@@ -1,0 +1,9 @@
+{
+  "extends": "@canonical/typescript-config",
+  "compilerOptions": {
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts"]
+}
