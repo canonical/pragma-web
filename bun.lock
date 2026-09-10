@@ -435,6 +435,7 @@
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.43.0",
+        "@canonical/design-tokens": "0.43.0",
         "@canonical/typescript-config": "0.43.0",
         "@canonical/typescript-config-react": "^0.45.0",
         "@canonical/vitest-config-react": "^0.45.0",
@@ -446,6 +447,7 @@
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "^6.0.0",
         "@vitest/coverage-v8": "^5.0.0",
+        "copyfiles": "^2.4.1",
         "jsdom": "^28.1.0",
         "typescript": "^7.0.2",
         "vite": "^8.0.1",
