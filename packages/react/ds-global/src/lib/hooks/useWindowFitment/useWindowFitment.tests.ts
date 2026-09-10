@@ -1,5 +1,5 @@
-import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { WindowFitmentSide } from "./types.js";
 import useWindowFitment, { computeArrowOffset } from "./useWindowFitment.js";
 
@@ -181,6 +181,148 @@ describe("useWindowFitment", () => {
     expect(result.current.bestPosition?.position).toEqual({
       top: 140,
       left: 20,
+    });
+  });
+});
+
+describe("useWindowFitment scroll positioning", () => {
+  let target: HTMLButtonElement;
+  let popup: HTMLDivElement;
+  let targetTop: number;
+  let viewport: EventTarget;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    targetTop = 100;
+    target = document.createElement("button");
+    popup = document.createElement("div");
+    document.body.append(target, popup);
+    target.getBoundingClientRect = () => makeRect(100, targetTop, 80, 20);
+    popup.getBoundingClientRect = () => makeRect(0, 0, 100, 60);
+
+    viewport = new EventTarget();
+    vi.stubGlobal("visualViewport", viewport);
+  });
+
+  afterEach(() => {
+    target.remove();
+    popup.remove();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  const renderOpenFitment = (scrollDelay = 150) => {
+    const hook = renderHook(() =>
+      useWindowFitment({
+        isOpen: true,
+        preferredDirections: ["block-end"],
+        scrollDelay,
+      }),
+    );
+    hook.result.current.targetRef.current = target;
+    hook.result.current.popupRef.current = popup;
+    hook.rerender();
+    return hook;
+  };
+
+  it("repositions on capture-phase ancestor scrolling", () => {
+    const hook = renderOpenFitment();
+    expect(hook.result.current.bestPosition?.position.top).toBe(120);
+
+    targetTop = 240;
+    const ancestor = document.createElement("div");
+    ancestor.append(target);
+    document.body.append(ancestor);
+    act(() => ancestor.dispatchEvent(new Event("scroll")));
+    act(() => vi.advanceTimersByTime(150));
+
+    expect(hook.result.current.bestPosition?.position.top).toBe(260);
+    ancestor.remove();
+  });
+
+  it("repositions on visual viewport scrolling", () => {
+    const hook = renderOpenFitment();
+    targetTop = 180;
+    act(() => viewport.dispatchEvent(new Event("scroll")));
+    act(() => vi.advanceTimersByTime(150));
+
+    expect(hook.result.current.bestPosition?.position.top).toBe(200);
+  });
+
+  it("honors scrollDelay before repositioning", () => {
+    const hook = renderOpenFitment(40);
+    targetTop = 180;
+    act(() => window.dispatchEvent(new Event("scroll")));
+    act(() => vi.advanceTimersByTime(39));
+    expect(hook.result.current.bestPosition?.position.top).toBe(120);
+    act(() => vi.advanceTimersByTime(1));
+    expect(hook.result.current.bestPosition?.position.top).toBe(200);
+  });
+
+  it("installs listeners only while open and cancels pending updates", () => {
+    const windowAdd = vi.spyOn(window, "addEventListener");
+    const windowRemove = vi.spyOn(window, "removeEventListener");
+    const viewportAdd = vi.spyOn(viewport, "addEventListener");
+    const viewportRemove = vi.spyOn(viewport, "removeEventListener");
+
+    const hook = renderHook(({ open }) => useWindowFitment({ isOpen: open }), {
+      initialProps: { open: false },
+    });
+    expect(windowAdd).not.toHaveBeenCalledWith(
+      "scroll",
+      expect.any(Function),
+      true,
+    );
+
+    hook.rerender({ open: true });
+    expect(windowAdd).toHaveBeenCalledWith(
+      "scroll",
+      expect.any(Function),
+      true,
+    );
+    expect(viewportAdd).toHaveBeenCalledWith("scroll", expect.any(Function));
+    act(() => viewport.dispatchEvent(new Event("scroll")));
+    hook.unmount();
+
+    expect(windowRemove).toHaveBeenCalledWith(
+      "scroll",
+      expect.any(Function),
+      true,
+    );
+    expect(viewportRemove).toHaveBeenCalledWith("scroll", expect.any(Function));
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("remeasures when reopened after the trigger moved without a scroll event", () => {
+    const hook = renderHook(
+      ({ open }) =>
+        useWindowFitment({
+          isOpen: open,
+          preferredDirections: ["block-end"],
+        }),
+      { initialProps: { open: true } },
+    );
+    hook.result.current.targetRef.current = target;
+    hook.result.current.popupRef.current = popup;
+    hook.rerender({ open: true });
+    expect(hook.result.current.bestPosition?.position.top).toBe(120);
+
+    hook.rerender({ open: false });
+    targetTop = 240;
+    hook.rerender({ open: true });
+
+    expect(hook.result.current.bestPosition?.position.top).toBe(260);
+  });
+
+  it("keeps a fully off-screen trigger at its natural popup position", () => {
+    targetTop = 900;
+    const hook = renderOpenFitment();
+
+    expect(hook.result.current.bestPosition).toMatchObject({
+      position: { top: 920, left: 90 },
+      fits: false,
+      autoFitOffset: { top: 0, left: 0 },
     });
   });
 });
