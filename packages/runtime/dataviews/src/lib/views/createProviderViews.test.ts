@@ -2,6 +2,7 @@ import { IDBFactory } from "fake-indexeddb";
 import { afterEach, describe, expect, it, type MockInstance, vi } from "vitest";
 import createDataViewsProvider from "../provider/createDataViewsProvider.js";
 import type { DataViewsProvider } from "../provider/types.js";
+import DEFAULT_WINDOW from "../query/defaultWindow.js";
 import createSchema from "../schema/createSchema.js";
 import createArraySource from "../source/createArraySource.js";
 import createIndexedDBViewStore from "./createIndexedDBViewStore.js";
@@ -70,7 +71,7 @@ const providerOver = (store: ViewStore): DataViewsProvider<Fields> => {
   const provider = createDataViewsProvider<Fields>({
     schema,
     capabilities,
-    window: { page: 3, size: 5 },
+    window: { ...DEFAULT_WINDOW, page: 3, size: 5 },
     views: store,
   });
   providers.push(provider);
@@ -93,7 +94,7 @@ const observed = async () => {
   const views = viewsOf(provider);
   const release = views.observe();
   await vi.waitFor(() => {
-    expect(views.state.get().listing.status).toBe("listed");
+    expect(views.state.get().listing.status).toBe("ready");
   });
   return { indexedDB, store, provider, views, release };
 };
@@ -102,7 +103,7 @@ const observed = async () => {
 const listed = async (views: ProviderViews): Promise<void> => {
   views.observe();
   await vi.waitFor(() => {
-    expect(views.state.get().listing.status).toBe("listed");
+    expect(views.state.get().listing.status).toBe("ready");
   });
 };
 
@@ -225,9 +226,9 @@ describe("createProviderViews", () => {
     }));
     const views = viewsOf(providerOver(standIn({ list })));
     views.observe();
-    expect(views.state.get().listing.status).toBe("loading");
+    expect(views.state.get().listing.status).toBe("pending");
     await vi.waitFor(() => {
-      expect(views.state.get().listing.status).toBe("listed");
+      expect(views.state.get().listing.status).toBe("ready");
     });
     expect(views.state.get().views.map((view) => view.name)).toEqual([
       "Failed",
@@ -265,10 +266,10 @@ describe("createProviderViews", () => {
     expect(unsubscribe).toHaveBeenCalledTimes(1);
     // Observed again, it stays listed rather than loading from scratch.
     await vi.waitFor(() => {
-      expect(views.state.get().listing.status).toBe("listed");
+      expect(views.state.get().listing.status).toBe("ready");
     });
     views.observe();
-    expect(views.state.get().listing.status).toBe("listed");
+    expect(views.state.get().listing.status).toBe("ready");
   });
 
   it("reports storage it cannot list, and lists again when asked", async () => {
@@ -280,13 +281,13 @@ describe("createProviderViews", () => {
     views.observe();
     await vi.waitFor(() => {
       expect(views.state.get().listing).toEqual({
-        status: "unavailable",
+        status: "failed",
         reason: "view storage is unavailable: blocked",
       });
     });
     views.reload();
     await vi.waitFor(() => {
-      expect(views.state.get().listing.status).toBe("listed");
+      expect(views.state.get().listing.status).toBe("ready");
     });
     expect(views.state.get().views).toHaveLength(1);
   });
@@ -307,13 +308,13 @@ describe("createProviderViews", () => {
     views.reload();
     views.reload();
     await vi.waitFor(() => {
-      expect(views.state.get().listing.status).toBe("listed");
+      expect(views.state.get().listing.status).toBe("ready");
     });
     early.resolve({ views: [], unreadable: [] });
     failing.reject(new Error("too late"));
     await Promise.allSettled([early.promise, failing.promise]);
     expect(views.state.get()).toMatchObject({
-      listing: { status: "listed" },
+      listing: { status: "ready" },
       views: [{ name: "Latest" }],
     });
   });
@@ -343,7 +344,7 @@ describe("createProviderViews opening and saving", () => {
     const { provider, views } = await observed();
     failedOnly(provider);
     await views.saveAs("Failed");
-    provider.navigateWindow(2);
+    provider.navigateWindow({ page: 2 });
     expect(views.state.get().modified).toBe(false);
     provider.fields.cores.gte.edit("8");
     expect(views.state.get().modified).toBe(true);
@@ -361,7 +362,7 @@ describe("createProviderViews opening and saving", () => {
     });
     provider.fields.cores.gte.edit("8");
     provider.fields.cores.gte.edit("16");
-    provider.navigateWindow(2);
+    provider.navigateWindow({ page: 2 });
     expect(published).toEqual([true]);
   });
 
@@ -372,24 +373,28 @@ describe("createProviderViews opening and saving", () => {
     provider.fields.status.eq.clear();
     const outcome = await views.open(view.id);
     expect(outcome).toEqual({ status: "opened", view });
-    expect(provider.result.get().slice.filter).toEqual([
+    expect(provider.state.get().slice.filter).toEqual([
       { field: "status", operator: "eq", operands: ["failed"] },
     ]);
-    expect(provider.result.get().window).toEqual({ page: 1, size: 5 });
+    expect(provider.state.get().window).toEqual({
+      ...DEFAULT_WINDOW,
+      page: 1,
+      size: 5,
+    });
     expect(views.state.get()).toMatchObject({ current: view, modified: false });
   });
 
   it("resets to the open view's query, and does nothing with none open", async () => {
     const { provider, views } = await observed();
     views.reset();
-    expect(provider.result.get().window.page).toBe(3);
+    expect(provider.state.get().window.page).toBe(3);
     failedOnly(provider);
     await views.saveAs("Failed");
     provider.fields.status.eq.set(["running"]);
-    provider.navigateWindow(4);
+    provider.navigateWindow({ page: 4 });
     views.reset();
-    expect(provider.result.get().slice.filter[0].operands).toEqual(["failed"]);
-    expect(provider.result.get().window.page).toBe(1);
+    expect(provider.state.get().slice.filter[0].operands).toEqual(["failed"]);
+    expect(provider.state.get().window.page).toBe(1);
     expect(views.state.get().modified).toBe(false);
   });
 
@@ -568,7 +573,7 @@ describe("createProviderViews across tabs", () => {
     provider.fields.cores.gte.edit("8");
     await views.save();
     views.reset();
-    expect(provider.result.get().slice.filter).toEqual([
+    expect(provider.state.get().slice.filter).toEqual([
       { field: "status", operator: "eq", operands: ["running"] },
     ]);
     expect(views.state.get()).toMatchObject({
@@ -599,7 +604,7 @@ describe("createProviderViews across tabs", () => {
     provider.fields.cores.gte.edit("8");
     expect(await views.save()).toEqual({ status: "missing" });
     expect(views.state.get().current).toBeNull();
-    expect(provider.result.get().slice.filter).toHaveLength(2);
+    expect(provider.state.get().slice.filter).toHaveLength(2);
   });
 
   it("hears the other tab's deletion and lets the identity go", async () => {
@@ -610,7 +615,7 @@ describe("createProviderViews across tabs", () => {
     await vi.waitFor(() => {
       expect(views.state.get().current).toBeNull();
     });
-    expect(provider.result.get().slice.filter).toHaveLength(1);
+    expect(provider.state.get().slice.filter).toHaveLength(1);
   });
 
   it("conflicts on rename and on delete, and succeeds on the retry", async () => {
@@ -632,7 +637,7 @@ describe("createProviderViews across tabs", () => {
     expect((await views.remove()).status).toBe("conflict");
     expect(await views.remove()).toEqual({ status: "removed" });
     expect(views.state.get().current).toBeNull();
-    expect(provider.result.get().slice.filter).toHaveLength(1);
+    expect(provider.state.get().slice.filter).toHaveLength(1);
   });
 
   it("reports an unreadable record on delete", async () => {
@@ -958,7 +963,7 @@ describe("createProviderViews lifetime", () => {
     // The outcome still answers the caller; the state no longer moves.
     expect((await opening).status).toBe("opened");
     expect(views.state.get()).toBe(before);
-    expect(provider.result.get().slice.filter).toEqual([]);
+    expect(provider.state.get().slice.filter).toEqual([]);
   });
 });
 
@@ -1003,7 +1008,7 @@ describe("createProviderViews races and failures", () => {
         },
       ],
     });
-    expect(provider.result.get().slice.filter).toEqual([]);
+    expect(provider.state.get().slice.filter).toEqual([]);
   });
 
   it("opens a view saved in another renderer: a query applies in any", async () => {
@@ -1034,7 +1039,7 @@ describe("createProviderViews races and failures", () => {
     gate.resolve();
     expect((await opening).status).toBe("opened");
     expect(views.state.get()).toMatchObject({ current: null, operation: null });
-    expect(provider.result.get().slice.filter).toEqual([]);
+    expect(provider.state.get().slice.filter).toEqual([]);
   });
 
   it("keeps a change it could not save, reported, through later reads, until retried", async () => {
