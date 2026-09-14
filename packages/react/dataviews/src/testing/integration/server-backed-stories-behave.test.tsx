@@ -69,12 +69,21 @@ describe("server-backed stories behave", () => {
       rest.getByRole("group", { name: labels.status }),
     ).toBeInTheDocument();
     expect(rest.getByLabelText(`${labels.cores} from`)).toBeInTheDocument();
+    expect(rest.getByLabelText(`${labels.name} contains`)).toBeInTheDocument();
+    expect(
+      rest.getByLabelText(`${labels.region} contains`),
+    ).toBeInTheDocument();
     const pageSizes = within(rest.getByLabelText("Items per page:"));
     for (const size of sizes) {
       expect(
         pageSizes.getByRole("option", { name: String(size) }),
       ).toBeInTheDocument();
     }
+    // Only this endpoint looks through the owner, so only it names its input.
+    const graphql = await renderFirstPage(endpoints["GraphQL API"].Answered);
+    expect(
+      graphql.getByLabelText(`${labels.owner} contains`),
+    ).toBeInTheDocument();
   });
 
   // A story's run removes the one before it; the last is removed by no later
