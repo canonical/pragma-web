@@ -93,3 +93,19 @@ export type ContainsCase = {
   /** What the case pins, for a failure to say. */
   readonly pins: string;
 };
+
+/** One answer from the mock machine API: its HTTP status and its parsed body. */
+export type MockApiAnswer = {
+  readonly status: number;
+  readonly body: unknown;
+};
+
+/** What a mock server has done with the one request a test follows. */
+export type MockRequestWatch = {
+  /** Settles once the server has received the request. */
+  readonly received: Promise<void>;
+  /** Whether the server has finished with it, answering it or not. */
+  readonly hasEnded: () => boolean;
+  /** Stop following the server's events. */
+  readonly stop: () => void;
+};

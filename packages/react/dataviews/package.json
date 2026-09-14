@@ -88,6 +88,7 @@
     "axe-core": "^4.11.1",
     "copyfiles": "^2.4.1",
     "jsdom": "^28.1.0",
+    "msw": "^2.12.10",
     "playwright": "^1.61.1",
     "storybook": "^10.6.0",
     "typescript": "^7.0.2",
