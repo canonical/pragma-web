@@ -20,6 +20,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "testing/**/*.ts",
+    "testing/**/*.tsx",
     ".storybook/*.ts",
     ".storybook/*.tsx",
     "vite.config.ts",
