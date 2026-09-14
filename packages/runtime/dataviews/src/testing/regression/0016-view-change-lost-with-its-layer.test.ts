@@ -35,9 +35,9 @@ describe("regression 0016 — a view's change lost with its layer", () => {
       }),
     });
     const release = presentation.observe();
-    presentation.show({ id: "a", presentation: null });
+    presentation.show({ id: "a", presentation: {} });
     presentation.arrange({ width: 150 });
-    presentation.show({ id: "b", presentation: null });
+    presentation.show({ id: "b", presentation: {} });
     await flushPresentation(patchPresentation);
     expect(presentation.state.get().presentationReason).toBe(
       "view storage failed",
@@ -50,7 +50,7 @@ describe("regression 0016 — a view's change lost with its layer", () => {
       { width: 150 },
     );
     // Shown again, the view keeps the change made to it before.
-    presentation.show({ id: "a", presentation: null });
+    presentation.show({ id: "a", presentation: {} });
     expect(presentation.state.get().presentation).toEqual({ width: 150 });
     release();
   });
