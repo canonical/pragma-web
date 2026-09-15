@@ -124,6 +124,7 @@ describe("public surface", () => {
   it("hands framework bindings their shared machinery from ./bindings", () => {
     expect(Object.keys(bindings).sort()).toEqual([
       "DISPLAY_STATUS_PHASES",
+      "applyQueryCommand",
       "areDisplayStatusesEqual",
       "areListsEqual",
       "areSizingsEqual",
