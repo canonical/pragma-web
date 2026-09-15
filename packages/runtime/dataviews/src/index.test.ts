@@ -83,7 +83,7 @@ describe("public surface", () => {
     });
     const release = provider.observe();
     expect(provider.state.get().slice.filter).toEqual([
-      { field: "status", operator: "eq", operands: ["failed"] },
+      { field: "status", operator: "isAny", operands: ["failed"] },
     ]);
     expect(location.read().toString()).toBe("status=failed&page=1&size=50");
     expect(provider.issues.get()).toEqual([]);

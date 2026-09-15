@@ -55,7 +55,7 @@ const collection = createCollection({
 
 /** Every filter these scenarios apply, and nothing else: no search. */
 const capabilities = declare({
-  filter: { status: ["eq"], cores: ["gte", "lte"] },
+  filter: { status: ["isAny"], cores: ["gte", "lte"] },
 });
 
 afterEach(() => {
@@ -124,7 +124,11 @@ const readView = (outcome: ViewOutcome): SavedView => {
 };
 
 const filterFailedOnly = (host: Host): void => {
-  host.setPredicate({ field: "status", operator: "eq", operands: ["failed"] });
+  host.setPredicate({
+    field: "status",
+    operator: "isAny",
+    operands: ["failed"],
+  });
 };
 
 const filterCoresAtLeast = (host: Host, cores: number): void => {
@@ -409,7 +413,7 @@ describe("createSavedViews", () => {
       const { provider, host, views } = await observeFreshProvider();
       filterFailedOnly(host);
       const view = readView(await views.saveAs("Failed"));
-      host.removePredicate("status", "eq");
+      host.removePredicate("status", "isAny");
       // A collapsed group and a cursor belong to the query they were made
       // under: neither survives the view's.
       host.adopt(
@@ -427,7 +431,7 @@ describe("createSavedViews", () => {
       const outcome = await views.open(view.id);
       expect(outcome).toEqual({ status: "opened", view });
       expect(provider.state.get().slice.filter).toEqual([
-        { field: "status", operator: "eq", operands: ["failed"] },
+        { field: "status", operator: "isAny", operands: ["failed"] },
       ]);
       expect(provider.state.get().window).toEqual({
         ...DEFAULT_WINDOW,
@@ -448,7 +452,7 @@ describe("createSavedViews", () => {
       await views.saveAs("Failed");
       host.setPredicate({
         field: "status",
-        operator: "eq",
+        operator: "isAny",
         operands: ["running"],
       });
       provider.navigateWindow({ page: 4 });
@@ -724,7 +728,7 @@ describe("createSavedViews", () => {
       expect(host.view.get()).toBeNull();
       expect(views.state.get().current).toBeNull();
       expect(provider.state.get().slice.filter).toEqual([
-        { field: "status", operator: "eq", operands: ["failed"] },
+        { field: "status", operator: "isAny", operands: ["failed"] },
       ]);
       // Respelt in place without the id: no step of history.
       expect(writes.at(-1)).toEqual([
@@ -774,7 +778,7 @@ describe("createSavedViews", () => {
       expect(host.view.get()).toBeNull();
       expect(views.state.get().current).toBeNull();
       expect(provider.state.get().slice.filter).toEqual([
-        { field: "status", operator: "eq", operands: ["failed"] },
+        { field: "status", operator: "isAny", operands: ["failed"] },
       ]);
       expect(writes.at(-1)).toEqual([
         "status=failed&page=1&size=50",
@@ -951,7 +955,7 @@ describe("createSavedViews", () => {
       await views.save();
       views.revert();
       expect(provider.state.get().slice.filter).toEqual([
-        { field: "status", operator: "eq", operands: ["running"] },
+        { field: "status", operator: "isAny", operands: ["running"] },
       ]);
       expect(views.state.get()).toMatchObject({
         modified: false,
@@ -1187,7 +1191,7 @@ describe("createSavedViews", () => {
       expect((await opening).status).toBe("opened");
       expect(views.state.get().current).toEqual(view);
       expect(provider.state.get().slice.filter).toEqual([
-        { field: "status", operator: "eq", operands: ["failed"] },
+        { field: "status", operator: "isAny", operands: ["failed"] },
       ]);
     });
   });

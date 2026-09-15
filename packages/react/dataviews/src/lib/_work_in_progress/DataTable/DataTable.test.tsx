@@ -1193,7 +1193,7 @@ describe("DataTable", () => {
     const { provider } = createMachineProvider({
       rows: [machine("m-1", "alpha")],
       capabilities: declareCapabilities(machines, {
-        filter: { status: ["eq"] },
+        filter: { status: ["isAny"] },
         sort: {
           fields: ["name"],
           terms: 1,

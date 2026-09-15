@@ -53,7 +53,7 @@ queryClient.mount();
 // What the endpoint runs: the parts offer this and nothing else.
 const capabilities = declareCapabilities(machineCollection, {
   filter: {
-    status: ["eq"],
+    status: ["isAny"],
     cores: ["gte", "lte"],
     name: ["contains"],
     region: ["contains"],
