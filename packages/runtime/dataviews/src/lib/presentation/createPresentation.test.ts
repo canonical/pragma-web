@@ -47,13 +47,14 @@ describe("createPresentation", () => {
     });
     expect(presentation.state.get()).toEqual({
       presentation: {},
+      own: {},
       presentationReason: null,
     });
     expect(readPresentation).not.toHaveBeenCalled();
     expect(subscribe).not.toHaveBeenCalled();
   });
 
-  it("publishes nothing for a change that moves nothing", () => {
+  it("publishes nothing for a change that moves nothing, and once for the view's own layer shown", () => {
     const presentation = createPresentation();
     let published = 0;
     presentation.state.subscribe(() => {
@@ -64,7 +65,10 @@ describe("createPresentation", () => {
     const view = { id: "v1", presentation: { width: 120 } };
     presentation.show(view);
     presentation.show(view);
-    expect(published).toBe(1);
+    // The arrangement in force is the same; the viewer's own layer is now the
+    // view's, which holds nothing yet.
+    expect(published).toBe(2);
+    expect(presentation.state.get().own).toEqual({});
   });
 
   it("hands its state out read-only at runtime", () => {
@@ -475,6 +479,7 @@ describe("createPresentation", () => {
     presentation.show(null);
     expect(presentation.state.get()).toEqual({
       presentation: {},
+      own: {},
       presentationReason: null,
     });
     presentation.refresh();
@@ -541,6 +546,7 @@ describe("createPresentation", () => {
     await vi.advanceTimersByTimeAsync(WRITE_DEADLINE);
     expect(presentation.state.get()).toEqual({
       presentation: { width: 120, height: 1 },
+      own: { width: 120, height: 1 },
       presentationReason: "view storage failed: quota exceeded",
     });
     presentation.refresh();
@@ -598,6 +604,7 @@ describe("createPresentation", () => {
     expect(patchPresentation).toHaveBeenCalledTimes(2);
     expect(presentation.state.get()).toEqual({
       presentation: { width: 130 },
+      own: { width: 130 },
       presentationReason: null,
     });
   });
@@ -849,6 +856,7 @@ describe("createPresentation restored", () => {
     });
     expect(presentation.state.get()).toEqual({
       presentation: restored,
+      own: restored,
       presentationReason: null,
     });
     expect(readArrangement(presentation)).not.toBe(restored);
