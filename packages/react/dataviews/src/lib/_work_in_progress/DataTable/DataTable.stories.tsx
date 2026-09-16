@@ -552,7 +552,9 @@ function FramedMachines(args: StoryTableProps): ReactElement {
  * caller's native props — here a capped height, within which the table
  * scrolls under its sticky header — and the footer holds the pagination bar
  * beneath the table, outside the table role, so it is reached as a landmark
- * and never read as a row.
+ * and never read as a row. The play checks where the bar is placed; the
+ * capped scroll, the sticky footer and its stacking are the stylesheet's,
+ * pinned by its own tests.
  */
 export const FrameAndFooter: Story = {
   parameters: consumerCode({

@@ -8,7 +8,7 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
 import { createMachineProvider } from "../../../../../../testing/machines.js";
-import narrowRootFilters from "./narrowRootFilters.js";
+import narrowRootFilters, * as module from "./narrowRootFilters.js";
 
 describe("narrowRootFilters", () => {
   it("answers the handles it is handed", () => {
@@ -17,5 +17,9 @@ describe("narrowRootFilters", () => {
       host: readProviderHost(provider),
     });
     expect(narrowRootFilters(handles)).toBe(handles);
+  });
+
+  it("is its module's one export", () => {
+    expect(Object.keys(module)).toEqual(["default"]);
   });
 });

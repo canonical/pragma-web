@@ -14,6 +14,10 @@ describe("Announcer stylesheet", () => {
     const rule = sheet.match(/\.ds\.data-views-announcer \{([^{}]*)\}/)?.at(1);
     expect(rule).toBeDefined();
     expect(rule).toMatch(/position:\s*absolute;/);
+    // The one-pixel box every word read and not drawn is clipped to.
+    expect(rule).toMatch(
+      /inline-size:\s*1px;\s*block-size:\s*1px;\s*margin:\s*-1px;\s*padding:\s*0;/,
+    );
     expect(rule).toMatch(/clip-path:\s*inset\(50%\);/);
     expect(rule).toMatch(/overflow:\s*hidden;/);
     expect(rule).toMatch(/white-space:\s*nowrap;/);

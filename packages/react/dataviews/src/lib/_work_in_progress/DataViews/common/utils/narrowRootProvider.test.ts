@@ -4,12 +4,16 @@
  */
 import { describe, expect, it } from "vitest";
 import { createMachineProvider } from "../../../../../../testing/machines.js";
-import narrowRootProvider from "./narrowRootProvider.js";
+import narrowRootProvider, * as module from "./narrowRootProvider.js";
 import widenRootProvider from "./widenRootProvider.js";
 
 describe("narrowRootProvider", () => {
   it("answers the stored provider it is handed", () => {
     const { provider } = createMachineProvider();
     expect(narrowRootProvider(widenRootProvider(provider))).toBe(provider);
+  });
+
+  it("is its module's one export", () => {
+    expect(Object.keys(module)).toEqual(["default"]);
   });
 });

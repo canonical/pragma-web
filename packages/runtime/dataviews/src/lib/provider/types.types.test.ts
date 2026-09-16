@@ -3,13 +3,16 @@
  * writes one: a provider's ordering command, and a source's declared default.
  * A misspelt field does not compile. Each refused call sits beside the same
  * call spelled correctly, so the expected error can only be the field's.
+ * The provider's host, beside them, answers no fact the collection and the
+ * row scopes already read.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import createManualSource from "../../../testing/createManualSource.js";
 import { createCollection } from "../collection/index.js";
 import { declareCapabilities } from "../source/index.js";
 import createDataViewsProvider from "./createDataViewsProvider.js";
+import type { ProviderHost } from "./types.js";
 
 type Machine = { readonly id: string; readonly name: string };
 
@@ -53,5 +56,14 @@ describe("typed sort terms", () => {
       });
     };
     expect(declares).toBeTypeOf("function");
+  });
+});
+
+describe("ProviderHost", () => {
+  it("answers neither a row's type nor whether a field applies to it", () => {
+    // A row's type is the collection's compiled reader's, published by the
+    // row scopes; whether a field applies is `readApplicability`'s.
+    expectTypeOf<ProviderHost>().not.toHaveProperty("readType");
+    expectTypeOf<ProviderHost>().not.toHaveProperty("applicability");
   });
 });

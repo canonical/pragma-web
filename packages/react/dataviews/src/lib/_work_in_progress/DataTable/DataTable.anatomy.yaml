@@ -73,7 +73,9 @@
 #                       which stays the single-pointer and keyboard path; the
 #                       press completes on a timer while the pointer is down,
 #                       selects only a row and is undone by deselecting it,
-#                       and entering and leaving the mode are announced
+#                       and entering and leaving the mode are announced;
+#                       selection withdrawn by the application ends the mode
+#                       unannounced, its controls leaving with it
 #   status row          "pending/regrouping/failed/refresh-failed/stale/no-data/no-results"
 #                       (1.3.1, 1.4.1, 4.1.3). The cell is `role=cell`, not a
 #                       live region; a settled outcome — failed, stale,

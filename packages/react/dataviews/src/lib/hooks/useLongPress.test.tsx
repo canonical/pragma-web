@@ -234,4 +234,56 @@ describe("useLongPress", () => {
     vi.advanceTimersByTime(LONG_PRESS_MS);
     expect(onLongPress).toHaveBeenCalledTimes(1);
   });
+
+  it("claims no click while taps are not its handler's", () => {
+    const claim = vi.fn(() => "row");
+    const Untapped = () => {
+      const gestures = useLongPress({ claim, onLongPress: () => undefined });
+      return (
+        // biome-ignore lint/a11y/useSemanticElements: the row under test is structure, as the table's is
+        // biome-ignore lint/a11y/useFocusableInteractive: the gestures are an enhancement over the row's own controls
+        <div role="row" {...gestures}>
+          row
+        </div>
+      );
+    };
+    render(<Untapped />);
+    fireEvent.click(screen.getByRole("row"));
+    expect(claim).not.toHaveBeenCalled();
+  });
+
+  it("hands a press and a tap what the claim answered, and nothing unclaimed", () => {
+    const onLongPress = vi.fn();
+    const onTap = vi.fn();
+    const Rows = () => {
+      const gestures = useLongPress({
+        claim: (target) =>
+          target instanceof Element ? target.getAttribute("data-row-id") : null,
+        onLongPress,
+        onTap,
+      });
+      return (
+        <div {...gestures}>
+          <span data-row-id="r-1">one</span>
+          <span>header</span>
+        </div>
+      );
+    };
+    render(<Rows />);
+    const claimed = screen.getByText("one");
+    const unclaimed = screen.getByText("header");
+    fireEvent.pointerDown(claimed, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).toHaveBeenCalledWith("r-1");
+    fireEvent.pointerUp(claimed, touch);
+    fireEvent.click(claimed);
+    fireEvent.click(claimed);
+    expect(onTap).toHaveBeenCalledTimes(1);
+    expect(onTap).toHaveBeenCalledWith("r-1");
+    fireEvent.pointerDown(unclaimed, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    fireEvent.click(unclaimed);
+    expect(onLongPress).toHaveBeenCalledTimes(1);
+    expect(onTap).toHaveBeenCalledTimes(1);
+  });
 });

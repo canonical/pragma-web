@@ -127,9 +127,10 @@ export type RowScopesConfig<TRow extends object = RowRecord> = {
   readonly fields: readonly string[];
   /**
    * Reads a record's declared type, as `compileRecordTypeReader` compiles it
-   * for the collection. Left out, every row's type is null.
+   * for the collection. Required, so a binding over a collection of several
+   * types cannot forget it and draw every scoped field as not applicable.
    */
-  readonly readType?: ((row: TRow) => string | null) | undefined;
+  readonly readType: (row: TRow) => string | null;
 };
 
 /**

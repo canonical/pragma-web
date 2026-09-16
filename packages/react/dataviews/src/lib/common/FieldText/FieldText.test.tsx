@@ -28,6 +28,7 @@ describe("FieldText", () => {
       rows: provider.rows,
       selection: provider.selection,
       fields: ["cores", "name"],
+      readType: () => null,
     });
     onTestFinished(scopes.observe());
     const { fields } = scopes.readRow("m-1");

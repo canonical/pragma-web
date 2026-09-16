@@ -129,9 +129,13 @@ export default function useLongPress<TClaim>({
         event.stopPropagation();
         return;
       }
-      const claimed = latest.current.claim(event.target, event.currentTarget);
+      const { claim, onTap } = latest.current;
+      if (onTap === undefined) {
+        return;
+      }
+      const claimed = claim(event.target, event.currentTarget);
       if (claimed !== null) {
-        latest.current.onTap(claimed);
+        onTap(claimed);
       }
     },
     onContextMenu: (event) => {

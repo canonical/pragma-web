@@ -29,6 +29,7 @@ const rowOf = () => {
     rows: provider.rows,
     selection: provider.selection,
     fields: ["name"],
+    readType: () => null,
   });
   onTestFinished(scopes.observe());
   const channels = scopes.readRow("m-1");

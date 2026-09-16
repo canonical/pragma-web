@@ -181,8 +181,11 @@ export type UseLongPressProps<TClaim> = {
   ) => TClaim | null;
   /** A touch held still for the delay, handed what it is still over. */
   readonly onLongPress: (claimed: TClaim) => void;
-  /** A click that was not the release of a long press: a tap, or a mouse click. */
-  readonly onTap: (claimed: TClaim) => void;
+  /**
+   * A click that was not the release of a long press: a tap, or a mouse
+   * click. Left out while taps are not the handler's, so no click is claimed.
+   */
+  readonly onTap?: ((claimed: TClaim) => void) | undefined;
 };
 
 /** What `useLongPress` answers: the handlers the pressed element takes. */

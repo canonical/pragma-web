@@ -1,13 +1,8 @@
 /**
- * The recipes pages declared their columns with `createColumns`, and the
- * stories beside them still showed, and ran, columns typed by hand as
- * `readonly DataTableColumn[]`: a reader copying a story's code got the
- * shape the pages had moved away from, with no field checked against the
- * collection.
- *
- * Every story declares and shows its columns through `createColumns`, but
- * for a column over a record value the schema does not declare, which
- * `createColumns` cannot name and which stays typed by hand.
+ * Every story declares and shows its columns through `createColumns`, as the
+ * recipes pages do, so the code a reader copies checks each field against
+ * the collection. A column over a record value the schema does not declare,
+ * which `createColumns` cannot name, stays typed by hand.
  */
 
 import { readdirSync, readFileSync } from "node:fs";

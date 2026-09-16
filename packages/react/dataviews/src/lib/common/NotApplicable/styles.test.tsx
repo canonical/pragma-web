@@ -22,4 +22,25 @@ describe("NotApplicable stylesheet", () => {
     // Clipped, never removed from the accessibility tree.
     expect(rule).not.toMatch(/display:\s*none|visibility:\s*hidden/);
   });
+
+  it("is brought by the component, so no renderer clips its word", () => {
+    const source = readFileSync(
+      path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "NotApplicable.tsx",
+      ),
+      "utf8",
+    );
+    expect(source).toMatch(/import "\.\/styles\.css";/);
+    for (const renderer of ["DataTable", "Cards"]) {
+      const rendererSheet = readFileSync(
+        path.join(
+          path.dirname(fileURLToPath(import.meta.url)),
+          `../../_work_in_progress/${renderer}/styles.css`,
+        ),
+        "utf8",
+      ).replace(/\/\*[\s\S]*?\*\//g, "");
+      expect(rendererSheet, renderer).not.toMatch(/not-applicable/);
+    }
+  });
 });

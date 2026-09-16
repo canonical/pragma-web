@@ -4,11 +4,15 @@
  */
 import { describe, expect, it } from "vitest";
 import { createMachineProvider } from "../../../../../../testing/machines.js";
-import widenRootProvider from "./widenRootProvider.js";
+import widenRootProvider, * as module from "./widenRootProvider.js";
 
 describe("widenRootProvider", () => {
   it("answers the provider it is handed", () => {
     const { provider } = createMachineProvider();
     expect(widenRootProvider(provider)).toBe(provider);
+  });
+
+  it("is its module's one export", () => {
+    expect(Object.keys(module)).toEqual(["default"]);
   });
 });

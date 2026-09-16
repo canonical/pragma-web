@@ -154,7 +154,7 @@ A collection whose records come in several types declares them on one `choices` 
 
 ## Selection on touch
 
-The checkbox is the selection's baseline path everywhere. On touch, a long press on a row selects it and puts the table in selection mode, where a tap on a row toggles it; a tap on one of the row's own controls — its checkbox, a link in a cell — is that control's alone. Deselecting the last row ends the mode. Entering and leaving are announced through the messages record (`selectionModeEntered`, `selectionModeEnded`), and the mode is stated on the table as `data-selection-mode="true"` while it holds, so a stylesheet may select it by attribute. A row's own selected state is its `aria-selected`, with no class repeating it.
+The checkbox is the selection's baseline path everywhere. On touch, a long press on a row selects it and puts the table in selection mode, where a tap on a row toggles it; a tap on one of the row's own controls — its checkbox, a link in a cell — is that control's alone. Deselecting the last row ends the mode, as does a table that stops offering selection. Entering and leaving by selection are announced through the messages record (`selectionModeEntered`, `selectionModeEnded`), and the mode is stated on the table as `data-selection-mode="true"` while it holds, so a stylesheet may select it by attribute. A row's own selected state is its `aria-selected`, with no class repeating it.
 
 <Canvas of={Stories.SelectionOnTouch} sourceState="none" />
 

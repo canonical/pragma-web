@@ -1,6 +1,7 @@
 /** The rendered reading carries what the model reading deliberately does not. */
 import { describe, expect, it } from "vitest";
 import type { DataTableColumn } from "../../types.js";
+import areBodyColumnsEqual from "./areBodyColumnsEqual.js";
 import areColumnsEqual from "./areColumnsEqual.js";
 
 const name: DataTableColumn = { id: "name", header: "Name" };
@@ -38,5 +39,29 @@ describe("areColumnsEqual", () => {
     expect(areColumnsEqual([scoped], [name])).toBe(false);
     expect(areColumnsEqual([name], [{ ...name, rowHeader: true }])).toBe(false);
     expect(areColumnsEqual([name], [{ ...name, hideable: false }])).toBe(false);
+  });
+
+  it("tells apart every pair the body's comparator does, and headings besides", () => {
+    const Cell = () => null;
+    const pairs: readonly (readonly [DataTableColumn, DataTableColumn])[] = [
+      [name, { ...name, cell: Cell }],
+      [name, { ...name, rowHeader: true }],
+      [name, { ...name, appliesTo: ["container"] }],
+      [name, { ...name, field: "status" }],
+    ];
+    for (const [a, b] of pairs) {
+      expect(areBodyColumnsEqual([a], [b])).toBe(false);
+      expect(areColumnsEqual([a], [b])).toBe(false);
+    }
+    const headings: readonly DataTableColumn[] = [
+      { ...name, header: "Host" },
+      { ...name, sortable: false },
+      { ...name, resizable: false },
+      { ...name, hideable: false },
+    ];
+    for (const other of headings) {
+      expect(areBodyColumnsEqual([name], [other])).toBe(true);
+      expect(areColumnsEqual([name], [other])).toBe(false);
+    }
   });
 });

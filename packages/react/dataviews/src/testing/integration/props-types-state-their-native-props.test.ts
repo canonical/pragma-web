@@ -1,11 +1,7 @@
 /**
- * Five component props types the typed table added neither extended their
- * root element's native props nor said why not, where every sibling says
- * one or the other.
- *
- * Every component props type in the package extends native props, is
- * derived from another component's props that do, or carries the exemption
- * note.
+ * Every component props type in the package extends its root element's
+ * native props, is derived from another component's props that do, or says
+ * why it does not.
  */
 
 import { readdirSync, readFileSync } from "node:fs";

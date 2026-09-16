@@ -27,6 +27,7 @@ const observeRow = (fields: readonly string[]) => {
     rows: provider.rows,
     selection: provider.selection,
     fields,
+    readType: () => null,
   });
   const releaseScopes = scopes.observe();
   onTestFinished(() => {
@@ -48,6 +49,7 @@ const channelsOver = (fields: readonly string[]) => {
     rows: provider.rows,
     selection: provider.selection,
     fields,
+    readType: () => null,
   });
   return { provider, channels: scopes.readRow("m-1") };
 };

@@ -22,6 +22,7 @@ describe("NamedCheckbox", () => {
       rows: provider.rows,
       selection: provider.selection,
       fields: [],
+      readType: () => null,
     }).readRow("m-1");
     render(
       <NamedCheckbox

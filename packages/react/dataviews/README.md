@@ -116,8 +116,6 @@ The pagination bar's selects are the design system's `SelectInput`, whose input 
 
 Every defect fixed carries a numbered regression test in `src/testing/regression/`, named for what went wrong. A regression about work done rather than what is drawn — a render, a subscription, an arrangement resolved again — counts that work through a `vi.mock` pass-through: the mocked module wraps the real one, calls it, and counts the call, so the component under test runs unchanged and only the count is added. A regression never swaps real behaviour for a stub, and asserts it counted something before it asserts a count did not grow, so a mock that stops applying cannot pass unseen.
 
-A regression is numbered for every finding a review fixes, not only for a behaviour that once failed where a reader could see it: a review finding about the shape of the code — a type that said more than it should, a module holding more than one export, a stylesheet or anatomy stating something the code does not — is pinned by a numbered regression too, so it cannot come back unseen. That goes beyond the code standards' regression structure, which reserves the folder for once-broken behaviour, and is kept as this package's practice.
-
 ## DataTable recipes
 
 The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / DataTable / Recipes** — under **DataViews** in the Storybook hub — source in [`src/lib/_work_in_progress/DataTable/DataTable.mdx`](src/lib/_work_in_progress/DataTable/DataTable.mdx):

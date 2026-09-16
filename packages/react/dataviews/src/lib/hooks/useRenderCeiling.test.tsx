@@ -88,4 +88,29 @@ describe("useRenderCeiling", () => {
     );
     expect(warned).toHaveBeenCalledTimes(1);
   });
+
+  it("words the unit and the remedy from the renderer alone", () => {
+    const warned = warn();
+    render(
+      <>
+        <Renderer
+          renderer="DataTable"
+          count={RENDER_CEILING + 1}
+          virtualized={false}
+        />
+        <Renderer
+          renderer="Cards"
+          count={RENDER_CEILING + 1}
+          virtualized={false}
+        />
+      </>,
+    );
+    const [table, cards] = warned.mock.calls.map((call) => String(call.at(0)));
+    expect(table).toMatch(
+      /^DataTable renders 501 rows at once.*virtualizeRows/,
+    );
+    expect(cards).toMatch(
+      /^Cards renders 501 cards at once.*no virtualization to opt into/,
+    );
+  });
 });
