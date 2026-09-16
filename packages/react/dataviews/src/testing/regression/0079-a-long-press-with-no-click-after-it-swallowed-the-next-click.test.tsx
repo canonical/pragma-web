@@ -15,7 +15,11 @@ import { LONG_PRESS_MS } from "../../lib/hooks/constants.js";
 import useLongPress from "../../lib/hooks/useLongPress.js";
 
 const Pressable = ({ onTap }: { readonly onTap: () => void }) => {
-  const gestures = useLongPress({ onLongPress: () => undefined, onTap });
+  const gestures = useLongPress({
+    claim: () => "row",
+    onLongPress: () => undefined,
+    onTap,
+  });
   return (
     // biome-ignore lint/a11y/useSemanticElements: the row under test is structure, as the table's is
     // biome-ignore lint/a11y/useFocusableInteractive: the gestures are an enhancement over the row's own controls

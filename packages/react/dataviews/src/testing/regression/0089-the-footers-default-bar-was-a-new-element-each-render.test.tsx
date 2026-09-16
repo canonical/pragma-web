@@ -18,12 +18,19 @@ const renders = vi.hoisted(() => ({ count: 0 }));
 
 vi.mock(
   "../../lib/_work_in_progress/DataViews/common/Pagination/Pagination.js",
-  () => ({
-    default: () => {
-      renders.count += 1;
-      return null;
-    },
-  }),
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("../../lib/_work_in_progress/DataViews/common/Pagination/Pagination.js")
+      >();
+    // A pass-through: the real bar renders, and each render is counted.
+    return {
+      default: (props: Parameters<typeof actual.default>[0]) => {
+        renders.count += 1;
+        return actual.default(props);
+      },
+    };
+  },
 );
 
 describe("the connected table's default footer", () => {

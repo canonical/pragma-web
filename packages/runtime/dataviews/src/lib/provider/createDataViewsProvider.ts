@@ -222,9 +222,6 @@ export default function createDataViewsProvider<
           });
     },
     complete,
-    typeOf(row: TRow): string | null {
-      return recordTyping?.typeOf(row) ?? null;
-    },
     recordType(id: string): string | null {
       return recordTyping?.recordType(id) ?? null;
     },

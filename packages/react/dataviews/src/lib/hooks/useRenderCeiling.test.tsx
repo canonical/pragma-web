@@ -29,9 +29,8 @@ describe("useRenderCeiling", () => {
     const { rerender } = render(
       <Renderer
         renderer="DataTable"
-        unit="rows"
         count={RENDER_CEILING + 1}
-        virtualization="available"
+        virtualized={false}
       />,
     );
     expect(warned).toHaveBeenCalledTimes(1);
@@ -41,9 +40,8 @@ describe("useRenderCeiling", () => {
     rerender(
       <Renderer
         renderer="DataTable"
-        unit="rows"
         count={RENDER_CEILING + 700}
-        virtualization="available"
+        virtualized={false}
       />,
     );
     expect(warned).toHaveBeenCalledTimes(1);
@@ -51,14 +49,7 @@ describe("useRenderCeiling", () => {
 
   it("says a renderer without virtualization has none to opt into, grouping the count", () => {
     const warned = warn();
-    render(
-      <Renderer
-        renderer="Cards"
-        unit="cards"
-        count={1200}
-        virtualization="none"
-      />,
-    );
+    render(<Renderer renderer="Cards" count={1200} virtualized={false} />);
     expect(warned.mock.calls.at(0)?.at(0)).toBe(
       "Cards renders 1,200 cards at once, past the 500 the package warns at. Measure it: this renderer has no virtualization to opt into. Every one is still rendered.",
     );
@@ -69,33 +60,18 @@ describe("useRenderCeiling", () => {
     render(
       <Renderer
         renderer="DataTable"
-        unit="rows"
         count={RENDER_CEILING}
-        virtualization="available"
+        virtualized={false}
       />,
     );
-    render(
-      <Renderer
-        renderer="DataTable"
-        unit="rows"
-        count={10_000}
-        virtualization="in-use"
-      />,
-    );
+    render(<Renderer renderer="DataTable" count={10_000} virtualized />);
     expect(warned).not.toHaveBeenCalled();
   });
 
   it("says nothing in a production build", () => {
     vi.stubEnv("NODE_ENV", "production");
     const warned = warn();
-    render(
-      <Renderer
-        renderer="Cards"
-        unit="cards"
-        count={10_000}
-        virtualization="none"
-      />,
-    );
+    render(<Renderer renderer="Cards" count={10_000} virtualized={false} />);
     expect(warned).not.toHaveBeenCalled();
   });
 
@@ -105,9 +81,8 @@ describe("useRenderCeiling", () => {
       <StrictMode>
         <Renderer
           renderer="DataTable"
-          unit="rows"
           count={RENDER_CEILING + 1}
-          virtualization="available"
+          virtualized={false}
         />
       </StrictMode>,
     );

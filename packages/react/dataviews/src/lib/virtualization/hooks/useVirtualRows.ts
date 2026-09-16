@@ -59,7 +59,7 @@ const readMounted = (body: HTMLDivElement | null): HTMLDivElement => {
   return body;
 };
 
-/** The viewport a body measures against: the table root, its parent. */
+/** The viewport a body measures against: the table, its parent. */
 const readViewport = (body: HTMLDivElement | null): HTMLElement =>
   // A mounted body is rendered inside the table's root, so it has a parent.
   readMounted(body).parentElement as HTMLElement;

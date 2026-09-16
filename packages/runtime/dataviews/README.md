@@ -166,7 +166,8 @@ export const instances = createCollection({
   empty. It satisfies no predicate, `isSet` included, and reads as absent to
   ordering, so filtering on a scoped field restricts the result to that field's
   types by meaning: nothing is added to the query, the URL or a saved view.
-  The host's `typeOf(row)` names the declared type a row carries, and
+  `compileRecordTypeReader(collection)` reads the declared type a row carries,
+  which the row scopes publish on each row's `type` channel, and
   `readApplicability(collection, field, type)` answers which state a cell is
   in: a renderer draws the third one as a dash carrying its own accessible
   text, so a reader can tell it from a field that is merely empty, and hands
@@ -180,13 +181,13 @@ export const instances = createCollection({
   identity, taken while the row was displayed and kept until the rows are next
   replaced after it leaves the selection, so an action's applicability to
   records selected on an earlier page is decidable without a lookup. The row
-  on display always answers for itself, so this never contradicts `typeOf`,
+  on display always answers for itself, so this never contradicts the row's `type`,
   and it changes only with a `rows` or a `selection` publication. An identity a
   host restored over rows this provider never modelled while they were
   selected answers null: not loaded, never assumed.
 
 **A monomorphic collection declares no `discriminator`, and none of this
-reaches it.** `collection.types` is null, `typeOf` answers null and
+reaches it.** `collection.types` is null, a row's type is null and
 `readApplicability` answers `"applies"` for every field, `recordType` answers
 null, no row is ever read for a type, and nothing costs anything.
 

@@ -1,6 +1,6 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import * as Stories from "./DataTable.stories";
-import * as Polymorphic from "./Polymorphic.stories";
+import * as Polymorphic from "./DataTable.polymorphic.stories";
 
 <Meta of={Stories} name="Recipes" />
 
@@ -57,7 +57,7 @@ export function Machines() {
 }
 ```
 
-Every column shows the record field its id names; `field` names a different one. Primitive values render as text, and anything else needs a cell renderer.
+Every column names the record field it shows, and its id is that field's name unless two columns show one field and one is given an `id`. Primitive values render as text, and anything else needs a cell renderer.
 
 <Canvas of={Stories.Default} sourceState="none" />
 
@@ -154,7 +154,7 @@ A collection whose records come in several types declares them on one `choices` 
 
 ## Selection on touch
 
-The checkbox is the selection's baseline path everywhere. On touch, a long press on a row selects it and puts the table in selection mode, where a tap on a row toggles it; a tap on one of the row's own controls — its checkbox, a link in a cell — is that control's alone. Deselecting the last row ends the mode. Entering and leaving are announced through the messages record (`selectionModeEntered`, `selectionModeLeft`), and the mode is stated on the table as `data-selection-mode="true"` while it holds, so a stylesheet may select it by attribute. A row's own selected state is its `aria-selected`, with no class repeating it.
+The checkbox is the selection's baseline path everywhere. On touch, a long press on a row selects it and puts the table in selection mode, where a tap on a row toggles it; a tap on one of the row's own controls — its checkbox, a link in a cell — is that control's alone. Deselecting the last row ends the mode. Entering and leaving are announced through the messages record (`selectionModeEntered`, `selectionModeEnded`), and the mode is stated on the table as `data-selection-mode="true"` while it holds, so a stylesheet may select it by attribute. A row's own selected state is its `aria-selected`, with no class repeating it.
 
 ## A warning past the render ceiling
 

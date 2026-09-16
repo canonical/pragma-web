@@ -16,7 +16,10 @@
  * solve its own geometry or word its own English.
  */
 
-export { readApplicability } from "../collection/index.js";
+export {
+  compileRecordTypeReader,
+  readApplicability,
+} from "../collection/index.js";
 export type {
   DisplayEntriesConfig,
   DisplayEntry,

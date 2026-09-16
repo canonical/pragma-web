@@ -232,4 +232,45 @@ describe("createRowScopes", () => {
     expect(scopes.readRow("m-1")).toBe(before);
     expect(before.record.get()).toEqual(machine("m-1", "stopped"));
   });
+
+  it("publishes a row's type, and only when a record returns as another", () => {
+    type Typed = { readonly id: string; readonly kind: string };
+    const byTypedId = (row: Typed): string => row.id;
+    const channel = createChannel<RowModel<Typed>>(
+      buildRowModel({ identify: byTypedId, rows: [{ id: "r-1", kind: "a" }] }),
+    );
+    const scopes = createRowScopes({
+      rows: channel,
+      selection: createSelection(),
+      fields: [],
+      readType: (row) => row.kind,
+    });
+    const detach = scopes.observe();
+    const type = scopes.readRow("r-1").type;
+    const heard: (string | null)[] = [];
+    const stop = type.subscribe(() => {
+      heard.push(type.get());
+    });
+    const publish = (kind: string): void => {
+      channel.set(
+        buildRowModel({
+          identify: byTypedId,
+          rows: [{ id: "r-1", kind }],
+          previous: channel.get(),
+        }),
+      );
+    };
+    expect(type.get()).toBe("a");
+    publish("a");
+    publish("b");
+    expect(heard).toEqual(["b"]);
+    stop();
+    detach();
+  });
+
+  it("names no type where no reader is given", () => {
+    const { scopes, detach } = harness([machine("m-1")]);
+    expect(scopes.readRow("m-1").type.get()).toBeNull();
+    detach();
+  });
 });

@@ -1,5 +1,5 @@
 /**
- * A table and cards over a collection whose records come in several types:
+ * A table over a collection whose records come in several types:
  * a field one type does not carry draws a state told apart from empty, a
  * column over such a field says which types it applies to, a column may
  * narrow that further and is checked where it mounts, and a page carrying a
@@ -10,16 +10,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import { pageOf } from "../../../../testing/fixtures.js";
 import {
-  container,
+  buildContainer,
+  buildVirtualMachine,
   createInstanceProvider,
   type Instance,
   instances,
   MIXED_FLEET,
-  virtualMachine,
 } from "../../../../testing/instances.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
 import { virtualizeRows } from "../../virtualization/index.js";
-import { Cards } from "../Cards/index.js";
 import createColumns from "./createColumns.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./types.js";
@@ -74,7 +73,10 @@ describe("a table over records of several types", () => {
   });
 
   it("tells a field the type does not carry apart from one holding no value", () => {
-    loadedTable([container("i-1", "bare", ""), virtualMachine("i-2", "vm")]);
+    loadedTable([
+      buildContainer("i-1", "bare", ""),
+      buildVirtualMachine("i-2", "vm"),
+    ]);
     // A container with no image named is a value that is empty: nothing is
     // drawn and nothing is read, where the machine's cell says why.
     expect(cellsOf("bare").at(2)).toHaveTextContent(/^$/);
@@ -173,39 +175,6 @@ describe("a table over records of several types", () => {
   });
 });
 
-describe("cards over records of several types", () => {
-  it("draws a field the record's type does not carry as not applicable", () => {
-    const { provider } = createInstanceProvider({ rows: MIXED_FLEET });
-    render(
-      <Cards
-        provider={provider}
-        fields={columns}
-        title="name"
-        label="Instances"
-      />,
-    );
-    const vm = screen.getByRole("listitem", { name: "db-01" });
-    const image = within(vm).getAllByRole("definition").at(1);
-    expect(image).toHaveTextContent(/^—Not applicable$/);
-    // A definition takes no name from its content; what a reader reaches is
-    // the word itself, so it is clipped and never hidden.
-    expect(image?.querySelector(".not-applicable")).not.toHaveAttribute(
-      "hidden",
-    );
-    expect(image?.querySelector("[aria-hidden='true']")).toHaveTextContent("—");
-    // The dash alone is hidden from readers: the word has no hidden ancestor.
-    expect(image?.querySelectorAll("[aria-hidden]")).toHaveLength(1);
-    expect(
-      within(vm).getByText("Not applicable").closest("[aria-hidden], [hidden]"),
-    ).toBeNull();
-    expect(
-      within(screen.getByRole("listitem", { name: "web-01" }))
-        .getAllByRole("definition")
-        .at(1),
-    ).toHaveTextContent(/^ubuntu:24\.04$/);
-  });
-});
-
 describe("a table's own render ceiling", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -214,7 +183,7 @@ describe("a table's own render ceiling", () => {
   it("warns of the rows it draws, and not where they are virtualized", () => {
     const warned = vi.spyOn(console, "warn").mockImplementation(() => {});
     const rows = Array.from({ length: 501 }, (_, index) =>
-      container(`i-${index}`, `host-${index}`),
+      buildContainer(`i-${index}`, `host-${index}`),
     );
     const { provider } = createInstanceProvider({ rows });
     const view = render(

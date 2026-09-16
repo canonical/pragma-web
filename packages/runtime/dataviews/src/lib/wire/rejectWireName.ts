@@ -1,3 +1,4 @@
+import { FIELD_PATH_DELIMITER } from "../rows/index.js";
 import { OPERATOR_DELIMITER, RESERVED_QUERY_KEYS } from "./constants.js";
 
 /**
@@ -19,7 +20,7 @@ export default function rejectWireName(field: string): string | null {
   if (RESERVED_QUERY_KEYS.includes(field)) {
     return `field name "${field}" is a reserved query parameter`;
   }
-  for (const segment of field.split(".")) {
+  for (const segment of field.split(FIELD_PATH_DELIMITER)) {
     if (segment === "") {
       return `field name "${field}" has a segment with no name`;
     }

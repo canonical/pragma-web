@@ -16,6 +16,10 @@ import { describe, expect, it, vi } from "vitest";
 import { createStandInPresentationStore } from "../../../../testing/createStandInStores.js";
 import { deliverRows } from "../../../../testing/fixtures.js";
 import {
+  createInstanceProvider,
+  MIXED_FLEET,
+} from "../../../../testing/instances.js";
+import {
   createMachineProvider,
   declareMachineOrdering,
   machine,
@@ -69,6 +73,9 @@ describe("DataTable SSR", () => {
     expect(readPresentation).not.toHaveBeenCalled();
     expect(heard).not.toHaveBeenCalled();
     expect(html).toContain('class="ds data-table dense"');
+    expect(html).toContain(
+      '<div class="ds data-table dense"><div class="table"',
+    );
     expect(html).toContain('role="table"');
     expect(html).toContain('aria-label="Machines"');
     // A resize handle's keys work only once scripts run, so none is sent.
@@ -202,5 +209,33 @@ describe("DataTable SSR", () => {
     expect(markup).not.toContain("<a ");
     expect(markup).not.toContain("<button");
     expect(markup).toContain('class="label">Name</span>');
+  });
+
+  it("sends the typed table's root, footer, row ids, cells and scope", () => {
+    const { provider } = createInstanceProvider();
+    const host = readProviderHost(provider);
+    host.complete(host.refresh(), deliverRows(MIXED_FLEET));
+    const html = renderToString(
+      <DataTable
+        provider={provider}
+        columns={[
+          { id: "name", header: "Name", rowHeader: true },
+          { id: "image", header: "Image", sortable: true },
+        ]}
+        label="Instances"
+        selectable
+        footer={<nav aria-label="Pages">pages</nav>}
+      />,
+    );
+    // The root holds the table, then the footer, then the announcer.
+    expect(html).toMatch(
+      /^<div class="ds data-table dense"><div class="table"[\s\S]*<\/div><div class="footer"><nav aria-label="Pages">pages<\/nav><\/div><div class="ds data-views-announcer"[^>]*><\/div><\/div>$/,
+    );
+    expect(html).toContain('data-row-id="i-2"');
+    expect(html).toMatch(/role="rowheader"[^>]*>db-01</);
+    expect(html).toContain(
+      '<span aria-hidden="true">—</span><span class="not-applicable">Not applicable</span>',
+    );
+    expect(html).toMatch(/class="scope" hidden="">Applies to container</);
   });
 });

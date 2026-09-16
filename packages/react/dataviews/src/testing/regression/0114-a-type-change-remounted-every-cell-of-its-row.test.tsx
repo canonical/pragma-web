@@ -14,11 +14,11 @@ import { useState } from "react";
 import { describe, expect, it } from "vitest";
 import { pageOf } from "../../../testing/fixtures.js";
 import {
-  container,
+  buildContainer,
+  buildVirtualMachine,
   createInstanceProvider,
   type Instance,
   instances,
-  virtualMachine,
 } from "../../../testing/instances.js";
 import createColumns from "../../lib/_work_in_progress/DataTable/createColumns.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -52,7 +52,7 @@ describe("a record returning as another type", () => {
         source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
       });
     };
-    deliver([container("i-1", "host-01")]);
+    deliver([buildContainer("i-1", "host-01")]);
     const button = () =>
       within(screen.getByRole("row", { name: "host-01" })).getByRole("button");
     fireEvent.click(button());
@@ -60,7 +60,7 @@ describe("a record returning as another type", () => {
     act(() => {
       provider.refresh();
     });
-    deliver([virtualMachine("i-1", "host-01")]);
+    deliver([buildVirtualMachine("i-1", "host-01")]);
     // The new type, and the state it held.
     expect(button()).toHaveTextContent("virtual-machine 1");
   });

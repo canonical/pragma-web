@@ -184,11 +184,11 @@ export const MixedTypes: Story = {
     );
     const cells = within(machine).getAllByRole("cell");
     // Image, the fifth cell after the checkbox and the header.
-    await expect(cells[4]).toHaveAccessibleName("Not applicable");
+    await expect(cells.at(4)).toHaveAccessibleName("Not applicable");
     await expect(
-      within(canvas.getByRole("row", { name: "scratch-01" })).getAllByRole(
-        "cell",
-      )[4],
+      within(canvas.getByRole("row", { name: "scratch-01" }))
+        .getAllByRole("cell")
+        .at(4),
     ).toHaveTextContent(/^$/);
     await expect(
       canvas.getByRole("columnheader", { name: "Image" }),
@@ -240,12 +240,12 @@ const columns = createColumns(instanceCollection, [
     const container = await waitFor(() =>
       canvas.getByRole("row", { name: "web-01" }),
     );
-    await expect(within(container).getAllByRole("cell")[1]) //
+    await expect(within(container).getAllByRole("cell").at(1)) //
       .toHaveAccessibleName("Not applicable");
     await expect(
-      within(canvas.getByRole("row", { name: "db-01" })).getAllByRole(
-        "cell",
-      )[1],
+      within(canvas.getByRole("row", { name: "db-01" }))
+        .getAllByRole("cell")
+        .at(1),
     ).toHaveTextContent(/^running$/);
     await expect(
       canvas.getByRole("columnheader", { name: "VM status" }),

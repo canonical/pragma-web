@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import isWithinControl from "./isWithinControl.js";
 
+/** The markup inside a row of a selectable table, as a tap finds it. */
 const markup = (html: string): HTMLElement => {
   const host = document.createElement("div");
-  host.innerHTML = html;
-  return host;
+  host.innerHTML = `<div role="row" data-row-id="m-1">${html}</div>`;
+  const row = host.firstElementChild;
+  if (!(row instanceof HTMLElement)) {
+    throw new Error("no row");
+  }
+  return row;
 };
 
 describe("isWithinControl", () => {
@@ -49,6 +54,13 @@ describe("isWithinControl", () => {
     expect(
       isWithinControl(markup('<div role="cell">x</div>').firstElementChild),
     ).toBe(false);
+  });
+
+  it("answers false for a control around the row rather than in it", () => {
+    const host = document.createElement("label");
+    host.innerHTML =
+      '<div role="row" data-row-id="m-1"><span>alpha</span></div>';
+    expect(isWithinControl(host.querySelector("span"))).toBe(false);
   });
 
   it("answers false for no element at all", () => {

@@ -11,7 +11,7 @@
    * so an application that never virtualizes a table loads them only if it
    * links `index.css`.
    */
-  .ds.data-table:has(> .ds.data-table-row-group.body.virtual) {
+  .ds.data-table > .table:has(> .ds.data-table-row-group.body.virtual) {
     /* The body's offset, which places the viewport among the entries, is
        measured from the table. */
     position: relative;
@@ -22,7 +22,8 @@
     /* The table is its own scroll viewport, and a viewport as tall as its
        content would mount every row: by default it is no taller than the
        screen, measured with the browser's bars shown so the cap holds
-       still while the page scrolls. A caller's own maximum wins. */
+       still while the page scrolls. A height capped on the table's root lowers it;
+       nothing a caller passes raises it. */
     max-block-size: 100svh;
   }
 }

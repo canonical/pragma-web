@@ -110,8 +110,8 @@ type OwnProps<
   readonly renderStatus?: (status: DisplayStatus) => ReactNode;
   /**
    * Mount only the rows near the viewport, from `virtualizeRows`. The table
-   * becomes its own scroll viewport, no taller than the screen unless a
-   * height capped on its frame says otherwise, and reports each row's
+   * becomes its own scroll viewport, no taller than the screen, or than a
+   * height capped on its root where that is less, and reports each row's
    * logical position so that
    * a row not mounted is still counted. Omitted, every row is rendered.
    */

@@ -4,6 +4,7 @@ export { default as useAnsweredFacets } from "./useAnsweredFacets.js";
 export { default as useDataViewsCell } from "./useDataViewsCell.js";
 export { default as useDataViewsValue } from "./useDataViewsValue.js";
 export { default as useFacets } from "./useFacets.js";
+export { default as useFieldScopes } from "./useFieldScopes.js";
 export { default as useHydrationFocusHandoff } from "./useHydrationFocusHandoff.js";
 export { default as useIsHydrated } from "./useIsHydrated.js";
 export { default as useLongPress } from "./useLongPress.js";

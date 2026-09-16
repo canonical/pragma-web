@@ -1,12 +1,32 @@
-import { memo, type ReactElement, useContext, useMemo } from "react";
+import { memo, type ReactElement, useMemo } from "react";
 import {
   CellContext,
   type CellContextValue,
-  MessagesContext,
+  NotApplicable,
 } from "../../../../common/index.js";
 import { useDataViewsValue } from "../../../../hooks/index.js";
-import { readFieldName, spellPrimitiveValue } from "../../../../utils/index.js";
+import {
+  areFieldScopesEqual,
+  readFieldName,
+  spellPrimitiveValue,
+} from "../../../../utils/index.js";
 import type { FieldValueProps } from "./types.js";
+
+/**
+ * Whether a value is handed what it draws unchanged: every prop the same,
+ * the field compared by what the value reads of it — its id, the record
+ * field, its own content and its types — and never its heading, which the
+ * card draws and the value does not.
+ */
+const arePropsEqual = <TRow extends object>(
+  a: FieldValueProps<TRow>,
+  b: FieldValueProps<TRow>,
+): boolean =>
+  a.provider === b.provider &&
+  a.channels === b.channels &&
+  a.applicability === b.applicability &&
+  a.field.cell === b.field.cell &&
+  areFieldScopesEqual([a.field], [b.field]);
 
 function FieldValue<TRow extends object>({
   provider,
@@ -21,8 +41,11 @@ function FieldValue<TRow extends object>({
     // channel is a card built against another field list.
     throw new Error(`no channel observes the field "${name}"`);
   }
-  const messages = useContext(MessagesContext);
   const value = useDataViewsValue(channel);
+  // Drawn again when the record returns as another type, so content narrowing
+  // on the record reads its current type even where its value and
+  // applicability did not move.
+  useDataViewsValue(channels.type);
   const cell = useMemo<CellContextValue>(
     () => ({
       collection: provider.collection,
@@ -52,12 +75,8 @@ function FieldValue<TRow extends object>({
         />
       ) : notApplicable ? (
         // A field that does not apply to this record, told apart from one it
-        // carries no value for: the dash is seen, the word is read — clipped,
-        // not hidden, so it stays in the accessibility tree.
-        <>
-          <span aria-hidden="true">—</span>
-          <span className="not-applicable">{messages.cellNotApplicable}</span>
-        </>
+        // carries no value for.
+        <NotApplicable />
       ) : (
         spellPrimitiveValue(value)
       )}
@@ -72,9 +91,11 @@ function FieldValue<TRow extends object>({
  * render as text, a field that does not apply to the record draws the
  * not-applicable state, and every other value renders nothing.
  *
- * It subscribes to its own field's channel alone, so a record republished
+ * It subscribes to its own field's channel and the record's type alone, so
+ * a record republished
  * with another field changed re-renders no value but that field's; the
  * record a field's own content is handed is read as the value renders.
- * Memoised, so a card re-rendering for its selection re-renders none of them.
+ * Memoised by what it reads, so a card re-rendering for its selection, or
+ * for a heading rebuilt inline, re-renders none of them.
  */
-export default memo(FieldValue) as typeof FieldValue;
+export default memo(FieldValue, arePropsEqual) as typeof FieldValue;

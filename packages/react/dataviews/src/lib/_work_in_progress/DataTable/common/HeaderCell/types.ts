@@ -118,5 +118,5 @@ export type HeaderCellProps = {
    * which records it applies to, rather than being left to guess at an empty
    * cell.
    */
-  readonly appliesTo: readonly string[] | null;
+  readonly scope: readonly string[] | null;
 };

@@ -1,106 +1,23 @@
-import type { Applicability } from "@canonical/dataviews-core";
-import type { RowChannels } from "@canonical/dataviews-core/bindings";
-import {
-  type ComponentType,
-  memo,
-  type ReactElement,
-  useContext,
-  useMemo,
-} from "react";
+import { memo, type ReactElement, useMemo } from "react";
 import {
   CellContext,
   type CellContextValue,
-  type DisplayFieldCellProps,
-  MessagesContext,
+  NotApplicable,
 } from "../../../../common/index.js";
-import { useDataViewsValue } from "../../../../hooks/index.js";
-import { spellPrimitiveValue } from "../../../../utils/index.js";
+import { readFieldName } from "../../../../utils/index.js";
+import { CustomContent, FieldText } from "./common/index.js";
 import type { BodyCellProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-body-cell";
-
-/**
- * What a cell shows for a field that does not apply to its row's record: a
- * dash, with the word for it read and not drawn.
- *
- * The dash alone would be indistinguishable from an empty field, which is a
- * different fact — the record has no value there, rather than the field not
- * being one of its own — so the two are told apart by what is read, not by
- * what is seen. The word is clipped rather than hidden: a hidden node leaves
- * the accessibility tree, and a reader would meet the same silence as an
- * empty cell.
- */
-function NotApplicable(): ReactElement {
-  const messages = useContext(MessagesContext);
-  return (
-    <>
-      <span aria-hidden="true">—</span>
-      <span className="not-applicable">{messages.cellNotApplicable}</span>
-    </>
-  );
-}
-
-/**
- * The default content of a cell: its own field's value as text.
- *
- * Subscribed to that one field, so a record republished with another field
- * changed re-renders nothing here.
- */
-function FieldText({
-  channel,
-}: {
-  readonly channel: RowChannels<object>["fields"][string];
-}): ReactElement {
-  const value = useDataViewsValue(channel);
-  return <>{spellPrimitiveValue(value)}</>;
-}
-
-/**
- * A column's own content, handed its field's value and the record the value
- * was read from.
- *
- * Subscribed to that one field, as the text cell is: the table's guarantee
- * is that a record republished with another field changed re-renders no
- * cell but that field's, and content is held to it too. The record is read
- * as the cell renders, so it is the record the value came from; content
- * drawing more of the record than its own field subscribes to it through
- * `useDataViewsCell`.
- */
-function CustomContent<TRow extends object>({
-  Content,
-  channels,
-  channel,
-  columnId,
-  applicability,
-}: {
-  readonly Content: ComponentType<DisplayFieldCellProps>;
-  readonly channels: RowChannels<TRow>;
-  readonly channel: RowChannels<TRow>["fields"][string];
-  readonly columnId: string;
-  readonly applicability: Applicability;
-}): ReactElement {
-  const value = useDataViewsValue(channel);
-  return (
-    <Content
-      // A row the field does not apply to holds no value there: one the
-      // source wrote anyway is not shown as if it did.
-      value={applicability === "not-applicable" ? undefined : value}
-      record={channels.record.get()}
-      applicability={applicability}
-      rowId={channels.id}
-      columnId={columnId}
-    />
-  );
-}
 
 function BodyCell<TRow extends object>({
   provider,
   channels,
   column,
-  field,
   id,
   applicability,
 }: BodyCellProps<TRow>): ReactElement {
+  const field = readFieldName(column);
   const channel = channels.fields[field];
   if (channel === undefined) {
     // The scopes observe every field the columns read, so a cell without

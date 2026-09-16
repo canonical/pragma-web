@@ -1,3 +1,4 @@
+export { default as areBodyColumnsEqual } from "./areBodyColumnsEqual.js";
 export { default as areColumnModelsEqual } from "./areColumnModelsEqual.js";
 export { default as areColumnOffersEqual } from "./areColumnOffersEqual.js";
 export { default as areColumnSettingsEqual } from "./areColumnSettingsEqual.js";

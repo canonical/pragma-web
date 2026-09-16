@@ -44,8 +44,7 @@ describe("CardItem", () => {
           details={[{ id: "status", header: "Status" }]}
           selectable={false}
           nameRecord={() => null}
-          applicabilityOf={() => "applies"}
-          typeOf={() => null}
+          decideApplicability={() => "applies"}
         />
       </ul>,
     );
@@ -67,8 +66,7 @@ describe("CardItem", () => {
           details={[]}
           selectable
           nameRecord={(row, rowId) => `${row.name} (${rowId})`}
-          applicabilityOf={() => "applies"}
-          typeOf={() => null}
+          decideApplicability={() => "applies"}
         />
       </ul>,
     );
@@ -96,8 +94,7 @@ describe("CardItem", () => {
           details={[]}
           selectable={false}
           nameRecord={() => null}
-          applicabilityOf={() => "applies"}
-          typeOf={() => null}
+          decideApplicability={() => "applies"}
         />,
       ),
     ).toThrow('no channel observes the field "name"');

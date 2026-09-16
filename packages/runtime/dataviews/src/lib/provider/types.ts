@@ -414,23 +414,13 @@ export type ProviderHost<
     completion: Completion<TRow>,
   ) => boolean;
   /**
-   * The declared type a row carries, or null when it carries none the
-   * collection declares — a monomorphic collection's rows included. Reading
-   * a row for its type is the provider's: a renderer asks rather than reads.
-   *
-   * Read by every renderer, which watches a record's type and asks
-   * `readApplicability` of the type whether a field applies to it. The pair
-   * of `recordType`, which answers the same fact by identity from memory
-   * for a selected row no longer on display.
-   */
-  readonly typeOf: (row: TRow) => string | null;
-  /**
    * The type remembered for a selected identity, or null when the provider
    * never modelled it while it was selected — a selection restored by a host
    * over rows this provider has not seen. A remembered type is let go when
    * the rows are next replaced after its identity leaves the selection, so
    * one reselected before then answers as before. It answers from the row on
-   * display whenever there is one, so it never contradicts `typeOf`,
+   * display whenever there is one, so it never contradicts the type the row
+   * scopes publish for it,
    * and it changes only with a `rows` or a `selection` publication: watching
    * those is watching this.
    *
@@ -457,8 +447,6 @@ export type RecordTypingConfig<
 export type RecordTyping<TRow extends object = RowRecord> = {
   /** Why a model cannot be displayed, or null when every row is typed. */
   readonly rejectionOf: (model: RowModel<TRow>) => string | null;
-  /** The declared type a row carries, or null for none the collection declares. */
-  readonly typeOf: (row: TRow) => string | null;
   /** The remembered type of a selected identity. */
   readonly recordType: (id: string) => string | null;
   /** Take the type of every selected row of a model about to be replaced. */

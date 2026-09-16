@@ -81,17 +81,6 @@ describe("createRecordTyping", () => {
     ).toThrow("a monomorphic collection has no record typing to build");
   });
 
-  describe("typeOf", () => {
-    it("names a row's declared type, and null for an undeclared one", () => {
-      const { record } = typing();
-      expect(record.typeOf(container("c-1"))).toBe("container");
-      expect(record.typeOf(machine("v-1"))).toBe("virtual-machine");
-      expect(record.typeOf({ id: "x", type: "sandbox" } as unknown as Instance)) //
-        .toBeNull();
-      expect(record.typeOf({ id: "x" } as unknown as Instance)).toBeNull();
-    });
-  });
-
   describe("rejectionOf", () => {
     it("accepts a model whose every row carries a declared type", () => {
       const { record } = typing();

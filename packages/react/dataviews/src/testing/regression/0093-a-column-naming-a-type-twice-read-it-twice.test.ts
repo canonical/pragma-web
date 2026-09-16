@@ -16,7 +16,7 @@ describe("a column naming a record type twice", () => {
     expect(() =>
       readFieldScopes({
         collection: instances,
-        subject: "DataTable column",
+        renderer: "DataTable",
         fields: [
           {
             id: "status",

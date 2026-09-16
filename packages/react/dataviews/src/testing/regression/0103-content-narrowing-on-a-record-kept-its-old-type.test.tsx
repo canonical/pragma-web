@@ -13,11 +13,11 @@ import { act, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { pageOf } from "../../../testing/fixtures.js";
 import {
-  container,
+  buildContainer,
+  buildVirtualMachine,
   createInstanceProvider,
   type Instance,
   instances,
-  virtualMachine,
 } from "../../../testing/instances.js";
 import { Cards } from "../../lib/_work_in_progress/Cards/index.js";
 import createColumns from "../../lib/_work_in_progress/DataTable/createColumns.js";
@@ -42,11 +42,11 @@ const answeredByHand = () => {
     });
   };
   const moveType = () => {
-    deliver([container("i-1", "host-01")]);
+    deliver([buildContainer("i-1", "host-01")]);
     act(() => {
       provider.refresh();
     });
-    deliver([virtualMachine("i-1", "host-01")]);
+    deliver([buildVirtualMachine("i-1", "host-01")]);
   };
   return { provider, moveType };
 };

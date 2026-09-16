@@ -47,7 +47,6 @@ describe("FieldValue", () => {
         channels={channels}
         field={{ id: "cores", header: "Cores" }}
         applicability="applies"
-        recordType={null}
       />,
     );
     expect(container.textContent).toBe("8");
@@ -70,7 +69,6 @@ describe("FieldValue", () => {
         channels={channels}
         field={{ id: "state", header: "State", field: "status", cell: Owner }}
         applicability="applies"
-        recordType={null}
       />,
     );
     expect(screen.getByText("m-1/state: failed on alpha")).toBeInTheDocument();
@@ -84,7 +82,6 @@ describe("FieldValue", () => {
         channels={channels}
         field={{ id: "cores", header: "Cores" }}
         applicability="not-applicable"
-        recordType={null}
       />,
     );
     expect(container).toHaveTextContent(/^—Not applicable$/);
@@ -109,7 +106,6 @@ describe("FieldValue", () => {
         channels={channels}
         field={{ id: "cores", header: "Cores", cell: Own }}
         applicability="not-applicable"
-        recordType={null}
       />,
     );
     expect(container).toHaveTextContent(
@@ -127,7 +123,6 @@ describe("FieldValue", () => {
           channels={channels}
           field={{ id: "cores", header: "Cores" }}
           applicability="applies"
-          recordType={null}
         />,
       ),
     ).toThrow('no channel observes the field "cores"');

@@ -43,7 +43,7 @@ describe("DataViews.DataTable", () => {
       });
     });
     const table = screen.getByRole("table", { name: "Machines" });
-    expect(table.parentElement).toHaveClass("ds", "data-table-frame", "rows");
+    expect(table.parentElement).toHaveClass("ds", "data-table", "rows");
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
   });
 

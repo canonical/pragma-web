@@ -7,12 +7,12 @@
 # their own files beside their components; this file only references them.
 #
 # Names — one per part, the same in the design, the DOM and here:
-#   DataTable       design "DataTable"    DOM `ds data-table-frame`: the frame,
+#   DataTable       design "DataTable"    DOM `ds data-table dense`: the root,
 #                   the caller's box, holding the table, its footer and its
 #                   announcer; the caller's props land here
-#   table                                 DOM `ds data-table dense`, `role=table`:
-#                   the scroll container, whose children are its row groups
-#   footer          design "footer"       DOM `ds data-table-footer`: beneath the
+#   table                                 DOM `div.table`, `role=table`: the
+#                   scroll container, whose children are its row groups
+#   footer          design "footer"       DOM `div.footer`: beneath the
 #                   table and outside its role, holding the pagination bar as
 #                   a landmark, sticky to the bottom of the view; the action
 #                   bar is to overlay it while rows are selected
@@ -51,7 +51,7 @@
 # `--density-padding-inline`). The DSL has no way to say "channel", so the
 # path names it and this note records the deviation.
 #
-# Density: the table carries the design system's `.dense` class, so it
+# Density: the root carries the design system's `.dense` class, so the table
 # is dense wherever it sits. It reads the channel and defines no density rule
 # of its own. `.dense` is a class, not a state; nothing changes structurally.
 #
@@ -154,8 +154,10 @@
 #     and the anatomy names by that value. To be raised against the standard.
 #   - `color/focus-ring` is the package's `color.focusRing`: a camelCase id
 #     the DSL's token-path grammar (`[a-z0-9-]+`) cannot spell.
-#   - The header row group's stacking above the scrolled body uses z-index 1;
-#     the package has no stacking token.
+#   - The header row group's stacking above the scrolled body, and the
+#     footer's above the table where the two overlap, use z-index 1; the
+#     package has no stacking token. The footer draws no surface or rule of
+#     its own: the pagination bar it holds draws both.
 #   - A gap's height is the range's per-render publication, the height of
 #     the entries it stands for, written on the gap itself: geometry no
 #     stylesheet can know, as `--data-table-columns` is.
@@ -307,9 +309,6 @@ node:
         role: footer
         styles:
           layout.position: sticky
-          appearance.background: color/background/layer2
-          appearance.border.top.width: dimension/stroke/thickness/medium
-          appearance.border.top.color: color/border/muted
         edges:
           - uri: apps.subcomponent.data_table-pagination_bar
             relation:

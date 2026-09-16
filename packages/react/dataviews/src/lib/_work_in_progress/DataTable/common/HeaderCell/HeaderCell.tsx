@@ -85,7 +85,7 @@ export default function HeaderCell({
   bounds,
   width,
   labelId,
-  appliesTo,
+  scope,
 }: HeaderCellProps): ReactElement {
   const messages = useContext(MessagesContext);
   // Whether Shift was held when a key began activating the button: a click
@@ -104,13 +104,13 @@ export default function HeaderCell({
   const describedBy =
     [
       precedence === null ? null : descriptionId,
-      appliesTo === null ? null : scopeId,
+      scope === null ? null : scopeId,
     ]
       .filter((id) => id !== null)
       .join(" ") || undefined;
   // The scope alone: what the header cell says of itself where its control
   // carries the rest.
-  const scopeDescription = appliesTo === null ? undefined : scopeId;
+  const scopeDescription = scope === null ? undefined : scopeId;
   const indicator =
     precedence === null ? null : (
       <>
@@ -230,9 +230,9 @@ export default function HeaderCell({
           never drawn, as its place in the ordering is: the dash in such a
           cell is then a fact about the record rather than a gap in the
           data. Hidden, and reached as the heading's description. */}
-      {appliesTo === null ? null : (
+      {scope === null ? null : (
         <span id={scopeId} className="scope" hidden>
-          {messages.columnAppliesTo(appliesTo)}
+          {messages.columnAppliesTo(scope)}
         </span>
       )}
       {sortable && hydrated ? (

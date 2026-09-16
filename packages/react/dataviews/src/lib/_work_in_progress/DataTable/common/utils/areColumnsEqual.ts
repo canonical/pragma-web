@@ -1,35 +1,29 @@
 import { areListsEqual } from "@canonical/dataviews-core/bindings";
-import {
-  areDisplayFieldsEqual,
-  areFieldScopesEqual,
-} from "../../../../utils/index.js";
 import type { DataTableColumn } from "../../types.js";
-import areColumnModelsEqual from "./areColumnModelsEqual.js";
+import areBodyColumnsEqual from "./areBodyColumnsEqual.js";
 
 /**
  * Whether two column arrays say the same thing about everything the
- * rendered tree reads, the model included. `header` and `cell` are
- * compared by reference: one is a node and the other a component, and
- * neither has content this could compare. A separate reading from the
- * model's, because an inline `header` node must not cost anyone a new
- * layout — only a re-render.
+ * rendered tree reads: what a body row reads, and what the header row and
+ * the column menus read besides — each heading, by reference, since a node
+ * has no content this could compare, and whether it sorts, resizes and
+ * hides. Kept apart from the body's reading, because an inline `header`
+ * node must cost a redraw of the header row alone.
  */
 export default function areColumnsEqual(
   a: readonly DataTableColumn[],
   b: readonly DataTableColumn[],
 ): boolean {
   return (
-    areColumnModelsEqual(a, b) &&
-    areDisplayFieldsEqual(a, b) &&
-    areFieldScopesEqual(a, b) &&
+    areBodyColumnsEqual(a, b) &&
     areListsEqual(
       a,
       b,
       (column, other) =>
+        column.header === other.header &&
         column.sortable === other.sortable &&
         column.resizable === other.resizable &&
-        column.hideable === other.hideable &&
-        column.rowHeader === other.rowHeader,
+        column.hideable === other.hideable,
     )
   );
 }

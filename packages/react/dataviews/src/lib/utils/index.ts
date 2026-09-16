@@ -14,3 +14,4 @@ export { default as readFieldScopes } from "./readFieldScopes.js";
 export { default as spellCount } from "./spellCount.js";
 export { default as spellPrimitiveValue } from "./spellPrimitiveValue.js";
 export { default as subscribeToDestinationInputs } from "./subscribeToDestinationInputs.js";
+export type * from "./types.js";

@@ -32,7 +32,7 @@ export type RowProps<TRow extends object> = {
    * Names a record for its checkbox, or answers null where the caller gave
    * no name.
    */
-  readonly rowLabel: (row: TRow, rowId: string) => string | null;
+  readonly nameRecord: (row: TRow, rowId: string) => string | null;
   /**
    * Whether one column applies to a record of one declared type, or of
    * none: its field's own scope, narrowed by the column's where it declares
@@ -40,15 +40,10 @@ export type RowProps<TRow extends object> = {
    * renders no cell again for it; the row asks per column rather than
    * carrying a map it would have to rebuild whenever its record moved.
    */
-  readonly applicabilityOf: (
+  readonly decideApplicability: (
     column: DataTableColumn,
     type: string | null,
   ) => Applicability;
-  /**
-   * The declared type a record carries, or null: what the row watches of its
-   * record. The table's, one identity for every row.
-   */
-  readonly typeOf: (record: TRow) => string | null;
   /** The row's logical position, reported only by a virtualized table. */
   readonly position?: number | undefined;
   /** The row element, for a virtualized table to measure. */

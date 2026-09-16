@@ -28,7 +28,7 @@ export type SelectionCellProps<TRow extends object> = {
    * Names a record for its checkbox, or answers null where the caller gave
    * no name, leaving it to the row header's text, or to the identity.
    */
-  readonly rowLabel: (row: TRow, rowId: string) => string | null;
+  readonly nameRecord: (row: TRow, rowId: string) => string | null;
   /**
    * The column heading the row, whose cell's text names the checkbox where
    * the caller gave no name, or null for none.

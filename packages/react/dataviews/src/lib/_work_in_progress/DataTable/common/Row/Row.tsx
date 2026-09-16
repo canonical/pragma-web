@@ -1,6 +1,5 @@
-import { memo, type ReactElement, useId } from "react";
+import { memo, type ReactElement, useId, useMemo } from "react";
 import { useDataViewsValue } from "../../../../hooks/index.js";
-import { readFieldName } from "../../../../utils/index.js";
 import { BodyCell } from "../BodyCell/index.js";
 import { SelectionCell } from "../SelectionCell/index.js";
 import type { RowProps } from "./types.js";
@@ -12,11 +11,10 @@ function Row<TRow extends object>({
   channels,
   columns,
   selectable,
-  rowLabel,
+  nameRecord,
   position,
   ref,
-  applicabilityOf,
-  typeOf,
+  decideApplicability,
 }: RowProps<TRow>): ReactElement {
   const selected = useDataViewsValue(channels.selected);
   // The row is named by its header cell where a column is the row header:
@@ -25,10 +23,13 @@ function Row<TRow extends object>({
   // Which columns apply to the record is a fact about its type, so the row
   // watches the type alone: it renders again when a record comes back as
   // another type, and for no move of any field.
-  const type = useDataViewsValue(channels.record, typeOf);
+  const type = useDataViewsValue(channels.type);
   // The column heading the row, if any; the table checked there is one at
   // most where it mounted.
-  const rowHeader = columns.find((column) => column.rowHeader === true) ?? null;
+  const rowHeader = useMemo(
+    () => columns.find((column) => column.rowHeader === true) ?? null,
+    [columns],
+  );
   return (
     // aria-selected is only meaningful where selection is offered, and it
     // must agree with the row's checkbox: both read this one channel.
@@ -49,7 +50,7 @@ function Row<TRow extends object>({
           provider={provider}
           channels={channels}
           selected={selected}
-          rowLabel={rowLabel}
+          nameRecord={nameRecord}
           rowHeader={rowHeader}
         />
       ) : null}
@@ -60,9 +61,7 @@ function Row<TRow extends object>({
           provider={provider}
           channels={channels}
           column={column}
-          field={readFieldName(column)}
-          applicability={applicabilityOf(column, type)}
-          recordType={type}
+          applicability={decideApplicability(column, type)}
         />
       ))}
     </div>

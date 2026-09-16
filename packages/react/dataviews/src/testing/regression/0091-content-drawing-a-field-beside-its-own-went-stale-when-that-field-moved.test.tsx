@@ -14,10 +14,10 @@ import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { pageOf } from "../../../testing/fixtures.js";
 import {
-  container,
+  buildContainer,
+  buildVirtualMachine,
   createInstanceProvider,
   instances,
-  virtualMachine,
 } from "../../../testing/instances.js";
 import createColumns from "../../lib/_work_in_progress/DataTable/createColumns.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -48,8 +48,8 @@ describe("content drawing a field beside its own", () => {
         source.latest().deliver({
           status: "succeeded",
           page: pageOf([
-            container("i-1", "web-01", image),
-            virtualMachine("i-2", "db-01", "uefi"),
+            buildContainer("i-1", "web-01", image),
+            buildVirtualMachine("i-2", "db-01", "uefi"),
           ]),
         });
       });

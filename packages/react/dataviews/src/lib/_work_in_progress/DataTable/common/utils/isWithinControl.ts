@@ -26,8 +26,16 @@ const CONTROLS = [
 /**
  * Whether a tap landed on a control of the row's own — its checkbox, a link
  * or a button in a cell — which answers for itself, so the row does not also
- * toggle for the same tap.
+ * toggle for the same tap. Only a control within the row counts: a table
+ * placed inside a label or an editable region is not every row's control.
  */
 export default function isWithinControl(target: EventTarget | null): boolean {
-  return target instanceof Element && target.closest(CONTROLS) !== null;
+  if (!(target instanceof Element)) {
+    return false;
+  }
+  const control = target.closest(CONTROLS);
+  return (
+    control !== null &&
+    target.closest("[data-row-id]")?.contains(control) === true
+  );
 }

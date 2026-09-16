@@ -1,5 +1,4 @@
 import type {
-  Applicability,
   DisplayStatus,
   RowRecord,
   SchemaFieldDefinition,
@@ -9,7 +8,6 @@ import {
   areListsEqual,
   isDataViewsProvider,
   listDisplayEntries,
-  readProviderHost,
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
@@ -20,6 +18,7 @@ import {
 } from "../../common/index.js";
 import {
   useDataViewsValue,
+  useFieldScopes,
   useMessages,
   useRenderCeiling,
   useRowScopes,
@@ -31,13 +30,18 @@ import {
   areFieldScopesEqual,
   describeStatus,
   readFieldName,
-  readFieldScopes,
 } from "../../utils/index.js";
 import { CardList, SelectAllOnPage } from "./common/index.js";
 import type { CardsProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-cards";
+
+/** Two field lists saying the same, the types each applies to included. */
+const areFieldsAndScopesEqual = (
+  a: readonly DisplayField[],
+  b: readonly DisplayField[],
+): boolean => areDisplayFieldsEqual(a, b) && areFieldScopesEqual(a, b);
 
 /** Two lists naming the same fields in the same order. */
 const areNamesEqual = (a: readonly string[], b: readonly string[]): boolean =>
@@ -100,7 +104,17 @@ export default function Cards<
     );
   }
   const words = useMessages(messages);
-  const declared = useStableValue(fields, areDisplayFieldsEqual);
+  // Held while the fields say the same, their record types included: a field
+  // narrowed to other types draws every card again.
+  const declared = useStableValue(fields, areFieldsAndScopesEqual);
+  // Every declared field's scope, checked where the cards mount, and whether
+  // a field applies to a card's record of one type, as a table asks it of a
+  // row.
+  const { decideApplicability } = useFieldScopes({
+    collection: provider.collection,
+    fields: declared,
+    renderer: "Cards",
+  });
   // Looked up in the held list, which holds the ids the caller's list holds:
   // one lookup names the card's heading and checks that the title names a
   // field at all.
@@ -135,37 +149,13 @@ export default function Cards<
   useRenderCeiling({
     renderer: "Cards",
     count: records.length,
-    unit: "cards",
-    virtualization: "none",
+    virtualized: false,
   });
   // Held behind one identity: a lambda must not re-render every card. Null
   // until the caller names records, so a card names itself by its title.
   const nameRecord = useStableCallback(
     (row: TRow, rowId: string): string | null =>
       rowLabel === undefined ? null : rowLabel(row, rowId),
-  );
-  // Every declared field's scope, checked where the cards mount, keyed on
-  // what a scope is read from, so a field rebuilt inline re-reads none.
-  const scoped = useStableValue(fields, areFieldScopesEqual);
-  const scopeOf = useMemo(
-    () =>
-      readFieldScopes({
-        collection: provider.collection,
-        fields: scoped,
-        subject: "Cards field",
-      }),
-    [scoped, provider],
-  );
-  // Whether one field applies to a card's record of one type, as a table
-  // asks it of a row. One identity, so a re-render of the cards re-renders
-  // no card for this.
-  const applicabilityOf = useStableCallback(
-    (field: DisplayField, type: string | null): Applicability =>
-      scopeOf(field).applicability(type),
-  );
-  // The declared type a record carries: what each card watches of its record.
-  const typeOf = useStableCallback((record: TRow): string | null =>
-    readProviderHost(provider).typeOf(record),
   );
   // The words' own text for a status, unless the caller renders its own.
   const describe = useCallback(
@@ -195,8 +185,7 @@ export default function Cards<
           details={details}
           selectable={selectable}
           nameRecord={nameRecord}
-          applicabilityOf={applicabilityOf}
-          typeOf={typeOf}
+          decideApplicability={decideApplicability}
         />
       </section>
     </MessagesContext>

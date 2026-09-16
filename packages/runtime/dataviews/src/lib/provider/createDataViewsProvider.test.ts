@@ -12,7 +12,11 @@ import {
   pageOf,
 } from "../../../testing/fixtures.js";
 import type { ActionOutcome } from "../action/index.js";
-import { createCollection, readApplicability } from "../collection/index.js";
+import {
+  compileRecordTypeReader,
+  createCollection,
+  readApplicability,
+} from "../collection/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
 import type { PresentationStore } from "../presentation/index.js";
 import {
@@ -1624,9 +1628,18 @@ describe("createDataViewsProvider record types", () => {
 
   it("names the declared type a row carries, and null for one it does not", () => {
     const { host } = instanceProvider();
-    expect(host.typeOf(container("c-1"))).toBe("container");
-    expect(host.typeOf(machine("v-1"))).toBe("virtual-machine");
-    expect(host.typeOf({ id: "x-1", type: "sandbox" } as unknown as Instance)) //
+    expect(compileRecordTypeReader(host.collection)(container("c-1"))).toBe(
+      "container",
+    );
+    expect(compileRecordTypeReader(host.collection)(machine("v-1"))).toBe(
+      "virtual-machine",
+    );
+    expect(
+      compileRecordTypeReader(host.collection)({
+        id: "x-1",
+        type: "sandbox",
+      } as unknown as Instance),
+    ) //
       .toBeNull();
   });
 
@@ -1712,7 +1725,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
     host.complete(host.refresh(), delivered([{ id: "m-1" }]));
     provider.selection.set(["m-1"]);
     expect(host.recordType("m-1")).toBeNull();
-    expect(host.typeOf({ id: "m-1" })).toBeNull();
+    expect(compileRecordTypeReader(host.collection)({ id: "m-1" })).toBeNull();
     expect(readApplicability(provider.collection, "status", null)).toBe(
       "applies",
     );
@@ -1735,7 +1748,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
       readApplicability(
         provider.collection,
         "secureboot",
-        readProviderHost(provider).typeOf({ id: "m-1" }),
+        compileRecordTypeReader(provider.collection)({ id: "m-1" }),
       ),
     ).toBe("applies");
   });

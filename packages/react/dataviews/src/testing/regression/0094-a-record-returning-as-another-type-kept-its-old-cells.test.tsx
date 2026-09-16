@@ -14,10 +14,10 @@ import { act, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { pageOf } from "../../../testing/fixtures.js";
 import {
-  container,
+  buildContainer,
+  buildVirtualMachine,
   createInstanceProvider,
   type Instance,
-  virtualMachine,
 } from "../../../testing/instances.js";
 import { Cards } from "../../lib/_work_in_progress/Cards/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -49,12 +49,12 @@ describe("a record returning under its id as another type", () => {
     render(
       <DataTable provider={provider} columns={columns} label="Instances" />,
     );
-    deliver([virtualMachine("i-1", "host-01")]);
+    deliver([buildVirtualMachine("i-1", "host-01")]);
     const image = () =>
       within(screen.getByRole("row", { name: "host-01" })).getByRole("cell");
     expect(image()).toHaveAccessibleName("Not applicable");
     refresh();
-    deliver([container("i-1", "host-01", "ubuntu:24.04")]);
+    deliver([buildContainer("i-1", "host-01", "ubuntu:24.04")]);
     expect(image()).toHaveTextContent(/^ubuntu:24\.04$/);
   });
 
@@ -68,14 +68,14 @@ describe("a record returning under its id as another type", () => {
         label="Instances"
       />,
     );
-    deliver([container("i-1", "host-01", "ubuntu:24.04")]);
+    deliver([buildContainer("i-1", "host-01", "ubuntu:24.04")]);
     const image = () =>
       within(screen.getByRole("listitem", { name: "host-01" }))
         .getAllByRole("definition")
         .at(0);
     expect(image()).toHaveTextContent(/^ubuntu:24\.04$/);
     refresh();
-    deliver([virtualMachine("i-1", "host-01")]);
+    deliver([buildVirtualMachine("i-1", "host-01")]);
     expect(image()).toHaveTextContent(/^—Not applicable$/);
   });
 });

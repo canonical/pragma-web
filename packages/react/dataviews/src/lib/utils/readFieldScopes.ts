@@ -1,41 +1,14 @@
-import type {
-  Applicability,
-  Collection,
-  SchemaFieldDefinition,
-} from "@canonical/dataviews-core";
+import type { Applicability } from "@canonical/dataviews-core";
 import { readApplicability } from "@canonical/dataviews-core/bindings";
-import type { DisplayField } from "../common/index.js";
 import readFieldName from "./readFieldName.js";
+import type {
+  FieldScope,
+  FieldScopes,
+  ReadFieldScopesConfig,
+} from "./types.js";
 
-/** What one declared column or field knows of record types. */
-export type FieldScope = {
-  /**
-   * The types a table's heading names, or null where it applies to every
-   * record: its own narrowing where it declares one, else its schema field's
-   * scope.
-   */
-  readonly appliesTo: readonly string[] | null;
-  /** Whether it applies to a record of the given declared type, or of none. */
-  readonly applicability: (type: string | null) => Applicability;
-};
-
-/** One declared column's or field's scope, by the column or field. */
-export type FieldScopes = (column: DisplayField) => FieldScope;
-
-export type ReadFieldScopesConfig = {
-  /** The collection whose declared types and scoped fields are read. */
-  readonly collection: Pick<
-    Collection<readonly SchemaFieldDefinition[]>,
-    "schema" | "types"
-  >;
-  /** Every column or field the renderer declares, shown or not. */
-  readonly fields: readonly DisplayField[];
-  /**
-   * What the renderer calls one of them, as its errors name it: a
-   * `DataTable column`, a `Cards field`.
-   */
-  readonly subject: "DataTable column" | "Cards field";
-};
+/** What each renderer calls one of the things it declares. */
+const NOUNS = { DataTable: "column", Cards: "field" } as const;
 
 /**
  * Read what each declared column — a table's column or a card's field —
@@ -56,17 +29,29 @@ export type ReadFieldScopesConfig = {
 export default function readFieldScopes({
   collection,
   fields,
-  subject,
+  renderer,
 }: ReadFieldScopesConfig): FieldScopes {
   const { schema, types } = collection;
+  const subject = `${renderer} ${NOUNS[renderer]}`;
   const scopes = new Map<string, FieldScope>();
   for (const column of fields) {
     const field = readFieldName(column);
     const narrowing = column.appliesTo;
     if (narrowing === undefined) {
+      const answers = new Map<string | null, Applicability>();
       scopes.set(column.id, {
-        appliesTo: schema.findField(field)?.appliesTo ?? null,
-        applicability: (type) => readApplicability(collection, field, type),
+        scope: schema.findField(field)?.appliesTo ?? null,
+        // Read once per type the column is asked about — at most every
+        // declared type and none — rather than once per cell.
+        applicability: (type) => {
+          const known = answers.get(type);
+          if (known !== undefined) {
+            return known;
+          }
+          const answer = readApplicability(collection, field, type);
+          answers.set(type, answer);
+          return answer;
+        },
       });
       continue;
     }
@@ -96,7 +81,7 @@ export default function readFieldScopes({
     }
     const within = new Set(narrowing);
     scopes.set(column.id, {
-      appliesTo: narrowing,
+      scope: narrowing,
       applicability: (type) =>
         type !== null && within.has(type) ? "applies" : "not-applicable",
     });
