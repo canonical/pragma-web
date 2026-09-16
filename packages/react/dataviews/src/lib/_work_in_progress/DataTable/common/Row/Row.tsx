@@ -55,16 +55,14 @@ function Row<TRow extends object>({
       ) : null}
       {columns.map((column) => (
         <BodyCell
-          // Keyed by the record's type too: content narrowing on the record
-          // is drawn again, from the record of its current type, when the
-          // type moves under a column whose applicability does not.
-          key={`${column.id}:${type}`}
+          key={column.id}
           id={column.rowHeader === true ? headerId : undefined}
           provider={provider}
           channels={channels}
           column={column}
           field={readFieldName(column)}
           applicability={applicabilityOf(column, type)}
+          recordType={type}
         />
       ))}
     </div>

@@ -18,6 +18,39 @@ describe("isWithinControl", () => {
       .toBe(false);
   });
 
+  it("answers for every control a cell may hold", () => {
+    for (const html of [
+      '<a href="/m">a</a>',
+      "<button>b</button>",
+      "<input />",
+      "<label>l</label>",
+      "<select></select>",
+      "<textarea></textarea>",
+      "<summary>s</summary>",
+      '<div contenteditable="true">e</div>',
+      ...[
+        "button",
+        "checkbox",
+        "combobox",
+        "link",
+        "menuitem",
+        "menuitemcheckbox",
+        "menuitemradio",
+        "option",
+        "radio",
+        "slider",
+        "switch",
+        "tab",
+        "textbox",
+      ].map((role) => `<div role="${role}">x</div>`),
+    ]) {
+      expect(isWithinControl(markup(html).firstElementChild), html).toBe(true);
+    }
+    expect(
+      isWithinControl(markup('<div role="cell">x</div>').firstElementChild),
+    ).toBe(false);
+  });
+
   it("answers false for no element at all", () => {
     expect(isWithinControl(null)).toBe(false);
     expect(isWithinControl(document.createTextNode("text"))).toBe(false);

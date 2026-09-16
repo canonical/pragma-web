@@ -18,7 +18,6 @@ import {
 import {
   type CSSProperties,
   isValidElement,
-  type PointerEvent,
   type ReactElement,
   useCallback,
   useEffect,
@@ -44,10 +43,10 @@ import {
   useStableValue,
 } from "../../../../hooks/index.js";
 import {
-  areColumnScopesEqual,
+  areFieldScopesEqual,
   describeStatus,
-  readColumnScopes,
   readFieldName,
+  readFieldScopes,
 } from "../../../../utils/index.js";
 import {
   useColumnArrangement,
@@ -81,6 +80,13 @@ import "../../styles.css";
 /** The frame: the caller's box, holding the table, its footer and its announcer. */
 const frameCssClassName = "ds data-table-frame";
 
+/**
+ * `dense` is the design system's own density class: it sets the channel the
+ * stylesheet reads for row height and cell padding, so the table is dense
+ * wherever it sits.
+ */
+const componentCssClassName = "ds data-table dense";
+
 /** The frame observes nothing of its own node; the merge is for the caller's ref. */
 const attachNothing = (): undefined => undefined;
 
@@ -99,13 +105,6 @@ const readRowId = (target: EventTarget, table: Element): string | null => {
     ? row.getAttribute("data-row-id")
     : null;
 };
-
-/**
- * `dense` is the design system's own density class: it sets the channel the
- * stylesheet reads for row height and cell padding, so the table is dense
- * wherever it sits.
- */
-const componentCssClassName = "ds data-table dense";
 
 /** One identity for a source that orders by nothing. */
 const NO_SORTABLE_FIELDS: readonly string[] = Object.freeze([]);
@@ -193,7 +192,7 @@ export default function ScopedDataTable<
   const declaredColumns = useStableValue(listed, areColumnsEqual);
   // Held by what a scope is read from alone, so an inline heading or cell
   // re-reads no scope.
-  const scopedColumns = useStableValue(listed, areColumnScopesEqual);
+  const scopedColumns = useStableValue(listed, areFieldScopesEqual);
 
   // The columns the presentation shows, in its order. Both derivations
   // below are keyed on content, not on array identity: a caller who
@@ -263,6 +262,7 @@ export default function ScopedDataTable<
   useRenderCeiling({
     renderer: "DataTable",
     count: ids.length,
+    unit: "rows",
     virtualization: virtualization === undefined ? "available" : "in-use",
   });
 
@@ -284,10 +284,17 @@ export default function ScopedDataTable<
   // checkbox's own change would deselect it again.
   // The row a press began on, set before the press is started, so a long
   // press always has one.
-  const pressedRow = useRef("");
   const gestures = useLongPress({
-    onLongPress: () => {
-      enterSelection(pressedRow.current);
+    // A press is the table's where it lands in one of its rows, and not on
+    // one of the row's own controls.
+    accepts: (event) =>
+      readRowId(event.target, event.currentTarget) !== null &&
+      !isWithinControl(event.target),
+    onLongPress: ({ target, container }) => {
+      const rowId = readRowId(target, container);
+      if (rowId !== null) {
+        enterSelection(rowId);
+      }
     },
     onTap: (event) => {
       const rowId = readRowId(event.target, event.currentTarget);
@@ -296,15 +303,6 @@ export default function ScopedDataTable<
       }
     },
   });
-  const onPointerDown = useStableCallback(
-    (event: PointerEvent<HTMLDivElement>): void => {
-      const rowId = readRowId(event.target, event.currentTarget);
-      if (rowId !== null && !isWithinControl(event.target)) {
-        pressedRow.current = rowId;
-        gestures.onPointerDown(event);
-      }
-    },
-  );
   // Subscribed only while in the mode, so a table outside it re-renders for
   // no selection change of its own.
   useEffect(() => {
@@ -314,7 +312,7 @@ export default function ScopedDataTable<
     return provider.selection.state.subscribe(() => {
       if (provider.selection.state.get().ids.size === 0) {
         setSelecting(false);
-        announce(messages.selectionModeLeft);
+        announce(messages.selectionModeEnded);
       }
     });
   }, [selecting, provider, announce, messages]);
@@ -338,9 +336,10 @@ export default function ScopedDataTable<
   // stored arrangement is checked where the table mounts all the same.
   const scopeOf = useMemo(
     () =>
-      readColumnScopes({
+      readFieldScopes({
         collection: provider.collection,
-        columns: scopedColumns,
+        fields: scopedColumns,
+        subject: "DataTable column",
       }),
     [scopedColumns, provider],
   );
@@ -484,7 +483,7 @@ export default function ScopedDataTable<
           // A custom state with no native or ARIA attribute: an attribute,
           // present while the mode holds.
           data-selection-mode={selecting ? "true" : undefined}
-          {...(selectable ? { ...gestures, onPointerDown } : {})}
+          {...(selectable ? gestures : {})}
           // Every logical row, the header's included, so a row a virtualized
           // table has not mounted is still counted.
           aria-rowcount={
@@ -544,7 +543,7 @@ export default function ScopedDataTable<
                     // Solved for every rendered column, in the same order.
                     width={geometry.widths[position] as number}
                     labelId={`${baseId}-${column.id}`}
-                    scopedTo={scopeOf(column).scopedTo}
+                    appliesTo={scopeOf(column).appliesTo}
                   />
                 );
               })}

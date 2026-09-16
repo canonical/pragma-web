@@ -1,5 +1,5 @@
 /**
- * The instance collection the polymorphic tests and stories share: records
+ * The instance collection the polymorphic tests share: records
  * of two types, containers and virtual machines, with a field scoped to
  * each, and a provider over a manual source the test answers.
  *

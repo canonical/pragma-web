@@ -118,7 +118,7 @@ export default function createColumns<
       // gives; without one they would share a key, a track and a scope.
       if (ids.has(named)) {
         throw new Error(
-          `two columns are named "${named}"; give the second an id of its own`,
+          `createColumns names two columns "${named}"; give the second an id of its own`,
         );
       }
       ids.add(named);
@@ -134,9 +134,10 @@ export default function createColumns<
         sizing,
         sortable,
       } = column;
-      // Each optional member is given only when the declaration carries one:
-      // spreading them wholesale would offer `undefined` where the column
-      // says a member may be absent, which is a different statement.
+      // Each optional member is given only when the declaration carries one.
+      // A rest spread would be shorter, but over the union of typed columns
+      // the compiler widens every optional member to admit `undefined`, which
+      // a column under exact optional property types does not.
       return Object.freeze({
         header,
         field,

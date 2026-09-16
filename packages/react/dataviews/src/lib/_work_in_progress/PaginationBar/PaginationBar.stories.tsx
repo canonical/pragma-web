@@ -2,11 +2,11 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
+import { consumerCode } from "../../../storybook/consumerCode.js";
 import {
   withAppScope,
   withScrollingFrame,
 } from "../../../storybook/decorators.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import {
   createPendingSource,
   createUncountedSource,

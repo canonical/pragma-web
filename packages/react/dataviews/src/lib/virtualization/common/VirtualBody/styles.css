@@ -13,7 +13,7 @@
    */
   .ds.data-table:has(> .ds.data-table-row-group.body.virtual) {
     /* The body's offset, which places the viewport among the entries, is
-       measured from the root. */
+       measured from the table. */
     position: relative;
     /* The range keeps the entry at the viewport's start in place when a
        row above it is measured; the browser's own anchoring would correct

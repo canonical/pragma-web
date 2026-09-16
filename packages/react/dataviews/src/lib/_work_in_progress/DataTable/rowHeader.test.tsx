@@ -3,9 +3,10 @@
  * named by it, and so is the row's checkbox unless the caller names the row.
  * One per table, and never hidden.
  */
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
+import { pageOf } from "../../../../testing/fixtures.js";
 import {
   createMachineProvider,
   type Machine,
@@ -127,7 +128,7 @@ describe("a column declared the row header", () => {
         ],
       }),
     ).toThrow(
-      'columns "name" and "status" are each the row header; a row has one',
+      'DataTable columns "name" and "status" are each the row header; a row has one',
     );
   });
 
@@ -150,5 +151,41 @@ describe("a column declared the row header", () => {
   it("has no axe violation, selectable", async () => {
     loadedTable(fleet, { selectable: true });
     await expectNoAxeViolations(screen.getByRole("table"));
+  });
+
+  it("renames a row's checkbox when the header's text or the caller's label moves", () => {
+    for (const labelled of [false, true]) {
+      const { provider, source } = createMachineProvider();
+      const view = render(
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          selectable
+          {...(labelled
+            ? { rowLabel: (row: Machine) => `host ${row.name}` }
+            : {})}
+        />,
+      );
+      const deliver = (name: string) => {
+        act(() => {
+          source.latest().deliver({
+            status: "succeeded",
+            page: pageOf([machine("m-1", name)]),
+          });
+        });
+      };
+      deliver("alpha");
+      act(() => {
+        provider.refresh();
+      });
+      deliver("gamma");
+      expect(
+        screen.getByRole("checkbox", {
+          name: labelled ? "Select host gamma" : "Select gamma",
+        }),
+      ).toBeInTheDocument();
+      view.unmount();
+    }
   });
 });

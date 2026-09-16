@@ -1,7 +1,7 @@
 import { areListsEqual } from "@canonical/dataviews-core/bindings";
 import {
-  areColumnScopesEqual,
   areDisplayFieldsEqual,
+  areFieldScopesEqual,
 } from "../../../../utils/index.js";
 import type { DataTableColumn } from "../../types.js";
 import areColumnModelsEqual from "./areColumnModelsEqual.js";
@@ -21,7 +21,7 @@ export default function areColumnsEqual(
   return (
     areColumnModelsEqual(a, b) &&
     areDisplayFieldsEqual(a, b) &&
-    areColumnScopesEqual(a, b) &&
+    areFieldScopesEqual(a, b) &&
     areListsEqual(
       a,
       b,

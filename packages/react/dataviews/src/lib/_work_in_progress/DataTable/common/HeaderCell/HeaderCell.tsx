@@ -85,7 +85,7 @@ export default function HeaderCell({
   bounds,
   width,
   labelId,
-  scopedTo,
+  appliesTo,
 }: HeaderCellProps): ReactElement {
   const messages = useContext(MessagesContext);
   // Whether Shift was held when a key began activating the button: a click
@@ -104,13 +104,13 @@ export default function HeaderCell({
   const describedBy =
     [
       precedence === null ? null : descriptionId,
-      scopedTo === null ? null : scopeId,
+      appliesTo === null ? null : scopeId,
     ]
       .filter((id) => id !== null)
       .join(" ") || undefined;
   // The scope alone: what the header cell says of itself where its control
   // carries the rest.
-  const scopeDescription = scopedTo === null ? undefined : scopeId;
+  const scopeDescription = appliesTo === null ? undefined : scopeId;
   const indicator =
     precedence === null ? null : (
       <>
@@ -226,13 +226,13 @@ export default function HeaderCell({
           )}
         </span>
       )}
-      {/* A column whose field only some record types carry says so, read and
-          never drawn: the dash in such a cell is then a fact about the
-          record rather than a gap in the data. Clipped, not hidden, so it
-          stays in the accessibility tree for the description to reach. */}
-      {scopedTo === null ? null : (
-        <span id={scopeId} className="scope">
-          {messages.columnAppliesTo(scopedTo)}
+      {/* A column that applies to only some record types says so, read and
+          never drawn, as its place in the ordering is: the dash in such a
+          cell is then a fact about the record rather than a gap in the
+          data. Hidden, and reached as the heading's description. */}
+      {appliesTo === null ? null : (
+        <span id={scopeId} className="scope" hidden>
+          {messages.columnAppliesTo(appliesTo)}
         </span>
       )}
       {sortable && hydrated ? (

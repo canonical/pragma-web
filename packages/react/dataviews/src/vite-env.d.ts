@@ -4,6 +4,6 @@
 // replace it: `process.env.NODE_ENV`, which they match as a token.
 declare namespace NodeJS {
   interface ProcessEnv {
-    readonly NODE_ENV?: "development" | "production" | "test";
+    readonly NODE_ENV?: string;
   }
 }

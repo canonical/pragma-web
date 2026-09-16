@@ -12,6 +12,13 @@
 # The design's "Checkbox variant" is not a case here: it is the table's
 # selection cell, chosen by the table's `selectable` prop, not per column.
 #
+# Not applicable: where the field does not apply to the row's record, the
+# default content is a dash hidden from assistive technology and the word
+# for the state, DOM `span.not-applicable`, read beside it and not drawn —
+# clipped, since nothing references it and the cell is named by it, to a
+# one-pixel box with its margin taken back: unthemable geometry. A column's own content is handed the state instead
+# and draws it however it likes.
+#
 # Row header: the cell of the one column declared `rowHeader` carries
 # `role=rowheader` and DOM `ds data-table-body-cell row-header`, and its row
 # is named by it. Not a case of the content switch — it shows whatever its
@@ -82,6 +89,17 @@ node:
                 - uri: global.component.contextual_menu
                   relation:
                     cardinality: "0..1"
+          - node:
+              role: not applicable
+              edges:
+                - node:
+                    role: dash
+                  relation:
+                    cardinality: "1"
+                - node:
+                    role: word
+                  relation:
+                    cardinality: "1"
           - uri: $custom
       relation:
         cardinality: "1"

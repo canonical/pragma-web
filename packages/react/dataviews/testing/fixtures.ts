@@ -522,8 +522,6 @@ export const MESSAGE_SAMPLES: {
   statusNoData: null,
   selectAllRows: null,
   selectRow: [[MESSAGE_MARK]],
-  selectionModeEntered: null,
-  selectionModeLeft: null,
   columnWidth: [[1], [7]],
   cellNotApplicable: null,
   // One type alone, and several: English lists them differently.
@@ -568,6 +566,8 @@ export const MESSAGE_SAMPLES: {
   columnShown: [[MESSAGE_MARK, 2, 3]],
   columnMoved: [[MESSAGE_MARK, 2, 3]],
   tableSettingsReset: null,
+  selectionModeEntered: null,
+  selectionModeEnded: null,
   sortPanel: null,
   sortTerm: [
     [MESSAGE_MARK, "asc"],

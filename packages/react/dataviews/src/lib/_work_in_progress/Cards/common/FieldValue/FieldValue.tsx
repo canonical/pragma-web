@@ -51,7 +51,7 @@ function FieldValue<TRow extends object>({
           columnId={field.id}
         />
       ) : notApplicable ? (
-        // A field this record's type does not carry, told apart from one it
+        // A field that does not apply to this record, told apart from one it
         // carries no value for: the dash is seen, the word is read — clipped,
         // not hidden, so it stays in the accessibility tree.
         <>
@@ -69,7 +69,7 @@ function FieldValue<TRow extends object>({
  * One field's value on a card, inside the same cell scope a table's cell
  * installs, so a field's own `cell` renders unchanged on a card and may call
  * `useDataViewsCell` for the record's channels. Without one, primitive values
- * render as text, a field the record's type does not carry draws the
+ * render as text, a field that does not apply to the record draws the
  * not-applicable state, and every other value renders nothing.
  *
  * It subscribes to its own field's channel alone, so a record republished

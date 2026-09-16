@@ -1,3 +1,8 @@
+/**
+ * The provider the polymorphic stories render over, built as the machine
+ * stories build theirs. Story-only.
+ */
+
 import {
   createDataViewsProvider,
   type DataViewsProvider,
@@ -13,9 +18,13 @@ import {
 
 type InstanceProvider = DataViewsProvider<InstanceFields, Instance>;
 
+/** How one story's instance provider is set up. Read once, when it mounts. */
 export type InstanceProviderConfig = {
+  /** The source, built once for the story; the instances over an array by default. */
   readonly source?: (() => Source<Instance>) | undefined;
+  /** The query the provider starts on, as the canonical text a snapshot carries. */
   readonly query?: string | undefined;
+  /** Commands issued once the provider is built, before anything observes it. */
   readonly prepare?: ((provider: InstanceProvider) => void) | undefined;
 };
 

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { consumerCode } from "../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../storybook/decorators.js";
 import {
   createMockApiLoader,
@@ -10,7 +11,6 @@ import {
   SERVER_BACKED_FACETS,
   SERVER_BACKED_RENDER_CODE,
 } from "../../../storybook/machines/constants.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
 import ServerBackedMachines from "../../../storybook/machines/ServerBackedMachines.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";

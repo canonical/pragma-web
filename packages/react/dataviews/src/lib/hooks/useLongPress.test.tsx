@@ -129,4 +129,55 @@ describe("useLongPress", () => {
     vi.advanceTimersByTime(LONG_PRESS_MS);
     expect(onLongPress).not.toHaveBeenCalled();
   });
+
+  it("takes a new press of any pointer for no release of the last", () => {
+    // Fired, then left rather than released: no release timer lets it go,
+    // so the next press itself must.
+    const { row, onTap } = mount();
+    fireEvent.pointerDown(row, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    fireEvent.pointerLeave(row, touch);
+    fireEvent.pointerDown(row, {
+      pointerType: "mouse",
+      clientX: 1,
+      clientY: 1,
+    });
+    fireEvent.click(row);
+    expect(onTap).toHaveBeenCalledTimes(1);
+  });
+
+  it("lets a fired press go a tick after a cancelled release too", () => {
+    const { row, onTap } = mount();
+    fireEvent.pointerDown(row, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    fireEvent.pointerCancel(row, touch);
+    vi.advanceTimersByTime(0);
+    expect(fireEvent.contextMenu(row)).toBe(true);
+    fireEvent.click(row);
+    expect(onTap).toHaveBeenCalledTimes(1);
+  });
+
+  it("starts no press its element does not accept", () => {
+    const onLongPress = vi.fn();
+    const Refusing = () => {
+      const gestures = useLongPress({
+        onLongPress,
+        onTap: () => undefined,
+        accepts: () => false,
+      });
+      return (
+        // biome-ignore lint/a11y/useSemanticElements: the row under test is structure, as the table's is
+        // biome-ignore lint/a11y/useFocusableInteractive: the gestures are an enhancement over the row's own controls
+        <div role="row" {...gestures}>
+          row
+        </div>
+      );
+    };
+    render(<Refusing />);
+    const row = screen.getByRole("row");
+    fireEvent.pointerDown(row, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).not.toHaveBeenCalled();
+    expect(fireEvent.contextMenu(row)).toBe(true);
+  });
 });

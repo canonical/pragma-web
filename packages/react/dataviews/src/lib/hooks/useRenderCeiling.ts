@@ -33,6 +33,7 @@ const isProduction = (): boolean => {
 export default function useRenderCeiling({
   renderer,
   count,
+  unit,
   virtualization,
 }: UseRenderCeilingProps): void {
   const warned = useRef(false);
@@ -51,7 +52,7 @@ export default function useRenderCeiling({
         ? "Measure it, and consider `virtualizeRows` from `@canonical/dataviews-react/virtualization`, which mounts only the rows in view."
         : "Measure it: this renderer has no virtualization to opt into.";
     console.warn(
-      `${renderer} renders ${COUNT.format(count)} rows at once, past the ${COUNT.format(RENDER_CEILING)} the package warns at. ${remedy} Every row is still rendered.`,
+      `${renderer} renders ${COUNT.format(count)} ${unit} at once, past the ${COUNT.format(RENDER_CEILING)} the package warns at. ${remedy} Every one is still rendered.`,
     );
-  }, [renderer, count, virtualization]);
+  }, [renderer, count, unit, virtualization]);
 }

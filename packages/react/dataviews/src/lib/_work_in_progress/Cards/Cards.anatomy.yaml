@@ -29,6 +29,10 @@
 #   select-all checkbox to label  dimension/050
 #   field rows and columns        dimension/050, dimension/200
 #   text                          typography/text/primary, color/text
+# A field that does not apply to a card's record draws a dash hidden from
+# assistive technology and the word for the state, DOM `span.not-applicable`,
+# clipped to a one-pixel box with its margin taken back: unthemable geometry,
+# recorded here.
 # Findings owed to the design owners: a data card's anatomy (where selection,
 # a menu and status sit on a card), the card's span on the application grid
 # (the spike spans one intrinsic group of four columns), and whether a card

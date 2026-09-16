@@ -80,6 +80,14 @@ describe("compileFieldReader", () => {
       expect(readField({ cores: 4 }, "cores.toFixed")).toBeUndefined();
     });
 
+    it("reads through a function's own property, as through an object's", () => {
+      // A function is an object a property is read from: its own keys are
+      // walked, and what it inherits is not.
+      const fn = Object.assign(() => 0, { region: "eu" });
+      expect(readField({ fn }, "fn.region")).toBe("eu");
+      expect(readField({ fn }, "fn.call")).toBeUndefined();
+    });
+
     it("does not address an own key that holds a literal dot", () => {
       // The path is the name, so a key spelled with a dot is reached by no
       // path; an adapter maps such a key to a stable name of its own.

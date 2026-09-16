@@ -7,8 +7,8 @@ import { Button, type ButtonProps } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { consumerCode } from "../../../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../../../storybook/decorators.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import {
   type Machine,
   machineCollection,

@@ -419,7 +419,9 @@ export type ProviderHost<
    * a row for its type is the provider's: a renderer asks rather than reads.
    *
    * Read by every renderer, which watches a record's type and asks
-   * `readApplicability` of the type whether a field applies to it.
+   * `readApplicability` of the type whether a field applies to it. The pair
+   * of `recordType`, which answers the same fact by identity from memory
+   * for a selected row no longer on display.
    */
   readonly typeOf: (row: TRow) => string | null;
   /**

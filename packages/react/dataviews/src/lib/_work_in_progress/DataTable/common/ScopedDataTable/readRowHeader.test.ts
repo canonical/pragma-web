@@ -42,7 +42,7 @@ describe("readRowHeader", () => {
         machines.schema,
       ),
     ).toThrow(
-      'columns "name" and "status" are each the row header; a row has one',
+      'DataTable columns "name" and "status" are each the row header; a row has one',
     );
   });
 
@@ -55,7 +55,7 @@ describe("readRowHeader", () => {
         instances.schema,
       ),
     ).toThrow(
-      'column "image" is the row header, but its field "image" does not apply to every record type',
+      'DataTable column "image" is the row header, but its field "image" does not apply to every record type',
     );
     // Narrowed itself, over a field every type carries.
     expect(() =>
@@ -70,6 +70,8 @@ describe("readRowHeader", () => {
         ],
         instances.schema,
       ),
-    ).toThrow('column "name" is the row header, but its field "name"');
+    ).toThrow(
+      'DataTable column "name" is the row header, but its field "name"',
+    );
   });
 });

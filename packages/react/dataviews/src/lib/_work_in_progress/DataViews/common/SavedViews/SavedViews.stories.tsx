@@ -14,8 +14,8 @@ import {
   useSyncExternalStore,
 } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { consumerCode } from "../../../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../../../storybook/decorators.js";
-import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import {
   type MachineProvider,
   useMachineProvider,

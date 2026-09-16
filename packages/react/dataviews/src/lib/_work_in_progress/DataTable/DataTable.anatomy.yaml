@@ -31,6 +31,9 @@
 #                   press on touch has put it in the mode where a tap toggles
 #                   a row; absent otherwise. A custom state with no native or
 #                   ARIA attribute, so an attribute, never a class
+#   row id          DOM `[data-row-id]` on each row of a selectable table: the
+#                   row a press or a tap landed on, which the table's one
+#                   gesture reads
 #   gap             DOM `ds data-table-gap`, hidden from assistive technology
 #   settings cell   design "settings action cell"
 #                   DOM `ds data-table-header-cell settings`
@@ -48,12 +51,12 @@
 # `--density-padding-inline`). The DSL has no way to say "channel", so the
 # path names it and this note records the deviation.
 #
-# Density: the root carries the design system's `.dense` class, so the table
+# Density: the table carries the design system's `.dense` class, so it
 # is dense wherever it sits. It reads the channel and defines no density rule
 # of its own. `.dense` is a class, not a state; nothing changes structurally.
 #
 # Accessibility (DataViews component coverage):
-#   root, rows, cells   "DataTable/header/row/cell"
+#   table, rows, cells  "DataTable/header/row/cell"
 #                       (1.3.1-1.3.2, 2.1.1-2.1.2, 2.4.3, 2.4.7, 4.1.2)
 #   select-all, selection cells
 #                       "Row/select-all checkboxes" (1.3.1, 2.1.1, 4.1.2-4.1.3)
@@ -73,15 +76,16 @@
 #                       reached as a landmark and never read as a row
 #   announcement        "DataViews.Settings", "Column header menu" and the
 #                       sort (4.1.3): one polite live region per root, in the
-#                       frame after the footer, coalescing what is said in one moment and
+#                       frame after the footer, coalescing what is said in one
+#                       moment and
 #                       adding each announcement as a new node, saying what
 #                       has no place on screen to be read from — the new
 #                       ordering, why a sort changed nothing, a column hidden,
 #                       shown or moved with its new position, always shown,
-#                       reset. It never repeats the status row. Every word
+#                       reset, selection mode entered on touch and ended. It never repeats the status row. Every word
 #                       comes from the messages record
 #   virtualized body    "DataTable virtualized rows" (1.3.1, 2.1.1, 2.4.3,
-#                       4.1.2): the root reports `aria-rowcount` and every
+#                       4.1.2): the table reports `aria-rowcount` and every
 #                       mounted row its `aria-rowindex` in logical order, the
 #                       header row being 1, so a gap is never read as the
 #                       table's end; the row holding focus stays mounted.
@@ -89,7 +93,7 @@
 # Virtualized: a table given `virtualization` mounts only the entries near its
 # viewport. The body row group takes the `virtual` class and holds gaps
 # in place of the entries it does not mount: before the first run of
-# mounted entries, between runs, and after the last. The root becomes the
+# mounted entries, between runs, and after the last. The table becomes the
 # scroll viewport the range is measured against. None of this changes a
 # table without `virtualization`.
 #
@@ -132,6 +136,10 @@
 #     display is deferred in the DSL.
 #   - A row's bottom border is drawn on every row but the last: the DSL
 #     cannot condition a style on position.
+#   - Where any pointer is coarse a selectable row declines text selection and the
+#     platform's callout (`user-select: none`, `-webkit-touch-callout: none`),
+#     since a held touch there is the row's long press; the DSL has neither
+#     key nor pointer media.
 #   - The status cell wraps where every other cell holds one line, and its
 #     row lays out as a block, so it spans the table even when a selectable
 #     table has no columns; the DSL has no keys for either.
@@ -151,7 +159,7 @@
 #   - A gap's height is the range's per-render publication, the height of
 #     the entries it stands for, written on the gap itself: geometry no
 #     stylesheet can know, as `--data-table-columns` is.
-#   - The virtualized root is positioned (`layout.position: relative`), so the
+#   - The virtualized table is positioned (`layout.position: relative`), so the
 #     body's offset is measured from it, and it opts out of the browser's
 #     scroll anchoring (`overflow-anchor: none`): the range anchors the
 #     scroll itself, and two corrections would move it twice. By default it

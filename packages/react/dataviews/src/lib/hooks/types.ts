@@ -159,18 +159,28 @@ export type UseAnnouncerResult = {
  */
 export type UseStableValueResult<TValue> = TValue;
 
-/** Props of `useLongPress`: what a long press and a tap each do. */
-export type UseLongPressProps = {
-  /** A touch held still for the delay. */
-  readonly onLongPress: () => void;
-  /** A click that was not the release of a long press: a tap, or a mouse click. */
-  readonly onTap: (event: MouseEvent<HTMLElement>) => void;
+/** Where a long press began: the element pressed, and the one handling it. */
+export type LongPressOrigin = {
+  readonly target: EventTarget;
+  readonly container: HTMLElement;
 };
 
-/**
- * What `useLongPress` answers: the handlers the pressed element takes, one
- * identity each for as long as the element is mounted.
- */
+/** Props of `useLongPress`: what a long press and a tap each do. */
+export type UseLongPressProps = {
+  /** A touch held still for the delay, handed where it began. */
+  readonly onLongPress: (origin: LongPressOrigin) => void;
+  /** A click that was not the release of a long press: a tap, or a mouse click. */
+  readonly onTap: (event: MouseEvent<HTMLElement>) => void;
+  /**
+   * Whether a press is one the handling element takes: a container passes
+   * presses to its own items and none other. Every press, by default.
+   */
+  readonly accepts?:
+    | ((event: PointerEvent<HTMLElement>) => boolean)
+    | undefined;
+};
+
+/** What `useLongPress` answers: the handlers the pressed element takes. */
 export type UseLongPressResult = {
   readonly onPointerDown: (event: PointerEvent<HTMLElement>) => void;
   readonly onPointerMove: (event: PointerEvent<HTMLElement>) => void;
@@ -185,8 +195,10 @@ export type UseLongPressResult = {
 export type UseRenderCeilingProps = {
   /** The renderer, as the warning names it. */
   readonly renderer: string;
-  /** How many rows it renders at once. */
+  /** How many it renders at once. */
   readonly count: number;
+  /** What it renders, as the warning counts them. */
+  readonly unit: "rows" | "cards";
   /**
    * Whether the renderer virtualizes: `in-use` where it does, so nothing is
    * said; `available` where it could, so the warning points to it; `none`
