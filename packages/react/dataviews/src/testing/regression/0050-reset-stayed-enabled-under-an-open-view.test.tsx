@@ -11,14 +11,20 @@
  */
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
+import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
 import {
   createMachineProvider,
   declareMachineOrdering,
   machine,
 } from "../../../testing/machines.js";
+import readAnnouncements from "../../../testing/readAnnouncements.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
+
+beforeEach(() => {
+  fakeAnnouncerClock();
+});
 
 describe("regression 0050 — reset stayed enabled under an open view", () => {
   it("offers no reset and announces none while only the view hides a column", async () => {
@@ -60,8 +66,6 @@ describe("regression 0050 — reset stayed enabled under an open view", () => {
     });
     expect(reset).toHaveClass("disabled");
     fireEvent.click(reset);
-    expect(
-      document.querySelector(".ds.data-table-announcement"),
-    ).toBeEmptyDOMElement();
+    expect(await readAnnouncements()).toEqual([]);
   });
 });

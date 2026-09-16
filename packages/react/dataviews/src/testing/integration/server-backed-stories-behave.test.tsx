@@ -85,7 +85,7 @@ describe("server-backed stories behave", () => {
     expect(
       rest.getByLabelText(`${labels.region} contains`),
     ).toBeInTheDocument();
-    const pageSizes = within(rest.getByLabelText("Items per page:"));
+    const pageSizes = within(rest.getByLabelText("Rows per page"));
     for (const size of sizes) {
       expect(
         pageSizes.getByRole("option", { name: String(size) }),

@@ -24,12 +24,14 @@ import { describe, expect, it, onTestFinished, vi } from "vitest";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
 import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
+import fakeAnnouncerClock from "../../../../../../testing/fakeAnnouncerClock.js";
 import {
   createMachineProvider,
   declareMachineOrdering,
   type MachineProvider,
   machine,
 } from "../../../../../../testing/machines.js";
+import readAnnouncements from "../../../../../../testing/readAnnouncements.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 
@@ -100,15 +102,9 @@ const choose = (name: string): void => {
   fireEvent.click(within(menu).getByRole("menuitem", { name }));
 };
 
-/**
- * What every other announcement ends in, so the same words said twice are
- * read twice: a no-break space.
- */
-const REPEAT_MARK = "\u00a0";
-
-/** What the table last announced of its columns. */
-const readAnnouncement = (): string | null =>
-  document.querySelector(".ds.data-table-announcement")?.textContent ?? null;
+/** What the table last announced, once what was just said has been spoken. */
+const readAnnouncement = async (): Promise<string | null> =>
+  (await readAnnouncements()).at(-1) ?? null;
 
 describe("DataViews.Settings", () => {
   it("throws outside a table's settings cell", () => {
@@ -157,7 +153,8 @@ describe("DataViews.Settings", () => {
     expect(listShown()).toEqual(["Name", "Status"]);
   });
 
-  it("hides a column, announces it and returns focus to its button, asking the source for nothing", () => {
+  it("hides a column, announces it and returns focus to its button, asking the source for nothing", async () => {
+    fakeAnnouncerClock();
     const recording = createRecordingLocation({ href: "/machines" });
     const { provider, source } = createProvider(recording.location);
     render(<Composition provider={provider} />);
@@ -166,7 +163,7 @@ describe("DataViews.Settings", () => {
     const slice = provider.state.get().slice;
     choose("Hide Status");
     expect(listShown()).toEqual(["Name", "Cores"]);
-    expect(readAnnouncement()).toBe("Status hidden");
+    expect(await readAnnouncement()).toBe("Status hidden");
     expect(findTrigger()).toHaveFocus();
     expect(provider.presentation.state.get().presentation).toEqual({
       "table.hidden": ["status"],
@@ -177,39 +174,38 @@ describe("DataViews.Settings", () => {
     expect(provider.state.get().slice).toBe(slice);
   });
 
-  it("shows a hidden column, announcing where it now stands", () => {
+  it("shows a hidden column, announcing where it now stands", async () => {
+    fakeAnnouncerClock();
     const { provider } = createProvider();
     render(<Composition provider={provider} />);
     choose("Hide Status");
+    await readAnnouncement();
     choose("Show Status");
     expect(listShown()).toEqual(["Name", "Status", "Cores"]);
-    // Every other announcement ends in a no-break space, so the region's
-    // text changes and a screen reader reads the same words again.
-    expect(readAnnouncement()).toBe(
-      `Status shown, position 2 of 3${REPEAT_MARK}`,
-    );
+    expect(await readAnnouncement()).toBe("Status shown, position 2 of 3");
     expect(findTrigger()).toHaveFocus();
   });
 
-  it("moves a column, announcing where it now stands each time", () => {
+  it("moves a column, announcing where it now stands each time", async () => {
+    fakeAnnouncerClock();
     const { provider } = createProvider();
     render(<Composition provider={provider} />);
     choose("Move Cores left");
     expect(listShown()).toEqual(["Name", "Cores", "Status"]);
-    expect(readAnnouncement()).toBe("Cores moved to position 2 of 3");
+    expect(await readAnnouncement()).toBe("Cores moved to position 2 of 3");
     expect(findTrigger()).toHaveFocus();
     choose("Move Cores left");
     expect(listShown()).toEqual(["Cores", "Name", "Status"]);
-    expect(readAnnouncement()).toBe(
-      `Cores moved to position 1 of 3${REPEAT_MARK}`,
-    );
+    // The same kind of words again are a new announcement, unaltered.
+    expect(await readAnnouncement()).toBe("Cores moved to position 1 of 3");
   });
 
-  it("keeps a column shown: the last one shown cannot be hidden, and an unhideable one says so", () => {
+  it("keeps a column shown: the last one shown cannot be hidden, and an unhideable one says so", async () => {
+    fakeAnnouncerClock();
     const { provider } = createProvider();
     render(<Composition provider={provider} />);
     choose("Name is always shown");
-    expect(readAnnouncement()).toBe("Name is always shown");
+    expect(await readAnnouncement()).toBe("Name is always shown");
     expect(listShown()).toEqual(["Name", "Status", "Cores"]);
     const hideable: readonly DataTableColumn[] = [
       { id: "status", header: "Status" },
@@ -262,12 +258,14 @@ describe("DataViews.Settings", () => {
     return { provider, source, recording };
   };
 
-  it("resets widths, order and hidden columns, announcing it and returning focus to its button", () => {
+  it("resets widths, order and hidden columns, announcing it and returning focus to its button", async () => {
+    fakeAnnouncerClock();
     const { provider } = renderArranged();
+    await readAnnouncement();
     choose("Reset table settings");
     expect(listShown()).toEqual(["Name", "Status", "Cores"]);
     expect(provider.presentation.state.get().presentation).toEqual({});
-    expect(readAnnouncement()).toBe("Table settings reset");
+    expect(await readAnnouncement()).toBe("Table settings reset");
     expect(findTrigger()).toHaveFocus();
   });
 
@@ -294,7 +292,8 @@ describe("DataViews.Settings", () => {
     expect(provider.presentation.state.get().presentation).toEqual({});
   });
 
-  it("works under StrictMode's doubled effects: one announcement, focus on its button", () => {
+  it("works under StrictMode's doubled effects: one announcement, focus on its button", async () => {
+    fakeAnnouncerClock();
     const { provider } = createProvider();
     render(
       <StrictMode>
@@ -303,7 +302,7 @@ describe("DataViews.Settings", () => {
     );
     choose("Hide Status");
     expect(listShown()).toEqual(["Name", "Cores"]);
-    expect(readAnnouncement()).toBe("Status hidden");
+    expect(await readAnnouncement()).toBe("Status hidden");
     expect(findTrigger()).toHaveFocus();
   });
 
