@@ -4,11 +4,11 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import { useContext, useMemo } from "react";
+import Context from "../Context.js";
 import {
   narrowRootFilters,
   narrowRootProvider,
-} from "../bridgeProviderTypes.js";
-import Context from "../Context.js";
+} from "../common/utils/index.js";
 import type { UseDataViewsResult } from "./types.js";
 
 /**

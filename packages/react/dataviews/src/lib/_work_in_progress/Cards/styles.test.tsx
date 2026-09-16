@@ -148,14 +148,7 @@ describe("Cards stylesheet", () => {
   });
 
   it("writes no length or colour of its own", () => {
-    // The one exception is the box a word read and not drawn is clipped to,
-    // one pixel with its margin taken back: unthemable geometry, recorded in
-    // the anatomy.
-    const themed = sheet.replace(
-      /inline-size:\s*1px;\s*block-size:\s*1px;\s*margin:\s*-1px;/g,
-      "",
-    );
-    expect(themed).not.toMatch(/\d(px|rem|em)\b|#[0-9a-f]{3,8}\b|opacity/i);
+    expect(sheet).not.toMatch(/\d(px|rem|em)\b|#[0-9a-f]{3,8}\b|opacity/i);
   });
 });
 

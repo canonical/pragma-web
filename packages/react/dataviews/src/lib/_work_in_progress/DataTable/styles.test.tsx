@@ -503,6 +503,14 @@ describe("DataTable stylesheet", () => {
       /inline-size:\s*var\(--dimension-200\);/,
     );
   });
+
+  it("clips the menu button's name to the one-pixel box, and draws no word of its own", () => {
+    expect(rule(/& > \.menu > \.trigger > \.menu-label/)).toMatch(
+      /inline-size:\s*1px;\s*block-size:\s*1px;\s*margin:\s*-1px;\s*padding:\s*0;/,
+    );
+    // The not-applicable word is clipped by its own sheet, not this one.
+    expect(sheet).not.toMatch(/not-applicable/);
+  });
 });
 
 /** Each anatomy file, beside the component implementing its root node. */
@@ -574,5 +582,31 @@ describe("DataTable anatomy", () => {
       cleanup();
     }
     expect([...stated]).toEqual([]);
+  });
+
+  it("records the selection mode attribute as the status is recorded", () => {
+    const anatomy = read("DataTable.anatomy.yaml");
+    const deviations = anatomy.slice(
+      anatomy.indexOf("# Deviations the DSL cannot express"),
+    );
+    expect(deviations).toMatch(/`data-status`/);
+    expect(deviations).toMatch(/`data-selection-mode`/);
+  });
+
+  it("states the virtualized cap as the stylesheet applies it", () => {
+    const anatomy = read("DataTable.anatomy.yaml");
+    expect(anatomy).not.toMatch(/a caller's own maximum wins/);
+    expect(anatomy).toMatch(/nothing a caller passes raises it/);
+  });
+
+  it("states the row header and selection on touch with their criteria", () => {
+    const anatomy = read("DataTable.anatomy.yaml");
+    const statement = anatomy.slice(anatomy.indexOf("# Accessibility"));
+    expect(statement).toMatch(
+      /row header cell\s+"DataTable row header" \(1\.3\.1, 4\.1\.2\)/,
+    );
+    expect(statement).toMatch(
+      /selection mode\s+"Selection on touch" \(2\.1\.1, 2\.5\.1, 2\.5\.2, 4\.1\.3\)/,
+    );
   });
 });

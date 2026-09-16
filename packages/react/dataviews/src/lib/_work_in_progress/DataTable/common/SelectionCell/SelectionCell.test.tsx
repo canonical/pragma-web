@@ -23,6 +23,7 @@ describe("SelectionCell", () => {
       rows: provider.rows,
       selection: provider.selection,
       fields: ["status"],
+      readType: () => null,
     });
     const releaseScopes = scopes.observe();
     onTestFinished(() => {

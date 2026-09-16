@@ -89,6 +89,7 @@ describe("a filter and an ordering by dotted fields over many rows", () => {
       rows: channel,
       selection: createSelection(),
       fields: ["config.region", "config.cores"],
+      readType: () => null,
     });
     const release = scopes.observe();
     channel.set(

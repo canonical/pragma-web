@@ -33,15 +33,16 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.cellNotApplicable).toBe("Not applicable");
     // English lists them: one alone, two joined, and more with commas and a
     // final "and", so a heading reads as a sentence however many there are.
-    expect(m.columnAppliesTo(["virtual machines"])).toBe(
-      "Applies to virtual machines",
+    // Handed the declared type names as the discriminator holds them.
+    expect(m.columnAppliesTo(["virtual-machine"])).toBe(
+      "Applies to virtual-machine",
     );
-    expect(m.columnAppliesTo(["containers", "virtual machines"])).toBe(
-      "Applies to containers and virtual machines",
+    expect(m.columnAppliesTo(["container", "virtual-machine"])).toBe(
+      "Applies to container and virtual-machine",
     );
-    expect(
-      m.columnAppliesTo(["containers", "virtual machines", "images"]),
-    ).toBe("Applies to containers, virtual machines and images");
+    expect(m.columnAppliesTo(["container", "virtual-machine", "image"])).toBe(
+      "Applies to container, virtual-machine and image",
+    );
     expect(m.columnAppliesTo([])).toBe("Applies to no record type");
   });
 

@@ -55,6 +55,12 @@ const rendered = {
 
 /** The stories checked once their play function has run, by part. */
 const played = {
+  // The table in selection mode, and framed with its footer, as each
+  // story's play leaves it.
+  DataTable: (({ SelectionOnTouch, FrameAndFooter }) => ({
+    SelectionOnTouch,
+    FrameAndFooter,
+  }))(composeStories(tableStories)),
   Polymorphic: composeStories(polymorphicStories),
   "REST API": composeStories(restStories),
   "GraphQL API": composeStories(graphqlStories),

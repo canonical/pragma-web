@@ -6,6 +6,10 @@
  */
 import { describe, expect, it, vi } from "vitest";
 import buildRowModel from "../../../testing/buildRowModel.js";
+import {
+  compileRecordTypeReader,
+  createCollection,
+} from "../collection/index.js";
 import { createChannel } from "../observable/index.js";
 import { createSelection } from "../selection/index.js";
 import createRowScopes from "./createRowScopes.js";
@@ -33,7 +37,12 @@ const harness = (
   const model = buildRowModel({ identify: byId, rows });
   const channel = createChannel<RowModel<Machine>>(model);
   const selection = createSelection();
-  const scopes = createRowScopes({ rows: channel, selection, fields });
+  const scopes = createRowScopes({
+    rows: channel,
+    selection,
+    fields,
+    readType: () => null,
+  });
   const detach = scopes.observe();
   const publish = (next: readonly Machine[]): void => {
     channel.set(
@@ -155,6 +164,7 @@ describe("createRowScopes", () => {
       rows: channel,
       selection,
       fields: ["status"],
+      readType: () => null,
     });
     scopes.observe();
     const minted = reads;
@@ -209,6 +219,7 @@ describe("createRowScopes", () => {
       rows: channel,
       selection,
       fields: ["status"],
+      readType: () => null,
     });
     // A registry nobody attached — a discarded render's, or a server
     // render's — subscribed to nothing, so this publication reaches it only
@@ -268,9 +279,42 @@ describe("createRowScopes", () => {
     detach();
   });
 
-  it("names no type where no reader is given", () => {
+  it("names no type where the reader answers none", () => {
     const { scopes, detach } = harness([machine("m-1")]);
     expect(scopes.readRow("m-1").type.get()).toBeNull();
+    detach();
+  });
+
+  it("publishes the type the collection's reader names, and null for an undeclared one", () => {
+    type Instance = { readonly id: string; readonly type: string };
+    const collection = createCollection({
+      identify: (instance: Instance) => instance.id,
+      discriminator: "type",
+      fields: [
+        { field: "type", kind: "choices", options: ["container", "vm"] },
+      ],
+    });
+    const identify = (instance: Instance): string => instance.id;
+    const rows = createChannel<RowModel<Instance>>(
+      buildRowModel({ identify, rows: [{ id: "i-1", type: "container" }] }),
+    );
+    const scopes = createRowScopes({
+      rows,
+      selection: createSelection(),
+      fields: [],
+      readType: compileRecordTypeReader(collection),
+    });
+    const detach = scopes.observe();
+    const { type } = scopes.readRow("i-1");
+    expect(type.get()).toBe("container");
+    rows.set(
+      buildRowModel({
+        identify,
+        rows: [{ id: "i-1", type: "appliance" }],
+        previous: rows.get(),
+      }),
+    );
+    expect(type.get()).toBeNull();
     detach();
   });
 });

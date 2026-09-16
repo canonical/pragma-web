@@ -25,6 +25,7 @@ const observeFleet = () => {
     rows: provider.rows,
     selection: provider.selection,
     fields: ["name", "status"],
+    readType: () => null,
   });
   const releaseScopes = scopes.observe();
   onTestFinished(() => {

@@ -2,7 +2,8 @@
  * The machinery the standalone parts and the composition share, outside
  * any ontology tier: the announcer a root speaks through, the cell context a
  * table installs and a column's own renderer reads, the field declaration
- * every renderer shows a record by, the words a table installs over its
+ * every renderer shows a record by, the content a table's cell and a card's
+ * field draw a value with, the words a table installs over its
  * private parts, what a renderer shows for a field that does not apply to a
  * record, the status a renderer shows above what it draws, the
  * settings menu a table installs in its settings cell and what it was given
@@ -13,7 +14,9 @@
 
 export * from "./Announcer/index.js";
 export * from "./CellContext/index.js";
+export * from "./CustomContent/index.js";
 export * from "./DisplayField/index.js";
+export * from "./FieldText/index.js";
 export * from "./MessagesContext/index.js";
 export * from "./NotApplicable/index.js";
 export * from "./SettingsMenuContext/index.js";

@@ -6,6 +6,7 @@ export { default as composeMessage } from "./composeMessage.js";
 export { default as describeOrdering } from "./describeOrdering.js";
 export { default as describeStatus } from "./describeStatus.js";
 export { default as interceptSubmit } from "./interceptSubmit.js";
+export { default as isFieldScopeEqual } from "./isFieldScopeEqual.js";
 export { default as isSameFacet } from "./isSameFacet.js";
 export { default as listHiddenFields } from "./listHiddenFields.js";
 export { default as listNiceTicks } from "./listNiceTicks.js";

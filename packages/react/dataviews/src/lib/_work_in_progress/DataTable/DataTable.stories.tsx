@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 import { consumerCode } from "../../../storybook/consumerCode.js";
 import { withAppScope, withFrame } from "../../../storybook/decorators.js";
 import {
@@ -22,8 +22,11 @@ import {
   useMachineProvider,
 } from "../../../storybook/machines/story-utils.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
+import { LONG_PRESS_MS } from "../../hooks/constants.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { virtualizeRows } from "../../virtualization/index.js";
+import { PaginationBar } from "../PaginationBar/index.js";
+import createColumns from "./createColumns.js";
 import Component from "./DataTable.js";
 import type { DataTableColumn, DataTableProps } from "./types.js";
 
@@ -93,58 +96,49 @@ const ruled = (name: string, rule: string): ReactNode => (
   </>
 );
 
-const plainColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const plainColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);
 
-// A sortable column may only name a field the fixture source declares it can
-// order by, and every sortable column below is built through this helper,
-// whose type holds it to that: a column offering a sort its source cannot
-// execute is a dead control, and no story demonstrates one.
-const sortableColumn = (
-  id: SortableField,
-  header: string,
-): DataTableColumn => ({ id, header, sortable: true });
+const sortableColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "owner", header: "Owner" },
+]);
 
-const sortableColumns: readonly DataTableColumn[] = [
-  sortableColumn("name", "Host"),
-  sortableColumn("status", "Status"),
-  { id: "region", header: "Region" },
-  sortableColumn("cores", "Cores"),
-  { id: "owner", header: "Owner" },
-];
-
-const sizedColumns: readonly DataTableColumn[] = [
+const sizedColumns = createColumns(machineCollection, [
   {
-    id: "name",
+    field: "name",
     header: ruled("Host", "flex ×2 · min 160"),
     sizing: { kind: "flex", weight: 2, minPx: 160 },
   },
   {
-    id: "status",
+    field: "status",
     header: ruled("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
-    id: "region",
+    field: "region",
     header: ruled("Region", "flex ×1 · 96–144"),
     sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 },
   },
   {
-    id: "cores",
+    field: "cores",
     header: ruled("Cores", "fixed 80"),
     sizing: { kind: "fixed", px: 80 },
   },
   {
-    id: "owner",
+    field: "owner",
     header: ruled("Owner", "flex ×1 · min 96"),
     sizing: { kind: "flex", weight: 1, minPx: 96 },
   },
-];
+]);
 
 /** Mark the named columns resizable, leaving the rest as they are. */
 const resizing = (
@@ -174,7 +168,7 @@ const searchForNothing = (provider: MachineProvider): void => {
 };
 
 /** What every table story imports from the package. */
-const tableParts = ["DataTable", "type DataTableColumn"];
+const tableParts = ["DataTable", "createColumns"];
 
 /** The table, as a story's consumer code renders it. */
 const tableCode = `<DataTable provider={provider} columns={columns} label="Machines" />`;
@@ -195,29 +189,29 @@ const framedTableCode = (
   ${tableCode}
 </div>`;
 
-const plainColumnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`;
+const plainColumnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);`;
 
-const sortableColumnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];`;
+const sortableColumnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "owner", header: "Owner" },
+]);`;
 
-const sizedColumnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 } },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 } },
-  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
-];`;
+const sizedColumnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 } },
+  { field: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+  { field: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 } },
+  { field: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
+  { field: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
+]);`;
 
 /** Press one key on a control, `times` times over. */
 const press = async (
@@ -464,6 +458,125 @@ export const Selectable: Story = {
   },
 };
 
+/** A touch at the centre of an element, as a finger lands on it. */
+const touchOf = (element: Element) => {
+  const box = element.getBoundingClientRect();
+  return {
+    pointerType: "touch",
+    clientX: box.left + box.width / 2,
+    clientY: box.top + box.height / 2,
+  };
+};
+
+/** The body row a host's checkbox sits in. */
+const rowOf = async (
+  canvas: Parameters<NonNullable<Story["play"]>>[0]["canvas"],
+  host: string,
+): Promise<HTMLElement> => {
+  const checkbox = await canvas.findByRole("checkbox", {
+    name: `Select ${host}`,
+  });
+  const row = checkbox.closest<HTMLElement>("[role='row']");
+  if (row === null) {
+    throw new Error(`no row holds the checkbox for ${host}`);
+  }
+  return row;
+};
+
+/**
+ * Selection on touch: the checkbox stays the baseline, and a long press on a
+ * row selects it and puts the table in selection mode, where a tap on a row
+ * toggles it. Deselecting the last row ends the mode. Both are announced,
+ * and the mode is stated on the table as `data-selection-mode`.
+ *
+ * The play holds a touch on alder past the long-press delay, taps birch into
+ * the selection and taps alder out of it, leaving the table in the mode.
+ */
+export const SelectionOnTouch: Story = {
+  parameters: consumerCode({
+    parts: tableParts,
+    declarations: plainColumnsCode,
+    render: selectableTableCode,
+  }),
+  args: { selectable: true },
+  render: renderMachines(plainColumns),
+  play: async ({ canvas }) => {
+    const alder = await rowOf(canvas, "alder.example.com");
+    const birch = await rowOf(canvas, "birch.example.com");
+    const table = canvas.getByRole("table");
+    const tap = async (row: HTMLElement): Promise<void> => {
+      await fireEvent.pointerDown(row, touchOf(row));
+      await fireEvent.pointerUp(row, touchOf(row));
+      await fireEvent.click(row);
+    };
+    await fireEvent.pointerDown(alder, touchOf(alder));
+    await new Promise((resolve) => setTimeout(resolve, LONG_PRESS_MS + 100));
+    await fireEvent.pointerUp(alder, touchOf(alder));
+    await fireEvent.click(alder);
+    await waitFor(() =>
+      expect(table).toHaveAttribute("data-selection-mode", "true"),
+    );
+    await expect(alder).toHaveAttribute("aria-selected", "true");
+    await tap(birch);
+    await waitFor(() => expect(birch).toHaveAttribute("aria-selected", "true"));
+    await tap(alder);
+    await waitFor(() =>
+      expect(
+        within(alder).getByRole("checkbox", {
+          name: "Select alder.example.com",
+        }),
+      ).not.toBeChecked(),
+    );
+    // Birch is still selected, so the mode holds.
+    await expect(table).toHaveAttribute("data-selection-mode", "true");
+  },
+};
+
+/** The table in a capped frame, with the pagination bar in its footer. */
+function FramedMachines(args: StoryTableProps): ReactElement {
+  const provider = useMachineProvider();
+  return (
+    <Component
+      {...args}
+      provider={provider}
+      columns={plainColumns}
+      rowLabel={hostName}
+      style={{ maxBlockSize: "20rem" }}
+      footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+    />
+  );
+}
+
+/**
+ * The frame and its footer: the table stands in a frame that takes the
+ * caller's native props — here a capped height, within which the table
+ * scrolls under its sticky header — and the footer holds the pagination bar
+ * beneath the table, outside the table role, so it is reached as a landmark
+ * and never read as a row. The play checks where the bar is placed; the
+ * capped scroll, the sticky footer and its stacking are the stylesheet's,
+ * pinned by its own tests.
+ */
+export const FrameAndFooter: Story = {
+  parameters: consumerCode({
+    parts: ["DataTable", "PaginationBar", "createColumns"],
+    declarations: plainColumnsCode,
+    render: `<DataTable
+  provider={provider}
+  columns={columns}
+  label="Machines"
+  style={{ maxBlockSize: "20rem" }}
+  footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+/>`,
+  }),
+  render: (args) => <FramedMachines {...args} />,
+  play: async ({ canvas }) => {
+    const navigation = await canvas.findByRole("navigation");
+    const table = canvas.getByRole("table");
+    await expect(table.contains(navigation)).toBe(false);
+    await expect(table.parentElement?.contains(navigation)).toBe(true);
+  },
+};
+
 /**
  * Select all acts on displayed rows: it governs the page, not the
  * collection. The window shows five machines; two are selected — birch,
@@ -553,13 +666,13 @@ export const HorizontalScroll: Story = {
 export const Resizable: Story = {
   parameters: consumerCode({
     parts: tableParts,
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
-  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 }, resizable: true },
-];`,
+    declarations: `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
+  { field: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+  { field: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
+  { field: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
+  { field: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 }, resizable: true },
+]);`,
     render: tableCode,
   }),
   decorators: [withFrame("48rem")],
@@ -581,43 +694,43 @@ export const Resizable: Story = {
 export const MixedResizableColumns: Story = {
   parameters: consumerCode({
     parts: tableParts,
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region", resizable: true },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`,
+    declarations: `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", resizable: true },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region", resizable: true },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);`,
     render: tableCode,
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(resizing(plainColumns, ["name", "region"])),
 };
 
-const boundedColumns: readonly DataTableColumn[] = [
+const boundedColumns = createColumns(machineCollection, [
   {
-    id: "name",
+    field: "name",
     header: ruled("Host", "resizable · 120–320"),
     sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 },
     resizable: true,
   },
   {
-    id: "region",
+    field: "region",
     header: ruled("Region", "resizable · 96–160"),
     sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 160 },
     resizable: true,
   },
   {
-    id: "status",
+    field: "status",
     header: ruled("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
-    id: "owner",
+    field: "owner",
     header: ruled("Owner", "takes the rest"),
     sizing: { kind: "flex", weight: 1, minPx: 96 },
   },
-];
+]);
 
 /**
  * Resize within bounds: a resize stops at the column's declared minimum and
@@ -631,12 +744,12 @@ const boundedColumns: readonly DataTableColumn[] = [
 export const ResizeWithinBounds: Story = {
   parameters: consumerCode({
     parts: tableParts,
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 } },
-  { id: "region", header: "Region", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 160 } },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
-];`,
+    declarations: `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 120, maxPx: 320 } },
+  { field: "region", header: "Region", resizable: true, sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 160 } },
+  { field: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+  { field: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
+]);`,
     render: tableCode,
   }),
   decorators: [withFrame("48rem")],
@@ -666,13 +779,13 @@ export const ResizeWithinBounds: Story = {
 export const ResizePastTheContainer: Story = {
   parameters: consumerCode({
     parts: tableParts,
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
-  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
-];`,
+    declarations: `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
+  { field: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+  { field: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
+  { field: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
+  { field: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 } },
+]);`,
     render: framedTableCode("36rem"),
   }),
   decorators: [withFrame("36rem")],
@@ -697,24 +810,24 @@ export const ResizePastTheContainer: Story = {
   },
 };
 
-const fixedColumns: readonly DataTableColumn[] = [
+const fixedColumns = createColumns(machineCollection, [
   {
-    id: "name",
+    field: "name",
     header: ruled("Host", "resizable · fixed 200"),
     sizing: { kind: "fixed", px: 200 },
     resizable: true,
   },
   {
-    id: "status",
+    field: "status",
     header: ruled("Status", "fixed 112"),
     sizing: { kind: "fixed", px: 112 },
   },
   {
-    id: "owner",
+    field: "owner",
     header: ruled("Owner", "fixed 120 · takes the rest"),
     sizing: { kind: "fixed", px: 120 },
   },
-];
+]);
 
 /**
  * Last column takes the rest: every column here is fixed, and together they
@@ -727,11 +840,11 @@ const fixedColumns: readonly DataTableColumn[] = [
 export const LastColumnTakesTheRest: Story = {
   parameters: consumerCode({
     parts: tableParts,
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true, sizing: { kind: "fixed", px: 200 } },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "owner", header: "Owner", sizing: { kind: "fixed", px: 120 } },
-];`,
+    declarations: `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", resizable: true, sizing: { kind: "fixed", px: 200 } },
+  { field: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+  { field: "owner", header: "Owner", sizing: { kind: "fixed", px: 120 } },
+]);`,
     render: framedTableCode("48rem"),
   }),
   decorators: [withFrame("48rem")],
@@ -777,7 +890,7 @@ function StatusCell({ value }: DisplayFieldCellProps): ReactElement | null {
  */
 export const CustomCellRenderer: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "type DisplayFieldCellProps", "type DataTableColumn"],
+    parts: ["DataTable", "type DisplayFieldCellProps", "createColumns"],
     declarations: `const statusDisplay: Record<string, { label: string; tone: string }> = {
   running: { label: "Running", tone: "var(--color-icon-success)" },
   failed: { label: "Failed", tone: "var(--color-icon-destructive)" },
@@ -796,19 +909,23 @@ const StatusCell = ({ value }: DisplayFieldCellProps) => {
   ) : null;
 };
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status", cell: StatusCell },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`,
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status", cell: StatusCell },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);`,
     render: tableCode,
   }),
   render: renderMachines(
-    plainColumns.map((column) =>
-      column.id === "status" ? { ...column, cell: StatusCell } : column,
-    ),
+    createColumns(machineCollection, [
+      { field: "name", header: "Host" },
+      { field: "status", header: "Status", cell: StatusCell },
+      { field: "region", header: "Region" },
+      { field: "cores", header: "Cores" },
+      { field: "owner", header: "Owner" },
+    ]),
   ),
 };
 
@@ -835,12 +952,12 @@ function HostCell({ value }: DisplayFieldCellProps): ReactElement {
   );
 }
 
-const scopedColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", cell: HostCell },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-];
+const scopedColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host", cell: HostCell },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+]);
 
 /**
  * Cell reading its scope: the Host cell calls `useDataViewsCell` for the
@@ -855,7 +972,7 @@ export const CellReadingItsScope: Story = {
     parts: [
       "DataTable",
       "type DisplayFieldCellProps",
-      "type DataTableColumn",
+      "createColumns",
       "useDataViewsCell",
       "useDataViewsValue",
     ],
@@ -878,12 +995,12 @@ export const CellReadingItsScope: Story = {
   );
 }
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", cell: HostCell },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-];`,
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", cell: HostCell },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+]);`,
     render: selectableTableCode,
   }),
   args: { selectable: true },
@@ -992,7 +1109,7 @@ export const NoMatch: Story = {
  */
 export const LongValues: Story = {
   parameters: consumerCode({
-    parts: tableParts,
+    parts: ["DataTable", "type DataTableColumn"],
     declarations: `const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Host", sizing: { kind: "fixed", px: 176 } },
   { id: "status", header: "Status", sizing: { kind: "fixed", px: 96 } },
@@ -1081,13 +1198,14 @@ const mountedPositions = (table: HTMLElement): number[] =>
  * window, mounted or not.
  */
 export const Virtualized: Story = {
-  parameters: virtualizedConsumer(`const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];`),
+  parameters:
+    virtualizedConsumer(`const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "owner", header: "Owner" },
+]);`),
   args: { selectable: true, style: { maxBlockSize: "24rem" } },
   render: renderVirtualized(sortableColumns),
   play: async ({ canvas }) => {
@@ -1200,13 +1318,14 @@ const columns: readonly DataTableColumn[] = [
  * the row is let go.
  */
 export const VirtualizedKeepsFocus: Story = {
-  parameters: virtualizedConsumer(`const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`),
+  parameters:
+    virtualizedConsumer(`const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);`),
   args: { selectable: true, style: { maxBlockSize: "24rem" } },
   render: renderVirtualized(plainColumns),
   play: async ({ canvas }) => {

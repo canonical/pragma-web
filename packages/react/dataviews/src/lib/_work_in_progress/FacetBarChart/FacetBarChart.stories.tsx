@@ -8,14 +8,17 @@ import {
   createRestHandlers,
 } from "../../../storybook/machines/api/index.js";
 import { SERVER_BACKED_FACETS } from "../../../storybook/machines/constants.js";
-import { createPendingSource } from "../../../storybook/machines/fixtures.js";
+import {
+  createPendingSource,
+  machineCollection,
+} from "../../../storybook/machines/fixtures.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
 import {
   type MachineProviderConfig,
   useMachineProvider,
 } from "../../../storybook/machines/story-utils.js";
-import type { DataTableColumn } from "../DataTable/index.js";
+import { createColumns } from "../DataTable/index.js";
 import { FacetBarChart as ConnectedChart } from "../DataViews/common/FacetBarChart/index.js";
 import { DataViews } from "../DataViews/index.js";
 import Component from "./FacetBarChart.js";
@@ -38,11 +41,11 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** The table beside the chart. */
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+]);
 
 /** The import every story's code shows for a part not yet on the root. */
 const prototypeImports = `import { machineCollection, machines } from "./machines.js";
@@ -118,17 +121,17 @@ function BesideFiltersMachines({
 export const BesideFilters: Story = {
   render: ({ label }) => <BesideFiltersMachines label={label} />,
   parameters: consumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress prototype: not yet exported from the package root.
 import { FacetBarChart } from "./DataViews/FacetBarChart.js";`,
     query: "page=1&size=5",
     facets: ["status", "cores"],
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];`,
+    declarations: `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+]);`,
     render: `<DataViews provider={provider}>
   <DataViews.Filters />
   <FacetBarChart field="status" label="Machines by status" />

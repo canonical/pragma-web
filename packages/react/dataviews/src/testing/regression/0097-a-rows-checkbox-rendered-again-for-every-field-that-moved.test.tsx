@@ -51,6 +51,8 @@ describe("a field of a selectable row moving", () => {
         page: pageOf([machine("m-1", "alpha", "running")]),
       });
     });
+    // Counted at all, so a mock that stopped applying cannot pass unseen.
+    expect(renders.names).toContain("Select alpha");
     renders.names.length = 0;
     act(() => {
       provider.refresh();

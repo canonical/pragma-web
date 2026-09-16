@@ -270,6 +270,13 @@ export default function ScopedDataTable<
   // the mode, where a tap toggles a row; it ends when the last selected row
   // is deselected. Both are announced, since nothing on screen says either.
   const [selecting, setSelecting] = useState(false);
+  // Selection no longer offered ends the mode as the table renders: React
+  // discards this render and renders again before committing, so no commit
+  // states a mode the table no longer acts on. It ends without an
+  // announcement, since the selection controls leave with it.
+  if (selecting && !selectable) {
+    setSelecting(false);
+  }
   const enterSelection = useStableCallback((rowId: string): void => {
     provider.selection.add([rowId]);
     if (!selecting) {
@@ -286,17 +293,18 @@ export default function ScopedDataTable<
     claim: (target, container) =>
       isWithinControl(target) ? null : readRowId(target, container),
     onLongPress: enterSelection,
-    onTap: (rowId) => {
-      if (selecting) {
-        provider.selection.toggle(rowId);
-      }
-    },
+    // Outside the mode a tap is not the table's, so no click reads a row.
+    onTap: selecting
+      ? (rowId) => {
+          provider.selection.toggle(rowId);
+        }
+      : undefined,
   });
   // Subscribed only while in the mode, so a table outside it re-renders for
   // no selection change of its own. The mode ends with the last selected
   // row — as it stands when the subscription is taken, too, since a
   // selection emptied or a provider swapped before then publishes nothing
-  // here — and with selection no longer offered.
+  // here.
   useEffect(() => {
     if (!selecting) {
       return undefined;
@@ -307,13 +315,9 @@ export default function ScopedDataTable<
         announce(messages.selectionModeEnded);
       }
     };
-    if (!selectable) {
-      setSelecting(false);
-      return undefined;
-    }
     endIfEmpty();
     return provider.selection.state.subscribe(endIfEmpty);
-  }, [selecting, selectable, provider, announce, messages]);
+  }, [selecting, provider, announce, messages]);
 
   // The header row's sort: the ordering in force and what each column shows
   // of it, the column that claims it, refusals, no-JS destinations, and the
@@ -451,8 +455,8 @@ export default function ScopedDataTable<
           role="table"
           aria-label={label}
           aria-busy={busy}
-          // A custom state with no native or ARIA attribute: an attribute,
-          // present while the mode holds.
+          // A custom state carried as an attribute, as the status is, and
+          // present while the mode holds: a recorded deviation.
           data-selection-mode={selecting ? "true" : undefined}
           {...(selectable ? gestures : {})}
           // Every logical row, the header's included, so a row a virtualized

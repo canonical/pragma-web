@@ -22,9 +22,6 @@ type ScopeRecord<TRow extends object> = {
   readonly slots: readonly FieldSlot[];
 };
 
-/** Every row's type, where no reader is given: none. */
-const readNoType = (): null => null;
-
 const sameOrder = (a: readonly string[], b: readonly string[]): boolean =>
   a.length === b.length && a.every((id, position) => id === b[position]);
 
@@ -54,7 +51,7 @@ export default function createRowScopes<TRow extends object>(
     field,
     read: compileFieldReader(field),
   }));
-  const readType = config.readType ?? readNoType;
+  const { readType } = config;
   const records = new Map<string, ScopeRecord<TRow>>();
   const ids = createChannel<readonly string[]>(Object.freeze([]), {
     equals: sameOrder,

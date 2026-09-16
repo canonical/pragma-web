@@ -109,7 +109,7 @@ export type DataViewsMessages = {
   /** A resize handle's value: the column's width in pixels. */
   readonly columnWidth: (pixels: number) => string;
 
-  // A field that does not apply to the record in its row.
+  // What a table's cell or a card's field says of a field that does not apply.
   /**
    * What a cell says in place of a value when its field does not apply to
    * the record's type — a third state beside a value and an empty field,
@@ -120,7 +120,10 @@ export type DataViewsMessages = {
    * What a column's heading says, read but not shown, when its field applies
    * to some of the collection's record types and not others: the types it
    * applies to, so a reader meeting a dash in the column knows which records
-   * carry the field at all.
+   * carry the field at all. The types are the collection's declared type
+   * names as the discriminator holds them — `"virtual-machine"`, not a label
+   * — in the order the column names them; words that would read them as
+   * labels are the application's to supply.
    */
   readonly columnAppliesTo: (types: readonly string[]) => string;
 

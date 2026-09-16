@@ -19,7 +19,7 @@ import {
   useMachineProvider,
 } from "../../../../../storybook/machines/story-utils.js";
 import { useDataViewsValue } from "../../../../hooks/index.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import { createColumns, DataTable } from "../../../DataTable/index.js";
 import { useDataViews } from "../../hooks/index.js";
 import DataViews from "../../Provider.js";
 import Pagination from "../Pagination/Pagination.js";
@@ -34,11 +34,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "owner", header: "Owner" },
+]);
 
 /**
  * A source that can archive and delete machines. Both actions take the
@@ -131,11 +131,11 @@ function ManagedMachines({
   );
 }
 
-const selectionActionCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const selectionActionCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "owner", header: "Owner" },
+]);
 
 // Pressed, it runs through the provider, which captures the selection as
 // its targets, runs the source's action and removes the ones that succeed.
@@ -171,7 +171,7 @@ const actionsCode = ({
     parts: [
       "DataTable",
       "DataViews",
-      "type DataTableColumn",
+      "createColumns",
       "useDataViews",
       ...(declarations === "" ? [] : ["useDataViewsValue"]),
     ],

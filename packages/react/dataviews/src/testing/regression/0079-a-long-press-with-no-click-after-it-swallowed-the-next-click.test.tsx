@@ -51,11 +51,8 @@ describe("a long press the platform sends no click after", () => {
     // No click follows the release. A tick later the press is over.
     vi.advanceTimersByTime(0);
     expect(fireEvent.contextMenu(row)).toBe(true);
-    fireEvent.pointerDown(row, {
-      pointerType: "mouse",
-      clientX: 1,
-      clientY: 1,
-    });
+    // A click with no press before it, as keyboard activation sends: only
+    // the press's own end can have let it through.
     fireEvent.click(row);
     expect(onTap).toHaveBeenCalledTimes(1);
   });

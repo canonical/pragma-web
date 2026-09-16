@@ -2,10 +2,11 @@ import { memo, type ReactElement, useMemo } from "react";
 import {
   CellContext,
   type CellContextValue,
+  CustomContent,
+  FieldText,
   NotApplicable,
 } from "../../../../common/index.js";
 import { readFieldName } from "../../../../utils/index.js";
-import { CustomContent, FieldText } from "./common/index.js";
 import type { BodyCellProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-body-cell";
@@ -81,11 +82,12 @@ function BodyCell<TRow extends object>({
  * implementation covers: the text cell, the cell of a field that does not
  * apply to a record's type, a column's own renderer, and the row header —
  * the cell of the one column declared `rowHeader`, which names its row — with
- * no inline editing or row actions yet. Every cell subscribes to its own
- * field alone, so a record update re-renders only the cells whose values
- * actually changed; the record a column's own content is handed is read as
- * it renders, and the cell draws again when the record's type moves.
- * Either way it installs the cell context the content reads.
+ * no inline editing or row actions yet. A cell draws from the parts a card's
+ * field draws from: its default text subscribes to its own field alone, a
+ * column's own content to that and to the record's type, and a
+ * not-applicable cell to neither, so a record update re-renders only the
+ * cells whose values actually changed. Either way it installs the cell
+ * context the content reads.
  *
  * Memoised: without it the claim above would hold for the channel and be
  * undone by the row, which would re-render every cell it has whenever it

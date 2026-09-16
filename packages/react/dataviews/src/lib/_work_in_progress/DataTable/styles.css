@@ -193,21 +193,6 @@
     overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    /* The word for a field that does not apply to the row's record: read
-       beside the dash, taking no room and drawing nothing. Clipped rather
-       than hidden, since nothing references it: the cell is named by it.
-       Unthemable geometry. */
-    & > .not-applicable {
-      position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
-      margin: -1px;
-      padding: 0;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
   }
 
   .ds.data-table-resize-handle {
@@ -328,8 +313,10 @@
        Unthemable geometry. */
     & > .menu > .trigger > .menu-label {
       position: absolute;
-      inline-size: 0;
-      block-size: 0;
+      inline-size: 1px;
+      block-size: 1px;
+      margin: -1px;
+      padding: 0;
       overflow: hidden;
       clip-path: inset(50%);
       white-space: nowrap;

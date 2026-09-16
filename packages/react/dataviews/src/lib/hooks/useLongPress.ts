@@ -17,10 +17,11 @@ type Press = {
  * handlers go on the pressed element or on a container, and `claim` answers
  * what a press or a click landed on — a row, say — or null where it is not
  * the handler's. A press is claimed where it begins and again when it fires,
- * so a long press is handed only what is still there under it. The click a released long press still produces is swallowed, so a
- * long press is never also a tap, and the context menu a platform opens for a
- * held touch is suppressed while a press is tracked, so the platform's
- * gesture does not fight this one. A mouse or pen is never a long press: its
+ * so a long press is handed only what is still there under it. The click a
+ * released long press still produces is swallowed, so a long press is never
+ * also a tap, and the context menu a platform opens for a held touch is
+ * suppressed while a press is tracked, so the platform's gesture does not
+ * fight this one. A mouse or pen is never a long press: its
  * clicks are taps, and its context menu is left alone.
  *
  * @note Impure: schedules the press timer, and cancels the click and the
@@ -128,9 +129,13 @@ export default function useLongPress<TClaim>({
         event.stopPropagation();
         return;
       }
-      const claimed = latest.current.claim(event.target, event.currentTarget);
+      const { claim, onTap } = latest.current;
+      if (onTap === undefined) {
+        return;
+      }
+      const claimed = claim(event.target, event.currentTarget);
       if (claimed !== null) {
-        latest.current.onTap(claimed);
+        onTap(claimed);
       }
     },
     onContextMenu: (event) => {

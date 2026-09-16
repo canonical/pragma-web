@@ -38,8 +38,8 @@ const isProduction = (): boolean => {
 };
 
 /**
- * Warn, in development, when a renderer draws more rows than the ceiling
- * without virtualization: a prompt to measure, never a cap.
+ * Warn, in development, when a renderer draws more rows or cards than the
+ * ceiling without virtualization: a prompt to measure, never a cap.
  *
  * Said once per mount, the first time the count passes the ceiling, and
  * never in a production build, nor where the renderer already virtualizes.

@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { instances } from "../../../../../../testing/instances.js";
 import { machines } from "../../../../../../testing/machines.js";
 import { readFieldScopes } from "../../../../utils/index.js";
+import type { FieldScope } from "../../../../utils/types.js";
 import type { DataTableColumn } from "../../types.js";
 import readRowHeader from "./readRowHeader.js";
 
@@ -101,6 +102,31 @@ describe("readRowHeader", () => {
         ],
         instances,
       ),
+    ).toMatchObject({ id: "name" });
+  });
+
+  it("is checked against the scope read for the column alone", () => {
+    const header = { id: "name", header: "Name", rowHeader: true } as const;
+    const scopedTo = (scope: FieldScope["scope"]) => (): FieldScope => ({
+      scope,
+      applicability: () => "applies",
+    });
+    // Nothing in the declaration or the schema narrows `name`: the scope
+    // read for it alone decides.
+    expect(() =>
+      readRowHeader([header], scopedTo(["container"]), instances.types),
+    ).toThrow(
+      'DataTable column "name" is the row header, but its field "name" does not apply to every record type',
+    );
+    expect(
+      readRowHeader(
+        [header],
+        scopedTo(["container", "virtual-machine"]),
+        instances.types,
+      ),
+    ).toMatchObject({ id: "name", hideable: false });
+    expect(
+      readRowHeader([header], scopedTo(null), instances.types),
     ).toMatchObject({ id: "name" });
   });
 });

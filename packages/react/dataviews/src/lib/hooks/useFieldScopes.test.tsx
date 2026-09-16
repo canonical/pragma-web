@@ -1,11 +1,12 @@
 /**
  * A renderer's field scopes, held while what a scope reads says the same:
  * a heading rebuilt inline reads no scope again, a field narrowed anew does,
- * and the applicability callback keeps one identity across both.
+ * and the applicability callback moves with the scopes it reads.
  */
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { instances } from "../../../testing/instances.js";
+import silenceRenderErrors from "../../../testing/silenceRenderErrors.js";
 import type { DisplayField } from "../common/index.js";
 import type { UseFieldScopesProps } from "./types.js";
 import useFieldScopes from "./useFieldScopes.js";
@@ -34,6 +35,24 @@ describe("useFieldScopes", () => {
       withImage({ id: "image", header: "Image", appliesTo: ["container"] }),
     );
     expect(result.current.readScope).not.toBe(first.readScope);
-    expect(result.current.decideApplicability).toBe(first.decideApplicability);
+    // The decision reads the scopes it was made over, so it moves with them.
+    expect(result.current.decideApplicability).not.toBe(
+      first.decideApplicability,
+    );
+  });
+
+  it("refuses a narrowing to an undeclared type in its renderer's own words", () => {
+    silenceRenderErrors();
+    const image = { id: "image", header: "Image", appliesTo: ["appliance"] };
+    for (const [renderer, subject] of [
+      ["DataTable", "DataTable column"],
+      ["Cards", "Cards field"],
+    ] as const) {
+      expect(() =>
+        renderHook(() => useFieldScopes({ ...withImage(image), renderer })),
+      ).toThrow(
+        `${subject} "image" applies to "appliance", which is not a type of "type"`,
+      );
+    }
   });
 });

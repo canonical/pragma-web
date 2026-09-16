@@ -22,6 +22,9 @@ export type FieldScope = {
   readonly applicability: (type: string | null) => Applicability;
 };
 
+/** A renderer of records, as its warnings and errors name it. */
+export type RendererName = "DataTable" | "Cards";
+
 /** One declared column's or field's scope, by the column or field. */
 export type FieldScopes = (column: DisplayField) => FieldScope;
 
@@ -38,5 +41,5 @@ export type ReadFieldScopesConfig = {
   /** Every column or field the renderer declares, shown or not. */
   readonly fields: readonly DisplayField[];
   /** The renderer declaring them, which its errors name. */
-  readonly renderer: "DataTable" | "Cards";
+  readonly renderer: RendererName;
 };

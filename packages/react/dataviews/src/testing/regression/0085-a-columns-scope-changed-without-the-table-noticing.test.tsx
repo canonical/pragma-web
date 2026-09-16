@@ -1,7 +1,7 @@
 /**
  * The columns are read by content, so a caller rebuilding its list changes
  * nothing; the content key compared ids, fields, sizing, sorting and
- * resizing, and not the members this rung added. A caller that narrowed a
+ * resizing, and not a column's narrowing, row header or hideability. A caller that narrowed a
  * column's scope, made it the row header or fixed its hideability while
  * keeping the same ids got the old columns back, and the table drew the old
  * scope and no row header.

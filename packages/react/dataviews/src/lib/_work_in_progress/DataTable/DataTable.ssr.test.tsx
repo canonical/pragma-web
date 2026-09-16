@@ -211,7 +211,7 @@ describe("DataTable SSR", () => {
     expect(markup).toContain('class="label">Name</span>');
   });
 
-  it("sends the typed table's root, footer, row ids, cells and scope", () => {
+  it("sends the root, footer, row ids, cells and scope of records of several types", () => {
     const { provider } = createInstanceProvider();
     const host = readProviderHost(provider);
     host.complete(host.refresh(), deliverRows(MIXED_FLEET));
@@ -234,7 +234,7 @@ describe("DataTable SSR", () => {
     expect(html).toContain('data-row-id="i-2"');
     expect(html).toMatch(/role="rowheader"[^>]*>db-01</);
     expect(html).toContain(
-      '<span aria-hidden="true">—</span><span class="not-applicable">Not applicable</span>',
+      '<span aria-hidden="true">—</span><span class="ds data-views-not-applicable">Not applicable</span>',
     );
     expect(html).toMatch(/class="scope" hidden="">Applies to container</);
   });

@@ -23,6 +23,7 @@ const observeRow = (fields: readonly string[]) => {
     rows: provider.rows,
     selection: provider.selection,
     fields,
+    readType: () => null,
   });
   const releaseScopes = scopes.observe();
   onTestFinished(() => {

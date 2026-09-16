@@ -5,7 +5,7 @@
  */
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { LONG_PRESS_MS } from "./constants.js";
+import { LONG_PRESS_MS, LONG_PRESS_SLOP_PX } from "./constants.js";
 import useLongPress from "./useLongPress.js";
 
 /** Every press the row under test takes is its own. */
@@ -212,5 +212,78 @@ describe("useLongPress", () => {
     expect(onLongPress).not.toHaveBeenCalled();
     // Still swallowed as a press's release, so no tap follows it.
     expect(fireEvent.click(row)).toBe(false);
+  });
+
+  it("lets a second touch press cancel the first, so only one fires", () => {
+    const { row, onLongPress } = mount();
+    fireEvent.pointerDown(row, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS / 2);
+    // A second finger, or a release the platform never sent.
+    fireEvent.pointerDown(row, { ...touch, clientX: 30 });
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls a drift of exactly the slop still a press", () => {
+    const { row, onLongPress } = mount();
+    fireEvent.pointerDown(row, touch);
+    fireEvent.pointerMove(row, {
+      ...touch,
+      clientX: touch.clientX + LONG_PRESS_SLOP_PX,
+    });
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("claims no click while taps are not its handler's", () => {
+    const claim = vi.fn(() => "row");
+    const Untapped = () => {
+      const gestures = useLongPress({ claim, onLongPress: () => undefined });
+      return (
+        // biome-ignore lint/a11y/useSemanticElements: the row under test is structure, as the table's is
+        // biome-ignore lint/a11y/useFocusableInteractive: the gestures are an enhancement over the row's own controls
+        <div role="row" {...gestures}>
+          row
+        </div>
+      );
+    };
+    render(<Untapped />);
+    fireEvent.click(screen.getByRole("row"));
+    expect(claim).not.toHaveBeenCalled();
+  });
+
+  it("hands a press and a tap what the claim answered, and nothing unclaimed", () => {
+    const onLongPress = vi.fn();
+    const onTap = vi.fn();
+    const Rows = () => {
+      const gestures = useLongPress({
+        claim: (target) =>
+          target instanceof Element ? target.getAttribute("data-row-id") : null,
+        onLongPress,
+        onTap,
+      });
+      return (
+        <div {...gestures}>
+          <span data-row-id="r-1">one</span>
+          <span>header</span>
+        </div>
+      );
+    };
+    render(<Rows />);
+    const claimed = screen.getByText("one");
+    const unclaimed = screen.getByText("header");
+    fireEvent.pointerDown(claimed, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).toHaveBeenCalledWith("r-1");
+    fireEvent.pointerUp(claimed, touch);
+    fireEvent.click(claimed);
+    fireEvent.click(claimed);
+    expect(onTap).toHaveBeenCalledTimes(1);
+    expect(onTap).toHaveBeenCalledWith("r-1");
+    fireEvent.pointerDown(unclaimed, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    fireEvent.click(unclaimed);
+    expect(onLongPress).toHaveBeenCalledTimes(1);
+    expect(onTap).toHaveBeenCalledTimes(1);
   });
 });

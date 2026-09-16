@@ -156,7 +156,7 @@ export default function selectRows<TRow extends object>(
         read: compileFieldReader(predicate.field),
       }),
     );
-  const searched = searchFields.map(compileFieldReader);
+  const searched = searchFields.map((field) => compileFieldReader(field));
   return rows.filter((row) => {
     for (const predicate of predicates) {
       if (!predicate.test(predicate.read(row))) {

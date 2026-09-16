@@ -8,13 +8,13 @@ describe("SERVER_BACKED_COLUMNS_CODE", () => {
   it("spells the columns the server-backed screen renders", () => {
     expect(
       SERVER_BACKED_COLUMNS_CODE,
-    ).toBe(`const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "region", header: "Region", sortable: true },
-  { id: "owner", header: "Owner", sortable: true },
-];`);
+    ).toBe(`const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "region", header: "Region", sortable: true },
+  { field: "owner", header: "Owner", sortable: true },
+]);`);
   });
 });
 

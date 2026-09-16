@@ -36,7 +36,7 @@ type Story = StoryObj<typeof Component>;
 
 /** The consumer code every story here shows: the endpoint through Relay. */
 const code = consumerCode({
-  parts: ["DataViews", "type DataTableColumn"],
+  parts: ["DataViews", "createColumns"],
   core: ["createRelaySource", "declareCapabilities", "readSlice"],
   imports: `import { createOperationDescriptor } from "relay-runtime";
 import MachinesQuery from "./__generated__/MachinesQuery.graphql.js";

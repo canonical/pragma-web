@@ -1,10 +1,10 @@
 /**
- * How many rows a renderer draws without virtualization before it warns, in
- * development, that the count deserves a measurement. A prompt and never a
- * cap: the renderer still draws every row the viewer asked for, and a
- * production build says nothing. Not a performance threshold — no universal
- * row count is one — but the count at which a table rendering every row is
- * worth a look. Documented as its value, not exported: an application acts on
+ * How many rows or cards a renderer draws without virtualization before it
+ * warns, in development, that the count deserves a measurement. A prompt and
+ * never a cap: the renderer still draws everything the viewer asked for, and
+ * a production build says nothing. Not a performance threshold — no
+ * universal count is one — but the count at which a renderer drawing every
+ * record is worth a look. Documented as its value, not exported: an application acts on
  * the warning, never on the number.
  */
 export const RENDER_CEILING = 500;

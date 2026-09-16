@@ -14,7 +14,7 @@ bun add @canonical/dataviews-core
 
 Under active development; both DataViews packages are unpublished, so the surface changes without compatibility. The root exports what an application calls — `createCollection` and `createSchema`, `createDataViewsProvider`, the sources `createArraySource`, `createQuerySource` and `createRelaySource`, the adapter helpers `declareCapabilities`, `readSlice` and `createPage`, the locations `createMemoryLocation` and `createPlatformLocation`, the wire grammar `encodeQuery` and `decodeQuery`, and the two query constants `EMPTY_SLICE` and `DEFAULT_WINDOW` — together with the grammar, collection, schema, result, refusal, count, capability, provider, action and saved-view types anyone writing a source or reading a result must name (`Slice`, `ResultWindow`, `Query`, `SourcePage`, `Completion`, `SourceCapabilities`, `DisplayStatus`, `ViewStore`, `Collection`, `Selection`, `ActionRun` and friends). What the provider builds and owns — the coordinator, the action run, the row model, the selection, the channels, and the source and location loops — is not exported. Three further entry points carry bytes or an audience the root does not:
 
-- `@canonical/dataviews-core/bindings` — the machinery every framework binding shares and no application calls: the column geometry (`resolveColumns`, `buildColumnTemplate`, `createColumnLayout`, `createGridInteraction`, `areSizingsEqual`, `readSizingBounds`), the arrangement a table places its columns by (`resolveColumnArrangement`), the row channels a body renders from (`createRowScopes`), the table's status, the entries of its body and the pagination facts a bar offers, each projected from the published state (`resolveDisplayStatus`, `areDisplayStatusesEqual`, `DISPLAY_STATUS_PHASES`, `listDisplayEntries`, `resolvePagination`), the filter records a root builds (`createFilterInputs`), the provider check (`isDataViewsProvider`) and the provider's internal host (`readProviderHost`), the list comparison (`areListsEqual`), and the wire key a form control is named by (`spellWireKey`).
+- `@canonical/dataviews-core/bindings` — the machinery every framework binding shares and no application calls: the column geometry (`resolveColumns`, `buildColumnTemplate`, `createColumnLayout`, `createGridInteraction`, `areSizingsEqual`, `readSizingBounds`), the arrangement a table places its columns by (`resolveColumnArrangement`), the row channels a body renders from (`createRowScopes`), the table's status, the entries of its body and the pagination facts a bar offers, each projected from the published state (`resolveDisplayStatus`, `areDisplayStatusesEqual`, `DISPLAY_STATUS_PHASES`, `listDisplayEntries`, `resolvePagination`), the filter records a root builds (`createFilterInputs`), the provider check (`isDataViewsProvider`) and the provider's internal host (`readProviderHost`), a row's declared type and whether a field applies to it (`compileRecordTypeReader`, `readApplicability`), the field names a schema declares (`FieldNameOf`), the list comparison (`areListsEqual`), and the wire key a form control is named by (`spellWireKey`).
 - `@canonical/dataviews-core/indexeddb` — the local-first IndexedDB saved-view store.
 - `@canonical/dataviews-core/virtualization` — the virtual range a virtualized table mounts its rows by.
 
@@ -166,9 +166,10 @@ export const instances = createCollection({
   empty. It satisfies no predicate, `isSet` included, and reads as absent to
   ordering, so filtering on a scoped field restricts the result to that field's
   types by meaning: nothing is added to the query, the URL or a saved view.
-  `compileRecordTypeReader(collection)` reads the declared type a row carries,
-  which the row scopes publish on each row's `type` channel, and
-  `readApplicability(collection, field, type)` answers which state a cell is
+  `compileRecordTypeReader(collection)` (from `./bindings`) reads the declared
+  type a row carries, which the row scopes publish on each row's `type`
+  channel, and `readApplicability(collection, field, type)` (from `./bindings`)
+  answers which state a cell is
   in: a renderer draws the third one as a dash carrying its own accessible
   text, so a reader can tell it from a field that is merely empty, and hands
   it to a column's own content, which may decide otherwise. This rests on the
@@ -191,11 +192,11 @@ reaches it.** `collection.types` is null, a row's type is null and
 `readApplicability` answers `"applies"` for every field, `recordType` answers
 null, no row is ever read for a type, and nothing costs anything.
 
-## Words this package uses twice
+## Words with more than one meaning
 
-Two words carry two settled meanings apiece, and both are fixed by decisions older than this package. Neither is renamed; which one is meant is always clear from what holds it.
+Two words carry more than one settled meaning, and the first two of each are fixed by decisions older than this package. Neither is renamed; which one is meant is always clear from what holds it.
 
-- **`scope`** is a *store's* partition in the saved-view store, and a *source's* selection scope in `SourceCapabilities`, meaning whether an action may address a whole query. The collection's generation is `state.generation`, which `reset()` advances so a completion from before the reset never publishes into after it; a row's channels are `RowChannels`, from `createRowScopes`.
+- **`scope`** is a *store's* partition in the saved-view store, a *source's* selection scope in `SourceCapabilities`, meaning whether an action may address a whole query, and a *field's* scope: the record types its `appliesTo` names, a *scoped* field being one that names any. The React renderers read a column's or a card field's as its `FieldScope`, which is never a row's. The collection's generation is `state.generation`, which `reset()` advances so a completion from before the reset never publishes into after it; a row's channels are `RowChannels`, from `createRowScopes`.
 - **`window`** is the *result* window — the page of a result, `page`, `size`, `cursor` and `collapsed` — everywhere in the query grammar and the source contract. Mounting only the rows near the viewport is *virtualization*, never windowing: the window is which rows the source is asked for, the virtualization which of the rows it answered with are in the DOM.
 
 Two smaller conventions, so they are not rediscovered:

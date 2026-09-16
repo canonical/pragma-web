@@ -6,24 +6,31 @@
  * source its endpoint is reached through.
  */
 
-import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
+import createColumns from "../../lib/_work_in_progress/DataTable/createColumns.js";
+import { machineCollection } from "./fixtures.js";
+
+/** The machine columns as declared, which the columns and their text are written from. */
+const SERVER_BACKED_DECLARATIONS = [
+  { field: "name", header: "Host", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "region", header: "Region", sortable: true },
+  { field: "owner", header: "Owner", sortable: true },
+] as const;
 
 /** The machine columns, each ordered by the header where the source can. */
-export const SERVER_BACKED_COLUMNS = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "region", header: "Region", sortable: true },
-  { id: "owner", header: "Owner", sortable: true },
-] as const satisfies readonly DataTableColumn[];
+export const SERVER_BACKED_COLUMNS = createColumns(
+  machineCollection,
+  SERVER_BACKED_DECLARATIONS,
+);
 
 /** The machine columns, as source text written from the columns themselves. */
-export const SERVER_BACKED_COLUMNS_CODE = `const columns: readonly DataTableColumn[] = [
-${SERVER_BACKED_COLUMNS.map(
-  ({ id, header, sortable }) =>
-    `  { id: ${JSON.stringify(id)}, header: ${JSON.stringify(header)}, sortable: ${String(sortable)} },`,
+export const SERVER_BACKED_COLUMNS_CODE = `const columns = createColumns(machineCollection, [
+${SERVER_BACKED_DECLARATIONS.map(
+  ({ field, header, sortable }) =>
+    `  { field: ${JSON.stringify(field)}, header: ${JSON.stringify(header)}, sortable: ${String(sortable)} },`,
 ).join("\n")}
-];`;
+]);`;
 
 /** The fields whose facets the server-backed screen asks its endpoint for. */
 export const SERVER_BACKED_FACETS = ["status", "cores"] as const;

@@ -23,7 +23,11 @@ import type {
   AnnouncerTopic,
   DisplayField,
 } from "../common/index.js";
-import type { FieldScopes, ReadFieldScopesConfig } from "../utils/index.js";
+import type {
+  FieldScopes,
+  ReadFieldScopesConfig,
+  RendererName,
+} from "../utils/index.js";
 
 /** What `useDataViewsValue` returns: the channel's current value, or the part `select` picks. */
 export type UseDataViewsValueResult<T> = T;
@@ -177,8 +181,11 @@ export type UseLongPressProps<TClaim> = {
   ) => TClaim | null;
   /** A touch held still for the delay, handed what it is still over. */
   readonly onLongPress: (claimed: TClaim) => void;
-  /** A click that was not the release of a long press: a tap, or a mouse click. */
-  readonly onTap: (claimed: TClaim) => void;
+  /**
+   * A click that was not the release of a long press: a tap, or a mouse
+   * click. Left out while taps are not the handler's, so no click is claimed.
+   */
+  readonly onTap?: ((claimed: TClaim) => void) | undefined;
 };
 
 /** What `useLongPress` answers: the handlers the pressed element takes. */
@@ -198,7 +205,7 @@ export type UseRenderCeilingResult = undefined;
 /** Props of `useRenderCeiling`: what a renderer draws, and how it could draw less. */
 export type UseRenderCeilingProps = {
   /** The renderer, as the warning names it and counts what it draws. */
-  readonly renderer: "DataTable" | "Cards";
+  readonly renderer: RendererName;
   /** How many it renders at once. */
   readonly count: number;
   /** Whether it draws only what is in view, so nothing is said. */
@@ -206,17 +213,14 @@ export type UseRenderCeilingProps = {
 };
 
 /** Props of `useFieldScopes`: the collection, the declared fields and their renderer. */
-export type UseFieldScopesProps = Pick<
-  ReadFieldScopesConfig,
-  "collection" | "fields" | "renderer"
->;
+export type UseFieldScopesProps = ReadFieldScopesConfig;
 
 /** What `useFieldScopes` answers: each field's scope, and the decision per type. */
 export type UseFieldScopesResult = {
   readonly readScope: FieldScopes;
   /**
    * Whether one field applies to a record of one declared type, or of none.
-   * One identity for as long as the renderer is mounted.
+   * One identity for as long as the scopes it reads say the same.
    */
   readonly decideApplicability: (
     field: DisplayField,

@@ -179,9 +179,7 @@ export const MixedTypes: Story = {
   args: { selectable: true },
   render: renderInstances(columns),
   play: async ({ canvas }) => {
-    const machine = await waitFor(() =>
-      canvas.getByRole("row", { name: "db-01" }),
-    );
+    const machine = await canvas.findByRole("row", { name: "db-01" });
     const cells = within(machine).getAllByRole("cell");
     // Image, the fifth cell after the checkbox and the header.
     await expect(cells.at(4)).toHaveAccessibleName("Not applicable");
@@ -237,11 +235,10 @@ const columns = createColumns(instanceCollection, [
     ]),
   ),
   play: async ({ canvas }) => {
-    const container = await waitFor(() =>
-      canvas.getByRole("row", { name: "web-01" }),
-    );
-    await expect(within(container).getAllByRole("cell").at(1)) //
-      .toHaveAccessibleName("Not applicable");
+    const container = await canvas.findByRole("row", { name: "web-01" });
+    await expect(
+      within(container).getAllByRole("cell").at(1),
+    ).toHaveAccessibleName("Not applicable");
     await expect(
       within(canvas.getByRole("row", { name: "db-01" }))
         .getAllByRole("cell")
