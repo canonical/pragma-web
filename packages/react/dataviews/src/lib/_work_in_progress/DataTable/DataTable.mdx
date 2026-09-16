@@ -134,6 +134,21 @@ const columns: readonly DataTableColumn[] = [
 
 <Canvas of={Stories.SelectAllActsOnDisplayedRows} sourceState="none" />
 
+## Row headers
+
+Declare one column `rowHeader` and its cell is the row's header: a reader hears its text before each of the row's other cells, the row is named by it, and so is the row's selection checkbox unless `rowLabel` names the row — a row whose header shows no text falls back to its identity. A table has at most one; a second fails where the table mounts. The row header is never hidden, whatever it declares, since hiding it would take the row's name with it.
+
+```tsx
+import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host", rowHeader: true },
+  { id: "status", header: "Status" },
+];
+
+<DataTable provider={provider} columns={columns} label="Machines" selectable />;
+```
+
 ## Resizing and its limits
 
 `resizable` puts a control on a column's trailing edge, driven by the pointer or the keyboard — arrow keys step the edge, Escape abandons a drag. Every resize is held to the column's declared `minPx` and `maxPx`, however often it has been resized, and a column widened past the container scrolls the table so the edge being moved stays in view.

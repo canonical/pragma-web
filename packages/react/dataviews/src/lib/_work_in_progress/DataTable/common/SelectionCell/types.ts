@@ -3,6 +3,7 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { RowChannels } from "@canonical/dataviews-core/bindings";
+import type { DataTableColumn } from "../../types.js";
 
 /**
  * Props of one row's selection cell.
@@ -23,5 +24,14 @@ export type SelectionCellProps<TRow extends object> = {
   >;
   readonly channels: RowChannels<TRow>;
   readonly selected: boolean;
-  readonly rowLabel: (row: TRow, rowId: string) => string;
+  /**
+   * Names a record for its checkbox, or answers null where the caller gave
+   * no name, leaving it to the row header's text, or to the identity.
+   */
+  readonly rowLabel: (row: TRow, rowId: string) => string | null;
+  /**
+   * The column heading the row, whose cell's text names the checkbox where
+   * the caller gave no name, or null for none.
+   */
+  readonly rowHeader: DataTableColumn | null;
 };

@@ -1,4 +1,4 @@
-import { memo, type ReactElement } from "react";
+import { memo, type ReactElement, useId } from "react";
 import { useDataViewsValue } from "../../../../hooks/index.js";
 import { readFieldName } from "../../../../utils/index.js";
 import { BodyCell } from "../BodyCell/index.js";
@@ -11,6 +11,7 @@ function Row<TRow extends object>({
   provider,
   channels,
   columns,
+  rowHeader,
   selectable,
   rowLabel,
   position,
@@ -18,6 +19,9 @@ function Row<TRow extends object>({
   applicabilityOf,
 }: RowProps<TRow>): ReactElement {
   const selected = useDataViewsValue(channels.selected);
+  // The row is named by its header cell where a column is the row header:
+  // a reader hears the name before each of the row's other cells.
+  const headerId = useId();
   // Read as the row renders rather than subscribed: which columns apply to
   // a record is a fact about its type, which no record changes under a row,
   // and a subscription here would re-render every cell for any field's move.
@@ -35,6 +39,7 @@ function Row<TRow extends object>({
         .join(" ")}
       aria-selected={selectable ? selected : undefined}
       aria-rowindex={position}
+      aria-labelledby={rowHeader === null ? undefined : headerId}
     >
       {selectable ? (
         <SelectionCell
@@ -42,11 +47,13 @@ function Row<TRow extends object>({
           channels={channels}
           selected={selected}
           rowLabel={rowLabel}
+          rowHeader={rowHeader}
         />
       ) : null}
       {columns.map((column) => (
         <BodyCell
           key={column.id}
+          id={column.rowHeader === true ? headerId : undefined}
           provider={provider}
           channels={channels}
           column={column}

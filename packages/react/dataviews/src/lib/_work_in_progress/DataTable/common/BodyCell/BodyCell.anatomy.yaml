@@ -12,6 +12,12 @@
 # The design's "Checkbox variant" is not a case here: it is the table's
 # selection cell, chosen by the table's `selectable` prop, not per column.
 #
+# Row header: the cell of the one column declared `rowHeader` carries
+# `role=rowheader` and DOM `ds data-table-body-cell row-header`, and its row
+# is named by it. Not a case of the content switch — it shows whatever its
+# column shows; the role is the row's — and the DSL has no key for a role, so
+# it is recorded here.
+#
 # Content is one switch, selected by `override`: text is the default, and a
 # column's `cell` replaces it. One prop-switch per node — the DSL's switch
 # names no prop, so two sibling switches on one node would be

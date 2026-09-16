@@ -26,6 +26,8 @@ export type BodyCellProps<TRow extends object> = {
   readonly channels: RowChannels<TRow>;
   readonly column: DataTableColumn;
   readonly field: string;
+  /** The element's id, given to the row header's cell so the row is named by it. */
+  readonly id?: string | undefined;
   /**
    * Whether this column's field applies to the record in this row. Derived
    * once by the table from the collection's scoping rather than read per

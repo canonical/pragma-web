@@ -14,6 +14,9 @@
 #   body row group                        DOM `ds data-table-row-group body`
 #   selection cell  design "BodyCell: Checkbox variant"
 #                                         DOM `ds data-table-body-cell selection`
+#   row header cell design "BodyCell"     DOM `ds data-table-body-cell row-header`,
+#                   `role=rowheader`: the BodyCell of the one column declared
+#                   `rowHeader`, which the row's `aria-labelledby` names it by
 #   status row      DOM `ds data-table-row status`
 #   status cell     DOM `ds data-table-body-cell status`, `data-status="<status>"`
 #   gap             DOM `ds data-table-gap`, hidden from assistive technology

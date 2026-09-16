@@ -229,6 +229,24 @@ const renderSettingsTable = (): HTMLElement => {
   return container;
 };
 
+/** A table whose first column heads each row. */
+const renderRowHeaderTable = (): HTMLElement => {
+  const { provider } = createMachineProvider({
+    rows: [machine("m-1", "alpha")],
+  });
+  const { container } = render(
+    <DataTable
+      provider={provider}
+      columns={[
+        { id: "name", header: "Name", rowHeader: true },
+        { id: "status", header: "Status" },
+      ]}
+      label="Machines"
+    />,
+  );
+  return container;
+};
+
 const classesOf = (container: HTMLElement): Set<string> =>
   new Set(
     [...container.querySelectorAll("[class]")].flatMap((element) => [
@@ -492,6 +510,7 @@ describe("DataTable anatomy", () => {
       renderSortedByTwo,
       renderServerMarkup,
       renderSettingsTable,
+      renderRowHeaderTable,
     ]) {
       const container = mount();
       for (const selector of [...stated]) {
