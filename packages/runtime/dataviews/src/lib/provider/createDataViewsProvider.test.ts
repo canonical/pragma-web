@@ -790,7 +790,7 @@ describe("createDataViewsProvider refresh", () => {
       href: "/machines?cpu__gte=4",
     });
     const views = createCountingViewStore();
-    const source = createArraySource<Machine>({
+    const source = createArraySource({
       rows: [
         { id: "m-1", cpu: 2 },
         { id: "m-2", cpu: 8 },

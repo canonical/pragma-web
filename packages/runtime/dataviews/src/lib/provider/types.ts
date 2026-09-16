@@ -32,7 +32,7 @@ import type {
   RowModel,
   RowRecord,
 } from "../rows/index.js";
-import type { SchemaFieldDefinition } from "../schema/index.js";
+import type { FieldNameOf, SchemaFieldDefinition } from "../schema/index.js";
 import type { Selection } from "../selection/index.js";
 import type { DataViewsSnapshot } from "../snapshot/index.js";
 import type {
@@ -122,7 +122,14 @@ export type DataViewsProvider<
   readonly navigateWindow: (
     window: WindowNavigation,
   ) => readonly SourceRefusal[];
-  readonly setSort: (sort: readonly SortTerm[]) => readonly SourceRefusal[];
+  /**
+   * Replace the ordering. Its terms name the collection's own fields, so a
+   * misspelt one does not compile; an ordering the source cannot execute is
+   * refused whole rather than truncated.
+   */
+  readonly setSort: (
+    sort: readonly SortTerm<FieldNameOf<TFields>>[],
+  ) => readonly SourceRefusal[];
   readonly setSearch: (search: string) => readonly SourceRefusal[];
   /**
    * Replace the grouping levels. Reserved: refused while no source declares

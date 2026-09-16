@@ -13,7 +13,15 @@ import type { DataTableColumn } from "../../types.js";
  * caller's native props.
  */
 export type BodyCellProps<TRow extends object> = {
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /**
+   * What the cell reads of the provider: the collection its scope is
+   * witnessed by. Only that, so a provider typed over its own field list is
+   * one of these without being widened.
+   */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "collection"
+  >;
   readonly channels: RowChannels<TRow>;
   readonly column: DataTableColumn;
   readonly field: string;

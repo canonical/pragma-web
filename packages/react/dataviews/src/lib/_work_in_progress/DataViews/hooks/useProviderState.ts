@@ -9,6 +9,7 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { useEffect, useMemo } from "react";
 import { useAnnouncer, useMessages } from "../../../hooks/index.js";
+import { widenRootProvider } from "../bridgeProviderTypes.js";
 import type { UseProviderStateProps, UseProviderStateResult } from "./types.js";
 
 /**
@@ -36,8 +37,9 @@ export default function useProviderState<
     );
   }
   // The context stores the widest provider shape, schema and record type
-  // alike; the hooks narrow it back after checking the collection.
-  const widest = provider as UseProviderStateResult["value"]["provider"];
+  // alike; the hooks narrow it back after checking the collection. Both
+  // directions of that crossing live in one place, with their reason.
+  const widest = widenRootProvider(provider);
   const inputs = useMemo(
     () => createFilterInputs({ host: readProviderHost(widest) }),
     [widest],

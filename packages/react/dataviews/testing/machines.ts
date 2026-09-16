@@ -12,6 +12,7 @@ import {
   type DataViewsProvider,
   type DataViewsProviderConfig,
   declareCapabilities,
+  type FieldNameOf,
   type PresentationStore,
   type QueryLocation,
   type SortTerm,
@@ -73,7 +74,7 @@ export const MACHINE_CAPABILITIES: SourceCapabilities = declareCapabilities(
  */
 export const declareMachineOrdering = (
   terms: number | null,
-  defaultSort: readonly SortTerm[] = [],
+  defaultSort: readonly SortTerm<FieldNameOf<MachineFields>>[] = [],
 ): SourceCapabilities =>
   declareCapabilities(machines, {
     ...MACHINE_DECLARATION,

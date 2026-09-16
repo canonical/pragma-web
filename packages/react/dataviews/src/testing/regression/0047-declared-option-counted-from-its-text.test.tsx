@@ -31,7 +31,7 @@ describe("regression 0047 — declared option counted from its text", () => {
       <DataViews
         provider={createDataViewsProvider({
           collection: tagged,
-          source: createArraySource<Tagged>({
+          source: createArraySource({
             rows: [
               { id: "a", tag: 42 },
               { id: "b", tag: "42" },

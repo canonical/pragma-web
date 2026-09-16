@@ -18,7 +18,16 @@ type RecordEntry = Extract<DisplayEntry, { readonly kind: "record" }>;
  * laying out the cards, not forwarding a caller's native props.
  */
 export type CardListProps<TRow extends object> = {
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /**
+   * What the cards it lays out read of the provider: the collection a
+   * field's scope is witnessed by, and the selection a checkbox toggles.
+   * Only those, so a provider typed over its own field list is one of these
+   * without being widened.
+   */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "collection" | "selection"
+  >;
   /** The record entries the core displays, in its order. */
   readonly records: readonly RecordEntry[];
   /** One record's channels, by its identity. */
