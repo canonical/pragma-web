@@ -124,6 +124,11 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 - **Columns and sizing** — fixed and flexible widths, bounds, and the last column taking the rest.
 - **Sorting** — offer a sort only on a field the source declares: `sortable` takes effect only where the source's declaration, read by the provider, names the field sortable.
 - **Selection** — the design system's checkboxes in a 32px column, named by `rowLabel`; select-all acts on the displayed rows.
+- **Records of several types** — a `discriminator` and fields scoped with `appliesTo`: a field that does not apply draws a dash read as "Not applicable", a heading is described by the types it applies to, and columns from `createColumns` hand their `cell` the record at its own type.
+- **Selection on touch** — a long press selects a row and enters selection mode, where a tap toggles a row; both are announced, and the mode is stated as `data-selection-mode`.
+- **A warning past the render ceiling** — past 500 rows without `virtualization`, one development warning pointing to `virtualizeRows`; never a cap.
+- **Row headers** — one column declared `rowHeader` names its row and the row's checkbox, and is never hidden.
+- **The frame and its footer** — native props land on the frame, and `footer` holds the pagination bar beneath the table, outside the table role.
 - **Resizing and its limits** — held to the declared bounds; no control on the last column; two tables on one provider read the same presentation, so they always agree on every width, and nothing is passed between them.
 - **A cell that reads its own scope** — a module-scope renderer reading its row's record through `useDataViewsCell(collection)`, typed by the collection.
 - **The outcomes** — pending, failed, empty and no match in place of the rows; a failed refresh and retained rows that no longer answer the current query (`refresh-failed`, `stale`) above them, with `renderStatus` over the core's `DisplayStatus`.

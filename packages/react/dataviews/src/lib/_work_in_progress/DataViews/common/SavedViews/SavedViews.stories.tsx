@@ -16,12 +16,13 @@ import {
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { consumerCode } from "../../../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../../../storybook/decorators.js";
+import { machineCollection } from "../../../../../storybook/machines/fixtures.js";
 import {
   type MachineProvider,
   useMachineProvider,
   useStoryViewStore,
 } from "../../../../../storybook/machines/story-utils.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import { createColumns, DataTable } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./SavedViews.js";
 
@@ -34,19 +35,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true, hideable: false },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", resizable: true, hideable: false },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", resizable: true, hideable: false },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", resizable: true, hideable: false },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);`;
 
 const composition = `<DataViews provider={provider}>
   <DataViews.SavedViews />
@@ -68,7 +69,7 @@ const failedMachines: ViewDraft = {
 
 /** The store's scope as every story's consumer code declares it. */
 const parameters = consumerCode({
-  parts: ["DataTable", "DataViews", "type DataTableColumn"],
+  parts: ["DataTable", "DataViews", "createColumns"],
   declarations: columnsCode,
   query: "page=1&size=5",
   store: true,
@@ -378,7 +379,7 @@ function QueryInTheLocation({
  */
 export const WithTheQueryInTheUrl: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "DataViews", "type DataTableColumn"],
+    parts: ["DataTable", "DataViews", "createColumns"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,

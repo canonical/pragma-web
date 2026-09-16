@@ -1,6 +1,9 @@
 import { type ReactElement, useContext } from "react";
 import { MessagesContext } from "../MessagesContext/index.js";
 import type { NotApplicableProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds data-views-not-applicable";
 
 /**
  * What a table's cell or a card's field shows for a field that does not
@@ -9,7 +12,7 @@ import type { NotApplicableProps } from "./types.js";
  * The dash alone would be indistinguishable from an empty field, which is a
  * different fact — the record has no value there, rather than the field not
  * being one of its own — so the two are told apart by what is read, not by
- * what is seen. The word is clipped rather than hidden, by the renderer's
+ * what is seen. The word is clipped rather than hidden, by its own
  * stylesheet: nothing references it, and a hidden node leaves the
  * accessibility tree, so a reader would meet the same silence as an empty
  * field.
@@ -21,7 +24,9 @@ export default function NotApplicable(
   return (
     <>
       <span aria-hidden="true">—</span>
-      <span className="not-applicable">{messages.cellNotApplicable}</span>
+      <span className={componentCssClassName}>
+        {messages.cellNotApplicable}
+      </span>
     </>
   );
 }

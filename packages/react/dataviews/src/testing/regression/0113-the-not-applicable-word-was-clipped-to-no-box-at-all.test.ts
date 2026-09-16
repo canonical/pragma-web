@@ -3,8 +3,8 @@
  * clipped — to a box of no size. Some screen readers pass over a box of no
  * size, which undid the reason for clipping it rather than hiding it.
  *
- * It is clipped to the standard one-pixel box, its margin taken back, in the
- * table's stylesheet and the cards' alike.
+ * It is clipped to the standard one-pixel box, its margin taken back, by the
+ * one stylesheet the not-applicable content carries for every renderer.
  */
 
 import { readFileSync } from "node:fs";
@@ -21,22 +21,15 @@ const ruleOf = (sheet: string, selector: RegExp): string =>
 
 describe("the not-applicable word's box", () => {
   it("is one pixel with its margin taken back, never none", () => {
-    for (const rule of [
-      ruleOf(
-        "../../lib/_work_in_progress/DataTable/styles.css",
-        /& > \.not-applicable/,
-      ),
-      ruleOf(
-        "../../lib/_work_in_progress/Cards/styles.css",
-        /& \.data-card \.not-applicable/,
-      ),
-    ]) {
-      expect(rule).toMatch(/inline-size:\s*1px;/);
-      expect(rule).toMatch(/block-size:\s*1px;/);
-      expect(rule).toMatch(/margin:\s*-1px;/);
-      expect(rule).toMatch(/clip-path:\s*inset\(50%\);/);
-      // Clipped, never removed: a word not displayed is a word not read.
-      expect(rule).not.toMatch(/display:\s*none|visibility:\s*hidden/);
-    }
+    const rule = ruleOf(
+      "../../lib/common/NotApplicable/styles.css",
+      /\.ds\.data-views-not-applicable/,
+    );
+    expect(rule).toMatch(/inline-size:\s*1px;/);
+    expect(rule).toMatch(/block-size:\s*1px;/);
+    expect(rule).toMatch(/margin:\s*-1px;/);
+    expect(rule).toMatch(/clip-path:\s*inset\(50%\);/);
+    // Clipped, never removed: a word not displayed is a word not read.
+    expect(rule).not.toMatch(/display:\s*none|visibility:\s*hidden/);
   });
 });

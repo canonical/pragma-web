@@ -7,6 +7,7 @@
  * A switch's tables take no footer, and one bar after the switch serves
  * both, as the cards' switch already did.
  */
+
 import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";

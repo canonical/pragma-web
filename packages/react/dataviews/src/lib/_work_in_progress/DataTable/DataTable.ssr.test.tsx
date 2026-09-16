@@ -234,7 +234,7 @@ describe("DataTable SSR", () => {
     expect(html).toContain('data-row-id="i-2"');
     expect(html).toMatch(/role="rowheader"[^>]*>db-01</);
     expect(html).toContain(
-      '<span aria-hidden="true">—</span><span class="not-applicable">Not applicable</span>',
+      '<span aria-hidden="true">—</span><span class="ds data-views-not-applicable">Not applicable</span>',
     );
     expect(html).toMatch(/class="scope" hidden="">Applies to container</);
   });

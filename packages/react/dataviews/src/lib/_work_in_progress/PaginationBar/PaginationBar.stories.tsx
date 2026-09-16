@@ -12,13 +12,14 @@ import {
   createUncountedSource,
   type Machine,
   type MachineFields,
+  machineCollection,
 } from "../../../storybook/machines/fixtures.js";
 import {
   type MachineProvider,
   type MachineProviderConfig,
   useMachineProvider,
 } from "../../../storybook/machines/story-utils.js";
-import { DataTable, type DataTableColumn } from "../DataTable/index.js";
+import { createColumns, DataTable } from "../DataTable/index.js";
 import Component from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
 
@@ -37,19 +38,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "owner", header: "Owner" },
+]);
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "owner", header: "Owner" },
+]);`;
 
 const pageCode = `<>
   <DataTable provider={provider} columns={columns} label="Machines" />
@@ -109,7 +110,7 @@ const expectAvailable = async (
  */
 export const FirstPage: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
+    parts: ["DataTable", "PaginationBar", "createColumns"],
     declarations: columnsCode,
     query: "page=1&size=5",
     render: pageCode,
@@ -129,7 +130,7 @@ export const FirstPage: Story = {
 /** A middle page: every destination is open. */
 export const MiddlePage: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
+    parts: ["DataTable", "PaginationBar", "createColumns"],
     declarations: columnsCode,
     query: "page=1&size=5",
     prepare: "provider.navigateWindow({ page: 2 });",
@@ -152,7 +153,7 @@ export const MiddlePage: Story = {
  */
 export const LastPage: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
+    parts: ["DataTable", "PaginationBar", "createColumns"],
     declarations: columnsCode,
     query: "page=1&size=5",
     prepare: "provider.navigateWindow({ page: 3 });",
@@ -180,7 +181,7 @@ export const LastPage: Story = {
  */
 export const RealDestinations: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
+    parts: ["DataTable", "PaginationBar", "createColumns"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
@@ -231,7 +232,7 @@ import { platform } from "./router.js";`,
  */
 export const WithoutACount: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
+    parts: ["DataTable", "PaginationBar", "createColumns"],
     imports: `import { machineCollection, machinesApi } from "./machines.js";`,
     declarations: `${columnsCode}
 
@@ -258,7 +259,7 @@ export const WithoutACount: Story = {
  */
 export const Loading: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
+    parts: ["DataTable", "PaginationBar", "createColumns"],
     declarations: `${columnsCode}
 
 // Shown while the source has not answered its first request.`,
@@ -288,7 +289,7 @@ export const Loading: Story = {
  */
 export const StickyInAScrollingFrame: Story = {
   parameters: consumerCode({
-    parts: ["DataTable", "PaginationBar", "type DataTableColumn"],
+    parts: ["DataTable", "PaginationBar", "createColumns"],
     declarations: columnsCode,
     render: `<div style={{ maxHeight: "16rem", overflow: "auto" }}>
   <DataTable provider={provider} columns={columns} label="Machines" />

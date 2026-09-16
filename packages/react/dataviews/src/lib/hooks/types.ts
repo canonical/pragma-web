@@ -23,7 +23,11 @@ import type {
   AnnouncerTopic,
   DisplayField,
 } from "../common/index.js";
-import type { FieldScopes, ReadFieldScopesConfig } from "../utils/index.js";
+import type {
+  FieldScopes,
+  ReadFieldScopesConfig,
+  RendererName,
+} from "../utils/index.js";
 
 /** What `useDataViewsValue` returns: the channel's current value, or the part `select` picks. */
 export type UseDataViewsValueResult<T> = T;
@@ -198,7 +202,7 @@ export type UseRenderCeilingResult = undefined;
 /** Props of `useRenderCeiling`: what a renderer draws, and how it could draw less. */
 export type UseRenderCeilingProps = {
   /** The renderer, as the warning names it and counts what it draws. */
-  readonly renderer: "DataTable" | "Cards";
+  readonly renderer: RendererName;
   /** How many it renders at once. */
   readonly count: number;
   /** Whether it draws only what is in view, so nothing is said. */
@@ -206,10 +210,7 @@ export type UseRenderCeilingProps = {
 };
 
 /** Props of `useFieldScopes`: the collection, the declared fields and their renderer. */
-export type UseFieldScopesProps = Pick<
-  ReadFieldScopesConfig,
-  "collection" | "fields" | "renderer"
->;
+export type UseFieldScopesProps = ReadFieldScopesConfig;
 
 /** What `useFieldScopes` answers: each field's scope, and the decision per type. */
 export type UseFieldScopesResult = {

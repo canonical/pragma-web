@@ -29,8 +29,8 @@
 #   status cell     DOM `ds data-table-body-cell status`, `data-status="<status>"`
 #   selection mode  `data-selection-mode="true"` on the table while a long
 #                   press on touch has put it in the mode where a tap toggles
-#                   a row; absent otherwise. A custom state with no native or
-#                   ARIA attribute, so an attribute, never a class
+#                   a row; absent otherwise. An attribute rather than a
+#                   class: a recorded deviation, beside `data-status`
 #   row id          DOM `[data-row-id]` on each row of a selectable table: the
 #                   row a press or a tap landed on, which the table's one
 #                   gesture reads
@@ -77,13 +77,14 @@
 #   announcement        "DataViews.Settings", "Column header menu" and the
 #                       sort (4.1.3): one polite live region per root, in the
 #                       frame after the footer, coalescing what is said in one
-#                       moment and
-#                       adding each announcement as a new node, saying what
+#                       moment and adding each announcement as a new node,
+#                       saying what
 #                       has no place on screen to be read from — the new
 #                       ordering, why a sort changed nothing, a column hidden,
 #                       shown or moved with its new position, always shown,
-#                       reset, selection mode entered on touch and ended. It never repeats the status row. Every word
-#                       comes from the messages record
+#                       reset, selection mode entered on touch and ended. It
+#                       never repeats the status row. Every word comes from
+#                       the messages record
 #   virtualized body    "DataTable virtualized rows" (1.3.1, 2.1.1, 2.4.3,
 #                       4.1.2): the table reports `aria-rowcount` and every
 #                       mounted row its `aria-rowindex` in logical order, the
@@ -136,8 +137,8 @@
 #     display is deferred in the DSL.
 #   - A row's bottom border is drawn on every row but the last: the DSL
 #     cannot condition a style on position.
-#   - Where any pointer is coarse a selectable row declines text selection and the
-#     platform's callout (`user-select: none`, `-webkit-touch-callout: none`),
+#   - Where any pointer is coarse a selectable row declines text selection and
+#     the platform's callout (`user-select: none`, `-webkit-touch-callout: none`),
 #     since a held touch there is the row's long press; the DSL has neither
 #     key nor pointer media.
 #   - The status cell wraps where every other cell holds one line, and its
@@ -152,6 +153,12 @@
 #     bare state word as a class (`.failed`, `.stale`) collides with global
 #     classes, so the status is an attribute the stylesheet selects by value
 #     and the anatomy names by that value. To be raised against the standard.
+#   - Selection mode is carried as `data-selection-mode` for the same reason:
+#     a custom state, which the code standards would write as a class, and
+#     a bare `.selecting` class would collide with global classes as a
+#     status word would. The anatomy names it by its presence, and a
+#     stylesheet selects it the same way. To be raised against the standard
+#     with `data-status`.
 #   - `color/focus-ring` is the package's `color.focusRing`: a camelCase id
 #     the DSL's token-path grammar (`[a-z0-9-]+`) cannot spell.
 #   - The header row group's stacking above the scrolled body, and the
@@ -166,7 +173,8 @@
 #     scroll anchoring (`overflow-anchor: none`): the range anchors the
 #     scroll itself, and two corrections would move it twice. By default it
 #     is no taller than the viewport (`100svh`), so the range stays bounded
-#     wherever it sits; a caller's own maximum wins. `virtual` is a class,
+#     wherever it sits; a height capped on the table's root lowers it, and
+#     nothing a caller passes raises it. `virtual` is a class,
 #     not a registry state, and the DSL has no key for scroll anchoring.
 #
 # Rows take a minimum height from the density line, never a fixed one, so a

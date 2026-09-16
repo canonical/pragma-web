@@ -9,18 +9,27 @@
 
 import { act, render } from "@testing-library/react";
 import { type ReactElement, useState } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
 import { Cards } from "../../lib/_work_in_progress/Cards/index.js";
-import type { DisplayFieldCellProps } from "../../lib/common/index.js";
+
+const renders = vi.hoisted(() => ({ values: 0 }));
+
+vi.mock("../../lib/common/FieldText/FieldText.js", async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import("../../lib/common/FieldText/FieldText.js")
+    >();
+  return {
+    default: (...args: Parameters<typeof actual.default>) => {
+      renders.values += 1;
+      return actual.default(...args);
+    },
+  };
+});
 
 describe("card headings written as inline elements", () => {
   it("draw no value again when the cards render again", () => {
-    const renders: string[] = [];
-    const Probe = ({ rowId }: DisplayFieldCellProps) => {
-      renders.push(rowId);
-      return null;
-    };
     const { provider } = createMachineProvider({
       rows: [machine("m-1", "alpha"), machine("m-2", "beta")],
     });
@@ -33,7 +42,7 @@ describe("card headings written as inline elements", () => {
           provider={provider}
           fields={[
             { id: "name", header: <span>Name</span> },
-            { id: "status", header: <span>Status</span>, cell: Probe },
+            { id: "status", header: <span>Status</span> },
           ]}
           title="name"
           label="Machines"
@@ -41,11 +50,12 @@ describe("card headings written as inline elements", () => {
       );
     };
     render(<Host />);
-    expect(renders.length).toBeGreaterThan(0);
-    renders.length = 0;
+    const before = renders.values;
+    // Counted at all, so a mock that stopped applying cannot pass unseen.
+    expect(before).toBeGreaterThan(0);
     act(() => {
       rerender();
     });
-    expect(renders).toEqual([]);
+    expect(renders.values).toBe(before);
   });
 });

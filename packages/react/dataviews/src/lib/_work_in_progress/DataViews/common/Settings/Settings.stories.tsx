@@ -3,11 +3,12 @@ import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { consumerCode } from "../../../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../../../storybook/decorators.js";
+import { machineCollection } from "../../../../../storybook/machines/fixtures.js";
 import {
   type MachineProvider,
   useMachineProvider,
 } from "../../../../../storybook/machines/story-utils.js";
-import type { DataTableColumn } from "../../../DataTable/index.js";
+import { createColumns } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Settings.js";
 
@@ -20,19 +21,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", hideable: false, sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", hideable: false, sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "owner", header: "Owner" },
+]);
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", hideable: false, sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", hideable: false, sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "cores", header: "Cores", sortable: true },
+  { field: "owner", header: "Owner" },
+]);`;
 
 const renderCode = `<DataViews provider={provider}>
   <DataViews.DataTable columns={columns} label="Machines" settings={<DataViews.Settings />} />
@@ -76,7 +77,7 @@ function Collection({
  */
 export const Default: Story = {
   parameters: consumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -90,7 +91,7 @@ export const Default: Story = {
  */
 export const HideAColumn: Story = {
   parameters: consumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     declarations: columnsCode,
     render: renderCode,
   }),
@@ -121,7 +122,7 @@ export const HideAColumn: Story = {
  */
 export const ArrangedByTheViewer: Story = {
   parameters: consumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     declarations: columnsCode,
     prepare: `provider.presentation.arrange({
   "table.order": ["status", "name", "cores", "owner"],

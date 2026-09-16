@@ -451,8 +451,8 @@ export default function ScopedDataTable<
           role="table"
           aria-label={label}
           aria-busy={busy}
-          // A custom state with no native or ARIA attribute: an attribute,
-          // present while the mode holds.
+          // A custom state carried as an attribute, as the status is, and
+          // present while the mode holds: a recorded deviation.
           data-selection-mode={selecting ? "true" : undefined}
           {...(selectable ? gestures : {})}
           // Every logical row, the header's included, so a row a virtualized

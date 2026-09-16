@@ -34,7 +34,7 @@ type Story = StoryObj<typeof Component>;
 
 /** The consumer code every story here shows: the endpoint through TanStack Query. */
 const code = consumerCode({
-  parts: ["DataViews", "type DataTableColumn"],
+  parts: ["DataViews", "createColumns"],
   core: [
     "createPage",
     "createQuerySource",

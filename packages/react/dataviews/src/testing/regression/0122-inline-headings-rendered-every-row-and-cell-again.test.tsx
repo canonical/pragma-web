@@ -9,19 +9,32 @@
  */
 
 import { act, render } from "@testing-library/react";
-import { type ReactElement, useState } from "react";
-import { describe, expect, it } from "vitest";
+import { createElement, memo, type ReactElement, useState } from "react";
+import { describe, expect, it, vi } from "vitest";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
+import type { RowProps } from "../../lib/_work_in_progress/DataTable/common/Row/types.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
-import type { DisplayFieldCellProps } from "../../lib/common/index.js";
+
+const renders = vi.hoisted(() => ({ rows: [] as string[] }));
+
+vi.mock(
+  "../../lib/_work_in_progress/DataTable/common/Row/Row.js",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("../../lib/_work_in_progress/DataTable/common/Row/Row.js")
+      >();
+    // Compared as the row itself is, so it renders exactly when the row does.
+    const Counted = memo((props: RowProps<object>) => {
+      renders.rows.push(props.channels.id);
+      return createElement(actual.default, props);
+    });
+    return { default: Counted };
+  },
+);
 
 describe("headings written as inline elements", () => {
-  it("draw no cell again when the table renders again", () => {
-    const renders: string[] = [];
-    const Probe = ({ rowId, columnId }: DisplayFieldCellProps) => {
-      renders.push(`${rowId}/${columnId}`);
-      return null;
-    };
+  it("render no row again when the table renders again", () => {
     const { provider } = createMachineProvider({
       rows: [machine("m-1", "alpha"), machine("m-2", "beta")],
     });
@@ -33,19 +46,20 @@ describe("headings written as inline elements", () => {
         <DataTable
           provider={provider}
           columns={[
-            { id: "name", header: <span>Name</span>, cell: Probe },
-            { id: "status", header: <span>Status</span>, cell: Probe },
+            { id: "name", header: <span>Name</span> },
+            { id: "status", header: <span>Status</span> },
           ]}
           label="Machines"
         />
       );
     };
     render(<Host />);
-    expect(renders.length).toBeGreaterThan(0);
-    renders.length = 0;
+    // Counted at all, so a mock that stopped applying cannot pass unseen.
+    expect(renders.rows.length).toBeGreaterThan(0);
+    renders.rows.length = 0;
     act(() => {
       rerender();
     });
-    expect(renders).toEqual([]);
+    expect(renders.rows).toEqual([]);
   });
 });

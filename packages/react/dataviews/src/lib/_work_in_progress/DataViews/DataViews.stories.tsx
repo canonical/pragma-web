@@ -15,7 +15,7 @@ import {
   useStoryViewStore,
 } from "../../../storybook/machines/story-utils.js";
 import { useDataViewsValue } from "../../hooks/index.js";
-import type { DataTableColumn } from "../DataTable/index.js";
+import { createColumns } from "../DataTable/index.js";
 import { useDataViews } from "./hooks/index.js";
 import Component from "./Provider.js";
 
@@ -31,19 +31,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);`;
 
 /**
  * The parameters the location carried that the provider refused — a clause
@@ -143,12 +143,7 @@ const failedMachines: ViewDraft = {
  */
 export const ConnectedParts: Story = {
   parameters: consumerCode({
-    parts: [
-      "DataViews",
-      "type DataTableColumn",
-      "useDataViews",
-      "useDataViewsValue",
-    ],
+    parts: ["DataViews", "createColumns", "useDataViews", "useDataViewsValue"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,
@@ -229,12 +224,7 @@ function QueryInTheLocation({
  */
 export const QueryInTheUrl: Story = {
   parameters: consumerCode({
-    parts: [
-      "DataViews",
-      "type DataTableColumn",
-      "useDataViews",
-      "useDataViewsValue",
-    ],
+    parts: ["DataViews", "createColumns", "useDataViews", "useDataViewsValue"],
     core: ["createPlatformLocation"],
     imports: `import { machineCollection, machines } from "./machines.js";
 import { platform } from "./router.js";`,

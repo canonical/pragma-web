@@ -9,10 +9,10 @@ import { describe, expect, it } from "vitest";
 import {
   createInstanceProvider,
   MIXED_FLEET,
-} from "../../../testing/instances.js";
-import { Cards } from "../../lib/_work_in_progress/Cards/index.js";
+} from "../../../../testing/instances.js";
+import Cards from "./Cards.js";
 
-const columns = [
+const fields = [
   { id: "name", header: "Name" },
   { id: "type", header: "Type" },
   { id: "image", header: "Image" },
@@ -24,7 +24,7 @@ describe("cards over records of several types", () => {
     render(
       <Cards
         provider={provider}
-        fields={columns}
+        fields={fields}
         title="name"
         label="Instances"
       />,
@@ -34,9 +34,9 @@ describe("cards over records of several types", () => {
     expect(image).toHaveTextContent(/^—Not applicable$/);
     // A definition takes no name from its content; what a reader reaches is
     // the word itself, so it is clipped and never hidden.
-    expect(image?.querySelector(".not-applicable")).not.toHaveAttribute(
-      "hidden",
-    );
+    expect(
+      image?.querySelector(".data-views-not-applicable"),
+    ).not.toHaveAttribute("hidden");
     expect(image?.querySelector("[aria-hidden='true']")).toHaveTextContent("—");
     // The dash alone is hidden from readers: the word has no hidden ancestor.
     expect(image?.querySelectorAll("[aria-hidden]")).toHaveLength(1);

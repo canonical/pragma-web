@@ -420,9 +420,8 @@ export type ProviderHost<
    * the rows are next replaced after its identity leaves the selection, so
    * one reselected before then answers as before. It answers from the row on
    * display whenever there is one, so it never contradicts the type the row
-   * scopes publish for it,
-   * and it changes only with a `rows` or a `selection` publication: watching
-   * those is watching this.
+   * scopes publish for it, and it changes only with a `rows` or a `selection`
+   * publication: watching those is watching this.
    *
    * @seam actions — read by `useDataViewsAction`, which decides an action's
    * applicability to records selected on an earlier page from here

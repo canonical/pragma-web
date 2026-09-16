@@ -13,8 +13,8 @@ const valueLabel = (value: unknown): string =>
 /**
  * Create one collection's record typing: the declared type a row carries,
  * whether a page's rows each carry one, and the memory of what type each
- * selected identity was displayed as. The declaration itself — the discriminator and its names —
- * was checked when the collection was created.
+ * selected identity was displayed as. The declaration itself — the
+ * discriminator and its names — was checked when the collection was created.
  *
  * A monomorphic collection builds none of this; the provider holds null
  * instead and answers from that.
@@ -31,6 +31,7 @@ export default function createRecordTyping<
   if (types === null) {
     throw new Error("a monomorphic collection has no record typing to build");
   }
+  // Refusal quotes the raw value, so it reads the discriminator itself.
   const discriminator = compileFieldReader(types.field);
   const declared = new Set(types.names);
   /** A row's declared type name, or null when it carries no such name. */

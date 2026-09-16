@@ -11,7 +11,8 @@ import type { Collection } from "./types.js";
  * Compiled once, so the discriminator's path and the declared names are
  * resolved once rather than on every row read. The one reading of a row's
  * type: the row scopes publish it per row, and the provider's record typing
- * remembers and refuses by it.
+ * remembers by it. Refusing a page reads the discriminator's raw value
+ * instead, since the refusal quotes the value that is not a declared name.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

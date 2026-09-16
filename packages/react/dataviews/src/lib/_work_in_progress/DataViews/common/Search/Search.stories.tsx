@@ -7,11 +7,12 @@ import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { consumerCode } from "../../../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../../../storybook/decorators.js";
+import { machineCollection } from "../../../../../storybook/machines/fixtures.js";
 import {
   type MachineProviderConfig,
   useMachineProvider,
 } from "../../../../../storybook/machines/story-utils.js";
-import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
+import { createColumns, DataTable } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";
@@ -28,24 +29,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "owner", header: "Owner" },
+]);
 
-const columnsCode = `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "owner", header: "Owner" },
-];`;
+const columnsCode = `const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "owner", header: "Owner" },
+]);`;
 
 const composition = `<DataViews provider={provider}>
   <DataViews.Search label="Search machines" />
   <DataTable provider={provider} columns={columns} label="Machines" />
 </DataViews>`;
 
-const parts = ["DataTable", "DataViews", "type DataTableColumn"];
+const parts = ["DataTable", "DataViews", "createColumns"];
 
 /** The query the location carries, shown the way an address bar would. */
 function QueryInTheLocation({

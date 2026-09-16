@@ -3,8 +3,9 @@ import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { consumerCode } from "../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../storybook/decorators.js";
+import { machineCollection } from "../../../storybook/machines/fixtures.js";
 import { useMachineProvider } from "../../../storybook/machines/story-utils.js";
-import type { DataTableColumn } from "../DataTable/index.js";
+import { createColumns } from "../DataTable/index.js";
 import { DataViews } from "../DataViews/index.js";
 import Component from "./RendererSwitch.js";
 
@@ -23,18 +24,18 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-const detailColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const detailColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);
 
-const summaryColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-];
+const summaryColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+]);
 
 /** Two renderers over one root: every machine's details, or a summary. */
 function TableOrSummaryMachines({

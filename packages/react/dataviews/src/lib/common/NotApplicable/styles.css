@@ -1,0 +1,18 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The word for a field that does not apply to a record: read beside the
+     dash, taking no room and drawing nothing. Clipped rather than hidden,
+     since nothing references it: a table's cell or a card's field is named
+     by it. Unthemable geometry. */
+  .ds.data-views-not-applicable {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

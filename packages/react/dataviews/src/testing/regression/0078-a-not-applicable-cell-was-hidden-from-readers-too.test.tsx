@@ -36,9 +36,9 @@ describe("a not-applicable cell, read", () => {
     const machine = screen.getByRole("row", { name: /db-01/ });
     const image = within(machine).getAllByRole("cell").at(1);
     expect(image).toHaveAccessibleName("Not applicable");
-    expect(image?.querySelector(".not-applicable")).not.toHaveAttribute(
-      "hidden",
-    );
+    expect(
+      image?.querySelector(".data-views-not-applicable"),
+    ).not.toHaveAttribute("hidden");
     const heading = screen.getByRole("columnheader", { name: "Image" });
     expect(heading).toHaveAccessibleDescription("Applies to container");
     // The sort control carries the same description, so a reader on it

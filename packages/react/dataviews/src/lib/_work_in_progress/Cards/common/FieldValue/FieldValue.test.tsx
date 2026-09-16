@@ -88,12 +88,12 @@ describe("FieldValue", () => {
     expect(container.querySelector("[aria-hidden='true']")).toHaveTextContent(
       "—",
     );
-    expect(container.querySelector(".not-applicable")).toHaveTextContent(
-      "Not applicable",
-    );
-    expect(container.querySelector(".not-applicable")).not.toHaveAttribute(
-      "hidden",
-    );
+    expect(
+      container.querySelector(".data-views-not-applicable"),
+    ).toHaveTextContent("Not applicable");
+    expect(
+      container.querySelector(".data-views-not-applicable"),
+    ).not.toHaveAttribute("hidden");
   });
 
   it("hands the field's own content the record and its applicability, and no value where the field does not apply", () => {

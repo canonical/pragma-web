@@ -66,9 +66,9 @@ describe("a table over records of several types", () => {
     expect(image).toHaveTextContent(/^—Not applicable$/);
     expect(image).toHaveAccessibleName("Not applicable");
     expect(image?.querySelector("[aria-hidden]")).toHaveTextContent("—");
-    expect(image?.querySelector(".not-applicable")).not.toHaveAttribute(
-      "hidden",
-    );
+    expect(
+      image?.querySelector(".data-views-not-applicable"),
+    ).not.toHaveAttribute("hidden");
     expect(cellsOf("web-01").at(2)).toHaveTextContent(/^ubuntu:24\.04$/);
   });
 

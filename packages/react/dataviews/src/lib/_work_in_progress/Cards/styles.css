@@ -67,18 +67,5 @@
       margin: 0;
       overflow-wrap: anywhere;
     }
-
-    /* The word for a field that does not apply to the record: read beside
-       the dash, taking no room and drawing nothing. Unthemable geometry. */
-    & .data-card .not-applicable {
-      position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
-      margin: -1px;
-      padding: 0;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
   }
 }
