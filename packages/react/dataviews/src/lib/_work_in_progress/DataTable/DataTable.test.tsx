@@ -58,10 +58,11 @@ import {
 } from "../../../../testing/machines.js";
 import readAnnouncements from "../../../../testing/readAnnouncements.js";
 import type { ManualSource } from "../../../../testing/types.js";
+import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";
-import type { DataTableCellProps, DataTableColumn } from "./types.js";
+import type { DataTableColumn } from "./types.js";
 
 type Provider = DataViewsProvider<MachineFields, Machine>;
 
@@ -375,7 +376,7 @@ describe("DataTable", () => {
   it("renders a column's own content inside that cell's scope", () => {
     // The cell takes no provider: the collection is its witness, and the
     // record channel is typed as its records.
-    const Badge = ({ value, rowId, columnId }: DataTableCellProps) => {
+    const Badge = ({ value, rowId, columnId }: DisplayFieldCellProps) => {
       const cell = useDataViewsCell(machines);
       const record = useDataViewsValue(cell.record);
       return (
@@ -1655,7 +1656,7 @@ describe("DataTable", () => {
 
   it("notifies only the row whose selection membership moved", () => {
     const renders: string[] = [];
-    const Probe = ({ rowId }: DataTableCellProps) => {
+    const Probe = ({ rowId }: DisplayFieldCellProps) => {
       // Reads the row's membership, so this probe is notified exactly when
       // that row's selection channel publishes.
       useDataViewsValue(useDataViewsCell(machines).selected);
@@ -1678,7 +1679,7 @@ describe("DataTable", () => {
 
   it("notifies only the cells whose field values changed", () => {
     const renders: string[] = [];
-    const Probe = ({ rowId, columnId }: DataTableCellProps) => {
+    const Probe = ({ rowId, columnId }: DisplayFieldCellProps) => {
       renders.push(`${rowId}/${columnId}`);
       return null;
     };
@@ -1785,7 +1786,7 @@ describe("DataTable", () => {
 
   it("stops observing the collection when the table unmounts", () => {
     const renders: string[] = [];
-    const Probe = ({ rowId }: DataTableCellProps) => {
+    const Probe = ({ rowId }: DisplayFieldCellProps) => {
       renders.push(rowId);
       return null;
     };
@@ -1919,7 +1920,7 @@ describe("DataTable", () => {
     const view = buildStoredView({
       id: "wide",
       name: "Wide",
-      query: "as=table",
+      query: "",
       presentation: {
         "table.width.name": 240,
         "table.order": ["status", "name"],
@@ -2338,7 +2339,7 @@ describe("DataTable", () => {
 
   it("renders no row and no cell again for a live resize preview", () => {
     const renders: string[] = [];
-    const Probe = ({ rowId, columnId }: DataTableCellProps) => {
+    const Probe = ({ rowId, columnId }: DisplayFieldCellProps) => {
       renders.push(`${rowId}/${columnId}`);
       return null;
     };
