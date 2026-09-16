@@ -312,6 +312,8 @@ function TableOrCardsMachines({
                 label={label}
                 selectable
                 rowLabel={(row) => String(row["name"])}
+                // One bar serves both renderers, after the switch.
+                footer={null}
               />
             ),
           },
@@ -358,7 +360,7 @@ import { RendererSwitch } from "./RendererSwitch.js";`,
       {
         id: "table",
         label: "Table",
-        content: <DataViews.DataTable columns={fields} label="Machines" selectable />,
+        content: <DataViews.DataTable columns={fields} label="Machines" selectable footer={null} />,
       },
       {
         id: "cards",

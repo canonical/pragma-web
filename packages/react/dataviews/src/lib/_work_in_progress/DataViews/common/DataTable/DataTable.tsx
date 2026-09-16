@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { ScopedDataTable } from "../../../DataTable/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
+import { Pagination } from "../Pagination/index.js";
 import type { DataViewsDataTableProps } from "./types.js";
 
 /**
@@ -12,21 +13,25 @@ import type { DataViewsDataTableProps } from "./types.js";
  * this part reads the root it is placed in, and throws outside one, rather
  * than taking a provider or messages of its own, and says what its
  * activations did through the root's one announcer rather than one of its
- * own. Its records are the widest shape: a custom cell types them through
- * `useDataViewsCell(collection)`, with the collection as its witness.
+ * own. Its footer holds the root's pagination bar unless the caller gives it
+ * another, or null for none. Its records are the widest shape: a custom cell
+ * types them through `useDataViewsCell(collection)`, with the collection as
+ * its witness.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export default function DataTable(
-  props: DataViewsDataTableProps,
-): ReactElement {
+export default function DataTable({
+  footer = <Pagination />,
+  ...props
+}: DataViewsDataTableProps): ReactElement {
   const { provider, messages, announce } = useDataViewsRoot("DataTable");
   return (
     <ScopedDataTable
       {...props}
+      footer={footer}
       provider={provider}
       messages={messages}
       announce={announce}

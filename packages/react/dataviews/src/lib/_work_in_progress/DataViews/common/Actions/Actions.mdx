@@ -84,6 +84,7 @@ export function Machines() {
         label="Machines"
         selectable
         rowLabel={(row) => row.name}
+        footer={<DataViews.Pagination sizes={[5, 10]} />}
       />
       <DataViews.Actions>
         <SelectionAction action="archive">Archive</SelectionAction>
@@ -91,7 +92,6 @@ export function Machines() {
           Delete
         </SelectionAction>
       </DataViews.Actions>
-      <DataViews.Pagination sizes={[5, 10]} />
     </DataViews>
   );
 }

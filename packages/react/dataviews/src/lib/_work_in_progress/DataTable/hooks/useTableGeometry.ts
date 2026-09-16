@@ -83,17 +83,19 @@ export default function useTableGeometry(
   const snapshot = useDataViewsValue(layout.state);
   const interactionState = useDataViewsValue(interaction.state);
 
-  const attach = useCallback(
-    (node: HTMLDivElement): (() => void) | undefined => {
-      // Inside the border, which is no room for a column. The observer's
-      // first report, which follows at once, is the exact content width.
-      setContainer(node.clientWidth);
-      return observeResize(node, (entry) => {
-        setContainer(entry.contentRect.width);
-      });
-    },
-    [],
-  );
+  const attach = useCallback((node: HTMLDivElement): (() => void) => {
+    // Inside the border, which is no room for a column. The observer's
+    // first report, which follows at once, is the exact content width.
+    setContainer(node.clientWidth);
+    const disconnect = observeResize(node, (entry) => {
+      setContainer(entry.contentRect.width);
+    });
+    // Always a cleanup, so React never calls this back with null: where
+    // there is no observer, the detach has nothing to disconnect.
+    return () => {
+      disconnect?.();
+    };
+  }, []);
 
   // Each reserving cell's last measured width: the selection column's and
   // the settings cell's are the stylesheet's tracks, and the columns share

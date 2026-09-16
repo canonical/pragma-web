@@ -21,17 +21,13 @@
    * table is dense wherever it sits, and it defines no density rule of its
    * own.
    */
-  .ds.data-table {
-    /* The columns are authoritative: when their total no longer fits, the
-       table scrolls rather than compressing a column past its minimum.
-       `overflow-x` alone would make the used `overflow-y` a scroll
-       container anyway, so both are declared — which is also what lets the
-       header stick when a caller caps the height. */
-    overflow: auto;
-    /* Each table sets its own tracks: a table nested in another's cell
-       inherits neither the selection track nor the settings track. */
-    --data-table-selection-track: initial;
-    --data-table-settings-track: initial;
+  /* The frame is the caller's box: a column holding the table, then its
+     footer, then the announcer. A height capped on it is the table's to
+     scroll within, and the footer keeps its place beneath. */
+  .ds.data-table-frame {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 0;
     color: var(--color-text);
     font-family: var(--typography-text-primary-font-family);
     font-size: var(--typography-text-primary-font-size);
@@ -40,6 +36,35 @@
        background with it. */
     background-color: var(--surface-color-background, var(--color-background));
     border: var(--dimension-stroke-thickness-medium) solid
+      var(--color-border-muted);
+  }
+
+  .ds.data-table {
+    /* The columns are authoritative: when their total no longer fits, the
+       table scrolls rather than compressing a column past its minimum.
+       `overflow-x` alone would make the used `overflow-y` a scroll
+       container anyway, so both are declared — which is also what lets the
+       header stick when a caller caps the frame's height. */
+    overflow: auto;
+    /* It takes the frame's height less the footer's, and shrinks below its
+       content so that height is what scrolls. */
+    flex: 1 1 auto;
+    min-block-size: 0;
+    /* Each table sets its own tracks: a table nested in another's cell
+       inherits neither the selection track nor the settings track. */
+    --data-table-selection-track: initial;
+    --data-table-settings-track: initial;
+  }
+
+  /* Beneath the table, outside its role. Sticky, so a table taller than the
+     view keeps its bar in view until the frame's end scrolls past; where the
+     frame's height is capped, the table scrolls and the bar simply stays. */
+  .ds.data-table-footer {
+    flex: none;
+    position: sticky;
+    inset-block-end: 0;
+    background-color: var(--color-background-layer2);
+    border-block-start: var(--dimension-stroke-thickness-medium) solid
       var(--color-border-muted);
   }
 

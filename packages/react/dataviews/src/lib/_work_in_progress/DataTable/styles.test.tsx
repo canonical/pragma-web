@@ -229,6 +229,22 @@ const renderSettingsTable = (): HTMLElement => {
   return container;
 };
 
+/** A table whose frame holds a footer. */
+const renderFramedTable = (): HTMLElement => {
+  const { provider } = createMachineProvider({
+    rows: [machine("m-1", "alpha")],
+  });
+  const { container } = render(
+    <DataTable
+      provider={provider}
+      columns={columns}
+      label="Machines"
+      footer={<p>Footer</p>}
+    />,
+  );
+  return container;
+};
+
 /** A table whose first column heads each row. */
 const renderRowHeaderTable = (): HTMLElement => {
   const { provider } = createMachineProvider({
@@ -292,6 +308,10 @@ describe("DataTable stylesheet", () => {
     }
     cleanup();
     for (const name of classesOf(renderSettingsTable())) {
+      rendered.add(name);
+    }
+    cleanup();
+    for (const name of classesOf(renderFramedTable())) {
       rendered.add(name);
     }
     cleanup();
@@ -363,8 +383,8 @@ describe("DataTable stylesheet", () => {
     expect(sheet).not.toMatch(/\d(px|rem|em)\b|#[0-9a-f]{3,8}\b|opacity/i);
   });
 
-  it("paints the surface it sits on", () => {
-    expect(rule(/\.ds\.data-table/)).toMatch(
+  it("paints the surface it sits on, from the frame", () => {
+    expect(rule(/\.ds\.data-table-frame/)).toMatch(
       /background-color:\s*var\(--surface-color-background,\s*var\(--color-background\)\);/,
     );
   });
@@ -511,6 +531,7 @@ describe("DataTable anatomy", () => {
       renderServerMarkup,
       renderSettingsTable,
       renderRowHeaderTable,
+      renderFramedTable,
     ]) {
       const container = mount();
       for (const selector of [...stated]) {

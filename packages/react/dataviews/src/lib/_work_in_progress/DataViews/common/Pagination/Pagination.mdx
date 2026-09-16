@@ -47,8 +47,14 @@ export function Machines() {
   );
   return (
     <DataViews provider={provider}>
-      <DataTable provider={provider} columns={columns} label="Machines" />
-      <DataViews.Pagination label="Machines pagination" sizes={[5, 10, 25]} />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        footer={
+          <DataViews.Pagination label="Machines pagination" sizes={[5, 10, 25]} />
+        }
+      />
     </DataViews>
   );
 }

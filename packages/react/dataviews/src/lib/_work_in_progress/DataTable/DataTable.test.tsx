@@ -198,16 +198,19 @@ describe("DataTable", () => {
     expect(table.querySelector('[role="cell"][style]')).toBeNull();
   });
 
-  it("merges the caller's class name and inline style onto the root", () => {
+  it("merges the caller's class name and inline style onto the frame", () => {
     loadedTable([machine("m-1", "alpha")], {
       className: "host",
       style: { opacity: 0.5 },
       id: "machines",
     });
     const table = screen.getByRole("table", { name: "Machines" });
-    expect(table.className).toBe("ds data-table dense host");
-    expect(table.style.opacity).toBe("0.5");
-    expect(table.id).toBe("machines");
+    // The frame is the caller's box; the table within it keeps its own.
+    const frame = table.parentElement;
+    expect(frame?.className).toBe("ds data-table-frame host");
+    expect(frame?.style.opacity).toBe("0.5");
+    expect(frame?.id).toBe("machines");
+    expect(table.className).toBe("ds data-table dense");
   });
 
   it("hands the root to a caller's callback ref without losing its own", () => {
@@ -224,11 +227,12 @@ describe("DataTable", () => {
       />,
     );
     const table = screen.getByRole("table", { name: "Machines" });
-    expect(seen).toEqual([table]);
-    // The table still measured its own container: its geometry ref survived.
+    const frame = table.parentElement;
+    expect(seen).toEqual([frame]);
+    // The table still measured its own container within the frame.
     expect(table.style.getPropertyValue("--data-table-columns")).not.toBe("");
     unmount();
-    expect(seen).toEqual([table, null]);
+    expect(seen).toEqual([frame, null]);
   });
 
   it("honours the cleanup a React 19 callback ref returns", () => {
@@ -248,12 +252,12 @@ describe("DataTable", () => {
         }}
       />,
     );
-    const table = screen.getByRole("table", { name: "Machines" });
-    expect(seen).toEqual([table]);
+    const frame = screen.getByRole("table", { name: "Machines" }).parentElement;
+    expect(seen).toEqual([frame]);
     unmount();
     // The cleanup ran, and it replaced the null call rather than joining it.
     expect(cleanups).toBe(1);
-    expect(seen).toEqual([table]);
+    expect(seen).toEqual([frame]);
   });
 
   it("keeps one attachment across renders that rebuild the caller's ref", () => {
@@ -298,7 +302,9 @@ describe("DataTable", () => {
         ref={ref}
       />,
     );
-    expect(ref.current).toBe(screen.getByRole("table", { name: "Machines" }));
+    expect(ref.current).toBe(
+      screen.getByRole("table", { name: "Machines" }).parentElement,
+    );
     unmount();
     expect(ref.current).toBeNull();
   });

@@ -47,7 +47,6 @@ describe("regression 0059 — a refusal was spoken twice", () => {
         <DataViews.Filters />
         <DataViews.SavedViews />
         <DataViews.DataTable columns={columns} label="Machines" />
-        <DataViews.Pagination />
       </DataViews>,
     );
     fireEvent.click(screen.getByRole("button", { name: "Name" }));

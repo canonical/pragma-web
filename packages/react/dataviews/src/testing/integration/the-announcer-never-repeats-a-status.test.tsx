@@ -35,8 +35,11 @@ const Composition = ({
   <DataViews provider={provider}>
     <DataViews.Filters />
     <DataViews.SavedViews />
-    <DataViews.DataTable columns={columns} label="Machines" />
-    <DataViews.Pagination sizes={[1, 5]} />
+    <DataViews.DataTable
+      columns={columns}
+      label="Machines"
+      footer={<DataViews.Pagination sizes={[1, 5]} />}
+    />
   </DataViews>
 );
 

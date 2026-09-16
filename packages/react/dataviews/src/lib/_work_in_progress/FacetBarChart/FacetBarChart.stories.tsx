@@ -104,8 +104,8 @@ function BesideFiltersMachines({
         columns={columns}
         label="Machines"
         rowLabel={(row) => String(row["name"])}
+        footer={<DataViews.Pagination sizes={[5, 10]} />}
       />
-      <DataViews.Pagination sizes={[5, 10]} />
     </DataViews>
   );
 }
@@ -132,8 +132,11 @@ import { FacetBarChart } from "./DataViews/FacetBarChart.js";`,
     render: `<DataViews provider={provider}>
   <DataViews.Filters />
   <FacetBarChart field="status" label="Machines by status" />
-  <DataViews.DataTable columns={columns} label="Machines" />
-  <DataViews.Pagination sizes={[5, 10]} />
+  <DataViews.DataTable
+    columns={columns}
+    label="Machines"
+    footer={<DataViews.Pagination sizes={[5, 10]} />}
+  />
 </DataViews>`,
   }),
   play: async ({ canvas }) => {

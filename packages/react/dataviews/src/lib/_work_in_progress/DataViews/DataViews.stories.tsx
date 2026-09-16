@@ -114,9 +114,9 @@ function Collection({
         // The connected table's records are the widest shape; a typed
         // label goes through the standalone table, or a cell's collection.
         rowLabel={(row) => String(row["name"])}
+        footer={<Component.Pagination sizes={[5, 10, 25]} />}
       />
       <Component.Actions />
-      <Component.Pagination sizes={[5, 10, 25]} />
     </Component>
   );
 }
@@ -168,9 +168,9 @@ ${queryIssuesCode}`,
     label="Machines"
     selectable
     rowLabel={(row) => String(row["name"])}
+    footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
   />
   <DataViews.Actions />
-  <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
   }),
   render: function Render() {
@@ -254,9 +254,9 @@ ${queryIssuesCode}`,
     label="Machines"
     selectable
     rowLabel={(row) => String(row["name"])}
+    footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
   />
   <DataViews.Actions />
-  <DataViews.Pagination sizes={[5, 10, 25]} />
 </DataViews>`,
   }),
   render: function Render() {

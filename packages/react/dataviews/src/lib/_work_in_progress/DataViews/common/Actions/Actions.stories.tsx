@@ -115,6 +115,7 @@ function ManagedMachines({
         label="Machines"
         selectable
         rowLabel={hostName}
+        footer={<Pagination sizes={[5, 10]} />}
       />
       <Component indicator={indicator}>
         <SelectionAction action="archive">Archive</SelectionAction>
@@ -126,7 +127,6 @@ function ManagedMachines({
           Delete
         </SelectionAction>
       </Component>
-      <Pagination sizes={[5, 10]} />
     </DataViews>
   );
 }
@@ -199,6 +199,7 @@ import { archiveMachines, machineCollection, machines } from "./machines.js";`,
     label="Machines"
     selectable
     rowLabel={(row) => row.name}
+    footer={<DataViews.Pagination sizes={[5, 10]} />}
   />
   <DataViews.Actions${indicator}>
     <SelectionAction action="archive">Archive</SelectionAction>
@@ -206,7 +207,6 @@ import { archiveMachines, machineCollection, machines } from "./machines.js";`,
       Delete
     </SelectionAction>
   </DataViews.Actions>
-  <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`,
   });
 

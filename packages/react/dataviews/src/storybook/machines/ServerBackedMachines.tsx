@@ -41,8 +41,8 @@ export default function ServerBackedMachines({
         columns={SERVER_BACKED_COLUMNS}
         label={SERVER_BACKED_PARTS.tableLabel}
         rowLabel={(row) => String(row["name"])}
+        footer={<DataViews.Pagination sizes={SERVER_BACKED_PARTS.sizes} />}
       />
-      <DataViews.Pagination sizes={SERVER_BACKED_PARTS.sizes} />
     </DataViews>
   );
 }
