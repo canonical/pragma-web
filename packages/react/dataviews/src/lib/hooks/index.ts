@@ -1,3 +1,4 @@
+export { RENDER_CEILING } from "./constants.js";
 export type * from "./types.js";
 export { default as useAnnouncer } from "./useAnnouncer.js";
 export { default as useAnsweredFacets } from "./useAnsweredFacets.js";
@@ -6,8 +7,10 @@ export { default as useDataViewsValue } from "./useDataViewsValue.js";
 export { default as useFacets } from "./useFacets.js";
 export { default as useHydrationFocusHandoff } from "./useHydrationFocusHandoff.js";
 export { default as useIsHydrated } from "./useIsHydrated.js";
+export { default as useLongPress } from "./useLongPress.js";
 export { default as useMergedRef } from "./useMergedRef.js";
 export { default as useMessages } from "./useMessages.js";
+export { default as useRenderCeiling } from "./useRenderCeiling.js";
 export { default as useRowScopes } from "./useRowScopes.js";
 export { default as useSelectAllOnPage } from "./useSelectAllOnPage.js";
 export { default as useStableCallback } from "./useStableCallback.js";

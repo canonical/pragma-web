@@ -27,6 +27,10 @@
 #                   `rowHeader`, which the row's `aria-labelledby` names it by
 #   status row      DOM `ds data-table-row status`
 #   status cell     DOM `ds data-table-body-cell status`, `data-status="<status>"`
+#   selection mode  `data-selection-mode="true"` on the table while a long
+#                   press on touch has put it in the mode where a tap toggles
+#                   a row; absent otherwise. A custom state with no native or
+#                   ARIA attribute, so an attribute, never a class
 #   gap             DOM `ds data-table-gap`, hidden from assistive technology
 #   settings cell   design "settings action cell"
 #                   DOM `ds data-table-header-cell settings`
@@ -120,7 +124,9 @@
 #     0`). The DSL names neither flex shrinking nor a sticky edge.
 #   - A selected row under the pointer takes
 #     `color/foreground/secondary/information/hover`; compound states
-#     (`@selected@hover`) are reserved, not permitted, in 0.3.0.
+#     (`@selected@hover`) are reserved, not permitted, in 0.3.0. The row's
+#     selected state is `aria-selected`, which the stylesheet selects by
+#     attribute; no class repeats it.
 #   - The status row and the rows are exclusive, except that a stale or a
 #     refresh-failed status precedes the rows it describes. Conditional
 #     display is deferred in the DSL.

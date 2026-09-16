@@ -134,6 +134,14 @@ const columns: readonly DataTableColumn[] = [
 
 <Canvas of={Stories.SelectAllActsOnDisplayedRows} sourceState="none" />
 
+## Selection on touch
+
+The checkbox is the selection's baseline path everywhere. On touch, a long press on a row selects it and puts the table in selection mode, where a tap on a row toggles it; a tap on one of the row's own controls — its checkbox, a link in a cell — is that control's alone. Deselecting the last row ends the mode. Entering and leaving are announced through the messages record (`selectionModeEntered`, `selectionModeLeft`), and the mode is stated on the table as `data-selection-mode="true"` while it holds, so a stylesheet may select it by attribute. A row's own selected state is its `aria-selected`, with no class repeating it.
+
+## A warning past the render ceiling
+
+A table rendering every row of a large window works, and says so in development: past `RENDER_CEILING` rows without `virtualization`, it warns once, naming the count and pointing to `virtualizeRows` from `@canonical/dataviews-react/virtualization`. It is a prompt to measure and never a cap — every row the viewer asked for is still rendered, and a production build says nothing. The cards renderer warns at the same count, saying it has no virtualization to opt into.
+
 ## Row headers
 
 Declare one column `rowHeader` and its cell is the row's header: a reader hears its text before each of the row's other cells, the row is named by it, and so is the row's selection checkbox unless `rowLabel` names the row — a row whose header shows no text falls back to its identity. A table has at most one; a second fails where the table mounts. The row header is never hidden, whatever it declares, since hiding it would take the row's name with it.

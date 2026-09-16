@@ -331,7 +331,7 @@ describe("DataTable stylesheet", () => {
       ".ds.data-table-header-cell.selection",
       ".ds.data-table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-header-cell.selection",
       ".ds.data-table-row-group.header > .ds.data-table-row",
-      ".ds.data-table-row-group.body > .ds.data-table-row.selected",
+      '.ds.data-table-row-group.body > .ds.data-table-row[aria-selected="true"]',
       ".ds.data-table-row > .ds.data-table-body-cell.selection",
       // A data cell, not only the selection and status cells sharing its
       // class: its ellipsis and padding live on this class.

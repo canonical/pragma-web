@@ -24,6 +24,7 @@ import {
   useId,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import {
   type EntryRenderer,
@@ -35,6 +36,7 @@ import {
   useDataViewsValue,
   useIsHydrated,
   useMergedRef,
+  useRenderCeiling,
   useRowScopes,
   useStableCallback,
   useStableValue,
@@ -221,6 +223,40 @@ export default function ScopedDataTable<
   // Busy while a request is in flight, and only then: the root says so
   // over retained rows as over none.
   const busy = state.pendingRequestId !== null;
+  // A development prompt past the ceiling, never a cap: every row is drawn.
+  useRenderCeiling({
+    renderer: "DataTable",
+    count: ids.length,
+    virtualization: virtualization === undefined ? "available" : "in-use",
+  });
+
+  // Selection mode, on touch: a long press on a row selects it and enters
+  // the mode, where a tap toggles a row; it ends when the last selected row
+  // is deselected. Both are announced, since nothing on screen says either.
+  const [selecting, setSelecting] = useState(false);
+  const enterSelection = useStableCallback((rowId: string): void => {
+    provider.selection.add([rowId]);
+    if (!selecting) {
+      setSelecting(true);
+      announce(messages.selectionModeEntered);
+    }
+  });
+  const toggleSelected = useStableCallback((rowId: string): void => {
+    provider.selection.toggle(rowId);
+  });
+  // Subscribed only while in the mode, so a table outside it re-renders for
+  // no selection change of its own.
+  useEffect(() => {
+    if (!selecting) {
+      return undefined;
+    }
+    return provider.selection.state.subscribe(() => {
+      if (provider.selection.state.get().ids.size === 0) {
+        setSelecting(false);
+        announce(messages.selectionModeLeft);
+      }
+    });
+  }, [selecting, provider, announce, messages]);
 
   // The header row's sort: the ordering in force and what each column shows
   // of it, the column that claims it, refusals, no-JS destinations, and the
@@ -338,6 +374,9 @@ export default function ScopedDataTable<
           columns={rendered}
           rowHeader={rowHeader}
           selectable={selectable}
+          selecting={selecting}
+          onLongPress={enterSelection}
+          onTap={toggleSelected}
           rowLabel={nameRow}
           applicabilityOf={applicabilityOf}
         />
@@ -349,6 +388,9 @@ export default function ScopedDataTable<
       rendered,
       rowHeader,
       selectable,
+      selecting,
+      enterSelection,
+      toggleSelected,
       nameRow,
       applicabilityOf,
     ],
@@ -380,6 +422,9 @@ export default function ScopedDataTable<
           role="table"
           aria-label={label}
           aria-busy={busy}
+          // A custom state with no native or ARIA attribute: an attribute,
+          // present while the mode holds.
+          data-selection-mode={selecting ? "true" : undefined}
           // Every logical row, the header's included, so a row a virtualized
           // table has not mounted is still counted.
           aria-rowcount={

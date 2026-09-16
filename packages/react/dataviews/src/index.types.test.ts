@@ -172,6 +172,8 @@ describe("public surface types", () => {
       "DataTable",
       "DataViews",
       "PaginationBar",
+      // The documented count past which a renderer warns in development.
+      "RENDER_CEILING",
       "createColumns",
       "useDataViews",
       "useDataViewsCell",

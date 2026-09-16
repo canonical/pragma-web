@@ -17,6 +17,7 @@ import { MessagesContext, StatusItem } from "../../common/index.js";
 import {
   useDataViewsValue,
   useMessages,
+  useRenderCeiling,
   useRowScopes,
   useStableCallback,
   useStableValue,
@@ -124,6 +125,12 @@ export default function Cards<
     () => entries.flatMap((entry) => (entry.kind === "record" ? [entry] : [])),
     [entries],
   );
+  // A development prompt past the ceiling, never a cap: every card is drawn.
+  useRenderCeiling({
+    renderer: "Cards",
+    count: records.length,
+    virtualization: "none",
+  });
   // Held behind one identity: a lambda must not re-render every card. Null
   // until the caller names records, so a card names itself by its title.
   const nameRecord = useStableCallback(
