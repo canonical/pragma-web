@@ -7,12 +7,12 @@
 # their own files beside their components; this file only references them.
 #
 # Names — one per part, the same in the design, the DOM and here:
-#   DataTable       design "DataTable"    DOM `ds data-table-frame`: the frame,
+#   DataTable       design "DataTable"    DOM `ds data-table dense`: the root,
 #                   the caller's box, holding the table, its footer and its
 #                   announcer; the caller's props land here
-#   table                                 DOM `ds data-table dense`, `role=table`:
-#                   the scroll container, whose children are its row groups
-#   footer          design "footer"       DOM `ds data-table-footer`: beneath the
+#   table                                 DOM `div.table`, `role=table`: the
+#                   scroll container, whose children are its row groups
+#   footer          design "footer"       DOM `div.footer`: beneath the
 #                   table and outside its role, holding the pagination bar as
 #                   a landmark, sticky to the bottom of the view; the action
 #                   bar is to overlay it while rows are selected
@@ -51,7 +51,7 @@
 # `--density-padding-inline`). The DSL has no way to say "channel", so the
 # path names it and this note records the deviation.
 #
-# Density: the table carries the design system's `.dense` class, so it
+# Density: the root carries the design system's `.dense` class, so the table
 # is dense wherever it sits. It reads the channel and defines no density rule
 # of its own. `.dense` is a class, not a state; nothing changes structurally.
 #

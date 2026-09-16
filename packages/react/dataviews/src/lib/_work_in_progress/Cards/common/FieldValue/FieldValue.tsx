@@ -1,8 +1,8 @@
-import { memo, type ReactElement, useContext, useMemo } from "react";
+import { memo, type ReactElement, useMemo } from "react";
 import {
   CellContext,
   type CellContextValue,
-  MessagesContext,
+  NotApplicable,
 } from "../../../../common/index.js";
 import { useDataViewsValue } from "../../../../hooks/index.js";
 import { readFieldName, spellPrimitiveValue } from "../../../../utils/index.js";
@@ -21,7 +21,6 @@ function FieldValue<TRow extends object>({
     // channel is a card built against another field list.
     throw new Error(`no channel observes the field "${name}"`);
   }
-  const messages = useContext(MessagesContext);
   const value = useDataViewsValue(channel);
   const cell = useMemo<CellContextValue>(
     () => ({
@@ -52,12 +51,8 @@ function FieldValue<TRow extends object>({
         />
       ) : notApplicable ? (
         // A field that does not apply to this record, told apart from one it
-        // carries no value for: the dash is seen, the word is read — clipped,
-        // not hidden, so it stays in the accessibility tree.
-        <>
-          <span aria-hidden="true">—</span>
-          <span className="not-applicable">{messages.cellNotApplicable}</span>
-        </>
+        // carries no value for.
+        <NotApplicable />
       ) : (
         spellPrimitiveValue(value)
       )}

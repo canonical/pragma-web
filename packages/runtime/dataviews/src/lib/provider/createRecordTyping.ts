@@ -54,7 +54,7 @@ export default function createRecordTyping<
       }
       return null;
     },
-    typeOf: nameOf,
+    readType: nameOf,
     recordType(id: string): string | null {
       // Memory is of identities while they are selected: an identity that
       // left the selection is not one an action can be decided for.
@@ -64,7 +64,7 @@ export default function createRecordTyping<
       // A row on display is the answer; memory answers for the rows that
       // are not. Reading it the other way round would let a remembered
       // type outlive the record it was taken from and contradict what
-      // `typeOf` reads off that same record.
+      // `readType` reads off that same record.
       const record = rows.get().byId(id);
       return record === undefined
         ? (remembered.get(id) ?? null)

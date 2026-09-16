@@ -49,7 +49,7 @@ export type CardListProps<TRow extends object> = {
    * The cards', one identity for every card, asked per field as a table asks
    * it per column.
    */
-  readonly applicabilityOf: (
+  readonly decideApplicability: (
     field: DisplayField,
     type: string | null,
   ) => Applicability;
@@ -57,5 +57,5 @@ export type CardListProps<TRow extends object> = {
    * The declared type a record carries, or null: what a card watches of its
    * record. The cards', one identity for every card.
    */
-  readonly typeOf: (record: TRow) => string | null;
+  readonly readType: (record: TRow) => string | null;
 };

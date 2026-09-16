@@ -1,57 +1,8 @@
-import { CheckboxInput } from "@canonical/react-ds-global-form";
-import { type ReactElement, useContext } from "react";
-import { MessagesContext } from "../../../../common/index.js";
+import type { ReactElement } from "react";
 import { useDataViewsValue } from "../../../../hooks/index.js";
-import { readFieldName, spellPrimitiveValue } from "../../../../utils/index.js";
+import { readFieldName } from "../../../../utils/index.js";
+import { HeaderNamedCheckbox, NamedCheckbox } from "./common/index.js";
 import type { SelectionCellProps } from "./types.js";
-
-const componentCssClassName = "ds data-table-body-cell selection";
-
-/** The cell and its checkbox, once the row's name is known. */
-function Checkbox<TRow extends object>({
-  provider,
-  channels,
-  selected,
-  name,
-}: Pick<SelectionCellProps<TRow>, "provider" | "channels" | "selected"> & {
-  readonly name: string;
-}): ReactElement {
-  const messages = useContext(MessagesContext);
-  return (
-    // biome-ignore lint/a11y/useSemanticElements: <td> is only valid inside a <table>, and this grid is deliberately not one
-    <div role="cell" className={componentCssClassName}>
-      <CheckboxInput
-        checked={selected}
-        aria-label={messages.selectRow(name)}
-        onChange={() => {
-          provider.selection.toggle(channels.id);
-        }}
-      />
-    </div>
-  );
-}
-
-/**
- * The checkbox of a row a column heads, named by that column's text where
- * the caller gave no name. Watches the header's channel as the text it
- * spells, so the name follows the text on screen and nothing else.
- */
-function HeaderNamedCheckbox<TRow extends object>({
-  channel,
-  named,
-  ...props
-}: Pick<SelectionCellProps<TRow>, "provider" | "channels" | "selected"> & {
-  readonly channel: SelectionCellProps<TRow>["channels"]["fields"][string];
-  readonly named: string | null;
-}): ReactElement {
-  const spelled = useDataViewsValue(channel, spellPrimitiveValue);
-  // Blank is no name at all: a header holding empty text, or none, leaves
-  // the row named by its identity rather than by nothing.
-  const name =
-    named ??
-    (spelled !== null && spelled.trim() !== "" ? spelled : props.channels.id);
-  return <Checkbox {...props} name={name} />;
-}
 
 /**
  * One row's selection checkbox: the design system's checkbox backed by the
@@ -79,7 +30,7 @@ export default function SelectionCell<TRow extends object>({
     rowLabel(record, channels.id),
   );
   return nameChannel === null ? (
-    <Checkbox {...props} name={named ?? channels.id} />
+    <NamedCheckbox {...props} name={named ?? channels.id} />
   ) : (
     <HeaderNamedCheckbox {...props} channel={nameChannel} named={named} />
   );

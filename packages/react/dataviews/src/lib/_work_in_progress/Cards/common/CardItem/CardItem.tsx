@@ -14,8 +14,8 @@ function CardItem<TRow extends object>({
   channels,
   title,
   details,
-  applicabilityOf,
-  typeOf,
+  decideApplicability,
+  readType,
   selectable,
   nameRecord,
 }: CardItemProps<TRow>): ReactElement {
@@ -33,7 +33,7 @@ function CardItem<TRow extends object>({
   // Which fields apply to the record is a fact about its type, so the card
   // watches the type alone: it renders again when a record comes back as
   // another type, and for no move of any field.
-  const type = useDataViewsValue(channels.record, typeOf);
+  const type = useDataViewsValue(channels.record, readType);
   const titleChannel = channels.fields[readFieldName(title)];
   if (titleChannel === undefined) {
     // The scopes observe every field the cards show, the title's included.
@@ -72,7 +72,7 @@ function CardItem<TRow extends object>({
             provider={provider}
             channels={channels}
             field={title}
-            applicability={applicabilityOf(title, type)}
+            applicability={decideApplicability(title, type)}
             recordType={type}
           />
         </span>
@@ -88,7 +88,7 @@ function CardItem<TRow extends object>({
                     provider={provider}
                     channels={channels}
                     field={field}
-                    applicability={applicabilityOf(field, type)}
+                    applicability={decideApplicability(field, type)}
                     recordType={type}
                   />
                 </dd>

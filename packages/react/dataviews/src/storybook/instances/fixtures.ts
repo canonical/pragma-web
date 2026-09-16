@@ -67,7 +67,7 @@ export const instanceCollection = createCollection({
 /** The fields of the instance collection, for typed columns and sort terms. */
 export type InstanceFields = typeof instanceCollection.schema.fields;
 
-const container = (
+const buildContainer = (
   id: string,
   name: string,
   image: string,
@@ -75,7 +75,7 @@ const container = (
   project = "default",
 ): Container => ({ id, name, type: "container", status, project, image });
 
-const virtualMachine = (
+const buildVirtualMachine = (
   id: string,
   name: string,
   firmware: VirtualMachine["firmware"],
@@ -97,16 +97,16 @@ const virtualMachine = (
  * that is empty stands beside one that does not apply.
  */
 export const instances: readonly Instance[] = Object.freeze([
-  container("i-01", "web-01", "ubuntu:24.04"),
-  virtualMachine("i-02", "db-01", "uefi", "running", "data"),
-  container("i-03", "cache-01", "alpine:3.20", "stopped"),
-  virtualMachine("i-04", "build-01", "bios", "stopped", "ci"),
-  container("i-05", "proxy-01", "ubuntu:22.04"),
-  virtualMachine("i-06", "win-01", "uefi", "frozen", "desktops"),
-  container("i-07", "scratch-01", "", "stopped"),
-  container("i-08", "web-02", "ubuntu:24.04"),
-  virtualMachine("i-09", "gpu-01", "uefi", "running", "ml"),
-  container("i-10", "log-01", "alpine:3.20", "running", "ops"),
+  buildContainer("i-01", "web-01", "ubuntu:24.04"),
+  buildVirtualMachine("i-02", "db-01", "uefi", "running", "data"),
+  buildContainer("i-03", "cache-01", "alpine:3.20", "stopped"),
+  buildVirtualMachine("i-04", "build-01", "bios", "stopped", "ci"),
+  buildContainer("i-05", "proxy-01", "ubuntu:22.04"),
+  buildVirtualMachine("i-06", "win-01", "uefi", "frozen", "desktops"),
+  buildContainer("i-07", "scratch-01", "", "stopped"),
+  buildContainer("i-08", "web-02", "ubuntu:24.04"),
+  buildVirtualMachine("i-09", "gpu-01", "uefi", "running", "ml"),
+  buildContainer("i-10", "log-01", "alpine:3.20", "running", "ops"),
 ]);
 
 /** How a story's instance source is set up. */

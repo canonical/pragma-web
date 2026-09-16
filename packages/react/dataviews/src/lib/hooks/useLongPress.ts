@@ -1,4 +1,4 @@
-import type { MouseEvent, PointerEvent } from "react";
+import type { PointerEvent } from "react";
 import { useEffect, useInsertionEffect, useRef } from "react";
 import { LONG_PRESS_MS, LONG_PRESS_SLOP_PX } from "./constants.js";
 import type {
@@ -40,7 +40,7 @@ export default function useLongPress({
   // release — or, where the platform sends none, let go a tick after it, so
   // no later click of another kind is taken for the press's.
   const fired = useRef(false);
-  const release = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const releaseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // The latest handlers, taken once a render commits: the timer and the
   // click read them, never a render React discarded.
   const latest = useRef({ onLongPress, onTap });
@@ -57,11 +57,11 @@ export default function useLongPress({
   // The release of a press: the compat click, where the platform sends one,
   // is dispatched before any timer runs, so a fired press still standing a
   // tick later had no click to swallow.
-  const released = (): void => {
+  const release = (): void => {
     cancel();
-    if (fired.current && release.current === null) {
-      release.current = setTimeout(() => {
-        release.current = null;
+    if (fired.current && releaseTimer.current === null) {
+      releaseTimer.current = setTimeout(() => {
+        releaseTimer.current = null;
         fired.current = false;
       }, 0);
     }
@@ -76,9 +76,9 @@ export default function useLongPress({
         clearTimeout(press.current.timer);
         press.current = null;
       }
-      if (release.current !== null) {
-        clearTimeout(release.current);
-        release.current = null;
+      if (releaseTimer.current !== null) {
+        clearTimeout(releaseTimer.current);
+        releaseTimer.current = null;
       }
       fired.current = false;
     },
@@ -117,8 +117,8 @@ export default function useLongPress({
         cancel();
       }
     },
-    onPointerUp: released,
-    onPointerCancel: released,
+    onPointerUp: release,
+    onPointerCancel: release,
     onPointerLeave: cancel,
     onClick: (event) => {
       if (fired.current) {

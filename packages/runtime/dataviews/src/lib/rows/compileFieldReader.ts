@@ -1,3 +1,5 @@
+import { FIELD_PATH_DELIMITER } from "./constants.js";
+
 /**
  * Compile the read of one field of a row record, by name or by dot path,
  * into a function of the row. Rows are constrained to `object` rather than
@@ -25,13 +27,13 @@ export default function compileFieldReader(
   field: string,
 ): (row: object) => unknown {
   // Most fields of most collections are flat, and read without a walk.
-  if (!field.includes(".")) {
+  if (!field.includes(FIELD_PATH_DELIMITER)) {
     return (row) =>
       Object.hasOwn(row, field)
         ? (row as Record<string, unknown>)[field]
         : undefined;
   }
-  const segments = field.split(".");
+  const segments = field.split(FIELD_PATH_DELIMITER);
   return (row) => {
     let value: unknown = row;
     for (const segment of segments) {

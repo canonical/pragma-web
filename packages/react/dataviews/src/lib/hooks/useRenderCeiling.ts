@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { RENDER_CEILING } from "./constants.js";
-import type { UseRenderCeilingProps } from "./types.js";
+import type { UseRenderCeilingProps, UseRenderCeilingResult } from "./types.js";
 
 /** English's own grouping of a count, so a large one reads as one number. */
 const COUNT = new Intl.NumberFormat("en");
@@ -35,7 +35,7 @@ export default function useRenderCeiling({
   count,
   unit,
   virtualization,
-}: UseRenderCeilingProps): void {
+}: UseRenderCeilingProps): UseRenderCeilingResult {
   const warned = useRef(false);
   useEffect(() => {
     if (

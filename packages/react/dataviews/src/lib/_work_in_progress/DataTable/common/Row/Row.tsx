@@ -15,8 +15,8 @@ function Row<TRow extends object>({
   rowLabel,
   position,
   ref,
-  applicabilityOf,
-  typeOf,
+  decideApplicability,
+  readType,
 }: RowProps<TRow>): ReactElement {
   const selected = useDataViewsValue(channels.selected);
   // The row is named by its header cell where a column is the row header:
@@ -25,7 +25,7 @@ function Row<TRow extends object>({
   // Which columns apply to the record is a fact about its type, so the row
   // watches the type alone: it renders again when a record comes back as
   // another type, and for no move of any field.
-  const type = useDataViewsValue(channels.record, typeOf);
+  const type = useDataViewsValue(channels.record, readType);
   // The column heading the row, if any; the table checked there is one at
   // most where it mounted.
   const rowHeader = columns.find((column) => column.rowHeader === true) ?? null;
@@ -61,7 +61,7 @@ function Row<TRow extends object>({
           channels={channels}
           column={column}
           field={readFieldName(column)}
-          applicability={applicabilityOf(column, type)}
+          applicability={decideApplicability(column, type)}
           recordType={type}
         />
       ))}

@@ -1624,9 +1624,9 @@ describe("createDataViewsProvider record types", () => {
 
   it("names the declared type a row carries, and null for one it does not", () => {
     const { host } = instanceProvider();
-    expect(host.typeOf(container("c-1"))).toBe("container");
-    expect(host.typeOf(machine("v-1"))).toBe("virtual-machine");
-    expect(host.typeOf({ id: "x-1", type: "sandbox" } as unknown as Instance)) //
+    expect(host.readType(container("c-1"))).toBe("container");
+    expect(host.readType(machine("v-1"))).toBe("virtual-machine");
+    expect(host.readType({ id: "x-1", type: "sandbox" } as unknown as Instance)) //
       .toBeNull();
   });
 
@@ -1712,7 +1712,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
     host.complete(host.refresh(), delivered([{ id: "m-1" }]));
     provider.selection.set(["m-1"]);
     expect(host.recordType("m-1")).toBeNull();
-    expect(host.typeOf({ id: "m-1" })).toBeNull();
+    expect(host.readType({ id: "m-1" })).toBeNull();
     expect(readApplicability(provider.collection, "status", null)).toBe(
       "applies",
     );
@@ -1735,7 +1735,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
       readApplicability(
         provider.collection,
         "secureboot",
-        readProviderHost(provider).typeOf({ id: "m-1" }),
+        readProviderHost(provider).readType({ id: "m-1" }),
       ),
     ).toBe("applies");
   });

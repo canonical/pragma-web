@@ -40,7 +40,7 @@ export type RowProps<TRow extends object> = {
    * renders no cell again for it; the row asks per column rather than
    * carrying a map it would have to rebuild whenever its record moved.
    */
-  readonly applicabilityOf: (
+  readonly decideApplicability: (
     column: DataTableColumn,
     type: string | null,
   ) => Applicability;
@@ -48,7 +48,7 @@ export type RowProps<TRow extends object> = {
    * The declared type a record carries, or null: what the row watches of its
    * record. The table's, one identity for every row.
    */
-  readonly typeOf: (record: TRow) => string | null;
+  readonly readType: (record: TRow) => string | null;
   /** The row's logical position, reported only by a virtualized table. */
   readonly position?: number | undefined;
   /** The row element, for a virtualized table to measure. */

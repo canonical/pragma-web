@@ -13,7 +13,7 @@ import type { Collection } from "./types.js";
  * names alone. A record carrying no declared type, named null, is a type no
  * scope names.
  *
- * The type is the provider's to name, through its host's `typeOf`: a
+ * The type is the provider's to name, through its host's `readType`: a
  * renderer watches a record's type and asks this of the type, so it reads
  * the record for nothing else.
  *

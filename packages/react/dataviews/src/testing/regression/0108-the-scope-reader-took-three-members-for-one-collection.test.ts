@@ -12,7 +12,7 @@ import { describe, expectTypeOf, it } from "vitest";
 import type {
   FieldScope,
   ReadFieldScopesConfig,
-} from "../../lib/utils/readFieldScopes.js";
+} from "../../lib/utils/index.js";
 
 describe("the scope reader", () => {
   it("reads the collection and the columns, and answers for a type", () => {

@@ -24,7 +24,7 @@ export default function readRowHeader(
       `DataTable columns ${named} are each the row header; a row has one`,
     );
   }
-  const header = headers[0];
+  const header = headers.at(0);
   if (header === undefined) {
     return null;
   }

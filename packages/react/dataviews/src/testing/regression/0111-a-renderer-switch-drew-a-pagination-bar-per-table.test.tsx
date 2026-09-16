@@ -25,6 +25,6 @@ describe("the renderer switch over two connected tables", () => {
     );
     expect(screen.getAllByRole("navigation", { name: "Pagination" })) //
       .toHaveLength(1);
-    expect(document.querySelector(".ds.data-table-footer")).toBeNull();
+    expect(document.querySelector(".ds.data-table > .footer")).toBeNull();
   });
 });

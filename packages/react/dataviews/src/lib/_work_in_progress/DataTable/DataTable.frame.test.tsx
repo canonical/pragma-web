@@ -1,8 +1,6 @@
 /**
  * The frame around the table: the caller's box, holding the table, a footer
  * beneath it and outside the table role, and a standalone table's announcer.
- * The connected table fills the footer with the root's pagination bar unless
- * told otherwise.
  */
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, render, screen, within } from "@testing-library/react";
@@ -20,7 +18,6 @@ import {
   type Machine,
   machine,
 } from "../../../../testing/machines.js";
-import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./types.js";
 
@@ -47,9 +44,9 @@ describe("the table's frame", () => {
       <DataTable provider={provider} columns={columns} label="Machines" />,
     );
     const frame = frameOf();
-    expect(frame).toHaveClass("ds", "data-table-frame");
+    expect(frame).toHaveClass("ds", "data-table", "dense");
     expect(frame).not.toHaveAttribute("role");
-    expect(frame.querySelector(".ds.data-table-footer")).toBeNull();
+    expect(frame.querySelector(":scope > .footer")).toBeNull();
     // The table's children are its row groups: nothing else stands in it.
     expect(
       [...screen.getByRole("table").children].map((child) =>
@@ -69,7 +66,7 @@ describe("the table's frame", () => {
       />,
     );
     const frame = frameOf();
-    const footer = frame.querySelector(".ds.data-table-footer");
+    const footer = frame.querySelector(":scope > .footer");
     expect(footer).toContainElement(
       screen.getByRole("navigation", { name: "Pages" }),
     );
@@ -93,7 +90,7 @@ describe("the table's frame", () => {
     const frame = frameOf();
     const announcer = frame.querySelector(".ds.data-views-announcer");
     expect(announcer).not.toBeNull();
-    expect(frame.querySelector(".ds.data-table-footer")?.nextElementSibling) //
+    expect(frame.querySelector(":scope > .footer")?.nextElementSibling) //
       .toBe(announcer);
   });
 
@@ -108,51 +105,6 @@ describe("the table's frame", () => {
       />,
     );
     await expectNoAxeViolations(container);
-  });
-});
-
-describe("the connected table's footer", () => {
-  it("holds the root's pagination bar unless told otherwise", () => {
-    const { provider } = createMachineProvider({ rows });
-    render(
-      <DataViews provider={provider}>
-        <DataViews.DataTable columns={columns} label="Machines" />
-      </DataViews>,
-    );
-    expect(frameOf().querySelector(".ds.data-table-footer")).toContainElement(
-      screen.getByRole("navigation", { name: "Pagination" }),
-    );
-    // The root's announcer, not one of the table's own, so the frame holds
-    // no live region.
-    expect(frameOf().querySelector(".ds.data-views-announcer")).toBeNull();
-  });
-
-  it("holds the caller's footer over the bar, and none for null", () => {
-    const { provider } = createMachineProvider({ rows });
-    const { unmount } = render(
-      <DataViews provider={provider}>
-        <DataViews.DataTable
-          columns={columns}
-          label="Machines"
-          footer={<p>own</p>}
-        />
-      </DataViews>,
-    );
-    expect(frameOf().querySelector(".ds.data-table-footer")).toHaveTextContent(
-      "own",
-    );
-    expect(screen.queryByRole("navigation")).toBeNull();
-    unmount();
-    render(
-      <DataViews provider={provider}>
-        <DataViews.DataTable columns={columns} label="Machines" footer={null} />
-        <DataViews.Pagination />
-      </DataViews>,
-    );
-    expect(frameOf().querySelector(".ds.data-table-footer")).toBeNull();
-    // The bar the caller placed itself stands where it was placed.
-    expect(screen.getByRole("navigation", { name: "Pagination" })) //
-      .toBeInTheDocument();
   });
 });
 
@@ -182,35 +134,6 @@ describe("the typed table on the server", () => {
     host.complete(host.refresh(), deliverRows(MIXED_FLEET));
     return provider;
   };
-
-  it("sends the frame, the rows' names and ids, the cells and the scope", () => {
-    const container = document.createElement("div");
-    container.innerHTML = renderToString(build(holding()));
-    // In the document, so a row's name is followed to the cell naming it.
-    document.body.append(container);
-    onTestFinished(() => {
-      container.remove();
-    });
-    const frame = container.querySelector(".ds.data-table-frame");
-    expect(
-      [...(frame?.children ?? [])].map((child) => child.className),
-    ).toEqual([
-      "ds data-table dense",
-      "ds data-table-footer",
-      "ds data-views-announcer",
-    ]);
-    const machine = within(container).getByRole("row", { name: "db-01" });
-    expect(machine).toHaveAttribute("data-row-id", "i-2");
-    expect(within(machine).getAllByRole("cell").at(-1)).toHaveTextContent(
-      /^—Not applicable$/,
-    );
-    const heading = within(container).getByRole("columnheader", {
-      name: "Image",
-    });
-    expect(heading.querySelector(".scope")).toHaveTextContent(
-      "Applies to container",
-    );
-  });
 
   it("hydrates without a mismatch", async () => {
     const container = document.createElement("div");

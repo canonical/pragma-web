@@ -11,7 +11,7 @@
    * so an application that never virtualizes a table loads them only if it
    * links `index.css`.
    */
-  .ds.data-table:has(> .ds.data-table-row-group.body.virtual) {
+  .ds.data-table > .table:has(> .ds.data-table-row-group.body.virtual) {
     /* The body's offset, which places the viewport among the entries, is
        measured from the table. */
     position: relative;

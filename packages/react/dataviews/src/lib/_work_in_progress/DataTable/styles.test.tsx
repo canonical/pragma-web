@@ -353,7 +353,7 @@ describe("DataTable stylesheet", () => {
       ".ds.data-table-header-cell > .label",
       ".ds.data-table-header-cell > .ds.data-table-resize-handle",
       ".ds.data-table-header-cell.selection",
-      ".ds.data-table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-header-cell.selection",
+      ".ds.data-table > .table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-header-cell.selection",
       ".ds.data-table-row-group.header > .ds.data-table-row",
       '.ds.data-table-row-group.body > .ds.data-table-row[aria-selected="true"]',
       ".ds.data-table-row > .ds.data-table-body-cell.selection",
@@ -414,15 +414,15 @@ describe("DataTable stylesheet", () => {
     expect(themed).not.toMatch(/\d(px|rem|em)\b|#[0-9a-f]{3,8}\b|opacity/i);
   });
 
-  it("paints the surface it sits on, from the frame", () => {
-    expect(rule(/\.ds\.data-table-frame/)).toMatch(
+  it("paints the surface it sits on, from the root", () => {
+    expect(rule(/\.ds\.data-table/)).toMatch(
       /background-color:\s*var\(--surface-color-background,\s*var\(--color-background\)\);/,
     );
   });
 
   it("reads the density channel and defines no density rule of its own", () => {
     const table = loaded().querySelector('[role="table"]');
-    expect(table).toHaveClass("dense");
+    expect(table?.parentElement).toHaveClass("dense");
     expect(sheet).not.toMatch(/\.dense\b/);
     // A minimum, so a taller cell grows its row rather than clipping.
     expect(rule(/\.ds\.data-table-row/)).toMatch(
@@ -441,12 +441,12 @@ describe("DataTable stylesheet", () => {
     // Each set on a table whose header holds its cell, and empty otherwise.
     expect(
       rule(
-        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.selection\s*\)/,
+        /\.ds\.data-table\s*>\s*\.table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.selection\s*\)/,
       ),
     ).toMatch(/--data-table-selection-track:\s*var\(--dimension-400\);/);
     expect(
       rule(
-        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.settings\s*\)/,
+        /\.ds\.data-table\s*>\s*\.table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.settings\s*\)/,
       ),
     ).toMatch(/--data-table-settings-track:\s*var\(--dimension-400\);/);
   });

@@ -77,13 +77,11 @@ import {
 import readRowHeader from "./readRowHeader.js";
 import "../../styles.css";
 
-/** The frame: the caller's box, holding the table, its footer and its announcer. */
-const frameCssClassName = "ds data-table-frame";
-
 /**
- * `dense` is the design system's own density class: it sets the channel the
- * stylesheet reads for row height and cell padding, so the table is dense
- * wherever it sits.
+ * The root, the caller's box holding the table, its footer and its
+ * announcer. `dense` is the design system's own density class: it sets the
+ * channel the stylesheet reads for row height and cell padding, so the table
+ * is dense wherever it sits.
  */
 const componentCssClassName = "ds data-table dense";
 
@@ -334,7 +332,7 @@ export default function ScopedDataTable<
   // checked here, where the table mounts, once per declared column list.
   // Every declared column, not only the ones shown: a column hidden by the
   // stored arrangement is checked where the table mounts all the same.
-  const scopeOf = useMemo(
+  const readScope = useMemo(
     () =>
       readFieldScopes({
         collection: provider.collection,
@@ -345,13 +343,13 @@ export default function ScopedDataTable<
   );
   // Whether one column applies to a record of one type. Held at one
   // identity, so a table that renders again renders no row again for this.
-  const applicabilityOf = useStableCallback(
+  const decideApplicability = useStableCallback(
     (column: DataTableColumn, type: string | null): Applicability =>
-      scopeOf(column).applicability(type),
+      readScope(column).applicability(type),
   );
   // The declared type a record carries: what each row watches of its record.
-  const typeOf = useStableCallback((record: TRow): string | null =>
-    readProviderHost(provider).typeOf(record),
+  const readType = useStableCallback((record: TRow): string | null =>
+    readProviderHost(provider).readType(record),
   );
 
   // The columns' visibility and places, as the settings menu offers them
@@ -438,8 +436,8 @@ export default function ScopedDataTable<
           columns={rendered}
           selectable={selectable}
           rowLabel={nameRow}
-          applicabilityOf={applicabilityOf}
-          typeOf={typeOf}
+          decideApplicability={decideApplicability}
+          readType={readType}
         />
       ),
     [
@@ -449,8 +447,8 @@ export default function ScopedDataTable<
       rendered,
       selectable,
       nameRow,
-      applicabilityOf,
-      typeOf,
+      decideApplicability,
+      readType,
     ],
   );
 
@@ -469,13 +467,13 @@ export default function ScopedDataTable<
       <div
         {...rest}
         ref={attach}
-        className={[frameCssClassName, className].filter(Boolean).join(" ")}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
         style={style}
       >
         {/* biome-ignore lint/a11y/useSemanticElements: a <table> resolves each row's widths from its own content, which is exactly what this grid replaces with one shared track list */}
         <div
           ref={geometry.attach}
-          className={componentCssClassName}
+          className="table"
           style={geometryStyle}
           role="table"
           aria-label={label}
@@ -543,7 +541,7 @@ export default function ScopedDataTable<
                     // Solved for every rendered column, in the same order.
                     width={geometry.widths[position] as number}
                     labelId={`${baseId}-${column.id}`}
-                    appliesTo={scopeOf(column).appliesTo}
+                    appliesTo={readScope(column).appliesTo}
                   />
                 );
               })}
@@ -569,9 +567,7 @@ export default function ScopedDataTable<
         </div>
         {/* Beneath the table and outside its role, since a table's children
           are its row groups: the bar here is a landmark, not a row. */}
-        {footer === undefined ? null : (
-          <div className="ds data-table-footer">{footer}</div>
-        )}
+        {footer === undefined ? null : <div className="footer">{footer}</div>}
         {region}
       </div>
     </MessagesContext>

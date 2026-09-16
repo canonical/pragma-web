@@ -207,10 +207,10 @@ describe("DataTable", () => {
     const table = screen.getByRole("table", { name: "Machines" });
     // The frame is the caller's box; the table within it keeps its own.
     const frame = table.parentElement;
-    expect(frame?.className).toBe("ds data-table-frame host");
+    expect(frame?.className).toBe("ds data-table dense host");
     expect(frame?.style.opacity).toBe("0.5");
     expect(frame?.id).toBe("machines");
-    expect(table.className).toBe("ds data-table dense");
+    expect(table.className).toBe("table");
   });
 
   it("hands the root to a caller's callback ref without losing its own", () => {

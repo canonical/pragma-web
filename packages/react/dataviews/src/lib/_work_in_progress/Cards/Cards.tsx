@@ -147,7 +147,7 @@ export default function Cards<
   // Every declared field's scope, checked where the cards mount, keyed on
   // what a scope is read from, so a field rebuilt inline re-reads none.
   const scoped = useStableValue(fields, areFieldScopesEqual);
-  const scopeOf = useMemo(
+  const readScope = useMemo(
     () =>
       readFieldScopes({
         collection: provider.collection,
@@ -159,13 +159,13 @@ export default function Cards<
   // Whether one field applies to a card's record of one type, as a table
   // asks it of a row. One identity, so a re-render of the cards re-renders
   // no card for this.
-  const applicabilityOf = useStableCallback(
+  const decideApplicability = useStableCallback(
     (field: DisplayField, type: string | null): Applicability =>
-      scopeOf(field).applicability(type),
+      readScope(field).applicability(type),
   );
   // The declared type a record carries: what each card watches of its record.
-  const typeOf = useStableCallback((record: TRow): string | null =>
-    readProviderHost(provider).typeOf(record),
+  const readType = useStableCallback((record: TRow): string | null =>
+    readProviderHost(provider).readType(record),
   );
   // The words' own text for a status, unless the caller renders its own.
   const describe = useCallback(
@@ -195,8 +195,8 @@ export default function Cards<
           details={details}
           selectable={selectable}
           nameRecord={nameRecord}
-          applicabilityOf={applicabilityOf}
-          typeOf={typeOf}
+          decideApplicability={decideApplicability}
+          readType={readType}
         />
       </section>
     </MessagesContext>

@@ -73,7 +73,7 @@ export const instances = createCollection({
 export type InstanceFields = typeof instances.schema.fields;
 
 /** One container of the given identity and name. */
-export const container = (
+export const buildContainer = (
   id: string,
   name: string,
   image = "ubuntu:24.04",
@@ -81,7 +81,7 @@ export const container = (
 ): Container => ({ id, name, type: "container", status, image });
 
 /** One virtual machine of the given identity and name. */
-export const virtualMachine = (
+export const buildVirtualMachine = (
   id: string,
   name: string,
   firmware: VirtualMachine["firmware"] = "uefi",
@@ -94,10 +94,10 @@ export const virtualMachine = (
  * apply to among the ones it does.
  */
 export const MIXED_FLEET: readonly Instance[] = Object.freeze([
-  container("i-1", "web-01", "ubuntu:24.04"),
-  virtualMachine("i-2", "db-01", "uefi", "stopped"),
-  container("i-3", "cache-01", "alpine:3.20", "stopped"),
-  virtualMachine("i-4", "build-01", "bios"),
+  buildContainer("i-1", "web-01", "ubuntu:24.04"),
+  buildVirtualMachine("i-2", "db-01", "uefi", "stopped"),
+  buildContainer("i-3", "cache-01", "alpine:3.20", "stopped"),
+  buildVirtualMachine("i-4", "build-01", "bios"),
 ]);
 
 /** What the fixture source declares: it filters, searches, orders and counts. */

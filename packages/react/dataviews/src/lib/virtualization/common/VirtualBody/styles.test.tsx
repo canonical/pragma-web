@@ -28,10 +28,12 @@ describe("virtualized DataTable stylesheet", () => {
         virtualization={virtualizeRows({ estimatedRowHeight: 32 })}
       />,
     );
-    const selector = sheet.match(/\.ds\.data-table:has\(> ([^)]+)\)/)?.[1];
+    const selector = sheet.match(
+      /\.ds\.data-table\s*>\s*\.table:has\(> ([^)]+)\)/,
+    )?.[1];
     expect(selector).toBe(".ds.data-table-row-group.body.virtual");
     expect(
-      container.querySelector(`.ds.data-table > ${selector}`),
+      container.querySelector(`.ds.data-table > .table > ${selector}`),
     ).not.toBeNull();
   });
 

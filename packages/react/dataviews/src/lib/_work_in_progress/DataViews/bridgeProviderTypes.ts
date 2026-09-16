@@ -32,9 +32,7 @@ import type {
 } from "@canonical/dataviews-core";
 
 /** The provider shape a root's context carries: the widest there is. */
-export type WidestProvider = DataViewsProvider<
-  readonly SchemaFieldDefinition[]
->;
+type WidestProvider = DataViewsProvider<readonly SchemaFieldDefinition[]>;
 
 /** The filter handles a root's context carries, at that same widest shape. */
 type WidestFilters = FilterHandles<readonly SchemaFieldDefinition[]>;

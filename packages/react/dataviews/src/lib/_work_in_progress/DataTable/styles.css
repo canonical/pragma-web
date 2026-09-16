@@ -17,14 +17,14 @@
    *
    * Colour, border, type and spacing come from @canonical/design-tokens. Row
    * height and cell padding come from the density channel of
-   * @canonical/styles: the table carries the design system's `.dense`, so the
+   * @canonical/styles: the root carries the design system's `.dense`, so the
    * table is dense wherever it sits, and it defines no density rule of its
    * own.
    */
-  /* The frame is the caller's box: a column holding the table, then its
+  /* The root is the caller's box: a column holding the table, then its
      footer, then the announcer. A height capped on it is the table's to
      scroll within, and the footer keeps its place beneath. */
-  .ds.data-table-frame {
+  .ds.data-table {
     display: flex;
     flex-direction: column;
     /* Shrinks below its content where a caller lays it out in a flex or
@@ -39,29 +39,29 @@
     background-color: var(--surface-color-background, var(--color-background));
     border: var(--dimension-stroke-thickness-medium) solid
       var(--color-border-muted);
-  }
-
-  .ds.data-table {
-    /* The columns are authoritative: when their total no longer fits, the
-       table scrolls rather than compressing a column past its minimum.
-       `overflow-x` alone would make the used `overflow-y` a scroll
-       container anyway, so both are declared — which is also what lets the
-       header stick when a caller caps the frame's height. */
-    overflow: auto;
-    /* It takes the frame's height less the footer's, and shrinks below its
-       content so that height is what scrolls. */
-    flex: 1 1 auto;
-    min-block-size: 0;
     /* Each table sets its own tracks: a table nested in another's cell
        inherits neither the selection track nor the settings track. */
     --data-table-selection-track: initial;
     --data-table-settings-track: initial;
   }
 
+  .ds.data-table > .table {
+    /* The columns are authoritative: when their total no longer fits, the
+       table scrolls rather than compressing a column past its minimum.
+       `overflow-x` alone would make the used `overflow-y` a scroll
+       container anyway, so both are declared — which is also what lets the
+       header stick when a caller caps the root's height. */
+    overflow: auto;
+    /* It takes the root's height less the footer's, and shrinks below its
+       content so that height is what scrolls. */
+    flex: 1 1 auto;
+    min-block-size: 0;
+  }
+
   /* Beneath the table, outside its role. Sticky, so a table taller than the
-     view keeps its bar in view until the frame's end scrolls past; where the
-     frame's height is capped, the table scrolls and the bar simply stays. */
-  .ds.data-table-footer {
+     view keeps its bar in view until the root's end scrolls past; where the
+     root's height is capped, the table scrolls and the bar simply stays. */
+  .ds.data-table > .footer {
     flex: none;
     position: sticky;
     inset-block-end: 0;
@@ -155,7 +155,8 @@
      ones, in a table whose header holds the select-all cell. The table reads
      its width back from the cell it sizes, and the solver shares what is
      left among the data columns. */
-  .ds.data-table:has(
+  .ds.data-table
+  > .table:has(
     > .ds.data-table-row-group.header
       > .ds.data-table-row
       > .ds.data-table-header-cell.selection
@@ -166,7 +167,8 @@
   /* The settings cell is the stylesheet's own track too, after the solved
      ones, in a table whose header holds it. Every row keeps the track, empty
      in the body, so each column's boundary is the same in every row. */
-  .ds.data-table:has(
+  .ds.data-table
+  > .table:has(
     > .ds.data-table-row-group.header
       > .ds.data-table-row
       > .ds.data-table-header-cell.settings

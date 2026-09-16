@@ -191,6 +191,9 @@ export type UseLongPressResult = {
   readonly onContextMenu: (event: MouseEvent<HTMLElement>) => void;
 };
 
+/** What `useRenderCeiling` answers: nothing; it warns, or it does not. */
+export type UseRenderCeilingResult = undefined;
+
 /** Props of `useRenderCeiling`: what a renderer draws, and how it could draw less. */
 export type UseRenderCeilingProps = {
   /** The renderer, as the warning names it. */

@@ -36,7 +36,7 @@ describe("whether a field applies to a record", () => {
     const provider = createDataViewsProvider({ collection, source });
     const host = readProviderHost(provider);
     const vm = { id: "v-1", type: "vm" };
-    expect(readApplicability(collection, "image", host.typeOf(vm))).toBe(
+    expect(readApplicability(collection, "image", host.readType(vm))).toBe(
       "not-applicable",
     );
   });
