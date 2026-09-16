@@ -26,6 +26,7 @@ import type { RowRecord } from "../rows/index.js";
 import type {
   AppliedOf,
   FieldKindOperators,
+  FieldNameOf,
   Schema,
   SchemaFieldDefinition,
 } from "../schema/index.js";
@@ -319,10 +320,6 @@ export type Source<TRow extends object = RowRecord> = {
   readonly runAction?: SourceActionRunner;
 };
 
-/** The names of a schema's fields. */
-type FieldNameOf<TFields extends readonly SchemaFieldDefinition[]> =
-  TFields[number]["field"];
-
 /**
  * The names of a schema's fields a facet can be computed for: every kind
  * but text, whose values form no discrete set and no range.
@@ -384,8 +381,14 @@ export type CapabilityDeclaration<
         readonly fields: readonly FieldNameOf<TFields>[];
         /** Maximum ordered terms; null when the source sets no limit. */
         readonly terms: number | null;
-        /** The ordering a query with no term runs on; empty when left out. */
-        readonly default?: readonly SortTerm[] | undefined;
+        /**
+         * The ordering a query with no term runs on; empty when left out.
+         * Its terms name the schema's own fields, so a misspelt one does
+         * not compile, as an unsortable one is refused at construction.
+         */
+        readonly default?:
+          | readonly SortTerm<FieldNameOf<TFields>>[]
+          | undefined;
         /** What breaks ties after the last term; unordered when left out. */
         readonly tiebreak?: SortTiebreak | undefined;
         /**
@@ -474,7 +477,11 @@ export type PageConfig<TRow extends object = RowRecord> = {
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type ArraySourceConfig<TRow extends object = RowRecord> = {
+export type ArraySourceConfig<
+  TFields extends
+    readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
   /** The complete record set. Copied at construction; never read live. */
   readonly rows: readonly TRow[];
   /**
@@ -483,14 +490,15 @@ export type ArraySourceConfig<TRow extends object = RowRecord> = {
    * of them, comparing an ordered term through its kind. A field the schema
    * does not define is refused.
    */
-  readonly collection: Collection<readonly SchemaFieldDefinition[], TRow>;
+  readonly collection: Collection<TFields, TRow>;
   /**
    * The ordering a query with no term of its own runs on. Empty by default,
-   * which declares that the source documents no order.
+   * which declares that the source documents no order. Its terms name the
+   * collection's own fields, so a misspelt one does not compile.
    *
    * @experimental A default may later take a tiebreak of its own.
    */
-  readonly defaultSort?: readonly SortTerm[] | undefined;
+  readonly defaultSort?: readonly SortTerm<FieldNameOf<TFields>>[] | undefined;
   /**
    * The BCP-47 tag text compares under, root collation with numeric ordering
    * by default, or null to compare by code unit. The source's locale, never

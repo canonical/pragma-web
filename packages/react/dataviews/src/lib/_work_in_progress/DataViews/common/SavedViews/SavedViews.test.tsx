@@ -77,7 +77,7 @@ const createProviderOver = (
 ): DataViewsProvider<Fields, Row> =>
   createDataViewsProvider({
     collection,
-    source: createArraySource<Row>({ rows: [], collection }),
+    source: createArraySource({ rows: [], collection }),
     views: store,
     ...(presentation === undefined ? {} : { presentation }),
   });
@@ -142,7 +142,7 @@ describe("DataViews.SavedViews", () => {
   it("fails clearly over a provider given no store", () => {
     const provider = createDataViewsProvider({
       collection,
-      source: createArraySource<Row>({ rows: [], collection }),
+      source: createArraySource({ rows: [], collection }),
     });
     expect(() =>
       render(

@@ -3,7 +3,7 @@ import { byId } from "../../../testing/fixtures.js";
 import { createCollection } from "../collection/index.js";
 import { DEFAULT_WINDOW, type Slice, type SortTerm } from "../query/index.js";
 import type { SourceDelivery } from "../result/index.js";
-import type { RowRecord } from "../rows/index.js";
+import type { FieldNameOf } from "../schema/index.js";
 import { ROOT_NUMERIC_COLLATION } from "./constants.js";
 import createArraySource from "./createArraySource.js";
 import type { SourceActionRunner, SourceRequest } from "./types.js";
@@ -36,7 +36,7 @@ const collection = createCollection({
 });
 
 const source = () =>
-  createArraySource<RowRecord>({
+  createArraySource({
     rows,
     collection,
     searchFields: ["name"],
@@ -107,6 +107,10 @@ describe("createArraySource", () => {
       createArraySource({
         rows,
         collection,
+        // @ts-expect-error - "zone" is not one of the collection's fields,
+        // which is half of what this pins: such a term does not compile, and
+        // a caller who writes one anyway — from JavaScript, or decoded from
+        // a URL — is refused at construction rather than ordering by nothing.
         defaultSort: [{ field: "zone", direction: "asc" }],
       }),
     ).toThrow('the default ordering names "zone", which is not sortable');
@@ -186,7 +190,9 @@ describe("createArraySource", () => {
   });
 
   it("freezes its declaration against the caller's arrays", () => {
-    const defaultSort: SortTerm[] = [{ field: "id", direction: "asc" }];
+    const defaultSort: SortTerm<
+      FieldNameOf<typeof collection.schema.fields>
+    >[] = [{ field: "id", direction: "asc" }];
     const searchFields = ["name"];
     const { capabilities } = createArraySource({
       rows,
@@ -400,10 +406,10 @@ describe("createArraySource", () => {
 
   it("copies the replacement records too", () => {
     const live = source();
-    const replacement = [{ id: "z" }];
+    const replacement = [{ id: "z", name: "Zeta", cpu: 1 }];
     live.setRows(replacement);
     // The push is only observable through a delivery made after it.
-    replacement.push({ id: "y" });
+    replacement.push({ id: "y", name: "Upsilon", cpu: 2 });
     const later = delivery();
     live.execute(request({ requestId: "i1:r9" }), later);
     expect(idsOf(deliveredAt(later, 0))).toEqual(["z"]);

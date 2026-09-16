@@ -65,6 +65,9 @@ import type { DataTableColumn } from "./types.js";
 
 type Provider = DataViewsProvider<MachineFields, Machine>;
 
+/** A field of the machine collection: what an ordering here may name. */
+type MachineField = MachineFields[number]["field"];
+
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", sortable: true },
   { id: "status", header: "Status" },
@@ -459,7 +462,7 @@ describe("DataTable", () => {
   /** Three sortable columns over a source ordering by all three. */
   const renderOrderingTable = (
     terms: number | null,
-    defaultSort: readonly SortTerm[] = [],
+    defaultSort: readonly SortTerm<MachineField>[] = [],
     columnsInView: readonly DataTableColumn[] = [
       { id: "name", header: "Name", sortable: true },
       { id: "status", header: "Status", sortable: true },
@@ -676,10 +679,13 @@ describe("DataTable", () => {
 
   /** Every ordering of distinct fields drawn from `fields`, the empty one included. */
   const listOrderings = (
-    fields: readonly string[],
-  ): readonly (readonly SortTerm[])[] => {
-    const orderings: (readonly SortTerm[])[] = [[]];
-    const extend = (prefix: readonly SortTerm[], left: readonly string[]) => {
+    fields: readonly MachineField[],
+  ): readonly (readonly SortTerm<MachineField>[])[] => {
+    const orderings: (readonly SortTerm<MachineField>[])[] = [[]];
+    const extend = (
+      prefix: readonly SortTerm<MachineField>[],
+      left: readonly MachineField[],
+    ) => {
       for (const field of left) {
         for (const direction of ["asc", "desc"] as const) {
           const next = [...prefix, { field, direction }];

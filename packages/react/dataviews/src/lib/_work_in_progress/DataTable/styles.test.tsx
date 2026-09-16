@@ -32,6 +32,7 @@ import {
   createMachineProvider,
   declareMachineOrdering,
   type Machine,
+  type MachineFields,
   machine,
 } from "../../../../testing/machines.js";
 import { virtualizeRows } from "../../virtualization/index.js";
@@ -95,7 +96,7 @@ const unreachable: SourceDelivery<Machine> = {
  */
 const settled = (
   delivery: SourceDelivery<Machine>,
-  sort?: SortTerm,
+  sort?: SortTerm<MachineFields[number]["field"]>,
 ): HTMLElement => {
   const { provider, source } = createMachineProvider();
   const { container } = render(

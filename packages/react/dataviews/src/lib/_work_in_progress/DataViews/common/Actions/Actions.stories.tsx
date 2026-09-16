@@ -47,7 +47,7 @@ const columns: readonly DataTableColumn[] = [
 const createManagedSource = (): Source<Machine> => {
   let remaining: readonly Machine[] = machines;
   const overAnyRows: ActionCapabilities = { targets: "explicit", limit: null };
-  const managed = createArraySource<Machine>({
+  const managed = createArraySource({
     rows: remaining,
     collection: machineCollection,
     actions: { archive: overAnyRows, delete: overAnyRows },

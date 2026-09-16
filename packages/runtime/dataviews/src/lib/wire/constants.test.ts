@@ -73,6 +73,45 @@ describe("the wire grammar's names", () => {
     );
   });
 
+  it("holds each rule to its own part of a dot path", () => {
+    // The delimiter rule is every segment's; the reserved rule is the whole
+    // path's, so `order` is an ordinary field and `table.order` is not.
+    expect(rejectWireName("config.region")).toBeNull();
+    expect(rejectWireName("order")).toBeNull();
+    expect(rejectWireName("hidden")).toBeNull();
+    expect(rejectWireName("config.re__gion")).toBe(
+      'field name "config.re__gion" must not contain "__"',
+    );
+    expect(rejectWireName("table.order")).toBe(
+      'field name "table.order" is a reserved query parameter',
+    );
+    expect(rejectWireName("table.hidden")).toBe(
+      'field name "table.hidden" is a reserved query parameter',
+    );
+  });
+
+  it("refuses a path segment with no name", () => {
+    for (const name of [".region", "config.", "config..region"]) {
+      expect(rejectWireName(name)).toBe(
+        `field name "${name}" has a segment with no name`,
+      );
+    }
+  });
+
+  it("spells and reads a dot path as it is declared", () => {
+    // The dot is not the delimiter, so a path needs no escaping and comes
+    // back from a key exactly as it went in.
+    const nested = createSchema([{ field: "config.region", kind: "text" }]);
+    expect(spellWireKey("config.region", "isAny")).toBe("config.region");
+    expect(spellWireKey("config.cores", "gte")).toBe("config.cores__gte");
+    expect(readWireField("config.region")).toBe("config.region");
+    expect(readWireField("config.cores__gte")).toBe("config.cores");
+    expect(isOwnedKey("config.region", nested)).toBe(true);
+    expect(isOwnedKey("config.region__contains", nested)).toBe(true);
+    // A path naming no field of the schema is the host's, as a flat name is.
+    expect(isOwnedKey("config.zone", nested)).toBe(false);
+  });
+
   it("owns the written keys and every address of a field, and nothing else", () => {
     const hasField = createSchema([{ field: "cpu", kind: "number" }]);
     // The cursor is written now, so it is the collection's: a write that

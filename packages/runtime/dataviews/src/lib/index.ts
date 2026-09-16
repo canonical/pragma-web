@@ -109,6 +109,7 @@ export type {
   DateField,
   EmptyOr,
   FieldKind,
+  FieldNameOf,
   FieldValidation,
   FlagField,
   NumberField,

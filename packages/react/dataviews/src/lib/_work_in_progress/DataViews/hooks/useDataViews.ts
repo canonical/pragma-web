@@ -1,11 +1,13 @@
 import type {
   Collection,
-  DataViewsProvider,
-  FilterHandles,
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import { useContext, useMemo } from "react";
+import {
+  narrowRootFilters,
+  narrowRootProvider,
+} from "../bridgeProviderTypes.js";
 import Context from "../Context.js";
 import type { UseDataViewsResult } from "./types.js";
 
@@ -36,9 +38,10 @@ export default function useDataViews<
   }
   // Checked above: the root's provider was built over this very collection,
   // so its records are the collection's and the widest shape the context
-  // holds narrows back to the types the caller named.
-  const provider = root.provider as DataViewsProvider<TFields, TRow>;
-  const filters = root.filters as FilterHandles<TFields>;
+  // holds narrows back to the types the caller named. That check is the
+  // narrowing's whole proof, which is why it sits immediately above it.
+  const provider = narrowRootProvider<TFields, TRow>(root.provider);
+  const filters = narrowRootFilters<TFields>(root.filters);
   return useMemo(
     () => ({
       collection: provider.collection,

@@ -187,7 +187,7 @@ type MachineSourceConfig = {
   /** The records; every machine by default. */
   readonly rows?: readonly Machine[] | undefined;
   /** The order the source documents for a query with no term; none by default. */
-  readonly defaultSort?: readonly SortTerm[] | undefined;
+  readonly defaultSort?: readonly SortTerm<SortableField>[] | undefined;
 };
 
 /** A local-array source over the machines, or over a caller's own rows. */
@@ -195,7 +195,7 @@ export const createMachineSource = ({
   rows = machines,
   defaultSort,
 }: MachineSourceConfig = {}): Source<Machine> =>
-  createArraySource<Machine>({
+  createArraySource({
     rows,
     collection: machineCollection,
     searchFields: ["name", "owner"],

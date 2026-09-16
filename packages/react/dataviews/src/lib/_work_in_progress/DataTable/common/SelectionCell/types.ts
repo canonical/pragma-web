@@ -12,7 +12,15 @@ import type { RowChannels } from "@canonical/dataviews-core/bindings";
  * props.
  */
 export type SelectionCellProps<TRow extends object> = {
-  readonly provider: DataViewsProvider<readonly SchemaFieldDefinition[], TRow>;
+  /**
+   * What the cell reads of the provider: the selection its checkbox toggles.
+   * Only that, so a provider typed over its own field list is one of these
+   * without being widened.
+   */
+  readonly provider: Pick<
+    DataViewsProvider<readonly SchemaFieldDefinition[], TRow>,
+    "selection"
+  >;
   readonly channels: RowChannels<TRow>;
   readonly selected: boolean;
   readonly rowLabel: (row: TRow, rowId: string) => string;
