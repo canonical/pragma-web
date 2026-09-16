@@ -192,7 +192,7 @@ reaches it.** `collection.types` is null, a row's type is null and
 `readApplicability` answers `"applies"` for every field, `recordType` answers
 null, no row is ever read for a type, and nothing costs anything.
 
-## Words this package uses twice
+## Words with more than one meaning
 
 Two words carry more than one settled meaning, and the first two of each are fixed by decisions older than this package. Neither is renamed; which one is meant is always clear from what holds it.
 

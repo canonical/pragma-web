@@ -66,147 +66,149 @@ const selectedIds = (
   provider: ReturnType<typeof createMachineProvider>["provider"],
 ) => [...provider.selection.state.get().ids].sort();
 
-describe("selection mode on touch", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("selects a long-pressed row and enters the mode, announced and stated", async () => {
-    const provider = loadedTable();
-    const table = screen.getByRole("table");
-    expect(table).not.toHaveAttribute("data-selection-mode");
-    longPress(rowNamed("alpha"));
-    expect(selectedIds(provider)).toEqual(["m-1"]);
-    expect(table).toHaveAttribute("data-selection-mode", "true");
-    expect(rowNamed("alpha")).toHaveAttribute("aria-selected", "true");
-    expect(await readAnnouncements()).toEqual([
-      "Selection mode: tap a row to select or deselect it.",
-    ]);
-  });
-
-  it("toggles a tapped row while in the mode, and leaves a tap on a control to it", async () => {
-    const provider = loadedTable();
-    longPress(rowNamed("alpha"));
-    tap(rowNamed("beta"));
-    expect(selectedIds(provider)).toEqual(["m-1", "m-2"]);
-    tap(rowNamed("beta"));
-    expect(selectedIds(provider)).toEqual(["m-1"]);
-    // The checkbox answers for itself: the row does not also toggle.
-    const checkbox = within(rowNamed("beta")).getByRole("checkbox");
-    fireEvent.click(checkbox);
-    expect(selectedIds(provider)).toEqual(["m-1", "m-2"]);
-    expect(await readAnnouncements()).toHaveLength(1);
-  });
-
-  it("ends the mode when the last selected row is deselected, announced", async () => {
-    const provider = loadedTable();
-    longPress(rowNamed("alpha"));
-    // A moment later, so leaving is its own announcement and not one with
-    // entering.
-    expect(await readAnnouncements()).toHaveLength(1);
-    tap(rowNamed("alpha"));
-    expect(selectedIds(provider)).toEqual([]);
-    expect(screen.getByRole("table")).not.toHaveAttribute(
-      "data-selection-mode",
-    );
-    expect(await readAnnouncements()).toEqual([
-      "Selection mode: tap a row to select or deselect it.",
-      "Selection mode ended.",
-    ]);
-    // Out of the mode, a tap toggles nothing.
-    tap(rowNamed("beta"));
-    expect(selectedIds(provider)).toEqual([]);
-  });
-
-  it("ends the mode when the selection is cleared from elsewhere, announced", async () => {
-    const provider = loadedTable();
-    longPress(rowNamed("alpha"));
-    expect(await readAnnouncements()).toHaveLength(1);
-    act(() => {
-      provider.selection.clear();
+describe("DataTable", () => {
+  describe("selection mode on touch", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
     });
-    expect(screen.getByRole("table")).not.toHaveAttribute(
-      "data-selection-mode",
-    );
-    expect((await readAnnouncements()).at(-1)).toBe("Selection mode ended.");
-  });
-
-  it("holds the mode while a long press adds a row already in it", async () => {
-    const provider = loadedTable();
-    longPress(rowNamed("alpha"));
-    longPress(rowNamed("beta"));
-    expect(selectedIds(provider)).toEqual(["m-1", "m-2"]);
-    // Entered once, said once.
-    expect(await readAnnouncements()).toHaveLength(1);
-  });
-
-  it("does nothing on a table that is not selectable, whose rows carry no id", () => {
-    const provider = loadedTable(false);
-    expect(rowNamed("alpha")).not.toHaveAttribute("data-row-id");
-    longPress(rowNamed("alpha"));
-    expect(selectedIds(provider)).toEqual([]);
-    expect(screen.getByRole("table")).not.toHaveAttribute(
-      "data-selection-mode",
-    );
-  });
-
-  it("does nothing for a mouse held on a row", () => {
-    const provider = loadedTable();
-    fireEvent.pointerDown(rowNamed("alpha"), {
-      pointerType: "mouse",
-      clientX: 10,
-      clientY: 10,
+    afterEach(() => {
+      vi.useRealTimers();
     });
-    act(() => {
-      vi.advanceTimersByTime(LONG_PRESS_MS);
-    });
-    expect(selectedIds(provider)).toEqual([]);
-    expect(screen.getByRole("table")).not.toHaveAttribute(
-      "data-selection-mode",
-    );
-  });
 
-  it("selects nothing when the pressed row leaves before the press is long", () => {
-    const { provider, source } = createMachineProvider();
-    render(
-      <DataTable
-        provider={provider}
-        columns={columns}
-        label="Machines"
-        selectable
-      />,
-    );
-    const deliver = (rows: readonly Machine[]) => {
+    it("selects a long-pressed row and enters the mode, announced and stated", async () => {
+      const provider = loadedTable();
+      const table = screen.getByRole("table");
+      expect(table).not.toHaveAttribute("data-selection-mode");
+      longPress(rowNamed("alpha"));
+      expect(selectedIds(provider)).toEqual(["m-1"]);
+      expect(table).toHaveAttribute("data-selection-mode", "true");
+      expect(rowNamed("alpha")).toHaveAttribute("aria-selected", "true");
+      expect(await readAnnouncements()).toEqual([
+        "Selection mode: tap a row to select or deselect it.",
+      ]);
+    });
+
+    it("toggles a tapped row while in the mode, and leaves a tap on a control to it", async () => {
+      const provider = loadedTable();
+      longPress(rowNamed("alpha"));
+      tap(rowNamed("beta"));
+      expect(selectedIds(provider)).toEqual(["m-1", "m-2"]);
+      tap(rowNamed("beta"));
+      expect(selectedIds(provider)).toEqual(["m-1"]);
+      // The checkbox answers for itself: the row does not also toggle.
+      const checkbox = within(rowNamed("beta")).getByRole("checkbox");
+      fireEvent.click(checkbox);
+      expect(selectedIds(provider)).toEqual(["m-1", "m-2"]);
+      expect(await readAnnouncements()).toHaveLength(1);
+    });
+
+    it("ends the mode when the last selected row is deselected, announced", async () => {
+      const provider = loadedTable();
+      longPress(rowNamed("alpha"));
+      // A moment later, so leaving is its own announcement and not one with
+      // entering.
+      expect(await readAnnouncements()).toHaveLength(1);
+      tap(rowNamed("alpha"));
+      expect(selectedIds(provider)).toEqual([]);
+      expect(screen.getByRole("table")).not.toHaveAttribute(
+        "data-selection-mode",
+      );
+      expect(await readAnnouncements()).toEqual([
+        "Selection mode: tap a row to select or deselect it.",
+        "Selection mode ended.",
+      ]);
+      // Out of the mode, a tap toggles nothing.
+      tap(rowNamed("beta"));
+      expect(selectedIds(provider)).toEqual([]);
+    });
+
+    it("ends the mode when the selection is cleared from elsewhere, announced", async () => {
+      const provider = loadedTable();
+      longPress(rowNamed("alpha"));
+      expect(await readAnnouncements()).toHaveLength(1);
       act(() => {
-        source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+        provider.selection.clear();
       });
-    };
-    deliver(fleet);
-    fireEvent.pointerDown(rowNamed("alpha"), touch);
-    act(() => {
-      provider.refresh();
+      expect(screen.getByRole("table")).not.toHaveAttribute(
+        "data-selection-mode",
+      );
+      expect((await readAnnouncements()).at(-1)).toBe("Selection mode ended.");
     });
-    deliver([machine("m-2", "beta", "failed")]);
-    act(() => {
-      vi.advanceTimersByTime(LONG_PRESS_MS);
-    });
-    expect(selectedIds(provider)).toEqual([]);
-    expect(screen.getByRole("table")).not.toHaveAttribute(
-      "data-selection-mode",
-    );
-  });
 
-  it("takes a press on the header for no press of its own", () => {
-    loadedTable();
-    const header = screen.getAllByRole("row")[0] ?? document.body;
-    fireEvent.pointerDown(header, touch);
-    act(() => {
-      vi.advanceTimersByTime(LONG_PRESS_MS);
+    it("holds the mode while a long press adds a row already in it", async () => {
+      const provider = loadedTable();
+      longPress(rowNamed("alpha"));
+      longPress(rowNamed("beta"));
+      expect(selectedIds(provider)).toEqual(["m-1", "m-2"]);
+      // Entered once, said once.
+      expect(await readAnnouncements()).toHaveLength(1);
     });
-    // No press started: the platform's menu is left alone.
-    expect(fireEvent.contextMenu(header)).toBe(true);
+
+    it("does nothing on a table that is not selectable, whose rows carry no id", () => {
+      const provider = loadedTable(false);
+      expect(rowNamed("alpha")).not.toHaveAttribute("data-row-id");
+      longPress(rowNamed("alpha"));
+      expect(selectedIds(provider)).toEqual([]);
+      expect(screen.getByRole("table")).not.toHaveAttribute(
+        "data-selection-mode",
+      );
+    });
+
+    it("does nothing for a mouse held on a row", () => {
+      const provider = loadedTable();
+      fireEvent.pointerDown(rowNamed("alpha"), {
+        pointerType: "mouse",
+        clientX: 10,
+        clientY: 10,
+      });
+      act(() => {
+        vi.advanceTimersByTime(LONG_PRESS_MS);
+      });
+      expect(selectedIds(provider)).toEqual([]);
+      expect(screen.getByRole("table")).not.toHaveAttribute(
+        "data-selection-mode",
+      );
+    });
+
+    it("selects nothing when the pressed row leaves before the press is long", () => {
+      const { provider, source } = createMachineProvider();
+      render(
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          selectable
+        />,
+      );
+      const deliver = (rows: readonly Machine[]) => {
+        act(() => {
+          source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+        });
+      };
+      deliver(fleet);
+      fireEvent.pointerDown(rowNamed("alpha"), touch);
+      act(() => {
+        provider.refresh();
+      });
+      deliver([machine("m-2", "beta", "failed")]);
+      act(() => {
+        vi.advanceTimersByTime(LONG_PRESS_MS);
+      });
+      expect(selectedIds(provider)).toEqual([]);
+      expect(screen.getByRole("table")).not.toHaveAttribute(
+        "data-selection-mode",
+      );
+    });
+
+    it("takes a press on the header for no press of its own", () => {
+      loadedTable();
+      const header = screen.getAllByRole("row").at(0) ?? document.body;
+      fireEvent.pointerDown(header, touch);
+      act(() => {
+        vi.advanceTimersByTime(LONG_PRESS_MS);
+      });
+      // No press started: the platform's menu is left alone.
+      expect(fireEvent.contextMenu(header)).toBe(true);
+    });
   });
 });

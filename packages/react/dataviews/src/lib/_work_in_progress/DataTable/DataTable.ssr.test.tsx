@@ -211,7 +211,7 @@ describe("DataTable SSR", () => {
     expect(markup).toContain('class="label">Name</span>');
   });
 
-  it("sends the typed table's root, footer, row ids, cells and scope", () => {
+  it("sends the root, footer, row ids, cells and scope of records of several types", () => {
     const { provider } = createInstanceProvider();
     const host = readProviderHost(provider);
     host.complete(host.refresh(), deliverRows(MIXED_FLEET));

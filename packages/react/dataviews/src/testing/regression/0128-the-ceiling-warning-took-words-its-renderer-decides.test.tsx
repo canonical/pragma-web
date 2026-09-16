@@ -43,7 +43,7 @@ describe("the render ceiling's warning", () => {
         />
       </>,
     );
-    const [table, cards] = warned.mock.calls.map((call) => String(call[0]));
+    const [table, cards] = warned.mock.calls.map((call) => String(call.at(0)));
     expect(table).toMatch(
       /^DataTable renders 501 rows at once.*virtualizeRows/,
     );

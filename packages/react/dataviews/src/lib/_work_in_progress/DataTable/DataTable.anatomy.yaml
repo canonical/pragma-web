@@ -62,6 +62,18 @@
 #                       "Row/select-all checkboxes" (1.3.1, 2.1.1, 4.1.2-4.1.3)
 #                       — CheckboxInput's own contract, plus the table's
 #                       names: "Select all displayed rows", "Select <row>"
+#   row header cell     "DataTable row header" (1.3.1, 4.1.2): the one column
+#                       declared `rowHeader` renders `role=rowheader`, heard
+#                       before each of the row's other cells, and the row and
+#                       its checkbox are named by its text; it is never
+#                       hidden, and a scope leaving a declared type out is
+#                       refused, so every row has a name
+#   selection mode      "Selection on touch" (2.1.1, 2.5.1, 2.5.2, 4.1.3): a
+#                       long press is a convenience over the row checkbox,
+#                       which stays the single-pointer and keyboard path; the
+#                       press completes on a timer while the pointer is down,
+#                       selects only a row and is undone by deselecting it,
+#                       and entering and leaving the mode are announced
 #   status row          "pending/regrouping/failed/refresh-failed/stale/no-data/no-results"
 #                       (1.3.1, 1.4.1, 4.1.3). The cell is `role=cell`, not a
 #                       live region; a settled outcome — failed, stale,
@@ -78,8 +90,8 @@
 #                       sort (4.1.3): one polite live region per root, in the
 #                       frame after the footer, coalescing what is said in one
 #                       moment and adding each announcement as a new node,
-#                       saying what
-#                       has no place on screen to be read from — the new
+#                       saying what has no place on screen to be read from —
+#                       the new
 #                       ordering, why a sort changed nothing, a column hidden,
 #                       shown or moved with its new position, always shown,
 #                       reset, selection mode entered on touch and ended. It

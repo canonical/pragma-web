@@ -84,7 +84,10 @@ describe("the long press over a table's rows", () => {
       />,
     );
     const outer = screen.getByRole("table", { name: "Machines" });
-    fireEvent.pointerDown(within(outer).getAllByRole("row")[0] ?? outer, touch);
+    fireEvent.pointerDown(
+      within(outer).getAllByRole("row").at(0) ?? outer,
+      touch,
+    );
     act(() => {
       vi.advanceTimersByTime(LONG_PRESS_MS);
     });

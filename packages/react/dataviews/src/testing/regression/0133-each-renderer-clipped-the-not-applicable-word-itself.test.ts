@@ -39,9 +39,9 @@ describe("a word read and not drawn", () => {
     const boxes = [
       read("common/NotApplicable/styles.css"),
       read("common/Announcer/styles.css"),
-      read("_work_in_progress/DataTable/styles.css").match(
-        /\.menu-label\s*\{[^{}]*\}/,
-      )?.[0] ?? "",
+      read("_work_in_progress/DataTable/styles.css")
+        .match(/\.menu-label\s*\{[^{}]*\}/)
+        ?.at(0) ?? "",
     ];
     for (const box of boxes) {
       expect(box).toMatch(

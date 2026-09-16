@@ -18,35 +18,41 @@ const fields = [
   { id: "image", header: "Image" },
 ];
 
-describe("cards over records of several types", () => {
-  it("draws a field the record's type does not carry as not applicable", () => {
-    const { provider } = createInstanceProvider({ rows: MIXED_FLEET });
-    render(
-      <Cards
-        provider={provider}
-        fields={fields}
-        title="name"
-        label="Instances"
-      />,
-    );
-    const vm = screen.getByRole("listitem", { name: "db-01" });
-    const image = within(vm).getAllByRole("definition").at(1);
-    expect(image).toHaveTextContent(/^—Not applicable$/);
-    // A definition takes no name from its content; what a reader reaches is
-    // the word itself, so it is clipped and never hidden.
-    expect(
-      image?.querySelector(".data-views-not-applicable"),
-    ).not.toHaveAttribute("hidden");
-    expect(image?.querySelector("[aria-hidden='true']")).toHaveTextContent("—");
-    // The dash alone is hidden from readers: the word has no hidden ancestor.
-    expect(image?.querySelectorAll("[aria-hidden]")).toHaveLength(1);
-    expect(
-      within(vm).getByText("Not applicable").closest("[aria-hidden], [hidden]"),
-    ).toBeNull();
-    expect(
-      within(screen.getByRole("listitem", { name: "web-01" }))
-        .getAllByRole("definition")
-        .at(1),
-    ).toHaveTextContent(/^ubuntu:24\.04$/);
+describe("Cards", () => {
+  describe("cards over records of several types", () => {
+    it("draws a field the record's type does not carry as not applicable", () => {
+      const { provider } = createInstanceProvider({ rows: MIXED_FLEET });
+      render(
+        <Cards
+          provider={provider}
+          fields={fields}
+          title="name"
+          label="Instances"
+        />,
+      );
+      const vm = screen.getByRole("listitem", { name: "db-01" });
+      const image = within(vm).getAllByRole("definition").at(1);
+      expect(image).toHaveTextContent(/^—Not applicable$/);
+      // A definition takes no name from its content; what a reader reaches is
+      // the word itself, so it is clipped and never hidden.
+      expect(
+        image?.querySelector(".data-views-not-applicable"),
+      ).not.toHaveAttribute("hidden");
+      expect(image?.querySelector("[aria-hidden='true']")).toHaveTextContent(
+        "—",
+      );
+      // The dash alone is hidden from readers: the word has no hidden ancestor.
+      expect(image?.querySelectorAll("[aria-hidden]")).toHaveLength(1);
+      expect(
+        within(vm)
+          .getByText("Not applicable")
+          .closest("[aria-hidden], [hidden]"),
+      ).toBeNull();
+      expect(
+        within(screen.getByRole("listitem", { name: "web-01" }))
+          .getAllByRole("definition")
+          .at(1),
+      ).toHaveTextContent(/^ubuntu:24\.04$/);
+    });
   });
 });

@@ -36,7 +36,7 @@ const typedByHand = (source: string): readonly string[] =>
     ...source.matchAll(
       /const \w+: readonly DataTableColumn\[\] = \[([\s\S]*?)\n\];/g,
     ),
-  ].map((match) => match[1] ?? "");
+  ].map((match) => match.at(1) ?? "");
 
 describe("the columns a story declares", () => {
   it("are declared through createColumns wherever the schema names them", () => {
@@ -45,7 +45,7 @@ describe("the columns a story declares", () => {
       typedByHand(readFileSync(path.join(lib, file), "utf8"))
         .filter((list) =>
           [...list.matchAll(/id: "([^"]+)"/g)].every((id) =>
-            declared.has(id[1] ?? ""),
+            declared.has(id.at(1) ?? ""),
           ),
         )
         .map(() => file),
