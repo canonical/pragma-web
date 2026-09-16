@@ -4,6 +4,7 @@ import {
   type CellContextValue,
   NotApplicable,
 } from "../../../../common/index.js";
+import { readFieldName } from "../../../../utils/index.js";
 import { CustomContent, FieldText } from "./common/index.js";
 import type { BodyCellProps } from "./types.js";
 
@@ -13,10 +14,10 @@ function BodyCell<TRow extends object>({
   provider,
   channels,
   column,
-  field,
   id,
   applicability,
 }: BodyCellProps<TRow>): ReactElement {
+  const field = readFieldName(column);
   const channel = channels.fields[field];
   if (channel === undefined) {
     // The scopes observe every field the columns read, so a cell without

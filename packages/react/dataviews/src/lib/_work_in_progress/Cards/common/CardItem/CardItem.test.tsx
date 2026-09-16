@@ -45,7 +45,6 @@ describe("CardItem", () => {
           selectable={false}
           nameRecord={() => null}
           decideApplicability={() => "applies"}
-          readType={() => null}
         />
       </ul>,
     );
@@ -68,7 +67,6 @@ describe("CardItem", () => {
           selectable
           nameRecord={(row, rowId) => `${row.name} (${rowId})`}
           decideApplicability={() => "applies"}
-          readType={() => null}
         />
       </ul>,
     );
@@ -97,7 +95,6 @@ describe("CardItem", () => {
           selectable={false}
           nameRecord={() => null}
           decideApplicability={() => "applies"}
-          readType={() => null}
         />,
       ),
     ).toThrow('no channel observes the field "name"');

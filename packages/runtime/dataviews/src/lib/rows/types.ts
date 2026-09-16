@@ -95,6 +95,12 @@ export type RowChannels<TRow extends object = RowRecord> = {
   readonly fields: Readonly<Record<string, ReadonlyChannel<unknown>>>;
   /** This row's membership of the collection's selection. */
   readonly selected: ReadonlyChannel<boolean>;
+  /**
+   * The declared record type the row carries, or null: what decides which
+   * fields apply to it. Publishes only when a record returns under its
+   * identity as another type.
+   */
+  readonly type: ReadonlyChannel<string | null>;
 };
 
 /** Configuration of one row model build. */
@@ -119,6 +125,11 @@ export type RowScopesConfig<TRow extends object = RowRecord> = {
   readonly selection: Selection;
   /** The field names the mounted cells observe. Duplicates are collapsed. */
   readonly fields: readonly string[];
+  /**
+   * Reads a record's declared type, as `compileRecordTypeReader` compiles it
+   * for the collection. Left out, every row's type is null.
+   */
+  readonly readType?: ((row: TRow) => string | null) | undefined;
 };
 
 /**

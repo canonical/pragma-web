@@ -5,16 +5,17 @@
  * the first, and one showing a field the second, so the scoping was read
  * two ways.
  *
- * The host names the type alone, and whether a field applies to a type is
- * one binding function every renderer asks.
+ * A row's type is read by one compiled reader over the collection, and
+ * whether a field applies to a type is one binding function every renderer
+ * asks; the host answers neither.
  */
 
 import { describe, expect, expectTypeOf, it } from "vitest";
 import createManualSource from "../../../testing/createManualSource.js";
 import type { ProviderHost } from "../../lib/bindings/index.js";
 import {
+  compileRecordTypeReader,
   readApplicability,
-  readProviderHost,
 } from "../../lib/bindings/index.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
@@ -24,6 +25,7 @@ type Instance = { readonly id: string; readonly type: string };
 describe("whether a field applies to a record", () => {
   it("is read from the type the host names, not asked of the host", () => {
     expectTypeOf<ProviderHost>().not.toHaveProperty("applicability");
+    expectTypeOf<ProviderHost>().not.toHaveProperty("readType");
     const collection = createCollection({
       identify: (instance: Instance) => instance.id,
       discriminator: "type",
@@ -34,10 +36,13 @@ describe("whether a field applies to a record", () => {
     });
     const { source } = createManualSource<Instance>();
     const provider = createDataViewsProvider({ collection, source });
-    const host = readProviderHost(provider);
     const vm = { id: "v-1", type: "vm" };
-    expect(readApplicability(collection, "image", host.readType(vm))).toBe(
-      "not-applicable",
-    );
+    expect(
+      readApplicability(
+        collection,
+        "image",
+        compileRecordTypeReader(collection)(vm),
+      ),
+    ).toBe("not-applicable");
   });
 });

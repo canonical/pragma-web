@@ -7,6 +7,7 @@
  */
 
 import type {
+  Applicability,
   DataViewsMessages,
   DataViewsProvider,
   Facet,
@@ -17,7 +18,12 @@ import type {
 } from "@canonical/dataviews-core";
 import type { RowScopes } from "@canonical/dataviews-core/bindings";
 import type { MouseEvent, PointerEvent, ReactNode, RefObject } from "react";
-import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
+import type {
+  AnnouncerHandle,
+  AnnouncerTopic,
+  DisplayField,
+} from "../common/index.js";
+import type { FieldScopes, ReadFieldScopesConfig } from "../utils/index.js";
 
 /** What `useDataViewsValue` returns: the channel's current value, or the part `select` picks. */
 export type UseDataViewsValueResult<T> = T;
@@ -159,25 +165,20 @@ export type UseAnnouncerResult = {
  */
 export type UseStableValueResult<TValue> = TValue;
 
-/** Where a long press began: the element pressed, and the one handling it. */
-export type LongPressOrigin = {
-  readonly target: EventTarget;
-  readonly container: HTMLElement;
-};
-
-/** Props of `useLongPress`: what a long press and a tap each do. */
-export type UseLongPressProps = {
-  /** A touch held still for the delay, handed where it began. */
-  readonly onLongPress: (origin: LongPressOrigin) => void;
-  /** A click that was not the release of a long press: a tap, or a mouse click. */
-  readonly onTap: (event: MouseEvent<HTMLElement>) => void;
+/** Props of `useLongPress`: what a press lands on, and what a long press and a tap each do with it. */
+export type UseLongPressProps<TClaim> = {
   /**
-   * Whether a press is one the handling element takes: a container passes
-   * presses to its own items and none other. Every press, by default.
+   * What a press or a click landed on — the element under it, inside the
+   * element handling it — or null where it is not the handler's to take.
    */
-  readonly accepts?:
-    | ((event: PointerEvent<HTMLElement>) => boolean)
-    | undefined;
+  readonly claim: (
+    target: EventTarget,
+    container: HTMLElement,
+  ) => TClaim | null;
+  /** A touch held still for the delay, handed what it is still over. */
+  readonly onLongPress: (claimed: TClaim) => void;
+  /** A click that was not the release of a long press: a tap, or a mouse click. */
+  readonly onTap: (claimed: TClaim) => void;
 };
 
 /** What `useLongPress` answers: the handlers the pressed element takes. */
@@ -196,16 +197,29 @@ export type UseRenderCeilingResult = undefined;
 
 /** Props of `useRenderCeiling`: what a renderer draws, and how it could draw less. */
 export type UseRenderCeilingProps = {
-  /** The renderer, as the warning names it. */
-  readonly renderer: string;
+  /** The renderer, as the warning names it and counts what it draws. */
+  readonly renderer: "DataTable" | "Cards";
   /** How many it renders at once. */
   readonly count: number;
-  /** What it renders, as the warning counts them. */
-  readonly unit: "rows" | "cards";
+  /** Whether it draws only what is in view, so nothing is said. */
+  readonly virtualized: boolean;
+};
+
+/** Props of `useFieldScopes`: the collection, the declared fields and their renderer. */
+export type UseFieldScopesProps = Pick<
+  ReadFieldScopesConfig,
+  "collection" | "fields" | "renderer"
+>;
+
+/** What `useFieldScopes` answers: each field's scope, and the decision per type. */
+export type UseFieldScopesResult = {
+  readonly readScope: FieldScopes;
   /**
-   * Whether the renderer virtualizes: `in-use` where it does, so nothing is
-   * said; `available` where it could, so the warning points to it; `none`
-   * where it cannot, so the warning says so.
+   * Whether one field applies to a record of one declared type, or of none.
+   * One identity for as long as the renderer is mounted.
    */
-  readonly virtualization: "in-use" | "available" | "none";
+  readonly decideApplicability: (
+    field: DisplayField,
+    type: string | null,
+  ) => Applicability;
 };

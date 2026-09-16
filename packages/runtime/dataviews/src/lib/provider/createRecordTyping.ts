@@ -1,3 +1,4 @@
+import { compileRecordTypeReader } from "../collection/index.js";
 import {
   compileFieldReader,
   type RowModel,
@@ -30,15 +31,10 @@ export default function createRecordTyping<
   if (types === null) {
     throw new Error("a monomorphic collection has no record typing to build");
   }
-  const discriminator = types.field;
-  const readType = compileFieldReader(discriminator);
+  const discriminator = compileFieldReader(types.field);
   const declared = new Set(types.names);
-
   /** A row's declared type name, or null when it carries no such name. */
-  const nameOf = (row: TRow): string | null => {
-    const value = readType(row);
-    return typeof value === "string" && declared.has(value) ? value : null;
-  };
+  const nameOf = compileRecordTypeReader(collection);
 
   // Keyed by the selected identities alone, so it is bounded by the
   // selection and never by how many rows have been displayed.
@@ -47,14 +43,13 @@ export default function createRecordTyping<
   return {
     rejectionOf(model: RowModel<TRow>): string | null {
       for (const entry of model.entries) {
-        const value = readType(entry.record);
+        const value = discriminator(entry.record);
         if (typeof value !== "string" || !declared.has(value)) {
           return `record type ${valueLabel(value)} of row "${entry.id}" is not declared`;
         }
       }
       return null;
     },
-    readType: nameOf,
     recordType(id: string): string | null {
       // Memory is of identities while they are selected: an identity that
       // left the selection is not one an action can be decided for.
@@ -64,7 +59,7 @@ export default function createRecordTyping<
       // A row on display is the answer; memory answers for the rows that
       // are not. Reading it the other way round would let a remembered
       // type outlive the record it was taken from and contradict what
-      // `readType` reads off that same record.
+      // the row scopes read off that same record.
       const record = rows.get().byId(id);
       return record === undefined
         ? (remembered.get(id) ?? null)

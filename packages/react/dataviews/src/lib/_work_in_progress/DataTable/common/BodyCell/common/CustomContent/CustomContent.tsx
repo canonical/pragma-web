@@ -6,7 +6,8 @@ import type { CustomContentProps } from "./types.js";
  * A column's own content, handed its field's value and the record the value
  * was read from.
  *
- * Subscribed to that one field, as the text cell is: the table's guarantee
+ * Subscribed to that one field, and to the record's type, as the text cell
+ * is to the field: the table's guarantee
  * is that a record republished with another field changed re-renders no
  * cell but that field's, and content is held to it too. The record is read
  * as the cell renders, so it is the record the value came from; content
@@ -21,6 +22,9 @@ export default function CustomContent<TRow extends object>({
   applicability,
 }: CustomContentProps<TRow>): ReactElement {
   const value = useDataViewsValue(channel);
+  // Drawn again when the record returns as another type, so content narrowing
+  // on the record reads its current type even where its value did not move.
+  useDataViewsValue(channels.type);
   return (
     <Content
       // A row the field does not apply to holds no value there: one the

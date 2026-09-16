@@ -2,7 +2,10 @@ import type {
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import { createRowScopes } from "@canonical/dataviews-core/bindings";
+import {
+  compileRecordTypeReader,
+  createRowScopes,
+} from "@canonical/dataviews-core/bindings";
 import { useEffect, useMemo } from "react";
 import type { UseRowScopesResult } from "./types.js";
 
@@ -28,6 +31,9 @@ export default function useRowScopes<
         rows: provider.rows,
         selection: provider.selection,
         fields,
+        // Each row publishes its record's declared type, which decides the
+        // fields that apply to it.
+        readType: compileRecordTypeReader(provider.collection),
       }),
     [provider, fields],
   );

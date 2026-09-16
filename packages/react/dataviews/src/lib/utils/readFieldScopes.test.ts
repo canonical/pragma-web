@@ -14,14 +14,14 @@ const scopesOver = (columns: readonly DisplayField[]) =>
   readFieldScopes({
     collection: instances,
     fields: columns,
-    subject: "DataTable column",
+    renderer: "DataTable",
   });
 
 describe("readFieldScopes", () => {
   it("applies an unscoped column over an unscoped field to every type", () => {
     const column: DisplayField = { id: "name", header: "Name" };
     const scope = scopesOver([column])(column);
-    expect(scope.appliesTo).toBeNull();
+    expect(scope.scope).toBeNull();
     expect(scope.applicability("container")).toBe("applies");
     expect(scope.applicability("virtual-machine")).toBe("applies");
   });
@@ -29,7 +29,7 @@ describe("readFieldScopes", () => {
   it("gives an unscoped column its field's scope", () => {
     const column: DisplayField = { id: "image", header: "Image" };
     const scope = scopesOver([column])(column);
-    expect(scope.appliesTo).toEqual(["container"]);
+    expect(scope.scope).toEqual(["container"]);
     expect(scope.applicability("container")).toBe("applies");
     expect(scope.applicability("virtual-machine")).toBe("not-applicable");
   });
@@ -42,7 +42,7 @@ describe("readFieldScopes", () => {
       appliesTo: ["virtual-machine"],
     };
     const scope = scopesOver([column])(column);
-    expect(scope.appliesTo).toEqual(["virtual-machine"]);
+    expect(scope.scope).toEqual(["virtual-machine"]);
     expect(scope.applicability("virtual-machine")).toBe("applies");
     expect(scope.applicability("container")).toBe("not-applicable");
   });
@@ -64,7 +64,7 @@ describe("readFieldScopes", () => {
       header: "Image",
       appliesTo: ["container"],
     };
-    expect(scopesOver([column])(column).appliesTo).toEqual(["container"]);
+    expect(scopesOver([column])(column).scope).toEqual(["container"]);
   });
 
   it("refuses a column naming a type its field does not apply to", () => {
@@ -95,7 +95,7 @@ describe("readFieldScopes", () => {
     expect(() =>
       readFieldScopes({
         collection: machines,
-        subject: "DataTable column",
+        renderer: "DataTable",
         fields: [{ id: "name", header: "Name", appliesTo: ["container"] }],
       }),
     ).toThrow(

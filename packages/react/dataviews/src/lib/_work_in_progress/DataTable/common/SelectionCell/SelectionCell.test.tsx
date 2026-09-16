@@ -35,7 +35,7 @@ describe("SelectionCell", () => {
           provider={provider}
           channels={scopes.readRow("m-1")}
           selected={false}
-          rowLabel={() => null}
+          nameRecord={() => null}
           rowHeader={{ id: "name", header: "Name", rowHeader: true }}
         />,
       ),

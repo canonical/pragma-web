@@ -11,7 +11,7 @@ import type { SelectionCellProps } from "./types.js";
  * where a column is the row header, else by the record's identity.
  */
 export default function SelectionCell<TRow extends object>({
-  rowLabel,
+  nameRecord,
   rowHeader,
   ...props
 }: SelectionCellProps<TRow>): ReactElement {
@@ -27,7 +27,7 @@ export default function SelectionCell<TRow extends object>({
   // record republished with another field moved re-renders no checkbox. A
   // name is a string, so equal names are identical reads.
   const named = useDataViewsValue(channels.record, (record) =>
-    rowLabel(record, channels.id),
+    nameRecord(record, channels.id),
   );
   return nameChannel === null ? (
     <NamedCheckbox {...props} name={named ?? channels.id} />

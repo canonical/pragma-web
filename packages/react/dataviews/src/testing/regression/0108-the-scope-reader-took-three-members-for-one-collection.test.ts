@@ -17,7 +17,7 @@ import type {
 describe("the scope reader", () => {
   it("reads the collection and the columns, and answers for a type", () => {
     expectTypeOf<keyof ReadFieldScopesConfig>().toEqualTypeOf<
-      "collection" | "fields" | "subject"
+      "collection" | "fields" | "renderer"
     >();
     expectTypeOf<FieldScope["applicability"]>().toEqualTypeOf<
       (type: string | null) => Applicability

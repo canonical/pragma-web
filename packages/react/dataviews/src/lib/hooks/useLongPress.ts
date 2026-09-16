@@ -1,11 +1,6 @@
-import type { PointerEvent } from "react";
 import { useEffect, useInsertionEffect, useRef } from "react";
 import { LONG_PRESS_MS, LONG_PRESS_SLOP_PX } from "./constants.js";
-import type {
-  LongPressOrigin,
-  UseLongPressProps,
-  UseLongPressResult,
-} from "./types.js";
+import type { UseLongPressProps, UseLongPressResult } from "./types.js";
 
 /** Where a press began, and the timer that will call it long. */
 type Press = {
@@ -19,9 +14,10 @@ type Press = {
  *
  * A touch held still for the delay is a long press; one released before it
  * is a tap, and one that drifts past the slop is a scroll and neither. The
- * handlers go on the pressed element, or on a container whose `accepts`
- * decides which presses are its own, and the long press is handed where it
- * began. The click a released long press still produces is swallowed, so a
+ * handlers go on the pressed element or on a container, and `claim` answers
+ * what a press or a click landed on — a row, say — or null where it is not
+ * the handler's. A press is claimed where it begins and again when it fires,
+ * so a long press is handed only what is still there under it. The click a released long press still produces is swallowed, so a
  * long press is never also a tap, and the context menu a platform opens for a
  * held touch is suppressed while a press is tracked, so the platform's
  * gesture does not fight this one. A mouse or pen is never a long press: its
@@ -30,11 +26,11 @@ type Press = {
  * @note Impure: schedules the press timer, and cancels the click and the
  * context menu of a long press.
  */
-export default function useLongPress({
+export default function useLongPress<TClaim>({
+  claim,
   onLongPress,
   onTap,
-  accepts = acceptsEvery,
-}: UseLongPressProps): UseLongPressResult {
+}: UseLongPressProps<TClaim>): UseLongPressResult {
   const press = useRef<Press | null>(null);
   // Set when the timer fires, read and cleared by the click that follows the
   // release — or, where the platform sends none, let go a tick after it, so
@@ -43,9 +39,9 @@ export default function useLongPress({
   const releaseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // The latest handlers, taken once a render commits: the timer and the
   // click read them, never a render React discarded.
-  const latest = useRef({ onLongPress, onTap });
+  const latest = useRef({ claim, onLongPress, onTap });
   useInsertionEffect(() => {
-    latest.current = { onLongPress, onTap };
+    latest.current = { claim, onLongPress, onTap };
   });
 
   const cancel = (): void => {
@@ -89,21 +85,25 @@ export default function useLongPress({
     onPointerDown: (event) => {
       // Any new press, of any pointer, is not the release of the last one.
       fired.current = false;
-      if (event.pointerType !== "touch" || !accepts(event)) {
+      const { target, currentTarget: container } = event;
+      if (
+        event.pointerType !== "touch" ||
+        latest.current.claim(target, container) === null
+      ) {
         return;
       }
       cancel();
-      const origin: LongPressOrigin = {
-        target: event.target,
-        container: event.currentTarget,
-      };
       press.current = {
         x: event.clientX,
         y: event.clientY,
         timer: setTimeout(() => {
           press.current = null;
           fired.current = true;
-          latest.current.onLongPress(origin);
+          // Claimed again: what the press began on may have gone under it.
+          const claimed = latest.current.claim(target, container);
+          if (claimed !== null) {
+            latest.current.onLongPress(claimed);
+          }
         }, LONG_PRESS_MS),
       };
     },
@@ -128,7 +128,10 @@ export default function useLongPress({
         event.stopPropagation();
         return;
       }
-      latest.current.onTap(event);
+      const claimed = latest.current.claim(event.target, event.currentTarget);
+      if (claimed !== null) {
+        latest.current.onTap(claimed);
+      }
     },
     onContextMenu: (event) => {
       if (press.current !== null || fired.current) {
@@ -137,6 +140,3 @@ export default function useLongPress({
     },
   };
 }
-
-/** Every press a pressed element takes is its own. */
-const acceptsEvery = (_event: PointerEvent<HTMLElement>): boolean => true;

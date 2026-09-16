@@ -18,8 +18,7 @@ const Renderer = () => {
   useRenderCeiling({
     renderer: "DataTable",
     count: RENDER_CEILING + 1,
-    unit: "rows",
-    virtualization: "available",
+    virtualized: false,
   });
   return null;
 };

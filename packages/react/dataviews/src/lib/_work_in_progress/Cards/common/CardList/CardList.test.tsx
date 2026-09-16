@@ -64,7 +64,6 @@ describe("CardList", () => {
         selectable={false}
         nameRecord={() => null}
         decideApplicability={() => "applies"}
-        readType={() => null}
       />,
     );
     const list = screen.getByRole("list");
@@ -89,7 +88,6 @@ describe("CardList", () => {
         selectable={false}
         nameRecord={() => null}
         decideApplicability={() => "applies"}
-        readType={() => null}
       />,
     );
     expect(within(screen.getByRole("list")).queryAllByRole("listitem")).toEqual(
@@ -119,7 +117,6 @@ describe("CardList", () => {
         selectable
         nameRecord={() => null}
         decideApplicability={() => "applies"}
-        readType={() => null}
       />,
     );
     expect(

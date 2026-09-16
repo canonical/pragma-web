@@ -70,7 +70,7 @@ export const instances = createCollection({
 });
 
 /** The fields of the instance collection, for typed handles and providers. */
-export type InstanceFields = typeof instances.schema.fields;
+type InstanceFields = typeof instances.schema.fields;
 
 /** One container of the given identity and name. */
 export const buildContainer = (
@@ -121,7 +121,7 @@ const INSTANCE_CAPABILITIES: SourceCapabilities = declareCapabilities(
 );
 
 /** How one test's instance provider is set up. */
-export type InstanceProviderConfig = Omit<
+type InstanceProviderConfig = Omit<
   ManualSourceConfig<Instance>,
   "capabilities"
 > & {
@@ -137,7 +137,6 @@ type InstanceProvider = DataViewsProvider<InstanceFields, Instance>;
 /** An instance provider over a manual source, with the source to answer it. */
 type InstanceFixture = {
   readonly provider: InstanceProvider;
-  readonly collection: Collection<InstanceFields, Instance>;
   readonly source: ManualSource<Instance>;
 };
 
@@ -162,5 +161,5 @@ export const createInstanceProvider = ({
     source: source.source,
     ...(location === undefined ? {} : { location }),
   });
-  return { provider, collection: instances, source };
+  return { provider, source };
 };

@@ -13,11 +13,11 @@ import type { DisplayField } from "../common/index.js";
 /** What one declared column or field knows of record types. */
 export type FieldScope = {
   /**
-   * The types a table's heading names, or null where it applies to every
-   * record: its own narrowing where it declares one, else its schema field's
-   * scope.
+   * The types it applies to, resolved: its own narrowing where it declares
+   * one, else its schema field's scope, or null where it applies to every
+   * record. What a table's heading names.
    */
-  readonly appliesTo: readonly string[] | null;
+  readonly scope: readonly string[] | null;
   /** Whether it applies to a record of the given declared type, or of none. */
   readonly applicability: (type: string | null) => Applicability;
 };
@@ -37,9 +37,6 @@ export type ReadFieldScopesConfig = {
   >;
   /** Every column or field the renderer declares, shown or not. */
   readonly fields: readonly DisplayField[];
-  /**
-   * What the renderer calls one of them, as its errors name it: a
-   * `DataTable column`, a `Cards field`.
-   */
-  readonly subject: "DataTable column" | "Cards field";
+  /** The renderer declaring them, which its errors name. */
+  readonly renderer: "DataTable" | "Cards";
 };

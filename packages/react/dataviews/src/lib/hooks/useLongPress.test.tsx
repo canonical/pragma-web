@@ -8,6 +8,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LONG_PRESS_MS } from "./constants.js";
 import useLongPress from "./useLongPress.js";
 
+/** Every press the row under test takes is its own. */
+const claimEvery = () => "row";
+
 const Pressable = ({
   onLongPress,
   onTap,
@@ -15,7 +18,7 @@ const Pressable = ({
   readonly onLongPress: () => void;
   readonly onTap: () => void;
 }) => {
-  const gestures = useLongPress({ onLongPress, onTap });
+  const gestures = useLongPress({ claim: claimEvery, onLongPress, onTap });
   return (
     // biome-ignore lint/a11y/useSemanticElements: the row under test is structure, as the table's is
     // biome-ignore lint/a11y/useFocusableInteractive: the gestures are an enhancement over the row's own controls
@@ -157,13 +160,14 @@ describe("useLongPress", () => {
     expect(onTap).toHaveBeenCalledTimes(1);
   });
 
-  it("starts no press its element does not accept", () => {
+  it("starts no press, and takes no tap, its element does not claim", () => {
     const onLongPress = vi.fn();
+    const onTap = vi.fn();
     const Refusing = () => {
       const gestures = useLongPress({
+        claim: () => null,
         onLongPress,
-        onTap: () => undefined,
-        accepts: () => false,
+        onTap,
       });
       return (
         // biome-ignore lint/a11y/useSemanticElements: the row under test is structure, as the table's is
@@ -179,5 +183,34 @@ describe("useLongPress", () => {
     vi.advanceTimersByTime(LONG_PRESS_MS);
     expect(onLongPress).not.toHaveBeenCalled();
     expect(fireEvent.contextMenu(row)).toBe(true);
+    fireEvent.click(row);
+    expect(onTap).not.toHaveBeenCalled();
+  });
+
+  it("hands a long press nothing once what it began on is no longer claimed", () => {
+    const onLongPress = vi.fn();
+    let claimed: string | null = "row";
+    const Leaving = () => {
+      const gestures = useLongPress({
+        claim: () => claimed,
+        onLongPress,
+        onTap: () => undefined,
+      });
+      return (
+        // biome-ignore lint/a11y/useSemanticElements: the row under test is structure, as the table's is
+        // biome-ignore lint/a11y/useFocusableInteractive: the gestures are an enhancement over the row's own controls
+        <div role="row" {...gestures}>
+          row
+        </div>
+      );
+    };
+    render(<Leaving />);
+    const row = screen.getByRole("row");
+    fireEvent.pointerDown(row, touch);
+    claimed = null;
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).not.toHaveBeenCalled();
+    // Still swallowed as a press's release, so no tap follows it.
+    expect(fireEvent.click(row)).toBe(false);
   });
 });

@@ -25,7 +25,6 @@ const arePropsEqual = <TRow extends object>(
   a.provider === b.provider &&
   a.channels === b.channels &&
   a.applicability === b.applicability &&
-  a.recordType === b.recordType &&
   a.field.cell === b.field.cell &&
   areFieldScopesEqual([a.field], [b.field]);
 
@@ -43,6 +42,10 @@ function FieldValue<TRow extends object>({
     throw new Error(`no channel observes the field "${name}"`);
   }
   const value = useDataViewsValue(channel);
+  // Drawn again when the record returns as another type, so content narrowing
+  // on the record reads its current type even where its value and
+  // applicability did not move.
+  useDataViewsValue(channels.type);
   const cell = useMemo<CellContextValue>(
     () => ({
       collection: provider.collection,
@@ -88,7 +91,8 @@ function FieldValue<TRow extends object>({
  * render as text, a field that does not apply to the record draws the
  * not-applicable state, and every other value renders nothing.
  *
- * It subscribes to its own field's channel alone, so a record republished
+ * It subscribes to its own field's channel and the record's type alone, so
+ * a record republished
  * with another field changed re-renders no value but that field's; the
  * record a field's own content is handed is read as the value renders.
  * Memoised by what it reads, so a card re-rendering for its selection, or

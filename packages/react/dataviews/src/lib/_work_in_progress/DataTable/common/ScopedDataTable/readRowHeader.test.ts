@@ -5,12 +5,25 @@
 import { describe, expect, it } from "vitest";
 import { instances } from "../../../../../../testing/instances.js";
 import { machines } from "../../../../../../testing/machines.js";
+import { readFieldScopes } from "../../../../utils/index.js";
+import type { DataTableColumn } from "../../types.js";
 import readRowHeader from "./readRowHeader.js";
+
+/** The row header over columns, their scopes read as the table reads them. */
+const readHeader = (
+  columns: readonly DataTableColumn[],
+  collection: typeof machines | typeof instances,
+): DataTableColumn | null =>
+  readRowHeader(
+    columns,
+    readFieldScopes({ collection, fields: columns, renderer: "DataTable" }),
+    collection.types,
+  );
 
 describe("readRowHeader", () => {
   it("answers null where no column is the row header", () => {
     expect(
-      readRowHeader(
+      readHeader(
         [
           { id: "name", header: "Name" },
           { id: "status", header: "Status" },
@@ -21,7 +34,7 @@ describe("readRowHeader", () => {
   });
 
   it("answers the row header, reading as never hideable", () => {
-    const header = readRowHeader(
+    const header = readHeader(
       [
         { id: "name", header: "Name", rowHeader: true, hideable: true },
         { id: "status", header: "Status" },
@@ -34,7 +47,7 @@ describe("readRowHeader", () => {
 
   it("refuses two columns each declared the row header, naming both", () => {
     expect(() =>
-      readRowHeader(
+      readHeader(
         [
           { id: "name", header: "Name", rowHeader: true },
           { id: "status", header: "Status", rowHeader: true },
@@ -50,7 +63,7 @@ describe("readRowHeader", () => {
     // Over a field only containers carry: a machine's row would be named by
     // a dash that is read as nothing.
     expect(() =>
-      readRowHeader(
+      readHeader(
         [{ id: "image", header: "Image", rowHeader: true }],
         instances,
       ),
@@ -59,7 +72,7 @@ describe("readRowHeader", () => {
     );
     // Narrowed itself, over a field every type carries.
     expect(() =>
-      readRowHeader(
+      readHeader(
         [
           {
             id: "name",
@@ -77,7 +90,7 @@ describe("readRowHeader", () => {
 
   it("takes a row header scoped to every declared type", () => {
     expect(
-      readRowHeader(
+      readHeader(
         [
           {
             id: "name",

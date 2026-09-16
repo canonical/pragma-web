@@ -18,8 +18,12 @@ type ScopeRecord<TRow extends object> = {
   readonly channels: RowChannels<TRow>;
   readonly row: Channel<TRow>;
   readonly selected: Channel<boolean>;
+  readonly type: Channel<string | null>;
   readonly slots: readonly FieldSlot[];
 };
+
+/** Every row's type, where no reader is given: none. */
+const readNoType = (): null => null;
 
 const sameOrder = (a: readonly string[], b: readonly string[]): boolean =>
   a.length === b.length && a.every((id, position) => id === b[position]);
@@ -50,6 +54,7 @@ export default function createRowScopes<TRow extends object>(
     field,
     read: compileFieldReader(field),
   }));
+  const readType = config.readType ?? readNoType;
   const records = new Map<string, ScopeRecord<TRow>>();
   const ids = createChannel<readonly string[]>(Object.freeze([]), {
     equals: sameOrder,
@@ -69,15 +74,18 @@ export default function createRowScopes<TRow extends object>(
     }
     const row = createChannel<TRow>(record);
     const membership = createChannel(selected);
+    const type = createChannel(readType(record));
     return {
       channels: Object.freeze({
         id,
         record: protectChannel(row),
         fields: Object.freeze(fields),
         selected: protectChannel(membership),
+        type: protectChannel(type),
       }),
       row,
       selected: membership,
+      type,
       slots,
     };
   };
@@ -105,6 +113,7 @@ export default function createRowScopes<TRow extends object>(
       for (const slot of existing.slots) {
         slot.channel.set(slot.read(entry.record));
       }
+      existing.type.set(readType(entry.record));
     }
     for (const id of records.keys()) {
       if (!live.has(id)) {

@@ -7,6 +7,9 @@ import type {
   ReadFieldScopesConfig,
 } from "./types.js";
 
+/** What each renderer calls one of the things it declares. */
+const NOUNS = { DataTable: "column", Cards: "field" } as const;
+
 /**
  * Read what each declared column — a table's column or a card's field —
  * knows of record types, checking every one that narrows its schema field's
@@ -26,9 +29,10 @@ import type {
 export default function readFieldScopes({
   collection,
   fields,
-  subject,
+  renderer,
 }: ReadFieldScopesConfig): FieldScopes {
   const { schema, types } = collection;
+  const subject = `${renderer} ${NOUNS[renderer]}`;
   const scopes = new Map<string, FieldScope>();
   for (const column of fields) {
     const field = readFieldName(column);
@@ -36,7 +40,7 @@ export default function readFieldScopes({
     if (narrowing === undefined) {
       const answers = new Map<string | null, Applicability>();
       scopes.set(column.id, {
-        appliesTo: schema.findField(field)?.appliesTo ?? null,
+        scope: schema.findField(field)?.appliesTo ?? null,
         // Read once per type the column is asked about — at most every
         // declared type and none — rather than once per cell.
         applicability: (type) => {
@@ -77,7 +81,7 @@ export default function readFieldScopes({
     }
     const within = new Set(narrowing);
     scopes.set(column.id, {
-      appliesTo: narrowing,
+      scope: narrowing,
       applicability: (type) =>
         type !== null && within.has(type) ? "applies" : "not-applicable",
     });

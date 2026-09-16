@@ -81,19 +81,6 @@ describe("createRecordTyping", () => {
     ).toThrow("a monomorphic collection has no record typing to build");
   });
 
-  describe("readType", () => {
-    it("names a row's declared type, and null for an undeclared one", () => {
-      const { record } = typing();
-      expect(record.readType(container("c-1"))).toBe("container");
-      expect(record.readType(machine("v-1"))).toBe("virtual-machine");
-      expect(
-        record.readType({ id: "x", type: "sandbox" } as unknown as Instance),
-      ) //
-        .toBeNull();
-      expect(record.readType({ id: "x" } as unknown as Instance)).toBeNull();
-    });
-  });
-
   describe("rejectionOf", () => {
     it("accepts a model whose every row carries a declared type", () => {
       const { record } = typing();

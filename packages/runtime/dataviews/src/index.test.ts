@@ -130,6 +130,7 @@ describe("public surface", () => {
       "areListsEqual",
       "areSizingsEqual",
       "buildColumnTemplate",
+      "compileRecordTypeReader",
       "createColumnLayout",
       "createFilterInputs",
       "createGridInteraction",

@@ -1,5 +1,4 @@
 import type {
-  Applicability,
   DisplayStatus,
   RowRecord,
   SchemaFieldDefinition,
@@ -11,7 +10,6 @@ import {
   createGridInteraction,
   isDataViewsProvider,
   listDisplayEntries,
-  readProviderHost,
   readSizingBounds,
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
@@ -34,6 +32,7 @@ import {
 } from "../../../../common/index.js";
 import {
   useDataViewsValue,
+  useFieldScopes,
   useIsHydrated,
   useLongPress,
   useMergedRef,
@@ -42,12 +41,7 @@ import {
   useStableCallback,
   useStableValue,
 } from "../../../../hooks/index.js";
-import {
-  areFieldScopesEqual,
-  describeStatus,
-  readFieldName,
-  readFieldScopes,
-} from "../../../../utils/index.js";
+import { describeStatus, readFieldName } from "../../../../utils/index.js";
 import {
   useColumnArrangement,
   useColumnManagement,
@@ -55,7 +49,6 @@ import {
   useTableGeometry,
 } from "../../hooks/index.js";
 import type {
-  DataTableColumn,
   DataTableVirtualization,
   ScopedDataTableProps,
 } from "../../types.js";
@@ -176,9 +169,18 @@ export default function ScopedDataTable<
   // The caller's columns, held at one reference while they say the same, so
   // a caller's inline columns re-read and re-arrange nothing.
   const declaredColumns = useStableValue(columns, areColumnsEqual);
+  // What each column knows of record types: the types its heading names,
+  // and whether it applies to a record of one type. Every declared column is
+  // checked where the table mounts, a column hidden by the stored arrangement
+  // included.
+  const { readScope, decideApplicability } = useFieldScopes({
+    collection: provider.collection,
+    fields: declaredColumns,
+    renderer: "DataTable",
+  });
   const declaredHeader = useMemo(
-    () => readRowHeader(declaredColumns, provider.collection),
-    [declaredColumns, provider],
+    () => readRowHeader(declaredColumns, readScope, provider.collection.types),
+    [declaredColumns, readScope, provider],
   );
   const listed = useMemo(
     () =>
@@ -189,9 +191,6 @@ export default function ScopedDataTable<
           ),
     [declaredColumns, declaredHeader],
   );
-  // Held by what a scope is read from alone, so an inline heading or cell
-  // re-reads no scope.
-  const scopedColumns = useStableValue(listed, areFieldScopesEqual);
 
   // The columns the presentation shows, in its order. Both derivations
   // below are keyed on content, not on array identity: a caller who
@@ -264,8 +263,7 @@ export default function ScopedDataTable<
   useRenderCeiling({
     renderer: "DataTable",
     count: ids.length,
-    unit: "rows",
-    virtualization: virtualization === undefined ? "available" : "in-use",
+    virtualized: virtualization !== undefined,
   });
 
   // Selection mode, on touch: a long press on a row selects it and enters
@@ -284,26 +282,12 @@ export default function ScopedDataTable<
   // one. A press or a tap on one of the row's own controls is that
   // control's — held on the checkbox, a press would select the row and the
   // checkbox's own change would deselect it again.
-  // The row a press began on, set before the press is started, so a long
-  // press always has one.
   const gestures = useLongPress({
-    // A press is the table's where it lands in one of its rows, and not on
-    // one of the row's own controls.
-    accepts: (event) =>
-      readRowId(event.target, event.currentTarget) !== null &&
-      !isWithinControl(event.target),
-    onLongPress: ({ target, container }) => {
-      const rowId = readRowId(target, container);
-      if (rowId !== null) {
-        enterSelection(rowId);
-      }
-    },
-    onTap: (event) => {
-      if (!selecting) {
-        return;
-      }
-      const rowId = readRowId(event.target, event.currentTarget);
-      if (rowId !== null && !isWithinControl(event.target)) {
+    claim: (target, container) =>
+      isWithinControl(target) ? null : readRowId(target, container),
+    onLongPress: enterSelection,
+    onTap: (rowId) => {
+      if (selecting) {
         provider.selection.toggle(rowId);
       }
     },
@@ -342,31 +326,6 @@ export default function ScopedDataTable<
     messages,
     announce,
   });
-
-  // What each column knows of record types: the types its header names, and
-  // how its cells decide a record. A column narrowing its field's scope is
-  // checked here, where the table mounts, once per declared column list.
-  // Every declared column, not only the ones shown: a column hidden by the
-  // stored arrangement is checked where the table mounts all the same.
-  const readScope = useMemo(
-    () =>
-      readFieldScopes({
-        collection: provider.collection,
-        fields: scopedColumns,
-        subject: "DataTable column",
-      }),
-    [scopedColumns, provider],
-  );
-  // Whether one column applies to a record of one type. Held at one
-  // identity, so a table that renders again renders no row again for this.
-  const decideApplicability = useStableCallback(
-    (column: DataTableColumn, type: string | null): Applicability =>
-      readScope(column).applicability(type),
-  );
-  // The declared type a record carries: what each row watches of its record.
-  const readType = useStableCallback((record: TRow): string | null =>
-    readProviderHost(provider).readType(record),
-  );
 
   // The columns' visibility and places, as the settings menu offers them
   // and every change to them is announced. The header row takes the focus a
@@ -417,7 +376,7 @@ export default function ScopedDataTable<
   // as lambdas, and a new function per render would re-render every row
   // and every cell of the body for nothing. Answers null where the caller
   // names no row, so a row is named by its header, or by its identity.
-  const nameRow = useStableCallback(
+  const nameRecord = useStableCallback(
     (row: TRow, rowId: string): string | null =>
       rowLabel === undefined ? null : rowLabel(row, rowId),
   );
@@ -451,9 +410,8 @@ export default function ScopedDataTable<
           channels={rowScopes.readRow(entry.rowId)}
           columns={bodyColumns}
           selectable={selectable}
-          rowLabel={nameRow}
+          nameRecord={nameRecord}
           decideApplicability={decideApplicability}
-          readType={readType}
         />
       ),
     [
@@ -462,9 +420,8 @@ export default function ScopedDataTable<
       rowScopes,
       bodyColumns,
       selectable,
-      nameRow,
+      nameRecord,
       decideApplicability,
-      readType,
     ],
   );
 
@@ -557,7 +514,7 @@ export default function ScopedDataTable<
                     // Solved for every rendered column, in the same order.
                     width={geometry.widths[position] as number}
                     labelId={`${baseId}-${column.id}`}
-                    appliesTo={readScope(column).appliesTo}
+                    scope={readScope(column).scope}
                   />
                 );
               })}
