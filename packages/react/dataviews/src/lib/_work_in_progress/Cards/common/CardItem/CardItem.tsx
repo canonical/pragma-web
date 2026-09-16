@@ -69,13 +69,11 @@ function CardItem<TRow extends object>({
         ) : null}
         <span id={titleId} className="title">
           <FieldValue
-            // Keyed by the record's type: content narrowing on the record is
-            // drawn again, from the record of its current type, when it moves.
-            key={type}
             provider={provider}
             channels={channels}
             field={title}
             applicability={applicabilityOf(title, type)}
+            recordType={type}
           />
         </span>
       </Card.Header>
@@ -83,7 +81,7 @@ function CardItem<TRow extends object>({
         <Card.Content className="content">
           <dl className="fields">
             {details.map((field) => (
-              <div key={`${field.id}:${type}`} className="field">
+              <div key={field.id} className="field">
                 <dt>{field.header}</dt>
                 <dd>
                   <FieldValue
@@ -91,6 +89,7 @@ function CardItem<TRow extends object>({
                     channels={channels}
                     field={field}
                     applicability={applicabilityOf(field, type)}
+                    recordType={type}
                   />
                 </dd>
               </div>

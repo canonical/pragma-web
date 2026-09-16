@@ -6,6 +6,7 @@
  */
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { pageOf } from "../../../../testing/fixtures.js";
 import {
   createMachineProvider,
   type Machine,
@@ -61,8 +62,9 @@ const loadedTable = (selectable = true) => {
   return provider;
 };
 
-const selectedIds = (provider: ReturnType<typeof loadedTable>) =>
-  [...provider.selection.state.get().ids].sort();
+const selectedIds = (
+  provider: ReturnType<typeof createMachineProvider>["provider"],
+) => [...provider.selection.state.get().ids].sort();
 
 describe("selection mode on touch", () => {
   beforeEach(() => {
@@ -155,6 +157,36 @@ describe("selection mode on touch", () => {
       clientX: 10,
       clientY: 10,
     });
+    act(() => {
+      vi.advanceTimersByTime(LONG_PRESS_MS);
+    });
+    expect(selectedIds(provider)).toEqual([]);
+    expect(screen.getByRole("table")).not.toHaveAttribute(
+      "data-selection-mode",
+    );
+  });
+
+  it("selects nothing when the pressed row leaves before the press is long", () => {
+    const { provider, source } = createMachineProvider();
+    render(
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        selectable
+      />,
+    );
+    const deliver = (rows: readonly Machine[]) => {
+      act(() => {
+        source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+      });
+    };
+    deliver(fleet);
+    fireEvent.pointerDown(rowNamed("alpha"), touch);
+    act(() => {
+      provider.refresh();
+    });
+    deliver([machine("m-2", "beta", "failed")]);
     act(() => {
       vi.advanceTimersByTime(LONG_PRESS_MS);
     });

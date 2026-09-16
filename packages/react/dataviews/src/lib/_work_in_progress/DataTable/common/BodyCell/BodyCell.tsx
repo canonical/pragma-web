@@ -167,7 +167,7 @@ function BodyCell<TRow extends object>({
  * no inline editing or row actions yet. Every cell subscribes to its own
  * field alone, so a record update re-renders only the cells whose values
  * actually changed; the record a column's own content is handed is read as
- * it renders, and the cell is drawn afresh when the record's type moves.
+ * it renders, and the cell draws again when the record's type moves.
  * Either way it installs the cell context the content reads.
  *
  * Memoised: without it the claim above would hold for the channel and be

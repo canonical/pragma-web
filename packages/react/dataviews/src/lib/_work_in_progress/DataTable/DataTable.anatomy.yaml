@@ -136,7 +136,7 @@
 #     display is deferred in the DSL.
 #   - A row's bottom border is drawn on every row but the last: the DSL
 #     cannot condition a style on position.
-#   - On a coarse pointer a selectable row declines text selection and the
+#   - Where any pointer is coarse a selectable row declines text selection and the
 #     platform's callout (`user-select: none`, `-webkit-touch-callout: none`),
 #     since a held touch there is the row's long press; the DSL has neither
 #     key nor pointer media.

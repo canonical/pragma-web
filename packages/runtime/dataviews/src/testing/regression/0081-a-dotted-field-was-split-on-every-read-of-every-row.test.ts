@@ -5,13 +5,28 @@
  * row per observed field on a reconcile — an array allocated per read where
  * the path never changes.
  *
- * The path is split once, where the reader is compiled for the pass.
+ * Each field's read is compiled once for a pass, not once per row.
  */
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { declareSort } from "../../../testing/fixtures.js";
 import { createSchema } from "../../lib/schema/index.js";
 import { executeSlice } from "../../lib/source/index.js";
+
+const compiled = vi.hoisted(() => ({ fields: [] as string[] }));
+
+vi.mock("../../lib/rows/compileFieldReader.js", async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import("../../lib/rows/compileFieldReader.js")
+    >();
+  return {
+    default: (field: string) => {
+      compiled.fields.push(field);
+      return actual.default(field);
+    },
+  };
+});
 
 const schema = createSchema([
   { field: "config.region", kind: "text" },
@@ -24,12 +39,7 @@ const rows = Array.from({ length: 200 }, (_, index) => ({
 }));
 
 describe("a filter and an ordering by dotted fields over many rows", () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("splits each path a handful of times, not once per row", () => {
-    const split = vi.spyOn(String.prototype, "split");
+  it("compiles each field's read once for the pass, not once per row", () => {
     const result = executeSlice(
       rows,
       {
@@ -43,9 +53,6 @@ describe("a filter and an ordering by dotted fields over many rows", () => {
       { schema, sort: declareSort(schema.fieldNames) },
     );
     expect(result).toHaveLength(100);
-    const dotted = split.mock.calls.filter(
-      (call: readonly unknown[]) => call[0] === ".",
-    );
-    expect(dotted.length).toBeLessThan(10);
+    expect(compiled.fields.sort()).toEqual(["config.cores", "config.region"]);
   });
 });

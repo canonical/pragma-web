@@ -13,6 +13,7 @@ import { type ComponentProps, createElement, type ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { pageOf } from "../../../testing/fixtures.js";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
+import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 const renders = vi.hoisted(() => ({ names: [] as string[] }));
 
@@ -29,10 +30,6 @@ vi.mock("@canonical/react-ds-global-form", async (importOriginal) => {
     },
   };
 });
-
-const { DataTable } = await import(
-  "../../lib/_work_in_progress/DataTable/index.js"
-);
 
 describe("a field of a selectable row moving", () => {
   it("renders the row's checkbox again for no field it does not name the row by", () => {

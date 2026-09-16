@@ -34,4 +34,10 @@ export type BodyCellProps<TRow extends object> = {
    * cell, and handed to a column's own content, which may draw it otherwise.
    */
   readonly applicability: Applicability;
+  /**
+   * The declared type of the record, or null: a cell compares it and draws
+   * again when it moves, so content narrowing on the record reads its current
+   * type even where the field's value and applicability did not move.
+   */
+  readonly recordType: string | null;
 };

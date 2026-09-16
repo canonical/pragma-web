@@ -26,10 +26,12 @@ const sheet = readFileSync(
 describe("a selectable row on a coarse pointer", () => {
   it("declines the platform's text selection and callout", () => {
     const coarse = sheet.match(
-      /@media \(pointer: coarse\)\s*\{\s*&\[aria-selected\]\s*\{([^}]*)\}/,
+      /@media \(any-pointer: coarse\)\s*\{\s*&\[aria-selected\]\s*\{([^}]*)\}/,
     )?.[1];
     expect(coarse).toMatch(/-webkit-touch-callout:\s*none;/);
-    expect(coarse).toMatch(/user-select:\s*none;/);
+    // Prefixed too: WebKit, where the callout is, long took only its own.
+    expect(coarse).toMatch(/-webkit-user-select:\s*none;/);
+    expect(coarse).toMatch(/(^|[^-])user-select:\s*none;/);
     // Not on every row: only one that carries aria-selected is selectable.
     expect(sheet).not.toMatch(/\.ds\.data-table-row\s*\{[^}]*user-select/);
   });

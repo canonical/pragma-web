@@ -12,6 +12,7 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
+import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { LONG_PRESS_MS } from "../../lib/hooks/constants.js";
 
 const calls = vi.hoisted(() => ({ count: 0 }));
@@ -26,10 +27,6 @@ vi.mock("../../lib/hooks/useLongPress.js", async (importOriginal) => {
     },
   };
 });
-
-const { DataTable } = await import(
-  "../../lib/_work_in_progress/DataTable/index.js"
-);
 
 const touch = { pointerType: "touch", clientX: 1, clientY: 1 };
 

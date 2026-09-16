@@ -12,6 +12,7 @@ import { act, render } from "@testing-library/react";
 import { type ReactElement, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
+import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 const renders = vi.hoisted(() => ({ count: 0 }));
 
@@ -23,10 +24,6 @@ vi.mock(
       return null;
     },
   }),
-);
-
-const { DataViews } = await import(
-  "../../lib/_work_in_progress/DataViews/index.js"
 );
 
 describe("the connected table's default footer", () => {

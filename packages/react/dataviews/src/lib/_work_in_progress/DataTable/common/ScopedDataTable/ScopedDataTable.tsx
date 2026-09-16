@@ -18,7 +18,6 @@ import {
 import {
   type CSSProperties,
   isValidElement,
-  type PointerEvent,
   type ReactElement,
   useCallback,
   useEffect,
@@ -285,10 +284,17 @@ export default function ScopedDataTable<
   // checkbox's own change would deselect it again.
   // The row a press began on, set before the press is started, so a long
   // press always has one.
-  const pressedRow = useRef("");
   const gestures = useLongPress({
-    onLongPress: () => {
-      enterSelection(pressedRow.current);
+    // A press is the table's where it lands in one of its rows, and not on
+    // one of the row's own controls.
+    accepts: (event) =>
+      readRowId(event.target, event.currentTarget) !== null &&
+      !isWithinControl(event.target),
+    onLongPress: ({ target, container }) => {
+      const rowId = readRowId(target, container);
+      if (rowId !== null) {
+        enterSelection(rowId);
+      }
     },
     onTap: (event) => {
       const rowId = readRowId(event.target, event.currentTarget);
@@ -297,15 +303,6 @@ export default function ScopedDataTable<
       }
     },
   });
-  const onPointerDown = useStableCallback(
-    (event: PointerEvent<HTMLDivElement>): void => {
-      const rowId = readRowId(event.target, event.currentTarget);
-      if (rowId !== null && !isWithinControl(event.target)) {
-        pressedRow.current = rowId;
-        gestures.onPointerDown(event);
-      }
-    },
-  );
   // Subscribed only while in the mode, so a table outside it re-renders for
   // no selection change of its own.
   useEffect(() => {
@@ -486,7 +483,7 @@ export default function ScopedDataTable<
           // A custom state with no native or ARIA attribute: an attribute,
           // present while the mode holds.
           data-selection-mode={selecting ? "true" : undefined}
-          {...(selectable ? { ...gestures, onPointerDown } : {})}
+          {...(selectable ? gestures : {})}
           // Every logical row, the header's included, so a row a virtualized
           // table has not mounted is still counted.
           aria-rowcount={

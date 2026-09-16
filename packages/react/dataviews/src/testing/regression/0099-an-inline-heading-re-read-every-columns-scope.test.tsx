@@ -16,6 +16,7 @@ import {
   createInstanceProvider,
   MIXED_FLEET,
 } from "../../../testing/instances.js";
+import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 const calls = vi.hoisted(() => ({ count: 0 }));
 
@@ -29,10 +30,6 @@ vi.mock("../../lib/utils/readFieldScopes.js", async (importOriginal) => {
     },
   };
 });
-
-const { DataTable } = await import(
-  "../../lib/_work_in_progress/DataTable/index.js"
-);
 
 describe("a heading written as an inline element", () => {
   it("re-reads no scope when the table renders again", () => {

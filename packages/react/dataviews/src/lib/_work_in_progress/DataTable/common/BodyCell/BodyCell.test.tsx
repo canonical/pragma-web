@@ -64,6 +64,7 @@ describe("BodyCell", () => {
           column={{ id: "zone", header: "Zone" }}
           field="zone"
           applicability="applies"
+          recordType={null}
         />,
       ),
     ).toThrow('no channel observes the field "zone"');
@@ -80,6 +81,7 @@ describe("BodyCell", () => {
         column={{ id: "name", header: "Name" }}
         field="name"
         applicability="not-applicable"
+        recordType={null}
       />,
     );
     const cell = screen.getByRole("cell");
@@ -99,6 +101,7 @@ describe("BodyCell", () => {
         column={{ id: "cores", header: "Cores", cell: Own }}
         field="cores"
         applicability="applies"
+        recordType={null}
       />,
     );
     expect(screen.getByRole("cell")).toHaveTextContent(
@@ -111,6 +114,7 @@ describe("BodyCell", () => {
         column={{ id: "cores", header: "Cores", cell: Own }}
         field="cores"
         applicability="not-applicable"
+        recordType={null}
       />,
     );
     // The record is still handed over whole: content may draw the state

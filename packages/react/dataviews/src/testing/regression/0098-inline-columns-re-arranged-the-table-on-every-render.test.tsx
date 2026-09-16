@@ -12,6 +12,7 @@ import { act, render } from "@testing-library/react";
 import { type ReactElement, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
+import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 const calls = vi.hoisted(() => ({ count: 0 }));
 
@@ -28,10 +29,6 @@ vi.mock("@canonical/dataviews-core/bindings", async (importOriginal) => {
     },
   };
 });
-
-const { DataTable } = await import(
-  "../../lib/_work_in_progress/DataTable/index.js"
-);
 
 describe("a column list written inline", () => {
   it("resolves no arrangement again when the table renders again", () => {
