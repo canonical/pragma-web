@@ -1571,8 +1571,9 @@ describe("DataTable", () => {
       "aria-selected",
       "true",
     );
+    // The selected state is aria-selected alone: no class repeats it.
     expect(elementAt(screen.getAllByRole("row"), 1).className).toBe(
-      "ds data-table-row selected",
+      "ds data-table-row",
     );
     fireEvent.click(screen.getByRole("checkbox", { name: "Select alpha" }));
     expect(provider.selection.state.get().ids.size).toBe(0);

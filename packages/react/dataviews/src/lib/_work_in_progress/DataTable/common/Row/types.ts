@@ -30,6 +30,12 @@ export type RowProps<TRow extends object> = {
   /** The column heading this row, whose cell names it, or null for none. */
   readonly rowHeader: DataTableColumn | null;
   readonly selectable: boolean;
+  /** Whether the table is in selection mode, where a tap on the row toggles it. */
+  readonly selecting: boolean;
+  /** A long press on the row, on touch: selects it and enters selection mode. */
+  readonly onLongPress: (rowId: string) => void;
+  /** A tap on the row while in selection mode: toggles it. */
+  readonly onTap: (rowId: string) => void;
   /** Names a record for its checkbox, or answers null where the caller gave no name. */
   readonly rowLabel: (row: TRow, rowId: string) => string | null;
   /**

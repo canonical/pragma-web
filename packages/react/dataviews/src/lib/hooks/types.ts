@@ -17,7 +17,7 @@ import type {
   Selection,
 } from "@canonical/dataviews-core";
 import type { RowScopes } from "@canonical/dataviews-core/bindings";
-import type { ReactNode, RefObject } from "react";
+import type { MouseEvent, PointerEvent, ReactNode, RefObject } from "react";
 import type { AnnouncerHandle, AnnouncerTopic } from "../common/index.js";
 
 /** What `useDataViewsValue` returns: the channel's current value, or the part `select` picks. */
@@ -166,3 +166,39 @@ export type UseAnnouncerResult = {
  * says the same. Positional, so it declares no props type of its own.
  */
 export type UseStableValueResult<TValue> = TValue;
+
+/** Props of `useLongPress`: what a long press and a tap each do. */
+export type UseLongPressProps = {
+  /** A touch held still for the delay. */
+  readonly onLongPress: () => void;
+  /** A click that was not the release of a long press: a tap, or a mouse click. */
+  readonly onTap: (event: MouseEvent<HTMLElement>) => void;
+};
+
+/**
+ * What `useLongPress` answers: the handlers the pressed element takes, one
+ * identity each for as long as the element is mounted.
+ */
+export type UseLongPressResult = {
+  readonly onPointerDown: (event: PointerEvent<HTMLElement>) => void;
+  readonly onPointerMove: (event: PointerEvent<HTMLElement>) => void;
+  readonly onPointerUp: () => void;
+  readonly onPointerCancel: () => void;
+  readonly onPointerLeave: () => void;
+  readonly onClick: (event: MouseEvent<HTMLElement>) => void;
+  readonly onContextMenu: (event: MouseEvent<HTMLElement>) => void;
+};
+
+/** Props of `useRenderCeiling`: what a renderer draws, and how it could draw less. */
+export type UseRenderCeilingProps = {
+  /** The renderer, as the warning names it. */
+  readonly renderer: string;
+  /** How many rows it renders at once. */
+  readonly count: number;
+  /**
+   * Whether the renderer virtualizes: `in-use` where it does, so nothing is
+   * said; `available` where it could, so the warning points to it; `none`
+   * where it cannot, so the warning says so.
+   */
+  readonly virtualization: "in-use" | "available" | "none";
+};

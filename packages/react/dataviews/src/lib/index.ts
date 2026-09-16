@@ -43,4 +43,8 @@ export type {
   DisplayFieldCellProps,
 } from "./common/index.js";
 export type { UseDataViewsCellResult } from "./hooks/index.js";
-export { useDataViewsCell, useDataViewsValue } from "./hooks/index.js";
+export {
+  RENDER_CEILING,
+  useDataViewsCell,
+  useDataViewsValue,
+} from "./hooks/index.js";

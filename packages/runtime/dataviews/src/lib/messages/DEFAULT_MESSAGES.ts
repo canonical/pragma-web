@@ -54,6 +54,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
 
   selectAllRows: "Select all displayed rows",
   selectRow: (name) => `Select ${name}`,
+  selectionModeEntered: "Selection mode: tap a row to select or deselect it.",
+  selectionModeLeft: "Selection mode ended.",
   columnWidth: (pixels) =>
     `${formatCount(pixels)} ${pixels === 1 ? "pixel" : "pixels"}`,
 

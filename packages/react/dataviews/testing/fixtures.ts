@@ -522,6 +522,8 @@ export const MESSAGE_SAMPLES: {
   statusNoData: null,
   selectAllRows: null,
   selectRow: [[MESSAGE_MARK]],
+  selectionModeEntered: null,
+  selectionModeLeft: null,
   columnWidth: [[1], [7]],
   cellNotApplicable: null,
   // One type alone, and several: English lists them differently.

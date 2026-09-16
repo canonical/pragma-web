@@ -106,6 +106,13 @@ export type DataViewsMessages = {
   readonly selectAllRows: string;
   /** One row's checkbox, by the row's name. */
   readonly selectRow: (name: string) => string;
+  /**
+   * Announced when a long press on a row puts the table in selection mode,
+   * where a tap toggles a row: what the mode is and how a row is toggled.
+   */
+  readonly selectionModeEntered: string;
+  /** Announced when the last selected row is deselected and the mode ends. */
+  readonly selectionModeLeft: string;
   /** A resize handle's value: the column's width in pixels. */
   readonly columnWidth: (pixels: number) => string;
 

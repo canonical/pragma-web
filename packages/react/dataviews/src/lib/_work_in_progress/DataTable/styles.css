@@ -128,7 +128,7 @@
       background-color: var(--color-foreground-ghost-hover);
     }
 
-    &.selected {
+    &[aria-selected="true"] {
       background-color: var(--color-foreground-secondary-information);
 
       &:hover {
