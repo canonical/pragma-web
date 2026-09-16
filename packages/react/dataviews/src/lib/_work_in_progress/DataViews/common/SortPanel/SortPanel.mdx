@@ -18,15 +18,15 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import { DataViews, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataViews } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sortable: true },
-  { id: "status", header: "Status", sortable: true },
-  { id: "cores", header: "Cores", sortable: true },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host", sortable: true },
+  { field: "status", header: "Status", sortable: true },
+  { field: "cores", header: "Cores", sortable: true },
+]);
 
 export function Machines() {
   const [provider] = useState(() =>

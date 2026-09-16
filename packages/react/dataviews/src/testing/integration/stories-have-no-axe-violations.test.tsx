@@ -23,6 +23,7 @@ import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
 import * as cardsStories from "../../lib/_work_in_progress/Cards/Cards.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
+import * as polymorphicStories from "../../lib/_work_in_progress/DataTable/Polymorphic.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
@@ -54,6 +55,7 @@ const rendered = {
 
 /** The stories checked once their play function has run, by part. */
 const played = {
+  Polymorphic: composeStories(polymorphicStories),
   "REST API": composeStories(restStories),
   "GraphQL API": composeStories(graphqlStories),
   Cards: composeStories(cardsStories),

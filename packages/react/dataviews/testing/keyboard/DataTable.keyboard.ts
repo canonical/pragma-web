@@ -30,6 +30,9 @@ type IndexedStory = {
 /** The table's stories. */
 const TABLE = "_work_in_progress/DataTable";
 
+/** The table's stories over records of several types. */
+const POLYMORPHIC = "_work_in_progress/DataTable/Polymorphic";
+
 /** The sort panel's stories, the path to an ordering without Shift. */
 const SORT_PANEL = "_work_in_progress/DataViews/SortPanel";
 
@@ -64,6 +67,7 @@ const GRAPHQL_API = "_work_in_progress/DataViews/GraphQL API";
  */
 const TITLES: readonly string[] = [
   TABLE,
+  POLYMORPHIC,
   SORT_PANEL,
   FILTERS,
   SETTINGS,

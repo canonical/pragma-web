@@ -27,19 +27,19 @@ import {
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
 import {
+  createColumns,
   DataTable,
   PaginationBar,
-  type DataTableColumn,
 } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "owner", header: "Owner" },
+]);
 
 export function Machines() {
   // Built once: the parts observe it, which starts its source.
