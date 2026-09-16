@@ -12,8 +12,13 @@ export type {
   DataTableColumn,
   DataTableProps,
   DataTableVirtualization,
+  TypedCellProps,
+  TypedColumn,
 } from "./_work_in_progress/DataTable/index.js";
-export { DataTable } from "./_work_in_progress/DataTable/index.js";
+export {
+  createColumns,
+  DataTable,
+} from "./_work_in_progress/DataTable/index.js";
 export type {
   DataViewsActionsProps,
   DataViewsDataTableProps,
