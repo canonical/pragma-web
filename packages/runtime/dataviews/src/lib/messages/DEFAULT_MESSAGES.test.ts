@@ -29,6 +29,21 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.columnWidth(120)).toBe("120 pixels");
   });
 
+  it("words a field that does not apply, and the types one applies to", () => {
+    expect(m.cellNotApplicable).toBe("Not applicable");
+    // English lists them: one alone, two joined, and more with commas and a
+    // final "and", so a heading reads as a sentence however many there are.
+    expect(m.columnAppliesTo(["virtual machines"])).toBe(
+      "Applies to virtual machines",
+    );
+    expect(m.columnAppliesTo(["containers", "virtual machines"])).toBe(
+      "Applies to containers and virtual machines",
+    );
+    expect(
+      m.columnAppliesTo(["containers", "virtual machines", "images"]),
+    ).toBe("Applies to containers, virtual machines and images");
+  });
+
   it("words a sort's precedence with an English ordinal once there are two terms", () => {
     expect(m.sortPrecedence("asc", 1, 1)).toBe("ascending");
     expect(m.sortPrecedence("desc", 2, 3)).toBe("descending, 2nd of 3");

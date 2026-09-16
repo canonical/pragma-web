@@ -1,4 +1,5 @@
 import type {
+  Applicability,
   Collection,
   FieldNameOf,
   RowRecord,
@@ -35,9 +36,22 @@ type ValueAt<TRow, TName extends string> = TName extends keyof TRow
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type TypedCellProps<TValue> = {
+export type TypedCellProps<TValue, TRow> = {
   /** The field's current value, typed from the record. */
   readonly value: TValue;
+  /**
+   * The whole record the value was read from, at its own type, as it stood
+   * when this content rendered: what content narrows on to read a field only
+   * one type carries. Content renders when its own field's value changes;
+   * content that draws other fields subscribes through `useDataViewsCell`.
+   */
+  readonly record: TRow;
+  /**
+   * Whether this column's field applies to the record's type. Content given
+   * a record the field does not apply to may draw it however it likes;
+   * content that ignores this draws a value there is none of.
+   */
+  readonly applicability: Applicability;
   /** The row's stable identity. */
   readonly rowId: string;
   /** The declaring column's identity. */
@@ -65,7 +79,7 @@ type TypedColumnOf<
   /** The column's heading. */
   readonly header: ReactNode;
   /** Content for this column's value, typed by the field it shows. */
-  readonly cell?: ComponentType<TypedCellProps<ValueAt<TRow, TName>>>;
+  readonly cell?: ComponentType<TypedCellProps<ValueAt<TRow, TName>, TRow>>;
 };
 
 /**
@@ -113,8 +127,17 @@ export default function createColumns<
 ): readonly DataTableColumn[] {
   return Object.freeze(
     columns.map((column): DataTableColumn => {
-      const { cell, field, header, id, hideable, resizable, sizing, sortable } =
-        column;
+      const {
+        appliesTo,
+        cell,
+        field,
+        header,
+        id,
+        hideable,
+        resizable,
+        sizing,
+        sortable,
+      } = column;
       // Each optional member is given only when the declaration carries one:
       // spreading them wholesale would offer `undefined` where the column
       // says a member may be absent, which is a different statement.
@@ -122,6 +145,7 @@ export default function createColumns<
         header,
         field,
         id: id ?? field,
+        ...(appliesTo === undefined ? {} : { appliesTo }),
         ...(sizing === undefined ? {} : { sizing }),
         ...(hideable === undefined ? {} : { hideable }),
         ...(sortable === undefined ? {} : { sortable }),

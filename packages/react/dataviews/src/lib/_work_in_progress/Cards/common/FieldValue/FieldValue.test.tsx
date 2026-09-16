@@ -46,6 +46,7 @@ describe("FieldValue", () => {
         provider={provider}
         channels={channels}
         field={{ id: "cores", header: "Cores" }}
+        applicability="applies"
       />,
     );
     expect(container.textContent).toBe("8");
@@ -67,9 +68,46 @@ describe("FieldValue", () => {
         provider={provider}
         channels={channels}
         field={{ id: "state", header: "State", field: "status", cell: Owner }}
+        applicability="applies"
       />,
     );
     expect(screen.getByText("m-1/state: failed on alpha")).toBeInTheDocument();
+  });
+
+  it("draws a dash for a field the record's type does not carry, with the word read", () => {
+    const { provider, channels } = observeRow(["cores"]);
+    const { container } = render(
+      <FieldValue
+        provider={provider}
+        channels={channels}
+        field={{ id: "cores", header: "Cores" }}
+        applicability="not-applicable"
+      />,
+    );
+    expect(container).toHaveTextContent(/^—Not applicable$/);
+    expect(container.querySelector("[aria-hidden='true']")).toHaveTextContent(
+      "—",
+    );
+    expect(container.querySelector("[hidden]")).toHaveTextContent(
+      "Not applicable",
+    );
+  });
+
+  it("hands the field's own content the record and its applicability, and no value where the field does not apply", () => {
+    const Own = ({ value, record, applicability }: DisplayFieldCellProps) =>
+      `${applicability}:${String(value)}:${JSON.stringify(record)}`;
+    const { provider, channels } = observeRow(["cores"]);
+    const { container } = render(
+      <FieldValue
+        provider={provider}
+        channels={channels}
+        field={{ id: "cores", header: "Cores", cell: Own }}
+        applicability="not-applicable"
+      />,
+    );
+    expect(container).toHaveTextContent(
+      /^not-applicable:undefined:\{"id":"m-1","name":"alpha","status":"failed","cores":8\}$/,
+    );
   });
 
   it("throws for a field its row's channels do not observe", () => {
@@ -81,6 +119,7 @@ describe("FieldValue", () => {
           provider={provider}
           channels={channels}
           field={{ id: "cores", header: "Cores" }}
+          applicability="applies"
         />,
       ),
     ).toThrow('no channel observes the field "cores"');

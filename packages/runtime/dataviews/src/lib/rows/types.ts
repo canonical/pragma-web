@@ -57,8 +57,9 @@ export type RowModel<TRow extends object = RowRecord> = {
  * Whether a schema field applies to a row, by the field's type scoping.
  * Value and empty are the field's own states; this is the third.
  *
- * @seam typed cells — read by the body cell, which draws a not-applicable
- * cell as a dash with the accessible text "not applicable"
+ * Read by the body cell, which draws a not-applicable cell as a dash with
+ * its own accessible text, so a reader can tell it from a field that is
+ * merely empty, and hands it to a column's own content.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.

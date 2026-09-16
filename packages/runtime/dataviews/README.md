@@ -166,8 +166,10 @@ export const instances = createCollection({
   empty. It satisfies no predicate, `isSet` included, and reads as absent to
   ordering, so filtering on a scoped field restricts the result to that field's
   types by meaning: nothing is added to the query, the URL or a saved view.
-  The host's `applicability(field, row)` answers which state a cell is in, for
-  the binding that draws it. This rests on the source writing no value at a
+  `applicability(field, row)` answers which state a cell is in: a renderer
+  draws the third one as a dash carrying its own accessible text, so a reader
+  can tell it from a field that is merely empty, and hands it to a column's
+  own content, which may decide otherwise. This rests on the source writing no value at a
   scoped key for a row the field does not apply to — the source's obligation,
   not something checked here.
 - **Identities stay opaque strings**, unique across types within the

@@ -1,4 +1,5 @@
 import type {
+  Applicability,
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
@@ -26,4 +27,10 @@ export type FieldValueProps<TRow extends object> = {
   readonly channels: RowChannels<TRow>;
   /** The field shown. */
   readonly field: DisplayField;
+  /**
+   * Whether this field applies to the record on this card. Derived once by
+   * the cards from the collection's scoping, as a table derives it, so both
+   * renderers say the same of the same record.
+   */
+  readonly applicability: Applicability;
 };

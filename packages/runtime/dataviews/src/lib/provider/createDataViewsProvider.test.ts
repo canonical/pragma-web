@@ -1631,6 +1631,14 @@ describe("createDataViewsProvider record types", () => {
     expect(host.applicability("type", container("c-1"))).toBe("applies");
   });
 
+  it("names the declared type a row carries, and null for one it does not", () => {
+    const { host } = instanceProvider();
+    expect(host.typeOf(container("c-1"))).toBe("container");
+    expect(host.typeOf(machine("v-1"))).toBe("virtual-machine");
+    expect(host.typeOf({ id: "x-1", type: "sandbox" } as unknown as Instance)) //
+      .toBeNull();
+  });
+
   it("fails a completion carrying a row of an undeclared type", () => {
     const { provider, host } = instanceProvider();
     host.complete(host.refresh(), delivered([machine("v-1")]));
@@ -1715,6 +1723,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
     expect(host.recordType("m-1")).toBeNull();
     expect(host.applicability("status", { id: "m-1" })).toBe("applies");
     expect(host.applicability("anything", { id: "m-1" })).toBe("applies");
+    expect(host.typeOf({ id: "m-1" })).toBeNull();
   });
 
   it("leaves a scoped field applying to every row", () => {

@@ -1,4 +1,5 @@
 import type {
+  Applicability,
   DisplayStatus,
   RowRecord,
   SchemaFieldDefinition,
@@ -10,6 +11,7 @@ import {
   createGridInteraction,
   isDataViewsProvider,
   listDisplayEntries,
+  readProviderHost,
   readSizingBounds,
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
@@ -45,6 +47,7 @@ import {
   useTableGeometry,
 } from "../../hooks/index.js";
 import type {
+  DataTableColumn,
   DataTableVirtualization,
   ScopedDataTableProps,
 } from "../../types.js";
@@ -58,6 +61,7 @@ import {
   TableBody,
 } from "../index.js";
 import { areColumnModelsEqual, readSizing } from "../utils/index.js";
+import readColumnScopes from "./readColumnScopes.js";
 import "../../styles.css";
 
 /**
@@ -178,7 +182,7 @@ export default function ScopedDataTable<
   useEffect(() => interaction.observe(), [interaction]);
 
   const geometry = useTableGeometry(layout, interaction, columnIds);
-  const scopes = useRowScopes(provider, fields);
+  const rowScopes = useRowScopes(provider, fields);
   const state = useDataViewsValue(provider.state);
   // The core's answer, held at one reference while it says the same thing,
   // so the entries are listed again only when a row identity or the status
@@ -187,7 +191,7 @@ export default function ScopedDataTable<
     resolveDisplayStatus(state),
     areDisplayStatusesEqual,
   );
-  const ids = useDataViewsValue(scopes.ids);
+  const ids = useDataViewsValue(rowScopes.ids);
   // The core decides what the body shows: the status row first, then the
   // rows where the status keeps them.
   const entries = useMemo(
@@ -209,6 +213,26 @@ export default function ScopedDataTable<
     messages,
     announce,
   });
+
+  // What each column knows of record types: the types its header names, and
+  // how its cells decide a record. A column narrowing its field's scope is
+  // checked here, where the table mounts, and once per column list, since
+  // neither the schema nor the columns move per row.
+  const scopeOf = useMemo(() => {
+    const host = readProviderHost(provider);
+    return readColumnScopes({
+      collection: provider.collection,
+      applicability: (field, record) => host.applicability(field, record),
+      typeOf: (record) => host.typeOf(record),
+      columns: rendered,
+    });
+  }, [rendered, provider]);
+  // Whether one column applies to one row's record. Held at one identity, so
+  // a table that renders again renders no row again for this.
+  const applicabilityOf = useStableCallback(
+    (column: DataTableColumn, record: TRow): Applicability =>
+      scopeOf(column).applicability(record),
+  );
 
   // The columns' visibility and places, as the settings menu offers them
   // and every change to them is announced. The header row takes the focus a
@@ -281,13 +305,22 @@ export default function ScopedDataTable<
           ref={placement?.ref}
           position={placement?.position}
           provider={provider}
-          channels={scopes.readRow(entry.rowId)}
+          channels={rowScopes.readRow(entry.rowId)}
           columns={rendered}
           selectable={selectable}
           rowLabel={nameRow}
+          applicabilityOf={applicabilityOf}
         />
       ),
-    [renderer, provider, scopes, rendered, selectable, nameRow],
+    [
+      renderer,
+      provider,
+      rowScopes,
+      rendered,
+      selectable,
+      nameRow,
+      applicabilityOf,
+    ],
   );
 
   // A custom property, which `CSSProperties` does not spell.
@@ -326,7 +359,7 @@ export default function ScopedDataTable<
             {selectable ? (
               <SelectAllCell
                 selection={provider.selection}
-                ids={scopes.ids}
+                ids={rowScopes.ids}
                 reserve={geometry.reserve}
               />
             ) : null}
@@ -364,6 +397,7 @@ export default function ScopedDataTable<
                   // Solved for every rendered column, in the same order.
                   width={geometry.widths[position] as number}
                   labelId={`${baseId}-${column.id}`}
+                  scopedTo={scopeOf(column).scopedTo}
                 />
               );
             })}

@@ -10,6 +10,7 @@
 
 import { createCollection } from "@canonical/dataviews-core";
 import { describe, expect, expectTypeOf, it } from "vitest";
+import { instances } from "../../../../testing/instances.js";
 import type { DisplayField } from "../../common/index.js";
 import createColumns from "./createColumns.js";
 import type { DataTableColumn } from "./types.js";
@@ -70,6 +71,15 @@ describe("createColumns", () => {
     });
   });
 
+  it("carries the record types a column narrows itself to", () => {
+    const columns = createColumns(instances, [
+      { field: "status", header: "Status", appliesTo: ["virtual-machine"] },
+      { field: "name", header: "Name" },
+    ]);
+    expect(columns.at(0)?.appliesTo).toEqual(["virtual-machine"]);
+    expect(columns.at(1)).not.toHaveProperty("appliesTo");
+  });
+
   it("names a nested field by its dot path", () => {
     const columns = createColumns(machines, [
       { field: "config.region", header: "Region" },
@@ -124,7 +134,42 @@ describe("what a column declaration refuses", () => {
       {
         field: "name",
         header: "Host",
-        cell: ({ value }: { readonly value: number }) => String(value),
+        cell: ({
+          value,
+        }: {
+          readonly value: number;
+          readonly record: Machine;
+        }) => String(value),
+      },
+    ]);
+  });
+
+  it("hands content the record at its own type, to narrow on its discriminator", () => {
+    createColumns(instances, [
+      {
+        field: "name",
+        header: "Name",
+        cell: ({ record }) => {
+          // Each arm reads a field only its own type carries, and the last
+          // pins that the arms are exhaustive: a third type would not compile.
+          switch (record.type) {
+            case "container":
+              return record.image;
+            case "virtual-machine":
+              return record.firmware;
+            default:
+              return record satisfies never;
+          }
+        },
+      },
+    ]);
+    createColumns(instances, [
+      {
+        field: "name",
+        header: "Name",
+        // @ts-expect-error - a container carries no firmware: the record
+        // must be narrowed on its type before a type's own field is read.
+        cell: ({ record }) => record.firmware,
       },
     ]);
   });

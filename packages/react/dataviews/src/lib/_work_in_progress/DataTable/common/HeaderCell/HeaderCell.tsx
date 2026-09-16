@@ -85,6 +85,7 @@ export default function HeaderCell({
   bounds,
   width,
   labelId,
+  scopedTo,
 }: HeaderCellProps): ReactElement {
   const messages = useContext(MessagesContext);
   // Whether Shift was held when a key began activating the button: a click
@@ -209,6 +210,14 @@ export default function HeaderCell({
             precedence.position,
             precedence.count,
           )}
+        </span>
+      )}
+      {/* A column whose field only some record types carry says so, read and
+          never drawn: the dash in such a cell is then a fact about the
+          record rather than a gap in the data. */}
+      {scopedTo === null ? null : (
+        <span className="scope" hidden>
+          {messages.columnAppliesTo(scopedTo)}
         </span>
       )}
       {sortable && hydrated ? (

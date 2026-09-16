@@ -17,6 +17,7 @@ import type {
   ActionRequest,
   ActionRun,
   ActionTargets,
+  Applicability,
   AppliedOf,
   ArraySource,
   ArraySourceConfig,
@@ -137,7 +138,6 @@ import type {
 } from "./index.js";
 import * as dataviews from "./index.js";
 import type {
-  Applicability,
   ArrangedColumn,
   ColumnCommandConfig,
   ColumnLayout,
@@ -191,6 +191,7 @@ type EveryPublicType = [
   ActionRequest,
   ActionRun,
   ActionTargets,
+  Applicability,
   AppliedOf<FlagField>,
   ArraySource,
   ArraySourceConfig,
@@ -312,7 +313,6 @@ type EveryPublicType = [
 
 /** Every type the binding entry point exports, as one enumerable tuple. */
 type EveryBindingType = [
-  Applicability,
   ArrangedColumn,
   ColumnCommandConfig,
   ColumnLayout,

@@ -51,7 +51,7 @@ type EveryPublicType = [
   DataTableColumn,
   DataTableProps<Fields>,
   DataTableVirtualization,
-  TypedCellProps<unknown>,
+  TypedCellProps<unknown, RowRecord>,
   TypedColumn<Fields>,
   DataViewsProps<Fields>,
   DataViewsFiltersProps,

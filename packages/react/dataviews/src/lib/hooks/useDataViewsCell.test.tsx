@@ -25,6 +25,7 @@ const installCell = (
   record: createFakeChannel<unknown>(alpha),
   fields: { status: createFakeChannel<unknown>(alpha.status) },
   selected: createFakeChannel(false),
+  applicability: "applies",
   ...overrides,
 });
 

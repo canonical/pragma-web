@@ -226,6 +226,9 @@ export default function createDataViewsProvider<
     applicability(field: string, row: TRow): Applicability {
       return recordTyping?.applicability(field, row) ?? "applies";
     },
+    typeOf(row: TRow): string | null {
+      return recordTyping?.typeOf(row) ?? null;
+    },
     recordType(id: string): string | null {
       return recordTyping?.recordType(id) ?? null;
     },
