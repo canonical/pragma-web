@@ -109,6 +109,21 @@ export type DataViewsMessages = {
   /** A resize handle's value: the column's width in pixels. */
   readonly columnWidth: (pixels: number) => string;
 
+  // A field that does not apply to the record in its row.
+  /**
+   * What a cell says in place of a value when its field does not apply to
+   * the record's type — a third state beside a value and an empty field,
+   * which a reader would otherwise hear as the same silence.
+   */
+  readonly cellNotApplicable: string;
+  /**
+   * What a column's heading says, read but not shown, when its field applies
+   * to some of the collection's record types and not others: the types it
+   * applies to, so a reader meeting a dash in the column knows which records
+   * carry the field at all.
+   */
+  readonly columnAppliesTo: (types: readonly string[]) => string;
+
   // The table's sort.
   /**
    * What a sorted heading states of its column: its direction, and its

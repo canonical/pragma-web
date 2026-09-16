@@ -71,6 +71,7 @@ export default function createRecordTyping<
       const type = nameOf(row);
       return type !== null && scope.has(type) ? "applies" : "not-applicable";
     },
+    typeOf: nameOf,
     recordType(id: string): string | null {
       // Memory is of identities while they are selected: an identity that
       // left the selection is not one an action can be decided for.

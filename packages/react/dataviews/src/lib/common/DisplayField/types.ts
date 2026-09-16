@@ -4,6 +4,7 @@
  * the props every renderer hands it, whichever renderer draws it.
  */
 
+import type { Applicability } from "@canonical/dataviews-core";
 import type { ComponentType, ReactNode } from "react";
 
 /**
@@ -15,6 +16,20 @@ import type { ComponentType, ReactNode } from "react";
 export type DisplayFieldCellProps = {
   /** The field's current value. */
   readonly value: unknown;
+  /**
+   * The whole record the value was read from, as it stood when this content
+   * rendered. Content renders when its own field's value changes, and for
+   * nothing else, which is the renderer's guarantee; content that draws
+   * other fields of the record subscribes to it through `useDataViewsCell`.
+   */
+  readonly record: unknown;
+  /**
+   * Whether this field applies to the record's type. A field scoped to
+   * other types is not empty but a third state; content given one may draw
+   * it however it likes, and content that ignores it draws the value, which
+   * for such a record there is none of.
+   */
+  readonly applicability: Applicability;
   /** The row's stable identity. */
   readonly rowId: string;
   /** The declaring field's identity: a table's column, a card's field. */

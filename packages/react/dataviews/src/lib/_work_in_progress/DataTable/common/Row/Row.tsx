@@ -15,8 +15,13 @@ function Row<TRow extends object>({
   rowLabel,
   position,
   ref,
+  applicabilityOf,
 }: RowProps<TRow>): ReactElement {
   const selected = useDataViewsValue(channels.selected);
+  // Read as the row renders rather than subscribed: which columns apply to
+  // a record is a fact about its type, which no record changes under a row,
+  // and a subscription here would re-render every cell for any field's move.
+  const record = channels.record.get();
   return (
     // aria-selected is only meaningful where selection is offered, and it
     // must agree with the row's checkbox: both read this one channel.
@@ -46,6 +51,7 @@ function Row<TRow extends object>({
           channels={channels}
           column={column}
           field={readFieldName(column)}
+          applicability={applicabilityOf(column, record)}
         />
       ))}
     </div>

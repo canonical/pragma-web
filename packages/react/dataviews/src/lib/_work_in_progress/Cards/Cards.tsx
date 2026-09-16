@@ -1,4 +1,5 @@
 import type {
+  Applicability,
   DisplayStatus,
   RowRecord,
   SchemaFieldDefinition,
@@ -8,14 +9,11 @@ import {
   areListsEqual,
   isDataViewsProvider,
   listDisplayEntries,
+  readProviderHost,
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
-import {
-  type DisplayField,
-  MessagesContext,
-  StatusItem,
-} from "../../common/index.js";
+import { MessagesContext, StatusItem } from "../../common/index.js";
 import {
   useDataViewsValue,
   useMessages,
@@ -132,6 +130,13 @@ export default function Cards<
     (row: TRow, rowId: string): string | null =>
       rowLabel === undefined ? null : rowLabel(row, rowId),
   );
+  // Whether one field applies to one card's record, as a table asks it of a
+  // row. One identity, so a re-render of the cards re-renders no card for
+  // this.
+  const applicabilityOf = useStableCallback(
+    (field: string, record: TRow): Applicability =>
+      readProviderHost(provider).applicability(field, record),
+  );
   // The words' own text for a status, unless the caller renders its own.
   const describe = useCallback(
     (shown: DisplayStatus) => describeStatus(shown, words),
@@ -160,6 +165,7 @@ export default function Cards<
           details={details}
           selectable={selectable}
           nameRecord={nameRecord}
+          applicabilityOf={applicabilityOf}
         />
       </section>
     </MessagesContext>

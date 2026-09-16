@@ -17,6 +17,23 @@ const formatSortTerm = (name: string, direction: SortDirection): string =>
   `${name}, ${DIRECTIONS[direction]}`;
 
 /**
+ * Names as English lists them: one alone, and more with commas and a final
+ * "and". Two need no comma, which joining all but the last already gives.
+ */
+const formatList = (names: readonly string[]): string => {
+  const last = names.at(-1);
+  /* v8 ignore next 3 -- a list of no names reaches no caller: the only
+     message that lists any words a field's own scoping, and a field scoped
+     to no type is refused when its schema is built. */
+  if (last === undefined) {
+    return "";
+  }
+  return names.length === 1
+    ? last
+    : `${names.slice(0, -1).join(", ")} and ${last}`;
+};
+
+/**
  * The words DataViews ships with: English. Plurals and ordinals are worded
  * through the platform's English rules, counts through its number format,
  * and every reason is stripped of the full stops it came with — those that
@@ -39,6 +56,9 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   selectRow: (name) => `Select ${name}`,
   columnWidth: (pixels) =>
     `${formatCount(pixels)} ${pixels === 1 ? "pixel" : "pixels"}`,
+
+  cellNotApplicable: "Not applicable",
+  columnAppliesTo: (types) => `Applies to ${formatList(types)}`,
 
   sortPrecedence: (direction, position, total) =>
     total === 1

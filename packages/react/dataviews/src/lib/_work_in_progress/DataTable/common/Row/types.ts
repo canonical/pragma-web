@@ -1,4 +1,5 @@
 import type {
+  Applicability,
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
@@ -28,6 +29,17 @@ export type RowProps<TRow extends object> = {
   readonly columns: readonly DataTableColumn[];
   readonly selectable: boolean;
   readonly rowLabel: (row: TRow, rowId: string) => string;
+  /**
+   * Whether one column applies to one record: its field's own scope,
+   * narrowed by the column's where it declares one. The table's, one
+   * identity for every row, so a row that re-renders renders no cell again
+   * for it; the row asks per column rather than carrying a map it would
+   * have to rebuild whenever its record moved.
+   */
+  readonly applicabilityOf: (
+    column: DataTableColumn,
+    record: TRow,
+  ) => Applicability;
   /** The row's logical position, reported only by a virtualized table. */
   readonly position?: number | undefined;
   /** The row element, for a virtualized table to measure. */

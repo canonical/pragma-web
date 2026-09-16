@@ -423,10 +423,19 @@ export type ProviderHost<
    * Always "applies" on a monomorphic collection, and on a field the schema
    * does not scope.
    *
-   * @seam typed cells — read by the body cell, whose not-applicable cell is
-   * the third state beside value and empty
+   * Read by a renderer's cells: a field that does not apply to a row is
+   * drawn as the third state beside value and empty.
    */
   readonly applicability: (field: string, row: TRow) => Applicability;
+  /**
+   * The declared type a row carries, or null when it carries none the
+   * collection declares — a monomorphic collection's rows included. Reading
+   * a row for its type is the provider's: a renderer asks rather than reads.
+   *
+   * Read by a table whose column narrows its field's scope to fewer types:
+   * the column decides a row by the type the provider names for it.
+   */
+  readonly typeOf: (row: TRow) => string | null;
   /**
    * The type remembered for a selected identity, or null when the provider
    * never modelled it while it was selected — a selection restored by a host
@@ -462,6 +471,8 @@ export type RecordTyping<TRow extends object = RowRecord> = {
   readonly rejectionOf: (model: RowModel<TRow>) => string | null;
   /** Whether a schema field applies to a row. */
   readonly applicability: (field: string, row: TRow) => Applicability;
+  /** The declared type a row carries, or null for none the collection declares. */
+  readonly typeOf: (row: TRow) => string | null;
   /** The remembered type of a selected identity. */
   readonly recordType: (id: string) => string | null;
   /** Take the type of every selected row of a model about to be replaced. */

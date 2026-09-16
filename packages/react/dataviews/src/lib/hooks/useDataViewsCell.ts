@@ -45,6 +45,7 @@ export default function useDataViewsCell<
       record: cell.record as ReadonlyChannel<TRow>,
       fields: cell.fields,
       selected: cell.selected,
+      applicability: cell.applicability,
     }),
     [cell],
   );

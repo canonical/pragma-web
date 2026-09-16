@@ -1,4 +1,4 @@
-import type { ReadonlyChannel } from "@canonical/dataviews-core";
+import type { Applicability, ReadonlyChannel } from "@canonical/dataviews-core";
 
 /**
  * The value installed per rendered cell by the table renderer: the
@@ -19,4 +19,11 @@ export type CellContextValue = {
   readonly record: ReadonlyChannel<unknown>;
   readonly fields: Readonly<Record<string, ReadonlyChannel<unknown>>>;
   readonly selected: ReadonlyChannel<boolean>;
+  /**
+   * Whether this cell's field applies to the record in its row. A field
+   * scoped to other record types is not empty: it is a third state, and a
+   * renderer says so rather than leaving the same silence a missing value
+   * leaves. Always "applies" where the collection declares one record type.
+   */
+  readonly applicability: Applicability;
 };

@@ -1,4 +1,5 @@
 import type {
+  Applicability,
   DataViewsProvider,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
@@ -43,4 +44,9 @@ export type CardListProps<TRow extends object> = {
    * its title field's text.
    */
   readonly nameRecord: (row: TRow, rowId: string) => string | null;
+  /**
+   * Whether one field applies to one record. The cards', one identity for
+   * every card, asked per field as a table asks it per column.
+   */
+  readonly applicabilityOf: (field: string, record: TRow) => Applicability;
 };

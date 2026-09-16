@@ -81,7 +81,6 @@ export {
 } from "../query/index.js";
 export { areFieldFacetsEqual } from "../result/index.js";
 export type {
-  Applicability,
   RowChannels,
   RowScopes,
   RowScopesConfig,

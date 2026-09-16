@@ -13,12 +13,7 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { ColumnSizing } from "@canonical/dataviews-core/bindings";
-import type {
-  ComponentProps,
-  ComponentType,
-  ReactElement,
-  ReactNode,
-} from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 import type {
   AnnouncerTopic,
   DataTableVirtualization,
@@ -35,6 +30,15 @@ export type { DataTableVirtualization } from "../../common/index.js";
  * name may change or move before the first release.
  */
 export type DataTableColumn = DisplayField & {
+  /**
+   * The record types this column applies to, narrower than its field's own
+   * scope: a cell in a row of any other type draws the not-applicable state,
+   * and the header names these types. Each must be a type the collection
+   * declares and, where the field is scoped, one the field applies to; a
+   * column naming any other fails where the table is mounted, since it would
+   * otherwise draw every cell not applicable and say nothing.
+   */
+  readonly appliesTo?: readonly string[];
   /** Declared sizing. Defaults to a flexible column with a 96px minimum. */
   readonly sizing?: ColumnSizing;
   /**
