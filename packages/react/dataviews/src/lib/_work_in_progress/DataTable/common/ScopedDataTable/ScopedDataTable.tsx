@@ -62,7 +62,11 @@ import {
   StatusRow,
   TableBody,
 } from "../index.js";
-import { areColumnModelsEqual, readSizing } from "../utils/index.js";
+import {
+  areColumnModelsEqual,
+  areColumnsEqual,
+  readSizing,
+} from "../utils/index.js";
 import readColumnScopes from "./readColumnScopes.js";
 import readRowHeader from "./readRowHeader.js";
 import "../../styles.css";
@@ -148,16 +152,22 @@ export default function ScopedDataTable<
   // The column heading each row, if one is declared, checked where the table
   // mounts. It reads as never hideable, so the columns every arrangement and
   // menu reads carry that reading rather than each of them learning the rule.
-  const rowHeader = useMemo(() => readRowHeader(columns), [columns]);
+  const declaredHeader = useMemo(
+    () => readRowHeader(columns, provider.collection.schema),
+    [columns, provider],
+  );
   const listed = useMemo(
     () =>
-      rowHeader === null
+      declaredHeader === null
         ? columns
         : columns.map((column) =>
-            column.rowHeader === true ? rowHeader : column,
+            column.rowHeader === true ? declaredHeader : column,
           ),
-    [columns, rowHeader],
+    [columns, declaredHeader],
   );
+  // Held at one reference while it says the same, as the rendered list is,
+  // so a caller's inline columns re-read no scope.
+  const declaredColumns = useStableValue(listed, areColumnsEqual);
 
   // The columns the presentation shows, in its order. Both derivations
   // below are keyed on content, not on array identity: a caller who
@@ -170,6 +180,12 @@ export default function ScopedDataTable<
     columns: listed,
   });
   const model = useStableValue(rendered, areColumnModelsEqual);
+  // The header the rows are handed, read from the content-stable list, so a
+  // caller rebuilding its columns inline re-renders no row for it.
+  const rowHeader = useMemo(
+    () => model.find((column) => column.rowHeader === true) ?? null,
+    [model],
+  );
 
   const fields = useMemo<readonly string[]>(
     () => model.map(readFieldName),
@@ -272,17 +288,18 @@ export default function ScopedDataTable<
 
   // What each column knows of record types: the types its header names, and
   // how its cells decide a record. A column narrowing its field's scope is
-  // checked here, where the table mounts, and once per column list, since
-  // neither the schema nor the columns move per row.
+  // checked here, where the table mounts, once per declared column list.
   const scopeOf = useMemo(() => {
     const host = readProviderHost(provider);
+    // Every declared column, not only the ones shown: a column hidden by the
+    // stored arrangement is checked where the table mounts all the same.
     return readColumnScopes({
       collection: provider.collection,
       applicability: (field, record) => host.applicability(field, record),
       typeOf: (record) => host.typeOf(record),
-      columns: rendered,
+      columns: declaredColumns,
     });
-  }, [rendered, provider]);
+  }, [declaredColumns, provider]);
   // Whether one column applies to one row's record. Held at one identity, so
   // a table that renders again renders no row again for this.
   const applicabilityOf = useStableCallback(

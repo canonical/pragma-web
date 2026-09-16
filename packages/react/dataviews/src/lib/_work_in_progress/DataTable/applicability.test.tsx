@@ -62,10 +62,12 @@ describe("a table over records of several types", () => {
     loadedTable();
     const [, , image] = cellsOf("db-01");
     // A virtual machine runs from no image: the field is not one of its own.
+    // The dash is seen and not read; the word is read and not seen.
     expect(image).toHaveTextContent(/^—Not applicable$/);
+    expect(image).toHaveAccessibleName("Not applicable");
     expect(image?.querySelector("[aria-hidden]")).toHaveTextContent("—");
-    expect(image?.querySelector("[hidden]")).toHaveTextContent(
-      "Not applicable",
+    expect(image?.querySelector(".not-applicable")).not.toHaveAttribute(
+      "hidden",
     );
     expect(cellsOf("web-01").at(2)).toHaveTextContent(/^ubuntu:24\.04$/);
   });
@@ -75,22 +77,21 @@ describe("a table over records of several types", () => {
     // A container with no image named is a value that is empty: nothing is
     // drawn and nothing is read, where the machine's cell says why.
     expect(cellsOf("bare").at(2)).toHaveTextContent(/^$/);
-    expect(cellsOf("bare").at(2)?.querySelector("[hidden]")).toBeNull();
+    expect(cellsOf("bare").at(2)).toHaveAccessibleName("");
     expect(cellsOf("vm").at(2)).toHaveTextContent(/^—Not applicable$/);
   });
 
   it("names the types a scoped column applies to in its header, read and not drawn", () => {
     loadedTable();
     const image = screen.getByRole("columnheader", { name: "Image" });
-    const scope = image.querySelector(".scope");
-    expect(scope).toHaveTextContent("Applies to container");
-    expect(scope).toHaveAttribute("hidden");
+    // Named by its label alone, described by the types: the description is
+    // what a reader reaches, so the text is clipped and never hidden.
+    expect(image).toHaveAccessibleDescription("Applies to container");
+    expect(image.querySelector(".scope")).not.toHaveAttribute("hidden");
     // A column over a field every type carries says nothing of types.
-    expect(
-      screen
-        .getByRole("columnheader", { name: "Name" })
-        .querySelector(".scope"),
-    ).toBeNull();
+    const name = screen.getByRole("columnheader", { name: "Name" });
+    expect(name).not.toHaveAccessibleDescription();
+    expect(name.querySelector(".scope")).toBeNull();
   });
 
   it("narrows a column to the types it names, and says so in its header", () => {
@@ -104,12 +105,10 @@ describe("a table over records of several types", () => {
       },
     ]);
     expect(cellsOf("db-01").at(1)).toHaveTextContent(/^stopped$/);
-    expect(cellsOf("web-01").at(1)).toHaveTextContent(/^—Not applicable$/);
+    expect(cellsOf("web-01").at(1)).toHaveAccessibleName("Not applicable");
     expect(
-      screen
-        .getByRole("columnheader", { name: "VM status" })
-        .querySelector(".scope"),
-    ).toHaveTextContent("Applies to virtual-machine");
+      screen.getByRole("columnheader", { name: "VM status" }),
+    ).toHaveAccessibleDescription("Applies to virtual-machine");
   });
 
   it("fails where it mounts for a column naming a type its field does not apply to", () => {
@@ -188,9 +187,12 @@ describe("cards over records of several types", () => {
     const vm = screen.getByRole("listitem", { name: "db-01" });
     const image = within(vm).getAllByRole("definition").at(1);
     expect(image).toHaveTextContent(/^—Not applicable$/);
-    expect(image?.querySelector("[hidden]")).toHaveTextContent(
-      "Not applicable",
+    // A definition takes no name from its content; what a reader reaches is
+    // the word itself, so it is clipped and never hidden.
+    expect(image?.querySelector(".not-applicable")).not.toHaveAttribute(
+      "hidden",
     );
+    expect(image?.querySelector("[aria-hidden='true']")).toHaveTextContent("—");
     expect(
       within(screen.getByRole("listitem", { name: "web-01" }))
         .getAllByRole("definition")

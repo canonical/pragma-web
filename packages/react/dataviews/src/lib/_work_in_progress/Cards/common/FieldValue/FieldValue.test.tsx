@@ -88,8 +88,11 @@ describe("FieldValue", () => {
     expect(container.querySelector("[aria-hidden='true']")).toHaveTextContent(
       "—",
     );
-    expect(container.querySelector("[hidden]")).toHaveTextContent(
+    expect(container.querySelector(".not-applicable")).toHaveTextContent(
       "Not applicable",
+    );
+    expect(container.querySelector(".not-applicable")).not.toHaveAttribute(
+      "hidden",
     );
   });
 

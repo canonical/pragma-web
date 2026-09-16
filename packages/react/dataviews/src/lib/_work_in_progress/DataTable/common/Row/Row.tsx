@@ -43,13 +43,24 @@ function Row<TRow extends object>({
       }
     },
   });
+  // A press that begins on one of the row's own controls is that control's
+  // too: held on the checkbox, it would select the row and the checkbox's
+  // own change would deselect it again.
+  const pressed: typeof gestures = {
+    ...gestures,
+    onPointerDown: (event) => {
+      if (!isWithinControl(event.target)) {
+        gestures.onPointerDown(event);
+      }
+    },
+  };
   return (
     // aria-selected is only meaningful where selection is offered, and it
     // must agree with the row's checkbox: both read this one channel.
     // biome-ignore lint/a11y/useSemanticElements: <tr> is only valid inside a <table>, and this grid is deliberately not one
     // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, not a widget — the focusable controls live in its cells
     <div
-      {...(selectable ? gestures : {})}
+      {...(selectable ? pressed : {})}
       ref={ref}
       role="row"
       className={componentCssClassName}

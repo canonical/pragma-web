@@ -75,6 +75,9 @@ export default function readColumnScopes<TRow extends object>({
       throw new Error(`column "${column.id}" applies to no record type`);
     }
     const fieldScope = schema.findField(field)?.appliesTo;
+    if (new Set(narrowing).size !== narrowing.length) {
+      throw new Error(`column "${column.id}" names a record type twice`);
+    }
     for (const name of narrowing) {
       if (!types.names.includes(name)) {
         throw new Error(

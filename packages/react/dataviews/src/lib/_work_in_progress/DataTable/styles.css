@@ -128,6 +128,17 @@
       background-color: var(--color-foreground-ghost-hover);
     }
 
+    /* A selectable row on a coarse pointer: a held touch is the row's long
+       press, so the platform's own gestures for it — text selection and the
+       callout — are declined. Selectable rows carry aria-selected; others
+       keep their text selectable. */
+    @media (pointer: coarse) {
+      &[aria-selected] {
+        -webkit-touch-callout: none;
+        user-select: none;
+      }
+    }
+
     &[aria-selected="true"] {
       background-color: var(--color-foreground-secondary-information);
 
@@ -166,6 +177,17 @@
        one long value widen the track the solver just sized. Zero here. */
     min-inline-size: 0;
     padding-inline: var(--density-padding-inline);
+  }
+
+  /* The word for a field the row's type does not carry: read beside the
+     dash, taking no room and drawing nothing. Unthemable geometry. */
+  .ds.data-table-body-cell > .not-applicable {
+    position: absolute;
+    inline-size: 0;
+    block-size: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .ds.data-table-body-cell {
@@ -295,6 +317,17 @@
     /* The menu button's name: read, taking no room and drawing nothing.
        Unthemable geometry. */
     & > .menu > .trigger > .menu-label {
+      position: absolute;
+      inline-size: 0;
+      block-size: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* Which record types the column applies to: read, taking no room and
+       drawing nothing. Unthemable geometry. */
+    & > .scope {
       position: absolute;
       inline-size: 0;
       block-size: 0;

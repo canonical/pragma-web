@@ -28,4 +28,15 @@ describe("areColumnsEqual", () => {
       areColumnsEqual([{ ...name, cell }], [{ ...name, cell: () => null }]),
     ).toBe(false);
   });
+
+  it("sees a scope, a row header and hideability change with the ids kept", () => {
+    const scoped = { ...name, appliesTo: ["container"] };
+    expect(areColumnsEqual([scoped], [{ ...scoped }])).toBe(true);
+    expect(
+      areColumnsEqual([scoped], [{ ...name, appliesTo: ["virtual-machine"] }]),
+    ).toBe(false);
+    expect(areColumnsEqual([scoped], [name])).toBe(false);
+    expect(areColumnsEqual([name], [{ ...name, rowHeader: true }])).toBe(false);
+    expect(areColumnsEqual([name], [{ ...name, hideable: false }])).toBe(false);
+  });
 });

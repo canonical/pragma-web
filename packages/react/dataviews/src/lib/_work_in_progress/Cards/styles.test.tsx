@@ -16,6 +16,10 @@ import { fileURLToPath } from "node:url";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
+  createInstanceProvider,
+  MIXED_FLEET,
+} from "../../../../testing/instances.js";
+import {
   createMachineProvider,
   machine,
 } from "../../../../testing/machines.js";
@@ -59,7 +63,7 @@ const pending = (): HTMLElement => {
 /** Every class the cards render, over rows and over a status alike. */
 const everyRenderedClass = (): ReadonlySet<string> =>
   new Set(
-    [mounted(), pending()].flatMap((container) =>
+    [mounted(), pending(), scoped()].flatMap((container) =>
       [...container.querySelectorAll("[class]")].flatMap((element) => [
         ...element.classList,
       ]),
@@ -78,6 +82,23 @@ const mounted = (): HTMLElement => {
       title="name"
       label="Machines"
       selectable
+    />,
+  );
+  return container;
+};
+
+/** Cards over records of two types, showing a field one type does not carry. */
+const scoped = (): HTMLElement => {
+  const { provider } = createInstanceProvider({ rows: MIXED_FLEET });
+  const { container } = render(
+    <Cards
+      provider={provider}
+      fields={[
+        { id: "name", header: "Name" },
+        { id: "image", header: "Image" },
+      ]}
+      title="name"
+      label="Instances"
     />,
   );
   return container;

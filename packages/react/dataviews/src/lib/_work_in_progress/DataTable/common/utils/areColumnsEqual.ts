@@ -3,6 +3,15 @@ import { areDisplayFieldsEqual } from "../../../../utils/index.js";
 import type { DataTableColumn } from "../../types.js";
 import areColumnModelsEqual from "./areColumnModelsEqual.js";
 
+/** Whether two columns name the same record types, or both name none. */
+const areScopesEqual = (
+  a: readonly string[] | undefined,
+  b: readonly string[] | undefined,
+): boolean =>
+  a === undefined || b === undefined
+    ? a === b
+    : areListsEqual(a, b, (name, other) => name === other);
+
 /**
  * Whether two column arrays say the same thing about everything the
  * rendered tree reads, the model included. `header` and `cell` are
@@ -23,7 +32,10 @@ export default function areColumnsEqual(
       b,
       (column, other) =>
         column.sortable === other.sortable &&
-        column.resizable === other.resizable,
+        column.resizable === other.resizable &&
+        column.hideable === other.hideable &&
+        column.rowHeader === other.rowHeader &&
+        areScopesEqual(column.appliesTo, other.appliesTo),
     )
   );
 }

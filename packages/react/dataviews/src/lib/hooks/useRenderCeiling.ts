@@ -6,6 +6,20 @@ import type { UseRenderCeilingProps } from "./types.js";
 const COUNT = new Intl.NumberFormat("en");
 
 /**
+ * Whether this is a production build. Spelled as the token bundlers replace
+ * with a literal; where nothing replaced it and no `process` exists — a
+ * browser serving the source as written — the read throws, and that is
+ * development.
+ */
+const isProduction = (): boolean => {
+  try {
+    return process.env.NODE_ENV === "production";
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Warn, in development, when a renderer draws more rows than the ceiling
  * without virtualization: a prompt to measure, never a cap.
  *
@@ -27,8 +41,7 @@ export default function useRenderCeiling({
       warned.current ||
       count <= RENDER_CEILING ||
       virtualization === "in-use" ||
-      typeof process === "undefined" ||
-      process.env["NODE_ENV"] === "production"
+      isProduction()
     ) {
       return;
     }

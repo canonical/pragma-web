@@ -27,8 +27,11 @@ export default function useLongPress({
   onTap,
 }: UseLongPressProps): UseLongPressResult {
   const press = useRef<Press | null>(null);
-  // Set when the timer fires, read and cleared by the click that follows.
+  // Set when the timer fires, read and cleared by the click that follows the
+  // release — or, where the platform sends none, let go a tick after it, so
+  // no later click of another kind is taken for the press's.
   const fired = useRef(false);
+  const release = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latest = useRef({ onLongPress, onTap });
   latest.current = { onLongPress, onTap };
 
@@ -38,16 +41,37 @@ export default function useLongPress({
       press.current = null;
     }
   }, []);
+  // The release of a press: the compat click, where the platform sends one,
+  // is dispatched before any timer runs, so a fired press still standing a
+  // tick later had no click to swallow.
+  const released = useCallback((): void => {
+    cancel();
+    if (fired.current && release.current === null) {
+      release.current = setTimeout(() => {
+        release.current = null;
+        fired.current = false;
+      }, 0);
+    }
+  }, [cancel]);
   // A press still tracked when the element goes is let go with it.
-  useEffect(() => cancel, [cancel]);
+  useEffect(
+    () => () => {
+      cancel();
+      if (release.current !== null) {
+        clearTimeout(release.current);
+      }
+    },
+    [cancel],
+  );
 
   const onPointerDown = useCallback(
     (event: PointerEvent<HTMLElement>): void => {
+      // Any new press, of any pointer, is not the release of the last one.
+      fired.current = false;
       if (event.pointerType !== "touch") {
         return;
       }
       cancel();
-      fired.current = false;
       press.current = {
         x: event.clientX,
         y: event.clientY,
@@ -95,8 +119,8 @@ export default function useLongPress({
   return {
     onPointerDown,
     onPointerMove,
-    onPointerUp: cancel,
-    onPointerCancel: cancel,
+    onPointerUp: released,
+    onPointerCancel: released,
     onPointerLeave: cancel,
     onClick,
     onContextMenu,

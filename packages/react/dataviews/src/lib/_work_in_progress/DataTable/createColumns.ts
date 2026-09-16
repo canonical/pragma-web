@@ -10,20 +10,42 @@ import type { DisplayFieldCellProps } from "../../common/index.js";
 import type { DataTableColumn } from "./types.js";
 
 /**
+ * What a record carries at a name it does not declare: `unknown` where the
+ * record describes no names at all — the default row shape — and `undefined`
+ * where it describes its names and this is not one of them, which is what a
+ * row reads there.
+ */
+type Missing<TRow> = string extends keyof TRow ? unknown : undefined;
+
+/**
+ * What a path through an optional or nullable member may also be: nothing,
+ * where the member is absent, which a row reads as `undefined`.
+ */
+type Absent<TMember> = undefined extends TMember
+  ? undefined
+  : null extends TMember
+    ? undefined
+    : never;
+
+/**
  * The value one field of a record carries, by name or by dot path.
  *
  * A path is walked one own key at a time, as a row is read: `config.region`
- * is the type at `region` of the type at `config`. A name the record does not
- * describe — the default row shape describes none — carries `unknown`, which
- * is what a cell over such a field is handed.
+ * is the type at `region` of the type at `config`, or `undefined` where
+ * `config` may be absent. Distributed over a record that is a union of
+ * types, so a field only one type carries is that type's value or
+ * `undefined` — the not-applicable case — rather than the `unknown` a name
+ * no type carries would be.
  */
-type ValueAt<TRow, TName extends string> = TName extends keyof TRow
-  ? TRow[TName]
-  : TName extends `${infer THead}.${infer TRest}`
-    ? THead extends keyof TRow
-      ? ValueAt<NonNullable<TRow[THead]>, TRest>
-      : unknown
-    : unknown;
+type ValueAt<TRow, TName extends string> = TRow extends unknown
+  ? TName extends keyof TRow
+    ? TRow[TName]
+    : TName extends `${infer THead}.${infer TRest}`
+      ? THead extends keyof TRow
+        ? ValueAt<NonNullable<TRow[THead]>, TRest> | Absent<TRow[THead]>
+        : Missing<TRow>
+      : Missing<TRow>
+  : never;
 
 /**
  * The props a typed column's own content receives: its field's value at the
@@ -125,8 +147,18 @@ export default function createColumns<
   _collection: Collection<TFields, TRow>,
   columns: readonly TypedColumn<TFields, TRow>[],
 ): readonly DataTableColumn[] {
+  const ids = new Set<string>();
   return Object.freeze(
     columns.map((column): DataTableColumn => {
+      const named = column.id ?? column.field;
+      // Two columns over one field are told apart by the id the caller
+      // gives; without one they would share a key, a track and a scope.
+      if (ids.has(named)) {
+        throw new Error(
+          `two columns are named "${named}"; give the second an id of its own`,
+        );
+      }
+      ids.add(named);
       const {
         appliesTo,
         cell,

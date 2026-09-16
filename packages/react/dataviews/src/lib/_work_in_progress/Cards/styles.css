@@ -67,5 +67,16 @@
       margin: 0;
       overflow-wrap: anywhere;
     }
+
+    /* The word for a field the record's type does not carry: read beside
+       the dash, taking no room and drawing nothing. Unthemable geometry. */
+    & .data-card .not-applicable {
+      position: absolute;
+      inline-size: 0;
+      block-size: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
   }
 }

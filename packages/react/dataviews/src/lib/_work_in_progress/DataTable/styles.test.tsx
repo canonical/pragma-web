@@ -29,6 +29,10 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { pageOf } from "../../../../testing/fixtures.js";
 import {
+  createInstanceProvider,
+  MIXED_FLEET,
+} from "../../../../testing/instances.js";
+import {
   createMachineProvider,
   declareMachineOrdering,
   type Machine,
@@ -245,6 +249,22 @@ const renderFramedTable = (): HTMLElement => {
   return container;
 };
 
+/** A table over records of two types: a scoped column and a not-applicable cell. */
+const renderScopedTable = (): HTMLElement => {
+  const { provider } = createInstanceProvider({ rows: MIXED_FLEET });
+  const { container } = render(
+    <DataTable
+      provider={provider}
+      columns={[
+        { id: "name", header: "Name" },
+        { id: "image", header: "Image" },
+      ]}
+      label="Instances"
+    />,
+  );
+  return container;
+};
+
 /** A table whose first column heads each row. */
 const renderRowHeaderTable = (): HTMLElement => {
   const { provider } = createMachineProvider({
@@ -312,6 +332,10 @@ describe("DataTable stylesheet", () => {
     }
     cleanup();
     for (const name of classesOf(renderFramedTable())) {
+      rendered.add(name);
+    }
+    cleanup();
+    for (const name of classesOf(renderScopedTable())) {
       rendered.add(name);
     }
     cleanup();
@@ -532,6 +556,7 @@ describe("DataTable anatomy", () => {
       renderSettingsTable,
       renderRowHeaderTable,
       renderFramedTable,
+      renderScopedTable,
     ]) {
       const container = mount();
       for (const selector of [...stated]) {

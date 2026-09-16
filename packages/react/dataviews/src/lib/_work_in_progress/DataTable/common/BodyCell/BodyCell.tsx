@@ -26,14 +26,16 @@ const componentCssClassName = "ds data-table-body-cell";
  * The dash alone would be indistinguishable from an empty field, which is a
  * different fact — the record has no value there, rather than the field not
  * being one of its own — so the two are told apart by what is read, not by
- * what is seen.
+ * what is seen. The word is clipped rather than hidden: a hidden node leaves
+ * the accessibility tree, and a reader would meet the same silence as an
+ * empty cell.
  */
 function NotApplicable(): ReactElement {
   const messages = useContext(MessagesContext);
   return (
     <>
       <span aria-hidden="true">—</span>
-      <span hidden>{messages.cellNotApplicable}</span>
+      <span className="not-applicable">{messages.cellNotApplicable}</span>
     </>
   );
 }
