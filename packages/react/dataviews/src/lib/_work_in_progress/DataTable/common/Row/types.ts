@@ -27,8 +27,11 @@ export type RowProps<TRow extends object> = {
   >;
   readonly channels: RowChannels<TRow>;
   readonly columns: readonly DataTableColumn[];
+  /** The column heading this row, whose cell names it, or null for none. */
+  readonly rowHeader: DataTableColumn | null;
   readonly selectable: boolean;
-  readonly rowLabel: (row: TRow, rowId: string) => string;
+  /** Names a record for its checkbox, or answers null where the caller gave no name. */
+  readonly rowLabel: (row: TRow, rowId: string) => string | null;
   /**
    * Whether one column applies to one record: its field's own scope,
    * narrowed by the column's where it declares one. The table's, one

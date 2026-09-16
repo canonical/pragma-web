@@ -39,6 +39,14 @@ export type DataTableColumn = DisplayField & {
    * otherwise draw every cell not applicable and say nothing.
    */
   readonly appliesTo?: readonly string[];
+  /**
+   * This column's cell is the row's header: it names the row, so a reader
+   * hears its text before each of the row's other cells, and the row's
+   * selection checkbox is named by it unless `rowLabel` names the row. A
+   * table has at most one, and it is never hidden — hiding it would take
+   * the row's name with it — so `hideable` reads as false on it.
+   */
+  readonly rowHeader?: boolean;
   /** Declared sizing. Defaults to a flexible column with a 96px minimum. */
   readonly sizing?: ColumnSizing;
   /**
@@ -93,9 +101,11 @@ type OwnProps<
   /** Render a leading selection column backed by the provider's selection. */
   readonly selectable?: boolean;
   /**
-   * Names one record, for its selection checkbox. Defaults to its
-   * identity. Written as a lambda it costs nothing: the table always calls
-   * the latest one and never re-renders a row because the function is new.
+   * Names one record, for its selection checkbox. Defaults to the text of
+   * the row header's cell where a column is the row header, and to the
+   * record's identity otherwise. Written as a lambda it costs nothing: the
+   * table always calls the latest one and never re-renders a row because
+   * the function is new.
    */
   readonly rowLabel?: (row: TRow, rowId: string) => string;
   /**

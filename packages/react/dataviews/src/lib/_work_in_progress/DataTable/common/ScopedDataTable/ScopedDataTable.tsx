@@ -62,6 +62,7 @@ import {
 } from "../index.js";
 import { areColumnModelsEqual, readSizing } from "../utils/index.js";
 import readColumnScopes from "./readColumnScopes.js";
+import readRowHeader from "./readRowHeader.js";
 import "../../styles.css";
 
 /**
@@ -73,9 +74,6 @@ const componentCssClassName = "ds data-table dense";
 
 /** One identity for a source that orders by nothing. */
 const NO_SORTABLE_FIELDS: readonly string[] = Object.freeze([]);
-
-/** A record answers to its own identity until the caller names it better. */
-const defaultRowLabel = (_row: object, rowId: string): string => rowId;
 
 /**
  * The body a virtualization descriptor carries, given what a virtualized body
@@ -106,7 +104,7 @@ export default function ScopedDataTable<
   columns,
   label,
   selectable = false,
-  rowLabel = defaultRowLabel,
+  rowLabel,
   renderStatus,
   virtualization,
   settings,
@@ -137,6 +135,20 @@ export default function ScopedDataTable<
   const baseId = useId();
   const hydrated = useIsHydrated();
 
+  // The column heading each row, if one is declared, checked where the table
+  // mounts. It reads as never hideable, so the columns every arrangement and
+  // menu reads carry that reading rather than each of them learning the rule.
+  const rowHeader = useMemo(() => readRowHeader(columns), [columns]);
+  const listed = useMemo(
+    () =>
+      rowHeader === null
+        ? columns
+        : columns.map((column) =>
+            column.rowHeader === true ? rowHeader : column,
+          ),
+    [columns, rowHeader],
+  );
+
   // The columns the presentation shows, in its order. Both derivations
   // below are keyed on content, not on array identity: a caller who
   // rebuilds its column array on every render must not re-mint the layout,
@@ -145,7 +157,7 @@ export default function ScopedDataTable<
   // inline `header` node must not cost anyone a new layout.
   const rendered = useColumnArrangement({
     presentation: provider.presentation,
-    columns,
+    columns: listed,
   });
   const model = useStableValue(rendered, areColumnModelsEqual);
 
@@ -245,7 +257,13 @@ export default function ScopedDataTable<
     changeColumn,
     resetColumns,
     listDestinations,
-  } = useColumnManagement({ provider, columns, headerRow, messages, announce });
+  } = useColumnManagement({
+    provider,
+    columns: listed,
+    headerRow,
+    messages,
+    announce,
+  });
   // One value while none of it changes, so a frame of a resize re-renders
   // no settings menu.
   const menu = useMemo<SettingsMenuProps>(
@@ -276,8 +294,12 @@ export default function ScopedDataTable<
 
   // Held behind one identity apiece: the README's own examples pass these
   // as lambdas, and a new function per render would re-render every row
-  // and every cell of the body for nothing.
-  const nameRow = useStableCallback(rowLabel);
+  // and every cell of the body for nothing. Answers null where the caller
+  // names no row, so a row is named by its header, or by its identity.
+  const nameRow = useStableCallback(
+    (row: TRow, rowId: string): string | null =>
+      rowLabel === undefined ? null : rowLabel(row, rowId),
+  );
   // The messages' words for a status, unless the caller renders its own.
   const describe = useCallback(
     (shown: DisplayStatus) => describeStatus(shown, messages),
@@ -307,6 +329,7 @@ export default function ScopedDataTable<
           provider={provider}
           channels={rowScopes.readRow(entry.rowId)}
           columns={rendered}
+          rowHeader={rowHeader}
           selectable={selectable}
           rowLabel={nameRow}
           applicabilityOf={applicabilityOf}
@@ -317,6 +340,7 @@ export default function ScopedDataTable<
       provider,
       rowScopes,
       rendered,
+      rowHeader,
       selectable,
       nameRow,
       applicabilityOf,

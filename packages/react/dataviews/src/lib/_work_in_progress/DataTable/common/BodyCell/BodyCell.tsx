@@ -96,6 +96,7 @@ function BodyCell<TRow extends object>({
   channels,
   column,
   field,
+  id,
   applicability,
 }: BodyCellProps<TRow>): ReactElement {
   const channel = channels.fields[field];
@@ -117,10 +118,17 @@ function BodyCell<TRow extends object>({
     [provider, channels, column.id, applicability],
   );
   const Content = column.cell;
+  const header = column.rowHeader === true;
   return (
     <CellContext value={cell}>
-      {/* biome-ignore lint/a11y/useSemanticElements: <td> is only valid inside a <table>, and this grid is deliberately not one */}
-      <div role="cell" className={componentCssClassName}>
+      {/* biome-ignore lint/a11y/useSemanticElements: <td> and <th> are only valid inside a <table>, and this grid is deliberately not one */}
+      <div
+        id={id}
+        role={header ? "rowheader" : "cell"}
+        className={[componentCssClassName, header && "row-header"]
+          .filter(Boolean)
+          .join(" ")}
+      >
         {Content !== undefined ? (
           <CustomContent
             Content={Content}
@@ -153,8 +161,9 @@ function BodyCell<TRow extends object>({
  *
  * That is the design system's description of the block. What this
  * implementation covers: the text cell, the cell of a field a record's type
- * does not carry, and a column's own renderer, with no inline editing or row
- * actions yet. A cell showing a field's value subscribes to that one field,
+ * does not carry, a column's own renderer, and the row header — the cell of
+ * the one column declared `rowHeader`, which names its row — with no inline
+ * editing or row actions yet. A cell showing a field's value subscribes to that one field,
  * so a record update re-renders only the cells whose values actually
  * changed; a cell drawing a column's own content subscribes to the record,
  * which that content is handed. Either way it installs the cell context the
