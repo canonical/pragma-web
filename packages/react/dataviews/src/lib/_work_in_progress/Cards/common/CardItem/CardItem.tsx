@@ -15,6 +15,7 @@ function CardItem<TRow extends object>({
   title,
   details,
   applicabilityOf,
+  typeOf,
   selectable,
   nameRecord,
 }: CardItemProps<TRow>): ReactElement {
@@ -29,8 +30,10 @@ function CardItem<TRow extends object>({
   const named = useDataViewsValue(channels.record, (record) =>
     nameRecord(record, channels.id),
   );
-  // Read as the card renders rather than subscribed: which fields apply to a
-  // record is a fact about its type, which no record changes under a card.
+  // Which fields apply to the record is a fact about its type, so the card
+  // watches the type alone: it renders again when a record comes back as
+  // another type, and for no move of any field.
+  useDataViewsValue(channels.record, typeOf);
   const record = channels.record.get();
   const titleChannel = channels.fields[readFieldName(title)];
   if (titleChannel === undefined) {

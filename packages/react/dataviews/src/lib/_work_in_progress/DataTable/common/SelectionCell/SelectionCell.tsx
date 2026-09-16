@@ -21,7 +21,6 @@ export default function SelectionCell<TRow extends object>({
   rowHeader,
 }: SelectionCellProps<TRow>): ReactElement {
   const messages = useContext(MessagesContext);
-  const record = useDataViewsValue(channels.record);
   const headerField = rowHeader === null ? null : readFieldName(rowHeader);
   const nameChannel =
     headerField === null ? null : channels.fields[headerField];
@@ -29,15 +28,22 @@ export default function SelectionCell<TRow extends object>({
     // The scopes observe every field the columns read, the header's included.
     throw new Error(`no channel observes the field "${headerField}"`);
   }
-  // The header's own channel where there is one, so the name follows the
-  // text on screen; the record otherwise, which is already watched.
-  const headerValue = useDataViewsValue(nameChannel ?? channels.record);
-  const spelled =
-    nameChannel === null ? null : spellPrimitiveValue(headerValue);
+  // Each read as the name it yields rather than the value it is read from:
+  // a record republished with another field moved re-renders no checkbox.
+  // A name is a string, so equal names are identical reads.
+  const named = useDataViewsValue(channels.record, (record) =>
+    rowLabel(record, channels.id),
+  );
+  // The header's text, where a column is the row header; where none is, a
+  // channel the row already watches, read as nothing.
+  const spelled = useDataViewsValue(
+    nameChannel ?? channels.selected,
+    (value) => (nameChannel === null ? null : spellPrimitiveValue(value)),
+  );
   // Blank is no name at all: a header holding empty text, or none, leaves
   // the row named by its identity rather than by nothing.
   const name =
-    rowLabel(record, channels.id) ??
+    named ??
     (spelled !== null && spelled.trim() !== "" ? spelled : channels.id);
   return (
     // biome-ignore lint/a11y/useSemanticElements: <td> is only valid inside a <table>, and this grid is deliberately not one

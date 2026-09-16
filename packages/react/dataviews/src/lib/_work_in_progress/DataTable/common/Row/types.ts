@@ -30,12 +30,6 @@ export type RowProps<TRow extends object> = {
   /** The column heading this row, whose cell names it, or null for none. */
   readonly rowHeader: DataTableColumn | null;
   readonly selectable: boolean;
-  /** Whether the table is in selection mode, where a tap on the row toggles it. */
-  readonly selecting: boolean;
-  /** A long press on the row, on touch: selects it and enters selection mode. */
-  readonly onLongPress: (rowId: string) => void;
-  /** A tap on the row while in selection mode: toggles it. */
-  readonly onTap: (rowId: string) => void;
   /** Names a record for its checkbox, or answers null where the caller gave no name. */
   readonly rowLabel: (row: TRow, rowId: string) => string | null;
   /**
@@ -49,6 +43,11 @@ export type RowProps<TRow extends object> = {
     column: DataTableColumn,
     record: TRow,
   ) => Applicability;
+  /**
+   * The declared type a record carries, or null: what the row watches of its
+   * record. The table's, one identity for every row.
+   */
+  readonly typeOf: (record: TRow) => string | null;
   /** The row's logical position, reported only by a virtualized table. */
   readonly position?: number | undefined;
   /** The row element, for a virtualized table to measure. */

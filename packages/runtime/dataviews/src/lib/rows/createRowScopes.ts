@@ -4,11 +4,14 @@ import {
   protectChannel,
   type ReadonlyChannel,
 } from "../observable/index.js";
-import readField from "./readField.js";
+import compileFieldReader from "./compileFieldReader.js";
 import type { RowChannels, RowScopes, RowScopesConfig } from "./types.js";
 
 /** One observed field, paired with the channel it publishes into. */
-type FieldSlot = { readonly field: string; readonly channel: Channel<unknown> };
+type FieldSlot = {
+  readonly read: (row: object) => unknown;
+  readonly channel: Channel<unknown>;
+};
 
 /** A row's channels with the writable side its updates go through. */
 type ScopeRecord<TRow extends object> = {
@@ -41,6 +44,12 @@ export default function createRowScopes<TRow extends object>(
   config: RowScopesConfig<TRow>,
 ): RowScopes<TRow> {
   const observed = [...new Set(config.fields)];
+  // Each observed field's read compiled once for the registry, not once per
+  // row minted or reconciled.
+  const readers = observed.map((field) => ({
+    field,
+    read: compileFieldReader(field),
+  }));
   const records = new Map<string, ScopeRecord<TRow>>();
   const ids = createChannel<readonly string[]>(Object.freeze([]), {
     equals: sameOrder,
@@ -53,10 +62,10 @@ export default function createRowScopes<TRow extends object>(
   ): ScopeRecord<TRow> => {
     const fields: Record<string, ReadonlyChannel<unknown>> = {};
     const slots: FieldSlot[] = [];
-    for (const field of observed) {
-      const channel = createChannel<unknown>(readField(record, field));
+    for (const { field, read } of readers) {
+      const channel = createChannel<unknown>(read(record));
       fields[field] = protectChannel(channel);
-      slots.push({ field, channel });
+      slots.push({ read, channel });
     }
     const row = createChannel<TRow>(record);
     const membership = createChannel(selected);
@@ -94,7 +103,7 @@ export default function createRowScopes<TRow extends object>(
         continue;
       }
       for (const slot of existing.slots) {
-        slot.channel.set(readField(entry.record, slot.field));
+        slot.channel.set(slot.read(entry.record));
       }
     }
     for (const id of records.keys()) {

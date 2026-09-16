@@ -8,7 +8,7 @@
  * The list names every control a cell may hold.
  */
 import { describe, expect, it } from "vitest";
-import isWithinControl from "../../lib/_work_in_progress/DataTable/common/Row/isWithinControl.js";
+import isWithinControl from "../../lib/_work_in_progress/DataTable/common/utils/isWithinControl.js";
 
 const element = (html: string): Element => {
   const host = document.createElement("div");

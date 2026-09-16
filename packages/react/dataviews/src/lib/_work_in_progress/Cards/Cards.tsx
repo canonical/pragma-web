@@ -144,6 +144,10 @@ export default function Cards<
     (field: string, record: TRow): Applicability =>
       readProviderHost(provider).applicability(field, record),
   );
+  // The declared type a record carries: what each card watches of its record.
+  const typeOf = useStableCallback((record: TRow): string | null =>
+    readProviderHost(provider).typeOf(record),
+  );
   // The words' own text for a status, unless the caller renders its own.
   const describe = useCallback(
     (shown: DisplayStatus) => describeStatus(shown, words),
@@ -173,6 +177,7 @@ export default function Cards<
           selectable={selectable}
           nameRecord={nameRecord}
           applicabilityOf={applicabilityOf}
+          typeOf={typeOf}
         />
       </section>
     </MessagesContext>

@@ -1,13 +1,18 @@
 /**
- * Reading one field of a record, by name and by dot path. Mutation-tested:
+ * Reading one field of a record, by name and by dot path, through a reader
+ * compiled once for the field. Mutation-tested:
  * each expectation fails if the own-property rule, the path walk or the
  * answer for an unreadable segment moves.
  */
 
 import { describe, expect, it } from "vitest";
-import readField from "./readField.js";
+import compileFieldReader from "./compileFieldReader.js";
 
-describe("readField", () => {
+/** One read, through a reader compiled for the field. */
+const readField = (row: object, field: string): unknown =>
+  compileFieldReader(field)(row);
+
+describe("compileFieldReader", () => {
   describe("a flat field", () => {
     it("reads an own property", () => {
       expect(readField({ name: "web-1" }, "name")).toBe("web-1");
@@ -82,5 +87,12 @@ describe("readField", () => {
         readField({ "config.region": "eu" }, "config.region"),
       ).toBeUndefined();
     });
+  });
+
+  it("answers each row it is handed from the one compiled path", () => {
+    const read = compileFieldReader("config.region");
+    expect(read({ config: { region: "eu" } })).toBe("eu");
+    expect(read({ config: { region: "us" } })).toBe("us");
+    expect(read({})).toBeUndefined();
   });
 });

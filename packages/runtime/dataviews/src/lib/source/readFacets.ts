@@ -1,6 +1,6 @@
 import type { Slice } from "../query/index.js";
 import type { Facet, FacetValue } from "../result/index.js";
-import { readField } from "../rows/index.js";
+import { compileFieldReader } from "../rows/index.js";
 import {
   compareByCodeUnit,
   type FieldKind,
@@ -43,8 +43,9 @@ const FACET_READERS: {
     const isText = definition.options === undefined;
     // Keyed by the value itself: a map tells the number 42 from the text "42".
     const tallies = new Map<string | number, Tally>();
+    const read = compileFieldReader(definition.field);
     for (const row of rows) {
-      const held = readField(row, definition.field);
+      const held = read(row);
       // The order keys a string or a number, as `isAny` reads a choice value,
       // and nothing else: a value it cannot key is no choice value.
       const key = order.readKey(held);
@@ -72,8 +73,9 @@ const FACET_READERS: {
   },
   flag: (rows, definition) => {
     // Set as `isSet` reads it: any value that is neither absent nor null.
+    const read = compileFieldReader(definition.field);
     const set = rows.filter((row) => {
-      const value = readField(row, definition.field);
+      const value = read(row);
       return value !== null && value !== undefined;
     }).length;
     return {
@@ -117,8 +119,9 @@ const readRange = <TValue extends string | number>(
 ): Facet => {
   let least: TValue | null = null;
   let greatest: TValue | null = null;
+  const read = compileFieldReader(definition.field);
   for (const row of rows) {
-    const value = readField(row, definition.field);
+    const value = read(row);
     if (!accepts(value)) {
       continue;
     }

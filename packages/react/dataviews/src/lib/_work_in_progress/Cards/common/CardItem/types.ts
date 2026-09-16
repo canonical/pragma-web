@@ -42,4 +42,9 @@ export type CardItemProps<TRow extends object> = {
    * every card, asked per field the card shows.
    */
   readonly applicabilityOf: (field: string, record: TRow) => Applicability;
+  /**
+   * The declared type a record carries, or null: what a card watches of its
+   * record. The cards', one identity for every card.
+   */
+  readonly typeOf: (record: TRow) => string | null;
 };

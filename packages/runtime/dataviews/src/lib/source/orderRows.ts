@@ -1,5 +1,5 @@
 import { collapseSortTerms } from "../query/index.js";
-import { readField } from "../rows/index.js";
+import { compileFieldReader } from "../rows/index.js";
 import {
   compareByCodeUnit,
   type KindOrder,
@@ -175,9 +175,14 @@ export default function orderRows<TRow extends object>(
   if (terms.length === 0) {
     return rows;
   }
+  // Each term's read compiled once for the pass, not once per row.
+  const readers = terms.map((term) => ({
+    term,
+    read: compileFieldReader(term.field),
+  }));
   const keyed = rows.map((row) => ({
     row,
-    keys: terms.map((term) => term.order.readKey(readField(row, term.field))),
+    keys: readers.map(({ term, read }) => term.order.readKey(read(row))),
   }));
   keyed.sort((a, b) => {
     // An index loop: a sort calls this for every comparison, and an entries

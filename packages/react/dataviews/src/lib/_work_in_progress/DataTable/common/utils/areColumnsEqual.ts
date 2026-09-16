@@ -2,15 +2,7 @@ import { areListsEqual } from "@canonical/dataviews-core/bindings";
 import { areDisplayFieldsEqual } from "../../../../utils/index.js";
 import type { DataTableColumn } from "../../types.js";
 import areColumnModelsEqual from "./areColumnModelsEqual.js";
-
-/** Whether two columns name the same record types, or both name none. */
-const areScopesEqual = (
-  a: readonly string[] | undefined,
-  b: readonly string[] | undefined,
-): boolean =>
-  a === undefined || b === undefined
-    ? a === b
-    : areListsEqual(a, b, (name, other) => name === other);
+import areColumnScopesEqual from "./areColumnScopesEqual.js";
 
 /**
  * Whether two column arrays say the same thing about everything the
@@ -27,6 +19,7 @@ export default function areColumnsEqual(
   return (
     areColumnModelsEqual(a, b) &&
     areDisplayFieldsEqual(a, b) &&
+    areColumnScopesEqual(a, b) &&
     areListsEqual(
       a,
       b,
@@ -34,8 +27,7 @@ export default function areColumnsEqual(
         column.sortable === other.sortable &&
         column.resizable === other.resizable &&
         column.hideable === other.hideable &&
-        column.rowHeader === other.rowHeader &&
-        areScopesEqual(column.appliesTo, other.appliesTo),
+        column.rowHeader === other.rowHeader,
     )
   );
 }
