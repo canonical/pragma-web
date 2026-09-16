@@ -1,3 +1,4 @@
+import type { Applicability } from "@canonical/dataviews-core";
 import { readApplicability } from "@canonical/dataviews-core/bindings";
 import readFieldName from "./readFieldName.js";
 import type {
@@ -33,9 +34,20 @@ export default function readFieldScopes({
     const field = readFieldName(column);
     const narrowing = column.appliesTo;
     if (narrowing === undefined) {
+      const answers = new Map<string | null, Applicability>();
       scopes.set(column.id, {
         appliesTo: schema.findField(field)?.appliesTo ?? null,
-        applicability: (type) => readApplicability(collection, field, type),
+        // Read once per type the column is asked about — at most every
+        // declared type and none — rather than once per cell.
+        applicability: (type) => {
+          const known = answers.get(type);
+          if (known !== undefined) {
+            return known;
+          }
+          const answer = readApplicability(collection, field, type);
+          answers.set(type, answer);
+          return answer;
+        },
       });
       continue;
     }

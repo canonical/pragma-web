@@ -69,6 +69,7 @@ import {
   TableBody,
 } from "../index.js";
 import {
+  areBodyColumnsEqual,
   areColumnModelsEqual,
   areColumnsEqual,
   isWithinControl,
@@ -172,22 +173,22 @@ export default function ScopedDataTable<
   // The column heading each row, if one is declared, checked where the table
   // mounts. It reads as never hideable, so the columns every arrangement and
   // menu reads carry that reading rather than each of them learning the rule.
+  // The caller's columns, held at one reference while they say the same, so
+  // a caller's inline columns re-read and re-arrange nothing.
+  const declaredColumns = useStableValue(columns, areColumnsEqual);
   const declaredHeader = useMemo(
-    () => readRowHeader(columns, provider.collection),
-    [columns, provider],
+    () => readRowHeader(declaredColumns, provider.collection),
+    [declaredColumns, provider],
   );
   const listed = useMemo(
     () =>
       declaredHeader === null
-        ? columns
-        : columns.map((column) =>
+        ? declaredColumns
+        : declaredColumns.map((column) =>
             column.rowHeader === true ? declaredHeader : column,
           ),
-    [columns, declaredHeader],
+    [declaredColumns, declaredHeader],
   );
-  // Held at one reference while it says the same, as the rendered list is,
-  // so a caller's inline columns re-arrange nothing.
-  const declaredColumns = useStableValue(listed, areColumnsEqual);
   // Held by what a scope is read from alone, so an inline heading or cell
   // re-reads no scope.
   const scopedColumns = useStableValue(listed, areFieldScopesEqual);
@@ -200,9 +201,12 @@ export default function ScopedDataTable<
   // inline `header` node must not cost anyone a new layout.
   const rendered = useColumnArrangement({
     presentation: provider.presentation,
-    columns: declaredColumns,
+    columns: listed,
   });
   const model = useStableValue(rendered, areColumnModelsEqual);
+  // What the body rows are handed: held by what a row reads, the heading
+  // left out, so inline headings re-render the header row and no body row.
+  const bodyColumns = useStableValue(rendered, areBodyColumnsEqual);
 
   const fields = useMemo<readonly string[]>(
     () => model.map(readFieldName),
@@ -295,8 +299,11 @@ export default function ScopedDataTable<
       }
     },
     onTap: (event) => {
+      if (!selecting) {
+        return;
+      }
       const rowId = readRowId(event.target, event.currentTarget);
-      if (selecting && rowId !== null && !isWithinControl(event.target)) {
+      if (rowId !== null && !isWithinControl(event.target)) {
         provider.selection.toggle(rowId);
       }
     },
@@ -374,7 +381,7 @@ export default function ScopedDataTable<
     listDestinations,
   } = useColumnManagement({
     provider,
-    columns: declaredColumns,
+    columns: listed,
     headerRow,
     messages,
     announce,
@@ -442,7 +449,7 @@ export default function ScopedDataTable<
           position={placement?.position}
           provider={provider}
           channels={rowScopes.readRow(entry.rowId)}
-          columns={rendered}
+          columns={bodyColumns}
           selectable={selectable}
           rowLabel={nameRow}
           decideApplicability={decideApplicability}
@@ -453,7 +460,7 @@ export default function ScopedDataTable<
       renderer,
       provider,
       rowScopes,
-      rendered,
+      bodyColumns,
       selectable,
       nameRow,
       decideApplicability,

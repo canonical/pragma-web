@@ -152,16 +152,18 @@ export default function Cards<
     (row: TRow, rowId: string): string | null =>
       rowLabel === undefined ? null : rowLabel(row, rowId),
   );
-  // Every declared field's scope, checked where the cards mount, once per
-  // held field list, so a field rebuilt inline re-reads none.
+  // Every declared field's scope, checked where the cards mount, keyed on
+  // what a scope is read from alone, so a heading rebuilt inline re-reads
+  // none.
+  const scoped = useStableValue(fields, areFieldScopesEqual);
   const readScope = useMemo(
     () =>
       readFieldScopes({
         collection: provider.collection,
-        fields: declared,
+        fields: scoped,
         subject: "Cards field",
       }),
-    [declared, provider],
+    [scoped, provider],
   );
   // Whether one field applies to a card's record of one type, as a table
   // asks it of a row. One identity, so a re-render of the cards re-renders

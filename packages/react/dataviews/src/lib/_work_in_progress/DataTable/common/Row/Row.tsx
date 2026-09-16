@@ -1,4 +1,4 @@
-import { memo, type ReactElement, useId } from "react";
+import { memo, type ReactElement, useId, useMemo } from "react";
 import { useDataViewsValue } from "../../../../hooks/index.js";
 import { readFieldName } from "../../../../utils/index.js";
 import { BodyCell } from "../BodyCell/index.js";
@@ -28,7 +28,10 @@ function Row<TRow extends object>({
   const type = useDataViewsValue(channels.record, readType);
   // The column heading the row, if any; the table checked there is one at
   // most where it mounted.
-  const rowHeader = columns.find((column) => column.rowHeader === true) ?? null;
+  const rowHeader = useMemo(
+    () => columns.find((column) => column.rowHeader === true) ?? null,
+    [columns],
+  );
   return (
     // aria-selected is only meaningful where selection is offered, and it
     // must agree with the row's checkbox: both read this one channel.
