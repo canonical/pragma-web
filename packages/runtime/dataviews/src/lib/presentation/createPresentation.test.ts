@@ -83,7 +83,7 @@ describe("createPresentation", () => {
     await store.create({
       id: "v1",
       name: "Wide",
-      query: "as=table",
+      query: "",
       presentation: {},
     });
     await store.patchPresentation("default", { density: "dense", width: 100 });
@@ -167,7 +167,7 @@ describe("createPresentation", () => {
     await store.create({
       id: "v1",
       name: "Wide",
-      query: "as=table",
+      query: "",
       presentation: {},
     });
     await store.patchPresentation("default", { width: 100 });
@@ -784,7 +784,7 @@ describe("createPresentation", () => {
           await store.create({
             id: "v1",
             name: "Wide",
-            query: "as=table",
+            query: "",
             presentation: {},
           });
           return { store, presentation: createPresentation({ store }) };
