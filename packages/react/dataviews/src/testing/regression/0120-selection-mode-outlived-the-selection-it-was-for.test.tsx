@@ -11,6 +11,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
+import readAnnouncements from "../../../testing/readAnnouncements.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { LONG_PRESS_MS } from "../../lib/hooks/constants.js";
 
@@ -54,5 +55,42 @@ describe("selection mode", () => {
     expect(screen.getByRole("table")).not.toHaveAttribute(
       "data-selection-mode",
     );
+  });
+
+  it("ends when the provider changes to one whose selection is empty", async () => {
+    const rows = [machine("m-1", "alpha")];
+    const first = createMachineProvider({ rows }).provider;
+    const second = createMachineProvider({ rows }).provider;
+    const view = render(
+      <DataTable
+        provider={first}
+        columns={columns}
+        label="Machines"
+        selectable
+      />,
+    );
+    fireEvent.pointerDown(screen.getByRole("row", { name: "alpha" }), {
+      pointerType: "touch",
+      clientX: 1,
+      clientY: 1,
+    });
+    act(() => {
+      vi.advanceTimersByTime(LONG_PRESS_MS);
+    });
+    expect(await readAnnouncements()).toHaveLength(1);
+    // The new provider's empty selection publishes nothing: only the read
+    // taken as the mode subscribes can end it.
+    view.rerender(
+      <DataTable
+        provider={second}
+        columns={columns}
+        label="Machines"
+        selectable
+      />,
+    );
+    expect(screen.getByRole("table")).not.toHaveAttribute(
+      "data-selection-mode",
+    );
+    expect((await readAnnouncements()).at(-1)).toBe("Selection mode ended.");
   });
 });

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 import { consumerCode } from "../../../storybook/consumerCode.js";
 import { withAppScope, withFrame } from "../../../storybook/decorators.js";
 import {
@@ -22,8 +22,10 @@ import {
   useMachineProvider,
 } from "../../../storybook/machines/story-utils.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
+import { LONG_PRESS_MS } from "../../hooks/constants.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { virtualizeRows } from "../../virtualization/index.js";
+import { PaginationBar } from "../PaginationBar/index.js";
 import createColumns from "./createColumns.js";
 import Component from "./DataTable.js";
 import type { DataTableColumn, DataTableProps } from "./types.js";
@@ -453,6 +455,123 @@ export const Selectable: Story = {
     await expect(
       Math.abs(32 + shared - canvas.getByRole("table").clientWidth),
     ).toBeLessThanOrEqual(1);
+  },
+};
+
+/** A touch at the centre of an element, as a finger lands on it. */
+const touchOf = (element: Element) => {
+  const box = element.getBoundingClientRect();
+  return {
+    pointerType: "touch",
+    clientX: box.left + box.width / 2,
+    clientY: box.top + box.height / 2,
+  };
+};
+
+/** The body row a host's checkbox sits in. */
+const rowOf = async (
+  canvas: Parameters<NonNullable<Story["play"]>>[0]["canvas"],
+  host: string,
+): Promise<HTMLElement> => {
+  const checkbox = await canvas.findByRole("checkbox", {
+    name: `Select ${host}`,
+  });
+  const row = checkbox.closest<HTMLElement>("[role='row']");
+  if (row === null) {
+    throw new Error(`no row holds the checkbox for ${host}`);
+  }
+  return row;
+};
+
+/**
+ * Selection on touch: the checkbox stays the baseline, and a long press on a
+ * row selects it and puts the table in selection mode, where a tap on a row
+ * toggles it. Deselecting the last row ends the mode. Both are announced,
+ * and the mode is stated on the table as `data-selection-mode`.
+ *
+ * The play holds a touch on alder past the long-press delay, taps birch into
+ * the selection and taps alder out of it, leaving the table in the mode.
+ */
+export const SelectionOnTouch: Story = {
+  parameters: consumerCode({
+    parts: tableParts,
+    declarations: plainColumnsCode,
+    render: selectableTableCode,
+  }),
+  args: { selectable: true },
+  render: renderMachines(plainColumns),
+  play: async ({ canvas }) => {
+    const alder = await rowOf(canvas, "alder.example.com");
+    const birch = await rowOf(canvas, "birch.example.com");
+    const table = canvas.getByRole("table");
+    const tap = async (row: HTMLElement): Promise<void> => {
+      await fireEvent.pointerDown(row, touchOf(row));
+      await fireEvent.pointerUp(row, touchOf(row));
+      await fireEvent.click(row);
+    };
+    await fireEvent.pointerDown(alder, touchOf(alder));
+    await new Promise((resolve) => setTimeout(resolve, LONG_PRESS_MS + 100));
+    await fireEvent.pointerUp(alder, touchOf(alder));
+    await fireEvent.click(alder);
+    await waitFor(() =>
+      expect(table).toHaveAttribute("data-selection-mode", "true"),
+    );
+    await expect(alder).toHaveAttribute("aria-selected", "true");
+    await tap(birch);
+    await waitFor(() => expect(birch).toHaveAttribute("aria-selected", "true"));
+    await tap(alder);
+    await waitFor(() =>
+      expect(
+        within(alder).getByRole("checkbox", {
+          name: "Select alder.example.com",
+        }),
+      ).not.toBeChecked(),
+    );
+    // Birch is still selected, so the mode holds.
+    await expect(table).toHaveAttribute("data-selection-mode", "true");
+  },
+};
+
+/** The table in a capped frame, with the pagination bar in its footer. */
+function FramedMachines(args: StoryTableProps): ReactElement {
+  const provider = useMachineProvider();
+  return (
+    <Component
+      {...args}
+      provider={provider}
+      columns={plainColumns}
+      rowLabel={hostName}
+      style={{ maxBlockSize: "20rem" }}
+      footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+    />
+  );
+}
+
+/**
+ * The frame and its footer: the table stands in a frame that takes the
+ * caller's native props — here a capped height, within which the table
+ * scrolls under its sticky header — and the footer holds the pagination bar
+ * beneath the table, outside the table role, so it is reached as a landmark
+ * and never read as a row.
+ */
+export const FrameAndFooter: Story = {
+  parameters: consumerCode({
+    parts: ["DataTable", "PaginationBar", "createColumns"],
+    declarations: plainColumnsCode,
+    render: `<DataTable
+  provider={provider}
+  columns={columns}
+  label="Machines"
+  style={{ maxBlockSize: "20rem" }}
+  footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+/>`,
+  }),
+  render: (args) => <FramedMachines {...args} />,
+  play: async ({ canvas }) => {
+    const navigation = await canvas.findByRole("navigation");
+    const table = canvas.getByRole("table");
+    await expect(table.contains(navigation)).toBe(false);
+    await expect(table.parentElement?.contains(navigation)).toBe(true);
   },
 };
 

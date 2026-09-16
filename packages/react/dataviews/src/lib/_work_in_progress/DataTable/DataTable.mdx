@@ -156,6 +156,8 @@ A collection whose records come in several types declares them on one `choices` 
 
 The checkbox is the selection's baseline path everywhere. On touch, a long press on a row selects it and puts the table in selection mode, where a tap on a row toggles it; a tap on one of the row's own controls — its checkbox, a link in a cell — is that control's alone. Deselecting the last row ends the mode. Entering and leaving are announced through the messages record (`selectionModeEntered`, `selectionModeEnded`), and the mode is stated on the table as `data-selection-mode="true"` while it holds, so a stylesheet may select it by attribute. A row's own selected state is its `aria-selected`, with no class repeating it.
 
+<Canvas of={Stories.SelectionOnTouch} sourceState="none" />
+
 ## A warning past the render ceiling
 
 A table rendering every row of a large window works, and says so in development: past 500 rows without `virtualization`, it warns once, naming the count and pointing to `virtualizeRows` from `@canonical/dataviews-react/virtualization`. It is a prompt to measure and never a cap — every row the viewer asked for is still rendered, and a production build says nothing. The cards renderer warns at the same count, saying it has no virtualization to opt into.
@@ -191,6 +193,8 @@ import { DataTable, PaginationBar } from "@canonical/dataviews-react";
   footer={<PaginationBar provider={provider} sizes={[10, 25, 50]} />}
 />;
 ```
+
+<Canvas of={Stories.FrameAndFooter} sourceState="none" />
 
 ## Resizing and its limits
 

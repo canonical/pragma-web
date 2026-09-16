@@ -5,7 +5,8 @@
  * rendered every row again, for a value none of them shows.
  *
  * The table decides what a tap does, and no row is told the mode: entering
- * it renders again the pressed row alone, whose own selection moved.
+ * it hands no row new props, and only the pressed row, whose own selection
+ * moved, draws again through its own subscription.
  */
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
@@ -42,7 +43,7 @@ describe("entering selection mode", () => {
     vi.useRealTimers();
   });
 
-  it("renders again the pressed row alone", () => {
+  it("hands no row new props", () => {
     const { provider } = createMachineProvider({
       rows: [machine("m-1", "alpha"), machine("m-2", "beta")],
     });

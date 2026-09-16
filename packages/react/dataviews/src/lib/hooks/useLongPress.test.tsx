@@ -5,7 +5,7 @@
  */
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { LONG_PRESS_MS } from "./constants.js";
+import { LONG_PRESS_MS, LONG_PRESS_SLOP_PX } from "./constants.js";
 import useLongPress from "./useLongPress.js";
 
 /** Every press the row under test takes is its own. */
@@ -212,5 +212,26 @@ describe("useLongPress", () => {
     expect(onLongPress).not.toHaveBeenCalled();
     // Still swallowed as a press's release, so no tap follows it.
     expect(fireEvent.click(row)).toBe(false);
+  });
+
+  it("lets a second touch press cancel the first, so only one fires", () => {
+    const { row, onLongPress } = mount();
+    fireEvent.pointerDown(row, touch);
+    vi.advanceTimersByTime(LONG_PRESS_MS / 2);
+    // A second finger, or a release the platform never sent.
+    fireEvent.pointerDown(row, { ...touch, clientX: 30 });
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls a drift of exactly the slop still a press", () => {
+    const { row, onLongPress } = mount();
+    fireEvent.pointerDown(row, touch);
+    fireEvent.pointerMove(row, {
+      ...touch,
+      clientX: touch.clientX + LONG_PRESS_SLOP_PX,
+    });
+    vi.advanceTimersByTime(LONG_PRESS_MS);
+    expect(onLongPress).toHaveBeenCalledTimes(1);
   });
 });
