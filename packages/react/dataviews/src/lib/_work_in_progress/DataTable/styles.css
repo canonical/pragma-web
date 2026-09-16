@@ -60,14 +60,15 @@
 
   /* Beneath the table, outside its role. Sticky, so a table taller than the
      view keeps its bar in view until the root's end scrolls past; where the
-     root's height is capped, the table scrolls and the bar simply stays. */
+     root's height is capped, the table scrolls and the bar simply stays. It
+     draws nothing of its own — the bar it holds draws its surface and its
+     rule — and stacks above the table's header and refusal reasons where
+     the two overlap. */
   .ds.data-table > .footer {
     flex: none;
     position: sticky;
     inset-block-end: 0;
-    background-color: var(--color-background-layer2);
-    border-block-start: var(--dimension-stroke-thickness-medium) solid
-      var(--color-border-muted);
+    z-index: 1;
   }
 
   /* Rows take their width from the track list, not from the scroll

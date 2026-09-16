@@ -39,6 +39,12 @@ import "./styles.css";
 
 const componentCssClassName = "ds data-cards";
 
+/** Two field lists saying the same, the types each applies to included. */
+const areFieldsAndScopesEqual = (
+  a: readonly DisplayField[],
+  b: readonly DisplayField[],
+): boolean => areDisplayFieldsEqual(a, b) && areFieldScopesEqual(a, b);
+
 /** Two lists naming the same fields in the same order. */
 const areNamesEqual = (a: readonly string[], b: readonly string[]): boolean =>
   areListsEqual(a, b, (name, other) => name === other);
@@ -100,7 +106,9 @@ export default function Cards<
     );
   }
   const words = useMessages(messages);
-  const declared = useStableValue(fields, areDisplayFieldsEqual);
+  // Held while the fields say the same, their record types included: a field
+  // narrowed to other types draws every card again.
+  const declared = useStableValue(fields, areFieldsAndScopesEqual);
   // Looked up in the held list, which holds the ids the caller's list holds:
   // one lookup names the card's heading and checks that the title names a
   // field at all.
@@ -144,17 +152,16 @@ export default function Cards<
     (row: TRow, rowId: string): string | null =>
       rowLabel === undefined ? null : rowLabel(row, rowId),
   );
-  // Every declared field's scope, checked where the cards mount, keyed on
-  // what a scope is read from, so a field rebuilt inline re-reads none.
-  const scoped = useStableValue(fields, areFieldScopesEqual);
+  // Every declared field's scope, checked where the cards mount, once per
+  // held field list, so a field rebuilt inline re-reads none.
   const readScope = useMemo(
     () =>
       readFieldScopes({
         collection: provider.collection,
-        fields: scoped,
+        fields: declared,
         subject: "Cards field",
       }),
-    [scoped, provider],
+    [declared, provider],
   );
   // Whether one field applies to a card's record of one type, as a table
   // asks it of a row. One identity, so a re-render of the cards re-renders

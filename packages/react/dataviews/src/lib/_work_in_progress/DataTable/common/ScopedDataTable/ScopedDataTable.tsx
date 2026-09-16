@@ -173,7 +173,7 @@ export default function ScopedDataTable<
   // mounts. It reads as never hideable, so the columns every arrangement and
   // menu reads carry that reading rather than each of them learning the rule.
   const declaredHeader = useMemo(
-    () => readRowHeader(columns, provider.collection.schema),
+    () => readRowHeader(columns, provider.collection),
     [columns, provider],
   );
   const listed = useMemo(
@@ -302,18 +302,27 @@ export default function ScopedDataTable<
     },
   });
   // Subscribed only while in the mode, so a table outside it re-renders for
-  // no selection change of its own.
+  // no selection change of its own. The mode ends with the last selected
+  // row — as it stands when the subscription is taken, too, since a
+  // selection emptied or a provider swapped before then publishes nothing
+  // here — and with selection no longer offered.
   useEffect(() => {
     if (!selecting) {
       return undefined;
     }
-    return provider.selection.state.subscribe(() => {
+    const endIfEmpty = (): void => {
       if (provider.selection.state.get().ids.size === 0) {
         setSelecting(false);
         announce(messages.selectionModeEnded);
       }
-    });
-  }, [selecting, provider, announce, messages]);
+    };
+    if (!selectable) {
+      setSelecting(false);
+      return undefined;
+    }
+    endIfEmpty();
+    return provider.selection.state.subscribe(endIfEmpty);
+  }, [selecting, selectable, provider, announce, messages]);
 
   // The header row's sort: the ordering in force and what each column shows
   // of it, the column that claims it, refusals, no-JS destinations, and the

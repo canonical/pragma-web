@@ -15,7 +15,7 @@ describe("readRowHeader", () => {
           { id: "name", header: "Name" },
           { id: "status", header: "Status" },
         ],
-        machines.schema,
+        machines,
       ),
     ).toBeNull();
   });
@@ -26,7 +26,7 @@ describe("readRowHeader", () => {
         { id: "name", header: "Name", rowHeader: true, hideable: true },
         { id: "status", header: "Status" },
       ],
-      machines.schema,
+      machines,
     );
     expect(header).toMatchObject({ id: "name", rowHeader: true });
     expect(header?.hideable).toBe(false);
@@ -39,7 +39,7 @@ describe("readRowHeader", () => {
           { id: "name", header: "Name", rowHeader: true },
           { id: "status", header: "Status", rowHeader: true },
         ],
-        machines.schema,
+        machines,
       ),
     ).toThrow(
       'DataTable columns "name" and "status" are each the row header; a row has one',
@@ -52,7 +52,7 @@ describe("readRowHeader", () => {
     expect(() =>
       readRowHeader(
         [{ id: "image", header: "Image", rowHeader: true }],
-        instances.schema,
+        instances,
       ),
     ).toThrow(
       'DataTable column "image" is the row header, but its field "image" does not apply to every record type',
@@ -68,10 +68,26 @@ describe("readRowHeader", () => {
             appliesTo: ["container"],
           },
         ],
-        instances.schema,
+        instances,
       ),
     ).toThrow(
       'DataTable column "name" is the row header, but its field "name"',
     );
+  });
+
+  it("takes a row header scoped to every declared type", () => {
+    expect(
+      readRowHeader(
+        [
+          {
+            id: "name",
+            header: "Name",
+            rowHeader: true,
+            appliesTo: ["container", "virtual-machine"],
+          },
+        ],
+        instances,
+      ),
+    ).toMatchObject({ id: "name" });
   });
 });

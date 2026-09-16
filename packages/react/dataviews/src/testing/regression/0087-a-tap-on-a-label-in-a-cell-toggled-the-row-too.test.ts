@@ -11,11 +11,12 @@
 import { describe, expect, it } from "vitest";
 import isWithinControl from "../../lib/_work_in_progress/DataTable/common/utils/isWithinControl.js";
 
+/** The element a tap lands on, inside a row of a selectable table. */
 const element = (html: string): Element => {
   const host = document.createElement("div");
-  host.innerHTML = html;
-  const first = host.firstElementChild;
-  if (first === null) {
+  host.innerHTML = `<div role="row" data-row-id="m-1">${html}</div>`;
+  const first = host.firstElementChild?.firstElementChild;
+  if (first === null || first === undefined) {
     throw new Error("no element");
   }
   return first;

@@ -1,4 +1,7 @@
-import type { Schema, SchemaFieldDefinition } from "@canonical/dataviews-core";
+import type {
+  Collection,
+  SchemaFieldDefinition,
+} from "@canonical/dataviews-core";
 import { readFieldName } from "../../../../utils/index.js";
 import type { DataTableColumn } from "../../types.js";
 
@@ -7,15 +10,18 @@ import type { DataTableColumn } from "../../types.js";
  * the table mounts.
  *
  * A row has one name, so two columns declared its header fail here and are
- * both named. A header must name every row, so a column over a field only
- * some record types carry, or one narrowed to fewer types itself, fails too:
+ * both named. A header must name every row, so a column over a field scoped
+ * to fewer than every declared type, or narrowed to fewer itself, fails too:
  * its cell in a row of another type would be the not-applicable dash, and
  * the row named by nothing. The one returned reads as never hideable,
  * whatever it declared: hiding the header would take the row's name with it.
  */
 export default function readRowHeader(
   columns: readonly DataTableColumn[],
-  schema: Schema<readonly SchemaFieldDefinition[]>,
+  collection: Pick<
+    Collection<readonly SchemaFieldDefinition[]>,
+    "schema" | "types"
+  >,
 ): DataTableColumn | null {
   const headers = columns.filter((column) => column.rowHeader === true);
   if (headers.length > 1) {
@@ -29,9 +35,16 @@ export default function readRowHeader(
     return null;
   }
   const field = readFieldName(header);
+  const { schema, types } = collection;
+  // A scope naming every declared type leaves no row out; one naming fewer
+  // does. A collection of one type has no scope to leave a row out by.
+  const leavesOut = (scope: readonly string[] | undefined): boolean =>
+    scope !== undefined &&
+    types !== null &&
+    types.names.some((name) => !scope.includes(name));
   if (
-    header.appliesTo !== undefined ||
-    schema.findField(field)?.appliesTo !== undefined
+    leavesOut(header.appliesTo) ||
+    leavesOut(schema.findField(field)?.appliesTo)
   ) {
     throw new Error(
       `DataTable column "${header.id}" is the row header, but its field "${field}" does not apply to every record type`,

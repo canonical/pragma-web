@@ -35,8 +35,8 @@ describe("SERVER_BACKED_RENDER_CODE", () => {
     columns={columns}
     label="Machines"
     rowLabel={(row) => String(row["name"])}
+    footer={<DataViews.Pagination sizes={[5, 10]} />}
   />
-  <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`);
   });
 });
