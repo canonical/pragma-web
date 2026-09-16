@@ -140,6 +140,7 @@ describe("public surface", () => {
       "listDisplayEntries",
       "moveColumn",
       "placeSortTerm",
+      "readApplicability",
       "readProviderHost",
       "readSizingBounds",
       "resetColumnArrangement",

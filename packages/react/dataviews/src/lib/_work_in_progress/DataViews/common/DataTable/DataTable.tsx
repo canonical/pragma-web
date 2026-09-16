@@ -4,6 +4,9 @@ import { useDataViewsRoot } from "../../hooks/index.js";
 import { Pagination } from "../Pagination/index.js";
 import type { DataViewsDataTableProps } from "./types.js";
 
+/** The footer's default, minted once: a new element per render would re-render the bar. */
+const PAGINATION = <Pagination />;
+
 /**
  * The collection's rows: the DataTable, bound to the enclosing root's
  * provider.
@@ -24,17 +27,18 @@ import type { DataViewsDataTableProps } from "./types.js";
  * name may change or move before the first release.
  */
 export default function DataTable({
-  footer = <Pagination />,
+  footer = PAGINATION,
   ...props
 }: DataViewsDataTableProps): ReactElement {
   const { provider, messages, announce } = useDataViewsRoot("DataTable");
   return (
     <ScopedDataTable
       {...props}
-      footer={footer}
+      {...(footer === null ? {} : { footer })}
       provider={provider}
       messages={messages}
-      announce={announce}
+      // The root's announcer, whose region the root places.
+      announcer={{ announce, region: null }}
     />
   );
 }

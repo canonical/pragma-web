@@ -15,6 +15,7 @@ function CardItem<TRow extends object>({
   title,
   details,
   applicabilityOf,
+  typeOf,
   selectable,
   nameRecord,
 }: CardItemProps<TRow>): ReactElement {
@@ -29,9 +30,10 @@ function CardItem<TRow extends object>({
   const named = useDataViewsValue(channels.record, (record) =>
     nameRecord(record, channels.id),
   );
-  // Read as the card renders rather than subscribed: which fields apply to a
-  // record is a fact about its type, which no record changes under a card.
-  const record = channels.record.get();
+  // Which fields apply to the record is a fact about its type, so the card
+  // watches the type alone: it renders again when a record comes back as
+  // another type, and for no move of any field.
+  const type = useDataViewsValue(channels.record, typeOf);
   const titleChannel = channels.fields[readFieldName(title)];
   if (titleChannel === undefined) {
     // The scopes observe every field the cards show, the title's included.
@@ -67,10 +69,13 @@ function CardItem<TRow extends object>({
         ) : null}
         <span id={titleId} className="title">
           <FieldValue
+            // Keyed by the record's type: content narrowing on the record is
+            // drawn again, from the record of its current type, when it moves.
+            key={type}
             provider={provider}
             channels={channels}
             field={title}
-            applicability={applicabilityOf(readFieldName(title), record)}
+            applicability={applicabilityOf(title, type)}
           />
         </span>
       </Card.Header>
@@ -78,17 +83,14 @@ function CardItem<TRow extends object>({
         <Card.Content className="content">
           <dl className="fields">
             {details.map((field) => (
-              <div key={field.id} className="field">
+              <div key={`${field.id}:${type}`} className="field">
                 <dt>{field.header}</dt>
                 <dd>
                   <FieldValue
                     provider={provider}
                     channels={channels}
                     field={field}
-                    applicability={applicabilityOf(
-                      readFieldName(field),
-                      record,
-                    )}
+                    applicability={applicabilityOf(field, type)}
                   />
                 </dd>
               </div>

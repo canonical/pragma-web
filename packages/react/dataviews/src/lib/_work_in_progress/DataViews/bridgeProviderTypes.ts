@@ -19,8 +19,8 @@
  * its call site: `useDataViews` compares the collection it was handed against
  * `provider.collection` by reference and throws when they differ, so the
  * provider it narrows was built over that very collection and its records and
- * field names are that collection's. Neither function performs that check, so
- * neither is exported beyond this domain, and `narrowRootProvider` is called
+ * field names are that collection's. None of these performs that check, so
+ * none is exported beyond this domain, and `narrowRootProvider` is called
  * only after it.
  */
 
@@ -37,7 +37,7 @@ export type WidestProvider = DataViewsProvider<
 >;
 
 /** The filter handles a root's context carries, at that same widest shape. */
-export type WidestFilters = FilterHandles<readonly SchemaFieldDefinition[]>;
+type WidestFilters = FilterHandles<readonly SchemaFieldDefinition[]>;
 
 /**
  * Take a provider as the widest shape, to store in a root's context.

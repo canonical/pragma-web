@@ -45,6 +45,7 @@ describe("CardItem", () => {
           selectable={false}
           nameRecord={() => null}
           applicabilityOf={() => "applies"}
+          typeOf={() => null}
         />
       </ul>,
     );
@@ -67,6 +68,7 @@ describe("CardItem", () => {
           selectable
           nameRecord={(row, rowId) => `${row.name} (${rowId})`}
           applicabilityOf={() => "applies"}
+          typeOf={() => null}
         />
       </ul>,
     );
@@ -95,6 +97,7 @@ describe("CardItem", () => {
           selectable={false}
           nameRecord={() => null}
           applicabilityOf={() => "applies"}
+          typeOf={() => null}
         />,
       ),
     ).toThrow('no channel observes the field "name"');

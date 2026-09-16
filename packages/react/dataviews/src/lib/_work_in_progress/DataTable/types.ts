@@ -31,15 +31,6 @@ export type { DataTableVirtualization } from "../../common/index.js";
  */
 export type DataTableColumn = DisplayField & {
   /**
-   * The record types this column applies to, narrower than its field's own
-   * scope: a cell in a row of any other type draws the not-applicable state,
-   * and the header names these types. Each must be a type the collection
-   * declares and, where the field is scoped, one the field applies to; a
-   * column naming any other fails where the table is mounted, since it would
-   * otherwise draw every cell not applicable and say nothing.
-   */
-  readonly appliesTo?: readonly string[];
-  /**
    * This column's cell is the row's header: it names the row, so a reader
    * hears its text before each of the row's other cells, and the row's
    * selection checkbox is named by it unless `rowLabel` names the row. A
@@ -134,12 +125,12 @@ type OwnProps<
    * What the frame's footer holds, beneath the table and outside its role:
    * the pagination bar, a landmark and not a row. It keeps to the bottom of
    * the view while a table taller than the view scrolls past, and to the
-   * bottom of the frame where the frame's height is capped. Left out or
-   * null, the frame has no footer; the connected table places
-   * `<DataViews.Pagination />` here unless told otherwise, and null tells
-   * it otherwise.
+   * bottom of the frame where the frame's height is capped. Left out, the
+   * frame has no footer. The connected table places `<DataViews.Pagination />`
+   * here unless it is given another footer, or null for none — the one
+   * spelling it adds, since only it has a footer by default.
    */
-  readonly footer?: ReactElement | null | undefined;
+  readonly footer?: ReactElement | undefined;
 };
 
 /**
@@ -187,12 +178,14 @@ export type ScopedDataTableProps<
 > = Omit<DataTableProps<TFields, TRow>, "messages"> & {
   /** Every message the table renders and announces, resolved. */
   readonly messages: DataViewsMessages;
-  /** Say an outcome through the announcer of the table's UI scope. */
-  readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
   /**
-   * The live region the table speaks through, placed in the frame after the
-   * footer: a standalone table's own. A connected table brings none, since
-   * it speaks through its root's.
+   * The announcer of the table's UI scope, named once: what says an outcome,
+   * and the live region it says it through, placed in the frame after the
+   * footer. A standalone table brings both; a connected table brings its
+   * root's `announce` and no region, since it speaks through the root's.
    */
-  readonly announcer?: ReactElement | undefined;
+  readonly announcer: {
+    readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
+    readonly region: ReactElement | null;
+  };
 };

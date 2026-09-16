@@ -158,7 +158,7 @@ The checkbox is the selection's baseline path everywhere. On touch, a long press
 
 ## A warning past the render ceiling
 
-A table rendering every row of a large window works, and says so in development: past `RENDER_CEILING` rows without `virtualization`, it warns once, naming the count and pointing to `virtualizeRows` from `@canonical/dataviews-react/virtualization`. It is a prompt to measure and never a cap — every row the viewer asked for is still rendered, and a production build says nothing. The cards renderer warns at the same count, saying it has no virtualization to opt into.
+A table rendering every row of a large window works, and says so in development: past 500 rows without `virtualization`, it warns once, naming the count and pointing to `virtualizeRows` from `@canonical/dataviews-react/virtualization`. It is a prompt to measure and never a cap — every row the viewer asked for is still rendered, and a production build says nothing. The cards renderer warns at the same count, saying it has no virtualization to opt into.
 
 ## Row headers
 

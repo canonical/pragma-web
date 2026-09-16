@@ -84,8 +84,8 @@ describe("BodyCell", () => {
     );
     const cell = screen.getByRole("cell");
     expect(cell).toHaveTextContent(/^—Not applicable$/);
+    expect(cell).toHaveAccessibleName("Not applicable");
     expect(cell.querySelector("[aria-hidden='true']")).toHaveTextContent("—");
-    expect(cell.querySelector("[hidden]")).toHaveTextContent("Not applicable");
   });
 
   it("hands a column's own content the record and its applicability, and no value where the field does not apply", () => {

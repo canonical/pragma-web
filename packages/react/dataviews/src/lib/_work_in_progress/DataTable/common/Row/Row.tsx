@@ -1,9 +1,8 @@
 import { memo, type ReactElement, useId } from "react";
-import { useDataViewsValue, useLongPress } from "../../../../hooks/index.js";
+import { useDataViewsValue } from "../../../../hooks/index.js";
 import { readFieldName } from "../../../../utils/index.js";
 import { BodyCell } from "../BodyCell/index.js";
 import { SelectionCell } from "../SelectionCell/index.js";
-import isWithinControl from "./isWithinControl.js";
 import type { RowProps } from "./types.js";
 
 const componentCssClassName = "ds data-table-row";
@@ -12,50 +11,38 @@ function Row<TRow extends object>({
   provider,
   channels,
   columns,
-  rowHeader,
   selectable,
-  selecting,
-  onLongPress,
-  onTap,
   rowLabel,
   position,
   ref,
   applicabilityOf,
+  typeOf,
 }: RowProps<TRow>): ReactElement {
   const selected = useDataViewsValue(channels.selected);
   // The row is named by its header cell where a column is the row header:
   // a reader hears the name before each of the row's other cells.
   const headerId = useId();
-  // Read as the row renders rather than subscribed: which columns apply to
-  // a record is a fact about its type, which no record changes under a row,
-  // and a subscription here would re-render every cell for any field's move.
-  const record = channels.record.get();
-  // On touch, a long press selects the row and enters selection mode, where
-  // a tap toggles it; a tap on one of the row's own controls is that
-  // control's, and the row leaves it alone.
-  const gestures = useLongPress({
-    onLongPress: () => {
-      onLongPress(channels.id);
-    },
-    onTap: (event) => {
-      if (selecting && !isWithinControl(event.target)) {
-        onTap(channels.id);
-      }
-    },
-  });
+  // Which columns apply to the record is a fact about its type, so the row
+  // watches the type alone: it renders again when a record comes back as
+  // another type, and for no move of any field.
+  const type = useDataViewsValue(channels.record, typeOf);
+  // The column heading the row, if any; the table checked there is one at
+  // most where it mounted.
+  const rowHeader = columns.find((column) => column.rowHeader === true) ?? null;
   return (
     // aria-selected is only meaningful where selection is offered, and it
     // must agree with the row's checkbox: both read this one channel.
     // biome-ignore lint/a11y/useSemanticElements: <tr> is only valid inside a <table>, and this grid is deliberately not one
     // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, not a widget — the focusable controls live in its cells
     <div
-      {...(selectable ? gestures : {})}
       ref={ref}
       role="row"
       className={componentCssClassName}
       aria-selected={selectable ? selected : undefined}
       aria-rowindex={position}
       aria-labelledby={rowHeader === null ? undefined : headerId}
+      // Where the table's touch gestures find the row they landed on.
+      data-row-id={selectable ? channels.id : undefined}
     >
       {selectable ? (
         <SelectionCell
@@ -68,13 +55,16 @@ function Row<TRow extends object>({
       ) : null}
       {columns.map((column) => (
         <BodyCell
-          key={column.id}
+          // Keyed by the record's type too: content narrowing on the record
+          // is drawn again, from the record of its current type, when the
+          // type moves under a column whose applicability does not.
+          key={`${column.id}:${type}`}
           id={column.rowHeader === true ? headerId : undefined}
           provider={provider}
           channels={channels}
           column={column}
           field={readFieldName(column)}
-          applicability={applicabilityOf(column, record)}
+          applicability={applicabilityOf(column, type)}
         />
       ))}
     </div>
@@ -89,8 +79,9 @@ function Row<TRow extends object>({
  * class repeating it.
  *
  * Memoised: every prop it takes is held at a stable reference by the
- * table, so a row re-renders for its own selection channel, for a column
- * model that actually changed and for the table entering or leaving
- * selection mode, and for nothing else.
+ * table, so a row re-renders for its own selection channel, for its record's
+ * type, and for a column model that actually changed, and for nothing else.
+ * It holds no gesture of its own: a long press is the table's, found by the
+ * row's id.
  */
 export default memo(Row) as typeof Row;

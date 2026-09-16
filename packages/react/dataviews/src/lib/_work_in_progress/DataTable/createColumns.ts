@@ -1,62 +1,50 @@
 import type {
-  Applicability,
   Collection,
-  FieldNameOf,
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
+import type { FieldNameOf } from "@canonical/dataviews-core/bindings";
 import type { ComponentType, ReactNode } from "react";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import type { DataTableColumn } from "./types.js";
 
 /**
+ * What a record carries at a name it does not declare: `unknown` where the
+ * record describes no names at all — the default row shape — and `undefined`
+ * where it describes its names and this is not one of them, which is what a
+ * row reads there.
+ */
+type Missing<TRow> = string extends keyof TRow ? unknown : undefined;
+
+/**
+ * What a path through an optional or nullable member may also be: nothing,
+ * where the member is absent, which a row reads as `undefined`.
+ */
+type Absent<TMember> = undefined extends TMember
+  ? undefined
+  : null extends TMember
+    ? undefined
+    : never;
+
+/**
  * The value one field of a record carries, by name or by dot path.
  *
  * A path is walked one own key at a time, as a row is read: `config.region`
- * is the type at `region` of the type at `config`. A name the record does not
- * describe — the default row shape describes none — carries `unknown`, which
- * is what a cell over such a field is handed.
+ * is the type at `region` of the type at `config`, or `undefined` where
+ * `config` may be absent. Distributed over a record that is a union of
+ * types, so a field only one type carries is that type's value or
+ * `undefined` — the not-applicable case — rather than the `unknown` a name
+ * no type carries would be.
  */
-type ValueAt<TRow, TName extends string> = TName extends keyof TRow
-  ? TRow[TName]
-  : TName extends `${infer THead}.${infer TRest}`
-    ? THead extends keyof TRow
-      ? ValueAt<NonNullable<TRow[THead]>, TRest>
-      : unknown
-    : unknown;
-
-/**
- * The props a typed column's own content receives: its field's value at the
- * type the record carries, and the row and column it is drawn in.
- *
- * Structurally the props every renderer hands a display field's content, so a
- * component written for one renders unchanged in another; what a typed column
- * adds is the value's type.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type TypedCellProps<TValue, TRow> = {
-  /** The field's current value, typed from the record. */
-  readonly value: TValue;
-  /**
-   * The whole record the value was read from, at its own type, as it stood
-   * when this content rendered: what content narrows on to read a field only
-   * one type carries. Content renders when its own field's value changes;
-   * content that draws other fields subscribes through `useDataViewsCell`.
-   */
-  readonly record: TRow;
-  /**
-   * Whether this column's field applies to the record's type. Content given
-   * a record the field does not apply to may draw it however it likes;
-   * content that ignores this draws a value there is none of.
-   */
-  readonly applicability: Applicability;
-  /** The row's stable identity. */
-  readonly rowId: string;
-  /** The declaring column's identity. */
-  readonly columnId: string;
-};
+type ValueAt<TRow, TName extends string> = TRow extends unknown
+  ? TName extends keyof TRow
+    ? TRow[TName]
+    : TName extends `${infer THead}.${infer TRest}`
+      ? THead extends keyof TRow
+        ? ValueAt<NonNullable<TRow[THead]>, TRest> | Absent<TRow[THead]>
+        : Missing<TRow>
+      : Missing<TRow>
+  : never;
 
 /**
  * One column as it is declared: the table's own members, plus the field it
@@ -79,16 +67,13 @@ type TypedColumnOf<
   /** The column's heading. */
   readonly header: ReactNode;
   /** Content for this column's value, typed by the field it shows. */
-  readonly cell?: ComponentType<TypedCellProps<ValueAt<TRow, TName>, TRow>>;
+  readonly cell?: ComponentType<
+    DisplayFieldCellProps<ValueAt<TRow, TName>, TRow>
+  >;
 };
 
-/**
- * One declared column of a collection: whichever of its fields it shows.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type TypedColumn<
+/** One declared column of a collection: whichever of its fields it shows. */
+type TypedColumn<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = {
@@ -125,8 +110,18 @@ export default function createColumns<
   _collection: Collection<TFields, TRow>,
   columns: readonly TypedColumn<TFields, TRow>[],
 ): readonly DataTableColumn[] {
+  const ids = new Set<string>();
   return Object.freeze(
     columns.map((column): DataTableColumn => {
+      const named = column.id ?? column.field;
+      // Two columns over one field are told apart by the id the caller
+      // gives; without one they would share a key, a track and a scope.
+      if (ids.has(named)) {
+        throw new Error(
+          `two columns are named "${named}"; give the second an id of its own`,
+        );
+      }
+      ids.add(named);
       const {
         appliesTo,
         cell,

@@ -78,10 +78,9 @@ export default function DataTable<
     <ScopedDataTable
       {...props}
       messages={words}
-      announce={announce}
-      // In the frame, after the table and its footer: a table's own
-      // children are its row groups, and the frame is what holds the rest.
-      announcer={<Announcer ref={ref} />}
+      // Its own announcer, whose region sits in the frame after the table and
+      // its footer: a table's own children are its row groups.
+      announcer={{ announce, region: <Announcer ref={ref} /> }}
     />
   );
 }

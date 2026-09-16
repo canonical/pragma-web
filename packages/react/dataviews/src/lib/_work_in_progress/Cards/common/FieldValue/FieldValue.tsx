@@ -31,9 +31,8 @@ function FieldValue<TRow extends object>({
       record: channels.record,
       fields: channels.fields,
       selected: channels.selected,
-      applicability,
     }),
-    [provider, channels, field.id, applicability],
+    [provider, channels, field.id],
   );
   const Content = field.cell;
   const notApplicable = applicability === "not-applicable";
@@ -53,10 +52,11 @@ function FieldValue<TRow extends object>({
         />
       ) : notApplicable ? (
         // A field this record's type does not carry, told apart from one it
-        // carries no value for: the dash is seen, the word is read.
+        // carries no value for: the dash is seen, the word is read — clipped,
+        // not hidden, so it stays in the accessibility tree.
         <>
           <span aria-hidden="true">—</span>
-          <span hidden>{messages.cellNotApplicable}</span>
+          <span className="not-applicable">{messages.cellNotApplicable}</span>
         </>
       ) : (
         spellPrimitiveValue(value)

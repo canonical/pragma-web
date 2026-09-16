@@ -18,6 +18,7 @@ import {
 import {
   type CSSProperties,
   isValidElement,
+  type PointerEvent,
   type ReactElement,
   useCallback,
   useEffect,
@@ -35,13 +36,19 @@ import {
 import {
   useDataViewsValue,
   useIsHydrated,
+  useLongPress,
   useMergedRef,
   useRenderCeiling,
   useRowScopes,
   useStableCallback,
   useStableValue,
 } from "../../../../hooks/index.js";
-import { describeStatus, readFieldName } from "../../../../utils/index.js";
+import {
+  areColumnScopesEqual,
+  describeStatus,
+  readColumnScopes,
+  readFieldName,
+} from "../../../../utils/index.js";
 import {
   useColumnArrangement,
   useColumnManagement,
@@ -62,8 +69,12 @@ import {
   StatusRow,
   TableBody,
 } from "../index.js";
-import { areColumnModelsEqual, readSizing } from "../utils/index.js";
-import readColumnScopes from "./readColumnScopes.js";
+import {
+  areColumnModelsEqual,
+  areColumnsEqual,
+  isWithinControl,
+  readSizing,
+} from "../utils/index.js";
 import readRowHeader from "./readRowHeader.js";
 import "../../styles.css";
 
@@ -72,6 +83,22 @@ const frameCssClassName = "ds data-table-frame";
 
 /** The frame observes nothing of its own node; the merge is for the caller's ref. */
 const attachNothing = (): undefined => undefined;
+
+/**
+ * The id of this table's row an event landed in, or null: a header row, the
+ * space between rows, or a row of a table nested in one of this table's
+ * cells, which is that table's to answer.
+ */
+const readRowId = (target: EventTarget, table: Element): string | null => {
+  /* v8 ignore next 3 -- unreachable: pointer and click events target elements */
+  if (!(target instanceof Element)) {
+    return null;
+  }
+  const row = target.closest("[data-row-id]");
+  return row !== null && row.closest("[role='table']") === table
+    ? row.getAttribute("data-row-id")
+    : null;
+};
 
 /**
  * `dense` is the design system's own density class: it sets the channel the
@@ -118,13 +145,13 @@ export default function ScopedDataTable<
   settings,
   footer,
   messages,
-  announce,
   announcer,
   className,
   style,
   ref,
   ...rest
 }: ScopedDataTableProps<TFields, TRow>): ReactElement {
+  const { announce, region } = announcer;
   if (!isDataViewsProvider(provider)) {
     throw new Error(
       "DataTable requires a provider created by createDataViewsProvider",
@@ -148,16 +175,25 @@ export default function ScopedDataTable<
   // The column heading each row, if one is declared, checked where the table
   // mounts. It reads as never hideable, so the columns every arrangement and
   // menu reads carry that reading rather than each of them learning the rule.
-  const rowHeader = useMemo(() => readRowHeader(columns), [columns]);
+  const declaredHeader = useMemo(
+    () => readRowHeader(columns, provider.collection.schema),
+    [columns, provider],
+  );
   const listed = useMemo(
     () =>
-      rowHeader === null
+      declaredHeader === null
         ? columns
         : columns.map((column) =>
-            column.rowHeader === true ? rowHeader : column,
+            column.rowHeader === true ? declaredHeader : column,
           ),
-    [columns, rowHeader],
+    [columns, declaredHeader],
   );
+  // Held at one reference while it says the same, as the rendered list is,
+  // so a caller's inline columns re-arrange nothing.
+  const declaredColumns = useStableValue(listed, areColumnsEqual);
+  // Held by what a scope is read from alone, so an inline heading or cell
+  // re-reads no scope.
+  const scopedColumns = useStableValue(listed, areColumnScopesEqual);
 
   // The columns the presentation shows, in its order. Both derivations
   // below are keyed on content, not on array identity: a caller who
@@ -167,7 +203,7 @@ export default function ScopedDataTable<
   // inline `header` node must not cost anyone a new layout.
   const rendered = useColumnArrangement({
     presentation: provider.presentation,
-    columns: listed,
+    columns: declaredColumns,
   });
   const model = useStableValue(rendered, areColumnModelsEqual);
 
@@ -241,9 +277,34 @@ export default function ScopedDataTable<
       announce(messages.selectionModeEntered);
     }
   });
-  const toggleSelected = useStableCallback((rowId: string): void => {
-    provider.selection.toggle(rowId);
+  // One gesture for the whole body rather than one per row: the row a press
+  // or a tap landed on is found by its id, and only rows of this table carry
+  // one. A press or a tap on one of the row's own controls is that
+  // control's — held on the checkbox, a press would select the row and the
+  // checkbox's own change would deselect it again.
+  // The row a press began on, set before the press is started, so a long
+  // press always has one.
+  const pressedRow = useRef("");
+  const gestures = useLongPress({
+    onLongPress: () => {
+      enterSelection(pressedRow.current);
+    },
+    onTap: (event) => {
+      const rowId = readRowId(event.target, event.currentTarget);
+      if (selecting && rowId !== null && !isWithinControl(event.target)) {
+        provider.selection.toggle(rowId);
+      }
+    },
   });
+  const onPointerDown = useStableCallback(
+    (event: PointerEvent<HTMLDivElement>): void => {
+      const rowId = readRowId(event.target, event.currentTarget);
+      if (rowId !== null && !isWithinControl(event.target)) {
+        pressedRow.current = rowId;
+        gestures.onPointerDown(event);
+      }
+    },
+  );
   // Subscribed only while in the mode, so a table outside it re-renders for
   // no selection change of its own.
   useEffect(() => {
@@ -272,22 +333,26 @@ export default function ScopedDataTable<
 
   // What each column knows of record types: the types its header names, and
   // how its cells decide a record. A column narrowing its field's scope is
-  // checked here, where the table mounts, and once per column list, since
-  // neither the schema nor the columns move per row.
-  const scopeOf = useMemo(() => {
-    const host = readProviderHost(provider);
-    return readColumnScopes({
-      collection: provider.collection,
-      applicability: (field, record) => host.applicability(field, record),
-      typeOf: (record) => host.typeOf(record),
-      columns: rendered,
-    });
-  }, [rendered, provider]);
-  // Whether one column applies to one row's record. Held at one identity, so
-  // a table that renders again renders no row again for this.
+  // checked here, where the table mounts, once per declared column list.
+  // Every declared column, not only the ones shown: a column hidden by the
+  // stored arrangement is checked where the table mounts all the same.
+  const scopeOf = useMemo(
+    () =>
+      readColumnScopes({
+        collection: provider.collection,
+        columns: scopedColumns,
+      }),
+    [scopedColumns, provider],
+  );
+  // Whether one column applies to a record of one type. Held at one
+  // identity, so a table that renders again renders no row again for this.
   const applicabilityOf = useStableCallback(
-    (column: DataTableColumn, record: TRow): Applicability =>
-      scopeOf(column).applicability(record),
+    (column: DataTableColumn, type: string | null): Applicability =>
+      scopeOf(column).applicability(type),
+  );
+  // The declared type a record carries: what each row watches of its record.
+  const typeOf = useStableCallback((record: TRow): string | null =>
+    readProviderHost(provider).typeOf(record),
   );
 
   // The columns' visibility and places, as the settings menu offers them
@@ -303,7 +368,7 @@ export default function ScopedDataTable<
     listDestinations,
   } = useColumnManagement({
     provider,
-    columns: listed,
+    columns: declaredColumns,
     headerRow,
     messages,
     announce,
@@ -372,13 +437,10 @@ export default function ScopedDataTable<
           provider={provider}
           channels={rowScopes.readRow(entry.rowId)}
           columns={rendered}
-          rowHeader={rowHeader}
           selectable={selectable}
-          selecting={selecting}
-          onLongPress={enterSelection}
-          onTap={toggleSelected}
           rowLabel={nameRow}
           applicabilityOf={applicabilityOf}
+          typeOf={typeOf}
         />
       ),
     [
@@ -386,13 +448,10 @@ export default function ScopedDataTable<
       provider,
       rowScopes,
       rendered,
-      rowHeader,
       selectable,
-      selecting,
-      enterSelection,
-      toggleSelected,
       nameRow,
       applicabilityOf,
+      typeOf,
     ],
   );
 
@@ -425,6 +484,7 @@ export default function ScopedDataTable<
           // A custom state with no native or ARIA attribute: an attribute,
           // present while the mode holds.
           data-selection-mode={selecting ? "true" : undefined}
+          {...(selectable ? { ...gestures, onPointerDown } : {})}
           // Every logical row, the header's included, so a row a virtualized
           // table has not mounted is still counted.
           aria-rowcount={
@@ -510,10 +570,10 @@ export default function ScopedDataTable<
         </div>
         {/* Beneath the table and outside its role, since a table's children
           are its row groups: the bar here is a landmark, not a row. */}
-        {footer === undefined || footer === null ? null : (
+        {footer === undefined ? null : (
           <div className="ds data-table-footer">{footer}</div>
         )}
-        {announcer}
+        {region}
       </div>
     </MessagesContext>
   );

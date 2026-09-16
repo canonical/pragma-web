@@ -11,7 +11,7 @@ import {
   instanceCollection,
 } from "./fixtures.js";
 
-export type InstanceProvider = DataViewsProvider<InstanceFields, Instance>;
+type InstanceProvider = DataViewsProvider<InstanceFields, Instance>;
 
 export type InstanceProviderConfig = {
   readonly source?: (() => Source<Instance>) | undefined;

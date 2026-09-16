@@ -13,6 +13,7 @@ import {
   useInstanceProvider,
 } from "../../../storybook/instances/story-utils.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
+import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";
 import createColumns from "./createColumns.js";
 import Component from "./DataTable.js";
@@ -64,11 +65,29 @@ const renderInstances =
   (args) => <InstancesTable {...args} columns={columns} options={options} />;
 
 /**
+ * What an instance runs from, drawn from fields two types carry differently.
+ * It reads more of the record than its column's field, so it subscribes to
+ * the record through the cell scope rather than reading the record it was
+ * handed, and narrows on the type; the compiler holds the arms exhaustive.
+ */
+function RunsFrom(): ReactElement {
+  const cell = useDataViewsCell(instanceCollection);
+  const record = useDataViewsValue(cell.record);
+  switch (record.type) {
+    case "container":
+      return <>{record.image === "" ? "no image" : `image ${record.image}`}</>;
+    case "virtual-machine":
+      return <>{`${record.firmware.toUpperCase()} firmware`}</>;
+    default:
+      return record satisfies never;
+  }
+}
+
+/**
  * The columns, declared over the collection: every field name is checked,
  * and a column's own content is handed its record at the record's own type.
  * The `image` and `firmware` columns each apply to one type, which their
- * headings say to a reader, and the `kind` column narrows on the type to
- * read the field only that type carries.
+ * headings say to a reader.
  */
 const columns = createColumns(instanceCollection, [
   { field: "name", header: "Instance", rowHeader: true, sortable: true },
@@ -77,21 +96,7 @@ const columns = createColumns(instanceCollection, [
   { field: "project", header: "Project", sortable: true },
   { field: "image", header: "Image", sortable: true },
   { field: "firmware", header: "Firmware", sortable: true },
-  {
-    id: "kind",
-    field: "type",
-    header: "Runs from",
-    cell: ({ record }) => {
-      switch (record.type) {
-        case "container":
-          return record.image === "" ? "no image" : `image ${record.image}`;
-        case "virtual-machine":
-          return `${record.firmware.toUpperCase()} firmware`;
-        default:
-          return record satisfies never;
-      }
-    },
-  },
+  { id: "kind", field: "type", header: "Runs from", cell: RunsFrom },
 ]);
 
 const collectionCode = `// The collection declares its record types on one \`choices\` field, and
@@ -109,8 +114,23 @@ export const instanceCollection = createCollection({
   discriminator: "type",
 });`;
 
-const columnsCode = `// Declared over the collection: a misspelt field does not compile, and a
-// column's own content narrows on the discriminator to read a type's field.
+const columnsCode = `// Content reading more of the record than its column's field subscribes to
+// the record through the cell scope, and narrows on the discriminator to read
+// a type's own field; the compiler holds the arms exhaustive.
+function RunsFrom() {
+  const cell = useDataViewsCell(instanceCollection);
+  const record = useDataViewsValue(cell.record);
+  switch (record.type) {
+    case "container":
+      return record.image === "" ? "no image" : \`image \${record.image}\`;
+    case "virtual-machine":
+      return \`\${record.firmware.toUpperCase()} firmware\`;
+    default:
+      return record satisfies never;
+  }
+}
+
+// Declared over the collection: a misspelt field does not compile.
 const columns = createColumns(instanceCollection, [
   { field: "name", header: "Instance", rowHeader: true, sortable: true },
   { field: "type", header: "Type", sortable: true },
@@ -118,21 +138,7 @@ const columns = createColumns(instanceCollection, [
   { field: "project", header: "Project", sortable: true },
   { field: "image", header: "Image", sortable: true },
   { field: "firmware", header: "Firmware", sortable: true },
-  {
-    id: "kind",
-    field: "type",
-    header: "Runs from",
-    cell: ({ record }) => {
-      switch (record.type) {
-        case "container":
-          return record.image === "" ? "no image" : \`image \${record.image}\`;
-        case "virtual-machine":
-          return \`\${record.firmware.toUpperCase()} firmware\`;
-        default:
-          return record satisfies never;
-      }
-    },
-  },
+  { id: "kind", field: "type", header: "Runs from", cell: RunsFrom },
 ]);`;
 
 const instanceSource = `createArraySource({
@@ -143,7 +149,12 @@ const instanceSource = `createArraySource({
 
 const instanceImports = `import { type Instance, instances } from "./instances.js";`;
 
-const parts = ["DataTable", "createColumns"];
+const parts = [
+  "DataTable",
+  "createColumns",
+  "useDataViewsCell",
+  "useDataViewsValue",
+];
 
 /**
  * Two record types in one table. A virtual machine runs from no image and a
@@ -173,17 +184,15 @@ export const MixedTypes: Story = {
     );
     const cells = within(machine).getAllByRole("cell");
     // Image, the fifth cell after the checkbox and the header.
-    await expect(cells[4]).toHaveTextContent("—Not applicable");
+    await expect(cells[4]).toHaveAccessibleName("Not applicable");
     await expect(
       within(canvas.getByRole("row", { name: "scratch-01" })).getAllByRole(
         "cell",
       )[4],
     ).toHaveTextContent(/^$/);
     await expect(
-      canvas
-        .getByRole("columnheader", { name: "Image" })
-        .querySelector(".scope"),
-    ).toHaveTextContent("Applies to container");
+      canvas.getByRole("columnheader", { name: "Image" }),
+    ).toHaveAccessibleDescription("Applies to container");
   },
 };
 
@@ -231,9 +240,8 @@ const columns = createColumns(instanceCollection, [
     const container = await waitFor(() =>
       canvas.getByRole("row", { name: "web-01" }),
     );
-    await expect(within(container).getAllByRole("cell")[1]).toHaveTextContent(
-      "—Not applicable",
-    );
+    await expect(within(container).getAllByRole("cell")[1]) //
+      .toHaveAccessibleName("Not applicable");
     await expect(
       within(canvas.getByRole("row", { name: "db-01" })).getAllByRole(
         "cell",

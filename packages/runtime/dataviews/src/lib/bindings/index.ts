@@ -9,12 +9,14 @@
  * with the command and its result, the list comparison, the comparison of
  * one field's facet, the ordering in force and the next one a header's activation, or its menu's choice, leads
  * to, the wire key a form control is named by, and the parameters a link
- * carries an arrangement in, and the words a root speaks — the application's
- * messages over the English record. React uses it now; a Svelte binding
+ * carries an arrangement in, the words a root speaks — the application's
+ * messages over the English record — and the reading of whether a field
+ * applies to a record's type, with the names of a collection's fields. React uses it now; a Svelte binding
  * would use the same names rather than solve its own geometry or word its
  * own English.
  */
 
+export { readApplicability } from "../collection/index.js";
 export type {
   DisplayEntriesConfig,
   DisplayEntry,
@@ -86,6 +88,7 @@ export type {
   RowScopesConfig,
 } from "../rows/index.js";
 export { createRowScopes } from "../rows/index.js";
+export type { FieldNameOf } from "../schema/index.js";
 export type { EffectiveOrdering } from "../source/index.js";
 export { resolveEffectiveOrdering } from "../source/index.js";
 export { spellWireKey } from "../wire/index.js";

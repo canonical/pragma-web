@@ -4,7 +4,7 @@ import {
   rankOperand,
   type Slice,
 } from "../query/index.js";
-import { readField } from "../rows/index.js";
+import { compileFieldReader } from "../rows/index.js";
 import {
   resolveFieldKind,
   type SchemaFieldDefinition,
@@ -21,6 +21,11 @@ const isAbsent = (value: unknown): boolean =>
 type CompiledPredicate = {
   readonly field: string;
   readonly test: (value: unknown) => boolean;
+};
+
+/** A compiled predicate beside the read of the field it tests. */
+type ReadPredicate = CompiledPredicate & {
+  readonly read: (row: object) => unknown;
 };
 
 /**
@@ -110,10 +115,10 @@ const compilePredicate = (
 const matchesSearch = (
   row: object,
   needle: string,
-  fields: readonly string[],
+  readers: readonly ((row: object) => unknown)[],
 ): boolean => {
-  for (const field of fields) {
-    const value = readField(row, field);
+  for (const read of readers) {
+    const value = read(row);
     if (typeof value !== "string" && typeof value !== "number") {
       continue;
     }
@@ -139,17 +144,25 @@ export default function selectRows<TRow extends object>(
   const searchFields = config.searchFields ?? [];
   const query = canonicalizeSlice(slice);
   const needle = query.search === null ? null : foldText(query.search);
+  // Each field's read compiled once for the pass, not once per row.
   const predicates = query.filter
     .filter((predicate) => predicate.field !== lifted)
-    .map((predicate) =>
-      compilePredicate(predicate, config.schema.findField(predicate.field)),
+    .map(
+      (predicate): ReadPredicate => ({
+        ...compilePredicate(
+          predicate,
+          config.schema.findField(predicate.field),
+        ),
+        read: compileFieldReader(predicate.field),
+      }),
     );
+  const searched = searchFields.map(compileFieldReader);
   return rows.filter((row) => {
     for (const predicate of predicates) {
-      if (!predicate.test(readField(row, predicate.field))) {
+      if (!predicate.test(predicate.read(row))) {
         return false;
       }
     }
-    return needle === null || matchesSearch(row, needle, searchFields);
+    return needle === null || matchesSearch(row, needle, searched);
   });
 }

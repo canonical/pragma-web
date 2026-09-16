@@ -19,6 +19,7 @@ const CARD_SPAN = 4;
 function CardList<TRow extends object>({
   provider,
   applicabilityOf,
+  typeOf,
   records,
   readRow,
   title,
@@ -39,6 +40,7 @@ function CardList<TRow extends object>({
             selectable={selectable}
             nameRecord={nameRecord}
             applicabilityOf={applicabilityOf}
+            typeOf={typeOf}
           />
         ))}
       </CardGroup>

@@ -12,13 +12,13 @@ import {
   type DataViewsProvider,
   type DataViewsProviderConfig,
   declareCapabilities,
-  type FieldNameOf,
   type PresentationStore,
   type QueryLocation,
   type SortTerm,
   type SourceCapabilities,
   type ViewStore,
 } from "@canonical/dataviews-core";
+import type { FieldNameOf } from "@canonical/dataviews-core/bindings";
 import createManualSource from "./createManualSource.js";
 import { COUNTED_EXACTLY, pageOf } from "./fixtures.js";
 import type { ManualSource, ManualSourceConfig } from "./types.js";

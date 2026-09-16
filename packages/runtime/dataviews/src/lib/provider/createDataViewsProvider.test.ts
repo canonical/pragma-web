@@ -12,7 +12,7 @@ import {
   pageOf,
 } from "../../../testing/fixtures.js";
 import type { ActionOutcome } from "../action/index.js";
-import { createCollection } from "../collection/index.js";
+import { createCollection, readApplicability } from "../collection/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
 import type { PresentationStore } from "../presentation/index.js";
 import {
@@ -1622,15 +1622,6 @@ describe("createDataViewsProvider record types", () => {
     expect(machineProvider().provider.collection.types).toBeNull();
   });
 
-  it("answers whether a field applies to a row", () => {
-    const { host } = instanceProvider();
-    expect(host.applicability("secureboot", machine("v-1"))).toBe("applies");
-    expect(host.applicability("secureboot", container("c-1"))).toBe(
-      "not-applicable",
-    );
-    expect(host.applicability("type", container("c-1"))).toBe("applies");
-  });
-
   it("names the declared type a row carries, and null for one it does not", () => {
     const { host } = instanceProvider();
     expect(host.typeOf(container("c-1"))).toBe("container");
@@ -1721,9 +1712,10 @@ describe("createDataViewsProvider monomorphic collection", () => {
     host.complete(host.refresh(), delivered([{ id: "m-1" }]));
     provider.selection.set(["m-1"]);
     expect(host.recordType("m-1")).toBeNull();
-    expect(host.applicability("status", { id: "m-1" })).toBe("applies");
-    expect(host.applicability("anything", { id: "m-1" })).toBe("applies");
     expect(host.typeOf({ id: "m-1" })).toBeNull();
+    expect(readApplicability(provider.collection, "status", null)).toBe(
+      "applies",
+    );
   });
 
   it("leaves a scoped field applying to every row", () => {
@@ -1740,7 +1732,11 @@ describe("createDataViewsProvider monomorphic collection", () => {
     // has nothing to exclude and the scoping never fires.
     expect(scoped.types).toBeNull();
     expect(
-      readProviderHost(provider).applicability("secureboot", { id: "m-1" }),
+      readApplicability(
+        provider.collection,
+        "secureboot",
+        readProviderHost(provider).typeOf({ id: "m-1" }),
+      ),
     ).toBe("applies");
   });
 

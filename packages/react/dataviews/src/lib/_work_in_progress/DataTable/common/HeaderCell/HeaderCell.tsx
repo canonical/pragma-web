@@ -97,7 +97,20 @@ export default function HeaderCell({
   // hydration is left on nothing.
   const { link, button } = useHydrationFocusHandoff({ hydrated });
   const descriptionId = `${labelId}-sort`;
-  const describedBy = precedence === null ? undefined : descriptionId;
+  const scopeId = `${labelId}-scope`;
+  // What describes the column: its place in the ordering, and the record
+  // types it applies to. Referenced, since a description a reader cannot
+  // reach from the control describes nothing.
+  const describedBy =
+    [
+      precedence === null ? null : descriptionId,
+      scopedTo === null ? null : scopeId,
+    ]
+      .filter((id) => id !== null)
+      .join(" ") || undefined;
+  // The scope alone: what the header cell says of itself where its control
+  // carries the rest.
+  const scopeDescription = scopedTo === null ? undefined : scopeId;
   const indicator =
     precedence === null ? null : (
       <>
@@ -127,8 +140,9 @@ export default function HeaderCell({
           ? ariaSort[precedence.direction]
           : undefined
       }
-      // A header with no control of its own is described itself.
-      aria-describedby={interactive ? undefined : describedBy}
+      // A header with no control of its own is described itself; one with a
+      // control still says which types it applies to.
+      aria-describedby={interactive ? scopeDescription : describedBy}
       // A refusal's reason stands while focus is in the header or in this
       // column's own menu, whose surface is portalled outside it, and goes
       // once focus leaves both: a choice from the menu settles it through the
@@ -214,9 +228,10 @@ export default function HeaderCell({
       )}
       {/* A column whose field only some record types carry says so, read and
           never drawn: the dash in such a cell is then a fact about the
-          record rather than a gap in the data. */}
+          record rather than a gap in the data. Clipped, not hidden, so it
+          stays in the accessibility tree for the description to reach. */}
       {scopedTo === null ? null : (
-        <span className="scope" hidden>
+        <span id={scopeId} className="scope">
           {messages.columnAppliesTo(scopedTo)}
         </span>
       )}

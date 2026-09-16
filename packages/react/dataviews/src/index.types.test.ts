@@ -30,8 +30,6 @@ import type {
   DisplayField,
   DisplayFieldCellProps,
   PaginationBarProps,
-  TypedCellProps,
-  TypedColumn,
   UseDataViewsCellResult,
   UseDataViewsFilterResult,
   UseDataViewsResult,
@@ -51,8 +49,6 @@ type EveryPublicType = [
   DataTableColumn,
   DataTableProps<Fields>,
   DataTableVirtualization,
-  TypedCellProps<unknown, RowRecord>,
-  TypedColumn<Fields>,
   DataViewsProps<Fields>,
   DataViewsFiltersProps,
   PaginationBarProps<Fields>,
@@ -173,7 +169,6 @@ describe("public surface types", () => {
       "DataViews",
       "PaginationBar",
       // The documented count past which a renderer warns in development.
-      "RENDER_CEILING",
       "createColumns",
       "useDataViews",
       "useDataViewsCell",
@@ -282,9 +277,20 @@ describe("connected part props", () => {
     expectTypeOf(dataviewsReact.DataViews.Settings).parameters.toEqualTypeOf<
       []
     >();
+    // The connected table's props are the table's less the provider and
+    // the words, with a footer that alone may be null: it has one by default.
     expectTypeOf<
-      Omit<DataTableProps<Fields, RowRecord>, "provider" | "messages">
-    >().toEqualTypeOf<DataViewsDataTableProps>();
+      Omit<
+        DataTableProps<Fields, RowRecord>,
+        "provider" | "messages" | "footer"
+      >
+    >().toEqualTypeOf<Omit<DataViewsDataTableProps, "footer">>();
+    expectTypeOf<DataViewsDataTableProps["footer"]>().toEqualTypeOf<
+      ReactElement | null | undefined
+    >();
+    expectTypeOf<DataTableProps<Fields>["footer"]>().toEqualTypeOf<
+      ReactElement | undefined
+    >();
   });
 
   it("keeps what Filters derives out of its props", () => {
