@@ -16,22 +16,22 @@ import {
   createArraySource,
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
-import { DataViews, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataViews } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
 import { RendererSwitch } from "./RendererSwitch.js";
 
-const detailColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-];
+const detailColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+]);
 
-const summaryColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-];
+const summaryColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+]);
 
 export function Machines() {
   const [provider] = useState(() =>

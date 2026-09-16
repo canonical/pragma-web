@@ -18,6 +18,8 @@ type ConsumerCode = {
   readonly imports?: string | undefined;
   /** Module-level code: columns, custom children. */
   readonly declarations?: string | undefined;
+  /** The collection the provider is built over, by name; the machines' by default. */
+  readonly collection?: string | undefined;
   /** The source, as source text; the machines over a local array by default. */
   readonly source?: string | undefined;
   /** The query the provider starts on, as the canonical text its snapshot carries. */
@@ -64,6 +66,7 @@ const indent = (text: string, depth: number): string =>
 
 /** The provider, built once in state, with the commands issued once it is. */
 const providerState = ({
+  collection,
   source,
   query,
   prepare,
@@ -72,7 +75,13 @@ const providerState = ({
   facets,
 }: Pick<
   ConsumerCode,
-  "source" | "query" | "prepare" | "store" | "location" | "facets"
+  | "collection"
+  | "source"
+  | "query"
+  | "prepare"
+  | "store"
+  | "location"
+  | "facets"
 >): string => {
   const commands =
     prepare === undefined
@@ -83,7 +92,7 @@ const providerState = ({
       ? []
       : [`snapshot: { query: ${JSON.stringify(query)}, presentation: {} },`];
   const config = [
-    "collection: machineCollection,",
+    `collection: ${collection},`,
     `source: ${source},`,
     ...(location === undefined ? [] : [`location: ${location},`]),
     ...(store === true ? ["views: store,", "presentation: store,"] : []),
@@ -115,6 +124,7 @@ export const consumerCode = ({
   coreTypes = [],
   imports,
   declarations,
+  collection = "machineCollection",
   source = machineSource,
   query,
   prepare,
@@ -144,7 +154,7 @@ ${imports ?? `import { machineCollection, machines } from "./machines.js";`}`,
           store ? viewStore : undefined,
           declarations,
           `export function Machines() {
-${providerState({ source, query, prepare, store, location, facets })}
+${providerState({ collection, source, query, prepare, store, location, facets })}
   return (
 ${indent(render, 4)}
   );

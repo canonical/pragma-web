@@ -135,6 +135,7 @@ export default function createColumns<
         id,
         hideable,
         resizable,
+        rowHeader,
         sizing,
         sortable,
       } = column;
@@ -146,6 +147,7 @@ export default function createColumns<
         field,
         id: id ?? field,
         ...(appliesTo === undefined ? {} : { appliesTo }),
+        ...(rowHeader === undefined ? {} : { rowHeader }),
         ...(sizing === undefined ? {} : { sizing }),
         ...(hideable === undefined ? {} : { hideable }),
         ...(sortable === undefined ? {} : { sortable }),

@@ -21,8 +21,8 @@ import {
 } from "@canonical/dataviews-core";
 import { createIndexedDBViewStore } from "@canonical/dataviews-core/indexeddb";
 import {
+  createColumns,
   DataViews,
-  type DataTableColumn,
   useDataViews,
   useDataViewsValue,
 } from "@canonical/dataviews-react";
@@ -41,12 +41,12 @@ const store = createIndexedDBViewStore({
   partition: null,
 });
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);
 
 // Refused parameters of the URL: a clause the grammar, the collection or the
 // source cannot run stays in the URL, and its reasons are the provider's.
@@ -156,7 +156,8 @@ The server hands the client `readSnapshot()` — the query as canonical text and
 
 ```tsx
 import type { DataViewsProvider } from "@canonical/dataviews-core";
-import { DataViews, type DataTableColumn } from "@canonical/dataviews-react";
+import { createColumns, DataViews } from "@canonical/dataviews-react";
+import { machineCollection } from "./machines.js";
 import type { Machine, machineCollection } from "./machines.js";
 
 type MachineProvider = DataViewsProvider<
@@ -164,11 +165,11 @@ type MachineProvider = DataViewsProvider<
   Machine
 >;
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores", sortable: true },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores", sortable: true },
+]);
 
 export function MachinesPage({
   provider,

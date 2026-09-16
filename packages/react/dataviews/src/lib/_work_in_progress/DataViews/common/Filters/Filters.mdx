@@ -20,9 +20,9 @@ import {
   createDataViewsProvider,
 } from "@canonical/dataviews-core";
 import {
+  createColumns,
   DataTable,
   DataViews,
-  type DataTableColumn,
 } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { type Machine, machines } from "./machines.js";
@@ -41,12 +41,12 @@ const machineCollection = createCollection({
   ],
 });
 
-const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+const columns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);
 
 export function Machines() {
   // Built once: the parts observe it, which starts its source and ports.

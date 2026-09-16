@@ -58,6 +58,7 @@ describe("createColumns", () => {
         sortable: true,
         hideable: false,
         resizable: true,
+        rowHeader: true,
         sizing: { kind: "fixed", px: 80 },
       },
     ]);
@@ -67,17 +68,31 @@ describe("createColumns", () => {
       sortable: true,
       hideable: false,
       resizable: true,
+      rowHeader: true,
       sizing: { kind: "fixed", px: 80 },
     });
   });
 
-  it("carries the record types a column narrows itself to", () => {
-    const columns = createColumns(instances, [
-      { field: "status", header: "Status", appliesTo: ["virtual-machine"] },
-      { field: "name", header: "Name" },
+  it("carries every member the table's column type declares", () => {
+    // Built by hand, member by member, so a member added to the column type
+    // and forgotten there would be typed in and dropped on the way out. The
+    // content is declared inline, since its props are typed by the field.
+    const declared = {
+      appliesTo: ["container"],
+      hideable: false,
+      resizable: true,
+      rowHeader: true,
+      sizing: { kind: "fixed", px: 80 },
+      sortable: true,
+    } as const satisfies Required<
+      Omit<DataTableColumn, "id" | "field" | "header" | "cell">
+    >;
+    const [column] = createColumns(instances, [
+      { field: "image", header: "Image", cell: () => null, ...declared },
     ]);
-    expect(columns.at(0)?.appliesTo).toEqual(["virtual-machine"]);
-    expect(columns.at(1)).not.toHaveProperty("appliesTo");
+    expect(Object.keys(column ?? {}).sort()).toEqual(
+      ["cell", "field", "header", "id", ...Object.keys(declared)].sort(),
+    );
   });
 
   it("names a nested field by its dot path", () => {
