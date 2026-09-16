@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { consumerCode } from "../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../storybook/decorators.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import { useMachineProvider } from "../../../storybook/machines/story-utils.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataViews } from "../DataViews/index.js";
@@ -57,6 +57,8 @@ function TableOrSummaryMachines({
                 label="Machines"
                 selectable
                 rowLabel={(row) => String(row["name"])}
+                // One bar serves both renderers, after the switch.
+                footer={null}
               />
             ),
           },
@@ -69,11 +71,13 @@ function TableOrSummaryMachines({
                 label="Machines, summarised"
                 selectable
                 rowLabel={(row) => String(row["name"])}
+                footer={null}
               />
             ),
           },
         ]}
       />
+      <DataViews.Pagination sizes={[5, 10]} />
     </DataViews>
   );
 }
@@ -90,22 +94,22 @@ export const TableOrSummary: Story = {
     <TableOrSummaryMachines label={label} />
   ),
   parameters: consumerCode({
-    parts: ["DataViews", "type DataTableColumn"],
+    parts: ["DataViews", "createColumns"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
 import { RendererSwitch } from "./RendererSwitch.js";`,
-    declarations: `const detailColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-  { id: "region", header: "Region" },
-  { id: "cores", header: "Cores" },
-  { id: "owner", header: "Owner" },
-];
+    declarations: `const detailColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+  { field: "region", header: "Region" },
+  { field: "cores", header: "Cores" },
+  { field: "owner", header: "Owner" },
+]);
 
-const summaryColumns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host" },
-  { id: "status", header: "Status" },
-];`,
+const summaryColumns = createColumns(machineCollection, [
+  { field: "name", header: "Host" },
+  { field: "status", header: "Status" },
+]);`,
     render: `<DataViews provider={provider}>
   <RendererSwitch
     label="Show machines as"
@@ -113,15 +117,17 @@ const summaryColumns: readonly DataTableColumn[] = [
       {
         id: "table",
         label: "Table",
-        content: <DataViews.DataTable columns={detailColumns} label="Machines" selectable />,
+        content: <DataViews.DataTable columns={detailColumns} label="Machines" selectable footer={null} />,
       },
       {
         id: "summary",
         label: "Summary",
-        content: <DataViews.DataTable columns={summaryColumns} label="Machines, summarised" selectable />,
+        content: <DataViews.DataTable columns={summaryColumns} label="Machines, summarised" selectable footer={null} />,
       },
     ]}
   />
+  {/* One bar serves both renderers. */}
+  <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`,
   }),
   play: async ({ canvas }) => {

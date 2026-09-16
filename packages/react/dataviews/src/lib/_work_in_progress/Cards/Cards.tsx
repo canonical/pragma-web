@@ -27,11 +27,11 @@ import {
   useStableValue,
 } from "../../hooks/index.js";
 import {
-  areColumnScopesEqual,
   areDisplayFieldsEqual,
+  areFieldScopesEqual,
   describeStatus,
-  readColumnScopes,
   readFieldName,
+  readFieldScopes,
 } from "../../utils/index.js";
 import { CardList, SelectAllOnPage } from "./common/index.js";
 import type { CardsProps } from "./types.js";
@@ -135,6 +135,7 @@ export default function Cards<
   useRenderCeiling({
     renderer: "Cards",
     count: records.length,
+    unit: "cards",
     virtualization: "none",
   });
   // Held behind one identity: a lambda must not re-render every card. Null
@@ -143,17 +144,21 @@ export default function Cards<
     (row: TRow, rowId: string): string | null =>
       rowLabel === undefined ? null : rowLabel(row, rowId),
   );
-  // Whether one field applies to one card's record, as a table asks it of a
-  // row. One identity, so a re-render of the cards re-renders no card for
-  // this.
   // Every declared field's scope, checked where the cards mount, keyed on
   // what a scope is read from, so a field rebuilt inline re-reads none.
-  const scoped = useStableValue(fields, areColumnScopesEqual);
+  const scoped = useStableValue(fields, areFieldScopesEqual);
   const scopeOf = useMemo(
     () =>
-      readColumnScopes({ collection: provider.collection, columns: scoped }),
+      readFieldScopes({
+        collection: provider.collection,
+        fields: scoped,
+        subject: "Cards field",
+      }),
     [scoped, provider],
   );
+  // Whether one field applies to a card's record of one type, as a table
+  // asks it of a row. One identity, so a re-render of the cards re-renders
+  // no card for this.
   const applicabilityOf = useStableCallback(
     (field: DisplayField, type: string | null): Applicability =>
       scopeOf(field).applicability(type),

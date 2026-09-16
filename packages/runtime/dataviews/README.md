@@ -166,28 +166,29 @@ export const instances = createCollection({
   empty. It satisfies no predicate, `isSet` included, and reads as absent to
   ordering, so filtering on a scoped field restricts the result to that field's
   types by meaning: nothing is added to the query, the URL or a saved view.
-  `applicability(field, row)` answers which state a cell is in: a renderer
-  draws the third one as a dash carrying its own accessible text, so a reader
-  can tell it from a field that is merely empty, and hands it to a column's
-  own content, which may decide otherwise. This rests on the source writing no value at a
-  scoped key for a row the field does not apply to — the source's obligation,
-  not something checked here.
+  The host's `typeOf(row)` names the declared type a row carries, and
+  `readApplicability(collection, field, type)` answers which state a cell is
+  in: a renderer draws the third one as a dash carrying its own accessible
+  text, so a reader can tell it from a field that is merely empty, and hands
+  it to a column's own content, which may decide otherwise. This rests on the
+  source writing no value at a scoped key for a row the field does not apply
+  to — the source's obligation, not something checked here.
 - **Identities stay opaque strings**, unique across types within the
   provider's scope and minted by the source, which prefixes with the type only
   where its own backend's identities collide. The UI never parses one.
 - **Type memory.** The host's `recordType(id)` answers the type of a selected
   identity, taken while the row was displayed and kept until the rows are next
   replaced after it leaves the selection, so an action's applicability to
-  records selected on an earlier page is decidable without a lookup. The row on display always
-  answers for itself, so this never contradicts `applicability`, and
-  it changes only with a `rows` or a `selection` publication. An identity a
+  records selected on an earlier page is decidable without a lookup. The row
+  on display always answers for itself, so this never contradicts `typeOf`,
+  and it changes only with a `rows` or a `selection` publication. An identity a
   host restored over rows this provider never modelled while they were
   selected answers null: not loaded, never assumed.
 
 **A monomorphic collection declares no `discriminator`, and none of this
-reaches it.** `collection.types` is null, `applicability` answers `"applies"`
-for every field, `recordType` answers null, no row is ever read for a type,
-and nothing costs anything.
+reaches it.** `collection.types` is null, `typeOf` answers null and
+`readApplicability` answers `"applies"` for every field, `recordType` answers
+null, no row is ever read for a type, and nothing costs anything.
 
 ## Words this package uses twice
 

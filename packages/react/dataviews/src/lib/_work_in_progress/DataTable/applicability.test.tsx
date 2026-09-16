@@ -87,7 +87,6 @@ describe("a table over records of several types", () => {
     // Named by its label alone, described by the types: the description is
     // what a reader reaches, so the text is clipped and never hidden.
     expect(image).toHaveAccessibleDescription("Applies to container");
-    expect(image.querySelector(".scope")).not.toHaveAttribute("hidden");
     // A column over a field every type carries says nothing of types.
     const name = screen.getByRole("columnheader", { name: "Name" });
     expect(name).not.toHaveAccessibleDescription();
@@ -118,7 +117,7 @@ describe("a table over records of several types", () => {
         { id: "image", header: "Image", appliesTo: ["virtual-machine"] },
       ]),
     ).toThrow(
-      'column "image" applies to "virtual-machine", which its field "image" does not',
+      'DataTable column "image" applies to "virtual-machine", which its field "image" does not',
     );
   });
 

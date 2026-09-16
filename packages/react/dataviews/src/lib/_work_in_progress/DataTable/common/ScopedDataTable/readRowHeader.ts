@@ -20,7 +20,9 @@ export default function readRowHeader(
   const headers = columns.filter((column) => column.rowHeader === true);
   if (headers.length > 1) {
     const named = headers.map((column) => `"${column.id}"`).join(" and ");
-    throw new Error(`columns ${named} are each the row header; a row has one`);
+    throw new Error(
+      `DataTable columns ${named} are each the row header; a row has one`,
+    );
   }
   const header = headers[0];
   if (header === undefined) {
@@ -32,7 +34,7 @@ export default function readRowHeader(
     schema.findField(field)?.appliesTo !== undefined
   ) {
     throw new Error(
-      `column "${header.id}" is the row header, but its field "${field}" does not apply to every record type`,
+      `DataTable column "${header.id}" is the row header, but its field "${field}" does not apply to every record type`,
     );
   }
   return { ...header, hideable: false };

@@ -54,8 +54,6 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
 
   selectAllRows: "Select all displayed rows",
   selectRow: (name) => `Select ${name}`,
-  selectionModeEntered: "Selection mode: tap a row to select or deselect it.",
-  selectionModeLeft: "Selection mode ended.",
   columnWidth: (pixels) =>
     `${formatCount(pixels)} ${pixels === 1 ? "pixel" : "pixels"}`,
 
@@ -108,6 +106,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   columnMoved: (name, position, total) =>
     `${name} moved to position ${formatCount(position)} of ${formatCount(total)}`,
   tableSettingsReset: "Table settings reset",
+  selectionModeEntered: "Selection mode: tap a row to select or deselect it.",
+  selectionModeEnded: "Selection mode ended.",
 
   sortPanel: "Sort",
   sortTerm: formatSortTerm,

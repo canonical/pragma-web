@@ -1,6 +1,6 @@
 export { default as applyRef } from "./applyRef.js";
-export { default as areColumnScopesEqual } from "./areColumnScopesEqual.js";
 export { default as areDisplayFieldsEqual } from "./areDisplayFieldsEqual.js";
+export { default as areFieldScopesEqual } from "./areFieldScopesEqual.js";
 export { default as areSortTermsEqual } from "./areSortTermsEqual.js";
 export { default as composeMessage } from "./composeMessage.js";
 export { default as describeOrdering } from "./describeOrdering.js";
@@ -9,8 +9,8 @@ export { default as interceptSubmit } from "./interceptSubmit.js";
 export { default as isSameFacet } from "./isSameFacet.js";
 export { default as listHiddenFields } from "./listHiddenFields.js";
 export { default as listNiceTicks } from "./listNiceTicks.js";
-export { default as readColumnScopes } from "./readColumnScopes.js";
 export { default as readFieldName } from "./readFieldName.js";
+export { default as readFieldScopes } from "./readFieldScopes.js";
 export { default as spellCount } from "./spellCount.js";
 export { default as spellPrimitiveValue } from "./spellPrimitiveValue.js";
 export { default as subscribeToDestinationInputs } from "./subscribeToDestinationInputs.js";

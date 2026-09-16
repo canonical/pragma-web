@@ -16,6 +16,9 @@ import type { Collection } from "./types.js";
  * The type is the provider's to name, through its host's `typeOf`: a
  * renderer watches a record's type and asks this of the type, so it reads
  * the record for nothing else.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export default function readApplicability(
   collection: Pick<

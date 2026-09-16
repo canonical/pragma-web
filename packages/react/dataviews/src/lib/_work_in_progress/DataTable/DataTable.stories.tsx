@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
+import { consumerCode } from "../../../storybook/consumerCode.js";
 import { withAppScope, withFrame } from "../../../storybook/decorators.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import {
   createEmptySource,
   createFailingSource,

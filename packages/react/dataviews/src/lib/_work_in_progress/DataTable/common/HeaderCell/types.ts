@@ -112,10 +112,11 @@ export type HeaderCellProps = {
   /** The id this header's label carries, for the resize handle's name. */
   readonly labelId: string;
   /**
-   * The record types this column's field applies to, or null where it
-   * applies to every one of them. Read but not shown: a reader meeting a
-   * dash in the column learns from the heading which records carry the
-   * field at all, rather than being left to guess at an empty cell.
+   * The record types this column applies to — its own narrowing, else its
+   * field's scope — or null where it applies to every one of them. Read but
+   * not shown: a reader meeting a dash in the column learns from the heading
+   * which records it applies to, rather than being left to guess at an empty
+   * cell.
    */
-  readonly scopedTo: readonly string[] | null;
+  readonly appliesTo: readonly string[] | null;
 };

@@ -127,7 +127,7 @@ describe("a column declared the row header", () => {
         ],
       }),
     ).toThrow(
-      'columns "name" and "status" are each the row header; a row has one',
+      'DataTable columns "name" and "status" are each the row header; a row has one',
     );
   });
 

@@ -20,7 +20,7 @@ import type { BodyCellProps } from "./types.js";
 const componentCssClassName = "ds data-table-body-cell";
 
 /**
- * What a cell shows for a field its row's record does not carry at all: a
+ * What a cell shows for a field that does not apply to its row's record: a
  * dash, with the word for it read and not drawn.
  *
  * The dash alone would be indistinguishable from an empty field, which is a
@@ -161,14 +161,14 @@ function BodyCell<TRow extends object>({
  * providing row-level interactions such as inline editing and row actions.
  *
  * That is the design system's description of the block. What this
- * implementation covers: the text cell, the cell of a field a record's type
- * does not carry, a column's own renderer, and the row header — the cell of
- * the one column declared `rowHeader`, which names its row — with no inline
- * editing or row actions yet. A cell showing a field's value subscribes to that one field,
- * so a record update re-renders only the cells whose values actually
- * changed; a cell drawing a column's own content subscribes to the record,
- * which that content is handed. Either way it installs the cell context the
- * content reads.
+ * implementation covers: the text cell, the cell of a field that does not
+ * apply to a record's type, a column's own renderer, and the row header —
+ * the cell of the one column declared `rowHeader`, which names its row — with
+ * no inline editing or row actions yet. Every cell subscribes to its own
+ * field alone, so a record update re-renders only the cells whose values
+ * actually changed; the record a column's own content is handed is read as
+ * it renders, and the cell is drawn afresh when the record's type moves.
+ * Either way it installs the cell context the content reads.
  *
  * Memoised: without it the claim above would hold for the channel and be
  * undone by the row, which would re-render every cell it has whenever it

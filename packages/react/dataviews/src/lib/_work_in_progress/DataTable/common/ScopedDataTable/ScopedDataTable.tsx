@@ -44,10 +44,10 @@ import {
   useStableValue,
 } from "../../../../hooks/index.js";
 import {
-  areColumnScopesEqual,
+  areFieldScopesEqual,
   describeStatus,
-  readColumnScopes,
   readFieldName,
+  readFieldScopes,
 } from "../../../../utils/index.js";
 import {
   useColumnArrangement,
@@ -81,6 +81,13 @@ import "../../styles.css";
 /** The frame: the caller's box, holding the table, its footer and its announcer. */
 const frameCssClassName = "ds data-table-frame";
 
+/**
+ * `dense` is the design system's own density class: it sets the channel the
+ * stylesheet reads for row height and cell padding, so the table is dense
+ * wherever it sits.
+ */
+const componentCssClassName = "ds data-table dense";
+
 /** The frame observes nothing of its own node; the merge is for the caller's ref. */
 const attachNothing = (): undefined => undefined;
 
@@ -99,13 +106,6 @@ const readRowId = (target: EventTarget, table: Element): string | null => {
     ? row.getAttribute("data-row-id")
     : null;
 };
-
-/**
- * `dense` is the design system's own density class: it sets the channel the
- * stylesheet reads for row height and cell padding, so the table is dense
- * wherever it sits.
- */
-const componentCssClassName = "ds data-table dense";
 
 /** One identity for a source that orders by nothing. */
 const NO_SORTABLE_FIELDS: readonly string[] = Object.freeze([]);
@@ -193,7 +193,7 @@ export default function ScopedDataTable<
   const declaredColumns = useStableValue(listed, areColumnsEqual);
   // Held by what a scope is read from alone, so an inline heading or cell
   // re-reads no scope.
-  const scopedColumns = useStableValue(listed, areColumnScopesEqual);
+  const scopedColumns = useStableValue(listed, areFieldScopesEqual);
 
   // The columns the presentation shows, in its order. Both derivations
   // below are keyed on content, not on array identity: a caller who
@@ -263,6 +263,7 @@ export default function ScopedDataTable<
   useRenderCeiling({
     renderer: "DataTable",
     count: ids.length,
+    unit: "rows",
     virtualization: virtualization === undefined ? "available" : "in-use",
   });
 
@@ -314,7 +315,7 @@ export default function ScopedDataTable<
     return provider.selection.state.subscribe(() => {
       if (provider.selection.state.get().ids.size === 0) {
         setSelecting(false);
-        announce(messages.selectionModeLeft);
+        announce(messages.selectionModeEnded);
       }
     });
   }, [selecting, provider, announce, messages]);
@@ -338,9 +339,10 @@ export default function ScopedDataTable<
   // stored arrangement is checked where the table mounts all the same.
   const scopeOf = useMemo(
     () =>
-      readColumnScopes({
+      readFieldScopes({
         collection: provider.collection,
-        columns: scopedColumns,
+        fields: scopedColumns,
+        subject: "DataTable column",
       }),
     [scopedColumns, provider],
   );
@@ -544,7 +546,7 @@ export default function ScopedDataTable<
                     // Solved for every rendered column, in the same order.
                     width={geometry.widths[position] as number}
                     labelId={`${baseId}-${column.id}`}
-                    scopedTo={scopeOf(column).scopedTo}
+                    appliesTo={scopeOf(column).appliesTo}
                   />
                 );
               })}

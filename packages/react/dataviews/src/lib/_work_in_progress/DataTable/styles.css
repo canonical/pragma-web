@@ -17,7 +17,7 @@
    *
    * Colour, border, type and spacing come from @canonical/design-tokens. Row
    * height and cell padding come from the density channel of
-   * @canonical/styles: the root carries the design system's `.dense`, so the
+   * @canonical/styles: the table carries the design system's `.dense`, so the
    * table is dense wherever it sits, and it defines no density rule of its
    * own.
    */
@@ -179,17 +179,6 @@
     padding-inline: var(--density-padding-inline);
   }
 
-  /* The word for a field the row's type does not carry: read beside the
-     dash, taking no room and drawing nothing. Unthemable geometry. */
-  .ds.data-table-body-cell > .not-applicable {
-    position: absolute;
-    inline-size: 0;
-    block-size: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
   .ds.data-table-body-cell {
     /* One line: a value too long for its column ellipsizes rather than
        wrapping the row out of the shared track list — clipped without the
@@ -198,6 +187,19 @@
     overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    /* The word for a field that does not apply to the row's record: read
+       beside the dash, taking no room and drawing nothing. Clipped rather
+       than hidden, since nothing references it: the cell is named by it.
+       Unthemable geometry. */
+    & > .not-applicable {
+      position: absolute;
+      inline-size: 0;
+      block-size: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
   }
 
   .ds.data-table-resize-handle {
@@ -317,17 +319,6 @@
     /* The menu button's name: read, taking no room and drawing nothing.
        Unthemable geometry. */
     & > .menu > .trigger > .menu-label {
-      position: absolute;
-      inline-size: 0;
-      block-size: 0;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
-
-    /* Which record types the column applies to: read, taking no room and
-       drawing nothing. Unthemable geometry. */
-    & > .scope {
       position: absolute;
       inline-size: 0;
       block-size: 0;

@@ -118,7 +118,7 @@ export default function createColumns<
       // gives; without one they would share a key, a track and a scope.
       if (ids.has(named)) {
         throw new Error(
-          `two columns are named "${named}"; give the second an id of its own`,
+          `createColumns names two columns "${named}"; give the second an id of its own`,
         );
       }
       ids.add(named);

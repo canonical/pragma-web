@@ -157,8 +157,7 @@ The server hands the client `readSnapshot()` — the query as canonical text and
 ```tsx
 import type { DataViewsProvider } from "@canonical/dataviews-core";
 import { createColumns, DataViews } from "@canonical/dataviews-react";
-import { machineCollection } from "./machines.js";
-import type { Machine, machineCollection } from "./machines.js";
+import { type Machine, machineCollection } from "./machines.js";
 
 type MachineProvider = DataViewsProvider<
   typeof machineCollection.schema.fields,

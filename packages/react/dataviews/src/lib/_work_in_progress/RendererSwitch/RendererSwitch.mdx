@@ -48,15 +48,17 @@ export function Machines() {
           {
             id: "table",
             label: "Table",
-            content: <DataViews.DataTable columns={detailColumns} label="Machines" selectable />,
+            content: <DataViews.DataTable columns={detailColumns} label="Machines" selectable footer={null} />,
           },
           {
             id: "summary",
             label: "Summary",
-            content: <DataViews.DataTable columns={summaryColumns} label="Machines, summarised" selectable />,
+            content: <DataViews.DataTable columns={summaryColumns} label="Machines, summarised" selectable footer={null} />,
           },
         ]}
       />
+      {/* One bar serves both renderers, after the switch. */}
+      <DataViews.Pagination sizes={[5, 10, 25]} />
     </DataViews>
   );
 }

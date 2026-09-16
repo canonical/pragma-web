@@ -17,6 +17,11 @@
 #   description     design none           DOM `span[hidden]`, the direction
 #                                         and precedence the sort control is
 #                                         described by
+#   scope           design none           DOM `span.scope`, hidden, the record
+#                                         types the column applies to, which
+#                                         the heading and its sort control are
+#                                         described by; present only where the
+#                                         column or its field is scoped
 #   reason          design none yet       DOM `span.sort-reason`, why the last
 #                                         activation changed nothing, shown
 #                                         and not live: the table's announcer

@@ -11,9 +11,9 @@
  * to, the wire key a form control is named by, and the parameters a link
  * carries an arrangement in, the words a root speaks — the application's
  * messages over the English record — and the reading of whether a field
- * applies to a record's type, with the names of a collection's fields. React uses it now; a Svelte binding
- * would use the same names rather than solve its own geometry or word its
- * own English.
+ * applies to a record's type, with the names of a collection's fields.
+ * React uses it now; a Svelte binding would use the same names rather than
+ * solve its own geometry or word its own English.
  */
 
 export { readApplicability } from "../collection/index.js";

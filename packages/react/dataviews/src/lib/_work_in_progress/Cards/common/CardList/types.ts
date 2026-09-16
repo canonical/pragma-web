@@ -45,8 +45,9 @@ export type CardListProps<TRow extends object> = {
    */
   readonly nameRecord: (row: TRow, rowId: string) => string | null;
   /**
-   * Whether one field applies to a record of one declared type, or of none. The cards', one identity for
-   * every card, asked per field as a table asks it per column.
+   * Whether one field applies to a record of one declared type, or of none.
+   * The cards', one identity for every card, asked per field as a table asks
+   * it per column.
    */
   readonly applicabilityOf: (
     field: DisplayField,

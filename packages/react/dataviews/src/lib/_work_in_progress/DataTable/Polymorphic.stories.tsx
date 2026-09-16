@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { consumerCode } from "../../../storybook/consumerCode.js";
 import { withAppScope } from "../../../storybook/decorators.js";
 import {
   createUndeclaredTypeSource,
@@ -12,7 +13,6 @@ import {
   type InstanceProviderConfig,
   useInstanceProvider,
 } from "../../../storybook/instances/story-utils.js";
-import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";
 import createColumns from "./createColumns.js";
@@ -158,13 +158,13 @@ const parts = [
 
 /**
  * Two record types in one table. A virtual machine runs from no image and a
- * container boots no firmware: each cell for a field the row's type does not
- * carry draws a dash, and a reader hears "Not applicable" there — told apart
- * from `scratch-01`, whose image is empty and whose cell says nothing. The
- * Image and Firmware headings each carry hidden text naming the types they
- * apply to. The "Runs from" column's own content narrows on the record's
- * type, so it reads `image` on a container and `firmware` on a machine, and
- * the compiler holds the two arms exhaustive.
+ * container boots no firmware: each cell for a field that does not apply to
+ * the row's type draws a dash, and a reader hears "Not applicable" there —
+ * told apart from `scratch-01`, whose image is empty and whose cell says
+ * nothing. The Image and Firmware headings are each described by the types
+ * they apply to, read but not drawn. The "Runs from" column's own content
+ * narrows on the record's type, so it reads `image` on a container and
+ * `firmware` on a machine, and the compiler holds the two arms exhaustive.
  */
 export const MixedTypes: Story = {
   parameters: consumerCode({

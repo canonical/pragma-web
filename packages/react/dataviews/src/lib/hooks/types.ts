@@ -185,8 +185,10 @@ export type UseLongPressResult = {
 export type UseRenderCeilingProps = {
   /** The renderer, as the warning names it. */
   readonly renderer: string;
-  /** How many rows it renders at once. */
+  /** How many it renders at once. */
   readonly count: number;
+  /** What it renders, as the warning counts them. */
+  readonly unit: "rows" | "cards";
   /**
    * Whether the renderer virtualizes: `in-use` where it does, so nothing is
    * said; `available` where it could, so the warning points to it; `none`

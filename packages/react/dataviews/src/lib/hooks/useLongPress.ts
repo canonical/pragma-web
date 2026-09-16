@@ -21,6 +21,9 @@ type Press = {
  * tracked, so the platform's gesture does not fight this one. A mouse or pen
  * is never a long press: its clicks are taps, and its context menu is left
  * alone.
+ *
+ * @note Impure: schedules the press timer, and cancels the click and the
+ * context menu of a long press.
  */
 export default function useLongPress({
   onLongPress,

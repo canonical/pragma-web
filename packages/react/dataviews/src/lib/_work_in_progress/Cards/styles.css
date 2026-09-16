@@ -68,7 +68,7 @@
       overflow-wrap: anywhere;
     }
 
-    /* The word for a field the record's type does not carry: read beside
+    /* The word for a field that does not apply to the record: read beside
        the dash, taking no room and drawing nothing. Unthemable geometry. */
     & .data-card .not-applicable {
       position: absolute;
