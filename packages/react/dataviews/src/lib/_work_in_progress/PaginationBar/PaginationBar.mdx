@@ -55,10 +55,12 @@ export function Machines() {
     }),
   );
   return (
-    <>
-      <DataTable provider={provider} columns={columns} label="Machines" />
-      <PaginationBar provider={provider} sizes={[5, 10, 25]} />
-    </>
+    <DataTable
+      provider={provider}
+      columns={columns}
+      label="Machines"
+      footer={<PaginationBar provider={provider} sizes={[5, 10, 25]} />}
+    />
   );
 }
 ```

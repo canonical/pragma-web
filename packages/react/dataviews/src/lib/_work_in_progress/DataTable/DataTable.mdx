@@ -149,6 +149,22 @@ const columns: readonly DataTableColumn[] = [
 <DataTable provider={provider} columns={columns} label="Machines" selectable />;
 ```
 
+## The frame and its footer
+
+The table stands in a frame, which is the caller's box: `className`, `style`, `ref` and the other native props land there, and a height capped on it scrolls the table within while the header sticks. The frame's `footer` holds the pagination bar beneath the table and outside the table role — a landmark, never a row — and keeps it to the bottom of the view while a tall table scrolls past. A standalone table's live region sits in the frame after the footer. The connected `DataViews.DataTable` places `DataViews.Pagination` in the footer unless given another, or `null` for none.
+
+```tsx
+import { DataTable, PaginationBar } from "@canonical/dataviews-react";
+
+<DataTable
+  provider={provider}
+  columns={columns}
+  label="Machines"
+  style={{ maxBlockSize: "60vh" }}
+  footer={<PaginationBar provider={provider} sizes={[10, 25, 50]} />}
+/>;
+```
+
 ## Resizing and its limits
 
 `resizable` puts a control on a column's trailing edge, driven by the pointer or the keyboard — arrow keys step the edge, Escape abandons a drag. Every resize is held to the column's declared `minPx` and `maxPx`, however often it has been resized, and a column widened past the container scrolls the table so the edge being moved stays in view.

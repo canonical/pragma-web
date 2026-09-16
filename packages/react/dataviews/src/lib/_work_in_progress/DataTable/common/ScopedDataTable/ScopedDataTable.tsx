@@ -65,6 +65,12 @@ import readColumnScopes from "./readColumnScopes.js";
 import readRowHeader from "./readRowHeader.js";
 import "../../styles.css";
 
+/** The frame: the caller's box, holding the table, its footer and its announcer. */
+const frameCssClassName = "ds data-table-frame";
+
+/** The frame observes nothing of its own node; the merge is for the caller's ref. */
+const attachNothing = (): undefined => undefined;
+
 /**
  * `dense` is the design system's own density class: it sets the channel the
  * stylesheet reads for row height and cell padding, so the table is dense
@@ -108,8 +114,10 @@ export default function ScopedDataTable<
   renderStatus,
   virtualization,
   settings,
+  footer,
   messages,
   announce,
+  announcer,
   className,
   style,
   ref,
@@ -285,12 +293,11 @@ export default function ScopedDataTable<
     ],
   );
 
-  // The container ref is the table's own — the solver measures it — so a
-  // caller's ref is merged onto it rather than dropped, as className and
-  // style are. The merge holds the caller's ref behind one identity, which
-  // matters most here: a ref React re-ran per render would rebuild the
-  // resize observer and re-measure the container on every frame of a drag.
-  const attach = useMergedRef(ref, geometry.attach);
+  // The caller's ref reaches the frame behind one identity, as the props
+  // promise: a callback ref rebuilt every render costs no re-attach. The
+  // frame attaches nothing of its own — the solver measures the table
+  // within it, whose width leaves out the scrollbar the frame's would count.
+  const attach = useMergedRef(ref, attachNothing);
 
   // Held behind one identity apiece: the README's own examples pass these
   // as lambdas, and a new function per render would re-render every row
@@ -347,103 +354,121 @@ export default function ScopedDataTable<
     ],
   );
 
-  // A custom property, which `CSSProperties` does not spell.
+  // A custom property, which `CSSProperties` does not spell. Written on the
+  // table, the container the solver measured, from which every row reads it;
+  // the caller's style is the frame's.
   const geometryStyle = {
-    ...style,
     "--data-table-columns": geometry.template,
   } as CSSProperties;
 
   return (
     <MessagesContext value={messages}>
-      {/* biome-ignore lint/a11y/useSemanticElements: a <table> resolves each row's widths from its own content, which is exactly what this grid replaces with one shared track list */}
+      {/* The frame is the caller's box: it takes the caller's props, holds
+          the table, the footer beneath it and the announcer, and a height
+          capped on it scrolls the table within it. */}
       <div
         {...rest}
         ref={attach}
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
-        style={geometryStyle}
-        role="table"
-        aria-label={label}
-        aria-busy={busy}
-        // Every logical row, the header's included, so a row a virtualized
-        // table has not mounted is still counted.
-        aria-rowcount={
-          virtualization === undefined ? undefined : entries.length + 1
-        }
+        className={[frameCssClassName, className].filter(Boolean).join(" ")}
+        style={style}
       >
-        {/* biome-ignore lint/a11y/useSemanticElements: <thead> is only valid inside a <table>, and this grid is deliberately not one */}
-        <div role="rowgroup" className="ds data-table-row-group header">
-          {/* biome-ignore lint/a11y/useSemanticElements: <tr> is only valid inside a <table>, and this grid is deliberately not one */}
-          {/* biome-ignore lint/a11y/useFocusableInteractive: the row is structure, not a widget — the focusable controls live in its cells */}
-          <div
-            ref={headerRow}
-            role="row"
-            className="ds data-table-row"
-            aria-rowindex={virtualization === undefined ? undefined : 1}
-          >
-            {selectable ? (
-              <SelectAllCell
-                selection={provider.selection}
-                ids={rowScopes.ids}
-                reserve={geometry.reserve}
-              />
-            ) : null}
-            {rendered.map((column, position) => {
-              const field = readFieldName(column);
-              const sortable = column.sortable === true && orderable.has(field);
-              return (
-                <HeaderCell
-                  key={column.id}
-                  column={column}
-                  sortable={sortable}
-                  precedence={headerSort.precedences.get(field) ?? null}
-                  primary={column.id === headerSort.primaryColumnId}
-                  // Spelled only while it is rendered: once scripts take over
-                  // the header is a button, and nothing reads a destination.
-                  destination={
-                    sortable && !hydrated
-                      ? headerSort.spellDestination(column.id)
-                      : null
-                  }
-                  hydrated={hydrated}
-                  reason={headerSort.readReason(column.id)}
-                  onClearRefusal={headerSort.clearRefusal}
-                  onSort={headerSort.sortColumn}
-                  removable={headerSort.stated.has(field)}
-                  onPlace={headerSort.placeColumn}
-                  onRemoveFromSort={headerSort.removeFromSort}
-                  offers={readOffers(column.id)}
-                  onChangeColumn={changeColumn}
-                  interaction={interaction}
-                  resizable={
-                    column.resizable === true && position < rendered.length - 1
-                  }
-                  bounds={readSizingBounds(layout.readDeclared(column.id))}
-                  // Solved for every rendered column, in the same order.
-                  width={geometry.widths[position] as number}
-                  labelId={`${baseId}-${column.id}`}
-                  scopedTo={scopeOf(column).scopedTo}
+        {/* biome-ignore lint/a11y/useSemanticElements: a <table> resolves each row's widths from its own content, which is exactly what this grid replaces with one shared track list */}
+        <div
+          ref={geometry.attach}
+          className={componentCssClassName}
+          style={geometryStyle}
+          role="table"
+          aria-label={label}
+          aria-busy={busy}
+          // Every logical row, the header's included, so a row a virtualized
+          // table has not mounted is still counted.
+          aria-rowcount={
+            virtualization === undefined ? undefined : entries.length + 1
+          }
+        >
+          {/* biome-ignore lint/a11y/useSemanticElements: <thead> is only valid inside a <table>, and this grid is deliberately not one */}
+          <div role="rowgroup" className="ds data-table-row-group header">
+            {/* biome-ignore lint/a11y/useSemanticElements: <tr> is only valid inside a <table>, and this grid is deliberately not one */}
+            {/* biome-ignore lint/a11y/useFocusableInteractive: the row is structure, not a widget — the focusable controls live in its cells */}
+            <div
+              ref={headerRow}
+              role="row"
+              className="ds data-table-row"
+              aria-rowindex={virtualization === undefined ? undefined : 1}
+            >
+              {selectable ? (
+                <SelectAllCell
+                  selection={provider.selection}
+                  ids={rowScopes.ids}
+                  reserve={geometry.reserve}
                 />
-              );
-            })}
-            {!isValidElement(settings) ? null : (
-              <SettingsCell
-                settings={settings}
-                menu={menu}
-                reserve={geometry.reserve}
-              />
-            )}
+              ) : null}
+              {rendered.map((column, position) => {
+                const field = readFieldName(column);
+                const sortable =
+                  column.sortable === true && orderable.has(field);
+                return (
+                  <HeaderCell
+                    key={column.id}
+                    column={column}
+                    sortable={sortable}
+                    precedence={headerSort.precedences.get(field) ?? null}
+                    primary={column.id === headerSort.primaryColumnId}
+                    // Spelled only while it is rendered: once scripts take over
+                    // the header is a button, and nothing reads a destination.
+                    destination={
+                      sortable && !hydrated
+                        ? headerSort.spellDestination(column.id)
+                        : null
+                    }
+                    hydrated={hydrated}
+                    reason={headerSort.readReason(column.id)}
+                    onClearRefusal={headerSort.clearRefusal}
+                    onSort={headerSort.sortColumn}
+                    removable={headerSort.stated.has(field)}
+                    onPlace={headerSort.placeColumn}
+                    onRemoveFromSort={headerSort.removeFromSort}
+                    offers={readOffers(column.id)}
+                    onChangeColumn={changeColumn}
+                    interaction={interaction}
+                    resizable={
+                      column.resizable === true &&
+                      position < rendered.length - 1
+                    }
+                    bounds={readSizingBounds(layout.readDeclared(column.id))}
+                    // Solved for every rendered column, in the same order.
+                    width={geometry.widths[position] as number}
+                    labelId={`${baseId}-${column.id}`}
+                    scopedTo={scopeOf(column).scopedTo}
+                  />
+                );
+              })}
+              {!isValidElement(settings) ? null : (
+                <SettingsCell
+                  settings={settings}
+                  menu={menu}
+                  reserve={geometry.reserve}
+                />
+              )}
+            </div>
           </div>
+          {virtualization === undefined ? (
+            <TableBody entries={entries} renderEntry={renderEntry} />
+          ) : (
+            renderVirtualizedBody(virtualization, {
+              entries,
+              renderEntry,
+              rows: provider.rows,
+              tracks: geometry.template,
+            })
+          )}
         </div>
-        {virtualization === undefined ? (
-          <TableBody entries={entries} renderEntry={renderEntry} />
-        ) : (
-          renderVirtualizedBody(virtualization, {
-            entries,
-            renderEntry,
-            rows: provider.rows,
-            tracks: geometry.template,
-          })
+        {/* Beneath the table and outside its role, since a table's children
+          are its row groups: the bar here is a landmark, not a row. */}
+        {footer === undefined || footer === null ? null : (
+          <div className="ds data-table-footer">{footer}</div>
         )}
+        {announcer}
       </div>
     </MessagesContext>
   );

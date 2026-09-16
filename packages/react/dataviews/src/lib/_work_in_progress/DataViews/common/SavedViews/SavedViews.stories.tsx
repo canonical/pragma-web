@@ -51,8 +51,12 @@ const columnsCode = `const columns: readonly DataTableColumn[] = [
 const composition = `<DataViews provider={provider}>
   <DataViews.SavedViews />
   <DataViews.Filters labels={{ status: "Status", cores: "Cores", name: "Host", region: "Region", owner: "Owner" }} />
-  <DataTable provider={provider} columns={columns} label="Machines" />
-  <DataViews.Pagination sizes={[5, 10, 25]} />
+  <DataTable
+    provider={provider}
+    columns={columns}
+    label="Machines"
+    footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
+  />
 </DataViews>`;
 
 const failedMachines: ViewDraft = {
@@ -92,8 +96,12 @@ function Collection({
         }}
       />
       {children}
-      <DataTable provider={provider} columns={columns} label="Machines" />
-      <DataViews.Pagination sizes={[5, 10, 25]} />
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
+      />
     </DataViews>
   );
 }

@@ -90,9 +90,9 @@ export function Machines() {
         label="Machines"
         selectable
         rowLabel={(row) => String(row["name"])}
+        footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
       />
       <DataViews.Actions />
-      <DataViews.Pagination sizes={[5, 10, 25]} />
     </DataViews>
   );
 }
@@ -179,8 +179,11 @@ export function MachinesPage({
     <DataViews provider={provider}>
       <DataViews.Search label="Search machines" />
       <DataViews.Filters labels={{ status: "Status", cores: "Cores" }} />
-      <DataViews.DataTable columns={columns} label="Machines" />
-      <DataViews.Pagination sizes={[5, 10, 25]} />
+      <DataViews.DataTable
+        columns={columns}
+        label="Machines"
+        footer={<DataViews.Pagination sizes={[5, 10, 25]} />}
+      />
     </DataViews>
   );
 }

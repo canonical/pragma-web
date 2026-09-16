@@ -65,11 +65,11 @@ export type UseColumnManagementResult = {
 export type UseTableGeometryResult = {
   /**
    * Attaches the container whose inline size the solver resolves against,
-   * returning the detach when there is an observer to disconnect. A React 19
-   * ref callback that returns a cleanup is never called with `null`, so the
-   * node is always a real one.
+   * returning the detach. Always a cleanup, even where there is no observer
+   * to disconnect: a React 19 ref callback that returns one is never called
+   * with `null`, so the node is always a real one.
    */
-  readonly attach: (node: HTMLDivElement) => (() => void) | undefined;
+  readonly attach: (node: HTMLDivElement) => () => void;
   /**
    * Attaches a cell one of the stylesheet's own tracks sizes — the
    * selection column's, the settings cell's — whose width the columns

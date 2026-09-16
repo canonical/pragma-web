@@ -45,12 +45,18 @@ import "./styles.css";
  * resetting the table's settings. Each change is written to the
  * presentation and asks the source for nothing.
  *
+ * The table sits in a frame, which is the caller's box: the frame takes the
+ * caller's props, a height capped on it scrolls the table within it, and
+ * its `footer` holds the pagination bar beneath the table and outside the
+ * table role, keeping to the bottom of the view while the table scrolls
+ * past. The connected table places `DataViews.Pagination` there by default.
+ *
  * Every word it renders comes from `messages`, over English. A standalone
  * table is its own root: it announces politely, through one live region of
- * its own after the table, what an activation or a change to its columns
- * did — the new ordering, why a sort changed nothing, a column hidden, shown
- * or moved with where it now stands. Inside a DataViews root, the connected
- * table speaks through the root's instead.
+ * its own in the frame after the footer, what an activation or a change to
+ * its columns did — the new ordering, why a sort changed nothing, a column
+ * hidden, shown or moved with where it now stands. Inside a DataViews root,
+ * the connected table speaks through the root's instead.
  *
  * Given `virtualization`, it mounts only the rows near its viewport and reports
  * every row's logical position; without it, every row is rendered.
@@ -69,11 +75,13 @@ export default function DataTable<
   const words = useMessages(messages);
   const { ref, announce } = useAnnouncer();
   return (
-    <>
-      <ScopedDataTable {...props} messages={words} announce={announce} />
-      {/* Beside the table rather than in it: a table's children are its row
-          groups. */}
-      <Announcer ref={ref} />
-    </>
+    <ScopedDataTable
+      {...props}
+      messages={words}
+      announce={announce}
+      // In the frame, after the table and its footer: a table's own
+      // children are its row groups, and the frame is what holds the rest.
+      announcer={<Announcer ref={ref} />}
+    />
   );
 }

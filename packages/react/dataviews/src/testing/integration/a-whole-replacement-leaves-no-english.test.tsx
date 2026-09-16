@@ -67,7 +67,6 @@ const Composition = ({
       selectable
       settings={<DataViews.Settings />}
     />
-    <DataViews.Pagination />
   </DataViews>
 );
 

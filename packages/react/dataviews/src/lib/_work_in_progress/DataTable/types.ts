@@ -130,16 +130,27 @@ type OwnProps<
    * change them. Left out, the header has no settings cell.
    */
   readonly settings?: ReactElement | undefined;
+  /**
+   * What the frame's footer holds, beneath the table and outside its role:
+   * the pagination bar, a landmark and not a row. It keeps to the bottom of
+   * the view while a table taller than the view scrolls past, and to the
+   * bottom of the frame where the frame's height is capped. Left out or
+   * null, the frame has no footer; the connected table places
+   * `<DataViews.Pagination />` here unless told otherwise, and null tells
+   * it otherwise.
+   */
+  readonly footer?: ReactElement | null | undefined;
 };
 
 /**
- * DataTable props. The root is a `div` carrying the table role, so it
- * extends native div props, less the ones the table owns: `children`,
- * because the table's content is its rows, which it renders itself; and
- * `role`, `aria-label`, `aria-labelledby`, `aria-busy` and `aria-rowcount`,
- * each of which the table sets from what it knows. `className`, `style` and
- * `ref` are merged with the table's own rather than clobbered by either
- * side.
+ * DataTable props. The root is the frame: a `div` holding the table, its
+ * footer and, for a standalone table, its announcer, so the props extend
+ * native div props, less the ones the table owns: `children`, because the
+ * frame's content is the table, which it renders itself; and `role`,
+ * `aria-label`, `aria-labelledby`, `aria-busy` and `aria-rowcount`, each of
+ * which the table sets on its own element from what it knows. `className`,
+ * `style` and `ref` are merged onto the frame with the table's own rather
+ * than clobbered by either side.
  *
  * `ref` is honoured in both React forms: a callback ref that returns a
  * cleanup has that cleanup called on detach, and one that returns nothing is
@@ -178,4 +189,10 @@ export type ScopedDataTableProps<
   readonly messages: DataViewsMessages;
   /** Say an outcome through the announcer of the table's UI scope. */
   readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
+  /**
+   * The live region the table speaks through, placed in the frame after the
+   * footer: a standalone table's own. A connected table brings none, since
+   * it speaks through its root's.
+   */
+  readonly announcer?: ReactElement | undefined;
 };
