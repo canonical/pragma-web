@@ -52,6 +52,8 @@ describe("a column list written inline", () => {
     };
     render(<Host />);
     const before = calls.count;
+    // Counted at all, so a mock that stopped applying cannot pass unseen.
+    expect(before).toBeGreaterThan(0);
     act(() => {
       rerender();
     });

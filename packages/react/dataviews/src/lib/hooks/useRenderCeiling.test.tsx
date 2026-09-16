@@ -5,6 +5,7 @@
  * virtualized. It is a prompt: nothing about what renders changes.
  */
 import { render } from "@testing-library/react";
+import { StrictMode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { RENDER_CEILING } from "./constants.js";
 import type { UseRenderCeilingProps } from "./types.js";
@@ -96,5 +97,20 @@ describe("useRenderCeiling", () => {
       />,
     );
     expect(warned).not.toHaveBeenCalled();
+  });
+
+  it("warns once under StrictMode, whose effects run twice", () => {
+    const warned = warn();
+    render(
+      <StrictMode>
+        <Renderer
+          renderer="DataTable"
+          unit="rows"
+          count={RENDER_CEILING + 1}
+          virtualization="available"
+        />
+      </StrictMode>,
+    );
+    expect(warned).toHaveBeenCalledTimes(1);
   });
 });

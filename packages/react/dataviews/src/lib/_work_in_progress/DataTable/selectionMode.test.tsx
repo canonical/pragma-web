@@ -121,15 +121,17 @@ describe("selection mode on touch", () => {
     expect(selectedIds(provider)).toEqual([]);
   });
 
-  it("ends the mode when the selection is cleared from elsewhere", () => {
+  it("ends the mode when the selection is cleared from elsewhere, announced", async () => {
     const provider = loadedTable();
     longPress(rowNamed("alpha"));
+    expect(await readAnnouncements()).toHaveLength(1);
     act(() => {
       provider.selection.clear();
     });
     expect(screen.getByRole("table")).not.toHaveAttribute(
       "data-selection-mode",
     );
+    expect((await readAnnouncements()).at(-1)).toBe("Selection mode ended.");
   });
 
   it("holds the mode while a long press adds a row already in it", async () => {
@@ -141,8 +143,9 @@ describe("selection mode on touch", () => {
     expect(await readAnnouncements()).toHaveLength(1);
   });
 
-  it("does nothing on a table that is not selectable", () => {
+  it("does nothing on a table that is not selectable, whose rows carry no id", () => {
     const provider = loadedTable(false);
+    expect(rowNamed("alpha")).not.toHaveAttribute("data-row-id");
     longPress(rowNamed("alpha"));
     expect(selectedIds(provider)).toEqual([]);
     expect(screen.getByRole("table")).not.toHaveAttribute(
@@ -194,5 +197,16 @@ describe("selection mode on touch", () => {
     expect(screen.getByRole("table")).not.toHaveAttribute(
       "data-selection-mode",
     );
+  });
+
+  it("takes a press on the header for no press of its own", () => {
+    loadedTable();
+    const header = screen.getAllByRole("row")[0] ?? document.body;
+    fireEvent.pointerDown(header, touch);
+    act(() => {
+      vi.advanceTimersByTime(LONG_PRESS_MS);
+    });
+    // No press started: the platform's menu is left alone.
+    expect(fireEvent.contextMenu(header)).toBe(true);
   });
 });

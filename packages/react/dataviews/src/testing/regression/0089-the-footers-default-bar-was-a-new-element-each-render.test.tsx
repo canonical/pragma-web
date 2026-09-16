@@ -46,6 +46,8 @@ describe("the connected table's default footer", () => {
     };
     render(<Host />);
     const before = renders.count;
+    // Counted at all, so a mock that stopped applying cannot pass unseen.
+    expect(before).toBeGreaterThan(0);
     act(() => {
       rerender();
     });

@@ -35,6 +35,8 @@ describe("the not-applicable word's box", () => {
       expect(rule).toMatch(/block-size:\s*1px;/);
       expect(rule).toMatch(/margin:\s*-1px;/);
       expect(rule).toMatch(/clip-path:\s*inset\(50%\);/);
+      // Clipped, never removed: a word not displayed is a word not read.
+      expect(rule).not.toMatch(/display:\s*none|visibility:\s*hidden/);
     }
   });
 });

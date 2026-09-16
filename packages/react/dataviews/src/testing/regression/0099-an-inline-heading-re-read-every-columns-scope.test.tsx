@@ -51,6 +51,8 @@ describe("a heading written as an inline element", () => {
     };
     render(<Host />);
     const before = calls.count;
+    // Counted at all, so a mock that stopped applying cannot pass unseen.
+    expect(before).toBeGreaterThan(0);
     act(() => {
       rerender();
     });

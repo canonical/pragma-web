@@ -20,18 +20,10 @@ const formatSortTerm = (name: string, direction: SortDirection): string =>
  * Names as English lists them: one alone, and more with commas and a final
  * "and". Two need no comma, which joining all but the last already gives.
  */
-const formatList = (names: readonly string[]): string => {
-  const last = names.at(-1);
-  /* v8 ignore next 3 -- a list of no names reaches no caller: the only
-     message that lists any words a field's own scoping, and a field scoped
-     to no type is refused when its schema is built. */
-  if (last === undefined) {
-    return "";
-  }
-  return names.length === 1
-    ? last
-    : `${names.slice(0, -1).join(", ")} and ${last}`;
-};
+const formatList = (names: readonly string[]): string =>
+  names.length < 2
+    ? names.join("")
+    : `${names.slice(0, -1).join(", ")} and ${names.slice(-1).join("")}`;
 
 /**
  * The words DataViews ships with: English. Plurals and ordinals are worded
@@ -58,7 +50,12 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
     `${formatCount(pixels)} ${pixels === 1 ? "pixel" : "pixels"}`,
 
   cellNotApplicable: "Not applicable",
-  columnAppliesTo: (types) => `Applies to ${formatList(types)}`,
+  // A message is public: an application may word a list of no types, which
+  // no renderer asks, and it reads as a sentence all the same.
+  columnAppliesTo: (types) =>
+    types.length === 0
+      ? "Applies to no record type"
+      : `Applies to ${formatList(types)}`,
 
   sortPrecedence: (direction, position, total) =>
     total === 1

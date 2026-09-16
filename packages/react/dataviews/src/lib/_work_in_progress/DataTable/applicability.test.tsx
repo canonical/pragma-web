@@ -6,7 +6,7 @@
  * record of a type the collection does not declare fails visibly.
  */
 import { act, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import { pageOf } from "../../../../testing/fixtures.js";
 import {
@@ -18,6 +18,7 @@ import {
   virtualMachine,
 } from "../../../../testing/instances.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
+import { virtualizeRows } from "../../virtualization/index.js";
 import { Cards } from "../Cards/index.js";
 import createColumns from "./createColumns.js";
 import DataTable from "./DataTable.js";
@@ -192,10 +193,71 @@ describe("cards over records of several types", () => {
       "hidden",
     );
     expect(image?.querySelector("[aria-hidden='true']")).toHaveTextContent("—");
+    // The dash alone is hidden from readers: the word has no hidden ancestor.
+    expect(image?.querySelectorAll("[aria-hidden]")).toHaveLength(1);
+    expect(
+      within(vm).getByText("Not applicable").closest("[aria-hidden], [hidden]"),
+    ).toBeNull();
     expect(
       within(screen.getByRole("listitem", { name: "web-01" }))
         .getAllByRole("definition")
         .at(1),
     ).toHaveTextContent(/^ubuntu:24\.04$/);
+  });
+});
+
+describe("a table's own render ceiling", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("warns of the rows it draws, and not where they are virtualized", () => {
+    const warned = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const rows = Array.from({ length: 501 }, (_, index) =>
+      container(`i-${index}`, `host-${index}`),
+    );
+    const { provider } = createInstanceProvider({ rows });
+    const view = render(
+      <DataTable provider={provider} columns={columns} label="Instances" />,
+    );
+    expect(warned.mock.calls.at(0)?.at(0)).toMatch(
+      /^DataTable renders 501 rows at once/,
+    );
+    view.unmount();
+    warned.mockClear();
+    const { provider: other } = createInstanceProvider({ rows });
+    render(
+      <DataTable
+        provider={other}
+        columns={columns}
+        label="Instances"
+        virtualization={virtualizeRows({ estimatedRowHeight: 32 })}
+      />,
+    );
+    expect(warned).not.toHaveBeenCalled();
+  });
+});
+
+describe("a scoped column that is sorted", () => {
+  it("describes its control by its place in the ordering and its types, and its heading by its types", () => {
+    const { provider } = createInstanceProvider({ rows: MIXED_FLEET });
+    render(
+      <DataTable
+        provider={provider}
+        columns={[
+          { id: "name", header: "Name" },
+          { id: "image", header: "Image", sortable: true },
+        ]}
+        label="Instances"
+      />,
+    );
+    act(() => {
+      provider.setSort([{ field: "image", direction: "asc" }]);
+    });
+    const heading = screen.getByRole("columnheader", { name: "Image" });
+    const control = within(heading).getByRole("button", { name: "Image" });
+    expect(control).toHaveAccessibleDescription(/ascending/);
+    expect(control).toHaveAccessibleDescription(/Applies to container$/);
+    expect(heading).toHaveAccessibleDescription("Applies to container");
   });
 });

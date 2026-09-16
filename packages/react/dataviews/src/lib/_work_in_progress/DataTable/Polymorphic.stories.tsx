@@ -246,16 +246,20 @@ const columns = createColumns(instanceCollection, [
       within(canvas.getByRole("row", { name: "db-01" })).getAllByRole(
         "cell",
       )[1],
-    ).toHaveTextContent("running");
+    ).toHaveTextContent(/^running$/);
+    await expect(
+      canvas.getByRole("columnheader", { name: "VM status" }),
+    ).toHaveAccessibleDescription("Applies to virtual-machine");
   },
 };
 
 /**
  * Ordered by a scoped field. A field that does not apply to a row reads as
- * absent to the ordering, so ascending by Image lists the containers by
- * image and the virtual machines after them, in the source's own order among
- * themselves. Nothing is added to the query for it: the scoping is the
- * collection's, not a filter.
+ * absent to the ordering, as an empty one does, so ascending by Image lists
+ * the containers by image, then every record with no image to order by — the
+ * virtual machines, and `scratch-01`, whose image is empty — in the source's
+ * own order among themselves. Nothing is added to the query for it: the
+ * scoping is the collection's, not a filter.
  */
 export const OrderedByScopedField: Story = {
   parameters: consumerCode({
@@ -285,17 +289,21 @@ export const OrderedByScopedField: Story = {
     const names = canvas
       .getAllByRole("rowheader")
       .map((header) => header.textContent);
-    // The containers with an image, by image; every machine after them,
-    // since a field that does not apply reads as absent.
-    const imaged = ["cache-01", "log-01", "proxy-01", "web-01", "web-02"];
-    await expect(names.filter((name) => imaged.includes(name ?? ""))).toEqual(
-      imaged,
-    );
-    for (const machine of ["db-01", "build-01", "win-01", "gpu-01"]) {
-      await expect(names.indexOf(machine)).toBeGreaterThan(
-        names.indexOf("web-02"),
-      );
-    }
+    // The containers with an image, by image; then every record with no
+    // image to order by, in the source's own order: a field that does not
+    // apply reads as absent, as the empty image of `scratch-01` does.
+    await expect(names).toEqual([
+      "cache-01",
+      "log-01",
+      "proxy-01",
+      "web-01",
+      "web-02",
+      "db-01",
+      "build-01",
+      "win-01",
+      "scratch-01",
+      "gpu-01",
+    ]);
   },
 };
 

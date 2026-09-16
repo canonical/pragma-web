@@ -66,15 +66,21 @@ export default function useLongPress({
       }, 0);
     }
   };
-  // A press still tracked when the element goes is let go with it.
+  // A press still tracked when the element goes — or its effects are torn
+  // down and set up again, as a hidden Activity or StrictMode does — is let
+  // go with it, and nothing it left behind outlives it: a fired press whose
+  // release was pending is over, so no later click is taken for its own.
   useEffect(
     () => () => {
       if (press.current !== null) {
         clearTimeout(press.current.timer);
+        press.current = null;
       }
       if (release.current !== null) {
         clearTimeout(release.current);
+        release.current = null;
       }
+      fired.current = false;
     },
     [],
   );

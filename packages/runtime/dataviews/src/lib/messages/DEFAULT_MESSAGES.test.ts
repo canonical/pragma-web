@@ -42,6 +42,7 @@ describe("DEFAULT_MESSAGES", () => {
     expect(
       m.columnAppliesTo(["containers", "virtual machines", "images"]),
     ).toBe("Applies to containers, virtual machines and images");
+    expect(m.columnAppliesTo([])).toBe("Applies to no record type");
   });
 
   it("words a sort's precedence with an English ordinal once there are two terms", () => {
