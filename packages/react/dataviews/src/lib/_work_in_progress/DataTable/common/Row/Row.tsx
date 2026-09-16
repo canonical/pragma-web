@@ -11,7 +11,6 @@ function Row<TRow extends object>({
   provider,
   channels,
   columns,
-  rowHeader,
   selectable,
   rowLabel,
   position,
@@ -25,10 +24,11 @@ function Row<TRow extends object>({
   const headerId = useId();
   // Which columns apply to the record is a fact about its type, so the row
   // watches the type alone: it renders again when a record comes back as
-  // another type, and for no move of any field. The record itself is read as
-  // the row renders, which is then the record of that type.
-  useDataViewsValue(channels.record, typeOf);
-  const record = channels.record.get();
+  // another type, and for no move of any field.
+  const type = useDataViewsValue(channels.record, typeOf);
+  // The column heading the row, if any; the table checked there is one at
+  // most where it mounted.
+  const rowHeader = columns.find((column) => column.rowHeader === true) ?? null;
   return (
     // aria-selected is only meaningful where selection is offered, and it
     // must agree with the row's checkbox: both read this one channel.
@@ -55,13 +55,16 @@ function Row<TRow extends object>({
       ) : null}
       {columns.map((column) => (
         <BodyCell
-          key={column.id}
+          // Keyed by the record's type too: content narrowing on the record
+          // is drawn again, from the record of its current type, when the
+          // type moves under a column whose applicability does not.
+          key={`${column.id}:${type}`}
           id={column.rowHeader === true ? headerId : undefined}
           provider={provider}
           channels={channels}
           column={column}
           field={readFieldName(column)}
-          applicability={applicabilityOf(column, record)}
+          applicability={applicabilityOf(column, type)}
         />
       ))}
     </div>

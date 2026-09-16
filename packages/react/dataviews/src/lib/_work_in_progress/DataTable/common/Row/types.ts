@@ -27,21 +27,20 @@ export type RowProps<TRow extends object> = {
   >;
   readonly channels: RowChannels<TRow>;
   readonly columns: readonly DataTableColumn[];
-  /** The column heading this row, whose cell names it, or null for none. */
-  readonly rowHeader: DataTableColumn | null;
   readonly selectable: boolean;
   /** Names a record for its checkbox, or answers null where the caller gave no name. */
   readonly rowLabel: (row: TRow, rowId: string) => string | null;
   /**
-   * Whether one column applies to one record: its field's own scope,
-   * narrowed by the column's where it declares one. The table's, one
+   * Whether one column applies to a record of one declared type, or of
+   * none: its field's own scope, narrowed by the column's where it declares
+   * one. The table's, one
    * identity for every row, so a row that re-renders renders no cell again
    * for it; the row asks per column rather than carrying a map it would
    * have to rebuild whenever its record moved.
    */
   readonly applicabilityOf: (
     column: DataTableColumn,
-    record: TRow,
+    type: string | null,
   ) => Applicability;
   /**
    * The declared type a record carries, or null: what the row watches of its

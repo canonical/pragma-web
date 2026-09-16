@@ -1,56 +1,37 @@
 /**
  * A column's scope over record types: its field's unless it narrows, checked
- * where the table mounts so a column can never name a type nothing carries.
+ * where the renderer mounts so a column can never name a type nothing
+ * carries.
  */
-import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
-import {
-  container,
-  createInstanceProvider,
-  type Instance,
-  virtualMachine,
-} from "../../../../../../testing/instances.js";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
-import type { DataTableColumn } from "../../types.js";
+import { instances } from "../../../testing/instances.js";
+import { machines } from "../../../testing/machines.js";
+import type { DisplayField } from "../common/index.js";
 import readColumnScopes from "./readColumnScopes.js";
 
-const web = container("i-1", "web-01");
-const db = virtualMachine("i-2", "db-01");
-
 /** The scopes of the given columns over the instance collection. */
-const scopesOver = (columns: readonly DataTableColumn[]) => {
-  const { provider } = createInstanceProvider();
-  const host = readProviderHost(provider);
-  return readColumnScopes({
-    collection: provider.collection,
-    applicability: (field, record) => host.applicability(field, record),
-    typeOf: (record) => host.typeOf(record),
-    columns,
-  });
-};
+const scopesOver = (columns: readonly DisplayField[]) =>
+  readColumnScopes({ collection: instances, columns });
 
 describe("readColumnScopes", () => {
-  it("applies an unscoped column over an unscoped field to every record", () => {
-    const column: DataTableColumn = { id: "name", header: "Name" };
+  it("applies an unscoped column over an unscoped field to every type", () => {
+    const column: DisplayField = { id: "name", header: "Name" };
     const scope = scopesOver([column])(column);
     expect(scope.scopedTo).toBeNull();
-    expect(scope.applicability(web)).toBe("applies");
-    expect(scope.applicability(db)).toBe("applies");
+    expect(scope.applicability("container")).toBe("applies");
+    expect(scope.applicability("virtual-machine")).toBe("applies");
   });
 
   it("gives an unscoped column its field's scope", () => {
-    const column: DataTableColumn = { id: "image", header: "Image" };
+    const column: DisplayField = { id: "image", header: "Image" };
     const scope = scopesOver([column])(column);
     expect(scope.scopedTo).toEqual(["container"]);
-    expect(scope.applicability(web)).toBe("applies");
-    expect(scope.applicability(db)).toBe("not-applicable");
+    expect(scope.applicability("container")).toBe("applies");
+    expect(scope.applicability("virtual-machine")).toBe("not-applicable");
   });
 
   it("narrows an unscoped field to the types a column names", () => {
-    const column: DataTableColumn = {
+    const column: DisplayField = {
       id: "vm-status",
       field: "status",
       header: "VM status",
@@ -58,25 +39,23 @@ describe("readColumnScopes", () => {
     };
     const scope = scopesOver([column])(column);
     expect(scope.scopedTo).toEqual(["virtual-machine"]);
-    expect(scope.applicability(db)).toBe("applies");
-    expect(scope.applicability(web)).toBe("not-applicable");
+    expect(scope.applicability("virtual-machine")).toBe("applies");
+    expect(scope.applicability("container")).toBe("not-applicable");
   });
 
   it("withholds a narrowed column from a record of no declared type", () => {
-    const column: DataTableColumn = {
+    const column: DisplayField = {
       id: "status",
       header: "Status",
       appliesTo: ["container", "virtual-machine"],
     };
-    // What a server that added a type would send, and the display refuses.
-    const rogue = { id: "x", type: "sandbox" } as unknown as Instance;
-    expect(scopesOver([column])(column).applicability(rogue)).toBe(
+    expect(scopesOver([column])(column).applicability(null)).toBe(
       "not-applicable",
     );
   });
 
   it("lets a column narrow within its field's own scope", () => {
-    const column: DataTableColumn = {
+    const column: DisplayField = {
       id: "image",
       header: "Image",
       appliesTo: ["container"],
@@ -109,19 +88,14 @@ describe("readColumnScopes", () => {
   });
 
   it("refuses a narrowing over a collection declaring no types", () => {
-    const { provider } = createMachineProvider();
-    const host = readProviderHost(provider);
     expect(() =>
       readColumnScopes({
-        collection: provider.collection,
-        applicability: (field, record) => host.applicability(field, record),
-        typeOf: (record) => host.typeOf(record),
+        collection: machines,
         columns: [{ id: "name", header: "Name", appliesTo: ["container"] }],
       }),
     ).toThrow(
       'column "name" applies to record types, but the collection declares none',
     );
-    expect(host.applicability("name", machine("m-1", "alpha"))).toBe("applies");
   });
 
   it("answers for no column it did not read", () => {

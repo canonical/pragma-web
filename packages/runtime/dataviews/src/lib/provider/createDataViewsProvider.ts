@@ -20,7 +20,6 @@ import type {
   WindowNavigation,
 } from "../query/index.js";
 import {
-  type Applicability,
   EMPTY_ROW_MODEL,
   type RowModel,
   type RowRecord,
@@ -223,9 +222,6 @@ export default function createDataViewsProvider<
           });
     },
     complete,
-    applicability(field: string, row: TRow): Applicability {
-      return recordTyping?.applicability(field, row) ?? "applies";
-    },
     typeOf(row: TRow): string | null {
       return recordTyping?.typeOf(row) ?? null;
     },

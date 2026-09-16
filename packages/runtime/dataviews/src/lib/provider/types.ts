@@ -26,12 +26,7 @@ import type {
   WindowNavigation,
 } from "../query/index.js";
 import type { Completion, SourceRefusal } from "../result/index.js";
-import type {
-  Applicability,
-  RowIdentifier,
-  RowModel,
-  RowRecord,
-} from "../rows/index.js";
+import type { RowIdentifier, RowModel, RowRecord } from "../rows/index.js";
 import type { FieldNameOf, SchemaFieldDefinition } from "../schema/index.js";
 import type { Selection } from "../selection/index.js";
 import type { DataViewsSnapshot } from "../snapshot/index.js";
@@ -419,21 +414,12 @@ export type ProviderHost<
     completion: Completion<TRow>,
   ) => boolean;
   /**
-   * Whether a schema field applies to a row, by the field's type scoping.
-   * Always "applies" on a monomorphic collection, and on a field the schema
-   * does not scope.
-   *
-   * Read by a renderer's cells: a field that does not apply to a row is
-   * drawn as the third state beside value and empty.
-   */
-  readonly applicability: (field: string, row: TRow) => Applicability;
-  /**
    * The declared type a row carries, or null when it carries none the
    * collection declares — a monomorphic collection's rows included. Reading
    * a row for its type is the provider's: a renderer asks rather than reads.
    *
-   * Read by a table whose column narrows its field's scope to fewer types:
-   * the column decides a row by the type the provider names for it.
+   * Read by every renderer, which watches a record's type and asks
+   * `readApplicability` of the type whether a field applies to it.
    */
   readonly typeOf: (row: TRow) => string | null;
   /**
@@ -442,7 +428,7 @@ export type ProviderHost<
    * over rows this provider has not seen. A remembered type is let go when
    * the rows are next replaced after its identity leaves the selection, so
    * one reselected before then answers as before. It answers from the row on
-   * display whenever there is one, so it never contradicts `applicability`,
+   * display whenever there is one, so it never contradicts `typeOf`,
    * and it changes only with a `rows` or a `selection` publication: watching
    * those is watching this.
    *
@@ -469,8 +455,6 @@ export type RecordTypingConfig<
 export type RecordTyping<TRow extends object = RowRecord> = {
   /** Why a model cannot be displayed, or null when every row is typed. */
   readonly rejectionOf: (model: RowModel<TRow>) => string | null;
-  /** Whether a schema field applies to a row. */
-  readonly applicability: (field: string, row: TRow) => Applicability;
   /** The declared type a row carries, or null for none the collection declares. */
   readonly typeOf: (row: TRow) => string | null;
   /** The remembered type of a selected identity. */

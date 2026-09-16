@@ -4,9 +4,8 @@
  * cap: the renderer still draws every row the viewer asked for, and a
  * production build says nothing. Not a performance threshold — no universal
  * row count is one — but the count at which a table rendering every row is
- * worth a look.
- *
- * `import { RENDER_CEILING } from "@canonical/dataviews-react";`
+ * worth a look. Documented as its value, not exported: an application acts on
+ * the warning, never on the number.
  */
 export const RENDER_CEILING = 500;
 

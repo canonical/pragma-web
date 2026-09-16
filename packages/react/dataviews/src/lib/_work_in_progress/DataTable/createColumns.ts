@@ -1,10 +1,9 @@
 import type {
-  Applicability,
   Collection,
-  FieldNameOf,
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
+import type { FieldNameOf } from "@canonical/dataviews-core/bindings";
 import type { ComponentType, ReactNode } from "react";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import type { DataTableColumn } from "./types.js";
@@ -48,39 +47,6 @@ type ValueAt<TRow, TName extends string> = TRow extends unknown
   : never;
 
 /**
- * The props a typed column's own content receives: its field's value at the
- * type the record carries, and the row and column it is drawn in.
- *
- * Structurally the props every renderer hands a display field's content, so a
- * component written for one renders unchanged in another; what a typed column
- * adds is the value's type.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type TypedCellProps<TValue, TRow> = {
-  /** The field's current value, typed from the record. */
-  readonly value: TValue;
-  /**
-   * The whole record the value was read from, at its own type, as it stood
-   * when this content rendered: what content narrows on to read a field only
-   * one type carries. Content renders when its own field's value changes;
-   * content that draws other fields subscribes through `useDataViewsCell`.
-   */
-  readonly record: TRow;
-  /**
-   * Whether this column's field applies to the record's type. Content given
-   * a record the field does not apply to may draw it however it likes;
-   * content that ignores this draws a value there is none of.
-   */
-  readonly applicability: Applicability;
-  /** The row's stable identity. */
-  readonly rowId: string;
-  /** The declaring column's identity. */
-  readonly columnId: string;
-};
-
-/**
  * One column as it is declared: the table's own members, plus the field it
  * shows and the content that draws it, both typed against the collection.
  *
@@ -101,16 +67,13 @@ type TypedColumnOf<
   /** The column's heading. */
   readonly header: ReactNode;
   /** Content for this column's value, typed by the field it shows. */
-  readonly cell?: ComponentType<TypedCellProps<ValueAt<TRow, TName>, TRow>>;
+  readonly cell?: ComponentType<
+    DisplayFieldCellProps<ValueAt<TRow, TName>, TRow>
+  >;
 };
 
-/**
- * One declared column of a collection: whichever of its fields it shows.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type TypedColumn<
+/** One declared column of a collection: whichever of its fields it shows. */
+type TypedColumn<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = {

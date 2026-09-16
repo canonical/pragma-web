@@ -18,21 +18,18 @@ import {
 
 const calls = vi.hoisted(() => ({ count: 0 }));
 
-vi.mock(
-  "../../lib/_work_in_progress/DataTable/common/ScopedDataTable/readColumnScopes.js",
-  async (importOriginal) => {
-    const actual =
-      await importOriginal<
-        typeof import("../../lib/_work_in_progress/DataTable/common/ScopedDataTable/readColumnScopes.js")
-      >();
-    return {
-      default: (...args: Parameters<typeof actual.default>) => {
-        calls.count += 1;
-        return actual.default(...args);
-      },
-    };
-  },
-);
+vi.mock("../../lib/utils/readColumnScopes.js", async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import("../../lib/utils/readColumnScopes.js")
+    >();
+  return {
+    default: (...args: Parameters<typeof actual.default>) => {
+      calls.count += 1;
+      return actual.default(...args);
+    },
+  };
+});
 
 const { DataTable } = await import(
   "../../lib/_work_in_progress/DataTable/index.js"

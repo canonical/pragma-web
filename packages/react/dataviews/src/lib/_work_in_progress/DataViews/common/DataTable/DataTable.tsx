@@ -34,10 +34,11 @@ export default function DataTable({
   return (
     <ScopedDataTable
       {...props}
-      footer={footer}
+      {...(footer === null ? {} : { footer })}
       provider={provider}
       messages={messages}
-      announce={announce}
+      // The root's announcer, whose region the root places.
+      announcer={{ announce, region: null }}
     />
   );
 }

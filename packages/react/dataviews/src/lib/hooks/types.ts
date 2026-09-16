@@ -7,7 +7,6 @@
  */
 
 import type {
-  Applicability,
   DataViewsMessages,
   DataViewsProvider,
   Facet,
@@ -40,13 +39,6 @@ export type UseDataViewsCellResult<TRow extends object = RowRecord> = {
   readonly fields: Readonly<Record<string, ReadonlyChannel<unknown>>>;
   /** Whether the row is in the collection's selection. */
   readonly selected: ReadonlyChannel<boolean>;
-  /**
-   * Whether this cell's field applies to the record in its row: a field
-   * scoped to other record types is not empty but a third state, which the
-   * default content draws as a dash and a column's own content may draw
-   * however it likes. Always "applies" on a monomorphic collection.
-   */
-  readonly applicability: Applicability;
 };
 
 /** What `useSelectAllOnPage` takes: the selection, and the page it acts on. */

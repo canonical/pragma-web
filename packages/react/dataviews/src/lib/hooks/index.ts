@@ -1,4 +1,3 @@
-export { RENDER_CEILING } from "./constants.js";
 export type * from "./types.js";
 export { default as useAnnouncer } from "./useAnnouncer.js";
 export { default as useAnsweredFacets } from "./useAnsweredFacets.js";

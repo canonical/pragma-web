@@ -1,6 +1,5 @@
 export { default as areColumnModelsEqual } from "./areColumnModelsEqual.js";
 export { default as areColumnOffersEqual } from "./areColumnOffersEqual.js";
-export { default as areColumnScopesEqual } from "./areColumnScopesEqual.js";
 export { default as areColumnSettingsEqual } from "./areColumnSettingsEqual.js";
 export { default as areColumnsEqual } from "./areColumnsEqual.js";
 export { default as areTracksEqual } from "./areTracksEqual.js";

@@ -115,9 +115,8 @@ function BodyCell<TRow extends object>({
       record: channels.record,
       fields: channels.fields,
       selected: channels.selected,
-      applicability,
     }),
-    [provider, channels, column.id, applicability],
+    [provider, channels, column.id],
   );
   const Content = column.cell;
   const header = column.rowHeader === true;

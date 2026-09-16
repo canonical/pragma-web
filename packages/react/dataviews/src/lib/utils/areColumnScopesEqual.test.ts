@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { DataTableColumn } from "../../types.js";
+import type { DisplayField } from "../common/index.js";
 import areColumnScopesEqual from "./areColumnScopesEqual.js";
 
-const image: DataTableColumn = { id: "image", header: "Image" };
+const image: DisplayField = { id: "image", header: "Image" };
 
 describe("areColumnScopesEqual", () => {
   it("reads the columns, their fields and the types they narrow to", () => {
@@ -26,7 +26,7 @@ describe("areColumnScopesEqual", () => {
     expect(
       areColumnScopesEqual(
         [{ ...image, cell: () => null }],
-        [{ ...image, header: "Picture", cell: () => null, sortable: true }],
+        [{ ...image, header: "Picture", cell: () => null }],
       ),
     ).toBe(true);
   });

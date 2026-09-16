@@ -20,13 +20,13 @@ type InstanceBase = {
 };
 
 /** A container: it runs from an image, and boots no firmware. */
-export type Container = InstanceBase & {
+type Container = InstanceBase & {
   readonly type: "container";
   readonly image: string;
 };
 
 /** A virtual machine: it boots firmware, and runs from no image. */
-export type VirtualMachine = InstanceBase & {
+type VirtualMachine = InstanceBase & {
   readonly type: "virtual-machine";
   readonly firmware: "bios" | "uefi";
 };
@@ -110,7 +110,7 @@ export const instances: readonly Instance[] = Object.freeze([
 ]);
 
 /** How a story's instance source is set up. */
-export type InstanceSourceConfig = {
+type InstanceSourceConfig = {
   readonly rows?: readonly Instance[] | undefined;
   readonly defaultSort?: readonly SortTerm<InstanceFields[number]["field"]>[];
 };

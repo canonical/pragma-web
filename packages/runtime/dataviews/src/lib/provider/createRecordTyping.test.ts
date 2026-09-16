@@ -1,9 +1,10 @@
 /**
  * Record typing is what a polymorphic collection knows about its types at
- * runtime: which fields apply to which type, and what type each selected
- * identity was displayed as. The declaration itself is the collection's
- * and is tested with it. Every case is mutation-tested — dropping the scope
- * index or the memory's prune fails one.
+ * runtime: the type a row carries, whether a page's rows each carry one, and
+ * what type each selected identity was displayed as. The declaration itself
+ * is the collection's and is tested with it, and which fields apply to a
+ * type is `readApplicability`'s. Every case is mutation-tested — dropping
+ * the memory's prune fails one.
  */
 import { describe, expect, it } from "vitest";
 import buildRowModel from "../../../testing/buildRowModel.js";
@@ -78,46 +79,6 @@ describe("createRecordTyping", () => {
         rows: createChannel<RowModel<Instance>>(EMPTY_ROW_MODEL),
       }),
     ).toThrow("a monomorphic collection has no record typing to build");
-  });
-
-  describe("applicability", () => {
-    it("applies an unscoped field to every type", () => {
-      const { record } = typing();
-      expect(record.applicability("type", container("c-1"))).toBe("applies");
-      expect(record.applicability("type", machine("v-1"))).toBe("applies");
-    });
-
-    it("applies a field the schema does not describe at all", () => {
-      // A column showing something outside the schema has no scoping, and
-      // absent scoping is every type.
-      expect(typing().record.applicability("uptime", container("c-1"))).toBe(
-        "applies",
-      );
-    });
-
-    it("withholds a scoped field from a row of another type", () => {
-      const { record } = typing();
-      expect(record.applicability("secureboot", machine("v-1"))).toBe(
-        "applies",
-      );
-      expect(record.applicability("secureboot", container("c-1"))).toBe(
-        "not-applicable",
-      );
-      expect(record.applicability("processes", container("c-1"))).toBe(
-        "applies",
-      );
-      expect(record.applicability("processes", machine("v-1"))).toBe(
-        "not-applicable",
-      );
-    });
-
-    it("withholds a scoped field from a row carrying no declared type", () => {
-      const { record } = typing();
-      const untyped = { id: "x", type: "sandbox" } as unknown as Instance;
-      expect(record.applicability("secureboot", untyped)).toBe(
-        "not-applicable",
-      );
-    });
   });
 
   describe("typeOf", () => {

@@ -13,7 +13,11 @@ import {
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
-import { MessagesContext, StatusItem } from "../../common/index.js";
+import {
+  type DisplayField,
+  MessagesContext,
+  StatusItem,
+} from "../../common/index.js";
 import {
   useDataViewsValue,
   useMessages,
@@ -23,8 +27,10 @@ import {
   useStableValue,
 } from "../../hooks/index.js";
 import {
+  areColumnScopesEqual,
   areDisplayFieldsEqual,
   describeStatus,
+  readColumnScopes,
   readFieldName,
 } from "../../utils/index.js";
 import { CardList, SelectAllOnPage } from "./common/index.js";
@@ -140,9 +146,17 @@ export default function Cards<
   // Whether one field applies to one card's record, as a table asks it of a
   // row. One identity, so a re-render of the cards re-renders no card for
   // this.
+  // Every declared field's scope, checked where the cards mount, keyed on
+  // what a scope is read from, so a field rebuilt inline re-reads none.
+  const scoped = useStableValue(fields, areColumnScopesEqual);
+  const scopeOf = useMemo(
+    () =>
+      readColumnScopes({ collection: provider.collection, columns: scoped }),
+    [scoped, provider],
+  );
   const applicabilityOf = useStableCallback(
-    (field: string, record: TRow): Applicability =>
-      readProviderHost(provider).applicability(field, record),
+    (field: DisplayField, type: string | null): Applicability =>
+      scopeOf(field).applicability(type),
   );
   // The declared type a record carries: what each card watches of its record.
   const typeOf = useStableCallback((record: TRow): string | null =>

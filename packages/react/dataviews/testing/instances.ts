@@ -29,13 +29,13 @@ type InstanceBase = {
 };
 
 /** A container: it runs from an image, and boots no firmware. */
-export type Container = InstanceBase & {
+type Container = InstanceBase & {
   readonly type: "container";
   readonly image: string;
 };
 
 /** A virtual machine: it boots firmware, and runs from no image. */
-export type VirtualMachine = InstanceBase & {
+type VirtualMachine = InstanceBase & {
   readonly type: "virtual-machine";
   readonly firmware: "bios" | "uefi";
 };
@@ -101,7 +101,7 @@ export const MIXED_FLEET: readonly Instance[] = Object.freeze([
 ]);
 
 /** What the fixture source declares: it filters, searches, orders and counts. */
-export const INSTANCE_CAPABILITIES: SourceCapabilities = declareCapabilities(
+const INSTANCE_CAPABILITIES: SourceCapabilities = declareCapabilities(
   instances,
   {
     filter: {
@@ -132,10 +132,10 @@ export type InstanceProviderConfig = Omit<
 };
 
 /** The provider the polymorphic tests drive. */
-export type InstanceProvider = DataViewsProvider<InstanceFields, Instance>;
+type InstanceProvider = DataViewsProvider<InstanceFields, Instance>;
 
 /** An instance provider over a manual source, with the source to answer it. */
-export type InstanceFixture = {
+type InstanceFixture = {
   readonly provider: InstanceProvider;
   readonly collection: Collection<InstanceFields, Instance>;
   readonly source: ManualSource<Instance>;

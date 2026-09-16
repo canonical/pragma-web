@@ -31,9 +31,8 @@ function FieldValue<TRow extends object>({
       record: channels.record,
       fields: channels.fields,
       selected: channels.selected,
-      applicability,
     }),
-    [provider, channels, field.id, applicability],
+    [provider, channels, field.id],
   );
   const Content = field.cell;
   const notApplicable = applicability === "not-applicable";

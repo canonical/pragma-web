@@ -43,7 +43,12 @@ import {
   useStableCallback,
   useStableValue,
 } from "../../../../hooks/index.js";
-import { describeStatus, readFieldName } from "../../../../utils/index.js";
+import {
+  areColumnScopesEqual,
+  describeStatus,
+  readColumnScopes,
+  readFieldName,
+} from "../../../../utils/index.js";
 import {
   useColumnArrangement,
   useColumnManagement,
@@ -66,12 +71,10 @@ import {
 } from "../index.js";
 import {
   areColumnModelsEqual,
-  areColumnScopesEqual,
   areColumnsEqual,
   isWithinControl,
   readSizing,
 } from "../utils/index.js";
-import readColumnScopes from "./readColumnScopes.js";
 import readRowHeader from "./readRowHeader.js";
 import "../../styles.css";
 
@@ -142,13 +145,13 @@ export default function ScopedDataTable<
   settings,
   footer,
   messages,
-  announce,
   announcer,
   className,
   style,
   ref,
   ...rest
 }: ScopedDataTableProps<TFields, TRow>): ReactElement {
+  const { announce, region } = announcer;
   if (!isDataViewsProvider(provider)) {
     throw new Error(
       "DataTable requires a provider created by createDataViewsProvider",
@@ -203,12 +206,6 @@ export default function ScopedDataTable<
     columns: declaredColumns,
   });
   const model = useStableValue(rendered, areColumnModelsEqual);
-  // The header the rows are handed, read from the content-stable list, so a
-  // caller rebuilding its columns inline re-renders no row for it.
-  const rowHeader = useMemo(
-    () => rendered.find((column) => column.rowHeader === true) ?? null,
-    [rendered],
-  );
 
   const fields = useMemo<readonly string[]>(
     () => model.map(readFieldName),
@@ -337,22 +334,21 @@ export default function ScopedDataTable<
   // What each column knows of record types: the types its header names, and
   // how its cells decide a record. A column narrowing its field's scope is
   // checked here, where the table mounts, once per declared column list.
-  const scopeOf = useMemo(() => {
-    const host = readProviderHost(provider);
-    // Every declared column, not only the ones shown: a column hidden by the
-    // stored arrangement is checked where the table mounts all the same.
-    return readColumnScopes({
-      collection: provider.collection,
-      applicability: (field, record) => host.applicability(field, record),
-      typeOf: (record) => host.typeOf(record),
-      columns: scopedColumns,
-    });
-  }, [scopedColumns, provider]);
-  // Whether one column applies to one row's record. Held at one identity, so
-  // a table that renders again renders no row again for this.
+  // Every declared column, not only the ones shown: a column hidden by the
+  // stored arrangement is checked where the table mounts all the same.
+  const scopeOf = useMemo(
+    () =>
+      readColumnScopes({
+        collection: provider.collection,
+        columns: scopedColumns,
+      }),
+    [scopedColumns, provider],
+  );
+  // Whether one column applies to a record of one type. Held at one
+  // identity, so a table that renders again renders no row again for this.
   const applicabilityOf = useStableCallback(
-    (column: DataTableColumn, record: TRow): Applicability =>
-      scopeOf(column).applicability(record),
+    (column: DataTableColumn, type: string | null): Applicability =>
+      scopeOf(column).applicability(type),
   );
   // The declared type a record carries: what each row watches of its record.
   const typeOf = useStableCallback((record: TRow): string | null =>
@@ -441,7 +437,6 @@ export default function ScopedDataTable<
           provider={provider}
           channels={rowScopes.readRow(entry.rowId)}
           columns={rendered}
-          rowHeader={rowHeader}
           selectable={selectable}
           rowLabel={nameRow}
           applicabilityOf={applicabilityOf}
@@ -453,7 +448,6 @@ export default function ScopedDataTable<
       provider,
       rowScopes,
       rendered,
-      rowHeader,
       selectable,
       nameRow,
       applicabilityOf,
@@ -576,10 +570,10 @@ export default function ScopedDataTable<
         </div>
         {/* Beneath the table and outside its role, since a table's children
           are its row groups: the bar here is a landmark, not a row. */}
-        {footer === undefined || footer === null ? null : (
+        {footer === undefined ? null : (
           <div className="ds data-table-footer">{footer}</div>
         )}
-        {announcer}
+        {region}
       </div>
     </MessagesContext>
   );
