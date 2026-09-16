@@ -6,7 +6,7 @@ import {
   FieldText,
   NotApplicable,
 } from "../../../../common/index.js";
-import { areFieldScopesEqual, readFieldName } from "../../../../utils/index.js";
+import { isFieldScopeEqual, readFieldName } from "../../../../utils/index.js";
 import type { FieldValueProps } from "./types.js";
 
 /**
@@ -23,7 +23,7 @@ const arePropsEqual = <TRow extends object>(
   a.channels === b.channels &&
   a.applicability === b.applicability &&
   a.field.cell === b.field.cell &&
-  areFieldScopesEqual([a.field], [b.field]);
+  isFieldScopeEqual(a.field, b.field);
 
 function FieldValue<TRow extends object>({
   provider,

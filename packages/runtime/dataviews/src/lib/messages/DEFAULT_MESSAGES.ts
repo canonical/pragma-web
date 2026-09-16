@@ -23,7 +23,7 @@ const formatSortTerm = (name: string, direction: SortDirection): string =>
 const formatList = (names: readonly string[]): string =>
   names.length < 2
     ? names.join("")
-    : `${names.slice(0, -1).join(", ")} and ${names.slice(-1).join("")}`;
+    : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
 
 /**
  * The words DataViews ships with: English. Plurals and ordinals are worded

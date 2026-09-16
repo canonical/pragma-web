@@ -217,7 +217,7 @@ export type UseFieldScopesResult = {
   readonly readScope: FieldScopes;
   /**
    * Whether one field applies to a record of one declared type, or of none.
-   * One identity for as long as the renderer is mounted.
+   * One identity for as long as the scopes it reads say the same.
    */
   readonly decideApplicability: (
     field: DisplayField,

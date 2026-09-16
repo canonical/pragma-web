@@ -1,15 +1,6 @@
 import { areListsEqual } from "@canonical/dataviews-core/bindings";
 import type { DisplayField } from "../common/index.js";
-import readFieldName from "./readFieldName.js";
-
-/** Whether two columns name the same record types, or both name none. */
-const areTypesEqual = (
-  a: readonly string[] | undefined,
-  b: readonly string[] | undefined,
-): boolean =>
-  a === undefined || b === undefined
-    ? a === b
-    : areListsEqual(a, b, (name, other) => name === other);
+import isFieldScopeEqual from "./isFieldScopeEqual.js";
 
 /**
  * Whether two column or field arrays say the same thing about record types:
@@ -21,12 +12,5 @@ export default function areFieldScopesEqual(
   a: readonly DisplayField[],
   b: readonly DisplayField[],
 ): boolean {
-  return areListsEqual(
-    a,
-    b,
-    (column, other) =>
-      column.id === other.id &&
-      readFieldName(column) === readFieldName(other) &&
-      areTypesEqual(column.appliesTo, other.appliesTo),
-  );
+  return areListsEqual(a, b, isFieldScopeEqual);
 }

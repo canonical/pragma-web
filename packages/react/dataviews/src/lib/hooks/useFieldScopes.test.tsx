@@ -1,7 +1,7 @@
 /**
  * A renderer's field scopes, held while what a scope reads says the same:
  * a heading rebuilt inline reads no scope again, a field narrowed anew does,
- * and the applicability callback keeps one identity across both.
+ * and the applicability callback moves with the scopes it reads.
  */
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -34,6 +34,9 @@ describe("useFieldScopes", () => {
       withImage({ id: "image", header: "Image", appliesTo: ["container"] }),
     );
     expect(result.current.readScope).not.toBe(first.readScope);
-    expect(result.current.decideApplicability).toBe(first.decideApplicability);
+    // The decision reads the scopes it was made over, so it moves with them.
+    expect(result.current.decideApplicability).not.toBe(
+      first.decideApplicability,
+    );
   });
 });

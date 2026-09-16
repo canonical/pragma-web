@@ -270,9 +270,15 @@ export default function ScopedDataTable<
   // the mode, where a tap toggles a row; it ends when the last selected row
   // is deselected. Both are announced, since nothing on screen says either.
   const [selecting, setSelecting] = useState(false);
+  // Selection no longer offered ends the mode as the table renders, so no
+  // commit states a mode the table no longer acts on.
+  if (selecting && !selectable) {
+    setSelecting(false);
+  }
+  const inSelectionMode = selecting && selectable;
   const enterSelection = useStableCallback((rowId: string): void => {
     provider.selection.add([rowId]);
-    if (!selecting) {
+    if (!inSelectionMode) {
       setSelecting(true);
       announce(messages.selectionModeEntered);
     }
@@ -287,7 +293,7 @@ export default function ScopedDataTable<
       isWithinControl(target) ? null : readRowId(target, container),
     onLongPress: enterSelection,
     onTap: (rowId) => {
-      if (selecting) {
+      if (inSelectionMode) {
         provider.selection.toggle(rowId);
       }
     },
@@ -296,9 +302,9 @@ export default function ScopedDataTable<
   // no selection change of its own. The mode ends with the last selected
   // row — as it stands when the subscription is taken, too, since a
   // selection emptied or a provider swapped before then publishes nothing
-  // here — and with selection no longer offered.
+  // here.
   useEffect(() => {
-    if (!selecting) {
+    if (!inSelectionMode) {
       return undefined;
     }
     const endIfEmpty = (): void => {
@@ -307,13 +313,9 @@ export default function ScopedDataTable<
         announce(messages.selectionModeEnded);
       }
     };
-    if (!selectable) {
-      setSelecting(false);
-      return undefined;
-    }
     endIfEmpty();
     return provider.selection.state.subscribe(endIfEmpty);
-  }, [selecting, selectable, provider, announce, messages]);
+  }, [inSelectionMode, provider, announce, messages]);
 
   // The header row's sort: the ordering in force and what each column shows
   // of it, the column that claims it, refusals, no-JS destinations, and the
@@ -453,7 +455,7 @@ export default function ScopedDataTable<
           aria-busy={busy}
           // A custom state carried as an attribute, as the status is, and
           // present while the mode holds: a recorded deviation.
-          data-selection-mode={selecting ? "true" : undefined}
+          data-selection-mode={inSelectionMode ? "true" : undefined}
           {...(selectable ? gestures : {})}
           // Every logical row, the header's included, so a row a virtualized
           // table has not mounted is still counted.
