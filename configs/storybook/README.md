@@ -9,7 +9,7 @@ This package, at the moment, solely exports the shared config. We might in the f
 2. Replace the contents of `.storybook/main.ts` by 
 
 ```typescript 
-import { createConfig } from "@canonical/storybook-config";
+import { createConfig } from "@canonical/asdstorybook-config";
 
 export default createConfig("react"); // or one of "svelte", "sveltekit", "lit"
 ```
