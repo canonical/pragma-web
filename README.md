@@ -346,3 +346,4 @@ These workspace apps are development and demo surfaces; none are published.
 ## Acknowledgements
 
 Thanks to [Chromatic](https://www.chromatic.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.
+
