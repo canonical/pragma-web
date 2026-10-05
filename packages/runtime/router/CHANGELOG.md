@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.44.0](https://github.com/canonical/pragma-web/compare/v0.43.0...v0.44.0) (2026-10-05)
+
+### Bug Fixes
+
+* **router-core:** honours replace in the hash adapter ([#1440](https://github.com/canonical/pragma-web/issues/1440)) ([f4a139a](https://github.com/canonical/pragma-web/commit/f4a139a62a0d85fcf38a7aaa962ab33daa0cc494))
+
+
 # [0.43.0](https://github.com/canonical/pragma-web/compare/v0.42.0...v0.43.0) (2026-09-30)
 
 * chore(monorepo)!: consume the core packages from npm (#1388) ([86e48a4](https://github.com/canonical/pragma-web/commit/86e48a4f166821f8a2d5352314ac65ba94ff2846)), closes [#1388](https://github.com/canonical/pragma-web/issues/1388)
