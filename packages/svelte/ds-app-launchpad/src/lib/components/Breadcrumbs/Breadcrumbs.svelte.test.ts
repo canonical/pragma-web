@@ -8,7 +8,7 @@ import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import { tabToNextFocusable } from "../../../../testing/tabToNextFocusable.js";
 import Component from "./Breadcrumbs.svelte";
-import type { Segment } from "./types.js";
+import type { BreadcrumbsSegment } from "./types.js";
 
 describe("Breadcrumbs component", () => {
   const baseProps = {
@@ -337,7 +337,10 @@ describe("Breadcrumbs component", () => {
     });
 
     it("segments props are reactive", async () => {
-      const segment = $state<Segment>({ label: "Initial", href: "/initial" });
+      const segment = $state<BreadcrumbsSegment>({
+        label: "Initial",
+        href: "/initial",
+      });
 
       const page = await render(Component, {
         ...baseProps,
