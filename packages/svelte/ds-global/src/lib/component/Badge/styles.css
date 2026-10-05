@@ -9,7 +9,12 @@
   color: var(--badge-color-text);
   border-radius: var(--dimension-radius-full);
   padding-inline: var(--dimension-050);
-  font: var(--ds-typography-text-tertiary-bold);
+  font:
+    var(--typography-text-tertiary-bold-font-weight)
+    var(--typography-text-tertiary-bold-font-size) /
+    var(--typography-text-tertiary-bold-line-height)
+    var(--typography-text-tertiary-bold-font-family);
+  letter-spacing: var(--typography-text-tertiary-bold-letter-spacing);
 }
 
 :is(.disabled, :disabled, [aria-disabled="true"]) .ds.badge {

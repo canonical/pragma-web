@@ -25,9 +25,12 @@
   const displayValue = $derived.by(() => {
     const nonNegativeInt = Math.round(Math.max(value, 0));
 
-    if (capped) return nonNegativeInt > 999 ? "999+" : nonNegativeInt;
-  
-    return formatter.format(nonNegativeInt);
+    const shouldCap = capped && nonNegativeInt > 999;
+
+    const valueToFormat = shouldCap ? 999 : nonNegativeInt;
+    const formattedValue = formatter.format(valueToFormat); 
+
+    return shouldCap ? `${formattedValue}+` : formattedValue;
   });
 </script>
 
