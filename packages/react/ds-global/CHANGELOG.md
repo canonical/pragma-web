@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.44.0](https://github.com/canonical/pragma-web/compare/v0.43.0...v0.44.0) (2026-10-05)
+
+### Bug Fixes
+
+* Adds type of button to the modal close button ([#1404](https://github.com/canonical/pragma-web/issues/1404)) ([1cbd291](https://github.com/canonical/pragma-web/commit/1cbd29143243468a52dac896d0570d296388b6c3))
+
+### Features
+
+* **react-ds-global:** adds the Timeline data types and utils ([#1327](https://github.com/canonical/pragma-web/issues/1327)) ([fe20bb6](https://github.com/canonical/pragma-web/commit/fe20bb60742124e0e59620b0cf9a9d77fe3e2799))
+
+
 # [0.43.0](https://github.com/canonical/pragma-web/compare/v0.42.0...v0.43.0) (2026-09-30)
 
 * chore(monorepo)!: consume the core packages from npm (#1388) ([86e48a4](https://github.com/canonical/pragma-web/commit/86e48a4f166821f8a2d5352314ac65ba94ff2846)), closes [#1388](https://github.com/canonical/pragma-web/issues/1388)

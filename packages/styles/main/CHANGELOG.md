@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.44.0](https://github.com/canonical/pragma-web/compare/v0.43.0...v0.44.0) (2026-10-05)
+
+### Features
+
+* **styles,styles-vanilla-adapter:** names lib and app at the top of the layer order ([#1429](https://github.com/canonical/pragma-web/issues/1429)) ([0e43f4c](https://github.com/canonical/pragma-web/commit/0e43f4cb7d201a1743edbff323efc06f06da8ca9))
+
+
 # [0.43.0](https://github.com/canonical/pragma-web/compare/v0.42.0...v0.43.0) (2026-09-30)
 
 * chore(monorepo)!: consume the core packages from npm (#1388) ([86e48a4](https://github.com/canonical/pragma-web/commit/86e48a4f166821f8a2d5352314ac65ba94ff2846)), closes [#1388](https://github.com/canonical/pragma-web/issues/1388)

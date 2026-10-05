@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.44.0](https://github.com/canonical/pragma-web/compare/v0.43.0...v0.44.0) (2026-10-05)
+
+### Bug Fixes
+
+* **boilerplate:** name tests *.test.ts(x) like the application template ([#1415](https://github.com/canonical/pragma-web/issues/1415)) ([a3b192b](https://github.com/canonical/pragma-web/commit/a3b192b2b1864581b07a8eae4fed306817305146))
+
+
 # [0.43.0](https://github.com/canonical/pragma-web/compare/v0.42.0...v0.43.0) (2026-09-30)
 
 * chore(monorepo)!: consume the core packages from npm (#1388) ([86e48a4](https://github.com/canonical/pragma-web/commit/86e48a4f166821f8a2d5352314ac65ba94ff2846)), closes [#1388](https://github.com/canonical/pragma-web/issues/1388)
