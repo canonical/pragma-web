@@ -63,7 +63,7 @@
     "relay-test-utils": "^21.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
+    "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
     "@canonical/typescript-config-react": "^0.44.0",
     "@canonical/webarchitect": "0.43.0",
