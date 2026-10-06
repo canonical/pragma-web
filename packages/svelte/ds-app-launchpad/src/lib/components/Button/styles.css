@@ -89,6 +89,6 @@
   }
 
   &.primary {
-    outline-offset: var(--dimension-stroke-thickness-large);
+    outline-offset: var(--dimension-stroke-thickness-medium);
   }
 }
