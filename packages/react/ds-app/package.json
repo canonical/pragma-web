@@ -62,7 +62,7 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
+    "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
     "@canonical/design-tokens": "0.43.0",
     "@canonical/react-ds-global-form": "^0.44.0",
