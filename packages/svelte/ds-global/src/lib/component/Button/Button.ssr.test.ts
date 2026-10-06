@@ -61,6 +61,19 @@ describe("Button SSR", () => {
     expect(componentLocator(page).classList).toContain("destructive");
   });
 
+  it("applies both importance and anticipation classes", () => {
+    const page = render(Component, {
+      props: {
+        ...baseProps,
+        importance: "primary",
+        anticipation: "destructive",
+      } satisfies ComponentProps<typeof Component>,
+    });
+    const root = componentLocator(page);
+    expect(root.classList).toContain("primary");
+    expect(root.classList).toContain("destructive");
+  });
+
   it("applies the branded emphasis class", () => {
     const page = render(Component, {
       props: { ...baseProps, emphasis: "branded" } satisfies ComponentProps<
@@ -128,16 +141,15 @@ describe("Button SSR", () => {
         loadingLabel: "Saving changes",
       } satisfies ComponentProps<typeof Component>,
     });
-    const status = page.container.querySelector('[role="status"]');
-    expect(status?.textContent?.trim()).toBe("Saving changes");
+    expect(page.getByRole("status").textContent?.trim()).toBe("Saving changes");
   });
 
   it("renders no loading status region when loading is not set", () => {
     const page = render(Component, { props: { ...baseProps } });
-    expect(page.container.querySelector('[role="status"]')).toBeNull();
+    expect(page.queryByRole("status")).toBeNull();
   });
 });
 
 function componentLocator(page: RenderResult): HTMLButtonElement {
-  return page.container.querySelector(".ds.button") as HTMLButtonElement;
+  return page.getByRole("button") as HTMLButtonElement;
 }

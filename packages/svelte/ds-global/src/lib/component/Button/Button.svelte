@@ -21,8 +21,6 @@
     ...rest
   }: ButtonProps = $props();
 
-  const hasVisibleChildren = $derived(children != null);
-
   // A loading button stays focusable (a natively disabled button would drop
   // keyboard focus to the document) and is instead marked aria-disabled, with
   // activation blocked here.
@@ -74,9 +72,9 @@
       {@render icon()}
     </span>
   {/if}
-  {#if hasVisibleChildren}
+  {#if children}
     <span class="label">
-      {@render children?.()}
+      {@render children()}
     </span>
   {/if}
   {#if loading}

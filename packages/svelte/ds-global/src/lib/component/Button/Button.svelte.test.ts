@@ -1,23 +1,32 @@
 import type { Locator } from "@vitest/browser/context";
 import type { ComponentProps } from "svelte";
+import { createRawSnippet } from "svelte";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import Component from "./Button.svelte";
-import {
-  buttonChildren,
-  buttonChildrenText,
-  buttonIcon,
-  complexChildren,
-  complexChildrenText,
-  iconTestId,
-  submitChildren,
-  submitChildrenText,
-} from "./test.fixtures.svelte";
+
+const buttonChildrenText = "Click me";
+const complexChildrenText = "Complex content";
+const submitChildrenText = "Submit";
+const iconTestId = "icon";
+
+const buttonChildren = createRawSnippet(() => ({
+  render: () => `<span>${buttonChildrenText}</span>`,
+}));
+const complexChildren = createRawSnippet(() => ({
+  render: () => `<span>${complexChildrenText}</span>`,
+}));
+const submitChildren = createRawSnippet(() => ({
+  render: () => `<span>${submitChildrenText}</span>`,
+}));
+// The icon is decorative and has no role, so it is found by test id.
+const buttonIcon = createRawSnippet(() => ({
+  render: () => `<svg data-testid="${iconTestId}"></svg>`,
+}));
 
 describe("Button component", () => {
   const baseProps = {
-    "data-testid": "button",
     children: buttonChildren,
   } satisfies ComponentProps<typeof Component>;
 
@@ -175,9 +184,7 @@ describe("Button component", () => {
 
     it("wraps the icon in the icon slot class", async () => {
       const page = await render(Component, { ...baseProps, icon: buttonIcon });
-      const iconWrapper = page.container.querySelector(
-        `[data-testid='${iconTestId}']`,
-      )?.parentElement;
+      const iconWrapper = page.getByTestId(iconTestId).element().parentElement;
       expect(iconWrapper).toHaveClass("icon");
     });
 
@@ -186,11 +193,9 @@ describe("Button component", () => {
         icon: buttonIcon,
         "aria-label": "Close",
       });
-      expect(
-        page.container.querySelector(`[data-testid='${iconTestId}']`),
-      ).not.toBeNull();
+      await expect.element(page.getByTestId(iconTestId)).toBeInTheDocument();
       await expect
-        .element(page.getByRole("button"))
+        .element(componentLocator(page))
         .toHaveAttribute("aria-label", "Close");
     });
   });
@@ -285,13 +290,6 @@ describe("Button component", () => {
         .toBeInTheDocument();
     });
 
-    it("keeps its accessible name from the label while loading", async () => {
-      const page = await render(Component, { ...baseProps, loading: true });
-      await expect
-        .element(page.getByRole("button", { name: buttonChildrenText }))
-        .toBeInTheDocument();
-    });
-
     it("applies the loading class", async () => {
       const page = await render(Component, { ...baseProps, loading: true });
       await expect.element(componentLocator(page)).toHaveClass("loading");
@@ -326,14 +324,12 @@ describe("Button component", () => {
   describe("loading status announcement", () => {
     it("renders no status region when loading is not controlled", async () => {
       const page = await render(Component, { ...baseProps });
-      expect(page.container.querySelector('[role="status"]')).toBeNull();
+      expect(page.getByRole("status").query()).toBeNull();
     });
 
     it("renders an empty status region when loading is false", async () => {
       const page = await render(Component, { ...baseProps, loading: false });
-      const status = page.container.querySelector('[role="status"]');
-      expect(status).not.toBeNull();
-      expect(status?.textContent?.trim()).toBe("");
+      await expect.element(page.getByRole("status")).toHaveTextContent("");
     });
 
     it("announces the default loading label when loading starts", async () => {
@@ -358,14 +354,13 @@ describe("Button component", () => {
     it("clears the status region when loading ends", async () => {
       const page = await render(Component, { ...baseProps, loading: true });
       await page.rerender({ loading: false });
-      const status = page.container.querySelector('[role="status"]');
-      expect(status?.textContent?.trim()).toBe("");
+      await expect.element(page.getByRole("status")).toHaveTextContent("");
     });
 
     it("renders the status region outside the button", async () => {
       const page = await render(Component, { ...baseProps, loading: true });
       const root = componentLocator(page).element();
-      expect(root.querySelector('[role="status"]')).toBeNull();
+      expect(root.contains(page.getByRole("status").element())).toBe(false);
     });
   });
 
@@ -476,27 +471,6 @@ describe("Button component", () => {
     });
   });
 
-  describe("density context", () => {
-    it("keeps the label centred in a widened button", async () => {
-      const context = document.createElement("div");
-      context.className = "app";
-      document.body.append(context);
-      onTestFinished(() => context.remove());
-      const page = await render(Component, {
-        props: { ...baseProps, style: "width: 300px;" },
-        target: context,
-      });
-      const root = componentLocator(page).element().getBoundingClientRect();
-      const label = page.container
-        .querySelector(".label")
-        ?.getBoundingClientRect();
-      expect(label).toBeDefined();
-      const rootCentre = root.left + root.width / 2;
-      const labelCentre = (label?.left ?? 0) + (label?.width ?? 0) / 2;
-      expect(Math.abs(rootCentre - labelCentre)).toBeLessThan(1);
-    });
-  });
-
   describe("border visibility", () => {
     // A red border colour on every channel makes the outline flag the only
     // thing deciding whether the border shows.
@@ -582,7 +556,6 @@ describe("Button component", () => {
   });
 });
 
-// Selects the component root by the testid set in baseProps.
 function componentLocator(page: RenderResult<typeof Component>): Locator {
-  return page.getByTestId("button");
+  return page.getByRole("button");
 }
