@@ -87,8 +87,4 @@
     --dimension-padding-inline-button: var(--dimension-100);
     --typography-button: var(--ds-typography-text-secondary);
   }
-
-  &.primary {
-    outline-offset: var(--dimension-stroke-thickness-medium);
-  }
 }
