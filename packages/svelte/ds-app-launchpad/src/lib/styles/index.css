@@ -11,8 +11,7 @@ body {
 }
 
 *:focus-visible {
-  outline: var(--dimension-stroke-thickness-large) solid
-    var(--modifier-color-focus-ring, var(--color-focusRing));
+  outline: var(--dimension-stroke-thickness-large) solid var(--color-focusRing);
   outline-offset: calc(var(--dimension-stroke-thickness-large) * -1);
 }
 
