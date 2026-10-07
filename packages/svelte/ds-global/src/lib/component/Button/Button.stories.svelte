@@ -21,12 +21,9 @@
     component: Button,
     tags: ["autodocs"],
     decorators: [() => ({ Component: Surface })],
+    // Storybook infers each prop's options from its type, but offers no way
+    // to unset an optional prop, so these add an `undefined` option.
     argTypes: {
-      // Importance is never blank — primary is the default hierarchy.
-      importance: {
-        control: "select",
-        options: [...MODIFIER_FAMILIES.importance],
-      },
       anticipation: {
         control: "select",
         options: [undefined, ...MODIFIER_FAMILIES.anticipation],
@@ -53,6 +50,14 @@
     ...matrixArgTypes,
     disabled: { control: false },
   } as const;
+
+  let saving = $state(false);
+  const save = () => {
+    saving = true;
+    setTimeout(() => {
+      saving = false;
+    }, 2000);
+  };
 </script>
 
 <Story name="Default">
@@ -243,5 +248,27 @@
 >
   {#snippet template(args)}
     <Button {...args} loading>Saving</Button>
+  {/snippet}
+</Story>
+
+<!--
+  Clicking the button puts it into the loading state for two seconds. Use a
+  screen reader to hear the loading label announced while keyboard focus stays
+  on the button.
+-->
+
+<Story
+  name="LoadingOnClick"
+  argTypes={{ loading: { control: false }, onclick: { control: false } }}
+>
+  {#snippet template(args)}
+    <Button
+      {...args}
+      loading={saving}
+      loadingLabel="Saving changes"
+      onclick={save}
+    >
+      Save changes
+    </Button>
   {/snippet}
 </Story>
