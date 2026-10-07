@@ -26,11 +26,6 @@ export interface ButtonProps extends BaseProps {
    */
   emphasis?: "branded";
   /**
-   * Button variant.
-   * - `"link"`: Styled as a text link
-   */
-  variant?: "link";
-  /**
    * Leading icon slot. Renders before the label inside a `.icon` span.
    * Icon-only buttons need an explicit `aria-label` or `aria-labelledby`
    * to be accessible, and should be paired with a Tooltip that states the

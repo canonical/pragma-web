@@ -12,7 +12,6 @@
     importance = "primary",
     anticipation,
     emphasis,
-    variant,
     icon,
     loading,
     loadingLabel = "Loading",
@@ -52,7 +51,6 @@
     importance,
     anticipation,
     emphasis,
-    variant,
     loading && "loading",
     className,
   ]}

@@ -155,13 +155,6 @@ describe("Button component", () => {
     });
   });
 
-  describe("variant prop", () => {
-    it("applies link variant class", async () => {
-      const page = await render(Component, { ...baseProps, variant: "link" });
-      await expect.element(componentLocator(page)).toHaveClass("link");
-    });
-  });
-
   describe("icon prop", () => {
     it("renders the icon slot when provided", async () => {
       const page = await render(Component, { ...baseProps, icon: buttonIcon });
