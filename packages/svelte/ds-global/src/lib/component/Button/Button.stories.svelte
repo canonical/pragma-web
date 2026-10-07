@@ -32,10 +32,6 @@
         control: "select",
         options: [undefined, "branded"],
       },
-      variant: {
-        control: "select",
-        options: [undefined, "link"],
-      },
     },
     args: { onclick: fn(), importance: "primary" },
   });
@@ -147,19 +143,6 @@
         <Button {...args} {importance} emphasis="branded" disabled>Get started</Button>
       {/each}
     </div>
-  {/snippet}
-</Story>
-
-<!--
-  Link variant renders as inline text with underline.
--->
-
-<Story
-  name="LinkVariant"
-  args={{ variant: "link" }}
->
-  {#snippet template(args)}
-    <Button {...args}>Learn more</Button>
   {/snippet}
 </Story>
 
