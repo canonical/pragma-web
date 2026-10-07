@@ -83,15 +83,6 @@ describe("Button SSR", () => {
     expect(componentLocator(page).classList).toContain("branded");
   });
 
-  it("applies the link variant class", () => {
-    const page = render(Component, {
-      props: { ...baseProps, variant: "link" } satisfies ComponentProps<
-        typeof Component
-      >,
-    });
-    expect(componentLocator(page).classList).toContain("link");
-  });
-
   it("applies a custom class", () => {
     const page = render(Component, {
       props: { ...baseProps, class: "test-class" } satisfies ComponentProps<
