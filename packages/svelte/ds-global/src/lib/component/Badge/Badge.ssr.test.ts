@@ -63,7 +63,7 @@ describe("Badge SSR", () => {
   });
 
   describe("Display value", () => {
-    it("displays the rounded variant by default", () => {
+    it("displays the uncapped variant by default", () => {
       const page = render(Component, {
         props: { ...baseProps, value: 10000 },
       });
@@ -100,7 +100,7 @@ describe("Badge SSR", () => {
       });
     });
 
-    describe("rounded", () => {
+    describe("uncapped", () => {
       it("displays 0 for negative values", () => {
         const page = render(Component, {
           props: { ...baseProps, value: -1 },

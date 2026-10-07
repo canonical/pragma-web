@@ -49,9 +49,12 @@
   {/snippet}
 </Story>
 
-<Story name="Disabled" args={{ value: 42 }} >
-{#snippet template(args)}
-    <div class="disabled" style="border: 1px dashed var(--color-border); width: 200px; min-height: 100px;">
+<Story name="Disabled" args={{ value: 42 }}>
+  {#snippet template(args)}
+    <div
+      class="disabled"
+      style="border: 1px dashed var(--color-border); width: 200px; min-height: 100px;"
+    >
       <span style="display: block;">Disabled parent</span>
       <Badge {...args} />
     </div>

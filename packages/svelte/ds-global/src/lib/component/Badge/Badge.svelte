@@ -21,20 +21,19 @@
     ...rest
   }: BadgeProps = $props();
 
-
   const displayValue = $derived.by(() => {
     const nonNegativeInt = Math.round(Math.max(value, 0));
 
     const shouldCap = capped && nonNegativeInt > 999;
 
     const valueToFormat = shouldCap ? 999 : nonNegativeInt;
-    const formattedValue = formatter.format(valueToFormat); 
+    const formattedValue = formatter.format(valueToFormat);
 
     return shouldCap ? `${formattedValue}+` : formattedValue;
   });
 </script>
 
-<span class={[componentCssClassName, className, criticality ]} {...rest}>
+<span class={[componentCssClassName, className, criticality]} {...rest}>
   {displayValue}
 </span>
 
@@ -44,6 +43,6 @@
 ## Example Usage
 ```svelte
 <Badge value={42} criticality="warning" />
-<Badge value={2351} variant="rounded" />
+<Badge value={2351} capped />
 ```
 -->

@@ -1,22 +1,25 @@
-.ds.badge {
-  --badge-color-background: var(--color-foreground-primary);
-  --badge-color-text: var(--color-text-onForegroundPrimary);
+@layer ds.components.global {
+  .ds.badge {
+    --badge-color-background: var(--color-foreground-primary);
+    --badge-color-text: var(--color-text-onForegroundPrimary);
 
-  background-color: var(
-    --modifier-color-foreground-primary,
-    var(--badge-color-background)
-  );
-  color: var(--badge-color-text);
-  border-radius: var(--dimension-radius-full);
-  padding-inline: var(--dimension-050);
-  font:
-    var(--typography-text-tertiary-bold-font-weight)
-    var(--typography-text-tertiary-bold-font-size) /
-    var(--typography-text-tertiary-bold-line-height)
-    var(--typography-text-tertiary-bold-font-family);
-  letter-spacing: var(--typography-text-tertiary-bold-letter-spacing);
-}
+    background-color: var(
+      --modifier-color-foreground-primary,
+      var(--badge-color-background)
+    );
+    color: var(--badge-color-text);
+    border-radius: var(--dimension-radius-full);
+    padding-inline: var(--dimension-050);
+    font:
+      var(--typography-text-tertiary-bold-font-weight)
+      var(--typography-text-tertiary-bold-font-size) /
+      var(--typography-text-tertiary-bold-line-height)
+      var(--typography-text-tertiary-bold-font-family);
+    letter-spacing: var(--typography-text-tertiary-bold-letter-spacing);
+  }
 
-:is(.disabled, :disabled, [aria-disabled="true"]) .ds.badge {
-  background-color: var(--modifier-color-foreground-primary-disabled);
+  :is(.disabled, :disabled, [aria-disabled="true"]) .ds.badge {
+    --badge-color-text: var(--color-text-onForegroundPrimary-disabled);
+    background-color: var(--modifier-color-foreground-primary-disabled);
+  }
 }

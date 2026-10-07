@@ -64,7 +64,7 @@ describe("Badge component", () => {
   });
 
   describe("Display value", () => {
-    it("displays the rounded variant by default", async () => {
+    it("displays the uncapped variant by default", async () => {
       const page = await render(Component, { ...baseProps, value: 10000 });
       await expect.element(componentLocator(page)).toHaveTextContent("10K");
     });
@@ -107,7 +107,7 @@ describe("Badge component", () => {
       });
     });
 
-    describe("rounded", () => {
+    describe("uncapped", () => {
       it("displays 0 for negative values", async () => {
         const page = await render(Component, {
           ...baseProps,
@@ -141,6 +141,47 @@ describe("Badge component", () => {
         await expect
           .element(componentLocator(page))
           .toHaveTextContent(expected);
+      });
+    });
+
+    describe("formatter", () => {
+      it("applies a basic custom formatter", async () => {
+        const formatter = { format: (value: number) => `Value: ${value}` };
+        const page = await render(Component, {
+          ...baseProps,
+          formatter,
+        });
+        await expect
+          .element(componentLocator(page))
+          .toHaveTextContent("Value: 42");
+      });
+
+      it("applies a built-in custom formatter", async () => {
+        const page = await render(Component, {
+          ...baseProps,
+          value: 22242,
+          formatter: new Intl.NumberFormat("ar-EG", {
+            notation: "compact",
+            compactDisplay: "long",
+            maximumSignificantDigits: 1,
+          }),
+        });
+        await expect
+          .element(componentLocator(page))
+          .toHaveTextContent("٢٠ ألف");
+      });
+
+      it("applies a custom formatter after capping", async () => {
+        const formatter = { format: (value: number) => `Value: ${value}` };
+        const page = await render(Component, {
+          ...baseProps,
+          value: 10000,
+          capped: true,
+          formatter,
+        });
+        await expect
+          .element(componentLocator(page))
+          .toHaveTextContent("Value: 999+");
       });
     });
   });
