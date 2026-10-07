@@ -17,10 +17,11 @@
     gap: var(--modal-header-gap);
     text-wrap: balance;
 
-    font-family: var(--typography-heading-4-font-family);
-    font-size: var(--typography-heading-4-font-size);
-    font-weight: var(--typography-heading-4-font-weight);
-    line-height: var(--typography-heading-4-line-height);
+    font-family: var(--typography-heading-2-font-family);
+    font-size: var(--typography-heading-2-font-size);
+    font-weight: var(--typography-heading-2-font-weight);
+    line-height: var(--typography-heading-2-line-height-dimension);
+    letter-spacing: var(--typography-heading-2-letter-spacing);
 
     > .title :is(h1, h2, h3, h4, h5, h6) {
       margin: 0;
