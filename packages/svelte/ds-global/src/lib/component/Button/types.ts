@@ -14,23 +14,15 @@ export interface ButtonProps extends BaseProps {
   children?: Snippet;
   /**
    * Visual hierarchy of the button.
-   * - `primary`: High prominence, main call-to-action (default)
-   * - `secondary`: Medium prominence, supporting actions
-   * - `tertiary`: Low prominence, less important actions
+   * @default "primary"
    */
   importance?: ModifierFamily<"importance">;
-  /**
-   * Expected outcome of the action.
-   * - `constructive`: Positive outcome (create, save, confirm)
-   * - `caution`: Potentially risky action requiring attention
-   * - `destructive`: Negative/irreversible outcome (delete, remove)
-   */
+  /** Expected outcome of the action. */
   anticipation?: ModifierFamily<"anticipation">;
   /**
    * Brand emphasis. Every importance level has a brand version; use it for
    * actions and calls to action in an editorial setting, such as the sites
    * or documentation tiers.
-   * - `branded`: Takes the brand colours
    */
   emphasis?: "branded";
   /**
