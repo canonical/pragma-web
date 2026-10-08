@@ -2,6 +2,7 @@
   appearance: none;
   position: relative;
   cursor: pointer;
+  outline-offset: var(--dimension-stroke-thickness-medium);
 
   width: var(--dimension-400);
   height: var(--dimension-200);
