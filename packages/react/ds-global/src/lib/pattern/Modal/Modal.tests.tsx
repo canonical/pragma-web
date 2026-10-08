@@ -431,6 +431,24 @@ describe("Modal pattern", () => {
     });
   });
 
+  describe("landmarks", () => {
+    it("exposes no page-level landmarks inside the dialog", () => {
+      render(
+        <OpenModal>
+          <Component.Header>Title</Component.Header>
+          <Component.Content>Body</Component.Content>
+          <Component.Footer>
+            <button type="button">Save</button>
+          </Component.Footer>
+        </OpenModal>,
+      );
+      // The header and footer render as <div>: a <header>/<footer> inside a
+      // <dialog> would be exposed as a page-level banner/contentinfo landmark.
+      expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+      expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+    });
+  });
+
   describe("backdrop", () => {
     it("closes on a click that lands on the dialog itself", () => {
       const { container } = render(

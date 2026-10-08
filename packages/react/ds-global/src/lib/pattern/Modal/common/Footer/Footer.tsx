@@ -18,12 +18,16 @@ const Footer = ({
   className,
   ...props
 }: FooterProps): React.ReactElement => (
-  <footer
+  // A <div>, not a <footer>: a <footer> only loses its page-level contentinfo
+  // landmark inside article, aside, main, nav or section — a <dialog> is not
+  // one of those, so browsers would expose this action bar as a second site
+  // footer. No landmark is needed inside the dialog.
+  <div
     className={[componentCssClassName, className].filter(Boolean).join(" ")}
     {...props}
   >
     {children}
-  </footer>
+  </div>
 );
 
 Footer.displayName = "Modal.Footer";

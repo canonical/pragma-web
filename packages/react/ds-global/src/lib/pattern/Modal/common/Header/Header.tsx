@@ -32,8 +32,13 @@ const Header = ({
 }: HeaderProps): React.ReactElement => {
   const modal = useModalContext();
 
+  // A <div>, not a <header>: a <header> only loses its page-level banner
+  // landmark inside article, aside, main, nav or section — a <dialog> is not
+  // one of those, so browsers would expose this title row as a second site
+  // banner. The dialog is already named through `aria-labelledby`, so no
+  // landmark is needed here.
   return (
-    <header
+    <div
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       {...props}
     >
@@ -50,7 +55,7 @@ const Header = ({
           onClick={onDismiss ?? modal.onDismiss}
         />
       )}
-    </header>
+    </div>
   );
 };
 
