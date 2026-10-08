@@ -6,12 +6,9 @@
    * slides from left (off) to right (on). Colours come from the switch token
    * channel; the geometry is in baseline multiples. */
   .ds.form-switch {
-    /* Geometry, all derived from the track size and a 1px inset. Fixed element sizes
-       (32×16px), NOT baseline multiples — the 4px-baseline spike halved the old
-       `--space-baseline × 4 / × 2`. Stable dimension tokens decouple the switch size
-       from the baseline grid unit. */
-    --switch-track-width: var(--dimension-400); /* 32px */
-    --switch-track-height: var(--dimension-200); /* 16px */
+    /* Geometry, all derived from the track size and a 1px inset. */
+    --switch-track-width: calc(var(--typography-text-primary-font-size) * 2);
+    --switch-track-height: var(--typography-text-primary-font-size);
     --switch-knob-inset: 1px;
     --switch-knob-size: calc(
       var(--switch-track-height) -
@@ -28,16 +25,30 @@
     /* Track: a 2:1 pill. No border, so the width/height are the exact track box
        and the absolutely-positioned knob is measured against the same box (a
        border under `box-sizing: border-box` would shrink the padding box the knob
-       is anchored to, throwing off the inset and slide). */
+        is anchored to, throwing off the inset and slide). */
+    /* Label-font box, seated like a text line so density modifiers track the label. */
     width: var(--switch-track-width);
     height: var(--switch-track-height);
+    padding: 0;
+    margin-block-start: var(--space-before);
+    margin-block-end: max(
+      0px,
+      calc(
+        var(
+          --density-line-height,
+          var(--density-lh-comfy, calc(var(--baseline-height) * 8))
+        ) -
+        var(--space-before) -
+        1em
+      )
+    );
     border-radius: var(--dimension-radius-full);
     background: var(
       --surface-color-foreground-switch-unselected,
       var(--color-foreground-switch-unselected)
     );
     cursor: pointer;
-    transition: background-color var(--motion-duration-fast) ease;
+    transition: background var(--motion-duration-fast) ease;
 
     /* Knob: a circle inset from the track edges, sliding on the inline axis. */
     &::before {

@@ -58,7 +58,7 @@ const Option = ({
       </Label>
       {option.description && showDescription ? (
         <p
-          className={["ds option-description", "p"].filter(Boolean).join(" ")}
+          className={["ds field-description", "p"].filter(Boolean).join(" ")}
           {...ariaProps.description}
         >
           {option.description}
