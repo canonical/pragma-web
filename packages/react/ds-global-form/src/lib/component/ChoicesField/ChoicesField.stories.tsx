@@ -1,7 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as decorators from "storybook/decorators.js";
 import * as fixtures from "storybook/fixtures.options.js";
+import type { Option } from "../../subcomponent/types.js";
 import { ChoicesField } from "./index.js";
+
+const describedOptions: Option[] = [
+  {
+    value: "immediate",
+    label: "Immediate updates",
+    description: "A short message whenever something changes.",
+  },
+  {
+    value: "weekly",
+    label: "Weekly digest",
+    description: "Everything from the past week in one message.",
+  },
+  {
+    value: "none",
+    label: "No updates",
+    description: "Nothing is sent.",
+  },
+];
 
 // Field-tier stories run inside a form decorator (label/description/error +
 // react-hook-form state).
@@ -48,6 +67,25 @@ export const StackedMultiple: Story = {
     options: fixtures.continents,
     isMultiple: true,
     layout: "stacked",
+  },
+};
+
+export const StackedWithDescriptions: Story = {
+  args: {
+    name: "select_stacked_descriptions",
+    label: "Choose update frequency",
+    options: describedOptions,
+    layout: "stacked",
+  },
+};
+
+export const StackedWithDividers: Story = {
+  args: {
+    name: "select_stacked_dividers",
+    label: "Choose update frequency",
+    options: describedOptions,
+    layout: "stacked",
+    withDividers: true,
   },
 };
 
