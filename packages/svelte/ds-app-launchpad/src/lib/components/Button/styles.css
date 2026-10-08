@@ -45,6 +45,10 @@
   display: inline-flex;
   justify-content: center;
 
+  &:focus-visible {
+    outline-color: var(--color-focusRing);
+  }
+
   &:disabled,
   &[aria-disabled="true"] {
     color: var(--modifier-color-text-disabled, var(--disabled--color-text));
