@@ -25,7 +25,7 @@
       margin: 0;
       border: none;
       border-top: var(--dimension-stroke-thickness-medium) solid
-        var(--color-border);
+        var(--color-border-muted);
     }
 
     /* Columns: a grid of equal-width columns. Each option fills its cell, so the
