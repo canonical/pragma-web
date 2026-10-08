@@ -12,5 +12,5 @@
  * ```
  */
 export function subId(id: string, subId: string) {
-  return `${id}|${subId}`;
+  return `${id}-${subId}`;
 }
