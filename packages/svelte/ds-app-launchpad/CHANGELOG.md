@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.1](https://github.com/canonical/pragma-web/compare/v0.44.0...v0.44.1) (2026-10-08)
+
+### Bug Fixes
+
+* **svelte-ds-app-launchpad:** draws the focus ring inside components again ([#1448](https://github.com/canonical/pragma-web/issues/1448)) ([421c772](https://github.com/canonical/pragma-web/commit/421c772cfc3372a6d06d65211047924a09362040))
+
+
 # [0.44.0](https://github.com/canonical/pragma-web/compare/v0.43.0...v0.44.0) (2026-10-05)
 
 ### chore
