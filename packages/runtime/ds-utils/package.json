@@ -1,7 +1,7 @@
 {
   "name": "@canonical/ds-utils",
   "description": "Framework-agnostic design system helpers: navigation trees, a URL query port, debounce, throttle, humanizeNumber, pluralize",
-  "version": "0.44.0",
+  "version": "0.44.1",
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -45,7 +45,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@canonical/ds-types": "^0.44.0"
+    "@canonical/ds-types": "^0.44.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

@@ -1,7 +1,7 @@
 {
   "name": "@canonical/styles-typography",
   "description": "Typography baseline alignment engines and scale tokens for the Canonical Design System.",
-  "version": "0.44.0",
+  "version": "0.44.1",
   "exports": {
     ".": "./src/index.css",
     "./tokens.css": "./src/tokens.css",

@@ -1,6 +1,6 @@
 {
   "name": "@canonical/vitest-config-react",
-  "version": "0.44.0",
+  "version": "0.44.1",
   "type": "module",
   "description": "Canonical's standard Vitest configuration factory for React packages",
   "main": "dist/esm/index.js",
