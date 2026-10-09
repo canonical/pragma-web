@@ -14,28 +14,15 @@
       padding: 0;
     }
 
-    /* Control row: `align-items: center` centres the control on the row, and a
-       multi-line (sentence) label wraps below it (AV-325). Spacing belongs to
-       the FIELD, not the label or control: the row's column-gap separates
-       control and label, the field's row-gap separates the row from the
-       description/error, and neither label nor control carries any padding or
-       margin — so spacing changes never shift the control off-centre. */
+    /* Control row: start-aligned so the control seats itself on the label's
+     * first line (AV-325) via its own density seat (CheckboxInput/SwitchInput
+     * styles.css); a multi-line label wraps below. Spacing between blocks
+     * belongs to the field's gaps, not the row's children. */
     & > .field-toggle-control {
-      --toggle-control-line: var(--density-line-height-effective, 1lh);
-
       display: flex;
       flex-direction: row;
-      align-items: center;
+      align-items: start;
       column-gap: var(--form-field-inline-gap);
-
-      /* Every direct child that ISN'T the label is the control (checkbox / switch
-         input): a fixed 16px-tall box (--dimension-200 — checkbox 16×16, switch
-         track 16 high). The row's `align-items: center` does the centring; the
-         control itself carries no offset, margin or padding, so its intrinsic
-         size and click target are unchanged. */
-      & > :not(.ds.field-label) {
-        --toggle-control-size: var(--dimension-200);
-      }
 
       /* The control label is often a full clickable sentence, so it reads as
          regular body prose (not the bold heading weight the field label uses by
@@ -49,7 +36,6 @@
         font-weight: var(--typography-text-primary-font-weight);
         text-align: start;
         cursor: pointer;
-        padding: 0;
       }
 
       /* Label BEFORE the control (switch convention): the DOM stays

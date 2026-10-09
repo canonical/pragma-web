@@ -9,10 +9,22 @@
     appearance: none;
     box-sizing: border-box;
     margin-inline: var(--form-input-padding-inline);
-    /* 16px control — a fixed element size, not a baseline multiple (the 4px-baseline
-       spike halved the old `--space-baseline × 2`). Stable --dimension-200 (16px). */
-    width: var(--dimension-200);
-    height: var(--dimension-200);
+    /* Label-font box, seated like a text line so density modifiers track the label. */
+    height: var(--typography-text-primary-font-size);
+    width: var(--typography-text-primary-font-size);
+    padding: 0;
+    margin-block-start: var(--space-before);
+    margin-block-end: max(
+      0px,
+      calc(
+        var(
+          --density-line-height,
+          var(--density-lh-comfy, calc(var(--baseline-height) * 8))
+        ) -
+        var(--space-before) -
+        1em
+      )
+    );
     border: var(--dimension-stroke-thickness-medium) solid var(--color-border);
     border-radius: 50%;
     background-color: var(
