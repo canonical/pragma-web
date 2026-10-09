@@ -237,7 +237,7 @@
     max(0px, calc(var(--control-seat-basis) - var(--button-border-width, 0px))),
     0.25px
   );
-  --seat-after: max(
+  /* --seat-after: max(
     0px,
     calc(
       var(--density-line-height-effective) -
@@ -246,7 +246,10 @@
       2 *
       var(--button-border-width, 0px)
     )
-  );
+  ); */
+  --seat-after: var(
+    --seat-before
+  ); /* interim fix for button symmetry while preserving baseline*/
 
   box-sizing: border-box;
   block-size: auto;
