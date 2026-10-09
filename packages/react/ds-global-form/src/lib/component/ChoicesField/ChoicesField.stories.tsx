@@ -51,6 +51,25 @@ export const StackedMultiple: Story = {
   },
 };
 
+export const StackedWithDescriptions: Story = {
+  args: {
+    name: "select_stacked_descriptions",
+    label: "Choose update frequency",
+    options: fixtures.describedOptions,
+    layout: "stacked",
+  },
+};
+
+export const StackedWithDividers: Story = {
+  args: {
+    name: "select_stacked_dividers",
+    label: "Choose update frequency",
+    options: fixtures.describedOptions,
+    layout: "stacked",
+    withDividers: true,
+  },
+};
+
 /**
  * Column layout: options are laid out in a grid of equal-width columns, so each
  * option's width is column-based rather than sized to its content. The
