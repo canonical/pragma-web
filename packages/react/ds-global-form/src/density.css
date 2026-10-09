@@ -339,7 +339,13 @@
    * --end-nudge already lands its bottom on the grid. Adding a density fill on top
    * would double-pad. Prose bottom rhythm belongs to the engine / `.editorial`. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
+  :is(
+    .ds.field-label,
+    .ds.field-description,
+    .ds.field-error,
+    .ds.option > input,
+    .field-toggle-control > input
+  ) {
     padding-block-end: max(
       0px,
       calc(
