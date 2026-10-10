@@ -108,6 +108,7 @@
 
 /* Spacing architecture tokens */
 @import url("./spacing.css");
+@import url("./spacing-roles.css");
 
 /* Density modifier family (context × density → control height + baseline).
  * After spacing.css, which supplies the --baseline-height these primitives use. */

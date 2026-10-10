@@ -60,7 +60,7 @@ const ROOT_ELEMENTS = `
 <optgroup class="ds" id="root-optgroup" label="x"></optgroup>
 <input class="ds" type="search" id="root-search">`;
 
-/** The four Vanilla utilities whose important declarations reach inside an island. */
+/** The Vanilla utilities whose important declarations reach inside an island. */
 const ESCAPES = `
 <div class="u-text-max-width">
   <div class="ds card"><ul id="esc-ul"><li>x</li></ul><ol id="esc-ol"><li>x</li></ol></div>
@@ -335,9 +335,10 @@ describe.each(VANILLA_VERSIONS)(
       // Five rules in Vanilla's build carry an important declaration that can
       // reach an element inside an island, because their subject compound has no
       // class and the Vanilla class sits on an ancestor OUTSIDE the island — the
-      // arrangement rule 2 recommends. Four counters answer them, one covering
-      // both table-layout utilities. `all: revert` cannot touch an important
-      // declaration: for important rules the layer order reverses.
+      // arrangement rule 2 recommends. Five counters answer them: one covers
+      // both table-layout utilities, and the content-card rule splits migrated
+      // text owners from its other first children. `all: revert` cannot touch
+      // an important declaration: for important rules the layer order reverses.
       await sameAsPragmaOnly(
         vanilla,
         ["esc-ul", "esc-ol", "esc-root-ul"],
@@ -348,12 +349,10 @@ describe.each(VANILLA_VERSIONS)(
         ["esc-table", "esc-root-table"],
         ["table-layout"],
       );
-      // A list root is the case the margin counter exists for: pragma leaves it
-      // at the browser's 16px and Vanilla forces it to 0. A paragraph or a
-      // heading in the same position is the case the counter must NOT touch,
-      // because pragma zeroes those itself and Vanilla's rule already agrees;
-      // reverting there would hand them the browser's `1em` instead. Measured
-      // before the exclusion: 14px on the paragraph, 19.92px on the heading.
+      // A list root keeps the original counter: pragma leaves it at the
+      // browser's 16px and Vanilla forces it to 0. Paragraphs and headings now
+      // carry their cap compensation in the sole bottom margin, so their narrow
+      // counter restores that computed value rather than reverting to `1em`.
       await sameAsPragmaOnly(
         vanilla,
         ["esc-first-child", "esc-first-p", "esc-first-h2", "esc-later-child"],

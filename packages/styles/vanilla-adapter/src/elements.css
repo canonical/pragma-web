@@ -583,17 +583,23 @@
     :where(:scope, :scope *):is(p),
     .p,
     :scope.p {
-      --font-size: var(--typography-text-primary-font-size);
+      --font-size: var(
+        --ds-typography-body-font-size,
+        var(--typography-text-primary-font-size)
+      );
       --font-weight: var(--typography-text-primary-font-weight);
       --line-height: var(
-        --typography-text-primary-line-height-dimension,
-        round(
-          up,
-          calc(
-            var(--typography-text-primary-font-size) *
-            var(--typography-text-primary-line-height)
-          ),
-          var(--baseline-height)
+        --ds-typography-body-line-height,
+        var(
+          --typography-text-primary-line-height-dimension,
+          round(
+            up,
+            calc(
+              var(--typography-text-primary-font-size) *
+              var(--typography-text-primary-line-height)
+            ),
+            var(--baseline-height)
+          )
         )
       );
       --space-after: 0;
@@ -608,17 +614,23 @@
        `<kbd class="ds keyboard-key code">` carry `ds` on the same element. */
     .code,
     :scope.code {
-      --font-size: var(--typography-text-primary-code-font-size);
+      --font-size: var(
+        --ds-typography-body-font-size,
+        var(--typography-text-primary-code-font-size)
+      );
       --font-weight: var(--typography-text-primary-code-font-weight);
       --line-height: var(
-        --typography-text-primary-code-line-height-dimension,
-        round(
-          up,
-          calc(
-            var(--typography-text-primary-code-font-size) *
-            var(--typography-text-primary-code-line-height)
-          ),
-          var(--baseline-height)
+        --ds-typography-body-line-height,
+        var(
+          --typography-text-primary-code-line-height-dimension,
+          round(
+            up,
+            calc(
+              var(--typography-text-primary-code-font-size) *
+              var(--typography-text-primary-code-line-height)
+            ),
+            var(--baseline-height)
+          )
         )
       );
       --space-after: 0;
@@ -658,8 +670,8 @@
       margin-block: 0;
     }
 
-    /* Baseline alignment: each text element's total height snaps to a multiple
-       of --baseline-height, through padding nudges inside the element's box. */
+    /* Baseline alignment: each text owner uses a cap-height start nudge and its
+       sole block-end margin to compensate the occupied size onto the grid. */
     :where(:scope, :scope *):is(h1, h2, h3, h4, h5, h6, p),
     .p,
     .code,
@@ -672,12 +684,32 @@
       line-height: var(--computed-line-height);
       font-size: var(--font-size);
 
+      --text-baseline-unit: var(--ds-spacing-baseline, var(--baseline-height));
       --baseline-position: calc((var(--computed-line-height) + 1cap) / 2);
-      --start-nudge: calc(
-        var(--baseline-height) -
-        mod(var(--baseline-position), var(--baseline-height))
+      --start-nudge: round(
+        nearest,
+        calc(
+          round(up, var(--baseline-position), var(--text-baseline-unit)) -
+          var(--baseline-position)
+        ),
+        0.015625px
       );
-      --end-nudge: calc(var(--baseline-height) - var(--start-nudge));
+      /* Every mapped line-height is a whole tier baseline: Site uses
+         24/32/40/48px on 8px; Docs and App use 20/24/32/40/48px on 4px.
+         Extra wrapped lines therefore add whole baselines and leave this
+         one-line compensation unchanged. */
+      --precompensation-size: calc(
+        var(--computed-line-height) +
+        var(--start-nudge)
+      );
+      --grid-compensation: calc(
+        round(
+          up,
+          calc(var(--precompensation-size) + var(--start-nudge)),
+          var(--text-baseline-unit)
+        ) -
+        var(--precompensation-size)
+      );
     }
 
     /* Block-level baseline nudges only: bare inline `.code` is excluded so it
@@ -685,12 +717,10 @@
     :where(:scope, :scope *):is(h1, h2, h3, h4, h5, h6, p),
     .p,
     :scope.p {
-      /* Nudges as padding — inside the box for flex/grid compatibility */
+      /* The cap nudge is inside the box; the remainder belongs to its sole margin. */
       padding-block-start: var(--start-nudge);
-      padding-block-end: var(--end-nudge);
-
-      /* Element-owned spacing — only active in .editorial contexts */
-      margin-block-end: calc(var(--space-after, 0) * var(--baseline-height));
+      padding-block-end: 0;
+      margin-block-end: var(--grid-compensation);
     }
   }
 }

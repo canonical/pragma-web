@@ -72,14 +72,16 @@ const VANILLA_REACH_EXPECTED = [
 ];
 
 /**
- * The counters themselves, one per property, as adapter.css writes them. Four
- * of them answer the five reaching rules above, because one covers both
- * table-layout utilities.
+ * The counters themselves, one per selector branch, as adapter.css writes
+ * them. Five answer the reaching rules above: one covers both table-layout
+ * utilities, while the content-card rule splits migrated text owners from the
+ * remaining first children so each branch keeps its Pragma margin.
  */
 const SECOND_BOUNDARY = [
   ":where(.u-text-max-width) :where(:scope, :scope *):is(ul, ol) max-width",
   ":where(.u-table-layout--fixed) :where(:scope, :scope *):is(table) table-layout",
   ":where(.p-content-card__author-and-date) > :where(:scope:first-child):not(h1, h2, h3, h4, h5, h6, p, .p, .code) margin-bottom",
+  ":where(.p-content-card__author-and-date) > :where(:scope:first-child):is(h1, h2, h3, h4, h5, h6, p, .p) margin-bottom",
   ":where(.u-vertically-center) > :where(:scope):is(img) align-self",
 ];
 
@@ -208,7 +210,7 @@ describe("the order contract", () => {
     },
   );
 
-  it("pragma's CSS carries no !important except the second boundary's four (the README's installation, step 7)", () => {
+  it("pragma's CSS carries no !important except the second boundary's five (the README's installation, step 7)", () => {
     // A page running pragma alone has none at all. On a mixed page the only
     // important declarations are the second boundary's, and they are important
     // because nothing else can be: for important rules the layer order

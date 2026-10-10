@@ -1,0 +1,79 @@
+/* @canonical/styles — Inside-out spacing seats
+ *
+ * Opt-in primitives for text and controls. Components attach these classes to
+ * the element that owns the text; surrounding containers own any larger gap.
+ */
+
+@layer ds.components.global {
+  :where(.ds.spacing-text-seat) {
+    --ds-text-baseline-offset: calc(
+      (var(--ds-typography-body-line-height) + 1cap) /
+      2
+    );
+    --ds-text-baseline-nudge: round(
+      nearest,
+      calc(
+        round(up, var(--ds-text-baseline-offset), var(--ds-spacing-baseline)) -
+        var(--ds-text-baseline-offset)
+      ),
+      0.015625px
+    );
+    --ds-text-precompensation-size: calc(
+      var(--ds-typography-body-line-height) +
+      var(--ds-text-baseline-nudge)
+    );
+    --ds-text-grid-compensation: calc(
+      round(
+        up,
+        calc(
+          var(--ds-text-precompensation-size) +
+          var(--ds-text-baseline-nudge)
+        ),
+        var(--ds-spacing-baseline)
+      ) -
+      var(--ds-text-precompensation-size)
+    );
+    display: flow-root;
+    font-size: var(--ds-typography-body-font-size);
+    line-height: var(--ds-typography-body-line-height);
+    margin-block: 0 var(--ds-text-grid-compensation);
+    padding-block: var(--ds-text-baseline-nudge) 0;
+  }
+
+  :where(.ds.spacing-control-seat) {
+    --ds-control-baseline-offset: calc(
+      (var(--ds-typography-body-line-height) + 1cap) /
+      2
+    );
+    --ds-control-baseline-nudge: round(
+      nearest,
+      calc(
+        round(
+          up,
+          var(--ds-control-baseline-offset),
+          var(--ds-spacing-baseline)
+        ) -
+        var(--ds-control-baseline-offset)
+      ),
+      0.015625px
+    );
+    --ds-control-padding-block: calc(
+      var(--ds-spacing-control-inset) +
+      var(--ds-control-baseline-nudge)
+    );
+    --ds-control-occupied-size: calc(
+      var(--ds-typography-body-line-height) +
+      2 *
+      var(--ds-control-padding-block)
+    );
+    --ds-control-grid-compensation: calc(
+      round(up, var(--ds-control-occupied-size), var(--ds-spacing-baseline)) -
+      var(--ds-control-occupied-size)
+    );
+    border: 0;
+    font-size: var(--ds-typography-body-font-size);
+    line-height: var(--ds-typography-body-line-height);
+    margin-block: 0 var(--ds-control-grid-compensation);
+    padding-block: var(--ds-control-padding-block);
+  }
+}
