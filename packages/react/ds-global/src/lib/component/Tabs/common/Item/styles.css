@@ -45,10 +45,6 @@
     text-decoration: none;
     white-space: nowrap;
 
-    /* Transparent underline reserved so the row never shifts when a border
-       appears on hover/active. */
-    border: 0;
-
     /* Keyboard focus: a design-system focus ring (design review) instead of the
        UA default outline. Inset offset so the ring hugs the tab and the row's
        `overflow` never clips it; :focus-visible only, so pointer clicks stay

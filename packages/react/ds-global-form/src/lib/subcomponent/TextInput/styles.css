@@ -5,26 +5,11 @@
 
 @layer ds.components.global {
   .ds.input.text {
-    --ds-stroke-width: var(--form-input-border-width, 1px);
-    --ds-stroke-color: var(
-      --form-input-border-color-bottom,
-      var(--form-input-border-color, var(--color-border))
-    );
-    --ds-focus-width: 1px;
-    --ds-focus-color: var(--form-focus-ring-color, currentColor);
-    --ds-focus-offset: 0;
     direction: inherit;
     display: flex;
     align-items: center;
     position: relative;
-    block-size: auto;
-    min-block-size: 0;
     box-sizing: border-box;
-    border: 0;
-    font-size: var(--ds-typography-body-font-size);
-    line-height: var(--ds-typography-body-line-height);
-    margin-block: 0 var(--ds-control-grid-compensation);
-    padding-block: var(--ds-control-padding-block);
     padding-inline: 0;
 
     & > input {
@@ -41,15 +26,6 @@
       padding-inline: var(--form-input-padding-inline);
     }
 
-    &.stroke-paint:focus-within {
-      --ds-stroke-slot: inset 0 0 0 var(--ds-stroke-width)
-        var(--ds-focus-color);
-      --ds-focus-slot: 0 0 0 var(--ds-focus-width) var(--ds-focus-color);
-      box-shadow: none;
-      outline: var(--ds-focus-width) solid transparent;
-      outline-offset: var(--ds-focus-offset);
-    }
-
     & > .prefix,
     & > .suffix {
       display: flex;
@@ -58,17 +34,6 @@
       color: var(--color-text-muted);
       white-space: nowrap;
       user-select: none;
-    }
-  }
-
-  .danger > .payload .ds.input.text.stroke-paint:focus-within {
-    --ds-focus-color: var(--form-focus-ring-color-error);
-    box-shadow: none;
-  }
-
-  @media (forced-colors: active) {
-    .ds.input.text.stroke-paint:focus-within {
-      outline-color: Highlight;
     }
   }
 }

@@ -1,3 +1,6 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -11,7 +14,7 @@
     display: flex;
     align-items: stretch;
     position: relative;
-    padding: 0;
+    padding-inline: 0;
 
     & > input {
       flex: 1;
@@ -20,8 +23,10 @@
       background: transparent;
       color: inherit;
       font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
       outline: none;
-      /* Baseline engine provides font-size, line-height, padding via `.p` */
+      padding-block: 0;
       padding-inline: var(--form-input-padding-inline);
     }
 

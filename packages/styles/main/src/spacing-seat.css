@@ -1,7 +1,11 @@
 /* @canonical/styles — Inside-out spacing seats
  *
- * Opt-in primitives for text and controls. Components attach these classes to
- * the element that owns the text; surrounding containers own any larger gap.
+ * Opt-in primitives for body text and controls. `spacing-text-seat` is only for
+ * body-line owners: body line heights are whole bU multiples, so wrapping
+ * preserves the one-line remainder. Headings keep the typography package's
+ * heading engine.
+ * Components attach a seat to the element that owns the text, while surrounding
+ * containers own any larger gap or grouped-row closure.
  */
 
 @layer ds.components.global {
@@ -40,6 +44,14 @@
     padding-block: var(--ds-text-baseline-nudge) 0;
   }
 
+  /* A set of abutting control rows closes once, from its actual intrinsic block
+     size. `size` includes every row, divider and wrapped line; each descendant
+     seat receives a zero end margin through the inherited helper input. */
+  :where(.ds.spacing-control-group) {
+    --ds-control-seat-margin-block-end: 0px;
+    block-size: calc-size(auto, round(up, size, var(--ds-spacing-baseline)));
+  }
+
   :where(.ds.spacing-control-seat) {
     --ds-control-baseline-offset: calc(
       (var(--ds-typography-body-line-height) + 1cap) /
@@ -70,10 +82,27 @@
       round(up, var(--ds-control-occupied-size), var(--ds-spacing-baseline)) -
       var(--ds-control-occupied-size)
     );
-    border: 0;
-    font-size: var(--ds-typography-body-font-size);
-    line-height: var(--ds-typography-body-line-height);
-    margin-block: 0 var(--ds-control-grid-compensation);
-    padding-block: var(--ds-control-padding-block);
+    /* Components may supply only these helper inputs. The helper remains the
+       sole owner of block padding, closure margin, line metrics and layout
+       border width, so a composite cannot accidentally seat both wrapper and
+       leaf or reintroduce a layout border. */
+    border-width: var(--ds-control-seat-border-width, 0);
+    font-size: var(
+      --ds-control-seat-font-size,
+      var(--ds-typography-body-font-size)
+    );
+    line-height: var(
+      --ds-control-seat-line-height,
+      var(--ds-typography-body-line-height)
+    );
+    margin-block: var(--ds-control-seat-margin-block-start, 0)
+      var(
+        --ds-control-seat-margin-block-end,
+        var(--ds-control-grid-compensation)
+      );
+    padding-block: var(
+      --ds-control-seat-padding-block,
+      var(--ds-control-padding-block)
+    );
   }
 }

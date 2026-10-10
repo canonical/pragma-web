@@ -1,4 +1,5 @@
 .spacing-control-block {
+  --bucket-member-width: 16rem;
   padding: 2rem;
   color: var(--color-text);
   background: var(--color-background);
@@ -37,7 +38,7 @@
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: auto auto auto;
-  grid-auto-columns: max-content;
+  grid-auto-columns: var(--bucket-member-width);
   align-items: first baseline;
   column-gap: 1.5rem;
   row-gap: 0.5rem;
@@ -49,7 +50,7 @@
 }
 
 .bucket-sample figcaption {
-  max-inline-size: 13rem;
+  inline-size: var(--bucket-member-width);
   font-weight: 600;
 }
 
@@ -58,6 +59,11 @@
   display: flex;
   align-items: first baseline;
   min-block-size: 5rem;
+}
+
+.bucket-measure--portal {
+  min-block-size: 10rem;
+  align-items: flex-start;
 }
 
 .bucket-measure:not(.bucket-measure--portal)::after {
@@ -70,10 +76,11 @@
 }
 
 .bucket-metrics {
-  max-inline-size: 15rem;
+  box-sizing: border-box;
+  inline-size: var(--bucket-member-width);
   padding: 0.5rem;
   font: 0.75rem / 1.35 monospace;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   color: var(--color-text-muted, currentColor);
   background: color-mix(in srgb, Canvas 88%, transparent);
 }

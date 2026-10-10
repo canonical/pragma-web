@@ -1,3 +1,6 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* DateTime — native input wrapper with shared chrome.
  * The .chrome class provides border, padding, focus, and state styles
  * from index.css's .ds.input.chrome rule. Component-specific overrides below.
@@ -7,6 +10,12 @@
 
 @layer ds.components.global {
   .ds.input.datetime {
+    --ds-stroke-slot: inset 0 calc(-1 * var(--ds-stroke-width)) 0 0
+      var(--ds-stroke-color);
+    &::-webkit-datetime-edit,
+    &::-webkit-datetime-edit-fields-wrapper {
+      padding-block: 0;
+    }
     /* This element IS the text-bearing leaf, so it carries the inline padding
      * (`.ds.input.chrome` provides only the block padding). */
     padding-inline: var(--form-input-padding-inline);

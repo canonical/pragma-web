@@ -65,6 +65,12 @@
   */
 
   .ds.button {
+    /* Resolve tier typography on the actual owner instead of inheriting the
+       root-resolved Site values. */
+    --button-font-size: var(--ds-typography-body-font-size);
+    --button-line-height: var(--ds-typography-body-line-height);
+    --ds-control-seat-font-size: var(--button-font-size);
+    --ds-control-seat-line-height: var(--button-line-height);
     --ds-stroke-width: var(--button-border-width);
     --ds-stroke-color: color-mix(
       in srgb,
@@ -89,7 +95,6 @@
     background-color: var(--modifier-surface, var(--button-color-background));
     /* The outline flag selects the paint-only inset stroke colour. It never
        contributes to layout, so every importance shares one geometry. */
-    border: 0;
 
     /* The foundation helper computes the local cap nudge, equal block padding
        and trailing compensation. These aliases remain available to consumers. */

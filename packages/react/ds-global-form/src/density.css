@@ -9,8 +9,8 @@
  * 2×3 matrix and the value table.
  *
  * THIS file is the FORM APPLICATION layer for controls that have not moved to
- * the semantic spacing seats. TextInput and SelectInput opt out below; labels,
- * textarea and the remaining native chromes keep the established density model.
+ * the semantic spacing seats. Single-line inputs opt out below; labels and the
+ * multiline textarea keep the established density model.
  *
  * Migrated controls compute their local cap nudge from spacing-seat.css and do
  * not subscribe to `.dense` or `.comfortable` geometry here.
@@ -19,18 +19,31 @@
  */
 
 @layer ds.components.global {
-  /* ── TRANSITIONAL: the fixed-height box (direct date/time chromes only) ──────
+  /* ── TRANSITIONAL: the fixed-height box (unmigrated input families) ─────────
    * The ORIGINAL density box: a FIXED grid-multiple height with border-box so the
-   * border is absorbed into the height. TextInput and SelectInput are excluded;
-   * the textarea has its existing intrinsic rule below. This still governs the
-   * remaining direct chromes — date, time and datetime.
+   * border is absorbed into the height. Semantic single-line owners are
+   * excluded; the textarea has its existing intrinsic rule below.
    *
    * Controls no longer carry `.p` — the density system supplies the body font tier
    * (font-size / weight / family) here. */
   /* NB `.ds.input.textarea` is EXCLUDED: the textarea seats intrinsically (its own
    * rule below) and must keep its multi-row min-height. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  .ds.input:not(.textarea, .text, .select) {
+  .ds.input:not(
+    .textarea,
+    .text,
+    .select,
+    .number,
+    .password,
+    .phone,
+    .date,
+    .time,
+    .datetime,
+    .combobox-input,
+    .color-trigger,
+    .color-inline-seat,
+    .color
+  ) {
     box-sizing: border-box;
     /* Same effective line-height the target-baseline uses (single source of the
        fallback chain), so a bare context class keeps a valid box height too. */
@@ -52,13 +65,40 @@
   }
 
   /* The remaining density chromes keep their established top alignment. */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input:not(.text, .select) {
+  :is(.comfortable, .dense, .app, .site, .docs)
+  .ds.input:not(
+    .text,
+    .select,
+    .number,
+    .password,
+    .phone,
+    .date,
+    .time,
+    .datetime,
+    .combobox-input,
+    .color-trigger,
+    .color-inline-seat,
+    .color
+  ) {
     align-items: flex-start;
   }
 
   /* Normalise leaves that remain on the density model. */
   :is(.comfortable, .dense, .app, .site, .docs)
-    .ds.input:not(.text, .select)
+    .ds.input:not(
+      .text,
+      .select,
+      .number,
+      .password,
+      .phone,
+      .date,
+      .time,
+      .datetime,
+      .combobox-input,
+      .color-trigger,
+      .color-inline-seat,
+      .color
+    )
     > input {
     box-sizing: border-box;
     min-block-size: 0;
@@ -131,52 +171,6 @@
       )
     );
     padding-block-start: var(--space-before);
-    padding-block-end: 0;
-  }
-
-  /* ── Intrinsic control seat: remaining composite input families ──────────────
-   * NumberInput, PasswordInput and PhoneInput remain on their established
-   * density seat. TextInput has moved to the semantic spacing seat. */
-  :is(.comfortable, .dense, .app, .site, .docs)
-  .ds.input:is(.number, .password, .phone) {
-    /* The UA enforces a line-height floor of `normal` on a single-line input.
-       Compute with that floored line so the existing density cell still closes. */
-    --seat-line-floored: max(var(--control-seat-line), 1.2em);
-
-    --seat-before: round(
-      nearest,
-      max(
-        0px,
-        calc(
-          var(--density-target-baseline-px, 0px) -
-          (var(--seat-line-floored) + 1cap) /
-          2 -
-          var(--form-input-border-width, 0px)
-        )
-      ),
-      0.25px
-    );
-    --seat-after: max(
-      0px,
-      calc(
-        var(--density-line-height-effective) -
-        var(--seat-line-floored) -
-        var(--seat-before) -
-        2 *
-        var(--form-input-border-width, 0px)
-      )
-    );
-
-    block-size: auto;
-    min-block-size: 0;
-    padding-block-end: var(--seat-after);
-    align-items: stretch;
-  }
-  :is(.comfortable, .dense, .app, .site, .docs)
-    .ds.input:is(.number, .password, .phone)
-    > input {
-    line-height: var(--seat-line-floored);
-    padding-block-start: var(--seat-before);
     padding-block-end: 0;
   }
 

@@ -229,55 +229,60 @@
     display: block;
     box-sizing: border-box;
     width: 100%;
-    /* Explicit height snapped to baseline grid — border-box includes border */
-    height: var(--form-input-height);
-    padding-block: var(--form-input-padding-block);
 
-    /* Base border */
-    border: var(--form-input-border-width) solid var(--form-input-border-color);
+    /* Legacy/multiline chrome keeps its established fixed box. Semantic
+       single-line owners carry `.spacing-control-seat`; the shared helper owns
+       their block geometry and paint-only border instead. */
+    &:not(.spacing-control-seat) {
+      height: var(--form-input-height);
+      padding-block: var(--form-input-padding-block);
 
-    /* Per-side overrides — only effective when a theme defines them.
-     * When undefined, var() falls through to the base shorthand. */
-    border-top-color: var(
-      --form-input-border-color-top,
-      var(--form-input-border-color)
-    );
-    border-right-color: var(
-      --form-input-border-color-right,
-      var(--form-input-border-color)
-    );
-    border-bottom-color: var(
-      --form-input-border-color-bottom,
-      var(--form-input-border-color)
-    );
-    border-left-color: var(
-      --form-input-border-color-left,
-      var(--form-input-border-color)
-    );
+      /* Base border */
+      border: var(--form-input-border-width) solid
+        var(--form-input-border-color);
 
-    border-top-width: var(
-      --form-input-border-width-top,
-      var(--form-input-border-width)
-    );
-    border-right-width: var(
-      --form-input-border-width-right,
-      var(--form-input-border-width)
-    );
-    border-bottom-width: var(
-      --form-input-border-width-bottom,
-      var(--form-input-border-width)
-    );
-    border-left-width: var(
-      --form-input-border-width-left,
-      var(--form-input-border-width)
-    );
+      /* Per-side overrides — only effective when a theme defines them. */
+      border-top-color: var(
+        --form-input-border-color-top,
+        var(--form-input-border-color)
+      );
+      border-right-color: var(
+        --form-input-border-color-right,
+        var(--form-input-border-color)
+      );
+      border-bottom-color: var(
+        --form-input-border-color-bottom,
+        var(--form-input-border-color)
+      );
+      border-left-color: var(
+        --form-input-border-color-left,
+        var(--form-input-border-color)
+      );
+
+      border-top-width: var(
+        --form-input-border-width-top,
+        var(--form-input-border-width)
+      );
+      border-right-width: var(
+        --form-input-border-width-right,
+        var(--form-input-border-width)
+      );
+      border-bottom-width: var(
+        --form-input-border-width-bottom,
+        var(--form-input-border-width)
+      );
+      border-left-width: var(
+        --form-input-border-width-left,
+        var(--form-input-border-width)
+      );
+      font-size: var(--form-input-font-size);
+      line-height: var(--form-input-line-height);
+    }
 
     border-radius: var(--form-input-border-radius);
     background-color: var(--form-input-background);
     color: var(--form-input-color);
     font-family: var(--typography-text-primary-font-family);
-    font-size: var(--form-input-font-size);
-    line-height: var(--form-input-line-height);
     /* Durations come from the motion token, never from a literal: `@canonical/styles`
      * zeroes the three duration tokens under `prefers-reduced-motion: reduce`, so a
      * literal here would keep animating for a reader who asked their system not to.
@@ -295,14 +300,40 @@
     }
 
     /* Focus — all four borders become visible */
-    &:focus-visible,
-    &:focus-within {
+    &:not(.spacing-control-seat):focus-visible,
+    &:not(.spacing-control-seat):focus-within {
       outline: none;
       border-color: var(--form-input-border-color-focus);
       border-top-color: var(--form-input-border-color-focus);
       border-right-color: var(--form-input-border-color-focus);
       border-left-color: var(--form-input-border-color-focus);
       box-shadow: 0 0 0 1px var(--form-focus-ring-color);
+    }
+
+    &.spacing-control-seat {
+      --ds-stroke-width: var(--form-input-border-width, 1px);
+      --ds-stroke-color: var(
+        --form-input-border-color-bottom,
+        var(--form-input-border-color, var(--color-border))
+      );
+      --ds-focus-width: 1px;
+      --ds-focus-color: var(--form-focus-ring-color, currentColor);
+      --ds-focus-offset: 0;
+      block-size: auto;
+      min-block-size: 0;
+    }
+
+    &.spacing-control-seat.stroke-paint:focus-visible,
+    &.spacing-control-seat.stroke-paint.focus-within:focus-within {
+      --ds-stroke-slot: inset 0 0 0 var(--ds-stroke-width) var(--ds-focus-color);
+      --ds-focus-slot: 0 0 0 var(--ds-focus-width) var(--ds-focus-color);
+      outline: var(--ds-focus-width) solid transparent;
+      outline-offset: var(--ds-focus-offset);
+    }
+
+    &.spacing-control-seat.stroke-paint-overlay:focus-visible,
+    &.spacing-control-seat.stroke-paint-overlay.focus-within:focus-within {
+      box-shadow: none;
     }
 
     /* Disabled — per design review (15/07): a disabled control needs no border.
@@ -321,6 +352,11 @@
       background-color: var(--form-input-background-disabled);
       color: var(--form-input-color-disabled);
       cursor: not-allowed;
+    }
+
+    &.spacing-control-seat:disabled,
+    &.spacing-control-seat:has(input:disabled) {
+      --ds-stroke-color: var(--form-input-border-color-disabled);
     }
   }
 
@@ -357,13 +393,24 @@
     --form-input-border-color-bottom: var(--form-input-border-color-error);
   }
 
-  .danger > .payload .ds.input.chrome:focus-visible,
-  .danger > .payload .ds.input.chrome:focus-within {
+  .danger > .payload .ds.input.chrome:not(.spacing-control-seat):focus-visible,
+  .danger > .payload .ds.input.chrome:not(.spacing-control-seat):focus-within {
     border-color: var(--form-focus-ring-color-error);
     border-top-color: var(--form-focus-ring-color-error);
     border-right-color: var(--form-focus-ring-color-error);
     border-left-color: var(--form-focus-ring-color-error);
     box-shadow: 0 0 0 1px var(--form-focus-ring-color-error);
+  }
+
+  .danger > .payload .ds.input.chrome.spacing-control-seat {
+    --ds-focus-color: var(--form-focus-ring-color-error);
+  }
+
+  @media (forced-colors: active) {
+    .ds.input.chrome.spacing-control-seat.stroke-paint:focus-visible,
+    .ds.input.chrome.spacing-control-seat.stroke-paint.focus-within:focus-within {
+      outline-color: Highlight;
+    }
   }
 
   /* ── .ds.form — form as subgrid ───────────────────────────────────── */

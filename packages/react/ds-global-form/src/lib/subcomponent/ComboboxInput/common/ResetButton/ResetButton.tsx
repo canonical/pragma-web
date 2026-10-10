@@ -2,7 +2,6 @@
 import type React from "react";
 import type { ResetButtonProps } from "./types.js";
 import "./styles.css";
-import { Button } from "@canonical/react-ds-global";
 import defaultMessages from "../../messages.js";
 
 const componentCssClassName = "ds combobox-reset-button";
@@ -21,7 +20,7 @@ const ResetButton = ({
   onClick,
 }: ResetButtonProps): React.ReactElement => {
   return (
-    <Button
+    <button
       id={id}
       style={style}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
@@ -30,7 +29,7 @@ const ResetButton = ({
       onClick={onClick}
     >
       x
-    </Button>
+    </button>
   );
 };
 

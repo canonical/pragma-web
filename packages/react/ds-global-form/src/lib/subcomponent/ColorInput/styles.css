@@ -1,3 +1,6 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -11,19 +14,9 @@
     gap: var(--form-field-inline-gap);
     width: 100%;
     box-sizing: border-box;
-    padding-block: var(--form-input-padding-block);
     padding-inline: var(--form-input-padding-inline);
-    border: var(--form-input-border-width) solid var(--form-input-border-color);
     border-radius: var(--form-input-border-radius);
-    background-color: var(--form-input-background);
-    color: var(--form-input-color);
-    font-family: var(--typography-text-primary-font-family);
-    font-size: var(--form-input-font-size);
-    line-height: var(--form-input-line-height);
     cursor: pointer;
-    transition:
-      border-color var(--motion-duration-fast) ease,
-      box-shadow var(--motion-duration-fast) ease;
     text-align: start;
     anchor-name: --color-trigger;
 
@@ -34,16 +27,7 @@
       );
     }
 
-    &:focus-visible {
-      outline: none;
-      border-color: var(--form-input-border-color-focus);
-      box-shadow: 0 0 0 1px var(--form-focus-ring-color);
-    }
-
     &:disabled {
-      border-color: var(--form-input-border-color-disabled);
-      background-color: var(--form-input-background-disabled);
-      color: var(--form-input-color-disabled);
       cursor: not-allowed;
     }
   }
@@ -125,19 +109,8 @@
     display: flex;
     align-items: center;
     gap: var(--form-field-inline-gap);
-    padding: var(--form-input-padding-block) var(--form-input-padding-inline);
-    border: var(--form-input-border-width) solid var(--form-input-border-color);
+    padding-inline: var(--form-input-padding-inline);
     border-radius: var(--form-input-border-radius);
-    background-color: var(--form-input-background);
-    transition:
-      border-color var(--motion-duration-fast) ease,
-      box-shadow var(--motion-duration-fast) ease;
-
-    &:focus-within {
-      outline: none;
-      border-color: var(--form-input-border-color-focus);
-      box-shadow: 0 0 0 1px var(--form-focus-ring-color);
-    }
   }
 
   .ds.input.color .hex-prefix {
@@ -178,27 +151,27 @@
     border: none;
     background: transparent;
     color: var(--form-input-color);
-    font-family: var(--typography-text-primary-font-family);
-    font-size: var(--form-input-font-size);
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
     outline: none;
+    padding-block: 0;
   }
 
   /* Danger state */
   .danger > .payload .ds.input.color > .color-trigger {
-    border-color: var(--form-input-border-color-error);
+    --ds-stroke-color: var(--form-input-border-color-error);
   }
 
   .danger > .payload .ds.input.color > .color-trigger:focus-visible {
-    border-color: var(--form-focus-ring-color-error);
-    box-shadow: 0 0 0 1px var(--form-focus-ring-color-error);
+    --ds-focus-color: var(--form-focus-ring-color-error);
   }
 
   .danger > .payload .ds.input.color.inline > .hex-input-row {
-    border-color: var(--form-input-border-color-error);
+    --ds-stroke-color: var(--form-input-border-color-error);
   }
 
   .danger > .payload .ds.input.color.inline > .hex-input-row:focus-within {
-    border-color: var(--form-focus-ring-color-error);
-    box-shadow: 0 0 0 1px var(--form-focus-ring-color-error);
+    --ds-focus-color: var(--form-focus-ring-color-error);
   }
 }

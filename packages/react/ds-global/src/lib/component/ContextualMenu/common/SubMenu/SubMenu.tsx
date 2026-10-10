@@ -163,6 +163,7 @@ const SubMenuParent = ({ item }: { item: _Item<MenuItem> }): ReactElement => {
         spacingTier,
         "contextual-menu__surface",
         "submenu",
+        "spacing-control-group",
         bestPosition?.positionName,
       ]
         .filter(Boolean)

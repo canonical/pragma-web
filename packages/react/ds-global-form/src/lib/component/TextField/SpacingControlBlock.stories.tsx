@@ -2,8 +2,16 @@ import { Button, Chip, ContextualMenu, Tabs } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { ColorInput } from "../../subcomponent/ColorInput/index.js";
+import { ComboboxInput } from "../../subcomponent/ComboboxInput/index.js";
+import { DateInput } from "../../subcomponent/DateInput/index.js";
+import { DateTimeInput } from "../../subcomponent/DateTimeInput/index.js";
+import { NumberInput } from "../../subcomponent/NumberInput/index.js";
+import { PasswordInput } from "../../subcomponent/PasswordInput/index.js";
+import { PhoneInput } from "../../subcomponent/PhoneInput/index.js";
 import { SelectInput } from "../../subcomponent/SelectInput/index.js";
 import { TextInput } from "../../subcomponent/TextInput/index.js";
+import { TimeInput } from "../../subcomponent/TimeInput/index.js";
 import "./SpacingControlBlock.css";
 
 const meta = {
@@ -59,9 +67,11 @@ const resolveLength = (
 const readMetrics = (
   owner: HTMLElement,
   baselineOwner: HTMLElement,
+  seatOwner: HTMLElement,
   usesControlInset: boolean,
 ): Metrics => {
-  const style = getComputedStyle(owner);
+  const ownerStyle = getComputedStyle(owner);
+  const style = getComputedStyle(seatOwner);
   const baselineStyle = getComputedStyle(baselineOwner);
   const ownerRect = owner.getBoundingClientRect();
   const baselineRect = baselineOwner.getBoundingClientRect();
@@ -79,6 +89,7 @@ const readMetrics = (
   const paddingStart = number(style.paddingBlockStart);
   const paddingEnd = number(style.paddingBlockEnd);
   const marginEnd = number(style.marginBlockEnd);
+  const ownerMarginEnd = number(ownerStyle.marginBlockEnd);
   const capModelBaseline =
     baselineRect.top -
     ownerRect.top +
@@ -101,7 +112,7 @@ const readMetrics = (
     paddingEnd,
     marginEnd,
     visible: ownerRect.height,
-    occupied: ownerRect.height + marginEnd,
+    occupied: ownerRect.height + ownerMarginEnd,
     borders: borderValues.join(" / "),
     capModelBaseline,
   };
@@ -150,6 +161,7 @@ const Measured = ({
   children,
   ownerSelector,
   baselineSelector,
+  seatSelector,
   globalOwnerSelector,
   usesControlInset = true,
 }: {
@@ -157,6 +169,7 @@ const Measured = ({
   children: React.ReactNode;
   ownerSelector: string;
   baselineSelector?: string;
+  seatSelector?: string;
   globalOwnerSelector?: string;
   usesControlInset?: boolean;
 }) => {
@@ -176,12 +189,17 @@ const Measured = ({
       const baselineOwner = (
         baselineSelector ? owner?.querySelector(baselineSelector) : owner
       ) as HTMLElement | null;
+      const seatOwner = (
+        seatSelector ? owner?.querySelector(seatSelector) : owner
+      ) as HTMLElement | null;
       const ownerStyle = owner ? getComputedStyle(owner) : null;
       const ownerIsVisible =
         ownerStyle?.display !== "none" && ownerStyle?.visibility !== "hidden";
-      if (owner && baselineOwner && ownerIsVisible) {
+      if (owner && baselineOwner && seatOwner && ownerIsVisible) {
         observer?.disconnect();
-        setMetrics(readMetrics(owner, baselineOwner, usesControlInset));
+        setMetrics(
+          readMetrics(owner, baselineOwner, seatOwner, usesControlInset),
+        );
       }
     };
     const schedule = () => {
@@ -208,7 +226,13 @@ const Measured = ({
       observer.disconnect();
       window.removeEventListener("resize", schedule);
     };
-  }, [baselineSelector, globalOwnerSelector, ownerSelector, usesControlInset]);
+  }, [
+    baselineSelector,
+    globalOwnerSelector,
+    ownerSelector,
+    seatSelector,
+    usesControlInset,
+  ]);
 
   return (
     <figure className="bucket-sample">
@@ -248,6 +272,8 @@ const TierMenu = ({ tier }: { tier: string }) => {
       label={`${tier} actions`}
       open={open}
       onOpenChange={setOpen}
+      preferredDirections={[{ side: "block-end", align: "start" }]}
+      maxWidth="16rem"
       items={[
         {
           key: `${tier}-open`,
@@ -255,7 +281,15 @@ const TierMenu = ({ tier }: { tier: string }) => {
           url: "#open",
           className: `measure-menu-${tier}`,
         },
-        { key: `${tier}-edit`, label: "Edit", url: "#edit" },
+        { type: "separator", key: `${tier}-separator` },
+        {
+          key: `${tier}-more`,
+          label: "More actions with a wrapping label",
+          items: [
+            { key: `${tier}-edit`, label: "Edit", url: "#edit" },
+            { key: `${tier}-copy`, label: "Copy link", url: "#copy" },
+          ],
+        },
       ]}
     >
       Actions
@@ -307,6 +341,60 @@ const Tier = ({
       >
         <TextInput name={`${tier}-text`} defaultValue="Text input" />
       </Measured>
+      <Measured
+        label="NumberInput wrapper / leaf"
+        ownerSelector=".input.number"
+        baselineSelector="input"
+      >
+        <NumberInput name={`${tier}-number`} defaultValue={42} suffix="kg" />
+      </Measured>
+      <Measured
+        label="PasswordInput wrapper / leaf"
+        ownerSelector=".input.password"
+        baselineSelector="input"
+      >
+        <PasswordInput name={`${tier}-password`} defaultValue="secret" />
+      </Measured>
+      <Measured
+        label="PhoneInput wrapper / number leaf"
+        ownerSelector=".input.phone"
+        baselineSelector=".number-input"
+      >
+        <PhoneInput
+          name={`${tier}-phone`}
+          value="+12025550123"
+          onChange={() => undefined}
+        />
+      </Measured>
+      <Measured label="DateInput native leaf" ownerSelector=".input.date">
+        <DateInput name={`${tier}-date`} defaultValue="2026-10-10" />
+      </Measured>
+      <Measured label="TimeInput native leaf" ownerSelector=".input.time">
+        <TimeInput name={`${tier}-time`} defaultValue="10:30" />
+      </Measured>
+      <Measured
+        label="DateTimeInput native leaf"
+        ownerSelector=".input.datetime"
+      >
+        <DateTimeInput
+          name={`${tier}-datetime`}
+          defaultValue="2026-10-10T10:30"
+        />
+      </Measured>
+      <Measured
+        label="ComboboxInput inner chrome"
+        ownerSelector=".input.combobox-input"
+        baselineSelector="input"
+      >
+        <ComboboxInput
+          value="one"
+          onChange={() => undefined}
+          options={[
+            { label: "Option one", value: "one" },
+            { label: "Option two", value: "two" },
+          ]}
+        />
+      </Measured>
       <Measured label="SelectInput" ownerSelector=".input.select">
         <SelectInput
           name={`${tier}-select`}
@@ -317,7 +405,26 @@ const Tier = ({
           ]}
         />
       </Measured>
-      <Measured label="Tabs item link" ownerSelector=".tabs-link">
+      <Measured
+        label="ColorInput trigger chrome"
+        ownerSelector=".color-trigger"
+        baselineSelector=".color-value"
+      >
+        <ColorInput value="#3b82f6" onChange={() => undefined} />
+      </Measured>
+      <Measured
+        label="ColorInput inline hex chrome"
+        ownerSelector=".color-inline-seat"
+        baselineSelector=".hex-input"
+      >
+        <ColorInput value="#3b82f6" swatches={[]} onChange={() => undefined} />
+      </Measured>
+      <Measured
+        label="Tabs strip / item row"
+        ownerSelector=".tabs"
+        seatSelector=".tabs-link"
+        baselineSelector=".tabs-link"
+      >
         <Tabs
           aria-label={`${title} sections`}
           navigationRoot={tabsRoot}
@@ -325,9 +432,11 @@ const Tier = ({
         />
       </Measured>
       <Measured
-        label="ContextualMenu portal item (tier measurement)"
+        label="ContextualMenu portal / item rows"
         ownerSelector=".contextual-menu"
-        globalOwnerSelector={`.contextual-menu__surface.${tier} .measure-menu-${tier}`}
+        globalOwnerSelector={`.contextual-menu__surface.${tier}:not(.submenu)`}
+        seatSelector={`.measure-menu-${tier}`}
+        baselineSelector={`.measure-menu-${tier} .label`}
       >
         <TierMenu tier={tier} />
       </Measured>

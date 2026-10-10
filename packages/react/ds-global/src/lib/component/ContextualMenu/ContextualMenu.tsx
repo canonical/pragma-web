@@ -152,6 +152,7 @@ const ContextualMenu = ({
         "ds",
         spacingTier,
         "contextual-menu__surface",
+        "spacing-control-group",
         bestPosition?.positionName,
       ]
         .filter(Boolean)

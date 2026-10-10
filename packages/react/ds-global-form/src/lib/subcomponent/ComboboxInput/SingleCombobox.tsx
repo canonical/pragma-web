@@ -118,9 +118,8 @@ export const SingleCombobox = forwardRef<HTMLInputElement, ComboboxInputProps>(
         style={style}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
-        <div className="ds input combobox-input chrome">
+        <div className="ds input combobox-input chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within">
           <input
-            className="p"
             {...getInputProps({
               disabled,
               placeholder,

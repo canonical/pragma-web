@@ -25,6 +25,8 @@
     /* Resolve these inherited aliases on the actual tier owner. */
     --chip-font-size: var(--ds-typography-body-font-size);
     --chip-line-height: var(--ds-typography-body-line-height);
+    --ds-control-seat-font-size: var(--chip-font-size);
+    --ds-control-seat-line-height: var(--chip-line-height);
     --ds-stroke-width: var(--chip-border-width);
     --ds-stroke-color: var(--modifier-color-border, var(--chip-color-border));
     --ds-focus-width: var(--dimension-stroke-thickness-large, 2px);
@@ -33,7 +35,6 @@
     border-color: var(--modifier-color-border, var(--chip-color-border));
     border-style: solid;
     border-radius: var(--chip-border-radius);
-    border-width: 0;
 
     color: var(--modifier-color-text, var(--chip-color-text));
     background-color: var(
@@ -47,9 +48,7 @@
     user-select: none;
     white-space: nowrap;
 
-    font-size: var(--chip-font-size);
     font-weight: var(--chip-font-weight);
-    line-height: var(--chip-line-height);
 
     margin-inline-end: var(--chip-margin-left);
     padding-inline: var(--chip-padding-horizontal);
