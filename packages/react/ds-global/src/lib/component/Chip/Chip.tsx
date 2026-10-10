@@ -18,6 +18,7 @@ const componentCssClassName = "ds chip";
 const Chip = (props: ChipProps): React.ReactElement => {
   const className = [
     componentCssClassName,
+    "spacing-control-seat stroke-paint stroke",
     props.criticality,
     props.release,
     props.className,

@@ -1,7 +1,8 @@
 /* @canonical/styles — Paint-only strokes
  *
- * Each paint owner initializes the slots it assembles. States replace a slot;
- * they never replace the assembled shadow list.
+ * Each paint owner initializes the slots it assembles. Shadow-based states
+ * replace a slot; they never replace the assembled shadow list. Existing
+ * outset focus rings keep their outline geometry through the focus inputs.
  *
  * A component that enables a stroke binds --ds-stroke-width and
  * --ds-stroke-color. A focusable component also binds --ds-focus-width,
@@ -32,9 +33,12 @@
       var(--ds-stroke-color, transparent);
   }
 
-  :where(.ds.stroke-paint:focus-visible) {
-    --ds-focus-slot: inset 0 0 0 var(--ds-focus-width, 0)
-      var(--ds-focus-color, transparent);
+  :where(
+    .ds.stroke-paint:focus-visible,
+    .ds.stroke-paint.focus-within:focus-within
+  ) {
+    outline: var(--ds-focus-width, 0) solid var(--ds-focus-color, transparent);
+    outline-offset: var(--ds-focus-offset, 0);
   }
 
   :where(.ds.stroke-paint-overlay) {
@@ -61,7 +65,10 @@
       outline-offset: calc(-1 * var(--ds-stroke-width, 0));
     }
 
-    :where(.ds.stroke-paint:focus-visible) {
+    :where(
+        .ds.stroke-paint:focus-visible,
+        .ds.stroke-paint.focus-within:focus-within
+      ) {
       outline: var(--ds-focus-width, 0) solid Highlight;
       outline-offset: var(--ds-focus-offset, 0);
     }

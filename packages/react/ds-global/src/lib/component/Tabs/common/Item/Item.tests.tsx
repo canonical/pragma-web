@@ -42,6 +42,22 @@ describe("Tabs Item (internal renderer)", () => {
     expect(screen.getByRole("listitem")).toHaveAttribute("data-active");
   });
 
+  it("keeps the active indicator hooks on an inert span", () => {
+    inList(
+      <Item
+        item={{ key: "current", label: "Current" }}
+        active
+        LinkComponent="a"
+      />,
+    );
+    const item = screen.getByRole("listitem");
+    const label = screen.getByText("Current");
+    expect(item).toHaveAttribute("data-active");
+    expect(item).toHaveAttribute("data-inert");
+    expect(label).toHaveAttribute("aria-current", "page");
+    expect(label).toHaveClass("stroke-block-end");
+  });
+
   it("omits href for a disabled item", () => {
     inList(
       <Item

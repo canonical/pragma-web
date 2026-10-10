@@ -30,14 +30,17 @@ const Item = ({
     >
       {url ? (
         <Link
-          className="tabs-link"
+          className="ds tabs-link spacing-control-seat stroke-paint stroke-block-end"
           href={disabled ? undefined : url}
           aria-current={active ? "page" : undefined}
         >
           {label}
         </Link>
       ) : (
-        <span className="tabs-link" aria-current={active ? "page" : undefined}>
+        <span
+          className="ds tabs-link spacing-control-seat stroke-paint stroke-block-end"
+          aria-current={active ? "page" : undefined}
+        >
           {label}
         </span>
       )}

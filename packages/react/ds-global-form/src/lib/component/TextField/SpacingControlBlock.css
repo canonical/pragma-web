@@ -1,0 +1,79 @@
+.spacing-control-block {
+  padding: 2rem;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+.bucket-tier {
+  margin-block: 2rem;
+  padding: 1rem;
+  overflow-x: auto;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, Highlight 18%, transparent) 0 1px,
+    transparent 1px var(--ds-spacing-baseline)
+  );
+}
+
+.bucket-tier > header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-block-end: 1rem;
+}
+
+.bucket-tier > header :is(h2, p) {
+  margin: 0;
+}
+
+.tier-unit {
+  display: inline-block;
+  inline-size: var(--ds-spacing-baseline);
+  block-size: var(--ds-spacing-baseline);
+  background: Highlight;
+}
+
+.bucket-samples {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto auto;
+  grid-auto-columns: max-content;
+  align-items: first baseline;
+  column-gap: 1.5rem;
+  row-gap: 0.5rem;
+  min-inline-size: max-content;
+}
+
+.bucket-sample {
+  display: contents;
+}
+
+.bucket-sample figcaption {
+  max-inline-size: 13rem;
+  font-weight: 600;
+}
+
+.bucket-measure {
+  position: relative;
+  display: flex;
+  align-items: first baseline;
+  min-block-size: 5rem;
+}
+
+.bucket-measure:not(.bucket-measure--portal)::after {
+  position: absolute;
+  z-index: -1;
+  inset-inline: 0;
+  inset-block-start: var(--bucket-first-baseline, 0);
+  border-block-start: 1px solid Highlight;
+  content: "";
+}
+
+.bucket-metrics {
+  max-inline-size: 15rem;
+  padding: 0.5rem;
+  font: 0.75rem / 1.35 monospace;
+  white-space: nowrap;
+  color: var(--color-text-muted, currentColor);
+  background: color-mix(in srgb, Canvas 88%, transparent);
+}

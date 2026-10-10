@@ -2,7 +2,8 @@ import { forwardRef, type ReactElement } from "react";
 import type { TextInputProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds input text chrome";
+const componentCssClassName =
+  "ds input text chrome spacing-control-seat stroke-paint stroke-paint-overlay stroke-block-end focus-within";
 
 /**
  * Presentational text input — pure markup, no react-hook-form.

@@ -13,6 +13,14 @@ import type { MenuEntry, MenuItem } from "../../types.js";
 import Item from "../Item/index.js";
 import { useMenuContext } from "../MenuContext.js";
 
+/** Product tier inherited by an item before its submenu is portalled to body. */
+const spacingTierOf = (element: Element | null): "site" | "docs" | "app" => {
+  const owner = element?.closest(".app, .docs, .site");
+  if (owner?.classList.contains("app")) return "app";
+  if (owner?.classList.contains("docs")) return "docs";
+  return "site";
+};
+
 /**
  * One node in a (possibly nested) contextual menu. A separator renders as a
  * plain divider (no item props — it is not interactive, and the navigation
@@ -93,6 +101,7 @@ const SubMenuParent = ({ item }: { item: _Item<MenuItem> }): ReactElement => {
   // can reference the popup it controls (item keys are only unique within one
   // menu, so useId rather than the item id).
   const submenuId = useId();
+  const spacingTier = spacingTierOf(targetRef.current);
 
   // The item carries both the roving props and the fitment target ref. The
   // tree's getItemProps already returns a `ref` (it registers the node for
@@ -151,6 +160,7 @@ const SubMenuParent = ({ item }: { item: _Item<MenuItem> }): ReactElement => {
     <div
       className={[
         "ds",
+        spacingTier,
         "contextual-menu__surface",
         "submenu",
         bestPosition?.positionName,

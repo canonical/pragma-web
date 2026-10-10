@@ -8,20 +8,12 @@
  * (ds-global's Accordion as well as this form package). See that file for the
  * 2×3 matrix and the value table.
  *
- * THIS file is the FORM APPLICATION layer: it applies those primitives to the
- * form's own controls (`.ds.input`, `.ds.field-label/description/error`, the
- * textarea) — sizing their boxes to the density cell and seating their text on the
- * 4px grid. The --form-* token mapping lives in index.css.
+ * THIS file is the FORM APPLICATION layer for controls that have not moved to
+ * the semantic spacing seats. TextInput and SelectInput opt out below; labels,
+ * textarea and the remaining native chromes keep the established density model.
  *
- * NB the BUTTON is a ds-global component, so its density seat lives in ds-global
- * (Button/styles.css), reading the same shared --density-* primitives — an app
- * that ships ds-global without the form package still gets a seated button.
- *
- * Text baseline sits on the density target — round(nearest, height × 2/3) — so
- * every control shares one baseline index. Controls use the INTRINSIC seat from
- * @canonical/styles (--control-seat-line/-basis): no fixed heights; border +
- * seat pads + line-height add up to the density cell. Zero-JS (cap-unit
- * approximation); holds to the cap tolerance.
+ * Migrated controls compute their local cap nudge from spacing-seat.css and do
+ * not subscribe to `.dense` or `.comfortable` geometry here.
  *
  * Layer: ds.components.global (@canonical/styles README, "Cascade layers").
  */
@@ -29,17 +21,16 @@
 @layer ds.components.global {
   /* ── TRANSITIONAL: the fixed-height box (direct date/time chromes only) ──────
    * The ORIGINAL density box: a FIXED grid-multiple height with border-box so the
-   * border is absorbed into the height. The composite text family, the select and
-   * the textarea have all moved OFF this rule onto the intrinsic seat (their
-   * equal-specificity rules further down override it); it still governs the
-   * remaining direct chromes — date, time, datetime — whose multi-part UA
-   * internals need their own measured pass before they join.
+   * border is absorbed into the height. TextInput and SelectInput are excluded;
+   * the textarea has its existing intrinsic rule below. This still governs the
+   * remaining direct chromes — date, time and datetime.
    *
    * Controls no longer carry `.p` — the density system supplies the body font tier
    * (font-size / weight / family) here. */
   /* NB `.ds.input.textarea` is EXCLUDED: the textarea seats intrinsically (its own
    * rule below) and must keep its multi-row min-height. */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input:not(.textarea) {
+  :is(.comfortable, .dense, .app, .site, .docs)
+  .ds.input:not(.textarea, .text, .select) {
     box-sizing: border-box;
     /* Same effective line-height the target-baseline uses (single source of the
        fallback chain), so a bare context class keeps a valid box height too. */
@@ -60,18 +51,15 @@
     font-family: var(--typography-text-primary-font-family);
   }
 
-  /* The input WRAPPER is the box (like the button element): don't stretch its
-   * child, top-reference it so the input's own space-before governs. Needs to beat
-   * the TextInput's `.ds.input.text { align-items: stretch }` (0,3,0). */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input.text,
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input {
+  /* The remaining density chromes keep their established top alignment. */
+  :is(.comfortable, .dense, .app, .site, .docs) .ds.input:not(.text, .select) {
     align-items: flex-start;
   }
 
-  /* The <input> is the text carrier — treat it exactly like the button label:
-   * same body font tier, and normalised so only the space-before (below) positions
-   * its text. (It's content-box with an intrinsic height, so reset that.) */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input > input {
+  /* Normalise leaves that remain on the density model. */
+  :is(.comfortable, .dense, .app, .site, .docs)
+    .ds.input:not(.text, .select)
+    > input {
     box-sizing: border-box;
     min-block-size: 0;
     block-size: auto;
@@ -146,45 +134,15 @@
     padding-block-end: 0;
   }
 
-  /* ── Intrinsic control seat: the composite text-input family ─────────────────
-   * The single-line <input> no longer uses the line-height:1 crush + space-before
-   * padding above (that rule is now labels-only). Instead it consumes the SHARED
-   * control seat from @canonical/styles (modifiers.density.css): the input's own
-   * line box (cell − 2 baselines) is the control interior, `--control-seat-before`
-   * seats its baseline on the density target, and the CHROME closes the box with
-   * `--control-seat-after` — so the chrome's height is INTRINSIC (no fixed
-   * block-size) yet lands exactly on the density cell, both edges on the grid.
-   *
-   * Placed AFTER the fixed-height box rule above so this (equal-specificity)
-   * rule wins for the text family. Direct chromes (select/date/time) and the
-   * textarea keep the previous model until their own cutover pass. */
+  /* ── Intrinsic control seat: remaining composite input families ──────────────
+   * NumberInput, PasswordInput and PhoneInput remain on their established
+   * density seat. TextInput has moved to the semantic spacing seat. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  .ds.input:is(.text, .number, .password, .phone) {
-    /* The COMPOSITE chrome family — every wrapper with an inner <input> leaf
-       (text, number, password, phone). One selector, one seat: the wrapper is
-       the box, the leaf carries the line. */
-
-    /* NO drift term here — deliberately. The old ~2px "native input renders low"
-       compensation was an artifact of the line-height:1 crush structure: give the
-       <input> a real line box (--control-seat-line below) and it renders its text
-       exactly like a <span> (measured; see the drift note at the end of this
-       file). Subtracting the stale 2px lifted the text 2px too high. */
-
-    /* The UA enforces a line-height FLOOR of `normal` (1.2em for Ubuntu) on a
-       single-line <input> — a specified line-height below it is silently clamped
-       (measured: dense's 16px line rendered 16.8px tall, pushing the chrome to
-       24.8). So the seat computes with the FLOORED line the UA will actually
-       use; the box then closes to the cell exactly in every density cell. */
+  .ds.input:is(.number, .password, .phone) {
+    /* The UA enforces a line-height floor of `normal` on a single-line input.
+       Compute with that floored line so the existing density cell still closes. */
     --seat-line-floored: max(var(--control-seat-line), 1.2em);
 
-    /* The chrome's border folds in HERE (a var() inside a custom property
-       substitutes at its declaring element, so the shared layer cannot read it).
-       Derived from the target directly — not --control-seat-basis — because the
-       basis assumes the unfloored line. Both the leaf's top pad and the chrome's
-       closing pad read this SAME `--seat-before`, keeping the complement
-       consistent. Rounded to ¼px so the pad is exactly representable in 1/64px
-       layout units (the fractional 1cap term otherwise leaves ~1/60px residues
-       on the box height). */
     --seat-before: round(
       nearest,
       max(
@@ -212,16 +170,10 @@
     block-size: auto;
     min-block-size: 0;
     padding-block-end: var(--seat-after);
-    /* Stretch (not the box rule's flex-start): a prefix/suffix — the password's
-       reveal-toggle, the number's unit affix — spans the leaf's column and its
-       own `align-items: center` centres its icon on the TEXT, which is the
-       optical pairing (centring on the box would float it into the asymmetric
-       closing pad). The old fixed-height model needed flex-start to top-pin the
-       crushed leaf; the intrinsic leaf seats itself, so stretch is safe again. */
     align-items: stretch;
   }
   :is(.comfortable, .dense, .app, .site, .docs)
-    .ds.input:is(.text, .number, .password, .phone)
+    .ds.input:is(.number, .password, .phone)
     > input {
     line-height: var(--seat-line-floored);
     padding-block-start: var(--seat-before);
@@ -283,52 +235,6 @@
       var(--control-seat-line) +
       var(--density-line-height-effective)
     );
-  }
-
-  /* ── Select: a single-element direct chrome on the intrinsic seat ────────────
-   * The <select> IS the chrome (border and text on one element), so it seats
-   * like the button: interior line box + seat pads, height emerging as exactly
-   * the density cell. Replaces the old fixed-height + 8px-block-padding path,
-   * which never seated the option text at all and CLIPPED it in apps/dense
-   * (24px fixed box − 8px pad left too little room for the line).
-   * The line is floored like the single-line input's: a <select> shows one line,
-   * so if the UA imposes a `normal` floor the formula already matches it, and if
-   * it does not the specified floor is simply what renders — correct either way
-   * (unlike the textarea, where flooring would break the multi-row rhythm).
-   * Remaining direct chromes (date/time/datetime) stay on the previous model
-   * until their own pass — their multi-part UA internals need their own
-   * measurement. */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input.select {
-    --seat-line-floored: max(var(--control-seat-line), 1.2em);
-    line-height: var(--seat-line-floored);
-
-    --seat-before: round(
-      nearest,
-      max(
-        0px,
-        calc(
-          var(--density-target-baseline-px, 0px) -
-          (var(--seat-line-floored) + 1cap) /
-          2 -
-          var(--form-input-border-width, 0px)
-        )
-      ),
-      0.25px
-    );
-    --seat-after: max(
-      0px,
-      calc(
-        var(--density-line-height-effective) -
-        var(--seat-line-floored) -
-        var(--seat-before) -
-        2 *
-        var(--form-input-border-width, 0px)
-      )
-    );
-
-    block-size: auto;
-    min-block-size: 0;
-    padding-block: var(--seat-before) var(--seat-after);
   }
 
   /* ── Bottom rhythm: density-seated flow text only (NOT prose) ─────────────────

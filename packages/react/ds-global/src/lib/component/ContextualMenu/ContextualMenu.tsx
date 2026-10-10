@@ -15,6 +15,14 @@ import "./styles.css";
 
 const componentCssClassName = "ds contextual-menu";
 
+/** Product tier inherited by a trigger before its menu is portalled to body. */
+const spacingTierOf = (element: Element | null): "site" | "docs" | "app" => {
+  const owner = element?.closest(".app, .docs, .site");
+  if (owner?.classList.contains("app")) return "app";
+  if (owner?.classList.contains("docs")) return "docs";
+  return "site";
+};
+
 /**
  * A contextual menu presents a flat list of actions — optionally partitioned
  * by separators — anchored to a trigger. It opens on click, positions itself
@@ -85,6 +93,7 @@ const ContextualMenu = ({
 
   const triggerProps = getTriggerProps();
   const annotatedEntries = annotatedRoot.items ?? [];
+  const spacingTier = spacingTierOf(targetRef.current);
 
   // The shared menu API threaded to every (nested) level. One state, one
   // highlight path, one keyboard handler — submenus are render-only. Memoised so
@@ -141,6 +150,7 @@ const ContextualMenu = ({
         // its own pragma territory, and that must not depend on another
         // constant keeping its "ds " prefix. SubMenu.tsx does the same.
         "ds",
+        spacingTier,
         "contextual-menu__surface",
         bestPosition?.positionName,
       ]

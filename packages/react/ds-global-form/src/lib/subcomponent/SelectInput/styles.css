@@ -1,3 +1,6 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -10,7 +13,34 @@
    * STROKE (transparent → colour → transparent along each diagonal), coloured by
    * --color-icon like every other control glyph. */
   .ds.input.select {
+    --ds-stroke-width: var(--form-input-border-width, 1px);
+    --ds-stroke-color: var(
+      --form-input-border-color-bottom,
+      var(--form-input-border-color, var(--color-border))
+    );
+    --ds-stroke-slot: inset 0 calc(-1 * var(--ds-stroke-width)) 0 0
+      var(--ds-stroke-color);
+    --ds-focus-width: 1px;
+    --ds-focus-color: var(--form-focus-ring-color, currentColor);
+    --ds-focus-offset: 0;
     appearance: none;
+    block-size: auto;
+    min-block-size: 0;
+    box-sizing: border-box;
+    border: 0;
+    font-size: var(--ds-typography-body-font-size);
+    line-height: var(--ds-typography-body-line-height);
+    margin-block: 0 var(--ds-control-grid-compensation);
+    padding-block: var(--ds-control-padding-block);
+
+    &.stroke-paint:focus-visible {
+      --ds-stroke-slot: inset 0 0 0 var(--ds-stroke-width)
+        var(--ds-focus-color);
+      --ds-focus-slot: 0 0 0 var(--ds-focus-width) var(--ds-focus-color);
+      box-shadow: var(--ds-paint-assembly);
+      outline: var(--ds-focus-width) solid transparent;
+      outline-offset: var(--ds-focus-offset);
+    }
     --select-caret-color: var(--color-icon, currentColor);
     --select-caret-half: 0.4em; /* each square; the chevron is two halves wide */
     /* left half: rising stroke ╱ */
@@ -41,5 +71,21 @@
      * room for the chevron. */
     padding-inline-start: var(--form-input-padding-inline);
     padding-inline-end: calc(var(--form-input-padding-inline) * 2 + 1em);
+  }
+
+  .danger > .payload .ds.input.select.stroke-paint:focus-visible {
+    --ds-focus-color: var(--form-focus-ring-color-error);
+    box-shadow: var(--ds-paint-assembly);
+  }
+
+  @media (forced-colors: active) {
+    .ds.input.select {
+      appearance: auto;
+      background-image: none;
+    }
+
+    .ds.input.select.stroke-paint:focus-visible {
+      outline-color: Highlight;
+    }
   }
 }

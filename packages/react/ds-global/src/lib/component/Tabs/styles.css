@@ -32,7 +32,9 @@
 
     /* Full-width muted baseline; the active tab paints a highlighted segment
        over it (see Tabs.Tab). */
-    border-bottom: var(--tabs-border-width) solid var(--color-border-muted);
+    border: 0;
+    box-shadow: inset 0 calc(-1 * var(--tabs-border-width)) 0
+      var(--color-border-muted);
 
     /* Overflow: the strip scrolls horizontally when the tabs exceed the
        container width (Figma "Overflow"). */

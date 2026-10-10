@@ -1,3 +1,5 @@
+@import url("@canonical/styles/spacing-seat.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -17,7 +19,6 @@
     --contextual-menu-item-color-background-active: var(
       --color-foreground-ghost-active
     );
-    --contextual-menu-item-padding-block: var(--dimension-050);
     --contextual-menu-item-padding-inline: var(--dimension-200);
     /* 4px gap: icon<->text and text<->caret (per the spec). */
     --contextual-menu-item-gap: var(--dimension-050);
@@ -40,16 +41,11 @@
     /* Icon and first line of text are centre-aligned (Figma annotation). */
     align-items: center;
     gap: var(--contextual-menu-item-gap);
-    padding-block: var(--contextual-menu-item-padding-block);
     padding-inline: var(--contextual-menu-item-padding-inline);
     color: var(--contextual-menu-item-color-text);
     background-color: var(--contextual-menu-item-color-background);
     /* The --dimension-300 (24px) fallback is load-bearing: the typography var's
        --number-line-height-* reference is unresolved in the built tokens. */
-    line-height: var(
-      --typography-text-primary-line-height,
-      var(--dimension-300)
-    );
     cursor: pointer;
     user-select: none;
 

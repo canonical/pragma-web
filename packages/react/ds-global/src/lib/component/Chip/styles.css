@@ -1,3 +1,6 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -10,21 +13,27 @@
     --chip-color-text: var(--color-text);
 
     --chip-border-radius: 1rem;
-    --chip-font-size: var(--font-size-small);
+    --chip-font-size: var(--ds-typography-body-font-size);
     --chip-font-weight: var(--font-weight-default);
-    --chip-line-height: var(--line-height-small);
-    --chip-border-width: var(--spacing-border-width);
-    --chip-padding-vertical: var(--spacing-vertical-xsmall);
+    --chip-line-height: var(--ds-typography-body-line-height);
+    --chip-border-width: var(--dimension-stroke-thickness-medium, 1px);
     --chip-padding-horizontal: var(--spacing-horizontal-small);
-    --chip-margin-bottom: var(--spacing-vertical-small);
     --chip-margin-left: var(--spacing-horizontal-medium);
   }
 
   .ds.chip {
+    /* Resolve these inherited aliases on the actual tier owner. */
+    --chip-font-size: var(--ds-typography-body-font-size);
+    --chip-line-height: var(--ds-typography-body-line-height);
+    --ds-stroke-width: var(--chip-border-width);
+    --ds-stroke-color: var(--modifier-color-border, var(--chip-color-border));
+    --ds-focus-width: var(--dimension-stroke-thickness-large, 2px);
+    --ds-focus-color: var(--color-focus-ring, currentColor);
+    --ds-focus-offset: 2px;
     border-color: var(--modifier-color-border, var(--chip-color-border));
     border-style: solid;
     border-radius: var(--chip-border-radius);
-    border-width: var(--chip-border-width);
+    border-width: 0;
 
     color: var(--modifier-color-text, var(--chip-color-text));
     background-color: var(
@@ -42,9 +51,7 @@
     font-weight: var(--chip-font-weight);
     line-height: var(--chip-line-height);
 
-    margin-block-end: var(--chip-margin-bottom);
     margin-inline-end: var(--chip-margin-left);
-    padding-block: var(--chip-padding-vertical);
     padding-inline: var(--chip-padding-horizontal);
 
     & > .lead {
@@ -75,7 +82,7 @@
       margin-left: var(--spacing-horizontal-xsmall);
       flex: 0 0 auto;
       border-radius: 50%;
-      border-color: transparent;
+      border: 0;
       height: var(--font-size-default);
       width: var(--font-size-default);
     }
