@@ -40,16 +40,23 @@
     padding-block: var(--side-panel-header-padding-block);
     /*
       Inline padding, not margin: nothing here needs the header's box itself
-      inset, and padding keeps it full panel width. The footer is the
-      exception — its border spans the padding box, so it insets with margin
-      (see Footer/styles.css).
+      inset, and padding keeps it full panel width. The footer's hairline also
+      runs edge to edge, so it insets its actions with padding the same way.
     */
     padding-inline: var(--side-panel-padding-inline);
 
     /*
+      Opens the scroll region, the counterpart of the footer's hairline: the
+      line runs edge to edge across the panel. Same recipe as the footer — the
+      panel owns the colour in `--side-panel-color-border`.
+    */
+    border-block-end: var(--dimension-stroke-thickness-medium) solid
+      var(--side-panel-color-border);
+
+    /*
       The title is heading text beside a control, not a control: its line box
-      is taller than the density seat line, so the typography engine seats it
-      rather than the density seat. It carries `.p`, the engine's class hook
+      is far taller than the density seat line, so the typography engine seats
+      it rather than the density seat. It carries `.p`, the engine's class hook
       for an element that is not `p` or `h1`–`h6`; this rule feeds the engine
       the title's type in place of the paragraph values `.p` brings.
     */

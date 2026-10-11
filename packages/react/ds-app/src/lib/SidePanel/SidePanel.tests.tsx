@@ -56,6 +56,26 @@ describe("SidePanel", () => {
       expect(dialog.className).toContain("custom-class");
     });
 
+    it("carries no size class at the default medium size", () => {
+      const { container } = render(
+        <SidePanel ref={createRef<SidePanelHandle>()}>
+          <SidePanel.Header>Panel title</SidePanel.Header>
+          <SidePanel.Content>Body</SidePanel.Content>
+        </SidePanel>,
+      );
+      expect(getDialog(container).className).not.toContain("large");
+    });
+
+    it("adds the large class at size large", () => {
+      const { container } = render(
+        <SidePanel ref={createRef<SidePanelHandle>()} size="large">
+          <SidePanel.Header>Panel title</SidePanel.Header>
+          <SidePanel.Content>Body</SidePanel.Content>
+        </SidePanel>,
+      );
+      expect(getDialog(container).className).toContain("large");
+    });
+
     it("renders closed until opened through its handle", () => {
       const handle = createRef<SidePanelHandle>();
       const { container } = render(
