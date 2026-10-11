@@ -8,6 +8,7 @@ import {
   useContextualMenu,
   useIsMounted,
 } from "../../hooks/index.js";
+import { Button } from "../Button/index.js";
 import MenuContext from "./common/MenuContext.js";
 import SubMenu from "./common/SubMenu/index.js";
 import type { ContextualMenuProps, MenuItem } from "./types.js";
@@ -183,7 +184,7 @@ const ContextualMenu = ({
             a no-op — focus would silently fall to <body> (WCAG 2.4.3). The
             fitment hook types its anchor as a div; the button anchors the same
             rect, so cast (Popover precedent). */}
-        <button
+        <Button
           type="button"
           id={triggerId}
           className="trigger"
@@ -191,7 +192,7 @@ const ContextualMenu = ({
           {...triggerProps}
         >
           {children}
-        </button>
+        </Button>
         {mounted ? createPortal(menuElement, document.body) : menuElement}
       </div>
     </MenuContext.Provider>

@@ -1,5 +1,4 @@
 .spacing-control-block {
-  --bucket-member-width: 16rem;
   padding: 2rem;
   color: var(--color-text);
   background: var(--color-background);
@@ -9,12 +8,27 @@
   display: none;
 }
 
-/* Exercise the same production fallback remainder even when this browser
-   supports the enhanced intrinsic-size path. */
+/* Exercise the production fallback when intrinsic size calculations exist. */
 .spacing-control-block .spacing-control-force-fallback {
   display: flow-root;
   block-size: auto;
   margin-block-end: var(--ds-control-group-single-row-compensation);
+}
+
+.bucket-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bucket-legend-edge,
+.bucket-legend-baseline {
+  inline-size: 1.5rem;
+  border-block-start: 1px solid #d71920;
+}
+
+.bucket-legend-baseline {
+  border-color: #0969da;
 }
 
 .bucket-tier {
@@ -49,50 +63,152 @@
 .bucket-samples {
   display: grid;
   grid-auto-flow: column;
-  grid-template-rows: auto auto auto;
-  grid-auto-columns: var(--bucket-member-width);
-  align-items: first baseline;
-  column-gap: 1.5rem;
-  row-gap: 0.5rem;
+  grid-template-rows: auto auto;
+  grid-auto-columns: max-content;
+  align-items: start;
+  column-gap: 1.25rem;
+  row-gap: 0.375rem;
   min-inline-size: max-content;
 }
 
-.bucket-sample {
+.bucket-samples > .bucket-sample {
   display: contents;
 }
 
 .bucket-sample figcaption {
-  inline-size: var(--bucket-member-width);
+  inline-size: max-content;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .bucket-measure {
   position: relative;
   display: flex;
-  align-items: first baseline;
-  min-block-size: 5rem;
-}
-
-.bucket-measure--portal {
-  min-block-size: 10rem;
   align-items: flex-start;
+  justify-self: start;
+  inline-size: max-content;
 }
 
-.bucket-measure:not(.bucket-measure--portal)::after {
+.bucket-tier:has(.bucket-menu-demo .trigger[aria-expanded="true"]) {
+  padding-block-end: 7rem;
+}
+
+.bucket-measure > .input.text,
+.bucket-measure > .input.password {
+  inline-size: 9rem;
+}
+
+.bucket-measure > .input.number,
+.bucket-measure > .input.time {
+  inline-size: 7rem;
+}
+
+.bucket-measure > .input.phone {
+  inline-size: 14rem;
+}
+
+.bucket-measure > .input.datetime {
+  inline-size: 12rem;
+}
+
+.bucket-measure > .input.date,
+.bucket-measure > .input.select,
+.bucket-measure > .input.combobox-input,
+.bucket-measure .color-inline-seat {
+  inline-size: 10rem;
+}
+
+.spacing-preview-menu-surface.ds {
+  position: static;
+  min-width: 0;
+  inline-size: max-content;
+  max-block-size: none;
+  overflow: visible;
+  opacity: 1;
+  visibility: visible;
+}
+
+.bucket-menu-demo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-block-start: 0.75rem;
+  font-weight: 400;
+}
+
+.bucket-guide,
+.bucket-shared-guides {
   position: absolute;
-  z-index: -1;
+  z-index: 2147483000;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bucket-guide {
+  inset-block-start: var(--bucket-guide-top);
+  inset-inline-start: var(--bucket-guide-left);
+  inline-size: var(--bucket-guide-width);
+}
+
+.bucket-guide > span,
+.bucket-shared-guides > span {
+  position: absolute;
+  block-size: 0;
+  border-block-start: 1px solid #d71920;
+}
+
+.bucket-guide > span {
   inset-inline: 0;
-  inset-block-start: var(--bucket-first-baseline, 0);
-  border-block-start: 1px solid Highlight;
-  content: "";
+}
+
+.bucket-guide-top {
+  inset-block-start: 0;
+}
+
+.bucket-guide > .bucket-guide-baseline {
+  inset-block-start: var(--bucket-guide-baseline);
+  border-color: #0969da;
+}
+
+.bucket-guide-end {
+  inset-block-start: var(--bucket-guide-end);
+}
+
+.bucket-shared-guides > span {
+  inset-inline-start: var(--bucket-shared-left);
+  inline-size: var(--bucket-shared-width);
+}
+
+.bucket-shared-top {
+  inset-block-start: var(--bucket-shared-top);
+}
+
+.bucket-shared-guides > .bucket-shared-baseline {
+  inset-block-start: var(--bucket-shared-baseline);
+  border-color: #0969da;
+}
+
+.bucket-shared-end {
+  inset-block-start: var(--bucket-shared-end);
+}
+
+.bucket-baseline-rig {
+  position: absolute;
+  display: block;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.bucket-baseline-marker {
+  display: inline-block;
+  inline-size: 0;
+  block-size: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
 }
 
 .bucket-metrics {
-  box-sizing: border-box;
-  inline-size: var(--bucket-member-width);
-  padding: 0.5rem;
-  font: 0.75rem / 1.35 monospace;
-  overflow-wrap: anywhere;
-  color: var(--color-text-muted, currentColor);
-  background: color-mix(in srgb, Canvas 88%, transparent);
+  display: none;
 }

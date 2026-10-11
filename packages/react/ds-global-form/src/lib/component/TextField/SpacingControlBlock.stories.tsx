@@ -1,4 +1,10 @@
-import { Button, Chip, ContextualMenu, Tabs } from "@canonical/react-ds-global";
+import {
+  Button,
+  Chip,
+  ContextualMenu,
+  ContextualMenuItem,
+  Tabs,
+} from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -33,10 +39,17 @@ type Metrics = {
   visible: number;
   occupied: number;
   borders: string;
-  capModelBaseline: number | null;
   blockStartDifference: number | null;
   naturalVisible: number | null;
   setClosure: number | null;
+  baseline: number | null;
+  capModelBaseline: number | null;
+  occupiedEnd: number;
+  guideLeft: number;
+  guideTop: number;
+  guideWidth: number;
+  sharedLeft: number | null;
+  sharedWidth: number | null;
 };
 
 const number = (value: string): number => Number.parseFloat(value) || 0;
@@ -50,6 +63,7 @@ const resolveLength = (
 ): number => {
   const tier = owner.closest<HTMLElement>(".site, .docs, .app") ?? owner;
   const probe = document.createElement("span");
+  probe.className = "bucket-length-probe";
   probe.style.cssText = [
     "position:absolute",
     "visibility:hidden",
@@ -67,6 +81,84 @@ const resolveLength = (
   return result;
 };
 
+const isNativeLeaf = (element: HTMLElement): boolean =>
+  element.matches("input, select, textarea");
+
+/** Read the baseline from browser layout, without deriving it from cap metrics. */
+const readBrowserBaseline = (
+  owner: HTMLElement,
+  baselineOwner: HTMLElement,
+  guideRect: DOMRect,
+): number | null => {
+  const baselineStyle = getComputedStyle(baselineOwner);
+  const needsTextFlowClone = /flex|grid/.test(baselineStyle.display);
+  if (!isNativeLeaf(baselineOwner) && !needsTextFlowClone) {
+    const before = owner.getBoundingClientRect();
+    const marker = document.createElement("span");
+    marker.className = "bucket-baseline-marker";
+    baselineOwner.append(marker);
+    const markerTop = marker.getBoundingClientRect().top;
+    const after = owner.getBoundingClientRect();
+    marker.remove();
+    if (
+      Math.abs(before.width - after.width) < 0.05 &&
+      Math.abs(before.height - after.height) < 0.05 &&
+      Math.abs(before.top - after.top) < 0.05
+    ) {
+      return markerTop - guideRect.top;
+    }
+  }
+
+  const tier = owner.closest<HTMLElement>(".site, .docs, .app") ?? owner;
+  const baselineRect = baselineOwner.getBoundingClientRect();
+  const rig = document.createElement("span");
+  rig.className = "bucket-baseline-rig";
+  const clone = baselineOwner.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll("[id]").forEach((element) =>
+    element.removeAttribute("id"),
+  );
+  clone.removeAttribute("id");
+  for (const property of baselineStyle) {
+    clone.style.setProperty(property, baselineStyle.getPropertyValue(property));
+  }
+  clone.style.setProperty("inline-size", `${baselineRect.width}px`);
+  clone.style.setProperty("block-size", `${baselineRect.height}px`);
+  clone.style.setProperty("position", "static");
+  clone.style.setProperty("inset", "auto");
+  clone.style.setProperty("transform", "none");
+  if (!needsTextFlowClone) {
+    clone.style.setProperty("display", "inline-block");
+    clone.style.setProperty("vertical-align", "baseline");
+    clone.style.setProperty("align-self", "baseline");
+  }
+  const marker = document.createElement("span");
+  marker.className = "bucket-baseline-marker";
+  if (needsTextFlowClone) {
+    const text = [...clone.childNodes].find(
+      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+    );
+    const textFlow = document.createElement("span");
+    textFlow.textContent = text?.textContent ?? "";
+    textFlow.append(marker);
+    text?.replaceWith(textFlow);
+    rig.append(clone);
+  } else {
+    rig.append(clone, marker);
+  }
+  tier.append(rig);
+  const cloneRect = clone.getBoundingClientRect();
+  const baseline =
+    baselineRect.top -
+    guideRect.top +
+    marker.getBoundingClientRect().top -
+    cloneRect.top;
+  const faithfulSize =
+    Math.abs(cloneRect.width - baselineRect.width) < 0.05 &&
+    Math.abs(cloneRect.height - baselineRect.height) < 0.05;
+  rig.remove();
+  return faithfulSize ? baseline : null;
+};
+
 const readMetrics = (
   owner: HTMLElement,
   baselineOwner: HTMLElement,
@@ -74,21 +166,20 @@ const readMetrics = (
   usesControlInset: boolean,
   referenceOwner: HTMLElement | null,
   hasTextBaseline: boolean,
-  centersLineBox: boolean,
   naturalVisibleOwner: HTMLElement | null,
 ): Metrics => {
   const ownerStyle = getComputedStyle(owner);
   const style = getComputedStyle(seatOwner);
   const baselineStyle = getComputedStyle(baselineOwner);
   const ownerRect = owner.getBoundingClientRect();
-  const baselineRect = baselineOwner.getBoundingClientRect();
+  const guideRect = naturalVisibleOwner?.getBoundingClientRect() ?? ownerRect;
   const fontSize = number(baselineStyle.fontSize);
   const lineHeight = number(baselineStyle.lineHeight);
-  const cap = resolveLength(owner, "1cap", baselineStyle);
   const unit = resolveLength(owner, "var(--ds-spacing-baseline)", style);
   const inset = usesControlInset
     ? resolveLength(owner, "var(--ds-spacing-control-inset, 0px)", style)
     : 0;
+  const cap = resolveLength(owner, "1cap", baselineStyle);
   const naturalBaseline = (lineHeight + cap) / 2;
   const unquantizedNudge =
     Math.ceil((naturalBaseline - 1e-7) / unit) * unit - naturalBaseline;
@@ -97,29 +188,8 @@ const readMetrics = (
   const paddingEnd = number(style.paddingBlockEnd);
   const marginEnd = number(style.marginBlockEnd);
   const ownerMarginEnd = number(ownerStyle.marginBlockEnd);
-  const borderStart = number(baselineStyle.borderBlockStartWidth);
-  const borderEnd = number(baselineStyle.borderBlockEndWidth);
-  const baselinePaddingStart = number(baselineStyle.paddingBlockStart);
-  const baselinePaddingEnd = number(baselineStyle.paddingBlockEnd);
-  const lineBoxOffset = centersLineBox
-    ? Math.max(
-        0,
-        (baselineRect.height -
-          borderStart -
-          borderEnd -
-          baselinePaddingStart -
-          baselinePaddingEnd -
-          lineHeight) /
-          2,
-      )
-    : 0;
-  const capModelBaseline = hasTextBaseline
-    ? baselineRect.top -
-      ownerRect.top +
-      borderStart +
-      baselinePaddingStart +
-      lineBoxOffset +
-      naturalBaseline
+  const baseline = hasTextBaseline
+    ? readBrowserBaseline(owner, baselineOwner, guideRect)
     : null;
   const borderValues = [
     style.borderBlockStartWidth,
@@ -139,7 +209,6 @@ const readMetrics = (
     visible: ownerRect.height,
     occupied: ownerRect.height + ownerMarginEnd,
     borders: borderValues.join(" / "),
-    capModelBaseline,
     blockStartDifference: referenceOwner
       ? ownerRect.top - referenceOwner.getBoundingClientRect().top
       : null,
@@ -147,6 +216,16 @@ const readMetrics = (
       ? naturalVisibleOwner.getBoundingClientRect().height
       : null,
     setClosure: naturalVisibleOwner ? ownerRect.height + ownerMarginEnd : null,
+    baseline,
+    capModelBaseline: hasTextBaseline
+      ? ownerRect.top - guideRect.top + paddingStart + naturalBaseline
+      : null,
+    occupiedEnd: ownerRect.bottom + ownerMarginEnd - guideRect.top,
+    guideLeft: guideRect.left,
+    guideTop: guideRect.top,
+    guideWidth: guideRect.width,
+    sharedLeft: null,
+    sharedWidth: null,
   };
 };
 
@@ -157,7 +236,11 @@ const MetricsOutput = ({
   metrics: Metrics | null;
   portal: boolean;
 }) => (
-  <output className="bucket-metrics">
+  <output
+    className="bucket-metrics"
+    data-metrics={metrics ? JSON.stringify(metrics) : undefined}
+    hidden
+  >
     {metrics ? (
       <>
         font/line {show(metrics.fontSize)} / {show(metrics.lineHeight)}
@@ -185,9 +268,9 @@ const MetricsOutput = ({
         ) : null}
         layout borders {metrics.borders}
         <br />
-        {metrics.capModelBaseline == null
+        {metrics.baseline == null
           ? "no text baseline"
-          : `cap-model baseline offset ${show(metrics.capModelBaseline)}`}
+          : `browser baseline offset ${show(metrics.baseline)}`}
         {portal ? (
           <>
             <br />
@@ -213,7 +296,6 @@ const Measured = ({
   usesControlInset = true,
   reference = false,
   hasTextBaseline = true,
-  centersLineBox = false,
   naturalVisibleSelector,
 }: {
   label: string;
@@ -225,7 +307,6 @@ const Measured = ({
   usesControlInset?: boolean;
   reference?: boolean;
   hasTextBaseline?: boolean;
-  centersLineBox?: boolean;
   naturalVisibleSelector?: string;
 }) => {
   const root = useRef<HTMLDivElement>(null);
@@ -257,19 +338,31 @@ const Measured = ({
       const ownerIsVisible =
         ownerStyle?.display !== "none" && ownerStyle?.visibility !== "hidden";
       if (owner && baselineOwner && seatOwner && ownerIsVisible) {
-        observer?.disconnect();
-        setMetrics(
-          readMetrics(
-            owner,
-            baselineOwner,
-            seatOwner,
-            usesControlInset,
-            referenceOwner ?? null,
-            hasTextBaseline,
-            centersLineBox,
-            naturalVisibleOwner,
-          ),
+        const nextMetrics = readMetrics(
+          owner,
+          baselineOwner,
+          seatOwner,
+          usesControlInset,
+          referenceOwner ?? null,
+          hasTextBaseline,
+          naturalVisibleOwner,
         );
+        if (!globalOwnerSelector && local) {
+          const localRect = local.getBoundingClientRect();
+          nextMetrics.guideLeft -= localRect.left;
+          nextMetrics.guideTop -= localRect.top;
+          if (reference) {
+            const row = local.closest<HTMLElement>(".bucket-samples");
+            if (row) {
+              const rowRect = row.getBoundingClientRect();
+              nextMetrics.sharedLeft = rowRect.left - localRect.left;
+              nextMetrics.sharedWidth = row.scrollWidth;
+            }
+          }
+        }
+        setMetrics(nextMetrics);
+      } else if (globalOwnerSelector) {
+        setMetrics(null);
       }
     };
     const schedule = () => {
@@ -277,7 +370,26 @@ const Measured = ({
       frame = requestAnimationFrame(() => requestAnimationFrame(update));
     };
     void document.fonts.ready.then(schedule);
-    observer = new MutationObserver(schedule);
+    const isGeneratedNode = (node: Node): boolean =>
+      node instanceof Element &&
+      (node.matches(
+        ".bucket-length-probe, .bucket-baseline-rig, .bucket-baseline-marker, .bucket-guide, .bucket-shared-guides, .bucket-metrics",
+      ) ||
+        Boolean(
+          node.closest(
+            ".bucket-length-probe, .bucket-baseline-rig, .bucket-baseline-marker, .bucket-guide, .bucket-shared-guides, .bucket-metrics",
+          ),
+        ));
+    observer = new MutationObserver((records) => {
+      const hasRelevantMutation = records.some((record) => {
+        if (isGeneratedNode(record.target)) return false;
+        if (record.type !== "childList") return true;
+        return [...record.addedNodes, ...record.removedNodes].some(
+          (node) => !isGeneratedNode(node),
+        );
+      });
+      if (hasRelevantMutation) schedule();
+    });
     observer.observe(
       document.body,
       globalOwnerSelector
@@ -290,15 +402,16 @@ const Measured = ({
         : { childList: true, subtree: true },
     );
     window.addEventListener("resize", schedule);
+    window.addEventListener("scroll", schedule, true);
     schedule();
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, true);
     };
   }, [
     baselineSelector,
-    centersLineBox,
     globalOwnerSelector,
     hasTextBaseline,
     naturalVisibleSelector,
@@ -311,21 +424,51 @@ const Measured = ({
     <figure className="bucket-sample">
       <figcaption>{label}</figcaption>
       <div
-        className={`bucket-measure${globalOwnerSelector ? " bucket-measure--portal" : ""}`}
+        className={`bucket-measure${globalOwnerSelector ? " bucket-measure--portal" : ""}${globalOwnerSelector && metrics ? " bucket-measure--open" : ""}`}
         ref={root}
         data-bucket-reference={reference || undefined}
-        style={
-          {
-            "--bucket-first-baseline":
-              metrics &&
-              metrics.capModelBaseline != null &&
-              !globalOwnerSelector
-                ? `${metrics.capModelBaseline}px`
-                : undefined,
-          } as React.CSSProperties
-        }
       >
         {children}
+        {metrics ? (
+          <span
+            aria-hidden="true"
+            className={`bucket-guide${globalOwnerSelector ? " bucket-guide--portal" : ""}`}
+            style={
+              {
+                "--bucket-guide-left": `${metrics.guideLeft}px`,
+                "--bucket-guide-top": `${metrics.guideTop}px`,
+                "--bucket-guide-width": `${metrics.guideWidth}px`,
+                "--bucket-guide-baseline": `${metrics.baseline ?? 0}px`,
+                "--bucket-guide-end": `${metrics.occupiedEnd}px`,
+              } as React.CSSProperties
+            }
+          >
+            <span className="bucket-guide-top" />
+            {metrics.baseline == null ? null : (
+              <span className="bucket-guide-baseline" />
+            )}
+            <span className="bucket-guide-end" />
+          </span>
+        ) : null}
+        {reference && metrics?.sharedWidth != null ? (
+          <span
+            aria-hidden="true"
+            className="bucket-shared-guides"
+            style={
+              {
+                "--bucket-shared-left": `${metrics.sharedLeft}px`,
+                "--bucket-shared-width": `${metrics.sharedWidth}px`,
+                "--bucket-shared-top": `${metrics.guideTop}px`,
+                "--bucket-shared-baseline": `${metrics.guideTop + (metrics.baseline ?? 0)}px`,
+                "--bucket-shared-end": `${metrics.guideTop + metrics.occupiedEnd}px`,
+              } as React.CSSProperties
+            }
+          >
+            <span className="bucket-shared-top" />
+            <span className="bucket-shared-baseline" />
+            <span className="bucket-shared-end" />
+          </span>
+        ) : null}
       </div>
       <MetricsOutput metrics={metrics} portal={Boolean(globalOwnerSelector)} />
     </figure>
@@ -355,7 +498,6 @@ const TierMenu = ({ tier }: { tier: string }) => {
           key: `${tier}-open`,
           label: "Open details",
           url: "#open",
-          className: `measure-menu-${tier}`,
         },
         { type: "separator", key: `${tier}-separator` },
         {
@@ -368,8 +510,30 @@ const TierMenu = ({ tier }: { tier: string }) => {
         },
       ]}
     >
-      Actions
+      Menu
     </ContextualMenu>
+  );
+};
+
+const MenuItemFixture = ({ tier }: { tier: string }) => {
+  const item = {
+    key: `${tier}-preview-menu-item`,
+    label: "Open details",
+    url: "#open",
+  } as React.ComponentProps<typeof ContextualMenuItem>["item"];
+  return (
+    <div
+      className="ds contextual-menu__surface spacing-control-group spacing-preview-menu-surface"
+      role="menu"
+      aria-label={`${tier} menu item specimen`}
+      aria-hidden="false"
+    >
+      <ContextualMenuItem
+        item={item}
+        itemProps={{ role: "menuitem", tabIndex: -1 }}
+        onSelect={() => undefined}
+      />
+    </div>
   );
 };
 
@@ -389,60 +553,73 @@ const Tier = ({
     </header>
     <div className="bucket-samples">
       <Measured
-        label="Body paragraph"
+        label="Body"
         ownerSelector="p.ds"
         usesControlInset={false}
       >
         <p className="ds">Body paragraph</p>
       </Measured>
-      <Measured label="Plain Button" ownerSelector=".button" reference>
+      <Measured
+        label="Button"
+        ownerSelector=".button"
+        baselineSelector=".label"
+        reference
+      >
         <Button>Button</Button>
       </Measured>
-      <Measured label="Leading-icon Button" ownerSelector=".button">
+      <Measured
+        label="Button + icon"
+        ownerSelector=".button"
+        baselineSelector=".label"
+      >
         <Button icon="edit">Edit</Button>
       </Measured>
       <Measured
-        label="Icon-only Button"
+        label="Icon-only"
         ownerSelector=".button"
         hasTextBaseline={false}
       >
         <Button icon="edit" aria-label="Edit" />
       </Measured>
-      <Measured label="Static dismissible Chip" ownerSelector=".chip">
+      <Measured
+        label="Dismissible Chip"
+        ownerSelector=".chip"
+        baselineSelector=".value"
+      >
         <Chip value="Dismiss" onDismiss={() => undefined} />
       </Measured>
-      <Measured label="Clickable Chip" ownerSelector=".chip">
+      <Measured
+        label="Clickable Chip"
+        ownerSelector=".chip"
+        baselineSelector=".value"
+      >
         <Chip value="Download" onClick={() => undefined} />
       </Measured>
       <Measured
-        label="TextInput wrapper / leaf"
+        label="Text"
         ownerSelector=".input.text"
         baselineSelector="input"
-        centersLineBox
       >
         <TextInput name={`${tier}-text`} defaultValue="Text input" />
       </Measured>
       <Measured
-        label="NumberInput wrapper / leaf"
+        label="Number"
         ownerSelector=".input.number"
         baselineSelector="input"
-        centersLineBox
       >
         <NumberInput name={`${tier}-number`} defaultValue={42} suffix="kg" />
       </Measured>
       <Measured
-        label="PasswordInput wrapper / leaf"
+        label="Password"
         ownerSelector=".input.password"
         baselineSelector="input"
-        centersLineBox
       >
         <PasswordInput name={`${tier}-password`} defaultValue="secret" />
       </Measured>
       <Measured
-        label="PhoneInput wrapper / number leaf"
+        label="Phone"
         ownerSelector=".input.phone"
         baselineSelector=".number-input"
-        centersLineBox
       >
         <PhoneInput
           name={`${tier}-phone`}
@@ -450,14 +627,14 @@ const Tier = ({
           onChange={() => undefined}
         />
       </Measured>
-      <Measured label="DateInput native leaf" ownerSelector=".input.date">
+      <Measured label="Date" ownerSelector=".input.date">
         <DateInput name={`${tier}-date`} defaultValue="2026-10-10" />
       </Measured>
-      <Measured label="TimeInput native leaf" ownerSelector=".input.time">
+      <Measured label="Time" ownerSelector=".input.time">
         <TimeInput name={`${tier}-time`} defaultValue="10:30" />
       </Measured>
       <Measured
-        label="DateTimeInput native leaf"
+        label="Date/time"
         ownerSelector=".input.datetime"
       >
         <DateTimeInput
@@ -466,10 +643,9 @@ const Tier = ({
         />
       </Measured>
       <Measured
-        label="ComboboxInput inner chrome"
+        label="Combobox"
         ownerSelector=".input.combobox-input"
         baselineSelector="input"
-        centersLineBox
       >
         <ComboboxInput
           value="one"
@@ -480,7 +656,7 @@ const Tier = ({
           ]}
         />
       </Measured>
-      <Measured label="SelectInput" ownerSelector=".input.select">
+      <Measured label="Select" ownerSelector=".input.select">
         <SelectInput
           name={`${tier}-select`}
           defaultValue="one"
@@ -491,21 +667,21 @@ const Tier = ({
         />
       </Measured>
       <Measured
-        label="ColorInput trigger chrome"
+        label="Color trigger"
         ownerSelector=".color-trigger"
         baselineSelector=".color-value"
       >
         <ColorInput value="#3b82f6" onChange={() => undefined} />
       </Measured>
       <Measured
-        label="ColorInput inline hex chrome"
+        label="Inline color"
         ownerSelector=".color-inline-seat"
         baselineSelector=".hex-input"
       >
         <ColorInput value="#3b82f6" swatches={[]} onChange={() => undefined} />
       </Measured>
       <Measured
-        label="Tabs strip / item row"
+        label="Tabs"
         ownerSelector=".tabs"
         seatSelector=".tabs-link"
         baselineSelector=".tabs-link"
@@ -518,7 +694,7 @@ const Tier = ({
         />
       </Measured>
       <Measured
-        label="Tabs forced fallback"
+        label="Tabs fallback"
         ownerSelector=".tabs"
         seatSelector=".tabs-link"
         baselineSelector=".tabs-link"
@@ -532,14 +708,18 @@ const Tier = ({
         />
       </Measured>
       <Measured
-        label="ContextualMenu portal / item rows"
-        ownerSelector=".contextual-menu"
-        globalOwnerSelector={`.contextual-menu__surface.${tier}:not(.submenu)`}
-        seatSelector={`.measure-menu-${tier}`}
-        baselineSelector={`.measure-menu-${tier} .label`}
+        label="Menu item"
+        ownerSelector=".spacing-preview-menu-surface"
+        seatSelector=".contextual-menu-item"
+        baselineSelector=".contextual-menu-item .label"
+        naturalVisibleSelector=".contextual-menu-item"
       >
-        <TierMenu tier={tier} />
+        <MenuItemFixture tier={tier} />
       </Measured>
+    </div>
+    <div className="bucket-menu-demo">
+      <span>Interactive menu:</span>
+      <TierMenu tier={tier} />
     </div>
   </section>
 );
@@ -548,10 +728,9 @@ export const SiteDocsApp: Story = {
   render: () => (
     <main className="spacing-control-block">
       <h1>01 Control block</h1>
-      <p>
-        Captions and metrics sit outside the measured rows. The row uses first
-        baseline alignment. Each blue guide marks the local cap-model estimate,
-        reported separately from CSS row alignment.
+      <p className="bucket-legend">
+        <span className="bucket-legend-edge" /> block start / occupied end
+        <span className="bucket-legend-baseline" /> browser text baseline
       </p>
       <p>No shipped Pragma equivalents: SegmentedControl and Pagination.</p>
       <Tier tier="site" title="Site" />

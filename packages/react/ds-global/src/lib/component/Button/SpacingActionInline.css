@@ -1,8 +1,23 @@
 .spacing-action-inline {
-  --action-member-width: 15rem;
   padding: 2rem;
   color: var(--color-text);
   background: var(--color-background);
+}
+
+.action-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-legend-edge,
+.action-legend-baseline {
+  inline-size: 1.5rem;
+  border-block-start: 1px solid #d71920;
+}
+
+.action-legend-baseline {
+  border-color: #0969da;
 }
 
 .action-tier {
@@ -30,11 +45,11 @@
 .action-samples {
   display: grid;
   grid-auto-flow: column;
-  grid-template-rows: auto auto auto;
-  grid-auto-columns: var(--action-member-width);
-  align-items: first baseline;
-  column-gap: 1.5rem;
-  row-gap: 0.5rem;
+  grid-template-rows: auto auto;
+  grid-auto-columns: max-content;
+  align-items: start;
+  column-gap: 1.25rem;
+  row-gap: 0.375rem;
   min-inline-size: max-content;
 }
 
@@ -43,42 +58,114 @@
 }
 
 .action-sample figcaption {
-  inline-size: var(--action-member-width);
+  inline-size: max-content;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .action-measure {
   position: relative;
   display: flex;
-  align-items: first baseline;
-  min-block-size: 5rem;
-}
-
-.action-measure--portal {
-  min-block-size: 8rem;
   align-items: flex-start;
+  justify-self: start;
+  inline-size: max-content;
 }
 
-.action-measure:not(.action-measure--portal)::after {
+.action-preview-menu-surface.ds {
+  position: static;
+  min-width: 0;
+  inline-size: max-content;
+  max-block-size: none;
+  overflow: visible;
+  opacity: 1;
+  visibility: visible;
+}
+
+.action-menu-demo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-block-start: 0.75rem;
+  font-weight: 400;
+}
+
+.action-tier:has(.action-menu-demo .trigger[aria-expanded="true"]) {
+  padding-block-end: 6rem;
+}
+
+.action-guide,
+.action-shared-guides {
   position: absolute;
-  z-index: -1;
-  inset-inline: 0;
-  inset-block-start: var(--action-baseline, 0);
-  border-block-start: 1px solid Highlight;
-  content: "";
+  z-index: 2147483000;
+  inset: 0;
+  pointer-events: none;
 }
 
-.action-measure > :is(.button, .chip, .tabs) {
-  outline: 1px dashed color-mix(in srgb, Highlight 65%, transparent);
-  outline-offset: -1px;
+.action-guide {
+  inset-block-start: var(--action-guide-top);
+  inset-inline-start: var(--action-guide-left);
+  inline-size: var(--action-guide-width);
+}
+
+.action-guide > span,
+.action-shared-guides > span {
+  position: absolute;
+  block-size: 0;
+  border-block-start: 1px solid #d71920;
+}
+
+.action-guide > span {
+  inset-inline: 0;
+}
+
+.action-guide-top {
+  inset-block-start: 0;
+}
+
+.action-guide > .action-guide-baseline {
+  inset-block-start: var(--action-guide-baseline);
+  border-color: #0969da;
+}
+
+.action-guide-end {
+  inset-block-start: var(--action-guide-end);
+}
+
+.action-shared-guides > span {
+  inset-inline-start: var(--action-shared-left);
+  inline-size: var(--action-shared-width);
+}
+
+.action-shared-top {
+  inset-block-start: var(--action-shared-top);
+}
+
+.action-shared-guides > .action-shared-baseline {
+  inset-block-start: var(--action-shared-baseline);
+  border-color: #0969da;
+}
+
+.action-shared-end {
+  inset-block-start: var(--action-shared-end);
+}
+
+.action-baseline-rig {
+  position: absolute;
+  display: block;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.action-baseline-marker {
+  display: inline-block;
+  inline-size: 0;
+  block-size: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
 }
 
 .action-metrics {
-  box-sizing: border-box;
-  inline-size: var(--action-member-width);
-  padding: 0.5rem;
-  font: 0.75rem / 1.35 monospace;
-  overflow-wrap: anywhere;
-  color: var(--color-text-muted, currentColor);
-  background: color-mix(in srgb, Canvas 88%, transparent);
+  display: none;
 }
