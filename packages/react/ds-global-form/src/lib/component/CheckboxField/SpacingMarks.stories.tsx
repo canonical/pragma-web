@@ -362,6 +362,7 @@ const NavigationSpecimen = ({
     <SideNavigation
       className="marks-nav-fixture"
       aria-label={`${tierLabel} ${kind} navigation`}
+      defaultExpanded={true}
       keyboardShortcut={false}
       root={
         kind === "action"

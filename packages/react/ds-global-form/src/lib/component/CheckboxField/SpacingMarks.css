@@ -108,8 +108,14 @@
 /* Keep each public row and its native padding in its rail. The Footer's
  * separate 8px region padding is retained; only unmeasured chrome is hidden. */
 .marks-measure > .side-navigation.marks-nav-fixture {
+  /* The product's narrow-screen takeover is outer rail chrome; keep the
+   * expanded fixture in this comparison row at every viewport width. */
+  position: relative;
+  inset: auto;
+  z-index: auto;
   inline-size: max-content;
   block-size: max-content;
+  flex-shrink: 0;
   gap: 0;
   color: #171717;
 }
