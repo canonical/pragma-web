@@ -1,0 +1,188 @@
+.spacing-field-inline {
+  padding: 2rem;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+.field-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field-legend-edge,
+.field-legend-baseline {
+  inline-size: 1.5rem;
+  border-block-start: 1px solid #d71920;
+}
+
+.field-legend-baseline {
+  border-color: #0969da;
+}
+
+.field-tier {
+  margin-block: 2rem;
+  padding: 1rem;
+  overflow-x: auto;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, Highlight 18%, transparent) 0 1px,
+    transparent 1px var(--ds-spacing-baseline)
+  );
+}
+
+.field-tier > header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-block-end: 1rem;
+}
+
+.field-tier > header > :is(h2, span) {
+  margin: 0;
+}
+
+.field-samples {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  grid-auto-columns: max-content;
+  align-items: start;
+  column-gap: 1.25rem;
+  row-gap: 0.375rem;
+  min-inline-size: max-content;
+}
+
+.field-sample {
+  display: contents;
+}
+
+.field-sample figcaption {
+  inline-size: max-content;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.field-measure {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-self: start;
+  inline-size: max-content;
+}
+
+.field-measure > .form {
+  inline-size: 12.125rem;
+}
+
+.field-measure > .form .input {
+  inline-size: 12.125rem;
+}
+.field-measure > .form .field-label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.field-measure .file-tree {
+  inline-size: 15.125rem;
+  color: #171717;
+  background: #f7f7f7;
+}
+.field-measure .search-box > .input {
+  color: #171717;
+}
+.field-preview-diff {
+  inline-size: 13rem;
+}
+.field-preview-diff-standard {
+  inline-size: 20rem;
+}
+
+.field-preview-diff-standard .diff-line-hunk,
+.field-preview-diff-annotated tr:not(.annotated-diff-line) {
+  display: none;
+}
+
+.field-preview-diff-standard .diff-line:not(.diff-line-hunk) ~ .diff-line {
+  display: none;
+}
+
+.field-inline-line {
+  white-space: nowrap;
+}
+.field-preview-token {
+  inline-size: 18rem;
+}
+
+.field-guide,
+.field-shared-guides {
+  position: absolute;
+  z-index: 2147483000;
+  inset: 0;
+  pointer-events: none;
+}
+
+.field-guide {
+  inset-block-start: var(--field-guide-top);
+  inset-inline-start: var(--field-guide-left);
+}
+
+.field-guide > span,
+.field-shared-guides > span {
+  position: absolute;
+  block-size: 0;
+  border-block-start: 1px solid #d71920;
+}
+
+.field-guide > span {
+  inset-inline-start: 0;
+  inline-size: 0.5rem;
+}
+.field-guide-top {
+  inset-block-start: 0;
+}
+.field-guide > .field-guide-baseline {
+  inset-block-start: var(--field-guide-baseline);
+  border-color: #0969da;
+}
+.field-guide-end {
+  inset-block-start: var(--field-guide-end);
+}
+.field-shared-guides > span {
+  inset-inline-start: var(--field-shared-left);
+  inline-size: var(--field-shared-width);
+}
+.field-shared-top {
+  inset-block-start: var(--field-shared-top);
+}
+.field-shared-guides > .field-shared-baseline {
+  inset-block-start: var(--field-shared-baseline);
+  border-color: #0969da;
+}
+.field-shared-end {
+  inset-block-start: var(--field-shared-end);
+}
+
+.field-baseline-rig {
+  position: absolute;
+  display: block;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.field-baseline-marker {
+  display: inline-block;
+  inline-size: 0;
+  block-size: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.field-metrics {
+  display: none;
+}

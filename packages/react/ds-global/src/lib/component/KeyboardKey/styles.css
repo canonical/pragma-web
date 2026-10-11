@@ -15,8 +15,7 @@
        (currently 0). Revisit once a 2px radius token lands. */
     --keyboard-key-border-radius: var(--dimension-radius-small);
     --keyboard-key-border-width: var(--dimension-stroke-thickness-medium);
-    /* 4px inline padding (Figma: 4px left/right). */
-    --keyboard-key-padding-inline: var(--dimension-050);
+    --keyboard-key-padding-inline: var(--ds-spacing-field);
   }
 
   /* The `.code` baseline utility (from @canonical/styles) supplies the

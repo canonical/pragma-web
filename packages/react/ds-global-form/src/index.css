@@ -79,8 +79,8 @@
     /* Chrome height snapped to baseline grid — border-box includes border */
     --form-input-height: calc(var(--space-baseline) * 6); /* 40px — 5bU */
     --form-input-padding-inline: var(
-      --component-padding-inline
-    ); /* 16px — inline (horizontal) */
+      --ds-spacing-field
+    ); /* Field text owner inline inset. */
 
     /* Per-side input padding overrides: */
     /* --form-input-padding-block-start:  … ; */ /* top padding    */
@@ -176,12 +176,11 @@
    * --density-space-sm/-md/-lg) each of its own tokens follows. Density knows
    * nothing about "field"; this is where the form makes that choice.
    *
-   * Scoped to the density classes so a plain form (no density class) keeps the
-   * :root defaults above. The var() fallbacks keep values sane if only a CONTEXT
-   * class (.app/.site/.docs) is present without a density class.
+   * Scoped to the density and tier classes so plain forms and tier contexts use
+   * the same semantic field role while density continues to govern the gaps.
    *
-   *   INLINE (horizontal): control padding + label↔input / prefix-suffix gap
-   *     → --density-padding-inline
+   *   INLINE (horizontal): control padding → --ds-spacing-field
+   *     label↔input / prefix-suffix gap → --density-padding-inline
    *   BLOCK (vertical), by magnitude:
    *     between-fields     → --density-space-lg  (widest structural gap, 40px app)
    *     label → control    → --density-space-md  (label to its own control, 8px app)
@@ -192,10 +191,7 @@
    *    the density matrix now carries Diana's numbers directly, so the form maps
    *    straight onto the rungs rather than pinning literals.) */
   :where(.comfortable, .dense, .app, .site, .docs) {
-    --form-input-padding-inline: var(
-      --density-padding-inline,
-      var(--space-200)
-    );
+    --form-input-padding-inline: var(--ds-spacing-field);
     --form-field-inline-gap: var(--density-padding-inline, var(--space-200));
     --form-field-block-gap: var(
       --density-space-lg,

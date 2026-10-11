@@ -37,12 +37,12 @@
     }
 
     td.diff-content {
-      /* padding: 0 0 0 calc(var(--git-diff-viewer-gutter-width) + 4px); */
-      padding: 0 0 0 4px;
+      padding: 0;
 
       pre {
         margin: 0;
-        padding: 0 8px;
+        padding-block: 0;
+        padding-inline: var(--ds-spacing-field);
         font-family: var(--font-family-mono);
       }
 

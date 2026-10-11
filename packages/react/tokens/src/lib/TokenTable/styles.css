@@ -2,7 +2,7 @@
   :root {
     --token-ui-canvas: #ffffff;
     --token-ui-ink: #171717;
-    --token-table-cell-padding: 0.625rem 0.75rem;
+    --token-table-cell-padding: 0.625rem var(--ds-spacing-field);
     --token-table-font-size: 0.8125rem;
   }
 
@@ -18,7 +18,7 @@
   }
 
   .ds.token-table.dense {
-    --token-table-cell-padding: 0.5rem 0.625rem;
+    --token-table-cell-padding: 0.5rem var(--ds-spacing-field);
     --token-table-font-size: 0.78125rem;
   }
 
@@ -126,7 +126,10 @@
 
     & .grid th,
     & .grid td {
-      padding: var(--token-table-cell-padding, 0.625rem 0.75rem);
+      padding: var(
+        --token-table-cell-padding,
+        0.625rem var(--ds-spacing-field)
+      );
       border-bottom: 1px solid
         color-mix(in srgb, var(--token-ui-ink, #171717) 8%, transparent);
       vertical-align: top;

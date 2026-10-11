@@ -6,8 +6,8 @@
     display: flex;
     align-items: center;
     border-bottom: 1px solid var(--file-tree-search-box-border-color);
-    padding: var(--file-tree-search-box-vertical-padding)
-      var(--file-tree-search-box-horizontal-padding);
+    padding-block: var(--file-tree-search-box-vertical-padding);
+    padding-inline: 0;
     background-color: var(--file-tree-search-box-background-color);
 
     position: sticky;
@@ -26,6 +26,7 @@
       vertical-align: baseline;
       font-size: 1rem;
       line-height: var(--file-tree-search-box-line-height);
+      padding-inline: var(--file-tree-search-box-horizontal-padding);
     }
 
     & > .search,

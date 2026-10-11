@@ -28,7 +28,7 @@
     --file-tree-node-indent-bar-color: #efefef;
     --file-tree-node-indent-bar-width: 1px;
     --file-tree-node-items-gap: 8px;
-    --file-tree-node-horizontal-padding: 0.25rem;
+    --file-tree-node-horizontal-padding: var(--ds-spacing-field);
     --file-tree-node-vertical-padding: 0.25rem;
 
     --file-tree-node-file-icon: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.99194 2.5H4.5V13.5H11.5V7.00806H9.24194C7.9993 7.00806 6.99194 6.0007 6.99194 4.75806V2.5ZM10.8869 5.50806L8.49194 3.1127V4.75806C8.49194 5.17227 8.82773 5.50806 9.24194 5.50806H10.8869ZM3 2.5C3 1.67157 3.67157 1 4.5 1H8.08647C8.35172 1 8.60609 1.10538 8.79364 1.29295L12.7072 5.20712C12.8947 5.39465 13 5.64898 13 5.91417V13.5C13 14.3284 12.3284 15 11.5 15H4.5C3.67157 15 3 14.3284 3 13.5V2.5ZM5.65837 8.48389H10.4917V9.98389H5.65837V8.48389ZM5.65837 10.7339V12.2339H10.4917V10.7339H5.65837Z' fill='black'/%3E%3C/svg%3E%0A");
@@ -36,7 +36,7 @@
     --file-tree-node-opened-folder-icon: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6 5.46408V3.60693H2.5V8.66667L2.94235 7.09388C3.12429 6.44696 3.7143 6 4.38632 6H11.5V5.46408H6ZM13 6H14.0216C15.0862 6 15.812 7.07821 15.4113 8.06457L13.38 13.0646C13.1503 13.6301 12.6007 14 11.9903 14H2.98007C2.97153 14 2.963 13.9999 2.9545 13.9998H2.5C1.67157 13.9998 1 13.3282 1 12.4998V3.60693C1 2.77851 1.67157 2.10693 2.5 2.10693H6C6.82843 2.10693 7.5 2.77851 7.5 3.60693V3.96408H11.5C12.3284 3.96408 13 4.63565 13 5.46408V6ZM4.38632 7.5H14.0216L11.9903 12.5H2.98007L4.38632 7.5Z' fill='black'/%3E%3C/svg%3E%0A");
 
     --file-tree-search-box-vertical-padding: 6px;
-    --file-tree-search-box-horizontal-padding: 8px;
+    --file-tree-search-box-horizontal-padding: var(--ds-spacing-field);
 
     --file-tree-search-box-line-height: 24px;
     --file-tree-search-box-button-size: 24px;
