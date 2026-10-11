@@ -33,7 +33,7 @@
       direction: inherit;
       display: flex;
       align-items: center;
-      gap: var(--space-100);
+      gap: var(--ds-spacing-mark);
       cursor: pointer;
 
       label {
@@ -66,8 +66,8 @@
       & > input[type="radio"] {
         appearance: none;
         box-sizing: border-box;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        width: var(--ds-typography-body-font-size);
+        height: var(--ds-typography-body-font-size);
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: 50%;
@@ -133,8 +133,8 @@
         appearance: none;
         box-sizing: border-box;
         position: relative;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        width: var(--ds-typography-body-font-size);
+        height: var(--ds-typography-body-font-size);
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: var(--dimension-radius-small);

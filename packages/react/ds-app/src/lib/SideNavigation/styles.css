@@ -26,13 +26,11 @@
     /* 0.5rem from the left and the right (aligns with the collapse
      toggle / context-switcher chevron beyond it). */
     --sidenav-inset-inline: var(--dimension-100);
-    /* 0.5rem between a leading icon and its label. */
-    --sidenav-icon-gap: var(--dimension-100);
-    /* Fixed leading-icon column so labels align down the rail with or
-     without an icon — matches the Icon component's default rendered size
-     (1rem). No design token names it, so this stays a provisional value
-     scoped here rather than reusing a spacing token for a sizing concern. */
-    --sidenav-icon-column-inline-size: 1.5rem;
+    /* Mark-to-label gap, independent of the row inset. */
+    --sidenav-icon-gap: var(--ds-spacing-mark);
+    /* The leading column follows the tier body icon, whether filled or empty. */
+    --sidenav-icon-column-inline-size: var(--ds-typography-body-font-size);
+    --sidenav-panel-indent: 1.5rem;
 
     /* ── Row background channel ────────────────────────────────────────
      Item/ItemButton/ItemExpandable/CollapseToggle consume THIS, not the
@@ -58,6 +56,9 @@
   }
 
   .ds.side-navigation {
+    --sidenav-icon-gap: var(--ds-spacing-mark);
+    --sidenav-icon-column-inline-size: var(--ds-typography-body-font-size);
+    --icon-size: var(--sidenav-icon-column-inline-size);
     box-sizing: border-box;
     /* Skip-link's absolute overlay anchors to this box. */
     position: relative;

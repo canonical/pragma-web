@@ -26,11 +26,10 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      column-gap: var(--form-field-inline-gap);
+      column-gap: var(--ds-spacing-mark);
 
       /* Every direct child that ISN'T the label is the control (checkbox / switch
-         input): a fixed 16px-tall box (--dimension-200 — checkbox 16×16, switch
-         track 16 high). The row's `align-items: center` does the centring; the
+         input). The row's `align-items: center` does the centring; the
          control itself carries no offset, margin or padding, so its intrinsic
          size and click target are unchanged. */
       & > :not(.ds.field-label) {

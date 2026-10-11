@@ -62,8 +62,8 @@
       align-items: center;
       justify-content: center;
       color: var(--color-icon);
-      width: var(--dimension-250);
-      height: var(--dimension-250);
+      width: var(--sidenav-icon-column-inline-size);
+      height: var(--sidenav-icon-column-inline-size);
     }
 
     &[data-disabled] .start {
@@ -114,7 +114,7 @@
       padding: 0;
 
       & .row {
-        margin-inline-start: var(--sidenav-icon-column-inline-size);
+        margin-inline-start: var(--sidenav-panel-indent);
       }
     }
   }

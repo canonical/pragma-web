@@ -1,0 +1,184 @@
+.spacing-marks {
+  padding: 2rem;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+.marks-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.marks-legend-edge,
+.marks-legend-baseline {
+  inline-size: 1.5rem;
+  border-block-start: 1px solid #d71920;
+}
+
+.marks-legend-baseline {
+  border-color: #0969da;
+}
+
+.marks-tier {
+  margin-block: 2rem;
+  padding: 1rem;
+  overflow-x: auto;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, Highlight 18%, transparent) 0 1px,
+    transparent 1px var(--ds-spacing-baseline)
+  );
+}
+
+.marks-tier > header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-block-end: 1rem;
+}
+
+.marks-tier > header > :is(h2, span) {
+  margin: 0;
+}
+
+.marks-samples {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  grid-auto-columns: max-content;
+  align-items: start;
+  column-gap: 1.25rem;
+  row-gap: 0.375rem;
+  min-inline-size: max-content;
+}
+
+.marks-sample {
+  display: contents;
+}
+
+.marks-sample figcaption {
+  inline-size: max-content;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.marks-measure {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-self: start;
+  inline-size: max-content;
+}
+
+.marks-measure > .form {
+  inline-size: max-content;
+}
+
+.marks-measure > .form .field > .field-label,
+.marks-measure > .form .field-toggle-heading {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.marks-measure > .form .input.select {
+  inline-size: 9rem;
+}
+
+.marks-measure > .accordion {
+  inline-size: 10rem;
+}
+
+.marks-icon-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-spacing-mark);
+  font-size: 1.25rem;
+}
+
+.marks-measure > .side-navigation {
+  inline-size: 15rem;
+  block-size: 14rem;
+  color: #171717;
+}
+
+.marks-guide,
+.marks-shared-guides {
+  position: absolute;
+  z-index: 2147483000;
+  inset: 0;
+  pointer-events: none;
+}
+
+.marks-guide {
+  inset-block-start: var(--marks-guide-top);
+  inset-inline-start: var(--marks-guide-left);
+}
+
+.marks-guide > span,
+.marks-shared-guides > span {
+  position: absolute;
+  block-size: 0;
+  border-block-start: 1px solid #d71920;
+}
+
+.marks-guide > span {
+  inset-inline-start: 0;
+  inline-size: 0.5rem;
+}
+
+.marks-guide-top {
+  inset-block-start: 0;
+}
+
+.marks-guide > .marks-guide-baseline {
+  inset-block-start: var(--marks-guide-baseline);
+  border-color: #0969da;
+}
+
+.marks-guide-end {
+  inset-block-start: var(--marks-guide-end);
+}
+
+.marks-shared-guides > span {
+  inset-inline-start: var(--marks-shared-left);
+  inline-size: var(--marks-shared-width);
+}
+
+.marks-shared-top {
+  inset-block-start: var(--marks-shared-top);
+}
+
+.marks-shared-guides > .marks-shared-baseline {
+  inset-block-start: var(--marks-shared-baseline);
+  border-color: #0969da;
+}
+
+.marks-shared-end {
+  inset-block-start: var(--marks-shared-end);
+}
+
+.marks-baseline-rig {
+  position: absolute;
+  display: block;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.marks-baseline-marker {
+  display: inline-block;
+  inline-size: 0;
+  block-size: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.marks-metrics {
+  display: none;
+}

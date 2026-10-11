@@ -46,7 +46,7 @@
       --color-foreground-ghost-active
     );
 
-    --accordion-item-header-gap: var(--dimension-200);
+    --accordion-item-header-gap: var(--ds-spacing-mark);
     /* Header block padding in baseline multiples (dimension-100 = 1 bU). The
        apps/sites element-size sizing (6px → 36/32) is owned by the height bucket. */
     --accordion-item-header-padding-block: var(--dimension-100);
@@ -56,10 +56,9 @@
     /* Vertical content padding in baseline multiples (dimension-100 = 1 bU). */
     --accordion-item-content-padding-block: var(--dimension-100);
 
-    /* Fixed chevron size (per Figma) so every item reserves the same chevron
-       column width and all headings start at the same x-position, regardless of
-       heading level — no horizontal drift. */
-    --accordion-item-chevron-size: var(--dimension-200);
+    /* The disclosure slot follows the tier body icon size, keeping headings
+       aligned regardless of their heading level. */
+    --accordion-item-chevron-size: var(--ds-typography-body-font-size);
 
     /* Indent the content so it aligns under the heading text, i.e. past the
        header inline padding + chevron + the gap between chevron and heading. */
@@ -71,6 +70,12 @@
   }
 
   .ds.accordion-item {
+    --accordion-item-chevron-size: var(--ds-typography-body-font-size);
+    --accordion-item-content-indent: calc(
+      var(--accordion-item-header-padding-inline) +
+      var(--accordion-item-chevron-size) +
+      var(--accordion-item-header-gap)
+    );
     box-sizing: border-box;
 
     /* Inline (side) borders — off by default, see the token above. */
@@ -82,9 +87,8 @@
       var(--accordion-item-color-border);
   }
 
-  /* Header tab — the native <summary>. The chevron is a fixed size, so a fixed
-     chevron column keeps all headings left-aligned; align-items:center centres
-     the fixed chevron on the header line. */
+  /* Header tab — the native <summary>. The tier-sized chevron column keeps
+     headings left-aligned; align-items:center centres it on the header line. */
   .ds.accordion-item > .header {
     box-sizing: border-box;
     display: flex;

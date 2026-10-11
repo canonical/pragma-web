@@ -54,8 +54,8 @@
       align-items: center;
       justify-content: center;
       color: var(--color-icon);
-      width: var(--dimension-250);
-      height: var(--dimension-250);
+      width: var(--sidenav-icon-column-inline-size);
+      height: var(--sidenav-icon-column-inline-size);
     }
 
     & > .row:disabled .start {

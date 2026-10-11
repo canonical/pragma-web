@@ -28,7 +28,7 @@ const ItemButton = ({
       {/* Start cell is always rendered (empty when no icon), matching Item,
           so content stays aligned whether or not a row has an icon. */}
       <span className="start">
-        {icon ? <Icon width={16} height={16} icon={icon} /> : null}
+        {icon ? <Icon icon={icon} /> : null}
       </span>
       {/* `title` — native tooltip fallback for truncated text. */}
       <span

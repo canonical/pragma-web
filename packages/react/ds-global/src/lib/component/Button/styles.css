@@ -30,7 +30,7 @@
        separate component channel. */
     --button-padding-inline-end: var(--ds-spacing-action);
     --button-padding-inline-start: var(--ds-spacing-action);
-    --button-gap: var(--dimension-100);
+    --button-gap: var(--ds-spacing-mark);
     --button-border-width: var(--dimension-stroke-thickness-medium);
     /* UI labels use the default 400 weight. */
     --button-font-weight: var(--font-weight-default, 400);
@@ -159,8 +159,8 @@
     align-self: center;
     justify-content: center;
     flex-shrink: 0;
-    width: var(--icon-size, 1em);
-    height: var(--icon-size, 1em);
+    width: var(--icon-size, var(--ds-typography-body-font-size));
+    height: var(--icon-size, var(--ds-typography-body-font-size));
 
     /* The icon has its own colour channel (distinct from the label text): on a
        filled primary it is the on-fill contrast icon, on ghost importances the

@@ -1,5 +1,6 @@
 import { ICON_NAMES } from "@canonical/ds-assets";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { CSSProperties } from "react";
 import Component from "./Icon.js";
 
 const meta = {
@@ -40,7 +41,7 @@ export const Size: Story = {
     docs: {
       description: {
         story:
-          "Icons are sized relative to the `font-size` of their container.",
+          "Icons use the tier body icon size, independent of heading or container font size. Set `--icon-size` on an ancestor or Icon to override it; `1em` opts into parent-font sizing.",
       },
     },
   },
@@ -70,6 +71,21 @@ export const Size: Story = {
         To indicate a positive and/or prominent action&nbsp;
         <Component {...args} />
       </h6>
+      <p
+        style={
+          { fontSize: "1.5rem", "--icon-size": "1em" } as CSSProperties
+        }
+      >
+        Ancestor 1em override&nbsp;
+        <Component {...args} />
+      </p>
+      <p>
+        Direct override&nbsp;
+        <Component
+          {...args}
+          style={{ "--icon-size": "1.5rem" } as CSSProperties}
+        />
+      </p>
     </div>
   ),
 };

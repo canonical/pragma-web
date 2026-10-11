@@ -37,7 +37,7 @@ const Item = ({
       {/* Start cell is always rendered (empty when no icon) so content
           stays in the middle column — labels align with or without icons. */}
       <span className="start">
-        {icon ? <Icon width={16} height={16} icon={icon} /> : null}
+        {icon ? <Icon icon={icon} /> : null}
       </span>
       {/* `title` — native-tooltip fallback for the truncated label,
           not the custom 800ms-delay one. Only meaningful when `children` is

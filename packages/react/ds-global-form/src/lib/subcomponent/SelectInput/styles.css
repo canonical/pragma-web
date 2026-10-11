@@ -18,7 +18,8 @@
     appearance: none;
     box-sizing: border-box;
     --select-caret-color: var(--color-icon, currentColor);
-    --select-caret-half: 0.4em; /* each square; the chevron is two halves wide */
+    --select-caret-size: var(--ds-typography-body-font-size);
+    --select-caret-half: calc(var(--select-caret-size) / 2);
     /* left half: rising stroke ╱ */
     background-image:
       linear-gradient(
@@ -46,7 +47,11 @@
      * (`.ds.input.chrome` provides only the block padding). The end side leaves
      * room for the chevron. */
     padding-inline-start: var(--form-input-padding-inline);
-    padding-inline-end: calc(var(--form-input-padding-inline) * 2 + 1em);
+    padding-inline-end: calc(
+      var(--form-input-padding-inline) *
+      2 +
+      var(--select-caret-size)
+    );
   }
 
   @media (forced-colors: active) {
