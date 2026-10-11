@@ -63,7 +63,7 @@
 
 .bucket-sample figcaption {
   inline-size: var(--bucket-member-width);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .bucket-measure {

@@ -44,7 +44,7 @@
 
 .action-sample figcaption {
   inline-size: var(--action-member-width);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .action-measure {

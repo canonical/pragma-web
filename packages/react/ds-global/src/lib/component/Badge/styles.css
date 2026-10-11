@@ -10,7 +10,7 @@
     --badge-border-radius: var(--dimension-radius-full);
     --badge-font-family: var(--typography-text-tertiary-bold-font-family);
     --badge-font-size: var(--typography-text-tertiary-bold-font-size);
-    --badge-font-weight: var(--typography-text-tertiary-bold-font-weight);
+    --badge-font-weight: var(--font-weight-default, 400);
     --badge-letter-spacing: var(--typography-text-tertiary-bold-letter-spacing);
     --badge-line-height: var(--typography-text-tertiary-bold-line-height);
     --badge-padding-vertical: 0;

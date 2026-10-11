@@ -29,7 +29,7 @@
       transition: background-color var(--motion-duration-fast) ease;
 
       &.selected {
-        font-weight: bold;
+        font-weight: var(--font-weight-default, 400);
       }
 
       &.highlighted,

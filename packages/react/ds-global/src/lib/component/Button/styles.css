@@ -32,8 +32,8 @@
     --button-padding-inline-start: var(--ds-spacing-action);
     --button-gap: var(--dimension-100);
     --button-border-width: var(--dimension-stroke-thickness-medium);
-    /* Label weight — the button label is medium, not the `.p` body weight. */
-    --button-font-weight: var(--typography-weight-medium);
+    /* UI labels use the default 400 weight. */
+    --button-font-weight: var(--font-weight-default, 400);
     /* The control-block seat uses the tier body font and line. */
     --button-font-size: var(--ds-typography-body-font-size);
     --button-line-height: var(--ds-typography-body-line-height);
