@@ -12,7 +12,7 @@
     --chip-color-border: var(--color-border-high-contrast);
     --chip-color-text: var(--color-text);
 
-    --chip-border-radius: 1rem;
+    --chip-border-radius: 999rem;
     --chip-font-size: var(--ds-typography-body-font-size);
     --chip-font-weight: var(--font-weight-default);
     --chip-line-height: var(--ds-typography-body-line-height);

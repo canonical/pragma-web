@@ -74,6 +74,7 @@ const readMetrics = (
   usesControlInset: boolean,
   referenceOwner: HTMLElement | null,
   hasTextBaseline: boolean,
+  centersLineBox: boolean,
   naturalVisibleOwner: HTMLElement | null,
 ): Metrics => {
   const ownerStyle = getComputedStyle(owner);
@@ -96,11 +97,28 @@ const readMetrics = (
   const paddingEnd = number(style.paddingBlockEnd);
   const marginEnd = number(style.marginBlockEnd);
   const ownerMarginEnd = number(ownerStyle.marginBlockEnd);
+  const borderStart = number(baselineStyle.borderBlockStartWidth);
+  const borderEnd = number(baselineStyle.borderBlockEndWidth);
+  const baselinePaddingStart = number(baselineStyle.paddingBlockStart);
+  const baselinePaddingEnd = number(baselineStyle.paddingBlockEnd);
+  const lineBoxOffset = centersLineBox
+    ? Math.max(
+        0,
+        (baselineRect.height -
+          borderStart -
+          borderEnd -
+          baselinePaddingStart -
+          baselinePaddingEnd -
+          lineHeight) /
+          2,
+      )
+    : 0;
   const capModelBaseline = hasTextBaseline
     ? baselineRect.top -
       ownerRect.top +
-      number(baselineStyle.borderBlockStartWidth) +
-      number(baselineStyle.paddingBlockStart) +
+      borderStart +
+      baselinePaddingStart +
+      lineBoxOffset +
       naturalBaseline
     : null;
   const borderValues = [
@@ -195,6 +213,7 @@ const Measured = ({
   usesControlInset = true,
   reference = false,
   hasTextBaseline = true,
+  centersLineBox = false,
   naturalVisibleSelector,
 }: {
   label: string;
@@ -206,6 +225,7 @@ const Measured = ({
   usesControlInset?: boolean;
   reference?: boolean;
   hasTextBaseline?: boolean;
+  centersLineBox?: boolean;
   naturalVisibleSelector?: string;
 }) => {
   const root = useRef<HTMLDivElement>(null);
@@ -246,6 +266,7 @@ const Measured = ({
             usesControlInset,
             referenceOwner ?? null,
             hasTextBaseline,
+            centersLineBox,
             naturalVisibleOwner,
           ),
         );
@@ -277,6 +298,7 @@ const Measured = ({
     };
   }, [
     baselineSelector,
+    centersLineBox,
     globalOwnerSelector,
     hasTextBaseline,
     naturalVisibleSelector,
@@ -396,6 +418,7 @@ const Tier = ({
         label="TextInput wrapper / leaf"
         ownerSelector=".input.text"
         baselineSelector="input"
+        centersLineBox
       >
         <TextInput name={`${tier}-text`} defaultValue="Text input" />
       </Measured>
@@ -403,6 +426,7 @@ const Tier = ({
         label="NumberInput wrapper / leaf"
         ownerSelector=".input.number"
         baselineSelector="input"
+        centersLineBox
       >
         <NumberInput name={`${tier}-number`} defaultValue={42} suffix="kg" />
       </Measured>
@@ -410,6 +434,7 @@ const Tier = ({
         label="PasswordInput wrapper / leaf"
         ownerSelector=".input.password"
         baselineSelector="input"
+        centersLineBox
       >
         <PasswordInput name={`${tier}-password`} defaultValue="secret" />
       </Measured>
@@ -417,6 +442,7 @@ const Tier = ({
         label="PhoneInput wrapper / number leaf"
         ownerSelector=".input.phone"
         baselineSelector=".number-input"
+        centersLineBox
       >
         <PhoneInput
           name={`${tier}-phone`}
@@ -443,6 +469,7 @@ const Tier = ({
         label="ComboboxInput inner chrome"
         ownerSelector=".input.combobox-input"
         baselineSelector="input"
+        centersLineBox
       >
         <ComboboxInput
           value="one"

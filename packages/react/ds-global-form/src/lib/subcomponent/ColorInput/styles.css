@@ -120,6 +120,10 @@
     user-select: none;
   }
 
+  .ds.input.color.inline .hex-prefix {
+    font-size: inherit;
+  }
+
   /* Hex input inside popover — has its own border */
   .ds.input.color > .color-popover > .hex-input-row > .hex-input {
     flex: 1;
