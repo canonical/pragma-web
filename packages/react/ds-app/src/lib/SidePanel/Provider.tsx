@@ -40,7 +40,8 @@ const componentCssClassName = "ds side-panel";
  * `useScrollOverflow` hook; engines with neither paint nothing. The content
  * pane is a tab stop, so keyboard users can scroll it; opening the panel
  * still focuses the panel itself, so from there Tab reaches the close
- * button, then the content, then the footer's actions.
+ * button, then the content, then the footer's actions. The actions
+ * line up at the inline-start edge — render the primary action first.
  *
  * There are two consumption patterns, `withSidePanel` and `SidePanel`.
  * `withSidePanel` is meant for static content: the call belongs at module
