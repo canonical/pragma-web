@@ -49,6 +49,35 @@
      seat receives a zero end margin through the inherited helper input. */
   :where(.ds.spacing-control-group) {
     --ds-control-seat-margin-block-end: 0px;
+    --ds-control-group-baseline-offset: calc(
+      (var(--ds-typography-body-line-height) + 1cap) /
+      2
+    );
+    --ds-control-group-baseline-nudge: round(
+      nearest,
+      calc(
+        round(
+          up,
+          var(--ds-control-group-baseline-offset),
+          var(--ds-spacing-baseline)
+        ) -
+        var(--ds-control-group-baseline-offset)
+      ),
+      0.015625px
+    );
+    --ds-control-group-single-row-size: calc(
+      var(--ds-typography-body-line-height) +
+      2 *
+      (var(--ds-spacing-control-inset) + var(--ds-control-group-baseline-nudge))
+    );
+    --ds-control-group-single-row-compensation: calc(
+      round(
+        up,
+        var(--ds-control-group-single-row-size),
+        var(--ds-spacing-baseline)
+      ) -
+      var(--ds-control-group-single-row-size)
+    );
     block-size: calc-size(auto, round(up, size, var(--ds-spacing-baseline)));
   }
 

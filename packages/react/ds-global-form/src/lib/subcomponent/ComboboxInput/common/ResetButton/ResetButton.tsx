@@ -28,7 +28,9 @@ const ResetButton = ({
       type="button"
       onClick={onClick}
     >
-      x
+      <span className="reset-glyph" aria-hidden="true">
+        x
+      </span>
     </button>
   );
 };

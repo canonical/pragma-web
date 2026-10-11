@@ -10,7 +10,7 @@
 
   .ds.input.color > .color-trigger {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--form-field-inline-gap);
     width: 100%;
     box-sizing: border-box;
@@ -39,6 +39,7 @@
     border-radius: var(--dimension-radius-small);
     border: var(--form-input-border-width) solid var(--form-input-border-color);
     flex-shrink: 0;
+    align-self: center;
   }
 
   .ds.input.color > .color-popover {
@@ -107,7 +108,7 @@
   /* Inline variant (hex-only, no popover) — apply chrome on the row */
   .ds.input.color.inline > .hex-input-row {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--form-field-inline-gap);
     padding-inline: var(--form-input-padding-inline);
     border-radius: var(--form-input-border-radius);

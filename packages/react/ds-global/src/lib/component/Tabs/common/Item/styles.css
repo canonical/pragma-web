@@ -18,7 +18,7 @@
    */
   :root {
     --tabs-tab-border-width: var(--dimension-strokeThickness-large, 2px);
-    --tabs-tab-padding-inline: var(--space-200); /* 16px */
+    --tabs-tab-padding-inline: var(--ds-spacing-action);
     --tabs-tab-focus-ring-width: var(--dimension-strokeThickness-large, 2px);
     --tabs-tab-focus-ring-color: var(--color-focus-ring);
   }
@@ -28,6 +28,7 @@
   }
 
   .ds.tabs-item .tabs-link {
+    --tabs-tab-padding-inline: var(--ds-spacing-action);
     --ds-stroke-width: var(--tabs-tab-border-width);
     --ds-stroke-color: transparent;
     --ds-focus-width: var(--tabs-tab-focus-ring-width);

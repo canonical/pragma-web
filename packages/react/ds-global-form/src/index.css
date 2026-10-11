@@ -320,7 +320,15 @@
       --ds-focus-color: var(--form-focus-ring-color, currentColor);
       --ds-focus-offset: 0;
       block-size: auto;
-      min-block-size: 0;
+      min-block-size: var(--ds-control-occupied-size);
+    }
+
+    /* Composite wrappers own the seated padding. Stretch their native input and
+       button hit areas through those padding bands without moving text or
+       changing the wrapper's occupied size. */
+    &.spacing-control-seat > :is(input, button, select) {
+      align-self: stretch;
+      margin-block: calc(-1 * var(--ds-control-padding-block));
     }
 
     &.spacing-control-seat.stroke-paint:focus-visible,

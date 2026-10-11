@@ -5,6 +5,18 @@
   background: var(--color-background);
 }
 
+.spacing-control-block .color-popover:not(:popover-open) {
+  display: none;
+}
+
+/* Exercise the same production fallback remainder even when this browser
+   supports the enhanced intrinsic-size path. */
+.spacing-control-block .spacing-control-force-fallback {
+  display: flow-root;
+  block-size: auto;
+  margin-block-end: var(--ds-control-group-single-row-compensation);
+}
+
 .bucket-tier {
   margin-block: 2rem;
   padding: 1rem;

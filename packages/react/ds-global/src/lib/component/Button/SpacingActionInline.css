@@ -1,0 +1,84 @@
+.spacing-action-inline {
+  --action-member-width: 15rem;
+  padding: 2rem;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+.action-tier {
+  margin-block: 2rem;
+  padding: 1rem;
+  overflow-x: auto;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, Highlight 18%, transparent) 0 1px,
+    transparent 1px var(--ds-spacing-baseline)
+  );
+}
+
+.action-tier > header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-block-end: 1rem;
+}
+
+.action-tier > header > :is(h2, span) {
+  margin: 0;
+}
+
+.action-samples {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto auto;
+  grid-auto-columns: var(--action-member-width);
+  align-items: first baseline;
+  column-gap: 1.5rem;
+  row-gap: 0.5rem;
+  min-inline-size: max-content;
+}
+
+.action-sample {
+  display: contents;
+}
+
+.action-sample figcaption {
+  inline-size: var(--action-member-width);
+  font-weight: 600;
+}
+
+.action-measure {
+  position: relative;
+  display: flex;
+  align-items: first baseline;
+  min-block-size: 5rem;
+}
+
+.action-measure--portal {
+  min-block-size: 8rem;
+  align-items: flex-start;
+}
+
+.action-measure:not(.action-measure--portal)::after {
+  position: absolute;
+  z-index: -1;
+  inset-inline: 0;
+  inset-block-start: var(--action-baseline, 0);
+  border-block-start: 1px solid Highlight;
+  content: "";
+}
+
+.action-measure > :is(.button, .chip, .tabs) {
+  outline: 1px dashed color-mix(in srgb, Highlight 65%, transparent);
+  outline-offset: -1px;
+}
+
+.action-metrics {
+  box-sizing: border-box;
+  inline-size: var(--action-member-width);
+  padding: 0.5rem;
+  font: 0.75rem / 1.35 monospace;
+  overflow-wrap: anywhere;
+  color: var(--color-text-muted, currentColor);
+  background: color-mix(in srgb, Canvas 88%, transparent);
+}

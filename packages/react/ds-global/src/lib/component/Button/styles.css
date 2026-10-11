@@ -26,14 +26,10 @@
     --button-color-text: var(--color-text);
     --button-color-border: var(--color-border-highlighted, var(--color-border));
 
-    /* Inline padding (Figma):
-       - end (right): always dimension-200 (16px) — the label always sits 16px
-         from the trailing edge.
-       - start (left): dimension-200 (16px) with no icon; dimension-100 (8px) when
-         an icon leads (the icon then sits closer to the edge), with a
-         dimension-100 (8px) gap between the icon and the label. */
-    --button-padding-inline-end: var(--dimension-200);
-    --button-padding-inline-start: var(--dimension-200);
+    /* Both inline edges use the action inset. The icon-to-label gap remains a
+       separate component channel. */
+    --button-padding-inline-end: var(--ds-spacing-action);
+    --button-padding-inline-start: var(--ds-spacing-action);
     --button-gap: var(--dimension-100);
     --button-border-width: var(--dimension-stroke-thickness-medium);
     /* Label weight — the button label is medium, not the `.p` body weight. */
@@ -69,6 +65,8 @@
        root-resolved Site values. */
     --button-font-size: var(--ds-typography-body-font-size);
     --button-line-height: var(--ds-typography-body-line-height);
+    --button-padding-inline-end: var(--ds-spacing-action);
+    --button-padding-inline-start: var(--ds-spacing-action);
     --ds-control-seat-font-size: var(--button-font-size);
     --ds-control-seat-line-height: var(--button-line-height);
     --ds-stroke-width: var(--button-border-width);
@@ -113,12 +111,6 @@
       color var(--motion-duration-fast) var(--motion-easing-standard),
       box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
 
-    &:has(> .icon) {
-      --button-padding-inline-start: var(--dimension-100);
-    }
-
-    /* A leading icon tightens the start padding to dimension-100; the gap between
-       the icon and label is already dimension-100. */
     /* State fallbacks resolve to the default (primary) surface states when no
        importance modifier supplies `--modifier-surface-*`. */
     &:hover:not(:disabled) {

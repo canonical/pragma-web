@@ -19,7 +19,7 @@
     --contextual-menu-item-color-background-active: var(
       --color-foreground-ghost-active
     );
-    --contextual-menu-item-padding-inline: var(--dimension-200);
+    --contextual-menu-item-padding-inline: var(--ds-spacing-action);
     /* 4px gap: icon<->text and text<->caret (per the spec). */
     --contextual-menu-item-gap: var(--dimension-050);
     /* De-emphasised slot text (badge / shortcut) — muted, matching
@@ -37,6 +37,7 @@
   }
 
   .ds.contextual-menu-item {
+    --contextual-menu-item-padding-inline: var(--ds-spacing-action);
     display: flex;
     /* Icon and first line of text are centre-aligned (Figma annotation). */
     align-items: center;

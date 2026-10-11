@@ -33,7 +33,10 @@ type Metrics = {
   visible: number;
   occupied: number;
   borders: string;
-  capModelBaseline: number;
+  capModelBaseline: number | null;
+  blockStartDifference: number | null;
+  naturalVisible: number | null;
+  setClosure: number | null;
 };
 
 const number = (value: string): number => Number.parseFloat(value) || 0;
@@ -69,6 +72,9 @@ const readMetrics = (
   baselineOwner: HTMLElement,
   seatOwner: HTMLElement,
   usesControlInset: boolean,
+  referenceOwner: HTMLElement | null,
+  hasTextBaseline: boolean,
+  naturalVisibleOwner: HTMLElement | null,
 ): Metrics => {
   const ownerStyle = getComputedStyle(owner);
   const style = getComputedStyle(seatOwner);
@@ -90,12 +96,13 @@ const readMetrics = (
   const paddingEnd = number(style.paddingBlockEnd);
   const marginEnd = number(style.marginBlockEnd);
   const ownerMarginEnd = number(ownerStyle.marginBlockEnd);
-  const capModelBaseline =
-    baselineRect.top -
-    ownerRect.top +
-    number(baselineStyle.borderBlockStartWidth) +
-    number(baselineStyle.paddingBlockStart) +
-    naturalBaseline;
+  const capModelBaseline = hasTextBaseline
+    ? baselineRect.top -
+      ownerRect.top +
+      number(baselineStyle.borderBlockStartWidth) +
+      number(baselineStyle.paddingBlockStart) +
+      naturalBaseline
+    : null;
   const borderValues = [
     style.borderBlockStartWidth,
     style.borderInlineEndWidth,
@@ -115,6 +122,13 @@ const readMetrics = (
     occupied: ownerRect.height + ownerMarginEnd,
     borders: borderValues.join(" / "),
     capModelBaseline,
+    blockStartDifference: referenceOwner
+      ? ownerRect.top - referenceOwner.getBoundingClientRect().top
+      : null,
+    naturalVisible: naturalVisibleOwner
+      ? naturalVisibleOwner.getBoundingClientRect().height
+      : null,
+    setClosure: naturalVisibleOwner ? ownerRect.height + ownerMarginEnd : null,
   };
 };
 
@@ -138,9 +152,24 @@ const MetricsOutput = ({
         <br />
         visible/occupied {show(metrics.visible)} / {show(metrics.occupied)}
         <br />
+        {metrics.naturalVisible != null ? (
+          <>
+            natural strip/set closure {show(metrics.naturalVisible)} /{" "}
+            {show(metrics.setClosure ?? 0)}
+            <br />
+          </>
+        ) : null}
+        {metrics.blockStartDifference != null && !portal ? (
+          <>
+            block-start vs Plain Button {show(metrics.blockStartDifference)}
+            <br />
+          </>
+        ) : null}
         layout borders {metrics.borders}
         <br />
-        cap-model baseline offset {show(metrics.capModelBaseline)}
+        {metrics.capModelBaseline == null
+          ? "no text baseline"
+          : `cap-model baseline offset ${show(metrics.capModelBaseline)}`}
         {portal ? (
           <>
             <br />
@@ -164,6 +193,9 @@ const Measured = ({
   seatSelector,
   globalOwnerSelector,
   usesControlInset = true,
+  reference = false,
+  hasTextBaseline = true,
+  naturalVisibleSelector,
 }: {
   label: string;
   children: React.ReactNode;
@@ -172,6 +204,9 @@ const Measured = ({
   seatSelector?: string;
   globalOwnerSelector?: string;
   usesControlInset?: boolean;
+  reference?: boolean;
+  hasTextBaseline?: boolean;
+  naturalVisibleSelector?: string;
 }) => {
   const root = useRef<HTMLDivElement>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -192,13 +227,27 @@ const Measured = ({
       const seatOwner = (
         seatSelector ? owner?.querySelector(seatSelector) : owner
       ) as HTMLElement | null;
+      const referenceOwner = local
+        ?.closest(".bucket-tier")
+        ?.querySelector<HTMLElement>("[data-bucket-reference] .button");
+      const naturalVisibleOwner = naturalVisibleSelector
+        ? (owner?.querySelector(naturalVisibleSelector) as HTMLElement | null)
+        : null;
       const ownerStyle = owner ? getComputedStyle(owner) : null;
       const ownerIsVisible =
         ownerStyle?.display !== "none" && ownerStyle?.visibility !== "hidden";
       if (owner && baselineOwner && seatOwner && ownerIsVisible) {
         observer?.disconnect();
         setMetrics(
-          readMetrics(owner, baselineOwner, seatOwner, usesControlInset),
+          readMetrics(
+            owner,
+            baselineOwner,
+            seatOwner,
+            usesControlInset,
+            referenceOwner ?? null,
+            hasTextBaseline,
+            naturalVisibleOwner,
+          ),
         );
       }
     };
@@ -229,6 +278,8 @@ const Measured = ({
   }, [
     baselineSelector,
     globalOwnerSelector,
+    hasTextBaseline,
+    naturalVisibleSelector,
     ownerSelector,
     seatSelector,
     usesControlInset,
@@ -240,10 +291,13 @@ const Measured = ({
       <div
         className={`bucket-measure${globalOwnerSelector ? " bucket-measure--portal" : ""}`}
         ref={root}
+        data-bucket-reference={reference || undefined}
         style={
           {
             "--bucket-first-baseline":
-              metrics && !globalOwnerSelector
+              metrics &&
+              metrics.capModelBaseline != null &&
+              !globalOwnerSelector
                 ? `${metrics.capModelBaseline}px`
                 : undefined,
           } as React.CSSProperties
@@ -319,13 +373,17 @@ const Tier = ({
       >
         <p className="ds">Body paragraph</p>
       </Measured>
-      <Measured label="Plain Button" ownerSelector=".button">
+      <Measured label="Plain Button" ownerSelector=".button" reference>
         <Button>Button</Button>
       </Measured>
       <Measured label="Leading-icon Button" ownerSelector=".button">
         <Button icon="edit">Edit</Button>
       </Measured>
-      <Measured label="Icon-only Button" ownerSelector=".button">
+      <Measured
+        label="Icon-only Button"
+        ownerSelector=".button"
+        hasTextBaseline={false}
+      >
         <Button icon="edit" aria-label="Edit" />
       </Measured>
       <Measured label="Static dismissible Chip" ownerSelector=".chip">
@@ -424,9 +482,24 @@ const Tier = ({
         ownerSelector=".tabs"
         seatSelector=".tabs-link"
         baselineSelector=".tabs-link"
+        naturalVisibleSelector=".tabs-list"
       >
         <Tabs
           aria-label={`${title} sections`}
+          navigationRoot={tabsRoot}
+          currentUrl="#/overview"
+        />
+      </Measured>
+      <Measured
+        label="Tabs forced fallback"
+        ownerSelector=".tabs"
+        seatSelector=".tabs-link"
+        baselineSelector=".tabs-link"
+        naturalVisibleSelector=".tabs-list"
+      >
+        <Tabs
+          className="spacing-control-force-fallback"
+          aria-label={`${title} sections, forced fallback`}
           navigationRoot={tabsRoot}
           currentUrl="#/overview"
         />
