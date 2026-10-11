@@ -52,7 +52,7 @@
         transparent
       );
       font-size: 0.625rem;
-      font-weight: 700;
+      font-weight: 400;
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
@@ -94,7 +94,7 @@
         transparent
       );
       font-size: 0.6875rem;
-      font-weight: 600;
+      font-weight: 400;
     }
 
     &.dimension {

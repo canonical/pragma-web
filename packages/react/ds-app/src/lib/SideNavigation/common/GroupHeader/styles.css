@@ -7,7 +7,7 @@
     color: var(--color-text-muted);
     font-family: var(--typography-text-tertiary-bold-font-family);
     font-size: var(--typography-text-tertiary-bold-font-size);
-    font-weight: var(--typography-text-tertiary-bold-font-weight);
+    font-weight: var(--font-weight-default, 400);
     line-height: var(--typography-text-tertiary-bold-line-height);
     letter-spacing: var(--typography-text-tertiary-bold-letter-spacing);
     padding-top: var(--sidenav-icon-gap);

@@ -27,6 +27,6 @@
     padding-inline: var(--tile-header-padding-inline);
     gap: var(--tile-header-gap);
 
-    font-weight: var(--typography-weight-semibold, 600);
+    font-weight: var(--font-weight-default, 400);
   }
 }

@@ -33,6 +33,10 @@
         text-align: left;
         font-weight: var(--editable-block-header-title-font-weight);
       }
+
+      > .title:not(:is(h1, h2, h3, h4, h5, h6)) {
+        font-weight: 400;
+      }
     }
 
     > .content {

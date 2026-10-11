@@ -35,7 +35,7 @@
     */
     --modal-header-font-family: var(--typography-heading-2-font-family);
     --modal-header-font-size: var(--typography-heading-2-font-size);
-    --modal-header-font-weight: var(--typography-heading-2-font-weight);
+    --modal-header-font-weight: var(--font-weight-default, 400);
     --modal-header-letter-spacing: var(--typography-heading-2-letter-spacing);
     /*
       The exact dimension takes precedence; the round() path is the

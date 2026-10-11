@@ -13,7 +13,7 @@
     */
     --side-panel-title-font-family: var(--typography-heading-2-font-family);
     --side-panel-title-font-size: var(--typography-heading-2-font-size);
-    --side-panel-title-font-weight: var(--typography-heading-2-font-weight);
+    --side-panel-title-font-weight: var(--font-weight-default, 400);
     --side-panel-title-letter-spacing: var(
       --typography-heading-2-letter-spacing
     );

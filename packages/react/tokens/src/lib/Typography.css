@@ -43,7 +43,7 @@
 .typography-page .eyebrow {
   color: color-mix(in srgb, var(--token-story-ink, #171717) 65%, transparent);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -99,7 +99,7 @@
 
 .typography-sample .eyebrow {
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: color-mix(in srgb, currentColor 65%, transparent);

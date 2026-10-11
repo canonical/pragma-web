@@ -80,7 +80,7 @@
         align-self: flex-end;
       }
       &.current .name {
-        font-weight: var(--typography-weight-medium);
+        font-weight: var(--font-weight-default, 400);
       }
     }
 
