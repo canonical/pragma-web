@@ -147,8 +147,10 @@
 
   /* Hex input inline — borderless, chrome is on the row */
   .ds.input.color.inline > .hex-input-row > .hex-input {
+    align-self: baseline;
     flex: 1;
     min-width: 0;
+    margin-block: 0;
     border: none;
     background: transparent;
     color: var(--form-input-color);
