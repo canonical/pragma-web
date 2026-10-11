@@ -9,13 +9,26 @@
     flex: none;
 
     /*
-      Inset by margin rather than padding, so the actions stay in line with
-      the text column while the pane's edge line runs the full panel width.
-    */
-    margin-inline: var(--side-panel-padding-inline);
+      Closes the scroll region, marking where the content pane ends and the
+      actions begin. The hairline runs edge to edge across the panel, so the
+      footer insets its ACTIONS with padding rather than insetting itself with
+      margin — a border spans the padding box, and padding keeps it full width
+      while the buttons stay in the text column.
 
+      The colour is the panel's to own, and is read without a local fallback so
+      the two cannot state different defaults: `--side-panel-color-border` is
+      declared in the panel's `:root` block.
+    */
+    border-block-start: var(--dimension-stroke-thickness-medium) solid
+      var(--side-panel-color-border);
+    padding-inline: var(--side-panel-padding-inline);
+
+    /*
+      Actions start at the inline-start edge, and the consumer renders the
+      primary action first: order in the markup is order on screen.
+    */
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
     gap: var(--side-panel-footer-gap);
     flex-wrap: wrap;
