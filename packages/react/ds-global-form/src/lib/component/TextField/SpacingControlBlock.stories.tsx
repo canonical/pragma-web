@@ -1,7 +1,6 @@
 import {
   Button,
   Chip,
-  ContextualMenu,
   ContextualMenuItem,
   Tabs,
 } from "@canonical/react-ds-global";
@@ -229,13 +228,7 @@ const readMetrics = (
   };
 };
 
-const MetricsOutput = ({
-  metrics,
-  portal,
-}: {
-  metrics: Metrics | null;
-  portal: boolean;
-}) => (
+const MetricsOutput = ({ metrics }: { metrics: Metrics | null }) => (
   <output
     className="bucket-metrics"
     data-metrics={metrics ? JSON.stringify(metrics) : undefined}
@@ -260,7 +253,7 @@ const MetricsOutput = ({
             <br />
           </>
         ) : null}
-        {metrics.blockStartDifference != null && !portal ? (
+        {metrics.blockStartDifference != null ? (
           <>
             block-start vs Plain Button {show(metrics.blockStartDifference)}
             <br />
@@ -271,15 +264,7 @@ const MetricsOutput = ({
         {metrics.baseline == null
           ? "no text baseline"
           : `browser baseline offset ${show(metrics.baseline)}`}
-        {portal ? (
-          <>
-            <br />
-            portal tier measurement; outside shared row
-          </>
-        ) : null}
       </>
-    ) : portal ? (
-      "open Actions to measure"
     ) : (
       "awaiting fonts and styles"
     )}
@@ -292,22 +277,22 @@ const Measured = ({
   ownerSelector,
   baselineSelector,
   seatSelector,
-  globalOwnerSelector,
   usesControlInset = true,
   reference = false,
   hasTextBaseline = true,
   naturalVisibleSelector,
+  flow = false,
 }: {
   label: string;
   children: React.ReactNode;
   ownerSelector: string;
   baselineSelector?: string;
   seatSelector?: string;
-  globalOwnerSelector?: string;
   usesControlInset?: boolean;
   reference?: boolean;
   hasTextBaseline?: boolean;
   naturalVisibleSelector?: string;
+  flow?: boolean;
 }) => {
   const root = useRef<HTMLDivElement>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -317,20 +302,18 @@ const Measured = ({
     let observer: MutationObserver | undefined;
     const update = () => {
       const local = root.current;
-      const owner = (
-        globalOwnerSelector
-          ? document.querySelector(globalOwnerSelector)
-          : local?.querySelector(ownerSelector)
-      ) as HTMLElement | null;
+      const owner = local?.querySelector(ownerSelector) as HTMLElement | null;
       const baselineOwner = (
         baselineSelector ? owner?.querySelector(baselineSelector) : owner
       ) as HTMLElement | null;
       const seatOwner = (
         seatSelector ? owner?.querySelector(seatSelector) : owner
       ) as HTMLElement | null;
-      const referenceOwner = local
-        ?.closest(".bucket-tier")
-        ?.querySelector<HTMLElement>("[data-bucket-reference] .button");
+      const referenceOwner = flow
+        ? null
+        : local
+            ?.closest(".bucket-tier")
+            ?.querySelector<HTMLElement>("[data-bucket-reference] .button");
       const naturalVisibleOwner = naturalVisibleSelector
         ? (owner?.querySelector(naturalVisibleSelector) as HTMLElement | null)
         : null;
@@ -347,7 +330,7 @@ const Measured = ({
           hasTextBaseline,
           naturalVisibleOwner,
         );
-        if (!globalOwnerSelector && local) {
+        if (local) {
           const localRect = local.getBoundingClientRect();
           nextMetrics.guideLeft -= localRect.left;
           nextMetrics.guideTop -= localRect.top;
@@ -361,8 +344,6 @@ const Measured = ({
           }
         }
         setMetrics(nextMetrics);
-      } else if (globalOwnerSelector) {
-        setMetrics(null);
       }
     };
     const schedule = () => {
@@ -390,17 +371,7 @@ const Measured = ({
       });
       if (hasRelevantMutation) schedule();
     });
-    observer.observe(
-      document.body,
-      globalOwnerSelector
-        ? {
-            attributes: true,
-            attributeFilter: ["aria-hidden", "class", "style"],
-            childList: true,
-            subtree: true,
-          }
-        : { childList: true, subtree: true },
-    );
+    observer.observe(document.body, { childList: true, subtree: true });
     window.addEventListener("resize", schedule);
     window.addEventListener("scroll", schedule, true);
     schedule();
@@ -412,7 +383,7 @@ const Measured = ({
     };
   }, [
     baselineSelector,
-    globalOwnerSelector,
+    flow,
     hasTextBaseline,
     naturalVisibleSelector,
     ownerSelector,
@@ -424,7 +395,7 @@ const Measured = ({
     <figure className="bucket-sample">
       <figcaption>{label}</figcaption>
       <div
-        className={`bucket-measure${globalOwnerSelector ? " bucket-measure--portal" : ""}${globalOwnerSelector && metrics ? " bucket-measure--open" : ""}`}
+        className={`bucket-measure${flow ? " bucket-measure--flow" : ""}`}
         ref={root}
         data-bucket-reference={reference || undefined}
       >
@@ -432,7 +403,7 @@ const Measured = ({
         {metrics ? (
           <span
             aria-hidden="true"
-            className={`bucket-guide${globalOwnerSelector ? " bucket-guide--portal" : ""}`}
+            className="bucket-guide"
             style={
               {
                 "--bucket-guide-left": `${metrics.guideLeft}px`,
@@ -470,7 +441,7 @@ const Measured = ({
           </span>
         ) : null}
       </div>
-      <MetricsOutput metrics={metrics} portal={Boolean(globalOwnerSelector)} />
+      <MetricsOutput metrics={metrics} />
     </figure>
   );
 };
@@ -482,37 +453,6 @@ const tabsRoot: React.ComponentProps<typeof Tabs>["navigationRoot"] = {
     { key: "overview", label: "Overview", url: "#/overview" },
     { key: "details", label: "Details", url: "#/details" },
   ],
-};
-
-const TierMenu = ({ tier }: { tier: string }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <ContextualMenu
-      label={`${tier} actions`}
-      open={open}
-      onOpenChange={setOpen}
-      preferredDirections={[{ side: "block-end", align: "start" }]}
-      maxWidth="16rem"
-      items={[
-        {
-          key: `${tier}-open`,
-          label: "Open details",
-          url: "#open",
-        },
-        { type: "separator", key: `${tier}-separator` },
-        {
-          key: `${tier}-more`,
-          label: "More actions with a wrapping label",
-          items: [
-            { key: `${tier}-edit`, label: "Edit", url: "#edit" },
-            { key: `${tier}-copy`, label: "Copy link", url: "#copy" },
-          ],
-        },
-      ]}
-    >
-      Menu
-    </ContextualMenu>
-  );
 };
 
 const MenuItemFixture = ({ tier }: { tier: string }) => {
@@ -551,14 +491,18 @@ const Tier = ({
         Grid unit: <span className="tier-unit" />
       </p>
     </header>
-    <div className="bucket-samples">
+    <div className="bucket-body-flow">
       <Measured
-        label="Body"
+        label="Body flow"
         ownerSelector="p.ds"
         usesControlInset={false}
+        flow
       >
         <p className="ds">Body paragraph</p>
+        <span className="bucket-following-flow-marker" aria-hidden="true" />
       </Measured>
+    </div>
+    <div className="bucket-samples">
       <Measured
         label="Button"
         ownerSelector=".button"
@@ -717,10 +661,6 @@ const Tier = ({
         <MenuItemFixture tier={tier} />
       </Measured>
     </div>
-    <div className="bucket-menu-demo">
-      <span>Interactive menu:</span>
-      <TierMenu tier={tier} />
-    </div>
   </section>
 );
 
@@ -731,6 +671,7 @@ export const SiteDocsApp: Story = {
       <p className="bucket-legend">
         <span className="bucket-legend-edge" /> block start / occupied end
         <span className="bucket-legend-baseline" /> browser text baseline
+        <span className="bucket-legend-following" /> following flow start
       </p>
       <p>No shipped Pragma equivalents: SegmentedControl and Pagination.</p>
       <Tier tier="site" title="Site" />

@@ -2,10 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Chip } from "../Chip/index.js";
-import {
-  ContextualMenu,
-  ContextualMenuItem,
-} from "../ContextualMenu/index.js";
+import { ContextualMenuItem } from "../ContextualMenu/index.js";
 import { Tabs } from "../Tabs/index.js";
 import { Button } from "./index.js";
 import "./SpacingActionInline.css";
@@ -181,13 +178,7 @@ const readMetrics = (
   };
 };
 
-const MetricsOutput = ({
-  metrics,
-  portal,
-}: {
-  metrics: Metrics | null;
-  portal: boolean;
-}) => (
+const MetricsOutput = ({ metrics }: { metrics: Metrics | null }) => (
   <output
     className="action-metrics"
     data-metrics={metrics ? JSON.stringify(metrics) : undefined}
@@ -205,15 +196,7 @@ const MetricsOutput = ({
         {metrics.iconBox == null
           ? "not present"
           : `${show(metrics.iconBox)} / ${show(metrics.iconGap ?? 0)}`}
-        {portal ? (
-          <>
-            <br />
-            portal tier measurement
-          </>
-        ) : null}
       </>
-    ) : portal ? (
-      "open Actions to measure"
     ) : (
       "awaiting fonts and styles"
     )}
@@ -226,7 +209,6 @@ const Measured = ({
   ownerSelector,
   labelSelector,
   iconSelector,
-  globalOwnerSelector,
   reference = false,
   hasTextBaseline = true,
   seatSelector,
@@ -237,7 +219,6 @@ const Measured = ({
   ownerSelector: string;
   labelSelector?: string;
   iconSelector?: string;
-  globalOwnerSelector?: string;
   reference?: boolean;
   hasTextBaseline?: boolean;
   seatSelector?: string;
@@ -249,11 +230,7 @@ const Measured = ({
   useEffect(() => {
     let frame = 0;
     const update = () => {
-      const owner = (
-        globalOwnerSelector
-          ? document.querySelector(globalOwnerSelector)
-          : root.current?.querySelector(ownerSelector)
-      ) as HTMLElement | null;
+      const owner = root.current?.querySelector(ownerSelector) as HTMLElement | null;
       const labelOwner = labelSelector
         ? owner?.querySelector<HTMLElement>(labelSelector)
         : owner;
@@ -283,7 +260,7 @@ const Measured = ({
           seatOwner,
           guideOwner,
         );
-        if (!globalOwnerSelector && root.current) {
+        if (root.current) {
           const localRect = root.current.getBoundingClientRect();
           nextMetrics.guideLeft -= localRect.left;
           nextMetrics.guideTop -= localRect.top;
@@ -297,8 +274,6 @@ const Measured = ({
           }
         }
         setMetrics(nextMetrics);
-      } else if (globalOwnerSelector) {
-        setMetrics(null);
       }
     };
     const schedule = () => {
@@ -329,7 +304,7 @@ const Measured = ({
       attributes: true,
       attributeFilter: ["aria-hidden", "class", "style"],
       childList: true,
-      subtree: Boolean(globalOwnerSelector),
+      subtree: true,
     });
     void document.fonts.ready.then(schedule);
     window.addEventListener("resize", schedule);
@@ -342,7 +317,6 @@ const Measured = ({
       window.removeEventListener("scroll", schedule, true);
     };
   }, [
-    globalOwnerSelector,
     hasTextBaseline,
     iconSelector,
     labelSelector,
@@ -356,7 +330,7 @@ const Measured = ({
     <figure className="action-sample">
       <figcaption>{label}</figcaption>
       <div
-        className={`action-measure${globalOwnerSelector ? " action-measure--portal" : ""}${globalOwnerSelector && metrics ? " action-measure--open" : ""}`}
+        className="action-measure"
         ref={root}
         data-action-reference={reference || undefined}
       >
@@ -364,7 +338,7 @@ const Measured = ({
         {metrics ? (
           <span
             aria-hidden="true"
-            className={`action-guide${globalOwnerSelector ? " action-guide--portal" : ""}`}
+            className="action-guide"
             style={
               {
                 "--action-guide-left": `${metrics.guideLeft}px`,
@@ -402,7 +376,7 @@ const Measured = ({
           </span>
         ) : null}
       </div>
-      <MetricsOutput metrics={metrics} portal={Boolean(globalOwnerSelector)} />
+      <MetricsOutput metrics={metrics} />
     </figure>
   );
 };
@@ -414,25 +388,6 @@ const tabsRoot: React.ComponentProps<typeof Tabs>["navigationRoot"] = {
     { key: "overview", label: "Overview", url: "#/overview" },
     { key: "details", label: "Details", url: "#/details" },
   ],
-};
-
-const TierMenu = ({ tier }: { tier: string }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <ContextualMenu
-      label={`${tier} actions`}
-      open={open}
-      onOpenChange={setOpen}
-      preferredDirections={[{ side: "block-end", align: "start" }]}
-      maxWidth="14rem"
-      items={[
-        { key: `${tier}-open`, label: "Open details", url: "#open" },
-        { key: `${tier}-copy`, label: "Copy link", url: "#copy" },
-      ]}
-    >
-      Menu
-    </ContextualMenu>
-  );
 };
 
 const MenuItemFixture = ({ tier }: { tier: string }) => {
@@ -541,10 +496,6 @@ const Tier = ({
       >
         <MenuItemFixture tier={tier} />
       </Measured>
-    </div>
-    <div className="action-menu-demo">
-      <span>Interactive menu:</span>
-      <TierMenu tier={tier} />
     </div>
   </section>
 );
