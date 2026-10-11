@@ -10,6 +10,11 @@
   gap: 0.5rem;
 }
 
+.marks-fixture-note {
+  margin-block: 0.5rem 0;
+  font-weight: 400;
+}
+
 .marks-legend-edge,
 .marks-legend-baseline {
   inline-size: 1.5rem;
@@ -100,10 +105,19 @@
   font-size: 1.25rem;
 }
 
-.marks-measure > .side-navigation {
-  inline-size: 15rem;
-  block-size: 14rem;
+/* Keep each public row and its native padding in its rail. The Footer's
+ * separate 8px region padding is retained; only unmeasured chrome is hidden. */
+.marks-measure > .side-navigation.marks-nav-fixture {
+  inline-size: max-content;
+  block-size: max-content;
+  gap: 0;
   color: #171717;
+}
+
+.marks-nav-fixture > .skip-link,
+.marks-nav-fixture > .side-navigation-header,
+.marks-nav-fixture > .content:empty {
+  display: none;
 }
 
 .marks-guide,

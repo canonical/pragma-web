@@ -339,41 +339,50 @@ const AccordionSpecimen = () => {
   );
 };
 
-const NavigationSpecimen = () => {
+const NavigationSpecimen = ({
+  kind,
+  tierLabel,
+}: {
+  kind: "marked" | "empty" | "expandable" | "action";
+  tierLabel: string;
+}) => {
   const [actionCount, setActionCount] = useState(0);
+  const item =
+    kind === "marked"
+      ? { key: "marked", label: "Marked", icon: "edit" as const }
+      : kind === "empty"
+        ? { key: "plain", label: "No icon" }
+        : {
+            key: "expandable",
+            label: "Expandable",
+            icon: "edit" as const,
+            items: [{ key: "child", label: "Child" }],
+          };
   return (
     <SideNavigation
-      applicationName="Marks"
+      className="marks-nav-fixture"
+      aria-label={`${tierLabel} ${kind} navigation`}
       keyboardShortcut={false}
-      root={{
-        key: "root",
-        items: [
-          {
-            key: "group",
-            items: [
-              { key: "marked", label: "Marked", icon: "edit" },
-              { key: "plain", label: "No icon" },
-              {
-                key: "expandable",
-                label: "Expandable",
-                icon: "edit",
-                items: [{ key: "child", label: "Child" }],
-              },
-            ],
-          },
-        ],
-      }}
-      footerRoot={{
-        key: "footer",
-        items: [
-          {
-            label: actionCount ? `Action ${actionCount}` : "Action",
-            icon: "edit",
-            control: "button",
-            onClick: () => setActionCount((count) => count + 1),
-          },
-        ],
-      }}
+      root={
+        kind === "action"
+          ? undefined
+          : { key: "root", items: [{ key: "group", items: [item] }] }
+      }
+      footerRoot={
+        kind === "action"
+          ? {
+              key: "footer",
+              items: [
+                {
+                  label: actionCount ? `Action ${actionCount}` : "Action",
+                  icon: "edit",
+                  control: "button",
+                  onClick: () => setActionCount((count) => count + 1),
+                },
+              ],
+            }
+          : undefined
+      }
     />
   );
 };
@@ -539,7 +548,7 @@ const Tier = ({
         markSelector=":scope > .start svg"
         labelSelector=":scope > .label"
       >
-        <NavigationSpecimen />
+        <NavigationSpecimen kind="marked" tierLabel={title} />
       </Measured>
       <Measured
         label="Nav empty slot"
@@ -547,7 +556,7 @@ const Tier = ({
         slotSelector=":scope > .start"
         labelSelector=":scope > .label"
       >
-        <NavigationSpecimen />
+        <NavigationSpecimen kind="empty" tierLabel={title} />
       </Measured>
       <Measured
         label="Nav disclosure"
@@ -556,7 +565,7 @@ const Tier = ({
         markSelector=":scope > .start svg"
         labelSelector=":scope > .label"
       >
-        <NavigationSpecimen />
+        <NavigationSpecimen kind="expandable" tierLabel={title} />
       </Measured>
       <Measured
         label="Nav action"
@@ -565,7 +574,7 @@ const Tier = ({
         markSelector=":scope > .start svg"
         labelSelector=":scope > .label"
       >
-        <NavigationSpecimen />
+        <NavigationSpecimen kind="action" tierLabel={title} />
       </Measured>
     </div>
   </section>
@@ -578,6 +587,10 @@ export const SiteDocsApp: Story = {
       <p className="marks-legend">
         <span className="marks-legend-edge" /> block start / occupied end{" "}
         <span className="marks-legend-baseline" /> browser text baseline
+      </p>
+      <p className="marks-fixture-note">
+        Navigation peers show one shipped row; this fixture hides the rail
+        header and skip link. The footer action keeps its region padding.
       </p>
       <Tier tier="site" title="Site" />
       <Tier tier="docs" title="Docs" />
