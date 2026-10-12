@@ -378,9 +378,9 @@ const Tier = ({ title, className }: { title: string; className: string }) => (
         </div>
       </Measured>
     </div>
-    <h3>Inline items · current values, owner decision pending</h3>
+    <h3>Inline items · selected item gap</h3>
     <div className="gaps-row">
-      <Measured caption="Range · existing inline gap" owner=".field" reference>
+      <Measured caption="Range · selected inline gap" owner=".field" reference>
         <Form defaultValues={{ volume: 50 }} onSubmit={() => undefined}>
           <Field
             name="volume"
@@ -392,7 +392,7 @@ const Tier = ({ title, className }: { title: string; className: string }) => (
         </Form>
       </Measured>
       <Measured
-        caption="Card footer · existing inline tag gap"
+        caption="Card footer · selected inline tag gap"
         owner=".card-footer"
       >
         <div className="gaps-card-grid">
@@ -405,7 +405,7 @@ const Tier = ({ title, className }: { title: string; className: string }) => (
         </div>
       </Measured>
       <Measured
-        caption="Modal footer · public action region"
+        caption="Modal footer · selected inline action gap"
         owner=".modal-footer"
       >
         <Modal.Footer>
@@ -424,8 +424,8 @@ export const SiteDocsApp: Story = {
       <p className="gaps-note">
         Container-owned block gaps. Red: block start / occupied end. Blue: first
         browser baseline. Help leads text/select controls and follows toggle
-        controls, as shipped. Card section insets, Toggle whole-unit phase and
-        inline item values remain current, pending the owner’s decision.
+        controls, as shipped. Card section insets and Toggle whole-unit phase
+        remain current. Inline items use the selected gap.
       </p>
       <Tier title="Site" className="site" />
       <Tier title="Docs" className="docs" />

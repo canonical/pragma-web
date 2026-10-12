@@ -52,6 +52,11 @@
     --ds-spacing-item-block-docs: 0.25rem;
     --ds-spacing-item-block-app: 0.25rem;
 
+    /* spacing.gap.element.inline: Site 8px; Docs 8px; App 8px. */
+    --ds-spacing-item-inline-site: 0.5rem;
+    --ds-spacing-item-inline-docs: 0.5rem;
+    --ds-spacing-item-inline-app: 0.5rem;
+
     /* spacing.gap.group.block: Site 24px; Docs 20px; App 20px. */
     --ds-spacing-group-site: 1.5rem;
     --ds-spacing-group-docs: 1.25rem;
@@ -78,6 +83,7 @@
     --ds-spacing-field: var(--ds-spacing-field-site);
     --ds-spacing-mark: var(--ds-spacing-mark-site);
     --ds-spacing-item-block: var(--ds-spacing-item-block-site);
+    --ds-spacing-item-inline: var(--ds-spacing-item-inline-site);
     --ds-spacing-group: var(--ds-spacing-group-site);
     --ds-spacing-section: var(--ds-spacing-section-site);
   }
@@ -96,6 +102,7 @@
     --ds-spacing-field: var(--ds-spacing-field-docs);
     --ds-spacing-mark: var(--ds-spacing-mark-docs);
     --ds-spacing-item-block: var(--ds-spacing-item-block-docs);
+    --ds-spacing-item-inline: var(--ds-spacing-item-inline-docs);
     --ds-spacing-group: var(--ds-spacing-group-docs);
     --ds-spacing-section: var(--ds-spacing-section-docs);
   }
@@ -110,6 +117,7 @@
     --ds-spacing-field: var(--ds-spacing-field-app);
     --ds-spacing-mark: var(--ds-spacing-mark-app);
     --ds-spacing-item-block: var(--ds-spacing-item-block-app);
+    --ds-spacing-item-inline: var(--ds-spacing-item-inline-app);
     --ds-spacing-group: var(--ds-spacing-group-app);
     --ds-spacing-section: var(--ds-spacing-section-app);
   }

@@ -10,7 +10,8 @@
     flex-wrap: wrap;
     /* Row gap gives stacked/wrapped options vertical breathing room (was 0, so
      * stacked items touched); column gap is the inline separation (per review). */
-    gap: var(--form-group-gap) var(--container-gap-loose);
+    row-gap: var(--form-group-gap);
+    column-gap: var(--ds-spacing-item-inline);
 
     /* Stacked: one option per line */
     &.stacked {
@@ -24,7 +25,8 @@
     &.columns {
       display: grid;
       grid-template-columns: repeat(var(--choices-columns, 2), 1fr);
-      gap: var(--form-group-gap) var(--container-gap-loose);
+      row-gap: var(--form-group-gap);
+      column-gap: var(--ds-spacing-item-inline);
     }
 
     /* Each option (common/Option, `.ds.option`) is styled here, scoped to this

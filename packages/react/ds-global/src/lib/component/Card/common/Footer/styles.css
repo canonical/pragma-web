@@ -23,7 +23,8 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--card-footer-gap);
+    row-gap: var(--card-footer-gap);
+    column-gap: var(--ds-spacing-item-inline);
 
     padding-block: var(--card-footer-padding-block);
     padding-inline: var(--card-footer-padding-inline);

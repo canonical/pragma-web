@@ -32,7 +32,8 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--modal-footer-gap);
+    row-gap: var(--modal-footer-gap);
+    column-gap: var(--ds-spacing-item-inline);
     padding-block: var(--modal-footer-padding-block);
     padding-inline: var(--modal-footer-padding-inline);
     /* Never shrink: only the content pane gives way. */
