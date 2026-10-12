@@ -141,6 +141,9 @@ function Measure({
           columns: css.gridTemplateColumns,
           background: css.backgroundColor,
           position: css.position,
+          fixtureContainment: node.matches(".surfaces-nav-fixture")
+            ? "Comparison-row rail containment overrides viewport takeover only; padding and all public slots are retained."
+            : null,
           zIndex: css.zIndex,
           overflow: [css.overflowX, css.overflowY],
           rect: unavailable
@@ -252,6 +255,11 @@ function Measure({
           !rect.height ||
           !text ||
           getComputedStyle(node).visibility === "hidden"
+        )
+          return [];
+        if (
+          node.matches('[data-owner="side-navigation"]') &&
+          getComputedStyle(node).position === "fixed"
         )
           return [];
         if (
@@ -722,6 +730,8 @@ function Page() {
             {[false, true].map((proposed) => (
               <SideNavigation
                 key={String(proposed)}
+                className="surfaces-nav-fixture"
+                defaultExpanded={true}
                 data-owner="side-navigation"
                 applicationName={
                   proposed ? "Proposed navigation" : "Current navigation"
@@ -755,7 +765,10 @@ function Page() {
               ? " awaiting measurement"
               : ` ${viewport < 620 ? 16 : viewport < 1036 ? 24 : 32}px at ${viewport}px`}
             . Row keylines remain derived from their own inset. Major block
-            edges remain current.
+            edges remain current. Both public rails are contained in this row at
+            narrow widths, overriding viewport takeover only; product padding
+            and all Header, Content and Footer slots are retained. Rails start
+            expanded and keep their expand/collapse controls.
           </p>
           <h3>Native overlays · current / proposed</h3>
           <Measure label={`${tier}-overlays`}>

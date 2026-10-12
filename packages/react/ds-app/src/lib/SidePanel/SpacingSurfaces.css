@@ -74,6 +74,15 @@
   block-size: 24rem;
   flex: none;
 }
+/* Same public rail containment as Marks04, retaining every surface slot here. */
+.surfaces-measure > .side-navigation.surfaces-nav-fixture {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  inline-size: var(--sidenav-rail-inline-size);
+  block-size: 24rem;
+  flex: none;
+}
 .surfaces-caption {
   margin-block: 16px 32px;
   max-inline-size: 80ch;
