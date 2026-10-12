@@ -69,6 +69,10 @@
   */
 
   .ds.tooltip {
+    --tooltip-padding-vertical: var(--ds-spacing-inset-surface-compact-block);
+    --tooltip-padding-horizontal: var(
+      --ds-spacing-inset-surface-compact-inline
+    );
     /* The tooltip's own background colour, read from the contrasted surface on
        this element (so the arrow, which reuses it, is coloured correctly too). */
     --tooltip-color-background: var(

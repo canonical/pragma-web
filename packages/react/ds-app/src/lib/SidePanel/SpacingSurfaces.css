@@ -1,0 +1,92 @@
+.surfaces06 {
+  padding: 24px;
+  font-weight: 400;
+}
+.surfaces06 h1,
+.surfaces06 h2,
+.surfaces06 h3 {
+  margin-block: 0 16px;
+}
+.surfaces06 p {
+  font-weight: 400;
+}
+.surfaces-tier {
+  margin-block: 32px;
+  padding: 16px;
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+}
+.surfaces-measure {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--grid-gutter);
+  position: relative;
+  inline-size: max-content;
+  min-inline-size: 100%;
+}
+.surfaces-tier {
+  overflow-x: auto;
+}
+.surfaces-cards.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 16rem);
+  gap: var(--grid-gutter);
+  inline-size: max-content;
+}
+.surfaces-reference.grid {
+  display: grid;
+  grid-template-columns: 16rem;
+  inline-size: 16rem;
+  flex: none;
+}
+.surfaces-measure > .tile {
+  inline-size: 16rem;
+  flex: none;
+}
+.surfaces-measure > .side-navigation {
+  block-size: 24rem;
+  flex: none;
+}
+.surfaces-caption {
+  margin-block: 16px 32px;
+  max-inline-size: 80ch;
+}
+.surfaces-inner-scroll {
+  overflow-x: auto;
+  min-inline-size: 0;
+}
+.surfaces-inner-scroll pre {
+  margin: 0;
+  font-weight: 400;
+}
+.surfaces-tooltip-stage {
+  padding-block-start: 48px;
+  min-inline-size: 16rem;
+}
+.surfaces-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.surfaces-guides i {
+  position: absolute;
+  inset-inline: 0;
+  block-size: 1px;
+  background: rgb(190 40 40 / 45%);
+}
+.surfaces-guides i[data-guide="baseline"] {
+  background: rgb(40 90 190 / 60%);
+}
+.surfaces-guides > b {
+  position: absolute;
+  transform: translateY(-4px);
+  inline-size: 1px;
+  block-size: 8px;
+  background: rgb(190 40 40 / 65%);
+}
+.surfaces-guides > b[data-guide="baseline"] {
+  background: rgb(40 90 190 / 80%);
+}
+.surfaces-overlay-trigger {
+  flex: none;
+}
