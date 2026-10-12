@@ -554,6 +554,27 @@ const Tier = ({
         </Form>
       </Measured>
       <Measured
+        label="Choices checkboxes"
+        ownerSelector=".option"
+        slotSelector=":scope > input"
+        markSelector=":scope > input"
+        labelSelector=":scope > .field-label"
+        paintKind="pseudo-centered-on-input-box"
+      >
+        <Form defaultValues={{ multiple: ["one"] }} onSubmit={() => undefined}>
+          <Field
+            name="multiple"
+            inputType="choices"
+            label="Choices"
+            isMultiple
+            options={[
+              { label: "One", value: "one" },
+              { label: "Two", value: "two" },
+            ]}
+          />
+        </Form>
+      </Measured>
+      <Measured
         label="Switch track"
         ownerSelector=".field-toggle-control"
         slotSelector=":scope > input"
