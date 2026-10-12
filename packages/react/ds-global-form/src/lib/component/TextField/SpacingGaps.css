@@ -1,0 +1,109 @@
+.spacing-gaps {
+  padding: 2rem;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+.gaps-note {
+  font-weight: 400;
+  max-inline-size: 70rem;
+}
+.gaps-tier {
+  margin-block: 2rem;
+  padding: 1rem;
+  overflow-x: auto;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, Highlight 18%, transparent) 0 1px,
+    transparent 1px var(--ds-spacing-baseline)
+  );
+}
+.gaps-tier h3 {
+  font-size: 1rem;
+  margin-block: 1.5rem 0.75rem;
+}
+.gaps-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  grid-template-rows: auto auto;
+  gap: 0.375rem 1.5rem;
+  align-items: start;
+  min-inline-size: max-content;
+}
+.gaps-sample {
+  display: contents;
+}
+.gaps-sample figcaption {
+  font-weight: 400;
+  white-space: nowrap;
+}
+.gaps-measure {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
+  inline-size: max-content;
+  justify-self: start;
+}
+.gaps-measure > .form,
+.gaps-sections > .form {
+  inline-size: 15rem;
+}
+.gaps-group,
+.gaps-sections {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+.gaps-group {
+  row-gap: var(--ds-spacing-group);
+}
+.gaps-sections {
+  row-gap: var(--ds-spacing-section);
+}
+.gaps-card-grid {
+  display: grid;
+  grid-template-columns: 16rem;
+  grid-template-rows: repeat(4, auto);
+}
+.gaps-measure > .modal-footer {
+  inline-size: max-content;
+}
+.gaps-peer-guides,
+.gaps-shared-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.gaps-peer-guides i,
+.gaps-shared-guides i {
+  position: absolute;
+  border-block-start: 1px solid #d71920;
+  block-size: 0;
+}
+.gaps-peer-guides i {
+  inline-size: 8px;
+  inset-inline-start: 0;
+}
+.gaps-shared-guides i {
+  inline-size: var(--gaps-shared-width);
+  inset-inline-start: var(--gaps-shared-left);
+}
+.gaps-top {
+  inset-block-start: var(--gaps-top);
+}
+.gaps-peer-guides .gaps-baseline,
+.gaps-shared-guides .gaps-baseline {
+  inset-block-start: var(--gaps-baseline);
+  border-color: #0969da;
+}
+.gaps-end {
+  inset-block-start: var(--gaps-end);
+}
+.gaps-baseline-marker {
+  display: inline-block;
+  inline-size: 0;
+  block-size: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}

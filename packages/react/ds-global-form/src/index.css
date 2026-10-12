@@ -49,19 +49,14 @@
        then tune each axis independently, and the names stay honest):
          BLOCK (vertical):  field-block-gap · field-label-gap · group-gap
          INLINE (horizontal): field-inline-gap                                    */
-    /* No-density-class defaults — mirror the density matrix's app/comfortable cell
-       (F-O4, 15/07 review). The density-scoped block further down re-derives these
-       per cell when a context/density class is present. */
-    --form-field-block-gap: calc(
-      var(--baseline-height) *
-      10
-    ); /* 40px — block: gap BETWEEN fields */
+    /* Semantic block relationships also apply without a density class. */
+    --form-field-block-gap: var(--ds-spacing-group); /* Complete field units. */
     --form-field-label-gap: var(
-      --space-100
-    ); /* 8px — block: gap from a field's LABEL down to its control */
+      --ds-spacing-item-block
+    ); /* Pieces within a field. */
     --form-field-label-description-gap: var(
-      --space-050
-    ); /* 4px — block: gap from a LABEL down to a leading description */
+      --ds-spacing-item-block
+    ); /* Pieces within a field. */
     --form-group-gap: var(
       --space-100
     ); /* 8px — block: gap from desc/error to the input */
@@ -177,35 +172,21 @@
    * nothing about "field"; this is where the form makes that choice.
    *
    * Scoped to the density and tier classes so plain forms and tier contexts use
-   * the same semantic field role while density continues to govern the gaps.
+   * the same semantic spacing roles. The legacy group carrier remains available
+   * for inline Range peers and choice-option flow.
    *
    *   INLINE (horizontal): control padding → --ds-spacing-field
    *     label↔input / prefix-suffix gap → --density-padding-inline
-   *   BLOCK (vertical), by magnitude:
-   *     between-fields     → --density-space-lg  (widest structural gap, 40px app)
-   *     label → control    → --density-space-md  (label to its own control, 8px app)
-   *     desc/error → input → --density-space-sm  (tight annotation gap, 8px)
-   *     label → description → --density-space-xs (tightest, 4px)
-   *   All rungs are whole baseline multiples, so vertical rhythm holds.
-   *   (space-md/-lg were retuned + space-xs added per the 15/07 review — F-O4;
-   *    the density matrix now carries Diana's numbers directly, so the form maps
-   *    straight onto the rungs rather than pinning literals.) */
+   *   BLOCK: complete fields use the group role; pieces within a field use the
+   *   item role. The legacy group carrier still follows density for the existing
+   *   Range inline relationship and choice-option flow. */
   :where(.comfortable, .dense, .app, .site, .docs) {
     --form-input-padding-inline: var(--ds-spacing-field);
     --form-field-inline-gap: var(--density-padding-inline, var(--space-200));
-    --form-field-block-gap: var(
-      --density-space-lg,
-      calc(var(--baseline-height) * 10)
-    );
-    --form-field-label-gap: var(
-      --density-space-md,
-      calc(var(--baseline-height) * 2)
-    );
+    --form-field-block-gap: var(--ds-spacing-group);
+    --form-field-label-gap: var(--ds-spacing-item-block);
     --form-group-gap: var(--density-space-sm, calc(var(--baseline-height) * 2));
-    --form-field-label-description-gap: var(
-      --density-space-xs,
-      calc(var(--baseline-height) * 1)
-    );
+    --form-field-label-description-gap: var(--ds-spacing-item-block);
   }
 
   /* ── .ds.input.chrome — shared input chrome ─────────────────────────

@@ -6,7 +6,7 @@
   .ds.field.field-toggle {
     display: flex;
     flex-direction: column;
-    row-gap: var(--form-group-gap);
+    row-gap: var(--ds-spacing-item-block);
 
     /* The heading is a mock label (a <legend>): reset the fieldset default so it
        flows like the other block children. */
