@@ -1,6 +1,33 @@
 .surfaces06 {
+  --surfaces-preview-grid-margin: 16px;
   padding: 24px;
   font-weight: 400;
+}
+@media (min-width: 38.75rem) {
+  .surfaces06 {
+    --surfaces-preview-grid-margin: 24px;
+  }
+}
+@media (min-width: 64.75rem) {
+  .surfaces06 {
+    --surfaces-preview-grid-margin: 32px;
+  }
+}
+.surfaces-cards-proposed > .cards {
+  row-gap: var(--ds-spacing-group);
+}
+.surfaces-card-proposed {
+  padding-inline: 0;
+  padding-block: var(--ds-spacing-inset-surface-standard-block);
+  row-gap: var(--ds-spacing-group);
+}
+/* The image consumes the first block edge; the frame retains its end inset. */
+.surfaces-card-proposed:has(> img:first-child) {
+  padding-block-start: 0;
+}
+.surfaces-card-proposed > :is(.card-header, .card-content, .card-footer) {
+  padding-inline: var(--ds-spacing-inset-surface-standard-inline);
+  padding-block: 0;
 }
 .surfaces06 h1,
 .surfaces06 h2,
