@@ -8,14 +8,6 @@
     title: "Components/DescriptionList/Item",
     tags: ["autodocs"],
     component: Item,
-    args: {
-      name: "Example term",
-    },
-    argTypes: {
-      children: {
-        control: { disable: true },
-      },
-    },
   });
 </script>
 
@@ -26,9 +18,12 @@
 </script>
 
 <Story name="Default">
-  {#snippet template({ children: _, ...args })}
+  {#snippet template()}
     <DescriptionList>
-      <DescriptionList.Item {...args}>Example description</DescriptionList.Item>
+      <DescriptionList.Item>
+        {#snippet name()}Example term{/snippet}
+        {#snippet description()}Example description{/snippet}
+      </DescriptionList.Item>
     </DescriptionList>
   {/snippet}
 </Story>

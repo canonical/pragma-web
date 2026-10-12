@@ -34,10 +34,22 @@
 ## Example Usage
 ```svelte
 <DescriptionList layout="list">
-  <DescriptionList.Item term="ID">134</DescriptionList.Item>
-  <DescriptionList.Item term="Requested by">John Smith</DescriptionList.Item>
-  <DescriptionList.Item term="Created">2023-10-01T12:00:00Z</DescriptionList.Item>
-  <DescriptionList.Item term="Status">Active</DescriptionList.Item>
+  <DescriptionList.Item>
+    {#snippet name()}ID{/snippet}
+    {#snippet description()}134{/snippet}
+  </DescriptionList.Item>
+  <DescriptionList.Item>
+    {#snippet name()}Requested by{/snippet}
+    {#snippet description()}John Smith{/snippet}
+  </DescriptionList.Item>
+  <DescriptionList.Item>
+    {#snippet name()}Created{/snippet}
+    {#snippet description()}2023-10-01T12:00:00Z{/snippet}
+  </DescriptionList.Item>
+  <DescriptionList.Item>
+    {#snippet name()}Status{/snippet}
+    {#snippet description()}Active{/snippet}
+  </DescriptionList.Item>
 </DescriptionList>
 ```
 -->

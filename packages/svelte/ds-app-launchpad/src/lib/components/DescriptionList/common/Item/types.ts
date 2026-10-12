@@ -3,15 +3,15 @@
 import type { Snippet } from "svelte";
 import type { SvelteHTMLElements } from "svelte/elements";
 
-type BaseProps = SvelteHTMLElements["div"];
+type BaseProps = Omit<SvelteHTMLElements["div"], "children">;
 
 export interface ItemProps extends BaseProps {
   /**
    * Term/name of the item
    */
-  name: string;
+  name: Snippet<[]>;
   /**
    * Description/content of the item
    */
-  children: Snippet<[]>;
+  description: Snippet<[]>;
 }

@@ -19,10 +19,12 @@ vi.mock("../../context.js", () => {
 
 describe("Item component", () => {
   const baseProps = {
-    children: createRawSnippet(() => ({
+    name: createRawSnippet(() => ({
+      render: () => "Term",
+    })),
+    description: createRawSnippet(() => ({
       render: () => `<span>Description</span>`,
     })),
-    name: "Term",
     "data-testid": "description-list-item",
   } satisfies ComponentProps<typeof Component>;
 
