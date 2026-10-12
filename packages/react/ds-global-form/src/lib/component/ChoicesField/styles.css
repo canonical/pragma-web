@@ -1,3 +1,5 @@
+@import url("@canonical/styles/spacing-seat.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -10,7 +12,7 @@
     flex-wrap: wrap;
     /* Row gap gives stacked/wrapped options vertical breathing room (was 0, so
      * stacked items touched); column gap is the inline separation (per review). */
-    row-gap: var(--form-group-gap);
+    row-gap: var(--ds-spacing-item-block);
     column-gap: var(--ds-spacing-item-inline);
 
     /* Stacked: one option per line */
@@ -25,7 +27,7 @@
     &.columns {
       display: grid;
       grid-template-columns: repeat(var(--choices-columns, 2), 1fr);
-      row-gap: var(--form-group-gap);
+      row-gap: var(--ds-spacing-item-block);
       column-gap: var(--ds-spacing-item-inline);
     }
 
@@ -34,22 +36,34 @@
     & > .ds.option {
       direction: inherit;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: var(--ds-spacing-mark);
       cursor: pointer;
 
       label {
-        padding: 0;
+        /* The option owns the complete body seat, including paragraph closure. */
+        padding-block: 0;
+        margin-block: 0;
+        line-height: inherit;
       }
 
       /* RadioInput/CheckboxInput carry their own padding margins
        * (--form-input-padding-inline); options align to the group edge. */
       & > input {
-        /* The option label's paragraph margin closes its baseline seat. Start
-         * the equal-size native mark with the label's text box, while leaving
-         * that margin and the following option's flow position intact. */
+        /* Natural label wrapping must not shrink the native mark. */
+        flex-shrink: 0;
+        /* Wrapped labels retain a first-line mark seat, derived from the line
+         * and mark sizes; closing compensation belongs to the option. */
         align-self: flex-start;
         margin-inline: 0;
+        margin-block: calc(
+            (
+              var(--ds-typography-body-line-height) -
+              var(--ds-typography-body-font-size)
+            ) /
+            2
+          )
+          0;
       }
 
       &.disabled {

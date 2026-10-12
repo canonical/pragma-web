@@ -85,7 +85,11 @@ const ToggleWrapper = <ComponentProps extends BaseInputProps>({
     >
       {/* Optional heading above the control (mock label — no htmlFor). */}
       {headingLabel && (
-        <Label name={name} tag="legend" className="field-toggle-heading">
+        <Label
+          name={name}
+          tag="legend"
+          className="field-toggle-heading spacing-text-seat"
+        >
           {headingLabel}
         </Label>
       )}
@@ -96,10 +100,14 @@ const ToggleWrapper = <ComponentProps extends BaseInputProps>({
           moves the label to the LEFT via CSS (the switch convention), keeping
           the accessible order stable. */}
       <div
-        className={["field-toggle-control", `label-${labelPosition}`].join(" ")}
+        className={[
+          "ds field-toggle-control spacing-text-seat",
+          `label-${labelPosition}`,
+        ].join(" ")}
       >
         <Component {...componentProps} />
         <Label
+          className="field-toggle-inline-label"
           name={name}
           isOptional={isOptional}
           requiredIndicator={requiredIndicator}

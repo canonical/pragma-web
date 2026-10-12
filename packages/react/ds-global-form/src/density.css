@@ -135,10 +135,8 @@
    * centring (e.g. the Button's `align-items: center`). */
   /* Description/Error carrying .p retain the body engine's line-height, cap nudge
    * and compensation margin; density seating applies only to control-like owners. */
-  /* Body font tier for the field label/description/error plus the toggle control
-     row (its own line metrics must match the label's so the control row centres
-     exactly), which lost `.p`. Scoped to just these (NOT the headings, which
-     keep their own tier). */
+  /* Font family and size remain shared. Migrated Toggle/Choices body owners
+     supply their own complete semantic seats; other labels keep density seating. */
   :is(.comfortable, .dense, .app, .site, .docs)
   :is(
     .ds.field-label,
@@ -153,11 +151,14 @@
 
   :is(.comfortable, .dense, .app, .site, .docs)
     :is(
-      .ds.field-label,
+      .ds.field-label:not(
+        .spacing-text-seat,
+        .field-toggle-inline-label,
+        .field-choice-label
+      ),
       .ds.field-description:not(.p),
       .ds.field-error:not(.p),
-      .ds.field-toggle,
-      .ds.option
+      .ds.option:not(.spacing-text-seat)
     ) {
     line-height: 1;
     /* Baseline within a line-height:1 box (font-relative cap approximation). */
@@ -249,7 +250,15 @@
    * --end-nudge already lands its bottom on the grid. Adding a density fill on top
    * would double-pad. Prose bottom rhythm belongs to the engine / `.editorial`. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(.ds.field-label, .ds.field-description:not(.p), .ds.field-error:not(.p)) {
+  :is(
+    .ds.field-label:not(
+      .spacing-text-seat,
+      .field-toggle-inline-label,
+      .field-choice-label
+    ),
+    .ds.field-description:not(.p),
+    .ds.field-error:not(.p)
+  ) {
     padding-block-end: max(
       0px,
       calc(

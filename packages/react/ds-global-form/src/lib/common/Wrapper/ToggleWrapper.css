@@ -1,3 +1,5 @@
+@import url("@canonical/styles/spacing-seat.css");
+
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
@@ -8,21 +10,13 @@
     flex-direction: column;
     row-gap: var(--ds-spacing-item-block);
 
-    /* The heading is a mock label (a <legend>): reset the fieldset default so it
-       flows like the other block children. */
-    & > .field-toggle-heading {
-      padding: 0;
-    }
-
     /* Control row: `align-items: center` centres the control on the row, and a
        multi-line (sentence) label wraps below it (AV-325). Spacing belongs to
        the FIELD, not the label or control: the row's column-gap separates
        control and label, the field's row-gap separates the row from the
-       description/error, and neither label nor control carries any padding or
-       margin — so spacing changes never shift the control off-centre. */
+       description/error. The row owns body seating and closing compensation;
+       its label and control own no additional block seat. */
     & > .field-toggle-control {
-      --toggle-control-line: var(--density-line-height-effective, 1lh);
-
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -49,6 +43,8 @@
         text-align: start;
         cursor: pointer;
         padding: 0;
+        margin-block: 0;
+        line-height: inherit;
       }
 
       /* Label BEFORE the control (switch convention): the DOM stays

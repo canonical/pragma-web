@@ -323,7 +323,7 @@ const Tier = ({ title, className }: { title: string; className: string }) => (
         </Form>
       </Measured>
       <Measured
-        caption="Toggle · current whole-unit phase; pending Density 08"
+        caption="Toggle · owned body seat and whole-unit closure"
         owner=".field"
       >
         <Unit toggle />
@@ -452,8 +452,8 @@ export const SiteDocsApp: Story = {
       <p className="gaps-note">
         Container-owned block gaps. Red: block start / occupied end. Blue: first
         browser baseline. Help leads text/select controls and follows toggle
-        controls, as shipped. Card section insets and Toggle whole-unit phase
-        remain current. Inline items use the selected gap.
+        controls, as shipped. Card section insets remain current. Inline items
+        use the selected gap.
       </p>
       <Tier title="Site" className="site" />
       <Tier title="Docs" className="docs" />
