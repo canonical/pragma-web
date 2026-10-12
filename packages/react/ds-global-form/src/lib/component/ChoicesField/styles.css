@@ -64,6 +64,10 @@
       }
 
       & > input[type="radio"] {
+        /* The option label's paragraph margin closes its baseline seat. Start
+         * the equal-size native mark with the label's text box, while leaving
+         * that margin and the following option's flow position intact. */
+        align-self: flex-start;
         appearance: none;
         box-sizing: border-box;
         width: var(--ds-typography-body-font-size);

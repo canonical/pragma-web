@@ -91,6 +91,11 @@
   color: #171717;
   background: #f7f7f7;
 }
+/* The shipped SearchBox has a 193px input minimum plus two 24px actions.
+ * Give that real composition enough room to avoid a fractional flex overflow. */
+.field-measure .file-tree:has(> .search-box) {
+  inline-size: 15.25rem;
+}
 .field-measure .search-box > .input {
   color: #171717;
 }

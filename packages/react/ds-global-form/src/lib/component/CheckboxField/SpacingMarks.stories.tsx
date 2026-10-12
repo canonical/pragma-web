@@ -24,6 +24,16 @@ type Metrics = {
   slotBlock: number;
   columnGap: number | null;
   markToLabel: number | null;
+  markCenterMinusLabelBoxCenter: number | null;
+  markCenterMinusLabelTextBoxCenter: number | null;
+  labelTextBoxKind: "dom-text-range" | "native-unavailable" | "no-text-range";
+  markCenterKind:
+    | "dom-mark-box"
+    | "pseudo-centered-on-input-box"
+    | "gradient-centered-on-input-box"
+    | "dom-track-box"
+    | "css-background-centered-native-control"
+    | "unavailable-no-mark";
   fontSize: number;
   labelBaseline: number | null;
   roleGap: number;
@@ -43,6 +53,16 @@ type Metrics = {
 };
 
 const number = (value: string): number => Number.parseFloat(value) || 0;
+
+const readOwnTextRect = (label: HTMLElement): DOMRect | null => {
+  const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+  while (node && !node.textContent?.trim()) node = walker.nextNode();
+  if (!node) return null;
+  const range = document.createRange();
+  range.selectNodeContents(node);
+  return range.getBoundingClientRect();
+};
 
 const resolveLength = (owner: HTMLElement, value: string): number => {
   const tier = owner.closest<HTMLElement>(".site, .docs, .app") ?? owner;
@@ -125,6 +145,7 @@ const Measured = ({
   nativeCaret = false,
   trailing = false,
   dedicatedTrack = false,
+  paintKind = "dom-mark-box",
 }: {
   label: string;
   children: React.ReactNode;
@@ -136,6 +157,7 @@ const Measured = ({
   nativeCaret?: boolean;
   trailing?: boolean;
   dedicatedTrack?: boolean;
+  paintKind?: Metrics["markCenterKind"];
 }) => {
   const root = useRef<HTMLDivElement>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -158,6 +180,7 @@ const Measured = ({
       const guideRect = owner.getBoundingClientRect();
       const ownerStyle = getComputedStyle(owner);
       const labelRect = text.getBoundingClientRect();
+      const labelTextRect = nativeCaret ? null : readOwnTextRect(text);
       const labelStyle = getComputedStyle(text);
       const roleGap = resolveLength(owner, "var(--ds-spacing-mark)");
       const bodyIconSize = resolveLength(
@@ -169,6 +192,10 @@ const Measured = ({
         : 0;
       const slotRect = slot?.getBoundingClientRect();
       const markRect = mark?.getBoundingClientRect();
+      // The native select paints two gradient tiles at background-position
+      // center, but its selected text has no DOM Range box. Do not report a
+      // tautological caret-vs-control center as label alignment.
+      const markCenter = markRect ? markRect.top + markRect.height / 2 : null;
       const gap = nativeCaret
         ? number(labelStyle.paddingInlineEnd) -
           number(labelStyle.paddingInlineStart) -
@@ -189,6 +216,24 @@ const Measured = ({
         slotBlock: nativeCaret ? caretSize : (slotRect?.height ?? 0),
         columnGap: nativeCaret ? null : number(ownerStyle.columnGap),
         markToLabel: gap,
+        markCenterMinusLabelBoxCenter:
+          markCenter == null
+            ? null
+            : markCenter - (labelRect.top + labelRect.height / 2),
+        markCenterMinusLabelTextBoxCenter:
+          markCenter == null || labelTextRect == null
+            ? null
+            : markCenter - (labelTextRect.top + labelTextRect.height / 2),
+        labelTextBoxKind: nativeCaret
+          ? "native-unavailable"
+          : labelTextRect
+            ? "dom-text-range"
+            : "no-text-range",
+        markCenterKind: nativeCaret
+          ? "css-background-centered-native-control"
+          : mark
+            ? paintKind
+            : "unavailable-no-mark",
         fontSize: number(labelStyle.fontSize),
         labelBaseline: readBrowserBaseline(owner, text, guideRect),
         roleGap,
@@ -266,6 +311,7 @@ const Measured = ({
     nativeCaret,
     trailing,
     dedicatedTrack,
+    paintKind,
   ]);
 
   return (
@@ -481,6 +527,7 @@ const Tier = ({
         slotSelector=":scope > input"
         markSelector=":scope > input"
         labelSelector=":scope > .field-label"
+        paintKind="pseudo-centered-on-input-box"
       >
         <Form defaultValues={{ check: true }} onSubmit={() => undefined}>
           <Field name="check" inputType="checkbox" label="Enabled" />
@@ -492,6 +539,7 @@ const Tier = ({
         slotSelector=":scope > input"
         markSelector=":scope > input"
         labelSelector=":scope > .field-label"
+        paintKind="gradient-centered-on-input-box"
       >
         <Form defaultValues={{ radio: "one" }} onSubmit={() => undefined}>
           <Field
@@ -513,6 +561,7 @@ const Tier = ({
         labelSelector=":scope > .field-label"
         trailing
         dedicatedTrack
+        paintKind="dom-track-box"
       >
         <Form defaultValues={{ switch: true }} onSubmit={() => undefined}>
           <Field name="switch" inputType="switch" label="Enabled" />

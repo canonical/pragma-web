@@ -422,7 +422,11 @@ const token = {
 const SearchSpecimen = () => {
   const [query, setQuery] = useState("alpha");
   return (
-    <FileTree onSearch={setQuery} searchQuery={query} header={<FileTree.SearchBox />}>
+    <FileTree
+      onSearch={setQuery}
+      searchQuery={query}
+      header={<FileTree.SearchBox />}
+    >
       <FileTree.File name="alpha.ts" />
     </FileTree>
   );
@@ -536,7 +540,7 @@ const Tier = ({
         </FileTree>
       </Measured>
       <Measured
-        label="Diff line"
+        label="Diff line (4 source spaces)"
         ownerSelector=".diff-line:not(.diff-line-hunk)"
         baselineSelector=".diff-content pre"
         seatSelector=".diff-content pre"
