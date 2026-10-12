@@ -48,6 +48,9 @@
 .gaps-sections > .form {
   inline-size: 15rem;
 }
+.gaps-measure:has(> .form) {
+  grid-template-columns: 15rem;
+}
 .gaps-group,
 .gaps-sections {
   display: grid;
