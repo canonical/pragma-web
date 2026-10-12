@@ -166,7 +166,7 @@ function Measure({
               majorInline:
                 "--surfaces-preview-grid-margin (viewport prototype only)",
               cardSectionGap:
-                "--ds-spacing-group (Card owner and matching subgrid parent carrier)",
+                "--ds-spacing-group (Card owner only; shipped parent band gap retained)",
             },
             compactInline: css
               .getPropertyValue("--ds-spacing-inset-surface-compact-inline")
@@ -197,6 +197,31 @@ function Measure({
         const picture = card.querySelector("img");
         return {
           variant: card.dataset.variant,
+          frameRect: {
+            top: card.getBoundingClientRect().top - origin.top,
+            bottom: card.getBoundingClientRect().bottom - origin.top,
+            width: card.getBoundingClientRect().width,
+          },
+          ownGap: getComputedStyle(card).rowGap,
+          inheritedGridRowGap: getComputedStyle(card)
+            .getPropertyValue("--grid-row-gap")
+            .trim(),
+          followingBandGap: (() => {
+            const following = [...(card.parentElement?.children ?? [])]
+              .filter(
+                (peer) =>
+                  peer.getBoundingClientRect().top >
+                  card.getBoundingClientRect().top + 1,
+              )
+              .sort(
+                (a, b) =>
+                  a.getBoundingClientRect().top - b.getBoundingClientRect().top,
+              )[0];
+            return following
+              ? following.getBoundingClientRect().top -
+                  card.getBoundingClientRect().bottom
+              : null;
+          })(),
           parentRows: getComputedStyle(card.parentElement as HTMLElement)
             .gridTemplateRows,
           parentGap: getComputedStyle(card.parentElement as HTMLElement).rowGap,
@@ -637,8 +662,43 @@ function Page() {
     <main className="surfaces06">
       <h1>06 Surfaces</h1>
       <p>
-        Compact edges are selected. Standard frame insets and grid-owned major
-        gutters are proposals for O3.
+        Approved surface construction remains a prototype while gutter scope and
+        wrapped Card bands are checked before production adoption.
+      </p>
+      <h2>Responsive gutter scope · shipped layout versus two choices</h2>
+      <Measure label="gutter-scope">
+        {["shipped", "global-responsive", "major-only"].map((scope) => (
+          <div
+            key={scope}
+            className="grid responsive surfaces-scope-grid"
+            data-owner={`grid-layout-${scope}`}
+            style={{
+              inlineSize: "16rem",
+              flex: "none",
+              padding:
+                scope === "global-responsive"
+                  ? "var(--surfaces-preview-grid-margin)"
+                  : "var(--grid-margin)",
+            }}
+          >
+            <div>
+              {scope === "shipped"
+                ? "Shipped layout"
+                : scope === "global-responsive"
+                  ? "Responsive global simulation"
+                  : "Major-only alias: layout retained"}
+            </div>
+          </div>
+        ))}
+      </Measure>
+      <p className="surfaces-caption">
+        These real responsive Grid layouts use the shipped example’s all-edge
+        padding construction. A responsive global margin changes all four layout
+        edges from 32px to 16/24/32px; a dedicated major-surface inline alias
+        preserves layout edges at 32px and changes only the proposed Modal,
+        SidePanel and navigation gutters below. Global --grid-margin stays
+        unchanged here. Both scope choices give the same responsive major inline
+        gutter; production scope is pending owner choice.
       </p>
       {tiers.map((tier) => (
         <section
@@ -658,6 +718,8 @@ function Page() {
                 >
                   <Reference proposed={proposed} />
                   <Reference proposed={proposed} varied withoutImage />
+                  <Reference proposed={proposed} varied />
+                  <Reference proposed={proposed} withoutImage />
                 </Cards>
               </div>
             ))}
@@ -684,11 +746,13 @@ function Page() {
             insets and parent gap stay shipped. Proposed Image consumes the top
             edge and stays full bleed; frame end inset is 16/12px, section
             inline insets 16/12px and block padding zero. Card owns 24/20px
-            section gaps; its public Cards parent uses the same alias to keep
-            inherited tracks coherent. The image-less varied Card retains frame
-            start and end insets of 16/12px and the shared reserved Image track.
-            Shared-track stretch is measured within each variant only. Prototype
-            anatomy pending O3; no production Card or Tile change.
+            section gaps through its own subgrid gap override. The public Cards
+            parent retains shipped 16px gaps, including the gap between two
+            wrapped bands; four Cards prove alignment within each band. The
+            image-less varied Card retains frame start and end insets of 16/12px
+            and the shared reserved Image track. Shared-track stretch is
+            measured within each variant only. Prototype anatomy pending O3; no
+            production Card or Tile change.
           </p>
           {cardReadings[`${tier}-standard`] && (
             <p className="surfaces-caption">
@@ -698,13 +762,13 @@ function Page() {
                 2,
               )}{" "}
               →{" "}
-              {cardReadings[`${tier}-standard`].cards[2]?.imageWidth?.toFixed(
+              {cardReadings[`${tier}-standard`].cards[4]?.imageWidth?.toFixed(
                 2,
               )}
               px; physical section seam is{" "}
               {cardReadings[`${tier}-standard`].cards[0]?.seam?.toFixed(2)} →{" "}
-              {cardReadings[`${tier}-standard`].cards[2]?.seam?.toFixed(2)}px.
-              Each pair shares its own tracks; the other variant cannot size
+              {cardReadings[`${tier}-standard`].cards[4]?.seam?.toFixed(2)}px.
+              Each band shares its own tracks; the other variant cannot size
               them.
             </p>
           )}
@@ -869,6 +933,8 @@ function ShippedPair({ tier }: { tier: Tier }) {
         <Cards>
           <Reference />
           <Reference varied withoutImage />
+          <Reference varied />
+          <Reference withoutImage />
         </Cards>
       </div>
       <output hidden data-shipped-current={tier}>

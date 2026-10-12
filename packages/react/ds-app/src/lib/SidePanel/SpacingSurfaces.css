@@ -13,9 +13,6 @@
     --surfaces-preview-grid-margin: 32px;
   }
 }
-.surfaces-cards-proposed > .cards {
-  row-gap: var(--ds-spacing-group);
-}
 .surfaces-card-proposed {
   padding-inline: 0;
   padding-block: var(--ds-spacing-inset-surface-standard-block);
@@ -86,6 +83,9 @@
 .surfaces-caption {
   margin-block: 16px 32px;
   max-inline-size: 80ch;
+}
+.surfaces-scope-grid > div {
+  grid-column: 1 / -1;
 }
 .surfaces-inner-scroll {
   overflow-x: auto;
