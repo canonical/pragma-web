@@ -97,7 +97,7 @@ const Measured = ({
       const firstBaseline = text ? baseline(text) : null;
       const owners = Array.from(
         host.querySelectorAll<HTMLElement>(
-          ".form, .field, .payload, .range-control, .card, .card-header, .card-content, .card-footer, .modal-footer, [data-gap-owner]",
+          ".form, .field, .payload, .range-control, .form-choices, .option, .card, .card-header, .card-content, .card-footer, .modal-footer, [data-gap-owner]",
         ),
       );
       setMetrics({
@@ -142,12 +142,19 @@ const Measured = ({
             }),
             inlineVisualAdjacency: [...children]
               .sort((a, b) => box(a).left - box(b).left)
-              .slice(1)
-              .map((child, index) => {
-                const previous = [...children].sort(
-                  (a, b) => box(a).left - box(b).left,
-                )[index];
-                return box(child).left - box(previous).right;
+              .flatMap((child) => {
+                const current = box(child);
+                const next = children
+                  .filter((candidate) => {
+                    const r = box(candidate);
+                    return (
+                      r.left >= current.right &&
+                      Math.min(r.bottom, current.bottom) >
+                        Math.max(r.top, current.top)
+                    );
+                  })
+                  .sort((a, b) => box(a).left - box(b).left)[0];
+                return next ? [box(next).left - current.right] : [];
               }),
             adjacent: children.slice(1).map((child, index) => ({
               blockDistance: box(child).top - box(children[index]).bottom,
@@ -388,6 +395,27 @@ const Tier = ({ title, className }: { title: string; className: string }) => (
             label="Volume"
             min={0}
             max={100}
+          />
+        </Form>
+      </Measured>
+      <Measured
+        caption="Choices columns · selected inline gap"
+        owner=".form-choices"
+      >
+        <Form defaultValues={{ choices: ["one"] }} onSubmit={() => undefined}>
+          <Field
+            name="choices"
+            inputType="choices"
+            label="Choices"
+            isMultiple
+            layout="columns"
+            columns={2}
+            options={[
+              { label: "One", value: "one" },
+              { label: "Two", value: "two" },
+              { label: "Three", value: "three" },
+              { label: "Four", value: "four" },
+            ]}
           />
         </Form>
       </Measured>
