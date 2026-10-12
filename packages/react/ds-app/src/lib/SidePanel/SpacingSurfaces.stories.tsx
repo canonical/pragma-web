@@ -341,7 +341,7 @@ function Measure({
     };
   }, [label, onSummary]);
   return (
-    <div className="surfaces-measure" ref={ref}>
+    <div className="surfaces-measure" data-relationship={label} ref={ref}>
       {children}
       <div className="surfaces-guides" aria-hidden="true">
         {guides.map((top, index) => (
@@ -621,6 +621,7 @@ function Overlay({
 }
 
 function Page() {
+  const [tallSecondBand, setTallSecondBand] = useState(false);
   const [viewport, setViewport] = useState<number | null>(null);
   const [readings, setReadings] = useState<Record<string, OverlayReading>>({});
   const [cardReadings, setCardReadings] = useState<Record<string, CardSummary>>(
@@ -681,7 +682,14 @@ function Page() {
                   : "var(--grid-margin)",
             }}
           >
-            <div>
+            <div
+              style={{
+                padding: "1rem",
+                background: "var(--color-background-container)",
+                border: "1px solid var(--color-border)",
+                textAlign: "center",
+              }}
+            >
               {scope === "shipped"
                 ? "Shipped layout"
                 : scope === "global-responsive"
@@ -700,6 +708,9 @@ function Page() {
         unchanged here. Both scope choices give the same responsive major inline
         gutter; production scope is pending owner choice.
       </p>
+      <Button onClick={() => setTallSecondBand((value) => !value)}>
+        Move tall content to {tallSecondBand ? "first" : "second"} Card band
+      </Button>
       {tiers.map((tier) => (
         <section
           key={tier}
@@ -717,9 +728,17 @@ function Page() {
                   data-owner={proposed ? "cards-proposed" : "cards-current"}
                 >
                   <Reference proposed={proposed} />
-                  <Reference proposed={proposed} varied withoutImage />
-                  <Reference proposed={proposed} varied />
-                  <Reference proposed={proposed} withoutImage />
+                  <Reference
+                    proposed={proposed}
+                    varied={!tallSecondBand}
+                    withoutImage
+                  />
+                  <Reference proposed={proposed} />
+                  <Reference
+                    proposed={proposed}
+                    varied={tallSecondBand}
+                    withoutImage
+                  />
                 </Cards>
               </div>
             ))}
@@ -751,8 +770,9 @@ function Page() {
             wrapped bands; four Cards prove alignment within each band. The
             image-less varied Card retains frame start and end insets of 16/12px
             and the shared reserved Image track. Shared-track stretch is
-            measured within each variant only. Prototype anatomy pending O3; no
-            production Card or Tile change.
+            measured within each variant only. Move the tall content to check
+            independent band sizing. Construction is approved; production
+            adoption awaits gutter scope and wrapped-band verification.
           </p>
           {cardReadings[`${tier}-standard`] && (
             <p className="surfaces-caption">
@@ -933,7 +953,7 @@ function ShippedPair({ tier }: { tier: Tier }) {
         <Cards>
           <Reference />
           <Reference varied withoutImage />
-          <Reference varied />
+          <Reference />
           <Reference withoutImage />
         </Cards>
       </div>

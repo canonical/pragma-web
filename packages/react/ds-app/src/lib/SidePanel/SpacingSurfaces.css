@@ -87,6 +87,15 @@
 .surfaces-scope-grid > div {
   grid-column: 1 / -1;
 }
+.surfaces-scope-grid {
+  border: 1px solid var(--color-border);
+}
+@media (width < 620px) {
+  .surfaces-measure[data-relationship="gutter-scope"] {
+    flex-direction: column;
+    inline-size: 100%;
+  }
+}
 .surfaces-inner-scroll {
   overflow-x: auto;
   min-inline-size: 0;
