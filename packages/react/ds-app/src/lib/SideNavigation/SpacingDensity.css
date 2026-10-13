@@ -25,22 +25,10 @@
   inline-size: var(--sidenav-rail-inline-size);
   block-size: 12rem;
 }
-/* The public Item class selects the existing helper; its label owns the seat. */
-.density-host-candidate .side-navigation-item.spacing-control-seat {
-  padding-block: 0;
-  margin-block: 0;
-}
-.density-host-candidate
-  .side-navigation-item.spacing-control-seat
-  > .row
-  > .label {
-  line-height: var(--ds-typography-body-line-height);
-  padding-block: var(
-    --ds-control-seat-padding-block,
-    var(--ds-control-padding-block)
-  );
-  margin-block: 0
-    var(--ds-control-seat-margin-block-end, var(--ds-control-grid-compensation));
+/* Prototype-only sizing adapter: the real label helper determines row flow. */
+.density-host-candidate .side-navigation-item,
+.density-host-candidate .side-navigation-item > .row {
+  height: auto;
 }
 .density-guides {
   position: absolute;
@@ -68,11 +56,6 @@
   max-inline-size: 80ch;
 }
 
-/* Historical approved Site host comparison only; production rows stay unchanged. */
-.site .density-host-approved40 .side-navigation-item {
-  height: var(--dimension-500);
-}
-
 /* The host label keeps its default seat; real baseline export seats the child. */
 .density-host-candidate .side-navigation-item > .row,
 .density-host-candidate .side-navigation-item > .row > .end {
@@ -86,4 +69,12 @@
   > span.chip:not(:has(button, a, input, select, textarea)) {
   --ds-control-seat-padding-block: var(--ds-spacing-control-inset-dense);
   --ds-control-seat-margin-block-end: 0px;
+}
+
+/* Preserve the native Nav label's inline containment without generic Label styling. */
+.density-nav-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

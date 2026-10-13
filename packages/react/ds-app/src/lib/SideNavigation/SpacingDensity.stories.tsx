@@ -1,7 +1,17 @@
 import { Chip } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useRef, useState } from "react";
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { SideNavigation } from "./index.js";
+import type { LinkComponentProps } from "./types.js";
 import "./SpacingDensity.css";
 
 const meta = {
@@ -10,6 +20,36 @@ const meta = {
 } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// The public LinkComponent receives one Fragment. Preserve its real anchor and
+// existing children; only its actual label gains the shared default seat.
+function seatLabel(children: ReactNode): ReactNode {
+  return Children.map(children, (child) => {
+    if (!isValidElement<{ children?: ReactNode; className?: string }>(child))
+      return child;
+    if (child.type === Fragment)
+      return cloneElement(child, {}, seatLabel(child.props.children));
+    if (
+      child.type === "span" &&
+      child.props.className?.split(/\s+/).includes("label")
+    ) {
+      return cloneElement(child, {
+        className: [
+          ...(child.props.className
+            ?.split(/\s+/)
+            .filter((name) => name !== "label") ?? []),
+          "ds",
+          "density-nav-label",
+          "spacing-control-seat",
+        ].join(" "),
+      });
+    }
+    return child;
+  });
+}
+function LabelSeatLink({ children, ...props }: LinkComponentProps) {
+  return <a {...props}>{seatLabel(children)}</a>;
+}
 
 function baseline(node: HTMLElement) {
   const marker = document.createElement("span");
@@ -46,8 +86,19 @@ function Fit({
       ];
       const rowMetrics = rows.map((row) => {
         const rect = row.getBoundingClientRect();
-        const label = row.querySelector<HTMLElement>(".label");
+        const label = row.querySelector<HTMLElement>(
+          ".density-nav-label,.label",
+        );
         const chip = row.querySelector<HTMLElement>(".chip");
+        const item = row.closest<HTMLElement>(".side-navigation-item");
+        const nav = row.closest(".side-navigation");
+        const ordinal = nav
+          ? [...nav.querySelectorAll(".side-navigation-item > .row")].indexOf(
+              row,
+            )
+          : -1;
+        const following =
+          item?.nextElementSibling?.querySelector<HTMLElement>(":scope > .row");
         const value = chip?.querySelector<HTMLElement>(".value");
         const labelBaseline = label ? baseline(label) : null;
         const chipBaseline = value ? baseline(value) : null;
@@ -55,6 +106,20 @@ function Fit({
         return {
           identity: `${row.closest("[data-density-host]")?.getAttribute("data-density-host")}:${label?.textContent}`,
           rootTag: row.tagName,
+          ordinal,
+          itemHeight: item?.getBoundingClientRect().height ?? null,
+          itemMargin: item ? getComputedStyle(item).marginBlock : null,
+          followingPaintDistance: following
+            ? following.getBoundingClientRect().top - rect.bottom
+            : null,
+          labelSeat: label
+            ? {
+                helperOwner: label.classList.contains("spacing-control-seat"),
+                padding: getComputedStyle(label).paddingBlock,
+                margin: getComputedStyle(label).marginBlock,
+                line: getComputedStyle(label).lineHeight,
+              }
+            : null,
           height: rect.height,
           top: rect.top - origin.top,
           bottom: rect.bottom - origin.top,
@@ -136,13 +201,17 @@ function Fit({
         publicDensityClass: density,
         viewport: window.innerWidth,
         enrollment:
-          "Fit evidence only: historical Site32/40 control reference, pending Docs/App28/32 candidate; public non-link LeafNavItem.slot, no production enrollment or approved Nav height",
+          "Intrinsic linked Nav-slot proof through the existing public LinkComponent adapter; actual Label owns default helper, no fixed host target or production density enrollment",
         parentBaselineComparison: (() => {
-          const plain = rowMetrics.find((row) =>
-            row.identity.startsWith("candidate-plain:"),
+          const plain = rowMetrics.find(
+            (row) =>
+              row.identity.startsWith("candidate-plain:") && row.ordinal === 0,
           );
           return rowMetrics
-            .filter((row) => row.identity.startsWith("candidate-"))
+            .filter(
+              (row) =>
+                row.identity.startsWith("candidate-") && row.ordinal === 0,
+            )
             .map((row) => ({
               identity: row.identity,
               labelBaselineDeltaFromPlain:
@@ -178,20 +247,17 @@ function Fit({
   return (
     <section className={`${tier} ${density} surface density-tier`}>
       <h2>{tier}</h2>
-      <p>
-        {tier === "site"
-          ? "Historical Site child 32 / host 40 fit reference · not Nav-height approval"
-          : "Pending Docs/App child 28 / host 32 candidate · preserved default reference below"}
-      </p>
+      <p>Intrinsic linked rows · default parent seat / direct dense child</p>
       <div ref={ref} className="density-fit-proof">
         <div className="density-fit-row">
           {["candidate-plain", "candidate-default", "candidate-chip"].map(
             (mode) => (
               <SideNavigation
                 key={mode}
-                className={`density-nav-fixture density-host-candidate density-host-approved40 ${mode === "candidate-chip" ? "density-host-clearance-candidate" : ""}`}
+                className={`density-nav-fixture density-host-candidate ${mode === "candidate-chip" ? "density-host-clearance-candidate" : ""}`}
                 data-density-host={mode}
-                currentUrl="plain"
+                currentUrl={`#density-${tier}-${mode}-first`}
+                LinkComponent={LabelSeatLink}
                 defaultExpanded
                 keyboardShortcut={false}
                 root={{
@@ -201,18 +267,23 @@ function Fit({
                       key: "group",
                       items: [
                         {
-                          key: "plain",
+                          key: "first",
+                          url: `#density-${tier}-${mode}-first`,
                           label:
                             mode === "candidate-plain"
                               ? "Plain"
                               : mode === "candidate-default"
                                 ? "Regular"
                                 : "Dense",
-                          className: "spacing-control-seat",
                           slot:
-                            mode !== "candidate-plain" ? (
+                            mode === "candidate-plain" ? undefined : (
                               <Chip value="Chip" />
-                            ) : undefined,
+                            ),
+                        },
+                        {
+                          key: "next",
+                          url: `#density-${tier}-${mode}-next`,
+                          label: "Next",
                         },
                       ],
                     },
@@ -241,8 +312,8 @@ function Fit({
           </div>
         </div>
         <p>
-          Legacy current rows / Standalone / Explicit Site reset outside the
-          proposed host
+          Legacy fixed rows / Standalone / Explicit Site reset outside the
+          intrinsic prototype
         </p>
         <div className="density-other-row">
           <SideNavigation
@@ -259,7 +330,7 @@ function Fit({
                     { key: "plain", label: "Plain" },
                     {
                       key: "chip",
-                      label: "With Chip",
+                      label: "Regular",
                       slot: <Chip value="Chip" />,
                     },
                   ],
@@ -269,12 +340,12 @@ function Fit({
           />
           {tier === "site" && (
             <SideNavigation
-              className="density-nav-fixture density-host-candidate density-host-clearance-candidate"
+              className="density-nav-fixture density-legacy-fixed density-host-clearance-candidate"
               data-density-host="current32-dense32"
               defaultExpanded
               keyboardShortcut={false}
               root={{
-                key: "current32-dense32",
+                key: "legacy-dense",
                 items: [
                   {
                     key: "group",
@@ -282,7 +353,6 @@ function Fit({
                       {
                         key: "chip",
                         label: "32px row",
-                        className: "spacing-control-seat",
                         slot: <Chip value="Chip" />,
                       },
                     ],
@@ -304,12 +374,14 @@ function Fit({
         </output>
       </div>
       <p className="density-caption">
-        {tier === "site"
-          ? "Site compares a 32px child in a 40px prototype host; this does not approve a Nav row height."
-          : "Docs/App propose a 28px child in the existing 32px host using the existing dense 4px input; production is unchanged."}{" "}
-        Plain, Regular and Dense retain the same parent label baseline and show
-        measured clearance at both painted edges. Enrollment remains pending;
-        default and outside-reset peers are references.
+        Linked public Nav slots use a disclosed LinkComponent adapter to attach
+        the existing helper to the real label, preserving the anchor and
+        children. The label determines intrinsic row height; two adjacent
+        painted rows contain its closing margin and expose actual touching
+        distance without a target height. Only the direct static Chip selects
+        existing dense 4px padding and no end compensation; baselines and
+        painted clearance are measured, with production enrollment still
+        pending.
       </p>
     </section>
   );
