@@ -67,17 +67,17 @@
   inline-size: 16rem;
   flex: none;
 }
-.surfaces-measure > .side-navigation {
+.surfaces-nav-stage {
+  inline-size: 15rem;
   block-size: 24rem;
   flex: none;
 }
 /* Same public rail containment as Marks04, retaining every surface slot here. */
-.surfaces-measure > .side-navigation.surfaces-nav-fixture {
+.surfaces-nav-stage > .side-navigation.surfaces-nav-fixture {
   position: relative;
   inset: auto;
   z-index: auto;
-  inline-size: var(--sidenav-rail-inline-size);
-  block-size: 24rem;
+  block-size: 100%;
   flex: none;
 }
 .surfaces-caption {

@@ -114,7 +114,7 @@ function Measure({
       const origin = host.getBoundingClientRect();
       const owners = [
         ...host.querySelectorAll<HTMLElement>(
-          "[data-owner],.card-header,.card-content,.card-footer,.tile-header,.tile-content,.modal-header,.modal-content,.modal-footer,.side-panel-header,.side-panel-content,.side-panel-footer,.side-navigation .header,.side-navigation .content,.side-navigation-group-header,.side-navigation-item,.tooltip,.tooltip .text,[data-scroll-owner]",
+          "[data-owner],.card-header,.card-content,.card-footer,.tile-header,.tile-content,.modal-header,.modal-content,.modal-footer,.side-panel-header,.side-panel-content,.side-panel-footer,.side-navigation-header,.side-navigation-context-switcher-region,.side-navigation .content,.side-navigation .footer,.side-navigation-group-header,.side-navigation-item,.tooltip,.tooltip .text,[data-scroll-owner]",
         ),
       ].map((node) => {
         const css = getComputedStyle(node);
@@ -136,6 +136,18 @@ function Measure({
             css.marginInlineStart,
           ],
           rowGap: css.rowGap,
+          navigationGutterCarrier: css
+            .getPropertyValue("--sidenav-inset-inline")
+            .trim(),
+          navigationSurfaceInsetCarrier: css
+            .getPropertyValue("--sidenav-surface-inset-inline")
+            .trim(),
+          navigationCollapsedCarrier: css
+            .getPropertyValue("--sidenav-rail-inline-size-collapsed")
+            .trim(),
+          expanded: node.matches(".side-navigation")
+            ? node.dataset.expanded
+            : null,
           columnGap: css.columnGap,
           rows: css.gridTemplateRows,
           columns: css.gridTemplateColumns,
@@ -275,10 +287,13 @@ function Measure({
         const text = node.querySelector<HTMLElement>(
           "[data-seat],.tile-header span,h1,.text",
         );
+        const textRect = text?.getBoundingClientRect();
         if (
           !rect.width ||
           !rect.height ||
           !text ||
+          !textRect?.width ||
+          !textRect.height ||
           getComputedStyle(node).visibility === "hidden"
         )
           return [];
@@ -812,47 +827,58 @@ function Page() {
               <Reference />
             </div>
             {[false, true].map((proposed) => (
-              <SideNavigation
-                key={String(proposed)}
-                className="surfaces-nav-fixture"
-                defaultExpanded={true}
-                data-owner="side-navigation"
-                applicationName={
-                  proposed ? "Proposed navigation" : "Current navigation"
-                }
-                keyboardShortcut={false}
-                style={
-                  proposed
-                    ? { paddingInline: "var(--surfaces-preview-grid-margin)" }
-                    : undefined
-                }
-                root={{
-                  key: "root",
-                  items: [
-                    {
-                      key: "group",
-                      label: "Workspace",
-                      items: [
-                        { key: "one", label: "Overview" },
-                        { key: "two", label: "Resources" },
-                      ],
-                    },
-                  ],
-                }}
-                footerRoot={{ key: "footer", items: [{ label: "Settings" }] }}
-              />
+              <div className="surfaces-nav-stage" key={String(proposed)}>
+                <SideNavigation
+                  key={String(proposed)}
+                  className="surfaces-nav-fixture"
+                  defaultExpanded={true}
+                  data-owner="side-navigation"
+                  applicationName="UI"
+                  keyboardShortcut={false}
+                  style={
+                    proposed
+                      ? ({
+                          "--sidenav-surface-inset-inline":
+                            "var(--surfaces-preview-grid-margin)",
+                          "--sidenav-rail-inline-size-collapsed":
+                            "calc(max(var(--sidenav-logo-inline-size), var(--sidenav-icon-column-inline-size), calc(var(--dimension-400) + var(--dimension-050))) + 2 * var(--sidenav-surface-inset-inline))",
+                        } as CSSProperties)
+                      : undefined
+                  }
+                  root={{
+                    key: "root",
+                    items: [
+                      {
+                        key: "group",
+                        label: "Workspace",
+                        items: [
+                          { key: "one", label: "Overview" },
+                          { key: "two", label: "Resources" },
+                        ],
+                      },
+                    ],
+                  }}
+                  footerRoot={{ key: "footer", items: [{ label: "Settings" }] }}
+                />
+              </div>
             ))}
           </Measure>
           <p className="surfaces-caption">
-            Current outer inline inset 8px; proposed viewport grid margin is
+            Current Header, Content and Footer inline insets are 8px; proposed
+            viewport grid margin is
             {viewport === null
               ? " awaiting measurement"
               : ` ${viewport < 620 ? 16 : viewport < 1036 ? 24 : 32}px at ${viewport}px`}
-            . Row keylines remain derived from their own inset. Major block
-            edges remain current. Both public rails are contained in this row at
-            narrow widths, overriding viewport takeover only; product padding
-            and all Header, Content and Footer slots are retained. Rails start
-            expanded and keep their expand/collapse controls.
+            . Root padding is zero; regions own the gutter once, and row labels
+            add only mark size and gap. Major block edges remain current. Both
+            public rails are contained in this row at narrow widths, overriding
+            viewport takeover only; product padding and all Header, Content and
+            Footer slots are retained. Rails start expanded and keep their
+            expand/collapse controls. Proposed desktop collapsed width derives
+            from the widest existing brand, mark or collapse toggle plus both
+            gutters (68/84/100px across viewport bands); production stays 52px
+            pending fit approval. Mobile keeps its native full-row collapsed
+            construction. Hidden collapsed titles have no page-baseline markers.
           </p>
           <h3>Native overlays · current / proposed</h3>
           <Measure label={`${tier}-overlays`}>
