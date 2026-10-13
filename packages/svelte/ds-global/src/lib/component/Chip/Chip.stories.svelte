@@ -41,13 +41,7 @@
   args={{ lead: "Category", value: "Ubuntu", onclick: fn() }}
 />
 
-<Story name="Dense" args={{ value: "Ubuntu", onclick: fn() }}>
-  {#snippet template(args)}
-    <div class="dense">
-      <Chip {...args} />
-    </div>
-  {/snippet}
-</Story>
+<Story name="Dense" args={{ value: "Ubuntu", onclick: fn(), class: "dense" }} />
 
 <Story
   name="Dismissible"

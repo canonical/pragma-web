@@ -47,14 +47,17 @@
     &:is(button),
     > .dismiss {
       margin: 0;
-      cursor: pointer;
 
-      &:hover {
-        background-color: var(--hover--color-foreground-secondary);
-      }
+      &:not(:disabled) {
+        cursor: pointer;
 
-      &:active {
-        background-color: var(--active--color-foreground-secondary);
+        &:hover {
+          background-color: var(--hover--color-foreground-secondary);
+        }
+
+        &:active {
+          background-color: var(--active--color-foreground-secondary);
+        }
       }
     }
 

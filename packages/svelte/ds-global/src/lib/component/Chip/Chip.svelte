@@ -39,8 +39,8 @@
   {@const { onclick, ondismiss, dismissLabel, ...restButtonProps } =
     validatedRestProps}
   <button
-    type="button"
     {...restButtonProps}
+    type="button"
     class={[componentCssClassName, criticality, className]}
     {onclick}
   >

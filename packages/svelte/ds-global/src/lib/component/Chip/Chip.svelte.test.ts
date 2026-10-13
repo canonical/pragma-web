@@ -13,6 +13,48 @@ describe("Chip", () => {
     expect(onclick).toHaveBeenCalledOnce();
   });
 
+  it.each(["submit", "reset"] as const)(
+    "ignores the native %s button type",
+    async (type) => {
+      const page = await render(Chip, {
+        value: "Ubuntu",
+        onclick: vi.fn(),
+        type,
+      });
+
+      await expect
+        .element(page.getByRole("button", { name: "Ubuntu" }))
+        .toHaveAttribute("type", "button");
+    },
+  );
+
+  it.each([false, true])(
+    "only shows interactive affordances when enabled (disabled: %s)",
+    async (disabled) => {
+      const onclick = vi.fn();
+      const page = await render(Chip, {
+        value: "Ubuntu",
+        onclick,
+        disabled,
+        style:
+          "--chip-color-background: rgb(0, 0, 0); " +
+          "--hover--color-foreground-secondary: rgb(255, 255, 255); " +
+          "--motion-duration-fast: 0s;",
+      });
+      const button = page.getByRole("button", { name: "Ubuntu" });
+
+      expect(getComputedStyle(button.element()).cursor === "pointer").toBe(
+        !disabled,
+      );
+      await button.hover();
+      await expect.element(button).toHaveStyle({
+        backgroundColor: disabled ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)",
+      });
+      (button.element() as HTMLButtonElement).click();
+      expect(onclick).toHaveBeenCalledTimes(disabled ? 0 : 1);
+    },
+  );
+
   it("exposes only dismissal as an action, with a contextual name", async () => {
     const ondismiss = vi.fn();
     const page = await render(Chip, {

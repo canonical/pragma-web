@@ -16,6 +16,19 @@ describe("Chip SSR", () => {
     expect(chip?.hasAttribute("density")).toBe(false);
   });
 
+  it.each(["submit", "reset"] as const)(
+    "ignores the native %s button type",
+    (type) => {
+      const page = render(Chip, {
+        props: { value: "Ubuntu", onclick: () => {}, type },
+      });
+
+      expect(
+        page.container.querySelector(".ds.chip")?.getAttribute("type"),
+      ).toBe("button");
+    },
+  );
+
   it("renders only the dismiss control for an applied value", () => {
     const page = render(Chip, {
       props: { lead: "Owner", value: "Bob", ondismiss: () => {} },
