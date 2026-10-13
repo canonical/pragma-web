@@ -6,29 +6,35 @@ import type { Locator } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import type { DescriptionListContext } from "../../types.js";
-import ItemTestHost from "./ItemTestHost.fixtures.svelte";
+import Component from "./Item.svelte";
+import {
+  descriptionListItem,
+  descriptionListItemProps,
+} from "./test.fixtures.svelte";
 
 vi.mock("../../context.js", () => {
   return {
     getDescriptionListContext: (): DescriptionListContext => ({
       layout: "auto",
     }),
-    setDescriptionListContext: (context: DescriptionListContext) => context,
   };
 });
 
 describe("Item component", () => {
   const baseProps = {
+    children: descriptionListItem,
     "data-testid": "description-list-item",
-  } satisfies ComponentProps<typeof ItemTestHost>;
+  } satisfies ComponentProps<typeof Component>;
 
   it("renders", async () => {
-    const page = await render(ItemTestHost, { ...baseProps });
+    const page = await render(Component, { ...baseProps });
     await expect.element(componentLocator(page)).toBeInTheDocument();
-    await expect.element(termLocator(page)).toHaveTextContent("Term");
+    await expect
+      .element(termLocator(page))
+      .toHaveTextContent(descriptionListItemProps.termText);
     await expect
       .element(descriptionLocator(page))
-      .toHaveTextContent("Description");
+      .toHaveTextContent(descriptionListItemProps.descriptionText);
   });
 
   describe("attributes", () => {
@@ -36,7 +42,7 @@ describe("Item component", () => {
       ["id", "test-id"],
       ["aria-label", "test-aria-label"],
     ])("applies %s", async (attribute, expected) => {
-      const page = await render(ItemTestHost, {
+      const page = await render(Component, {
         ...baseProps,
         [attribute]: expected,
       });
@@ -46,7 +52,7 @@ describe("Item component", () => {
     });
 
     it("applies classes", async () => {
-      const page = await render(ItemTestHost, {
+      const page = await render(Component, {
         ...baseProps,
         class: "test-class",
       });
@@ -54,7 +60,7 @@ describe("Item component", () => {
     });
 
     it("applies style", async () => {
-      const page = await render(ItemTestHost, {
+      const page = await render(Component, {
         ...baseProps,
         style: "color: orange;",
       });
@@ -65,14 +71,14 @@ describe("Item component", () => {
   });
 });
 
-function componentLocator(page: RenderResult<typeof ItemTestHost>): Locator {
+function componentLocator(page: RenderResult<typeof Component>): Locator {
   return page.getByTestId("description-list-item");
 }
 
-function termLocator(page: RenderResult<typeof ItemTestHost>): Locator {
+function termLocator(page: RenderResult<typeof Component>): Locator {
   return page.getByRole("term");
 }
 
-function descriptionLocator(page: RenderResult<typeof ItemTestHost>): Locator {
+function descriptionLocator(page: RenderResult<typeof Component>): Locator {
   return page.getByRole("definition");
 }
