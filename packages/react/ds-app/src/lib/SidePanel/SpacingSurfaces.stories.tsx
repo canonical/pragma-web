@@ -28,11 +28,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 const tiers = ["site", "docs", "app"] as const;
 type Tier = (typeof tiers)[number];
-const frame = {
-  paddingInline: "var(--ds-spacing-inset-surface-standard-inline)",
-  paddingBlock: "var(--ds-spacing-inset-surface-standard-block)",
-};
-const zero = { padding: 0 };
 const image = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="64"><rect width="320" height="64" fill="#777"/><path d="M0 32H320" stroke="#fff"/></svg>')}`;
 
 function Reference({
@@ -47,7 +42,7 @@ function Reference({
   return (
     <Card
       data-owner="card"
-      className={proposed ? "surfaces-card-proposed" : undefined}
+      className={proposed ? undefined : "surfaces-card-before"}
       data-variant={proposed ? "proposed" : "current"}
     >
       {!withoutImage && <Card.Image src={image} alt="Full-width image band" />}
@@ -176,7 +171,7 @@ function Measure({
               standardInline: "--ds-spacing-action",
               standardBlock: "--ds-spacing-action",
               majorInline:
-                "--surfaces-preview-grid-margin (viewport prototype only)",
+                "Public part overrides → --ds-spacing-inset-surface-major-inline → --grid-margin; Nav regions use state-aware --sidenav-surface-inset-inline",
               cardSectionGap:
                 "--ds-spacing-group (Card owner only; shipped parent band gap retained)",
             },
@@ -213,6 +208,13 @@ function Measure({
             top: card.getBoundingClientRect().top - origin.top,
             bottom: card.getBoundingClientRect().bottom - origin.top,
             width: card.getBoundingClientRect().width,
+          },
+          framePaint: {
+            sourceKind:
+              "Computed final pseudo-element paint; no guessed paint bounding box",
+            physicalBorder: getComputedStyle(card).borderWidth,
+            shadow: getComputedStyle(card, "::after").boxShadow,
+            pointerEvents: getComputedStyle(card, "::after").pointerEvents,
           },
           ownGap: getComputedStyle(card).rowGap,
           inheritedGridRowGap: getComputedStyle(card)
@@ -539,17 +541,16 @@ function Overlay({
     };
   }, [kind, name, tier, onReading]);
   const style = (
-    proposed
+    !proposed
       ? kind === "modal"
         ? {
-            "--modal-padding-inline": "var(--surfaces-preview-grid-margin)",
+            "--modal-padding-inline": "1.5rem",
             "--modal-header-padding-inline": "var(--modal-padding-inline)",
             "--modal-content-padding-inline": "var(--modal-padding-inline)",
             "--modal-footer-padding-inline": "var(--modal-padding-inline)",
           }
         : {
-            "--side-panel-padding-inline":
-              "var(--surfaces-preview-grid-margin)",
+            "--side-panel-padding-inline": "1.5rem",
           }
       : {}
   ) as CSSProperties;
@@ -672,56 +673,24 @@ function Page() {
     const currentHeader = current.parts[0];
     const proposedHeader = proposed.parts[0];
     const footer = proposed.parts.find((part) => part.name.includes("footer"));
-    return `${kind === "modal" ? "Modal" : "SidePanel"} last-open snapshots: inline padding ${currentHeader?.paddingInline} at ${current.viewport}px → ${proposedHeader?.paddingInline} at ${proposed.viewport}px. ${kind === "panel" ? `Proposed Footer uses ${footer?.marginInline} inline margins, with ${footer?.paddingInline} padding.` : "Header, Content and Footer share the gutter."} Closed geometry is unavailable; snapshots remain labelled with their captured viewport.`;
+    return `${kind === "modal" ? "Modal" : "SidePanel"} last-open snapshots: inline padding ${currentHeader?.paddingInline} at ${current.viewport}px → ${proposedHeader?.paddingInline} at ${proposed.viewport}px. ${kind === "panel" ? `Adopted Footer uses ${footer?.marginInline} inline margins, with ${footer?.paddingInline} padding.` : "Header, Content and Footer share the gutter."} Closed geometry is unavailable; snapshots remain labelled with their captured viewport.`;
   };
   return (
     <main className="surfaces06">
       <h1>06 Surfaces</h1>
       <p>
-        Approved surface construction remains a prototype while gutter scope and
-        wrapped Card bands are checked before production adoption.
+        Global grid margins and horizontal gutters, standard surfaces and Card
+        construction and expanded navigation gutters are adopted. The compact
+        rail retains its current 52px width; the widened contrast is rejected.
+        Density enrollment remains a proposal.
       </p>
-      <h2>Responsive gutter scope · shipped layout versus two choices</h2>
-      <Measure label="gutter-scope">
-        {["shipped", "global-responsive", "major-only"].map((scope) => (
-          <div
-            key={scope}
-            className="grid responsive surfaces-scope-grid"
-            data-owner={`grid-layout-${scope}`}
-            style={{
-              inlineSize: "16rem",
-              flex: "none",
-              padding:
-                scope === "global-responsive"
-                  ? "var(--surfaces-preview-grid-margin)"
-                  : "var(--grid-margin)",
-            }}
-          >
-            <div
-              style={{
-                padding: "1rem",
-                background: "var(--color-background-container)",
-                border: "1px solid var(--color-border)",
-                textAlign: "center",
-              }}
-            >
-              {scope === "shipped"
-                ? "Shipped layout"
-                : scope === "global-responsive"
-                  ? "Responsive global simulation"
-                  : "Major-only alias: layout retained"}
-            </div>
-          </div>
-        ))}
-      </Measure>
+      <h2>Global responsive layout · adopted</h2>
       <p className="surfaces-caption">
-        These real responsive Grid layouts use the shipped example’s all-edge
-        padding construction. A responsive global margin changes all four layout
-        edges from 32px to 16/24/32px; a dedicated major-surface inline alias
-        preserves layout edges at 32px and changes only the proposed Modal,
-        SidePanel and navigation gutters below. Global --grid-margin stays
-        unchanged here. Both scope choices give the same responsive major inline
-        gutter; production scope is pending owner choice.
+        All top-level grids use viewport margins and horizontal gutters: 16px
+        below 620px, 24px from 620px, then margin 32px from 1036px. Large
+        Site/Docs gutters are 32px; App gutters remain 24px. Existing block gaps
+        and column queries are retained. The Native Grids story exposes frozen
+        Before, actual After and nested product boundaries.
       </p>
       <Button onClick={() => setTallSecondBand((value) => !value)}>
         Move tall content to {tallSecondBand ? "first" : "second"} Card band
@@ -757,28 +726,30 @@ function Page() {
                 </Cards>
               </div>
             ))}
-            <Tile data-owner="tile">
+            <Tile data-owner="tile" className="surfaces-tile-before">
               <Tile.Header>
-                <span>Current Tile</span>
+                <span>Frozen Before Tile</span>
               </Tile.Header>
               <Tile.Content>
                 <p className="p">Comparable body copy.</p>
               </Tile.Content>
             </Tile>
-            <Tile data-owner="tile" style={frame}>
-              <Tile.Header style={zero}>
-                <span>Proposed Tile</span>
+            <Tile data-owner="tile">
+              <Tile.Header>
+                <span>Adopted Tile</span>
               </Tile.Header>
-              <Tile.Content style={zero}>
+              <Tile.Content>
                 <p className="p">Comparable body copy.</p>
               </Tile.Content>
             </Tile>
           </Measure>
           <p className="surfaces-caption">
-            Card first: separate current and proposed public Cards groups, each
-            sharing four tracks across short and varied content. Current section
-            insets and parent gap stay shipped. Proposed Image consumes the top
-            edge and stays full bleed; frame end inset is 16/12px, section
+            Card first: separate frozen Before and adopted After public Cards
+            groups, each sharing four tracks across short and varied content.
+            Frozen Before restores the exact former section defaults and
+            physical frame border; its paint frame is disabled. Adopted Image
+            consumes the top edge and stays full bleed to the frame width; the
+            frame stroke is paint-only. frame end inset is 16/12px, section
             inline insets 16/12px and block padding zero. Card owns 24/20px
             section gaps through its own subgrid gap override. The public Cards
             parent retains shipped 16px gaps, including the gap between two
@@ -786,13 +757,14 @@ function Page() {
             image-less varied Card retains frame start and end insets of 16/12px
             and the shared reserved Image track. Shared-track stretch is
             measured within each variant only. Move the tall content to check
-            independent band sizing. Construction is approved; production
-            adoption awaits gutter scope and wrapped-band verification.
+            independent band sizing. Card construction is adopted; its
+            four-track parent keeps wrapped-band spacing independent of section
+            gaps.
           </p>
           {cardReadings[`${tier}-standard`] && (
             <p className="surfaces-caption">
               At {cardReadings[`${tier}-standard`].viewport}px, current →
-              proposed Image width is{" "}
+              adopted After Image width is{" "}
               {cardReadings[`${tier}-standard`].cards[0]?.imageWidth?.toFixed(
                 2,
               )}{" "}
@@ -821,7 +793,7 @@ function Page() {
             escape remains an existing mechanism limitation, pending
             disposition.
           </p>
-          <h3>Persistent panel · current / proposed</h3>
+          <h3>Persistent panel · frozen Before / adopted After</h3>
           <Measure label={`${tier}-navigation`}>
             <div className="grid surfaces-reference">
               <Reference />
@@ -837,13 +809,11 @@ function Page() {
                   keyboardShortcut={false}
                   style={
                     proposed
-                      ? ({
+                      ? undefined
+                      : ({
                           "--sidenav-surface-inset-inline":
-                            "var(--surfaces-preview-grid-margin)",
-                          "--sidenav-rail-inline-size-collapsed":
-                            "calc(max(var(--sidenav-logo-inline-size), var(--sidenav-icon-column-inline-size), calc(var(--dimension-400) + var(--dimension-050))) + 2 * var(--sidenav-surface-inset-inline))",
+                            "var(--sidenav-inset-inline)",
                         } as CSSProperties)
-                      : undefined
                   }
                   root={{
                     key: "root",
@@ -864,23 +834,17 @@ function Page() {
             ))}
           </Measure>
           <p className="surfaces-caption">
-            Current Header, Content and Footer inline insets are 8px; proposed
-            viewport grid margin is
-            {viewport === null
-              ? " awaiting measurement"
-              : ` ${viewport < 620 ? 16 : viewport < 1036 ? 24 : 32}px at ${viewport}px`}
-            . Root padding is zero; regions own the gutter once, and row labels
-            add only mark size and gap. Major block edges remain current. Both
-            public rails are contained in this row at narrow widths, overriding
-            viewport takeover only; product padding and all Header, Content and
-            Footer slots are retained. Rails start expanded and keep their
-            expand/collapse controls. Proposed desktop collapsed width derives
-            from the widest existing brand, mark or collapse toggle plus both
-            gutters (68/84/100px across viewport bands); production stays 52px
-            pending fit approval. Mobile keeps its native full-row collapsed
-            construction. Hidden collapsed titles have no page-baseline markers.
+            Frozen Before regions use 8px. Adopted expanded regions use the
+            global viewport margin 16/24/32px; label starts add only their mark
+            column and 8px gap. The compact desktop state retains 8px regions
+            and its current 52px rail. Native row heights are unchanged. Root
+            padding is zero; region gutters are owned once. Internal popup rows
+            keep 8px control padding. ContextSwitcher portal max-width keeps its
+            existing body-context fallback; ancestor-only private overrides do
+            not cross the portal. Both native navigation fixtures are contained
+            in their own rows.
           </p>
-          <h3>Native overlays · current / proposed</h3>
+          <h3>Native overlays · frozen Before / adopted After</h3>
           <Measure label={`${tier}-overlays`}>
             <div className="grid surfaces-reference">
               <Reference />
@@ -899,10 +863,11 @@ function Page() {
           </Measure>
           <p className="surfaces-caption">
             Open public Modal or SidePanel to inspect native overlay
-            construction. Current inline gutter 24px; proposed viewport grid
-            margin is 16px below 620, 24px from 620, and 32px from 1036. Divided
-            header/footer and scrollable content keep current block padding.
-            Top-layer / viewport positioning has no shared page baseline.
+            construction. Frozen Before inline gutter is 24px; adopted viewport
+            grid margin is 16px below 620, 24px from 620, and 32px from 1036.
+            Divided header/footer and scrollable content keep current block
+            padding. Top-layer / viewport positioning has no shared page
+            baseline.
           </p>
           <p className="surfaces-caption">
             {overlayCaption(tier, "modal")} {overlayCaption(tier, "panel")}
@@ -914,7 +879,7 @@ function Page() {
 }
 export const Surfaces: Story = { render: () => <Page /> };
 
-// Public shipped control: no preview class or candidate style on any owner.
+// Isolated frozen Before: exact former defaults on the same public renderer.
 function ShippedPair({ tier }: { tier: Tier }) {
   const ref = useRef<HTMLDivElement>(null);
   const [metrics, setMetrics] = useState<unknown>(null);
@@ -965,14 +930,15 @@ function ShippedPair({ tier }: { tier: Tier }) {
         overflowX: "auto",
       }}
     >
-      <h2>{tier} · isolated shipped Cards pair</h2>
+      <h2>{tier} · isolated frozen Before Cards pair</h2>
       <div
         ref={ref}
         className="grid"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(2,16rem)",
-          gap: "var(--grid-gutter)",
+          rowGap: "var(--container-gap-default)",
+          columnGap: "var(--grid-gutter)",
           inlineSize: "max-content",
         }}
       >
@@ -994,6 +960,213 @@ export const ShippedCurrentReference: Story = {
     <main>
       {tiers.map((tier) => (
         <ShippedPair key={tier} tier={tier} />
+      ))}
+    </main>
+  ),
+};
+
+function GridProof({ tier, nesting = "" }: { tier: Tier; nesting?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [metrics, setMetrics] = useState<unknown>(null);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+    const measure = () =>
+      setMetrics(
+        [...host.querySelectorAll<HTMLElement>("[data-grid-proof]")].map(
+          (grid) => {
+            const css = getComputedStyle(grid);
+            const cells = [...grid.children].map((cell) =>
+              cell.getBoundingClientRect(),
+            );
+            return {
+              tier,
+              nesting,
+              variant: grid.dataset.gridProof,
+              viewport: innerWidth,
+              margin: css.getPropertyValue("--grid-margin").trim(),
+              gutter: css.getPropertyValue("--grid-gutter").trim(),
+              padding: css.padding,
+              columnGap: css.columnGap,
+              rowGap: css.rowGap,
+              columnTracks: css.gridTemplateColumns,
+              physicalColumnGap:
+                cells.length > 1 && Math.abs(cells[0].top - cells[1].top) < 0.1
+                  ? cells[1].left - cells[0].right
+                  : null,
+              width: grid.getBoundingClientRect().width,
+            };
+          },
+        ),
+      );
+    void document.fonts.ready.then(measure);
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [tier, nesting]);
+  return (
+    <section className={nesting}>
+      <div className={tier} ref={ref}>
+        <h2>{nesting ? `${nesting} → ${tier}` : tier}</h2>
+        {[false, true].map((after) => (
+          <figure key={String(after)}>
+            <figcaption>
+              {after
+                ? "Actual adopted Grid"
+                : "Frozen Before: margin32 / gutter16"}
+            </figcaption>
+            <div
+              data-grid-proof={after ? "after" : "before"}
+              className="grid responsive"
+              style={
+                {
+                  padding: "var(--grid-margin)",
+                  ...(after
+                    ? {}
+                    : { "--grid-margin": "2rem", "--grid-gutter": "1rem" }),
+                } as CSSProperties
+              }
+            >
+              {Array.from({ length: 20 }, (_, index) => (
+                <div
+                  key={String(index)}
+                  style={{
+                    minWidth: 0,
+                    padding: "0.5rem",
+                    background: "var(--color-background-container)",
+                    border: "1px solid var(--color-border)",
+                    textAlign: "center",
+                  }}
+                >
+                  {index + 1}
+                </div>
+              ))}
+            </div>
+          </figure>
+        ))}
+        <output hidden data-native-grid-reading>
+          {JSON.stringify(metrics)}
+        </output>
+      </div>
+    </section>
+  );
+}
+export const NativeGrids: Story = {
+  render: () => (
+    <main className="surfaces06">
+      <h1>06 Surfaces · actual responsive grids</h1>
+      <p>
+        Viewport thresholds are inclusive 620px and 1036px. Public Grid column
+        counts retain their existing 768px/1280px queries. Horizontal gutters
+        change; default row gap remains 16px. Nested Site inside App resets to
+        Site, and App inside Site resets to App.
+      </p>
+      {tiers.map((tier) => (
+        <GridProof key={tier} tier={tier} />
+      ))}
+      <GridProof tier="site" nesting="app" />
+      <GridProof tier="app" nesting="site" />
+    </main>
+  ),
+};
+
+export const CollapsedNavigation: Story = {
+  render: () => (
+    <main className="surfaces06">
+      <h1>06 Surfaces · collapsed navigation fit proposal</h1>
+      <p>
+        The adopted compact desktop rail retains its current 52px width and 8px
+        regions. Expanded labelled panels use the responsive 16/24/32px major
+        gutter. The rejected contrast shows the 84/100px widening that would
+        result from applying full-panel gutters to the compact state. The
+        recalled 48px baseline remains unverified. Expand the first two native
+        controls to compare old versus adopted expanded gutters. Both use the
+        corrected centered icon anatomy. The public collapsed state hides
+        Content and Context; its brand, collapse toggle and Footer icons remain.
+        Icon-only controls have no shared text-baseline guides.
+      </p>
+      {tiers.map((tier) => (
+        <section key={tier} className={`${tier} surface surfaces-tier`}>
+          <h2>{tier}</h2>
+          <Measure label={`${tier}-collapsed-fit`}>
+            {["before", "adopted", "rejected"].map((variant) => (
+              <figure key={variant}>
+                <figcaption>
+                  {variant === "rejected"
+                    ? "Rejected widened rail 84/100"
+                    : variant === "adopted"
+                      ? "Adopted compact 52 / inset 8"
+                      : "Frozen Before 52 / inset 8"}
+                </figcaption>
+                <div className="surfaces-nav-stage">
+                  <SideNavigation
+                    className="surfaces-nav-fixture"
+                    data-owner="side-navigation"
+                    data-variant={variant}
+                    defaultExpanded={false}
+                    applicationName="UI"
+                    brand={
+                      <span role="img" aria-label="Brand">
+                        ●
+                      </span>
+                    }
+                    keyboardShortcut={false}
+                    style={
+                      variant === "rejected"
+                        ? ({
+                            "--sidenav-surface-inset-inline":
+                              "var(--grid-margin)",
+                            "--sidenav-rail-inline-size-collapsed":
+                              "calc(max(var(--sidenav-logo-inline-size), var(--sidenav-icon-column-inline-size), calc(var(--dimension-400) + var(--dimension-050))) + 2 * var(--sidenav-surface-inset-inline))",
+                          } as CSSProperties)
+                        : variant === "before"
+                          ? ({
+                              "--sidenav-surface-inset-inline":
+                                "var(--sidenav-inset-inline)",
+                            } as CSSProperties)
+                          : undefined
+                    }
+                    root={{
+                      key: "root",
+                      items: [
+                        {
+                          key: "workspace",
+                          label: "Workspace",
+                          items: [
+                            {
+                              key: "overview",
+                              label: "Overview",
+                              icon: "folder",
+                            },
+                            {
+                              key: "resources",
+                              label: "Resources",
+                              icon: "folder",
+                            },
+                          ],
+                        },
+                      ],
+                    }}
+                    footerRoot={{
+                      key: "footer",
+                      items: [
+                        {
+                          label: "Settings",
+                          control: "button",
+                          icon: "folder",
+                        },
+                      ],
+                    }}
+                  />
+                </div>
+              </figure>
+            ))}
+          </Measure>
+        </section>
       ))}
     </main>
   ),

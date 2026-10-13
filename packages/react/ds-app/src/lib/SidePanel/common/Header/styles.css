@@ -44,7 +44,10 @@
       exception — its border spans the padding box, so it insets with margin
       (see Footer/styles.css).
     */
-    padding-inline: var(--side-panel-padding-inline);
+    padding-inline: var(
+      --side-panel-padding-inline,
+      var(--ds-spacing-inset-surface-major-inline)
+    );
 
     /*
       The title is heading text beside a control, not a control: its line box

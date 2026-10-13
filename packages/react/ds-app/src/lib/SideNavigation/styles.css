@@ -56,7 +56,9 @@
 
   .ds.side-navigation {
     /* Resolve the existing override on its real owner, independently of control/popover insets. */
-    --sidenav-surface-inset-inline: var(--sidenav-inset-inline);
+    --sidenav-surface-inset-inline: var(
+      --ds-spacing-inset-surface-major-inline
+    );
     font-size: var(--ds-typography-body-font-size);
     --sidenav-icon-gap: var(--ds-spacing-mark);
     --sidenav-icon-column-inline-size: var(--ds-typography-body-font-size);
@@ -151,6 +153,13 @@
       }
     }
 
+    /* A compact desktop rail keeps its control inset and narrow width. */
+    @media (min-width: 38.75rem) {
+      &[data-expanded="false"] {
+        --sidenav-surface-inset-inline: var(--sidenav-inset-inline);
+      }
+    }
+
     &[data-expanded="false"] {
       inline-size: var(--sidenav-rail-inline-size-collapsed);
       justify-content: space-between;
@@ -177,6 +186,7 @@
 
         .row {
           grid-template-columns: var(--sidenav-icon-column-inline-size);
+          justify-content: center;
         }
       }
 
@@ -217,6 +227,7 @@
               var(--sidenav-icon-column-inline-size) 1fr
               auto;
             padding-inline: var(--sidenav-inset-inline);
+            justify-content: normal;
             /* This popup row owns its gutter, unlike the padded regions. */
             &::before {
               inset-inline-start: 0;

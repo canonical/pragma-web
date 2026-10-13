@@ -1,30 +1,33 @@
 .surfaces06 {
-  --surfaces-preview-grid-margin: 16px;
+  --surfaces-preview-grid-margin: var(--grid-margin);
   padding: 24px;
   font-weight: 400;
 }
-@media (min-width: 38.75rem) {
-  .surfaces06 {
-    --surfaces-preview-grid-margin: 24px;
-  }
-}
-@media (min-width: 64.75rem) {
-  .surfaces06 {
-    --surfaces-preview-grid-margin: 32px;
-  }
-}
-.surfaces-card-proposed {
-  padding-inline: 0;
-  padding-block: var(--ds-spacing-inset-surface-standard-block);
-  row-gap: var(--ds-spacing-group);
-}
-/* The image consumes the first block edge; the frame retains its end inset. */
-.surfaces-card-proposed:has(> img:first-child) {
-  padding-block-start: 0;
-}
-.surfaces-card-proposed > :is(.card-header, .card-content, .card-footer) {
-  padding-inline: var(--ds-spacing-inset-surface-standard-inline);
+/* Frozen pre-adoption defaults; the adopted peer reads production styles. */
+.surfaces-card-before {
+  border: var(--card-border-width) solid var(--card-color-border);
+  --ds-stroke-width: 0;
   padding-block: 0;
+  row-gap: 1rem;
+  --card-header-padding-block: 1rem;
+  --card-header-padding-inline: 1rem;
+  --card-content-padding-block-start: 0.5rem;
+  --card-content-padding-block-end: 1rem;
+  --card-content-padding-inline: 1rem;
+  --card-footer-padding-block: 1rem;
+  --card-footer-padding-inline: 1rem;
+}
+.surfaces-card-before > .card-header:has(+ .card-content) {
+  padding-block-end: 0;
+}
+.surfaces-tile-before {
+  row-gap: 0;
+  padding: 0;
+  --tile-header-padding-block: 0.5rem;
+  --tile-header-padding-inline: 1rem;
+  --tile-content-padding-top: 0.5rem;
+  --tile-content-padding-bottom: 1rem;
+  --tile-content-padding-inline: 1rem;
 }
 .surfaces06 h1,
 .surfaces06 h2,
@@ -54,7 +57,8 @@
 .surfaces-cards.grid {
   display: grid;
   grid-template-columns: repeat(2, 16rem);
-  gap: var(--grid-gutter);
+  row-gap: var(--container-gap-default);
+  column-gap: var(--grid-gutter);
   inline-size: max-content;
 }
 .surfaces-reference.grid {

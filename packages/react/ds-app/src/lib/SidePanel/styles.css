@@ -37,8 +37,7 @@
       against gray-520, and gray-820 in dark so it stays pale either way.
     */
     --side-panel-color-border: var(--color-border-muted);
-    /* One inline padding, read by the header, content and footer alike. */
-    --side-panel-padding-inline: var(--dimension-300);
+    /* Parts share the public inline override, with a responsive major fallback. */
     /* Block padding of the two pinned regions, so the rhythm is tunable. */
     --side-panel-header-padding-block: var(--dimension-200);
     --side-panel-footer-padding-block: var(--dimension-200);

@@ -23,8 +23,7 @@ describe("Card component", () => {
 
     const header = screen.getByText("Title");
     expect(header).toHaveClass("card-header");
-    // The header is not a separate visual section: it merges with the content
-    // that follows (the seam-collapse selector targets this adjacency).
+    // Header and Content remain adjacent in their fixed shared section tracks.
     expect(header.nextElementSibling).toHaveClass("card-content");
     expect(screen.getByText("Body")).toHaveClass("card-content");
     // Footer carries tags and labels (e.g. Chip), not CTAs or links.

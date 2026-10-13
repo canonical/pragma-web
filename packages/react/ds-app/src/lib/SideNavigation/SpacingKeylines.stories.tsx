@@ -117,7 +117,12 @@ function Row({
         direction,
         viewport: window.innerWidth,
         outerSurfacePadding: css.paddingInline,
-        gutterCarrier: css.getPropertyValue("--sidenav-inset-inline").trim(),
+        legacyControlInsetCarrier: css
+          .getPropertyValue("--sidenav-inset-inline")
+          .trim(),
+        surfaceInsetCarrier: css
+          .getPropertyValue("--sidenav-surface-inset-inline")
+          .trim(),
         parts: [...nav.children]
           .filter((node) =>
             node.matches(
@@ -316,11 +321,14 @@ function Row({
         disclosure grouping and interaction carry the hierarchy.
         ContextSwitcher’s actual button box starts on the label keyline, with
         its existing 8px text inset. Navigation is contained in this comparison
-        row, with every slot retained. Its current outer gutter is 8px; labels
-        therefore start at 32/30px. Accordion retains its own 16px header inset
-        and 40/38px label start. Responsive major-surface adoption is pending
-        scope selection. Clipped labels and viewport popups keep hidden
-        measurements and have no row-guide markers.
+        row, with every slot retained. Expanded labels start at the responsive
+        viewport gutter plus the 16/14px mark and 8px gap. Compact desktop
+        navigation retains 8px gutters and the current 52px width. Accordion
+        retains its own 16px inset and 40/38px label start. Navigation row
+        heights remain inherited upstream values, not a new density policy.
+        Context menu sizing retains its existing global portal fallback. Clipped
+        labels and viewport popups keep hidden measurements and have no
+        row-guide markers.
       </p>
     </section>
   );

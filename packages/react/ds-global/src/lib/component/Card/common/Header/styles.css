@@ -6,13 +6,10 @@
    * @implements ds:global.subcomponent.card-header
    *
    * DSL anatomy: layout.type flow, space-between; title uses font/weight/semibold.
-   * A content-bearing section: it pads itself (the card frame applies no general
-   * padding). Vertical padding is in baseline multiples.
+   * The Card frame owns block seating; this section owns standard inline insets.
    */
   :root {
     --card-header-gap: var(--dimension-200);
-    --card-header-padding-block: var(--dimension-200);
-    --card-header-padding-inline: var(--dimension-200);
   }
 
   .ds.card-header {
@@ -22,7 +19,10 @@
     justify-content: space-between;
     gap: var(--card-header-gap);
 
-    padding-block: var(--card-header-padding-block);
-    padding-inline: var(--card-header-padding-inline);
+    padding-block: var(--card-header-padding-block, 0);
+    padding-inline: var(
+      --card-header-padding-inline,
+      var(--ds-spacing-inset-surface-standard-inline)
+    );
   }
 }

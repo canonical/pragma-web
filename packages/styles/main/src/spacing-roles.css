@@ -127,5 +127,6 @@
     --ds-spacing-inset-surface-compact-block: var(--ds-spacing-control-inset);
     --ds-spacing-inset-surface-standard-inline: var(--ds-spacing-action);
     --ds-spacing-inset-surface-standard-block: var(--ds-spacing-action);
+    --ds-spacing-inset-surface-major-inline: var(--grid-margin);
   }
 }

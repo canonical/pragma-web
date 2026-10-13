@@ -23,7 +23,10 @@
       padding would run the hairline edge to edge. The margin keeps it stopping
       short of both panel edges, in line with the text column.
     */
-    margin-inline: var(--side-panel-padding-inline);
+    margin-inline: var(
+      --side-panel-padding-inline,
+      var(--ds-spacing-inset-surface-major-inline)
+    );
 
     display: flex;
     justify-content: flex-end;

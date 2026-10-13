@@ -346,10 +346,7 @@ const Tier = ({ title, className }: { title: string; className: string }) => (
           <Field name="second" inputType="text" label="Second field" />
         </Form>
       </Measured>
-      <Measured
-        caption="Card · current section insets; pending Surface 06"
-        owner=".card"
-      >
+      <Measured caption="Card · adopted frame and section group" owner=".card">
         <div className="gaps-card-grid">
           <Card>
             <Card.Header>
@@ -452,8 +449,8 @@ export const SiteDocsApp: Story = {
       <p className="gaps-note">
         Container-owned block gaps. Red: block start / occupied end. Blue: first
         browser baseline. Help leads text/select controls and follows toggle
-        controls, as shipped. Card section insets remain current. Inline items
-        use the selected gap.
+        controls, as shipped. Card uses the adopted frame and section group.
+        Inline items use the selected gap.
       </p>
       <Tier title="Site" className="site" />
       <Tier title="Docs" className="docs" />

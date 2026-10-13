@@ -54,7 +54,7 @@
         position: absolute;
         inset-block: 0;
         inset-inline-start: calc(-1 * var(--sidenav-surface-inset-inline));
-        inline-size: var(--dimension-stroke-thickness-medium);
+        inline-size: var(--dimension-stroke-thickness-large);
         background: var(--color-icon);
         pointer-events: none;
       }

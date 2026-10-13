@@ -21,7 +21,6 @@
     --modal-header-color-border: var(--color-border-muted);
     --modal-header-border-width: var(--dimension-stroke-thickness-medium);
     --modal-header-padding-block: var(--dimension-200);
-    --modal-header-padding-inline: var(--modal-padding-inline);
     --modal-header-gap: var(--dimension-200);
   }
 
@@ -62,7 +61,10 @@
     gap: var(--modal-header-gap);
 
     padding-block: var(--modal-header-padding-block);
-    padding-inline: var(--modal-header-padding-inline);
+    padding-inline: var(
+      --modal-header-padding-inline,
+      var(--modal-padding-inline, var(--ds-spacing-inset-surface-major-inline))
+    );
     /* Never shrink: only the content pane gives way. */
     flex: 0 0 auto;
     /* Positions the inset rule below. */
@@ -79,7 +81,13 @@
       content: "";
       position: absolute;
       inset-block-end: 0;
-      inset-inline: var(--modal-header-padding-inline);
+      inset-inline: var(
+        --modal-header-padding-inline,
+        var(
+          --modal-padding-inline,
+          var(--ds-spacing-inset-surface-major-inline)
+        )
+      );
       block-size: var(--modal-header-border-width);
       background-color: var(--modal-header-color-border);
     }

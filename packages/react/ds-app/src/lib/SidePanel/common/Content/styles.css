@@ -31,7 +31,10 @@
       while the padding keeps the text clear of both.
     */
     padding-block: var(--side-panel-content-padding-block);
-    padding-inline: var(--side-panel-padding-inline);
+    padding-inline: var(
+      --side-panel-padding-inline,
+      var(--ds-spacing-inset-surface-major-inline)
+    );
 
     /*
       Focusable (Content.tsx sets `tabIndex`) so keyboard users can scroll it.
