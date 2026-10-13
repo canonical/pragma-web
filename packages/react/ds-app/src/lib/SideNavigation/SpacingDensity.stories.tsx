@@ -44,6 +44,20 @@ function BeforeLink({ children, ...props }: LinkComponentProps) {
   return <a {...props}>{beforeLabel(children)}</a>;
 }
 
+// A custom link can honor its full public contract without forwarding data attrs.
+function ClassOnlyLink({
+  href,
+  className,
+  children,
+  "aria-current": current,
+}: LinkComponentProps) {
+  return (
+    <a href={href} className={className} aria-current={current}>
+      {children}
+    </a>
+  );
+}
+
 function PortalChip({
   origin,
   tier,
@@ -149,6 +163,15 @@ function Fit({
               }
             : null,
           height: rect.height,
+          provider: row.matches(navigationDensityPolicy.providerSelector)
+            ? navigationDensityPolicy.provider
+            : null,
+          providerClassPresent: row.classList.contains(
+            navigationDensityPolicy.providerClassName,
+          ),
+          diagnosticProviderAttribute: row.getAttribute(
+            "data-ds-density-provider",
+          ),
           top: rect.top - origin.top,
           bottom: rect.bottom - origin.top,
           x: rect.left - origin.left,
@@ -267,10 +290,9 @@ function Fit({
         ].map((chip) => ({
           origin: originId,
           targetTier: "site",
-          provider:
-            chip
-              .closest("[data-ds-density-provider]")
-              ?.getAttribute("data-ds-density-provider") ?? null,
+          provider: chip.closest(navigationDensityPolicy.providerSelector)
+            ? navigationDensityPolicy.provider
+            : null,
           height: chip.getBoundingClientRect().height,
           occupiedHeight:
             chip.getBoundingClientRect().height +
@@ -315,6 +337,7 @@ function Fit({
                 key={mode}
                 className="density-nav-fixture"
                 data-density-host={mode}
+                LinkComponent={mode === "candidate-chip" ? ClassOnlyLink : "a"}
                 currentUrl={`#density-${tier}-${mode}-first`}
                 defaultExpanded
                 keyboardShortcut={false}
@@ -495,11 +518,13 @@ function Fit({
       </div>
       <p className="density-caption">
         Plain and enrolled static Chip share the unchanged default label seat.
-        Reset is an explicit nonenrolled reset reference, not another public
-        density mode. Intrinsic painted rows contain closure and touch the next
-        row; no target height is authored. Other controls, interactive Chips,
-        nested product/reset wrappers and portals outside the direct trailing
-        slot keep their default seat.
+        Dense uses a public custom link forwarding only guaranteed props; the
+        provider class keeps automatic enrollment when data attributes are
+        dropped. Reset is an explicit nonenrolled reset reference, not another
+        public density mode. Intrinsic painted rows contain closure and touch
+        the next row; no target height is authored. Other controls, interactive
+        Chips, nested product/reset wrappers and portals outside the direct
+        trailing slot keep their default seat.
       </p>
     </section>
   );
@@ -555,7 +580,7 @@ function NativeVariants({
         railWidth: nav?.getBoundingClientRect().width,
         rows: [
           ...host.querySelectorAll<HTMLElement>(
-            ".row[data-ds-density-provider]",
+            navigationDensityPolicy.providerSelector,
           ),
         ].map((row) => {
           let hiddenByClosedDetails = false;

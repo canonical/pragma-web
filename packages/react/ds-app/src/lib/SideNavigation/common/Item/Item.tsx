@@ -60,7 +60,7 @@ const Item = ({
     >
       {url ? (
         <Link
-          className="ds row spacing-control-seat-metrics"
+          className={`ds row spacing-control-seat-metrics ${navigationDensityPolicy.providerClassName}`}
           data-ds-density-provider={navigationDensityPolicy.provider}
           data-ds-density-policy-version={navigationDensityPolicy.version}
           href={disabled ? undefined : url}
@@ -70,7 +70,7 @@ const Item = ({
         </Link>
       ) : (
         <span
-          className="ds row spacing-control-seat-metrics"
+          className={`ds row spacing-control-seat-metrics ${navigationDensityPolicy.providerClassName}`}
           data-ds-density-provider={navigationDensityPolicy.provider}
           data-ds-density-policy-version={navigationDensityPolicy.version}
           aria-current={active ? "page" : undefined}

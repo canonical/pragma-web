@@ -106,7 +106,7 @@ const ItemExpandable = ({
       >
         {/* biome-ignore lint/a11y/noStaticElementInteractions: <summary> is the native disclosure trigger for its <details> (implicit button semantics per HTML-AAM); biome's static-element check doesn't recognise it. */}
         <summary
-          className="ds row spacing-control-seat-metrics"
+          className={`ds row spacing-control-seat-metrics ${navigationDensityPolicy.providerClassName}`}
           data-ds-density-provider={navigationDensityPolicy.provider}
           data-ds-density-policy-version={navigationDensityPolicy.version}
           onClick={handleSummaryClick}

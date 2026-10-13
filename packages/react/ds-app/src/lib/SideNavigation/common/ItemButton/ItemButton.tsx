@@ -26,7 +26,7 @@ const ItemButton = ({
 }: ItemButtonProps): React.ReactElement => (
   <li className={[componentCssClassName, className].filter(Boolean).join(" ")}>
     <button
-      className="ds row spacing-control-seat-metrics"
+      className={`ds row spacing-control-seat-metrics ${navigationDensityPolicy.providerClassName}`}
       data-ds-density-provider={navigationDensityPolicy.provider}
       data-ds-density-policy-version={navigationDensityPolicy.version}
       {...props}

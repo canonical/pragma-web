@@ -1,12 +1,12 @@
 @layer ds.components.apps {
   /* The provider owns a private channel, not generic helper inputs. Only an
      eligible direct static subscriber crosses the trailing-slot boundary. */
-  :where(.ds.row[data-ds-density-provider="navigation-static-chip"]) {
+  :where(.ds.row.sidenav-static-chip-provider-v1) {
     --sidenav-static-chip-inset: var(--ds-spacing-control-inset-dense);
     --sidenav-static-chip-end: 0px;
   }
 
-  :where(.ds.row[data-ds-density-provider="navigation-static-chip"])
+  :where(.ds.row.sidenav-static-chip-provider-v1)
     > .end
     > span.chip[data-ds-density-subscriber="static-chip"]:not(
       :has(button, a, input, select, textarea)

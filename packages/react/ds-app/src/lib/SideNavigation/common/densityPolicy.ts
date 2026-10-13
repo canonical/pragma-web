@@ -2,12 +2,12 @@
 export const navigationDensityPolicy = {
   version: 1,
   provider: "navigation-static-chip",
+  providerClassName: "sidenav-static-chip-provider-v1",
   subscriber: "static-chip",
   role: "spacing.inset.control.block",
   member: "dense",
   source: "--ds-spacing-control-inset-dense",
-  providerSelector:
-    '.ds.row[data-ds-density-provider="navigation-static-chip"]',
+  providerSelector: ".ds.row.sidenav-static-chip-provider-v1",
   subscriberSelector:
     '> .end > span.chip[data-ds-density-subscriber="static-chip"]',
   helperInputs: {

@@ -1,6 +1,9 @@
+import { Chip } from "@canonical/react-ds-global";
 import { render, screen } from "@testing-library/react";
 import type React from "react";
 import { describe, expect, it } from "vitest";
+import type { LinkComponentProps } from "../../types.js";
+import { navigationDensityPolicy } from "../densityPolicy.js";
 import Item from "./Item.js";
 
 describe("Item", () => {
@@ -20,6 +23,39 @@ describe("Item", () => {
     expect(screen.getByText("Machines")).not.toHaveClass("label");
     expect(row).not.toHaveClass("spacing-control-seat");
   });
+  it("preserves enrollment through a custom link forwarding only its public contract", () => {
+    function ClassOnlyLink({
+      href,
+      className,
+      children,
+      "aria-current": current,
+    }: LinkComponentProps) {
+      return (
+        <a href={href} className={className} aria-current={current}>
+          {children}
+        </a>
+      );
+    }
+    const { container } = render(
+      <Item
+        url="/machines"
+        LinkComponent={ClassOnlyLink}
+        slot={<Chip value="Chip" />}
+      >
+        Machines
+      </Item>,
+    );
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("href", "/machines");
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
+    expect(
+      container.querySelector(
+        `${navigationDensityPolicy.providerSelector} ${navigationDensityPolicy.subscriberSelector}`,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Machines")).toHaveClass("spacing-control-seat");
+  });
+
   it("renders a link when url is set", () => {
     render(<Item url="/machines">Machines</Item>);
     expect(screen.getByRole("link", { name: "Machines" })).toHaveAttribute(
