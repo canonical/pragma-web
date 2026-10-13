@@ -52,7 +52,7 @@ function Row({
       };
       const labels = [
         ...host.querySelectorAll<HTMLElement>(
-          ".accordion-item > .header > .heading,.accordion-item > .content > [data-keyline-content],.side-navigation-header .title,.side-navigation-group-header,.side-navigation-item > .row > .side-navigation-label,.side-navigation-item-button > .row > .side-navigation-label,.side-navigation-item-expandable > .details > .row > .side-navigation-label,.side-navigation-context-switcher .trigger > .side-navigation-label > .row > .side-navigation-label",
+          ".accordion-item > .header > .heading,.accordion-item > .content > [data-keyline-content],.side-navigation-header .title,.side-navigation-group-header,.side-navigation-item > .row > .side-navigation-label,.side-navigation-item-button > .row > .side-navigation-label,.side-navigation-item-expandable > .details > .row > .side-navigation-label,.side-navigation-context-switcher .trigger > .label > .row > .label",
         ),
       ].filter((node) => node.getBoundingClientRect().width > 0);
       const records = labels.map((node) => {
