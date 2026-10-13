@@ -1,0 +1,45 @@
+.keylines07 {
+  padding: 24px;
+  font-weight: 400;
+}
+.keylines-tier {
+  margin-block: 32px;
+  padding: 16px;
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+}
+.keylines-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  inline-size: 15rem;
+  gap: var(--ds-spacing-group);
+}
+.keylines-row > .side-navigation.keylines-nav-fixture {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  block-size: 22rem;
+}
+.keylines-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.keylines-guides > i {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 1px;
+  background: rgb(40 90 190 / 60%);
+}
+.keylines-guides > b {
+  position: absolute;
+  inline-size: 8px;
+  block-size: 1px;
+  transform: translateX(-4px);
+  background: rgb(40 90 190 / 80%);
+}
+.keylines-caption {
+  margin-block: 16px 32px;
+  max-inline-size: 80ch;
+}

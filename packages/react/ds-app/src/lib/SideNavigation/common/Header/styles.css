@@ -16,8 +16,14 @@
     .brand-container {
       display: flex;
       align-items: baseline;
-      gap: var(--dimension-050);
-      padding-inline: var(--sidenav-inset-inline);
+      /* Preserve the brand column while continuing the row's label keyline. */
+      gap: calc(
+        var(--sidenav-icon-column-inline-size) +
+        var(--sidenav-icon-gap) -
+        var(--sidenav-logo-inline-size)
+      );
+      /* The Header region owns the outer inset. */
+      padding-inline: 0;
 
       .brand {
         block-size: var(--sidenav-logo-block-size);

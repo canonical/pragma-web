@@ -8,19 +8,19 @@
     list-style: none;
     height: var(--dimension-400);
 
-    /* The row: link or label. [icon] [label] [end], 0.5rem gap, 0.5rem inset —
-      shares --sidenav-inset-inline/--sidenav-icon-gap with the header so the
-      leading icon lines up with the logo above it. Fixed row height
+    /* The row: link or label. [icon] [label] [end], mark gap and frame-owned
+      outer inset, so the leading icon lines up with the logo above it. Fixed row height
       (`--dimension-400`, 2rem) — reverses the intrinsic, padding-driven
       height this file previously read. */
     & > .row {
+      position: relative;
       display: grid;
       grid-template-columns: var(--sidenav-icon-column-inline-size) 1fr auto;
       align-items: center;
       gap: var(--sidenav-icon-gap); /* 0.5rem */
       width: 100%;
       height: 100%;
-      padding-inline: var(--sidenav-inset-inline); /* 0.5rem */
+      padding-inline: 0;
       box-sizing: border-box;
       text-decoration: none;
       color: var(--color-text);
@@ -48,8 +48,16 @@
 
     &[data-active] > .row {
       background: var(--sidenav-row-background-active);
-      box-shadow: inset var(--dimension-stroke-thickness-medium) 0 0 0
-        var(--color-icon);
+      /* The region's padded scroll window contains logical-start paint. */
+      &::before {
+        content: "";
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: calc(-1 * var(--sidenav-surface-inset-inline));
+        inline-size: var(--dimension-stroke-thickness-medium);
+        background: var(--color-icon);
+        pointer-events: none;
+      }
     }
 
     /* Declared after [data-active] so a disabled+active item (edge case) still

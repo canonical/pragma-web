@@ -11,7 +11,8 @@
     line-height: var(--typography-text-tertiary-bold-line-height);
     letter-spacing: var(--typography-text-tertiary-bold-letter-spacing);
     padding-top: var(--sidenav-icon-gap);
-    padding-inline: var(--sidenav-inset-inline); /* 0.5 rem */
+    padding-inline: 0;
+    padding-inline-start: var(--sidenav-label-continuation);
     /* Figma's group-heading component sets its text style's case to `UPPER`
      (a literal transform of the authored string, confirmed against the
      source file — not a font feature): "Header" renders as "HEADER", not

@@ -8,30 +8,44 @@
        (its inline-block default is for inline placements; the rail is a
        block column). */
     & > .ds.contextual-menu {
-      display: block;
-      height: var(--dimension-400);
+      /* Contain the Button helper’s trailing closure in the real wrapper. */
+      display: flow-root;
+      /* The field box continues labels; its own field padding stays separate. */
+      margin-inline-start: var(--sidenav-label-continuation);
 
       & > .trigger {
-        height: 100%;
         display: grid;
-        grid-template-columns: 1fr auto;
+        grid-template-columns: 1fr;
         align-items: center;
         width: 100%;
-        padding-block: var(--sidenav-icon-gap);
-        padding-inline: var(--sidenav-icon-gap);
+        padding-inline: var(--ds-spacing-field);
         box-sizing: border-box;
         color: var(--color-text);
         background: var(--color-foreground-input);
-        border: none;
-        border-block-end: var(--dimension-stroke-thickness-medium) solid
-          var(--color-border);
+        /* Button's existing helper owns its default occupied body seat.
+           Only the bottom paint slot changes; focus and forced colors remain
+           in the shared stroke assembly. */
+        --ds-stroke-width: var(--dimension-stroke-thickness-medium);
+        --ds-stroke-color: var(--color-border);
+        --ds-stroke-slot: inset 0 calc(-1 * var(--ds-stroke-width)) 0 0
+          var(--ds-stroke-color);
+        @media (forced-colors: active) {
+          &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-block-end: var(--ds-stroke-width) solid CanvasText;
+          }
+        }
         cursor: pointer;
+        text-align: start;
 
         &:hover {
           background: var(--color-foreground-input-hover);
         }
-
-        & > .row {
+        /* ContextualMenu's Button owns a label wrapper around the row. */
+        & > .label > .row {
           display: flex;
           align-items: center;
           justify-content: space-between;

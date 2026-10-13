@@ -29,7 +29,7 @@
       gap: var(--sidenav-icon-gap); /* 0.5rem */
       width: 100%;
       height: var(--dimension-400);
-      padding-inline: var(--sidenav-inset-inline); /* 0.5rem */
+      padding-inline: 0;
       box-sizing: border-box;
       color: var(--color-text);
       background: var(--sidenav-row-background);
@@ -104,18 +104,14 @@
       }
     }
 
-    /* Children — always leaves, indented past the parent's icon column so
-     they read as nested. */
+    /* Children retain their own reserved mark column, continuing parent labels
+       without adding the same continuation a second time. */
     & > .details > .children {
       display: flex;
       flex-direction: column;
       list-style: none;
       margin: 0;
       padding: 0;
-
-      & .row {
-        margin-inline-start: var(--sidenav-panel-indent);
-      }
     }
   }
 }
