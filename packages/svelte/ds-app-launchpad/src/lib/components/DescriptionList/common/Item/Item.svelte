@@ -7,7 +7,7 @@
 
   const componentCssClassName = "ds description-list-item";
 
-  let { class: className, name, description, ...rest }: ItemProps = $props();
+  let { class: className, children, ...rest }: ItemProps = $props();
 
   const descriptionListContext = getDescriptionListContext();
 </script>
@@ -16,8 +16,5 @@
   class={[componentCssClassName, className, descriptionListContext.layout]}
   {...rest}
 >
-  <dt>
-    {@render name()}
-  </dt>
-  <dd>{@render description()}</dd>
+  {@render children?.()}
 </div>

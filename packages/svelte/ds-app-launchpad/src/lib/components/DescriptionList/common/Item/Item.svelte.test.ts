@@ -1,35 +1,29 @@
 /* @canonical/generator-ds 0.17.1 */
 
 import type { ComponentProps } from "svelte";
-import { createRawSnippet } from "svelte";
 import { describe, expect, it, vi } from "vitest";
 import type { Locator } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import type { DescriptionListContext } from "../../types.js";
-import Component from "./Item.svelte";
+import ItemTestHost from "./ItemTestHost.fixtures.svelte";
 
 vi.mock("../../context.js", () => {
   return {
     getDescriptionListContext: (): DescriptionListContext => ({
       layout: "auto",
     }),
+    setDescriptionListContext: (context: DescriptionListContext) => context,
   };
 });
 
 describe("Item component", () => {
   const baseProps = {
-    name: createRawSnippet(() => ({
-      render: () => "Term",
-    })),
-    description: createRawSnippet(() => ({
-      render: () => `<span>Description</span>`,
-    })),
     "data-testid": "description-list-item",
-  } satisfies ComponentProps<typeof Component>;
+  } satisfies ComponentProps<typeof ItemTestHost>;
 
   it("renders", async () => {
-    const page = await render(Component, { ...baseProps });
+    const page = await render(ItemTestHost, { ...baseProps });
     await expect.element(componentLocator(page)).toBeInTheDocument();
     await expect.element(termLocator(page)).toHaveTextContent("Term");
     await expect
@@ -42,7 +36,7 @@ describe("Item component", () => {
       ["id", "test-id"],
       ["aria-label", "test-aria-label"],
     ])("applies %s", async (attribute, expected) => {
-      const page = await render(Component, {
+      const page = await render(ItemTestHost, {
         ...baseProps,
         [attribute]: expected,
       });
@@ -52,7 +46,7 @@ describe("Item component", () => {
     });
 
     it("applies classes", async () => {
-      const page = await render(Component, {
+      const page = await render(ItemTestHost, {
         ...baseProps,
         class: "test-class",
       });
@@ -60,7 +54,7 @@ describe("Item component", () => {
     });
 
     it("applies style", async () => {
-      const page = await render(Component, {
+      const page = await render(ItemTestHost, {
         ...baseProps,
         style: "color: orange;",
       });
@@ -71,14 +65,14 @@ describe("Item component", () => {
   });
 });
 
-function componentLocator(page: RenderResult<typeof Component>): Locator {
+function componentLocator(page: RenderResult<typeof ItemTestHost>): Locator {
   return page.getByTestId("description-list-item");
 }
 
-function termLocator(page: RenderResult<typeof Component>): Locator {
+function termLocator(page: RenderResult<typeof ItemTestHost>): Locator {
   return page.getByRole("term");
 }
 
-function descriptionLocator(page: RenderResult<typeof Component>): Locator {
+function descriptionLocator(page: RenderResult<typeof ItemTestHost>): Locator {
   return page.getByRole("definition");
 }

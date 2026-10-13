@@ -35,20 +35,20 @@
 ```svelte
 <DescriptionList layout="list">
   <DescriptionList.Item>
-    {#snippet name()}ID{/snippet}
-    {#snippet description()}134{/snippet}
+    <dt>ID</dt>
+    <dd>134</dd>
   </DescriptionList.Item>
   <DescriptionList.Item>
-    {#snippet name()}Requested by{/snippet}
-    {#snippet description()}John Smith{/snippet}
+    <dt>Requested by</dt>
+    <dd>John Smith</dd>
   </DescriptionList.Item>
   <DescriptionList.Item>
-    {#snippet name()}Created{/snippet}
-    {#snippet description()}2023-10-01T12:00:00Z{/snippet}
+    <dt>Created</dt>
+    <dd>2023-10-01T12:00:00Z</dd>
   </DescriptionList.Item>
   <DescriptionList.Item>
-    {#snippet name()}Status{/snippet}
-    {#snippet description()}Active{/snippet}
+    <dt>Status</dt>
+    <dd>Active</dd>
   </DescriptionList.Item>
 </DescriptionList>
 ```

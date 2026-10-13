@@ -17,42 +17,43 @@
 {#snippet template(args: ComponentProps<typeof DescriptionList>)}
   <DescriptionList {...args}>
     <DescriptionList.Item>
-      {#snippet name()}ID{/snippet}
-      {#snippet description()}134{/snippet}
+      <dt>ID</dt>
+      <dd>134</dd>
     </DescriptionList.Item>
     <DescriptionList.Item>
-      {#snippet name()}
+      <dt>
         <UserIcon class="icon" aria-hidden="true" />
-        Requested by{/snippet}
-      {#snippet description()}Jane Doe{/snippet}
+        Requested by
+      </dt>
+      <dd>Jane Doe</dd>
     </DescriptionList.Item>
     <DescriptionList.Item>
-      {#snippet name()}Created{/snippet}
-      {#snippet description()}
+      <dt>Created</dt>
+      <dd>
         <DateTime date="2023-10-01T12:00:00Z" />
-      {/snippet}
+      </dd>
     </DescriptionList.Item>
     <DescriptionList.Item>
-      {#snippet name()}A very long term name to test layout behavior{/snippet}
-      {#snippet description()}
+      <dt>A very long term name to test layout behavior</dt>
+      <dd>
         This is a description for a term with a very long name to see how the
         layout handles it.
-      {/snippet}
+      </dd>
     </DescriptionList.Item>
     <DescriptionList.Item>
-      {#snippet name()}Status{/snippet}
-      {#snippet description()}
+      <dt>Status</dt>
+      <dd>
         <Chip value="Active" readonly criticality="success" />
-      {/snippet}
+      </dd>
     </DescriptionList.Item>
     <DescriptionList.Item>
-      {#snippet name()}<LinkIcon
-          class="icon"
-          aria-hidden="true"
-        />Artifact{/snippet}
-      {#snippet description()}
+      <dt>
+        <LinkIcon class="icon" aria-hidden="true" />
+        Artifact
+      </dt>
+      <dd>
         <Link href="#">View Artifact</Link>
-      {/snippet}
+      </dd>
     </DescriptionList.Item>
   </DescriptionList>
 {/snippet}
@@ -62,27 +63,6 @@
 <Story name="With grid layout" args={{ layout: "grid" }} {template} />
 
 <Story name="With list layout" args={{ layout: "list" }} {template} />
-
-<Story name="With icons in keys">
-  {#snippet template(args: ComponentProps<typeof DescriptionList>)}
-    <DescriptionList {...args}>
-      <DescriptionList.Item>
-        {#snippet name()}
-          <UserIcon class="icon" aria-hidden="true" />
-          Requested by
-        {/snippet}
-        {#snippet description()}Jane Doe{/snippet}
-      </DescriptionList.Item>
-      <DescriptionList.Item>
-        {#snippet name()}
-          <LinkIcon class="icon" aria-hidden="true" />
-          Artifact
-        {/snippet}
-        {#snippet description()}View Artifact{/snippet}
-      </DescriptionList.Item>
-    </DescriptionList>
-  {/snippet}
-</Story>
 
 <style>
   :global(.icon) {
