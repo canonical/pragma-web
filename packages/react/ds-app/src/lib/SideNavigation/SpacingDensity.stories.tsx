@@ -62,6 +62,10 @@ function Fit({
           labelBaseline:
             labelBaseline === null ? null : labelBaseline - origin.top,
           labelFont: label ? getComputedStyle(label).font : null,
+          hostPaintBackground: getComputedStyle(row).backgroundColor,
+          selected:
+            row.closest(".side-navigation-item")?.hasAttribute("data-active") ??
+            false,
           chip:
             chip && chipCss && chipBaseline !== null
               ? {
@@ -75,6 +79,14 @@ function Fit({
                   fontSize: chipCss.fontSize,
                   lineHeight: chipCss.lineHeight,
                   baseline: chipBaseline - origin.top,
+                  paintedClearanceStart:
+                    chip.getBoundingClientRect().top - rect.top,
+                  paintedClearanceEnd:
+                    rect.bottom - chip.getBoundingClientRect().bottom,
+                  occupiedClearanceEnd:
+                    rect.bottom -
+                    chip.getBoundingClientRect().bottom -
+                    parseFloat(chipCss.marginBlockEnd),
                   baselineDelta:
                     labelBaseline === null
                       ? null
@@ -124,7 +136,21 @@ function Fit({
         publicDensityClass: density,
         viewport: window.innerWidth,
         enrollment:
-          "Prototype only: public non-link LeafNavItem.slot, no production subscriber",
+          "Fit evidence only: historical Site32/40 control reference, pending Docs/App28/32 candidate; public non-link LeafNavItem.slot, no production enrollment or approved Nav height",
+        parentBaselineComparison: (() => {
+          const plain = rowMetrics.find((row) =>
+            row.identity.startsWith("candidate-plain:"),
+          );
+          return rowMetrics
+            .filter((row) => row.identity.startsWith("candidate-"))
+            .map((row) => ({
+              identity: row.identity,
+              labelBaselineDeltaFromPlain:
+                row.labelBaseline === null || plain?.labelBaseline == null
+                  ? null
+                  : row.labelBaseline - plain.labelBaseline,
+            }));
+        })(),
         rows: rowMetrics,
         standalone: [
           ...host.querySelectorAll<HTMLElement>("[data-non-subscriber]"),
@@ -152,40 +178,49 @@ function Fit({
   return (
     <section className={`${tier} ${density} surface density-tier`}>
       <h2>{tier}</h2>
-      <p>Proposed shared seat · plain row / Chip row</p>
+      <p>
+        {tier === "site"
+          ? "Historical Site child 32 / host 40 fit reference · not Nav-height approval"
+          : "Pending Docs/App child 28 / host 32 candidate · preserved default reference below"}
+      </p>
       <div ref={ref} className="density-fit-proof">
         <div className="density-fit-row">
-          {["candidate-plain", "candidate-chip"].map((mode) => (
-            <SideNavigation
-              key={mode}
-              className="density-nav-fixture density-host-candidate"
-              data-density-host={mode}
-              defaultExpanded
-              keyboardShortcut={false}
-              root={{
-                key: mode,
-                items: [
-                  {
-                    key: "group",
-                    items: [
-                      {
-                        key: "plain",
-                        label:
-                          mode === "candidate-plain"
-                            ? "Plain text"
-                            : "With Chip",
-                        className: "spacing-control-seat",
-                        slot:
-                          mode === "candidate-chip" ? (
-                            <Chip value="Chip" />
-                          ) : undefined,
-                      },
-                    ],
-                  },
-                ],
-              }}
-            />
-          ))}
+          {["candidate-plain", "candidate-default", "candidate-chip"].map(
+            (mode) => (
+              <SideNavigation
+                key={mode}
+                className={`density-nav-fixture density-host-candidate density-host-approved40 ${mode === "candidate-chip" ? "density-host-clearance-candidate" : ""}`}
+                data-density-host={mode}
+                currentUrl="plain"
+                defaultExpanded
+                keyboardShortcut={false}
+                root={{
+                  key: mode,
+                  items: [
+                    {
+                      key: "group",
+                      items: [
+                        {
+                          key: "plain",
+                          label:
+                            mode === "candidate-plain"
+                              ? "Plain"
+                              : mode === "candidate-default"
+                                ? "Regular"
+                                : "Dense",
+                          className: "spacing-control-seat",
+                          slot:
+                            mode !== "candidate-plain" ? (
+                              <Chip value="Chip" />
+                            ) : undefined,
+                        },
+                      ],
+                    },
+                  ],
+                }}
+              />
+            ),
+          )}
           <div className="density-guides" aria-hidden>
             {guides.map((top, index) => (
               <i
@@ -221,7 +256,7 @@ function Fit({
                 {
                   key: "group",
                   items: [
-                    { key: "plain", label: "Plain text" },
+                    { key: "plain", label: "Plain" },
                     {
                       key: "chip",
                       label: "With Chip",
@@ -232,6 +267,30 @@ function Fit({
               ],
             }}
           />
+          {tier === "site" && (
+            <SideNavigation
+              className="density-nav-fixture density-host-candidate density-host-clearance-candidate"
+              data-density-host="current32-dense32"
+              defaultExpanded
+              keyboardShortcut={false}
+              root={{
+                key: "current32-dense32",
+                items: [
+                  {
+                    key: "group",
+                    items: [
+                      {
+                        key: "chip",
+                        label: "32px row",
+                        className: "spacing-control-seat",
+                        slot: <Chip value="Chip" />,
+                      },
+                    ],
+                  },
+                ],
+              }}
+            />
+          )}
           <Chip value="Standalone" data-non-subscriber="standalone" />
           <div className="site">
             <Chip
@@ -245,15 +304,12 @@ function Fit({
         </output>
       </div>
       <p className="density-caption">
-        Real public non-link Item slots contain static Chips; each 32px row
-        stays shipped. Site proposal selects the existing dense member through
-        helper inputs, omitting child nudge and end compensation. Docs/App
-        retain default seating. Baseline fit is measured, not inferred from
-        height. Shared guides reference the proposed plain row and its
-        same-level Chip peer. Legacy rows are separate. Standalone and explicit
-        Site reset are outside the proposed host, not a nested reset-policy
-        proof. Host enrollment remains pending owner choice; no Table or Tabs
-        API is added.
+        {tier === "site"
+          ? "Site compares a 32px child in a 40px prototype host; this does not approve a Nav row height."
+          : "Docs/App propose a 28px child in the existing 32px host using the existing dense 4px input; production is unchanged."}{" "}
+        Plain, Regular and Dense retain the same parent label baseline and show
+        measured clearance at both painted edges. Enrollment remains pending;
+        default and outside-reset peers are references.
       </p>
     </section>
   );

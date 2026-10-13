@@ -25,11 +25,6 @@
   inline-size: var(--sidenav-rail-inline-size);
   block-size: 12rem;
 }
-/* Prototype-only member selection on the proposed, real public host. */
-.site .density-host-candidate {
-  --ds-control-seat-padding-block: var(--ds-spacing-control-inset-dense);
-  --ds-control-seat-margin-block-end: 0px;
-}
 /* The public Item class selects the existing helper; its label owns the seat. */
 .density-host-candidate .side-navigation-item.spacing-control-seat {
   padding-block: 0;
@@ -71,4 +66,24 @@
 .density-caption {
   margin-block: 16px 32px;
   max-inline-size: 80ch;
+}
+
+/* Historical approved Site host comparison only; production rows stay unchanged. */
+.site .density-host-approved40 .side-navigation-item {
+  height: var(--dimension-500);
+}
+
+/* The host label keeps its default seat; real baseline export seats the child. */
+.density-host-candidate .side-navigation-item > .row,
+.density-host-candidate .side-navigation-item > .row > .end {
+  align-items: baseline;
+}
+/* Prototype-only selection of the direct static child, never ancestor inputs. */
+.density-host-clearance-candidate
+  .side-navigation-item
+  > .row
+  > .end
+  > span.chip:not(:has(button, a, input, select, textarea)) {
+  --ds-control-seat-padding-block: var(--ds-spacing-control-inset-dense);
+  --ds-control-seat-margin-block-end: 0px;
 }
