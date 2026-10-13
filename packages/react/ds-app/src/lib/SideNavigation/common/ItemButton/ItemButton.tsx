@@ -1,5 +1,6 @@
 import { Icon } from "@canonical/react-ds-global";
 import type React from "react";
+import { navigationDensityPolicy } from "../densityPolicy.js";
 import type { ItemButtonProps } from "./types.js";
 import "./styles.css";
 
@@ -24,15 +25,19 @@ const ItemButton = ({
   ...props
 }: ItemButtonProps): React.ReactElement => (
   <li className={[componentCssClassName, className].filter(Boolean).join(" ")}>
-    <button className="row" {...props} type="button">
+    <button
+      className="ds row spacing-control-seat-metrics"
+      data-ds-density-provider={navigationDensityPolicy.provider}
+      data-ds-density-policy-version={navigationDensityPolicy.version}
+      {...props}
+      type="button"
+    >
       {/* Start cell is always rendered (empty when no icon), matching Item,
           so content stays aligned whether or not a row has an icon. */}
-      <span className="start">
-        {icon ? <Icon icon={icon} /> : null}
-      </span>
+      <span className="start">{icon ? <Icon icon={icon} /> : null}</span>
       {/* `title` — native tooltip fallback for truncated text. */}
       <span
-        className="label"
+        className="ds side-navigation-label spacing-control-seat"
         title={typeof children === "string" ? children : undefined}
       >
         {children}

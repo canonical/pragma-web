@@ -1,0 +1,32 @@
+@layer ds.components.apps {
+  /* The provider owns a private channel, not generic helper inputs. Only an
+     eligible direct static subscriber crosses the trailing-slot boundary. */
+  :where(.ds.row[data-ds-density-provider="navigation-static-chip"]) {
+    --sidenav-static-chip-inset: var(--ds-spacing-control-inset-dense);
+    --sidenav-static-chip-end: 0px;
+  }
+
+  :where(.ds.row[data-ds-density-provider="navigation-static-chip"])
+    > .end
+    > span.chip[data-ds-density-subscriber="static-chip"]:not(
+      :has(button, a, input, select, textarea)
+    ):not(.site, .docs, .app, [data-ds-density-reset]) {
+    --ds-control-seat-padding-block: var(--sidenav-static-chip-inset);
+    --ds-control-seat-margin-block-end: var(--sidenav-static-chip-end);
+  }
+
+  /* The mark uses the same default-seat metrics as its sibling text owner.
+     This is alignment within the line, not another seat on the row. */
+  :where(.ds.row.spacing-control-seat-metrics) > .start,
+  :where(.ds.row.spacing-control-seat-metrics) > .end.caret {
+    align-self: start;
+    margin-block-start: calc(
+      var(--ds-control-padding-block) +
+      (
+        var(--ds-typography-body-line-height) -
+        var(--sidenav-icon-column-inline-size)
+      ) /
+      2
+    );
+  }
+}

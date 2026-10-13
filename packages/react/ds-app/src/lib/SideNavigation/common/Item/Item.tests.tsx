@@ -4,6 +4,22 @@ import { describe, expect, it } from "vitest";
 import Item from "./Item.js";
 
 describe("Item", () => {
+  it("seats only the actual label and publishes the versioned slot policy", () => {
+    const { container } = render(<Item url="/machines">Machines</Item>);
+    const row = screen.getByRole("link");
+    expect(row).toHaveAttribute(
+      "data-ds-density-provider",
+      "navigation-static-chip",
+    );
+    expect(row).toHaveAttribute("data-ds-density-policy-version", "1");
+    expect(container.querySelectorAll(".spacing-control-seat")).toHaveLength(1);
+    expect(screen.getByText("Machines")).toHaveClass(
+      "side-navigation-label",
+      "spacing-control-seat",
+    );
+    expect(screen.getByText("Machines")).not.toHaveClass("label");
+    expect(row).not.toHaveClass("spacing-control-seat");
+  });
   it("renders a link when url is set", () => {
     render(<Item url="/machines">Machines</Item>);
     expect(screen.getByRole("link", { name: "Machines" })).toHaveAttribute(
@@ -89,6 +105,8 @@ describe("Item", () => {
       </Item>,
     );
     const strong = screen.getByText("Machines");
-    expect(strong.closest(".label")).not.toHaveAttribute("title");
+    expect(strong.closest(".side-navigation-label")).not.toHaveAttribute(
+      "title",
+    );
   });
 });

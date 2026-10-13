@@ -179,9 +179,17 @@
        show in tooltips on hover after 800ms — a documented follow-up;
        this is the icon-only layout half. */
       & > .ds.footer {
-        .label,
+        .side-navigation-label {
+          /* Keep the actual text seat in flow while showing only the icon. */
+          clip-path: inset(50%);
+          inline-size: 0;
+          grid-area: 1 / 1;
+        }
         .end {
           display: none;
+        }
+        .start {
+          grid-area: 1 / 1;
         }
 
         .row {
@@ -234,10 +242,15 @@
             }
           }
 
-          .label {
-            display: inline-block;
+          .side-navigation-label {
+            clip-path: none;
+            inline-size: auto;
+            grid-area: auto;
           }
 
+          .start {
+            grid-area: auto;
+          }
           .end {
             display: flex;
           }

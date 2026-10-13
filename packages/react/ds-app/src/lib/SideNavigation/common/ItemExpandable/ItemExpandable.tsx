@@ -1,6 +1,7 @@
 import { Icon } from "@canonical/react-ds-global";
 import type React from "react";
 import { useCallback, useEffect, useId, useRef } from "react";
+import { navigationDensityPolicy } from "../densityPolicy.js";
 import type { ItemExpandableProps } from "./types.js";
 import "./styles.css";
 
@@ -105,18 +106,18 @@ const ItemExpandable = ({
       >
         {/* biome-ignore lint/a11y/noStaticElementInteractions: <summary> is the native disclosure trigger for its <details> (implicit button semantics per HTML-AAM); biome's static-element check doesn't recognise it. */}
         <summary
-          className="row"
+          className="ds row spacing-control-seat-metrics"
+          data-ds-density-provider={navigationDensityPolicy.provider}
+          data-ds-density-policy-version={navigationDensityPolicy.version}
           onClick={handleSummaryClick}
           style={{ anchorName }}
         >
           {/* Start cell is always rendered (empty when no icon), matching
               Item, so content stays aligned whether or not a row has an icon. */}
-          <span className="start">
-            {icon ? <Icon icon={icon} /> : null}
-          </span>
+          <span className="start">{icon ? <Icon icon={icon} /> : null}</span>
           {/* `title` — native tooltip fallback for truncated text. */}
           <span
-            className="label"
+            className="ds side-navigation-label spacing-control-seat"
             title={typeof heading === "string" ? heading : undefined}
           >
             {heading}

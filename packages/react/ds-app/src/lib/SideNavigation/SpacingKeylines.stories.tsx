@@ -52,7 +52,7 @@ function Row({
       };
       const labels = [
         ...host.querySelectorAll<HTMLElement>(
-          ".accordion-item > .header > .heading,.accordion-item > .content > [data-keyline-content],.side-navigation-header .title,.side-navigation-group-header,.side-navigation-item > .row > .label,.side-navigation-item-button > .row > .label,.side-navigation-item-expandable > .details > .row > .label,.side-navigation-context-switcher .trigger > .label > .row > .label",
+          ".accordion-item > .header > .heading,.accordion-item > .content > [data-keyline-content],.side-navigation-header .title,.side-navigation-group-header,.side-navigation-item > .row > .side-navigation-label,.side-navigation-item-button > .row > .side-navigation-label,.side-navigation-item-expandable > .details > .row > .side-navigation-label,.side-navigation-context-switcher .trigger > .side-navigation-label > .row > .side-navigation-label",
         ),
       ].filter((node) => node.getBoundingClientRect().width > 0);
       const records = labels.map((node) => {
@@ -324,11 +324,11 @@ function Row({
         row, with every slot retained. Expanded labels start at the responsive
         viewport gutter plus the 16/14px mark and 8px gap. Compact desktop
         navigation retains 8px gutters and the current 52px width. Accordion
-        retains its own 16px inset and 40/38px label start. Navigation row
-        heights remain inherited upstream values, not a new density policy.
-        Context menu sizing retains its existing global portal fallback. Clipped
-        labels and viewport popups keep hidden measurements and have no
-        row-guide markers.
+        retains its own 16px inset and 40/38px label start. Navigation rows now
+        contain the actual default label seat; intrinsic paint includes its
+        closure without a target height. Context menu sizing retains its
+        existing global portal fallback. Clipped labels and viewport popups keep
+        hidden measurements and have no row-guide markers.
       </p>
     </section>
   );

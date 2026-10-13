@@ -75,7 +75,11 @@ const Chip = (props: ChipProps): React.ReactElement => {
     ...rest
   } = props;
   return (
-    <span className={className} {...rest}>
+    <span
+      className={className}
+      {...rest}
+      data-ds-density-subscriber={!_onDismiss ? "static-chip" : undefined}
+    >
       {content}
     </span>
   );

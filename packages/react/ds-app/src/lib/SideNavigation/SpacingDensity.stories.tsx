@@ -1,4 +1,4 @@
-import { Chip } from "@canonical/react-ds-global";
+import { Button, Chip } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Children,
@@ -7,9 +7,12 @@ import {
   isValidElement,
   type ReactNode,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
+import { navigationDensityPolicy } from "./common/densityPolicy.js";
 import { SideNavigation } from "./index.js";
 import type { LinkComponentProps } from "./types.js";
 import "./SpacingDensity.css";
@@ -21,34 +24,54 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The public LinkComponent receives one Fragment. Preserve its real anchor and
-// existing children; only its actual label gains the shared default seat.
-function seatLabel(children: ReactNode): ReactNode {
+// Isolated frozen component Before: the real link/DOM is retained, but the
+// newly added internal label helper is absent as it was before this migration.
+function beforeLabel(children: ReactNode): ReactNode {
   return Children.map(children, (child) => {
     if (!isValidElement<{ children?: ReactNode; className?: string }>(child))
       return child;
     if (child.type === Fragment)
-      return cloneElement(child, {}, seatLabel(child.props.children));
+      return cloneElement(child, {}, beforeLabel(child.props.children));
     if (
       child.type === "span" &&
-      child.props.className?.split(/\s+/).includes("label")
-    ) {
-      return cloneElement(child, {
-        className: [
-          ...(child.props.className
-            ?.split(/\s+/)
-            .filter((name) => name !== "label") ?? []),
-          "ds",
-          "density-nav-label",
-          "spacing-control-seat",
-        ].join(" "),
-      });
-    }
+      child.props.className?.includes("side-navigation-label")
+    )
+      return cloneElement(child, { className: "label" });
     return child;
   });
 }
-function LabelSeatLink({ children, ...props }: LinkComponentProps) {
-  return <a {...props}>{seatLabel(children)}</a>;
+function BeforeLink({ children, ...props }: LinkComponentProps) {
+  return <a {...props}>{beforeLabel(children)}</a>;
+}
+
+function PortalChip({
+  origin,
+  tier,
+  onReady,
+}: {
+  origin: string;
+  tier: string;
+  onReady: (node: HTMLElement) => void;
+}) {
+  const [target, setTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const node = document.createElement("div");
+    node.className = "site density-portal-reference";
+    node.dataset.densityOrigin = origin;
+    const caption = document.createElement("p");
+    caption.textContent = `Site portal target from ${tier}`;
+    node.append(caption);
+    document.body.append(node);
+    setTarget(node);
+    onReady(node);
+    return () => node.remove();
+  }, [origin, tier, onReady]);
+  return target
+    ? createPortal(
+        <Chip value="Portal" data-non-subscriber="portal-target-site" />,
+        target,
+      )
+    : null;
 }
 
 function baseline(node: HTMLElement) {
@@ -69,6 +92,8 @@ function Fit({
   density?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const originId = useId();
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const [metrics, setMetrics] = useState<unknown>(null);
   const [guides, setGuides] = useState<number[]>([]);
   const [ticks, setTicks] = useState<
@@ -86,9 +111,7 @@ function Fit({
       ];
       const rowMetrics = rows.map((row) => {
         const rect = row.getBoundingClientRect();
-        const label = row.querySelector<HTMLElement>(
-          ".density-nav-label,.label",
-        );
+        const label = row.querySelector<HTMLElement>(".side-navigation-label");
         const chip = row.querySelector<HTMLElement>(".chip");
         const item = row.closest<HTMLElement>(".side-navigation-item");
         const nav = row.closest(".side-navigation");
@@ -101,6 +124,11 @@ function Fit({
           item?.nextElementSibling?.querySelector<HTMLElement>(":scope > .row");
         const value = chip?.querySelector<HTMLElement>(".value");
         const labelBaseline = label ? baseline(label) : null;
+        const labelRange = document.createRange();
+        if (label) labelRange.selectNodeContents(label);
+        const labelText = label ? labelRange.getBoundingClientRect() : null;
+        const mark = row.querySelector<HTMLElement>(".start .icon");
+        const markBox = mark?.getBoundingClientRect();
         const chipBaseline = value ? baseline(value) : null;
         const chipCss = chip ? getComputedStyle(chip) : null;
         return {
@@ -127,6 +155,18 @@ function Fit({
           labelBaseline:
             labelBaseline === null ? null : labelBaseline - origin.top,
           labelFont: label ? getComputedStyle(label).font : null,
+          rowFont: getComputedStyle(row).font,
+          mark:
+            markBox && labelText
+              ? {
+                  width: markBox.width,
+                  height: markBox.height,
+                  ownTextCenterDelta:
+                    markBox.top +
+                    markBox.height / 2 -
+                    (labelText.top + labelText.height / 2),
+                }
+              : null,
           hostPaintBackground: getComputedStyle(row).backgroundColor,
           selected:
             row.closest(".side-navigation-item")?.hasAttribute("data-active") ??
@@ -200,8 +240,9 @@ function Fit({
         tier,
         publicDensityClass: density,
         viewport: window.innerWidth,
+        policy: navigationDensityPolicy,
         enrollment:
-          "Intrinsic linked Nav-slot proof through the existing public LinkComponent adapter; actual Label owns default helper, no fixed host target or production density enrollment",
+          "Production direct static-Chip enrollment; actual private Label owns default helper; actual DOM product/reset and portal boundaries",
         parentBaselineComparison: (() => {
           const plain = rowMetrics.find(
             (row) =>
@@ -221,6 +262,22 @@ function Fit({
             }));
         })(),
         rows: rowMetrics,
+        portalTarget: [
+          ...(portalTarget?.querySelectorAll<HTMLElement>(".chip") ?? []),
+        ].map((chip) => ({
+          origin: originId,
+          targetTier: "site",
+          provider:
+            chip
+              .closest("[data-ds-density-provider]")
+              ?.getAttribute("data-ds-density-provider") ?? null,
+          height: chip.getBoundingClientRect().height,
+          occupiedHeight:
+            chip.getBoundingClientRect().height +
+            parseFloat(getComputedStyle(chip).marginBlockEnd),
+          padding: getComputedStyle(chip).paddingBlock,
+          endMargin: getComputedStyle(chip).marginBlockEnd,
+        })),
         standalone: [
           ...host.querySelectorAll<HTMLElement>("[data-non-subscriber]"),
         ].map((chip) => ({
@@ -243,21 +300,22 @@ function Fit({
       resize.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [tier, density]);
+  }, [tier, density, portalTarget, originId]);
   return (
     <section className={`${tier} ${density} surface density-tier`}>
       <h2>{tier}</h2>
-      <p>Intrinsic linked rows · default parent seat / direct dense child</p>
+      <p>
+        Production intrinsic rows · default label seat / automatic static child
+      </p>
       <div ref={ref} className="density-fit-proof">
         <div className="density-fit-row">
           {["candidate-plain", "candidate-default", "candidate-chip"].map(
             (mode) => (
               <SideNavigation
                 key={mode}
-                className={`density-nav-fixture density-host-candidate ${mode === "candidate-chip" ? "density-host-clearance-candidate" : ""}`}
+                className="density-nav-fixture"
                 data-density-host={mode}
                 currentUrl={`#density-${tier}-${mode}-first`}
-                LinkComponent={LabelSeatLink}
                 defaultExpanded
                 keyboardShortcut={false}
                 root={{
@@ -269,15 +327,21 @@ function Fit({
                         {
                           key: "first",
                           url: `#density-${tier}-${mode}-first`,
+                          icon: "settings",
                           label:
                             mode === "candidate-plain"
                               ? "Plain"
                               : mode === "candidate-default"
-                                ? "Regular"
+                                ? "Reset"
                                 : "Dense",
                           slot:
                             mode === "candidate-plain" ? undefined : (
-                              <Chip value="Chip" />
+                              <Chip
+                                value="Chip"
+                                data-ds-density-reset={
+                                  mode === "candidate-default" ? "" : undefined
+                                }
+                              />
                             ),
                         },
                         {
@@ -312,76 +376,130 @@ function Fit({
           </div>
         </div>
         <p>
-          Legacy fixed rows / Standalone / Explicit Site reset outside the
-          intrinsic prototype
+          Frozen component Before / non-subscribers and real nested DOM
+          boundaries
         </p>
+        <SideNavigation
+          className="density-nav-fixture density-frozen-before"
+          data-density-host="frozen-before"
+          LinkComponent={BeforeLink}
+          defaultExpanded
+          keyboardShortcut={false}
+          root={{
+            key: "before",
+            items: [
+              {
+                key: "group",
+                items: [
+                  { key: "plain", url: "#before-plain", label: "Before" },
+                  {
+                    key: "chip",
+                    url: "#before-chip",
+                    label: "Chip",
+                    slot: <Chip value="Chip" />,
+                  },
+                ],
+              },
+            ],
+          }}
+        />
         <div className="density-other-row">
           <SideNavigation
             className="density-nav-fixture"
-            data-density-host="current-default"
+            data-density-host="boundaries"
             defaultExpanded
             keyboardShortcut={false}
             root={{
-              key: "current",
+              key: "boundaries",
               items: [
                 {
                   key: "group",
                   items: [
-                    { key: "plain", label: "Plain" },
                     {
-                      key: "chip",
-                      label: "Regular",
-                      slot: <Chip value="Chip" />,
+                      key: "button",
+                      label: "Button",
+                      slot: (
+                        <Button data-non-subscriber="button-in-host">
+                          Action
+                        </Button>
+                      ),
+                    },
+                    {
+                      key: "interactive",
+                      label: "Interactive",
+                      slot: (
+                        <Chip
+                          value="Click"
+                          onClick={() => {}}
+                          data-non-subscriber="interactive-in-host"
+                        />
+                      ),
+                    },
+                    {
+                      key: "dismiss",
+                      label: "Dismiss",
+                      slot: (
+                        <Chip
+                          value="Dismiss"
+                          onDismiss={() => {}}
+                          data-non-subscriber="dismiss-in-host"
+                        />
+                      ),
+                    },
+                    {
+                      key: "product",
+                      label: "Site reset",
+                      slot: (
+                        <span className="site">
+                          <Chip
+                            value="Reset"
+                            data-non-subscriber="nested-site-reset"
+                          />
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "reset",
+                      label: "Reset",
+                      slot: (
+                        <span data-ds-density-reset>
+                          <Chip
+                            value="Reset"
+                            data-non-subscriber="nested-explicit-reset"
+                          />
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "portal",
+                      label: "Portal",
+                      slot: (
+                        <PortalChip
+                          origin={originId}
+                          tier={tier}
+                          onReady={setPortalTarget}
+                        />
+                      ),
                     },
                   ],
                 },
               ],
             }}
           />
-          {tier === "site" && (
-            <SideNavigation
-              className="density-nav-fixture density-legacy-fixed density-host-clearance-candidate"
-              data-density-host="current32-dense32"
-              defaultExpanded
-              keyboardShortcut={false}
-              root={{
-                key: "legacy-dense",
-                items: [
-                  {
-                    key: "group",
-                    items: [
-                      {
-                        key: "chip",
-                        label: "32px row",
-                        slot: <Chip value="Chip" />,
-                      },
-                    ],
-                  },
-                ],
-              }}
-            />
-          )}
           <Chip value="Standalone" data-non-subscriber="standalone" />
-          <div className="site">
-            <Chip
-              value="Site reset"
-              data-non-subscriber="explicit-site-reset"
-            />
-          </div>
+          <Button data-non-subscriber="button-outside">Action</Button>
         </div>
         <output hidden data-density-fit={tier}>
           {JSON.stringify(metrics)}
         </output>
       </div>
       <p className="density-caption">
-        Linked public Nav slots use a disclosed LinkComponent adapter to attach
-        the existing helper to the real label, preserving the anchor and
-        children. The label determines intrinsic row height; two adjacent
-        painted rows contain its closing margin and expose actual touching
-        distance without a target height. Only the direct static Chip selects
-        existing dense 4px padding and no end compensation; baselines and
-        painted clearance are measured, with production enrollment still
-        pending.
+        Plain and enrolled static Chip share the unchanged default label seat.
+        Reset is an explicit nonenrolled reset reference, not another public
+        density mode. Intrinsic painted rows contain closure and touch the next
+        row; no target height is authored. Other controls, interactive Chips,
+        nested product/reset wrappers and portals outside the direct trailing
+        slot keep their default seat.
       </p>
     </section>
   );
@@ -390,7 +508,7 @@ function Fit({
 export const HostProposal: Story = {
   render: () => (
     <main className="density08">
-      <h1>08 Density · host fit proposal</h1>
+      <h1>08 Density · enrolled navigation host</h1>
       {["site", "docs", "app"].map((tier) => (
         <Fit key={tier} tier={tier} />
       ))}
@@ -401,13 +519,217 @@ export const HostProposal: Story = {
 export const PublicDensityClasses: Story = {
   render: () => (
     <main className="density08">
-      <h1>08 Density · public class boundary proposal</h1>
+      <h1>08 Density · public class boundaries</h1>
       {["site", "docs", "app"].flatMap((tier) =>
         ["normal", "comfortable", "dense"].map((density) => (
           <Fit
             key={`${tier}-${density}`}
             tier={tier}
             density={density === "normal" ? "" : density}
+          />
+        )),
+      )}
+    </main>
+  ),
+};
+
+function NativeVariants({
+  tier,
+  expanded,
+}: {
+  tier: string;
+  expanded: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [metrics, setMetrics] = useState<unknown>(null);
+  const [actions, setActions] = useState(0);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+    let frame = 0;
+    const measure = () => {
+      const nav = host.querySelector<HTMLElement>(".side-navigation");
+      setMetrics({
+        tier,
+        expanded: nav?.dataset.expanded,
+        railWidth: nav?.getBoundingClientRect().width,
+        rows: [
+          ...host.querySelectorAll<HTMLElement>(
+            ".row[data-ds-density-provider]",
+          ),
+        ].map((row) => {
+          let hiddenByClosedDetails = false;
+          for (
+            let ancestor = row.parentElement;
+            ancestor;
+            ancestor = ancestor.parentElement
+          ) {
+            if (
+              ancestor instanceof HTMLDetailsElement &&
+              !ancestor.open &&
+              !ancestor.querySelector(":scope > summary")?.contains(row)
+            )
+              hiddenByClosedDetails = true;
+          }
+          const available =
+            !hiddenByClosedDetails &&
+            row.getClientRects().length > 0 &&
+            row.getBoundingClientRect().height > 0;
+          const label = row.querySelector<HTMLElement>(
+            ".side-navigation-label",
+          );
+          const mark = row.querySelector<HTMLElement>(".start .icon");
+          const range = document.createRange();
+          if (label) range.selectNodeContents(label);
+          const text = label ? range.getBoundingClientRect() : null;
+          const box = mark?.getBoundingClientRect();
+          return {
+            tag: row.tagName,
+            label: label?.textContent,
+            height: row.getBoundingClientRect().height,
+            font: label ? getComputedStyle(label).font : null,
+            available,
+            labelBaseline: label && available ? baseline(label) : null,
+            paintClip: label ? getComputedStyle(label).clipPath : null,
+            mark:
+              available &&
+              box &&
+              text &&
+              box.width > 0 &&
+              box.height > 0 &&
+              text.height > 0
+                ? {
+                    width: box.width,
+                    height: box.height,
+                    ownTextCenterDelta:
+                      box.top + box.height / 2 - (text.top + text.height / 2),
+                  }
+                : null,
+            open: row.closest("details")?.open ?? null,
+          };
+        }),
+      });
+    };
+    void document.fonts.ready.then(measure);
+    const resize = new ResizeObserver(measure);
+    resize.observe(host);
+    const nav = host.querySelector<HTMLElement>(".side-navigation");
+    if (nav) resize.observe(nav);
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+    const state = new MutationObserver(schedule);
+    if (nav)
+      state.observe(nav, {
+        attributes: true,
+        attributeFilter: ["data-expanded"],
+      });
+    host.addEventListener("toggle", schedule, true);
+    host.addEventListener("click", schedule);
+    return () => {
+      resize.disconnect();
+      state.disconnect();
+      cancelAnimationFrame(frame);
+      host.removeEventListener("toggle", schedule, true);
+      host.removeEventListener("click", schedule);
+    };
+  }, [tier]);
+  return (
+    <section className={`${tier} surface density-tier`}>
+      <h2>
+        {tier} · {expanded ? "expanded" : "compact"}
+      </h2>
+      <div ref={ref} className="density-fit-proof">
+        <SideNavigation
+          className="density-nav-fixture"
+          applicationName="Work"
+          defaultExpanded={expanded}
+          keyboardShortcut={false}
+          currentUrl="#density-child"
+          root={{
+            key: "variants",
+            items: [
+              {
+                key: "group",
+                items: [
+                  {
+                    key: "link",
+                    label: "Overview",
+                    url: "#density-overview",
+                    icon: "folder",
+                    slot: <Chip value="Chip" />,
+                  },
+                  {
+                    key: "expand",
+                    label: "Resources",
+                    icon: "folder",
+                    items: [
+                      {
+                        key: "child",
+                        label: "Child",
+                        url: "#density-child",
+                        icon: "folder",
+                        slot: <Chip value="Chip" />,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          }}
+          footerRoot={{
+            key: "footer",
+            items: [
+              {
+                label: "Action",
+                control: "button",
+                icon: "folder",
+                onClick: () => setActions((n) => n + 1),
+                slot: <Chip value="Chip" />,
+              },
+              {
+                label: "Settings",
+                icon: "settings",
+                items: [
+                  {
+                    label: "Child",
+                    url: "#density-footer-child",
+                    icon: "folder",
+                    slot: <Chip value="Chip" />,
+                  },
+                ],
+              },
+            ],
+          }}
+        />
+        <output
+          hidden
+          data-density-native={`${tier}-${expanded}`}
+          data-actions={actions}
+        >
+          {JSON.stringify(metrics)}
+        </output>
+      </div>
+      <p>
+        Real links, actions and native disclosures. Compact desktop stays
+        narrow; clipped label paint preserves its intrinsic seat and accessible
+        name. Mobile keeps its native Menu behavior.
+      </p>
+    </section>
+  );
+}
+
+export const NativeRows: Story = {
+  render: () => (
+    <main className="density08">
+      <h1>08 Density · native row variants</h1>
+      {["site", "docs", "app"].flatMap((tier) =>
+        [true, false].map((expanded) => (
+          <NativeVariants
+            key={`${tier}-${expanded}`}
+            tier={tier}
+            expanded={expanded}
           />
         )),
       )}

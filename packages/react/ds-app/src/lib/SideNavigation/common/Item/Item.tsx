@@ -1,5 +1,6 @@
 import { Icon } from "@canonical/react-ds-global";
 import type React from "react";
+import { navigationDensityPolicy } from "../densityPolicy.js";
 import type { ItemProps } from "./types.js";
 import "./styles.css";
 
@@ -36,14 +37,12 @@ const Item = ({
     <>
       {/* Start cell is always rendered (empty when no icon) so content
           stays in the middle column — labels align with or without icons. */}
-      <span className="start">
-        {icon ? <Icon icon={icon} /> : null}
-      </span>
+      <span className="start">{icon ? <Icon icon={icon} /> : null}</span>
       {/* `title` — native-tooltip fallback for the truncated label,
           not the custom 800ms-delay one. Only meaningful when `children` is
           plain text. */}
       <span
-        className="label"
+        className="ds side-navigation-label spacing-control-seat"
         title={typeof children === "string" ? children : undefined}
       >
         {children}
@@ -61,14 +60,21 @@ const Item = ({
     >
       {url ? (
         <Link
-          className="row"
+          className="ds row spacing-control-seat-metrics"
+          data-ds-density-provider={navigationDensityPolicy.provider}
+          data-ds-density-policy-version={navigationDensityPolicy.version}
           href={disabled ? undefined : url}
           aria-current={active ? "page" : undefined}
         >
           {content}
         </Link>
       ) : (
-        <span className="row" aria-current={active ? "page" : undefined}>
+        <span
+          className="ds row spacing-control-seat-metrics"
+          data-ds-density-provider={navigationDensityPolicy.provider}
+          data-ds-density-policy-version={navigationDensityPolicy.version}
+          aria-current={active ? "page" : undefined}
+        >
           {content}
         </span>
       )}

@@ -3,6 +3,28 @@ import { describe, expect, it, vi } from "vitest";
 import Component from "./Chip.js";
 
 describe("Chip component", () => {
+  it("subscribes only noninteractive, nondismissible roots to host density", () => {
+    const { container } = render(
+      <>
+        <Component value="Static" />
+        <Component value="Action" onClick={vi.fn()} />
+        <Component value="Dismissible" onDismiss={vi.fn()} />
+      </>,
+    );
+    expect(
+      container.querySelectorAll('[data-ds-density-subscriber="static-chip"]'),
+    ).toHaveLength(1);
+    expect(screen.getByText("Static").closest(".chip")).toHaveAttribute(
+      "data-ds-density-subscriber",
+      "static-chip",
+    );
+    expect(screen.getByRole("button", { name: "Action" })).not.toHaveAttribute(
+      "data-ds-density-subscriber",
+    );
+    expect(
+      screen.getByText("Dismissible").closest(".chip"),
+    ).not.toHaveAttribute("data-ds-density-subscriber");
+  });
   it("renders", () => {
     render(<Component lead={"Cloud"} value={"AWS"} />);
     expect(screen.getByText("AWS")).toBeInTheDocument();

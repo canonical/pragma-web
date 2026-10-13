@@ -81,7 +81,7 @@
     block-size: calc-size(auto, round(up, size, var(--ds-spacing-baseline)));
   }
 
-  :where(.ds.spacing-control-seat) {
+  :where(.ds.spacing-control-seat, .ds.spacing-control-seat-metrics) {
     --ds-control-baseline-offset: calc(
       (var(--ds-typography-body-line-height) + 1cap) /
       2
@@ -111,6 +111,9 @@
       round(up, var(--ds-control-occupied-size), var(--ds-spacing-baseline)) -
       var(--ds-control-occupied-size)
     );
+  }
+
+  :where(.ds.spacing-control-seat) {
     /* Components may supply only these helper inputs. The helper remains the
        sole owner of block padding, closure margin, line metrics and layout
        border width, so a composite cannot accidentally seat both wrapper and

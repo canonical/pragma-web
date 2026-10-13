@@ -22,13 +22,7 @@
   position: relative;
   inset: auto;
   z-index: auto;
-  inline-size: var(--sidenav-rail-inline-size);
   block-size: 12rem;
-}
-/* Prototype-only sizing adapter: the real label helper determines row flow. */
-.density-host-candidate .side-navigation-item,
-.density-host-candidate .side-navigation-item > .row {
-  height: auto;
 }
 .density-guides {
   position: absolute;
@@ -56,25 +50,31 @@
   max-inline-size: 80ch;
 }
 
-/* The host label keeps its default seat; real baseline export seats the child. */
-.density-host-candidate .side-navigation-item > .row,
-.density-host-candidate .side-navigation-item > .row > .end {
-  align-items: baseline;
-}
-/* Prototype-only selection of the direct static child, never ancestor inputs. */
-.density-host-clearance-candidate
-  .side-navigation-item
-  > .row
-  > .end
-  > span.chip:not(:has(button, a, input, select, textarea)) {
-  --ds-control-seat-padding-block: var(--ds-spacing-control-inset-dense);
-  --ds-control-seat-margin-block-end: 0px;
+.density-portal-reference {
+  display: flow-root;
+  margin-block: var(--ds-spacing-group);
 }
 
-/* Preserve the native Nav label's inline containment without generic Label styling. */
-.density-nav-label {
+/* Frozen Before only; no fixed sizing or manual seat override in After. */
+.density-frozen-before .side-navigation-item {
+  height: var(--dimension-400);
+}
+.density-frozen-before .side-navigation-item > .row {
+  height: 100%;
+  align-items: center;
+}
+.density-frozen-before .label {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.density-frozen-before .chip {
+  --ds-control-seat-padding-block: var(--ds-control-padding-block);
+  --ds-control-seat-margin-block-end: var(--ds-control-grid-compensation);
+}
+
+.density-frozen-before .row > .start {
+  align-self: center;
+  margin-block-start: 0;
 }
