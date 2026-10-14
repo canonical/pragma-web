@@ -42,6 +42,7 @@ import * as barChartStories from "../../lib/_work_in_progress/FacetBarChart/Face
 import * as rangeChartStories from "../../lib/_work_in_progress/FacetRangeChart/FacetRangeChart.stories.js";
 import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
 import * as switchStories from "../../lib/_work_in_progress/RendererSwitch/RendererSwitch.stories.js";
+import * as timelineStories from "../../lib/_work_in_progress/Timeline/Timeline.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -88,6 +89,7 @@ const parts = {
   Cards: composeStories(cardsStories),
   FacetBarChart: composeStories(barChartStories),
   FacetRangeChart: composeStories(rangeChartStories),
+  Timeline: composeStories(timelineStories),
 };
 
 /**
@@ -106,6 +108,8 @@ const AUTHORED: Readonly<Record<string, readonly string[]>> = {
   // The cards' stories place a switch of their own, named the same way, and
   // one story's own cell writes a sentence saying the record's "from".
   Cards: ["Show machines as", "Waiting on an address from the upstream pool."],
+  // The timeline's story names its own switch the same way.
+  Timeline: ["Show review activity as"],
 };
 
 /** List every phrase a part's stories author, the shared ones included. */

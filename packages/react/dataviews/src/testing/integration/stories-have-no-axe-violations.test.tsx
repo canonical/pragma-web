@@ -31,6 +31,7 @@ import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.re
 import * as barChartStories from "../../lib/_work_in_progress/FacetBarChart/FacetBarChart.stories.js";
 import * as rangeChartStories from "../../lib/_work_in_progress/FacetRangeChart/FacetRangeChart.stories.js";
 import * as switchStories from "../../lib/_work_in_progress/RendererSwitch/RendererSwitch.stories.js";
+import * as timelineStories from "../../lib/_work_in_progress/Timeline/Timeline.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -59,6 +60,7 @@ const played = {
   Cards: composeStories(cardsStories),
   FacetBarChart: composeStories(barChartStories),
   FacetRangeChart: composeStories(rangeChartStories),
+  Timeline: composeStories(timelineStories),
   Filters: Object.fromEntries(
     Object.entries(composeStories(filtersStories)).filter(([name]) =>
       FACETED_FILTER_STORIES.has(name),
