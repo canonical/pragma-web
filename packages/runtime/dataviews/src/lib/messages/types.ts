@@ -383,4 +383,12 @@ export type DataViewsMessages = {
   readonly chartRenderer: string;
   /** The name of the table a switch offers beside its chart. */
   readonly tableRenderer: string;
+
+  // The timeline.
+  /** How many events a collapsed timeline hides. */
+  readonly eventsHidden: (count: number) => string;
+  /** The command revealing the next events, by how many it reveals. */
+  readonly showMoreEvents: (count: number) => string;
+  /** The command revealing every hidden event. */
+  readonly showAllEvents: string;
 };
