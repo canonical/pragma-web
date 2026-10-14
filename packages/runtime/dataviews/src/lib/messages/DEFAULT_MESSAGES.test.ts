@@ -368,6 +368,12 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.renderer).toBe("Show as");
   });
 
+  it("words the timeline's collapsed events", () => {
+    expect(m.eventsHidden(1200)).toBe("1,200 hidden");
+    expect(m.showMoreEvents(4)).toBe("Show 4 more");
+    expect(m.showAllEvents).toBe("Show all");
+  });
+
   it("words the action bar, counting rows", () => {
     expect(m.selectionActions).toBe("Selection actions");
     expect(m.rowsSelected(3)).toBe("3 selected");

@@ -231,4 +231,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   chartHighest: "Highest",
 
   renderer: "Show as",
+
+  eventsHidden: (count) => `${formatCount(count)} hidden`,
+  showMoreEvents: (count) => `Show ${formatCount(count)} more`,
+  showAllEvents: "Show all",
 });

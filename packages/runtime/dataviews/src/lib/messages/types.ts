@@ -353,4 +353,12 @@ export type DataViewsMessages = {
    * themselves are named by the application, as fields and options are.
    */
   readonly renderer: string;
+
+  // The timeline.
+  /** How many events a collapsed timeline hides. */
+  readonly eventsHidden: (count: number) => string;
+  /** The command revealing the next events, by how many it reveals. */
+  readonly showMoreEvents: (count: number) => string;
+  /** The command revealing every hidden event. */
+  readonly showAllEvents: string;
 };
