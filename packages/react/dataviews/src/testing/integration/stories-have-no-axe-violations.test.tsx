@@ -21,6 +21,7 @@ import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataV
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
+import * as timelineStories from "../../lib/_work_in_progress/Timeline/Timeline.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -66,6 +67,7 @@ const played = {
   DataCards: composeStories(dataCardsStories),
   DataChart: composeStories(dataChartStories),
   DataChartWithTable: composeStories(dataChartWithTableStories),
+  Timeline: composeStories(timelineStories),
   // The links with a refused clause, on a memory location and no mock API.
   Composition: Object.fromEntries(
     Object.entries(composeStories(compositionStories)).filter(([name]) =>
