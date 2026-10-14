@@ -21,19 +21,23 @@ type ActionChipProps = OwnProps &
     SvelteHTMLElements["button"],
     keyof OwnProps | "children" | "onclick"
   > & {
-    onclick: (event: MouseEvent) => void;
-    ondismiss?: never;
-    dismissLabel?: never;
+    onclick: NonNullable<SvelteHTMLElements["button"]["onclick"]>;
+    children?: never;
   };
 
 /** A chip with only its dismissal control in the tab order. */
 type DismissibleChipProps = OwnProps &
   Omit<SvelteHTMLElements["span"], keyof OwnProps | "children" | "onclick"> & {
     onclick?: never;
-    ondismiss: (event: MouseEvent) => void;
-    /** Accessible name for the removal button; defaults to `Dismiss {lead}: {value}`. */
-    dismissLabel?: string;
+    /** The dismissal control, rendered after the value and badge. */
+    children: Snippet;
   };
 
 /** Chips always have exactly one action. Use Tag for non-interactive metadata. */
 export type ChipProps = ActionChipProps | DismissibleChipProps;
+
+export type ChipContext = {
+  readonly defaultDismissLabel: string;
+  /** Register a dismissal control and return its cleanup function. */
+  registerDismiss: () => () => void;
+};

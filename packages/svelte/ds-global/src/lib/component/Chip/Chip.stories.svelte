@@ -2,7 +2,7 @@
   import { MODIFIER_FAMILIES } from "@canonical/ds-types";
   import { defineMeta } from "@storybook/addon-svelte-csf";
   import { fn } from "storybook/test";
-  import Chip from "./Chip.svelte";
+  import { Chip } from "./index.js";
 
   // Document the shared API rather than both sets of native element props.
   const documentedProps = [
@@ -12,8 +12,6 @@
     "badge",
     "criticality",
     "onclick",
-    "ondismiss",
-    "dismissLabel",
   ];
 
   const { Story } = defineMeta({
@@ -27,7 +25,7 @@
         argTypes: { include: documentedProps },
         description: {
           component:
-            "Chips trigger a secondary action or dismiss an applied item. For read-only metadata and status, use Tag.",
+            "Chips trigger a secondary action or dismiss an applied item. Compose Chip.Dismiss inside a chip for dismissal; it accepts native button attributes and events. For read-only metadata and status, use Tag.",
         },
       },
     },
@@ -43,10 +41,21 @@
 
 <Story name="Dense" args={{ value: "Ubuntu", onclick: fn(), class: "dense" }} />
 
-<Story
-  name="Dismissible"
-  args={{ lead: "Owner", value: "Bob", ondismiss: fn() }}
-/>
+<Story name="Dismissible" args={{ lead: "Owner", value: "Bob" }}>
+  {#snippet template({ lead, value })}
+    <Chip {lead} {value}>
+      <Chip.Dismiss onclick={fn()} />
+    </Chip>
+  {/snippet}
+</Story>
+
+<Story name="Disabled dismissal" args={{ lead: "Owner", value: "Bob" }}>
+  {#snippet template({ lead, value })}
+    <Chip {lead} {value}>
+      <Chip.Dismiss onclick={fn()} disabled aria-label="Remove owner" />
+    </Chip>
+  {/snippet}
+</Story>
 
 <Story name="Criticalities">
   {#snippet template()}
@@ -98,8 +107,9 @@
   {#snippet template()}
     <Chip
       value="This is a very long value that will overflow"
-      ondismiss={fn()}
       style="max-width: 200px;"
-    />
+    >
+      <Chip.Dismiss onclick={fn()} />
+    </Chip>
   {/snippet}
 </Story>

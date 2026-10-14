@@ -1,6 +1,12 @@
 import { render } from "@canonical/svelte-ssr-test";
 import { describe, expect, it } from "vitest";
-import Chip from "./Chip.svelte";
+import { Chip } from "./index.js";
+import Fixture, {
+  customIcon,
+  defaultDismiss,
+  duplicateDismiss,
+} from "./test.fixtures.svelte";
+import type { ChipProps } from "./types.js";
 
 describe("Chip SSR", () => {
   it("renders an actionable chip as a non-submitting button", () => {
@@ -17,7 +23,7 @@ describe("Chip SSR", () => {
   });
 
   it.each(["submit", "reset"] as const)(
-    "ignores the native %s button type",
+    "accepts the native %s button type",
     (type) => {
       const page = render(Chip, {
         props: { value: "Ubuntu", onclick: () => {}, type },
@@ -25,13 +31,13 @@ describe("Chip SSR", () => {
 
       expect(
         page.container.querySelector(".ds.chip")?.getAttribute("type"),
-      ).toBe("button");
+      ).toBe(type);
     },
   );
 
   it("renders only the dismiss control for an applied value", () => {
     const page = render(Chip, {
-      props: { lead: "Owner", value: "Bob", ondismiss: () => {} },
+      props: { lead: "Owner", value: "Bob", children: defaultDismiss },
     });
     const chip = page.container.querySelector(".ds.chip");
 
@@ -41,5 +47,80 @@ describe("Chip SSR", () => {
     expect(chip?.querySelector("button")?.getAttribute("aria-label")).toBe(
       "Dismiss Owner: Bob",
     );
+    expect(page.container.querySelector("button button")).toBeNull();
+    expect(chip?.querySelector("button")?.getAttribute("type")).toBe("button");
+  });
+
+  it("uses the value alone in the default dismiss name when there is no lead", () => {
+    const page = render(Chip, {
+      props: { value: "Ubuntu", children: defaultDismiss },
+    });
+
+    expect(page.getByRole("button").getAttribute("aria-label")).toBe(
+      "Dismiss Ubuntu",
+    );
+  });
+
+  it("forwards native dismiss props and allows custom content on the server", () => {
+    const page = render(Fixture, {
+      props: {
+        dismissProps: {
+          onclick: () => {},
+          disabled: true,
+          class: "custom-dismiss",
+          title: "Remove owner",
+          "aria-label": "Remove Bob",
+          children: customIcon,
+          type: "submit",
+        },
+      },
+    });
+    const root = page.container.querySelector(".ds.chip");
+    const dismiss = page.getByRole("button");
+
+    expect(root?.tagName).toBe("SPAN");
+    expect(root?.classList.contains("custom-chip")).toBe(true);
+    expect(root?.hasAttribute("disabled")).toBe(false);
+    expect(root?.hasAttribute("title")).toBe(false);
+    expect(dismiss.className).toBe("dismiss custom-dismiss");
+    expect(dismiss.getAttribute("aria-label")).toBe("Remove Bob");
+    expect(dismiss.getAttribute("title")).toBe("Remove owner");
+    expect(dismiss.getAttribute("type")).toBe("submit");
+    expect(dismiss.hasAttribute("disabled")).toBe(true);
+    expect(dismiss.querySelector('[data-testid="custom-icon"]')).not.toBeNull();
+    expect(dismiss.querySelector("svg")).toBeNull();
+  });
+
+  it("rejects multiple dismiss controls", () => {
+    expect(() =>
+      render(Chip, {
+        props: { value: "Ubuntu", children: duplicateDismiss },
+      }),
+    ).toThrow("Chip supports exactly one Chip.Dismiss");
+  });
+
+  it("rejects a dismiss control outside a chip", () => {
+    expect(() =>
+      render(Chip.Dismiss, { props: { onclick: () => {} } }),
+    ).toThrow();
+  });
+
+  it("rejects chips with no action or conflicting actions at runtime", () => {
+    for (const props of [
+      { value: "Ubuntu" },
+      { value: "Ubuntu", onclick: () => {}, children: defaultDismiss },
+    ]) {
+      expect(() =>
+        render(Chip, { props: props as unknown as ChipProps }),
+      ).toThrow("Chip requires exactly one of onclick or children");
+    }
+  });
+
+  it("rejects dismiss controls supplied through an action chip's icon", () => {
+    expect(() =>
+      render(Chip, {
+        props: { value: "Ubuntu", onclick: () => {}, icon: defaultDismiss },
+      }),
+    ).toThrow("Chip cannot have both onclick and Chip.Dismiss");
   });
 });

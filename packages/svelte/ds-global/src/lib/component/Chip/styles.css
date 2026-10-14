@@ -42,10 +42,6 @@
 
     &:is(button) {
       inline-size: auto;
-    }
-
-    &:is(button),
-    > .dismiss {
       margin: 0;
 
       &:not(:disabled) {
@@ -62,8 +58,7 @@
     }
 
     > .icon,
-    > .badge,
-    > .dismiss {
+    > .badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -79,21 +74,6 @@
     > .value {
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-
-    > .dismiss {
-      inline-size: var(--dimension-200);
-      block-size: var(--dimension-200);
-      padding: var(--dimension-025);
-      border: var(--dimension-stroke-thickness-medium) solid transparent;
-      border-radius: var(--dimension-radius-full);
-      background-color: transparent;
-      color: inherit;
-
-      > svg {
-        inline-size: 100%;
-        block-size: 100%;
-      }
     }
   }
 }
