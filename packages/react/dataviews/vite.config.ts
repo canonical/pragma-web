@@ -12,14 +12,15 @@ const plugins: any[] = [react()];
 const testConfig = reactTestConfig({
   glob: "test",
   ssr: true,
-  // Unmeasured: stories, decorators, the hidden-button reader, the French
-  // record, the import speller, the consumer-code and summary helpers, the
-  // GraphQL query, the mock API's untested readers and matchers, and the
-  // untested testing/ helpers.
+  // Unmeasured: stories, the timeline's story fixtures, decorators, the
+  // hidden-button reader, the French record, the import speller, the
+  // consumer-code and summary helpers, the GraphQL query, the mock API's
+  // untested readers and matchers, and the untested testing/ helpers.
   coverage: {
     include: ["src/**/*.{ts,tsx}", "testing/**/*.{ts,tsx}"],
     exclude: [
       "**/*.stories.{ts,tsx}",
+      "src/storybook/activities/fixtures.tsx",
       "src/storybook/decorators.tsx",
       "src/storybook/getHiddenButton.ts",
       "src/storybook/locales/fr.ts",
