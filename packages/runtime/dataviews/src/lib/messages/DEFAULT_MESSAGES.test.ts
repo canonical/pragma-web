@@ -374,6 +374,29 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.showAllEvents).toBe("Show all");
   });
 
+  it("words the timeline's controls", () => {
+    expect(m.filterBy).toBe("Filter by:");
+    expect([m.actorFilter, m.eventFilter, m.eventDate]).toEqual([
+      "Actor",
+      "Event",
+      "Date",
+    ]);
+    expect(m.filterByField("Reviewer")).toBe("Filter by Reviewer");
+    expect([
+      m.resetFilters,
+      m.reset,
+      m.sortLatest,
+      m.sortEarliest,
+      m.orderByDate,
+    ]).toEqual([
+      "Reset filters",
+      "Reset",
+      "Latest",
+      "Earliest",
+      "Order by date",
+    ]);
+  });
+
   it("words the action bar, counting rows", () => {
     expect(m.selectionActions).toBe("Selection actions");
     expect(m.rowsSelected(3)).toBe("3 selected");
