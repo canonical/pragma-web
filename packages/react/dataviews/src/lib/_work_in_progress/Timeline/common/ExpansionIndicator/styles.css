@@ -1,0 +1,42 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* A strip ruled above and below; the timeline's connector passes it. */
+  .ds.data-timeline-expansion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dimension-100);
+    padding: var(--dimension-100) var(--dimension-200);
+    border-block: var(--dimension-stroke-thickness-medium) solid
+      var(--color-border-muted);
+    color: var(--color-text);
+    font-size: var(--typography-text-secondary-font-size);
+    line-height: var(--typography-text-secondary-line-height);
+
+    & > .command {
+      display: inline-flex;
+      gap: var(--dimension-100);
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--color-text-link);
+      font: inherit;
+      font-weight: var(--typography-weight-semi-bold);
+      text-decoration: underline;
+      cursor: pointer;
+
+      &::before {
+        content: "•" / "";
+        color: var(--color-text-muted);
+        text-decoration: none;
+      }
+
+      &:focus-visible {
+        outline: var(--dimension-stroke-thickness-medium) solid
+          var(--color-focus-ring);
+        outline-offset: var(--dimension-025);
+      }
+    }
+  }
+}

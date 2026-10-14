@@ -1,0 +1,106 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* Three tracks — date, marker, content — which a timeline's rows subgrid. */
+  .ds.data-timeline-event {
+    --data-timeline-row-height: var(--dimension-400);
+
+    position: relative;
+    display: grid;
+    grid-template-columns:
+      [datetime] max-content
+      [marker] var(--data-timeline-axis-width, var(--dimension-400))
+      [content] minmax(0, 1fr);
+    column-gap: var(--dimension-200);
+    align-items: start;
+
+    & > .ds.data-timeline-datetime {
+      grid-column: datetime;
+      grid-row: 1;
+      padding-block-start: var(--dimension-150);
+    }
+
+    /* A criticality class sets --modifier-color-border, which the connector and the marker both read. */
+    & > .marker {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      grid-column: marker;
+      grid-row: 1;
+      align-self: stretch;
+      align-items: flex-start;
+      justify-content: center;
+      padding-block-start: var(--dimension-150);
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset-block-start: 0;
+        z-index: -1;
+        inline-size: var(--dimension-stroke-thickness-medium);
+        block-size: 100%;
+        background-color: var(
+          --modifier-color-border,
+          var(--color-border-muted)
+        );
+      }
+    }
+
+    & > .content {
+      display: flex;
+      flex-direction: column;
+      grid-column: content;
+      grid-row: 1;
+      gap: var(--dimension-100);
+      min-inline-size: 0;
+      padding-block: var(--dimension-150);
+
+      & > .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--dimension-100);
+        min-block-size: var(--data-timeline-row-height);
+        font-size: var(--typography-text-primary-font-size);
+        line-height: var(--typography-text-primary-line-height);
+
+        & > .actor {
+          display: flex;
+          flex: none;
+          align-items: center;
+          block-size: var(--data-timeline-row-height);
+          color: var(--color-text);
+          font-weight: var(--typography-weight-semi-bold);
+          text-decoration: none;
+        }
+
+        & > .payload {
+          flex: 1 1 8rem;
+          min-inline-size: 0;
+          color: var(--color-text);
+        }
+
+        & > .ds.data-timeline-datetime {
+          display: flex;
+          flex: none;
+          align-items: center;
+          block-size: var(--data-timeline-row-height);
+        }
+      }
+    }
+
+    & > .custom.full {
+      grid-column: content;
+      grid-row: 1;
+      min-inline-size: 0;
+    }
+
+    /* Narrow: the description drops below the actor. */
+    @container (max-width: 620px) {
+      & > .content > .row > .payload {
+        flex-basis: 100%;
+        order: 1;
+      }
+    }
+  }
+}
