@@ -14,4 +14,4 @@ type OwnProps = {
  * @implements ds:global.subcomponent.modal-footer
  */
 export type FooterProps = OwnProps &
-  Omit<ComponentProps<"footer">, keyof OwnProps>;
+  Omit<ComponentProps<"div">, keyof OwnProps>;

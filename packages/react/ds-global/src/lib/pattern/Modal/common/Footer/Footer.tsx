@@ -18,12 +18,12 @@ const Footer = ({
   className,
   ...props
 }: FooterProps): React.ReactElement => (
-  <footer
+  <div
     className={[componentCssClassName, className].filter(Boolean).join(" ")}
     {...props}
   >
     {children}
-  </footer>
+  </div>
 );
 
 Footer.displayName = "Modal.Footer";

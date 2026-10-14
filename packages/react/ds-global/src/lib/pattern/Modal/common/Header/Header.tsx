@@ -33,7 +33,7 @@ const Header = ({
   const modal = useModalContext();
 
   return (
-    <header
+    <div
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       {...props}
     >
@@ -50,7 +50,7 @@ const Header = ({
           onClick={onDismiss ?? modal.onDismiss}
         />
       )}
-    </header>
+    </div>
   );
 };
 

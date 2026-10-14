@@ -34,4 +34,4 @@ type OwnProps = {
  * @implements ds:global.subcomponent.modal-header
  */
 export type HeaderProps = OwnProps &
-  Omit<ComponentProps<"header">, keyof OwnProps>;
+  Omit<ComponentProps<"div">, keyof OwnProps>;
