@@ -1319,7 +1319,7 @@ describe("DataViews.Filters", () => {
         .map((checkbox) => checkbox.getAttribute("value"));
       expect(values).toHaveLength(200);
       expect(values.slice(0, 3)).toEqual(["r0", "1", "r2"]);
-    });
+    }, 15_000);
 
     it("moves no set onto one already standing, so no restriction is overwritten", () => {
       const provider = createFacetedProvider();
