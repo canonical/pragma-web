@@ -140,6 +140,7 @@ describe("public surface", () => {
       "listDisplayEntries",
       "moveColumn",
       "placeSortTerm",
+      "readInstant",
       "readProviderHost",
       "readSizingBounds",
       "resetColumnArrangement",
@@ -157,6 +158,9 @@ describe("public surface", () => {
       expect(dataviews).not.toHaveProperty(name);
     }
     expect(bindings.isDataViewsProvider(undefined)).toBe(false);
+    expect(bindings.readInstant("2026-01-02T01:00:00-05:00")).toBe(
+      Date.UTC(2026, 0, 2, 6),
+    );
     expect(bindings.resolveMessages({ search: "Find" }).search).toBe("Find");
     expect(
       bindings.buildColumnTemplate(
