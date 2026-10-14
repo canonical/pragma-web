@@ -1,0 +1,117 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The control bar: filters leading, the order control trailing, ruled underneath. */
+  .ds.data-timeline-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dimension-100) var(--dimension-200);
+    padding-block: var(--dimension-100);
+    border-block-end: var(--dimension-stroke-thickness-medium) solid
+      var(--color-border-muted);
+
+    & .filters,
+    & .order {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--dimension-100);
+    }
+
+    & .filter {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+    }
+
+    & .trigger-content {
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+    }
+
+    /* One neutral-button recipe for the filter triggers, the reset and the order control. */
+    & .control,
+    & .filter > .ds.contextual-menu > .trigger,
+    & .filter > .menu > .trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--dimension-050);
+      padding: var(--dimension-050) var(--dimension-100);
+      border: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+      border-radius: 0.125rem;
+      background-color: var(--color-background);
+      color: var(--color-text);
+      font-family: inherit;
+      font-size: var(--typography-text-primary-font-size);
+      line-height: var(--typography-text-primary-line-height);
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--color-background-layer2);
+      }
+
+      &:focus-visible {
+        outline: var(--dimension-stroke-thickness-medium) solid
+          var(--color-focus-ring);
+        outline-offset: var(--dimension-025);
+      }
+    }
+
+    /* Before scripts: the menu is a disclosure of links, open below its trigger. */
+    & .filter > .menu {
+      & > .trigger {
+        list-style: none;
+
+        &::-webkit-details-marker {
+          display: none;
+        }
+      }
+
+      & > .options {
+        position: absolute;
+        inset-block-start: 100%;
+        inset-inline-start: 0;
+        z-index: var(--z-index-overlay, 100);
+        min-inline-size: max-content;
+        margin: var(--dimension-050) 0 0;
+        padding: var(--dimension-050) 0;
+        border: var(--dimension-stroke-thickness-medium) solid
+          var(--color-border-muted);
+        background-color: var(--color-background);
+        list-style: none;
+
+        & a {
+          display: flex;
+          align-items: center;
+          gap: var(--dimension-100);
+          padding: var(--dimension-050) var(--dimension-200);
+          color: var(--color-text);
+          text-decoration: none;
+
+          &:hover {
+            background-color: var(--color-background-layer2);
+          }
+        }
+      }
+    }
+
+    & .refusal {
+      color: var(--color-text-error);
+      font-size: var(--typography-text-secondary-font-size);
+      line-height: var(--typography-text-secondary-line-height);
+    }
+
+    /* Narrow: the reset and the order control keep their icons and lose their labels. */
+    @container (max-width: 620px) {
+      & .control > .label:not(.kept) {
+        display: none;
+      }
+    }
+  }
+}
