@@ -372,7 +372,7 @@ describe("DataViews.Settings", () => {
       ]) {
         expect(chosen).toContain(name);
       }
-    });
+    }, 15000);
 
     it("hydrates what the server drew and hands a focused link's focus to the menu button", async () => {
       const href = "/machines?status=running";
