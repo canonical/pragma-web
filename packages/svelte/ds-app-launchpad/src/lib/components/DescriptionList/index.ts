@@ -10,8 +10,12 @@ const DescriptionList = DescriptionListRoot as typeof DescriptionListRoot & {
    * @example
    * ```svelte
    * <DescriptionList>
-   *   <DescriptionList.Item term="ID">134</DescriptionList.Item>
+   *   <DescriptionList.Item>
+   *     <dt>ID</dt>
+   *     <dd>134</dd>
+   *   </DescriptionList.Item>
    * </DescriptionList>
+   * ```
    */
   Item: typeof Item;
 };

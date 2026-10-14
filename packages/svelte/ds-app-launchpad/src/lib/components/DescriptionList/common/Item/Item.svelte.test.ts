@@ -1,13 +1,16 @@
 /* @canonical/generator-ds 0.17.1 */
 
 import type { ComponentProps } from "svelte";
-import { createRawSnippet } from "svelte";
 import { describe, expect, it, vi } from "vitest";
 import type { Locator } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import type { DescriptionListContext } from "../../types.js";
 import Component from "./Item.svelte";
+import {
+  descriptionListItem,
+  descriptionListItemProps,
+} from "./test.fixtures.svelte";
 
 vi.mock("../../context.js", () => {
   return {
@@ -19,20 +22,19 @@ vi.mock("../../context.js", () => {
 
 describe("Item component", () => {
   const baseProps = {
-    children: createRawSnippet(() => ({
-      render: () => `<span>Description</span>`,
-    })),
-    name: "Term",
+    children: descriptionListItem,
     "data-testid": "description-list-item",
   } satisfies ComponentProps<typeof Component>;
 
   it("renders", async () => {
     const page = await render(Component, { ...baseProps });
     await expect.element(componentLocator(page)).toBeInTheDocument();
-    await expect.element(termLocator(page)).toHaveTextContent("Term");
+    await expect
+      .element(termLocator(page))
+      .toHaveTextContent(descriptionListItemProps.termText);
     await expect
       .element(descriptionLocator(page))
-      .toHaveTextContent("Description");
+      .toHaveTextContent(descriptionListItemProps.descriptionText);
   });
 
   describe("attributes", () => {
