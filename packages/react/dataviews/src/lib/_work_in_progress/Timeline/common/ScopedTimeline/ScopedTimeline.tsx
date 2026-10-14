@@ -10,24 +10,25 @@ import {
   resolveDisplayStatus,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
-import { MessagesContext, StatusItem } from "../../common/index.js";
+import { MessagesContext, StatusItem } from "../../../../common/index.js";
 import {
   useDataViewsValue,
-  useMessages,
   useRowScopes,
   useStableCallback,
   useStableValue,
-} from "../../hooks/index.js";
-import { describeStatus } from "../../utils/index.js";
-import { EventList, type NamedEvent, SelectAllOnPage } from "./common/index.js";
-import { useDateTimeFormats } from "./hooks/index.js";
-import type { TimelineDecoration, TimelineProps } from "./types.js";
+} from "../../../../hooks/index.js";
+import { describeStatus } from "../../../../utils/index.js";
+import { useDateTimeFormats, useTimelineHeader } from "../../hooks/index.js";
+import type { TimelineDecoration } from "../../types.js";
 import {
   areMappingsEqual,
   mapRecord,
   resolveMarkerSizes,
-} from "./utils/index.js";
-import "./styles.css";
+} from "../../utils/index.js";
+import { EventList, type NamedEvent } from "../EventList/index.js";
+import { Header } from "../Header/index.js";
+import { SelectAllOnPage } from "../SelectAllOnPage/index.js";
+import type { ScopedTimelineProps } from "./types.js";
 
 const componentCssClassName = "ds data-timeline";
 
@@ -35,24 +36,11 @@ const componentCssClassName = "ds data-timeline";
 const NO_FIELDS: readonly string[] = [];
 
 /**
- * A timeline renders the records of one collection as events in time: one
- * event per record on the page, in the order the query puts them, each
- * marked on a shared axis. It renders records and nothing else — it does not
- * fetch, sort or page — and reads what the table reads: the query's rows,
- * the core's status and the selection, so a record selected on the timeline
- * is selected in every renderer on the provider.
- *
- * Each record is read through `mapping`; `dateTime` must name a `date`
- * field. A long page collapses behind a strip revealing the rest. Every word
- * comes from `messages`, over English.
- *
- * Not exported from the package root: a work-in-progress spike, imported from
- * its own module until it is admitted.
- *
- * @experimental Pre-release: a work-in-progress spike, not admitted to the
- * package root; its shape may change or it may be withdrawn.
+ * The timeline itself, speaking through the announcer and the words of the
+ * UI scope it is placed in: its own as a standalone `Timeline`, or a
+ * `DataViews` root's.
  */
-export default function Timeline<
+export default function ScopedTimeline<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 >({
@@ -64,13 +52,21 @@ export default function Timeline<
   decorate,
   renderStatus,
   messages,
+  announce,
   markerCombination = "all-sizes",
   dateTimePosition = "trailing",
   expansion = {},
   dateTimeFormats,
+  showControls = true,
+  showActorFilter = true,
+  showEventFilter = true,
+  showSorting = true,
+  actorFilterLabel,
+  eventFilterLabel,
+  dateTimeLabel,
   className,
   ...rest
-}: TimelineProps<TFields, TRow>): ReactElement {
+}: ScopedTimelineProps<TFields, TRow>): ReactElement {
   if (!isDataViewsProvider(provider)) {
     throw new Error(
       "Timeline requires a provider created by createDataViewsProvider",
@@ -81,7 +77,6 @@ export default function Timeline<
       `Timeline reads its dates from "${mapping.dateTime}", which is not a date field`,
     );
   }
-  const words = useMessages(messages);
   useEffect(() => provider.observe(), [provider]);
   const scopes = useRowScopes(provider, NO_FIELDS);
   const model = useDataViewsValue(provider.rows);
@@ -116,21 +111,38 @@ export default function Timeline<
       : [];
     return resolveMarkerSizes(items, markerCombination);
   }, [model, status, mapped, decorateRow, nameRow, markerCombination]);
+  const items = useMemo(() => events.map(({ item }) => item), [events]);
+  const header = useTimelineHeader({
+    provider,
+    mapping: mapped,
+    showActorFilter,
+    showEventFilter,
+    showSorting,
+    actorFilterLabel: actorFilterLabel ?? messages.actorFilter,
+    eventFilterLabel: eventFilterLabel ?? messages.eventFilter,
+    dateTimeLabel: dateTimeLabel ?? messages.eventDate,
+    items,
+    messages,
+    announce,
+  });
   // A new page starts collapsed again; the same page refreshed keeps what was revealed.
   const page = useMemo(() => model.ids.join("\u0000"), [model]);
   const formats = useDateTimeFormats(dateTimeFormats);
   const describe = useCallback(
-    (shown: DisplayStatus) => describeStatus(shown, words),
-    [words],
+    (shown: DisplayStatus) => describeStatus(shown, messages),
+    [messages],
   );
+  const hasControls =
+    showControls && (header.filters.length > 0 || header.order !== null);
   return (
-    <MessagesContext value={words}>
+    <MessagesContext value={messages}>
       <section
         {...rest}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
         aria-label={label}
         aria-busy={state.pendingRequestId !== null}
       >
+        {hasControls ? <Header {...header} /> : null}
         {selectable ? (
           <SelectAllOnPage selection={provider.selection} ids={scopes.ids} />
         ) : null}

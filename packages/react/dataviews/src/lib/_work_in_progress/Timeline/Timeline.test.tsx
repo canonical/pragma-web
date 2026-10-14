@@ -2,6 +2,7 @@ import {
   createArraySource,
   createDataViewsProvider,
   type DataViewsProvider,
+  declareCapabilities,
   type SourceDelivery,
 } from "@canonical/dataviews-core";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
@@ -26,7 +27,8 @@ import {
   createActivityProvider,
 } from "../../../../testing/activities.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
-import { pageOf } from "../../../../testing/fixtures.js";
+import { COUNTED_EXACTLY, pageOf } from "../../../../testing/fixtures.js";
+import readAnnouncements from "../../../../testing/readAnnouncements.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
 import { DataTable } from "../DataTable/index.js";
 import Timeline from "./Timeline.js";
@@ -433,6 +435,69 @@ describe("Timeline", () => {
     expect(
       screen.getByRole("button", { name: "Everything" }),
     ).toBeInTheDocument();
+  });
+
+  it("draws its controls where the source allows them, and none when asked", () => {
+    loadedTimeline();
+    expect(screen.getByText("Filter by:")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Actor" })).toBeInTheDocument();
+    const { provider } = createActivityProvider({ rows: ACTIVITY_PAGE });
+    render(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Bare"
+        showControls={false}
+      />,
+    );
+    expect(
+      screen
+        .getByRole("region", { name: "Bare" })
+        .querySelector(".data-timeline-header"),
+    ).toBeNull();
+  });
+
+  it("draws no controls where the source allows none", () => {
+    const { provider } = createActivityProvider({
+      rows: ACTIVITY_PAGE,
+      capabilities: declareCapabilities(activities, {
+        counts: COUNTED_EXACTLY,
+      }),
+      facets: [],
+    });
+    render(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+      />,
+    );
+    expect(document.querySelector(".data-timeline-header")).toBeNull();
+  });
+
+  it("filters the collection from its header, asking the source again", () => {
+    const { provider, source } = loadedTimeline(ACTIVITY_PAGE, {});
+    const asked = source.calls.length;
+    fireEvent.click(screen.getByRole("button", { name: "Actor" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "John Roe" }));
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "actor", operator: "isAny", operands: ["john"] },
+    ]);
+    expect(source.calls.length).toBe(asked + 1);
+  });
+
+  it("orders the collection from its header, saying so through its own announcer", async () => {
+    const { provider } = loadedTimeline(ACTIVITY_PAGE, {
+      dateTimeLabel: "When",
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Order by date" }));
+    expect(provider.state.get().slice.sort).toEqual([
+      { field: "at", direction: "desc" },
+    ]);
+    expect(screen.getByRole("button", { name: "Latest" })).toBeInTheDocument();
+    expect((await readAnnouncements()).at(-1)).toBe(
+      "Sorted by When, descending.",
+    );
   });
 
   it("names its root by its label, spreading and merging the caller's props", () => {

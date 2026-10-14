@@ -64,4 +64,46 @@ describe("Timeline on the server", () => {
     expect(markup).toContain('aria-busy="true"');
     expect(markup).not.toContain("<ol");
   });
+
+  it("draws its controls as links to the queries their changes lead to", () => {
+    const provider = createDataViewsProvider({
+      collection: activities,
+      source: createArraySource({
+        rows: ACTIVITY_PAGE,
+        collection: activities,
+      }),
+      location: createMemoryLocation({ href: "/activity?kind=push" }),
+      facets: ["actor", "kind"],
+    });
+    provider.refresh();
+    const markup = renderToString(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+        actorFilterLabel="Reviewer"
+        eventFilterLabel="Activity"
+      />,
+    );
+    expect(markup).toContain("Filter by:");
+    expect(markup).toMatch(
+      /<details class="menu"><summary class="trigger"><span class="trigger-content"><span class="label">Reviewer<\/span>/u,
+    );
+    expect(markup).toMatch(/<a href="\?actor=john[^"]*">John Roe<\/a>/u);
+    expect(markup).toMatch(
+      /<a href="\?[^"]*" aria-current="true"><svg[^>]*>.*?<\/svg>push<\/a>/u,
+    );
+    expect(markup).toMatch(
+      /<a class="control" href="\?[^"]*" aria-label="Reset filters">/u,
+    );
+    expect(markup).toMatch(
+      /<a class="control" href="\?[^"]*sort[^"]*" aria-label="Order by date">/u,
+    );
+    const header = markup.slice(
+      markup.indexOf("data-timeline-header"),
+      markup.indexOf('<ol class="events"'),
+    );
+    expect(header).not.toContain("<button");
+    expect(header).not.toContain("<form");
+  });
 });
