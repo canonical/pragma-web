@@ -198,6 +198,14 @@ function Fit({
             chip && chipCss && chipBaseline !== null
               ? {
                   rootTag: chip.tagName,
+                  legacyResetAttributePresent: chip.hasAttribute(
+                    "data-ds-density-reset",
+                  ),
+                  productRootTier: chip.parentElement?.matches(
+                    ".site,.docs,.app",
+                  )
+                    ? chip.parentElement.className
+                    : null,
                   height: chip.getBoundingClientRect().height,
                   occupiedHeight:
                     chip.getBoundingClientRect().height +
@@ -265,7 +273,7 @@ function Fit({
         viewport: window.innerWidth,
         policy: navigationDensityPolicy,
         enrollment:
-          "Production direct static-Chip enrollment; actual private Label owns default helper; actual DOM product/reset and portal boundaries",
+          "Production direct static-Chip enrollment; actual private Label owns default helper; actual DOM product-role and portal boundaries",
         parentBaselineComparison: (() => {
           const plain = rowMetrics.find(
             (row) =>
@@ -331,54 +339,69 @@ function Fit({
       </p>
       <div ref={ref} className="density-fit-proof">
         <div className="density-fit-row">
-          {["candidate-plain", "candidate-default", "candidate-chip"].map(
-            (mode) => (
-              <SideNavigation
-                key={mode}
-                className="density-nav-fixture"
-                data-density-host={mode}
-                LinkComponent={mode === "candidate-chip" ? ClassOnlyLink : "a"}
-                currentUrl={`#density-${tier}-${mode}-first`}
-                defaultExpanded
-                keyboardShortcut={false}
-                root={{
-                  key: mode,
-                  items: [
-                    {
-                      key: "group",
-                      items: [
-                        {
-                          key: "first",
-                          url: `#density-${tier}-${mode}-first`,
-                          icon: "settings",
-                          label:
-                            mode === "candidate-plain"
-                              ? "Plain"
-                              : mode === "candidate-default"
-                                ? "Reset"
+          {[
+            "candidate-plain",
+            "candidate-default",
+            "candidate-chip",
+            "candidate-legacy-attribute",
+          ].map((mode) => (
+            <SideNavigation
+              key={mode}
+              className="density-nav-fixture"
+              data-density-host={mode}
+              LinkComponent={mode === "candidate-chip" ? ClassOnlyLink : "a"}
+              currentUrl={`#density-${tier}-${mode}-first`}
+              defaultExpanded
+              keyboardShortcut={false}
+              root={{
+                key: mode,
+                items: [
+                  {
+                    key: "group",
+                    items: [
+                      {
+                        key: "first",
+                        url: `#density-${tier}-${mode}-first`,
+                        icon: "settings",
+                        label:
+                          mode === "candidate-plain"
+                            ? "Plain"
+                            : mode === "candidate-default"
+                              ? "Root"
+                              : mode === "candidate-legacy-attribute"
+                                ? "Attr"
                                 : "Dense",
-                          slot:
-                            mode === "candidate-plain" ? undefined : (
+                        slot:
+                          mode === "candidate-plain" ? undefined : mode ===
+                            "candidate-default" ? (
+                            <span className={tier}>
                               <Chip
                                 value="Chip"
-                                data-ds-density-reset={
-                                  mode === "candidate-default" ? "" : undefined
-                                }
+                                data-non-subscriber="product-root-reference"
                               />
-                            ),
-                        },
-                        {
-                          key: "next",
-                          url: `#density-${tier}-${mode}-next`,
-                          label: "Next",
-                        },
-                      ],
-                    },
-                  ],
-                }}
-              />
-            ),
-          )}
+                            </span>
+                          ) : (
+                            <Chip
+                              value="Chip"
+                              data-ds-density-reset={
+                                mode === "candidate-legacy-attribute"
+                                  ? ""
+                                  : undefined
+                              }
+                            />
+                          ),
+                      },
+                      {
+                        key: "next",
+                        url: `#density-${tier}-${mode}-next`,
+                        label: "Next",
+                      },
+                    ],
+                  },
+                ],
+              }}
+            />
+          ))}
           <div className="density-guides" aria-hidden>
             {guides.map((top, index) => (
               <i
@@ -471,24 +494,12 @@ function Fit({
                     },
                     {
                       key: "product",
-                      label: "Site reset",
+                      label: "Site root",
                       slot: (
                         <span className="site">
                           <Chip
-                            value="Reset"
-                            data-non-subscriber="nested-site-reset"
-                          />
-                        </span>
-                      ),
-                    },
-                    {
-                      key: "reset",
-                      label: "Reset",
-                      slot: (
-                        <span data-ds-density-reset>
-                          <Chip
-                            value="Reset"
-                            data-non-subscriber="nested-explicit-reset"
+                            value="Root"
+                            data-non-subscriber="nested-site-product-root"
                           />
                         </span>
                       ),
@@ -520,11 +531,12 @@ function Fit({
         Plain and enrolled static Chip share the unchanged default label seat.
         Dense uses a public custom link forwarding only guaranteed props; the
         provider class keeps automatic enrollment when data attributes are
-        dropped. Reset is an explicit nonenrolled reset reference, not another
-        public density mode. Intrinsic painted rows contain closure and touch
-        the next row; no target height is authored. Other controls, interactive
-        Chips, nested product/reset wrappers and portals outside the direct
-        trailing slot keep their default seat.
+        dropped. Root is an ordinary default Chip inside a real product root.
+        Attr demonstrates that the former reset attribute cannot opt out.
+        Intrinsic painted rows contain closure and touch the next row; no target
+        height is authored. Other controls, interactive Chips, wrappers outside
+        direct-child eligibility and portals outside the direct trailing slot
+        keep their default seat.
       </p>
     </section>
   );

@@ -64,6 +64,21 @@ describe("Item", () => {
     );
   });
 
+  it("keeps a direct static Chip eligible when it carries the obsolete reset attribute", () => {
+    const { container } = render(
+      <Item slot={<Chip value="Legacy attribute" data-ds-density-reset="" />}>
+        Machines
+      </Item>,
+    );
+    const chip = screen.getByText("Legacy attribute").closest(".chip");
+    expect(chip).toHaveAttribute("data-ds-density-reset");
+    expect(
+      container.querySelector(
+        `${navigationDensityPolicy.providerSelector} ${navigationDensityPolicy.subscriberSelector}:not(.site,.docs,.app)`,
+      ),
+    ).toBe(chip);
+  });
+
   it("renders a plain label when url is absent", () => {
     render(<Item>Ada Lovelace</Item>);
     expect(screen.queryByRole("link")).not.toBeInTheDocument();

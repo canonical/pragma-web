@@ -17,5 +17,8 @@ describe("navigation density policy", () => {
     expect(css).toContain(":has(button, a, input, select, textarea)");
     expect(policy.role).toBe("spacing.inset.control.block");
     expect(policy.member).toBe("dense");
+    expect(css).not.toContain("data-ds-density-reset");
+    expect(policy.resets).toEqual(["site", "docs", "app"]);
+    expect(policy.resetBoundary).toBe("product-root.v1");
   });
 });

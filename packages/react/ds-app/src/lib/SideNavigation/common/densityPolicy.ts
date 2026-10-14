@@ -15,9 +15,10 @@ export const navigationDensityPolicy = {
     closure: "--ds-control-seat-margin-block-end",
   },
   boundary: "navigation.trailing-slot.direct-static-chip.v1",
-  resets: ["site", "docs", "app", "data-ds-density-reset"],
+  resets: ["site", "docs", "app"],
   portalBoundary: "dom-target.v1",
-  resetBoundary: "product-or-explicit-wrapper.v1",
+  resetBoundary: "product-root.v1",
+  wrapperBoundary: "structural direct-child eligibility; not a reset input",
   portals: "actual DOM target; no React-context propagation",
   exclusions: ["interactive Chip", "dismissible Chip", "other controls"],
 } as const;
