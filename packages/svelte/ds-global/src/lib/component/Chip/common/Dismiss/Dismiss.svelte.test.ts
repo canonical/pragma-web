@@ -34,8 +34,8 @@ describe("Chip.Dismiss", () => {
         "data-testid": "dismiss-control",
       },
     });
-    const root = page.container.querySelector(".ds.chip");
     const dismiss = page.getByRole("button", { name: "Remove Bob" });
+    const root = dismiss.element().parentElement;
 
     expect(root?.tagName).toBe("SPAN");
     expect(root?.id).toBe("chip-root");
@@ -68,9 +68,9 @@ describe("Chip.Dismiss", () => {
     const dismiss = page.getByRole("button", { name: "Dismiss Owner: Bob" });
 
     await expect.element(dismiss).toBeDisabled();
-    expect(
-      page.container.querySelector(".ds.chip")?.hasAttribute("disabled"),
-    ).toBe(false);
+    expect(dismiss.element().parentElement?.hasAttribute("disabled")).toBe(
+      false,
+    );
     (dismiss.element() as HTMLButtonElement).click();
     expect(onclick).not.toHaveBeenCalled();
   });
@@ -94,7 +94,7 @@ describe("Chip.Dismiss", () => {
     });
 
     await expect.element(page.getByTestId("custom-icon")).toBeInTheDocument();
-    expect(page.container.querySelector(".dismiss svg")).toBeNull();
+    expect(page.getByRole("button").element().querySelector("svg")).toBeNull();
     await expect
       .element(page.getByRole("button", { name: "Dismiss Owner: Bob" }))
       .toHaveAccessibleName("Dismiss Owner: Bob");
@@ -175,9 +175,9 @@ describe("Chip.Dismiss", () => {
       const dismiss = page.getByRole("button");
 
       await expect.element(dismiss).toHaveAttribute(attribute, expected);
-      expect(
-        page.container.querySelector(".ds.chip")?.getAttribute(attribute),
-      ).not.toBe(expected);
+      expect(dismiss.element().parentElement?.getAttribute(attribute)).not.toBe(
+        expected,
+      );
     });
 
     it("merges custom classes with the dismiss class", async () => {

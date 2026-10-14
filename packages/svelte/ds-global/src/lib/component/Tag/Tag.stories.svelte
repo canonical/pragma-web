@@ -13,19 +13,23 @@
     "criticality",
   ];
 
+  /**
+   * Tags identify metadata or status without an action.
+   * Use [Chip](?path=/docs/components-chip--docs) for selectable or dismissible items.
+   */
   const { Story } = defineMeta({
     title: "components/Tag",
     component: Tag,
     tags: ["autodocs"],
+    argTypes: {
+      icon: { control: false },
+      badge: { control: false },
+    },
     parameters: {
       controls: { include: documentedProps },
       docs: {
         controls: { include: documentedProps },
         argTypes: { include: documentedProps },
-        description: {
-          component:
-            "Tags identify metadata or status without an action. Use Chip for selectable or dismissible items.",
-        },
       },
     },
   });
@@ -43,7 +47,7 @@
   {/snippet}
 </Story>
 
-<Story name="Criticalities">
+<Story name="Criticalities" parameters={{ controls: { disable: true } }}>
   {#snippet template()}
     {#each MODIFIER_FAMILIES.criticality as criticality (criticality)}
       <Tag
@@ -56,7 +60,7 @@
   {/snippet}
 </Story>
 
-<Story name="Anticipation">
+<Story name="Anticipation" parameters={{ controls: { disable: true } }}>
   {#snippet template()}
     {#each MODIFIER_FAMILIES.anticipation as anticipation (anticipation)}
       <Tag
@@ -68,7 +72,7 @@
   {/snippet}
 </Story>
 
-<Story name="Importance">
+<Story name="Importance" parameters={{ controls: { disable: true } }}>
   {#snippet template()}
     {#each MODIFIER_FAMILIES.importance as importance (importance)}
       <Tag
@@ -109,7 +113,10 @@
   {/snippet}
 </Story>
 
-<Story name="Overflow" parameters={{ docs: { disable: true } }}>
+<Story
+  name="Overflow"
+  parameters={{ controls: { disable: true }, docs: { disable: true } }}
+>
   {#snippet template()}
     <Tag
       value="This is a very long value that will overflow"

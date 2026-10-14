@@ -61,8 +61,8 @@ describe("Chip", () => {
     const page = await render(Fixture, {
       dismissProps: { onclick },
     });
-    const root = page.container.querySelector(".ds.chip");
     const dismiss = page.getByRole("button", { name: "Dismiss Owner: Bob" });
+    const root = dismiss.element().parentElement;
 
     expect(root?.tagName).toBe("SPAN");
     expect(root?.textContent?.replace(/\s+/g, " ").trim()).toBe("Owner: Bob");
@@ -91,14 +91,18 @@ describe("Chip", () => {
 
       for (let index = 0; index < 2; index += 1) {
         await page.rerender({ showDismiss: false });
-        expect(page.container.querySelector("button")).toBeNull();
-        expect(page.container.querySelector(".ds.chip")?.tagName).toBe("SPAN");
+        expect(page.getByRole("button").query()).toBeNull();
+        expect(page.getByText("Bob").element().parentElement?.tagName).toBe(
+          "SPAN",
+        );
 
         await page.rerender({ showDismiss: true });
         await expect
           .element(page.getByRole("button", { name: "Dismiss Owner: Bob" }))
           .toBeInTheDocument();
-        expect(page.container.querySelector(".ds.chip")?.tagName).toBe("SPAN");
+        expect(page.getByRole("button").element().parentElement?.tagName).toBe(
+          "SPAN",
+        );
       }
     });
 
@@ -120,7 +124,7 @@ describe("Chip", () => {
         value: "Ubuntu",
         showDismiss: false,
       });
-      expect(page.container.querySelectorAll("button")).toHaveLength(1);
+      expect(page.getByRole("button").all()).toHaveLength(1);
       await expect
         .element(page.getByRole("button", { name: "Dismiss Reviewer: Alice" }))
         .toHaveAccessibleName("Dismiss Reviewer: Alice");

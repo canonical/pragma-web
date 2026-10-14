@@ -13,11 +13,11 @@ describe("Chip SSR", () => {
     const page = render(Chip, {
       props: { value: "Ubuntu", onclick: () => {} },
     });
-    const chip = page.container.querySelector(".ds.chip");
+    const chip = page.getByRole("button", { name: "Ubuntu" });
 
-    expect(chip?.tagName).toBe("BUTTON");
+    expect(chip.tagName).toBe("BUTTON");
     expect(chip?.getAttribute("type")).toBe("button");
-    expect(chip?.querySelector("button")).toBeNull();
+    expect(page.getAllByRole("button")).toHaveLength(1);
     expect(chip?.className).toBe("ds chip");
     expect(chip?.hasAttribute("density")).toBe(false);
   });
@@ -30,7 +30,7 @@ describe("Chip SSR", () => {
       });
 
       expect(
-        page.container.querySelector(".ds.chip")?.getAttribute("type"),
+        page.getByRole("button", { name: "Ubuntu" }).getAttribute("type"),
       ).toBe(type);
     },
   );
@@ -39,16 +39,15 @@ describe("Chip SSR", () => {
     const page = render(Chip, {
       props: { lead: "Owner", value: "Bob", children: defaultDismiss },
     });
-    const chip = page.container.querySelector(".ds.chip");
+    const dismiss = page.getByRole("button", { name: "Dismiss Owner: Bob" });
+    const chip = dismiss.parentElement;
 
     expect(chip?.tagName).toBe("SPAN");
     expect(chip?.className).toBe("ds chip");
     expect(chip?.hasAttribute("density")).toBe(false);
-    expect(chip?.querySelector("button")?.getAttribute("aria-label")).toBe(
-      "Dismiss Owner: Bob",
-    );
-    expect(page.container.querySelector("button button")).toBeNull();
-    expect(chip?.querySelector("button")?.getAttribute("type")).toBe("button");
+    expect(dismiss.getAttribute("aria-label")).toBe("Dismiss Owner: Bob");
+    expect(page.getAllByRole("button")).toHaveLength(1);
+    expect(dismiss.getAttribute("type")).toBe("button");
   });
 
   it("uses the value alone in the default dismiss name when there is no lead", () => {
@@ -75,8 +74,8 @@ describe("Chip SSR", () => {
         },
       },
     });
-    const root = page.container.querySelector(".ds.chip");
-    const dismiss = page.getByRole("button");
+    const dismiss = page.getByRole("button", { name: "Remove Bob" });
+    const root = dismiss.parentElement;
 
     expect(root?.tagName).toBe("SPAN");
     expect(root?.classList.contains("custom-chip")).toBe(true);
@@ -87,7 +86,7 @@ describe("Chip SSR", () => {
     expect(dismiss.getAttribute("title")).toBe("Remove owner");
     expect(dismiss.getAttribute("type")).toBe("submit");
     expect(dismiss.hasAttribute("disabled")).toBe(true);
-    expect(dismiss.querySelector('[data-testid="custom-icon"]')).not.toBeNull();
+    expect(dismiss.contains(page.getByTestId("custom-icon"))).toBe(true);
     expect(dismiss.querySelector("svg")).toBeNull();
   });
 

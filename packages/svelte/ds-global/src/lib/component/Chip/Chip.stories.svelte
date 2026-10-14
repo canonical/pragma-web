@@ -12,21 +12,34 @@
     "badge",
     "criticality",
     "onclick",
+    "children",
+    "disabled",
   ];
 
+  /**
+   * Chips trigger a secondary action or dismiss an applied item.
+   * Compose `Chip.Dismiss` inside a chip for dismissal; it accepts native
+   * button attributes and events.
+   *
+   * For read-only metadata and status, use [Tag](?path=/docs/components-tag--docs).
+   */
   const { Story } = defineMeta({
     title: "components/Chip",
     component: Chip,
     tags: ["autodocs"],
+    args: { disabled: false },
+    argTypes: {
+      disabled: { control: "boolean" },
+      icon: { control: false },
+      badge: { control: false },
+      children: { control: false },
+      onclick: { control: false },
+    },
     parameters: {
       controls: { include: documentedProps },
       docs: {
         controls: { include: documentedProps },
         argTypes: { include: documentedProps },
-        description: {
-          component:
-            "Chips trigger a secondary action or dismiss an applied item. Compose Chip.Dismiss inside a chip for dismissal; it accepts native button attributes and events. For read-only metadata and status, use Tag.",
-        },
       },
     },
   });
@@ -42,22 +55,29 @@
 <Story name="Dense" args={{ value: "Ubuntu", onclick: fn(), class: "dense" }} />
 
 <Story name="Dismissible" args={{ lead: "Owner", value: "Bob" }}>
-  {#snippet template({ lead, value })}
-    <Chip {lead} {value}>
-      <Chip.Dismiss onclick={fn()} />
+  {#snippet template({ lead, value, criticality, ...args })}
+    <Chip {lead} {value} {criticality}>
+      <Chip.Dismiss
+        onclick={fn()}
+        disabled={"disabled" in args ? args.disabled : false}
+      />
     </Chip>
   {/snippet}
 </Story>
 
-<Story name="Disabled dismissal" args={{ lead: "Owner", value: "Bob" }}>
-  {#snippet template({ lead, value })}
-    <Chip {lead} {value}>
+<Story
+  name="Disabled dismissal"
+  args={{ lead: "Owner", value: "Bob", disabled: true }}
+  argTypes={{ disabled: { control: false } }}
+>
+  {#snippet template({ lead, value, criticality })}
+    <Chip {lead} {value} {criticality}>
       <Chip.Dismiss onclick={fn()} disabled aria-label="Remove owner" />
     </Chip>
   {/snippet}
 </Story>
 
-<Story name="Criticalities">
+<Story name="Criticalities" parameters={{ controls: { disable: true } }}>
   {#snippet template()}
     {#each MODIFIER_FAMILIES.criticality as criticality (criticality)}
       <Chip
@@ -103,7 +123,10 @@
   {/snippet}
 </Story>
 
-<Story name="Overflow" parameters={{ docs: { disable: true } }}>
+<Story
+  name="Overflow"
+  parameters={{ controls: { disable: true }, docs: { disable: true } }}
+>
   {#snippet template()}
     <Chip
       value="This is a very long value that will overflow"
