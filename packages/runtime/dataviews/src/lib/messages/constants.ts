@@ -281,4 +281,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
 
   chartRenderer: "Chart",
   tableRenderer: "Table",
+
+  eventsHidden: (count) => `${formatCount(count)} hidden`,
+  showMoreEvents: (count) => `Show ${formatCount(count)} more`,
+  showAllEvents: "Show all",
 });
