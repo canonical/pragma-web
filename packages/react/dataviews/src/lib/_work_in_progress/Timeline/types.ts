@@ -1,5 +1,12 @@
+import type {
+  DataViewsMessages,
+  DataViewsProvider,
+  DisplayStatus,
+  RowRecord,
+  SchemaFieldDefinition,
+} from "@canonical/dataviews-core";
 import type { ModifierFamily } from "@canonical/ds-types";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 /**
  * The size of one event's marker on the timeline's axis.
@@ -162,3 +169,56 @@ export type TimelineDateTimeFormats = {
   /** Hovering a date shows its alternate form. Defaults to true. */
   readonly tooltip?: boolean;
 };
+
+type OwnProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object,
+> = {
+  /** The provider owning this collection's query, result and selection. */
+  readonly provider: DataViewsProvider<TFields, TRow>;
+  /** The record fields each event is read from; `dateTime` must name a `date` field. */
+  readonly mapping: TimelineFieldMapping;
+  /** The timeline's accessible name. */
+  readonly label: string;
+  /** Offer a checkbox on each event, and one selecting every event on the page, backed by the provider's selection. */
+  readonly selectable?: boolean;
+  /** Names one record, for its selection checkbox. Defaults to its event's description, label or identity. */
+  readonly rowLabel?: (row: TRow, rowId: string) => string;
+  /**
+   * Adds to each mapped event — a marker, custom content, a criticality.
+   * The latest one is always called; its identity alone maps nothing again.
+   */
+  readonly decorate?: (row: TRow, rowId: string) => TimelineDecoration;
+  /** Replaces the default text of a status, as the core decided it. */
+  readonly renderStatus?: (status: DisplayStatus) => ReactNode;
+  /** The words the timeline renders, over English; the connected timeline takes its root's. */
+  readonly messages?: Partial<DataViewsMessages>;
+  /** Defaults to `all-sizes`. */
+  readonly markerCombination?: TimelineMarkerCombination;
+  /** Defaults to `trailing`. */
+  readonly dateTimePosition?: TimelineDateTimePosition;
+  /** How a long page collapses; `false` shows every event. Defaults to collapsing below the first 8. */
+  readonly expansion?: TimelineExpansion | false;
+  readonly dateTimeFormats?: TimelineDateTimeFormats;
+};
+
+/**
+ * Timeline props. The root is a `section` named by `label`, so it extends
+ * native section props, less `children`, since its content is the records,
+ * and `aria-label`, `aria-labelledby` and `aria-busy`, which it sets.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = OwnProps<TFields, TRow> &
+  Omit<
+    ComponentProps<"section">,
+    | keyof OwnProps<TFields, TRow>
+    | "children"
+    | "aria-label"
+    | "aria-labelledby"
+    | "aria-busy"
+  >;
