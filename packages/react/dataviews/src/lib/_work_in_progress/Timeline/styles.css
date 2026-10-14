@@ -1,0 +1,103 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The root is `data-timeline`, not `timeline`: `.ds.timeline` is the design system's own pattern. */
+  .ds.data-timeline {
+    --data-timeline-axis-width: var(--dimension-400);
+    --data-timeline-row-height: var(--dimension-400);
+    --data-timeline-gap: var(--dimension-200);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--data-timeline-gap);
+    container-type: inline-size;
+    color: var(--color-text);
+    font-family: var(--typography-text-primary-font-family);
+    font-size: var(--typography-text-primary-font-size);
+    font-weight: var(--typography-text-primary-font-weight);
+
+    & > .status {
+      padding-block: var(--dimension-100);
+    }
+
+    & > .select-all {
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-050);
+    }
+
+    /* Every event shares three tracks — date, marker, content — so markers align down the axis. */
+    & > .events {
+      display: grid;
+      grid-template-columns:
+        [datetime] max-content
+        [marker] var(--data-timeline-axis-width)
+        [content] minmax(0, 1fr);
+      column-gap: var(--data-timeline-gap);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      & > .item {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        column-gap: var(--data-timeline-gap);
+
+        & > .ds.data-timeline-event {
+          grid-column: 1 / -1;
+          grid-template-columns: subgrid;
+          column-gap: var(--data-timeline-gap);
+        }
+      }
+
+      /* The strip spans the row; the connector passes it on two rails on the marker axis. */
+      & > .item.expansion {
+        & > .ds.data-timeline-expansion {
+          grid-column: 1 / -1;
+          grid-row: 1;
+          margin-block: var(--dimension-150);
+        }
+
+        &::before,
+        &::after {
+          content: "";
+          grid-column: marker;
+          grid-row: 1;
+          justify-self: center;
+          inline-size: var(--dimension-stroke-thickness-medium);
+          block-size: var(--dimension-150);
+          background-color: var(
+            --modifier-color-border,
+            var(--color-border-muted)
+          );
+        }
+
+        &::before {
+          align-self: start;
+        }
+
+        &::after {
+          align-self: end;
+        }
+
+        &:last-child::after {
+          display: none;
+        }
+      }
+
+      /* The line starts at the first marker and stops at the last. */
+      & > .item:first-child > .ds.data-timeline-event > .marker::before {
+        inset-block-start: var(--dimension-150);
+      }
+
+      & > .item:last-child > .ds.data-timeline-event > .marker::before {
+        block-size: var(--data-timeline-row-height);
+      }
+    }
+
+    & .ds.data-timeline-event .select {
+      flex: none;
+    }
+  }
+}

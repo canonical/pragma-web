@@ -33,5 +33,6 @@
 @import url("./_work_in_progress/Timeline/common/Event/styles.css");
 @import url("./_work_in_progress/Timeline/common/ExpansionIndicator/styles.css");
 @import url("./_work_in_progress/Timeline/common/Marker/styles.css");
+@import url("./_work_in_progress/Timeline/styles.css");
 @import url("./common/Announcer/styles.css");
 @import url("./virtualization/common/VirtualBody/styles.css");
