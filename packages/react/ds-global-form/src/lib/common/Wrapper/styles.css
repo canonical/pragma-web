@@ -37,5 +37,24 @@
     & > .payload > * {
       grid-column: 1 / -1;
     }
+
+    /* Aside label layout: the label sits BESIDE the payload (input + helper
+     * text) instead of stacked above it. Own two columns (auto + the rest)
+     * rather than the form subgrid — the label takes only the width it
+     * needs. */
+    &.label-aside {
+      grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+      column-gap: var(--form-field-inline-gap);
+      row-gap: 0;
+
+      & > .ds.field-label {
+        grid-column: 1;
+      }
+
+      & > .payload {
+        grid-column: 2;
+        grid-template-columns: none;
+      }
+    }
   }
 }
