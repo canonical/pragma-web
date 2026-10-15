@@ -20,6 +20,16 @@
       padding-block: var(--dimension-100);
     }
 
+    /* The count of events shown: said, never seen. */
+    & > .showing {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
     & > .select-all {
       display: flex;
       align-items: center;
@@ -80,20 +90,31 @@
         &::after {
           align-self: end;
         }
-
-        &:last-child::after {
-          display: none;
-        }
       }
 
       /* The line starts at the first marker and stops at the last. */
       & > .item:first-child > .ds.data-timeline-event > .marker::before {
         inset-block-start: var(--dimension-150);
       }
+    }
+
+    /* Without a trailing node the line stops at the last marker; with one it runs on to it. */
+    &:not(.has-trailing) > .events {
+      & > .item.expansion:last-child::after {
+        display: none;
+      }
 
       & > .item:last-child > .ds.data-timeline-event > .marker::before {
         block-size: var(--data-timeline-row-height);
       }
+    }
+
+    &.has-trailing
+      > .events
+      > .item:last-child
+      > .ds.data-timeline-event
+      > .marker::before {
+      block-size: calc(100% + var(--data-timeline-gap));
     }
 
     & .ds.data-timeline-event .select {

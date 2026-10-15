@@ -32,7 +32,7 @@ import readAnnouncements from "../../../../testing/readAnnouncements.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
 import { DataTable } from "../DataTable/index.js";
 import Timeline from "./Timeline.js";
-import type { TimelineProps } from "./types.js";
+import type { TimelineProps, TimelineRenderContext } from "./types.js";
 
 type Props = Partial<TimelineProps<ActivityFields, Activity>>;
 
@@ -498,6 +498,176 @@ describe("Timeline", () => {
     expect((await readAnnouncements()).at(-1)).toBe(
       "Sorted by When, descending.",
     );
+  });
+
+  it("says politely how many of the page's events it shows", () => {
+    const page = Array.from({ length: 10 }, (_unused, at) =>
+      activity(`a-${at + 1}`, at + 1),
+    );
+    const { view } = loadedTimeline(page);
+    const line = view.container.querySelector(".showing");
+    expect(line).toHaveAttribute("aria-live", "polite");
+    expect(line).toHaveTextContent("Showing 8 of 10 events");
+    fireEvent.click(screen.getByRole("button", { name: "Show all" }));
+    expect(line).toHaveTextContent("Showing 10 of 10 events");
+  });
+
+  it("says it shows none of none while nothing has arrived", () => {
+    const { view } = manualTimeline();
+    expect(view.container.querySelector(".showing")).toHaveTextContent(
+      "Showing 0 of 0 events",
+    );
+  });
+
+  it("draws a trailing node last, the connector running on to it", () => {
+    const { view } = loadedTimeline(ACTIVITY_PAGE, {
+      trailing: <button type="button">Load earlier activity</button>,
+    });
+    const region = readRegion();
+    expect(region).toHaveClass("has-trailing");
+    expect(region.lastElementChild).toHaveClass("trailing");
+    expect(region.lastElementChild).toHaveTextContent("Load earlier activity");
+    view.unmount();
+    loadedTimeline();
+    expect(readRegion()).not.toHaveClass("has-trailing");
+    expect(readRegion().querySelector(".trailing")).toBeNull();
+  });
+
+  it("draws each event through renderItem, handing it the event's context", () => {
+    const renderItem = vi.fn(
+      (item: { readonly id: string }, context: { readonly index: number }) => (
+        <span className="mine">{`${item.id}@${context.index}`}</span>
+      ),
+    );
+    loadedTimeline(ACTIVITY_PAGE, { renderItem });
+    expect(
+      [...readRegion().querySelectorAll(".item .mine")].map(
+        (drawn) => drawn.textContent,
+      ),
+    ).toEqual(["a-1@0", "a-2@1", "a-3@2", "a-4@3", "a-5@4"]);
+    expect(readRegion().querySelector(".data-timeline-event")).toBeNull();
+    const [item, context] = renderItem.mock.calls.at(-1) ?? [];
+    expect(item).not.toHaveProperty("name");
+    expect(context).toEqual({
+      order: null,
+      isVisible: true,
+      isFiltered: false,
+      markerSize: "medium",
+      index: 4,
+      control: null,
+    });
+  });
+
+  it("counts renderItem's positions over the page, past a collapsed middle", () => {
+    const page = Array.from({ length: 6 }, (_unused, at) =>
+      activity(`a-${at + 1}`, at + 1),
+    );
+    const indices: number[] = [];
+    loadedTimeline(page, {
+      expansion: { method: "middle", initialVisible: 4 },
+      renderItem: (_item, { index }) => {
+        indices.push(index);
+        return null;
+      },
+    });
+    expect(indices.slice(-4)).toEqual([0, 1, 4, 5]);
+    expect(readRegion().querySelectorAll(".item:not(.expansion)")).toHaveLength(
+      4,
+    );
+  });
+
+  it("hands renderItem the order, the restriction and the record's checkbox", () => {
+    const contexts: TimelineRenderContext[] = [];
+    const { provider } = loadedTimeline(ACTIVITY_PAGE, {
+      selectable: true,
+      renderItem: (item, context) => {
+        contexts.push(context);
+        return (
+          <div>
+            {context.control}
+            {item.id}
+          </div>
+        );
+      },
+    });
+    expect(
+      screen.getByRole("checkbox", { name: "Select push a-4" }),
+    ).toBeInTheDocument();
+    act(() => {
+      provider.setSort([{ field: "at", direction: "desc" }]);
+    });
+    expect(contexts.at(-1)?.order).toBe("newest");
+    act(() => {
+      provider.setSort([{ field: "at", direction: "asc" }]);
+    });
+    expect(contexts.at(-1)?.order).toBe("oldest");
+    fireEvent.click(screen.getByRole("button", { name: "Actor" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Jane Doe" }));
+    expect(contexts.at(-1)?.isFiltered).toBe(true);
+  });
+
+  it("counts a search as a restriction", () => {
+    const contexts: TimelineRenderContext[] = [];
+    const { provider } = createActivityProvider({
+      rows: ACTIVITY_PAGE,
+      capabilities: declareCapabilities(activities, {
+        search: ["summary"],
+        counts: COUNTED_EXACTLY,
+      }),
+      facets: [],
+    });
+    render(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+        renderItem={(_item, context) => {
+          contexts.push(context);
+          return null;
+        }}
+      />,
+    );
+    expect(contexts.at(-1)?.isFiltered).toBe(false);
+    act(() => {
+      provider.setSearch("push");
+    });
+    expect(contexts.at(-1)?.isFiltered).toBe(true);
+  });
+
+  it("reports the page's events whenever they change, to the latest callback", () => {
+    const first = vi.fn();
+    const latest = vi.fn();
+    const { provider, source } = createActivityProvider();
+    const view = render(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+        onVisibleItemsChange={first}
+      />,
+    );
+    expect(first).toHaveBeenLastCalledWith([]);
+    view.rerender(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+        onVisibleItemsChange={latest}
+      />,
+    );
+    act(() => {
+      source.latest().deliver({
+        status: "succeeded",
+        page: pageOf(ACTIVITY_PAGE.slice(0, 2)),
+      });
+    });
+    const [reported] = latest.mock.calls.at(-1) ?? [];
+    expect(reported.map(({ id }: { readonly id: string }) => id)).toEqual([
+      "a-1",
+      "a-2",
+    ]);
+    expect(reported[0]).not.toHaveProperty("name");
+    expect(first).toHaveBeenCalledTimes(1);
   });
 
   it("names its root by its label, spreading and merging the caller's props", () => {
