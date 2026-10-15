@@ -24,24 +24,25 @@
       background-color var(--motion-duration-fast) ease,
       border-color var(--motion-duration-fast) ease;
 
+    /* Ring fill = selected token, centre dot = unselected token; both
+     * surface-provided (flat fallback) so the control adapts to OnSurface
+     * stepping. */
     &:checked {
-      /* Dot = selected token, ring fill = unselected token; both surface-provided
-       * (flat fallback) so the control adapts to OnSurface stepping. */
       border-color: var(
         --surface-color-foreground-radio-selected,
         var(--color-foreground-radio-selected)
       );
       background: radial-gradient(
         var(
-            --surface-color-foreground-radio-selected,
-            var(--color-foreground-radio-selected)
-          )
-          40%,
-        var(
             --surface-color-foreground-radio-unselected,
             var(--color-foreground-radio-unselected)
           )
-          41%
+          30%,
+        var(
+            --surface-color-foreground-radio-selected,
+            var(--color-foreground-radio-selected)
+          )
+          31%
       );
     }
 
@@ -49,18 +50,19 @@
       background-color: var(--color-foreground-radio-unselected-hover);
     }
 
-    /* Hover on a selected radio shifts only the dot's fill, not via a whole-element
-     * brightness filter (which would also dim the ring). Re-paint the gradient with
-     * the hovered selected shade from the `--hover--…-selected` channel. */
+    /* Hover on a selected radio shifts only the ring's fill, not via a
+     * whole-element brightness filter (which would also dim the dot).
+     * Re-paint the gradient with the hovered selected shade from the
+     * `--hover--…-selected` channel. */
     &:checked:hover:not(:disabled) {
       border-color: var(--hover--color-foreground-radio-selected);
       background: radial-gradient(
-        var(--hover--color-foreground-radio-selected) 40%,
         var(
             --surface-color-foreground-radio-unselected,
             var(--color-foreground-radio-unselected)
           )
-          41%
+          30%,
+        var(--hover--color-foreground-radio-selected) 31%
       );
     }
 
