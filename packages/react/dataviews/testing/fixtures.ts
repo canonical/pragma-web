@@ -676,6 +676,10 @@ export const MESSAGE_SAMPLES: {
   countUnknown: null,
   chartLowest: null,
   chartHighest: null,
+  eventsShown: [
+    [1, 1],
+    [8, 20],
+  ],
   eventsHidden: [[1], [12]],
   showMoreEvents: [[1], [4]],
   showAllEvents: null,

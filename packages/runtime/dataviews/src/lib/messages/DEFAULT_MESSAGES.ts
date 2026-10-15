@@ -232,6 +232,8 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
 
   renderer: "Show as",
 
+  eventsShown: (shown, total) =>
+    `Showing ${formatCount(shown)} of ${formatCount(total)} ${choosePlural(total, "event", "events")}`,
   eventsHidden: (count) => `${formatCount(count)} hidden`,
   showMoreEvents: (count) => `Show ${formatCount(count)} more`,
   showAllEvents: "Show all",
