@@ -32,7 +32,6 @@
       padding-inline: var(--form-field-inline-gap);
       border: none;
       background: transparent;
-      color: var(--color-icon);
       cursor: pointer;
 
       & > .reveal-icon {
@@ -59,6 +58,13 @@
 
       /* No hover colour change: the reveal toggle keeps `--color-icon` in all
        * pointer states (per design review). */
+
+      /* Disabled field: the icon mask reads `currentColor`, so the disabled
+       * icon colour rides on the toggle itself. */
+      &:disabled {
+        color: var(--form-input-color-disabled);
+        cursor: not-allowed;
+      }
 
       &:focus-visible {
         outline: none;
