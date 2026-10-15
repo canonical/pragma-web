@@ -55,68 +55,13 @@
        box top (off the baseline). The placement rule owns the start. */
     padding-block-end: 0;
 
-    /* Body font tier — what `.p` used to supply. */
-    font-size: var(--typography-text-primary-font-size);
-    font-family: var(--typography-text-primary-font-family);
-  }
-
-  /* The input WRAPPER is the box (like the button element): don't stretch its
-   * child, top-reference it so the input's own space-before governs. Needs to beat
-   * the TextInput's `.ds.input.text { align-items: stretch }` (0,3,0). */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input.text,
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input {
-    align-items: flex-start;
-  }
-
-  /* The <input> is the text carrier — treat it exactly like the button label:
-   * same body font tier, and normalised so only the space-before (below) positions
-   * its text. (It's content-box with an intrinsic height, so reset that.) */
-  :is(.comfortable, .dense, .app, .site, .docs) .ds.input > input {
-    box-sizing: border-box;
-    min-block-size: 0;
-    block-size: auto;
-    margin-block: 0;
-    font-size: var(--typography-text-primary-font-size);
-    font-family: var(--typography-text-primary-font-family);
-  }
-
-  /* ── Baseline placement: `.baseline` nudge + `--space-before` ───────────────
-   * Two parts, the combination that put controls ON the grid:
-   *
-   *  1. NUDGE (the DS.01 `.baseline` mechanism): --bl-start-nudge snaps the text's
-   *     first baseline onto the NEAREST grid line, computed from the element's own
-   *     font (1cap + line-height) — font-relative, so it's exact at any size and
-   *     needs no per-element fudge. This is what lands text exactly on a line.
-   *
-   *  2. --space-before: whole baselines added to move that snapped baseline DOWN to
-   *     the density TARGET line (round-up of the remaining distance), less the box's
-   *     own top border.
-   *
-   *     padding-block-start = bl-start-nudge + space-before − border-top
-   *     space-before = round(up, target − bl-start-nudge − border-top, baseline)
-   *
-   * Applies to the button, the input, and the field label/description/error — i.e.
-   * CONTROL-like text only. Bare prose (p / .p / h1–h6) is DELIBERATELY NOT here:
-   * running text belongs to the typography engine, which already seats it on the
-   * grid (snapped --computed-line-height + --start/--end-nudge) and lets `.editorial`
-   * add its inter-block margins. Density crushing prose to line-height:1 fought that
-   * engine (and only ever put the FIRST line on-grid — wrapped lines drifted). By
-   * partitioning prose OUT, density and the engine write to disjoint element sets,
-   * so `.editorial` composes with density with no specificity war. `:is()` (not
-   * `:where()`) still gives the control seat the specificity to beat a control's own
-   * centring (e.g. the Button's `align-items: center`). */
-  /* Body font tier for the field label/description/error plus the toggle control
-     row (its own line metrics must match the label's so the control row centres
-     exactly), which lost `.p`. Scoped to just these (NOT the headings, which
+      /* Body font tier for the field label and error plus the toggle control row
+     (its own line metrics must match the label's so the control row centres
+     exactly), which lost `.p`. The description reads the secondary ramp, so
+     it stays out of this seat. Scoped to just these (NOT the headings, which
      keep their own tier). */
   :is(.comfortable, .dense, .app, .site, .docs)
-    :is(
-      .ds.field-label,
-      .ds.field-description,
-      .ds.field-error,
-      .ds.field-toggle,
-      .ds.option
-    ) {
+  :is(.ds.field-label, .ds.field-error, .ds.field-toggle, .ds.option) {
     font-size: var(--typography-text-primary-font-size);
     font-family: var(--typography-text-primary-font-family);
   }

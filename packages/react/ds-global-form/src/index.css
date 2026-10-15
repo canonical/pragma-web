@@ -140,15 +140,30 @@
 
     /* ── Description ────────────────────────────────────────────────── */
 
-    /* Description reads the SECONDARY type ramp (design review): it is subordinate
-       supporting text, so it takes the smaller secondary size, not the primary
-       body size. Colour is already the muted token. */
+    /* Subordinate supporting text: reads the SECONDARY type ramp. */
     --form-description-font-size: var(--typography-text-secondary-font-size);
+    --form-description-font-weight: var(
+      --typography-text-secondary-font-weight
+    );
+    --form-description-line-height: var(
+      --typography-text-secondary-line-height-dimension
+    );
+    --form-description-letter-spacing: var(
+      --typography-text-secondary-letter-spacing
+    );
     --form-description-color: var(--color-text-muted);
 
     /* ── Error ──────────────────────────────────────────────────────── */
 
-    --form-error-font-size: var(--typography-text-primary-font-size);
+    /* Status message: reads the SECONDARY type ramp like the description. */
+    --form-error-font-size: var(--typography-text-secondary-font-size);
+    --form-error-font-weight: var(--typography-text-secondary-font-weight);
+    --form-error-line-height: var(
+      --typography-text-secondary-line-height-dimension
+    );
+    --form-error-letter-spacing: var(
+      --typography-text-secondary-letter-spacing
+    );
     --form-error-color: var(--modifier-color-text, var(--color-text-error));
 
     /* ── State colors ───────────────────────────────────────────────── */
