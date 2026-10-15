@@ -48,12 +48,6 @@
     min-block-size: var(--density-box-height);
     align-items: flex-start;
     justify-content: flex-start;
-    /* Kill the UA BOTTOM padding only. Do NOT zero padding-block-start here: this
-       selector is more specific (0,4,0) than the placement rule below (0,2,0), so a
-       `padding-block: 0` shorthand would out-specify and WIPE the placement's
-       `padding-block-start: var(--space-before)` — leaving the label pinned to the
-       box top (off the baseline). The placement rule owns the start. */
-    padding-block-end: 0;
 
     /* Body font tier — what `.p` used to supply. */
     font-size: var(--typography-text-primary-font-size);
