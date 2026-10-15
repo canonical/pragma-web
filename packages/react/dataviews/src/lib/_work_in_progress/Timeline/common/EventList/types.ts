@@ -1,9 +1,12 @@
 import type { Selection } from "@canonical/dataviews-core";
+import type { ReactNode } from "react";
 import type { UseDateTimeFormatsResult } from "../../hooks/index.js";
 import type {
   TimelineDateTimePosition,
   TimelineExpansion,
   TimelineItem,
+  TimelineRenderContext,
+  TimelineSortOrder,
 } from "../../types.js";
 import type { SizedEvent } from "../../utils/index.js";
 
@@ -25,4 +28,10 @@ export type EventListProps = {
   readonly expansion: TimelineExpansion | false;
   /** The selection each event's checkbox is backed by, or null where events are not selectable. */
   readonly selection: Selection | null;
+  /** Draws each event in full, or null to draw the event part. */
+  readonly renderItem:
+    | ((item: TimelineItem, context: TimelineRenderContext) => ReactNode)
+    | null;
+  readonly order: TimelineSortOrder | null;
+  readonly isFiltered: boolean;
 };

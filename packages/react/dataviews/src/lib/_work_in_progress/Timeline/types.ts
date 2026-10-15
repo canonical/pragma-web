@@ -52,6 +52,14 @@ export type TimelineCollapsingMethod = "none" | "bottom" | "middle";
 export type TimelineDateTimePosition = "leading" | "trailing";
 
 /**
+ * The order a timeline's events stand in by their date.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineSortOrder = "newest" | "oldest";
+
+/**
  * The graphic marking one event. The first of `customGraphic`, `imageUrl`,
  * `icon` and `initials` given is drawn; a small marker draws none.
  *
@@ -128,6 +136,26 @@ export type TimelineFieldMapping = {
 };
 
 /**
+ * What `renderItem` is handed beside each event it draws.
+ *
+ * @experimental Pre-release: a work-in-progress spike, not admitted to the
+ * package root; its shape may change or it may be withdrawn.
+ */
+export type TimelineRenderContext = {
+  /** The order the date leads the ordering in, or null where it does not lead it. */
+  readonly order: TimelineSortOrder | null;
+  /** Whether the event is shown; only shown events are drawn. */
+  readonly isVisible: boolean;
+  /** Whether the query restricts the collection, by a filter or a search. */
+  readonly isFiltered: boolean;
+  readonly markerSize: TimelineMarkerSize;
+  /** The event's position among the page's events. */
+  readonly index: number;
+  /** The record's selection checkbox where the events are selectable, or null. */
+  readonly control: ReactNode;
+};
+
+/**
  * How a long page of events collapses, and how much each step reveals.
  *
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
@@ -200,6 +228,15 @@ type OwnProps<
   /** How a long page collapses; `false` shows every event. Defaults to collapsing below the first 8. */
   readonly expansion?: TimelineExpansion | false;
   readonly dateTimeFormats?: TimelineDateTimeFormats;
+  /** Always the last node, which the connector line runs on to. */
+  readonly trailing?: ReactNode;
+  /** Draws each event in full; null draws an empty item. */
+  readonly renderItem?: (
+    item: TimelineItem,
+    context: TimelineRenderContext,
+  ) => ReactNode;
+  /** Called with the page's events whenever they change. */
+  readonly onVisibleItemsChange?: (visible: TimelineItem[]) => void;
   /** Draw the control bar. Defaults to true. */
   readonly showControls?: boolean;
   /** Offer the actor filter, where the source can restrict and facet the actor. Defaults to true. */

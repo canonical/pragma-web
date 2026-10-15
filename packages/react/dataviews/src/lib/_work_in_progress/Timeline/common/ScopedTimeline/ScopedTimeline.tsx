@@ -8,6 +8,7 @@ import {
   isDataViewsProvider,
   listDisplayEntries,
   resolveDisplayStatus,
+  resolveEffectiveOrdering,
 } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useCallback, useEffect, useMemo } from "react";
 import { MessagesContext, StatusItem } from "../../../../common/index.js";
@@ -22,6 +23,8 @@ import { useDateTimeFormats, useTimelineHeader } from "../../hooks/index.js";
 import type {
   TimelineDateTimeFormats,
   TimelineDecoration,
+  TimelineItem,
+  TimelineSortOrder,
 } from "../../types.js";
 import {
   areMappingsEqual,
@@ -72,6 +75,9 @@ export default function ScopedTimeline<
   actorFilterLabel,
   eventFilterLabel,
   dateTimeLabel,
+  trailing,
+  renderItem,
+  onVisibleItemsChange,
   className,
   ...rest
 }: ScopedTimelineProps<TFields, TRow>): ReactElement {
@@ -120,6 +126,28 @@ export default function ScopedTimeline<
     return resolveMarkerSizes(items, markerCombination);
   }, [model, status, mapped, decorateRow, nameRow, markerCombination]);
   const items = useMemo(() => events.map(({ item }) => item), [events]);
+  const visible = useMemo(
+    () => items.map(({ name: _name, ...item }): TimelineItem => item),
+    [items],
+  );
+  const reportVisible = useStableCallback((shown: TimelineItem[]) => {
+    onVisibleItemsChange?.(shown);
+  });
+  useEffect(() => {
+    reportVisible(visible);
+  }, [visible, reportVisible]);
+  const lead = resolveEffectiveOrdering(
+    state.slice,
+    provider.capabilities.sort,
+  ).terms.at(0);
+  const order: TimelineSortOrder | null =
+    lead?.field !== mapping.dateTime
+      ? null
+      : lead.direction === "desc"
+        ? "newest"
+        : "oldest";
+  const isFiltered =
+    state.slice.filter.length > 0 || (state.slice.search ?? "") !== "";
   const header = useTimelineHeader({
     provider,
     mapping: mapped,
@@ -146,7 +174,13 @@ export default function ScopedTimeline<
     <MessagesContext value={messages}>
       <section
         {...rest}
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+        className={[
+          componentCssClassName,
+          trailing === undefined ? null : "has-trailing",
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
         aria-label={label}
         aria-busy={state.pendingRequestId !== null}
       >
@@ -157,15 +191,19 @@ export default function ScopedTimeline<
         {status === null ? null : (
           <StatusItem status={status} renderStatus={renderStatus ?? describe} />
         )}
-        {events.length === 0 ? null : (
-          <EventList
-            key={page}
-            events={events}
-            dateTimePosition={dateTimePosition}
-            formats={formats}
-            expansion={expansion}
-            selection={selectable ? provider.selection : null}
-          />
+        <EventList
+          key={page}
+          events={events}
+          dateTimePosition={dateTimePosition}
+          formats={formats}
+          expansion={expansion}
+          selection={selectable ? provider.selection : null}
+          renderItem={renderItem ?? null}
+          order={order}
+          isFiltered={isFiltered}
+        />
+        {trailing === undefined ? null : (
+          <div className="trailing">{trailing}</div>
         )}
       </section>
     </MessagesContext>
