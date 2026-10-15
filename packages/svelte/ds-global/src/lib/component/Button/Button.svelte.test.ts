@@ -194,6 +194,28 @@ describe("Button component", () => {
   });
 
   describe("accessibility", () => {
+    describe("icon-only warning", () => {
+      const iconOnlyWarning = expect.stringContaining("icon-only buttons");
+
+      it("warns for an icon-only button without an accessible name", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        await render(Component, { icon: buttonIcon });
+        expect(warn).toHaveBeenCalledWith(iconOnlyWarning);
+      });
+
+      it("does not warn when an icon-only button has an aria-label", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        await render(Component, { icon: buttonIcon, "aria-label": "Add" });
+        expect(warn).not.toHaveBeenCalled();
+      });
+
+      it("does not warn when an icon button has visible text", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        await render(Component, { ...baseProps, icon: buttonIcon });
+        expect(warn).not.toHaveBeenCalled();
+      });
+    });
+
     it("derives its accessible name from children without aria-label", async () => {
       const page = await render(Component, { children: submitChildren });
       const button = page.getByRole("button", { name: submitChildrenText });
