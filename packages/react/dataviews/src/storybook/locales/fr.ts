@@ -274,4 +274,6 @@ export const FRENCH: DataViewsMessages = {
   sortLatest: "Plus récents",
   sortEarliest: "Plus anciens",
   orderByDate: "Trier par date",
+  eventsShown: (shown, events) =>
+    `${count(shown)} ${plural(shown, "événement affiché", "événements affichés")} sur ${count(events)}`,
 };
