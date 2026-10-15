@@ -1,4 +1,16 @@
-import type { TimelineCollapsingMethod } from "../types.js";
+import type {
+  DataViewsMessages,
+  DataViewsProvider,
+  SchemaFieldDefinition,
+} from "@canonical/dataviews-core";
+import type { ReactNode } from "react";
+import type { AnnouncerTopic } from "../../../common/index.js";
+import type { HeaderProps } from "../common/Header/index.js";
+import type {
+  TimelineCollapsingMethod,
+  TimelineFieldMapping,
+  TimelineItem,
+} from "../types.js";
 
 /** What `useTimelineExpansion` takes: the events on the page, and how they collapse. */
 export type UseTimelineExpansionProps = {
@@ -44,3 +56,25 @@ export type UseDateTimeFormatsResult = {
   readonly tooltip: boolean;
   readonly format: (value: string) => FormattedDateTime;
 };
+
+/** What `useTimelineHeader` takes: the provider, how its records read as events, and how to say an outcome. */
+export type UseTimelineHeaderProps<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object,
+> = {
+  readonly provider: DataViewsProvider<TFields, TRow>;
+  readonly mapping: TimelineFieldMapping;
+  readonly showActorFilter: boolean;
+  readonly showEventFilter: boolean;
+  readonly showSorting: boolean;
+  readonly actorFilterLabel: string;
+  readonly eventFilterLabel: string;
+  readonly dateTimeLabel: string;
+  /** The page's events, which name the values the filters offer. */
+  readonly items: readonly TimelineItem[];
+  readonly messages: DataViewsMessages;
+  readonly announce: (message: ReactNode, topic?: AnnouncerTopic) => void;
+};
+
+/** What `useTimelineHeader` answers: the controls the source allows, wired to its query. */
+export type UseTimelineHeaderResult = HeaderProps;

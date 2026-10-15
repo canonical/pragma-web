@@ -200,6 +200,20 @@ type OwnProps<
   /** How a long page collapses; `false` shows every event. Defaults to collapsing below the first 8. */
   readonly expansion?: TimelineExpansion | false;
   readonly dateTimeFormats?: TimelineDateTimeFormats;
+  /** Draw the control bar. Defaults to true. */
+  readonly showControls?: boolean;
+  /** Offer the actor filter, where the source can restrict and facet the actor. Defaults to true. */
+  readonly showActorFilter?: boolean;
+  /** Offer the event filter, where the source can restrict and facet the event type. Defaults to true. */
+  readonly showEventFilter?: boolean;
+  /** Offer the order control, where the source orders by the date. Defaults to true. */
+  readonly showSorting?: boolean;
+  /** The actor filter's label. Defaults to the messages' `actorFilter`. */
+  readonly actorFilterLabel?: string;
+  /** The event filter's label. Defaults to the messages' `eventFilter`. */
+  readonly eventFilterLabel?: string;
+  /** What the date is called where an ordering by it is said. Defaults to the messages' `eventDate`. */
+  readonly dateTimeLabel?: string;
 };
 
 /**

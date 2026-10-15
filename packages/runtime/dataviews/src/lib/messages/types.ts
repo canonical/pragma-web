@@ -361,4 +361,24 @@ export type DataViewsMessages = {
   readonly showMoreEvents: (count: number) => string;
   /** The command revealing every hidden event. */
   readonly showAllEvents: string;
+  /** The text leading a timeline's filters. */
+  readonly filterBy: string;
+  /** The actor filter's label, where the timeline is given none. */
+  readonly actorFilter: string;
+  /** The event filter's label, where the timeline is given none. */
+  readonly eventFilter: string;
+  /** What a timeline's date is called where an ordering by it is said, where it is given no name. */
+  readonly eventDate: string;
+  /** One filter's menu, by the field's label. */
+  readonly filterByField: (label: string) => string;
+  /** The control lifting every filter of a timeline, as it is named. */
+  readonly resetFilters: string;
+  /** The same control, as it is shown. */
+  readonly reset: string;
+  /** The ordering control, while the latest events come first. */
+  readonly sortLatest: string;
+  /** The ordering control, while the earliest events come first. */
+  readonly sortEarliest: string;
+  /** The ordering control, while the events stand in no order by date. */
+  readonly orderByDate: string;
 };

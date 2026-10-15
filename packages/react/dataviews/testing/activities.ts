@@ -10,15 +10,18 @@ import {
   type Collection,
   createCollection,
   createDataViewsProvider,
+  createPage,
   type DataViewsProvider,
   type DataViewsProviderConfig,
   declareCapabilities,
+  type Facet,
   type QueryLocation,
   type SourceCapabilities,
+  type SourcePage,
 } from "@canonical/dataviews-core";
 import type { TimelineFieldMapping } from "../src/lib/_work_in_progress/Timeline/index.js";
 import createManualSource from "./createManualSource.js";
-import { COUNTED_EXACTLY, pageOf } from "./fixtures.js";
+import { COUNTED_EXACTLY, countExactly } from "./fixtures.js";
 import type { ManualSource, ManualSourceConfig } from "./types.js";
 
 /** One activity record, as a source would deliver it. */
@@ -86,6 +89,31 @@ export const ACTIVITY_PAGE: readonly Activity[] = [
   activity("a-5", 5, "john", "push"),
 ];
 
+const facetOf = (rows: readonly Activity[], field: "actor" | "kind"): Facet => {
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    counts.set(row[field], (counts.get(row[field]) ?? 0) + 1);
+  }
+  return {
+    kind: "values",
+    values: [...counts].map(([value, count]) => ({
+      value,
+      count: countExactly(count),
+    })),
+  };
+};
+
+/** A page of activities, counted exactly, with the actor and kind facets they hold. */
+export const pageOfActivities = (
+  rows: readonly Activity[],
+): SourcePage<Activity> =>
+  createPage({
+    rows,
+    matched: rows.length,
+    total: rows.length,
+    facets: { actor: facetOf(rows, "actor"), kind: facetOf(rows, "kind") },
+  });
+
 /** What the fixture source declares: it filters by actor and kind, orders by date and facets both. */
 export const ACTIVITY_CAPABILITIES: SourceCapabilities = declareCapabilities(
   activities,
@@ -106,6 +134,10 @@ export type ActivityProviderConfig = Omit<
   /** The rows every request is answered with at once; by hand when left out. */
   readonly rows?: readonly Activity[] | undefined;
   readonly location?: QueryLocation | undefined;
+  /** The facets the provider asks for. Defaults to the actor and the kind. */
+  readonly facets?:
+    | DataViewsProviderConfig<ActivityFields, Activity>["facets"]
+    | undefined;
   readonly snapshot?: DataViewsProviderConfig<
     ActivityFields,
     Activity
@@ -129,18 +161,19 @@ export const createActivityProvider = ({
   rows,
   capabilities = ACTIVITY_CAPABILITIES,
   location,
+  facets = ["actor", "kind"],
   snapshot,
   ...rest
 }: ActivityProviderConfig = {}): ActivityFixture => {
   const source = createManualSource<Activity>({
     ...rest,
     capabilities,
-    ...(rows === undefined ? {} : { answer: () => pageOf(rows) }),
+    ...(rows === undefined ? {} : { answer: () => pageOfActivities(rows) }),
   });
   const provider = createDataViewsProvider({
     collection: activities,
     source: source.source,
-    facets: ["actor", "kind"],
+    facets,
     ...(location === undefined ? {} : { location }),
     ...(snapshot === undefined ? {} : { snapshot }),
   });
