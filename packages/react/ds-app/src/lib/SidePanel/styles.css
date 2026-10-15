@@ -33,9 +33,10 @@
 
     --side-panel-border-radius: var(--dimension-radius-medium);
     /*
-      The hairline closing the scroll region is a divider, not a boundary, so it
-      takes the muted border rather than the default one — gray-100 in light mode
-      against gray-520, and gray-820 in dark so it stays pale either way.
+      The colour of the scroll region's divider lines, kept muted rather than
+      default — gray-100 in light mode against gray-520, and gray-820 in dark
+      so it stays pale either way. Read without a local fallback by its
+      consumers so the panel stays the single owner of the value.
     */
     --side-panel-color-border: var(--color-border-muted);
     /* One inline padding, read by the header, content and footer alike. */
