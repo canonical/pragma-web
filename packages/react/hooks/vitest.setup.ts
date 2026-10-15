@@ -1,8 +1,6 @@
-import * as matchers from "@testing-library/jest-dom/matchers";
+import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach, expect, vitest } from "vitest";
-
-expect.extend(matchers as unknown as Parameters<typeof expect.extend>[0]);
+import { afterEach, vitest } from "vitest";
 
 // Cleanup the DOM after each test, and drop the observers the tests created
 // so `ResizeObserverMock.instances` only ever holds the current test's.
