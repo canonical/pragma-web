@@ -53,7 +53,6 @@
     "test:vitest:watch": "vitest"
   },
   "dependencies": {
-    "@canonical/design-tokens": "0.43.0",
     "@canonical/ds-assets": "^0.44.1",
     "@canonical/ds-utils": "^0.44.1",
     "@canonical/react-hooks": "^0.44.1",
@@ -65,6 +64,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
+    "@canonical/design-tokens": "0.43.0",
     "@canonical/ds-types": "^0.44.1",
     "@canonical/router-core": "^0.44.1",
     "@canonical/router-react": "^0.44.1",
