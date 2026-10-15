@@ -68,6 +68,18 @@ Markers are sized over the page's runs of one actor and of one event type (`mark
 
 <Canvas of={Stories.Decorated} sourceState="none" />
 
+## A trailing node
+
+`trailing` is always the last node: the connector line runs on from the last event to it, as the timeline's own footer.
+
+<Canvas of={Stories.WithTrailing} sourceState="none" />
+
+## Drawing events yourself
+
+`renderItem` draws each event in full from the event and its context — the order the date leads the ordering in, whether the query restricts the collection, the event's marker size, its position among the page's events, and the record's selection checkbox where the events are selectable. Returning null draws an empty item. `onVisibleItemsChange` is called with the page's events whenever they change.
+
+<Canvas of={Stories.CustomRendering} sourceState="none" />
+
 ## Long pages
 
 A long page collapses below its first 8 events, behind a strip revealing 4 more at a time or all of them. `expansion={{ method: "middle" }}` collapses between the first and last events instead; `expansion={false}` shows every event. A new page starts collapsed again.
@@ -76,7 +88,7 @@ A long page collapses below its first 8 events, behind a strip revealing 4 more 
 
 ## Status
 
-The timeline shows the core's status as the table does: loading, failed, nothing to show, or events kept beneath a status saying they no longer answer the query.
+A polite line, never seen, says how many of the page's events are shown, as the count changes. The timeline also shows the core's status as the table does: loading, failed, nothing to show, or events kept beneath a status saying they no longer answer the query.
 
 <Canvas of={Stories.Loading} sourceState="none" />
 

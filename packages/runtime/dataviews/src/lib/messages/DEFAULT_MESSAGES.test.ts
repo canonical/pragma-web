@@ -369,6 +369,9 @@ describe("DEFAULT_MESSAGES", () => {
   });
 
   it("words the timeline's collapsed events", () => {
+    expect(m.eventsShown(8, 20)).toBe("Showing 8 of 20 events");
+    expect(m.eventsShown(1, 1)).toBe("Showing 1 of 1 event");
+    expect(m.eventsShown(0, 0)).toBe("Showing 0 of 0 events");
     expect(m.eventsHidden(1200)).toBe("1,200 hidden");
     expect(m.showMoreEvents(4)).toBe("Show 4 more");
     expect(m.showAllEvents).toBe("Show all");

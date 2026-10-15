@@ -3,7 +3,7 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactElement } from "react";
+import { type ReactElement, useState } from "react";
 import { expect, userEvent, within } from "storybook/test";
 import {
   type ActivityProviderConfig,
@@ -128,6 +128,57 @@ export const LeadingDates: Story = {
  */
 export const Decorated: Story = {
   render: (args) => <ReviewTimeline {...args} decorate={decorateActivity} />,
+};
+
+/**
+ * A trailing node, always last: the connector line runs on from the last
+ * event to it.
+ */
+export const WithTrailing: Story = {
+  render: (args) => (
+    <ReviewTimeline
+      {...args}
+      expansion={false}
+      trailing={<p className="ds">Proposal opened on 1 September 2026</p>}
+    />
+  ),
+};
+
+/**
+ * Each event drawn by the caller through `renderItem`, from the event and its
+ * context: here a compact line naming the marker size each would have.
+ */
+export const CustomRendering: Story = {
+  render: (args) => (
+    <ReviewTimeline
+      {...args}
+      renderItem={(item, { markerSize, index }) => (
+        <p className="ds">
+          {`${index + 1}. ${item.description ?? item.id} (${markerSize})`}
+        </p>
+      )}
+    />
+  ),
+};
+
+function CountedTimeline(props: StoryTimelineProps): ReactElement {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <p className="ds">{`${count} reported`}</p>
+      <ReviewTimeline
+        {...props}
+        onVisibleItemsChange={(visible) => {
+          setCount(visible.length);
+        }}
+      />
+    </>
+  );
+}
+
+/** The page's events reported to the caller whenever they change. */
+export const ReportingTheEvents: Story = {
+  render: (args) => <CountedTimeline {...args} />,
 };
 
 /** No controls: the timeline only shows the log. */
