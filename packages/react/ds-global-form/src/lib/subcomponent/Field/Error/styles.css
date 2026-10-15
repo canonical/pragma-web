@@ -3,8 +3,16 @@
 @layer ds.components.global {
   .ds.field-error {
     color: var(--form-error-color);
+    font-size: var(--form-error-font-size);
+    font-weight: var(--form-error-font-weight);
+    line-height: var(--form-error-line-height);
+    letter-spacing: var(--form-error-letter-spacing);
     /* Align to the field edge like the label (no side padding by default), not
      * to the input's inner padding. Overridable via the shared variable. */
     padding-inline: var(--form-label-padding-inline, 0);
+
+    & > .ds.icon {
+      margin-inline-end: var(--space-050);
+    }
   }
 }
