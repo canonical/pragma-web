@@ -32,9 +32,16 @@ const componentCssClassName = "ds side-panel";
  * Compose the body from `SidePanel.Header`, `SidePanel.Content` and
  * `SidePanel.Footer`. The panel lays them out as a flex column: header and
  * footer keep their size, and the content pane takes the rest and scrolls
- * within it. The content pane is a tab stop, so keyboard users can scroll it;
- * opening the panel still focuses the panel itself, so from there Tab reaches
- * the close button, then the content, then the footer's actions.
+ * within it. 2px lines mark the pane's edges while content is hidden past
+ * them — the start line once the pane scrolls away from the top, the end
+ * line until it bottoms out, both together in between — measured by the
+ * `useScrollOverflow` hook, so the lines behave identically in every
+ * browser JavaScript runs in. Where JavaScript is unavailable, the pane
+ * falls back to scroll-driven CSS in the engines that ship it, and paints
+ * nothing in the rest. The content pane is a tab stop, so keyboard users
+ * can scroll it; opening the panel still focuses the panel itself, so from
+ * there Tab reaches the close button, then the content, then the footer's
+ * actions.
  *
  * There are two consumption patterns, `withSidePanel` and `SidePanel`.
  * `withSidePanel` is meant for static content: the call belongs at module

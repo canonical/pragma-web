@@ -9,19 +9,8 @@
     flex: none;
 
     /*
-      Closes the scroll region, marking where the content pane ends and the
-      actions begin.
-
-      The colour is the panel's to own, and is read without a local fallback so
-      the two cannot state different defaults: `--side-panel-color-border` is
-      declared in the panel's `:root` block.
-    */
-    border-block-start: var(--dimension-stroke-thickness-medium) solid
-      var(--side-panel-color-border);
-    /*
-      Inset by margin rather than padding: a border spans the padding box, so
-      padding would run the hairline edge to edge. The margin keeps it stopping
-      short of both panel edges, in line with the text column.
+      Inset by margin rather than padding, so the actions stay in line with
+      the text column while the pane's edge line runs the full panel width.
     */
     margin-inline: var(--side-panel-padding-inline);
 
