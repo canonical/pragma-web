@@ -295,4 +295,6 @@ export const DEFAULT_MESSAGES: DataViewsMessages = Object.freeze({
   sortLatest: "Latest",
   sortEarliest: "Earliest",
   orderByDate: "Order by date",
+  eventsShown: (shown, total) =>
+    `Showing ${formatCount(shown)} of ${formatCount(total)} ${choosePlural(total, "event", "events")}`,
 });
