@@ -31,6 +31,20 @@
   // their content are not reliably announced.
   const hasLoadingStatus = $derived(loading !== undefined);
 
+  $effect(() => {
+    if (
+      import.meta.env.DEV &&
+      (icon || loading) &&
+      !children &&
+      !rest["aria-label"] &&
+      !rest["aria-labelledby"]
+    ) {
+      console.warn(
+        "Button: icon-only buttons need an explicit `aria-label` or `aria-labelledby` to be accessible.",
+      );
+    }
+  });
+
   // Blocks activation while loading: preventDefault stops a form submission
   // and stopImmediatePropagation stops listeners attached after this one.
   const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
