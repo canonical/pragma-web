@@ -37,3 +37,22 @@ export const Disabled: Story = {
     disabled: true,
   },
 };
+
+/** Helper text sits under the input, not above it. */
+export const WithHelperText: Story = {
+  args: {
+    name: "event_helper",
+    label: "Event date and time",
+    description: "Times are in your local timezone.",
+  },
+};
+
+/** Aside label layout: the label sits beside the input and its helper text. */
+export const AsideLabelLayout: Story = {
+  args: {
+    name: "event_aside",
+    label: "Starts at",
+    description: "Times are in your local timezone.",
+    labelLayout: "aside",
+  },
+};
