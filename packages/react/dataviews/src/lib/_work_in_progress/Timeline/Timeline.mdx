@@ -1,0 +1,106 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Timeline.stories";
+
+<Meta of={Stories} name="Recipes" />
+
+# Timeline recipes
+
+`Timeline` shows a collection's records as events in time: one event per record on the page, in the order the query puts them, each marked on a shared axis. It reads what the table reads — the provider's rows, the core's status and the selection — and its controls filter and order the collection through the provider, never the page alone. `Timeline` takes a provider; its connected twin reads the enclosing `DataViews` root instead. Both are work-in-progress spikes: neither is exported from the package root, and their shape may change or they may be withdrawn.
+
+## Mapping records to events
+
+`mapping` names the record field each part of an event is read from. `dateTime` is required and must name a field of kind `date`; the timeline throws otherwise. Every other part is optional, read as text, and left out when blank.
+
+```tsx
+import {
+  createArraySource,
+  createDataViewsProvider,
+} from "@canonical/dataviews-core";
+import { useState } from "react";
+import { activities, activityCollection } from "./activities.js";
+// A work-in-progress spike: not yet exported from the package root.
+import { Timeline } from "./Timeline.js";
+
+export function ReviewActivity() {
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: activityCollection,
+      source: createArraySource({ rows: activities, collection: activityCollection }),
+      facets: ["actor", "kind"],
+    }),
+  );
+  return (
+    <Timeline
+      provider={provider}
+      label="Review activity"
+      mapping={{
+        dateTime: "at",
+        actorId: "actor",
+        actorName: "actorName",
+        eventType: "kind",
+        description: "summary",
+      }}
+      actorFilterLabel="Reviewer"
+      eventFilterLabel="Activity"
+      dateTimeFormats={{ timeZone: "UTC" }}
+    />
+  );
+}
+```
+
+<Canvas of={Stories.Default} sourceState="none" />
+
+## Controls
+
+The header leads its filters with "Filter by:". It offers a menu for the actor and for the event type wherever the source can restrict the mapped field to a value and facets it, with a check beside each value in force; choosing that value again lifts the restriction. A reset appears while either filter holds one. The order control, wherever the source orders by the date, states the order in force — latest or earliest first — and toggles it, putting the date first in the ordering and keeping every other term in force. A refused change is said, and stands beside its control until the query moves. The filters are labelled "Actor" and "Event" unless named by `actorFilterLabel` and `eventFilterLabel`. On a narrow timeline the reset and the order control keep their icons and lose their labels. `showActorFilter`, `showEventFilter` and `showSorting` turn each control off; `showControls={false}` draws none.
+
+<Canvas of={Stories.WithoutControls} sourceState="none" />
+
+## Markers and dates
+
+Markers are sized over the page's runs of one actor and of one event type (`markerCombination`). Dates are written in `dateTimeFormats.locale` and `timeZone`: pass both on a server render, so the server writes what the client hydrates. One control switches every event between the absolute and relative forms. `dateTimePosition="leading"` puts the date before the marker.
+
+<Canvas of={Stories.LeadingDates} sourceState="none" />
+
+## Decorating events
+
+`decorate` adds to each mapped event: a marker graphic, custom content, or a criticality. It cannot replace an event's identity or date, which the record decides.
+
+<Canvas of={Stories.Decorated} sourceState="none" />
+
+## Long pages
+
+A long page collapses below its first 8 events, behind a strip revealing 4 more at a time or all of them. `expansion={{ method: "middle" }}` collapses between the first and last events instead; `expansion={false}` shows every event. A new page starts collapsed again.
+
+<Canvas of={Stories.CollapsedInTheMiddle} sourceState="none" />
+
+## Status
+
+The timeline shows the core's status as the table does: loading, failed, nothing to show, or events kept beneath a status saying they no longer answer the query.
+
+<Canvas of={Stories.Loading} sourceState="none" />
+
+<Canvas of={Stories.Failed} sourceState="none" />
+
+## A timeline or a table
+
+Give a timeline and a table to `RendererSwitch` over one root, and the reader chooses between them. Both read one query, one page and one selection.
+
+<Canvas of={Stories.BesideATable} sourceState="none" />
+
+## Without scripting
+
+The server draws the events of the URL's query as a plain ordered list with native checkboxes. Where the provider has a location, each filter is a disclosure of real links, each to the query its value leads to, and the reset and the order control are links too, so every control works before scripts run. Once they run, the filters become the design system's menus and the rest become buttons, and a reader focused on a link keeps focus on the control replacing it.
+
+## Provisional coverage
+
+These notes are provisional, recorded for a spike and re-evaluated when the timeline is designed for data views.
+
+| Surface | Principal criteria | Behaviour today |
+|---|---|---|
+| Timeline | 1.3.1, 1.3.2, 2.4.3 | A region named by `label`, busy while a request is outstanding, holding an ordered list of events in result order |
+| Event | 1.1.1, 1.3.1, 2.4.4 | The actor's name, a link where the record names one; the marker's duplicate link is taken out of the reading and tab order |
+| Date | 1.3.1, 4.1.2 | A `time` element carrying its ISO value, its other form described by a tooltip; where toggling is allowed, a pressed-state button |
+| Controls | 1.3.1, 2.1.1, 2.4.4, 4.1.2 | The design system's menus for the filters, a reset and the order control, each named even where its label is hidden; links before scripts run; a refusal shown beside its control and announced |
+| Event checkbox and select all | 1.3.1, 2.1.1, 4.1.2 | Native checkboxes backed by the provider's selection, shared with every renderer on the provider |
+| Collapsed events | 1.3.1, 2.1.1 | A strip stating how many events are hidden, with native buttons revealing more or all |
