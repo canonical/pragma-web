@@ -106,4 +106,31 @@ describe("Timeline on the server", () => {
     expect(header).not.toContain("<button");
     expect(header).not.toContain("<form");
   });
+
+  it("draws the count of events shown and the trailing node", () => {
+    const provider = createDataViewsProvider({
+      collection: activities,
+      source: createArraySource({
+        rows: ACTIVITY_PAGE,
+        collection: activities,
+      }),
+      facets: ["actor", "kind"],
+    });
+    provider.refresh();
+    const markup = renderToString(
+      <Timeline
+        provider={provider}
+        mapping={ACTIVITY_MAPPING}
+        label="Activity"
+        trailing={<span>End of the log</span>}
+      />,
+    );
+    expect(markup).toMatch(
+      /<p class="showing" aria-live="polite">Showing 5 of 5 events<\/p>/u,
+    );
+    expect(markup).toMatch(/class="ds data-timeline has-trailing"/u);
+    expect(markup).toMatch(
+      /<div class="trailing"><span>End of the log<\/span><\/div><\/section>/u,
+    );
+  });
 });
