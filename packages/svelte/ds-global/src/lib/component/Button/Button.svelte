@@ -12,6 +12,7 @@
     importance = "primary",
     anticipation,
     emphasis,
+    nested,
     icon,
     loading,
     loadingLabel = "Loading",
@@ -51,6 +52,7 @@
     importance,
     anticipation,
     emphasis,
+    nested && "nested dense",
     loading && "loading",
     className,
   ]}

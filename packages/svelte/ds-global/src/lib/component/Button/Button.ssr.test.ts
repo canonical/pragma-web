@@ -37,6 +37,18 @@ describe("Button SSR", () => {
     expect(root.classList).toContain("button");
   });
 
+  it("applies the nested and dense classes when nested", () => {
+    const page = render(Component, { props: { ...baseProps, nested: true } });
+    const root = componentLocator(page);
+    expect(root.classList).toContain("nested");
+    expect(root.classList).toContain("dense");
+  });
+
+  it("does not apply the nested class by default", () => {
+    const page = render(Component, { props: { ...baseProps } });
+    expect(componentLocator(page).classList).not.toContain("nested");
+  });
+
   it("applies the default importance class", () => {
     const page = render(Component, { props: { ...baseProps } });
     expect(componentLocator(page).classList).toContain("primary");

@@ -26,6 +26,12 @@ export interface ButtonProps extends BaseProps {
    */
   emphasis?: "branded";
   /**
+   * Makes the button denser for use nested inside another component, such as
+   * a table cell. Outside nested contexts, use the default size.
+   * @default false
+   */
+  nested?: boolean;
+  /**
    * Leading icon slot. Renders before the label inside a `.icon` span.
    * Icon-only buttons need an explicit `aria-label` or `aria-labelledby`
    * to be accessible, and should be paired with a Tooltip that states the
