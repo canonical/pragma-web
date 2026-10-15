@@ -8,19 +8,6 @@
     */
     flex: none;
 
-    /*
-      Closes the scroll region, marking where the content pane ends and the
-      actions begin. The hairline runs edge to edge across the panel, so the
-      footer insets its ACTIONS with padding rather than insetting itself with
-      margin — a border spans the padding box, and padding keeps it full width
-      while the buttons stay in the text column.
-
-      The colour is the panel's to own, and is read without a local fallback so
-      the two cannot state different defaults: `--side-panel-color-border` is
-      declared in the panel's `:root` block.
-    */
-    border-block-start: var(--dimension-stroke-thickness-medium) solid
-      var(--side-panel-color-border);
     padding-inline: var(--side-panel-padding-inline);
 
     /*

@@ -40,18 +40,10 @@
     padding-block: var(--side-panel-header-padding-block);
     /*
       Inline padding, not margin: nothing here needs the header's box itself
-      inset, and padding keeps it full panel width. The footer's hairline also
-      runs edge to edge, so it insets its actions with padding the same way.
+      inset, and padding keeps it full panel width. The footer insets its
+      actions with padding the same way.
     */
     padding-inline: var(--side-panel-padding-inline);
-
-    /*
-      Opens the scroll region, the counterpart of the footer's hairline: the
-      line runs edge to edge across the panel. Same recipe as the footer — the
-      panel owns the colour in `--side-panel-color-border`.
-    */
-    border-block-end: var(--dimension-stroke-thickness-medium) solid
-      var(--side-panel-color-border);
 
     /*
       The title is heading text beside a control, not a control: its line box
