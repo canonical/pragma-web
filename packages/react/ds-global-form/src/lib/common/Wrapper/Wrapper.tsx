@@ -57,6 +57,7 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
       registerProps,
       ...ariaProps.input,
       ...otherProps,
+      required: !isOptional,
     }),
     [name, registerProps, ariaProps.input],
   ) as unknown as ComponentProps;
