@@ -219,7 +219,7 @@
 </Story>
 
 <!--
-  A loading button shows a Spinner, is marked `aria-busy` and `aria-disabled`,
+  A loading button shows a spinner, is marked `aria-busy` and `aria-disabled`,
   and blocks activation so the action cannot be triggered again while it is in
   flight. It stays focusable, and a visually hidden status region announces
   `loadingLabel`.

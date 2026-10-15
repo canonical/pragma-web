@@ -3,7 +3,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 @prefix ds: <https://ds.canonical.com/>.
 
-ds:implementation.library.svelte-ds-global ds:hasImplementation ds:implementation.svelte-ds-global.global.component.announcement, ds:implementation.svelte-ds-global.global.component.breadcrumbs, ds:implementation.svelte-ds-global.global.component.button, ds:implementation.svelte-ds-global.global.pattern.modal, ds:implementation.svelte-ds-global.global.pattern.skip_link, ds:implementation.svelte-ds-global.global.subcomponent.breadcrumbs-item, ds:implementation.svelte-ds-global.global.subcomponent.modal-content, ds:implementation.svelte-ds-global.global.subcomponent.modal-footer, ds:implementation.svelte-ds-global.global.subcomponent.modal-header, ds:implementation.svelte-ds-global.global.subcomponent.spinner.
+ds:implementation.library.svelte-ds-global ds:hasImplementation ds:implementation.svelte-ds-global.global.component.announcement, ds:implementation.svelte-ds-global.global.component.breadcrumbs, ds:implementation.svelte-ds-global.global.component.button, ds:implementation.svelte-ds-global.global.pattern.modal, ds:implementation.svelte-ds-global.global.pattern.skip_link, ds:implementation.svelte-ds-global.global.subcomponent.breadcrumbs-item, ds:implementation.svelte-ds-global.global.subcomponent.modal-content, ds:implementation.svelte-ds-global.global.subcomponent.modal-footer, ds:implementation.svelte-ds-global.global.subcomponent.modal-header.
 ds:implementation.svelte-ds-global.global.component.announcement a ds:ImplementationObject;
     ds:implementsBlock ds:global.component.announcement;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Announcement/Announcement.svelte";
@@ -45,8 +45,3 @@ ds:implementation.svelte-ds-global.global.subcomponent.modal-header a ds:Impleme
     ds:implementsBlock ds:global.subcomponent.modal-header;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/common/Header/Header.svelte";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/common/Header/Header.svelte".
-ds:implementation.svelte-ds-global.global.subcomponent.spinner a ds:ImplementationObject;
-    ds:implementsBlock ds:global.subcomponent.spinner;
-    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/subcomponent/Spinner/Spinner.svelte";
-    ds:importStatement "import { Spinner } from \"@canonical/svelte-ds-global\";";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/svelte/ds-global/src/lib/subcomponent/Spinner/Spinner.svelte".

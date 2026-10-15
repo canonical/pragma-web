@@ -31,6 +31,12 @@
 
   /* Reads the modifier channels generically: --modifier-surface, --modifier-outline (0/1) and --modifier-color-*; interaction states read the per-state channels. */
 
+  @keyframes ds-button-spinner-rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .ds.button {
     position: relative;
     display: inline-flex;
@@ -126,7 +132,7 @@
     color: var(--modifier-color-icon-disabled, var(--color-icon-disabled));
   }
 
-  /* Icon and label stay laid out but transparent (not `visibility: hidden`, which would drop the accessible name) with the Spinner centred on top. A loading button blocks activation but keeps the enabled colours, overriding :disabled. */
+  /* Icon and label stay laid out but transparent (not `visibility: hidden`, which would drop the accessible name) with the spinner centred on top. A loading button blocks activation but keeps the enabled colours, overriding :disabled. */
   .ds.button.loading {
     cursor: progress;
     color: var(--modifier-color-text, var(--button-color-text));
@@ -150,6 +156,12 @@
       align-items: center;
       justify-content: center;
     }
+
+    & .spinner {
+      width: var(--icon-size, 1em);
+      height: var(--icon-size, 1em);
+      animation: ds-button-spinner-rotate 1s linear infinite;
+    }
   }
 
   /* Visually hidden, still in the accessibility tree. */
@@ -168,6 +180,10 @@
   @media (prefers-reduced-motion: reduce) {
     .ds.button {
       transition: none;
+
+      & .spinner {
+        animation: none;
+      }
     }
   }
 

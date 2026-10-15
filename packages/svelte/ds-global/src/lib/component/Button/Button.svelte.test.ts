@@ -255,11 +255,9 @@ describe("Button component", () => {
   });
 
   describe("loading state", () => {
-    it("overlays a Spinner while loading", async () => {
+    it("overlays a spinner while loading", async () => {
       const page = await render(Component, { ...baseProps, loading: true });
-      const spinner = page.container.querySelector(
-        ".loading-spinner .ds.spinner",
-      );
+      const spinner = page.container.querySelector(".loading-spinner .spinner");
       expect(spinner).not.toBeNull();
     });
 
@@ -318,7 +316,7 @@ describe("Button component", () => {
       expect(label?.textContent).toContain(buttonChildrenText);
     });
 
-    it("keeps the consumer icon in the DOM but adds the Spinner overlay", async () => {
+    it("keeps the consumer icon in the DOM but adds the spinner overlay", async () => {
       const page = await render(Component, {
         ...baseProps,
         loading: true,
