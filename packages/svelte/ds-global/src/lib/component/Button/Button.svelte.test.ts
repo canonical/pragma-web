@@ -4,6 +4,7 @@ import { createRawSnippet } from "svelte";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
+import "../../../../.storybook/styles.css";
 import Component from "./Button.svelte";
 
 const buttonChildrenText = "Click me";
@@ -483,6 +484,28 @@ describe("Button component", () => {
       const rootCentre = root.left + root.width / 2;
       const labelCentre = (label?.left ?? 0) + (label?.width ?? 0) / 2;
       expect(Math.abs(rootCentre - labelCentre)).toBeLessThan(1);
+    });
+  });
+
+  describe("nested", () => {
+    it("is shorter than the default button within a density context", async () => {
+      const context = document.createElement("div");
+      context.className = "app";
+      document.body.append(context);
+      onTestFinished(() => context.remove());
+      const heightOf = async (props: Record<string, unknown>) => {
+        const page = await render(Component, {
+          props: { ...baseProps, ...props },
+          target: context,
+        });
+        const button = Array.from(page.container.querySelectorAll("button")).at(
+          -1,
+        );
+        return button?.getBoundingClientRect().height ?? 0;
+      };
+      const defaultHeight = await heightOf({});
+      const nestedHeight = await heightOf({ nested: true });
+      expect(nestedHeight).toBeLessThan(defaultHeight);
     });
   });
 
