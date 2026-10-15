@@ -255,3 +255,22 @@
     </Button>
   {/snippet}
 </Story>
+
+<!--
+  `nested` makes the button denser for use inside another component, such as a
+  table cell. Outside such a context, use the default size. Density comes from
+  the surrounding context class (`app` here), so the nested button is shorter
+  than the default one.
+-->
+
+<Story
+  name="Nested"
+  argTypes={{ nested: { control: false } }}
+>
+  {#snippet template(args)}
+    <div class="app" style="display: flex; gap: var(--dimension-200); align-items: center;">
+      <Button {...args}>Default</Button>
+      <Button {...args} nested>Nested</Button>
+    </div>
+  {/snippet}
+</Story>
