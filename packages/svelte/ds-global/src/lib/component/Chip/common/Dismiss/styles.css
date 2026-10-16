@@ -1,0 +1,33 @@
+@layer ds.components.global {
+  .ds.chip > .dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    inline-size: var(--dimension-200);
+    block-size: var(--dimension-200);
+    margin: 0;
+    padding: var(--dimension-025);
+    border: var(--dimension-stroke-thickness-medium) solid transparent;
+    border-radius: var(--dimension-radius-full);
+    background-color: transparent;
+    color: inherit;
+
+    &:not(:disabled) {
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--hover--color-foreground-secondary);
+      }
+
+      &:active {
+        background-color: var(--active--color-foreground-secondary);
+      }
+    }
+
+    > svg {
+      inline-size: 100%;
+      block-size: 100%;
+    }
+  }
+}

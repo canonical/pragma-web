@@ -13,6 +13,8 @@ Most conventions here are documented. Setup and the monorepo mechanics are in [`
 # Important
 
 - Before writing or changing a React component's props type, read `.kb/react-props.md`: props extend the native props of the root element.
+- Document Svelte compound subcomponents on their property declarations in the exporting `index.ts`, including an `@example` usage snippet. Documentation in the `.svelte` file is lost when attaching a component with an assignment such as `Chip.Dismiss = Dismiss`.
+- Keep Svelte context types in the component's `types.ts` and their `createContext` helpers in `context.ts`. Expose reactive parent values through getters and read them through the child's named context object rather than destructuring snapshots.
 - Before adding a dependency to a runtime or component package, read `.kb/documentation-site.md`: the documentation site depends on the runtime, never the reverse.
 - Before opening a pull request, read `.kb/chromatic.md`: Chromatic reviews visual changes, and a pull request with no visual change carries the `Chromatic: skip` label.
 - Before adding a new package, read `.kb/publishing.md`: its first publish and its trusted-publisher setup are manual steps a human takes.

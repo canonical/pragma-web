@@ -1,0 +1,79 @@
+@layer ds.components.global {
+  .ds.chip {
+    --chip-color-border: var(--modifier-color-border, var(--color-border));
+    --chip-color-text: var(
+      --modifier-color-text-onForegroundSecondary,
+      var(--color-text-onForegroundSecondary)
+    );
+    --chip-color-background: var(
+      --modifier-color-foreground-secondary,
+      var(--color-foreground-secondary)
+    );
+    --chip-padding-block: max(
+      0px,
+      calc(
+        var(--density-padding-block, var(--dimension-025)) -
+        var(--dimension-stroke-thickness-medium)
+      )
+    );
+
+    display: inline-flex;
+    align-items: center;
+    border: var(--dimension-stroke-thickness-medium) solid
+      var(--chip-color-border);
+    border-radius: var(--dimension-radius-full);
+    padding-block: var(--chip-padding-block);
+    padding-inline: var(--dimension-100);
+    font:
+      var(--typography-text-secondary-font-weight)
+      var(--typography-text-secondary-font-size) /
+      var(--typography-text-secondary-line-height)
+      var(--typography-text-secondary-font-family);
+    gap: var(--dimension-050);
+    color: var(--chip-color-text);
+    background-color: var(--chip-color-background);
+    white-space: nowrap;
+    transition: background-color var(--motion-duration-fast)
+      var(--motion-easing-standard);
+
+    &:has(> .dismiss) {
+      padding-inline-end: var(--dimension-050);
+    }
+
+    &:is(button) {
+      inline-size: auto;
+      margin: 0;
+
+      &:not(:disabled) {
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--hover--color-foreground-secondary);
+        }
+
+        &:active {
+          background-color: var(--active--color-foreground-secondary);
+        }
+      }
+    }
+
+    > .icon,
+    > .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    > .lead {
+      font-variant-caps: all-small-caps;
+      font-variant-numeric: oldstyle-nums;
+      letter-spacing: var(--dimension-letterSpacing-wide);
+    }
+
+    > .value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
