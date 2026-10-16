@@ -39,6 +39,49 @@ describe("Choices (presentational)", () => {
     expect(container.querySelector("fieldset")).toHaveClass("stacked");
   });
 
+  it("renders a divider between consecutive options when withDividers in stacked layout", () => {
+    render(
+      <Choices name="color" options={options} layout="stacked" withDividers />,
+    );
+    expect(screen.getAllByRole("separator")).toHaveLength(2);
+  });
+
+  it("renders no dividers without withDividers", () => {
+    render(<Choices name="color" options={options} layout="stacked" />);
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+  });
+
+  it("renders no dividers outside the stacked layout", () => {
+    const { container } = render(
+      <Choices name="color" options={options} withDividers />,
+    );
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+    expect(container.querySelector(".ds.choices-divider")).toBeNull();
+  });
+
+  it("renders option descriptions in the stacked layout", () => {
+    const opts = [
+      { label: "Red", value: "red", description: "A warm colour" },
+      ...options.slice(1),
+    ];
+    render(<Choices name="color" options={opts} layout="stacked" />);
+    const input = screen.getByRole("radio", { name: "Red" });
+    const descriptionId = input.getAttribute("aria-describedby");
+    expect(screen.getByText("A warm colour")).toHaveAttribute(
+      "id",
+      descriptionId,
+    );
+  });
+
+  it("renders no option descriptions outside the stacked layout", () => {
+    const opts = [
+      { label: "Red", value: "red", description: "A warm colour" },
+      ...options.slice(1),
+    ];
+    render(<Choices name="color" options={opts} />);
+    expect(screen.queryByText("A warm colour")).not.toBeInTheDocument();
+  });
+
   it("reflects the selected value (single)", () => {
     render(<Choices name="color" options={options} value="blue" />);
     const radios = screen.getAllByRole("radio");
