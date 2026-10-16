@@ -8,25 +8,14 @@
     */
     flex: none;
 
-    /*
-      Closes the scroll region, marking where the content pane ends and the
-      actions begin.
+    padding-inline: var(--side-panel-padding-inline);
 
-      The colour is the panel's to own, and is read without a local fallback so
-      the two cannot state different defaults: `--side-panel-color-border` is
-      declared in the panel's `:root` block.
-    */
-    border-block-start: var(--dimension-stroke-thickness-medium) solid
-      var(--side-panel-color-border);
     /*
-      Inset by margin rather than padding: a border spans the padding box, so
-      padding would run the hairline edge to edge. The margin keeps it stopping
-      short of both panel edges, in line with the text column.
+      Actions start at the inline-start edge, and the consumer renders the
+      primary action first: order in the markup is order on screen.
     */
-    margin-inline: var(--side-panel-padding-inline);
-
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
     gap: var(--side-panel-footer-gap);
     flex-wrap: wrap;

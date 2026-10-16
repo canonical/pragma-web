@@ -15,9 +15,10 @@
   :root {
     /*
       design-tokens 0.8.1 ships no `size/*` token, so this is a literal.
+      Medium — the default panel size (465px).
       TODO: replace with a token when one exists.
     */
-    --side-panel-inline-size: 33.5rem;
+    --side-panel-inline-size: 29.0625rem;
     /*
       ...and no `shadow/*` token either. The shadow is what separates the panel
       from the live page, so unlike a modal we cannot drop it.
@@ -32,9 +33,10 @@
 
     --side-panel-border-radius: var(--dimension-radius-medium);
     /*
-      The hairline closing the scroll region is a divider, not a boundary, so it
-      takes the muted border rather than the default one — gray-100 in light mode
-      against gray-520, and gray-820 in dark so it stays pale either way.
+      The colour of the scroll region's divider lines, kept muted rather than
+      default — gray-100 in light mode against gray-520, and gray-820 in dark
+      so it stays pale either way. Read without a local fallback by its
+      consumers so the panel stays the single owner of the value.
     */
     --side-panel-color-border: var(--color-border-muted);
     /* One inline padding, read by the header, content and footer alike. */
@@ -89,6 +91,14 @@
     z-index: var(--side-panel-z-index);
     border-radius: var(--side-panel-border-radius);
     box-shadow: var(--side-panel-box-shadow);
+
+    /*
+      Large (640px) opts into the wider panel through the same custom
+      property the default size sets, 
+    */
+    &.large {
+      --side-panel-inline-size: 40rem;
+    }
 
     /*
       The panel is focused when it opens so that reading starts inside it, but
