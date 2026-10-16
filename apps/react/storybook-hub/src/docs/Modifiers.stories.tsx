@@ -69,6 +69,7 @@ export const NestingOverride: Story = {
         <div className="success">
           <Badge value={1} criticality="success" />
         </div>
+        <Badge value={2} criticality="default" />
       </div>
     </div>
   ),
