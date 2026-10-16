@@ -101,7 +101,11 @@
        is the label's inherited one anyway). The block placement that
        lands the label on the baseline grid comes from the density seat at the end of
        this file (the button no longer carries `.p`, so the engine's on-element nudges
-       don't apply — without the seat the label is flat/unaligned). */
+       don't apply — without the seat the label is flat/unaligned). --font-size /
+       --line-height stay exposed, as on every text-styled element, for any
+       consumer that reads them. */
+    --font-size: var(--button-font-size);
+    --line-height: var(--button-line-height);
     font-family: var(--typography-text-primary-font-family);
     font-weight: var(--button-font-weight);
     letter-spacing: var(--typography-text-primary-letter-spacing);
