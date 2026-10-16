@@ -253,5 +253,6 @@
   align-items: flex-start;
   justify-content: flex-start;
   line-height: var(--control-seat-line);
-  padding-block: var(--seat-before) var(--seat-after);
+  padding-block: var(--seat-before);
+  margin-block-end: calc(var(--seat-after) - var(--seat-before));
 }
