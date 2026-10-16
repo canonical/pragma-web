@@ -90,11 +90,14 @@
       );
     }
 
-    /* Inset so the ring stays inside the button in dense layouts. */
+    /* A 1px gap of the background separates the ring from the button, so the
+       ring only has to contrast with the background, not with the fill too.
+       TODO: replace the width literal and the stroke-thickness offset with
+       focus-ring tokens once they exist. */
     &:focus-visible {
       outline: var(--focus-outline-width, 2px) solid
         var(--modifier-color-focus-ring, var(--color-focus-ring, currentColor));
-      outline-offset: calc(-1 * var(--focus-outline-width, 2px));
+      outline-offset: var(--dimension-stroke-thickness-medium);
     }
 
     &:disabled {
