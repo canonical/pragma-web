@@ -11,23 +11,20 @@
    * - layout.align: center -> align-items: center
    *
    * Tokens follow the Figma spec: links use color-text-link, the current item
-   * and the separator use color-text, and the separator margin uses the
-   * dimension scale (Figma specs 6px, which is not on the scale; the nearest
-   * token is dimension-100 = 8px).
+   * and the separator use color-text, and the spacing around the separator
+   * uses the dimension scale (Figma specs 6px, which is not on the scale; the
+   * nearest token is dimension-100 = 8px).
    */
   .ds.breadcrumbs-item {
-    /* Component tokens — pure aliases to semantic tokens, component-scoped
-       per cs:styling.tokens.scoping */
-    --breadcrumbs-item-link-color: var(--color-text-link);
-    --breadcrumbs-item-current-color: var(--color-text);
-    --breadcrumbs-item-disabled-color: var(--color-text-disabled);
-    --breadcrumbs-item-separator-color: var(--color-text);
-    --breadcrumbs-item-separator-margin: var(--dimension-100);
-    --breadcrumbs-item-focus-color: var(--color-text-link);
+    /* The component tokens (--breadcrumbs-item-*) are defined on
+       `.ds.breadcrumbs`, the component root. */
 
     /* layout.type: flow, layout.direction: horizontal */
     display: flex;
     flex-direction: row;
+
+    /* Distance between the separator and the link. */
+    column-gap: var(--breadcrumbs-item-separator-margin);
 
     /* layout.align: center */
     align-items: center;
@@ -53,9 +50,11 @@
     }
 
     /* Separator element — DSL role: separator. Rendered before the link so a
-       wrapped row starts with the slash; hidden on the first item. */
+       wrapped row starts with the slash; hidden on the first item. Spacing
+       around it is gap-based (the list column-gap before, the item
+       column-gap after) rather than separator margins, so a separator that
+       opens a wrapped row aligns flush with the container edge. */
     & > .separator {
-      margin-inline: var(--breadcrumbs-item-separator-margin);
       color: var(--breadcrumbs-item-separator-color);
     }
 
