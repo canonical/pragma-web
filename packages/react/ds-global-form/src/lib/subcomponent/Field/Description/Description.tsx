@@ -21,9 +21,7 @@ const Description = ({
     <p
       id={id}
       style={style}
-      className={[componentCssClassName, "p", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       {children}
     </p>

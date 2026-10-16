@@ -34,6 +34,8 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
   nestedRegisterProps,
   unregisterOnUnmount,
 
+  labelLayout = "stacked",
+  descriptionPosition = "leading",
   mockLabel = false,
   ...otherProps
 }: WrapperProps<ComponentProps>): React.ReactElement => {
@@ -55,6 +57,7 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
       registerProps,
       ...ariaProps.input,
       ...otherProps,
+      required: !isOptional,
     }),
     [name, registerProps, ariaProps.input],
   ) as unknown as ComponentProps;
@@ -63,7 +66,12 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
     <div
       id={id}
       style={style}
-      className={[componentCssClassName, className, isError && states.Danger]
+      className={[
+        componentCssClassName,
+        labelLayout === "aside" && "label-aside",
+        className,
+        isError && states.Danger,
+      ]
         .filter(Boolean)
         .join(" ")}
     >
@@ -77,10 +85,13 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
         {label}
       </Label>
       <div className="payload">
-        {description && (
+        {descriptionPosition === "leading" && description && (
           <Description {...ariaProps.description}>{description}</Description>
         )}
         <Component {...componentProps} />
+        {descriptionPosition === "trailing" && description && (
+          <Description {...ariaProps.description}>{description}</Description>
+        )}
         {isError && (
           <FieldError {...ariaProps.error}>
             {fieldError?.message?.toString()}
