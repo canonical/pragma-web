@@ -29,12 +29,12 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         style={style}
         className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
-        {prefix && <span className="prefix">{prefix}</span>}
+        {prefix && <span className="prefix p">{prefix}</span>}
         {/* `id` goes on the <input> (not the wrapper) so the Field label's
             `htmlFor` targets a labelable element; `type` is last so it can't be
             overridden via spread. */}
         <input id={id} className="p" ref={ref} {...nativeProps} type="number" />
-        {suffix && <span className="suffix">{suffix}</span>}
+        {suffix && <span className="suffix p">{suffix}</span>}
       </div>
     );
   },
