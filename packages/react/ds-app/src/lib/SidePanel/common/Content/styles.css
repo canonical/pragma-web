@@ -26,6 +26,36 @@
     overscroll-behavior: contain;
 
     /*
+      The scroll region's edges — 2px lines marking the boundaries the header
+      and footer meet the pane at, painted only while content is hidden past
+      that edge. `useScrollOverflow` measures the pane and publishes the two
+      edge states as `data-overflow-top` / `data-overflow-bottom` (see
+      Content.tsx); the selectors below switch the border colours on them.
+      Plain measurement rather than scroll-driven animations or scroll-state
+      container queries, so the lines behave identically in every browser
+      JavaScript runs in; the no-JavaScript story is the `@supports` block at
+      the end of this sheet.
+
+      The borders are always reserved — the attributes switch their colour,
+      never their width — so the lines appearing or disappearing never shifts
+      the pane. And a scroll container's borders are part of its box, not its
+      content: they stay pinned at the edges while the pane scrolls. A border
+      spans the padding box, so with the pane's inline padding the lines run
+      edge to edge across the panel while the text stays in its column. The
+      colour is the panel's to own: `--side-panel-color-border` is declared in
+      the panel's `:root` block.
+    */
+    border-block: var(--side-panel-overflow-line-thickness) solid transparent;
+
+    &[data-overflow-top] {
+      border-block-start-color: var(--side-panel-color-border);
+    }
+
+    &[data-overflow-bottom] {
+      border-block-end-color: var(--side-panel-color-border);
+    }
+
+    /*
       Inline padding, not margin: the pane must span the full panel width, so
       its scrollbar hugs the panel edge and the focus ring below reaches it,
       while the padding keeps the text clear of both.
@@ -44,6 +74,60 @@
       outline: var(--side-panel-focus-ring-width) solid
         var(--side-panel-color-focus-ring);
       outline-offset: calc(-1 * var(--side-panel-focus-ring-width));
+    }
+  }
+
+  /*
+    The no-JavaScript fallback, in the engines that ship scroll-driven
+    animations. When JavaScript runs, Content.tsx stamps `data-overflow-driven`
+    onto the pane after mount and the hook's attributes own the lines — this
+    block's `:not()` leaves such panes alone, so exactly one mechanism paints
+    per pane. When JavaScript does not run the attribute never appears, and
+    the pane animates the same borders against its OWN scroll progress
+    instead — no scripting involved. Engines with neither JavaScript nor
+    scroll-driven animations show no lines: without a measurement there is
+    nothing to say which edges overflow, and a line that cannot tell the
+    truth is worse than none.
+
+    Each animation is narrowed to a single pixel of the scroll range by
+    `animation-range`, so the colour change reads as a switch, not a fade:
+
+    - `side-panel-line-top` runs across the FIRST pixel — before it the pane
+      sits at the top and nothing is hidden above, so the line stays
+      transparent; past it, content is hidden above and the line holds the
+      border colour (`both` fills the range's far side).
+    - `side-panel-line-bottom` runs across the LAST pixel — before it there
+      is still content below, so `both` fills the near side and the line
+      holds the border colour; across it the pane bottoms out and the line
+      turns transparent.
+  */
+  @supports (animation-timeline: scroll()) {
+    .ds.side-panel-content:not([data-overflow-driven]) {
+      animation:
+        side-panel-line-top linear both,
+        side-panel-line-bottom linear both;
+      animation-timeline: scroll(self block), scroll(self block);
+      animation-range:
+        0px 1px,
+        calc(100% - 1px) 100%;
+    }
+  }
+
+  @keyframes side-panel-line-top {
+    from {
+      border-block-start-color: transparent;
+    }
+    to {
+      border-block-start-color: var(--side-panel-color-border);
+    }
+  }
+
+  @keyframes side-panel-line-bottom {
+    from {
+      border-block-end-color: var(--side-panel-color-border);
+    }
+    to {
+      border-block-end-color: transparent;
     }
   }
 }
