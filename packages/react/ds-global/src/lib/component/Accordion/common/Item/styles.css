@@ -53,8 +53,19 @@
     --accordion-item-header-padding-inline: var(--dimension-200);
 
     --accordion-item-content-padding-inline: var(--dimension-200);
-    /* Vertical content padding in baseline multiples (dimension-100 = 1 bU). */
+    /* Split block padding in baseline multiples (dimension-100 = 1 bU): one
+       rung on top (header -> content), a wider gap at the bottom (content ->
+       divider). The [open] rule below subtracts the divider's thickness from
+       the bottom pad, so painted padding + divider stays a whole baseline
+       multiple. */
     --accordion-item-content-padding-block: var(--dimension-100);
+    --accordion-item-content-padding-block-end: var(--dimension-200);
+
+    /* Readable measure cap: the panel's TEXT may run at most 40em wide.
+       Box sizing is border-box, so the .content rule below adds the two
+       inline paddings back onto the cap — the content box, what the text
+       actually fills, lands on exactly 40em. */
+    --accordion-item-content-max-width: 40em;
 
     /* Fixed chevron size (per Figma) so every item reserves the same chevron
        column width and all headings start at the same x-position, regardless of
@@ -246,9 +257,23 @@
     box-sizing: border-box;
     color: var(--accordion-item-color-text);
 
-    padding-block: var(--accordion-item-content-padding-block);
+    /* Split block padding: the start (header -> content) is one density rung;
+       the end (content -> divider) is TWO of the same rung (design review:
+       16px — the comfortable rung doubled) — see the tokens above and the
+       density block below. */
+    padding-block: var(--accordion-item-content-padding-block)
+      var(--accordion-item-content-padding-block-end);
     padding-inline-start: var(--accordion-item-content-indent);
     padding-inline-end: var(--accordion-item-content-padding-inline);
+
+    /* Measure cap (design review): max-width includes the inline paddings
+       (border-box), so the cap is the 40em measure PLUS them — what remains
+       for the text is exactly 40em. */
+    max-width: calc(
+      var(--accordion-item-content-max-width) +
+      var(--accordion-item-content-indent) +
+      var(--accordion-item-content-padding-inline)
+    );
   }
 
   /* 1px divider baseline compensation: subtract the divider thickness from the
@@ -266,7 +291,7 @@
 
   .ds.accordion-item[open] > .content {
     padding-block-end: calc(
-      var(--accordion-item-content-padding-block) -
+      var(--accordion-item-content-padding-block-end) -
       var(--dimension-stroke-thickness-medium)
     );
   }
@@ -299,15 +324,22 @@
    * the h6-in-header case is owned by a later pass. The default (body-tier)
    * heading is exact. */
   :is(.comfortable, .dense, .app, .site, .docs) .ds.accordion-item {
-    /* The CONTENT panel consumes the density system's semantic spacing rung for
-       its block padding — space-md (16px apps-comfortable, 8px apps-dense,
-       20/12px sites) — instead of the fixed 1 bU, so the panel's breathing room
-       follows the density cell. Every rung is a whole baseline multiple, so the
-       rhythm holds; the [open] divider compensation reads this same token, so it
-       follows automatically. Outside a density scope the :root default stands. */
+    /* The CONTENT panel's TOP gap (header -> content) consumes the density
+       system's semantic spacing rung — space-md — instead of the fixed 1 bU,
+       so it follows the density cell. The BOTTOM gap is re-declared HERE as
+       two of the same rung (a var() substituted at :root would capture the
+       :root rung and never follow this override): 16px comfy — the value the
+       design review asked for — 8px apps-dense. Every rung is a whole
+       baseline multiple, so the rhythm holds; the [open] divider
+       compensation reads the end token, so it follows automatically.
+       Outside a density scope the :root defaults stand. */
     --accordion-item-content-padding-block: var(
       --density-space-md,
       var(--dimension-100)
+    );
+    --accordion-item-content-padding-block-end: calc(
+      var(--accordion-item-content-padding-block) *
+      2
     );
   }
 
