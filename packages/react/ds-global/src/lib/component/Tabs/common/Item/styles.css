@@ -6,19 +6,18 @@
    *
    * Figma (node 4388-106316): each tab is text with `--dimension-200` (16px)
    * horizontal padding, no gap to its neighbours. The tab shows a bottom border
-   * on hover (muted) and when active (highlighted); an inert tab (no url) is
-   * muted with no hover affordance.
+   * on hover (muted) and when active (highlighted), and a focus border on
+   * every side when keyboard-focused; an inert tab (no url) is muted with no
+   * hover affordance.
    *
-   * Baseline grid: the tab box snaps to the typographic baseline grid — its
-   * min block-size and vertical padding are whole multiples of --baseline-height
-   * (1bU = 8px), so the strip sits on the same grid as surrounding text.
+   * Baseline grid: the tab box snaps to the typographic baseline grid — the
+   * density height rule below sizes it to a whole multiple of
+   * --baseline-height (1bU = 4px), so the strip sits on the same grid as
+   * surrounding text.
    */
   :root {
-    --tabs-tab-border-width: var(--dimension-strokeThickness-large, 2px);
+    --tabs-tab-border-width: var(--dimension-stroke-thickness-large);
     --tabs-tab-padding-inline: var(--space-200); /* 16px */
-    /* 5bU = 40px tab height on the 8px baseline grid. */
-    --tabs-tab-min-block-size: calc(var(--baseline-height) * 5);
-    --tabs-tab-focus-ring-width: var(--dimension-strokeThickness-large, 2px);
     --tabs-tab-focus-ring-color: var(--color-focus-ring);
   }
 
@@ -30,9 +29,6 @@
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
-    /* Baseline-snapped block size; vertical padding kept to baseline units so the
-       label's line box centres on the grid. */
-    min-block-size: var(--tabs-tab-min-block-size);
     padding-block: var(--space-100); /* 1bU */
     padding-inline: var(--tabs-tab-padding-inline);
     font: var(--typography-text-primary);
@@ -40,27 +36,26 @@
     text-decoration: none;
     white-space: nowrap;
 
-    /* Transparent underline reserved so the row never shifts when a border
-       appears on hover/active. */
-    border-bottom: var(--tabs-tab-border-width) solid transparent;
+    /* Transparent border reserved on every side so the row never shifts when
+       the hover/active underline or the keyboard focus border appears. */
+    border: var(--tabs-tab-border-width) solid transparent;
+  }
 
-    /* Keyboard focus: a design-system focus ring (design review) instead of the
-       UA default outline. Inset offset so the ring hugs the tab and the row's
-       `overflow` never clips it; :focus-visible only, so pointer clicks stay
-       quiet. */
-    &:focus-visible {
-      outline: var(--tabs-tab-focus-ring-width) solid
-        var(--tabs-tab-focus-ring-color);
-      outline-offset: calc(-1 * var(--tabs-tab-focus-ring-width));
-    }
+  :where(.comfortable, .dense, .app, .site, .docs) .ds.tabs-item .tabs-link {
+    min-block-size: calc(
+      var(--density-line-height-effective, calc(var(--baseline-height) * 8)) +
+        3 * var(--baseline-height)
+    );
+    padding-block: 0;
   }
 
   /* Hover: a muted bottom border hints the tab is navigable, and settles faster
      than the active/selection change (below). Not on the active tab (it already
      shows the highlighted border), nor on inert or disabled tabs (they are not
-     interactive). */
+     interactive); suppressed while keyboard-focused so the hover affordance
+     never paints over the focus border. */
   .ds.tabs-item:not([data-active]):not([data-inert]):not([data-disabled])
-  .tabs-link:hover {
+    .tabs-link:hover:not(:focus-visible) {
     border-bottom-color: var(--color-border-muted);
     transition-duration: var(--motion-duration-fast);
   }
@@ -69,6 +64,24 @@
   .ds.tabs-item[data-active] .tabs-link,
   .ds.tabs-item .tabs-link[aria-current="page"] {
     border-bottom-color: var(--color-border-highlighted);
+  }
+
+  /* Keyboard focus: the design-system focus border. Sits after the active rule so the focus border wins
+     on every edge of a focused tab, including the underline edge of a
+     focused+active tab; hover defers to it via :not(:focus-visible) above.
+     :focus-visible only, so pointer clicks stay quiet. A border lives inside
+     the tab's box, so the strip's overflow can never clip it. When design-tokens ships
+     --border-focus-ring, this rule becomes `border-color:
+     var(--border-focus-ring)`. */
+  .ds.tabs-item .tabs-link:focus-visible {
+    /* The border below IS the focus indicator; suppress the UA default ring
+       (outline: auto), which the old custom outline used to replace and would
+       otherwise show through alongside the border. */
+    outline: none;
+    border-color: var(
+      --modifier-color-focus-ring,
+      var(--tabs-tab-focus-ring-color)
+    );
   }
 
   /* Inert (no url) or disabled tabs: muted, non-interactive, no hover
