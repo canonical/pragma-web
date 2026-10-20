@@ -2,33 +2,27 @@
 // The boot, against the hermetic corpus — including the anatomy collision.
 //
 // -----------------------------------------------------------------------------
-// 🔬 THE MEASUREMENT THIS FILE EXISTS FOR, AND HOW IT WAS OBTAINED.
+// 🔬 THE MEASUREMENT THIS FILE EXISTS FOR.
 //
-// `CUSTOM_MAPPINGS` carries one entry, `anatomy:uri → anatomyUri`, and the
-// constant's prose says the boot "dies loudly" without it. Two documents in
-// this repo DISAGREED about whether that is true at this commit: R.03 records
-// R-4's fatality escalation as "error+drop implemented; fatality PENDING",
-// while the app's former `graphql.ts` asserted the fatality as established
-// fact. One of them had to be stale.
+// `anatomy:uri` maps to the GraphQL field name `uri`, which the converged base
+// reserves as the primary key the compiler injects on every Node implementer.
+// Unresolved, that is `M005`, severity `error`, and `runPasses`' fatality gate
+// refuses to hand out the schema: the boot dies. The anatomy DSL resolves it in
+// the ontology itself, with `graphql:name "anatomyUri"` on the term
+// (`@canonical/anatomy-dsl` 0.43.0), and the corpus carries the same annotation.
 //
-// It was resolved by RUNNING IT, not by reading either document: the corpus
-// below was compiled twice at pragma `4d228c8`, once with `CUSTOM_MAPPINGS`
-// and once with `{}`. OBSERVED, verbatim:
-//
-//   WITH    → boot succeeds; SDL carries `anatomyUri: String` on `NamedNode`;
-//             one diagnostic, `V014`, severity `info`.
-//   WITHOUT → boot THROWS `CompilationError`, message
-//             "ke-graphql: compilation failed with 1 error(s)", carrying
-//             `M005 … maps to NamedNode.uri, a structural field the compiler
-//             owns — the field is DROPPED."  The diagnostic's severity is
-//             `error`, and `runPasses`' compile-level fatality gate refuses to
-//             hand out the schema.
-//
-// SO THE FATALITY IS LIVE AT `4d228c8` AND R.03's "pending" IS THE STALE
-// DOCUMENT. The assertions below are written from that observation. If a
-// future ke-graphql change downgrades M005 to a warning, this file goes red —
-// which is the correct outcome, because the app's committed `schema.graphql`
-// would then quietly lose a field instead of refusing to build.
+// This package used to carry the rename as a `CUSTOM_MAPPINGS` constant, from
+// before the annotation existed upstream. Once it did, the constant referenced
+// nothing on the real graph (`M003`) and was deleted. What this file measures
+// is therefore no longer a constant of this package but a property of the
+// ontology plus the compiler, and it is measured both ways rather than read
+// from a document: the annotated corpus boots with `anatomyUri: String` on
+// `NamedNode` and `uri: ID!` untouched; the same corpus with the annotation
+// stripped from the source text throws `CompilationError` carrying `M005`. If
+// a future ke-graphql stopped binding `graphql:name`, or downgraded M005 to a
+// warning, this file goes red — which is the correct outcome, because the
+// app's committed `schema.graphql` would then quietly lose a field instead of
+// refusing to build.
 //
 // -----------------------------------------------------------------------------
 // 🔴 THE DEFAULT IS NO WRITE, AND EXACTLY ONE TEST DEPARTS FROM IT. Omitting
@@ -53,7 +47,6 @@ import {
   CORPUS_SEM_ROOT,
   MISSING_ROOT,
 } from "../../testing/corpus.js";
-import { ANATOMY_URI, CUSTOM_MAPPINGS } from "../config/index.js";
 import {
   cacheRefRoots,
   collectTtlSources,
@@ -114,14 +107,12 @@ describe("createPragmaProvider over both roots", () => {
 });
 
 describe("the anatomy:uri collision", () => {
-  it("keeps the field under the name the committed schema already carries", async () => {
+  it("honours the ontology's graphql:name annotation", async () => {
     const { api } = await booted;
-    // Not merely "some field survived": the mapping's whole justification is
-    // that it restores the EXACT name the schema had, so nothing downstream
-    // moves. `anatomyUri: String` appears in the app's committed
-    // schema.graphql at 4d228c8.
+    // Not merely "some field survived": the annotation's whole point is that
+    // it produces the EXACT name the committed schema carries, so nothing
+    // downstream moves.
     expect(api.sdl).toContain("anatomyUri: String");
-    expect(CUSTOM_MAPPINGS[ANATOMY_URI]).toEqual({ graphqlName: "anatomyUri" });
   });
 
   it("has NOT quietly renamed the reserved field", async () => {
@@ -175,26 +166,29 @@ describe("the pinned compiler options", () => {
     ).toEqual(["V014:info"]);
   });
 
-  it("KILLS THE BOOT when the mapping is absent — observed, not assumed", async () => {
+  it("KILLS THE BOOT when the annotation is stripped — observed, not assumed", async () => {
     // THE NEGATIVE HALF, run for real.
     //
-    // `CUSTOM_MAPPINGS` is a pinned constant (OQ-4), so there is deliberately
-    // no way to unset it through this package's public surface. The negative
-    // case is therefore compiled one layer down — the package's own collector
-    // and prefix harvester, handed to ke-graphql with `mappings: {}` — which
-    // is the honest place for it: the claim is about what the COMPILER does to
-    // this corpus, and that is precisely what justifies the constant existing.
-    //
-    // Everything else is held identical to `createPragmaProvider`: same
-    // sources, same prefixes, same `mode`/`prefixing`/`incremental`. The only
-    // difference is the mapping.
+    // The annotation lives in the ontology, so the negative case is the same
+    // corpus with that one line removed from the source TEXT, handed to
+    // ke-graphql one layer down through the package's own collector and
+    // prefix harvester. Everything else is held identical to
+    // `createPragmaProvider`: same sources, same prefixes, same
+    // `mode`/`prefixing`/`incremental`. The only difference is the annotation.
+    const ANNOTATION = /^\s*graphql:name "anatomyUri" ;\n/m;
     const sources = collectTtlSources({
       refRoots: cacheRefRoots(CORPUS_REFS_ROOT),
       semRoot: CORPUS_SEM_ROOT,
-    });
-    const unmapped = createSchemaPlugin({
+    }).map((source) =>
+      source.path.endsWith("anatomy.ttl")
+        ? { ...source, content: source.content.replace(ANNOTATION, "") }
+        : source,
+    );
+    expect(sources.some((source) => ANNOTATION.test(source.content))).toBe(
+      false,
+    );
+    const unannotated = createSchemaPlugin({
       incremental: true,
-      mappings: {},
       mode: "annotated",
       prefixing: "none",
     });
@@ -202,23 +196,22 @@ describe("the pinned compiler options", () => {
       sources: sources.map(({ content, path }) => ({ content, path })),
       prefixes: harvestPrefixes(sources),
       // biome-ignore lint: Plugin generic variance requires explicit unknown
-      plugins: [unmapped] as Plugin<any>[],
+      plugins: [unannotated] as Plugin<any>[],
     }).then(
       () => undefined,
       (error: unknown) => error,
     );
 
-    // OBSERVED at 4d228c8: it throws. It does not return a schema minus the
-    // field. R.03's "fatality pending" is the stale document.
+    // It throws. It does not return a schema minus the field.
     expect(thrown).toBeInstanceOf(Error);
     expect((thrown as Error).message).toContain("compilation failed");
     expect((thrown as Error).message).toContain("M005");
-    expect((thrown as Error).message).toContain(ANATOMY_URI);
-    // The diagnostic names the collision AND the remedy this constant is.
+    expect((thrown as Error).message).toContain(
+      "http://anatomy-dsl.example.org/ontology#uri",
+    );
     expect((thrown as Error).message).toContain(
       "a structural field the compiler owns — the field is DROPPED",
     );
-    expect((thrown as Error).message).toContain("add a custom mapping");
   });
 });
 

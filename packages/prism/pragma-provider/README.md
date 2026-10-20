@@ -7,7 +7,7 @@ executable GraphQL schema, and serves it as a fetch-native handler.
 
 It exists because the docsite app should not. Until this package landed,
 `apps/react/pragma-docs/src/server/graphql.ts` held the ref-package list, the semantic
-package list, an ontology exclusion, a custom field mapping, and the compiler options —
+package list, an ontology exclusion, a custom field mapping (since deleted), and the compiler options —
 296 lines of knowledge about *pragma's specific ontologies* living inside an application
 that claims to render against any conformant provider. After this package, the app
 imports one factory and depends on **no knowledge engine at all**: no `@canonical/ke`,
@@ -46,23 +46,24 @@ would delete it from this repo. They are pinned constants
 | `REF_PACKAGES` | `design-system`, `code-standards`, `anatomy-dsl` — the source packages, declared as dependencies at exact versions and read from `node_modules` | A manifest the packages publish themselves, so the list is read rather than hard-coded |
 | `SEM_PACKAGES` | `surface`, `design-system-docs` — the docsite's own demand model, in a second root | Publishing the demand model as a ref package, collapsing two roots to one |
 | `EXCLUDED_SOURCES` | drops `design-system-docs/data/shim-concept.ttl`, whose `ds:embodiesConcept rdfs:domain ds:Entity` smears two fields onto all fourteen `ds:` types | A modelling fix: narrow the domain off the class-tree root |
-| `CUSTOM_MAPPINGS` | renames `anatomy:uri` → `anatomyUri`, because `uri` is the compiler-injected primary key | A `graphql:name "anatomyUri"` annotation on the term in the anatomy DSL's own repository |
 
-### The anatomy collision is now a test, not a paragraph
+### The anatomy collision: resolved upstream, still measured here
 
-`CUSTOM_MAPPINGS` is the single most load-bearing line in the package, and its
-justification used to be prose in a comment that nothing checked. Two documents in this
-repo disagreed about whether the failure it prevents was fatal yet.
+A fourth constant used to sit in that table: `CUSTOM_MAPPINGS`, renaming `anatomy:uri`
+to `anatomyUri` because `uri` is the primary key the compiler injects on every Node, and
+an ontology property of the same name is an `M005` error that kills the boot. Its
+documented upstream fix was a `graphql:name "anatomyUri"` annotation on the term in the
+anatomy DSL itself. `@canonical/anatomy-dsl` 0.43.0 carries that annotation, so the
+constant did nothing on the real graph (the compiler reported `M003`, a mapping that
+references nothing) and it was deleted.
 
-It was settled by running it. **Measured at `4d228c8`**, over the hermetic corpus:
-
-| | Outcome |
-|---|---|
-| **with** the mapping | boots; SDL carries `anatomyUri: String` on `NamedNode`; one `V014` info diagnostic |
-| **without** it | **throws `CompilationError`** — `M005 … maps to NamedNode.uri, a structural field the compiler owns — the field is DROPPED` |
-
-The fatality is live. `src/lib/provider/createPragmaProvider.test.ts` asserts it, both
-halves, on every run.
+What stays is the measurement. The hermetic corpus carries the same annotation, and
+`src/lib/provider/createPragmaProvider.test.ts` asserts both halves on every run: with the
+annotation the SDL carries `anatomyUri: String` on `NamedNode` and the compiler's own
+`uri: ID!` is untouched; with the annotation stripped from the source text the boot
+throws `CompilationError` carrying `M005 … the field is DROPPED`. If a future ke-graphql
+stopped binding `graphql:name`, or downgraded M005 to a warning, this file goes red,
+which is the right outcome: the committed schema would otherwise quietly lose a field.
 
 ---
 

@@ -80,12 +80,13 @@ describe("the committed schema.graphql is this provider's output", () => {
   //
   // These assertions are the floor that makes the check mean something: the
   // subject has to actually be a pragma emission before conformance is worth
-  // asserting of it. They name the provider's own signature — the anatomy
-  // mapping CUSTOM_MAPPINGS exists for, an ontology-derived type the contract
-  // knows nothing about, and a size no stub reaches.
+  // asserting of it. They name the provider's own signature — the `anatomyUri`
+  // field the anatomy ontology's `graphql:name` annotation produces, an
+  // ontology-derived type the contract knows nothing about, and a size no
+  // stub reaches.
   const sdl = readCommittedSdl();
 
-  it("carries the anatomy mapping this provider configures", () => {
+  it("carries the anatomy DSL's annotated field name", () => {
     expect(sdl).toContain("anatomyUri");
   });
 

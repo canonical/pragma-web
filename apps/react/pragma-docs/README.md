@@ -128,8 +128,8 @@ spreads it.
 ([`@canonical/prism-pragma-provider`](../../../packages/prism/pragma-provider))
 and serves its compiled schema at `http://127.0.0.1:5175/graphql` — nothing
 else, no HTML. **The app assembles no provider of its own**: the ref-package
-list, the ontology exclusions, the custom field mapping and the compiler
-options all live in that package, and this app depends on no knowledge engine
+list, the ontology exclusions and the compiler options all live in that
+package, and this app depends on no knowledge engine
 (no `@canonical/ke`, no `@canonical/ke-graphql`). `graph.ts` is transport plus
 one factory call. Every `dev*` / `preview*` script starts one for you via the
 launcher (`src/server/withGraph.ts`), so in normal use you never run it by

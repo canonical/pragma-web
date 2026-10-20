@@ -60,7 +60,7 @@
  * remedy) and invalidate every committed Relay artifact at once. An implicit
  * default that a dependency bump could change is exactly the kind of unstated
  * fact this package exists to write down. They are constants, not options,
- * for the same reason `CUSTOM_MAPPINGS` is (see config/constants.ts).
+ * for the same reason `EXCLUDED_SOURCES` is (see config/constants.ts).
  */
 
 import { relative } from "node:path";
@@ -70,11 +70,7 @@ import {
   type SchemaPluginApi,
 } from "@canonical/ke-graphql";
 import { createGraphQLHandler } from "@canonical/ke-graphql/http";
-import {
-  CUSTOM_MAPPINGS,
-  type PragmaProvider,
-  type PragmaProviderOptions,
-} from "../config/index.js";
+import type { PragmaProvider, PragmaProviderOptions } from "../config/index.js";
 import {
   collectTtlSources,
   describeRefRoots,
@@ -111,7 +107,6 @@ export const createPragmaProvider = async (
   const prefixes = harvestPrefixes(sources);
   const graphql = createSchemaPlugin({
     incremental: true,
-    mappings: CUSTOM_MAPPINGS,
     mode: MODE,
     prefixing: PREFIXING,
     provider: PROVIDER,

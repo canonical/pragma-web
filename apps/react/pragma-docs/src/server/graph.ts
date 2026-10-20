@@ -12,8 +12,8 @@
  *
  * **The provider is no longer assembled here.** It comes from
  * `@canonical/prism-pragma-provider`, which owns pragma's ref-package list,
- * its semantic-package list, the shim-concept exclusion, the `anatomy:uri`
- * mapping and the compiler options — every fact about pragma's specific
+ * its semantic-package list, the shim-concept exclusion and the compiler
+ * options — every fact about pragma's specific
  * ontologies that used to live in this app's `src/server/graphql.ts`. What is
  * left in this file is TRANSPORT: the port, the hostname, the `/graphql`-only
  * routing and the per-request hit log. This app depends on no knowledge engine

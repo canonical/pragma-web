@@ -19,7 +19,7 @@ holds 551 tests at 100%.
 | `refs/@canonical/design-system/main/definitions/ontology.ttl` | the first root compiles; `ds:Entity` roots the class tree the shim would smear across |
 | `refs/@canonical/design-system/main/data/instances.ttl` | instance data merges into the same store; carries a **channel-dotted reference** (`ds:.subcomponent.button-label`) that only parses because `escapeChannelDottedRefs` rewrites it |
 | `refs/@canonical/design-system/main/data/.channel.ttl` | **dot-prefixed files are skipped.** Its one triple would add a `ds:Component` named `leaked`; nothing in the collected set ever mentions it |
-| `refs/@canonical/anatomy-dsl/main/definitions/anatomy.ttl` | declares `<http://anatomy-dsl.example.org/ontology#uri>` **verbatim** — the IRI `ANATOMY_URI` names. This is the M005 collision, reproduced |
+| `refs/@canonical/anatomy-dsl/main/definitions/anatomy.ttl` | declares an `anatomy:uri` property, which collides with the compiler's own `uri` key (M005), **and** the `graphql:name "anatomyUri"` annotation the real anatomy DSL resolves it with. The boot test proves the annotation is honoured and that stripping it is fatal |
 | `sem/surface/definitions/surface.ttl` | the **second root** merges: `sem://surface#Job` yields a `Job` type the first root cannot |
 | `sem/design-system-docs/data/shim-concept.ttl` | the real `EXCLUDED_SOURCES` entry, at its real path. `ds:embodiesConcept rdfs:domain ds:Entity` is the domain smear; the collector must drop this file |
 
@@ -30,8 +30,8 @@ which is the state a partially-populated refs cache is actually in.
 ## What this corpus is not
 
 It is **not** a copy of pragma's ontologies. The IRIs are `example.org` stand-ins
-except for `anatomy:uri`, which must be byte-identical to the real IRI because
-the constant under test names it. Vendoring the real ontologies into this repo
+throughout; only the `graphql:` annotation vocabulary is the real one, because
+that is what the compiler binds. Vendoring the real ontologies into this repo
 would be a licensing and staleness problem for no test value: the properties
 under test are about the collector and the compiler, not about pragma's
 modelling.
