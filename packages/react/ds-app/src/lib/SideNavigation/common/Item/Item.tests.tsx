@@ -79,6 +79,46 @@ describe("Item", () => {
     ).toBe(chip);
   });
 
+  it("keeps static trailing Chips eligible through one or two neutral wrappers", () => {
+    const { container } = render(
+      <>
+        <Item slot={<Chip value="Direct" />}>Direct row</Item>
+        <Item
+          slot={
+            <span>
+              <Chip value="One wrapper" />
+            </span>
+          }
+        >
+          One-wrapper row
+        </Item>
+        <Item
+          slot={
+            <span data-ds-density-reset className="comfortable">
+              <span className="dense">
+                <Chip value="Two wrappers" />
+              </span>
+            </span>
+          }
+        >
+          Two-wrapper row
+        </Item>
+      </>,
+    );
+    const subscribers = container.querySelectorAll(
+      `${navigationDensityPolicy.providerSelector} ${navigationDensityPolicy.subscriberSelector}`,
+    );
+    expect([...subscribers].map((chip) => chip.textContent)).toEqual([
+      "Direct",
+      "One wrapper",
+      "Two wrappers",
+    ]);
+    expect(screen.getByText("Direct").closest(".chip")).toHaveClass(
+      "ds",
+      "chip",
+    );
+  });
+
   it("renders a plain label when url is absent", () => {
     render(<Item>Ada Lovelace</Item>);
     expect(screen.queryByRole("link")).not.toBeInTheDocument();

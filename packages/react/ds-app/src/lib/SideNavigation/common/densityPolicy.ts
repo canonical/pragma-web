@@ -9,16 +9,16 @@ export const navigationDensityPolicy = {
   source: "--ds-spacing-control-inset-dense",
   providerSelector: ".ds.row.sidenav-static-chip-provider-v1",
   subscriberSelector:
-    '> .end > span.chip[data-ds-density-subscriber="static-chip"]',
+    '> .end span.chip[data-ds-density-subscriber="static-chip"]',
   helperInputs: {
     padding: "--ds-control-seat-padding-block",
     closure: "--ds-control-seat-margin-block-end",
   },
-  boundary: "navigation.trailing-slot.direct-static-chip.v1",
+  boundary: "navigation.trailing-slot.static-chip.v1",
   resets: ["site", "docs", "app"],
   portalBoundary: "dom-target.v1",
   resetBoundary: "product-root.v1",
-  wrapperBoundary: "structural direct-child eligibility; not a reset input",
+  wrapperBoundary: "neutral descendants inherit; product roots reset",
   portals: "actual DOM target; no React-context propagation",
   exclusions: ["interactive Chip", "dismissible Chip", "other controls"],
 } as const;

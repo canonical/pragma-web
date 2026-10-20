@@ -1,8 +1,14 @@
 @layer ds.components.apps {
-  /* The provider owns a private channel, not generic helper inputs. Only an
-     eligible direct static subscriber crosses the trailing-slot boundary.
-     Wrappers are excluded structurally, not by a per-instance reset input.
-     Genuine product roots resolve their own tier roles. */
+  /* The provider owns a private inherited channel, not generic helper inputs.
+     Neutral trailing-slot wrappers preserve it. Genuine product roots restore
+     the component's normal seat until a nested provider establishes density. */
+  :where(
+    .ds.row.sidenav-static-chip-provider-v1 > .end :is(.site, .docs, .app)
+  ) {
+    --sidenav-static-chip-inset: initial;
+    --sidenav-static-chip-end: initial;
+  }
+
   :where(.ds.row.sidenav-static-chip-provider-v1) {
     --sidenav-static-chip-inset: var(--ds-spacing-control-inset-dense);
     --sidenav-static-chip-end: 0px;
@@ -10,11 +16,17 @@
 
   :where(.ds.row.sidenav-static-chip-provider-v1)
     > .end
-    > span.chip[data-ds-density-subscriber="static-chip"]:not(
+    span.chip[data-ds-density-subscriber="static-chip"]:not(
       :has(button, a, input, select, textarea)
-    ):not(.site, .docs, .app) {
-    --ds-control-seat-padding-block: var(--sidenav-static-chip-inset);
-    --ds-control-seat-margin-block-end: var(--sidenav-static-chip-end);
+    ) {
+    --ds-control-seat-padding-block: var(
+      --sidenav-static-chip-inset,
+      var(--ds-control-padding-block)
+    );
+    --ds-control-seat-margin-block-end: var(
+      --sidenav-static-chip-end,
+      var(--ds-control-grid-compensation)
+    );
   }
 
   /* The mark uses the same default-seat metrics as its sibling text owner.

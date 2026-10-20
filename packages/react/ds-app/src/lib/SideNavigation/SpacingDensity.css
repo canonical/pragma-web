@@ -55,6 +55,24 @@
   margin-block: var(--ds-spacing-group);
 }
 
+.density-neutral-wrapper {
+  display: contents;
+}
+
+.density-fit-proof
+  .side-navigation.density-nav-fixture.density-nested-provider-fixture {
+  block-size: auto;
+  min-block-size: 0;
+}
+
+.density-policy-boundary {
+  display: block;
+}
+
+.density-nested-provider-fixture > .side-navigation-header {
+  display: none;
+}
+
 /* Frozen Before only; no fixed sizing or manual seat override in After. */
 .density-frozen-before .side-navigation-item {
   height: var(--dimension-400);

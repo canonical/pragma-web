@@ -15,10 +15,20 @@ describe("navigation density policy", () => {
       expect(css).toContain(`${input}:`);
     for (const reset of policy.resets) expect(css).toContain(reset);
     expect(css).toContain(":has(button, a, input, select, textarea)");
+    expect(css).toContain(
+      ".ds.row.sidenav-static-chip-provider-v1 > .end :is(.site, .docs, .app) ) { --sidenav-static-chip-inset: initial; --sidenav-static-chip-end: initial;",
+    );
+    expect(css).toContain(
+      "--ds-control-seat-padding-block: var( --sidenav-static-chip-inset, var(--ds-control-padding-block) );",
+    );
+    expect(css).not.toContain("@scope");
     expect(policy.role).toBe("spacing.inset.control.block");
     expect(policy.member).toBe("dense");
     expect(css).not.toContain("data-ds-density-reset");
     expect(policy.resets).toEqual(["site", "docs", "app"]);
     expect(policy.resetBoundary).toBe("product-root.v1");
+    expect(policy.wrapperBoundary).toBe(
+      "neutral descendants inherit; product roots reset",
+    );
   });
 });

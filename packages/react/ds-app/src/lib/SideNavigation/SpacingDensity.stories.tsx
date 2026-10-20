@@ -58,6 +58,89 @@ function ClassOnlyLink({
   );
 }
 
+function SiteProviderLink({ className, ...props }: LinkComponentProps) {
+  return <a {...props} className={`${className} site`} />;
+}
+
+function AppProviderLink({ className, ...props }: LinkComponentProps) {
+  return <a {...props} className={`${className} app`} />;
+}
+
+function DocsProviderLink({ className, ...props }: LinkComponentProps) {
+  return <a {...props} className={`${className} docs`} />;
+}
+
+const candidateModes = [
+  "candidate-plain",
+  "candidate-direct",
+  "candidate-one-wrapper",
+  "candidate-two-wrappers",
+  "candidate-legacy-switches",
+  "candidate-product-root",
+  "candidate-same-node-provider",
+] as const;
+type CandidateMode = (typeof candidateModes)[number];
+
+function candidateLabel(mode: CandidateMode) {
+  switch (mode) {
+    case "candidate-plain":
+      return "Plain";
+    case "candidate-direct":
+      return "Direct";
+    case "candidate-one-wrapper":
+      return "Wrapped";
+    case "candidate-two-wrappers":
+      return "RTL wrapped";
+    case "candidate-legacy-switches":
+      return "Legacy switches";
+    case "candidate-product-root":
+      return "Product root";
+    case "candidate-same-node-provider":
+      return "Root provider";
+  }
+}
+
+function crossTier(tier: string) {
+  if (tier === "site") return "app";
+  if (tier === "app") return "site";
+  return "docs";
+}
+
+function candidateSlot(mode: CandidateMode, tier: string) {
+  const chip = <Chip value="Chip" />;
+  switch (mode) {
+    case "candidate-plain":
+      return undefined;
+    case "candidate-direct":
+      return chip;
+    case "candidate-one-wrapper":
+      return <span className="density-neutral-wrapper">{chip}</span>;
+    case "candidate-two-wrappers":
+      return (
+        <span className="density-neutral-wrapper">
+          <span className="density-neutral-wrapper">{chip}</span>
+        </span>
+      );
+    case "candidate-legacy-switches":
+      return (
+        <span
+          className="comfortable density-neutral-wrapper"
+          data-ds-density-reset
+        >
+          <span className="dense density-neutral-wrapper">{chip}</span>
+        </span>
+      );
+    case "candidate-product-root":
+      return (
+        <span className={`${crossTier(tier)} density-neutral-wrapper`}>
+          <Chip value="Chip" data-non-subscriber="product-root-reference" />
+        </span>
+      );
+    case "candidate-same-node-provider":
+      return chip;
+  }
+}
+
 function PortalChip({
   origin,
   tier,
@@ -273,7 +356,7 @@ function Fit({
         viewport: window.innerWidth,
         policy: navigationDensityPolicy,
         enrollment:
-          "Production direct static-Chip enrollment; actual private Label owns default helper; actual DOM product-role and portal boundaries",
+          "Production static-Chip enrollment through neutral wrappers; actual private Label owns default helper; actual DOM product-role and portal boundaries",
         parentBaselineComparison: (() => {
           const plain = rowMetrics.find(
             (row) =>
@@ -339,17 +422,23 @@ function Fit({
       </p>
       <div ref={ref} className="density-fit-proof">
         <div className="density-fit-row">
-          {[
-            "candidate-plain",
-            "candidate-default",
-            "candidate-chip",
-            "candidate-legacy-attribute",
-          ].map((mode) => (
+          {candidateModes.map((mode) => (
             <SideNavigation
               key={mode}
               className="density-nav-fixture"
               data-density-host={mode}
-              LinkComponent={mode === "candidate-chip" ? ClassOnlyLink : "a"}
+              dir={mode === "candidate-two-wrappers" ? "rtl" : "ltr"}
+              LinkComponent={
+                mode === "candidate-direct"
+                  ? ClassOnlyLink
+                  : mode === "candidate-same-node-provider"
+                    ? tier === "site"
+                      ? AppProviderLink
+                      : tier === "app"
+                        ? SiteProviderLink
+                        : DocsProviderLink
+                    : "a"
+              }
               currentUrl={`#density-${tier}-${mode}-first`}
               defaultExpanded
               keyboardShortcut={false}
@@ -363,33 +452,8 @@ function Fit({
                         key: "first",
                         url: `#density-${tier}-${mode}-first`,
                         icon: "settings",
-                        label:
-                          mode === "candidate-plain"
-                            ? "Plain"
-                            : mode === "candidate-default"
-                              ? "Root"
-                              : mode === "candidate-legacy-attribute"
-                                ? "Attr"
-                                : "Dense",
-                        slot:
-                          mode === "candidate-plain" ? undefined : mode ===
-                            "candidate-default" ? (
-                            <span className={tier}>
-                              <Chip
-                                value="Chip"
-                                data-non-subscriber="product-root-reference"
-                              />
-                            </span>
-                          ) : (
-                            <Chip
-                              value="Chip"
-                              data-ds-density-reset={
-                                mode === "candidate-legacy-attribute"
-                                  ? ""
-                                  : undefined
-                              }
-                            />
-                          ),
+                        label: candidateLabel(mode),
+                        slot: candidateSlot(mode, tier),
                       },
                       {
                         key: "next",
@@ -521,22 +585,95 @@ function Fit({
             }}
           />
           <Chip value="Standalone" data-non-subscriber="standalone" />
+          <span className={crossTier(tier)}>
+            <Chip
+              value="Target default"
+              data-non-subscriber="cross-tier-standalone"
+            />
+          </span>
           <Button data-non-subscriber="button-outside">Action</Button>
+          <div
+            className={`ds row ${navigationDensityPolicy.providerClassName} density-policy-boundary`}
+            data-density-policy-diagnostic="nested-provider"
+          >
+            <div className="end">
+              <div className={crossTier(tier)}>
+                <SideNavigation
+                  className="density-nav-fixture density-nested-provider-fixture"
+                  data-density-host="nested-provider"
+                  defaultExpanded
+                  keyboardShortcut={false}
+                  root={{
+                    key: "nested-provider",
+                    items: [
+                      {
+                        key: "group",
+                        items: [
+                          {
+                            key: "chip",
+                            label: "Nested",
+                            slot: <Chip value="Chip" />,
+                          },
+                        ],
+                      },
+                    ],
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            className={`ds row ${navigationDensityPolicy.providerClassName} density-policy-boundary`}
+            data-density-policy-diagnostic="same-node-provider"
+          >
+            <div className="end">
+              <SideNavigation
+                className="density-nav-fixture density-nested-provider-fixture"
+                data-density-host="nested-same-node-provider"
+                defaultExpanded
+                keyboardShortcut={false}
+                LinkComponent={
+                  tier === "site"
+                    ? AppProviderLink
+                    : tier === "app"
+                      ? SiteProviderLink
+                      : DocsProviderLink
+                }
+                root={{
+                  key: "nested-same-node-provider",
+                  items: [
+                    {
+                      key: "group",
+                      items: [
+                        {
+                          key: "chip",
+                          label: "Same node",
+                          url: "#density-nested-same-node-provider",
+                          slot: <Chip value="Chip" />,
+                        },
+                      ],
+                    },
+                  ],
+                }}
+              />
+            </div>
+          </div>
         </div>
         <output hidden data-density-fit={tier}>
           {JSON.stringify(metrics)}
         </output>
       </div>
       <p className="density-caption">
-        Plain and enrolled static Chip share the unchanged default label seat.
-        Dense uses a public custom link forwarding only guaranteed props; the
-        provider class keeps automatic enrollment when data attributes are
-        dropped. Root is an ordinary default Chip inside a real product root.
-        Attr demonstrates that the former reset attribute cannot opt out.
-        Intrinsic painted rows contain closure and touch the next row; no target
-        height is authored. Other controls, interactive Chips, wrappers outside
-        direct-child eligibility and portals outside the direct trailing slot
-        keep their default seat.
+        Plain, direct and wrapped static Chips share the unchanged label seat.
+        Direct uses a public custom link forwarding only guaranteed props; the
+        private provider class preserves enrollment. Neutral wrappers, legacy
+        density classes and the former reset attribute cannot opt out. A real
+        cross-tier product root restores its target-tier default. Nested and
+        same-node providers inside the outer trailing slot establish target-tier
+        density again after a real root reset. Intrinsic painted rows contain
+        closure and touch the next row; no target height is authored. Other
+        controls, interactive Chips and portals outside the trailing slot keep
+        their default seat.
       </p>
     </section>
   );
