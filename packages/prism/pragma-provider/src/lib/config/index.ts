@@ -14,12 +14,14 @@ export {
   PREFIX_DECL,
   REF_NAME,
   REF_PACKAGES,
+  REF_SCOPE,
   SEM_PACKAGES,
   TTL_DIRS,
 } from "./constants.js";
 export type {
   PragmaProvider,
   PragmaProviderOptions,
+  RefRoot,
   SourceRoots,
   TtlSource,
 } from "./types.js";

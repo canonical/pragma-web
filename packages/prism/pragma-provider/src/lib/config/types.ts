@@ -1,45 +1,69 @@
+/**
+ * The types the config domain shares with the rest of the package.
+ *
+ * @module config/types
+ */
+
 import type { SchemaPluginApi } from "@canonical/ke-graphql";
 
-/** One Turtle source: its store-visible label and its (escaped) content. */
+/** One Turtle source, keyed by the path the store reports it under. */
 export interface TtlSource {
+  /** Store-visible path: `<package>/<relative path>`, forward slashes. */
   readonly path: string;
+  /** The Turtle text, with channel-dotted references already escaped. */
   readonly content: string;
 }
 
-/** The two filesystem roots the collector walks. */
-export interface SourceRoots {
-  /** The pragma CLI's refs cache — `<root>/<pkg>/<ref>/{definitions,data}`. */
-  readonly refsRoot: string;
-  /** The semantics working tree — `<root>/<pkg>/{definitions,data}`. Skipped when absent. */
-  readonly semRoot: string;
+/**
+ * One source package resolved to a directory on disk.
+ *
+ * `dir` is the directory whose `definitions/` and `data/` subdirectories
+ * hold the package's Turtle. Where it comes from is the resolver's business
+ * (an installed npm package, or a `<package>/main` entry in the pragma CLI's
+ * refs cache); the collector only walks it.
+ */
+export interface RefRoot {
+  /** The unscoped package name, which is also the store-visible path prefix. */
+  readonly package: string;
+  /** The directory holding `definitions/` and `data/`. */
+  readonly dir: string;
+  /** The package version, when the directory carries a `package.json`. */
+  readonly version?: string;
 }
 
-export interface PragmaProviderOptions {
-  /** Refs cache root. Default: `$PRAGMA_REFS_DIR`, else {@link DEFAULT_REFS_ROOT}. */
-  readonly refsRoot?: string;
-  /** Semantics working tree. Default: `$PRAGMA_SEM_DIR`, else {@link DEFAULT_SEM_ROOT}. Skipped when absent. */
-  readonly semRoot?: string;
+/** The roots `collectTtlSources` walks. */
+export interface SourceRoots {
+  /** The ref packages, each resolved to a directory. */
+  readonly refRoots: readonly RefRoot[];
   /**
-   * Where to write the emitted SDL. ABSENT MEANS NO WRITE.
-   *
-   * The path belongs to the CONSUMER; this package never derives one. See
-   * `createPragmaProvider.ts`'s header for why this is optional rather than
-   * required, and why it has no default.
+   * The semantics working tree, or `null` to skip it deliberately. A string
+   * that names a missing directory is announced as a miss; `null` is not.
    */
+  readonly semRoot: string | null;
+}
+
+/** Options for {@link createPragmaProvider}. */
+export interface PragmaProviderOptions {
+  /**
+   * A pragma refs cache (`<root>/<package>/main/{definitions,data}`) to read
+   * the ref packages from instead of the installed npm packages. Default:
+   * `$PRAGMA_REFS_DIR` when set, else the packages installed next to this one.
+   */
+  readonly refsRoot?: string;
+  /**
+   * The semantics working tree. Default: `$PRAGMA_SEM_DIR`, else the sibling
+   * checkout. Pass `null` to compile the ref packages alone, whatever the
+   * machine has — the schema the docsite commits is generated that way.
+   */
+  readonly semRoot?: string | null;
+  /** Where to write the emitted SDL. Absent means no write. */
   readonly sdlOutput?: string;
 }
 
-/**
- * The booted provider: a fetch-native handler plus the compiled schema's API.
- *
- * There is no in-process `execute` member. One existed in the app's former
- * `graphql.ts` so the SSR prepare step could skip the HTTP hop, and it was the
- * reason a pre-parsed AST from the app's graphql v16 had to be kept away from
- * ke-graphql's v17 executor. The prepare step now POSTs over HTTP like any
- * other client, so the two graphql versions no longer share a process at all
- * and the whole text-only-boundary discipline is moot.
- */
+/** What {@link createPragmaProvider} resolves to. */
 export interface PragmaProvider {
+  /** The fetch-native GraphQL handler. */
   readonly handle: (request: Request) => Promise<Response>;
+  /** The compiled schema and its diagnostics, as ke-graphql registers them. */
   readonly api: SchemaPluginApi;
 }

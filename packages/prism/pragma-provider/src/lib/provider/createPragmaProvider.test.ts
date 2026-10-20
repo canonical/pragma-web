@@ -54,7 +54,11 @@ import {
   MISSING_ROOT,
 } from "../../testing/corpus.js";
 import { ANATOMY_URI, CUSTOM_MAPPINGS } from "../config/index.js";
-import { collectTtlSources, harvestPrefixes } from "../sources/index.js";
+import {
+  cacheRefRoots,
+  collectTtlSources,
+  harvestPrefixes,
+} from "../sources/index.js";
 import { createPragmaProvider } from "./createPragmaProvider.js";
 
 /** One boot, shared: Oxigraph is a WASM store and booting it is not free. */
@@ -185,7 +189,7 @@ describe("the pinned compiler options", () => {
     // sources, same prefixes, same `mode`/`prefixing`/`incremental`. The only
     // difference is the mapping.
     const sources = collectTtlSources({
-      refsRoot: CORPUS_REFS_ROOT,
+      refRoots: cacheRefRoots(CORPUS_REFS_ROOT),
       semRoot: CORPUS_SEM_ROOT,
     });
     const unmapped = createSchemaPlugin({
@@ -256,6 +260,28 @@ describe("sdlOutput", () => {
     expect(written).toContain("type Component");
     expect(written).toContain("anatomyUri: String");
     rmSync(dirname(destination), { recursive: true, force: true });
+  });
+});
+
+describe("createPragmaProvider with the semantics root left to the environment", () => {
+  it("reads PRAGMA_SEM_DIR when no semRoot option is given", async () => {
+    vi.stubEnv("PRAGMA_SEM_DIR", CORPUS_SEM_ROOT);
+    const { api } = await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
+    vi.unstubAllEnvs();
+    // `Job` comes only from the semantics tree, so its presence proves the
+    // environment's root was walked rather than skipped.
+    expect(api.sdl).toContain("type Job");
+  });
+
+  it("skips the semantics tree when semRoot is null, whatever the environment says", async () => {
+    vi.stubEnv("PRAGMA_SEM_DIR", CORPUS_SEM_ROOT);
+    const { api } = await createPragmaProvider({
+      refsRoot: CORPUS_REFS_ROOT,
+      semRoot: null,
+    });
+    vi.unstubAllEnvs();
+    expect(api.sdl).toContain("type Component");
+    expect(api.sdl).not.toContain("type Job");
   });
 });
 

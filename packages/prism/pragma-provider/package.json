@@ -45,6 +45,9 @@
     "test:vitest:watch": "vitest"
   },
   "dependencies": {
+    "@canonical/anatomy-dsl": "0.43.0",
+    "@canonical/code-standards": "0.43.0",
+    "@canonical/design-system": "0.43.0",
     "@canonical/ke": "0.43.0",
     "@canonical/ke-graphql": "0.43.0"
   },

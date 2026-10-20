@@ -23,7 +23,15 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-/** The cached source packages whose TTL constitutes the docsite graph. */
+/** The npm scope the ref packages are published under. */
+export const REF_SCOPE = "@canonical";
+
+/**
+ * The source packages whose TTL constitutes the docsite graph: published on
+ * npm under {@link REF_SCOPE}, declared as this package's dependencies at
+ * exact versions, and read from `node_modules` by default. A pragma refs
+ * cache (`PRAGMA_REFS_DIR`) can stand in for them, see `resolveRefRoots.ts`.
+ */
 export const REF_PACKAGES: readonly string[] = [
   "design-system",
   "code-standards",
@@ -70,7 +78,11 @@ export const EXCLUDED_SOURCES: readonly string[] = [
   "design-system-docs/data/shim-concept.ttl",
 ];
 
-/** The ref (branch) of each source package the provider reads. */
+/**
+ * The ref (branch) directory under each package in the pragma CLI's refs
+ * cache: `<cache>/<package>/main/{definitions,data}`. Only the cache layout
+ * has it; an installed package holds `definitions/` and `data/` at its root.
+ */
 export const REF_NAME = "main";
 
 /**
@@ -142,7 +154,14 @@ export const CUSTOM_MAPPINGS: Readonly<
  */
 export const CHANNEL_DOTTED_REF = /\b([A-Za-z][\w-]*):\.(?=[A-Za-z_])/g;
 
-/** The pragma CLI's cache location — the refs root when nothing overrides it. */
+/**
+ * The pragma CLI's cache location (`pragma sources update` populates it).
+ *
+ * It is NOT a default any more: the ref packages are read from the installed
+ * npm packages unless `PRAGMA_REFS_DIR` or the `refsRoot` option names a
+ * cache. The constant stays so the override has a documented home to point
+ * at, and so a message can name where the CLI keeps the cache.
+ */
 export const DEFAULT_REFS_ROOT: string = join(
   homedir(),
   ".cache",

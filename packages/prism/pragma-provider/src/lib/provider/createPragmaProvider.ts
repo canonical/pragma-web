@@ -77,8 +77,9 @@ import {
 } from "../config/index.js";
 import {
   collectTtlSources,
+  describeRefRoots,
   harvestPrefixes,
-  resolveRefsRoot,
+  resolveRefRoots,
   resolveSemRoot,
 } from "../sources/index.js";
 
@@ -87,6 +88,9 @@ const MODE = "annotated";
 
 /** Field-name prefixing, pinned — see this module's header. */
 const PREFIXING = "none";
+
+/** The provider identity stamped into the SDL's provenance header. */
+const PROVIDER = "@canonical/prism-pragma-provider";
 
 /**
  * Boot the store, compile the schema, and build the fetch handler.
@@ -97,9 +101,12 @@ const PREFIXING = "none";
 export const createPragmaProvider = async (
   options: PragmaProviderOptions = {},
 ): Promise<PragmaProvider> => {
+  const refRoots = resolveRefRoots(options.refsRoot);
   const sources = collectTtlSources({
-    refsRoot: options.refsRoot ?? resolveRefsRoot(),
-    semRoot: options.semRoot ?? resolveSemRoot(),
+    refRoots,
+    // `undefined` means "not given", so the environment decides; `null` is
+    // the caller saying "the ref packages alone", and is passed through.
+    semRoot: options.semRoot === undefined ? resolveSemRoot() : options.semRoot,
   });
   const prefixes = harvestPrefixes(sources);
   const graphql = createSchemaPlugin({
@@ -107,6 +114,11 @@ export const createPragmaProvider = async (
     mappings: CUSTOM_MAPPINGS,
     mode: MODE,
     prefixing: PREFIXING,
+    provider: PROVIDER,
+    // Which release of each ref package the SDL was compiled from, so a
+    // schema diff names its cause. The semantics tree is a working tree and
+    // has no version to name; its presence shows in the types instead.
+    revision: describeRefRoots(refRoots),
     sdlOutput: options.sdlOutput,
   });
   // biome-ignore lint/suspicious/noExplicitAny: the Plugin generic is invariant, so the heterogeneous plugin array needs `any` here — matching ke-graphql's own demo

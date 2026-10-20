@@ -24,7 +24,6 @@ import {
   MISSING_ROOT,
 } from "../../testing/corpus.js";
 import {
-  DEFAULT_REFS_ROOT,
   DEFAULT_SEM_ROOT,
   REF_PACKAGES,
   SEM_PACKAGES,
@@ -32,11 +31,13 @@ import {
 import {
   collectTtlSources,
   escapeChannelDottedRefs,
-  resolveRefsRoot,
   resolveSemRoot,
 } from "./collectTtlSources.js";
+import { cacheRefRoots } from "./resolveRefRoots.js";
 
-const bothRoots = { refsRoot: CORPUS_REFS_ROOT, semRoot: CORPUS_SEM_ROOT };
+/** The corpus's ref packages, in the refs-cache layout the corpus mirrors. */
+const corpusRefRoots = cacheRefRoots(CORPUS_REFS_ROOT);
+const bothRoots = { refRoots: corpusRefRoots, semRoot: CORPUS_SEM_ROOT };
 
 describe("the ordering precondition", () => {
   it("keeps REF_PACKAGES and SEM_PACKAGES disjoint", () => {
@@ -115,7 +116,7 @@ describe("collectTtlSources over both roots", () => {
 
 describe("collectTtlSources without the semantics tree", () => {
   const paths = collectTtlSources({
-    refsRoot: CORPUS_REFS_ROOT,
+    refRoots: corpusRefRoots,
     semRoot: MISSING_ROOT,
   }).map((source) => source.path);
 
@@ -142,7 +143,7 @@ describe("collectTtlSources with a semantics tree that is there but wrong", () =
   // otherwise report a healthy compile of a half-empty schema.
   const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
   const paths = collectTtlSources({
-    refsRoot: CORPUS_REFS_ROOT,
+    refRoots: corpusRefRoots,
     semRoot: CORPUS_WRONG_SEM_ROOT,
   }).map((source) => source.path);
   const warnings = warn.mock.calls.map((call) => String(call[0]));
@@ -169,20 +170,40 @@ describe("collectTtlSources with a semantics tree that is there but wrong", () =
   });
 });
 
-describe("collectTtlSources when the cache is unusable", () => {
-  it("throws an actionable message when the refs root is missing", () => {
-    expect(() =>
-      collectTtlSources({ refsRoot: MISSING_ROOT, semRoot: CORPUS_SEM_ROOT }),
-    ).toThrow(/pragma refs cache not found at .*— run `pragma sources update`/);
+describe("collectTtlSources with the semantics tree skipped on purpose", () => {
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  const paths = collectTtlSources({
+    refRoots: corpusRefRoots,
+    semRoot: null,
+  }).map((source) => source.path);
+  const warnings = warn.mock.calls.map((call) => String(call[0]));
+  warn.mockRestore();
+
+  it("collects the first root only", () => {
+    expect(paths).toStrictEqual([
+      "anatomy-dsl/definitions/anatomy.ttl",
+      "design-system/data/instances.ttl",
+      "design-system/data/tokens/colors.ttl",
+      "design-system/definitions/ontology.ttl",
+    ]);
   });
 
-  it("throws a DIFFERENT message when the refs root is present but empty", () => {
-    // Distinguishable on purpose: "not there" and "there but you have not run
-    // the update" are different mistakes with the same remedy, and a single
-    // message would send someone looking for a directory that exists.
+  it("announces nothing: an explicit null is not a missing tree", () => {
+    // The docsite's schema generator asks for exactly this on every machine,
+    // and a warning on every run would train everyone to ignore the one that
+    // matters.
+    expect(warnings).toEqual([]);
+  });
+});
+
+describe("collectTtlSources when the roots hold nothing", () => {
+  it("throws an actionable message when no root contributes a source", () => {
+    // The cache root exists and is empty: "there but you have not run the
+    // update". The missing-root case is the resolver's to report, in
+    // `resolveRefRoots.test.ts`, before the collector is ever reached.
     expect(() =>
       collectTtlSources({
-        refsRoot: CORPUS_EMPTY_REFS_ROOT,
+        refRoots: cacheRefRoots(CORPUS_EMPTY_REFS_ROOT),
         semRoot: CORPUS_SEM_ROOT,
       }),
     ).toThrow(/no \.ttl sources found under /);
@@ -228,19 +249,7 @@ describe("escapeChannelDottedRefs", () => {
   });
 });
 
-describe("root resolution", () => {
-  it("prefers PRAGMA_REFS_DIR over the cache default", () => {
-    vi.stubEnv("PRAGMA_REFS_DIR", CORPUS_REFS_ROOT);
-    expect(resolveRefsRoot()).toBe(CORPUS_REFS_ROOT);
-    vi.unstubAllEnvs();
-  });
-
-  it("falls back to the pragma CLI's cache location", () => {
-    vi.stubEnv("PRAGMA_REFS_DIR", undefined);
-    expect(resolveRefsRoot()).toBe(DEFAULT_REFS_ROOT);
-    vi.unstubAllEnvs();
-  });
-
+describe("semantics root resolution", () => {
   it("prefers PRAGMA_SEM_DIR over the working-tree default", () => {
     vi.stubEnv("PRAGMA_SEM_DIR", CORPUS_SEM_ROOT);
     expect(resolveSemRoot()).toBe(CORPUS_SEM_ROOT);
