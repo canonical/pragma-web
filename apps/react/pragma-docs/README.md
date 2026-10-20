@@ -49,9 +49,10 @@ server to compete with.
 bun run storybook    # component workshop
 ```
 
-Relay's compiler artifacts are committed, not rebuilt on the fly:
+The Relay schema and the compiler artifacts are committed, not rebuilt on the fly:
 
 ```bash
+bun run schema         # regenerate src/relay/schema.graphql from the provider's ref packages
 bun run relay          # regenerate src/relay/__generated__ after schema/query edits
 bun run relay:watch    # the same, re-running on change — pair with dev:*
 ```
@@ -148,6 +149,17 @@ for the source layout it expects. This is a prerequisite of *that provider*,
 not of this app: any provider implementing `@canonical/prism-contract` can take
 its place — `@canonical/prism-graph-example` is a second one, written by
 hand without the compiler — and set `VITE_GRAPHQL_URL`.
+
+**The schema is generated, and gated.** `src/relay/schema.graphql` is what
+relay-compiler validates every operation against. `bun run schema`
+(`src/server/schema.ts`) writes it from two halves: the SDL the pragma provider
+emits over the ref packages it declares as dependencies, at the exact versions
+in its `package.json` and with no semantics tree, plus the authored extensions
+under `src/relay/extensions/` (today the journeys add-on's types, which have no
+published source yet). `bun run check` runs `schema:check`, which regenerates
+and fails on a diff, so a schema change is always a visible diff with a cause:
+a bumped ref package, a changed extension, or a changed compiler. The graph
+server never writes this file; what it serves may be a superset of it.
 
 **Generated artifacts are committed.** The Vite plugin runs with
 `codegen: false`, so `src/relay/__generated__/` is not rebuilt on the fly:

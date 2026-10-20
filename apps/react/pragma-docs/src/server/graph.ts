@@ -40,23 +40,8 @@
  * A consumer that has been misconfigured to point at the web server (or vice
  * versa) then fails on content type instead of silently parsing a page.
  */
-import { fileURLToPath } from "node:url";
 import { createPragmaProvider } from "@canonical/prism-pragma-provider";
 import { DEFAULT_GRAPHQL_URL } from "#graphql-endpoint";
-
-/**
- * The emitted SDL destination — the file relay-compiler reads.
- *
- * It lives HERE, not in the provider package: the path belongs to THIS app's
- * source tree, and a provider that derived it from its own `import.meta.url`
- * would resolve it inside the package (or inside `node_modules`) with no type
- * error, no lint error and no test failure — only a boot would reveal it, and
- * a boot needs a populated refs cache. So `sdlOutput` is an argument with no
- * default: the provider takes a path or it writes nothing at all.
- */
-const SDL_OUTPUT_PATH = fileURLToPath(
-  new URL("../relay/schema.graphql", import.meta.url),
-);
 
 /** The listen port: `GRAPH_PORT`, else the one port literal in the app. */
 const PORT =
@@ -80,9 +65,15 @@ const HOSTNAME = new URL(DEFAULT_GRAPHQL_URL).hostname;
 // line in sync with GRAPHQL_HIT_MARKER in test/e2e/servers.e2e.ts.
 let hits = 0;
 
-const backend = await createPragmaProvider({
-  sdlOutput: SDL_OUTPUT_PATH,
-}).catch((error: unknown): never => {
+// No `sdlOutput`: this boot WRITES NOTHING. `src/relay/schema.graphql` is
+// produced by `bun run schema` (`src/server/schema.ts`) from the ref packages
+// alone, and gated by `schema:check`. A server that rewrote it on every boot,
+// from whatever this machine has cached or checked out, is exactly the
+// unstated input that gate exists to remove. The boot may still see MORE
+// than the committed schema — a semantics tree next door adds the journeys
+// types — and that is fine at runtime: the served schema is a superset of
+// the compiled one.
+const backend = await createPragmaProvider().catch((error: unknown): never => {
   console.error(
     "[graph] the GraphQL backend failed to boot:",
     error instanceof Error ? error.message : error,
