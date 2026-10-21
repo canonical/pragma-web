@@ -1,4 +1,5 @@
 import type { ComponentProps, MouseEvent } from "react";
+import type { MessageKey } from "../i18n/index.js";
 import type { BOXES, CHANNELS, KINDS, LIFECYCLES } from "./constants.js";
 
 /** Entity families (the shape channel's vocabulary). */
@@ -13,16 +14,22 @@ export type Lifecycle = (typeof LIFECYCLES)[number];
 /** The four channels, in the order the legend presents them. */
 export type Channel = (typeof CHANNELS)[number];
 
-/** Fields every encoding row shares; `label`/`description` feed the legend. */
+/**
+ * Fields every encoding row shares; the legend reads its copy through the
+ * catalog keys `labelKey` and `descriptionKey`.
+ */
 export interface EncodingRow<Value extends string> {
   readonly value: Value;
-  readonly label: string;
-  readonly description: string;
+  readonly labelKey: MessageKey;
+  readonly descriptionKey: MessageKey;
 }
 
-/** Shape channel row: a named shape and its `border-radius` payload. */
+/**
+ * Shape channel row: the catalog key of the shape's name and its
+ * `border-radius` payload.
+ */
 export interface KindEncoding extends EncodingRow<Kind> {
-  readonly shape: string;
+  readonly shapeKey: MessageKey;
   readonly radius: string;
 }
 

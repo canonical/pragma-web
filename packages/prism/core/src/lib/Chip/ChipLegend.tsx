@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { t } from "../i18n/index.js";
 import Chip from "./Chip.js";
 import {
   BOX_ENCODINGS,
@@ -43,29 +44,32 @@ function listEntriesForChannel(
     case "namespace":
       return prefixes.map((prefix) => ({
         key: prefix,
-        label: `${prefix}:`,
-        description: `Entities whose URI starts with ${prefix}:`,
+        label: t("chip.legend.namespace.label", { prefix }),
+        description: t("chip.legend.namespace.description", { prefix }),
         channels: { ...baseline, namespace: prefix },
       }));
     case "box":
       return BOX_ENCODINGS.map((row) => ({
         key: row.value,
-        label: row.label,
-        description: row.description,
+        label: t(row.labelKey),
+        description: t(row.descriptionKey),
         channels: { ...baseline, box: row.value },
       }));
     case "kind":
       return KIND_ENCODINGS.map((row) => ({
         key: row.value,
-        label: `${row.label} (${row.shape})`,
-        description: row.description,
+        label: t("chip.legend.kind.label", {
+          label: t(row.labelKey),
+          shape: t(row.shapeKey),
+        }),
+        description: t(row.descriptionKey),
         channels: { ...baseline, kind: row.value },
       }));
     case "lifecycle":
       return LIFECYCLE_ENCODINGS.map((row) => ({
         key: row.value,
-        label: row.label,
-        description: row.description,
+        label: t(row.labelKey),
+        description: t(row.descriptionKey),
         channels: { ...baseline, lifecycle: row.value },
       }));
     /* v8 ignore start -- exhaustive switch: every Channel member is handled above, so this arm is unreachable */
@@ -98,9 +102,9 @@ const ChipLegend = ({
     className={[LEGEND_CSS_CLASS_NAME, className].filter(Boolean).join(" ")}
   >
     {CHANNEL_DESCRIPTORS.map((channel) => (
-      <section aria-label={channel.label} key={channel.value}>
-        <p className="title">{channel.label}</p>
-        <p className="summary">{channel.description}</p>
+      <section aria-label={t(channel.labelKey)} key={channel.value}>
+        <p className="title">{t(channel.labelKey)}</p>
+        <p className="summary">{t(channel.descriptionKey)}</p>
         <ul className="entries">
           {listEntriesForChannel(channel.value, prefixes).map((entry) => (
             <li key={entry.key}>

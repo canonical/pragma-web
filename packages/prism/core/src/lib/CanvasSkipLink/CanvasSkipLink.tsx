@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { CANVAS_ELEMENT_ID } from "../Canvas/index.js";
+import { t } from "../i18n/index.js";
 import type { CanvasSkipLinkProps } from "./types.js";
 import "./styles.css";
 
@@ -22,7 +23,7 @@ export default function CanvasSkipLink({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       href={`#${CANVAS_ELEMENT_ID}`}
     >
-      Skip to content
+      {t("canvasSkipLink.label")}
     </a>
   );
 }

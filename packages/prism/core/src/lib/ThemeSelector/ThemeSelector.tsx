@@ -1,5 +1,6 @@
 import { usePreferredTheme } from "@canonical/react-hooks";
 import type { ChangeEvent, ReactElement } from "react";
+import { t } from "../i18n/index.js";
 import type { ThemeSelectorProps } from "./types.js";
 
 const componentCssClassName = "ds theme-selector";
@@ -19,7 +20,7 @@ const componentCssClassName = "ds theme-selector";
  * `import { ThemeSelector } from "@canonical/prism-core";`
  */
 export default function ThemeSelector({
-  "aria-label": ariaLabel = "Color theme",
+  "aria-label": ariaLabel = t("themeSelector.label"),
   className,
   ...props
 }: ThemeSelectorProps): ReactElement {
@@ -45,9 +46,9 @@ export default function ThemeSelector({
       onChange={handleChange}
       value={selectValue}
     >
-      <option value="system">System</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
+      <option value="system">{t("themeSelector.system")}</option>
+      <option value="light">{t("themeSelector.light")}</option>
+      <option value="dark">{t("themeSelector.dark")}</option>
     </select>
   );
 }

@@ -1,6 +1,7 @@
 import type { RouteMap } from "@canonical/router-core";
 import { Link } from "@canonical/router-react";
 import type React from "react";
+import { t } from "../i18n/index.js";
 import { useLensShortcuts } from "./hooks/useLensShortcuts.js";
 import type { RailProps } from "./types.js";
 import "./styles.css";
@@ -33,6 +34,9 @@ const componentCssClassName = "ds rail";
  * control such as `ThemeSelector`. In the collapsed rail the heading and
  * the labels hide visually and stay in the accessibility tree.
  *
+ * The rail's accessible name defaults to "Primary"; an `aria-label`
+ * replaces it.
+ *
  * The links are typed `Link<RouteMap, string>`: an entry's route name is a
  * plain string, and every entry is a parameterless index route because
  * `collectLenses` throws on one that takes params.
@@ -43,6 +47,7 @@ const Rail = ({
   entries,
   brand,
   children,
+  "aria-label": ariaLabel = t("rail.label"),
   className,
   ...props
 }: RailProps): React.ReactElement => {
@@ -52,7 +57,7 @@ const Rail = ({
   return (
     <nav
       {...props}
-      aria-label="Primary"
+      aria-label={ariaLabel}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-region="primary-nav"
     >

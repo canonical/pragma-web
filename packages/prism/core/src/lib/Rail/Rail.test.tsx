@@ -60,6 +60,24 @@ describe("Rail", () => {
     expect(labels).toEqual(["Home", "Catalog", "Glossary"]);
   });
 
+  it("takes a consumer aria-label in place of its default name", () => {
+    const router = createRouter(LENS_ROUTES, {
+      adapter: createMemoryAdapter("/"),
+    });
+    render(
+      <RouterProvider router={router}>
+        <Rail
+          aria-label="Principal"
+          brand={brand}
+          entries={collectLenses(LENS_ROUTES)}
+        />
+      </RouterProvider>,
+    );
+    expect(
+      screen.getByRole("navigation", { name: "Principal" }),
+    ).toBeInTheDocument();
+  });
+
   it("shows each lens's keyboard hint as kbd and aria-keyshortcuts", () => {
     renderRail();
     // Sourced from the ROUTES' allocation, not from a literal here: the

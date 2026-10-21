@@ -1,4 +1,5 @@
 import type { CSSProperties, MouseEvent, ReactElement } from "react";
+import { t } from "../i18n/index.js";
 import {
   CHIP_CSS_CLASS_NAME,
   DEFAULT_BOX,
@@ -59,7 +60,7 @@ const Chip = (props: ChipProps): ReactElement => {
       ? undefined
       : lifecycle === "none"
         ? summary
-        : `${summary} (${lifecycle})`;
+        : t("chip.summaryWithLifecycle", { summary, lifecycle });
   const sharedProps = {
     className: [CHIP_CSS_CLASS_NAME, className].filter(Boolean).join(" "),
     // The channel payloads; typed as ChipChannelStyle, cast for React's

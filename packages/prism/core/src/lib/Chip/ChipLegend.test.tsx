@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { PREFIXES } from "../../../testing/fixtures.js";
+import { t } from "../i18n/index.js";
 import ChipLegend from "./ChipLegend.js";
 import {
   BOX_ENCODINGS,
@@ -13,8 +14,8 @@ describe("ChipLegend", () => {
   it("renders one group per channel, titled from the descriptors", () => {
     render(<ChipLegend prefixes={PREFIXES} />);
     for (const channel of CHANNEL_DESCRIPTORS) {
-      expect(screen.getByText(channel.label)).toBeInTheDocument();
-      expect(screen.getByText(channel.description)).toBeInTheDocument();
+      expect(screen.getByText(t(channel.labelKey))).toBeInTheDocument();
+      expect(screen.getByText(t(channel.descriptionKey))).toBeInTheDocument();
     }
   });
 
@@ -32,16 +33,20 @@ describe("ChipLegend", () => {
   it("generates every other entry from the encoding rows", () => {
     render(<ChipLegend prefixes={PREFIXES} />);
     for (const row of BOX_ENCODINGS) {
-      expect(screen.getByText(row.label)).toBeInTheDocument();
+      expect(screen.getByText(t(row.labelKey))).toBeInTheDocument();
     }
     for (const row of KIND_ENCODINGS) {
       expect(
-        screen.getByText(`${row.label} (${row.shape})`),
+        screen.getByText(`${t(row.labelKey)} (${t(row.shapeKey)})`),
       ).toBeInTheDocument();
     }
     for (const row of LIFECYCLE_ENCODINGS) {
-      expect(screen.getByText(row.label)).toBeInTheDocument();
+      expect(screen.getByText(t(row.labelKey))).toBeInTheDocument();
     }
+    expect(screen.getByText("Component (rounded)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Entities whose URI starts with cs:"),
+    ).toBeInTheDocument();
   });
 
   it("renders every swatch as a real chip through the shared pipeline", () => {

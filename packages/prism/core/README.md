@@ -227,6 +227,18 @@ binding can derive names from it. Check the bindings in two places:
   graph for every binding's class and throws when the graph does not know
   one.
 
+## Strings
+
+Every string the components show a reader (the skip link, the rail's and
+the theme control's names and options, the chip legend's copy, the lifecycle
+folded into a chip's description) comes from one English catalog,
+`src/lib/i18n/constants.ts`, read through the package's `t(key, values)`.
+The catalog has the flat key-to-message shape, with `{name}` placeholders,
+that `@canonical/i18n-core` catalogs take, and `t` is the one seam a
+locale-aware layer replaces: no component holds a literal. Until then,
+`Rail` and `ThemeSelector` take an `aria-label` that replaces their default
+name.
+
 ## Consumer obligations
 
 - Mount `HomesProvider` above routed content.
