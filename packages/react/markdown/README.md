@@ -1,0 +1,125 @@
+# @canonical/react-markdown
+
+Renders Markdown through design-system elements. A document is parsed as
+GitHub-flavoured Markdown, with GitHub-style admonitions, and each HTML
+element it produces is rendered by the component the components map names for
+its tag: inline code as `InlineCode`, admonitions as `Announcement`, fenced
+code and tables with the design system's styles.
+
+Rendering is synchronous, so a server render and a client render produce the
+same markup. The package knows nothing about routing: a router-aware link is
+the consumer's `a` entry in the components map.
+
+## Installation
+
+```bash
+bun add @canonical/react-markdown
+```
+
+Requires React 19. The default components import their own CSS, as every
+design-system component does, so the package is consumed through a bundler
+(Vite, for instance). For server rendering, bundle `@canonical/*` packages
+rather than leaving them external, so the CSS imports are handled.
+
+## Quick start
+
+```tsx
+import { Markdown } from "@canonical/react-markdown";
+
+export default function ReleaseNotes({ notes }: { notes: string }) {
+  return (
+    <article>
+      <Markdown source={notes} />
+    </article>
+  );
+}
+```
+
+`Markdown` renders the document's elements as a fragment, with no wrapper of
+its own: put it inside whatever element the page needs.
+
+## Components
+
+`components` maps a tag name to the component that renders it, or to another
+tag name to render in its place. It defaults to `defaultComponents`.
+
+A map you pass **replaces** the defaults; it is never merged with them. To keep
+the design-system elements and change one of them, spread them:
+
+```tsx
+import { defaultComponents, Markdown } from "@canonical/react-markdown";
+
+const components = { ...defaultComponents, a: RouterLink };
+
+<Markdown source={source} components={components} />;
+```
+
+To render a heading level as another, name the tag:
+
+```tsx
+// Comments are shown inside a page, so their headings must not outrank it.
+const commentComponents = { h1: "h3", h2: "h3" } as const;
+```
+
+An override receives the native props of the element it replaces, plus
+`node`, the syntax-tree element being rendered. `node` is not an HTML
+attribute: take it out of the props you spread onto an element, or React writes
+`node="[object Object]"` into the markup.
+
+```tsx
+import type { ComponentProps } from "react";
+
+function RouterLink({ node, ...props }: ComponentProps<"a"> & { node?: unknown }) {
+  return <Link {...props} />;
+}
+```
+
+Declare the map at module scope, so it is the same object on every render.
+
+## Sanitising
+
+`sanitize` defaults to `true`: the rendered HTML is filtered against a
+GitHub-like allow-list, which removes scripts, event-handler attributes,
+`style`, and links with unsafe protocols. Admonition markers survive it.
+
+Raw HTML in the source never becomes live markup, whatever `sanitize` says.
+Sanitised, it is removed; with `sanitize={false}`, it is shown as literal text.
+Turn sanitising off only for trusted documents whose generated attributes must
+all survive.
+
+## Admonitions
+
+A blockquote whose first line is exactly one of the five GitHub markers
+becomes an admonition. The marker is case-insensitive, and must be alone on its
+line:
+
+```md
+> [!WARNING]
+> Back up your data first.
+```
+
+| Marker           | Rendered as                                 |
+|------------------|---------------------------------------------|
+| `[!NOTE]`        | `Announcement`, `information`, "Note"       |
+| `[!TIP]`         | `Announcement`, `success`, "Tip"            |
+| `[!IMPORTANT]`   | `Announcement`, `information`, "Important"  |
+| `[!WARNING]`     | `Announcement`, `warning`, "Warning"        |
+| `[!CAUTION]`     | `Announcement`, `error`, "Caution"          |
+
+The headings are English. To translate them, override `blockquote`: the
+blockquote of an admonition carries its kind as `data-admonition`.
+
+## Presets
+
+`remarkPreset` and `rehypePreset` are the unified plugin lists `Markdown`
+runs: GitHub-flavoured Markdown and admonitions on the Markdown side, heading
+ids on the HTML side. Use them to build your own unified pipeline that agrees
+with `Markdown` on what a document means.
+
+## Public API
+
+- `Markdown` — render a Markdown `source` through a components map.
+- `defaultComponents` — the design-system elements `Markdown` uses by default.
+- `remarkPreset`, `rehypePreset` — the unified plugins every renderer runs.
+- `MarkdownProps` — the props of `Markdown`.
+- `MarkdownComponents` — the shape of a components map.
