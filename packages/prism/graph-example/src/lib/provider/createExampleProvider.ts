@@ -503,11 +503,11 @@ export const createExampleProvider = (
   );
 
   /**
-   * The entities a text links to, resolved exactly as `node(id:)` resolves
-   * an IRI, as one page holding every edge. A reference nothing answers to
-   * is dropped.
+   * Build the page of entities a text links to, each resolved exactly as
+   * `node(id:)` resolves an IRI, with every edge on the one page. A
+   * reference nothing answers to is dropped.
    */
-  const referencesView = (iris: readonly string[]): View => {
+  const buildReferencesView = (iris: readonly string[]): View => {
     const edges = iris.flatMap((iri) => {
       const node = viewByUri.get(iri) ?? nullableClassView(iri);
       return node === null ? [] : [{ node, cursor: toCursor(iri) }];
@@ -524,10 +524,10 @@ export const createExampleProvider = (
   };
 
   /**
-   * The `Prose` view. The context is read with `?.` because graphql-js hands
-   * resolvers whatever context its caller passed, including none.
+   * Build the `Prose` view. The context is read with `?.` because graphql-js
+   * hands resolvers whatever context its caller passed, including none.
    */
-  const proseView = (prose: ProseRecord): View => ({
+  const buildProseView = (prose: ProseRecord): View => ({
     markdown: (args: MarkdownArgs, context?: ExampleContext) =>
       prose.texts[
         selectProseLanguage(prose.texts, [
@@ -538,7 +538,7 @@ export const createExampleProvider = (
     lang: (_args: unknown, context?: ExampleContext) =>
       selectProseLanguage(prose.texts, [context?.locale]),
     availableLanguages: prose.availableLanguages,
-    references: () => referencesView(prose.references),
+    references: () => buildReferencesView(prose.references),
   });
 
   /**
@@ -580,7 +580,7 @@ export const createExampleProvider = (
     },
     prose: (args: { uri: string }) => {
       const prose = proseByUri.get(args.uri);
-      return prose === undefined ? null : proseView(prose);
+      return prose === undefined ? null : buildProseView(prose);
     },
   };
 
