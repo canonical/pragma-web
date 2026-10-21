@@ -5,6 +5,6 @@
  * @module
  */
 
-export { collectFacet } from "./collectFacet.js";
-export { defineFacet } from "./defineFacet.js";
+export { default as collectFacet } from "./collectFacet.js";
+export { default as defineFacet } from "./defineFacet.js";
 export type { FacetBearer, RouteFacet, RouteMeta } from "./types.js";

@@ -2,7 +2,7 @@ import type { RouteMap } from "@canonical/router-core";
 import { Link } from "@canonical/router-react";
 import type React from "react";
 import { useMessages } from "../i18n/index.js";
-import { useLensShortcuts } from "./hooks/useLensShortcuts.js";
+import useLensShortcuts from "./hooks/useLensShortcuts.js";
 import type { RailProps } from "./types.js";
 import "./styles.css";
 

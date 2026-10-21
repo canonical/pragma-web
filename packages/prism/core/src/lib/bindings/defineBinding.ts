@@ -23,9 +23,9 @@ const assertField = (value: unknown, field: string): void => {
  * @throws When a field is empty or not a string, or the id is not lower
  *   camel case.
  */
-export const defineBinding = <const TId extends string>(
+export default function defineBinding<const TId extends string>(
   binding: EntityBinding<TId>,
-): EntityBinding<TId> => {
+): EntityBinding<TId> {
   assertField(binding.id, "id");
   assertField(binding.classUri, "classUri");
   assertField(binding.typename, "typename");
@@ -35,4 +35,4 @@ export const defineBinding = <const TId extends string>(
     );
   }
   return binding;
-};
+}

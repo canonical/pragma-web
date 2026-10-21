@@ -8,7 +8,7 @@ import { RouterProvider } from "@canonical/router-react";
 import { render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import { makeLensContext } from "./makeLensContext.js";
+import makeLensContext from "./makeLensContext.js";
 import type { LensContextProps } from "./types.js";
 
 const Blank = (): null => null;

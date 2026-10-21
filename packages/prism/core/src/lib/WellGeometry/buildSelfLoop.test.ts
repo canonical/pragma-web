@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSelfLoop } from "./buildSelfLoop.js";
+import buildSelfLoop from "./buildSelfLoop.js";
 
 describe("buildSelfLoop", () => {
   it("loops off the box's east side, labelled beyond the loop", () => {

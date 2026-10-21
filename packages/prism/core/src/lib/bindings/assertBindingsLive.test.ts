@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { assertBindingsLive } from "./assertBindingsLive.js";
+import assertBindingsLive from "./assertBindingsLive.js";
 import { BINDING_PROBE_QUERY } from "./constants.js";
 import type { GraphQLExecute } from "./types.js";
 

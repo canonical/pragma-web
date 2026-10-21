@@ -1,7 +1,7 @@
 import { route } from "@canonical/router-core";
 import { describe, expect, it } from "vitest";
-import { collectFacet } from "./collectFacet.js";
-import { defineFacet } from "./defineFacet.js";
+import collectFacet from "./collectFacet.js";
+import defineFacet from "./defineFacet.js";
 
 const badgeFacet = defineFacet<string, "badge">("badge", (value, key) => {
   if (typeof value !== "string") {

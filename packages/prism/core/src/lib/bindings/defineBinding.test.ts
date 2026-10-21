@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defineBinding } from "./defineBinding.js";
+import defineBinding from "./defineBinding.js";
 import type { EntityBinding } from "./types.js";
 
 const station = {

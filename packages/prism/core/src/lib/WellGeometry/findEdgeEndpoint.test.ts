@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findEdgeEndpoint } from "./findEdgeEndpoint.js";
+import findEdgeEndpoint from "./findEdgeEndpoint.js";
 import type { WellBox } from "./types.js";
 
 const box: WellBox = { x: 100, y: 100, width: 40, height: 20 };

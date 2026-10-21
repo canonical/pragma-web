@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { relaxBoxes } from "./relaxBoxes.js";
+import relaxBoxes from "./relaxBoxes.js";
 import type { WellBox } from "./types.js";
 
 /** A 20 × 20 box centred at (`x`, `y`). */

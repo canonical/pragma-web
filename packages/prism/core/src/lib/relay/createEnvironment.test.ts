@@ -20,7 +20,7 @@ import {
   PING_QUERY,
   PING_RESPONSE,
 } from "../../../testing/fixtures.js";
-import { createEnvironment } from "./createEnvironment.js";
+import createEnvironment from "./createEnvironment.js";
 import type { CreateEnvironmentOptions } from "./types.js";
 
 const buildJsonResponse = (payload: unknown): Response =>

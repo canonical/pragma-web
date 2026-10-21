@@ -34,13 +34,13 @@ import type { LensContextProps } from "./types.js";
  *   naming the current entity.
  * @returns The `Context` component for the lens's strip.
  */
-export const makeLensContext = ({
+export default function makeLensContext({
   lensRouteName,
   paramKey,
 }: {
   readonly lensRouteName: string;
   readonly paramKey?: string;
-}): ((props: LensContextProps) => React.ReactElement) => {
+}): (props: LensContextProps) => React.ReactElement {
   const LensContext = ({ lensLabel }: LensContextProps): React.ReactElement => {
     const { match } = useRouterState();
     const params: Readonly<Record<string, unknown>> =
@@ -57,4 +57,4 @@ export const makeLensContext = ({
     );
   };
   return LensContext;
-};
+}

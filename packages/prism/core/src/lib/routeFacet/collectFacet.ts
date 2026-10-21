@@ -25,13 +25,13 @@ import type { FacetBearer, RouteFacet, RouteMeta } from "./types.js";
  * @param routes - The route table to walk.
  * @returns The bearers, each with its name, route and parsed value.
  */
-export const collectFacet = <
+export default function collectFacet<
   TRoutes extends Readonly<Record<string, AnyRoute>>,
   TValue,
 >(
   facet: RouteFacet<TValue>,
   routes: TRoutes,
-): readonly FacetBearer<Extract<keyof TRoutes, string>, TValue>[] => {
+): readonly FacetBearer<Extract<keyof TRoutes, string>, TValue>[] {
   const bearers: FacetBearer<Extract<keyof TRoutes, string>, TValue>[] = [];
   for (const [name, route] of Object.entries(routes)) {
     const value = facet.read(route.meta as RouteMeta | undefined);
@@ -44,4 +44,4 @@ export const collectFacet = <
     }
   }
   return bearers;
-};
+}

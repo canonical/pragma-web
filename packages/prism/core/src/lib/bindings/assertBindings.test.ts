@@ -4,7 +4,7 @@ import {
   NODE_SDL,
   NON_OBJECT_SDL,
 } from "../../../testing/fixtures.js";
-import { assertBindings } from "./assertBindings.js";
+import assertBindings from "./assertBindings.js";
 
 const station = {
   id: "station",

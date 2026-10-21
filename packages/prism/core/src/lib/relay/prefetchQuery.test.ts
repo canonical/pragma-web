@@ -13,7 +13,7 @@ import type { FetchFunction } from "relay-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import { PING_QUERY, PING_RESPONSE } from "../../../testing/fixtures.js";
-import { createEnvironment } from "./createEnvironment.js";
+import createEnvironment from "./createEnvironment.js";
 import {
   getPrefetchEnvironment,
   setPrefetchEnvironment,

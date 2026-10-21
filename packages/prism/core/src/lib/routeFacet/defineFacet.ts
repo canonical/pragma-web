@@ -32,17 +32,19 @@ import type { RouteFacet } from "./types.js";
  * @param parse - Returns the value by identity, or throws the tenant's message.
  * @returns The facet's key, authoring side and reading side.
  */
-export const defineFacet = <TValue, const TKey extends string = string>(
+export default function defineFacet<TValue, const TKey extends string = string>(
   key: TKey,
   parse: (value: unknown, key: TKey) => TValue,
-): RouteFacet<TValue, TKey> => ({
-  key,
-  of: (value) =>
-    // A computed key over a generic widens to an index signature; the cast
-    // restores the literal key the signature already promises.
-    ({ [key]: value }) as unknown as { readonly [P in TKey]: TValue },
-  read: (meta) => {
-    const raw = meta?.[key];
-    return raw === undefined ? undefined : parse(raw, key);
-  },
-});
+): RouteFacet<TValue, TKey> {
+  return {
+    key,
+    of: (value) =>
+      // A computed key over a generic widens to an index signature; the cast
+      // restores the literal key the signature already promises.
+      ({ [key]: value }) as unknown as { readonly [P in TKey]: TValue },
+    read: (meta) => {
+      const raw = meta?.[key];
+      return raw === undefined ? undefined : parse(raw, key);
+    },
+  };
+}

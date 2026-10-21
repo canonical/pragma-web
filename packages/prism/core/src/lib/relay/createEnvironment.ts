@@ -140,11 +140,12 @@ const getDataID = (fieldValue: {
  * @returns A fresh environment with its own store.
  * @throws When neither `graphqlUrl` nor `fetchFn` is given.
  */
-export const createEnvironment = (
+export default function createEnvironment(
   options: CreateEnvironmentOptions,
-): Environment =>
-  new Environment({
+): Environment {
+  return new Environment({
     getDataID,
     network: Network.create(resolveFetchFunction(options)),
     store: new Store(RecordSource.create(options.records)),
   });
+}

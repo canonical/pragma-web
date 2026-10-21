@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createEnvironment } from "./createEnvironment.js";
+import createEnvironment from "./createEnvironment.js";
 import {
   getPrefetchEnvironment,
   setPrefetchEnvironment,

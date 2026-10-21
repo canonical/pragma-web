@@ -5,7 +5,7 @@
  * @module
  */
 
-export { collectLenses } from "./collectLenses.js";
+export { default as collectLenses } from "./collectLenses.js";
 export { ROUTE_LENS_META_KEY } from "./constants.js";
-export { routeLensFacet } from "./routeLensFacet.js";
+export { default as routeLensFacet } from "./routeLensFacet.js";
 export type { CollectedLens, LensEntry, LensTier } from "./types.js";

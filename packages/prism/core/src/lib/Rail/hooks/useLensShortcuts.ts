@@ -50,7 +50,7 @@ const isEditableTarget = (target: EventTarget | null): boolean => {
  * @note Impure: attaches a `keydown` listener to `document` while mounted,
  *   and navigates the router when a guarded key fires.
  */
-export const useLensShortcuts = (): UseLensShortcutsResult => {
+export default function useLensShortcuts(): UseLensShortcutsResult {
   const router = useRouter();
   // Keyed on the route table, a stable object reference for the router's
   // lifetime — so the walk, and the invariants it enforces, run once.
@@ -101,4 +101,4 @@ export const useLensShortcuts = (): UseLensShortcutsResult => {
   }, [navigate, allocation, shortcutsEnabled]);
 
   return allocation;
-};
+}

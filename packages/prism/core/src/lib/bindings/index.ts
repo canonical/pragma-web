@@ -5,7 +5,7 @@
  * @module
  */
 
-export { assertBindings } from "./assertBindings.js";
-export { assertBindingsLive } from "./assertBindingsLive.js";
-export { defineBinding } from "./defineBinding.js";
+export { default as assertBindings } from "./assertBindings.js";
+export { default as assertBindingsLive } from "./assertBindingsLive.js";
+export { default as defineBinding } from "./defineBinding.js";
 export type { EntityBinding, GraphQLExecute } from "./types.js";

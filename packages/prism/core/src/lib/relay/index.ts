@@ -6,7 +6,7 @@
  * @module
  */
 
-export { createEnvironment } from "./createEnvironment.js";
+export { default as createEnvironment } from "./createEnvironment.js";
 export {
   getPrefetchEnvironment,
   setPrefetchEnvironment,

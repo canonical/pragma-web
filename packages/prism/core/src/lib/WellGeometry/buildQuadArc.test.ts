@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildQuadArc } from "./buildQuadArc.js";
+import buildQuadArc from "./buildQuadArc.js";
 
 describe("buildQuadArc", () => {
   it("bows the control point off the chord and labels the apex", () => {

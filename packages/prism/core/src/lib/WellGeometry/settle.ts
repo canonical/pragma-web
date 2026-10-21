@@ -6,4 +6,6 @@
  * @param value - A coordinate, in px.
  * @returns The coordinate rounded to one decimal place.
  */
-export const settle = (value: number): number => Math.round(value * 10) / 10;
+export default function settle(value: number): number {
+  return Math.round(value * 10) / 10;
+}

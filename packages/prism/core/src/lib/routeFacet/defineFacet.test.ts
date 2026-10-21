@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defineFacet } from "./defineFacet.js";
+import defineFacet from "./defineFacet.js";
 
 /** A facet whose parser throws a message of its own — the property that a
  * boolean type guard could not have carried (see `defineFacet`). */

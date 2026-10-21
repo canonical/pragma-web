@@ -1,8 +1,8 @@
 import { route } from "@canonical/router-core";
 import { describe, expect, it } from "vitest";
 import { LENS_ROUTES } from "../../../testing/fixtures.js";
-import { collectLenses } from "./collectLenses.js";
-import { routeLensFacet } from "./routeLensFacet.js";
+import collectLenses from "./collectLenses.js";
+import routeLensFacet from "./routeLensFacet.js";
 
 const page = () => null;
 const Icon = () => null;

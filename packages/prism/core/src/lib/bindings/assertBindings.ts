@@ -38,10 +38,10 @@ const collectObjectTypes = (
  * @throws When the SDL does not parse, or a binding breaks a rule; the
  *   message names the binding.
  */
-export const assertBindings = (
+export default function assertBindings(
   sdl: string,
   bindings: readonly EntityBinding[],
-): void => {
+): void {
   const types = collectObjectTypes(parse(sdl));
   const seen = new Set<string>();
   for (const { id, typename } of bindings) {
@@ -61,4 +61,4 @@ export const assertBindings = (
       );
     }
   }
-};
+}

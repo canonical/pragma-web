@@ -1,6 +1,6 @@
 import type { AnyRoute } from "@canonical/router-core";
 import { collectFacet } from "../routeFacet/index.js";
-import { routeLensFacet } from "./routeLensFacet.js";
+import routeLensFacet from "./routeLensFacet.js";
 import type { CollectedLens } from "./types.js";
 
 /**
@@ -20,11 +20,9 @@ import type { CollectedLens } from "./types.js";
  * @throws When a route taking params declares a lens, or two lenses share
  *   an `order`.
  */
-export const collectLenses = <
+export default function collectLenses<
   TRoutes extends Readonly<Record<string, AnyRoute>>,
->(
-  routes: TRoutes,
-): readonly CollectedLens<Extract<keyof TRoutes, string>>[] => {
+>(routes: TRoutes): readonly CollectedLens<Extract<keyof TRoutes, string>>[] {
   const nameByOrder = new Map<number, string>();
   const lenses: CollectedLens<Extract<keyof TRoutes, string>>[] = [];
 
@@ -45,4 +43,4 @@ export const collectLenses = <
   }
 
   return lenses.sort((left, right) => left.order - right.order);
-};
+}

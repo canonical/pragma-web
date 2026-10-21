@@ -2,7 +2,7 @@ import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import type { Environment } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { createStaticRouter } from "../router/index.js";
-import { createEnvironment } from "./createEnvironment.js";
+import createEnvironment from "./createEnvironment.js";
 import {
   getPrefetchEnvironment,
   setPrefetchEnvironment,

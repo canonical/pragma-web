@@ -25,10 +25,10 @@ const readBox = (boxes: readonly WellBox[], index: number): WellBox => {
  * @throws When the list has a hole: every index below `length` must hold a box.
  * @note Impure: mutates the `x` and `y` of the boxes it is given.
  */
-export const relaxBoxes = (
+export default function relaxBoxes(
   boxes: WellBox[],
   { gap, iterations, pinned }: RelaxOptions,
-): void => {
+): void {
   const isPinned = (index: number): boolean => pinned?.has(index) === true;
   for (let iteration = 0; iteration < iterations; iteration += 1) {
     let moved = false;
@@ -61,4 +61,4 @@ export const relaxBoxes = (
     }
     if (!moved) break;
   }
-};
+}

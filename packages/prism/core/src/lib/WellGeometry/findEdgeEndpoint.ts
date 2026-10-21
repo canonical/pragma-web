@@ -11,11 +11,11 @@ import type { WellBox } from "./types.js";
  * @param gap - Clearance between the border and the endpoint, in px.
  * @returns The trimmed endpoint.
  */
-export const findEdgeEndpoint = (
+export default function findEdgeEndpoint(
   box: Readonly<WellBox>,
   towards: { readonly x: number; readonly y: number },
   gap: number,
-): { x: number; y: number } => {
+): { x: number; y: number } {
   const dx = towards.x - box.x;
   const dy = towards.y - box.y;
   if (dx === 0 && dy === 0) return { x: box.x, y: box.y };
@@ -26,4 +26,4 @@ export const findEdgeEndpoint = (
   const ty = dy === 0 ? Number.POSITIVE_INFINITY : halfHeight / Math.abs(dy);
   const t = Math.min(tx, ty, 1);
   return { x: box.x + dx * t, y: box.y + dy * t };
-};
+}

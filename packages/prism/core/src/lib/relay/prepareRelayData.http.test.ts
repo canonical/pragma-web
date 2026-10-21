@@ -39,7 +39,7 @@ import {
 } from "../../../testing/fixtures.js";
 import startGraphStub from "../../../testing/startGraphStub.js";
 import type { CapturedRequest, GraphStub } from "../../../testing/types.js";
-import { createEnvironment } from "./createEnvironment.js";
+import createEnvironment from "./createEnvironment.js";
 import {
   getPrefetchEnvironment,
   setPrefetchEnvironment,

@@ -33,7 +33,7 @@ const parseLensEntry = (value: unknown, key: string): LensEntry => {
  * the declaration, `undefined` when the route declares none, or throws when
  * the declaration is malformed.
  */
-export const routeLensFacet = defineFacet<
-  LensEntry,
-  typeof ROUTE_LENS_META_KEY
->(ROUTE_LENS_META_KEY, parseLensEntry);
+export default defineFacet<LensEntry, typeof ROUTE_LENS_META_KEY>(
+  ROUTE_LENS_META_KEY,
+  parseLensEntry,
+);

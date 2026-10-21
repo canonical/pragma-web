@@ -1,6 +1,6 @@
 import type { AnyRoute } from "@canonical/router-core";
 import { collectFacet } from "../routeFacet/index.js";
-import { routeShortcutFacet } from "./routeShortcutFacet.js";
+import routeShortcutFacet from "./routeShortcutFacet.js";
 import type { ShortcutAllocation } from "./types.js";
 
 /**
@@ -30,11 +30,9 @@ import type { ShortcutAllocation } from "./types.js";
  * @returns The allocation, by key and by route.
  * @throws When two routes claim one key, or a route taking params claims one.
  */
-export const collectShortcuts = <
+export default function collectShortcuts<
   TRoutes extends Readonly<Record<string, AnyRoute>>,
->(
-  routes: TRoutes,
-): ShortcutAllocation<Extract<keyof TRoutes, string>> => {
+>(routes: TRoutes): ShortcutAllocation<Extract<keyof TRoutes, string>> {
   const byKey = new Map<string, Extract<keyof TRoutes, string>>();
   const byRoute = new Map<Extract<keyof TRoutes, string>, string>();
 
@@ -58,4 +56,4 @@ export const collectShortcuts = <
   }
 
   return { byKey, byRoute };
-};
+}

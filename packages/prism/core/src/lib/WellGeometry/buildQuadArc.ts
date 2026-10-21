@@ -1,4 +1,4 @@
-import { settle } from "./settle.js";
+import settle from "./settle.js";
 import type { QuadArc } from "./types.js";
 
 /**
@@ -11,11 +11,11 @@ import type { QuadArc } from "./types.js";
  * @param bow - How far the control point sits off the chord, in px.
  * @returns The SVG path and the label anchor, settled.
  */
-export const buildQuadArc = (
+export default function buildQuadArc(
   start: { readonly x: number; readonly y: number },
   end: { readonly x: number; readonly y: number },
   bow: number,
-): QuadArc => {
+): QuadArc {
   const middleX = (start.x + end.x) / 2;
   const middleY = (start.y + end.y) / 2;
   const chordX = end.x - start.x;
@@ -30,4 +30,4 @@ export const buildQuadArc = (
       y: settle((start.y + end.y + 2 * controlY) / 4 - 6),
     },
   };
-};
+}

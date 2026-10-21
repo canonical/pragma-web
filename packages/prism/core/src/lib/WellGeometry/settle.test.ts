@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { settle } from "./settle.js";
+import settle from "./settle.js";
 
 describe("settle", () => {
   it("rounds to a tenth of a px", () => {

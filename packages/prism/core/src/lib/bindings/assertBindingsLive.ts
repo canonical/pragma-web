@@ -15,10 +15,10 @@ import type { EntityBinding, GraphQLExecute } from "./types.js";
  *   message names the binding.
  * @note Impure: runs one graph operation per binding through `execute`.
  */
-export const assertBindingsLive = async (
+export default async function assertBindingsLive(
   execute: GraphQLExecute,
   bindings: readonly EntityBinding[],
-): Promise<void> => {
+): Promise<void> {
   for (const { id, classUri } of bindings) {
     const result = await execute(BINDING_PROBE_QUERY, { uri: classUri });
     const errors = result.errors ?? [];
@@ -38,4 +38,4 @@ export const assertBindingsLive = async (
       );
     }
   }
-};
+}
