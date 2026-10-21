@@ -228,8 +228,8 @@ binding can derive names from it. Check the bindings in two places:
 
 ## Public API
 
-- Components: `Chip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`, `CANVAS_ELEMENT_ID`,
-  `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+- Components: `Chip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`, `ClientOnly`,
+  `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`; types `ChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,

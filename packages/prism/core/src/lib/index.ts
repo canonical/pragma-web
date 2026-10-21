@@ -11,7 +11,7 @@ export {
   defineBinding,
 } from "./bindings/index.js";
 export type { CanvasProps } from "./Canvas/index.js";
-export { CANVAS_ELEMENT_ID, Canvas } from "./Canvas/index.js";
+export { Canvas } from "./Canvas/index.js";
 export type { CanvasSkipLinkProps } from "./CanvasSkipLink/index.js";
 export { CanvasSkipLink } from "./CanvasSkipLink/index.js";
 export type {
