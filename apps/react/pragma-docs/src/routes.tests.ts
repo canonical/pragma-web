@@ -8,26 +8,18 @@
 
 import { describe, expect, it } from "vitest";
 import { resolveChipHref } from "#lib/Chip";
+import {
+  COMPONENT_URI,
+  STANDARD_URI,
+  UIBLOCK_TERM,
+} from "../testing/fixtures.js";
 import { appRoutes } from "./routes.js";
-
-/** The definitions exemplar term (percent-encoded in URLs). */
-const UIBLOCK_TERM = "ds:UIBlock";
-
-/**
- * The standards exemplar — the ABSOLUTE IRI, percent-encoded in URLs.
- * `node(id:)` accepts nothing else, so the reading route's param is not
- * the compact form. `resolveChipHref` is form-agnostic and would pass with
- * a compact constant too; the absolute form is used because a pin that
- * tests a shape the app no longer emits tests nothing.
- */
-const STANDARD_URI =
-  "http://pragma.canonical.com/codestandards#code.array.safe_access";
 
 describe("appRoutes", () => {
   it("round-trips componentEntity render() against resolveChipHref (the D31 landing pin)", () => {
-    expect(
-      appRoutes.componentEntity.render({ uri: "ds:global.component.button" }),
-    ).toBe(resolveChipHref("ds:global.component.button", "component"));
+    expect(appRoutes.componentEntity.render({ uri: COMPONENT_URI })).toBe(
+      resolveChipHref(COMPONENT_URI, "component"),
+    );
   });
 
   it("round-trips definitionsTerm render() against the term chip href", () => {
@@ -36,6 +28,9 @@ describe("appRoutes", () => {
     );
   });
 
+  // `resolveChipHref` is form-agnostic and would pass with a compact IRI
+  // too; the absolute form is pinned because a pin that tests a shape the
+  // app no longer emits tests nothing.
   it("round-trips standardEntity render() against the standard chip href", () => {
     expect(appRoutes.standardEntity.render({ uri: STANDARD_URI })).toBe(
       resolveChipHref(STANDARD_URI, "standard"),

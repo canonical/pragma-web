@@ -1,12 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
+import { STANDARD_URI } from "../../../../testing/fixtures.js";
 import { standardEntityVariables } from "./standardEntityQuery.js";
 import warmStandardEntity from "./warmStandardEntity.js";
 
-const SAFE_ACCESS = {
-  uri: "http://pragma.canonical.com/codestandards#code.array.safe_access",
-};
+const SAFE_ACCESS = { uri: STANDARD_URI };
 
 afterEach(() => {
   // The prefetch environment is module state shared across this file's tests.

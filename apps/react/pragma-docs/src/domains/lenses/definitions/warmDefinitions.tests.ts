@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
+import { UIBLOCK_TERM } from "../../../../testing/fixtures.js";
 import { definitionsExplorerVariables } from "./definitionsQuery.js";
 import warmDefinitions from "./warmDefinitions.js";
 
@@ -14,12 +15,12 @@ describe("warmDefinitions", () => {
     const fetchFn = createFetchSpy();
     setPrefetchEnvironment(createEnvironment({ fetchFn }));
 
-    void warmDefinitions({ term: "ds:UIBlock" });
+    void warmDefinitions({ term: UIBLOCK_TERM });
 
     expect(fetchFn).toHaveBeenCalledTimes(1);
     const [request, variables] = fetchFn.mock.lastCall ?? [];
     expect(request?.name).toBe("DefinitionsExplorerQuery");
-    expect(variables).toEqual(definitionsExplorerVariables("ds:UIBlock"));
+    expect(variables).toEqual(definitionsExplorerVariables(UIBLOCK_TERM));
   });
 
   it("prefetches the term-less explorer on /definitions", () => {

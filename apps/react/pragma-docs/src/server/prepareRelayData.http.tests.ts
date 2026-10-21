@@ -59,6 +59,12 @@ import {
   getPrefetchEnvironment,
   setPrefetchEnvironment,
 } from "#relay";
+import {
+  COMPONENT_URI,
+  JOB_URI,
+  STANDARD_URI,
+  UIBLOCK_TERM,
+} from "../../testing/fixtures.js";
 import prepareRelayData from "./prepareRelayData.js";
 
 /** One captured request: what the prepare step actually put on the wire. */
@@ -69,12 +75,8 @@ interface CapturedRequest {
   readonly body: Record<string, unknown>;
 }
 
-/** The standards exemplar: an absolute IRI, percent-encoded in its URL. */
-const STANDARD_URI =
-  "http://pragma.canonical.com/codestandards#code.array.safe_access";
-
 /** The root-field key a term-bearing definitions operation writes. */
-const UIBLOCK_CLASS_KEY = 'ontologyClass(uri:"ds:UIBlock")';
+const UIBLOCK_CLASS_KEY = `ontologyClass(uri:"${UIBLOCK_TERM}")`;
 
 /**
  * The stub's answers, by operation name. Operations without an answer get
@@ -85,8 +87,8 @@ const STUB_RESPONSES: Readonly<Record<string, unknown>> = {
   ComponentProbeQuery: {
     data: {
       component: {
-        id: "ds:global.component.button",
-        uri: "ds:global.component.button",
+        id: COMPONENT_URI,
+        uri: COMPONENT_URI,
         name: "Button",
       },
     },
@@ -240,10 +242,10 @@ describe("prepareRelayData over HTTP", () => {
       variables: { count: CATALOG_PAGE_SIZE, cursor: null },
     },
     {
-      url: "/components/ds%3Aglobal.component.button",
+      url: `/components/${encodeURIComponent(COMPONENT_URI)}`,
       operationName: "ComponentEntityQuery",
       variables: {
-        uri: "ds:global.component.button",
+        uri: COMPONENT_URI,
         count: RELATION_PAGE_SIZE,
       },
     },
@@ -253,9 +255,9 @@ describe("prepareRelayData over HTTP", () => {
       variables: { uri: "", hasTerm: false },
     },
     {
-      url: "/definitions/ds%3AUIBlock",
+      url: `/definitions/${encodeURIComponent(UIBLOCK_TERM)}`,
       operationName: "DefinitionsExplorerQuery",
-      variables: { uri: "ds:UIBlock", hasTerm: true },
+      variables: { uri: UIBLOCK_TERM, hasTerm: true },
     },
     {
       url: "/standards",
@@ -285,12 +287,12 @@ describe("prepareRelayData over HTTP", () => {
       },
     },
     {
-      url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3",
+      url: `/journeys/${encodeURIComponent(JOB_URI)}`,
       operationName: "JourneysExplorerQuery",
       variables: {
         jobs: JOB_PAGE_SIZE,
         pairings: PAIRING_PAGE_SIZE,
-        uri: "sem://design-system-docs#job.l3",
+        uri: JOB_URI,
         hasJob: true,
       },
     },
@@ -326,7 +328,10 @@ describe("prepareRelayData over HTTP", () => {
   it("keeps two prepares in flight at once apart", async () => {
     const [termless, term] = await Promise.all([
       prepareRelayData("/definitions", graphqlUrl),
-      prepareRelayData("/definitions/ds%3AUIBlock", graphqlUrl),
+      prepareRelayData(
+        `/definitions/${encodeURIComponent(UIBLOCK_TERM)}`,
+        graphqlUrl,
+      ),
     ]);
 
     // One request each: the second request's static router, built while

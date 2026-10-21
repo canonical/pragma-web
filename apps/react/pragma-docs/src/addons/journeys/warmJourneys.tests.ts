@@ -1,10 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
+import { JOB_URI } from "../../../testing/fixtures.js";
 import { journeysExplorerVariables } from "./journeysQuery.js";
 import warmJourneys from "./warmJourneys.js";
-
-const JOB = "sem://design-system-docs#job.l3";
 
 afterEach(() => {
   // The prefetch environment is module state shared across this file's tests.
@@ -16,12 +15,12 @@ describe("warmJourneys", () => {
     const fetchFn = createFetchSpy();
     setPrefetchEnvironment(createEnvironment({ fetchFn }));
 
-    void warmJourneys({ job: JOB });
+    void warmJourneys({ job: JOB_URI });
 
     expect(fetchFn).toHaveBeenCalledTimes(1);
     const [request, variables] = fetchFn.mock.lastCall ?? [];
     expect(request?.name).toBe("JourneysExplorerQuery");
-    expect(variables).toEqual(journeysExplorerVariables(JOB));
+    expect(variables).toEqual(journeysExplorerVariables(JOB_URI));
   });
 
   it("prefetches the job-less explorer on /journeys", () => {
