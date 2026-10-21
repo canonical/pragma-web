@@ -101,8 +101,12 @@ export interface LensSource {
   readonly tier: 1 | 2 | undefined;
 }
 
-/** A lens declaration: the object a `routeLensFacet.of({ … })` call is given. */
-const LENS_FACET_PATTERN = /routeLensFacet\.of\(\s*\{([^}]*)\}\s*\)/g;
+/**
+ * The opening of a lens declaration, up to and including the `{` of the
+ * object a `routeLensFacet.of({ … })` call is given. The object itself is
+ * read by brace depth, since it may nest braces of its own.
+ */
+const LENS_FACET_OPENING_PATTERN = /routeLensFacet\.of\(\s*\{/g;
 
 /** A literal tier inside a lens declaration. */
 const LITERAL_TIER_PATTERN = /\btier:\s*([12])\b/;
@@ -173,10 +177,8 @@ export const readLensTier = (directory: string): 1 | 2 | undefined => {
   const tiers = new Set<1 | 2>();
   for (const file of tsxFilesUnder(directory)) {
     if (TEST_FILE_PATTERN.test(file)) continue;
-    for (const [, body] of readFileSync(file, "utf8").matchAll(
-      LENS_FACET_PATTERN,
-    )) {
-      const tier = LITERAL_TIER_PATTERN.exec(body ?? "")?.at(1);
+    for (const body of readLensFacetBodies(readFileSync(file, "utf8"))) {
+      const tier = LITERAL_TIER_PATTERN.exec(body)?.at(1);
       if (tier === undefined) {
         throw new Error(
           `A lens facet in ${file} declares no literal tier. Each operation ` +
@@ -196,6 +198,26 @@ export const readLensTier = (directory: string): 1 | 2 | undefined => {
   }
   return [...tiers].at(0);
 };
+
+/**
+ * The text of every object a `routeLensFacet.of({ … })` call in `source` is
+ * given, without its outer braces. Each object ends at the `}` that brings
+ * the brace depth back to zero, so nested objects and template-literal
+ * placeholders stay inside it. An object that never closes reads as empty,
+ * so it declares no tier and is refused like any other facet without one.
+ */
+const readLensFacetBodies = (source: string): string[] =>
+  [...source.matchAll(LENS_FACET_OPENING_PATTERN)].map((opening) => {
+    const start = source.indexOf("{", opening.index) + 1;
+    let depth = 1;
+    for (let index = start; index < source.length; index += 1) {
+      const character = source.charAt(index);
+      if (character === "{") depth += 1;
+      if (character === "}") depth -= 1;
+      if (depth === 0) return source.slice(start, index);
+    }
+    return "";
+  });
 
 const tsxFilesUnder = (directory: string): string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
