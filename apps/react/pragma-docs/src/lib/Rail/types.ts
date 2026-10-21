@@ -18,5 +18,12 @@ type OwnProps = {
   readonly brand: RailBrand;
 };
 
+/**
+ * Props accepted by `Rail`: the lenses and the brand it lists, and the
+ * native props of its `<nav>` root.
+ *
+ * The native `children` is excluded because the rail renders its own
+ * content, the brand and one entry per lens.
+ */
 export type RailProps = OwnProps &
   Omit<ComponentProps<"nav">, keyof OwnProps | "children">;

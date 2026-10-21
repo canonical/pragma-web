@@ -10,6 +10,7 @@
 import type { ReactElement } from "react";
 
 interface IconProps {
+  /** The glyph's width and height, in pixels. */
   readonly size?: number;
 }
 
@@ -23,12 +24,26 @@ const sharedProps = (size: number) =>
     width: size,
   }) as const;
 
+/**
+ * Home: a house, the Home lens's rail glyph.
+ *
+ * A stroke glyph `size` pixels square (16 by default), drawn in
+ * `currentColor` and `aria-hidden`: the rail entry's visible label names
+ * it. A lens passes it as its `icon` in `routeLensFacet.of`.
+ */
 export const HomeIcon = ({ size = 16 }: IconProps): ReactElement => (
   <svg aria-hidden="true" {...sharedProps(size)}>
     <path d="M2 8.5 8 3l6 5.5M4 7.5V13h8V7.5" />
   </svg>
 );
 
+/**
+ * Components: a grid of four tiles, the Components lens's rail glyph.
+ *
+ * A stroke glyph `size` pixels square (16 by default), drawn in
+ * `currentColor` and `aria-hidden`: the rail entry's visible label names
+ * it. A lens passes it as its `icon` in `routeLensFacet.of`.
+ */
 export const ComponentsIcon = ({ size = 16 }: IconProps): ReactElement => (
   <svg aria-hidden="true" {...sharedProps(size)}>
     <rect height="4.6" rx="1" width="4.6" x="2.5" y="2.5" />
@@ -38,6 +53,13 @@ export const ComponentsIcon = ({ size = 16 }: IconProps): ReactElement => (
   </svg>
 );
 
+/**
+ * Definitions: three linked nodes, the Definitions lens's rail glyph.
+ *
+ * A stroke glyph `size` pixels square (16 by default), drawn in
+ * `currentColor` and `aria-hidden`: the rail entry's visible label names
+ * it. A lens passes it as its `icon` in `routeLensFacet.of`.
+ */
 export const DefinitionsIcon = ({ size = 16 }: IconProps): ReactElement => (
   <svg aria-hidden="true" {...sharedProps(size)}>
     <circle cx="4" cy="4" r="2" />
@@ -47,6 +69,13 @@ export const DefinitionsIcon = ({ size = 16 }: IconProps): ReactElement => (
   </svg>
 );
 
+/**
+ * Standards: a shield with a check, the Standards lens's rail glyph.
+ *
+ * A stroke glyph `size` pixels square (16 by default), drawn in
+ * `currentColor` and `aria-hidden`: the rail entry's visible label names
+ * it. A lens passes it as its `icon` in `routeLensFacet.of`.
+ */
 export const StandardsIcon = ({ size = 16 }: IconProps): ReactElement => (
   <svg aria-hidden="true" {...sharedProps(size)}>
     <path d="M8 2 13 4v4c0 3.2-2.2 5.3-5 6-2.8-.7-5-2.8-5-6V4l5-2z" />
@@ -54,6 +83,13 @@ export const StandardsIcon = ({ size = 16 }: IconProps): ReactElement => (
   </svg>
 );
 
+/**
+ * Guides: a page with two lines of text, the Guides lens's rail glyph.
+ *
+ * A stroke glyph `size` pixels square (16 by default), drawn in
+ * `currentColor` and `aria-hidden`: the rail entry's visible label names
+ * it. A lens passes it as its `icon` in `routeLensFacet.of`.
+ */
 export const GuidesIcon = ({ size = 16 }: IconProps): ReactElement => (
   <svg aria-hidden="true" {...sharedProps(size)}>
     <path d="M3 3h7a3 3 0 0 1 3 3v7H6a3 3 0 0 1-3-3V3z" />

@@ -14,5 +14,12 @@ type OwnProps = {
   readonly current?: string;
 };
 
+/**
+ * Props accepted by `LensBreadcrumbs`: the lens and the current page the
+ * trail runs between, and the native props of its `<nav>` root.
+ *
+ * The native `children` is excluded because the trail renders its own
+ * crumbs.
+ */
 export type LensBreadcrumbsProps = OwnProps &
   Omit<ComponentProps<"nav">, keyof OwnProps | "children">;
