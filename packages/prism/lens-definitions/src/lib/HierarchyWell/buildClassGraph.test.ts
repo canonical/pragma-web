@@ -1,8 +1,8 @@
 /**
- * The radial layout's contracts — the SSR keystone unchanged from the
- * retired layer grid: DETERMINISM (positions are computed on the server
- * AND the client, so same input must yield byte-equal output), plus the
- * grammar the migration added: depth rides the RADIUS, boxes separate,
+ * The radial layout's contracts — the SSR keystone, DETERMINISM
+ * (positions are computed on the server AND the client, so same input must
+ * yield byte-equal output), plus the layout's grammar: depth rides the
+ * RADIUS, boxes separate,
  * object properties become labelled semantic arcs (self-references loop),
  * and node ids stay prefixed term addresses.
  */

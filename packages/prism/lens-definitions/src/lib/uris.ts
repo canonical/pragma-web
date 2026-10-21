@@ -3,7 +3,7 @@
  *
  * The ontology GraphQL surface returns FULL IRIs from every `uri` field on
  * `Ontology.classes` / `Ontology.properties` and on class/property lookups
- * (verified live: `ds:UIBlock` resolves but comes back as
+ * (`ds:UIBlock` resolves but comes back as
  * `https://ds.canonical.com/UIBlock`), while the lens's term addresses —
  * the `/definitions/:term` param and term-chip hrefs — use the compact
  * prefixed form (`ds:UIBlock`). This codec converts between the two using

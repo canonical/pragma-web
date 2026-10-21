@@ -2,8 +2,8 @@
  * The lens filter vocabulary's contracts. These pin the two properties the
  * whole explorer rests on: the DEFAULT is a no-op (the SSR determinism
  * rule — a non-no-op default would change first paint and break
- * hydration), and text never reaches the chip predicate (the rail/graph
- * separation the exhibit establishes).
+ * hydration), and text never reaches the chip predicate (the search box
+ * governs the rail, the chips govern the graph).
  */
 
 import { describe, expect, it } from "vitest";
@@ -55,7 +55,7 @@ describe("createAllNamespacesFilter", () => {
   });
 });
 
-describe("matchesText — the exhibit's rule", () => {
+describe("matchesText", () => {
   it("matches case-insensitively over the label", () => {
     expect(matchesText("ui bl", "UI Block", "ds:UIBlock")).toBe(true);
   });

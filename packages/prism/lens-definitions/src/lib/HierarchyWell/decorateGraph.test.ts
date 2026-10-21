@@ -4,7 +4,7 @@
  * filter) must produce byte-identical output to the server's
  * selection-only render, or hydration diverges.
  *
- * Also pins the exhibit's heuristics as executable claims: the ego-fade is
+ * Also pins the well's heuristics as executable claims: the ego-fade is
  * ONE hop and never transitive, edges survive only with both endpoints,
  * and filtering never touches a position.
  */
@@ -161,9 +161,9 @@ describe("selection (server-rendered, URL-derived)", () => {
 
 describe("the ego-fade is ONE hop, never transitive", () => {
   it("excludes a node two hops away", () => {
-    // Component → UIBlock → Entity. Selecting Component must NOT spare
-    // Entity: the exhibit's fade is a neighbourhood, not a reachability
-    // set, and this is the assertion that keeps it that way.
+    // Component → UIBlock → Entity. Selecting Component must NOT spare Entity:
+    // the fade is a neighbourhood, not a reachability set, and this is the
+    // assertion that keeps it that way.
     const result = decorateForSelection(buildGraph(), "ds:Component");
     expect(readNodeClassName(result, "ds:UIBlock")).toBeUndefined();
     expect(readNodeClassName(result, "ds:Entity")).toContain(NODE_FADED_CLASS);
@@ -256,7 +256,7 @@ describe("filtering HIDES in the graph (the asymmetry's other half)", () => {
     expect(readNodeClassName(result, "ds:Component")).toBeUndefined();
   });
 
-  it("drops an edge that loses EITHER endpoint (the exhibit's rule)", () => {
+  it("drops an edge that loses EITHER endpoint", () => {
     const result = decorateForView(buildGraph(), {
       selected: undefined,
       filter: { ...noOpFilter, abstractions: ["concrete"] },
@@ -270,8 +270,8 @@ describe("filtering HIDES in the graph (the asymmetry's other half)", () => {
   });
 
   it("NEVER moves a node — filtering changes class names, not geometry", () => {
-    // The one habit we deliberately do not copy from the exhibit, which
-    // re-runs its force simulation on every lens change.
+    // A filter change never re-runs the layout, so nothing moves under
+    // the reader.
     const before = decorateForView(buildGraph(), {
       selected: undefined,
       filter: noOpFilter,

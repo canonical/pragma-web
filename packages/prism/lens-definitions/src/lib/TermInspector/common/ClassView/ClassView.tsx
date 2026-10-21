@@ -61,8 +61,8 @@ export default function ClassView({
         "Inherited". The `inherited` boolean is already fetched; the source
         ancestor is NOT on the fragment, so the grouping names that the
         property is inherited without claiming which class it came from
-        (that would need a query change). Each row now also carries the
-        property's own definition, previously fetched but dropped. */}
+        (that would need a query change). Each row also carries the
+        property's own definition. */}
       {(() => {
         const declared = data.properties.filter(
           (classProperty) => !classProperty.inherited,

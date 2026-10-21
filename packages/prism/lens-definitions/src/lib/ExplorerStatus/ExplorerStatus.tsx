@@ -9,12 +9,11 @@ const componentCssClassName = "ds explorer-status";
  * The explorer's status figure — the mode strip's `status` socket
  * (`slot.explorer-status`).
  *
- * It answers the question the exhibit's maturity bar answers ("how much of
- * this model am I looking at?") using the only quantity this ontology
- * genuinely supports: how many classes the current filter shows, out of
- * how many exist, and how many of those are abstract. Every number is
- * counted from the same graph data the well draws — nothing is asserted
- * that the store does not hold.
+ * It answers "how much of this model am I looking at?" using the only quantity
+ * this ontology genuinely supports: how many classes the current filter shows,
+ * out of how many exist, and how many of those are abstract. Every number is
+ * counted from the same graph data the well draws — nothing is asserted that
+ * the store does not hold.
  *
  * The bar is proportion, not decoration: its width IS visible/total, and
  * the same ratio is stated in words beside it, so the figure never depends

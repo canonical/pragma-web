@@ -13,7 +13,7 @@ const componentCssClassName = "ds term-node";
  * the router's `Link` stamps `aria-current="page"` on the current term's
  * node, which the stylesheet raises.
  *
- * Abstract classes are marked the way the exhibit marks them: the label
+ * Abstract classes are marked twice over: the label
  * goes italic and a small ABSTRACT tag rides underneath — real text, so
  * the distinction survives with styling off rather than living in colour
  * alone. The tag sits OUTSIDE the anchor: a node's accessible name must

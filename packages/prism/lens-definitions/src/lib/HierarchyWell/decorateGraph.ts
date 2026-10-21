@@ -2,17 +2,16 @@
  * The well's presentation layer: a PURE projection from (graph, selection,
  * focus, filter) to the `className` the well paints with. Nothing here
  * measures, mutates or re-lays-out — positions come from `buildClassGraph`
- * and are never touched, because the exhibit's one habit we deliberately
- * do NOT copy is re-running physics on every filter change. We dim; we
- * never move.
+ * and are never touched: a filter change never re-runs the layout, so
+ * nothing moves under the reader. We dim; we never move.
  *
  * THE SSR SPLIT — the rule this module exists to make legible:
  *
- * - `decorateForSelection` takes ONLY the selected term, which comes from
- *   the URL and is therefore identical on the server and the client. It is
- *   safe to server-render, and it IS server-rendered: the well boots with
- *   the selection's ego-fade already painted, exactly as the exhibit boots
- *   with a selection. Being pure and URL-derived is the whole argument.
+ * - `decorateForSelection` takes ONLY the selected term, which comes from the
+ *   URL and is therefore identical on the server and the client. It is safe to
+ *   server-render, and it IS server-rendered: the well boots with the
+ *   selection's ego-fade already painted. Being pure and URL-derived is the
+ *   whole argument.
  *
  * - `decorateForView` layers the CLIENT-ONLY state (hover/focus, filter)
  *   on top. It is safe only because its neutral input — no hover, no
@@ -95,8 +94,8 @@ export interface DecorateInput {
  * styling when the pointer leaves.
  *
  * Filtering HIDES: a node whose facets fail the chips takes
- * `HIDDEN_CLASS`, and an edge survives only when BOTH its endpoints do
- * (the exhibit's rule). Hidden elements keep their positions, so nothing
+ * `HIDDEN_CLASS`, and an edge survives only when BOTH its endpoints do.
+ * Hidden elements keep their positions, so nothing
  * re-flows when a chip comes back on.
  */
 export const decorateForView = (

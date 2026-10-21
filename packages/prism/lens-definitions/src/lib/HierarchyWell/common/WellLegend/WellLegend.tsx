@@ -6,10 +6,9 @@ import "./styles.css";
 const componentCssClassName = "ds well-legend";
 
 /**
- * The well's legend — canvas-local furniture, bottom-left, exactly where
- * the exhibit puts it. It exists because the graph encodes things
- * VISUALLY (a dashed italic node is abstract; an arrow runs subclass →
- * superclass) and an encoding nobody can read is decoration.
+ * The well's legend — canvas-local furniture, bottom-left. It exists because
+ * the graph encodes things VISUALLY (a dashed italic node is abstract; an arrow
+ * runs subclass → superclass) and an encoding nobody can read is decoration.
  *
  * Deliberately small and static: it explains the two encodings the well
  * actually uses and nothing else. The chip toolbar in the mode strip

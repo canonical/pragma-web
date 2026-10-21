@@ -10,13 +10,11 @@ import type { LineageProps } from "./types.js";
 const SUBCLASS_OF = "⊂";
 
 /**
- * The class's ancestry as an ordered breadcrumb chain — the reference
- * ontology explorer's `.lineage`. `superclasses` arrives nearest-first
- * (direct parent, …, root — the same order the flat list marked "(direct)"
- * on the head), so the chain reads self ⊂ parent ⊂ … ⊂ root left to right.
- * Every ancestor is a real term link; the leaf (the class itself) is plain
- * text, since it is the page the reader is already on. Pure over data the
- * fragment already fetches — no query change.
+ * The class's ancestry as an ordered breadcrumb chain. `superclasses`
+ * arrives nearest-first (direct parent, …, root), so the chain reads
+ * self ⊂ parent ⊂ … ⊂ root left to right. Every ancestor is a real term
+ * link; the leaf (the class itself) is plain text, since it is the page
+ * the reader is already on. Pure over the class fragment's data.
  *
  * `import { Lineage } from "../Lineage/index.js";`
  */

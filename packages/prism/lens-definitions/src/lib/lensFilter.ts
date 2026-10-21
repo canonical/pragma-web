@@ -3,12 +3,11 @@
  * rail, the well and the mode strip's controls all read.
  *
  * Two axes, both derived from what an `OntologyClass` ACTUALLY carries
- * (verified live against the graph — see `lensFilter.test.ts` for the
- * shape contract and the report for the evidence):
+ * (`lensFilter.test.ts` pins the shape contract):
  *
  * - `text` — a case-insensitive substring over a term's label OR its
- *   prefixed URI. Rail-only by contract: the exhibit's search never
- *   touches the graph, and neither does ours.
+ *   prefixed URI. Rail-only by contract: the search never touches the
+ *   graph.
  * - `abstraction` / `namespaces` — the per-class facets the graph really
  *   has (`isAbstract`, `namespace`). There is no lifecycle, status or
  *   channel field on `OntologyClass`, and the `Tag` vocabulary (which does
@@ -72,7 +71,7 @@ export const normalizeFilterText = (raw: string): string =>
 
 /**
  * Does a term's TEXT match? Case-insensitive substring over the label or
- * the prefixed URI, exactly the exhibit's rule. An empty query matches
+ * the prefixed URI. An empty query matches
  * everything (the no-op default's whole point).
  */
 export const matchesText = (
@@ -87,8 +86,7 @@ export const matchesText = (
 /**
  * Does a CLASS pass the chip axes? Text is deliberately NOT consulted:
  * the chips govern the graph, the search box governs the rail, and mixing
- * them would let a rail search silently re-shape the graph — which the
- * exhibit never does.
+ * them would let a rail search silently re-shape the graph.
  */
 export const matchesChips = (
   filter: LensFilter,

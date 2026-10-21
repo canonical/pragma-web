@@ -27,7 +27,7 @@ import definitionsExplorerRecordsProperty from "../../../testing/records/definit
 const UNKNOWN_TERM = "ds:NoSuchTerm";
 
 /** The captured store plus the null lookups an unknown term stores —
- * verified live: `/definitions/ds%3ANoSuchTerm` serialises exactly
+ * `/definitions/ds%3ANoSuchTerm` serialises exactly
  * `ontologyClass(uri:"…"): null` and `ontologyProperty(uri:"…"): null`
  * on `client:root`. */
 const unknownTermRecords = {
@@ -124,9 +124,9 @@ describe("TermInspector", () => {
     // The declared table carries the class's own property and prefixed range.
     expect(within(panel).getByText("hasVariant")).toBeInTheDocument();
     expect(within(panel).getAllByText("ds:UIBlock").length).toBeGreaterThan(0);
-    // Each property's definition is surfaced beneath its row (it was
-    // fetched all along and previously dropped). The changelog property's
-    // definition is a fixture string — assert it renders.
+    // Each property's definition is surfaced beneath its row. The
+    // changelog property's definition is a fixture string — assert it
+    // renders.
     expect(
       within(panel).getByText(
         "Links a UI Block to its dated change log entries.",

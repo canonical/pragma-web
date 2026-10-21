@@ -21,7 +21,7 @@
  * comparator, the filter object or any internal; the assertion is what a
  * reader would see in the graph.
  *
- * TEETH (verified by hand, and the reason this file exists): setting the
+ * TEETH (the reason this file exists): setting the
  * comparator body to `return true` makes the hidden count stay 0 and this
  * test fail. Restoring it makes it pass.
  */

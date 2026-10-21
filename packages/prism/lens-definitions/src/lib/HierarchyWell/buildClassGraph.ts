@@ -5,20 +5,18 @@
  * identically on the server and the client; the SSR/hydration suite
  * gates any drift.
  *
- * Layout model, per ontology: a radial tree. Depth from the root is the
- * RADIUS (meaning on the radial axis — the old layer semantics survive as
- * concentric rings), and each subtree claims an angular window
- * proportional to its leaf count (classic tidy-radial, deterministic).
- * The shared relaxation pass then separates any boxes that still collide
- * — physics on the angular axis. A 17-class ontology settles into a
- * compact disc instead of a 1,500px-wide comb, which is what fixes the
- * old well's horizontal overflow at the root.
+ * Layout model, per ontology: a radial tree. Depth from the root is the RADIUS
+ * (each depth is a concentric ring), and each subtree claims an angular window
+ * proportional to its leaf count (classic tidy-radial, deterministic). The
+ * shared relaxation pass then separates any boxes that still collide — physics
+ * on the angular axis. A 17-class ontology settles into a compact disc instead
+ * of a 1,500px-wide comb, so the root never overflows the canvas horizontally.
  *
  * Clusters pack left-to-right, wrapping into rows against a target
  * width, in query order — stable, and the wrap keeps the whole canvas
  * near the golden-ish aspect the explorer's underground actually has.
  *
- * Edges carry the TWO families the exhibit drew and the old well lost:
+ * Edges carry TWO families:
  * subclass → superclass stays a quiet STRUCTURAL line; object properties
  * (domain → range, both classes present) become SEMANTIC arcs wearing
  * their predicate — the addition that turns the tree back into an

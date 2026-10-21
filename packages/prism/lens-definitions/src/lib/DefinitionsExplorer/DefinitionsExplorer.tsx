@@ -67,11 +67,11 @@ const componentCssClassName = "ds definitions-explorer";
  * seam use (`definitionsQuery.ts`), so the SSR-warmed store always
  * fulfils this exact operation.
  *
- * The lens's EPHEMERAL filter lives in `LensFilter` rather than in
- * this component's own state, for one specific reason recorded there in
- * full: the mode strip's chips are rendered by the lens's layout as a
- * sibling of the canvas, so no prop path reaches them. Context is the smallest mechanism that crosses that
- * boundary. Everything else still flows as props from here.
+ * The lens's EPHEMERAL filter lives in `LensFilter` rather than in this
+ * component's own state, for one specific reason recorded there in full: the
+ * mode strip's chips are rendered by the lens's layout as a sibling of the
+ * canvas, so no prop path reaches them. Context is the smallest mechanism that
+ * crosses that boundary. Everything else still flows as props from here.
  *
  * THE SSR DETERMINISM RULE. The context's initial filter is the no-op
  * default, and `resolveFilter` turns it into "every ontology lit" using
@@ -83,20 +83,19 @@ const componentCssClassName = "ds definitions-explorer";
  * string. Selection, by contrast, IS server-rendered: it comes from the
  * URL (`term`), identical on both sides.
  *
- * THE SHARED HOVER CENTRE (the bidirectional-hover
- * mechanism). The transient ego centre used to be well-LOCAL state; it is
- * lifted HERE, beside the filter, so the rail and the well write the one
- * value and both read it. Hovering (or focusing) a graph node OR a rail
- * item raises the centre; the well fades to its 1-hop neighbourhood and
- * the rail marks the matching item, in either direction. It is CLIENT-ONLY
- * and seeded `undefined` — the neutral value that produces the same markup
- * as the server's selection-only render, so it never breaks hydration
- * (the same rule the filter obeys). It is NEVER seeded from the URL,
- * `localStorage` or `window`.
+ * THE SHARED HOVER CENTRE (the bidirectional-hover mechanism). The transient
+ * ego centre lives HERE, beside the filter, so the rail and the well write the
+ * one value and both read it. Hovering (or focusing) a graph node OR a rail
+ * item raises the centre; the well fades to its 1-hop neighbourhood and the
+ * rail marks the matching item, in either direction. It is CLIENT-ONLY and
+ * seeded `undefined` — the neutral value that produces the same markup as the
+ * server's selection-only render, so it never breaks hydration (the same rule
+ * the filter obeys). It is NEVER seeded from the URL, `localStorage` or
+ * `window`.
  *
  * DEPTH FOR THE RAIL. The rail shows each class's superclass depth, but its
  * own fragment cannot carry `superclass` without re-emitting the shared
- * operation's query text (the relay-byte-identity contract — verified).
+ * operation's query text (the relay-byte-identity contract).
  * So the explorer reads the WELL's fragment (already in this operation,
  * masked from the rail) and derives the depth map with the very function
  * the well lays out by (`computeClassDepths`), then hands it down. One

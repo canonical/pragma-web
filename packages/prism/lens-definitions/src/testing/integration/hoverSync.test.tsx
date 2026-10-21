@@ -1,10 +1,9 @@
 /**
- * BIDIRECTIONAL HOVER, PROVEN AT THE DOM — the claim the exhibit never
- * makes (its hover fades the graph only; the rail is inert). The ego centre
- * was well-LOCAL; it now lives in `DefinitionsExplorer`, shared by the rail
- * and the well, so a hover on EITHER surface reaches the OTHER.
+ * BIDIRECTIONAL HOVER, PROVEN AT THE DOM. The ego centre lives in
+ * `DefinitionsExplorer`, shared by the rail and the well, so a hover on
+ * EITHER surface reaches the OTHER.
  *
- * These are interaction TEETH in the MED-1 sense: not "a handler fired" but
+ * These are interaction TEETH: not "a handler fired" but
  * the actual cross-surface DOM change a reader would see. Both directions
  * read the real painted class, never an internal.
  *
@@ -134,7 +133,7 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     expect(patternRailItem.classList.contains("is-hovered")).toBe(false);
   });
 
-  it("keyboard focus on a rail item drives the same shared centre (past the exhibit's keyboard gap)", {
+  it("keyboard focus on a rail item drives the same shared centre", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
     const { container } = render(

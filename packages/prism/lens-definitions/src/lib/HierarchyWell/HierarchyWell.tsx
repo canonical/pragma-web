@@ -56,19 +56,18 @@ const MAX_ZOOM = 2;
 const CAMERA_MARGIN = 24;
 
 /**
- * The explorer's centre panel: the class graph sunk into a well below the
- * page, rendered by the lens's own well renderer: an SVG edge layer under
- * an HTML node layer, both in
- * ONE 1:1 px space inside a transformed camera, so nodes stay real links
- * with crisp DOM text and the edges can carry the full grammar (straight
- * structural hairlines, labelled semantic arcs, hollow vs filled heads).
+ * The explorer's centre panel: the class graph sunk into a well below the page,
+ * rendered by the lens's own well renderer: an SVG edge layer under an HTML
+ * node layer, both in ONE 1:1 px space inside a transformed camera, so nodes
+ * stay real links with crisp DOM text and the edges can carry the full grammar
+ * (straight structural hairlines, labelled semantic arcs, hollow vs filled
+ * heads).
  *
- * THE CAMERA. Pan by dragging the floor, zoom by wheel (toward the
- * cursor). The INITIAL camera is a pure function of the graph
- * (`fitScale`) — a constant on both sides of hydration, exactly as the
- * old DEFAULT_VIEWPORT was; the listeners only mutate it client-side,
- * after hydration. The wheel listener is attached non-passively in an
- * effect because it must preventDefault the page scroll.
+ * THE CAMERA. Pan by dragging the floor, zoom by wheel (toward the cursor). The
+ * INITIAL camera is a pure function of the graph (`fitScale`) — a constant on
+ * both sides of hydration; the listeners only mutate it client-side, after
+ * hydration. The wheel listener is attached non-passively in an effect because
+ * it must preventDefault the page scroll.
  *
  * THE ASYMMETRY: this graph HIDES what the filter excludes (and drops any
  * edge that loses an endpoint), where the rail merely dims. Hiding is by
@@ -80,12 +79,12 @@ const CAMERA_MARGIN = 24;
  * while incident to the hovered/selected term. Ambient density stays low;
  * interaction reveals — alive means responsive, not restless.
  *
- * Hover/focus rides the SHARED `hoverCentre` exactly as before: one
+ * Hover/focus rides the SHARED `hoverCentre`: one
  * DOM-resolving code path (`data-id` closest-walk) serves pointer and
  * keyboard; state is client-only and starts empty, so first client paint
  * reproduces the server's selection-only markup byte for byte.
  *
- * Accessibility posture: unchanged — every node is a real link, but the
+ * Accessibility: every node is a real link, but the
  * COMPLETE keyboard path through the explorer is the TermRail; the well
  * is a spatial view over the same nouns, never the only route to any.
  *

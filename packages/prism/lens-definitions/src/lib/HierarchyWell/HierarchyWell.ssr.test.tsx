@@ -60,7 +60,7 @@ describe("HierarchyWell SSR", () => {
       html.match(/class="edge structural/g)?.length ?? 0;
     expect(structuralEdgeCount).toBe(fixtureSubclassCount);
     // Semantic arcs (object properties) are in the server markup too —
-    // the edge family whose absence made the old well an organigram.
+    // the edge family that makes the graph an ontology, not a tree.
     expect(html).toContain('class="edge semantic');
     // The camera transform is a constant of the graph — explicit, never
     // measured.
@@ -69,12 +69,11 @@ describe("HierarchyWell SSR", () => {
   });
 
   it("server-renders the SELECTION'S ego-fade — the default visual state", () => {
-    // The exhibit boots with a selection already made and its
-    // neighbourhood already lit. Ours does the same, and does it on the
-    // SERVER: `term` comes from the URL, so the fade is a pure function
-    // of data both sides hold, and baking it into the markup means the
-    // first paint is the finished picture rather than a flash of
-    // undifferentiated graph.
+    // The well boots with a selection already made and its neighbourhood
+    // already lit, and does it on the SERVER: `term` comes from the URL, so the
+    // fade is a pure function of data both sides hold, and baking it into the
+    // markup means the first paint is the finished picture rather than a flash
+    // of undifferentiated graph.
     const html = renderToString(
       createDefinitionsPage(
         UIBLOCK_TERM,

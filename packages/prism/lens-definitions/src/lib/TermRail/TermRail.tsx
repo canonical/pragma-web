@@ -17,11 +17,11 @@ import "./styles.css";
  * compiled artifact instead.
  *
  * The rail does NOT declare `superclass` here on purpose: adding it would
- * re-emit the shared operation's query text and break the relay-byte
- * identity contract (verified — Relay writes fragment selections into the
- * wire text, so the field is not free even though the well already fetches
- * it). Depth therefore arrives as a prop the explorer derives from the
- * well's fragment; see `depthByUri` in the props and `DefinitionsExplorer`.
+ * re-emit the shared operation's query text and break the relay-byte identity
+ * contract (Relay writes fragment selections into the wire text, so the field
+ * is not free even though the well already fetches it). Depth therefore arrives
+ * as a prop the explorer derives from the well's fragment; see `depthByUri` in
+ * the props and `DefinitionsExplorer`.
  */
 const declareTermRailFragment = (): unknown => graphql`
   fragment TermRail_ontologies on Ontology @relay(plural: true) {
@@ -53,12 +53,12 @@ const formatTermLabel = (
 ): string => label ?? prefixed;
 
 /**
- * The depth glyph: the exhibit's monospace `·` run, one dot per superclass
- * hop. A root (depth 0) shows an empty cell rather than nothing, so every
- * item's label starts at the same inline offset within its depth and the
- * glyph column stays a column. Purely decorative — the indent (a
- * `data-depth` hook the stylesheet reads) carries the same information
- * spatially, and the accessible name never includes it.
+ * The depth glyph: a monospace `·` run, one dot per superclass hop. A root
+ * (depth 0) shows an empty cell rather than nothing, so every item's label
+ * starts at the same inline offset within its depth and the glyph column stays
+ * a column. Purely decorative — the indent (a `data-depth` hook the stylesheet
+ * reads) carries the same information spatially, and the accessible name never
+ * includes it.
  */
 const formatDepthGlyph = (depth: number): string => "·".repeat(depth);
 
@@ -74,7 +74,7 @@ const MAX_INDENT_DEPTH = 6;
  * canvas never has to be traversed to reach anything — the well is a
  * spatial view over the same nouns, not the only path (WCAG 2.1.3).
  *
- * A REAL INDEX, to the exhibit's bar and past it. Each class item carries
+ * A REAL INDEX. Each class item carries
  * the two REAL axes the ontology actually has — no invented status:
  *
  * - An ABSTRACTION marker (`data-abstraction`): a small glyph that restates
@@ -84,26 +84,24 @@ const MAX_INDENT_DEPTH = 6;
  *   marks abstractness and provenance and refuses to fake a status dot the
  *   data cannot back.
  * - A DEPTH indicator: the superclass depth (`depthByUri`, the same measure
- *   the well stacks its layers by) as the exhibit's monospace dot-run AND
+ *   the well stacks its layers by) as a monospace dot-run AND
  *   as a real indent, so the class tree's shape is legible in the flat list.
  *
- * THE ASYMMETRY (the exhibit's central heuristic, and our TTL contract's
- * demand): the rail DIMS, it never HIDES. Every term stays mounted in
+ * THE ASYMMETRY: the rail DIMS, it never HIDES. Every term stays mounted in
  * document order under every filter, marked `data-dimmed` when it falls
  * out — so the index stays complete and stable, items never jump under the
  * cursor, and the number of things that exist never appears to change.
  * Only the graph hides (see `HierarchyWell`).
  *
  * Dimming is NOT disablement, and is deliberately not announced as such. A
- * dimmed item is still in the list, still focusable, and still navigates —
- * marking it `aria-disabled` told assistive technology the link was
- * unavailable when it plainly was not, which is a worse answer than saying
+ * dimmed item is still in the list, still focusable, and still navigates, so
+ * marking it `aria-disabled` would tell assistive technology the link is
+ * unavailable when it plainly is not, which is a worse answer than saying
  * nothing. The state reaches a screen reader in words instead: each heading
- * reports its own match count, so a filter that dims everything says so
- * rather than falling silent. `data-dimmed` carries the visual cue and
- * nothing else.
+ * reports its own match count, so a filter that dims everything says so rather
+ * than falling silent. `data-dimmed` carries the visual cue and nothing else.
  *
- * BIDIRECTIONAL HOVER (past the exhibit, whose hover only fades the graph):
+ * BIDIRECTIONAL HOVER:
  * pointing at — or keyboard-focusing — a rail item raises it as the shared
  * ego centre (`onHoverTerm`), so the WELL fades to that term's 1-hop
  * neighbourhood exactly as a graph-node hover does; and when the shared

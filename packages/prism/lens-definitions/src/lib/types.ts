@@ -8,7 +8,7 @@ export type Abstraction = (typeof ABSTRACTION_VALUES)[number];
  * ALLOW-lists: a term shows undimmed when its facets are both allowed.
  * An EMPTY allow-list means "no chip on this axis is lit", which dims
  * every term on that axis — the honest reading of "you turned everything
- * off", and exactly what the exhibit's chips do.
+ * off".
  */
 export interface LensFilter {
   /** The rail's search text, already trimmed and lower-cased. */

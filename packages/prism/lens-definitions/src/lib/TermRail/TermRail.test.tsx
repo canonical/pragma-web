@@ -138,7 +138,7 @@ describe("TermRail", () => {
     );
     expect(componentDepth).toBeGreaterThan(0);
 
-    // …and the depth glyph (the exhibit's monospace dot-run) is rendered,
+    // …and the depth glyph (a monospace dot-run) is rendered,
     // one dot per TRUE hop (the indent clamps, the glyph does not), and
     // aria-hidden so it never enters the accessible name.
     const glyph = componentItem?.querySelector(".depth");
