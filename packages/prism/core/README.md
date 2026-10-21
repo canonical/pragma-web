@@ -16,6 +16,11 @@ package holds the parts every such site needs and none of them owns:
 - **Well geometry**: the pure, deterministic layout functions a graph well
   settles its nodes and edges with (`relaxBoxes`, `edgeEndpoint`, `quadArc`,
   `selfLoop`, `settle`).
+- **Homes**: where each kind of graph node lives (`HomesProvider`,
+  `useHome`), so a mention of a node links to the page that owns it.
+- **Entity bindings**: which GraphQL type serves each ontology class
+  (`defineBinding`), checked against the schema (`assertBindings`) and the
+  running graph (`assertBindingsLive`).
 - **Route facets**: typed annotations a route carries on its `meta` bag, and
   the walk that reads them back off a route table. A lens declares itself
   with `routeLensFacet` on its index route, and claims a keyboard shortcut
@@ -170,6 +175,57 @@ prepare step stamps its server traffic through it, and a request attribute
 such as the reader's locale travels the same way. Do not reach the provider
 through module state instead.
 
+## Homes
+
+A site declares one resolver per `__typename`, and `Node` as the fallback,
+each building its href through the router so it follows the route table:
+
+```tsx
+const homes: Homes = {
+  Station: (node, router) =>
+    router.buildPath("stationsEntity", { params: { uri: node.uri } }),
+  Node: (node, router) =>
+    router.buildPath("definitionsTerm", { params: { term: node.uri } }),
+};
+
+<HomesProvider homes={homes}>
+  <Outlet />
+</HomesProvider>;
+```
+
+`useHome(node)` returns the node's href, or `undefined` when neither its
+type nor `Node` has a resolver. Mount `HomesProvider` inside the router and
+above all routed content: `useHome` throws without one, because a missing
+provider is a wiring bug, not a node without a home.
+
+## Entity bindings
+
+```ts
+export const station = defineBinding({
+  id: "station",
+  classUri: "metro:Station",
+  typename: "Station",
+});
+```
+
+`defineBinding` keeps `id` a literal type (`"station"`), so code built on a
+binding can derive names from it. Check the bindings in two places:
+
+- in the site's `check` script, `assertBindings(sdl, bindings)` parses the
+  provider's schema and throws, naming the binding, when an id repeats or a
+  type is missing or does not implement `Node`;
+- at boot, `await assertBindingsLive(execute, bindings)` asks the running
+  graph for every binding's class and throws when the graph does not know
+  one.
+
+## Consumer obligations
+
+- Mount `HomesProvider` above routed content.
+- Pass `prepareRelayData` the site's `routes`, `middleware` and `notFound`,
+  and stamp per-request attributes through `headers`, never module state.
+- Source `Chip`'s `prefixes` from the provider's `ontologies { prefix }`.
+- Run `assertBindings` in a `check` script and `assertBindingsLive` at boot.
+
 ## Public API
 
 - Components: `Chip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`, `CANVAS_ELEMENT_ID`,
@@ -186,6 +242,10 @@ through module state instead.
   `FacetBearer`, `LensEntry`, `LensTier`, `CollectedLens`,
   `ShortcutAllocation`.
 - Router: `createStaticRouter`.
+- Homes: `HomesProvider`, `useHome`; types `Homes`, `HomeResolver`,
+  `HomeNode`, `HomesProviderProps`.
+- Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`; types
+  `EntityBinding`, `GraphQLExecute`.
 - Relay: `createEnvironment`, `getPrefetchEnvironment`,
   `setPrefetchEnvironment`, `prefetchQuery`, `prepareRelayData`; types
   `CreateEnvironmentOptions`, `PrepareRelayDataOptions`, `PreparedRelayData`.

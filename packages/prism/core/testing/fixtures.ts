@@ -241,3 +241,48 @@ export const WARM_NOT_FOUND = route({
 
 /** A site's namespace prefixes, in the order its provider lists them. */
 export const PREFIXES = ["ds", "cs", "docs"] as const;
+
+/**
+ * A provider schema in SDL: `Station` implements `Node` (half in its
+ * definition, half in an extension), `Line` does not, and `Query` serves
+ * the binding probe.
+ */
+export const NODE_SDL = `
+interface Node {
+  uri: ID!
+}
+
+interface Named {
+  name: String
+}
+
+type Station implements Named {
+  uri: ID!
+  name: String
+}
+
+extend type Station implements Node
+
+type Line {
+  uri: ID!
+}
+
+type OntologyClass {
+  uri: ID!
+}
+
+type Query {
+  ontologyClass(uri: String!): OntologyClass
+}
+`;
+
+/** A schema with no `Node` interface at all. */
+export const NO_NODE_SDL = `
+type Station {
+  uri: ID!
+}
+
+type Query {
+  station: Station
+}
+`;

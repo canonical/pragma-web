@@ -20,6 +20,13 @@ export type { ClientOnlyProps } from "./ClientOnly/index.js";
 export { ClientOnly } from "./ClientOnly/index.js";
 export type { ErrorBoundaryProps } from "./ErrorBoundary/index.js";
 export { ErrorBoundary } from "./ErrorBoundary/index.js";
+export type {
+  HomeNode,
+  HomeResolver,
+  Homes,
+  HomesProviderProps,
+} from "./homes/index.js";
+export { HomesProvider, useHome } from "./homes/index.js";
 export type { LensBreadcrumbsProps } from "./LensBreadcrumbs/index.js";
 export { LensBreadcrumbs, makeLensContext } from "./LensBreadcrumbs/index.js";
 export type { ModeStripProps } from "./ModeStrip/index.js";
