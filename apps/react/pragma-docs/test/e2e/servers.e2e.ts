@@ -819,6 +819,42 @@ describe("server matrix (2×3) serves correctly", () => {
             );
             await new Promise((resolve) => setTimeout(resolve, 200));
             expect(server.hits("client")).toBe(clientHitsBefore + 1);
+
+            // 5j. ONE GRAPH REQUEST PER SERVER-RENDERED PAGE. The prepare
+            //     step awaits the matched route's `warm` with a per-request
+            //     environment; every other static router the server builds
+            //     for the same request (the status match, the render) runs
+            //     its `warm` with no environment published, so it fetches
+            //     nothing. A strict delta, then, not a floor: a second hit
+            //     per page is a double fetch.
+            const ssrBeforeSingle = server.hits("ssr");
+            const definitionsOnce = await fetch(`${server.base}/definitions`);
+            expect(definitionsOnce.status).toBe(200);
+            await definitionsOnce.text();
+            await waitForHits(server, "ssr", ssrBeforeSingle + 1);
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            expect(server.hits("ssr")).toBe(ssrBeforeSingle + 1);
+
+            //     …and two renders in flight at once stay apart: one hit
+            //     each, and each document carries its own page. The prefetch
+            //     environment is one module-level slot, so a render that left
+            //     it published across its await would hand it to the other
+            //     request's `warm` (an extra hit, and the other page's
+            //     records in this page's store).
+            const ssrBeforePair = server.hits("ssr");
+            const [catalogPair, termPair] = await Promise.all([
+              fetch(`${server.base}/components`).then((response) =>
+                response.text(),
+              ),
+              fetch(`${server.base}/definitions/ds%3AUIBlock`).then(
+                (response) => response.text(),
+              ),
+            ]);
+            expect(catalogPair).toContain("Accordion");
+            expect(termPair).toContain("UI Block");
+            await waitForHits(server, "ssr", ssrBeforePair + 2);
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            expect(server.hits("ssr")).toBe(ssrBeforePair + 2);
           }
         } finally {
           await server.stop();

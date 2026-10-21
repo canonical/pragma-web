@@ -2,10 +2,9 @@ import { route } from "@canonical/router-core";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
-import { ROUTE_QUERY_META_KEY, warmRouteQuery } from "#relay";
 import GuidePage from "./GuidePage.js";
 import HomePage from "./HomePage.js";
-import { lobbyRouteEntry } from "./lobbyQuery.js";
+import warmLobby from "./warmLobby.js";
 
 /**
  * The lobby's mode-strip context tenant: a single `Home` crumb (the lens
@@ -24,14 +23,14 @@ const HomeContext = makeLensContext({
  * (`/guides/:slug`, which stays a plain authored page — it has no graph
  * query yet).
  *
- * The lobby builds its `RouteQueryEntry` ONCE (in `lobbyQuery.ts`) and
- * parks it twice per the P-2/P-5 handshake:
+ * The lobby's data reaches the store through `warm: warmLobby`, the one
+ * seam between the router and the data layer:
  *
- * - `meta[ROUTE_QUERY_META_KEY]` — the server prepare step POSTs the query
- *   to the graph server and serialises the reply into the store
- *   (`prepareRelayData`);
- * - `prefetch` — hover (router-react's `Link`) and the initial hydration
- *   load warm the client store through `warmRouteQuery`.
+ * - on the server, `prepareRelayData` awaits it with a per-request
+ *   environment and serialises the store for hydration;
+ * - on hover (router-react's `Link`) and on the first browser load it runs
+ *   against the browser environment, where it does nothing when the store
+ *   already holds the data.
  *
  * The lobby claims the mode strip's context socket with "Home" — the lens
  * name as the Rail's `LENS_ENTRIES` labels it, matching how every other
@@ -42,11 +41,8 @@ const routes = {
   home: route({
     url: "/",
     content: HomePage,
-    warm: (params, search) => {
-      warmRouteQuery(lobbyRouteEntry, params, search);
-    },
+    warm: warmLobby,
     meta: {
-      [ROUTE_QUERY_META_KEY]: lobbyRouteEntry,
       ...shellStripFacet.of({ Context: HomeContext }),
       ...routeShortcutFacet.of("1"),
     },

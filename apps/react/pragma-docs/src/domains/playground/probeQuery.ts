@@ -1,10 +1,10 @@
 /**
  * The playground probe's query contract, lifted to the route level (P-2 D3):
  * the compiled `ComponentProbeQuery` operation and its exact variable values,
- * exported from one module so the route's server entry (`routes.ts` meta) and
- * the component (`ComponentProbe`) read the same operation and byte-identical
- * variables — after `ClientOnly` drops, the component's store read must match
- * the server-executed operation exactly.
+ * exported from one module so the route's `warmPlayground` and the component
+ * (`ComponentProbe`) read the same operation and byte-identical variables —
+ * after `ClientOnly` drops, the component's store read must match the
+ * server-executed operation exactly.
  *
  * This module imports the GENERATED artifact rather than declaring a tag:
  * it sits on the server bricks' native import chain (via `appRoutes`), where

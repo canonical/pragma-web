@@ -22,8 +22,8 @@ import { JSXRenderer } from "@canonical/react-ssr/renderer";
 import { getRequestUrl } from "@canonical/react-ssr/server";
 import { resolveGraphqlUrl } from "#graphql-endpoint";
 import EntryServer, { type InitialData } from "./entry.js";
-import { prepareRelayData } from "./prepareRelayData.js";
-import { resolveRouteStatus } from "./routeQueries.js";
+import prepareRelayData from "./prepareRelayData.js";
+import resolveRouteStatus from "./resolveRouteStatus.js";
 
 const htmlString = fs.readFileSync(
   path.join(process.cwd(), "dist", "client", "index.html"),
@@ -49,8 +49,8 @@ function cookieHeader(request: Request | IncomingMessage): string | null {
  * importing an in-process ke-graphql backend, and nobody had verified that a
  * WASM store could be bundled into `dist/server`. Since the PRD-3 process
  * split, preparing means POSTing to the graph server — so this module's
- * import graph reaches `prepareRelayData` → `routeQueries` → the app's routes
- * and stops there. It never reaches the store or the schema-plugin packages,
+ * import graph reaches `prepareRelayData` → the app's routes and stops
+ * there. It never reaches the store or the schema-plugin packages,
  * and no WASM enters `dist/server`. The standing proof is to build the server
  * bundle and grep the emitted code for the store package's name: zero hits
  * (matches inside TSDoc do not count — this bundle preserves comments).

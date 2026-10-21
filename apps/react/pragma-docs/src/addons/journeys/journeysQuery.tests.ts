@@ -20,8 +20,8 @@
 import { describe, expect, it } from "vitest";
 import {
   JOB_PAGE_SIZE,
+  journeysExplorerQueryNode,
   journeysExplorerVariables,
-  journeysRouteEntry,
   PAIRING_PAGE_SIZE,
   readJobParam,
 } from "./journeysQuery.js";
@@ -73,31 +73,20 @@ describe("readJobParam", () => {
   });
 });
 
-describe("journeysRouteEntry", () => {
-  it("carries a compiled operation with real text (the P-2 contract)", () => {
-    expect(typeof journeysRouteEntry.query.params.text).toBe("string");
-    expect(journeysRouteEntry.query.params.text?.length).toBeGreaterThan(0);
-    expect(journeysRouteEntry.query.params.name).toBe("JourneysExplorerQuery");
+describe("journeysExplorerQueryNode", () => {
+  it("carries a compiled operation with real text", () => {
+    expect(typeof journeysExplorerQueryNode.params.text).toBe("string");
+    expect(journeysExplorerQueryNode.params.text?.length).toBeGreaterThan(0);
+    expect(journeysExplorerQueryNode.params.name).toBe("JourneysExplorerQuery");
   });
 
   it("roots at pairings and reads composes through the Surface interface", () => {
     // The R2 finding, pinned in the shipped operation text: a `views` root
     // structurally cannot see the composes edges that hang off lenses.
-    const text = journeysRouteEntry.query.params.text ?? "";
+    const text = journeysExplorerQueryNode.params.text ?? "";
     expect(text).toContain("head: pairings(first:");
     expect(text).toContain("tail: pairings(last:");
     expect(text).toContain("pairsSurface");
     expect(text).toContain("composes");
-  });
-
-  it("builds identical variables to the direct builder", () => {
-    // The seams must agree byte for byte or the SSR-warmed store will not
-    // fulfil the component's read.
-    expect(journeysRouteEntry.variables({ job: JOB }, {})).toEqual(
-      journeysExplorerVariables(JOB),
-    );
-    expect(journeysRouteEntry.variables({}, {})).toEqual(
-      journeysExplorerVariables(undefined),
-    );
   });
 });

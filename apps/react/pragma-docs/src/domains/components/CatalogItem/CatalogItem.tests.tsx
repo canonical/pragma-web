@@ -1,7 +1,7 @@
 /**
  * CatalogItem through the real page fan-out: the card's link address is
  * the router's own render of `componentEntity` (percent-encoded URI
- * segment — the D31 pin in `routeQueries.tests.ts` holds it equal to
+ * segment — the D31 pin in `src/routes.tests.ts` holds it equal to
  * `resolveChipHref`), with the tier tag and the summary teaser.
  */
 

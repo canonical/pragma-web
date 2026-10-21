@@ -1,23 +1,23 @@
 import { route } from "@canonical/router-core";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
-import { ROUTE_QUERY_META_KEY, warmRouteQuery } from "#relay";
 import { DefinitionsPage } from "./DefinitionsPage/index.js";
-import { definitionsRouteEntry } from "./definitionsQuery.js";
 import { definitionsStripSlots } from "./stripSlots.js";
+import warmDefinitions from "./warmDefinitions.js";
 
 /**
  * The Definitions lens routes (P-5): the explorer (`/definitions`, the
  * lens key the Rail links to) and the term view (`/definitions/:term`,
  * percent-encoded prefixed URI, e.g. `/definitions/ds%3AUIBlock`). Both
- * mount the same page over the same ONE `RouteQueryEntry`
- * (`definitionsQuery.ts`), parked twice per the P-2/P-5 handshake:
+ * mount the same page over the same ONE operation (`definitionsQuery.ts`),
+ * and both reach the store through `warm: warmDefinitions`, the one seam
+ * between the router and the data layer:
  *
- * - `meta[ROUTE_QUERY_META_KEY]` — the server prepare step POSTs the query
- *   to the graph server and serialises the reply into the store
- *   (`prepareRelayData`);
- * - `prefetch` — hover (router-react's `Link`) and the initial hydration
- *   load warm the client store through `warmRouteQuery`.
+ * - on the server, `prepareRelayData` awaits it with a per-request
+ *   environment and serialises the store for hydration;
+ * - on hover (router-react's `Link`) and on the first browser load it runs
+ *   against the browser environment, where it does nothing when the store
+ *   already holds the data.
  *
  * Both routes claim ALL THREE mode-strip sockets (R5 — a toolbar and the
  * top bar should be useful): the context name, the filter chips, and the
@@ -35,11 +35,8 @@ const routes = {
   definitions: route({
     url: "/definitions",
     content: DefinitionsPage,
-    warm: (params, search) => {
-      warmRouteQuery(definitionsRouteEntry, params, search);
-    },
+    warm: warmDefinitions,
     meta: {
-      [ROUTE_QUERY_META_KEY]: definitionsRouteEntry,
       ...shellStripFacet.of({ ...definitionsStripSlots }),
       ...routeShortcutFacet.of("3"),
     },
@@ -47,11 +44,8 @@ const routes = {
   definitionsTerm: route({
     url: "/definitions/:term",
     content: DefinitionsPage,
-    warm: (params, search) => {
-      warmRouteQuery(definitionsRouteEntry, params, search);
-    },
+    warm: warmDefinitions,
     meta: {
-      [ROUTE_QUERY_META_KEY]: definitionsRouteEntry,
       ...shellStripFacet.of({ ...definitionsStripSlots }),
     },
   }),

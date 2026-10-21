@@ -3,6 +3,7 @@
   "files": {
     "includes": [
       "src",
+      "testing",
       "*.json",
       "vite.config.ts",
       "!src/relay/__generated__",

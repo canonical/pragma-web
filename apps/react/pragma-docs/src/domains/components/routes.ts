@@ -2,11 +2,10 @@ import { route } from "@canonical/router-core";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
-import { ROUTE_QUERY_META_KEY, warmRouteQuery } from "#relay";
 import { ComponentEntityPage } from "./ComponentEntityPage/index.js";
 import { ComponentsCatalogPage } from "./ComponentsCatalogPage/index.js";
-import { componentsCatalogRouteEntry } from "./catalogQuery.js";
-import { componentEntityRouteEntry } from "./entityQuery.js";
+import warmCatalog from "./warmCatalog.js";
+import warmComponentEntity from "./warmComponentEntity.js";
 
 /**
  * The lens's mode-strip context tenant: the breadcrumb trail. `Components`
@@ -21,16 +20,15 @@ const ComponentsContext = makeLensContext({
 });
 
 /**
- * The Components lens routes (P-5). Each data-bearing route builds its
- * `RouteQueryEntry` ONCE (in its query module) and parks it twice:
+ * The Components lens routes (P-5). Each data-bearing route's data reaches
+ * the store through its `warm` (`warmCatalog`, `warmComponentEntity`), the
+ * one seam between the router and the data layer:
  *
- * - `meta[ROUTE_QUERY_META_KEY]` — the server prepare step POSTs the query
- *   to the graph server and serialises the reply into the store (P-2,
- *   `prepareRelayData`);
- * - `prefetch` — hover (router-react's `Link`) and the initial hydration
- *   load warm the client store through `warmRouteQuery`, which no-ops
- *   without a published environment (SSR) and when the store already
- *   fulfils the operation (the freshly hydrated page).
+ * - on the server, `prepareRelayData` awaits it with a per-request
+ *   environment and serialises the store for hydration;
+ * - on hover (router-react's `Link`) and on the first browser load it runs
+ *   against the browser environment, where it does nothing when the store
+ *   already holds the data (the freshly hydrated page).
  *
  * Both routes claim the mode strip's context socket ("Components") — the
  * lens name, stationary across the lens's URLs; controls/status stay
@@ -44,11 +42,8 @@ const routes = {
   components: route({
     url: "/components",
     content: ComponentsCatalogPage,
-    warm: (params, search) => {
-      warmRouteQuery(componentsCatalogRouteEntry, params, search);
-    },
+    warm: warmCatalog,
     meta: {
-      [ROUTE_QUERY_META_KEY]: componentsCatalogRouteEntry,
       ...shellStripFacet.of({ Context: ComponentsContext }),
       ...routeShortcutFacet.of("2"),
     },
@@ -56,11 +51,8 @@ const routes = {
   componentEntity: route({
     url: "/components/:uri",
     content: ComponentEntityPage,
-    warm: (params, search) => {
-      warmRouteQuery(componentEntityRouteEntry, params, search);
-    },
+    warm: warmComponentEntity,
     meta: {
-      [ROUTE_QUERY_META_KEY]: componentEntityRouteEntry,
       ...shellStripFacet.of({ Context: ComponentsContext }),
     },
   }),

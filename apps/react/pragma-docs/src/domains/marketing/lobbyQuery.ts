@@ -1,8 +1,7 @@
 /**
  * The Home lobby's query contract (the `standardsIndexQuery.ts` sibling):
  * the compiled `LobbyQuery` operation plus the one variables builder,
- * shared by the server prepare step (`routes.ts` meta), the client
- * prefetch seam (`warmRouteQuery`), and the page's hook — byte-identical
+ * shared by the route's `warmLobby` and the page's hook — byte-identical
  * variables everywhere. Artifact-only imports: this module rides the
  * server bricks' native import chain; the tag lives in `HomePage.tsx`.
  *
@@ -39,7 +38,6 @@
  */
 
 import { GRAPH_BINDINGS } from "#lib/graphBindings";
-import type { RouteQueryEntry } from "#relay";
 import type { LobbyQuery$variables } from "#relay/__generated__/LobbyQuery.graphql.js";
 import lobbyQueryNode from "#relay/__generated__/LobbyQuery.graphql.js";
 
@@ -81,12 +79,3 @@ export const lobbyVariables = (): LobbyQuery$variables => ({
   standardClass: LOBBY_STANDARD_CLASS,
   exemplars: LOBBY_EXEMPLAR_COUNT,
 });
-
-/**
- * The route's one query entry — parked under BOTH `meta` (the P-2 server
- * prepare contract) and `prefetch` (the P-5 warm-up seam) by `routes.ts`.
- */
-export const lobbyRouteEntry: RouteQueryEntry = {
-  query: lobbyQueryNode,
-  variables: lobbyVariables,
-};

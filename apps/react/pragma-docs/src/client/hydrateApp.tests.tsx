@@ -19,6 +19,7 @@ import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createStaticRouter } from "#lib/router";
+import createFetchSpy from "../../testing/createFetchSpy.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
 // Definitions block: the captured explorer records, plus the jsdom shims
@@ -46,16 +47,11 @@ import { hydrateApp } from "./hydrateApp.js";
 /** The URL the server renders and the client hydrates at. */
 const PLAYGROUND_URL = "/playground";
 
-/** A fetch spy that never settles: any call means "the network was hit". */
-const createFetchSpy = () =>
-  vi.fn(() => new Promise<never>(() => {})) as ReturnType<typeof vi.fn> &
-    FetchFunction;
-
 /**
- * The seeded pages the seam must hydrate silently. The P-5 lens routes
- * carry `prefetch` hooks that FIRE during these tests (the browser
+ * The seeded pages the seam must hydrate silently. The data-bearing
+ * routes carry `warm` hooks that FIRE during these tests (the browser
  * router's initial `performLoad`), so the zero-fetch assertion also proves
- * `warmRouteQuery`'s check guard: without it, the initial pass would
+ * `prefetchQuery`'s store check: without it, the initial pass would
  * refetch the very page the server just seeded.
  */
 const SEEDED_PAGES = [
@@ -284,9 +280,9 @@ describe("hydrateApp over the seeded SSR output", () => {
       expect(container.querySelector(liveSelector)?.textContent).toBe(liveText);
       // …and the network was NEVER consulted: hydration read the records
       // the seam seeded from `__INITIAL_DATA__`, and the route prefetch the
-      // initial load fires found the store already warm (`warmRouteQuery`'s
-      // check guard). Discarding the records in `hydrateApp`
-      // (`records: undefined`) or the guard in `warmRouteQuery` turns
+      // initial load fires found the store already warm (`prefetchQuery`'s
+      // store check). Discarding the records in `hydrateApp`
+      // (`records: undefined`) or the check in `prefetchQuery` turns
       // exactly this assertion red.
       expect(globalFetch).not.toHaveBeenCalled();
     },

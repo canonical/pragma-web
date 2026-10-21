@@ -1,11 +1,8 @@
 /**
  * The generic route-table walk: every route carrying a given facet.
  *
- * This is a GENERALISATION OF AN EXISTING WALK, not a new idea —
- * `collectRouteQueries` (`src/server/routeQueries.ts`) does exactly this for
- * the query facet, and predates it. Anything needing "the set of routes that
- * annotated themselves with X" should come here rather than grow a third
- * copy of the loop.
+ * Anything needing "the set of routes that annotated themselves with X"
+ * should come here rather than grow its own copy of the loop.
  */
 
 import type { AnyRoute } from "@canonical/router-core";
@@ -31,9 +28,9 @@ export interface FacetBearer<TName extends string, TValue> {
  * user-visible: the Rail's lens order is owner-ruled and stays declared in
  * `#lib/Rail/constants.js`.
  *
- * A malformed annotation throws HERE, at first collection, exactly as
- * `collectRouteQueries` does — one bad route fails the whole collection
- * rather than quietly dropping itself out of the set.
+ * A malformed annotation throws HERE, at first collection — one bad route
+ * fails the whole collection rather than quietly dropping itself out of the
+ * set.
  */
 export const collectFacet = <
   TRoutes extends Readonly<Record<string, AnyRoute>>,

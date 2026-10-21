@@ -54,7 +54,7 @@ interface EntityConnection {
 }
 
 /**
- * Kinds whose landing route EXISTS today (`routeQueries.tests.ts` pins the
+ * Kinds whose landing route EXISTS today (`src/routes.tests.ts` pins the
  * set; `ROUTE_PREFIX_BY_KIND` anticipates the rest). A linkable relation
  * delivering, say, a pattern still renders inert until `/patterns` lives.
  */

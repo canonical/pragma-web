@@ -2,7 +2,7 @@
  * Node module hook that resolves `.css` imports to an empty module.
  *
  * The Express dev server imports the app's route modules NATIVELY (see
- * `routeQueries.ts` — the data pass runs to completion before the render
+ * `prepareRelayData.ts` — the data pass runs to completion before the render
  * pass, which is what lives behind `ssrLoadModule`), and that import chain
  * carries client CSS side-effect imports (e.g. `src/lib/Chip/styles.css`),
  * which Node cannot load (ERR_UNKNOWN_FILE_EXTENSION — tsx transforms

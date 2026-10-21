@@ -1,23 +1,23 @@
 import { route } from "@canonical/router-core";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
-import { ROUTE_QUERY_META_KEY, warmRouteQuery } from "#relay";
 import { JourneysPage } from "./JourneysPage/index.js";
-import { journeysRouteEntry } from "./journeysQuery.js";
 import { journeysStripSlots } from "./stripSlots.js";
+import warmJourneys from "./warmJourneys.js";
 
 /**
  * The Journeys lens routes (AV-351): the diagram (`/journeys`, the lens
  * key the Rail links to) and the job view (`/journeys/:job`,
  * percent-encoded graph URI). Both mount the same page over the same ONE
- * `RouteQueryEntry` (`journeysQuery.ts`), parked twice per the P-2/P-5
- * handshake:
+ * operation (`journeysQuery.ts`), and both reach the store through
+ * `warm: warmJourneys`, the one seam between the router and the data
+ * layer:
  *
- * - `meta[ROUTE_QUERY_META_KEY]` — the server prepare step POSTs the query
- *   to the graph server and serialises the reply into the store
- *   (`prepareRelayData`);
- * - `prefetch` — hover (router-react's `Link`) and the initial hydration
- *   load warm the client store through `warmRouteQuery`.
+ * - on the server, `prepareRelayData` awaits it with a per-request
+ *   environment and serialises the store for hydration;
+ * - on hover (router-react's `Link`) and on the first browser load it runs
+ *   against the browser environment, where it does nothing when the store
+ *   already holds the data.
  *
  * THE JOB IS THE ADDRESSABLE THING (P-D7). A journey is a job's path
  * through the surfaces that serve it, so the job is what a reader links
@@ -45,11 +45,8 @@ const routes = {
   journeys: route({
     url: "/journeys",
     content: JourneysPage,
-    warm: (params, search) => {
-      warmRouteQuery(journeysRouteEntry, params, search);
-    },
+    warm: warmJourneys,
     meta: {
-      [ROUTE_QUERY_META_KEY]: journeysRouteEntry,
       ...shellStripFacet.of({ ...journeysStripSlots }),
       ...routeShortcutFacet.of("5"),
     },
@@ -57,11 +54,8 @@ const routes = {
   journeysJob: route({
     url: "/journeys/:job",
     content: JourneysPage,
-    warm: (params, search) => {
-      warmRouteQuery(journeysRouteEntry, params, search);
-    },
+    warm: warmJourneys,
     meta: {
-      [ROUTE_QUERY_META_KEY]: journeysRouteEntry,
       ...shellStripFacet.of({ ...journeysStripSlots }),
     },
   }),
