@@ -19,8 +19,7 @@ overrides a Markdown renderer takes.
 Every representation reads its node through a fragment of its own, so a
 lens spreads it in its query and hands the component the key. The
 representations select only what the contract guarantees on every node
-(`_meta { title curie type { uri } }`); a type's own arm adds what that type
-carries.
+(`_meta { title curie type { uri } }`).
 
 ## Installation
 
@@ -153,22 +152,16 @@ import {
 ```
 
 A map is keyed by `__typename`; `Node` is the arm for every type the map
-does not name. A site gives a type its own arm by spreading over the
-defaults:
+does not name. An arm receives the node as its representation's composite
+fragment reads it, the node's home as `href` (`undefined` when it has
+none), and the native props of the root it renders.
 
-```tsx
-const maps = {
-  ...defaultProjectionMaps,
-  chip: { ...defaultProjectionMaps.chip, Station: StationChip },
-};
-```
-
-An arm receives the node as the representation's composite fragment reads
-it, the node's home as `href` (`undefined` when it has none), and the
-native props of the root it renders. A type's arm reads its own fields
-through a fragment spread inside an inline fragment on that type in the
-representation's composite, so every key of a map is matched by an arm of
-its composite; the package's tests hold the two in step.
+The composites are the package's own: each spreads the fragment of every
+arm the package ships, inside an inline fragment on that arm's type, and
+the package's tests hold each map's keys and its composite's arms in step.
+A site cannot add a spread to a composite, so an arm a site wrote for a type
+of its own would see only what the composite already selects. A site
+therefore mounts `defaultProjectionMaps`, whose arms are the `Node` arms.
 
 A node's home is resolved with its compact address (`_meta.curie`) as the
 `uri` a site's home resolver receives, so one entity has one address.
@@ -204,12 +197,8 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 ## Public API
 
 - Representations: `EntityChip`, `EntityRow`, `EntityCard`,
-  `EntityCommand`, `EntityTitle`; types `EntityChipProps`, `EntityChipArm`,
-  `EntityChipArmProps`, `EntityRowProps`, `EntityRowArm`,
-  `EntityRowArmProps`, `EntityCardProps`, `EntityCardArm`,
-  `EntityCardArmProps`, `EntityCommandProps`, `EntityCommandArm`,
-  `EntityCommandArmProps`, `EntityTitleProps`, `EntityTitleArm`,
-  `EntityTitleArmProps`.
+  `EntityCommand`, `EntityTitle`; types `EntityChipProps`, `EntityRowProps`,
+  `EntityCardProps`, `EntityCommandProps`, `EntityTitleProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

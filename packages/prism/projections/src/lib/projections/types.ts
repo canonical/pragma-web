@@ -29,7 +29,11 @@ export interface ProjectionMaps {
 
 /** Props accepted by `ProjectionsProvider`. */
 export interface ProjectionsProviderProps {
-  /** The site's maps: `defaultProjectionMaps`, or a spread over it. */
+  /**
+   * The site's maps: `defaultProjectionMaps`. An arm reads only what its
+   * representation's composite selects, and only the package writes the
+   * composites.
+   */
   readonly maps: ProjectionMaps;
   /** The content whose representations read the maps. */
   readonly children: ReactNode;
