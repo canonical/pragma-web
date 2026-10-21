@@ -1,0 +1,31 @@
+/*
+ * StandardsPage — the lens heading over the grouped index. Normal flow: the
+ * index scrolls with the canvas, as a reading view does.
+ */
+
+@layer ds.prism {
+  /* A SUBGRID pass-through: the page authors no columns of its own — it
+   * inherits the lens layout's intrinsic columns and re-emits them to the
+   * index, so the index's category links land on the shared lines. A reading
+   * view, so it claims no block size: the index scrolls with the canvas. */
+  .ds.standards-page {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-content: start;
+  }
+
+  /* Present for assistive tech and as the section's `aria-labelledby` target
+   * (`lens-standards-title`), absent from the layout: the mode strip's
+   * breadcrumb trail carries the visible title. The visually hidden idiom. */
+  .ds.standards-page > .heading {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

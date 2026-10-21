@@ -42,10 +42,7 @@ import {
 } from "vitest";
 import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#addons/journeys";
 import { CATALOG_PAGE_SIZE, RELATION_PAGE_SIZE } from "#domains/components";
-import {
-  STANDARD_CLASS_URI,
-  STANDARDS_PAGE_SIZE,
-} from "#domains/lenses/standards";
+import { STANDARDS_BINDING } from "#domains/lenses";
 import {
   LOBBY_COMPONENT_CLASS,
   LOBBY_EXEMPLAR_COUNT,
@@ -194,8 +191,10 @@ describe("prepareRelayData over HTTP", () => {
       url: "/standards",
       operationName: "StandardsIndexQuery",
       variables: {
-        classUri: STANDARD_CLASS_URI,
-        count: STANDARDS_PAGE_SIZE,
+        classUri: STANDARDS_BINDING.classUri,
+        // The lens's page size, pinned here as the literal the SSR
+        // variables must carry: the package does not export it.
+        count: 100,
         cursor: null,
       },
     },
@@ -204,7 +203,7 @@ describe("prepareRelayData over HTTP", () => {
       operationName: "StandardEntityQuery",
       variables: {
         uri: STANDARD_URI,
-        classUri: STANDARD_CLASS_URI,
+        classUri: STANDARDS_BINDING.classUri,
       },
     },
     {

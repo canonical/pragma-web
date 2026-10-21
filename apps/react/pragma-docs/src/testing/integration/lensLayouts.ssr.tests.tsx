@@ -37,13 +37,15 @@ import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
 import { EntryServer } from "#server";
 import { definitionsExplorerRecords } from "../../../testing/definitionsRecords.js";
+import {
+  LINK_COMPONENT_URI,
+  standardEntityRecords,
+  standardsIndexRecords,
+} from "../../../testing/standardsRecords.js";
 import journeysExplorerRecords from "../../addons/journeys/__fixtures__/journeysExplorerRecords.js";
 import journeysExplorerRecordsJob from "../../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import catalogRecords from "../../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../../domains/components/__fixtures__/componentEntityRecordsButton.js";
-import standardEntityRecords from "../../domains/lenses/standards/__fixtures__/standardEntityRecords.js";
-import standardsIndexRecords from "../../domains/lenses/standards/__fixtures__/standardsIndexRecords.js";
-import { LINK_COMPONENT_URI } from "../../domains/lenses/standards/__fixtures__/standardsPageHarness.js";
 import lobbyRecords from "../../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../../domains/playground/__fixtures__/componentProbeRecords.js";
 
@@ -478,7 +480,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
       'data-view="standard-reading"',
     );
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
-      '<h1 id="standard-reading-title">react.component.link_component</h1>',
+      '<h1 class="heading" id="standard-reading-title">react.component.link_component</h1>',
     );
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
       'data-slot="reading-canvas"',

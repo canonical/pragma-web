@@ -30,10 +30,12 @@ import componentEntityRecordsButton from "../domains/components/__fixtures__/com
 import "../../testing/stubReactFlowGlobals.js";
 import type { InitialData } from "#server";
 import { definitionsExplorerRecords } from "../../testing/definitionsRecords.js";
+import {
+  LINK_COMPONENT_URI,
+  standardEntityRecords,
+} from "../../testing/standardsRecords.js";
 import journeysExplorerRecords from "../addons/journeys/__fixtures__/journeysExplorerRecords.js";
 import journeysExplorerRecordsJob from "../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
-import standardEntityRecords from "../domains/lenses/standards/__fixtures__/standardEntityRecords.js";
-import { LINK_COMPONENT_URI } from "../domains/lenses/standards/__fixtures__/standardsPageHarness.js";
 import lobbyRecords from "../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../domains/playground/__fixtures__/componentProbeRecords.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
@@ -103,7 +105,7 @@ const SEEDED_PAGES = [
     url: `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
     records: standardEntityRecords,
     serverMarker:
-      '<h1 id="standard-reading-title">react.component.link_component</h1>',
+      '<h1 class="heading" id="standard-reading-title">react.component.link_component</h1>',
     liveSelector: "#standard-reading-title",
     liveText: "react.component.link_component",
   },

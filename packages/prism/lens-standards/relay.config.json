@@ -1,0 +1,31 @@
+{
+  "root": "..",
+  "sources": {
+    "lens-standards/src": "lens-standards",
+    "projections/src": "prism-projections"
+  },
+  "excludes": ["**/node_modules/**", "**/__generated__/**"],
+  "projects": {
+    "prism-projections": {
+      "schema": "contract/schema/contract.graphql",
+      "language": "typescript",
+      "eagerEsModules": true,
+      "output": "lens-standards/.relay/prism-projections",
+      "schemaConfig": {
+        "nodeInterfaceIdField": "uri",
+        "nodeInterfaceIdVariableName": "id"
+      }
+    },
+    "lens-standards": {
+      "base": "prism-projections",
+      "schema": "contract/schema/contract.graphql",
+      "language": "typescript",
+      "eagerEsModules": true,
+      "output": "lens-standards/src/__generated__",
+      "schemaConfig": {
+        "nodeInterfaceIdField": "uri",
+        "nodeInterfaceIdVariableName": "id"
+      }
+    }
+  }
+}

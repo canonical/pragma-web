@@ -1,0 +1,44 @@
+/*
+ * StandardsLayout — the Standards lens's page grid.
+ *
+ * The rail sits in the west columns, then the viewport stacks the mode
+ * strip, the canvas and the colophon. The columns are the design system's
+ * intrinsic grid (`--grid-intrinsic`, from @canonical/styles): unnamed
+ * columns in fours, auto-filled, so their count tracks the width. The
+ * viewport and the canvas are subgrids of these columns, so every page
+ * aligns to the same ruler and a region claims its width by spanning them.
+ */
+
+@layer ds.prism {
+  :root {
+    --standards-layout-color-background: var(--color-background);
+    --standards-layout-color-text: var(--color-text);
+  }
+
+  .ds.standards-layout {
+    display: grid;
+    grid-template-columns: var(--grid-intrinsic);
+    /* The layout's single row is the 100dvh box; the viewport stacks its own
+     * rows within it. */
+    grid-template-rows: minmax(0, 1fr);
+    block-size: 100dvh;
+    /* The layout never scrolls — the canvas owns the scroll. */
+    overflow: clip;
+    background: var(--standards-layout-color-background);
+    color: var(--standards-layout-color-text);
+  }
+
+  /* The viewport claims every column east of the rail: `3 / -1` starts after
+   * the rail's two columns (the rail's --rail-span) and runs to the last line
+   * whatever the live column count. It stacks the strip, canvas and colophon
+   * rows; `min-block-size: 0` lets the middle row shrink so the canvas, not
+   * the layout, scrolls. */
+  .ds.standards-layout .viewport {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 3 / -1;
+    grid-template-rows: min-content minmax(0, 1fr) min-content;
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+}
