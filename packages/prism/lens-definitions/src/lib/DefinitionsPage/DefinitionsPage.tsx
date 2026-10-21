@@ -29,7 +29,7 @@ const DefinitionsPage = ({
   params,
 }: DefinitionsPageProps): React.ReactElement => {
   const t = useMessages();
-  const term = readTermParam(params ?? {});
+  const term = readTermParam(params);
 
   return (
     <section

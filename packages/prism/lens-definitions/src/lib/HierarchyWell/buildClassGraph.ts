@@ -121,25 +121,24 @@ interface WorkingNode extends WellBox {
  * none of them squats the middle pretending to be THE root).
  */
 const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
+  type OntologyClass = ClassGraphOntology["classes"][number];
   const namespaces = [ontology];
-  const childrenOf = new Map<string, string[]>();
-  const roots: string[] = [];
-  const classByUri = new Map(
-    ontology.classes.map((klass) => [klass.uri, klass]),
-  );
+  const childrenOf = new Map<string, OntologyClass[]>();
+  const roots: OntologyClass[] = [];
+  const uris = new Set(ontology.classes.map((klass) => klass.uri));
   for (const klass of ontology.classes) {
     const parent = klass.superclass?.uri;
-    if (parent !== undefined && classByUri.has(parent)) {
+    if (parent !== undefined && uris.has(parent)) {
       const siblings = childrenOf.get(parent) ?? [];
-      siblings.push(klass.uri);
+      siblings.push(klass);
       childrenOf.set(parent, siblings);
     } else {
-      roots.push(klass.uri);
+      roots.push(klass);
     }
   }
 
-  const countLeaves = (uri: string): number => {
-    const children = childrenOf.get(uri) ?? [];
+  const countLeaves = (klass: OntologyClass): number => {
+    const children = childrenOf.get(klass.uri) ?? [];
     if (children.length === 0) return 1;
     let total = 0;
     for (const child of children) total += countLeaves(child);
@@ -148,12 +147,16 @@ const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
 
   const nodes: WorkingNode[] = [];
   const singleRoot = roots.length === 1;
-  const depthByUri = computeClassDepths(ontology.classes);
 
-  const place = (uri: string, from: number, to: number): void => {
-    const klass = classByUri.get(uri);
-    if (klass === undefined) return;
-    const depth = depthByUri.get(uri) ?? 0;
+  // A child sits one hop deeper than the parent that placed it, which is its
+  // superclass depth within the ontology: the walk starts at the roots, so
+  // it never enters a cycle.
+  const place = (
+    klass: OntologyClass,
+    depth: number,
+    from: number,
+    to: number,
+  ): void => {
     // Radius: the lone root owns the centre; in a multi-root disc every
     // root starts one ring out, keeping the middle clear.
     const ring = singleRoot ? depth : depth + 1;
@@ -174,12 +177,12 @@ const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
       width: estimateWidth(label),
       height: NODE_HEIGHT,
     });
-    const children = childrenOf.get(uri) ?? [];
+    const children = childrenOf.get(klass.uri) ?? [];
     const total = children.reduce((sum, child) => sum + countLeaves(child), 0);
     let cursor = from;
     for (const child of children) {
       const share = ((to - from) * countLeaves(child)) / Math.max(total, 1);
-      place(child, cursor, cursor + share);
+      place(child, depth + 1, cursor, cursor + share);
       cursor += share;
     }
   };
@@ -188,7 +191,7 @@ const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
   let cursor = 0;
   for (const root of roots) {
     const share = (2 * Math.PI * countLeaves(root)) / Math.max(totalLeaves, 1);
-    place(root, cursor, cursor + share);
+    place(root, 0, cursor, cursor + share);
     cursor += share;
   }
 

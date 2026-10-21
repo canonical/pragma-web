@@ -57,7 +57,7 @@ const useCurrentTerm = (): string | undefined => {
   const { match } = useRouterState();
   return readTermParam(
     match?.kind === "route"
-      ? ((match.params ?? {}) as Readonly<Record<string, unknown>>)
+      ? (match.params as Readonly<Record<string, unknown>>)
       : {},
   );
 };
