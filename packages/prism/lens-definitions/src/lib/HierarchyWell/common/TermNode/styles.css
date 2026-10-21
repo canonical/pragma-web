@@ -4,8 +4,10 @@
  * for an abstract class, a small tag at its foot outside the link, so the
  * node's accessible name stays the term alone.
  *
- * Each design decision reads a component token bound to a semantic token,
- * which falls back to the lens's default where the site binds none.
+ * Each design decision reads a component token. Where the design system has
+ * a token for it, the component token reads that token, falling back to the
+ * lens's default where the site binds none; where it has none, the component
+ * token holds the lens's own value.
  *
  * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
  */
@@ -16,14 +18,11 @@
     --term-node-background: var(--color-background);
     --term-node-border-width: var(--dimension-stroke-thickness-medium, 1px);
     --term-node-border-color: var(--color-border-muted);
-    --term-node-radius: var(--radius-medium, 0.5rem);
+    --term-node-radius: var(--dimension-radius-medium, 0.5rem);
     --term-node-color: var(--color-text);
-    --term-node-font-size: var(--font-size-small, 0.875rem);
+    --term-node-font-size: var(--dimension-size-font-size-300, 0.875rem);
     --term-node-shadow: drop-shadow(
-      var(
-        --shadow-raised,
-        0 1px 2px color-mix(in oklab, var(--color-text) 12%, transparent)
-      )
+      0 1px 2px color-mix(in oklab, var(--color-text) 12%, transparent)
     );
     --term-node-selected-border-color: var(--color-text);
     --term-node-selected-border-width: var(
@@ -35,12 +34,12 @@
       var(--color-text) 6%,
       var(--color-background)
     );
-    --term-node-selected-font-weight: var(--font-weight-semibold, 600);
-    --term-node-tag-font-size: var(--font-size-micro, 0.5rem);
+    --term-node-selected-font-weight: 600;
+    --term-node-tag-font-size: 0.5rem;
     --term-node-tag-offset: calc(1.2 * var(--space-150, 0.75rem));
-    --term-node-tag-letter-spacing: var(--letter-spacing-wide, 0.08em);
+    --term-node-tag-letter-spacing: 0.08em;
     --term-node-tag-color: var(--color-text-muted);
-    --term-node-faded-opacity: var(--opacity-faded, 0.16);
+    --term-node-faded-opacity: 0.16;
     --term-node-transition-duration: var(--motion-duration-fast, 0.15s);
   }
 

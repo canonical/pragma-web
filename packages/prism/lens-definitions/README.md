@@ -121,35 +121,39 @@ selection leaves the contract and when the artifacts are stale. Run
 
 The stylesheets sit in the `ds.prism` cascade layer. Each design decision
 reads a component token, declared on `:root` and named for its component
-(`--term-rail-dimmed-opacity`, `--hierarchy-well-accent-color`, …), bound to
-a semantic token, so a site retunes the lens through either tier. Where the
-site binds no such semantic token, the binding falls back to the lens's own
-default. Two component tokens hold a literal layout measure instead:
-`--definitions-explorer-well-min-block-size` and
+(`--term-rail-dimmed-opacity`, `--hierarchy-well-accent-color`, …), so a
+site retunes the lens by setting component tokens. Where the design system
+has a token for the decision, the component token reads it, and falls back
+to the lens's own default where the site loads none, so a site also retunes
+those decisions through the design system:
+
+- colour: `--color-text`, `--color-text-muted`, `--color-text-branded`,
+  `--color-background`, `--color-background-contrasted`, `--color-border`,
+  `--color-border-muted`;
+- type: `--dimension-size-font-size-250`, `--dimension-size-font-size-300`,
+  `--dimension-size-font-size-350`, `--dimension-letter-spacing-wide`,
+  `--typography-font-family-monospace`;
+- shape: `--dimension-radius-small`, `--dimension-radius-medium`,
+  `--dimension-radius-full`, `--dimension-stroke-thickness-medium`,
+  `--dimension-stroke-thickness-large`;
+- space and motion: `--space-025` to `--space-800`, `--motion-duration-fast`.
+
+Where the design system has no token, the component token holds the lens's
+own value, and only the component token retunes it: the type sizes off the
+system's scale (the well's labels and captions, the legend, the inspector's
+definitions, the abstract tag), the font weights and the wider tracking,
+every opacity, the indicator size, the well's edge widths and shadows, and
+two layout measures, `--definitions-explorer-well-min-block-size` and
 `--well-legend-max-inline-size`.
 
-The semantic tokens the lens reads and falls back from:
-
-- type: `--font-size-default`, `--font-size-small`, `--font-size-detail`,
-  `--font-size-label`, `--font-size-caption`, `--font-size-micro`,
-  `--font-size-subheading`, `--font-weight-semibold`, `--font-weight-bold`,
-  `--letter-spacing-label`, `--letter-spacing-wide`, `--letter-spacing-wider`;
-- shape: `--radius-small`, `--radius-medium`, `--size-indicator`,
-  `--stroke-width-hairline`, `--stroke-width-accent`, `--shadow-raised`,
-  `--shadow-floating`;
-- opacity: `--opacity-muted`, `--opacity-dimmed`, `--opacity-faded`,
-  `--opacity-ambient`, `--opacity-subtle`, `--opacity-faint`.
-
-The stylesheets also read custom properties the package does not define:
+The stylesheets also read custom properties that are not design decisions:
 
 - `--grid-intrinsic`, the intrinsic column template from `@canonical/styles`,
   which the layout's root reads;
 - `--z-plate` and `--z-underground`, the strata the well's floating hint and
   legend are raised to and the well itself sits on, and
   `--surface-underground-background`, the well floor's tint, which the site
-  defines;
-- the semantic `--color-*`, `--space-*`, `--dimension-*`, `--motion-*` and
-  `--font-family-mono` tokens the site's theme binds.
+  defines.
 
 ## Public API
 

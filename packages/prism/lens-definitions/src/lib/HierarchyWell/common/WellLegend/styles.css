@@ -4,10 +4,12 @@
  * that scales with the well. Its swatches restate the node and edge
  * encodings exactly, so the legend cannot drift from what the graph draws.
  *
- * Each design decision reads a component token bound to a semantic token,
- * which falls back to the lens's default where the site binds none. The
- * legend's cap, `--well-legend-max-inline-size`, is a literal layout
- * measure, as are the few pixels that draw the legend's arrowhead.
+ * Each design decision reads a component token. Where the design system has
+ * a token for it, the component token reads that token, falling back to the
+ * lens's default where the site binds none; where it has none, the component
+ * token holds the lens's own value, as the legend's cap
+ * `--well-legend-max-inline-size` does. The few pixels that draw the
+ * legend's arrowhead are literal too.
  */
 
 @layer ds.prism {
@@ -18,20 +20,18 @@
     --well-legend-padding-inline: var(--space-150, 0.75rem);
     --well-legend-border-width: var(--dimension-stroke-thickness-medium, 1px);
     --well-legend-border-color: var(--color-border-muted);
-    --well-legend-radius: var(--radius-medium, 0.5rem);
+    --well-legend-radius: var(--dimension-radius-medium, 0.5rem);
     --well-legend-background: var(--color-background);
-    --well-legend-shadow: var(
-      --shadow-floating,
+    --well-legend-shadow:
       0 1px 2px color-mix(in oklab, var(--color-text) 6%, transparent),
-      0 6px 24px color-mix(in oklab, var(--color-text) 7%, transparent)
-    );
-    --well-legend-font-size: var(--font-size-caption, 0.6875rem);
+      0 6px 24px color-mix(in oklab, var(--color-text) 7%, transparent);
+    --well-legend-font-size: 0.6875rem;
     --well-legend-color: var(--color-text-muted);
     --well-legend-gap: var(--space-050, 0.25rem);
     --well-legend-row-gap: var(--space-100, 0.5rem);
     --well-legend-swatch-inline-size: var(--space-300, 1.5rem);
     --well-legend-swatch-block-size: var(--space-150, 0.75rem);
-    --well-legend-swatch-radius: var(--radius-small, 0.1875rem);
+    --well-legend-swatch-radius: var(--dimension-radius-small, 0.1875rem);
     --well-legend-swatch-background: var(--color-background);
     --well-legend-line-color: var(--color-border-muted);
     --well-legend-relation-color: var(--color-text-branded);

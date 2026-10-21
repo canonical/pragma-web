@@ -6,9 +6,10 @@
  * overflows into the canvas region's own scroll rather than stacking: no
  * conditional at-rule reshapes it.
  *
- * Each design decision reads a component token bound to a semantic token,
- * which falls back to the lens's default where the site binds none, so a
- * site retunes the explorer through either tier. The well's floor height,
+ * Each design decision reads a component token. Where the design system has
+ * a token for it, the component token reads that token, falling back to the
+ * lens's default where the site binds none; where it has none, the component
+ * token holds the lens's own value. The well's floor height,
  * `--definitions-explorer-well-min-block-size`, is a literal layout
  * measure.
  */
@@ -23,7 +24,10 @@
     --definitions-explorer-panel-padding: var(--space-200, 1rem);
     --definitions-explorer-search-margin: var(--space-200, 1rem);
     --definitions-explorer-search-gap: var(--space-050, 0.25rem);
-    --definitions-explorer-search-font-size: var(--font-size-small, 0.875rem);
+    --definitions-explorer-search-font-size: var(
+      --dimension-size-font-size-300,
+      0.875rem
+    );
     --definitions-explorer-search-color: var(--color-text-muted);
     /* The last-resort floor of the well on a pathologically short canvas. */
     --definitions-explorer-well-min-block-size: 12rem;

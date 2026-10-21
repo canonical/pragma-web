@@ -4,13 +4,15 @@
  * leaf; the ⊂ glyphs are muted connectors that never wrap away from the
  * link they precede.
  *
- * Each design decision reads a component token bound to a semantic token,
- * which falls back to the lens's default where the site binds none.
+ * Each design decision reads a component token. Where the design system has
+ * a token for it, the component token reads that token, falling back to the
+ * lens's default where the site binds none; where it has none, the component
+ * token holds the lens's own value.
  */
 
 @layer ds.prism {
   :root {
-    --lineage-self-font-weight: var(--font-weight-semibold, 600);
+    --lineage-self-font-weight: 600;
     --lineage-glyph-color: var(--color-text-muted);
   }
 

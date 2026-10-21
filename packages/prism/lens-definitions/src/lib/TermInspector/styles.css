@@ -3,29 +3,37 @@
  * the explorer's grid; this file styles only the inspector's interior,
  * the parts its views render included.
  *
- * Each design decision reads a component token bound to a semantic token,
- * which falls back to the lens's default where the site binds none.
+ * Each design decision reads a component token. Where the design system has
+ * a token for it, the component token reads that token, falling back to the
+ * lens's default where the site binds none; where it has none, the component
+ * token holds the lens's own value.
  */
 
 @layer ds.prism {
   :root {
-    --term-inspector-font-size: var(--font-size-small, 0.875rem);
+    --term-inspector-font-size: var(--dimension-size-font-size-300, 0.875rem);
     --term-inspector-padding: var(--space-200, 1rem);
     --term-inspector-border-width: var(
       --dimension-stroke-thickness-medium,
       1px
     );
     --term-inspector-border-color: var(--color-border-muted);
-    --term-inspector-radius: var(--radius-medium, 0.5rem);
+    --term-inspector-radius: var(--dimension-radius-medium, 0.5rem);
     --term-inspector-muted-color: var(--color-text-muted);
     --term-inspector-heading-gap: var(--space-200, 1rem);
     --term-inspector-heading-margin-end: var(--space-050, 0.25rem);
-    --term-inspector-label-font-size: var(--font-size-label, 0.75rem);
-    --term-inspector-label-letter-spacing: var(--letter-spacing-label, 0.05em);
+    --term-inspector-label-font-size: var(
+      --dimension-size-font-size-250,
+      0.75rem
+    );
+    --term-inspector-label-letter-spacing: var(
+      --dimension-letter-spacing-wide,
+      0.05em
+    );
     --term-inspector-list-indent: var(--space-200, 1rem);
     --term-inspector-cell-padding-block: var(--space-050, 0.25rem);
     --term-inspector-cell-padding-inline: var(--space-100, 0.5rem);
-    --term-inspector-definition-font-size: var(--font-size-detail, 0.8125rem);
+    --term-inspector-definition-font-size: 0.8125rem;
     --term-inspector-details-gap: var(--space-050, 0.25rem);
   }
 

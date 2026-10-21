@@ -4,45 +4,53 @@
  * per-ontology groups, the count beside each heading, and each term's
  * abstraction mark, depth glyph and indent.
  *
- * Each design decision reads a component token bound to a semantic token,
- * which falls back to the lens's default where the site binds none.
+ * Each design decision reads a component token. Where the design system has
+ * a token for it, the component token reads that token, falling back to the
+ * lens's default where the site binds none; where it has none, the component
+ * token holds the lens's own value.
  *
  * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
  */
 
 @layer ds.prism {
   :root {
-    --term-rail-font-size: var(--font-size-small, 0.875rem);
-    --term-rail-title-font-size: var(--font-size-default, 1rem);
+    --term-rail-font-size: var(--dimension-size-font-size-300, 0.875rem);
+    --term-rail-title-font-size: var(--dimension-size-font-size-350, 1rem);
     --term-rail-title-margin-start: var(--space-200, 1rem);
     --term-rail-title-margin-end: var(--space-100, 0.5rem);
     --term-rail-heading-gap: var(--space-100, 0.5rem);
     --term-rail-heading-margin-start: var(--space-100, 0.5rem);
     --term-rail-heading-margin-end: var(--space-050, 0.25rem);
-    --term-rail-label-font-size: var(--font-size-label, 0.75rem);
-    --term-rail-label-letter-spacing: var(--letter-spacing-label, 0.05em);
+    --term-rail-label-font-size: var(--dimension-size-font-size-250, 0.75rem);
+    --term-rail-label-letter-spacing: var(
+      --dimension-letter-spacing-wide,
+      0.05em
+    );
     --term-rail-muted-color: var(--color-text-muted);
-    --term-rail-count-opacity: var(--opacity-muted, 0.75);
+    --term-rail-count-opacity: 0.75;
     --term-rail-item-gap: var(--space-050, 0.25rem);
     --term-rail-item-padding-block: var(--space-025, 0.125rem);
     --term-rail-item-padding-inline: var(--space-050, 0.25rem);
-    --term-rail-item-radius: var(--radius-medium, 0.5rem);
+    --term-rail-item-radius: var(--dimension-radius-medium, 0.5rem);
     --term-rail-indent-step: var(--space-150, 0.75rem);
-    --term-rail-mark-size: var(--size-indicator, 0.5rem);
+    --term-rail-mark-size: 0.5rem;
     --term-rail-mark-border-width: var(
       --dimension-stroke-thickness-medium,
       1px
     );
     --term-rail-mark-color: var(--color-border);
-    --term-rail-depth-font-family: var(--font-family-mono, monospace);
+    --term-rail-depth-font-family: var(
+      --typography-font-family-monospace,
+      monospace
+    );
     --term-rail-depth-color: var(--color-border);
-    --term-rail-dimmed-opacity: var(--opacity-dimmed, 0.38);
+    --term-rail-dimmed-opacity: 0.38;
     --term-rail-hovered-background: color-mix(
       in oklab,
       var(--color-text) 6%,
       var(--color-background)
     );
-    --term-rail-current-font-weight: var(--font-weight-semibold, 600);
+    --term-rail-current-font-weight: 600;
     --term-rail-transition-duration: var(--motion-duration-fast, 0.15s);
   }
 
