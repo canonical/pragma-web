@@ -11,18 +11,22 @@
  *
  * The nest's providers (`HeadProvider`, `RelayEnvironmentProvider`,
  * `RouterProvider`) hold no state of their own: each provides a context
- * value read from its props. Whether the nest stays mounted is therefore
- * observable only through the state that lives below it, and that is what
- * this suite reads:
+ * value read from its props. The one thing the nest owns is the `Outlet`'s
+ * subscription to the router, which it holds for as long as it is mounted;
+ * everything below the `Outlet` is keyed on the matched route and remounts
+ * whenever that changes. This suite reads both:
  *
- * - THE SHELL STAYS. Moving between two terms of the Definitions lens keeps
- *   the matched route, so the layout's root node and its filter chips (state
- *   the layout's `LensFilterProvider` owns) survive, which they can only do
- *   if nothing above the layout remounted. The store the environment holds
- *   serves every page (the network is never called), and the head carries
- *   exactly one `<title>`.
- * - THE LAYOUT REMOUNTS. Switching to Standards and back yields a new
- *   Definitions root, with the chips back at their default.
+ * - THE SHELL STAYS. The router's own `subscribe` is wrapped to record
+ *   which subscriptions are live. A change of route inside the lens (a term
+ *   to the lens index) remounts the layout but not the nest, so the
+ *   subscriptions that outlive it are the nest's own. Every one of them must
+ *   still be live after a switch to Standards and back: a nest rebuilt per
+ *   lens drops them. Moving between two terms (the same route, new params)
+ *   keeps the layout's root node and its filter chips. The store the
+ *   environment holds serves every page (the network is never called), and
+ *   the head carries exactly one `<title>`.
+ * - THE LAYOUT REMOUNTS. Each change of route yields a new Definitions root,
+ *   with the chips back at their default.
  */
 
 import "../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
@@ -64,6 +68,39 @@ const countChipsOff = (container: HTMLElement): number =>
   container.querySelectorAll(
     '[data-slot="controls"] button[aria-pressed="false"]',
   ).length;
+
+/**
+ * Record which of the router's subscriptions are live, by wrapping its own
+ * `subscribe` so each subscription, numbered in the order it was made, is
+ * tracked until it is dropped.
+ *
+ * @note Impure: replaces `router.subscribe` with a spy that delegates to it.
+ */
+const trackRouterSubscriptions = (
+  router: Router<typeof appRoutes, typeof notFoundRoute>,
+): ReadonlySet<number> => {
+  const live = new Set<number>();
+  const subscribe = router.subscribe.bind(router);
+  let count = 0;
+  vi.spyOn(router, "subscribe").mockImplementation((listener) => {
+    count += 1;
+    const subscription = count;
+    live.add(subscription);
+    const unsubscribe = subscribe(listener);
+    return () => {
+      live.delete(subscription);
+      unsubscribe();
+    };
+  });
+  return live;
+};
+
+/** The members of `before` that are still in `after`. */
+const keepSurvivors = (
+  before: ReadonlySet<number>,
+  after: ReadonlySet<number>,
+): ReadonlySet<number> =>
+  new Set([...before].filter((subscription) => after.has(subscription)));
 
 /** Click the rail's entry for `href`, through the real router. */
 const clickRail = async (container: HTMLElement, href: string) => {
@@ -114,7 +151,7 @@ describe("Shell across a lens switch", () => {
     vi.unstubAllGlobals();
   });
 
-  it("keeps the state below the shell across navigation and remounts the lens layout on a switch", async () => {
+  it("keeps the shell mounted across a lens switch and remounts the lens layout", async () => {
     // One store warm for every page the test visits, behind a network that
     // never answers: any fetch at all means the store did not survive.
     const relayFetch = createFetchSpy();
@@ -137,6 +174,7 @@ describe("Shell across a lens switch", () => {
         notFound: notFoundRoute,
       },
     );
+    const liveSubscriptions = trackRouterSubscriptions(router);
 
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -182,22 +220,45 @@ describe("Shell across a lens switch", () => {
     expect(countChipsOff(container)).toBe(1);
     expect(readStatus(container)).toBe(filteredStatus);
 
+    // The lens index: another route of the same lens, so the layout and its
+    // filter provider remount and the chips start over, while the nest above
+    // the layout stays. The subscriptions that outlive the move are the
+    // nest's own.
+    const liveOnTerm = new Set(liveSubscriptions);
+    await act(async () => {
+      router.navigate("definitions");
+    });
+    await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
+    const definitionsIndexLayout = container.querySelector(
+      ".ds.definitions-layout",
+    );
+    expect(definitionsIndexLayout).not.toBeNull();
+    expect(definitionsIndexLayout).not.toBe(definitionsLayout);
+    expect(countChipsOff(container)).toBe(0);
+    const nestSubscriptions = keepSurvivors(liveOnTerm, liveSubscriptions);
+    expect(nestSubscriptions.size).toBeGreaterThan(0);
+
     // Switch to Standards: a different layout element, with its own strip.
     await clickRail(container, "/standards");
     await waitFor(() => expect(readCurrentCrumb(container)).toBe("Standards"));
     expect(container.querySelector(".ds.standards-layout")).not.toBeNull();
     expect(container.querySelector(".ds.definitions-layout")).toBeNull();
 
-    // And back: the chips start over, because the layout and its filter
-    // provider were mounted afresh.
+    // And back: a new layout, with the chips at their default.
     await clickRail(container, "/definitions");
     await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
     const definitionsLayoutAgain = container.querySelector(
       ".ds.definitions-layout",
     );
     expect(definitionsLayoutAgain).not.toBeNull();
-    expect(definitionsLayoutAgain).not.toBe(definitionsLayout);
+    expect(definitionsLayoutAgain).not.toBe(definitionsIndexLayout);
     expect(countChipsOff(container)).toBe(0);
+
+    // The nest held every one of its subscriptions through the lens switch
+    // and back: it was never unmounted.
+    expect(keepSurvivors(nestSubscriptions, liveSubscriptions)).toEqual(
+      nestSubscriptions,
+    );
 
     // The store served every page, and the head carries one title.
     expect(relayFetch).not.toHaveBeenCalled();
