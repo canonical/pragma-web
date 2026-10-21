@@ -1,11 +1,15 @@
-import type { WrapperComponentProps } from "@canonical/router-core";
-import type { ReactElement, ReactNode } from "react";
-import { LensLayout } from "#lib/LensLayout";
+import { SkipLink } from "@canonical/react-ds-global";
+import type { ReactElement } from "react";
+import { CANVAS_ELEMENT_ID, Canvas } from "#lib/Canvas";
 import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import { JourneyViewProvider } from "../journeyViewContext.js";
 import { journeysStripSlots } from "../stripSlots.js";
+import type { JourneysLayoutProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds journeys-layout";
 
 const { Context, Controls } = journeysStripSlots;
 
@@ -19,23 +23,30 @@ const { Context, Controls } = journeysStripSlots;
  * The provider remounts with the layout, so the view resets whenever the
  * route changes.
  *
- * Renders no element of its own — `LensLayout` owns the root — so its only
- * prop is the routed page.
+ * Its root is the layout's own page grid: the rail in the west columns,
+ * then a viewport stacking the strip, the canvas and the colophon.
  *
  * `import { JourneysLayout } from "#addons/journeys";`
  */
 export default function JourneysLayout({
   children,
-}: WrapperComponentProps<ReactNode>): ReactElement {
+  className,
+  ...props
+}: JourneysLayoutProps): ReactElement {
   return (
     <JourneyViewProvider>
-      <LensLayout
-        footer={<SiteColophon />}
-        rail={<SiteRail />}
-        strip={<ModeStrip context={<Context />} controls={<Controls />} />}
+      <div
+        {...props}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
       >
-        {children}
-      </LensLayout>
+        <SkipLink mainId={CANVAS_ELEMENT_ID}>Skip to content</SkipLink>
+        <SiteRail />
+        <div className="viewport">
+          <ModeStrip context={<Context />} controls={<Controls />} />
+          <Canvas>{children}</Canvas>
+          <SiteColophon />
+        </div>
+      </div>
     </JourneyViewProvider>
   );
 }

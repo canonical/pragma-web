@@ -1,10 +1,14 @@
-import type { WrapperComponentProps } from "@canonical/router-core";
-import type { ReactElement, ReactNode } from "react";
+import { SkipLink } from "@canonical/react-ds-global";
+import type { ReactElement } from "react";
+import { CANVAS_ELEMENT_ID, Canvas } from "#lib/Canvas";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
-import { LensLayout } from "#lib/LensLayout";
 import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
+import type { ComponentsLayoutProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds components-layout";
 
 /**
  * The strip's breadcrumb trail: `Components` on the catalog,
@@ -21,21 +25,28 @@ const ComponentsContext = makeLensContext({
  * The Components lens's page layout: the site rail and colophon around the
  * catalog and entity pages, with the strip carrying the breadcrumb trail.
  *
- * Renders no element of its own — `LensLayout` owns the root — so its only
- * prop is the routed page.
+ * Its root is the layout's own page grid: the rail in the west columns,
+ * then a viewport stacking the strip, the canvas and the colophon.
  *
  * `import { ComponentsLayout } from "#domains/components";`
  */
 export default function ComponentsLayout({
   children,
-}: WrapperComponentProps<ReactNode>): ReactElement {
+  className,
+  ...props
+}: ComponentsLayoutProps): ReactElement {
   return (
-    <LensLayout
-      footer={<SiteColophon />}
-      rail={<SiteRail />}
-      strip={<ModeStrip context={<ComponentsContext />} />}
+    <div
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      {children}
-    </LensLayout>
+      <SkipLink mainId={CANVAS_ELEMENT_ID}>Skip to content</SkipLink>
+      <SiteRail />
+      <div className="viewport">
+        <ModeStrip context={<ComponentsContext />} />
+        <Canvas>{children}</Canvas>
+        <SiteColophon />
+      </div>
+    </div>
   );
 }

@@ -1,29 +1,40 @@
-import type { WrapperComponentProps } from "@canonical/router-core";
-import type { ReactElement, ReactNode } from "react";
-import { LensLayout } from "#lib/LensLayout";
+import { SkipLink } from "@canonical/react-ds-global";
+import type { ReactElement } from "react";
+import { CANVAS_ELEMENT_ID, Canvas } from "#lib/Canvas";
 import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
+import type { GuidesLayoutProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds guides-layout";
 
 /**
  * The Guides lens's page layout: the site rail and colophon around the
  * guides index and a guide's reading page, with an empty strip.
  *
- * Renders no element of its own — `LensLayout` owns the root — so its only
- * prop is the routed page.
+ * Its root is the layout's own page grid: the rail in the west columns,
+ * then a viewport stacking the strip, the canvas and the colophon.
  *
  * `import { GuidesLayout } from "#domains/lenses";`
  */
 export default function GuidesLayout({
   children,
-}: WrapperComponentProps<ReactNode>): ReactElement {
+  className,
+  ...props
+}: GuidesLayoutProps): ReactElement {
   return (
-    <LensLayout
-      footer={<SiteColophon />}
-      rail={<SiteRail />}
-      strip={<ModeStrip />}
+    <div
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      {children}
-    </LensLayout>
+      <SkipLink mainId={CANVAS_ELEMENT_ID}>Skip to content</SkipLink>
+      <SiteRail />
+      <div className="viewport">
+        <ModeStrip />
+        <Canvas>{children}</Canvas>
+        <SiteColophon />
+      </div>
+    </div>
   );
 }

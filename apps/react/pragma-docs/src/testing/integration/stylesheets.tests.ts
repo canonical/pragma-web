@@ -6,8 +6,9 @@
  *
  * - the layout's shared tokens are each DEFINED exactly once (regions
  *   consume, never re-define), and the dissolved width tokens are absent;
- * - exactly ONE grid template is authored in the app — the lens layout's
- *   intrinsic columns — and every other grid is a subgrid;
+ * - no grid template is authored in the app: each lens layout's root reads
+ *   the design system's intrinsic columns (`var(--grid-intrinsic)`), and
+ *   every other grid is a subgrid;
  * - exactly one LAYOUT-CAPABLE conditional at-rule exists: the sanctioned
  *   AX.1 collapse in Rail/styles.css. Feature queries that cannot reflow
  *   layout (`prefers-color-scheme`, `forced-colors`,
@@ -38,7 +39,7 @@ describe("the app stylesheets", () => {
 
   // The metric tokens that SURVIVE the strict intrinsic-grid model: the
   // strip's block-axis height and the four z-axis strata. Each defined
-  // exactly once, in LensLayout/styles.css.
+  // exactly once, in styles/app.css.
   it.each([
     "--strip-h",
     "--z-underground",
@@ -65,33 +66,39 @@ describe("the app stylesheets", () => {
   );
 
   // THE INTRINSIC-GRID INVARIANT (the strict model's teeth, owner ruling
-  // 2026-07-22: EVERYTHING is a subgrid, no exceptions). Exactly ONE grid
-  // TEMPLATE exists in the whole app — the layout's intrinsic columns. Every
-  // OTHER `grid-template-columns` declaration, without exception, is
-  // `subgrid`: pages, explorers, region tenants, card grids, list grids,
-  // ALL of them inherit the layout's columns and spend spans. Nothing authors
-  // its own template, not even a leaf card-grid (no `auto-fill minmax(Nrem)`
-  // anywhere but the layout). This is the assertion that catches the "looks
-  // like one column" regression AND any stray leaf template: a grid that
-  // authors a template (or is `display: block` in the chain) trips it.
-  it("authors exactly ONE grid template — the layout's; every other grid is a subgrid, no exceptions", () => {
+  // 2026-07-22: EVERYTHING is a subgrid, no exceptions). The app authors NO
+  // grid template of its own. The columns are the design system's intrinsic
+  // grid (`--grid-intrinsic`, from @canonical/styles), read only at a lens
+  // layout's root, so every lens lands on the same ruler. Every OTHER
+  // `grid-template-columns` declaration, without exception, is `subgrid`:
+  // pages, explorers, region tenants, card grids, list grids, ALL of them
+  // inherit the layout's columns and spend spans. This is the assertion that
+  // catches the "looks like one column" regression AND any stray leaf
+  // template: a grid that authors a template (or reads the intrinsic columns
+  // anywhere but a layout's root) trips it.
+  it("authors no grid template — lens layout roots read the intrinsic columns; every other grid is a subgrid", () => {
     // Strip CSS comments first, so a property token quoted in a comment
     // (describing the model) is not miscounted as real CSS.
-    const cssNoComments = allCss.replaceAll(/\/\*[\s\S]*?\*\//g, "");
-    const authored = [
-      ...cssNoComments.matchAll(/grid-template-columns:\s*([^;]+);/g),
-    ]
-      .map((m) => m[1].trim())
-      .filter((value) => !value.startsWith("subgrid") && value !== "inherit");
+    const authored = cssFiles.flatMap((file) =>
+      [
+        ...readFileSync(file, "utf8")
+          .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+          .matchAll(/grid-template-columns:\s*([^;]+);/g),
+      ]
+        .map((match) => match[1].trim())
+        .filter((value) => !value.startsWith("subgrid") && value !== "inherit")
+        .map((value) => ({ file, value })),
+    );
 
-    // EXACTLY ONE authored template, full stop — and it is the layout's
-    // intrinsic grid: an auto-fill of FOUR `minmax(var(--grid-col-min…))`
-    // columns. Everything else in the app is `subgrid`.
-    expect(authored).toHaveLength(1);
-    expect(authored[0]).toMatch(/^repeat\(\s*auto-fill/);
-    expect(
-      (authored[0].match(/minmax\(\s*var\(--grid-col-min/g) ?? []).length,
-    ).toBe(4);
+    expect(authored.length).toBeGreaterThan(0);
+    for (const { file, value } of authored) {
+      expect(value, `${file} reads the intrinsic columns`).toBe(
+        "var(--grid-intrinsic)",
+      );
+      expect(file, "only a lens layout's root reads them").toMatch(
+        /\/[A-Z]\w*Layout\/styles\.css$/,
+      );
+    }
   });
 
   /**

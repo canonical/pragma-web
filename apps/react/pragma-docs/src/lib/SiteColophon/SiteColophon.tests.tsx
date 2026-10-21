@@ -1,0 +1,21 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import SiteColophon from "./SiteColophon.js";
+
+describe("SiteColophon", () => {
+  it("renders the site's statement in the footer region", () => {
+    render(<SiteColophon />);
+    const footer = screen.getByRole("contentinfo");
+    expect(footer.dataset.region).toBe("footer");
+    expect(footer.textContent).toBe(
+      "Pragma — the design system, documented from its knowledge graph.",
+    );
+  });
+
+  it("passes native props through and merges a consumer className after its own", () => {
+    render(<SiteColophon className="is-quiet" id="colophon" />);
+    const footer = screen.getByRole("contentinfo");
+    expect(footer.id).toBe("colophon");
+    expect(footer.className).toBe("ds site-colophon is-quiet");
+  });
+});

@@ -1,29 +1,40 @@
-import type { WrapperComponentProps } from "@canonical/router-core";
-import type { ReactElement, ReactNode } from "react";
-import { LensLayout } from "#lib/LensLayout";
+import { SkipLink } from "@canonical/react-ds-global";
+import type { ReactElement } from "react";
+import { CANVAS_ELEMENT_ID, Canvas } from "#lib/Canvas";
 import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
+import type { AccountLayoutProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds account-layout";
 
 /**
  * The account pages' layout: the site rail and colophon around the sign-in
  * and account pages, with an empty strip.
  *
- * Renders no element of its own — `LensLayout` owns the root — so its only
- * prop is the routed page.
+ * Its root is the layout's own page grid: the rail in the west columns,
+ * then a viewport stacking the strip, the canvas and the colophon.
  *
  * `import { AccountLayout } from "#domains/account";`
  */
 export default function AccountLayout({
   children,
-}: WrapperComponentProps<ReactNode>): ReactElement {
+  className,
+  ...props
+}: AccountLayoutProps): ReactElement {
   return (
-    <LensLayout
-      footer={<SiteColophon />}
-      rail={<SiteRail />}
-      strip={<ModeStrip />}
+    <div
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      {children}
-    </LensLayout>
+      <SkipLink mainId={CANVAS_ELEMENT_ID}>Skip to content</SkipLink>
+      <SiteRail />
+      <div className="viewport">
+        <ModeStrip />
+        <Canvas>{children}</Canvas>
+        <SiteColophon />
+      </div>
+    </div>
   );
 }

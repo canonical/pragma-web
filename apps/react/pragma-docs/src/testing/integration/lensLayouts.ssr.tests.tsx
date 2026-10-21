@@ -13,7 +13,7 @@
  * single `<main data-region="canvas">`: CANVAS = its children, CHROME =
  * everything else. Then, per URL:
  *
- *   1. each region renders exactly once;
+ *   1. each region renders exactly once, in document order;
  *   2. every canvas is distinct (each URL renders its own page);
  *   3. `aria-current` sits exactly where the per-URL model says (the rail's
  *      exact-match link, plus the breadcrumb's current crumb);
@@ -499,6 +499,22 @@ describe("the lens layouts, rendered through the SSR entry", () => {
           `${url} renders ${marker} once`,
         ).toBe(1);
       }
+    }
+  });
+
+  it("renders the regions in order on every URL: skip link, rail, strip, canvas, footer", () => {
+    for (const [url, { chrome }] of getPages()) {
+      const positions = [
+        'class="ds skip-link"',
+        'data-region="primary-nav"',
+        'data-region="mode-strip"',
+        'data-region="canvas"',
+        'data-region="footer"',
+      ].map((marker) => chrome.indexOf(marker));
+      expect(positions, `region order on ${url}`).toEqual(
+        positions.toSorted((a, b) => a - b),
+      );
+      expect(positions, `every region on ${url}`).not.toContain(-1);
     }
   });
 

@@ -1,11 +1,15 @@
-import type { WrapperComponentProps } from "@canonical/router-core";
-import type { ReactElement, ReactNode } from "react";
-import { LensLayout } from "#lib/LensLayout";
+import { SkipLink } from "@canonical/react-ds-global";
+import type { ReactElement } from "react";
+import { CANVAS_ELEMENT_ID, Canvas } from "#lib/Canvas";
 import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import { LensFilterProvider } from "../lensFilterContext.js";
 import { definitionsStripSlots } from "../stripSlots.js";
+import type { DefinitionsLayoutProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds definitions-layout";
 
 const { Context, Controls, Status } = definitionsStripSlots;
 
@@ -19,29 +23,34 @@ const { Context, Controls, Status } = definitionsStripSlots;
  * The provider remounts with the layout, so the filter resets whenever the
  * route changes.
  *
- * Renders no element of its own — `LensLayout` owns the root — so its only
- * prop is the routed page.
+ * Its root is the layout's own page grid: the rail in the west columns,
+ * then a viewport stacking the strip, the canvas and the colophon.
  *
  * `import { DefinitionsLayout } from "#domains/lenses/definitions";`
  */
 export default function DefinitionsLayout({
   children,
-}: WrapperComponentProps<ReactNode>): ReactElement {
+  className,
+  ...props
+}: DefinitionsLayoutProps): ReactElement {
   return (
     <LensFilterProvider>
-      <LensLayout
-        footer={<SiteColophon />}
-        rail={<SiteRail />}
-        strip={
+      <div
+        {...props}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      >
+        <SkipLink mainId={CANVAS_ELEMENT_ID}>Skip to content</SkipLink>
+        <SiteRail />
+        <div className="viewport">
           <ModeStrip
             context={<Context />}
             controls={<Controls />}
             status={<Status />}
           />
-        }
-      >
-        {children}
-      </LensLayout>
+          <Canvas>{children}</Canvas>
+          <SiteColophon />
+        </div>
+      </div>
     </LensFilterProvider>
   );
 }

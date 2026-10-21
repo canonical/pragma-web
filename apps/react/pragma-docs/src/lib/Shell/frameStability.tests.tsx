@@ -10,10 +10,10 @@
  *
  * What it pins, per layer:
  *
- * - THE LAYOUT REMOUNTS. The `.ds.lens-layout` element after a switch is a
- *   different node, and the Definitions filter chips come back at their
- *   default after a round trip: the layout's `LensFilterProvider` was
- *   unmounted and mounted fresh.
+ * - THE LAYOUT REMOUNTS. Each lens renders its own layout root; the
+ *   Definitions root after a round trip is a new node, and the Definitions
+ *   filter chips come back at their default: the layout's
+ *   `LensFilterProvider` was unmounted and mounted fresh.
  * - THE SHELL STAYS. The Profiler around `Shell` reports exactly one mount,
  *   the store the environment holds still serves Definitions on the way
  *   back (the network is never called), and the head carries exactly one
@@ -139,7 +139,7 @@ describe("Shell across a lens switch", () => {
 
     // Definitions, unfiltered: every class is visible.
     await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
-    const definitionsLayout = container.querySelector(".ds.lens-layout");
+    const definitionsLayout = container.querySelector(".ds.definitions-layout");
     expect(definitionsLayout).not.toBeNull();
 
     // Turn one ontology off through the strip's chips: the figure recounts.
@@ -155,14 +155,18 @@ describe("Shell across a lens switch", () => {
     // Switch to Standards: a different layout element, with its own strip.
     await clickRail(container, "/standards");
     await waitFor(() => expect(readCurrentCrumb(container)).toBe("Standards"));
-    const standardsLayout = container.querySelector(".ds.lens-layout");
-    expect(standardsLayout).not.toBeNull();
-    expect(standardsLayout).not.toBe(definitionsLayout);
+    expect(container.querySelector(".ds.standards-layout")).not.toBeNull();
+    expect(container.querySelector(".ds.definitions-layout")).toBeNull();
 
     // And back: the chips start over, because the layout and its filter
     // provider were mounted afresh.
     await clickRail(container, "/definitions");
     await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
+    const definitionsLayoutAgain = container.querySelector(
+      ".ds.definitions-layout",
+    );
+    expect(definitionsLayoutAgain).not.toBeNull();
+    expect(definitionsLayoutAgain).not.toBe(definitionsLayout);
     expect(
       container.querySelectorAll(
         '[data-slot="controls"] button[aria-pressed="false"]',
