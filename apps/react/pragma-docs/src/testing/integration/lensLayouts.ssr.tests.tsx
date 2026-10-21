@@ -2,8 +2,9 @@
 
 /**
  * Every lens layout, rendered through the real SSR entry: each measured URL
- * renders inside its lens's own layout, and each layout carries exactly one
- * rail, one strip, one canvas and one footer.
+ * (every lens, an entity page per lens, and the guide, playground, account
+ * and login pages) renders inside its own layout, and each layout carries
+ * exactly one rail, one strip, one canvas and one footer.
  *
  * Method. Render `EntryServer`'s tree (static router, Relay environment, the
  * `<html>` document) to a string per URL — node environment, so
@@ -14,7 +15,9 @@
  * everything else. Then, per URL:
  *
  *   1. each region renders exactly once, in document order;
- *   2. every canvas is distinct (each URL renders its own page);
+ *   2. every canvas is distinct (each URL renders its own page), and sits
+ *      inside the layout its route is grouped under, named by the layout
+ *      root's class;
  *   3. `aria-current` sits exactly where the per-URL model says (the rail's
  *      exact-match link, plus the breadcrumb's current crumb);
  *   4. the strip's `context`, `controls` and `status` slots carry exactly
@@ -42,6 +45,7 @@ import standardEntityRecords from "../../domains/lenses/standards/__fixtures__/s
 import standardsIndexRecords from "../../domains/lenses/standards/__fixtures__/standardsIndexRecords.js";
 import { LINK_COMPONENT_URI } from "../../domains/lenses/standards/__fixtures__/standardsPageHarness.js";
 import lobbyRecords from "../../domains/marketing/__fixtures__/lobbyRecords.js";
+import componentProbeRecords from "../../domains/playground/__fixtures__/componentProbeRecords.js";
 
 /** The v1 lens URLs, owner-ruled order. */
 const LENS_URLS = [
@@ -74,6 +78,24 @@ const STANDARD_READING_URL = `/standards/${encodeURIComponent(LINK_COMPONENT_URI
  * node DOM. Same R3 posture: no rail entry is exact-current here. */
 const JOURNEYS_JOB_URL = "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3";
 
+/** A guide's reading page: a non-lens URL of the marketing domain that
+ * renders under the Guides layout, beside the guides index. Same R3
+ * posture: the rail's Guides entry is not exact-current here. */
+const GUIDE_URL = "/guides/getting-started";
+
+/** The account page, signed in through the demo guard's `?auth=1`, so the
+ * page renders rather than redirecting to the login page. */
+const ACCOUNT_URL = "/account?auth=1";
+
+/** The pages that are not lenses: each renders under its layout with an
+ * empty strip. */
+const NON_LENS_URLS = [
+  GUIDE_URL,
+  "/playground",
+  ACCOUNT_URL,
+  "/login",
+] as const;
+
 /** Every URL the certification measures. */
 const MEASURED_URLS = [
   ...LENS_URLS,
@@ -81,7 +103,27 @@ const MEASURED_URLS = [
   DEFINITIONS_TERM_URL,
   STANDARD_READING_URL,
   JOURNEYS_JOB_URL,
+  ...NON_LENS_URLS,
 ] as const;
+
+/** The layout each measured URL renders under, by its root's class: the
+ * route table's grouping, as served. */
+const EXPECTED_LAYOUT: Readonly<Record<string, string>> = {
+  "/": "marketing-layout",
+  "/components": "components-layout",
+  "/definitions": "definitions-layout",
+  "/standards": "standards-layout",
+  "/journeys": "journeys-layout",
+  "/guides": "guides-layout",
+  [BUTTON_ENTITY_URL]: "components-layout",
+  [DEFINITIONS_TERM_URL]: "definitions-layout",
+  [STANDARD_READING_URL]: "standards-layout",
+  [JOURNEYS_JOB_URL]: "journeys-layout",
+  [GUIDE_URL]: "guides-layout",
+  "/playground": "playground-layout",
+  [ACCOUNT_URL]: "account-layout",
+  "/login": "account-layout",
+};
 
 /** Data-bearing pages render from their captured fixture records — the
  * `initialData` a dev server would embed — so canvases are real content. */
@@ -108,6 +150,8 @@ const PAGE_RECORDS: Readonly<Record<string, RecordMap>> = {
   // address replays its OWN verbatim capture.
   "/journeys": journeysExplorerRecords,
   [JOURNEYS_JOB_URL]: journeysExplorerRecordsJob,
+  // The playground's probe, at the variables its warm step requests.
+  "/playground": componentProbeRecords,
 };
 
 /** Per-URL expectation for the rail: the hrefs
@@ -135,6 +179,14 @@ const EXPECTED_ARIA_CURRENT: Readonly<Record<string, readonly string[]>> = {
   [STANDARD_READING_URL]: [],
   // …and the rail's Journeys entry is NOT current at a job URL.
   [JOURNEYS_JOB_URL]: [],
+  // …nor its Guides entry at a guide.
+  [GUIDE_URL]: [],
+  // The rail's foot links the playground and the demo sign-in
+  // (`/account?auth=1`), each exact-current at its own address; the login
+  // page has no rail link.
+  "/playground": ["/playground"],
+  [ACCOUNT_URL]: [ACCOUNT_URL],
+  "/login": [],
 };
 
 /**
@@ -196,6 +248,9 @@ const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
     lensHref: "/journeys",
     current: "sem://design-system-docs#job.l3",
   }),
+  // The guide page renders under the Guides layout, the playground and the
+  // account pages under their own: every one of them leaves the trail out.
+  ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, ""])),
 };
 
 /** Per-URL count of `aria-current="page"` carried INSIDE the strip context
@@ -216,6 +271,7 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
   [DEFINITIONS_TERM_URL]: 1,
   [STANDARD_READING_URL]: 1,
   [JOURNEYS_JOB_URL]: 1,
+  ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, 0])),
 };
 
 /**
@@ -263,6 +319,9 @@ const EXPECTED_STRIP_CLAIMS: Readonly<
   // The job view claims the switch too — the view is ephemeral, not
   // URL-derived, so both journeys addresses carry the same strip tenant.
   [JOURNEYS_JOB_URL]: { controls: "journeys-view", status: false },
+  ...Object.fromEntries(
+    NON_LENS_URLS.map((url) => [url, { controls: false, status: false }]),
+  ),
 };
 
 const renderPage = (url: string): string =>
@@ -480,6 +539,25 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet(BUTTON_ENTITY_URL).canvas).toContain(
       '<h1 id="component-entity-title">Button</h1>',
     );
+    // The non-lens pages render their own page, not a fallback: the guide
+    // its slug, the playground its probe from the warm store, and the
+    // account and login pages their copy.
+    expect(mustGet(GUIDE_URL).canvas).toContain(
+      '<h1 id="guide-title">getting-started</h1>',
+    );
+    expect(mustGet("/playground").canvas).toContain('id="playground-title"');
+    expect(mustGet("/playground").canvas).not.toContain("Loading the graph");
+    expect(mustGet(ACCOUNT_URL).canvas).toContain('id="account-title"');
+    expect(mustGet("/login").canvas).toContain('id="login-title"');
+  });
+
+  it("renders each URL inside the layout its route is grouped under", () => {
+    for (const [url, { chrome }] of getPages()) {
+      const layouts = [...chrome.matchAll(/class="ds ([a-z-]+-layout)"/g)].map(
+        (match) => match[1],
+      );
+      expect(layouts, `layout on ${url}`).toEqual([EXPECTED_LAYOUT[url]]);
+    }
   });
 
   it("renders each region exactly once on every URL", () => {
