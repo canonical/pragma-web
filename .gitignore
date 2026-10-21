@@ -89,3 +89,7 @@ static/js/modules
 .claude/
 .kg/
 node_modules
+
+# relay-compiler artifacts of the source-shipped projections package: built by
+# its `build` script at install, shipped in its tarball, never committed
+packages/prism/projections/src/__generated__/
