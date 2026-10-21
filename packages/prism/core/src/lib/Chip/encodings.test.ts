@@ -126,6 +126,17 @@ describe("resolveNamespaceTint", () => {
     expect(resolveNamespaceTint("docs", prefixes)).toContain(" 275)");
   });
 
+  it("rounds the hue and wraps it past a full turn", () => {
+    const five = ["ds", "cs", "docs", "ex", "geo"] as const;
+    // 3 × 137.508 = 412.524 → 413 → 53; 4 × 137.508 = 550.032 → 550 → 190.
+    expect(resolveNamespaceTint("ex", five)).toBe(
+      "oklch(var(--chip-tint-l, 0.45) var(--chip-tint-c, 0.12) 53)",
+    );
+    expect(resolveNamespaceTint("geo", five)).toBe(
+      "oklch(var(--chip-tint-l, 0.45) var(--chip-tint-c, 0.12) 190)",
+    );
+  });
+
   it("gives every prefix a distinct hue", () => {
     const tints = prefixes.map((prefix) =>
       resolveNamespaceTint(prefix, prefixes),
