@@ -1,16 +1,24 @@
 /*
  * NodeRow — the row of any node: its title and its compact address.
+ *
+ * Each design decision reads a component token bound to a semantic token,
+ * so a site retunes the row through either tier.
  */
 
 @layer ds.prism {
+  :root {
+    --node-row-gap: var(--space-100, 0.5rem);
+    --node-row-location-color-text: var(--color-text-muted);
+  }
+
   .ds.node-row {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: var(--space-100, 0.5rem);
+    gap: var(--node-row-gap);
   }
 
   .ds.node-row .location {
-    color: var(--color-text-muted, inherit);
+    color: var(--node-row-location-color-text);
   }
 }
