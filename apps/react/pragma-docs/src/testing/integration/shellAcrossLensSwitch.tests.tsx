@@ -31,6 +31,10 @@
 
 import "../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
 import {
+  createEnvironment,
+  setPrefetchEnvironment,
+} from "@canonical/prism-core";
+import {
   createBrowserAdapter,
   createRouter,
   type Router,
@@ -40,7 +44,6 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Shell } from "#lib/Shell";
-import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import mergeRecordMaps from "../../../testing/mergeRecordMaps.js";
 import definitionsExplorerRecords from "../../domains/lenses/definitions/__fixtures__/definitionsExplorerRecords.js";

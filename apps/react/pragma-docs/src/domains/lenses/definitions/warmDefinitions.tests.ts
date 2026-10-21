@@ -1,5 +1,8 @@
+import {
+  createEnvironment,
+  setPrefetchEnvironment,
+} from "@canonical/prism-core";
 import { afterEach, describe, expect, it } from "vitest";
-import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
 import { UIBLOCK_TERM } from "../../../../testing/fixtures.js";
 import { definitionsExplorerVariables } from "./definitionsQuery.js";

@@ -1,9 +1,10 @@
 // @vitest-environment node
 
 /**
- * The prepare step's no-data paths, over the app's real route table: a URL
- * whose route has no `warm`, and a URL no route matches, both resolve to
- * `undefined` without dialling the graph.
+ * The site's prepare step over its real route table: a URL whose route has
+ * no `warm` resolves to `undefined` without dialling the graph. The step's
+ * generic paths (unmatched URLs, redirects, failures) are prism-core's own
+ * contract and are pinned there.
  */
 
 import { describe, expect, it, vi } from "vitest";
@@ -34,12 +35,6 @@ describe("prepareRelayData", () => {
     const { prepared, consoleError } = await prepareSilenced(
       "/guides/getting-started",
     );
-    expect(prepared).toBeUndefined();
-    expect(consoleError).toEqual([]);
-  });
-
-  it("resolves undefined without a request for an unmatched URL", async () => {
-    const { prepared, consoleError } = await prepareSilenced("/no-such-route");
     expect(prepared).toBeUndefined();
     expect(consoleError).toEqual([]);
   });

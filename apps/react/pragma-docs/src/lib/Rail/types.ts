@@ -1,5 +1,5 @@
+import type { CollectedLens } from "@canonical/prism-core";
 import type { ComponentProps } from "react";
-import type { CollectedLens } from "#lib/routeLens";
 
 /** The rail's brand link: the site's name, and the route it leads to. */
 export interface RailBrand {

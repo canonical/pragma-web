@@ -24,15 +24,18 @@
  * ownership (AV-340)". Do not read this file as that guard.
  */
 
+import {
+  createEnvironment,
+  createStaticRouter,
+  setPrefetchEnvironment,
+} from "@canonical/prism-core";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createStaticRouter } from "#lib/router";
 import { Shell } from "#lib/Shell";
-import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import type { InitialData } from "#server";
 import mergeRecordMaps from "../../testing/mergeRecordMaps.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";

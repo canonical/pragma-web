@@ -1,5 +1,8 @@
+import {
+  createEnvironment,
+  setPrefetchEnvironment,
+} from "@canonical/prism-core";
 import { afterEach, describe, expect, it } from "vitest";
-import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import { componentEntityVariables } from "./entityQuery.js";
 import warmComponentEntity from "./warmComponentEntity.js";

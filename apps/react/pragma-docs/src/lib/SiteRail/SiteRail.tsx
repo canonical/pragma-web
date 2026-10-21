@@ -1,7 +1,7 @@
+import { collectLenses } from "@canonical/prism-core";
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { Rail, type RailBrand } from "#lib/Rail";
-import { collectLenses } from "#lib/routeLens";
 import type { SiteRailProps } from "./types.js";
 
 const SITE_BRAND: RailBrand = {

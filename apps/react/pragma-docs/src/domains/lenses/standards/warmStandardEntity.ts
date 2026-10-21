@@ -1,4 +1,4 @@
-import { prefetchQuery } from "#relay";
+import { prefetchQuery } from "@canonical/prism-core";
 import {
   standardEntityQueryNode,
   standardEntityVariables,

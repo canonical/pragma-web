@@ -10,6 +10,7 @@
  */
 
 import "./__fixtures__/stubReactFlowGlobals.js";
+import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
@@ -18,8 +19,6 @@ import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it, vi } from "vitest";
-import { createStaticRouter } from "#lib/router";
-import { createEnvironment } from "#relay";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import definitionsExplorerRecords from "./__fixtures__/definitionsExplorerRecords.js";
 import { LensFilterProvider } from "./lensFilterContext.js";

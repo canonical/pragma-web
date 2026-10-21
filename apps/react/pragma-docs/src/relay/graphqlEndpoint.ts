@@ -5,9 +5,10 @@
  * consumer — browser bundle, SSR prepare step, launcher — has to agree on one
  * absolute address. This module is that agreement, and it deliberately has
  * **zero imports**: `src/server/graph.ts` reads it to pick its listen port, and
- * that process hosts ke-graphql's pinned graphql v17 RC. Importing anything
- * from `#relay/environment.js` here would drag relay-runtime (and the app's
- * graphql v16) into the v17 process and reopen the two-versions tightrope.
+ * that process hosts ke-graphql's pinned graphql v17 RC. Importing the Relay
+ * environment (`@canonical/prism-core`) here would drag relay-runtime (and
+ * the app's graphql v16) into the v17 process and reopen the two-versions
+ * tightrope.
  *
  * The port literal appears exactly ONCE, in {@link DEFAULT_GRAPHQL_URL};
  * `graph.ts` and `withGraph.ts` derive the number via `new URL(...).port`.

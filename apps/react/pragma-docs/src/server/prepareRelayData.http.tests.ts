@@ -19,16 +19,16 @@
  *   only way to tell a server render from a browser);
  * - the response is deserialised into the Relay store and handed back as
  *   `{records}`;
- * - two prepares in flight at once stay apart: each sends its own request
- *   and neither snapshot carries the other's data;
- * - the prefetch environment is cleared again on every path;
- * - an unreachable endpoint degrades (logged `undefined`) instead of
- *   throwing: a graph that is down must cost the page its data, not its
- *   200.
+ * - two prepares of the site's own routes in flight at once stay apart:
+ *   each sends its own request and neither snapshot carries the other's
+ *   data.
+ *
+ * The step's generic contract (the prefetch slot cleared on every path, a
+ * published slot refused, an unreachable graph degrading) is prism-core's,
+ * and is pinned there.
  */
 
-import { createServer } from "node:http";
-import type { AddressInfo } from "node:net";
+import { setPrefetchEnvironment } from "@canonical/prism-core";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import {
   afterAll,
@@ -56,12 +56,6 @@ import {
   RELATION_PAGE_SIZE as PROBE_RELATION_PAGE_SIZE,
   PROBE_URI,
 } from "#domains/playground";
-import {
-  createEnvironment,
-  getPrefetchEnvironment,
-  setPrefetchEnvironment,
-} from "#relay";
-import createFetchSpy from "../../testing/createFetchSpy.js";
 import {
   COMPONENT_PROBE_RESPONSE,
   COMPONENT_URI,
@@ -91,23 +85,6 @@ const STUB_RESPONSES: Readonly<Record<string, unknown>> = {
 let stub: GraphStub;
 let captured: CapturedRequest[];
 let graphqlUrl: string;
-let deadGraphqlUrl: string;
-
-/**
- * An address nothing is listening on: an ephemeral port reserved by the OS
- * and immediately released. Reserved-then-closed rather than a hard-coded
- * low port, because the WHATWG "bad port" list makes `fetch` reject ports
- * like 1 before it ever opens a socket — which tests the URL parser, not the
- * degradation path.
- */
-const reserveClosedPort = (): Promise<number> =>
-  new Promise((resolve) => {
-    const probe = createServer();
-    probe.listen(0, "127.0.0.1", () => {
-      const { port } = probe.address() as AddressInfo;
-      probe.close(() => resolve(port));
-    });
-  });
 
 /** The `client:root` record of a prepared snapshot. */
 const readRoot = (records: RecordMap | undefined) =>
@@ -131,7 +108,6 @@ const readSoleRequest = (): CapturedRequest => {
 };
 
 beforeAll(async () => {
-  deadGraphqlUrl = `http://127.0.0.1:${await reserveClosedPort()}/graphql`;
   stub = await startGraphStub(STUB_RESPONSES);
   captured = stub.captured;
   graphqlUrl = stub.url;
@@ -297,71 +273,5 @@ describe("prepareRelayData over HTTP", () => {
     expect(readRoot(term?.records)).toHaveProperty([UIBLOCK_CLASS_KEY]);
     expect(readRoot(termless?.records)).toHaveProperty(["ontologies"]);
     expect(readRoot(termless?.records)).not.toHaveProperty([UIBLOCK_CLASS_KEY]);
-  });
-
-  it("leaves no prefetch environment published after a prepare", async () => {
-    await prepareRelayData("/playground", graphqlUrl);
-    expect(getPrefetchEnvironment()).toBeUndefined();
-  });
-
-  it("leaves no prefetch environment published after a failed prepare", async () => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    try {
-      const prepared = await prepareRelayData("/playground", deadGraphqlUrl);
-      expect(prepared).toBeUndefined();
-    } finally {
-      consoleError.mockRestore();
-    }
-    expect(getPrefetchEnvironment()).toBeUndefined();
-  });
-
-  it("refuses to warm into an environment that is already published", async () => {
-    // On the server the slot is empty outside the prepare step's own warm
-    // call, so a published one means two requests would share a store. The
-    // foreign environment's fetch spy records synchronously, so a warm that
-    // reached it while the static router was being built would show here.
-    const foreignFetch = createFetchSpy();
-    const foreign = createEnvironment({ fetchFn: foreignFetch });
-    setPrefetchEnvironment(foreign);
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    try {
-      const prepared = await prepareRelayData("/playground", graphqlUrl);
-      expect(prepared).toBeUndefined();
-      expect(consoleError.mock.calls).toContainEqual([
-        expect.stringContaining("relay prepare failed for /playground"),
-        expect.objectContaining({
-          message: expect.stringContaining("already published"),
-        }),
-      ]);
-    } finally {
-      consoleError.mockRestore();
-    }
-    // The foreign environment is left as it was, and nothing was fetched
-    // into it or sent to the graph.
-    expect(getPrefetchEnvironment()).toBe(foreign);
-    expect(foreignFetch).not.toHaveBeenCalled();
-    expect(captured).toHaveLength(0);
-  });
-
-  it("degrades to no records (logged) when the graph is unreachable", async () => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    try {
-      const prepared = await prepareRelayData("/playground", deadGraphqlUrl);
-      expect(prepared).toBeUndefined();
-      expect(consoleError.mock.calls).toContainEqual([
-        expect.stringContaining(
-          `relay prepare failed for /playground against ${deadGraphqlUrl}`,
-        ),
-        expect.anything(),
-      ]);
-    } finally {
-      consoleError.mockRestore();
-    }
   });
 });

@@ -14,15 +14,14 @@
  * sensible empty.
  *
  * `guides` does declare two things: its keyboard shortcut
- * (`#lib/routeShortcut`) and its lens (`#lib/routeLens`). A stub is still a
+ * (`routeShortcutFacet`) and its lens (`routeLensFacet`). A stub is still a
  * destination, and the digit and the rail entry belong to whichever route
  * owns the address — being unbuilt does not change who declares them.
  */
 
+import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
 import { GuidesIcon } from "#lib/Rail";
-import { routeLensFacet } from "#lib/routeLens";
-import { routeShortcutFacet } from "#lib/routeShortcut";
 import LensPlaceholder from "./LensPlaceholder.js";
 
 const routes = {

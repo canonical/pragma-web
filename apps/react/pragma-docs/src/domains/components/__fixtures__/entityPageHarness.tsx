@@ -9,12 +9,12 @@
  * tests, never collected as one.
  */
 
+import { createEnvironment } from "@canonical/prism-core";
 import { HeadProvider } from "@canonical/react-head";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { createEnvironment } from "#relay";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { ComponentEntityPage } from "../ComponentEntityPage/index.js";
 

@@ -1,7 +1,6 @@
+import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
 import { HomeIcon } from "#lib/Rail";
-import { routeLensFacet } from "#lib/routeLens";
-import { routeShortcutFacet } from "#lib/routeShortcut";
 import GuidePage from "./GuidePage.js";
 import HomePage from "./HomePage.js";
 import warmLobby from "./warmLobby.js";

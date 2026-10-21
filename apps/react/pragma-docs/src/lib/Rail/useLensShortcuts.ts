@@ -35,11 +35,14 @@
  * hints and `aria-keyshortcuts` for keys that no longer fire.
  */
 
+import {
+  collectShortcuts,
+  type ShortcutAllocation,
+} from "@canonical/prism-core";
 import { usePreferredShortcuts } from "@canonical/react-hooks";
 import type { RouteName } from "@canonical/router-core";
 import { type RegisteredRouteMap, useRouter } from "@canonical/router-react";
 import { useEffect, useMemo } from "react";
-import { collectShortcuts, type ShortcutAllocation } from "#lib/routeShortcut";
 
 const isEditableTarget = (target: EventTarget | null): boolean => {
   if (!(target instanceof HTMLElement)) return false;

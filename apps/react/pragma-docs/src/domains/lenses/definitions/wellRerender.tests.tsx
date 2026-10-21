@@ -27,6 +27,7 @@
  */
 
 import "./__fixtures__/stubReactFlowGlobals.js";
+import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -34,8 +35,6 @@ import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import { createStaticRouter } from "#lib/router";
-import { createEnvironment } from "#relay";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import definitionsExplorerRecords from "./__fixtures__/definitionsExplorerRecords.js";

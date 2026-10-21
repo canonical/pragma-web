@@ -1,3 +1,4 @@
+import { createEnvironment } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import {
   createMemoryAdapter,
@@ -8,10 +9,13 @@ import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { useRelayEnvironment } from "react-relay";
 import { describe, expect, it } from "vitest";
-import { createEnvironment } from "#relay";
 import Shell from "./Shell.js";
 
-const environment = createEnvironment();
+// The nest only provides the environment; nothing here queries, so a fetch
+// that never settles stands in for the network.
+const environment = createEnvironment({
+  fetchFn: () => new Promise<never>(() => {}),
+});
 
 /** Route content that reads every context the nest provides. */
 function Probe(): ReactElement {
