@@ -1,6 +1,6 @@
-import { SkipLink } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
-import { CANVAS_ELEMENT_ID, Canvas } from "#lib/Canvas";
+import { Canvas } from "#lib/Canvas";
+import { CanvasSkipLink } from "#lib/CanvasSkipLink";
 import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
@@ -28,7 +28,7 @@ export default function PlaygroundLayout({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <SkipLink mainId={CANVAS_ELEMENT_ID}>Skip to content</SkipLink>
+      <CanvasSkipLink />
       <SiteRail />
       <div className="viewport">
         <ModeStrip />

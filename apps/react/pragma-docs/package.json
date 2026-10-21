@@ -15,6 +15,7 @@
     "#domains/playground": "./src/domains/playground/index.ts",
     "#graphql-endpoint": "./src/relay/graphqlEndpoint.ts",
     "#lib/Canvas": "./src/lib/Canvas/index.ts",
+    "#lib/CanvasSkipLink": "./src/lib/CanvasSkipLink/index.ts",
     "#lib/Chip": "./src/lib/Chip/index.ts",
     "#lib/ErrorBoundary": "./src/lib/ErrorBoundary/index.ts",
     "#lib/LensBreadcrumbs": "./src/lib/LensBreadcrumbs/index.ts",

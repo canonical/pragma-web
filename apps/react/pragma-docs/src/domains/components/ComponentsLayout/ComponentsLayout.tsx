@@ -1,6 +1,6 @@
-import { SkipLink } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
-import { CANVAS_ELEMENT_ID, Canvas } from "#lib/Canvas";
+import { Canvas } from "#lib/Canvas";
+import { CanvasSkipLink } from "#lib/CanvasSkipLink";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
 import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
@@ -40,7 +40,7 @@ export default function ComponentsLayout({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <SkipLink mainId={CANVAS_ELEMENT_ID}>Skip to content</SkipLink>
+      <CanvasSkipLink />
       <SiteRail />
       <div className="viewport">
         <ModeStrip context={<ComponentsContext />} />

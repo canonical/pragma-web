@@ -585,7 +585,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
   it("renders the regions in order on every URL: skip link, rail, strip, canvas, footer", () => {
     for (const [url, { chrome }] of getPages()) {
       const positions = [
-        'class="ds skip-link"',
+        'class="ds canvas-skip-link"',
         'data-region="primary-nav"',
         'data-region="mode-strip"',
         'data-region="canvas"',
