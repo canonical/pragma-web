@@ -1,5 +1,5 @@
 /**
- * The explorer triptych's warm-store proof (Stage-1 class): the captured
+ * The explorer triptych's warm-store proof: the captured
  * `/definitions/ds%3AUIBlock` records render the rail's groups, the
  * well's node graph, and the inspector's class record WITHOUT the network
  * being consulted — with teeth, because the same render against an empty

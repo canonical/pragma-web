@@ -102,7 +102,7 @@ describe("the well answers a chip toggle", () => {
 
     // The unfiltered graph: every class painted, none hidden. The total
     // is read from the render rather than pinned, so this survives the
-    // ontology growing (the 111-to-108 drift lesson).
+    // ontology gaining or losing classes.
     const total = countNodes();
     expect(total).toBeGreaterThan(0);
     expect(countHiddenNodes()).toBe(0);

@@ -208,8 +208,8 @@ describe("hover/focus overrides selection transiently", () => {
     expect(readNodeClassName(result, "ds:UIBlock")).toContain(
       NODE_SELECTED_CLASS,
     );
-    // …but the fade now centres on what is hovered, so UIBlock (not a
-    // neighbour of CodeStandard) is dimmed even though it is selected.
+    // …but while a term is hovered the fade centres on it, so UIBlock (not
+    // a neighbour of CodeStandard) is dimmed even though it is selected.
     expect(readNodeClassName(result, "ds:UIBlock")).toContain(NODE_FADED_CLASS);
     expect(readNodeClassName(result, "cs:CodeStandard")).toBeUndefined();
   });
