@@ -14,7 +14,7 @@ import type { LensFilterProviderProps } from "./types.js";
  * It renders no element of its own (a context provider), so it takes no
  * native props.
  *
- * `import { LensFilterProvider } from "./LensFilter/index.js";`
+ * `import { LensFilterProvider } from "./LensFilterProvider/index.js";`
  */
 export default function LensFilterProvider({
   children,

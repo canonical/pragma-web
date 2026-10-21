@@ -13,7 +13,7 @@ import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { DefinitionsPage } from "../src/lib/DefinitionsPage/index.js";
-import { LensFilterProvider } from "../src/lib/LensFilter/index.js";
+import { LensFilterProvider } from "../src/lib/LensFilterProvider/index.js";
 import { definitionsRoutes } from "../src/lib/routes.js";
 import { HOMES } from "./fixtures.js";
 

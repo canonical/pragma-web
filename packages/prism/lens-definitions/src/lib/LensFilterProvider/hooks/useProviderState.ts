@@ -4,7 +4,8 @@ import type { LensFilter } from "../../types.js";
 import type { UseProviderStateResult } from "./types.js";
 
 /**
- * Hold the provider's filter, starting from the no-op default.
+ * Hold the provider's filter, starting from the no-op default. It takes
+ * no argument (`UseProviderStateProps` is empty).
  *
  * The initial value is `DEFAULT_LENS_FILTER`, whose `namespaces` is empty:
  * every consumer reads it as "no chip has been touched, so show everything",

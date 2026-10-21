@@ -11,7 +11,7 @@ import {
 } from "./definitionsQuery.js";
 import { ExplorerControls } from "./ExplorerControls/index.js";
 import { ExplorerStatus } from "./ExplorerStatus/index.js";
-import { useLensFilter } from "./LensFilter/index.js";
+import { useLensFilter } from "./LensFilterProvider/index.js";
 import {
   classifyAbstraction,
   matchesChips,
@@ -123,10 +123,10 @@ const Context = makeLensContext({
  * `DefinitionsLayout` renders into the strip's `context`, `controls` and
  * `status` sockets.
  *
- * They take NO props: the layout renders them as siblings of the routed
- * page, so nothing the page holds can reach them as a prop. The FILTER
- * reaches them through `LensFilter`, the context the layout provides
- * around both the strip and the page.
+ * They take NO props: the layout renders them as siblings of the routed page,
+ * so nothing the page holds can reach them as a prop. The FILTER reaches them
+ * through `LensFilterProvider`, the context the layout provides around both the
+ * strip and the page.
  *
  * THE DATA does NOT come through that context, and the reason is the SSR
  * determinism rule. An announcement from the explorer could only arrive in

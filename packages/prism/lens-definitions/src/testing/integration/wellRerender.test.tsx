@@ -49,7 +49,7 @@ import {
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
 import { DefinitionsPage } from "../../lib/DefinitionsPage/index.js";
 import { HIDDEN_CLASS } from "../../lib/HierarchyWell/constants.js";
-import { LensFilterProvider } from "../../lib/LensFilter/index.js";
+import { LensFilterProvider } from "../../lib/LensFilterProvider/index.js";
 import { definitionsRoutes } from "../../lib/routes.js";
 import { definitionsStripSlots } from "../../lib/stripSlots.js";
 

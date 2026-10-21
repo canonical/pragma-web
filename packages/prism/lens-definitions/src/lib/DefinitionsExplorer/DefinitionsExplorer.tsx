@@ -8,7 +8,7 @@ import hierarchyWellFragmentNode from "../../__generated__/HierarchyWell_ontolog
 import { buildDefinitionsExplorerVariables } from "../definitionsQuery.js";
 import { computeClassDepths, HierarchyWell } from "../HierarchyWell/index.js";
 import { useMessages } from "../i18n/index.js";
-import { useLensFilter } from "../LensFilter/index.js";
+import { useLensFilter } from "../LensFilterProvider/index.js";
 import { normalizeFilterText, resolveFilter } from "../lensFilter.js";
 import { TermInspector } from "../TermInspector/index.js";
 import { TermRail } from "../TermRail/index.js";
@@ -67,7 +67,7 @@ const componentCssClassName = "ds definitions-explorer";
  * seam use (`definitionsQuery.ts`), so the SSR-warmed store always
  * fulfils this exact operation.
  *
- * The lens's EPHEMERAL filter lives in `LensFilter` rather than in this
+ * The lens's EPHEMERAL filter lives in `LensFilterProvider` rather than in
  * component's own state, for one specific reason recorded there in full: the
  * mode strip's chips are rendered by the lens's layout as a sibling of the
  * canvas, so no prop path reaches them. Context is the smallest mechanism that

@@ -1,7 +1,7 @@
 import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { useMessages } from "../i18n/index.js";
-import { LensFilterProvider } from "../LensFilter/index.js";
+import { LensFilterProvider } from "../LensFilterProvider/index.js";
 import { definitionsStripSlots } from "../stripSlots.js";
 import type { DefinitionsLayoutProps } from "./types.js";
 import "./styles.css";

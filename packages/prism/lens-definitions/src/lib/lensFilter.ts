@@ -45,11 +45,11 @@ export const createAllNamespacesFilter = (
  * Resolve the EFFECTIVE filter against the ontologies that actually exist.
  *
  * An untouched filter carries no namespaces, because the shared state
- * (`LensFilter`) sits above the query and cannot know the graph's
- * prefixes. Every consumer reads that the same way — "no chip has been
- * pressed, so show everything" — and this is the one place that reading
- * lives, so the rail, the well and the mode strip's toolbar can never
- * disagree about what an untouched filter means.
+ * (`LensFilterProvider`) sits above the query and cannot know the graph's
+ * prefixes. Every consumer reads that the same way — "no chip has been pressed,
+ * so show everything" — and this is the one place that reading lives, so the
+ * rail, the well and the mode strip's toolbar can never disagree about what an
+ * untouched filter means.
  *
  * Pure, and a no-op on the default value, which is what keeps the server
  * render and the client's first paint byte-identical.
