@@ -81,4 +81,12 @@ describe("relaxBoxes", () => {
     const [first, , third] = boxes;
     expect(Math.abs((third?.x ?? 0) - (first?.x ?? 0))).toBeLessThan(20);
   });
+
+  it("throws on a hole in the box list", () => {
+    const boxes: WellBox[] = [square(0, 0)];
+    boxes.length = 2;
+    expect(() => relaxBoxes(boxes, { gap: 4, iterations: 1 })).toThrow(
+      "relaxBoxes: no box at index 1",
+    );
+  });
 });

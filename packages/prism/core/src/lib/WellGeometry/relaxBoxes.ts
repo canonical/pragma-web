@@ -1,6 +1,18 @@
 import type { RelaxOptions, WellBox } from "./types.js";
 
 /**
+ * Read the box at `index`; a hole in the list breaks the pass's contract
+ * that every index below `length` holds a box, so it throws.
+ */
+const readBox = (boxes: readonly WellBox[], index: number): WellBox => {
+  const box = boxes.at(index);
+  if (box === undefined) {
+    throw new Error(`relaxBoxes: no box at index ${index}`);
+  }
+  return box;
+};
+
+/**
  * The bounded relaxation pass — a static collision guarantee: every
  * unordered pair of overlapping boxes (plus gap) pushes apart along the
  * axis of least overlap, half each; pinned boxes never move (their partner
@@ -10,6 +22,7 @@ import type { RelaxOptions, WellBox } from "./types.js";
  *
  * @param boxes - The boxes to separate; moved in place.
  * @param options - The gap, the pass budget and the pinned indexes.
+ * @throws When the list has a hole: every index below `length` must hold a box.
  * @note Impure: mutates the `x` and `y` of the boxes it is given.
  */
 export const relaxBoxes = (
@@ -19,9 +32,10 @@ export const relaxBoxes = (
   const isPinned = (index: number): boolean => pinned?.has(index) === true;
   for (let iteration = 0; iteration < iterations; iteration += 1) {
     let moved = false;
-    for (const [a, boxA] of boxes.entries()) {
-      for (const [offset, boxB] of boxes.slice(a + 1).entries()) {
-        const b = a + 1 + offset;
+    for (let a = 0; a < boxes.length; a += 1) {
+      const boxA = readBox(boxes, a);
+      for (let b = a + 1; b < boxes.length; b += 1) {
+        const boxB = readBox(boxes, b);
         if (isPinned(a) && isPinned(b)) continue;
         const overlapX =
           (boxA.width + boxB.width) / 2 + gap - Math.abs(boxA.x - boxB.x);
