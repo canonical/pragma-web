@@ -193,6 +193,12 @@ describe("Query.prose", () => {
     ).toMatchObject({ asked: french });
   });
 
+  it("serves the language markdown(lang:) asks for over the locale", async () => {
+    expect(
+      await ask({ uri: MULTILINGUAL_ENTITY_URI, lang: "en" }, { locale: "fr" }),
+    ).toMatchObject({ lang: "fr", markdown: french, asked: english });
+  });
+
   it("resolves the links that name entities or classes, in order of first mention", async () => {
     const prose = await ask({ uri: MULTILINGUAL_ENTITY_URI });
     expect(prose?.references).toEqual({
