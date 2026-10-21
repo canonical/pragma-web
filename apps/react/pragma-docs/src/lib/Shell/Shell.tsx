@@ -8,9 +8,9 @@ import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
+import { RouterLink } from "#lib/RouterLink";
 import formatDocumentTitle from "../../formatDocumentTitle.js";
 import { homes } from "../../homes.js";
-import { RouterLink } from "../RouterLink/index.js";
 import type { ShellProps } from "./types.js";
 
 /**

@@ -4,8 +4,8 @@ import {
   ProjectionsProvider,
 } from "@canonical/prism-projections";
 import type { ElementType } from "react";
+import { RouterLink } from "#lib/RouterLink";
 import { homes } from "../../src/homes.js";
-import { RouterLink } from "../../src/lib/RouterLink/index.js";
 
 /**
  * Storybook decorator that provides the site's homes, the default
