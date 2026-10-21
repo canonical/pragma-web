@@ -10,11 +10,11 @@ import type { PropertyViewProps } from "./types.js";
  *
  * `import { PropertyView } from "./common/PropertyView/index.js";`
  */
-const PropertyView = ({
+export default function PropertyView({
   data,
   term,
   namespaces,
-}: PropertyViewProps): React.ReactElement => {
+}: PropertyViewProps): React.ReactElement {
   const t = useMessages();
   return (
     <article aria-labelledby="term-inspector-title">
@@ -63,6 +63,4 @@ const PropertyView = ({
       </dl>
     </article>
   );
-};
-
-export default PropertyView;
+}

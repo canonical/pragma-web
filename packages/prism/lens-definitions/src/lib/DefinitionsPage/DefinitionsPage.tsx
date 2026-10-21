@@ -24,10 +24,10 @@ const componentCssClassName = "ds definitions-page";
  *
  * `import { DefinitionsPage } from "./DefinitionsPage/index.js";`
  */
-const DefinitionsPage = ({
+export default function DefinitionsPage({
   className,
   params,
-}: DefinitionsPageProps): React.ReactElement => {
+}: DefinitionsPageProps): React.ReactElement {
   const t = useMessages();
   const term = readTermParam(params);
 
@@ -49,6 +49,4 @@ const DefinitionsPage = ({
       </ErrorBoundary>
     </section>
   );
-};
-
-export default DefinitionsPage;
+}

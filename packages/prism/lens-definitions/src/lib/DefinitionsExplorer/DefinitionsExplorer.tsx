@@ -104,10 +104,10 @@ const componentCssClassName = "ds definitions-explorer";
  *
  * `import { DefinitionsExplorer } from "../DefinitionsExplorer/index.js";`
  */
-const DefinitionsExplorer = ({
+export default function DefinitionsExplorer({
   className,
   term,
-}: DefinitionsExplorerProps): React.ReactElement => {
+}: DefinitionsExplorerProps): React.ReactElement {
   const t = useMessages();
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
     definitionsExplorerQueryNode,
@@ -223,6 +223,4 @@ const DefinitionsExplorer = ({
       />
     </div>
   );
-};
-
-export default DefinitionsExplorer;
+}

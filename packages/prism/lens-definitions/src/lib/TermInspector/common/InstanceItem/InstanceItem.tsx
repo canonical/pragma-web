@@ -11,10 +11,12 @@ import type { InstanceItemProps } from "./types.js";
  *
  * `import { InstanceItem } from "../InstanceItem/index.js";`
  */
-const InstanceItem = ({ node }: InstanceItemProps): React.ReactElement => (
-  <li>
-    <EntityChip node={node} /> <code>{node._meta.curie}</code>
-  </li>
-);
-
-export default InstanceItem;
+export default function InstanceItem({
+  node,
+}: InstanceItemProps): React.ReactElement {
+  return (
+    <li>
+      <EntityChip node={node} /> <code>{node._meta.curie}</code>
+    </li>
+  );
+}

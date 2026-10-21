@@ -20,27 +20,27 @@ const SUBCLASS_OF = "⊂";
  *
  * `import { Lineage } from "../Lineage/index.js";`
  */
-const Lineage = ({
+export default function Lineage({
   self,
   ancestors,
   namespaces,
-}: LineageProps): React.ReactElement => (
-  <p className="lineage">
-    <span className="self">{self}</span>
-    {ancestors.map((ancestor) => (
-      <span key={ancestor.uri}>
-        <span aria-hidden="true" className="glyph">
-          {" "}
-          {SUBCLASS_OF}{" "}
+}: LineageProps): React.ReactElement {
+  return (
+    <p className="lineage">
+      <span className="self">{self}</span>
+      {ancestors.map((ancestor) => (
+        <span key={ancestor.uri}>
+          <span aria-hidden="true" className="glyph">
+            {" "}
+            {SUBCLASS_OF}{" "}
+          </span>
+          <TermLink
+            label={ancestor.label}
+            namespaces={namespaces}
+            uri={ancestor.uri}
+          />
         </span>
-        <TermLink
-          label={ancestor.label}
-          namespaces={namespaces}
-          uri={ancestor.uri}
-        />
-      </span>
-    ))}
-  </p>
-);
-
-export default Lineage;
+      ))}
+    </p>
+  );
+}

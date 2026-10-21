@@ -8,10 +8,10 @@ import type { PropertyTableProps } from "./types.js";
  *
  * `import { PropertyTable } from "../PropertyTable/index.js";`
  */
-const PropertyTable = ({
+export default function PropertyTable({
   properties,
   namespaces,
-}: PropertyTableProps): React.ReactElement => {
+}: PropertyTableProps): React.ReactElement {
   const t = useMessages();
   return (
     <table>
@@ -34,6 +34,4 @@ const PropertyTable = ({
       </tbody>
     </table>
   );
-};
-
-export default PropertyTable;
+}

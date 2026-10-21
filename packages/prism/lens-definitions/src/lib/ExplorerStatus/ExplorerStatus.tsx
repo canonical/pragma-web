@@ -24,12 +24,12 @@ const componentCssClassName = "ds explorer-status";
  *
  * `import { ExplorerStatus } from "./ExplorerStatus/index.js";`
  */
-const ExplorerStatus = ({
+export default function ExplorerStatus({
   className,
   visible,
   total,
   abstract,
-}: ExplorerStatusProps): React.ReactElement => {
+}: ExplorerStatusProps): React.ReactElement {
   const t = useMessages();
   // Guard the degenerate graph so the bar never computes NaN.
   const share = total === 0 ? 0 : Math.round((visible / total) * 100);
@@ -58,6 +58,4 @@ const ExplorerStatus = ({
       </figcaption>
     </figure>
   );
-};
-
-export default ExplorerStatus;
+}

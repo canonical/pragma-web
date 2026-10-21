@@ -25,7 +25,7 @@ const componentCssClassName = "ds term-node";
  *
  * `import { TermNode } from "./common/TermNode/index.js";`
  */
-const TermNode = ({ node }: TermNodeProps): React.ReactElement => {
+export default function TermNode({ node }: TermNodeProps): React.ReactElement {
   const t = useMessages();
   return (
     <div
@@ -57,6 +57,4 @@ const TermNode = ({ node }: TermNodeProps): React.ReactElement => {
       ) : null}
     </div>
   );
-};
-
-export default TermNode;
+}

@@ -12,11 +12,11 @@ import type { ClassViewProps } from "./types.js";
  *
  * `import { ClassView } from "./common/ClassView/index.js";`
  */
-const ClassView = ({
+export default function ClassView({
   data,
   term,
   namespaces,
-}: ClassViewProps): React.ReactElement => {
+}: ClassViewProps): React.ReactElement {
   const t = useMessages();
   return (
     <article aria-labelledby="term-inspector-title">
@@ -113,6 +113,4 @@ const ClassView = ({
       )}
     </article>
   );
-};
-
-export default ClassView;
+}

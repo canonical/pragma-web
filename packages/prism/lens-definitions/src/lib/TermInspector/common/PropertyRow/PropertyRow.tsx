@@ -12,10 +12,10 @@ import type { PropertyRowProps } from "./types.js";
  *
  * `import { PropertyRow } from "../PropertyRow/index.js";`
  */
-const PropertyRow = ({
+export default function PropertyRow({
   classProperty,
   namespaces,
-}: PropertyRowProps): React.ReactElement => {
+}: PropertyRowProps): React.ReactElement {
   const t = useMessages();
   const notes = [
     classProperty.required ? t("inspector.notes.required") : "",
@@ -46,6 +46,4 @@ const PropertyRow = ({
       ) : null}
     </>
   );
-};
-
-export default PropertyRow;
+}

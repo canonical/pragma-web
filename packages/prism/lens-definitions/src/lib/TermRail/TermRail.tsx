@@ -124,14 +124,14 @@ const MAX_INDENT_DEPTH = 6;
  *
  * `import { TermRail } from "../TermRail/index.js";`
  */
-const TermRail = ({
+export default function TermRail({
   className,
   filter,
   ontologies,
   depthByUri,
   hoverCentre,
   onHoverTerm,
-}: TermRailProps): React.ReactElement => {
+}: TermRailProps): React.ReactElement {
   const t = useMessages();
   const data = useFragment<TermRail_ontologies$key>(
     termRailFragmentNode,
@@ -269,6 +269,4 @@ const TermRail = ({
       })}
     </nav>
   );
-};
-
-export default TermRail;
+}

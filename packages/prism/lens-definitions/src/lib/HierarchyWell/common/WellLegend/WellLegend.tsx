@@ -21,7 +21,7 @@ const componentCssClassName = "ds well-legend";
  *
  * `import { WellLegend } from "./common/WellLegend/index.js";`
  */
-const WellLegend = (): React.ReactElement => {
+export default function WellLegend(): React.ReactElement {
   const t = useMessages();
   return (
     <dl aria-label={t("legend.label")} className={componentCssClassName}>
@@ -49,6 +49,4 @@ const WellLegend = (): React.ReactElement => {
       </div>
     </dl>
   );
-};
-
-export default WellLegend;
+}

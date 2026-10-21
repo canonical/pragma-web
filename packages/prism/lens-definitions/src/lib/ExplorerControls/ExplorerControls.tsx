@@ -46,12 +46,12 @@ const ABSTRACTION_COPY: {
  *
  * `import { ExplorerControls } from "../ExplorerControls/index.js";`
  */
-const ExplorerControls = ({
+export default function ExplorerControls({
   className,
   filter,
   namespaceLabels,
   onFilterChange,
-}: ExplorerControlsProps): React.ReactElement => {
+}: ExplorerControlsProps): React.ReactElement {
   const t = useMessages();
   const prefixes = namespaceLabels.map(({ prefix }) => prefix);
 
@@ -118,6 +118,4 @@ const ExplorerControls = ({
       </fieldset>
     </div>
   );
-};
-
-export default ExplorerControls;
+}

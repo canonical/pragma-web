@@ -115,13 +115,13 @@ const componentCssClassName = "ds term-inspector";
  *
  * `import { TermInspector } from "./TermInspector/index.js";`
  */
-const TermInspector = ({
+export default function TermInspector({
   className,
   term,
   classRef,
   propertyRef,
   namespaces,
-}: TermInspectorProps): React.ReactElement => {
+}: TermInspectorProps): React.ReactElement {
   const t = useMessages();
   const classData = useFragment(
     termInspectorClassFragmentNode,
@@ -165,6 +165,4 @@ const TermInspector = ({
       {body}
     </aside>
   );
-};
-
-export default TermInspector;
+}

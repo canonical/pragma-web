@@ -8,17 +8,15 @@ import type { TermLinkProps } from "./types.js";
  *
  * `import { TermLink } from "../TermLink/index.js";`
  */
-const TermLink = ({
+export default function TermLink({
   uri,
   label,
   namespaces,
-}: TermLinkProps): React.ReactElement => {
+}: TermLinkProps): React.ReactElement {
   const prefixed = compactUri(uri, namespaces);
   return (
     <Link params={{ term: prefixed }} to="definitionsTerm">
       {label ?? prefixed}
     </Link>
   );
-};
-
-export default TermLink;
+}
