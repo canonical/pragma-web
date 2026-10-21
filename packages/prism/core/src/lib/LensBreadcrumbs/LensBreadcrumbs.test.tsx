@@ -20,7 +20,7 @@ const bareRoutes: RouteMap = {
   journeys: route({ url: "/journeys", content: () => null }),
 } as const;
 
-const at = (url: string, node: ReactElement): ReactElement => (
+const wrapInRouterAt = (url: string, node: ReactElement): ReactElement => (
   <RouterProvider
     router={createRouter(bareRoutes, { adapter: createMemoryAdapter(url) })}
   >
@@ -31,7 +31,7 @@ const at = (url: string, node: ReactElement): ReactElement => (
 describe("LensBreadcrumbs", () => {
   it("renders a single current crumb on a lens index (no back-link)", () => {
     render(
-      at(
+      wrapInRouterAt(
         "/definitions",
         <LensBreadcrumbs lensLabel="Definitions" lensRouteName="definitions" />,
       ),
@@ -47,7 +47,7 @@ describe("LensBreadcrumbs", () => {
 
   it("renders a linked lens crumb plus a current entity crumb", () => {
     render(
-      at(
+      wrapInRouterAt(
         "/components/ds%3Aglobal.component.button",
         <LensBreadcrumbs
           current="ds:global.component.button"
@@ -97,7 +97,7 @@ describe("LensBreadcrumbs", () => {
 
   it("applies the component class alongside the DS breadcrumbs class", () => {
     render(
-      at(
+      wrapInRouterAt(
         "/standards",
         <LensBreadcrumbs lensLabel="Standards" lensRouteName="standards" />,
       ),

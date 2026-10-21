@@ -45,14 +45,14 @@ describe("useHome", () => {
   it("hands the resolver the node and the provider's router", () => {
     // Typed over the fixture table: a site registers its own route map, so
     // its resolvers are typed against it without a cast.
-    const termHome = (
+    const resolveTermHome = (
       node: HomeNode,
       router: Router<typeof LENS_ROUTES>,
     ): string =>
       router.buildPath("glossaryTerm", { params: { term: node.uri } });
-    expect(resolveHome({ Term: termHome as unknown as HomeResolver })).toBe(
-      "/glossary/ds%3AUIBlock",
-    );
+    expect(
+      resolveHome({ Term: resolveTermHome as unknown as HomeResolver }),
+    ).toBe("/glossary/ds%3AUIBlock");
   });
 
   it("throws when no HomesProvider is mounted above", () => {

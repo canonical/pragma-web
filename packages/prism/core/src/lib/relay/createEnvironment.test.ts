@@ -23,7 +23,7 @@ import {
 import { createEnvironment } from "./createEnvironment.js";
 import type { CreateEnvironmentOptions } from "./types.js";
 
-const jsonResponse = (payload: unknown): Response =>
+const buildJsonResponse = (payload: unknown): Response =>
   new Response(JSON.stringify(payload), {
     headers: { "Content-Type": "application/json" },
     status: 200,
@@ -35,7 +35,7 @@ const originalFetch = globalThis.fetch;
 const stubFetch = (payload: unknown) => {
   const fetchSpy = vi
     .fn<typeof fetch>()
-    .mockImplementation(() => Promise.resolve(jsonResponse(payload)));
+    .mockImplementation(() => Promise.resolve(buildJsonResponse(payload)));
   globalThis.fetch = fetchSpy;
   return fetchSpy;
 };

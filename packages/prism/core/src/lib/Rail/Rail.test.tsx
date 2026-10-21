@@ -150,12 +150,24 @@ describe("Rail", () => {
   it("lists the entries in the order the lenses declare, not the table's", () => {
     // Orders 10, 2, 7 declared in table order: the rail must sort them, and
     // the gaps must not matter.
-    const lens = (label: string, order: number) =>
+    const buildLens = (label: string, order: number) =>
       routeLensFacet.of({ label, icon: Icon, order, tier: 1 });
     const routes = {
-      home: route({ url: "/", content: () => null, meta: lens("Ten", 10) }),
-      second: route({ url: "/b", content: () => null, meta: lens("Two", 2) }),
-      third: route({ url: "/c", content: () => null, meta: lens("Seven", 7) }),
+      home: route({
+        url: "/",
+        content: () => null,
+        meta: buildLens("Ten", 10),
+      }),
+      second: route({
+        url: "/b",
+        content: () => null,
+        meta: buildLens("Two", 2),
+      }),
+      third: route({
+        url: "/c",
+        content: () => null,
+        meta: buildLens("Seven", 7),
+      }),
     } as const;
     renderRailOver(routes);
     const nav = screen.getByRole("navigation", { name: "Primary" });

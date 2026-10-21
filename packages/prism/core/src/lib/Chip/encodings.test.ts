@@ -243,7 +243,7 @@ function parseOklch(value: string): readonly [number, number, number] {
   return [lightness, Number(match.at(3)), Number(match.at(4))];
 }
 
-function oklchToSrgb([lightness, chroma, hueDegrees]: readonly [
+function convertOklchToSrgb([lightness, chroma, hueDegrees]: readonly [
   number,
   number,
   number,
@@ -254,16 +254,16 @@ function oklchToSrgb([lightness, chroma, hueDegrees]: readonly [
   const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
   const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
   const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
-  const toGamma = (linear: number): number => {
+  const applyGamma = (linear: number): number => {
     const clamped = Math.min(1, Math.max(0, linear));
     return clamped <= 0.0031308
       ? 12.92 * clamped
       : 1.055 * clamped ** (1 / 2.4) - 0.055;
   };
   return [
-    toGamma(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
-    toGamma(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
-    toGamma(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s),
+    applyGamma(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
+    applyGamma(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
+    applyGamma(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s),
   ];
 }
 
@@ -280,15 +280,19 @@ function compositeOver(
   ];
 }
 
-function relativeLuminance([red, green, blue]: Srgb): number {
-  const linear = (channel: number): number =>
+function computeRelativeLuminance([red, green, blue]: Srgb): number {
+  const linearizeChannel = (channel: number): number =>
     channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
-  return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
+  return (
+    0.2126 * linearizeChannel(red) +
+    0.7152 * linearizeChannel(green) +
+    0.0722 * linearizeChannel(blue)
+  );
 }
 
-function contrastRatio(first: Srgb, second: Srgb): number {
-  const firstLuminance = relativeLuminance(first);
-  const secondLuminance = relativeLuminance(second);
+function measureContrast(first: Srgb, second: Srgb): number {
+  const firstLuminance = computeRelativeLuminance(first);
+  const secondLuminance = computeRelativeLuminance(second);
   const lighter = Math.max(firstLuminance, secondLuminance);
   const darker = Math.min(firstLuminance, secondLuminance);
   return (lighter + 0.05) / (darker + 0.05);
@@ -316,7 +320,7 @@ describe("instance chip contrast (WCAG AA)", () => {
   it("keeps text-vs-composited-fill at ≥ 4.5:1 for every hue at the fallbacks", () => {
     const tint = resolveNamespaceTint("ds", ["ds"]);
     // `--color-background` light: `--color-palette-white`.
-    const background = oklchToSrgb(parseOklch("oklch(100% 0 0)"));
+    const background = convertOklchToSrgb(parseOklch("oklch(100% 0 0)"));
     const fillAlpha = parsePercentAsAlpha(
       getBoxEncoding("instance").fillWeight,
     );
@@ -324,10 +328,10 @@ describe("instance chip contrast (WCAG AA)", () => {
     const chroma = readHookFallback(tint, "--chip-tint-c");
 
     for (let hue = 0; hue < 360; hue += 15) {
-      const text = oklchToSrgb([lightness, chroma, hue]);
+      const text = convertOklchToSrgb([lightness, chroma, hue]);
       const fill = compositeOver(text, fillAlpha, background);
       expect(
-        contrastRatio(text, fill),
+        measureContrast(text, fill),
         `hue ${hue} on its instance fill`,
       ).toBeGreaterThanOrEqual(4.5);
     }
