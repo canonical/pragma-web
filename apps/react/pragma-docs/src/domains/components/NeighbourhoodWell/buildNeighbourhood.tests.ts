@@ -9,8 +9,8 @@
 import { describe, expect, it } from "vitest";
 import {
   buildNeighbourhood,
-  edgeEndpoint,
   estimateNodeWidth,
+  findEdgeEndpoint,
 } from "./buildNeighbourhood.js";
 import {
   COLLISION_GAP,
@@ -102,7 +102,7 @@ describe("estimateNodeWidth", () => {
   });
 });
 
-describe("edgeEndpoint", () => {
+describe("findEdgeEndpoint", () => {
   it("meets the box border along the segment, never inside it", () => {
     const node = {
       uri: "a",
@@ -115,7 +115,7 @@ describe("edgeEndpoint", () => {
       width: 100,
       height: 30,
     } as const;
-    const point = edgeEndpoint(node, { x: 200, y: 0 }, 0);
+    const point = findEdgeEndpoint(node, { x: 200, y: 0 }, 0);
     expect(point.x).toBe(50);
     expect(point.y).toBe(0);
   });

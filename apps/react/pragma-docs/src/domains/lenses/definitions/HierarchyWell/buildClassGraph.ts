@@ -28,10 +28,10 @@
  */
 
 import {
-  edgeEndpoint,
-  quadArc,
+  buildQuadArc,
+  buildSelfLoop,
+  findEdgeEndpoint,
   relaxBoxes,
-  selfLoop,
   settle,
   type WellBox,
 } from "@canonical/prism-core";
@@ -326,8 +326,8 @@ export const buildClassGraph = (
       const child = nodeById.get(toPrefixedUri(klass.uri, namespaces));
       const parent = nodeById.get(toPrefixedUri(parentUri, namespaces));
       if (child === undefined || parent === undefined) continue;
-      const start = edgeEndpoint(child, parent, 2);
-      const end = edgeEndpoint(parent, child, 6);
+      const start = findEdgeEndpoint(child, parent, 2);
+      const end = findEdgeEndpoint(parent, child, 6);
       edges.push({
         id: `sub:${child.id}`,
         source: child.id,
@@ -355,10 +355,10 @@ export const buildClassGraph = (
       parallelCount.set(pairKey, rank + 1);
       const arc =
         source === target
-          ? selfLoop(source)
-          : quadArc(
-              edgeEndpoint(source, target, 3),
-              edgeEndpoint(target, source, 7),
+          ? buildSelfLoop(source)
+          : buildQuadArc(
+              findEdgeEndpoint(source, target, 3),
+              findEdgeEndpoint(target, source, 7),
               EDGE_BOW * (1 + rank * 0.7),
             );
       edges.push({

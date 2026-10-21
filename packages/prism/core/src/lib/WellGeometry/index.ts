@@ -8,9 +8,9 @@
  * @module
  */
 
-export { edgeEndpoint } from "./edgeEndpoint.js";
-export { quadArc } from "./quadArc.js";
+export { buildQuadArc } from "./buildQuadArc.js";
+export { buildSelfLoop } from "./buildSelfLoop.js";
+export { findEdgeEndpoint } from "./findEdgeEndpoint.js";
 export { relaxBoxes } from "./relaxBoxes.js";
-export { selfLoop } from "./selfLoop.js";
 export { settle } from "./settle.js";
 export type { QuadArc, RelaxOptions, WellBox } from "./types.js";

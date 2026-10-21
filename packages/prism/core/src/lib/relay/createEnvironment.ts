@@ -80,7 +80,7 @@ const createHttpNetwork = (
  * cache config as an interface where the pipeline wants a plain record —
  * hence the spread and the single response cast at this library boundary.
  */
-const toFetchFunction =
+const adaptFetchFunction =
   (fetchGraphQL: RelayRuntimeFetch): FetchFunction =>
   (params, variables, cacheConfig) =>
     fetchGraphQL(params, variables, {
@@ -100,7 +100,7 @@ const resolveFetchFunction = (
   if (typeof options.graphqlUrl !== "string" || options.graphqlUrl === "") {
     throw new Error("createEnvironment: pass a graphqlUrl or a fetchFn");
   }
-  return toFetchFunction(
+  return adaptFetchFunction(
     createHttpNetwork(options.graphqlUrl, options.headers).fetch,
   );
 };

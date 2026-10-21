@@ -62,9 +62,9 @@ export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
 export { ThemeSelector } from "./ThemeSelector/index.js";
 export type { QuadArc, RelaxOptions, WellBox } from "./WellGeometry/index.js";
 export {
-  edgeEndpoint,
-  quadArc,
+  buildQuadArc,
+  buildSelfLoop,
+  findEdgeEndpoint,
   relaxBoxes,
-  selfLoop,
   settle,
 } from "./WellGeometry/index.js";

@@ -2,16 +2,16 @@ import { settle } from "./settle.js";
 import type { QuadArc } from "./types.js";
 
 /**
- * A semantic arc: a quadratic bowing `bow` px off its chord, wearing its
- * label at the curve's apex (t = 0.5). The bow's sign flips which side the
- * arc swells toward; magnitude stacks for parallel edges.
+ * Build a semantic arc: a quadratic bowing `bow` px off its chord, wearing
+ * its label at the curve's apex (t = 0.5). The bow's sign flips which side
+ * the arc swells toward; magnitude stacks for parallel edges.
  *
  * @param start - The arc's first endpoint.
  * @param end - The arc's second endpoint.
  * @param bow - How far the control point sits off the chord, in px.
  * @returns The SVG path and the label anchor, settled.
  */
-export const quadArc = (
+export const buildQuadArc = (
   start: { readonly x: number; readonly y: number },
   end: { readonly x: number; readonly y: number },
   bow: number,

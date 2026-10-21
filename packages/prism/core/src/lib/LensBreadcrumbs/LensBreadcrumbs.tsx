@@ -12,7 +12,7 @@ import "./styles.css";
 const componentCssClassName = "ds lens-breadcrumbs";
 
 /**
- * The router-integration adapter the DS `Breadcrumbs` applies to every
+ * Create the router-integration adapter the DS `Breadcrumbs` applies to every
  * NON-current item. The trail has at most one linked crumb — the lens
  * index — so a single adapter bound to that route name is enough: it
  * renders router-react's `Link` with the route name, so the click is
@@ -22,7 +22,7 @@ const componentCssClassName = "ds lens-breadcrumbs";
  * from the route name, so the adapter ignores the incoming `href` (there is
  * exactly one destination — this lens's index).
  */
-const lensLinkComponent =
+const createLensLinkComponent =
   (lensRouteName: string) =>
   ({ className, children }: LinkComponentProps): React.ReactElement => (
     // Typed over the open route map: the name is a plain string, and an
@@ -84,7 +84,7 @@ const LensBreadcrumbs = ({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       items={items}
-      LinkComponent={lensLinkComponent(lensRouteName)}
+      LinkComponent={createLensLinkComponent(lensRouteName)}
     />
   );
 };

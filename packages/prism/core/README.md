@@ -14,8 +14,8 @@ package holds the parts every such site needs and none of them owns:
   shaped by its kind, filled or outlined by class vs instance, and dotted by
   lifecycle; `ChipLegend` explains the grammar.
 - **Well geometry**: the pure, deterministic layout functions a graph well
-  settles its nodes and edges with (`relaxBoxes`, `edgeEndpoint`, `quadArc`,
-  `selfLoop`, `settle`).
+  settles its nodes and edges with (`relaxBoxes`, `findEdgeEndpoint`,
+  `buildQuadArc`, `buildSelfLoop`, `settle`).
 - **Homes**: where each kind of graph node lives (`HomesProvider`,
   `useHome`), so a mention of a node links to the page that owns it.
 - **Entity bindings**: which GraphQL type serves each ontology class
@@ -257,8 +257,8 @@ name.
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
   `ThemeSelectorProps`.
-- Well geometry: `settle`, `edgeEndpoint`, `relaxBoxes`, `quadArc`,
-  `selfLoop`; types `WellBox`, `RelaxOptions`, `QuadArc`.
+- Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
+  `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `RelaxOptions`, `QuadArc`.
 
 - Facets: `defineFacet`, `collectFacet`, `routeLensFacet`, `collectLenses`,
   `routeShortcutFacet`, `collectShortcuts`; types `RouteFacet`, `RouteMeta`,

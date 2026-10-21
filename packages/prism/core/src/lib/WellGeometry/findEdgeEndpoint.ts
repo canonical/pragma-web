@@ -1,8 +1,8 @@
 import type { WellBox } from "./types.js";
 
 /**
- * The point where the segment from `towards` to `box`'s centre crosses the
- * box border (plus a small gap), so edges meet nodes at their edge instead
+ * Find the point where the segment from `towards` to `box`'s centre crosses
+ * the box border (plus a small gap), so edges meet nodes at their edge instead
  * of diving underneath them. Falls back to the centre for a degenerate
  * (zero-length) segment, and never overshoots `towards` itself.
  *
@@ -11,7 +11,7 @@ import type { WellBox } from "./types.js";
  * @param gap - Clearance between the border and the endpoint, in px.
  * @returns The trimmed endpoint.
  */
-export const edgeEndpoint = (
+export const findEdgeEndpoint = (
   box: Readonly<WellBox>,
   towards: { readonly x: number; readonly y: number },
   gap: number,
