@@ -4,12 +4,20 @@
  * yield byte-equal output), plus the layout's grammar: depth rides the
  * RADIUS, boxes separate,
  * object properties become labelled semantic arcs (self-references loop),
- * and node ids stay prefixed term addresses.
+ * and node ids stay prefixed term addresses. Each choice that shapes the
+ * picture has a case of its own: leaf-proportional angular windows, a
+ * multi-root disc's clear centre, stacked parallel arcs and wrapping rows.
  */
 
 import { describe, expect, it } from "vitest";
 import { buildClassGraph, computeClassDepths } from "./buildClassGraph.js";
-import { COLLISION_GAP } from "./constants.js";
+import {
+  COLLISION_GAP,
+  NODE_MAX_WIDTH,
+  RING_X,
+  RING_Y,
+  TARGET_ROW_WIDTH,
+} from "./constants.js";
 import type { ClassGraphOntology } from "./types.js";
 
 /** A miniature two-ontology input mirroring the live shape (full IRIs in,
@@ -133,6 +141,61 @@ const makeOpenInput = (): ClassGraphOntology[] => [
   },
 ];
 
+/** Build one ontology class by its local name, with an optional superclass. */
+const makeClass = (
+  namespace: string,
+  name: string,
+  superclass?: string,
+): ClassGraphOntology["classes"][number] => ({
+  uri: `${namespace}${name}`,
+  label: name,
+  isAbstract: false,
+  superclass:
+    superclass === undefined ? null : { uri: `${namespace}${superclass}` },
+});
+
+/** Build one ontology from its classes and object properties. */
+const makeOntology = (
+  prefix: string,
+  classes: readonly [name: string, superclass?: string][],
+  relations: readonly [name: string, domain: string, range: string][] = [],
+): ClassGraphOntology => {
+  const namespace = `https://${prefix}.example.com/`;
+  return {
+    prefix,
+    namespace,
+    classes: classes.map(([name, superclass]) =>
+      makeClass(namespace, name, superclass),
+    ),
+    properties: relations.map(([name, domain, range]) => ({
+      uri: `${namespace}${name}`,
+      label: name,
+      kind: "OBJECT",
+      domain: { uri: `${namespace}${domain}` },
+      range: `${namespace}${range}`,
+    })),
+  };
+};
+
+/** Find a node of a built graph by id, failing loudly when it is missing. */
+const findNode = (
+  graph: ReturnType<typeof buildClassGraph>,
+  id: string,
+): { readonly x: number; readonly y: number } => {
+  const node = graph.nodes.find((candidate) => candidate.id === id);
+  if (node === undefined) throw new Error(`no node ${id}`);
+  return node;
+};
+
+/** The angle a node sits at around a centre, in the ring's own ellipse
+ * (each axis scaled by its ring spacing), measured clockwise from the top. */
+const measureRingAngle = (
+  centre: { readonly x: number; readonly y: number },
+  node: { readonly x: number; readonly y: number },
+): number =>
+  Math.atan2((node.y - centre.y) / RING_Y, (node.x - centre.x) / RING_X) +
+  Math.PI / 2;
+
 describe("computeClassDepths", () => {
   it("stops counting where the chain leaves the ontology", () => {
     const input = makeOpenInput().at(0);
@@ -247,6 +310,76 @@ describe("buildClassGraph", () => {
     expect(
       graph.edges.find((edge) => edge.family === "semantic")?.predicate,
     ).toBe("an:fills");
+  });
+
+  it("gives each subtree an angular window in proportion to its leaves", () => {
+    // Root's two children: Wide holds three leaves, Lone is a leaf. Wide's
+    // window is the first three quarters of the turn, Lone's the last
+    // quarter, and each child sits mid-window.
+    const graph = buildClassGraph([
+      makeOntology("pr", [
+        ["Root"],
+        ["Wide", "Root"],
+        ["Lone", "Root"],
+        ["A", "Wide"],
+        ["B", "Wide"],
+        ["C", "Wide"],
+      ]),
+    ]);
+    const root = findNode(graph, "pr:Root");
+    expect(measureRingAngle(root, findNode(graph, "pr:Wide"))).toBeCloseTo(
+      (3 / 4) * Math.PI,
+      1,
+    );
+    expect(measureRingAngle(root, findNode(graph, "pr:Lone"))).toBeCloseTo(
+      -(1 / 4) * Math.PI,
+      1,
+    );
+  });
+
+  it("keeps a multi-root disc's centre clear: every root sits one ring out", () => {
+    const graph = buildClassGraph([makeOntology("mr", [["North"], ["South"]])]);
+    const north = findNode(graph, "mr:North");
+    const south = findNode(graph, "mr:South");
+    // The two roots share the disc on opposite sides of an empty centre.
+    expect(Math.hypot(north.x - south.x, north.y - south.y)).toBeCloseTo(
+      2 * RING_X,
+      0,
+    );
+  });
+
+  it("stacks the bows of parallel relations, so each draws its own arc", () => {
+    const graph = buildClassGraph([
+      makeOntology(
+        "pl",
+        [["Source"], ["Target", "Source"]],
+        [
+          ["uses", "Source", "Target"],
+          ["requires", "Source", "Target"],
+        ],
+      ),
+    ]);
+    const arcs = graph.edges.filter((edge) => edge.family === "semantic");
+    expect(arcs).toHaveLength(2);
+    expect(arcs.at(0)?.d).not.toBe(arcs.at(1)?.d);
+    expect(arcs.at(0)?.labelAt).not.toEqual(arcs.at(1)?.labelAt);
+  });
+
+  it("wraps clusters into a new row past the target row width", () => {
+    // Single-class ontologies, each as wide as a node is drawn: more of them
+    // than one row of the target width holds.
+    const longName = "A".repeat(NODE_MAX_WIDTH);
+    const count = Math.ceil(TARGET_ROW_WIDTH / NODE_MAX_WIDTH) + 1;
+    const graph = buildClassGraph(
+      Array.from({ length: count }, (_, index) =>
+        makeOntology(`o${index}`, [[longName]]),
+      ),
+    );
+    const rows = new Set(graph.clusters.map((cluster) => cluster.y));
+    expect(rows.size).toBeGreaterThan(1);
+    expect(graph.clusters.at(-1)?.y).toBeGreaterThan(
+      graph.clusters.at(0)?.y ?? Number.POSITIVE_INFINITY,
+    );
   });
 
   it("draws no structural edge to a superclass outside the graph", () => {
