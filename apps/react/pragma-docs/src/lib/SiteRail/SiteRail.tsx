@@ -2,6 +2,7 @@ import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useMemo } from "react";
 import { Rail, type RailBrand } from "#lib/Rail";
 import { collectLenses } from "#lib/routeLens";
+import type { SiteRailProps } from "./types.js";
 
 const SITE_BRAND: RailBrand = {
   label: "Pragma",
@@ -15,15 +16,15 @@ const SITE_BRAND: RailBrand = {
  *
  * It reads the table off the router rather than importing the app's routes,
  * because the route table imports the lens layouts that render this rail;
- * importing back would close a cycle. Takes no props: it is site chrome, the
- * same on every lens, and `Rail` owns the rendered element.
+ * importing back would close a cycle. The brand and the lenses are the
+ * site's own; every other prop reaches the rail's `<nav>` root.
  *
  * `import { SiteRail } from "#lib/SiteRail";`
  */
-export default function SiteRail(): ReactElement {
+export default function SiteRail(props: SiteRailProps): ReactElement {
   const router = useRouter();
   // Keyed on the route table, a stable reference for the router's lifetime,
   // so the walk and the invariants it enforces run once.
   const lenses = useMemo(() => collectLenses(router.routes), [router.routes]);
-  return <Rail brand={SITE_BRAND} entries={lenses} />;
+  return <Rail {...props} brand={SITE_BRAND} entries={lenses} />;
 }

@@ -4,8 +4,9 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { appRoutes, notFoundRoute } from "../../routes.js";
 import SiteRail from "./SiteRail.js";
+import type { SiteRailProps } from "./types.js";
 
-const renderSiteRail = () =>
+const renderSiteRail = (props: SiteRailProps = {}) =>
   render(
     <RouterProvider
       router={createRouter(appRoutes, {
@@ -13,7 +14,7 @@ const renderSiteRail = () =>
         notFound: notFoundRoute,
       })}
     >
-      <SiteRail />
+      <SiteRail {...props} />
     </RouterProvider>,
   );
 
@@ -42,5 +43,12 @@ describe("SiteRail", () => {
       .querySelector(".rail-brand");
     expect(brand).toHaveAttribute("href", "/");
     expect(brand?.textContent).toBe("Pragmadesign system docs");
+  });
+
+  it("passes native props through to the rail's nav root", () => {
+    renderSiteRail({ className: "is-pinned", id: "site-rail" });
+    const nav = screen.getByRole("navigation", { name: "Primary" });
+    expect(nav.id).toBe("site-rail");
+    expect(nav).toHaveClass("is-pinned");
   });
 });
