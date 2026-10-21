@@ -164,12 +164,12 @@ does not name. An arm receives the node as its representation's composite
 fragment reads it, the node's home as `href` (`undefined` when it has
 none), and the native props of the root it renders.
 
-The composites are the package's own: each spreads the fragment of every
-arm the package ships, inside an inline fragment on that arm's type, and
-the package's tests hold each map's keys and its composite's arms in step.
-A site cannot add a spread to a composite, so an arm a site wrote for a type
-of its own would see only what the composite already selects. A site
-therefore mounts `defaultProjectionMaps`, whose arms are the `Node` arms.
+The composites are the package's own: each selects what dispatch reads
+plus the `Node` arm's fragment, spread at the top level, and the package's
+tests hold each map's keys and its composite's arms in step. A site cannot
+add a spread to a composite, so an arm a site wrote for a type of its own
+would see only what the composite already selects. A site therefore mounts
+`defaultProjectionMaps`, whose arms are the `Node` arms.
 
 A node's home is resolved with its compact address (`_meta.curie`) as the
 `uri` a site's home resolver receives, so one entity has one address.

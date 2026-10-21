@@ -7,9 +7,9 @@ import type { EntityChipProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The chip's composite fragment: what dispatch reads, plus one spread per
- * arm in the chip map. A type's own arm is spread inside an inline fragment
- * on that type, so the arm reads its own fields wherever the chip renders.
+ * The chip's composite fragment: what dispatch reads, plus the `Node`
+ * arm's fragment, spread at the top level because `Node` is the one arm
+ * the chip map holds.
  */
 const entityChipFragmentSource = (): unknown => graphql`
   fragment EntityChip_node on Node {
@@ -25,8 +25,8 @@ void entityChipFragmentSource;
 
 /**
  * The inline mention of a graph node: it renders the node through the chip
- * map's arm for the node's `__typename`, falling back to the `Node` arm,
- * and hands the arm the node's home.
+ * map's arm for the node's `__typename`, falling back to the `Node` arm, and
+ * hands the arm the node's home.
  *
  * It renders no element of its own; the arm renders the root, a `<span>`.
  *

@@ -7,9 +7,9 @@ import type { EntityCommandProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The command's composite fragment: what dispatch reads, plus one spread per
- * arm in the command map. A type's own arm is spread inside an inline fragment
- * on that type, so the arm reads its own fields wherever the command renders.
+ * The command's composite fragment: what dispatch reads, plus the `Node`
+ * arm's fragment, spread at the top level because `Node` is the one arm
+ * the command map holds.
  */
 const entityCommandFragmentSource = (): unknown => graphql`
   fragment EntityCommand_node on Node {
@@ -24,9 +24,9 @@ void entityCommandFragmentSource;
 /* v8 ignore stop */
 
 /**
- * The command-palette entry: a node offered as a destination to jump to. It renders the node through the command map's arm for the node's
- * `__typename`, falling back to the `Node` arm, and hands the arm the node's
- * home.
+ * The command-palette entry: a node offered as a destination to jump to. It
+ * renders the node through the command map's arm for the node's `__typename`,
+ * falling back to the `Node` arm, and hands the arm the node's home.
  *
  * It renders no element of its own; the arm renders the root, an `<li>`.
  *

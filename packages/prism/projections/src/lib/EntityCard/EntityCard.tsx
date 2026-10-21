@@ -7,9 +7,9 @@ import type { EntityCardProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The card's composite fragment: what dispatch reads, plus one spread per
- * arm in the card map. A type's own arm is spread inside an inline fragment
- * on that type, so the arm reads its own fields wherever the card renders.
+ * The card's composite fragment: what dispatch reads, plus the `Node`
+ * arm's fragment, spread at the top level because `Node` is the one arm
+ * the card map holds.
  */
 const entityCardFragmentSource = (): unknown => graphql`
   fragment EntityCard_node on Node {
@@ -24,9 +24,9 @@ void entityCardFragmentSource;
 /* v8 ignore stop */
 
 /**
- * The card: a node as a self-contained tile in a grid of entities. It renders the node through the card map's arm for the node's
- * `__typename`, falling back to the `Node` arm, and hands the arm the node's
- * home.
+ * The card: a node as a self-contained tile in a grid of entities. It renders
+ * the node through the card map's arm for the node's `__typename`, falling
+ * back to the `Node` arm, and hands the arm the node's home.
  *
  * It renders no element of its own; the arm renders the root, an `<article>`.
  *
