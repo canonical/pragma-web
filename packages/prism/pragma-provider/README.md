@@ -99,6 +99,61 @@ structural: there is no path in this package to get wrong.
 
 ---
 
+## Prose: Markdown sidecars beside the Turtle
+
+An entity's long-form documentation is Markdown, written in a file beside the Turtle that
+declares the entity, in the ref package's `definitions/` or `data/`. The provider serves it
+through one extension to the compiled schema:
+
+```graphql
+type Prose {
+  markdown(lang: String): String!
+  lang: String!
+  availableLanguages: [String!]!
+  references: NodeConnection!
+}
+extend type Query { prose(uri: ID!): Prose }
+```
+
+**Naming.** A sidecar is named after the entity's local name: `button.md` describes the
+entity whose IRI is a namespace declared by the Turtle in the same directory followed by
+`button`. A translation adds a language tag before the extension: `button.fr.md`,
+`button.pt-BR.md`. Local names may contain dots, so a name whose last segment looks like a
+language (`lit.component.ssr.md`) is read both ways, and the graph decides which one names
+an entity.
+
+**The default language is `en`.** A sidecar without a language segment is the English
+text, and every entity with prose must have one: it is what a request falls back to.
+
+**The request's language.** `markdown` without `lang`, and `lang`, follow the request's
+`x-prism-locale` header when the entity is authored in that language, and the default
+language otherwise. `markdown(lang:)` asks for a language explicitly; it falls back to the
+header, then to the default. Matching is exact: `fr-CA` is not served `fr`. The header is
+not `Accept-Language`, which a browser sends on its own, so a client fetch and a server
+render of the same page would otherwise disagree. A value that is not a language tag
+counts as no header.
+
+**References.** A link in the Markdown whose destination is a CURIE with a prefix the
+corpus declares (`[Button](ds:global.component.button)`) or an absolute IRI is a
+reference. Links in code, images, escaped brackets and raw HTML are not. `references`
+resolves each through `node(id:)` across every language of the text, in order of first
+mention, and drops the ones the graph does not hold.
+
+**Why a root field.** ke-graphql merges extension fields into the object types it
+generates and into `Query`, and into nothing else: `Node` cannot take one. A root field
+also reads the same way against any provider; a field on each concrete type would need a
+type-specific fragment. Because `Prose` is built with this package's `graphql` and
+composed into ke-graphql's schema, the package pins the exact `graphql` version
+ke-graphql pins, so both resolve to one installed copy.
+
+**Binding happens once, at boot, against the store, and refuses to guess.** A sidecar
+whose name reads as two existing entities, two sidecars holding the same language of one
+entity, and an entity with a translation but no English text each fail the boot with a
+message naming the files. A sidecar that names no entity is announced with a warning and
+not served.
+
+---
+
 ## Testing: the hermetic corpus
 
 Pragma's real corpus is the three ref packages plus a semantics working tree. The
