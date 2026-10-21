@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ROUTE_LENS_META_KEY } from "./constants.js";
-import { routeLensFacet } from "./lensFacet.js";
+import { routeLensFacet } from "./routeLensFacet.js";
 import type { LensEntry } from "./types.js";
 
 const Icon = () => null;

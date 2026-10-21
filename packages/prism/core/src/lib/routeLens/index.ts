@@ -7,5 +7,5 @@
 
 export { collectLenses } from "./collectLenses.js";
 export { ROUTE_LENS_META_KEY } from "./constants.js";
-export { routeLensFacet } from "./lensFacet.js";
+export { routeLensFacet } from "./routeLensFacet.js";
 export type { CollectedLens, LensEntry, LensTier } from "./types.js";

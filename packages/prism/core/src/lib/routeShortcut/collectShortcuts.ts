@@ -1,6 +1,6 @@
 import type { AnyRoute } from "@canonical/router-core";
 import { collectFacet } from "../routeFacet/index.js";
-import { routeShortcutFacet } from "./shortcutFacet.js";
+import { routeShortcutFacet } from "./routeShortcutFacet.js";
 import type { ShortcutAllocation } from "./types.js";
 
 /**

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { LENS_ROUTES } from "../../../testing/fixtures.js";
 import { collectShortcuts } from "./collectShortcuts.js";
 import { ROUTE_SHORTCUT_META_KEY } from "./constants.js";
-import { routeShortcutFacet } from "./shortcutFacet.js";
+import { routeShortcutFacet } from "./routeShortcutFacet.js";
 
 const page = () => null;
 

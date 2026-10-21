@@ -1,6 +1,6 @@
 import type { AnyRoute } from "@canonical/router-core";
 import { collectFacet } from "../routeFacet/index.js";
-import { routeLensFacet } from "./lensFacet.js";
+import { routeLensFacet } from "./routeLensFacet.js";
 import type { CollectedLens } from "./types.js";
 
 /**
