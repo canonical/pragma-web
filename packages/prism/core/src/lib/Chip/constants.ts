@@ -50,6 +50,13 @@ export const GOLDEN_ANGLE_DEGREES = 137.508;
 export const UNKNOWN_NAMESPACE_TINT =
   "var(--chip-tint-unknown, oklch(var(--chip-tint-l, 0.45) 0 0))";
 
+/**
+ * The shape channel's encoding, one row per {@link KINDS} value, each row's
+ * `value` equal to its key (the type makes a missing or mismatched row a
+ * compile error). The label, description and shape copy are catalog keys,
+ * read through `t()`; `radius` is the chip's `border-radius`, behind a
+ * per-kind theme hook.
+ */
 export const KIND_INDEX: EncodingIndex<Kind, KindEncoding> = {
   component: {
     value: "component",
@@ -95,6 +102,12 @@ export const KIND_INDEX: EncodingIndex<Kind, KindEncoding> = {
   },
 };
 
+/**
+ * The border-vs-fill channel's encoding, one row per {@link BOXES} value,
+ * each row's `value` equal to its key. The label and description are
+ * catalog keys, read through `t()`; the weights are the tint's share of the
+ * fill and of the stroke.
+ */
 export const BOX_INDEX: EncodingIndex<Box, BoxEncoding> = {
   class: {
     value: "class",
@@ -112,6 +125,12 @@ export const BOX_INDEX: EncodingIndex<Box, BoxEncoding> = {
   },
 };
 
+/**
+ * The status-dot channel's encoding, one row per {@link LIFECYCLES} value,
+ * each row's `value` equal to its key. The label and description are
+ * catalog keys, read through `t()`; `dot` is the dot's colour behind a
+ * per-state theme hook, or `null` for `none`, which shows no dot.
+ */
 export const LIFECYCLE_INDEX: EncodingIndex<Lifecycle, LifecycleEncoding> = {
   canonical: {
     value: "canonical",
@@ -139,6 +158,11 @@ export const LIFECYCLE_INDEX: EncodingIndex<Lifecycle, LifecycleEncoding> = {
   },
 };
 
+/**
+ * The legend's copy for each of the four channels, one row per
+ * {@link CHANNELS} value, each row's `value` equal to its key; the label
+ * and description are catalog keys, read through `t()`.
+ */
 export const CHANNEL_INDEX: EncodingIndex<Channel, ChannelDescriptor> = {
   namespace: {
     value: "namespace",
@@ -162,16 +186,33 @@ export const CHANNEL_INDEX: EncodingIndex<Channel, ChannelDescriptor> = {
   },
 };
 
-/** Row tables in presentation order — the legend generates from these. */
+/**
+ * The shape channel's rows in {@link KINDS} order, as the legend lists them.
+ */
 export const KIND_ENCODINGS: readonly KindEncoding[] = KINDS.map(
   (value) => KIND_INDEX[value],
 );
+
+/**
+ * The border-vs-fill channel's rows in {@link BOXES} order, as the legend
+ * lists them.
+ */
 export const BOX_ENCODINGS: readonly BoxEncoding[] = BOXES.map(
   (value) => BOX_INDEX[value],
 );
+
+/**
+ * The status-dot channel's rows in {@link LIFECYCLES} order, as the legend
+ * lists them.
+ */
 export const LIFECYCLE_ENCODINGS: readonly LifecycleEncoding[] = LIFECYCLES.map(
   (value) => LIFECYCLE_INDEX[value],
 );
+
+/**
+ * The channels' legend copy in {@link CHANNELS} order, as the legend
+ * presents it.
+ */
 export const CHANNEL_DESCRIPTORS: readonly ChannelDescriptor[] = CHANNELS.map(
   (value) => CHANNEL_INDEX[value],
 );
