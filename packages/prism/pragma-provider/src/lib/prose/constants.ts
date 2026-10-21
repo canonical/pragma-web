@@ -1,7 +1,7 @@
 /**
  * The prose domain's fixed values: the language a sidecar is written in when
- * its name says nothing, what reads as a language in a name, and what counts
- * as a reference destination.
+ * its name says nothing, what reads as a language, the header a request
+ * names its language in, and what counts as a reference destination.
  */
 
 /**
@@ -19,6 +19,15 @@ export const DEFAULT_PROSE_LANG = "en";
  * language.
  */
 export const LANGUAGE_TAG = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
+
+/**
+ * The request header that names the language prose is served in when a
+ * query does not ask for one. Not `Accept-Language`: a browser sends that on
+ * its own, so a client-side fetch and a server-side render of the same page
+ * would see different languages. Whoever builds the request sets this one
+ * deliberately, from the locale the page is rendered in.
+ */
+export const LOCALE_HEADER = "x-prism-locale";
 
 /**
  * A link destination that can name an entity: an IRI scheme, a colon, and a
