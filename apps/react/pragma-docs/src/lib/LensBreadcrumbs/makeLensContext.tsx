@@ -1,7 +1,6 @@
 import { useRouterState } from "@canonical/router-react";
 import type React from "react";
 import LensBreadcrumbs from "./LensBreadcrumbs.js";
-import type { LensRouteName } from "./types.js";
 
 /**
  * Build a lens's mode-strip `Context` tenant: the breadcrumb trail to the
@@ -31,7 +30,7 @@ export const makeLensContext = ({
   paramKey,
 }: {
   readonly lensLabel: string;
-  readonly lensRouteName: LensRouteName;
+  readonly lensRouteName: string;
   readonly paramKey?: string;
 }): (() => React.ReactElement) => {
   const LensContext = (): React.ReactElement => {

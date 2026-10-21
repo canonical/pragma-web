@@ -70,6 +70,31 @@ describe("LensBreadcrumbs", () => {
     expect(current.tagName).not.toBe("A");
   });
 
+  it("derives the back-link's href from the route table", () => {
+    // The lens's index route lives wherever the table puts it: the crumb
+    // follows the route, not a path written beside it.
+    const relocated: RouteMap = {
+      components: route({ url: "/catalogue", content: () => null }),
+    } as const;
+    render(
+      <RouterProvider
+        router={createRouter(relocated, {
+          adapter: createMemoryAdapter("/catalogue"),
+        })}
+      >
+        <LensBreadcrumbs
+          current="ds:global.component.button"
+          lensLabel="Components"
+          lensRouteName="components"
+        />
+      </RouterProvider>,
+    );
+    expect(screen.getByRole("link", { name: "Components" })).toHaveAttribute(
+      "href",
+      "/catalogue",
+    );
+  });
+
   it("applies the component class alongside the DS breadcrumbs class", () => {
     render(
       at(
