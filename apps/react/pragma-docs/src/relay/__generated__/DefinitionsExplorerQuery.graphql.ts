@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<9928bdb2e5d01d0319722ddcf46f669a>>
+ * @generated SignedSource<<f3bd4fd72eb916af11d3b9f26e6402aa>>
  * @lightSyntaxTransform
  */
 
@@ -454,6 +454,10 @@ return {
                               }
                             ],
                             "storageKey": null
+                          },
+                          {
+                            "kind": "TypeDiscriminator",
+                            "abstractKey": "__isNode"
                           }
                         ],
                         "storageKey": null
@@ -534,12 +538,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d4b0f987d11ae0ceaeec5963df740c2c",
+    "cacheID": "0f12afac4357ce630b2e766d17a0c0e4",
     "id": null,
     "metadata": {},
     "name": "DefinitionsExplorerQuery",
     "operationKind": "query",
-    "text": "query DefinitionsExplorerQuery(\n  $uri: String!\n  $hasTerm: Boolean!\n) {\n  ontologies {\n    prefix\n    namespace\n    classes {\n      uri\n      isAbstract\n    }\n    ...TermRail_ontologies\n    ...HierarchyWell_ontologies\n  }\n  ontologyClass(uri: $uri) @include(if: $hasTerm) {\n    ...TermInspector_class\n    uri\n  }\n  ontologyProperty(uri: $uri) @include(if: $hasTerm) {\n    ...TermInspector_property\n    uri\n  }\n}\n\nfragment HierarchyWell_ontologies on Ontology {\n  prefix\n  namespace\n  classes {\n    uri\n    label\n    isAbstract\n    superclass {\n      uri\n    }\n  }\n  properties {\n    uri\n    label\n    kind\n    domain {\n      uri\n    }\n    range\n  }\n}\n\nfragment TermInspector_class on OntologyClass {\n  uri\n  label\n  definition\n  isAbstract\n  namespace\n  instanceCount\n  superclass {\n    uri\n    label\n  }\n  superclasses {\n    uri\n    label\n  }\n  subclasses {\n    uri\n    label\n  }\n  properties {\n    required\n    singular\n    inherited\n    property {\n      uri\n      label\n      definition\n      range\n      kind\n    }\n  }\n  instances(first: 12) {\n    edges {\n      node {\n        __typename\n        uri\n        _meta {\n          curie\n          title\n          type {\n            uri\n          }\n        }\n      }\n    }\n    pageInfo {\n      hasNextPage\n    }\n  }\n}\n\nfragment TermInspector_property on OntologyProperty {\n  uri\n  label\n  definition\n  kind\n  functional\n  range\n  namespace\n  domain {\n    uri\n    label\n  }\n  inverse {\n    uri\n    label\n  }\n}\n\nfragment TermRail_ontologies on Ontology {\n  prefix\n  label\n  namespace\n  classes {\n    uri\n    label\n    isAbstract\n    instanceCount\n  }\n  properties {\n    uri\n    label\n    kind\n  }\n}\n"
+    "text": "query DefinitionsExplorerQuery(\n  $uri: String!\n  $hasTerm: Boolean!\n) {\n  ontologies {\n    prefix\n    namespace\n    classes {\n      uri\n      isAbstract\n    }\n    ...TermRail_ontologies\n    ...HierarchyWell_ontologies\n  }\n  ontologyClass(uri: $uri) @include(if: $hasTerm) {\n    ...TermInspector_class\n    uri\n  }\n  ontologyProperty(uri: $uri) @include(if: $hasTerm) {\n    ...TermInspector_property\n    uri\n  }\n}\n\nfragment EntityChip_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    curie\n  }\n  ...NodeChip_node\n}\n\nfragment HierarchyWell_ontologies on Ontology {\n  prefix\n  namespace\n  classes {\n    uri\n    label\n    isAbstract\n    superclass {\n      uri\n    }\n  }\n  properties {\n    uri\n    label\n    kind\n    domain {\n      uri\n    }\n    range\n  }\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  _meta {\n    title\n    curie\n    type {\n      uri\n    }\n  }\n}\n\nfragment TermInspector_class on OntologyClass {\n  uri\n  label\n  definition\n  isAbstract\n  namespace\n  instanceCount\n  superclass {\n    uri\n    label\n  }\n  superclasses {\n    uri\n    label\n  }\n  subclasses {\n    uri\n    label\n  }\n  properties {\n    required\n    singular\n    inherited\n    property {\n      uri\n      label\n      definition\n      range\n      kind\n    }\n  }\n  instances(first: 12) {\n    edges {\n      node {\n        __typename\n        uri\n        _meta {\n          curie\n        }\n        ...EntityChip_node\n      }\n    }\n    pageInfo {\n      hasNextPage\n    }\n  }\n}\n\nfragment TermInspector_property on OntologyProperty {\n  uri\n  label\n  definition\n  kind\n  functional\n  range\n  namespace\n  domain {\n    uri\n    label\n  }\n  inverse {\n    uri\n    label\n  }\n}\n\nfragment TermRail_ontologies on Ontology {\n  prefix\n  label\n  namespace\n  classes {\n    uri\n    label\n    isAbstract\n    instanceCount\n  }\n  properties {\n    uri\n    label\n    kind\n  }\n}\n"
   }
 };
 })();

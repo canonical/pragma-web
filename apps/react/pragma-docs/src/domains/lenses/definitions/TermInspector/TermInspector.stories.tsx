@@ -4,7 +4,10 @@ import { type ReactElement, Suspense } from "react";
 import { useLazyLoadQuery } from "react-relay";
 import type { DefinitionsExplorerQuery } from "#relay/__generated__/DefinitionsExplorerQuery.graphql.js";
 import definitionsExplorerQueryNode from "#relay/__generated__/DefinitionsExplorerQuery.graphql.js";
-import { withRouter } from "../../../../../.storybook/decorators/index.js";
+import {
+  withProjections,
+  withRouter,
+} from "../../../../../.storybook/decorators/index.js";
 import { definitionsExplorerVariables } from "../definitionsQuery.js";
 import TermInspector from "./TermInspector.js";
 
@@ -43,7 +46,7 @@ const meta: Meta<typeof TermInspector> = {
   title: "Definitions/TermInspector",
   component: TermInspector,
   tags: ["autodocs"],
-  decorators: [withRouter({ routes: bareRoutes })],
+  decorators: [withProjections(), withRouter({ routes: bareRoutes })],
   parameters: {
     relay: {
       mockResolvers: {

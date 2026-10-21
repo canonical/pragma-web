@@ -1,10 +1,10 @@
 /**
  * The inspector's four states, driven through the real page over captured
  * records: the class view (ds:UIBlock), the property view
- * (ds:hasSubcomponent), the instance list with its D31 landing rule
- * (ds:Component — component instances link to their live entity route,
- * everything else is plain text), and the unknown-term alert (null
- * lookups synthesised onto the captured store, exactly the shape the
+ * (ds:hasSubcomponent), the instance list (ds:Component: each instance is
+ * an entity chip that links to the home the site declares for its type and
+ * reads as plain text where it declares none), and the unknown-term alert
+ * (null lookups synthesised onto the captured store, exactly the shape the
  * server serialises for an unknown term).
  */
 
@@ -44,6 +44,28 @@ const unknownTermRecords = {
 
 const inspector = (): HTMLElement =>
   screen.getByRole("complementary", { name: "Term inspector" });
+
+/**
+ * The captured ds:Component store with the Accordion instance's record
+ * repointed at `typename`. Its type record carries `__isNode: true`, as a
+ * captured store does for every type a `Node` fragment has matched.
+ */
+const repointAccordionTypename = (typename: string): RecordMap => {
+  const accordion = "https://ds.canonical.com/global.component.accordion";
+  const records = definitionsExplorerRecordsComponent as unknown as Record<
+    string,
+    Record<string, unknown>
+  >;
+  return {
+    ...records,
+    [accordion]: { ...records[accordion], __typename: typename },
+    [`client:__type:${typename}`]: {
+      __id: `client:__type:${typename}`,
+      __isNode: true,
+      __typename: "__TypeSchema",
+    },
+  } as unknown as RecordMap;
+};
 
 describe("TermInspector", () => {
   it("renders the class view for ds:UIBlock, no fetch", {
@@ -154,7 +176,7 @@ describe("TermInspector", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("links component instances to their live entity route, D31 (others stay text)", {
+  it("links component instances to their entity page", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
     const fetchFn = createFetchSpy();
@@ -167,10 +189,10 @@ describe("TermInspector", () => {
     );
     const panel = inspector();
 
-    // Component instances land on /components/<encoded uri> — the only
-    // live entity route (the D31 landing rule). The link TEXT is
-    // `_meta.title`, which is total, and the address is `_meta.curie`, the
-    // same compact form the catalog addresses this entity by.
+    // Component instances land on /components/<encoded curie>, the home
+    // the site declares for a Component. The link TEXT is `_meta.title`,
+    // which is total, and the address is `_meta.curie`, the same compact
+    // form the catalog addresses this entity by.
     expect(
       within(panel)
         .getByRole("link", { name: "Accordion" })
@@ -181,41 +203,54 @@ describe("TermInspector", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("leaves an instance of ANOTHER class as plain text, D31's other half", {
+  it("leaves an instance of a type without a home as plain text", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
-    // The teeth for the new discriminator. Every instance in the captured
-    // fixture is a Component, so the negative branch of the landing rule
-    // has no live exemplar — and the discriminator is now a CLASS
-    // comparison (`_meta.type.uri` against the components binding) rather
-    // than a `__typename` test, so "everything links" is a real failure
-    // mode this file must be able to see. One instance's `_meta` is
-    // repointed at `ds:Pattern`, a class this same fixture already carries.
+    // Every instance in the captured fixture is a Component, so the inert
+    // half of the chip has no live exemplar. One instance is repointed at a
+    // type the site declares no home for, so "everything links" is a
+    // failure this file can see.
     const fetchFn = createFetchSpy();
-    const accordionMeta =
-      "client:https://ds.canonical.com/global.component.accordion:_meta";
-    const patternInstanceRecords = {
-      ...definitionsExplorerRecordsComponent,
-      [accordionMeta]: {
-        ...(
-          definitionsExplorerRecordsComponent as unknown as Record<
-            string,
-            Record<string, unknown>
-          >
-        )[accordionMeta],
-        type: { __ref: "https://ds.canonical.com/Pattern" },
-      },
-    } as unknown as RecordMap;
-    render(definitionsPageAt("ds:Component", patternInstanceRecords, fetchFn));
+    render(
+      definitionsPageAt(
+        "ds:Component",
+        repointAccordionTypename("Pattern"),
+        fetchFn,
+      ),
+    );
     const panel = inspector();
 
     expect(within(panel).queryByRole("link", { name: "Accordion" })).toBeNull();
     expect(within(panel).getByText("Accordion")).toBeInTheDocument();
-    // …while its Component siblings still link, so this is the class
-    // comparison biting and not the whole list going flat.
+    // …while its Component siblings still link, so this is the home lookup
+    // biting and not the whole list going flat.
     expect(
       within(panel).getByRole("link", { name: "Announcement" }),
     ).toBeInTheDocument();
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("links an instance that is an ontology class to its Definitions page", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    // The chip dispatches on the instance's own type through the site's
+    // homes: an OntologyClass lives in this lens, addressed by its compact
+    // address, the same address a Component's entity page uses.
+    const fetchFn = createFetchSpy();
+    render(
+      definitionsPageAt(
+        "ds:Component",
+        repointAccordionTypename("OntologyClass"),
+        fetchFn,
+      ),
+    );
+    const panel = inspector();
+
+    expect(
+      within(panel)
+        .getByRole("link", { name: "Accordion" })
+        .getAttribute("href"),
+    ).toBe("/definitions/ds%3Aglobal.component.accordion");
     expect(fetchFn).not.toHaveBeenCalled();
   });
 

@@ -1,6 +1,9 @@
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { withRouter } from "../../../../../.storybook/decorators/index.js";
+import {
+  withProjections,
+  withRouter,
+} from "../../../../../.storybook/decorators/index.js";
 import DefinitionsPage from "./DefinitionsPage.js";
 
 /** Name-compatible bare routes so term/instance links resolve without
@@ -19,7 +22,7 @@ const meta: Meta<typeof DefinitionsPage> = {
   title: "Definitions/DefinitionsPage",
   component: DefinitionsPage,
   tags: ["autodocs"],
-  decorators: [withRouter({ routes: bareRoutes })],
+  decorators: [withProjections(), withRouter({ routes: bareRoutes })],
   parameters: {
     relay: {
       mockResolvers: {

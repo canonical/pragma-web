@@ -27,7 +27,15 @@
  */
 
 import "./__fixtures__/stubReactFlowGlobals.js";
-import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
+import {
+  createEnvironment,
+  createStaticRouter,
+  HomesProvider,
+} from "@canonical/prism-core";
+import {
+  defaultProjectionMaps,
+  ProjectionsProvider,
+} from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -36,6 +44,7 @@ import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
+import { homes } from "../../../homes.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import definitionsExplorerRecords from "./__fixtures__/definitionsExplorerRecords.js";
 import { DEFINITIONS_TEST_TIMEOUT_MS } from "./__fixtures__/definitionsPageHarness.js";
@@ -72,10 +81,14 @@ const explorerWithChips = (fetchFn: FetchFunction): ReactElement => {
             notFound: notFoundRoute,
           })}
         >
-          <LensFilterProvider>
-            <Controls />
-            <DefinitionsPage params={{}} />
-          </LensFilterProvider>
+          <HomesProvider homes={homes}>
+            <ProjectionsProvider maps={defaultProjectionMaps}>
+              <LensFilterProvider>
+                <Controls />
+                <DefinitionsPage params={{}} />
+              </LensFilterProvider>
+            </ProjectionsProvider>
+          </HomesProvider>
         </RouterProvider>
       </RelayEnvironmentProvider>
     </HeadProvider>
