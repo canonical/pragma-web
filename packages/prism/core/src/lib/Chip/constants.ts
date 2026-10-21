@@ -10,10 +10,6 @@ import type {
   LifecycleEncoding,
 } from "./types.js";
 
-/** Root CSS class names, shared with `styles.css`. */
-export const CHIP_CSS_CLASS_NAME = "ds chip";
-export const LEGEND_CSS_CLASS_NAME = "ds chip-legend";
-
 /** Entity families (the shape channel's vocabulary). */
 export const KINDS = [
   "component",

@@ -1,10 +1,6 @@
 import type { CSSProperties, MouseEvent, ReactElement } from "react";
 import { t } from "../i18n/index.js";
-import {
-  CHIP_CSS_CLASS_NAME,
-  DEFAULT_BOX,
-  DEFAULT_LIFECYCLE,
-} from "./constants.js";
+import { DEFAULT_BOX, DEFAULT_LIFECYCLE } from "./constants.js";
 import {
   assertNonEmptyString,
   buildChipChannelStyle,
@@ -12,6 +8,8 @@ import {
 } from "./encodings.js";
 import type { ChipProps } from "./types.js";
 import "./styles.css";
+
+const componentCssClassName = "ds chip";
 
 /**
  * An inline mention of a graph entity — a site's ambient mechanism for
@@ -62,7 +60,7 @@ const Chip = (props: ChipProps): ReactElement => {
         ? summary
         : t("chip.summaryWithLifecycle", { summary, lifecycle });
   const sharedProps = {
-    className: [CHIP_CSS_CLASS_NAME, className].filter(Boolean).join(" "),
+    className: [componentCssClassName, className].filter(Boolean).join(" "),
     // The channel payloads; typed as ChipChannelStyle, cast for React's
     // style prop (custom properties pass through to setProperty). A
     // consumer's own style merges underneath them.

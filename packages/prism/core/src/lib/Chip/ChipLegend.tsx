@@ -7,11 +7,12 @@ import {
   DEFAULT_BOX,
   DEFAULT_LIFECYCLE,
   KIND_ENCODINGS,
-  LEGEND_CSS_CLASS_NAME,
   LIFECYCLE_ENCODINGS,
 } from "./constants.js";
 import type { Channel, ChipChannelValues, ChipLegendProps } from "./types.js";
 import "./styles.css";
+
+const componentCssClassName = "ds chip-legend";
 
 /** One generated legend row: legend copy plus the swatch's channel values. */
 interface LegendEntry {
@@ -99,7 +100,7 @@ const ChipLegend = ({
 }: ChipLegendProps): ReactElement => (
   <div
     {...props}
-    className={[LEGEND_CSS_CLASS_NAME, className].filter(Boolean).join(" ")}
+    className={[componentCssClassName, className].filter(Boolean).join(" ")}
   >
     {CHANNEL_DESCRIPTORS.map((channel) => (
       <section aria-label={t(channel.labelKey)} key={channel.value}>
