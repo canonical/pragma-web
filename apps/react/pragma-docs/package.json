@@ -14,7 +14,6 @@
     "#domains/marketing": "./src/domains/marketing/index.ts",
     "#domains/playground": "./src/domains/playground/index.ts",
     "#graphql-endpoint": "./src/relay/graphqlEndpoint.ts",
-    "#lib/Chip": "./src/lib/Chip/index.ts",
     "#lib/LensIcons": "./src/lib/LensIcons/index.ts",
     "#lib/Shell": "./src/lib/Shell/index.ts",
     "#lib/SiteColophon": "./src/lib/SiteColophon/index.ts",

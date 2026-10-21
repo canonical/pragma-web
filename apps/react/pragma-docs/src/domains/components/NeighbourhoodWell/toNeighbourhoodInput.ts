@@ -9,19 +9,23 @@
  * absolute IRI never reaches this layer's output.
  *
  * Linking posture: a neighbour gets an href only when its relation row is
- * `linkable` — the entities whose canonical homes exist today (components
- * via `/components/:uri`, ontology terms via `/definitions/:term`, the
- * interim D31 map). Everything else renders as an inert chip: an unlinked
- * mention is honest; a dead link is not. The class (rdf:type) node's
+ * `linkable` AND the caller's resolver finds a home for its kind (the well
+ * resolves components, ontology terms and standards through the router).
+ * Everything else renders as an inert chip: an unlinked mention is honest;
+ * a dead link is not. The class (rdf:type) node's
  * definitions address derives from the class's own `namespace` field —
  * data the fragment carries, never a hardcoded namespace table (the
  * uris.ts doctrine); when the derivation fails the node stays, inert.
  */
 
-import { detectKindInUri, type Kind, resolveChipHref } from "#lib/Chip";
 import type { NeighbourhoodWell_component$data } from "#relay/__generated__/NeighbourhoodWell_component.graphql.js";
 import { RELATION_SPECS, type RelationSpec } from "./constants.js";
-import type { NeighbourhoodInput, NeighbourInput } from "./types.js";
+import { detectKindInUri } from "./detectKindInUri.js";
+import type {
+  NeighbourHrefResolver,
+  NeighbourhoodInput,
+  NeighbourInput,
+} from "./types.js";
 
 /** The extraction's product: layout input plus the honesty payloads. */
 export interface NeighbourhoodExtract {
@@ -53,27 +57,17 @@ interface EntityConnection {
   readonly pageInfo: { readonly hasNextPage: boolean };
 }
 
-/**
- * Kinds whose landing route EXISTS today (`src/routes.tests.ts` pins the
- * set; `ROUTE_PREFIX_BY_KIND` anticipates the rest). A linkable relation
- * delivering, say, a pattern still renders inert until `/patterns` lives.
- */
-const LIVE_ROUTE_KINDS: ReadonlySet<Kind> = new Set([
-  "component",
-  "term",
-  "standard",
-]);
-
 const toNeighbours = (
   connection: EntityConnection | null | undefined,
   spec: RelationSpec,
+  resolveHref: NeighbourHrefResolver,
 ): NeighbourInput[] =>
   (connection?.edges ?? [])
     .filter((edge) => edge !== null)
     .map((edge) => {
       // The well addresses and labels every node in the COMPACT form the
-      // graph itself hands back (`_meta.curie`) — chip hrefs, the D31
-      // landing addresses, and `data-well-uri` are all that form. `uri`
+      // graph itself hands back (`_meta.curie`) — chip hrefs, the landing
+      // addresses, and `data-well-uri` are all that form. `uri`
       // stays the absolute IRI and stays Relay's identity; it is never the
       // string a reader sees.
       const curie = edge.node._meta.curie;
@@ -86,10 +80,7 @@ const toNeighbours = (
         label: edge.node.name ?? curie,
         spec,
         kind,
-        href:
-          spec.linkable && LIVE_ROUTE_KINDS.has(kind)
-            ? resolveChipHref(curie, kind)
-            : undefined,
+        href: spec.linkable ? resolveHref(curie, kind) : undefined,
       };
     });
 
@@ -118,10 +109,16 @@ export const deriveClassTerm = (
  * Extracts the well's input from the fragment payload. Neighbours are
  * unique by URI (first relation wins — one entity, one node, one edge);
  * the connection caps surface as `truncated` predicates so the partial
- * state renders honestly (AX.8) instead of silently reading as complete.
+ * state renders honestly instead of silently reading as complete.
+ *
+ * @param data - The well's fragment payload.
+ * @param resolveHref - A neighbour's landing href by compact URI and kind,
+ *   or `undefined` when its kind has no home.
+ * @returns The layout's input and the truncated predicates.
  */
 export const toNeighbourhoodInput = (
   data: NeighbourhoodWell_component$data,
+  resolveHref: NeighbourHrefResolver,
 ): NeighbourhoodExtract => {
   const gathered: NeighbourInput[] = [];
   const truncated: string[] = [];
@@ -131,7 +128,7 @@ export const toNeighbourhoodInput = (
     key: RelationSpec["key"],
   ): void => {
     const spec = getSpec(key);
-    gathered.push(...toNeighbours(connection, spec));
+    gathered.push(...toNeighbours(connection, spec, resolveHref));
     if (connection?.pageInfo.hasNextPage === true) {
       truncated.push(spec.predicate);
     }
@@ -144,7 +141,7 @@ export const toNeighbourhoodInput = (
       uri: term ?? type.uri,
       label: type.label ?? type.uri,
       spec: getSpec("type"),
-      href: term === undefined ? undefined : resolveChipHref(term, "term"),
+      href: term === undefined ? undefined : resolveHref(term, "term"),
     });
   }
   if (data.tier !== null && data.tier !== undefined) {

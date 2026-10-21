@@ -1,11 +1,21 @@
+import { Chip, type Kind } from "@canonical/prism-core";
+import type { Router } from "@canonical/router-core";
+import {
+  type RegisteredNotFound,
+  type RegisteredRouteMap,
+  useRouter,
+} from "@canonical/router-react";
 import type React from "react";
 import { useMemo, useState } from "react";
 import { graphql, useFragment } from "react-relay";
-import { Chip } from "#lib/Chip";
 import type { NeighbourhoodWell_component$key } from "#relay/__generated__/NeighbourhoodWell_component.graphql.js";
 import neighbourhoodWellFragmentNode from "#relay/__generated__/NeighbourhoodWell_component.graphql.js";
 import { buildNeighbourhood } from "./buildNeighbourhood.js";
-import { EDGE_FAMILIES, WELL_CSS_CLASS_NAME } from "./constants.js";
+import {
+  CHIP_PREFIXES,
+  EDGE_FAMILIES,
+  WELL_CSS_CLASS_NAME,
+} from "./constants.js";
 import { toNeighbourhoodInput } from "./toNeighbourhoodInput.js";
 import type { NeighbourhoodWellProps } from "./types.js";
 import "./styles.css";
@@ -124,6 +134,28 @@ const neighbourhoodWellFragmentSource = (): unknown => graphql`
 `;
 void neighbourhoodWellFragmentSource;
 
+/**
+ * A neighbour's landing href, built through the router for the kinds whose
+ * homes exist: components and standards on their entity pages, ontology
+ * terms in Definitions. Every other kind has no home yet and stays inert.
+ */
+const resolveNeighbourHref = (
+  router: Router<RegisteredRouteMap, RegisteredNotFound>,
+  uri: string,
+  kind: Kind,
+): string | undefined => {
+  switch (kind) {
+    case "component":
+      return router.buildPath("componentEntity", { params: { uri } });
+    case "term":
+      return router.buildPath("definitionsTerm", { params: { term: uri } });
+    case "standard":
+      return router.buildPath("standardEntity", { params: { uri } });
+    default:
+      return undefined;
+  }
+};
+
 /** Reads the well node a pointer/focus event landed on, if any. */
 const readUriFromEvent = (target: EventTarget | null): string | undefined => {
   if (!(target instanceof Element)) return undefined;
@@ -162,9 +194,13 @@ const NeighbourhoodWell = ({
     neighbourhoodWellFragmentNode,
     component,
   );
+  const router = useRouter();
   const { input, truncated } = useMemo(
-    () => toNeighbourhoodInput(data),
-    [data],
+    () =>
+      toNeighbourhoodInput(data, (uri, kind) =>
+        resolveNeighbourHref(router, uri, kind),
+      ),
+    [data, router],
   );
   const graph = useMemo(() => buildNeighbourhood(input), [input]);
   const [focusedUri, setFocusedUri] = useState<string | undefined>(undefined);
@@ -285,6 +321,7 @@ const NeighbourhoodWell = ({
                     href={node.isCentre ? undefined : node.href}
                     kind={node.kind}
                     label={node.label}
+                    prefixes={CHIP_PREFIXES}
                     uri={node.uri}
                   />
                 </div>

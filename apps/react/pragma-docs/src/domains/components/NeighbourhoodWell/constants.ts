@@ -1,7 +1,27 @@
-import type { Box, Kind } from "#lib/Chip";
+import type { Box, Kind } from "@canonical/prism-core";
 
 /** Root CSS class name, `ds`-prefixed per the app-wide convention. */
 export const WELL_CSS_CLASS_NAME = "ds neighbourhood-well";
+
+/**
+ * The namespace prefixes the well's chips tint by, in the order the pragma
+ * provider lists its ontologies. The well's fragment selects no
+ * `ontologies { prefix }`, so the list is written here until it does.
+ */
+export const CHIP_PREFIXES = ["ds", "cs", "docs"] as const;
+
+/**
+ * The kinds a pragma URI's local name can name in one of its interior
+ * segments (`ds:global.component.button` names `component`).
+ */
+export const URI_KINDS: readonly Kind[] = [
+  "component",
+  "pattern",
+  "standard",
+  "concept",
+  "term",
+  "token",
+];
 
 /**
  * The two edge families of the well grammar (AV-364). STRUCTURAL edges are
@@ -45,8 +65,8 @@ export type Sector = keyof typeof SECTORS;
  * One row per relation the well draws — the single source of truth for how
  * each Component field becomes nodes and edges. `direction` is the
  * predicate's true direction (`out` = subject → neighbour), which decides
- * where the arrowhead lands. `linkable` marks relations whose entities have
- * a live canonical home today (the interim D31 map, `resolveChipHref`);
+ * where the arrowhead lands. `linkable` marks relations whose entities may
+ * have a canonical home (the well's href resolver decides which kinds do);
  * everything else renders as an inert chip — never a dead link.
  */
 export interface RelationSpec {

@@ -105,7 +105,7 @@ const DOCS_ONLY = new Set([
 
 describe("the story corpus", () => {
   it("is discovered from the tree, and has not shrunk", () => {
-    expect(modulePaths.length).toBeGreaterThanOrEqual(25);
+    expect(modulePaths.length).toBeGreaterThanOrEqual(24);
   });
 
   it("composes to stories, and has not silently stopped", () => {
@@ -118,7 +118,7 @@ describe("the story corpus", () => {
       (count, composed) => count + Object.keys(composed).length,
       0,
     );
-    expect(total).toBeGreaterThanOrEqual(47);
+    expect(total).toBeGreaterThanOrEqual(37);
   });
 
   it("carries no allowlist entry for a module that is not in the tree", () => {
