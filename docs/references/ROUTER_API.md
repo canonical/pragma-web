@@ -901,6 +901,21 @@ const router = useRouter();
 router.navigate("home");
 ```
 
+#### `useHref`
+
+```ts
+function useHref<
+  TRoutes extends RouteMap = RegisteredRouteMap,
+  TName extends RouteName<TRoutes> = RouteName<TRoutes>,
+>(name: TName, ...args: RouteArgs<TRoutes, TName>): string;
+```
+
+Resolves the href of a named route through the nearest provider's `buildPath`. It takes the same name and build options as `Link`'s `to`/`params`/`search`/`hash`, checked against [`PathBuildOptions`](#supporting-types) the same way, so use it where a component needs an href but renders its own anchor (a `LinkComponent` adapter), or for `window.open` or a form `action`. It does not subscribe to router state: the href depends only on the route table and the arguments. Throws if no provider is present. Like `buildPath`, a union of names requires the options as soon as one member declares params; pass one literal name for full checking. With explicit generics, name the route too (`useHref<AppRoutes, "guide">`): a route map alone leaves `TName` at the union of every name.
+
+```ts
+const href = useHref("guide", { params: { slug: "intro" }, hash: "setup" });
+```
+
 #### `useRoute`
 
 ```ts

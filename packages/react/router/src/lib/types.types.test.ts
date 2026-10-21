@@ -1,10 +1,13 @@
 import type {
+  RouteArgs,
   Router,
   RouterState,
   StandardSchemaV1,
 } from "@canonical/router-core";
 import { route } from "@canonical/router-core";
 import { describe, expectTypeOf, it } from "vitest";
+import type { UseHrefProps } from "./hooks/types.js";
+import useHref from "./hooks/useHref.js";
 import useRoute from "./hooks/useRoute.js";
 import type useRouter from "./hooks/useRouter.js";
 import type useRouterState from "./hooks/useRouterState.js";
@@ -147,6 +150,38 @@ describe("Link props", () => {
   it("rejects an unknown route name", () => {
     // @ts-expect-error - "nope" is not a key of the route map.
     expectTypeOf(Link<Routes>).toBeCallableWith({ to: "nope" });
+  });
+});
+
+describe("useHref", () => {
+  it("takes the same build options as buildPath", () => {
+    expectTypeOf<UseHrefProps<Routes, "user">>().toEqualTypeOf<
+      RouteArgs<Routes, "user">
+    >();
+  });
+
+  it("returns a string", () => {
+    expectTypeOf(useHref<Routes, "home">).returns.toEqualTypeOf<string>();
+  });
+
+  it("requires params for a parameterized route", () => {
+    // @ts-expect-error - route "user" declares :id, so `params` is required.
+    expectTypeOf(useHref<Routes, "user">).toBeCallableWith("user");
+  });
+
+  it("takes the search schema's input type", () => {
+    expectTypeOf(useHref<Routes, "results">).toBeCallableWith("results", {
+      search: { page: "2" },
+    });
+    expectTypeOf(useHref<Routes, "results">).toBeCallableWith("results", {
+      // @ts-expect-error - `page` is coerced to a number only after validation.
+      search: { page: 2 },
+    });
+  });
+
+  it("rejects an unknown route name", () => {
+    // @ts-expect-error - "nope" is not a key of the route map.
+    expectTypeOf(useHref<Routes>).toBeCallableWith("nope");
   });
 });
 
