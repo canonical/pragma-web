@@ -14,10 +14,13 @@
  *   Definitions root after a round trip is a new node, and the Definitions
  *   filter chips come back at their default: the layout's
  *   `LensFilterProvider` was unmounted and mounted fresh.
- * - THE SHELL STAYS. The Profiler around `Shell` reports exactly one mount,
- *   the store the environment holds still serves Definitions on the way
- *   back (the network is never called), and the head carries exactly one
- *   `<title>`.
+ * - THE SHELL STAYS. Each provider of the nest (`HeadProvider`,
+ *   `RelayEnvironmentProvider`, `RouterProvider`) is wrapped in a mount
+ *   counter, and each mounts exactly once and never unmounts across the
+ *   round trip. A remount of any of them, or a provider moved into a lens
+ *   layout, would mount it again. The store the environment holds still
+ *   serves Definitions on the way back (the network is never called), and
+ *   the head carries exactly one `<title>`.
  */
 
 import "../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
@@ -27,12 +30,13 @@ import {
   type Router,
 } from "@canonical/router-core";
 import { fireEvent, waitFor } from "@testing-library/react";
-import { act, Profiler, type ProfilerOnRenderCallback } from "react";
+import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import mergeRecordMaps from "../../../testing/mergeRecordMaps.js";
+import type { MountCount } from "../../../testing/types.js";
 import definitionsExplorerRecords from "../../domains/lenses/definitions/__fixtures__/definitionsExplorerRecords.js";
 import standardsIndexRecords from "../../domains/lenses/standards/__fixtures__/standardsIndexRecords.js";
 import { appRoutes, middleware, notFoundRoute } from "../../routes.js";
@@ -41,6 +45,56 @@ import Shell from "./Shell.js";
 (
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
+
+/** The mounts and unmounts of each provider `Shell` nests, counted by the
+ * wrappers the module mocks below put around the real providers. */
+const providerMounts = vi.hoisted(
+  (): Record<string, MountCount> => ({
+    HeadProvider: { mounts: 0, unmounts: 0 },
+    RelayEnvironmentProvider: { mounts: 0, unmounts: 0 },
+    RouterProvider: { mounts: 0, unmounts: 0 },
+  }),
+);
+
+vi.mock("@canonical/react-head", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@canonical/react-head")>();
+  const { default: trackMounts } = await import(
+    "../../../testing/trackMounts.js"
+  );
+  return {
+    ...actual,
+    HeadProvider: trackMounts(actual.HeadProvider, providerMounts.HeadProvider),
+  };
+});
+
+vi.mock("react-relay", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-relay")>();
+  const { default: trackMounts } = await import(
+    "../../../testing/trackMounts.js"
+  );
+  return {
+    ...actual,
+    RelayEnvironmentProvider: trackMounts(
+      actual.RelayEnvironmentProvider,
+      providerMounts.RelayEnvironmentProvider,
+    ),
+  };
+});
+
+vi.mock("@canonical/router-react", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@canonical/router-react")>();
+  const { default: trackMounts } = await import(
+    "../../../testing/trackMounts.js"
+  );
+  return {
+    ...actual,
+    RouterProvider: trackMounts(
+      actual.RouterProvider,
+      providerMounts.RouterProvider,
+    ),
+  };
+});
 
 /** The status figure's caption: how many classes the chips leave visible. */
 const readStatus = (container: HTMLElement): string | undefined =>
@@ -85,6 +139,10 @@ describe("Shell across a lens switch", () => {
     );
     globalFetch = createFetchSpy();
     vi.stubGlobal("fetch", globalFetch);
+    for (const count of Object.values(providerMounts)) {
+      count.mounts = 0;
+      count.unmounts = 0;
+    }
   });
 
   afterEach(async () => {
@@ -123,18 +181,13 @@ describe("Shell across a lens switch", () => {
       },
     );
 
-    const onRender = vi.fn<ProfilerOnRenderCallback>();
     const container = document.createElement("div");
     document.body.appendChild(container);
     containers.push(container);
     const root = createRoot(container);
     roots.push(root);
     await act(async () => {
-      root.render(
-        <Profiler id="shell" onRender={onRender}>
-          <Shell environment={environment} router={router} />
-        </Profiler>,
-      );
+      root.render(<Shell environment={environment} router={router} />);
     });
 
     // Definitions, unfiltered: every class is visible.
@@ -173,13 +226,16 @@ describe("Shell across a lens switch", () => {
       ),
     ).toHaveLength(0);
 
-    // The shell held throughout: the store served every page, the nest
-    // mounted once, and the head carries one title.
+    // The shell held throughout: every provider of the nest mounted once
+    // and never unmounted, the store served every page, and the head
+    // carries one title.
+    expect(providerMounts).toEqual({
+      HeadProvider: { mounts: 1, unmounts: 0 },
+      RelayEnvironmentProvider: { mounts: 1, unmounts: 0 },
+      RouterProvider: { mounts: 1, unmounts: 0 },
+    });
     expect(relayFetch).not.toHaveBeenCalled();
     expect(globalFetch).not.toHaveBeenCalled();
-    expect(
-      onRender.mock.calls.filter(([, phase]) => phase === "mount"),
-    ).toHaveLength(1);
     expect(document.head.querySelectorAll("title")).toHaveLength(1);
   });
 });

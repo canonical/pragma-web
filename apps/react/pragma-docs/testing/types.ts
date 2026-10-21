@@ -18,3 +18,10 @@ export interface GraphStub {
   /** Stop listening; resolves once the socket is closed. */
   readonly close: () => Promise<void>;
 }
+
+/** How many times a tracked component has mounted and unmounted (see
+ * `trackMounts`). */
+export interface MountCount {
+  mounts: number;
+  unmounts: number;
+}
