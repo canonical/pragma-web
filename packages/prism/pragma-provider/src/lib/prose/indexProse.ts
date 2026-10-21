@@ -44,6 +44,60 @@ const buildProseDocument = (
 };
 
 /**
+ * Group the candidates whose IRI the graph describes by the sidecar they
+ * were read from.
+ *
+ * @throws When one sidecar is bound to more than one entity: its name reads
+ * more than one way.
+ */
+const groupBoundByPath = (
+  candidates: readonly ProseCandidate[],
+  subjects: ReadonlySet<string>,
+): ReadonlyMap<string, readonly ProseCandidate[]> => {
+  const boundByPath = new Map<string, ProseCandidate[]>();
+  for (const candidate of candidates) {
+    if (subjects.has(candidate.iri)) {
+      boundByPath.set(candidate.path, [
+        ...(boundByPath.get(candidate.path) ?? []),
+        candidate,
+      ]);
+    }
+  }
+  for (const [path, bound] of boundByPath) {
+    if (bound.length > 1) {
+      throw new Error(
+        `prose sidecar ${path} names more than one entity (${bound.map((candidate) => candidate.iri).join(", ")}): rename it so its name reads one way.`,
+      );
+    }
+  }
+  return boundByPath;
+};
+
+/**
+ * Group bound candidates by the entity they describe, one per language.
+ *
+ * @throws When two sidecars hold the same entity's text in the same language.
+ */
+const groupTextsByEntity = (
+  bound: readonly ProseCandidate[],
+): ReadonlyMap<string, ReadonlyMap<string, ProseCandidate>> => {
+  const textsByIri = new Map<string, Map<string, ProseCandidate>>();
+  for (const candidate of bound) {
+    const texts: Map<string, ProseCandidate> =
+      textsByIri.get(candidate.iri) ?? new Map();
+    const clash = texts.get(candidate.lang);
+    if (clash !== undefined) {
+      throw new Error(
+        `prose sidecars ${clash.path} and ${candidate.path} both hold the "${candidate.lang}" text of ${candidate.iri}: keep one.`,
+      );
+    }
+    texts.set(candidate.lang, candidate);
+    textsByIri.set(candidate.iri, texts);
+  }
+  return textsByIri;
+};
+
+/**
  * Bind sidecars to the entities they describe and index their prose.
  *
  * A candidate is bound when its IRI is in `subjects`. Three outcomes cannot
@@ -70,35 +124,8 @@ export const indexProse = ({
   readonly subjects: ReadonlySet<string>;
   readonly prefixes: Readonly<Record<string, string>>;
 }): ProseBinding => {
-  const boundByPath = new Map<string, ProseCandidate[]>();
-  for (const candidate of candidates) {
-    if (subjects.has(candidate.iri)) {
-      boundByPath.set(candidate.path, [
-        ...(boundByPath.get(candidate.path) ?? []),
-        candidate,
-      ]);
-    }
-  }
-  for (const [path, bound] of boundByPath) {
-    if (bound.length > 1) {
-      throw new Error(
-        `prose sidecar ${path} names more than one entity (${bound.map((candidate) => candidate.iri).join(", ")}): rename it so its name reads one way.`,
-      );
-    }
-  }
-  const textsByIri = new Map<string, Map<string, ProseCandidate>>();
-  for (const candidate of [...boundByPath.values()].flat()) {
-    const texts: Map<string, ProseCandidate> =
-      textsByIri.get(candidate.iri) ?? new Map();
-    const clash = texts.get(candidate.lang);
-    if (clash !== undefined) {
-      throw new Error(
-        `prose sidecars ${clash.path} and ${candidate.path} both hold the "${candidate.lang}" text of ${candidate.iri}: keep one.`,
-      );
-    }
-    texts.set(candidate.lang, candidate);
-    textsByIri.set(candidate.iri, texts);
-  }
+  const boundByPath = groupBoundByPath(candidates, subjects);
+  const textsByIri = groupTextsByEntity([...boundByPath.values()].flat());
   const index: ProseIndex = new Map(
     [...textsByIri].map(([iri, texts]) => [
       iri,
