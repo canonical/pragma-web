@@ -83,9 +83,9 @@ Every heading gets an `id` slugged from its text and prefixed with
 and a second heading with the same text gets `user-content-hello-world-1`.
 
 The prefix keeps the document's ids apart from the page's own, and from
-global names a page's scripts rely on. It is the prefix the sanitiser gives
-any author-written id, so a heading's id is the same with or without
-sanitising.
+global names a page's scripts rely on. It is the prefix GitHub uses and the
+one GFM footnote ids carry. Headings get their ids after sanitising, so a
+heading's id, like a footnote's, is the same with or without sanitising.
 
 `extractHeadings` lists a document's headings with those ids, for a table of
 contents:

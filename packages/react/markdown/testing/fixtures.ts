@@ -61,5 +61,12 @@ A claim.[^1]
 [^1]: The source.
 `;
 
+/** Two footnote references, one of them used twice, and their notes. */
+export const footnoteDocument = `A claim.[^1] Another.[^note] The first again.[^1]
+
+[^1]: The first source.
+[^note]: The second source.
+`;
+
 /** The heading `testing/sample.mdx` opens with, as Markdown. */
 export const sampleMdxHeading = "# Getting started";

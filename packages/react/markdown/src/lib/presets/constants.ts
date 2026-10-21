@@ -19,9 +19,8 @@ import { ADMONITION_KINDS, remarkAdmonitions } from "../admonitions/index.js";
  *
  * Markdown is often written by someone other than the page's author, so its
  * ids share a namespace with nothing on the page. `user-content-` is the
- * prefix the sanitiser already gives every author-written `id`, the one
- * GitHub uses for rendered content and the one GFM footnotes carry. A
- * hyphenated id is never exposed as a bare global variable, so a heading
+ * prefix GitHub uses for rendered content and the one GFM footnote ids carry.
+ * A hyphenated id is never exposed as a bare global variable, so a heading
  * cannot clobber a global the page's scripts rely on. Slugging runs after
  * sanitising with this fixed prefix, so a heading has the same id whether the
  * document was sanitised or not, and whether it was rendered from Markdown or
@@ -52,9 +51,17 @@ export const rehypePreset: readonly Pluggable[] = [
  * The sanitising schema: rehype-sanitize's default, GitHub-like schema, which
  * also lets a `<blockquote>` keep a `data-admonition` attribute naming one of
  * the five admonition kinds. Any other value of that attribute is removed.
+ *
+ * Unlike the default schema, it prefixes no `id` or `aria-*` reference with
+ * `user-content-`. The only ids in a sanitised tree are the ones Markdown
+ * generates, because raw HTML is removed: GFM footnote ids, which already
+ * carry `user-content-`, and the fixed id of the footnotes label. Prefixing
+ * them a second time would leave every footnote link pointing at an id that
+ * no longer exists, since links are not rewritten.
  */
 export const SANITIZE_SCHEMA: SanitizeOptions = {
   ...defaultSchema,
+  clobber: [],
   attributes: {
     ...defaultSchema.attributes,
     blockquote: [
@@ -68,9 +75,8 @@ export const SANITIZE_SCHEMA: SanitizeOptions = {
 };
 
 /**
- * `rehypePreset` preceded by the sanitiser. Slugging comes second so heading
- * ids are not prefixed a second time by the sanitiser's own `user-content-`
- * clobbering.
+ * `rehypePreset` preceded by the sanitiser. Slugging comes second so the ids
+ * it gives headings are never subject to the sanitiser.
  */
 export const sanitizedRehypePreset: readonly Pluggable[] = [
   [rehypeSanitize, SANITIZE_SCHEMA],

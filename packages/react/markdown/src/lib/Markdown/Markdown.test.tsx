@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   admonitionDocument,
   duplicateHeadingsDocument,
+  footnoteDocument,
   gfmDocument,
   hostileDocument,
 } from "../../../testing/fixtures.js";
@@ -93,6 +94,49 @@ describe("Markdown", () => {
 
       expect(html).toContain('<h1 id="user-content-hello-world">');
       expect(html).toContain('<h2 id="user-content-hello-world-1">');
+    });
+  });
+
+  describe("footnotes", () => {
+    /** Render the footnote document and return its root element. */
+    function renderFootnotes(sanitize: boolean): HTMLElement {
+      return render(<Markdown source={footnoteDocument} sanitize={sanitize} />)
+        .container;
+    }
+
+    it.each([true, false])(
+      "links every reference and backreference to an existing id (sanitize: %s)",
+      (sanitize) => {
+        const container = renderFootnotes(sanitize);
+        const links = Array.from(
+          container.querySelectorAll<HTMLAnchorElement>("a[href^='#']"),
+        );
+        const describedBy = Array.from(
+          container.querySelectorAll("[aria-describedby]"),
+          (element) => element.getAttribute("aria-describedby"),
+        );
+
+        expect(links).toHaveLength(6);
+        for (const link of links) {
+          const target = link.hash.slice(1);
+          expect(container.querySelector(`[id="${target}"]`)).not.toBeNull();
+        }
+        expect(describedBy).toHaveLength(3);
+        for (const id of describedBy) {
+          expect(container.querySelector(`[id="${id}"]`)).not.toBeNull();
+        }
+      },
+    );
+
+    it("gives footnotes the same ids with and without sanitising", () => {
+      const listIds = (sanitize: boolean): string[] =>
+        Array.from(
+          renderFootnotes(sanitize).querySelectorAll("[id]"),
+          ({ id }) => id,
+        );
+
+      expect(listIds(true)).toEqual(listIds(false));
+      expect(listIds(true)).toContain("user-content-fn-1");
     });
   });
 
