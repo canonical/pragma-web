@@ -70,3 +70,19 @@ export const footnoteDocument = `A claim.[^1] Another.[^note] The first again.[^
 
 /** The heading `testing/sample.mdx` opens with, as Markdown. */
 export const sampleMdxHeading = "# Getting started";
+
+/**
+ * Links in several schemes, one per paragraph, in this order: a link in a
+ * scheme a consumer may name (`ds`), an image in that scheme, a `javascript:`
+ * link, a `JavaScript:` one in mixed case, and an `https:` link.
+ */
+export const schemeLinksDocument = `[Button](ds:global.component.button)
+
+![Logo](ds:logo.png)
+
+[click](javascript:alert(1))
+
+[shout](JavaScript:alert(1))
+
+[Docs](https://example.com)
+`;

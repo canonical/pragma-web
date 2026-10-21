@@ -121,6 +121,35 @@ Sanitised, it is removed; with `sanitize={false}`, it is shown as literal text.
 Turn sanitising off only for trusted documents whose generated attributes must
 all survive.
 
+## Links in other schemes
+
+A link keeps its `href` when the URL is relative or its scheme is `http`,
+`https`, `irc`, `ircs`, `mailto` or `xmpp`. Any other `href` is dropped,
+whether the document is sanitised or not: `[Button](ds:button)` renders as
+an anchor with no destination.
+
+When a document's links use a scheme of your own, such as a compact address
+that a link override resolves, name it in `linkSchemes`:
+
+```tsx
+<Markdown
+  source={source}
+  components={{ ...defaultComponents, a: AddressLink }}
+  linkSchemes={["ds", "cs"]}
+/>
+```
+
+Name each scheme in lower case, without its colon. A link in a named scheme
+keeps its `href` exactly as written, and the `a` override receives it;
+`DS:button` is not `ds:button`. Images are unaffected: an image's `src` keeps
+only the schemes it keeps without `linkSchemes`.
+
+`javascript`, `vbscript`, `data` and `file` can never be named, and
+`Markdown` throws when `linkSchemes` holds one of them or a value that is not
+a lower-case URL scheme. A consumer that derives its schemes from data, such
+as the prefixes of the addresses a document links to, filters them first
+through `LINK_SCHEME_PATTERN` and `REFUSED_LINK_SCHEMES`.
+
 ## Admonitions
 
 A blockquote whose first line is exactly one of the five GitHub markers
@@ -212,6 +241,10 @@ sanitised.
 - `defaultComponents` — the design-system elements `Markdown` uses by default.
 - `extractHeadings` — list a document's headings with their rendered ids.
 - `remarkPreset`, `rehypePreset` — the unified plugins every renderer runs.
+- `LINK_SCHEME_PATTERN`, `REFUSED_LINK_SCHEMES` — the form a scheme named in
+  `linkSchemes` must take, and the schemes it may never name, so a consumer
+  that derives its schemes from data can leave out the ones `Markdown`
+  refuses.
 - `MarkdownProps` — the props of `Markdown`.
 - `MarkdownComponents` — the shape of a components map.
 - `Heading`, `HeadingDepth` — an entry of `extractHeadings`, and its level.

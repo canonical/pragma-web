@@ -8,6 +8,7 @@ import {
   footnoteDocument,
   gfmDocument,
   hostileDocument,
+  schemeLinksDocument,
 } from "../../../testing/fixtures.js";
 import type { MarkdownElementProps } from "../types.js";
 import Markdown from "./Markdown.js";
@@ -187,6 +188,88 @@ describe("Markdown", () => {
       expect(container.querySelector("img")).toBeNull();
       expect(container.textContent).toContain("<script>alert(1)</script>");
       expect(container.querySelector("a")?.getAttribute("href")).toBe("");
+    });
+  });
+
+  describe("links in other schemes", () => {
+    /** Read each paragraph's link href, or its image src, in document order. */
+    function listUrls(container: HTMLElement): (string | null)[] {
+      return Array.from(container.querySelectorAll("p"), (paragraph) => {
+        const image = paragraph.querySelector("img");
+        if (image) return image.getAttribute("src");
+        return paragraph.querySelector("a")?.getAttribute("href") ?? null;
+      });
+    }
+
+    it.each([true, false])(
+      "keeps a named scheme's href and nothing else (sanitize: %s)",
+      (sanitize) => {
+        const { container } = render(
+          <Markdown
+            source={schemeLinksDocument}
+            sanitize={sanitize}
+            linkSchemes={["ds"]}
+          />,
+        );
+        const [button, logo, script, shout, docs] = listUrls(container);
+
+        expect(button).toBe("ds:global.component.button");
+        expect(docs).toBe("https://example.com");
+        // Neither an image in the named scheme nor a script link is kept:
+        // sanitised, the attribute is removed; unsanitised, it is emptied.
+        for (const url of [logo, script, shout]) {
+          expect(url === null || url === "").toBe(true);
+        }
+      },
+    );
+
+    it.each([true, false])(
+      "drops an href in another scheme when none is named (sanitize: %s)",
+      (sanitize) => {
+        const { container } = render(
+          <Markdown source={schemeLinksDocument} sanitize={sanitize} />,
+        );
+        const [button, , , , docs] = listUrls(container);
+
+        expect(button === null || button === "").toBe(true);
+        expect(docs).toBe("https://example.com");
+      },
+    );
+
+    it("hands a link override the kept href", () => {
+      const { container } = render(
+        <Markdown
+          source="[Button](ds:global.component.button)"
+          components={{ a: ProbeLink }}
+          linkSchemes={["ds"]}
+        />,
+      );
+
+      expect(
+        container.querySelector(".probe")?.getAttribute("data-probe-href"),
+      ).toBe("ds:global.component.button");
+    });
+
+    it("renders the same href on the server", () => {
+      const html = renderToString(
+        <Markdown
+          source="[Button](ds:global.component.button)"
+          linkSchemes={["ds"]}
+        />,
+      );
+
+      expect(html).toContain('<a href="ds:global.component.button">');
+    });
+
+    it("refuses to keep links in the javascript scheme", () => {
+      expect(() =>
+        render(
+          <Markdown
+            source={schemeLinksDocument}
+            linkSchemes={["javascript"]}
+          />,
+        ),
+      ).toThrow('links in the "javascript" scheme are never kept');
     });
   });
 
