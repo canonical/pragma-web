@@ -9,15 +9,21 @@
 
     --badge-border-radius: var(--dimension-radius-full);
     --badge-font-family: var(--typography-text-tertiary-bold-font-family);
-    --badge-font-size: var(--typography-text-tertiary-bold-font-size);
+    --badge-font-size: var(
+      --_typography-indicator-font-size,
+      var(--typography-text-tertiary-bold-font-size)
+    );
     --badge-font-weight: var(--font-weight-default, 400);
     --badge-letter-spacing: var(--typography-text-tertiary-bold-letter-spacing);
-    --badge-line-height: var(--typography-text-tertiary-bold-line-height);
+    --badge-line-height: var(
+      --_typography-indicator-line-height,
+      var(--typography-text-tertiary-bold-line-height)
+    );
     --badge-padding-vertical: 0;
     --badge-padding-horizontal: var(--dimension-050);
     --badge-margin-bottom: 0;
 
-    --badge-min-width: calc(var(--badge-line-height) * 1em);
+    --badge-min-width: 1lh;
 
     /* Base badge styles using tokens */
     background-color: var(

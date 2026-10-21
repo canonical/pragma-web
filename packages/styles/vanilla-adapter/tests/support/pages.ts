@@ -336,6 +336,7 @@ export const emulate = async (media: MediaEmulation): Promise<void> => {
   onTestFinished(() =>
     commands.emulateMedia({
       colorScheme: "light",
+      forcedColors: "none",
       reducedMotion: "no-preference",
     }),
   );

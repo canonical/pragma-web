@@ -39,6 +39,22 @@
     --ds-typography-body-line-height: var(--ds-typography-body-line-height-app);
   }
 
+  /* Private SP-7 indicator type. `.global` is the existing Site-equivalent
+   * provider alias; it does not change the inherited body type. */
+  :root,
+  .global,
+  .site,
+  .docs,
+  .app {
+    --_typography-indicator-font-size: 0.75rem;
+    --_typography-indicator-line-height: 1rem;
+  }
+
+  .os {
+    --_typography-indicator-font-size: 0.625rem;
+    --_typography-indicator-line-height: 1rem;
+  }
+
   :root,
   .global,
   .site,

@@ -140,9 +140,9 @@ export const withNavLayout: Decorator = (Story) => (
 );
 
 /**
- * Mock Badge for stories — there is no real Badge component yet. Passed as a
- * leaf item's `slot` to exercise the Item end slot. Swap for the real component
- * once it lands.
+ * String-capable fixture indicator retained for navigation examples whose
+ * authored value is not accepted by the numeric Badge API. Indicator-fit
+ * proof stories use the real Badge component directly.
  */
 export const MockBadge = ({ children }: { children: ReactNode }): ReactNode => (
   <span

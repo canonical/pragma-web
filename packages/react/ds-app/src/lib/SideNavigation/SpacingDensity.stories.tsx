@@ -1,4 +1,4 @@
-import { Button, Chip } from "@canonical/react-ds-global";
+import { Badge, Button, Chip } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Children,
@@ -907,6 +907,154 @@ export const NativeRows: Story = {
           />
         )),
       )}
+    </main>
+  ),
+};
+
+type IndicatorFitMetrics = {
+  badgeBaselineDelta: number;
+  badgeBlockEndClearance: number;
+  badgeBlockStartClearance: number;
+  badgeFontSize: string;
+  badgeLineHeight: string;
+  itemHeightDelta: number;
+  rowHeightDelta: number;
+};
+
+function IndicatorBadgeTier({
+  density,
+  dir = "ltr",
+  tier,
+}: {
+  density: "default" | "dense" | "comfortable";
+  dir?: "ltr" | "rtl";
+  tier: "site" | "docs" | "app";
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [metrics, setMetrics] = useState<IndicatorFitMetrics | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void document.fonts.ready.then(() => {
+      requestAnimationFrame(() => {
+        const root = ref.current;
+        const plainItem = root?.querySelector<HTMLElement>(
+          ".indicator-fit-plain",
+        );
+        const badgeItem = root?.querySelector<HTMLElement>(
+          ".indicator-fit-badge",
+        );
+        const plainRow = plainItem?.querySelector<HTMLElement>(".row");
+        const badgeRow = badgeItem?.querySelector<HTMLElement>(".row");
+        const label = badgeItem?.querySelector<HTMLElement>(
+          ".side-navigation-label",
+        );
+        const badge = badgeItem?.querySelector<HTMLElement>(".badge");
+        if (
+          !active ||
+          !plainItem ||
+          !badgeItem ||
+          !plainRow ||
+          !badgeRow ||
+          !label ||
+          !badge
+        )
+          return;
+
+        const labelStyle = getComputedStyle(label);
+        const badgeStyle = getComputedStyle(badge);
+        const labelRect = label.getBoundingClientRect();
+        const badgeRect = badge.getBoundingClientRect();
+        const lineStart =
+          labelRect.top + Number.parseFloat(labelStyle.paddingBlockStart);
+        const lineEnd = lineStart + Number.parseFloat(labelStyle.lineHeight);
+        setMetrics({
+          badgeBaselineDelta: baseline(badge) - baseline(label),
+          badgeBlockEndClearance: lineEnd - badgeRect.bottom,
+          badgeBlockStartClearance: badgeRect.top - lineStart,
+          badgeFontSize: badgeStyle.fontSize,
+          badgeLineHeight: badgeStyle.lineHeight,
+          itemHeightDelta:
+            badgeItem.getBoundingClientRect().height -
+            plainItem.getBoundingClientRect().height,
+          rowHeightDelta:
+            badgeRow.getBoundingClientRect().height -
+            plainRow.getBoundingClientRect().height,
+        });
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const densityClass = density === "default" ? "" : density;
+  return (
+    <section className={`${tier} ${densityClass} indicator-fit-case`} dir={dir}>
+      <h2>{`${tier} · ${density}${dir === "rtl" ? " · RTL" : ""}`}</h2>
+      <div ref={ref}>
+        <SideNavigation
+          className="indicator-fit-nav"
+          data-indicator-fit={`${tier}-${density}-${dir}`}
+          defaultExpanded
+          keyboardShortcut={false}
+          root={{
+            key: `${tier}-${density}`,
+            items: [
+              {
+                key: "indicators",
+                items: [
+                  {
+                    className: "indicator-fit-plain",
+                    icon: "machines",
+                    key: "plain",
+                    label: "Machines",
+                  },
+                  {
+                    className: "indicator-fit-badge",
+                    icon: "machines",
+                    key: "badge",
+                    label: "Machines",
+                    slot: <Badge value={42} />,
+                  },
+                ],
+              },
+            ],
+          }}
+        />
+      </div>
+      <output hidden data-indicator-fit-result={`${tier}-${density}-${dir}`}>
+        {metrics ? JSON.stringify(metrics) : "pending"}
+      </output>
+    </section>
+  );
+}
+
+/**
+ * The supported invariant-indicator route: real Badge instances in the
+ * existing static SideNavigation trailing slot, paired with plain rows.
+ */
+export const InvariantBadge: Story = {
+  render: () => (
+    <main className="density08 indicator-fit">
+      <h1>08 Density · invariant Badge fit</h1>
+      <div className="indicator-fit-grid">
+        {(["site", "docs", "app"] as const).flatMap((tier) =>
+          (["default", "dense", "comfortable"] as const).map((density) => (
+            <IndicatorBadgeTier
+              key={`${tier}-${density}`}
+              density={density}
+              tier={tier}
+            />
+          )),
+        )}
+        <IndicatorBadgeTier
+          key="app-dense-rtl"
+          density="dense"
+          dir="rtl"
+          tier="app"
+        />
+      </div>
     </main>
   ),
 };

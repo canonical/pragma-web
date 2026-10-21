@@ -96,3 +96,29 @@
   align-self: center;
   margin-block-start: 0;
 }
+
+.indicator-fit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--ds-spacing-group);
+}
+
+.indicator-fit-case {
+  min-inline-size: 17rem;
+  padding: var(--ds-spacing-action);
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+}
+
+.indicator-fit-case > h2 {
+  margin-block-start: 0;
+}
+
+.indicator-fit .side-navigation.indicator-fit-nav {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  min-block-size: 0;
+  block-size: auto;
+  inline-size: 15rem;
+}
