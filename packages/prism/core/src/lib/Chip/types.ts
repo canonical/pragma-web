@@ -116,8 +116,9 @@ type OwnProps = {
   readonly lifecycle?: Lifecycle;
   /**
    * One-line definition exposed as the chip's `aria-description` (with the
-   * lifecycle folded in when asserted) and echoed as a native `title` hover
-   * peek. Both are string attributes, so the chip still reads as plain text.
+   * lifecycle's catalog label folded in when asserted) and echoed as a
+   * native `title` hover peek. Both are string attributes, so the chip
+   * still reads as plain text.
    */
   readonly summary?: string;
   /**

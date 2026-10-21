@@ -177,7 +177,7 @@ describe("Chip", () => {
     );
   });
 
-  it("folds an asserted lifecycle into the aria-description", () => {
+  it("folds an asserted lifecycle's catalog label into the aria-description", () => {
     // The dot's meaning must reach assistive tech, not just sighted readers.
     render(
       <Chip
@@ -191,7 +191,7 @@ describe("Chip", () => {
     );
     expect(screen.getByText("Button")).toHaveAttribute(
       "aria-description",
-      "The primary action component. (deprecated)",
+      "The primary action component. (Deprecated)",
     );
   });
 

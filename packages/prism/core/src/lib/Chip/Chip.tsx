@@ -5,6 +5,7 @@ import {
   assertNonEmptyString,
   buildChipChannelStyle,
   deriveNamespaceFromUri,
+  getLifecycleEncoding,
 } from "./encodings.js";
 import type { ChipProps } from "./types.js";
 import "./styles.css";
@@ -51,14 +52,18 @@ const Chip = (props: ChipProps): ReactElement => {
   assertNonEmptyString(label, "label");
 
   const resolvedNamespace = namespace ?? deriveNamespaceFromUri(uri);
-  // The definition peek, with the lifecycle folded in so what the dot shows
-  // visually also reaches assistive tech.
+  // The definition peek, with the lifecycle's catalog label folded in so
+  // what the dot shows visually also reaches assistive tech, in the
+  // catalog's language.
   const description =
     summary === undefined
       ? undefined
       : lifecycle === "none"
         ? summary
-        : t("chip.summaryWithLifecycle", { summary, lifecycle });
+        : t("chip.summaryWithLifecycle", {
+            summary,
+            lifecycle: t(getLifecycleEncoding(lifecycle).labelKey),
+          });
   const sharedProps = {
     className: [componentCssClassName, className].filter(Boolean).join(" "),
     // The channel payloads; typed as ChipChannelStyle, cast for React's
