@@ -18,6 +18,25 @@ import type { PreparedRelayData } from "./types.js";
 const SSR_HEADERS = { "x-pragma-ssr": "1" } as const;
 
 /**
+ * Throw unless the prefetch slot is empty.
+ *
+ * On the server the slot is empty everywhere outside `warmInEnvironment`, so
+ * a published environment means another caller would share this request's
+ * warm, and with it its store.
+ *
+ * @throws When an environment is already published.
+ * @note Impure: reads the module-level prefetch environment.
+ */
+const assertNoPrefetchEnvironment = (): void => {
+  if (getPrefetchEnvironment() !== undefined) {
+    throw new Error(
+      "a prefetch environment is already published; the server publishes " +
+        "one only while a route's warm runs",
+    );
+  }
+};
+
+/**
  * Call `warm` with `environment` published as the prefetch environment, and
  * clear it again before returning.
  *
@@ -30,12 +49,13 @@ const SSR_HEADERS = { "x-pragma-ssr": "1" } as const;
  * route's `warm` while it is being built, so a slot left published across
  * an await would hand that second request this request's environment.
  *
+ * The caller has already asserted the slot empty: it must do so before
+ * matching, because building the static router runs the matched route's
+ * `warm` against whatever the slot holds.
+ *
  * @param environment - The per-request environment to warm.
  * @param warm - Calls the matched route's `warm`.
  * @returns The `warm` call's result, as a promise.
- * @throws When an environment is already published: on the server the slot
- *   is empty everywhere outside this function, so a published one means two
- *   requests would share a store.
  * @note Impure: writes the module-level prefetch environment, and the
  *   `warm` it calls performs network requests.
  */
@@ -43,12 +63,6 @@ const warmInEnvironment = (
   environment: Environment,
   warm: () => void | Promise<void>,
 ): Promise<void> => {
-  if (getPrefetchEnvironment() !== undefined) {
-    throw new Error(
-      "a prefetch environment is already published; the server publishes " +
-        "one only while a route's warm runs",
-    );
-  }
   setPrefetchEnvironment(environment);
   try {
     return Promise.resolve(warm());
@@ -62,9 +76,9 @@ const warmInEnvironment = (
  * `warm` against a per-request environment that talks to `graphqlUrl`, and
  * serialise that environment's store for hydration.
  *
- * The order is: match; create the environment; publish it, call the route's
- * `warm` and clear it again, all synchronously (`warmInEnvironment`); await
- * the `warm`; serialise. The environment is cleared BEFORE the await rather
+ * The order is: assert the prefetch slot empty; match; create the
+ * environment; publish it, call the route's `warm` and clear it again, all
+ * synchronously (`warmInEnvironment`); await the `warm`; serialise. The environment is cleared BEFORE the await rather
  * than after the serialise because the prefetch slot is one module-level
  * value shared by every request in this process: left published across the
  * await, it would receive the `warm` of any request whose static router is
@@ -85,6 +99,12 @@ const warmInEnvironment = (
  * Only the route's own `warm` is awaited. The router runs every wrapper's
  * `warm` on each load as well; no wrapper in this app has one, and one
  * added later would not contribute to the server-rendered store.
+ *
+ * The slot is asserted empty before matching, not just before publishing:
+ * building the static router runs the matched route's `warm` synchronously,
+ * so a check placed after the match would come after that `warm` had
+ * already fetched into a foreign environment. A published slot fails the
+ * step (logged `undefined`) without a single request.
  *
  * Returns `undefined` for an unmatched URL, a redirect, the not-found page
  * and a route with no `warm`, all without dialling the graph. It also
@@ -112,6 +132,7 @@ export default async function prepareRelayData(
   graphqlUrl: string,
 ): Promise<PreparedRelayData | undefined> {
   try {
+    assertNoPrefetchEnvironment();
     const match = createStaticRouter(appRoutes, url, {
       middleware: [...middleware],
       notFound: notFoundRoute,

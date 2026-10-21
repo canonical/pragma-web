@@ -59,6 +59,7 @@ import {
   getPrefetchEnvironment,
   setPrefetchEnvironment,
 } from "#relay";
+import createFetchSpy from "../../testing/createFetchSpy.js";
 import {
   COMPONENT_URI,
   JOB_URI,
@@ -364,8 +365,11 @@ describe("prepareRelayData over HTTP", () => {
 
   it("refuses to warm into an environment that is already published", async () => {
     // On the server the slot is empty outside the prepare step's own warm
-    // call, so a published one means two requests would share a store.
-    const foreign = createEnvironment({ graphqlUrl });
+    // call, so a published one means two requests would share a store. The
+    // foreign environment's fetch spy records synchronously, so a warm that
+    // reached it while the static router was being built would show here.
+    const foreignFetch = createFetchSpy();
+    const foreign = createEnvironment({ fetchFn: foreignFetch });
     setPrefetchEnvironment(foreign);
     const consoleError = vi
       .spyOn(console, "error")
@@ -382,8 +386,10 @@ describe("prepareRelayData over HTTP", () => {
     } finally {
       consoleError.mockRestore();
     }
-    // The foreign environment is left as it was, and nothing was sent.
+    // The foreign environment is left as it was, and nothing was fetched
+    // into it or sent to the graph.
     expect(getPrefetchEnvironment()).toBe(foreign);
+    expect(foreignFetch).not.toHaveBeenCalled();
     expect(captured).toHaveLength(0);
   });
 
