@@ -1,7 +1,7 @@
+import { ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import type React from "react";
 import { Suspense } from "react";
-import ErrorBoundary from "#lib/ErrorBoundary";
 import { JourneysExplorer } from "../JourneysExplorer/index.js";
 import { readJobParam } from "../journeysQuery.js";
 import type { JourneysPageProps } from "./types.js";

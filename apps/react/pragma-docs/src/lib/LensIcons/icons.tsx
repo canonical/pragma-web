@@ -1,18 +1,13 @@
 /**
- * The rail's icon set — 16px stroke glyphs adapted from the A.06 exhibit
- * (`docs-shell-prototype.html`), which is the rail's look-and-feel
- * reference. Inline SVG (no asset pipeline), `currentColor`, and always
- * `aria-hidden`: the accessible name is the entry's visible label. The
- * icons are what survives the sanctioned small-viewport collapse (AX.1),
- * so every rail entry must carry one.
+ * The site's lens glyphs — 16px stroke glyphs, one per lens, that each lens
+ * passes as its `icon` in `routeLensFacet.of`. Inline SVG (no asset
+ * pipeline), `currentColor`, and always `aria-hidden`: the accessible name
+ * is the rail entry's visible label. The icons are what survives the rail's
+ * small-viewport collapse, so every lens must carry one.
  */
 
 import type { ReactElement } from "react";
-
-interface IconProps {
-  /** The glyph's width and height, in pixels. */
-  readonly size?: number;
-}
+import type { IconProps } from "./types.js";
 
 const sharedProps = (size: number) =>
   ({
@@ -97,24 +92,17 @@ export const GuidesIcon = ({ size = 16 }: IconProps): ReactElement => (
   </svg>
 );
 
-/** Journeys: a path stepping left to right, the lens's own spine. */
+/**
+ * Journeys: a path stepping left to right, the Journeys lens's rail glyph.
+ *
+ * A stroke glyph `size` pixels square (16 by default), drawn in
+ * `currentColor` and `aria-hidden`: the rail entry's visible label names
+ * it. A lens passes it as its `icon` in `routeLensFacet.of`.
+ */
 export const JourneysIcon = ({ size = 16 }: IconProps): ReactElement => (
   <svg aria-hidden="true" {...sharedProps(size)}>
     <circle cx="3.5" cy="4" r="1.6" />
     <circle cx="12.5" cy="12" r="1.6" />
     <path d="M3.5 5.6v3.9a2 2 0 0 0 2 2h5.4" />
-  </svg>
-);
-
-export const PlaygroundIcon = ({ size = 15 }: IconProps): ReactElement => (
-  <svg aria-hidden="true" {...sharedProps(size)}>
-    <path d="M5 5 2 8l3 3M11 5l3 3-3 3" />
-  </svg>
-);
-
-export const SignInIcon = ({ size = 15 }: IconProps): ReactElement => (
-  <svg aria-hidden="true" {...sharedProps(size)}>
-    <circle cx="8" cy="5.5" r="2.5" />
-    <path d="M3.5 13.5c.6-2.6 2.3-4 4.5-4s3.9 1.4 4.5 4" />
   </svg>
 );

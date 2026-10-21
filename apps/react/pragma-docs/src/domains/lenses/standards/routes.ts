@@ -1,6 +1,6 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { StandardsIcon } from "#lib/Rail";
+import { StandardsIcon } from "#lib/LensIcons";
 import { StandardReadingPage } from "./StandardReadingPage/index.js";
 import { StandardsPage } from "./StandardsPage/index.js";
 import warmStandardEntity from "./warmStandardEntity.js";

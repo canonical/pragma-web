@@ -1,8 +1,10 @@
+import {
+  Canvas,
+  CanvasSkipLink,
+  ModeStrip,
+  makeLensContext,
+} from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { Canvas } from "#lib/Canvas";
-import { CanvasSkipLink } from "#lib/CanvasSkipLink";
-import { makeLensContext } from "#lib/LensBreadcrumbs";
-import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import type { StandardsLayoutProps } from "./types.js";

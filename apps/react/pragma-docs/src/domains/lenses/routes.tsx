@@ -21,7 +21,7 @@
 
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { GuidesIcon } from "#lib/Rail";
+import { GuidesIcon } from "#lib/LensIcons";
 import LensPlaceholder from "./LensPlaceholder.js";
 
 const routes = {

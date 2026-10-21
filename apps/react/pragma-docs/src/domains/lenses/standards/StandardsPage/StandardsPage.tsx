@@ -1,8 +1,8 @@
+import { ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import type React from "react";
 import { Suspense } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
-import ErrorBoundary from "#lib/ErrorBoundary";
 import type { StandardsIndexQuery } from "#relay/__generated__/StandardsIndexQuery.graphql.js";
 import standardsIndexQueryNode from "#relay/__generated__/StandardsIndexQuery.graphql.js";
 import { StandardsIndex } from "../StandardsIndex/index.js";

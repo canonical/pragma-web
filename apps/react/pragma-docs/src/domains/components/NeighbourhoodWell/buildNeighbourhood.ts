@@ -12,12 +12,17 @@
  * every well. Within a sector, neighbours spread evenly across the span on
  * an ellipse (wider than tall — the well borrows the reading column's
  * horizontal room); crowded sectors stagger onto an outer ring. The
- * shared bounded relaxation pass (`#lib/WellGeometry`) then separates any
+ * shared bounded relaxation pass (`relaxBoxes`) then separates any
  * boxes that still collide — organic packing, deterministic by
  * construction (fixed iteration count, stable pair order, centre pinned).
  */
 
-import { edgeEndpoint, quadArc, relaxBoxes, settle } from "#lib/WellGeometry";
+import {
+  edgeEndpoint,
+  quadArc,
+  relaxBoxes,
+  settle,
+} from "@canonical/prism-core";
 import {
   CENTRE_EXTRA_WIDTH,
   CENTRE_NODE_HEIGHT,
@@ -43,7 +48,7 @@ import type {
   WellNode,
 } from "./types.js";
 
-export { edgeEndpoint } from "#lib/WellGeometry";
+export { edgeEndpoint } from "@canonical/prism-core";
 
 /** A node mid-layout: mutable position, frozen identity. */
 interface WorkingNode extends Omit<WellNode, "x" | "y"> {

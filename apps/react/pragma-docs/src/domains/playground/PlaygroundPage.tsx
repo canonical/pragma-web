@@ -5,9 +5,9 @@
  * pragma data instead of lorem ipsum.
  */
 
+import { ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, Suspense } from "react";
-import ErrorBoundary from "#lib/ErrorBoundary";
 import ComponentProbe from "./ComponentProbe.js";
 import { PROBE_URI } from "./probeQuery.js";
 

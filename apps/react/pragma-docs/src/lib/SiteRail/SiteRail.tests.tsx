@@ -51,4 +51,30 @@ describe("SiteRail", () => {
     expect(nav.id).toBe("site-rail");
     expect(nav).toHaveClass("is-pinned");
   });
+
+  it("keeps the utility cluster out of the lens list", () => {
+    renderSiteRail();
+    const lenses = screen
+      .getByRole("navigation", { name: "Primary" })
+      .querySelector(".rail-lenses");
+    const utilities = screen.getByRole("list", { name: "Utilities" });
+    expect(lenses?.contains(utilities)).toBe(false);
+    expect(
+      utilities.contains(screen.getByRole("link", { name: "Playground" })),
+    ).toBe(true);
+    expect(
+      utilities.contains(screen.getByRole("link", { name: "Demo sign-in" })),
+    ).toBe(true);
+    expect(
+      utilities.contains(screen.getByRole("combobox", { name: "Color theme" })),
+    ).toBe(true);
+  });
+
+  it("links the demo sign-in to the account route with the demo credential", () => {
+    renderSiteRail();
+    expect(screen.getByRole("link", { name: "Demo sign-in" })).toHaveAttribute(
+      "href",
+      "/account?auth=1",
+    );
+  });
 });

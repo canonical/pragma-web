@@ -1,6 +1,6 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { JourneysIcon } from "#lib/Rail";
+import { JourneysIcon } from "#lib/LensIcons";
 import { JourneysPage } from "./JourneysPage/index.js";
 import warmJourneys from "./warmJourneys.js";
 

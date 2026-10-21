@@ -1,11 +1,11 @@
-import type { RailProps } from "#lib/Rail";
+import type { RailProps } from "@canonical/prism-core";
 
 /**
  * Props accepted by `SiteRail`: the native props of the rail's `<nav>`
  * root, passed through to `Rail`.
  *
- * `Rail`'s `brand` and `entries` are excluded because the site rail supplies
- * both: the site's brand, and the lenses the running router's table
- * declares.
+ * `Rail`'s `brand`, `entries` and `children` are excluded because the site
+ * rail supplies all three: the site's brand, the lenses the running router's
+ * table declares, and the site's utility cluster.
  */
-export type SiteRailProps = Omit<RailProps, "brand" | "entries">;
+export type SiteRailProps = Omit<RailProps, "brand" | "entries" | "children">;

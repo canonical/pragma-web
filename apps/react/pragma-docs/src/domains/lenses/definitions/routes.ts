@@ -1,6 +1,6 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { DefinitionsIcon } from "#lib/Rail";
+import { DefinitionsIcon } from "#lib/LensIcons";
 import { DefinitionsPage } from "./DefinitionsPage/index.js";
 import warmDefinitions from "./warmDefinitions.js";
 
