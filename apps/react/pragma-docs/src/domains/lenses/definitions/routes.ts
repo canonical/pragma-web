@@ -1,4 +1,6 @@
 import { route } from "@canonical/router-core";
+import { DefinitionsIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
 import { DefinitionsPage } from "./DefinitionsPage/index.js";
@@ -39,6 +41,12 @@ const routes = {
     meta: {
       ...shellStripFacet.of({ ...definitionsStripSlots }),
       ...routeShortcutFacet.of("3"),
+      ...routeLensFacet.of({
+        label: "Definitions",
+        icon: DefinitionsIcon,
+        order: 3,
+        tier: 1,
+      }),
     },
   }),
   definitionsTerm: route({

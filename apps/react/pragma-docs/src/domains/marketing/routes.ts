@@ -1,5 +1,7 @@
 import { route } from "@canonical/router-core";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
+import { HomeIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
 import GuidePage from "./GuidePage.js";
@@ -45,6 +47,12 @@ const routes = {
     meta: {
       ...shellStripFacet.of({ Context: HomeContext }),
       ...routeShortcutFacet.of("1"),
+      ...routeLensFacet.of({
+        label: "Home",
+        icon: HomeIcon,
+        order: 1,
+        tier: 2,
+      }),
     },
   }),
   guide: route({

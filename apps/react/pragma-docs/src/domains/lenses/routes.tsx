@@ -13,13 +13,15 @@
  * controls or status to claim, so every strip socket renders its sensible
  * empty — which is exactly what `frameStability.tests.tsx` measures.
  *
- * `guides` does declare ONE thing, and only one: its keyboard shortcut
- * (`#lib/routeShortcut`). A stub is still a destination, and the digit
- * belongs to whichever route owns the address — being unbuilt does not
- * change who allocates it.
+ * `guides` does declare two things: its keyboard shortcut
+ * (`#lib/routeShortcut`) and its lens (`#lib/routeLens`). A stub is still a
+ * destination, and the digit and the rail entry belong to whichever route
+ * owns the address — being unbuilt does not change who declares them.
  */
 
 import { route } from "@canonical/router-core";
+import { GuidesIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import LensPlaceholder from "./LensPlaceholder.js";
 
@@ -28,6 +30,12 @@ const routes = {
     url: "/guides",
     meta: {
       ...routeShortcutFacet.of("6"),
+      ...routeLensFacet.of({
+        label: "Guides",
+        icon: GuidesIcon,
+        order: 6,
+        tier: 1,
+      }),
     },
     content: () => (
       <LensPlaceholder

@@ -1,5 +1,7 @@
 import { route } from "@canonical/router-core";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
+import { StandardsIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
 import { StandardReadingPage } from "./StandardReadingPage/index.js";
@@ -50,6 +52,12 @@ const routes = {
     meta: {
       ...shellStripFacet.of({ Context: StandardsContext }),
       ...routeShortcutFacet.of("4"),
+      ...routeLensFacet.of({
+        label: "Standards",
+        icon: StandardsIcon,
+        order: 4,
+        tier: 1,
+      }),
     },
   }),
   standardEntity: route({

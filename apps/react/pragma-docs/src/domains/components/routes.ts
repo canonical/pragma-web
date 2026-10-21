@@ -1,5 +1,7 @@
 import { route } from "@canonical/router-core";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
+import { ComponentsIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
 import { ComponentEntityPage } from "./ComponentEntityPage/index.js";
@@ -46,6 +48,12 @@ const routes = {
     meta: {
       ...shellStripFacet.of({ Context: ComponentsContext }),
       ...routeShortcutFacet.of("2"),
+      ...routeLensFacet.of({
+        label: "Components",
+        icon: ComponentsIcon,
+        order: 2,
+        tier: 2,
+      }),
     },
   }),
   componentEntity: route({

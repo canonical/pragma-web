@@ -1,4 +1,6 @@
 import { route } from "@canonical/router-core";
+import { JourneysIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
 import { JourneysPage } from "./JourneysPage/index.js";
@@ -49,6 +51,12 @@ const routes = {
     meta: {
       ...shellStripFacet.of({ ...journeysStripSlots }),
       ...routeShortcutFacet.of("5"),
+      ...routeLensFacet.of({
+        label: "Journeys",
+        icon: JourneysIcon,
+        order: 5,
+        tier: 2,
+      }),
     },
   }),
   journeysJob: route({

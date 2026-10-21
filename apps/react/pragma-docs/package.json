@@ -25,6 +25,7 @@
     "#lib/WellGeometry": "./src/lib/WellGeometry/index.ts",
     "#lib/authGuard": "./src/lib/authGuard/index.ts",
     "#lib/routeFacet": "./src/lib/routeFacet/index.ts",
+    "#lib/routeLens": "./src/lib/routeLens/index.ts",
     "#lib/routeShortcut": "./src/lib/routeShortcut/index.ts",
     "#lib/router": "./src/lib/router/index.ts",
     "#relay": "./src/relay/index.ts",
