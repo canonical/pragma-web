@@ -85,7 +85,7 @@
     list-style: none;
   }
 
-  .ds.term-rail li {
+  .ds.term-rail .item {
     display: flex;
     align-items: baseline;
     gap: var(--term-rail-item-gap);
@@ -101,41 +101,41 @@
   /* The indent: the class tree's shape, made spatial. Each superclass hop
    * pushes the row's start in by one step; the component clamps the depth, so
    * a deep chain never walks a label off the rail. */
-  .ds.term-rail li[data-depth="1"] {
+  .ds.term-rail .item[data-depth="1"] {
     padding-inline-start: calc(
       var(--term-rail-item-padding-inline) +
       var(--term-rail-indent-step)
     );
   }
-  .ds.term-rail li[data-depth="2"] {
+  .ds.term-rail .item[data-depth="2"] {
     padding-inline-start: calc(
       var(--term-rail-item-padding-inline) +
       2 *
       var(--term-rail-indent-step)
     );
   }
-  .ds.term-rail li[data-depth="3"] {
+  .ds.term-rail .item[data-depth="3"] {
     padding-inline-start: calc(
       var(--term-rail-item-padding-inline) +
       3 *
       var(--term-rail-indent-step)
     );
   }
-  .ds.term-rail li[data-depth="4"] {
+  .ds.term-rail .item[data-depth="4"] {
     padding-inline-start: calc(
       var(--term-rail-item-padding-inline) +
       4 *
       var(--term-rail-indent-step)
     );
   }
-  .ds.term-rail li[data-depth="5"] {
+  .ds.term-rail .item[data-depth="5"] {
     padding-inline-start: calc(
       var(--term-rail-item-padding-inline) +
       5 *
       var(--term-rail-indent-step)
     );
   }
-  .ds.term-rail li[data-depth="6"] {
+  .ds.term-rail .item[data-depth="6"] {
     padding-inline-start: calc(
       var(--term-rail-item-padding-inline) +
       6 *
@@ -155,7 +155,7 @@
     background: var(--term-rail-mark-color);
   }
 
-  .ds.term-rail li[data-abstraction="abstract"] .mark {
+  .ds.term-rail .mark.abstract {
     border-style: dashed;
     border-color: var(--term-rail-muted-color);
     background: transparent;
@@ -178,22 +178,22 @@
 
   /* A filtered-out item DIMS and stays exactly where it was: the rail is the
    * stable, complete index, and dimmed items stay focusable and clickable. */
-  .ds.term-rail li[data-dimmed] {
+  .ds.term-rail .item.is-dimmed {
     opacity: var(--term-rail-dimmed-opacity);
   }
 
   /* The hover highlight, distinct from selection: the row the shared ego
    * centre names lifts with a soft fill, whether the pointer is over it, over
    * its node in the graph, or it holds keyboard focus. */
-  .ds.term-rail li.is-hovered {
+  .ds.term-rail .item.is-hovered {
     background: var(--term-rail-hovered-background);
   }
 
-  .ds.term-rail li a {
+  .ds.term-rail .link {
     overflow-wrap: anywhere;
   }
 
-  .ds.term-rail li a[aria-current="page"] {
+  .ds.term-rail .link[aria-current="page"] {
     font-weight: var(--term-rail-current-font-weight);
   }
 
@@ -203,7 +203,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ds.term-rail li {
+    .ds.term-rail .item {
       transition: none;
     }
   }

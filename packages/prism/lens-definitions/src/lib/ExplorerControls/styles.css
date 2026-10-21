@@ -89,22 +89,21 @@
       background-color var(--explorer-controls-transition-duration) ease;
   }
 
+  /* The swatch reads its fill from the chip, so the pressed state is set
+   * once, on the chip's own `aria-pressed`. */
   .ds.explorer-controls .swatch {
     inline-size: var(--explorer-controls-swatch-size);
     block-size: var(--explorer-controls-swatch-size);
     border-radius: 50%;
     border: var(--explorer-controls-chip-border-width) solid currentColor;
-    background: transparent;
+    background: var(--explorer-controls-swatch-fill, transparent);
   }
 
   .ds.explorer-controls .chip[aria-pressed="true"] {
+    --explorer-controls-swatch-fill: currentColor;
     color: var(--explorer-controls-chip-color-pressed);
     border-color: currentColor;
     background: var(--explorer-controls-chip-background-pressed);
-  }
-
-  .ds.explorer-controls .chip[aria-pressed="true"] .swatch {
-    background: currentColor;
   }
 
   .ds.explorer-controls .chip:hover {

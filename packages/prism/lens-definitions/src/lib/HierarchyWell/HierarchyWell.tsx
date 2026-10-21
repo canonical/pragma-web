@@ -267,7 +267,10 @@ const HierarchyWell = ({
               </text>
             ))}
             {edges.map((edge) => {
+              // Only a relation answers to the ego centre: a semantic arc
+              // incident to it rises and wears its predicate.
               const incident =
+                edge.family === "semantic" &&
                 labelCentre !== undefined &&
                 (edge.source === labelCentre || edge.target === labelCentre);
               return (
@@ -282,9 +285,17 @@ const HierarchyWell = ({
                     .join(" ")}
                   key={edge.id}
                 >
-                  <path d={edge.d} markerEnd={`url(#hw-head-${edge.family})`} />
+                  <path
+                    className="line"
+                    d={edge.d}
+                    markerEnd={`url(#hw-head-${edge.family})`}
+                  />
                   {edge.labelAt === undefined ? null : (
-                    <text x={edge.labelAt.x} y={edge.labelAt.y}>
+                    <text
+                      className="predicate"
+                      x={edge.labelAt.x}
+                      y={edge.labelAt.y}
+                    >
                       {edge.predicate}
                     </text>
                   )}

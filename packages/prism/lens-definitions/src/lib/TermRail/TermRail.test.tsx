@@ -105,21 +105,21 @@ describe("TermRail", () => {
   }, () => {
     const rail = renderRail();
 
-    // UI Block is abstract; its item carries the abstraction axis as a
-    // data hook AND a rendered marker glyph. This is the same distinction
-    // the graph draws (dashed border), restated honestly in the index.
+    // UI Block is abstract; its item renders a marker glyph carrying the
+    // abstraction axis as a modifier. This is the same distinction the
+    // graph draws (dashed border), restated honestly in the index.
     const abstractItem = within(rail)
       .getByRole("link", { name: "UI Block" })
       .closest("li");
-    expect(abstractItem).toHaveAttribute("data-abstraction", "abstract");
-    expect(abstractItem?.querySelector(".mark")).not.toBeNull();
+    expect(abstractItem?.querySelector(".mark.abstract")).not.toBeNull();
 
     // A concrete class carries the other value — the axis is total over
     // isAbstract, never a third invented "status".
     const concreteItem = within(rail)
       .getByRole("link", { name: "Component" })
       .closest("li");
-    expect(concreteItem).toHaveAttribute("data-abstraction", "concrete");
+    expect(concreteItem?.querySelector(".mark")).not.toBeNull();
+    expect(concreteItem?.querySelector(".mark.abstract")).toBeNull();
   });
 
   it("shows superclass depth — a class under its parent carries a deeper indent than a root", {
@@ -183,8 +183,8 @@ describe("TermRail", () => {
     expect(nonMatch).toBeInTheDocument();
 
     // The non-match is DIMMED; the match is not.
-    expect(nonMatch.closest("li")).toHaveAttribute("data-dimmed", "true");
-    expect(match.closest("li")).not.toHaveAttribute("data-dimmed");
+    expect(nonMatch.closest("li")).toHaveClass("is-dimmed");
+    expect(match.closest("li")).not.toHaveClass("is-dimmed");
     // …and it is dimmed, NOT disabled. The link still works and is still
     // focusable, so announcing it as unavailable would be a false state; the
     // heading counts are what tell a screen reader the filter did something.
@@ -200,7 +200,7 @@ describe("TermRail", () => {
     });
     expect(
       within(rail).getByRole("link", { name: "Code Standard" }).closest("li"),
-    ).not.toHaveAttribute("data-dimmed");
+    ).not.toHaveClass("is-dimmed");
   });
 
   it("reports each group's match count in words, not only in opacity", {

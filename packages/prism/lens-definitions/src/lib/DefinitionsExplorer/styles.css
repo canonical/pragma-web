@@ -78,14 +78,14 @@
     margin-block: 0 var(--definitions-explorer-search-margin);
   }
 
-  .ds.definitions-explorer .search label {
+  .ds.definitions-explorer .field {
     display: grid;
     gap: var(--definitions-explorer-search-gap);
     font-size: var(--definitions-explorer-search-font-size);
     color: var(--definitions-explorer-search-color);
   }
 
-  .ds.definitions-explorer .search input {
+  .ds.definitions-explorer .query {
     inline-size: 100%;
     min-inline-size: 0;
   }

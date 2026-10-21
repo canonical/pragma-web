@@ -95,18 +95,36 @@
     overflow: visible;
   }
 
+  /* An edge carries its paint as properties its line and its predicate
+   * read, so each family and the incident state set them in one flat rule.
+   * Structural: subclass -> superclass, the taxonomy's quiet skeleton. */
   .ds.hierarchy-well .edge {
+    --hierarchy-well-edge-stroke: var(--hierarchy-well-line-color);
+    --hierarchy-well-edge-stroke-width: var(--hierarchy-well-line-width);
+    --hierarchy-well-edge-line-opacity: 1;
+    --hierarchy-well-edge-predicate-opacity: 0;
     transition: opacity var(--hierarchy-well-transition-duration) ease;
   }
 
-  .ds.hierarchy-well .edge path {
-    fill: none;
+  /* Semantic: object properties. Ambient by default (thin, translucent). */
+  .ds.hierarchy-well .edge.semantic {
+    --hierarchy-well-edge-stroke: var(--hierarchy-well-accent-color);
+    --hierarchy-well-edge-line-opacity: var(--hierarchy-well-ambient-opacity);
   }
 
-  /* Structural: subclass -> superclass, the taxonomy's quiet skeleton. */
-  .ds.hierarchy-well .edge.structural path {
-    stroke: var(--hierarchy-well-line-color);
-    stroke-width: var(--hierarchy-well-line-width);
+  /* A relation INCIDENT to the ego centre rises and wears its predicate;
+   * the well marks only semantic edges incident. */
+  .ds.hierarchy-well .edge.is-incident {
+    --hierarchy-well-edge-stroke-width: var(--hierarchy-well-accent-width);
+    --hierarchy-well-edge-line-opacity: 1;
+    --hierarchy-well-edge-predicate-opacity: 1;
+  }
+
+  .ds.hierarchy-well .line {
+    fill: none;
+    stroke: var(--hierarchy-well-edge-stroke);
+    stroke-width: var(--hierarchy-well-edge-stroke-width);
+    opacity: var(--hierarchy-well-edge-line-opacity);
   }
 
   .ds.hierarchy-well .head.structural {
@@ -115,24 +133,11 @@
     stroke-width: var(--hierarchy-well-line-width);
   }
 
-  /* Semantic: object properties. Ambient by default (thin, translucent); an
-   * arc INCIDENT to the ego centre rises and wears its predicate. */
-  .ds.hierarchy-well .edge.semantic path {
-    stroke: var(--hierarchy-well-accent-color);
-    stroke-width: var(--hierarchy-well-line-width);
-    opacity: var(--hierarchy-well-ambient-opacity);
-  }
-
-  .ds.hierarchy-well .edge.semantic.is-incident path {
-    stroke-width: var(--hierarchy-well-accent-width);
-    opacity: 1;
-  }
-
   .ds.hierarchy-well .head.semantic {
     fill: var(--hierarchy-well-accent-color);
   }
 
-  .ds.hierarchy-well .edge.semantic text {
+  .ds.hierarchy-well .predicate {
     font-family: var(--hierarchy-well-label-font-family);
     font-size: var(--hierarchy-well-label-font-size);
     fill: var(--hierarchy-well-accent-color);
@@ -140,12 +145,8 @@
     stroke: var(--hierarchy-well-label-halo);
     stroke-width: var(--hierarchy-well-label-halo-width);
     text-anchor: middle;
-    opacity: 0;
+    opacity: var(--hierarchy-well-edge-predicate-opacity);
     pointer-events: none;
-  }
-
-  .ds.hierarchy-well .edge.semantic.is-incident text {
-    opacity: 1;
   }
 
   /* Edges fade HARDER than nodes, so what survives around the focus is its

@@ -22,7 +22,7 @@ export default function ClassView({
     <article aria-labelledby="term-inspector-title">
       <header>
         <h2 id="term-inspector-title">{data.label ?? term}</h2>
-        <p>
+        <p className="address">
           <code>{term}</code>
           {t("inspector.class.in")}
           <code>{data.namespace}</code>

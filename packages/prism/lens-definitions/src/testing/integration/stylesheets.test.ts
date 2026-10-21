@@ -47,9 +47,10 @@ const LITERAL_TOKENS = [
   "--well-legend-max-inline-size",
 ];
 
-/** List the component tokens a stylesheet declares with no `var()`. */
+/** List the component tokens a stylesheet's `:root` declares with no `var()`. */
 function listLiteralTokens(css: string): string[] {
-  return [...css.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
+  const root = css.match(/:root\s*\{([^}]*)\}/)?.at(1) ?? "";
+  return [...root.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
     .filter((match) => !(match.at(2) ?? "").includes("var("))
     .map((match) => match.at(1) ?? "");
 }

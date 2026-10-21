@@ -26,7 +26,6 @@
     --term-inspector-cell-padding-block: var(--space-050, 0.25rem);
     --term-inspector-cell-padding-inline: var(--space-100, 0.5rem);
     --term-inspector-definition-font-size: var(--font-size-detail, 0.8125rem);
-    --term-inspector-self-font-weight: var(--font-weight-semibold, 600);
     --term-inspector-details-gap: var(--space-050, 0.25rem);
   }
 
@@ -53,7 +52,7 @@
     white-space: nowrap;
   }
 
-  .ds.term-inspector header p {
+  .ds.term-inspector .address {
     margin-block: 0;
     color: var(--term-inspector-muted-color);
   }
@@ -95,26 +94,9 @@
     vertical-align: top;
   }
 
-  /* The lineage breadcrumb: the ancestry chain reads left to right, wrapping
-   * on a narrow panel. The class itself is the emphasised leaf; the ⊂ glyphs
-   * are muted connectors that never wrap away from the link they precede. */
-  .ds.term-inspector .lineage {
-    margin-block: 0;
-    line-height: 1.6;
-  }
-
-  .ds.term-inspector .lineage .self {
-    font-weight: var(--term-inspector-self-font-weight);
-  }
-
-  .ds.term-inspector .lineage .glyph {
-    color: var(--term-inspector-muted-color);
-    white-space: nowrap;
-  }
-
   /* A property's definition: a full-width row beneath its property, quieter
    * than the property's own row, so it reads as that row's continuation. */
-  .ds.term-inspector .definition-row td {
+  .ds.term-inspector .definition {
     padding-block-start: 0;
     color: var(--term-inspector-muted-color);
     font-size: var(--term-inspector-definition-font-size);

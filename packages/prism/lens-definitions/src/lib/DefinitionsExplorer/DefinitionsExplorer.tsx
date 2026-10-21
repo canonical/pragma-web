@@ -185,9 +185,10 @@ export default function DefinitionsExplorer({
             empty — the no-op that keeps first client paint equal to the
             server's. */}
         <p className="search">
-          <label>
+          <label className="field">
             {t("explorer.search.label")}
             <input
+              className="query"
               onChange={(event) => {
                 const raw = event.target.value;
                 setSearchText(raw);

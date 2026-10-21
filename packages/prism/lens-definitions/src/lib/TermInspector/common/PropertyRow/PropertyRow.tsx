@@ -40,8 +40,10 @@ export default function PropertyRow({
         <td>{notes}</td>
       </tr>
       {classProperty.property.definition ? (
-        <tr className="definition-row">
-          <td colSpan={4}>{classProperty.property.definition}</td>
+        <tr>
+          <td className="definition" colSpan={4}>
+            {classProperty.property.definition}
+          </td>
         </tr>
       ) : null}
     </>

@@ -77,18 +77,18 @@ const MAX_INDENT_DEPTH = 6;
  * A REAL INDEX. Each class item carries
  * the two REAL axes the ontology actually has — no invented status:
  *
- * - An ABSTRACTION marker (`data-abstraction`): a small glyph that restates
- *   exactly what the graph encodes with a dashed border and an ABSTRACT
- *   tag. The ontology carries `isAbstract` and `namespace` and NOTHING
- *   resembling a lifecycle, status or channel on a class, so this rail
- *   marks abstractness and provenance and refuses to fake a status dot the
- *   data cannot back.
+ * - An ABSTRACTION marker (the mark's `abstract` modifier): a small glyph
+ *   that restates exactly what the graph encodes with a dashed border and
+ *   an ABSTRACT tag. The ontology carries `isAbstract` and `namespace` and
+ *   NOTHING resembling a lifecycle, status or channel on a class, so this
+ *   rail marks abstractness and provenance and refuses to fake a status dot
+ *   the data cannot back.
  * - A DEPTH indicator: the superclass depth (`depthByUri`, the same measure
- *   the well stacks its layers by) as a monospace dot-run AND
- *   as a real indent, so the class tree's shape is legible in the flat list.
+ *   the well rings its classes by) as a monospace dot-run AND as a real
+ *   indent, so the class tree's shape is legible in the flat list.
  *
  * THE ASYMMETRY: the rail DIMS, it never HIDES. Every term stays mounted in
- * document order under every filter, marked `data-dimmed` when it falls
+ * document order under every filter, marked `is-dimmed` when it falls
  * out — so the index stays complete and stable, items never jump under the
  * cursor, and the number of things that exist never appears to change.
  * Only the graph hides (see `HierarchyWell`).
@@ -99,7 +99,7 @@ const MAX_INDENT_DEPTH = 6;
  * unavailable when it plainly is not, which is a worse answer than saying
  * nothing. The state reaches a screen reader in words instead: each heading
  * reports its own match count, so a filter that dims everything says so rather
- * than falling silent. `data-dimmed` carries the visual cue and nothing else.
+ * than falling silent. `is-dimmed` carries the visual cue and nothing else.
  *
  * BIDIRECTIONAL HOVER:
  * pointing at — or keyboard-focusing — a rail item raises it as the shared
@@ -136,14 +136,24 @@ export default function TermRail({
     ontologies,
   );
 
+  // One item's classes: `is-dimmed` when the filter leaves it out, and
+  // `is-hovered` when the shared centre names it — which is THIS row when
+  // the pointer is here, but also when the pointer is over this term's NODE
+  // in the graph.
+  const formatItemClassName = (prefixed: string, dimmed: boolean): string =>
+    [
+      "item",
+      dimmed ? "is-dimmed" : "",
+      prefixed === hoverCentre ? "is-hovered" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
   // One binding for both input modalities and both item kinds: raise the
   // term on pointer-enter/keyboard-focus, clear it on leave/blur. The well
   // reads the same shared centre, so this is what makes a rail hover reach
-  // the graph. `is-hovered` marks the row the shared centre currently names
-  // — which is THIS row when the pointer is here, but also when the pointer
-  // is over this term's NODE in the graph.
+  // the graph.
   const bindHover = (prefixed: string) => ({
-    className: prefixed === hoverCentre ? "is-hovered" : undefined,
     onBlur: () => {
       onHoverTerm(undefined);
     },
@@ -212,9 +222,8 @@ export default function TermRail({
             <ul>
               {classes.map(({ term, prefixed, depth, dimmed }) => (
                 <li
-                  data-abstraction={term.isAbstract ? "abstract" : "concrete"}
+                  className={formatItemClassName(prefixed, dimmed)}
                   data-depth={Math.min(depth, MAX_INDENT_DEPTH)}
-                  data-dimmed={dimmed || undefined}
                   key={term.uri}
                   {...bindHover(prefixed)}
                 >
@@ -223,11 +232,18 @@ export default function TermRail({
                       honest about the one real per-class axis. Decorative —
                       aria-hidden — because the "abstract" word below carries
                       it to assistive tech. */}
-                  <span aria-hidden="true" className="mark" />
+                  <span
+                    aria-hidden="true"
+                    className={term.isAbstract ? "mark abstract" : "mark"}
+                  />
                   <span aria-hidden="true" className="depth">
                     {formatDepthGlyph(depth)}
                   </span>
-                  <Link params={{ term: prefixed }} to="definitionsTerm">
+                  <Link
+                    className="link"
+                    params={{ term: prefixed }}
+                    to="definitionsTerm"
+                  >
                     {formatTermLabel(term.label, prefixed)}
                   </Link>
                   {term.isAbstract ? (
@@ -251,11 +267,15 @@ export default function TermRail({
             <ul>
               {properties.map(({ term, prefixed, dimmed }) => (
                 <li
-                  data-dimmed={dimmed || undefined}
+                  className={formatItemClassName(prefixed, dimmed)}
                   key={term.uri}
                   {...bindHover(prefixed)}
                 >
-                  <Link params={{ term: prefixed }} to="definitionsTerm">
+                  <Link
+                    className="link"
+                    params={{ term: prefixed }}
+                    to="definitionsTerm"
+                  >
                     {formatTermLabel(term.label, prefixed)}
                   </Link>
                   <span className="note">{term.kind.toLowerCase()}</span>

@@ -1,6 +1,9 @@
 import type React from "react";
 import { TermLink } from "../TermLink/index.js";
 import type { LineageProps } from "./types.js";
+import "./styles.css";
+
+const componentCssClassName = "ds lineage";
 
 /**
  * The subset-of glyph the lineage breadcrumb reads with — U+2282, "a is a
@@ -24,7 +27,7 @@ export default function Lineage({
   namespaces,
 }: LineageProps): React.ReactElement {
   return (
-    <p className="lineage">
+    <p className={componentCssClassName}>
       <span className="self">{self}</span>
       {ancestors.map((ancestor) => (
         <span key={ancestor.uri}>
