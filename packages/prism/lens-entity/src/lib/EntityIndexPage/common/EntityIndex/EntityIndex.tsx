@@ -5,12 +5,10 @@ import type { EntityIndex_query$key } from "../../../../__generated__/EntityInde
 import entityIndexFragmentNode from "../../../../__generated__/EntityIndex_query.graphql.js";
 import type { EntityIndexPaginationQuery } from "../../../../__generated__/EntityIndexPaginationQuery.graphql.js";
 import type { EntityIndexQuery } from "../../../../__generated__/EntityIndexQuery.graphql.js";
+import entityIndexQueryNode from "../../../../__generated__/EntityIndexQuery.graphql.js";
+import buildEntityIndexVariables from "../../../buildEntityIndexVariables.js";
 import { ENTITY_PAGE_SIZE } from "../../../constants.js";
 import { useEntityFilter } from "../../../EntityFilterProvider/index.js";
-import {
-  buildEntityIndexVariables,
-  entityIndexQueryNode,
-} from "../../../entityIndexQuery.js";
 import { useMessages } from "../../../i18n/index.js";
 import matchesEntityText from "../../../matchesEntityText.js";
 import type { EntityIndexProps } from "./types.js";

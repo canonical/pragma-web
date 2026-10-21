@@ -9,7 +9,7 @@ import { ENTITY_ROUTE_SUFFIX } from "./constants.js";
 import { EntityIcon } from "./EntityIcon/index.js";
 import { EntityIndexPage } from "./EntityIndexPage/index.js";
 import { EntityPage } from "./EntityPage/index.js";
-import { readUriParam } from "./entityPageQuery.js";
+import readUriParam from "./readUriParam.js";
 import type { EntityLensOptions, EntityRoutes } from "./types.js";
 import warmEntity from "./warmEntity.js";
 import warmEntityIndex from "./warmEntityIndex.js";

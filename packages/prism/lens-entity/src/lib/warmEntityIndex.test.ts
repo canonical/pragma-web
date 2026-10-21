@@ -5,7 +5,7 @@ import {
 import { afterEach, describe, expect, it } from "vitest";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import { STATIONS_BINDING } from "../../testing/fixtures.js";
-import { buildEntityIndexVariables } from "./entityIndexQuery.js";
+import buildEntityIndexVariables from "./buildEntityIndexVariables.js";
 import warmEntityIndex from "./warmEntityIndex.js";
 
 afterEach(() => {

@@ -1,8 +1,6 @@
 import { type EntityBinding, prefetchQuery } from "@canonical/prism-core";
-import {
-  buildEntityIndexVariables,
-  entityIndexQueryNode,
-} from "./entityIndexQuery.js";
+import entityIndexQueryNode from "../__generated__/EntityIndexQuery.graphql.js";
+import buildEntityIndexVariables from "./buildEntityIndexVariables.js";
 
 /**
  * Warm the store for a binding's index: prefetch the index's one operation,

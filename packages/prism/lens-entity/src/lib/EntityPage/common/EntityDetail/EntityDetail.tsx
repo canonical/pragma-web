@@ -3,12 +3,10 @@ import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
 import { useLazyLoadQuery } from "react-relay";
 import type { EntityNamespacesQuery } from "../../../../__generated__/EntityNamespacesQuery.graphql.js";
+import entityNamespacesQueryNode from "../../../../__generated__/EntityNamespacesQuery.graphql.js";
 import type { EntityPageQuery } from "../../../../__generated__/EntityPageQuery.graphql.js";
-import {
-  buildEntityPageVariables,
-  entityNamespacesQueryNode,
-  entityPageQueryNode,
-} from "../../../entityPageQuery.js";
+import entityPageQueryNode from "../../../../__generated__/EntityPageQuery.graphql.js";
+import buildEntityPageVariables from "../../../buildEntityPageVariables.js";
 import { Message, useMessages } from "../../../i18n/index.js";
 import isInstanceOf from "../../../isInstanceOf.js";
 import { EntitySummary } from "../EntitySummary/index.js";

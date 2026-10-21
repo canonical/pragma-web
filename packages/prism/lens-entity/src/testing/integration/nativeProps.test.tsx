@@ -17,6 +17,8 @@ import {
   STATIONS_BINDING,
 } from "../../../testing/fixtures.js";
 import type { EntityPageQuery } from "../../__generated__/EntityPageQuery.graphql.js";
+import entityPageQueryNode from "../../__generated__/EntityPageQuery.graphql.js";
+import buildEntityPageVariables from "../../lib/buildEntityPageVariables.js";
 import { EntityFilterProvider } from "../../lib/EntityFilterProvider/index.js";
 import { EntityIndex } from "../../lib/EntityIndexPage/common/EntityIndex/index.js";
 import { EntityIndexPage } from "../../lib/EntityIndexPage/index.js";
@@ -27,10 +29,6 @@ import { EntitySummary } from "../../lib/EntityPage/common/EntitySummary/index.j
 import { FieldsTable } from "../../lib/EntityPage/common/FieldsTable/index.js";
 import { Relations } from "../../lib/EntityPage/common/Relations/index.js";
 import { EntityPage } from "../../lib/EntityPage/index.js";
-import {
-  buildEntityPageVariables,
-  entityPageQueryNode,
-} from "../../lib/entityPageQuery.js";
 
 /** The native props each probed root receives, derived from `name`. */
 const nativeProps = (name: string) =>

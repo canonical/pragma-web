@@ -4,13 +4,11 @@ import {
 } from "@canonical/prism-core";
 import { type CacheConfig, fetchQuery } from "relay-runtime";
 import type { EntityNamespacesQuery } from "../__generated__/EntityNamespacesQuery.graphql.js";
+import entityNamespacesQueryNode from "../__generated__/EntityNamespacesQuery.graphql.js";
 import type { EntityPageQuery } from "../__generated__/EntityPageQuery.graphql.js";
-import {
-  buildEntityPageVariables,
-  entityNamespacesQueryNode,
-  entityPageQueryNode,
-  readUriParam,
-} from "./entityPageQuery.js";
+import entityPageQueryNode from "../__generated__/EntityPageQuery.graphql.js";
+import buildEntityPageVariables from "./buildEntityPageVariables.js";
+import readUriParam from "./readUriParam.js";
 
 /** Answer from the store when it holds the data, and fetch otherwise. */
 const STORE_OR_NETWORK: CacheConfig & {
