@@ -4,6 +4,12 @@
  * @module
  */
 
+export type { EntityBinding, GraphQLExecute } from "./bindings/index.js";
+export {
+  assertBindings,
+  assertBindingsLive,
+  defineBinding,
+} from "./bindings/index.js";
 export type { CanvasProps } from "./Canvas/index.js";
 export { CANVAS_ELEMENT_ID, Canvas } from "./Canvas/index.js";
 export type { CanvasSkipLinkProps } from "./CanvasSkipLink/index.js";
