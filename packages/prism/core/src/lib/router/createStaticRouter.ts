@@ -36,6 +36,9 @@ import { createRouter, createServerAdapter } from "@canonical/router-core";
  * @param url - The request URL, as a string or a `URL`.
  * @param options - Router options other than the adapter and initial URL.
  * @returns The router, with the URL's match result on `match`.
+ * @note Impure: building the router runs router-core's initial load, which
+ *   fires the matched route's and its wrappers' `warm` hooks in the
+ *   background; those fetch into the published prefetch environment.
  */
 export default function createStaticRouter<
   const TRoutes extends RouteMap,

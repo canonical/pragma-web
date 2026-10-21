@@ -38,6 +38,9 @@ export default class ErrorBoundary extends Component<
    * a caller passes `fallback={null}` — the subtree renders as literally
    * nothing, with no trace anyone can act on. Rendering the fallback is the
    * boundary's job; discarding the diagnosis is not.
+   *
+   * @note Impure: writes the error and its component stack to
+   *   `console.error`.
    */
   componentDidCatch(error: Error, info: ErrorInfo): void {
     console.error(
