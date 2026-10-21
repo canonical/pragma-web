@@ -24,7 +24,7 @@ holds 551 tests at 100%.
 | `sem/design-system-docs/data/shim-concept.ttl` | the real `EXCLUDED_SOURCES` entry, at its real path. `ds:embodiesConcept rdfs:domain ds:Entity` is the domain smear; the collector must drop this file |
 
 `code-standards` is listed in `REF_PACKAGES` but **deliberately absent from the
-corpus**: that is what exercises `walkTtl`'s "directory does not exist" return,
+corpus**: that is what exercises `walkFiles`'s "directory does not exist" return,
 which is the state a partially-populated refs cache is actually in.
 
 ## What this corpus is not

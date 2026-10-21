@@ -32,7 +32,7 @@
  * explicitly, and is not a miss to announce.
  */
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import {
   CHANNEL_DOTTED_REF,
@@ -44,6 +44,7 @@ import {
   type TtlSource,
 } from "../config/index.js";
 import { mapTurtleSyntax } from "./turtleText.js";
+import { walkFiles } from "./walkFiles.js";
 
 /**
  * Escape channel-dotted local names so strict Turtle parsers accept them.
@@ -84,18 +85,11 @@ export const walkTtl = (
   label: string,
   out: TtlSource[],
 ): void => {
-  if (!existsSync(dir)) return;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name.startsWith(".")) continue;
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      walkTtl(full, base, label, out);
-    } else if (entry.isFile() && entry.name.endsWith(".ttl")) {
-      out.push({
-        path: storeVisiblePath(label, base, full),
-        content: escapeChannelDottedRefs(readFileSync(full, "utf-8")),
-      });
-    }
+  for (const full of walkFiles(dir, ".ttl")) {
+    out.push({
+      path: storeVisiblePath(label, base, full),
+      content: escapeChannelDottedRefs(readFileSync(full, "utf-8")),
+    });
   }
 };
 
