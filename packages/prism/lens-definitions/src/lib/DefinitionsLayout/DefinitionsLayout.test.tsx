@@ -8,7 +8,7 @@ import { useLensFilter } from "../LensFilterProvider/index.js";
 /** A routed page that prints the namespaces the shared filter allows. */
 const FilterProbe = () => {
   const { filter } = useLensFilter();
-  return <output>{filter.namespaces.join(",") || "untouched"}</output>;
+  return <output>{filter.namespaces?.join(",") ?? "untouched"}</output>;
 };
 
 describe("DefinitionsLayout", () => {
@@ -81,6 +81,32 @@ describe("DefinitionsLayout", () => {
     expect(screen.getByRole("status")).toHaveTextContent("untouched");
     fireEvent.click(screen.getByRole("button", { name: "anatomy" }));
     expect(screen.getByRole("status")).toHaveTextContent("surface,ds,cs");
+  });
+
+  it("turns every ontology off when the reader presses the last lit chip", () => {
+    render(
+      createDefinitionsLayout({
+        url: "/definitions",
+        records: definitionsExplorerRecords,
+        fetchFn: createFetchSpy(),
+        rail: null,
+        children: <FilterProbe />,
+      }),
+    );
+    const chips = within(
+      screen.getByRole("group", { name: "Filter by ontology" }),
+    ).getAllByRole("button");
+    expect(chips.length).toBeGreaterThan(1);
+
+    for (const chip of chips) fireEvent.click(chip);
+
+    // Every chip reads off, and the shared filter holds an EMPTY allow-list
+    // rather than falling back to "untouched", so nothing is shown.
+    expect(chips.map((chip) => chip.getAttribute("aria-pressed"))).toEqual(
+      chips.map(() => "false"),
+    );
+    expect(screen.getByRole("status").textContent).toBe("");
+    expect(screen.getByRole("figure").textContent).toContain("0 of 60");
   });
 
   it("merges the site's class names after its own on its root", () => {

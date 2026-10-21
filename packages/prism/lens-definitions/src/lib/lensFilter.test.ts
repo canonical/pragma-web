@@ -14,6 +14,7 @@ import {
   matchesChips,
   matchesText,
   normalizeFilterText,
+  resolveFilter,
   toggleIn,
 } from "./lensFilter.js";
 
@@ -92,6 +93,42 @@ describe("matchesChips — text never reaches the graph", () => {
     } as const;
     expect(matchesChips(nothingLit, true, "ds")).toBe(false);
     expect(matchesChips(nothingLit, false, "ds")).toBe(false);
+  });
+});
+
+describe("resolveFilter", () => {
+  const prefixes = ["ds", "cs"] as const;
+
+  it("lights every ontology on an untouched filter, with the caller's own array", () => {
+    // The well's memo compares `namespaces` by reference, so the resolved
+    // allow-list must BE the caller's array, never a copy of it.
+    expect(resolveFilter(DEFAULT_LENS_FILTER, prefixes).namespaces).toBe(
+      prefixes,
+    );
+  });
+
+  it("keeps a pressed allow-list as the reader left it, by reference", () => {
+    const pressed = ["cs"] as const;
+    const filter = { ...DEFAULT_LENS_FILTER, namespaces: pressed };
+    expect(resolveFilter(filter, prefixes).namespaces).toBe(pressed);
+  });
+
+  it("keeps an EMPTY allow-list empty: every ontology turned off", () => {
+    const filter = { ...DEFAULT_LENS_FILTER, namespaces: [] };
+    expect(resolveFilter(filter, prefixes).namespaces).toEqual([]);
+  });
+
+  it("carries the other axes through untouched", () => {
+    const filter = {
+      ...DEFAULT_LENS_FILTER,
+      text: "block",
+      abstractions: ["concrete"] as const,
+    };
+    expect(resolveFilter(filter, prefixes)).toEqual({
+      text: "block",
+      abstractions: ["concrete"],
+      namespaces: prefixes,
+    });
   });
 });
 
