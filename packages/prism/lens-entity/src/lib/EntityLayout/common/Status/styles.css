@@ -1,0 +1,20 @@
+/*
+ * Status — the entity lens's strip figure on the index. It lives inside the
+ * strip band, whose height is stationary frame, so nothing here may change
+ * it. The design system has no semantic token for its type size, so that
+ * component token holds the lens's own value.
+ */
+
+@layer ds.prism {
+  :root {
+    --entity-status-font-size: 0.75rem;
+    --entity-status-color: var(--color-text-muted);
+  }
+
+  .ds.entity-status {
+    color: var(--entity-status-color);
+    font-size: var(--entity-status-font-size);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}
