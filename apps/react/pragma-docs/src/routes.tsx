@@ -29,8 +29,9 @@ const notFoundRoute = route({
 /**
  * Each lens renders its routes inside its own layout: the routes of one
  * group share a wrapper, and the wrapper renders the rail, the lens's strip,
- * the colophon and any provider the strip and the page share. The provider
- * nest above every layout is mounted by the client and server entries.
+ * the colophon and any provider the strip and the page share. Above every
+ * layout sits `Shell`, the provider nest the client and server entries
+ * mount.
  *
  * `/guides/:slug` lives in the marketing domain but renders under the
  * Guides layout, beside the guides index it belongs to.

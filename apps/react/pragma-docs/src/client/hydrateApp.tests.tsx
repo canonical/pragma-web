@@ -9,16 +9,14 @@
  * controls prove both spies can fail.
  */
 
-import { HeadProvider } from "@canonical/react-head";
-import { Outlet, RouterProvider } from "@canonical/router-react";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createStaticRouter } from "#lib/router";
+import { Shell } from "#lib/Shell";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
@@ -26,7 +24,6 @@ import componentEntityRecordsButton from "../domains/components/__fixtures__/com
 // React Flow needs when the well MOUNTS (ResizeObserver/DOMMatrix —
 // side-effect import, no test behaviour of its own).
 import definitionsExplorerRecords from "../domains/lenses/definitions/__fixtures__/definitionsExplorerRecords.js";
-import formatDocumentTitle from "../formatDocumentTitle.js";
 import "../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import type { InitialData } from "#server";
@@ -167,23 +164,13 @@ const renderSeededServerHtml = (
   records: RecordMap = componentProbeRecords,
 ): string =>
   renderToString(
-    <HeadProvider titleTemplate={formatDocumentTitle}>
-      <RelayEnvironmentProvider
-        environment={createEnvironment({
-          records,
-          fetchFn,
-        })}
-      >
-        <RouterProvider
-          router={createStaticRouter(appRoutes, url, {
-            middleware: [...middleware],
-            notFound: notFoundRoute,
-          })}
-        >
-          <Outlet fallback={<p>Loading…</p>} />
-        </RouterProvider>
-      </RelayEnvironmentProvider>
-    </HeadProvider>,
+    <Shell
+      environment={createEnvironment({ records, fetchFn })}
+      router={createStaticRouter(appRoutes, url, {
+        middleware: [...middleware],
+        notFound: notFoundRoute,
+      })}
+    />,
   );
 
 type TestWindow = Window & { __INITIAL_DATA__?: InitialData };

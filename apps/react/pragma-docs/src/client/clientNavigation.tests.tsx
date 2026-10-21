@@ -24,21 +24,18 @@
  * ownership (AV-340)". Do not read this file as that guard.
  */
 
-import { HeadProvider } from "@canonical/react-head";
-import { Outlet, RouterProvider } from "@canonical/router-react";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createStaticRouter } from "#lib/router";
+import { Shell } from "#lib/Shell";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import type { InitialData } from "#server";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
-import formatDocumentTitle from "../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
 import { hydrateApp } from "./hydrateApp.js";
 
@@ -84,20 +81,13 @@ const renderSeededServerHtml = (
   records: RecordMap,
 ): string =>
   renderToString(
-    <HeadProvider titleTemplate={formatDocumentTitle}>
-      <RelayEnvironmentProvider
-        environment={createEnvironment({ records, fetchFn })}
-      >
-        <RouterProvider
-          router={createStaticRouter(appRoutes, url, {
-            middleware: [...middleware],
-            notFound: notFoundRoute,
-          })}
-        >
-          <Outlet fallback={<p>Loading…</p>} />
-        </RouterProvider>
-      </RelayEnvironmentProvider>
-    </HeadProvider>,
+    <Shell
+      environment={createEnvironment({ records, fetchFn })}
+      router={createStaticRouter(appRoutes, url, {
+        middleware: [...middleware],
+        notFound: notFoundRoute,
+      })}
+    />,
   );
 
 type TestWindow = Window & { __INITIAL_DATA__?: InitialData };
