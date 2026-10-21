@@ -3,7 +3,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createEntitySite from "../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
-import createMetroFetch from "../../../testing/createMetroFetch.js";
+import createRecordedFetch from "../../../testing/createRecordedFetch.js";
 import createWarmEnvironment from "../../../testing/createWarmEnvironment.js";
 import {
   ENTITY_TEST_TIMEOUT_MS,
@@ -196,7 +196,7 @@ describe("EntityLayout", () => {
     render(
       createEntitySite({
         url: "/stations",
-        environment: createEnvironment({ fetchFn: createMetroFetch() }),
+        environment: createEnvironment({ fetchFn: createRecordedFetch() }),
         layout: {
           ...STATIONS_LAYOUT,
           binding: { ...STATIONS_BINDING, classUri: "metro:Nowhere" },

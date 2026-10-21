@@ -71,7 +71,6 @@
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
     "@canonical/prism-contract": "^0.44.1",
-    "@canonical/prism-graph-example": "^0.44.1",
     "@canonical/typescript-config-react": "^0.44.1",
     "@canonical/vitest-config-react": "^0.44.1",
     "@testing-library/jest-dom": "^7.0.0",

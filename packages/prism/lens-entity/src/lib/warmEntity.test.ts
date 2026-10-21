@@ -4,7 +4,7 @@ import {
 } from "@canonical/prism-core";
 import { afterEach, describe, expect, it } from "vitest";
 import createFetchSpy from "../../testing/createFetchSpy.js";
-import createMetroFetch from "../../testing/createMetroFetch.js";
+import createRecordedFetch from "../../testing/createRecordedFetch.js";
 import {
   NORTHGATE_CURIE,
   NORTHGATE_IRI,
@@ -43,7 +43,7 @@ describe("warmEntity", () => {
   });
 
   it("runs both steps against the environment it read when called", async () => {
-    const fetchFn = createMetroFetch();
+    const fetchFn = createRecordedFetch();
     const environment = createEnvironment({ fetchFn });
 
     await warmLikeTheServer(environment, { uri: NORTHGATE_CURIE });
@@ -61,7 +61,7 @@ describe("warmEntity", () => {
   });
 
   it("makes no request when the store already holds both operations", async () => {
-    const fetchFn = createMetroFetch();
+    const fetchFn = createRecordedFetch();
     const environment = createEnvironment({ fetchFn });
     await warmLikeTheServer(environment, { uri: NORTHGATE_CURIE });
     fetchFn.mockClear();
@@ -72,7 +72,7 @@ describe("warmEntity", () => {
   });
 
   it("sends an absolute IRI through unchanged", async () => {
-    const fetchFn = createMetroFetch();
+    const fetchFn = createRecordedFetch();
     await warmLikeTheServer(createEnvironment({ fetchFn }), {
       uri: NORTHGATE_IRI,
     });

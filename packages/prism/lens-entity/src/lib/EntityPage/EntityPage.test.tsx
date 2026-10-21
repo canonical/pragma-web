@@ -4,7 +4,7 @@ import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
 import createEntitySite from "../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
-import createMetroFetch from "../../../testing/createMetroFetch.js";
+import createRecordedFetch from "../../../testing/createRecordedFetch.js";
 import createWarmEnvironment from "../../../testing/createWarmEnvironment.js";
 import {
   CENTRAL_EXCHANGE_CURIE,
@@ -142,7 +142,7 @@ describe("EntityPage", () => {
     render(
       createEntitySite({
         url: stationUrl(COASTAL_ZONE_CURIE),
-        environment: createEnvironment({ fetchFn: createMetroFetch() }),
+        environment: createEnvironment({ fetchFn: createRecordedFetch() }),
         children: (
           <EntityPage
             binding={{ id: "zones", classUri: "geo:Zone", typename: "Zone" }}
