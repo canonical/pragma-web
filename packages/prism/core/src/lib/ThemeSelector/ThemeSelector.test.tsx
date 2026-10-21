@@ -54,4 +54,17 @@ describe("ThemeSelector", () => {
     expect(document.cookie).not.toContain("theme=dark");
     expect(getSelect().value).toBe("system");
   });
+
+  it("passes native props through and merges a consumer className after its own", () => {
+    render(<ThemeSelector className="is-compact" data-testid="theme" id="t" />);
+    const select = getSelect();
+    expect(select.id).toBe("t");
+    expect(select.dataset.testid).toBe("theme");
+    expect(select.className).toBe("ds theme-selector is-compact");
+  });
+
+  it("takes a consumer aria-label in place of its default name", () => {
+    render(<ThemeSelector aria-label="Theme" />);
+    expect(screen.getByRole("combobox", { name: "Theme" })).toBeInTheDocument();
+  });
 });

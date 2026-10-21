@@ -76,7 +76,8 @@ lens's shortcut key itself. Its `children` render at its foot as the site's
 utility cluster, styled from a class contract: a `p.utilities-label`
 heading, a `ul.utilities` labelled by it, `a.item.util`
 links (icon plus `span.label`) and an `li.theme` for a control
-such as `ThemeSelector`.
+such as `ThemeSelector`, whose `.ds.theme-selector` root shrinks with the
+collapsed rail.
 
 ### Stylesheets
 
@@ -242,7 +243,8 @@ binding can derive names from it. Check the bindings in two places:
   `ModeStrip`, `Rail`, `ThemeSelector`; types `ChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
-  `LensBreadcrumbsProps`, `ModeStripProps`, `RailProps`, `RailBrand`.
+  `LensBreadcrumbsProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
+  `ThemeSelectorProps`.
 - Well geometry: `settle`, `edgeEndpoint`, `relaxBoxes`, `quadArc`,
   `selfLoop`; types `WellBox`, `RelaxOptions`, `QuadArc`.
 

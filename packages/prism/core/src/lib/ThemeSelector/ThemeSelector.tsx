@@ -1,5 +1,8 @@
 import { usePreferredTheme } from "@canonical/react-hooks";
 import type { ChangeEvent, ReactElement } from "react";
+import type { ThemeSelectorProps } from "./types.js";
+
+const componentCssClassName = "ds theme-selector";
 
 /**
  * The colour-theme control: a select offering the system theme, light and
@@ -8,11 +11,18 @@ import type { ChangeEvent, ReactElement } from "react";
  *
  * Choosing "System" clears the stored preference; choosing "Light" or "Dark"
  * stores it. The select shows "System" while no preference is stored, and
- * the stored theme otherwise.
+ * the stored theme otherwise. Native `<select>` props pass through to the
+ * root, a consumer `className` merges after the component's own, and an
+ * `aria-label` (or an `aria-labelledby`, which takes precedence) replaces
+ * the default accessible name.
  *
  * `import { ThemeSelector } from "@canonical/prism-core";`
  */
-export default function ThemeSelector(): ReactElement {
+export default function ThemeSelector({
+  "aria-label": ariaLabel = "Color theme",
+  className,
+  ...props
+}: ThemeSelectorProps): ReactElement {
   const { value, source, set, reset } = usePreferredTheme();
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -29,7 +39,9 @@ export default function ThemeSelector(): ReactElement {
 
   return (
     <select
-      aria-label="Color theme"
+      {...props}
+      aria-label={ariaLabel}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       onChange={handleChange}
       value={selectValue}
     >

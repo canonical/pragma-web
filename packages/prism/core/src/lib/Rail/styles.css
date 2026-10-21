@@ -195,7 +195,7 @@
 
     /* The theme select has no icon form; it shrinks with the rail instead
      * of hiding — a truncated but operable control beats an invisible one. */
-    .ds.rail .theme select {
+    .ds.rail .theme .ds.theme-selector {
       inline-size: 100%;
     }
   }
