@@ -491,6 +491,10 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(
       mustGet(STANDARD_READING_URL).canvas.match(/class="ds node-chip"/g),
     ).toHaveLength(2);
+    // …and a chip of a standard links to that standard's reading page.
+    expect(mustGet(STANDARD_READING_URL).canvas).toContain(
+      `href="/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#react.component.props")}"`,
+    );
     // The journeys canvases render REAL content from the fixture records:
     // the index carries the PRIMARY-SURFACE table (AV-351). The table and
     // the graph are ONE reading at a time (RULING 1), with the TABLE as the

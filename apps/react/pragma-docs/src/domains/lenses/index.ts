@@ -4,7 +4,7 @@
 // colophon to their layouts and the site's standards class to the Standards
 // lens's routes.
 
-export { STANDARDS_BINDING } from "./constants.js";
+export { CODE_STANDARDS_NAMESPACE, STANDARDS_BINDING } from "./constants.js";
 export { default as definitionsLayout } from "./definitionsLayout.js";
 export { default as LensPlaceholder } from "./LensPlaceholder.js";
 export { default as guidesLayout } from "./layout.js";

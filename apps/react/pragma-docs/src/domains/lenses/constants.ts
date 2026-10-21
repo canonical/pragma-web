@@ -15,3 +15,12 @@ import type { StandardsBinding } from "@canonical/prism-lens-standards";
 export const STANDARDS_BINDING = {
   classUri: "cs:CodeStandard",
 } as const satisfies StandardsBinding;
+
+/**
+ * The namespace the `cs:` prefix names. A mention of a standard hands its
+ * home the compact address, and the Standards lens addresses a reading page
+ * by the absolute IRI, the one form `node(id:)` accepts, so the site's home
+ * for a standard expands the prefix with it.
+ */
+export const CODE_STANDARDS_NAMESPACE =
+  "http://pragma.canonical.com/codestandards#";

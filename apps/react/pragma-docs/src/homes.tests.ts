@@ -28,8 +28,18 @@ describe("homes", () => {
     );
   });
 
+  it("houses a code standard on its reading page, by its absolute IRI", () => {
+    expect(resolveHome("CodeStandard", "cs:code.array.safe_access")).toBe(
+      "/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23code.array.safe_access",
+    );
+  });
+
   it("houses no other type", () => {
-    expect(Object.keys(homes).sort()).toEqual(["Component", "OntologyClass"]);
+    expect(Object.keys(homes).sort()).toEqual([
+      "CodeStandard",
+      "Component",
+      "OntologyClass",
+    ]);
     expect(resolveHome("Pattern", "ds:global.pattern.card")).toBeUndefined();
   });
 });
