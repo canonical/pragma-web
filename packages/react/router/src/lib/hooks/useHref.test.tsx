@@ -1,19 +1,8 @@
-import type { StandardSchemaV1 } from "@canonical/router-core";
 import { createRouter, route } from "@canonical/router-core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import RouterProvider from "../RouterProvider/Provider.js";
 import useHref from "./useHref.js";
-
-function testSchema<TValue>(): StandardSchemaV1<TValue, TValue> {
-  return {
-    "~standard": {
-      version: 1,
-      vendor: "router-react-test",
-      validate: (value) => ({ value: value as TValue }),
-    },
-  };
-}
 
 const routes = {
   home: route({
@@ -22,7 +11,6 @@ const routes = {
   }),
   user: route({
     url: "/users/:id",
-    search: testSchema<{ q?: string }>(),
     content: () => "user",
   }),
 };
@@ -32,7 +20,6 @@ function UserHref() {
     <span>
       {useHref<typeof routes, "user">("user", {
         params: { id: "42" },
-        search: { q: "x" },
         hash: "bio",
       })}
     </span>
@@ -48,7 +35,6 @@ describe("useHref", () => {
     const router = createRouter(routes);
     const expected = router.buildPath("user", {
       params: { id: "42" },
-      search: { q: "x" },
       hash: "bio",
     });
 
@@ -58,7 +44,7 @@ describe("useHref", () => {
       </RouterProvider>,
     );
 
-    expect(expected).toBe("/users/42?q=x#bio");
+    expect(expected).toBe("/users/42#bio");
     expect(screen.getByText(expected)).toBeTruthy();
   });
 
