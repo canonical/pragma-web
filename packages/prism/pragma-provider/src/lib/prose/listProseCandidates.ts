@@ -11,7 +11,8 @@ import type { ProseCandidate } from "./types.js";
  * A sidecar sits beside the Turtle that declares its entity, so the prefixes
  * declared in that directory are the namespaces its name can be in. A
  * sidecar in a directory with no Turtle has no candidate. Nothing here asks
- * the graph which candidates exist.
+ * the graph which candidates exist. Each directory's Turtle is harvested
+ * once, however many sidecars sit in it.
  *
  * @param sidecars - The collected sidecars.
  * @param sources - The collected Turtle sources.
@@ -20,9 +21,11 @@ import type { ProseCandidate } from "./types.js";
 export const listProseCandidates = (
   sidecars: readonly ProseSidecar[],
   sources: readonly TtlSource[],
-): ProseCandidate[] =>
-  sidecars.flatMap((sidecar) => {
-    const directory = posix.dirname(sidecar.path);
+): ProseCandidate[] => {
+  const namespacesByDirectory = new Map<string, ReadonlySet<string>>();
+  const readNamespaces = (directory: string): ReadonlySet<string> => {
+    const harvested = namespacesByDirectory.get(directory);
+    if (harvested) return harvested;
     const namespaces = new Set(
       Object.values(
         harvestPrefixes(
@@ -30,6 +33,11 @@ export const listProseCandidates = (
         ),
       ),
     );
+    namespacesByDirectory.set(directory, namespaces);
+    return namespaces;
+  };
+  return sidecars.flatMap((sidecar) => {
+    const namespaces = readNamespaces(posix.dirname(sidecar.path));
     return readSidecarName(posix.basename(sidecar.path)).flatMap((reading) =>
       [...namespaces].map((namespace) => ({
         iri: `${namespace}${reading.localName}`,
@@ -39,3 +47,4 @@ export const listProseCandidates = (
       })),
     );
   });
+};
