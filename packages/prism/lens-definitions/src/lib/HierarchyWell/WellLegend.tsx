@@ -1,4 +1,5 @@
 import type React from "react";
+import { useMessages } from "../i18n/index.js";
 import { ABSTRACTION_VALUES } from "../lensFilter.js";
 
 /**
@@ -15,42 +16,43 @@ import { ABSTRACTION_VALUES } from "../lensFilter.js";
  * Static content means no client state, so it server-renders with the rest
  * of the well and takes no part in the hydration argument.
  */
-const WellLegend = (): React.ReactElement => (
-  <dl
-    aria-label="Graph legend"
-    className="hierarchy-furniture hierarchy-legend"
-  >
-    {ABSTRACTION_VALUES.map((value) => (
-      <div className="hierarchy-legend-row" key={value}>
+const WellLegend = (): React.ReactElement => {
+  const t = useMessages();
+  return (
+    <dl
+      aria-label={t("legend.label")}
+      className="hierarchy-furniture hierarchy-legend"
+    >
+      {ABSTRACTION_VALUES.map((value) => (
+        <div className="hierarchy-legend-row" key={value}>
+          <dt>
+            <span
+              aria-hidden="true"
+              className={`hierarchy-legend-swatch hierarchy-legend-swatch-${value}`}
+            />
+          </dt>
+          <dd>
+            {t(value === "abstract" ? "legend.abstract" : "legend.concrete")}
+          </dd>
+        </div>
+      ))}
+      <div className="hierarchy-legend-row">
+        <dt>
+          <span aria-hidden="true" className="hierarchy-legend-edge" />
+        </dt>
+        <dd>{t("legend.superclass")}</dd>
+      </div>
+      <div className="hierarchy-legend-row">
         <dt>
           <span
             aria-hidden="true"
-            className={`hierarchy-legend-swatch hierarchy-legend-swatch-${value}`}
+            className="hierarchy-legend-edge hierarchy-legend-edge-relation"
           />
         </dt>
-        <dd>
-          {value === "abstract"
-            ? "abstract class — not instantiated directly"
-            : "concrete class"}
-        </dd>
+        <dd>{t("legend.relation")}</dd>
       </div>
-    ))}
-    <div className="hierarchy-legend-row">
-      <dt>
-        <span aria-hidden="true" className="hierarchy-legend-edge" />
-      </dt>
-      <dd>points to its superclass</dd>
-    </div>
-    <div className="hierarchy-legend-row">
-      <dt>
-        <span
-          aria-hidden="true"
-          className="hierarchy-legend-edge hierarchy-legend-edge-relation"
-        />
-      </dt>
-      <dd>relation — hover a class to see its named arcs</dd>
-    </div>
-  </dl>
-);
+    </dl>
+  );
+};
 
 export default WellLegend;

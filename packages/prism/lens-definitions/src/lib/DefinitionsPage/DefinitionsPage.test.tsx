@@ -9,7 +9,10 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createDefinitionsPage from "../../../testing/createDefinitionsPage.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
-import { DEFINITIONS_TEST_TIMEOUT_MS } from "../../../testing/fixtures.js";
+import {
+  DEFINITIONS_TEST_TIMEOUT_MS,
+  UIBLOCK_TERM,
+} from "../../../testing/fixtures.js";
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
 
 describe("DefinitionsPage at /definitions (no term)", () => {
@@ -47,5 +50,32 @@ describe("DefinitionsPage at /definitions (no term)", () => {
       screen.getByRole("heading", { level: 1, name: "Definitions" }),
     ).toBeInTheDocument();
     expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("DefinitionsPage's document title", () => {
+  it("names the lens on the explorer and the term on a term view", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    const explorer = render(
+      createDefinitionsPage(
+        undefined,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    expect(document.querySelector("title")?.textContent).toBe("Definitions");
+    explorer.unmount();
+
+    render(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    expect(document.querySelector("title")?.textContent).toBe(
+      "ds:UIBlock — Definitions",
+    );
   });
 });

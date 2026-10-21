@@ -8,6 +8,7 @@ import hierarchyWellFragmentNode from "../../__generated__/HierarchyWell_ontolog
 import { definitionsExplorerVariables } from "../definitionsQuery.js";
 import { classDepthsByUri } from "../HierarchyWell/buildClassGraph.js";
 import { HierarchyWell } from "../HierarchyWell/index.js";
+import { useMessages } from "../i18n/index.js";
 import { normalizeFilterText, resolveFilter } from "../lensFilter.js";
 import { useLensFilter } from "../lensFilterContext.js";
 import { TermInspector } from "../TermInspector/index.js";
@@ -106,6 +107,7 @@ const DefinitionsExplorer = ({
   className,
   term,
 }: DefinitionsExplorerProps): React.ReactElement => {
+  const t = useMessages();
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
     definitionsExplorerQueryNode,
     definitionsExplorerVariables(term),
@@ -184,14 +186,14 @@ const DefinitionsExplorer = ({
             server's. */}
         <p className="definitions-explorer-search">
           <label>
-            Filter terms
+            {t("explorer.search.label")}
             <input
               onChange={(event) => {
                 const raw = event.target.value;
                 setSearchText(raw);
                 setFilter({ ...filter, text: normalizeFilterText(raw) });
               }}
-              placeholder="Search terms…"
+              placeholder={t("explorer.search.placeholder")}
               type="search"
               value={searchText}
             />

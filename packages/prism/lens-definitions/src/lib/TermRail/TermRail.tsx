@@ -3,6 +3,7 @@ import type React from "react";
 import { graphql, useFragment } from "react-relay";
 import type { TermRail_ontologies$key } from "../../__generated__/TermRail_ontologies.graphql.js";
 import termRailFragmentNode from "../../__generated__/TermRail_ontologies.graphql.js";
+import { useMessages } from "../i18n/index.js";
 import { matchesChips, matchesText } from "../lensFilter.js";
 import { toPrefixedUri } from "../uris.js";
 import type { TermRailProps } from "./types.js";
@@ -129,6 +130,7 @@ const TermRail = ({
   hoverCentre,
   onHoverTerm,
 }: TermRailProps): React.ReactElement => {
+  const t = useMessages();
   const data = useFragment<TermRail_ontologies$key>(
     termRailFragmentNode,
     ontologies,
@@ -158,7 +160,7 @@ const TermRail = ({
 
   return (
     <nav
-      aria-label="Ontology terms"
+      aria-label={t("rail.label")}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-rail"
     >
@@ -199,9 +201,12 @@ const TermRail = ({
           <section aria-labelledby={headingId} key={ontology.prefix}>
             <h2 id={headingId}>{ontology.label ?? ontology.prefix}</h2>
             <h3>
-              Classes
+              {t("rail.classes")}
               <span className="term-rail-count">
-                {classMatches} of {classes.length}
+                {t("rail.count", {
+                  matches: classMatches,
+                  total: classes.length,
+                })}
               </span>
             </h3>
             <ul>
@@ -226,7 +231,7 @@ const TermRail = ({
                     {termLabel(term.label, prefixed)}
                   </Link>
                   {term.isAbstract ? (
-                    <span className="term-rail-note">abstract</span>
+                    <span className="term-rail-note">{t("rail.abstract")}</span>
                   ) : null}
                   {term.instanceCount > 0 ? (
                     <span className="term-rail-note">{term.instanceCount}</span>
@@ -235,9 +240,12 @@ const TermRail = ({
               ))}
             </ul>
             <h3>
-              Properties
+              {t("rail.properties")}
               <span className="term-rail-count">
-                {propertyMatches} of {properties.length}
+                {t("rail.count", {
+                  matches: propertyMatches,
+                  total: properties.length,
+                })}
               </span>
             </h3>
             <ul>

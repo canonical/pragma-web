@@ -1,4 +1,5 @@
 import type React from "react";
+import { type MessageKey, useMessages } from "../i18n/index.js";
 import {
   ABSTRACTION_VALUES,
   type Abstraction,
@@ -9,19 +10,22 @@ import "./styles.css";
 
 const componentCssClassName = "ds explorer-controls";
 
-/** What each abstraction chip says, and what it means. The copy names the
- * axis for what it IS — a fact about the class — never dressing it up as
- * maturity, which this ontology does not record. */
+/** The catalog keys of what each abstraction chip says, and what it means.
+ * The copy names the axis for what it IS — a fact about the class — never
+ * dressing it up as maturity, which this ontology does not record. */
 const ABSTRACTION_COPY: {
-  readonly [K in Abstraction]: { label: string; hint: string };
+  readonly [K in Abstraction]: {
+    readonly label: MessageKey;
+    readonly hint: MessageKey;
+  };
 } = {
   abstract: {
-    label: "Abstract",
-    hint: "Classes that are never instantiated directly",
+    label: "controls.abstraction.abstract.label",
+    hint: "controls.abstraction.abstract.hint",
   },
   concrete: {
-    label: "Concrete",
-    hint: "Classes with instances of their own",
+    label: "controls.abstraction.concrete.label",
+    hint: "controls.abstraction.concrete.hint",
   },
 };
 
@@ -48,6 +52,7 @@ const ExplorerControls = ({
   namespaceLabels,
   onFilterChange,
 }: ExplorerControlsProps): React.ReactElement => {
+  const t = useMessages();
   const prefixes = namespaceLabels.map(({ prefix }) => prefix);
 
   return (
@@ -55,7 +60,10 @@ const ExplorerControls = ({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-controls"
     >
-      <fieldset aria-label="Filter by abstraction" className="chip-group">
+      <fieldset
+        aria-label={t("controls.abstraction.label")}
+        className="chip-group"
+      >
         {ABSTRACTION_VALUES.map((value) => {
           const on = filter.abstractions.includes(value);
           return (
@@ -73,16 +81,19 @@ const ExplorerControls = ({
                   ),
                 });
               }}
-              title={ABSTRACTION_COPY[value].hint}
+              title={t(ABSTRACTION_COPY[value].hint)}
               type="button"
             >
               <span aria-hidden="true" className="explorer-chip-swatch" />
-              {ABSTRACTION_COPY[value].label}
+              {t(ABSTRACTION_COPY[value].label)}
             </button>
           );
         })}
       </fieldset>
-      <fieldset aria-label="Filter by ontology" className="chip-group">
+      <fieldset
+        aria-label={t("controls.ontology.label")}
+        className="chip-group"
+      >
         {namespaceLabels.map(({ prefix, label }) => {
           const on = filter.namespaces.includes(prefix);
           return (
@@ -96,7 +107,7 @@ const ExplorerControls = ({
                   namespaces: toggleIn(filter.namespaces, prefixes, prefix),
                 });
               }}
-              title={`Terms from the ${label} ontology`}
+              title={t("controls.ontology.hint", { label })}
               type="button"
             >
               <span aria-hidden="true" className="explorer-chip-swatch" />

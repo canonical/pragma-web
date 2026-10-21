@@ -1,5 +1,6 @@
 import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
+import { useMessages } from "../i18n/index.js";
 import { LensFilterProvider } from "../lensFilterContext.js";
 import { definitionsStripSlots } from "../stripSlots.js";
 import type { DefinitionsLayoutProps } from "./types.js";
@@ -35,6 +36,7 @@ export default function DefinitionsLayout({
   rail,
   ...props
 }: DefinitionsLayoutProps): ReactElement {
+  const t = useMessages();
   return (
     <LensFilterProvider>
       <div
@@ -45,7 +47,7 @@ export default function DefinitionsLayout({
         {rail}
         <div className="viewport">
           <ModeStrip
-            context={<Context lensLabel="Definitions" />}
+            context={<Context lensLabel={t("lens.label")} />}
             controls={<Controls />}
             status={<Status />}
           />

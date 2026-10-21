@@ -2,6 +2,7 @@ import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
 import { DefinitionsIcon } from "./DefinitionsIcon/index.js";
 import { DefinitionsPage } from "./DefinitionsPage/index.js";
+import { MESSAGES } from "./i18n/index.js";
 import warmDefinitions from "./warmDefinitions.js";
 
 /**
@@ -33,8 +34,10 @@ export const definitionsRoutes = {
     warm: warmDefinitions,
     meta: {
       ...routeShortcutFacet.of("3"),
+      // Route meta is built at module scope, where no hook can run, so the
+      // label reads the catalog constant rather than the translator.
       ...routeLensFacet.of({
-        label: "Definitions",
+        label: MESSAGES["lens.label"],
         icon: DefinitionsIcon,
         order: 3,
         tier: 1,

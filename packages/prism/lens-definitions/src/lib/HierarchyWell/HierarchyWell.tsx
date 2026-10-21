@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { graphql, useFragment } from "react-relay";
 import type { HierarchyWell_ontologies$key } from "../../__generated__/HierarchyWell_ontologies.graphql.js";
 import hierarchyWellFragmentNode from "../../__generated__/HierarchyWell_ontologies.graphql.js";
+import { useMessages } from "../i18n/index.js";
 import { buildClassGraph } from "./buildClassGraph.js";
 import { decorateForView } from "./decorateGraph.js";
 import type { HierarchyWellProps, TermFlowNode } from "./types.js";
@@ -71,37 +72,40 @@ const CAMERA_MARGIN = 24;
  * ESTIMATED from the label (no text measurement exists on the server), so
  * a long class name ellipsises and the tooltip keeps it recoverable.
  */
-const TermNode = ({ node }: { node: TermFlowNode }): React.ReactElement => (
-  <div
-    className={["hierarchy-node-shell", node.className]
-      .filter(Boolean)
-      .join(" ")}
-    data-id={node.id}
-    style={{
-      insetInlineStart: node.x - node.width / 2,
-      insetBlockStart: node.y - node.height / 2,
-      inlineSize: node.width,
-      blockSize: node.height,
-    }}
-  >
-    <Link
-      className={[
-        "hierarchy-node",
-        node.data.isAbstract ? "hierarchy-node-abstract" : "",
-      ]
+const TermNode = ({ node }: { node: TermFlowNode }): React.ReactElement => {
+  const t = useMessages();
+  return (
+    <div
+      className={["hierarchy-node-shell", node.className]
         .filter(Boolean)
         .join(" ")}
-      params={{ term: node.data.term }}
-      title={node.data.label}
-      to="definitionsTerm"
+      data-id={node.id}
+      style={{
+        insetInlineStart: node.x - node.width / 2,
+        insetBlockStart: node.y - node.height / 2,
+        inlineSize: node.width,
+        blockSize: node.height,
+      }}
     >
-      {node.data.label}
-    </Link>
-    {node.data.isAbstract ? (
-      <span className="hierarchy-node-tag">abstract</span>
-    ) : null}
-  </div>
-);
+      <Link
+        className={[
+          "hierarchy-node",
+          node.data.isAbstract ? "hierarchy-node-abstract" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        params={{ term: node.data.term }}
+        title={node.data.label}
+        to="definitionsTerm"
+      >
+        {node.data.label}
+      </Link>
+      {node.data.isAbstract ? (
+        <span className="hierarchy-node-tag">{t("well.abstract")}</span>
+      ) : null}
+    </div>
+  );
+};
 
 /**
  * The explorer's centre panel: the class graph in an underground well (the
@@ -145,6 +149,7 @@ const HierarchyWell = ({
   hoverCentre,
   onHoverTerm,
 }: HierarchyWellProps): React.ReactElement => {
+  const t = useMessages();
   const data = useFragment<HierarchyWell_ontologies$key>(
     hierarchyWellFragmentNode,
     ontologies,
@@ -232,7 +237,7 @@ const HierarchyWell = ({
           info. */}
       {/* biome-ignore lint/a11y/useSemanticElements: no native element carries role="group" for a diagram canvas; see the note above. */}
       <div
-        aria-label="Class hierarchy"
+        aria-label={t("well.label")}
         className="hierarchy-canvas"
         onBlur={() => onHoverTerm(undefined)}
         onFocus={(event) => onHoverTerm(readTermFromEvent(event.target))}
@@ -342,9 +347,7 @@ const HierarchyWell = ({
       </div>
       {/* Canvas-local furniture: static, so it costs the hydration
           argument nothing. */}
-      <p className="hierarchy-furniture hierarchy-hint">
-        Drag to pan · scroll to zoom · select a class to inspect it
-      </p>
+      <p className="hierarchy-furniture hierarchy-hint">{t("well.hint")}</p>
       <WellLegend />
     </div>
   );

@@ -1,4 +1,5 @@
 import type React from "react";
+import { useMessages } from "../i18n/index.js";
 import type { ExplorerStatusProps } from "./types.js";
 import "./styles.css";
 
@@ -27,6 +28,7 @@ const ExplorerStatus = ({
   total,
   abstract,
 }: ExplorerStatusProps): React.ReactElement => {
+  const t = useMessages();
   // Guard the degenerate graph so the bar never computes NaN.
   const share = total === 0 ? 0 : Math.round((visible / total) * 100);
 
@@ -49,8 +51,8 @@ const ExplorerStatus = ({
         <span className="explorer-status-fill" />
       </div>
       <figcaption>
-        {visible} of {total} classes
-        {abstract > 0 ? ` · ${abstract} abstract` : ""}
+        {t("status.classes", { visible, count: total })}
+        {abstract > 0 ? t("status.abstract", { abstract }) : ""}
       </figcaption>
     </figure>
   );

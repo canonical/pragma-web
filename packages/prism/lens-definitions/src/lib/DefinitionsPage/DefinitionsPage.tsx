@@ -4,6 +4,7 @@ import type React from "react";
 import { Suspense } from "react";
 import { DefinitionsExplorer } from "../DefinitionsExplorer/index.js";
 import { readTermParam } from "../definitionsQuery.js";
+import { useMessages } from "../i18n/index.js";
 import type { DefinitionsPageProps } from "./types.js";
 import "./styles.css";
 
@@ -25,6 +26,7 @@ const DefinitionsPage = ({
   className,
   params,
 }: DefinitionsPageProps): React.ReactElement => {
+  const t = useMessages();
   const term = readTermParam(params ?? {});
 
   return (
@@ -33,17 +35,13 @@ const DefinitionsPage = ({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-view="definitions"
     >
-      <Head title={term ? `${term} — Definitions` : "Definitions"} />
-      <h1 id="lens-definitions-title">Definitions</h1>
+      <Head title={term ? t("page.title.term", { term }) : t("lens.label")} />
+      <h1 id="lens-definitions-title">{t("lens.label")}</h1>
       <ErrorBoundary
-        fallback={
-          <p role="alert">
-            The graph query failed. Is the dev backend up? Reload to retry.
-          </p>
-        }
+        fallback={<p role="alert">{t("page.error")}</p>}
         resetKey={term}
       >
-        <Suspense fallback={<p>Loading the ontologies…</p>}>
+        <Suspense fallback={<p>{t("page.loading")}</p>}>
           <DefinitionsExplorer term={term} />
         </Suspense>
       </ErrorBoundary>
