@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { defaultProjectionMaps } from "../constants.js";
+import { defaultProjectionMaps } from "../../node/index.js";
 import ProjectionsProvider from "../Provider.js";
 import type { ProjectionMaps } from "../types.js";
 import useProjectionMaps from "./useProjectionMaps.js";

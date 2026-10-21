@@ -8,10 +8,8 @@ import {
   STATION_NODE,
 } from "../../../testing/fixtures.js";
 import type { NodePayload } from "../../../testing/types.js";
-import {
-  defaultProjectionMaps,
-  type ProjectionMaps,
-} from "../projections/index.js";
+import { defaultProjectionMaps } from "../node/index.js";
+import type { ProjectionMaps } from "../projections/index.js";
 import EntityTitle from "./EntityTitle.js";
 import type { EntityTitleArmProps } from "./types.js";
 

@@ -11,7 +11,7 @@ import { EntityCard } from "../EntityCard/index.js";
 import { EntityChip } from "../EntityChip/index.js";
 import { EntityCommand } from "../EntityCommand/index.js";
 import { EntityRow } from "../EntityRow/index.js";
-import { defaultProjectionMaps } from "./constants.js";
+import { defaultProjectionMaps } from "../node/index.js";
 import useProjectionMaps from "./hooks/useProjectionMaps.js";
 import ProjectionsProvider from "./Provider.js";
 

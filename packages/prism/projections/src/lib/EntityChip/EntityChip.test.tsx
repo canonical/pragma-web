@@ -7,7 +7,7 @@ import {
   ONTOLOGY_CLASS_NODE,
   STATION_NODE,
 } from "../../../testing/fixtures.js";
-import { defaultProjectionMaps } from "../projections/index.js";
+import { defaultProjectionMaps } from "../node/index.js";
 import EntityChip from "./EntityChip.js";
 import type { EntityChipArmProps } from "./types.js";
 

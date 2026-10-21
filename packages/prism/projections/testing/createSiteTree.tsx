@@ -16,8 +16,8 @@ import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { Environment } from "relay-runtime";
+import { defaultProjectionMaps } from "../src/lib/node/index.js";
 import {
-  defaultProjectionMaps,
   type ProjectionMaps,
   ProjectionsProvider,
 } from "../src/lib/projections/index.js";

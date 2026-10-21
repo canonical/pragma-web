@@ -1,11 +1,9 @@
-import {
-  NodeCard,
-  NodeChip,
-  NodeCommand,
-  NodeRow,
-  NodeTitle,
-} from "../node/index.js";
-import type { ProjectionMaps } from "./types.js";
+import type { ProjectionMaps } from "../projections/index.js";
+import { NodeCard } from "./NodeCard/index.js";
+import { NodeChip } from "./NodeChip/index.js";
+import { NodeCommand } from "./NodeCommand/index.js";
+import { NodeRow } from "./NodeRow/index.js";
+import { NodeTitle } from "./NodeTitle/index.js";
 
 /**
  * The maps a site mounts: each representation renders any node through its

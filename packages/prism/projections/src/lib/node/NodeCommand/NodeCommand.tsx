@@ -3,7 +3,7 @@ import { graphql, useFragment } from "react-relay";
 import type { NodeCommand_node$key } from "../../../__generated__/NodeCommand_node.graphql.js";
 import nodeCommandFragmentNode from "../../../__generated__/NodeCommand_node.graphql.js";
 import type { EntityCommandArmProps } from "../../EntityCommand/index.js";
-import useProjectionLink from "../../projections/hooks/useProjectionLink.js";
+import { useProjectionLink } from "../../projections/index.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */

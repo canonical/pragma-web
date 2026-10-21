@@ -23,13 +23,13 @@ export {
   markdownComponents,
   ProseReferencesProvider,
 } from "./markdown/index.js";
+export { defaultProjectionMaps } from "./node/index.js";
 export type {
   ProjectionMap,
   ProjectionMaps,
   ProjectionsProviderProps,
 } from "./projections/index.js";
 export {
-  defaultProjectionMaps,
   ProjectionsProvider,
   useProjectionMaps,
 } from "./projections/index.js";

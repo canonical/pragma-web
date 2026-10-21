@@ -2,7 +2,7 @@ import type { LinkComponentProps } from "@canonical/react-ds-global";
 import { renderHook } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { defaultProjectionMaps } from "../constants.js";
+import { defaultProjectionMaps } from "../../node/index.js";
 import ProjectionsProvider from "../Provider.js";
 import useProjectionLink from "./useProjectionLink.js";
 

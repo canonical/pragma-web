@@ -1,11 +1,12 @@
 /**
  * Projection maps: which arm renders each type of node in each
- * representation, provided once per site and read by every representation.
+ * representation, provided once per site and read by every representation
+ * and arm.
  *
  * @module
  */
 
-export { defaultProjectionMaps } from "./constants.js";
+export { default as useProjectionLink } from "./hooks/useProjectionLink.js";
 export { default as useProjectionMaps } from "./hooks/useProjectionMaps.js";
 export { default as ProjectionsProvider } from "./Provider.js";
 export type {
