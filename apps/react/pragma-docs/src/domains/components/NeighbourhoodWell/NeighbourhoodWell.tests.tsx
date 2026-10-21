@@ -16,9 +16,15 @@ const createFetchSpy = () =>
   vi.fn(() => new Promise<never>(() => {})) as ReturnType<typeof vi.fn> &
     FetchFunction;
 
-const renderWell = (): HTMLElement => {
+/** The `_meta` record of the Button fixture's one specialisation. */
+const DROPDOWN_META_ID =
+  "client:https://ds.canonical.com/global.component.dropdown_button:_meta";
+
+const renderWell = (
+  records: typeof componentEntityRecordsButton = componentEntityRecordsButton,
+): HTMLElement => {
   const { container } = render(
-    entityPageAt(BUTTON_URI, componentEntityRecordsButton, createFetchSpy()),
+    entityPageAt(BUTTON_URI, records, createFetchSpy()),
   );
   const well = container.querySelector(".ds.neighbourhood-well");
   expect(well).not.toBeNull();
@@ -43,6 +49,24 @@ describe("NeighbourhoodWell", () => {
     );
     const tier = well.querySelector('[data-well-uri="ds:global"]');
     expect(tier?.querySelector("a")).toBeNull();
+  });
+
+  it("links a neighbour whose URI names a standard to its standards page", () => {
+    // A linkable relation delivering a standard: the URI's own kind segment
+    // outranks the relation's default, and the standard's home is built
+    // through the router's `standardEntity` route.
+    const standardUri = "cs:react.standard.component_props";
+    const well = renderWell({
+      ...componentEntityRecordsButton,
+      [DROPDOWN_META_ID]: {
+        ...componentEntityRecordsButton[DROPDOWN_META_ID],
+        curie: standardUri,
+      },
+    });
+    const node = well.querySelector(`[data-well-uri="${standardUri}"]`);
+    expect(node?.querySelector("a")?.getAttribute("href")).toBe(
+      `/standards/${encodeURIComponent(standardUri)}`,
+    );
   });
 
   it("generates the legend from the edge-family table (it cannot drift)", () => {
