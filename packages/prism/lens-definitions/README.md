@@ -73,14 +73,27 @@ these keys:
 
 The lens's links are typed by the site's `RouterRegister`, so a table that
 renames either key fails the site's type check. To link ontology classes
-mentioned elsewhere on the site to their term view, declare their home:
+and properties mentioned elsewhere on the site to their term view, declare
+their homes:
 
 ```ts
 const homes: Homes = {
   OntologyClass: (node, router) =>
     router.buildPath("definitionsTerm", { params: { term: node.uri } }),
+  OntologyProperty: (node, router) =>
+    router.buildPath("definitionsTerm", { params: { term: node.uri } }),
 };
 ```
+
+## Mentions of classes and properties
+
+The lens ships no projection arms. An arm reads only what its
+representation's composite fragment selects, and only
+`@canonical/prism-projections` writes the composites, so an
+`OntologyClass` or `OntologyProperty` arm here could render nothing the
+`Node` arm does not. A site mounts `defaultProjectionMaps`: its `Node` arms
+render a mentioned class or property by its title and compact address, and
+the homes above link the mention to the term view.
 
 ## Rail placement
 
