@@ -51,7 +51,7 @@ describe("the schema", () => {
     expect(provider.sdl).toContain("type Station implements Node");
   });
 
-  it("adds no root fields — the contract's five must suffice", () => {
+  it("adds exactly one root field, prose, to the contract's five", () => {
     const query = provider.schema.getQueryType();
     expect(Object.keys(query?.getFields() ?? {}).sort()).toEqual([
       "node",
@@ -59,6 +59,7 @@ describe("the schema", () => {
       "ontology",
       "ontologyClass",
       "ontologyProperty",
+      "prose",
     ]);
   });
 
@@ -121,6 +122,119 @@ describe("Query.node", () => {
         edge.node.__typename,
       );
     }
+  });
+});
+
+describe("Query.prose", () => {
+  /** The prose selection every case reads. */
+  const PROSE = `query Prose($uri: ID!, $lang: String) {
+    prose(uri: $uri) {
+      lang
+      availableLanguages
+      markdown
+      asked: markdown(lang: $lang)
+      references {
+        edges { cursor node { __typename uri } }
+        pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+      }
+    }
+  }`;
+
+  /** Run `PROSE` with `variables`, and with `contextValue` when given. */
+  const ask = async (
+    variables: Record<string, unknown>,
+    contextValue?: unknown,
+  ): Promise<Record<string, unknown> | null> => {
+    const result = await graphql({
+      schema: provider.schema,
+      source: PROSE,
+      rootValue: provider.rootValue,
+      variableValues: variables,
+      contextValue,
+    });
+    expect(result.errors).toBeUndefined();
+    return (result.data as { prose: Record<string, unknown> | null }).prose;
+  };
+
+  const english = exampleDataset.entities.find(
+    (entity) => entity.uri === MULTILINGUAL_ENTITY_URI,
+  )?.prose?.en;
+  const french = exampleDataset.entities.find(
+    (entity) => entity.uri === MULTILINGUAL_ENTITY_URI,
+  )?.prose?.fr;
+
+  it("serves the default language with no context at all", async () => {
+    expect(await ask({ uri: MULTILINGUAL_ENTITY_URI })).toMatchObject({
+      lang: "en",
+      availableLanguages: ["en", "fr"],
+      markdown: english,
+      asked: english,
+    });
+  });
+
+  it("serves the context's locale when it is authored", async () => {
+    expect(
+      await ask({ uri: MULTILINGUAL_ENTITY_URI }, { locale: "fr" }),
+    ).toMatchObject({ lang: "fr", markdown: french });
+  });
+
+  it("serves the default language for an unauthored locale", async () => {
+    expect(
+      await ask({ uri: MULTILINGUAL_ENTITY_URI }, { locale: "de" }),
+    ).toMatchObject({ lang: "en", markdown: english });
+  });
+
+  it("serves the language markdown(lang:) asks for, else the locale", async () => {
+    expect(
+      await ask({ uri: MULTILINGUAL_ENTITY_URI, lang: "fr" }, {}),
+    ).toMatchObject({ lang: "en", markdown: english, asked: french });
+    expect(
+      await ask({ uri: MULTILINGUAL_ENTITY_URI, lang: "de" }, { locale: "fr" }),
+    ).toMatchObject({ asked: french });
+  });
+
+  it("resolves the links that name entities or classes, in order of first mention", async () => {
+    const prose = await ask({ uri: MULTILINGUAL_ENTITY_URI });
+    expect(prose?.references).toEqual({
+      edges: [
+        {
+          cursor: toCursor("https://metro.example/onto#north-line"),
+          node: {
+            __typename: "Line",
+            uri: "https://metro.example/onto#north-line",
+          },
+        },
+        {
+          cursor: toCursor(SECOND_NAMESPACE_ENTITY_URI),
+          node: { __typename: "Zone", uri: SECOND_NAMESPACE_ENTITY_URI },
+        },
+        {
+          cursor: toCursor("https://metro.example/onto#circle-line"),
+          node: {
+            __typename: "Line",
+            uri: "https://metro.example/onto#circle-line",
+          },
+        },
+        {
+          cursor: toCursor("https://metro.example/onto#Station"),
+          node: {
+            __typename: "OntologyClass",
+            uri: "https://metro.example/onto#Station",
+          },
+        },
+      ],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: toCursor("https://metro.example/onto#north-line"),
+        endCursor: toCursor("https://metro.example/onto#Station"),
+      },
+    });
+  });
+
+  it("is null for an entity without prose, and for a value that is not an IRI", async () => {
+    expect(await ask({ uri: BARE_ENTITY_URI })).toBeNull();
+    expect(await ask({ uri: "metro:northgate" })).toBeNull();
   });
 });
 
@@ -1004,6 +1118,55 @@ describe("defensive paths, exercised with purpose-built datasets", () => {
     // expansion is textual — this documents that, rather than pretending
     // the collision cannot happen.
     expect(data.expanded).toEqual({ uri: "urn:trap:C" });
+  });
+});
+
+describe("prose, exercised with purpose-built datasets", () => {
+  const station = exampleDataset.entities.find(
+    (entity) => entity.uri === MULTILINGUAL_ENTITY_URI,
+  );
+  if (station === undefined) throw new Error("the dataset lost Northgate");
+
+  /** The shipped dataset with Northgate's prose replaced by `prose`. */
+  const withProse = (prose: Record<string, string>): ExampleDataset => ({
+    ...exampleDataset,
+    entities: [{ ...station, prose }],
+  });
+
+  it("serves prose that links to nothing as an empty page", async () => {
+    const data = await runWith(
+      withProse({ en: "No links, and [one external](https://example.com/)." }),
+      `{ prose(uri: "${MULTILINGUAL_ENTITY_URI}") {
+          references { edges { cursor } pageInfo { startCursor endCursor } }
+        } }`,
+    );
+    expect(data.prose).toEqual({
+      references: {
+        edges: [],
+        pageInfo: { startCursor: null, endCursor: null },
+      },
+    });
+  });
+
+  it("orders the languages after the default by code point", async () => {
+    const data = await runWith(
+      withProse({
+        zh: "中文",
+        en: "English",
+        "pt-BR": "Português",
+        de: "Deutsch",
+      }),
+      `{ prose(uri: "${MULTILINGUAL_ENTITY_URI}") { availableLanguages } }`,
+    );
+    expect(data.prose).toEqual({
+      availableLanguages: ["en", "de", "pt-BR", "zh"],
+    });
+  });
+
+  it("refuses prose with no default-language text", () => {
+    expect(() => createExampleProvider(withProse({ fr: "Français" }))).toThrow(
+      `${MULTILINGUAL_ENTITY_URI} has prose but none in the default language "en"`,
+    );
   });
 });
 

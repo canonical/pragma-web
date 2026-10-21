@@ -31,10 +31,13 @@ import {
 } from "./constants.js";
 import { exampleDataset } from "./dataset.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
+import { extractReferences } from "./extractReferences.js";
 import { readProviderSdl } from "./providerSdl.js";
+import { selectProseLanguage } from "./selectProseLanguage.js";
 import type {
   ExampleClass,
   ExampleClassProperty,
+  ExampleContext,
   ExampleDataset,
   ExampleEntity,
   ExampleGeoPoint,
@@ -42,6 +45,7 @@ import type {
   ExampleProperty,
   ExampleProvider,
   LangMap,
+  ProseTexts,
 } from "./types.js";
 
 /**
@@ -64,6 +68,20 @@ interface MetaSource {
   readonly uri: string | null;
   readonly typename: string;
   readonly cls: ExampleClass;
+}
+
+/** Arguments of `Prose.markdown`. */
+interface MarkdownArgs {
+  readonly lang?: string | null;
+}
+
+/** An entity's prose, indexed once when the provider is built. */
+interface ProseRecord {
+  readonly texts: ProseTexts;
+  /** The default language first, then the rest in code-point order. */
+  readonly availableLanguages: readonly string[];
+  /** Candidate IRIs across every language, in order of first mention. */
+  readonly references: readonly string[];
 }
 
 /** An entity paired with its resolved class and its built view. */
@@ -435,6 +453,94 @@ export const createExampleProvider = (
     };
   };
 
+  // -------------------------------------------------------------------
+  // Prose. Indexed once, here, rather than per request: the languages and
+  // the references of a text do not change between requests, only which
+  // language a request is served.
+  // -------------------------------------------------------------------
+
+  /** The declared prefixes, which a CURIE in prose is expanded against. */
+  const prefixes = Object.fromEntries(
+    dataset.ontologies.map((ontology) => [ontology.prefix, ontology.namespace]),
+  );
+
+  /**
+   * One entity's prose with its languages ordered and its references
+   * extracted. Prose without default-language text is refused: it is what
+   * every request falls back to, so a dataset without it cannot be served.
+   */
+  const indexProse = (uri: string, texts: ProseTexts): ProseRecord => {
+    if (!Object.hasOwn(texts, DEFAULT_LANG)) {
+      throw new Error(
+        `${uri} has prose but none in the default language "${DEFAULT_LANG}"`,
+      );
+    }
+    const availableLanguages = [
+      DEFAULT_LANG,
+      ...Object.keys(texts)
+        .filter((lang) => lang !== DEFAULT_LANG)
+        .sort(),
+    ];
+    return {
+      texts,
+      availableLanguages,
+      references: [
+        ...new Set(
+          availableLanguages.flatMap((lang) =>
+            extractReferences(texts[lang], prefixes),
+          ),
+        ),
+      ],
+    };
+  };
+
+  const proseByUri = new Map(
+    records.flatMap(({ entity }): [string, ProseRecord][] =>
+      entity.prose === undefined
+        ? []
+        : [[entity.uri, indexProse(entity.uri, entity.prose)]],
+    ),
+  );
+
+  /**
+   * The entities a text links to, resolved exactly as `node(id:)` resolves
+   * an IRI, as one page holding every edge. A reference nothing answers to
+   * is dropped.
+   */
+  const referencesView = (iris: readonly string[]): View => {
+    const edges = iris.flatMap((iri) => {
+      const node = viewByUri.get(iri) ?? nullableClassView(iri);
+      return node === null ? [] : [{ node, cursor: toCursor(iri) }];
+    });
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: edges.at(0)?.cursor ?? null,
+        endCursor: edges.at(-1)?.cursor ?? null,
+      },
+    };
+  };
+
+  /**
+   * The `Prose` view. The context is read with `?.` because graphql-js hands
+   * resolvers whatever context its caller passed, including none.
+   */
+  const proseView = (prose: ProseRecord): View => ({
+    markdown: (args: MarkdownArgs, context?: ExampleContext) =>
+      prose.texts[
+        selectProseLanguage(prose.texts, [
+          args.lang ?? undefined,
+          context?.locale,
+        ])
+      ],
+    lang: (_args: unknown, context?: ExampleContext) =>
+      selectProseLanguage(prose.texts, [context?.locale]),
+    availableLanguages: prose.availableLanguages,
+    references: () => referencesView(prose.references),
+  });
+
   /**
    * Expand the prefixed convenience form (`"metro:Station"`) to an absolute
    * IRI. An absolute IRI passes through untouched: its scheme is never a
@@ -451,8 +557,9 @@ export const createExampleProvider = (
   };
 
   // -------------------------------------------------------------------
-  // The contract's five root fields. Nothing is added to Query: every type
-  // this provider declares is reachable from here.
+  // The contract's five root fields, plus `prose`: the one root field this
+  // provider adds (see schema/extension.graphql for why it is a root field).
+  // Every type the provider declares is reachable from here.
   // -------------------------------------------------------------------
 
   const rootValue: Record<string, unknown> = {
@@ -470,6 +577,10 @@ export const createExampleProvider = (
     ontologyProperty: (args: { uri: string }) => {
       const property = propertyByUri.get(expandUri(args.uri));
       return property === undefined ? null : propertyView(property);
+    },
+    prose: (args: { uri: string }) => {
+      const prose = proseByUri.get(args.uri);
+      return prose === undefined ? null : proseView(prose);
     },
   };
 

@@ -11,8 +11,9 @@
  */
 
 import { graphql } from "graphql";
-import type { ExampleProvider } from "../provider/index.js";
+import type { ExampleContext, ExampleProvider } from "../provider/index.js";
 import graphiqlHtml from "./graphiqlHtml.js";
+import { readRequestLocale } from "./readRequestLocale.js";
 
 /** Options for {@link createExampleHandler}. */
 export interface ExampleHandlerOptions {
@@ -94,6 +95,10 @@ export const createExampleHandler = (
       schema: provider.schema,
       source: body.query,
       rootValue: provider.rootValue,
+      // The request's language, for the prose fields that follow it.
+      contextValue: {
+        locale: readRequestLocale(request),
+      } satisfies ExampleContext,
       variableValues: body.variables ?? undefined,
       operationName: body.operationName ?? undefined,
     });

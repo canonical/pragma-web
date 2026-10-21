@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createExampleProvider } from "../provider/index.js";
+import {
+  createExampleProvider,
+  MULTILINGUAL_ENTITY_URI,
+} from "../provider/index.js";
 import { createExampleHandler } from "./createExampleHandler.js";
 
 const provider = createExampleProvider();
@@ -75,6 +78,39 @@ describe("POST", () => {
   it("rejects a JSON body whose query is not a string", async () => {
     const handler = createExampleHandler(provider);
     expect((await handler(post({ query: 42 }))).status).toBe(400);
+  });
+});
+
+describe("the request's locale", () => {
+  const PROSE = `{ prose(uri: "${MULTILINGUAL_ENTITY_URI}") { lang markdown } }`;
+
+  /** POST the prose query with `headers` and return its `prose`. */
+  const askProse = async (headers: Record<string, string>) => {
+    const handler = createExampleHandler(provider);
+    const response = await handler(
+      post(
+        { query: PROSE },
+        { headers: { "Content-Type": "application/json", ...headers } },
+      ),
+    );
+    const body = (await response.json()) as {
+      data: { prose: { lang: string; markdown: string } };
+    };
+    return body.data.prose;
+  };
+
+  it("reaches Prose.lang and Prose.markdown through x-prism-locale", async () => {
+    const prose = await askProse({ "x-prism-locale": "fr" });
+    expect(prose.lang).toBe("fr");
+    expect(prose.markdown).toContain("Porte-Nord");
+  });
+
+  it("falls back to the default language without the header", async () => {
+    expect((await askProse({})).lang).toBe("en");
+  });
+
+  it("treats a malformed header as no header", async () => {
+    expect((await askProse({ "x-prism-locale": "FR" })).lang).toBe("en");
   });
 });
 

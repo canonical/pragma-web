@@ -35,6 +35,21 @@ export const GEO_POINT_CLASS_URI = `${GEO_NAMESPACE}GeoPoint`;
 /** Language `EntityMeta`'s arguments default to, per the contract SDL. */
 export const DEFAULT_LANG = "en";
 
+/**
+ * A language tag as this provider reads one: a two- or three-letter
+ * lowercase primary language, then any number of hyphenated subtags of two
+ * to eight letters or digits (`fr`, `pt-BR`, `zh-Hant`).
+ */
+export const LANGUAGE_TAG = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
+
+/**
+ * The request header that names the language prose is served in when a
+ * query does not ask for one. Not `Accept-Language`, which a browser sends
+ * on its own: a client fetch and a server render of the same page would see
+ * different languages.
+ */
+export const LOCALE_HEADER = "x-prism-locale";
+
 /** Page size used when a connection query supplies neither `first` nor `last`. */
 export const DEFAULT_PAGE_SIZE = 20;
 

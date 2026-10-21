@@ -16,6 +16,12 @@ import type { GraphQLSchema } from "graphql";
  */
 export type LangMap = Readonly<Record<string, string>>;
 
+/**
+ * An entity's prose: Markdown keyed by language tag. Must hold the default
+ * language (`DEFAULT_LANG`), which every request falls back to.
+ */
+export type ProseTexts = Readonly<Record<string, string>>;
+
 /** How a property relates its subject to its object. Mirrors `PropertyKind`. */
 export type ExamplePropertyKind = "DATATYPE" | "OBJECT" | "ANNOTATION";
 
@@ -85,6 +91,8 @@ export interface ExampleEntity {
   readonly servesLine?: readonly string[];
   /** IRI of the fare zone this station sits in — an entity in the geo namespace. */
   readonly inZone?: string;
+  /** Long-form Markdown about this entity, served through `Query.prose`. */
+  readonly prose?: ProseTexts;
 }
 
 /** The whole dataset: a TBox and an ABox. */
@@ -93,6 +101,16 @@ export interface ExampleDataset {
   readonly classes: readonly ExampleClass[];
   readonly properties: readonly ExampleProperty[];
   readonly entities: readonly ExampleEntity[];
+}
+
+/**
+ * What this provider's resolvers read from the execution context. Every
+ * field is optional, and the context itself may be absent: graphql-js passes
+ * whatever its caller gave, and a caller may give nothing.
+ */
+export interface ExampleContext {
+  /** The language the request asks prose to be served in. */
+  readonly locale?: string;
 }
 
 /**
