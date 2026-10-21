@@ -14,6 +14,8 @@
  * does), so the view is writable on every real render; `journeysStrip`
  * below additionally mounts the strip's own switch under the SAME provider,
  * the way the layout renders it as a sibling of the canvas.
+ * `journeysLayoutAt` mounts the page inside the real `JourneysLayout`
+ * instead, so the only view provider is the one the layout holds.
  *
  * Lives in `__fixtures__` beside the captured record maps: imported by
  * tests, never collected as one.
@@ -21,7 +23,7 @@
 
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
@@ -29,6 +31,7 @@ import { createStaticRouter } from "#lib/router";
 import { createEnvironment } from "#relay";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
+import { JourneysLayout } from "../JourneysLayout/index.js";
 import { JourneysPage } from "../JourneysPage/index.js";
 import { JourneyViewProvider } from "../journeyViewContext.js";
 import { journeysStripSlots } from "../stripSlots.js";
@@ -41,16 +44,14 @@ import { journeysStripSlots } from "../stripSlots.js";
  */
 export const JOURNEYS_TEST_TIMEOUT_MS = 20_000;
 
-/**
- * The journeys page at `job` (undefined = the `/journeys` index) over an
- * environment seeded with `records` (`undefined` = cold store). The page
- * owns its Suspense/ErrorBoundary; the router exists for `Link` context and
- * selection only (no Outlet — the lens layout stays out of component tests).
- */
-export const journeysPageAt = (
+/** The real provider stack a journeys page renders under: a seeded (or
+ * cold) environment, the title template, and a static router over the real
+ * app routes at the page's own URL. */
+const renderUnderProviders = (
   job: string | undefined,
   records: RecordMap | undefined,
   fetchFn: FetchFunction,
+  children: ReactNode,
 ): ReactElement => (
   <HeadProvider titleTemplate={formatDocumentTitle}>
     <RelayEnvironmentProvider
@@ -68,21 +69,39 @@ export const journeysPageAt = (
           },
         )}
       >
-        <JourneyViewProvider>
-          <JourneysPage params={job === undefined ? {} : { job }} />
-        </JourneyViewProvider>
+        {children}
       </RouterProvider>
     </RelayEnvironmentProvider>
   </HeadProvider>
 );
 
 /**
- * The page AND the strip's view switch under ONE `JourneyViewProvider` — the
- * production topology (RULING 1): the switch is mounted by the frame as a
- * sibling of the canvas, and context is the only path between them. Use this
- * when a test needs to drive the switch and observe the canvas react (the
- * interaction teeth). The strip tenant is mounted first, standing in for the
- * mode strip's `controls` socket.
+ * The journeys page at `job` (undefined = the `/journeys` index) over an
+ * environment seeded with `records` (`undefined` = cold store). The page
+ * owns its Suspense/ErrorBoundary; the router exists for `Link` context and
+ * selection only (no Outlet — the lens layout stays out of component tests).
+ */
+export const journeysPageAt = (
+  job: string | undefined,
+  records: RecordMap | undefined,
+  fetchFn: FetchFunction,
+): ReactElement =>
+  renderUnderProviders(
+    job,
+    records,
+    fetchFn,
+    <JourneyViewProvider>
+      <JourneysPage params={job === undefined ? {} : { job }} />
+    </JourneyViewProvider>,
+  );
+
+/**
+ * The page AND the strip's view switch under ONE `JourneyViewProvider`, the
+ * topology `JourneysLayout` renders: the switch sits in the layout's strip as
+ * a sibling of the canvas, and context is the only path between them. Use
+ * this when a test needs to drive the switch and observe the canvas react
+ * (the interaction teeth). The strip tenant is mounted first, standing in for
+ * the mode strip's `controls` socket.
  */
 export const journeysStrip = (
   job: string | undefined,
@@ -90,29 +109,32 @@ export const journeysStrip = (
   fetchFn: FetchFunction,
 ): ReactElement => {
   const { Controls } = journeysStripSlots;
-  return (
-    <HeadProvider titleTemplate={formatDocumentTitle}>
-      <RelayEnvironmentProvider
-        environment={createEnvironment({ records, fetchFn })}
-      >
-        <RouterProvider
-          router={createStaticRouter(
-            appRoutes,
-            job === undefined
-              ? "/journeys"
-              : appRoutes.journeysJob.render({ job }),
-            {
-              middleware: [...middleware],
-              notFound: notFoundRoute,
-            },
-          )}
-        >
-          <JourneyViewProvider>
-            <Controls />
-            <JourneysPage params={job === undefined ? {} : { job }} />
-          </JourneyViewProvider>
-        </RouterProvider>
-      </RelayEnvironmentProvider>
-    </HeadProvider>
+  return renderUnderProviders(
+    job,
+    records,
+    fetchFn,
+    <JourneyViewProvider>
+      <Controls />
+      <JourneysPage params={job === undefined ? {} : { job }} />
+    </JourneyViewProvider>,
   );
 };
+
+/**
+ * The page inside the real `JourneysLayout`, with no provider of its own:
+ * whatever view the strip's switch and the explorer share comes from the
+ * layout alone.
+ */
+export const journeysLayoutAt = (
+  job: string | undefined,
+  records: RecordMap | undefined,
+  fetchFn: FetchFunction,
+): ReactElement =>
+  renderUnderProviders(
+    job,
+    records,
+    fetchFn,
+    <JourneysLayout>
+      <JourneysPage params={job === undefined ? {} : { job }} />
+    </JourneysLayout>,
+  );
