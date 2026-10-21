@@ -6,28 +6,22 @@
  * overflows into the canvas region's own scroll rather than stacking: no
  * conditional at-rule reshapes it.
  *
- * Each design decision reads a component token. Where the design system has
- * a token for it, the component token reads that token, falling back to the
- * lens's default where the site binds none; where it has none, the component
- * token holds the lens's own value. The well's floor height,
- * `--definitions-explorer-well-min-block-size`, is a literal layout
- * measure.
+ * Each design decision reads a component token. The colours and spacing
+ * read the design system's semantic tokens. The design system has no
+ * semantic token for the divider width or the search label's type size, so
+ * those component tokens hold the lens's own value and only they retune it.
+ * The well's floor height, `--definitions-explorer-well-min-block-size`, is
+ * a literal layout measure.
  */
 
 @layer ds.prism {
   :root {
-    --definitions-explorer-divider-width: var(
-      --dimension-stroke-thickness-medium,
-      1px
-    );
+    --definitions-explorer-divider-width: 1px;
     --definitions-explorer-divider-color: var(--color-border-muted);
     --definitions-explorer-panel-padding: var(--space-200, 1rem);
     --definitions-explorer-search-margin: var(--space-200, 1rem);
     --definitions-explorer-search-gap: var(--space-050, 0.25rem);
-    --definitions-explorer-search-font-size: var(
-      --dimension-size-font-size-300,
-      0.875rem
-    );
+    --definitions-explorer-search-font-size: 0.875rem;
     --definitions-explorer-search-color: var(--color-text-muted);
     /* The last-resort floor of the well on a pathologically short canvas. */
     --definitions-explorer-well-min-block-size: 12rem;

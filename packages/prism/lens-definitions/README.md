@@ -123,28 +123,22 @@ The stylesheets sit in the `ds.prism` cascade layer. Each design decision
 reads a component token, declared on `:root` and named for its component
 (`--term-rail-dimmed-opacity`, `--hierarchy-well-accent-color`, …), so a
 site retunes the lens by setting component tokens. Where the design system
-has a token for the decision, the component token reads it, and falls back
-to the lens's own default where the site loads none, so a site also retunes
-those decisions through the design system:
+has a semantic token for the decision, the component token reads it, so a
+site also retunes those decisions through its theme:
 
 - colour: `--color-text`, `--color-text-muted`, `--color-text-branded`,
   `--color-background`, `--color-background-contrasted`, `--color-border`,
   `--color-border-muted`;
-- type: `--dimension-size-font-size-250`, `--dimension-size-font-size-300`,
-  `--dimension-size-font-size-350`, `--dimension-letter-spacing-wide`,
-  `--typography-font-family-monospace`;
-- shape: `--dimension-radius-small`, `--dimension-radius-medium`,
-  `--dimension-radius-full`, `--dimension-stroke-thickness-medium`,
-  `--dimension-stroke-thickness-large`;
-- space and motion: `--space-025` to `--space-800`, `--motion-duration-fast`.
+- space and motion: `--space-025` to `--space-800`, `--motion-duration-fast`,
+  each with the lens's own default as its fallback.
 
-Where the design system has no token, the component token holds the lens's
-own value, and only the component token retunes it: the type sizes off the
-system's scale (the well's labels and captions, the legend, the inspector's
-definitions, the abstract tag), the font weights and the wider tracking,
-every opacity, the indicator size, the well's edge widths and shadows, and
+The design system has no semantic token for the rest, so the component
+token holds the lens's own value and only the component token retunes it:
+every type size, font family, weight and tracking; every radius, border,
+stroke and edge width; every opacity and shadow geometry; the indicator size; and
 two layout measures, `--definitions-explorer-well-min-block-size` and
-`--well-legend-max-inline-size`.
+`--well-legend-max-inline-size`. No component token reads a primitive
+token.
 
 The stylesheets also read custom properties that are not design decisions:
 

@@ -4,12 +4,13 @@
  * that scales with the well. Its swatches restate the node and edge
  * encodings exactly, so the legend cannot drift from what the graph draws.
  *
- * Each design decision reads a component token. Where the design system has
- * a token for it, the component token reads that token, falling back to the
- * lens's default where the site binds none; where it has none, the component
- * token holds the lens's own value, as the legend's cap
- * `--well-legend-max-inline-size` does. The few pixels that draw the
- * legend's arrowhead are literal too.
+ * Each design decision reads a component token. The colours and spacing
+ * read the design system's semantic tokens. The design system has no
+ * semantic token for the type size, the border width, the radii or the
+ * shadow's geometry, so those component tokens hold the lens's own value
+ * and only they retune it. The legend's cap,
+ * `--well-legend-max-inline-size`, is a literal layout measure, and the few
+ * pixels that draw the legend's arrowhead are literal too.
  */
 
 @layer ds.prism {
@@ -18,9 +19,9 @@
     --well-legend-max-inline-size: 15rem;
     --well-legend-padding-block: var(--space-100, 0.5rem);
     --well-legend-padding-inline: var(--space-150, 0.75rem);
-    --well-legend-border-width: var(--dimension-stroke-thickness-medium, 1px);
+    --well-legend-border-width: 1px;
     --well-legend-border-color: var(--color-border-muted);
-    --well-legend-radius: var(--dimension-radius-medium, 0.5rem);
+    --well-legend-radius: 0.5rem;
     --well-legend-background: var(--color-background);
     --well-legend-shadow:
       0 1px 2px color-mix(in oklab, var(--color-text) 6%, transparent),
@@ -31,7 +32,7 @@
     --well-legend-row-gap: var(--space-100, 0.5rem);
     --well-legend-swatch-inline-size: var(--space-300, 1.5rem);
     --well-legend-swatch-block-size: var(--space-150, 0.75rem);
-    --well-legend-swatch-radius: var(--dimension-radius-small, 0.1875rem);
+    --well-legend-swatch-radius: 0.1875rem;
     --well-legend-swatch-background: var(--color-background);
     --well-legend-line-color: var(--color-border-muted);
     --well-legend-relation-color: var(--color-text-branded);

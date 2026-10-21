@@ -4,10 +4,11 @@
  * for an abstract class, a small tag at its foot outside the link, so the
  * node's accessible name stays the term alone.
  *
- * Each design decision reads a component token. Where the design system has
- * a token for it, the component token reads that token, falling back to the
- * lens's default where the site binds none; where it has none, the component
- * token holds the lens's own value.
+ * Each design decision reads a component token. The colours, spacing and
+ * motion read the design system's semantic tokens. The design system has no
+ * semantic token for the type sizes, weight and tracking, the border
+ * widths, the radius or the fade's opacity, so those component tokens hold
+ * the lens's own value and only they retune it.
  *
  * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
  */
@@ -16,19 +17,16 @@
   :root {
     --term-node-padding-inline: var(--space-100, 0.5rem);
     --term-node-background: var(--color-background);
-    --term-node-border-width: var(--dimension-stroke-thickness-medium, 1px);
+    --term-node-border-width: 1px;
     --term-node-border-color: var(--color-border-muted);
-    --term-node-radius: var(--dimension-radius-medium, 0.5rem);
+    --term-node-radius: 0.5rem;
     --term-node-color: var(--color-text);
-    --term-node-font-size: var(--dimension-size-font-size-300, 0.875rem);
+    --term-node-font-size: 0.875rem;
     --term-node-shadow: drop-shadow(
       0 1px 2px color-mix(in oklab, var(--color-text) 12%, transparent)
     );
     --term-node-selected-border-color: var(--color-text);
-    --term-node-selected-border-width: var(
-      --dimension-stroke-thickness-large,
-      2px
-    );
+    --term-node-selected-border-width: 2px;
     --term-node-selected-background: color-mix(
       in oklab,
       var(--color-text) 6%,

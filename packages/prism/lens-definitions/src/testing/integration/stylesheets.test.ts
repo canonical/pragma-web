@@ -14,10 +14,11 @@
  *   is a subgrid, so the explorer lands on the same ruler as the site;
  * - no theme is named: a site's theme activates through its own classes;
  * - every component token reads another token, save the ones named here that
- *   hold the lens's own value where the design system has no token;
+ *   hold the lens's own value where the design system has no semantic token;
  * - the tokens read from outside the lens are exactly the ones named here,
- *   each defined by the design system's stylesheets or by the site, so a
- *   misspelt or invented name cannot sit unnoticed behind its fallback.
+ *   each a semantic token of the design system or a hook the site defines,
+ *   so a misspelt, invented or primitive name cannot sit unnoticed behind
+ *   its fallback.
  */
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -46,13 +47,20 @@ const files = collectCss(LIBRARY_DIRECTORY);
 
 /**
  * The component tokens that hold the lens's own value, because the design
- * system has no token for the decision: two layout measures, and the type
- * sizes off the system's scale, the weights, the tracking, the opacities,
- * the indicator size and the edge widths.
+ * system has no semantic token for the decision: two layout measures, and
+ * the type sizes, the font families, the weights, the tracking, the radii,
+ * the stroke and edge widths, the opacities and the indicator size.
  */
 const LITERAL_TOKENS = [
+  "--definitions-explorer-divider-width",
+  "--definitions-explorer-search-font-size",
   "--definitions-explorer-well-min-block-size",
+  "--explorer-controls-chip-border-width",
+  "--explorer-controls-chip-font-size",
+  "--explorer-controls-chip-radius",
   "--explorer-controls-swatch-size",
+  "--explorer-status-bar-radius",
+  "--explorer-status-font-size",
   "--hierarchy-well-accent-width",
   "--hierarchy-well-ambient-opacity",
   "--hierarchy-well-caption-font-size",
@@ -60,26 +68,50 @@ const LITERAL_TOKENS = [
   "--hierarchy-well-caption-letter-spacing",
   "--hierarchy-well-caption-opacity",
   "--hierarchy-well-edge-faded-opacity",
+  "--hierarchy-well-hint-font-size",
+  "--hierarchy-well-hint-radius",
+  "--hierarchy-well-label-font-family",
   "--hierarchy-well-label-font-size",
+  "--hierarchy-well-label-halo-width",
   "--hierarchy-well-line-width",
   "--lineage-self-font-weight",
+  "--term-inspector-border-width",
   "--term-inspector-definition-font-size",
+  "--term-inspector-font-size",
+  "--term-inspector-label-font-size",
+  "--term-inspector-label-letter-spacing",
+  "--term-inspector-radius",
+  "--term-node-border-width",
   "--term-node-faded-opacity",
+  "--term-node-font-size",
+  "--term-node-radius",
+  "--term-node-selected-border-width",
   "--term-node-selected-font-weight",
   "--term-node-tag-font-size",
   "--term-node-tag-letter-spacing",
   "--term-rail-count-opacity",
   "--term-rail-current-font-weight",
+  "--term-rail-depth-font-family",
   "--term-rail-dimmed-opacity",
+  "--term-rail-font-size",
+  "--term-rail-item-radius",
+  "--term-rail-label-font-size",
+  "--term-rail-label-letter-spacing",
+  "--term-rail-mark-border-width",
   "--term-rail-mark-size",
+  "--term-rail-title-font-size",
+  "--well-legend-border-width",
   "--well-legend-font-size",
   "--well-legend-max-inline-size",
+  "--well-legend-radius",
+  "--well-legend-swatch-radius",
 ];
 
 /**
  * The tokens the lens reads from outside itself: the design system's
- * `@canonical/styles` tokens, and the site's grid preset, strata and
- * underground surface.
+ * semantic colour, space and motion tokens, and the site's grid preset,
+ * strata and underground surface. No primitive token is among them: a
+ * component token reads the semantic tier or holds its own value.
  */
 const EXTERNAL_TOKENS = [
   "--color-background",
@@ -89,15 +121,6 @@ const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-branded",
   "--color-text-muted",
-  "--dimension-letter-spacing-wide",
-  "--dimension-radius-full",
-  "--dimension-radius-medium",
-  "--dimension-radius-small",
-  "--dimension-size-font-size-250",
-  "--dimension-size-font-size-300",
-  "--dimension-size-font-size-350",
-  "--dimension-stroke-thickness-large",
-  "--dimension-stroke-thickness-medium",
   "--grid-intrinsic",
   "--motion-duration-fast",
   "--space-025",
@@ -108,7 +131,6 @@ const EXTERNAL_TOKENS = [
   "--space-300",
   "--space-800",
   "--surface-underground-background",
-  "--typography-font-family-monospace",
   "--z-plate",
   "--z-underground",
 ];

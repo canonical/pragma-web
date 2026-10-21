@@ -4,10 +4,11 @@
  * stationary frame: nothing here may change it, or the canvas would jump on
  * a lens switch. Hence the small fixed metrics and `min-inline-size: 0`.
  *
- * Each design decision reads a component token. Where the design system has
- * a token for it, the component token reads that token, falling back to the
- * lens's default where the site binds none; where it has none, the component
- * token holds the lens's own value.
+ * Each design decision reads a component token. The colours, spacing and
+ * motion read the design system's semantic tokens. The design system has no
+ * semantic token for the chip's type size, border width and radius, or the
+ * swatch size, so those component tokens hold the lens's own value and only
+ * they retune it.
  */
 
 @layer ds.prism {
@@ -23,17 +24,11 @@
       1.25 *
       var(--space-100, 0.5rem)
     );
-    --explorer-controls-chip-border-width: var(
-      --dimension-stroke-thickness-medium,
-      1px
-    );
+    --explorer-controls-chip-border-width: 1px;
     --explorer-controls-chip-border-color: var(--color-border-muted);
-    --explorer-controls-chip-radius: var(--dimension-radius-full, 999px);
+    --explorer-controls-chip-radius: 999px;
     --explorer-controls-chip-color: var(--color-text-muted);
-    --explorer-controls-chip-font-size: var(
-      --dimension-size-font-size-250,
-      0.75rem
-    );
+    --explorer-controls-chip-font-size: 0.75rem;
     --explorer-controls-chip-color-pressed: var(--color-text);
     --explorer-controls-chip-background-pressed: color-mix(
       in oklab,

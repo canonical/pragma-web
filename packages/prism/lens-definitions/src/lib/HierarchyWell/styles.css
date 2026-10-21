@@ -6,11 +6,12 @@
  * ABSOLUTELY inside its camera, never `position: fixed`, which the canvas's
  * containment would re-anchor.
  *
- * Each design decision reads a component token. Where the design system has
- * a token for it, the component token reads that token, falling back to the
- * lens's default where the site binds none; where it has none, the component
- * token holds the lens's own value. The floor and its stratum read the
- * site's underground surface hooks.
+ * Each design decision reads a component token. The colours, spacing and
+ * motion read the design system's semantic tokens. The design system has no
+ * semantic token for the edge and halo widths, the opacities, the monospace
+ * family, the type sizes, weight and tracking, or the hint's radius, so
+ * those component tokens hold the lens's own value and only they retune it.
+ * The floor and its stratum read the site's underground surface hooks.
  *
  * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
  */
@@ -25,16 +26,10 @@
     --hierarchy-well-accent-width: 1.8;
     --hierarchy-well-head-fill: var(--color-background);
     --hierarchy-well-ambient-opacity: 0.35;
-    --hierarchy-well-label-font-family: var(
-      --typography-font-family-monospace,
-      monospace
-    );
+    --hierarchy-well-label-font-family: "Ubuntu Mono", monospace;
     --hierarchy-well-label-font-size: 0.6875rem;
     --hierarchy-well-label-halo: var(--color-background);
-    --hierarchy-well-label-halo-width: var(
-      --dimension-stroke-thickness-large,
-      3px
-    );
+    --hierarchy-well-label-halo-width: 3px;
     --hierarchy-well-caption-font-size: 0.9rem;
     --hierarchy-well-caption-font-weight: 700;
     --hierarchy-well-caption-letter-spacing: 0.12em;
@@ -44,16 +39,13 @@
     --hierarchy-well-hint-inset: var(--space-150, 0.75rem);
     --hierarchy-well-hint-padding-block: var(--space-050, 0.25rem);
     --hierarchy-well-hint-padding-inline: var(--space-150, 0.75rem);
-    --hierarchy-well-hint-radius: var(--dimension-radius-full, 999px);
+    --hierarchy-well-hint-radius: 999px;
     --hierarchy-well-hint-background: color-mix(
       in oklab,
       var(--color-background) 85%,
       transparent
     );
-    --hierarchy-well-hint-font-size: var(
-      --dimension-size-font-size-250,
-      0.75rem
-    );
+    --hierarchy-well-hint-font-size: 0.75rem;
     --hierarchy-well-hint-color: var(--color-text-muted);
     --hierarchy-well-transition-duration: var(--motion-duration-fast, 0.15s);
   }

@@ -4,10 +4,10 @@
  * leaf; the ⊂ glyphs are muted connectors that never wrap away from the
  * link they precede.
  *
- * Each design decision reads a component token. Where the design system has
- * a token for it, the component token reads that token, falling back to the
- * lens's default where the site binds none; where it has none, the component
- * token holds the lens's own value.
+ * Each design decision reads a component token. The colours read the design
+ * system's semantic tokens. The design system has no semantic token for the
+ * leaf's weight, so its component token holds the lens's own value and only
+ * it retunes it.
  */
 
 @layer ds.prism {
