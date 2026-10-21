@@ -94,6 +94,37 @@ describe("collectShortcuts", () => {
     );
   });
 
+  it("accepts a key above the BMP, one code point in two UTF-16 units", () => {
+    // MATHEMATICAL DOUBLE-STRUCK CAPITAL A: `KeyboardEvent.key` reports it
+    // as one character, though its `.length` is 2.
+    const astral = "\u{1D538}";
+    const routes = {
+      home: route({
+        url: "/",
+        content: page,
+        meta: { [ROUTE_SHORTCUT_META_KEY]: astral },
+      }),
+    } as const;
+    expect(Object.fromEntries(collectShortcuts(routes).byKey)).toEqual({
+      [astral]: "home",
+    });
+  });
+
+  it("rejects a ZWJ sequence, one grapheme over several code points", () => {
+    // WOMAN + ZERO WIDTH JOINER + LAPTOP renders as one glyph, but no
+    // keydown reports it as its `key`.
+    const routes = {
+      home: route({
+        url: "/",
+        content: page,
+        meta: { [ROUTE_SHORTCUT_META_KEY]: "\u{1F469}\u200D\u{1F4BB}" },
+      }),
+    } as const;
+    expect(() => collectShortcuts(routes)).toThrow(
+      /not a single-character key/,
+    );
+  });
+
   it("collects the fixture table's allocation, skipping the param route", () => {
     expect(Object.fromEntries(collectShortcuts(LENS_ROUTES).byKey)).toEqual({
       "1": "home",
