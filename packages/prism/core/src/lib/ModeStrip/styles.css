@@ -27,7 +27,7 @@
   }
 
   /* The context slot: the mode's title/breadcrumb, west. */
-  .ds.mode-strip .strip-context {
+  .ds.mode-strip .context {
     font-weight: 500;
     white-space: nowrap;
   }
@@ -36,7 +36,7 @@
    * filters east — context anchored west, controls hard right, the band reading
    * as space-between across the strip. Empty, it collapses to nothing (no
    * children to push), so the lens layout stays stationary. */
-  .ds.mode-strip .strip-controls {
+  .ds.mode-strip .controls {
     flex: 1;
     display: flex;
     align-items: center;
@@ -46,7 +46,7 @@
   }
 
   /* The status socket: readouts sit east, before future ephemera anchors. */
-  .ds.mode-strip .strip-status {
+  .ds.mode-strip .status {
     display: flex;
     align-items: center;
     gap: var(--space-100, 0.5rem);

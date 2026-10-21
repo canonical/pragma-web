@@ -156,17 +156,17 @@
     gap: var(--container-gap-default, 1rem);
   }
 
-  .ds.chip-legend .chip-legend-title {
+  .ds.chip-legend .title {
     margin: 0;
     font-weight: 600;
   }
 
-  .ds.chip-legend .chip-legend-summary {
+  .ds.chip-legend .summary {
     margin: 0;
     color: var(--color-foreground-secondary, inherit);
   }
 
-  .ds.chip-legend .chip-legend-entries {
+  .ds.chip-legend .entries {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -174,13 +174,13 @@
     gap: 0.5rem;
   }
 
-  .ds.chip-legend .chip-legend-entries li {
+  .ds.chip-legend .entries li {
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
   }
 
-  .ds.chip-legend .chip-legend-note {
+  .ds.chip-legend .note {
     color: var(--color-foreground-secondary, inherit);
   }
 }

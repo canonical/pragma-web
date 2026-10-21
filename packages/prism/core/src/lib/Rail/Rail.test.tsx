@@ -54,7 +54,7 @@ describe("Rail", () => {
     renderRail();
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(nav.dataset.region).toBe("primary-nav");
-    const labels = [...nav.querySelectorAll(".rail-lenses .rail-label")].map(
+    const labels = [...nav.querySelectorAll(".lenses .label")].map(
       (label) => label.textContent,
     );
     expect(labels).toEqual(["Home", "Catalog", "Glossary"]);
@@ -77,7 +77,7 @@ describe("Rail", () => {
   it("renders the lens order's digits as 1–3", () => {
     renderRail();
     const nav = screen.getByRole("navigation", { name: "Primary" });
-    const digits = [...nav.querySelectorAll(".rail-lenses kbd")].map(
+    const digits = [...nav.querySelectorAll(".lenses kbd")].map(
       (kbd) => kbd.textContent,
     );
     expect(digits).toEqual(["1", "2", "3"]);
@@ -142,7 +142,7 @@ describe("Rail", () => {
     renderRailOver(routes);
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(
-      [...nav.querySelectorAll(".rail-lenses .rail-label")].map(
+      [...nav.querySelectorAll(".lenses .label")].map(
         (label) => label.textContent,
       ),
     ).toEqual(["Two", "Seven", "Ten"]);
@@ -152,7 +152,7 @@ describe("Rail", () => {
     renderRail("/catalog");
     const brandLink = screen
       .getByRole("navigation", { name: "Primary" })
-      .querySelector(".rail-brand");
+      .querySelector(".brand");
     expect(brandLink).toHaveAttribute("href", "/");
     expect(brandLink?.querySelector("small")?.textContent).toBe(
       "a field guide",
@@ -172,7 +172,7 @@ describe("Rail", () => {
     );
     const brandLink = screen
       .getByRole("navigation", { name: "Primary" })
-      .querySelector(".rail-brand");
+      .querySelector(".brand");
     expect(brandLink?.textContent).toBe("Metro");
     expect(brandLink?.querySelector("small")).toBeNull();
   });
@@ -196,7 +196,7 @@ describe("Rail", () => {
         })}
       >
         <Rail brand={brand} entries={collectLenses(LENS_ROUTES)}>
-          <ul aria-label="Utilities" className="rail-utilities">
+          <ul aria-label="Utilities" className="utilities">
             <li>Help</li>
           </ul>
         </Rail>
@@ -205,10 +205,8 @@ describe("Rail", () => {
     const nav = screen.getByRole("navigation", { name: "Primary" });
     const utilities = screen.getByRole("list", { name: "Utilities" });
     expect(nav.lastElementChild).toBe(utilities);
-    expect(nav.querySelector(".rail-lenses")?.contains(utilities)).toBe(false);
-    expect(nav.querySelector(".rail-spacer")?.nextElementSibling).toBe(
-      utilities,
-    );
+    expect(nav.querySelector(".lenses")?.contains(utilities)).toBe(false);
+    expect(nav.querySelector(".spacer")?.nextElementSibling).toBe(utilities);
   });
 
   it("navigates on a bare lens digit (the wired keyboard grammar)", async () => {

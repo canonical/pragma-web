@@ -16,8 +16,8 @@
  * layout's columns; it is a stack, not a column layout.
  *
  * The utility cluster (`children`) is styled from its class contract:
- * `.rail-util-label`, `.rail-utilities`, `.rail-item.rail-util` and
- * `.rail-theme`.
+ * `.utilities-label`, `.utilities`, `.item.util` and
+ * `.theme`.
  */
 
 @layer ds.prism {
@@ -39,7 +39,7 @@
   }
 
   /* Brand: dot + wordmark, the door back to Home. */
-  .ds.rail .rail-brand {
+  .ds.rail .brand {
     display: flex;
     align-items: center;
     gap: var(--space-100, 0.5rem);
@@ -50,7 +50,7 @@
     text-decoration: none;
   }
 
-  .ds.rail .rail-brand-dot {
+  .ds.rail .brand-dot {
     inline-size: 10px;
     block-size: 10px;
     border-radius: 50%;
@@ -58,7 +58,7 @@
     flex-shrink: 0;
   }
 
-  .ds.rail .rail-brand-word small {
+  .ds.rail .brand-word small {
     display: block;
     font-weight: 400;
     font-size: 0.66rem;
@@ -76,7 +76,7 @@
   }
 
   /* A rail entry: icon + label + (revealed-on-approach) keyboard hint. */
-  .ds.rail .rail-item {
+  .ds.rail .item {
     display: flex;
     align-items: center;
     gap: var(--space-100, 0.5rem);
@@ -88,11 +88,11 @@
       var(--motion-easing-standard, ease-out);
   }
 
-  .ds.rail .rail-item svg {
+  .ds.rail .item svg {
     flex-shrink: 0;
   }
 
-  .ds.rail .rail-item:hover {
+  .ds.rail .item:hover {
     background: var(--color-background-layer2, #eee);
     color: var(--color-text, #000);
   }
@@ -102,7 +102,7 @@
    * edges. Colour per Chip's `--chip-focus` pattern: a component theme hook
    * defaulting to the token set's theme-neutral, guaranteed-contrast colour,
    * with `currentColor` as the last-resort fallback. */
-  .ds.rail .rail-item:focus-visible {
+  .ds.rail .item:focus-visible {
     outline: 2px solid
       var(--rail-focus, var(--color-background-contrasted, currentColor));
     outline-offset: -1px;
@@ -111,13 +111,13 @@
   /* Active lens: styled from the router's own aria-current attribute — the
    * rail's ONLY route-dependent bit, and an attribute rather than a class,
    * so the SSR layout suite can name it precisely. */
-  .ds.rail .rail-item[aria-current="page"] {
+  .ds.rail .item[aria-current="page"] {
     background: var(--color-background-layer2, #eee);
     color: var(--color-text, #000);
     font-weight: 500;
   }
 
-  .ds.rail .rail-kbd {
+  .ds.rail .kbd {
     margin-inline-start: auto;
     font-size: 0.62rem;
     font-family: inherit;
@@ -131,16 +131,16 @@
       var(--motion-easing-standard, ease-out);
   }
 
-  .ds.rail .rail-item:hover .rail-kbd,
-  .ds.rail .rail-item:focus-visible .rail-kbd {
+  .ds.rail .item:hover .kbd,
+  .ds.rail .item:focus-visible .kbd {
     opacity: 1;
   }
 
-  .ds.rail .rail-spacer {
+  .ds.rail .spacer {
     flex: 1;
   }
 
-  .ds.rail .rail-util-label {
+  .ds.rail .utilities-label {
     margin: 0;
     font-size: 0.62rem;
     text-transform: uppercase;
@@ -150,12 +150,12 @@
       var(--space-050, 0.25rem);
   }
 
-  .ds.rail .rail-util {
+  .ds.rail .util {
     font-size: 0.85rem;
     padding-block: var(--space-050, 0.25rem);
   }
 
-  .ds.rail .rail-theme {
+  .ds.rail .theme {
     padding: var(--space-100, 0.5rem);
   }
 
@@ -173,10 +173,10 @@
       grid-column: span 1;
     }
 
-    .ds.rail .rail-label,
-    .ds.rail .rail-kbd,
-    .ds.rail .rail-brand-word,
-    .ds.rail .rail-util-label {
+    .ds.rail .label,
+    .ds.rail .kbd,
+    .ds.rail .brand-word,
+    .ds.rail .utilities-label {
       position: absolute;
       inline-size: 1px;
       block-size: 1px;
@@ -189,7 +189,7 @@
 
     /* The theme select has no icon form; it shrinks with the rail instead
      * of hiding — a truncated but operable control beats an invisible one. */
-    .ds.rail .rail-theme select {
+    .ds.rail .theme select {
       inline-size: 100%;
     }
   }
@@ -199,8 +199,8 @@
    * non-layout feature query, so it does not count against the single
    * collapse. */
   @media (prefers-reduced-motion: reduce) {
-    .ds.rail .rail-item,
-    .ds.rail .rail-kbd {
+    .ds.rail .item,
+    .ds.rail .kbd {
       transition: none;
     }
   }

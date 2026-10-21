@@ -108,7 +108,7 @@ const keepSurvivors = (
 /** Click the rail's entry for `href`, through the real router. */
 const clickRail = async (container: HTMLElement, href: string) => {
   const link = container.querySelector<HTMLAnchorElement>(
-    `nav[data-region="primary-nav"] .rail-lenses a[href="${href}"]`,
+    `nav[data-region="primary-nav"] .lenses a[href="${href}"]`,
   );
   expect(link, `the rail links ${href}`).not.toBeNull();
   await act(async () => {

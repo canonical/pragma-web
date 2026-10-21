@@ -73,9 +73,9 @@ export function GlossaryLayout() {
 
 The rail reads its lenses from the route table it is given and wires each
 lens's shortcut key itself. Its `children` render at its foot as the site's
-utility cluster, styled from a class contract: a `p.rail-util-label`
-heading, a `ul.rail-utilities` labelled by it, `a.rail-item.rail-util`
-links (icon plus `span.rail-label`) and an `li.rail-theme` for a control
+utility cluster, styled from a class contract: a `p.utilities-label`
+heading, a `ul.utilities` labelled by it, `a.item.util`
+links (icon plus `span.label`) and an `li.theme` for a control
 such as `ThemeSelector`.
 
 ### Stylesheets

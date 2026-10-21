@@ -33,13 +33,13 @@ const ModeStrip = ({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-region="mode-strip"
     >
-      <div className="strip-context" data-slot="context">
+      <div className="context" data-slot="context">
         {context}
       </div>
-      <div className="strip-controls" data-slot="controls">
+      <div className="controls" data-slot="controls">
         {controls}
       </div>
-      <div className="strip-status" data-slot="status">
+      <div className="status" data-slot="status">
         {status}
       </div>
     </header>

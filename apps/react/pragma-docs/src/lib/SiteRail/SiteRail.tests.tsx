@@ -23,7 +23,7 @@ describe("SiteRail", () => {
     renderSiteRail();
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(
-      [...nav.querySelectorAll(".rail-lenses .rail-label")].map(
+      [...nav.querySelectorAll(".lenses .label")].map(
         (label) => label.textContent,
       ),
     ).toEqual([
@@ -40,7 +40,7 @@ describe("SiteRail", () => {
     renderSiteRail();
     const brand = screen
       .getByRole("navigation", { name: "Primary" })
-      .querySelector(".rail-brand");
+      .querySelector(".brand");
     expect(brand).toHaveAttribute("href", "/");
     expect(brand?.textContent).toBe("Pragmadesign system docs");
   });
@@ -56,7 +56,7 @@ describe("SiteRail", () => {
     renderSiteRail();
     const lenses = screen
       .getByRole("navigation", { name: "Primary" })
-      .querySelector(".rail-lenses");
+      .querySelector(".lenses");
     const utilities = screen.getByRole("list", { name: "Utilities" });
     expect(lenses?.contains(utilities)).toBe(false);
     expect(

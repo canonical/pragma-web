@@ -99,9 +99,9 @@ const ChipLegend = ({
   >
     {CHANNEL_DESCRIPTORS.map((channel) => (
       <section aria-label={channel.label} key={channel.value}>
-        <p className="chip-legend-title">{channel.label}</p>
-        <p className="chip-legend-summary">{channel.description}</p>
-        <ul className="chip-legend-entries">
+        <p className="title">{channel.label}</p>
+        <p className="summary">{channel.description}</p>
+        <ul className="entries">
           {listEntriesForChannel(channel.value, prefixes).map((entry) => (
             <li key={entry.key}>
               <Chip
@@ -113,7 +113,7 @@ const ChipLegend = ({
                 prefixes={prefixes}
                 uri={`legend:${channel.value}.${entry.key}`}
               />
-              <span className="chip-legend-note">{entry.description}</span>
+              <span className="note">{entry.description}</span>
             </li>
           ))}
         </ul>

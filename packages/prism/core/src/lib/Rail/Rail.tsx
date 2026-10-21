@@ -27,9 +27,9 @@ const componentCssClassName = "ds rail";
  * `kbd`, and the shown digit is the wired digit by construction.
  *
  * The utility cluster is the site's markup; the stylesheet styles this
- * contract: a `p.rail-util-label` heading with an id, a
- * `ul.rail-utilities` labelled by it, `li > a.rail-item.rail-util` links
- * holding an icon and a `span.rail-label`, and an `li.rail-theme` for a
+ * contract: a `p.utilities-label` heading with an id, a
+ * `ul.utilities` labelled by it, `li > a.item.util` links
+ * holding an icon and a `span.label`, and an `li.theme` for a
  * control such as `ThemeSelector`. In the collapsed rail the heading and
  * the labels hide visually and stay in the accessibility tree.
  *
@@ -56,15 +56,15 @@ const Rail = ({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-region="primary-nav"
     >
-      <Link<RouteMap, string> className="rail-brand" to={brand.to}>
-        <span aria-hidden="true" className="rail-brand-dot" />
-        <span className="rail-brand-word">
+      <Link<RouteMap, string> className="brand" to={brand.to}>
+        <span aria-hidden="true" className="brand-dot" />
+        <span className="brand-word">
           {brand.label}
           {brand.caption === undefined ? null : <small>{brand.caption}</small>}
         </span>
       </Link>
 
-      <ul className="rail-lenses">
+      <ul className="lenses">
         {entries.map(({ name, label, icon: Icon }) => {
           const hint = byRoute.get(name);
           return (
@@ -76,22 +76,20 @@ const Rail = ({
               <Link<RouteMap, string>
                 aria-keyshortcuts={hint}
                 aria-label={label}
-                className="rail-item"
+                className="item"
                 title={label}
                 to={name}
               >
                 <Icon />
-                <span className="rail-label">{label}</span>
-                {hint === undefined ? null : (
-                  <kbd className="rail-kbd">{hint}</kbd>
-                )}
+                <span className="label">{label}</span>
+                {hint === undefined ? null : <kbd className="kbd">{hint}</kbd>}
               </Link>
             </li>
           );
         })}
       </ul>
 
-      <div aria-hidden="true" className="rail-spacer" />
+      <div aria-hidden="true" className="spacer" />
 
       {children}
     </nav>

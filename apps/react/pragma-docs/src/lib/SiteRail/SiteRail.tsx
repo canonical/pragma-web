@@ -36,33 +36,29 @@ export default function SiteRail(props: SiteRailProps): ReactElement {
   const lenses = useMemo(() => collectLenses(router.routes), [router.routes]);
   return (
     <Rail {...props} brand={SITE_BRAND} entries={lenses}>
-      <p className="rail-util-label" id="rail-utilities-label">
+      <p className="utilities-label" id="rail-utilities-label">
         Utilities
       </p>
-      <ul aria-labelledby="rail-utilities-label" className="rail-utilities">
+      <ul aria-labelledby="rail-utilities-label" className="utilities">
         <li>
           {/* The SSR-certified demo canvas keeps a door. */}
-          <Link
-            className="rail-item rail-util"
-            title="Playground"
-            to="playground"
-          >
+          <Link className="item util" title="Playground" to="playground">
             <PlaygroundIcon />
-            <span className="rail-label">Playground</span>
+            <span className="label">Playground</span>
           </Link>
         </li>
         <li>
           <Link
-            className="rail-item rail-util"
+            className="item util"
             search={{ auth: "1" }}
             title="Demo sign-in"
             to="account"
           >
             <SignInIcon />
-            <span className="rail-label">Demo sign-in</span>
+            <span className="label">Demo sign-in</span>
           </Link>
         </li>
-        <li className="rail-theme">
+        <li className="theme">
           {/* Chrome preference — cookie-backed via usePreferredTheme. */}
           <ThemeSelector />
         </li>

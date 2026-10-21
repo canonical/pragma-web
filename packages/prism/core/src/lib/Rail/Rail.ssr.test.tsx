@@ -13,7 +13,7 @@ const renderRailHtml = (url: string): string =>
         brand={{ label: "Atlas", caption: "a field guide", to: "home" }}
         entries={collectLenses(LENS_ROUTES)}
       >
-        <p className="rail-util-label">Utilities</p>
+        <p className="utilities-label">Utilities</p>
       </Rail>
     </RouterProvider>,
   );
@@ -29,6 +29,6 @@ describe("Rail SSR", () => {
     // Displayed hints survive SSR (they are markup, not effects).
     expect(html).toContain("aria-keyshortcuts=");
     // The utility cluster is part of the server markup.
-    expect(html).toContain("rail-util-label");
+    expect(html).toContain("utilities-label");
   });
 });
