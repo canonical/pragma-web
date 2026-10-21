@@ -286,3 +286,34 @@ type Query {
   station: Station
 }
 `;
+
+/**
+ * A schema whose every named declaration other than `Query` is not an object
+ * type: `Thing` is an interface that itself implements `Node`, so only the
+ * declaration's kind tells it apart from a bindable type.
+ */
+export const NON_OBJECT_SDL = `
+interface Node {
+  uri: ID!
+}
+
+interface Thing implements Node {
+  uri: ID!
+}
+
+input Stop {
+  uri: ID!
+}
+
+union Place = Query
+
+enum Zone {
+  CENTRAL
+}
+
+scalar Instant
+
+type Query {
+  thing: Thing
+}
+`;

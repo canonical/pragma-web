@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { NO_NODE_SDL, NODE_SDL } from "../../../testing/fixtures.js";
+import {
+  NO_NODE_SDL,
+  NODE_SDL,
+  NON_OBJECT_SDL,
+} from "../../../testing/fixtures.js";
 import { assertBindings } from "./assertBindings.js";
 
 const station = {
@@ -26,6 +30,20 @@ describe("assertBindings", () => {
       'assertBindings: binding "depot" names type "Depot", which the schema does not declare',
     );
   });
+
+  it.each(["Thing", "Stop", "Place", "Zone", "Instant"])(
+    "throws when a binding names %s, declared but not as an object type",
+    (typename) => {
+      // No node ever carries an interface's, an input's, a union's, an
+      // enum's or a scalar's name as its `__typename`, so the schema does
+      // not declare a bindable type by that name.
+      expect(() =>
+        assertBindings(NON_OBJECT_SDL, [{ ...station, id: "probe", typename }]),
+      ).toThrow(
+        `assertBindings: binding "probe" names type "${typename}", which the schema does not declare`,
+      );
+    },
+  );
 
   it("throws when a binding's type does not implement Node", () => {
     expect(() =>
