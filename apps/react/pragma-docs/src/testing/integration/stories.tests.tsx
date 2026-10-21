@@ -1,7 +1,7 @@
 /**
  * Every story renders without erroring.
  *
- * WHY THIS EXISTS. The app ships 29 `*.stories.tsx` files and, until this
+ * WHY THIS EXISTS. The app ships 25 `*.stories.tsx` files and, until this
  * gate, nothing executed any of them. `@storybook/addon-vitest` is registered
  * in the shared Storybook config but the app declares no `storybookTest`
  * project, and no Chromatic workflow exists for this app — so the stories were
@@ -105,6 +105,9 @@ const DOCS_ONLY = new Set([
 
 describe("the story corpus", () => {
   it("is discovered from the tree, and has not shrunk", () => {
+    // The Definitions lens's rail, well, inspector and explorer have no
+    // story here: `@canonical/prism-lens-definitions` exports none of them,
+    // and its page story renders all four over the site's styles.
     expect(modulePaths.length).toBeGreaterThanOrEqual(25);
   });
 
