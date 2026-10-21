@@ -81,6 +81,7 @@ import { LENS_OPERATION_VARIABLES } from "../fixtures.js";
 import {
   collectLensSources,
   discoverLensOperationNames,
+  discoverLensOperations,
   readOperationText,
 } from "../lensOperations.js";
 
@@ -241,6 +242,18 @@ describe("the lens operations", () => {
 
   it("discovers at least one operation (anti-vacuity)", () => {
     expect(names.length).toBeGreaterThan(0);
+  });
+
+  it("harvests the lens packages beside the app", () => {
+    // The core lens set spans the app's lens tree and the lens packages; a
+    // scan that silently dropped the packages would still find the app's
+    // operations and pass.
+    const fromPackages = [...discoverLensOperations()]
+      .filter(([, source]) =>
+        source.directory.includes("/packages/prism/lens-"),
+      )
+      .map(([name]) => name);
+    expect(fromPackages).toContain("DefinitionsExplorerQuery");
   });
 
   it("has variables declared for every discovered operation", () => {

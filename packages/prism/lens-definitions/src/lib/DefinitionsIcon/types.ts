@@ -1,0 +1,11 @@
+import type { ComponentProps } from "react";
+
+type OwnProps = {
+  /** The glyph's width and height, in pixels; 16 when omitted. */
+  readonly size?: number;
+};
+
+/** Props accepted by `DefinitionsIcon`: its size, and the native props of
+ * its root `<svg>`. */
+export type DefinitionsIconProps = OwnProps &
+  Omit<ComponentProps<"svg">, keyof OwnProps>;
