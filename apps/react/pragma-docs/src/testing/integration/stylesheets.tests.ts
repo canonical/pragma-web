@@ -85,7 +85,13 @@ describe("the app stylesheets", () => {
           .replaceAll(/\/\*[\s\S]*?\*\//g, "")
           .matchAll(/grid-template-columns:\s*([^;]+);/g),
       ]
-        .map((match) => match[1].trim())
+        .map((match) => {
+          const value = match.at(1);
+          if (value === undefined) {
+            throw new Error(`${file} has a grid template with no value`);
+          }
+          return value.trim();
+        })
         .filter((value) => !value.startsWith("subgrid") && value !== "inherit")
         .map((value) => ({ file, value })),
     );
@@ -127,6 +133,6 @@ describe("the app stylesheets", () => {
   it("allows exactly one layout-capable conditional at-rule — the sanctioned AX.1 collapse", () => {
     const conditionals = layoutCapableConditionals();
     expect(conditionals).toHaveLength(1);
-    expect(conditionals[0]).toMatch(/^@media[^{]*max-width/);
+    expect(conditionals.at(0)).toMatch(/^@media[^{]*max-width/);
   });
 });

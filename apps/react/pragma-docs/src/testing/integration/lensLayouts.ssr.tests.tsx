@@ -384,26 +384,28 @@ const STRIP_CONTROLS_PATTERN =
 const STRIP_STATUS_PATTERN =
   /(<div class="strip-status" data-slot="status">)([\s\S]*?)(<\/div><\/header>)/;
 
-/** The context slot's raw markup, asserted against the per-URL model. */
-const extractStripContext = (chrome: string): string => {
-  const match = STRIP_CONTEXT_PATTERN.exec(chrome);
-  expect(match, "chrome carries exactly one context slot").not.toBeNull();
-  return (match as RegExpExecArray)[2];
+/**
+ * A strip slot's raw inner markup: the content group (the second capture) of
+ * the slot's pattern. A chrome that carries no such slot fails the test.
+ */
+const extractStripSlot = (chrome: string, pattern: RegExp): string => {
+  const content = pattern.exec(chrome)?.at(2);
+  if (content === undefined) {
+    throw new Error(`chrome carries no strip slot matching ${pattern}`);
+  }
+  return content;
 };
 
-/** The controls/status slots' raw inner markup. */
-const extractStripSlot = (chrome: string, pattern: RegExp): string => {
-  const match = pattern.exec(chrome);
-  expect(match, "chrome carries exactly one such strip slot").not.toBeNull();
-  return (match as RegExpExecArray)[2];
-};
+/** The context slot's raw markup, asserted against the per-URL model. */
+const extractStripContext = (chrome: string): string =>
+  extractStripSlot(chrome, STRIP_CONTEXT_PATTERN);
 
 /** The hrefs of anchors carrying aria-current, in document order. */
 const ariaCurrentHrefs = (chrome: string): string[] =>
   [...chrome.matchAll(/<a\b[^>]*>/g)]
-    .map((match) => match[0])
+    .flatMap((match) => match.at(0) ?? [])
     .filter((anchor) => anchor.includes('aria-current="page"'))
-    .map((anchor) => /href="([^"]*)"/.exec(anchor)?.[1] ?? "(no href)");
+    .map((anchor) => /href="([^"]*)"/.exec(anchor)?.at(1) ?? "(no href)");
 
 interface LensPage {
   readonly chrome: string;
@@ -554,7 +556,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
   it("renders each URL inside the layout its route is grouped under", () => {
     for (const [url, { chrome }] of getPages()) {
       const layouts = [...chrome.matchAll(/class="ds ([a-z-]+-layout)"/g)].map(
-        (match) => match[1],
+        (match) => match.at(1),
       );
       expect(layouts, `layout on ${url}`).toEqual([EXPECTED_LAYOUT[url]]);
     }
