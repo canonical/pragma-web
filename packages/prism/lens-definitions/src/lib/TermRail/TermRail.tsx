@@ -17,12 +17,12 @@ import "./styles.css";
  * scope wherever no Relay transform has run; the component reads the
  * compiled artifact instead.
  *
- * The rail does NOT declare `superclass` here on purpose: adding it would
- * re-emit the shared operation's query text and break the relay-byte identity
- * contract (Relay writes fragment selections into the wire text, so the field
- * is not free even though the well already fetches it). Depth therefore arrives
- * as a prop the explorer derives from the well's fragment; see `depthByUri` in
- * the props and `DefinitionsExplorer`.
+ * The rail selects no `superclass`. The well's fragment already selects it
+ * in the same operation, and Relay writes every fragment's selections into
+ * the request text, so selecting it here too would request the field a
+ * second time for data the explorer already holds. Depth therefore arrives
+ * as a prop the explorer derives from the well's fragment; see `depthByUri`
+ * in the props and `DefinitionsExplorer`.
  */
 const declareTermRailFragment = (): unknown => graphql`
   fragment TermRail_ontologies on Ontology @relay(plural: true) {

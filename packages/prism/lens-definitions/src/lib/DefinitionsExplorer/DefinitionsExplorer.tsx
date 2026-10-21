@@ -93,9 +93,10 @@ const componentCssClassName = "ds definitions-explorer";
  * `window`.
  *
  * DEPTH FOR THE RAIL. The rail shows each class's superclass depth, but its
- * own fragment cannot carry `superclass` without re-emitting the shared
- * operation's query text (the relay-byte-identity contract).
- * So the explorer reads the WELL's fragment (already in this operation,
+ * own fragment does not select `superclass`: the well's fragment already
+ * selects it in this operation, and Relay writes every fragment's
+ * selections into the request text, so a second selection would only
+ * request the field again. So the explorer reads the WELL's fragment (already in this operation,
  * masked from the rail) and derives the depth map with the very function
  * the well lays out by (`computeClassDepths`), then hands it down. One
  * algorithm, two readers, zero query change.

@@ -14,10 +14,9 @@ type OwnProps = {
   /**
    * Superclass depth per class, keyed by FULL IRI — the same measure the
    * well stacks its layers by (`computeClassDepths`), computed once by
-   * `DefinitionsExplorer` and passed down. The rail's own fragment cannot
-   * carry `superclass` without changing the shared operation's query text
-   * (the relay-byte-identity contract), so depth arrives as data rather
-   * than as a fragment field. A URI absent from the map reads as depth 0.
+   * `DefinitionsExplorer` and passed down, so the rail's fragment does not
+   * select `superclass` a second time in the operation whose well fragment
+   * already selects it. A URI absent from the map reads as depth 0.
    */
   readonly depthByUri: ReadonlyMap<string, number>;
   /**
