@@ -4,6 +4,7 @@
  * @module sources
  */
 
+export { collectProseSidecars } from "./collectProseSidecars.js";
 export {
   collectTtlSources,
   escapeChannelDottedRefs,

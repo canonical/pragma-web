@@ -33,7 +33,7 @@
  */
 
 import { existsSync, readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { join } from "node:path";
 import {
   CHANNEL_DOTTED_REF,
   DEFAULT_SEM_ROOT,
@@ -43,6 +43,7 @@ import {
   TTL_DIRS,
   type TtlSource,
 } from "../config/index.js";
+import { compareByPath, formatStoreVisiblePath } from "./storePaths.js";
 import { mapTurtleSyntax } from "./turtleText.js";
 import { walkFiles } from "./walkFiles.js";
 
@@ -64,18 +65,6 @@ export const resolveSemRoot = (): string =>
   process.env.PRAGMA_SEM_DIR ?? DEFAULT_SEM_ROOT;
 
 /**
- * Sort key: the store-visible path. Paths are unique (each root's label is
- * its package name and the ref and semantics package lists are disjoint), so
- * there is no equal arm.
- */
-const byPath = (a: TtlSource, b: TtlSource): number =>
-  a.path < b.path ? -1 : 1;
-
-/** `<label>/<path relative to base>`, forward slashes on every platform. */
-const storeVisiblePath = (label: string, base: string, full: string): string =>
-  `${label}/${relative(base, full).split(sep).join("/")}`;
-
-/**
  * Collect every `.ttl` under `dir` (recursively, skipping dot-prefixed
  * entries) into `out`, keyed relative to `base` under `label`.
  */
@@ -87,7 +76,7 @@ export const walkTtl = (
 ): void => {
   for (const full of walkFiles(dir, ".ttl")) {
     out.push({
-      path: storeVisiblePath(label, base, full),
+      path: formatStoreVisiblePath(label, base, full),
       content: escapeChannelDottedRefs(readFileSync(full, "utf-8")),
     });
   }
@@ -140,6 +129,6 @@ export const collectTtlSources = ({
   const collected = sources.filter(
     (source) => !EXCLUDED_SOURCES.includes(source.path),
   );
-  collected.sort(byPath);
+  collected.sort(compareByPath);
   return collected;
 };
