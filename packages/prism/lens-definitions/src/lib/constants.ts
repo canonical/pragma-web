@@ -11,8 +11,8 @@ export const ABSTRACTION_VALUES = ["abstract", "concrete"] as const;
 
 /**
  * The no-op default — the ONLY value that may be a component's initial
- * state. `namespaces: undefined` is impossible here, so the well needs a
- * separate "all prefixes" seed; see `createAllNamespacesFilter`.
+ * state. Its `namespaces` is empty, which every consumer reads as "no chip
+ * pressed"; `resolveFilter` lights the graph's own prefixes from it.
  */
 export const DEFAULT_LENS_FILTER: LensFilter = {
   text: "",

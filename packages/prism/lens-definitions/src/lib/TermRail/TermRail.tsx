@@ -3,9 +3,9 @@ import type React from "react";
 import { graphql, useFragment } from "react-relay";
 import type { TermRail_ontologies$key } from "../../__generated__/TermRail_ontologies.graphql.js";
 import termRailFragmentNode from "../../__generated__/TermRail_ontologies.graphql.js";
+import compactUri from "../compactUri.js";
 import { useMessages } from "../i18n/index.js";
 import { matchesChips, matchesText } from "../lensFilter.js";
-import { compactUri } from "../uris.js";
 import type { TermRailProps } from "./types.js";
 import "./styles.css";
 

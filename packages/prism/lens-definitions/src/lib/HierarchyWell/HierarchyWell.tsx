@@ -16,7 +16,7 @@ import "./styles.css";
  * The source relay-compiler reads `HierarchyWell_ontologies` from; nothing
  * calls it, and the component reads the compiled artifact. `namespace`
  * rides along because the graph returns FULL IRIs and the well's node ids
- * are prefixed term addresses (see `uris.ts`). `properties` feeds the
+ * are prefixed term addresses (see `compactUri.ts`). `properties` feeds the
  * SEMANTIC edge family: object properties whose domain and range are both
  * drawn classes, the relations that make the well read as an ontology
  * rather than an organigram.

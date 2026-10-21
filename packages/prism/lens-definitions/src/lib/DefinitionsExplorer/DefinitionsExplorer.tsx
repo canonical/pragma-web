@@ -17,17 +17,16 @@ import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * Codegen source of truth for `DefinitionsExplorerQuery` — the whole
- * triptych is ONE operation: the rail and well
- * fragments fan out over `ontologies`; the term lookup rides the same
- * operation behind `@include(if: $hasTerm)`, querying BOTH `ontologyClass`
- * and `ontologyProperty` because a term address does not encode which one
- * it names — whichever is non-null wins in the inspector. `prefix` /
- * `namespace` also ride at the root for the inspector's URI codec (the
- * graph returns full IRIs; term addresses are prefixed — see `uris.ts`).
- * Nothing calls it: the hook reads the compiled artifact, because an
- * evaluated tag throws at module scope wherever no Relay transform has
- * run.
+ * Codegen source of truth for `DefinitionsExplorerQuery` — the whole triptych
+ * is ONE operation: the rail and well fragments fan out over `ontologies`; the
+ * term lookup rides the same operation behind `@include(if: $hasTerm)`,
+ * querying BOTH `ontologyClass` and `ontologyProperty` because a term address
+ * does not encode which one it names — whichever is non-null wins in the
+ * inspector. `prefix` / `namespace` also ride at the root for the inspector's
+ * URI codec (the graph returns full IRIs; term addresses are prefixed — see
+ * `compactUri.ts`). Nothing calls it: the hook reads the compiled artifact,
+ * because an evaluated tag throws at module scope wherever no Relay transform
+ * has run.
  */
 const declareDefinitionsExplorerQuery = (): unknown => graphql`
   query DefinitionsExplorerQuery($uri: String!, $hasTerm: Boolean!) {

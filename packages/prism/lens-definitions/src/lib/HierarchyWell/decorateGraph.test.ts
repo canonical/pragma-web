@@ -10,7 +10,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { createAllNamespacesFilter } from "../lensFilter.js";
+import createAllNamespacesFilter from "../../../testing/createAllNamespacesFilter.js";
 import type { LensFilter } from "../types.js";
 import { buildClassGraph } from "./buildClassGraph.js";
 import {

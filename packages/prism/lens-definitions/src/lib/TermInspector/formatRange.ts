@@ -1,5 +1,5 @@
+import compactUri from "../compactUri.js";
 import type { OntologyNamespace } from "../types.js";
-import { compactUri } from "../uris.js";
 
 /** `https://…/Subcomponent` → `ds:Subcomponent`; datatype ranges (e.g.
  * `xsd:string` shapes) pass through the codec unchanged. */

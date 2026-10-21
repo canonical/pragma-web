@@ -8,7 +8,7 @@
 
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { createAllNamespacesFilter } from "../lensFilter.js";
+import createAllNamespacesFilter from "../../../testing/createAllNamespacesFilter.js";
 import type { LensFilter } from "../types.js";
 import ExplorerControls from "./ExplorerControls.js";
 

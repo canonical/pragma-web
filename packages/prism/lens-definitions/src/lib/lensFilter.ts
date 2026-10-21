@@ -22,24 +22,11 @@
  * query string — that would break hydration (the SSR determinism rule).
  */
 
-import { DEFAULT_LENS_FILTER } from "./constants.js";
 import type { Abstraction, LensFilter } from "./types.js";
 
 /** Which axis value a class sits on — total over `isAbstract`. */
 export const classifyAbstraction = (isAbstract: boolean): Abstraction =>
   isAbstract ? "abstract" : "concrete";
-
-/**
- * The default with every known prefix lit. Callers build this from the
- * ontologies the query returned, so a new ontology needs no code change.
- * Pure and order-preserving, so two calls with the same input are equal.
- */
-export const createAllNamespacesFilter = (
-  prefixes: readonly string[],
-): LensFilter => ({
-  ...DEFAULT_LENS_FILTER,
-  namespaces: [...prefixes],
-});
 
 /**
  * Resolve the EFFECTIVE filter against the ontologies that actually exist.

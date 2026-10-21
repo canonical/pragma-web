@@ -7,10 +7,10 @@
  */
 
 import { describe, expect, it } from "vitest";
+import createAllNamespacesFilter from "../../testing/createAllNamespacesFilter.js";
 import { ABSTRACTION_VALUES, DEFAULT_LENS_FILTER } from "./constants.js";
 import {
   classifyAbstraction,
-  createAllNamespacesFilter,
   matchesChips,
   matchesText,
   normalizeFilterText,
@@ -37,21 +37,6 @@ describe("the default filter is a no-op (the SSR determinism keystone)", () => {
     // If this ever becomes non-empty (a query-string or localStorage seed),
     // the server's markup and the client's first paint diverge.
     expect(DEFAULT_LENS_FILTER.text).toBe("");
-  });
-});
-
-describe("createAllNamespacesFilter", () => {
-  it("lights every prefix it is given, in order", () => {
-    const filter = createAllNamespacesFilter(["ds", "cs", "anatomy"]);
-    expect([...filter.namespaces]).toEqual(["ds", "cs", "anatomy"]);
-    expect(filter.text).toBe("");
-  });
-
-  it("passes every class when seeded from the ontologies' own prefixes", () => {
-    const filter = createAllNamespacesFilter(["ds", "cs", "anatomy"]);
-    expect(matchesChips(filter, true, "ds")).toBe(true);
-    expect(matchesChips(filter, false, "cs")).toBe(true);
-    expect(matchesChips(filter, false, "anatomy")).toBe(true);
   });
 });
 

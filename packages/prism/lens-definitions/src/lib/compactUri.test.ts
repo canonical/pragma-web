@@ -1,13 +1,13 @@
 /**
- * The prefixed↔full URI codec, pinned against the live graph's real
- * namespaces (the graph returns full IRIs; term addresses are prefixed):
- * ds is /-terminated, cs and anatomy are #-terminated — both shapes must
- * round-trip, and unknown URIs must pass through rather than throw.
+ * The URI codec, pinned against the live graph's real namespaces (the
+ * graph returns full IRIs; term addresses are prefixed): ds is
+ * /-terminated, cs and anatomy are #-terminated — both shapes must compact,
+ * and unknown URIs must pass through rather than throw.
  */
 
 import { describe, expect, it } from "vitest";
+import compactUri from "./compactUri.js";
 import type { OntologyNamespace } from "./types.js";
-import { compactUri, expandUri } from "./uris.js";
 
 /** The three live ontologies' addressing identities, as the graph states
  * them (`{ ontologies { prefix namespace } }`). */
@@ -59,30 +59,5 @@ describe("compactUri", () => {
     expect(compactUri("https://example.org/inner/Thing", nested)).toBe(
       "inner:Thing",
     );
-  });
-});
-
-describe("expandUri", () => {
-  it("expands a known prefix", () => {
-    expect(expandUri("ds:UIBlock", NAMESPACES)).toBe(
-      "https://ds.canonical.com/UIBlock",
-    );
-    expect(expandUri("anatomy:Node", NAMESPACES)).toBe(
-      "http://anatomy-dsl.example.org/ontology#Node",
-    );
-  });
-
-  it("passes unknown prefixes and colon-less strings through", () => {
-    expect(expandUri("xsd:string", NAMESPACES)).toBe("xsd:string");
-    expect(expandUri("no-colon-here", NAMESPACES)).toBe("no-colon-here");
-  });
-});
-
-describe("round trip", () => {
-  it("full → prefixed → full is identity for every live namespace", () => {
-    for (const { namespace } of NAMESPACES) {
-      const full = `${namespace}SomeTerm`;
-      expect(expandUri(compactUri(full, NAMESPACES), NAMESPACES)).toBe(full);
-    }
   });
 });

@@ -32,8 +32,8 @@ import {
   settle,
   type WellBox,
 } from "@canonical/prism-core";
+import compactUri from "../compactUri.js";
 import type { OntologyNamespace } from "../types.js";
-import { compactUri } from "../uris.js";
 import {
   CANVAS_PADDING,
   CLUSTER_GAP,

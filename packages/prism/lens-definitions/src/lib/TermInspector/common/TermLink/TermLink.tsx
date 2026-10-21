@@ -1,6 +1,6 @@
 import { Link } from "@canonical/router-react";
 import type React from "react";
-import { compactUri } from "../../../uris.js";
+import compactUri from "../../../compactUri.js";
 import type { TermLinkProps } from "./types.js";
 
 /**
