@@ -1,5 +1,5 @@
 import type { HierarchyWell_ontologies$key } from "../../__generated__/HierarchyWell_ontologies.graphql.js";
-import type { LensFilter } from "../lensFilter.js";
+import type { LensFilter, OntologyNamespace } from "../types.js";
 
 /**
  * One class node's payload: the prefixed term (the route address), its
@@ -90,4 +90,40 @@ export interface HierarchyWellProps {
    * graph hover lights up the index and a rail hover fades the graph.
    */
   readonly onHoverTerm: (term: string | undefined) => void;
+}
+
+/** One ontology as the `HierarchyWell_ontologies` fragment delivers it
+ * (readonly shapes so fragment data plugs in directly). */
+export interface ClassGraphOntology extends OntologyNamespace {
+  readonly classes: readonly {
+    readonly uri: string;
+    readonly label: string | null | undefined;
+    readonly isAbstract: boolean;
+    readonly superclass: { readonly uri: string } | null | undefined;
+  }[];
+  readonly properties: readonly {
+    readonly uri: string;
+    readonly label: string | null | undefined;
+    readonly kind: string;
+    readonly domain: { readonly uri: string } | null | undefined;
+    readonly range: string;
+  }[];
+}
+
+/** The settled graph plus canvas extent and the initial camera scale. */
+export interface ClassGraph {
+  readonly nodes: readonly TermFlowNode[];
+  readonly edges: readonly TermFlowEdge[];
+  readonly clusters: readonly ClusterExtent[];
+  readonly width: number;
+  readonly height: number;
+  /** Deterministic initial zoom: fits a typical canvas, clamped sane. */
+  readonly fitScale: number;
+}
+
+/** One class's addressing-and-hierarchy identity, the minimum the depth
+ * walk needs (a subset of the well's fragment shape). */
+export interface DepthClass {
+  readonly uri: string;
+  readonly superclass?: { readonly uri: string } | null | undefined;
 }

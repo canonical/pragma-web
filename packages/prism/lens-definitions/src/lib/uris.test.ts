@@ -6,7 +6,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { compactUri, expandUri, type OntologyNamespace } from "./uris.js";
+import type { OntologyNamespace } from "./types.js";
+import { compactUri, expandUri } from "./uris.js";
 
 /** The three live ontologies' addressing identities, as the graph states
  * them (`{ ontologies { prefix namespace } }`). */

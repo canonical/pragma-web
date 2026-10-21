@@ -1,6 +1,6 @@
 import type React from "react";
+import { ABSTRACTION_VALUES } from "../constants.js";
 import { useMessages } from "../i18n/index.js";
-import { ABSTRACTION_VALUES } from "../lensFilter.js";
 
 /**
  * The well's legend — canvas-local furniture, bottom-left, exactly where

@@ -35,56 +35,32 @@ import {
   settle,
   type WellBox,
 } from "@canonical/prism-core";
-import { compactUri, type OntologyNamespace } from "../uris.js";
-import type { ClusterExtent, TermFlowEdge, TermFlowNode } from "./types.js";
-
-/** One ontology as the `HierarchyWell_ontologies` fragment delivers it
- * (readonly shapes so fragment data plugs in directly). */
-export interface ClassGraphOntology extends OntologyNamespace {
-  readonly classes: readonly {
-    readonly uri: string;
-    readonly label: string | null | undefined;
-    readonly isAbstract: boolean;
-    readonly superclass: { readonly uri: string } | null | undefined;
-  }[];
-  readonly properties: readonly {
-    readonly uri: string;
-    readonly label: string | null | undefined;
-    readonly kind: string;
-    readonly domain: { readonly uri: string } | null | undefined;
-    readonly range: string;
-  }[];
-}
-
-/** The settled graph plus canvas extent and the initial camera scale. */
-export interface ClassGraph {
-  readonly nodes: readonly TermFlowNode[];
-  readonly edges: readonly TermFlowEdge[];
-  readonly clusters: readonly ClusterExtent[];
-  readonly width: number;
-  readonly height: number;
-  /** Deterministic initial zoom: fits a typical canvas, clamped sane. */
-  readonly fitScale: number;
-}
-
-/* Geometry constants — content-estimated boxes, never measured (SSR). */
-export const NODE_CHAR_WIDTH = 7.2;
-export const NODE_PADDING = 30;
-export const NODE_MIN_WIDTH = 60;
-export const NODE_MAX_WIDTH = 210;
-export const NODE_HEIGHT = 32;
-/** Ring spacing per depth step: wide x, shallower y (label-shaped). */
-export const RING_X = 200;
-export const RING_Y = 105;
-export const RELAX_ITERATIONS = 80;
-export const COLLISION_GAP = 14;
-export const CLUSTER_GAP = 120;
-export const CANVAS_PADDING = 48;
-/** Clusters wrap into a new row past this cumulative width. */
-export const TARGET_ROW_WIDTH = 1700;
-export const EDGE_BOW = 34;
-/** The width the initial camera aims to show whole. */
-export const FIT_VIEW_WIDTH = 1150;
+import type { OntologyNamespace } from "../types.js";
+import { compactUri } from "../uris.js";
+import {
+  CANVAS_PADDING,
+  CLUSTER_GAP,
+  COLLISION_GAP,
+  EDGE_BOW,
+  FIT_VIEW_WIDTH,
+  NODE_CHAR_WIDTH,
+  NODE_HEIGHT,
+  NODE_MAX_WIDTH,
+  NODE_MIN_WIDTH,
+  NODE_PADDING,
+  RELAX_ITERATIONS,
+  RING_X,
+  RING_Y,
+  TARGET_ROW_WIDTH,
+} from "./constants.js";
+import type {
+  ClassGraph,
+  ClassGraphOntology,
+  ClusterExtent,
+  DepthClass,
+  TermFlowEdge,
+  TermFlowNode,
+} from "./types.js";
 
 const estimateWidth = (label: string): number =>
   Math.min(
@@ -113,13 +89,6 @@ export const measureSuperclassDepth = (
   }
   return depth;
 };
-
-/** One class's addressing-and-hierarchy identity, the minimum the depth
- * walk needs (a subset of the well's fragment shape). */
-export interface DepthClass {
-  readonly uri: string;
-  readonly superclass?: { readonly uri: string } | null | undefined;
-}
 
 /**
  * The superclass depth of every class in ONE ontology, keyed by full URI

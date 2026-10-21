@@ -1,10 +1,8 @@
 import type React from "react";
+import { ABSTRACTION_VALUES } from "../constants.js";
 import { type MessageKey, useMessages } from "../i18n/index.js";
-import {
-  ABSTRACTION_VALUES,
-  type Abstraction,
-  toggleIn,
-} from "../lensFilter.js";
+import { toggleIn } from "../lensFilter.js";
+import type { Abstraction } from "../types.js";
 import type { ExplorerControlsProps } from "./types.js";
 import "./styles.css";
 

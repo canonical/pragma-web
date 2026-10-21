@@ -16,13 +16,7 @@
  * page throw — the inspector's not-found branch owns unknown terms.
  */
 
-/** One ontology's addressing identity, as the graph states it. */
-export interface OntologyNamespace {
-  /** The compact prefix, e.g. `ds`. */
-  readonly prefix: string;
-  /** The full namespace IRI, e.g. `https://ds.canonical.com/`. */
-  readonly namespace: string;
-}
+import type { OntologyNamespace } from "./types.js";
 
 /**
  * Full IRI → prefixed form (`https://ds.canonical.com/UIBlock` →

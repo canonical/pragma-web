@@ -1,4 +1,4 @@
-import type { LensFilter } from "../lensFilter.js";
+import type { LensFilter } from "../types.js";
 
 /** One ontology as the toolbar names it: the prefix is the filter's key,
  * the label is what a reader sees. */

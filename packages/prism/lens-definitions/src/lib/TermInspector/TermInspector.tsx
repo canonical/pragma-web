@@ -13,7 +13,8 @@ import type {
 } from "../../__generated__/TermInspector_property.graphql.js";
 import termInspectorPropertyFragmentNode from "../../__generated__/TermInspector_property.graphql.js";
 import { useMessages } from "../i18n/index.js";
-import { compactUri, type OntologyNamespace } from "../uris.js";
+import type { OntologyNamespace } from "../types.js";
+import { compactUri } from "../uris.js";
 import type { TermInspectorProps } from "./types.js";
 import "./styles.css";
 

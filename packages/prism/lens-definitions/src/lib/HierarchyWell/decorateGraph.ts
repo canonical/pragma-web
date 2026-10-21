@@ -26,16 +26,15 @@
  * is its connective tissue rather than a uniform grey.
  */
 
-import type { LensFilter } from "../lensFilter.js";
 import { matchesChips } from "../lensFilter.js";
+import type { LensFilter } from "../types.js";
+import {
+  EDGE_FADED_CLASS,
+  HIDDEN_CLASS,
+  NODE_FADED_CLASS,
+  NODE_SELECTED_CLASS,
+} from "./constants.js";
 import type { TermFlowEdge, TermFlowNode } from "./types.js";
-
-/** The class names this module emits — the CSS contract, in one place. */
-export const NODE_SELECTED_CLASS = "is-selected";
-export const NODE_FADED_CLASS = "is-faded";
-export const EDGE_FADED_CLASS = "is-faded";
-/** Filtered-OUT graph elements: the graph hides where the rail dims. */
-export const HIDDEN_CLASS = "is-hidden";
 
 /** A decorated graph, ready for React Flow. */
 export interface DecoratedGraph {

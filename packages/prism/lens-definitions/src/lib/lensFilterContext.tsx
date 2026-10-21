@@ -5,7 +5,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { DEFAULT_LENS_FILTER, type LensFilter } from "./lensFilter.js";
+import { DEFAULT_LENS_FILTER } from "./constants.js";
+import type { LensFilter } from "./types.js";
 
 /**
  * THE ONE CONTEXT IN THIS LENS, and the constraint that forced it.

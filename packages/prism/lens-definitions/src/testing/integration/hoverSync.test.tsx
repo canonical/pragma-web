@@ -27,7 +27,7 @@ import {
   UIBLOCK_TERM,
 } from "../../../testing/fixtures.js";
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
-import { NODE_FADED_CLASS } from "../../lib/HierarchyWell/decorateGraph.js";
+import { NODE_FADED_CLASS } from "../../lib/HierarchyWell/constants.js";
 
 /** The graph node whose term link points at `href` — the stable
  * cross-reference between a rail item and its node (both address the same

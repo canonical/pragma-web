@@ -7,11 +7,10 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { ABSTRACTION_VALUES, DEFAULT_LENS_FILTER } from "./constants.js";
 import {
-  ABSTRACTION_VALUES,
   classifyAbstraction,
   createAllNamespacesFilter,
-  DEFAULT_LENS_FILTER,
   matchesChips,
   matchesText,
   normalizeFilterText,

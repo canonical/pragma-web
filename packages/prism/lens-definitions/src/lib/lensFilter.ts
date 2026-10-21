@@ -23,41 +23,12 @@
  * query string — that would break hydration (the SSR determinism rule).
  */
 
-/** The abstraction axis: the two states `isAbstract` can take, plus the
- * unfiltered default. Chips toggle membership, never a tri-state. */
-export const ABSTRACTION_VALUES = ["abstract", "concrete"] as const;
-export type Abstraction = (typeof ABSTRACTION_VALUES)[number];
+import { DEFAULT_LENS_FILTER } from "./constants.js";
+import type { Abstraction, LensFilter } from "./types.js";
 
 /** Which axis value a class sits on — total over `isAbstract`. */
 export const classifyAbstraction = (isAbstract: boolean): Abstraction =>
   isAbstract ? "abstract" : "concrete";
-
-/**
- * The lens's whole ephemeral state. `namespaces`/`abstractions` are
- * ALLOW-lists: a term shows undimmed when its facets are both allowed.
- * An EMPTY allow-list means "no chip on this axis is lit", which dims
- * every term on that axis — the honest reading of "you turned everything
- * off", and exactly what the exhibit's chips do.
- */
-export interface LensFilter {
-  /** The rail's search text, already trimmed and lower-cased. */
-  readonly text: string;
-  /** Allowed abstraction values. */
-  readonly abstractions: readonly Abstraction[];
-  /** Allowed ontology prefixes (`ds`, `cs`, `anatomy`). */
-  readonly namespaces: readonly string[];
-}
-
-/**
- * The no-op default — the ONLY value that may be a component's initial
- * state. `namespaces: undefined` is impossible here, so the well needs a
- * separate "all prefixes" seed; see `createAllNamespacesFilter`.
- */
-export const DEFAULT_LENS_FILTER: LensFilter = {
-  text: "",
-  abstractions: ABSTRACTION_VALUES,
-  namespaces: [],
-};
 
 /**
  * The default with every known prefix lit. Callers build this from the

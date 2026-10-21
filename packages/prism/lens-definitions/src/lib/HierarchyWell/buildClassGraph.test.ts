@@ -8,12 +8,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import {
-  buildClassGraph,
-  type ClassGraphOntology,
-  COLLISION_GAP,
-  computeClassDepths,
-} from "./buildClassGraph.js";
+import { buildClassGraph, computeClassDepths } from "./buildClassGraph.js";
+import { COLLISION_GAP } from "./constants.js";
+import type { ClassGraphOntology } from "./types.js";
 
 /** A miniature two-ontology input mirroring the live shape (full IRIs in,
  * prefixed node ids out; one relation, one parallel pair, one loop).

@@ -10,17 +10,21 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { createAllNamespacesFilter, type LensFilter } from "../lensFilter.js";
-import { buildClassGraph, type ClassGraphOntology } from "./buildClassGraph.js";
+import { createAllNamespacesFilter } from "../lensFilter.js";
+import type { LensFilter } from "../types.js";
+import { buildClassGraph } from "./buildClassGraph.js";
 import {
-  decorateForSelection,
-  decorateForView,
   EDGE_FADED_CLASS,
-  findEgoNeighbourhood,
   HIDDEN_CLASS,
   NODE_FADED_CLASS,
   NODE_SELECTED_CLASS,
+} from "./constants.js";
+import {
+  decorateForSelection,
+  decorateForView,
+  findEgoNeighbourhood,
 } from "./decorateGraph.js";
+import type { ClassGraphOntology } from "./types.js";
 
 /** A small chain plus a sibling: Entity ← UIBlock ← {Component, Pattern},
  * and a second ontology, so one-hop-vs-transitive is observable. */
