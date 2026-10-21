@@ -8,6 +8,18 @@ import type {
 import { createRouter, createServerAdapter } from "@canonical/router-core";
 
 /**
+ * Format an address the way the router keys its hydration: path, query and
+ * fragment, without the origin. Hydrating with an absolute address would
+ * never equal the href a later `load()` of the same address computes, and
+ * that load would run the route's `warm` again.
+ */
+const formatRelativeHref = (url: string | URL): string => {
+  // The base only resolves a relative string; its origin is discarded.
+  const parsed = new URL(url, "http://localhost");
+  return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+};
+
+/**
  * Create a static (server-positioned) router, for server-side rendering and
  * for tests that render a route at a fixed URL.
  *
@@ -67,7 +79,7 @@ export default function createStaticRouter<
 
   if (kind !== "unmatched") {
     router.hydrate({
-      href: typeof url === "string" ? url : url.href,
+      href: formatRelativeHref(url),
       kind,
       routeId,
       status,

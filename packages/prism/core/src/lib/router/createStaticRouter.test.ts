@@ -1,6 +1,6 @@
 import { route } from "@canonical/router-core";
 import { createElement } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import createStaticRouter from "./createStaticRouter.js";
 
 const Page = () => createElement("p", null, "page");
@@ -61,6 +61,24 @@ describe("createStaticRouter", () => {
     );
     expect(router.match?.kind).toBe("route");
     expect(router.dehydrate()?.routeId).toBe("term");
+  });
+
+  it.each([
+    ["a URL object", new URL("http://localhost/terms/density?view=grid#top")],
+    ["an absolute string", "http://localhost/terms/density?view=grid#top"],
+    ["a relative string", "/terms/density?view=grid#top"],
+  ])("hydrates %s by its path, query and fragment alone", async (_, url) => {
+    const warm = vi.fn();
+    const warmed = {
+      term: route({ url: "/terms/:term", content: Page, warm }),
+    } as const;
+    const router = createStaticRouter(warmed, url);
+    expect(router.dehydrate()?.href).toBe("/terms/density?view=grid#top");
+    // A load of the hydrated address returns the hydrated result rather
+    // than loading, so the route's `warm` does not run a second time.
+    const calls = warm.mock.calls.length;
+    await router.load("/terms/density?view=grid#top");
+    expect(warm).toHaveBeenCalledTimes(calls);
   });
 
   it("reports the same match on every read of the getter", () => {
