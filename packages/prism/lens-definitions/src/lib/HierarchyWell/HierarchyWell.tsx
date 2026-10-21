@@ -139,6 +139,7 @@ const HierarchyWell = ({
   // Wheel zoom, toward the cursor. Non-passive: the well owns the wheel.
   useEffect(() => {
     const canvas = canvasRef.current;
+    /* v8 ignore next -- React attaches the ref before it runs an effect */
     if (canvas === null) return;
     const handleWheel = (event: WheelEvent): void => {
       event.preventDefault();
@@ -164,6 +165,8 @@ const HierarchyWell = ({
 
   const readTermFromEvent = useCallback(
     (target: EventTarget | null): string | undefined => {
+      /* v8 ignore next -- React hands its handlers an element target: it
+       * re-targets an event fired on a text node to the node's parent */
       if (!(target instanceof Element)) return undefined;
       return target.closest<HTMLElement>("[data-id]")?.dataset.id;
     },
@@ -193,6 +196,8 @@ const HierarchyWell = ({
         onMouseOver={(event) => onHoverTerm(readTermFromEvent(event.target))}
         onPointerDown={(event) => {
           // Pan starts on the floor only — a press on a node is a click.
+          /* v8 ignore next -- React hands its handlers an element target: it
+           * re-targets an event fired on a text node to the node's parent */
           if (!(event.target instanceof Element)) return;
           if (event.target.closest("a") !== null) return;
           drag.current = {

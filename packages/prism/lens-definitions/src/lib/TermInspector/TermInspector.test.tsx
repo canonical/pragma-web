@@ -19,6 +19,7 @@ import {
   PROPERTY_TERM,
   UIBLOCK_TERM,
 } from "../../../testing/fixtures.js";
+import patchRecords from "../../../testing/patchRecords.js";
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
 import definitionsExplorerRecordsComponent from "../../../testing/records/definitionsExplorerRecordsComponent.js";
 import definitionsExplorerRecordsProperty from "../../../testing/records/definitionsExplorerRecordsProperty.js";
@@ -237,5 +238,156 @@ describe("TermInspector", () => {
     expect(alert.textContent).toContain("No term at");
     expect(alert.textContent).toContain(UNKNOWN_TERM);
     expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("reads a class's absent label, definition and instances honestly", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    const fetchFn = createFetchSpy();
+    render(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        patchRecords(definitionsExplorerRecords, {
+          "https://ds.canonical.com/UIBlock": {
+            label: null,
+            definition: null,
+            instanceCount: 0,
+          },
+          "client:https://ds.canonical.com/UIBlock:properties:0": {
+            required: true,
+            singular: true,
+          },
+          "https://ds.canonical.com/hasVariant": {
+            label: null,
+            definition: null,
+          },
+        }),
+        fetchFn,
+      ),
+    );
+    const panel = findInspector();
+
+    // The compact address stands in for the absent label, as the heading
+    // and as the lineage's own leaf.
+    expect(
+      within(panel).getByRole("heading", { level: 2, name: UIBLOCK_TERM }),
+    ).toBeInTheDocument();
+    const lineage = within(panel).getByRole("heading", { name: "Lineage" })
+      .nextElementSibling as HTMLElement;
+    expect(lineage.textContent?.startsWith(UIBLOCK_TERM)).toBe(true);
+    expect(within(panel).getByText("No definition recorded.")).toBeVisible();
+    expect(
+      within(panel).getByText("No named instances (0 recorded)."),
+    ).toBeInTheDocument();
+    // An unlabelled property links by its compact address, and carries both
+    // cardinality notes.
+    const row = within(panel)
+      .getByRole("link", { name: "ds:hasVariant" })
+      .closest("tr");
+    expect(row?.textContent).toContain("required · singular");
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("calls a class with no ancestors a root of its ontology", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    render(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        patchRecords(definitionsExplorerRecords, {
+          "https://ds.canonical.com/UIBlock": { superclasses: { __refs: [] } },
+        }),
+        createFetchSpy(),
+      ),
+    );
+
+    expect(
+      within(findInspector()).getByText("A root of its ontology."),
+    ).toBeInTheDocument();
+  });
+
+  it("states no truncation when every instance is listed", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    render(
+      createDefinitionsPage(
+        COMPONENT_TERM,
+        patchRecords(definitionsExplorerRecordsComponent, {
+          "client:https://ds.canonical.com/Component:instances(first:12):pageInfo":
+            { hasNextPage: false },
+        }),
+        createFetchSpy(),
+      ),
+    );
+    const panel = findInspector();
+
+    expect(within(panel).getByText("Accordion")).toBeInTheDocument();
+    expect(within(panel).queryByText(/and more/)).toBeNull();
+  });
+
+  it("reads a property's absent label, definition, domain and inverse honestly", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    render(
+      createDefinitionsPage(
+        PROPERTY_TERM,
+        patchRecords(definitionsExplorerRecordsProperty, {
+          "https://ds.canonical.com/hasSubcomponent": {
+            label: null,
+            definition: null,
+            functional: true,
+            domain: null,
+            inverse: null,
+          },
+        }),
+        createFetchSpy(),
+      ),
+    );
+    const panel = findInspector();
+
+    expect(
+      within(panel).getByRole("heading", { level: 2, name: PROPERTY_TERM }),
+    ).toBeInTheDocument();
+    expect(within(panel).getByText("No definition recorded.")).toBeVisible();
+    const details = within(panel)
+      .getAllByRole("definition")
+      .map((dd) => dd.textContent);
+    expect(details).toEqual([
+      "object",
+      "yes",
+      "ds:Subcomponent",
+      "unstated",
+      "none",
+    ]);
+  });
+
+  it("says so when a class declares and inherits nothing, and names none of its instances", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    render(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        patchRecords(definitionsExplorerRecords, {
+          "https://ds.canonical.com/UIBlock": {
+            properties: { __refs: [] },
+            instanceCount: 3,
+          },
+        }),
+        createFetchSpy(),
+      ),
+    );
+    const panel = findInspector();
+
+    expect(
+      within(panel).getByText("None declared on this class."),
+    ).toBeInTheDocument();
+    expect(
+      within(panel).queryByRole("heading", { name: "Inherited" }),
+    ).toBeNull();
+    expect(
+      within(panel).getByText(
+        "No named instances (3 recorded — blank-node instances are embeddable, not standalone).",
+      ),
+    ).toBeInTheDocument();
   });
 });

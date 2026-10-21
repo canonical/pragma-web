@@ -101,7 +101,47 @@ const makeInput = (): ClassGraphOntology[] => [
   },
 ];
 
+/** An ontology whose classes name a superclass from outside it, and whose
+ * labels are absent, as a provider may serve them. */
+const makeOpenInput = (): ClassGraphOntology[] => [
+  {
+    prefix: "an",
+    namespace: "https://anatomy.canonical.com/",
+    classes: [
+      {
+        uri: "https://anatomy.canonical.com/Slot",
+        label: null,
+        isAbstract: false,
+        superclass: { uri: "https://anatomy.canonical.com/Part" },
+      },
+      {
+        uri: "https://anatomy.canonical.com/Part",
+        label: "Part",
+        isAbstract: true,
+        superclass: { uri: "https://ds.canonical.com/Entity" },
+      },
+    ],
+    properties: [
+      {
+        uri: "https://anatomy.canonical.com/fills",
+        label: null,
+        kind: "OBJECT",
+        domain: { uri: "https://anatomy.canonical.com/Slot" },
+        range: "https://anatomy.canonical.com/Part",
+      },
+    ],
+  },
+];
+
 describe("computeClassDepths", () => {
+  it("stops counting where the chain leaves the ontology", () => {
+    const input = makeOpenInput().at(0);
+    if (input === undefined) throw new Error("fixture missing");
+    const depths = computeClassDepths(input.classes);
+    expect(depths.get("https://anatomy.canonical.com/Part")).toBe(0);
+    expect(depths.get("https://anatomy.canonical.com/Slot")).toBe(1);
+  });
+
   it("measures superclass depth with roots at zero", () => {
     const input = makeInput().at(0);
     if (input === undefined) throw new Error("fixture missing");
@@ -197,5 +237,24 @@ describe("buildClassGraph", () => {
     ]);
     expect(graph.fitScale).toBeGreaterThan(0);
     expect(graph.fitScale).toBeLessThanOrEqual(1);
+  });
+
+  it("labels a node and a relation by their compact addresses when the graph gives no label", () => {
+    const graph = buildClassGraph(makeOpenInput());
+    expect(graph.nodes.find((node) => node.id === "an:Slot")?.data.label).toBe(
+      "an:Slot",
+    );
+    expect(
+      graph.edges.find((edge) => edge.family === "semantic")?.predicate,
+    ).toBe("an:fills");
+  });
+
+  it("draws no structural edge to a superclass outside the graph", () => {
+    const structural = buildClassGraph(makeOpenInput()).edges.filter(
+      (edge) => edge.family === "structural",
+    );
+    expect(structural.map((edge) => [edge.source, edge.target])).toEqual([
+      ["an:Slot", "an:Part"],
+    ]);
   });
 });

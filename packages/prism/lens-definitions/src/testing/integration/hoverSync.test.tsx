@@ -165,4 +165,36 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     fireEvent.blur(componentItem);
     expect(componentItem.classList.contains("is-hovered")).toBe(false);
   });
+
+  it("keyboard focus on a graph node drives the same shared centre back to the rail", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    const { container } = render(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
+    const well = container.querySelector<HTMLElement>(
+      '[data-slot="explorer-canvas"]',
+    );
+    if (!well) throw new Error("unreachable");
+    const componentRailItem = within(rail)
+      .getByRole("link", { name: "Component" })
+      .closest("li");
+    if (!componentRailItem) throw new Error("no Component rail item");
+    const componentLink = findNodeByHref(
+      well,
+      "/definitions/ds%3AComponent",
+    ).querySelector("a");
+    if (!componentLink) throw new Error("no Component node link");
+
+    fireEvent.focus(componentLink);
+    expect(componentRailItem.classList.contains("is-hovered")).toBe(true);
+
+    fireEvent.blur(componentLink);
+    expect(componentRailItem.classList.contains("is-hovered")).toBe(false);
+  });
 });

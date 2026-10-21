@@ -9,7 +9,10 @@
  * and carry explicit timeouts for fully-parallel runs.
  */
 
+import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
+import { RouterProvider } from "@canonical/router-react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import { RelayEnvironmentProvider, useLazyLoadQuery } from "react-relay";
 import { describe, expect, it } from "vitest";
 import createDefinitionsPage from "../../../testing/createDefinitionsPage.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
@@ -17,7 +20,31 @@ import {
   DEFINITIONS_TEST_TIMEOUT_MS,
   UIBLOCK_TERM,
 } from "../../../testing/fixtures.js";
+import patchRecords from "../../../testing/patchRecords.js";
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
+import type { DefinitionsExplorerQuery } from "../../__generated__/DefinitionsExplorerQuery.graphql.js";
+import definitionsExplorerQueryNode from "../../__generated__/DefinitionsExplorerQuery.graphql.js";
+import { DEFAULT_LENS_FILTER } from "../constants.js";
+import { buildDefinitionsExplorerVariables } from "../definitionsQuery.js";
+import { definitionsRoutes } from "../routes.js";
+import TermRail from "./TermRail.js";
+
+/** The rail alone over the warm store, handed an empty depth map. */
+const RailWithoutDepths = () => {
+  const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
+    definitionsExplorerQueryNode,
+    buildDefinitionsExplorerVariables(undefined),
+  );
+  return (
+    <TermRail
+      depthByUri={new Map()}
+      filter={{ ...DEFAULT_LENS_FILTER, namespaces: ["ds"] }}
+      hoverCentre={undefined}
+      onHoverTerm={() => {}}
+      ontologies={data.ontologies}
+    />
+  );
+};
 
 const renderRail = (): HTMLElement => {
   render(
@@ -206,5 +233,52 @@ describe("TermRail", () => {
       .textContent?.replace("Classes", "")
       .trim();
     expect(filtered).toBe(`1 of ${classCount?.split(" of ").at(1)}`);
+  });
+
+  it("names an unlabelled ontology and class by their compact addresses", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    render(
+      createDefinitionsPage(
+        UIBLOCK_TERM,
+        patchRecords(definitionsExplorerRecords, {
+          "client:root:ontologies:1": { label: null },
+          "https://ds.canonical.com/UIBlock": { label: null },
+        }),
+        createFetchSpy(),
+      ),
+    );
+    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
+    const dsGroup = within(rail).getByRole("region", { name: "ds" });
+
+    expect(
+      within(dsGroup).getByRole("link", { name: "ds:UIBlock" }),
+    ).toBeInTheDocument();
+  });
+
+  it("reads a class the depth map does not name as a root", {
+    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+  }, () => {
+    render(
+      <RelayEnvironmentProvider
+        environment={createEnvironment({
+          records: definitionsExplorerRecords,
+          fetchFn: createFetchSpy(),
+        })}
+      >
+        <RouterProvider
+          router={createStaticRouter(definitionsRoutes, "/definitions")}
+        >
+          <RailWithoutDepths />
+        </RouterProvider>
+      </RelayEnvironmentProvider>,
+    );
+    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
+
+    expect(
+      [...rail.querySelectorAll("li[data-depth]")].map((item) =>
+        item.getAttribute("data-depth"),
+      ),
+    ).not.toContain("1");
   });
 });

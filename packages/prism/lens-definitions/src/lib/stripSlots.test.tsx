@@ -118,3 +118,16 @@ describe("the strip's tenants over a COLD store", () => {
     expect(html).not.toContain('data-slot="explorer-status"');
   });
 });
+
+describe("the strip's tenants off the lens's routes", () => {
+  it("read no term from a URL the lens does not route", () => {
+    const fetchFn = createFetchSpy();
+    const html = renderToString(
+      createStrip("/elsewhere", definitionsExplorerRecords, fetchFn),
+    );
+
+    // The term-less explorer's variables, which the warm store fulfils.
+    expect(html).toContain('data-slot="explorer-status"');
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+});
