@@ -5,6 +5,14 @@ set of lenses over one knowledge graph: each lens is a domain with its own
 routes and page layout, and every lens reads the graph through Relay. This
 package holds the parts every such site needs and none of them owns:
 
+- **Lens chrome**: the components a lens layout composes — `Rail`,
+  `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`), `Canvas`,
+  `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page needs,
+  `ErrorBoundary` and `ClientOnly`. There is no shared frame: each lens's
+  layout arranges these as it needs.
+- **Well geometry**: the pure, deterministic layout functions a graph well
+  settles its nodes and edges with (`relaxBoxes`, `edgeEndpoint`, `quadArc`,
+  `selfLoop`, `settle`).
 - **Route facets**: typed annotations a route carries on its `meta` bag, and
   the walk that reads them back off a route table. A lens declares itself
   with `routeLensFacet` on its index route, and claims a keyboard shortcut
@@ -25,6 +33,55 @@ bun add @canonical/prism-core
 ```
 
 Requires React 19 and `@canonical/router-core` / `@canonical/router-react`.
+
+## Lens chrome
+
+```tsx
+import {
+  Canvas,
+  CanvasSkipLink,
+  collectLenses,
+  ModeStrip,
+  Rail,
+} from "@canonical/prism-core";
+import { Outlet, useRouter } from "@canonical/router-react";
+
+export function GlossaryLayout() {
+  const { routes } = useRouter();
+  return (
+    <div className="glossary-layout">
+      <CanvasSkipLink />
+      <Rail brand={{ label: "Atlas", to: "home" }} entries={collectLenses(routes)}>
+        {/* the site's utility cluster */}
+      </Rail>
+      <ModeStrip context={<GlossaryContext />} />
+      <Canvas>
+        <Outlet />
+      </Canvas>
+    </div>
+  );
+}
+```
+
+The rail reads its lenses from the route table it is given and wires each
+lens's shortcut key itself. Its `children` render at its foot as the site's
+utility cluster, styled from a class contract: a `p.rail-util-label`
+heading, a `ul.rail-utilities` labelled by it, `a.rail-item.rail-util`
+links (icon plus `span.rail-label`) and an `li.rail-theme` for a control
+such as `ThemeSelector`.
+
+### Stylesheets
+
+Each component imports its own stylesheet, so a bundler that handles CSS
+imports needs no further setup. The rules sit in `@layer ds.prism`: below a
+site's own `app` layer, above `ds.components.global`, so a site overrides
+them without specificity games. Load `@canonical/styles` first; it declares
+the layer order.
+
+The stylesheets read the site's layout tokens and fall back when a site
+does not define them: `--strip-h` (the strip's height), `--z-plate`,
+`--z-chrome` and `--z-overlay` (the z-axis strata) and `--rail-span` (the
+rail's column span over the layout's `--grid-intrinsic` columns).
 
 ## Route facets
 
@@ -86,6 +143,14 @@ such as the reader's locale travels the same way. Do not reach the provider
 through module state instead.
 
 ## Public API
+
+- Components: `Canvas`, `CanvasSkipLink`, `CANVAS_ELEMENT_ID`,
+  `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+  `ModeStrip`, `Rail`, `ThemeSelector`; types `CanvasProps`,
+  `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
+  `LensBreadcrumbsProps`, `ModeStripProps`, `RailProps`, `RailBrand`.
+- Well geometry: `settle`, `edgeEndpoint`, `relaxBoxes`, `quadArc`,
+  `selfLoop`; types `WellBox`, `RelaxOptions`, `QuadArc`.
 
 - Facets: `defineFacet`, `collectFacet`, `routeLensFacet`, `collectLenses`,
   `routeShortcutFacet`, `collectShortcuts`; types `RouteFacet`, `RouteMeta`,

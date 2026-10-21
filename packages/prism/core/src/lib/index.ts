@@ -4,6 +4,20 @@
  * @module
  */
 
+export type { CanvasProps } from "./Canvas/index.js";
+export { CANVAS_ELEMENT_ID, Canvas } from "./Canvas/index.js";
+export type { CanvasSkipLinkProps } from "./CanvasSkipLink/index.js";
+export { CanvasSkipLink } from "./CanvasSkipLink/index.js";
+export type { ClientOnlyProps } from "./ClientOnly/index.js";
+export { ClientOnly } from "./ClientOnly/index.js";
+export type { ErrorBoundaryProps } from "./ErrorBoundary/index.js";
+export { ErrorBoundary } from "./ErrorBoundary/index.js";
+export type { LensBreadcrumbsProps } from "./LensBreadcrumbs/index.js";
+export { LensBreadcrumbs, makeLensContext } from "./LensBreadcrumbs/index.js";
+export type { ModeStripProps } from "./ModeStrip/index.js";
+export { ModeStrip } from "./ModeStrip/index.js";
+export type { RailBrand, RailProps } from "./Rail/index.js";
+export { Rail } from "./Rail/index.js";
 export type {
   CreateEnvironmentOptions,
   PreparedRelayData,
@@ -23,3 +37,12 @@ export { collectLenses, routeLensFacet } from "./routeLens/index.js";
 export { createStaticRouter } from "./router/index.js";
 export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
+export { ThemeSelector } from "./ThemeSelector/index.js";
+export type { QuadArc, RelaxOptions, WellBox } from "./WellGeometry/index.js";
+export {
+  edgeEndpoint,
+  quadArc,
+  relaxBoxes,
+  selfLoop,
+  settle,
+} from "./WellGeometry/index.js";

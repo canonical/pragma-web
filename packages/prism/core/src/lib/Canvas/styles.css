@@ -1,0 +1,41 @@
+/*
+ * Canvas — the region a lens layout renders its routed page into.
+ *
+ * A SUBGRID spanning its parent's full width (`grid-column: 1 / -1`), so the
+ * column lines pass THROUGH it to the page and explorer below. That is why
+ * the canvas is not a `container-type` query container: size containment
+ * severs subgrid inheritance (a contained box's `grid-template-columns:
+ * subgrid` resolves to `none` and the chain collapses to full width), so
+ * components that want region-relative sizing read the intrinsic COLUMNS
+ * instead. No padding: the canvas is a bare grid cell the page fills edge to
+ * edge; any breathing room is a region's own, expressed as a column span.
+ * The canvas keeps the scroll, so the layout around it never scrolls.
+ */
+
+@layer ds.prism {
+  .ds.canvas {
+    z-index: var(--z-plate, 1);
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    overflow: auto;
+    min-block-size: 0;
+    min-inline-size: 0;
+  }
+
+  .ds.canvas:focus {
+    /* Skip-link target: programmatic focus, no ring on the whole plate. */
+    outline: none;
+  }
+
+  /* The routed page mounts as the canvas's direct child. By default it
+   * spans the canvas's full column set (`1 / -1`): a page is a full-bleed
+   * region, and its OWN inner grid (a subgrid) then distributes those columns
+   * to the lens's rail, well and inspector. A page that wants a narrower
+   * measure overrides its span; the default is full width so a page never
+   * accidentally collapses to one column. */
+  .ds.canvas > * {
+    grid-column: 1 / -1;
+    min-inline-size: 0;
+  }
+}
