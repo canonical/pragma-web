@@ -129,6 +129,7 @@ export default function TermRail({
   depthByUri,
   hoverCentre,
   onHoverTerm,
+  ...props
 }: TermRailProps): React.ReactElement {
   const t = useMessages();
   const data = useFragment<TermRail_ontologies$key>(
@@ -170,6 +171,7 @@ export default function TermRail({
 
   return (
     <nav
+      {...props}
       aria-label={t("rail.label")}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-rail"

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import type { HierarchyWell_ontologies$key } from "../../__generated__/HierarchyWell_ontologies.graphql.js";
 import type { LensFilter, OntologyNamespace } from "../types.js";
 
@@ -62,10 +63,7 @@ export interface ClusterExtent {
   readonly height: number;
 }
 
-/** Props accepted by `HierarchyWell`. */
-export interface HierarchyWellProps {
-  /** Additional CSS class names. */
-  className?: string;
+type OwnProps = {
   /**
    * The lens's ephemeral filter. The well HIDES on it (the asymmetry: the
    * rail only dims), and an edge survives only when both its endpoints do.
@@ -91,7 +89,15 @@ export interface HierarchyWellProps {
    * graph hover lights up the index and a rail hover fades the graph.
    */
   readonly onHoverTerm: (term: string | undefined) => void;
-}
+};
+
+/**
+ * Props accepted by `HierarchyWell`: the ontologies it draws, the filter it
+ * hides by, the selection and the shared hover centre, and the native props
+ * of its root `<div>`.
+ */
+export type HierarchyWellProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps>;
 
 /** One ontology as the `HierarchyWell_ontologies` fragment delivers it
  * (readonly shapes so fragment data plugs in directly). */

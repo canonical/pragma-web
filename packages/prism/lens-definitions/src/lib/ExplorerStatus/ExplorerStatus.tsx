@@ -28,6 +28,7 @@ export default function ExplorerStatus({
   visible,
   total,
   abstract,
+  ...props
 }: ExplorerStatusProps): React.ReactElement {
   const t = useMessages();
   // Guard the degenerate graph so the bar never computes NaN.
@@ -35,6 +36,7 @@ export default function ExplorerStatus({
 
   return (
     <figure
+      {...props}
       aria-live="polite"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-status"

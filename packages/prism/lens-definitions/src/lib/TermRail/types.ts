@@ -1,10 +1,8 @@
+import type { ComponentProps } from "react";
 import type { TermRail_ontologies$key } from "../../__generated__/TermRail_ontologies.graphql.js";
 import type { LensFilter } from "../types.js";
 
-/** Props accepted by `TermRail`. */
-export interface TermRailProps {
-  /** Additional CSS class names. */
-  className?: string;
+type OwnProps = {
   /**
    * The lens's ephemeral filter, owned by `DefinitionsExplorer` so the
    * rail, the well and the strip's controls all read one value. The rail
@@ -38,4 +36,11 @@ export interface TermRailProps {
    * 1-hop neighbourhood, exactly as a graph-node hover does.
    */
   readonly onHoverTerm: (term: string | undefined) => void;
-}
+};
+
+/**
+ * Props accepted by `TermRail`: the ontologies it lists, the filter it dims
+ * by and the shared hover centre, and the native props of its root `<nav>`.
+ */
+export type TermRailProps = OwnProps &
+  Omit<ComponentProps<"nav">, keyof OwnProps>;

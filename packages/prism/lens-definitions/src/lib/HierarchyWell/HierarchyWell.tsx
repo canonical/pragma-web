@@ -97,6 +97,7 @@ const HierarchyWell = ({
   term,
   hoverCentre,
   onHoverTerm,
+  ...props
 }: HierarchyWellProps): React.ReactElement => {
   const t = useMessages();
   const data = useFragment<HierarchyWell_ontologies$key>(
@@ -174,6 +175,7 @@ const HierarchyWell = ({
 
   return (
     <div
+      {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-canvas"
     >
@@ -317,25 +319,35 @@ const HierarchyWell = ({
 };
 
 /**
+ * Drop the two props the memo comparator does not compare by identity: the
+ * filter, compared by its chip axes, and the hover callback.
+ */
+const listIdentityProps = ({
+  filter: _filter,
+  onHoverTerm: _onHoverTerm,
+  ...identityProps
+}: HierarchyWellProps): Readonly<Record<string, unknown>> => identityProps;
+
+/**
  * Memoised at the boundary: the explorer re-renders on every keystroke in
  * the search box (the shared filter's `text` changes), but the WELL does
  * not answer to text. The comparator re-renders on exactly the inputs the
- * decoration reads: the fragment ref, the selected term, the chip axes,
- * and the shared `hoverCentre` (a rail hover MUST reach the graph).
+ * well reads: the chip axes of the filter, and every other prop by identity
+ * (the fragment ref, the selected term, the shared `hoverCentre`, which a
+ * rail hover MUST carry to the graph, and the native props of its root).
  * `onHoverTerm` is a stable callback the explorer memoises; comparing it
  * would defeat the memo on every render.
  */
 export default memo(HierarchyWell, (previous, next) => {
-  if (
-    previous.ontologies !== next.ontologies ||
-    previous.term !== next.term ||
-    previous.className !== next.className ||
-    previous.hoverCentre !== next.hoverCentre
-  ) {
-    return false;
-  }
+  const previousProps = listIdentityProps(previous);
+  const nextProps = listIdentityProps(next);
+  const names = new Set([
+    ...Object.keys(previousProps),
+    ...Object.keys(nextProps),
+  ]);
   return (
     previous.filter.abstractions === next.filter.abstractions &&
-    previous.filter.namespaces === next.filter.namespaces
+    previous.filter.namespaces === next.filter.namespaces &&
+    [...names].every((name) => Object.is(previousProps[name], nextProps[name]))
   );
 });

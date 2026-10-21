@@ -121,6 +121,7 @@ export default function TermInspector({
   classRef,
   propertyRef,
   namespaces,
+  ...props
 }: TermInspectorProps): React.ReactElement {
   const t = useMessages();
   const classData = useFragment(
@@ -158,6 +159,7 @@ export default function TermInspector({
 
   return (
     <aside
+      {...props}
       aria-label={t("inspector.label")}
       aria-live="polite"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}

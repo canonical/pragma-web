@@ -51,12 +51,14 @@ export default function ExplorerControls({
   filter,
   namespaceLabels,
   onFilterChange,
+  ...props
 }: ExplorerControlsProps): React.ReactElement {
   const t = useMessages();
   const prefixes = namespaceLabels.map(({ prefix }) => prefix);
 
   return (
     <div
+      {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-controls"
     >

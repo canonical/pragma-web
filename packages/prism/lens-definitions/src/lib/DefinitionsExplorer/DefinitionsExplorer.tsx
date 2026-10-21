@@ -105,6 +105,7 @@ const componentCssClassName = "ds definitions-explorer";
 export default function DefinitionsExplorer({
   className,
   term,
+  ...props
 }: DefinitionsExplorerProps): React.ReactElement {
   const t = useMessages();
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
@@ -178,6 +179,7 @@ export default function DefinitionsExplorer({
 
   return (
     <div
+      {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <div className="rail">
