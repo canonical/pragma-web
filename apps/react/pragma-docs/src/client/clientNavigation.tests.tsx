@@ -34,6 +34,7 @@ import { createStaticRouter } from "#lib/router";
 import { Shell } from "#lib/Shell";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import type { InitialData } from "#server";
+import mergeRecordMaps from "../../testing/mergeRecordMaps.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
@@ -53,23 +54,7 @@ const createFetchSpy = () =>
   vi.fn(() => new Promise<never>(() => {})) as ReturnType<typeof vi.fn> &
     FetchFunction;
 
-/**
- * Both pages' records in one store so the whole journey renders warm —
- * a shallow per-record merge is exact for Relay's flat record maps (the
- * only shared record is `client:root`, whose fields union cleanly).
- */
-const mergeRecordMaps = (...maps: readonly RecordMap[]): RecordMap => {
-  const merged: Record<string, Record<string, unknown>> = {};
-  for (const map of maps) {
-    for (const [dataId, record] of Object.entries(map)) {
-      merged[dataId] = merged[dataId]
-        ? { ...merged[dataId], ...(record as Record<string, unknown>) }
-        : { ...(record as Record<string, unknown>) };
-    }
-  }
-  return merged as unknown as RecordMap;
-};
-
+/** Both pages' records in one store, so the whole journey renders warm. */
 const journeyRecords = mergeRecordMaps(
   catalogRecords,
   componentEntityRecordsButton,
