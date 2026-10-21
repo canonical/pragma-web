@@ -10,6 +10,7 @@ import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import formatDocumentTitle from "../../formatDocumentTitle.js";
 import { homes } from "../../homes.js";
+import { RouterLink } from "../RouterLink/index.js";
 import type { ShellProps } from "./types.js";
 
 /**
@@ -17,7 +18,7 @@ import type { ShellProps } from "./types.js";
  * wrapped around the router's `Outlet`, with the document-title template.
  * Inside the router sit the site's homes and the projection maps, so every
  * mention of a graph node renders through its type's arm and links to the
- * page that owns it.
+ * page that owns it, through the router so the link navigates on the client.
  * The client entry and the server entry both render it, so the hydrated tree
  * and the server markup share one nest. Each lens's layout renders below it,
  * through the `Outlet`.
@@ -37,7 +38,10 @@ export default function Shell<
       <RelayEnvironmentProvider environment={environment}>
         <RouterProvider router={router}>
           <HomesProvider homes={homes}>
-            <ProjectionsProvider maps={defaultProjectionMaps}>
+            <ProjectionsProvider
+              LinkComponent={RouterLink}
+              maps={defaultProjectionMaps}
+            >
               <Outlet fallback={<p>Loading…</p>} />
             </ProjectionsProvider>
           </HomesProvider>

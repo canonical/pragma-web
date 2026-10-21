@@ -45,6 +45,7 @@ import type { FetchFunction } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
+import { RouterLink } from "../../../lib/RouterLink/index.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import definitionsExplorerRecords from "./__fixtures__/definitionsExplorerRecords.js";
 import { DEFINITIONS_TEST_TIMEOUT_MS } from "./__fixtures__/definitionsPageHarness.js";
@@ -82,7 +83,10 @@ const explorerWithChips = (fetchFn: FetchFunction): ReactElement => {
           })}
         >
           <HomesProvider homes={homes}>
-            <ProjectionsProvider maps={defaultProjectionMaps}>
+            <ProjectionsProvider
+              LinkComponent={RouterLink}
+              maps={defaultProjectionMaps}
+            >
               <LensFilterProvider>
                 <Controls />
                 <DefinitionsPage params={{}} />

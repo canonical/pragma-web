@@ -3,6 +3,7 @@
 export { ExampleComponent } from "./ExampleComponent/index.js";
 export { default as LazyComponent } from "./LazyComponent/index.js";
 export * from "./LensIcons/index.js";
+export * from "./RouterLink/index.js";
 export * from "./Shell/index.js";
 export * from "./SiteColophon/index.js";
 export * from "./SiteRail/index.js";

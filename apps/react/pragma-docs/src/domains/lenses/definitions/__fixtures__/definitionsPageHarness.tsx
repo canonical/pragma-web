@@ -28,6 +28,7 @@ import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import formatDocumentTitle from "../../../../formatDocumentTitle.js";
 import { homes } from "../../../../homes.js";
+import { RouterLink } from "../../../../lib/RouterLink/index.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../../routes.js";
 import { DefinitionsPage } from "../DefinitionsPage/index.js";
 import { LensFilterProvider } from "../lensFilterContext.js";
@@ -52,9 +53,10 @@ export const DEFINITIONS_TEST_TIMEOUT_MS = 20_000;
  * `Link` context and selection only (no Outlet — the lens layout stays out
  * of component tests).
  *
- * The site's homes and the default projection maps sit inside the router,
- * as `Shell` mounts them, because the inspector mentions a class's
- * instances as entity chips that link to their homes.
+ * The site's homes, the default projection maps and the router link
+ * adapter sit inside the router, as `Shell` mounts them, because the
+ * inspector mentions a class's instances as entity chips that link to
+ * their homes through the router.
  *
  * `LensFilterProvider` is part of the stack because it is part of the
  * stack in production: `DefinitionsLayout` wraps the page in it, so the lens's
@@ -84,7 +86,10 @@ export const definitionsPageAt = (
         )}
       >
         <HomesProvider homes={homes}>
-          <ProjectionsProvider maps={defaultProjectionMaps}>
+          <ProjectionsProvider
+            LinkComponent={RouterLink}
+            maps={defaultProjectionMaps}
+          >
             <LensFilterProvider>
               <DefinitionsPage params={term === undefined ? {} : { term }} />
             </LensFilterProvider>
