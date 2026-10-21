@@ -21,3 +21,17 @@ export const STANDARD_URI =
 
 /** The journeys exemplar: a job's IRI. */
 export const JOB_URI = "sem://design-system-docs#job.l3";
+
+/**
+ * A graph answer to the playground's `ComponentProbeQuery`: the components
+ * exemplar, named "Button".
+ */
+export const COMPONENT_PROBE_RESPONSE = {
+  data: {
+    component: {
+      id: COMPONENT_URI,
+      uri: COMPONENT_URI,
+      name: "Button",
+    },
+  },
+} as const;

@@ -27,7 +27,7 @@
  *   200.
  */
 
-import { createServer, type Server } from "node:http";
+import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import {
@@ -61,20 +61,15 @@ import {
 } from "#relay";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import {
+  COMPONENT_PROBE_RESPONSE,
   COMPONENT_URI,
   JOB_URI,
   STANDARD_URI,
   UIBLOCK_TERM,
 } from "../../testing/fixtures.js";
+import startGraphStub from "../../testing/startGraphStub.js";
+import type { CapturedRequest, GraphStub } from "../../testing/types.js";
 import prepareRelayData from "./prepareRelayData.js";
-
-/** One captured request: what the prepare step actually put on the wire. */
-interface CapturedRequest {
-  readonly method: string;
-  readonly url: string;
-  readonly headers: Record<string, string | string[] | undefined>;
-  readonly body: Record<string, unknown>;
-}
 
 /** The root-field key a term-bearing definitions operation writes. */
 const UIBLOCK_CLASS_KEY = `ontologyClass(uri:"${UIBLOCK_TERM}")`;
@@ -85,22 +80,14 @@ const UIBLOCK_CLASS_KEY = `ontologyClass(uri:"${UIBLOCK_TERM}")`;
  * assert, and the prepare step logs the failure.
  */
 const STUB_RESPONSES: Readonly<Record<string, unknown>> = {
-  ComponentProbeQuery: {
-    data: {
-      component: {
-        id: COMPONENT_URI,
-        uri: COMPONENT_URI,
-        name: "Button",
-      },
-    },
-  },
+  ComponentProbeQuery: COMPONENT_PROBE_RESPONSE,
   DefinitionsExplorerQuery: {
     data: { ontologies: [], ontologyClass: null, ontologyProperty: null },
   },
 };
 
-const captured: CapturedRequest[] = [];
-let server: Server;
+let stub: GraphStub;
+let captured: CapturedRequest[];
 let graphqlUrl: string;
 let deadGraphqlUrl: string;
 
@@ -143,39 +130,9 @@ const readSoleRequest = (): CapturedRequest => {
 
 beforeAll(async () => {
   deadGraphqlUrl = `http://127.0.0.1:${await reserveClosedPort()}/graphql`;
-  await new Promise<void>((resolve) => {
-    server = createServer((req, res) => {
-      const chunks: Buffer[] = [];
-      req.on("data", (chunk: Buffer) => chunks.push(chunk));
-      req.on("end", () => {
-        const body = JSON.parse(Buffer.concat(chunks).toString()) as Record<
-          string,
-          unknown
-        >;
-        captured.push({
-          method: req.method ?? "",
-          url: req.url ?? "",
-          headers: req.headers,
-          body,
-        });
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(
-          JSON.stringify(
-            STUB_RESPONSES[String(body.operationName)] ?? {
-              errors: [{ message: "stub: request recorded, not answered" }],
-            },
-          ),
-        );
-      });
-    });
-    // Port 0 — the OS picks a free one, so this suite never collides with
-    // a real graph server or with a parallel worker.
-    server.listen(0, "127.0.0.1", () => {
-      const { port } = server.address() as AddressInfo;
-      graphqlUrl = `http://127.0.0.1:${port}/graphql`;
-      resolve();
-    });
-  });
+  stub = await startGraphStub(STUB_RESPONSES);
+  captured = stub.captured;
+  graphqlUrl = stub.url;
 });
 
 beforeEach(() => {
@@ -186,12 +143,7 @@ afterEach(() => {
   setPrefetchEnvironment(undefined);
 });
 
-afterAll(
-  () =>
-    new Promise<void>((resolve) => {
-      server.close(() => resolve());
-    }),
-);
+afterAll(() => stub.close());
 
 describe("prepareRelayData over HTTP", () => {
   it("POSTs the route's operation to the graph endpoint and returns its records", async () => {
