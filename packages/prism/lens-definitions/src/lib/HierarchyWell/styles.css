@@ -6,8 +6,9 @@
  * ABSOLUTELY inside its camera, never `position: fixed`, which the canvas's
  * containment would re-anchor.
  *
- * Each design decision reads a component token bound to a semantic token;
- * the floor and its stratum read the site's underground surface hooks.
+ * Each design decision reads a component token bound to a semantic token,
+ * which falls back to the lens's default where the site binds none; the
+ * floor and its stratum read the site's underground surface hooks.
  *
  * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
  */
@@ -17,18 +18,27 @@
     --hierarchy-well-background: var(--surface-underground-background);
     --hierarchy-well-z-index: var(--z-underground);
     --hierarchy-well-line-color: var(--color-border-muted);
-    --hierarchy-well-line-width: 1.4;
+    --hierarchy-well-line-width: var(--stroke-width-hairline, 1.4);
     --hierarchy-well-accent-color: var(--color-text-branded);
-    --hierarchy-well-accent-width: 1.8;
+    --hierarchy-well-accent-width: var(--stroke-width-accent, 1.8);
     --hierarchy-well-head-fill: var(--color-background);
-    --hierarchy-well-ambient-opacity: 0.35;
+    --hierarchy-well-ambient-opacity: var(--opacity-ambient, 0.35);
     --hierarchy-well-label-font-family: var(--font-family-mono, monospace);
-    --hierarchy-well-label-font-size: 0.6875rem;
+    --hierarchy-well-label-font-size: var(--font-size-caption, 0.6875rem);
     --hierarchy-well-label-halo: var(--color-background);
-    --hierarchy-well-caption-font-size: 0.9rem;
+    --hierarchy-well-label-halo-width: var(
+      --dimension-stroke-thickness-large,
+      3px
+    );
+    --hierarchy-well-caption-font-size: var(--font-size-subheading, 0.9rem);
+    --hierarchy-well-caption-font-weight: var(--font-weight-bold, 700);
+    --hierarchy-well-caption-letter-spacing: var(
+      --letter-spacing-wider,
+      0.12em
+    );
     --hierarchy-well-caption-color: var(--color-text-muted);
-    --hierarchy-well-caption-opacity: 0.55;
-    --hierarchy-well-edge-faded-opacity: 0.06;
+    --hierarchy-well-caption-opacity: var(--opacity-subtle, 0.55);
+    --hierarchy-well-edge-faded-opacity: var(--opacity-faint, 0.06);
     --hierarchy-well-hint-inset: var(--space-150, 0.75rem);
     --hierarchy-well-hint-padding-block: var(--space-050, 0.25rem);
     --hierarchy-well-hint-padding-inline: var(--space-150, 0.75rem);
@@ -38,7 +48,7 @@
       var(--color-background) 85%,
       transparent
     );
-    --hierarchy-well-hint-font-size: 0.75rem;
+    --hierarchy-well-hint-font-size: var(--font-size-label, 0.75rem);
     --hierarchy-well-hint-color: var(--color-text-muted);
     --hierarchy-well-transition-duration: var(--motion-duration-fast, 0.15s);
   }
@@ -128,7 +138,7 @@
     fill: var(--hierarchy-well-accent-color);
     paint-order: stroke;
     stroke: var(--hierarchy-well-label-halo);
-    stroke-width: 3px;
+    stroke-width: var(--hierarchy-well-label-halo-width);
     text-anchor: middle;
     opacity: 0;
     pointer-events: none;
@@ -154,8 +164,8 @@
   .ds.hierarchy-well .cluster-caption {
     font-family: var(--hierarchy-well-label-font-family);
     font-size: var(--hierarchy-well-caption-font-size);
-    font-weight: 700;
-    letter-spacing: 0.12em;
+    font-weight: var(--hierarchy-well-caption-font-weight);
+    letter-spacing: var(--hierarchy-well-caption-letter-spacing);
     text-transform: uppercase;
     fill: var(--hierarchy-well-caption-color);
     opacity: var(--hierarchy-well-caption-opacity);

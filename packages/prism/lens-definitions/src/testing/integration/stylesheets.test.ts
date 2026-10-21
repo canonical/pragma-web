@@ -12,7 +12,9 @@
  * - no grid template is authored but the layout's root, which reads the
  *   design system's intrinsic columns: every other `grid-template-columns`
  *   is a subgrid, so the explorer lands on the same ruler as the site;
- * - no theme is named: a site's theme activates through its own classes.
+ * - no theme is named: a site's theme activates through its own classes;
+ * - every component token reads another token, so a site retunes the lens
+ *   through the semantic tier, save the literal layout measures named here.
  */
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -38,6 +40,19 @@ function readCss(file: string): string {
 }
 
 const files = collectCss(LIBRARY_DIRECTORY);
+
+/** The component tokens that hold a literal layout measure on purpose. */
+const LITERAL_TOKENS = [
+  "--definitions-explorer-well-min-block-size",
+  "--well-legend-max-inline-size",
+];
+
+/** List the component tokens a stylesheet declares with no `var()`. */
+function listLiteralTokens(css: string): string[] {
+  return [...css.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
+    .filter((match) => !(match.at(2) ?? "").includes("var("))
+    .map((match) => match.at(1) ?? "");
+}
 
 /**
  * List the conditional at-rule preludes that can gate layout: every
@@ -91,6 +106,11 @@ describe("the lens stylesheets", () => {
       expect(css, file).not.toMatch(/\.(?:dark|light)\b/);
       expect(css, file).not.toMatch(/prefers-color-scheme/);
     }
+  });
+
+  it("bind every component token to another token", () => {
+    const literal = files.flatMap((file) => listLiteralTokens(readCss(file)));
+    expect(literal.toSorted()).toEqual(LITERAL_TOKENS);
   });
 
   it("paint in the prism layer, never in a site's", () => {

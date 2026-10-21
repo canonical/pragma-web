@@ -109,9 +109,25 @@ selection leaves the contract and when the artifacts are stale. Run
 The stylesheets sit in the `ds.prism` cascade layer. Each design decision
 reads a component token, declared on `:root` and named for its component
 (`--term-rail-dimmed-opacity`, `--hierarchy-well-accent-color`, …), bound to
-a semantic token, so a site retunes the lens through either tier.
+a semantic token, so a site retunes the lens through either tier. Where the
+site binds no such semantic token, the binding falls back to the lens's own
+default. Two component tokens hold a literal layout measure instead:
+`--definitions-explorer-well-min-block-size` and
+`--well-legend-max-inline-size`.
 
-The stylesheets read custom properties the package does not define:
+The semantic tokens the lens reads and falls back from:
+
+- type: `--font-size-default`, `--font-size-small`, `--font-size-detail`,
+  `--font-size-label`, `--font-size-caption`, `--font-size-micro`,
+  `--font-size-subheading`, `--font-weight-semibold`, `--font-weight-bold`,
+  `--letter-spacing-label`, `--letter-spacing-wide`, `--letter-spacing-wider`;
+- shape: `--radius-small`, `--radius-medium`, `--size-indicator`,
+  `--stroke-width-hairline`, `--stroke-width-accent`, `--shadow-raised`,
+  `--shadow-floating`;
+- opacity: `--opacity-muted`, `--opacity-dimmed`, `--opacity-faded`,
+  `--opacity-ambient`, `--opacity-subtle`, `--opacity-faint`.
+
+The stylesheets also read custom properties the package does not define:
 
 - `--grid-intrinsic`, the intrinsic column template from `@canonical/styles`,
   which the layout's root reads;

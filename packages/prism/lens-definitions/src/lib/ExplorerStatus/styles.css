@@ -3,16 +3,17 @@
  * (slot.explorer-status). It lives INSIDE the strip band, whose height is
  * stationary frame, so nothing here may change it.
  *
- * Each design decision reads a component token bound to a semantic token.
+ * Each design decision reads a component token bound to a semantic token,
+ * which falls back to the lens's default where the site binds none.
  */
 
 @layer ds.prism {
   :root {
     --explorer-status-gap: var(--space-100, 0.5rem);
-    --explorer-status-font-size: 0.75rem;
+    --explorer-status-font-size: var(--font-size-label, 0.75rem);
     --explorer-status-color: var(--color-text-muted);
-    --explorer-status-bar-inline-size: 4rem;
-    --explorer-status-bar-block-size: 0.375rem;
+    --explorer-status-bar-inline-size: var(--space-800, 4rem);
+    --explorer-status-bar-block-size: calc(1.5 * var(--space-050, 0.25rem));
     --explorer-status-bar-radius: var(--dimension-radius-full, 999px);
     --explorer-status-bar-background: var(--color-border-muted);
     --explorer-status-fill-background: var(--color-text-muted);

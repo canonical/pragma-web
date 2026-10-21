@@ -4,7 +4,8 @@
  * for an abstract class, a small tag at its foot outside the link, so the
  * node's accessible name stays the term alone.
  *
- * Each design decision reads a component token bound to a semantic token.
+ * Each design decision reads a component token bound to a semantic token,
+ * which falls back to the lens's default where the site binds none.
  *
  * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
  */
@@ -15,11 +16,14 @@
     --term-node-background: var(--color-background);
     --term-node-border-width: var(--dimension-stroke-thickness-medium, 1px);
     --term-node-border-color: var(--color-border-muted);
-    --term-node-radius: 0.5rem;
+    --term-node-radius: var(--radius-medium, 0.5rem);
     --term-node-color: var(--color-text);
-    --term-node-font-size: 0.875rem;
+    --term-node-font-size: var(--font-size-small, 0.875rem);
     --term-node-shadow: drop-shadow(
-      0 1px 2px color-mix(in oklab, var(--color-text) 12%, transparent)
+      var(
+        --shadow-raised,
+        0 1px 2px color-mix(in oklab, var(--color-text) 12%, transparent)
+      )
     );
     --term-node-selected-border-color: var(--color-text);
     --term-node-selected-border-width: var(
@@ -31,9 +35,12 @@
       var(--color-text) 6%,
       var(--color-background)
     );
-    --term-node-tag-font-size: 0.5rem;
+    --term-node-selected-font-weight: var(--font-weight-semibold, 600);
+    --term-node-tag-font-size: var(--font-size-micro, 0.5rem);
+    --term-node-tag-offset: calc(1.2 * var(--space-150, 0.75rem));
+    --term-node-tag-letter-spacing: var(--letter-spacing-wide, 0.08em);
     --term-node-tag-color: var(--color-text-muted);
-    --term-node-faded-opacity: 0.16;
+    --term-node-faded-opacity: var(--opacity-faded, 0.16);
     --term-node-transition-duration: var(--motion-duration-fast, 0.15s);
   }
 
@@ -77,11 +84,11 @@
 
   .ds.term-node .tag {
     position: absolute;
-    inset-block-end: -0.9rem;
+    inset-block-end: calc(-1 * var(--term-node-tag-offset));
     inset-inline: 0;
     text-align: center;
     font-size: var(--term-node-tag-font-size);
-    letter-spacing: 0.08em;
+    letter-spacing: var(--term-node-tag-letter-spacing);
     text-transform: uppercase;
     color: var(--term-node-tag-color);
     pointer-events: none;
@@ -93,7 +100,7 @@
   .ds.term-node .link[aria-current="page"] {
     border-color: var(--term-node-selected-border-color);
     border-width: var(--term-node-selected-border-width);
-    font-weight: 600;
+    font-weight: var(--term-node-selected-font-weight);
     background: var(--term-node-selected-background);
   }
 
