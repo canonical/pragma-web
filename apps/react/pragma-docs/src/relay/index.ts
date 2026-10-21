@@ -26,6 +26,7 @@ export {
   getPrefetchEnvironment,
   setPrefetchEnvironment,
 } from "./prefetchEnvironment.js";
+export { default as prefetchQuery } from "./prefetchQuery.js";
 export type { RouteQueryEntry } from "./routeQuery.js";
 export { ROUTE_QUERY_META_KEY, readRouteQueryEntry } from "./routeQuery.js";
 export { warmRouteQuery } from "./warmRouteQuery.js";
