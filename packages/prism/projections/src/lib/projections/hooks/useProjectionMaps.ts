@@ -10,9 +10,9 @@ import type { UseProjectionMapsResult } from "./types.js";
  *   bug, not a site without maps.
  */
 export default function useProjectionMaps(): UseProjectionMapsResult {
-  const maps = useContext(ProjectionsContext);
-  if (maps === undefined) {
+  const projections = useContext(ProjectionsContext);
+  if (projections === undefined) {
     throw new Error("useProjectionMaps: no ProjectionsProvider above");
   }
-  return maps;
+  return projections.maps;
 }

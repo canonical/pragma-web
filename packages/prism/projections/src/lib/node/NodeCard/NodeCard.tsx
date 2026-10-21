@@ -3,6 +3,7 @@ import { graphql, useFragment } from "react-relay";
 import type { NodeCard_node$key } from "../../../__generated__/NodeCard_node.graphql.js";
 import nodeCardFragmentNode from "../../../__generated__/NodeCard_node.graphql.js";
 import type { EntityCardArmProps } from "../../EntityCard/index.js";
+import useProjectionLink from "../../projections/hooks/useProjectionLink.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -31,6 +32,9 @@ const componentCssClassName = "ds node-card";
  * The root carries the node's class IRI as `data-type`, for styling by
  * class; it is the arm's own and wins over the same attribute passed in.
  *
+ * The link renders through the `LinkComponent` the nearest
+ * `ProjectionsProvider` holds, so a site's router handles the navigation.
+ *
  * Reachable as `defaultProjectionMaps.card.Node`.
  */
 export default function NodeCard({
@@ -40,6 +44,7 @@ export default function NodeCard({
   ...props
 }: EntityCardArmProps): ReactElement {
   const data = useFragment<NodeCard_node$key>(nodeCardFragmentNode, node);
+  const LinkComponent = useProjectionLink();
   return (
     <article
       {...props}
@@ -50,7 +55,7 @@ export default function NodeCard({
         {href === undefined ? (
           data._meta.title
         ) : (
-          <a href={href}>{data._meta.title}</a>
+          <LinkComponent href={href}>{data._meta.title}</LinkComponent>
         )}
       </h3>
       <p className="location">

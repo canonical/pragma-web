@@ -1,3 +1,4 @@
+import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ReactNode } from "react";
 import type { EntityCardArm } from "../EntityCard/index.js";
 import type { EntityChipArm } from "../EntityChip/index.js";
@@ -35,6 +36,20 @@ export interface ProjectionsProviderProps {
    * composites.
    */
   readonly maps: ProjectionMaps;
+  /**
+   * The link every representation renders a node's home through: the
+   * site's router link adapter, so following a mention navigates on the
+   * client. Defaults to the intrinsic `"a"`, a full document load.
+   */
+  readonly LinkComponent?: LinkComponent;
   /** The content whose representations read the maps. */
   readonly children: ReactNode;
+}
+
+/** What a `ProjectionsProvider` holds for the representations below it. */
+export interface ProjectionsContextValue {
+  /** The site's maps, one per representation. */
+  readonly maps: ProjectionMaps;
+  /** The link a node's home renders through. */
+  readonly LinkComponent: LinkComponent;
 }

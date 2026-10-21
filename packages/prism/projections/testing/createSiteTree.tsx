@@ -5,6 +5,7 @@ import {
   type Homes,
   HomesProvider,
 } from "@canonical/prism-core";
+import type { LinkComponent } from "@canonical/react-ds-global";
 import {
   createMemoryAdapter,
   createRouter,
@@ -44,6 +45,8 @@ const HOMES: Homes = {
 export interface SiteTreeOptions {
   /** The maps to provide, in place of `defaultProjectionMaps`. */
   readonly maps?: ProjectionMaps;
+  /** The link a node's home renders through, in place of the provider's default. */
+  readonly LinkComponent?: LinkComponent;
 }
 
 /**
@@ -62,7 +65,7 @@ export const createStoreOnlyEnvironment = (): Environment =>
 export default function createSiteTree(
   environment: Environment,
   children: ReactNode,
-  { maps = defaultProjectionMaps }: SiteTreeOptions = {},
+  { maps = defaultProjectionMaps, LinkComponent }: SiteTreeOptions = {},
 ): ReactElement {
   return (
     <RelayEnvironmentProvider environment={environment}>
@@ -72,7 +75,9 @@ export default function createSiteTree(
         })}
       >
         <HomesProvider homes={HOMES}>
-          <ProjectionsProvider maps={maps}>{children}</ProjectionsProvider>
+          <ProjectionsProvider LinkComponent={LinkComponent} maps={maps}>
+            {children}
+          </ProjectionsProvider>
         </HomesProvider>
       </RouterProvider>
     </RelayEnvironmentProvider>

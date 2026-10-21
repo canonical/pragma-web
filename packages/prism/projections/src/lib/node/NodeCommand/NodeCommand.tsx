@@ -3,6 +3,7 @@ import { graphql, useFragment } from "react-relay";
 import type { NodeCommand_node$key } from "../../../__generated__/NodeCommand_node.graphql.js";
 import nodeCommandFragmentNode from "../../../__generated__/NodeCommand_node.graphql.js";
 import type { EntityCommandArmProps } from "../../EntityCommand/index.js";
+import useProjectionLink from "../../projections/hooks/useProjectionLink.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -31,6 +32,9 @@ const componentCssClassName = "ds node-command";
  * The root carries the node's class IRI as `data-type`, for styling by
  * class; it is the arm's own and wins over the same attribute passed in.
  *
+ * The link renders through the `LinkComponent` the nearest
+ * `ProjectionsProvider` holds, so a site's router handles the navigation.
+ *
  * Reachable as `defaultProjectionMaps.command.Node`.
  */
 export default function NodeCommand({
@@ -40,6 +44,7 @@ export default function NodeCommand({
   ...props
 }: EntityCommandArmProps): ReactElement {
   const data = useFragment<NodeCommand_node$key>(nodeCommandFragmentNode, node);
+  const LinkComponent = useProjectionLink();
   return (
     <li
       {...props}
@@ -49,9 +54,9 @@ export default function NodeCommand({
       {href === undefined ? (
         <span className="title">{data._meta.title}</span>
       ) : (
-        <a className="title" href={href}>
+        <LinkComponent className="title" href={href}>
           {data._meta.title}
-        </a>
+        </LinkComponent>
       )}{" "}
       <span className="location">{data._meta.curie}</span>
     </li>

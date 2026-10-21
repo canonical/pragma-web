@@ -135,7 +135,8 @@ heads.
 
 ## Maps and arms
 
-Mount the maps once, inside the router and beside the site's homes:
+Mount the maps once, inside the router and beside the site's homes, with
+the site's router link adapter:
 
 ```tsx
 import { HomesProvider } from "@canonical/prism-core";
@@ -145,11 +146,18 @@ import {
 } from "@canonical/prism-projections";
 
 <HomesProvider homes={homes}>
-  <ProjectionsProvider maps={defaultProjectionMaps}>
+  <ProjectionsProvider LinkComponent={RouterLink} maps={defaultProjectionMaps}>
     <Outlet />
   </ProjectionsProvider>
 </HomesProvider>;
 ```
+
+Every link to a node's home renders through `LinkComponent`, typed against
+the shared `LinkComponentProps` of `@canonical/react-ds-global` and
+defaulting to the intrinsic `"a"`. A plain anchor follows a mention with a
+full document load, so a site with a client-side router passes an adapter
+that renders the router's own link for an `href`; the router then navigates
+on the client and the page keeps its state.
 
 A map is keyed by `__typename`; `Node` is the arm for every type the map
 does not name. An arm receives the node as its representation's composite
