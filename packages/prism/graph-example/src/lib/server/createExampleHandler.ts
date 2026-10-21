@@ -11,7 +11,11 @@
  */
 
 import { graphql } from "graphql";
-import type { ExampleContext, ExampleProvider } from "../provider/index.js";
+import {
+  type ExampleContext,
+  type ExampleProvider,
+  LOCALE_HEADER,
+} from "../provider/index.js";
 import graphiqlHtml from "./graphiqlHtml.js";
 import { readRequestLocale } from "./readRequestLocale.js";
 
@@ -42,7 +46,9 @@ const corsHeaders = (enabled: boolean): Record<string, string> =>
     ? {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Accept",
+        // A cross-origin request carrying the locale is preflighted; the
+        // header must be allowed here or the browser drops the request.
+        "Access-Control-Allow-Headers": `Content-Type, Accept, ${LOCALE_HEADER}`,
       }
     : {};
 

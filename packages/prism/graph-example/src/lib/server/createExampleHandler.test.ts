@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   createExampleProvider,
+  LOCALE_HEADER,
   MULTILINGUAL_ENTITY_URI,
 } from "../provider/index.js";
 import { createExampleHandler } from "./createExampleHandler.js";
@@ -154,6 +155,19 @@ describe("CORS", () => {
     expect(response.headers.get("Access-Control-Allow-Methods")).toBe(
       "GET, POST, OPTIONS",
     );
+  });
+
+  it("allows the locale header in a preflight", async () => {
+    const handler = createExampleHandler(provider, { cors: true });
+    const response = await handler(
+      new Request("http://localhost/graphql", { method: "OPTIONS" }),
+    );
+    expect(
+      response.headers
+        .get("Access-Control-Allow-Headers")
+        ?.split(",")
+        .map((name) => name.trim().toLowerCase()),
+    ).toEqual(["content-type", "accept", LOCALE_HEADER]);
   });
 
   it("sends no allow headers when disabled", async () => {
