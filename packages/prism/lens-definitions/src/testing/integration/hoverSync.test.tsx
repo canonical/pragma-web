@@ -13,6 +13,10 @@
  * - Hover a GRAPH node → the matching RAIL item gains its hover-highlight
  *   (`is-hovered`), distinct from the aria-current selection underneath.
  *
+ * The rail-to-graph cases mount the explorer with NO term selected, where
+ * the well paints no fade at all, so every faded node they see is the
+ * hover's doing and a hover that never reached the graph fails them.
+ *
  * The mount is the full triptych over the captured store (the heaviest
  * render), so it carries the shared timeout for parallel runs.
  */
@@ -41,13 +45,17 @@ const findNodeByHref = (well: HTMLElement, href: string): HTMLElement => {
   return node;
 };
 
+/** How many of the well's nodes the ego-fade currently dims. */
+const countFadedNodes = (well: HTMLElement): number =>
+  well.querySelectorAll(`.ds.term-node.${NODE_FADED_CLASS}`).length;
+
 describe("bidirectional hover — the rail and the graph share one ego centre", () => {
   it("a RAIL hover fades the GRAPH: the hovered term's node stays lit, a distant node fades", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
     const { container } = render(
       createDefinitionsPage(
-        UIBLOCK_TERM,
+        undefined,
         definitionsExplorerRecords,
         createFetchSpy(),
       ),
@@ -58,39 +66,29 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     );
     if (!well) throw new Error("unreachable");
 
-    // Before any hover, the selection's OWN fade is what shows (UIBlock is
-    // selected in this fixture). We assert the DELTA a rail hover makes, so
-    // pick a probe whose faded-ness the rail hover is what changes: hover a
-    // ROOT with a small neighbourhood and watch a node outside it fade.
+    // No term is selected and nothing is hovered: the well fades nothing.
+    expect(countFadedNodes(well)).toBe(0);
+
     const componentItem = within(rail)
       .getByRole("link", { name: "Component" })
       .closest("li");
     if (!componentItem) throw new Error("no Component rail item");
 
-    // Hover the rail's "Component" item — its node and one-hop neighbours
-    // stay lit; a node two hops away (a sibling, e.g. Pattern) fades.
+    // Hover the rail's "Component" item: its node and one-hop neighbours
+    // stay lit, and every other node fades.
     fireEvent.mouseEnter(componentItem);
 
+    expect(countFadedNodes(well)).toBeGreaterThan(0);
     const componentNode = findNodeByHref(well, "/definitions/ds%3AComponent");
     // The hovered term itself is the ego centre — never faded.
     expect(componentNode.classList.contains(NODE_FADED_CLASS)).toBe(false);
-
-    // A node NOT in Component's 1-hop neighbourhood fades. CodeStandard is
-    // in a different ontology entirely — guaranteed distant.
+    // CodeStandard is in a different ontology entirely — guaranteed distant.
     const distantNode = findNodeByHref(well, "/definitions/cs%3ACodeStandard");
     expect(distantNode.classList.contains(NODE_FADED_CLASS)).toBe(true);
 
-    // Leaving the rail item restores the selection-only fade: the distant
-    // node is faded by the SELECTION now (UIBlock selected), but the point
-    // is the hovered-centre override lifted.
+    // Leaving the rail item lifts the hover's fade entirely.
     fireEvent.mouseLeave(componentItem);
-    // Component is a neighbour of the selected UIBlock, so with the hover
-    // gone it returns to un-faded under the selection's own ego.
-    expect(
-      findNodeByHref(well, "/definitions/ds%3AComponent").classList.contains(
-        NODE_FADED_CLASS,
-      ),
-    ).toBe(false);
+    expect(countFadedNodes(well)).toBe(0);
   });
 
   it("a GRAPH hover marks the RAIL: the hovered node's rail item gains is-hovered", {
@@ -138,7 +136,7 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
   }, () => {
     const { container } = render(
       createDefinitionsPage(
-        UIBLOCK_TERM,
+        undefined,
         definitionsExplorerRecords,
         createFetchSpy(),
       ),
@@ -154,6 +152,9 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
       .closest("li");
     if (!componentItem) throw new Error("no Component rail item");
 
+    // Nothing selected, nothing focused: the well fades nothing.
+    expect(countFadedNodes(well)).toBe(0);
+
     // Focus (not pointer) raises the centre — the fade follows the keyboard.
     fireEvent.focus(componentItem);
     const distantNode = findNodeByHref(well, "/definitions/cs%3ACodeStandard");
@@ -161,7 +162,9 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     // The rail item marks itself under focus too.
     expect(componentItem.classList.contains("is-hovered")).toBe(true);
 
+    // Blurring lifts the fade and the mark together.
     fireEvent.blur(componentItem);
+    expect(countFadedNodes(well)).toBe(0);
     expect(componentItem.classList.contains("is-hovered")).toBe(false);
   });
 
