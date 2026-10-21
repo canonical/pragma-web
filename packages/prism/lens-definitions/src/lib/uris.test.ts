@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { type OntologyNamespace, toFullUri, toPrefixedUri } from "./uris.js";
+import { compactUri, expandUri, type OntologyNamespace } from "./uris.js";
 
 /** The three live ontologies' addressing identities, as the graph states
  * them (`{ ontologies { prefix namespace } }`). */
@@ -16,22 +16,22 @@ const NAMESPACES: readonly OntologyNamespace[] = [
   { prefix: "anatomy", namespace: "http://anatomy-dsl.example.org/ontology#" },
 ];
 
-describe("toPrefixedUri", () => {
+describe("compactUri", () => {
   it("prefixes a /-namespace IRI", () => {
-    expect(toPrefixedUri("https://ds.canonical.com/UIBlock", NAMESPACES)).toBe(
+    expect(compactUri("https://ds.canonical.com/UIBlock", NAMESPACES)).toBe(
       "ds:UIBlock",
     );
   });
 
   it("prefixes a #-namespace IRI", () => {
     expect(
-      toPrefixedUri(
+      compactUri(
         "http://pragma.canonical.com/codestandards#CodeStandard",
         NAMESPACES,
       ),
     ).toBe("cs:CodeStandard");
     expect(
-      toPrefixedUri(
+      compactUri(
         "http://anatomy-dsl.example.org/ontology#NamedNode",
         NAMESPACES,
       ),
@@ -40,12 +40,12 @@ describe("toPrefixedUri", () => {
 
   it("passes an unknown IRI through unchanged", () => {
     expect(
-      toPrefixedUri("http://www.w3.org/2001/XMLSchema#string", NAMESPACES),
+      compactUri("http://www.w3.org/2001/XMLSchema#string", NAMESPACES),
     ).toBe("http://www.w3.org/2001/XMLSchema#string");
   });
 
   it("never emits an empty local name (a bare namespace passes through)", () => {
-    expect(toPrefixedUri("https://ds.canonical.com/", NAMESPACES)).toBe(
+    expect(compactUri("https://ds.canonical.com/", NAMESPACES)).toBe(
       "https://ds.canonical.com/",
     );
   });
@@ -55,25 +55,25 @@ describe("toPrefixedUri", () => {
       { prefix: "outer", namespace: "https://example.org/" },
       { prefix: "inner", namespace: "https://example.org/inner/" },
     ];
-    expect(toPrefixedUri("https://example.org/inner/Thing", nested)).toBe(
+    expect(compactUri("https://example.org/inner/Thing", nested)).toBe(
       "inner:Thing",
     );
   });
 });
 
-describe("toFullUri", () => {
+describe("expandUri", () => {
   it("expands a known prefix", () => {
-    expect(toFullUri("ds:UIBlock", NAMESPACES)).toBe(
+    expect(expandUri("ds:UIBlock", NAMESPACES)).toBe(
       "https://ds.canonical.com/UIBlock",
     );
-    expect(toFullUri("anatomy:Node", NAMESPACES)).toBe(
+    expect(expandUri("anatomy:Node", NAMESPACES)).toBe(
       "http://anatomy-dsl.example.org/ontology#Node",
     );
   });
 
   it("passes unknown prefixes and colon-less strings through", () => {
-    expect(toFullUri("xsd:string", NAMESPACES)).toBe("xsd:string");
-    expect(toFullUri("no-colon-here", NAMESPACES)).toBe("no-colon-here");
+    expect(expandUri("xsd:string", NAMESPACES)).toBe("xsd:string");
+    expect(expandUri("no-colon-here", NAMESPACES)).toBe("no-colon-here");
   });
 });
 
@@ -81,7 +81,7 @@ describe("round trip", () => {
   it("full → prefixed → full is identity for every live namespace", () => {
     for (const { namespace } of NAMESPACES) {
       const full = `${namespace}SomeTerm`;
-      expect(toFullUri(toPrefixedUri(full, NAMESPACES), NAMESPACES)).toBe(full);
+      expect(expandUri(compactUri(full, NAMESPACES), NAMESPACES)).toBe(full);
     }
   });
 });

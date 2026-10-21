@@ -61,7 +61,7 @@ import { definitionsStripSlots } from "../../lib/stripSlots.js";
  * tests mount the chips without the well. This is the join, and the join
  * is exactly where the memo boundary lives.
  */
-const explorerWithChips = (fetchFn: FetchFunction): ReactElement => {
+const createExplorerWithChips = (fetchFn: FetchFunction): ReactElement => {
   const { Controls } = definitionsStripSlots;
   return (
     <RelayEnvironmentProvider
@@ -88,25 +88,25 @@ const explorerWithChips = (fetchFn: FetchFunction): ReactElement => {
 
 /** How many of the well's nodes the graph is currently HIDING. Counted
  * from the DOM React Flow painted, never from the model. */
-const hiddenNodeCount = (): number =>
+const countHiddenNodes = (): number =>
   document.querySelectorAll(`.hierarchy-node-shell.${HIDDEN_CLASS}`).length;
 
 /** Every node the well painted, hidden or not. */
-const totalNodeCount = (): number =>
+const countNodes = (): number =>
   document.querySelectorAll(".hierarchy-node-shell").length;
 
 describe("the well answers a chip toggle", () => {
   it("hides nodes in the GRAPH when an ontology chip goes off", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
-    render(explorerWithChips(createFetchSpy()));
+    render(createExplorerWithChips(createFetchSpy()));
 
     // The unfiltered graph: every class painted, none hidden. The total
     // is read from the render rather than pinned, so this survives the
     // ontology growing (the 111-to-108 drift lesson).
-    const total = totalNodeCount();
+    const total = countNodes();
     expect(total).toBeGreaterThan(0);
-    expect(hiddenNodeCount()).toBe(0);
+    expect(countHiddenNodes()).toBe(0);
 
     // Toggle a real chip through the real UI — the same button a reader
     // presses, mounted by the same code path the layout uses.
@@ -117,35 +117,35 @@ describe("the well answers a chip toggle", () => {
     // THE CLAIM: the graph itself changed. Some nodes are now hidden,
     // and not all of them are — a chip narrows the view, it does not
     // blank it. Counts are related to each other, never pinned.
-    const hidden = hiddenNodeCount();
+    const hidden = countHiddenNodes();
     expect(hidden).toBeGreaterThan(0);
     expect(hidden).toBeLessThan(total);
     // The graph HIDES rather than removing: positions are preserved so
     // the picture restores exactly when the chip comes back on.
-    expect(totalNodeCount()).toBe(total);
+    expect(countNodes()).toBe(total);
 
     // And it is reversible: pressing the chip again restores the whole
     // graph, which is what "hide, never re-lay-out" buys.
     fireEvent.click(chip);
-    expect(hiddenNodeCount()).toBe(0);
-    expect(totalNodeCount()).toBe(total);
+    expect(countHiddenNodes()).toBe(0);
+    expect(countNodes()).toBe(total);
   });
 
   it("hides nodes in the GRAPH when an abstraction chip goes off", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
-    render(explorerWithChips(createFetchSpy()));
+    render(createExplorerWithChips(createFetchSpy()));
 
-    const total = totalNodeCount();
-    expect(hiddenNodeCount()).toBe(0);
+    const total = countNodes();
+    expect(countHiddenNodes()).toBe(0);
 
     // The other axis, so the comparator is pinned on BOTH the fields it
     // compares — `abstractions` as well as `namespaces`.
     fireEvent.click(screen.getByRole("button", { name: "Abstract" }));
 
-    const hidden = hiddenNodeCount();
+    const hidden = countHiddenNodes();
     expect(hidden).toBeGreaterThan(0);
     expect(hidden).toBeLessThan(total);
-    expect(totalNodeCount()).toBe(total);
+    expect(countNodes()).toBe(total);
   });
 });

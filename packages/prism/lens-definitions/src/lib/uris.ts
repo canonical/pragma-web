@@ -29,7 +29,7 @@ export interface OntologyNamespace {
  * `ds:UIBlock`). Longest-namespace match wins so one namespace being a
  * prefix of another can never mis-split; unmatched URIs pass through.
  */
-export const toPrefixedUri = (
+export const compactUri = (
   uri: string,
   namespaces: readonly OntologyNamespace[],
 ): string => {
@@ -52,7 +52,7 @@ export const toPrefixedUri = (
  * `https://ds.canonical.com/UIBlock`). URIs whose prefix is unknown — or
  * that carry no colon at all — pass through.
  */
-export const toFullUri = (
+export const expandUri = (
   uri: string,
   namespaces: readonly OntologyNamespace[],
 ): string => {

@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
-  definitionsExplorerVariables,
+  buildDefinitionsExplorerVariables,
   readTermParam,
 } from "./definitionsQuery.js";
 
@@ -27,16 +27,16 @@ describe("readTermParam", () => {
   });
 });
 
-describe("definitionsExplorerVariables", () => {
+describe("buildDefinitionsExplorerVariables", () => {
   it("maps a term to { uri: term, hasTerm: true }", () => {
-    expect(definitionsExplorerVariables("ds:UIBlock")).toEqual({
+    expect(buildDefinitionsExplorerVariables("ds:UIBlock")).toEqual({
       uri: "ds:UIBlock",
       hasTerm: true,
     });
   });
 
   it("maps no term to the degenerate { uri: '', hasTerm: false }", () => {
-    expect(definitionsExplorerVariables(undefined)).toEqual({
+    expect(buildDefinitionsExplorerVariables(undefined)).toEqual({
       uri: "",
       hasTerm: false,
     });

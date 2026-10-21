@@ -42,7 +42,7 @@ export const readTermParam = (
  * operation, the prefetch warm-up, and the component's store read use
  * identical values.
  */
-export const definitionsExplorerVariables = (
+export const buildDefinitionsExplorerVariables = (
   term: string | undefined,
 ): DefinitionsExplorerQuery$variables => ({
   uri: term ?? "",

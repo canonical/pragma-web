@@ -12,7 +12,7 @@ import {
   buildClassGraph,
   type ClassGraphOntology,
   COLLISION_GAP,
-  classDepthsByUri,
+  computeClassDepths,
 } from "./buildClassGraph.js";
 
 /** A miniature two-ontology input mirroring the live shape (full IRIs in,
@@ -104,11 +104,11 @@ const makeInput = (): ClassGraphOntology[] => [
   },
 ];
 
-describe("classDepthsByUri", () => {
+describe("computeClassDepths", () => {
   it("measures superclass depth with roots at zero", () => {
     const input = makeInput().at(0);
     if (input === undefined) throw new Error("fixture missing");
-    const depths = classDepthsByUri(input.classes);
+    const depths = computeClassDepths(input.classes);
     expect(depths.get("https://ds.canonical.com/Entity")).toBe(0);
     expect(depths.get("https://ds.canonical.com/UIBlock")).toBe(1);
     expect(depths.get("https://ds.canonical.com/Component")).toBe(2);
@@ -140,11 +140,13 @@ describe("buildClassGraph", () => {
     ) {
       throw new Error("fixture nodes missing");
     }
-    const distance = (
+    const measureDistance = (
       a: { x: number; y: number },
       b: { x: number; y: number },
     ): number => Math.hypot(a.x - b.x, a.y - b.y);
-    expect(distance(uiBlock, entity)).toBeLessThan(distance(component, entity));
+    expect(measureDistance(uiBlock, entity)).toBeLessThan(
+      measureDistance(component, entity),
+    );
   });
 
   it("separates every pair of boxes (the collision guarantee)", () => {

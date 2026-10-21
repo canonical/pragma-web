@@ -5,7 +5,7 @@ import type { TermRail_ontologies$key } from "../../__generated__/TermRail_ontol
 import termRailFragmentNode from "../../__generated__/TermRail_ontologies.graphql.js";
 import { useMessages } from "../i18n/index.js";
 import { matchesChips, matchesText } from "../lensFilter.js";
-import { toPrefixedUri } from "../uris.js";
+import { compactUri } from "../uris.js";
 import type { TermRailProps } from "./types.js";
 import "./styles.css";
 
@@ -23,7 +23,7 @@ import "./styles.css";
  * it). Depth therefore arrives as a prop the explorer derives from the
  * well's fragment; see `depthByUri` in the props and `DefinitionsExplorer`.
  */
-const termRailFragmentSource = (): unknown => graphql`
+const declareTermRailFragment = (): unknown => graphql`
   fragment TermRail_ontologies on Ontology @relay(plural: true) {
     prefix
     label
@@ -41,13 +41,13 @@ const termRailFragmentSource = (): unknown => graphql`
     }
   }
 `;
-void termRailFragmentSource;
+void declareTermRailFragment;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds term-rail";
 
 /** One rail item's display name: the graph label, else the prefixed URI. */
-const termLabel = (
+const formatTermLabel = (
   label: string | null | undefined,
   prefixed: string,
 ): string => label ?? prefixed;
@@ -60,7 +60,7 @@ const termLabel = (
  * `data-depth` hook the stylesheet reads) carries the same information
  * spatially, and the accessible name never includes it.
  */
-const depthGlyph = (depth: number): string => "·".repeat(depth);
+const formatDepthGlyph = (depth: number): string => "·".repeat(depth);
 
 /** Depth capped for the INDENT only — a pathological chain must never push
  * a label off the rail. The glyph still shows the true count. */
@@ -142,7 +142,7 @@ const TermRail = ({
   // the graph. `is-hovered` marks the row the shared centre currently names
   // — which is THIS row when the pointer is here, but also when the pointer
   // is over this term's NODE in the graph.
-  const hoverBindings = (prefixed: string) => ({
+  const bindHover = (prefixed: string) => ({
     className: prefixed === hoverCentre ? "is-hovered" : undefined,
     onBlur: () => {
       onHoverTerm(undefined);
@@ -172,7 +172,7 @@ const TermRail = ({
         // and their ontology's namespace chip (a property has no
         // abstraction of its own, so the abstraction chips leave it be).
         const classes = ontology.classes.map((term) => {
-          const prefixed = toPrefixedUri(term.uri, namespaces);
+          const prefixed = compactUri(term.uri, namespaces);
           return {
             term,
             prefixed,
@@ -183,7 +183,7 @@ const TermRail = ({
           };
         });
         const properties = ontology.properties.map((term) => {
-          const prefixed = toPrefixedUri(term.uri, namespaces);
+          const prefixed = compactUri(term.uri, namespaces);
           return {
             term,
             prefixed,
@@ -216,7 +216,7 @@ const TermRail = ({
                   data-depth={Math.min(depth, MAX_INDENT_DEPTH)}
                   data-dimmed={dimmed || undefined}
                   key={term.uri}
-                  {...hoverBindings(prefixed)}
+                  {...bindHover(prefixed)}
                 >
                   {/* The abstraction marker: the SAME distinction the graph
                       draws (dashed vs solid), restated here so the rail is
@@ -225,10 +225,10 @@ const TermRail = ({
                       it to assistive tech. */}
                   <span aria-hidden="true" className="term-rail-mark" />
                   <span aria-hidden="true" className="term-rail-depth">
-                    {depthGlyph(depth)}
+                    {formatDepthGlyph(depth)}
                   </span>
                   <Link params={{ term: prefixed }} to="definitionsTerm">
-                    {termLabel(term.label, prefixed)}
+                    {formatTermLabel(term.label, prefixed)}
                   </Link>
                   {term.isAbstract ? (
                     <span className="term-rail-note">{t("rail.abstract")}</span>
@@ -253,10 +253,10 @@ const TermRail = ({
                 <li
                   data-dimmed={dimmed || undefined}
                   key={term.uri}
-                  {...hoverBindings(prefixed)}
+                  {...bindHover(prefixed)}
                 >
                   <Link params={{ term: prefixed }} to="definitionsTerm">
-                    {termLabel(term.label, prefixed)}
+                    {formatTermLabel(term.label, prefixed)}
                   </Link>
                   <span className="term-rail-note">
                     {term.kind.toLowerCase()}

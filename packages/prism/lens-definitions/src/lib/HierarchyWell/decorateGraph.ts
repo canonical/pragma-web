@@ -48,7 +48,7 @@ export interface DecoratedGraph {
  * sharing an edge with it. Returns an empty set when nothing is focused,
  * which callers read as "fade nothing".
  */
-export const egoNeighbourhood = (
+export const findEgoNeighbourhood = (
   edges: readonly TermFlowEdge[],
   focus: string | undefined,
 ): ReadonlySet<string> => {
@@ -120,7 +120,7 @@ export const decorateForView = (
   const centre = focused ?? selected;
   const egoCentre =
     centre !== undefined && visible.has(centre) ? centre : undefined;
-  const near = egoNeighbourhood(graph.edges, egoCentre);
+  const near = findEgoNeighbourhood(graph.edges, egoCentre);
   const fading = egoCentre !== undefined;
 
   const nodes = graph.nodes.map((node) => {

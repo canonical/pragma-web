@@ -33,7 +33,7 @@ import { NODE_FADED_CLASS } from "../../lib/HierarchyWell/decorateGraph.js";
  * cross-reference between a rail item and its node (both address the same
  * term). Returns the `.hierarchy-node-shell` wrapper that carries the
  * decoration class. */
-const nodeForHref = (well: HTMLElement, href: string): HTMLElement => {
+const findNodeByHref = (well: HTMLElement, href: string): HTMLElement => {
   const link = well.querySelector<HTMLElement>(
     `a.hierarchy-node[href="${href}"]`,
   );
@@ -72,13 +72,13 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     // stay lit; a node two hops away (a sibling, e.g. Pattern) fades.
     fireEvent.mouseEnter(componentItem);
 
-    const componentNode = nodeForHref(well, "/definitions/ds%3AComponent");
+    const componentNode = findNodeByHref(well, "/definitions/ds%3AComponent");
     // The hovered term itself is the ego centre — never faded.
     expect(componentNode.classList.contains(NODE_FADED_CLASS)).toBe(false);
 
     // A node NOT in Component's 1-hop neighbourhood fades. CodeStandard is
     // in a different ontology entirely — guaranteed distant.
-    const distantNode = nodeForHref(well, "/definitions/cs%3ACodeStandard");
+    const distantNode = findNodeByHref(well, "/definitions/cs%3ACodeStandard");
     expect(distantNode.classList.contains(NODE_FADED_CLASS)).toBe(true);
 
     // Leaving the rail item restores the selection-only fade: the distant
@@ -88,7 +88,7 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     // Component is a neighbour of the selected UIBlock, so with the hover
     // gone it returns to un-faded under the selection's own ego.
     expect(
-      nodeForHref(well, "/definitions/ds%3AComponent").classList.contains(
+      findNodeByHref(well, "/definitions/ds%3AComponent").classList.contains(
         NODE_FADED_CLASS,
       ),
     ).toBe(false);
@@ -118,7 +118,7 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     expect(patternRailItem.classList.contains("is-hovered")).toBe(false);
 
     // Hover the Pattern NODE in the graph (React Flow's node-enter path).
-    const patternNode = nodeForHref(well, "/definitions/ds%3APattern");
+    const patternNode = findNodeByHref(well, "/definitions/ds%3APattern");
     fireEvent.mouseEnter(patternNode);
 
     // THE CROSS-SURFACE CLAIM: the matching RAIL item lit up — a graph
@@ -157,7 +157,7 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
 
     // Focus (not pointer) raises the centre — the fade follows the keyboard.
     fireEvent.focus(componentItem);
-    const distantNode = nodeForHref(well, "/definitions/cs%3ACodeStandard");
+    const distantNode = findNodeByHref(well, "/definitions/cs%3ACodeStandard");
     expect(distantNode.classList.contains(NODE_FADED_CLASS)).toBe(true);
     // The rail item marks itself under focus too.
     expect(componentItem.classList.contains("is-hovered")).toBe(true);

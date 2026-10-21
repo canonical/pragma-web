@@ -29,7 +29,7 @@ export const ABSTRACTION_VALUES = ["abstract", "concrete"] as const;
 export type Abstraction = (typeof ABSTRACTION_VALUES)[number];
 
 /** Which axis value a class sits on — total over `isAbstract`. */
-export const abstractionOf = (isAbstract: boolean): Abstraction =>
+export const classifyAbstraction = (isAbstract: boolean): Abstraction =>
   isAbstract ? "abstract" : "concrete";
 
 /**
@@ -51,7 +51,7 @@ export interface LensFilter {
 /**
  * The no-op default — the ONLY value that may be a component's initial
  * state. `namespaces: undefined` is impossible here, so the well needs a
- * separate "all prefixes" seed; see `allNamespacesFilter`.
+ * separate "all prefixes" seed; see `createAllNamespacesFilter`.
  */
 export const DEFAULT_LENS_FILTER: LensFilter = {
   text: "",
@@ -64,7 +64,7 @@ export const DEFAULT_LENS_FILTER: LensFilter = {
  * ontologies the query returned, so a new ontology needs no code change.
  * Pure and order-preserving, so two calls with the same input are equal.
  */
-export const allNamespacesFilter = (
+export const createAllNamespacesFilter = (
   prefixes: readonly string[],
 ): LensFilter => ({
   ...DEFAULT_LENS_FILTER,
@@ -124,7 +124,7 @@ export const matchesChips = (
   isAbstract: boolean,
   prefix: string,
 ): boolean =>
-  filter.abstractions.includes(abstractionOf(isAbstract)) &&
+  filter.abstractions.includes(classifyAbstraction(isAbstract)) &&
   filter.namespaces.includes(prefix);
 
 /** Toggle one value in an allow-list, preserving the canonical order. */

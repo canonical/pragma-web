@@ -9,8 +9,8 @@
 import { describe, expect, it } from "vitest";
 import {
   ABSTRACTION_VALUES,
-  abstractionOf,
-  allNamespacesFilter,
+  classifyAbstraction,
+  createAllNamespacesFilter,
   DEFAULT_LENS_FILTER,
   matchesChips,
   matchesText,
@@ -41,15 +41,15 @@ describe("the default filter is a no-op (the SSR determinism keystone)", () => {
   });
 });
 
-describe("allNamespacesFilter", () => {
+describe("createAllNamespacesFilter", () => {
   it("lights every prefix it is given, in order", () => {
-    const filter = allNamespacesFilter(["ds", "cs", "anatomy"]);
+    const filter = createAllNamespacesFilter(["ds", "cs", "anatomy"]);
     expect([...filter.namespaces]).toEqual(["ds", "cs", "anatomy"]);
     expect(filter.text).toBe("");
   });
 
   it("passes every class when seeded from the ontologies' own prefixes", () => {
-    const filter = allNamespacesFilter(["ds", "cs", "anatomy"]);
+    const filter = createAllNamespacesFilter(["ds", "cs", "anatomy"]);
     expect(matchesChips(filter, true, "ds")).toBe(true);
     expect(matchesChips(filter, false, "cs")).toBe(true);
     expect(matchesChips(filter, false, "anatomy")).toBe(true);
@@ -80,19 +80,21 @@ describe("matchesChips — text never reaches the graph", () => {
     // A filter whose text matches NOTHING still passes the chip predicate:
     // the search box dims the rail, never the graph.
     const filter = {
-      ...allNamespacesFilter(["ds"]),
+      ...createAllNamespacesFilter(["ds"]),
       text: "no-such-term-anywhere",
     };
     expect(matchesChips(filter, false, "ds")).toBe(true);
   });
 
   it("dims a class whose namespace chip is off", () => {
-    expect(matchesChips(allNamespacesFilter(["ds"]), false, "cs")).toBe(false);
+    expect(matchesChips(createAllNamespacesFilter(["ds"]), false, "cs")).toBe(
+      false,
+    );
   });
 
   it("dims a class whose abstraction chip is off", () => {
     const concreteOnly = {
-      ...allNamespacesFilter(["ds"]),
+      ...createAllNamespacesFilter(["ds"]),
       abstractions: ["concrete"] as const,
     };
     expect(matchesChips(concreteOnly, true, "ds")).toBe(false);
@@ -101,7 +103,7 @@ describe("matchesChips — text never reaches the graph", () => {
 
   it("dims everything on an axis whose allow-list is empty", () => {
     const nothingLit = {
-      ...allNamespacesFilter([]),
+      ...createAllNamespacesFilter([]),
       abstractions: [],
     } as const;
     expect(matchesChips(nothingLit, true, "ds")).toBe(false);
@@ -109,10 +111,10 @@ describe("matchesChips — text never reaches the graph", () => {
   });
 });
 
-describe("abstractionOf", () => {
+describe("classifyAbstraction", () => {
   it("is total over isAbstract", () => {
-    expect(abstractionOf(true)).toBe("abstract");
-    expect(abstractionOf(false)).toBe("concrete");
+    expect(classifyAbstraction(true)).toBe("abstract");
+    expect(classifyAbstraction(false)).toBe("concrete");
   });
 });
 

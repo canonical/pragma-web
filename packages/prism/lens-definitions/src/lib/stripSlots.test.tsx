@@ -25,7 +25,7 @@ import { definitionsRoutes } from "./routes.js";
 import { definitionsStripSlots } from "./stripSlots.js";
 
 /** The strip's tenants under the provider stack a site gives them. */
-const stripAt = (
+const createStrip = (
   url: string,
   records: RecordMap | undefined,
   fetchFn: FetchFunction,
@@ -53,7 +53,7 @@ describe("the strip's tenants over a warm store", () => {
     // a hydration mismatch in the lens layout itself.
     const fetchFn = createFetchSpy();
     const html = renderToString(
-      stripAt("/definitions", definitionsExplorerRecords, fetchFn),
+      createStrip("/definitions", definitionsExplorerRecords, fetchFn),
     );
 
     expect(html).toContain('data-slot="explorer-controls"');
@@ -75,7 +75,7 @@ describe("the strip's tenants over a warm store", () => {
 
   it("counts the classes the graph actually shows, and recounts as chips move", () => {
     render(
-      stripAt("/definitions", definitionsExplorerRecords, createFetchSpy()),
+      createStrip("/definitions", definitionsExplorerRecords, createFetchSpy()),
     );
 
     // Unfiltered: everything is shown, so visible === total.
@@ -92,7 +92,7 @@ describe("the strip's tenants over a warm store", () => {
 
   it("offers exactly the ontologies the graph carries, no invented ones", () => {
     render(
-      stripAt("/definitions", definitionsExplorerRecords, createFetchSpy()),
+      createStrip("/definitions", definitionsExplorerRecords, createFetchSpy()),
     );
     expect(
       within(screen.getByRole("group", { name: "Filter by ontology" }))
@@ -109,7 +109,9 @@ describe("the strip's tenants over a COLD store", () => {
     // entire document down (a site's server entry caught exactly this). Each
     // socket therefore carries its own Suspense + error boundary.
     const fetchFn = createFetchSpy();
-    const html = renderToString(stripAt("/definitions", undefined, fetchFn));
+    const html = renderToString(
+      createStrip("/definitions", undefined, fetchFn),
+    );
 
     // Rendered without throwing, and carrying no content.
     expect(html).not.toContain('data-slot="explorer-controls"');

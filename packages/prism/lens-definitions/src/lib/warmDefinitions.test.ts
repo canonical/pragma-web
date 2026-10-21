@@ -5,7 +5,7 @@ import {
 import { afterEach, describe, expect, it } from "vitest";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import { UIBLOCK_TERM } from "../../testing/fixtures.js";
-import { definitionsExplorerVariables } from "./definitionsQuery.js";
+import { buildDefinitionsExplorerVariables } from "./definitionsQuery.js";
 import warmDefinitions from "./warmDefinitions.js";
 
 afterEach(() => {
@@ -23,7 +23,7 @@ describe("warmDefinitions", () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
     const [request, variables] = fetchFn.mock.lastCall ?? [];
     expect(request?.name).toBe("DefinitionsExplorerQuery");
-    expect(variables).toEqual(definitionsExplorerVariables(UIBLOCK_TERM));
+    expect(variables).toEqual(buildDefinitionsExplorerVariables(UIBLOCK_TERM));
   });
 
   it("prefetches the term-less explorer on /definitions", () => {
@@ -35,6 +35,6 @@ describe("warmDefinitions", () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
     const [request, variables] = fetchFn.mock.lastCall ?? [];
     expect(request?.name).toBe("DefinitionsExplorerQuery");
-    expect(variables).toEqual(definitionsExplorerVariables(undefined));
+    expect(variables).toEqual(buildDefinitionsExplorerVariables(undefined));
   });
 });

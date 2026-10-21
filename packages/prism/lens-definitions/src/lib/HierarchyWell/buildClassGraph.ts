@@ -35,7 +35,7 @@ import {
   settle,
   type WellBox,
 } from "@canonical/prism-core";
-import { type OntologyNamespace, toPrefixedUri } from "../uris.js";
+import { compactUri, type OntologyNamespace } from "../uris.js";
 import type { ClusterExtent, TermFlowEdge, TermFlowNode } from "./types.js";
 
 /** One ontology as the `HierarchyWell_ontologies` fragment delivers it
@@ -100,7 +100,7 @@ const estimateWidth = (label: string): number =>
  * superclass, or one not in this ontology's list). Cycles — schema-illegal
  * but defended — terminate at the walk's length bound.
  */
-export const superclassDepth = (
+export const measureSuperclassDepth = (
   uri: string,
   superclassByUri: ReadonlyMap<string, string | undefined>,
 ): number => {
@@ -126,7 +126,7 @@ export interface DepthClass {
  * — shared with the rail so the index indents by the identical measure
  * the well ringifies by (M-STRUCT: one source of truth for depth).
  */
-export const classDepthsByUri = (
+export const computeClassDepths = (
   classes: readonly DepthClass[],
 ): ReadonlyMap<string, number> => {
   const superclassByUri = new Map<string, string | undefined>(
@@ -135,7 +135,7 @@ export const classDepthsByUri = (
   return new Map(
     classes.map((klass) => [
       klass.uri,
-      superclassDepth(klass.uri, superclassByUri),
+      measureSuperclassDepth(klass.uri, superclassByUri),
     ]),
   );
 };
@@ -151,7 +151,7 @@ interface WorkingNode extends WellBox {
  * share the disc as siblings of a virtual centre (and sit at radius 1 so
  * none of them squats the middle pretending to be THE root).
  */
-const layoutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
+const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
   const namespaces = [ontology];
   const childrenOf = new Map<string, string[]>();
   const roots: string[] = [];
@@ -169,17 +169,17 @@ const layoutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
     }
   }
 
-  const leafCount = (uri: string): number => {
+  const countLeaves = (uri: string): number => {
     const children = childrenOf.get(uri) ?? [];
     if (children.length === 0) return 1;
     let total = 0;
-    for (const child of children) total += leafCount(child);
+    for (const child of children) total += countLeaves(child);
     return total;
   };
 
   const nodes: WorkingNode[] = [];
   const singleRoot = roots.length === 1;
-  const depthByUri = classDepthsByUri(ontology.classes);
+  const depthByUri = computeClassDepths(ontology.classes);
 
   const place = (uri: string, from: number, to: number): void => {
     const klass = classByUri.get(uri);
@@ -191,11 +191,11 @@ const layoutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
     const angle = (from + to) / 2 - Math.PI / 2;
     const radiusX = singleRoot && depth === 0 ? 0 : ring * RING_X;
     const radiusY = singleRoot && depth === 0 ? 0 : ring * RING_Y;
-    const label = klass.label ?? toPrefixedUri(klass.uri, namespaces);
+    const label = klass.label ?? compactUri(klass.uri, namespaces);
     nodes.push({
-      id: toPrefixedUri(klass.uri, namespaces),
+      id: compactUri(klass.uri, namespaces),
       data: {
-        term: toPrefixedUri(klass.uri, namespaces),
+        term: compactUri(klass.uri, namespaces),
         label,
         isAbstract: klass.isAbstract,
         prefix: ontology.prefix,
@@ -206,19 +206,19 @@ const layoutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
       height: NODE_HEIGHT,
     });
     const children = childrenOf.get(uri) ?? [];
-    const total = children.reduce((sum, child) => sum + leafCount(child), 0);
+    const total = children.reduce((sum, child) => sum + countLeaves(child), 0);
     let cursor = from;
     for (const child of children) {
-      const share = ((to - from) * leafCount(child)) / Math.max(total, 1);
+      const share = ((to - from) * countLeaves(child)) / Math.max(total, 1);
       place(child, cursor, cursor + share);
       cursor += share;
     }
   };
 
-  const totalLeaves = roots.reduce((sum, root) => sum + leafCount(root), 0);
+  const totalLeaves = roots.reduce((sum, root) => sum + countLeaves(root), 0);
   let cursor = 0;
   for (const root of roots) {
-    const share = (2 * Math.PI * leafCount(root)) / Math.max(totalLeaves, 1);
+    const share = (2 * Math.PI * countLeaves(root)) / Math.max(totalLeaves, 1);
     place(root, cursor, cursor + share);
     cursor += share;
   }
@@ -249,7 +249,7 @@ export const buildClassGraph = (
   const clusters: Cluster[] = ontologies
     .filter((ontology) => ontology.classes.length > 0)
     .map((ontology) => {
-      const nodes = layoutCluster(ontology);
+      const nodes = layOutCluster(ontology);
       let minX = Number.POSITIVE_INFINITY;
       let minY = Number.POSITIVE_INFINITY;
       let maxX = Number.NEGATIVE_INFINITY;
@@ -323,8 +323,8 @@ export const buildClassGraph = (
     for (const klass of ontology.classes) {
       const parentUri = klass.superclass?.uri;
       if (parentUri === undefined) continue;
-      const child = nodeById.get(toPrefixedUri(klass.uri, namespaces));
-      const parent = nodeById.get(toPrefixedUri(parentUri, namespaces));
+      const child = nodeById.get(compactUri(klass.uri, namespaces));
+      const parent = nodeById.get(compactUri(parentUri, namespaces));
       if (child === undefined || parent === undefined) continue;
       const start = findEdgeEndpoint(child, parent, 2);
       const end = findEdgeEndpoint(parent, child, 6);
@@ -345,11 +345,11 @@ export const buildClassGraph = (
       if (property.kind !== "OBJECT") continue;
       const domainUri = property.domain?.uri;
       if (domainUri === undefined) continue;
-      const source = nodeById.get(toPrefixedUri(domainUri, allNamespaces));
-      const target = nodeById.get(toPrefixedUri(property.range, allNamespaces));
+      const source = nodeById.get(compactUri(domainUri, allNamespaces));
+      const target = nodeById.get(compactUri(property.range, allNamespaces));
       if (source === undefined || target === undefined) continue;
       const predicate =
-        property.label ?? toPrefixedUri(property.uri, allNamespaces);
+        property.label ?? compactUri(property.uri, allNamespaces);
       const pairKey = `${source.id}=>${target.id}`;
       const rank = parallelCount.get(pairKey) ?? 0;
       parallelCount.set(pairKey, rank + 1);
@@ -362,7 +362,7 @@ export const buildClassGraph = (
               EDGE_BOW * (1 + rank * 0.7),
             );
       edges.push({
-        id: `rel:${toPrefixedUri(property.uri, allNamespaces)}`,
+        id: `rel:${compactUri(property.uri, allNamespaces)}`,
         source: source.id,
         target: target.id,
         family: "semantic",

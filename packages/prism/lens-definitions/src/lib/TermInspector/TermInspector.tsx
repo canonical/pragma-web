@@ -13,7 +13,7 @@ import type {
 } from "../../__generated__/TermInspector_property.graphql.js";
 import termInspectorPropertyFragmentNode from "../../__generated__/TermInspector_property.graphql.js";
 import { useMessages } from "../i18n/index.js";
-import { type OntologyNamespace, toPrefixedUri } from "../uris.js";
+import { compactUri, type OntologyNamespace } from "../uris.js";
 import type { TermInspectorProps } from "./types.js";
 import "./styles.css";
 
@@ -25,7 +25,7 @@ import "./styles.css";
  * and picks whichever key it was handed. Ontology types carry NO Node ids
  * (plain fragments, no @refetchable). Never invoked.
  */
-const termInspectorClassFragmentSource = (): unknown => graphql`
+const declareTermInspectorClassFragment = (): unknown => graphql`
   fragment TermInspector_class on OntologyClass {
     uri
     label
@@ -73,7 +73,7 @@ const termInspectorClassFragmentSource = (): unknown => graphql`
     }
   }
 `;
-void termInspectorClassFragmentSource;
+void declareTermInspectorClassFragment;
 /* v8 ignore stop */
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -87,7 +87,7 @@ void termInspectorClassFragmentSource;
  * exist against an arbitrary provider, and the honest answer is to drop
  * it rather than fork the operation behind a capability probe.
  */
-const termInspectorPropertyFragmentSource = (): unknown => graphql`
+const declareTermInspectorPropertyFragment = (): unknown => graphql`
   fragment TermInspector_property on OntologyProperty {
     uri
     label
@@ -106,7 +106,7 @@ const termInspectorPropertyFragmentSource = (): unknown => graphql`
     }
   }
 `;
-void termInspectorPropertyFragmentSource;
+void declareTermInspectorPropertyFragment;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds term-inspector";
@@ -121,7 +121,7 @@ const TermLink = ({
   readonly label: string | null | undefined;
   readonly namespaces: readonly OntologyNamespace[];
 }): React.ReactElement => {
-  const prefixed = toPrefixedUri(uri, namespaces);
+  const prefixed = compactUri(uri, namespaces);
   return (
     <Link params={{ term: prefixed }} to="definitionsTerm">
       {label ?? prefixed}
@@ -131,10 +131,10 @@ const TermLink = ({
 
 /** `https://…/Subcomponent` → `ds:Subcomponent`; datatype ranges (e.g.
  * `xsd:string` shapes) pass through the codec unchanged. */
-const rangeDisplay = (
+const formatRange = (
   range: string,
   namespaces: readonly OntologyNamespace[],
-): string => toPrefixedUri(range, namespaces);
+): string => compactUri(range, namespaces);
 
 /**
  * The subset-of glyph the lineage breadcrumb reads with — U+2282, "a is a
@@ -211,7 +211,7 @@ const PropertyRow = ({
           />
         </th>
         <td>
-          <code>{rangeDisplay(classProperty.property.range, namespaces)}</code>
+          <code>{formatRange(classProperty.property.range, namespaces)}</code>
         </td>
         <td>{classProperty.property.kind.toLowerCase()}</td>
         <td>{notes}</td>
@@ -409,7 +409,7 @@ const PropertyView = ({
         <dd>{t(data.functional ? "inspector.yes" : "inspector.no")}</dd>
         <dt>{t("inspector.property.range")}</dt>
         <dd>
-          <code>{rangeDisplay(data.range, namespaces)}</code>
+          <code>{formatRange(data.range, namespaces)}</code>
         </dd>
         <dt>{t("inspector.property.domain")}</dt>
         <dd>

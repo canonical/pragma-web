@@ -5,8 +5,8 @@ import type { DefinitionsExplorerQuery } from "../../__generated__/DefinitionsEx
 import definitionsExplorerQueryNode from "../../__generated__/DefinitionsExplorerQuery.graphql.js";
 import type { HierarchyWell_ontologies$key } from "../../__generated__/HierarchyWell_ontologies.graphql.js";
 import hierarchyWellFragmentNode from "../../__generated__/HierarchyWell_ontologies.graphql.js";
-import { definitionsExplorerVariables } from "../definitionsQuery.js";
-import { classDepthsByUri } from "../HierarchyWell/buildClassGraph.js";
+import { buildDefinitionsExplorerVariables } from "../definitionsQuery.js";
+import { computeClassDepths } from "../HierarchyWell/buildClassGraph.js";
 import { HierarchyWell } from "../HierarchyWell/index.js";
 import { useMessages } from "../i18n/index.js";
 import { normalizeFilterText, resolveFilter } from "../lensFilter.js";
@@ -30,7 +30,7 @@ import "./styles.css";
  * evaluated tag throws at module scope wherever no Relay transform has
  * run.
  */
-const definitionsExplorerQuerySource = (): unknown => graphql`
+const declareDefinitionsExplorerQuery = (): unknown => graphql`
   query DefinitionsExplorerQuery($uri: String!, $hasTerm: Boolean!) {
     ontologies {
       prefix
@@ -55,7 +55,7 @@ const definitionsExplorerQuerySource = (): unknown => graphql`
     }
   }
 `;
-void definitionsExplorerQuerySource;
+void declareDefinitionsExplorerQuery;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds definitions-explorer";
@@ -100,7 +100,7 @@ const componentCssClassName = "ds definitions-explorer";
  * operation's query text (the relay-byte-identity contract — verified).
  * So the explorer reads the WELL's fragment (already in this operation,
  * masked from the rail) and derives the depth map with the very function
- * the well lays out by (`classDepthsByUri`), then hands it down. One
+ * the well lays out by (`computeClassDepths`), then hands it down. One
  * algorithm, two readers, zero query change.
  */
 const DefinitionsExplorer = ({
@@ -110,7 +110,7 @@ const DefinitionsExplorer = ({
   const t = useMessages();
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
     definitionsExplorerQueryNode,
-    definitionsExplorerVariables(term),
+    buildDefinitionsExplorerVariables(term),
   );
   const namespaces = data.ontologies.map(({ prefix, namespace }) => ({
     prefix,
@@ -169,7 +169,7 @@ const DefinitionsExplorer = ({
   const depthByUri = useMemo(() => {
     const merged = new Map<string, number>();
     for (const ontology of wellData) {
-      for (const [uri, depth] of classDepthsByUri(ontology.classes)) {
+      for (const [uri, depth] of computeClassDepths(ontology.classes)) {
         merged.set(uri, depth);
       }
     }

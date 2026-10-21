@@ -6,8 +6,8 @@
  *
  * - PREFIXED FORM ONLY. `ontologyClass(uri:)` accepts the prefixed form and
  *   echoes back the absolute IRI, so none of these may be compared against a
- *   `uri` the graph returned. Compare returned IRIs with each other, or pass
- *   the returned one through `toPrefixedUri` first.
+ *   `uri` the graph returned. Compare returned IRIs with each other, or compact
+ *   the returned one to its prefixed form first.
  * - A MODULE CONSTANT, NOT AN ENVIRONMENT VARIABLE. The SSR prepare step and
  *   the client hydration must compute byte-identical variables, or the warmed
  *   store does not fulfil the client's operation. A `VITE_*` variable resolves

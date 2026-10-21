@@ -21,7 +21,7 @@ import "./styles.css";
  * drawn classes, the relations that make the well read as an ontology
  * rather than an organigram.
  */
-const hierarchyWellFragmentSource = (): unknown => graphql`
+const declareHierarchyWellFragment = (): unknown => graphql`
   fragment HierarchyWell_ontologies on Ontology @relay(plural: true) {
     prefix
     namespace
@@ -44,7 +44,7 @@ const hierarchyWellFragmentSource = (): unknown => graphql`
     }
   }
 `;
-void hierarchyWellFragmentSource;
+void declareHierarchyWellFragment;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds hierarchy-well";
@@ -190,7 +190,7 @@ const HierarchyWell = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas === null) return;
-    const onWheel = (event: WheelEvent): void => {
+    const handleWheel = (event: WheelEvent): void => {
       event.preventDefault();
       const bounds = canvas.getBoundingClientRect();
       const pointerX = event.clientX - bounds.left;
@@ -208,8 +208,8 @@ const HierarchyWell = ({
         };
       });
     };
-    canvas.addEventListener("wheel", onWheel, { passive: false });
-    return () => canvas.removeEventListener("wheel", onWheel);
+    canvas.addEventListener("wheel", handleWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", handleWheel);
   }, []);
 
   const readTermFromEvent = useCallback(

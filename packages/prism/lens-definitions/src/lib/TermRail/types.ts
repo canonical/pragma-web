@@ -14,7 +14,7 @@ export interface TermRailProps {
   readonly ontologies: TermRail_ontologies$key;
   /**
    * Superclass depth per class, keyed by FULL IRI — the same measure the
-   * well stacks its layers by (`classDepthsByUri`), computed once by
+   * well stacks its layers by (`computeClassDepths`), computed once by
    * `DefinitionsExplorer` and passed down. The rail's own fragment cannot
    * carry `superclass` without changing the shared operation's query text
    * (the relay-byte-identity contract), so depth arrives as data rather

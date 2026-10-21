@@ -9,7 +9,7 @@
 
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { allNamespacesFilter, type LensFilter } from "../lensFilter.js";
+import { createAllNamespacesFilter, type LensFilter } from "../lensFilter.js";
 import ExplorerControls from "./ExplorerControls.js";
 import ExplorerStatus from "./ExplorerStatus.js";
 
@@ -34,7 +34,7 @@ const renderControls = (
 
 describe("ExplorerControls", () => {
   it("offers one chip per real axis value — abstraction and ontology", () => {
-    renderControls(allNamespacesFilter(["ds", "cs"]));
+    renderControls(createAllNamespacesFilter(["ds", "cs"]));
     // The axes are named for what they ARE. No "experimental"/"stable"
     // chip exists, because OntologyClass carries no such field.
     expect(
@@ -51,7 +51,7 @@ describe("ExplorerControls", () => {
 
   it("reports lit state through aria-pressed, not colour alone", () => {
     renderControls({
-      ...allNamespacesFilter(["ds"]),
+      ...createAllNamespacesFilter(["ds"]),
       abstractions: ["concrete"],
     });
     expect(screen.getByRole("button", { name: "Abstract" })).toHaveAttribute(
@@ -73,7 +73,7 @@ describe("ExplorerControls", () => {
   });
 
   it("toggles a lit chip OFF, leaving the other axis untouched", () => {
-    const filter = allNamespacesFilter(["ds", "cs"]);
+    const filter = createAllNamespacesFilter(["ds", "cs"]);
     const { onFilterChange } = renderControls(filter);
 
     fireEvent.click(screen.getByRole("button", { name: "cs" }));
@@ -88,7 +88,7 @@ describe("ExplorerControls", () => {
 
   it("toggles an unlit chip back ON in canonical order", () => {
     const { onFilterChange } = renderControls({
-      ...allNamespacesFilter(["ds", "cs"]),
+      ...createAllNamespacesFilter(["ds", "cs"]),
       namespaces: ["cs"],
     });
 

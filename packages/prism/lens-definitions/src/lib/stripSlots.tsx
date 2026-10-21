@@ -6,11 +6,15 @@ import { useLazyLoadQuery } from "react-relay";
 import type { DefinitionsExplorerQuery } from "../__generated__/DefinitionsExplorerQuery.graphql.js";
 import definitionsExplorerQueryNode from "../__generated__/DefinitionsExplorerQuery.graphql.js";
 import {
-  definitionsExplorerVariables,
+  buildDefinitionsExplorerVariables,
   readTermParam,
 } from "./definitionsQuery.js";
 import { ExplorerControls, ExplorerStatus } from "./ExplorerControls/index.js";
-import { abstractionOf, matchesChips, resolveFilter } from "./lensFilter.js";
+import {
+  classifyAbstraction,
+  matchesChips,
+  resolveFilter,
+} from "./lensFilter.js";
 import { useLensFilter } from "./lensFilterContext.js";
 
 /**
@@ -61,7 +65,9 @@ const useCurrentTerm = (): string | undefined => {
  * Wrap a socket so it can never take the layout down: it renders its
  * content when the store is warm, and nothing at all otherwise.
  */
-const guarded = (Content: React.ComponentType): (() => React.ReactElement) => {
+const guardSocket = (
+  Content: React.ComponentType,
+): (() => React.ReactElement) => {
   const Guarded = (): React.ReactElement => (
     <ErrorBoundary fallback={null}>
       <Suspense fallback={null}>
@@ -81,7 +87,7 @@ const ControlsContent = (): React.ReactElement => {
   const term = useCurrentTerm();
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
     definitionsExplorerQueryNode,
-    definitionsExplorerVariables(term),
+    buildDefinitionsExplorerVariables(term),
   );
   const { filter, setFilter } = useLensFilter();
   const prefixes = data.ontologies.map((ontology) => ontology.prefix);
@@ -105,7 +111,7 @@ const StatusContent = (): React.ReactElement => {
   const term = useCurrentTerm();
   const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
     definitionsExplorerQueryNode,
-    definitionsExplorerVariables(term),
+    buildDefinitionsExplorerVariables(term),
   );
   const { filter } = useLensFilter();
   const prefixes = data.ontologies.map((ontology) => ontology.prefix);
@@ -121,7 +127,7 @@ const StatusContent = (): React.ReactElement => {
     matchesChips(effective, entry.isAbstract, entry.prefix),
   );
   const abstractCount = visible.filter(
-    (entry) => abstractionOf(entry.isAbstract) === "abstract",
+    (entry) => classifyAbstraction(entry.isAbstract) === "abstract",
   ).length;
 
   return (
@@ -146,6 +152,6 @@ const Context = makeLensContext({
 
 export const definitionsStripSlots = {
   Context,
-  Controls: guarded(ControlsContent),
-  Status: guarded(StatusContent),
+  Controls: guardSocket(ControlsContent),
+  Status: guardSocket(StatusContent),
 } as const;

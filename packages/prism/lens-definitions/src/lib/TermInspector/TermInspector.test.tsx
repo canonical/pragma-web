@@ -38,7 +38,7 @@ const unknownTermRecords = {
   },
 } as unknown as RecordMap;
 
-const inspector = (): HTMLElement =>
+const findInspector = (): HTMLElement =>
   screen.getByRole("complementary", { name: "Term inspector" });
 
 /**
@@ -71,7 +71,7 @@ describe("TermInspector", () => {
     render(
       createDefinitionsPage(UIBLOCK_TERM, definitionsExplorerRecords, fetchFn),
     );
-    const panel = inspector();
+    const panel = findInspector();
 
     expect(panel.getAttribute("aria-live")).toBe("polite");
     expect(
@@ -145,7 +145,7 @@ describe("TermInspector", () => {
         fetchFn,
       ),
     );
-    const panel = inspector();
+    const panel = findInspector();
 
     expect(
       within(panel).getByRole("heading", { level: 2, name: "hasSubcomponent" }),
@@ -185,7 +185,7 @@ describe("TermInspector", () => {
         fetchFn,
       ),
     );
-    const panel = inspector();
+    const panel = findInspector();
 
     expect(within(panel).queryByRole("link", { name: "Accordion" })).toBeNull();
     expect(within(panel).getByText("Accordion")).toBeInTheDocument();
@@ -212,7 +212,7 @@ describe("TermInspector", () => {
         fetchFn,
       ),
     );
-    const panel = inspector();
+    const panel = findInspector();
 
     expect(
       within(panel)

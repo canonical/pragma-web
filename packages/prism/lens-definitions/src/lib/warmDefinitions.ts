@@ -1,7 +1,7 @@
 import { prefetchQuery } from "@canonical/prism-core";
 import {
+  buildDefinitionsExplorerVariables,
   definitionsExplorerQueryNode,
-  definitionsExplorerVariables,
   readTermParam,
 } from "./definitionsQuery.js";
 
@@ -25,6 +25,6 @@ export default function warmDefinitions(
 ): Promise<void> {
   return prefetchQuery(
     definitionsExplorerQueryNode,
-    definitionsExplorerVariables(readTermParam(params)),
+    buildDefinitionsExplorerVariables(readTermParam(params)),
   );
 }

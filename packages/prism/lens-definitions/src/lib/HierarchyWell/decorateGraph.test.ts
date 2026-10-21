@@ -10,13 +10,13 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { allNamespacesFilter, type LensFilter } from "../lensFilter.js";
+import { createAllNamespacesFilter, type LensFilter } from "../lensFilter.js";
 import { buildClassGraph, type ClassGraphOntology } from "./buildClassGraph.js";
 import {
   decorateForSelection,
   decorateForView,
   EDGE_FADED_CLASS,
-  egoNeighbourhood,
+  findEgoNeighbourhood,
   HIDDEN_CLASS,
   NODE_FADED_CLASS,
   NODE_SELECTED_CLASS,
@@ -71,11 +71,11 @@ const makeInput = (): ClassGraphOntology[] => [
   },
 ];
 
-const graph = () => buildClassGraph(makeInput());
+const buildGraph = () => buildClassGraph(makeInput());
 const ALL_PREFIXES = ["ds", "cs"];
-const noOpFilter: LensFilter = allNamespacesFilter(ALL_PREFIXES);
+const noOpFilter: LensFilter = createAllNamespacesFilter(ALL_PREFIXES);
 
-const classOf = (
+const readNodeClassName = (
   result: { readonly nodes: readonly { id: string; className?: string }[] },
   id: string,
 ): string | undefined => result.nodes.find((node) => node.id === id)?.className;
@@ -86,8 +86,8 @@ describe("THE SSR DETERMINISM RULE", () => {
     // may only know the URL; the client's FIRST render additionally holds
     // hover (empty) and the filter (the no-op seed). If those are truly
     // no-ops, the two serialise identically.
-    const server = decorateForSelection(graph(), "ds:UIBlock");
-    const clientFirstPaint = decorateForView(graph(), {
+    const server = decorateForSelection(buildGraph(), "ds:UIBlock");
+    const clientFirstPaint = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       focused: undefined,
       filter: noOpFilter,
@@ -96,8 +96,8 @@ describe("THE SSR DETERMINISM RULE", () => {
   });
 
   it("holds with NO selection too (the /definitions address)", () => {
-    const server = decorateForSelection(graph(), undefined);
-    const clientFirstPaint = decorateForView(graph(), {
+    const server = decorateForSelection(buildGraph(), undefined);
+    const clientFirstPaint = decorateForView(buildGraph(), {
       selected: undefined,
       focused: undefined,
       filter: noOpFilter,
@@ -109,8 +109,8 @@ describe("THE SSR DETERMINISM RULE", () => {
     // Guards the test above from passing vacuously. If hover state leaked
     // into the first render, hydration would break — and this proves the
     // comparison above is capable of noticing.
-    const server = decorateForSelection(graph(), "ds:UIBlock");
-    const leaked = decorateForView(graph(), {
+    const server = decorateForSelection(buildGraph(), "ds:UIBlock");
+    const leaked = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       focused: "ds:Component",
       filter: noOpFilter,
@@ -119,11 +119,11 @@ describe("THE SSR DETERMINISM RULE", () => {
   });
 
   it("is pure: the same inputs give byte-equal output across calls", () => {
-    const once = decorateForView(graph(), {
+    const once = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       filter: noOpFilter,
     });
-    const twice = decorateForView(graph(), {
+    const twice = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       filter: noOpFilter,
     });
@@ -133,18 +133,22 @@ describe("THE SSR DETERMINISM RULE", () => {
 
 describe("selection (server-rendered, URL-derived)", () => {
   it("marks the selected node and fades its non-neighbours", () => {
-    const result = decorateForSelection(graph(), "ds:UIBlock");
-    expect(classOf(result, "ds:UIBlock")).toContain(NODE_SELECTED_CLASS);
+    const result = decorateForSelection(buildGraph(), "ds:UIBlock");
+    expect(readNodeClassName(result, "ds:UIBlock")).toContain(
+      NODE_SELECTED_CLASS,
+    );
     // One hop from UIBlock: Entity (up), Component and Pattern (down).
-    expect(classOf(result, "ds:Entity")).toBeUndefined();
-    expect(classOf(result, "ds:Component")).toBeUndefined();
-    expect(classOf(result, "ds:Pattern")).toBeUndefined();
+    expect(readNodeClassName(result, "ds:Entity")).toBeUndefined();
+    expect(readNodeClassName(result, "ds:Component")).toBeUndefined();
+    expect(readNodeClassName(result, "ds:Pattern")).toBeUndefined();
     // A different ontology's root is not a neighbour — it fades.
-    expect(classOf(result, "cs:CodeStandard")).toContain(NODE_FADED_CLASS);
+    expect(readNodeClassName(result, "cs:CodeStandard")).toContain(
+      NODE_FADED_CLASS,
+    );
   });
 
   it("fades nothing when no term is selected", () => {
-    const result = decorateForSelection(graph(), undefined);
+    const result = decorateForSelection(buildGraph(), undefined);
     for (const node of result.nodes) {
       expect(node.className).toBeUndefined();
     }
@@ -156,16 +160,16 @@ describe("the ego-fade is ONE hop, never transitive", () => {
     // Component → UIBlock → Entity. Selecting Component must NOT spare
     // Entity: the exhibit's fade is a neighbourhood, not a reachability
     // set, and this is the assertion that keeps it that way.
-    const result = decorateForSelection(graph(), "ds:Component");
-    expect(classOf(result, "ds:UIBlock")).toBeUndefined();
-    expect(classOf(result, "ds:Entity")).toContain(NODE_FADED_CLASS);
+    const result = decorateForSelection(buildGraph(), "ds:Component");
+    expect(readNodeClassName(result, "ds:UIBlock")).toBeUndefined();
+    expect(readNodeClassName(result, "ds:Entity")).toContain(NODE_FADED_CLASS);
     // A sibling is two hops away too (via the shared parent).
-    expect(classOf(result, "ds:Pattern")).toContain(NODE_FADED_CLASS);
+    expect(readNodeClassName(result, "ds:Pattern")).toContain(NODE_FADED_CLASS);
   });
 
-  it("egoNeighbourhood returns the centre plus its direct partners only", () => {
-    const { edges } = graph();
-    expect([...egoNeighbourhood(edges, "ds:UIBlock")].sort()).toEqual([
+  it("findEgoNeighbourhood returns the centre plus its direct partners only", () => {
+    const { edges } = buildGraph();
+    expect([...findEgoNeighbourhood(edges, "ds:UIBlock")].sort()).toEqual([
       "ds:Component",
       "ds:Entity",
       "ds:Pattern",
@@ -174,11 +178,11 @@ describe("the ego-fade is ONE hop, never transitive", () => {
   });
 
   it("is empty without a centre", () => {
-    expect(egoNeighbourhood(graph().edges, undefined).size).toBe(0);
+    expect(findEgoNeighbourhood(buildGraph().edges, undefined).size).toBe(0);
   });
 
   it("fades every edge not incident to the centre — and spares those that are", () => {
-    const result = decorateForSelection(graph(), "ds:Component");
+    const result = decorateForSelection(buildGraph(), "ds:Component");
     const incident = result.edges.find(
       (edge) => edge.source === "ds:Component",
     );
@@ -190,62 +194,66 @@ describe("the ego-fade is ONE hop, never transitive", () => {
 
 describe("hover/focus overrides selection transiently", () => {
   it("re-centres the fade on the focused node while keeping the selection styled", () => {
-    const result = decorateForView(graph(), {
+    const result = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       focused: "cs:CodeStandard",
       filter: noOpFilter,
     });
     // The selection KEEPS its marker — leaving the pointer must not lose
     // where you are…
-    expect(classOf(result, "ds:UIBlock")).toContain(NODE_SELECTED_CLASS);
+    expect(readNodeClassName(result, "ds:UIBlock")).toContain(
+      NODE_SELECTED_CLASS,
+    );
     // …but the fade now centres on what is hovered, so UIBlock (not a
     // neighbour of CodeStandard) is dimmed even though it is selected.
-    expect(classOf(result, "ds:UIBlock")).toContain(NODE_FADED_CLASS);
-    expect(classOf(result, "cs:CodeStandard")).toBeUndefined();
+    expect(readNodeClassName(result, "ds:UIBlock")).toContain(NODE_FADED_CLASS);
+    expect(readNodeClassName(result, "cs:CodeStandard")).toBeUndefined();
   });
 
   it("clearing the focus restores the selection's own fade", () => {
-    const hovered = decorateForView(graph(), {
+    const hovered = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       focused: "cs:CodeStandard",
       filter: noOpFilter,
     });
-    const cleared = decorateForView(graph(), {
+    const cleared = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       focused: undefined,
       filter: noOpFilter,
     });
     expect(JSON.stringify(cleared)).not.toBe(JSON.stringify(hovered));
     expect(JSON.stringify(cleared)).toBe(
-      JSON.stringify(decorateForSelection(graph(), "ds:UIBlock")),
+      JSON.stringify(decorateForSelection(buildGraph(), "ds:UIBlock")),
     );
   });
 });
 
 describe("filtering HIDES in the graph (the asymmetry's other half)", () => {
-  const dsOnly: LensFilter = allNamespacesFilter(["ds"]);
+  const dsOnly: LensFilter = createAllNamespacesFilter(["ds"]);
 
   it("hides a class whose namespace chip is off", () => {
-    const result = decorateForView(graph(), {
+    const result = decorateForView(buildGraph(), {
       selected: undefined,
       filter: dsOnly,
     });
-    expect(classOf(result, "cs:CodeStandard")).toContain(HIDDEN_CLASS);
-    expect(classOf(result, "ds:Component")).toBeUndefined();
+    expect(readNodeClassName(result, "cs:CodeStandard")).toContain(
+      HIDDEN_CLASS,
+    );
+    expect(readNodeClassName(result, "ds:Component")).toBeUndefined();
   });
 
   it("hides a class whose abstraction chip is off", () => {
-    const result = decorateForView(graph(), {
+    const result = decorateForView(buildGraph(), {
       selected: undefined,
       filter: { ...noOpFilter, abstractions: ["concrete"] },
     });
-    expect(classOf(result, "ds:UIBlock")).toContain(HIDDEN_CLASS);
-    expect(classOf(result, "ds:Entity")).toContain(HIDDEN_CLASS);
-    expect(classOf(result, "ds:Component")).toBeUndefined();
+    expect(readNodeClassName(result, "ds:UIBlock")).toContain(HIDDEN_CLASS);
+    expect(readNodeClassName(result, "ds:Entity")).toContain(HIDDEN_CLASS);
+    expect(readNodeClassName(result, "ds:Component")).toBeUndefined();
   });
 
   it("drops an edge that loses EITHER endpoint (the exhibit's rule)", () => {
-    const result = decorateForView(graph(), {
+    const result = decorateForView(buildGraph(), {
       selected: undefined,
       filter: { ...noOpFilter, abstractions: ["concrete"] },
     });
@@ -260,11 +268,11 @@ describe("filtering HIDES in the graph (the asymmetry's other half)", () => {
   it("NEVER moves a node — filtering changes class names, not geometry", () => {
     // The one habit we deliberately do not copy from the exhibit, which
     // re-runs its force simulation on every lens change.
-    const before = decorateForView(graph(), {
+    const before = decorateForView(buildGraph(), {
       selected: undefined,
       filter: noOpFilter,
     });
-    const after = decorateForView(graph(), {
+    const after = decorateForView(buildGraph(), {
       selected: undefined,
       filter: { ...noOpFilter, abstractions: ["concrete"] },
     });
@@ -279,11 +287,11 @@ describe("filtering HIDES in the graph (the asymmetry's other half)", () => {
   it("a hidden node's neighbourhood does not privilege anything", () => {
     // Selecting a term, then filtering it out: the fade would otherwise
     // spotlight the neighbours of something invisible.
-    const result = decorateForView(graph(), {
+    const result = decorateForView(buildGraph(), {
       selected: "ds:UIBlock",
       filter: { ...noOpFilter, abstractions: ["concrete"] },
     });
-    expect(classOf(result, "ds:Component")).toBeUndefined();
-    expect(classOf(result, "cs:CodeStandard")).toBeUndefined();
+    expect(readNodeClassName(result, "ds:Component")).toBeUndefined();
+    expect(readNodeClassName(result, "cs:CodeStandard")).toBeUndefined();
   });
 });
