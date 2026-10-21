@@ -29,9 +29,9 @@ const ModeStrip = ({
 }: ModeStripProps): React.ReactElement => {
   return (
     <header
+      {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-region="mode-strip"
-      {...props}
     >
       <div className="strip-context" data-slot="context">
         {context}

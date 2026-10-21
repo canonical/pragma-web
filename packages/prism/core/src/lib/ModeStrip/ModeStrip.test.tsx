@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { createRef } from "react";
 import { describe, expect, it } from "vitest";
 import ModeStrip from "./ModeStrip.js";
 
@@ -43,5 +44,16 @@ describe("ModeStrip", () => {
     const strip = screen.getByTestId("strip");
     expect(strip.className).toContain("ds mode-strip");
     expect(strip.className).toContain("custom-class");
+  });
+
+  it("keeps its region identity over a forwarded data-region", () => {
+    render(<ModeStrip data-region="elsewhere" data-testid="strip" />);
+    expect(screen.getByTestId("strip").dataset.region).toBe("mode-strip");
+  });
+
+  it("forwards a ref to its header root", () => {
+    const ref = createRef<HTMLElement>();
+    render(<ModeStrip ref={ref} />);
+    expect(ref.current?.tagName).toBe("HEADER");
   });
 });

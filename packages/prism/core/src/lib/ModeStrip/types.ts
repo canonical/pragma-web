@@ -1,16 +1,23 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
-/** Props accepted by `ModeStrip`: its three sockets, and the native props of
- * its `<header>` root. */
-export interface ModeStripProps
-  extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+type OwnProps = {
   /** The lens's context region, west slot: typically the breadcrumb trail
    * to the current page (`LensBreadcrumbs`). A ReactNode rather than a bare
    * string, because the socket holds navigation markup that carries the page
    * title, not a label. Empty until a layout claims it. */
-  context?: ReactNode;
+  readonly context?: ReactNode;
   /** The lens's controls region content: its filters and toggles. */
-  controls?: ReactNode;
+  readonly controls?: ReactNode;
   /** The lens's status region content: its readouts. */
-  status?: ReactNode;
-}
+  readonly status?: ReactNode;
+};
+
+/**
+ * Props accepted by `ModeStrip`: its three sockets, and the native props of
+ * its `<header>` root.
+ *
+ * `children` is excluded: the strip's content is its three sockets, so a
+ * free child would have no socket to land in.
+ */
+export type ModeStripProps = OwnProps &
+  Omit<ComponentProps<"header">, keyof OwnProps | "children">;
