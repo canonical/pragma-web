@@ -1,5 +1,5 @@
 export { default as Chip } from "./Chip.js";
-export { default as ChipLegend } from "./Legend.js";
+export { default as ChipLegend } from "./ChipLegend.js";
 export type {
   Box,
   ChipLegendProps,

@@ -1,13 +1,13 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { PREFIXES } from "../../../testing/fixtures.js";
+import ChipLegend from "./ChipLegend.js";
 import {
   BOX_ENCODINGS,
   CHANNEL_DESCRIPTORS,
   KIND_ENCODINGS,
   LIFECYCLE_ENCODINGS,
 } from "./constants.js";
-import ChipLegend from "./Legend.js";
 
 describe("ChipLegend", () => {
   it("renders one group per channel, titled from the descriptors", () => {

@@ -6,7 +6,7 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { PREFIXES } from "../../../testing/fixtures.js";
 import Chip from "./Chip.js";
-import ChipLegend from "./Legend.js";
+import ChipLegend from "./ChipLegend.js";
 
 describe("Chip server-render output", () => {
   it("server-renders the text form as a span", () => {
