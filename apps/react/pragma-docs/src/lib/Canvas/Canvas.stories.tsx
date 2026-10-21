@@ -31,7 +31,7 @@ export const UndergroundWell: Story = {
       <section>
         <h1>Underground</h1>
         <div
-          className="underground"
+          className="ds underground"
           style={{ blockSize: "16rem", display: "grid", placeItems: "center" }}
         >
           <p>A graph well sinks here.</p>

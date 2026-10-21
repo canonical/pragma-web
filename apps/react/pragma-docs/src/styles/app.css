@@ -76,11 +76,11 @@
 
   /* The one documented usage hook for the underground surface: graph wells
    * (the explorer's canvas, Stage live-component wells, report matrices)
-   * apply `.underground` to sink below the sheet. Content ON the well floor
+   * carry `ds underground` to sink below the sheet. Content ON the well floor
    * renders raised again — nodes float as panels inside the depression. A
-   * well that wants no card resets the hook from its own root class, which
-   * out-specifies this single class. */
-  .underground {
+   * well that wants no card resets the hook with its own root class plus the
+   * hook (`.ds.<well>.underground`), which out-specifies `.ds.underground`. */
+  .ds.underground {
     background: var(--surface-underground-background);
     box-shadow: var(--surface-underground-shadow);
     border: var(--surface-underground-border);

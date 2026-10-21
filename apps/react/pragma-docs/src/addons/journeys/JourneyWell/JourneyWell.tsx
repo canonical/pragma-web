@@ -118,7 +118,7 @@ const JourneyLegend = (): React.ReactElement => (
 
 /**
  * The Journeys lens's centre panel: the demand model's left-to-right
- * spine in the shell's underground well (the `.underground` hook — the
+ * spine in an underground well (the `.ds.underground` hook — the
  * depression you look INTO, AX.3). Rendered with React Flow v12, whose SSR
  * path renders the full node DOM server-side because every node carries
  * explicit `width`/`height` and both `handles` from the deterministic

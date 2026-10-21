@@ -1,7 +1,7 @@
 /*
  * JourneyWell — the centre panel's lower half: the demand model's spine
  * (job → pairing → surface → layout) sunk into an underground well
- * (`.underground` supplies the depression; styles/app.css). Modelled on
+ * (`.ds.underground` supplies the depression; styles/app.css). Modelled on
  * the definitions HierarchyWell: full bleed inside its box, nodes raised as
  * chips on the well floor, canvas-local furniture floated ABSOLUTELY
  * against the well — never `position: fixed`, which the canvas's
@@ -15,19 +15,22 @@
  */
 
 @layer app {
-  /* Full bleed, NO CARD. The graph IS the background (owner ruling): drop the
-   * `.underground` hook's border, radius AND shadow entirely so the well runs
-   * edge to edge with nothing framing it — one surface, not a card sunk in the
-   * canvas. Only the depression's background tint remains (the recess you look
-   * INTO, AX.3). The well's root class (specificity 0,2,0) out-specifies the
-   * single-class `.underground` hook (0,1,0, styles/app.css), so the reset
-   * needs no ancestor. The hook itself is untouched; other tenants still get
-   * the card. `position: relative` makes this the containing block for the
+  /* `position: relative` makes the well the containing block for the
    * floating furniture. */
   .ds.journey-well {
     position: relative;
     min-block-size: 0;
     overflow: hidden;
+  }
+
+  /* Full bleed, NO CARD. The graph IS the background (owner ruling): drop the
+   * `.ds.underground` hook's border, radius AND shadow entirely so the well
+   * runs edge to edge with nothing framing it — one surface, not a card sunk
+   * in the canvas. Only the depression's background tint remains (the recess
+   * you look INTO, AX.3). The well's root class plus the hook (specificity
+   * 0,3,0) out-specifies the hook alone (0,2,0, styles/app.css). The hook
+   * itself is untouched; other tenants still get the card. */
+  .ds.journey-well.underground {
     border: none;
     border-radius: 0;
     box-shadow: none;

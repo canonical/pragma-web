@@ -2,7 +2,7 @@
  * NeighbourhoodWell — the entity page's closing well (AV-364).
  *
  * The section keeps the page's reading rhythm (heading, prose states); the
- * canvas inside is an `.underground` depression (AX.3) holding the settled
+ * canvas inside is a `.ds.underground` depression (AX.3) holding the settled
  * graph. The canvas is 1:1 px space — the SVG edge layer and the HTML chip
  * layer share one coordinate system and NOTHING scales, so chips stay real
  * links with crisp text at every viewport. A canvas wider than the column
