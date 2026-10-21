@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { resolveRouteStatus } from "./routeQueries.js";
+import resolveRouteStatus from "./resolveRouteStatus.js";
 
 describe("resolveRouteStatus", () => {
   // The renderer starts at 200 and only ever moves on a shell error, so

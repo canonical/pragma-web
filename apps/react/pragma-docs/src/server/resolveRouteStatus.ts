@@ -18,10 +18,10 @@ import { appRoutes, middleware, notFoundRoute } from "../routes.js";
  * header the entry point must send rather than a document to render, and no
  * route in this app is one today.
  */
-export const resolveRouteStatus = (url: string): number => {
+export default function resolveRouteStatus(url: string): number {
   const match = createStaticRouter(appRoutes, url, {
     middleware: [...middleware],
     notFound: notFoundRoute,
   }).match;
   return match?.kind === "route" ? match.status : 404;
-};
+}

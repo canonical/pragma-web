@@ -23,7 +23,7 @@ import { getRequestUrl } from "@canonical/react-ssr/server";
 import { resolveGraphqlUrl } from "#graphql-endpoint";
 import EntryServer, { type InitialData } from "./entry.js";
 import prepareRelayData from "./prepareRelayData.js";
-import { resolveRouteStatus } from "./routeQueries.js";
+import resolveRouteStatus from "./resolveRouteStatus.js";
 
 const htmlString = fs.readFileSync(
   path.join(process.cwd(), "dist", "client", "index.html"),
