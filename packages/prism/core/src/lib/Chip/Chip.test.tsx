@@ -125,7 +125,9 @@ describe("Chip", () => {
     );
     const style = screen.getByText("Modal form").style;
     expect(style.getPropertyValue("--chip-tint")).toContain("--chip-tint-l");
-    expect(style.getPropertyValue("--chip-radius")).toBe("1.25em");
+    expect(style.getPropertyValue("--chip-radius")).toBe(
+      "var(--chip-radius-pattern, 1.25em)",
+    );
     expect(style.getPropertyValue("--chip-fill-weight")).toBe("0%");
     expect(style.getPropertyValue("--chip-stroke-weight")).toBe("80%");
     expect(style.getPropertyValue("--chip-dot")).toContain("--chip-dot-beta");
@@ -300,7 +302,9 @@ describe("Chip", () => {
     expect(chip.id).toBe("button-mention");
     expect(chip.style.fontWeight).toBe("700");
     // The chip's own channel style and data attributes win.
-    expect(chip.style.getPropertyValue("--chip-radius")).toBe("0.375em");
+    expect(chip.style.getPropertyValue("--chip-radius")).toBe(
+      "var(--chip-radius-component, 0.375em)",
+    );
     expect(chip).toHaveAttribute("data-kind", "component");
   });
 

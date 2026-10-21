@@ -28,7 +28,10 @@
 
   /* The context slot: the mode's title/breadcrumb, west. */
   .ds.mode-strip .context {
-    font-weight: 500;
+    font-weight: var(
+      --mode-strip-context-font-weight,
+      var(--font-weight-medium, 500)
+    );
     white-space: nowrap;
   }
 
@@ -51,6 +54,6 @@
     align-items: center;
     gap: var(--space-100, 0.5rem);
     color: var(--color-text-muted, #666);
-    font-size: 0.875rem;
+    font-size: var(--mode-strip-status-font-size, 0.875rem);
   }
 }

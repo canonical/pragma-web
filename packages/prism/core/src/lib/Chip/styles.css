@@ -44,7 +44,7 @@
         var(--chip-tint, currentColor) var(--chip-stroke-weight, 0%),
         transparent
       );
-    padding-inline: 0.4em;
+    padding-inline: var(--chip-padding-inline, 0.4em);
     padding-block: 0.0625em;
 
     /* Chips may wrap across lines like any other text; clone the decoration
@@ -129,7 +129,10 @@
 
   .ds.chip-legend .title {
     margin: 0;
-    font-weight: 600;
+    font-weight: var(
+      --chip-legend-title-font-weight,
+      var(--font-weight-semibold, 600)
+    );
   }
 
   .ds.chip-legend .summary {
@@ -142,13 +145,13 @@
     padding: 0;
     list-style: none;
     display: grid;
-    gap: 0.5rem;
+    gap: var(--chip-legend-entries-gap, var(--space-100, 0.5rem));
   }
 
   .ds.chip-legend .entries li {
     display: flex;
     align-items: baseline;
-    gap: 0.75rem;
+    gap: var(--chip-legend-entry-gap, var(--space-150, 0.75rem));
   }
 
   .ds.chip-legend .note {
