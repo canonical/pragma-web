@@ -15,7 +15,7 @@ export const navigationDensityPolicy = {
     closure: "--ds-control-seat-margin-block-end",
   },
   boundary: "navigation.trailing-slot.static-chip.v1",
-  resets: ["site", "docs", "app"],
+  resets: ["global", "site", "docs", "app", "os"],
   portalBoundary: "dom-target.v1",
   resetBoundary: "product-root.v1",
   wrapperBoundary: "neutral descendants inherit; product roots reset",

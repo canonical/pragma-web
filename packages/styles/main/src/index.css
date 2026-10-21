@@ -48,6 +48,7 @@
  *   ds.modifiers   theme, the typographic scale, the channel families and
  *                  their shims, the density and context classes
  *   ds.surfaces    the surface families
+ *   ds.density     provider-owned density channels
  *   ds.states      the derived hover / active / disabled channels
  *   ds.components  the parent of the tier layers. Nothing is written directly
  *                  into it, by rule: a declaration in a parent layer sits in
@@ -90,12 +91,14 @@
  * Each generated file opens its own `@layer` block, so none of these imports
  * carries a `layer()` keyword: that would nest the file's layer inside another. */
 @import url("@canonical/design-tokens/dist/sets.primitive.css");
+@import url("./private.spacing.primitive.css");
 @import url("@canonical/design-tokens/dist/modifiers.theme.css");
 @import url("@canonical/design-tokens/dist/modifiers.surfaces.css");
 @import url("@canonical/design-tokens/dist/modifiers.anticipation.css");
 @import url("@canonical/design-tokens/dist/modifiers.criticality.css");
 @import url("@canonical/design-tokens/dist/modifiers.emphasis.css");
 @import url("@canonical/design-tokens/dist/modifiers.importance.css");
+@import url("./private.spacing.modifiers.css");
 /* TEMP shims (remove once generated upstream):
    - states: writes the explicit per-state colour tokens into the modifier
      channel (the generated modifiers only expose root), so hover/active/

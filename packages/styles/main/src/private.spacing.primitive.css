@@ -1,0 +1,18 @@
+@layer ds.tokens {
+  :root {
+    --dimension-000: 0rem;
+    --dimension-050: 0.25rem;
+    --dimension-100: 0.5rem;
+    --dimension-1200: 6rem;
+    --dimension-150: 0.75rem;
+    --dimension-1600: 8rem;
+    --dimension-200: 1rem;
+    --dimension-250: 1.25rem;
+    --dimension-300: 1.5rem;
+    --dimension-400: 2rem;
+    --dimension-500: 2.5rem;
+    --dimension-600: 3rem;
+    --dimension-800: 4rem;
+    --dimension-900: 4.5rem;
+  }
+}

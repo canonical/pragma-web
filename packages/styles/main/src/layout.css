@@ -32,6 +32,7 @@
  *   ds.modifiers   theme, the typographic scale, the channel families and
  *                  their shims, the density and context classes
  *   ds.surfaces    the surface families
+ *   ds.density     provider-owned density channels
  *   ds.states      the derived hover / active / disabled channels
  *   ds.components  the parent of the tier layers. Nothing is written directly
  *                  into it, by rule: a declaration in a parent layer sits in

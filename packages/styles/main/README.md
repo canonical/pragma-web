@@ -115,7 +115,7 @@ layers:
 
 ```css
 @layer normalize, ds.tokens, ds.reset, ds.typography, ds.modifiers, ds.surfaces,
-  ds.states, ds.components, ds.components.global, ds.components.sites,
+  ds.density, ds.states, ds.components, ds.components.global, ds.components.sites,
   ds.components.documentation, ds.components.stores, ds.components.apps,
   lib, app;
 ```
@@ -130,8 +130,9 @@ Read it from the bottom up — each position is an argument.
 | `ds.typography` | The element rules that apply the typographic mapping, and the baseline engine, from `@canonical/styles-typography`. | Above the reset because it is a more specific statement about text; below the modifiers, which can retune the scale. |
 | `ds.modifiers` | Theme, the typographic scale, the intent families (anticipation, criticality, emphasis, importance) and their shims, and the context and density classes. | Above typography, because a modifier's job is to shift what the layers below produced. |
 | `ds.surfaces` | The surface families: `surface`, `contrasted`, `modal`. | Above the modifiers, because a surface re-points colour channels the modifiers set. |
-| `ds.states` | The derived hover, active and disabled channels. | Above the surfaces, because a state is derived from whatever the surface resolved to. |
-| `ds.components` | Nothing, by rule. It is the parent of the tier layers below and holds no rule of its own. | Highest of the design system's eight top-level layers, so a component is the final word on its own box. A rule written *directly* into a parent layer sits in that layer's implicit final sublayer, which is above every named sublayer — so such a rule would outrank every tier and no component package could override it by layer. Everything this package puts in `ds.components` therefore sits in a tier. |
+| `ds.density` | Provider-owned density channels. | Above surfaces and below derived states so density can refine product spacing without outranking state or component rules. |
+| `ds.states` | The derived hover, active and disabled channels. | Above density, because a state is derived from the resolved product channels. |
+| `ds.components` | Nothing, by rule. It is the parent of the tier layers below and holds no rule of its own. | Highest of the design system's nine top-level layers, so a component is the final word on its own box. A rule written *directly* into a parent layer sits in that layer's implicit final sublayer, which is above every named sublayer — so such a rule would outrank every tier and no component package could override it by layer. Everything this package puts in `ds.components` therefore sits in a tier. |
 | `ds.components.global` | The stylesheets of the shared component packages, and this package's own layout presets. | The base of the tier tree: what every other tier refines. |
 | `ds.components.sites` | The stylesheets of the sites tier. | The four second-level tiers never appear on the same page, so their order among themselves decides nothing. It is fixed here anyway, so that it can never come to depend on which package a bundler emits first. |
 | `ds.components.documentation` | The stylesheets of the documentation tier. | As above. |
@@ -172,7 +173,7 @@ else.
 ```
 
 The order statement comes from the application loading `@canonical/styles` first (see
-[Usage](#usage)). A layer name is placed the moment the browser first meets it, so with the fifteen
+[Usage](#usage)). A layer name is placed the moment the browser first meets it, so with the sixteen
 names already fixed, `ds.components.apps-lxd`, being new, is appended after them inside
 `ds.components`, where it sorts above every tier. That is the tree's own rule — the more specific tier
 wins — and it means this stylesheet never has to know which applications exist.
@@ -182,7 +183,7 @@ that layer's implicit final sublayer, which is above every named sublayer, so a 
 would outrank every tier — the opposite of what the tiers are for.
 
 The names are tier ids from that tree, lowercased and hyphenated for a sub-tier (`apps-lxd`,
-`sites-webcomponentsprototype`). They are not the context words a page puts on its root (`app`,
+`sites-webcomponentsprototype`). They are not the context words a page puts on its root (`global`, `app`,
 `site`, `docs`): a tier says who owns a component, a context says what kind of page it is being shown
 on, and the two are chosen by different people for different reasons.
 
@@ -194,6 +195,8 @@ on, and the two are chosen by different people for different reasons.
 | `reset.css` root declarations | `ds.reset` | yes |
 | `reset.css` box-sizing | `ds.reset` | yes — `*`, `::before`, `::after` |
 | `spacing.css` | `ds.tokens` | no |
+| `private.spacing.primitive.css` | `ds.tokens` | no |
+| `private.spacing.modifiers.css` | `ds.modifiers`; also establishes `ds.density` in the order | no |
 | `motion.css` | `ds.tokens` | no |
 | `overflow.css` root default | `ds.tokens` | no |
 | `overflow.css` `.surface` | `ds.surfaces` | no |
@@ -356,6 +359,8 @@ The following token sets from `@canonical/design-tokens` are included:
 | Token set | Contents | Layer it opens |
 | --- | --- | --- |
 | `sets.primitive` | Base colour palette, spacing scale, font sizes | `ds.tokens` |
+| private spacing primitive snapshot | The subset required by the private semantic spacing provider | `ds.tokens` |
+| private semantic spacing snapshot | Product-context spacing values and private governed channels | `ds.modifiers`; its order statement also names `ds.density` |
 | `modifiers.theme` | Light/dark theme mappings, and `color-scheme` on the document root | `ds.modifiers` |
 | `modifiers.surfaces` | Surface elevation tokens | `ds.surfaces` |
 | `modifiers.anticipation` | Constructive/destructive/caution intents | `ds.modifiers` |
@@ -380,6 +385,8 @@ src/
   normalize.css                   -- this package's own reset
   reset.css                       -- the document root's baseline
   spacing.css                     -- spacing tokens
+  private.spacing.primitive.css   -- private spacing primitive snapshot
+  private.spacing.modifiers.css   -- private semantic spacing snapshot
   motion.css                      -- motion tokens, and reduced motion
   overflow.css                    -- scroll overflow affordance
   grid.css                        -- layout presets

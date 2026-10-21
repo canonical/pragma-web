@@ -3,7 +3,9 @@
      Neutral trailing-slot wrappers preserve it. Genuine product roots restore
      the component's normal seat until a nested provider establishes density. */
   :where(
-    .ds.row.sidenav-static-chip-provider-v1 > .end :is(.site, .docs, .app)
+    .ds.row.sidenav-static-chip-provider-v1
+      > .end
+      :is(.global, .site, .docs, .app, .os)
   ) {
     --sidenav-static-chip-inset: initial;
     --sidenav-static-chip-end: initial;

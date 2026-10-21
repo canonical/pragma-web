@@ -31,6 +31,7 @@ const MIXED_ORDER = [
   "ds.typography",
   "ds.modifiers",
   "ds.surfaces",
+  "ds.density",
   "ds.states",
   "ds.adapter",
   "ds.components",
@@ -104,7 +105,7 @@ const withoutImports = (css: string): string =>
   css.replace(/^\s*@import[^;]*;/gm, "");
 
 describe("the order contract", () => {
-  it("layers.css is a single statement naming the nineteen layers in order", () => {
+  it("layers.css is a single statement naming the twenty layers in order", () => {
     const sheet = parse(layersCss);
     expect(sheet.cssRules.length).toBe(1);
     expect(sheet.cssRules[0]).toBeInstanceOf(CSSLayerStatementRule);
@@ -245,7 +246,7 @@ describe("the order contract", () => {
     );
   });
 
-  it("sorts all 171 pairs of the nineteen names as written, by computed style", async () => {
+  it("sorts all 190 pairs of the twenty names as written, by computed style", async () => {
     // The name list alone cannot show this: a top-level layer written between
     // two sublayers of `ds` sorts above all of `ds`, which is how a top-level
     // `adapter` sat above the component tiers until it became `ds.adapter`.
@@ -264,7 +265,7 @@ describe("the order contract", () => {
         css += `@layer ${MIXED_ORDER[j]} { #${id} { color: rgb(2, 2, 2) } } @layer ${MIXED_ORDER[i]} { #${id} { color: rgb(1, 1, 1) } }\n`;
         body += `<i id="${id}"></i>`;
       }
-    expect(pairs.length).toBe(171);
+    expect(pairs.length).toBe(190);
     const doc = await render({ root: "", styles: [layersCss, css], body });
     const parentWins = (i: number, j: number): boolean =>
       MIXED_ORDER[j]?.startsWith(`${MIXED_ORDER[i]}.`) ?? false;

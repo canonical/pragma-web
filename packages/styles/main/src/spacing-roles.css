@@ -1,17 +1,13 @@
-/* @canonical/styles — Semantic spacing roles
+/* @canonical/styles — Semantic spacing compatibility aliases
  *
- * The tier table for the inside-out spacing model. Values are declared once,
- * then the site, documentation and application contexts select aliases from
- * that table. Component styles consume only the aliases.
+ * Components keep their established channels while the generated spacing
+ * provider owns product values. Every product root redeclares the bridge so a
+ * nested context resolves its own provider values rather than inheriting an
+ * alias that was resolved by an ancestor.
  */
 
 @layer ds.tokens {
   :root {
-    /* Existing baseline input: Site 8px; Docs 4px; App 4px. */
-    --ds-spacing-baseline-site: 0.5rem;
-    --ds-spacing-baseline-docs: 0.25rem;
-    --ds-spacing-baseline-app: 0.25rem;
-
     /* Internal body font input: Site 16px; Docs 14px; App 14px. */
     --ds-typography-body-font-size-site: 1rem;
     --ds-typography-body-font-size-docs: 0.875rem;
@@ -21,112 +17,56 @@
     --ds-typography-body-line-height-site: 1.5rem;
     --ds-typography-body-line-height-docs: 1.25rem;
     --ds-typography-body-line-height-app: 1.25rem;
-
-    /* spacing.inset.control.block: Site 0; Docs 4px; App 4px. */
-    --ds-spacing-control-inset-site: 0px;
-    --ds-spacing-control-inset-docs: 0.25rem;
-    --ds-spacing-control-inset-app: 0.25rem;
-
-    /* spacing.inset.control.block, dense member: Site 4px; Docs 4px; App 4px. */
-    --ds-spacing-control-inset-dense-site: 0.25rem;
-    --ds-spacing-control-inset-dense-docs: 0.25rem;
-    --ds-spacing-control-inset-dense-app: 0.25rem;
-
-    /* spacing.inset.action.inline: Site 16px; Docs 12px; App 12px. */
-    --ds-spacing-action-site: 1rem;
-    --ds-spacing-action-docs: 0.75rem;
-    --ds-spacing-action-app: 0.75rem;
-
-    /* spacing.inset.field.inline: Site 8px; Docs 8px; App 8px. */
-    --ds-spacing-field-site: 0.5rem;
-    --ds-spacing-field-docs: 0.5rem;
-    --ds-spacing-field-app: 0.5rem;
-
-    /* spacing.gap.mark.inline: Site 8px; Docs 8px; App 8px. */
-    --ds-spacing-mark-site: 0.5rem;
-    --ds-spacing-mark-docs: 0.5rem;
-    --ds-spacing-mark-app: 0.5rem;
-
-    /* spacing.gap.element.block: Site 8px; Docs 4px; App 4px. */
-    --ds-spacing-item-block-site: 0.5rem;
-    --ds-spacing-item-block-docs: 0.25rem;
-    --ds-spacing-item-block-app: 0.25rem;
-
-    /* spacing.gap.element.inline: Site 8px; Docs 8px; App 8px. */
-    --ds-spacing-item-inline-site: 0.5rem;
-    --ds-spacing-item-inline-docs: 0.5rem;
-    --ds-spacing-item-inline-app: 0.5rem;
-
-    /* spacing.gap.group.block: Site 24px; Docs 20px; App 20px. */
-    --ds-spacing-group-site: 1.5rem;
-    --ds-spacing-group-docs: 1.25rem;
-    --ds-spacing-group-app: 1.25rem;
-
-    /* spacing.gap.pattern.block: Site 72px; Docs 40px; App 40px. */
-    --ds-spacing-section-site: 4.5rem;
-    --ds-spacing-section-docs: 2.5rem;
-    --ds-spacing-section-app: 2.5rem;
   }
 
   :root,
   .site {
-    --ds-spacing-baseline: var(--ds-spacing-baseline-site);
     --ds-typography-body-font-size: var(--ds-typography-body-font-size-site);
     --ds-typography-body-line-height: var(
       --ds-typography-body-line-height-site
     );
-    --ds-spacing-control-inset: var(--ds-spacing-control-inset-site);
-    --ds-spacing-control-inset-dense: var(
-      --ds-spacing-control-inset-dense-site
-    );
-    --ds-spacing-action: var(--ds-spacing-action-site);
-    --ds-spacing-field: var(--ds-spacing-field-site);
-    --ds-spacing-mark: var(--ds-spacing-mark-site);
-    --ds-spacing-item-block: var(--ds-spacing-item-block-site);
-    --ds-spacing-item-inline: var(--ds-spacing-item-inline-site);
-    --ds-spacing-group: var(--ds-spacing-group-site);
-    --ds-spacing-section: var(--ds-spacing-section-site);
   }
 
   .docs {
-    --ds-spacing-baseline: var(--ds-spacing-baseline-docs);
     --ds-typography-body-font-size: var(--ds-typography-body-font-size-docs);
     --ds-typography-body-line-height: var(
       --ds-typography-body-line-height-docs
     );
-    --ds-spacing-control-inset: var(--ds-spacing-control-inset-docs);
-    --ds-spacing-control-inset-dense: var(
-      --ds-spacing-control-inset-dense-docs
-    );
-    --ds-spacing-action: var(--ds-spacing-action-docs);
-    --ds-spacing-field: var(--ds-spacing-field-docs);
-    --ds-spacing-mark: var(--ds-spacing-mark-docs);
-    --ds-spacing-item-block: var(--ds-spacing-item-block-docs);
-    --ds-spacing-item-inline: var(--ds-spacing-item-inline-docs);
-    --ds-spacing-group: var(--ds-spacing-group-docs);
-    --ds-spacing-section: var(--ds-spacing-section-docs);
   }
 
   .app {
-    --ds-spacing-baseline: var(--ds-spacing-baseline-app);
     --ds-typography-body-font-size: var(--ds-typography-body-font-size-app);
     --ds-typography-body-line-height: var(--ds-typography-body-line-height-app);
-    --ds-spacing-control-inset: var(--ds-spacing-control-inset-app);
-    --ds-spacing-control-inset-dense: var(--ds-spacing-control-inset-dense-app);
-    --ds-spacing-action: var(--ds-spacing-action-app);
-    --ds-spacing-field: var(--ds-spacing-field-app);
-    --ds-spacing-mark: var(--ds-spacing-mark-app);
-    --ds-spacing-item-block: var(--ds-spacing-item-block-app);
-    --ds-spacing-item-inline: var(--ds-spacing-item-inline-app);
-    --ds-spacing-group: var(--ds-spacing-group-app);
-    --ds-spacing-section: var(--ds-spacing-section-app);
   }
 
-  :where(:root, .site, .docs, .app) {
-    --ds-spacing-inset-surface-compact-inline: var(--ds-spacing-field);
-    --ds-spacing-inset-surface-compact-block: var(--ds-spacing-control-inset);
-    --ds-spacing-inset-surface-standard-inline: var(--ds-spacing-action);
-    --ds-spacing-inset-surface-standard-block: var(--ds-spacing-action);
+  :root,
+  .global,
+  .site,
+  .docs,
+  .app,
+  .os {
+    --ds-spacing-baseline: var(--spacing-baseline);
+    --ds-spacing-control-inset: var(--spacing-inset-control-block);
+    --ds-spacing-control-inset-dense: var(--_spacing-inset-control-block-dense);
+    --ds-spacing-action: var(--spacing-inset-action-inline);
+    --ds-spacing-field: var(--spacing-inset-input-inline);
+    --ds-spacing-mark: var(--spacing-gap-mark-inline);
+    --ds-spacing-item-block: var(--spacing-gap-item-block);
+    --ds-spacing-item-inline: var(--spacing-gap-item-inline);
+    --ds-spacing-group: var(--spacing-gap-group-block);
+    --ds-spacing-section: var(--spacing-gap-section-block);
+    --ds-spacing-inset-surface-compact-inline: var(
+      --spacing-inset-surface-compact-inline
+    );
+    --ds-spacing-inset-surface-compact-block: var(
+      --spacing-inset-surface-compact-block
+    );
+    --ds-spacing-inset-surface-standard-inline: var(
+      --spacing-inset-surface-standard-inline
+    );
+    --ds-spacing-inset-surface-standard-block: var(
+      --spacing-inset-surface-standard-block
+    );
     --ds-spacing-inset-surface-major-inline: var(--grid-margin);
   }
 }
