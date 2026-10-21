@@ -111,15 +111,50 @@ interface WorkingNode extends WellBox {
   readonly data: TermFlowNode["data"];
 }
 
+type OntologyClass = ClassGraphOntology["classes"][number];
+
+/** One ontology's subclass forest: each class's children, and its roots. */
+interface ClassForest {
+  readonly childrenOf: ReadonlyMap<string, readonly OntologyClass[]>;
+  readonly roots: readonly OntologyClass[];
+}
+
+/** A class with its subtree, and the number of leaves the subtree holds. */
+interface ClassTree {
+  readonly klass: OntologyClass;
+  readonly leaves: number;
+  readonly children: readonly ClassTree[];
+}
+
+/** What every step of one cluster's radial walk reads. */
+interface ClusterWalk {
+  readonly ontology: ClassGraphOntology;
+  readonly singleRoot: boolean;
+}
+
+/** One ontology's laid-out nodes and the bounding box around them. */
+interface Cluster {
+  readonly ontology: ClassGraphOntology;
+  readonly nodes: readonly WorkingNode[];
+  readonly minX: number;
+  readonly minY: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** Where a cluster's top-left corner lands on the canvas. */
+interface PackedCluster {
+  readonly cluster: Cluster;
+  readonly x: number;
+  readonly y: number;
+}
+
 /**
- * One ontology's radial cluster, centred at (0,0): subtree angular
- * windows proportional to leaf counts, radius = depth. Multiple roots
- * share the disc as siblings of a virtual centre (and sit at radius 1 so
- * none of them squats the middle pretending to be THE root).
+ * Group one ontology's classes into a forest: a class whose superclass is
+ * in the same ontology is that superclass's child, and every other class
+ * is a root.
  */
-const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
-  type OntologyClass = ClassGraphOntology["classes"][number];
-  const namespaces = [ontology];
+const groupClassForest = (ontology: ClassGraphOntology): ClassForest => {
   const childrenOf = new Map<string, OntologyClass[]>();
   const roots: OntologyClass[] = [];
   const uris = new Set(ontology.classes.map((klass) => klass.uri));
@@ -133,117 +168,138 @@ const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
       roots.push(klass);
     }
   }
+  return { childrenOf, roots };
+};
 
-  const countLeaves = (klass: OntologyClass): number => {
-    const children = childrenOf.get(klass.uri) ?? [];
-    if (children.length === 0) return 1;
-    let total = 0;
-    for (const child of children) total += countLeaves(child);
-    return total;
+/**
+ * Build a class's subtree from the forest, counting its leaves once: a
+ * class with no children is one leaf, and any other class holds its
+ * children's leaves.
+ */
+const buildClassTree = (
+  klass: OntologyClass,
+  forest: ClassForest,
+): ClassTree => {
+  const children = (forest.childrenOf.get(klass.uri) ?? []).map((child) =>
+    buildClassTree(child, forest),
+  );
+  const leaves =
+    children.length === 0
+      ? 1
+      : children.reduce((sum, child) => sum + child.leaves, 0);
+  return { klass, leaves, children };
+};
+
+/**
+ * Place one class and its subtree inside the angular window `[from, to)`,
+ * one ring further out per depth. A child sits one hop deeper than the
+ * parent that placed it, which is its superclass depth within the
+ * ontology: the walk starts at the roots, so it never enters a cycle.
+ */
+const placeSubtree = (
+  walk: ClusterWalk,
+  { klass, children }: ClassTree,
+  depth: number,
+  from: number,
+  to: number,
+): WorkingNode[] => {
+  const namespaces = [walk.ontology];
+  // Radius: the lone root owns the centre; in a multi-root disc every
+  // root starts one ring out, keeping the middle clear.
+  const ring = walk.singleRoot ? depth : depth + 1;
+  const angle = (from + to) / 2 - Math.PI / 2;
+  const atCentre = walk.singleRoot && depth === 0;
+  const radiusX = atCentre ? 0 : ring * RING_X;
+  const radiusY = atCentre ? 0 : ring * RING_Y;
+  const label = klass.label ?? compactUri(klass.uri, namespaces);
+  const node: WorkingNode = {
+    id: compactUri(klass.uri, namespaces),
+    data: {
+      term: compactUri(klass.uri, namespaces),
+      label,
+      isAbstract: klass.isAbstract,
+      prefix: walk.ontology.prefix,
+    },
+    x: Math.cos(angle) * radiusX,
+    y: Math.sin(angle) * radiusY,
+    width: estimateWidth(label),
+    height: NODE_HEIGHT,
   };
+  return [node, ...placeSiblings(walk, children, depth + 1, from, to)];
+};
 
-  const nodes: WorkingNode[] = [];
-  const singleRoot = roots.length === 1;
-
-  // A child sits one hop deeper than the parent that placed it, which is its
-  // superclass depth within the ontology: the walk starts at the roots, so
-  // it never enters a cycle.
-  const place = (
-    klass: OntologyClass,
-    depth: number,
-    from: number,
-    to: number,
-  ): void => {
-    // Radius: the lone root owns the centre; in a multi-root disc every
-    // root starts one ring out, keeping the middle clear.
-    const ring = singleRoot ? depth : depth + 1;
-    const angle = (from + to) / 2 - Math.PI / 2;
-    const radiusX = singleRoot && depth === 0 ? 0 : ring * RING_X;
-    const radiusY = singleRoot && depth === 0 ? 0 : ring * RING_Y;
-    const label = klass.label ?? compactUri(klass.uri, namespaces);
-    nodes.push({
-      id: compactUri(klass.uri, namespaces),
-      data: {
-        term: compactUri(klass.uri, namespaces),
-        label,
-        isAbstract: klass.isAbstract,
-        prefix: ontology.prefix,
-      },
-      x: Math.cos(angle) * radiusX,
-      y: Math.sin(angle) * radiusY,
-      width: estimateWidth(label),
-      height: NODE_HEIGHT,
-    });
-    const children = childrenOf.get(klass.uri) ?? [];
-    const total = children.reduce((sum, child) => sum + countLeaves(child), 0);
-    let cursor = from;
-    for (const child of children) {
-      const share = ((to - from) * countLeaves(child)) / Math.max(total, 1);
-      place(child, depth + 1, cursor, cursor + share);
-      cursor += share;
-    }
-  };
-
-  const totalLeaves = roots.reduce((sum, root) => sum + countLeaves(root), 0);
-  let cursor = 0;
-  for (const root of roots) {
-    const share = (2 * Math.PI * countLeaves(root)) / Math.max(totalLeaves, 1);
-    place(root, 0, cursor, cursor + share);
+/**
+ * Share the angular window `[from, to)` among sibling classes in
+ * proportion to their leaf counts, and place each subtree in its share.
+ */
+const placeSiblings = (
+  walk: ClusterWalk,
+  siblings: readonly ClassTree[],
+  depth: number,
+  from: number,
+  to: number,
+): WorkingNode[] => {
+  const total = siblings.reduce((sum, sibling) => sum + sibling.leaves, 0);
+  let cursor = from;
+  return siblings.flatMap((sibling) => {
+    const share = ((to - from) * sibling.leaves) / Math.max(total, 1);
+    const placed = placeSubtree(walk, sibling, depth, cursor, cursor + share);
     cursor += share;
-  }
+    return placed;
+  });
+};
 
+/**
+ * One ontology's radial cluster, centred at (0,0): subtree angular
+ * windows proportional to leaf counts, radius = depth. Multiple roots
+ * share the disc as siblings of a virtual centre (and sit at radius 1 so
+ * none of them squats the middle pretending to be THE root). The shared
+ * relaxation pass then separates any boxes that still collide.
+ */
+const layOutCluster = (ontology: ClassGraphOntology): WorkingNode[] => {
+  const forest = groupClassForest(ontology);
+  const trees = forest.roots.map((root) => buildClassTree(root, forest));
+  const walk: ClusterWalk = { ontology, singleRoot: trees.length === 1 };
+  const nodes = placeSiblings(walk, trees, 0, 0, 2 * Math.PI);
   relaxBoxes(nodes, {
     gap: COLLISION_GAP,
     iterations: RELAX_ITERATIONS,
-    pinned: singleRoot ? new Set([0]) : undefined,
+    pinned: walk.singleRoot ? new Set([0]) : undefined,
   });
   return nodes;
 };
 
-/**
- * Builds the settled multi-ontology graph: clusters laid out at the
- * origin, packed into wrapping rows, then normalised to a padded
- * top-left origin. Node ids are PREFIXED term URIs throughout.
- */
-export const buildClassGraph = (
-  ontologies: readonly ClassGraphOntology[],
-): ClassGraph => {
-  interface Cluster {
-    readonly ontology: ClassGraphOntology;
-    readonly nodes: WorkingNode[];
-    readonly width: number;
-    readonly height: number;
+/** Measure the bounding box around one ontology's laid-out nodes. */
+const measureCluster = (
+  ontology: ClassGraphOntology,
+  nodes: readonly WorkingNode[],
+): Cluster => {
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+  for (const node of nodes) {
+    minX = Math.min(minX, node.x - node.width / 2);
+    minY = Math.min(minY, node.y - node.height / 2);
+    maxX = Math.max(maxX, node.x + node.width / 2);
+    maxY = Math.max(maxY, node.y + node.height / 2);
   }
+  return {
+    ontology,
+    nodes,
+    minX,
+    minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+};
 
-  const clusters: Cluster[] = ontologies
-    .filter((ontology) => ontology.classes.length > 0)
-    .map((ontology) => {
-      const nodes = layOutCluster(ontology);
-      let minX = Number.POSITIVE_INFINITY;
-      let minY = Number.POSITIVE_INFINITY;
-      let maxX = Number.NEGATIVE_INFINITY;
-      let maxY = Number.NEGATIVE_INFINITY;
-      for (const node of nodes) {
-        minX = Math.min(minX, node.x - node.width / 2);
-        minY = Math.min(minY, node.y - node.height / 2);
-        maxX = Math.max(maxX, node.x + node.width / 2);
-        maxY = Math.max(maxY, node.y + node.height / 2);
-      }
-      // Rebase each cluster to its own top-left origin.
-      for (const node of nodes) {
-        node.x -= minX;
-        node.y -= minY;
-      }
-      return {
-        ontology,
-        nodes,
-        width: maxX - minX,
-        height: maxY - minY,
-      };
-    });
-
-  // Pack clusters into wrapping rows, query order (stable).
-  const extents: ClusterExtent[] = [];
+/**
+ * Pack clusters left to right into rows that wrap at the target width, in
+ * query order, so the packing is stable.
+ */
+const packClusters = (clusters: readonly Cluster[]): PackedCluster[] => {
+  const packed: PackedCluster[] = [];
   let rowX = 0;
   let rowY = 0;
   let rowHeight = 0;
@@ -253,72 +309,94 @@ export const buildClassGraph = (
       rowX = 0;
       rowHeight = 0;
     }
-    for (const node of cluster.nodes) {
-      node.x += rowX + CANVAS_PADDING;
-      node.y += rowY + CANVAS_PADDING;
-    }
-    extents.push({
-      prefix: cluster.ontology.prefix,
-      x: settle(rowX + CANVAS_PADDING),
-      y: settle(rowY + CANVAS_PADDING),
-      width: settle(cluster.width),
-      height: settle(cluster.height),
+    packed.push({
+      cluster,
+      x: rowX + CANVAS_PADDING,
+      y: rowY + CANVAS_PADDING,
     });
     rowX += cluster.width + CLUSTER_GAP;
     rowHeight = Math.max(rowHeight, cluster.height);
   }
+  return packed;
+};
 
-  const nodes: TermFlowNode[] = clusters
-    .flatMap((cluster) => cluster.nodes)
-    .map((node) => ({
+/** The canvas rectangle each packed cluster occupies. */
+const buildClusterExtents = (
+  packed: readonly PackedCluster[],
+): ClusterExtent[] =>
+  packed.map(({ cluster, x, y }) => ({
+    prefix: cluster.ontology.prefix,
+    x: settle(x),
+    y: settle(y),
+    width: settle(cluster.width),
+    height: settle(cluster.height),
+  }));
+
+/**
+ * Every node at its settled canvas position: rebased to its cluster's
+ * top-left corner, then moved to where the cluster was packed.
+ */
+const buildNodes = (packed: readonly PackedCluster[]): TermFlowNode[] =>
+  packed.flatMap(({ cluster, x, y }) =>
+    cluster.nodes.map((node) => ({
       id: node.id,
       data: node.data,
-      x: settle(node.x),
-      y: settle(node.y),
+      x: settle(node.x - cluster.minX + x),
+      y: settle(node.y - cluster.minY + y),
       width: node.width,
       height: node.height,
-    }));
-  const nodeById = new Map(nodes.map((node) => [node.id, node]));
-  // Full IRI → prefixed id, across EVERY ontology's namespace (a
-  // property's range may cross ontologies).
+    })),
+  );
+
+/** Structural edges: subclass → superclass, straight, unlabelled. */
+const buildStructuralEdges = (
+  ontologies: readonly ClassGraphOntology[],
+  nodeById: ReadonlyMap<string, TermFlowNode>,
+): TermFlowEdge[] =>
+  ontologies.flatMap((ontology) => {
+    const namespaces = [ontology];
+    return ontology.classes.flatMap((klass): TermFlowEdge[] => {
+      const parentUri = klass.superclass?.uri;
+      if (parentUri === undefined) return [];
+      const child = nodeById.get(compactUri(klass.uri, namespaces));
+      const parent = nodeById.get(compactUri(parentUri, namespaces));
+      if (child === undefined || parent === undefined) return [];
+      const start = findEdgeEndpoint(child, parent, 2);
+      const end = findEdgeEndpoint(parent, child, 6);
+      return [
+        {
+          id: `sub:${child.id}`,
+          source: child.id,
+          target: parent.id,
+          family: "structural",
+          d: `M ${settle(start.x)} ${settle(start.y)} L ${settle(end.x)} ${settle(end.y)}`,
+        },
+      ];
+    });
+  });
+
+/**
+ * Semantic edges: object properties whose domain AND range are drawn
+ * classes, each wearing its predicate. Parallel arcs (do/don't) stack
+ * their bows; self-references loop. Ids resolve across EVERY ontology's
+ * namespace, because a property's range may cross ontologies.
+ */
+const buildSemanticEdges = (
+  ontologies: readonly ClassGraphOntology[],
+  nodeById: ReadonlyMap<string, TermFlowNode>,
+): TermFlowEdge[] => {
   const allNamespaces: OntologyNamespace[] = ontologies.map(
     ({ prefix, namespace }) => ({ prefix, namespace }),
   );
-
-  const edges: TermFlowEdge[] = [];
-  // Structural: subclass → superclass, straight, unlabelled.
-  for (const ontology of ontologies) {
-    const namespaces = [ontology];
-    for (const klass of ontology.classes) {
-      const parentUri = klass.superclass?.uri;
-      if (parentUri === undefined) continue;
-      const child = nodeById.get(compactUri(klass.uri, namespaces));
-      const parent = nodeById.get(compactUri(parentUri, namespaces));
-      if (child === undefined || parent === undefined) continue;
-      const start = findEdgeEndpoint(child, parent, 2);
-      const end = findEdgeEndpoint(parent, child, 6);
-      edges.push({
-        id: `sub:${child.id}`,
-        source: child.id,
-        target: parent.id,
-        family: "structural",
-        d: `M ${settle(start.x)} ${settle(start.y)} L ${settle(end.x)} ${settle(end.y)}`,
-      });
-    }
-  }
-  // Semantic: object properties whose domain AND range are drawn classes.
-  // Parallel arcs (do/don't) stack their bows; self-references loop.
   const parallelCount = new Map<string, number>();
-  for (const ontology of ontologies) {
-    for (const property of ontology.properties) {
-      if (property.kind !== "OBJECT") continue;
+  return ontologies.flatMap((ontology) =>
+    ontology.properties.flatMap((property): TermFlowEdge[] => {
+      if (property.kind !== "OBJECT") return [];
       const domainUri = property.domain?.uri;
-      if (domainUri === undefined) continue;
+      if (domainUri === undefined) return [];
       const source = nodeById.get(compactUri(domainUri, allNamespaces));
       const target = nodeById.get(compactUri(property.range, allNamespaces));
-      if (source === undefined || target === undefined) continue;
-      const predicate =
-        property.label ?? compactUri(property.uri, allNamespaces);
+      if (source === undefined || target === undefined) return [];
       const pairKey = `${source.id}=>${target.id}`;
       const rank = parallelCount.get(pairKey) ?? 0;
       parallelCount.set(pairKey, rank + 1);
@@ -330,18 +408,28 @@ export const buildClassGraph = (
               findEdgeEndpoint(target, source, 7),
               EDGE_BOW * (1 + rank * 0.7),
             );
-      edges.push({
-        id: `rel:${compactUri(property.uri, allNamespaces)}`,
-        source: source.id,
-        target: target.id,
-        family: "semantic",
-        predicate,
-        d: arc.d,
-        labelAt: arc.labelAt,
-      });
-    }
-  }
+      return [
+        {
+          id: `rel:${compactUri(property.uri, allNamespaces)}`,
+          source: source.id,
+          target: target.id,
+          family: "semantic",
+          predicate: property.label ?? compactUri(property.uri, allNamespaces),
+          d: arc.d,
+          labelAt: arc.labelAt,
+        },
+      ];
+    }),
+  );
+};
 
+/**
+ * The canvas size around every node, padded, and the initial zoom that
+ * fits it to a typical view, clamped between 0.35 and 1.
+ */
+const measureCanvas = (
+  nodes: readonly TermFlowNode[],
+): Pick<ClassGraph, "width" | "height" | "fitScale"> => {
   const width = settle(
     Math.max(...nodes.map((node) => node.x + node.width / 2), 0) +
       CANVAS_PADDING,
@@ -353,5 +441,31 @@ export const buildClassGraph = (
   const fitScale = settle(
     Math.min(Math.max(FIT_VIEW_WIDTH / Math.max(width, 1), 0.35), 1),
   );
-  return { nodes, edges, clusters: extents, width, height, fitScale };
+  return { width, height, fitScale };
+};
+
+/**
+ * Builds the settled multi-ontology graph: clusters laid out at the
+ * origin, packed into wrapping rows, then normalised to a padded
+ * top-left origin. Node ids are PREFIXED term URIs throughout.
+ */
+export const buildClassGraph = (
+  ontologies: readonly ClassGraphOntology[],
+): ClassGraph => {
+  const clusters = ontologies
+    .filter((ontology) => ontology.classes.length > 0)
+    .map((ontology) => measureCluster(ontology, layOutCluster(ontology)));
+  const packed = packClusters(clusters);
+  const nodes = buildNodes(packed);
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+  const edges = [
+    ...buildStructuralEdges(ontologies, nodeById),
+    ...buildSemanticEdges(ontologies, nodeById),
+  ];
+  return {
+    nodes,
+    edges,
+    clusters: buildClusterExtents(packed),
+    ...measureCanvas(nodes),
+  };
 };
