@@ -1,4 +1,8 @@
-import { createEnvironment } from "@canonical/prism-core";
+import { createEnvironment, useHome } from "@canonical/prism-core";
+import {
+  defaultProjectionMaps,
+  useProjectionMaps,
+} from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import {
   createMemoryAdapter,
@@ -20,11 +24,15 @@ const environment = createEnvironment({
 /** Route content that reads every context the nest provides. */
 function Probe(): ReactElement {
   const provided = useRelayEnvironment();
+  const home = useHome({ __typename: "OntologyClass", uri: "ds:Component" });
+  const maps = useProjectionMaps();
   return (
     <section>
       <Head title="Probe" />
       <h1>Probe content</h1>
       <p>{provided === environment ? "Environment provided" : "Other"}</p>
+      <p>Home: {home ?? "none"}</p>
+      <p>{maps === defaultProjectionMaps ? "Default maps" : "Other maps"}</p>
     </section>
   );
 }
@@ -36,6 +44,10 @@ const renderShell = () =>
       router={createRouter(
         {
           probe: route({ url: "/", content: Probe }),
+          definitionsTerm: route({
+            url: "/definitions/:term",
+            content: () => null,
+          }),
           other: route({ url: "/other", content: () => <p>Other page</p> }),
         },
         { adapter: createMemoryAdapter("/") },
@@ -55,6 +67,14 @@ describe("Shell", () => {
   it("provides the Relay environment it is given", async () => {
     renderShell();
     expect(await screen.findByText("Environment provided")).toBeInTheDocument();
+  });
+
+  it("provides the site's homes and the default projection maps", async () => {
+    renderShell();
+    expect(
+      await screen.findByText("Home: /definitions/ds%3AComponent"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Default maps")).toBeInTheDocument();
   });
 
   it("composes the page's title with the document title template", async () => {
