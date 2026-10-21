@@ -1,6 +1,6 @@
 /**
  * The browser-session Relay environment, published for route prefetch hooks
- * (the P-5 hover/initial-load warm-up seam — see `warmRouteQuery`).
+ * (the P-5 hover/initial-load warm-up seam — see `prefetchQuery`).
  *
  * A module-scope holder rather than React context on purpose: route
  * `prefetch` callbacks run inside the router core, outside any React tree,

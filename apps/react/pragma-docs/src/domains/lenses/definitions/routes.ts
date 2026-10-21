@@ -1,10 +1,11 @@
 import { route } from "@canonical/router-core";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
-import { ROUTE_QUERY_META_KEY, warmRouteQuery } from "#relay";
+import { ROUTE_QUERY_META_KEY } from "#relay";
 import { DefinitionsPage } from "./DefinitionsPage/index.js";
 import { definitionsRouteEntry } from "./definitionsQuery.js";
 import { definitionsStripSlots } from "./stripSlots.js";
+import warmDefinitions from "./warmDefinitions.js";
 
 /**
  * The Definitions lens routes (P-5): the explorer (`/definitions`, the
@@ -16,8 +17,8 @@ import { definitionsStripSlots } from "./stripSlots.js";
  * - `meta[ROUTE_QUERY_META_KEY]` — the server prepare step POSTs the query
  *   to the graph server and serialises the reply into the store
  *   (`prepareRelayData`);
- * - `prefetch` — hover (router-react's `Link`) and the initial hydration
- *   load warm the client store through `warmRouteQuery`.
+ * - `warm` — hover (router-react's `Link`) and the initial hydration
+ *   load warm the client store through `warmDefinitions`.
  *
  * Both routes claim ALL THREE mode-strip sockets (R5 — a toolbar and the
  * top bar should be useful): the context name, the filter chips, and the
@@ -35,9 +36,7 @@ const routes = {
   definitions: route({
     url: "/definitions",
     content: DefinitionsPage,
-    warm: (params, search) => {
-      warmRouteQuery(definitionsRouteEntry, params, search);
-    },
+    warm: warmDefinitions,
     meta: {
       [ROUTE_QUERY_META_KEY]: definitionsRouteEntry,
       ...shellStripFacet.of({ ...definitionsStripSlots }),
@@ -47,9 +46,7 @@ const routes = {
   definitionsTerm: route({
     url: "/definitions/:term",
     content: DefinitionsPage,
-    warm: (params, search) => {
-      warmRouteQuery(definitionsRouteEntry, params, search);
-    },
+    warm: warmDefinitions,
     meta: {
       [ROUTE_QUERY_META_KEY]: definitionsRouteEntry,
       ...shellStripFacet.of({ ...definitionsStripSlots }),

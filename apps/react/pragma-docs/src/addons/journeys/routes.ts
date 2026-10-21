@@ -1,10 +1,11 @@
 import { route } from "@canonical/router-core";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
-import { ROUTE_QUERY_META_KEY, warmRouteQuery } from "#relay";
+import { ROUTE_QUERY_META_KEY } from "#relay";
 import { JourneysPage } from "./JourneysPage/index.js";
 import { journeysRouteEntry } from "./journeysQuery.js";
 import { journeysStripSlots } from "./stripSlots.js";
+import warmJourneys from "./warmJourneys.js";
 
 /**
  * The Journeys lens routes (AV-351): the diagram (`/journeys`, the lens
@@ -16,8 +17,8 @@ import { journeysStripSlots } from "./stripSlots.js";
  * - `meta[ROUTE_QUERY_META_KEY]` — the server prepare step POSTs the query
  *   to the graph server and serialises the reply into the store
  *   (`prepareRelayData`);
- * - `prefetch` — hover (router-react's `Link`) and the initial hydration
- *   load warm the client store through `warmRouteQuery`.
+ * - `warm` — hover (router-react's `Link`) and the initial hydration
+ *   load warm the client store through `warmJourneys`.
  *
  * THE JOB IS THE ADDRESSABLE THING (P-D7). A journey is a job's path
  * through the surfaces that serve it, so the job is what a reader links
@@ -45,9 +46,7 @@ const routes = {
   journeys: route({
     url: "/journeys",
     content: JourneysPage,
-    warm: (params, search) => {
-      warmRouteQuery(journeysRouteEntry, params, search);
-    },
+    warm: warmJourneys,
     meta: {
       [ROUTE_QUERY_META_KEY]: journeysRouteEntry,
       ...shellStripFacet.of({ ...journeysStripSlots }),
@@ -57,9 +56,7 @@ const routes = {
   journeysJob: route({
     url: "/journeys/:job",
     content: JourneysPage,
-    warm: (params, search) => {
-      warmRouteQuery(journeysRouteEntry, params, search);
-    },
+    warm: warmJourneys,
     meta: {
       [ROUTE_QUERY_META_KEY]: journeysRouteEntry,
       ...shellStripFacet.of({ ...journeysStripSlots }),

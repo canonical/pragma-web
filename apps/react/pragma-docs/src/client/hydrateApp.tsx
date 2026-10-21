@@ -51,7 +51,7 @@ export const hydrateApp = (
 
   // Publish the environment for route prefetch hooks BEFORE the router
   // exists: creating the browser router fires an initial `performLoad`,
-  // whose prefetch hooks must already see the seeded store (warmRouteQuery's
+  // whose prefetch hooks must already see the seeded store (prefetchQuery's
   // `check` guard is what keeps that initial pass network-silent).
   setPrefetchEnvironment(relayEnvironment);
 

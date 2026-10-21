@@ -5,11 +5,13 @@ import {
   componentProbeQueryNode,
   componentProbeVariables,
 } from "./probeQuery.js";
+import warmPlayground from "./warmPlayground.js";
 
 const routes = {
   playground: route({
     url: "/playground",
     content: PlaygroundPage,
+    warm: warmPlayground,
     // The server bricks POST this entry to the graph server before rendering
     // and serialise the resulting store into `__INITIAL_DATA__.relay.records`
     // (see src/server/prepareRelayData.ts). The route has no params and no

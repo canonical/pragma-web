@@ -1,15 +1,14 @@
 /**
  * The definitions query contract: the one variables builder that the
- * server prepare step, the prefetch seam, and the explorer's hook all
- * share — `/definitions` (no term) and `/definitions/:term` are the SAME
- * operation, switched by `$hasTerm`, so the builder's exact output is the
- * fulfilment key for every SSR-warmed render.
+ * route's `warmDefinitions` and the explorer's hook share — `/definitions`
+ * (no term) and `/definitions/:term` are the SAME operation, switched by
+ * `$hasTerm`, so the builder's exact output is the fulfilment key for
+ * every SSR-warmed render.
  */
 
 import { describe, expect, it } from "vitest";
 import {
   definitionsExplorerVariables,
-  definitionsRouteEntry,
   readTermParam,
 } from "./definitionsQuery.js";
 
@@ -41,22 +40,5 @@ describe("definitionsExplorerVariables", () => {
       uri: "",
       hasTerm: false,
     });
-  });
-});
-
-describe("definitionsRouteEntry", () => {
-  it("carries the compiled operation text", () => {
-    expect(definitionsRouteEntry.query.params.text).toContain(
-      "query DefinitionsExplorerQuery",
-    );
-  });
-
-  it("derives variables from route params through the one builder", () => {
-    expect(definitionsRouteEntry.variables({ term: "ds:UIBlock" }, {})).toEqual(
-      definitionsExplorerVariables("ds:UIBlock"),
-    );
-    expect(definitionsRouteEntry.variables({}, {})).toEqual(
-      definitionsExplorerVariables(undefined),
-    );
   });
 });

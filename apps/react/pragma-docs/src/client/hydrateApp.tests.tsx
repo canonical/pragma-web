@@ -52,10 +52,10 @@ const createFetchSpy = () =>
     FetchFunction;
 
 /**
- * The seeded pages the seam must hydrate silently. The P-5 lens routes
- * carry `prefetch` hooks that FIRE during these tests (the browser
+ * The seeded pages the seam must hydrate silently. The data-bearing
+ * routes carry `warm` hooks that FIRE during these tests (the browser
  * router's initial `performLoad`), so the zero-fetch assertion also proves
- * `warmRouteQuery`'s check guard: without it, the initial pass would
+ * `prefetchQuery`'s store check: without it, the initial pass would
  * refetch the very page the server just seeded.
  */
 const SEEDED_PAGES = [
@@ -284,9 +284,9 @@ describe("hydrateApp over the seeded SSR output", () => {
       expect(container.querySelector(liveSelector)?.textContent).toBe(liveText);
       // …and the network was NEVER consulted: hydration read the records
       // the seam seeded from `__INITIAL_DATA__`, and the route prefetch the
-      // initial load fires found the store already warm (`warmRouteQuery`'s
-      // check guard). Discarding the records in `hydrateApp`
-      // (`records: undefined`) or the guard in `warmRouteQuery` turns
+      // initial load fires found the store already warm (`prefetchQuery`'s
+      // store check). Discarding the records in `hydrateApp`
+      // (`records: undefined`) or the check in `prefetchQuery` turns
       // exactly this assertion red.
       expect(globalFetch).not.toHaveBeenCalled();
     },
