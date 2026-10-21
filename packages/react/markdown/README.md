@@ -76,6 +76,40 @@ function RouterLink({ node, ...props }: ComponentProps<"a"> & { node?: unknown }
 
 Declare the map at module scope, so it is the same object on every render.
 
+## Headings
+
+Every heading gets an `id` slugged from its text and prefixed with
+`user-content-`: `# Hello world` renders `<h1 id="user-content-hello-world">`,
+and a second heading with the same text gets `user-content-hello-world-1`.
+
+The prefix keeps the document's ids apart from the page's own, and from
+global names a page's scripts rely on. It is the prefix the sanitiser gives
+any author-written id, so a heading's id is the same with or without
+sanitising.
+
+`extractHeadings` lists a document's headings with those ids, for a table of
+contents:
+
+```tsx
+import { extractHeadings } from "@canonical/react-markdown";
+
+function TableOfContents({ source }: { source: string }) {
+  return (
+    <ul>
+      {extractHeadings(source).map(({ id, depth, text }) => (
+        <li key={id} data-depth={depth}>
+          <a href={`#${id}`}>{text}</a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Each entry has the heading's `depth` (1 to 6), its `id`, and its `text` with
+inline markup flattened. The "Footnotes" heading GitHub-flavoured Markdown
+generates is not listed.
+
 ## Sanitising
 
 `sanitize` defaults to `true`: the rendered HTML is filtered against a
@@ -120,6 +154,8 @@ with `Markdown` on what a document means.
 
 - `Markdown` — render a Markdown `source` through a components map.
 - `defaultComponents` — the design-system elements `Markdown` uses by default.
+- `extractHeadings` — list a document's headings with their rendered ids.
 - `remarkPreset`, `rehypePreset` — the unified plugins every renderer runs.
 - `MarkdownProps` — the props of `Markdown`.
 - `MarkdownComponents` — the shape of a components map.
+- `Heading`, `HeadingDepth` — an entry of `extractHeadings`, and its level.
