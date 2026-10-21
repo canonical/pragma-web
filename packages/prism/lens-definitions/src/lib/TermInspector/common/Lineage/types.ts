@@ -1,7 +1,7 @@
+import type { ComponentProps } from "react";
 import type { OntologyNamespace } from "../../../types.js";
 
-/** Props accepted by `Lineage`. */
-export interface LineageProps {
+type OwnProps = {
   /** The class's own name, the chain's plain-text leaf. */
   readonly self: string;
   /** The class's ancestors, nearest first. */
@@ -11,4 +11,10 @@ export interface LineageProps {
   }[];
   /** The ontologies' (prefix, namespace) pairs, for compacting IRIs. */
   readonly namespaces: readonly OntologyNamespace[];
-}
+};
+
+/**
+ * Props accepted by `Lineage`: the class and its ancestors, and the native
+ * props of its root `<p>`.
+ */
+export type LineageProps = OwnProps & Omit<ComponentProps<"p">, keyof OwnProps>;

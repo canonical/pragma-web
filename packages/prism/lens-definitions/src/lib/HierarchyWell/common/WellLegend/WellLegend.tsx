@@ -1,6 +1,7 @@
 import type React from "react";
 import { ABSTRACTION_VALUES } from "../../../constants.js";
 import { useMessages } from "../../../i18n/index.js";
+import type { WellLegendProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds well-legend";
@@ -20,10 +21,17 @@ const componentCssClassName = "ds well-legend";
  *
  * `import { WellLegend } from "./common/WellLegend/index.js";`
  */
-export default function WellLegend(): React.ReactElement {
+export default function WellLegend({
+  className,
+  ...props
+}: WellLegendProps): React.ReactElement {
   const t = useMessages();
   return (
-    <dl aria-label={t("legend.label")} className={componentCssClassName}>
+    <dl
+      {...props}
+      aria-label={t("legend.label")}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       {ABSTRACTION_VALUES.map((value) => (
         <div className="row" key={value}>
           <dt className="symbol">

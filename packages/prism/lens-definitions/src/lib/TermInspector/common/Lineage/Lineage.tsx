@@ -22,12 +22,17 @@ const SUBCLASS_OF = "⊂";
  * `import { Lineage } from "../Lineage/index.js";`
  */
 export default function Lineage({
+  className,
   self,
   ancestors,
   namespaces,
+  ...props
 }: LineageProps): React.ReactElement {
   return (
-    <p className={componentCssClassName}>
+    <p
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <span className="self">{self}</span>
       {ancestors.map((ancestor) => (
         <span key={ancestor.uri}>

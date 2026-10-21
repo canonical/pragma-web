@@ -15,10 +15,11 @@ export default function PropertyView({
   data,
   term,
   namespaces,
+  ...props
 }: PropertyViewProps): React.ReactElement {
   const t = useMessages();
   return (
-    <article aria-labelledby="term-inspector-title">
+    <article {...props} aria-labelledby="term-inspector-title">
       <header>
         <h2 className="heading" id="term-inspector-title">
           {data.label ?? term}

@@ -16,10 +16,11 @@ export default function ClassView({
   data,
   term,
   namespaces,
+  ...props
 }: ClassViewProps): React.ReactElement {
   const t = useMessages();
   return (
-    <article aria-labelledby="term-inspector-title">
+    <article {...props} aria-labelledby="term-inspector-title">
       <header>
         <h2 className="heading" id="term-inspector-title">
           {data.label ?? term}

@@ -13,9 +13,10 @@ import type { InstanceItemProps } from "./types.js";
  */
 export default function InstanceItem({
   node,
+  ...props
 }: InstanceItemProps): React.ReactElement {
   return (
-    <li>
+    <li {...props}>
       <EntityChip node={node} />{" "}
       <code className="identifier">{node._meta.curie}</code>
     </li>

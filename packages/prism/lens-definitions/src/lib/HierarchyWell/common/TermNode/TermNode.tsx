@@ -25,19 +25,27 @@ const componentCssClassName = "ds term-node";
  *
  * `import { TermNode } from "./common/TermNode/index.js";`
  */
-export default function TermNode({ node }: TermNodeProps): React.ReactElement {
+export default function TermNode({
+  className,
+  node,
+  style,
+  ...props
+}: TermNodeProps): React.ReactElement {
   const t = useMessages();
   return (
     <div
+      {...props}
       className={[
         componentCssClassName,
         node.data.isAbstract ? "abstract" : "",
         node.className,
+        className,
       ]
         .filter(Boolean)
         .join(" ")}
       data-id={node.id}
       style={{
+        ...style,
         insetInlineStart: node.x - node.width / 2,
         insetBlockStart: node.y - node.height / 2,
         inlineSize: node.width,
