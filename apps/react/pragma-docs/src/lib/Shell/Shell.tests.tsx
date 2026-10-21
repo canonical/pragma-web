@@ -1,6 +1,7 @@
 import { createEnvironment, useHome } from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
+  EntityChip,
   useProjectionMaps,
 } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
@@ -9,11 +10,26 @@ import {
   createRouter,
   route,
 } from "@canonical/router-core";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { useRelayEnvironment } from "react-relay";
+import { graphql, useLazyLoadQuery, useRelayEnvironment } from "react-relay";
+import { createOperationDescriptor, getRequest } from "relay-runtime";
 import { describe, expect, it } from "vitest";
+import type { ShellTestsQuery } from "#relay/__generated__/ShellTestsQuery.graphql.js";
+import shellTestsQueryNode from "#relay/__generated__/ShellTestsQuery.graphql.js";
 import Shell from "./Shell.js";
+
+/* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
+/** One node, read as the chip a lens mentions it with. */
+const shellTestsQuerySource = (): unknown => graphql`
+  query ShellTestsQuery($id: ID!) {
+    node(id: $id) {
+      ...EntityChip_node
+    }
+  }
+`;
+void shellTestsQuerySource;
+/* v8 ignore stop */
 
 // The nest only provides the environment; nothing here queries, so a fetch
 // that never settles stands in for the network.
@@ -81,5 +97,64 @@ describe("Shell", () => {
     renderShell();
     await screen.findByRole("heading", { name: "Probe content" });
     expect(document.title).toBe("Probe — Pragma docs");
+  });
+
+  it("links a mentioned node's home through the router", async () => {
+    const chipEnvironment = createEnvironment({
+      fetchFn: () => new Promise<never>(() => {}),
+    });
+    const variables = { id: "https://ds.canonical.com/Component" };
+    chipEnvironment.commitPayload(
+      createOperationDescriptor(getRequest(shellTestsQueryNode), variables),
+      {
+        node: {
+          __typename: "OntologyClass",
+          uri: variables.id,
+          _meta: {
+            title: "Component",
+            curie: "ds:Component",
+            type: { uri: "http://www.w3.org/2002/07/owl#Class" },
+          },
+        },
+      },
+    );
+    const Mention = (): ReactElement => {
+      const data = useLazyLoadQuery<ShellTestsQuery>(
+        shellTestsQueryNode,
+        variables,
+        { fetchPolicy: "store-only" },
+      );
+      if (data.node == null) {
+        throw new Error("the store lost the mentioned node");
+      }
+      return (
+        <p>
+          Built on <EntityChip node={data.node} />.
+        </p>
+      );
+    };
+    render(
+      <Shell
+        environment={chipEnvironment}
+        router={createRouter(
+          {
+            mention: route({ url: "/", content: Mention }),
+            definitionsTerm: route({
+              url: "/definitions/:term",
+              content: ({ params }: { readonly params: { term: string } }) => (
+                <p>Term {params.term}</p>
+              ),
+            }),
+          },
+          { adapter: createMemoryAdapter("/") },
+        )}
+      />,
+    );
+    const link = await screen.findByRole("link", { name: "Component" });
+    expect(link.getAttribute("href")).toBe("/definitions/ds%3AComponent");
+    // The router took the click: the browser's own navigation was prevented
+    // and the term's page rendered in place.
+    expect(fireEvent.click(link)).toBe(false);
+    expect(await screen.findByText("Term ds:Component")).toBeInTheDocument();
   });
 });
