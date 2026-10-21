@@ -29,8 +29,8 @@ export interface KindEncoding extends EncodingRow<Kind> {
 /**
  * Box channel row: `color-mix` percentages of the tint applied to the fill
  * and to the (always-present, so metrics never shift) 1px stroke. The
- * instance fill weight routes through a theme hook: dark mode lowers it
- * (see `styles.css`) so the tint-on-fill text contrast stays ≥ 4.5:1 AA.
+ * instance fill weight routes through a theme hook: a dark theme lowers it
+ * so the tint-on-fill text contrast stays ≥ 4.5:1 AA.
  */
 export interface BoxEncoding extends EncodingRow<Box> {
   readonly fillWeight: string;

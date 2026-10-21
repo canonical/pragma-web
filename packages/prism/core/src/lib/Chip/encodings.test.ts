@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   BOXES,
@@ -208,9 +206,10 @@ describe("buildChipChannelStyle", () => {
  * the fill weight, alpha-composited over the page background — so the pair
  * can silently converge when either value moves. Every namespace shares one
  * lightness and one chroma and differs only in hue, so the property to hold
- * is that EVERY hue clears AA: this suite sweeps the hue wheel at both
- * themes' lightness and chroma, light values from the tint's fallbacks,
- * dark values parsed from the dark hooks in `styles.css`.
+ * is that EVERY hue clears AA: this suite sweeps the hue wheel at the
+ * lightness, chroma and fill weight the hooks fall back to, the light values
+ * this package ships. A site's dark theme defines its own hook values and
+ * holds them to the same floor.
  *
  * oklch → sRGB uses Björn Ottosson's published OKLab ↔ linear-sRGB
  * matrices; alpha compositing happens in gamma-encoded sRGB, where the
@@ -218,21 +217,6 @@ describe("buildChipChannelStyle", () => {
  */
 
 type Srgb = readonly [number, number, number];
-
-/**
- * The stylesheet's source, for parsing the dark theme hooks — the real
- * shipped values, not a copy. Read beside this test file (vitest's
- * `testPath`, so the read is independent of the runner's cwd; a plain
- * `import.meta.url` is not a file URL under the jsdom environment, and
- * vitest stubs CSS imports even with `?raw`).
- */
-function readStylesCss(): string {
-  const testPath = expect.getState().testPath;
-  if (typeof testPath !== "string") {
-    throw new Error("vitest did not expose the current test path");
-  }
-  return readFileSync(join(dirname(testPath), "styles.css"), "utf-8");
-}
 
 /** Parses the first `oklch(L C H)` in a value (`%` lightness supported). */
 function parseOklch(value: string): readonly [number, number, number] {
@@ -298,22 +282,6 @@ function contrastRatio(first: Srgb, second: Srgb): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/**
- * The value a dark theme hook declares in `styles.css`. The hook appears in
- * both dark blocks (`:root.dark` and the `prefers-color-scheme` fallback);
- * all occurrences must agree or the two dark paths have drifted apart.
- */
-function readDarkHookValue(property: string): string {
-  const values = [
-    ...readStylesCss().matchAll(new RegExp(`${property}:\\s*([^;]+);`, "g")),
-  ].map((match) => (match.at(1) ?? "").trim());
-  expect(values.length, `${property} declared in styles.css`).toBeGreaterThan(
-    0,
-  );
-  expect(new Set(values).size, `${property} agrees across dark blocks`).toBe(1);
-  return values.at(0) ?? "";
-}
-
 /** First percentage in a CSS value, as an alpha (`var(--x, 15%)` → 0.15). */
 function parsePercentAsAlpha(value: string): number {
   const match = value.match(/([\d.]+)%/);
@@ -321,15 +289,6 @@ function parsePercentAsAlpha(value: string): number {
     throw new Error(`No percentage in "${value}"`);
   }
   return Number(match.at(1)) / 100;
-}
-
-/** The first number in a CSS value (`var(--x, 0.45)` → 0.45). */
-function parseNumber(value: string): number {
-  const match = value.match(/(\d*\.?\d+)(?!.*\d)/);
-  if (match === null) {
-    throw new Error(`No number in "${value}"`);
-  }
-  return Number(match.at(1));
 }
 
 /** The fallback a `var(--name, fallback)` hook carries inside `value`. */
@@ -342,40 +301,23 @@ function readHookFallback(value: string, property: string): number {
 }
 
 describe("instance chip contrast (WCAG AA)", () => {
-  it("keeps text-vs-composited-fill at ≥ 4.5:1 for every hue × theme", () => {
-    const lightTint = resolveNamespaceTint("ds", ["ds"]);
-    const themes = {
-      light: {
-        // `--color-background` light: `--color-palette-white`.
-        background: parseOklch("oklch(100% 0 0)"),
-        fillAlpha: parsePercentAsAlpha(getBoxEncoding("instance").fillWeight),
-        lightness: readHookFallback(lightTint, "--chip-tint-l"),
-        chroma: readHookFallback(lightTint, "--chip-tint-c"),
-      },
-      dark: {
-        // `--color-background` dark: `--color-palette-gray-930`.
-        background: parseOklch("oklch(23.08% 0 0)"),
-        fillAlpha: parsePercentAsAlpha(
-          readDarkHookValue("--chip-fill-weight-instance"),
-        ),
-        lightness: parseNumber(readDarkHookValue("--chip-tint-l")),
-        chroma: parseNumber(readDarkHookValue("--chip-tint-c")),
-      },
-    } as const;
+  it("keeps text-vs-composited-fill at ≥ 4.5:1 for every hue at the fallbacks", () => {
+    const tint = resolveNamespaceTint("ds", ["ds"]);
+    // `--color-background` light: `--color-palette-white`.
+    const background = oklchToSrgb(parseOklch("oklch(100% 0 0)"));
+    const fillAlpha = parsePercentAsAlpha(
+      getBoxEncoding("instance").fillWeight,
+    );
+    const lightness = readHookFallback(tint, "--chip-tint-l");
+    const chroma = readHookFallback(tint, "--chip-tint-c");
 
-    for (const [themeName, theme] of Object.entries(themes)) {
-      for (let hue = 0; hue < 360; hue += 15) {
-        const text = oklchToSrgb([theme.lightness, theme.chroma, hue]);
-        const fill = compositeOver(
-          text,
-          theme.fillAlpha,
-          oklchToSrgb(theme.background),
-        );
-        expect(
-          contrastRatio(text, fill),
-          `hue ${hue} on its instance fill (${themeName})`,
-        ).toBeGreaterThanOrEqual(4.5);
-      }
+    for (let hue = 0; hue < 360; hue += 15) {
+      const text = oklchToSrgb([lightness, chroma, hue]);
+      const fill = compositeOver(text, fillAlpha, background);
+      expect(
+        contrastRatio(text, fill),
+        `hue ${hue} on its instance fill`,
+      ).toBeGreaterThanOrEqual(4.5);
     }
   });
 });

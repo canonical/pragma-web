@@ -91,6 +91,15 @@ does not define them: `--strip-h` (the strip's height), `--z-plate`,
 `--z-chrome` and `--z-overlay` (the z-axis strata) and `--rail-span` (the
 rail's column span over the layout's `--grid-intrinsic` columns).
 
+The stylesheets name no theme. Their fallbacks are light values; a site's
+dark theme (whatever class or query activates it) defines the Chip's hooks:
+`--chip-tint-l` and `--chip-tint-c` (every namespace tint's lightness and
+chroma), `--chip-fill-weight-instance` (an instance's fill, 15% by
+default), and `--chip-dot-canonical`, `--chip-dot-beta` and
+`--chip-dot-deprecated` (the lifecycle dots). The site keeps an instance's
+text-on-fill contrast at 4.5:1 or above for every hue at its values; the
+light fallbacks are held to that floor here.
+
 ## Chip
 
 ```tsx
@@ -109,9 +118,8 @@ place in the list picks its hue (golden-angle steps), so the same list
 always tints the same way and appending a prefix keeps every earlier tint.
 A chip's namespace is its URI's prefix unless `namespace` overrides it; one
 outside the list gets a neutral tint. Lightness and chroma are shared by
-every hue behind `--chip-tint-l` and `--chip-tint-c`, which the dark theme
-redefines, so text-on-fill contrast holds at AA for every hue in both
-themes.
+every hue behind `--chip-tint-l` and `--chip-tint-c`, so text-on-fill
+contrast holds at AA for every hue at once.
 
 The chip knows no routes: pass `href` (the noun's canonical home, which the
 site resolves) to render a link, or leave it out to render inert text.
@@ -224,6 +232,7 @@ binding can derive names from it. Check the bindings in two places:
 - Pass `prepareRelayData` the site's `routes`, `middleware` and `notFound`,
   and stamp per-request attributes through `headers`, never module state.
 - Source `Chip`'s `prefixes` from the provider's `ontologies { prefix }`.
+- Define the Chip's hooks in a dark theme (see Stylesheets).
 - Run `assertBindings` in a `check` script and `assertBindingsLive` at boot.
 
 ## Public API

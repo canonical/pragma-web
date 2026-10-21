@@ -11,8 +11,10 @@
  *   --chip-dot            status dot    → lifecycle
  *
  * The inline values are `var(--chip-…-<value>, fallback)` references, so a
- * theme restyles a channel by defining the hook (see the dark blocks below)
- * without touching any component logic.
+ * theme restyles a channel by defining the hook without touching any
+ * component logic. The fallbacks are the light values; this stylesheet names
+ * no theme, so a site's dark theme defines the dark values (the hooks are
+ * listed in the README).
  */
 
 @layer ds.prism {
@@ -82,37 +84,6 @@
     outline: 2px solid
       var(--chip-focus, var(--color-background-contrasted, currentColor));
     outline-offset: 2px;
-  }
-
-  /* Theme hooks: dark values for the tint and dot palettes. Every tint is
-   * `oklch(var(--chip-tint-l, …) var(--chip-tint-c, …) <hue>)`, the hue
-   * fixed by the namespace's place in the site's prefixes, so the two hooks
-   * here move every namespace's tint at once — themes restyle without
-   * touching logic.
-   *
-   * `--chip-fill-weight-instance` drops from 15% to 8% in dark: the lighter
-   * dark-mode tints pull a 15% fill close enough to the text that tint-on-fill
-   * contrast falls below the 4.5:1 AA floor; 8% keeps every hue above it
-   * (regression-tested in `encodings.test.ts`). */
-  :root.dark {
-    --chip-tint-l: 0.78;
-    --chip-tint-c: 0.11;
-    --chip-dot-canonical: oklch(0.7 0.14 150);
-    --chip-dot-beta: oklch(0.78 0.14 85);
-    --chip-dot-deprecated: oklch(0.68 0.17 25);
-    --chip-fill-weight-instance: 8%;
-  }
-
-  /* System-dark fallback for pages rendered before the theme class applies. */
-  @media (prefers-color-scheme: dark) {
-    :root:not(.light) {
-      --chip-tint-l: 0.78;
-      --chip-tint-c: 0.11;
-      --chip-dot-canonical: oklch(0.7 0.14 150);
-      --chip-dot-beta: oklch(0.78 0.14 85);
-      --chip-dot-deprecated: oklch(0.68 0.17 25);
-      --chip-fill-weight-instance: 8%;
-    }
   }
 
   /* Forced colors (Windows High Contrast): the UA flattens `background` and

@@ -15,8 +15,8 @@
  * hard-coded here. Both the renderer (`Chip`) and the legend (`ChipLegend`)
  * go through these functions, so the legend cannot drift from behaviour.
  * Every payload sits behind a `var(--chip-…, fallback)` hook: a theme
- * restyles a channel by defining the hook (see the dark blocks in
- * `styles.css`) without touching any logic here.
+ * restyles a channel by defining the hook without touching any logic here;
+ * the fallbacks are the light values.
  *
  * Accepted WCAG 1.4.1 posture: the tint (and every other channel here) is
  * enrichment, not information — a chip's label and its `href` already carry
