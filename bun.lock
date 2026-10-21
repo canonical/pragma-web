@@ -382,6 +382,41 @@
         "graphql": "^16.11.0 || ^17.0.0-rc.0",
       },
     },
+    "packages/prism/core": {
+      "name": "@canonical/prism-core",
+      "version": "0.44.1",
+      "dependencies": {
+        "@canonical/react-ds-global": "^0.44.1",
+        "@canonical/react-hooks": "^0.44.1",
+        "@canonical/router-core": "^0.44.1",
+        "@canonical/router-react": "^0.44.1",
+        "graphql": "^16.11.0",
+        "react": "^19.2.4",
+        "relay-runtime": "^21.0.1",
+        "relay-runtime-network": "^0.1.0",
+      },
+      "devDependencies": {
+        "@biomejs/biome": "2.5.15",
+        "@canonical/biome-config": "0.43.0",
+        "@canonical/typescript-config-react": "^0.44.1",
+        "@canonical/vitest-config-react": "^0.44.1",
+        "@canonical/webarchitect": "0.43.0",
+        "@testing-library/jest-dom": "^7.0.0",
+        "@testing-library/react": "^16.3.2",
+        "@types/node": "^26.0.0",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "@types/relay-runtime": "^20.1.1",
+        "@vitejs/plugin-react": "^6.0.0",
+        "@vitest/coverage-v8": "^5.0.0",
+        "copyfiles": "^2.4.1",
+        "jsdom": "^28.1.0",
+        "react-dom": "^19.2.4",
+        "typescript": "^7.0.2",
+        "vite": "^8.0.1",
+        "vitest": "^5.0.0",
+      },
+    },
     "packages/prism/graph-example": {
       "name": "@canonical/prism-graph-example",
       "version": "0.44.1",
@@ -1583,6 +1618,8 @@
     "@canonical/pragma-docs": ["@canonical/pragma-docs@workspace:apps/react/pragma-docs"],
 
     "@canonical/prism-contract": ["@canonical/prism-contract@workspace:packages/prism/contract"],
+
+    "@canonical/prism-core": ["@canonical/prism-core@workspace:packages/prism/core"],
 
     "@canonical/prism-graph-example": ["@canonical/prism-graph-example@workspace:packages/prism/graph-example"],
 
