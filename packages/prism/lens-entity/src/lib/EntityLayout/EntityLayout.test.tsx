@@ -10,7 +10,7 @@ import {
   STATION_COUNT,
   STATIONS_BINDING,
 } from "../../../testing/fixtures.js";
-import { MESSAGES } from "../i18n/constants.js";
+import { MESSAGES } from "../i18n/index.js";
 
 /** The layout the stations lens's site wrapper mounts. */
 const STATIONS_LAYOUT = {

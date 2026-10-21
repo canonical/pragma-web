@@ -14,7 +14,7 @@ import {
   NORTHGATE_IRI,
   UNKNOWN_ADDRESS,
 } from "../../../testing/fixtures.js";
-import { MESSAGES } from "../i18n/constants.js";
+import { MESSAGES } from "../i18n/index.js";
 import EntityPage from "./EntityPage.js";
 
 /** A station whose class's graph carries a comment and no definition. */

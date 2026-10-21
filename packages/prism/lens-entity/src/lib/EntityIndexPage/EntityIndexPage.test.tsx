@@ -13,9 +13,9 @@ import createWarmEnvironment from "../../../testing/createWarmEnvironment.js";
 import {
   ENTITY_TEST_TIMEOUT_MS,
   STATION_COUNT,
+  STATIONS_BINDING,
 } from "../../../testing/fixtures.js";
-import EntityFilterContext from "../EntityFilterProvider/Context.js";
-import { MESSAGES } from "../i18n/constants.js";
+import { MESSAGES } from "../i18n/index.js";
 import EntityIndexPage from "./EntityIndexPage.js";
 
 describe("EntityIndexPage", () => {
@@ -50,25 +50,18 @@ describe("EntityIndexPage", () => {
       createEntitySite({
         url: "/stations",
         environment,
+        layout: { binding: STATIONS_BINDING, label: "Stations" },
         children: (
-          <EntityFilterContext
-            value={{ filter: { text: "", view: "cards" }, setFilter: () => {} }}
-          >
-            <EntityIndexPage
-              binding={{
-                id: "stations",
-                classUri: "metro:Station",
-                typename: "Station",
-              }}
-              label="Stations"
-            />
-          </EntityFilterContext>
+          <EntityIndexPage binding={STATIONS_BINDING} label="Stations" />
         ),
       }),
     );
+    fireEvent.click(
+      screen.getByRole("button", { name: MESSAGES["controls.view.cards"] }),
+    );
 
     expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
-    expect(screen.queryByRole("list")).toBeNull();
+    expect(within(screen.getByRole("main")).queryByRole("list")).toBeNull();
     expect(document.querySelector(".ds.entity-index")).toHaveAttribute(
       "data-view",
       "cards",
