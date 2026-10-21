@@ -42,7 +42,7 @@ export const LOBBY_TEST_TIMEOUT_MS = 15_000;
 /**
  * The lobby over an environment seeded with `records` (`undefined` = cold
  * store). The page owns its Suspense/ErrorBoundary; the router exists for
- * `Link` context only (no Outlet — the Shell stays out of component
+ * `Link` context only (no Outlet — the lens layout stays out of component
  * tests).
  */
 export const lobbyPage = (

@@ -1,7 +1,7 @@
 /**
  * The v1 lens routes that have no views yet — honest minimal stubs
  * (P-4.1). Each states what lands on its canvas and which P-item builds
- * it; the shell frame around them is the finished product. Home keeps its
+ * it; the lens layout around them is the finished product. Home keeps its
  * existing page (`#domains/marketing`); `/guides/:slug` (the reading
  * detail) already exists there too and stays. Components graduated to its
  * real views (`#domains/components`, P-5) and left this file; Definitions
@@ -9,9 +9,9 @@
  * Standards graduated to the reading views (`./standards`, P-5) and left
  * as well.
  *
- * None of these declare `SHELL_STRIP_META_KEY` strip slots: a stub has no
- * controls or status to claim, so every strip socket renders its sensible
- * empty — which is exactly what `frameStability.tests.tsx` measures.
+ * They render inside `GuidesLayout`, whose strip is empty: a stub has no
+ * trail, controls or status to show, so every strip socket renders its
+ * sensible empty.
  *
  * `guides` does declare two things: its keyboard shortcut
  * (`#lib/routeShortcut`) and its lens (`#lib/routeLens`). A stub is still a

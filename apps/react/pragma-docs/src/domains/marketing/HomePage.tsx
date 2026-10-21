@@ -196,7 +196,7 @@ const LobbyBands = (): React.ReactElement => {
  *
  * The h1 stays OUTSIDE the boundaries (the frame suite keys the home
  * canvas off `lobby-title`), and route content never suspends at Outlet
- * level — suspension there would swap the whole Shell for the fallback
+ * level — suspension there would swap the whole layout for the fallback
  * (the PlaygroundPage precedent).
  */
 const HomePage = (): React.ReactElement => {

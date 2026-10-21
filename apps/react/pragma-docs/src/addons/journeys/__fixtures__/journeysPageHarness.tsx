@@ -8,12 +8,12 @@
  *
  * The rail filter still lives inside the explorer's own `useState`. The VIEW
  * switch (RULING 1) does NOT: it moved to the mode strip's `controls` socket,
- * so its ephemeral state lives in `journeyViewContext` — a shell-spanning
+ * so its ephemeral state lives in `journeyViewContext` — a layout-spanning
  * provider, exactly like the Definitions lens's filter context. This harness
- * therefore wraps the page in `JourneyViewProvider` (as `routes.tsx` wraps
- * the Shell), so the view is writable on every real render; `journeysStrip`
+ * therefore wraps the page in `JourneyViewProvider` (as `JourneysLayout`
+ * does), so the view is writable on every real render; `journeysStrip`
  * below additionally mounts the strip's own switch under the SAME provider,
- * the way the Shell mounts it as a sibling of the canvas.
+ * the way the layout renders it as a sibling of the canvas.
  *
  * Lives in `__fixtures__` beside the captured record maps: imported by
  * tests, never collected as one.
@@ -45,7 +45,7 @@ export const JOURNEYS_TEST_TIMEOUT_MS = 20_000;
  * The journeys page at `job` (undefined = the `/journeys` index) over an
  * environment seeded with `records` (`undefined` = cold store). The page
  * owns its Suspense/ErrorBoundary; the router exists for `Link` context and
- * selection only (no Outlet — the Shell stays out of component tests).
+ * selection only (no Outlet — the lens layout stays out of component tests).
  */
 export const journeysPageAt = (
   job: string | undefined,

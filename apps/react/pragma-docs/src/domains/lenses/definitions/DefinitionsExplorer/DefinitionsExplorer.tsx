@@ -67,9 +67,8 @@ const componentCssClassName = "ds definitions-explorer";
  *
  * The lens's EPHEMERAL filter lives in `lensFilterContext` rather than in
  * this component's own state, for one specific reason recorded there in
- * full: the mode strip's chips are mounted BY THE FRAME (Shell reads the
- * route's static `meta`), so they are siblings of the canvas and no prop
- * path reaches them. Context is the smallest mechanism that crosses that
+ * full: the mode strip's chips are rendered by the lens's layout as a
+ * sibling of the canvas, so no prop path reaches them. Context is the smallest mechanism that crosses that
  * boundary. Everything else still flows as props from here.
  *
  * THE SSR DETERMINISM RULE. The context's initial filter is the no-op

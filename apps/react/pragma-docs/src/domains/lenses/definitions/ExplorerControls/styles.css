@@ -7,7 +7,7 @@
  * postures below.
  *
  * At-rules: one prefers-reduced-motion block, census-EXEMPT (it cannot
- * reflow layout — see frameStability.tests.tsx's query-TEXT exemption).
+ * reflow layout — see stylesheets.tests.ts's query-TEXT exemption).
  */
 
 @layer app {

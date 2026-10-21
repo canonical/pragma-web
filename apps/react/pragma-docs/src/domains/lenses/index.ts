@@ -2,5 +2,7 @@
 // sub-domains with their own barrels; they are not re-exported here, because a
 // barrel that flattened them would hide which domain owns a given lens.
 
+export * from "./GuidesLayout/index.js";
 export { default as LensPlaceholder } from "./LensPlaceholder.js";
+export { default as guidesLayout } from "./layout.js";
 export { default as lensRoutes } from "./routes.js";

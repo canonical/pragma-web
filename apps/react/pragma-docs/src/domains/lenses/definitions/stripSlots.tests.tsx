@@ -1,12 +1,12 @@
 /**
- * The strip's tenants against the REAL frame: mounted the way the Shell
- * mounts them (from the route's `meta`), over the same warm store the
- * explorer reads.
+ * The strip's tenants under the REAL providers: mounted the way
+ * `DefinitionsLayout` renders them, over the same warm store the explorer
+ * reads.
  *
  * The claims that matter here are the two that a component test cannot
  * make: the strip SERVER-RENDERS its content from the warm store (so there
- * is no empty-then-populated hydration mismatch in the frame), and a cold
- * store degrades to empty sockets WITHOUT taking the frame down.
+ * is no empty-then-populated hydration mismatch in the strip), and a cold
+ * store degrades to empty sockets WITHOUT taking the layout down.
  */
 
 import "./__fixtures__/stubReactFlowGlobals.js";
@@ -29,7 +29,7 @@ const createFetchSpy = () =>
   vi.fn(() => new Promise<never>(() => {})) as ReturnType<typeof vi.fn> &
     FetchFunction;
 
-/** The strip's tenants under the provider stack the Shell gives them. */
+/** The strip's tenants under the provider stack the app gives them. */
 const stripAt = (
   url: string,
   records: RecordMap | undefined,
@@ -113,9 +113,9 @@ describe("the strip's tenants over a warm store", () => {
 });
 
 describe("the strip's tenants over a COLD store", () => {
-  it("degrade to empty sockets instead of suspending the whole frame", () => {
-    // `useLazyLoadQuery` suspends on a cold store, and these render inside
-    // the Shell — outside any page boundary. Unguarded, that takes the
+  it("degrade to empty sockets instead of suspending the whole layout", () => {
+    // `useLazyLoadQuery` suspends on a cold store, and these render in the
+    // layout — outside any page boundary. Unguarded, that takes the
     // entire document down (entry.tests.tsx caught exactly this). Each
     // socket therefore carries its own Suspense + error boundary.
     const fetchFn = createFetchSpy();

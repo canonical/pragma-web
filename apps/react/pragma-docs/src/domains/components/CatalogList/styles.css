@@ -1,6 +1,6 @@
 /*
  * CatalogList — the catalog's composed layout: tier jump-links west in
- * the frame's --subnav-w column (CONSUMED, defined only by the Shell),
+ * the frame's --subnav-w column (CONSUMED, defined only by the lens layout),
  * tier-grouped card grid east. The card grid is the AX.1 exhibit:
  * repeat(auto-fill, minmax(15rem, 1fr)) — column count falls out of the
  * canvas width, no query anywhere (INTRINSIC-GRID.md entry 7).

@@ -15,7 +15,7 @@
  *
  * This file closes that. It mounts the page and the strip's Controls the
  * way PRODUCTION mounts them — siblings under one `LensFilterProvider`,
- * because the strip is rendered by the Shell outside the page's subtree —
+ * because the layout renders the strip outside the page's subtree —
  * clicks a real chip through the real UI, and asserts on the WELL'S OWN
  * NODES: the count carrying `is-hidden` must rise. Nothing here reads the
  * comparator, the filter object or any internal; the assertion is what a
@@ -51,8 +51,8 @@ const createFetchSpy = () =>
 
 /**
  * The explorer AND the strip's chip toolbar under ONE filter provider —
- * the production arrangement (`routes.tsx` wraps the Shell, which mounts
- * the strip from route `meta`). Neither existing suite renders both: the
+ * the production arrangement (`DefinitionsLayout` puts the provider around
+ * both the strip and the canvas). Neither existing suite renders both: the
  * explorer's tests mount the page without the chips, and the strip's
  * tests mount the chips without the well. This is the join, and the join
  * is exactly where the memo boundary lives.
@@ -106,7 +106,7 @@ describe("the well answers a chip toggle", () => {
     expect(hiddenNodeCount()).toBe(0);
 
     // Toggle a real chip through the real UI — the same button a reader
-    // presses, mounted by the same code path the Shell uses.
+    // presses, mounted by the same code path the layout uses.
     const chip = screen.getByRole("button", { name: "anatomy" });
     expect(chip).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(chip);

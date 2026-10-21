@@ -3,7 +3,7 @@
  * The page fills the canvas region (heading row + a released 1fr row) so
  * the explorer's panels own their scroll rather than the canvas.
  * min-block-size: 0 at every link is the release chain (INTRINSIC-GRID.md).
- * Zero layout-capable conditional at-rules — the census (frameStability.
+ * Zero layout-capable conditional at-rules — the census (stylesheets.
  * tests) sanctions exactly one, app-wide, and it is the frame's collapse.
  *
  * THE TOP-SPACE FIX (FIX 3). The canvas already opens with the mode strip,

@@ -1,23 +1,10 @@
 import { route } from "@canonical/router-core";
-import { makeLensContext } from "#lib/LensBreadcrumbs";
 import { HomeIcon } from "#lib/Rail";
 import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
-import { shellStripFacet } from "#lib/Shell";
 import GuidePage from "./GuidePage.js";
 import HomePage from "./HomePage.js";
 import warmLobby from "./warmLobby.js";
-
-/**
- * The lobby's mode-strip context tenant: a single `Home` crumb (the lens
- * name as its lens declaration labels it). The lobby has one address,
- * so there is no terminal crumb and no route param to read — the lens crumb
- * IS the current page.
- */
-const HomeContext = makeLensContext({
-  lensLabel: "Home",
-  lensRouteName: "home",
-});
 
 /**
  * The marketing routes: the Home lobby (`/`, AV-350 — the front door, and
@@ -34,10 +21,9 @@ const HomeContext = makeLensContext({
  *   against the browser environment, where it does nothing when the store
  *   already holds the data.
  *
- * The lobby claims the mode strip's context socket with "Home" — the lens
- * name as its lens declaration labels it, matching how every other
- * lens claims its own name. Controls/status stay UNCLAIMED — honestly
- * empty: the lobby has no filters and no status to report.
+ * The lobby declares the Home lens (`routeLensFacet`) and its digit, and
+ * renders inside `MarketingLayout`. The guide page renders inside the
+ * Guides lens's layout instead, beside the guides index it belongs to.
  */
 const routes = {
   home: route({
@@ -45,7 +31,6 @@ const routes = {
     content: HomePage,
     warm: warmLobby,
     meta: {
-      ...shellStripFacet.of({ Context: HomeContext }),
       ...routeShortcutFacet.of("1"),
       ...routeLensFacet.of({
         label: "Home",

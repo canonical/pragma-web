@@ -9,7 +9,7 @@
  * (INTRINSIC-GRID.md entry 5).
  *
  * At-rules: one `prefers-reduced-motion` block at the foot. It is EXEMPT
- * from the layout-capable census (frameStability.tests.tsx matches query
+ * from the layout-capable census (stylesheets.tests.ts matches query
  * TEXT and exempts motion/colour/contrast features, which cannot reflow
  * layout), so the app's sanctioned layout-capable count stays at one.
  */
@@ -341,7 +341,7 @@
   }
 
   /* Fade and lift are the well's only motion; drop them when asked. The
-   * at-rule is census-EXEMPT (frameStability.tests.tsx matches query TEXT
+   * at-rule is census-EXEMPT (stylesheets.tests.ts matches query TEXT
    * and exempts prefers-reduced-motion, which cannot reflow layout), so the
    * count of layout-capable conditionals stays at one. */
   @media (prefers-reduced-motion: reduce) {

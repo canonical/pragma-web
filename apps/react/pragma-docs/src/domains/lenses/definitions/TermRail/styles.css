@@ -3,7 +3,7 @@
  * PANEL's width comes from the explorer's grid template (the frame's
  * --subnav-w token, consumed there, never re-defined); this file styles
  * only the rail's interior. Zero conditional at-rules: the at-rule census
- * (frameStability.tests.tsx) sanctions exactly one in the app.
+ * (stylesheets.tests.ts) sanctions exactly one in the app.
  */
 
 @layer app {
@@ -164,7 +164,7 @@
 
   /* The dim transition is the only motion this rail has; honour the user's
    * stated preference and drop it. This at-rule is census-EXEMPT: the
-   * layout-capable census (frameStability.tests.tsx) matches query TEXT and
+   * layout-capable census (stylesheets.tests.ts) matches query TEXT and
    * exempts `prefers-reduced-motion` outright, since it cannot reflow
    * layout. The count of sanctioned layout-capable at-rules stays at one. */
   @media (prefers-reduced-motion: reduce) {

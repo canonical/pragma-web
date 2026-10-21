@@ -11,7 +11,7 @@
  * Grammar hooks (`--well-*`) fall back to the app's utilitarian tokens so
  * the well inherits AV-363's surface system the day it lands, without
  * edits here. One `prefers-reduced-motion` block at the foot kills the
- * fades; no other at-rules (frameStability's layout-capable census).
+ * fades; no other at-rules (stylesheets.tests.ts's layout-capable census).
  */
 
 @layer app {

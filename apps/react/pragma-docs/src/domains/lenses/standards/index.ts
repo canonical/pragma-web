@@ -2,10 +2,12 @@
 
 // The sub-domain's own surface, beside the components above.
 export { STANDARD_CLASS_URI } from "./constants.js";
+export { default as standardsLayout } from "./layout.js";
 export { default as standardsRoutes } from "./routes.js";
 export * from "./StandardArticle/index.js";
 export * from "./StandardReadingPage/index.js";
 export * from "./StandardsIndex/index.js";
+export * from "./StandardsLayout/index.js";
 export * from "./StandardsPage/index.js";
 export {
   STANDARDS_PAGE_SIZE,

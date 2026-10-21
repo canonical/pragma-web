@@ -41,11 +41,11 @@ export const DEFINITIONS_TEST_TIMEOUT_MS = 20_000;
  * The definitions page at `term` (undefined = the `/definitions`
  * explorer) over an environment seeded with `records` (`undefined` = cold
  * store). The page owns its Suspense/ErrorBoundary; the router exists for
- * `Link` context and selection only (no Outlet — the Shell stays out of
- * component tests).
+ * `Link` context and selection only (no Outlet — the lens layout stays out
+ * of component tests).
  *
  * `LensFilterProvider` is part of the stack because it is part of the
- * stack in production: `routes.tsx` wraps the Shell in it, so the lens's
+ * stack in production: `DefinitionsLayout` wraps the page in it, so the lens's
  * ephemeral filter is writable on every real render. Without it here the
  * context's inert fallback would silently swallow every filter change and
  * the rail's dimming tests would pass or fail for the wrong reason.

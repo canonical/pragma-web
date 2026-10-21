@@ -5,9 +5,11 @@ export {
 } from "./constants.js";
 export { default as GuidePage } from "./GuidePage.js";
 export { default as HomePage } from "./HomePage.js";
+export { default as marketingLayout } from "./layout.js";
 export {
   LOBBY_EXEMPLAR_COUNT,
   lobbyQueryNode,
   lobbyVariables,
 } from "./lobbyQuery.js";
+export * from "./MarketingLayout/index.js";
 export { default as marketingRoutes } from "./routes.js";

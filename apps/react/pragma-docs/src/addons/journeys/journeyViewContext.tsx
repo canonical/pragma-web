@@ -16,19 +16,18 @@ import {
  *
  * The Table ⇄ Graph switch moved out of the canvas and into the mode strip's
  * `controls` socket, exactly as the Definitions chips fill it. The strip is
- * rendered by `Shell`, which reads the active route's static `meta` and
- * mounts the claimed `Controls` component ITSELF — so the toolbar lives
- * OUTSIDE the page's React subtree, a sibling of the canvas rather than a
- * descendant. `StripSlotsEntry` is plain route data (component TYPES, never
- * elements), so there is no prop path from `JourneysExplorer` up to the
- * switch: the toolbar is mounted by the frame, above the state it needs to
- * read and write.
+ * rendered by the lens's own layout (`JourneysLayout`) as a sibling of the
+ * routed page, not a descendant: the router hands the layout the page as
+ * `children`, and the switch sits beside it. So there is no prop path from
+ * `JourneysExplorer` across to the switch — the toolbar is rendered above
+ * the state it needs to read and write.
  *
  * Props cannot cross that boundary. Context can, and it is the smallest
- * mechanism that does: no store, no router change, no widening of the strip
- * handshake (which would make every future lens pay for this one's needs).
- * The provider wraps the Shell (see `routes.tsx`), so the switch and the
- * canvas share ONE ephemeral view.
+ * bridge that does: no store, no router change, nothing every other lens
+ * would have to carry. `JourneysLayout` puts the provider around both the
+ * strip and the canvas, so the switch and the explorer share ONE ephemeral
+ * view. The provider remounts with the layout on every route change, so the
+ * view starts from its default on each navigation.
  *
  * THE SSR DETERMINISM RULE. The initial value is `DEFAULT_JOURNEY_VIEW` —
  * "table", the primary surface — read from NOTHING: never `localStorage`,
@@ -38,7 +37,7 @@ import {
  *
  * The fallback matters too: a consumer outside any provider degrades to the
  * same no-op default rather than throwing, so a stray mount can never take
- * the shell down.
+ * the layout down.
  */
 
 /** What the lens's consumers share: the view and the way to change it. */

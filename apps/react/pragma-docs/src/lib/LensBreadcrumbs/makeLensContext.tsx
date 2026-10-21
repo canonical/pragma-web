@@ -4,14 +4,14 @@ import LensBreadcrumbs from "./LensBreadcrumbs.js";
 
 /**
  * Build a lens's mode-strip `Context` tenant: the breadcrumb trail to the
- * current page, parked on the lens's routes under `SHELL_STRIP_META_KEY`
- * and mounted by the Shell into the strip's `context` socket.
+ * current page, which the lens's layout renders into the strip's `context`
+ * socket.
  *
  * One factory serves every lens (M-STRUCT: one component, parameterised,
  * not five near-identical ones). It reads the CURRENT route param — the
  * entity/term/reading identity — straight off the router match, so the
  * terminal crumb is URL-derived: no Relay query, no fetch, no suspension of
- * the frame, and byte-identical markup on the server and the client (the
+ * the layout, and byte-identical markup on the server and the client (the
  * SSR-determinism the strip's tenants must honour).
  *
  * - `lensLabel` / `lensRouteName`: the constant first crumb (the lens name,

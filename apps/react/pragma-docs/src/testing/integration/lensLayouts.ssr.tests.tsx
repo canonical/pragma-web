@@ -1,98 +1,34 @@
 // @vitest-environment node
 
 /**
- * The P-4.1 certification: switching lenses moves ONLY the canvas plate —
- * proven by measurement, not eyeballing.
+ * Every lens layout, rendered through the real SSR entry: each measured URL
+ * renders inside its lens's own layout, and each layout carries exactly one
+ * rail, one strip, one canvas and one footer.
  *
- * Method. Render `EntryServer`'s tree (static router, Relay environment,
- * the `<html>` document) to a string per lens URL — node environment, so
- * `renderToString` walks the exact SSR branch production walks. Called
- * directly, WITHOUT the `JSXRenderer` wrapper production puts around it:
- * the head/script wrapping `JSXRenderer` adds (`otherHeadElements`,
- * `scriptElements`, `linkElements`, the `__INITIAL_DATA__` injection) is out
- * of frame by construction — all of it lands in `<head>` or as scripts,
- * never inside `<body>`, which is exactly why the body-frame measurement
- * below stays valid without it. Split each page's `<body>` at the canvas
- * plate's stable structural identity (the single `<main
- * data-region="canvas">` element):
- * FRAME = body with the canvas's children cut out (the canvas open tag
- * itself is frame — its attributes are chrome). Then:
+ * Method. Render `EntryServer`'s tree (static router, Relay environment, the
+ * `<html>` document) to a string per URL — node environment, so
+ * `renderToString` walks the exact SSR branch production walks. Data-bearing
+ * pages render from their captured fixture records (the `initialData` a dev
+ * server embeds), so every canvas is real content. Each body is split at the
+ * single `<main data-region="canvas">`: CANVAS = its children, CHROME =
+ * everything else. Then, per URL:
  *
- *   1. every canvas is pairwise distinct (the comparison is not vacuous);
- *   2. raw frames pairwise DIFFER — the accounted-for deltas (the
- *      router's `aria-current="page"`, and since P-5 the mode strip's
- *      claimed context text) are really present and visible to this
- *      measurement (the extraction has eyes on the rail and the strip);
- *   3. the aria-current placements are exactly the modelled expectation
- *      per URL (Home carries two: brand + Home lens, both `href="/"`),
- *      and the strip's three claimable slots — `context`, `controls`,
- *      `status` — match the per-URL model RAW; normalisation can never
- *      hide a wrong claim, because the raw content is asserted first;
- *   4. after normalising ONLY those deltas (strip the attribute, blank
- *      exactly the three claimed slots' contents), all frames are
- *      byte-identical (`toBe` on the strings);
- *   5. the normaliser forgives nothing else — synthetic perturbations to
- *      the strip's own region, to any slot's IDENTITY attributes, and to
- *      the frame at large all survive normalisation and fail the
- *      comparison.
+ *   1. each region renders exactly once;
+ *   2. every canvas is distinct (each URL renders its own page);
+ *   3. `aria-current` sits exactly where the per-URL model says (the rail's
+ *      exact-match link, plus the breadcrumb's current crumb);
+ *   4. the strip's `context`, `controls` and `status` slots carry exactly
+ *      what the URL's lens layout puts there, asserted on the raw markup.
  *
- * THE R5 LOOSENING (owner-approved, recorded here rather than smuggled).
- * Until AV-274 this suite asserted `controls` and `status` were EMPTY on
- * every URL, and its teeth test used planted status text as proof that the
- * normaliser's scope was one slot. The Definitions lens now claims both
- * sockets — a filter toolbar and a status figure — because a strip that is
- * never used is furniture pretending to be an instrument. So the model
- * widened: per-URL claims for all three slots, asserted RAW, with the
- * normaliser blanking exactly those three. The teeth test grew to
- * compensate, and now proves the widened normaliser still catches a
- * renamed socket, a tampered strip region, and frame changes elsewhere —
- * the properties the old status-planting control used to establish.
- *
- * The claims are asserted STRUCTURALLY, not as pinned strings: the status
- * figure carries a live count off the graph, and pinning it would turn
- * every ontology edit into a frame-stability failure — a false alarm about
- * something this suite does not measure.
- *
- * THE P-6 CONTEXT WIDENING (owner-ruled, recorded here rather than
- * smuggled). Until P-6 the `context` slot carried a bare lens-name STRING,
- * and its pattern was text-only. The owner ruling moved every page title out
- * of the canvas and INTO the strip as the DS `Breadcrumbs` pattern, so the
- * context slot now holds navigation MARKUP — the trail to the current page.
- * The model widened the same disciplined way the controls/status claims did:
- * the context slot's pattern is now markup-aware (bounded by the next slot),
- * the per-URL model asserts the FULL trail RAW (an index page's single
- * current crumb, or an entity page's linked lens crumb + current crumb whose
- * text is the ROUTE PARAM), the normaliser blanks exactly that slot, and the
- * teeth test's context perturbation still proves the blanking is scoped to
- * the slot's contents, never its identity. Because the trail is URL-derived
- * (a constant lens crumb + the route param, no graph read), pinning it does
- * NOT couple this suite to the ontology — a wrong claim still fails RAW
- * first. The breadcrumb's terminal crumb also carries one
- * `aria-current="page"` on a `<span>`; the raw aria-current census models it
- * per URL (added to the rail's anchor count), so the total stays exact.
- *
- * Since P-5 the measured set also carries a non-lens URL — the Button
- * entity page — rendered from its captured fixture records (initialData,
- * exactly what the dev servers embed), so its canvas is real content and
- * nothing in the render path waits on a network that node does not have.
- *
- * Alongside the markup claim, the stylesheet claims: the four layout
- * tokens and the four z-axis tokens are each DEFINED exactly once across
- * the app's stylesheets (regions consume, never re-define), and exactly
- * one LAYOUT-CAPABLE conditional at-rule — `@media` with any real
- * condition, every `@container`, every `@supports` — exists in the app:
- * the sanctioned AX.1 collapse in Rail/styles.css. Feature queries that
- * cannot reflow layout by design (`prefers-color-scheme`, `forced-colors`,
- * `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
- * file — and only while no other condition rides along in the prelude.
+ * The status figure carries a live count off the graph, so the strip's
+ * controls and status are asserted STRUCTURALLY (which tenant fills the
+ * slot), never as pinned strings. The breadcrumb trail is URL-derived (the
+ * lens name + the route param), so it is pinned in full.
  *
  * Head elements are outside the measurement on purpose: titles are
- * route-owned document state (a11y requires them to change), not chrome.
- * `frame stability` scopes to `<body>`.
+ * route-owned document state, not chrome.
  */
 
-import { readdirSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { renderToString } from "react-dom/server";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
@@ -117,9 +53,9 @@ const LENS_URLS = [
   "/guides",
 ] as const;
 
-/** The P-5 entity exemplar: a non-lens URL whose frame must still be the
- * same instrument body. Exact-match linking means NO rail entry carries
- * `aria-current` here (ruling R3). */
+/** The P-5 entity exemplar: a non-lens URL, rendered inside its lens's
+ * layout. Exact-match linking means NO rail entry carries `aria-current`
+ * here (ruling R3). */
 const BUTTON_ENTITY_URL = "/components/ds%3Aglobal.component.button";
 
 /** The P-5 definitions exemplar: the term view — a second non-lens URL,
@@ -174,7 +110,7 @@ const PAGE_RECORDS: Readonly<Record<string, RecordMap>> = {
   [JOURNEYS_JOB_URL]: journeysExplorerRecordsJob,
 };
 
-/** Per-URL expectation for the first accounted-for delta: the hrefs
+/** Per-URL expectation for the rail: the hrefs
  * carrying `aria-current="page"`. Home has two — the brand link and the
  * Home lens entry both point at "/". The entity URL has NONE: the rail's
  * Components entry is an exact-match link (R3). */
@@ -192,7 +128,7 @@ const EXPECTED_ARIA_CURRENT: Readonly<Record<string, readonly string[]>> = {
   [BUTTON_ENTITY_URL]: [],
   // Exact-match linking (R3): the rail's Definitions entry is NOT current
   // at a term URL. The term links that ARE current live in the canvas
-  // (rail item + well node), outside this frame measurement.
+  // (rail item + well node), outside the chrome measured here.
   [DEFINITIONS_TERM_URL]: [],
   // Same R3 posture: the rail's Standards entry is NOT current at a
   // reading URL.
@@ -202,20 +138,17 @@ const EXPECTED_ARIA_CURRENT: Readonly<Record<string, readonly string[]>> = {
 };
 
 /**
- * Per-URL expectation for the second accounted-for delta: the mode strip's
- * claimed `data-slot="context"` MARKUP (the P-6 handshake). Until P-6 this
- * was a bare lens-name string; the owner ruling moved every page title out
- * of the canvas and INTO the strip as the DS `Breadcrumbs` pattern, so the
- * context socket now holds the trail markup, and the model must assert it
- * HONESTLY — RAW, before the normaliser blanks it.
+ * Per-URL expectation for the mode strip's `data-slot="context"` MARKUP:
+ * the DS `Breadcrumbs` trail to the current page, which every lens layout
+ * but the stubs' renders there.
  *
  * The trail is URL-DERIVED, which is exactly why this can be pinned without
  * pinning a graph count: an INDEX page is one current crumb (the lens name);
  * an ENTITY page is the lens crumb (a router link back to the index) plus
  * the current crumb, whose text is the ROUTE PARAM (a prefixed URI/slug),
  * not a fetched display name — so the assertion stays stable across ontology
- * edits, and a wrong claim (or a stub suddenly claiming one) fails here
- * first. `/guides` still claims nothing, so its context slot is empty.
+ * edits, and a wrong trail (or a stub suddenly rendering one) fails here.
+ * `/guides` renders under `GuidesLayout`, whose context slot is empty.
  */
 
 /** Build the exact breadcrumb markup a `LensBreadcrumbs` renders in the
@@ -236,9 +169,9 @@ const trail = (
 };
 
 const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
-  // The lobby claims its lens name too (AV-350) — "Home", exactly as the
+  // The lobby shows its lens name too (AV-350) — "Home", exactly as the
   // lens declaration labels it; on its single address it is one current
-  // crumb. Only `/guides` (still a stub) claims nothing.
+  // crumb. Only `/guides` (still a stub) shows nothing.
   "/": trail("Home"),
   "/components": trail("Components"),
   "/definitions": trail("Definitions"),
@@ -267,11 +200,11 @@ const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
 
 /** Per-URL count of `aria-current="page"` carried INSIDE the strip context
  * slot: the breadcrumb trail's terminal (current) crumb carries exactly one,
- * on every URL that claims a Context — i.e. every measured URL but `/guides`
- * (the lone stub with an empty context). The raw aria-current census below
- * adds this to the rail's anchor count, because the current crumb is a
+ * on every URL whose layout renders a trail — i.e. every measured URL but
+ * `/guides` (the lone stub with an empty context). The aria-current census
+ * below adds this to the rail's anchor count, because the current crumb is a
  * `<span>`, invisible to the anchor-scoped href model but real to a total
- * count over the whole frame. */
+ * count over the whole chrome. */
 const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
   "/": 1,
   "/components": 1,
@@ -286,18 +219,16 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
 };
 
 /**
- * Per-URL expectation for the third and fourth accounted-for deltas: the
- * strip's `controls` and `status` claims (R5 — "a toolbar and the top bar
- * should be useful"). Only the Definitions views claim them; every other
- * URL must still render both sockets EMPTY, and this model is what says so.
+ * Per-URL expectation for the strip's `controls` and `status` slots (R5 —
+ * "a toolbar and the top bar should be useful"). Only the Definitions and
+ * Journeys layouts fill them; every other URL must still render both
+ * sockets EMPTY, and this model is what says so.
  *
- * The claims are asserted STRUCTURALLY, never as pinned strings. The
- * status figure reports a live count off the graph, so pinning its text
- * would make the frame certification fail whenever the ontology gains a
- * class — a false alarm about frame stability, which is not what this
- * suite measures. Structure ("does this slot carry the toolbar / the
- * figure, or nothing at all?") is the honest claim, and it is the claim
- * whose violation would actually mean the frame moved.
+ * The slots are asserted STRUCTURALLY, never as pinned strings. The status
+ * figure reports a live count off the graph, so pinning its text would make
+ * this suite fail whenever the ontology gains a class — a false alarm about
+ * something it does not measure. Structure ("does this slot carry the
+ * toolbar / the figure, or nothing at all?") is the honest claim.
  */
 const EXPECTED_STRIP_CLAIMS: Readonly<
   Record<
@@ -355,9 +286,9 @@ const extractBody = (html: string): string => {
   return html.slice(start, end);
 };
 
-/** Split a body into { frame, canvas }: canvas = the children of the single
- * `<main>` plate; frame = everything else, including the plate's open tag. */
-const splitAtCanvas = (body: string): { frame: string; canvas: string } => {
+/** Split a body into { chrome, canvas }: canvas = the children of the single
+ * `<main>`; chrome = everything else, including the `<main>` open tag. */
+const splitAtCanvas = (body: string): { chrome: string; canvas: string } => {
   // The canvas's structural identity must be unique for the cut to be exact.
   expect(body.split("<main").length - 1).toBe(1);
   expect(body.split("</main>").length - 1).toBe(1);
@@ -368,7 +299,7 @@ const splitAtCanvas = (body: string): { frame: string; canvas: string } => {
   const openEnd = body.indexOf(">", open);
   const close = body.lastIndexOf("</main>");
   return {
-    frame: body.slice(0, openEnd + 1) + body.slice(close),
+    chrome: body.slice(0, openEnd + 1) + body.slice(close),
     canvas: body.slice(openEnd + 1, close),
   };
 };
@@ -394,46 +325,29 @@ const STRIP_CONTROLS_PATTERN =
 const STRIP_STATUS_PATTERN =
   /(<div class="strip-status" data-slot="status">)([\s\S]*?)(<\/div><\/header>)/;
 
-/** The context slot's RAW text — asserted against the model BEFORE any
- * normalisation, so blanking below can never hide a wrong claim. */
-const extractStripContext = (frame: string): string => {
-  const match = STRIP_CONTEXT_PATTERN.exec(frame);
-  expect(match, "frame carries exactly one context slot").not.toBeNull();
+/** The context slot's raw markup, asserted against the per-URL model. */
+const extractStripContext = (chrome: string): string => {
+  const match = STRIP_CONTEXT_PATTERN.exec(chrome);
+  expect(match, "chrome carries exactly one context slot").not.toBeNull();
   return (match as RegExpExecArray)[2];
 };
 
-/** The controls/status slots' RAW inner markup, asserted before
- * normalisation for the same reason the context text is. */
-const extractStripSlot = (frame: string, pattern: RegExp): string => {
-  const match = pattern.exec(frame);
-  expect(match, "frame carries exactly one such strip slot").not.toBeNull();
+/** The controls/status slots' raw inner markup. */
+const extractStripSlot = (chrome: string, pattern: RegExp): string => {
+  const match = pattern.exec(chrome);
+  expect(match, "chrome carries exactly one such strip slot").not.toBeNull();
   return (match as RegExpExecArray)[2];
 };
-
-/**
- * Forgive exactly the accounted-for deltas, nothing else: strip the
- * router's aria-current attribute, then blank ONLY the three claimed strip
- * slots' contents. Widened for the controls/status claims — an
- * owner-approved loosening, paid for by the RAW per-URL assertions above
- * it and by the teeth test below, which proves the widened normaliser
- * still catches everything outside those three slots.
- */
-const normalizeFrame = (frame: string): string =>
-  frame
-    .replaceAll(' aria-current="page"', "")
-    .replace(STRIP_CONTEXT_PATTERN, "$1$3")
-    .replace(STRIP_CONTROLS_PATTERN, "$1$3")
-    .replace(STRIP_STATUS_PATTERN, "$1$3");
 
 /** The hrefs of anchors carrying aria-current, in document order. */
-const ariaCurrentHrefs = (frame: string): string[] =>
-  [...frame.matchAll(/<a\b[^>]*>/g)]
+const ariaCurrentHrefs = (chrome: string): string[] =>
+  [...chrome.matchAll(/<a\b[^>]*>/g)]
     .map((match) => match[0])
     .filter((anchor) => anchor.includes('aria-current="page"'))
     .map((anchor) => /href="([^"]*)"/.exec(anchor)?.[1] ?? "(no href)");
 
 interface LensPage {
-  readonly frame: string;
+  readonly chrome: string;
   readonly canvas: string;
 }
 
@@ -456,8 +370,12 @@ const mustGet = (url: string): LensPage => {
   return page;
 };
 
-describe("frame stability across lens switches (the P-4.1 certification)", () => {
-  it("renders every measured canvas distinctly (the comparison has content)", () => {
+/** How many times `marker` occurs in `markup`. */
+const countOccurrences = (markup: string, marker: string): number =>
+  markup.split(marker).length - 1;
+
+describe("the lens layouts, rendered through the SSR entry", () => {
+  it("renders every measured canvas distinctly", () => {
     const canvases = [...getPages().values()].map(({ canvas }) => canvas);
     expect(new Set(canvases).size).toBe(MEASURED_URLS.length);
     // And each canvas holds ITS page, not a fallback:
@@ -520,7 +438,7 @@ describe("frame stability across lens switches (the P-4.1 certification)", () =>
     expect(mustGet("/journeys").canvas).toContain('scope="row"');
     expect(mustGet("/journeys").canvas).toContain("Group by");
     // The view switch is NO LONGER in the canvas (RULING 1): it is the mode
-    // strip's `controls` tenant now, so it lands in the FRAME, not here. The
+    // strip's `controls` tenant now, so it lands in the CHROME, not here. The
     // strip claim is asserted by EXPECTED_STRIP_CLAIMS below; the canvas must
     // NOT carry the switch.
     expect(mustGet("/journeys").canvas).not.toContain(
@@ -564,56 +482,47 @@ describe("frame stability across lens switches (the P-4.1 certification)", () =>
     );
   });
 
-  it("carries the full frame on every lens", () => {
-    for (const [url, { frame }] of getPages()) {
+  it("renders each region exactly once on every URL", () => {
+    for (const [url, { chrome }] of getPages()) {
       for (const marker of [
         'data-region="primary-nav"',
         'data-region="mode-strip"',
         'data-region="canvas"',
         'data-region="footer"',
+        'data-slot="context"',
         'data-slot="controls"',
         'data-slot="status"',
         "Skip to content",
       ]) {
-        expect(frame, `${url} frame carries ${marker}`).toContain(marker);
-      }
-    }
-  });
-
-  it("frames differ raw — the accounted-for delta is visible to this measurement", () => {
-    const urls = [...getPages().keys()];
-    for (const [i, a] of urls.entries()) {
-      for (const b of urls.slice(i + 1)) {
         expect(
-          mustGet(a).frame === mustGet(b).frame,
-          `${a} vs ${b} raw frames must differ (aria-current moved)`,
-        ).toBe(false);
+          countOccurrences(chrome, marker),
+          `${url} renders ${marker} once`,
+        ).toBe(1);
       }
     }
   });
 
   it("places aria-current exactly as modelled, per lens", () => {
-    for (const [url, { frame }] of getPages()) {
-      expect(ariaCurrentHrefs(frame), `aria-current on ${url}`).toEqual(
+    for (const [url, { chrome }] of getPages()) {
+      expect(ariaCurrentHrefs(chrome), `aria-current on ${url}`).toEqual(
         EXPECTED_ARIA_CURRENT[url],
       );
     }
   });
 
   it("counts every raw aria-current occurrence against the model — anchors or not", () => {
-    // BEFORE normalisation, and blind to the carrying element: the
-    // anchor-scoped href check above cannot see a stray `aria-current` on a
-    // non-anchor, but the normaliser would still forgive it. This count
-    // closes that gap — any extra carrier on any element breaks it.
+    // Blind to the carrying element: the anchor-scoped href check above
+    // cannot see a stray `aria-current` on a non-anchor. This count closes
+    // that gap — any extra carrier on any element breaks it.
     //
     // The total is the rail's exact-match anchors PLUS the strip
     // breadcrumb's terminal (current) crumb — a `<span aria-current="page">`
     // the anchor model above cannot see, present on every URL that claims a
     // Context (all but `/guides`). Both carriers are modelled, so an
     // unaccounted-for third would break this.
-    for (const [url, { frame }] of getPages()) {
+    for (const [url, { chrome }] of getPages()) {
       expect(
-        (frame.match(/aria-current="page"/g) ?? []).length,
+        (chrome.match(/aria-current="page"/g) ?? []).length,
         `raw aria-current count on ${url}`,
       ).toBe(
         EXPECTED_ARIA_CURRENT[url].length + STRIP_CONTEXT_ARIA_CURRENT[url],
@@ -621,27 +530,25 @@ describe("frame stability across lens switches (the P-4.1 certification)", () =>
     }
   });
 
-  it("carries the strip context exactly as modelled, per URL — RAW", () => {
-    // The raw slot text is the assertion; the normaliser below only blanks
-    // what THIS test has already proven correct. A route claiming the
-    // wrong context (or a stub suddenly claiming one) fails here first.
-    for (const [url, { frame }] of getPages()) {
-      expect(extractStripContext(frame), `strip context on ${url}`).toBe(
+  it("carries the strip context exactly as modelled, per URL", () => {
+    // A layout rendering the wrong trail (or a stub suddenly rendering one)
+    // fails here.
+    for (const [url, { chrome }] of getPages()) {
+      expect(extractStripContext(chrome), `strip context on ${url}`).toBe(
         EXPECTED_STRIP_CONTEXT[url],
       );
     }
   });
 
-  it("carries the strip controls/status claims exactly as modelled, per URL — RAW", () => {
-    // Same discipline as the context assertion above: the RAW slot
-    // contents are checked BEFORE the normaliser blanks them, so a route
-    // that wrongly claims (or wrongly drops) a socket fails here first.
-    for (const [url, { frame }] of getPages()) {
+  it("carries the strip controls and status exactly as modelled, per URL", () => {
+    // A layout that wrongly fills (or wrongly leaves empty) a socket fails
+    // here.
+    for (const [url, { chrome }] of getPages()) {
       const expected = EXPECTED_STRIP_CLAIMS[url];
       if (expected === undefined) throw new Error(`no strip model for ${url}`);
 
-      const controls = extractStripSlot(frame, STRIP_CONTROLS_PATTERN);
-      const status = extractStripSlot(frame, STRIP_STATUS_PATTERN);
+      const controls = extractStripSlot(chrome, STRIP_CONTROLS_PATTERN);
+      const status = extractStripSlot(chrome, STRIP_STATUS_PATTERN);
 
       if (expected.controls) {
         // Structural, not a pinned string: the toolbar is present and is the
@@ -663,122 +570,21 @@ describe("frame stability across lens switches (the P-4.1 certification)", () =>
       }
     }
   });
-
-  it("frames are byte-identical once the accounted-for deltas are normalised", () => {
-    const base = normalizeFrame(mustGet("/").frame);
-    for (const url of MEASURED_URLS.slice(1)) {
-      expect(normalizeFrame(mustGet(url).frame), `frame of ${url}`).toBe(base);
-    }
-  });
-
-  it("the normaliser forgives nothing but the modelled deltas (its own teeth)", () => {
-    const frame = mustGet("/components").frame;
-    const perturbed = frame.replace(
-      'data-region="primary-nav"',
-      'data-region="primary-nav-tampered"',
-    );
-    expect(perturbed).not.toBe(frame);
-    expect(normalizeFrame(perturbed)).not.toBe(normalizeFrame(frame));
-  });
-
-  it("the strip normaliser forgives the three claimed slots — and NOTHING else", () => {
-    const frame = mustGet(BUTTON_ENTITY_URL).frame;
-
-    // FORGIVEN, by design: content in each of the three claimed slots.
-    // Blanking makes two different claims compare equal — which is
-    // precisely why the RAW per-URL model assertions above exist, and why
-    // this loosening is safe rather than merely convenient.
-    for (const [label, changed] of [
-      ["context", frame.replace(STRIP_CONTEXT_PATTERN, "$1Impostor$3")],
-      [
-        "controls",
-        frame.replace(
-          /(<div class="strip-controls" data-slot="controls">)(<\/div>)/,
-          "$1planted$2",
-        ),
-      ],
-      [
-        "status",
-        frame.replace(
-          /(<div class="strip-status" data-slot="status">)(<\/div>)/,
-          "$1planted$2",
-        ),
-      ],
-    ] as const) {
-      expect(changed, `${label} perturbation must alter the frame`).not.toBe(
-        frame,
-      );
-      expect(
-        normalizeFrame(changed),
-        `${label} content is forgiven by the normaliser`,
-      ).toBe(normalizeFrame(frame));
-    }
-
-    // NOT FORGIVEN — the widened normaliser's scope is those three slots,
-    // never "the strip" and never the frame at large. Each of these
-    // perturbations must survive normalisation and break byte-identity.
-    // This is the control that keeps the R5 loosening honest: without it,
-    // a normaliser that blanked the whole strip would pass every test
-    // above.
-    for (const [label, tampered] of [
-      // The strip's own element, just outside the slots.
-      [
-        "strip region",
-        frame.replace('data-region="mode-strip"', 'data-region="mode-strip-x"'),
-      ],
-      // A slot's own identity attributes — blanking contents must not
-      // extend to forgiving a renamed or missing socket.
-      [
-        "controls slot identity",
-        frame.replace('data-slot="controls"', 'data-slot="controls-x"'),
-      ],
-      [
-        "status slot identity",
-        frame.replace('data-slot="status"', 'data-slot="status-x"'),
-      ],
-      [
-        "context slot identity",
-        frame.replace('data-slot="context"', 'data-slot="context-x"'),
-      ],
-      // And the rest of the frame, unchanged from the original teeth test.
-      [
-        "primary nav",
-        frame.replace(
-          'data-region="primary-nav"',
-          'data-region="primary-nav-tampered"',
-        ),
-      ],
-      [
-        "footer",
-        frame.replace('data-region="footer"', 'data-region="footer-x"'),
-      ],
-    ] as const) {
-      expect(tampered, `${label} perturbation must alter the frame`).not.toBe(
-        frame,
-      );
-      expect(
-        normalizeFrame(tampered),
-        `${label} must NOT be forgiven by the normaliser`,
-      ).not.toBe(normalizeFrame(frame));
-    }
-  });
 });
 
 /**
- * The 404 route, rendered at last (AV-334 gap #2). `notFoundRoute` is wired
- * into every router construction across six test files and was never
- * exercised by any of them.
+ * The 404 route (AV-334 gap #2). `notFoundRoute` is wired into every router
+ * construction across six test files and was never exercised by any of
+ * them.
  *
- * It is deliberately NOT a member of MEASURED_URLS. The frame
- * certification above measures pages mounted inside `publicLayout` — its
- * `splitAtCanvas` requires exactly one `<main data-region="canvas">`, which
- * is the Shell's. `notFoundRoute` is declared OUTSIDE the `group(...)`
- * wrappers in routes.tsx, so it renders bare: zero `<main>`, no rail, no
- * strip. Adding the URL to the measured set would fail that structural
- * assertion, and the only way to make it pass would be to loosen the
- * certification for every other URL. So the honest test is this one — it
- * pins what the 404 route ACTUALLY is today, including its unshelled-ness,
- * which is the fact a future reader most needs to know.
+ * It is deliberately NOT a member of MEASURED_URLS. The suite above
+ * measures pages rendered inside a lens layout — its `splitAtCanvas`
+ * requires exactly one `<main data-region="canvas">`, which is the
+ * layout's. `notFoundRoute` is declared OUTSIDE every `group(...)` in
+ * routes.tsx, so it renders bare: zero `<main>`, no rail, no strip. So the
+ * honest test is this one — it pins what the 404 route ACTUALLY is today,
+ * including that no layout wraps it, which is the fact a future reader most
+ * needs to know.
  */
 describe("the not-found route renders (AV-334 gap #2)", () => {
   const body = extractBody(renderPage("/no-such-page"));
@@ -788,11 +594,11 @@ describe("the not-found route renders (AV-334 gap #2)", () => {
     expect(body).toContain("The page you are looking for does not exist.");
   });
 
-  it("renders OUTSIDE the shell — no canvas plate, no chrome", () => {
+  it("renders outside every lens layout — no canvas, no chrome", () => {
     // The structural claim that keeps it out of MEASURED_URLS. If the 404
-    // is ever moved inside `publicLayout` (a reasonable future change),
+    // is ever grouped under a lens layout (a reasonable future change),
     // this fails loudly and points at the decision above rather than
-    // letting the frame suite break mysteriously.
+    // letting the suite above break mysteriously.
     expect(body.split("<main").length - 1).toBe(0);
     expect(body).not.toContain('data-region="primary-nav"');
     expect(body).not.toContain('data-region="canvas"');
@@ -806,110 +612,5 @@ describe("the not-found route renders (AV-334 gap #2)", () => {
       expect(canvas).not.toBe(body);
       expect(canvas).not.toContain("Page not found");
     }
-  });
-});
-
-/** Recursively collect the app's own stylesheets. */
-const collectCss = (dir: string): string[] =>
-  readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const full = `${dir}/${entry.name}`;
-    if (entry.isDirectory()) return collectCss(full);
-    return entry.name.endsWith(".css") ? [full] : [];
-  });
-
-describe("the shared tokens are defined once (the stylesheet half)", () => {
-  const srcDir = fileURLToPath(new URL("../..", import.meta.url));
-  const cssFiles = collectCss(srcDir);
-  const allCss = cssFiles.map((file) => readFileSync(file, "utf8")).join("\n");
-
-  it("finds the app stylesheets", () => {
-    expect(cssFiles.length).toBeGreaterThanOrEqual(4);
-  });
-
-  // The metric tokens that SURVIVE the strict intrinsic-grid model: the
-  // strip's block-axis height and the four z-axis strata. Each defined
-  // exactly once, at the shell.
-  it.each([
-    "--strip-h",
-    "--z-underground",
-    "--z-plate",
-    "--z-chrome",
-    "--z-overlay",
-  ])("defines %s exactly once across src/**/*.css", (token) => {
-    const definitions = allCss.match(new RegExp(`${token}\\s*:`, "g")) ?? [];
-    expect(definitions).toHaveLength(1);
-  });
-
-  // The inline-axis WIDTH tokens are DISSOLVED under the strict
-  // intrinsic-grid model (owner ruling 2026-07-22): there are no named
-  // column widths any more — the shell provides unnamed intrinsic columns
-  // and every region claims its width by SPANNING them. These tokens must
-  // not exist anywhere; a reintroduction is a regression toward the old
-  // fixed-track frame.
-  it.each(["--rail-w", "--subnav-w", "--aside-w"])(
-    "does NOT define %s — the width tokens are dissolved (span, not token)",
-    (token) => {
-      const definitions = allCss.match(new RegExp(`${token}\\s*:`, "g")) ?? [];
-      expect(definitions).toHaveLength(0);
-    },
-  );
-
-  // THE INTRINSIC-GRID INVARIANT (the strict model's teeth, owner ruling
-  // 2026-07-22: EVERYTHING is a subgrid, no exceptions). Exactly ONE grid
-  // TEMPLATE exists in the whole app — the shell's intrinsic columns. Every
-  // OTHER `grid-template-columns` declaration, without exception, is
-  // `subgrid`: pages, explorers, region tenants, card grids, list grids,
-  // ALL of them inherit the shell's columns and spend spans. Nothing authors
-  // its own template, not even a leaf card-grid (no `auto-fill minmax(Nrem)`
-  // anywhere but the shell). This is the assertion that catches the "looks
-  // like one column" regression AND any stray leaf template: a grid that
-  // authors a template (or is `display: block` in the chain) trips it.
-  it("authors exactly ONE grid template — the shell; every other grid is a subgrid, no exceptions", () => {
-    // Strip CSS comments first, so a property token quoted in a comment
-    // (describing the model) is not miscounted as real CSS.
-    const cssNoComments = allCss.replaceAll(/\/\*[\s\S]*?\*\//g, "");
-    const authored = [
-      ...cssNoComments.matchAll(/grid-template-columns:\s*([^;]+);/g),
-    ]
-      .map((m) => m[1].trim())
-      .filter((value) => !value.startsWith("subgrid") && value !== "inherit");
-
-    // EXACTLY ONE authored template, full stop — and it is the shell's
-    // intrinsic frame: an auto-fill of FOUR `minmax(var(--grid-col-min…))`
-    // columns. Everything else in the app is `subgrid`.
-    expect(authored).toHaveLength(1);
-    expect(authored[0]).toMatch(/^repeat\(\s*auto-fill/);
-    expect(
-      (authored[0].match(/minmax\(\s*var\(--grid-col-min/g) ?? []).length,
-    ).toBe(4);
-  });
-
-  /**
-   * The layout-capable census. Every conditional at-rule prelude
-   * (`@media` / `@container` / `@supports`) counts unless it is a media
-   * query built ONLY of feature queries that cannot reflow layout by
-   * design: `prefers-color-scheme`, `forced-colors`,
-   * `prefers-reduced-motion`. The exemption matches query TEXT, never
-   * files: stripping the exempt features from the prelude must leave no
-   * condition behind, so an exempt feature riding with a width term is
-   * still caught. `@container` and `@supports` always count — both can
-   * gate layout.
-   */
-  const layoutCapableConditionals = (): string[] =>
-    (allCss.match(/@(?:media|container|supports)[^{]*/g) ?? []).filter(
-      (prelude) => {
-        if (!prelude.startsWith("@media")) return true;
-        const residue = prelude.replaceAll(
-          /\((?:prefers-color-scheme|forced-colors|prefers-reduced-motion)[^)]*\)/g,
-          "",
-        );
-        return residue.includes("(");
-      },
-    );
-
-  it("allows exactly one layout-capable conditional at-rule — the sanctioned AX.1 collapse", () => {
-    const conditionals = layoutCapableConditionals();
-    expect(conditionals).toHaveLength(1);
-    expect(conditionals[0]).toMatch(/^@media[^{]*max-width/);
   });
 });

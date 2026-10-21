@@ -3,10 +3,8 @@
  * destination rather than by a table sitting beside it.
  *
  * This directory is deliberately neutral ground rather than part of
- * `#lib/Rail`. The precedent — `SHELL_STRIP_META_KEY` lives with its reader
- * in `#lib/Shell` — would put it there, but the rail is only the first
- * DISPLAY of this allocation, not its owner, and a home here costs one
- * directory now instead of a file move later.
+ * `#lib/Rail`: the rail is only the first DISPLAY of this allocation, not
+ * its owner, and the keyboard listener reads it too.
  *
  * THE VALUE IS A BARE `KeyboardEvent.key` STRING, deliberately the smallest
  * honest thing. The command grammar — modes, registers, chords, sequences,

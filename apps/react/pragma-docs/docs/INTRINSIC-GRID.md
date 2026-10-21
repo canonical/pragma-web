@@ -83,9 +83,9 @@ strip row ALWAYS present (`min-block-size: var(--strip-h)`, empty sockets),
 reading §2 as governing strip CONTENT (which mode gets to put what in the
 band) and AX.6 as governing the BAND (frame geometry). The exhibit supports
 this reading: its `.strip` never unmounts; only the per-mode `sgroup`s
-toggle. Measured consequence: the five lens frames are byte-identical
-(modulo the router's own `aria-current`) through the real SSR pipeline —
-`frameStability.tests.tsx` pins it.
+toggle. Measured consequence: every lens layout renders exactly one strip
+band on every URL through the real SSR pipeline —
+`src/testing/integration/lensLayouts.ssr.tests.tsx` pins it.
 
 ## 5 — `container-type` makes the canvas a containing block: the fixed/sticky trap (P-4.1)
 
@@ -119,9 +119,10 @@ the likely candidate). The law is written down before there is a corpse.
 west, quick-facts aside east (`--aside-w`). The obvious modern move is a
 `@container canvas (inline-size < …)` rule that stacks the aside under the
 article on narrow canvases — the canvas is even a named query container
-already. But the at-rule census (`frameStability.tests.tsx`) sanctions
-exactly ONE layout-capable conditional in the app, the Rail collapse, and
-a second one would erode the AX.1 posture one "just this once" at a time.
+already. But the at-rule census
+(`src/testing/integration/stylesheets.tests.ts`) sanctions exactly ONE
+layout-capable conditional in the app, the Rail collapse, and a second one
+would erode the AX.1 posture one "just this once" at a time.
 
 **Fix.** Flex, intrinsically: the body is `display: flex; flex-wrap: wrap`,
 the article `flex: 1 1 32rem; min-inline-size: 0`, the aside

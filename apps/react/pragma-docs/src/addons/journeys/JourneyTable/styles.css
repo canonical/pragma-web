@@ -6,7 +6,7 @@
  * distinction they can see at a glance, and the job's story as clearly
  * secondary text. DS tokens with literal fallbacks throughout; logical
  * properties throughout (this frame is direction-agnostic); zero
- * layout-capable conditional at-rules — the census (frameStability.tests)
+ * layout-capable conditional at-rules — the census (stylesheets.tests)
  * sanctions exactly one app-wide, and it is the frame's collapse, not ours.
  */
 

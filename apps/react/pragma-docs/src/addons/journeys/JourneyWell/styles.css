@@ -7,7 +7,7 @@
  * against the well — never `position: fixed`, which the canvas's
  * containment would re-anchor (INTRINSIC-GRID.md entry 5). React Flow
  * positions everything absolutely inside its own wrapper. --z-plate is
- * CONSUMED, never defined here (frameStability.tests counts definitions).
+ * CONSUMED, never defined here (stylesheets.tests counts definitions).
  *
  * At-rules: one `prefers-reduced-motion` block at the foot, census-EXEMPT
  * (matched by query text, cannot reflow layout), so the app's sanctioned

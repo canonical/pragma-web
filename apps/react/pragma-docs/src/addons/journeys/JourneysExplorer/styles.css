@@ -2,7 +2,7 @@
  * JourneysExplorer — the triptych: demand index west, the primary table
  * over the journey well centre, the job inspector east. The west column
  * takes the frame's --subnav-w as its minimum, the east --aside-w — both
- * CONSUMED, never re-defined (frameStability.tests counts definitions); the
+ * CONSUMED, never re-defined (stylesheets.tests counts definitions); the
  * centre releases its min-content claim so neither the table nor the well
  * can prop the frame open (INTRINSIC-GRID.md, one level down). Panels own
  * their scroll (min-block-size: 0 down the chain). Zero layout-capable

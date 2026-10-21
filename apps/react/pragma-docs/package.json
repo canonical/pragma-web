@@ -20,7 +20,7 @@
     "#lib/LensLayout": "./src/lib/LensLayout/index.ts",
     "#lib/ModeStrip": "./src/lib/ModeStrip/index.ts",
     "#lib/Rail": "./src/lib/Rail/index.ts",
-    "#lib/Shell": "./src/lib/Shell/index.ts",
+    "#lib/SiteColophon": "./src/lib/SiteColophon/index.ts",
     "#lib/SiteRail": "./src/lib/SiteRail/index.ts",
     "#lib/ThemeSelector": "./src/lib/ThemeSelector/index.ts",
     "#lib/WellGeometry": "./src/lib/WellGeometry/index.ts",

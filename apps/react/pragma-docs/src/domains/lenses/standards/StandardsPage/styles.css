@@ -2,7 +2,7 @@
  * StandardsPage — the lens heading over the grouped index. Normal flow:
  * the index scrolls with the canvas (a reading mode, not a
  * panels-own-their-scroll explorer). Zero conditional at-rules (the
- * census in frameStability.tests.tsx).
+ * census in stylesheets.tests.ts).
  */
 
 @layer app {
