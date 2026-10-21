@@ -21,6 +21,15 @@ const numericTerm = {
   },
 } as const;
 
+/** A params schema that parses every term to the empty string. */
+const emptyTerm = {
+  "~standard": {
+    version: 1,
+    vendor: "test",
+    validate: () => ({ value: { term: "" } }),
+  },
+} as const;
+
 const routes: RouteMap = {
   glossary: route({ url: "/glossary", content: Blank }),
   glossaryTerm: route({ url: "/glossary/:term", content: Blank }),
@@ -29,16 +38,28 @@ const routes: RouteMap = {
     content: Blank,
     params: numericTerm,
   }),
+  emptied: route({
+    url: "/emptied/:term",
+    content: Blank,
+    params: emptyTerm,
+  }),
 } as const;
 
 const notFound = route({ url: "/404", content: Blank });
 
-/** Render the lens context at `url`, once the router has matched it. */
-const renderAt = async (url: string, Context: () => ReactElement) => {
-  const router = createRouter(routes, {
-    adapter: createMemoryAdapter(url),
-    notFound,
-  });
+/**
+ * Render the lens context at `url`, once the router has matched it. With
+ * `withNotFound` false the router has no not-found route, so an unknown URL
+ * leaves it with no match at all.
+ */
+const renderAt = async (
+  url: string,
+  Context: () => ReactElement,
+  withNotFound = true,
+) => {
+  const router = withNotFound
+    ? createRouter(routes, { adapter: createMemoryAdapter(url), notFound })
+    : createRouter(routes, { adapter: createMemoryAdapter(url) });
   await router.load(url);
   render(
     <RouterProvider router={router}>
@@ -93,5 +114,23 @@ describe("makeLensContext", () => {
   it("renders the lens crumb alone when no route matched", async () => {
     const nav = await renderAt("/nowhere", GlossaryContext);
     expect(within(nav).getAllByRole("listitem")).toHaveLength(1);
+  });
+
+  it("renders the lens crumb alone when the router has no match at all", async () => {
+    const nav = await renderAt("/nowhere", GlossaryContext, false);
+    expect(within(nav).getAllByRole("listitem")).toHaveLength(1);
+    expect(within(nav).getByText("Glossary")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  it("adds no current crumb for an empty-string param", async () => {
+    const nav = await renderAt("/emptied/anything", GlossaryContext);
+    expect(within(nav).getAllByRole("listitem")).toHaveLength(1);
+    expect(within(nav).getByText("Glossary")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 });
