@@ -8,6 +8,14 @@ export type { CanvasProps } from "./Canvas/index.js";
 export { CANVAS_ELEMENT_ID, Canvas } from "./Canvas/index.js";
 export type { CanvasSkipLinkProps } from "./CanvasSkipLink/index.js";
 export { CanvasSkipLink } from "./CanvasSkipLink/index.js";
+export type {
+  Box,
+  ChipLegendProps,
+  ChipProps,
+  Kind,
+  Lifecycle,
+} from "./Chip/index.js";
+export { Chip, ChipLegend } from "./Chip/index.js";
 export type { ClientOnlyProps } from "./ClientOnly/index.js";
 export { ClientOnly } from "./ClientOnly/index.js";
 export type { ErrorBoundaryProps } from "./ErrorBoundary/index.js";

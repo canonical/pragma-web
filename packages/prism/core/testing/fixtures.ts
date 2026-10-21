@@ -238,3 +238,6 @@ export const WARM_NOT_FOUND = route({
   content: BlankPage,
   warm: () => prefetchQuery(PING_QUERY, {}),
 });
+
+/** A site's namespace prefixes, in the order its provider lists them. */
+export const PREFIXES = ["ds", "cs", "docs"] as const;

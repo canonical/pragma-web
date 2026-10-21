@@ -10,6 +10,9 @@ package holds the parts every such site needs and none of them owns:
   `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page needs,
   `ErrorBoundary` and `ClientOnly`. There is no shared frame: each lens's
   layout arranges these as it needs.
+- **Chip**: the inline mention of a graph entity, tinted by its namespace,
+  shaped by its kind, filled or outlined by class vs instance, and dotted by
+  lifecycle; `ChipLegend` explains the grammar.
 - **Well geometry**: the pure, deterministic layout functions a graph well
   settles its nodes and edges with (`relaxBoxes`, `edgeEndpoint`, `quadArc`,
   `selfLoop`, `settle`).
@@ -83,6 +86,31 @@ does not define them: `--strip-h` (the strip's height), `--z-plate`,
 `--z-chrome` and `--z-overlay` (the z-axis strata) and `--rail-span` (the
 rail's column span over the layout's `--grid-intrinsic` columns).
 
+## Chip
+
+```tsx
+<Chip
+  href={href}
+  kind="component"
+  label="Button"
+  prefixes={prefixes}
+  uri="ds:global.component.button"
+/>
+```
+
+`prefixes` is required: it is the site's namespace list, sourced from the
+provider (`ontologies { prefix }`), never written by hand. A namespace's
+place in the list picks its hue (golden-angle steps), so the same list
+always tints the same way and appending a prefix keeps every earlier tint.
+A chip's namespace is its URI's prefix unless `namespace` overrides it; one
+outside the list gets a neutral tint. Lightness and chroma are shared by
+every hue behind `--chip-tint-l` and `--chip-tint-c`, which the dark theme
+redefines, so text-on-fill contrast holds at AA for every hue in both
+themes.
+
+The chip knows no routes: pass `href` (the noun's canonical home, which the
+site resolves) to render a link, or leave it out to render inert text.
+
 ## Route facets
 
 ```ts
@@ -144,9 +172,10 @@ through module state instead.
 
 ## Public API
 
-- Components: `Canvas`, `CanvasSkipLink`, `CANVAS_ELEMENT_ID`,
+- Components: `Chip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`, `CANVAS_ELEMENT_ID`,
   `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
-  `ModeStrip`, `Rail`, `ThemeSelector`; types `CanvasProps`,
+  `ModeStrip`, `Rail`, `ThemeSelector`; types `ChipProps`,
+  `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `ModeStripProps`, `RailProps`, `RailBrand`.
 - Well geometry: `settle`, `edgeEndpoint`, `relaxBoxes`, `quadArc`,
