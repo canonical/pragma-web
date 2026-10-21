@@ -8,10 +8,10 @@ import type { LobbyQuery } from "#relay/__generated__/LobbyQuery.graphql.js";
 import lobbyQueryNode from "#relay/__generated__/LobbyQuery.graphql.js";
 import {
   LOBBY_COMPONENT_CLASS,
-  LOBBY_EXEMPLAR_COUNT,
   LOBBY_PATTERN_CLASS,
   LOBBY_STANDARD_CLASS,
-} from "./lobbyQuery.js";
+} from "./constants.js";
+import { LOBBY_EXEMPLAR_COUNT } from "./lobbyQuery.js";
 import "./homeStyles.css";
 
 /**

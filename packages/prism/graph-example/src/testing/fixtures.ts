@@ -46,10 +46,10 @@ export const LENS_OPERATION_VARIABLES: Record<
   // The standards lens now reaches its collection through the TBox, so it
   // needs a class binding — and this is the gate's OWN binding, never the
   // app's. The app's runtime binding lives in
-  // `apps/react/pragma-docs/src/lib/graphBindings`; importing it here would
-  // couple the neutrality proof to the deployment it exists to be
-  // independent of, and the gate would go green because the app agreed
-  // with itself.
+  // `apps/react/pragma-docs/src/domains/lenses/standards/constants.ts`;
+  // importing it here would couple the neutrality proof to the deployment it
+  // exists to be independent of, and the gate would go green because the app
+  // agreed with itself.
   StandardEntityQuery: { uri: SAMPLE_ENTITY_URI, classUri: SAMPLE_CLASS_URI },
   StandardsIndexQuery: {
     classUri: SAMPLE_CLASS_URI,

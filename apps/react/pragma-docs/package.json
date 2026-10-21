@@ -23,7 +23,6 @@
     "#lib/ThemeSelector": "./src/lib/ThemeSelector/index.ts",
     "#lib/WellGeometry": "./src/lib/WellGeometry/index.ts",
     "#lib/authGuard": "./src/lib/authGuard/index.ts",
-    "#lib/graphBindings": "./src/lib/graphBindings/index.ts",
     "#lib/routeFacet": "./src/lib/routeFacet/index.ts",
     "#lib/routeShortcut": "./src/lib/routeShortcut/index.ts",
     "#lib/router": "./src/lib/router/index.ts",

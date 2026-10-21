@@ -391,7 +391,7 @@ Two things it does **not** guard, both worth knowing before trusting a green run
 **It does not guard the app's runtime bindings.** The contract's root surface names no
 subject, so a lens that enumerates things is handed a class URI from outside the graph.
 This gate supplies its OWN (`metro:Station`, in `src/testing/fixtures.ts`); the app
-supplies its own from `apps/react/pragma-docs/src/lib/graphBindings`. **The two must never
+supplies its own from `apps/react/pragma-docs/src/domains/lenses/standards/constants.ts`. **The two must never
 meet.** Importing the app's binding here would make the gate go green because the app
 agreed with itself, when the point is that the operation is neutral about which class it
 is pointed at. The consequence is that an operation can be contract-clean here and still

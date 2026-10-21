@@ -3,8 +3,8 @@
  * reads those annotations back off the route table.
  *
  * NOT barrelled from `#lib/index.js` — that barrel carries the app's
- * COMPONENTS, and this renders nothing (the same reason `graphBindings` and
- * `WellGeometry` stay out of it). Import from `#lib/routeFacet/index.js`.
+ * COMPONENTS, and this renders nothing (the same reason `WellGeometry` stays
+ * out of it). Import from `#lib/routeFacet/index.js`.
  */
 
 export type { FacetBearer } from "./collectFacet.js";

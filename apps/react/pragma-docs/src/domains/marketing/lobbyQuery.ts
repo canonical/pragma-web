@@ -37,25 +37,13 @@
  * stub route and the copy says so.
  */
 
-import { GRAPH_BINDINGS } from "#lib/graphBindings";
 import type { LobbyQuery$variables } from "#relay/__generated__/LobbyQuery.graphql.js";
 import lobbyQueryNode from "#relay/__generated__/LobbyQuery.graphql.js";
-
-/**
- * The class URIs the lobby's counted doors read. Prefixed form: the
- * `ontologyClass(uri:)` argument accepts it and echoes back the full IRI
- * (verified live), which is why nothing here compares URIs for identity.
- *
- * The three names survive as this module's exports — every caller keeps
- * importing them from here — but the STRINGS now live in one place for the
- * whole app (`#lib/graphBindings`), beside the standards lens's binding
- * and the term inspector's. Three literals in a marketing module were the
- * app's own prior answer to "how does a lens name its collection"; this is
- * that answer, generalised rather than replaced.
- */
-export const LOBBY_COMPONENT_CLASS = GRAPH_BINDINGS.components.classUri;
-export const LOBBY_PATTERN_CLASS = GRAPH_BINDINGS.patterns.classUri;
-export const LOBBY_STANDARD_CLASS = GRAPH_BINDINGS.standards.classUri;
+import {
+  LOBBY_COMPONENT_CLASS,
+  LOBBY_PATTERN_CLASS,
+  LOBBY_STANDARD_CLASS,
+} from "./constants.js";
 
 /**
  * How many exemplar components the hero's projection lists. A handful:

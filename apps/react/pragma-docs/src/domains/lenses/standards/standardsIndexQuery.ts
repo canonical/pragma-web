@@ -8,9 +8,9 @@
  * tag lives in `StandardsPage.tsx`.
  */
 
-import { GRAPH_BINDINGS } from "#lib/graphBindings";
 import type { StandardsIndexQuery$variables } from "#relay/__generated__/StandardsIndexQuery.graphql.js";
 import standardsIndexQueryNode from "#relay/__generated__/StandardsIndexQuery.graphql.js";
+import { STANDARD_CLASS_URI } from "./constants.js";
 
 /**
  * One page of the standards connection. 100 is a size THIS APP chooses,
@@ -34,11 +34,10 @@ export { standardsIndexQueryNode };
  * route has no params and no search schema; filters stay out of v1,
  * mirroring the catalog's R2 posture), but the collection it enumerates is
  * now named by the app's committed binding rather than by a bespoke root
- * field. A fork repoints this lens by editing `#lib/graphBindings` and
- * nothing else.
+ * field (`STANDARD_CLASS_URI`, this domain's own constant).
  */
 export const standardsIndexVariables = (): StandardsIndexQuery$variables => ({
-  classUri: GRAPH_BINDINGS.standards.classUri,
+  classUri: STANDARD_CLASS_URI,
   count: STANDARDS_PAGE_SIZE,
   cursor: null,
 });

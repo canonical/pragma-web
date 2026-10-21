@@ -347,7 +347,7 @@ describe("StandardsIndex grouping", () => {
     "renders the empty state, NOT a crash, when the binding names no class",
     () => {
       // `ontologyClass` is nullable and a mis-set binding is the likeliest
-      // way to hit it — a typo in `#lib/graphBindings`, or a deployment
+      // way to hit it — a typo in `STANDARD_CLASS_URI`, or a deployment
       // whose graph never loaded that ontology. The page must degrade, not
       // throw, and the route's ErrorBoundary must never be reached.
       const fetchFn = createFetchSpy();
