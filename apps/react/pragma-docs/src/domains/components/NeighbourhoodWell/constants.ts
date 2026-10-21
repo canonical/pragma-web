@@ -4,13 +4,6 @@ import type { Box, Kind } from "@canonical/prism-core";
 export const WELL_CSS_CLASS_NAME = "ds neighbourhood-well";
 
 /**
- * The namespace prefixes the well's chips tint by, in the order the pragma
- * provider lists its ontologies. The well's fragment selects no
- * `ontologies { prefix }`, so the list is written here until it does.
- */
-export const CHIP_PREFIXES = ["ds", "cs", "docs"] as const;
-
-/**
  * The kinds a pragma URI's local name can name in one of its interior
  * segments (`ds:global.component.button` names `component`).
  */

@@ -24,9 +24,14 @@ import "./styles.css";
  * for the head title and the not-found line, and fragment data is
  * invisible to it by design. The title's URI fallback is the COMPACT form
  * (`_meta.curie`) — a browser tab is an identity line like any other.
+ * `ontologies { prefix }` is the provider's namespace list, in its order:
+ * the well's chips tint by it.
  */
 const componentEntityQuerySource = (): unknown => graphql`
   query ComponentEntityQuery($uri: String!, $count: Int!) {
+    ontologies {
+      prefix
+    }
     component(uri: $uri) {
       name
       uri
@@ -95,7 +100,10 @@ const EntityContent = ({
       {/* The closing well spans the full row UNDER the two-tenant body:
           the page ends by looking down into the graph it was projected
           from (AX.3, AV-364). */}
-      <NeighbourhoodWell component={component} />
+      <NeighbourhoodWell
+        component={component}
+        prefixes={data.ontologies.map(({ prefix }) => prefix)}
+      />
     </>
   );
 };

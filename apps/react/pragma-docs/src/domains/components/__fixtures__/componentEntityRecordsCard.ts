@@ -239,6 +239,28 @@ const componentEntityRecordsCard = {
     'component(uri:"ds:global.component.card")': {
       __ref: "https://ds.canonical.com/global.component.card",
     },
+    ontologies: {
+      __refs: [
+        "client:root:ontologies:0",
+        "client:root:ontologies:1",
+        "client:root:ontologies:2",
+      ],
+    },
+  },
+  "client:root:ontologies:0": {
+    __id: "client:root:ontologies:0",
+    __typename: "Ontology",
+    prefix: "ds",
+  },
+  "client:root:ontologies:1": {
+    __id: "client:root:ontologies:1",
+    __typename: "Ontology",
+    prefix: "cs",
+  },
+  "client:root:ontologies:2": {
+    __id: "client:root:ontologies:2",
+    __typename: "Ontology",
+    prefix: "anatomy",
   },
   "https://ds.canonical.com/Component": {
     __id: "https://ds.canonical.com/Component",

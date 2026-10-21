@@ -24,6 +24,9 @@ const bareRecords = {
     'component(uri:"ds:global.component.bare")': {
       __ref: BARE_URI,
     },
+    // The page's query also selects the provider's ontologies; an empty
+    // list keeps the store complete without tinting anything.
+    ontologies: { __refs: [] },
   },
   [BARE_URI]: {
     __id: BARE_URI,

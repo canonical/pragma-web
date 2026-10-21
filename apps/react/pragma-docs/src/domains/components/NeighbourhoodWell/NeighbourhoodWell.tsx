@@ -11,11 +11,7 @@ import { graphql, useFragment } from "react-relay";
 import type { NeighbourhoodWell_component$key } from "#relay/__generated__/NeighbourhoodWell_component.graphql.js";
 import neighbourhoodWellFragmentNode from "#relay/__generated__/NeighbourhoodWell_component.graphql.js";
 import { buildNeighbourhood } from "./buildNeighbourhood.js";
-import {
-  CHIP_PREFIXES,
-  EDGE_FAMILIES,
-  WELL_CSS_CLASS_NAME,
-} from "./constants.js";
+import { EDGE_FAMILIES, WELL_CSS_CLASS_NAME } from "./constants.js";
 import { toNeighbourhoodInput } from "./toNeighbourhoodInput.js";
 import type { NeighbourhoodWellProps } from "./types.js";
 import "./styles.css";
@@ -189,6 +185,7 @@ const readUriFromEvent = (target: EventTarget | null): string | undefined => {
 const NeighbourhoodWell = ({
   className,
   component,
+  prefixes,
 }: NeighbourhoodWellProps): React.ReactElement => {
   const data = useFragment<NeighbourhoodWell_component$key>(
     neighbourhoodWellFragmentNode,
@@ -321,7 +318,7 @@ const NeighbourhoodWell = ({
                     href={node.isCentre ? undefined : node.href}
                     kind={node.kind}
                     label={node.label}
-                    prefixes={CHIP_PREFIXES}
+                    prefixes={prefixes}
                     uri={node.uri}
                   />
                 </div>

@@ -5,6 +5,11 @@ import type { EdgeFamily, RelationSpec, Sector } from "./constants.js";
 export interface NeighbourhoodWellProps {
   /** The entity page's fragment ref. */
   readonly component: NeighbourhoodWell_component$key;
+  /**
+   * The provider's namespace prefixes, in its `ontologies { prefix }`
+   * order: the chips tint by them.
+   */
+  readonly prefixes: readonly string[];
   /** Additional CSS classes. */
   readonly className?: string;
 }

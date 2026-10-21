@@ -34,6 +34,9 @@ const notFoundRecords = {
     __id: "client:root",
     __typename: "__Root",
     'component(uri:"ds:no.such.component")': null,
+    // The page's query also selects the provider's ontologies; an empty
+    // list is all the not-found branch needs.
+    ontologies: { __refs: [] },
   },
 } as unknown as RecordMap;
 
