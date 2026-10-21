@@ -18,7 +18,10 @@
  * - the tokens read from outside the lens are exactly the ones named here,
  *   each a semantic token of the design system or a hook the site defines,
  *   so a misspelt, invented or primitive name cannot sit unnoticed behind
- *   its fallback.
+ *   its fallback;
+ * - no rule declaration holds a unit-bearing literal, so every length, time
+ *   and percentage that is a design decision lives in a component token,
+ *   save the unthemable declarations named here.
  */
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -48,8 +51,9 @@ const files = collectCss(LIBRARY_DIRECTORY);
 /**
  * The component tokens that hold the lens's own value, because the design
  * system has no semantic token for the decision: two layout measures, and
- * the type sizes, the font families, the weights, the tracking, the radii,
- * the stroke and edge widths, the opacities and the indicator size.
+ * the type sizes, the font families, the weights, the tracking, the line
+ * heights, the radii, the stroke and edge widths, the focus ring, the
+ * arrowhead, the opacities and the indicator size.
  */
 const LITERAL_TOKENS = [
   "--definitions-explorer-divider-width",
@@ -57,6 +61,9 @@ const LITERAL_TOKENS = [
   "--definitions-explorer-well-min-block-size",
   "--explorer-controls-chip-border-width",
   "--explorer-controls-chip-font-size",
+  "--explorer-controls-chip-line-height",
+  "--explorer-controls-chip-outline-offset",
+  "--explorer-controls-chip-outline-width",
   "--explorer-controls-chip-radius",
   "--explorer-controls-swatch-size",
   "--explorer-status-bar-radius",
@@ -74,6 +81,7 @@ const LITERAL_TOKENS = [
   "--hierarchy-well-label-font-size",
   "--hierarchy-well-label-halo-width",
   "--hierarchy-well-line-width",
+  "--lineage-line-height",
   "--lineage-self-font-weight",
   "--term-inspector-border-width",
   "--term-inspector-definition-font-size",
@@ -92,6 +100,7 @@ const LITERAL_TOKENS = [
   "--term-rail-count-opacity",
   "--term-rail-current-font-weight",
   "--term-rail-depth-font-family",
+  "--term-rail-depth-line-height",
   "--term-rail-dimmed-opacity",
   "--term-rail-font-size",
   "--term-rail-item-radius",
@@ -100,6 +109,9 @@ const LITERAL_TOKENS = [
   "--term-rail-mark-border-width",
   "--term-rail-mark-size",
   "--term-rail-title-font-size",
+  "--well-legend-arrow-half-width",
+  "--well-legend-arrow-length",
+  "--well-legend-arrow-overhang",
   "--well-legend-border-width",
   "--well-legend-font-size",
   "--well-legend-max-inline-size",
@@ -140,6 +152,30 @@ const EXTERNAL_TOKENS = [
 const LENS_PROPERTY =
   /^--(?:definitions-|explorer-|hierarchy-well-|lineage-|term-|well-legend-)/;
 
+/**
+ * The rule declarations that may hold a unit-bearing literal, because none
+ * is a design decision: the visually hidden idiom's one-pixel clip, a
+ * circle's half-box radius, and the layout root filling the viewport. A
+ * bare `0` carries no unit.
+ */
+const UNTHEMABLE_DECLARATIONS = [
+  "block-size: 100dvh",
+  "block-size: 1px",
+  "border-radius: 50%",
+  "clip-path: inset(50%)",
+  "inline-size: 1px",
+  "margin: -1px",
+];
+
+/**
+ * The literals unthemable in any declaration: `100%` fills the containing
+ * block and `1fr` the grid's free space.
+ */
+const UNTHEMABLE_LITERALS = ["100%", "1fr"];
+
+/** A number with a unit: a length, a time, an angle or a percentage. */
+const UNIT_LITERAL = /(?<![\w.-])-?(?:\d+\.?\d*|\.\d+)(?:%|[a-z]+)(?![\w-])/g;
+
 /** List every custom property a stylesheet reads from outside the lens. */
 function listExternalTokens(css: string): string[] {
   return [...css.matchAll(/var\(\s*(--[a-z0-9-]+)/g)]
@@ -153,6 +189,27 @@ function listLiteralTokens(css: string): string[] {
   return [...root.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
     .filter((match) => !(match.at(2) ?? "").includes("var("))
     .map((match) => match.at(1) ?? "");
+}
+
+/**
+ * List the rule declarations, outside the `:root` component tokens, that
+ * hold a unit-bearing literal, as `property: value`, the unthemable
+ * declarations and literals left out.
+ */
+function listRawDecisions(css: string): string[] {
+  const rules = css.replace(/:root\s*\{[^}]*\}/, "");
+  return [...rules.matchAll(/(-{0,2}[a-z][a-z0-9-]*)\s*:\s*([^;{}]+);/g)]
+    .filter((match) => !(match.at(1) ?? "").startsWith("--"))
+    .map(
+      (match) =>
+        `${match.at(1)}: ${(match.at(2) ?? "").replaceAll(/\s+/g, " ").trim()}`,
+    )
+    .filter((declaration) => !UNTHEMABLE_DECLARATIONS.includes(declaration))
+    .filter((declaration) =>
+      (declaration.match(UNIT_LITERAL) ?? []).some(
+        (literal) => !UNTHEMABLE_LITERALS.includes(literal),
+      ),
+    );
 }
 
 /**
@@ -219,6 +276,25 @@ describe("the lens stylesheets", () => {
       files.flatMap((file) => listExternalTokens(readCss(file))),
     );
     expect([...external].toSorted()).toEqual(EXTERNAL_TOKENS);
+  });
+
+  it("hold no design decision outside a component token", () => {
+    expect(files.flatMap((file) => listRawDecisions(readCss(file)))).toEqual(
+      [],
+    );
+  });
+
+  it("tell a raw decision from an unthemable declaration", () => {
+    expect(
+      listRawDecisions(
+        ".ds.probe { outline: 2px solid red; inline-size: 100%; margin: 0; }",
+      ),
+    ).toEqual(["outline: 2px solid red"]);
+    expect(
+      listRawDecisions(
+        ":root { --probe-width: 2px; } .ds.probe { margin: -1px; --probe-gap: 1rem; }",
+      ),
+    ).toEqual([]);
   });
 
   it("paint in the prism layer, never in a site's", () => {

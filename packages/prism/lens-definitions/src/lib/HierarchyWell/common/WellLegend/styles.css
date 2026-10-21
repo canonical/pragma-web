@@ -6,11 +6,10 @@
  *
  * Each design decision reads a component token. The colours and spacing
  * read the design system's semantic tokens. The design system has no
- * semantic token for the type size, the border width, the radii or the
- * shadow's geometry, so those component tokens hold the lens's own value
- * and only they retune it. The legend's cap,
- * `--well-legend-max-inline-size`, is a literal layout measure, and the few
- * pixels that draw the legend's arrowhead are literal too.
+ * semantic token for the type size, the border width, the radii, the
+ * shadow's geometry or the arrowhead's, so those component tokens hold the
+ * lens's own value and only they retune it. The legend's cap,
+ * `--well-legend-max-inline-size`, is a literal layout measure.
  */
 
 @layer ds.prism {
@@ -36,6 +35,11 @@
     --well-legend-swatch-background: var(--color-background);
     --well-legend-line-color: var(--color-border-muted);
     --well-legend-relation-color: var(--color-text-branded);
+    /* The arrowhead: a triangle its length long and twice its half-width
+     * tall, centred on the line and overhanging the line's end. */
+    --well-legend-arrow-length: 5px;
+    --well-legend-arrow-half-width: 3px;
+    --well-legend-arrow-overhang: 1px;
   }
 
   .ds.well-legend {
@@ -99,10 +103,11 @@
   .ds.well-legend .edge::after {
     content: "";
     position: absolute;
-    inset-inline-end: -1px;
-    inset-block-start: -3px;
-    border-block: 3px solid transparent;
-    border-inline-start: 5px solid var(--well-legend-line-color);
+    inset-inline-end: calc(-1 * var(--well-legend-arrow-overhang));
+    inset-block-start: calc(-1 * var(--well-legend-arrow-half-width));
+    border-block: var(--well-legend-arrow-half-width) solid transparent;
+    border-inline-start: var(--well-legend-arrow-length) solid
+      var(--well-legend-line-color);
   }
 
   /* The relation swatch: the semantic arc's accent, the arcs' own hue. */

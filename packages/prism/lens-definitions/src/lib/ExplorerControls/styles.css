@@ -6,9 +6,9 @@
  *
  * Each design decision reads a component token. The colours, spacing and
  * motion read the design system's semantic tokens. The design system has no
- * semantic token for the chip's type size, border width and radius, or the
- * swatch size, so those component tokens hold the lens's own value and only
- * they retune it.
+ * semantic token for the chip's type size, line height, border width and
+ * radius, its focus ring's width and offset, or the swatch size, so those
+ * component tokens hold the lens's own value and only they retune it.
  */
 
 @layer ds.prism {
@@ -29,6 +29,7 @@
     --explorer-controls-chip-radius: 999px;
     --explorer-controls-chip-color: var(--color-text-muted);
     --explorer-controls-chip-font-size: 0.75rem;
+    --explorer-controls-chip-line-height: 1.4;
     --explorer-controls-chip-color-pressed: var(--color-text);
     --explorer-controls-chip-background-pressed: color-mix(
       in oklab,
@@ -39,6 +40,8 @@
       --color-background-contrasted,
       currentColor
     );
+    --explorer-controls-chip-outline-width: 2px;
+    --explorer-controls-chip-outline-offset: 2px;
     --explorer-controls-swatch-size: 0.5rem;
     --explorer-controls-transition-duration: var(--motion-duration-fast, 0.15s);
   }
@@ -80,7 +83,7 @@
     color: var(--explorer-controls-chip-color);
     font: inherit;
     font-size: var(--explorer-controls-chip-font-size);
-    line-height: 1.4;
+    line-height: var(--explorer-controls-chip-line-height);
     white-space: nowrap;
     cursor: pointer;
     transition:
@@ -111,8 +114,9 @@
   }
 
   .ds.explorer-controls .chip:focus-visible {
-    outline: 2px solid var(--explorer-controls-chip-outline-color);
-    outline-offset: 2px;
+    outline: var(--explorer-controls-chip-outline-width) solid
+      var(--explorer-controls-chip-outline-color);
+    outline-offset: var(--explorer-controls-chip-outline-offset);
   }
 
   @media (prefers-reduced-motion: reduce) {

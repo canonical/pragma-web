@@ -134,9 +134,11 @@ site also retunes those decisions through its theme:
 
 The design system has no semantic token for the rest, so the component
 token holds the lens's own value and only the component token retunes it:
-every type size, font family, weight and tracking; every radius, border,
-stroke and edge width; every opacity and shadow geometry; the indicator size; and
-two layout measures, `--definitions-explorer-well-min-block-size` and
+every type size, font family, weight, tracking and line height; every
+radius, border, stroke and edge width; the focus ring's width and offset;
+every opacity and shadow geometry; the indicator size and the legend's
+arrowhead; and two layout measures,
+`--definitions-explorer-well-min-block-size` and
 `--well-legend-max-inline-size`. No component token reads a primitive
 token.
 

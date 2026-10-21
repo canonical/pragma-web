@@ -7,9 +7,9 @@
  * Each design decision reads a component token. The colours, spacing and
  * motion read the design system's semantic tokens. The design system has no
  * semantic token for the type sizes, the tracking, the item radius, the
- * mark's size and stroke, the monospace family, the opacities or the
- * weight, so those component tokens hold the lens's own value and only they
- * retune it.
+ * mark's size and stroke, the depth glyph's family and line height, the
+ * opacities or the weight, so those component tokens hold the lens's own
+ * value and only they retune it.
  *
  * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
  */
@@ -37,6 +37,7 @@
     --term-rail-mark-color: var(--color-border);
     --term-rail-depth-font-family: ui-monospace, monospace;
     --term-rail-depth-color: var(--color-border);
+    --term-rail-depth-line-height: 1;
     --term-rail-dimmed-opacity: 0.38;
     --term-rail-hovered-background: color-mix(
       in oklab,
@@ -169,7 +170,7 @@
     flex-shrink: 0;
     font-family: var(--term-rail-depth-font-family);
     font-size: var(--term-rail-label-font-size);
-    line-height: 1;
+    line-height: var(--term-rail-depth-line-height);
     color: var(--term-rail-depth-color);
   }
 
