@@ -292,13 +292,16 @@ describe("Rail", () => {
     expect(router.getState().location.pathname).toBe("/");
   });
 
-  it("leaves modifier chords alone", async () => {
-    const { router } = renderRail("/");
-    fireEvent.keyDown(document, { key: "2", ctrlKey: true });
-    // Give a queued navigation a beat to (wrongly) land before asserting.
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(router.getState().location.pathname).toBe("/");
-  });
+  it.each(["altKey", "ctrlKey", "metaKey", "shiftKey"] as const)(
+    "leaves a %s chord alone",
+    async (modifier) => {
+      const { router } = renderRail("/");
+      fireEvent.keyDown(document, { key: "2", [modifier]: true });
+      // Give a queued navigation a beat to (wrongly) land before asserting.
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      expect(router.getState().location.pathname).toBe("/");
+    },
+  );
 
   it("leaves digits alone mid-IME composition", async () => {
     const { router } = renderRail("/");
