@@ -26,8 +26,10 @@ import {
  * bridge that does: no store, no router change, nothing every other lens
  * would have to carry. `JourneysLayout` puts the provider around both the
  * strip and the canvas, so the switch and the explorer share ONE ephemeral
- * view. The provider remounts with the layout on every route change, so the
- * view starts from its default on each navigation.
+ * view. The provider lives as long as the layout, which the router
+ * remounts whenever the matched route changes, so the view survives a move
+ * from one job to another (the same route, new params) and starts from its
+ * default on a move to the lens index or to another lens.
  *
  * THE SSR DETERMINISM RULE. The initial value is `DEFAULT_JOURNEY_VIEW` —
  * "table", the primary surface — read from NOTHING: never `localStorage`,

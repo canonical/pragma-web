@@ -20,8 +20,10 @@ const { Context, Controls, Status } = definitionsStripSlots;
  *
  * `LensFilterProvider` encloses the whole layout because the chips in the
  * strip and the explorer in the canvas are siblings that share one filter.
- * The provider remounts with the layout, so the filter resets whenever the
- * route changes.
+ * The provider lives as long as the layout, which the router remounts
+ * whenever the matched route changes: the filter survives a move from one
+ * term to another (the same route, new params) and resets on a move to the
+ * lens index or to another lens.
  *
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon.

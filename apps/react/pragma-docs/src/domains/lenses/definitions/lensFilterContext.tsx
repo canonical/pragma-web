@@ -24,8 +24,10 @@ import { DEFAULT_LENS_FILTER, type LensFilter } from "./lensFilter.js";
  * bridge that does: no store, no router change, nothing every other lens
  * would have to carry. `DefinitionsLayout` puts the provider around both
  * the strip and the canvas, so the chips and the explorer share ONE
- * filter. The provider remounts with the layout on every route change, so
- * the filter starts from its default on each navigation.
+ * filter. The provider lives as long as the layout, which the router
+ * remounts whenever the matched route changes, so the filter survives a
+ * move from one term to another (the same route, new params) and starts
+ * from its default on a move to the lens index or to another lens.
  *
  * WHAT THIS CONTEXT DELIBERATELY DOES NOT CARRY: the graph data. An
  * earlier attempt had the explorer ANNOUNCE its ontologies here, which
