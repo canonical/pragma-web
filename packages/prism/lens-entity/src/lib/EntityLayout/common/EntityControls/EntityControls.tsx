@@ -3,6 +3,7 @@ import { ENTITY_VIEWS } from "../../../constants.js";
 import { useEntityFilter } from "../../../EntityFilterProvider/index.js";
 import { useMessages } from "../../../i18n/index.js";
 import { VIEW_MESSAGES } from "./constants.js";
+import type { EntityControlsProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds entity-controls";
@@ -15,13 +16,23 @@ const componentCssClassName = "ds entity-controls";
  * It reads no query, so it needs no `SocketGuard`: the search box stands
  * even while the index loads.
  *
- * `import { Controls } from "./common/Controls/index.js";`
+ * It takes the native props of its `<div>` root and spreads them onto it;
+ * a consumer `className` merges after its own.
+ *
+ * `import { EntityControls } from "./common/EntityControls/index.js";`
  */
-export default function Controls(): ReactElement {
+export default function EntityControls({
+  className,
+  ...props
+}: EntityControlsProps): ReactElement {
   const t = useMessages();
   const { filter, setFilter } = useEntityFilter();
   return (
-    <div className={componentCssClassName} data-slot="entity-controls">
+    <div
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      data-slot="entity-controls"
+    >
       <input
         aria-label={t("controls.search.label")}
         className="search"

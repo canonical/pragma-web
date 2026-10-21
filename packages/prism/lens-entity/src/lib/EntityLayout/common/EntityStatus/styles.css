@@ -1,8 +1,8 @@
 /*
- * Status — the entity lens's strip figure on the index. It lives inside the
- * strip band, whose height is stationary frame, so nothing here may change
- * it. The design system has no semantic token for its type size, so that
- * component token holds the lens's own value.
+ * EntityStatus — the entity lens's strip figure on the index. It lives
+ * inside the strip band, whose height is stationary frame, so nothing here
+ * may change it. The design system has no semantic token for its type
+ * size, so that component token holds the lens's own value.
  */
 
 @layer ds.prism {

@@ -1,7 +1,7 @@
 /*
- * Controls — the entity lens's strip toolbar on the index: a search box and
- * a two-button view toggle. It lives inside the strip band, whose height is
- * stationary frame, so its metrics are small and fixed.
+ * EntityControls — the entity lens's strip toolbar on the index: a search
+ * box and a two-button view toggle. It lives inside the strip band, whose
+ * height is stationary frame, so its metrics are small and fixed.
  *
  * The design system has no semantic token for the type size, the border
  * width, the radius, or the focus ring's width and offset, so those

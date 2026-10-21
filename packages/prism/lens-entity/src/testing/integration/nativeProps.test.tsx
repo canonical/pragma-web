@@ -17,8 +17,11 @@ import {
   STATIONS_BINDING,
 } from "../../../testing/fixtures.js";
 import type { EntityPageQuery } from "../../__generated__/EntityPageQuery.graphql.js";
+import { EntityFilterProvider } from "../../lib/EntityFilterProvider/index.js";
 import { EntityIndex } from "../../lib/EntityIndexPage/common/EntityIndex/index.js";
 import { EntityIndexPage } from "../../lib/EntityIndexPage/index.js";
+import { EntityControls } from "../../lib/EntityLayout/common/EntityControls/index.js";
+import { EntityStatus } from "../../lib/EntityLayout/common/EntityStatus/index.js";
 import { EntityLayout } from "../../lib/EntityLayout/index.js";
 import { EntitySummary } from "../../lib/EntityPage/common/EntitySummary/index.js";
 import { FieldsTable } from "../../lib/EntityPage/common/FieldsTable/index.js";
@@ -129,5 +132,19 @@ describe("native props", () => {
       </EntityLayout>,
     );
     expectRoot("layout", "entity-layout");
+  });
+
+  it("reach the root of the strip's controls and status", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    await renderWarm(
+      "/stations",
+      <EntityFilterProvider>
+        <EntityControls {...nativeProps("controls")} />
+        <EntityStatus binding={STATIONS_BINDING} {...nativeProps("status")} />
+      </EntityFilterProvider>,
+    );
+    expectRoot("controls", "entity-controls");
+    expectRoot("status", "entity-status");
   });
 });

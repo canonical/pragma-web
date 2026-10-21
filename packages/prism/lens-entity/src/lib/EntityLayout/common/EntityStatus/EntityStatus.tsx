@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { useMessages } from "../../../i18n/index.js";
 import useIndexStripQuery from "../../hooks/useIndexStripQuery.js";
-import type { StatusProps } from "./types.js";
+import type { EntityStatusProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds entity-status";
@@ -13,15 +13,23 @@ const componentCssClassName = "ds entity-status";
  * and the canvas cannot disagree. `aria-live` announces the change as the
  * reader types.
  *
- * `import { Status } from "./common/Status/index.js";`
+ * It takes the native props of its `<output>` root and spreads them onto
+ * it; a consumer `className` merges after its own.
+ *
+ * `import { EntityStatus } from "./common/EntityStatus/index.js";`
  */
-export default function Status({ binding }: StatusProps): ReactElement {
+export default function EntityStatus({
+  binding,
+  className,
+  ...props
+}: EntityStatusProps): ReactElement {
   const t = useMessages();
   const { count, visible } = useIndexStripQuery(binding);
   return (
     <output
       aria-live="polite"
-      className={componentCssClassName}
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="entity-status"
     >
       {t("status.count", { visible, count })}

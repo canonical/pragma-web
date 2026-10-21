@@ -2,9 +2,9 @@ import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
 import { useRouterState } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { EntityFilterProvider } from "../EntityFilterProvider/index.js";
-import { Controls } from "./common/Controls/index.js";
+import { EntityControls } from "./common/EntityControls/index.js";
+import { EntityStatus } from "./common/EntityStatus/index.js";
 import { SocketGuard } from "./common/SocketGuard/index.js";
-import { Status } from "./common/Status/index.js";
 import { Trail } from "./common/Trail/index.js";
 import type { EntityLayoutProps } from "./types.js";
 import "./styles.css";
@@ -56,11 +56,11 @@ export default function EntityLayout({
         <div className="viewport">
           <ModeStrip
             context={<Trail binding={binding} label={label} />}
-            controls={onIndex ? <Controls /> : null}
+            controls={onIndex ? <EntityControls /> : null}
             status={
               onIndex ? (
                 <SocketGuard>
-                  <Status binding={binding} />
+                  <EntityStatus binding={binding} />
                 </SocketGuard>
               ) : null
             }
