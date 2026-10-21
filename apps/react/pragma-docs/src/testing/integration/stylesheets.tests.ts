@@ -11,7 +11,8 @@
  *   every other grid is a subgrid;
  * - no LAYOUT-CAPABLE conditional at-rule exists in the app: the one
  *   sanctioned small-viewport collapse is the rail's, and the rail's
- *   stylesheet ships with `@canonical/prism-core`. Feature queries that
+ *   stylesheet ships with `@canonical/prism-core`, whose own stylesheet
+ *   census holds the package to that one. Feature queries that
  *   cannot reflow layout (`prefers-color-scheme`, `forced-colors`,
  *   `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
  *   file — and only while no other condition rides along in the prelude.
