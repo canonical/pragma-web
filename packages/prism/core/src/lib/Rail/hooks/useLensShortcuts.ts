@@ -1,38 +1,3 @@
-/**
- * The keyboard grammar's lens digits, wired as an EPHEMERAL document
- * listener — attach on mount, detach on unmount, no stored state anywhere:
- * the destination is URL state, owned by the router, and the listener
- * itself owns nothing.
- *
- * The allocation comes from the ROUTE TABLE, not from a table beside it:
- * each lens route claims its own digit (`routeShortcutFacet`) and this hook
- * collects them off `useRouter().routes`. The routes arrive through the
- * router rather than through an import of the site's route table on
- * purpose — the route table imports the lens layouts, which render the rail,
- * so importing back would close a cycle. The hook also reflects the table
- * the router is ACTUALLY running, which is what makes the digits derived
- * rather than merely parallel.
- *
- * The hook RETURNS the allocation so the rail can display exactly what it
- * wires: one walk per render, one source, no way for the shown digit and
- * the live digit to disagree.
- *
- * Guards, in check order: the stored shortcuts preference is off
- * (`usePreferredShortcuts`); no modifier chords (the browser's own
- * `Alt+digit` etc. stay untouched); no firing mid-IME-composition (the
- * digit is text being composed, not a command) or on key auto-repeat (a
- * held digit navigates once); no firing while the user types in an
- * editable target — digits belong to the text field then, not the
- * rail.
- *
- * WCAG 2.1.4 (Character Key Shortcuts) asks that a bare-key shortcut be
- * switchable off, through a mechanism available to the user. The stored
- * preference is the switch; a site satisfies the criterion only once it
- * offers a control that writes it, and that control must, in the same
- * change, stop the rail advertising `kbd` hints and `aria-keyshortcuts` for
- * keys that no longer fire.
- */
-
 import { usePreferredShortcuts } from "@canonical/react-hooks";
 import type { RouteName } from "@canonical/router-core";
 import { type RegisteredRouteMap, useRouter } from "@canonical/router-react";
@@ -53,11 +18,33 @@ const isEditableTarget = (target: EventTarget | null): boolean => {
 
 /**
  * Wire the running router's shortcut allocation to the document, and return
- * it for display.
+ * it for display. The listener is ephemeral — attached on mount, detached on
+ * unmount, with no stored state: the destination is URL state, owned by the
+ * router.
  *
- * Named through the router's REGISTERED map rather than a site's route
- * type: same precision, and this package knows nothing about the site's
- * route module.
+ * The allocation comes from the route table: each lens route claims its own
+ * digit (`routeShortcutFacet`) and the hook collects them off
+ * `useRouter().routes`. The routes arrive through the router rather than an
+ * import of the site's route table, because the route table imports the
+ * lens layouts, which render the rail, so importing it back would close a
+ * cycle; reading the router also reflects the table it is actually running.
+ * Routes are named through the router's registered map rather than a site's
+ * route type: the same precision, with no knowledge of the site's route
+ * module. Returning the allocation lets the rail display exactly the digits
+ * it wires, from one walk per render.
+ *
+ * A key navigates only when every guard passes, in this order: the stored
+ * shortcuts preference (`usePreferredShortcuts`) is not off; no modifier is
+ * held (the browser's own `Alt+digit` and the like stay untouched); the key
+ * is neither mid-IME-composition (the digit is text being composed) nor an
+ * auto-repeat (a held digit navigates once); and the target is not an
+ * editable control (digits belong to the text field then).
+ *
+ * WCAG 2.1.4 (Character Key Shortcuts) asks that a bare-key shortcut be
+ * switchable off by the user. The stored preference is the switch; a site
+ * meets the criterion only once it offers a control that writes it, and
+ * that control must, in the same change, stop the rail advertising `kbd`
+ * hints and `aria-keyshortcuts` for keys that no longer fire.
  *
  * @returns The allocation the listener navigates by.
  * @note Impure: attaches a `keydown` listener to `document` while mounted,
