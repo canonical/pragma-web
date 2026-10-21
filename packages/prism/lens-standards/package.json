@@ -1,6 +1,6 @@
 {
   "name": "@canonical/prism-lens-standards",
-  "description": "The Standards lens of a Prism documentation site: a grouped index of the graph's code standards and a reading page for each",
+  "description": "The Standards lens of a Prism documentation site: a grouped index of the graph's code standards and a reading page for each, rendering its prose with a chip for every entity it mentions",
   "version": "0.44.1",
   "type": "module",
   "exports": {
@@ -29,11 +29,12 @@
     "access": "public"
   },
   "scripts": {
+    "schema": "bun scripts/writeSchema.ts",
     "build": "bun run relay",
     "build:all": "bun run relay",
-    "relay": "mkdir -p src/__generated__ && relay-compiler --project lens-standards",
-    "check": "bun run check:tier1 && bun run check:biome && bun run check:ts",
-    "check:tier1": "relay-compiler --project lens-standards --validate",
+    "relay": "bun run schema && mkdir -p src/__generated__ && relay-compiler --project lens-standards",
+    "check": "bun run check:tier2 && bun run check:biome && bun run check:ts",
+    "check:tier2": "bun run schema && relay-compiler --project lens-standards --validate",
     "check:fix": "bun run check:biome:fix && bun run check:ts",
     "check:biome": "biome check",
     "check:biome:fix": "biome check --write",
@@ -46,12 +47,14 @@
     "targets": {
       "build": {
         "outputs": [
-          "{projectRoot}/src/__generated__"
+          "{projectRoot}/src/__generated__",
+          "{projectRoot}/.relay"
         ]
       },
       "build:all": {
         "outputs": [
-          "{projectRoot}/src/__generated__"
+          "{projectRoot}/src/__generated__",
+          "{projectRoot}/.relay"
         ]
       }
     }
@@ -61,6 +64,7 @@
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-projections": "^0.44.1",
     "@canonical/react-head": "^0.44.1",
+    "@canonical/react-markdown": "^0.44.1",
     "@canonical/router-core": "^0.44.1",
     "@canonical/router-react": "^0.44.1",
     "react": "^19.2.4",
@@ -82,6 +86,7 @@
     "@types/relay-runtime": "^20.1.1",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/coverage-v8": "^5.0.0",
+    "graphql": "^16.11.0",
     "jsdom": "^28.1.0",
     "react-dom": "^19.2.4",
     "relay-compiler": "^21.0.1",

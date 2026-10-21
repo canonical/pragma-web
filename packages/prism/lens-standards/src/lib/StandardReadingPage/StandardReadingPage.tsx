@@ -21,6 +21,10 @@ import "./styles.css";
  * Nothing calls it: the hook reads the compiled artifact, because an
  * evaluated tag throws at module scope wherever no Relay transform has run.
  *
+ * `body` is the standard's prose, from the Prose extension: a provider that
+ * serves it answers null for a standard with none, so the article falls back
+ * to the description. Selecting it is what makes the lens Tier 2.
+ *
  * `boundClass` IS LOAD-BEARING. `node(id:)` returns ANY node, so without a
  * guard `/standards/<a component IRI>` would render a standards page for a
  * component. The guard compares two absolute IRIs that the same server
@@ -44,6 +48,9 @@ const declareStandardEntityQuery = (): unknown => graphql`
         }
       }
       ...StandardArticle_standard
+    }
+    body: prose(uri: $uri) {
+      ...StandardProse_body
     }
   }
 `;
@@ -101,7 +108,7 @@ function ReadingContent({
   return (
     <>
       <Head title={standard._meta.title} />
-      <StandardArticle standard={standard} />
+      <StandardArticle body={data.body ?? null} standard={standard} />
     </>
   );
 }

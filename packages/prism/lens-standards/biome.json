@@ -4,10 +4,13 @@
     "includes": [
       "src",
       "testing",
+      "scripts",
+      "schema",
       "*.json",
       "vitest.config.ts",
       "vitest.setup.ts",
-      "!src/__generated__"
+      "!src/__generated__",
+      "!.relay"
     ]
   }
 }

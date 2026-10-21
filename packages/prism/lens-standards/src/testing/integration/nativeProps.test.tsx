@@ -21,6 +21,7 @@ import type { StandardEntityQuery } from "../../__generated__/StandardEntityQuer
 import standardEntityQueryNode from "../../__generated__/StandardEntityQuery.graphql.js";
 import type { StandardsIndexQuery } from "../../__generated__/StandardsIndexQuery.graphql.js";
 import standardsIndexQueryNode from "../../__generated__/StandardsIndexQuery.graphql.js";
+import { StandardProse } from "../../lib/StandardArticle/common/StandardProse/index.js";
 import { StandardArticle } from "../../lib/StandardArticle/index.js";
 import { StandardReadingPage } from "../../lib/StandardReadingPage/index.js";
 import { StandardsIcon } from "../../lib/StandardsIcon/index.js";
@@ -53,14 +54,25 @@ const ArticleProbe = () => {
     standardEntityQueryNode,
     buildStandardEntityVariables(classUri, LINK_COMPONENT_URI),
   );
-  if (!data.node) throw new Error("the store must hold the standard");
+  if (!data.node || !data.body) {
+    throw new Error("the store must hold the standard and its prose");
+  }
   return (
-    <StandardArticle
-      className="probe"
-      data-probe="article"
-      id="article"
-      standard={data.node}
-    />
+    <>
+      <StandardArticle
+        body={data.body}
+        className="probe"
+        data-probe="article"
+        id="article"
+        standard={data.node}
+      />
+      <StandardProse
+        body={data.body}
+        className="probe"
+        data-probe="prose"
+        id="prose"
+      />
+    </>
   );
 };
 
@@ -138,6 +150,15 @@ describe("native props", () => {
     expect(container.querySelector("#article")).toHaveAttribute(
       "data-slot",
       "reading-canvas",
+    );
+    expect(container.querySelector("#prose")).toHaveClass(
+      "ds",
+      "standard-prose",
+      "probe",
+    );
+    expect(container.querySelector("#prose")).toHaveAttribute(
+      "data-probe",
+      "prose",
     );
   });
 

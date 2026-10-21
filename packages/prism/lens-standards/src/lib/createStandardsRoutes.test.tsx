@@ -39,7 +39,7 @@ describe("createStandardsRoutes", () => {
         label: "Standards",
         icon: StandardsIcon,
         order: 4,
-        tier: 1,
+        tier: 2,
       },
     ]);
   });

@@ -6,7 +6,10 @@
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { standardsRoutes } from "#domains/lenses";
-import { withRouter } from "../../.storybook/decorators/index.js";
+import {
+  withProjections,
+  withRouter,
+} from "../../.storybook/decorators/index.js";
 
 const Component = standardsRoutes.standardEntity.content;
 
@@ -30,7 +33,7 @@ const meta: Meta<typeof Component> = {
   title: "Prism/StandardReadingPage",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRouter({ routes: bareRoutes })],
+  decorators: [withProjections(), withRouter({ routes: bareRoutes })],
   parameters: {
     relay: {
       mockResolvers: {
@@ -54,11 +57,39 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The reading column over a mocked standard. */
+/** The reading column over a mocked standard with no prose: its
+ * description, as plain text. */
 export const Default: Story = {
   args: {
     params: { uri: STANDARD_IRI },
     search: {},
+  },
+  parameters: {
+    relay: {
+      mockResolvers: {
+        Query: () => ({ prose: null }),
+      },
+    },
+  },
+};
+
+/** A standard with prose: Markdown, with a chip for the entity it links to
+ * by its compact address. */
+export const WithProse: Story = {
+  args: {
+    params: { uri: STANDARD_IRI },
+    search: {},
+  },
+  parameters: {
+    relay: {
+      mockResolvers: {
+        Prose: () => ({
+          markdown:
+            "## Why `.at()`\n\nBracket access hides an `undefined`; see [safe array access](cs:code.array.safe_access) for the rule, and the [MDN reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/at).",
+          lang: "en",
+        }),
+      },
+    },
   },
 };
 

@@ -15,6 +15,7 @@
     "src/**/*.tsx",
     "testing/**/*.ts",
     "testing/**/*.tsx",
+    "scripts/**/*.ts",
     "vitest.config.ts",
     "vitest.setup.ts"
   ]

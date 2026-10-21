@@ -60,7 +60,7 @@ export default function createStandardsRoutes(
           label: MESSAGES["lens.label"],
           icon: StandardsIcon,
           order: 4,
-          tier: 1,
+          tier: 2,
         }),
       },
     }),

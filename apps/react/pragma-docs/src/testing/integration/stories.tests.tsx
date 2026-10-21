@@ -125,7 +125,7 @@ describe("the story corpus", () => {
       (count, composed) => count + Object.keys(composed).length,
       0,
     );
-    expect(total).toBeGreaterThanOrEqual(45);
+    expect(total).toBeGreaterThanOrEqual(46);
   });
 
   it("carries no allowlist entry for a module that is not in the tree", () => {

@@ -93,21 +93,21 @@ const SEEDED_PAGES = [
     liveSelector: "#term-inspector-title",
     liveText: "UI Block",
   },
-  // Standards block (P-5): the reading page — the server HTML carries
-  // the article's identity h1 (`_meta.title`, which for a standard with no
-  // asserted name is the IRI's local name) and hydrating over it must stay
-  // mismatch-silent and network-silent like every other seeded page. The
-  // URL is the ABSOLUTE IRI percent-encoded: `node(id:)` accepts nothing
-  // else, and this pin is where the two halves of that address — the
-  // server's variables and the client's — have to agree byte for byte.
+  // Standards block: the reading page — the server HTML carries the
+  // standard's prose with its first reference already a chip (the link the
+  // prose writes as a compact address), and hydrating over it must stay
+  // mismatch-silent and network-silent like every other seeded page: the
+  // chip's data rides the reading page's own operation. The URL is the
+  // ABSOLUTE IRI percent-encoded: `node(id:)` accepts nothing else, and this
+  // pin is where the two halves of that address — the server's variables
+  // and the client's — have to agree byte for byte.
   {
     name: "standard reading",
     url: `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
     records: standardEntityRecords,
-    serverMarker:
-      '<h1 class="heading" id="standard-reading-title">react.component.link_component</h1>',
-    liveSelector: "#standard-reading-title",
-    liveText: "react.component.link_component",
+    serverMarker: 'class="ds node-chip"',
+    liveSelector: ".ds.standard-prose .ds.node-chip",
+    liveText: "one prop",
   },
   // Journeys job block (AV-351 / RULING 1 + 2): the view is EPHEMERAL, not
   // URL-derived, so the job page — like the index — defaults to the TABLE.

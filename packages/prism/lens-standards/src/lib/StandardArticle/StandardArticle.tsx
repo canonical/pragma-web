@@ -3,6 +3,7 @@ import { graphql, useFragment } from "react-relay";
 import type { StandardArticle_standard$key } from "../../__generated__/StandardArticle_standard.graphql.js";
 import standardArticleFragmentNode from "../../__generated__/StandardArticle_standard.graphql.js";
 import { useMessages } from "../i18n/index.js";
+import { StandardProse } from "./common/StandardProse/index.js";
 import type { StandardArticleProps } from "./types.js";
 import "./styles.css";
 
@@ -53,11 +54,13 @@ function splitProseBlocks(text: string): string[] {
 
 /**
  * The reading column: the standard's identity header (title, compact
- * address, class) and its description.
+ * address, class) and its body.
  *
- * The description is the graph's `_meta.definition` rendered as plain-text
- * paragraph blocks, so inline backticks and `*emphasis*` marks in the source
- * text show verbatim. The title is `_meta.title`, which is total: the
+ * The body is the standard's prose when it has some, rendered as Markdown
+ * with a chip for every entity it links to (`StandardProse`). Without prose
+ * it is the graph's `_meta.definition` rendered as plain-text paragraph
+ * blocks, so inline backticks and `*emphasis*` marks in the source text show
+ * verbatim. The title is `_meta.title`, which is total: the
  * provider computes a fallback chain ending in the IRI's local name, so
  * there is no fallback here. `_meta.curie` carries the compact identity for
  * the reader, while `uri` stays the absolute IRI Relay keys on and
@@ -66,6 +69,7 @@ function splitProseBlocks(text: string): string[] {
  * `import { StandardArticle } from "./StandardArticle/index.js";`
  */
 export default function StandardArticle({
+  body,
   className,
   standard,
   ...props
@@ -95,7 +99,9 @@ export default function StandardArticle({
           </span>
         </p>
       </header>
-      {data._meta.definition ? (
+      {body ? (
+        <StandardProse body={body} />
+      ) : data._meta.definition ? (
         <div className="prose">
           {splitProseBlocks(data._meta.definition).map((block) => (
             <p className="paragraph" key={block}>

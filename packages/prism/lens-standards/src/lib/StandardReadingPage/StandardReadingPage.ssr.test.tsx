@@ -16,7 +16,7 @@ import standardEntityRecords from "../../../testing/records/standardEntityRecord
 import { StandardReadingPage } from "./index.js";
 
 describe("StandardReadingPage on the server", () => {
-  it("renders the marker, the breadcrumb, the article and its description", () => {
+  it("renders the marker, the breadcrumb, the article and its prose", () => {
     const fetchFn = createFetchSpy();
     const html = renderToString(
       createStandardsPage(
@@ -37,7 +37,9 @@ describe("StandardReadingPage on the server", () => {
     );
     expect(html).toContain('aria-label="Breadcrumb"');
     expect(html).toContain('data-slot="reading-canvas"');
-    expect(html).toContain("LinkComponentProps");
+    expect(html).toContain(
+      '<h2 id="user-content-why-one-prop">Why one prop</h2>',
+    );
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });

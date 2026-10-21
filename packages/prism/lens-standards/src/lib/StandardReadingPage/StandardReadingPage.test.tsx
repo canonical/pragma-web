@@ -22,6 +22,7 @@ import createStandardsPage from "../../../testing/createStandardsPage.js";
 import {
   CS_NAMESPACE,
   LINK_COMPONENT_CURIE,
+  LINK_COMPONENT_PROSE_KEY,
   LINK_COMPONENT_URI,
   STANDARDS_BINDING_FIXTURE,
   STANDARDS_TEST_TIMEOUT_MS,
@@ -56,6 +57,7 @@ const notFoundRecords = {
       __ref: `${CS_NAMESPACE}CodeStandard`,
     },
     [`node(id:"${NO_SUCH_URI}")`]: null,
+    [`prose(uri:"${NO_SUCH_URI}")`]: null,
   },
   [`${CS_NAMESPACE}CodeStandard`]: {
     __id: `${CS_NAMESPACE}CodeStandard`,
@@ -82,6 +84,7 @@ const wrongClassRecords = {
     'node(id:"https://ds.canonical.com/global.component.button")': {
       __ref: "https://ds.canonical.com/global.component.button",
     },
+    'prose(uri:"https://ds.canonical.com/global.component.button")': null,
   },
   "http://pragma.canonical.com/codestandards#CodeStandard": {
     __id: "http://pragma.canonical.com/codestandards#CodeStandard",
@@ -161,16 +164,42 @@ describe("StandardReadingPage", () => {
       expect(breadcrumb.querySelector("a")?.getAttribute("href")).toBe(
         "/standards",
       );
+      // The prose, read from the same warm store: its two references are
+      // chips already, so they too needed no request.
+      expect(
+        screen.getByRole("heading", { level: 2, name: "Why one prop" }),
+      ).toBeInTheDocument();
+      expect(document.querySelectorAll(".ds.node-chip")).toHaveLength(2);
+      // Head: the document title, composed from the page's own <Head> and
+      // the site's title template.
+      expect(document.title).toBe("react.component.link_component — Docs");
+      // …and the network was NEVER consulted.
+      expect(fetchFn).not.toHaveBeenCalled();
+    },
+    STANDARDS_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "falls back to the description when the standard has no prose, no fetch",
+    () => {
+      const fetchFn = createFetchSpy();
+      render(
+        standardReadingPageAt(
+          LINK_COMPONENT_URI,
+          patchRecords(standardEntityRecords, {
+            "client:root": { [LINK_COMPONENT_PROSE_KEY]: null },
+          }),
+          fetchFn,
+        ),
+      );
+
       // The description: plain-text paragraph blocks from
       // `_meta.definition`, its inline code marks shown verbatim.
       expect(screen.getByText(/A \*complex\* component/)).toBeInTheDocument();
       expect(
         document.querySelectorAll(".ds.standard-article .paragraph").length,
       ).toBeGreaterThan(1);
-      // Head: the document title, composed from the page's own <Head> and
-      // the site's title template.
-      expect(document.title).toBe("react.component.link_component — Docs");
-      // …and the network was NEVER consulted.
+      expect(document.querySelector(".ds.standard-prose")).toBeNull();
       expect(fetchFn).not.toHaveBeenCalled();
     },
     STANDARDS_TEST_TIMEOUT_MS,

@@ -1,6 +1,7 @@
 /**
- * The reading column on the server: header, class line and description
- * blocks render to static markup from a warm store, with no client script.
+ * The reading column on the server: header, class line and prose render to
+ * static markup from a warm store, with no client script, the prose's
+ * references already chips.
  */
 
 import { renderToString } from "react-dom/server";
@@ -16,7 +17,7 @@ import standardEntityRecords from "../../../testing/records/standardEntityRecord
 import { StandardReadingPage } from "../StandardReadingPage/index.js";
 
 describe("StandardArticle on the server", () => {
-  it("renders the reading column with its class line and description", () => {
+  it("renders the reading column with its class line and its prose", () => {
     const fetchFn = createFetchSpy();
     const html = renderToString(
       createStandardsPage(
@@ -30,7 +31,8 @@ describe("StandardArticle on the server", () => {
       ),
     );
     expect(html).toContain('data-slot="reading-canvas"');
-    expect(html).toContain('class="prose"');
+    expect(html).toContain('class="ds standard-prose" lang="en"');
+    expect(html.match(/class="ds node-chip"/g)).toHaveLength(2);
     expect(html).toContain(LINK_COMPONENT_CURIE);
     expect(html).toContain('<span class="class">class: CodeStandard</span>');
     expect(fetchFn).not.toHaveBeenCalled();

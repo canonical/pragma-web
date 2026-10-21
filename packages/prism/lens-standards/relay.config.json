@@ -18,7 +18,7 @@
     },
     "lens-standards": {
       "base": "prism-projections",
-      "schema": "contract/schema/contract.graphql",
+      "schema": "lens-standards/.relay/schema.graphql",
       "language": "typescript",
       "eagerEsModules": true,
       "output": "lens-standards/src/__generated__",

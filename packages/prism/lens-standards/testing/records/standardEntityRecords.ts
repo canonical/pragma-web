@@ -12,6 +12,15 @@
  * and inline code marks, which is what the plain-text rendering is tested
  * on.
  *
+ * `body` is the standard's prose, from the Prose extension, stored under
+ * the root field's own key (`prose(uri:"…")`, not the `body` alias). Its
+ * Markdown holds one link of each kind the reading page must tell apart: a
+ * compact address and an absolute IRI, each naming one of the two
+ * references the connection carries, an external `https:` link, and a link
+ * written inside a code span. The references are two other standards, each
+ * with what the entity chip selects. A suite that needs a standard with no
+ * prose sets the root field to `null` with `patchRecords`.
+ *
  * `boundClass.subclasses` is EMPTY, the strict case for the reading page's
  * class guard: the permitted set is exactly one IRI, so a node of any other
  * class is rejected.
@@ -35,6 +44,11 @@ const standardEntityRecords = {
       {
         __ref:
           "http://pragma.canonical.com/codestandards#react.component.link_component",
+      },
+    'prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component")':
+      {
+        __ref:
+          'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component")',
       },
   },
   "http://pragma.canonical.com/codestandards#CodeStandard": {
@@ -80,6 +94,86 @@ const standardEntityRecords = {
     __typename: "__TypeSchema",
     __isNode: true,
   },
+  'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component")':
+    {
+      __id: 'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component")',
+      __typename: "Prose",
+      markdown:
+        "# Why one prop\n\nA complex component takes its link renderer through [one prop](cs:react.component.props), as [every component that renders HTML](http://pragma.canonical.com/codestandards#react.component.props.html_rendering) takes its native props.\n\nThe [React reference](https://react.dev/reference/react/createElement) covers the `as` alternative.\n\nWrite `[props](cs:react.component.props)` to link a standard from prose.\n",
+      lang: "en",
+      references: {
+        __ref:
+          'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references',
+      },
+    },
+  'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references':
+    {
+      __id: 'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references',
+      __typename: "NodeConnection",
+      edges: {
+        __refs: [
+          'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references:edges:0',
+          'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references:edges:1',
+        ],
+      },
+    },
+  'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references:edges:0':
+    {
+      __id: 'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references:edges:0',
+      __typename: "NodeEdge",
+      node: {
+        __ref:
+          "http://pragma.canonical.com/codestandards#react.component.props",
+      },
+    },
+  "http://pragma.canonical.com/codestandards#react.component.props": {
+    __id: "http://pragma.canonical.com/codestandards#react.component.props",
+    __typename: "CodeStandard",
+    _meta: {
+      __ref:
+        "client:http://pragma.canonical.com/codestandards#react.component.props:_meta",
+    },
+    uri: "http://pragma.canonical.com/codestandards#react.component.props",
+  },
+  "client:http://pragma.canonical.com/codestandards#react.component.props:_meta":
+    {
+      __id: "client:http://pragma.canonical.com/codestandards#react.component.props:_meta",
+      __typename: "EntityMeta",
+      curie: "cs:react.component.props",
+      title: "react.component.props",
+      type: {
+        __ref: "http://pragma.canonical.com/codestandards#CodeStandard",
+      },
+    },
+  'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references:edges:1':
+    {
+      __id: 'client:root:prose(uri:"http://pragma.canonical.com/codestandards#react.component.link_component"):references:edges:1',
+      __typename: "NodeEdge",
+      node: {
+        __ref:
+          "http://pragma.canonical.com/codestandards#react.component.props.html_rendering",
+      },
+    },
+  "http://pragma.canonical.com/codestandards#react.component.props.html_rendering":
+    {
+      __id: "http://pragma.canonical.com/codestandards#react.component.props.html_rendering",
+      __typename: "CodeStandard",
+      _meta: {
+        __ref:
+          "client:http://pragma.canonical.com/codestandards#react.component.props.html_rendering:_meta",
+      },
+      uri: "http://pragma.canonical.com/codestandards#react.component.props.html_rendering",
+    },
+  "client:http://pragma.canonical.com/codestandards#react.component.props.html_rendering:_meta":
+    {
+      __id: "client:http://pragma.canonical.com/codestandards#react.component.props.html_rendering:_meta",
+      __typename: "EntityMeta",
+      curie: "cs:react.component.props.html_rendering",
+      title: "react.component.props.html_rendering",
+      type: {
+        __ref: "http://pragma.canonical.com/codestandards#CodeStandard",
+      },
+    },
 } as unknown as RecordMap;
 
 export default standardEntityRecords;

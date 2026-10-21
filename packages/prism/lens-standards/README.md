@@ -4,13 +4,17 @@ The Standards lens of a Prism documentation site: a grouped index of the
 instances of the class a site binds it to, and a reading page for each. The
 index groups the standards by their own class, with jump links between the
 groups and an explicit "Load more" when the graph carries more than one page.
-The reading page shows a standard's title, compact address, class and
-description, and refuses an address whose node is not one of the bound
-class's instances.
+The reading page shows a standard's title, compact address and class, then
+its prose rendered as Markdown, and refuses an address whose node is not one
+of the bound class's instances. A standard with no prose shows its
+description instead.
 
-The lens is **Tier 1**: its operations and its fragments compile against
-`@canonical/prism-contract`'s SDL alone, so it runs over any provider that
-conforms to the contract.
+The lens is **Tier 2**: its operations compile against
+`@canonical/prism-contract`'s SDL plus the Prose extension
+(`schema/prose.graphql`), `Query.prose(uri:)` and its `Prose` type. It runs
+over any provider that conforms to the contract and serves that extension;
+both providers in this repository, `@canonical/prism-pragma-provider` and
+`@canonical/prism-graph-example`, do.
 
 ## Installation
 
@@ -19,7 +23,8 @@ bun add @canonical/prism-lens-standards
 ```
 
 Requires React 19, Relay 21, `@canonical/prism-core`,
-`@canonical/prism-projections` and `@canonical/react-head`.
+`@canonical/prism-projections`, `@canonical/react-head` and
+`@canonical/react-markdown`.
 
 ## Binding the lens
 
@@ -71,7 +76,20 @@ const [standards, standardEntity] = group(standardsLayout, [
 ```
 
 The lens renders inside the site's provider nest: `HeadProvider`,
-`RelayEnvironmentProvider` and `RouterProvider`.
+`RelayEnvironmentProvider`, `RouterProvider`, and inside the router
+`HomesProvider` and `ProjectionsProvider`, which the prose's chips read their
+homes and arms from.
+
+## Links in a standard's prose
+
+A link in a standard's prose whose destination is one of the entities the
+provider resolved as the prose's references, written as its compact address
+(`[props](cs:react.component.props)`) or its absolute IRI, renders as that
+entity's chip: the author's text, linked to the entity's home. Every other
+link stays the link its author wrote, and a link inside a code span stays
+text. The prose's headings render one level down, so the standard's title
+stays the page's only `h1`, and the prose's root carries the language the
+provider served it in as `lang`.
 
 On the server, a site prepares the store through each route's `warm`, which
 prefetches the route's operation into the published prefetch environment; the
@@ -92,19 +110,25 @@ these keys:
 
 The lens's links are typed by the site's `RouterRegister`, so a table that
 renames either key fails the site's type check. To link the standards
-mentioned elsewhere on the site to their reading page, declare their home
-under the type the provider serves them as:
+mentioned on the site, in a standard's prose among other places, to their
+reading page, declare their home under the type the provider serves them
+as. A mention hands its home the node's compact address, and the reading
+page is addressed by the absolute IRI, so the home expands the prefix:
 
 ```ts
+const CODE_STANDARDS_NAMESPACE = "http://pragma.canonical.com/codestandards#";
+
 const homes: Homes = {
   CodeStandard: (node, router) =>
-    router.buildPath("standardEntity", { params: { uri: node.uri } }),
+    router.buildPath("standardEntity", {
+      params: { uri: node.uri.replace(/^cs:/, CODE_STANDARDS_NAMESPACE) },
+    }),
 };
 ```
 
 ## Rail placement
 
-The index route declares the lens with `order: 4`, `tier: 1` and the
+The index route declares the lens with `order: 4`, `tier: 2` and the
 shortcut `"4"`. A site's other lenses must claim other orders and other
 digits: `collectLenses` throws on a duplicate order, and `collectShortcuts`
 on a duplicate key.
@@ -117,10 +141,18 @@ so no Relay transform runs over its files, and a site compiles nothing of the
 lens unless its own documents spread a lens fragment.
 
 The package's `relay.config.json` reads the projections package's fragments
-as a base project; only the lens's own artifacts land in `src/__generated__`.
-`check:tier1` runs `relay-compiler --validate` against the contract SDL
-alone: it fails when a selection leaves the contract and when the artifacts
-are stale. Run `bun run relay` after editing a fragment.
+as a base project, compiled against the contract SDL; only the lens's own
+artifacts land in `src/__generated__`. The lens's own project compiles
+against `.relay/schema.graphql`, which `bun run schema` writes: the contract
+SDL with the Prose extension merged into its `Query` type. It is merged, not
+handed to relay-compiler as an extension, because relay-compiler compiles a
+field it reads from `extend type Query` as a client extension and never
+sends it to the server.
+
+`check:tier2` writes that schema and runs `relay-compiler --validate`
+against it: it fails when a selection leaves the contract and the Prose
+extension, and when the artifacts are stale. Run `bun run relay` after
+editing a fragment.
 
 ## Styling
 
