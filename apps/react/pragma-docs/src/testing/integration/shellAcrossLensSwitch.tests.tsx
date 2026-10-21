@@ -1,26 +1,28 @@
 /**
- * The shell providers stay mounted across a lens switch; the lens layout
- * remounts.
+ * The shell stays mounted across navigation; a lens switch remounts the lens
+ * layout.
  *
  * Each lens renders inside its own layout, so a lens switch replaces the
- * whole layout — rail, strip, canvas and any provider the layout holds —
- * while `Shell`, the provider nest above it, stays put. This suite drives
- * that through the real app: the real route table, a browser router, the
- * Relay environment `Shell` provides, and clicks on the real rail.
+ * whole layout (rail, strip, canvas and any provider the layout holds) while
+ * `Shell`, the provider nest above it, stays put. This suite drives that
+ * through the real app with no module mocked: the real route table, a
+ * browser router, the Relay environment `Shell` provides, and clicks on the
+ * real rail.
  *
- * What it pins, per layer:
+ * The nest's providers (`HeadProvider`, `RelayEnvironmentProvider`,
+ * `RouterProvider`) hold no state of their own: each provides a context
+ * value read from its props. Whether the nest stays mounted is therefore
+ * observable only through the state that lives below it, and that is what
+ * this suite reads:
  *
- * - THE LAYOUT REMOUNTS. Each lens renders its own layout root; the
- *   Definitions root after a round trip is a new node, and the Definitions
- *   filter chips come back at their default: the layout's
- *   `LensFilterProvider` was unmounted and mounted fresh.
- * - THE SHELL STAYS. Each provider of the nest (`HeadProvider`,
- *   `RelayEnvironmentProvider`, `RouterProvider`) is wrapped in a mount
- *   counter, and each mounts exactly once and never unmounts across the
- *   round trip. A remount of any of them, or a provider moved into a lens
- *   layout, would mount it again. The store the environment holds still
- *   serves Definitions on the way back (the network is never called), and
- *   the head carries exactly one `<title>`.
+ * - THE SHELL STAYS. Moving between two terms of the Definitions lens keeps
+ *   the matched route, so the layout's root node and its filter chips (state
+ *   the layout's `LensFilterProvider` owns) survive, which they can only do
+ *   if nothing above the layout remounted. The store the environment holds
+ *   serves every page (the network is never called), and the head carries
+ *   exactly one `<title>`.
+ * - THE LAYOUT REMOUNTS. Switching to Standards and back yields a new
+ *   Definitions root, with the chips back at their default.
  */
 
 import "../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
@@ -33,68 +35,19 @@ import { fireEvent, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Shell } from "#lib/Shell";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import mergeRecordMaps from "../../../testing/mergeRecordMaps.js";
-import type { MountCount } from "../../../testing/types.js";
 import definitionsExplorerRecords from "../../domains/lenses/definitions/__fixtures__/definitionsExplorerRecords.js";
+import definitionsExplorerRecordsComponent from "../../domains/lenses/definitions/__fixtures__/definitionsExplorerRecordsComponent.js";
+import definitionsExplorerRecordsProperty from "../../domains/lenses/definitions/__fixtures__/definitionsExplorerRecordsProperty.js";
 import standardsIndexRecords from "../../domains/lenses/standards/__fixtures__/standardsIndexRecords.js";
 import { appRoutes, middleware, notFoundRoute } from "../../routes.js";
-import Shell from "./Shell.js";
 
 (
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
-
-/** The mounts and unmounts of each provider `Shell` nests, counted by the
- * wrappers the module mocks below put around the real providers. */
-const providerMounts = vi.hoisted(
-  (): Record<string, MountCount> => ({
-    HeadProvider: { mounts: 0, unmounts: 0 },
-    RelayEnvironmentProvider: { mounts: 0, unmounts: 0 },
-    RouterProvider: { mounts: 0, unmounts: 0 },
-  }),
-);
-
-vi.mock("@canonical/react-head", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@canonical/react-head")>();
-  const { default: trackMounts } = await import(
-    "../../../testing/trackMounts.js"
-  );
-  return {
-    ...actual,
-    HeadProvider: trackMounts(actual.HeadProvider, providerMounts.HeadProvider),
-  };
-});
-
-vi.mock("react-relay", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("react-relay")>();
-  const { default: trackMounts } = await import(
-    "../../../testing/trackMounts.js"
-  );
-  return {
-    ...actual,
-    RelayEnvironmentProvider: trackMounts(
-      actual.RelayEnvironmentProvider,
-      providerMounts.RelayEnvironmentProvider,
-    ),
-  };
-});
-
-vi.mock("@canonical/router-react", async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import("@canonical/router-react")>();
-  const { default: trackMounts } = await import(
-    "../../../testing/trackMounts.js"
-  );
-  return {
-    ...actual,
-    RouterProvider: trackMounts(
-      actual.RouterProvider,
-      providerMounts.RouterProvider,
-    ),
-  };
-});
 
 /** The status figure's caption: how many classes the chips leave visible. */
 const readStatus = (container: HTMLElement): string | undefined =>
@@ -105,6 +58,12 @@ const readStatus = (container: HTMLElement): string | undefined =>
 const readCurrentCrumb = (container: HTMLElement): string | undefined =>
   container.querySelector('[data-slot="context"] [aria-current="page"]')
     ?.textContent ?? undefined;
+
+/** How many of the strip's filter chips are turned off. */
+const countChipsOff = (container: HTMLElement): number =>
+  container.querySelectorAll(
+    '[data-slot="controls"] button[aria-pressed="false"]',
+  ).length;
 
 /** Click the rail's entry for `href`, through the real router. */
 const clickRail = async (container: HTMLElement, href: string) => {
@@ -139,10 +98,6 @@ describe("Shell across a lens switch", () => {
     );
     globalFetch = createFetchSpy();
     vi.stubGlobal("fetch", globalFetch);
-    for (const count of Object.values(providerMounts)) {
-      count.mounts = 0;
-      count.unmounts = 0;
-    }
   });
 
   afterEach(async () => {
@@ -159,19 +114,21 @@ describe("Shell across a lens switch", () => {
     vi.unstubAllGlobals();
   });
 
-  it("keeps the shell providers mounted and remounts the lens layout", async () => {
-    // One store warm for both lenses, behind a network that never answers:
-    // any fetch at all means the store did not survive.
+  it("keeps the state below the shell across navigation and remounts the lens layout on a switch", async () => {
+    // One store warm for every page the test visits, behind a network that
+    // never answers: any fetch at all means the store did not survive.
     const relayFetch = createFetchSpy();
     const environment = createEnvironment({
       records: mergeRecordMaps(
         definitionsExplorerRecords,
+        definitionsExplorerRecordsComponent,
+        definitionsExplorerRecordsProperty,
         standardsIndexRecords,
       ),
       fetchFn: relayFetch,
     });
     setPrefetchEnvironment(environment);
-    window.history.pushState({}, "", "/definitions");
+    window.history.pushState({}, "", "/definitions/ds%3AComponent");
     const router: Router<typeof appRoutes, typeof notFoundRoute> = createRouter(
       appRoutes,
       {
@@ -190,7 +147,7 @@ describe("Shell across a lens switch", () => {
       root.render(<Shell environment={environment} router={router} />);
     });
 
-    // Definitions, unfiltered: every class is visible.
+    // A Definitions term, unfiltered: every class is visible.
     await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
     const definitionsLayout = container.querySelector(".ds.definitions-layout");
     expect(definitionsLayout).not.toBeNull();
@@ -203,7 +160,27 @@ describe("Shell across a lens switch", () => {
     await act(async () => {
       if (chip !== null) fireEvent.click(chip);
     });
-    expect(readStatus(container)).not.toContain("60 of 60");
+    expect(countChipsOff(container)).toBe(1);
+    const filteredStatus = readStatus(container);
+    expect(filteredStatus).not.toContain("60 of 60");
+
+    // Another term of the same lens: the same layout node, and the chip
+    // stays off, so nothing above the layout remounted.
+    await act(async () => {
+      router.navigate("definitionsTerm", {
+        params: { term: "ds:hasSubcomponent" },
+      });
+    });
+    await waitFor(() =>
+      expect(window.location.pathname).toBe(
+        "/definitions/ds%3AhasSubcomponent",
+      ),
+    );
+    expect(container.querySelector(".ds.definitions-layout")).toBe(
+      definitionsLayout,
+    );
+    expect(countChipsOff(container)).toBe(1);
+    expect(readStatus(container)).toBe(filteredStatus);
 
     // Switch to Standards: a different layout element, with its own strip.
     await clickRail(container, "/standards");
@@ -220,20 +197,9 @@ describe("Shell across a lens switch", () => {
     );
     expect(definitionsLayoutAgain).not.toBeNull();
     expect(definitionsLayoutAgain).not.toBe(definitionsLayout);
-    expect(
-      container.querySelectorAll(
-        '[data-slot="controls"] button[aria-pressed="false"]',
-      ),
-    ).toHaveLength(0);
+    expect(countChipsOff(container)).toBe(0);
 
-    // The shell held throughout: every provider of the nest mounted once
-    // and never unmounted, the store served every page, and the head
-    // carries one title.
-    expect(providerMounts).toEqual({
-      HeadProvider: { mounts: 1, unmounts: 0 },
-      RelayEnvironmentProvider: { mounts: 1, unmounts: 0 },
-      RouterProvider: { mounts: 1, unmounts: 0 },
-    });
+    // The store served every page, and the head carries one title.
     expect(relayFetch).not.toHaveBeenCalled();
     expect(globalFetch).not.toHaveBeenCalled();
     expect(document.head.querySelectorAll("title")).toHaveLength(1);
