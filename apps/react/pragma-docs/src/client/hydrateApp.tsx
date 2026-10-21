@@ -7,18 +7,15 @@
  * server already serialised" guarantee lives on this exact read chain.
  */
 
-import { HeadProvider } from "@canonical/react-head";
 import { createBrowserAdapter, createRouter } from "@canonical/router-core";
-import { Outlet, RouterProvider } from "@canonical/router-react";
 import {
   type HydrationOptions,
   hydrateRoot,
   type Root,
 } from "react-dom/client";
-import { RelayEnvironmentProvider } from "react-relay";
+import { Shell } from "#lib/Shell";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import type { InitialData } from "#server";
-import formatDocumentTitle from "../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
 
 /**
@@ -63,13 +60,7 @@ export const hydrateApp = (
 
   return hydrateRoot(
     container,
-    <HeadProvider titleTemplate={formatDocumentTitle}>
-      <RelayEnvironmentProvider environment={relayEnvironment}>
-        <RouterProvider router={router}>
-          <Outlet fallback={<p>Loading…</p>} />
-        </RouterProvider>
-      </RelayEnvironmentProvider>
-    </HeadProvider>,
+    <Shell environment={relayEnvironment} router={router} />,
     options,
   );
 };

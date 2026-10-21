@@ -130,7 +130,7 @@ describe("ComponentEntityPage against a warm store", () => {
         <ComponentEntityPage params={{ uri: BUTTON_URI }} />
       </RelayEnvironmentProvider>,
     );
-    // Suspended interior — the marker still stands (the frame suite keys
+    // Suspended interior — the marker still stands (the SSR layout suite keys
     // the entity canvas off it).
     const section = container.querySelector('[data-view="component-entity"]');
     expect(section).not.toBeNull();

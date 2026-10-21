@@ -15,37 +15,36 @@ import { abstractionOf, matchesChips, resolveFilter } from "./lensFilter.js";
 import { useLensFilter } from "./lensFilterContext.js";
 
 /**
- * The Definitions lens's mode-strip tenants — the components the routes
- * park on their `meta` under `SHELL_STRIP_META_KEY`, which the Shell
- * mounts into the strip's `controls` and `status` sockets (the P-5
- * handshake).
+ * The Definitions lens's mode-strip tenants — the components
+ * `DefinitionsLayout` renders into the strip's `context`, `controls` and
+ * `status` sockets.
  *
- * They take NO props: `StripSlotsEntry` carries component types, not
- * elements, so the frame constructs them with nothing. The FILTER reaches
- * them through `lensFilterContext` (see that module for why a context is
- * the smallest mechanism that crosses the frame boundary).
+ * They take NO props: the layout renders them as siblings of the routed
+ * page, so nothing the page holds can reach them as a prop. The FILTER
+ * reaches them through `lensFilterContext` (see that module for why a
+ * context is the smallest bridge between the strip and the page).
  *
  * THE DATA does NOT come through that context, and the reason is the SSR
  * determinism rule. An announcement from the explorer could only arrive in
  * an effect — client-only, after paint — so the strip would render empty
  * on the server and populated on the client: a hydration mismatch in the
- * frame itself. Instead these components read the SAME operation the
- * explorer reads, from the same warm store: the Shell renders inside
+ * strip itself. Instead these components read the SAME operation the
+ * explorer reads, from the same warm store: the layout renders inside
  * `RelayEnvironmentProvider`, and the route's prepare step has already
  * executed and serialised exactly this query. The read is a store hit on
  * both sides, the markup matches, and no second network request exists —
  * the one-operation-per-page register holds, because this is the same
  * operation with the same variables, not another one.
  *
- * THE FRAME MUST NEVER DEPEND ON WARM DATA. `useLazyLoadQuery` SUSPENDS on
- * a cold store, and these components render inside the Shell — outside any
+ * THE STRIP MUST NEVER DEPEND ON WARM DATA. `useLazyLoadQuery` SUSPENDS on
+ * a cold store, and these components render in the layout — outside any
  * page-level boundary. Unguarded, a cold render (a failed prepare step, a
- * graph that did not answer) suspends the whole document and takes the
- * frame, the rail and the canvas down with it; `entry.tests.tsx` caught
+ * graph that did not answer) suspends the whole layout and takes the
+ * rail, the strip and the canvas down with it; `entry.tests.tsx` caught
  * exactly that. So each socket carries its OWN Suspense and error
  * boundary, both falling back to nothing: an empty socket is the honest
- * rendering of "the graph did not answer", and the strip band —
- * stationary frame (AX.6) — stays intact either way.
+ * rendering of "the graph did not answer", and the strip band (AX.6)
+ * stays intact either way.
  */
 
 /** Read the current term exactly as the page does, so the strip's query
@@ -60,7 +59,7 @@ const useCurrentTerm = (): string | undefined => {
 };
 
 /**
- * Wrap a socket so it can never destabilise the frame: it renders its
+ * Wrap a socket so it can never take the layout down: it renders its
  * content when the store is warm, and nothing at all otherwise.
  */
 const guarded = (Content: React.ComponentType): (() => React.ReactElement) => {

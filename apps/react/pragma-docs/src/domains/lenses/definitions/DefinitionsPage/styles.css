@@ -9,7 +9,7 @@
 
 @layer app {
   /* A SUBGRID pass-through (strict model): the page authors NO columns of its
-   * own — it inherits the shell's intrinsic columns and re-emits them to the
+   * own — it inherits the lens layout's intrinsic columns and re-emits them to the
    * explorer, so the chain shell → canvas → page → explorer is unbroken and
    * the term rail lands on the same lines every other lens's rail does. It
    * owns only the block axis: the (visually-hidden) heading row over the
@@ -23,7 +23,7 @@
     min-block-size: 0;
   }
 
-  /* Present for assistive tech and the frame suite's labelledby key
+  /* Present for assistive tech and the SSR layout suite's labelledby key
    * (`lens-definitions-title`), absent from the layout — the mode strip's
    * breadcrumb trail now carries the visible title, so the canvas copy was
    * the empty band at the top. The table's visually-hidden idiom (also used

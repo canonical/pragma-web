@@ -3,10 +3,10 @@ import {
   Breadcrumbs,
   type LinkComponentProps,
 } from "@canonical/react-ds-global";
-import { Link } from "@canonical/router-react";
+import type { RouteMap } from "@canonical/router-core";
+import { Link, useRouter } from "@canonical/router-react";
 import type React from "react";
-import type { LensBreadcrumbsProps, LensRouteName } from "./types.js";
-import { LENS_INDEX_PATH } from "./types.js";
+import type { LensBreadcrumbsProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds lens-breadcrumbs";
@@ -19,12 +19,13 @@ const componentCssClassName = "ds lens-breadcrumbs";
  * not a label.
  *
  * The trail is URL-DERIVED and nothing else: the lens crumb is a constant
- * (the lens name + its index route), and the terminal crumb is the route
- * param the page already matched on — so this component reads no Relay
- * query, adds no operation, and never suspends the frame. It renders
+ * (the lens name + its index route, whose href the router builds from the
+ * route table), and the terminal crumb is the route param the page already
+ * matched on — so this component reads no Relay
+ * query, adds no operation, and never suspends the lens layout. It renders
  * identically on the server and the client (same URL, same params), which
  * is exactly the SSR-determinism the strip's tenants must honour: no
- * empty-then-populated hydration mismatch in the frame.
+ * empty-then-populated hydration mismatch in the lens layout.
  *
  * Two shapes:
  * - INDEX (`current` absent): one crumb, the lens name, marked `current`
@@ -42,7 +43,7 @@ const componentCssClassName = "ds lens-breadcrumbs";
  * The router-integration adapter the DS `Breadcrumbs` applies to every
  * NON-current item. The trail has at most one linked crumb — the lens
  * index — so a single adapter bound to that route name is enough: it
- * renders router-react's `Link` with the typed route name, so the click is
+ * renders router-react's `Link` with the route name, so the click is
  * intercepted and routed through the SPA router (`router.navigate`) rather
  * than doing a full page load. The DS Item forwards `className` and
  * `aria-current`; `Link` derives the `href` and the current-match itself
@@ -50,9 +51,11 @@ const componentCssClassName = "ds lens-breadcrumbs";
  * exactly one destination — this lens's index).
  */
 const lensLinkComponent =
-  (lensRouteName: LensRouteName) =>
+  (lensRouteName: string) =>
   ({ className, children }: LinkComponentProps): React.ReactElement => (
-    <Link className={className} to={lensRouteName}>
+    // Typed over the open route map: the name is a plain string, and an
+    // index route takes no params.
+    <Link<RouteMap, string> className={className} to={lensRouteName}>
       {children}
     </Link>
   );
@@ -64,6 +67,7 @@ const LensBreadcrumbs = ({
   current,
   ...props
 }: LensBreadcrumbsProps): React.ReactElement => {
+  const router = useRouter<RouteMap>();
   const items: BreadcrumbItem[] =
     current === undefined
       ? [{ key: lensRouteName, label: lensLabel, current: true }]
@@ -71,17 +75,17 @@ const LensBreadcrumbs = ({
           {
             key: lensRouteName,
             label: lensLabel,
-            url: LENS_INDEX_PATH[lensRouteName],
+            url: router.buildPath(lensRouteName),
           },
           { key: current, label: current, current: true },
         ];
 
   return (
     <Breadcrumbs
+      {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       items={items}
       LinkComponent={lensLinkComponent(lensRouteName)}
-      {...props}
     />
   );
 };

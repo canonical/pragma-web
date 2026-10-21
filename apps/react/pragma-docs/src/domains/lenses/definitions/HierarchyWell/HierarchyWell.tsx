@@ -103,8 +103,8 @@ const TermNode = ({ node }: { node: TermFlowNode }): React.ReactElement => (
 );
 
 /**
- * The explorer's centre panel: the class graph in the shell's underground
- * well (AX.3), rendered by the bespoke well renderer (AV-364 — React
+ * The explorer's centre panel: the class graph in an underground well (the
+ * `.ds.underground` hook, AX.3), rendered by the bespoke well renderer (AV-364 — React
  * Flow retired here): an SVG edge layer under an HTML node layer, both in
  * ONE 1:1 px space inside a transformed camera, so nodes stay real links
  * with crisp DOM text and the edges can carry the full grammar (straight

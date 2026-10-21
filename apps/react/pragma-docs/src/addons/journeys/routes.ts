@@ -1,8 +1,8 @@
 import { route } from "@canonical/router-core";
+import { JourneysIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
-import { shellStripFacet } from "#lib/Shell";
 import { JourneysPage } from "./JourneysPage/index.js";
-import { journeysStripSlots } from "./stripSlots.js";
 import warmJourneys from "./warmJourneys.js";
 
 /**
@@ -25,21 +25,17 @@ import warmJourneys from "./warmJourneys.js";
  * but is a way of looking, not a place — it lives in the lens's ephemeral
  * filter, never in the URL.
  *
- * Both routes claim the strip's `context` AND `controls` sockets (RULING
- * 1). The `controls` socket now holds the Table ⇄ Graph view switch — the
- * one instrument that is genuinely a strip-level toolbar: it chooses which
- * reading of the demand model the canvas shows, needs no explanatory caveat,
- * and its labels are data-independent, so the strip content is a stable
- * string. (The lens's OTHER controls — the coordinate chooser and the
+ * The diagram declares the lens (`routeLensFacet`) and its digit; both
+ * routes render inside `JourneysLayout`, whose strip carries the `context`
+ * AND `controls` sockets (RULING 1). The `controls` socket holds the
+ * Table ⇄ Graph view switch — the one instrument that is genuinely a
+ * strip-level toolbar: it chooses which reading of the demand model the
+ * canvas shows, needs no explanatory caveat, and its labels are
+ * data-independent, so the strip content is a stable string. (The lens's OTHER controls — the coordinate chooser and the
  * persona filter — stay in the rail: each needs its own explanatory text
  * (the persona axis is APPROXIMATE and says so), and a strip toolbar is the
  * wrong place for a caveat that must be read.) The `status` socket stays
- * unclaimed — the lens has no single figure worth a live count.
- *
- * Claiming the `controls` socket deliberately loosened
- * `frameStability.tests.tsx`, which previously asserted the journeys
- * `controls` slot was empty; that change landed in its own commit with its
- * own justification, the same way the Definitions claim did.
+ * empty — the lens has no single figure worth a live count.
  */
 const routes = {
   journeys: route({
@@ -47,17 +43,19 @@ const routes = {
     content: JourneysPage,
     warm: warmJourneys,
     meta: {
-      ...shellStripFacet.of({ ...journeysStripSlots }),
       ...routeShortcutFacet.of("5"),
+      ...routeLensFacet.of({
+        label: "Journeys",
+        icon: JourneysIcon,
+        order: 5,
+        tier: 2,
+      }),
     },
   }),
   journeysJob: route({
     url: "/journeys/:job",
     content: JourneysPage,
     warm: warmJourneys,
-    meta: {
-      ...shellStripFacet.of({ ...journeysStripSlots }),
-    },
   }),
 } as const;
 

@@ -4,7 +4,7 @@
  */
 
 @layer app {
-  /* Present for assistive tech and the frame suite's key
+  /* Present for assistive tech and the SSR layout suite's key
    * (`component-entity-title`), absent from the layout — the mode strip's
    * breadcrumb trail carries this entity's name as the terminal crumb now,
    * so the canvas h1 was a duplicate title. The shared visually-hidden idiom;

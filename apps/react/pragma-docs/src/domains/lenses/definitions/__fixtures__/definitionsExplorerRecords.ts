@@ -6,7 +6,7 @@
  * Nothing trimmed: the explorer's one operation carries every
  * ontology (rail + well, now including object properties for the
  * semantic edge family) plus the ds:UIBlock class lookup (inspector);
- * the hydration/frame certifications replay these exact bytes.
+ * the hydration and SSR layout suites replay these exact bytes.
  *
  * HAND-TRANSFORMED, NOT RE-CAPTURED (the converged-base migration). A
  * re-capture in an environment without the semantics tree would silently

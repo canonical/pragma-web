@@ -9,6 +9,7 @@ export {
   readTermParam,
 } from "./definitionsQuery.js";
 export * from "./HierarchyWell/index.js";
+export { default as definitionsLayout } from "./layout.js";
 export type {
   LensFilterProviderProps,
   LensFilterValue,

@@ -303,10 +303,10 @@ const JourneysExplorer = ({
   // THE VIEW SWITCH (RULING 1, P-D7). The table and the graph are two
   // readings of the same model and the lens shows ONE at a time — the
   // owner's ruling. The switch itself now lives in the MODE STRIP's
-  // `controls` socket (see stripSlots.tsx / routes.ts), so the ephemeral
-  // choice is READ here from `journeyViewContext` rather than held in this
-  // component's own state — the toolbar is mounted by the frame, a sibling
-  // of the canvas, so context is the only path from it down to here. The
+  // `controls` socket (see stripSlots.tsx / JourneysLayout), so the
+  // ephemeral choice is READ here from `journeyViewContext` rather than held
+  // in this component's own state — the toolbar is rendered by the lens
+  // layout, a sibling of the canvas, so context is the only path from it down to here. The
   // choice never enters the URL (only the selected job is addressable). Its
   // initial value is the constant DEFAULT_JOURNEY_VIEW — "table", the
   // primary surface — a no-op default read from nothing, so the server's
@@ -364,7 +364,7 @@ const JourneysExplorer = ({
   }, [coordinates, data.jobs, job]);
 
   // THE VIEW-DEPENDENT LAYOUT (RULING 2), strict intrinsic-grid form. The
-  // explorer is a SUBGRID inheriting the shell's intrinsic columns; the view
+  // explorer is a SUBGRID inheriting the lens layout's intrinsic columns; the view
   // no longer swaps a grid TEMPLATE, it swaps the tenants' column SPANS,
   // driven entirely by `data-view` in the stylesheet (see styles.css). The
   // inspector element still exists ONLY in graph mode (no empty column in

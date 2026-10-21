@@ -12,15 +12,13 @@ const componentCssClassName = "ds mode-strip";
  * mode furniture, not shell chrome — Guides' strip is nearly empty, the
  * explorer's is dense).
  *
- * P-4.1 renders the slot SOCKETS only: three stable mounts (`context` ·
- * `controls` · `status`, each carrying its `data-slot` identity) with
- * sensible empties. A composed layout claims them through its route's
- * `SHELL_STRIP_META_KEY` meta entry, which the Shell reads and passes down
- * as these props (the P-5 handshake) — this component stays a pure
- * projection of its props.
+ * It renders the slot SOCKETS: three stable mounts (`context` · `controls`
+ * · `status`, each carrying its `data-slot` identity) with sensible empties.
+ * Each lens's layout passes the content it wants in each socket as these
+ * props — this component stays a pure projection of its props.
  *
- * The band itself is stationary frame (AX.6): `--strip-h` tall on every
- * lens, so the canvas plate below never jumps on a lens switch.
+ * The band itself is the same on every lens (AX.6): `--strip-h` tall, so
+ * the canvas below never jumps on a lens switch.
  */
 const ModeStrip = ({
   className,

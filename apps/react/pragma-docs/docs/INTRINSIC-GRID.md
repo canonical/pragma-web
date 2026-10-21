@@ -2,7 +2,7 @@
 
 A running log of every fight with the intrinsic grid model (AX.1: intrinsic
 sizing throughout — `min-content`, `1fr`, `minmax()` — never
-breakpoint-swapped templates; the shell's small-viewport collapse is the one
+breakpoint-swapped templates; the rail's small-viewport collapse is the one
 sanctioned exception). Ruled into existence by P-D18: what broke, what fixed
 it, why. Newest entries at the bottom; entries are never rewritten, only
 appended — a later entry may overturn an earlier one.
@@ -83,9 +83,9 @@ strip row ALWAYS present (`min-block-size: var(--strip-h)`, empty sockets),
 reading §2 as governing strip CONTENT (which mode gets to put what in the
 band) and AX.6 as governing the BAND (frame geometry). The exhibit supports
 this reading: its `.strip` never unmounts; only the per-mode `sgroup`s
-toggle. Measured consequence: the five lens frames are byte-identical
-(modulo the router's own `aria-current`) through the real SSR pipeline —
-`frameStability.tests.tsx` pins it.
+toggle. Measured consequence: every lens layout renders exactly one strip
+band on every URL through the real SSR pipeline —
+`src/testing/integration/lensLayouts.ssr.tests.tsx` pins it.
 
 ## 5 — `container-type` makes the canvas a containing block: the fixed/sticky trap (P-4.1)
 
@@ -119,9 +119,10 @@ the likely candidate). The law is written down before there is a corpse.
 west, quick-facts aside east (`--aside-w`). The obvious modern move is a
 `@container canvas (inline-size < …)` rule that stacks the aside under the
 article on narrow canvases — the canvas is even a named query container
-already. But the at-rule census (`frameStability.tests.tsx`) sanctions
-exactly ONE layout-capable conditional in the app, the Rail collapse, and
-a second one would erode the AX.1 posture one "just this once" at a time.
+already. But the at-rule census
+(`src/testing/integration/stylesheets.tests.ts`) sanctions exactly ONE
+layout-capable conditional in the app, the Rail collapse, and a second one
+would erode the AX.1 posture one "just this once" at a time.
 
 **Fix.** Flex, intrinsically: the body is `display: flex; flex-wrap: wrap`,
 the article `flex: 1 1 32rem; min-inline-size: 0`, the aside
@@ -214,6 +215,34 @@ paths), so the layout is a pure function (`buildClassTree`) and the
 initial camera is a constant `defaultViewport` — never `fitView`, which
 measures. A measured anything in this path would be a hydration
 mismatch, which the hydration suite gates.
+
+---
+
+## 10 — The shared frame is retired: each lens layout owns the page grid
+
+**What.** The shared frame the entries above call "the shell" or "the
+frame" (one grid carrying the rail, the strip, the canvas and the footer
+for every lens) no longer exists. `Shell` now names the app's provider
+nest alone (head, Relay environment, router) and renders no element of
+its own. Each lens declares its own layout, and each layout's root is the
+page grid: it reads the design system's intrinsic columns
+(`grid-template-columns: var(--grid-intrinsic)`), places the rail in the
+west columns, and stacks the strip, the canvas and the colophon in a
+viewport subgrid to the east.
+
+**Reading the entries above.** Where an entry says "the shell's column
+template", "the shell's columns" or "the frame", read the lens layout's
+root grid: the rules recorded there (the `min-size: 0` release chain, the
+rail's single collapse, the canvas as containing block) hold at every
+lens layout's root. The `--subnav-w` and `--aside-w` tokens entries 6 and
+8 name are dissolved: no stylesheet defines them.
+
+**Pinned by.** `src/testing/integration/stylesheets.tests.ts` (only a lens
+layout's root reads the intrinsic columns, every other grid is a subgrid,
+and the dissolved width tokens are defined nowhere) and
+`src/testing/integration/lensLayouts.ssr.tests.tsx` (every URL renders
+inside exactly the layout its route is grouped under, with its regions in
+order).
 
 ---
 

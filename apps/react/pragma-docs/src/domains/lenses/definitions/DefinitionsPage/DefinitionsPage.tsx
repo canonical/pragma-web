@@ -13,10 +13,10 @@ const componentCssClassName = "ds definitions-page";
  * The Definitions lens route content — BOTH routes (`/definitions`, key
  * `definitions`, and `/definitions/:term`, key `definitionsTerm`) mount
  * this page; the only difference is the decoded `term` param. The h1
- * marker stays OUTSIDE the boundaries (the frame suite keys the
+ * marker stays OUTSIDE the boundaries (the SSR layout suite keys the
  * definitions canvas off `lens-definitions-title`), and route content
  * never suspends at Outlet level — suspension there would swap the whole
- * Shell for the fallback (the PlaygroundPage precedent).
+ * layout for the fallback (the PlaygroundPage precedent).
  *
  * No default term (owner ruling): `/definitions` renders the full
  * explorer with an honestly empty inspector, never a redirect.

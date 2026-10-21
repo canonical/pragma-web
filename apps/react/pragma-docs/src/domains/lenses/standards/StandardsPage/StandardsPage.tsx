@@ -44,10 +44,10 @@ const IndexContent = (): React.ReactElement => {
 
 /**
  * The standards index route (`/standards`, key `standards` — the key the
- * Rail links to). The h1 marker stays OUTSIDE the boundaries (the frame
- * suite keys the standards canvas off `lens-standards-title`), and route
+ * Rail links to). The h1 marker stays OUTSIDE the boundaries (the SSR
+ * layout suite keys the standards canvas off `lens-standards-title`), and route
  * content never suspends at Outlet level — suspension there would swap
- * the whole Shell for the fallback (the PlaygroundPage precedent). No
+ * the whole layout for the fallback (the PlaygroundPage precedent). No
  * filters in v1 (the catalog's R2 posture): the composed layout is
  * category jump-links + grouped lists only.
  */

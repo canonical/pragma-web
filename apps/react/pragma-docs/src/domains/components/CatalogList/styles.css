@@ -1,13 +1,13 @@
 /*
- * CatalogList — the catalog's composed layout: tier jump-links west in
- * the frame's --subnav-w column (CONSUMED, defined only by the Shell),
- * tier-grouped card grid east. The card grid is the AX.1 exhibit:
+ * CatalogList — the catalog's composed layout: tier jump-links west,
+ * tier-grouped card grid east, each a span of the lens layout's intrinsic
+ * columns. The card grid is the AX.1 exhibit:
  * repeat(auto-fill, minmax(15rem, 1fr)) — column count falls out of the
  * canvas width, no query anywhere (INTRINSIC-GRID.md entry 7).
  */
 
 @layer app {
-  /* SUBGRID that spends the shell's columns (strict model): the tier
+  /* SUBGRID that spends the lens layout's columns (strict model): the tier
    * jump-links take the westmost 2 columns, the card grid takes the rest.
    * The card grid inside (.catalog-cards) is a leaf that runs its own
    * auto-fill over its column span (INTRINSIC-GRID entry 7 — untouched). */
@@ -25,7 +25,7 @@
   }
   /* The groups column is itself a SUBGRID (strict model — everything is): it
    * spans the columns east of the tier links and passes them on to each tier
-   * section, so the cards below inherit the shell's columns all the way down.
+   * section, so the cards below inherit the lens layout's columns all the way down.
    * The whole chain — groups → section → card list → card — is subgrid. */
   .ds.catalog-list > .catalog-groups {
     grid-column: 3 / -1;
@@ -70,7 +70,7 @@
   }
 
   /* The card grid is a SUBGRID (strict model — no leaf auto-fill template):
-   * it inherits the section's columns (which are the shell's), and each card
+   * it inherits the section's columns (which are the lens layout's), and each card
    * claims a span. At ~10 canvas columns a 3-column card gives ~3 cards a row
    * (12 cols → 3, 16 cols → 5) — the count falls out of the live column count,
    * aligned to the ruler, with no template of its own and no media query. */
@@ -81,7 +81,7 @@
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-    /* The shell runs zero column gap, so a subgrid inherits none — the cards
+    /* The lens layout runs zero column gap, so a subgrid inherits none — the cards
      * would touch. A subgrid may set its OWN gap over the inherited tracks:
      * this gives the cards a gutter without disturbing the column lines. */
     column-gap: var(--space-200, 1rem);

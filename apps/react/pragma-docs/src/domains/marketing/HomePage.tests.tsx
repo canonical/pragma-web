@@ -23,10 +23,10 @@ import {
 import lobbyRecords from "./__fixtures__/lobbyRecords.js";
 import {
   LOBBY_COMPONENT_CLASS,
-  LOBBY_EXEMPLAR_COUNT,
   LOBBY_PATTERN_CLASS,
   LOBBY_STANDARD_CLASS,
-} from "./lobbyQuery.js";
+} from "./constants.js";
+import { LOBBY_EXEMPLAR_COUNT } from "./lobbyQuery.js";
 
 /** A fetch spy that never settles: any call means "the network was hit". */
 const createFetchSpy = () =>

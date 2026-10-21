@@ -73,7 +73,7 @@ const providerStack = (
 /**
  * The standards index page over an environment seeded with `records`
  * (`undefined` = cold store). The page owns its Suspense/ErrorBoundary;
- * the router exists for `Link` context only (no Outlet — the Shell stays
+ * the router exists for `Link` context only (no Outlet — the lens layout stays
  * out of component tests).
  */
 export const standardsIndexPage = (

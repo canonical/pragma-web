@@ -1,8 +1,7 @@
 /*
  * TermInspector — the explorer's east panel. The PANEL's width comes from
- * the explorer's grid template (the frame's --aside-w token as the
- * minimum, consumed there, never re-defined); this file styles only the
- * inspector's interior. Zero conditional at-rules (the census).
+ * the explorer's grid (a span of the lens layout's intrinsic columns);
+ * this file styles only the inspector's interior. Zero conditional at-rules (the census).
  */
 
 @layer app {
@@ -53,7 +52,7 @@
   }
 
   /* The property table scrolls inside the panel rather than propping the
-   * panel (and the frame) open — the entry-1 lesson, one level down. */
+   * panel (and the lens layout) open — the entry-1 lesson, one level down. */
   .ds.term-inspector table {
     display: block;
     overflow-x: auto;

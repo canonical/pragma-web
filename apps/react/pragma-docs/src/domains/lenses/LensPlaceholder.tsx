@@ -14,7 +14,7 @@ interface LensPlaceholderProps {
  * The honest minimal stub for a lens whose views are not built yet
  * (P-4.1 brief): a placeholder canvas section stating what lands here and
  * which P-item builds it. Everything outside this section — rail, strip,
- * footer — is the finished frame; only this plate is provisional.
+ * footer — is the finished lens layout; only this canvas is provisional.
  */
 export default function LensPlaceholder({
   title,

@@ -2,7 +2,7 @@
  * NeighbourhoodWell — the entity page's closing well (AV-364).
  *
  * The section keeps the page's reading rhythm (heading, prose states); the
- * canvas inside is an `.underground` depression (AX.3) holding the settled
+ * canvas inside is a `.ds.underground` depression (AX.3) holding the settled
  * graph. The canvas is 1:1 px space — the SVG edge layer and the HTML chip
  * layer share one coordinate system and NOTHING scales, so chips stay real
  * links with crisp text at every viewport. A canvas wider than the column
@@ -11,7 +11,7 @@
  * Grammar hooks (`--well-*`) fall back to the app's utilitarian tokens so
  * the well inherits AV-363's surface system the day it lands, without
  * edits here. One `prefers-reduced-motion` block at the foot kills the
- * fades; no other at-rules (frameStability's layout-capable census).
+ * fades; no other at-rules (stylesheets.tests.ts's layout-capable census).
  */
 
 @layer app {

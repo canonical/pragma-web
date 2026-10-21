@@ -132,7 +132,7 @@ const readUriFromEvent = (target: EventTarget | null): string | undefined => {
 
 /**
  * The entity page's closing section: the component's one-hop ego graph,
- * sunk into an `.underground` well (AX.3 — the reader finishes the
+ * sunk into a `.ds.underground` well (AX.3 — the reader finishes the
  * document and looks down into the substrate it was projected from).
  *
  * The renderer is deliberately dumb: `buildNeighbourhood` settles every
@@ -191,7 +191,7 @@ const NeighbourhoodWell = ({
               input modalities — the HierarchyWell posture). */}
           <figure
             aria-label={`${input.centreLabel} and its ${input.neighbours.length} related entities`}
-            className="well-canvas underground"
+            className="well-canvas ds underground"
             onBlur={() => setFocusedUri(undefined)}
             onFocus={(event) => setFocusedUri(readUriFromEvent(event.target))}
             onMouseLeave={() => setFocusedUri(undefined)}

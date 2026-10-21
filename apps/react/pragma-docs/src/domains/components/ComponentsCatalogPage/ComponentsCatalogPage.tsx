@@ -40,9 +40,9 @@ const CatalogContent = (): React.ReactElement => {
 /**
  * The components catalog route (`/components`, key `components` — the key
  * the Rail links to). The h1 marker stays OUTSIDE the boundaries (the
- * frame suite keys the catalog canvas off `lens-components-title`), and
+ * SSR layout suite keys the catalog canvas off `lens-components-title`), and
  * route content never suspends at Outlet level — suspension there would
- * swap the whole Shell (the PlaygroundPage precedent). No filters in v1
+ * swap the whole layout (the PlaygroundPage precedent). No filters in v1
  * (ruling R2): the composed layout is jump-links + grouped grid only.
  */
 const ComponentsCatalogPage = ({

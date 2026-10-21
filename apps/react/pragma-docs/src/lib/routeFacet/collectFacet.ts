@@ -25,8 +25,8 @@ export interface FacetBearer<TName extends string, TValue> {
  *
  * ORDER IS INCIDENTAL. It is `appRoutes`' declaration order, which is a
  * destructuring convenience and not a ruling. It must never drive anything
- * user-visible: the Rail's lens order is owner-ruled and stays declared in
- * `#lib/Rail/constants.js`.
+ * user-visible: the rail's lens order comes from each lens facet's own
+ * `order`, which `collectLenses` sorts by.
  *
  * A malformed annotation throws HERE, at first collection — one bad route
  * fails the whole collection rather than quietly dropping itself out of the

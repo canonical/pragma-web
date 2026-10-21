@@ -8,10 +8,10 @@ import type { LobbyQuery } from "#relay/__generated__/LobbyQuery.graphql.js";
 import lobbyQueryNode from "#relay/__generated__/LobbyQuery.graphql.js";
 import {
   LOBBY_COMPONENT_CLASS,
-  LOBBY_EXEMPLAR_COUNT,
   LOBBY_PATTERN_CLASS,
   LOBBY_STANDARD_CLASS,
-} from "./lobbyQuery.js";
+} from "./constants.js";
+import { LOBBY_EXEMPLAR_COUNT } from "./lobbyQuery.js";
 import "./homeStyles.css";
 
 /**
@@ -194,9 +194,9 @@ const LobbyBands = (): React.ReactElement => {
  * (cardinality 1) is the lens list. The strip is the optional one and
  * renders only when the graph actually yields exemplars.
  *
- * The h1 stays OUTSIDE the boundaries (the frame suite keys the home
+ * The h1 stays OUTSIDE the boundaries (the SSR layout suite keys the home
  * canvas off `lobby-title`), and route content never suspends at Outlet
- * level — suspension there would swap the whole Shell for the fallback
+ * level — suspension there would swap the whole layout for the fallback
  * (the PlaygroundPage precedent).
  */
 const HomePage = (): React.ReactElement => {

@@ -1,9 +1,9 @@
 /*
  * Rail — the primary rail (AX.2). Under the strict intrinsic-grid model
- * (owner ruling) the rail is a grid ITEM of the shell: its width is a
- * COLUMN SPAN of the shell's intrinsic columns (`--rail-span`), never a
+ * (owner ruling) the rail is a grid ITEM of the lens layout: its width is a
+ * COLUMN SPAN of the lens layout's intrinsic columns (`--rail-span`), never a
  * fixed --rail-w token — the token is gone. Because the rail spans the
- * shell's own columns, its inner edge lands on an intrinsic line that every
+ * lens layout's own columns, its inner edge lands on an intrinsic line that every
  * lens's own rail also lands on: the whole app reads against one ruler.
  * Chrome stratum on the semantic z-axis. Carries the ONE sanctioned
  * small-viewport reflow (AX.1): below 56.25rem the rail narrows to a single
@@ -107,7 +107,7 @@
 
   /* Active lens: styled from the router's own aria-current attribute — the
    * rail's ONLY route-dependent bit, and an attribute rather than a class,
-   * so the frame-stability measurement can name it precisely. */
+   * so the SSR layout suite can name it precisely. */
   .ds.rail .rail-item[aria-current="page"] {
     background: var(--color-background-layer2, #eee);
     color: var(--color-text, #000);
@@ -162,7 +162,7 @@
    * span is hidden, the aria-label on the list links comes from the label
    * text — hidden-not-removed would drop it, so labels stay in the DOM as
    * visually-hidden text). The --rail-w token is untouched: it describes
-   * the frame's uncollapsed metric (AX.6 pins lens switches, not viewport
+   * the layout's uncollapsed metric (AX.6 pins lens switches, not viewport
    * changes). */
   @media (max-width: 56.25rem) {
     .ds.rail {

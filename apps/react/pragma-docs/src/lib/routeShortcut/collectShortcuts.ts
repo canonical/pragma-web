@@ -2,12 +2,10 @@
  * The shortcut allocation: every route's claimed key, and the two lookups
  * anything reading it needs.
  *
- * THIS IS THE HOLE THE OLD DESIGN LEFT OPEN. Before this, the digits lived
- * in `LENS_ENTRIES` as a `"1" | … | "6"` union. A union rejects an INVALID
- * key; nothing rejected a DUPLICATE one — two entries claiming `"3"`
- * compiled cleanly, the listener resolved it by array order (`.find()`,
- * first wins) and the rail rendered the digit twice. Collecting the
- * allocation is what makes a collision a failure instead of a coin toss.
+ * Collecting the allocation is what makes a collision a failure. A union
+ * type of digits rejects an INVALID key but accepts a DUPLICATE one: two
+ * claims of `"3"` would compile, resolve first-wins at runtime and render
+ * the digit twice. Walking the table and throwing on a repeat closes that.
  */
 
 import type { AnyRoute } from "@canonical/router-core";
@@ -24,8 +22,8 @@ export interface ShortcutAllocation<TName extends string = string> {
 /**
  * Collect `routes`' shortcut allocation, enforcing both invariants.
  *
- * BOTH INVARIANTS THROW, matching the conviction the strip facet already
- * established: a half-declared annotation is a bug, not an absence. The
+ * BOTH INVARIANTS THROW, matching the convention every route facet keeps:
+ * a half-declared annotation is a bug, not an absence. The
  * cost — a bad allocation crashes the shell rather than degrading — is
  * bounded, because the allocation is STATIC ROUTE DATA pinned by a test
  * (`collectShortcuts.tests.ts` asserts the app's real table), so an

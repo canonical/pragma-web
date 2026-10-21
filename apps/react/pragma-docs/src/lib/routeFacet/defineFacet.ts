@@ -7,21 +7,19 @@
  * live there at the acknowledged cost of `unknown`-typed access. Without
  * this helper each tenant hand-writes its own reader and each AUTHORING
  * site writes a bare computed key — which type-checks the KEY but never the
- * VALUE: `{ [SHELL_STRIP_META_KEY]: 42 }` compiles. `of()` closes that
+ * VALUE: `{ [ROUTE_LENS_META_KEY]: 42 }` compiles. `of()` closes that
  * hole, because the value is checked where it is written; `read()` keeps
  * the assertion in one place for where it is consumed.
  *
  * THE CONVENTION THIS HELPER KEEPS: absence is fine (`undefined`),
  * presence-and-malformed THROWS — a route that half-declares a facet is a
- * bug, not an absence. That is why `parse`
- * is a parser that throws the tenant's OWN message rather than a boolean
- * `value is T` guard: a guard collapses `readStripSlots`' four distinct
- * diagnostics ("not an object", "Context/Controls/Status is not a
- * component") into one generic failure, and those four messages are pinned
- * by `#lib/Shell/stripFacet.tests.js`.
+ * bug, not an absence. That is why `parse` is a parser that throws the
+ * tenant's OWN message rather than a boolean `value is T` guard: a guard
+ * would collapse a tenant's distinct diagnostics (the lens facet's "label
+ * is not a non-empty string", "icon is not a component", …) into one
+ * generic failure, and those messages are pinned by each tenant's tests.
  *
- * TENANTS. `#lib/Shell/stripFacet.js` and
- * `#lib/routeShortcut/shortcutFacet.js` read through here.
+ * TENANTS. `#lib/routeShortcut` and `#lib/routeLens` read through here.
  */
 
 /** A route's `meta` bag, exactly as `AnyRoute` declares it. */

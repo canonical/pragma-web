@@ -17,6 +17,7 @@ export {
   componentEntityVariables,
   RELATION_PAGE_SIZE,
 } from "./entityQuery.js";
+export { default as componentsLayout } from "./layout.js";
 export * from "./PropertiesSection/index.js";
 export * from "./RelationsSection/index.js";
 export { default as componentsRoutes } from "./routes.js";

@@ -1,24 +1,11 @@
 import { route } from "@canonical/router-core";
-import { makeLensContext } from "#lib/LensBreadcrumbs";
+import { StandardsIcon } from "#lib/Rail";
+import { routeLensFacet } from "#lib/routeLens";
 import { routeShortcutFacet } from "#lib/routeShortcut";
-import { shellStripFacet } from "#lib/Shell";
 import { StandardReadingPage } from "./StandardReadingPage/index.js";
 import { StandardsPage } from "./StandardsPage/index.js";
 import warmStandardEntity from "./warmStandardEntity.js";
 import warmStandardsIndex from "./warmStandardsIndex.js";
-
-/**
- * The lens's mode-strip context tenant: the breadcrumb trail. `Standards`
- * on the index, `Standards / <uri>` on a reading page — the reading crumb
- * is the `:uri` route param (now the entity's ABSOLUTE IRI, which is the
- * only thing `node(id:)` accepts), URL-derived, so the strip reads no
- * query.
- */
-const StandardsContext = makeLensContext({
-  lensLabel: "Standards",
-  lensRouteName: "standards",
-  paramKey: "uri",
-});
 
 /**
  * The Standards lens routes (P-5): the grouped index (`/standards`, the
@@ -37,10 +24,10 @@ const StandardsContext = makeLensContext({
  *   against the browser environment, where it does nothing when the store
  *   already holds the data.
  *
- * Both routes claim the mode strip's context socket ("Standards") — the
- * lens name, stationary across the lens's URLs. Controls/status stay
- * UNCLAIMED — honestly empty: the cs: surface carries no filter controls
- * (v1) and no governance/status fields to put there.
+ * The index declares the lens (`routeLensFacet`) and its digit; both
+ * routes render inside `StandardsLayout`, whose strip carries the trail
+ * and leaves controls and status empty: the cs: surface carries no filter
+ * controls (v1) and no governance/status fields to put there.
  */
 const routes = {
   standards: route({
@@ -48,17 +35,19 @@ const routes = {
     content: StandardsPage,
     warm: warmStandardsIndex,
     meta: {
-      ...shellStripFacet.of({ Context: StandardsContext }),
       ...routeShortcutFacet.of("4"),
+      ...routeLensFacet.of({
+        label: "Standards",
+        icon: StandardsIcon,
+        order: 4,
+        tier: 1,
+      }),
     },
   }),
   standardEntity: route({
     url: "/standards/:uri",
     content: StandardReadingPage,
     warm: warmStandardEntity,
-    meta: {
-      ...shellStripFacet.of({ Context: StandardsContext }),
-    },
   }),
 } as const;
 

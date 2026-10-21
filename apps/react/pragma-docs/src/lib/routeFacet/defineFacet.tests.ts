@@ -29,8 +29,8 @@ describe("defineFacet", () => {
   });
 
   it("returns a well-formed value by identity", () => {
-    // Identity, not equality: `readStripSlots` promised the caller gets the
-    // very object the route parked, and `stripFacet` still does.
+    // Identity, not equality: the caller gets the very object the route
+    // parked.
     const entry = { nested: true };
     const objectFacet = defineFacet<object, "entry">("entry", (value) => {
       if (typeof value !== "object" || value === null) {

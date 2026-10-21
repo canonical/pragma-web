@@ -18,7 +18,7 @@ import "./styles.css";
  * conforming provider that names a subject — the whole root surface is
  * five structural fields. So the index enumerates
  * `ontologyClass(uri: $classUri).instances`, with the class supplied from
- * outside the graph by `#lib/graphBindings`. Relay is content with a
+ * outside the graph by the domain constant `STANDARD_CLASS_URI`. Relay is content with a
  * `@refetchable` fragment on `Query` whose `@connection` sits nested
  * inside `ontologyClass`; the generated pagination query carries
  * `$classUri` through with the rest.

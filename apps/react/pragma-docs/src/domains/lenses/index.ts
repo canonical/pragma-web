@@ -3,4 +3,5 @@
 // barrel that flattened them would hide which domain owns a given lens.
 
 export { default as LensPlaceholder } from "./LensPlaceholder.js";
+export { default as guidesLayout } from "./layout.js";
 export { default as lensRoutes } from "./routes.js";

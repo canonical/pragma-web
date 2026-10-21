@@ -8,8 +8,8 @@
  * each lens route claims its own digit (`#lib/routeShortcut`) and this hook
  * collects them off `useRouter().routes`. The routes arrive through the
  * hook rather than through an `appRoutes` import on purpose — `routes.tsx`
- * imports Shell, Shell imports Rail, so importing back would close a cycle
- * that ESM survives only by accident of laziness. The hook also reflects
+ * imports the lens layouts, which render the rail, so importing back would
+ * close a cycle that ESM survives only by accident of laziness. The hook also reflects
  * the table the router is ACTUALLY running, which is what makes the digits
  * derived rather than merely parallel.
  *
@@ -53,7 +53,7 @@ const isEditableTarget = (target: EventTarget | null): boolean => {
 
 // Named through the router's REGISTERED map rather than by importing
 // `AppRoutes`: same precision, and `#lib` keeps knowing nothing about the
-// app's route module (which imports Shell, which imports this rail).
+// app's route module (which imports the layouts that render this rail).
 export const useLensShortcuts = (): ShortcutAllocation<
   RouteName<RegisteredRouteMap>
 > => {

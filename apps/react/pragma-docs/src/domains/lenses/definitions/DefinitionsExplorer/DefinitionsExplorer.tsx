@@ -35,7 +35,7 @@ const definitionsExplorerQuerySource = (): unknown => graphql`
       namespace
       # The class facets the mode strip's chips filter on and its status
       # figure counts. They ride the ROOT (not only the fragments) because
-      # the strip renders in the frame, outside this page's subtree, and
+      # the strip renders in the lens layout, outside this page's subtree, and
       # Relay masks fragment data — the strip reads this same operation
       # from the same warm store, so it must be able to see them.
       classes {
@@ -67,9 +67,8 @@ const componentCssClassName = "ds definitions-explorer";
  *
  * The lens's EPHEMERAL filter lives in `lensFilterContext` rather than in
  * this component's own state, for one specific reason recorded there in
- * full: the mode strip's chips are mounted BY THE FRAME (Shell reads the
- * route's static `meta`), so they are siblings of the canvas and no prop
- * path reaches them. Context is the smallest mechanism that crosses that
+ * full: the mode strip's chips are rendered by the lens's layout as a
+ * sibling of the canvas, so no prop path reaches them. Context is the smallest mechanism that crosses that
  * boundary. Everything else still flows as props from here.
  *
  * THE SSR DETERMINISM RULE. The context's initial filter is the no-op

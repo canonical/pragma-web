@@ -24,21 +24,19 @@
  * ownership (AV-340)". Do not read this file as that guard.
  */
 
-import { HeadProvider } from "@canonical/react-head";
-import { Outlet, RouterProvider } from "@canonical/router-react";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createStaticRouter } from "#lib/router";
+import { Shell } from "#lib/Shell";
 import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import type { InitialData } from "#server";
+import mergeRecordMaps from "../../testing/mergeRecordMaps.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
-import formatDocumentTitle from "../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
 import { hydrateApp } from "./hydrateApp.js";
 
@@ -56,23 +54,7 @@ const createFetchSpy = () =>
   vi.fn(() => new Promise<never>(() => {})) as ReturnType<typeof vi.fn> &
     FetchFunction;
 
-/**
- * Both pages' records in one store so the whole journey renders warm —
- * a shallow per-record merge is exact for Relay's flat record maps (the
- * only shared record is `client:root`, whose fields union cleanly).
- */
-const mergeRecordMaps = (...maps: readonly RecordMap[]): RecordMap => {
-  const merged: Record<string, Record<string, unknown>> = {};
-  for (const map of maps) {
-    for (const [dataId, record] of Object.entries(map)) {
-      merged[dataId] = merged[dataId]
-        ? { ...merged[dataId], ...(record as Record<string, unknown>) }
-        : { ...(record as Record<string, unknown>) };
-    }
-  }
-  return merged as unknown as RecordMap;
-};
-
+/** Both pages' records in one store, so the whole journey renders warm. */
 const journeyRecords = mergeRecordMaps(
   catalogRecords,
   componentEntityRecordsButton,
@@ -84,20 +66,13 @@ const renderSeededServerHtml = (
   records: RecordMap,
 ): string =>
   renderToString(
-    <HeadProvider titleTemplate={formatDocumentTitle}>
-      <RelayEnvironmentProvider
-        environment={createEnvironment({ records, fetchFn })}
-      >
-        <RouterProvider
-          router={createStaticRouter(appRoutes, url, {
-            middleware: [...middleware],
-            notFound: notFoundRoute,
-          })}
-        >
-          <Outlet fallback={<p>Loading…</p>} />
-        </RouterProvider>
-      </RelayEnvironmentProvider>
-    </HeadProvider>,
+    <Shell
+      environment={createEnvironment({ records, fetchFn })}
+      router={createStaticRouter(appRoutes, url, {
+        middleware: [...middleware],
+        notFound: notFoundRoute,
+      })}
+    />,
   );
 
 type TestWindow = Window & { __INITIAL_DATA__?: InitialData };

@@ -6,7 +6,7 @@
  * block margin that a heading-in-a-bar must not inherit.
  *
  * Token-based with fallbacks, logical properties, and zero conditional
- * at-rules — the frame census (frameStability.tests) sanctions exactly one
+ * at-rules — the stylesheet census (stylesheets.tests) sanctions exactly one
  * layout-capable at-rule app-wide, and it is the rail's collapse, not here.
  */
 

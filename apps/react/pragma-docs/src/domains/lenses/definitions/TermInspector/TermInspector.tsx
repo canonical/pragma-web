@@ -1,7 +1,6 @@
 import { Link } from "@canonical/router-react";
 import type React from "react";
 import { graphql, useFragment } from "react-relay";
-import { GRAPH_BINDINGS } from "#lib/graphBindings";
 import type {
   TermInspector_class$data,
   TermInspector_class$key,
@@ -108,6 +107,13 @@ const termInspectorPropertyFragmentSource = (): unknown => graphql`
 void termInspectorPropertyFragmentSource;
 
 const componentCssClassName = "ds term-inspector";
+
+/**
+ * The class whose instances have a home of their own (`/components/:uri`).
+ * Prefixed form: it is compared only after the instance's returned class IRI
+ * has been brought to the prefixed form by `toPrefixedUri`.
+ */
+const COMPONENT_CLASS_URI = "ds:Component";
 
 /** A term link for a related class/property, labelled by the graph. */
 const TermLink = ({
@@ -258,14 +264,14 @@ const PropertyTable = ({
  * its lens lands.
  *
  * WHAT DISCRIMINATES A COMPONENT is the instance's own CLASS, read off
- * `_meta.type.uri` and compared against the app's components binding —
+ * `_meta.type.uri` and compared against `COMPONENT_CLASS_URI` —
  * never `__typename`. The contract's `NodeEdge.node` is `Node!` and a
  * conforming provider's concrete typenames are its own business, so a
  * `__typename === "Component"` test asks a question only pragma's compiled
  * schema can answer. `_meta.type` is the class the graph itself assigns,
  * and it is non-null on every node. The comparison runs through
  * `toPrefixedUri` because `ontologyClass(uri:)` echoes back the ABSOLUTE
- * IRI while the binding is stated prefixed: the two forms must be brought
+ * IRI while the constant is stated prefixed: the two forms must be brought
  * onto the same footing before `===` means anything. `namespaces` already
  * rides this component as a prop and the query already fetches
  * `ontologies { prefix namespace }` — no new variable, no new round trip.
@@ -301,10 +307,7 @@ const InstanceItem = ({
 }): React.ReactElement => {
   const curie = node._meta.curie;
   const display = node._meta.title;
-  if (
-    toPrefixedUri(node._meta.type.uri, namespaces) ===
-    GRAPH_BINDINGS.components.classUri
-  ) {
+  if (toPrefixedUri(node._meta.type.uri, namespaces) === COMPONENT_CLASS_URI) {
     return (
       <li>
         <Link params={{ uri: curie }} to="componentEntity">

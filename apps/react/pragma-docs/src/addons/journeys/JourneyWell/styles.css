@@ -1,13 +1,13 @@
 /*
  * JourneyWell — the centre panel's lower half: the demand model's spine
- * (job → pairing → surface → layout) sunk into the shell's underground well
- * (`.underground` supplies the depression; Shell/styles.css). Modelled on
+ * (job → pairing → surface → layout) sunk into an underground well
+ * (`.ds.underground` supplies the depression; styles/app.css). Modelled on
  * the definitions HierarchyWell: full bleed inside its box, nodes raised as
  * chips on the well floor, canvas-local furniture floated ABSOLUTELY
  * against the well — never `position: fixed`, which the canvas's
  * containment would re-anchor (INTRINSIC-GRID.md entry 5). React Flow
  * positions everything absolutely inside its own wrapper. --z-plate is
- * CONSUMED, never defined here (frameStability.tests counts definitions).
+ * CONSUMED, never defined here (stylesheets.tests counts definitions).
  *
  * At-rules: one `prefers-reduced-motion` block at the foot, census-EXEMPT
  * (matched by query text, cannot reflow layout), so the app's sanctioned
@@ -15,20 +15,22 @@
  */
 
 @layer app {
-  /* Full bleed, NO CARD. The graph IS the background (owner ruling): drop the
-   * `.underground` hook's border, radius AND shadow entirely so the well runs
-   * edge to edge with nothing framing it — one surface, not a card sunk in the
-   * canvas. Only the depression's background tint remains (the recess you look
-   * INTO, AX.3). The reset is scoped under `.ds.shell` so it OUT-SPECIFIES the
-   * `.ds.shell .underground` hook (Shell/styles.css) — without that ancestor
-   * the hook's border/radius/shadow win and the box reappears (the owner saw
-   * exactly that). The hook itself is untouched; other tenants still get the
-   * card. `position: relative` makes this the containing block for the
+  /* `position: relative` makes the well the containing block for the
    * floating furniture. */
-  .ds.shell .ds.journey-well {
+  .ds.journey-well {
     position: relative;
     min-block-size: 0;
     overflow: hidden;
+  }
+
+  /* Full bleed, NO CARD. The graph IS the background (owner ruling): drop the
+   * `.ds.underground` hook's border, radius AND shadow entirely so the well
+   * runs edge to edge with nothing framing it — one surface, not a card sunk
+   * in the canvas. Only the depression's background tint remains (the recess
+   * you look INTO, AX.3). The well's root class plus the hook (specificity
+   * 0,3,0) out-specifies the hook alone (0,2,0, styles/app.css). The hook
+   * itself is untouched; other tenants still get the card. */
+  .ds.journey-well.underground {
     border: none;
     border-radius: 0;
     box-shadow: none;

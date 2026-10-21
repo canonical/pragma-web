@@ -33,7 +33,8 @@ export interface JourneyViewSwitchProps {
  * is announced as a named group and each option stays visible without colour
  * alone (weight + fill). Pure — it renders `view` and calls `onViewChange`,
  * holding no state of its own (the ephemeral view lives in
- * `journeyViewContext`, above the frame boundary this component sits on).
+ * `journeyViewContext`, which the lens layout provides around both the
+ * strip this component sits in and the canvas).
  */
 const JourneyViewSwitch = ({
   className,

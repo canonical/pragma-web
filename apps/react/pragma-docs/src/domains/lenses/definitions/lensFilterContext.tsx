@@ -14,28 +14,29 @@ import { DEFAULT_LENS_FILTER, type LensFilter } from "./lensFilter.js";
  * wiring the strip's Controls forces one". It does, and here is the exact
  * reason, so the next reader does not undo this on principle:
  *
- * The mode strip is rendered by `Shell`, which reads the active route's
- * static `meta` and mounts the claimed `Controls`/`Status` components
- * itself. The strip therefore lives OUTSIDE the page's React subtree — a
- * sibling of the canvas, not a descendant. `StripSlotsEntry` is plain
- * route data (component TYPES, never elements), so there is no prop path
- * from `DefinitionsExplorer` up to the chips: the toolbar is mounted by
- * the frame, above the state it needs to read and write.
+ * The mode strip is rendered by the lens's own layout (`DefinitionsLayout`)
+ * as a sibling of the routed page, not a descendant: the router hands the
+ * layout the page as `children`, and the strip's chips sit beside it. So
+ * there is no prop path from `DefinitionsExplorer` across to the chips —
+ * the toolbar is rendered above the state it needs to read and write.
  *
  * Props cannot cross that boundary. Context can, and it is the smallest
- * mechanism that does: no store, no router change, no widening of the
- * strip handshake (which would make every future lens pay for this one's
- * needs). The provider wraps the Shell (see `routes.tsx`), so the chips
- * and the canvas share ONE filter.
+ * bridge that does: no store, no router change, nothing every other lens
+ * would have to carry. `DefinitionsLayout` puts the provider around both
+ * the strip and the canvas, so the chips and the explorer share ONE
+ * filter. The provider lives as long as the layout, which the router
+ * remounts whenever the matched route changes, so the filter survives a
+ * move from one term to another (the same route, new params) and starts
+ * from its default on a move to the lens index or to another lens.
  *
  * WHAT THIS CONTEXT DELIBERATELY DOES NOT CARRY: the graph data. An
  * earlier attempt had the explorer ANNOUNCE its ontologies here, which
  * could only happen in an effect — client-only, after paint — so the strip
  * rendered empty on the server and populated on the client: a hydration
- * mismatch in the frame itself, caught by the frame certification. The
- * strip instead reads the same Relay operation from the same warm store
- * (see `stripSlots.tsx`). This context holds ONLY the reader's ephemeral
- * choices, which is all that genuinely needs sharing.
+ * mismatch in the strip itself. The strip instead reads the same Relay
+ * operation from the same warm store (see `stripSlots.tsx`). This context
+ * holds ONLY the reader's ephemeral choices, which is all that genuinely
+ * needs sharing.
  *
  * THE SSR DETERMINISM RULE. The initial value is `DEFAULT_LENS_FILTER`,
  * whose `namespaces` is empty — read by every consumer as "no chip has
@@ -46,7 +47,7 @@ import { DEFAULT_LENS_FILTER, type LensFilter } from "./lensFilter.js";
  *
  * The fallback matters too: a consumer outside any provider degrades to
  * the same no-op rather than throwing, so a stray mount can never take the
- * shell down.
+ * layout down.
  */
 
 /** What the lens's consumers share: the filter and the way to change it. */

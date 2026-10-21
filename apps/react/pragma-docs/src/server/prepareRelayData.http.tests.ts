@@ -42,7 +42,10 @@ import {
 } from "vitest";
 import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#addons/journeys";
 import { CATALOG_PAGE_SIZE, RELATION_PAGE_SIZE } from "#domains/components";
-import { STANDARDS_PAGE_SIZE } from "#domains/lenses/standards";
+import {
+  STANDARD_CLASS_URI,
+  STANDARDS_PAGE_SIZE,
+} from "#domains/lenses/standards";
 import {
   LOBBY_COMPONENT_CLASS,
   LOBBY_EXEMPLAR_COUNT,
@@ -53,7 +56,6 @@ import {
   RELATION_PAGE_SIZE as PROBE_RELATION_PAGE_SIZE,
   PROBE_URI,
 } from "#domains/playground";
-import { GRAPH_BINDINGS } from "#lib/graphBindings";
 import {
   createEnvironment,
   getPrefetchEnvironment,
@@ -216,7 +218,7 @@ describe("prepareRelayData over HTTP", () => {
       url: "/standards",
       operationName: "StandardsIndexQuery",
       variables: {
-        classUri: GRAPH_BINDINGS.standards.classUri,
+        classUri: STANDARD_CLASS_URI,
         count: STANDARDS_PAGE_SIZE,
         cursor: null,
       },
@@ -226,7 +228,7 @@ describe("prepareRelayData over HTTP", () => {
       operationName: "StandardEntityQuery",
       variables: {
         uri: STANDARD_URI,
-        classUri: GRAPH_BINDINGS.standards.classUri,
+        classUri: STANDARD_CLASS_URI,
       },
     },
     {

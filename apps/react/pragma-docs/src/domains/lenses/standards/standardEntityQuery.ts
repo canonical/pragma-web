@@ -34,9 +34,9 @@
  * shape of the work.
  */
 
-import { GRAPH_BINDINGS } from "#lib/graphBindings";
 import type { StandardEntityQuery$variables } from "#relay/__generated__/StandardEntityQuery.graphql.js";
 import standardEntityQueryNode from "#relay/__generated__/StandardEntityQuery.graphql.js";
+import { STANDARD_CLASS_URI } from "./constants.js";
 
 /** The compiled operation (full text under `params.text`, `id: null`). */
 export { standardEntityQueryNode };
@@ -53,5 +53,5 @@ export const standardEntityVariables = (
   params: Readonly<Record<string, unknown>>,
 ): StandardEntityQuery$variables => ({
   uri: String(params.uri),
-  classUri: GRAPH_BINDINGS.standards.classUri,
+  classUri: STANDARD_CLASS_URI,
 });

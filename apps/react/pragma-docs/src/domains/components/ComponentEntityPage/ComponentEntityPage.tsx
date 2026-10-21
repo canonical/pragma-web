@@ -104,7 +104,7 @@ const EntityContent = ({
  * The component entity route (`/components/:uri`, key `componentEntity`).
  * The `data-view` marker and the boundaries live OUTSIDE the suspending
  * interior so route content never suspends at Outlet level — suspension
- * there would swap the whole Shell for the fallback (the PlaygroundPage
+ * there would swap the whole layout for the fallback (the PlaygroundPage
  * precedent). `params.uri` arrives percent-decoded from the router codec.
  */
 const ComponentEntityPage = ({

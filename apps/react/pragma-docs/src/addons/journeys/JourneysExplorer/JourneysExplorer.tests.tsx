@@ -21,7 +21,7 @@
  *   the presence/absence of the inspector region — not merely the view swap.
  *
  * The default is the TABLE (two tracks, no inspector), and the SSR
- * determinism half is proved by the frame + hydrate suites (the default
+ * determinism half is proved by the SSR layout and hydrate suites (the default
  * view's markup is byte-fixed). Here we exercise the client transition the
  * strip's switch performs.
  */
