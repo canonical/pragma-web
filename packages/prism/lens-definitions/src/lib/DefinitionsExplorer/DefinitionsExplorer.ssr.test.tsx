@@ -1,8 +1,8 @@
 /**
- * SSR posture — the React Flow keystone: the whole triptych renders to
- * static markup from a warm store, INCLUDING the well's full node DOM
- * (React Flow v12 server-renders nodes carrying explicit width/height and
- * handles). No browser API, no network, no client JS.
+ * SSR posture: the whole triptych renders to static markup from a warm
+ * store, INCLUDING the well's full node DOM, each node a positioned box
+ * carrying its estimated geometry. No browser API, no network, no client
+ * JS.
  */
 
 import { renderToString } from "react-dom/server";

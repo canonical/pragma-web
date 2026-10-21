@@ -134,7 +134,7 @@ const TermInspector = ({
 
   let body: React.ReactElement;
   if (term === undefined) {
-    // No default term (owner ruling): /definitions is the whole explorer
+    // No default term: /definitions is the whole explorer
     // with an honestly empty inspector, never a redirect.
     body = <p className="empty">{t("inspector.empty")}</p>;
   } else if (classData) {
@@ -144,7 +144,7 @@ const TermInspector = ({
       <PropertyView data={propertyData} namespaces={namespaces} term={term} />
     );
   } else {
-    // Unknown term: a 200 with an honest alert (the R4 posture — the term
+    // Unknown term: a 200 with an honest alert (the term
     // space is the graph's, not the router's).
     body = (
       <p role="alert">

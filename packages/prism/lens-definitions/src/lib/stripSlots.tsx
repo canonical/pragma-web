@@ -45,9 +45,8 @@ import {
  * page-level boundary. Unguarded, a cold render (a failed prepare step, a
  * graph that did not answer) suspends the whole layout and takes the
  * rail, the strip and the canvas down with it. So each socket carries its
- * OWN Suspense and error
- * boundary, both falling back to nothing: an empty socket is the honest
- * rendering of "the graph did not answer", and the strip band (AX.6)
+ * OWN Suspense and error boundary, both falling back to nothing: an empty socket is the honest
+ * rendering of "the graph did not answer", and the strip band
  * stays intact either way.
  */
 

@@ -80,9 +80,9 @@ const MAX_INDENT_DEPTH = 6;
  * - An ABSTRACTION marker (`data-abstraction`): a small glyph that restates
  *   exactly what the graph encodes with a dashed border and an ABSTRACT
  *   tag. The ontology carries `isAbstract` and `namespace` and NOTHING
- *   resembling a lifecycle/status/channel on a class (verified live —
- *   R7's lesson), so this rail marks abstractness and provenance and
- *   refuses to fake a status dot the data cannot back.
+ *   resembling a lifecycle, status or channel on a class, so this rail
+ *   marks abstractness and provenance and refuses to fake a status dot the
+ *   data cannot back.
  * - A DEPTH indicator: the superclass depth (`depthByUri`, the same measure
  *   the well stacks its layers by) as the exhibit's monospace dot-run AND
  *   as a real indent, so the class tree's shape is legible in the flat list.
@@ -114,9 +114,9 @@ const MAX_INDENT_DEPTH = 6;
  *
  * Both filter axes reach this rail: the text query (rail-only by
  * contract — it never re-shapes the graph) and the chips (which govern
- * both). All of it is EPHEMERAL view state owned by `DefinitionsExplorer`
- * (the P-D7 transient tier), never the URL — a filtered rail is a way of
- * looking, not a place to link to.
+ * both). All of it is EPHEMERAL view state owned by `DefinitionsExplorer`,
+ * never the URL — a filtered rail is a way of looking, not a place to link
+ * to.
  *
  * Selection needs no wiring here: the router's `Link` stamps
  * `aria-current="page"` on the item whose address is the current URL, and

@@ -117,7 +117,7 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     // Nothing hovered yet: the rail item carries no hover highlight.
     expect(patternRailItem.classList.contains("is-hovered")).toBe(false);
 
-    // Hover the Pattern NODE in the graph (React Flow's node-enter path).
+    // Hover the Pattern NODE in the graph (the well's node-enter path).
     const patternNode = findNodeByHref(well, "/definitions/ds%3APattern");
     fireEvent.mouseEnter(patternNode);
 

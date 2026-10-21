@@ -11,7 +11,7 @@ const SUBCLASS_OF = "⊂";
 
 /**
  * The class's ancestry as an ordered breadcrumb chain — the reference
- * ontology explorer's `.lineage` (B8). `superclasses` arrives nearest-first
+ * ontology explorer's `.lineage`. `superclasses` arrives nearest-first
  * (direct parent, …, root — the same order the flat list marked "(direct)"
  * on the head), so the chain reads self ⊂ parent ⊂ … ⊂ root left to right.
  * Every ancestor is a real term link; the leaf (the class itself) is plain

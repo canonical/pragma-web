@@ -1,7 +1,7 @@
 /**
  * The well's presentation layer: a PURE projection from (graph, selection,
- * focus, filter) to the `className` React Flow paints with. Nothing here
- * measures, mutates or re-lays-out — positions come from `buildClassTree`
+ * focus, filter) to the `className` the well paints with. Nothing here
+ * measures, mutates or re-lays-out — positions come from `buildClassGraph`
  * and are never touched, because the exhibit's one habit we deliberately
  * do NOT copy is re-running physics on every filter change. We dim; we
  * never move.
@@ -36,7 +36,7 @@ import {
 } from "./constants.js";
 import type { TermFlowEdge, TermFlowNode } from "./types.js";
 
-/** A decorated graph, ready for React Flow. */
+/** A decorated graph, ready for the well to paint. */
 export interface DecoratedGraph {
   readonly nodes: readonly TermFlowNode[];
   readonly edges: readonly TermFlowEdge[];
@@ -129,9 +129,9 @@ export const decorateForView = (
       hidden && HIDDEN_CLASS,
       !hidden && fading && !near.has(node.id) && NODE_FADED_CLASS,
     );
-    // Only rebuild the node when something actually changed: React Flow
-    // diffs by identity, and a fresh object per render would repaint the
-    // whole graph on every pointer move.
+    // Only rebuild the node when something actually changed: React diffs
+    // the node list by identity, and a fresh object per render would repaint
+    // the whole graph on every pointer move.
     return node.className === className ? node : { ...node, className };
   });
 

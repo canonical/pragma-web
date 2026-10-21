@@ -16,8 +16,8 @@ export interface TermNodeData extends Record<string, unknown> {
 }
 
 /**
- * The well's own node shape (React Flow retired — AV-364's well grammar):
- * a positioned box addressed by its CENTRE, in the canvas's 1:1 px space.
+ * The well's own node shape: a positioned box addressed by its CENTRE, in
+ * the canvas's 1:1 px space.
  * `id` is the prefixed term URI — the same string the term route
  * addresses, so selection and links need no translation. `className` is
  * the decorate pass's output (`decorateGraph.ts`), the only mutable-ish
@@ -78,7 +78,7 @@ export interface HierarchyWellProps {
   /**
    * The SHARED transient ego centre — hover or keyboard focus on EITHER
    * surface, lifted into `DefinitionsExplorer` so the rail and the well
-   * agree on one focus (P-D7). The well fades to this centre's 1-hop
+   * agree on one focus. The well fades to this centre's 1-hop
    * neighbourhood. CLIENT-ONLY: `undefined` on the server and the first
    * client paint, so the well's boot markup is the selection-only fade,
    * byte-identical to the server's (see `decorateGraph.ts`).

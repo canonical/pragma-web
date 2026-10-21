@@ -24,7 +24,7 @@ export interface TermRailProps {
   readonly depthByUri: ReadonlyMap<string, number>;
   /**
    * The transient hover/focus centre — the shared ego centre this lens
-   * lifts into `DefinitionsExplorer` (P-D7). CLIENT-ONLY: `undefined` on
+   * lifts into `DefinitionsExplorer`. CLIENT-ONLY: `undefined` on
    * the server and on the first client paint, so the rail's initial markup
    * matches the server's byte for byte. When it names a rail term, that
    * item takes `is-hovered` (distinct from `.active`/`aria-current`

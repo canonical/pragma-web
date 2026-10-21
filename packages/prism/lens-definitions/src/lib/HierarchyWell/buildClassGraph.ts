@@ -1,7 +1,6 @@
 /**
- * The definitions well's DETERMINISTIC layout — the well grammar
- * (AV-364) replacing the retired layer-grid: RADIAL CLUSTERS instead of
- * an organigram. Pure — same input, byte-equal output
+ * The definitions well's DETERMINISTIC layout: RADIAL CLUSTERS rather
+ * than an organigram. Pure — same input, byte-equal output
  * (`buildClassGraph.test.ts` pins it) — because positions are computed
  * identically on the server and the client; the SSR/hydration suite
  * gates any drift.
@@ -93,7 +92,7 @@ export const measureSuperclassDepth = (
 /**
  * The superclass depth of every class in ONE ontology, keyed by full URI
  * — shared with the rail so the index indents by the identical measure
- * the well ringifies by (M-STRUCT: one source of truth for depth).
+ * the well ringifies by, one source of truth for depth.
  */
 export const computeClassDepths = (
   classes: readonly DepthClass[],

@@ -81,7 +81,7 @@ describe("TermInspector", () => {
     expect(
       within(panel).getByText(/category of visual or abstract entity/),
     ).toBeInTheDocument();
-    // Lineage breadcrumb (B8): self ⊂ direct parent ⊂ … ⊂ root, in order,
+    // Lineage breadcrumb: self ⊂ direct parent ⊂ … ⊂ root, in order,
     // with the ⊂ glyph between links. The self leaf is the class itself and
     // is NOT a link; the ancestors are.
     const lineage = within(panel).getByRole("heading", {
@@ -110,7 +110,7 @@ describe("TermInspector", () => {
         .getByRole("link", { name: "Component" })
         .getAttribute("href"),
     ).toBe("/definitions/ds%3AComponent");
-    // Properties split by provenance (B7): a "Properties" grouping for the
+    // Properties split by provenance: a "Properties" grouping for the
     // class's own, an "Inherited" grouping for what it inherits — two
     // separate tables, not one table with an "inherited" note.
     expect(
@@ -124,7 +124,7 @@ describe("TermInspector", () => {
     // The declared table carries the class's own property and prefixed range.
     expect(within(panel).getByText("hasVariant")).toBeInTheDocument();
     expect(within(panel).getAllByText("ds:UIBlock").length).toBeGreaterThan(0);
-    // B9: each property's definition is surfaced beneath its row (it was
+    // Each property's definition is surfaced beneath its row (it was
     // fetched all along and previously dropped). The changelog property's
     // definition is a fixture string — assert it renders.
     expect(
@@ -228,7 +228,7 @@ describe("TermInspector", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("renders the unknown-term alert (a 200 posture, R4) without fetching", {
+  it("renders the unknown-term alert (a 200 posture) without fetching", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
     const fetchFn = createFetchSpy();

@@ -3,13 +3,13 @@
  *
  * The well is memoised at its boundary (`HierarchyWell`'s `memo`
  * comparator), and that comparator is the single point of failure for the
- * whole chip mechanism: it decides whether a filter change reaches React
- * Flow at all. Every OTHER consequence of a chip has its own independent
+ * whole chip mechanism: it decides whether a filter change reaches the
+ * graph at all. Every OTHER consequence of a chip has its own independent
  * witness — the chip's `aria-pressed` flips in `ExplorerControls.test`,
  * the status figure recounts in `stripSlots.test` (a sibling reading the
  * same context), the rail dims in `TermRail.test` — so if the comparator
- * were replaced by `return true`, freezing the graph forever, all 91
- * definitions tests still passed. The chips would visibly toggle, the
+ * were replaced by `return true`, freezing the graph forever, every other
+ * definitions test would still pass. The chips would visibly toggle, the
  * figure would recount, the rail would dim, and the GRAPH would sit
  * frozen, which is the one thing the lens exists to show.
  *
@@ -87,7 +87,7 @@ const createExplorerWithChips = (fetchFn: FetchFunction): ReactElement => {
 };
 
 /** How many of the well's nodes the graph is currently HIDING. Counted
- * from the DOM React Flow painted, never from the model. */
+ * from the DOM the well painted, never from the model. */
 const countHiddenNodes = (): number =>
   document.querySelectorAll(`.ds.term-node.${HIDDEN_CLASS}`).length;
 

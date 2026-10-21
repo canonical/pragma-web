@@ -18,7 +18,7 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * Codegen source of truth for `DefinitionsExplorerQuery` — the whole
- * triptych is ONE operation (the P-2/P-5 register): the rail and well
+ * triptych is ONE operation: the rail and well
  * fragments fan out over `ontologies`; the term lookup rides the same
  * operation behind `@include(if: $hasTerm)`, querying BOTH `ontologyClass`
  * and `ontologyProperty` because a term address does not encode which one
@@ -83,7 +83,7 @@ const componentCssClassName = "ds definitions-explorer";
  * string. Selection, by contrast, IS server-rendered: it comes from the
  * URL (`term`), identical on both sides.
  *
- * THE SHARED HOVER CENTRE (P-D7 transient, and the bidirectional-hover
+ * THE SHARED HOVER CENTRE (the bidirectional-hover
  * mechanism). The transient ego centre used to be well-LOCAL state; it is
  * lifted HERE, beside the filter, so the rail and the well write the one
  * value and both read it. Hovering (or focusing) a graph node OR a rail

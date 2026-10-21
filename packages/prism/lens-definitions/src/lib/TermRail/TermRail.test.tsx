@@ -4,7 +4,7 @@
  * addresses, and — the load-bearing one — THE ASYMMETRY: the rail DIMS
  * under a filter and never HIDES, so the index stays complete and stable
  * while the graph is what disappears. The filter itself stays EPHEMERAL
- * (component state, P-D7 transient tier — the URL never changes while
+ * (component state — the URL never changes while
  * filtering). Mounts are consolidated (the full-triptych render is heavy)
  * and carry explicit timeouts for fully-parallel runs.
  */
@@ -191,7 +191,7 @@ describe("TermRail", () => {
     expect(nonMatch.closest("li")).not.toHaveAttribute("aria-disabled");
     expect(nonMatch).not.toHaveAttribute("aria-disabled");
 
-    // The filter is view state, never address state (P-D7).
+    // The filter is view state, never address state.
     expect(window.location.pathname).toBe(urlBefore);
 
     // Clearing un-dims everything.
