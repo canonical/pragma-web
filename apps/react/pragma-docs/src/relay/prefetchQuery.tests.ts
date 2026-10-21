@@ -16,7 +16,6 @@ import {
   componentProbeVariables,
 } from "#domains/playground";
 import createFetchSpy from "../../testing/createFetchSpy.js";
-import componentProbeRecords from "../domains/playground/__fixtures__/componentProbeRecords.js";
 import { createEnvironment } from "./environment.js";
 import {
   getPrefetchEnvironment,
@@ -50,15 +49,16 @@ describe("prefetchQuery", () => {
   });
 
   it("resolves without fetching when the store already holds the data", async () => {
-    const fetchFn = createFetchSpy();
-    setPrefetchEnvironment(
-      createEnvironment({ records: componentProbeRecords, fetchFn }),
+    const fetchFn = vi.fn<FetchFunction>(() =>
+      Promise.resolve({ data: { component: null } }),
     );
+    setPrefetchEnvironment(createEnvironment({ fetchFn }));
+    await prefetchQuery(componentProbeQueryNode, componentProbeVariables());
 
     await expect(
       prefetchQuery(componentProbeQueryNode, componentProbeVariables()),
     ).resolves.toBeUndefined();
-    expect(fetchFn).not.toHaveBeenCalled();
+    expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 
   it("collapses two quick calls into one request", () => {
