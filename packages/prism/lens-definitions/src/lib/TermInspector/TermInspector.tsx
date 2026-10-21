@@ -4,7 +4,7 @@ import type { TermInspector_class$key } from "../../__generated__/TermInspector_
 import termInspectorClassFragmentNode from "../../__generated__/TermInspector_class.graphql.js";
 import type { TermInspector_property$key } from "../../__generated__/TermInspector_property.graphql.js";
 import termInspectorPropertyFragmentNode from "../../__generated__/TermInspector_property.graphql.js";
-import { useMessages } from "../i18n/index.js";
+import { Message, useMessages } from "../i18n/index.js";
 import { ClassView } from "./common/ClassView/index.js";
 import { PropertyView } from "./common/PropertyView/index.js";
 import type { TermInspectorProps } from "./types.js";
@@ -148,9 +148,10 @@ export default function TermInspector({
     // space is the graph's, not the router's).
     body = (
       <p role="alert">
-        {t("inspector.unknown.prefix")}
-        <code>{term}</code>
-        {t("inspector.unknown.suffix")}
+        <Message
+          elements={{ term: <code>{term}</code> }}
+          id="inspector.unknown"
+        />
       </p>
     );
   }

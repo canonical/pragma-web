@@ -1,5 +1,5 @@
 import type React from "react";
-import { useMessages } from "../../../i18n/index.js";
+import { Message, useMessages } from "../../../i18n/index.js";
 import { InstanceItem } from "../InstanceItem/index.js";
 import { Lineage } from "../Lineage/index.js";
 import { PropertyTable } from "../PropertyTable/index.js";
@@ -23,10 +23,17 @@ export default function ClassView({
       <header>
         <h2 id="term-inspector-title">{data.label ?? term}</h2>
         <p className="address">
-          <code>{term}</code>
-          {t("inspector.class.in")}
-          <code>{data.namespace}</code>
-          {data.isAbstract ? t("inspector.class.abstract") : ""}
+          <Message
+            elements={{
+              term: <code>{term}</code>,
+              namespace: <code>{data.namespace}</code>,
+            }}
+            id={
+              data.isAbstract
+                ? "inspector.class.address.abstract"
+                : "inspector.class.address"
+            }
+          />
         </p>
       </header>
       <p>{data.definition ?? t("inspector.definition.none")}</p>

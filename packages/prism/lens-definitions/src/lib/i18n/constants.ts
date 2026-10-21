@@ -2,8 +2,10 @@
  * The lens's English catalog: every string a reader sees, by message key. A
  * value may hold `{name}` placeholders the translator fills, or be a plural
  * record whose branch the `count` value selects: the shape
- * `@canonical/i18n-core`'s `createTranslator` reads. Where a sentence wraps
- * an element, its text is split at the element into a prefix and a suffix.
+ * `@canonical/i18n-core`'s `createTranslator` reads. A sentence that wraps
+ * an element is still one message: the element's `{name}` placeholder marks
+ * where it goes, and `Message` renders the element there, so a translation
+ * may reorder the sentence around it.
  */
 export const MESSAGES = {
   "lens.label": "Definitions",
@@ -25,7 +27,10 @@ export const MESSAGES = {
     one: "{visible} of {count} class",
     other: "{visible} of {count} classes",
   },
-  "status.abstract": " · {abstract} abstract",
+  "status.classes.abstract": {
+    one: "{visible} of {count} class · {abstract} abstract",
+    other: "{visible} of {count} classes · {abstract} abstract",
+  },
   "legend.label": "Graph legend",
   "legend.abstract": "abstract class — not instantiated directly",
   "legend.concrete": "concrete class",
@@ -42,13 +47,13 @@ export const MESSAGES = {
   "inspector.label": "Term inspector",
   "inspector.empty":
     "Select a term — from the rail or the hierarchy — to inspect its definition, relations, and instances.",
-  "inspector.unknown.prefix": "No term at ",
-  "inspector.unknown.suffix":
-    ". The rail lists every term the ontologies carry.",
+  "inspector.unknown":
+    "No term at {term}. The rail lists every term the ontologies carry.",
   "inspector.definition.none": "No definition recorded.",
-  "inspector.class.in": " · class in ",
-  "inspector.class.abstract": " · abstract",
-  "inspector.property.in": " · property in ",
+  "inspector.class.address": "{term} · class in {namespace}",
+  "inspector.class.address.abstract":
+    "{term} · class in {namespace} · abstract",
+  "inspector.property.address": "{term} · property in {namespace}",
   "inspector.lineage": "Lineage",
   "inspector.lineage.root": "A root of its ontology.",
   "inspector.subclasses": "Subclasses",

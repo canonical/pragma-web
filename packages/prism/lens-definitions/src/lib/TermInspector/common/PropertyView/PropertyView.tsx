@@ -1,5 +1,5 @@
 import type React from "react";
-import { useMessages } from "../../../i18n/index.js";
+import { Message, useMessages } from "../../../i18n/index.js";
 import formatRange from "../../formatRange.js";
 import { TermLink } from "../TermLink/index.js";
 import type { PropertyViewProps } from "./types.js";
@@ -21,9 +21,13 @@ export default function PropertyView({
       <header>
         <h2 id="term-inspector-title">{data.label ?? term}</h2>
         <p className="address">
-          <code>{term}</code>
-          {t("inspector.property.in")}
-          <code>{data.namespace}</code>
+          <Message
+            elements={{
+              term: <code>{term}</code>,
+              namespace: <code>{data.namespace}</code>,
+            }}
+            id="inspector.property.address"
+          />
         </p>
       </header>
       <p>{data.definition ?? t("inspector.definition.none")}</p>
