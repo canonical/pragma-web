@@ -8,7 +8,6 @@
  */
 
 import type { ReactElement } from "react";
-import type { LensEntry } from "./constants.js";
 
 interface IconProps {
   readonly size?: number;
@@ -83,15 +82,3 @@ export const SignInIcon = ({ size = 15 }: IconProps): ReactElement => (
     <path d="M3.5 13.5c.6-2.6 2.3-4 4.5-4s3.9 1.4 4.5 4" />
   </svg>
 );
-
-/** The lens → glyph pairing, keyed by route name. */
-export const LENS_ICONS: Readonly<
-  Record<LensEntry["to"], (props: IconProps) => ReactElement>
-> = {
-  components: ComponentsIcon,
-  definitions: DefinitionsIcon,
-  guides: GuidesIcon,
-  home: HomeIcon,
-  journeys: JourneysIcon,
-  standards: StandardsIcon,
-};

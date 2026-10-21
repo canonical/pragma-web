@@ -237,7 +237,7 @@ const trail = (
 
 const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
   // The lobby claims its lens name too (AV-350) — "Home", exactly as the
-  // Rail's LENS_ENTRIES labels it; on its single address it is one current
+  // lens declaration labels it; on its single address it is one current
   // crumb. Only `/guides` (still a stub) claims nothing.
   "/": trail("Home"),
   "/components": trail("Components"),

@@ -1,20 +1,44 @@
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentType } from "react";
 import { ModeStrip } from "#lib/ModeStrip";
-import { Rail } from "#lib/Rail";
+import {
+  ComponentsIcon,
+  DefinitionsIcon,
+  GuidesIcon,
+  HomeIcon,
+  JourneysIcon,
+  Rail,
+  StandardsIcon,
+} from "#lib/Rail";
+import { collectLenses, type LensTier, routeLensFacet } from "#lib/routeLens";
 import { withRouter } from "../../../.storybook/decorators/index.js";
 import Component from "./LensLayout.js";
+
+/** A bare index route declaring a lens, so the rail slot lists it. */
+const lensRoute = (
+  url: string,
+  label: string,
+  icon: ComponentType,
+  order: number,
+  tier: LensTier,
+) =>
+  route({
+    url,
+    content: () => null,
+    meta: routeLensFacet.of({ label, icon, order, tier }),
+  });
 
 /** Name-compatible bare routes, so the rail's links resolve without mounting
  * the app's real pages. A name the rail links to and this table lacks makes
  * `buildPath` throw and the story fail to render. */
 const bareRoutes = {
-  home: route({ url: "/", content: () => null }),
-  components: route({ url: "/components", content: () => null }),
-  definitions: route({ url: "/definitions", content: () => null }),
-  standards: route({ url: "/standards", content: () => null }),
-  journeys: route({ url: "/journeys", content: () => null }),
-  guides: route({ url: "/guides", content: () => null }),
+  home: lensRoute("/", "Home", HomeIcon, 1, 2),
+  components: lensRoute("/components", "Components", ComponentsIcon, 2, 2),
+  definitions: lensRoute("/definitions", "Definitions", DefinitionsIcon, 3, 1),
+  standards: lensRoute("/standards", "Standards", StandardsIcon, 4, 1),
+  journeys: lensRoute("/journeys", "Journeys", JourneysIcon, 5, 2),
+  guides: lensRoute("/guides", "Guides", GuidesIcon, 6, 1),
   playground: route({ url: "/playground", content: () => null }),
   account: route({ url: "/account", content: () => null }),
 } as const;
@@ -26,7 +50,12 @@ const meta: Meta<typeof Component> = {
   decorators: [withRouter({ routes: bareRoutes })],
   parameters: { layout: "fullscreen" },
   args: {
-    rail: <Rail />,
+    rail: (
+      <Rail
+        brand={{ label: "Pragma", caption: "design system docs", to: "home" }}
+        entries={collectLenses(bareRoutes)}
+      />
+    ),
     strip: <ModeStrip />,
     footer: (
       <p>Pragma — the design system, documented from its knowledge graph.</p>

@@ -10,4 +10,5 @@ export * from "./LensLayout/index.js";
 export * from "./ModeStrip/index.js";
 export * from "./Rail/index.js";
 export * from "./Shell/index.js";
+export { SiteRail } from "./SiteRail/index.js";
 export { default as ThemeSelector } from "./ThemeSelector/index.js";

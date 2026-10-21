@@ -10,7 +10,7 @@ import warmLobby from "./warmLobby.js";
 
 /**
  * The lobby's mode-strip context tenant: a single `Home` crumb (the lens
- * name as the Rail's `LENS_ENTRIES` labels it). The lobby has one address,
+ * name as its lens declaration labels it). The lobby has one address,
  * so there is no terminal crumb and no route param to read — the lens crumb
  * IS the current page.
  */
@@ -35,7 +35,7 @@ const HomeContext = makeLensContext({
  *   already holds the data.
  *
  * The lobby claims the mode strip's context socket with "Home" — the lens
- * name as the Rail's `LENS_ENTRIES` labels it, matching how every other
+ * name as its lens declaration labels it, matching how every other
  * lens claims its own name. Controls/status stay UNCLAIMED — honestly
  * empty: the lobby has no filters and no status to report.
  */

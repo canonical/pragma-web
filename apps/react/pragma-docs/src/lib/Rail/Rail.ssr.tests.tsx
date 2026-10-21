@@ -3,6 +3,7 @@
 import { RouterProvider } from "@canonical/router-react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { collectLenses } from "#lib/routeLens";
 import { appRoutes, notFoundRoute } from "../../routes.js";
 import createStaticRouter from "../router/createStaticRouter.js";
 import Rail from "./Rail.js";
@@ -12,7 +13,10 @@ const renderRailHtml = (url: string): string =>
     <RouterProvider
       router={createStaticRouter(appRoutes, url, { notFound: notFoundRoute })}
     >
-      <Rail />
+      <Rail
+        brand={{ label: "Pragma", caption: "design system docs", to: "home" }}
+        entries={collectLenses(appRoutes)}
+      />
     </RouterProvider>,
   );
 

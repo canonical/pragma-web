@@ -4,7 +4,7 @@ import { useRouterState } from "@canonical/router-react";
 import type React from "react";
 import { LensLayout } from "#lib/LensLayout";
 import { ModeStrip } from "#lib/ModeStrip";
-import { Rail } from "#lib/Rail";
+import { SiteRail } from "#lib/SiteRail";
 import { shellStripFacet } from "./stripFacet.js";
 import type { ShellProps } from "./types.js";
 
@@ -36,7 +36,7 @@ const Shell = ({ children, ...props }: ShellProps): React.ReactElement => {
       footer={
         <p>Pragma — the design system, documented from its knowledge graph.</p>
       }
-      rail={<Rail />}
+      rail={<SiteRail />}
       strip={
         <ModeStrip
           context={StripContext === undefined ? undefined : <StripContext />}
