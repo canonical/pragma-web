@@ -50,3 +50,11 @@ export interface ProseBinding {
   /** The paths of the sidecars that name no entity in the graph, in path order. */
   readonly unbound: readonly string[];
 }
+
+/** An IRI the store would not parse, and the store's own reason. */
+export interface RefusedIri {
+  /** The IRI as it was sent. */
+  readonly iri: string;
+  /** What the store threw for it. */
+  readonly reason: unknown;
+}

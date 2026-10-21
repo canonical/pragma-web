@@ -4,7 +4,14 @@
 // language, with their links resolved through the graph.
 // =============================================================================
 
-import { readFileSync } from "node:fs";
+import {
+  appendFileSync,
+  cpSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { createPragmaProvider } from "../../lib/provider/index.js";
@@ -138,5 +145,31 @@ describe("Query.prose", () => {
 
   it("is null for a value that is not an IRI", async () => {
     expect(await ask({ uri: "button" })).toBeNull();
+  });
+});
+
+describe("createPragmaProvider over a sidecar linking to an unparseable IRI", () => {
+  /** A scratch copy of the corpus whose button sidecar ends with `line`. */
+  const copyCorpusWithButtonLine = (line: string): string => {
+    const refsRoot = mkdtempSync(join(tmpdir(), "prism-prose-refused-"));
+    cpSync(CORPUS_REFS_ROOT, refsRoot, { recursive: true });
+    appendFileSync(join(refsRoot, "design-system/main/data/button.md"), line);
+    return refsRoot;
+  };
+
+  it.each([
+    ["[usage](ds:button#usage)", `${DS}button#usage`],
+    ["[the survey](https://example.com/100%)", "https://example.com/100%"],
+  ])("refuses to boot over %s", async (link, iri) => {
+    const refsRoot = copyCorpusWithButtonLine(`\nSee ${link}.\n`);
+    try {
+      await expect(
+        createPragmaProvider({ refsRoot, semRoot: CORPUS_SEM_ROOT }),
+      ).rejects.toThrow(
+        `prose sidecar design-system/data/button.md links to ${iri}, which the store cannot parse as an IRI: fix the link's destination.`,
+      );
+    } finally {
+      rmSync(refsRoot, { recursive: true, force: true });
+    }
   });
 });
