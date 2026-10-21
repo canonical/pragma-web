@@ -27,7 +27,7 @@ function readDocumentedValueNames(): string[] {
     .slice(1)
     .flatMap((bullet) => {
       const values = bullet.split("; types").at(0) ?? "";
-      return [...values.matchAll(/`([^`]+)`/g)].map((match) => match[1]);
+      return [...values.matchAll(/`([^`]+)`/g)].map((match) => match.at(1));
     })
     .filter((name): name is string => name !== undefined)
     .sort();
