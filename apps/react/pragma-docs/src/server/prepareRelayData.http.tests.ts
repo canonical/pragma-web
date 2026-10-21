@@ -121,6 +121,23 @@ const reserveClosedPort = (): Promise<number> =>
 const readRoot = (records: RecordMap | undefined) =>
   records?.["client:root"] ?? {};
 
+/**
+ * The one request a prepare put on the wire. Throws unless exactly one was
+ * captured, so a case that sent none (or several) fails on the count, not
+ * on a property read of `undefined`.
+ *
+ * @note Impure: reads the module-scope `captured` log.
+ */
+const readSoleRequest = (): CapturedRequest => {
+  const request = captured.at(0);
+  if (captured.length !== 1 || request === undefined) {
+    throw new Error(
+      `Expected exactly one captured request, got ${captured.length}.`,
+    );
+  }
+  return request;
+};
+
 beforeAll(async () => {
   deadGraphqlUrl = `http://127.0.0.1:${await reserveClosedPort()}/graphql`;
   await new Promise<void>((resolve) => {
@@ -179,7 +196,7 @@ describe("prepareRelayData over HTTP", () => {
 
     // The request left the process.
     expect(captured).toHaveLength(1);
-    const request = captured.at(0) as CapturedRequest;
+    const request = readSoleRequest();
     expect(request.method).toBe("POST");
     expect(request.url).toBe("/graphql");
 
@@ -300,7 +317,7 @@ describe("prepareRelayData over HTTP", () => {
       }
 
       expect(captured).toHaveLength(1);
-      const request = captured.at(0) as CapturedRequest;
+      const request = readSoleRequest();
       expect(request.body.operationName).toBe(operationName);
       expect(request.body.variables).toEqual(variables);
     });
