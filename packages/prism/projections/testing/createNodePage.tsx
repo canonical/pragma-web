@@ -17,6 +17,10 @@ const createNodePageQuerySource = (): unknown => graphql`
   query createNodePageQuery($id: ID!) {
     node(id: $id) {
       ...EntityChip_node
+      ...EntityRow_node
+      ...EntityCard_node
+      ...EntityCommand_node
+      ...EntityTitle_node
     }
   }
 `;

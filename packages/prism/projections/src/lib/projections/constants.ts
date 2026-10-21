@@ -1,4 +1,10 @@
-import { NodeChip } from "../node/index.js";
+import {
+  NodeCard,
+  NodeChip,
+  NodeCommand,
+  NodeRow,
+  NodeTitle,
+} from "../node/index.js";
 import type { ProjectionMaps } from "./types.js";
 
 /**
@@ -9,4 +15,8 @@ import type { ProjectionMaps } from "./types.js";
  */
 export const defaultProjectionMaps: ProjectionMaps = {
   chip: { Node: NodeChip },
+  row: { Node: NodeRow },
+  card: { Node: NodeCard },
+  command: { Node: NodeCommand },
+  title: { Node: NodeTitle },
 };

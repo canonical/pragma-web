@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
+import type { EntityCardArm } from "../EntityCard/index.js";
 import type { EntityChipArm } from "../EntityChip/index.js";
+import type { EntityCommandArm } from "../EntityCommand/index.js";
+import type { EntityRowArm } from "../EntityRow/index.js";
+import type { EntityTitleArm } from "../EntityTitle/index.js";
 
 /**
  * One representation's arms, keyed by the `__typename` each renders. `Node`
@@ -13,6 +17,14 @@ export type ProjectionMap<TArm> = { readonly Node: TArm } & {
 export interface ProjectionMaps {
   /** The inline mention: a node named in running text. */
   readonly chip: ProjectionMap<EntityChipArm>;
+  /** The list row: a node as one entry of a list of results. */
+  readonly row: ProjectionMap<EntityRowArm>;
+  /** The card: a node as a self-contained tile in a grid of entities. */
+  readonly card: ProjectionMap<EntityCardArm>;
+  /** The command-palette entry: a node offered as a destination. */
+  readonly command: ProjectionMap<EntityCommandArm>;
+  /** The page title: the heading of the page a node owns. */
+  readonly title: ProjectionMap<EntityTitleArm>;
 }
 
 /** Props accepted by `ProjectionsProvider`. */

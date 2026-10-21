@@ -1,0 +1,22 @@
+/*
+ * NodeCard — the card of any node: its title and its compact address.
+ */
+
+@layer ds.prism {
+  .ds.node-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-050, 0.25rem);
+    padding: var(--space-150, 0.75rem);
+    border: 1px solid var(--color-border-muted, #ddd);
+  }
+
+  .ds.node-card .title {
+    margin: 0;
+  }
+
+  .ds.node-card .location {
+    margin: 0;
+    color: var(--color-text-muted, inherit);
+  }
+}

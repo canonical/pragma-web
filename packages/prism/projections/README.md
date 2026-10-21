@@ -7,6 +7,11 @@ representation renders any node, whatever its type, through the arm its
 site maps to the node's `__typename`, and links it to the node's home.
 
 - **`EntityChip`**: the inline mention, a node named in running text.
+- **`EntityRow`**: the list row, a node as one entry of a list of results.
+- **`EntityCard`**: the card, a node as a self-contained tile in a grid.
+- **`EntityCommand`**: the command-palette entry, a node offered as a
+  destination to jump to.
+- **`EntityTitle`**: the page title, the heading of the page a node owns.
 
 Every representation reads its node through a fragment of its own, so a
 lens spreads it in its query and hands the component the key. The
@@ -79,21 +84,52 @@ outside the site's `src`, so they keep their own artifact imports.
 ## Representations
 
 ```tsx
-import { EntityChip } from "@canonical/prism-projections";
+import { EntityChip, EntityRow } from "@canonical/prism-projections";
 
 <p>
   Built on <EntityChip node={node} />.
 </p>
+<ul>
+  {edges.map(({ node }) => (
+    <EntityRow key={node.uri} node={node} />
+  ))}
+</ul>
 ```
 
 A representation renders no element of its own: its arm renders the root,
 and every arm of one representation renders the same root tag, so the
-representation's native props are that tag's. The chip's root is a
-`<span>`, and its `children`, when given, stand in for the node's title.
+representation's native props are that tag's:
 
-Each `Node` arm renders the node's title as `.title`, a link when the node
-has a home and inert text when it has none, and carries the node's class
-IRI as `data-type` on its root (`.ds.node-chip`).
+| Representation | Root | `children` |
+|---|---|---|
+| `EntityChip` | `<span>` | the mention's text, in place of the node's title |
+| `EntityRow` | `<li>` | none: the arm renders the slots |
+| `EntityCard` | `<article>` | none |
+| `EntityCommand` | `<li>` | none |
+| `EntityTitle` | `<hgroup>` | none |
+
+### Slots
+
+An arm fills its root from a shared vocabulary of slots, each a child
+element whose class names its role: `.title`, `.kind`, `.location`,
+`.summary`, `.meta`, `.key-values`, `.usage` and `.preview`. A site styles
+a slot once for every type of node, and an arm renders the slots its type
+can fill.
+
+The `Node` arms fill the two every node can: `.title` (`_meta.title`) and
+`.location` (`_meta.curie`, the node's compact address). Each root carries
+the node's class IRI as `data-type`, for styling by class. The title links
+to the node's home when it has one and reads as inert text when it has
+none, except in `EntityTitle`, which never links: a title names the page it
+heads.
+
+| Arm | Root class | Renders |
+|---|---|---|
+| chip | `.ds.node-chip` | `.title`; the root's `title` is the compact address |
+| row | `.ds.node-row` | `.title`, then `<code class="location">` |
+| card | `.ds.node-card` | `<h3 class="title">`, then `<p class="location">` |
+| command | `.ds.node-command` | `.title`, then `<span class="location">` |
+| title | `.ds.node-title` | `<h1 class="title">`, then `<p class="location">` |
 
 ## Maps and arms
 
@@ -136,8 +172,13 @@ A node's home is resolved with its compact address (`_meta.curie`) as the
 
 ## Public API
 
-- Representations: `EntityChip`; types `EntityChipProps`, `EntityChipArm`,
-  `EntityChipArmProps`.
+- Representations: `EntityChip`, `EntityRow`, `EntityCard`,
+  `EntityCommand`, `EntityTitle`; types `EntityChipProps`, `EntityChipArm`,
+  `EntityChipArmProps`, `EntityRowProps`, `EntityRowArm`,
+  `EntityRowArmProps`, `EntityCardProps`, `EntityCardArm`,
+  `EntityCardArmProps`, `EntityCommandProps`, `EntityCommandArm`,
+  `EntityCommandArmProps`, `EntityTitleProps`, `EntityTitleArm`,
+  `EntityTitleArmProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.
