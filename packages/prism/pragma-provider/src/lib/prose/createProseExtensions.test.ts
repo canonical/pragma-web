@@ -79,6 +79,7 @@ describe("createProseExtensions", () => {
           lang
           markdown
           asked: markdown(lang: "fr")
+          english: markdown(lang: "en")
           unauthored: markdown(lang: "de")
           unset: markdown(lang: null)
           availableLanguages
@@ -91,6 +92,7 @@ describe("createProseExtensions", () => {
           lang: "fr",
           markdown: "Français",
           asked: "Français",
+          english: "English",
           unauthored: "Français",
           unset: "Français",
           availableLanguages: ["en", "fr"],

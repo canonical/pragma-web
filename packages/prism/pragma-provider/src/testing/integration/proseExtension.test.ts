@@ -105,6 +105,14 @@ describe("Query.prose", () => {
     });
   });
 
+  it("serves the language markdown(lang:) asks for over the header's", async () => {
+    expect(await ask({ uri: `${DS}button`, lang: "en" }, "fr")).toMatchObject({
+      lang: "fr",
+      markdown: readCorpusFile("data/button.fr.md"),
+      asked: readCorpusFile("data/button.md"),
+    });
+  });
+
   it("falls back to the locale when lang is not authored", async () => {
     expect(await ask({ uri: `${DS}button`, lang: "de" }, "fr")).toMatchObject({
       asked: readCorpusFile("data/button.fr.md"),
