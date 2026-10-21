@@ -18,38 +18,6 @@ import {
   resolveFilter,
 } from "./lensFilter.js";
 
-/**
- * The Definitions lens's mode-strip tenants — the components
- * `DefinitionsLayout` renders into the strip's `context`, `controls` and
- * `status` sockets.
- *
- * They take NO props: the layout renders them as siblings of the routed
- * page, so nothing the page holds can reach them as a prop. The FILTER
- * reaches them through `LensFilter` (see that module for why a
- * context is the smallest bridge between the strip and the page).
- *
- * THE DATA does NOT come through that context, and the reason is the SSR
- * determinism rule. An announcement from the explorer could only arrive in
- * an effect — client-only, after paint — so the strip would render empty
- * on the server and populated on the client: a hydration mismatch in the
- * strip itself. Instead these components read the SAME operation the
- * explorer reads, from the same warm store: the layout renders inside
- * `RelayEnvironmentProvider`, and the route's prepare step has already
- * executed and serialised exactly this query. The read is a store hit on
- * both sides, the markup matches, and no second network request exists —
- * the one-operation-per-page register holds, because this is the same
- * operation with the same variables, not another one.
- *
- * THE STRIP MUST NEVER DEPEND ON WARM DATA. `useLazyLoadQuery` SUSPENDS on
- * a cold store, and these components render in the layout — outside any
- * page-level boundary. Unguarded, a cold render (a failed prepare step, a
- * graph that did not answer) suspends the whole layout and takes the
- * rail, the strip and the canvas down with it. So each socket carries its
- * OWN Suspense and error boundary, both falling back to nothing: an empty socket is the honest
- * rendering of "the graph did not answer", and the strip band
- * stays intact either way.
- */
-
 /** Read the current term exactly as the page does, so the strip's query
  * variables match the explorer's and hit the same warm store entry. */
 const useCurrentTerm = (): string | undefined => {
@@ -150,6 +118,37 @@ const Context = makeLensContext({
   paramKey: "term",
 });
 
+/**
+ * The Definitions lens's mode-strip tenants — the components
+ * `DefinitionsLayout` renders into the strip's `context`, `controls` and
+ * `status` sockets.
+ *
+ * They take NO props: the layout renders them as siblings of the routed
+ * page, so nothing the page holds can reach them as a prop. The FILTER
+ * reaches them through `LensFilter`, the context the layout provides
+ * around both the strip and the page.
+ *
+ * THE DATA does NOT come through that context, and the reason is the SSR
+ * determinism rule. An announcement from the explorer could only arrive in
+ * an effect — client-only, after paint — so the strip would render empty
+ * on the server and populated on the client: a hydration mismatch in the
+ * strip itself. Instead these components read the SAME operation the
+ * explorer reads, from the same warm store: the layout renders inside
+ * `RelayEnvironmentProvider`, and the route's prepare step has already
+ * executed and serialised exactly this query. The read is a store hit on
+ * both sides, the markup matches, and no second network request exists —
+ * the one-operation-per-page register holds, because this is the same
+ * operation with the same variables, not another one.
+ *
+ * THE STRIP MUST NEVER DEPEND ON WARM DATA. `useLazyLoadQuery` SUSPENDS on
+ * a cold store, and these components render in the layout — outside any
+ * page-level boundary. Unguarded, a cold render (a failed prepare step, a
+ * graph that did not answer) suspends the whole layout and takes the
+ * rail, the strip and the canvas down with it. So each socket carries its
+ * OWN Suspense and error boundary, both falling back to nothing: an empty
+ * socket is the honest rendering of "the graph did not answer", and the
+ * strip band stays intact either way.
+ */
 export const definitionsStripSlots = {
   Context,
   Controls: guardSocket(ControlsContent),

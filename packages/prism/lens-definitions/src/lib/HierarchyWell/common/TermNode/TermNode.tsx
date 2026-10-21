@@ -4,6 +4,8 @@ import { useMessages } from "../../../i18n/index.js";
 import type { TermNodeProps } from "./types.js";
 import "./styles.css";
 
+const componentCssClassName = "ds term-node";
+
 /**
  * A class node: a real term link, so the graph's nodes are anchors — they
  * SSR as content, hover-prefetch their term, and navigate through the
@@ -23,8 +25,6 @@ import "./styles.css";
  *
  * `import { TermNode } from "./common/TermNode/index.js";`
  */
-const componentCssClassName = "ds term-node";
-
 const TermNode = ({ node }: TermNodeProps): React.ReactElement => {
   const t = useMessages();
   return (

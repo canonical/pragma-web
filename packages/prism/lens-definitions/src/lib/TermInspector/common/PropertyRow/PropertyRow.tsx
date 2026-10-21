@@ -4,10 +4,12 @@ import formatRange from "../../formatRange.js";
 import { TermLink } from "../TermLink/index.js";
 import type { PropertyRowProps } from "./types.js";
 
-/** One property row plus its definition line — shared by the Declared and
- * Inherited groupings. The definition (already fetched, previously
- * dropped) rides a second row spanning the table so it reads beneath its
- * property rather than crowding the Notes column. *
+/**
+ * One property row plus its definition line — shared by the Declared and
+ * Inherited groupings. The definition rides a second row spanning the
+ * table so it reads beneath its property rather than crowding the Notes
+ * column.
+ *
  * `import { PropertyRow } from "../PropertyRow/index.js";`
  */
 const PropertyRow = ({
