@@ -2010,6 +2010,11 @@ type Query {
   specification(uri: String!): Specification
   specifications(first: Int, after: String, last: Int, before: String): SpecificationConnection!
 
+  """
+  The prose authored for the entity `uri` names (an absolute IRI), or null when it has none.
+  """
+  prose(uri: ID!): Prose
+
   # ---- from src/relay/extensions/journeys.graphql ----
   validity(uri: String!): Validity
 
@@ -2266,6 +2271,29 @@ type SpecificationConnection {
 type SpecificationEdge {
   node: Specification!
   cursor: String!
+}
+
+"""Long-form Markdown authored for one entity, per language."""
+type Prose {
+  """
+  The text in `lang`, else in the request's locale, else in the default language.
+  """
+  markdown(lang: String): String!
+
+  """
+  The language `markdown` serves without `lang`: the request's locale when authored, else the default.
+  """
+  lang: String!
+
+  """
+  Every authored language, the default first, then the rest in code-point order.
+  """
+  availableLanguages: [String!]!
+
+  """
+  Entities the prose links to across its languages, in order of first mention; destinations node(id:) does not resolve are dropped.
+  """
+  references: NodeConnection!
 }
 
 # ---- authored extension: src/relay/extensions/journeys.graphql ----
