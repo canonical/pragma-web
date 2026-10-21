@@ -134,7 +134,8 @@ export default function DefinitionsExplorer({
   // the query returned. That keeps the first render (server AND client) at
   // the no-op filter, and the chips take over the moment one is pressed.
   // The strip resolves the identical fallback over the identical data
-  // (`stripSlots.tsx`), so the toolbar and the canvas never disagree.
+  // (`DefinitionsLayout`'s `useStripQuery`), so the toolbar and the canvas
+  // never disagree.
   const filter = useMemo(
     () => resolveFilter(contextFilter, prefixes),
     [contextFilter, prefixes],

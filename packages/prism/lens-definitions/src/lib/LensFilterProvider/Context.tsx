@@ -18,7 +18,7 @@ import type { LensFilterValue } from "./types.js";
  * explorer could only arrive in an effect, client-only and after paint, so
  * the strip would render empty on the server and populated on the client: a
  * hydration mismatch in the strip itself. The strip reads the same Relay
- * operation from the same warm store instead (see `stripSlots.tsx`), and
+ * operation from the same warm store instead (see `DefinitionsLayout`'s `useStripQuery`), and
  * this context holds only the reader's ephemeral choices.
  *
  * Its default is the no-op filter with an inert setter, so a consumer

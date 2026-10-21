@@ -6,7 +6,7 @@
  * whole chip mechanism: it decides whether a filter change reaches the
  * graph at all. Every OTHER consequence of a chip has its own independent
  * witness — the chip's `aria-pressed` flips in `ExplorerControls.test`,
- * the status figure recounts in `stripSlots.test` (a sibling reading the
+ * the status figure recounts in `Status.test` (a sibling reading the
  * same context), the rail dims in `TermRail.test` — so if the comparator
  * were replaced by `return true`, freezing the graph forever, every other
  * definitions test would still pass. The chips would visibly toggle, the
@@ -47,11 +47,11 @@ import {
   HOMES,
 } from "../../../testing/fixtures.js";
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
+import { Controls } from "../../lib/DefinitionsLayout/common/Controls/index.js";
 import { DefinitionsPage } from "../../lib/DefinitionsPage/index.js";
 import { HIDDEN_CLASS } from "../../lib/HierarchyWell/constants.js";
 import { LensFilterProvider } from "../../lib/LensFilterProvider/index.js";
 import { definitionsRoutes } from "../../lib/routes.js";
-import { definitionsStripSlots } from "../../lib/stripSlots.js";
 
 /**
  * The explorer AND the strip's chip toolbar under ONE filter provider —
@@ -62,7 +62,6 @@ import { definitionsStripSlots } from "../../lib/stripSlots.js";
  * is exactly where the memo boundary lives.
  */
 const createExplorerWithChips = (fetchFn: FetchFunction): ReactElement => {
-  const { Controls } = definitionsStripSlots;
   return (
     <RelayEnvironmentProvider
       environment={createEnvironment({

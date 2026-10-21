@@ -1,14 +1,14 @@
 import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { useMessages } from "../i18n/index.js";
 import { LensFilterProvider } from "../LensFilterProvider/index.js";
-import { definitionsStripSlots } from "../stripSlots.js";
+import { Controls } from "./common/Controls/index.js";
+import { SocketGuard } from "./common/SocketGuard/index.js";
+import { Status } from "./common/Status/index.js";
+import { Trail } from "./common/Trail/index.js";
 import type { DefinitionsLayoutProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds definitions-layout";
-
-const { Context, Controls, Status } = definitionsStripSlots;
 
 /**
  * The Definitions lens's page layout: the site's rail and colophon around
@@ -20,7 +20,9 @@ const { Context, Controls, Status } = definitionsStripSlots;
  * The provider lives as long as the layout, which the router remounts
  * whenever the matched route changes: the filter survives a move from one
  * term to another (the same route, new params) and resets on a move to the
- * lens index or to another lens.
+ * lens index or to another lens. The chips and the figure read the explorer's
+ * own operation from the warm store (`useStripQuery`), each inside its own
+ * `SocketGuard`, so a cold store empties their sockets and nothing else.
  *
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon. The rail
@@ -36,7 +38,6 @@ export default function DefinitionsLayout({
   rail,
   ...props
 }: DefinitionsLayoutProps): ReactElement {
-  const t = useMessages();
   return (
     <LensFilterProvider>
       <div
@@ -47,9 +48,17 @@ export default function DefinitionsLayout({
         {rail}
         <div className="viewport">
           <ModeStrip
-            context={<Context lensLabel={t("lens.label")} />}
-            controls={<Controls />}
-            status={<Status />}
+            context={<Trail />}
+            controls={
+              <SocketGuard>
+                <Controls />
+              </SocketGuard>
+            }
+            status={
+              <SocketGuard>
+                <Status />
+              </SocketGuard>
+            }
           />
           <Canvas>{children}</Canvas>
           {colophon}

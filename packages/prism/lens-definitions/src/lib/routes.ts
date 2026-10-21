@@ -5,6 +5,10 @@ import { DefinitionsPage } from "./DefinitionsPage/index.js";
 import { MESSAGES } from "./i18n/index.js";
 import warmDefinitions from "./warmDefinitions.js";
 
+// Every lens domain keeps its route table in a `routes.ts` barrel, the one
+// file a site's route table reads a lens from, so this file keeps that
+// shared name rather than the name of its one export.
+
 /**
  * The Definitions lens's two routes, by the names a site's route table keeps
  * them under: the explorer (`definitions`, `/definitions`, the lens index the
