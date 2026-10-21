@@ -33,7 +33,10 @@ export type {
   HomesProviderProps,
 } from "./homes/index.js";
 export { HomesProvider, useHome } from "./homes/index.js";
-export type { LensBreadcrumbsProps } from "./LensBreadcrumbs/index.js";
+export type {
+  LensBreadcrumbsProps,
+  LensContextProps,
+} from "./LensBreadcrumbs/index.js";
 export { LensBreadcrumbs, makeLensContext } from "./LensBreadcrumbs/index.js";
 export type { ModeStripProps } from "./ModeStrip/index.js";
 export { ModeStrip } from "./ModeStrip/index.js";

@@ -4,37 +4,73 @@ import { describe, expect, it } from "vitest";
 import * as publicApi from "./index.js";
 
 /**
- * Read the runtime names the README's "Public API" section documents: in each
- * bullet, the backticked names before `; types` (the type names after it
- * leave no runtime trace to compare). The README is located from vitest's
- * `testPath`, since `import.meta.url` is not a file URL under jsdom.
+ * Read a file that sits next to this test, located from vitest's `testPath`,
+ * since `import.meta.url` is not a file URL under jsdom.
  */
-function readDocumentedValueNames(): string[] {
+function readBesideTest(relativePath: string): string {
   const testPath = expect.getState().testPath;
   if (typeof testPath !== "string") {
     throw new Error("vitest did not expose the current test path");
   }
-  const readme = readFileSync(
-    join(dirname(testPath), "..", "..", "README.md"),
-    "utf8",
-  );
-  const section = readme.split("\n## Public API\n").at(1);
+  return readFileSync(join(dirname(testPath), relativePath), "utf8");
+}
+
+/** Collect the backticked names in a piece of Markdown, sorted. */
+function collectBacktickedNames(markdown: string): string[] {
+  return [...markdown.matchAll(/`([^`]+)`/g)]
+    .map((match) => match.at(1))
+    .filter((name): name is string => name !== undefined)
+    .sort();
+}
+
+/**
+ * Split the README's "Public API" section into its bullets, each cut at
+ * `; types` into the runtime names before it and the type names after it.
+ */
+function splitDocumentedBullets(): { values: string; types: string }[] {
+  const section = readBesideTest(join("..", "..", "README.md"))
+    .split("\n## Public API\n")
+    .at(1);
   if (section === undefined) {
     throw new Error("README.md has no '## Public API' section");
   }
   return section
     .split(/^- /m)
     .slice(1)
-    .flatMap((bullet) => {
-      const values = bullet.split("; types").at(0) ?? "";
-      return [...values.matchAll(/`([^`]+)`/g)].map((match) => match.at(1));
-    })
-    .filter((name): name is string => name !== undefined)
+    .map((bullet) => {
+      const [values = "", types = ""] = bullet.split("; types");
+      return { values, types };
+    });
+}
+
+/**
+ * Collect the type names the barrel re-exports, from its `export type { … }`
+ * statements: types leave no runtime trace, so the source is the only record.
+ */
+function collectBarrelTypeNames(): string[] {
+  return [...readBesideTest("index.ts").matchAll(/export type \{([^}]+)\}/g)]
+    .flatMap((match) => (match.at(1) ?? "").split(","))
+    .map((name) => name.trim())
+    .filter((name) => name !== "")
     .sort();
 }
 
 describe("the package barrel", () => {
   it("exports exactly the runtime names the README documents", () => {
-    expect(Object.keys(publicApi).sort()).toEqual(readDocumentedValueNames());
+    const documented = collectBacktickedNames(
+      splitDocumentedBullets()
+        .map(({ values }) => values)
+        .join("\n"),
+    );
+    expect(Object.keys(publicApi).sort()).toEqual(documented);
+  });
+
+  it("exports exactly the type names the README documents", () => {
+    const documented = collectBacktickedNames(
+      splitDocumentedBullets()
+        .map(({ types }) => types)
+        .join("\n"),
+    );
+    expect(collectBarrelTypeNames()).toEqual(documented);
   });
 });
