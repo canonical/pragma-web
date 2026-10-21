@@ -35,7 +35,7 @@ const definitionsExplorerQuerySource = (): unknown => graphql`
       namespace
       # The class facets the mode strip's chips filter on and its status
       # figure counts. They ride the ROOT (not only the fragments) because
-      # the strip renders in the frame, outside this page's subtree, and
+      # the strip renders in the lens layout, outside this page's subtree, and
       # Relay masks fragment data — the strip reads this same operation
       # from the same warm store, so it must be able to see them.
       classes {

@@ -31,10 +31,8 @@ const componentCssClassName = "ds entity-aside";
 
 /**
  * The entity view's east rail: a quick-facts list (URI, version, tier).
- * The smallest honest tenant of the frame's `--aside-w` column — it exists
- * so the token is CONSUMED by a real region (AX.6: regions consume the
- * frame tokens, never re-define them); richer facts arrive with later
- * P-5 passes.
+ * The smallest honest tenant of the entity view's east column; richer facts
+ * arrive with later P-5 passes.
  */
 const EntityAside = ({
   className,

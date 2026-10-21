@@ -1,8 +1,7 @@
 /**
  * EntityAside through the real page fan-out: the quick-facts list carries
  * URI, version (with the honest fallback — the captured value is null),
- * and tier; the region claims `data-region="aside"`, which is what makes
- * the frame's `--aside-w` token CONSUMED by a real tenant.
+ * and tier; the region claims `data-region="aside"`.
  */
 
 import { render, screen } from "@testing-library/react";

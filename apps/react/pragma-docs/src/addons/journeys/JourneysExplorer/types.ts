@@ -20,7 +20,7 @@ export const DEFAULT_JOURNEY_VIEW: JourneyView = "table";
  * THE VIEW-DEPENDENT LAYOUT (RULING 2), now expressed the strict
  * intrinsic-grid way. The explorer no longer sets its own column TEMPLATE —
  * under the one-grid model it is a `grid-template-columns: subgrid` that
- * inherits the shell's intrinsic columns (see styles.css). The view switch
+ * inherits the lens layout's intrinsic columns (see styles.css). The view switch
  * therefore changes the tenants' SPANS, not the grid template:
  *
  * - GRAPH: rail (span 2) · well (the middle) · inspector (span 3) — the

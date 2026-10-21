@@ -13,7 +13,7 @@
     max-inline-size: 72ch;
   }
 
-  /* Present for assistive tech and the frame suite's key
+  /* Present for assistive tech and the SSR layout suite's key
    * (`standard-reading-title`), absent from the layout — the mode strip's
    * breadcrumb trail carries this standard's identity as the terminal crumb
    * now, so the canvas h1 was a duplicate title. The shared visually-hidden

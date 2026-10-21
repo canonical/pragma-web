@@ -22,10 +22,10 @@ const componentCssClassName = "ds lens-breadcrumbs";
  * (the lens name + its index route, whose href the router builds from the
  * route table), and the terminal crumb is the route param the page already
  * matched on — so this component reads no Relay
- * query, adds no operation, and never suspends the frame. It renders
+ * query, adds no operation, and never suspends the lens layout. It renders
  * identically on the server and the client (same URL, same params), which
  * is exactly the SSR-determinism the strip's tenants must honour: no
- * empty-then-populated hydration mismatch in the frame.
+ * empty-then-populated hydration mismatch in the lens layout.
  *
  * Two shapes:
  * - INDEX (`current` absent): one crumb, the lens name, marked `current`

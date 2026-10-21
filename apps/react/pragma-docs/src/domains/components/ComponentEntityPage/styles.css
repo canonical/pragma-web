@@ -5,7 +5,7 @@
  * page is a SUBGRID pass-through and the body a SUBGRID whose article and
  * aside claim column SPANS. The old flex-wrap collapse (INTRINSIC-GRID
  * entry 6) is superseded — the aside is a fixed span of the intrinsic
- * columns now, aligned to the frame's ruler rather than wrapping on a
+ * columns now, aligned to the lens layout's ruler rather than wrapping on a
  * content basis. Entry 6's narrow-canvas wrap is a debt to revisit if a
  * real narrow-canvas need appears (a span can't wrap); at desktop widths
  * the fixed span is the cleaner, frame-aligned answer.
@@ -37,7 +37,7 @@
   }
 
   /* The closing neighbourhood well sits UNDER the two-tenant body, spanning
-   * the frame's full row (a direct child of the page's subgrid, so it must
+   * the page's full row (a direct child of the page's subgrid, so it must
    * claim its columns): the page ends by looking down into the graph it was
    * projected from (AX.3, AV-364). Its canvas scrolls internally, so the
    * span never forces the page wider than the ruler. */

@@ -1,6 +1,6 @@
 /**
  * The page's own contract: the static lens marker stands OUTSIDE the
- * boundaries (the frame suite keys the journeys canvas off it), and the
+ * boundaries (the SSR layout suite keys the journeys canvas off it), and the
  * interior suspends without taking the marker with it.
  */
 

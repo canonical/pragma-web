@@ -1,7 +1,7 @@
 /*
  * TermRail — the explorer's west rail (the triptych's first panel). The
- * PANEL's width comes from the explorer's grid template (the frame's
- * --subnav-w token, consumed there, never re-defined); this file styles
+ * PANEL's width comes from the explorer's grid (a span of the lens
+ * layout's intrinsic columns); this file styles
  * only the rail's interior. Zero conditional at-rules: the at-rule census
  * (stylesheets.tests.ts) sanctions exactly one in the app.
  */

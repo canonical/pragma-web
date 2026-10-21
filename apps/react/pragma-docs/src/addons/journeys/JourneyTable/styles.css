@@ -7,7 +7,7 @@
  * secondary text. DS tokens with literal fallbacks throughout; logical
  * properties throughout (this frame is direction-agnostic); zero
  * layout-capable conditional at-rules — the census (stylesheets.tests)
- * sanctions exactly one app-wide, and it is the frame's collapse, not ours.
+ * sanctions exactly one app-wide, and it is the rail's collapse, not ours.
  */
 
 @layer app {
@@ -76,7 +76,7 @@
 
   /* The table owns its own scroll, so the header can stay put while the rows
    * move under it, and a wide table scrolls INSIDE its box rather than
-   * pushing the frame open. */
+   * pushing the lens layout open. */
   .ds.journey-table .journey-table-scroll {
     overflow: auto;
     min-block-size: 0;

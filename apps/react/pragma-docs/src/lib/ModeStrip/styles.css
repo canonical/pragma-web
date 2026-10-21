@@ -1,10 +1,11 @@
 /*
  * ModeStrip — the composed layout's controls/status band (A.06 §2).
  *
- * Consumes --strip-h from the shell's layout tokens (never hard-coded):
+ * Consumes --strip-h from the app's layout tokens (styles/app.css, never
+ * hard-coded):
  * min-block-size, not height, so a dense mode's controls may wrap without
  * clipping — but every empty or single-row strip is exactly --strip-h,
- * keeping the frame stationary (AX.6).
+ * keeping the lens layout stationary (AX.6).
  */
 
 @layer app {
@@ -34,7 +35,7 @@
   /* The controls socket grows to claim the middle of the band and packs its
    * filters east — context anchored west, controls hard right, the band reading
    * as space-between across the strip. Empty, it collapses to nothing (no
-   * children to push), so the frame stays stationary. */
+   * children to push), so the lens layout stays stationary. */
   .ds.mode-strip .strip-controls {
     flex: 1;
     display: flex;

@@ -1,5 +1,5 @@
 /**
- * SSR posture: the page's canvas identity (`data-view` + the frame
+ * SSR posture: the page's canvas identity (`data-view` + the SSR layout
  * suite's h1 marker) and the term view's real content render to a string
  * from the warm store.
  */

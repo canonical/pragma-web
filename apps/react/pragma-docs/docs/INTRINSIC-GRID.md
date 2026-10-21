@@ -2,7 +2,7 @@
 
 A running log of every fight with the intrinsic grid model (AX.1: intrinsic
 sizing throughout — `min-content`, `1fr`, `minmax()` — never
-breakpoint-swapped templates; the shell's small-viewport collapse is the one
+breakpoint-swapped templates; the rail's small-viewport collapse is the one
 sanctioned exception). Ruled into existence by P-D18: what broke, what fixed
 it, why. Newest entries at the bottom; entries are never rewritten, only
 appended — a later entry may overturn an earlier one.
@@ -215,6 +215,34 @@ paths), so the layout is a pure function (`buildClassTree`) and the
 initial camera is a constant `defaultViewport` — never `fitView`, which
 measures. A measured anything in this path would be a hydration
 mismatch, which the hydration suite gates.
+
+---
+
+## 10 — The shared frame is retired: each lens layout owns the page grid
+
+**What.** The shared frame the entries above call "the shell" or "the
+frame" (one grid carrying the rail, the strip, the canvas and the footer
+for every lens) no longer exists. `Shell` now names the app's provider
+nest alone (head, Relay environment, router) and renders no element of
+its own. Each lens declares its own layout, and each layout's root is the
+page grid: it reads the design system's intrinsic columns
+(`grid-template-columns: var(--grid-intrinsic)`), places the rail in the
+west columns, and stacks the strip, the canvas and the colophon in a
+viewport subgrid to the east.
+
+**Reading the entries above.** Where an entry says "the shell's column
+template", "the shell's columns" or "the frame", read the lens layout's
+root grid: the rules recorded there (the `min-size: 0` release chain, the
+rail's single collapse, the canvas as containing block) hold at every
+lens layout's root. The `--subnav-w` and `--aside-w` tokens entries 6 and
+8 name are dissolved: no stylesheet defines them.
+
+**Pinned by.** `src/testing/integration/stylesheets.tests.ts` (only a lens
+layout's root reads the intrinsic columns, every other grid is a subgrid,
+and the dissolved width tokens are defined nowhere) and
+`src/testing/integration/lensLayouts.ssr.tests.tsx` (every URL renders
+inside exactly the layout its route is grouped under, with its regions in
+order).
 
 ---
 

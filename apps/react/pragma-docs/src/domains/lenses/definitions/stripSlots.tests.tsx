@@ -60,7 +60,7 @@ describe("the strip's tenants over a warm store", () => {
     // The whole reason the strip reads Relay directly instead of being
     // told by the explorer: an announcement could only arrive in an
     // effect, so the server would render empty and the client populated —
-    // a hydration mismatch in the frame itself.
+    // a hydration mismatch in the lens layout itself.
     const fetchFn = createFetchSpy();
     const html = renderToString(
       stripAt("/definitions", definitionsExplorerRecords, fetchFn),

@@ -30,7 +30,7 @@ const renderAt = (url: string, node: ReactElement): string =>
 describe("LensBreadcrumbs SSR", () => {
   it("server-renders the index trail as a single current crumb", () => {
     // The trail is URL-derived, so it renders on the server identically to
-    // the client — no empty-then-populated hydration mismatch in the frame.
+    // the client — no empty-then-populated hydration mismatch in the layout.
     const html = renderAt(
       "/components",
       <LensBreadcrumbs lensLabel="Components" lensRouteName="components" />,

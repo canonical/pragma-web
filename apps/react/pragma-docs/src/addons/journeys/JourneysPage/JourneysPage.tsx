@@ -13,7 +13,7 @@ const componentCssClassName = "ds journeys-page";
  * The Journeys lens route content — BOTH routes (`/journeys`, key
  * `journeys`, and `/journeys/:job`, key `journeysJob`) mount this page;
  * the only difference is the decoded `job` param. The h1 marker stays
- * OUTSIDE the boundaries (the frame suite keys the journeys canvas off
+ * OUTSIDE the boundaries (the SSR layout suite keys the journeys canvas off
  * `lens-journeys-title`), and route content never suspends at Outlet
  * level — suspension there would swap the whole layout for the fallback
  * (the PlaygroundPage precedent).

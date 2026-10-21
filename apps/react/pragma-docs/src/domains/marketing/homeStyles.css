@@ -2,13 +2,13 @@
  * The Home lobby — editorial bands stacked vertically, on the SUBGRID chain
  * (owner ruling: strict, no exceptions). `layout.lobby` is a vertical stack,
  * but under the one-grid model even a stack is a `grid-template-columns:
- * subgrid` child that inherits the shell's intrinsic columns — so the lobby
+ * subgrid` child that inherits the lens layout's intrinsic columns — so the lobby
  * reads against the same ruler as every other lens rather than floating in a
  * lone measure. It has no secondary nav or aside; instead its bands claim
  * column SPANS: the reading bands take a measured subset (prose at the full
  * intrinsic width would be unreadable), the door grid takes the whole set.
  *
- * Zero conditional at-rules (the frame suite's census allows exactly one in
+ * Zero conditional at-rules (the stylesheet census allows exactly one in
  * the app — the sanctioned AX.1 rail collapse). The door grid and exemplar
  * strip reflow on their own — `auto-fill`/`flex-wrap` do the work. Logical
  * properties throughout; DS tokens with fallbacks.
@@ -45,7 +45,7 @@
     max-inline-size: 68ch;
   }
 
-  /* Present for assistive tech and the frame suite's labelledby key
+  /* Present for assistive tech and the SSR layout suite's labelledby key
    * (`lobby-title`), absent from the layout — the mode strip's breadcrumb
    * trail carries the visible "Home" title now, so this canvas copy was
    * redundant. The shared visually-hidden idiom. */

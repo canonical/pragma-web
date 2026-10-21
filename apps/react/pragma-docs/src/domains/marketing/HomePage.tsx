@@ -194,7 +194,7 @@ const LobbyBands = (): React.ReactElement => {
  * (cardinality 1) is the lens list. The strip is the optional one and
  * renders only when the graph actually yields exemplars.
  *
- * The h1 stays OUTSIDE the boundaries (the frame suite keys the home
+ * The h1 stays OUTSIDE the boundaries (the SSR layout suite keys the home
  * canvas off `lobby-title`), and route content never suspends at Outlet
  * level — suspension there would swap the whole layout for the fallback
  * (the PlaygroundPage precedent).

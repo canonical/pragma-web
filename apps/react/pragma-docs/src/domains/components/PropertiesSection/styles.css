@@ -1,7 +1,8 @@
 /*
  * PropertiesSection — the entity's property table. Wide tables scroll
  * inside their own container rather than widening the canvas (the same
- * min-content discipline INTRINSIC-GRID.md entry 1 records for the frame).
+ * min-content discipline INTRINSIC-GRID.md entry 1 records for the lens
+ * layout's grid).
  */
 
 @layer app {
