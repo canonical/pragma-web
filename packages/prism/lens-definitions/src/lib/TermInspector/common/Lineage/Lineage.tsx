@@ -25,11 +25,11 @@ const Lineage = ({
   ancestors,
   namespaces,
 }: LineageProps): React.ReactElement => (
-  <p className="term-inspector-lineage">
-    <span className="term-inspector-lineage-self">{self}</span>
+  <p className="lineage">
+    <span className="self">{self}</span>
     {ancestors.map((ancestor) => (
       <span key={ancestor.uri}>
-        <span aria-hidden="true" className="term-inspector-lineage-glyph">
+        <span aria-hidden="true" className="glyph">
           {" "}
           {SUBCLASS_OF}{" "}
         </span>

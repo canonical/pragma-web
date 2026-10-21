@@ -85,7 +85,7 @@ describe("TermRail", () => {
       .getByRole("link", { name: "UI Block" })
       .closest("li");
     expect(abstractItem).toHaveAttribute("data-abstraction", "abstract");
-    expect(abstractItem?.querySelector(".term-rail-mark")).not.toBeNull();
+    expect(abstractItem?.querySelector(".mark")).not.toBeNull();
 
     // A concrete class carries the other value — the axis is total over
     // isAbstract, never a third invented "status".
@@ -114,7 +114,7 @@ describe("TermRail", () => {
     // …and the depth glyph (the exhibit's monospace dot-run) is rendered,
     // one dot per TRUE hop (the indent clamps, the glyph does not), and
     // aria-hidden so it never enters the accessible name.
-    const glyph = componentItem?.querySelector(".term-rail-depth");
+    const glyph = componentItem?.querySelector(".depth");
     expect(glyph?.textContent?.length ?? 0).toBeGreaterThanOrEqual(
       componentDepth,
     );

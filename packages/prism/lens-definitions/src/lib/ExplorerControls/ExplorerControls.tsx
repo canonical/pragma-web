@@ -69,7 +69,7 @@ const ExplorerControls = ({
           return (
             <button
               aria-pressed={on}
-              className="explorer-chip"
+              className="chip"
               key={value}
               onClick={() => {
                 onFilterChange({
@@ -84,7 +84,7 @@ const ExplorerControls = ({
               title={t(ABSTRACTION_COPY[value].hint)}
               type="button"
             >
-              <span aria-hidden="true" className="explorer-chip-swatch" />
+              <span aria-hidden="true" className="swatch" />
               {t(ABSTRACTION_COPY[value].label)}
             </button>
           );
@@ -99,7 +99,7 @@ const ExplorerControls = ({
           return (
             <button
               aria-pressed={on}
-              className="explorer-chip"
+              className="chip"
               key={prefix}
               onClick={() => {
                 onFilterChange({
@@ -110,7 +110,7 @@ const ExplorerControls = ({
               title={t("controls.ontology.hint", { label })}
               type="button"
             >
-              <span aria-hidden="true" className="explorer-chip-swatch" />
+              <span aria-hidden="true" className="swatch" />
               {label}
             </button>
           );

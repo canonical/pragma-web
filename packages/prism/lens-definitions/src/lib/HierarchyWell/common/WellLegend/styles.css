@@ -1,0 +1,110 @@
+/*
+ * WellLegend — the well's legend, floating at its bottom left over the
+ * graph: a small corner accessory capped at a fixed width, never a panel
+ * that scales with the well. Its swatches restate the node and edge
+ * encodings exactly, so the legend cannot drift from what the graph draws.
+ *
+ * Each design decision reads a component token bound to a semantic token.
+ */
+
+@layer ds.prism {
+  :root {
+    --well-legend-inset: var(--space-150, 0.75rem);
+    --well-legend-max-inline-size: 15rem;
+    --well-legend-padding-block: var(--space-100, 0.5rem);
+    --well-legend-padding-inline: var(--space-150, 0.75rem);
+    --well-legend-border-width: var(--dimension-stroke-thickness-medium, 1px);
+    --well-legend-border-color: var(--color-border-muted);
+    --well-legend-radius: 0.5rem;
+    --well-legend-background: var(--color-background);
+    --well-legend-shadow:
+      0 1px 2px color-mix(in oklab, var(--color-text) 6%, transparent),
+      0 6px 24px color-mix(in oklab, var(--color-text) 7%, transparent);
+    --well-legend-font-size: 0.6875rem;
+    --well-legend-color: var(--color-text-muted);
+    --well-legend-gap: var(--space-050, 0.25rem);
+    --well-legend-row-gap: var(--space-100, 0.5rem);
+    --well-legend-swatch-inline-size: 1.5rem;
+    --well-legend-swatch-block-size: 0.75rem;
+    --well-legend-swatch-radius: 0.1875rem;
+    --well-legend-swatch-background: var(--color-background);
+    --well-legend-line-color: var(--color-border-muted);
+    --well-legend-relation-color: var(--color-text-branded);
+  }
+
+  .ds.well-legend {
+    position: absolute;
+    z-index: var(--z-plate);
+    inset-block-end: var(--well-legend-inset);
+    inset-inline-start: var(--well-legend-inset);
+    max-inline-size: min(
+      var(--well-legend-max-inline-size),
+      calc(100% - 2 * var(--well-legend-inset))
+    );
+    display: grid;
+    gap: var(--well-legend-gap);
+    margin: 0;
+    padding: var(--well-legend-padding-block) var(--well-legend-padding-inline);
+    border: var(--well-legend-border-width) solid
+      var(--well-legend-border-color);
+    border-radius: var(--well-legend-radius);
+    background: var(--well-legend-background);
+    box-shadow: var(--well-legend-shadow);
+    font-size: var(--well-legend-font-size);
+    color: var(--well-legend-color);
+    pointer-events: none;
+  }
+
+  .ds.well-legend .row {
+    display: flex;
+    align-items: center;
+    gap: var(--well-legend-row-gap);
+  }
+
+  .ds.well-legend dt,
+  .ds.well-legend dd {
+    margin: 0;
+  }
+
+  .ds.well-legend .swatch {
+    display: block;
+    inline-size: var(--well-legend-swatch-inline-size);
+    block-size: var(--well-legend-swatch-block-size);
+    border-radius: var(--well-legend-swatch-radius);
+    border: var(--well-legend-border-width) solid var(--well-legend-line-color);
+    background: var(--well-legend-swatch-background);
+  }
+
+  .ds.well-legend .swatch.abstract {
+    border-style: dashed;
+  }
+
+  /* The subclass edge: a line with an arrowhead, drawn in CSS so the legend
+   * carries no image dependency. */
+  .ds.well-legend .edge {
+    position: relative;
+    display: block;
+    inline-size: var(--well-legend-swatch-inline-size);
+    block-size: 0;
+    border-block-start: var(--well-legend-border-width) solid
+      var(--well-legend-line-color);
+  }
+
+  .ds.well-legend .edge::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: -1px;
+    inset-block-start: -3px;
+    border-block: 3px solid transparent;
+    border-inline-start: 5px solid var(--well-legend-line-color);
+  }
+
+  /* The relation swatch: the semantic arc's accent, the arcs' own hue. */
+  .ds.well-legend .edge.relation {
+    border-block-start-color: var(--well-legend-relation-color);
+  }
+
+  .ds.well-legend .edge.relation::after {
+    border-inline-start-color: var(--well-legend-relation-color);
+  }
+}

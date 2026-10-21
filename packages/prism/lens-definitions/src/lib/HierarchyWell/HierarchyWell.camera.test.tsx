@@ -24,8 +24,12 @@ const renderCamera = (): { canvas: HTMLElement; camera: HTMLElement } => {
       createFetchSpy(),
     ),
   );
-  const canvas = container.querySelector<HTMLElement>(".hierarchy-canvas");
-  const camera = container.querySelector<HTMLElement>(".hierarchy-camera");
+  const canvas = container.querySelector<HTMLElement>(
+    ".ds.hierarchy-well .canvas",
+  );
+  const camera = container.querySelector<HTMLElement>(
+    ".ds.hierarchy-well .camera",
+  );
   if (canvas === null || camera === null) {
     throw new Error("the well rendered no canvas");
   }
@@ -59,7 +63,7 @@ describe("HierarchyWell camera", () => {
     const { canvas, camera } = renderCamera();
     const start = readCamera(camera);
 
-    const node = canvas.querySelector("a.hierarchy-node");
+    const node = canvas.querySelector(".ds.term-node a");
     if (node === null) throw new Error("the well drew no node");
     fireEvent.pointerDown(node, { clientX: 0, clientY: 0, pointerId: 1 });
     fireEvent.pointerMove(canvas, { clientX: 40, clientY: 30 });

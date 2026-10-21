@@ -1,6 +1,9 @@
 import type React from "react";
 import { ABSTRACTION_VALUES } from "../../../constants.js";
 import { useMessages } from "../../../i18n/index.js";
+import "./styles.css";
+
+const componentCssClassName = "ds well-legend";
 
 /**
  * The well's legend — canvas-local furniture, bottom-left, exactly where
@@ -21,35 +24,26 @@ import { useMessages } from "../../../i18n/index.js";
 const WellLegend = (): React.ReactElement => {
   const t = useMessages();
   return (
-    <dl
-      aria-label={t("legend.label")}
-      className="hierarchy-furniture hierarchy-legend"
-    >
+    <dl aria-label={t("legend.label")} className={componentCssClassName}>
       {ABSTRACTION_VALUES.map((value) => (
-        <div className="hierarchy-legend-row" key={value}>
+        <div className="row" key={value}>
           <dt>
-            <span
-              aria-hidden="true"
-              className={`hierarchy-legend-swatch hierarchy-legend-swatch-${value}`}
-            />
+            <span aria-hidden="true" className={["swatch", value].join(" ")} />
           </dt>
           <dd>
             {t(value === "abstract" ? "legend.abstract" : "legend.concrete")}
           </dd>
         </div>
       ))}
-      <div className="hierarchy-legend-row">
+      <div className="row">
         <dt>
-          <span aria-hidden="true" className="hierarchy-legend-edge" />
+          <span aria-hidden="true" className="edge" />
         </dt>
         <dd>{t("legend.superclass")}</dd>
       </div>
-      <div className="hierarchy-legend-row">
+      <div className="row">
         <dt>
-          <span
-            aria-hidden="true"
-            className="hierarchy-legend-edge hierarchy-legend-edge-relation"
-          />
+          <span aria-hidden="true" className="edge relation" />
         </dt>
         <dd>{t("legend.relation")}</dd>
       </div>

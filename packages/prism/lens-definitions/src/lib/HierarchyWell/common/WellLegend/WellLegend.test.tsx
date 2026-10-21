@@ -24,8 +24,7 @@ describe("WellLegend", () => {
     const legend = screen.getByLabelText("Graph legend");
     // The furniture class is what positions it absolutely against the
     // well and raises it to --z-plate.
-    expect(legend).toHaveClass("hierarchy-furniture");
-    expect(legend).toHaveClass("hierarchy-legend");
+    expect(legend).toHaveClass("ds", "well-legend");
   });
 
   it("server-renders whole (it is static, so it holds no client state)", () => {

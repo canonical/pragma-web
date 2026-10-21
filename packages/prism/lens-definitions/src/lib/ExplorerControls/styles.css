@@ -1,95 +1,116 @@
 /*
  * ExplorerControls — the Definitions strip's chip toolbar
- * (slot.explorer-controls). It lives INSIDE the strip band, whose height (--strip-h) is stationary
- * frame — nothing here may change it, or the canvas would jump on a lens
- * switch (AX.6). Hence the fixed small metrics and `min-block-size: 0`
- * postures below.
+ * (slot.explorer-controls). It lives INSIDE the strip band, whose height is
+ * stationary frame: nothing here may change it, or the canvas would jump on
+ * a lens switch. Hence the small fixed metrics and `min-inline-size: 0`.
  *
- * At-rules: one prefers-reduced-motion block, census-EXEMPT (it cannot
- * reflow layout — see stylesheets.test.ts's query-TEXT exemption).
+ * Each design decision reads a component token bound to a semantic token.
  */
 
-@layer app {
+@layer ds.prism {
+  :root {
+    --explorer-controls-gap: var(--space-200, 1rem);
+    --explorer-controls-group-gap: var(--space-050, 0.25rem);
+    --explorer-controls-chip-gap: 0.375rem;
+    --explorer-controls-chip-padding-block: 0.1875rem;
+    --explorer-controls-chip-padding-inline: 0.625rem;
+    --explorer-controls-chip-border-width: var(
+      --dimension-stroke-thickness-medium,
+      1px
+    );
+    --explorer-controls-chip-border-color: var(--color-border-muted);
+    --explorer-controls-chip-radius: var(--dimension-radius-full, 999px);
+    --explorer-controls-chip-color: var(--color-text-muted);
+    --explorer-controls-chip-font-size: 0.75rem;
+    --explorer-controls-chip-color-pressed: var(--color-text);
+    --explorer-controls-chip-background-pressed: color-mix(
+      in oklab,
+      var(--color-text) 6%,
+      var(--color-background)
+    );
+    --explorer-controls-chip-outline-color: var(
+      --color-background-contrasted,
+      currentColor
+    );
+    --explorer-controls-swatch-size: 0.5rem;
+    --explorer-controls-transition-duration: var(--motion-duration-fast, 0.15s);
+  }
+
   .ds.explorer-controls {
     display: flex;
     align-items: center;
-    gap: var(--space-200, 1rem);
+    gap: var(--explorer-controls-gap);
     min-inline-size: 0;
     overflow-x: auto;
   }
 
-  /* A fieldset per axis: the semantic grouping element, so each axis's
-   * chips are announced as a named set. The UA's default border/margin/
-   * padding are cleared — the grouping is for assistive tech, not a visible
-   * box, and the strip's band height is stationary frame. */
+  /* A fieldset per axis: the semantic grouping element, so each axis's chips
+   * are announced as a named set. The UA's border, margin and padding are
+   * cleared: the grouping is for assistive tech, not a visible box. */
   .ds.explorer-controls .chip-group {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--explorer-controls-group-gap);
     margin: 0;
     padding: 0;
     border: none;
     min-inline-size: 0;
   }
 
-  /* The chip: a real toggle button. At rest it is quiet; lit, it takes the
-   * text colour and a filled swatch — so the on/off distinction is carried
-   * by fill AND weight, never by hue alone (WCAG 1.4.1). */
-  .ds.explorer-controls .explorer-chip {
+  /* The chip: a real toggle button. At rest it is quiet; pressed, it takes
+   * the text colour and a filled swatch, so the on/off distinction is carried
+   * by fill AND weight, never by hue alone. */
+  .ds.explorer-controls .chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    padding: 0.1875rem 0.625rem;
-    border: 1px solid var(--color-border-muted, #ddd);
-    border-radius: 999px;
+    gap: var(--explorer-controls-chip-gap);
+    padding: var(--explorer-controls-chip-padding-block)
+      var(--explorer-controls-chip-padding-inline);
+    border: var(--explorer-controls-chip-border-width) solid
+      var(--explorer-controls-chip-border-color);
+    border-radius: var(--explorer-controls-chip-radius);
     background: transparent;
-    color: var(--color-text-muted, #666);
+    color: var(--explorer-controls-chip-color);
     font: inherit;
-    font-size: 0.75rem;
+    font-size: var(--explorer-controls-chip-font-size);
     line-height: 1.4;
     white-space: nowrap;
     cursor: pointer;
     transition:
-      color 0.15s ease,
-      border-color 0.15s ease,
-      background-color 0.15s ease;
+      color var(--explorer-controls-transition-duration) ease,
+      border-color var(--explorer-controls-transition-duration) ease,
+      background-color var(--explorer-controls-transition-duration) ease;
   }
 
-  .ds.explorer-controls .explorer-chip-swatch {
-    inline-size: 0.5rem;
-    block-size: 0.5rem;
+  .ds.explorer-controls .swatch {
+    inline-size: var(--explorer-controls-swatch-size);
+    block-size: var(--explorer-controls-swatch-size);
     border-radius: 50%;
-    border: 1px solid currentColor;
+    border: var(--explorer-controls-chip-border-width) solid currentColor;
     background: transparent;
   }
 
-  .ds.explorer-controls .explorer-chip[aria-pressed="true"] {
-    color: var(--color-text, #000);
+  .ds.explorer-controls .chip[aria-pressed="true"] {
+    color: var(--explorer-controls-chip-color-pressed);
     border-color: currentColor;
-    background: color-mix(
-      in oklab,
-      var(--color-text, #000) 6%,
-      var(--color-background, #fff)
-    );
+    background: var(--explorer-controls-chip-background-pressed);
   }
 
-  .ds.explorer-controls
-    .explorer-chip[aria-pressed="true"]
-    .explorer-chip-swatch {
+  .ds.explorer-controls .chip[aria-pressed="true"] .swatch {
     background: currentColor;
   }
 
-  .ds.explorer-controls .explorer-chip:hover {
-    color: var(--color-text, #000);
+  .ds.explorer-controls .chip:hover {
+    color: var(--explorer-controls-chip-color-pressed);
   }
 
-  .ds.explorer-controls .explorer-chip:focus-visible {
-    outline: 2px solid var(--color-background-contrasted, currentColor);
+  .ds.explorer-controls .chip:focus-visible {
+    outline: 2px solid var(--explorer-controls-chip-outline-color);
     outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ds.explorer-controls .explorer-chip {
+    .ds.explorer-controls .chip {
       transition: none;
     }
   }

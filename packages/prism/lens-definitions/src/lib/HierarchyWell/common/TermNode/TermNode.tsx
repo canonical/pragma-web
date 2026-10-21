@@ -2,6 +2,7 @@ import { Link } from "@canonical/router-react";
 import type React from "react";
 import { useMessages } from "../../../i18n/index.js";
 import type { TermNodeProps } from "./types.js";
+import "./styles.css";
 
 /**
  * A class node: a real term link, so the graph's nodes are anchors — they
@@ -22,11 +23,17 @@ import type { TermNodeProps } from "./types.js";
  *
  * `import { TermNode } from "./common/TermNode/index.js";`
  */
+const componentCssClassName = "ds term-node";
+
 const TermNode = ({ node }: TermNodeProps): React.ReactElement => {
   const t = useMessages();
   return (
     <div
-      className={["hierarchy-node-shell", node.className]
+      className={[
+        componentCssClassName,
+        node.data.isAbstract ? "abstract" : "",
+        node.className,
+      ]
         .filter(Boolean)
         .join(" ")}
       data-id={node.id}
@@ -38,12 +45,7 @@ const TermNode = ({ node }: TermNodeProps): React.ReactElement => {
       }}
     >
       <Link
-        className={[
-          "hierarchy-node",
-          node.data.isAbstract ? "hierarchy-node-abstract" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className="link"
         params={{ term: node.data.term }}
         title={node.data.label}
         to="definitionsTerm"
@@ -51,7 +53,7 @@ const TermNode = ({ node }: TermNodeProps): React.ReactElement => {
         {node.data.label}
       </Link>
       {node.data.isAbstract ? (
-        <span className="hierarchy-node-tag">{t("well.abstract")}</span>
+        <span className="tag">{t("well.abstract")}</span>
       ) : null}
     </div>
   );

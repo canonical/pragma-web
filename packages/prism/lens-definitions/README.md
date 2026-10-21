@@ -104,6 +104,24 @@ lens's own artifacts land in `src/__generated__`. `check:tier1` runs
 selection leaves the contract and when the artifacts are stale. Run
 `bun run relay` after editing a fragment.
 
+## Styling
+
+The stylesheets sit in the `ds.prism` cascade layer. Each design decision
+reads a component token, declared on `:root` and named for its component
+(`--term-rail-dimmed-opacity`, `--hierarchy-well-accent-color`, …), bound to
+a semantic token, so a site retunes the lens through either tier.
+
+The stylesheets read custom properties the package does not define:
+
+- `--grid-intrinsic`, the intrinsic column template from `@canonical/styles`,
+  which the layout's root reads;
+- `--z-plate` and `--z-underground`, the strata the well's floating hint and
+  legend are raised to and the well itself sits on, and
+  `--surface-underground-background`, the well floor's tint, which the site
+  defines;
+- the semantic `--color-*`, `--space-*`, `--dimension-*`, `--motion-*` and
+  `--font-family-mono` tokens the site's theme binds.
+
 ## Public API
 
 - Routes: `definitionsRoutes`, `warmDefinitions`.

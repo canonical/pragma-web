@@ -31,13 +31,13 @@ import { NODE_FADED_CLASS } from "../../lib/HierarchyWell/constants.js";
 
 /** The graph node whose term link points at `href` — the stable
  * cross-reference between a rail item and its node (both address the same
- * term). Returns the `.hierarchy-node-shell` wrapper that carries the
+ * term). Returns the `.ds.term-node` wrapper that carries the
  * decoration class. */
 const findNodeByHref = (well: HTMLElement, href: string): HTMLElement => {
   const link = well.querySelector<HTMLElement>(
-    `a.hierarchy-node[href="${href}"]`,
+    `.ds.term-node a[href="${href}"]`,
   );
-  const node = link?.closest<HTMLElement>(".hierarchy-node-shell");
+  const node = link?.closest<HTMLElement>(".ds.term-node");
   if (!node) throw new Error(`no graph node for ${href}`);
   return node;
 };

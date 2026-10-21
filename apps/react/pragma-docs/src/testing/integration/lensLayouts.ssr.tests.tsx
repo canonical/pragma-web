@@ -466,9 +466,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain(
       '<h2 id="term-inspector-title">UI Block</h2>',
     );
-    expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain(
-      "hierarchy-node-shell",
-    );
+    expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain("ds term-node");
     expect(mustGet("/standards").canvas).toContain('id="lens-standards-title"');
     // The standards canvases render REAL content from their fixture
     // records: the index carries a grouped standard link, the reading

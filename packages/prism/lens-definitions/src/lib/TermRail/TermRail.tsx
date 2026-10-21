@@ -204,7 +204,7 @@ const TermRail = ({
             <h2 id={headingId}>{ontology.label ?? ontology.prefix}</h2>
             <h3>
               {t("rail.classes")}
-              <span className="term-rail-count">
+              <span className="count">
                 {t("rail.count", {
                   matches: classMatches,
                   total: classes.length,
@@ -225,25 +225,25 @@ const TermRail = ({
                       honest about the one real per-class axis. Decorative —
                       aria-hidden — because the "abstract" word below carries
                       it to assistive tech. */}
-                  <span aria-hidden="true" className="term-rail-mark" />
-                  <span aria-hidden="true" className="term-rail-depth">
+                  <span aria-hidden="true" className="mark" />
+                  <span aria-hidden="true" className="depth">
                     {formatDepthGlyph(depth)}
                   </span>
                   <Link params={{ term: prefixed }} to="definitionsTerm">
                     {formatTermLabel(term.label, prefixed)}
                   </Link>
                   {term.isAbstract ? (
-                    <span className="term-rail-note">{t("rail.abstract")}</span>
+                    <span className="note">{t("rail.abstract")}</span>
                   ) : null}
                   {term.instanceCount > 0 ? (
-                    <span className="term-rail-note">{term.instanceCount}</span>
+                    <span className="note">{term.instanceCount}</span>
                   ) : null}
                 </li>
               ))}
             </ul>
             <h3>
               {t("rail.properties")}
-              <span className="term-rail-count">
+              <span className="count">
                 {t("rail.count", {
                   matches: propertyMatches,
                   total: properties.length,
@@ -260,9 +260,7 @@ const TermRail = ({
                   <Link params={{ term: prefixed }} to="definitionsTerm">
                     {formatTermLabel(term.label, prefixed)}
                   </Link>
-                  <span className="term-rail-note">
-                    {term.kind.toLowerCase()}
-                  </span>
+                  <span className="note">{term.kind.toLowerCase()}</span>
                 </li>
               ))}
             </ul>

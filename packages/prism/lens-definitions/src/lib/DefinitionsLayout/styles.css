@@ -9,7 +9,12 @@
  * aligns to the same ruler and a region claims its width by spanning them.
  */
 
-@layer app {
+@layer ds.prism {
+  :root {
+    --definitions-layout-color-background: var(--color-background);
+    --definitions-layout-color-text: var(--color-text);
+  }
+
   .ds.definitions-layout {
     display: grid;
     grid-template-columns: var(--grid-intrinsic);
@@ -19,8 +24,8 @@
     block-size: 100dvh;
     /* The layout never scrolls — the canvas owns the scroll. */
     overflow: clip;
-    background: var(--color-background, #fff);
-    color: var(--color-text, #000);
+    background: var(--definitions-layout-color-background);
+    color: var(--definitions-layout-color-text);
   }
 
   /* The viewport claims every column east of the rail: `3 / -1` starts after

@@ -53,15 +53,15 @@ describe("HierarchyWell SSR", () => {
     );
 
     expect(html).toContain('data-slot="explorer-canvas"');
-    const nodeCount = html.match(/hierarchy-node-shell/g)?.length ?? 0;
+    const nodeCount = html.match(/ds term-node/g)?.length ?? 0;
     expect(fixtureClassRecords.length).toBeGreaterThan(0);
     expect(nodeCount).toBe(fixtureClassRecords.length);
     const structuralEdgeCount =
-      html.match(/hierarchy-edge-structural/g)?.length ?? 0;
+      html.match(/class="edge structural/g)?.length ?? 0;
     expect(structuralEdgeCount).toBe(fixtureSubclassCount);
     // Semantic arcs (object properties) are in the server markup too —
     // the edge family whose absence made the old well an organigram.
-    expect(html).toContain("hierarchy-edge-semantic");
+    expect(html).toContain('class="edge semantic');
     // The camera transform is a constant of the graph — explicit, never
     // measured.
     expect(html).toContain("translate(");
@@ -90,9 +90,8 @@ describe("HierarchyWell SSR", () => {
     // Some nodes are spared (the one-hop neighbourhood): if EVERY node
     // were faded the fade would convey nothing. Counting faded NODES
     // against all nodes — bare "is-faded" would sweep in faded edges.
-    const nodeCount = html.match(/hierarchy-node-shell/g)?.length ?? 0;
-    const fadedNodes =
-      html.match(/hierarchy-node-shell[^"]*is-faded/g)?.length ?? 0;
+    const nodeCount = html.match(/ds term-node/g)?.length ?? 0;
+    const fadedNodes = html.match(/ds term-node[^"]*is-faded/g)?.length ?? 0;
     expect(nodeCount).toBe(fixtureClassRecords.length);
     expect(fadedNodes).toBeGreaterThan(0);
     expect(fadedNodes).toBeLessThan(nodeCount);
@@ -111,7 +110,7 @@ describe("HierarchyWell SSR", () => {
         createFetchSpy(),
       ),
     );
-    expect(html).toContain("hierarchy-node-shell");
+    expect(html).toContain("ds term-node");
     expect(html).not.toContain("is-faded");
     expect(html).not.toContain("is-selected");
   });

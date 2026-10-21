@@ -181,11 +181,11 @@ const DefinitionsExplorer = ({
     <div
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <div className="definitions-explorer-rail">
+      <div className="rail">
         {/* The search box lives with the state that owns it. It starts
             empty — the no-op that keeps first client paint equal to the
             server's. */}
-        <p className="definitions-explorer-search">
+        <p className="search">
           <label>
             {t("explorer.search.label")}
             <input

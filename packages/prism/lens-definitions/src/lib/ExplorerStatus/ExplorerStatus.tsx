@@ -42,7 +42,7 @@ const ExplorerStatus = ({
     >
       <div
         aria-hidden="true"
-        className="explorer-status-bar"
+        className="bar"
         // The one inline style in the lens: a computed proportion cannot
         // live in a stylesheet. It is a width, not a colour or a layout
         // rule, so the stylesheet still owns every visual decision.
@@ -50,7 +50,7 @@ const ExplorerStatus = ({
           { "--explorer-status-share": `${share}%` } as React.CSSProperties
         }
       >
-        <span className="explorer-status-fill" />
+        <span className="fill" />
       </div>
       <figcaption>
         {t("status.classes", { visible, count: total })}

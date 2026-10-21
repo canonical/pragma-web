@@ -172,9 +172,7 @@ const HierarchyWell = ({
 
   return (
     <div
-      className={[componentCssClassName, "underground", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-slot="explorer-canvas"
     >
       {/* The pan/zoom diagram surface. `group` is deliberate: it names the
@@ -188,7 +186,7 @@ const HierarchyWell = ({
       {/* biome-ignore lint/a11y/useSemanticElements: no native element carries role="group" for a diagram canvas; see the note above. */}
       <div
         aria-label={t("well.label")}
-        className="hierarchy-canvas"
+        className="canvas"
         onBlur={() => onHoverTerm(undefined)}
         onFocus={(event) => onHoverTerm(readTermFromEvent(event.target))}
         onMouseLeave={() => onHoverTerm(undefined)}
@@ -219,14 +217,14 @@ const HierarchyWell = ({
         role="group"
       >
         <div
-          className="hierarchy-camera"
+          className="camera"
           style={{
             transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.k})`,
           }}
         >
           <svg
             aria-hidden="true"
-            className="hierarchy-edges"
+            className="edges"
             height={graph.height}
             width={graph.width}
           >
@@ -240,7 +238,7 @@ const HierarchyWell = ({
                 refY="5"
                 viewBox="0 0 10 10"
               >
-                <path className="hw-head-structural" d="M 1 1 L 9 5 L 1 9 Z" />
+                <path className="head structural" d="M 1 1 L 9 5 L 1 9 Z" />
               </marker>
               <marker
                 id="hw-head-semantic"
@@ -251,12 +249,12 @@ const HierarchyWell = ({
                 refY="5"
                 viewBox="0 0 10 10"
               >
-                <path className="hw-head-semantic" d="M 0 1 L 9 5 L 0 9 Z" />
+                <path className="head semantic" d="M 0 1 L 9 5 L 0 9 Z" />
               </marker>
             </defs>
             {graph.clusters.map((cluster) => (
               <text
-                className="hierarchy-cluster-caption"
+                className="cluster-caption"
                 key={cluster.prefix}
                 x={cluster.x}
                 y={cluster.y - 20}
@@ -271,8 +269,8 @@ const HierarchyWell = ({
               return (
                 <g
                   className={[
-                    "hierarchy-edge",
-                    `hierarchy-edge-${edge.family}`,
+                    "edge",
+                    edge.family,
                     incident ? "is-incident" : "",
                     edge.className,
                   ]
@@ -297,7 +295,7 @@ const HierarchyWell = ({
       </div>
       {/* Canvas-local furniture: static, so it costs the hydration
           argument nothing. */}
-      <p className="hierarchy-furniture hierarchy-hint">{t("well.hint")}</p>
+      <p className="hint">{t("well.hint")}</p>
       <WellLegend />
     </div>
   );

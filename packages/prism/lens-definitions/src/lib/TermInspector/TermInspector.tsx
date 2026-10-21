@@ -136,7 +136,7 @@ const TermInspector = ({
   if (term === undefined) {
     // No default term (owner ruling): /definitions is the whole explorer
     // with an honestly empty inspector, never a redirect.
-    body = <p className="term-inspector-empty">{t("inspector.empty")}</p>;
+    body = <p className="empty">{t("inspector.empty")}</p>;
   } else if (classData) {
     body = <ClassView data={classData} namespaces={namespaces} term={term} />;
   } else if (propertyData) {

@@ -37,7 +37,7 @@ describe("HierarchyWell", () => {
     // The well announces itself.
     expect(
       screen.getByLabelText("Class hierarchy", {
-        selector: ".hierarchy-canvas",
+        selector: ".ds.hierarchy-well .canvas",
       }),
     ).toBeInTheDocument();
 
@@ -60,7 +60,7 @@ describe("HierarchyWell", () => {
       .map((ref) => recordMap[ref])
       .filter((record) => record !== undefined);
     const classCount = listedClasses.length;
-    const nodeLinks = well.querySelectorAll("a.hierarchy-node");
+    const nodeLinks = well.querySelectorAll(".ds.term-node a");
     expect(classCount).toBeGreaterThan(0);
     expect(nodeLinks).toHaveLength(classCount);
     const hrefs = [...nodeLinks].map((link) => link.getAttribute("href"));
@@ -78,7 +78,7 @@ describe("HierarchyWell", () => {
     const abstractCount = listedClasses.filter(
       (record) => record.isAbstract === true,
     ).length;
-    const abstractNodes = well.querySelectorAll("a.hierarchy-node-abstract");
+    const abstractNodes = well.querySelectorAll(".ds.term-node.abstract a");
     expect(abstractNodes).toHaveLength(abstractCount);
     expect([...abstractNodes].map((node) => node.textContent)).toContain(
       "UI Block",
