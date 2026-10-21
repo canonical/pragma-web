@@ -20,13 +20,13 @@ const componentCssClassName = "ds mode-strip";
  *
  * `import { ModeStrip } from "@canonical/prism-core";`
  */
-const ModeStrip = ({
+export default function ModeStrip({
   className,
   context,
   controls,
   status,
   ...props
-}: ModeStripProps): React.ReactElement => {
+}: ModeStripProps): React.ReactElement {
   return (
     <header
       {...props}
@@ -44,6 +44,4 @@ const ModeStrip = ({
       </div>
     </header>
   );
-};
-
-export default ModeStrip;
+}

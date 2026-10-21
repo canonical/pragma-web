@@ -32,7 +32,7 @@ const componentCssClassName = "ds chip";
  *
  * `import { Chip } from "@canonical/prism-core";`
  */
-const Chip = (props: ChipProps): ReactElement => {
+export default function Chip(props: ChipProps): ReactElement {
   const t = useMessages();
   const {
     uri,
@@ -111,6 +111,4 @@ const Chip = (props: ChipProps): ReactElement => {
       {label}
     </a>
   );
-};
-
-export default Chip;
+}

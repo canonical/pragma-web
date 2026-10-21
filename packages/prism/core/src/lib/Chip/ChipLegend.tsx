@@ -95,11 +95,11 @@ function listEntriesForChannel(
  *
  * `import { ChipLegend } from "@canonical/prism-core";`
  */
-const ChipLegend = ({
+export default function ChipLegend({
   prefixes,
   className,
   ...props
-}: ChipLegendProps): ReactElement => {
+}: ChipLegendProps): ReactElement {
   const t = useMessages();
   return (
     <div
@@ -130,6 +130,4 @@ const ChipLegend = ({
       ))}
     </div>
   );
-};
-
-export default ChipLegend;
+}

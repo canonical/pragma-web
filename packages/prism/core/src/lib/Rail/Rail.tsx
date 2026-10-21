@@ -43,14 +43,14 @@ const componentCssClassName = "ds rail";
  *
  * `import { Rail } from "@canonical/prism-core";`
  */
-const Rail = ({
+export default function Rail({
   entries,
   brand,
   children,
   "aria-label": ariaLabel,
   className,
   ...props
-}: RailProps): React.ReactElement => {
+}: RailProps): React.ReactElement {
   const t = useMessages();
   // Widened to `string` keys: an entry names its route with a plain string.
   const byRoute: ReadonlyMap<string, string> = useLensShortcuts().byRoute;
@@ -100,6 +100,4 @@ const Rail = ({
       {children}
     </nav>
   );
-};
-
-export default Rail;
+}

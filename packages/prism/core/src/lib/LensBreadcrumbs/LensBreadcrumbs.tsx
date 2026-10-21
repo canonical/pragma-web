@@ -59,13 +59,13 @@ const createLensLinkComponent =
  *
  * `import { LensBreadcrumbs } from "@canonical/prism-core";`
  */
-const LensBreadcrumbs = ({
+export default function LensBreadcrumbs({
   className,
   lensLabel,
   lensRouteName,
   current,
   ...props
-}: LensBreadcrumbsProps): React.ReactElement => {
+}: LensBreadcrumbsProps): React.ReactElement {
   const router = useRouter<RouteMap>();
   const items: BreadcrumbItem[] =
     current === undefined
@@ -87,6 +87,4 @@ const LensBreadcrumbs = ({
       LinkComponent={createLensLinkComponent(lensRouteName)}
     />
   );
-};
-
-export default LensBreadcrumbs;
+}
