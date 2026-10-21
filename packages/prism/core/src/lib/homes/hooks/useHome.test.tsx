@@ -7,9 +7,9 @@ import { RouterProvider } from "@canonical/router-react";
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { LENS_ROUTES } from "../../../testing/fixtures.js";
-import HomesProvider from "./Provider.js";
-import type { HomeNode, HomeResolver, Homes } from "./types.js";
+import { LENS_ROUTES } from "../../../../testing/fixtures.js";
+import HomesProvider from "../Provider.js";
+import type { HomeNode, HomeResolver, Homes } from "../types.js";
 import useHome from "./useHome.js";
 
 const term: HomeNode = { __typename: "Term", uri: "ds:UIBlock" };

@@ -5,6 +5,7 @@
  * @module
  */
 
+export { default as useHome } from "./hooks/useHome.js";
 export { default as HomesProvider } from "./Provider.js";
 export type {
   HomeNode,
@@ -12,4 +13,3 @@ export type {
   Homes,
   HomesProviderProps,
 } from "./types.js";
-export { default as useHome } from "./useHome.js";

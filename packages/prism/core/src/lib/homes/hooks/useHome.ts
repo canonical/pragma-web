@@ -1,7 +1,8 @@
 import { useRouter } from "@canonical/router-react";
 import { useContext } from "react";
-import HomesContext from "./Context.js";
-import type { HomeNode, HomeResolver } from "./types.js";
+import HomesContext from "../Context.js";
+import type { HomeResolver } from "../types.js";
+import type { UseHomeProps, UseHomeResult } from "./types.js";
 
 /**
  * The canonical home of `node`: the href its type's resolver builds, falling
@@ -13,7 +14,7 @@ import type { HomeNode, HomeResolver } from "./types.js";
  * @throws When no `HomesProvider` is mounted above: that is a wiring bug,
  *   not a node without a home.
  */
-export default function useHome(node: HomeNode): string | undefined {
+export default function useHome(node: UseHomeProps): UseHomeResult {
   const homes = useContext(HomesContext);
   const router = useRouter();
   if (homes === undefined) {

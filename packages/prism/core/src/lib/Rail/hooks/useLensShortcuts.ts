@@ -37,10 +37,8 @@ import { usePreferredShortcuts } from "@canonical/react-hooks";
 import type { RouteName } from "@canonical/router-core";
 import { type RegisteredRouteMap, useRouter } from "@canonical/router-react";
 import { useEffect, useMemo } from "react";
-import {
-  collectShortcuts,
-  type ShortcutAllocation,
-} from "../routeShortcut/index.js";
+import { collectShortcuts } from "../../routeShortcut/index.js";
+import type { UseLensShortcutsResult } from "./types.js";
 
 /** Whether a keystroke landed in a control the reader is typing into. */
 const isEditableTarget = (target: EventTarget | null): boolean => {
@@ -65,9 +63,7 @@ const isEditableTarget = (target: EventTarget | null): boolean => {
  * @note Impure: attaches a `keydown` listener to `document` while mounted,
  *   and navigates the router when a guarded key fires.
  */
-export const useLensShortcuts = (): ShortcutAllocation<
-  RouteName<RegisteredRouteMap>
-> => {
+export const useLensShortcuts = (): UseLensShortcutsResult => {
   const router = useRouter();
   // Keyed on the route table, a stable object reference for the router's
   // lifetime — so the walk, and the invariants it enforces, run once.

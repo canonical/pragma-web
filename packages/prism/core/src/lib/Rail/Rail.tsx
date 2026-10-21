@@ -1,8 +1,8 @@
 import type { RouteMap } from "@canonical/router-core";
 import { Link } from "@canonical/router-react";
 import type React from "react";
+import { useLensShortcuts } from "./hooks/useLensShortcuts.js";
 import type { RailProps } from "./types.js";
-import { useLensShortcuts } from "./useLensShortcuts.js";
 import "./styles.css";
 
 const componentCssClassName = "ds rail";

@@ -4,9 +4,9 @@ import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 import { LENS_ROUTES } from "../../../testing/fixtures.js";
+import useHome from "./hooks/useHome.js";
 import HomesProvider from "./Provider.js";
 import type { Homes } from "./types.js";
-import useHome from "./useHome.js";
 
 /** Prints the home of a `Term` node. */
 const TermHome = (): ReactElement => (
