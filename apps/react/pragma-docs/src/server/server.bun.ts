@@ -30,7 +30,7 @@ import { viteFetchMiddleware } from "@canonical/react-ssr/server";
 import { createServer as createViteServer } from "vite";
 import { resolveGraphqlUrl } from "#graphql-endpoint";
 import { getAuthRedirectHref } from "#lib/authGuard";
-import { prepareRelayData } from "./prepareRelayData.js";
+import prepareRelayData from "./prepareRelayData.js";
 import { resolveRouteStatus } from "./routeQueries.js";
 
 const PORT = Number(process.env.PORT) || 5174;

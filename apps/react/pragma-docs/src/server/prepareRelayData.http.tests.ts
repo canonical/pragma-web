@@ -1,69 +1,65 @@
 // @vitest-environment node
 
 /**
- * The prepare step's HTTP contract, against a real socket.
+ * The prepare step's HTTP contract, over the app's real route table and a
+ * real socket.
  *
- * This is the suite that carries the PRD-3 process split. The e2e matrix
- * cannot: its probe cells need the pragma refs cache (`pragma sources
- * update`) to compile a schema, and a machine without one fails them for a
- * reason that has nothing to do with this wiring. So the wire format is
- * pinned here instead, against a stub HTTP server on an OS-assigned port —
- * no graph, no WASM, no refs cache, and no way for the assertions to pass
- * vacuously.
+ * The e2e matrix cannot carry this: its probe cells need the pragma refs
+ * cache (`pragma sources update`) to compile a schema, and a machine
+ * without one fails them for a reason that has nothing to do with this
+ * wiring. So the wire format is pinned here instead, against a stub HTTP
+ * server on an OS-assigned port: no graph, no WASM, no refs cache, and no
+ * way for the assertions to pass vacuously.
  *
  * What it pins:
  *
- * - the request LEAVES the process (the old prepare step called an
- *   in-process executor; nothing crossed a socket, so nothing could have
- *   been asserted about one);
- * - it carries the operation's full text and the route's variables;
- * - it carries `x-pragma-ssr: 1`, which is the graph server's only way to
- *   tell a server render from a browser and therefore the load-bearing half
- *   of the e2e suite's hit-counting assertions;
+ * - the matched route's `warm` sends its operation over the wire, exactly
+ *   once per prepared URL, with the full operation text, the variables its
+ *   domain builds from the URL, and `x-pragma-ssr: 1` (the graph server's
+ *   only way to tell a server render from a browser);
  * - the response is deserialised into the Relay store and handed back as
  *   `{records}`;
+ * - two prepares in flight at once stay apart: each sends its own request
+ *   and neither snapshot carries the other's data;
+ * - the prefetch environment is cleared again on every path;
  * - an unreachable endpoint degrades (logged `undefined`) instead of
- *   throwing — a graph that is down must cost the page its data, not its
+ *   throwing: a graph that is down must cost the page its data, not its
  *   200.
- *
- * The routes table is mocked with a VALID entry (the real
- * `ComponentProbeQuery` artifact and its real variables builder, exactly as
- * `src/relay/environment.tests.ts` uses them): `readRouteQueryEntry` demands
- * a non-empty `query.params.text` and a `variables` FUNCTION, so a
- * hand-rolled stub would be rejected during collection and every case here
- * would pass through the degradation path instead of the transport.
  */
 
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { prepareRelayData } from "./prepareRelayData.js";
-
-vi.mock("../routes.js", async () => {
-  const { route } = await import("@canonical/router-core");
-  const { ROUTE_QUERY_META_KEY } = await import("#relay");
-  const { componentProbeVariables } = await import("#domains/playground");
-  const { default: componentProbeQueryNode } = await import(
-    "#relay/__generated__/ComponentProbeQuery.graphql.js"
-  );
-  return {
-    appRoutes: {
-      home: route({ url: "/", content: () => null }),
-      playground: route({
-        url: "/playground",
-        content: () => null,
-        meta: {
-          [ROUTE_QUERY_META_KEY]: {
-            query: componentProbeQueryNode,
-            variables: () => componentProbeVariables(),
-          },
-        },
-      }),
-    },
-    middleware: [],
-    notFoundRoute: route({ url: "/not-found", content: () => null }),
-  };
-});
+import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#addons/journeys";
+import { CATALOG_PAGE_SIZE, RELATION_PAGE_SIZE } from "#domains/components";
+import { STANDARDS_PAGE_SIZE } from "#domains/lenses/standards";
+import {
+  LOBBY_COMPONENT_CLASS,
+  LOBBY_EXEMPLAR_COUNT,
+  LOBBY_PATTERN_CLASS,
+  LOBBY_STANDARD_CLASS,
+} from "#domains/marketing";
+import {
+  RELATION_PAGE_SIZE as PROBE_RELATION_PAGE_SIZE,
+  PROBE_URI,
+} from "#domains/playground";
+import { GRAPH_BINDINGS } from "#lib/graphBindings";
+import {
+  createEnvironment,
+  getPrefetchEnvironment,
+  setPrefetchEnvironment,
+} from "#relay";
+import prepareRelayData from "./prepareRelayData.js";
 
 /** One captured request: what the prepare step actually put on the wire. */
 interface CapturedRequest {
@@ -72,6 +68,33 @@ interface CapturedRequest {
   readonly headers: Record<string, string | string[] | undefined>;
   readonly body: Record<string, unknown>;
 }
+
+/** The standards exemplar: an absolute IRI, percent-encoded in its URL. */
+const STANDARD_URI =
+  "http://pragma.canonical.com/codestandards#code.array.safe_access";
+
+/** The root-field key a term-bearing definitions operation writes. */
+const UIBLOCK_CLASS_KEY = 'ontologyClass(uri:"ds:UIBlock")';
+
+/**
+ * The stub's answers, by operation name. Operations without an answer get
+ * a GraphQL error: the request is recorded, which is all those cases
+ * assert, and the prepare step logs the failure.
+ */
+const STUB_RESPONSES: Readonly<Record<string, unknown>> = {
+  ComponentProbeQuery: {
+    data: {
+      component: {
+        id: "ds:global.component.button",
+        uri: "ds:global.component.button",
+        name: "Button",
+      },
+    },
+  },
+  DefinitionsExplorerQuery: {
+    data: { ontologies: [], ontologyClass: null, ontologyProperty: null },
+  },
+};
 
 const captured: CapturedRequest[] = [];
 let server: Server;
@@ -94,6 +117,10 @@ const reserveClosedPort = (): Promise<number> =>
     });
   });
 
+/** The `client:root` record of a prepared snapshot. */
+const readRoot = (records: RecordMap | undefined) =>
+  records?.["client:root"] ?? {};
+
 beforeAll(async () => {
   deadGraphqlUrl = `http://127.0.0.1:${await reserveClosedPort()}/graphql`;
   await new Promise<void>((resolve) => {
@@ -101,26 +128,23 @@ beforeAll(async () => {
       const chunks: Buffer[] = [];
       req.on("data", (chunk: Buffer) => chunks.push(chunk));
       req.on("end", () => {
+        const body = JSON.parse(Buffer.concat(chunks).toString()) as Record<
+          string,
+          unknown
+        >;
         captured.push({
           method: req.method ?? "",
           url: req.url ?? "",
           headers: req.headers,
-          body: JSON.parse(Buffer.concat(chunks).toString()) as Record<
-            string,
-            unknown
-          >,
+          body,
         });
         res.writeHead(200, { "content-type": "application/json" });
         res.end(
-          JSON.stringify({
-            data: {
-              component: {
-                id: "ds:global.component.button",
-                uri: "ds:global.component.button",
-                name: "Button",
-              },
+          JSON.stringify(
+            STUB_RESPONSES[String(body.operationName)] ?? {
+              errors: [{ message: "stub: request recorded, not answered" }],
             },
-          }),
+          ),
         );
       });
     });
@@ -132,6 +156,14 @@ beforeAll(async () => {
       resolve();
     });
   });
+});
+
+beforeEach(() => {
+  captured.length = 0;
+});
+
+afterEach(() => {
+  setPrefetchEnvironment(undefined);
 });
 
 afterAll(
@@ -156,8 +188,8 @@ describe("prepareRelayData over HTTP", () => {
     expect(typeof request.body.query).toBe("string");
     expect(request.body.query).toContain("query ComponentProbeQuery");
     expect(request.body.variables).toEqual({
-      uri: "ds:global.component.button",
-      count: 12,
+      uri: PROBE_URI,
+      count: PROBE_RELATION_PAGE_SIZE,
     });
 
     // …and marked as server-side traffic, which is what lets the graph
@@ -170,6 +202,167 @@ describe("prepareRelayData over HTTP", () => {
     // The response was deserialised into the store and handed back.
     expect(prepared).toBeDefined();
     expect(JSON.stringify(prepared?.records)).toContain("Button");
+  });
+
+  // Every data-bearing URL the app serves, with the operation its route's
+  // `warm` sends and the variables its domain builds from the URL,
+  // percent-decoding included.
+  const urlCases: ReadonlyArray<{
+    readonly url: string;
+    readonly operationName: string;
+    readonly variables: Readonly<Record<string, unknown>>;
+  }> = [
+    {
+      url: "/playground",
+      operationName: "ComponentProbeQuery",
+      variables: { uri: PROBE_URI, count: PROBE_RELATION_PAGE_SIZE },
+    },
+    {
+      url: "/components",
+      operationName: "ComponentsCatalogQuery",
+      variables: { count: CATALOG_PAGE_SIZE, cursor: null },
+    },
+    {
+      url: "/components/ds%3Aglobal.component.button",
+      operationName: "ComponentEntityQuery",
+      variables: {
+        uri: "ds:global.component.button",
+        count: RELATION_PAGE_SIZE,
+      },
+    },
+    {
+      url: "/definitions",
+      operationName: "DefinitionsExplorerQuery",
+      variables: { uri: "", hasTerm: false },
+    },
+    {
+      url: "/definitions/ds%3AUIBlock",
+      operationName: "DefinitionsExplorerQuery",
+      variables: { uri: "ds:UIBlock", hasTerm: true },
+    },
+    {
+      url: "/standards",
+      operationName: "StandardsIndexQuery",
+      variables: {
+        classUri: GRAPH_BINDINGS.standards.classUri,
+        count: STANDARDS_PAGE_SIZE,
+        cursor: null,
+      },
+    },
+    {
+      url: `/standards/${encodeURIComponent(STANDARD_URI)}`,
+      operationName: "StandardEntityQuery",
+      variables: {
+        uri: STANDARD_URI,
+        classUri: GRAPH_BINDINGS.standards.classUri,
+      },
+    },
+    {
+      url: "/journeys",
+      operationName: "JourneysExplorerQuery",
+      variables: {
+        jobs: JOB_PAGE_SIZE,
+        pairings: PAIRING_PAGE_SIZE,
+        uri: "",
+        hasJob: false,
+      },
+    },
+    {
+      url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3",
+      operationName: "JourneysExplorerQuery",
+      variables: {
+        jobs: JOB_PAGE_SIZE,
+        pairings: PAIRING_PAGE_SIZE,
+        uri: "sem://design-system-docs#job.l3",
+        hasJob: true,
+      },
+    },
+    {
+      url: "/",
+      operationName: "LobbyQuery",
+      variables: {
+        componentClass: LOBBY_COMPONENT_CLASS,
+        patternClass: LOBBY_PATTERN_CLASS,
+        standardClass: LOBBY_STANDARD_CLASS,
+        exemplars: LOBBY_EXEMPLAR_COUNT,
+      },
+    },
+  ];
+  for (const { url, operationName, variables } of urlCases) {
+    it(`sends one ${operationName} with the URL's variables for ${url}`, async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      try {
+        await prepareRelayData(url, graphqlUrl);
+      } finally {
+        consoleError.mockRestore();
+      }
+
+      expect(captured).toHaveLength(1);
+      const request = captured.at(0) as CapturedRequest;
+      expect(request.body.operationName).toBe(operationName);
+      expect(request.body.variables).toEqual(variables);
+    });
+  }
+
+  it("keeps two prepares in flight at once apart", async () => {
+    const [termless, term] = await Promise.all([
+      prepareRelayData("/definitions", graphqlUrl),
+      prepareRelayData("/definitions/ds%3AUIBlock", graphqlUrl),
+    ]);
+
+    // One request each: the second request's static router, built while
+    // the first prepare awaits, found no environment to warm into.
+    expect(captured).toHaveLength(2);
+    // Each snapshot holds its own operation's root fields and nothing of
+    // the other's.
+    expect(readRoot(term?.records)).toHaveProperty([UIBLOCK_CLASS_KEY]);
+    expect(readRoot(termless?.records)).toHaveProperty(["ontologies"]);
+    expect(readRoot(termless?.records)).not.toHaveProperty([UIBLOCK_CLASS_KEY]);
+  });
+
+  it("leaves no prefetch environment published after a prepare", async () => {
+    await prepareRelayData("/playground", graphqlUrl);
+    expect(getPrefetchEnvironment()).toBeUndefined();
+  });
+
+  it("leaves no prefetch environment published after a failed prepare", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    try {
+      const prepared = await prepareRelayData("/playground", deadGraphqlUrl);
+      expect(prepared).toBeUndefined();
+    } finally {
+      consoleError.mockRestore();
+    }
+    expect(getPrefetchEnvironment()).toBeUndefined();
+  });
+
+  it("refuses to warm into an environment that is already published", async () => {
+    // On the server the slot is empty outside the prepare step's own warm
+    // call, so a published one means two requests would share a store.
+    const foreign = createEnvironment({ graphqlUrl });
+    setPrefetchEnvironment(foreign);
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    try {
+      const prepared = await prepareRelayData("/playground", graphqlUrl);
+      expect(prepared).toBeUndefined();
+      expect(consoleError.mock.calls).toContainEqual([
+        expect.stringContaining("relay prepare failed for /playground"),
+        expect.objectContaining({
+          message: expect.stringContaining("already published"),
+        }),
+      ]);
+    } finally {
+      consoleError.mockRestore();
+    }
+    // The foreign environment is left as it was, and nothing was sent.
+    expect(getPrefetchEnvironment()).toBe(foreign);
+    expect(captured).toHaveLength(0);
   });
 
   it("degrades to no records (logged) when the graph is unreachable", async () => {

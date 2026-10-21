@@ -1,45 +1,14 @@
-/**
- * The server-side data prepare step: match the URL, execute the matched
- * route's query to completion against the graph server, and serialise the
- * resulting Relay store for hydration.
- *
- * One function, integrated into ALL FOUR server bricks — the two dev servers
- * (`server.bun.ts`, `server.express.ts`) and, since the PRD-3 process split,
- * the two preview bricks by way of the compiled `renderer.tsx`. The preview
- * bricks could not have it before because the backend was in-process and
- * bundling an Oxigraph WASM store into `dist/server` was an unverified spike.
- * The graph is a separate process now, so the prepare step is just an HTTP
- * client and every brick can have one.
- *
- * ## No incremental drain here any more
- *
- * The previous in-process adapter had to drain ke-graphql's incremental
- * results itself (`isIncrementalResults` / `mergeIncremental`) because it
- * called the executor directly. Over HTTP that is the SERVER's job, and
- * ke-graphql already does it: `createGraphQLHandler` merges incremental
- * results into one complete JSON response whenever the request does not
- * accept `multipart/mixed` — see
- * `node_modules/.../ke-graphql/src/http/createGraphQLHandler.ts:392-400`.
- * Its `accepts` helper (`:133-143`) requires an EXACT media-type match, and
- * the wildcard `Accept` header relay-runtime's fetch sends selects no
- * media type exactly — so the drain always fires for us.
- *
- * The route→query map still lives in THIS (native) module registry: the dev
- * bricks load `EntryServer` and the rest of the render world via
- * `ssrLoadModule`, so the deliberate double-match (one here for data, one in
- * `EntryServer` for render) crosses a registry boundary carrying only plain
- * data — see `routeQueries.ts`.
- */
-
-import { fetchQuery, type OperationType } from "relay-runtime";
+import type { AnyRoute } from "@canonical/router-core";
+import type { Environment } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { createEnvironment } from "#relay";
-import { matchRouteQuery } from "./routeQueries.js";
-
-/** The serialised store snapshot for `initialData.relay`. */
-export interface PreparedRelayData {
-  readonly records: RecordMap;
-}
+import { createStaticRouter } from "#lib/router";
+import {
+  createEnvironment,
+  getPrefetchEnvironment,
+  setPrefetchEnvironment,
+} from "#relay";
+import { appRoutes, middleware, notFoundRoute } from "../routes.js";
+import type { PreparedRelayData } from "./types.js";
 
 /**
  * Marks the outgoing request as this app's own server-side traffic. The graph
@@ -49,38 +18,121 @@ export interface PreparedRelayData {
 const SSR_HEADERS = { "x-pragma-ssr": "1" } as const;
 
 /**
- * Execute the matched route's query against `graphqlUrl` and serialise the
- * store. Returns `undefined` when the route maps to no query — and on any
- * failure (malformed route meta, unreachable graph, execution error),
- * logging it: the page then renders without server data and the client
- * fetches over HTTP, which is a degraded page rather than a 500.
+ * Call `warm` with `environment` published as the prefetch environment, and
+ * clear it again before returning.
  *
- * @note Impure — performs a network request to the graph server.
+ * The environment is published only for the synchronous duration of the
+ * call. A route's `warm` reads it synchronously when called (see
+ * `prefetchQuery`), so the fetch it starts is already bound to
+ * `environment` by the time the slot is cleared. Clearing before the caller
+ * awaits is what keeps concurrent requests apart: the slot is one
+ * module-level value, and a second request's static router runs its own
+ * route's `warm` while it is being built, so a slot left published across
+ * an await would hand that second request this request's environment.
+ *
+ * @param environment - The per-request environment to warm.
+ * @param warm - Calls the matched route's `warm`.
+ * @returns The `warm` call's result, as a promise.
+ * @throws When an environment is already published: on the server the slot
+ *   is empty everywhere outside this function, so a published one means two
+ *   requests would share a store.
+ * @note Impure: writes the module-level prefetch environment, and the
+ *   `warm` it calls performs network requests.
  */
-export const prepareRelayData = async (
+const warmInEnvironment = (
+  environment: Environment,
+  warm: () => void | Promise<void>,
+): Promise<void> => {
+  if (getPrefetchEnvironment() !== undefined) {
+    throw new Error(
+      "a prefetch environment is already published; the server publishes " +
+        "one only while a route's warm runs",
+    );
+  }
+  setPrefetchEnvironment(environment);
+  try {
+    return Promise.resolve(warm());
+  } finally {
+    setPrefetchEnvironment(undefined);
+  }
+};
+
+/**
+ * The server-side data prepare step: match `url`, await the matched route's
+ * `warm` against a per-request environment that talks to `graphqlUrl`, and
+ * serialise that environment's store for hydration.
+ *
+ * The order is: match; create the environment; publish it, call the route's
+ * `warm` and clear it again, all synchronously (`warmInEnvironment`); await
+ * the `warm`; serialise. The environment is cleared BEFORE the await rather
+ * than after the serialise because the prefetch slot is one module-level
+ * value shared by every request in this process: left published across the
+ * await, it would receive the `warm` of any request whose static router is
+ * built meanwhile, costing an extra fetch and leaking that page's records
+ * into this one's snapshot. The static routers `resolveRouteStatus` and
+ * `EntryServer` build later run their `warm` with the slot empty, so the
+ * page costs exactly one graph request.
+ *
+ * The dev servers import this module, and the app's routes with it,
+ * natively, while `EntryServer` loads through Vite's `ssrLoadModule` in a
+ * separate module registry: the data pass must run to completion before
+ * the render pass starts, and the render pass is what lives behind
+ * `ssrLoadModule`. Each registry matches the URL on its own, and only plain
+ * data (the serialised records) crosses between them. The preview bundle
+ * shares one registry, where `EntryServer` builds its static router after
+ * this step has cleared the slot.
+ *
+ * Only the route's own `warm` is awaited. The router runs every wrapper's
+ * `warm` on each load as well; no wrapper in this app has one, and one
+ * added later would not contribute to the server-rendered store.
+ *
+ * Returns `undefined` for an unmatched URL, a redirect, the not-found page
+ * and a route with no `warm`, all without dialling the graph. It also
+ * returns `undefined` on any failure (an unreachable graph, an execution
+ * error, a `warm` that throws), logging it: the page then renders without
+ * server data, which is a degraded page rather than a 500. `entry.tsx`
+ * renders through a fetch function that always rejects, so a store this
+ * step left cold fails loudly in the page's error state rather than
+ * reaching the network during the render.
+ *
+ * The graph server drains incremental results itself. ke-graphql's HTTP
+ * handler merges `@defer`/`@stream` payloads into one complete JSON
+ * response whenever the request does not accept `multipart/mixed` exactly,
+ * and relay-runtime's wildcard `Accept` header selects no media type
+ * exactly, so this step always receives one complete response.
+ *
+ * @param url - The request's path and query string.
+ * @param graphqlUrl - The graph server's GraphQL endpoint.
+ * @returns The serialised store, or `undefined` when there is none to send.
+ * @note Impure: publishes and clears the module-level prefetch environment
+ *   and performs network requests to the graph server.
+ */
+export default async function prepareRelayData(
   url: string,
   graphqlUrl: string,
-): Promise<PreparedRelayData | undefined> => {
+): Promise<PreparedRelayData | undefined> {
   try {
-    // Matching happens INSIDE the try: the collector behind `matchRouteQuery`
-    // walks EVERY route's meta for every URL, so one malformed `ssrQuery`
-    // entry would otherwise escape the catch and turn all server renders
-    // into 500s instead of degrading to the no-server-data path below.
-    const matched = matchRouteQuery(url);
-    if (!matched) return undefined;
+    const match = createStaticRouter(appRoutes, url, {
+      middleware: [...middleware],
+      notFound: notFoundRoute,
+    }).match;
+    if (match?.kind !== "route") return undefined;
+    const route: AnyRoute = match.route;
+    const warm = route.warm;
+    if (warm === undefined) return undefined;
     // A dedicated per-request environment (never a shared one), so the
-    // serialised snapshot contains exactly this route's data (P-2 D9).
+    // serialised snapshot contains exactly this route's data.
     const environment = createEnvironment({
       graphqlUrl,
       headers: SSR_HEADERS,
     });
-    await fetchQuery<OperationType>(
-      environment,
-      matched.query,
-      matched.variables,
-    ).toPromise();
+    await warmInEnvironment(environment, () =>
+      warm(match.params, match.search, {
+        signal: new AbortController().signal,
+      }),
+    );
     // `RecordMap` isn't root-exported from relay-runtime (hence the deep
-    // import above) and `toJSON()` returns the untyped JSON shape — hence
+    // import above) and `toJSON()` returns the untyped JSON shape, hence
     // the cast back to the nominal type here.
     const records = environment.getStore().getSource().toJSON() as RecordMap;
     return { records };
@@ -91,4 +143,4 @@ export const prepareRelayData = async (
     );
     return undefined;
   }
-};
+}

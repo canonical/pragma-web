@@ -25,17 +25,16 @@
 // NOTE: this server must run with `--import ./src/server/nodeCssNoop.ts`
 // (after `--import tsx` — see the `dev:express` script). The reason is no
 // longer the graph backend: it is that the prepare step imports the app's
-// ROUTE modules natively (prepareRelayData → routeQueries → appRoutes →
-// pages), and that chain carries client CSS side-effect imports Node cannot
-// load. The .css no-op hook must register before this module's static
-// import graph loads.
+// ROUTE modules natively (prepareRelayData → appRoutes → pages), and that
+// chain carries client CSS side-effect imports Node cannot load. The .css
+// no-op hook must register before this module's static import graph loads.
 import fs from "node:fs";
 import * as process from "node:process";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import { resolveGraphqlUrl } from "#graphql-endpoint";
 import { getAuthRedirectHref } from "#lib/authGuard";
-import { prepareRelayData } from "./prepareRelayData.js";
+import prepareRelayData from "./prepareRelayData.js";
 import { resolveRouteStatus } from "./routeQueries.js";
 
 const PORT = Number(process.env.PORT) || 5174;

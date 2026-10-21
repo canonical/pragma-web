@@ -1,7 +1,7 @@
 // =============================================================================
 // SERVER — the node/bun execution domain.
 //
-// Only the four modules that export anything appear here. `graph.ts`,
+// Only the modules that export anything appear here. `graph.ts`,
 // `schema.ts`, `server.bun.ts`, `server.express.ts`, `preview.bun.ts`,
 // `preview.express.ts`, `withGraph.ts` and `nodeCssNoop.ts` export NOTHING:
 // they are process entry points and a bundler shim, executed rather than
@@ -11,8 +11,7 @@
 
 export type { InitialData } from "./entry.js";
 export { default as EntryServer } from "./entry.js";
-export type { PreparedRelayData } from "./prepareRelayData.js";
-export { prepareRelayData } from "./prepareRelayData.js";
+export { default as prepareRelayData } from "./prepareRelayData.js";
 export { default as createAppRenderer } from "./renderer.js";
 export type { ResolvedRouteQuery } from "./routeQueries.js";
 export {
@@ -20,3 +19,4 @@ export {
   matchRouteQuery,
   resolveRouteStatus,
 } from "./routeQueries.js";
+export type { PreparedRelayData } from "./types.js";
