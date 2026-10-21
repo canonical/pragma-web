@@ -54,6 +54,7 @@
   "dependencies": {
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-pragma-provider": "^0.44.1",
+    "@canonical/prism-projections": "^0.44.1",
     "@canonical/react-ds-global": "^0.44.1",
     "@canonical/react-head": "^0.44.1",
     "@canonical/react-hooks": "^0.44.1",

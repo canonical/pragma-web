@@ -35,7 +35,25 @@ export default defineConfig(({ mode }) => ({
   // backtick-quote a graphql file name in a comment. `codegen: false` because
   // artifacts are committed and regenerated explicitly via the `relay` /
   // `relay:watch` scripts.
-  plugins: [relay({ codegen: false }), react()],
+  //
+  // `relay.config.json` is a multi-project file rooted at the repository,
+  // because the compiler must also read the fragments of
+  // @canonical/prism-projections, which this app's queries spread. The
+  // plugin reads only a single-project file, so it is handed this app's
+  // source and artifact directories here. Its filter leaves out every file
+  // outside this app's `src`, the package's included: the package imports
+  // its own compiled artifacts and needs no rewrite.
+  plugins: [
+    relay({
+      codegen: false,
+      relayConfig: {
+        src: "./src",
+        artifactDirectory: "./src/relay/__generated__",
+        eagerEsModules: true,
+      },
+    }),
+    react(),
+  ],
   // Honour the PORT env var for `dev` (SPA) and `preview` so all server scripts
   // — including the SSR ones, which already read PORT — respond to it uniformly.
   server: { port: PORT },

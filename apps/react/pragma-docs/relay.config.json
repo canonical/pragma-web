@@ -1,17 +1,25 @@
 {
-  "src": "./src",
-  "schema": "./src/relay/schema.graphql",
-  "language": "typescript",
-  "eagerEsModules": true,
-  "artifactDirectory": "./src/relay/__generated__",
+  "root": "../../..",
+  "sources": {
+    "apps/react/pragma-docs/src": "pragma-docs",
+    "packages/prism/projections/src": "pragma-docs"
+  },
   "excludes": [
     "**/node_modules/**",
     "**/__generated__/**",
     "**/dist/**",
     "**/relay/extensions/**"
   ],
-  "schemaConfig": {
-    "nodeInterfaceIdField": "uri",
-    "nodeInterfaceIdVariableName": "id"
+  "projects": {
+    "pragma-docs": {
+      "schema": "apps/react/pragma-docs/src/relay/schema.graphql",
+      "language": "typescript",
+      "eagerEsModules": true,
+      "output": "apps/react/pragma-docs/src/relay/__generated__",
+      "schemaConfig": {
+        "nodeInterfaceIdField": "uri",
+        "nodeInterfaceIdVariableName": "id"
+      }
+    }
   }
 }
