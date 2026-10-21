@@ -1,0 +1,12 @@
+import pw from "/opt/node-tools/node_modules/playwright/index.js"; const { chromium } = pw;
+import { readFileSync, readdirSync, renameSync } from "node:fs"; import http from "node:http"; import path from "node:path";
+const ROOT = "/home/user/graph-atlas";
+const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+const srv = http.createServer((req, res) => { let body; const p = path.join(ROOT, decodeURIComponent(req.url.split("?")[0])); try { body = readFileSync(p); } catch { console.log("404", req.url); res.writeHead(404); res.end(); return; } res.writeHead(200, { "content-type": MIME[path.extname(p)] || "application/octet-stream" }); res.end(body); }).listen(8772);
+const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium", args: ["--use-gl=swiftshader", "--font-render-hinting=none"] });
+const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, colorScheme: "dark", recordVideo: { dir: "video", size: { width: 1920, height: 1080 } } });
+const page = await ctx.newPage(); const errs = []; page.on("pageerror", e => errs.push(e.message.slice(0, 200))); page.on("console", m => { if (m.type() === "error") errs.push(m.text().slice(0, 200)); });
+await page.goto("http://localhost:8772/trailer.html", { waitUntil: "load" }); await page.waitForSelector("body[data-ready]", { timeout: 15000 }); const tReady = Date.now(); console.log("ready");
+await page.waitForTimeout(42500);
+const video = page.video(); await ctx.close(); const p = await video.path(); renameSync(p, "video/trailer.webm");
+await browser.close(); srv.close(); console.log("recorded", "video/trailer.webm", errs);

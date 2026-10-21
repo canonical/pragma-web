@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "3d-force-graph": "1.73.4",
+    "d3": "7.9.0",
+    "d3-force": "3.0.0",
+    "d3-force-3d": "3.0.5",
+    "d3-sankey": "0.12.3",
+    "three": "0.128.0"
+  }
+}

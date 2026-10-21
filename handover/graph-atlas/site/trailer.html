@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<title>Pragma trailer</title>
+<link rel="preload" href="fonts/UbuntuSansMono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/UbuntuSans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="pragma.css">
+<style>
+  @font-face { font-family: "Ubuntu Sans"; src: url("fonts/UbuntuSans.woff2") format("woff2-variations"); font-weight: 100 800; font-stretch: 75% 100%; }
+  @font-face { font-family: "Ubuntu Sans Mono"; src: url("fonts/UbuntuSansMono.woff2") format("woff2-variations"); font-weight: 400 700; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #1d1d1d; color: #fff; font-family: "Ubuntu Sans", Ubuntu, sans-serif; }
+  .scene { position: absolute; inset: 0; opacity: 0; transition: opacity .8s ease; }
+  .scene.on { opacity: 1; }
+  .scene.off { opacity: 0; transition: opacity .6s ease; }
+  /* 1 terminal */
+  #s1 { display: grid; place-items: center; }
+  #s1 .term { width: 1400px; font: 34px/1.5 "Ubuntu Sans Mono", monospace; color: #e5e5e5; white-space: pre-wrap; }
+  #s1 .term .p { color: #8c8c8c; } #s1 .term .cur { display: inline-block; width: .6em; height: 1.1em; background: #e5e5e5; vertical-align: -.15em; animation: blink 1s steps(1) infinite; }
+  #s1 .term .out { color: #368bf6; } #s1 .term .cmt { color: #8c8c8c; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .tag { position: absolute; left: 80px; bottom: 70px; font-size: 44px; font-weight: 300; letter-spacing: -.01em; opacity: 0; transform: translateY(12px); transition: opacity .8s, transform .8s; }
+  .tag.on { opacity: 1; transform: none; } .tag b { font-weight: 600; }
+  /* 2 galaxy */
+  #s2 canvas { position: absolute; inset: 0; }
+  #s2 .leg { position: absolute; right: 80px; top: 70px; display: grid; gap: 10px; font-size: 26px; }
+  #s2 .leg div { display: flex; align-items: center; gap: 14px; opacity: 0; transform: translateX(20px); transition: opacity .6s, transform .6s; } #s2 .leg div.on { opacity: 1; transform: none; }
+  #s2 .leg i { width: 18px; height: 18px; border-radius: 50%; display: inline-block; } #s2 .leg span { color: #8c8c8c; }
+  #s2 .facts { position: absolute; left: 80px; top: 70px; font: 26px/1.5 "Ubuntu Sans Mono", monospace; color: #e5e5e5; }
+  #s2 .facts div { opacity: 0; transform: translateX(-16px); transition: opacity .5s, transform .5s; } #s2 .facts div.on { opacity: 1; transform: none; }
+  #s2 .facts .p { color: #8c8c8c; } #s2 .facts .o { color: #c463b1; }
+  /* 3 anatomy */
+  #s3 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 0 120px; gap: 60px; }
+  #s3 .stagebtn { position: relative; height: 420px; display: grid; place-items: center; }
+  #s3 .btnwrap { transform: scale(4.5); transform-origin: center; }
+  #s3 .btnwrap .ds.button { opacity: 0; transform: scale(.6); transition: opacity .6s, transform .7s cubic-bezier(.2,.8,.2,1); }
+  #s3 .btnwrap.on .ds.button { opacity: 1; transform: none; }
+  #s3 .btnwrap .icon { opacity: 0; transform: translateX(-30px); transition: opacity .5s, transform .6s; } #s3 .btnwrap.icon-on .icon { opacity: 1; transform: none; }
+  #s3 .btnwrap .label { opacity: 0; transition: opacity .5s; } #s3 .btnwrap.label-on .label { opacity: 1; }
+  #s3 .call { display: grid; gap: 22px; font-size: 28px; line-height: 1.35; }
+  #s3 .call div { opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .5s; border-left: 3px solid #c463b1; padding-left: 20px; } #s3 .call div.on { opacity: 1; transform: none; }
+  #s3 .call b { display: block; font-weight: 600; } #s3 .call code { font: 22px "Ubuntu Sans Mono", monospace; color: #8c8c8c; }
+  #s3 .pin { position: absolute; font: 22px "Ubuntu Sans Mono", monospace; color: #e5e5e5; background: #131313; border: 1px solid #555; padding: 6px 12px; opacity: 0; transform: translateY(-20px); transition: opacity .5s, transform .6s; } #s3 .pin.on { opacity: 1; transform: none; }
+  /* 4 board */
+  #s4 { perspective: 2400px; perspective-origin: 50% 30%; background: #131313; }
+  #s4 .board { position: absolute; left: 110px; top: 80px; width: 1700px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 36px; transform-style: preserve-3d; transform: rotateX(10deg) rotateY(-4deg) translateY(var(--pan, 0px)); transition: transform 9s linear; }
+  #s4 .frame { background: #1d1d1d; border: 1px solid #333; padding: 28px 32px; opacity: 0; transform: translateZ(900px) translateY(-60px); transition: opacity .7s, transform 1s cubic-bezier(.2,.8,.2,1); box-shadow: 0 30px 60px -20px rgba(0,0,0,.8); }
+  #s4 .frame.on { opacity: 1; transform: translateZ(calc(var(--depth) * 10px)); }
+  #s4 .frame .fbody, #s4 .frame .fbody * { all: revert-layer; }
+  #s4 .frame .fbody form { display: grid; gap: 12px; } #s4 .frame .fbody .actions, #s4 .frame .fbody .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  #s4 .frame .fbody .stack-v { display: grid; gap: 12px; } #s4 .frame .fbody .titlebar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  #s4 .frame .fbody .tiles-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; } #s4 .frame .fbody .cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  #s4 .frame .fbody .h2 { font-size: 24px; font-weight: 500; margin: 0; display: flex; gap: 8px; align-items: center; } #s4 .frame .fbody .h3 { font-size: 18px; font-weight: 500; margin: 0 0 12px; }
+  #s4 .frame .fbody .muted { color: #8c8c8c; } #s4 .frame .fbody p { margin: 0; } #s4 .frame .fbody .big { font-size: 28px; font-weight: 300; }
+  #s4 .frame .fbody dl.keys { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; margin: 0; } #s4 .frame .fbody dl.keys dt, #s4 .frame .fbody dl.keys dd { margin: 0; }
+  .end { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; background: rgba(19,19,19,.88); opacity: 0; pointer-events: none; transition: opacity 1.2s; }
+  .end.on { opacity: 1; }
+  .end .card { text-align: center; display: grid; gap: 18px; }
+  .end h1 { font-size: 96px; font-weight: 300; margin: 0; letter-spacing: -.02em; }
+  .end .nums { display: flex; gap: 48px; justify-content: center; font-size: 30px; color: #c3c2b7; }
+  .end .nums b { display: block; font-size: 56px; font-weight: 500; color: #fff; }
+  .end .url { font: 26px "Ubuntu Sans Mono", monospace; color: #8c8c8c; }
+  .bar { position: absolute; left: 0; bottom: 0; height: 6px; background: #c463b1; width: 0; transition: width .2s linear; }
+</style>
+</head>
+<body>
+<section class="scene on" id="s1"><div class="term" id="term"></div><div class="tag" id="tag1">One design system. <b>65,298 statements.</b></div></section>
+<section class="scene" id="s2"><canvas id="gal" width="1920" height="1080"></canvas>
+  <div class="leg"><div><i style="background:#368bf6"></i>design tokens <span>3,508</span></div><div><i style="background:#c463b1"></i>design system <span>552</span></div><div><i style="background:#e95420"></i>code standards <span>168</span></div><div><i style="background:#a9a9a9"></i>anatomy &amp; schema <span>396</span></div></div>
+  <div class="facts" id="facts"></div>
+  <div class="tag" id="tag2">Every component is a <b>node</b>. Every fact is an <b>edge</b>.</div>
+</section>
+<section class="scene" id="s3">
+  <div class="stagebtn"><div class="btnwrap" id="btnwrap"><button class="ds button primary"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="ds icon" aria-hidden="true">
+  <g>
+    <path d="M8.7499 1.15099V7.24999L14.8489 7.25099V8.75099H8.7489L8.7499 14.85H7.2499V8.74999H1.1499V7.24999H7.2499V1.14999L8.7499 1.15099Z" fill="currentColor"/>
+  </g>
+</svg></span><span class="label">Create instance</span></button></div><div class="pin" id="pin1" style="left:120px;top:60px">slot icon · 0..1</div><div class="pin" id="pin2" style="right:80px;top:60px">slot label · 1</div><div class="pin" id="pin3" style="left:260px;bottom:40px">29 style keys · 144 token bindings</div></div>
+  <div class="call" id="call"><div><b>ds:global.component.button</b><code>pragma block lookup Button</code></div><div><b>appearance.background</b><code>modifier.color.foreground.primary → color.foreground.primary</code></div><div><b>appearance.border.width</b><code>dimension.stroke.thickness.medium → 1px</code></div><div><b>typography.color</b><code>modifier.color.text → color.text</code></div><div><b>implemented by</b><code>@canonical/react-ds-global · Button.tsx</code></div></div>
+  <div class="tag" id="tag3">The spec, the tokens and the code are <b>one graph</b>.</div>
+</section>
+<section class="scene" id="s4"><div class="board app dark" id="board"></div></section>
+<div class="end" id="end"><div class="card"><h1>pragma</h1><div class="nums"><div><b>65,298</b>triples</div><div><b>325</b>blocks</div><div><b>745</b>tokens</div><div><b>94</b>implementations</div></div><div class="url">bunx @canonical/pragma-cli --help</div></div></div>
+<div class="bar" id="bar"></div>
+<script>
+(async () => {
+  try { await Promise.all([document.fonts.load('34px "Ubuntu Sans Mono"'), document.fonts.load('700 34px "Ubuntu Sans Mono"'), document.fonts.load('300 44px "Ubuntu Sans"'), document.fonts.load('600 44px "Ubuntu Sans"')]); await document.fonts.ready; } catch {}
+  const [L, comps] = await Promise.all([fetch("data/layout.json").then(r => r.json()), fetch("data/compositions.json").then(r => r.json())]);
+  document.body.dataset.ready = "1";
+  const T0 = performance.now(); const now = () => (performance.now() - T0) / 1000;
+  const at = (t, fn) => setTimeout(fn, Math.max(0, t * 1000 - (performance.now() - T0)));
+  const after = (t, fn) => setTimeout(fn, t * 1000);
+  const show = (id) => { document.querySelectorAll(".scene").forEach(s => { s.classList.toggle("on", s.id === id); s.classList.toggle("off", s.id !== id); }); };
+  const TOTAL = 40; (function bar() { document.getElementById("bar").style.width = (Math.min(1, now() / TOTAL) * 100) + "%"; if (now() < TOTAL) requestAnimationFrame(bar); })();
+  // ---- scene 1: terminal
+  const term = document.getElementById("term");
+  const type = (text, start, cps = 40) => new Promise(res => { let i = 0; const step = () => { i++; const html = term.dataset.html || ""; term.innerHTML = html + text.slice(0, i) + '<span class="cur"></span>'; if (i < text.length) setTimeout(step, 1000 / cps); else { term.dataset.html = html + text; res(); } }; setTimeout(step, start * 1000); });
+  const print = (html) => { term.dataset.html = (term.dataset.html || "") + html; term.innerHTML = term.dataset.html + '<span class="cur"></span>'; };
+  print('<span class="p">$ </span>'); await type('pragma graph query "SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o }"', 0.4, 48);
+  after(0.5, () => print('\n<span class="out">n\n65298</span>\n\n'));
+  after(1.3, () => print('<span class="p">$ </span>')); await type("pragma block lookup Button", 1.5, 40);
+  after(0.4, () => print('\n<span class="out">## Button</span>\n- Tier: ds:global\n<span class="cmt">Buttons trigger actions within an interface, typically involving data transformation or manipulation…</span>\n\n'));
+  after(1.4, () => document.getElementById("tag1").classList.add("on"));
+  // ---- scene 2: galaxy
+  const nodes = L.nodes.map((n, i) => ({ i, x: n[0], y: n[1], ns: n[2], cls: n[3], deg: n[4], label: n[5], iri: n[6] || "" }));
+  const isSchema = (n) => /owl#|shacl#|rdf-schema#/.test(n.cls) || n.ns === "other" || n.cls === "";
+  const kind = (n) => isSchema(n) ? "schema" : n.ns === "w3c" ? "dt" : n.ns === "anatomy" ? "schema" : n.ns;
+  const COL = { dt: "#368bf6", ds: "#c463b1", cs: "#e95420", schema: "#a9a9a9" };
+  for (const n of nodes) n.k = kind(n);
+  const btnNode = nodes.find(n => n.iri === "global.component.button") || nodes.find(n => n.label === "Button");
+  const edges = L.links; const nb = []; for (const l of edges) { if (l[0] === btnNode.i) nb.push({ j: l[1], p: l[2], dir: "→" }); else if (l[1] === btnNode.i) nb.push({ j: l[0], p: l[2], dir: "←" }); }
+  const cv = document.getElementById("gal"), ctx = cv.getContext("2d");
+  const order = ["dt", "ds", "cs", "schema"]; let reveal = { dt: 0, ds: 0, cs: 0, schema: 0 }; let zoom = { k: 0.52, x: 1000, y: 560 }; let edgeProg = 0, ring = 0;
+  const r = (n) => 1.4 + Math.sqrt(n.deg) * 0.5;
+  function draw() { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = "#1d1d1d"; ctx.fillRect(0, 0, 1920, 1080); ctx.translate(zoom.x, zoom.y); ctx.scale(zoom.k, zoom.k);
+    ctx.lineWidth = 0.6 / zoom.k; ctx.globalAlpha = .22; for (const k of order) { if (!reveal[k]) continue; ctx.strokeStyle = COL[k]; ctx.beginPath(); for (const l of edges) { const a = nodes[l[0]], b = nodes[l[1]]; if (a.k !== k) continue; if (Math.random() > reveal[k]) continue; ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); } ctx.stroke(); }
+    ctx.globalAlpha = 1; for (const k of order) { if (!reveal[k]) continue; ctx.fillStyle = COL[k]; ctx.beginPath(); for (const n of nodes) { if (n.k !== k) continue; if (((n.i * 7919) % 1000) / 1000 > reveal[k]) continue; ctx.moveTo(n.x + r(n), n.y); ctx.arc(n.x, n.y, r(n), 0, 6.283); } ctx.fill(); }
+    if (edgeProg > 0) { ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.6 / zoom.k; ctx.globalAlpha = .9; ctx.beginPath(); for (const e of nb) { const b = nodes[e.j]; ctx.moveTo(btnNode.x, btnNode.y); ctx.lineTo(btnNode.x + (b.x - btnNode.x) * edgeProg, btnNode.y + (b.y - btnNode.y) * edgeProg); } ctx.stroke(); ctx.fillStyle = "#fff"; for (const e of nb) { const b = nodes[e.j]; ctx.beginPath(); ctx.arc(b.x, b.y, r(b) + 1.5 / zoom.k, 0, 6.283); ctx.fill(); } }
+    if (ring > 0) { ctx.strokeStyle = "#fff"; ctx.lineWidth = 2.5 / zoom.k; ctx.globalAlpha = 1; ctx.beginPath(); ctx.arc(btnNode.x, btnNode.y, (6 + 10 * ring) / zoom.k, 0, 6.283); ctx.stroke(); ctx.font = `${16 / zoom.k}px Ubuntu Sans, sans-serif`; ctx.fillStyle = "#fff"; ctx.fillText("Button", btnNode.x + 14 / zoom.k, btnNode.y - 8 / zoom.k); }
+    ctx.globalAlpha = 1; }
+  let galOn = false; (function loop() { if (galOn) draw(); requestAnimationFrame(loop); })();
+  const tween = (ms, fn) => new Promise(res => { const s = performance.now(); (function f() { const p = Math.min(1, (performance.now() - s) / ms); fn(p < .5 ? 2 * p * p : -1 + (4 - 2 * p) * p); if (p < 1) requestAnimationFrame(f); else res(); })(); });
+  at(7.5, async () => { show("s2"); galOn = true; const leg = document.querySelectorAll("#s2 .leg div");
+    for (let k = 0; k < order.length; k++) { leg[k].classList.add("on"); await tween(900, p => reveal[order[k]] = p); }
+    document.getElementById("tag2").classList.add("on");
+    await new Promise(r => setTimeout(r, 900));
+    const k0 = zoom.k; const kx = 2.6; await tween(2600, p => { zoom.k = k0 + (kx - k0) * p; zoom.x = 960 + (960 - btnNode.x * zoom.k - 960) * p; zoom.y = 540 + (540 - btnNode.y * zoom.k - 540) * p; });
+    zoom.x = 960 - btnNode.x * zoom.k; zoom.y = 540 - btnNode.y * zoom.k;
+    await tween(500, p => ring = p); await tween(900, p => edgeProg = p);
+    const facts = document.getElementById("facts"); const rows = nb.slice(0, 9).map(e => `<div><span class="p">${e.dir === "→" ? e.p : e.p + " ⁻¹"}</span> <span class="o">${nodes[e.j].label}</span></div>`); facts.innerHTML = rows.join(""); const fd = facts.querySelectorAll("div"); fd.forEach((d, i) => setTimeout(() => d.classList.add("on"), i * 180)); });
+  // ---- scene 3: anatomy
+  at(19.5, () => { show("s3"); galOn = false; const w = document.getElementById("btnwrap"); setTimeout(() => w.classList.add("on"), 300); setTimeout(() => { w.classList.add("icon-on"); document.getElementById("pin1").classList.add("on"); }, 1300); setTimeout(() => { w.classList.add("label-on"); document.getElementById("pin2").classList.add("on"); }, 2100); setTimeout(() => document.getElementById("pin3").classList.add("on"), 2900);
+    document.querySelectorAll("#call div").forEach((d, i) => setTimeout(() => d.classList.add("on"), 900 + i * 700)); setTimeout(() => document.getElementById("tag3").classList.add("on"), 5200); });
+  // ---- scene 4: board
+  const pick = ["page-header", "sign-in", "create-form", "status-tiles", "activity", "release-cards", "settings", "feedback", "shortcuts", "empty"];
+  const board = document.getElementById("board");
+  board.innerHTML = pick.map(k => comps.find(c => c.key === k)).filter(Boolean).map((c, i) => `<div class="frame" style="grid-column: span ${c.size >= 4 ? 2 : 1}"><div class="fbody">${c.html}</div></div>`).join("");
+  for (const f of board.querySelectorAll(".frame")) { let max = 0; (function walk(el, d) { for (const ch of el.children) { if (d > max) max = d; walk(ch, d + 1); } })(f, 1); f.style.setProperty("--depth", max); }
+  at(27, () => { show("s4"); const fr = board.querySelectorAll(".frame"); fr.forEach((f, i) => setTimeout(() => f.classList.add("on"), 300 + i * 420)); setTimeout(() => board.style.setProperty("--pan", "-760px"), 1500); setTimeout(() => document.getElementById("end").classList.add("on"), 10500); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Tiers &amp; blocks · Pragma Graph Atlas</title>
+<style>
+  svg .tier-node text { font-size: 12px; }
+  svg .tier-node .cnt { fill: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  svg .tier-link { fill: none; stroke: var(--color-border-disabled); stroke-width: 1.5; }
+  .matrix { border-collapse: collapse; font-size: .875rem; width: 100%; }
+  .matrix th, .matrix td { padding: 0; border: 2px solid var(--color-background); }
+  .matrix th { font-weight: 400; text-align: left; padding: .25rem .5rem; color: var(--color-text); white-space: nowrap; }
+  .matrix thead th { color: var(--color-text-muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .03em; padding-bottom: .5rem; }
+  .matrix td { text-align: center; min-width: 3.5rem; height: 2rem; font-variant-numeric: tabular-nums; }
+  .matrix td.z { color: var(--color-text-disabled); }
+  .matrix td.t { font-weight: 600; background: var(--color-background-layer2); }
+  .matrix tr.total th { font-weight: 600; }
+  .roster { display: grid; gap: var(--dimension-200); }
+  .roster .tier { display: grid; grid-template-columns: 11rem 1fr; gap: var(--dimension-200); align-items: start; }
+  .roster .tier h3 { font-size: .875rem; } .roster .tier .sub { font-size: .75rem; color: var(--color-text-muted); }
+  .roster .chips { display: flex; flex-wrap: wrap; gap: .25rem .375rem; }
+  .roster .chip { border-left: 3px solid var(--c); }
+  @media (max-width: 40rem) { .roster .tier { grid-template-columns: 1fr; } }
+  .dots { border-collapse: collapse; font-size: .75rem; }
+  .dots th { font-weight: 400; text-align: left; padding: .125rem .75rem .125rem 0; white-space: nowrap; }
+  .dots thead th { writing-mode: vertical-rl; transform: rotate(180deg); text-align: left; padding: 0 .125rem; color: var(--color-text-muted); height: 9rem; vertical-align: bottom; }
+  .dots td { width: 1.25rem; height: 1.25rem; text-align: center; border: 1px solid var(--color-border-disabled); }
+  .dots td span { display: inline-block; width: .625rem; height: .625rem; border-radius: 50%; }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">03 / 16 · tiers and blocks</div>
+    <h1>313 blocks, 16 tiers, one chain of inheritance</h1>
+    <p class="lede">A block is one reusable piece of interface at one of four grains: component, subcomponent, pattern or layout. Every block belongs to a tier, and tiers form a hierarchy: a product tier such as <code>apps_lxd</code> inherits the blocks of <code>apps</code>, which inherits those of <code>global</code>. Reads in <code>pragma</code> are scoped by that chain.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>The inheritance chain</h2><p class="small muted">Tier IRIs encode their parent (<code>apps_lxd</code> sits under <code>apps</code>); the four top-level product families sit under <code>global</code>. The bar beside each tier is its own block count; a product tier sees its own blocks plus everything above it.</p></header>
+    <figure><div class="chart" id="tree"></div><figcaption>Sixteen tiers. <code>stores</code> declares no blocks yet, <code>apps_notary</code> and <code>apps_juju</code> almost none; <code>apps_launchpad</code> and <code>apps_landscape</code> are the two product tiers with a substantial vocabulary of their own.</figcaption></figure>
+  </section>
+
+  <section class="block" id="apps">
+    <header><h2>The apps tier, up close</h2><p class="small muted" id="appsLede"></p></header>
+    <div class="stats" id="appsStats"></div>
+    <div class="two">
+      <figure><div id="appsAddsLegend"></div><div class="chart" id="appsAdds"></div><figcaption>What each product tier adds on top of what it inherits, by grain. Launchpad and Landscape are the two product tiers with a vocabulary of their own; Notary adds nothing yet.</figcaption></figure>
+      <figure><div class="chart" id="appsScope"></div><figcaption>Blocks in scope for a read scoped to each product tier: the global and apps blocks it inherits plus its own. This is what <code>pragma block list --tier &lt;name&gt;</code> answers with.</figcaption></figure>
+    </div>
+    <div class="two">
+      <div><h3>The blocks the apps tier owns</h3><p class="small muted" style="margin:.25rem 0 .75rem">Click a row for its summary, properties and the pragma command that reads it.</p><div id="appsRoster"></div></div>
+      <div><h3>Product tiers that re-declare a shared name</h3><p class="small muted" style="margin:.25rem 0 .75rem">A product tier that documents a block under a name global or apps already carries: a specialisation, or a block documented before it was upstreamed.</p><div id="appsShadow"></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <header><h2>Tier by grain</h2><p class="small muted">The same 313 blocks (plus 9 groups, 2 views and 1 variant, counted under "other") as a matrix. Cell shade follows the count.</p></header>
+    <div class="scroll-x" id="matrix"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Names that live in more than one tier</h2><p class="small muted"><span id="sharedCount">Some</span> block names are carried by two or three tiers at once, which is why <code>pragma block lookup button</code> answers with the one in scope. A product tier's copy is a specialisation of the global one, or a block that has not yet been upstreamed.</p></header>
+    <div class="scroll-x" id="shared"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Documentation stage, per tier</h2><p class="small muted">220 blocks carry a documentation-stage tag. The triage vocabulary comes from the <code>ds:Tag</code> nodes; the remaining 105 blocks carry no stage.</p></header>
+    <div id="stageLegend"></div>
+    <figure><div class="chart" id="stages"></div><figcaption>Stacked by stage, in the fixed order of the legend. Hover a segment for the count.</figcaption></figure>
+  </section>
+
+  <section class="block">
+    <header><h2>The roster</h2><p class="small muted">Every block by tier, as text. The left border carries the grain. Top-level tiers first, product tiers after. Click a block for its details.</p></header>
+    <div id="grainLegend"></div>
+    <div class="roster" id="roster"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Around the blocks</h2><p class="small muted">Three smaller populations the design-system pack carries beside the blocks.</p></header>
+    <div class="two">
+      <figure><div class="chart" id="propTypes"></div><figcaption>727 block properties by declared type (top twelve types). <code>text</code> and <code>boolean</code> make up 43%.</figcaption></figure>
+      <figure><div class="chart" id="changelog"></div><figcaption>43 change-log entries by month, 2026. Each is a dated note on a block ("renamed from ViewContentLayout", "Added to React Components").</figcaption></figure>
+    </div>
+    <div class="two">
+      <div><h3>Eleven modifier families</h3><div id="modifiers"></div></div>
+      <div><h3>Thirteen concepts</h3><div id="concepts"></div></div>
+    </div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("tiers.html");
+  const [b, anat] = await A.load("blocks", "anatomies");
+  const anatBy = new Map(anat.map(a => [a.b, a]));
+  const grainOf = (c) => A.local(c).toLowerCase();
+  const GRAINS = [["component", 1], ["subcomponent", 2], ["pattern", 3], ["layout", 4], ["other", null]];
+  const gcolor = (g) => { const f = GRAINS.find(x => x[0] === g); return f && f[1] ? A.series(f[1]) : "var(--series-other)"; };
+  const blocks = b.blocks.map(x => ({ ...x, grain: ["component", "subcomponent", "pattern", "layout"].includes(grainOf(x.class)) ? grainOf(x.class) : "other", tierName: A.local(x.tier || ""), stage: x.stage ? A.local(x.stage).replace("tag.", "") : null }));
+  const tierNames = b.tiers.map(t => A.local(t.t)).sort();
+  const parentOf = (t) => t === "global" ? null : t.includes("_") ? t.split("_")[0] : "global";
+  const countBy = d3.rollup(blocks, v => v.length, d => d.tierName);
+  const topLevel = ["global", "apps", "sites", "stores", "documentation"];
+  const real = blocks.filter(d => d.grain !== "other");
+  document.getElementById("stats").innerHTML = [
+    ["Blocks", A.fmt(real.length), "components, subcomponents, patterns, layouts"],
+    ["In the five top-level tiers", A.fmt(real.filter(d => topLevel.includes(d.tierName)).length), "what `pragma block list` shows by default"],
+    ["In product tiers", A.fmt(real.filter(d => !topLevel.includes(d.tierName)).length), "visible with --tier <name> or --tier all"],
+    ["With a written anatomy", A.fmt(anat.filter(a => a.nodes || a.error).length), `of ${anat.length} anatomy properties; the other ${anat.filter(a => a.empty).length} are still empty strings`],
+    ["Properties", A.fmt(b.props.length), "declared across the blocks"],
+    ["Subcomponent links", A.fmt(b.blockLinks.filter(l => l.p.endsWith("hasSubcomponent")).length), "parent → part edges"],
+  ].map(([l, v, n]) => `<div class="stat"><span class="label">${l}</span><span class="value">${v}</span><span class="note">${n}</span></div>`).join("");
+
+  // --- details panel for a block
+  const propsBy = d3.group(b.props, p => p.b), subsBy = d3.group(b.blockLinks.filter(l => l.p.endsWith("hasSubcomponent")), l => l.s);
+  const famName = new Map(b.modifiers.map(m => [m.fam, m.famName]));
+  function showBlock(x) { const ps = propsBy.get(x.b) || [], subs = subsBy.get(x.b) || [], an = anatBy.get(x.b);
+    const fams = (x.families || "").split("|").filter(Boolean).map(f => famName.get(f) || A.local(f));
+    const html = `<dl><dt>IRI</dt><dd><code>${A.esc(A.curie(x.b))}</code></dd><dt>Grain</dt><dd>${x.grain}</dd><dt>Tier</dt><dd>ds:${x.tierName}</dd>${x.stage ? `<dt>Stage</dt><dd>${A.esc(stageLabel[x.stage] || x.stage)}</dd>` : ""}<dt>Bindings</dt><dd>${x.bindings} token bindings</dd><dt>Implementations</dt><dd>${x.impls}</dd><dt>Anatomy</dt><dd>${an && an.nodes ? `${an.nodes} nodes, depth ${an.depth}, ${an.styleCount} style entries` : an && an.error ? "written but does not parse" : "empty"}</dd>${fams.length ? `<dt>Modifier families</dt><dd>${fams.join(", ")}</dd>` : ""}</dl>
+      ${x.summary ? `<h4>Summary</h4><div class="small">${A.esc(x.summary).slice(0, 900)}${x.summary.length > 900 ? "…" : ""}</div>` : ""}
+      ${ps.length ? `<h4>Properties (${ps.length})</h4><ul class="facts">${ps.map(p => `<li><span class="p">${A.esc(p.pname || "?")}</span><span class="o">${A.esc(p.ptype || "")}${p.optional === "true" ? " <span class='muted'>optional</span>" : ""}</span></li>`).join("")}</ul>` : ""}
+      ${subs.length ? `<h4>Subcomponents (${subs.length})</h4><ul class="facts">${subs.map(l => { const t = blocks.find(y => y.b === l.o); return `<li><span class="p">has</span><span class="o">${t ? `<a class="jump" data-b="${A.esc(t.b)}">${A.esc(t.name)}</a>` : A.esc(A.curie(l.o))}</span></li>`; }).join("")}</ul>` : ""}
+      ${A.cmd(`pragma block lookup "${x.name}" --tier ${x.tierName}\npragma graph inspect ${A.curie(x.b)}`)}`;
+    const panel = A.showPanel(x.name, `${x.grain} · ds:${x.tierName}`, html);
+    panel.querySelectorAll("a.jump").forEach(a => a.addEventListener("click", () => { const y = blocks.find(z => z.b === a.dataset.b); if (y) showBlock(y); }));
+  }
+  function showTier(t) { const list = blocks.filter(x => x.tierName === t); const chain = []; let c = t; while (c) { chain.unshift(c); c = parentOf(c); }
+    const html = `<dl><dt>IRI</dt><dd><code>ds:${A.esc(t)}</code></dd><dt>Inherits from</dt><dd>${chain.slice(0, -1).join(" › ") || "—"}</dd><dt>Own blocks</dt><dd>${list.length}</dd><dt>In scope</dt><dd>${d3.sum(chain, k => countBy.get(k) || 0)} blocks (${chain.map(k => `${k} ${countBy.get(k) || 0}`).join(" + ")})</dd></dl>
+      ${GRAINS.filter(([g]) => list.some(x => x.grain === g)).map(([g]) => `<h4>${g} (${list.filter(x => x.grain === g).length})</h4><ul class="facts">${list.filter(x => x.grain === g).sort((p, q) => d3.ascending(p.name, q.name)).map(x => `<li><span class="p">${x.stage ? A.esc(stageLabel[x.stage] || x.stage) : ""}</span><span class="o"><a class="jump" data-b="${A.esc(x.b)}">${A.esc(x.name)}</a></span></li>`).join("")}</ul>`).join("")}
+      ${A.cmd(`pragma tier lookup ${t}\npragma block list --tier ${t}`)}`;
+    const panel = A.showPanel(`ds:${t}`, "tier", html);
+    panel.querySelectorAll("a.jump").forEach(a => a.addEventListener("click", () => { const y = blocks.find(z => z.b === a.dataset.b); if (y) showBlock(y); }));
+  }
+  const stageLabel = { needsdefinition: "needs:definition", needstriage: "needs:triage", needsdocumentation: "needs:documentation", "specialadoption-docs": "special:adoption-docs", triagedbacklog: "triaged:backlog", triagedrejected: "triaged:rejected" };
+
+  // --- tree
+  const strat = d3.stratify().id(d => d).parentId(d => parentOf(d))(tierNames);
+  const root = d3.hierarchy(strat).sort((a, b) => (countBy.get(b.data.id) || 0) - (countBy.get(a.data.id) || 0));
+  const tree = d3.tree().nodeSize([24, 230])(root);
+  let minX = Infinity, maxX = -Infinity; root.each(d => { minX = Math.min(minX, d.x); maxX = Math.max(maxX, d.x); });
+  const W = 900, H = maxX - minX + 40;
+  const svg = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "Tier hierarchy");
+  const g = svg.append("g").attr("transform", `translate(20,${20 - minX})`);
+  g.selectAll("path").data(root.links()).join("path").attr("class", "tier-link").attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+  const maxN = d3.max(tierNames, t => countBy.get(t) || 0), bar = d3.scaleLinear().domain([0, maxN]).range([0, 110]);
+  const n = g.selectAll("g.tier-node").data(root.descendants()).join("g").attr("class", "tier-node").attr("transform", d => `translate(${d.y},${d.x})`);
+  n.append("circle").attr("r", 4).attr("fill", "var(--color-text)");
+  n.append("text").attr("x", 9).attr("y", 4).text(d => d.data.id);
+  n.append("rect").attr("x", d => 9 + d.data.id.length * 7.2 + 8).attr("y", -6).attr("height", 12).attr("width", d => bar(countBy.get(d.data.id) || 0)).attr("fill", "var(--series-1)");
+  n.append("text").attr("class", "cnt").attr("x", d => 9 + d.data.id.length * 7.2 + 12 + bar(countBy.get(d.data.id) || 0)).attr("y", 4).attr("font-size", 11).text(d => A.fmt(countBy.get(d.data.id) || 0));
+  n.style("cursor", "pointer").on("click", (ev, d) => showTier(d.data.id)).on("pointermove", (ev, d) => { const list = blocks.filter(x => x.tierName === d.data.id); const chain = []; let t = d.data.id; while (t) { chain.unshift(t); t = parentOf(t); } A.tip(`<b>ds:${d.data.id}</b><br>${list.length} own blocks: ${GRAINS.map(([gr]) => `${list.filter(x => x.grain === gr).length} ${gr}`).join(", ")}<br>in scope: ${chain.join(" › ")} = ${d3.sum(chain, c => countBy.get(c) || 0)} blocks`, ev); }).on("pointerleave", () => A.tip(null));
+  document.getElementById("tree").replaceChildren(svg.node());
+
+  // --- matrix
+  const tierOrder = [...topLevel, ...tierNames.filter(t => !topLevel.includes(t))];
+  const mx = d3.rollup(blocks, v => v.length, d => d.tierName, d => d.grain);
+  const maxCell = d3.max(blocks.length ? [...mx.values()].flatMap(m => [...m.values()]) : [1]);
+  const shade = d3.scaleSequential(d3.interpolateRgb("var(--color-background)", "var(--series-1)")).domain([0, maxCell]);
+  const cellStyle = (v) => v ? `background:color-mix(in oklch, var(--series-1) ${Math.round(12 + 88 * v / maxCell)}%, var(--color-background));color:${v / maxCell > .55 ? "var(--color-background)" : "var(--color-text)"}` : "";
+  document.getElementById("matrix").innerHTML = `<table class="matrix"><thead><tr><th>Tier</th>${GRAINS.map(([g]) => `<th style="text-align:center">${g}</th>`).join("")}<th style="text-align:center">all</th></tr></thead><tbody>${tierOrder.map(t => { const m = mx.get(t) || new Map(); const tot = d3.sum([...m.values()]); return `<tr><th>${topLevel.includes(t) ? "<b>" + t + "</b>" : "&nbsp;&nbsp;" + t}</th>${GRAINS.map(([g]) => { const v = m.get(g) || 0; return `<td class="${v ? "" : "z"}" style="${cellStyle(v)}">${v || "·"}</td>`; }).join("")}<td class="t">${tot}</td></tr>`; }).join("")}<tr class="total"><th>all tiers</th>${GRAINS.map(([g]) => `<td class="t">${blocks.filter(x => x.grain === g).length}</td>`).join("")}<td class="t">${blocks.length}</td></tr></tbody></table>`;
+
+  // --- shared names
+  const byName = d3.group(real, d => d.name);
+  const shared = [...byName.entries()].filter(([, v]) => new Set(v.map(x => x.tierName)).size > 1).sort((a, b) => b[1].length - a[1].length || d3.ascending(a[0], b[0]));
+  const sharedTiers = tierOrder.filter(t => shared.some(([, v]) => v.some(x => x.tierName === t)));
+  document.getElementById("sharedCount").textContent = String(shared.length);
+  document.getElementById("shared").innerHTML = `<table class="dots"><thead><tr><th></th>${sharedTiers.map(t => `<th>${t}</th>`).join("")}</tr></thead><tbody>${shared.map(([name, v]) => `<tr><th>${name} <span class="muted">${[...new Set(v.map(x => x.grain))].join("/")}</span></th>${sharedTiers.map(t => { const hit = v.find(x => x.tierName === t); return `<td>${hit ? `<span style="background:${gcolor(hit.grain)}" title="${A.curie(hit.b)}"></span>` : ""}</td>`; }).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin-top:.5rem">${shared.length} names · dot colour is the grain (see legend below).</p>`;
+
+  // --- stages
+  const STAGES = ["needsdefinition", "needstriage", "needsdocumentation", "specialadoption-docs", "triagedbacklog", "triagedrejected"];
+  const _stageLabel = { needsdefinition: "needs:definition", needstriage: "needs:triage", needsdocumentation: "needs:documentation", "specialadoption-docs": "special:adoption-docs", triagedbacklog: "triaged:backlog", triagedrejected: "triaged:rejected" };
+  A.legend("#stageLegend", STAGES.map((s, i) => ({ label: stageLabel[s], color: A.series(i + 1), count: blocks.filter(x => x.stage === s).length })).concat([{ label: "no stage", color: "var(--series-other)", count: blocks.filter(x => !x.stage).length }]));
+  const stageRows = tierOrder.filter(t => countBy.get(t)).map(t => ({ tier: t, segs: STAGES.map((s, i) => ({ s, n: blocks.filter(x => x.tierName === t && x.stage === s).length, color: A.series(i + 1) })).concat([{ s: "none", n: blocks.filter(x => x.tierName === t && !x.stage).length, color: "var(--series-other)" }]), total: countBy.get(t) }));
+  { const rowH = 22, labelW = 170, W2 = 900; const x = d3.scaleLinear().domain([0, d3.max(stageRows, r => r.total)]).range([0, W2 - labelW - 60]);
+    const sv = d3.create("svg").attr("viewBox", `0 0 ${W2} ${stageRows.length * rowH + 8}`).attr("role", "img").attr("aria-label", "Documentation stage per tier");
+    const gg = sv.append("g").attr("transform", `translate(${labelW},4)`);
+    gg.append("g").attr("class", "grid").selectAll("line").data(x.ticks(5)).join("line").attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", 0).attr("y2", stageRows.length * rowH);
+    const r = gg.selectAll("g.r").data(stageRows).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+    r.append("text").attr("x", -8).attr("y", rowH / 2).attr("dy", ".32em").attr("text-anchor", "end").attr("font-size", 12).text(d => d.tier);
+    r.each(function (d) { let acc = 0; d3.select(this).selectAll("rect").data(d.segs.filter(s => s.n)).join("rect").attr("x", s => { const v = x(acc); acc += s.n; return v + 1; }).attr("y", 4).attr("height", 14).attr("width", s => Math.max(0, x(s.n) - 2)).attr("fill", s => s.color).on("pointermove", (ev, s) => A.tip(`<b>${d.tier}</b><br>${stageLabel[s.s] || "no stage"}: ${s.n} of ${d.total}`, ev)).on("pointerleave", () => A.tip(null)); });
+    r.append("text").attr("x", d => x(d.total) + 6).attr("y", rowH / 2).attr("dy", ".32em").attr("font-size", 12).attr("class", "tabular").text(d => d.total);
+    document.getElementById("stages").replaceChildren(sv.node()); }
+
+  // --- roster
+  A.legend("#grainLegend", GRAINS.map(([g]) => ({ label: g === "other" ? "other (group, view, variant)" : g, color: gcolor(g), count: blocks.filter(x => x.grain === g).length })));
+  const rosterEl = document.getElementById("roster");
+  rosterEl.addEventListener("click", ev => { const chip = ev.target.closest(".chip"); if (!chip) return; const x = blocks.find(z => z.b === chip.dataset.b); if (x) showBlock(x); });
+  rosterEl.innerHTML = tierOrder.filter(t => countBy.get(t)).map(t => { const list = blocks.filter(x => x.tierName === t).sort((p, q) => d3.ascending(p.grain, q.grain) || d3.ascending(p.name, q.name)); return `<div class="tier"><div><h3>ds:${t}</h3><div class="sub">${list.length} blocks</div></div><div class="chips">${list.map(x => `<span class="chip" data-b="${A.esc(x.b)}" style="--c:${gcolor(x.grain)};cursor:pointer" title="${A.curie(x.b)} · ${x.grain}${x.stage ? " · " + (stageLabel[x.stage] || x.stage) : ""}">${x.name}</span>`).join("")}</div></div>`; }).join("");
+
+  // --- the apps tier
+  { const apps = blocks.filter(x => x.tierName === "apps").sort((p, q) => GRAINS.findIndex(g => g[0] === p.grain) - GRAINS.findIndex(g => g[0] === q.grain) || d3.ascending(p.name, q.name));
+    const products = tierNames.filter(t => t.startsWith("apps_"));
+    const g = (list, gr) => list.filter(x => x.grain === gr).length;
+    const globalN = countBy.get("global") || 0, appsN = apps.length;
+    const productBlocks = blocks.filter(x => x.tierName.startsWith("apps_"));
+    const first = (t) => (t || "").split(/\n/)[0].replace(/\*\*/g, "").slice(0, 140);
+    document.getElementById("appsLede").innerHTML = `<code>ds:apps</code> is the tier for applications: dashboards, consoles and admin tools. It inherits the ${globalN} global blocks and adds the ${appsN} that only an application needs: ${g(apps, "layout")} layouts (${apps.filter(x => x.grain === "layout").map(x => x.name).join(", ")}), ${g(apps, "pattern")} patterns (${apps.filter(x => x.grain === "pattern").map(x => x.name).join(", ")}), ${g(apps, "component")} components and ${g(apps, "subcomponent")} subcomponents. Beneath it sit ${products.length} product tiers, one per Canonical application, which together own ${productBlocks.length} further blocks. A product tier owns only what is specific to that product; everything else it reads through the chain, so <code>pragma block list --tier apps_lxd</code> answers with LXD's own ${countBy.get("apps_lxd") || 0} blocks plus the ${appsN} apps blocks and the ${globalN} global ones. None of the ${productBlocks.length} product-tier blocks has an implementation edge yet; the implementation libraries all target <code>global</code>.`;
+    document.getElementById("appsStats").innerHTML = [["Apps-tier blocks", appsN, `${g(apps, "component")} components · ${g(apps, "subcomponent")} subcomponents · ${g(apps, "pattern")} patterns · ${g(apps, "layout")} layouts`], ["Product tiers", products.length, products.map(t => t.replace("apps_", "")).join(", ")], ["Product-tier blocks", productBlocks.length, `${d3.max(products, t => countBy.get(t) || 0)} in the largest tier, 0 in the smallest`], ["In scope for apps", globalN + appsN, "global + apps"], ["With a documentation stage", apps.filter(x => x.stage).length + productBlocks.filter(x => x.stage).length, `of ${appsN + productBlocks.length} apps-family blocks`], ["Property declarations", d3.sum([...apps, ...productBlocks], x => +x.props), "across the apps family"]].map(([l, v, n]) => `<div class="stat"><span class="label">${l}</span><span class="value">${A.fmt(v)}</span><span class="note">${n}</span></div>`).join("");
+    A.legend("#appsAddsLegend", GRAINS.map(([gr]) => ({ label: gr === "other" ? "other (group, view, variant)" : gr, color: gcolor(gr) })));
+    const addRows = products.map(t => ({ tier: t.replace("apps_", ""), total: countBy.get(t) || 0, segs: GRAINS.map(([gr]) => ({ gr, n: blocks.filter(x => x.tierName === t && x.grain === gr).length, color: gcolor(gr) })) })).sort((p, q) => q.total - p.total);
+    { const rowH = 22, labelW = 150, W2 = 560; const x = d3.scaleLinear().domain([0, d3.max(addRows, r => r.total) || 1]).range([0, W2 - labelW - 50]);
+      const sv = d3.create("svg").attr("viewBox", `0 0 ${W2} ${addRows.length * rowH + 8}`).attr("role", "img").attr("aria-label", "Blocks each product tier adds");
+      const gg = sv.append("g").attr("transform", `translate(${labelW},4)`);
+      gg.append("g").attr("class", "grid").selectAll("line").data(x.ticks(4)).join("line").attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", 0).attr("y2", addRows.length * rowH);
+      const r = gg.selectAll("g.r").data(addRows).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+      r.append("text").attr("x", -8).attr("y", rowH / 2).attr("dy", ".32em").attr("text-anchor", "end").attr("font-size", 12).text(d => d.tier);
+      r.each(function (d) { let acc = 0; d3.select(this).selectAll("rect").data(d.segs.filter(sg => sg.n)).join("rect").attr("x", sg => { const v = x(acc); acc += sg.n; return v + 1; }).attr("y", 4).attr("height", 14).attr("width", sg => Math.max(0, x(sg.n) - 2)).attr("fill", sg => sg.color).on("pointermove", (ev, sg) => A.tip(`<b>apps_${d.tier}</b><br>${sg.n} ${sg.gr}${sg.n === 1 ? "" : "s"} of ${d.total}`, ev)).on("pointerleave", () => A.tip(null)); });
+      r.append("text").attr("x", d => x(d.total) + 6).attr("y", rowH / 2).attr("dy", ".32em").attr("font-size", 12).attr("class", "tabular").text(d => d.total);
+      r.style("cursor", "pointer").on("click", (ev, d) => showTier("apps_" + d.tier));
+      document.getElementById("appsAdds").replaceChildren(sv.node()); }
+    const scopeRows = products.map(t => ({ tier: t.replace("apps_", ""), own: countBy.get(t) || 0 })).sort((p, q) => q.own - p.own);
+    { const rowH = 22, labelW = 150, W2 = 560; const x = d3.scaleLinear().domain([0, globalN + appsN + d3.max(scopeRows, r => r.own)]).range([0, W2 - labelW - 60]);
+      const sv = d3.create("svg").attr("viewBox", `0 0 ${W2} ${scopeRows.length * rowH + 30}`).attr("role", "img").attr("aria-label", "Blocks in scope per product tier");
+      const lg = sv.append("g"); [["global", "var(--ordinal-2)"], ["apps", "var(--ordinal-3)"], ["own", "var(--ordinal-5)"]].forEach(([k, c], i) => { lg.append("rect").attr("x", i * 70).attr("y", 2).attr("width", 10).attr("height", 10).attr("fill", c); lg.append("text").attr("x", i * 70 + 14).attr("y", 11).attr("font-size", 11).text(k); });
+      const gg = sv.append("g").attr("transform", `translate(${labelW},22)`);
+      const r = gg.selectAll("g.r").data(scopeRows).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+      r.append("text").attr("x", -8).attr("y", rowH / 2).attr("dy", ".32em").attr("text-anchor", "end").attr("font-size", 12).text(d => d.tier);
+      r.append("rect").attr("x", 0).attr("y", 4).attr("height", 14).attr("width", x(globalN) - 1).attr("fill", "var(--ordinal-2)");
+      r.append("rect").attr("x", x(globalN) + 1).attr("y", 4).attr("height", 14).attr("width", x(appsN) - 2).attr("fill", "var(--ordinal-3)");
+      r.append("rect").attr("x", x(globalN + appsN) + 1).attr("y", 4).attr("height", 14).attr("width", d => Math.max(0, x(d.own) - 1)).attr("fill", "var(--ordinal-5)");
+      r.append("text").attr("x", d => x(globalN + appsN + d.own) + 6).attr("y", rowH / 2).attr("dy", ".32em").attr("font-size", 12).attr("class", "tabular").text(d => globalN + appsN + d.own);
+      r.on("pointermove", (ev, d) => A.tip(`<b>--tier apps_${d.tier}</b><br>${globalN} global + ${appsN} apps + ${d.own} own = ${globalN + appsN + d.own} blocks`, ev)).on("pointerleave", () => A.tip(null));
+      document.getElementById("appsScope").replaceChildren(sv.node()); }
+    A.table("#appsRoster", [{ label: "Block", key: "name", render: x => `<a class="jump" data-b="${A.esc(x.b)}" style="cursor:pointer">${A.esc(x.name)}</a>` }, { label: "Grain", key: "grain" }, { label: "Summary", key: "s", render: x => `<span class="muted">${A.esc(first(x.summary))}${(x.summary || "").length > 140 ? "…" : ""}</span>` }, { label: "Props", key: "props", num: true }], apps);
+    document.getElementById("appsRoster").querySelectorAll("a.jump").forEach(a => a.addEventListener("click", () => { const y = blocks.find(z => z.b === a.dataset.b); if (y) showBlock(y); }));
+    const upper = new Map(); for (const x of blocks) if (x.tierName === "global" || x.tierName === "apps") upper.set(x.name.toLowerCase(), x.tierName);
+    const shadowRows = products.map(t => ({ tier: t, names: blocks.filter(x => x.tierName === t && upper.has(x.name.toLowerCase())).map(x => `${x.name} <span class="muted">(${upper.get(x.name.toLowerCase())})</span>`) })).filter(r => r.names.length).sort((p, q) => q.names.length - p.names.length);
+    A.table("#appsShadow", [{ label: "Product tier", key: "tier", render: r => `<code>ds:${r.tier}</code>` }, { label: "Re-declared", key: "n", num: true, render: r => r.names.length }, { label: "Names (and the tier that already carries them)", key: "names", render: r => r.names.join(", ") }], shadowRows);
+  }
+
+  // --- property types, changelog, modifiers, concepts
+  const pt = d3.rollups(b.props, v => v.length, d => d.ptype || "(untyped)").sort((p, q) => q[1] - p[1]);
+  A.hbars("#propTypes", pt.slice(0, 12).map(([t, n]) => ({ label: t, value: n })), { rowH: 20, labelW: 150, aria: "Property types" });
+  const months = d3.rollups(b.changelog, v => v.length, d => d.ts.slice(0, 7)).sort((p, q) => d3.ascending(p[0], q[0]));
+  A.hbars("#changelog", months.map(([m, n]) => ({ label: m, value: n })), { rowH: 20, labelW: 90, aria: "Change log entries per month" });
+  const fams = d3.groups(b.modifiers, d => d.fam).map(([f, v]) => ({ fam: v[0].famName, values: [...new Set(v.map(x => x.mName).filter(Boolean))].sort() })).sort((p, q) => d3.ascending(p.fam, q.fam));
+  A.table("#modifiers", [{ label: "Family", key: "fam" }, { label: "Values", key: "v", render: r => r.values.join(", ") || "<span class='muted'>none declared</span>" }], fams);
+  const cons = b.concepts.map(c => ({ name: c.name, type: c.typeName })).sort((p, q) => d3.ascending(p.type, q.type) || d3.ascending(p.name, q.name));
+  A.table("#concepts", [{ label: "Type", key: "type" }, { label: "Concept", key: "name" }], cons);
+})();
+</script>
+</body>
+</html>

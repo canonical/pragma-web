@@ -1,0 +1,33 @@
+import pw from "/opt/node-tools/node_modules/playwright/index.js"; const { chromium } = pw;
+import { readFileSync } from "node:fs"; import http from "node:http"; import path from "node:path";
+const ROOT = "/home/user/graph-atlas", NM = "/tmp/claude-0/-home-user/06a72397-f574-54f4-af6d-d59fdfba2a1a/scratchpad/extract/node_modules";
+const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+const srv = http.createServer((req, res) => { let body; const p = path.join(ROOT, decodeURIComponent(req.url.split("?")[0])); try { body = readFileSync(p); } catch { if (!req.url.includes("favicon")) console.log("404", req.url); res.writeHead(404); res.end(); return; } res.writeHead(200, { "content-type": MIME[path.extname(p)] || "application/octet-stream" }); res.end(body); }).listen(8777);
+const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
+const run = async (file, scheme, width, shots) => {
+  const ctx = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: scheme }); const page = await ctx.newPage(); const errs = [];
+  page.on("pageerror", e => errs.push(e.message.slice(0, 160))); page.on("console", m => { if (m.type() === "error") errs.push(m.text().slice(0, 160)); });
+  await page.route(/https:\/\/(cdnjs|unpkg)[^ ]*/, r => r.fulfill({ body: readFileSync(`${NM}/d3/dist/d3.min.js`), contentType: "text/javascript" }));
+  await page.goto(`http://localhost:8777/${file}`, { waitUntil: "load" }); await page.waitForTimeout(2800);
+  await shots(page);
+  const sw = await page.evaluate(() => document.documentElement.scrollWidth);
+  console.log(file.padEnd(18), scheme, width, "scrollWidth", sw, "frames", await page.evaluate(() => document.querySelectorAll(".frame").length), errs.length ? errs : "");
+  await ctx.close();
+};
+const stageShot = async (page, name) => { const y = await page.evaluate(() => document.getElementById("stage").getBoundingClientRect().top + scrollY); await page.evaluate(y => scrollTo(0, y - 10), y); await page.waitForTimeout(500); await page.screenshot({ path: `shots/${name}.png` }); };
+await run("compositions.html", "light", 1280, async (p) => {
+  await stageShot(p, "c-tilt-light");
+  await p.click("#tilt", { force: true }); await p.waitForTimeout(900); await p.screenshot({ path: "shots/c-flat-light.png", fullPage: true });
+  await p.click("#tilt", { force: true }); await p.selectOption("#scale", "3.5"); await p.waitForTimeout(900); await stageShot(p, "c-tilt-strong");
+  await p.selectOption("#scale", "2");
+  await p.click("#indexBtn", { force: true }); await p.waitForTimeout(400); await p.screenshot({ path: "shots/c-drawer.png" }); await p.click("#drawerClose", { force: true });
+  const i = await p.evaluate(() => [...document.querySelectorAll(".frame")].findIndex(f => f.getAttribute("aria-label") === "Application shell"));
+  await p.evaluate(i => document.getElementById("f-" + i).scrollIntoView({ block: "center" }), i); await p.waitForTimeout(400);
+  await p.locator(`#f-${i}`).click({ force: true, position: { x: 6, y: 6 } }); await p.waitForTimeout(500); await p.screenshot({ path: "shots/c-panel.png" });
+});
+await run("compositions.html", "dark", 1280, async (p) => { await stageShot(p, "c-tilt-dark"); });
+await run("compositions.html", "light", 400, async (p) => { await p.screenshot({ path: "shots/c-phone.png" }); });
+await run("board.html", "light", 1280, async (p) => { await stageShot(p, "b-tilt-light"); await p.click("#tilt", { force: true }); await p.waitForTimeout(900); await p.screenshot({ path: "shots/b-flat-light.png", fullPage: true }); });
+await run("board.html", "dark", 1280, async (p) => { await stageShot(p, "b-tilt-dark"); });
+await run("board.html", "light", 400, async () => {});
+await browser.close(); srv.close();

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <!--TODO the right and bottom of this icon are slightly cropped -->
+  <g id="success">
+      <path xmlns="http://www.w3.org/2000/svg" d="M8 0a8 8 0 110 16A8 8 0 018 0zm0 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zm2.814 2.45l1.203.897-5.537 7.43-3.485-3.694 1.09-1.03 2.259 2.394 4.47-5.997z" fill="currentColor" fill-rule="nonzero"/>
+  </g>
+</svg>

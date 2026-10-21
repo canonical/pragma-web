@@ -1,0 +1,23 @@
+/* Story-only helper from pragma-web (storybook/navigation/CanonicalLogo), not in the published package. */
+@layer ds.components.apps {
+  .ds.canonical-logo {
+    --mark-size: 4;
+    --mark-margin-top: 5;
+    --logo-height: 4;
+    --logo-overflow: 0.25rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    block-size: var(--sidenav-logo-block-size, 2.5rem);
+    inline-size: var(--sidenav-logo-inline-size, 1.25rem);
+    margin-block-end: calc(var(--space-baseline) - var(--logo-overflow));
+    padding: 0;
+    background: var(--color-background-logo);
+    & > .mark {
+      display: block;
+      inline-size: calc(var(--space-baseline) * var(--mark-size));
+      block-size: calc(var(--space-baseline) * var(--mark-size));
+      margin-block-start: calc(var(--space-baseline) * var(--mark-margin-top));
+    }
+  }
+}

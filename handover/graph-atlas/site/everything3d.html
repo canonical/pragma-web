@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Everything in 3D · Pragma Graph Atlas</title>
+<style>
+  .stage { position: relative; border: 1px solid var(--color-border-disabled); background: var(--color-background); overflow: hidden; }
+  .stage canvas { display: block; width: 100%; height: min(82vh, 960px); min-height: 440px; touch-action: none; cursor: grab; }
+  .overlay { position: absolute; left: .75rem; top: .75rem; display: grid; gap: .375rem; font-size: .75rem; line-height: 1.3333; background: color-mix(in srgb, var(--color-background) 86%, transparent); padding: .5rem .75rem; border: 1px solid var(--color-border-disabled); max-width: 19rem; }
+  .overlay .legend { gap: .125rem .75rem; font-size: .75rem; }
+  .overlay label { display: inline-flex; align-items: center; gap: .375rem; margin-right: .75rem; cursor: pointer; }
+  .overlay input { margin: 0; accent-color: var(--color-focus-ring); }
+  .controls { position: absolute; right: .75rem; top: .75rem; display: flex; gap: .5rem; }
+  .controls button { font: inherit; font-size: .75rem; padding: .25rem .5rem; background: var(--color-background); color: var(--color-text); border: 1px solid var(--color-border); cursor: pointer; }
+  .controls button[aria-pressed="true"] { background: var(--color-text); color: var(--color-background); }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">13 / 16 · every triple, in depth</div>
+    <h1>38,816 nodes and 65,298 edges in WebGL</h1>
+    <p class="lede">The whole graph, including blank nodes and literal values, as a point cloud: one draw call for the points, one for the lines. The layout was settled in three dimensions offline, so the view is identical every time and renders at full frame rate. Literal values sit on spheres around their subjects, which gives every richly described node a visible halo.</p>
+  </div>
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stage"><canvas id="c" aria-label="Every triple in three dimensions"></canvas>
+      <div class="overlay"><div id="legend"></div><div><label><input type="checkbox" id="lyLit" checked> literals</label><label><input type="checkbox" id="lyEdges" checked> edges</label></div><div class="muted" id="status">Loading…</div></div>
+      <div class="controls"><button id="spin" aria-pressed="true">Auto-rotate</button><button id="reset">Reset view</button></div>
+    </div>
+    <p class="small muted">Drag to orbit, scroll to zoom, click a disc for its triples. Discs are named nodes (larger with degree), smaller points are blank nodes, the faint gray dust is literal values. If this frame stays empty the browser has no WebGL; the <a href="everything.html">flat version</a> draws the same data.</p>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("everything3d.html");
+  const status = document.getElementById("status");
+  const [L, L2] = await A.load("full3d", "full2d");
+  const N = L.nodes.length, E = L.links.length;
+  const NS = ["dt", "ds", "cs", "anatomy", "schema"]; const nsIndex = (s) => { const i = NS.indexOf(s); return i < 0 ? 4 : i; };
+  const pal = ["var(--ns-dt)", "var(--ns-ds)", "var(--ns-cs)", "var(--ns-anatomy)", "var(--ns-schema)", "var(--series-other)"].map(v => new THREE.Color(A.resolve(v)));
+  const bg = new THREE.Color(A.resolve("var(--color-background)"));
+  A.legend("#legend", [["dt: tokens", 0], ["ds: design system", 1], ["cs: standards", 2], ["anatomy:", 3], ["schema", 4], ["literal value", 5]].map(([l, i]) => ({ label: l, color: "#" + pal[i].getHexString(), shape: "dot" })));
+  const canvas = document.getElementById("c");
+  if (typeof THREE === "undefined") { status.textContent = "The 3D renderer could not load."; return; }
+  let renderer; try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false }); } catch (e) { status.textContent = "WebGL is not available in this browser."; return; }
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1)); renderer.setClearColor(bg, 1);
+  const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(50, 1, 1, 20000); camera.position.set(0, 0, 2600);
+  const group = new THREE.Group(); scene.add(group);
+  const S = 1.0;
+  // positions & colours
+  const pts = { iri: [], blank: [], lit: [] }, cols = { iri: [], blank: [], lit: [] }, sizes = { iri: [] };
+  const K = new Uint8Array(N); const iriIndex = [];
+  for (let i = 0; i < N; i++) { const n = L.nodes[i]; K[i] = n[3]; const key = n[3] === 0 ? "iri" : n[3] === 1 ? "blank" : "lit"; if (key === "iri") iriIndex.push(i); pts[key].push(n[0] * S, n[1] * S, n[2] * S); const c = n[3] === 2 ? pal[5] : pal[nsIndex(n[4])]; cols[key].push(c.r, c.g, c.b); if (key === "iri") sizes.iri.push(3 + Math.sqrt(L2.nodes[i][5]) * 0.9); }
+  const mk = (key, size, opacity) => { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pts[key], 3)); g.setAttribute("color", new THREE.Float32BufferAttribute(cols[key], 3)); const m = new THREE.PointsMaterial({ size, vertexColors: true, sizeAttenuation: true, transparent: opacity < 1, opacity, depthWrite: opacity >= 1 }); return new THREE.Points(g, m); };
+  // IRIs: per-vertex size via shader
+  const gi = new THREE.BufferGeometry(); gi.setAttribute("position", new THREE.Float32BufferAttribute(pts.iri, 3)); gi.setAttribute("color", new THREE.Float32BufferAttribute(cols.iri, 3)); gi.setAttribute("psize", new THREE.Float32BufferAttribute(sizes.iri, 1));
+  const mi = new THREE.ShaderMaterial({ vertexColors: true, transparent: true, depthWrite: false, uniforms: { scale: { value: 1 } }, vertexShader: `uniform float scale; attribute float psize; varying vec3 vC; void main(){ vC = color; vec4 mv = modelViewMatrix * vec4(position,1.0); gl_PointSize = psize * scale * (900.0 / -mv.z); gl_Position = projectionMatrix * mv; }`, fragmentShader: `varying vec3 vC; void main(){ vec2 d = gl_PointCoord - vec2(0.5); if (dot(d,d) > 0.25) discard; gl_FragColor = vec4(vC, 0.95); }` });
+  const iriPts = new THREE.Points(gi, mi); group.add(iriPts);
+  const blankPts = mk("blank", 4.5, 0.85); group.add(blankPts);
+  const litPts = mk("lit", 2.2, 0.45); group.add(litPts);
+  // edges
+  const lp = new Float32Array(E * 6), lc = new Float32Array(E * 6);
+  for (let e = 0; e < E; e++) { const [a, b] = L.links[e]; const na = L.nodes[a], nb = L.nodes[b]; lp.set([na[0] * S, na[1] * S, na[2] * S, nb[0] * S, nb[1] * S, nb[2] * S], e * 6); const c = na[3] === 2 ? pal[5] : pal[nsIndex(na[4])]; lc.set([c.r, c.g, c.b, c.r, c.g, c.b], e * 6); }
+  const gl = new THREE.BufferGeometry(); gl.setAttribute("position", new THREE.BufferAttribute(lp, 3)); gl.setAttribute("color", new THREE.BufferAttribute(lc, 3));
+  const lines = new THREE.LineSegments(gl, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.12, depthWrite: false })); group.add(lines);
+  document.getElementById("lyLit").addEventListener("change", e => litPts.visible = e.target.checked);
+  document.getElementById("lyEdges").addEventListener("change", e => lines.visible = e.target.checked);
+  status.textContent = `${A.fmt(N)} nodes · ${A.fmt(E)} edges · 4 draw calls`;
+  // interaction: drag to orbit, wheel to zoom
+  let spinning = !matchMedia("(prefers-reduced-motion: reduce)").matches, rx = 0.25, ry = 0, dist = 2600, drag = null;
+  document.getElementById("spin").setAttribute("aria-pressed", String(spinning));
+  canvas.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY }; canvas.setPointerCapture(e.pointerId); spinning = false; document.getElementById("spin").setAttribute("aria-pressed", "false"); });
+  canvas.addEventListener("pointermove", e => { if (!drag) return; ry += (e.clientX - drag.x) * 0.005; rx += (e.clientY - drag.y) * 0.005; rx = Math.max(-1.4, Math.min(1.4, rx)); drag = { x: e.clientX, y: e.clientY }; });
+  canvas.addEventListener("pointerup", () => drag = null);
+  canvas.addEventListener("wheel", e => { e.preventDefault(); dist = Math.max(300, Math.min(8000, dist * (1 + e.deltaY * 0.001))); }, { passive: false });
+  document.getElementById("spin").addEventListener("click", e => { spinning = !spinning; e.currentTarget.setAttribute("aria-pressed", String(spinning)); });
+  document.getElementById("reset").addEventListener("click", () => { rx = 0.25; ry = 0; dist = 2600; });
+  // click → details panel (named nodes only, picked with a raycaster)
+  const outE = new Array(N), inE = new Array(N); for (let e = 0; e < E; e++) { const l = L2.links[e]; (outE[l[0]] ||= []).push(e); (inE[l[1]] ||= []).push(e); }
+  let literals = null; const PRE = { "1999/02/22-rdf-syntax-ns#": "rdf:", "2000/01/rdf-schema#": "rdfs:", "2002/07/owl#": "owl:", "ns/shacl#": "sh:", "2004/02/skos/core#": "skos:", "codestandards#": "cs:", "w3c:": "w3c-tokens:" };
+  const pretty = (p) => { for (const k in PRE) if (p.includes(k)) return PRE[k] + p.split(k)[1]; return p; };
+  const curieOf = (i) => { const n = L2.nodes[i]; const l = n[6], ns = n[3]; for (const k in PRE) if (l.includes(k)) return PRE[k] + l.split(k)[1]; return (ns === "ds" ? "ds:" : ns === "dt" ? "dt:" : ns === "cs" ? "cs:" : ns === "anatomy" ? "anatomy:" : "") + l; };
+  async function describe(i) { const n = L2.nodes[i]; const o = outE[i] || [], inc = inE[i] || [];
+    if (!literals && o.some(e => K[L2.links[e][1]] === 2)) { try { literals = await A.load("literals"); } catch { literals = {}; } }
+    const obj = (j) => K[j] === 2 ? `<span class="o lit">${A.esc(literals?.[j] ?? L2.nodes[j][6])}</span>` : `<span class="o">${K[j] === 0 ? `<a class="jump" data-i="${j}">${A.esc(L2.nodes[j][6])}</a>` : A.esc(L2.nodes[j][6])}${K[j] === 1 ? ` <span class="muted">(${A.esc(L2.nodes[j][4] || "blank")})</span>` : ""}</span>`;
+    const rows = (es, dir) => es.map(e => { const l = L2.links[e]; const j = dir === "out" ? l[1] : l[0]; return `<li><span class="p">${A.esc(pretty(l[2]))}</span>${obj(j)}</li>`; }).join("");
+    const html = `<dl><dt>IRI</dt><dd><code>${A.esc(curieOf(i))}</code></dd>${n[4] ? `<dt>Class</dt><dd>${A.esc(n[4].replace("w3c:", "w3c-tokens:"))}</dd>` : ""}<dt>Degree</dt><dd>${n[5]} (${o.length} out, ${inc.length} in)</dd></dl>
+      ${o.length ? `<h4>Its triples (${o.length})</h4><ul class="facts">${rows(o.slice(0, 80), "out")}</ul>` : ""}${inc.length ? `<h4>Referenced by (${inc.length})</h4><ul class="facts">${rows(inc.slice(0, 40), "in")}</ul>` : ""}${A.cmd(`pragma graph inspect ${curieOf(i)}`)}`;
+    const panel = A.showPanel(n[6], `named node${n[4] ? " · " + n[4].replace("w3c:", "w3c-tokens:") : ""}`, html);
+    panel.querySelectorAll("a.jump").forEach(a => a.addEventListener("click", () => describe(+a.dataset.i)));
+  }
+  const ray = new THREE.Raycaster(); ray.params.Points.threshold = 7; const ndc = new THREE.Vector2(); let downAt = null;
+  canvas.addEventListener("pointerdown", e => downAt = [e.clientX, e.clientY], true);
+  canvas.addEventListener("pointerup", e => { if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 4) return; const r = canvas.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); const hits = ray.intersectObject(iriPts); if (hits.length) { hits.sort((a, b) => a.distanceToRay - b.distanceToRay); describe(iriIndex[hits[0].index]); } });
+  function size() { const w = canvas.clientWidth, h = canvas.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  new ResizeObserver(size).observe(canvas); size();
+  (function frame() { if (spinning) ry += 0.0015; group.rotation.set(rx, ry, 0); camera.position.set(0, 0, dist); camera.lookAt(0, 0, 0); mi.uniforms.scale.value = 1; renderer.render(scene, camera); requestAnimationFrame(frame); })();
+})();
+</script>
+</body>
+</html>

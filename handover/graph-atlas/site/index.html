@@ -1,0 +1,184 @@
+<title>Pragma Graph Atlas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<style>
+  .triple { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: var(--dimension-100); align-items: stretch; }
+  .triple .part { border: var(--dimension-stroke) solid var(--color-border-disabled); padding: .75rem 1rem; display: grid; gap: .25rem; min-width: 0; }
+  .triple .part .role { font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; color: var(--color-text-muted); }
+  .triple .part code { word-break: break-all; }
+  .triple .arrow { align-self: center; color: var(--color-text-muted); font-size: 1.25rem; }
+  @media (max-width: 40rem) { .triple { grid-template-columns: 1fr; } .triple .arrow { transform: rotate(90deg); justify-self: center; } }
+  .stack { display: grid; gap: .5rem; }
+  .stack .bar { display: flex; height: 28px; gap: 2px; }
+  .stack .bar span { display: block; height: 100%; min-width: 0; }
+  .object-kinds { display: grid; gap: .5rem; }
+</style>
+
+<header class="masthead"><div class="wrap"></div></header>
+
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">Canonical design system · knowledge graph · pragma 0.43.0 snapshot</div>
+    <h1>Sixty-five thousand statements about one design system</h1>
+    <p class="lede">The Canonical design system is not a component library with documentation attached. It is an RDF graph: every component, token, modifier, tier, standard and implementation is a node, and every fact about it is a triple. This atlas reads that graph with the <code>pragma</code> command-line tool and draws what it finds, one angle per page.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="hero">
+      <div class="figure tabular-none">65,298</div>
+      <div class="muted">triples in the embedded snapshot, answered offline from <code>pragma graph query "SELECT (COUNT(*) AS ?n) WHERE { ?s ?p ?o }"</code></div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="block">
+    <header>
+      <h2>One triple, read aloud</h2>
+      <p class="small muted">A triple is a subject, a predicate and an object. Here is one of the 65,298, exactly as the graph holds it. The subject is always an identifier; the object is an identifier, a literal value, or an anonymous node that groups further triples.</p>
+    </header>
+    <div class="triple">
+      <div class="part"><span class="role">Subject</span><code>ds:global.component.button</code><span class="small muted">the Button component in the global tier</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="part"><span class="role">Predicate</span><code>ds:hasModifierFamily</code><span class="small muted">"composes the variant axis…"</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="part"><span class="role">Object</span><code>ds:global.modifier_family.importance</code><span class="small muted">the Importance family: Primary, Secondary, Tertiary</span></div>
+    </div>
+    <figure class="object-kinds">
+      <div class="stack" id="objectKinds"></div>
+      <figcaption>What sits in the object position across all 65,298 triples. Blank-node objects are the anonymous records: a block's 727 properties, 1,010 token bindings, 1,904 token declarations, 1,237 resolved values and 43 change-log entries all live on blank nodes.</figcaption>
+    </figure>
+  </section>
+
+  <section class="block">
+    <header>
+      <h2>Which vocabulary each statement speaks</h2>
+      <p class="small muted">Every predicate belongs to a namespace. Grouping the 65,298 triples by the namespace of their predicate shows which part of the design system carries the weight: the token model is two thirds of the graph by itself.</p>
+    </header>
+    <figure>
+      <div class="stack" id="vocabStack"></div>
+      <div id="vocabLegend"></div>
+      <figcaption>Namespaces: <code>dt:</code> and <code>w3c-tokens:</code> are the token ontology, <code>ds:</code> the design-system ontology, <code>cs:</code> the code standards, <code>anatomy:</code> the anatomy DSL. The structural vocabularies (<code>rdf:</code>, <code>rdfs:</code>, <code>owl:</code>, <code>sh:</code>, <code>skos:</code>) type nodes, label them and hold the schema itself.</figcaption>
+    </figure>
+    <details class="table"><summary>Table: triples by predicate namespace</summary><div id="vocabTable"></div></details>
+  </section>
+
+  <section class="block">
+    <header>
+      <h2>Census of classes</h2>
+      <p class="small muted">Every typed node, by class. 9,573 of the triples are <code>rdf:type</code> statements; this is what they say. Bars are grouped by namespace and coloured by it, so the same hue means the same vocabulary on every page of the atlas.</p>
+    </header>
+    <div id="classLegend"></div>
+    <figure>
+      <div class="chart" id="classChart"></div>
+      <figcaption>Fifty-five classes with at least one instance. A node can carry more than one type (an <code>owl:FunctionalProperty</code> is also an <code>owl:ObjectProperty</code> or <code>owl:DatatypeProperty</code>), so the bars sum to more than the number of nodes.</figcaption>
+    </figure>
+  </section>
+
+  <section class="block">
+    <header>
+      <h2>The predicates that carry the graph</h2>
+      <p class="small muted">176 distinct predicates occur. The thirty most frequent account for 85% of all triples. Four of them (<code>dt:declaredAt</code>, <code>dt:at</code>, <code>dt:under</code>, <code>dt:emits</code>) occur exactly 1,904 times each: one of each per CSS declaration.</p>
+    </header>
+    <figure>
+      <div class="chart" id="predChart"></div>
+      <figcaption>Top thirty predicates by number of triples, coloured by namespace. <code>rdf:first</code> and <code>rdf:rest</code> are the cells of RDF lists: 3,117 each, almost all of them the ordered reference chains and resolution chains of the token model.</figcaption>
+    </figure>
+    <details class="table"><summary>Table: all 176 predicates</summary><div id="predTable"></div></details>
+  </section>
+
+  <section class="block">
+    <header>
+      <h2>Sixteen views of the same graph</h2>
+      <p class="small muted">Each page below is a different projection of the same 65,298 triples. The first five read the design-system ontology, the next two the token model, then the standards and the implementation coverage; the last four draw the graph whole: first its 4,624 named entities, then all 38,816 nodes of every triple, each flat and in three dimensions. The last two are pictures for slides: the whole system as an isometric city, and the real components on a board of frames.</p>
+    </header>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="block">
+    <header>
+      <h2>Where the data comes from</h2>
+      <p class="small muted">The snapshot is compiled from five packs. Each pack is a package of Turtle files; <code>pragma sources status</code> names them, and <code>pragma colophon</code> credits them.</p>
+    </header>
+    <div id="packs"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("index.html");
+  const o = await A.load("overview");
+  const total = +o.objKinds.total;
+  // --- stats
+  const stats = [
+    ["Entities", "4,377", "named nodes the CLI counts as entities"],
+    ["Classes in use", String(o.classes.length), "with at least one instance"],
+    ["Predicates", String(o.predicates.length), "distinct relationship types"],
+    ["Vocabularies", "6", "ds, dt, w3c-tokens, anatomy, cs, dt-web"],
+    ["Packs", "5", "design-system, anatomy-dsl, token-ontology, code-standards, ds-implementations"],
+    ["Literal values", A.fmt(+o.objKinds.literal), `${A.pct(+o.objKinds.literal / total)} of all objects`],
+    ["Blank-node subjects", A.fmt(+o.objKinds.blankSubject), `${A.pct(+o.objKinds.blankSubject / total)} of all triples describe an anonymous record`],
+    ["Named graphs", "0", "one default graph; no quads"],
+  ];
+  document.getElementById("stats").innerHTML = stats.map(([l, v, n]) => `<div class="stat"><span class="label">${l}</span><span class="value">${v}</span><span class="note">${n}</span></div>`).join("");
+
+  // --- object kinds stacked bar
+  const kinds = [["IRI (another node)", +o.objKinds.iri, A.series(1)], ["Literal (text, number, JSON)", +o.objKinds.literal, A.series(2)], ["Blank node (anonymous record)", +o.objKinds.blank, "var(--series-other)"]];
+  const ok = document.getElementById("objectKinds");
+  ok.innerHTML = `<div class="bar">${kinds.map(([l, v, c]) => `<span style="flex:${v};background:${c}" title="${l}: ${A.fmt(v)}"></span>`).join("")}</div><div class="legend">${kinds.map(([l, v, c]) => `<span class="key"><span class="swatch" style="background:${c}"></span>${l} <span class="count">${A.fmt(v)} · ${A.pct(v / total)}</span></span>`).join("")}</div>`;
+
+  // --- vocabulary stack (by predicate namespace)
+  const vocabOf = (p) => { const c = A.curie(p); const pre = c.slice(0, c.indexOf(":")); if (pre === "dt" || pre === "w3c-tokens" || pre === "dt-web") return "dt"; if (["rdf", "rdfs", "owl", "sh", "skos", "dcterms", "xsd"].includes(pre)) return "schema"; return pre; };
+  const vocab = d3.rollups(o.predicates, v => d3.sum(v, d => +d.n), d => vocabOf(d.p)).sort((a, b) => b[1] - a[1]);
+  const vocabLabel = { dt: "dt: + w3c-tokens: (token model)", ds: "ds: (design system)", cs: "cs: (code standards)", anatomy: "anatomy: (anatomy DSL)", schema: "rdf: rdfs: owl: sh: skos: (structure & schema)" };
+  const vs = document.getElementById("vocabStack");
+  vs.innerHTML = `<div class="bar">${vocab.map(([k, v]) => `<span style="flex:${v};background:${A.nsColor(k)}"></span>`).join("")}</div>`;
+  A.legend("#vocabLegend", vocab.map(([k, v]) => ({ label: vocabLabel[k] || k, color: A.nsColor(k), count: v })));
+  // detailed table by exact prefix
+  const byPrefix = d3.rollups(o.predicates, v => ({ n: d3.sum(v, d => +d.n), preds: v.length }), d => { const c = A.curie(d.p); return c.slice(0, c.indexOf(":") + 1); }).sort((a, b) => b[1].n - a[1].n);
+  A.table("#vocabTable", [{ label: "Prefix", key: "p", render: r => `<code>${r.p}</code>` }, { label: "Triples", key: "n", num: true }, { label: "Share", key: "s", render: r => A.pct(r.n / total) }, { label: "Distinct predicates", key: "preds", num: true }], byPrefix.map(([p, v]) => ({ p, n: v.n, preds: v.preds })));
+
+  // --- class census grouped by namespace
+  const nsOrder = ["dt", "ds", "cs", "anatomy", "schema"];
+  const classes = o.classes.map(d => ({ iri: d.c, n: +d.n, ns: A.nsOf(d.c) })).sort((a, b) => nsOrder.indexOf(a.ns) - nsOrder.indexOf(b.ns) || b.n - a.n);
+  A.legend("#classLegend", nsOrder.map(ns => ({ label: A.NS_LABEL[ns], color: A.nsColor(ns), count: d3.sum(classes.filter(c => c.ns === ns), c => c.n) })));
+  A.hbars("#classChart", classes.map(c => ({ label: A.curie(c.iri), value: c.n, color: A.nsColor(c.ns), tip: `<b>${A.curie(c.iri)}</b><br>${A.fmt(c.n)} instances<br><span class="mono">${c.iri}</span>` })), { rowH: 18, labelW: 250, aria: "Instances per class" });
+
+  // --- predicates
+  const preds = o.predicates.map(d => ({ iri: d.p, n: +d.n, subjects: +d.subjects, literals: +d.literals })).sort((a, b) => b.n - a.n);
+  A.hbars("#predChart", preds.slice(0, 30).map(p => ({ label: A.curie(p.iri), value: p.n, color: A.nsColor(vocabOf(p.iri)), tip: `<b>${A.curie(p.iri)}</b><br>${A.fmt(p.n)} triples · ${A.fmt(p.subjects)} distinct subjects<br>${A.fmt(p.literals)} literal objects` })), { rowH: 18, labelW: 250, aria: "Top 30 predicates" });
+  A.table("#predTable", [{ label: "#", key: "i", num: true }, { label: "Predicate", key: "p", render: r => `<code>${A.curie(r.iri)}</code>` }, { label: "Triples", key: "n", num: true }, { label: "Subjects", key: "subjects", num: true }, { label: "Literal objects", key: "literals", num: true }], preds.map((p, i) => ({ ...p, i: i + 1 })));
+
+  // --- cards
+  const cards = [
+    ["schema.html", "Schema", "The 55 classes laid out by vocabulary, joined by the 122 kinds of edge that actually occur between them, each weighted by how often."],
+    ["tiers.html", "Tiers & blocks", "313 blocks across 16 tiers: the inheritance chain, the tier-by-grain census, and the 25 names that live in more than one tier."],
+    ["anatomy.html", "Anatomy & bindings", "The Button's anatomy tree, the 111 style keys, and the 1,010 bindings that tie block anatomy to design tokens, by state."],
+    ["anatomies.html", "Anatomy census", "All 181 written anatomies as small multiples, the composition graph of which blocks contain which, and the grammar's statistics."],
+    ["tokens.html", "Token pipeline", "From 45 DTCG files through 1,311 definitions and 745 symbols to 1,156 CSS variables and 1,904 declarations, as one flow."],
+    ["values.html", "Token values", "Every colour the graph resolves, light beside dark; the type scale set in its own sizes; the spacing scale drawn to scale."],
+    ["standards.html", "Standards", "147 code standards in 21 categories, with their do/don't examples counted and the languages those examples are written in."],
+    ["coverage.html", "Coverage", "Which of the 122 global blocks have an implementation in React, Svelte or TypeScript, and which are still spec only."],
+    ["galaxy.html", "Entities (2D)", "All 4,624 named nodes and 10,836 node-to-node edges in one precomputed map, clustered by vocabulary, with the hubs labelled."],
+    ["universe.html", "Entities (3D)", "The same entity graph in WebGL, three-dimensional and slowly turning, for the presentation screen."],
+    ["everything.html", "Everything (2D)", "Every one of the 65,298 triples: 38,816 nodes including blank nodes and literal values, with layers you can switch off."],
+    ["everything3d.html", "Everything (3D)", "The complete graph as a WebGL point cloud, laid out in three dimensions offline so it opens settled and identical every time."],
+    ["city.html", "City (isometric)", "All 325 blocks as buildings in 16 districts: height is how much is specified, solid means implemented, copyable as vector for a slide."],
+    ["board.html", "Board (real components)", "A board of 27 frames, each holding the published React component as it really renders, packed by size and elevated by anatomy depth, with an index drawer and details panel."],
+    ["compositions.html", "Compositions (real components)", "Thirteen credible, prefilled screens composed from the real components, with no metadata, elevated by HTML depth and layered element by element."],
+  ];
+  document.getElementById("cards").innerHTML = cards.map(([h, t, d], i) => `<a class="card" href="${h}"><span class="num">${String(i + 2).padStart(2, "0")} / 16</span><h3>${t}</h3><p>${d}</p></a>`).join("");
+
+  // --- packs
+  A.table("#packs", [{ label: "Pack", key: "name", render: r => `<code>${r.name}</code>` }, { label: "Ref", key: "ref" }, { label: "Holds", key: "holds" }], [
+    { name: "@canonical/design-system", ref: "npm 0.43.0", holds: "the ds: ontology; 313 blocks (181 with a written anatomy), guidelines, properties; 16 tiers; 11 modifier families; 13 concepts; 44 tags" },
+    { name: "@canonical/anatomy-dsl", ref: "npm 0.43.0", holds: "the anatomy: ontology and the 111 style keys that anatomy trees may bind" },
+    { name: "@canonical/token-ontology", ref: "npm 0.43.0", holds: "the dt: and w3c-tokens: ontologies; 745 symbols, 1,311 definitions, 1,156 variables, 1,904 declarations, 1,237 resolved values" },
+    { name: "@canonical/code-standards", ref: "npm 0.43.0", holds: "the cs: ontology; 147 standards in 21 categories with 575 do/don't examples" },
+    { name: "@canonical/ds-implementations", ref: "git 3828317 (pragma-web)", holds: "4 implementation libraries and the 94 implementation objects linking code to blocks" },
+  ]);
+})();
+</script>

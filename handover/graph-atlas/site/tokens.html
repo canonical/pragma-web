@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Token pipeline · Pragma Graph Atlas</title>
+<style>
+  svg .stage-title { font-size: 12px; font-weight: 600; }
+  svg .stage-total { font-size: 20px; font-weight: 300; }
+  svg .stage-sub { font-size: 10px; fill: var(--color-text-muted); }
+  svg .seg-label { font-size: 10px; }
+  svg .band { fill: var(--color-background-layer2); stroke: none; }
+  .coords { display: grid; gap: .5rem; font-size: .875rem; }
+  .coords .fam { display: grid; grid-template-columns: 9rem 1fr; gap: .75rem; align-items: baseline; }
+  .coords .vals { display: flex; flex-wrap: wrap; gap: .25rem; }
+  .coords .chip b { font-weight: 600; }
+  @media (max-width: 40rem) { .coords .fam { grid-template-columns: 1fr; } }
+  .arcs { display: grid; gap: .25rem; font-size: .875rem; }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">06 / 16 · the token model</div>
+    <h1>From 35 token files to 1,904 CSS declarations</h1>
+    <p class="lede">Two thirds of the graph describes design tokens, and it describes them as a pipeline. A DTCG file defines a <b>token</b> (45 files are recorded, 35 of them define tokens; the rest carry resolver and set metadata); tokens that share a name are one <b>symbol</b>; a symbol is emitted as a CSS <b>variable</b> on a platform; a variable is <b>declared</b> under a CSS condition such as <code>:root</code> or <code>.dark</code>; and the graph records the <b>resolved value</b> at every coordinate of the modifier space.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <header><h2>The pipeline, stage by stage</h2><p class="small muted">Each column is one stage, drawn to a shared scale and split by the dimension that matters at that stage. The bands between columns connect the totals, so the shape shows where the count grows and shrinks: light and dark define most colour tokens twice, which is why 1,311 definitions collapse into 745 symbols.</p></header>
+    <figure><div class="chart scroll-x" id="pipeline"></div><figcaption>Hover a segment for its count. Files are grouped by directory under <code>global/</code>; definitions and symbols by DTCG type; variables by tier; declarations by the CSS condition they are emitted under.</figcaption></figure>
+  </section>
+
+  <section class="block">
+    <header><h2>The modifier space: 36 coordinates in 9 contracts</h2><p class="small muted">A coordinate is one value of one modifier family (<code>mode.dark</code>, <code>importance.primary</code>). A resolved value is recorded per symbol per coordinate where the value differs; the number after each coordinate is how many symbols carry a specific value there. Base values (no coordinate) number 718.</p></header>
+    <div class="coords" id="coords"></div>
+  </section>
+
+  <section class="block">
+    <div class="two">
+      <figure><div class="chart" id="conds"></div><figcaption>1,904 declarations by the CSS condition they are emitted under, stacked by variable tier (primitive → semantic → derived, light to dark). <code>@layer ds.tokens :root</code> carries the primitives; <code>@layer ds.modifiers</code> carries the rest, split by selector.</figcaption></figure>
+      <div style="display:grid;gap:var(--dimension-300)">
+        <figure><div class="chart" id="chains"></div><figcaption>Resolution-chain length of the 1,072 resolved values that record one: how many hops from the symbol to the value that finally answers.</figcaption></figure>
+        <figure><div class="chart" id="refs"></div><figcaption>Where the 1,020 <code>dt:refersTo</code> references from token definitions land, by family of the target symbol. Most semantic colours point straight into the primitive palette.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <header><h2>Variables: tier × visibility × type</h2><p class="small muted">1,156 CSS custom properties on the web platform (IRIs under <code>dt:s4/web/--…</code>). 74 are internal: the <code>--active--…</code> and <code>--hover--…</code> state deltas that derived declarations compute from.</p></header>
+    <div id="varTable"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("tokens.html");
+  const t = await A.load("tokens");
+  const TYPE = { color: 1, dimension: 2, number: 3, typography: 4 };
+  const typeColor = (ty) => TYPE[ty] ? A.series(TYPE[ty]) : "var(--series-other)";
+  const typeName = (iri) => A.local(iri).replace("w3c-tokens/", "");
+  const fileGroup = (f) => { const p = f.replace(/^global\//, "").split("/"); if (p[0] === "primitive") return "primitive"; if (p[0] === "semantic" && p[1] === "color") return "semantic/color"; if (p[0] === "semantic" && p[1] === "spacing") return "semantic/spacing"; if (p[1] === "modifier") return "modifier/" + p[2]; return p.slice(0, 2).join("/"); };
+  const tierName = (iri) => A.local(iri).replace("tier.", "");
+  const TIERC = { primitive: "var(--ordinal-2)", semantic: "var(--ordinal-3)", derived: "var(--ordinal-5)" };
+
+  // ---- pipeline stages
+  const files = t.files.map(f => ({ name: f.f.replace(/^.*\/file\//, ""), n: +f.tokens })).map(f => ({ ...f, group: fileGroup(f.name) }));
+  const stage1 = d3.rollups(files, v => v.length, d => d.group).map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n);
+  const defsByType = d3.rollups(t.fileTypeSym, v => d3.sum(v, d => +d.tokens), d => typeName(d.type)).map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n);
+  const symsByType = d3.rollups(t.symbols, v => v.length, d => typeName(d.type || "")).map(([k, n]) => ({ k: k || "untyped", n })).sort((a, b) => b.n - a.n);
+  const varsByTier = d3.rollups(t.variables, v => v.length, d => tierName(d.tier || "")).map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n);
+  const condName = (iri) => { const c = A.local(iri).replace("s4/web/cond/", ""); return c.replace("layer-ds-", "").replace("/", " · "); };
+  const declByCond = d3.rollups(t.declByTierCond, v => d3.sum(v, d => +d.n), d => condName(d.cond)).map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n);
+  const grpColor = (g) => ({ primitive: "var(--ordinal-2)", "semantic/color": A.series(1), "semantic/spacing": A.series(3) }[g] || "var(--series-other-2)");
+  const stages = [
+    { title: "Token files", total: files.length, sub: "with token definitions", segs: stage1, color: s => grpColor(s.k) },
+    { title: "Token definitions", total: d3.sum(defsByType, s => s.n), sub: "w3c-tokens:Token, by type", segs: defsByType, color: s => typeColor(s.k) },
+    { title: "Symbols", total: d3.sum(symsByType, s => s.n), sub: "dt:TokenSymbol, by type", segs: symsByType, color: s => typeColor(s.k) },
+    { title: "CSS variables", total: d3.sum(varsByTier, s => s.n), sub: "dt:Variable, by tier", segs: varsByTier, color: s => TIERC[s.k] || "var(--series-other)" },
+    { title: "Declarations", total: d3.sum(declByCond, s => s.n), sub: "dt:Declaration, by condition", segs: declByCond, color: s => /tokens/.test(s.k) ? "var(--ordinal-2)" : /modifiers · root/.test(s.k) ? "var(--ordinal-3)" : /states/.test(s.k) ? "var(--ordinal-5)" : "var(--ordinal-4)" },
+  ];
+  const colW = 120, gapW = 90, top = 70, plotH = 420, W = 40 + stages.length * colW + (stages.length - 1) * gapW, H = top + plotH + 30;
+  const y = d3.scaleLinear().domain([0, d3.max(stages, s => s.total)]).range([0, plotH]);
+  const svg = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).style("min-width", "860px").attr("role", "img").attr("aria-label", "Token pipeline");
+  const base = top + plotH; const unl = [];
+  // bands between stage totals
+  for (let i = 0; i < stages.length - 1; i++) { const x1 = 20 + i * (colW + gapW) + colW, x2 = x1 + gapW; const h1 = y(stages[i].total), h2 = y(stages[i + 1].total); svg.append("path").attr("class", "band").attr("d", `M${x1},${base} L${x1},${base - h1} C${x1 + gapW / 2},${base - h1} ${x1 + gapW / 2},${base - h2} ${x2},${base - h2} L${x2},${base} Z`); }
+  stages.forEach((s, i) => {
+    const x = 20 + i * (colW + gapW); const g = svg.append("g").attr("transform", `translate(${x},0)`);
+    g.append("text").attr("class", "stage-total").attr("y", 24).text(A.fmt(s.total));
+    g.append("text").attr("class", "stage-title").attr("y", 42).text(s.title);
+    g.append("text").attr("class", "stage-sub").attr("y", 56).text(s.sub);
+    let acc = 0;
+    for (const seg of s.segs) { const h = y(seg.n); const yy = base - acc - h; acc += h;
+      g.append("rect").attr("x", 0).attr("y", yy + 1).attr("width", colW).attr("height", Math.max(0, h - 2)).attr("fill", s.color(seg)).on("pointermove", (ev) => A.tip(`<b>${s.title}</b><br>${seg.k}: ${A.fmt(seg.n)} (${A.pct(seg.n / s.total)})`, ev)).on("pointerleave", () => A.tip(null));
+      if (h < 13) unl.push({ x, k: seg.k, n: seg.n, c: s.color(seg) });
+      if (h >= 13) g.append("text").attr("class", "seg-label").attr("x", 6).attr("y", yy + h / 2).attr("dy", ".32em").attr("fill", h > 0 && /ordinal-(4|5)|series-1\)|series-other-2/.test(s.color(seg)) ? "var(--color-background)" : "var(--color-text)").style("fill", /ordinal-(4|5)|series-1\)|series-other-2|series-2|series-3/.test(s.color(seg)) ? "var(--color-background)" : "var(--color-text)").text(`${seg.k.length > 17 ? seg.k.slice(0, 16) + "…" : seg.k} ${A.fmt(seg.n)}`); }
+  });
+  svg.append("line").attr("x1", 10).attr("x2", W - 10).attr("y1", base + .5).attr("y2", base + .5).attr("stroke", "var(--color-border)");
+  // segments too thin to label are listed under their column
+  const byX = d3.groups(unl, u => u.x); let extra = 0;
+  for (const [x, list] of byX) { list.forEach((u, i) => { svg.append("rect").attr("x", x).attr("y", base + 10 + i * 13).attr("width", 8).attr("height", 8).attr("fill", u.c); svg.append("text").attr("x", x + 12).attr("y", base + 17 + i * 13).attr("font-size", 10).attr("class", "muted").text(`${u.k} ${A.fmt(u.n)}`); }); extra = Math.max(extra, list.length); }
+  svg.attr("viewBox", `0 0 ${W} ${H + extra * 13 + 6}`);
+  document.getElementById("pipeline").replaceChildren(svg.node());
+
+  // ---- coordinates
+  const rv = new Map(t.resolvedByCoord.filter(d => d.coord).map(d => [d.coord, +d.n]));
+  const fams = d3.groups(t.coordinates, c => A.local(c.c).split(".")[1]).sort((a, b) => d3.sum(b[1], c => rv.get(c.c) || 0) - d3.sum(a[1], c => rv.get(c.c) || 0));
+  const contractInfo = d3.rollup(t.contracts, v => Object.fromEntries(v.map(x => [A.local(x.p), A.local(x.o)])), d => A.local(d.c).replace("contract.", ""));
+  document.getElementById("coords").innerHTML = fams.map(([f, cs]) => { const ci = contractInfo.get(f) || {}; return `<div class="fam"><div><b>${f}</b><div class="tiny muted">${cs[0].famName ? "family " + cs[0].famName : ""}${ci.level ? " · " + ci.level.replace("level.", "") : ""}${ci.provision ? " · " + ci.provision.replace("provision.", "") : ""}${ci.providesType ? " · provides " + ci.providesType : ""}</div></div><div class="vals">${cs.map(c => A.local(c.c).split(".")[2]).sort().map(v => { const n = rv.get(`https://dt.canonical.com/coordinate.${f}.${v}`) || 0; return `<span class="chip">${v}${n ? ` <b>${A.fmt(n)}</b>` : ""}</span>`; }).join("")}</div></div>`; }).join("") + `<div class="fam"><div><b>theme / product</b><div class="tiny muted">contracts with no coordinate of their own</div></div><div class="vals"><span class="chip">contract.theme</span><span class="chip">contract.product</span></div></div>`;
+
+  // ---- declarations by condition, stacked by tier
+  const condRows = d3.groups(t.declByTierCond, d => condName(d.cond)).map(([k, v]) => ({ label: k, total: d3.sum(v, d => +d.n), segs: ["primitive", "semantic", "derived"].map(tier => ({ tier, n: d3.sum(v.filter(d => tierName(d.tier) === tier), d => +d.n) })) })).sort((a, b) => b.total - a.total);
+  { const rowH = 20, labelW = 190, W2 = 560; const x = d3.scaleLinear().domain([0, d3.max(condRows, r => r.total)]).range([0, W2 - labelW - 56]);
+    const sv = d3.create("svg").attr("viewBox", `0 0 ${W2} ${condRows.length * rowH + 30}`).attr("role", "img").attr("aria-label", "Declarations by condition");
+    const lg = sv.append("g").attr("transform", "translate(0,0)"); ["primitive", "semantic", "derived"].forEach((tier, i) => { lg.append("rect").attr("x", i * 90).attr("y", 2).attr("width", 10).attr("height", 10).attr("fill", TIERC[tier]); lg.append("text").attr("x", i * 90 + 14).attr("y", 11).attr("font-size", 11).text(tier); });
+    const gg = sv.append("g").attr("transform", `translate(${labelW},22)`);
+    const r = gg.selectAll("g").data(condRows).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+    r.append("text").attr("x", -8).attr("y", rowH / 2).attr("dy", ".32em").attr("text-anchor", "end").attr("font-size", 11).text(d => d.label);
+    r.each(function (d) { let acc = 0; d3.select(this).selectAll("rect").data(d.segs.filter(s => s.n)).join("rect").attr("x", s => { const v = x(acc); acc += s.n; return v + 1; }).attr("y", 3).attr("height", 14).attr("width", s => Math.max(0, x(s.n) - 2)).attr("fill", s => TIERC[s.tier]).on("pointermove", (ev, s) => A.tip(`<b>${d.label}</b><br>${s.tier}: ${A.fmt(s.n)} of ${A.fmt(d.total)}`, ev)).on("pointerleave", () => A.tip(null)); });
+    r.append("text").attr("x", d => x(d.total) + 6).attr("y", rowH / 2).attr("dy", ".32em").attr("font-size", 11).attr("class", "tabular").text(d => A.fmt(d.total));
+    document.getElementById("conds").replaceChildren(sv.node()); }
+
+  // ---- chain lengths, references
+  A.hbars("#chains", t.chainLen.map(c => ({ label: `${c.len} hop${c.len > 1 ? "s" : ""}`, value: +c.n })), { rowH: 22, labelW: 70, aria: "Resolution chain length" });
+  const fam = (n) => { const p = n.split("."); return p[0] === "color" && p[1] === "palette" ? "color.palette (primitive)" : p[0] === "color" ? "color (semantic)" : p[0]; };
+  const refs = d3.rollups(t.symRefs, v => d3.sum(v, d => +d.n), d => fam(d.b)).sort((a, b) => b[1] - a[1]);
+  A.hbars("#refs", refs.map(([k, n]) => ({ label: k, value: n })), { rowH: 22, labelW: 170, aria: "Reference targets by family" });
+
+  // ---- variables table
+  const vt = d3.rollups(t.varTierVis, v => d3.sum(v, d => +d.n), d => tierName(d.tier), d => A.local(d.vis).replace("visibility.", ""), d => typeName(d.type || "") || "no symbol");
+  const rows = []; for (const [tier, m] of vt) for (const [vis, m2] of m) for (const [type, n] of m2) rows.push({ tier, vis, type, n });
+  rows.sort((a, b) => ["primitive", "semantic", "derived"].indexOf(a.tier) - ["primitive", "semantic", "derived"].indexOf(b.tier) || d3.ascending(a.vis, b.vis) || b.n - a.n);
+  A.table("#varTable", [{ label: "Tier", key: "tier" }, { label: "Visibility", key: "vis" }, { label: "Symbol type", key: "type" }, { label: "Variables", key: "n", num: true }], rows);
+})();
+</script>
+</body>
+</html>

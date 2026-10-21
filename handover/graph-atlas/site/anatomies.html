@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Anatomy census · Pragma Graph Atlas</title>
+<style>
+  .grammar { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--dimension-300); align-items: start; }
+  .grammar > * { min-width: 0; max-width: 100%; }
+  .grammar pre { background: var(--color-background-layer2); padding: .75rem 1rem; font-size: .75rem; line-height: 1.45; }
+  .grammar pre .c { color: var(--color-text-muted); }
+  .grammar pre .k { color: var(--series-1); }
+  .grammar dl { display: grid; grid-template-columns: max-content 1fr; gap: .375rem 1rem; margin: 0; font-size: .875rem; line-height: 1.4286; }
+  .grammar dt { font-family: var(--font-mono); font-size: .8125rem; } .grammar dd { margin: 0; } .grammar dd .n { color: var(--color-text-muted); }
+  @media (max-width: 48rem) { .grammar { grid-template-columns: 1fr; } }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: var(--dimension-200) var(--dimension-200); }
+  .glyph { display: grid; gap: .25rem; cursor: pointer; border-top: 1px solid var(--color-border-disabled); padding-top: .5rem; min-width: 0; }
+  .glyph:hover { border-top-color: var(--color-text); }
+  .glyph svg { width: 100%; height: auto; display: block; }
+  .glyph .t { font-size: .8125rem; line-height: 1.25; font-weight: 600; overflow-wrap: anywhere; }
+  .glyph .m { font-size: .6875rem; color: var(--color-text-muted); line-height: 1.3; font-variant-numeric: tabular-nums; }
+  svg .comp-link { fill: none; stroke: var(--color-border); stroke-width: 1.2; opacity: .7; }
+  svg .comp-label { font-size: 10px; paint-order: stroke; stroke: var(--color-background); stroke-width: 3px; }
+  .outline { font-family: var(--font-mono); font-size: .75rem; line-height: 1.5; display: grid; gap: .125rem; }
+  .outline .rel { color: var(--color-text-muted); }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">05 / 16 · the anatomy census</div>
+    <h1>181 written anatomies, 882 nodes, one grammar</h1>
+    <p class="lede">Every block carries an <code>ds:anatomyDsl</code> property, but only 181 of the 325 hold a document yet; 147 are empty strings and 5 do not parse. This page reads the 176 that do: what the grammar looks like, who has an anatomy and who has not, every tree drawn small, and which blocks are built out of which.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0"><div class="stats" id="stats"></div></section>
+
+  <section class="block">
+    <header><h2>The grammar, on the Button</h2><p class="small muted">The DSL is YAML. One <code>node</code> is the block; <code>edges</code> nest further nodes; a <code>relation</code> on an edge names the slot a consumer fills and how many children may appear; <code>styles</code> bind a style key, optionally per state, to a token or a literal. Counts on the right are across all 176 parsed documents.</p></header>
+    <div class="grammar"><pre id="snippet"></pre><dl id="grammar"></dl></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Who has an anatomy</h2><p class="small muted">Written and parsed (blue), written but malformed (orange), still empty (gray), by tier and by grain. The global tier is the best covered; Launchpad and Landscape, the two large product tiers, have written almost none.</p></header>
+    <div id="covLegend"></div>
+    <div class="two"><figure><div class="chart" id="covTier"></div><figcaption>By tier.</figcaption></figure><figure><div class="chart" id="covGrain"></div><figcaption>By grain.</figcaption></figure></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Every anatomy, drawn small</h2><p class="small muted">All 176 parsed trees as glyphs, largest first. Filled discs are named nodes (they point at another block); hollow discs are anonymous roles; the square is the root. Click a glyph for the full outline with slots, cardinalities and style keys.</p></header>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Which blocks are built out of which</h2><p class="small muted">A named node inside an anatomy is a reference to another block. Following those references across all documents gives the composition graph: an arrow runs from the containing block to the contained one. Node size is how many anatomies contain the block. Blocks referenced but without an anatomy of their own are drawn hollow.</p></header>
+    <div id="compLegend"></div>
+    <figure><div class="chart" id="composition"></div><figcaption>Hover a node for its name and counts; click it for the outline of its anatomy. The layout is a force simulation run to rest before drawing, so it is the same on every load.</figcaption></figure>
+    <div class="two"><figure><div class="chart" id="contained"></div><figcaption>The blocks most often contained in other anatomies.</figcaption></figure><figure><div class="chart" id="containers"></div><figcaption>The anatomies that reference the most other blocks.</figcaption></figure></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Shape statistics</h2><p class="small muted">Distributions across the 176 parsed documents.</p></header>
+    <div class="two">
+      <figure><div class="chart" id="nodesHist"></div><figcaption>Nodes per anatomy.</figcaption></figure>
+      <figure><div class="chart" id="depthHist"></div><figcaption>Depth of the deepest node (root is 0).</figcaption></figure>
+    </div>
+    <div class="two">
+      <figure><div class="chart" id="cards"></div><figcaption>Cardinality forms written on edges. <code>1</code> is exactly one; <code>0..1</code> optional; <code>1..*</code> one or more.</figcaption></figure>
+      <figure><div class="chart" id="slots"></div><figcaption>Slot names, top fifteen. <code>default</code> is the unnamed children slot.</figcaption></figure>
+    </div>
+    <div class="two">
+      <figure><div class="chart" id="states"></div><figcaption>Style entries by state suffix (<code>key@hover</code> and friends).</figcaption></figure>
+      <figure><div class="chart" id="keysUse"></div><figcaption>Style keys by the number of anatomies that bind them, top twenty.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <header><h2>The largest anatomies</h2></header>
+    <div id="largest"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("anatomies.html");
+  const [anat, btn] = await A.load("anatomies", "button");
+  const parsed = anat.filter(a => a.nodes).sort((p, q) => q.nodes - p.nodes || q.styleCount - p.styleCount);
+  const GC = { component: 1, subcomponent: 2, pattern: 3, layout: 4 };
+  const gcolor = (g) => GC[g] ? A.series(GC[g]) : "var(--series-other)";
+  const totals = { nodes: d3.sum(parsed, a => a.nodes), named: d3.sum(parsed, a => a.named), anon: d3.sum(parsed, a => a.anon), refs: d3.sum(parsed, a => a.refs.length), styles: d3.sum(parsed, a => a.styleCount), slots: d3.sum(parsed, a => a.slots.length), cards: d3.sum(parsed, a => a.cards.length), switches: d3.sum(parsed, a => a.switches) };
+  document.getElementById("stats").innerHTML = [["Anatomy properties", anat.length, "one per block, group, view and variant"], ["Written and parsed", parsed.length, "YAML documents with a root node"], ["Malformed", anat.filter(a => a.error).length, "written, but the YAML does not parse"], ["Empty", anat.filter(a => a.empty).length, "the property holds an empty string"], ["Nodes", totals.nodes, `${totals.named} named · ${totals.anon} anonymous`], ["Style entries", totals.styles, "key, state and token or literal"], ["References to other blocks", totals.refs, "named child nodes"], ["Deepest tree", d3.max(parsed, a => a.depth), "levels below the root"]].map(([l, v, n]) => `<div class="stat"><span class="label">${l}</span><span class="value">${A.fmt(v)}</span><span class="note">${n}</span></div>`).join("");
+
+  // grammar snippet: Button, first 26 lines, keys coloured
+  const lines = (btn.dsl || "").split("\n").filter(l => !l.startsWith("#")).slice(0, 26);
+  document.getElementById("snippet").innerHTML = lines.map(l => A.esc(l).replace(/^(\s*)([\w.@-]+)(:)/, '$1<span class="k">$2</span>$3').replace(/(#.*)$/, '<span class="c">$1</span>')).join("\n") + "\n<span class='c'>⋮ (" + ((btn.dsl || "").split("\n").length - 26) + " more lines)</span>";
+  const stateEntries = d3.sum(parsed, a => d3.sum(Object.entries(a.states).filter(([k]) => k !== "default"), ([, n]) => n));
+  document.getElementById("grammar").innerHTML = [["node", "A part of the block. The outermost node is the block itself.", totals.nodes], ["uri", "Names the node as another block: a reference, drawn as a filled disc.", totals.named], ["role", "Names an anonymous part that has no block of its own.", totals.anon], ["edges", "The node's children, in order.", totals.nodes - parsed.length], ["relation.slotName", "The slot a consumer fills with this child.", totals.slots], ["relation.cardinality", "How many of the child may appear: 1, 0..1, 1..*, …", totals.cards], ["styles", "Style key → token path or literal; a list is a fallback chain.", totals.styles], ["key@state", "A binding that applies in one interaction state only.", stateEntries], ["switch", "A node whose shape depends on a property value.", totals.switches]].map(([k, d, n]) => `<dt>${k}</dt><dd>${d} <span class="n">${A.fmt(n)}</span></dd>`).join("");
+
+  // coverage
+  const status = (a) => a.nodes ? "parsed" : a.error ? "malformed" : "empty";
+  const SC = { parsed: A.series(1), malformed: A.series(2), empty: "var(--series-other)" };
+  A.legend("#covLegend", ["parsed", "malformed", "empty"].map(k => ({ label: k, color: SC[k], count: anat.filter(a => status(a) === k).length })));
+  function stacked(sel, rows, aria) { const rowH = 20, labelW = 180, W = 560; const x = d3.scaleLinear().domain([0, d3.max(rows, r => r.total)]).range([0, W - labelW - 56]);
+    const sv = d3.create("svg").attr("viewBox", `0 0 ${W} ${rows.length * rowH + 8}`).attr("role", "img").attr("aria-label", aria); const g = sv.append("g").attr("transform", `translate(${labelW},4)`);
+    const r = g.selectAll("g").data(rows).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+    r.append("text").attr("x", -8).attr("y", rowH / 2).attr("dy", ".32em").attr("text-anchor", "end").attr("font-size", 11).text(d => d.label);
+    r.each(function (d) { let acc = 0; d3.select(this).selectAll("rect").data(d.segs.filter(s => s.n)).join("rect").attr("x", s => { const v = x(acc); acc += s.n; return v + 1; }).attr("y", 3).attr("height", 14).attr("width", s => Math.max(0, x(s.n) - 2)).attr("fill", s => s.color).on("pointermove", (ev, s) => A.tip(`<b>${d.label}</b><br>${s.k}: ${s.n} of ${d.total}`, ev)).on("pointerleave", () => A.tip(null)); });
+    r.append("text").attr("x", d => x(d.total) + 6).attr("y", rowH / 2).attr("dy", ".32em").attr("font-size", 11).attr("class", "tabular").text(d => `${d.segs[0].n}/${d.total}`);
+    document.querySelector(sel).replaceChildren(sv.node()); }
+  const mk = (key) => d3.groups(anat, a => a[key]).map(([k, list]) => ({ label: k, total: list.length, segs: ["parsed", "malformed", "empty"].map(st => ({ k: st, n: list.filter(a => status(a) === st).length, color: SC[st] })) })).sort((p, q) => q.total - p.total);
+  stacked("#covTier", mk("tier"), "Anatomy coverage by tier"); stacked("#covGrain", mk("grain"), "Anatomy coverage by grain");
+
+  // gallery of glyphs
+  const toH = (t) => d3.hierarchy(t, d => d.c);
+  function glyph(a) { const h = toH(a.tree); const layout = d3.tree().nodeSize([9, 18])(h); let minX = Infinity, maxX = -Infinity; h.each(d => { minX = Math.min(minX, d.x); maxX = Math.max(maxX, d.x); });
+    const w = (h.height + 1) * 18 + 10, hh = maxX - minX + 12; const sv = d3.create("svg").attr("viewBox", `0 0 ${Math.max(w, 60)} ${Math.max(hh, 24)}`).attr("preserveAspectRatio", "xMinYMid meet").attr("aria-hidden", "true"); const g = sv.append("g").attr("transform", `translate(5,${6 - minX})`);
+    g.selectAll("path").data(h.links()).join("path").attr("fill", "none").attr("stroke", "var(--color-border)").attr("stroke-width", .8).attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+    g.selectAll("circle").data(h.descendants().filter(d => d.depth)).join("circle").attr("cx", d => d.y).attr("cy", d => d.x).attr("r", 2.6).attr("fill", d => d.data.u ? gcolor(a.grain) : "var(--color-background)").attr("stroke", d => d.data.u ? "none" : "var(--color-text)").attr("stroke-width", .9);
+    g.append("rect").attr("x", -3).attr("y", -3).attr("width", 6).attr("height", 6).attr("fill", gcolor(a.grain));
+    return sv.node(); }
+  function outline(a) { const rows = []; (function walk(n, depth) { rows.push(`<div style="padding-left:${depth * 1}rem">${n.u ? `<b>${A.esc(n.u)}</b>` : A.esc(n.r || "node")}${n.rel && (n.rel.slot || n.rel.card) ? ` <span class="rel">${n.rel.slot ? "slot " + A.esc(n.rel.slot) : ""}${n.rel.card ? " ×" + A.esc(n.rel.card) : ""}</span>` : ""}${n.k ? ` <span class="rel">· ${n.k} styles</span>` : ""}</div>`); for (const c of n.c) walk(c, depth + 1); })(a.tree, 0); return rows.join(""); }
+  function showAnatomy(a) { A.showPanel(a.name, `${a.grain} · ds:${a.tier} · anatomy`, `<dl><dt>Nodes</dt><dd>${a.nodes} (${a.named} named, ${a.anon} anonymous)</dd><dt>Depth</dt><dd>${a.depth}</dd><dt>Style entries</dt><dd>${a.styleCount} on ${a.keys.length} keys</dd><dt>Slots</dt><dd>${a.slots.length ? [...new Set(a.slots)].join(", ") : "—"}</dd><dt>References</dt><dd>${a.refs.length ? a.refs.map(A.esc).join(", ") : "—"}</dd><dt>Source</dt><dd>${a.lines} lines, ${A.fmt(a.chars)} characters</dd></dl><h4>Outline</h4><div class="outline">${outline(a)}</div>${a.keys.length ? `<h4>Style keys used</h4><div class="small">${a.keys.map(A.esc).join(", ")}</div>` : ""}${A.cmd(`pragma block lookup "${a.name}" --tier ${a.tier} --detail detailed`)}`); }
+  const gal = document.getElementById("gallery");
+  for (const a of parsed) { const el = document.createElement("div"); el.className = "glyph"; el.tabIndex = 0; el.setAttribute("role", "button"); el.appendChild(glyph(a)); el.insertAdjacentHTML("beforeend", `<div class="t">${A.esc(a.name)}</div><div class="m">${a.tier} · ${a.grain}<br>${a.nodes} nodes · depth ${a.depth} · ${a.styleCount} styles</div>`); el.addEventListener("click", () => showAnatomy(a)); el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showAnatomy(a); } }); gal.appendChild(el); }
+
+  // composition graph
+  const keyOf = (u) => { const p = (u || "").split("."); return p.length >= 2 ? p.slice(-2).join(".") : u; };
+  const byKey = new Map(); for (const a of parsed) { const k = keyOf(a.self || A.local(a.b)); if (!byKey.has(k)) byKey.set(k, []); byKey.get(k).push(a); }
+  const resolve = (ref, tier) => { const list = byKey.get(keyOf(ref)) || []; return list.find(a => a.tier === tier) || list.find(a => a.tier === "global") || list[0] || null; };
+  const cnodes = new Map(), clinks = [];
+  const nodeFor = (id, a, ref) => { if (!cnodes.has(id)) cnodes.set(id, { id, a, label: a ? a.name : keyOf(ref).split(".").pop(), grain: a ? a.grain : (keyOf(ref).split(".")[0] || "other"), tier: a ? a.tier : "?", inDeg: 0, outDeg: 0 }); return cnodes.get(id); };
+  for (const a of parsed) for (const ref of a.refs) { const t = resolve(ref, a.tier); const src = nodeFor(a.b, a), dst = t ? nodeFor(t.b, t) : nodeFor("ref:" + keyOf(ref), null, ref); if (src === dst) continue; clinks.push({ source: src.id, target: dst.id }); src.outDeg++; dst.inDeg++; }
+  const cn = [...cnodes.values()];
+  A.legend("#compLegend", [["component", 1], ["subcomponent", 2], ["pattern", 3], ["layout", 4]].map(([g, i]) => ({ label: g, color: A.series(i) })).concat([{ label: "referenced, no anatomy of its own", color: "var(--color-text)", shape: "ring" }]));
+  { const W = 900, H = 760; const sim = d3.forceSimulation(cn).force("link", d3.forceLink(clinks).id(d => d.id).distance(58).strength(.5)).force("charge", d3.forceManyBody().strength(-190)).force("center", d3.forceCenter(W / 2, H / 2)).force("collide", d3.forceCollide(d => 10 + Math.sqrt(d.inDeg) * 4)).force("x", d3.forceX(W / 2).strength(.04)).force("y", d3.forceY(H / 2).strength(.06)).stop();
+    for (let i = 0; i < 300; i++) sim.tick();
+    for (const n of cn) { n.x = Math.max(30, Math.min(W - 30, n.x)); n.y = Math.max(20, Math.min(H - 20, n.y)); }
+    const sv = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "Composition graph of anatomies");
+    sv.append("defs").append("marker").attr("id", "arr").attr("viewBox", "0 0 10 10").attr("refX", 10).attr("refY", 5).attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto-start-reverse").append("path").attr("d", "M0,0 L10,5 L0,10 z").attr("fill", "var(--color-border)");
+    const r = (d) => 4 + Math.sqrt(d.inDeg) * 3;
+    sv.append("g").selectAll("line").data(clinks).join("line").attr("class", "comp-link").attr("marker-end", "url(#arr)").attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => { const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y, L = Math.hypot(dx, dy) || 1; return d.target.x - dx / L * (r(d.target) + 2); }).attr("y2", d => { const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y, L = Math.hypot(dx, dy) || 1; return d.target.y - dy / L * (r(d.target) + 2); });
+    const g = sv.append("g").selectAll("g").data(cn).join("g").attr("transform", d => `translate(${d.x},${d.y})`).style("cursor", d => d.a ? "pointer" : "default");
+    g.append("circle").attr("r", r).attr("fill", d => d.a ? gcolor(d.grain) : "var(--color-background)").attr("stroke", d => d.a ? "var(--color-background)" : "var(--color-text)").attr("stroke-width", 1.5);
+    g.append("text").attr("class", "comp-label").attr("x", d => r(d) + 3).attr("y", 3).text(d => d.label);
+    g.on("pointermove", (ev, d) => A.tip(`<b>${A.esc(d.label)}</b> ${d.grain}${d.a ? " · " + d.tier : " · no anatomy written"}<br>contained in ${d.inDeg} anatom${d.inDeg === 1 ? "y" : "ies"} · contains ${d.outDeg}`, ev)).on("pointerleave", () => A.tip(null)).on("click", (ev, d) => { if (d.a) showAnatomy(d.a); });
+    document.getElementById("composition").replaceChildren(sv.node()); }
+  A.hbars("#contained", cn.filter(d => d.inDeg).sort((p, q) => q.inDeg - p.inDeg).slice(0, 12).map(d => ({ label: d.label, value: d.inDeg, color: d.a ? gcolor(d.grain) : "var(--series-other)" })), { rowH: 20, labelW: 160, aria: "Most contained blocks" });
+  A.hbars("#containers", cn.filter(d => d.outDeg).sort((p, q) => q.outDeg - p.outDeg).slice(0, 12).map(d => ({ label: d.label, value: d.outDeg, color: gcolor(d.grain) })), { rowH: 20, labelW: 160, aria: "Anatomies referencing most blocks" });
+
+  // shape statistics
+  const hist = (sel, vals, label) => { const m = d3.rollups(vals, v => v.length, v => v).sort((p, q) => p[0] - q[0]); A.hbars(sel, m.map(([k, n]) => ({ label: `${k} ${label}`, value: n })), { rowH: 18, labelW: 90, aria: label }); };
+  hist("#nodesHist", parsed.map(a => a.nodes), "nodes"); hist("#depthHist", parsed.map(a => a.depth), "deep");
+  const cardC = d3.rollups(parsed.flatMap(a => a.cards), v => v.length, c => c).sort((p, q) => q[1] - p[1]); A.hbars("#cards", cardC.map(([k, n]) => ({ label: k, value: n })), { rowH: 20, labelW: 70, aria: "Cardinality forms" });
+  const slotC = d3.rollups(parsed.flatMap(a => a.slots), v => v.length, s => s).sort((p, q) => q[1] - p[1]).slice(0, 15); A.hbars("#slots", slotC.map(([k, n]) => ({ label: k, value: n })), { rowH: 20, labelW: 110, aria: "Slot names" });
+  const stC = {}; for (const a of parsed) for (const [k, n] of Object.entries(a.states)) stC[k] = (stC[k] || 0) + n; A.hbars("#states", Object.entries(stC).sort((p, q) => q[1] - p[1]).map(([k, n]) => ({ label: k, value: n })), { rowH: 20, labelW: 110, aria: "Style entries by state" });
+  const keyC = d3.rollups(parsed.flatMap(a => a.keys), v => v.length, k => k).sort((p, q) => q[1] - p[1]).slice(0, 20); A.hbars("#keysUse", keyC.map(([k, n]) => ({ label: k, value: n })), { rowH: 18, labelW: 200, aria: "Style keys by anatomies using them" });
+  A.table("#largest", [{ label: "Block", key: "name", render: a => `<a class="jump" style="cursor:pointer" data-b="${A.esc(a.b)}">${A.esc(a.name)}</a>` }, { label: "Tier", key: "tier" }, { label: "Grain", key: "grain" }, { label: "Nodes", key: "nodes", num: true }, { label: "Named", key: "named", num: true }, { label: "Depth", key: "depth", num: true }, { label: "Styles", key: "styleCount", num: true }, { label: "Slots", key: "sl", num: true, render: a => a.slots.length }, { label: "Lines", key: "lines", num: true }], parsed.slice(0, 15));
+  document.getElementById("largest").querySelectorAll("a.jump").forEach(el => el.addEventListener("click", () => { const a = parsed.find(x => x.b === el.dataset.b); if (a) showAnatomy(a); }));
+})();
+</script>
+</body>
+</html>

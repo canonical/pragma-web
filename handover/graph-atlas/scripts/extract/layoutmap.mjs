@@ -1,0 +1,13 @@
+import pw from "/opt/node-tools/node_modules/playwright/index.js"; const { chromium } = pw;
+import { readFileSync } from "node:fs"; import http from "node:http"; import path from "node:path";
+const ROOT = "/home/user/graph-atlas", NM = "/tmp/claude-0/-home-user/06a72397-f574-54f4-af6d-d59fdfba2a1a/scratchpad/extract/node_modules";
+const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+const srv = http.createServer((req, res) => { let body; const p = path.join(ROOT, decodeURIComponent(req.url.split("?")[0])); try { body = readFileSync(p); } catch { res.writeHead(404); res.end(); return; } res.writeHead(200, { "content-type": MIME[path.extname(p)] || "application/octet-stream" }); res.end(body); }).listen(8784);
+const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
+const file = process.argv[2] || "compositions.html";
+const page = await (await browser.newContext({ viewport: { width: 1280, height: 1000 } })).newPage();
+await page.route(/https:\/\/(cdnjs|unpkg)[^ ]*/, r => r.fulfill({ body: readFileSync(`${NM}/d3/dist/d3.min.js`), contentType: "text/javascript" }));
+await page.goto(`http://localhost:8784/${file}`, { waitUntil: "load" }); await page.waitForTimeout(3000);
+const rows = await page.evaluate(() => { const b = document.getElementById("board"); return [...b.querySelectorAll(".frame")].map(f => { const body = f.querySelector(".fbody"); const content = body.offsetHeight + 50; return [f.getAttribute("aria-label"), f.offsetLeft, f.offsetTop, f.offsetWidth, f.offsetHeight, Math.round(100 * (f.offsetHeight - content) / f.offsetHeight) + "% empty"]; }).sort((a, b) => a[2] - b[2] || a[1] - b[1]); });
+for (const r of rows) console.log(r.join("  "));
+await browser.close(); srv.close();

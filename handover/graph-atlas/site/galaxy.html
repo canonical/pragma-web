@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Galaxy · Pragma Graph Atlas</title>
+<style>
+  .stage { position: relative; border: 1px solid var(--color-border-disabled); background: var(--color-background); }
+  .stage canvas { display: block; width: 100%; height: min(78vh, 900px); min-height: 420px; touch-action: none; cursor: grab; }
+  .overlay { position: absolute; left: .75rem; top: .75rem; display: grid; gap: .25rem; font-size: .75rem; line-height: 1.3333; background: color-mix(in srgb, var(--color-background) 85%, transparent); padding: .5rem .75rem; border: 1px solid var(--color-border-disabled); max-width: 18rem; }
+  .overlay .legend { gap: .125rem .75rem; font-size: .75rem; }
+  .overlay .hint { color: var(--color-text-muted); }
+  .regions { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--dimension-200); font-size: .875rem; }
+  .regions div { border-top: 3px solid var(--c); padding-top: .5rem; }
+  .regions b { display: block; }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">10 / 16 · the entity graph, flat</div>
+    <h1>4,624 named nodes and 10,836 edges in one map</h1>
+    <p class="lede">Every IRI that appears as a subject or an object, placed by a force layout computed once and shipped with the page, so the picture is the same every time it opens. Edges are the node-to-node triples (type statements left out). Colour is the vocabulary; size is degree; the labels mark the most connected nodes.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stage" id="stage"><canvas id="c" aria-label="Map of the whole graph"></canvas>
+      <div class="overlay"><div id="legend"></div><div class="hint">Scroll to zoom, drag to pan, hover a node for its name. Click a node to open its details and highlight its neighbours; double-click resets.</div></div>
+    </div>
+    <p class="small muted">Blank nodes (34,919 statements) are not drawn: they are the anonymous property, binding, declaration and resolved-value records that hang off these nodes. Three hues plus two grays: the fourth and fifth vocabularies are drawn gray because no fourth hue stays distinguishable from the other three for every kind of colour vision in a scatter.</p>
+  </section>
+
+  <section class="block">
+    <header><h2>Reading the regions</h2></header>
+    <div class="regions" id="regions"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>The thirty most connected nodes</h2><p class="small muted">Degree counts both directions. The token files and the <code>:root</code> conditions are hubs because every definition and declaration points at them.</p></header>
+    <div id="hubs"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("galaxy.html");
+  const L = await A.load("layout");
+  const nodes = L.nodes.map((n, i) => ({ i, x: n[0], y: n[1], ns: n[2], cls: n[3], deg: n[4], label: n[5], iri: n[6] || n[5] }));
+  const curie = (n) => { const l = n.iri; if (n.ns === "ds") return "ds:" + l; if (n.ns === "cs") return "cs:" + l.replace("codestandards#", ""); if (n.ns === "anatomy") return "anatomy:" + l; if (n.ns === "w3c") return "w3c-tokens:" + l.replace("w3c:", ""); if (n.ns === "dt") return "dt:" + l; return l.replace(/^.*#/, m => ({ "2002/07/owl#": "owl:", "2000/01/rdf-schema#": "rdfs:", "1999/02/22-rdf-syntax-ns#": "rdf:", "ns/shacl#": "sh:", "2001/XMLSchema#": "xsd:" }[m] || m)); };
+  const out = nodes.map(() => []), inn = nodes.map(() => []);
+  for (const l of L.links) { out[l[0]].push([l[1], l[2]]); inn[l[1]].push([l[0], l[2]]); }
+  let selected = null, neighbours = new Set();
+  function select(i) { selected = i == null ? null : nodes[i]; neighbours = new Set(); if (selected) { for (const [j] of out[selected.i]) neighbours.add(j); for (const [j] of inn[selected.i]) neighbours.add(j); } draw(); if (!selected) return;
+    const n = selected; const row = ([j, p]) => `<li><span class="p">${A.esc(p)}</span><span class="o"><a class="jump" data-i="${j}">${A.esc(nodes[j].label)}</a></span></li>`;
+    const html = `<dl><dt>IRI</dt><dd><code>${A.esc(curie(n))}</code></dd><dt>Class</dt><dd>${A.esc(n.cls ? n.cls.replace("w3c:", "w3c-tokens:") : "untyped")}</dd><dt>Vocabulary</dt><dd>${A.esc(A.NS_LABEL[n.k] || n.k)}</dd><dt>Degree</dt><dd>${n.deg} (${out[n.i].length} out, ${inn[n.i].length} in)</dd></dl>
+      ${out[n.i].length ? `<h4>Points at (${out[n.i].length})</h4><ul class="facts">${out[n.i].slice(0, 40).map(row).join("")}${out[n.i].length > 40 ? `<li><span class="p"></span><span class="o muted">… ${out[n.i].length - 40} more</span></li>` : ""}</ul>` : ""}
+      ${inn[n.i].length ? `<h4>Pointed at by (${inn[n.i].length})</h4><ul class="facts">${inn[n.i].slice(0, 40).map(row).join("")}${inn[n.i].length > 40 ? `<li><span class="p"></span><span class="o muted">… ${inn[n.i].length - 40} more</span></li>` : ""}</ul>` : ""}
+      <p class="muted">Literal facts (names, descriptions, values) are not in this entity map; the Everything view and <code>pragma graph inspect</code> show them.</p>
+      ${A.cmd(`pragma graph inspect ${curie(n)}`)}`;
+    const panel = A.showPanel(n.label, `${n.cls ? n.cls.replace("w3c:", "w3c-tokens:") : "node"} · ${n.k}`, html);
+    panel.querySelectorAll("a.jump").forEach(a => a.addEventListener("click", () => select(+a.dataset.i)));
+  }
+  window.onPanelClose = () => select(null);
+  const links = L.links;
+  const isSchema = (n) => /owl#|shacl#|rdf-schema#/.test(n.cls) || n.ns === "other" || n.cls === "";
+  const kind = (n) => isSchema(n) ? "schema" : n.ns === "w3c" ? "dt" : n.ns;
+  const palette = { ds: A.resolve("var(--ns-ds)"), dt: A.resolve("var(--ns-dt)"), cs: A.resolve("var(--ns-cs)"), anatomy: A.resolve("var(--ns-anatomy)"), schema: A.resolve("var(--ns-schema)") };
+  const inkBg = A.resolve("var(--color-background)"), inkText = A.resolve("var(--color-text)"), inkMuted = A.resolve("var(--color-text-muted)");
+  for (const n of nodes) n.k = kind(n);
+  const counts = d3.rollup(nodes, v => v.length, n => n.k);
+  A.legend("#legend", [["dt", "dt: tokens (incl. w3c-tokens:)"], ["ds", "ds: design system"], ["cs", "cs: standards"], ["anatomy", "anatomy: style keys (squares)"], ["schema", "schema: owl, shacl, rdfs"]].map(([k, l]) => ({ label: l, color: palette[k], count: counts.get(k) || 0, shape: k === "anatomy" ? "square" : "dot" })));
+  const canvas = document.getElementById("c"), ctx = canvas.getContext("2d");
+  const r = d3.scaleSqrt().domain([1, d3.max(nodes, n => n.deg)]).range([1.6, 11]);
+  const hubs = nodes.slice().sort((a, b) => b.deg - a.deg).slice(0, 34);
+  const labelSet = new Set(hubs.map(h => h.i));
+  let T = d3.zoomIdentity, W = 0, H = 0, dpr = 1;
+  function size() { dpr = Math.min(2, devicePixelRatio || 1); W = canvas.clientWidth; H = canvas.clientHeight; canvas.width = W * dpr; canvas.height = H * dpr; fit(); draw(); }
+  function fit() { const s = Math.min(W, H) / 2100; T = d3.zoomIdentity.translate(W / 2, H / 2).scale(s); d3.select(canvas).call(zoom.transform, T); }
+  const zoom = d3.zoom().scaleExtent([0.1, 12]).on("zoom", (ev) => { T = ev.transform; draw(); });
+  d3.select(canvas).call(zoom).on("dblclick.zoom", null).on("dblclick", () => fit());
+  function draw() {
+    ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = inkBg; ctx.fillRect(0, 0, W, H);
+    ctx.translate(T.x, T.y); ctx.scale(T.k, T.k);
+    ctx.lineWidth = 0.6 / T.k; ctx.globalAlpha = Math.min(0.35, 0.12 + T.k * 0.1);
+    const byKind = {}; for (const l of links) { const a = nodes[l[0]]; (byKind[a.k] ||= []).push(l); }
+    for (const k in byKind) { ctx.strokeStyle = palette[k]; ctx.beginPath(); for (const l of byKind[k]) { const a = nodes[l[0]], b = nodes[l[1]]; ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); } ctx.stroke(); }
+    ctx.globalAlpha = 1;
+    for (const k of ["schema", "anatomy", "dt", "ds", "cs"]) { ctx.fillStyle = palette[k]; for (const n of nodes) { if (n.k !== k) continue; const rr = r(n.deg); if (k === "anatomy") ctx.fillRect(n.x - rr, n.y - rr, rr * 2, rr * 2); else { ctx.beginPath(); ctx.arc(n.x, n.y, rr, 0, 6.2832); ctx.fill(); } } }
+    const fs = Math.max(10 / T.k, 3); ctx.font = `${fs}px Ubuntu Sans, Ubuntu, sans-serif`; ctx.textBaseline = "middle"; ctx.lineWidth = fs * .35; ctx.strokeStyle = inkBg; ctx.fillStyle = inkText; ctx.lineJoin = "round";
+    for (const h of hubs) { const t = h.label.length > 34 ? h.label.slice(0, 33) + "…" : h.label; const x = h.x + r(h.deg) + 2 / T.k; ctx.strokeText(t, x, h.y); ctx.fillText(t, x, h.y); }
+    if (selected) { // highlight selection and its neighbourhood
+      ctx.globalAlpha = .9; ctx.lineWidth = 1.2 / T.k; ctx.strokeStyle = inkText; ctx.beginPath(); for (const [j] of out[selected.i]) { ctx.moveTo(selected.x, selected.y); ctx.lineTo(nodes[j].x, nodes[j].y); } for (const [j] of inn[selected.i]) { ctx.moveTo(selected.x, selected.y); ctx.lineTo(nodes[j].x, nodes[j].y); } ctx.stroke();
+      ctx.lineWidth = 1.5 / T.k; for (const j of neighbours) { const n = nodes[j]; ctx.beginPath(); ctx.arc(n.x, n.y, r(n.deg) + 2 / T.k, 0, 6.2832); ctx.stroke(); }
+      ctx.lineWidth = 3 / T.k; ctx.beginPath(); ctx.arc(selected.x, selected.y, r(selected.deg) + 4 / T.k, 0, 6.2832); ctx.stroke();
+      const fs2 = Math.max(12 / T.k, 3); ctx.font = `600 ${fs2}px Ubuntu Sans, Ubuntu, sans-serif`; ctx.lineWidth = fs2 * .35; ctx.strokeStyle = inkBg; ctx.fillStyle = inkText; const x = selected.x + r(selected.deg) + 6 / T.k; ctx.strokeText(selected.label, x, selected.y); ctx.fillText(selected.label, x, selected.y);
+    }
+    ctx.restore();
+  }
+  const q = d3.quadtree().x(n => n.x).y(n => n.y).addAll(nodes);
+  canvas.addEventListener("pointermove", (ev) => { const rect = canvas.getBoundingClientRect(); const [px, py] = T.invert([ev.clientX - rect.left, ev.clientY - rect.top]); const n = q.find(px, py, 14 / T.k); if (n) A.tip(`<b>${n.label}</b><br>${n.cls ? "a " + n.cls.replace("w3c:", "w3c-tokens:") : "untyped"} · ${n.k}<br>degree ${n.deg}`, ev); else A.tip(null); });
+  canvas.addEventListener("pointerleave", () => A.tip(null));
+  let down = null; canvas.addEventListener("pointerdown", ev => down = [ev.clientX, ev.clientY]);
+  canvas.addEventListener("pointerup", ev => { if (!down || Math.hypot(ev.clientX - down[0], ev.clientY - down[1]) > 4) return; const rect = canvas.getBoundingClientRect(); const [px, py] = T.invert([ev.clientX - rect.left, ev.clientY - rect.top]); const n = q.find(px, py, 14 / T.k); select(n ? n.i : null); });
+  new ResizeObserver(size).observe(canvas); size();
+  if (matchMedia("(prefers-color-scheme: dark)").matches) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => location.reload());
+  // regions
+  const reg = [["dt", "Token model", "The largest cloud: 1,311 token definitions radiating from their 45 files, the 745 symbols they define, and the 1,156 CSS variables tied to the 31 conditions they are declared under."], ["ds", "Design system", "313 blocks, their 16 tiers, 44 tags, 11 modifier families and the 94 implementation objects, in a tight web around the tier and tag nodes every block points at."], ["cs", "Code standards", "147 standards and 21 categories, almost disconnected from the rest: a standard points at its category and sometimes at the standard it extends, and nothing else."], ["anatomy", "Anatomy DSL", "111 style keys. Bindings reach them through blank nodes, so in this map they appear mostly as a loose cluster beside the schema nodes."], ["schema", "Schema", "The classes, properties and SHACL shapes of all five ontologies, linked by domain, range and subclass statements."]];
+  document.getElementById("regions").innerHTML = reg.map(([k, t, d]) => `<div style="--c:${palette[k]}"><b>${t} <span class="muted">${A.fmt(counts.get(k) || 0)} nodes</span></b>${d}</div>`).join("");
+  A.table("#hubs", [{ label: "#", key: "i", num: true }, { label: "Node", key: "label", render: n => `<code>${n.label}</code>` }, { label: "Class", key: "cls", render: n => n.cls.replace("w3c:", "w3c-tokens:") }, { label: "Vocabulary", key: "k" }, { label: "Degree", key: "deg", num: true }], hubs.slice(0, 30).map((h, i) => ({ ...h, i: i + 1 })));
+})();
+</script>
+</body>
+</html>

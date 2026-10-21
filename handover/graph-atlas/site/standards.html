@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Standards · Pragma Graph Atlas</title>
+<style>
+  .shelf { display: grid; gap: var(--dimension-300); }
+  .shelf .cat { display: grid; grid-template-columns: 12rem 1fr; gap: var(--dimension-200); }
+  .shelf .cat h3 { font-size: 1rem; } .shelf .cat .sub { font-size: .75rem; color: var(--color-text-muted); }
+  .shelf ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); gap: .375rem .75rem; }
+  .shelf li { font-size: .875rem; line-height: 1.4286; display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: baseline; border-bottom: 1px solid var(--color-border-disabled); padding-bottom: .25rem; min-width: 0; }
+  .shelf li .ex { font-size: .6875rem; color: var(--color-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .shelf li .ex i { display: inline-block; width: .5rem; height: .5rem; margin-right: .2rem; vertical-align: 0; }
+  .shelf li .ext { font-size: .6875rem; color: var(--color-text-muted); grid-column: 1 / -1; }
+  @media (max-width: 40rem) { .shelf .cat { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">08 / 16 · code standards</div>
+    <h1>147 standards, 575 worked examples</h1>
+    <p class="lede">The code-standards pack is the graph's rulebook: each <code>cs:CodeStandard</code> has a category, a description, and do/don't examples with a language and a code block. Seven standards extend another. The categories are SKOS concepts, so <code>testing-unit</code> is narrower than <code>testing</code>.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="block">
+    <div class="two">
+      <figure><div class="chart" id="cats"></div><figcaption>Standards per category. React, CSS and Svelte are the three largest; the four <code>testing-*</code> categories are narrower concepts of <code>testing</code>.</figcaption></figure>
+      <figure><div id="exLegend"></div><div class="chart" id="examples"></div><figcaption>Do and don't examples per category. Almost every standard pairs one good example with one bad one; the Rust and Lit standards carry several.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="two">
+      <figure><div class="chart" id="langs"></div><figcaption>Language of the 575 examples. TypeScript carries 39%; Rust examples are the second population because the Rust category is written example-first.</figcaption></figure>
+      <div><h3>Standards that extend another</h3><p class="small muted" style="margin:.25rem 0 .75rem">The <code>cs:extends</code> edges: a specialised rule that inherits a general one.</p><div id="extends"></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <header><h2>The rulebook, by category</h2><p class="small muted">Every standard's title, with its example counts (blue do, orange don't). Hover a title for the first lines of its description.</p></header>
+    <div class="shelf" id="shelf"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("standards.html");
+  const s = await A.load("standards");
+  const std = s.standards.map(x => ({ ...x, cat: A.local(x.cat || ""), dos: +x.dos, donts: +x.donts, langs: (x.langs || "").split("|").filter(Boolean) }));
+  const catLabel = new Map(s.categories.map(c => [A.local(c.c), c.label]));
+  const byCat = d3.rollups(std, v => ({ n: v.length, dos: d3.sum(v, d => d.dos), donts: d3.sum(v, d => d.donts) }), d => d.cat).sort((a, b) => b[1].n - a[1].n);
+  const totalEx = d3.sum(std, d => d.dos + d.donts);
+  document.getElementById("stats").innerHTML = [["Standards", std.length, "cs:CodeStandard"], ["Categories", byCat.length, "cs:Category, SKOS concepts"], ["Do examples", d3.sum(std, d => d.dos), "cs:do"], ["Don't examples", d3.sum(std, d => d.donts), "cs:dont"], ["Example languages", s.exLangs.length, "cs:language values"], ["Extends edges", std.filter(d => d.ext.length).length, "cs:extends"]].map(([l, v, n]) => `<div class="stat"><span class="label">${l}</span><span class="value">${A.fmt(v)}</span><span class="note">${n}</span></div>`).join("");
+  A.hbars("#cats", byCat.map(([c, v]) => ({ label: c, value: v.n, tip: `<b>${c}</b> (${catLabel.get(c) || c})<br>${v.n} standards · ${v.dos} do · ${v.donts} don't` })), { rowH: 20, labelW: 150, aria: "Standards per category" });
+  // grouped do/don't bars
+  A.legend("#exLegend", [{ label: "do", color: A.series(1) }, { label: "don't", color: A.series(2) }]);
+  { const rows = byCat, rowH = 20, labelW = 150, W = 560; const x = d3.scaleLinear().domain([0, d3.max(rows, r => Math.max(r[1].dos, r[1].donts))]).range([0, W - labelW - 50]);
+    const sv = d3.create("svg").attr("viewBox", `0 0 ${W} ${rows.length * rowH + 8}`).attr("role", "img").attr("aria-label", "Do and don't examples per category");
+    const g = sv.append("g").attr("transform", `translate(${labelW},4)`);
+    g.append("g").attr("class", "grid").selectAll("line").data(x.ticks(4)).join("line").attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", 0).attr("y2", rows.length * rowH);
+    const r = g.selectAll("g.r").data(rows).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+    r.append("text").attr("x", -8).attr("y", rowH / 2).attr("dy", ".32em").attr("text-anchor", "end").attr("font-size", 11).text(d => d[0]);
+    r.append("rect").attr("y", 2).attr("height", 7).attr("width", d => x(d[1].dos)).attr("fill", A.series(1));
+    r.append("rect").attr("y", 11).attr("height", 7).attr("width", d => x(d[1].donts)).attr("fill", A.series(2));
+    r.append("text").attr("x", d => x(Math.max(d[1].dos, d[1].donts)) + 5).attr("y", rowH / 2).attr("dy", ".32em").attr("font-size", 10).attr("class", "muted tabular").text(d => `${d[1].dos} / ${d[1].donts}`);
+    r.on("pointermove", (ev, d) => A.tip(`<b>${d[0]}</b><br>${d[1].dos} do · ${d[1].donts} don't`, ev)).on("pointerleave", () => A.tip(null));
+    document.getElementById("examples").replaceChildren(sv.node()); }
+  A.hbars("#langs", s.exLangs.map(l => ({ label: l.lang, value: +l.n, tip: `<b>${l.lang}</b><br>${l.n} examples · ${A.pct(+l.n / totalEx)}` })), { rowH: 20, labelW: 110, aria: "Example languages" });
+  const byIri = new Map(std.map(d => [d.s, d]));
+  A.table("#extends", [{ label: "Standard", key: "a", render: r => `<code>${A.curie(r.s)}</code><br><span class="muted">${r.label}</span>` }, { label: "extends", key: "b", render: r => r.ext.map(e => `<code>${A.curie(e)}</code><br><span class="muted">${byIri.get(e)?.label || ""}</span>`).join("<br>") }], std.filter(d => d.ext.length));
+  document.getElementById("shelf").innerHTML = byCat.map(([c, v]) => { const list = std.filter(d => d.cat === c).sort((a, b) => d3.ascending(a.label, b.label)); return `<div class="cat"><div><h3>${c}</h3><div class="sub">${catLabel.get(c) && catLabel.get(c) !== c ? catLabel.get(c) + " · " : ""}${v.n} standards · ${v.dos + v.donts} examples</div></div><ul>${list.map(d => `<li title="${(d.desc || "").replace(/"/g, "&quot;").slice(0, 300)}"><span>${d.label}</span><span class="ex"><i style="background:${A.series(1)}"></i>${d.dos} <i style="background:${A.series(2)}"></i>${d.donts}</span>${d.ext.length ? `<span class="ext">extends ${d.ext.map(e => A.curie(e)).join(", ")}</span>` : ""}</li>`).join("")}</ul></div>`; }).join("");
+})();
+</script>
+</body>
+</html>

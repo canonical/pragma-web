@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Everything · Pragma Graph Atlas</title>
+<style>
+  .stage { position: relative; border: 1px solid var(--color-border-disabled); background: var(--color-background); }
+  .stage canvas { display: block; width: 100%; height: min(80vh, 940px); min-height: 440px; touch-action: none; cursor: grab; }
+  .overlay { position: absolute; left: .75rem; top: .75rem; display: grid; gap: .375rem; font-size: .75rem; line-height: 1.3333; background: color-mix(in srgb, var(--color-background) 86%, transparent); padding: .5rem .75rem; border: 1px solid var(--color-border-disabled); max-width: 19rem; }
+  .overlay .legend { gap: .125rem .75rem; font-size: .75rem; }
+  .overlay label { display: inline-flex; align-items: center; gap: .375rem; margin-right: .75rem; cursor: pointer; }
+  .overlay input { margin: 0; accent-color: var(--color-focus-ring); }
+  .overlay .hint { color: var(--color-text-muted); }
+  .kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--dimension-200); font-size: .875rem; }
+  .kinds div { border-top: 3px solid var(--c); padding-top: .5rem; } .kinds b { display: block; font-size: 1.25rem; font-weight: 500; }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">12 / 16 · every triple, flat</div>
+    <h1>All 65,298 triples as one drawing</h1>
+    <p class="lede">Nothing left out this time. Every subject and object is a node: 4,641 named nodes, 8,825 blank nodes and 25,350 literal values, one per statement. Every triple is an edge, type statements included. The named and blank nodes were laid out by force; each literal sits in a ring around the node it describes, so a halo is a node with many facts on it.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stage"><canvas id="c" aria-label="Every triple in the graph"></canvas>
+      <div class="overlay">
+        <div id="legend"></div>
+        <div><label><input type="checkbox" id="lyIri" checked> named</label><label><input type="checkbox" id="lyBlank" checked> blank</label><label><input type="checkbox" id="lyLit" checked> literals</label><label><input type="checkbox" id="lyType" checked> rdf:type edges</label></div>
+        <div class="hint" id="status">Loading 65,298 triples…</div>
+      </div>
+    </div>
+    <p class="small muted">Scroll to zoom, drag to pan, hover for a node's name; click a node to read every triple on it in a side panel; double-click resets. Named nodes are discs, blank nodes squares, literals the small gray dots. Colour is the vocabulary of the node or, for a blank node, of its class. Edges take the colour of their subject.</p>
+  </section>
+
+  <section class="block">
+    <header><h2>Three kinds of node</h2></header>
+    <div class="kinds" id="kinds"></div>
+  </section>
+
+  <section class="block">
+    <div class="two">
+      <figure><div class="chart" id="blankClasses"></div><figcaption>What the blank nodes are. The 3,117 list cells carry no class of their own: they are the <code>rdf:first</code>/<code>rdf:rest</code> chains of ordered references.</figcaption></figure>
+      <figure><div class="chart" id="litPreds"></div><figcaption>Which predicates the 25,350 literals hang from (top twenty).</figcaption></figure>
+    </div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("everything.html");
+  const status = document.getElementById("status");
+  const L = await A.load("full2d");
+  const N = L.nodes.length, E = L.links.length;
+  const X = new Float32Array(N), Y = new Float32Array(N), K = new Uint8Array(N), DEG = new Uint16Array(N), NSI = new Uint8Array(N);
+  const NS = ["dt", "ds", "cs", "anatomy", "schema", ""]; const nsIndex = (s) => { const i = NS.indexOf(s); return i < 0 ? 4 : i; };
+  for (let i = 0; i < N; i++) { const n = L.nodes[i]; X[i] = n[0]; Y[i] = n[1]; K[i] = n[2]; NSI[i] = n[2] === 2 ? 5 : nsIndex(n[3]); DEG[i] = Math.min(65535, n[5]); }
+  const palette = ["var(--ns-dt)", "var(--ns-ds)", "var(--ns-cs)", "var(--ns-anatomy)", "var(--ns-schema)", "var(--series-other)"].map(A.resolve);
+  const inkBg = A.resolve("var(--color-background)"), inkText = A.resolve("var(--color-text)");
+  const isType = L.links.map(l => l[2] === "1999/02/22-rdf-syntax-ns#type");
+  const counts = { iri: 0, blank: 0, lit: 0 }; for (let i = 0; i < N; i++) counts[K[i] === 0 ? "iri" : K[i] === 1 ? "blank" : "lit"]++;
+  A.legend("#legend", [["dt: tokens", 0, "dot"], ["ds: design system", 1, "dot"], ["cs: standards", 2, "dot"], ["anatomy:", 3, "dot"], ["schema", 4, "dot"], ["literal value", 5, "dot"]].map(([l, i, s]) => ({ label: l, color: palette[i], shape: s })));
+  status.textContent = `${A.fmt(N)} nodes · ${A.fmt(E)} edges`;
+  const canvas = document.getElementById("c"), ctx = canvas.getContext("2d");
+  const layers = { iri: true, blank: true, lit: true, type: true };
+  for (const [id, key] of [["lyIri", "iri"], ["lyBlank", "blank"], ["lyLit", "lit"], ["lyType", "type"]]) document.getElementById(id).addEventListener("change", e => { layers[key] = e.target.checked; draw(); });
+  const hubs = []; for (let i = 0; i < N; i++) if (K[i] === 0) hubs.push(i); hubs.sort((a, b) => DEG[b] - DEG[a]); const top = hubs.slice(0, 36);
+  let T = d3.zoomIdentity, W = 0, H = 0, dpr = 1;
+  const zoom = d3.zoom().scaleExtent([0.1, 20]).on("zoom", (ev) => { T = ev.transform; draw(); });
+  d3.select(canvas).call(zoom).on("dblclick.zoom", null).on("dblclick", fit);
+  function fit() { const s = Math.min(W, H) / 2100; d3.select(canvas).call(zoom.transform, d3.zoomIdentity.translate(W / 2, H / 2).scale(s)); }
+  function size() { dpr = Math.min(2, devicePixelRatio || 1); W = canvas.clientWidth; H = canvas.clientHeight; canvas.width = W * dpr; canvas.height = H * dpr; fit(); }
+  function visible(i) { const k = K[i]; return k === 0 ? layers.iri : k === 1 ? layers.blank : layers.lit; }
+  function draw() {
+    ctx.save(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = inkBg; ctx.fillRect(0, 0, W, H); ctx.translate(T.x, T.y); ctx.scale(T.k, T.k);
+    const vx0 = -T.x / T.k - 20, vy0 = -T.y / T.k - 20, vx1 = (W - T.x) / T.k + 20, vy1 = (H - T.y) / T.k + 20;
+    const inView = (i) => X[i] >= vx0 && X[i] <= vx1 && Y[i] >= vy0 && Y[i] <= vy1;
+    // edges grouped by subject namespace
+    ctx.lineWidth = 0.5 / T.k; ctx.globalAlpha = Math.min(0.3, 0.08 + T.k * 0.08); ctx.lineCap = "round";
+    for (let g = 0; g < 5; g++) { ctx.strokeStyle = palette[g]; ctx.beginPath(); let any = false; for (let e = 0; e < E; e++) { const l = L.links[e]; const a = l[0], b = l[1]; if (NSI[a] !== g) continue; if (!layers.type && isType[e]) continue; if (!visible(a) || !visible(b)) continue; if (!inView(a) && !inView(b)) continue; ctx.moveTo(X[a], Y[a]); ctx.lineTo(X[b], Y[b]); any = true; } if (any) ctx.stroke(); }
+    ctx.globalAlpha = 1;
+    // literals
+    if (layers.lit) { ctx.fillStyle = palette[5]; const r = Math.max(0.5, 0.9); ctx.beginPath(); for (let i = 0; i < N; i++) { if (K[i] !== 2 || !inView(i)) continue; ctx.moveTo(X[i] + r, Y[i]); ctx.arc(X[i], Y[i], r, 0, 6.2832); } ctx.fill(); }
+    // blank nodes as squares
+    if (layers.blank) for (let g = 0; g < 5; g++) { ctx.fillStyle = palette[g]; ctx.globalAlpha = .8; const s = 1.4; for (let i = 0; i < N; i++) { if (K[i] !== 1 || NSI[i] !== g || !inView(i)) continue; ctx.fillRect(X[i] - s, Y[i] - s, s * 2, s * 2); } }
+    ctx.globalAlpha = 1;
+    // named nodes as discs sized by degree
+    if (layers.iri) for (let g = 0; g < 5; g++) { ctx.fillStyle = palette[g]; ctx.beginPath(); for (let i = 0; i < N; i++) { if (K[i] !== 0 || NSI[i] !== g || !inView(i)) continue; const r = 1.6 + Math.sqrt(DEG[i]) * 0.35; ctx.moveTo(X[i] + r, Y[i]); ctx.arc(X[i], Y[i], r, 0, 6.2832); } ctx.fill(); }
+    if (layers.iri) { const fs = Math.max(10 / T.k, 2.5); ctx.font = `${fs}px Ubuntu Sans, Ubuntu, sans-serif`; ctx.textBaseline = "middle"; ctx.lineWidth = fs * .35; ctx.strokeStyle = inkBg; ctx.fillStyle = inkText; ctx.lineJoin = "round"; for (const i of top) { if (!inView(i)) continue; const t = L.nodes[i][6]; const tt = t.length > 34 ? t.slice(0, 33) + "…" : t; const x = X[i] + 1.6 + Math.sqrt(DEG[i]) * .35 + 2 / T.k; ctx.strokeText(tt, x, Y[i]); ctx.fillText(tt, x, Y[i]); } }
+    if (selected != null) { const sx = X[selected], sy = Y[selected]; ctx.globalAlpha = .95; ctx.strokeStyle = inkText; ctx.lineWidth = 1.2 / T.k; ctx.beginPath(); for (const e of outE[selected] || []) { const j = L.links[e][1]; ctx.moveTo(sx, sy); ctx.lineTo(X[j], Y[j]); } for (const e of inE[selected] || []) { const j = L.links[e][0]; ctx.moveTo(sx, sy); ctx.lineTo(X[j], Y[j]); } ctx.stroke();
+      ctx.lineWidth = 1.5 / T.k; for (const j of nbr) { ctx.beginPath(); ctx.arc(X[j], Y[j], 2.5 / T.k + 2, 0, 6.2832); ctx.stroke(); }
+      ctx.lineWidth = 3 / T.k; ctx.beginPath(); ctx.arc(sx, sy, 5 / T.k + 3, 0, 6.2832); ctx.stroke();
+      const fs2 = Math.max(12 / T.k, 3); ctx.font = `600 ${fs2}px Ubuntu Sans, Ubuntu, sans-serif`; ctx.textBaseline = "middle"; ctx.lineWidth = fs2 * .35; ctx.strokeStyle = inkBg; ctx.fillStyle = inkText; ctx.lineJoin = "round"; const t = L.nodes[selected][6]; ctx.strokeText(t, sx + 8 / T.k, sy); ctx.fillText(t, sx + 8 / T.k, sy); }
+    ctx.restore();
+  }
+  // adjacency for the details panel
+  const outE = new Array(N), inE = new Array(N); for (let e = 0; e < E; e++) { const l = L.links[e]; (outE[l[0]] ||= []).push(e); (inE[l[1]] ||= []).push(e); }
+  let literals = null, selected = null, nbr = new Set();
+  const PRE = { "1999/02/22-rdf-syntax-ns#": "rdf:", "2000/01/rdf-schema#": "rdfs:", "2002/07/owl#": "owl:", "ns/shacl#": "sh:", "2004/02/skos/core#": "skos:", "codestandards#": "cs:", "w3c:": "w3c-tokens:", "2001/XMLSchema#": "xsd:" };
+  const pretty = (p) => { for (const k in PRE) if (p.includes(k)) return PRE[k] + p.split(k)[1]; return p; };
+  const curieOf = (i) => { const n = L.nodes[i]; if (K[i] !== 0) return n[6]; const l = n[6]; const ns = n[3]; for (const k in PRE) if (l.includes(k)) return PRE[k] + l.split(k)[1]; return (ns === "ds" ? "ds:" : ns === "dt" ? "dt:" : ns === "cs" ? "cs:" : ns === "anatomy" ? "anatomy:" : "") + l; };
+  async function select(i) { selected = i; nbr = new Set(); if (i != null) { for (const e of outE[i] || []) nbr.add(L.links[e][1]); for (const e of inE[i] || []) nbr.add(L.links[e][0]); } draw(); if (i == null) return;
+    const n = L.nodes[i]; const needLit = (outE[i] || []).some(e => K[L.links[e][1]] === 2 && L.nodes[L.links[e][1]][6].endsWith("…"));
+    if (needLit && !literals) { try { literals = await A.load("literals"); } catch { literals = {}; } }
+    const obj = (j) => K[j] === 2 ? `<span class="o lit">${A.esc(literals?.[j] ?? L.nodes[j][6])}</span>` : `<span class="o"><a class="jump" data-i="${j}">${A.esc(L.nodes[j][6])}</a>${K[j] === 1 ? ` <span class="muted">(${A.esc(L.nodes[j][4] || "blank")})</span>` : ""}</span>`;
+    const rows = (es, dir) => es.map(e => { const l = L.links[e]; const j = dir === "out" ? l[1] : l[0]; return `<li><span class="p">${A.esc(pretty(l[2]))}</span>${obj(j)}</li>`; }).join("");
+    const o = (outE[i] || []).slice().sort((a, b) => (L.links[a][2] > L.links[b][2]) - (L.links[a][2] < L.links[b][2])), inc = inE[i] || [];
+    const kind = K[i] === 0 ? "named node" : K[i] === 1 ? "blank node" : "literal";
+    const html = `<dl>${K[i] === 0 ? `<dt>IRI</dt><dd><code>${A.esc(curieOf(i))}</code></dd>` : ""}${n[4] && K[i] !== 2 ? `<dt>Class</dt><dd>${A.esc(n[4].replace("w3c:", "w3c-tokens:"))}</dd>` : ""}<dt>Kind</dt><dd>${kind}${K[i] !== 2 ? ` · ${n[3] || "schema"}` : ""}</dd>${K[i] !== 2 ? `<dt>Degree</dt><dd>${n[5]} (${o.length} out, ${inc.length} in)</dd>` : ""}</dl>
+      ${o.length ? `<h4>Its triples (${o.length})</h4><ul class="facts">${rows(o.slice(0, 80), "out")}${o.length > 80 ? `<li><span class="p"></span><span class="o muted">… ${o.length - 80} more</span></li>` : ""}</ul>` : ""}
+      ${inc.length ? `<h4>Referenced by (${inc.length})</h4><ul class="facts">${rows(inc.slice(0, 40), "in")}${inc.length > 40 ? `<li><span class="p"></span><span class="o muted">… ${inc.length - 40} more</span></li>` : ""}</ul>` : ""}
+      ${K[i] === 0 ? A.cmd(`pragma graph inspect ${curieOf(i)}`) : K[i] === 1 ? `<p class="muted">Blank nodes have no address of their own; inspect the node that points at them.</p>` : ""}`;
+    const panel = A.showPanel(K[i] === 2 ? ((literals?.[i] ?? n[6]) || "(empty literal)").slice(0, 80) : n[6], `${kind}${n[4] ? " · " + n[4].replace("w3c:", "w3c-tokens:") : ""}`, html);
+    panel.querySelectorAll("a.jump").forEach(a => a.addEventListener("click", () => select(+a.dataset.i)));
+  }
+  window.onPanelClose = () => select(null);
+  let down = null; canvas.addEventListener("pointerdown", ev => down = [ev.clientX, ev.clientY]);
+  canvas.addEventListener("pointerup", ev => { if (!down || Math.hypot(ev.clientX - down[0], ev.clientY - down[1]) > 4) return; const rect = canvas.getBoundingClientRect(); const [px, py] = T.invert([ev.clientX - rect.left, ev.clientY - rect.top]); const i = q.find(px, py, 12 / T.k); select(i != null && visible(i) ? i : null); });
+  const q = d3.quadtree().x(i => X[i]).y(i => Y[i]).addAll(d3.range(N));
+  canvas.addEventListener("pointermove", (ev) => { const rect = canvas.getBoundingClientRect(); const [px, py] = T.invert([ev.clientX - rect.left, ev.clientY - rect.top]); const i = q.find(px, py, 10 / T.k); if (i == null || !visible(i)) { A.tip(null); return; } const n = L.nodes[i]; A.tip(`<b>${n[6]}</b><br>${K[i] === 2 ? "literal · object of " + L.links.find(l => l[1] === i)?.[2] : (K[i] === 1 ? "blank node" : "named node") + (n[4] ? " · a " + n[4].replace("w3c:", "w3c-tokens:") : "")}${K[i] !== 2 ? " · degree " + n[5] : ""}`, ev); });
+  canvas.addEventListener("pointerleave", () => A.tip(null));
+  new ResizeObserver(() => { size(); draw(); }).observe(canvas); size(); draw();
+  document.getElementById("kinds").innerHTML = [["Named nodes (IRIs)", counts.iri, "Every entity with an identifier: blocks, tiers, symbols, variables, files, conditions, classes and properties. Drawn as discs, sized by degree.", palette[0]], ["Blank nodes", counts.blank, "Anonymous records: block properties, token bindings, declarations, resolved values, change-log entries and 3,117 RDF list cells. Drawn as squares in the colour of their class.", palette[1]], ["Literal values", counts.lit, "Names, descriptions, YAML anatomies, JSON values, numbers and booleans. One dot per statement, on a ring around the node they describe.", palette[5]]].map(([t, n, d, c]) => `<div style="--c:${c}"><b>${A.fmt(n)}</b>${t}<div class="small muted">${d}</div></div>`).join("");
+  const bc = d3.rollups(d3.range(N).filter(i => K[i] === 1), v => v.length, i => L.nodes[i][4] || "(list cell, untyped)").sort((a, b) => b[1] - a[1]);
+  A.hbars("#blankClasses", bc.map(([c, n]) => ({ label: c.replace("w3c:", "w3c-tokens:"), value: n })), { rowH: 20, labelW: 170, aria: "Blank nodes by class" });
+  const lp = d3.rollups(L.links.filter(l => K[l[1]] === 2), v => v.length, l => l[2]).sort((a, b) => b[1] - a[1]).slice(0, 20);
+  A.hbars("#litPreds", lp.map(([p, n]) => ({ label: p.replace("2000/01/rdf-schema#", "rdfs:").replace("codestandards#", "cs:").replace("w3c:", "w3c-tokens:"), value: n })), { rowH: 20, labelW: 170, aria: "Literals per predicate" });
+})();
+</script>
+</body>
+</html>

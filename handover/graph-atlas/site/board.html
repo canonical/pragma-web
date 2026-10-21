@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<style>
+  /* Ubuntu Sans from @canonical/ds-assets, the files @canonical/styles/fonts loads, declared on the document
+     so the Shadow DOM islands inherit it. Ubuntu Sans Mono comes from Google Fonts: the mono files in
+     ds-assets are not fonts (see the note in @canonical/styles/src/fonts.css, PRA-146). */
+  @font-face { font-family: "Ubuntu Sans"; src: url("fonts/UbuntuSans.woff2") format("woff2-variations"); font-weight: 100 800; font-stretch: 75% 100%; font-display: swap; }
+  @font-face { font-family: "Ubuntu Sans"; font-style: italic; src: url("fonts/UbuntuSans-Italic.woff2") format("woff2-variations"); font-weight: 100 800; font-stretch: 75% 100%; font-display: swap; }
+</style>
+
+<title>Board · Pragma Graph Atlas</title>
+<style>
+  /* A board of frames. Each frame holds a real published component (server-rendered markup of
+     @canonical/react-ds-global 0.44.1, styled by pragma.css). Frames pack into a dense grid sized by the
+     component's own footprint; elevation follows the block's anatomy depth in the graph. */
+  .boardwrap { position: relative; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: .375rem; align-items: center; padding: .5rem 0 .75rem; }
+  .toolbar button, .toolbar select { font: inherit; font-size: .75rem; padding: .25rem .5rem; background: var(--color-background); color: var(--color-text); border: 1px solid var(--color-border); cursor: pointer; }
+  .toolbar button[aria-pressed="true"] { background: var(--color-text); color: var(--color-background); }
+  .toolbar .sep { width: 1px; height: 1.25rem; background: var(--color-border-disabled); }
+  .stage { perspective: 1800px; perspective-origin: 50% 30%; padding: 1.5rem 2.5rem 3rem 1rem; margin-inline: -1rem; overflow: clip; }
+  .board { position: relative; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  .stage:not(.tilted) { perspective: none; }
+  .tilted .board { transform: rotateX(var(--rx, 12deg)) rotateY(var(--ry, -4deg)) translateZ(-60px); }
+  .frame { position: relative; grid-column: span var(--w, 2); display: grid; grid-template-rows: auto 1fr auto; background: var(--color-background); border: 1px solid var(--color-border-disabled); transform-style: preserve-3d; transform: translateZ(calc(var(--depth, 0) * var(--dz, 26px))); transition: transform .7s cubic-bezier(.2,.7,.2,1), box-shadow .7s; cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden;
+    box-shadow: 0 calc(2px + var(--depth, 0) * 6px) calc(8px + var(--depth, 0) * 14px) calc(-4px - var(--depth, 0) * 2px) rgba(0,0,0,.45); }
+  .frame:hover { border-color: var(--color-text); }
+  .frame.flash { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
+  .frame .fhead { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; padding: .5rem .75rem .25rem; font-size: .75rem; line-height: 1.3333; }
+  .frame .fhead b { font-weight: 600; } .frame .fhead span { color: var(--color-text-muted); white-space: nowrap; }
+  .frame .fbody { padding: .5rem .75rem .75rem; min-width: 0; align-self: start; display: block; }
+  .frame .fhead .curie { display: block; font: 10px/1.3 var(--font-mono); color: var(--color-text-disabled); font-weight: 400; overflow-wrap: anywhere; }
+  .frame .ffoot { display: flex; justify-content: space-between; gap: .5rem; padding: .25rem .75rem .5rem; font-size: .6875rem; color: var(--color-text-muted); border-top: 1px solid var(--color-background-layer2); font-variant-numeric: tabular-nums; }
+  .frame .depthbar { display: inline-flex; gap: 2px; } .frame .depthbar i { width: 5px; height: 8px; background: var(--color-border-disabled); } .frame .depthbar i.on { background: var(--series-1); }
+  .frame.missing { border-style: dashed; }
+  /* side navigation drawer */
+  .drawer { position: fixed; left: 0; top: 0; bottom: 0; width: min(18rem, 86vw); background: var(--color-background); border-right: 1px solid var(--color-border); z-index: 25; transform: translateX(-100%); transition: transform .3s; display: grid; grid-template-rows: auto 1fr; padding-top: env(safe-area-inset-top, 0px); }
+  .drawer.open { transform: none; }
+  .drawer header { display: flex; justify-content: space-between; align-items: center; padding: .75rem 1rem; border-bottom: 1px solid var(--color-border-disabled); }
+  .drawer header h3 { font-size: .875rem; }
+  .drawer button.close { font: inherit; background: none; border: 1px solid var(--color-border); color: var(--color-text); width: 2rem; height: 2rem; cursor: pointer; }
+  .drawer nav { overflow: auto; padding: .5rem 0 1rem; }
+  .drawer h4 { font-size: .6875rem; text-transform: uppercase; letter-spacing: .04em; color: var(--color-text-muted); margin: .75rem 1rem .25rem; font-weight: 600; }
+  .drawer a { display: flex; justify-content: space-between; gap: .5rem; padding: .3rem 1rem; font-size: .875rem; color: var(--color-text); text-decoration: none; cursor: pointer; }
+  .drawer a:hover, .drawer a.current { background: var(--color-background-layer2); }
+  .drawer a .d { color: var(--color-text-muted); font-size: .75rem; font-variant-numeric: tabular-nums; }
+  .scrim { position: fixed; inset: 0; background: var(--color-backdrop); z-index: 24; display: none; } .scrim.open { display: block; }
+  .legend-depth { display: flex; gap: 1rem; align-items: center; font-size: .75rem; color: var(--color-text-muted); flex-wrap: wrap; }
+  @media (prefers-reduced-motion: reduce) { .board, .frame, .drawer { transition: none; } }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Frame index"><header><h3>Frames</h3><button class="close" id="drawerClose" aria-label="Close index">×</button></header><nav id="drawerNav"></nav></aside>
+<main class="wrap boardwrap">
+  <div class="page-head">
+    <div class="eyebrow">15 / 16 · the real components, on a board</div>
+    <h1>25 frames, each one a real component</h1>
+    <p class="lede">A board of frames, the way a design file lays out its components. Every frame holds the published React component, server-rendered to the markup it really produces and styled by its own stylesheet, so what you see is what ships. Frames take the size their component needs and pack into the grid; their elevation is the block's anatomy depth in the graph, so a component built from more parts floats higher. Open the index for navigation; click a frame for what the graph knows about it.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="toolbar">
+      <button id="indexBtn">☰ Index</button>
+      <span class="sep"></span>
+      <button id="tilt" aria-pressed="true">3D tilt</button>
+      <select id="depthMode" aria-label="Elevation"><option value="anatomy">Elevation: anatomy depth</option><option value="props">Elevation: properties</option><option value="bindings">Elevation: token bindings</option><option value="flat">Elevation: flat</option></select>
+      <span class="sep"></span>
+      <select id="theme" aria-label="Theme"><option value="">Theme: follow page</option><option value="light">Theme: light</option><option value="dark">Theme: dark</option></select>
+      <select id="context" aria-label="Context"><option value="app">Context: app</option><option value="site">Context: site</option><option value="docs">Context: docs</option></select>
+      <span class="sep"></span>
+      <span class="legend-depth"><span>elevation ▮▮▮▮▮▮ = 0…6</span><span id="count"></span></span>
+    </div>
+    <div class="stage tilted" id="stage"><div class="board app" id="board"></div></div>
+    <p class="small muted">Move the pointer across the board to tilt it; switch the tilt off for a flat capture. The frames are live DOM: hover states, focus rings and the open accordion all work. Each frame is a Shadow DOM island that loads only pragma's stylesheet, so nothing from this page restyles the component. ContextualMenu and Popover need a browser-side hook context, and Chip and Label are not finalised; they are not on this board.</p>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("board.html");
+  const root = document.documentElement;
+  const syncTheme = (force) => { root.classList.remove("light", "dark"); const t = force || root.dataset.theme; if (t === "light" || t === "dark") root.classList.add(t); };
+  syncTheme(); new MutationObserver(() => syncTheme(document.getElementById("theme").value)).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+  document.getElementById("theme").addEventListener("change", e => { syncTheme(e.target.value); typeof islands !== "undefined" && islands.forEach(sr => A.islandSet(sr, { scheme: schemeNow() })); });
+  const [frames, bl, im, anat] = await A.load("frames", "blocks", "implementations", "anatomies");
+  const byName = new Map(); for (const b of bl.blocks) { const k = b.name.toLowerCase().replace(/[^a-z0-9]/g, ""); if (!byName.has(k) || A.local(b.tier || "") === "global") byName.set(k, b); }
+  const anatBy = new Map(anat.map(a => [a.b, a])); const implBy = d3.group(im.impls, i => i.block);
+  const libName = new Map(im.libProps.filter(p => p.p.endsWith("libraryName")).map(p => [p.l, p.o]));
+  const GRAIN_ORDER = ["component", "subcomponent", "pattern", "layout"];
+  const items = frames.map((f, i) => { const b = byName.get(f.name.toLowerCase().replace(/[^a-z0-9]/g, "")); const an = b ? anatBy.get(b.b) : null; return { ...f, i, b, grain: b ? A.local(b.class).toLowerCase() : "component", tier: b ? A.local(b.tier || "") : "", depth: an && an.nodes ? an.depth : 0, nodes: an ? an.nodes : 0, props: b ? +b.props : 0, bindings: b ? +b.bindings : 0, impls: b ? (implBy.get(b.b) || []) : [] }; });
+  items.sort((p, q) => GRAIN_ORDER.indexOf(p.grain) - GRAIN_ORDER.indexOf(q.grain) || q.size - p.size || d3.ascending(p.name, q.name));
+  const board = document.getElementById("board");
+  const maxFor = { anatomy: 6, props: d3.max(items, d => d.props) || 1, bindings: d3.max(items, d => d.bindings) || 1 };
+  const elev = (d, mode) => mode === "flat" ? 0 : mode === "anatomy" ? d.depth : Math.round(6 * d[mode] / maxFor[mode]);
+  board.innerHTML = items.map(d => `<article class="frame${d.b ? "" : " missing"}" id="f-${d.i}" data-i="${d.i}" data-span="${d.size}" data-min="${d.size}" data-max="${d.size + 1}" style="--depth:${elev(d, "anatomy")}" tabindex="0" role="button" aria-label="${A.esc(d.title || d.name)}"><div class="fhead"><b>${A.esc(d.title || d.name)}<span class="curie">${d.b ? A.esc(A.curie(d.b.b)) : "not in the graph"}</span></b><span>${d.b ? d.grain : ""}</span></div><div class="fbody"></div><div class="ffoot"><span class="depthbar" title="anatomy depth ${d.depth}">${[0, 1, 2, 3, 4, 5].map(k => `<i class="${k < d.depth ? "on" : ""}"></i>`).join("")}</span><span>${d.b ? `${d.props} props · ${d.bindings} bindings${d.nodes ? ` · ${d.nodes} nodes` : ""}` : ""}</span></div></article>`).join("");
+  const schemeNow = () => document.getElementById("theme").value || (root.dataset.theme === "light" || root.dataset.theme === "dark" ? root.dataset.theme : "");
+  const islands = await Promise.all(items.map(d => A.island(document.getElementById("f-" + d.i).querySelector(".fbody"), d.html, { scheme: schemeNow() })));
+  document.getElementById("count").textContent = `${items.length} frames · ${items.filter(d => d.b).length} matched to graph blocks`;
+  // row spans from measured heights (masonry-like packing in a dense grid)
+  const pack = () => A.packBoard(board, [...board.querySelectorAll(".frame")], { minCol: 230, gap: 24 });
+  const stage = document.getElementById("stage"); stage.classList.remove("tilted"); pack(); stage.classList.add("tilted");
+  let lastW = 0; const repack = () => { const t = stage.classList.contains("tilted"); stage.classList.remove("tilted"); pack(); if (t) stage.classList.add("tilted"); };
+  new ResizeObserver(() => { const w = board.clientWidth; if (w === lastW) return; lastW = w; repack(); }).observe(document.body); document.fonts?.ready.then(repack);
+  // tilt & parallax
+  document.getElementById("tilt").addEventListener("click", e => { const on = e.currentTarget.getAttribute("aria-pressed") !== "true"; e.currentTarget.setAttribute("aria-pressed", String(on)); stage.classList.toggle("tilted", on); });
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) stage.addEventListener("pointermove", ev => { const r = stage.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - .5, y = (ev.clientY - r.top) / r.height - .5; board.style.setProperty("--rx", (12 - y * 8).toFixed(1) + "deg"); board.style.setProperty("--ry", (-4 + x * 8).toFixed(1) + "deg"); });
+  document.getElementById("depthMode").addEventListener("change", e => { for (const d of items) document.getElementById("f-" + d.i).style.setProperty("--depth", elev(d, e.target.value)); });
+  document.getElementById("context").addEventListener("change", e => { islands.forEach(sr => A.islandSet(sr, { context: e.target.value })); const t = stage.classList.contains("tilted"); stage.classList.remove("tilted"); pack(); if (t) stage.classList.add("tilted"); });
+  // keep the tilt pivot and the viewer on the part of the board in view
+  const pivot = () => { const r = stage.getBoundingClientRect(); const y = Math.max(0, Math.min(r.height, innerHeight / 2 - r.top)); stage.style.perspectiveOrigin = `50% ${y}px`; board.style.transformOrigin = `50% ${y}px`; };
+  let pv = 0; addEventListener("scroll", () => { if (!pv) pv = requestAnimationFrame(() => { pv = 0; pivot(); }); }, { passive: true }); addEventListener("resize", pivot); pivot();
+  // drawer index
+  const drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim");
+  const openDrawer = (on) => { drawer.classList.toggle("open", on); scrim.classList.toggle("open", on); };
+  document.getElementById("indexBtn").addEventListener("click", () => openDrawer(true)); document.getElementById("drawerClose").addEventListener("click", () => openDrawer(false)); scrim.addEventListener("click", () => openDrawer(false));
+  document.addEventListener("keydown", e => { if (e.key === "Escape") openDrawer(false); });
+  const groups = d3.groups(items, d => d.grain).sort((p, q) => GRAIN_ORDER.indexOf(p[0]) - GRAIN_ORDER.indexOf(q[0]));
+  document.getElementById("drawerNav").innerHTML = groups.map(([g, list]) => `<h4>${g} · ${list.length}</h4>${list.map(d => `<a data-i="${d.i}">${A.esc(d.title || d.name)}<span class="d">depth ${d.depth}</span></a>`).join("")}`).join("");
+  document.getElementById("drawerNav").addEventListener("click", e => { const a = e.target.closest("a"); if (!a) return; const el = document.getElementById("f-" + a.dataset.i); el.scrollIntoView({ behavior: "smooth", block: "center" }); el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1600); document.querySelectorAll("#drawerNav a").forEach(x => x.classList.toggle("current", x === a)); if (innerWidth < 900) openDrawer(false); });
+  // details panel
+  function details(d) { const b = d.b; if (!b) { A.showPanel(d.title || d.name, "rendered component", `<p class="muted">This component is published in <code>@canonical/react-ds-global</code> but the snapshot's graph carries no block under this name.</p>`); return; }
+    const an = anatBy.get(b.b); const props = (bl.props || []).filter(p => p.b === b.b);
+    A.showPanel(b.name, `${d.grain} · ds:${d.tier}`, `<dl><dt>IRI</dt><dd><code>${A.esc(A.curie(b.b))}</code></dd><dt>Anatomy</dt><dd>${an && an.nodes ? `${an.nodes} nodes, depth ${an.depth}, ${an.styleCount} style entries` : "not written"}</dd><dt>Bindings</dt><dd>${b.bindings} token bindings</dd><dt>Stage</dt><dd>${b.stage ? A.esc(A.local(b.stage).replace("tag.", "")) : "—"}</dd></dl>
+      ${d.impls.length ? `<h4>Implemented in</h4><ul class="facts">${d.impls.map(i => `<li><span class="p">${A.esc((libName.get(i.lib) || "").replace("@canonical/", ""))}</span><span class="o"><a href="${A.esc(i.head)}" target="_blank" rel="noopener">${A.esc(i.head.replace("https://github.com/canonical/pragma-web/blob/main/", ""))}</a>${i.import ? `<br><code>${A.esc(i.import)}</code>` : ""}</span></li>`).join("")}</ul>` : ""}
+      ${b.summary ? `<h4>Summary</h4><div class="small">${A.esc(b.summary).slice(0, 700)}${b.summary.length > 700 ? "…" : ""}</div>` : ""}
+      ${props.length ? `<h4>Properties (${props.length})</h4><ul class="facts">${props.slice(0, 20).map(p => `<li><span class="p">${A.esc(p.pname || "?")}</span><span class="o">${A.esc(p.ptype || "")}${p.optional === "true" ? " <span class='muted'>optional</span>" : ""}</span></li>`).join("")}</ul>` : ""}
+      ${A.cmd(`pragma block lookup "${b.name}" --tier ${d.tier}`)}`); }
+  board.addEventListener("click", e => { const t = e.composedPath()[0]; if (t && t.closest && t.closest("a, button, input, select, textarea, summary, details, label")) return; const f = e.target.closest(".frame"); if (f) details(items.find(d => d.i === +f.dataset.i)); });
+  board.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.classList.contains("frame")) details(items.find(d => d.i === +e.target.dataset.i)); });
+})();
+</script>
+</body>
+</html>

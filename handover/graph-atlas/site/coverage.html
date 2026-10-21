@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Coverage · Pragma Graph Atlas</title>
+<style>
+  .cov { border-collapse: collapse; font-size: .8125rem; width: 100%; }
+  .cov th, .cov td { padding: .2rem .5rem .2rem 0; border-bottom: 1px solid var(--color-border-disabled); white-space: nowrap; }
+  .cov thead th { font-size: .6875rem; text-transform: uppercase; letter-spacing: .03em; color: var(--color-text-muted); font-weight: 600; text-align: left; vertical-align: bottom; }
+  .cov td.c { text-align: center; width: 6rem; }
+  .cov td.c span { display: inline-block; width: .75rem; height: .75rem; border-radius: 50%; }
+  .cov td.c .no { width: .375rem; height: .375rem; background: var(--color-border-disabled); }
+  .cov tr.grain th { padding-top: 1rem; font-weight: 600; color: var(--color-text); font-size: .875rem; border-bottom-color: var(--color-border); }
+  .cov td.stage { color: var(--color-text-muted); font-size: .6875rem; }
+  .cov .name a { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">09 / 16 · spec to code</div>
+    <h1>Which global blocks have code behind them</h1>
+    <p class="lede">The <code>ds-implementations</code> pack, synchronised from <code>canonical/pragma-web</code>, records 94 <code>ds:ImplementationObject</code> nodes: a block, the library that implements it, the source file at <code>main</code> and at the release tag, and the import statement. All of them implement global-tier blocks; no product tier has an implementation edge yet.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="block">
+    <div class="two">
+      <figure><div id="covLegend"></div><div class="chart" id="byGrain"></div><figcaption>Global-tier blocks by grain: implemented in at least one library (blue) versus spec only (gray).</figcaption></figure>
+      <figure><div class="chart" id="byLib"></div><figcaption>Implementation objects per library. The two React packages carry 82 of 94; <code>ds-types</code> implements the eight modifier families as TypeScript constants.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <header><h2>The matrix</h2><p class="small muted">Every global component, subcomponent, pattern, layout and view, against the four libraries. A filled dot is an implementation object; the last column is the block's documentation-stage tag where one exists.</p></header>
+    <div id="libLegend"></div>
+    <div class="scroll-x" id="matrix"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Spec only</h2><p class="small muted">The global components, patterns and layouts with no implementation edge at all: the design system's backlog, as the graph states it.</p></header>
+    <div id="missing"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("coverage.html");
+  const [im, bl] = await A.load("implementations", "blocks");
+  const libProps = d3.rollup(im.libProps, v => Object.fromEntries(v.map(x => [A.local(x.p), x.o])), d => d.l);
+  const LIBS = [...libProps.keys()].map(l => ({ iri: l, name: libProps.get(l).libraryName, platform: libProps.get(l).platform, version: libProps.get(l).version, link: libProps.get(l).link })).sort((a, b) => d3.ascending(a.name, b.name));
+  const libIdx = new Map(LIBS.map((l, i) => [l.iri, i]));
+  const libColor = (iri) => A.series(libIdx.get(iri) + 1);
+  const impls = im.impls.map(x => ({ ...x }));
+  const byBlock = d3.group(impls, d => d.block);
+  const stageLabel = (s) => s ? A.local(s).replace("tag.", "").replace("needs", "needs:").replace("triaged", "triaged:").replace("specialadoption", "special:adoption") : "";
+  const globals = bl.blocks.filter(b => A.local(b.tier || "") === "global").map(b => ({ ...b, grain: A.local(b.class).toLowerCase(), impls: byBlock.get(b.b) || [] }));
+  const GR = ["component", "subcomponent", "pattern", "layout", "view", "group", "variant"];
+  globals.sort((a, b) => GR.indexOf(a.grain) - GR.indexOf(b.grain) || d3.ascending(a.name, b.name));
+  const implemented = globals.filter(g => g.impls.length);
+  document.getElementById("stats").innerHTML = [["Implementation objects", impls.length, "ds:ImplementationObject"], ["Libraries", LIBS.length, LIBS.map(l => l.platform).join(", ")], ["Global blocks", globals.length, "components, subcomponents, patterns, layouts, views, groups"], ["Implemented", implemented.length, `${A.pct(implemented.length / globals.length)} of global blocks`], ["In two libraries", globals.filter(g => new Set(g.impls.map(i => i.lib)).size > 1).length, "React and Svelte both"], ["Modifier families typed", impls.filter(i => /modifier_family/.test(i.block)).length, "constants in @canonical/ds-types"]].map(([l, v, n]) => `<div class="stat"><span class="label">${l}</span><span class="value">${A.fmt(v)}</span><span class="note">${n}</span></div>`).join("");
+  A.legend("#covLegend", [{ label: "implemented", color: A.series(1) }, { label: "spec only", color: "var(--series-other)" }]);
+  { const rows = GR.filter(g => globals.some(x => x.grain === g)).map(g => ({ g, yes: globals.filter(x => x.grain === g && x.impls.length).length, no: globals.filter(x => x.grain === g && !x.impls.length).length }));
+    const rowH = 24, labelW = 120, W = 560; const x = d3.scaleLinear().domain([0, d3.max(rows, r => r.yes + r.no)]).range([0, W - labelW - 60]);
+    const sv = d3.create("svg").attr("viewBox", `0 0 ${W} ${rows.length * rowH + 8}`).attr("role", "img").attr("aria-label", "Implemented vs spec-only by grain");
+    const g = sv.append("g").attr("transform", `translate(${labelW},4)`);
+    const r = g.selectAll("g").data(rows).join("g").attr("transform", (d, i) => `translate(0,${i * rowH})`);
+    r.append("text").attr("x", -8).attr("y", rowH / 2).attr("dy", ".32em").attr("text-anchor", "end").attr("font-size", 12).text(d => d.g);
+    r.append("rect").attr("y", 4).attr("height", 16).attr("x", 0).attr("width", d => Math.max(0, x(d.yes) - 1)).attr("fill", A.series(1));
+    r.append("rect").attr("y", 4).attr("height", 16).attr("x", d => x(d.yes) + 1).attr("width", d => Math.max(0, x(d.no) - 1)).attr("fill", "var(--series-other)");
+    r.append("text").attr("x", d => x(d.yes + d.no) + 6).attr("y", rowH / 2).attr("dy", ".32em").attr("font-size", 12).attr("class", "tabular").text(d => `${d.yes} of ${d.yes + d.no}`);
+    r.on("pointermove", (ev, d) => A.tip(`<b>${d.g}</b><br>${d.yes} implemented · ${d.no} spec only`, ev)).on("pointerleave", () => A.tip(null));
+    document.getElementById("byGrain").replaceChildren(sv.node()); }
+  A.hbars("#byLib", LIBS.map(l => ({ label: l.name.replace("@canonical/", ""), value: impls.filter(i => i.lib === l.iri).length, color: libColor(l.iri), tip: `<b>${l.name}</b> ${l.version}<br>${l.platform} · ${impls.filter(i => i.lib === l.iri).length} implementation objects` })), { rowH: 24, labelW: 170, aria: "Implementations per library" });
+  A.legend("#libLegend", LIBS.map(l => ({ label: `${l.name} (${l.platform})`, color: libColor(l.iri), shape: "dot", count: impls.filter(i => i.lib === l.iri).length })));
+  let html = `<table class="cov"><thead><tr><th>block</th>${LIBS.map(l => `<th style="text-align:center">${l.name.replace("@canonical/", "").replace("-ds-global", "")}<br><span class="muted" style="font-weight:400">${l.platform}</span></th>`).join("")}<th>stage</th></tr></thead><tbody>`;
+  let lastG = null;
+  for (const b of globals) { if (b.grain !== lastG) { lastG = b.grain; html += `<tr class="grain"><th colspan="${LIBS.length + 2}">${b.grain} · ${globals.filter(x => x.grain === b.grain).length}</th></tr>`; }
+    html += `<tr><td class="name"><span title="${A.curie(b.b)}">${b.name}</span></td>${LIBS.map(l => { const i = b.impls.find(x => x.lib === l.iri); return `<td class="c">${i ? `<a href="${i.head}" target="_blank" rel="noopener" title="${i.head.replace("https://github.com/canonical/pragma-web/blob/main/", "")}"><span style="background:${libColor(l.iri)}"></span></a>` : `<span class="no"></span>`}</td>`; }).join("")}<td class="stage">${stageLabel(b.stage)}</td></tr>`; }
+  html += "</tbody></table>";
+  document.getElementById("matrix").innerHTML = html;
+  const missing = globals.filter(g => !g.impls.length && ["component", "pattern", "layout"].includes(g.grain));
+  A.table("#missing", [{ label: "Grain", key: "grain" }, { label: "Block", key: "name" }, { label: "IRI", key: "b", render: r => `<code>${A.curie(r.b)}</code>` }, { label: "Stage", key: "s", render: r => stageLabel(r.stage) }, { label: "Properties", key: "props", num: true }], missing);
+})();
+</script>
+</body>
+</html>

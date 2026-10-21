@@ -1,0 +1,16 @@
+import pw from "/opt/node-tools/node_modules/playwright/index.js"; const { chromium } = pw;
+import { readFileSync } from "node:fs"; import http from "node:http"; import path from "node:path";
+const ROOT = "/home/user/graph-atlas", NM = "/tmp/claude-0/-home-user/06a72397-f574-54f4-af6d-d59fdfba2a1a/scratchpad/extract/node_modules";
+const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+const srv = http.createServer((req, res) => { let body; const p = path.join(ROOT, decodeURIComponent(req.url.split("?")[0])); try { body = readFileSync(p); } catch { res.writeHead(404); res.end(); return; } res.writeHead(200, { "content-type": MIME[path.extname(p)] || "application/octet-stream" }); res.end(body); }).listen(8786);
+const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
+const page = await (await browser.newContext({ viewport: { width: 1280, height: 1000 } })).newPage();
+await page.route(/https:\/\/(cdnjs|unpkg)[^ ]*/, r => r.fulfill({ body: readFileSync(`${NM}/d3/dist/d3.min.js`), contentType: "text/javascript" }));
+await page.goto("http://localhost:8786/compositions.html", { waitUntil: "load" }); await page.waitForTimeout(3000);
+const probe = (tag) => page.evaluate((tag) => { const f = [...document.querySelectorAll(".frame")].find(x => x.getAttribute("aria-label") === "Application shell"); const sr = f.querySelector(".fbody").shadowRoot; const r = (e) => { const b = e.getBoundingClientRect(); return [Math.round(b.y), Math.round(b.height)]; };
+  const out = { tag, frame: r(f), surface: r(sr.querySelector(".surface")), layout: r(sr.querySelector(".ds.application-layout")), nav: r(sr.querySelector(".ds.side-navigation")), header: r(sr.querySelector(".ds.side-navigation-header")), title: r(sr.querySelector(".title")), main: r(sr.querySelector(".screen-main")), frameOffsetTop: f.offsetTop, navOffset: sr.querySelector(".ds.side-navigation").offsetTop, headerTranslate: getComputedStyle(sr.querySelector(".ds.side-navigation-header")).translate, navCS: [getComputedStyle(sr.querySelector(".ds.side-navigation")).position, getComputedStyle(sr.querySelector(".ds.application-layout > .navigation")).position, getComputedStyle(sr.querySelector(".ds.application-layout > .navigation")).insetBlockStart] }; return out; }, tag);
+await page.evaluate(() => { const f = [...document.querySelectorAll(".frame")].find(x => x.getAttribute("aria-label") === "Application shell"); window.scrollTo(0, f.offsetTop + document.getElementById("board").getBoundingClientRect().top + scrollY - 200); }); await page.waitForTimeout(900);
+console.log(JSON.stringify(await probe("tilted+layered")));
+await page.click("#tilt", { force: true }); await page.waitForTimeout(900); console.log(JSON.stringify(await probe("flat+layered")));
+await page.selectOption("#layer", ""); await page.waitForTimeout(500); console.log(JSON.stringify(await probe("flat+nolayer")));
+await browser.close(); srv.close();

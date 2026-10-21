@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Schema · Pragma Graph Atlas</title>
+<style>
+  .hier { font-size: .875rem; line-height: 1.4286; display: grid; gap: .125rem; }
+  .hier div { white-space: nowrap; }
+  .hier .n { color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  svg .node rect { stroke: none; }
+  svg .node text { font-size: 11px; }
+  svg .edge { fill: none; stroke-linecap: round; opacity: .55; }
+  svg .edge.hl { opacity: 1; }
+  svg .edge.dim { opacity: .08; }
+  svg .col-label { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; fill: var(--color-text-muted); }
+  svg .elabel { font-size: 10px; fill: var(--color-text-muted); paint-order: stroke; stroke: var(--color-background); stroke-width: 3px; }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">02 / 16 · the ontology</div>
+    <h1>Fifty-five classes, joined by the edges that actually occur</h1>
+    <p class="lede">Declared ontologies say what <em>may</em> connect. This map draws what <em>does</em>: every pair of classes with at least one triple between an instance of one and an instance of the other, with the stroke weighted by how many. Classes sit in a column per vocabulary and are ordered by instance count.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div id="legend"></div>
+    <figure>
+      <div class="chart scroll-x" id="map"></div>
+      <figcaption>Each box is a class; the number is its instance count. An edge runs from the subject's class to the object's class. Stroke width is proportional to the square root of the triple count (1 to 1,904). Hover an edge for its predicates; click a class for its properties and connections. Edges within one column curve out to the right of it. Self-edges (TokenSymbol → TokenSymbol, Category → Category) are drawn as small loops.</figcaption>
+    </figure>
+    <details class="table"><summary>Table: all class-to-class edges, by predicate</summary><div id="edgeTable"></div></details>
+  </section>
+
+  <section class="block">
+    <header><h2>How the classes inherit</h2><p class="small muted">The <code>rdfs:subClassOf</code> statements the ontologies declare, indented. Instance counts count direct typing only, so <code>ds:UIBlock</code> itself shows none although 313 nodes are blocks through its four subclasses.</p></header>
+    <div class="two" id="hier"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>Properties declared, per vocabulary</h2><p class="small muted">The ontologies declare 77 object properties (node to node) and 82 datatype properties (node to literal). Of the 159, 80 never appear on an instance in this snapshot, 46 of them in the anatomy and w3c-tokens vocabularies whose instances the design-system pack does not yet ship.</p></header>
+    <div class="two">
+      <figure><div class="chart" id="propChart"></div><figcaption>Declared properties per vocabulary, split by kind. Teal: object properties; blue: datatype properties.</figcaption></figure>
+      <figure><div class="chart" id="shapeChart"></div><figcaption>SHACL node shapes per target class: the validation constraints the packs ship alongside their ontology (33 shapes, 146 property constraints).</figcaption></figure>
+    </div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("schema.html");
+  const [s, o] = await A.load("schema", "overview");
+  const count = new Map(o.classes.map(d => [d.c, +d.n]));
+  const parent = new Map(); const label = new Map();
+  for (const c of s.owlClasses) { if (c.parent) parent.set(c.c, c.parent); if (c.label) label.set(c.c, c.label); }
+  const colOf = (iri) => iri.startsWith("https://dt.canonical.com/w3c-tokens/") ? "w3c" : A.nsOf(iri);
+  const COLS = [["ds", "ds: design system"], ["anatomy", "anatomy:"], ["dt", "dt: tokens"], ["w3c", "w3c-tokens:"], ["cs", "cs: standards"], ["schema", "owl / shacl / rdfs"]];
+  const colColor = { ds: A.nsColor("ds"), anatomy: A.nsColor("anatomy"), dt: A.nsColor("dt"), w3c: A.nsColor("dt"), cs: A.nsColor("cs"), schema: A.nsColor("schema") };
+  // nodes: every class with instances
+  const nodes = [...count.entries()].map(([iri, n]) => ({ iri, n, col: colOf(iri), label: A.local(iri) }));
+  // aggregate edges per class pair
+  const pairs = d3.rollups(s.classEdges, v => ({ n: d3.sum(v, d => +d.n), preds: v.map(d => ({ p: A.curie(d.p), n: +d.n })).sort((a, b) => b.n - a.n) }), d => d.sc + "|" + d.oc)
+    .map(([k, v]) => { const [a, b] = k.split("|"); return { a, b, ...v }; }).filter(e => count.has(e.a) && count.has(e.b)).sort((a, b) => b.n - a.n);
+  // layout
+  const colX = {}, colW = 170, gap = 70, rowH = 30, top = 36;
+  COLS.forEach(([c], i) => colX[c] = 20 + i * (colW + gap));
+  const byCol = d3.group(nodes, d => d.col);
+  const pos = new Map();
+  let maxRows = 0;
+  for (const [c] of COLS) { const list = (byCol.get(c) || []).sort((x, y) => y.n - x.n); list.forEach((d, i) => pos.set(d.iri, { x: colX[c], y: top + i * rowH, d })); maxRows = Math.max(maxRows, list.length); }
+  const W = 20 + COLS.length * (colW + gap), H = top + maxRows * rowH + 20;
+  const svg = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).style("min-width", "900px").attr("role", "img").attr("aria-label", "Class map");
+  svg.append("g").selectAll("text").data(COLS).join("text").attr("class", "col-label").attr("x", d => colX[d[0]]).attr("y", 16).text(d => d[1]);
+  const wscale = d3.scaleSqrt().domain([1, d3.max(pairs, d => d.n)]).range([1, 9]);
+  const eg = svg.append("g");
+  const edgeSel = eg.selectAll("path").data(pairs).join("path").attr("class", "edge").attr("stroke", d => colColor[colOf(d.a)]).attr("stroke-width", d => wscale(d.n)).attr("d", d => {
+    const A_ = pos.get(d.a), B = pos.get(d.b); const ay = A_.y + 11, by = B.y + 11;
+    if (d.a === d.b) { const x = A_.x + colW, y = ay; return `M${x},${y - 6} C${x + 24},${y - 18} ${x + 24},${y + 18} ${x},${y + 6}`; }
+    if (A_.x === B.x) { const x = A_.x + colW, bend = 28 + Math.abs(ay - by) * .15; return `M${x},${ay} C${x + bend},${ay} ${x + bend},${by} ${x},${by}`; }
+    const x1 = A_.x < B.x ? A_.x + colW : A_.x, x2 = A_.x < B.x ? B.x : B.x + colW; const mx = (x1 + x2) / 2;
+    return `M${x1},${ay} C${mx},${ay} ${mx},${by} ${x2},${by}`;
+  });
+  edgeSel.on("pointermove", (ev, d) => { edgeSel.classed("dim", e => e !== d).classed("hl", e => e === d); A.tip(`<b>${A.curie(d.a)}</b> → <b>${A.curie(d.b)}</b><br>${A.fmt(d.n)} triples<br>${d.preds.map(p => `${p.p} <span class="muted">${A.fmt(p.n)}</span>`).join("<br>")}`, ev); })
+    .on("pointerleave", () => { edgeSel.classed("dim", false).classed("hl", false); A.tip(null); });
+  // edge labels for the heaviest pair per source column pair, when single predicate and big
+  const labelled = pairs.filter(d => d.n >= 300 && d.a !== d.b && pos.get(d.a).x !== pos.get(d.b).x);
+  svg.append("g").selectAll("text").data(labelled).join("text").attr("class", "elabel").attr("text-anchor", "middle")
+    .attr("x", d => { const A_ = pos.get(d.a), B = pos.get(d.b); return (Math.min(A_.x, B.x) + colW + Math.max(A_.x, B.x)) / 2; })
+    .attr("y", d => (pos.get(d.a).y + pos.get(d.b).y) / 2 + 8).text(d => `${d.preds[0].p} ${A.fmt(d.n)}`);
+  const ng = svg.append("g").selectAll("g").data(nodes).join("g").attr("class", "node").attr("transform", d => { const p = pos.get(d.iri); return `translate(${p.x},${p.y})`; });
+  ng.append("rect").attr("width", colW).attr("height", 22).attr("fill", "var(--color-background-layer2)");
+  ng.append("rect").attr("width", 4).attr("height", 22).attr("fill", d => colColor[d.col]);
+  ng.append("text").attr("x", 10).attr("y", 15).text(d => d.label.length > 20 ? d.label.slice(0, 19) + "…" : d.label);
+  ng.append("text").attr("x", colW - 6).attr("y", 15).attr("text-anchor", "end").attr("class", "muted tabular").text(d => A.fmt(d.n));
+  ng.style("cursor", "pointer").on("click", (ev, d) => {
+    const dom = [...s.objProps.filter(p => p.domain === d.iri), ...s.dataProps.filter(p => p.domain === d.iri)];
+    const seen = new Set(); const props = dom.filter(p => !seen.has(p.p) && seen.add(p.p)).map(p => ({ p: A.curie(p.p), range: p.range ? A.curie(p.range) : "", kind: s.objProps.some(o => o.p === p.p) ? "object" : "datatype", n: (s.propUse.find(u => u.p === p.p) || {}).n || 0 }));
+    const outs = pairs.filter(e => e.a === d.iri), ins = pairs.filter(e => e.b === d.iri);
+    const html = `<dl><dt>IRI</dt><dd><code>${A.esc(A.curie(d.iri))}</code></dd><dt>Instances</dt><dd>${A.fmt(d.n)}</dd><dt>Parent class</dt><dd>${parent.get(d.iri) ? A.esc(A.curie(parent.get(d.iri))) : "—"}</dd></dl>
+      ${props.length ? `<h4>Declared properties with this domain (${props.length})</h4><ul class="facts">${props.map(p => `<li><span class="p">${A.esc(p.p)}</span><span class="o">${p.kind}${p.range ? " → " + A.esc(p.range) : ""} <span class="muted">${A.fmt(+p.n)} uses</span></span></li>`).join("")}</ul>` : ""}
+      ${outs.length ? `<h4>Instances point at (${outs.length} classes)</h4><ul class="facts">${outs.map(e => `<li><span class="p">${e.preds.map(x => A.esc(x.p)).join(", ")}</span><span class="o">${A.esc(A.curie(e.b))} <span class="muted">${A.fmt(e.n)}</span></span></li>`).join("")}</ul>` : ""}
+      ${ins.length ? `<h4>Pointed at from (${ins.length} classes)</h4><ul class="facts">${ins.map(e => `<li><span class="p">${e.preds.map(x => A.esc(x.p)).join(", ")}</span><span class="o">${A.esc(A.curie(e.a))} <span class="muted">${A.fmt(e.n)}</span></span></li>`).join("")}</ul>` : ""}
+      ${A.cmd(`pragma ontology lookup ${A.curie(d.iri).split(":")[0]}\npragma graph query "SELECT ?s WHERE { ?s a ${A.curie(d.iri)} } LIMIT 20"`)}`;
+    A.showPanel(A.local(d.iri), `class · ${A.fmt(d.n)} instances`, html);
+  }).on("pointermove", (ev, d) => { edgeSel.classed("dim", e => e.a !== d.iri && e.b !== d.iri).classed("hl", e => e.a === d.iri || e.b === d.iri); A.tip(`<b>${A.curie(d.iri)}</b><br>${A.fmt(d.n)} instances<br>${pairs.filter(e => e.a === d.iri).length} outgoing kinds of edge · ${pairs.filter(e => e.b === d.iri).length} incoming`, ev); })
+    .on("pointerleave", () => { edgeSel.classed("dim", false).classed("hl", false); A.tip(null); });
+  document.getElementById("map").replaceChildren(svg.node());
+  A.legend("#legend", COLS.map(([c, l]) => ({ label: l, color: colColor[c], count: (byCol.get(c) || []).length })).concat([{ label: "edge width ∝ √triples", color: "transparent" }]));
+  A.table("#edgeTable", [{ label: "Subject class", key: "a", render: r => `<code>${A.curie(r.sc)}</code>` }, { label: "Predicate", key: "p", render: r => `<code>${A.curie(r.p)}</code>` }, { label: "Object class", key: "b", render: r => `<code>${A.curie(r.oc)}</code>` }, { label: "Triples", key: "n", num: true }], s.classEdges.slice().sort((x, y) => +y.n - +x.n));
+
+  // hierarchy
+  const all = new Set([...s.owlClasses.map(c => c.c), ...count.keys()]);
+  const children = new Map(); for (const c of all) { const p = parent.get(c); if (p) { if (!children.has(p)) children.set(p, []); children.get(p).push(c); } }
+  const roots = [...all].filter(c => !parent.get(c) || !all.has(parent.get(c)));
+  const groups = { ds: [], dt: [], w3c: [], anatomy: [], cs: [], schema: [] };
+  for (const r of roots) groups[colOf(r)]?.push(r);
+  const render = (c, depth) => `<div style="padding-left:${depth * 1.25}rem"><span>${A.curie(c)}</span> <span class="n">${count.has(c) ? A.fmt(count.get(c)) : "·"}</span></div>` + (children.get(c) || []).sort((x, y) => (count.get(y) || 0) - (count.get(x) || 0)).map(k => render(k, depth + 1)).join("");
+  document.getElementById("hier").innerHTML = [["ds", "ds: design system"], ["dt", "dt: and w3c-tokens:"], ["anatomy", "anatomy:"], ["cs", "cs:"]].map(([g, t]) => `<div><h3>${t}</h3><div class="hier">${(g === "dt" ? groups.dt.concat(groups.w3c) : groups[g]).filter(r => !/owl#|shacl#|rdf-schema#/.test(r)).sort((x, y) => (count.get(y) || 0) - (count.get(x) || 0)).map(r => render(r, 0)).join("")}</div></div>`).join("");
+
+  // properties per vocabulary
+  const propNs = (p) => colOf(p.p) === "w3c" ? "w3c-tokens:" : A.curie(p.p).slice(0, A.curie(p.p).indexOf(":") + 1);
+  const used = new Set(s.propUse.map(d => d.p));
+  const vocabs = ["ds:", "dt:", "w3c-tokens:", "dt-web:", "anatomy:", "cs:"];
+  const rows = [];
+  for (const v of vocabs) { const op = s.objProps.filter(p => propNs(p) === v), dp = s.dataProps.filter(p => propNs(p) === v); rows.push({ label: v + " object", value: new Set(op.map(p => p.p)).size, color: A.series(3), sub: `${new Set(op.filter(p => used.has(p.p)).map(p => p.p)).size} used` }); rows.push({ label: v + " datatype", value: new Set(dp.map(p => p.p)).size, color: A.series(1), sub: `${new Set(dp.filter(p => used.has(p.p)).map(p => p.p)).size} used` }); }
+  A.hbars("#propChart", rows.map(r => ({ ...r, tip: `<b>${r.label}</b><br>${r.value} declared · ${r.sub}` })), { rowH: 22, labelW: 150, aria: "Declared properties per vocabulary" });
+  const shapes = d3.rollups(s.shapes.filter(d => d.target), v => ({ n: v.length, props: d3.sum(v, d => +d.props) }), d => d.target).map(([t, v]) => ({ label: A.curie(t), value: v.props, color: A.nsColor(A.nsOf(t)), tip: `<b>${A.curie(t)}</b><br>${v.n} shape(s), ${v.props} property constraints` })).sort((a, b) => b.value - a.value);
+  A.hbars("#shapeChart", shapes, { rowH: 20, labelW: 190, aria: "SHACL property constraints per target class" });
+})();
+</script>
+</body>
+</html>

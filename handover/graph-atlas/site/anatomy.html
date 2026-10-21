@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Anatomy &amp; bindings · Pragma Graph Atlas</title>
+<style>
+  svg .anat-link { fill: none; stroke: var(--color-border); stroke-width: 1.5; }
+  svg .anat-node text { font-size: 12px; }
+  svg .anat-node .meta { font-size: 10px; fill: var(--color-text-muted); }
+  svg .anat-node .slot { font-size: 10px; fill: var(--color-text-muted); paint-order: stroke; stroke: var(--color-background); stroke-width: 3px; }
+  .styles { font-size: .75rem; line-height: 1.3333; display: grid; grid-template-columns: max-content 1fr; gap: .125rem 1rem; }
+  .styles .k { color: var(--color-text-muted); white-space: nowrap; }
+  .styles .v { word-break: break-word; }
+  .heat { border-collapse: collapse; font-size: .75rem; }
+  .heat th { font-weight: 400; text-align: left; padding: .125rem .5rem .125rem 0; white-space: nowrap; }
+  .heat thead th { text-align: center; color: var(--color-text-muted); }
+  .heat td { text-align: center; min-width: 3rem; height: 1.5rem; border: 2px solid var(--color-background); font-variant-numeric: tabular-nums; }
+  .keys { display: grid; gap: var(--dimension-200); }
+  .keys .facet { display: grid; grid-template-columns: 8rem 1fr; gap: var(--dimension-200); }
+  .keys .chips { display: flex; flex-wrap: wrap; gap: .25rem; }
+  .keys .chip { border-left: 3px solid var(--c); font-family: var(--font-mono); }
+  @media (max-width: 40rem) { .keys .facet { grid-template-columns: 1fr; } }
+  svg .sk-node rect { stroke: none; }
+  svg .sk-link { fill: none; mix-blend-mode: multiply; }
+  :root[data-theme="dark"] svg .sk-link, .dark-blend svg .sk-link { mix-blend-mode: screen; }
+  svg .sk-label { font-size: 11px; }
+  svg .sk-label .n { fill: var(--color-text-muted); }
+  .anat-two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">04 / 16 · anatomy and token bindings</div>
+    <h1>How a block is built, and which tokens it reads</h1>
+    <p class="lede">A block's anatomy is a tree of named parts and anonymous roles, with slots, cardinalities and the style keys each part binds to a design token. The graph flattens those bindings into 1,010 <code>ds:TokenBinding</code> records, so "which components read <code>color.text</code>" is one query. 181 of the 325 blocks carry a written anatomy; the <a href="anatomies.html">anatomy census</a> draws all of them.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <header><h2>The Button, as the anatomy DSL describes it</h2><p class="small muted">Parsed from the YAML in <code>ds:anatomyDsl</code> on <code>ds:global.component.button</code>, authored 2026-09-13 from the React implementation's stylesheet. Named nodes point at other blocks; anonymous nodes carry a role. Edge labels show slot name and cardinality.</p></header>
+    <div class="two anat-two">
+      <figure><div class="chart" id="anatTree"></div><figcaption>The Button's node tree. The number under each node is how many style keys it binds; click a node to list them.</figcaption></figure>
+      <figure><h3 style="font-weight:600">Root node styles <span class="muted small" id="rootCount"></span></h3><div class="styles" id="rootStyles"></div><figcaption>Style key → token. A list is the var() fallback chain, in order; <code>@hover</code> and friends are per-state bindings.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <header><h2>1,010 bindings, from block grain to token family</h2><p class="small muted">Each binding is one node of one block, one style key, one state, one token symbol. Read left to right: which grains of block bind, through which facet of style, into which family of token.</p></header>
+    <figure><div class="chart" id="sankey"></div><figcaption>Band width is the number of bindings. Components and subcomponents do almost all the binding; colour and dimension receive almost all of it.</figcaption></figure>
+  </section>
+
+  <section class="block">
+    <header><h2>Bindings by block and state</h2><p class="small muted">The 24 blocks with the most bindings, against the 8 interaction states a style key can be bound under. 78% of bindings are the default state.</p></header>
+    <div class="scroll-x" id="heat"></div>
+  </section>
+
+  <section class="block">
+    <div class="two">
+      <figure><div class="chart" id="symbols"></div><figcaption>The twenty token symbols consumed by the most bindings. <code>dimension.200</code> (1rem) and <code>color.text</code> lead.</figcaption></figure>
+      <figure><div class="chart" id="facets"></div><figcaption>Bindings per style facet. Appearance (background, border, outline) and spacing are where tokens meet blocks.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <header><h2>The 111 style keys</h2><p class="small muted">The vocabulary an anatomy may bind, from <code>@canonical/anatomy-dsl</code>. A key is <b>primitive</b> (takes a literal such as <code>inline-flex</code>), <b>token</b> (must take a token), or <b>either</b>. The number after a key is how many bindings in the snapshot use it.</p></header>
+    <div id="keyLegend"></div>
+    <div class="keys" id="keys"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-sankey/0.12.3/d3-sankey.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("anatomy.html");
+  const [tree, bi, bl] = await A.load("button-tree", "bindings", "blocks");
+  if (matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light") document.body.classList.add("dark-blend");
+  const blockName = new Map(bl.blocks.map(x => [x.b, x.name])), blockGrain = new Map(bl.blocks.map(x => [x.b, A.local(x.class).toLowerCase()]));
+
+  // --- anatomy tree
+  const toNode = (n, rel) => ({ name: n.uri ? n.uri.replace(/^global\./, "") : (n.role || "node"), named: !!n.uri, styles: n.styles || {}, rel: rel || {}, children: (n.edges || []).map(e => toNode(e.node || { uri: e.uri }, e.relation)) });
+  const rootData = toNode(tree.node);
+  const h = d3.hierarchy(rootData);
+  const t = d3.tree().nodeSize([54, 230])(h);
+  let minX = Infinity, maxX = -Infinity; h.each(d => { minX = Math.min(minX, d.x); maxX = Math.max(maxX, d.x); });
+  const W = (h.height + 1) * 230 + 40, H = maxX - minX + 80;
+  const svg = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "Button anatomy tree");
+  const g = svg.append("g").attr("transform", `translate(16,${30 - minX})`);
+  g.selectAll("path").data(h.links()).join("path").attr("class", "anat-link").attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+  g.selectAll("text.slot").data(h.links()).join("text").attr("class", "slot").attr("x", d => (d.source.y + d.target.y) / 2 + 20).attr("y", d => (d.source.x + d.target.x) / 2 - 4).attr("text-anchor", "middle").text(d => [d.target.data.rel.slotName ? "slot " + d.target.data.rel.slotName : null, d.target.data.rel.cardinality != null ? "×" + d.target.data.rel.cardinality : null].filter(Boolean).join(" · "));
+  const nd = g.selectAll("g.anat-node").data(h.descendants()).join("g").attr("class", "anat-node").attr("transform", d => `translate(${d.y},${d.x})`);
+  nd.append("rect").attr("x", -6).attr("y", -11).attr("width", d => Math.max(60, d.data.name.length * 6.6 + 12)).attr("height", 22).attr("fill", d => d.data.named ? "var(--series-1)" : "var(--color-background-layer2)").attr("stroke", d => d.data.named ? "none" : "var(--color-border)");
+  nd.append("text").attr("y", 4).attr("fill", d => d.data.named ? "var(--color-background)" : "var(--color-text)").style("fill", d => d.data.named ? "var(--color-background)" : null).text(d => d.data.name);
+  nd.append("text").attr("class", "meta").attr("y", 24).text(d => { const k = Object.keys(d.data.styles).length; return k ? `${k} style key${k > 1 ? "s" : ""}` : "no styles"; });
+  nd.style("cursor", "pointer").on("click", (ev, d) => { const st = Object.entries(d.data.styles); A.showPanel(d.data.name, d.data.named ? "named node → block" : "anonymous role", `<dl><dt>Depth</dt><dd>${d.depth}</dd>${d.data.rel.slotName ? `<dt>Slot</dt><dd>${A.esc(d.data.rel.slotName)}</dd>` : ""}${d.data.rel.cardinality != null ? `<dt>Cardinality</dt><dd>${A.esc(d.data.rel.cardinality)}</dd>` : ""}<dt>Children</dt><dd>${d.children ? d.children.length : 0}</dd></dl>${st.length ? `<h4>Style keys (${st.length})</h4><ul class="facts">${st.map(([k, v]) => `<li><span class="p">${A.esc(k)}</span><span class="o">${A.esc(Array.isArray(v) ? v.join(" → ") : v)}</span></li>`).join("")}</ul>` : "<p class='muted'>No styles bound on this node.</p>"}${d.data.named ? A.cmd(`pragma block lookup ${d.data.name.split(".").pop()}`) : ""}`); }).on("pointermove", (ev, d) => A.tip(`<b>${d.data.name}</b> ${d.data.named ? "(named node → block)" : "(anonymous role)"}<br>${Object.entries(d.data.styles).slice(0, 12).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(" → ") : v}`).join("<br>")}${Object.keys(d.data.styles).length > 12 ? "<br>…" : ""}`, ev)).on("pointerleave", () => A.tip(null));
+  document.getElementById("anatTree").replaceChildren(svg.node());
+  const rs = Object.entries(rootData.styles);
+  document.getElementById("rootCount").textContent = `${rs.length} keys`;
+  document.getElementById("rootStyles").innerHTML = rs.map(([k, v]) => `<span class="k mono">${k}</span><span class="v mono">${Array.isArray(v) ? v.join(" → ") : v}</span>`).join("");
+
+  // --- sankey grain → facet → family
+  const facetOf = (k) => (k || "").split(".")[0] || "?";
+  const famOf = (s) => { const n = A.local(s); const p = n.split("."); if (p[0] === "modifier" || p[0] === "surface") return p[0] + "." + (p[1] || ""); return p[0]; };
+  const rows = bi.bindings.map(x => ({ grain: blockGrain.get(x.block) || "other", facet: facetOf(x.key), fam: famOf(x.sym), state: x.state, block: x.block, sym: x.sym, key: x.key }));
+  const famCounts = d3.rollups(rows, v => v.length, d => d.fam).sort((p, q) => q[1] - p[1]);
+  const keepFam = new Set(famCounts.slice(0, 7).map(d => d[0]));
+  const famName = (f) => keepFam.has(f) ? f : "other families";
+  const nodesS = [], idx = new Map(); const nid = (k, stage) => { if (!idx.has(k)) { idx.set(k, nodesS.length); nodesS.push({ name: k, stage }); } return idx.get(k); };
+  const l1 = d3.rollups(rows, v => v.length, d => d.grain, d => d.facet).flatMap(([a, m]) => m.map(([b, n]) => ({ source: nid("grain:" + a, 0), target: nid("facet:" + b, 1), value: n })));
+  const l2 = d3.rollups(rows, v => v.length, d => d.facet, d => famName(d.fam)).flatMap(([a, m]) => m.map(([b, n]) => ({ source: nid("facet:" + a, 1), target: nid("fam:" + b, 2), value: n })));
+  const sk = d3.sankey().nodeWidth(10).nodePadding(10).nodeSort((a, b) => b.value - a.value).extent([[1, 10], [899, 470]]);
+  const graph = sk({ nodes: nodesS.map(d => ({ ...d })), links: [...l1, ...l2] });
+  const GC = { component: 1, subcomponent: 2, pattern: 3, layout: 4 };
+  const nodeColor = (n) => n.stage === 0 ? (GC[n.name.slice(6)] ? A.series(GC[n.name.slice(6)]) : "var(--series-other)") : n.stage === 1 ? "var(--series-other-2)" : (famColor[n.name.slice(4)] || "var(--series-other)");
+  const famColor = { color: A.series(1), dimension: A.series(2), spacing: A.series(3), typography: A.series(4), "modifier.color": A.series(5), "surface.color": A.series(6), motion: A.series(7) };
+  const sv = d3.create("svg").attr("viewBox", "0 0 900 480").attr("role", "img").attr("aria-label", "Bindings from grain to facet to token family");
+  sv.append("g").selectAll("path").data(graph.links).join("path").attr("class", "sk-link").attr("d", d3.sankeyLinkHorizontal()).attr("stroke", d => nodeColor(d.source.stage === 0 ? d.source : d.target)).attr("stroke-opacity", .35).attr("stroke-width", d => Math.max(1, d.width))
+    .on("pointermove", (ev, d) => A.tip(`<b>${d.source.name.split(":")[1]}</b> → <b>${d.target.name.split(":")[1]}</b><br>${A.fmt(d.value)} bindings`, ev)).on("pointerleave", () => A.tip(null));
+  const gn = sv.append("g").selectAll("g").data(graph.nodes).join("g").attr("class", "sk-node");
+  gn.append("rect").attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0).attr("height", d => Math.max(1, d.y1 - d.y0)).attr("fill", nodeColor);
+  gn.append("text").attr("class", "sk-label").attr("x", d => d.stage === 2 ? d.x0 - 6 : d.x1 + 6).attr("y", d => (d.y0 + d.y1) / 2).attr("dy", ".32em").attr("text-anchor", d => d.stage === 2 ? "end" : "start").html(d => `${d.name.split(":")[1]} <tspan class="n">${A.fmt(d.value)}</tspan>`);
+  sv.append("g").selectAll("text").data([["grain of block", 1], ["style facet", 450], ["token family", 899]]).join("text").attr("x", d => d[1]).attr("y", 8).attr("text-anchor", (d, i) => i === 0 ? "start" : i === 1 ? "middle" : "end").attr("font-size", 11).attr("class", "muted").text(d => d[0]);
+  document.getElementById("sankey").replaceChildren(sv.node());
+
+  // --- heatmap
+  const STATES = ["default", "hover", "focus", "active", "disabled", "invalid", "selected", "indeterminate"];
+  const perBlock = d3.rollups(rows, v => v.length, d => d.block).sort((p, q) => q[1] - p[1]).slice(0, 24);
+  const cell = d3.rollup(rows, v => v.length, d => d.block, d => d.state);
+  const maxC = d3.max(perBlock, ([b]) => d3.max(STATES, s => cell.get(b)?.get(s) || 0));
+  document.getElementById("heat").innerHTML = `<table class="heat"><thead><tr><th>block</th>${STATES.map(s => `<th>${s}</th>`).join("")}<th>all</th></tr></thead><tbody>${perBlock.map(([b, n]) => `<tr><th>${blockName.get(b) || A.curie(b)} <span class="muted">${blockGrain.get(b) || ""}</span></th>${STATES.map(s => { const v = cell.get(b)?.get(s) || 0; const p = Math.log1p(v) / Math.log1p(maxC); return `<td style="${v ? `background:color-mix(in oklch, var(--series-1) ${Math.round(10 + 90 * p)}%, var(--color-background));color:${p > .6 ? "var(--color-background)" : "var(--color-text)"}` : "color:var(--color-text-disabled)"}">${v || "·"}</td>`; }).join("")}<td style="font-weight:600">${n}</td></tr>`).join("")}<tr><th>all 1,010</th>${STATES.map(s => `<td style="font-weight:600">${rows.filter(r => r.state === s).length}</td>`).join("")}<td style="font-weight:600">${rows.length}</td></tr></tbody></table>`;
+
+  // --- symbols & facets
+  const sym = d3.rollups(rows, v => v.length, d => d.sym).sort((p, q) => q[1] - p[1]).slice(0, 20);
+  A.hbars("#symbols", sym.map(([s, n]) => ({ label: A.local(s), value: n, color: famColor[famOf(s)] || "var(--series-other)", tip: `<b>${A.curie(s)}</b><br>${n} bindings in ${new Set(rows.filter(r => r.sym === s).map(r => r.block)).size} blocks` })), { rowH: 20, labelW: 230, aria: "Most consumed token symbols" });
+  const fac = d3.rollups(rows, v => v.length, d => d.facet).sort((p, q) => q[1] - p[1]);
+  A.hbars("#facets", fac.map(([f, n]) => ({ label: f, value: n })), { rowH: 22, labelW: 110, aria: "Bindings per facet" });
+
+  // --- style keys
+  const useByKey = d3.rollup(rows, v => v.length, d => d.key);
+  const KC = { primitive: "var(--series-other-2)", token: A.series(1), either: A.series(3) };
+  const keys = bi.styleKeys.map(k => ({ key: A.local(k.k).replace(/^key\./, ""), kind: k.kind || "?", ns: (k.namespaces || "").split("|").filter(Boolean) })).map(k => ({ ...k, facet: k.key.split(".")[0], n: useByKey.get(k.key) || 0 }));
+  A.legend("#keyLegend", ["primitive", "token", "either"].map(k => ({ label: k, color: KC[k], count: keys.filter(x => x.kind === k).length })));
+  const facets = d3.groups(keys, k => k.facet).sort((p, q) => q[1].length - p[1].length);
+  document.getElementById("keys").innerHTML = facets.map(([f, list]) => `<div class="facet"><div><h3>${f}</h3><div class="small muted">${list.length} keys · ${d3.sum(list, k => k.n)} bindings</div></div><div class="chips">${list.sort((p, q) => q.n - p.n || d3.ascending(p.key, q.key)).map(k => `<span class="chip" style="--c:${KC[k.kind]}" title="${k.kind}${k.ns.length ? " · token namespaces: " + k.ns.join(", ") : ""}">${k.key.slice(f.length + 1) || k.key}${k.n ? ` <span class="muted">${k.n}</span>` : ""}</span>`).join("")}</div></div>`).join("");
+})();
+</script>
+</body>
+</html>

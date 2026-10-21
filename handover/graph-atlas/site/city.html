@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Isometric city · Pragma Graph Atlas</title>
+<style>
+  .stage { position: relative; border: 1px solid var(--color-border-disabled); background: var(--color-background); }
+  .stage svg { display: block; width: 100%; height: auto; }
+  .below { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 1.5rem; padding: .75rem 1rem; border-top: 1px solid var(--color-border-disabled); }
+  .controls { position: absolute; right: .75rem; top: .75rem; display: flex; flex-wrap: wrap; gap: .375rem; justify-content: flex-end; max-width: 60%; }
+  .controls button, .controls select { font: inherit; font-size: .75rem; padding: .25rem .5rem; background: var(--color-background); color: var(--color-text); border: 1px solid var(--color-border); cursor: pointer; }
+  .controls button[aria-pressed="true"] { background: var(--color-text); color: var(--color-background); }
+  svg .district-label { font-size: 13px; font-weight: 600; paint-order: stroke; stroke: var(--color-background); stroke-width: 4px; }
+  svg .district-sub { font-size: 10px; fill: var(--color-text-muted); paint-order: stroke; stroke: var(--color-background); stroke-width: 3px; }
+  svg .landmark { font-size: 10px; paint-order: stroke; stroke: var(--color-background); stroke-width: 3px; }
+  svg .bld { cursor: pointer; }
+  svg .bld:hover .top { stroke: var(--color-text); stroke-width: 1.2; }
+  .key { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--dimension-200); font-size: .875rem; }
+  .key div { border-top: 3px solid var(--c, var(--color-border)); padding-top: .5rem; } .key b { display: block; }
+  @media (max-width: 40rem) { .controls { position: static; margin-top: .5rem; max-width: none; justify-content: flex-start; } }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">14 / 16 · the design system as a city</div>
+    <h1>325 blocks as buildings, 16 tiers as districts</h1>
+    <p class="lede">A picture for a slide. The ground plan is the tier tree: the global tier is the centre, the apps tier and its ten product tiers sit to its right, sites, documentation and stores below. Every block is a building; its height is how much the graph specifies about it; its colour is the grain. A solid building has an implementation in a library; an outlined one is specified but not yet built.</p>
+  </div>
+
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stage" id="stage">
+      <div class="controls">
+        <select id="metric" aria-label="Height metric"><option value="props">Height: properties</option><option value="bindings">Height: token bindings</option><option value="anatomy">Height: anatomy nodes</option><option value="flat">Height: uniform</option></select>
+        <button id="rotate">Rotate 90°</button>
+        <button id="labels" aria-pressed="true">Landmark labels</button>
+        <button id="copy">Copy as SVG</button>
+      </div>
+      <div id="svgHost"></div>
+      <div class="below"><div id="legend"></div><div class="muted small" id="status"></div></div>
+    </div>
+    <p class="small muted">Hover a building for its name; click it for its details. "Copy as SVG" puts the drawing on the clipboard as vector, ready to paste into Keynote, Figma or Inkscape; a screenshot works too. Rotate turns the whole city a quarter turn so a different district faces the viewer.</p>
+  </section>
+
+  <section class="block">
+    <header><h2>How to read it</h2></header>
+    <div class="key" id="key"></div>
+  </section>
+
+  <section class="block">
+    <header><h2>The districts</h2><p class="small muted">Each tier's footprint, population and how much of it is built.</p></header>
+    <div id="districts"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("city.html");
+  const [b, anat] = await A.load("blocks", "anatomies");
+  const anatBy = new Map(anat.map(a => [a.b, a]));
+  const GC = { component: 1, subcomponent: 2, pattern: 3, layout: 4 };
+  const grainOf = (c) => { const g = A.local(c).toLowerCase(); return GC[g] ? g : "other"; };
+  const blocks = b.blocks.map(x => ({ ...x, grain: grainOf(x.class), tier: A.local(x.tier || ""), props: +x.props, bindings: +x.bindings, impls: +x.impls, anatomy: anatBy.get(x.b)?.nodes || 0 }));
+  const gcolor = (g) => GC[g] ? A.resolve(A.series(GC[g])) : A.resolve("var(--series-other)");
+  const inkText = A.resolve("var(--color-text)"), inkMuted = A.resolve("var(--color-text-muted)"), inkBg = A.resolve("var(--color-background)"), inkGround = A.resolve("var(--color-background-layer2)"), inkLine = A.resolve("var(--color-border-disabled)");
+  const count = d3.rollup(blocks, v => v.length, x => x.tier);
+  // ---- district plan (grid units). Footprint columns chosen from population; positions hand-placed to follow the tier tree.
+  const cols = (n) => Math.max(2, Math.ceil(Math.sqrt(n * 1.5)));
+  const rowsOf = (n, c) => Math.max(1, Math.ceil(n / c));
+  const D = {};
+  const place = (t, x, y, c) => { const n = count.get(t) || 0; const cc = c || cols(n); D[t] = { tier: t, x, y, cols: cc, rows: rowsOf(n, cc), n }; return D[t]; };
+  const g0 = place("global", 0, 0, 14);
+  const ap = place("apps", g0.cols + 3, 0, 8);
+  const products = ["apps_launchpad", "apps_landscape", "apps_workplaceengineering", "apps_lxd", "apps_portal", "apps_debcrafters", "apps_support", "apps_anbox", "apps_juju", "apps_notary"];
+  let px = ap.x + ap.cols + 2, py = 0, rowH = 0;
+  for (const t of products) { const n = count.get(t) || 0; const c = n > 20 ? 7 : n > 5 ? 4 : 2; const r = Math.max(1, Math.ceil(Math.max(n, 1) / c)); if (px + c > ap.x + ap.cols + 2 + 16) { px = ap.x + ap.cols + 2; py += rowH + 2; rowH = 0; } D[t] = { tier: t, x: px, y: py, cols: c, rows: r, n }; px += c + 2; rowH = Math.max(rowH, r); }
+  const si = place("sites", 0, g0.rows + 3, 6);
+  place("sites_webcomponentsprototype", si.cols + 2, g0.rows + 3, 5);
+  place("documentation", si.cols + 2 + 5 + 2, g0.rows + 3, 2);
+  D["stores"] = { tier: "stores", x: si.cols + 2 + 5 + 2 + 4, y: g0.rows + 3, cols: 3, rows: 2, n: 0 };
+  // ---- assign cells
+  const GR = ["component", "subcomponent", "pattern", "layout", "other"];
+  const cells = [];
+  for (const t in D) { const d = D[t]; const list = blocks.filter(x => x.tier === t).sort((p, q) => GR.indexOf(p.grain) - GR.indexOf(q.grain) || q.props - p.props || d3.ascending(p.name, q.name)); list.forEach((x, i) => { cells.push({ ...x, cx: d.x + (i % d.cols), cy: d.y + Math.floor(i / d.cols) }); }); }
+  // ---- projection
+  const S = 22, COS = Math.cos(Math.PI / 6), SIN = 0.5; let rot = 0;
+  const maxX = d3.max(Object.values(D), d => d.x + d.cols), maxY = d3.max(Object.values(D), d => d.y + d.rows);
+  const rotate = (x, y) => { for (let i = 0; i < rot; i++) { [x, y] = [maxY - y, x]; } return [x, y]; };
+  const iso = (x, y, z) => { const [rx, ry] = rotate(x, y); return [(rx - ry) * COS * S, (rx + ry) * SIN * S - z]; };
+  const metricSel = document.getElementById("metric"); let metric = "props", showLabels = true;
+  const heightOf = (x) => { const v = metric === "flat" ? 1 : x[metric]; const max = metric === "flat" ? 1 : d3.max(cells, c => c[metric]) || 1; return 6 + (metric === "flat" ? 10 : Math.sqrt(v / max) * 70); };
+  const shade = (hex, k) => { const c = d3.color(hex); const l = d3.lab(c); l.l = Math.max(5, Math.min(98, l.l + k)); return l.formatHex(); };
+  function render() {
+    const host = document.getElementById("svgHost");
+    const pts = []; for (const d of Object.values(D)) for (const [x, y] of [[d.x, d.y], [d.x + d.cols, d.y], [d.x, d.y + d.rows], [d.x + d.cols, d.y + d.rows]]) pts.push(iso(x, y, 0));
+    const minx = d3.min(pts, p => p[0]) - 60, maxx = d3.max(pts, p => p[0]) + 60, miny = d3.min(pts, p => p[1]) - 100, maxy = d3.max(pts, p => p[1]) + 44;
+    const svg = d3.create("svg").attr("viewBox", `${minx} ${miny} ${maxx - minx} ${maxy - miny}`).attr("xmlns", "http://www.w3.org/2000/svg").attr("role", "img").attr("aria-label", "The design system drawn as an isometric city").style("font-family", "Ubuntu Sans, Ubuntu, sans-serif");
+    svg.append("rect").attr("x", minx).attr("y", miny).attr("width", maxx - minx).attr("height", maxy - miny).attr("fill", inkBg);
+    // ground plates, drawn back to front
+    const districts = Object.values(D).map(d => ({ ...d, depth: Math.min(...[[d.x, d.y], [d.x + d.cols, d.y], [d.x, d.y + d.rows], [d.x + d.cols, d.y + d.rows]].map(([x, y]) => { const [rx, ry] = rotate(x, y); return rx + ry; })) })).sort((p, q) => p.depth - q.depth);
+    const gG = svg.append("g");
+    for (const d of districts) { const poly = [[d.x - .4, d.y - .4], [d.x + d.cols + .4, d.y - .4], [d.x + d.cols + .4, d.y + d.rows + .4], [d.x - .4, d.y + d.rows + .4]].map(([x, y]) => iso(x, y, 0));
+      gG.append("polygon").attr("points", poly.map(p => p.join(",")).join(" ")).attr("fill", d.n ? inkGround : inkBg).attr("stroke", inkLine).attr("stroke-width", d.n ? 1 : 1.5).attr("stroke-dasharray", d.n ? null : "4 3");
+      d.front = poly.reduce((a, p) => p[1] > a[1] ? p : a); }
+    // buildings, painter's order by rotated depth
+    const bG = svg.append("g");
+    const ordered = cells.map(c => { const [rx, ry] = rotate(c.cx, c.cy); return { ...c, depth: rx + ry }; }).sort((p, q) => p.depth - q.depth);
+    const landmarks = new Set(ordered.slice().sort((p, q) => (metric === "flat" ? q.props - p.props : q[metric] - p[metric])).slice(0, 14).map(c => c.b));
+    for (const c of ordered) { const h = heightOf(c), m = .12; const x0 = c.cx + m, y0 = c.cy + m, x1 = c.cx + 1 - m, y1 = c.cy + 1 - m;
+      const P = (x, y, z) => iso(x, y, z); const top = [P(x0, y0, h), P(x1, y0, h), P(x1, y1, h), P(x0, y1, h)];
+      // the two visible side faces depend on rotation: pick the faces whose outward normal points toward the viewer
+      const faces = [{ pts: [P(x0, y1, 0), P(x1, y1, 0), P(x1, y1, h), P(x0, y1, h)], k: -14, n: [0, 1] }, { pts: [P(x1, y0, 0), P(x1, y1, 0), P(x1, y1, h), P(x1, y0, h)], k: -26, n: [1, 0] }, { pts: [P(x0, y0, 0), P(x1, y0, 0), P(x1, y0, h), P(x0, y0, h)], k: -14, n: [0, -1] }, { pts: [P(x0, y0, 0), P(x0, y1, 0), P(x0, y1, h), P(x0, y0, h)], k: -26, n: [-1, 0] }];
+      const vis = faces.filter(f => { const [nx, ny] = rotate(f.n[0], f.n[1]); const [ox, oy] = rotate(0, 0); return (nx - ox) + (ny - oy) > 0; });
+      const base = gcolor(c.grain); const built = c.impls > 0;
+      const g = bG.append("g").attr("class", "bld").datum(c);
+      for (const f of vis) g.append("polygon").attr("points", f.pts.map(p => p.join(",")).join(" ")).attr("fill", built ? shade(base, f.k) : inkBg).attr("stroke", built ? shade(base, -34) : base).attr("stroke-width", built ? .4 : 1).attr("stroke-linejoin", "round");
+      g.append("polygon").attr("class", "top").attr("points", top.map(p => p.join(",")).join(" ")).attr("fill", built ? shade(base, 10) : inkBg).attr("stroke", built ? shade(base, -30) : base).attr("stroke-width", built ? .4 : 1).attr("stroke-linejoin", "round");
+      if (showLabels && landmarks.has(c.b)) { const [tx, ty] = P((x0 + x1) / 2, (y0 + y1) / 2, h); g.append("line").attr("x1", tx).attr("y1", ty - 2).attr("x2", tx).attr("y2", ty - 16).attr("stroke", inkText).attr("stroke-width", .8); g.append("text").attr("class", "landmark").attr("x", tx).attr("y", ty - 19).attr("text-anchor", "middle").attr("fill", inkText).text(c.name); }
+      g.on("pointermove", (ev) => A.tip(`<b>${A.esc(c.name)}</b> ${c.grain} · ds:${c.tier}<br>${c.props} properties · ${c.bindings} token bindings · ${c.anatomy} anatomy nodes<br>${built ? `${c.impls} implementation${c.impls > 1 ? "s" : ""}` : "spec only, no implementation"}`, ev)).on("pointerleave", () => A.tip(null)).on("click", () => showBlock(c));
+    }
+    // district labels last, at the corner nearest the viewer, so no building covers them
+    const lG = svg.append("g");
+    for (const d of districts) { const built = blocks.filter(x => x.tier === d.tier && x.impls).length; const [lx, ly] = d.front;
+      lG.append("text").attr("class", "district-label").attr("x", lx).attr("y", ly + 16).attr("text-anchor", "middle").attr("fill", inkText).text(`ds:${d.tier}`);
+      lG.append("text").attr("class", "district-sub").attr("x", lx).attr("y", ly + 28).attr("text-anchor", "middle").attr("fill", inkMuted).text(d.n ? `${d.n} blocks${built ? ` · ${built} built` : ""}` : "no blocks yet"); }
+    host.replaceChildren(svg.node());
+    document.getElementById("status").textContent = `${cells.length} buildings · ${blocks.filter(x => x.impls).length} built · height = ${metricSel.options[metricSel.selectedIndex].text.replace("Height: ", "")} · view ${rot * 90}°`;
+  }
+  function showBlock(c) { A.showPanel(c.name, `${c.grain} · ds:${c.tier}`, `<dl><dt>IRI</dt><dd><code>${A.esc(A.curie(c.b))}</code></dd><dt>Properties</dt><dd>${c.props}</dd><dt>Token bindings</dt><dd>${c.bindings}</dd><dt>Anatomy</dt><dd>${c.anatomy ? c.anatomy + " nodes" : "not written"}</dd><dt>Implementations</dt><dd>${c.impls || "none (spec only)"}</dd>${c.stage ? `<dt>Stage</dt><dd>${A.esc(A.local(c.stage).replace("tag.", ""))}</dd>` : ""}</dl>${c.summary ? `<h4>Summary</h4><div class="small">${A.esc(c.summary).slice(0, 700)}${c.summary.length > 700 ? "…" : ""}</div>` : ""}${A.cmd(`pragma block lookup "${c.name}" --tier ${c.tier}`)}`); }
+  A.legend("#legend", [["component", 1], ["subcomponent", 2], ["pattern", 3], ["layout", 4]].map(([g, i]) => ({ label: g, color: A.series(i), count: blocks.filter(x => x.grain === g).length })).concat([{ label: "other (group, view, variant)", color: "var(--series-other)", count: blocks.filter(x => x.grain === "other").length }, { label: "outlined = spec only", color: "var(--color-text)", shape: "ring" }]));
+  metricSel.addEventListener("change", () => { metric = metricSel.value; render(); });
+  document.getElementById("rotate").addEventListener("click", () => { rot = (rot + 1) % 4; render(); });
+  document.getElementById("labels").addEventListener("click", (e) => { showLabels = !showLabels; e.currentTarget.setAttribute("aria-pressed", String(showLabels)); render(); });
+  document.getElementById("copy").addEventListener("click", async (e) => { const svg = document.querySelector("#svgHost svg"); const text = new XMLSerializer().serializeToString(svg); const btn = e.currentTarget; try { await navigator.clipboard.writeText(text); btn.textContent = "Copied SVG"; } catch { btn.textContent = "Copy blocked: select and copy from the source"; } setTimeout(() => btn.textContent = "Copy as SVG", 2000); });
+  render();
+  document.getElementById("key").innerHTML = [["Districts are tiers", "The ground plan follows the inheritance chain: global at the centre, apps and its product tiers to the right, sites with its prototype below, documentation and the empty stores plot beside them.", "var(--color-border)"], ["Buildings are blocks", "One building per block, 325 in all. Within a district they stand grouped by grain: components first, then subcomponents, patterns and layouts.", "var(--series-1)"], ["Height is specification", "By default the number of declared properties (0 to " + d3.max(blocks, x => x.props) + "). Switch to token bindings (Button is the tallest, 144) or anatomy nodes to see a different skyline.", "var(--series-3)"], ["Solid is built", "A solid building has at least one implementation object; an outlined one is still specification. Only the global district has solid buildings: the 94 implementations all target global blocks.", "var(--series-2)"]].map(([t, d, c]) => `<div style="--c:${c}"><b>${t}</b>${d}</div>`).join("");
+  A.table("#districts", [{ label: "Tier", key: "tier", render: d => `<code>ds:${d.tier}</code>` }, { label: "Blocks", key: "n", num: true }, { label: "Built", key: "built", num: true }, { label: "Components", key: "c", num: true }, { label: "Subcomponents", key: "s", num: true }, { label: "Patterns", key: "p", num: true }, { label: "Layouts", key: "l", num: true }, { label: "Tallest (properties)", key: "tall" }], Object.values(D).sort((p, q) => q.n - p.n).map(d => { const list = blocks.filter(x => x.tier === d.tier); const tall = list.slice().sort((p, q) => q.props - p.props)[0]; return { tier: d.tier, n: d.n, built: list.filter(x => x.impls).length, c: list.filter(x => x.grain === "component").length, s: list.filter(x => x.grain === "subcomponent").length, p: list.filter(x => x.grain === "pattern").length, l: list.filter(x => x.grain === "layout").length, tall: tall ? `${tall.name} (${tall.props})` : "—" }; }));
+})();
+</script>
+</body>
+</html>

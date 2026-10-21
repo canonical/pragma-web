@@ -1,0 +1,13 @@
+import pw from "/opt/node-tools/node_modules/playwright/index.js"; const { chromium } = pw;
+import { readFileSync } from "node:fs"; import http from "node:http"; import path from "node:path";
+const ROOT = "/home/user/graph-atlas", NM = "/tmp/claude-0/-home-user/06a72397-f574-54f4-af6d-d59fdfba2a1a/scratchpad/extract/node_modules";
+const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
+const srv = http.createServer((req, res) => { let body; const p = path.join(ROOT, decodeURIComponent(req.url.split("?")[0])); try { body = readFileSync(p); } catch { res.writeHead(404); res.end(); return; } res.writeHead(200, { "content-type": MIME[path.extname(p)] || "application/octet-stream" }); res.end(body); }).listen(8780);
+const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
+const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+await page.route(/https:\/\/(cdnjs|unpkg)[^ ]*/, r => r.fulfill({ body: readFileSync(`${NM}/d3/dist/d3.min.js`), contentType: "text/javascript" }));
+await page.goto("http://localhost:8780/board.html", { waitUntil: "load" }); await page.waitForTimeout(2500); await page.click("#tilt", { force: true }); await page.waitForTimeout(800);
+const r = await page.evaluate(() => { const f = [...document.querySelectorAll(".frame")].find(x => x.getAttribute("aria-label") === "ContextualMenu"); f.scrollIntoView({ block: "center" }); const b = f.getBoundingClientRect(); return [b.x, b.y, b.width, b.height, f.querySelector(".fbody").shadowRoot.querySelector(".island").innerHTML.slice(0, 700)]; });
+await page.waitForTimeout(400); const b = await page.evaluate(() => { const f = [...document.querySelectorAll(".frame")].find(x => x.getAttribute("aria-label") === "ContextualMenu").getBoundingClientRect(); return [f.x, f.y, f.width, f.height]; });
+await page.screenshot({ path: "shots/ctxmenu.png", clip: { x: Math.max(0, b[0] - 20), y: Math.max(0, b[1] - 20), width: Math.min(1260, b[2] + 260), height: b[3] + 220 } });
+console.log(r[4]); await browser.close(); srv.close();

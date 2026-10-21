@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<title>Universe · Pragma Graph Atlas</title>
+<style>
+  .stage { position: relative; border: 1px solid var(--color-border-disabled); background: var(--color-background); overflow: hidden; }
+  #g3 { width: 100%; height: min(80vh, 920px); min-height: 440px; }
+  .overlay { position: absolute; left: .75rem; top: .75rem; display: grid; gap: .25rem; font-size: .75rem; line-height: 1.3333; background: color-mix(in srgb, var(--color-background) 85%, transparent); padding: .5rem .75rem; border: 1px solid var(--color-border-disabled); max-width: 18rem; pointer-events: none; }
+  .overlay .legend { gap: .125rem .75rem; font-size: .75rem; }
+  .controls { position: absolute; right: .75rem; top: .75rem; display: flex; gap: .5rem; }
+  .controls button { font: inherit; font-size: .75rem; padding: .25rem .5rem; background: var(--color-background); color: var(--color-text); border: 1px solid var(--color-border); cursor: pointer; }
+  .controls button[aria-pressed="true"] { background: var(--color-text); color: var(--color-background); }
+  .fallback { padding: var(--dimension-300); font-size: .875rem; color: var(--color-text-muted); }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">11 / 16 · the entity graph, in depth</div>
+    <h1>The same 4,624 nodes, in three dimensions</h1>
+    <p class="lede">For the projection screen: the whole entity graph rendered in WebGL, seeded from the flat map and settled in three dimensions, turning slowly. The three clouds are the token model, the design system and the standards; the thin strands between them are the edges that make it one graph rather than three.</p>
+  </div>
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="stage" id="stage">
+      <div id="g3"></div>
+      <div class="overlay"><div id="legend"></div><div class="muted" id="status">Settling layout…</div></div>
+      <div class="controls"><button id="spin" aria-pressed="true">Auto-rotate</button><button id="reset">Reset view</button></div>
+    </div>
+    <p class="small muted">Drag to orbit, scroll to zoom, hover a node for its name, click it for its details. Node size follows degree; edges fade with distance. If this frame stays empty, the browser has no WebGL: the <a href="galaxy.html">flat map</a> shows the same graph.</p>
+  </section>
+  <section class="block">
+    <header><h2>What connects the clouds</h2><p class="small muted">The edges that cross from one vocabulary to another, counted. These are the strands visible between the clusters.</p></header>
+    <div id="cross"></div>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://unpkg.com/3d-force-graph@1.73.4/dist/3d-force-graph.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("universe.html");
+  const L = await A.load("layout");
+  const isSchema = (cls, ns) => /owl#|shacl#|rdf-schema#/.test(cls) || ns === "other" || cls === "";
+  const kindOf = (n) => isSchema(n[3], n[2]) ? "schema" : n[2] === "w3c" ? "dt" : n[2];
+  const palette = { ds: A.resolve("var(--ns-ds)"), dt: A.resolve("var(--ns-dt)"), cs: A.resolve("var(--ns-cs)"), anatomy: A.resolve("var(--ns-anatomy)"), schema: A.resolve("var(--ns-schema)") };
+  const bg = A.resolve("var(--color-background)");
+  const nodes = L.nodes.map((n, i) => ({ id: i, x: n[0] / 3, y: -n[1] / 3, z: (Math.random() - .5) * 120, k: kindOf(n), ns: n[2], cls: n[3], deg: n[4], label: n[5], iri: n[6] || n[5] }));
+  const links = L.links.map(l => ({ source: l[0], target: l[1], p: l[2] }));
+  const curie = (n) => { const l = n.iri; if (n.ns === "ds") return "ds:" + l; if (n.ns === "cs") return "cs:" + l.replace("codestandards#", ""); if (n.ns === "anatomy") return "anatomy:" + l; if (n.ns === "w3c") return "w3c-tokens:" + l.replace("w3c:", ""); if (n.ns === "dt") return "dt:" + l; return l.replace(/^.*#/, m => ({ "2002/07/owl#": "owl:", "2000/01/rdf-schema#": "rdfs:", "1999/02/22-rdf-syntax-ns#": "rdf:", "ns/shacl#": "sh:", "2001/XMLSchema#": "xsd:" }[m] || m)); };
+  const out = nodes.map(() => []), inn = nodes.map(() => []);
+  for (const l of L.links) { out[l[0]].push([l[1], l[2]]); inn[l[1]].push([l[0], l[2]]); }
+  function describe(n) { const row = ([j, p]) => `<li><span class="p">${A.esc(p)}</span><span class="o"><a class="jump" data-i="${j}">${A.esc(nodes[j].label)}</a></span></li>`;
+    const html = `<dl><dt>IRI</dt><dd><code>${A.esc(curie(n))}</code></dd><dt>Class</dt><dd>${A.esc(n.cls ? n.cls.replace("w3c:", "w3c-tokens:") : "untyped")}</dd><dt>Vocabulary</dt><dd>${A.esc(A.NS_LABEL[n.k] || n.k)}</dd><dt>Degree</dt><dd>${n.deg} (${out[n.id].length} out, ${inn[n.id].length} in)</dd></dl>
+      ${out[n.id].length ? `<h4>Points at (${out[n.id].length})</h4><ul class="facts">${out[n.id].slice(0, 40).map(row).join("")}</ul>` : ""}
+      ${inn[n.id].length ? `<h4>Pointed at by (${inn[n.id].length})</h4><ul class="facts">${inn[n.id].slice(0, 40).map(row).join("")}</ul>` : ""}
+      ${A.cmd(`pragma graph inspect ${curie(n)}`)}`;
+    const panel = A.showPanel(n.label, `${n.cls ? n.cls.replace("w3c:", "w3c-tokens:") : "node"} · ${n.k}`, html);
+    panel.querySelectorAll("a.jump").forEach(a => a.addEventListener("click", () => { const m = nodes[+a.dataset.i]; describe(m); focusOn(m); }));
+  }
+  let focusOn = () => {};
+  const counts = d3.rollup(nodes, v => v.length, n => n.k);
+  A.legend("#legend", [["dt", "dt: tokens"], ["ds", "ds: design system"], ["cs", "cs: standards"], ["anatomy", "anatomy:"], ["schema", "schema"]].map(([k, l]) => ({ label: l, color: palette[k], count: counts.get(k) || 0, shape: "dot" })));
+  // cross-vocabulary edges table
+  const cross = d3.rollups(links.filter(l => nodes[l.source].k !== nodes[l.target].k), v => v.length, l => nodes[l.source].k + " → " + nodes[l.target].k, l => l.p).flatMap(([pair, m]) => m.map(([p, n]) => ({ pair, p, n }))).sort((a, b) => b.n - a.n);
+  A.table("#cross", [{ label: "From → to", key: "pair" }, { label: "Predicate", key: "p", render: r => `<code>${r.p}</code>` }, { label: "Edges", key: "n", num: true }], cross.slice(0, 25));
+  const el = document.getElementById("g3");
+  if (typeof ForceGraph3D !== "function") { el.innerHTML = `<div class="fallback">The 3D renderer could not load. The <a href="galaxy.html">flat map</a> shows the same graph.</div>`; return; }
+  const status = document.getElementById("status");
+  let spinning = true;
+  const G = ForceGraph3D()(el)
+    .backgroundColor(bg)
+    .width(el.clientWidth).height(el.clientHeight)
+    .graphData({ nodes, links })
+    .nodeColor(n => palette[n.k]).nodeVal(n => 0.6 + Math.sqrt(n.deg) * 0.5).nodeOpacity(0.95).nodeResolution(6)
+    .nodeLabel(n => `<div style="font:12px Ubuntu Sans, sans-serif;color:${A.resolve("var(--color-text)")};background:${bg};padding:4px 8px;border:1px solid ${A.resolve("var(--color-border)")}"><b>${n.label}</b><br>${n.cls || "untyped"} · degree ${n.deg}</div>`)
+    .linkColor(l => palette[nodes[typeof l.source === "object" ? l.source.id : l.source].k]).linkOpacity(0.18).linkWidth(0)
+    .enableNodeDrag(false).showNavInfo(false)
+    .onNodeClick(n => { spinning = false; document.getElementById("spin").setAttribute("aria-pressed", "false"); describe(n); })
+    .warmupTicks(0).cooldownTicks(160)
+    .d3AlphaDecay(0.03).d3VelocityDecay(0.35)
+    .onEngineStop(() => { status.textContent = `${A.fmt(nodes.length)} nodes · ${A.fmt(links.length)} edges · layout settled`; });
+  G.d3Force("charge").strength(-14).distanceMax(220);
+  G.d3Force("link").distance(8).strength(0.3);
+  G.cameraPosition({ x: 0, y: 0, z: 1100 });
+  focusOn = (n) => { const d = 160; const ratio = 1 + d / Math.hypot(n.x, n.y, n.z); G.cameraPosition({ x: n.x * ratio, y: n.y * ratio, z: n.z * ratio }, n, 800); };
+  let angle = 0; const R = 1100;
+  (function orbit() { if (spinning) { angle += 0.0018; G.cameraPosition({ x: R * Math.sin(angle), y: 120 * Math.sin(angle * .6), z: R * Math.cos(angle) }); } requestAnimationFrame(orbit); })();
+  el.addEventListener("pointerdown", () => { spinning = false; document.getElementById("spin").setAttribute("aria-pressed", "false"); });
+  document.getElementById("spin").addEventListener("click", (e) => { spinning = !spinning; e.currentTarget.setAttribute("aria-pressed", String(spinning)); });
+  document.getElementById("reset").addEventListener("click", () => { angle = 0; G.cameraPosition({ x: 0, y: 0, z: R }, { x: 0, y: 0, z: 0 }, 600); });
+  new ResizeObserver(() => G.width(el.clientWidth).height(el.clientHeight)).observe(el);
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { spinning = false; document.getElementById("spin").setAttribute("aria-pressed", "false"); }
+})();
+</script>
+</body>
+</html>
