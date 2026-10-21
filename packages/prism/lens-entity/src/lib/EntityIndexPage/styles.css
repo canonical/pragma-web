@@ -1,0 +1,31 @@
+/*
+ * EntityIndexPage — the lens heading over the class's index. Normal flow:
+ * the index scrolls with the canvas.
+ *
+ * A subgrid pass-through: the page authors no columns of its own. It
+ * inherits the lens layout's intrinsic columns and re-emits them to the
+ * index, so the cards view lands on the same ruler as the rest of the site.
+ */
+
+@layer ds.prism {
+  :root {
+    --entity-index-page-gap: var(--space-200, 1rem);
+  }
+
+  .ds.entity-index-page {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-content: start;
+    row-gap: var(--entity-index-page-gap);
+  }
+
+  .ds.entity-index-page > * {
+    grid-column: 1 / -1;
+    min-inline-size: 0;
+  }
+
+  .ds.entity-index-page > .heading {
+    margin: 0;
+  }
+}
