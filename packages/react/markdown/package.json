@@ -9,6 +9,14 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js"
+    },
+    "./mdx": {
+      "types": "./dist/types/lib/MdxProvider/index.d.ts",
+      "import": "./dist/esm/lib/MdxProvider/index.js"
+    },
+    "./mdx/vite": {
+      "types": "./dist/types/lib/createMdxVitePreset/index.d.ts",
+      "import": "./dist/esm/lib/createMdxVitePreset/index.js"
     }
   },
   "files": [
@@ -45,6 +53,7 @@
   },
   "dependencies": {
     "@canonical/react-ds-global": "^0.44.1",
+    "@mdx-js/rollup": "^3.1.1",
     "@types/hast": "^3.0.4",
     "@types/mdast": "^4.0.4",
     "hast-util-to-string": "^3.0.1",
@@ -57,6 +66,14 @@
     "remark-rehype": "^11.1.2",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0"
+  },
+  "peerDependencies": {
+    "vite": "^8.0.1"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

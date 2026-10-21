@@ -60,3 +60,6 @@ A claim.[^1]
 
 [^1]: The source.
 `;
+
+/** The heading `testing/sample.mdx` opens with, as Markdown. */
+export const sampleMdxHeading = "# Getting started";
