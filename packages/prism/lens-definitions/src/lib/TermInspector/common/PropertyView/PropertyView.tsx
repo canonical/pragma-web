@@ -1,4 +1,5 @@
 import type React from "react";
+import formatPropertyKind from "../../../formatPropertyKind.js";
 import { Message, useMessages } from "../../../i18n/index.js";
 import formatRange from "../../formatRange.js";
 import { TermLink } from "../TermLink/index.js";
@@ -35,7 +36,7 @@ export default function PropertyView({
       <p>{data.definition ?? t("inspector.definition.none")}</p>
       <dl className="details">
         <dt className="key">{t("inspector.property.kind")}</dt>
-        <dd className="value">{data.kind.toLowerCase()}</dd>
+        <dd className="value">{formatPropertyKind(data.kind, t)}</dd>
         <dt className="key">{t("inspector.property.functional")}</dt>
         <dd className="value">
           {t(data.functional ? "inspector.yes" : "inspector.no")}

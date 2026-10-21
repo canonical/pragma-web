@@ -4,6 +4,7 @@ import { graphql, useFragment } from "react-relay";
 import type { TermRail_ontologies$key } from "../../__generated__/TermRail_ontologies.graphql.js";
 import termRailFragmentNode from "../../__generated__/TermRail_ontologies.graphql.js";
 import compactUri from "../compactUri.js";
+import formatPropertyKind from "../formatPropertyKind.js";
 import { useMessages } from "../i18n/index.js";
 import { matchesChips, matchesText } from "../lensFilter.js";
 import type { TermRailProps } from "./types.js";
@@ -282,7 +283,9 @@ export default function TermRail({
                   >
                     {formatTermLabel(term.label, prefixed)}
                   </Link>
-                  <span className="note">{term.kind.toLowerCase()}</span>
+                  <span className="note">
+                    {formatPropertyKind(term.kind, t)}
+                  </span>
                 </li>
               ))}
             </ul>

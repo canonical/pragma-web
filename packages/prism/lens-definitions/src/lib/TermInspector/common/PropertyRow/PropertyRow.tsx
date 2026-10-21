@@ -1,4 +1,5 @@
 import type React from "react";
+import formatPropertyKind from "../../../formatPropertyKind.js";
 import { useMessages } from "../../../i18n/index.js";
 import formatRange from "../../formatRange.js";
 import { TermLink } from "../TermLink/index.js";
@@ -38,7 +39,9 @@ export default function PropertyRow({
             {formatRange(classProperty.property.range, namespaces)}
           </code>
         </td>
-        <td className="cell">{classProperty.property.kind.toLowerCase()}</td>
+        <td className="cell">
+          {formatPropertyKind(classProperty.property.kind, t)}
+        </td>
         <td className="cell">{notes}</td>
       </tr>
       {classProperty.property.definition ? (

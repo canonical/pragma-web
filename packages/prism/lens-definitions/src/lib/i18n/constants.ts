@@ -44,6 +44,9 @@ export const MESSAGES = {
   "rail.properties": "Properties",
   "rail.count": "{matches} of {total}",
   "rail.abstract": "abstract",
+  "kind.object": "object",
+  "kind.datatype": "datatype",
+  "kind.annotation": "annotation",
   "inspector.label": "Term inspector",
   "inspector.empty":
     "Select a term — from the rail or the hierarchy — to inspect its definition, relations, and instances.",
