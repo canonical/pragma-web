@@ -1,20 +1,18 @@
 /**
  * The Definitions lens's query contract (the `entityQuery.ts` sibling):
  * the compiled `DefinitionsExplorerQuery` operation plus the one variables
- * builder, shared by the server prepare step (`routes.ts` meta), the
- * client prefetch seam (`warmRouteQuery`), and the explorer's hook —
- * byte-identical variables everywhere. Artifact-only imports: this module
+ * builder, shared by the route's `warmDefinitions` and the explorer's
+ * hook — byte-identical variables everywhere. Artifact-only imports: this module
  * rides the server bricks' native import chain; the tag lives in
  * `DefinitionsExplorer.tsx`.
  *
- * ONE entry serves BOTH routes (`/definitions` and `/definitions/:term`):
+ * ONE operation serves BOTH routes (`/definitions` and `/definitions/:term`):
  * the term-less explorer runs the same operation with `hasTerm: false`
  * (and a degenerate empty `uri` — the schema's `uri` argument is
  * non-nullable, and `@include(if: $hasTerm)` keeps the lookup fields out
  * of the term-less execution entirely).
  */
 
-import type { RouteQueryEntry } from "#relay";
 import type { DefinitionsExplorerQuery$variables } from "#relay/__generated__/DefinitionsExplorerQuery.graphql.js";
 import definitionsExplorerQueryNode from "#relay/__generated__/DefinitionsExplorerQuery.graphql.js";
 
@@ -51,13 +49,3 @@ export const definitionsExplorerVariables = (
   uri: term ?? "",
   hasTerm: term !== undefined,
 });
-
-/**
- * The one query entry — parked under BOTH `meta` (the P-2 server prepare
- * contract) and `prefetch` (the P-5 warm-up seam) by `routes.ts`, on both
- * definitions routes.
- */
-export const definitionsRouteEntry: RouteQueryEntry = {
-  query: definitionsExplorerQueryNode,
-  variables: (params) => definitionsExplorerVariables(readTermParam(params)),
-};

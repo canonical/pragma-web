@@ -1,15 +1,14 @@
 /**
  * The Standards index route's query contract (the components lens's
  * `catalogQuery.ts` sibling): the compiled `StandardsIndexQuery` operation
- * plus the one variables builder, shared by the server prepare step
- * (`routes.ts` meta), the client prefetch seam (`warmRouteQuery`), and the
- * page's hook — byte-identical variables everywhere. Artifact-only
+ * plus the one variables builder, shared by the route's
+ * `warmStandardsIndex` and the page's hook — byte-identical variables
+ * everywhere. Artifact-only
  * imports: this module rides the server bricks' native import chain; the
  * tag lives in `StandardsPage.tsx`.
  */
 
 import { GRAPH_BINDINGS } from "#lib/graphBindings";
-import type { RouteQueryEntry } from "#relay";
 import type { StandardsIndexQuery$variables } from "#relay/__generated__/StandardsIndexQuery.graphql.js";
 import standardsIndexQueryNode from "#relay/__generated__/StandardsIndexQuery.graphql.js";
 
@@ -43,12 +42,3 @@ export const standardsIndexVariables = (): StandardsIndexQuery$variables => ({
   count: STANDARDS_PAGE_SIZE,
   cursor: null,
 });
-
-/**
- * The route's one query entry — parked under BOTH `meta` (the P-2 server
- * prepare contract) and `prefetch` (the P-5 warm-up seam) by `routes.ts`.
- */
-export const standardsIndexRouteEntry: RouteQueryEntry = {
-  query: standardsIndexQueryNode,
-  variables: standardsIndexVariables,
-};

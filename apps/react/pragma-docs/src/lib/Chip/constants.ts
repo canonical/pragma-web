@@ -29,7 +29,7 @@ export const DEFAULT_LIFECYCLE: Lifecycle = "none";
  * `component`, `term`, and `standard` are live: their routes exist
  * (`/components/:uri`, `/definitions/:term` — the Definitions lens is the
  * glossary's home — and `/standards/:uri`, the Standards lens's reading
- * pages), and `routeQueries.tests.ts` pins each against its route's
+ * pages), and `src/routes.tests.ts` pins each against its route's
  * `render()`.
  */
 export const ROUTE_PREFIX_BY_KIND: { readonly [K in Kind]: string } = {

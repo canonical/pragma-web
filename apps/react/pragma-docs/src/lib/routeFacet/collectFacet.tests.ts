@@ -62,8 +62,8 @@ describe("collectFacet", () => {
   });
 
   it("fails the WHOLE collection on one malformed bearer", () => {
-    // Same conviction as `collectRouteQueries`: a bad annotation is a bug to
-    // surface, never a route that quietly drops out of the set.
+    // A bad annotation is a bug to surface, never a route that quietly drops
+    // out of the set.
     const routes = {
       good: route({ url: "/good", content: page, meta: badgeFacet.of("a") }),
       bad: route({ url: "/bad", content: page, meta: { badge: 7 } }),

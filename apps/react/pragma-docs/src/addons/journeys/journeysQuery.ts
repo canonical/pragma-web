@@ -1,13 +1,12 @@
 /**
  * The Journeys lens's query contract (the `definitionsQuery.ts` sibling):
  * the compiled `JourneysExplorerQuery` operation plus the one variables
- * builder, shared by the server prepare step (`routes.ts` meta), the
- * client prefetch seam (`warmRouteQuery`), and the page's hook —
+ * builder, shared by the route's `warmJourneys` and the page's hook —
  * byte-identical variables everywhere. Artifact-only imports: this module
  * rides the server bricks' native import chain; the tag lives in
  * `JourneysExplorer.tsx`.
  *
- * ONE entry serves BOTH routes (`/journeys` and `/journeys/:job`): the
+ * ONE operation serves BOTH routes (`/journeys` and `/journeys/:job`): the
  * job-less index runs the same operation, and the selected job is read
  * from the URL rather than fetched separately — the whole demand model is
  * small enough (52 jobs, 133 pairings) that one operation carries it and
@@ -19,7 +18,6 @@
  * coordinate roots the DIAGRAM (ruling R1); the job addresses the VIEW.
  */
 
-import type { RouteQueryEntry } from "#relay";
 import type { JourneysExplorerQuery$variables } from "#relay/__generated__/JourneysExplorerQuery.graphql.js";
 import journeysExplorerQueryNode from "#relay/__generated__/JourneysExplorerQuery.graphql.js";
 
@@ -60,8 +58,8 @@ export const readJobParam = (
  * 133 pairings and all 51 paired jobs (measured against the live backend,
  * not assumed). The union is taken by URI, so the overlap collapses to
  * nothing. This beats the cursor approach on every axis that matters here:
- * no `endCursor` has to be threaded through the server prepare step and
- * the prefetch seam as a variable, no second round trip exists to fail
+ * no `endCursor` has to be threaded through the route's `warm` as a
+ * variable, no second round trip exists to fail
  * independently, and the operation stays one operation — the P-2 register
  * holds.
  *
@@ -91,13 +89,3 @@ export const journeysExplorerVariables = (
   hasJob: job !== undefined,
   uri: job ?? "",
 });
-
-/**
- * The one query entry — parked under BOTH `meta` (the P-2 server prepare
- * contract) and `prefetch` (the P-5 warm-up seam) by `routes.ts`, on both
- * journeys routes.
- */
-export const journeysRouteEntry: RouteQueryEntry = {
-  query: journeysExplorerQueryNode,
-  variables: (params) => journeysExplorerVariables(readJobParam(params)),
-};

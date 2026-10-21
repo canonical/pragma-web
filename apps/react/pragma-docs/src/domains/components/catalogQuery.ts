@@ -1,13 +1,11 @@
 /**
  * The catalog route's query contract (the `entityQuery.ts` sibling): the
  * compiled `ComponentsCatalogQuery` operation plus the one variables
- * builder, shared by the server prepare step, the client prefetch seam,
- * and the page's hook. Artifact-only imports — this module rides the
- * server bricks' native import chain; the tag lives in
- * `ComponentsCatalogPage.tsx`.
+ * builder, shared by the route's `warmCatalog` and the page's hook.
+ * Artifact-only imports — this module rides the server bricks' native
+ * import chain; the tag lives in `ComponentsCatalogPage.tsx`.
  */
 
-import type { RouteQueryEntry } from "#relay";
 import type { ComponentsCatalogQuery$variables } from "#relay/__generated__/ComponentsCatalogQuery.graphql.js";
 import componentsCatalogQueryNode from "#relay/__generated__/ComponentsCatalogQuery.graphql.js";
 
@@ -32,12 +30,3 @@ export const componentsCatalogVariables =
     count: CATALOG_PAGE_SIZE,
     cursor: null,
   });
-
-/**
- * The route's one query entry — parked under BOTH `meta` (the P-2 server
- * prepare contract) and `prefetch` (the P-5 warm-up seam) by `routes.ts`.
- */
-export const componentsCatalogRouteEntry: RouteQueryEntry = {
-  query: componentsCatalogQueryNode,
-  variables: componentsCatalogVariables,
-};

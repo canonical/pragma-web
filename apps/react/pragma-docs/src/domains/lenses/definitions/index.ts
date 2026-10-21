@@ -6,7 +6,6 @@ export * from "./DefinitionsPage/index.js";
 export {
   definitionsExplorerQueryNode,
   definitionsExplorerVariables,
-  definitionsRouteEntry,
   readTermParam,
 } from "./definitionsQuery.js";
 export * from "./HierarchyWell/index.js";

@@ -2,11 +2,8 @@ import { route } from "@canonical/router-core";
 import { makeLensContext } from "#lib/LensBreadcrumbs";
 import { routeShortcutFacet } from "#lib/routeShortcut";
 import { shellStripFacet } from "#lib/Shell";
-import { ROUTE_QUERY_META_KEY } from "#relay";
 import { StandardReadingPage } from "./StandardReadingPage/index.js";
 import { StandardsPage } from "./StandardsPage/index.js";
-import { standardEntityRouteEntry } from "./standardEntityQuery.js";
-import { standardsIndexRouteEntry } from "./standardsIndexQuery.js";
 import warmStandardEntity from "./warmStandardEntity.js";
 import warmStandardsIndex from "./warmStandardsIndex.js";
 
@@ -29,17 +26,16 @@ const StandardsContext = makeLensContext({
  * percent-encoded ABSOLUTE IRI, e.g.
  * `/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23code.array.safe_access`
  * — the D31 address `resolveChipHref` derives for `standard` mentions,
- * pinned round-trip in `routeQueries.tests.ts`). Each data-bearing route
- * builds its
- * `RouteQueryEntry` ONCE (in its query module) and parks it twice per the
- * P-2/P-5 handshake:
+ * pinned round-trip in `src/routes.tests.ts`). Each data-bearing route's
+ * data reaches the store through its `warm` (`warmStandardsIndex`,
+ * `warmStandardEntity`), the one seam between the router and the data
+ * layer:
  *
- * - `meta[ROUTE_QUERY_META_KEY]` — the server prepare step POSTs the query
- *   to the graph server and serialises the reply into the store
- *   (`prepareRelayData`);
- * - `warm` — hover (router-react's `Link`) and the initial hydration
- *   load warm the client store through `warmStandardsIndex` and
- *   `warmStandardEntity`.
+ * - on the server, `prepareRelayData` awaits it with a per-request
+ *   environment and serialises the store for hydration;
+ * - on hover (router-react's `Link`) and on the first browser load it runs
+ *   against the browser environment, where it does nothing when the store
+ *   already holds the data.
  *
  * Both routes claim the mode strip's context socket ("Standards") — the
  * lens name, stationary across the lens's URLs. Controls/status stay
@@ -52,7 +48,6 @@ const routes = {
     content: StandardsPage,
     warm: warmStandardsIndex,
     meta: {
-      [ROUTE_QUERY_META_KEY]: standardsIndexRouteEntry,
       ...shellStripFacet.of({ Context: StandardsContext }),
       ...routeShortcutFacet.of("4"),
     },
@@ -62,7 +57,6 @@ const routes = {
     content: StandardReadingPage,
     warm: warmStandardEntity,
     meta: {
-      [ROUTE_QUERY_META_KEY]: standardEntityRouteEntry,
       ...shellStripFacet.of({ Context: StandardsContext }),
     },
   }),

@@ -8,14 +8,12 @@ export * from "./ComponentsCatalogPage/index.js";
 export {
   CATALOG_PAGE_SIZE,
   componentsCatalogQueryNode,
-  componentsCatalogRouteEntry,
   componentsCatalogVariables,
 } from "./catalogQuery.js";
 export * from "./EntityAside/index.js";
 export * from "./EntityHeader/index.js";
 export {
   componentEntityQueryNode,
-  componentEntityRouteEntry,
   componentEntityVariables,
   RELATION_PAGE_SIZE,
 } from "./entityQuery.js";

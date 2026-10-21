@@ -9,6 +9,5 @@ export * from "./StandardsPage/index.js";
 export {
   STANDARDS_PAGE_SIZE,
   standardsIndexQueryNode,
-  standardsIndexRouteEntry,
   standardsIndexVariables,
 } from "./standardsIndexQuery.js";

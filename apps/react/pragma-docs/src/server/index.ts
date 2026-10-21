@@ -13,10 +13,5 @@ export type { InitialData } from "./entry.js";
 export { default as EntryServer } from "./entry.js";
 export { default as prepareRelayData } from "./prepareRelayData.js";
 export { default as createAppRenderer } from "./renderer.js";
-export type { ResolvedRouteQuery } from "./routeQueries.js";
-export {
-  collectRouteQueries,
-  matchRouteQuery,
-  resolveRouteStatus,
-} from "./routeQueries.js";
+export { resolveRouteStatus } from "./routeQueries.js";
 export type { PreparedRelayData } from "./types.js";

@@ -34,7 +34,7 @@ const componentCssClassName = "ds catalog-item";
  * (router-react `Link`, so hover-prefetch warms the store through the
  * route's `warm`), with a tier tag and a summary teaser.
  * The `params` round-trip is pinned to `resolveChipHref` by the D31 test
- * in `routeQueries.tests.ts` — cards and chips land on the same address.
+ * in `src/routes.tests.ts` — cards and chips land on the same address.
  */
 const CatalogItem = ({
   className,

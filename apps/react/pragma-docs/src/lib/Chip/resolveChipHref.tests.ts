@@ -23,7 +23,7 @@ describe("resolveChipHref", () => {
     // The glossary's home is the ontology explorer's term route
     // (`/definitions/:term`). The route-side half of this pin —
     // `appRoutes.definitionsTerm.render({ term }) === resolveChipHref(term,
-    // "term")` — lives in `routeQueries.tests.ts` beside the component pin.
+    // "term")` — lives in `src/routes.tests.ts` beside the component pin.
     expect(resolveChipHref("ds:UIBlock", "term")).toBe(
       "/definitions/ds%3AUIBlock",
     );

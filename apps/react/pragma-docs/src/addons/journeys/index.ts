@@ -43,7 +43,6 @@ export {
   JOB_PAGE_SIZE,
   journeysExplorerQueryNode,
   journeysExplorerVariables,
-  journeysRouteEntry,
   PAIRING_PAGE_SIZE,
   readJobParam,
 } from "./journeysQuery.js";
