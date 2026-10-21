@@ -18,7 +18,6 @@ const componentCssClassName = "ds components-layout";
  * route param (the prefixed URI), so the trail reads no query.
  */
 const ComponentsContext = makeLensContext({
-  lensLabel: "Components",
   lensRouteName: "components",
   paramKey: "uri",
 });
@@ -45,7 +44,7 @@ export default function ComponentsLayout({
       <CanvasSkipLink />
       <SiteRail />
       <div className="viewport">
-        <ModeStrip context={<ComponentsContext />} />
+        <ModeStrip context={<ComponentsContext lensLabel="Components" />} />
         <Canvas>{children}</Canvas>
         <SiteColophon />
       </div>

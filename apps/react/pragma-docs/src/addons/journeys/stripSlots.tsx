@@ -32,7 +32,6 @@ const ControlsContent = (): React.ReactElement => {
  * suspends the layout.
  */
 const Context = makeLensContext({
-  lensLabel: "Journeys",
   lensRouteName: "journeys",
   paramKey: "job",
 });

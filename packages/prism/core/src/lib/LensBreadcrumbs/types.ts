@@ -23,3 +23,10 @@ type OwnProps = {
  */
 export type LensBreadcrumbsProps = OwnProps &
   Omit<ComponentProps<"nav">, keyof OwnProps | "children">;
+
+/**
+ * Props accepted by the `Context` component `makeLensContext` builds: the
+ * lens crumb's text, given at render time so a layout can read it through
+ * the catalog in scope for the request.
+ */
+export type LensContextProps = Pick<OwnProps, "lensLabel">;

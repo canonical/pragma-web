@@ -42,7 +42,10 @@ export default function JourneysLayout({
         <CanvasSkipLink />
         <SiteRail />
         <div className="viewport">
-          <ModeStrip context={<Context />} controls={<Controls />} />
+          <ModeStrip
+            context={<Context lensLabel="Journeys" />}
+            controls={<Controls />}
+          />
           <Canvas>{children}</Canvas>
           <SiteColophon />
         </div>

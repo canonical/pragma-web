@@ -18,7 +18,6 @@ const componentCssClassName = "ds standards-layout";
  * entity's absolute IRI), so the trail reads no query.
  */
 const StandardsContext = makeLensContext({
-  lensLabel: "Standards",
   lensRouteName: "standards",
   paramKey: "uri",
 });
@@ -45,7 +44,7 @@ export default function StandardsLayout({
       <CanvasSkipLink />
       <SiteRail />
       <div className="viewport">
-        <ModeStrip context={<StandardsContext />} />
+        <ModeStrip context={<StandardsContext lensLabel="Standards" />} />
         <Canvas>{children}</Canvas>
         <SiteColophon />
       </div>

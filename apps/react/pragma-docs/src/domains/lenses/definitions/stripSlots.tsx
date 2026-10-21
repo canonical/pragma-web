@@ -140,7 +140,6 @@ const StatusContent = (): React.ReactElement => {
  * needs no Suspense guard (unlike the chip toolbar and the figure above).
  */
 const Context = makeLensContext({
-  lensLabel: "Definitions",
   lensRouteName: "definitions",
   paramKey: "term",
 });

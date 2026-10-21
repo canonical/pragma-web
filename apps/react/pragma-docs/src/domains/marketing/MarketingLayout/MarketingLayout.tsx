@@ -17,7 +17,6 @@ const componentCssClassName = "ds marketing-layout";
  * address, so the lens crumb is the current page.
  */
 const HomeContext = makeLensContext({
-  lensLabel: "Home",
   lensRouteName: "home",
 });
 
@@ -43,7 +42,7 @@ export default function MarketingLayout({
       <CanvasSkipLink />
       <SiteRail />
       <div className="viewport">
-        <ModeStrip context={<HomeContext />} />
+        <ModeStrip context={<HomeContext lensLabel="Home" />} />
         <Canvas>{children}</Canvas>
         <SiteColophon />
       </div>

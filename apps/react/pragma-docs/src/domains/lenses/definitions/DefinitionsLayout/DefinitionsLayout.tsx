@@ -43,7 +43,7 @@ export default function DefinitionsLayout({
         <SiteRail />
         <div className="viewport">
           <ModeStrip
-            context={<Context />}
+            context={<Context lensLabel="Definitions" />}
             controls={<Controls />}
             status={<Status />}
           />

@@ -242,6 +242,11 @@ with no module state and no change to a component; the package does not
 export that provider yet. Until then, `Rail` and `ThemeSelector` take an
 `aria-label` that replaces their default name.
 
+A lens's own name is the site's string, not the package's: the `Context`
+component `makeLensContext` builds takes the lens crumb's text as its
+`lensLabel` prop, so a layout gives it at render time, read through the
+site's own catalog, and the factory holds no reader-facing string.
+
 ## Consumer obligations
 
 - Mount `HomesProvider` above routed content.
@@ -258,7 +263,7 @@ export that provider yet. Until then, `Rail` and `ThemeSelector` take an
   `ModeStrip`, `Rail`, `ThemeSelector`; types `ChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
-  `LensBreadcrumbsProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
+  `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
   `ThemeSelectorProps`.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `RelaxOptions`, `QuadArc`.

@@ -9,6 +9,7 @@ import { render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 import { makeLensContext } from "./makeLensContext.js";
+import type { LensContextProps } from "./types.js";
 
 const Blank = (): null => null;
 
@@ -54,7 +55,7 @@ const notFound = route({ url: "/404", content: Blank });
  */
 const renderAt = async (
   url: string,
-  Context: () => ReactElement,
+  Context: (props: LensContextProps) => ReactElement,
   withNotFound = true,
 ) => {
   const router = withNotFound
@@ -63,14 +64,13 @@ const renderAt = async (
   await router.load(url);
   render(
     <RouterProvider router={router}>
-      <Context />
+      <Context lensLabel="Glossary" />
     </RouterProvider>,
   );
   return screen.getByRole("navigation", { name: "Breadcrumb" });
 };
 
 const GlossaryContext = makeLensContext({
-  lensLabel: "Glossary",
   lensRouteName: "glossary",
   paramKey: "term",
 });
@@ -97,11 +97,33 @@ describe("makeLensContext", () => {
     );
   });
 
-  it("ignores the params when the lens names no paramKey", async () => {
-    const HomeContext = makeLensContext({
-      lensLabel: "Glossary",
-      lensRouteName: "glossary",
+  it("reads the lens crumb's text from its prop on every render", async () => {
+    // One component, built once at module scope, renders whichever label
+    // the layout reads for the request in front of it.
+    const router = createRouter(routes, {
+      adapter: createMemoryAdapter("/glossary/ds%3AUIBlock"),
     });
+    await router.load("/glossary/ds%3AUIBlock");
+    const { rerender } = render(
+      <RouterProvider router={router}>
+        <GlossaryContext lensLabel="Glossaire" />
+      </RouterProvider>,
+    );
+    expect(screen.getByRole("link", { name: "Glossaire" })).toHaveAttribute(
+      "href",
+      "/glossary",
+    );
+    rerender(
+      <RouterProvider router={router}>
+        <GlossaryContext lensLabel="Glossar" />
+      </RouterProvider>,
+    );
+    expect(screen.getByRole("link", { name: "Glossar" })).toBeInTheDocument();
+    expect(screen.queryByText("Glossaire")).toBeNull();
+  });
+
+  it("ignores the params when the lens names no paramKey", async () => {
+    const HomeContext = makeLensContext({ lensRouteName: "glossary" });
     const nav = await renderAt("/glossary/ds%3AUIBlock", HomeContext);
     expect(within(nav).getAllByRole("listitem")).toHaveLength(1);
   });
