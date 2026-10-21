@@ -36,6 +36,14 @@ export type {
 } from "./EntityTitle/index.js";
 export { EntityTitle } from "./EntityTitle/index.js";
 export type {
+  ProseLinkProps,
+  ProseReferencesProviderProps,
+} from "./markdown/index.js";
+export {
+  markdownComponents,
+  ProseReferencesProvider,
+} from "./markdown/index.js";
+export type {
   ProjectionMap,
   ProjectionMaps,
   ProjectionsProviderProps,

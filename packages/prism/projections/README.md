@@ -13,6 +13,9 @@ site maps to the node's `__typename`, and links it to the node's home.
   destination to jump to.
 - **`EntityTitle`**: the page title, the heading of the page a node owns.
 
+Prose links to graph nodes render as chips too, through the element
+overrides a Markdown renderer takes.
+
 Every representation reads its node through a fragment of its own, so a
 lens spreads it in its query and hands the component the key. The
 representations select only what the contract guarantees on every node
@@ -170,6 +173,34 @@ its composite; the package's tests hold the two in step.
 A node's home is resolved with its compact address (`_meta.curie`) as the
 `uri` a site's home resolver receives, so one entity has one address.
 
+## Prose links
+
+A page's prose may link to graph nodes, by absolute IRI or compact address,
+in plain CommonMark: `[Button](ds:global.component.button)`. The provider
+resolves the nodes a passage links to and serves them as a `NodeConnection`;
+the page spreads `ProseReferencesProvider_references` on it and provides it
+around the prose. `markdownComponents` is the element-override map a
+Markdown renderer takes: its `a` renders a link whose href names one of the
+references as that node's `EntityChip`, labelled with the author's text and
+linked to the node's home, and any other link as the plain anchor its
+author wrote.
+
+```tsx
+import {
+  markdownComponents,
+  ProseReferencesProvider,
+} from "@canonical/prism-projections";
+
+<ProseReferencesProvider references={prose.references}>
+  <Markdown components={markdownComponents}>{prose.markdown}</Markdown>
+</ProseReferencesProvider>;
+```
+
+With no `ProseReferencesProvider` above, every link renders as a plain
+anchor. The renderer must hand a compact-address href to the override
+unchanged; a renderer that strips hrefs with an unknown scheme turns every
+`prefix:local` link into a link to nowhere before the override sees it.
+
 ## Public API
 
 - Representations: `EntityChip`, `EntityRow`, `EntityCard`,
@@ -182,3 +213,5 @@ A node's home is resolved with its compact address (`_meta.curie`) as the
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.
+- Prose: `markdownComponents`, `ProseReferencesProvider`; types
+  `ProseLinkProps`, `ProseReferencesProviderProps`.

@@ -29,3 +29,17 @@ export const STATION_NODE: NodePayload = {
 
 /** The href the site's `thing` route builds for `ONTOLOGY_CLASS_NODE`. */
 export const ONTOLOGY_CLASS_HREF = "/things/ds%3AUIBlock";
+
+/** The class whose instances a page's prose links to. */
+export const REFERENCING_CLASS_URI = "https://ds.canonical.com/Component";
+
+/**
+ * A page's prose references: one node a link reaches by its IRI, one it
+ * reaches by its compact address.
+ */
+export const PROSE_REFERENCES = {
+  edges: [{ node: ONTOLOGY_CLASS_NODE }, { node: STATION_NODE }],
+} as const;
+
+/** A link that names no reference. */
+export const UNREFERENCED_HREF = "https://example.com/elsewhere";
