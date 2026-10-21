@@ -43,16 +43,14 @@
   },
   "dependencies": {
     "@canonical/ds-utils": "^0.44.1",
+    "@canonical/react-markdown": "^0.44.1",
     "@canonical/storybook-config": "^0.44.1",
     "@canonical/styles": "^0.44.1",
     "@js-temporal/polyfill": "^0.5.1",
     "highlight.js": "^11.11.1",
     "react": ">=18.0.0 <20.0.0",
     "react-dom": ">=18.0.0 <20.0.0",
-    "react-markdown": "^10.1.0",
-    "react-tooltip": "^5.30.0",
-    "rehype-sanitize": "^6.0.0",
-    "remark-gfm": "^4.0.1"
+    "react-tooltip": "^5.30.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

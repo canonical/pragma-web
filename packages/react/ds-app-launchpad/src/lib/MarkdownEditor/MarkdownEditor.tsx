@@ -1,3 +1,4 @@
+import { Markdown, type MarkdownComponents } from "@canonical/react-markdown";
 import hljs from "highlight.js";
 import type React from "react";
 import {
@@ -9,9 +10,6 @@ import {
   useRef,
   useState,
 } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeSanitize from "rehype-sanitize";
-import remarkGfm from "remark-gfm";
 import "../GitDiffViewer/common/CodeDiffViewer/HighlighTheme.css";
 import {
   icons,
@@ -23,10 +21,11 @@ import { useEditor } from "./hooks/index.js";
 import "./styles.css";
 import type { EditMode, MarkdownEditorProps } from "./types.js";
 
-("react-markdown");
-
 const componentCssClassName = "ds markdown-editor";
 const borderCssClassName = "bordered";
+
+// The preview demotes top-level headings so a comment never outranks its host page.
+const previewComponents: MarkdownComponents = { h1: "h3", h2: "h3" };
 
 /**
  * A dual-mode Markdown editor for writing and previewing Markdown content.
@@ -235,16 +234,12 @@ const MarkdownEditor = forwardRef(
         />
         {editMode === "preview" && (
           <div className="editor-content" style={previewStyle} ref={previewRef}>
-            <ReactMarkdown
-              rehypePlugins={[rehypeSanitize]}
-              remarkPlugins={[remarkGfm]}
-              components={{
-                h1: ({ children }) => <h3>{children}</h3>,
-                h2: ({ children }) => <h3>{children}</h3>,
-              }}
-            >
-              {textareaRef.current?.value || defaultValue || emptyInputMessage}
-            </ReactMarkdown>
+            <Markdown
+              source={
+                textareaRef.current?.value || defaultValue || emptyInputMessage
+              }
+              components={previewComponents}
+            />
           </div>
         )}
       </div>

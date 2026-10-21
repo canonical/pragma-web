@@ -91,6 +91,19 @@ describe("MarkdownEditor", () => {
     });
   });
 
+  it("previews GitHub-flavoured Markdown with top-level headings demoted", () => {
+    const { container } = render(
+      <MarkdownEditor
+        editMode="preview"
+        defaultValue={"# Title\n\n| A | B |\n| - | - |\n| 1 | 2 |"}
+      />,
+    );
+
+    expect(container.querySelector("h1")).not.toBeInTheDocument();
+    expect(container.querySelector("h3")).toHaveTextContent("Title");
+    expect(container.querySelector("table")).toBeInTheDocument();
+  });
+
   it("shows a checkbox to switch between write and preview modes", () => {
     render(<MarkdownEditor previewSwitchMode="checkbox" />);
 
