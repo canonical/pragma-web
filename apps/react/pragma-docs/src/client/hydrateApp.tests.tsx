@@ -27,9 +27,9 @@ import componentEntityRecordsButton from "../domains/components/__fixtures__/com
 // Definitions block: the captured explorer records, plus the jsdom shims
 // React Flow needs when the well MOUNTS (ResizeObserver/DOMMatrix —
 // side-effect import, no test behaviour of its own).
-import definitionsExplorerRecords from "../domains/lenses/definitions/__fixtures__/definitionsExplorerRecords.js";
-import "../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
+import "../../testing/stubReactFlowGlobals.js";
 import type { InitialData } from "#server";
+import { definitionsExplorerRecords } from "../../testing/definitionsRecords.js";
 import journeysExplorerRecords from "../addons/journeys/__fixtures__/journeysExplorerRecords.js";
 import journeysExplorerRecordsJob from "../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import standardEntityRecords from "../domains/lenses/standards/__fixtures__/standardEntityRecords.js";
@@ -87,7 +87,7 @@ const SEEDED_PAGES = [
     name: "definitions term",
     url: "/definitions/ds%3AUIBlock",
     records: definitionsExplorerRecords,
-    serverMarker: '<h2 id="term-inspector-title">UI Block</h2>',
+    serverMarker: '<h2 class="heading" id="term-inspector-title">UI Block</h2>',
     liveSelector: "#term-inspector-title",
     liveText: "UI Block",
   },

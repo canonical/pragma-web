@@ -94,6 +94,13 @@ node_modules
 # its `build` script at install, shipped in its tarball, never committed
 packages/prism/projections/src/__generated__/
 
+# relay-compiler artifacts of the source-shipped Definitions lens: its own,
+# built by its `build` script at install and shipped in its tarball, and the
+# projections fragments its spreads resolve against, compiled beside them and
+# never shipped; neither is committed
+packages/prism/lens-definitions/src/__generated__/
+packages/prism/lens-definitions/.relay/
+
 # relay-compiler artifacts of the source-shipped entity lens: its own, built
 # by its `build` script at install and shipped in its tarball, and the
 # projections fragments its spreads resolve against, compiled beside them and
