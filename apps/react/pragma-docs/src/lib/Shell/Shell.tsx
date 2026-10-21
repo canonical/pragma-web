@@ -2,37 +2,26 @@
 
 import { useRouterState } from "@canonical/router-react";
 import type React from "react";
+import { LensLayout } from "#lib/LensLayout";
 import { ModeStrip } from "#lib/ModeStrip";
 import { Rail } from "#lib/Rail";
-import { CANVAS_ELEMENT_ID } from "./constants.js";
 import { shellStripFacet } from "./stripFacet.js";
 import type { ShellProps } from "./types.js";
-import "./styles.css";
-
-const componentCssClassName = "ds shell";
 
 /**
  * DocsShell — the site frame (`layout.shell`, one instance, all lenses).
  *
- * Region grid per the landed spec: primary rail west (AX.2), then the mode
- * viewport — mode strip / canvas / footer. The active lens's composed
- * layout mounts as `children` into the canvas; the rest is the stationary
- * frame (AX.6): its metrics come from the layout tokens defined once in
- * `styles.css`, so a lens switch repaints ONLY the canvas plate
- * (`frameStability.tests.tsx` measures exactly that).
+ * It renders `LensLayout` with the site rail, the colophon, and the mode
+ * strip the active route claims; the active lens's composed layout mounts
+ * as `children` into the canvas.
  *
  * The mode strip renders the composed layout's `controls`/`status` sockets.
  * A route claims them by parking a `StripSlotsEntry` on its `meta` under
- * `SHELL_STRIP_META_KEY` (the P-5 handshake); no v1 route claims them yet,
- * so every socket renders its sensible empty. The strip BAND is stationary
- * frame either way — A.06 §2 scopes strip content per mode, but AX.6 pins
- * the band itself, or the canvas would jump vertically on a lens switch.
+ * `SHELL_STRIP_META_KEY` (the P-5 handshake); a socket no route claims
+ * renders its sensible empty. The strip BAND is stationary frame either way
+ * (AX.6), or the canvas would jump vertically on a lens switch.
  */
-const Shell = ({
-  className,
-  children,
-  ...props
-}: ShellProps): React.ReactElement => {
+const Shell = ({ children, ...props }: ShellProps): React.ReactElement => {
   const { match } = useRouterState();
   const strip = shellStripFacet.read(
     match?.kind === "route" ? match.route.meta : undefined,
@@ -42,37 +31,22 @@ const Shell = ({
   const StripStatus = strip?.Status;
 
   return (
-    <div
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    <LensLayout
       {...props}
-    >
-      <a className="shell-skip" href={`#${CANVAS_ELEMENT_ID}`}>
-        Skip to content
-      </a>
-      <Rail />
-      <div className="shell-viewport">
+      footer={
+        <p>Pragma — the design system, documented from its knowledge graph.</p>
+      }
+      rail={<Rail />}
+      strip={
         <ModeStrip
           context={StripContext === undefined ? undefined : <StripContext />}
           controls={StripControls === undefined ? undefined : <StripControls />}
           status={StripStatus === undefined ? undefined : <StripStatus />}
         />
-        {/* The canvas plate (slot.shell-canvas): the one region a lens
-            switch repaints. tabIndex -1 makes it the skip link's landing. */}
-        <main
-          className="shell-canvas"
-          data-region="canvas"
-          id={CANVAS_ELEMENT_ID}
-          tabIndex={-1}
-        >
-          {children}
-        </main>
-        <footer className="shell-footer" data-region="footer">
-          <p>
-            Pragma — the design system, documented from its knowledge graph.
-          </p>
-        </footer>
-      </div>
-    </div>
+      }
+    >
+      {children}
+    </LensLayout>
   );
 };
 

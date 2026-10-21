@@ -1,7 +1,7 @@
 /*
  * JourneyWell — the centre panel's lower half: the demand model's spine
- * (job → pairing → surface → layout) sunk into the shell's underground well
- * (`.underground` supplies the depression; Shell/styles.css). Modelled on
+ * (job → pairing → surface → layout) sunk into the lens layout's underground well
+ * (`.underground` supplies the depression; LensLayout/styles.css). Modelled on
  * the definitions HierarchyWell: full bleed inside its box, nodes raised as
  * chips on the well floor, canvas-local furniture floated ABSOLUTELY
  * against the well — never `position: fixed`, which the canvas's
@@ -19,13 +19,13 @@
    * `.underground` hook's border, radius AND shadow entirely so the well runs
    * edge to edge with nothing framing it — one surface, not a card sunk in the
    * canvas. Only the depression's background tint remains (the recess you look
-   * INTO, AX.3). The reset is scoped under `.ds.shell` so it OUT-SPECIFIES the
-   * `.ds.shell .underground` hook (Shell/styles.css) — without that ancestor
+   * INTO, AX.3). The reset is scoped under `.ds.lens-layout` so it OUT-SPECIFIES the
+   * `.ds.lens-layout .underground` hook (LensLayout/styles.css) — without that ancestor
    * the hook's border/radius/shadow win and the box reappears (the owner saw
    * exactly that). The hook itself is untouched; other tenants still get the
    * card. `position: relative` makes this the containing block for the
    * floating furniture. */
-  .ds.shell .ds.journey-well {
+  .ds.lens-layout .ds.journey-well {
     position: relative;
     min-block-size: 0;
     overflow: hidden;

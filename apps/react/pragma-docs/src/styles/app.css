@@ -1,6 +1,6 @@
 /*
- * App-level global styles. The DocsShell owns the viewport (its grid,
- * layout tokens, and z-axis live in src/lib/Shell/styles.css); this file
+ * App-level global styles. The lens layout owns the viewport (its grid,
+ * layout tokens, and z-axis live in src/lib/LensLayout/styles.css); this file
  * only prepares the page for a full-viewport frame.
  */
 

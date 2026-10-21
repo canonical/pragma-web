@@ -1,6 +1,6 @@
 /*
  * EntityAside — the entity view's quick-facts rail. CONSUMES the frame's
- * --aside-w token as its flex basis (defined once in Shell/styles.css,
+ * --aside-w token as its flex basis (defined once in LensLayout/styles.css,
  * never re-defined here — frameStability.tests.tsx counts definitions).
  * `flex: 0 1` lets the intrinsic model shrink the rail when the canvas
  * narrows instead of forcing a horizontal scrollbar; when the row cannot

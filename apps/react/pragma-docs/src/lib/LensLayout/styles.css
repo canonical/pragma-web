@@ -1,39 +1,37 @@
 /*
- * DocsShell — the site frame (`layout.shell`, P-4.1/AV-301).
+ * LensLayout — the page grid every lens layout renders into.
  *
- * One instance, all lenses: primary rail west, then the mode viewport
- * (strip / mode / footer). The composed layout of the active lens mounts
- * into the canvas; everything else here is the stationary frame (AX.6) —
- * an instrument body whose metrics never move on a lens switch.
+ * The rail sits west, then the viewport stacks the mode strip, the canvas
+ * and the footer. Each lens layout fills those regions with its own
+ * content; the grid, and the metrics its regions read, are defined here.
  *
- * This file is the single definition site for the frame's shared tokens:
+ * This file is the single definition site for the layout's shared tokens:
  *
- *   layout tokens (AX.6)   --rail-w · --strip-h · --subnav-w · --aside-w
+ *   block-axis metric      --strip-h
  *   z-axis tokens (AX.7)   --z-underground < --z-plate < --z-chrome < --z-overlay
  *   underground surface    --surface-underground-* (AX.3)
  *
- * Regions consume the tokens (Rail/styles.css reads --rail-w, the
- * ModeStrip reads --strip-h; composed layouts read --subnav-w/--aside-w
- * when P-5 mounts them); nothing may hard-code these dimensions, and
- * nothing may re-define the tokens — `frameStability.tests.tsx` asserts
- * each is defined exactly once across the app's stylesheets.
+ * Regions consume the tokens (the ModeStrip reads --strip-h); nothing may
+ * hard-code these metrics, and nothing may re-define the tokens — the
+ * stylesheet census asserts each is defined exactly once across the app's
+ * stylesheets.
  */
 
 @layer app {
-  .ds.shell {
+  .ds.lens-layout {
     /* ── The one layout metric that survives the intrinsic-grid model ──
      * The strip band's height (AX.6): a block-axis metric, orthogonal to the
      * column model, so it stays a token. The old inline-axis metrics
      * (--rail-w / --subnav-w / --aside-w) are GONE: under the strict
      * intrinsic-grid model (owner ruling) there are no named width tracks at
-     * all — the shell provides unnamed columns (in fours, `.intrinsic`) and
+     * all — the layout provides unnamed columns (in fours, `.intrinsic`) and
      * every region claims its width by SPANNING some count of them. A region's
      * width is therefore its span × the intrinsic column width, not a fixed
      * rem token; nothing hard-codes an inline width any more. */
     --strip-h: 53px;
 
     /* The intrinsic grid's own knob (the canonical `.grid.intrinsic`
-     * default, restated here so the shell reads self-contained): the
+     * default, restated here so the layout reads self-contained): the
      * narrowest a single column may be before `auto-fill` drops one. The
      * column COUNT falls out of the canvas width against this — ~12 columns
      * at 1440, ~16 at 1680 — and every region's span is read against that
@@ -75,19 +73,19 @@
     --surface-underground-border: 1px solid var(--color-border-muted, #ddd);
 
     /* ── THE ONE GRID DEFINITION (owner ruling: strict, no exceptions) ──
-     * The shell IS `.grid.intrinsic` (@canonical/styles): unnamed columns
+     * The layout IS `.grid.intrinsic` (@canonical/styles): unnamed columns
      * provided in fours, `auto-fill` so the count tracks the width. This is
      * the ONLY place in the app a grid TEMPLATE is authored — every other
      * grid below (viewport, canvas, every page, every explorer) is a
      * `grid-template-columns: subgrid` child that inherits THESE columns, so
      * the whole app aligns to one ruler and a rail on one lens lands on the
-     * same lines as a rail on another. `frameStability.tests.tsx` enforces
-     * the invariant: one template here, `subgrid` everywhere else.
+     * same lines as a rail on another. The stylesheet census enforces the
+     * invariant: one template here, `subgrid` everywhere else.
      *
      * The template is the canonical intrinsic value verbatim (four
      * `minmax(--grid-col-min, 1fr)` columns, auto-filled) rather than the
-     * `.grid.intrinsic` class, because the shell is also the 100dvh block
-     * frame and carries the strip/canvas/footer ROWS — one element owning
+     * `.grid.intrinsic` class, because the layout is also the 100dvh block
+     * box and carries the strip/canvas/footer ROWS — one element owning
      * both axes reads clearer than composing two utility classes here. */
     display: grid;
     grid-template-columns: repeat(
@@ -96,11 +94,11 @@
           minmax(var(--grid-col-min), 1fr) minmax(var(--grid-col-min), 1fr)
       );
     /* The block axis: the viewport spans every column and stacks the
-     * strip / canvas / footer rows within itself (below). The shell's single
-     * row is the 100dvh frame. */
+     * strip / canvas / footer rows within itself (below). The layout's single
+     * row is the 100dvh box. */
     grid-template-rows: minmax(0, 1fr);
     block-size: 100dvh;
-    /* The shell never scrolls (A.06 §1.3) — regions own their scroll. */
+    /* The layout never scrolls (A.06 §1.3) — regions own their scroll. */
     overflow: clip;
     background: var(--color-background, #fff);
     color: var(--color-text, #000);
@@ -111,12 +109,12 @@
    * Class first (the theme selector stamps .dark/.light on <html>), then the
    * system fallback for pages rendered before the class applies — the same
    * two-block pattern as Chip/styles.css. */
-  :root.dark .ds.shell {
+  :root.dark .ds.lens-layout {
     --underground-depth: 30%;
   }
 
   @media (prefers-color-scheme: dark) {
-    :root:not(.light) .ds.shell {
+    :root:not(.light) .ds.lens-layout {
       --underground-depth: 30%;
     }
   }
@@ -126,7 +124,7 @@
    * P-5's tenants) apply `.underground` to sink below the sheet. Content ON
    * the well floor renders raised again — nodes float as panels inside the
    * depression. No well ships in P-4.1; the hook is the contract. */
-  .ds.shell .underground {
+  .ds.lens-layout .underground {
     background: var(--surface-underground-background);
     box-shadow: var(--surface-underground-shadow);
     border: var(--surface-underground-border);
@@ -135,7 +133,7 @@
   }
 
   /* Skip link: hidden until focused, then floats above the chrome. */
-  .ds.shell .shell-skip {
+  .ds.lens-layout .skip {
     position: absolute;
     inset-block-start: var(--space-100, 0.5rem);
     inset-inline-start: -100rem;
@@ -145,20 +143,20 @@
     color: var(--color-text, #000);
   }
 
-  .ds.shell .shell-skip:focus {
+  .ds.lens-layout .skip:focus {
     inset-inline-start: var(--space-100, 0.5rem);
   }
 
   /* ── The mode viewport: strip / mode / footer (ds:anatomyDsl rows) ──
-   * A SUBGRID of the shell (owner ruling: every grid but the shell is a
+   * A SUBGRID of the layout (owner ruling: every grid but the layout's is a
    * subgrid). It spans the columns to the east of the rail
    * (`grid-column: var(--viewport-span)`, defined at the tenant below) and
    * INHERITS those column lines, so its strip/canvas/footer — and everything
    * they nest — align to the same intrinsic ruler as the rail. On the block
    * axis it owns the strip / canvas / footer rows itself; `min-block-size: 0`
-   * lets the middle row shrink so the canvas, not the shell, scrolls
+   * lets the middle row shrink so the canvas, not the layout, scrolls
    * (INTRINSIC-GRID.md entry 2). */
-  .ds.shell .shell-viewport {
+  .ds.lens-layout .viewport {
     display: grid;
     grid-template-columns: subgrid;
     /* The viewport claims every column east of the rail. `3 / -1` is robust
@@ -172,7 +170,7 @@
     min-block-size: 0;
   }
 
-  /* The canvas: the one region the lens switch repaints (slot.shell-canvas).
+  /* The canvas: the region the routed page renders into.
    * A SUBGRID spanning the viewport's full width (`grid-column: 1 / -1`), so
    * the column lines pass THROUGH it to the page and explorer below — this is
    * the crux of the strict model, and it is why the canvas can no longer be a
@@ -186,7 +184,7 @@
    * canvas is a bare grid
    * cell the page fills edge to edge; any breathing room is a region's own,
    * expressed as a column span, not canvas chrome. Scroll is KEPT. */
-  .ds.shell .shell-canvas {
+  .ds.lens-layout .canvas {
     z-index: var(--z-plate);
     display: grid;
     grid-template-columns: subgrid;
@@ -196,7 +194,7 @@
     min-inline-size: 0;
   }
 
-  .ds.shell .shell-canvas:focus {
+  .ds.lens-layout .canvas:focus {
     /* Skip-link target: programmatic focus, no ring on the whole plate. */
     outline: none;
   }
@@ -207,17 +205,17 @@
    * distributes those columns to the lens's rail / well / inspector. A page
    * that wants to sit in a narrower measure overrides its span; the default
    * is full width so a page never accidentally collapses to one column. */
-  .ds.shell .shell-canvas > * {
+  .ds.lens-layout .canvas > * {
     grid-column: 1 / -1;
     min-inline-size: 0;
   }
 
-  /* Footer: shell chrome (slot.shell-footer — colophon; the changelog link
+  /* Footer: chrome (the colophon; the changelog link
    * arrives with its view). Spans the viewport's full width — it is a band,
    * not a column tenant. Keeps its own inline padding (chrome breathing room
    * is the footer's, not the canvas's — the canvas is the one region ruled
    * padding-free). */
-  .ds.shell .shell-footer {
+  .ds.lens-layout .footer {
     z-index: var(--z-chrome);
     grid-column: 1 / -1;
     border-block-start: 1px solid var(--color-border-muted, #ddd);
@@ -226,7 +224,7 @@
     color: var(--color-text-muted, #666);
   }
 
-  .ds.shell .shell-footer p {
+  .ds.lens-layout .footer p {
     margin: 0;
   }
 }

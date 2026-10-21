@@ -1,6 +1,6 @@
 /*
  * HierarchyWell — the explorer's centre panel: the class graph sunk into
- * the shell's underground well (`.underground` supplies the depression's
+ * the lens layout's underground well (`.underground` supplies the depression's
  * surface; this file sizes the well, takes it FULL BLEED, raises the
  * nodes, and hangs the canvas-local furniture). The panel's width comes
  * from the explorer's grid template; the bespoke well renderer (AV-364)
@@ -15,14 +15,14 @@
  */
 
 @layer app {
-  /* FULL BLEED, NO CARD. The shared `.underground` hook (Shell/styles.css)
+  /* FULL BLEED, NO CARD. The shared `.underground` hook (LensLayout/styles.css)
    * gives every well a rounded, bordered, shadowed card — right for a well
    * sitting IN a padded page, wrong here, where the canvas IS the page and the
    * graph is the background (owner ruling). Drop the card entirely — border,
    * radius AND shadow — so the surface runs edge to edge with nothing framing
    * it. Only the depression's background tint remains (the recess you look
-   * INTO, AX.3). The reset is scoped under `.ds.shell` so it OUT-SPECIFIES the
-   * `.ds.shell .underground` hook — without that ancestor the hook (specificity
+   * INTO, AX.3). The reset is scoped under `.ds.lens-layout` so it OUT-SPECIFIES the
+   * `.ds.lens-layout .underground` hook — without that ancestor the hook (specificity
    * 0,0,3) beats a bare `.ds.hierarchy-well` (0,0,2) and the box reappears
    * (which is exactly what the owner was still seeing). The hook itself is
    * untouched — other tenants still get the card. This is an override at the
@@ -33,7 +33,7 @@
    * canvas is a `container-type: inline-size` query container, so fixed
    * resolves against IT, not the viewport (INTRINSIC-GRID.md entry 5's
    * containment law) — a fixed child would anchor to a box nobody expects. */
-  .ds.shell .ds.hierarchy-well {
+  .ds.lens-layout .ds.hierarchy-well {
     position: relative;
     min-block-size: 0;
     overflow: hidden;
