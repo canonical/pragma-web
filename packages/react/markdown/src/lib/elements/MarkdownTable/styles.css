@@ -1,0 +1,25 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.markdown-table {
+    --markdown-table-cell-padding-block: var(--dimension-050);
+    --markdown-table-cell-padding-inline: var(--dimension-100);
+    --markdown-table-divider-color: var(--color-border-muted);
+    --markdown-table-divider-width: var(--dimension-stroke-thickness-medium);
+    --markdown-table-header-divider-color: var(--color-border);
+
+    border-collapse: collapse;
+
+    & th,
+    & td {
+      padding-block: var(--markdown-table-cell-padding-block);
+      padding-inline: var(--markdown-table-cell-padding-inline);
+      border-block-end: var(--markdown-table-divider-width) solid
+        var(--markdown-table-divider-color);
+    }
+
+    & th {
+      border-block-end-color: var(--markdown-table-header-divider-color);
+    }
+  }
+}
