@@ -1,18 +1,7 @@
 import { createEnvironment } from "@canonical/prism-core";
-import type { Environment, FetchFunction } from "relay-runtime";
-import type { Mock } from "vitest";
-import createRecordedFetch, {
-  type RecordedFetchOptions,
-} from "./createRecordedFetch.js";
+import createRecordedFetch from "./createRecordedFetch.js";
+import type { RecordedFetchOptions, WarmEnvironment } from "./types.js";
 import warmRoute from "./warmRoute.js";
-
-/** A warmed environment and the recorded fetch behind it. */
-export interface WarmEnvironment {
-  /** The environment, its store holding what the route's warm fetched. */
-  readonly environment: Environment;
-  /** The fetch function, its call log cleared after the warm. */
-  readonly fetchFn: Mock<FetchFunction>;
-}
 
 /**
  * Create an environment over the metro graph's recorded responses and warm

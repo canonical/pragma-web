@@ -1,19 +1,10 @@
 import { createEnvironment } from "@canonical/prism-core";
 import { renderToString } from "react-dom/server";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import createEntitySite, { type EntitySiteLayout } from "./createEntitySite.js";
+import createEntitySite from "./createEntitySite.js";
 import createRecordedFetch from "./createRecordedFetch.js";
+import type { EntitySiteLayout, ServerMarkup } from "./types.js";
 import warmRoute from "./warmRoute.js";
-
-/** What a server render of one page hands the client. */
-export interface ServerMarkup {
-  /** The page's markup. */
-  readonly html: string;
-  /** The serialised store the markup was rendered from. */
-  readonly records: RecordMap;
-  /** How many requests the render made once the warm had settled. */
-  readonly requestsAfterWarm: number;
-}
 
 /**
  * Render `url` the way a site's server does: warm a per-request environment

@@ -1,46 +1,14 @@
-import {
-  createStaticRouter,
-  type EntityBinding,
-  HomesProvider,
-} from "@canonical/prism-core";
+import { createStaticRouter, HomesProvider } from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
 } from "@canonical/prism-projections";
 import { Outlet, RouterProvider } from "@canonical/router-react";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import type { Environment } from "relay-runtime";
 import { EntityLayout } from "../src/lib/EntityLayout/index.js";
 import { HOMES, SITE_ROUTES } from "./fixtures.js";
-
-/** The layout `createEntitySite` wraps the content in, and the site's slots
- * it binds. */
-export interface EntitySiteLayout {
-  /** The binding whose routes the layout wraps. */
-  readonly binding: EntityBinding;
-  /** The lens's label. */
-  readonly label: string;
-  /** The site's rail; none when omitted. */
-  readonly rail?: ReactNode;
-  /** The site's footer band, if any. */
-  readonly colophon?: ReactNode;
-  /** Class names the site adds to the layout's root. */
-  readonly className?: string;
-}
-
-/** What `createEntitySite` mounts. */
-export interface EntitySiteSetup {
-  /** The URL the static router matches. */
-  readonly url: string;
-  /** The Relay environment the site reads from. */
-  readonly environment: Environment;
-  /** The content; the matched route's, through the router's outlet, when
-   * omitted. */
-  readonly children?: ReactNode;
-  /** The lens layout to wrap the content in; none when omitted. */
-  readonly layout?: EntitySiteLayout;
-}
+import type { EntitySiteSetup } from "./types.js";
 
 /**
  * Build the lens under the provider stack a site mounts it in: a Relay

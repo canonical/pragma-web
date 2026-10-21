@@ -1,17 +1,7 @@
 import type { FetchFunction, GraphQLResponse, Variables } from "relay-runtime";
 import { type Mock, vi } from "vitest";
 import metroResponses from "./records/metroResponses.js";
-
-/** Options for `createRecordedFetch`. */
-export interface RecordedFetchOptions {
-  /**
-   * The size of the index's first page, in place of the lens's own, so the
-   * "Load more" path runs against the metro graph's sixteen stations. Only
-   * `EntityIndexQuery`'s `count` is lowered; the pagination query asks for
-   * the lens's own page size.
-   */
-  readonly cap?: number;
-}
+import type { RecordedFetchOptions } from "./types.js";
 
 /**
  * Key a request by its operation and its variables, the variables' keys
