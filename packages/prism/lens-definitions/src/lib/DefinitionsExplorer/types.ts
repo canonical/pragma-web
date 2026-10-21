@@ -1,3 +1,4 @@
+/** Props accepted by `DefinitionsExplorer`. */
 export interface DefinitionsExplorerProps {
   /** Additional CSS class names. */
   className?: string;

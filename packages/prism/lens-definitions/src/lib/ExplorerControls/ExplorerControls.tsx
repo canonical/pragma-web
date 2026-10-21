@@ -43,6 +43,8 @@ const ABSTRACTION_COPY: {
  * is available to assistive tech and not merely to the eye. Toggling
  * dims the rail and hides in the graph (the asymmetry) — it never
  * navigates, because a way of looking is not a place to link to.
+ *
+ * `import { ExplorerControls } from "../ExplorerControls/index.js";`
  */
 const ExplorerControls = ({
   className,

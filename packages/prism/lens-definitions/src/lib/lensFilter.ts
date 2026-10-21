@@ -46,7 +46,7 @@ export const createAllNamespacesFilter = (
  * Resolve the EFFECTIVE filter against the ontologies that actually exist.
  *
  * An untouched filter carries no namespaces, because the shared state
- * (`lensFilterContext`) sits above the query and cannot know the graph's
+ * (`LensFilter`) sits above the query and cannot know the graph's
  * prefixes. Every consumer reads that the same way — "no chip has been
  * pressed, so show everything" — and this is the one place that reading
  * lives, so the rail, the well and the mode strip's toolbar can never

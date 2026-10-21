@@ -11,6 +11,8 @@ const DEFAULT_SIZE = 16;
  * It is always `aria-hidden`: the rail entry's visible label names it. The
  * lens passes it as its `icon` in its `routeLensFacet` declaration, so it is
  * what survives the rail's small-viewport collapse.
+ *
+ * `import { DefinitionsIcon } from "./DefinitionsIcon/index.js";`
  */
 export default function DefinitionsIcon({
   size = DEFAULT_SIZE,

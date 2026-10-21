@@ -1,6 +1,6 @@
 import type React from "react";
-import { ABSTRACTION_VALUES } from "../constants.js";
-import { useMessages } from "../i18n/index.js";
+import { ABSTRACTION_VALUES } from "../../../constants.js";
+import { useMessages } from "../../../i18n/index.js";
 
 /**
  * The well's legend — canvas-local furniture, bottom-left, exactly where
@@ -15,6 +15,8 @@ import { useMessages } from "../i18n/index.js";
  *
  * Static content means no client state, so it server-renders with the rest
  * of the well and takes no part in the hydration argument.
+ *
+ * `import { WellLegend } from "./common/WellLegend/index.js";`
  */
 const WellLegend = (): React.ReactElement => {
   const t = useMessages();

@@ -1,3 +1,4 @@
+/** Props accepted by `DefinitionsPage`. */
 export interface DefinitionsPageProps {
   /** Additional CSS class names. */
   className?: string;

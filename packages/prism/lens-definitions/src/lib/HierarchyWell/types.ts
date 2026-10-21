@@ -62,6 +62,7 @@ export interface ClusterExtent {
   readonly height: number;
 }
 
+/** Props accepted by `HierarchyWell`. */
 export interface HierarchyWellProps {
   /** Additional CSS class names. */
   className?: string;

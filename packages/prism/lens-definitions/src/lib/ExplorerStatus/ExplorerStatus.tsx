@@ -21,6 +21,8 @@ const componentCssClassName = "ds explorer-status";
  * on reading a coloured bar. `aria-live="polite"` announces the change
  * when chips move the count, which is the whole point of putting it in the
  * strip rather than in the canvas.
+ *
+ * `import { ExplorerStatus } from "./ExplorerStatus/index.js";`
  */
 const ExplorerStatus = ({
   className,

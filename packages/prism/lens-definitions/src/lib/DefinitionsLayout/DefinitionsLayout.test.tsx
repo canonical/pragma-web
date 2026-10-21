@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import createDefinitionsLayout from "../../../testing/createDefinitionsLayout.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
-import { useLensFilter } from "../lensFilterContext.js";
+import { useLensFilter } from "../LensFilter/index.js";
 
 /** A routed page that prints the namespaces the shared filter allows. */
 const FilterProbe = () => {

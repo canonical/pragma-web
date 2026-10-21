@@ -6,11 +6,10 @@ import definitionsExplorerQueryNode from "../../__generated__/DefinitionsExplore
 import type { HierarchyWell_ontologies$key } from "../../__generated__/HierarchyWell_ontologies.graphql.js";
 import hierarchyWellFragmentNode from "../../__generated__/HierarchyWell_ontologies.graphql.js";
 import { buildDefinitionsExplorerVariables } from "../definitionsQuery.js";
-import { computeClassDepths } from "../HierarchyWell/buildClassGraph.js";
-import { HierarchyWell } from "../HierarchyWell/index.js";
+import { computeClassDepths, HierarchyWell } from "../HierarchyWell/index.js";
 import { useMessages } from "../i18n/index.js";
+import { useLensFilter } from "../LensFilter/index.js";
 import { normalizeFilterText, resolveFilter } from "../lensFilter.js";
-import { useLensFilter } from "../lensFilterContext.js";
 import { TermInspector } from "../TermInspector/index.js";
 import { TermRail } from "../TermRail/index.js";
 import type { DefinitionsExplorerProps } from "./types.js";
@@ -68,7 +67,7 @@ const componentCssClassName = "ds definitions-explorer";
  * seam use (`definitionsQuery.ts`), so the SSR-warmed store always
  * fulfils this exact operation.
  *
- * The lens's EPHEMERAL filter lives in `lensFilterContext` rather than in
+ * The lens's EPHEMERAL filter lives in `LensFilter` rather than in
  * this component's own state, for one specific reason recorded there in
  * full: the mode strip's chips are rendered by the lens's layout as a
  * sibling of the canvas, so no prop path reaches them. Context is the smallest mechanism that crosses that
@@ -102,6 +101,8 @@ const componentCssClassName = "ds definitions-explorer";
  * masked from the rail) and derives the depth map with the very function
  * the well lays out by (`computeClassDepths`), then hands it down. One
  * algorithm, two readers, zero query change.
+ *
+ * `import { DefinitionsExplorer } from "../DefinitionsExplorer/index.js";`
  */
 const DefinitionsExplorer = ({
   className,

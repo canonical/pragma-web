@@ -1,4 +1,3 @@
-import { Link } from "@canonical/router-react";
 import type React from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { graphql, useFragment } from "react-relay";
@@ -6,9 +5,10 @@ import type { HierarchyWell_ontologies$key } from "../../__generated__/Hierarchy
 import hierarchyWellFragmentNode from "../../__generated__/HierarchyWell_ontologies.graphql.js";
 import { useMessages } from "../i18n/index.js";
 import { buildClassGraph } from "./buildClassGraph.js";
+import { TermNode } from "./common/TermNode/index.js";
+import { WellLegend } from "./common/WellLegend/index.js";
 import { decorateForView } from "./decorateGraph.js";
-import type { HierarchyWellProps, TermFlowNode } from "./types.js";
-import WellLegend from "./WellLegend.js";
+import type { HierarchyWellProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -56,58 +56,6 @@ const MAX_ZOOM = 2;
 const CAMERA_MARGIN = 24;
 
 /**
- * A class node: a real term link, so the graph's nodes are anchors — they
- * SSR as content, hover-prefetch their term, and navigate through the
- * router (URL state, never component state). Selection is the address:
- * the router's `Link` stamps `aria-current="page"` on the current term's
- * node, which the stylesheet raises.
- *
- * Abstract classes are marked the way the exhibit marks them: the label
- * goes italic and a small ABSTRACT tag rides underneath — real text, so
- * the distinction survives with styling off rather than living in colour
- * alone. The tag sits OUTSIDE the anchor: a node's accessible name must
- * be the term itself, never the term plus its decoration.
- *
- * The label is `title`-attributed as well as rendered: node geometry is
- * ESTIMATED from the label (no text measurement exists on the server), so
- * a long class name ellipsises and the tooltip keeps it recoverable.
- */
-const TermNode = ({ node }: { node: TermFlowNode }): React.ReactElement => {
-  const t = useMessages();
-  return (
-    <div
-      className={["hierarchy-node-shell", node.className]
-        .filter(Boolean)
-        .join(" ")}
-      data-id={node.id}
-      style={{
-        insetInlineStart: node.x - node.width / 2,
-        insetBlockStart: node.y - node.height / 2,
-        inlineSize: node.width,
-        blockSize: node.height,
-      }}
-    >
-      <Link
-        className={[
-          "hierarchy-node",
-          node.data.isAbstract ? "hierarchy-node-abstract" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        params={{ term: node.data.term }}
-        title={node.data.label}
-        to="definitionsTerm"
-      >
-        {node.data.label}
-      </Link>
-      {node.data.isAbstract ? (
-        <span className="hierarchy-node-tag">{t("well.abstract")}</span>
-      ) : null}
-    </div>
-  );
-};
-
-/**
  * The explorer's centre panel: the class graph in an underground well (the
  * `.ds.underground` hook, AX.3), rendered by the bespoke well renderer (AV-364 — React
  * Flow retired here): an SVG edge layer under an HTML node layer, both in
@@ -140,6 +88,8 @@ const TermNode = ({ node }: { node: TermFlowNode }): React.ReactElement => {
  * Accessibility posture: unchanged — every node is a real link, but the
  * COMPLETE keyboard path through the explorer is the TermRail; the well
  * is a spatial view over the same nouns, never the only route to any.
+ *
+ * `import { HierarchyWell } from "../HierarchyWell/index.js";`
  */
 const HierarchyWell = ({
   className,

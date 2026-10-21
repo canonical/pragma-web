@@ -1,6 +1,7 @@
 import type { TermRail_ontologies$key } from "../../__generated__/TermRail_ontologies.graphql.js";
 import type { LensFilter } from "../types.js";
 
+/** Props accepted by `TermRail`. */
 export interface TermRailProps {
   /** Additional CSS class names. */
   className?: string;

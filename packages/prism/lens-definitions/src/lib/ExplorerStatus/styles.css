@@ -1,0 +1,49 @@
+/*
+ * ExplorerStatus — the Definitions strip's status figure
+ * (slot.explorer-status). It lives INSIDE the strip band, whose height is
+ * stationary frame, so nothing here may change it.
+ *
+ * At-rules: one prefers-reduced-motion block, census-EXEMPT (it cannot
+ * reflow layout — see stylesheets.test.ts's query-TEXT exemption).
+ */
+
+@layer app {
+  .ds.explorer-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #666);
+    white-space: nowrap;
+  }
+
+  .ds.explorer-status figcaption {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The proportion bar. Its fill width IS the ratio the caption states, so
+   * the two can never disagree; the caption is the accessible channel and
+   * the bar is the glanceable one. */
+  .ds.explorer-status .explorer-status-bar {
+    inline-size: 4rem;
+    block-size: 0.375rem;
+    border-radius: 999px;
+    background: var(--color-border-muted, #ddd);
+    overflow: hidden;
+  }
+
+  .ds.explorer-status .explorer-status-fill {
+    display: block;
+    block-size: 100%;
+    inline-size: var(--explorer-status-share, 100%);
+    background: var(--color-text-muted, #666);
+    transition: inline-size 0.15s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds.explorer-status .explorer-status-fill {
+      transition: none;
+    }
+  }
+}

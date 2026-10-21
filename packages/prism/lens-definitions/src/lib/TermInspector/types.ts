@@ -2,6 +2,7 @@ import type { TermInspector_class$key } from "../../__generated__/TermInspector_
 import type { TermInspector_property$key } from "../../__generated__/TermInspector_property.graphql.js";
 import type { OntologyNamespace } from "../types.js";
 
+/** Props accepted by `TermInspector`. */
 export interface TermInspectorProps {
   /** Additional CSS class names. */
   className?: string;

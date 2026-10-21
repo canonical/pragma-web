@@ -9,13 +9,14 @@ import {
   buildDefinitionsExplorerVariables,
   readTermParam,
 } from "./definitionsQuery.js";
-import { ExplorerControls, ExplorerStatus } from "./ExplorerControls/index.js";
+import { ExplorerControls } from "./ExplorerControls/index.js";
+import { ExplorerStatus } from "./ExplorerStatus/index.js";
+import { useLensFilter } from "./LensFilter/index.js";
 import {
   classifyAbstraction,
   matchesChips,
   resolveFilter,
 } from "./lensFilter.js";
-import { useLensFilter } from "./lensFilterContext.js";
 
 /**
  * The Definitions lens's mode-strip tenants — the components
@@ -24,7 +25,7 @@ import { useLensFilter } from "./lensFilterContext.js";
  *
  * They take NO props: the layout renders them as siblings of the routed
  * page, so nothing the page holds can reach them as a prop. The FILTER
- * reaches them through `lensFilterContext` (see that module for why a
+ * reaches them through `LensFilter` (see that module for why a
  * context is the smallest bridge between the strip and the page).
  *
  * THE DATA does NOT come through that context, and the reason is the SSR

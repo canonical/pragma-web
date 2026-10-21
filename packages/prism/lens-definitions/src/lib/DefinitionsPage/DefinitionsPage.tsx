@@ -21,6 +21,8 @@ const componentCssClassName = "ds definitions-page";
  *
  * No default term: `/definitions` renders the full
  * explorer with an honestly empty inspector, never a redirect.
+ *
+ * `import { DefinitionsPage } from "./DefinitionsPage/index.js";`
  */
 const DefinitionsPage = ({
   className,

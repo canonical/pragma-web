@@ -121,6 +121,8 @@ const MAX_INDENT_DEPTH = 6;
  * Selection needs no wiring here: the router's `Link` stamps
  * `aria-current="page"` on the item whose address is the current URL, and
  * hovering any item prefetches its term through the route's warm-up seam.
+ *
+ * `import { TermRail } from "../TermRail/index.js";`
  */
 const TermRail = ({
   className,

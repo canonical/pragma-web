@@ -20,7 +20,7 @@ import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import definitionsExplorerRecords from "../../testing/records/definitionsExplorerRecords.js";
-import { LensFilterProvider } from "./lensFilterContext.js";
+import { LensFilterProvider } from "./LensFilter/index.js";
 import { definitionsRoutes } from "./routes.js";
 import { definitionsStripSlots } from "./stripSlots.js";
 
