@@ -4,7 +4,6 @@ export * from "./CatalogItem/index.js";
 export * from "./CatalogList/index.js";
 export * from "./ComponentEntityPage/index.js";
 export * from "./ComponentsCatalogPage/index.js";
-export * from "./ComponentsLayout/index.js";
 // The domain's own surface, beside the components above.
 export {
   CATALOG_PAGE_SIZE,

@@ -26,7 +26,7 @@ const { Context, Controls, Status } = definitionsStripSlots;
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon.
  *
- * `import { DefinitionsLayout } from "#domains/lenses/definitions";`
+ * `import { DefinitionsLayout } from "./DefinitionsLayout/index.js";`
  */
 export default function DefinitionsLayout({
   children,

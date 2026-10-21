@@ -16,7 +16,7 @@ const componentCssClassName = "ds playground-layout";
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon.
  *
- * `import { PlaygroundLayout } from "#domains/playground";`
+ * `import { PlaygroundLayout } from "./PlaygroundLayout/index.js";`
  */
 export default function PlaygroundLayout({
   children,

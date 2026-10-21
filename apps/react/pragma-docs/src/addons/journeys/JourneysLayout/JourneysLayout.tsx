@@ -26,7 +26,7 @@ const { Context, Controls } = journeysStripSlots;
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon.
  *
- * `import { JourneysLayout } from "#addons/journeys";`
+ * `import { JourneysLayout } from "./JourneysLayout/index.js";`
  */
 export default function JourneysLayout({
   children,

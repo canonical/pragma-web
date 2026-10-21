@@ -16,7 +16,7 @@ const componentCssClassName = "ds guides-layout";
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon.
  *
- * `import { GuidesLayout } from "#domains/lenses";`
+ * `import { GuidesLayout } from "./GuidesLayout/index.js";`
  */
 export default function GuidesLayout({
   children,

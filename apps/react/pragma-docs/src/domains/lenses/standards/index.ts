@@ -7,7 +7,6 @@ export { default as standardsRoutes } from "./routes.js";
 export * from "./StandardArticle/index.js";
 export * from "./StandardReadingPage/index.js";
 export * from "./StandardsIndex/index.js";
-export * from "./StandardsLayout/index.js";
 export * from "./StandardsPage/index.js";
 export {
   STANDARDS_PAGE_SIZE,

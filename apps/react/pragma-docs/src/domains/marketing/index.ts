@@ -11,5 +11,4 @@ export {
   lobbyQueryNode,
   lobbyVariables,
 } from "./lobbyQuery.js";
-export * from "./MarketingLayout/index.js";
 export { default as marketingRoutes } from "./routes.js";

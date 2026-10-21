@@ -28,7 +28,7 @@ const StandardsContext = makeLensContext({
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon.
  *
- * `import { StandardsLayout } from "#domains/lenses/standards";`
+ * `import { StandardsLayout } from "./StandardsLayout/index.js";`
  */
 export default function StandardsLayout({
   children,

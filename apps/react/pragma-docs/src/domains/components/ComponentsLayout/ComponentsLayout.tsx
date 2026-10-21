@@ -28,7 +28,7 @@ const ComponentsContext = makeLensContext({
  * Its root is the layout's own page grid: the rail in the west columns,
  * then a viewport stacking the strip, the canvas and the colophon.
  *
- * `import { ComponentsLayout } from "#domains/components";`
+ * `import { ComponentsLayout } from "./ComponentsLayout/index.js";`
  */
 export default function ComponentsLayout({
   children,
