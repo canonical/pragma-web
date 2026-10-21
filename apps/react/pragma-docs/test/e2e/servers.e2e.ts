@@ -368,7 +368,7 @@ describe("server matrix (2×3) serves correctly", () => {
               // so the opening tag is matched loosely up to its close.
               (
                 definitionsTermHtml.match(
-                  /<h3>Classes[\s\S]*?<h3>Properties/g,
+                  /<h3 class="subheading">Classes[\s\S]*?<h3 class="subheading">Properties/g,
                 ) ?? []
               )
                 .map(

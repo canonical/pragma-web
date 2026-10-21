@@ -21,12 +21,14 @@ export default function ClassView({
   return (
     <article aria-labelledby="term-inspector-title">
       <header>
-        <h2 id="term-inspector-title">{data.label ?? term}</h2>
+        <h2 className="heading" id="term-inspector-title">
+          {data.label ?? term}
+        </h2>
         <p className="address">
           <Message
             elements={{
-              term: <code>{term}</code>,
-              namespace: <code>{data.namespace}</code>,
+              term: <code className="identifier">{term}</code>,
+              namespace: <code className="identifier">{data.namespace}</code>,
             }}
             id={
               data.isAbstract
@@ -37,7 +39,7 @@ export default function ClassView({
         </p>
       </header>
       <p>{data.definition ?? t("inspector.definition.none")}</p>
-      <h3>{t("inspector.lineage")}</h3>
+      <h3 className="subheading">{t("inspector.lineage")}</h3>
       {data.superclasses.length === 0 ? (
         <p>{t("inspector.lineage.root")}</p>
       ) : (
@@ -47,11 +49,11 @@ export default function ClassView({
           self={data.label ?? term}
         />
       )}
-      <h3>{t("inspector.subclasses")}</h3>
+      <h3 className="subheading">{t("inspector.subclasses")}</h3>
       {data.subclasses.length === 0 ? (
         <p>{t("inspector.subclasses.none")}</p>
       ) : (
-        <ul>
+        <ul className="list">
           {data.subclasses.map((subclass) => (
             <li key={subclass.uri}>
               <TermLink
@@ -79,7 +81,7 @@ export default function ClassView({
         );
         return (
           <>
-            <h3>{t("inspector.properties")}</h3>
+            <h3 className="subheading">{t("inspector.properties")}</h3>
             {declared.length === 0 ? (
               <p>{t("inspector.properties.none")}</p>
             ) : (
@@ -87,14 +89,14 @@ export default function ClassView({
             )}
             {inherited.length === 0 ? null : (
               <>
-                <h3>{t("inspector.inherited")}</h3>
+                <h3 className="subheading">{t("inspector.inherited")}</h3>
                 <PropertyTable namespaces={namespaces} properties={inherited} />
               </>
             )}
           </>
         );
       })()}
-      <h3>{t("inspector.instances")}</h3>
+      <h3 className="subheading">{t("inspector.instances")}</h3>
       {data.instances.edges.length === 0 ? (
         <p>
           {t(
@@ -106,7 +108,7 @@ export default function ClassView({
         </p>
       ) : (
         <>
-          <ul>
+          <ul className="list">
             {data.instances.edges.map(({ node }) => (
               <InstanceItem key={node.uri} node={node} />
             ))}

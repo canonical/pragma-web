@@ -211,8 +211,10 @@ export default function TermRail({
 
         return (
           <section aria-labelledby={headingId} key={ontology.prefix}>
-            <h2 id={headingId}>{ontology.label ?? ontology.prefix}</h2>
-            <h3>
+            <h2 className="heading" id={headingId}>
+              {ontology.label ?? ontology.prefix}
+            </h2>
+            <h3 className="subheading">
               {t("rail.classes")}
               <span className="count">
                 {t("rail.count", {
@@ -221,7 +223,7 @@ export default function TermRail({
                 })}
               </span>
             </h3>
-            <ul>
+            <ul className="list">
               {classes.map(({ term, prefixed, depth, dimmed }) => (
                 <li
                   className={formatItemClassName(prefixed, dimmed)}
@@ -257,7 +259,7 @@ export default function TermRail({
                 </li>
               ))}
             </ul>
-            <h3>
+            <h3 className="subheading">
               {t("rail.properties")}
               <span className="count">
                 {t("rail.count", {
@@ -266,7 +268,7 @@ export default function TermRail({
                 })}
               </span>
             </h3>
-            <ul>
+            <ul className="list">
               {properties.map(({ term, prefixed, dimmed }) => (
                 <li
                   className={formatItemClassName(prefixed, dimmed)}

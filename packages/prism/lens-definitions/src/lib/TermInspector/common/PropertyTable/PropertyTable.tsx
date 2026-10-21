@@ -14,13 +14,21 @@ export default function PropertyTable({
 }: PropertyTableProps): React.ReactElement {
   const t = useMessages();
   return (
-    <table>
+    <table className="table">
       <thead>
         <tr>
-          <th scope="col">{t("inspector.table.property")}</th>
-          <th scope="col">{t("inspector.table.range")}</th>
-          <th scope="col">{t("inspector.table.kind")}</th>
-          <th scope="col">{t("inspector.table.notes")}</th>
+          <th className="cell" scope="col">
+            {t("inspector.table.property")}
+          </th>
+          <th className="cell" scope="col">
+            {t("inspector.table.range")}
+          </th>
+          <th className="cell" scope="col">
+            {t("inspector.table.kind")}
+          </th>
+          <th className="cell" scope="col">
+            {t("inspector.table.notes")}
+          </th>
         </tr>
       </thead>
       <tbody>

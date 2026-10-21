@@ -150,7 +150,7 @@ export default function TermInspector({
     body = (
       <p role="alert">
         <Message
-          elements={{ term: <code>{term}</code> }}
+          elements={{ term: <code className="identifier">{term}</code> }}
           id="inspector.unknown"
         />
       </p>

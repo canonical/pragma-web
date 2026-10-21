@@ -464,7 +464,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     // term-less canvas carries the honest empty inspector.
     expect(mustGet("/definitions").canvas).toContain("Select a term");
     expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain(
-      '<h2 id="term-inspector-title">UI Block</h2>',
+      '<h2 class="heading" id="term-inspector-title">UI Block</h2>',
     );
     expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain("ds term-node");
     expect(mustGet("/standards").canvas).toContain('id="lens-standards-title"');

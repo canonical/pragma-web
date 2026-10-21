@@ -16,7 +16,8 @@ export default function InstanceItem({
 }: InstanceItemProps): React.ReactElement {
   return (
     <li>
-      <EntityChip node={node} /> <code>{node._meta.curie}</code>
+      <EntityChip node={node} />{" "}
+      <code className="identifier">{node._meta.curie}</code>
     </li>
   );
 }

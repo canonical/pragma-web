@@ -38,7 +38,9 @@ export default function DefinitionsPage({
       data-view="definitions"
     >
       <Head title={term ? t("page.title.term", { term }) : t("lens.label")} />
-      <h1 id="lens-definitions-title">{t("lens.label")}</h1>
+      <h1 className="heading" id="lens-definitions-title">
+        {t("lens.label")}
+      </h1>
       <ErrorBoundary
         fallback={<p role="alert">{t("page.error")}</p>}
         resetKey={term}

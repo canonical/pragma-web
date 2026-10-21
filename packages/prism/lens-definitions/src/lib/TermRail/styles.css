@@ -52,13 +52,13 @@
     font-size: var(--term-rail-font-size);
   }
 
-  .ds.term-rail h2 {
+  .ds.term-rail .heading {
     margin-block: var(--term-rail-title-margin-start)
       var(--term-rail-title-margin-end);
     font-size: var(--term-rail-title-font-size);
   }
 
-  .ds.term-rail h3 {
+  .ds.term-rail .subheading {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -81,7 +81,7 @@
     opacity: var(--term-rail-count-opacity);
   }
 
-  .ds.term-rail ul {
+  .ds.term-rail .list {
     margin-block: 0;
     padding-inline-start: 0;
     list-style: none;

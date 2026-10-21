@@ -87,7 +87,7 @@ const SEEDED_PAGES = [
     name: "definitions term",
     url: "/definitions/ds%3AUIBlock",
     records: definitionsExplorerRecords,
-    serverMarker: '<h2 id="term-inspector-title">UI Block</h2>',
+    serverMarker: '<h2 class="heading" id="term-inspector-title">UI Block</h2>',
     liveSelector: "#term-inspector-title",
     liveText: "UI Block",
   },

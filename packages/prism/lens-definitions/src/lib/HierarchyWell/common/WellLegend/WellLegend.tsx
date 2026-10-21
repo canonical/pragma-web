@@ -26,25 +26,25 @@ export default function WellLegend(): React.ReactElement {
     <dl aria-label={t("legend.label")} className={componentCssClassName}>
       {ABSTRACTION_VALUES.map((value) => (
         <div className="row" key={value}>
-          <dt>
+          <dt className="symbol">
             <span aria-hidden="true" className={["swatch", value].join(" ")} />
           </dt>
-          <dd>
+          <dd className="meaning">
             {t(value === "abstract" ? "legend.abstract" : "legend.concrete")}
           </dd>
         </div>
       ))}
       <div className="row">
-        <dt>
+        <dt className="symbol">
           <span aria-hidden="true" className="edge" />
         </dt>
-        <dd>{t("legend.superclass")}</dd>
+        <dd className="meaning">{t("legend.superclass")}</dd>
       </div>
       <div className="row">
-        <dt>
+        <dt className="symbol">
           <span aria-hidden="true" className="edge relation" />
         </dt>
-        <dd>{t("legend.relation")}</dd>
+        <dd className="meaning">{t("legend.relation")}</dd>
       </div>
     </dl>
   );

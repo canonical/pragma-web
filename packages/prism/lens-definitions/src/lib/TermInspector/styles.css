@@ -41,7 +41,7 @@
    * (`term-inspector-title`), absent from the layout: the mode strip's trail
    * carries the selected term as its terminal crumb. The visually hidden
    * idiom; the term and namespace line below stays visible. */
-  .ds.term-inspector h2 {
+  .ds.term-inspector .heading {
     position: absolute;
     inline-size: 1px;
     block-size: 1px;
@@ -57,7 +57,7 @@
     color: var(--term-inspector-muted-color);
   }
 
-  .ds.term-inspector h3 {
+  .ds.term-inspector .subheading {
     margin-block: var(--term-inspector-heading-gap)
       var(--term-inspector-heading-margin-end);
     font-size: var(--term-inspector-label-font-size);
@@ -66,26 +66,25 @@
     color: var(--term-inspector-muted-color);
   }
 
-  .ds.term-inspector ul {
+  .ds.term-inspector .list {
     margin-block: 0;
     padding-inline-start: var(--term-inspector-list-indent);
   }
 
-  .ds.term-inspector code {
+  .ds.term-inspector .identifier {
     overflow-wrap: anywhere;
   }
 
   /* The property table scrolls inside the panel rather than propping the
    * panel, and the lens layout, open. */
-  .ds.term-inspector table {
+  .ds.term-inspector .table {
     display: block;
     overflow-x: auto;
     border-collapse: collapse;
     max-inline-size: 100%;
   }
 
-  .ds.term-inspector th,
-  .ds.term-inspector td {
+  .ds.term-inspector .cell {
     padding: var(--term-inspector-cell-padding-block)
       var(--term-inspector-cell-padding-inline);
     border-block-end: var(--term-inspector-border-width) solid
@@ -102,20 +101,20 @@
     font-size: var(--term-inspector-definition-font-size);
   }
 
-  .ds.term-inspector dl {
+  .ds.term-inspector .details {
     margin-block: 0;
     display: grid;
     gap: var(--term-inspector-details-gap);
   }
 
-  .ds.term-inspector dt {
+  .ds.term-inspector .key {
     color: var(--term-inspector-muted-color);
     font-size: var(--term-inspector-label-font-size);
     text-transform: uppercase;
     letter-spacing: var(--term-inspector-label-letter-spacing);
   }
 
-  .ds.term-inspector dd {
+  .ds.term-inspector .value {
     margin-inline-start: 0;
   }
 

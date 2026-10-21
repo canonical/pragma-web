@@ -28,7 +28,7 @@ describe("Status", () => {
     expect(html).toContain('data-slot="explorer-status"');
     // React separates adjacent text nodes with `<!-- -->` markers in SSR
     // output, so the caption is asserted on its stripped text.
-    const caption = /<figcaption>([\s\S]*?)<\/figcaption>/
+    const caption = /<figcaption class="caption">([\s\S]*?)<\/figcaption>/
       .exec(html)?.[1]
       ?.replaceAll("<!-- -->", "");
     // 60 live classes across the four ontologies, 5 of them abstract.

@@ -19,29 +19,35 @@ export default function PropertyView({
   return (
     <article aria-labelledby="term-inspector-title">
       <header>
-        <h2 id="term-inspector-title">{data.label ?? term}</h2>
+        <h2 className="heading" id="term-inspector-title">
+          {data.label ?? term}
+        </h2>
         <p className="address">
           <Message
             elements={{
-              term: <code>{term}</code>,
-              namespace: <code>{data.namespace}</code>,
+              term: <code className="identifier">{term}</code>,
+              namespace: <code className="identifier">{data.namespace}</code>,
             }}
             id="inspector.property.address"
           />
         </p>
       </header>
       <p>{data.definition ?? t("inspector.definition.none")}</p>
-      <dl>
-        <dt>{t("inspector.property.kind")}</dt>
-        <dd>{data.kind.toLowerCase()}</dd>
-        <dt>{t("inspector.property.functional")}</dt>
-        <dd>{t(data.functional ? "inspector.yes" : "inspector.no")}</dd>
-        <dt>{t("inspector.property.range")}</dt>
-        <dd>
-          <code>{formatRange(data.range, namespaces)}</code>
+      <dl className="details">
+        <dt className="key">{t("inspector.property.kind")}</dt>
+        <dd className="value">{data.kind.toLowerCase()}</dd>
+        <dt className="key">{t("inspector.property.functional")}</dt>
+        <dd className="value">
+          {t(data.functional ? "inspector.yes" : "inspector.no")}
         </dd>
-        <dt>{t("inspector.property.domain")}</dt>
-        <dd>
+        <dt className="key">{t("inspector.property.range")}</dt>
+        <dd className="value">
+          <code className="identifier">
+            {formatRange(data.range, namespaces)}
+          </code>
+        </dd>
+        <dt className="key">{t("inspector.property.domain")}</dt>
+        <dd className="value">
           {data.domain ? (
             <TermLink
               label={data.domain.label}
@@ -52,8 +58,8 @@ export default function PropertyView({
             t("inspector.domain.unstated")
           )}
         </dd>
-        <dt>{t("inspector.property.inverse")}</dt>
-        <dd>
+        <dt className="key">{t("inspector.property.inverse")}</dt>
+        <dd className="value">
           {data.inverse ? (
             <TermLink
               label={data.inverse.label}

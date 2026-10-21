@@ -26,22 +26,24 @@ export default function PropertyRow({
   return (
     <>
       <tr>
-        <th scope="row">
+        <th className="cell" scope="row">
           <TermLink
             label={classProperty.property.label}
             namespaces={namespaces}
             uri={classProperty.property.uri}
           />
         </th>
-        <td>
-          <code>{formatRange(classProperty.property.range, namespaces)}</code>
+        <td className="cell">
+          <code className="identifier">
+            {formatRange(classProperty.property.range, namespaces)}
+          </code>
         </td>
-        <td>{classProperty.property.kind.toLowerCase()}</td>
-        <td>{notes}</td>
+        <td className="cell">{classProperty.property.kind.toLowerCase()}</td>
+        <td className="cell">{notes}</td>
       </tr>
       {classProperty.property.definition ? (
         <tr>
-          <td className="definition" colSpan={4}>
+          <td className="cell definition" colSpan={4}>
             {classProperty.property.definition}
           </td>
         </tr>

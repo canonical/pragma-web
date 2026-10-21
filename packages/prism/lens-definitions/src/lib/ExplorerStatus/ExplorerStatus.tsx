@@ -53,7 +53,7 @@ export default function ExplorerStatus({
       >
         <span className="fill" />
       </div>
-      <figcaption>
+      <figcaption className="caption">
         {abstract > 0
           ? t("status.classes.abstract", { visible, count: total, abstract })
           : t("status.classes", { visible, count: total })}

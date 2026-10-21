@@ -71,8 +71,8 @@
     gap: var(--well-legend-row-gap);
   }
 
-  .ds.well-legend dt,
-  .ds.well-legend dd {
+  .ds.well-legend .symbol,
+  .ds.well-legend .meaning {
     margin: 0;
   }
 

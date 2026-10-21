@@ -19,6 +19,9 @@
  *   each a semantic token of the design system or a hook the site defines,
  *   so a misspelt, invented or primitive name cannot sit unnoticed behind
  *   its fallback;
+ * - every selector reaches a child through a role class, never through
+ *   its element type, so a changed heading level or list element keeps
+ *   its styling;
  * - no rule declaration holds a unit-bearing literal, so every length, time
  *   and percentage that is a design decision lives in a component token,
  *   save the unthemable declarations named here.
@@ -213,6 +216,24 @@ function listRawDecisions(css: string): string[] {
 }
 
 /**
+ * List the selectors that address an element by its type: any compound
+ * selector, past the first, that opens with an element name.
+ */
+function listTypeSelectors(css: string): string[] {
+  return [...css.matchAll(/([^{};]+)\{/g)]
+    .map((match) => (match.at(1) ?? "").trim())
+    .filter((prelude) => !prelude.startsWith("@") && prelude !== ":root")
+    .flatMap((prelude) => prelude.split(","))
+    .map((selector) => selector.trim())
+    .filter((selector) =>
+      selector
+        .split(/\s*[\s>+~]\s*/)
+        .slice(1)
+        .some((compound) => /^[a-z]/.test(compound)),
+    );
+}
+
+/**
  * List the conditional at-rule preludes that can gate layout: every
  * `@container` and `@supports`, and every `@media` that keeps a condition
  * once the exempt feature queries are stripped from it.
@@ -276,6 +297,15 @@ describe("the lens stylesheets", () => {
       files.flatMap((file) => listExternalTokens(readCss(file))),
     );
     expect([...external].toSorted()).toEqual(EXTERNAL_TOKENS);
+  });
+
+  it("address every child by class, never by element type", () => {
+    expect(files.flatMap((file) => listTypeSelectors(readCss(file)))).toEqual(
+      [],
+    );
+    expect(
+      listTypeSelectors(".ds.probe h2, .ds.probe > .heading { margin: 0; }"),
+    ).toEqual([".ds.probe h2"]);
   });
 
   it("hold no design decision outside a component token", () => {

@@ -25,7 +25,7 @@
   /* Present for assistive tech and as the section's `aria-labelledby` target
    * (`lens-definitions-title`), absent from the layout: the mode strip's
    * breadcrumb trail carries the visible title. The visually hidden idiom. */
-  .ds.definitions-page > h1 {
+  .ds.definitions-page > .heading {
     position: absolute;
     inline-size: 1px;
     block-size: 1px;

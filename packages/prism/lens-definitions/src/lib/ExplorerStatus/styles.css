@@ -32,7 +32,7 @@
     white-space: nowrap;
   }
 
-  .ds.explorer-status figcaption {
+  .ds.explorer-status .caption {
     font-variant-numeric: tabular-nums;
   }
 
