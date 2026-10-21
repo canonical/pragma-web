@@ -223,8 +223,8 @@ describe("prose sidecars", () => {
       refsRoot: CORPUS_REFS_ROOT,
       semRoot: CORPUS_SEM_ROOT,
     });
-    const warnings = warn.mock.calls.map((call) => String(call[0]));
-    const infos = info.mock.calls.map((call) => String(call[0]));
+    const warnings = warn.mock.calls.map((call) => String(call.at(0)));
+    const infos = info.mock.calls.map((call) => String(call.at(0)));
     warn.mockRestore();
     info.mockRestore();
     expect(warnings.filter((line) => line.includes("prose sidecar"))).toEqual([
