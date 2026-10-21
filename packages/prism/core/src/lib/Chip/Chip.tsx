@@ -1,4 +1,4 @@
-import type { CSSProperties, MouseEvent, ReactElement } from "react";
+import type { CSSProperties, ReactElement } from "react";
 import { useMessages } from "../i18n/index.js";
 import { DEFAULT_BOX, DEFAULT_LIFECYCLE } from "./constants.js";
 import {
@@ -43,7 +43,6 @@ const Chip = (props: ChipProps): ReactElement => {
     box = DEFAULT_BOX,
     lifecycle = DEFAULT_LIFECYCLE,
     summary,
-    onNavigate,
     className,
     style,
     ...rest
@@ -105,15 +104,10 @@ const Chip = (props: ChipProps): ReactElement => {
     );
   }
 
-  const { href, onClick, ...anchorProps } = rest;
-
-  function handleClick(event: MouseEvent<HTMLAnchorElement>): void {
-    onClick?.(event);
-    onNavigate?.(uri, event);
-  }
+  const { href, ...anchorProps } = rest;
 
   return (
-    <a {...anchorProps} {...sharedProps} href={href} onClick={handleClick}>
+    <a {...anchorProps} {...sharedProps} href={href}>
       {label}
     </a>
   );

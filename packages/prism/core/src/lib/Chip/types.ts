@@ -1,4 +1,4 @@
-import type { ComponentProps, MouseEvent } from "react";
+import type { ComponentProps } from "react";
 import type { MessageKey } from "../i18n/index.js";
 import type { BOXES, CHANNELS, KINDS, LIFECYCLES } from "./constants.js";
 
@@ -121,19 +121,6 @@ type OwnProps = {
    * still reads as plain text.
    */
   readonly summary?: string;
-  /**
-   * Click callback for router integration, called with the chip's URI
-   * (after the native `onClick`, when one is given) before the browser
-   * follows `href`; call `event.preventDefault()` to take over. Only fires
-   * on the anchor form — a chip without an href stays inert. An
-   * implementation should leave modified clicks (`metaKey`, `ctrlKey`,
-   * `shiftKey`, `button !== 0`) to the browser, so they keep their native
-   * behaviour (new tab, new window, download).
-   */
-  readonly onNavigate?: (
-    uri: string,
-    event: MouseEvent<HTMLAnchorElement>,
-  ) => void;
 };
 
 /**

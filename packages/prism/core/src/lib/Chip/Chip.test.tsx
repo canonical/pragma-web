@@ -208,30 +208,6 @@ describe("Chip", () => {
     expect(screen.getByText("Button")).not.toHaveAttribute("aria-description");
   });
 
-  it("calls onNavigate with the uri when the link is clicked", () => {
-    const handleNavigate = vi.fn(
-      (_uri: string, event: { preventDefault: () => void }) => {
-        // Prevent jsdom from attempting real navigation.
-        event.preventDefault();
-      },
-    );
-    render(
-      <Chip
-        prefixes={PREFIXES}
-        href="/components/button"
-        kind="component"
-        label="Button"
-        onNavigate={handleNavigate}
-        uri="ds:global.component.button"
-      />,
-    );
-    screen.getByRole("link", { name: "Button" }).click();
-    expect(handleNavigate).toHaveBeenCalledTimes(1);
-    expect(handleNavigate.mock.calls.at(0)?.at(0)).toBe(
-      "ds:global.component.button",
-    );
-  });
-
   it("applies additional class names alongside the component classes", () => {
     render(
       <Chip
@@ -336,27 +312,26 @@ describe("Chip", () => {
     );
   });
 
-  it("calls the native onClick before onNavigate", () => {
-    const calls: string[] = [];
+  it("passes the native onClick through to the link", () => {
+    const handleClick = vi.fn((event: { preventDefault: () => void }) => {
+      // Prevent jsdom from attempting real navigation.
+      event.preventDefault();
+    });
     render(
       <Chip
         href="/components/button"
         kind="component"
         label="Button"
-        onClick={(event) => {
-          event.preventDefault();
-          calls.push("onClick");
-        }}
-        onNavigate={(uri) => calls.push(`onNavigate ${uri}`)}
+        onClick={handleClick}
         prefixes={PREFIXES}
         uri="ds:global.component.button"
       />,
     );
     screen.getByRole("link", { name: "Button" }).click();
-    expect(calls).toEqual(["onClick", "onNavigate ds:global.component.button"]);
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it("follows a link with neither onClick nor onNavigate", () => {
+  it("follows a link without an onClick", () => {
     render(
       <Chip
         href="#button"
