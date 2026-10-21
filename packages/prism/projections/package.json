@@ -7,7 +7,12 @@
     ".": "./src/index.ts"
   },
   "files": [
-    "src"
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/testing",
+    "!src/__generated__/createNodePageQuery.graphql.ts",
+    "!src/__generated__/createReferencesPageQuery.graphql.ts"
   ],
   "author": {
     "email": "webteam@canonical.com",
