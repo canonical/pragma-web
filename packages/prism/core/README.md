@@ -11,6 +11,9 @@ package holds the parts every such site needs and none of them owns:
   with `routeShortcutFacet`.
 - **The static router**: `createStaticRouter`, a server-positioned router for
   server-side rendering and for tests.
+- **Relay plumbing**: `createEnvironment` over the graph's endpoint, the
+  prefetch slot a route's `warm` fetches into (`prefetchQuery`), and the
+  server's data prepare step (`prepareRelayData`).
 
 The package renders no brand, names no provider and selects no graph field:
 the site supplies its route table, its brand and its data.
@@ -49,6 +52,39 @@ data, so pin both collections in the site's own route-table test and a bad
 declaration cannot ship. `defineFacet` and `collectFacet` build a facet of
 your own.
 
+## Relay
+
+A route warms the store from its `warm` hook; it never names a query in its
+`meta`:
+
+```ts
+const glossaryTerm = route({
+  url: "/glossary/:term",
+  content: TermPage,
+  warm: ({ term }) => prefetchQuery(termQueryNode, { term }),
+});
+```
+
+`createEnvironment` takes the graph's address or a replacement fetch
+function, never neither: there is no default endpoint, because only the site
+knows where its graph lives.
+
+```ts
+const environment = createEnvironment({ graphqlUrl, records });
+setPrefetchEnvironment(environment); // before the browser router is created
+```
+
+On the server, `prepareRelayData(url, graphqlUrl, options)` matches the URL,
+awaits the matched route's `warm` against a fresh per-request environment and
+returns `{ records }` to embed in the page, or `undefined` (logged) when there
+is nothing to send or the graph failed. `options` carries the site's
+`routes`, `middleware` and `notFound` route, and `headers`.
+
+`headers` is the one per-request seam between a site and its provider: the
+prepare step stamps its server traffic through it, and a request attribute
+such as the reader's locale travels the same way. Do not reach the provider
+through module state instead.
+
 ## Public API
 
 - Facets: `defineFacet`, `collectFacet`, `routeLensFacet`, `collectLenses`,
@@ -56,3 +92,6 @@ your own.
   `FacetBearer`, `LensEntry`, `LensTier`, `CollectedLens`,
   `ShortcutAllocation`.
 - Router: `createStaticRouter`.
+- Relay: `createEnvironment`, `getPrefetchEnvironment`,
+  `setPrefetchEnvironment`, `prefetchQuery`, `prepareRelayData`; types
+  `CreateEnvironmentOptions`, `PrepareRelayDataOptions`, `PreparedRelayData`.
