@@ -47,6 +47,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@canonical/i18n-core": "^0.44.1",
     "@canonical/react-ds-global": "^0.44.1",
     "@canonical/react-hooks": "^0.44.1",
     "@canonical/router-core": "^0.44.1",

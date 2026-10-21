@@ -248,18 +248,29 @@ describe("Chip", () => {
   });
 
   it("rejects an empty uri or label at the content boundary", () => {
-    // Called as plain functions to exercise the asserts without React noise.
-    expect(() =>
-      Chip({ uri: "", label: "Button", kind: "component", prefixes: PREFIXES }),
-    ).toThrow(/"uri" must be a non-empty string/);
-    expect(() =>
-      Chip({
-        uri: "ds:global.component.button",
-        label: "",
-        kind: "component",
-        prefixes: PREFIXES,
-      }),
-    ).toThrow(/"label" must be a non-empty string/);
+    // React reports the render error before rethrowing; keep the output clean.
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    try {
+      expect(() =>
+        render(
+          <Chip uri="" label="Button" kind="component" prefixes={PREFIXES} />,
+        ),
+      ).toThrow(/"uri" must be a non-empty string/);
+      expect(() =>
+        render(
+          <Chip
+            uri="ds:global.component.button"
+            label=""
+            kind="component"
+            prefixes={PREFIXES}
+          />,
+        ),
+      ).toThrow(/"label" must be a non-empty string/);
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 
   it("tints a namespace outside the prefixes with the unknown tint", () => {

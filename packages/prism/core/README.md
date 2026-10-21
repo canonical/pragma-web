@@ -232,12 +232,15 @@ binding can derive names from it. Check the bindings in two places:
 Every string the components show a reader (the skip link, the rail's and
 the theme control's names and options, the chip legend's copy, the lifecycle
 folded into a chip's description) comes from one English catalog,
-`src/lib/i18n/constants.ts`, read through the package's `t(key, values)`.
-The catalog has the flat key-to-message shape, with `{name}` placeholders,
-that `@canonical/i18n-core` catalogs take, and `t` is the one seam a
-locale-aware layer replaces: no component holds a literal. Until then,
-`Rail` and `ThemeSelector` take an `aria-label` that replaces their default
-name.
+`src/lib/i18n/constants.ts`. Each component reads its strings through the
+translator an internal React context holds, whose default is
+`@canonical/i18n-core`'s `createTranslator("en", …)` over that catalog: no
+component holds a literal, and a placeholder with no value stays verbatim
+rather than breaking a render. Because the translator comes from context,
+a request-scoped locale reaches the components by providing that context,
+with no module state and no change to a component; the package does not
+export that provider yet. Until then, `Rail` and `ThemeSelector` take an
+`aria-label` that replaces their default name.
 
 ## Consumer obligations
 

@@ -5,3 +5,9 @@ export type MessageKey = keyof typeof MESSAGES;
 
 /** The values that fill a message's `{name}` placeholders, by name. */
 export type MessageValues = Readonly<Record<string, string>>;
+
+/**
+ * A translator over the package's catalog: a key and its placeholder values
+ * in, the message out.
+ */
+export type Translate = (key: MessageKey, values?: MessageValues) => string;

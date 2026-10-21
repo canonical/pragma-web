@@ -1,7 +1,7 @@
 import type { RouteMap } from "@canonical/router-core";
 import { Link } from "@canonical/router-react";
 import type React from "react";
-import { t } from "../i18n/index.js";
+import { useMessages } from "../i18n/index.js";
 import { useLensShortcuts } from "./hooks/useLensShortcuts.js";
 import type { RailProps } from "./types.js";
 import "./styles.css";
@@ -47,17 +47,18 @@ const Rail = ({
   entries,
   brand,
   children,
-  "aria-label": ariaLabel = t("rail.label"),
+  "aria-label": ariaLabel,
   className,
   ...props
 }: RailProps): React.ReactElement => {
+  const t = useMessages();
   // Widened to `string` keys: an entry names its route with a plain string.
   const byRoute: ReadonlyMap<string, string> = useLensShortcuts().byRoute;
 
   return (
     <nav
       {...props}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? t("rail.label")}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-region="primary-nav"
     >

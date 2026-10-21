@@ -1,7 +1,7 @@
 /**
  * The package's English catalog: every string a reader sees, by message key.
- * A value may hold `{name}` placeholders that `t` fills, the same flat
- * key-to-message shape `@canonical/i18n-core` catalogs take.
+ * A value may hold `{name}` placeholders the translator fills: the flat
+ * key-to-message shape `@canonical/i18n-core`'s `createTranslator` reads.
  */
 export const MESSAGES = {
   "canvasSkipLink.label": "Skip to content",

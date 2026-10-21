@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { t } from "../i18n/index.js";
+import { type Translate, useMessages } from "../i18n/index.js";
 import Chip from "./Chip.js";
 import {
   BOX_ENCODINGS,
@@ -28,11 +28,13 @@ interface LegendEntry {
  * demonstrates exactly one dimension of the grammar. The namespace rows are
  * the site's prefixes; the others are the encoding tables. The switch is
  * exhaustive over {@link Channel}, so adding a channel without legend
- * coverage is a compile error.
+ * coverage is a compile error. Every string is read through `t`, the
+ * translator in the legend's scope.
  */
 function listEntriesForChannel(
   channel: Channel,
   prefixes: readonly string[],
+  t: Translate,
 ): readonly LegendEntry[] {
   const baseline: ChipChannelValues = {
     namespace: prefixes.at(0),
@@ -97,34 +99,37 @@ const ChipLegend = ({
   prefixes,
   className,
   ...props
-}: ChipLegendProps): ReactElement => (
-  <div
-    {...props}
-    className={[componentCssClassName, className].filter(Boolean).join(" ")}
-  >
-    {CHANNEL_DESCRIPTORS.map((channel) => (
-      <section aria-label={t(channel.labelKey)} key={channel.value}>
-        <p className="title">{t(channel.labelKey)}</p>
-        <p className="summary">{t(channel.descriptionKey)}</p>
-        <ul className="entries">
-          {listEntriesForChannel(channel.value, prefixes).map((entry) => (
-            <li key={entry.key}>
-              <Chip
-                box={entry.channels.box}
-                kind={entry.channels.kind}
-                label={entry.label}
-                lifecycle={entry.channels.lifecycle}
-                namespace={entry.channels.namespace}
-                prefixes={prefixes}
-                uri={`legend:${channel.value}.${entry.key}`}
-              />
-              <span className="note">{entry.description}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ))}
-  </div>
-);
+}: ChipLegendProps): ReactElement => {
+  const t = useMessages();
+  return (
+    <div
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
+      {CHANNEL_DESCRIPTORS.map((channel) => (
+        <section aria-label={t(channel.labelKey)} key={channel.value}>
+          <p className="title">{t(channel.labelKey)}</p>
+          <p className="summary">{t(channel.descriptionKey)}</p>
+          <ul className="entries">
+            {listEntriesForChannel(channel.value, prefixes, t).map((entry) => (
+              <li key={entry.key}>
+                <Chip
+                  box={entry.channels.box}
+                  kind={entry.channels.kind}
+                  label={entry.label}
+                  lifecycle={entry.channels.lifecycle}
+                  namespace={entry.channels.namespace}
+                  prefixes={prefixes}
+                  uri={`legend:${channel.value}.${entry.key}`}
+                />
+                <span className="note">{entry.description}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+};
 
 export default ChipLegend;

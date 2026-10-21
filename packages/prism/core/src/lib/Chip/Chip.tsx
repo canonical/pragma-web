@@ -1,5 +1,5 @@
 import type { CSSProperties, MouseEvent, ReactElement } from "react";
-import { t } from "../i18n/index.js";
+import { useMessages } from "../i18n/index.js";
 import { DEFAULT_BOX, DEFAULT_LIFECYCLE } from "./constants.js";
 import {
   assertNonEmptyString,
@@ -33,6 +33,7 @@ const componentCssClassName = "ds chip";
  * `import { Chip } from "@canonical/prism-core";`
  */
 const Chip = (props: ChipProps): ReactElement => {
+  const t = useMessages();
   const {
     uri,
     label,

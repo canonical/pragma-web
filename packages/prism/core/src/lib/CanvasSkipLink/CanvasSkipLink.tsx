@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { CANVAS_ELEMENT_ID } from "../Canvas/index.js";
-import { t } from "../i18n/index.js";
+import { useMessages } from "../i18n/index.js";
 import type { CanvasSkipLinkProps } from "./types.js";
 import "./styles.css";
 
@@ -17,6 +17,7 @@ export default function CanvasSkipLink({
   className,
   ...props
 }: CanvasSkipLinkProps): ReactElement {
+  const t = useMessages();
   return (
     <a
       {...props}

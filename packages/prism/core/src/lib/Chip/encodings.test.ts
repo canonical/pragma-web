@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { t } from "../i18n/index.js";
+import { MESSAGES } from "../i18n/index.js";
 import {
   BOXES,
   CHANNEL_DESCRIPTORS,
@@ -23,8 +23,8 @@ describe("chip encodings", () => {
     for (const kind of KINDS) {
       const row = getKindEncoding(kind);
       expect(row.value).toBe(kind);
-      expect(t(row.labelKey)).not.toBe("");
-      expect(t(row.shapeKey)).not.toBe("");
+      expect(MESSAGES[row.labelKey]).not.toBe("");
+      expect(MESSAGES[row.shapeKey]).not.toBe("");
     }
   });
 
@@ -32,7 +32,7 @@ describe("chip encodings", () => {
     for (const box of BOXES) {
       const row = getBoxEncoding(box);
       expect(row.value).toBe(box);
-      expect(t(row.labelKey)).not.toBe("");
+      expect(MESSAGES[row.labelKey]).not.toBe("");
     }
   });
 
@@ -40,7 +40,7 @@ describe("chip encodings", () => {
     for (const lifecycle of LIFECYCLES) {
       const row = getLifecycleEncoding(lifecycle);
       expect(row.value).toBe(lifecycle);
-      expect(t(row.labelKey)).not.toBe("");
+      expect(MESSAGES[row.labelKey]).not.toBe("");
     }
   });
 
