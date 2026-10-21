@@ -19,6 +19,7 @@ import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createStaticRouter } from "#lib/router";
+import createFetchSpy from "../../testing/createFetchSpy.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
 // Definitions block: the captured explorer records, plus the jsdom shims
@@ -45,11 +46,6 @@ import { hydrateApp } from "./hydrateApp.js";
 
 /** The URL the server renders and the client hydrates at. */
 const PLAYGROUND_URL = "/playground";
-
-/** A fetch spy that never settles: any call means "the network was hit". */
-const createFetchSpy = () =>
-  vi.fn(() => new Promise<never>(() => {})) as ReturnType<typeof vi.fn> &
-    FetchFunction;
 
 /**
  * The seeded pages the seam must hydrate silently. The data-bearing
