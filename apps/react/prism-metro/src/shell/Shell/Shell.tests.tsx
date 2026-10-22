@@ -1,8 +1,5 @@
 import { createEnvironment, useHome } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  useProjectionMaps,
-} from "@canonical/prism-projections";
+import { useProjectionMaps } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import {
   createMemoryAdapter,
@@ -13,6 +10,7 @@ import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { useRelayEnvironment } from "react-relay";
 import { describe, expect, it } from "vitest";
+import { metroProjectionMaps } from "#projections";
 import {
   CIRCLE_LINE_CURIE,
   NORTHGATE_CURIE,
@@ -44,7 +42,7 @@ function Probe(): ReactElement {
       <p>Station home: {stationHome}</p>
       <p>Line home: {lineHome}</p>
       <p>Class home: {classHome}</p>
-      <p>{maps === defaultProjectionMaps ? "Default maps" : "Other maps"}</p>
+      <p>{maps === metroProjectionMaps ? "Metro maps" : "Other maps"}</p>
     </section>
   );
 }
@@ -96,9 +94,9 @@ describe("Shell", () => {
     ).toBeInTheDocument();
   });
 
-  it("provides the default projection maps", async () => {
+  it("provides the site's projection maps", async () => {
     renderShell();
-    expect(await screen.findByText("Default maps")).toBeInTheDocument();
+    expect(await screen.findByText("Metro maps")).toBeInTheDocument();
   });
 
   it("composes the page's title with the document title template", async () => {

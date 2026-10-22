@@ -1,0 +1,21 @@
+/*
+ * LineRow — a line's row: the Node arm's row with room around it and a
+ * rule below it, so each line of the network reads as its own entry.
+ *
+ * Each design decision reads a component token bound to a semantic token,
+ * so the site retunes the row through either tier.
+ */
+
+@layer app {
+  :root {
+    --line-row-padding-block: var(--space-100, 0.5rem);
+    --line-row-border-width: var(--dimension-stroke-thickness-medium, 1px);
+    --line-row-color-border: var(--color-border-muted, currentColor);
+  }
+
+  .ds.line-row {
+    padding-block: var(--line-row-padding-block);
+    border-block-end: var(--line-row-border-width) solid
+      var(--line-row-color-border);
+  }
+}

@@ -1,14 +1,12 @@
 import { HomesProvider } from "@canonical/prism-core";
-import {
-  defaultProjectionMaps,
-  ProjectionsProvider,
-} from "@canonical/prism-projections";
+import { ProjectionsProvider } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { MESSAGES } from "#i18n";
+import { metroProjectionMaps } from "#projections";
 import formatDocumentTitle from "../../formatDocumentTitle.js";
 import { homes } from "../../homes.js";
 import type { ShellProps } from "./types.js";
@@ -16,9 +14,9 @@ import type { ShellProps } from "./types.js";
 /**
  * The application's provider nest: every context a route's content reads,
  * wrapped around the router's `Outlet`, with the document-title template.
- * Inside the router sit the site's homes and the default projection maps, so
- * every mention of a graph node renders through its `Node` arm and links to
- * the page that owns it. The client entry and the server entry both render it,
+ * Inside the router sit the site's homes and its projection maps, so every
+ * mention of a graph node renders through its type's arm and links to the
+ * page that owns it. The client entry and the server entry both render it,
  * so the hydrated tree and the server markup share one nest. Each lens's
  * layout renders below it, through the `Outlet`.
  *
@@ -40,7 +38,7 @@ export default function Shell<
       <RelayEnvironmentProvider environment={environment}>
         <RouterProvider router={router}>
           <HomesProvider homes={homes}>
-            <ProjectionsProvider maps={defaultProjectionMaps}>
+            <ProjectionsProvider maps={metroProjectionMaps}>
               <Outlet fallback={<p>{MESSAGES["shell.loading"]}</p>} />
             </ProjectionsProvider>
           </HomesProvider>
