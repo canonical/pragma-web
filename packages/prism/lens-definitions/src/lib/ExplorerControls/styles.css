@@ -1,8 +1,11 @@
 /*
  * ExplorerControls — the Definitions strip's chip toolbar
  * (slot.explorer-controls). It lives INSIDE the strip band, whose height is
- * stationary frame: nothing here may change it, or the canvas would jump on
- * a lens switch. Hence the small fixed metrics and `min-inline-size: 0`.
+ * stationary frame: nothing here may change it on interaction, or the
+ * canvas would jump. Hence the small fixed metrics. Where the strip is
+ * narrower than the chips, the groups and their chips wrap onto further
+ * lines rather than scroll or shrink: every chip stays whole, readable and
+ * reachable, and the strip is as tall at a given width whatever is pressed.
  *
  * Each design decision reads a component token. The colours, spacing and
  * motion read the design system's semantic tokens. The design system has no
@@ -48,10 +51,10 @@
 
   .ds.explorer-controls {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--explorer-controls-gap);
     min-inline-size: 0;
-    overflow-x: auto;
   }
 
   /* A fieldset per axis: the semantic grouping element, so each axis's chips
@@ -59,6 +62,7 @@
    * cleared: the grouping is for assistive tech, not a visible box. */
   .ds.explorer-controls .chip-group {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--explorer-controls-group-gap);
     margin: 0;
@@ -85,6 +89,7 @@
     font-size: var(--explorer-controls-chip-font-size);
     line-height: var(--explorer-controls-chip-line-height);
     white-space: nowrap;
+    flex-shrink: 0;
     cursor: pointer;
     transition:
       color var(--explorer-controls-transition-duration) ease,
