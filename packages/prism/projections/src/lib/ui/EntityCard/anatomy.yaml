@@ -23,7 +23,9 @@
 # The sidecar carries a rendered example of the entity beside the body: the
 # entity type decides whether it has one (UI blocks), and its consumer fills
 # it. It comes first in the DOM so the body's sections keep the Card's
-# dividers, and it is placed after them.
+# dividers, and it is placed after them, on the content and footer tracks
+# only, so a tall example grows the card's body and footer and never the
+# empty image and header tracks above the title.
 #
 # With-sidecar reflow, bound in styles.css under
 # `.ds.entity-card:has(> .sidecar)` (the DSL's states re-value channels and
@@ -31,7 +33,7 @@
 # into a column subgrid as wide as its own span plus the sidecar's two
 # columns, its gap the grid's gutter; the body and the footer keep the card's
 # own span (`1 / span var(--entity-card-body-span)`); the sidecar takes the
-# last two columns of every row track.
+# last two columns of the content and footer tracks.
 #
 # Every decision is read through a component token declared on the root
 # (`--entity-card-*`), bound to the symbol or the literal named here.
@@ -61,7 +63,7 @@ node:
         role: sidecar
         styles:
           layout.grid.column: "span var(--entity-card-sidecar-span) / -1"
-          layout.grid.row: "1 / -1"
+          layout.grid.row: "3 / -1"
           size.min.width: 0
           spacing.internal.block.start: component.padding.block
           spacing.internal.block.end: component.padding.block

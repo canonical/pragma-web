@@ -55,10 +55,11 @@
     grid-column: 1 / span var(--entity-card-body-span);
   }
 
-  /* Beside the body, over every row track the card spans. */
+  /* Beside the body and the footer, on their two tracks only: a tall
+   * example grows them, never the empty tracks above the title. */
   .ds.entity-card > .sidecar {
     grid-column: span var(--entity-card-sidecar-span) / -1;
-    grid-row: 1 / -1;
+    grid-row: 3 / -1;
     min-width: 0;
     padding-block: var(--entity-card-sidecar-padding-block);
     padding-inline: var(--entity-card-sidecar-padding-inline);

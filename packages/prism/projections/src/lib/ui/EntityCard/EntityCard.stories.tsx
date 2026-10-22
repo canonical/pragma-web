@@ -50,6 +50,26 @@ const BUTTON_EXAMPLE = (
   </>
 );
 
+/** A sidecar example taller than the card's body: one button per variant. */
+const TALL_EXAMPLE = (
+  <>
+    {[
+      "Submit",
+      "Save draft",
+      "Preview",
+      "Publish",
+      "Schedule",
+      "Archive",
+      "Duplicate",
+      "Delete",
+    ].map((label) => (
+      <p key={label}>
+        <Button type="button">{label}</Button>
+      </p>
+    ))}
+  </>
+);
+
 const meta: Meta<typeof Component> = {
   title: "Components/EntityCard",
   component: Component,
@@ -70,6 +90,14 @@ export const UIBlock: Story = { args: toCardArgs(UI_BLOCK_ENTITY) };
 /** A UI block with its sidecar: the rendered example beside the body. */
 export const UIBlockWithSidecar: Story = {
   args: { ...toCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },
+};
+
+/**
+ * A UI block whose example is taller than its body: the card grows its body
+ * and footer to hold it, and the title stays at the top.
+ */
+export const UIBlockWithTallSidecar: Story = {
+  args: { ...toCardArgs(UI_BLOCK_ENTITY), sidecar: TALL_EXAMPLE },
 };
 
 /** A modifier, with its class and family. */
