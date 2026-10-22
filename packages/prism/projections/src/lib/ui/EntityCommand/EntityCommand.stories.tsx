@@ -51,6 +51,15 @@ export const ModifierFamily: Story = {
 /** A code standard, its long name truncating on the first line. */
 export const Standard: Story = { args: toCommandArgs(STANDARD_ENTITY) };
 
+/**
+ * The result the keyboard selection rests on, highlighted as a hovered one
+ * is. The palette gives each row its option role; on this bare list item
+ * the attribute is styled but not yet announced.
+ */
+export const Selected: Story = {
+  args: { ...toCommandArgs(UI_BLOCK_ENTITY), "aria-selected": true },
+};
+
 /** The five types as one list of results, each 56px. */
 export const List: Story = {
   render: () => (

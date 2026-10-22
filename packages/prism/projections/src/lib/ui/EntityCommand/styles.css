@@ -14,6 +14,7 @@
     /* The matrix's 24px line, which every representation shares. */
     --entity-command-line-height: var(--space-300);
     --entity-command-hover-background: var(--color-foreground-ghost-hover);
+    --entity-command-selected-background: var(--color-foreground-ghost-hover);
     --entity-command-title-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
@@ -40,6 +41,11 @@
 
   .ds.entity-command:hover {
     background: var(--entity-command-hover-background);
+  }
+
+  /* The result the keyboard selection rests on reads as a hovered one. */
+  .ds.entity-command[aria-selected="true"] {
+    background: var(--entity-command-selected-background);
   }
 
   .ds.entity-command .identity {
