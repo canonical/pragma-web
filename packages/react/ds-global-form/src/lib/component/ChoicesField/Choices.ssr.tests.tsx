@@ -27,4 +27,22 @@ describe("Choices (SSR)", () => {
     );
     expect(html).toContain('type="checkbox"');
   });
+
+  it("renders descriptions and dividers to static HTML", () => {
+    const html = renderToString(
+      <Choices
+        name="color"
+        options={[
+          { label: "Red", value: "red", description: "A warm colour" },
+          { label: "Blue", value: "blue" },
+        ]}
+        layout="stacked"
+        withDividers
+      />,
+    );
+    expect(html).toContain("ds option-description");
+    expect(html).toContain("A warm colour");
+    expect(html).toContain("<hr");
+    expect(html).toContain("ds choices-divider");
+  });
 });
