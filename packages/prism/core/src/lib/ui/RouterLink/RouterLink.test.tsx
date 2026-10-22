@@ -4,6 +4,7 @@ import {
   createMemoryAdapter,
   createRouter,
   route,
+  type StandardSchemaV1,
 } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -13,11 +14,27 @@ import RouterLink from "./RouterLink.js";
 
 const warmThing = vi.fn(async () => {});
 
+/**
+ * A search schema that declares one query value, `tab`, and drops any
+ * other key.
+ */
+const thingSearch: StandardSchemaV1<{ tab?: string }> = {
+  "~standard": {
+    version: 1,
+    vendor: "router-link-test",
+    validate: (value) => {
+      const { tab } = value as { readonly tab?: string };
+      return { value: tab === undefined ? {} : { tab } };
+    },
+  },
+};
+
 /** A route table with one entity page, which names the entity it shows. */
 const routes = {
   home: route({ url: "/", content: () => <p>Home page</p> }),
   thing: route({
     url: "/things/:uri",
+    search: thingSearch,
     warm: warmThing,
     content: ({ params }: { readonly params: { readonly uri: string } }) => (
       <p>Thing {params.uri}</p>
@@ -25,18 +42,17 @@ const routes = {
   }),
 };
 
-/** Render `link` beside the routed content, under a router at `/`. */
+/** Create a router over the test routes, starting at `/`. */
+const createTestRouter = (notFound?: ReturnType<typeof route>) =>
+  createRouter(routes, { adapter: createMemoryAdapter("/"), notFound });
+
+/** Render `link` beside the routed content, under `router`. */
 const renderWithRouter = async (
   link: ReactElement,
-  notFound?: ReturnType<typeof route>,
+  router: ReturnType<typeof createTestRouter> = createTestRouter(),
 ): Promise<HTMLElement> => {
   render(
-    <RouterProvider
-      router={createRouter(routes, {
-        adapter: createMemoryAdapter("/"),
-        notFound,
-      })}
-    >
+    <RouterProvider router={router}>
       {link}
       <Outlet />
     </RouterProvider>,
@@ -88,9 +104,7 @@ describe("RouterLink", () => {
 
     it("renders an anchor without an href when it is given none", async () => {
       render(
-        <RouterProvider
-          router={createRouter(routes, { adapter: createMemoryAdapter("/") })}
-        >
+        <RouterProvider router={createTestRouter()}>
           <RouterLink>Nowhere</RouterLink>
         </RouterProvider>,
       );
@@ -109,6 +123,22 @@ describe("RouterLink", () => {
       // prevented and the matched page rendered in place.
       expect(fireEvent.click(link)).toBe(false);
       expect(await screen.findByText("Thing ds:Button")).toBeInTheDocument();
+    });
+
+    it("keeps the href's hash and declared query on the client", async () => {
+      const router = createTestRouter();
+      const link = await renderWithRouter(
+        <RouterLink href="/things/ds%3AButton?tab=usage#props">
+          Button
+        </RouterLink>,
+        router,
+      );
+      expect(fireEvent.click(link)).toBe(false);
+      expect(await screen.findByText("Thing ds:Button")).toBeInTheDocument();
+      const { location } = router.getState();
+      expect(location.pathname).toBe("/things/ds%3AButton");
+      expect(location.searchParams.get("tab")).toBe("usage");
+      expect(location.hash).toBe("#props");
     });
 
     it("navigates on the client when the target is the link's own frame", async () => {
@@ -233,7 +263,7 @@ describe("RouterLink", () => {
     it("leaves an href only the not-found route matches to the browser", async () => {
       const link = await renderWithRouter(
         <RouterLink href="/elsewhere/a/b">Elsewhere</RouterLink>,
-        route({ url: "/not-found", content: () => null }),
+        createTestRouter(route({ url: "/not-found", content: () => null })),
       );
       expect(fireEvent.click(link)).toBe(true);
     });
