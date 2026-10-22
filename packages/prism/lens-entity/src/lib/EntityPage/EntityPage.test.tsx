@@ -1,7 +1,7 @@
 import { createEnvironment } from "@canonical/prism-core";
 import { render, screen, within } from "@testing-library/react";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import createEntitySite from "../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import createRecordedFetch from "../../../testing/createRecordedFetch.js";
@@ -233,6 +233,51 @@ describe("EntityPage", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(
       `Nothing in the graph answers to ${NORTHGATE_CURIE}.`,
     );
+  });
+
+  it("clears its error when the reader moves to another address", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const url = stationUrl(NORTHGATE_CURIE);
+    const { environment, fetchFn } = await createWarmEnvironment(url);
+    // The graph goes down after the warm: the store still holds Northgate,
+    // and any address it does not hold fails.
+    fetchFn.mockRejectedValue(new Error("graph down"));
+    // React logs the error the boundary catches; keep the run's output clean.
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const renderPage = (address: string) =>
+      createEntitySite({
+        url,
+        environment,
+        children: (
+          <EntityPage
+            binding={{
+              id: "stations",
+              classUri: "metro:Station",
+              typename: "Station",
+            }}
+            label="Stations"
+            uri={address}
+          />
+        ),
+      });
+
+    try {
+      const { rerender } = render(renderPage(HARBOURSIDE_CURIE));
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        MESSAGES["page.error"],
+      );
+
+      rerender(renderPage(NORTHGATE_CURIE));
+      expect(
+        await screen.findByRole("heading", { level: 1, name: "Northgate" }),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("alert")).toBeNull();
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 
   it("shows its loading state over a cold store", () => {

@@ -102,6 +102,11 @@ const componentCssClassName = "ds definitions-explorer";
  * algorithm, two readers, zero query change.
  *
  * `import { DefinitionsExplorer } from "../DefinitionsExplorer/index.js";`
+ *
+ * @note Impure: fetches the page's operation through `useLazyLoadQuery`,
+ *   suspending while the Relay store does not hold it, reads the well's
+ *   fragment from that store, and reads and writes the shared lens filter
+ *   through its context.
  */
 export default function DefinitionsExplorer({
   className,

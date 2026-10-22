@@ -9,6 +9,10 @@ import useStripQuery from "../../hooks/useStripQuery.js";
  * a display name the graph does not have.
  *
  * `import { Controls } from "./common/Controls/index.js";`
+ *
+ * @note Impure: reads the Relay store, the router and the filter context
+ *   through `useStripQuery`, and suspends while the store does not hold the
+ *   operation.
  */
 export default function Controls(): ReactElement {
   const { filter, prefixes, setFilter } = useStripQuery();

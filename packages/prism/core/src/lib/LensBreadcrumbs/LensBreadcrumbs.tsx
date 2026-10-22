@@ -6,6 +6,7 @@ import {
 import type { RouteMap } from "@canonical/router-core";
 import { Link, useRouter } from "@canonical/router-react";
 import type React from "react";
+import { useMemo } from "react";
 import type { LensBreadcrumbsProps } from "./types.js";
 import "./styles.css";
 
@@ -67,6 +68,12 @@ export default function LensBreadcrumbs({
   ...props
 }: LensBreadcrumbsProps): React.ReactElement {
   const router = useRouter<RouteMap>();
+  // One adapter per route name: a new function each render would be a new
+  // component type, and React would remount the crumb's anchor every time.
+  const LinkComponent = useMemo(
+    () => createLensLinkComponent(lensRouteName),
+    [lensRouteName],
+  );
   const items: BreadcrumbItem[] =
     current === undefined
       ? [{ key: lensRouteName, label: lensLabel, current: true }]
@@ -84,7 +91,7 @@ export default function LensBreadcrumbs({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       items={items}
-      LinkComponent={createLensLinkComponent(lensRouteName)}
+      LinkComponent={LinkComponent}
     />
   );
 }

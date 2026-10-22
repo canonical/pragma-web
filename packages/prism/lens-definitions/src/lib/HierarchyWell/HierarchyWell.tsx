@@ -337,6 +337,11 @@ const listIdentityProps = ({
  * rail hover MUST carry to the graph, and the native props of its root).
  * `onHoverTerm` is a stable callback the explorer memoises; comparing it
  * would defeat the memo on every render.
+ *
+ * @note Impure: reads the ontologies from the Relay store through
+ *   `useFragment`, which subscribes to their updates, and attaches a
+ *   non-passive `wheel` listener to the canvas in an effect, removed on
+ *   unmount, because zooming must cancel the page scroll.
  */
 export default memo(HierarchyWell, (previous, next) => {
   const previousProps = listIdentityProps(previous);

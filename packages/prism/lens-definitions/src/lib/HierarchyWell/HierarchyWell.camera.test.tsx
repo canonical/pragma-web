@@ -41,10 +41,11 @@ const readCamera = (camera: HTMLElement) => {
   const match = camera.style.transform.match(
     /translate\(([-\d.]+)px, ([-\d.]+)px\) scale\(([-\d.e]+)\)/,
   );
-  if (match === null) {
+  const [x, y, k] = [match?.at(1), match?.at(2), match?.at(3)];
+  if (x === undefined || y === undefined || k === undefined) {
     throw new Error(`unexpected transform "${camera.style.transform}"`);
   }
-  return { x: Number(match[1]), y: Number(match[2]), k: Number(match[3]) };
+  return { x: Number(x), y: Number(y), k: Number(k) };
 };
 
 describe("HierarchyWell camera", () => {

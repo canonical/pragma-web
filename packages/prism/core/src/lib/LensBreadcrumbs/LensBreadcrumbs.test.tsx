@@ -95,6 +95,33 @@ describe("LensBreadcrumbs", () => {
     );
   });
 
+  it("keeps the lens crumb's anchor across a re-render", () => {
+    const router = createRouter(bareRoutes, {
+      adapter: createMemoryAdapter("/components"),
+    });
+    const { rerender } = render(
+      <RouterProvider router={router}>
+        <LensBreadcrumbs
+          current="a"
+          lensLabel="Components"
+          lensRouteName="components"
+        />
+      </RouterProvider>,
+    );
+    const before = screen.getByRole("link", { name: "Components" });
+    rerender(
+      <RouterProvider router={router}>
+        <LensBreadcrumbs
+          current="b"
+          lensLabel="Components"
+          lensRouteName="components"
+        />
+      </RouterProvider>,
+    );
+    expect(screen.getByText("b")).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Components" })).toBe(before);
+  });
+
   it("applies the component class alongside the DS breadcrumbs class", () => {
     render(
       wrapInRouterAt(

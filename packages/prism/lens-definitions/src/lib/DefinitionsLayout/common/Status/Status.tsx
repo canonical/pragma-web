@@ -10,6 +10,10 @@ import useStripQuery from "../../hooks/useStripQuery.js";
  * resolved filter, so the figure and the graph cannot disagree.
  *
  * `import { Status } from "./common/Status/index.js";`
+ *
+ * @note Impure: reads the Relay store, the router and the filter context
+ *   through `useStripQuery`, and suspends while the store does not hold the
+ *   operation.
  */
 export default function Status(): ReactElement {
   const { filter, ontologies } = useStripQuery();

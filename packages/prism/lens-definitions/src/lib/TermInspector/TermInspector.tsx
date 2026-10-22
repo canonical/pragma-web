@@ -114,6 +114,9 @@ const componentCssClassName = "ds term-inspector";
  * and the announcement is the inspector's, not the whole canvas's.
  *
  * `import { TermInspector } from "./TermInspector/index.js";`
+ *
+ * @note Impure: reads the selected class or property from the Relay store
+ *   through `useFragment`, which subscribes to its updates.
  */
 export default function TermInspector({
   className,
