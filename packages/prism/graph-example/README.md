@@ -65,9 +65,11 @@ const sdl = readContractSdl() + readExtensionSdl();   // src/lib/provider/provid
 ```
 
 `schema/extension.graphql` adds the `Node` implementers `Line`, `Station`,
-`Interchange` and `Zone`, the `Stop` interface over the two station types, and four
-value types with no IRI of their own: the embeddable `GeoPoint`, and `Route`, `Call` and
-`DiagramPoint`, which carry the network model (see below). `findBreakingChanges(contractOnly, extended)` returns zero, and
+`Interchange` and `Zone` for the network and `RollingStock`, `Formation`, `Unit` and
+`CarType` for its fleet, the `Stop` interface over the two station types, and six value
+types with no IRI of their own: the embeddable `GeoPoint`; `Route`, `Call` and
+`DiagramPoint`, which carry the network model; and `UnitPosition` and `CarPosition`,
+which carry the fleet model (see both below). `findBreakingChanges(contractOnly, extended)` returns zero, and
 `satisfiesContract(readProviderSdl())` returns **zero violations**.
 
 **Note what the extension does *not* contain: `extend type Query`.** Every type this
@@ -102,7 +104,10 @@ and a data file" literally true.
 | `metro:name` (DATATYPE, no domain), `metro:servesLine` (OBJECT, with `inverse`), `metro:note` (ANNOTATION) | all three `PropertyKind` values, `functional`, `inverse`, nullable `domain` |
 | 23 stations + 4 interchanges + 2 fare zones, 7 lines | `instances(first/after/last/before)` with real `hasNextPage` |
 | four line topologies: linear lines (North, Coastal), a loop run both ways (Circle), two linear lines closing a ring between shared termini (Upland, Lowland), a ring run by two lines in opposite directions (Ringway Clockwise, Ringway Anticlockwise) | the network model a map or a line strip needs — see the network section |
-| `metro:Route`, `metro:Call`, `metro:DiagramPoint`, value classes with no instances | `_meta` on a value type: `type` resolved, `curie` the typename, `title` the label or the typename |
+| `metro:Route`, `metro:Call`, `metro:DiagramPoint`, `metro:UnitPosition`, `metro:CarPosition`, value classes with no instances | `_meta` on a value type: `type` resolved, `curie` the typename, `title` the label or the typename |
+| `metro:RollingStock`, `metro:Formation`, `metro:Unit`, `metro:CarType`, further root classes: 3 stocks, 4 formations, 3 units and 7 car types | Nodes beyond the network, reached through `node(id:)` and `OntologyClass.instances` alone |
+| six formation cases: a fixed formation (Series 70), one unit run alone or coupled (Series 90 three-car and six-car), an asymmetric unit reversed in its formation (Series 50 four-car), one stock in different lengths per line (Series 90 on the North and Upland lines), a formation longer than a platform (the six-car at Marsh End), a line run by two stocks (Coastal) | the fleet model a formation diagram needs — see the fleet section |
+| `metro:code`, `metro:position`, `metro:formations`, `metro:length`, `metro:capacity`, `metro:reversed`, global properties two types answer to | a property's local name is the field it projects, so a field two types share is one property with no `domain` |
 | `metro:reverse`, declared its own `inverse` | a symmetric property: `OntologyProperty.inverse` pointing at itself |
 | `metro:ghost` — **no descriptive predicates at all** | the local-name tier of `_meta.title` |
 | `https://metro.example/onto#` — **IRI with an empty local name** | the whole-IRI tier of `_meta.title` |
@@ -155,6 +160,50 @@ dataset file.
 
 ---
 
+## The fleet: stock, formations, units and cars
+
+The lines are run by a fleet, modelled closely enough to draw each train to scale from
+GraphQL alone. Like the network, it is a provider extension: the contract is unchanged,
+and `RollingStock`, `Formation`, `Unit` and `CarType` are Nodes reached through
+`node(id:)` and `OntologyClass.instances`.
+
+- **A formation is an ordered list of units, each possibly reversed; a unit is a set of
+  cars permanently coupled in order.** `Formation.units` lists `UnitPosition`s and
+  `Unit.cars` lists `CarPosition`s, value types with no IRI of their own.
+- **Lengths are whole millimetres, measured over couplers**, so they add up without
+  gaps. **`capacity` is passengers seated plus standing.**
+- **Only car types store measures.** `Unit.length` and `capacity` are the sums of its
+  cars' car types, and `Formation.length` and `capacity` the sums of its units; the
+  provider computes both and the dataset states neither.
+- **Positions count from 1 with no gaps**, from the formation's or the unit's front.
+- **`UnitPosition.reversed`** means the unit runs last car first. **`CarPosition.reversed`**
+  means the car's leading end faces the rear of its unit. **`CarType.hasCab`** means a
+  driving cab at the car's leading end. A car's orientation in the train is its own
+  `reversed` XOR its unit's, which is what a drawing needs to put cab ends right: the
+  Series 50 unit has one cab, and two of them back to back, the second reversed, make a
+  train with a cab at each end and none inside.
+- **`RollingStock.formations`** holds the stock's alternatives in authored order,
+  shortest first. **`Line.formations`** lists the formations a line is run with, and a
+  line may be run by more than one stock. **`Formation.stock`** is the stock that lists
+  the formation and **`Formation.lines`** the lines whose formations list it, in IRI
+  order; both are read as inverses, never stored. A formation no stock lists fails its
+  non-null `stock` rather than being handed an invented one.
+- **`Stop.platformLength`** is the usable length of the station's shortest platform, in
+  the same millimetres, so it compares with a formation's length directly. It is null
+  for a station no route calls at. One formation overhangs one platform: the Series 90
+  six-car at Marsh End on the North Line.
+- **Shared fields are shared properties.** A property's local name is the field it
+  projects, so `metro:code` (a line's and a car type's), `metro:position` (a call's and
+  a car's or unit's place), `metro:formations` (a line's and a stock's), and
+  `metro:length`, `metro:capacity` and `metro:reversed` are global properties with no
+  `domain`.
+
+`fleetMembership.test.ts` checks every computed measure and inverse against what it is
+computed from, and `fleetFormations.test.ts` reads each formation case off the record
+that exhibits it, both through GraphQL.
+
+---
+
 ## `_meta.title` by hand — the verdict
 
 `title(lang: String = "en"): String!` is **non-null**, so every provider owes a total
@@ -203,14 +252,15 @@ it is a *consequence*, and it should be stated rather than discovered. Measured 
 | TBox views and traversal (`ancestorsOf`, `fieldsOf`, `propertyView`, `classPropertyView`, `classView`, `nullableClassView`, `superclassOf`) | **95** |
 | the `_meta` wrapper itself (`metaView`) | **20** |
 | **total attributable to the non-null TBox** | **115** |
-| everything else in the function body (entities, routes, calls, diagram points, connections, ontologies, root fields) | 206 |
+| everything else in the function body (entities, routes, calls, diagram points, the fleet, connections, ontologies, root fields) | 346 |
 
 Each region counts the code lines from a declaration to the next one in the function
-body, with the filter given under Size below. More than a third of the function body
-(115 of 321 lines) is TBox machinery that exists only because those two fields are
-non-null. A `type: OntologyClass` (nullable) and
-`fields: [ClassProperty!]` (nullable) would let a flat-record provider conform with
-roughly a third less code.
+body, with the filter given under Size below. A quarter of the function body (115 of 461
+lines) is TBox machinery that exists only because those two fields are non-null, and
+most of the rest serves this provider's own network and fleet models: of the 252 body
+lines that serve the contract alone, the TBox is nearly half. A `type: OntologyClass`
+(nullable) and `fields: [ClassProperty!]` (nullable) would let a flat-record provider
+conform with far less code.
 
 One side effect worth naming: because `OntologyClass` itself implements `Node`, a class
 needs a class. This dataset declares `rdfs:Class` for that, which is an instance of
@@ -310,21 +360,23 @@ wc -l src/lib/provider/createExampleProvider.ts   # with docs
 
 | Module set | Code | With docs |
 | --- | --- | --- |
-| `createExampleProvider.ts` | 374 | 573 |
+| `createExampleProvider.ts` | 536 | 798 |
 | `connection.ts` (Relay paging) | 58 | 126 |
 | `providerSdl.ts` (SDL loading) | 33 | 79 |
 | `descriptive.ts` (**the whole `_meta.title` chain**) | **28** | 64 |
-| barrels (the four `index.ts`) | 16 | 53 |
-| **provider runtime total** | **509** | **895** |
-| `dataset.ts` (the data file — inert records) | 888 | 984 |
-| `types.ts` + `constants.ts` (declarations only) | 90 | 204 |
+| `sumMeasures.ts` + `isNetworkEntity.ts` (fleet helpers) | 16 | 28 |
+| barrels (the four `index.ts`) | 18 | 55 |
+| **provider runtime total** | **689** | **1150** |
+| `dataset.ts` (the data file — inert records) | 1298 | 1425 |
+| `types.ts` + `constants.ts` (declarations only) | 139 | 308 |
 | HTTP server (`createExampleHandler` + GraphiQL) | 95 | 161 |
-| `schema/extension.graphql` | 67 | 191 |
-| tests + test infrastructure (every `*.test.ts` and `src/testing/*.ts`) | 2959 | 3842 |
+| `schema/extension.graphql` | 116 | 321 |
+| tests + test infrastructure (every `*.test.ts` and `src/testing/*.ts`) | 4103 | 5226 |
 
-**509 code lines against a 150–200 target — roughly 2.5×.** 69 of them serve this
-provider's own network model (routes, calls and diagram points) rather than the contract;
-without it the provider is 440 lines, roughly 2.2×.
+**689 code lines against a 150–200 target — roughly 3.4×.** 249 of them serve this
+provider's own models rather than the contract: 69 the network (routes, calls and
+diagram points) and 180 the fleet (stocks, formations, units, car types and platform
+lengths). Without them the provider is 440 lines, roughly 2.2×.
 Where it goes, and which parts are anybody's fault:
 
 1. **The contract declares 54 fields** across `Node`, `EntityMeta`, `PageInfo`,
@@ -336,7 +388,7 @@ Where it goes, and which parts are anybody's fault:
    to the original estimate, and it means the target should be restated as a function of
    the contract's size rather than as a constant.
 2. **The mandatory TBox (Finding B) is 115 of those lines** — 95 of TBox views and
-   traversal plus the 20-line `_meta` wrapper, out of a 321-line function body. This is
+   traversal plus the 20-line `_meta` wrapper, out of a 461-line function body. This is
    the one number that is genuinely evidence *about the converged base*, and the only one
    a contract change could meaningfully reduce.
 3. **Relay paging is 58 lines and is not the base's fault.** `first/after/last/before` on
