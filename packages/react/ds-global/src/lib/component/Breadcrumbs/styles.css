@@ -14,6 +14,16 @@
    * (the typography-text-primary tier, per the Figma spec).
    */
   .ds.breadcrumbs {
+    /* Component tokens — pure aliases to semantic tokens, component-scoped
+       per cs:styling.tokens.scoping. Defined on the component root so both
+       the list and the items resolve them. */
+    --breadcrumbs-item-link-color: var(--color-text-link);
+    --breadcrumbs-item-current-color: var(--color-text);
+    --breadcrumbs-item-disabled-color: var(--color-text-disabled);
+    --breadcrumbs-item-separator-color: var(--color-text);
+    --breadcrumbs-item-separator-margin: var(--dimension-100);
+    --breadcrumbs-item-focus-color: var(--color-text-link);
+
     & > .list {
       /* layout.type: flow, layout.direction: horizontal */
       display: flex;
@@ -22,6 +32,11 @@
 
       /* Guidelines: 4px vertical distance between wrapped rows */
       row-gap: var(--dimension-050);
+
+      /* Distance between an item and the next item's separator. The
+         separator itself carries no start margin, so a separator that
+         opens a wrapped row aligns flush with the container edge. */
+      column-gap: var(--breadcrumbs-item-separator-margin);
 
       /* layout.align: center */
       align-items: center;

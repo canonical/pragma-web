@@ -212,12 +212,15 @@
     block-size: auto;
     min-block-size: 0;
     padding-block-end: var(--seat-after);
-    /* Stretch (not the box rule's flex-start): a prefix/suffix — the password's
-       reveal-toggle, the number's unit affix — spans the leaf's column and its
-       own `align-items: center` centres its icon on the TEXT, which is the
-       optical pairing (centring on the box would float it into the asymmetric
-       closing pad). The old fixed-height model needed flex-start to top-pin the
-       crushed leaf; the intrinsic leaf seats itself, so stretch is safe again. */
+    /* Stretch (not the box rule's flex-start): a prefix/suffix spans the
+       leaf's column. An affix that must pair with the VALUE takes the leaf's
+       own seat — the number input's unit slots read --seat-line-floored and
+       --seat-before in NumberInput/styles.css (end pad 0, like the leaf), so
+       their text rides the value's line box; a plain `align-items: center` on
+       the full stretch would float them above the seated text (the pad split
+       is asymmetric: seat-before ≠ seat-after). The old fixed-height model
+       needed flex-start to top-pin the crushed leaf; the intrinsic leaf
+       seats itself, so stretch is safe again. */
     align-items: stretch;
   }
   :is(.comfortable, .dense, .app, .site, .docs)
