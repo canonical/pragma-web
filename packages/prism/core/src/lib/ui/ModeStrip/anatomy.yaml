@@ -1,0 +1,55 @@
+---
+# ModeStrip — the band atop a lens's canvas with three sockets: context
+# (west), controls (grow, pack east), status (east). Its height is the
+# density line unit plus one component padding on each side, content-box,
+# so an empty strip and a one-row strip are the same height and the canvas
+# never jumps on a lens switch. It spans every column of the row the
+# archetype layout places it in.
+#
+# Token ledger:
+#   --mode-strip-divider-width: 1px  a hairline below the band.
+#   space.100 (8px) between controls and between readouts: one baseline pair;
+#   container.gap.tight (4px) is for key/value pairs and default (16px)
+#   separates groups.
+node:
+  uri: prism.component.mode_strip
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: flex
+    layout.align: center
+    layout.wrap: wrap
+    layout.boxSizing: content-box
+    size.min.block: density.line.height
+    spacing.gap: container.gap.default
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.bottom.color: color.border.muted
+  edges:
+    - node:
+        role: context socket
+        styles:
+          typography.weight: typography.weight.medium
+          typography.whiteSpace: nowrap
+      relation: { cardinality: "1", slotName: context }
+    - node:
+        role: controls socket
+        styles:
+          layout.flex.grow: 1
+          layout.type: flex
+          layout.align: center
+          layout.justify: flex-end
+          layout.wrap: wrap
+          spacing.gap: space.100
+      relation: { cardinality: "1", slotName: controls }
+    - node:
+        role: status socket
+        styles:
+          layout.type: flex
+          layout.align: center
+          spacing.gap: space.100
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: status }

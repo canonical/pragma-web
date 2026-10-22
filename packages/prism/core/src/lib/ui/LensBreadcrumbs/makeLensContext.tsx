@@ -1,5 +1,5 @@
 import { useRouterState } from "@canonical/router-react";
-import type React from "react";
+import type { ReactElement } from "react";
 import LensBreadcrumbs from "./LensBreadcrumbs.js";
 import type { LensContextProps } from "./types.js";
 
@@ -40,8 +40,8 @@ export default function makeLensContext({
 }: {
   readonly lensRouteName: string;
   readonly paramKey?: string;
-}): (props: LensContextProps) => React.ReactElement {
-  const LensContext = ({ lensLabel }: LensContextProps): React.ReactElement => {
+}): (props: LensContextProps) => ReactElement {
+  const LensContext = ({ lensLabel }: LensContextProps): ReactElement => {
     const { match } = useRouterState();
     const params: Readonly<Record<string, unknown>> =
       match?.kind === "route" ? match.params : {};
