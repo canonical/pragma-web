@@ -93,23 +93,28 @@ ds:implementation.react-ds-global-form.global.pattern.form a ds:ImplementationOb
 ds:implementation.react-ds-global-form.global.subcomponent.checkbox_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.checkbox_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/CheckboxInput/CheckboxInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/CheckboxInput/CheckboxInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/CheckboxInput/CheckboxInput.tsx";
+    ds:importStatement "import { CheckboxInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.color_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.color_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/ColorInput/ColorInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/ColorInput/ColorInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/ColorInput/ColorInput.tsx";
+    ds:importStatement "import { ColorInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.combobox_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.combobox_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/ComboboxInput/ComboboxInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/ComboboxInput/ComboboxInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/ComboboxInput/ComboboxInput.tsx";
+    ds:importStatement "import { ComboboxInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.date_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.date_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/DateInput/DateInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/DateInput/DateInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/DateInput/DateInput.tsx";
+    ds:importStatement "import { DateInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.date_time_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.date_time_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/DateTimeInput/DateTimeInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/DateTimeInput/DateTimeInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/DateTimeInput/DateTimeInput.tsx";
+    ds:importStatement "import { DateTimeInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.field-description a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.field-description;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/Field/Description/Description.tsx";
@@ -121,31 +126,38 @@ ds:implementation.react-ds-global-form.global.subcomponent.field-label a ds:Impl
 ds:implementation.react-ds-global-form.global.subcomponent.file_upload_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.file_upload_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/FileUploadInput/FileUploadInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/FileUploadInput/FileUploadInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/FileUploadInput/FileUploadInput.tsx";
+    ds:importStatement "import { FileUploadInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.hidden_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.hidden_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/HiddenInput/HiddenInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/HiddenInput/HiddenInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/HiddenInput/HiddenInput.tsx";
+    ds:importStatement "import { HiddenInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.number_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.number_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/NumberInput/NumberInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/NumberInput/NumberInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/NumberInput/NumberInput.tsx";
+    ds:importStatement "import { NumberInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.password_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.password_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/PasswordInput/PasswordInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/PasswordInput/PasswordInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/PasswordInput/PasswordInput.tsx";
+    ds:importStatement "import { PasswordInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.phone_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.phone_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/PhoneInput/PhoneInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/PhoneInput/PhoneInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/PhoneInput/PhoneInput.tsx";
+    ds:importStatement "import { PhoneInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.radio_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.radio_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/RadioInput/RadioInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/RadioInput/RadioInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/RadioInput/RadioInput.tsx";
+    ds:importStatement "import { RadioInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.range_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.range_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/RangeInput/RangeInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/RangeInput/RangeInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/RangeInput/RangeInput.tsx";
+    ds:importStatement "import { RangeInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.rating_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.rating_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/RatingInput/RatingInput.tsx";
@@ -154,20 +166,25 @@ ds:implementation.react-ds-global-form.global.subcomponent.rating_input a ds:Imp
 ds:implementation.react-ds-global-form.global.subcomponent.select_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.select_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/SelectInput/SelectInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/SelectInput/SelectInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/SelectInput/SelectInput.tsx";
+    ds:importStatement "import { SelectInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.switch_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.switch_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/SwitchInput/SwitchInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/SwitchInput/SwitchInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/SwitchInput/SwitchInput.tsx";
+    ds:importStatement "import { SwitchInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.text_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.text_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/TextInput/TextInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/TextInput/TextInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/TextInput/TextInput.tsx";
+    ds:importStatement "import { TextInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.textarea_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.textarea_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/TextareaInput/TextareaInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/TextareaInput/TextareaInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/TextareaInput/TextareaInput.tsx";
+    ds:importStatement "import { TextareaInput } from \"@canonical/react-ds-global-form\";".
 ds:implementation.react-ds-global-form.global.subcomponent.time_input a ds:ImplementationObject;
     ds:implementsBlock ds:global.subcomponent.time_input;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/react/ds-global-form/src/lib/subcomponent/TimeInput/TimeInput.tsx";
-    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/TimeInput/TimeInput.tsx".
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.44.1/packages/react/ds-global-form/src/lib/subcomponent/TimeInput/TimeInput.tsx";
+    ds:importStatement "import { TimeInput } from \"@canonical/react-ds-global-form\";".
