@@ -4,6 +4,7 @@ import type { AnyRoute, RouteMap, Router } from "@canonical/router-core";
 import { useRouter } from "@canonical/router-react";
 import type { MouseEvent, ReactElement } from "react";
 import type { RouterLinkProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds router-link";
 
