@@ -6,7 +6,7 @@
 import {
   type Box,
   ChipLegend,
-  Chip as Component,
+  MentionChip as Component,
   type Kind,
   type Lifecycle,
 } from "@canonical/prism-core";
@@ -43,7 +43,7 @@ const BUTTON_URI = "ds:global.component.button";
 const BUTTON_HREF = `/components/${encodeURIComponent(BUTTON_URI)}`;
 
 const meta: Meta<typeof Component> = {
-  title: "Prism/Chip",
+  title: "Prism/MentionChip",
   component: Component,
   tags: ["autodocs"],
   // A baseline mention every story inherits; the matrix stories map over

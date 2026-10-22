@@ -1,4 +1,4 @@
-import type { EncodingIndex } from "../Chip/index.js";
+import type { EncodingIndex } from "../MentionChip/index.js";
 import type { Channel, ChannelDescriptor } from "./types.js";
 
 /** The four channels, in the order the legend presents them. */

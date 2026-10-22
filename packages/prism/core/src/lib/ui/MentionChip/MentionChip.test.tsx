@@ -5,8 +5,8 @@ import { dirname, join } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PREFIXES } from "../../../../testing/fixtures.js";
-import Chip from "./Chip.js";
 import { KIND_INDEX, KINDS } from "./constants.js";
+import MentionChip from "./MentionChip.js";
 
 /**
  * Read the kind radii the anatomy's token ledger lists, as a map from kind
@@ -35,10 +35,10 @@ function readLedgerRadii(): Map<string, string> {
   );
 }
 
-describe("Chip", () => {
+describe("MentionChip", () => {
   it("renders as a non-interactive span without an href", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="component"
         label="Button"
@@ -55,7 +55,7 @@ describe("Chip", () => {
 
   it("renders as a link with an href", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         href="/components/button"
         kind="component"
@@ -74,7 +74,7 @@ describe("Chip", () => {
     render(
       <p data-testid="prose">
         Use the{" "}
-        <Chip
+        <MentionChip
           prefixes={PREFIXES}
           href="/components/button"
           kind="component"
@@ -84,7 +84,7 @@ describe("Chip", () => {
           uri="ds:global.component.button"
         />{" "}
         component with the{" "}
-        <Chip
+        <MentionChip
           prefixes={PREFIXES}
           box="class"
           kind="standard"
@@ -101,7 +101,7 @@ describe("Chip", () => {
 
   it("derives the namespace from the uri prefix by default", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="standard"
         label="imports"
@@ -113,7 +113,7 @@ describe("Chip", () => {
 
   it("lets an explicit namespace override the uri prefix", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="standard"
         label="imports"
@@ -129,7 +129,7 @@ describe("Chip", () => {
 
   it("exposes its identity and channel values as data attributes", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="component"
         label="Button"
@@ -146,7 +146,7 @@ describe("Chip", () => {
 
   it("sets one custom property per encoding channel", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         box="class"
         kind="pattern"
@@ -156,18 +156,22 @@ describe("Chip", () => {
       />,
     );
     const style = screen.getByText("Modal form").style;
-    expect(style.getPropertyValue("--chip-tint")).toContain("--chip-tint-l");
-    expect(style.getPropertyValue("--chip-radius")).toBe(
-      "var(--chip-radius-pattern, 1.25em)",
+    expect(style.getPropertyValue("--mention-chip-tint")).toContain(
+      "--mention-chip-tint-l",
     );
-    expect(style.getPropertyValue("--chip-fill-weight")).toBe("0%");
-    expect(style.getPropertyValue("--chip-stroke-weight")).toBe("80%");
-    expect(style.getPropertyValue("--chip-dot")).toContain("--chip-dot-beta");
+    expect(style.getPropertyValue("--mention-chip-radius")).toBe(
+      "var(--mention-chip-radius-pattern, 1.25em)",
+    );
+    expect(style.getPropertyValue("--mention-chip-fill-weight")).toBe("0%");
+    expect(style.getPropertyValue("--mention-chip-stroke-weight")).toBe("80%");
+    expect(style.getPropertyValue("--mention-chip-dot")).toContain(
+      "--mention-chip-dot-beta",
+    );
   });
 
   it("shows the summary as a hover peek via title", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="term"
         label="density"
@@ -183,7 +187,7 @@ describe("Chip", () => {
 
   it("omits the title when no summary is given", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="term"
         label="density"
@@ -195,7 +199,7 @@ describe("Chip", () => {
 
   it("exposes the summary to assistive tech via aria-description", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="term"
         label="density"
@@ -212,7 +216,7 @@ describe("Chip", () => {
   it("folds an asserted lifecycle's catalog label into the aria-description", () => {
     // The dot's meaning must reach assistive tech, not just sighted readers.
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="component"
         label="Button"
@@ -229,7 +233,7 @@ describe("Chip", () => {
 
   it("omits aria-description without a summary, even with a lifecycle", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="component"
         label="Button"
@@ -242,7 +246,7 @@ describe("Chip", () => {
 
   it("applies additional class names alongside the component classes", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         className="extra"
         kind="component"
@@ -251,7 +255,7 @@ describe("Chip", () => {
       />,
     );
     const chip = screen.getByText("Button");
-    expect(chip.className).toContain("ds chip");
+    expect(chip.className).toContain("ds mention-chip");
     expect(chip.className).toContain("extra");
   });
 
@@ -263,12 +267,17 @@ describe("Chip", () => {
     try {
       expect(() =>
         render(
-          <Chip uri="" label="Button" kind="component" prefixes={PREFIXES} />,
+          <MentionChip
+            uri=""
+            label="Button"
+            kind="component"
+            prefixes={PREFIXES}
+          />,
         ),
       ).toThrow(/"uri" must be a non-empty string/);
       expect(() =>
         render(
-          <Chip
+          <MentionChip
             uri="ds:global.component.button"
             label=""
             kind="component"
@@ -283,7 +292,7 @@ describe("Chip", () => {
 
   it("tints a namespace outside the prefixes with the unknown tint", () => {
     render(
-      <Chip
+      <MentionChip
         kind="term"
         label="Mystery"
         prefixes={PREFIXES}
@@ -292,21 +301,26 @@ describe("Chip", () => {
     );
     const chip = screen.getByText("Mystery");
     expect(chip).toHaveAttribute("data-namespace", "mystery");
-    expect(chip.style.getPropertyValue("--chip-tint")).toContain(
-      "--chip-tint-unknown",
+    expect(chip.style.getPropertyValue("--mention-chip-tint")).toContain(
+      "--mention-chip-tint-unknown",
     );
   });
 
   it("marks a URI with no prefix with an empty namespace", () => {
     render(
-      <Chip kind="term" label="Bare" prefixes={PREFIXES} uri="bare-name" />,
+      <MentionChip
+        kind="term"
+        label="Bare"
+        prefixes={PREFIXES}
+        uri="bare-name"
+      />,
     );
     expect(screen.getByText("Bare")).toHaveAttribute("data-namespace", "");
   });
 
   it("passes native props through to the root, under its own attributes", () => {
     render(
-      <Chip
+      <MentionChip
         data-kind="overridden"
         data-testid="chip"
         id="button-mention"
@@ -321,15 +335,15 @@ describe("Chip", () => {
     expect(chip.id).toBe("button-mention");
     expect(chip.style.fontWeight).toBe("700");
     // The chip's own channel style and data attributes win.
-    expect(chip.style.getPropertyValue("--chip-radius")).toBe(
-      "var(--chip-radius-component, 0.375em)",
+    expect(chip.style.getPropertyValue("--mention-chip-radius")).toBe(
+      "var(--mention-chip-radius-component, 0.375em)",
     );
     expect(chip).toHaveAttribute("data-kind", "component");
   });
 
   it("passes the anchor's native props through on the linked form", () => {
     render(
-      <Chip
+      <MentionChip
         href="/components/button"
         kind="component"
         label="Button"
@@ -350,7 +364,7 @@ describe("Chip", () => {
       event.preventDefault();
     });
     render(
-      <Chip
+      <MentionChip
         href="/components/button"
         kind="component"
         label="Button"
@@ -365,7 +379,7 @@ describe("Chip", () => {
 
   it("follows a link without an onClick", () => {
     render(
-      <Chip
+      <MentionChip
         href="#button"
         kind="component"
         label="Button"
@@ -380,7 +394,7 @@ describe("Chip", () => {
 
   it("leads with a hidden lifecycle dot when the mention asserts one", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="term"
         label="density"
@@ -397,7 +411,7 @@ describe("Chip", () => {
 
   it("renders no dot for the unmarked lifecycle", () => {
     render(
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         href="/glossary/density"
         kind="term"
@@ -415,7 +429,7 @@ describe("Chip", () => {
     expect([...ledger.keys()]).toEqual([...KINDS]);
     for (const kind of KINDS) {
       expect(KIND_INDEX[kind].radius).toBe(
-        `var(--chip-radius-${kind}, ${ledger.get(kind)})`,
+        `var(--mention-chip-radius-${kind}, ${ledger.get(kind)})`,
       );
     }
   });

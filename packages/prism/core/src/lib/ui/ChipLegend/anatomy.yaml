@@ -1,6 +1,6 @@
 ---
 # ChipLegend — the generated legend: one group per channel, each a title, a
-# summary and a list of entries, each entry a real Chip and its note. The
+# summary and a list of entries, each entry a real MentionChip and its note. The
 # legend is a grid of its groups, its gap the grid's gutter; inside a group
 # the title, the summary and the entries sit tighter than the gutter, so
 # each carries the space after it as external spacing and the group sets no
@@ -54,7 +54,7 @@ node:
                       spacing.external.block.end: space.100
                     edges:
                       - node:
-                          uri: prism.component.chip
+                          uri: prism.component.mention_chip
                         relation: { cardinality: "1", slotName: swatch }
                       - node:
                           role: entry note

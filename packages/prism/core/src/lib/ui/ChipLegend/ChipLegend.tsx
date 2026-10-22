@@ -4,13 +4,13 @@ import type { ReactElement } from "react";
 import { type Translate, useMessages } from "../../i18n/index.js";
 import {
   BOX_ENCODINGS,
-  Chip,
-  type ChipChannelValues,
   DEFAULT_BOX,
   DEFAULT_LIFECYCLE,
   KIND_ENCODINGS,
   LIFECYCLE_ENCODINGS,
-} from "../Chip/index.js";
+  MentionChip,
+  type MentionChipChannelValues,
+} from "../MentionChip/index.js";
 import { CHANNEL_DESCRIPTORS } from "./constants.js";
 import type { Channel, ChipLegendProps } from "./types.js";
 import "./styles.css";
@@ -22,7 +22,7 @@ interface LegendEntry {
   readonly key: string;
   readonly label: string;
   readonly description: string;
-  readonly channels: ChipChannelValues;
+  readonly channels: MentionChipChannelValues;
 }
 
 /**
@@ -39,7 +39,7 @@ function listEntriesForChannel(
   prefixes: readonly string[],
   t: Translate,
 ): readonly LegendEntry[] {
-  const baseline: ChipChannelValues = {
+  const baseline: MentionChipChannelValues = {
     namespace: prefixes.at(0),
     kind: "term",
     box: DEFAULT_BOX,
@@ -91,8 +91,8 @@ function listEntriesForChannel(
 
 /**
  * The chip legend — generated, never hand-written. The namespace group lists
- * one swatch per site prefix; every other group maps over the encoding
- * tables `Chip` renders from; and every swatch is a real `Chip` styled
+ * one swatch per site prefix; every other group maps over the encoding tables
+ * `MentionChip` renders from; and every swatch is a real `MentionChip` styled
  * through the same channel pipeline, so the legend cannot drift from
  * behaviour.
  *
@@ -122,7 +122,7 @@ export default function ChipLegend({
           <ul className="entries">
             {listEntriesForChannel(channel.value, prefixes, t).map((entry) => (
               <li className="entry" key={entry.key}>
-                <Chip
+                <MentionChip
                   box={entry.channels.box}
                   className="swatch"
                   kind={entry.channels.kind}

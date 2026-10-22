@@ -40,13 +40,13 @@ export const GOLDEN_ANGLE_DEGREES = 137.508;
 
 /**
  * The oklch lightness every namespace tint shares when the theme sets no
- * `--chip-tint-l`.
+ * `--mention-chip-tint-l`.
  */
 export const TINT_LIGHTNESS_FALLBACK = 0.45;
 
 /**
  * The oklch chroma every namespace tint shares when the theme sets no
- * `--chip-tint-c`.
+ * `--mention-chip-tint-c`.
  */
 export const TINT_CHROMA_FALLBACK = 0.12;
 
@@ -54,7 +54,7 @@ export const TINT_CHROMA_FALLBACK = 0.12;
  * The tint of a mention whose namespace is not one of the site's prefixes:
  * the tint lightness with no chroma, behind its own theme hook.
  */
-export const UNKNOWN_NAMESPACE_TINT = `var(--chip-tint-unknown, oklch(var(--chip-tint-l, ${TINT_LIGHTNESS_FALLBACK}) 0 0))`;
+export const UNKNOWN_NAMESPACE_TINT = `var(--mention-chip-tint-unknown, oklch(var(--mention-chip-tint-l, ${TINT_LIGHTNESS_FALLBACK}) 0 0))`;
 
 /**
  * The shape channel's encoding, one row per {@link KINDS} value, each row's
@@ -69,42 +69,42 @@ export const KIND_INDEX: EncodingIndex<Kind, KindEncoding> = {
     labelKey: "chip.kind.component.label",
     descriptionKey: "chip.kind.component.description",
     shapeKey: "chip.kind.component.shape",
-    radius: "var(--chip-radius-component, 0.375em)",
+    radius: "var(--mention-chip-radius-component, 0.375em)",
   },
   pattern: {
     value: "pattern",
     labelKey: "chip.kind.pattern.label",
     descriptionKey: "chip.kind.pattern.description",
     shapeKey: "chip.kind.pattern.shape",
-    radius: "var(--chip-radius-pattern, 1.25em)",
+    radius: "var(--mention-chip-radius-pattern, 1.25em)",
   },
   standard: {
     value: "standard",
     labelKey: "chip.kind.standard.label",
     descriptionKey: "chip.kind.standard.description",
     shapeKey: "chip.kind.standard.shape",
-    radius: "var(--chip-radius-standard, 0)",
+    radius: "var(--mention-chip-radius-standard, 0)",
   },
   concept: {
     value: "concept",
     labelKey: "chip.kind.concept.label",
     descriptionKey: "chip.kind.concept.description",
     shapeKey: "chip.kind.concept.shape",
-    radius: "var(--chip-radius-concept, 1em 0.25em)",
+    radius: "var(--mention-chip-radius-concept, 1em 0.25em)",
   },
   term: {
     value: "term",
     labelKey: "chip.kind.term.label",
     descriptionKey: "chip.kind.term.description",
     shapeKey: "chip.kind.term.shape",
-    radius: "var(--chip-radius-term, 0.25em 1em)",
+    radius: "var(--mention-chip-radius-term, 0.25em 1em)",
   },
   token: {
     value: "token",
     labelKey: "chip.kind.token.label",
     descriptionKey: "chip.kind.token.description",
     shapeKey: "chip.kind.token.shape",
-    radius: "var(--chip-radius-token, 0 0.75em 0.75em 0)",
+    radius: "var(--mention-chip-radius-token, 0 0.75em 0.75em 0)",
   },
 };
 
@@ -126,7 +126,7 @@ export const BOX_INDEX: EncodingIndex<Box, BoxEncoding> = {
     value: "instance",
     labelKey: "chip.box.instance.label",
     descriptionKey: "chip.box.instance.description",
-    fillWeight: "var(--chip-fill-weight-instance, 15%)",
+    fillWeight: "var(--mention-chip-fill-weight-instance, 15%)",
     strokeWeight: "0%",
   },
 };
@@ -142,19 +142,19 @@ export const LIFECYCLE_INDEX: EncodingIndex<Lifecycle, LifecycleEncoding> = {
     value: "canonical",
     labelKey: "chip.lifecycle.canonical.label",
     descriptionKey: "chip.lifecycle.canonical.description",
-    dot: "var(--chip-dot-canonical, oklch(0.55 0.15 150))",
+    dot: "var(--mention-chip-dot-canonical, oklch(0.55 0.15 150))",
   },
   beta: {
     value: "beta",
     labelKey: "chip.lifecycle.beta.label",
     descriptionKey: "chip.lifecycle.beta.description",
-    dot: "var(--chip-dot-beta, oklch(0.65 0.15 85))",
+    dot: "var(--mention-chip-dot-beta, oklch(0.65 0.15 85))",
   },
   deprecated: {
     value: "deprecated",
     labelKey: "chip.lifecycle.deprecated.label",
     descriptionKey: "chip.lifecycle.deprecated.description",
-    dot: "var(--chip-dot-deprecated, oklch(0.55 0.2 25))",
+    dot: "var(--mention-chip-dot-deprecated, oklch(0.55 0.2 25))",
   },
   none: {
     value: "none",

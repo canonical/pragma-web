@@ -8,7 +8,7 @@ import {
   BOX_ENCODINGS,
   KIND_ENCODINGS,
   LIFECYCLE_ENCODINGS,
-} from "../Chip/index.js";
+} from "../MentionChip/index.js";
 import ChipLegend from "./ChipLegend.js";
 import { CHANNEL_DESCRIPTORS, CHANNELS } from "./constants.js";
 
@@ -33,7 +33,7 @@ describe("ChipLegend", () => {
     render(<ChipLegend prefixes={PREFIXES} />);
     const group = screen.getByRole("region", { name: "Tint — namespace" });
     expect(
-      [...group.querySelectorAll(".chip[data-uri]")].map((swatch) =>
+      [...group.querySelectorAll(".mention-chip[data-uri]")].map((swatch) =>
         swatch.getAttribute("data-namespace"),
       ),
     ).toEqual([...PREFIXES]);
@@ -68,16 +68,16 @@ describe("ChipLegend", () => {
       BOX_ENCODINGS.length +
       KIND_ENCODINGS.length +
       LIFECYCLE_ENCODINGS.length;
-    const swatches = container.querySelectorAll(".chip[data-uri]");
+    const swatches = container.querySelectorAll(".mention-chip[data-uri]");
     expect(swatches).toHaveLength(expectedSwatchCount);
     const first = swatches.item(0) as HTMLElement;
-    expect(first.style.getPropertyValue("--chip-tint")).not.toBe("");
+    expect(first.style.getPropertyValue("--mention-chip-tint")).not.toBe("");
   });
 
   it("tints the other groups' swatches with the first prefix", () => {
     render(<ChipLegend prefixes={PREFIXES} />);
     const group = screen.getByRole("region", { name: "Dot — lifecycle" });
-    for (const swatch of group.querySelectorAll(".chip[data-uri]")) {
+    for (const swatch of group.querySelectorAll(".mention-chip[data-uri]")) {
       expect(swatch).toHaveAttribute("data-namespace", "ds");
     }
   });
@@ -85,11 +85,13 @@ describe("ChipLegend", () => {
   it("renders an empty namespace group, and unknown tints, with no prefixes", () => {
     render(<ChipLegend prefixes={[]} />);
     const group = screen.getByRole("region", { name: "Tint — namespace" });
-    expect(group.querySelectorAll(".chip[data-uri]")).toHaveLength(0);
+    expect(group.querySelectorAll(".mention-chip[data-uri]")).toHaveLength(0);
     const kinds = screen.getByRole("region", { name: "Shape — entity family" });
-    const swatch = kinds.querySelector(".chip[data-uri]") as HTMLElement;
-    expect(swatch.style.getPropertyValue("--chip-tint")).toContain(
-      "--chip-tint-unknown",
+    const swatch = kinds.querySelector(
+      ".mention-chip[data-uri]",
+    ) as HTMLElement;
+    expect(swatch.style.getPropertyValue("--mention-chip-tint")).toContain(
+      "--mention-chip-tint-unknown",
     );
   });
 
@@ -110,7 +112,9 @@ describe("ChipLegend", () => {
     render(<ChipLegend prefixes={PREFIXES} />);
     const group = screen.getByRole("region", { name: "Tint — namespace" });
     const entry = group.querySelector(".entry");
-    expect(entry?.firstElementChild?.className).toContain("ds chip swatch");
+    expect(entry?.firstElementChild?.className).toContain(
+      "ds mention-chip swatch",
+    );
     expect(entry?.lastElementChild?.className).toBe("note");
   });
 });

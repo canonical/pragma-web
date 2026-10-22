@@ -10,9 +10,9 @@ package holds the parts every such site needs and none of them owns:
   `Rail`, `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`),
   `Canvas`, `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page
   needs, `ErrorBoundary` and `ClientOnly`.
-- **Chip**: the inline mention of a graph entity, tinted by its namespace,
-  shaped by its kind, filled or outlined by class vs instance, and dotted by
-  lifecycle; `ChipLegend` explains the grammar.
+- **MentionChip**: the inline mention of a graph entity, tinted by its
+  namespace, shaped by its kind, filled or outlined by class vs instance,
+  and dotted by lifecycle; `ChipLegend` explains the grammar.
 - **Well geometry**: the pure, deterministic layout functions a graph well
   settles its nodes and edges with (`relaxBoxes`, `findEdgeEndpoint`,
   `buildQuadArc`, `buildSelfLoop`, `settle`).
@@ -127,14 +127,15 @@ and subgrid sets its gap from `--grid-gutter`. A site puts its context and
 density classes (`docs comfortable`) on the document. The container
 queries read the `shell` container a site's shell names.
 
-The stylesheets name no theme. The Chip's fallbacks are light values; a
-site's dark theme (whatever class or query activates it) defines the Chip's
-hooks: `--chip-tint-l` and `--chip-tint-c` (every namespace tint's
-lightness and chroma), `--chip-fill-weight-instance` (an instance's fill,
-15% by default), and `--chip-dot-canonical`, `--chip-dot-beta` and
-`--chip-dot-deprecated` (the lifecycle dots). The site keeps an instance's
-text-on-fill contrast at 4.5:1 or above for every hue at its values; the
-light fallbacks are held to that floor here.
+The stylesheets name no theme. The MentionChip's fallbacks are light values;
+a site's dark theme (whatever class or query activates it) defines the
+MentionChip's hooks: `--mention-chip-tint-l` and `--mention-chip-tint-c`
+(every namespace tint's lightness and chroma),
+`--mention-chip-fill-weight-instance` (an instance's fill, 15% by default),
+and `--mention-chip-dot-canonical`, `--mention-chip-dot-beta` and
+`--mention-chip-dot-deprecated` (the lifecycle dots). The site keeps an
+instance's text-on-fill contrast at 4.5:1 or above for every hue at its
+values; the light fallbacks are held to that floor here.
 
 ### Component checks
 
@@ -149,10 +150,10 @@ overflow and spacing.
 
 Every component has its stories; `bun run storybook` serves them.
 
-## Chip
+## MentionChip
 
 ```tsx
-<Chip
+<MentionChip
   href={href}
   kind="component"
   label="Button"
@@ -167,8 +168,8 @@ place in the list picks its hue (golden-angle steps), so the same list
 always tints the same way and appending a prefix keeps every earlier tint.
 A chip's namespace is its URI's prefix unless `namespace` overrides it; one
 outside the list gets a neutral tint. Lightness and chroma are shared by
-every hue behind `--chip-tint-l` and `--chip-tint-c`, so text-on-fill
-contrast holds at AA for every hue at once.
+every hue behind `--mention-chip-tint-l` and `--mention-chip-tint-c`, so
+text-on-fill contrast holds at AA for every hue at once.
 
 The chip knows no routes: pass `href` (the noun's canonical home, which the
 site resolves) to render a link, or leave it out to render inert text.
@@ -311,17 +312,17 @@ site's own catalog, and the factory holds no reader-facing string.
 - Mount `HomesProvider` above routed content.
 - Pass `prepareRelayData` the site's `routes`, `middleware` and `notFound`,
   and stamp per-request attributes through `headers`, never module state.
-- Source `Chip`'s `prefixes` from the provider's `ontologies { prefix }`.
-- Define the Chip's hooks in a dark theme (see Stylesheets).
+- Source `MentionChip`'s `prefixes` from the provider's `ontologies { prefix }`.
+- Define the MentionChip's hooks in a dark theme (see Stylesheets).
 - Run `assertBindings` in a `check` script and `assertBindingsLive` at boot.
 
 ## Public API
 
 - Layouts: `WorkspaceLayout`, `DocumentLayout`; types
   `WorkspaceLayoutProps`, `DocumentLayoutProps`.
-- Components: `Chip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`, `ClientOnly`,
-  `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
-  `ModeStrip`, `Rail`, `ThemeSelector`; types `ChipProps`,
+- Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
+  `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+  `ModeStrip`, `Rail`, `ThemeSelector`; types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,

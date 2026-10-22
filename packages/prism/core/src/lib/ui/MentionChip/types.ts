@@ -60,7 +60,7 @@ export type EncodingIndex<
 };
 
 /** One value per channel — everything the decoration derives from. */
-export interface ChipChannelValues {
+export interface MentionChipChannelValues {
   /** The namespace prefix, or `undefined` when the mention has none. */
   readonly namespace: string | undefined;
   readonly kind: Kind;
@@ -71,12 +71,12 @@ export interface ChipChannelValues {
 }
 
 /** The custom properties `styles.css` consumes, one channel each. */
-export interface ChipChannelStyle {
-  readonly "--chip-tint": string;
-  readonly "--chip-radius": string;
-  readonly "--chip-fill-weight": string;
-  readonly "--chip-stroke-weight": string;
-  readonly "--chip-dot": string;
+export interface MentionChipChannelStyle {
+  readonly "--mention-chip-tint": string;
+  readonly "--mention-chip-radius": string;
+  readonly "--mention-chip-fill-weight": string;
+  readonly "--mention-chip-stroke-weight": string;
+  readonly "--mention-chip-dot": string;
 }
 
 type OwnProps = {
@@ -120,13 +120,13 @@ type OwnProps = {
 };
 
 /**
- * Props accepted by `Chip`. The root depends on `href`: with one the chip is
- * an `<a>` and takes the anchor's native props, without one it is an inert
- * `<span>` and takes the span's.
+ * Props accepted by `MentionChip`. The root depends on `href`: with one the
+ * chip is an `<a>` and takes the anchor's native props, without one it is an
+ * inert `<span>` and takes the span's.
  *
  * The native `children` is excluded because the chip renders its `label`.
  */
-export type ChipProps =
+export type MentionChipProps =
   | (OwnProps & {
       /** Landing URL: the noun's canonical home. */
       readonly href: string;

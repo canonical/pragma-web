@@ -56,31 +56,31 @@
    * Deeper wells: the same 5% step that reads as a clear depression on paper
    * is invisible on near-black, so the knob turns up.
    *
-   * Chip hooks (`@canonical/prism-core`'s Chip falls back to its light
-   * values): every namespace tint is `oklch(--chip-tint-l --chip-tint-c
-   * <hue>)`, so the two tint hooks move every namespace at once. The
-   * instance fill drops from 15% to 8%, so the lighter dark tints keep
-   * text-vs-fill contrast above the 4.5:1 AA floor for every hue with room
-   * to spare (`chipContrast.tests`). */
+   * MentionChip hooks (`@canonical/prism-core`'s MentionChip falls back to
+   * its light values): every namespace tint is `oklch(--mention-chip-tint-l
+   * --mention-chip-tint-c <hue>)`, so the two tint hooks move every namespace
+   * at once. The instance fill drops from 15% to 8%, so the lighter dark
+   * tints keep text-vs-fill contrast above the 4.5:1 AA floor for every hue
+   * with room to spare (`chipContrast.tests`). */
   :root.dark {
     --underground-depth: 30%;
-    --chip-tint-l: 0.78;
-    --chip-tint-c: 0.11;
-    --chip-dot-canonical: oklch(0.7 0.14 150);
-    --chip-dot-beta: oklch(0.78 0.14 85);
-    --chip-dot-deprecated: oklch(0.68 0.17 25);
-    --chip-fill-weight-instance: 8%;
+    --mention-chip-tint-l: 0.78;
+    --mention-chip-tint-c: 0.11;
+    --mention-chip-dot-canonical: oklch(0.7 0.14 150);
+    --mention-chip-dot-beta: oklch(0.78 0.14 85);
+    --mention-chip-dot-deprecated: oklch(0.68 0.17 25);
+    --mention-chip-fill-weight-instance: 8%;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not(.light) {
       --underground-depth: 30%;
-      --chip-tint-l: 0.78;
-      --chip-tint-c: 0.11;
-      --chip-dot-canonical: oklch(0.7 0.14 150);
-      --chip-dot-beta: oklch(0.78 0.14 85);
-      --chip-dot-deprecated: oklch(0.68 0.17 25);
-      --chip-fill-weight-instance: 8%;
+      --mention-chip-tint-l: 0.78;
+      --mention-chip-tint-c: 0.11;
+      --mention-chip-dot-canonical: oklch(0.7 0.14 150);
+      --mention-chip-dot-beta: oklch(0.78 0.14 85);
+      --mention-chip-dot-deprecated: oklch(0.68 0.17 25);
+      --mention-chip-fill-weight-instance: 8%;
     }
   }
 

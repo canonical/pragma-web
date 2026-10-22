@@ -3,7 +3,7 @@ import { MESSAGES } from "../../i18n/index.js";
 import { BOXES, GOLDEN_ANGLE_DEGREES, KINDS, LIFECYCLES } from "./constants.js";
 import {
   assertNonEmptyString,
-  buildChipChannelStyle,
+  buildMentionChipChannelStyle,
   deriveNamespaceFromUri,
   getBoxEncoding,
   getKindEncoding,
@@ -76,10 +76,10 @@ describe("assertNonEmptyString", () => {
   it("accepts a non-empty string and rejects anything else", () => {
     expect(() => assertNonEmptyString("x", "uri")).not.toThrow();
     expect(() => assertNonEmptyString("", "uri")).toThrow(
-      'Chip: "uri" must be a non-empty string',
+      'MentionChip: "uri" must be a non-empty string',
     );
     expect(() => assertNonEmptyString(7, "label")).toThrow(
-      'Chip: "label" must be a non-empty string',
+      'MentionChip: "label" must be a non-empty string',
     );
   });
 });
@@ -105,10 +105,10 @@ describe("resolveNamespaceTint", () => {
 
   it("steps the hue by the golden angle per place in the prefixes", () => {
     expect(resolveNamespaceTint("ds", prefixes)).toBe(
-      "oklch(var(--chip-tint-l, 0.45) var(--chip-tint-c, 0.12) 0)",
+      "oklch(var(--mention-chip-tint-l, 0.45) var(--mention-chip-tint-c, 0.12) 0)",
     );
     expect(resolveNamespaceTint("cs", prefixes)).toBe(
-      `oklch(var(--chip-tint-l, 0.45) var(--chip-tint-c, 0.12) ${Math.round(GOLDEN_ANGLE_DEGREES)})`,
+      `oklch(var(--mention-chip-tint-l, 0.45) var(--mention-chip-tint-c, 0.12) ${Math.round(GOLDEN_ANGLE_DEGREES)})`,
     );
     expect(resolveNamespaceTint("docs", prefixes)).toContain(" 275)");
   });
@@ -117,10 +117,10 @@ describe("resolveNamespaceTint", () => {
     const five = ["ds", "cs", "docs", "ex", "geo"] as const;
     // 3 × 137.508 = 412.524 → 413 → 53; 4 × 137.508 = 550.032 → 550 → 190.
     expect(resolveNamespaceTint("ex", five)).toBe(
-      "oklch(var(--chip-tint-l, 0.45) var(--chip-tint-c, 0.12) 53)",
+      "oklch(var(--mention-chip-tint-l, 0.45) var(--mention-chip-tint-c, 0.12) 53)",
     );
     expect(resolveNamespaceTint("geo", five)).toBe(
-      "oklch(var(--chip-tint-l, 0.45) var(--chip-tint-c, 0.12) 190)",
+      "oklch(var(--mention-chip-tint-l, 0.45) var(--mention-chip-tint-c, 0.12) 190)",
     );
   });
 
@@ -142,40 +142,47 @@ describe("resolveNamespaceTint", () => {
 
   it("gives an unknown or absent namespace the neutral tint", () => {
     expect(resolveNamespaceTint("mystery", prefixes)).toContain(
-      "--chip-tint-unknown",
+      "--mention-chip-tint-unknown",
     );
     expect(resolveNamespaceTint(undefined, prefixes)).toContain(
-      "--chip-tint-unknown",
+      "--mention-chip-tint-unknown",
     );
-    expect(resolveNamespaceTint("ds", [])).toContain("--chip-tint-unknown");
+    expect(resolveNamespaceTint("ds", [])).toContain(
+      "--mention-chip-tint-unknown",
+    );
   });
 
   it("gives the neutral tint the lightness every namespace tint falls back to", () => {
     expect(
       readHookFallback(
         resolveNamespaceTint("mystery", prefixes),
-        "--chip-tint-l",
+        "--mention-chip-tint-l",
       ),
     ).toBe(
-      readHookFallback(resolveNamespaceTint("ds", prefixes), "--chip-tint-l"),
+      readHookFallback(
+        resolveNamespaceTint("ds", prefixes),
+        "--mention-chip-tint-l",
+      ),
     );
   });
 });
 
-describe("buildChipChannelStyle", () => {
+describe("buildMentionChipChannelStyle", () => {
   it("emits one custom property per channel", () => {
-    const style = buildChipChannelStyle({
+    const style = buildMentionChipChannelStyle({
       namespace: "ds",
       kind: "component",
       box: "instance",
       lifecycle: "canonical",
       prefixes: ["ds"],
     });
-    expect(style["--chip-tint"]).toContain("--chip-tint-l");
-    expect(style["--chip-radius"]).not.toBe("");
-    expect(style["--chip-fill-weight"]).not.toBe("");
-    expect(style["--chip-stroke-weight"]).not.toBe("");
-    expect(style["--chip-dot"]).toContain("--chip-dot-canonical");
+    expect(style["--mention-chip-tint"]).toContain("--mention-chip-tint-l");
+    expect(style["--mention-chip-radius"]).not.toBe("");
+    expect(style["--mention-chip-fill-weight"]).not.toBe("");
+    expect(style["--mention-chip-stroke-weight"]).not.toBe("");
+    expect(style["--mention-chip-dot"]).toContain(
+      "--mention-chip-dot-canonical",
+    );
   });
 
   it("swaps fill for stroke between instance and class", () => {
@@ -185,25 +192,28 @@ describe("buildChipChannelStyle", () => {
       lifecycle: "none",
       prefixes: ["ds"],
     } as const;
-    const instance = buildChipChannelStyle({ ...channels, box: "instance" });
-    const klass = buildChipChannelStyle({ ...channels, box: "class" });
-    expect(instance["--chip-fill-weight"]).not.toBe(
-      klass["--chip-fill-weight"],
+    const instance = buildMentionChipChannelStyle({
+      ...channels,
+      box: "instance",
+    });
+    const klass = buildMentionChipChannelStyle({ ...channels, box: "class" });
+    expect(instance["--mention-chip-fill-weight"]).not.toBe(
+      klass["--mention-chip-fill-weight"],
     );
-    expect(instance["--chip-stroke-weight"]).not.toBe(
-      klass["--chip-stroke-weight"],
+    expect(instance["--mention-chip-stroke-weight"]).not.toBe(
+      klass["--mention-chip-stroke-weight"],
     );
   });
 
   it("maps the unmarked lifecycle to a transparent dot", () => {
-    const style = buildChipChannelStyle({
+    const style = buildMentionChipChannelStyle({
       namespace: "docs",
       kind: "term",
       box: "instance",
       lifecycle: "none",
       prefixes: ["docs"],
     });
-    expect(style["--chip-dot"]).toBe("transparent");
+    expect(style["--mention-chip-dot"]).toBe("transparent");
   });
 });
 
@@ -324,8 +334,8 @@ describe("instance chip contrast (WCAG AA)", () => {
     const fillAlpha = parsePercentAsAlpha(
       getBoxEncoding("instance").fillWeight,
     );
-    const lightness = readHookFallback(tint, "--chip-tint-l");
-    const chroma = readHookFallback(tint, "--chip-tint-c");
+    const lightness = readHookFallback(tint, "--mention-chip-tint-l");
+    const chroma = readHookFallback(tint, "--mention-chip-tint-c");
 
     for (let hue = 0; hue < 360; hue += 15) {
       const text = convertOklchToSrgb([lightness, chroma, hue]);

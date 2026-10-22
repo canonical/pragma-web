@@ -12,7 +12,7 @@ const meta: Meta<typeof ChipLegend> = {
 export default meta;
 type Story = StoryObj<typeof ChipLegend>;
 
-/** One group per channel, each swatch a real Chip. */
+/** One group per channel, each swatch a real MentionChip. */
 export const Default: Story = {
   args: { prefixes: ["ds", "cs"] },
 };

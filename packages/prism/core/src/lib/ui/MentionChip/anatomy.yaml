@@ -1,44 +1,58 @@
 ---
-# Chip — an inline mention of a graph entity. Its decoration is derived from
-# four channels the component sets inline as its own custom properties
-# (`ChipChannelStyle` in types.ts): chip.tint (namespace), chip.radius
-# (kind), chip.fill.weight and chip.stroke.weight (class vs instance),
-# chip.dot (lifecycle). The stylesheet reads each channel with the literal it
-# falls back to; the per-value payloads live in constants.ts and are listed
-# here. The lifecycle dot is a real `span.dot` the component omits when the
-# lifecycle is `none`, so no state rule is needed. A `[href]` chip is a link
-# and takes the link states.
+# MentionChip — an inline mention of a graph entity, inside running prose.
+#
+# Why not a published component: `@canonical/react-ds-global`'s Chip is a
+# standalone control (a pill with its own font size, padding, background,
+# margin, hover state and dismiss button) and its Badge is a count or
+# status label; neither sits inside a sentence inheriting the prose's font,
+# and neither derives its decoration from the entity it names. This
+# component is both: inline text that degrades to its label, decorated from
+# the graph. Its root class, `mention-chip`, keeps it clear of the published
+# Chip's `.ds.chip` rules.
+#
+# Its decoration is derived from four channels the component sets inline as
+# its own custom properties (`MentionChipChannelStyle` in types.ts):
+# mention.chip.tint (namespace), mention.chip.radius (kind),
+# mention.chip.fill.weight and mention.chip.stroke.weight (class vs
+# instance), mention.chip.dot (lifecycle). The stylesheet reads each channel
+# with the literal it falls back to; the per-value payloads live in
+# constants.ts and are listed here. The lifecycle dot is a real `span.dot`
+# the component omits when the lifecycle is `none`, so no state rule is
+# needed. A `[href]` chip is a link and takes the link states.
 #
 # `@media (forced-colors: active)` re-values border style, the dot's
 # forced-color-adjust and the link colour; an exempt feature query, bound
 # in styles.css and not expressible here.
 #
 # Every other decision is read through a component token declared on the
-# root (`--chip-*`), bound to the symbol or the literal named here.
+# root (`--mention-chip-*`), bound to the symbol or the literal named here.
 #
 # Token ledger:
-#   --chip-radius-fallback: 0.375em  (kind radii in constants.ts: component
-#     0.375em, pattern 1.25em, standard 0, concept 1em 0.25em, term 0.25em 1em,
-#     token 0 0.75em 0.75em 0) — em so the mention scales with its prose.
-#   --chip-padding-inline: 0.4em; --chip-padding-block: 0.0625em
-#   --chip-dot-size: 0.4em; --chip-dot-gap: 0.3em; --chip-dot-shift: 0.0625em
-#   --chip-stroke-width: 1px (always present so class/instance never reflow)
-#   --chip-focus-ring-width: 2px; --chip-focus-ring-offset: 2px
+#   --mention-chip-radius-fallback: 0.375em  (kind radii in constants.ts:
+#     component 0.375em, pattern 1.25em, standard 0, concept 1em 0.25em,
+#     term 0.25em 1em, token 0 0.75em 0.75em 0) — em so the mention scales
+#     with its prose.
+#   --mention-chip-padding-inline: 0.4em; --mention-chip-padding-block: 0.0625em
+#   --mention-chip-dot-size: 0.4em; --mention-chip-dot-gap: 0.3em;
+#   --mention-chip-dot-shift: 0.0625em
+#   --mention-chip-stroke-width: 1px (always present so class/instance never
+#     reflow)
+#   --mention-chip-focus-ring-width: 2px; --mention-chip-focus-ring-offset: 2px
 #   tints: oklch lightness 0.45 / chroma 0.12 (constants.ts), dots oklch
 #     literals (constants.ts): no semantic status colours exist for a
 #     namespace tint; upstream request.
 node:
-  uri: prism.component.chip
+  uri: prism.component.mention_chip
   styles:
     layout.type: inline
     typography.font: inherit
-    typography.color: [chip.tint, inherit]
+    typography.color: [mention.chip.tint, inherit]
     typography.decoration: none
-    appearance.radius: [chip.radius, 0.375em]
-    appearance.background: "color-mix(in oklab, var(--chip-tint, currentColor) var(--chip-fill-weight, 0%), transparent)"
+    appearance.radius: [mention.chip.radius, 0.375em]
+    appearance.background: "color-mix(in oklab, var(--mention-chip-tint, currentColor) var(--mention-chip-fill-weight, 0%), transparent)"
     appearance.border.width: 1px
     appearance.border.style: solid
-    appearance.border.color: "color-mix(in oklab, var(--chip-tint, currentColor) var(--chip-stroke-weight, 0%), transparent)"
+    appearance.border.color: "color-mix(in oklab, var(--mention-chip-tint, currentColor) var(--mention-chip-stroke-weight, 0%), transparent)"
     spacing.internal.inline.start: 0.4em
     spacing.internal.inline.end: 0.4em
     spacing.internal.block.start: 0.0625em
@@ -57,7 +71,7 @@ node:
           size.height: 0.4em
           spacing.external.inline.end: 0.3em
           appearance.radius: 50%
-          appearance.background: chip.dot
+          appearance.background: mention.chip.dot
           layout.verticalAlign: 0.0625em
       relation: { cardinality: "0..1", slotName: dot }
     - node:

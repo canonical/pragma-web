@@ -5,18 +5,23 @@ import { useMessages } from "../../i18n/index.js";
 import { DEFAULT_BOX, DEFAULT_LIFECYCLE } from "./constants.js";
 import {
   assertNonEmptyString,
-  buildChipChannelStyle,
+  buildMentionChipChannelStyle,
   deriveNamespaceFromUri,
   getLifecycleEncoding,
 } from "./encodings.js";
-import type { ChipProps } from "./types.js";
+import type { MentionChipProps } from "./types.js";
 import "./styles.css";
 
-const componentCssClassName = "ds chip";
+const componentCssClassName = "ds mention-chip";
 
 /**
  * An inline mention of a graph entity — a site's ambient mechanism for
  * naming things the knowledge graph knows about.
+ *
+ * It is not the published `Chip` or `Badge` of `@canonical/react-ds-global`:
+ * those are standalone controls and labels with their own type and box,
+ * where a mention sits inside a sentence, inherits the prose's font and
+ * takes its decoration from the entity it names.
  *
  * A chip is a mention, not the entity itself: `uri` is its identity and the
  * decoration is derived, per the four orthogonal channels in `encodings.ts`
@@ -33,11 +38,11 @@ const componentCssClassName = "ds chip";
  * root; the chip's own class, style, description and data attributes are
  * set after them.
  *
- * `import { Chip } from "@canonical/prism-core";`
+ * `import { MentionChip } from "@canonical/prism-core";`
  *
- * @implements prism.component.chip
+ * @implements prism.component.mention_chip
  */
-export default function Chip(props: ChipProps): ReactElement {
+export default function MentionChip(props: MentionChipProps): ReactElement {
   const t = useMessages();
   const {
     uri,
@@ -74,12 +79,12 @@ export default function Chip(props: ChipProps): ReactElement {
           });
   const sharedProps = {
     className: [componentCssClassName, className].filter(Boolean).join(" "),
-    // The channel payloads; typed as ChipChannelStyle, cast for React's
+    // The channel payloads; typed as MentionChipChannelStyle, cast for React's
     // style prop (custom properties pass through to setProperty). A
     // consumer's own style merges underneath them.
     style: {
       ...style,
-      ...buildChipChannelStyle({
+      ...buildMentionChipChannelStyle({
         namespace: resolvedNamespace,
         kind,
         box,

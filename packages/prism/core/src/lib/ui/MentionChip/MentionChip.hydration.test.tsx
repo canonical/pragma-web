@@ -11,14 +11,14 @@ import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PREFIXES } from "../../../../testing/fixtures.js";
-import Chip from "./Chip.js";
+import MentionChip from "./MentionChip.js";
 
 // Driving `act` directly (no Testing Library wrapper) needs the flag.
 (
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-describe("Chip hydration", () => {
+describe("MentionChip hydration", () => {
   const roots: Root[] = [];
   const containers: HTMLElement[] = [];
 
@@ -51,7 +51,7 @@ describe("Chip hydration", () => {
 
   it("hydrates the span form over its own server HTML without recoverable errors", async () => {
     const jsx = (
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         kind="term"
         label="density"
@@ -66,7 +66,7 @@ describe("Chip hydration", () => {
 
   it("hydrates the anchor form over its own server HTML without recoverable errors", async () => {
     const jsx = (
-      <Chip
+      <MentionChip
         prefixes={PREFIXES}
         href="/components/ds%3Aglobal.component.button"
         kind="component"
@@ -91,14 +91,14 @@ describe("Chip hydration", () => {
     try {
       const onRecoverableError = await hydrateAgainst(
         renderToString(
-          <Chip
+          <MentionChip
             prefixes={PREFIXES}
             kind="term"
             label="server label"
             uri="docs:glossary.density"
           />,
         ),
-        <Chip
+        <MentionChip
           prefixes={PREFIXES}
           kind="term"
           label="client label"

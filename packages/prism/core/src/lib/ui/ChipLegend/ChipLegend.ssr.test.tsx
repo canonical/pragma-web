@@ -10,6 +10,6 @@ describe("ChipLegend SSR", () => {
     const html = renderToString(<ChipLegend prefixes={PREFIXES} />);
     expect(html).toContain('class="ds chip-legend"');
     expect(html).toContain('class="group"');
-    expect(html).toContain('class="ds chip swatch"');
+    expect(html).toContain('class="ds mention-chip swatch"');
   });
 });
