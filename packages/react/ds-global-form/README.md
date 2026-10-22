@@ -171,6 +171,24 @@ import { MyColorPicker } from "./MyColorPicker";
 
 Custom components must be wrapped with `withWrapper`. Custom components must satisfy the `InputProps` type and integrate with react-hook-form via `useFormContext`.
 
+### Standalone Inputs
+
+Every input the Field pattern composes is also exported on its own: `TextInput`, `SelectInput`, `CheckboxInput`, `SwitchInput`, `RadioInput`, `NumberInput`, `PasswordInput`, `RangeInput`, `RatingInput`, `DateInput`, `TimeInput`, `DateTimeInput`, `ColorInput`, `ComboboxInput`, `PhoneInput`, `FileUploadInput`, `TextareaInput` and `HiddenInput`, each with its props type. They are presentational: no `<Form>`, no react-hook-form context and no label, so a control outside a form keeps the same input chrome. Name it with `aria-label` or a `<label>` of your own.
+
+```tsx
+import { SelectInput } from "@canonical/react-ds-global-form";
+
+<SelectInput
+  aria-label="Language"
+  value={locale}
+  onChange={(event) => setLocale(event.target.value)}
+  options={[
+    { value: "en", label: "English" },
+    { value: "fr", label: "français" },
+  ]}
+/>
+```
+
 ## Middleware Pattern
 
 Middleware are higher-order components that wrap fields to add functionality. They compose via the `middleware` prop:
