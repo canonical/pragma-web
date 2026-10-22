@@ -13,6 +13,10 @@
     "./testing": {
       "types": "./testing/index.ts",
       "import": "./testing/index.ts"
+    },
+    "./testing/browser": {
+      "types": "./testing/browser/index.ts",
+      "import": "./testing/browser/index.ts"
     }
   },
   "files": [
@@ -51,7 +55,8 @@
     "storybook": "storybook dev -p 6011 --no-open --host 0.0.0.0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts"
   },
   "dependencies": {
     "@canonical/i18n-core": "^0.44.1",
@@ -86,6 +91,7 @@
     "@vitest/coverage-v8": "^5.0.0",
     "copyfiles": "^2.4.1",
     "jsdom": "^28.1.0",
+    "playwright": "^1.61.1",
     "react-dom": "^19.2.4",
     "storybook": "^10.6.0",
     "typescript": "^7.0.2",
