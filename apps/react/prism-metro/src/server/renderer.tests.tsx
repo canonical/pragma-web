@@ -113,12 +113,16 @@ describe("createAppRenderer", () => {
     expect(initialData.relay?.records).toBeDefined();
   });
 
-  it("answers an unknown URL with 404 and no relay data, dialling no graph", async () => {
-    const { initialData, statusCode } = await renderDocument(
-      new Request("http://localhost/nowhere"),
-    );
-    expect(graph.requests).toHaveLength(0);
-    expect(statusCode).toBe(404);
-    expect(initialData).toEqual({ url: "/nowhere" });
-  });
+  it.each(["/nowhere", "/stations/%ZZ"])(
+    "answers %s with the not-found page at 404, dialling no graph",
+    async (url) => {
+      const { html, initialData, statusCode } = await renderDocument(
+        new Request(`http://localhost${url}`),
+      );
+      expect(graph.requests).toHaveLength(0);
+      expect(statusCode).toBe(404);
+      expect(initialData).toEqual({ url });
+      expect(html).toContain("<title>Page not found — Metro</title>");
+    },
+  );
 });

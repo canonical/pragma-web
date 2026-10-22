@@ -51,6 +51,11 @@ describe("EntryServer", () => {
     expect(html).toContain("<title>Page not found — Metro</title>");
   });
 
+  it("renders the not-found page for a path that does not decode", async () => {
+    const html = await renderAndSettle({ url: "/stations/%ZZ" });
+    expect(html).toContain("<title>Page not found — Metro</title>");
+  });
+
   it.each(["/stations", "/lines", "/definitions"])(
     "renders %s from a cold store without reaching the network",
     async (url) => {

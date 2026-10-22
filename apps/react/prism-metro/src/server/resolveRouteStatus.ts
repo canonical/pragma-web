@@ -1,9 +1,11 @@
 import { createStaticRouter } from "@canonical/prism-core";
 import { appRoutes, notFoundRoute } from "../routes.js";
+import selectRoutableUrl from "./selectRoutableUrl.js";
 
 /**
  * The HTTP status the routed document deserves: the matched route's status,
- * 200, and 404 for every URL no route matches.
+ * 200, and 404 for every URL no route matches, a path that does not
+ * percent-decode among them.
  *
  * `JSXRenderer` starts at 200 and moves only to 500 on a shell error, and it
  * takes its status at construction, so the server resolves the match before
@@ -14,7 +16,7 @@ import { appRoutes, notFoundRoute } from "../routes.js";
  * @returns The status to answer with.
  */
 export default function resolveRouteStatus(url: string): number {
-  const match = createStaticRouter(appRoutes, url, {
+  const match = createStaticRouter(appRoutes, selectRoutableUrl(url), {
     notFound: notFoundRoute,
   }).match;
   return match?.kind === "route" ? match.status : 404;

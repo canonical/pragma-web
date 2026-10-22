@@ -7,12 +7,14 @@ import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import type { ServerEntrypointProps } from "@canonical/react-ssr/renderer";
 import { Shell } from "#shell";
 import { appRoutes, notFoundRoute } from "../routes.js";
+import selectRoutableUrl from "./selectRoutableUrl.js";
 import type { InitialData } from "./types.js";
 
 /**
  * The server render of the app: the document around `Shell`, with a static
- * router at the request's URL and a fresh Relay environment seeded from the
- * prepare step's records, the same bytes the client hydrates from.
+ * router at the request's URL (the not-found page for a path that does not
+ * percent-decode) and a fresh Relay environment seeded from the prepare
+ * step's records, the same bytes the client hydrates from.
  *
  * The environment's network always rejects. The prepare step has already
  * run, so a render that misses the store disagrees with it about an
@@ -30,7 +32,7 @@ import type { InitialData } from "./types.js";
 export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
   const initialData = props.initialData ?? {};
   const url = initialData.url ?? "/";
-  const router = createStaticRouter(appRoutes, url, {
+  const router = createStaticRouter(appRoutes, selectRoutableUrl(url), {
     notFound: notFoundRoute,
   });
   const relayEnvironment = createEnvironment({

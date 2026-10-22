@@ -18,4 +18,11 @@ describe("resolveRouteStatus", () => {
   it("answers an unknown URL with 404", () => {
     expect(resolveRouteStatus("/nowhere")).toBe(404);
   });
+
+  it.each(["/stations/%ZZ", "/stations/%E0%A4%A", "/definitions/%ZZ"])(
+    "answers %s, whose path does not decode, with 404",
+    (url) => {
+      expect(resolveRouteStatus(url)).toBe(404);
+    },
+  );
 });

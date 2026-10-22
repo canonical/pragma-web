@@ -60,10 +60,11 @@ describe("prepareRelayData", () => {
     ).toBeGreaterThan(0);
   });
 
-  it("prepares nothing for an unknown URL, dialling no graph", async () => {
-    await expect(
-      prepareRelayData("/nowhere", graph.url),
-    ).resolves.toBeUndefined();
-    expect(graph.requests).toHaveLength(0);
-  });
+  it.each(["/nowhere", "/stations/%ZZ"])(
+    "prepares nothing for %s, dialling no graph",
+    async (url) => {
+      await expect(prepareRelayData(url, graph.url)).resolves.toBeUndefined();
+      expect(graph.requests).toHaveLength(0);
+    },
+  );
 });

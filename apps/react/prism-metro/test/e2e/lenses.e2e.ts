@@ -120,8 +120,11 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(landing.html).toContain(String(title));
   });
 
-  it("answers an unknown URL with 404", async () => {
-    const { status } = await fetchPage(script, "/nowhere");
-    expect(status).toBe(404);
-  });
+  it.each(["/nowhere", "/stations/%ZZ", "/definitions/%E0%A4%A"])(
+    "answers %s with 404",
+    async (path) => {
+      const { status } = await fetchPage(script, path);
+      expect(status).toBe(404);
+    },
+  );
 });
