@@ -1,6 +1,7 @@
 import type React from "react";
 import { useCallback, useEffect, useId, useState } from "react";
 import { Content, ContextSwitcher, Footer, Header } from "./common/index.js";
+import { DEFAULT_MESSAGES } from "./constants.js";
 import { useCollapseShortcut } from "./hooks/useCollapseShortcut/index.js";
 import type { SideNavigationProps } from "./types.js";
 import "./styles.css";
@@ -53,9 +54,11 @@ const SideNavigation = ({
   defaultExpanded: defaultExpandedProp,
   keyboardShortcut = true,
   "aria-label": ariaLabel,
+  messages: messagesProp,
   ...props
 }: SideNavigationProps): React.ReactElement => {
   const contentId = useId();
+  const messages = { ...DEFAULT_MESSAGES, ...messagesProp };
 
   const [expanded, setExpanded] = useState(defaultExpandedProp ?? true);
 
@@ -88,7 +91,7 @@ const SideNavigation = ({
       {/* Skip navigation, first in DOM order — visually hidden until focused,
           then jumps keyboard users past the navigation block. */}
       <a className="skip-link" href={skipTo}>
-        Skip to main content
+        {messages.skipToContent()}
       </a>
       <Header
         brand={brand}
@@ -96,6 +99,7 @@ const SideNavigation = ({
         expanded={expanded}
         onToggle={handleToggle}
         collapseControls={contentId}
+        collapseToggleMessages={messages}
       />
       {contextSwitcher ? (
         // Own region between Header and Content — a select-like widget is
@@ -108,7 +112,7 @@ const SideNavigation = ({
         root={root}
         LinkComponent={LinkComponent}
         currentUrl={currentUrl}
-        aria-label={ariaLabel ?? "Main navigation"}
+        aria-label={ariaLabel ?? messages.navigation()}
       />
       {footerRoot ? (
         <Footer

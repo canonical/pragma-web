@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
+import type { CollapseToggleMessages } from "../CollapseToggle/types.js";
 
 type OwnProps = {
   /** Brand content (logo mark) rendered at the start of the header. */
@@ -11,6 +12,8 @@ type OwnProps = {
   onToggle?: () => void;
   /** id of the navigation region the collapse toggle controls (`aria-controls`). */
   collapseControls?: string;
+  /** The collapse toggle's text. Any message left out keeps its default. */
+  collapseToggleMessages?: Partial<CollapseToggleMessages>;
 };
 
 // The root is a `<header>` landmark, not a `<div>` — the previous

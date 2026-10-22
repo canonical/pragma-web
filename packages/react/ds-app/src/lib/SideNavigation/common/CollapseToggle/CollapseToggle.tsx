@@ -1,5 +1,6 @@
 import { Icon, TooltipEngine } from "@canonical/react-ds-global";
 import type React from "react";
+import { DEFAULT_MESSAGES } from "./constants.js";
 import type { CollapseToggleProps } from "./types.js";
 import "./styles.css";
 
@@ -15,15 +16,19 @@ const TOOLTIP_ACTIVATE_DELAY_MS = 1000;
 const CollapseToggleTrigger = ({
   className,
   expanded = true,
+  messages: messagesProp,
   "aria-label": ariaLabel,
   ...props
 }: CollapseToggleProps): React.ReactElement => {
+  const messages = { ...DEFAULT_MESSAGES, ...messagesProp };
+
   return (
     <button
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-expanded={expanded}
       aria-label={
-        ariaLabel ?? (expanded ? "Collapse navigation" : "Expand navigation")
+        ariaLabel ??
+        (expanded ? messages.collapseNavigation() : messages.expandNavigation())
       }
       {...props}
       type="button"
@@ -33,7 +38,7 @@ const CollapseToggleTrigger = ({
           "Menu"/"Close menu" replaces it — CSS-toggled siblings (see
           styles.css), no media-query read in JS, so it stays SSR-identical. */}
       <Icon icon={expanded ? "collapse-side-nav" : "expand-side-nav"} />
-      <span>{expanded ? "Close menu" : "Menu"}</span>
+      <span>{expanded ? messages.closeMenu() : messages.openMenu()}</span>
     </button>
   );
 };
@@ -55,14 +60,23 @@ const CollapseToggleTrigger = ({
  */
 const CollapseToggle = ({
   expanded = true,
+  messages,
   ...props
-}: CollapseToggleProps): React.ReactElement => (
-  <TooltipEngine
-    Message={expanded ? "Collapse" : "Expand"}
-    activateDelay={TOOLTIP_ACTIVATE_DELAY_MS}
-  >
-    <CollapseToggleTrigger expanded={expanded} {...props} />
-  </TooltipEngine>
-);
+}: CollapseToggleProps): React.ReactElement => {
+  const { collapse, expand } = { ...DEFAULT_MESSAGES, ...messages };
+
+  return (
+    <TooltipEngine
+      Message={expanded ? collapse() : expand()}
+      activateDelay={TOOLTIP_ACTIVATE_DELAY_MS}
+    >
+      <CollapseToggleTrigger
+        expanded={expanded}
+        messages={messages}
+        {...props}
+      />
+    </TooltipEngine>
+  );
+};
 
 export default CollapseToggle;
