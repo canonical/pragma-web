@@ -6,6 +6,16 @@ import {
   readNodeMeta,
   selectOnNode,
 } from "../../testing/expectFieldsRoundTrip.js";
+import {
+  ASYMMETRIC_UNIT_URI,
+  COUPLED_FORMATION_URI,
+  COUPLED_STOCK_URI,
+  MIXED_STOCK_LINE_URI,
+  OVERLONG_LINE_URI,
+  REVERSED_UNIT_FORMATION_URI,
+  SHORT_PLATFORM_STATION_URI,
+  SINGLE_UNIT_FORMATION_URI,
+} from "../../testing/fixtures.js";
 import type { PublishedFields } from "../../testing/types.js";
 import { toCursor } from "./connection.js";
 import {
@@ -1054,11 +1064,9 @@ describe("Stop.diagramPosition", () => {
 });
 
 describe("RollingStock.formations", () => {
-  const SERIES_90 = "https://metro.example/onto#series-90";
-
   it("lists the stock's alternative formations in authored order, shortest first", async () => {
     const data = await run(`{
-      node(id: "${SERIES_90}") {
+      node(id: "${COUPLED_STOCK_URI}") {
         __typename
         ... on RollingStock { name formations { uri length } }
       }
@@ -1068,11 +1076,11 @@ describe("RollingStock.formations", () => {
       name: "Series 90",
       formations: [
         {
-          uri: "https://metro.example/onto#series-90-three-car",
+          uri: SINGLE_UNIT_FORMATION_URI,
           length: 60000,
         },
         {
-          uri: "https://metro.example/onto#series-90-six-car",
+          uri: COUPLED_FORMATION_URI,
           length: 120000,
         },
       ],
@@ -1080,26 +1088,28 @@ describe("RollingStock.formations", () => {
   });
 
   it("publishes its fields, and each one round-trips", async () => {
-    await expectFieldsRoundTrip(run, SERIES_90, selectOnNode, readNodeMeta);
+    await expectFieldsRoundTrip(
+      run,
+      COUPLED_STOCK_URI,
+      selectOnNode,
+      readNodeMeta,
+    );
   });
 });
 
 describe("Formation", () => {
-  const SIX_CAR = "https://metro.example/onto#series-90-six-car";
-  const FOUR_CAR = "https://metro.example/onto#series-50-four-car";
-
   it("names the stock that lists it", async () => {
     const data = await run(`{
-      node(id: "${SIX_CAR}") { ... on Formation { stock { uri } } }
+      node(id: "${COUPLED_FORMATION_URI}") { ... on Formation { stock { uri } } }
     }`);
     expect(data.node).toEqual({
-      stock: { uri: "https://metro.example/onto#series-90" },
+      stock: { uri: COUPLED_STOCK_URI },
     });
   });
 
   it("numbers its units from the front, each with its way round", async () => {
     const data = await run(`{
-      node(id: "${FOUR_CAR}") {
+      node(id: "${REVERSED_UNIT_FORMATION_URI}") {
         ... on Formation { units { position reversed unit { uri } } }
       }
     }`);
@@ -1108,12 +1118,12 @@ describe("Formation", () => {
         {
           position: 1,
           reversed: false,
-          unit: { uri: "https://metro.example/onto#unit-50" },
+          unit: { uri: ASYMMETRIC_UNIT_URI },
         },
         {
           position: 2,
           reversed: true,
-          unit: { uri: "https://metro.example/onto#unit-50" },
+          unit: { uri: ASYMMETRIC_UNIT_URI },
         },
       ],
     });
@@ -1122,26 +1132,23 @@ describe("Formation", () => {
   it("measures the formation as the sum of its units", async () => {
     // Two units of 60000 mm and 490 passengers each.
     const data = await run(`{
-      node(id: "${SIX_CAR}") { ... on Formation { length capacity } }
+      node(id: "${COUPLED_FORMATION_URI}") { ... on Formation { length capacity } }
     }`);
     expect(data.node).toEqual({ length: 120000, capacity: 980 });
   });
 
   it("lists the lines run with it, in IRI order", async () => {
     const data = await run(`{
-      node(id: "${SIX_CAR}") { ... on Formation { lines { uri } } }
+      node(id: "${COUPLED_FORMATION_URI}") { ... on Formation { lines { uri } } }
     }`);
     expect(data.node).toEqual({
-      lines: [
-        { uri: "https://metro.example/onto#coastal-line" },
-        { uri: "https://metro.example/onto#north-line" },
-      ],
+      lines: [{ uri: MIXED_STOCK_LINE_URI }, { uri: OVERLONG_LINE_URI }],
     });
   });
 
   it("describes a unit position as a value of the UnitPosition class", async () => {
     const data = await run(`{
-      node(id: "${SIX_CAR}") {
+      node(id: "${COUPLED_FORMATION_URI}") {
         ... on Formation { units { _meta { title curie type { uri } } } }
       }
     }`);
@@ -1156,13 +1163,18 @@ describe("Formation", () => {
   });
 
   it("publishes its fields, and each one round-trips", async () => {
-    await expectFieldsRoundTrip(run, SIX_CAR, selectOnNode, readNodeMeta);
+    await expectFieldsRoundTrip(
+      run,
+      COUPLED_FORMATION_URI,
+      selectOnNode,
+      readNodeMeta,
+    );
   });
 
   it("publishes a unit position's fields, and each one round-trips", async () => {
     await expectFieldsRoundTrip(
       run,
-      SIX_CAR,
+      COUPLED_FORMATION_URI,
       (meta) => `... on Formation { units { ${meta} } }`,
       (node) =>
         assertPresent(
@@ -1176,18 +1188,18 @@ describe("Formation", () => {
 describe("Line.formations", () => {
   it("lists the formations a line is run with, in authored order", async () => {
     const data = await run(`{
-      node(id: "https://metro.example/onto#coastal-line") {
+      node(id: "${MIXED_STOCK_LINE_URI}") {
         ... on Line { formations { uri stock { uri } } }
       }
     }`);
     expect(data.node).toEqual({
       formations: [
         {
-          uri: "https://metro.example/onto#series-90-six-car",
-          stock: { uri: "https://metro.example/onto#series-90" },
+          uri: COUPLED_FORMATION_URI,
+          stock: { uri: COUPLED_STOCK_URI },
         },
         {
-          uri: "https://metro.example/onto#series-50-four-car",
+          uri: REVERSED_UNIT_FORMATION_URI,
           stock: { uri: "https://metro.example/onto#series-50" },
         },
       ],
@@ -1304,7 +1316,7 @@ describe("Unit.cars", () => {
 describe("Stop.platformLength", () => {
   it("serves the length of the station's shortest platform, in millimetres", async () => {
     const data = await run(`{
-      node(id: "https://metro.example/onto#marsh-end") {
+      node(id: "${SHORT_PLATFORM_STATION_URI}") {
         ... on Stop { platformLength }
       }
     }`);
