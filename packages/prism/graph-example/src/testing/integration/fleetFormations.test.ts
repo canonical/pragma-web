@@ -30,12 +30,13 @@ import {
 } from "../fixtures.js";
 import { readFleet } from "../readFleet.js";
 import type {
+  CabEnd,
   Fleet,
-  FleetCarType,
   FleetFormation,
   FleetLine,
   FleetStock,
   FleetUnit,
+  RunningCar,
 } from "../types.js";
 
 let fleet: Fleet;
@@ -43,20 +44,6 @@ let fleet: Fleet;
 beforeAll(async () => {
   fleet = await readFleet();
 });
-
-/** A driving cab in a train: which car it is in, and which end it faces. */
-interface CabEnd {
-  /** The car's place in the train, counted from 1 at the front. */
-  readonly car: number;
-  readonly faces: "front" | "rear";
-}
-
-/** One car as it runs in a train: its car type and which way round it is. */
-interface RunningCar {
-  readonly carType: FleetCarType;
-  /** True when the car's leading end faces the rear of the train. */
-  readonly reversed: boolean;
-}
 
 /**
  * A formation's cars in train order. A reversed unit runs last car first,

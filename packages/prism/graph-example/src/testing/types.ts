@@ -2,9 +2,10 @@
  * The shapes the test readers return, as a client reads them through
  * GraphQL: `readNetwork`'s lines with their routes and calls and stations
  * with their lines and diagram places, and `readFleet`'s rolling stocks,
- * formations, units and car types with the lines they run; and the part
- * of a `_meta` selection the field round-trip reads. Test-only, and
- * type-only.
+ * formations, units and car types with the lines they run; the cars and
+ * cabs of a formation in train order, as the fleet tests derive them; and
+ * the part of a `_meta` selection the field round-trip reads. Test-only,
+ * and type-only.
  */
 
 /** One class's instances page, the way the readers select it. */
@@ -138,6 +139,20 @@ export interface FleetLine {
   readonly uri: string;
   readonly formations: readonly NetworkReference[];
   readonly routes: readonly { readonly calls: readonly FleetCall[] }[];
+}
+
+/** One car as it runs in a train: its car type and which way round it is. */
+export interface RunningCar {
+  readonly carType: FleetCarType;
+  /** True when the car's leading end faces the rear of the train. */
+  readonly reversed: boolean;
+}
+
+/** A driving cab in a train: which car it is in, and which end it faces. */
+export interface CabEnd {
+  /** The car's place in the train, counted from 1 at the front. */
+  readonly car: number;
+  readonly faces: "front" | "rear";
 }
 
 /**
