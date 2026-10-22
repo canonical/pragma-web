@@ -103,10 +103,12 @@ describe("the dark chip hooks", () => {
 
     for (let hue = 0; hue < 360; hue += 15) {
       const text = convertOklchToSrgb([lightness, chroma, hue]);
+      const [textRed, textGreen, textBlue] = text;
+      const [backgroundRed, backgroundGreen, backgroundBlue] = background;
       const fill: Srgb = [
-        alpha * text[0] + (1 - alpha) * background[0],
-        alpha * text[1] + (1 - alpha) * background[1],
-        alpha * text[2] + (1 - alpha) * background[2],
+        alpha * textRed + (1 - alpha) * backgroundRed,
+        alpha * textGreen + (1 - alpha) * backgroundGreen,
+        alpha * textBlue + (1 - alpha) * backgroundBlue,
       ];
       expect(
         measureContrast(text, fill),
