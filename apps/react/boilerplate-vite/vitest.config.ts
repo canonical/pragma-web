@@ -6,6 +6,10 @@ import viteConfig from "./vite.config.js";
 export default mergeConfig(
   viteConfig({ command: "serve", mode: "test" }),
   defineConfig({
+    // Some @canonical packages declare only a "module" entry, with no "main"
+    // or "exports" (react-ds-global-form). The test environment's resolver
+    // reads no "module" field by default, so name it.
+    resolve: { mainFields: ["module", "jsnext:main", "jsnext"] },
     test: {
       // Browser-like environment for component tests
       environment: "jsdom",
