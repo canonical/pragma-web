@@ -7,7 +7,7 @@ executable GraphQL schema, and serves it as a fetch-native handler.
 
 It exists because the docsite app should not. Until this package landed,
 `apps/react/pragma-docs/src/server/graphql.ts` held the ref-package list, the semantic
-package list, an ontology exclusion, a custom field mapping, and the compiler options —
+package list, an ontology exclusion, a custom field mapping (since deleted), and the compiler options —
 296 lines of knowledge about *pragma's specific ontologies* living inside an application
 that claims to render against any conformant provider. After this package, the app
 imports one factory and depends on **no knowledge engine at all**: no `@canonical/ke`,
@@ -43,26 +43,27 @@ would delete it from this repo. They are pinned constants
 
 | Constant | What it encodes | The upstream fix that deletes it |
 |---|---|---|
-| `REF_PACKAGES` | `design-system`, `code-standards`, `anatomy-dsl` — the cached source packages | A manifest in the refs cache the provider could read instead of hard-coding |
+| `REF_PACKAGES` | `design-system`, `code-standards`, `anatomy-dsl` — the source packages, declared as dependencies at exact versions and read from `node_modules` | A manifest the packages publish themselves, so the list is read rather than hard-coded |
 | `SEM_PACKAGES` | `surface`, `design-system-docs` — the docsite's own demand model, in a second root | Publishing the demand model as a ref package, collapsing two roots to one |
 | `EXCLUDED_SOURCES` | drops `design-system-docs/data/shim-concept.ttl`, whose `ds:embodiesConcept rdfs:domain ds:Entity` smears two fields onto all fourteen `ds:` types | A modelling fix: narrow the domain off the class-tree root |
-| `CUSTOM_MAPPINGS` | renames `anatomy:uri` → `anatomyUri`, because `uri` is the compiler-injected primary key | A `graphql:name "anatomyUri"` annotation on the term in the anatomy DSL's own repository |
 
-### The anatomy collision is now a test, not a paragraph
+### The anatomy collision: resolved upstream, still measured here
 
-`CUSTOM_MAPPINGS` is the single most load-bearing line in the package, and its
-justification used to be prose in a comment that nothing checked. Two documents in this
-repo disagreed about whether the failure it prevents was fatal yet.
+A fourth constant used to sit in that table: `CUSTOM_MAPPINGS`, renaming `anatomy:uri`
+to `anatomyUri` because `uri` is the primary key the compiler injects on every Node, and
+an ontology property of the same name is an `M005` error that kills the boot. Its
+documented upstream fix was a `graphql:name "anatomyUri"` annotation on the term in the
+anatomy DSL itself. `@canonical/anatomy-dsl` 0.43.0 carries that annotation, so the
+constant did nothing on the real graph (the compiler reported `M003`, a mapping that
+references nothing) and it was deleted.
 
-It was settled by running it. **Measured at `4d228c8`**, over the hermetic corpus:
-
-| | Outcome |
-|---|---|
-| **with** the mapping | boots; SDL carries `anatomyUri: String` on `NamedNode`; one `V014` info diagnostic |
-| **without** it | **throws `CompilationError`** — `M005 … maps to NamedNode.uri, a structural field the compiler owns — the field is DROPPED` |
-
-The fatality is live. `src/lib/provider/createPragmaProvider.test.ts` asserts it, both
-halves, on every run.
+What stays is the measurement. The hermetic corpus carries the same annotation, and
+`src/lib/provider/createPragmaProvider.test.ts` asserts both halves on every run: with the
+annotation the SDL carries `anatomyUri: String` on `NamedNode` and the compiler's own
+`uri: ID!` is untouched; with the annotation stripped from the source text the boot
+throws `CompilationError` carrying `M005 … the field is DROPPED`. If a future ke-graphql
+stopped binding `graphql:name`, or downgraded M005 to a warning, this file goes red,
+which is the right outcome: the committed schema would otherwise quietly lose a field.
 
 ---
 
@@ -93,16 +94,19 @@ package never derives a path.
 The app's former `graphql.ts` derived one from `import.meta.url`. Carried into a package
 unchanged, that resolves relative to the *package* — so the app's schema would be
 written into `node_modules`, and `tsc`, `biome` and every test in the repo would still
-pass. Only a boot reveals it, and a boot needs a refs cache. The guard is therefore
+pass. Only a boot reveals it. The guard is therefore
 structural: there is no path in this package to get wrong.
 
 ---
 
 ## Testing: the hermetic corpus
 
-Pragma's real corpus is the pragma CLI's refs cache plus a semantics working tree.
-Neither exists in CI or in a fresh clone, so a suite that needed them would be skipped —
-and a skipped gate is worse than no gate.
+Pragma's real corpus is the three ref packages plus a semantics working tree. The
+packages are installed, so a boot over them is possible in CI, but it is a three-second
+boot over several hundred files and it proves pragma's ontologies rather than this
+package's logic; the semantics tree does not exist in CI at all. The unit suite therefore
+runs against a corpus of its own, and only `resolveRefRoots.test.ts` touches the real
+install, read-only, to prove the default resolution finds it.
 
 `src/testing/__fixtures__/corpus/` is a hand-written Turtle corpus in the exact shape the
 collector walks, small enough to read in one sitting and complete enough to make every
@@ -122,7 +126,7 @@ They are kept because the property that suite asserts — additivity of the seco
 root — is a property of the **source set**, orthogonal to the structural head, and both
 sides of the comparison are equally stale. The type inventory has not drifted: the
 merged capture carries 183 top-level definitions, exactly the live schema's count. They
-cannot be regenerated without a full refs cache, and a capture from a *partial* cache is
+cannot be regenerated without the semantics tree, and a capture from a *partial* corpus is
 worse than a stale one because it looks current.
 
 What that leaves open is measured only in part. `src/testing/integration/committedSdl.test.ts`
@@ -130,7 +134,7 @@ checks the schema the app **ships** — the committed `schema.graphql` — again
 contract on every run, so the structural head those captures are stale against is not
 unmeasured. Its subject is a **committed artifact**, not a live emission, so it cannot
 see that file drift from what `createPragmaProvider` would emit today. Closing that
-second gap needs a boot with a populated refs cache; the test's own header states the
+second gap is the docsite's `schema:check`, which regenerates the committed file from the installed packages and fails on a diff; the test's own header states the
 same limit. What a live emission can show without one — that the compiler this package
 pins still satisfies the contract — `createPragmaProvider.test.ts` checks over the
 hermetic corpus.
@@ -146,7 +150,20 @@ bun run serve   # GraphiQL at http://127.0.0.1:5177/graphql
 Port 5177: the docsite's own graph holds 5175 and graph-example holds 5176, so all three
 run at once and the docsite can be pointed at any of them with `VITE_GRAPHQL_URL`.
 
-**It will not boot without a populated pragma refs cache** (`pragma sources update`, or
-`PRAGMA_REFS_DIR`). That is correct: `collectTtlSources` throws with the remedy in the
-message before an Oxigraph store is ever created. A demo that fabricated a graph to have
-something to serve would be demonstrating something other than this provider.
+**It boots from the installed ref packages.** `@canonical/design-system`,
+`@canonical/code-standards` and `@canonical/anatomy-dsl` are dependencies of this package,
+pinned to exact versions, so `bun install` is the whole setup and two machines with the
+same lockfile compile the same graph. The versions are stamped into the emitted SDL's
+provenance header as its `revision`, so a schema diff names the release that caused it.
+
+To work against ontology branches that are not published yet, point `PRAGMA_REFS_DIR` (or
+the `refsRoot` option) at a pragma refs cache (`pragma sources update` populates one at
+`~/.cache/pragma/refs/@canonical`); its `<package>/main/{definitions,data}` layout is read
+instead. A cache root that does not exist is an error with the remedy in the message,
+before an Oxigraph store is ever created.
+
+**The semantics tree is optional, and can be refused.** `PRAGMA_SEM_DIR` (or `semRoot`)
+names the working tree holding `surface` and `design-system-docs`; a missing one is
+announced and skipped. `semRoot: null` skips it silently whatever the machine has, which
+is how the docsite generates the schema it commits: from the ref packages alone, so a
+local checkout cannot leak into the committed file.

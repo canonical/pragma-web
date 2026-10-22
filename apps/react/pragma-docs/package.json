@@ -33,6 +33,8 @@
   },
   "scripts": {
     "graph": "bun src/server/graph.ts",
+    "schema": "bun src/server/schema.ts",
+    "schema:check": "bun run schema && git diff --exit-code -- src/relay/schema.graphql",
     "dev": "bun src/server/withGraph.ts vite",
     "dev:express": "bun src/server/withGraph.ts node --import tsx --import ./src/server/nodeCssNoop.ts src/server/server.express.ts",
     "dev:bun": "bun src/server/withGraph.ts bun src/server/server.bun.ts",
@@ -44,7 +46,7 @@
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --mode server",
     "build:storybook": "storybook build",
-    "check": "bun run check:biome && bun run check:ts && bun run relay:check",
+    "check": "bun run check:biome && bun run check:ts && bun run schema:check && bun run relay:check",
     "check:fix": "bun run check:biome:fix && bun run check:ts",
     "check:biome": "biome check",
     "check:biome:fix": "biome check --write",
