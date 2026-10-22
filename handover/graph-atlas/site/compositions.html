@@ -27,6 +27,11 @@
   .board { position: relative; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
   .stage:not(.tilted) { perspective: none; }
   .tilted .board { transform: rotateX(var(--rx, 9deg)) rotateY(var(--ry, -3deg)) translateZ(-80px); }
+  /* Exploded: a teardown. The frames lie flat on the board as the chassis and every nested layer rises in big
+     steps, seen from a steep angle through a far perspective, so depth reads as displacement, not as scale. */
+  .stage.exploded { perspective: 3600px; }
+  .exploded .board { transform: rotateX(var(--rx, 54deg)) rotateY(var(--ry, -16deg)) translateZ(-200px); }
+  .exploded .frame { --lift: 0px !important; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
   .frame { position: relative; grid-column: span var(--w, 2); background: var(--color-background); border: 1px solid var(--color-border-disabled); padding: 1.25rem 1.5rem 1.5rem; box-sizing: border-box; min-width: 0; cursor: pointer; transform-style: preserve-3d; transform: translateZ(var(--lift, 0px)); transition: transform .7s cubic-bezier(.2,.7,.2,1), box-shadow .7s;
     box-shadow: 0 calc(2px + var(--depth, 0) * 3px) calc(10px + var(--depth, 0) * 8px) calc(-6px - var(--depth, 0) * 1px) rgba(0,0,0,.5); }
   .frame:hover { border-color: var(--color-border); }
@@ -52,12 +57,13 @@
   <div class="page-head">
     <div class="eyebrow">16 / 16 · the real components, composed</div>
     <h1>Fifteen screens' worth of the system, on one board</h1>
-    <p class="lede">The same published components as the previous board, but composed the way a product uses them and filled with plausible data: an application shell with the real side navigation, a side panel and a modal, a page header, a create form, a sign-in, status tiles, release cards, an activity feed, settings, shortcuts, feedback, a maintenance schedule, a danger zone and an empty state. No labels on the frames; click one for the blocks it is made of. Elevation is the HTML depth from each composition's root, and with layering on every nested element rises by its own depth, so a form field's input floats above its label and a card's buttons above the card.</p>
+    <p class="lede">The same published components as the previous board, but composed the way a product uses them and filled with plausible data: an application shell with the real side navigation, a side panel and a modal, a page header, a create form, a sign-in, status tiles, release cards, an activity feed, settings, shortcuts, feedback, a maintenance schedule, a danger zone and an empty state. No labels on the frames; click one for the blocks it is made of. Elevation is the HTML depth from each composition's root, and with layering on every nested element rises by its own depth, so a form field's input floats above its label and a card's buttons above the card. Exploded pulls the layers far apart, one step per nesting level, with the frames as the base.</p>
   </div>
   <section class="block" style="border-top:0;padding-top:0">
     <div class="toolbar">
       <button id="indexBtn">☰ Index</button><span class="sep"></span>
       <button id="tilt" aria-pressed="true">3D tilt</button>
+      <button id="explode" aria-pressed="false" title="Pull the layers apart (x)">Exploded</button>
       <select id="layer" aria-label="Layering"><option value="elements" selected>Layer: every element</option><option value="components">Layer: components only</option><option value="">Layer: off</option></select>
       <select id="scale" aria-label="Depth scale"><option value="1">Depth: subtle</option><option value="2" selected>Depth: medium</option><option value="3.5">Depth: strong</option></select>
       <span class="sep"></span>
@@ -66,7 +72,7 @@
       <span class="sep"></span><span class="small muted" id="count"></span>
     </div>
     <div class="stage tilted" id="stage"><div class="board app" id="board"></div></div>
-    <p class="small muted">Move the pointer to tilt; switch the tilt off for a flat capture. Each frame is a Shadow DOM island that loads only pragma's stylesheet, so the components render exactly as their own CSS says, untouched by this page. Everything is live DOM: the inputs accept typing, the accordion opens, the hover states are the real ones. Click a frame to see which components it is made of.</p>
+    <p class="small muted">Move the pointer to tilt; switch the tilt off for a flat capture. Exploded (or the x key) pulls every composition apart into its layers, seen from above; the Depth select sets how far. Each frame is a Shadow DOM island that loads only pragma's stylesheet, so the components render exactly as their own CSS says, untouched by this page. Everything is live DOM: the inputs accept typing, the accordion opens, the hover states are the real ones. Click a frame to see which components it is made of.</p>
   </section>
 </main>
 <footer class="colophon wrap"></footer>
@@ -91,22 +97,37 @@
   // nested element rises one constant step per level, so height is linear in HTML depth.
   let maxAll = 0;
   islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); const max = A.depthOf(sr); f.style.setProperty("--depth", max); f.dataset.depth = max; maxAll = Math.max(maxAll, max); });
-  // a frame's lift is its depth relative to the deepest frame, so the deepest rises a fixed 45px per scale step
-  const applyScale = (k) => { islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); f.style.setProperty("--lift", (45 * k * (+f.dataset.depth) / maxAll).toFixed(1) + "px"); A.islandSet(sr, { dz2: (1.5 * k) + "px" }); }); };
+  // a frame's lift is its depth relative to the deepest frame, so the deepest rises a fixed 45px per scale step;
+  // exploded, the per-level step is six times larger and the CSS pins the lift to 0, so the frames are the base
+  const exploded = () => stage.classList.contains("exploded");
+  const applyScale = (k) => { islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); f.style.setProperty("--lift", (45 * k * (+f.dataset.depth) / maxAll).toFixed(1) + "px"); A.islandSet(sr, { dz2: ((exploded() ? 9 : 1.5) * k) + "px" }); }); };
   applyScale(2);
-  document.getElementById("count").textContent = `${comps.length} compositions · HTML depth 1…${maxAll}`;
-  const pack = () => A.packBoard(board, [...board.querySelectorAll(".frame")], { minCol: 170, gap: 32 });
-  const relayout = () => { const t = stage.classList.contains("tilted"); stage.classList.remove("tilted"); pack(); if (t) stage.classList.add("tilted"); };
+  const count = () => { document.getElementById("count").textContent = `${comps.length} compositions · HTML depth 1…${maxAll}${exploded() ? " · exploded" : ""}`; };
+  count();
+  // the chassis rows get more air when the stacks above them rise
+  const pack = (x = exploded()) => A.packBoard(board, [...board.querySelectorAll(".frame")], { minCol: 170, gap: x ? 56 : 32 });
+  // measure with no transform on the board, then restore the mode
+  const relayout = () => { const t = stage.classList.contains("tilted"), x = exploded(); stage.classList.remove("tilted", "exploded"); pack(x); if (x) stage.classList.add("exploded"); if (t) stage.classList.add("tilted"); };
   let lastW = 0; const onResize = () => { const w = board.clientWidth; if (w === lastW) return; lastW = w; relayout(); };
   onResize(); new ResizeObserver(onResize).observe(document.body); document.fonts?.ready.then(() => { lastW = 0; onResize(); });
-  document.getElementById("tilt").addEventListener("click", e => { const on = e.currentTarget.getAttribute("aria-pressed") !== "true"; e.currentTarget.setAttribute("aria-pressed", String(on)); stage.classList.toggle("tilted", on); });
-  document.getElementById("layer").addEventListener("change", e => islands.forEach(sr => A.islandSet(sr, { layer: e.target.value })));
-  document.getElementById("scale").addEventListener("change", e => applyScale(+e.target.value));
+  const tiltBtn = document.getElementById("tilt"), explodeBtn = document.getElementById("explode"), layerSel = document.getElementById("layer"), scaleSel = document.getElementById("scale");
+  const setTilt = (on) => { tiltBtn.setAttribute("aria-pressed", String(on)); stage.classList.toggle("tilted", on); if (!on && exploded()) setExploded(false); };
+  // exploded needs the tilt (a flat exploded board shows nothing) and per-element layering
+  const setExploded = (on) => { explodeBtn.setAttribute("aria-pressed", String(on)); stage.classList.toggle("exploded", on); board.style.removeProperty("--rx"); board.style.removeProperty("--ry");
+    if (on) { if (!stage.classList.contains("tilted")) setTilt(true); if (!layerSel.value) { layerSel.value = "elements"; islands.forEach(sr => A.islandSet(sr, { layer: "elements" })); } }
+    applyScale(+scaleSel.value); count(); lastW = 0; onResize(); pivot(); };
+  tiltBtn.addEventListener("click", () => setTilt(tiltBtn.getAttribute("aria-pressed") !== "true"));
+  explodeBtn.addEventListener("click", () => setExploded(!exploded()));
+  document.addEventListener("keydown", e => { if (e.key === "x" && !e.altKey && !e.ctrlKey && !e.metaKey && !e.composedPath().some(el => el.matches && el.matches("input, textarea, select, [contenteditable]"))) setExploded(!exploded()); });
+  layerSel.addEventListener("change", e => islands.forEach(sr => A.islandSet(sr, { layer: e.target.value })));
+  scaleSel.addEventListener("change", e => applyScale(+e.target.value));
 
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) stage.addEventListener("pointermove", ev => { const r = stage.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - .5, y = (ev.clientY - r.top) / r.height - .5; board.style.setProperty("--rx", (9 - y * 6).toFixed(1) + "deg"); board.style.setProperty("--ry", (-3 + x * 6).toFixed(1) + "deg"); });
+  // the pointer nudges the tilt around the mode's base angle: a gentle 9°/−3° normally, a steep 54°/−16° exploded
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) stage.addEventListener("pointermove", ev => { const r = stage.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - .5, y = (ev.clientY - r.top) / r.height - .5; const [bx, by, range] = exploded() ? [54, -16, 20] : [9, -3, 6]; board.style.setProperty("--rx", (bx - y * range).toFixed(1) + "deg"); board.style.setProperty("--ry", (by + x * range).toFixed(1) + "deg"); });
   document.getElementById("context").addEventListener("change", e => { islands.forEach(sr => A.islandSet(sr, { context: e.target.value })); lastW = 0; onResize(); });
   // keep the tilt pivot and the viewer on the part of the board in view
-  const pivot = () => { const r = stage.getBoundingClientRect(); const y = Math.max(0, Math.min(r.height, innerHeight / 2 - r.top)); stage.style.perspectiveOrigin = `50% ${y}px`; board.style.transformOrigin = `50% ${y}px`; };
+  // (exploded, the pivot sits higher: at 54° the board above it tips away and shrinks, so less should be above it)
+  const pivot = () => { const r = stage.getBoundingClientRect(); const y = Math.max(0, Math.min(r.height, innerHeight * (exploded() ? .38 : .5) - r.top)); stage.style.perspectiveOrigin = `50% ${y}px`; board.style.transformOrigin = `50% ${y}px`; };
   let pv = 0; addEventListener("scroll", () => { if (!pv) pv = requestAnimationFrame(() => { pv = 0; pivot(); }); }, { passive: true }); addEventListener("resize", pivot); pivot();
   // drawer
   const drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim");

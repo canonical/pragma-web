@@ -202,6 +202,9 @@ The stage:
 - **Tilted.** A `.stage.tilted` wrapper applies `perspective`, and the board gets `rotateX(9deg) rotateY(-3deg)`. Pointer movement nudges both angles.
 - **Pivot.** `pivot()` keeps the perspective origin at the viewport centre while scrolling.
 - **Flat.** The flat mode sets `perspective: none`.
+- **Exploded.** The `Exploded` toolbar button (or the `x` key, ignored while typing in an island input) adds `.exploded` to the stage: a teardown view. The per-level step becomes `9px × k` instead of `1.5px × k` (18px per level at medium), the frames' `--lift` is pinned to 0 so they are the flat base, the board rotates `rotateX(54deg) rotateY(-16deg)` (pointer range ±10°) behind a 3600px perspective pulled back 200px, so depth reads as displacement rather than scale, and the pivot sits at 38% of the viewport rather than 50%. Turning it on turns the tilt on and forces Layer to `elements` if it was off; turning the tilt off turns it off. The packer runs with `gap: 56` instead of 32 while exploded, so the chassis rows have air under the stacks that climb over them (near layers sort in front within the board's one `preserve-3d` context).
+
+Pragma clips `.ds.card`, `.ds.tile`, `.ds.accordion`, `.ds.modal` and the side navigation's `.ds.content` with `overflow: hidden` (`auto` on `.ds.modal-content`). Any overflow other than `visible` or `clip` groups the element's 3D descendants into one plane, so those subtrees were flat under layering. `ISLAND_CSS` sets them to `overflow: clip` (`visible` on `modal-content`) under `.island[data-layer]`, which keeps the clipping and lets the layers through.
 
 ### 6.5 Packing: `packBoard` in `atlas.js`
 
@@ -331,6 +334,7 @@ Always look at a screenshot before reporting a visual fix. Several earlier "fixe
 | Every frame full width | Packer overweighted exact fit | Score preferred span first |
 | Badge stretched full width | Flex or grid stretch in a composition | Intrinsic width |
 | Light theme broken on dark devices | Theme select set a class; page `color-scheme` listened only to `data-theme` | `:root.light` and `:root.dark` in `atlas.css`; `.island:not(.light)` rewrite |
+| Cards, tiles, accordions and modals flat under layering | Pragma's `overflow: hidden` groups 3D descendants | `overflow: clip` for them in `ISLAND_CSS` |
 
 ## 12. Analysis already delivered to the user
 
