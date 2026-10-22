@@ -184,7 +184,8 @@ export const EXTRACTION_CASES: readonly ExtractionCase[] = [
  * A search index written so every ranking key decides at least one case:
  * a CURIE and a definition each matching earlier than a title, two titles
  * matching at different positions, two titles of different lengths, two of
- * the same length that differ only in case, and two identical titles.
+ * different lengths whose title order is the reverse of their length order,
+ * two of the same length that differ only in case, and two identical titles.
  * Listed out of rank order, so the order is the ranking's, not the index's.
  */
 export const SEARCH_ENTRIES: readonly SearchEntry[] = [
@@ -229,6 +230,13 @@ export const SEARCH_ENTRIES: readonly SearchEntry[] = [
     definition: null,
   },
   { uri: `${DS}chip`, title: "Chip", curie: "ds:chip", definition: null },
+  {
+    uri: `${DS}keyline`,
+    title: "Keyline",
+    curie: "ds:keyline",
+    definition: null,
+  },
+  { uri: `${DS}knob`, title: "Knob", curie: "ds:knob", definition: null },
 ];
 
 /** The cases `rankSearchEntries` is held to over {@link SEARCH_ENTRIES}. */
@@ -250,6 +258,11 @@ export const RANKING_CASES: readonly RankingCase[] = [
     name: "ranks a shorter title first among matches at one position",
     text: "alert",
     expected: [`${DS}alert`, `${DS}alert-banner`],
+  },
+  {
+    name: "ranks a shorter title first even where it sorts later by code point",
+    text: "k",
+    expected: [`${DS}knob`, `${DS}keyline`],
   },
   {
     name: "orders titles of one length by code point, capitals first",
