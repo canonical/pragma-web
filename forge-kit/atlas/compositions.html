@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,300..700;1,400&family=Ubuntu+Sans+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="atlas.css">
+<style>
+  /* Ubuntu Sans from @canonical/ds-assets, the files @canonical/styles/fonts loads, declared on the document
+     so the Shadow DOM islands inherit it. Ubuntu Sans Mono comes from Google Fonts: the mono files in
+     ds-assets are not fonts (see the note in @canonical/styles/src/fonts.css, PRA-146). */
+  @font-face { font-family: "Ubuntu Sans"; src: url("fonts/UbuntuSans.woff2") format("woff2-variations"); font-weight: 100 800; font-stretch: 75% 100%; font-display: swap; }
+  @font-face { font-family: "Ubuntu Sans"; font-style: italic; src: url("fonts/UbuntuSans-Italic.woff2") format("woff2-variations"); font-weight: 100 800; font-stretch: 75% 100%; font-display: swap; }
+</style>
+
+<title>Compositions · Pragma Graph Atlas</title>
+<style>
+  /* Thirteen compositions built from the published components (server-rendered markup of
+     @canonical/react-ds-global and react-ds-global-form 0.44.1, styled by pragma.css), on a board
+     with no metadata. Elevation is the HTML nesting depth from each component root; with layering
+     on, every nested element is also raised by its own depth. */
+  .toolbar { display: flex; flex-wrap: wrap; gap: .375rem; align-items: center; padding: .5rem 0 .75rem; }
+  .toolbar button, .toolbar select { font: inherit; font-size: .75rem; padding: .25rem .5rem; background: var(--color-background); color: var(--color-text); border: 1px solid var(--color-border); cursor: pointer; }
+  .toolbar button[aria-pressed="true"] { background: var(--color-text); color: var(--color-background); }
+  .toolbar .sep { width: 1px; height: 1.25rem; background: var(--color-border-disabled); }
+  .stage { perspective: 2200px; perspective-origin: 50% 40%; padding: 2rem 3.5rem 4rem 2.5rem; margin-inline: -1rem; overflow: clip; background: var(--color-background-layer2); }
+  .board { position: relative; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  .stage:not(.tilted) { perspective: none; }
+  .tilted .board { transform: rotateX(var(--rx, 9deg)) rotateY(var(--ry, -3deg)) translateZ(-80px); }
+  .frame { position: relative; grid-column: span var(--w, 2); background: var(--color-background); border: 1px solid var(--color-border-disabled); padding: 1.25rem 1.5rem 1.5rem; box-sizing: border-box; min-width: 0; cursor: pointer; transform-style: preserve-3d; transform: translateZ(var(--lift, 0px)); transition: transform .7s cubic-bezier(.2,.7,.2,1), box-shadow .7s;
+    box-shadow: 0 calc(2px + var(--depth, 0) * 3px) calc(10px + var(--depth, 0) * 8px) calc(-6px - var(--depth, 0) * 1px) rgba(0,0,0,.5); }
+  .frame:hover { border-color: var(--color-border); }
+  .frame.flash { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+  .frame .fbody { min-width: 0; transform-style: preserve-3d; display: block; }
+  .drawer { position: fixed; left: 0; top: 0; bottom: 0; width: min(18rem, 86vw); background: var(--color-background); border-right: 1px solid var(--color-border); z-index: 25; transform: translateX(-100%); transition: transform .3s; display: grid; grid-template-rows: auto 1fr; padding-top: env(safe-area-inset-top, 0px); }
+  .drawer.open { transform: none; }
+  .drawer header { display: flex; justify-content: space-between; align-items: center; padding: .75rem 1rem; border-bottom: 1px solid var(--color-border-disabled); } .drawer header h3 { font-size: .875rem; }
+  .drawer button.close { font: inherit; background: none; border: 1px solid var(--color-border); color: var(--color-text); width: 2rem; height: 2rem; cursor: pointer; }
+  .drawer nav { overflow: auto; padding: .5rem 0 1rem; }
+  .drawer a { display: grid; gap: .125rem; padding: .4rem 1rem; font-size: .875rem; color: var(--color-text); text-decoration: none; cursor: pointer; }
+  .drawer a:hover, .drawer a.current { background: var(--color-background-layer2); }
+  .drawer a .d { color: var(--color-text-muted); font-size: .75rem; }
+  .scrim { position: fixed; inset: 0; background: var(--color-backdrop); z-index: 24; display: none; } .scrim.open { display: block; }
+  @media (prefers-reduced-motion: reduce) { .board, .frame, .drawer { transition: none; } }
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap"></div></header>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Composition index"><header><h3>Compositions</h3><button class="close" id="drawerClose" aria-label="Close index">×</button></header><nav id="drawerNav"></nav></aside>
+<main class="wrap">
+  <div class="page-head">
+    <div class="eyebrow">16 / 16 · the real components, composed</div>
+    <h1>Fifteen screens' worth of the system, on one board</h1>
+    <p class="lede">The same published components as the previous board, but composed the way a product uses them and filled with plausible data: an application shell with the real side navigation, a side panel and a modal, a page header, a create form, a sign-in, status tiles, release cards, an activity feed, settings, shortcuts, feedback, a maintenance schedule, a danger zone and an empty state. No labels on the frames; click one for the blocks it is made of. Elevation is the HTML depth from each composition's root, and with layering on every nested element rises by its own depth, so a form field's input floats above its label and a card's buttons above the card.</p>
+  </div>
+  <section class="block" style="border-top:0;padding-top:0">
+    <div class="toolbar">
+      <button id="indexBtn">☰ Index</button><span class="sep"></span>
+      <button id="tilt" aria-pressed="true">3D tilt</button>
+      <select id="layer" aria-label="Layering"><option value="elements" selected>Layer: every element</option><option value="components">Layer: components only</option><option value="">Layer: off</option></select>
+      <select id="scale" aria-label="Depth scale"><option value="1">Depth: subtle</option><option value="2" selected>Depth: medium</option><option value="3.5">Depth: strong</option></select>
+      <span class="sep"></span>
+      <select id="theme" aria-label="Theme"><option value="">Theme: follow page</option><option value="light">Theme: light</option><option value="dark">Theme: dark</option></select>
+      <select id="context" aria-label="Context"><option value="app">Context: app</option><option value="site">Context: site</option><option value="docs">Context: docs</option></select>
+      <span class="sep"></span><span class="small muted" id="count"></span>
+    </div>
+    <div class="stage tilted" id="stage"><div class="board app" id="board"></div></div>
+    <p class="small muted">Move the pointer to tilt; switch the tilt off for a flat capture. Each frame is a Shadow DOM island that loads only pragma's stylesheet, so the components render exactly as their own CSS says, untouched by this page. Everything is live DOM: the inputs accept typing, the accordion opens, the hover states are the real ones. Click a frame to see which components it is made of.</p>
+  </section>
+</main>
+<footer class="colophon wrap"></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="atlas.js"></script>
+<script>
+(async () => {
+  const A = Atlas; A.mountNav("compositions.html");
+  const root = document.documentElement;
+  const syncTheme = (force) => { root.classList.remove("light", "dark"); const t = force || root.dataset.theme; if (t === "light" || t === "dark") root.classList.add(t); };
+  syncTheme(); new MutationObserver(() => { syncTheme(document.getElementById("theme").value); typeof islands !== "undefined" && islands.forEach(sr => A.islandSet(sr, { scheme: scheme() })); }).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+  document.getElementById("theme").addEventListener("change", e => { syncTheme(e.target.value); typeof islands !== "undefined" && islands.forEach(sr => A.islandSet(sr, { scheme: scheme() })); });
+  const [comps, bl] = await A.load("compositions", "blocks");
+  const board = document.getElementById("board"), stage = document.getElementById("stage");
+  const byName0 = new Map(); for (const b of bl.blocks) { const k = b.name.toLowerCase().replace(/[^a-z0-9]/g, ""); if (!byName0.has(k) || A.local(b.tier || "") === "global") byName0.set(k, b); }
+  const MIN = { "app-shell": 4, "side-panel": 4, "modal": 3, "page-header": 3, "status-tiles": 3, "release-cards": 3 };
+  board.innerHTML = comps.map((c, i) => `<article class="frame" id="f-${i}" data-i="${i}" data-span="${c.size}" data-min="${MIN[c.key] || 2}" data-max="${c.size + 1}" tabindex="0" role="button" aria-label="${A.esc(c.title)}"><div class="fbody"></div></article>`).join("");
+  // each composition renders inside a Shadow DOM island that loads only pragma.css
+  const scheme = () => document.getElementById("theme").value || (root.dataset.theme === "light" || root.dataset.theme === "dark" ? root.dataset.theme : "");
+  const islands = await Promise.all(comps.map((c, i) => A.island(document.getElementById("f-" + i).querySelector(".fbody"), c.html, { layer: "elements", screen: c.screen, scheme: scheme() })));
+  // Elevation: a frame rises by the deepest HTML path below its component root; inside the island every
+  // nested element rises one constant step per level, so height is linear in HTML depth.
+  let maxAll = 0;
+  islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); const max = A.depthOf(sr); f.style.setProperty("--depth", max); f.dataset.depth = max; maxAll = Math.max(maxAll, max); });
+  // a frame's lift is its depth relative to the deepest frame, so the deepest rises a fixed 45px per scale step
+  const applyScale = (k) => { islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); f.style.setProperty("--lift", (45 * k * (+f.dataset.depth) / maxAll).toFixed(1) + "px"); A.islandSet(sr, { dz2: (1.5 * k) + "px" }); }); };
+  applyScale(2);
+  document.getElementById("count").textContent = `${comps.length} compositions · HTML depth 1…${maxAll}`;
+  const pack = () => A.packBoard(board, [...board.querySelectorAll(".frame")], { minCol: 170, gap: 32 });
+  const relayout = () => { const t = stage.classList.contains("tilted"); stage.classList.remove("tilted"); pack(); if (t) stage.classList.add("tilted"); };
+  let lastW = 0; const onResize = () => { const w = board.clientWidth; if (w === lastW) return; lastW = w; relayout(); };
+  onResize(); new ResizeObserver(onResize).observe(document.body); document.fonts?.ready.then(() => { lastW = 0; onResize(); });
+  document.getElementById("tilt").addEventListener("click", e => { const on = e.currentTarget.getAttribute("aria-pressed") !== "true"; e.currentTarget.setAttribute("aria-pressed", String(on)); stage.classList.toggle("tilted", on); });
+  document.getElementById("layer").addEventListener("change", e => islands.forEach(sr => A.islandSet(sr, { layer: e.target.value })));
+  document.getElementById("scale").addEventListener("change", e => applyScale(+e.target.value));
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) stage.addEventListener("pointermove", ev => { const r = stage.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - .5, y = (ev.clientY - r.top) / r.height - .5; board.style.setProperty("--rx", (9 - y * 6).toFixed(1) + "deg"); board.style.setProperty("--ry", (-3 + x * 6).toFixed(1) + "deg"); });
+  document.getElementById("context").addEventListener("change", e => { islands.forEach(sr => A.islandSet(sr, { context: e.target.value })); lastW = 0; onResize(); });
+  // keep the tilt pivot and the viewer on the part of the board in view
+  const pivot = () => { const r = stage.getBoundingClientRect(); const y = Math.max(0, Math.min(r.height, innerHeight / 2 - r.top)); stage.style.perspectiveOrigin = `50% ${y}px`; board.style.transformOrigin = `50% ${y}px`; };
+  let pv = 0; addEventListener("scroll", () => { if (!pv) pv = requestAnimationFrame(() => { pv = 0; pivot(); }); }, { passive: true }); addEventListener("resize", pivot); pivot();
+  // drawer
+  const drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim");
+  const openDrawer = (on) => { drawer.classList.toggle("open", on); scrim.classList.toggle("open", on); };
+  document.getElementById("indexBtn").addEventListener("click", () => openDrawer(true)); document.getElementById("drawerClose").addEventListener("click", () => openDrawer(false)); scrim.addEventListener("click", () => openDrawer(false));
+  document.addEventListener("keydown", e => { if (e.key === "Escape") openDrawer(false); });
+  document.getElementById("drawerNav").innerHTML = comps.map((c, i) => `<a data-i="${i}">${A.esc(c.title)}<span class="d">${c.uses.join(", ")} · depth ${document.getElementById("f-" + i).dataset.depth}</span></a>`).join("");
+  document.getElementById("drawerNav").addEventListener("click", e => { const a = e.target.closest("a"); if (!a) return; const el = document.getElementById("f-" + a.dataset.i); el.scrollIntoView({ behavior: "smooth", block: "center" }); el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1600); document.querySelectorAll("#drawerNav a").forEach(x => x.classList.toggle("current", x === a)); if (innerWidth < 900) openDrawer(false); });
+  // details: which blocks a composition is made of
+  const byName = new Map(); for (const b of bl.blocks) { const k = b.name.toLowerCase().replace(/[^a-z0-9]/g, ""); if (!byName.has(k) || A.local(b.tier || "") === "global") byName.set(k, b); }
+  function details(i) { const c = comps[i]; const el = document.getElementById("f-" + i); const n = islands[i].querySelectorAll(".island *").length;
+    A.showPanel(c.title, `composition · ${c.uses.length} components · HTML depth ${el.dataset.depth} · ${n} elements`, `<h4>Made of</h4><ul class="facts">${c.uses.map(u => { const b = byName.get(u.toLowerCase()); return `<li><span class="p">${A.esc(u)}</span><span class="o">${b ? `<code>${A.esc(A.curie(b.b))}</code> · ${A.local(b.class).toLowerCase()}` : "<span class='muted'>no block in the graph</span>"}</span></li>`; }).join("")}</ul>${A.cmd(c.uses.filter(u => byName.get(u.toLowerCase())).slice(0, 3).map(u => `pragma block lookup "${byName.get(u.toLowerCase()).name}"`).join("\n"))}`); }
+  board.addEventListener("click", e => { const t = e.composedPath()[0]; if (t && t.closest && t.closest("a, button, input, select, textarea, summary, label, details")) return; const f = e.target.closest(".frame"); if (f) details(+f.dataset.i); });
+  board.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.classList.contains("frame")) details(+e.target.dataset.i); });
+})();
+</script>
+</body>
+</html>

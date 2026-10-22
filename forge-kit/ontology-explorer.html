@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Ontology — Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root{
+  --paper:#F6F4F5;
+  --panel:#FFFFFF;
+  --ink:#2B2129;
+  --muted:#77707B;
+  --line:#E4DFE3;
+  --aubergine:#772953;
+  --aubergine-soft:#F3E8EE;
+  --orange:#E95420;
+  --orange-soft:#FDEEE7;
+  --validated:#2E7D4F;
+  --validated-soft:#E5F2EA;
+  --proposal:#B07C0A;
+  --proposal-soft:#FBF3DE;
+  --discussion:#2E6FB0;
+  --discussion-soft:#E7F0F9;
+  --rejected:#9B95A0;
+  --rejected-soft:#F0EEF1;
+  --deprecated:#B3403A;
+  --deprecated-soft:#F9E9E8;
+  --enum:#5E548E;
+  --enum-soft:#EDEAF6;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(43,33,41,.06), 0 6px 24px rgba(43,33,41,.07);
+  font-size:15px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  font-family:'Ubuntu',system-ui,-apple-system,sans-serif;
+  background:var(--paper);color:var(--ink);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* ---------- top bar ---------- */
+header{
+  display:flex;align-items:center;gap:20px;
+  padding:10px 18px;background:var(--panel);
+  border-bottom:1px solid var(--line);z-index:5;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand h1{font-size:1.05rem;font-weight:700;margin:0;letter-spacing:-.01em;white-space:nowrap}
+.brand .sub{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--orange);display:inline-block;transform:translateY(-1px)}
+
+.maturity{display:flex;flex-direction:column;gap:3px;min-width:170px}
+.maturity .bar{display:flex;height:7px;border-radius:4px;overflow:hidden;background:var(--line)}
+.maturity .bar span{height:100%}
+.maturity small{font-size:.7rem;color:var(--muted);letter-spacing:.02em}
+
+.lens{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
+.lens .lens-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-right:2px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 11px;border-radius:999px;font-size:.78rem;font-weight:500;
+  border:1.5px solid var(--line);background:var(--panel);color:var(--muted);
+  transition:all .15s ease;
+}
+.chip .swatch{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35}
+.chip.on{color:var(--ink)}
+.chip.on .swatch{opacity:1}
+.chip.on[data-status="validated"]{border-color:var(--validated);background:var(--validated-soft)}
+.chip.on[data-status="validated"] .swatch{background:var(--validated)}
+.chip.on[data-status="proposal"]{border-color:var(--proposal);background:var(--proposal-soft)}
+.chip.on[data-status="proposal"] .swatch{background:var(--proposal)}
+.chip.on[data-status="discussion"]{border-color:var(--discussion);background:var(--discussion-soft)}
+.chip.on[data-status="discussion"] .swatch{background:var(--discussion)}
+.chip.on[data-status="dropped"]{border-color:var(--rejected);background:var(--rejected-soft)}
+.chip.on[data-status="dropped"] .swatch{background:var(--rejected)}
+.about-btn{
+  padding:5px 14px;border-radius:999px;border:1.5px solid var(--aubergine);
+  color:var(--aubergine);font-size:.8rem;font-weight:500;
+}
+.about-btn:hover{background:var(--aubergine);color:#fff}
+
+/* ---------- layout ---------- */
+main{flex:1;display:flex;min-height:0}
+.rail{
+  width:250px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;min-height:0;
+}
+.rail .search{padding:12px 12px 8px}
+.rail input{
+  width:100%;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;
+  font:inherit;font-size:.85rem;background:var(--paper);
+}
+.rail input::placeholder{color:var(--muted)}
+.rail .list{flex:1;overflow-y:auto;padding:0 8px 16px}
+.rail h2{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);
+  margin:14px 8px 6px;font-weight:700;
+}
+.rail .item{
+  display:flex;align-items:center;gap:8px;width:100%;text-align:left;
+  padding:6px 8px;border-radius:7px;font-size:.85rem;line-height:1.25;
+}
+.rail .item:hover{background:var(--paper)}
+.rail .item.active{background:var(--aubergine-soft);color:var(--aubergine);font-weight:500}
+.rail .item .st{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rail .item .depth{color:var(--line);font-family:'Ubuntu Mono',monospace;flex-shrink:0}
+.rail .item.dim{opacity:.38}
+.rail .item em{font-style:normal;color:var(--muted);font-size:.72rem;margin-left:auto}
+
+.canvas-wrap{flex:1;position:relative;min-width:0}
+svg#graph{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+svg#graph:active{cursor:grabbing}
+.legend{
+  position:absolute;left:14px;bottom:14px;background:var(--panel);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:10px 14px;font-size:.72rem;color:var(--muted);display:flex;flex-direction:column;gap:6px;
+}
+.legend .row{display:flex;align-items:center;gap:8px}
+.legend svg{flex-shrink:0}
+.hint{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  font-size:.72rem;color:var(--muted);background:rgba(255,255,255,.85);
+  padding:4px 12px;border-radius:999px;pointer-events:none;backdrop-filter:blur(4px);
+}
+
+/* ---------- graph elements ---------- */
+.node{cursor:pointer}
+.node rect{
+  fill:var(--panel);stroke-width:1.6px;
+  filter:drop-shadow(0 1px 2px rgba(43,33,41,.10));
+}
+.node text{font-family:'Ubuntu',sans-serif;font-size:12.5px;fill:var(--ink);pointer-events:none}
+.node .tag{font-size:8.5px;letter-spacing:.08em;fill:var(--muted)}
+.node[data-status="validated"] rect{stroke:var(--validated)}
+.node[data-status="proposal"] rect{stroke:var(--proposal);stroke-dasharray:5 3}
+.node[data-status="discussion"] rect{stroke:var(--discussion);stroke-dasharray:1.5 3;stroke-linecap:round}
+.node[data-status="rejected"] rect,.node[data-status="deprecated"] rect{stroke:var(--rejected);stroke-dasharray:2 4;fill:var(--rejected-soft)}
+.node[data-status="rejected"] text,.node[data-status="deprecated"] text{fill:var(--rejected)}
+.node[data-kind="enum"] rect{stroke:var(--enum);fill:var(--enum-soft);rx:16}
+.node.selected rect{stroke-width:3px;fill:#FFF9F6}
+.node.faded{opacity:.16}
+.link{fill:none;stroke-width:1.5px}
+.link.subclass{stroke:#C9C2C6}
+.link.relation{stroke:var(--orange);stroke-width:1.7px}
+.link[data-status="proposal"],.link[data-status="discussion"]{stroke-dasharray:5 4;opacity:.75}
+.link.faded{opacity:.06}
+.link-label{font-family:'Ubuntu Mono',monospace;font-size:9.5px;fill:var(--orange);paint-order:stroke;stroke:var(--paper);stroke-width:3px}
+.link-label.faded{opacity:.06}
+
+/* ---------- inspector ---------- */
+.inspector{
+  width:360px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--line);
+  overflow-y:auto;padding:20px 22px 40px;
+}
+.inspector .empty{color:var(--muted);font-size:.85rem;margin-top:30px;text-align:center;line-height:1.6}
+.inspector .empty .glyph{font-size:2rem;display:block;margin-bottom:10px;color:var(--line)}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;
+  font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+}
+.badge.validated{background:var(--validated-soft);color:var(--validated)}
+.badge.proposal{background:var(--proposal-soft);color:var(--proposal)}
+.badge.discussion{background:var(--discussion-soft);color:var(--discussion)}
+.badge.rejected{background:var(--rejected-soft);color:var(--rejected)}
+.badge.deprecated{background:var(--deprecated-soft);color:var(--deprecated)}
+.badge.draft{background:var(--paper);color:var(--muted)}
+.badge.ghost{background:var(--paper);color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.inspector .head{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.inspector h2.name{font-size:1.35rem;margin:2px 0 2px;letter-spacing:-.015em}
+.inspector .uri{font-family:'Ubuntu Mono',monospace;font-size:.72rem;color:var(--muted);word-break:break-all;margin-bottom:14px}
+.inspector .lineage{font-size:.78rem;color:var(--muted);margin-bottom:14px}
+.inspector .lineage b{color:var(--aubergine);font-weight:500;cursor:pointer}
+.inspector .lineage b:hover{text-decoration:underline}
+.inspector h3{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);
+  margin:20px 0 7px;border-top:1px solid var(--line);padding-top:14px;font-weight:700;
+}
+.inspector p{font-size:.86rem;line-height:1.55;margin:0 0 8px}
+.inspector p.note{color:var(--muted);font-size:.8rem;font-style:italic}
+.attr{
+  border:1px solid var(--line);border-radius:8px;padding:8px 11px;margin-bottom:7px;
+}
+.attr .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.attr .aname{font-family:'Ubuntu Mono',monospace;font-size:.8rem;font-weight:700}
+.attr .atype{font-size:.72rem;color:var(--muted);font-family:'Ubuntu Mono',monospace}
+.attr .req{font-size:.65rem;color:var(--orange);font-weight:700;letter-spacing:.05em}
+.attr .adef{font-size:.78rem;color:var(--muted);margin-top:4px;line-height:1.45}
+.rel{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 0;border-bottom:1px dashed var(--line);font-size:.82rem}
+.rel:last-child{border-bottom:none}
+.rel .arrow{color:var(--orange);font-family:'Ubuntu Mono',monospace}
+.rel .rname{font-family:'Ubuntu Mono',monospace;font-weight:700;font-size:.78rem}
+.rel .card{color:var(--muted);font-size:.7rem;font-family:'Ubuntu Mono',monospace}
+.rel b{color:var(--aubergine);font-weight:500;cursor:pointer}
+.rel b:hover{text-decoration:underline}
+details.cst{border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:.8rem}
+details.cst summary{padding:7px 11px;cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+details.cst summary .cname{font-family:'Ubuntu Mono',monospace;font-size:.74rem;font-weight:700}
+details.cst .body{padding:0 11px 10px;color:var(--muted);line-height:1.5}
+details.cst .body .sel{color:var(--ink);font-style:italic;margin-bottom:5px}
+.opt{display:flex;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.82rem}
+.opt:last-child{border:none}
+.opt .oname{font-weight:700;min-width:110px}
+.opt .odef{color:var(--muted);font-size:.78rem;line-height:1.45}
+.examples{display:flex;flex-wrap:wrap;gap:6px}
+.examples span{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:3px 9px;font-size:.76rem}
+
+/* ---------- about overlay ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(43,33,41,.45);display:none;
+  align-items:center;justify-content:center;z-index:50;padding:24px;
+}
+.overlay.open{display:flex}
+.sheet{
+  background:var(--panel);border-radius:14px;max-width:720px;width:100%;max-height:84vh;
+  overflow-y:auto;padding:28px 32px;box-shadow:0 20px 60px rgba(43,33,41,.35);
+}
+.sheet h2{margin:0 0 4px;font-size:1.3rem}
+.sheet .close{float:right;font-size:1.4rem;color:var(--muted);line-height:1}
+.sheet h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin:22px 0 8px;font-weight:700}
+.sheet p{font-size:.87rem;line-height:1.6;margin:0 0 10px}
+.sheet .axiom{border-left:3px solid var(--aubergine);padding:6px 14px;margin-bottom:10px}
+.sheet .axiom .aid{font-family:'Ubuntu Mono',monospace;font-weight:700;color:var(--aubergine);margin-right:8px}
+.sheet .story{font-size:.84rem;line-height:1.5;padding:6px 0;border-bottom:1px dashed var(--line)}
+.sheet .story b{color:var(--aubergine);font-weight:500}
+
+@media (max-width:1080px){.inspector{width:300px}.rail{width:210px}}
+@media (max-width:840px){
+  main{flex-direction:column;overflow-y:auto}
+  .rail{width:100%;max-height:180px;border-right:none;border-bottom:1px solid var(--line)}
+  .canvas-wrap{min-height:420px}
+  .inspector{width:100%;border-left:none;border-top:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="dot" aria-hidden="true"></span>
+    <h1>Product Ontology</h1>
+    <span class="sub">working model · read-only explorer · July 2026</span>
+  </div>
+  <div class="maturity" id="maturity" title="Share of classes by governance status"></div>
+  <div class="lens" role="group" aria-label="Filter by governance status">
+    <span class="lens-label">Governance lens</span>
+    <button class="chip on" data-status="validated"><span class="swatch"></span>Validated</button>
+    <button class="chip on" data-status="proposal"><span class="swatch"></span>Proposal</button>
+    <button class="chip on" data-status="discussion"><span class="swatch"></span>In discussion</button>
+    <button class="chip" data-status="dropped"><span class="swatch"></span>Rejected &amp; deprecated</button>
+    <button class="about-btn" id="aboutBtn">Why this model</button>
+  </div>
+</header>
+
+<main>
+  <nav class="rail" aria-label="Ontology terms">
+    <div class="search"><input id="search" type="search" placeholder="Search terms…" aria-label="Search terms"></div>
+    <div class="list" id="termList"></div>
+  </nav>
+
+  <div class="canvas-wrap">
+    <svg id="graph" role="img" aria-label="Ontology graph"></svg>
+    <div class="hint">Drag to pan · scroll to zoom · click a node to inspect</div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <aside class="inspector" id="inspector" aria-live="polite">
+    <div class="empty">
+      <span class="glyph">◍</span>
+      Select a class or enumeration<br>to see its definition, attributes,<br>relations and open questions.
+    </div>
+  </aside>
+</main>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="About this model">
+  <div class="sheet">
+    <button class="close" id="closeOverlay" aria-label="Close">×</button>
+    <h2>Why this model</h2>
+    <p>A shared vocabulary for what the company builds, sells and delivers — governed row by row. Everything below comes straight from the working document.</p>
+    <h3>Assumptions &amp; axioms</h3>
+    <div class="axiom"><span class="aid">A1</span><span class="badge validated">Validated</span>
+      <p>The semantic model expresses an <b>enterprise-sales-centered</b> vision of the company: it distinguishes sales vs. non-sales readings of the same concept, prefers "enterprise sales" over generic "sales", and lets that preference drive modelling order, entity choice and default relation shape.</p></div>
+    <div class="axiom"><span class="aid">A2</span><span class="badge proposal">Proposal</span>
+      <p>The model should <b>identify without deeply modelling</b> non-catalog entities (actors, governance constraints, records). They serve as interfaces that strengthen the product model.</p></div>
+    <div class="axiom"><span class="aid">A3</span><span class="badge proposal">Proposal</span>
+      <p>Classes should be <b>owned by a department</b>, which keeps authority over the definition and evolution of its vocabulary.</p></div>
+    <div class="axiom"><span class="aid">H1</span><span class="badge proposal">Proposal</span>
+      <p>Non-asset entities considered: Governance/Constraints, Actors, Records/Events.</p></div>
+    <h3>Who this serves</h3>
+    <div id="stories"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Data — transcribed from the working document (Data sections).
+   Status values: validated | proposal | discussion | rejected |
+   deprecated | draft (no status recorded).
+   ============================================================ */
+const DATA = {
+classes: [
+ {id:"Entity",label:"Entity",status:"validated",abstract:true,parent:null,owner:null,
+  def:"A conceptual abstraction representing any discrete element of the company's value proposition that can be categorized, managed, or exchanged within a commercial or operational context.",
+  rationale:"Acts as a base class to establish shared properties.",examples:[],note:"Not instantiated directly — use its subclasses."},
+ {id:"CatalogItem",label:"Catalog Item",status:"validated",abstract:true,parent:"Entity",owner:"Sales",
+  def:"A describable, versioned, or composable element of the company's portfolio that can be offered, assembled, or delivered. CatalogItems are the things the company builds — they have technical identity (composition, capabilities, versioning) and commercial identity (how they are packaged and positioned). All CatalogItems exist independently of any specific customer, transaction, or point in time.",
+  rationale:"Represents products, solutions…",examples:[],note:"See RFC1. The main focus of the ontology."},
+ {id:"Actor",label:"Actor",status:"validated",abstract:true,parent:"Entity",owner:null,
+  def:"An entity with agency that participates in the company's activities (commercial or operational). Actors initiate actions, hold relationships, and enter into agreements — they are not inventory, nor things the company builds. An Actor's identity is defined by its role in relation to the company, not by technical attributes like version or composition.",
+  rationale:"Represents a decision-making entity.",examples:[],note:"See RFC1. A side focus. Doesn't have to be an individual (cf. actor–network theory)."},
+ {id:"Customer",label:"Customer",status:"validated",abstract:false,parent:"Actor",owner:"Sales",
+  def:"An Actor that holds or has held a commercial relationship with the company. Defined by contractual engagement — current or historical — and is the entity to which offers are directed, contracts are bound, and obligations are owed.",
+  rationale:null,examples:[],note:"See RFC1."},
+ {id:"User",label:"User",status:"discussion",abstract:false,parent:"Actor",owner:null,def:"(TBD)",rationale:null,examples:[],note:null},
+ {id:"OpenSourceCommunity",label:"OS Community / Org",status:"proposal",abstract:false,parent:"Actor",owner:null,def:"(TBD)",rationale:null,examples:[],note:null},
+ {id:"Partner",label:"Partner",status:"validated",abstract:false,parent:"Actor",owner:"Sales",
+  def:"An Actor that holds a collaborative or co-delivery relationship with the company: a mutual arrangement where both parties contribute capability, reach, or expertise toward shared outcomes. Unlike a Customer, a Partner does not primarily consume the company's offerings; they extend, resell, integrate, or co-build them. A Partner's identity is defined by what they do with the company, not what they buy from it.",
+  rationale:null,examples:[],note:"See RFC1."},
+ {id:"Constraint",label:"Constraint",status:"validated",abstract:true,parent:"Entity",owner:null,
+  def:"An entity that expresses a rule, policy, standard, or requirement that constrains how other entities are built, offered, or operated. Governance entities have their own lifecycle — created, revised, and retired independently of the things they govern. It does not describe what something is; it describes what something must or must not do.",
+  rationale:"Represents a constraint.",examples:[],note:"See RFC1. A core focus. (The definition still says 'Governance' — a naming drift worth sweeping.)"},
+ {id:"Requirement",label:"Requirement",status:"proposal",abstract:false,parent:"Constraint",owner:null,
+  def:"A formally stated need or constraint that specifies what an entity must represent, support, or enable to fulfil its intended purpose. The ontology should provide a common way to express a requirement understood throughout.",rationale:null,examples:[],note:null},
+ {id:"Policy",label:"Policy",status:"proposal",abstract:false,parent:"Constraint",owner:null,
+  def:"A formally defined rule (or set of rules) specifying permitted, required, or prohibited actions within a domain. Defined internally by the organisation; it may mirror external requirements, but the organisation has total control over it.",rationale:null,examples:[],note:null},
+ {id:"LegalFramework",label:"Legal Framework",status:"proposal",abstract:false,parent:"Constraint",owner:null,
+  def:"A formally defined rule or requirement strictly related to a law or regulation in one or more jurisdictions where the company operates. Unlike a policy, the organisation has no (or little) control over it.",rationale:null,examples:[],note:null},
+ {id:"Record",label:"Record",status:"proposal",abstract:true,parent:"Entity",owner:null,
+  def:"An entity that captures something that occurred at a point or over a period in time — a transaction, activity, event, or decision. Records have temporal extent, participants, and outcomes. A Record is not a thing you build or sell; it is evidence that something happened.",rationale:"Represents a temporal event.",examples:[],note:"See RFC1. A side focus."},
+ {id:"Cycle",label:"Cycle",status:"proposal",abstract:false,parent:"Record",owner:null,
+  def:"A period of time (for Canonical, a 6-month period) where engineering work has been done to a particular product.",rationale:null,examples:[],note:null},
+ {id:"Persona",label:"Persona",status:"proposal",abstract:true,parent:null,owner:null,
+  def:"Condensed, qualitative, representative information about a relevant Actor in the Canonical ecosystem.",rationale:null,examples:[],note:"No parent declared yet."},
+ {id:"SKU",label:"SKU",status:"validated",abstract:false,parent:"CatalogItem",owner:"Sales",
+  def:"The commercial realization of a Solution as defined within the operational and contractual vocabulary of sales and delivery.",
+  rationale:"Aligns with the operational vocabulary of the sales team. SKUs here represent delivery of solutions tailored to a particular customer more than one-size-fits-all bundles.",
+  examples:["Charmed OpenStack Upgrade Service","Board Enablement Services — New Board","Edge Kubernetes — Large (SaaS)"],
+  note:"Salesforce confusion: SKUs are called products there. Might require scrutiny later."},
+ {id:"Product",label:"Product",status:"validated",abstract:false,parent:"CatalogItem",owner:"Engineering",
+  def:"A packaged and versioned piece of software (and optionally hardware) that delivers a specific set of capabilities intentionally shaped by design, bounded, and internally coherent (not emergent from integration). It can be installed, run, and used directly to perform a primary purpose and enable a high-level outcome.",
+  rationale:"Bounded by design, defined by purpose-driven APIs. Usually integrated with other software/hardware but defined coherently without those integrations. Its value proposition can be priced in a market.",
+  examples:["Multipass","Kubernetes","MicroCloud","Landscape","Canonical Observability Stack"],
+  note:"MAAS: hardware as a support to software."},
+ {id:"Solution",label:"Solution",status:"validated",abstract:false,parent:"CatalogItem",owner:"Sales",
+  def:"A purpose-driven assembly of one or multiple products, usually combined with services, configurations, or content, to address a specific set of use cases. Delivers a complete outcome, often requiring integration, orchestration, or adaptation beyond what its products provide on their own.",
+  rationale:"Results from integrating products with services or practices; carries value propositions and a price.",
+  examples:["Private Cloud Build","Kubernetes Discover","Managed Kubeflow"],
+  note:"Likely more meaningful to model from the sales perspective; to be defined closely with engineering."},
+ {id:"AtomicProduct",label:"Atomic Product",status:"proposal",abstract:false,parent:"Product",owner:null,def:null,rationale:null,examples:[],note:null},
+ {id:"CompositeProduct",label:"Composite Product",status:"proposal",abstract:false,parent:"Product",owner:null,def:null,rationale:null,examples:[],note:null},
+ {id:"ComponentClass",label:"Component",status:"rejected",abstract:false,parent:"Product",owner:null,
+  def:"Reusable building blocks or modules that are part of one or several applications; not satisfying a full use case alone.",rationale:null,examples:[],note:"Rejected as a subclass — lives on as a ProductCategory enum value."},
+ {id:"PlatformClass",label:"Platform",status:"rejected",abstract:false,parent:"Product",owner:null,
+  def:"Environment that does not satisfy specific use cases, but enables to build on top of; a foundation for operating other types.",rationale:null,examples:[],note:"Rejected as a subclass — lives on as a ProductCategory enum value."},
+ {id:"ToolClass",label:"Tool",status:"rejected",abstract:false,parent:"Product",owner:null,
+  def:"Deliverable used to create, test, or package components or apps.",rationale:null,examples:[],note:"Rejected as a subclass — lives on as a ProductCategory enum value."},
+ {id:"StandaloneAppClass",label:"Standalone App",status:"rejected",abstract:false,parent:"Product",owner:null,
+  def:"Standalone software that implements a use case; can be deployed and used independently.",rationale:null,examples:[],note:"Rejected as a subclass — lives on as a ProductCategory enum value."},
+ {id:"ManagementClass",label:"Management",status:"deprecated",abstract:false,parent:"Product",owner:null,
+  def:"Components or apps that manage the deployment, monitoring, security and maintenance of other components or apps across their lifecycle.",rationale:null,examples:[],note:null},
+ {id:"StoreClass",label:"Store",status:"rejected",abstract:false,parent:"Product",owner:null,
+  def:"Software that presents other types as a searchable catalog with version management.",rationale:null,examples:[],note:"Rejected as a subclass — lives on as a ProductCategory enum value."},
+ {id:"OffTheShelfSolution",label:"Off-the-shelf Solution",status:"proposal",abstract:false,parent:"Solution",owner:null,
+  def:"Predefined combinations of Products forming a coherent system, configured and orchestrated toward a common goal. No one-off engineering work per customer; already productized and ready to deploy.",rationale:null,examples:[],note:null},
+ {id:"CustomSolution",label:"Custom Solution",status:"proposal",abstract:false,parent:"Solution",owner:null,
+  def:"Combinations of Products forming a coherent system, put together for a specific customer to meet a one-off need. Requires specific engineering effort to deploy and operate.",rationale:null,examples:[],note:null},
+ {id:"Ecosystem",label:"Ecosystem",status:"proposal",abstract:false,parent:null,owner:null,
+  def:"Gathering of Products and Solutions relating to the same domain of use cases, which can interconnect and are designed to work together.",rationale:null,examples:[],note:"No parent declared yet."},
+ {id:"Service",label:"Service",status:"proposal",abstract:false,parent:null,owner:null,
+  def:"Capabilities provided outside the software itself that help users: support, consulting, training, operational management, maintenance — aimed at improving the value of investments.",rationale:null,examples:[],note:"No parent declared yet — the validated Solution definition already references services."},
+ {id:"SSDLCRequirement",label:"SSDLC Requirement",status:"proposal",abstract:false,parent:"Constraint",owner:"Engineering",
+  def:"A specific set of tasks and/or work deliverables that engineering teams need to complete as part of the product development and maintenance process, assuring products are developed with security in mind and, where applicable, compliant to internal and external standards or regulatory requirements.",
+  rationale:null,examples:[],note:"Declared parent is 'Governance', which doesn't exist by that name — mapped here to Constraint."},
+ {id:"SSDLCRelease",label:"SSDLC Release",status:"proposal",abstract:false,parent:"Constraint",owner:"Engineering",
+  def:"The release type that is expected of a product during a given roadmap cycle.",rationale:null,examples:[],note:"Declared parent is 'Governance' — mapped here to Constraint."},
+ {id:"SSDLCSecurityCommitment",label:"SSDLC Security Commitment",status:"proposal",abstract:false,parent:"SSDLCRelease",owner:"Engineering",
+  def:"Indicates whether a product has specific security commitments attached to it (either an LTS commitment or specific customer commitments).",
+  rationale:null,examples:[],note:"Currently a subclass of SSDLC Release — arguably should be a relation, not inheritance."}
+],
+enums: [
+ {id:"ProductCategory",label:"Product Category ⟨enum⟩",status:"validated",
+  def:"Single best-fit description of a product's type.",
+  options:[
+   {name:"Component",status:"validated",def:"Reusable building blocks or modules, part of one or several applications; not satisfying a full use case alone."},
+   {name:"Platform",status:"validated",def:"Environment that enables building on top; a foundation for operating other types."},
+   {name:"Tool",status:"validated",def:"Deliverable used to create, test, or package components or apps."},
+   {name:"Standalone App",status:"validated",def:"Standalone software implementing a use case; deployable and usable independently."},
+   {name:"Management",status:"deprecated",def:"Components or apps managing deployment, monitoring, security, maintenance of others."},
+   {name:"Store",status:"validated",def:"Software presenting other types as a searchable catalog with version management."}
+  ]},
+ {id:"Channel",label:"Channel ⟨enum⟩",status:"proposal",
+  def:"Distribution channel of a catalog item version.",
+  options:[
+   {name:"Stable",status:"proposal",def:"Fully tested, production-ready; recommended for general users."},
+   {name:"Candidate",status:"proposal",def:"Believed production-ready and feature-complete; final validation before release."},
+   {name:"Beta",status:"proposal",def:"Early public access to new features, for testers and early adopters."},
+   {name:"Edge",status:"proposal",def:"Bleeding-edge channel, updated frequently; may be unstable."}
+  ]},
+ {id:"Release",label:"Release ⟨enum⟩",status:"proposal",
+  def:"Type of a product release.",
+  options:[
+   {name:"LTS",status:"proposal",def:"Release with specific long-term security commitments; expanded security-maintenance scope and different SSDLC requirements."},
+   {name:"Initial",status:"proposal",def:"First release made available to the intended public; must go through all SSDLC components."},
+   {name:"Major",status:"proposal",def:"Subsequent release with significant, often backward-incompatible changes."},
+   {name:"Minor",status:"proposal",def:"Subsequent, usually backward-compatible release: improvements, enhancements, bug fixes."}
+  ]}
+],
+attributes: [
+ {cls:"Entity",name:"uri",status:"validated",type:"Typed String",req:true,def:"A unique identifier for the entity — realised in RDF as the resource IRI.",ex:"canonical:product:juju · canonical:sku:customer:contract-id"},
+ {cls:"Entity",name:"name",status:"validated",type:"String",req:true,def:"The name of the entity. Naming schemes may vary by class and existing usage.",ex:"Anbox, LXD, Charmed Kubeflow"},
+ {cls:"Entity",name:"description",status:"validated",type:"String",req:true,def:"The purpose and general rationale behind the entity.",ex:null},
+ {cls:"CatalogItem",name:"version",status:"validated",type:"—",req:false,def:"Contested in discussion: think in channels (Cedric); not all products have versions (Daniele); Ubuntu Pro versions by contract rather than software. Open: version of a composite product?",ex:null},
+ {cls:"CatalogItem",name:"release_type",status:"proposal",type:"Release enum",req:false,def:"A version is tied to a release type (initial, major, minor, LTS); LTS differs through its security commitments. Feeds SSDLC requirements per release.",ex:null},
+ {cls:"CatalogItem",name:"channel",status:"discussion",type:"Channel enum",req:false,def:null,ex:null},
+ {cls:"Solution",name:"readiness",status:"validated",type:"Choice: Ready to pitch · Ready to sell · Ready to deliver",req:false,def:"Sale readiness of the solution. Bridges technical maturity with commercial usage.",ex:null},
+ {cls:"Solution",name:"isTemplate",status:"validated",type:"Boolean",req:false,def:"Whether a solution can be used as a template. Intentionally an alternative to solution composition, keeping a flat hierarchy.",ex:null},
+ {cls:"Solution",name:"custom",status:"proposal",type:"Boolean",req:false,def:"If true, custom solution; otherwise off the shelf.",ex:null},
+ {cls:"Product",name:"category",status:"proposal",type:"ProductCategory enum",req:false,def:"Single best-fit description of the product's type. Result of RFC#5 discussion.",ex:null},
+ {cls:"Product",name:"saas",status:"validated",type:"Boolean",req:false,def:"Whether the product is delivered as SaaS.",ex:null},
+ {cls:"Product",name:"deliverable",status:"draft",type:"Boolean",req:false,def:"Whether the product can be delivered.",ex:null},
+ {cls:"Product",name:"opinionated packaging",status:"validated",type:"Boolean",req:false,def:"From the former model, for SSDLC adaptation — flagged as needing revisiting.",ex:null},
+ {cls:"Product",name:"non opinionated packaging",status:"validated",type:"Boolean",req:false,def:"From the former model, for SSDLC adaptation — flagged as needing revisiting.",ex:null},
+ {cls:"Product",name:"Opinionated Packaging",status:"proposal",type:"Boolean",req:false,def:"Whether Canonical meaningfully changes the upstream product when packaging and redistributing it. (Duplicates the validated boolean.)",ex:null},
+ {cls:"Product",name:"Packaging Classification",status:"proposal",type:"Choice: Opinionated · Unopinionated",req:false,def:"Enum alternative to the packaging booleans.",ex:null},
+ {cls:"Product",name:"component",status:"rejected",type:"Boolean",req:false,def:"If true, the product is a component.",ex:null},
+ {cls:"Product",name:"management",status:"rejected",type:"Boolean",req:false,def:null,ex:null},
+ {cls:"SSDLCRequirement",name:"SSDLC requirement 1–14",status:"proposal",type:"Boolean ×14",req:false,def:"Whether each SSDLC requirement is applicable to the product or not.",ex:null},
+ {cls:"SSDLCRelease",name:"SSDLC Release Type",status:"proposal",type:"Choice: Initial · Minor · Major · LTS",req:false,def:"Type of release planned for the given roadmap cycle.",ex:null},
+ {cls:"SSDLCSecurityCommitment",name:"Security Commitment",status:"proposal",type:"Boolean",req:false,def:"Whether the product release/version has any security commitment attached to it.",ex:null}
+],
+relations: [
+ {from:"SKU",name:"deliversSolution",to:"Solution",status:"validated",card:"1 → 1",req:true,def:"The solution that the SKU delivers. Assumes the attached solution already aggregates all required products and sub-solutions."},
+ {from:"SKU",name:"isDesignedFor",to:null,status:"discussion",card:"?",req:false,def:"For which customer the SKU was designed, if any. Target class not yet decided."},
+ {from:"Solution",name:"isComposedOf",to:"Product",status:"validated",card:"1 → many",req:true,def:"How solutions are composed of products. Mirrors the existing mental model."},
+ {from:"Solution",name:"implementsTemplate",to:"Solution",status:"validated",card:"1 → 1",req:false,def:"Links a solution to the template solution it implements."},
+ {from:"Product",name:"delivers",to:"Solution",status:"discussion",card:"1 → many",req:false,def:null},
+ {from:"Product",name:"category",to:"ProductCategory",status:"proposal",card:"1 → 1",req:false,def:"Draft attribute pointing at the validated ProductCategory enum."},
+ {from:"CatalogItem",name:"release_type",to:"Release",status:"proposal",card:"1 → 1",req:false,def:"Draft attribute pointing at the proposed Release enum."},
+ {from:"CatalogItem",name:"channel",to:"Channel",status:"discussion",card:"1 → 1",req:false,def:"Draft attribute pointing at the proposed Channel enum."}
+],
+constraints: [
+ {cls:"Product",name:"SSDLCComponentPlatformLTSRule",sel:"category = component | platform, release_type = lts",status:"proposal",rule:"Security Event Logging, Security Documentation, Threat Model, Penetration Testing Request, SBOM, Vulnerability Management Process (Plan + security.md), Vulnerability Scanning, Static Code Analysis, PSIRT Integration."},
+ {cls:"Product",name:"SSDLCComponentPlatformMajorRule",sel:"category = component | platform, release_type = major",status:"proposal",rule:"Vulnerability Scanning, Vulnerability Management Process (security.md + Plan), SBOM, Threat Model, SCA, Security Documentation, Security Event Logging; NOT penetration testing, NOT PSIRT integration."},
+ {cls:"Product",name:"SSDLCComponentPlatformMinorRule",sel:"category = component | platform, release_type = minor",status:"proposal",rule:"Vulnerability Scanning, SBOM only. (Source cell both negates and asserts these — internal contradiction flagged.)"},
+ {cls:"Product",name:"SSDLCComponentPlatformInitialRule",sel:"category = component | platform, release_type = initial",status:"proposal",rule:"Vulnerability Management Process (Plan + security.md), SBOM, Vulnerability Scanning, Threat Model, SCA, Security Event Logging; NOT security documentation, NOT penetration testing, NOT PSIRT integration."},
+ {cls:"Product",name:"SSDLCToolLTSRule",sel:"category = tool, release_type = lts",status:"discussion",rule:"(empty — requires more discussion)"},
+ {cls:"Product",name:"SSDLCToolMajorRule",sel:"category = tool, release_type = major",status:"proposal",rule:"Vulnerability Scanning, Vulnerability Management Process (Plan + security.md), SBOM, Threat Model, SCA, Security Documentation, Security Event Logging; NOT penetration testing, NOT PSIRT integration."},
+ {cls:"Product",name:"SSDLCToolMinorRule",sel:"category = tool, release_type = minor",status:"proposal",rule:"Vulnerability Scanning, SBOM only. (Source cell both negates and asserts these.)"},
+ {cls:"Product",name:"SSDLCToolInitialRule",sel:"category = tool, release_type = initial",status:"proposal",rule:"Vulnerability Management Process (Plan + security.md), SBOM, Vulnerability Scanning, Threat Model, SCA, Security Event Logging; NOT security documentation, NOT penetration testing, NOT PSIRT integration."},
+ {cls:"Product",name:"SSDLCUnopinionatedPackagingLTSRule",sel:"unopinionated packaging = true, release_type = lts",status:"proposal",rule:"SBOM, Vulnerability Scanning, PSIRT Integration; NOT the rest."},
+ {cls:"Product",name:"SSDLCUnopinionatedPackagingMajorRule",sel:"unopinionated packaging = true, release_type = major",status:"proposal",rule:"Vulnerability Scanning, SBOM only. (Source cell both negates and asserts these.)"},
+ {cls:"Product",name:"SSDLCUnopinionatedPackagingMinorRule",sel:"unopinionated packaging = true, release_type = minor",status:"proposal",rule:"Nothing required."},
+ {cls:"Product",name:"SSDLCUnopinionatedPackagingInitialRule",sel:"unopinionated packaging = true, release_type = initial",status:"proposal",rule:"Nothing required."},
+ {cls:"Product",name:"SSDLCOpinionatedPackagingLTSRule",sel:"opinionated packaging = true, release_type = lts",status:"proposal",rule:"Security Documentation, Threat Model, SBOM, Vulnerability Management Process (Plan + security.md), Vulnerability Scanning, SCA, PSIRT Integration; NOT security event logging, NOT penetration testing. (Plan appears both negated and asserted in source.)"},
+ {cls:"Product",name:"SSDLCOpinionatedPackagingMajorRule",sel:"opinionated packaging = true, release_type = major",status:"proposal",rule:"Vulnerability Scanning, SBOM only. (Source cell both negates and asserts these.)"},
+ {cls:"Product",name:"SSDLCOpinionatedPackagingMinorRule",sel:"opinionated packaging = true, release_type = minor",status:"proposal",rule:"Nothing required."},
+ {cls:"Product",name:"SSDLCOpinionatedPackagingInitialRule",sel:"opinionated packaging = true, release_type = initial",status:"proposal",rule:"Security Documentation, Vulnerability Management Process (security.md); NOT the rest. (security.md appears both negated and asserted in source.)"},
+ {cls:"Product",name:"SSDLCHostedSAASLTSRule",sel:"saas = true, release_type = lts",status:"proposal",rule:"(empty)"},
+ {cls:"Product",name:"SSDLCHostedSAASMajorRule",sel:"saas = true, release_type = major",status:"proposal",rule:"Security Event Logging, Security Documentation, Threat Model, Penetration Testing Request, SBOM, Vulnerability Management Process (Plan + security.md), Vulnerability Scanning, SCA, PSIRT Integration."},
+ {cls:"Product",name:"SSDLCHostedSAASMinorRule",sel:"saas = true, release_type = minor",status:"proposal",rule:"Vulnerability Scanning, SBOM; NOT the rest."},
+ {cls:"Product",name:"SSDLCHostedSAASInitialRule",sel:"saas = true, release_type = minor (sic — likely 'initial')",status:"proposal",rule:"Vulnerability Management Process (Plan + security.md), SBOM, Vulnerability Scanning, Threat Model, SCA, Security Event Logging; NOT security documentation, NOT penetration testing, NOT PSIRT integration."}
+],
+stories: [
+ ["Product manager","have a shared understanding with stakeholders of the definition and scope of my products"],
+ ["Content writer","have clear definitions of the product portfolio to communicate on our material"],
+ ["Seller","use a consistent language to describe our portfolio and its value propositions to leads and customers"],
+ ["Security & compliance engineer","know the protocol to apply for a release of a particular category of products"],
+ ["Marketer","have a clear delimitation of products vs. solutions to promote specific products for specific user categories"],
+ ["Product & engineering managers","understand the requirements and commitments attached to a product or a particular release"],
+ ["Developer","understand the requirements and commitments I need to deliver in the product release"],
+ ["Sales","understand the SSDLC process and structure to back my pitch with structured explanations"],
+ ["Field engineer","know the most plausible packages to meet a customer need, and which add-ons are available"],
+ ["Chief of staff","access a single source of truth for the product catalog for analysis and reporting"],
+ ["CS product manager & developers","understand correct internal terminology — is a not-yet-customer an account or a customer?"],
+ ["RevOps","(story not yet written)"]
+]
+};
+
+/* ============================================================ */
+const STATUS_LABEL = {validated:"Validated",proposal:"Proposal",discussion:"Requires discussion",rejected:"Rejected",deprecated:"Deprecated",draft:"No status"};
+const STATUS_COLOR = {validated:"#2E7D4F",proposal:"#B07C0A",discussion:"#2E6FB0",rejected:"#9B95A0",deprecated:"#B3403A",draft:"#9B95A0"};
+const lensState = {validated:true,proposal:true,discussion:true,dropped:false};
+const lensBucket = s => (s==="rejected"||s==="deprecated") ? "dropped" : (s==="draft" ? "proposal" : s);
+
+const nodes = [
+  ...DATA.classes.map(c => ({...c, kind:"class"})),
+  ...DATA.enums.map(e => ({...e, kind:"enum"}))
+];
+const nodeById = new Map(nodes.map(n => [n.id, n]));
+const links = [];
+DATA.classes.forEach(c => { if (c.parent && nodeById.has(c.parent)) links.push({source:c.id, target:c.parent, type:"subclass", status:c.status}); });
+DATA.relations.forEach(r => { if (r.to && nodeById.has(r.from) && nodeById.has(r.to)) links.push({source:r.from, target:r.to, type:"relation", status:r.status, label:r.name}); });
+
+/* ---------- maturity bar ---------- */
+(function(){
+  const counts = {};
+  DATA.classes.forEach(c => counts[c.status] = (counts[c.status]||0)+1);
+  const total = DATA.classes.length;
+  const order = ["validated","proposal","discussion","rejected","deprecated"];
+  const bar = order.filter(s=>counts[s]).map(s=>`<span style="width:${(counts[s]/total*100).toFixed(1)}%;background:${STATUS_COLOR[s]}" title="${STATUS_LABEL[s]}: ${counts[s]}"></span>`).join("");
+  document.getElementById("maturity").innerHTML =
+    `<div class="bar">${bar}</div><small>${counts.validated||0} of ${total} classes validated</small>`;
+})();
+
+/* ---------- legend ---------- */
+document.getElementById("legend").innerHTML = `
+  <div class="row"><svg width="26" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="#C9C2C6" stroke-width="1.6"/><path d="M18 1 L26 5 L18 9 Z" fill="#fff" stroke="#C9C2C6"/></svg>subclass of</div>
+  <div class="row"><svg width="26" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="#E95420" stroke-width="1.7"/><path d="M20 1.5 L26 5 L20 8.5 Z" fill="#E95420"/></svg>relation</div>
+  <div class="row"><svg width="26" height="12"><rect x="1" y="1" width="24" height="10" rx="3" fill="#fff" stroke="#2E7D4F" stroke-width="1.6"/></svg>validated</div>
+  <div class="row"><svg width="26" height="12"><rect x="1" y="1" width="24" height="10" rx="3" fill="#fff" stroke="#B07C0A" stroke-width="1.6" stroke-dasharray="4 2.5"/></svg>proposal / draft</div>
+  <div class="row"><svg width="26" height="12"><rect x="1" y="1" width="24" height="10" rx="3" fill="#fff" stroke="#2E6FB0" stroke-width="1.6" stroke-dasharray="1.5 3" stroke-linecap="round"/></svg>in discussion</div>
+  <div class="row"><svg width="26" height="12"><rect x="1" y="1" width="24" height="10" rx="3" fill="#F0EEF1" stroke="#9B95A0" stroke-width="1.4" stroke-dasharray="2 3"/></svg>rejected / deprecated</div>
+  <div class="row"><svg width="26" height="12"><rect x="1" y="1" width="24" height="10" rx="6" fill="#EDEAF6" stroke="#5E548E" stroke-width="1.6"/></svg>enumeration</div>`;
+
+/* ---------- graph ---------- */
+const svg = d3.select("#graph");
+const wrap = document.querySelector(".canvas-wrap");
+let W = wrap.clientWidth, H = wrap.clientHeight;
+
+svg.append("defs").html(`
+  <marker id="arrRel" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#E95420"/></marker>
+  <marker id="arrSub" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse"><path d="M1 1 L11 6 L1 11 Z" fill="#FFFFFF" stroke="#C9C2C6" stroke-width="1.4"/></marker>
+`);
+
+const zoomLayer = svg.append("g");
+svg.call(d3.zoom().scaleExtent([0.35, 2.5]).on("zoom", e => zoomLayer.attr("transform", e.transform)));
+
+const linkSel = zoomLayer.append("g").selectAll("path").data(links).join("path")
+  .attr("class", d => `link ${d.type}`)
+  .attr("data-status", d => d.status)
+  .attr("marker-end", d => d.type === "relation" ? "url(#arrRel)" : "url(#arrSub)");
+
+const linkLabelSel = zoomLayer.append("g").selectAll("text")
+  .data(links.filter(l => l.type === "relation")).join("text")
+  .attr("class","link-label").attr("text-anchor","middle").attr("dy","-4")
+  .text(d => d.label);
+
+const nodeSel = zoomLayer.append("g").selectAll("g").data(nodes).join("g")
+  .attr("class","node")
+  .attr("data-status", d => d.status === "draft" ? "proposal" : d.status)
+  .attr("data-kind", d => d.kind)
+  .attr("tabindex", 0)
+  .attr("role","button")
+  .attr("aria-label", d => `${d.label}, ${STATUS_LABEL[d.status]}`)
+  .call(d3.drag()
+    .on("start",(e,d)=>{ if(!e.active) sim.alphaTarget(.25).restart(); d.fx=d.x; d.fy=d.y; })
+    .on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; })
+    .on("end",(e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+  .on("click",(e,d)=>select(d.id))
+  .on("keydown",(e,d)=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();select(d.id);} })
+  .on("mouseenter",(e,d)=>highlight(d.id))
+  .on("mouseleave",()=>highlight(null));
+
+nodeSel.each(function(d){
+  const g = d3.select(this);
+  const label = d.label;
+  const t = g.append("text").attr("text-anchor","middle").attr("dy", d.abstract ? 1 : 4)
+    .style("font-style", d.abstract ? "italic" : "normal")
+    .style("font-weight", d.status === "validated" ? 500 : 400)
+    .text(label);
+  const bw = t.node().getComputedTextLength() + 26;
+  d.w = Math.max(bw, 64); d.h = d.abstract ? 40 : 30;
+  g.insert("rect","text").attr("x",-d.w/2).attr("y",-d.h/2).attr("width",d.w).attr("height",d.h).attr("rx",d.kind==="enum"?15:7);
+  if (d.abstract) g.append("text").attr("class","tag").attr("text-anchor","middle").attr("dy",14).text("ABSTRACT");
+});
+
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d=>d.id)
+      .distance(l => l.type==="subclass" ? 95 : 150).strength(l => l.type==="subclass" ? .7 : .25))
+  .force("charge", d3.forceManyBody().strength(-620))
+  .force("center", d3.forceCenter(W/2, H/2))
+  .force("collide", d3.forceCollide().radius(d => d.w/2 + 16))
+  .force("x", d3.forceX(W/2).strength(.045))
+  .force("y", d3.forceY(H/2).strength(.06));
+
+function edgePath(d){
+  const sx=d.source.x, sy=d.source.y, tx=d.target.x, ty=d.target.y;
+  if (d.source === d.target){ // self loop
+    const r = d.source.w/2;
+    return `M ${sx+r-6} ${sy-6} C ${sx+r+55} ${sy-55}, ${sx+r+55} ${sy+45}, ${sx+r-4} ${sy+8}`;
+  }
+  if (d.type === "relation"){
+    const mx=(sx+tx)/2, my=(sy+ty)/2, dx=tx-sx, dy=ty-sy, n=Math.hypot(dx,dy)||1;
+    const cx=mx - dy/n*30, cy=my + dx/n*30;
+    return `M ${sx} ${sy} Q ${cx} ${cy} ${tx} ${ty}`;
+  }
+  return `M ${sx} ${sy} L ${tx} ${ty}`;
+}
+sim.on("tick", () => {
+  linkSel.attr("d", edgePath);
+  linkLabelSel
+    .attr("x", d => d.source===d.target ? d.source.x + d.source.w/2 + 62 : (d.source.x+d.target.x)/2 - (d.target.y-d.source.y)/(Math.hypot(d.target.x-d.source.x,d.target.y-d.source.y)||1)*17)
+    .attr("y", d => d.source===d.target ? d.source.y : (d.source.y+d.target.y)/2 + (d.target.x-d.source.x)/(Math.hypot(d.target.x-d.source.x,d.target.y-d.source.y)||1)*17);
+  nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+/* ---------- hover highlight ---------- */
+function highlight(id){
+  if (!id){ nodeSel.classed("faded",false); linkSel.classed("faded",false); linkLabelSel.classed("faded",false); return; }
+  const near = new Set([id]);
+  links.forEach(l => { if(l.source.id===id||l.target.id===id){near.add(l.source.id);near.add(l.target.id);} });
+  nodeSel.classed("faded", d => !near.has(d.id));
+  linkSel.classed("faded", l => l.source.id!==id && l.target.id!==id);
+  linkLabelSel.classed("faded", l => l.source.id!==id && l.target.id!==id);
+}
+
+/* ---------- lens filter ---------- */
+function applyLens(){
+  const visible = d => lensState[lensBucket(d.status)];
+  nodeSel.style("display", d => visible(d) ? null : "none");
+  const linkVisible = l => visible(l.source.id?l.source:nodeById.get(l.source)) && visible(l.target.id?l.target:nodeById.get(l.target));
+  linkSel.style("display", l => linkVisible(l) ? null : "none");
+  linkLabelSel.style("display", l => linkVisible(l) ? null : "none");
+  document.querySelectorAll("#termList .item").forEach(el => {
+    const n = nodeById.get(el.dataset.id);
+    el.classList.toggle("dim", !lensState[lensBucket(n.status)]);
+  });
+  sim.alpha(.3).restart();
+}
+document.querySelectorAll(".lens .chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const s = chip.dataset.status;
+    lensState[s] = !lensState[s];
+    chip.classList.toggle("on", lensState[s]);
+    applyLens();
+  });
+});
+
+/* ---------- left rail ---------- */
+const listEl = document.getElementById("termList");
+function buildList(filter=""){
+  const f = filter.trim().toLowerCase();
+  const match = n => !f || n.label.toLowerCase().includes(f) || n.id.toLowerCase().includes(f);
+  let html = "<h2>Classes</h2>";
+  const children = p => DATA.classes.filter(c => c.parent === p);
+  const walk = (cls, depth) => {
+    if (match(cls)) html += `<button class="item" data-id="${cls.id}">
+      <span class="depth">${"·".repeat(depth)}</span>
+      <span class="st" style="background:${STATUS_COLOR[cls.status]}"></span>
+      <span style="${cls.abstract?'font-style:italic':''}">${cls.label}</span>
+      ${cls.owner?`<em>${cls.owner}</em>`:""}</button>`;
+    children(cls.id).forEach(ch => walk(ch, depth+1));
+  };
+  DATA.classes.filter(c => !c.parent).forEach(root => walk(root, 0));
+  html += "<h2>Enumerations</h2>";
+  DATA.enums.filter(match).forEach(e => {
+    html += `<button class="item" data-id="${e.id}"><span class="depth"></span><span class="st" style="background:${STATUS_COLOR[e.status]}"></span>${e.label}</button>`;
+  });
+  listEl.innerHTML = html;
+  listEl.querySelectorAll(".item").forEach(el => el.addEventListener("click", () => select(el.dataset.id)));
+  applyLensListOnly();
+}
+function applyLensListOnly(){
+  document.querySelectorAll("#termList .item").forEach(el => {
+    const n = nodeById.get(el.dataset.id);
+    if(n) el.classList.toggle("dim", !lensState[lensBucket(n.status)]);
+  });
+}
+document.getElementById("search").addEventListener("input", e => buildList(e.target.value));
+buildList();
+
+/* ---------- inspector ---------- */
+const insp = document.getElementById("inspector");
+let selected = null;
+function esc(s){ return s ? s.replace(/&/g,"&amp;").replace(/</g,"&lt;") : ""; }
+function badge(st){ return `<span class="badge ${st}">${STATUS_LABEL[st]}</span>`; }
+
+function select(id){
+  selected = id;
+  document.querySelectorAll("#termList .item").forEach(el => el.classList.toggle("active", el.dataset.id === id));
+  nodeSel.classed("selected", d => d.id === id);
+  highlight(id);
+  const n = nodeById.get(id);
+  if (!n) return;
+  let html = `<div class="head">${badge(n.status)}${n.abstract?'<span class="badge ghost">abstract</span>':""}${n.owner?`<span class="badge ghost">owned by ${esc(n.owner)}</span>`:""}<span class="badge ghost">${n.kind==="enum"?"enumeration":"class"}</span></div>
+  <h2 class="name">${esc(n.label.replace(" ⟨enum⟩",""))}</h2>
+  <div class="uri">po:${n.id}</div>`;
+
+  if (n.kind === "class" && n.parent){
+    const chain = []; let p = n.parent;
+    while (p){ chain.push(p); p = nodeById.get(p)?.parent; }
+    html += `<div class="lineage">⊂ ${chain.map(c=>`<b data-goto="${c}">${esc(nodeById.get(c).label)}</b>`).join(" ⊂ ")}</div>`;
+  }
+  if (n.def) html += `<h3>Definition</h3><p>${esc(n.def)}</p>`;
+  else if (n.kind === "class") html += `<h3>Definition</h3><p class="note">No definition recorded yet.</p>`;
+  if (n.rationale) html += `<h3>Rationale</h3><p>${esc(n.rationale)}</p>`;
+  if (n.note) html += `<p class="note">${esc(n.note)}</p>`;
+  if (n.examples && n.examples.length) html += `<h3>Example instances</h3><div class="examples">${n.examples.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`;
+
+  if (n.kind === "enum"){
+    html += `<h3>Options</h3>` + n.options.map(o =>
+      `<div class="opt"><span class="oname">${esc(o.name)}</span><span>${badge(o.status)}<div class="odef">${esc(o.def)}</div></span></div>`).join("");
+  } else {
+    const attrs = DATA.attributes.filter(a => a.cls === n.id);
+    if (attrs.length){
+      html += `<h3>Attributes</h3>` + attrs.map(a => `<div class="attr">
+        <div class="top"><span class="aname">${esc(a.name)}</span><span class="atype">${esc(a.type)}</span>${a.req?'<span class="req">REQUIRED</span>':""}${badge(a.status)}</div>
+        ${a.def?`<div class="adef">${esc(a.def)}</div>`:""}${a.ex?`<div class="adef">e.g. ${esc(a.ex)}</div>`:""}</div>`).join("");
+    }
+    const inherited = [];
+    let p = n.parent;
+    while (p){ DATA.attributes.filter(a=>a.cls===p).forEach(a=>inherited.push({...a,fromCls:p})); p = nodeById.get(p)?.parent; }
+    if (inherited.length){
+      html += `<h3>Inherited</h3>` + inherited.map(a =>
+        `<div class="rel"><span class="rname">${esc(a.name)}</span><span class="card">from</span><b data-goto="${a.fromCls}">${esc(nodeById.get(a.fromCls).label)}</b>${badge(a.status)}</div>`).join("");
+    }
+    const rels = DATA.relations.filter(r => r.from === n.id || r.to === n.id);
+    if (rels.length){
+      html += `<h3>Relations</h3>` + rels.map(r => {
+        const out = r.from === n.id;
+        const other = out ? r.to : r.from;
+        return `<div class="rel">
+          ${out?"":`<b data-goto="${other}">${esc(nodeById.get(other)?.label||"?")}</b>`}
+          <span class="rname">${esc(r.name)}</span><span class="arrow">→</span>
+          ${out?(other?`<b data-goto="${other}">${esc(nodeById.get(other)?.label||"?")}</b>`:`<span class="card">target TBD</span>`):`<b>${esc(n.label)}</b>`}
+          <span class="card">${r.card}${r.req?" · required":""}</span>${badge(r.status)}
+          ${r.def?`<div class="adef" style="width:100%;font-size:.76rem;color:var(--muted)">${esc(r.def)}</div>`:""}</div>`;
+      }).join("");
+    }
+    const csts = DATA.constraints.filter(c => c.cls === n.id);
+    if (csts.length){
+      html += `<h3>Constraints (${csts.length}, all draft)</h3>` + csts.map(c => `<details class="cst">
+        <summary><span class="cname">${esc(c.name)}</span>${badge(c.status)}</summary>
+        <div class="body"><div class="sel">applies when ${esc(c.sel)}</div>${esc(c.rule)}</div></details>`).join("");
+    }
+  }
+  insp.innerHTML = html;
+  insp.scrollTop = 0;
+  insp.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => select(el.dataset.goto)));
+}
+
+/* ---------- about overlay ---------- */
+document.getElementById("stories").innerHTML = DATA.stories.map(([who,what]) =>
+  `<div class="story">As a <b>${who}</b>, I would like to ${what}.</div>`).join("");
+const overlay = document.getElementById("overlay");
+document.getElementById("aboutBtn").addEventListener("click",()=>overlay.classList.add("open"));
+document.getElementById("closeOverlay").addEventListener("click",()=>overlay.classList.remove("open"));
+overlay.addEventListener("click",e=>{ if(e.target===overlay) overlay.classList.remove("open"); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") overlay.classList.remove("open"); });
+
+/* ---------- resize ---------- */
+new ResizeObserver(() => {
+  W = wrap.clientWidth; H = wrap.clientHeight;
+  sim.force("center", d3.forceCenter(W/2, H/2));
+  sim.force("x", d3.forceX(W/2).strength(.045));
+  sim.force("y", d3.forceY(H/2).strength(.06));
+  sim.alpha(.2).restart();
+}).observe(wrap);
+
+applyLens();
+select("CatalogItem");
+</script>
+</body>
+</html>
