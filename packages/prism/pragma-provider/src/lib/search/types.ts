@@ -24,7 +24,7 @@ export type SearchIndex = readonly SearchEntry[];
 export interface SearchMatch {
   /** The entry's absolute IRI. */
   readonly uri: string;
-  /** The field that matched: 0 the title, 1 the CURIE, 2 the definition. */
+  /** The field that matched, as its place in `SEARCH_FIELDS`. */
   readonly tier: number;
   /** Where in that field the text starts, lowercased. */
   readonly position: number;
