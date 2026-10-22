@@ -56,6 +56,10 @@ export const appRoutes = {
   linesEntity,
 } as const;
 
+/**
+ * The route table's type. The `RouterRegister` augmentation below carries
+ * it, so the router types every route name and its params from this table.
+ */
 export type AppRoutes = typeof appRoutes;
 
 declare module "@canonical/router-react" {
