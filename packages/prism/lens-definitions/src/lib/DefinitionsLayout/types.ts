@@ -1,17 +1,17 @@
+import type { WorkspaceLayoutProps } from "@canonical/prism-core";
 import type { WrapperComponentProps } from "@canonical/router-core";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type OwnProps = WrapperComponentProps<ReactNode> & {
-  /** The site's rail, rendered in the layout's west columns. */
+  /** The site's rail, rendered in the workspace's rail region. */
   readonly rail: ReactNode;
-  /** The site's footer band, rendered below the canvas; none when omitted. */
-  readonly colophon?: ReactNode;
 };
 
 /**
- * Props accepted by `DefinitionsLayout`: the routed page the router hands its
- * wrapper, the site's rail and colophon, and the native props of the layout's
- * root `<div>`.
+ * Props accepted by `DefinitionsLayout`, which renders no element of its
+ * own: the routed page the router hands its wrapper and the site's rail,
+ * and the native props of the workspace's root `<div>`, which they reach.
+ * The strip and the inspector are the lens's, so a site passes neither.
  */
 export type DefinitionsLayoutProps = OwnProps &
-  Omit<ComponentProps<"div">, keyof OwnProps>;
+  Omit<WorkspaceLayoutProps, keyof OwnProps | "strip" | "inspector">;
