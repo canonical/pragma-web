@@ -1,0 +1,232 @@
+@layer ds.components.global {
+  :root {
+    --button-color-background: var(
+      --modifier-color-foreground-primary,
+      var(--color-foreground-primary)
+    );
+    --button-color-background-hover: var(--color-foreground-primary-hover);
+    --button-color-background-active: var(--color-foreground-primary-active);
+    --button-color-background-disabled: var(
+      --color-foreground-primary-disabled
+    );
+    --button-color-text: var(--color-text);
+    --button-color-border: var(--color-border-highlighted, var(--color-border));
+
+    --button-padding-inline-end: var(--dimension-200);
+    --button-padding-inline-start: var(--dimension-200);
+    --button-gap: var(--dimension-100);
+    --button-border-width: var(--dimension-stroke-thickness-medium);
+    --button-font-weight: var(--typography-weight-medium);
+    /* Snaps up to the baseline grid, as the typography mapper does. */
+    --button-font-size: var(--typography-text-secondary-font-size);
+    --button-line-height: round(
+      up,
+      calc(
+        var(--button-font-size) *
+        var(--typography-text-secondary-line-height)
+      ),
+      var(--baseline-height)
+    );
+  }
+
+  /* Reads the modifier channels generically: --modifier-surface, --modifier-outline (0/1) and --modifier-color-*; interaction states read the per-state channels. */
+
+  @keyframes ds-button-spinner-rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .ds.button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--button-gap);
+    cursor: pointer;
+
+    color: var(--modifier-color-text, var(--button-color-text));
+    background-color: var(--modifier-surface, var(--button-color-background));
+    /* The border is always laid out and mixed to transparent when the importance hides it, so every importance shares one geometry. */
+    --button-outline-mix: calc(var(--modifier-outline, 0) * 100%);
+    border-color: color-mix(
+      in srgb,
+      var(--modifier-color-border, var(--button-color-border))
+        var(--button-outline-mix),
+      transparent
+    );
+    border-style: solid;
+    border-width: var(--button-border-width);
+
+    --font-size: var(--button-font-size);
+    --line-height: var(--button-line-height);
+    font-weight: var(--button-font-weight);
+    padding-inline: var(--button-padding-inline-start)
+      var(--button-padding-inline-end);
+
+    text-align: center;
+    text-decoration: none;
+
+    transition:
+      background-color var(--motion-duration-fast) var(--motion-easing-standard),
+      color var(--motion-duration-fast) var(--motion-easing-standard),
+      border-color var(--motion-duration-fast) var(--motion-easing-standard);
+
+    &:has(> .icon) {
+      --button-padding-inline-start: var(--dimension-100);
+    }
+
+    &:hover:not(:disabled, .loading) {
+      background-color: var(
+        --modifier-surface-hover,
+        var(--button-color-background-hover)
+      );
+    }
+
+    &:active:not(:disabled, .loading) {
+      background-color: var(
+        --modifier-surface-active,
+        var(--button-color-background-active)
+      );
+    }
+
+    /* A 1px gap of the background separates the ring from the button, so the
+       ring only has to contrast with the background, not with the fill too.
+       TODO: drop the literal fallbacks once the focus-outline tokens exist. */
+    &:focus-visible {
+      outline: var(--focus-outline-width, 2px) solid
+        var(--modifier-color-focus-ring, var(--color-focus-ring, currentColor));
+      outline-offset: var(--focus-outline-offset, 1px);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      color: var(--modifier-color-text-disabled, var(--color-text-disabled));
+      background-color: var(
+        --modifier-surface-disabled,
+        var(--button-color-background-disabled)
+      );
+      border-color: color-mix(
+        in srgb,
+        var(
+            --modifier-color-border-disabled,
+            var(--color-border-highlighted-disabled)
+          )
+          var(--button-outline-mix),
+        transparent
+      );
+    }
+  }
+
+  .ds.button > .icon {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--icon-size, 1em);
+    height: var(--icon-size, 1em);
+
+    color: var(--modifier-color-icon, var(--modifier-color-text, currentColor));
+  }
+
+  .ds.button:disabled > .icon {
+    color: var(--modifier-color-icon-disabled, var(--color-icon-disabled));
+  }
+
+  /* Icon and label stay laid out but transparent (not `visibility: hidden`, which would drop the accessible name) with the spinner centred on top. A loading button blocks activation but keeps the enabled colours, overriding :disabled. */
+  .ds.button.loading {
+    cursor: progress;
+    color: var(--modifier-color-text, var(--button-color-text));
+    background-color: var(--modifier-surface, var(--button-color-background));
+    border-color: color-mix(
+      in srgb,
+      var(--modifier-color-border, var(--button-color-border))
+        var(--button-outline-mix),
+      transparent
+    );
+
+    & > .icon,
+    & > .label {
+      opacity: 0;
+    }
+
+    & > .loading-spinner {
+      position: absolute;
+      inset: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    & .spinner {
+      width: var(--icon-size, 1em);
+      height: var(--icon-size, 1em);
+      animation: ds-button-spinner-rotate 1s linear infinite;
+    }
+  }
+
+  /* Visually hidden, still in the accessibility tree. */
+  .ds.button-loading-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds.button {
+      transition: none;
+
+      & .spinner {
+        animation: none;
+      }
+    }
+  }
+
+  /* Density seat: consumes the shared control seat from @canonical/styles
+     (modifiers.density.css) so the box height is intrinsic and lands exactly on
+     the density cell. Lives here, not in ds-global-form, so an app shipping
+     ds-global alone still gets a seated button.
+
+     Order, not specificity, arbitrates against the base rule: every global-tier
+     package shares the `ds.components.global` layer, and escalating this
+     selector would also override other packages' (0,2,0) rules. `:where()`
+     keeps the density-scope gate without adding specificity.
+
+     `.nested` buttons are their own dense scope (the `dense` class is set by the
+     component), so they seat without an ancestor scope. */
+  :where(.comfortable, .dense, .app, .site, .docs) .ds.button,
+  .ds.button:where(.nested) {
+    /* The border is folded in here because a var() in a custom property resolves at its declaring element. Rounded to ¼px to stay on the 1/64px layout grid. */
+    --seat-before: round(
+      nearest,
+      max(
+        0px,
+        calc(var(--control-seat-basis) - var(--button-border-width, 0px))
+      ),
+      0.25px
+    );
+    --seat-after: max(
+      0px,
+      calc(
+        var(--density-line-height-effective) -
+        var(--control-seat-line) -
+        var(--seat-before) -
+        2 *
+        var(--button-border-width, 0px)
+      )
+    );
+
+    box-sizing: border-box;
+    block-size: auto;
+    align-items: flex-start;
+    line-height: var(--control-seat-line);
+    padding-block: var(--seat-before) var(--seat-after);
+  }
+}
