@@ -785,14 +785,16 @@ const assertChipBadgePair = (
   ).toBeGreaterThan(0);
   close(px(computed(doc, badgeNode).fontSize), rootSize * 0.75);
   close(px(computed(doc, badgeNode).lineHeight), rootSize);
+  expect(px(computed(doc, badgeNode).marginInlineStart)).toBeGreaterThan(0);
 };
 
 describe("Badge in the public Chip slot", () => {
-  it("shares the Chip label baseline, preserves host sizes and clears every painted edge", async () => {
+  it("covers 36 primary tier, direction, root-size and placement configurations", async () => {
     const cases = (["site", "docs", "app"] as const).flatMap((tier) =>
-      (["default", "dense", "comfortable"] as const).map((density) => ({
-        density,
-        id: `${tier}-${density}-ltr`,
+      (["ltr", "rtl"] as const).map((dir) => ({
+        density: "default" as const,
+        id: `${tier}-default-${dir}`,
+        dir,
         tier,
       })),
     );
@@ -801,7 +803,7 @@ describe("Badge in the public Chip slot", () => {
         root: "",
         styles: [...chipBadgeStyles, `:root { font-size: ${rootSize}px; }`],
         body: cases
-          .map(({ tier, density }) => chipBadgeCase(tier, density))
+          .map(({ tier, density, dir }) => chipBadgeCase(tier, density, dir))
           .join(""),
       });
 
@@ -837,14 +839,127 @@ describe("Badge in the public Chip slot", () => {
     }
   });
 
-  it("keeps logical spacing and painted clearance in RTL", async () => {
+  it("checks density compatibility classes separately from the primary matrix", async () => {
+    const cases = (["site", "docs", "app"] as const).flatMap((tier) =>
+      (["dense", "comfortable"] as const).map((density) => ({
+        density,
+        id: `${tier}-${density}-ltr`,
+        tier,
+      })),
+    );
     const doc = await render({
       root: "",
       styles: chipBadgeStyles,
-      body: chipBadgeCase("app", "dense", "rtl"),
+      body: [
+        ...(["site", "docs", "app"] as const).map((tier) =>
+          chipBadgeCase(tier, "default"),
+        ),
+        ...cases.map(({ tier, density }) => chipBadgeCase(tier, density)),
+      ].join(""),
     });
-    assertChipBadgePair(doc, "app-dense-rtl", "standalone", 16);
-    assertChipBadgePair(doc, "app-dense-rtl", "navigation", 16);
+    for (const { id, tier } of cases) {
+      assertChipBadgePair(doc, id, "standalone", 16);
+      assertChipBadgePair(doc, id, "navigation", 16);
+      for (const placement of ["standalone", "navigation"] as const) {
+        const compatibilityChip = doc.getElementById(
+          `${id}-${placement}-plain-chip`,
+        );
+        const defaultChip = doc.getElementById(
+          `${tier}-default-ltr-${placement}-plain-chip`,
+        );
+        if (!compatibilityChip || !defaultChip)
+          throw new Error(`missing ${tier} ${placement} compatibility Chip`);
+        const compatibilityRect = compatibilityChip.getBoundingClientRect();
+        const defaultRect = defaultChip.getBoundingClientRect();
+        const compatibilityStyle = computed(doc, compatibilityChip);
+        const defaultStyle = computed(doc, defaultChip);
+        close(compatibilityRect.height, defaultRect.height);
+        close(compatibilityRect.width, defaultRect.width);
+        close(
+          px(compatibilityStyle.paddingBlockStart),
+          px(defaultStyle.paddingBlockStart),
+        );
+        close(
+          px(compatibilityStyle.paddingBlockEnd),
+          px(defaultStyle.paddingBlockEnd),
+        );
+        close(px(compatibilityStyle.lineHeight), px(defaultStyle.lineHeight));
+      }
+    }
+  });
+
+  it("keeps the default, criticality and custom Badge fills visible", async () => {
+    const doc = await render({
+      root: "",
+      styles: chipBadgeStyles,
+      body: [
+        chipBadgeCase("site", "default"),
+        chipBadgeCase("docs", "dense"),
+        chipBadgeCase("app", "comfortable"),
+      ].join(""),
+    });
+    const defaultChip = doc.getElementById(
+      "site-default-ltr-standalone-badge-chip",
+    );
+    const defaultBadge = doc.getElementById(
+      "site-default-ltr-standalone-badge-badge",
+    );
+    const criticalChip = doc.getElementById(
+      "docs-dense-ltr-standalone-badge-chip",
+    );
+    const criticalBadge = doc.getElementById(
+      "docs-dense-ltr-standalone-badge-badge",
+    );
+    const customBadge = doc.getElementById(
+      "app-comfortable-ltr-standalone-badge-badge",
+    );
+    if (
+      !defaultChip ||
+      !defaultBadge ||
+      !criticalChip ||
+      !criticalBadge ||
+      !customBadge
+    )
+      throw new Error("missing Chip Badge appearance fixture");
+
+    const defaultStyle = computed(doc, defaultBadge);
+    expect(defaultStyle.backgroundColor).not.toBe(
+      computed(doc, defaultChip).backgroundColor,
+    );
+    expect(defaultStyle.color).not.toBe(defaultStyle.backgroundColor);
+
+    const criticalStyle = computed(doc, criticalBadge);
+    expect(criticalBadge.classList).toContain("error");
+    expect(criticalStyle.backgroundColor).not.toBe(
+      computed(doc, criticalChip).backgroundColor,
+    );
+    expect(criticalStyle.color).not.toBe(criticalStyle.backgroundColor);
+
+    const customStyle = computed(doc, customBadge);
+    expect(customStyle.backgroundColor).toBe("rgb(1, 2, 3)");
+    expect(customStyle.color).not.toBe(customStyle.backgroundColor);
+  });
+
+  it("keeps the default nested Badge distinct in the dark theme", async () => {
+    await emulate({ colorScheme: "dark" });
+    const doc = await render({
+      root: "",
+      styles: chipBadgeStyles,
+      body: chipBadgeCase("site", "default"),
+    });
+    const chipNode = doc.getElementById(
+      "site-default-ltr-standalone-badge-chip",
+    );
+    const badgeNode = doc.getElementById(
+      "site-default-ltr-standalone-badge-badge",
+    );
+    if (!chipNode || !badgeNode)
+      throw new Error("missing dark-theme Chip Badge fixture");
+    const badgeStyle = computed(doc, badgeNode);
+    expect(badgeStyle.backgroundColor).not.toBe(
+      computed(doc, chipNode).backgroundColor,
+    );
+    expect(badgeStyle.color).not.toBe(badgeStyle.backgroundColor);
   });
 
   it("suppresses a custom Badge fill in forced colors without hiding its text", async () => {

@@ -16,6 +16,8 @@ const componentCssClassName = "ds chip";
  * @implements ds:global.component.chip
  */
 const Chip = (props: ChipProps): React.ReactElement => {
+  const hasBadge =
+    props.badge !== undefined && props.badge !== null && props.badge !== false;
   const className = [
     componentCssClassName,
     "spacing-control-seat stroke-paint stroke",
@@ -30,6 +32,7 @@ const Chip = (props: ChipProps): React.ReactElement => {
     <>
       {props.lead && <span className="lead">{props.lead}</span>}
       {props.value && <span className="value">{props.value}</span>}
+      {hasBadge && (props.lead || props.value) ? " " : null}
       {props.badge}
       {props.onDismiss && (
         <button

@@ -83,6 +83,20 @@ describe("Chip component", () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
+  it("includes a Badge in an interactive Chip's accessible name", () => {
+    render(
+      <Component
+        value="Machines"
+        badge={<Badge value={7} />}
+        onClick={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Machines 7" }),
+    ).toBeInTheDocument();
+  });
+
   it("applies criticality modifier", () => {
     render(<Component lead="Cloud" value="AWS" criticality="success" />);
 

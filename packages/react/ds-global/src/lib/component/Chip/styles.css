@@ -119,11 +119,17 @@
 
     /* Context-specific styling for the public Badge slot. */
     & .ds.badge {
-      /** Pull the badge closer to the edge of a chip */
+      /* Distinguish the default Badge surface from the Chip's secondary
+       * surface. Criticality channels and consumer overrides still win in
+       * Badge's own declarations. */
+      --badge-color-background: var(--color-foreground-primary);
+      --badge-color-text: var(--color-text-onForegroundPrimary);
+
+      /* Pull the badge closer to the edge of a chip. */
       --badge-chip-margin-tweak: var(--dimension-025);
 
       align-self: baseline;
-      margin-inline-start: var(--spacing-horizontal-small);
+      margin-inline-start: var(--ds-spacing-mark);
       margin-inline-end: var(--badge-chip-margin-tweak);
     }
   }
