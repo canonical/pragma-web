@@ -132,6 +132,14 @@ site also retunes those decisions through its theme:
 - space and motion: `--space-025` to `--space-800`, `--motion-duration-fast`,
   each with the lens's own default as its fallback.
 
+The well's accent, which paints the semantic arcs (the object properties
+between classes), their arrowheads and predicate labels, and the legend's
+relation swatch, reads `--color-text-branded`, so it takes the theme's brand
+hue and follows it between light and dark. A site that wants a fixed accent
+sets `--hierarchy-well-accent-color` and
+`--well-legend-relation-color` to the same colour, for example
+`oklch(0.55 0.17 45)`.
+
 The design system has no semantic token for the rest, so the component
 token holds the lens's own value and only the component token retunes it:
 every type size, font family, weight, tracking and line height; every
