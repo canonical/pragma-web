@@ -45,9 +45,17 @@ describe("EntityLayout", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Stations" }),
     ).toBeInTheDocument();
-    expect(document.querySelector(".ds.entity-layout")?.className).toBe(
-      "ds entity-layout site-layout",
+    const layout = document.querySelector(".ds.document-layout");
+    expect(layout?.className).toBe("ds document-layout site-layout");
+    // The rail, the routed page and the colophon land in the document
+    // archetype's regions, and the canvas is the page's one main region.
+    expect(layout?.querySelector(":scope > .rail")?.firstElementChild).toBe(
+      screen.getByRole("navigation", { name: "Site rail" }),
     );
+    expect(layout?.querySelector(":scope > .colophon")?.textContent).toBe(
+      "Colophon",
+    );
+    expect(screen.getAllByRole("main")).toHaveLength(1);
   });
 
   it("trails the lens on the index, and the lens then the address on an entity", {
