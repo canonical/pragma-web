@@ -207,3 +207,4 @@ template from `@canonical/styles`; every other grid is a subgrid of it.
 - Routes: `createEntityRoutes`; types `EntityRoutes`, `EntityLensOptions`.
 - Layout: `EntityLayout`; types `EntityLayoutProps`.
 - Pages: `EntityIndexPage`, `EntityPage`; types `EntityIndexPageProps`, `EntityPageProps`.
+- Addresses, for a site's own routes that take an entity's address the way the lens's do: `expandAddress`, `readUriParam`; types `OntologyNamespace`.
