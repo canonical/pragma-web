@@ -16,8 +16,8 @@ import { GRAPHQL_URL_ENV_VAR } from "#relay";
 import { NORTHGATE_TITLE } from "../../testing/fixtures.js";
 import startMetroGraph from "../../testing/startMetroGraph.js";
 import type { MetroGraph } from "../../testing/types.js";
-import type { InitialData } from "./entry.js";
 import createAppRenderer from "./renderer.js";
+import type { InitialData } from "./types.js";
 
 /** The bootstrap script `JSXRenderer` embeds the initial data with. */
 const INITIAL_DATA_PATTERN = /window\.__INITIAL_DATA__ = (.*?)<\/script>/s;

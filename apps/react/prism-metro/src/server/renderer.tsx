@@ -5,9 +5,10 @@ import { extractPreferences } from "@canonical/react-hooks";
 import { JSXRenderer } from "@canonical/react-ssr/renderer";
 import { getRequestUrl } from "@canonical/react-ssr/server";
 import { resolveGraphqlUrl } from "#relay";
-import EntryServer, { type InitialData } from "./entry.js";
+import EntryServer from "./entry.js";
 import prepareRelayData from "./prepareRelayData.js";
 import resolveRouteStatus from "./resolveRouteStatus.js";
+import type { InitialData } from "./types.js";
 
 // The built client shell, read once at module load: it carries the hashed
 // script and link tags Vite injected at build time, which the renderer

@@ -5,24 +5,9 @@
 import "../styles/app.css";
 import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import type { ServerEntrypointProps } from "@canonical/react-ssr/renderer";
-import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { Shell } from "#shell";
 import { appRoutes, notFoundRoute } from "../routes.js";
-
-/** The initial data a server render embeds for the client to hydrate from. */
-export interface InitialData extends Record<string, unknown> {
-  /** The request's path and query string. */
-  readonly url?: string;
-  /** Colour-scheme preference resolved from the request cookie, if any. */
-  readonly theme?: "light" | "dark";
-  /**
-   * The Relay hydration payload from the server's prepare step: the
-   * serialised record map of the route's warmed operations.
-   */
-  readonly relay?: {
-    readonly records?: RecordMap;
-  };
-}
+import type { InitialData } from "./types.js";
 
 /**
  * The server render of the app: the document around `Shell`, with a static

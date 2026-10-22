@@ -2,8 +2,8 @@
 
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { InitialData } from "./entry.js";
 import EntryServer from "./entry.js";
+import type { InitialData } from "./types.js";
 
 /** Rejections that reached the process during a test. */
 let unhandled: unknown[] = [];
