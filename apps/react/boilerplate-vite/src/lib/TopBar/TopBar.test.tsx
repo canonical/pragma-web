@@ -26,14 +26,14 @@ describe("TopBar", () => {
     );
   });
 
-  it("holds the demo navigation", () => {
+  it("holds the demo navigation, with a link to the dashboard", () => {
     renderWithProviders(<TopBar />);
 
     const navigation = screen.getByRole("navigation", { name: "Main" });
 
     expect(
-      within(navigation).getByRole("link", { name: "Contact" }),
-    ).toHaveAttribute("href", "/contact");
+      within(navigation).getByRole("link", { name: "Dashboard" }),
+    ).toHaveAttribute("href", "/dashboard");
   });
 
   it("holds the theme and language selectors, with the input chrome", () => {

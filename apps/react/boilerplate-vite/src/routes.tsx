@@ -16,6 +16,8 @@ import accountRoutes from "#domains/account/routes.js";
 import { PAGE_SIZE, productListQuery } from "#domains/catalog/ProductList.js";
 import catalogRoutes from "#domains/catalog/routes.js";
 import contactRoutes from "#domains/contact/routes.js";
+import DashboardLayout from "#domains/dashboard/DashboardLayout.js";
+import dashboardRoutes from "#domains/dashboard/routes.js";
 import marketingRoutes from "#domains/marketing/routes.js";
 import TopBar from "#lib/TopBar/index.js";
 import type { RelaySeedPayload } from "#relay/environment.js";
@@ -100,6 +102,12 @@ const publicLayout = wrapper<ReactElement>({
   ),
 });
 
+/** The dashboard's layout: the application shell and its side navigation. */
+const applicationLayout = wrapper<ReactElement>({
+  id: "application-layout",
+  component: DashboardLayout,
+});
+
 function NotFoundPage(): ReactElement {
   const { t } = useTranslation();
 
@@ -137,6 +145,15 @@ const [catalog] = group(
   group(publicLayout, [catalogRoutes.catalog] as const),
 );
 
+const [dashboard, dashboardInstances, dashboardSettings] = group(
+  topBarLayout,
+  group(applicationLayout, [
+    dashboardRoutes.dashboard,
+    dashboardRoutes.dashboardInstances,
+    dashboardRoutes.dashboardSettings,
+  ] as const),
+);
+
 // Static redirect route: matched entirely from the URL, no content — the
 // router (and the SSR disposition helper) answers with a real 301. Static
 // redirects accept 301 or 308 only; runtime redirect() covers the 302 family.
@@ -154,6 +171,9 @@ const appRoutes = {
   login,
   contact,
   catalog,
+  dashboard,
+  dashboardInstances,
+  dashboardSettings,
 } as const;
 
 export type AppRoutes = typeof appRoutes;

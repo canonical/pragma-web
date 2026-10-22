@@ -14,6 +14,13 @@
     min-block-size: 100dvh;
   }
 
+  /* Under an application shell the page is exactly the viewport's height:
+     the side navigation and the page scroll inside the shell, not the
+     document. */
+  .page-frame:has(> .ds.application-shell) {
+    block-size: 100dvh;
+  }
+
   /* The public pages: one constrained column. */
   .public-content {
     box-sizing: border-box;

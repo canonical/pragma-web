@@ -11,4 +11,13 @@ export const stubRoutes = {
   catalog: route({ url: "/catalog", content: () => null }),
   contact: route({ url: "/contact", content: () => null }),
   account: route({ url: "/account", content: () => null }),
+  dashboard: route({ url: "/dashboard", content: () => null }),
+  dashboardInstances: route({
+    url: "/dashboard/instances",
+    content: () => null,
+  }),
+  dashboardSettings: route({
+    url: "/dashboard/settings",
+    content: () => null,
+  }),
 } as const;

@@ -8,8 +8,12 @@ on:
       - packages/styles/**
       - packages/runtime/ds-utils/**
       - packages/react/ds-global/**
+      - packages/react/ds-global-form/**
+      - packages/react/ds-app/**
       - apps/react/boilerplate-vite/**
       - "!packages/react/ds-global/**/*.stories.*"
+      - "!packages/react/ds-global-form/**/*.stories.*"
+      - "!packages/react/ds-app/**/*.stories.*"
       - "!**/*.test.*"
       - "!**/*.md"
       - "!**/*.mdx"
@@ -22,8 +26,12 @@ on:
       - packages/styles/**
       - packages/runtime/ds-utils/**
       - packages/react/ds-global/**
+      - packages/react/ds-global-form/**
+      - packages/react/ds-app/**
       - apps/react/boilerplate-vite/**
       - "!packages/react/ds-global/**/*.stories.*"
+      - "!packages/react/ds-global-form/**/*.stories.*"
+      - "!packages/react/ds-app/**/*.stories.*"
       - "!**/*.test.*"
       - "!**/*.md"
       - "!**/*.mdx"
@@ -39,5 +47,7 @@ jobs:
         "packages/ds-assets/**",
         "packages/styles/**/!(*.test.*|*.stories.*|*.md|*.mdx)",
         "packages/runtime/ds-utils/**/!(*.test.*|*.stories.*|*.md|*.mdx)",
-        "packages/react/ds-global/**/!(*.test.*|*.stories.*|*.md|*.mdx)"
+        "packages/react/ds-global/**/!(*.test.*|*.stories.*|*.md|*.mdx)",
+        "packages/react/ds-global-form/**/!(*.test.*|*.stories.*|*.md|*.mdx)",
+        "packages/react/ds-app/**/!(*.test.*|*.stories.*|*.md|*.mdx)"
       ]'

@@ -30,6 +30,7 @@ const routes = {
   catalog: route({ url: "/catalog", content: () => null }),
   contact: route({ url: "/contact", content: () => null }),
   account: route({ url: "/account", content: () => null }),
+  dashboard: route({ url: "/dashboard", content: () => null }),
 } as const;
 
 /**
