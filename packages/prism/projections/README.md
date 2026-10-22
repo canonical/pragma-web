@@ -1,10 +1,14 @@
 # @canonical/prism-projections
 
-The Entity representations of a Prism documentation site. A lens mentions
-graph nodes it knows nothing about: an ontology class's instances, the
+The Entity representations of a Prism documentation site, in two layers.
+The representations (`EntityChip`, `EntityRow`, `EntityCard`,
+`EntityCommand`, `EntityGraphNode` and the `EntityList` that lists them)
+are slotted components that read no Relay fragment: a lens or a story
+fills their slots with whatever it has. The projections mention graph
+nodes a lens knows nothing about: an ontology class's instances, the
 results of a search, the entities a passage of prose links to. Each
-representation renders any node, whatever its type, through the arm its
-site maps to the node's `__typename`, and links it to the node's home.
+projection renders any node, whatever its type, through the arm its site
+maps to the node's `__typename`, and links it to the node's home.
 
 - **`ChipProjection`**: the inline mention, a node named in running text.
 - **`RowProjection`**: the list row, a node as one entry of a list of
@@ -16,30 +20,34 @@ site maps to the node's `__typename`, and links it to the node's home.
 Prose links to graph nodes render as chips too, through the element
 overrides a Markdown renderer takes.
 
-Every representation reads its node through a fragment of its own, so a
-lens spreads it in its query and hands the component the key. The
-representations select only what the contract guarantees on every node
+Every projection reads its node through a fragment of its own, so a lens
+spreads it in its query and hands the component the key. The projections
+select only what the contract guarantees on every node
 (`_meta { title curie type { uri } }`).
 
 ## Slotted representations
 
-Each representation is also a slotted component that reads no Relay
-fragment and no context: it renders the slots it is given, in the order its
-anatomy fixes, and links its title to `href` through `LinkComponent` (the
-intrinsic `"a"` by default) or renders it as inert text without one. Each
-folder under `src/lib/ui/` carries its `anatomy.yaml`, the design contract
-its stylesheet transcribes.
+A representation reads no Relay fragment and no context: it renders the
+slots it is given, in the order its anatomy fixes, and links its title to
+`href` through `LinkComponent` (the intrinsic `"a"` by default) or renders
+it as inert text without one. Each folder under `src/lib/ui/` carries its
+`anatomy.yaml`, the design contract its stylesheet transcribes. The rows
+and the cards set their text in the context's primary tier, so their
+heights follow the context's line: a row is that line and 4px above and
+below it, 32px in a site and 28px in the docs. The package's Storybook
+lays the five representations of each type out as one matrix, under
+`Documentation/Projection matrix`.
 
-- **`EntityChip`**: the inline mention, a 28px pill in running text: an
+- **`EntityChip`**: the inline mention, a pill in running text: an
   optional lead filed before the catalog's separator, the value, then an
   optional badge, icon and disclosure chevron.
-- **`EntityRow`**: the list entry, a 32px row of an index: the namespace
+- **`EntityRow`**: the list entry, one row of an index: the namespace
   prefix and the title, then one muted word at the end.
 - **`EntityCard`**: the card, built on the published `Card`: location, the
   title and the entity it belongs to, kind, summary, key values and the
   footer's vitals, and an optional sidecar beside them, two columns wide,
   for a rendered example of the entity.
-- **`EntityCommand`**: the command-palette result, a 56px row: the title
+- **`EntityCommand`**: the command-palette result, a two-line row: the title
   over "kind in location", and one vital at the end.
 - **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a 50-unit
   box and two lines of `<text>`, the title over "kind in location", for a
@@ -112,7 +120,7 @@ relay({
 The plugin rewrites the site's tags only. The package's files resolve
 outside the site's `src`, so they keep their own artifact imports.
 
-## Representations
+## Projections
 
 ```tsx
 import { ChipProjection, RowProjection } from "@canonical/prism-projections";
@@ -127,11 +135,11 @@ import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 </ul>
 ```
 
-A representation renders no element of its own: its arm renders the root,
-and every arm of one representation renders the same root tag, so the
-representation's native props are that tag's:
+A projection renders no element of its own: its arm renders the root, and
+every arm of one projection renders the same root tag, so the projection's
+native props are that tag's:
 
-| Representation | Root | `children` |
+| Projection | Root | `children` |
 |---|---|---|
 | `ChipProjection` | `<span>` | the mention's text, in place of the node's title |
 | `RowProjection` | `<li>` | none: the arm renders the slots |

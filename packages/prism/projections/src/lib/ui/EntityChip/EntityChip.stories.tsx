@@ -2,6 +2,7 @@
 
 import { Icon } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { withSentence } from "../../../../.storybook/decorators/index.js";
 import {
   CLASS_ENTITY,
   MODIFIER_ENTITY,
@@ -22,6 +23,7 @@ const meta: Meta<typeof Component> = {
   title: "Components/EntityChip",
   component: Component,
   tags: ["autodocs"],
+  decorators: [withSentence()],
 };
 
 export default meta;

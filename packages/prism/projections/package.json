@@ -78,6 +78,7 @@
     "@canonical/styles": "^0.44.1",
     "@canonical/typescript-config-react": "^0.44.1",
     "@canonical/vitest-config-react": "^0.44.1",
+    "@storybook/addon-docs": "^10.6.0",
     "@storybook/react-vite": "^10.6.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
