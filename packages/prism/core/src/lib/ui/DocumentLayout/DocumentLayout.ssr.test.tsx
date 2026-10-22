@@ -26,4 +26,14 @@ describe("DocumentLayout SSR", () => {
       '<div class="colophon"><footer>Colophon</footer></div>',
     );
   });
+
+  it("server-renders no aside and no colophon for a node that renders nothing", () => {
+    const html = renderToString(
+      <DocumentLayout aside={false} colophon="" rail={null}>
+        <p>Routed page</p>
+      </DocumentLayout>,
+    );
+    expect(html).not.toContain('class="aside"');
+    expect(html).not.toContain('class="colophon"');
+  });
 });

@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import { Canvas } from "../Canvas/index.js";
 import { CanvasSkipLink } from "../CanvasSkipLink/index.js";
+import isRenderedNode from "../isRenderedNode.js";
 import type { DocumentLayoutProps } from "./types.js";
 import "./styles.css";
 
@@ -19,7 +20,9 @@ const componentCssClassName = "ds document-layout";
  *
  * Below two groups of columns the aside takes a row of its own under the
  * canvas, the two sharing the free height; below one group the rail
- * narrows to one column. Both are container queries on the shell.
+ * narrows to one column. Both are container queries on the shell. An aside
+ * or a colophon that renders nothing (`null`, a boolean or the empty
+ * string) leaves no region.
  *
  * `import { DocumentLayout } from "@canonical/prism-core";`
  *
@@ -43,12 +46,10 @@ export default function DocumentLayout({
       <div className="rail">{rail}</div>
       <div className="strip">{strip}</div>
       <Canvas className="canvas">{children}</Canvas>
-      {aside === undefined || aside === null ? null : (
-        <div className="aside">{aside}</div>
-      )}
-      {colophon === undefined || colophon === null ? null : (
+      {isRenderedNode(aside) ? <div className="aside">{aside}</div> : null}
+      {isRenderedNode(colophon) ? (
         <div className="colophon">{colophon}</div>
-      )}
+      ) : null}
     </div>
   );
 }

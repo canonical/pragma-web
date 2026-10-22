@@ -9,10 +9,13 @@ type OwnProps = {
   readonly strip?: ReactNode;
   /**
    * Content beside the page, in the last three columns of the body; no
-   * aside region when omitted.
+   * aside region when omitted or when it renders nothing.
    */
   readonly aside?: ReactNode;
-  /** The site's footer band, under the body; no colophon row when omitted. */
+  /**
+   * The site's footer band, under the body; no colophon when omitted or when
+   * it renders nothing.
+   */
   readonly colophon?: ReactNode;
   /** The routed page, rendered in the canvas. */
   readonly children: ReactNode;

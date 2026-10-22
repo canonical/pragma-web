@@ -58,6 +58,20 @@ describe("DocumentLayout", () => {
     expect(document.querySelector(":scope > .colophon")).toBeNull();
   });
 
+  it.each([
+    ["false", false],
+    ["true", true],
+    ["the empty string", ""],
+  ])("renders no aside and no colophon region when given %s", (_name, node) => {
+    render(
+      <DocumentLayout aside={node} colophon={node} rail={null}>
+        <p>Routed page</p>
+      </DocumentLayout>,
+    );
+    expect(document.querySelector(".aside")).toBeNull();
+    expect(document.querySelector(".colophon")).toBeNull();
+  });
+
   it("merges a consumer className after its own and passes native props", () => {
     render(
       <DocumentLayout aria-label="Document" className="site" rail={null}>

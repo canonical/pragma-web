@@ -111,6 +111,25 @@ describe("WorkspaceLayout", () => {
     expect(screen.queryByRole("button")).toBeNull();
   });
 
+  it.each([
+    ["false", false],
+    ["true", true],
+    ["the empty string", ""],
+  ])(
+    "renders no inspector region and no trigger for an inspector of %s",
+    (_name, node) => {
+      render(
+        <WorkspaceLayout data-testid="workspace" inspector={node} rail={null}>
+          <p>Routed page</p>
+        </WorkspaceLayout>,
+      );
+      expect(
+        screen.getByTestId("workspace").querySelector(":scope > .inspector"),
+      ).toBeNull();
+      expect(screen.queryByRole("button")).toBeNull();
+    },
+  );
+
   it("merges a consumer className after its own and passes native props", () => {
     render(
       <WorkspaceLayout aria-label="Workspace" className="site" rail={null}>

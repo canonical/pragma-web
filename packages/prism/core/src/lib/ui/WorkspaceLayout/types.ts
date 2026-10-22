@@ -11,7 +11,8 @@ type OwnProps = {
    * The inspector: a persistent region in the last three columns, and the
    * content of a drawer below three groups of columns. It is read-only: it
    * remounts when it moves between the two, so any state it holds resets.
-   * When omitted there is no inspector region and no drawer trigger, and
+   * When omitted, or when it renders nothing (`null`, a boolean or the
+   * empty string), there is no inspector region and no drawer trigger, and
    * the canvas takes the columns the inspector would hold.
    */
   readonly inspector?: ReactNode;
