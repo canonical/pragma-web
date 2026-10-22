@@ -1,0 +1,20 @@
+---
+# NetworkStationPage — the content of /network/stations/:uri, in the
+# workspace's inspector: the document title and one station's panel, or the
+# not-found, loading or error status in its place. Binds no styles of its own.
+node:
+  uri: metro.component.network_station_page
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: metro.component.station_panel
+          - node:
+              role: not-found status
+          - node:
+              role: loading status
+          - node:
+              role: error status
+      relation:
+        cardinality: "1"

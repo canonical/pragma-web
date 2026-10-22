@@ -1,0 +1,66 @@
+---
+# SchematicMap — the network as an octilinear diagram: every line drawn once
+# (a reverse route is the same track), shared stretches side by side, each
+# interchange a capsule spanning the strokes it joins, each station a tick or
+# a dot, every station name a link to its home. Bespoke: no published
+# component draws a diagram. Server-rendered SVG; no script draws it.
+node:
+  uri: metro.component.schematic_map
+  styles:
+    layout.type: block
+    size.width: 100%
+    size.height: 100%
+    layout.overflow: hidden
+    typography.color: color.text
+  edges:
+    - node:
+        role: title
+        # <title> of the <svg>, the map's accessible name
+      relation:
+        cardinality: "1"
+        slotName: title
+    - node:
+        role: line track
+        # one <g> per line: <path stroke={colour}> per drawn route,
+        # data-line={uri}; <title> carries the line's name
+      relation:
+        cardinality: "1..*"
+        slotName: lines
+    - node:
+        role: station mark
+        # <a href={home}> wrapping a dot (plain station) or a capsule
+        # (interchange): an outer shape filled currentColor and an inner one
+        # inset by the stroke, filled from the background
+        styles:
+          typography.color: color.text
+          interaction.cursor: pointer
+          appearance.outline.color@focus: color.focus.ring
+          appearance.outline.style@focus: solid
+          appearance.outline.width@focus: 2px
+        edges:
+          - node:
+              role: mark fill
+              styles:
+                typography.color: color.background
+            relation:
+              cardinality: "1"
+          - node:
+              role: station label
+              # <text> at the geometry's label anchor
+              styles:
+                typography.color: color.text
+                typography.decoration@hover: underline
+            relation:
+              cardinality: "1"
+      relation:
+        cardinality: "1..*"
+        slotName: stations
+    - node:
+        role: selected station mark
+        # the station the route names (`/network/stations/:uri`): same shape,
+        # aria-current="page", drawn in the link colour
+        styles:
+          typography.color: color.text.link
+      relation:
+        cardinality: "0..1"
+        slotName: selected

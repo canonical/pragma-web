@@ -1,0 +1,57 @@
+---
+# StationPanel — the network workspace's inspector. Without a station it says
+# what to do and lists every routed station; with one it shows where the
+# station sits on each route: the stop before and after it, and the
+# transfer time at an interchange. Composes DescriptionList for the facts;
+# bespoke only as the inspector's arrangement.
+node:
+  uri: metro.component.station_panel
+  styles:
+    layout.type: grid
+    spacing.gap.block: container.gap.default
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+  edges:
+    - switch:
+        on: props
+        cases:
+          - node:
+              role: empty state
+              # hint paragraph and the station list
+              edges:
+                - node:
+                    role: hint
+                    styles:
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1" }
+                - node:
+                    uri: prism.component.entity_row
+                    # S7's Station/Interchange row projection, via the map
+                  relation:
+                    cardinality: "1..*"
+                    slotName: stations
+          - node:
+              role: station detail
+              edges:
+                - node:
+                    role: title
+                    # <h2>, the station's _meta.title
+                  relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: global.component.description_list
+                    # zone, platforms, transfer minutes (interchanges)
+                  relation: { cardinality: "1", slotName: facts }
+                - node:
+                    role: route neighbours
+                    # one <section> per route calling here: the route label,
+                    # previous stop, next stop (links to their homes); a loop
+                    # wraps, a terminus shows none on its open side
+                    styles:
+                      layout.type: grid
+                      spacing.gap.block: container.gap.tight
+                  relation:
+                    cardinality: "1..*"
+                    slotName: routes
+      relation:
+        cardinality: "1"

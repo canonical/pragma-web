@@ -1,0 +1,56 @@
+---
+# RouteStrip — a Route projected onto LineStrip: its label as the strip's
+# heading, its calls as CallStops in order, the continues markers when it
+# loops, and, when the route has a reverse, a direction toggle that shows one
+# of the two strips (both render without script; the toggle appears with
+# script, cs:css.media.scripting).
+node:
+  uri: metro.component.route_strip
+  projection:
+    on: Route
+  edges:
+    - node:
+        uri: metro.component.line_strip
+        edges:
+          - node:
+              role: label
+              projection: { field: label }
+            relation: { cardinality: "1", slotName: label }
+          - node:
+              role: loop flag
+              projection: { field: isLoop }
+            relation: { cardinality: "1" }
+          - node:
+              uri: metro.component.call_stop
+            relation:
+              cardinality: "1..*"
+              slotName: default
+              projection: { field: calls }
+      relation:
+        cardinality: "1"
+    - node:
+        role: direction toggle
+        # two buttons with aria-pressed; hidden under scripting: none
+        styles:
+          layout.type: flex
+          spacing.gap.inline: container.gap.tight
+      relation:
+        cardinality: "0..1"
+        slotName: toggle
+    - node:
+        uri: metro.component.line_strip
+        # the reverse direction's strip
+        edges:
+          - node:
+              role: reverse label
+              projection: { field: label }
+            relation: { cardinality: "1", slotName: label }
+          - node:
+              uri: metro.component.call_stop
+            relation:
+              cardinality: "1..*"
+              projection: { field: calls }
+      relation:
+        cardinality: "0..1"
+        slotName: reverse
+        projection: { field: reverse }

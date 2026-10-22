@@ -1,0 +1,60 @@
+---
+# LineStrip — one direction of a line as a passenger reads it above the
+# doors: the stops in order on one rule in the line's colour, the current
+# stop marked, interchanges with the lines they meet. A loop shows a
+# "continues" marker at both ends. Bespoke: no published component draws a
+# route. An <ol>, so the order is the markup's; CSS lays it out.
+#
+# Below three groups (912px) the strip reads top to bottom: under the
+# shell's container query the stop list re-values three of its keys,
+# layout.direction to column, appearance.border.width to "0 0 0 4px" and
+# spacing.internal.block.start to 0. The DSL has no query construct, so this
+# comment is their record.
+node:
+  uri: metro.component.line_strip
+  styles:
+    layout.type: grid
+    layout.grid.column: "1 / -1"
+    spacing.gap.block: container.gap.tight
+    spacing.external.block.end: container.gap.loose
+  edges:
+    - node:
+        role: heading
+        # the route's label ("To Marsh End", "Clockwise")
+        styles:
+          typography.weight: typography.weight.semiBold
+      relation:
+        cardinality: "1"
+        slotName: label
+    - node:
+        role: stop list
+        # the <ol>; the rule is its block-start border, coloured by the
+        # route's line, which the root receives as --line-strip-colour
+        # from data
+        styles:
+          layout.type: flex
+          layout.direction: row
+          spacing.gap.inline: container.gap.default
+          spacing.internal.block.start: container.gap.default
+          spacing.internal.inline.start: container.gap.default
+          appearance.border.width: "4px 0 0 0"
+          appearance.border.style: solid
+          appearance.border.color: [line.strip.colour, color.border]
+          layout.overflow.inline: auto
+        edges:
+          - node:
+              role: continues marker
+              # first and last <li>, aria-hidden text "…continues"; a loop only
+              styles:
+                typography.color: color.text.muted
+            relation:
+              cardinality: "0..2"
+              slotName: continues
+          - node:
+              role: stop
+              # the slotted <li>s, filled by CallStop
+            relation:
+              cardinality: "1..*"
+              slotName: default
+      relation:
+        cardinality: "1"

@@ -1,0 +1,20 @@
+---
+# NetworkMap — the network workspace's canvas: it reads every line, route and
+# stop position the map needs and draws them as one SchematicMap, with the
+# station a route names marked. Its loading and error states fill the canvas
+# in place of the map. Bespoke: it is the map's data owner, and binds no
+# styles of its own.
+node:
+  uri: metro.component.network_map
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: metro.component.schematic_map
+          - node:
+              role: loading status
+          - node:
+              role: error status
+      relation:
+        cardinality: "1"

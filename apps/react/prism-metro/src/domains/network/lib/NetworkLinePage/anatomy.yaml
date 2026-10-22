@@ -1,0 +1,30 @@
+---
+# NetworkLinePage — the content of /network/lines/:uri, the main column of
+# the line route's document layout: the line's title with its code, then one
+# strip per route the line draws, each with its direction toggle where the
+# route has a reverse; or the not-found, loading or error status in their
+# place. Binds no styles of its own: the strips carry their spacing.
+node:
+  uri: metro.component.network_line_page
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: line
+              edges:
+                - node:
+                    role: line heading
+                    # <h1>: the line's title, then its code
+                  relation: { cardinality: "1", slotName: title }
+                - node:
+                    uri: metro.component.route_strip
+                  relation: { cardinality: "1..*", slotName: routes }
+          - node:
+              role: not-found status
+          - node:
+              role: loading status
+          - node:
+              role: error status
+      relation:
+        cardinality: "1"
