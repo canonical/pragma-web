@@ -91,6 +91,53 @@ describe("MarkdownEditor", () => {
     });
   });
 
+  it("previews GitHub-flavoured Markdown through design-system elements", () => {
+    const { container } = render(
+      <MarkdownEditor
+        editMode="preview"
+        defaultValue={"# Title\n\n| A | B |\n| - | - |\n| 1 | 2 |"}
+      />,
+    );
+
+    expect(container.querySelector("h1")).not.toBeInTheDocument();
+    expect(container.querySelector("h3")).toHaveTextContent("Title");
+    expect(
+      container.querySelector("table.ds.markdown-table"),
+    ).toBeInTheDocument();
+  });
+
+  it("previews an admonition as an announcement", () => {
+    const { container } = render(
+      <MarkdownEditor editMode="preview" defaultValue={"> [!NOTE]\n> hi"} />,
+    );
+
+    const announcement = container.querySelector(".ds.announcement");
+    expect(announcement).toHaveTextContent("Note");
+    expect(announcement).toHaveTextContent("hi");
+    expect(container.querySelector("blockquote")).not.toBeInTheDocument();
+  });
+
+  it("gives preview headings no ids, so two previews of one heading never collide", () => {
+    const { container } = render(
+      <>
+        <MarkdownEditor
+          editMode="preview"
+          defaultValue={"# Title\n\n#### Sub"}
+        />
+        <MarkdownEditor
+          editMode="preview"
+          defaultValue={"# Title\n\n#### Sub"}
+        />
+      </>,
+    );
+
+    expect(container.querySelectorAll("h3")).toHaveLength(2);
+    expect(container.querySelectorAll("h4")).toHaveLength(2);
+    expect(
+      container.querySelectorAll(":is(h1, h2, h3, h4, h5, h6)[id]"),
+    ).toHaveLength(0);
+  });
+
   it("shows a checkbox to switch between write and preview modes", () => {
     render(<MarkdownEditor previewSwitchMode="checkbox" />);
 
