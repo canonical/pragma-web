@@ -1,0 +1,26 @@
+/* This application's own CSS, in `app`. Left unlayered it would beat every
+ * rule the design system ships, because unlayered CSS outranks any layer.
+ * `app` sorts above the design system's own layers only while the entry
+ * imports `index.css`, and with it `@canonical/styles`' order statement,
+ * before anything that pulls this file in.
+ *
+ * It holds only what the lens packages read and leave to the site: the
+ * strata the Definitions lens's well sits on and raises its floating hint
+ * and legend to, the tint of the well's floor, and the body margin, which
+ * the lenses' full-viewport layouts need to be zero. */
+
+@layer app {
+  :root {
+    --z-underground: 0;
+    --z-plate: 1;
+    --surface-underground-background: color-mix(
+      in oklab,
+      var(--color-background) 94%,
+      var(--color-text)
+    );
+  }
+
+  body {
+    margin: 0;
+  }
+}

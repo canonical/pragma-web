@@ -1,0 +1,27 @@
+{
+  "root": "../../..",
+  "sources": {
+    "apps/react/prism-metro/src": "prism-metro",
+    "packages/prism/projections/src": "prism-metro",
+    "packages/prism/lens-definitions/src": "prism-metro",
+    "packages/prism/lens-entity/src": "prism-metro"
+  },
+  "excludes": [
+    "**/node_modules/**",
+    "**/__generated__/**",
+    "**/.relay/**",
+    "**/dist/**"
+  ],
+  "projects": {
+    "prism-metro": {
+      "schema": "apps/react/prism-metro/src/relay/schema.graphql",
+      "language": "typescript",
+      "eagerEsModules": true,
+      "output": "apps/react/prism-metro/src/relay/__generated__",
+      "schemaConfig": {
+        "nodeInterfaceIdField": "uri",
+        "nodeInterfaceIdVariableName": "id"
+      }
+    }
+  }
+}
