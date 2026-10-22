@@ -1,4 +1,4 @@
-import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
+import type { PreparedRelayData } from "@canonical/prism-core";
 
 /** The initial data a server render embeds for the client to hydrate from. */
 export interface InitialData extends Record<string, unknown> {
@@ -8,9 +8,8 @@ export interface InitialData extends Record<string, unknown> {
   readonly theme?: "light" | "dark";
   /**
    * The Relay hydration payload from the server's prepare step: the
-   * serialised record map of the route's warmed operations.
+   * serialised record map of the route's warmed operations, omitted when
+   * the step prepared nothing.
    */
-  readonly relay?: {
-    readonly records?: RecordMap;
-  };
+  readonly relay?: PreparedRelayData;
 }
