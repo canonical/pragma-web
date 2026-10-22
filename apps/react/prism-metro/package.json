@@ -7,6 +7,7 @@
   "imports": {
     "#domains/lenses": "./src/domains/lenses/index.ts",
     "#i18n": "./src/i18n/index.ts",
+    "#lib/ui": "./src/lib/ui/index.ts",
     "#projections": "./src/projections/index.ts",
     "#relay": "./src/relay/index.ts",
     "#server": "./src/server/index.ts",

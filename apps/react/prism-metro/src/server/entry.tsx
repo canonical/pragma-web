@@ -5,6 +5,7 @@
 import "../styles/app.css";
 import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import type { ServerEntrypointProps } from "@canonical/react-ssr/renderer";
+import { SiteDocument } from "#lib/ui";
 import { Shell } from "#shell";
 import { appRoutes, notFoundRoute } from "../routes.js";
 import selectRoutableUrl from "../selectRoutableUrl.js";
@@ -21,9 +22,11 @@ import type { InitialData } from "./types.js";
  * operation or its variables; the rejection lands in the suspended
  * boundary's error state instead of reaching the graph mid-render.
  *
- * The cookie-resolved theme is painted on `<html>` beside the root
- * declaration, so the first paint matches the reader's preference; React
- * hydrates only `#root`, so the element is never reconciled.
+ * The document is `SiteDocument`, which the client hydrates whole, so the
+ * server and the client render one tree. The cookie-resolved theme travels
+ * in the initial data and is painted on `<html>` beside the site's context,
+ * so the first paint matches the reader's preference, and the client renders
+ * the same class from the same data.
  *
  * @param props - The renderer's entry props: the initial data and the head
  *   elements of the HTML shell.
@@ -46,22 +49,12 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
       ),
   });
   return (
-    <html
-      className={["app comfortable", initialData.theme]
-        .filter(Boolean)
-        .join(" ")}
+    <SiteDocument
+      head={[props.otherHeadElements, props.scriptElements, props.linkElements]}
       lang={props.lang}
+      theme={initialData.theme}
     >
-      <head>
-        {props.otherHeadElements}
-        {props.scriptElements}
-        {props.linkElements}
-      </head>
-      <body>
-        <div id="root">
-          <Shell environment={relayEnvironment} router={router} />
-        </div>
-      </body>
-    </html>
+      <Shell environment={relayEnvironment} router={router} />
+    </SiteDocument>
   );
 }

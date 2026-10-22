@@ -8,6 +8,7 @@ import {
   hydrateRoot,
   type Root,
 } from "react-dom/client";
+import { SiteDocument } from "#lib/ui";
 import { resolveGraphqlUrl } from "#relay";
 import type { InitialData } from "#server";
 import { Shell } from "#shell";
@@ -15,8 +16,14 @@ import { appRoutes, notFoundRoute } from "../routes.js";
 import createRoutableAdapter from "./createRoutableAdapter.js";
 
 /**
- * Hydrate the app into `container` over the server's markup, returning the
- * created root.
+ * Hydrate the whole server-rendered document, returning the created root.
+ *
+ * It renders the tree the server entry rendered, `SiteDocument` around
+ * `Shell`, so the ids `useId` derives from the tree's shape match the
+ * server's. `lang` is read off the `<html>` the server rendered, since the
+ * renderer picks the locale and does not embed it; the theme comes from the
+ * initial data. The head's elements are left out: React keeps the head nodes
+ * the server rendered that the client does not render.
  *
  * It reads the `__INITIAL_DATA__` the server embedded and seeds the browser
  * session's one Relay environment from its records, so the hydration render
@@ -30,7 +37,7 @@ import createRoutableAdapter from "./createRoutableAdapter.js";
  * server routed it, so a path that does not percent-decode hydrates the
  * not-found page the server answered it with.
  *
- * @param container - The element the server rendered the app into.
+ * @param target - The document the server rendered.
  * @param options - Passed through to `hydrateRoot`; tests pass
  *   `onRecoverableError` to assert a mismatch-free hydration.
  * @returns The hydrated root.
@@ -38,7 +45,7 @@ import createRoutableAdapter from "./createRoutableAdapter.js";
  *   hydrates the DOM.
  */
 export default function hydrateApp(
-  container: Element | Document,
+  target: Document,
   options?: HydrationOptions,
 ): Root {
   const initialData = (
@@ -58,8 +65,10 @@ export default function hydrateApp(
   });
 
   return hydrateRoot(
-    container,
-    <Shell environment={relayEnvironment} router={router} />,
+    target,
+    <SiteDocument lang={target.documentElement.lang} theme={initialData?.theme}>
+      <Shell environment={relayEnvironment} router={router} />
+    </SiteDocument>,
     options,
   );
 }

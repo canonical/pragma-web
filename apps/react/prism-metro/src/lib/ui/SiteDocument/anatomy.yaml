@@ -1,0 +1,32 @@
+---
+# SiteDocument — the whole HTML document the server renders and the client
+# hydrates: the head's elements, and the application inside the body's root
+# element. It binds no styles of its own.
+node:
+  uri: metro.component.site_document
+  edges:
+    - node:
+        role: document head
+        edges:
+          - node:
+              role: head element
+            relation:
+              cardinality: "0..*"
+              slotName: head
+      relation:
+        cardinality: "1"
+    - node:
+        role: document body
+        edges:
+          - node:
+              role: app root
+              edges:
+                - node:
+                    role: application
+                  relation:
+                    cardinality: "1"
+                    slotName: default
+            relation:
+              cardinality: "1"
+      relation:
+        cardinality: "1"

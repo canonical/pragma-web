@@ -30,8 +30,8 @@ export default mergeConfig(
           // relay-compiler output, ignored by git and read by nothing.
           "src/relay/__generated__/**",
           // Thin process entry points with no dispatch of their own: the
-          // bundle entry hydrates `#root`, the graph hands every request to
-          // the example package's handler, and the schema script rewrites
+          // bundle entry hydrates the document, the graph hands every request
+          // to the example package's handler, and the schema script rewrites
           // the committed SDL. The e2e suite runs each of them. The two Bun
           // web servers dispatch requests, so their suites count.
           "src/client/entry.tsx",
