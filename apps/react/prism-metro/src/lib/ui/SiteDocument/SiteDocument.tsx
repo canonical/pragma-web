@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import { DOCUMENT_CONTEXT_CLASS_NAME, ROOT_ELEMENT_ID } from "./constants.js";
 import type { SiteDocumentProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds site-document";
 
