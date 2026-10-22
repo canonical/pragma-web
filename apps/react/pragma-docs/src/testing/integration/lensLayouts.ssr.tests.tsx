@@ -3,8 +3,9 @@
 /**
  * Every lens layout, rendered through the real SSR entry: each measured URL
  * (every lens, an entity page per lens, and the guide, playground, account
- * and login pages) renders inside its own layout, and each layout carries
- * exactly one rail, one strip, one canvas and one footer.
+ * and login pages) renders inside its own layout, built on one of the two
+ * archetypes, and each layout carries exactly one rail, one strip and one
+ * canvas, and a document layout one footer.
  *
  * Method. Render `EntryServer`'s tree (static router, Relay environment, the
  * `<html>` document) to a string per URL — node environment, so
@@ -16,7 +17,7 @@
  *
  *   1. each region renders exactly once, in document order;
  *   2. every canvas is distinct (each URL renders its own page), and sits
- *      inside the layout its route is grouped under, named by the layout
+ *      inside the archetype its layout is built on, named by the layout
  *      root's class;
  *   3. `aria-current` sits exactly where the per-URL model says (the rail's
  *      exact-match link, plus the breadcrumb's current crumb);
@@ -108,24 +109,41 @@ const MEASURED_URLS = [
   ...NON_LENS_URLS,
 ] as const;
 
-/** The layout each measured URL renders under, by its root's class: the
- * route table's grouping, as served. */
+/** The archetype each measured URL's layout renders, by its root's class:
+ * the Definitions lens is a workspace, every other page a document. */
 const EXPECTED_LAYOUT: Readonly<Record<string, string>> = {
-  "/": "marketing-layout",
-  "/components": "components-layout",
-  "/definitions": "definitions-layout",
-  "/standards": "standards-layout",
-  "/journeys": "journeys-layout",
-  "/guides": "guides-layout",
-  [BUTTON_ENTITY_URL]: "components-layout",
-  [DEFINITIONS_TERM_URL]: "definitions-layout",
-  [STANDARD_READING_URL]: "standards-layout",
-  [JOURNEYS_JOB_URL]: "journeys-layout",
-  [GUIDE_URL]: "guides-layout",
-  "/playground": "playground-layout",
-  [ACCOUNT_URL]: "account-layout",
-  "/login": "account-layout",
+  "/": "document-layout",
+  "/components": "document-layout",
+  "/definitions": "workspace-layout",
+  "/standards": "document-layout",
+  "/journeys": "document-layout",
+  "/guides": "document-layout",
+  [BUTTON_ENTITY_URL]: "document-layout",
+  [DEFINITIONS_TERM_URL]: "workspace-layout",
+  [STANDARD_READING_URL]: "document-layout",
+  [JOURNEYS_JOB_URL]: "document-layout",
+  [GUIDE_URL]: "document-layout",
+  "/playground": "document-layout",
+  [ACCOUNT_URL]: "document-layout",
+  "/login": "document-layout",
 };
+
+/** The regions every layout renders, in document order. */
+const LAYOUT_REGIONS = [
+  'class="ds canvas-skip-link"',
+  'data-region="primary-nav"',
+  'data-region="mode-strip"',
+  'data-region="canvas"',
+] as const;
+
+/**
+ * The regions a URL's layout renders, in document order: a document layout
+ * ends in the site's colophon, a workspace has none.
+ */
+const listExpectedRegions = (url: string): readonly string[] =>
+  EXPECTED_LAYOUT[url] === "document-layout"
+    ? [...LAYOUT_REGIONS, 'data-region="footer"']
+    : LAYOUT_REGIONS;
 
 /** Data-bearing pages render from their captured fixture records — the
  * `initialData` a dev server would embed — so canvases are real content. */
@@ -563,7 +581,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet("/login").canvas).toContain('id="login-title"');
   });
 
-  it("renders each URL inside the layout its route is grouped under", () => {
+  it("renders each URL inside the archetype its layout is built on", () => {
     for (const [url, { chrome }] of getPages()) {
       const layouts = [...chrome.matchAll(/class="ds ([a-z-]+-layout)"/g)].map(
         (match) => match.at(1),
@@ -572,13 +590,10 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     }
   });
 
-  it("renders each region exactly once on every URL", () => {
+  it("renders each region its layout holds exactly once on every URL", () => {
     for (const [url, { chrome }] of getPages()) {
       for (const marker of [
-        'data-region="primary-nav"',
-        'data-region="mode-strip"',
-        'data-region="canvas"',
-        'data-region="footer"',
+        ...listExpectedRegions(url),
         'data-slot="context"',
         'data-slot="controls"',
         'data-slot="status"',
@@ -590,17 +605,17 @@ describe("the lens layouts, rendered through the SSR entry", () => {
         ).toBe(1);
       }
     }
+    // A workspace renders no colophon.
+    expect(
+      countOccurrences(mustGet("/definitions").chrome, 'data-region="footer"'),
+    ).toBe(0);
   });
 
-  it("renders the regions in order on every URL: skip link, rail, strip, canvas, footer", () => {
+  it("renders the regions in order on every URL: skip link, rail, strip, canvas, then a document's footer", () => {
     for (const [url, { chrome }] of getPages()) {
-      const positions = [
-        'class="ds canvas-skip-link"',
-        'data-region="primary-nav"',
-        'data-region="mode-strip"',
-        'data-region="canvas"',
-        'data-region="footer"',
-      ].map((marker) => chrome.indexOf(marker));
+      const positions = listExpectedRegions(url).map((marker) =>
+        chrome.indexOf(marker),
+      );
       expect(positions, `region order on ${url}`).toEqual(
         positions.toSorted((a, b) => a - b),
       );

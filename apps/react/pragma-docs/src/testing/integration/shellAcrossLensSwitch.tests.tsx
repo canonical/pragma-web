@@ -192,7 +192,13 @@ describe("Shell across a lens switch", () => {
 
     // A Definitions term, unfiltered: every class is visible.
     await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
-    const definitionsLayout = container.querySelector(".ds.definitions-layout");
+    // The shell is the one intrinsic grid, and the lens's layout, the
+    // workspace archetype, is its child.
+    const shell = container.querySelector(".ds.shell.grid.intrinsic");
+    expect(shell).not.toBeNull();
+    const definitionsLayout = container.querySelector(
+      ".ds.shell > .ds.workspace-layout",
+    );
     expect(definitionsLayout).not.toBeNull();
 
     // Turn one ontology off through the strip's chips: the figure recounts.
@@ -219,7 +225,7 @@ describe("Shell across a lens switch", () => {
         "/definitions/ds%3AhasSubcomponent",
       ),
     );
-    expect(container.querySelector(".ds.definitions-layout")).toBe(
+    expect(container.querySelector(".ds.workspace-layout")).toBe(
       definitionsLayout,
     );
     expect(countChipsOff(container)).toBe(1);
@@ -235,7 +241,7 @@ describe("Shell across a lens switch", () => {
     });
     await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
     const definitionsIndexLayout = container.querySelector(
-      ".ds.definitions-layout",
+      ".ds.workspace-layout",
     );
     expect(definitionsIndexLayout).not.toBeNull();
     expect(definitionsIndexLayout).not.toBe(definitionsLayout);
@@ -246,21 +252,25 @@ describe("Shell across a lens switch", () => {
     // Switch to Standards: a different layout element, with its own strip.
     await clickRail(container, "/standards");
     await waitFor(() => expect(readCurrentCrumb(container)).toBe("Standards"));
-    expect(container.querySelector(".ds.standards-layout")).not.toBeNull();
-    expect(container.querySelector(".ds.definitions-layout")).toBeNull();
+    expect(
+      container.querySelector(".ds.shell > .ds.document-layout"),
+    ).not.toBeNull();
+    expect(container.querySelector(".ds.workspace-layout")).toBeNull();
 
     // And back: a new layout, with the chips at their default.
     await clickRail(container, "/definitions");
     await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
     const definitionsLayoutAgain = container.querySelector(
-      ".ds.definitions-layout",
+      ".ds.workspace-layout",
     );
     expect(definitionsLayoutAgain).not.toBeNull();
     expect(definitionsLayoutAgain).not.toBe(definitionsIndexLayout);
     expect(countChipsOff(container)).toBe(0);
 
     // The nest held every one of its subscriptions through the lens switch
-    // and back: it was never unmounted.
+    // and back, and the shell's grid root stayed the same node: it was never
+    // unmounted.
+    expect(container.querySelector(".ds.shell")).toBe(shell);
     expect(keepSurvivors(nestSubscriptions, liveSubscriptions)).toEqual(
       nestSubscriptions,
     );

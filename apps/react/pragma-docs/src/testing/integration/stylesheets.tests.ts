@@ -6,13 +6,13 @@
  *
  * - the layout's shared tokens are each DEFINED exactly once (regions
  *   consume, never re-define), and the dissolved width tokens are absent;
- * - no grid template is authored in the app: each lens layout's root reads
- *   the design system's intrinsic columns (`var(--grid-intrinsic)`), and
- *   every other grid is a subgrid;
- * - no LAYOUT-CAPABLE conditional at-rule exists in the app: the one
- *   sanctioned small-viewport collapse is the rail's, and the rail's
- *   stylesheet ships with `@canonical/prism-core`, whose own stylesheet
- *   census holds the package to that one. Feature queries that
+ * - no grid template is authored in the app: the shell's root takes the
+ *   design system's intrinsic columns from the `grid intrinsic` preset
+ *   classes, and every grid below it is a subgrid;
+ * - no LAYOUT-CAPABLE conditional at-rule exists in the app: the reflows
+ *   are the archetype layouts' and the rail's container queries on the
+ *   shell, which ship with `@canonical/prism-core` and its checks. Feature
+ *   queries that
  *   cannot reflow layout (`prefers-color-scheme`, `forced-colors`,
  *   `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
  *   file — and only while no other condition rides along in the prelude.
@@ -63,46 +63,28 @@ describe("the app stylesheets", () => {
     },
   );
 
-  // THE INTRINSIC-GRID INVARIANT (the strict model's teeth, owner ruling
-  // 2026-07-22: EVERYTHING is a subgrid, no exceptions). The app authors NO
-  // grid template of its own. The columns are the design system's intrinsic
-  // grid (`--grid-intrinsic`, from @canonical/styles), read only at a lens
-  // layout's root, so every lens lands on the same ruler. Every OTHER
-  // `grid-template-columns` declaration, without exception, is `subgrid`:
-  // pages, explorers, region tenants, card grids, list grids, ALL of them
-  // inherit the layout's columns and spend spans. This is the assertion that
-  // catches the "looks like one column" regression AND any stray leaf
-  // template: a grid that authors a template (or reads the intrinsic columns
-  // anywhere but a layout's root) trips it.
-  it("authors no grid template — lens layout roots read the intrinsic columns; every other grid is a subgrid", () => {
+  // THE INTRINSIC-GRID INVARIANT (owner ruling: one grid, everything below
+  // it a subgrid). The app authors NO grid template: the shell's root takes
+  // the intrinsic columns from the `grid intrinsic` preset classes, and
+  // every `grid-template-columns` the app declares, without exception, is
+  // `subgrid`. A stray template, or a read of the intrinsic columns
+  // anywhere, trips it.
+  it("authors no grid template — every grid in the app is a subgrid", () => {
     // Strip CSS comments first, so a property token quoted in a comment
     // (describing the model) is not miscounted as real CSS.
-    const authored = cssFiles.flatMap((file) =>
+    const templates = cssFiles.flatMap((file) =>
       [
         ...readFileSync(file, "utf8")
           .replaceAll(/\/\*[\s\S]*?\*\//g, "")
           .matchAll(/grid-template-columns:\s*([^;]+);/g),
-      ]
-        .map((match) => {
-          const value = match.at(1);
-          if (value === undefined) {
-            throw new Error(`${file} has a grid template with no value`);
-          }
-          return value.trim();
-        })
-        .filter((value) => !value.startsWith("subgrid") && value !== "inherit")
-        .map((value) => ({ file, value })),
+      ].map((match) => ({ file, value: (match.at(1) ?? "").trim() })),
     );
 
-    expect(authored.length).toBeGreaterThan(0);
-    for (const { file, value } of authored) {
-      expect(value, `${file} reads the intrinsic columns`).toBe(
-        "var(--grid-intrinsic)",
-      );
-      expect(file, "only a lens layout's root reads them").toMatch(
-        /\/[A-Z]\w*Layout\/styles\.css$/,
-      );
-    }
+    expect(templates.length).toBeGreaterThan(0);
+    expect(
+      templates.filter(({ value }) => !value.startsWith("subgrid")),
+    ).toEqual([]);
+    expect(allCss).not.toContain("--grid-intrinsic");
   });
 
   /**
@@ -128,7 +110,7 @@ describe("the app stylesheets", () => {
       },
     );
 
-  it("authors no layout-capable conditional at-rule — the rail's collapse ships with prism-core", () => {
+  it("authors no layout-capable conditional at-rule — the reflows ship with prism-core", () => {
     expect(layoutCapableConditionals()).toEqual([]);
   });
 });
