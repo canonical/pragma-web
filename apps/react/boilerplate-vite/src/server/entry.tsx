@@ -16,6 +16,7 @@ import {
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import { fetchQuery, RelayEnvironmentProvider } from "react-relay";
 import { catalogs, i18nConfig } from "#i18n/index.js";
+import LoadingMessage from "#lib/LoadingMessage/index.js";
 import { createEnvironment } from "#relay/environment.js";
 import formatDocumentTitle from "../formatDocumentTitle.js";
 import {
@@ -289,7 +290,7 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
             <HeadProvider titleTemplate={formatDocumentTitle}>
               <RelayEnvironmentProvider environment={relayEnvironment}>
                 <RouterProvider router={router}>
-                  <Outlet fallback={<p>Loading…</p>} />
+                  <Outlet fallback={<LoadingMessage />} />
                 </RouterProvider>
               </RelayEnvironmentProvider>
             </HeadProvider>

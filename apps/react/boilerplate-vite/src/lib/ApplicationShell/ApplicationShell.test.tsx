@@ -80,6 +80,23 @@ describe("ApplicationShell", () => {
     ).not.toHaveAttribute("aria-current");
   });
 
+  it("translates the side navigation's built-in text", () => {
+    renderWithProviders(
+      <ApplicationShell label="Tableau de bord" root={root}>
+        <p>Page</p>
+      </ApplicationShell>,
+      "/dashboard",
+      "fr",
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Aller au contenu principal" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Réduire la navigation" }),
+    ).toHaveTextContent("Fermer le menu");
+  });
+
   it("renders a disabled item without a link", () => {
     renderShell();
 

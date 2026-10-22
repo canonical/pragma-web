@@ -26,6 +26,23 @@ describe("OverviewPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("reads fully in French: labels, data, figures and relative times", () => {
+    renderWithProviders(<OverviewPage />, "/dashboard", "fr");
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Vue d'ensemble" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/^2,4\sTo$/u)).toBeInTheDocument();
+    expect(screen.getByText("web-01 démarrée")).toBeInTheDocument();
+    expect(screen.getByText("il y a 2 minutes")).toBeInTheDocument();
+    expect(screen.getByText("hier")).toBeInTheDocument();
+    expect(screen.getByText("Planificateur")).toBeInTheDocument();
+    expect(screen.getByText("Bêta · noyau 6.17")).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Fil d'Ariane" }),
+    ).toBeInTheDocument();
+  });
+
   it("marks Overview as the current crumb", () => {
     renderWithProviders(<OverviewPage />, "/dashboard");
 

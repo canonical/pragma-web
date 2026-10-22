@@ -64,12 +64,10 @@ export default function useDashboardNavigation({
         {
           key: "help-group",
           items: [
-            {
-              ...createHelpItem(legalUrl, {
-                legalLabel: t("dashboard.nav.legal"),
-              }),
+            createHelpItem(legalUrl, {
               label: t("dashboard.nav.help"),
-            },
+              legalLabel: t("dashboard.nav.legal"),
+            }),
           ],
         },
       ],

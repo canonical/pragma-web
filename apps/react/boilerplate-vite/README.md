@@ -215,13 +215,18 @@ from there. The type error you get until the catalog is complete is the point.
 logical properties (`margin-inline-start`, `text-align: start`) so layouts
 mirror structurally.
 
-**What is (and is not) translated.** UI chrome — navigation, selector labels,
-page headings and taglines, the catalog's loading/error/stock/rating strings —
-comes from the catalogs. Product names and taglines are data, not chrome, and
-render untranslated; the identifier-heavy developer prose on the home and
-catalog pages stays in English deliberately. Prices and ratings go through
-`useFormatters`, so the same data renders as `$125.00` in English and
-`125,00 $US` in French.
+**What is (and is not) translated.** Everything a reader sees comes from the
+catalogs: navigation, headings, labels, buttons, status words, the dashboard's
+sample data, the design system's built-in text (the side navigation's skip
+link and collapse toggle, landmark names, close buttons) and the developer
+prose on the home and catalog pages. What stays as written is names, which are
+the same in every language — the app's name, people, products, instances and
+projects — and the product data the catalog's API returns. Code names inside
+translated prose sit between backticks in every catalog, and `CodeMessage`
+(`src/lib/CodeMessage`) renders them as code. Numbers, sizes, prices and
+relative times go through `useFormatters`, so the same data renders as
+`2.4 TB` and `2 minutes ago` in English, `2,4 To` and `il y a 2 minutes` in
+French.
 
 In Storybook, every story is wrapped in the provider by a `withI18n` decorator
 and the toolbar's Locale menu (globe icon) switches the story's language.

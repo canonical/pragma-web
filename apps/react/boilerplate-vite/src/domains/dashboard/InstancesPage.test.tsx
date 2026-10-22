@@ -54,6 +54,20 @@ describe("InstancesPage", () => {
     );
   });
 
+  it("labels statuses and memory in the active locale", () => {
+    renderWithProviders(<InstancesPage />, "/dashboard/instances", "fr");
+
+    expect(
+      screen.getAllByText("En cours d'exécution · Ubuntu 24.04 LTS"),
+    ).not.toHaveLength(0);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Afficher les détails de db-01" }),
+    );
+
+    expect(screen.getByText("16 Gio")).toBeInTheDocument();
+  });
+
   describe("the details aside", () => {
     it("prompts for a selection until an instance is chosen", () => {
       renderPage();

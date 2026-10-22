@@ -1,9 +1,16 @@
-import type { ActivityEvent, Instance, Release } from "./types.js";
+import type { MessageKey } from "#i18n/en.js";
+import type {
+  ActivityEvent,
+  Instance,
+  InstanceStatus,
+  Release,
+} from "./types.js";
 
 /*
- * Sample data for the dashboard, modelled on LXD. It is data rather than
- * interface copy, so it stays in English in every locale, as the rest of the
- * boilerplate's sample data does.
+ * Sample data for the dashboard, modelled on LXD. Every word a reader sees is
+ * a catalog key, so the dashboard reads fully in each locale; what stays as is
+ * are names — instance and project names, people, product names, addresses —
+ * which are the same in every language.
  */
 
 /** Where the side navigation's Help › Legal information item points. */
@@ -12,61 +19,75 @@ export const LEGAL_URL = "https://ubuntu.com/legal";
 /** The project the dashboard shows, the first crumb of every page. */
 export const PROJECT_NAME = "default";
 
-/** The figures of the overview's status tiles. */
+/** The figures of the overview's status tiles; storage is in terabytes. */
 export const OVERVIEW_FIGURES = {
   running: 128,
   stopped: 4,
-  storageUsed: "2.4 TB",
-  storageTotal: "4 TB",
+  storageUsedTb: 2.4,
+  storageTotalTb: 4,
   alerts: 2,
 } as const;
+
+/** How the overview formats a size in terabytes: "2.4 TB", "2,4 To". */
+export const TERABYTES: Intl.NumberFormatOptions = {
+  style: "unit",
+  unit: "terabyte",
+  maximumFractionDigits: 1,
+};
+
+/** The catalog key of each instance status's label. */
+export const STATUS_KEYS: Readonly<Record<InstanceStatus, MessageKey>> = {
+  running: "dashboard.status.running",
+  stopped: "dashboard.status.stopped",
+  starting: "dashboard.status.starting",
+};
 
 export const INSTANCES: readonly Instance[] = [
   {
     name: "web-01",
-    status: "Running",
+    status: "running",
     release: "Ubuntu 24.04 LTS",
     ipv4: "10.42.0.11",
-    memory: "4 GiB",
+    memoryGib: 4,
   },
   {
     name: "web-02",
-    status: "Running",
+    status: "running",
     release: "Ubuntu 24.04 LTS",
     ipv4: "10.42.0.12",
-    memory: "4 GiB",
+    memoryGib: 4,
   },
   {
     name: "db-01",
-    status: "Running",
+    status: "running",
     release: "Ubuntu 22.04 LTS",
     ipv4: "10.42.0.21",
-    memory: "16 GiB",
+    memoryGib: 16,
   },
   {
     name: "db-02",
-    status: "Running",
+    status: "running",
     release: "Ubuntu 22.04 LTS",
     ipv4: "10.42.0.22",
-    memory: "16 GiB",
+    memoryGib: 16,
   },
   {
     name: "cache-01",
-    status: "Stopped",
+    status: "stopped",
     release: "Ubuntu 24.04 LTS",
     ipv4: "",
-    memory: "2 GiB",
+    memoryGib: 2,
   },
   {
     name: "worker-01",
-    status: "Running",
+    status: "running",
     release: "Ubuntu 24.04 LTS",
     ipv4: "10.42.0.41",
-    memory: "8 GiB",
+    memoryGib: 8,
   },
 ];
 
-/** The releases the create form offers, by value. */
+/** The releases the create form offers, by value; labels are product names. */
 export const RELEASE_OPTIONS = [
   { value: "noble", label: "Ubuntu 24.04 LTS" },
   { value: "jammy", label: "Ubuntu 22.04 LTS" },
@@ -76,49 +97,61 @@ export const RELEASE_OPTIONS = [
 export const RELEASES: readonly Release[] = [
   {
     name: "Ubuntu 24.04 LTS",
-    summary:
-      "Noble Numbat. Five years of security updates, ten with Ubuntu Pro.",
-    detail: "Stable · kernel 6.8",
+    summaryKey: "dashboard.releases.noble",
+    channel: "stable",
+    kernel: "6.8",
   },
   {
     name: "Ubuntu 25.10",
-    summary: "Questing Quokka. Interim release with nine months of support.",
-    detail: "Beta · kernel 6.17",
+    summaryKey: "dashboard.releases.questing",
+    channel: "beta",
+    kernel: "6.17",
   },
 ];
+
+/** The catalog key of each release channel's label. */
+export const CHANNEL_KEYS: Readonly<Record<Release["channel"], MessageKey>> = {
+  stable: "dashboard.releases.stable",
+  beta: "dashboard.releases.beta",
+};
 
 export const ACTIVITY: readonly ActivityEvent[] = [
   {
     key: "start",
-    actor: "Alice",
-    datetime: "2 min ago",
-    text: "Started web-01",
+    actor: { name: "Alice" },
+    minutesAgo: 2,
+    messageKey: "dashboard.activity.started",
+    values: { instance: "web-01" },
     criticality: "success",
   },
   {
     key: "snapshot",
-    actor: "Scheduler",
-    datetime: "14 min ago",
-    text: "Snapshot nightly-2026-10-21 taken",
+    actor: { key: "dashboard.activity.scheduler" },
+    minutesAgo: 14,
+    messageKey: "dashboard.activity.snapshot",
+    values: { snapshot: "nightly-2026-10-21" },
   },
   {
     key: "disk",
-    actor: "Monitor",
-    datetime: "1 h ago",
-    text: "Disk on db-02 at 85%",
+    actor: { key: "dashboard.activity.monitor" },
+    minutesAgo: 60,
+    messageKey: "dashboard.activity.disk",
+    values: { instance: "db-02", percent: "85" },
     criticality: "warning",
   },
   {
     key: "profile",
-    actor: "Bob",
-    datetime: "yesterday",
-    text: "Profile gpu updated",
+    actor: { name: "Bob" },
+    minutesAgo: 24 * 60,
+    messageKey: "dashboard.activity.profile",
+    values: { profile: "gpu" },
   },
   {
     key: "failed",
-    actor: "Monitor",
-    datetime: "2 days ago",
-    text: "cache-01 failed to start",
+    actor: { key: "dashboard.activity.monitor" },
+    minutesAgo: 2 * 24 * 60,
+    messageKey: "dashboard.activity.failed",
+    values: { instance: "cache-01" },
     criticality: "error",
   },
 ];

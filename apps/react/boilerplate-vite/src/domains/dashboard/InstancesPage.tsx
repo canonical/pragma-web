@@ -1,4 +1,4 @@
-import { useTranslation } from "@canonical/i18n-react";
+import { useFormatters, useTranslation } from "@canonical/i18n-react";
 import {
   ContentLayout,
   SidePanel,
@@ -9,7 +9,7 @@ import { Badge, Button, Tile } from "@canonical/react-ds-global";
 import { Field, Form } from "@canonical/react-ds-global-form";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useRef, useState } from "react";
-import { INSTANCES, RELEASE_OPTIONS } from "./constants.js";
+import { INSTANCES, RELEASE_OPTIONS, STATUS_KEYS } from "./constants.js";
 import DashboardBreadcrumbs from "./DashboardBreadcrumbs.js";
 import type { Instance } from "./types.js";
 import "./styles.css";
@@ -33,15 +33,16 @@ function createInstance(data: Record<string, unknown>): Instance {
 
   return {
     name: String(data.instance_name ?? ""),
-    status: "Starting",
+    status: "starting",
     release: release?.label ?? String(data.release ?? ""),
     ipv4: "",
-    memory: "4 GiB",
+    memoryGib: 4,
   };
 }
 
 export default function InstancesPage(): ReactElement {
   const { t } = useTranslation();
+  const formatters = useFormatters();
   const panelRef = useRef<SidePanelHandle>(null);
   const [instances, setInstances] = useState<readonly Instance[]>(INSTANCES);
   const [selectedName, setSelectedName] = useState<string | null>(null);
@@ -63,13 +64,17 @@ export default function InstancesPage(): ReactElement {
       {selected ? (
         <dl className="details">
           <dt>{t("dashboard.instances.status")}</dt>
-          <dd>{selected.status}</dd>
+          <dd>{t(STATUS_KEYS[selected.status])}</dd>
           <dt>{t("dashboard.instances.release")}</dt>
           <dd>{selected.release}</dd>
           <dt>{t("dashboard.instances.address")}</dt>
           <dd>{selected.ipv4 || "—"}</dd>
           <dt>{t("dashboard.instances.memory")}</dt>
-          <dd>{selected.memory}</dd>
+          <dd>
+            {t("dashboard.instances.memoryValue", {
+              value: formatters.number(selected.memoryGib),
+            })}
+          </dd>
         </dl>
       ) : (
         <p className="muted">{t("dashboard.instances.selectHint")}</p>
@@ -111,7 +116,10 @@ export default function InstancesPage(): ReactElement {
                   <Tile.Header>{instance.name}</Tile.Header>
                   <Tile.Content>
                     <p className="muted">
-                      {instance.status} · {instance.release}
+                      {t("dashboard.instances.summary", {
+                        status: t(STATUS_KEYS[instance.status]),
+                        release: instance.release,
+                      })}
                     </p>
                     <Button
                       aria-label={t("dashboard.instances.show", {
@@ -157,11 +165,13 @@ export default function InstancesPage(): ReactElement {
             />
             <Field
               controlLabel={t("dashboard.instances.pro")}
+              description={t("dashboard.instances.proDescription")}
               inputType="checkbox"
               isOptional
               name="enable_pro"
             />
             <Field
+              description={t("dashboard.instances.cloudInitDescription")}
               inputType="textarea"
               isOptional
               label={t("dashboard.instances.cloudInit")}

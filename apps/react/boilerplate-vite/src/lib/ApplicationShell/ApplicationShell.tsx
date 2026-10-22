@@ -50,6 +50,15 @@ export default function ApplicationShell({
             currentUrl={pathname}
             footerRoot={footerRoot}
             LinkComponent={RouterLink}
+            messages={{
+              skipToContent: () => t("shell.skipToContent"),
+              collapseNavigation: () => t("shell.collapseNavigation"),
+              expandNavigation: () => t("shell.expandNavigation"),
+              collapse: () => t("shell.collapse"),
+              expand: () => t("shell.expand"),
+              openMenu: () => t("shell.openMenu"),
+              closeMenu: () => t("shell.closeMenu"),
+            }}
             root={root}
           />
         }

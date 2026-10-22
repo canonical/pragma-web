@@ -125,6 +125,47 @@ const ar: Record<MessageKey, MessageValue> = {
   "dashboard.settings.confirmTitle": "حذف المشروع؟",
   "dashboard.settings.confirmBody":
     "سيؤدي هذا إلى حذف المشروع {project} ومثيلاته وتخزينها نهائيًا. لا يمكن التراجع عن ذلك.",
+  "app.loading": "جارٍ التحميل…",
+  "shell.skipToContent": "الانتقال إلى المحتوى الرئيسي",
+  "shell.collapseNavigation": "طي شريط التنقل",
+  "shell.expandNavigation": "توسيع شريط التنقل",
+  "shell.collapse": "طي",
+  "shell.expand": "توسيع",
+  "shell.openMenu": "القائمة",
+  "shell.closeMenu": "إغلاق القائمة",
+  "dashboard.breadcrumbs": "مسار التنقل",
+  "dashboard.close": "إغلاق",
+  "dashboard.status.running": "قيد التشغيل",
+  "dashboard.status.stopped": "متوقفة",
+  "dashboard.status.starting": "قيد البدء",
+  "dashboard.releases.noble":
+    "Noble Numbat. خمس سنوات من التحديثات الأمنية، وعشر سنوات مع Ubuntu Pro.",
+  "dashboard.releases.questing":
+    "Questing Quokka. إصدار مرحلي بدعم لمدة تسعة أشهر.",
+  "dashboard.releases.stable": "مستقر",
+  "dashboard.releases.beta": "تجريبي",
+  "dashboard.releases.detail": "{channel} · النواة {kernel}",
+  "dashboard.activity.scheduler": "المجدول",
+  "dashboard.activity.monitor": "المراقب",
+  "dashboard.activity.started": "تم تشغيل {instance}",
+  "dashboard.activity.snapshot": "تم أخذ اللقطة {snapshot}",
+  "dashboard.activity.disk": "القرص في {instance} عند {percent}٪",
+  "dashboard.activity.profile": "تم تحديث الملف الشخصي {profile}",
+  "dashboard.activity.failed": "تعذّر تشغيل {instance}",
+  "dashboard.instances.summary": "{status} · {release}",
+  "dashboard.instances.memoryValue": "{value} جيبيبايت",
+  "dashboard.instances.proDescription":
+    "تغطية للأمان والامتثال لمثيلاتك، تشمل دعمًا ممتدًا للحزم التي تهمك.",
+  "dashboard.instances.cloudInitDescription":
+    "إعدادات تُطبّق عند أول إقلاع: حزم للتثبيت، ومستخدمون للإنشاء، وأوامر للتنفيذ.",
+  "home.exampleBody":
+    "مكوّن بسيط أُنشئ مع التطبيق. يأتي مع قصة Storybook (`ExampleComponent.stories.tsx`) واختبار، وهو نقطة البداية لمكوّناتك الخاصة.",
+  "home.exampleGreeting": "مرحبًا من ExampleComponent",
+  "home.streamingBody":
+    "يقرأ `LazyComponent` طلب جلب مؤخرًا ومحاكًى باستخدام `use()` في React 19، فيتعلّق عرضه. داخل حدّ `Suspense` هذا يبثّ الخادم هيكل الصفحة أولًا، ويعرض البديل، ثم يضخّ المحتوى عند جاهزيته، من دون رحلة كاملة إلى العميل.",
+  "home.streamed": "بُثّ بعد مهلة",
+  "catalog.intro":
+    "توضح هذه الصفحة طبقة بيانات Relay. يُصدر `ProductList` استعلام `useLazyLoadQuery`، ويقرأ كل `ProductCard` جزءه عبر `useFragment`، وتحلّ البيئة العمليات وفق المخطط المحاكى المحلي في `src/relay/schema.ts`. اضبط `VITE_GRAPHQL_URL` لتوجيهها إلى نقطة نهاية حقيقية.",
 };
 
 export default ar;

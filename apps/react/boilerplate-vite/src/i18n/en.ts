@@ -121,6 +121,47 @@ const en = {
   "dashboard.settings.confirmTitle": "Delete project?",
   "dashboard.settings.confirmBody":
     "This permanently deletes the {project} project, its instances and their storage. This cannot be undone.",
+  "app.loading": "Loading…",
+  "shell.skipToContent": "Skip to main content",
+  "shell.collapseNavigation": "Collapse navigation",
+  "shell.expandNavigation": "Expand navigation",
+  "shell.collapse": "Collapse",
+  "shell.expand": "Expand",
+  "shell.openMenu": "Menu",
+  "shell.closeMenu": "Close menu",
+  "dashboard.breadcrumbs": "Breadcrumb",
+  "dashboard.close": "Close",
+  "dashboard.status.running": "Running",
+  "dashboard.status.stopped": "Stopped",
+  "dashboard.status.starting": "Starting",
+  "dashboard.releases.noble":
+    "Noble Numbat. Five years of security updates, ten with Ubuntu Pro.",
+  "dashboard.releases.questing":
+    "Questing Quokka. Interim release with nine months of support.",
+  "dashboard.releases.stable": "Stable",
+  "dashboard.releases.beta": "Beta",
+  "dashboard.releases.detail": "{channel} · kernel {kernel}",
+  "dashboard.activity.scheduler": "Scheduler",
+  "dashboard.activity.monitor": "Monitor",
+  "dashboard.activity.started": "Started {instance}",
+  "dashboard.activity.snapshot": "Snapshot {snapshot} taken",
+  "dashboard.activity.disk": "Disk on {instance} at {percent}%",
+  "dashboard.activity.profile": "Profile {profile} updated",
+  "dashboard.activity.failed": "{instance} failed to start",
+  "dashboard.instances.summary": "{status} · {release}",
+  "dashboard.instances.memoryValue": "{value} GiB",
+  "dashboard.instances.proDescription":
+    "Security and compliance coverage for your instances, including extended support for the packages you care about.",
+  "dashboard.instances.cloudInitDescription":
+    "Configuration to run on first boot: packages to install, users to create, commands to run.",
+  "home.exampleBody":
+    "A plain component scaffolded alongside the app. It ships with a Storybook story (`ExampleComponent.stories.tsx`) and a test — the starting point for your own components.",
+  "home.exampleGreeting": "Hello from ExampleComponent",
+  "home.streamingBody":
+    "`LazyComponent` reads a synthetic delayed fetch with React 19 `use()`, so it suspends. Inside this `Suspense` boundary the server streams the page shell first, shows the fallback, then flushes the resolved content in — no full client round-trip.",
+  "home.streamed": "Streamed in after a delay",
+  "catalog.intro":
+    "This page demonstrates the Relay data layer. `ProductList` issues a `useLazyLoadQuery`, each `ProductCard` reads its own `useFragment`, and the environment resolves operations against the local mock schema in `src/relay/schema.ts` — set `VITE_GRAPHQL_URL` to point it at a real endpoint instead.",
 } satisfies Messages;
 
 /** Every message key the app can translate. */

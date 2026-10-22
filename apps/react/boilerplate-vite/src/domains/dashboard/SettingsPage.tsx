@@ -97,7 +97,9 @@ export default function SettingsPage(): ReactElement {
       </ContentLayout>
 
       <Modal closeOnBackdropClick ref={modalRef}>
-        <Modal.Header>{t("dashboard.settings.confirmTitle")}</Modal.Header>
+        <Modal.Header dismissLabel={t("dashboard.close")}>
+          {t("dashboard.settings.confirmTitle")}
+        </Modal.Header>
         <Modal.Content>
           <p>
             {t("dashboard.settings.confirmBody", { project: PROJECT_NAME })}

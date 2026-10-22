@@ -1,3 +1,4 @@
+import { useTranslation } from "@canonical/i18n-react";
 import { Breadcrumbs } from "@canonical/react-ds-global";
 import { useRoute } from "@canonical/router-react";
 import type { ReactElement } from "react";
@@ -13,11 +14,13 @@ import projectBreadcrumbs from "./projectBreadcrumbs.js";
  * its own position and the two cannot disagree.
  */
 export default function DashboardBreadcrumbs(): ReactElement {
+  const { t } = useTranslation();
   const { root } = useDashboardNavigation({ legalUrl: LEGAL_URL });
   const { pathname } = useRoute();
 
   return (
     <Breadcrumbs
+      aria-label={t("dashboard.breadcrumbs")}
       items={[
         { label: PROJECT_NAME, url: "/dashboard" },
         ...projectBreadcrumbs(root, pathname),
