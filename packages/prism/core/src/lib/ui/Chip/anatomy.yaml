@@ -1,0 +1,62 @@
+---
+# Chip — an inline mention of a graph entity. Its decoration is derived from
+# four channels the component sets inline as its own custom properties
+# (`ChipChannelStyle` in types.ts): chip.tint (namespace), chip.radius
+# (kind), chip.fill.weight and chip.stroke.weight (class vs instance),
+# chip.dot (lifecycle). The stylesheet reads each channel with the literal it
+# falls back to; the per-value payloads live in constants.ts and are listed
+# here. The lifecycle dot is a real `span.dot` the component omits when the
+# lifecycle is `none`, so no state rule is needed. A `[href]` chip is a link
+# and takes the link states.
+#
+# `@media (forced-colors: active)` re-values border style, the dot's
+# forced-color-adjust and the link colour; an exempt feature query, bound
+# in styles.css and not expressible here.
+#
+# Token ledger:
+#   --chip-radius-fallback: 0.375em  (kind radii in constants.ts: component
+#     0.375em, pattern 1.25em, standard 0, concept 1em 0.25em, term 0.25em 1em,
+#     token 0 0.75em 0.75em 0) — em so the mention scales with its prose.
+#   --chip-padding-inline: 0.4em; --chip-padding-block: 0.0625em
+#   --chip-dot-size: 0.4em; --chip-dot-gap: 0.3em; --chip-dot-shift: 0.0625em
+#   --chip-stroke-width: 1px (always present so class/instance never reflow)
+#   --chip-focus-ring-width: 2px; --chip-focus-ring-offset: 2px
+#   tints: oklch lightness 0.45 / chroma 0.12 (constants.ts), dots oklch
+#     literals (constants.ts): no semantic status colours exist for a
+#     namespace tint; upstream request.
+node:
+  uri: prism.component.chip
+  styles:
+    layout.type: inline
+    typography.font: inherit
+    typography.color: [chip.tint, inherit]
+    typography.decoration: none
+    appearance.radius: [chip.radius, 0.375em]
+    appearance.background: "color-mix(in oklab, var(--chip-tint, currentColor) var(--chip-fill-weight, 0%), transparent)"
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.color: "color-mix(in oklab, var(--chip-tint, currentColor) var(--chip-stroke-weight, 0%), transparent)"
+    spacing.internal.inline.start: 0.4em
+    spacing.internal.inline.end: 0.4em
+    spacing.internal.block.start: 0.0625em
+    spacing.internal.block.end: 0.0625em
+    typography.decoration@hover: underline
+    appearance.outline.width@focus: 2px
+    appearance.outline.style@focus: solid
+    appearance.outline.color@focus: color.focusRing
+    appearance.outline.offset@focus: 2px
+  edges:
+    - node:
+        role: lifecycle dot
+        styles:
+          layout.type: inline-block
+          size.width: 0.4em
+          size.height: 0.4em
+          spacing.external.inline.end: 0.3em
+          appearance.radius: 50%
+          appearance.background: chip.dot
+          layout.verticalAlign: 0.0625em
+      relation: { cardinality: "0..1", slotName: dot }
+    - node:
+        role: label text
+      relation: { cardinality: "1", slotName: default }

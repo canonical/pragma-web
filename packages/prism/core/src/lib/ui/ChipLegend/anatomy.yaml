@@ -1,0 +1,59 @@
+---
+# ChipLegend — the generated legend: one group per channel, each a title, a
+# summary and a list of entries, each entry a real Chip and its note.
+node:
+  uri: prism.component.chip_legend
+  styles:
+    layout.type: grid
+    spacing.gap: container.gap.default
+  edges:
+    - node:
+        role: channel group
+        styles:
+          layout.type: grid
+          spacing.gap: container.gap.tight
+        edges:
+          - node:
+              role: group title
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.weight: typography.weight.semiBold
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: group summary
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: summary }
+          - node:
+              role: entry list
+              styles:
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.external.inline.start: 0
+                spacing.external.inline.end: 0
+                spacing.internal.inline.start: 0
+                layout.type: grid
+                spacing.gap: space.100
+              edges:
+                - node:
+                    role: legend entry
+                    styles:
+                      layout.type: flex
+                      layout.align: baseline
+                      spacing.gap: container.gap.default
+                    edges:
+                      - node:
+                          uri: prism.component.chip
+                        relation: { cardinality: "1", slotName: swatch }
+                      - node:
+                          role: entry note
+                          styles:
+                            typography.color: color.text.muted
+                        relation: { cardinality: "1", slotName: note }
+                  relation: { cardinality: "1..*", slotName: entry }
+            relation: { cardinality: "1", slotName: entries }
+      relation: { cardinality: "1..*", slotName: group }

@@ -2,6 +2,8 @@
 
 export * from "./Canvas/index.js";
 export * from "./CanvasSkipLink/index.js";
+export * from "./Chip/index.js";
+export * from "./ChipLegend/index.js";
 export * from "./LensBreadcrumbs/index.js";
 export * from "./ModeStrip/index.js";
 export * from "./Rail/index.js";

@@ -1,8 +1,6 @@
 import type {
   Box,
   BoxEncoding,
-  Channel,
-  ChannelDescriptor,
   EncodingIndex,
   Kind,
   KindEncoding,
@@ -25,9 +23,6 @@ export const BOXES = ["class", "instance"] as const;
 
 /** Lifecycle states (the status-dot channel's vocabulary). */
 export const LIFECYCLES = ["canonical", "beta", "deprecated", "none"] as const;
-
-/** The four channels, in the order the legend presents them. */
-export const CHANNELS = ["namespace", "box", "kind", "lifecycle"] as const;
 
 /** A mention names a thing (an ABox individual) unless it says otherwise. */
 export const DEFAULT_BOX: Box = "instance";
@@ -170,34 +165,6 @@ export const LIFECYCLE_INDEX: EncodingIndex<Lifecycle, LifecycleEncoding> = {
 };
 
 /**
- * The legend's copy for each of the four channels, one row per
- * {@link CHANNELS} value, each row's `value` equal to its key; the label
- * and description are catalog keys, read through `t()`.
- */
-export const CHANNEL_INDEX: EncodingIndex<Channel, ChannelDescriptor> = {
-  namespace: {
-    value: "namespace",
-    labelKey: "chip.channel.namespace.label",
-    descriptionKey: "chip.channel.namespace.description",
-  },
-  box: {
-    value: "box",
-    labelKey: "chip.channel.box.label",
-    descriptionKey: "chip.channel.box.description",
-  },
-  kind: {
-    value: "kind",
-    labelKey: "chip.channel.kind.label",
-    descriptionKey: "chip.channel.kind.description",
-  },
-  lifecycle: {
-    value: "lifecycle",
-    labelKey: "chip.channel.lifecycle.label",
-    descriptionKey: "chip.channel.lifecycle.description",
-  },
-};
-
-/**
  * The shape channel's rows in {@link KINDS} order, as the legend lists them.
  */
 export const KIND_ENCODINGS: readonly KindEncoding[] = KINDS.map(
@@ -218,12 +185,4 @@ export const BOX_ENCODINGS: readonly BoxEncoding[] = BOXES.map(
  */
 export const LIFECYCLE_ENCODINGS: readonly LifecycleEncoding[] = LIFECYCLES.map(
   (value) => LIFECYCLE_INDEX[value],
-);
-
-/**
- * The channels' legend copy in {@link CHANNELS} order, as the legend
- * presents it.
- */
-export const CHANNEL_DESCRIPTORS: readonly ChannelDescriptor[] = CHANNELS.map(
-  (value) => CHANNEL_INDEX[value],
 );

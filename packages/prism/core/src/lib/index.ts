@@ -10,14 +10,6 @@ export {
   assertBindingsLive,
   defineBinding,
 } from "./bindings/index.js";
-export type {
-  Box,
-  ChipLegendProps,
-  ChipProps,
-  Kind,
-  Lifecycle,
-} from "./Chip/index.js";
-export { Chip, ChipLegend } from "./Chip/index.js";
 export type { ClientOnlyProps } from "./ClientOnly/index.js";
 export { ClientOnly } from "./ClientOnly/index.js";
 export type { ErrorBoundaryProps } from "./ErrorBoundary/index.js";
@@ -51,10 +43,15 @@ export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
 export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
 export { ThemeSelector } from "./ThemeSelector/index.js";
 export type {
+  Box,
   CanvasProps,
   CanvasSkipLinkProps,
+  ChipLegendProps,
+  ChipProps,
+  Kind,
   LensBreadcrumbsProps,
   LensContextProps,
+  Lifecycle,
   ModeStripProps,
   RailBrand,
   RailProps,
@@ -63,6 +60,8 @@ export type {
 export {
   Canvas,
   CanvasSkipLink,
+  Chip,
+  ChipLegend,
   LensBreadcrumbs,
   ModeStrip,
   makeLensContext,

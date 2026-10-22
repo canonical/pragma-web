@@ -1,13 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { MESSAGES } from "../i18n/index.js";
-import {
-  BOXES,
-  CHANNEL_DESCRIPTORS,
-  CHANNELS,
-  GOLDEN_ANGLE_DEGREES,
-  KINDS,
-  LIFECYCLES,
-} from "./constants.js";
+import { MESSAGES } from "../../i18n/index.js";
+import { BOXES, GOLDEN_ANGLE_DEGREES, KINDS, LIFECYCLES } from "./constants.js";
 import {
   assertNonEmptyString,
   buildChipChannelStyle,
@@ -42,12 +35,6 @@ describe("chip encodings", () => {
       expect(row.value).toBe(lifecycle);
       expect(MESSAGES[row.labelKey]).not.toBe("");
     }
-  });
-
-  it("describes every channel exactly once", () => {
-    expect(CHANNEL_DESCRIPTORS.map((row) => row.value)).toStrictEqual([
-      ...CHANNELS,
-    ]);
   });
 
   it("throws on values outside the vocabulary", () => {
