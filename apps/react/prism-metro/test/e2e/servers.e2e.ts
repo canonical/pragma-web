@@ -11,15 +11,11 @@
  * `test` run by the `*.e2e.ts` name; run it with `bun run test:e2e`.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { DEV_READY_MS, GRAPH_READY_MS, PREVIEW_READY_MS } from "./constants.js";
 import { type RunningServer, startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
 
-// Readiness budgets: dev* boots straight away; preview* builds the client and
-// the renderer before serving.
-const GRAPH_READY_MS = 20_000;
-const DEV_READY_MS = 30_000;
-const PREVIEW_READY_MS = 120_000;
 const TEST_TIMEOUT_MS = PREVIEW_READY_MS + 30_000;
 
 interface Cell {

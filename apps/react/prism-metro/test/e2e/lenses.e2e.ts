@@ -7,13 +7,10 @@
  * server rendered from the data it prepared.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { DEV_READY_MS, GRAPH_READY_MS, PREVIEW_READY_MS } from "./constants.js";
 import { type RunningServer, startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
-
-const GRAPH_READY_MS = 20_000;
-const DEV_READY_MS = 30_000;
-const PREVIEW_READY_MS = 120_000;
 
 /** The bootstrap script the renderer embeds the initial data with. */
 const INITIAL_DATA_PATTERN = /window\.__INITIAL_DATA__ = (.*?)<\/script>/s;
