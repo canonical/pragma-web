@@ -1,0 +1,62 @@
+---
+# EntityRow — the list entry of an entity: a 32px row in an index.
+# Reference: the projection matrix's in-page list entry (the namespace prefix
+# muted, the title, and a muted word right-aligned, on a 24px line with 4px
+# block insets). Slot order: location, title, then meta at the end.
+#
+# The row sets its text in the context's primary tier, so its line is the
+# context's: 24px in a site, which makes the matrix's 32px row, and 20px in
+# the docs and in an app, which makes 28px.
+#
+# The matrix's 24px and 8px inline insets are its navigation's indentation;
+# the row sets none, so its text sits on the column line of the list that
+# holds it.
+#
+# Why not a published component: no published list entry exists.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-row-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind):
+#   space.050 (4px) for the block insets: a 32px entry on a 24px line; the
+#   shim's block component padding (8px) would make it 40px.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050, and the
+# semantic typography symbols typography.text.primary.fontSize and
+# typography.text.primary.line.height.dimension.
+node:
+  uri: prism.component.entity_row
+  styles:
+    layout.type: flex
+    layout.align: baseline
+    layout.justify: space-between
+    spacing.gap: grid.gutter
+    spacing.internal.block.start: space.050
+    spacing.internal.block.end: space.050
+    layout.listStyle: none
+    typography.size: typography.text.primary.fontSize
+    typography.lineHeight: typography.text.primary.line.height.dimension
+  edges:
+    - node:
+        role: identity
+        styles:
+          layout.overflow: hidden
+          typography.overflow: ellipsis
+          typography.whiteSpace: nowrap
+        edges:
+          - node:
+              role: location
+              styles:
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: location }
+          - node:
+              role: title
+            relation: { cardinality: "1", slotName: title }
+      relation: { cardinality: "1", slotName: identity }
+    - node:
+        role: meta
+        styles:
+          typography.color: color.text.muted
+          typography.align: end
+          typography.whiteSpace: nowrap
+      relation: { cardinality: "0..1", slotName: meta }

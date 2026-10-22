@@ -33,6 +33,8 @@ its stylesheet transcribes.
 - **`EntityChip`**: the inline mention, a 28px pill in running text: an
   optional lead filed before the catalog's separator, the value, then an
   optional badge, icon and disclosure chevron.
+- **`EntityRow`**: the list entry, a 32px row of an index: the namespace
+  prefix and the title, then one muted word at the end.
 
 ## Installation
 
@@ -217,7 +219,8 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
   `CardProjectionProps`, `CommandProjectionProps`.
-- Representations: `EntityChip`; types `EntityChipProps`.
+- Representations: `EntityChip`, `EntityRow`; types `EntityChipProps`,
+  `EntityRowProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

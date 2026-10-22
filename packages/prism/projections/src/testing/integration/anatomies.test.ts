@@ -30,13 +30,18 @@ const UI_TOKENS = [
   "--color-border",
   "--color-foreground-secondary",
   "--color-text-muted",
+  "--typography-text-primary-font-size",
+  "--typography-text-primary-line-height-dimension",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
 
 describe("the package's components", () => {
   it("are the generic representations, each under src/lib/ui", () => {
-    expect(folders.map((folder) => basename(folder))).toEqual(["EntityChip"]);
+    expect(folders.map((folder) => basename(folder))).toEqual([
+      "EntityChip",
+      "EntityRow",
+    ]);
   });
 
   for (const folder of folders) {
