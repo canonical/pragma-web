@@ -28,6 +28,9 @@ triplet. Both are non-null: a line without them cannot be drawn or signed.
 its own; each route carries its ordered calls, because direction is data.
 `servedBy` is the set of stops those calls visit, read as the inverse of
 `Stop.servesLine`.
+
+`formations` lists the formations the line is run with, in authored order. A
+line may be run by more than one rolling stock.
 """
 type Line implements Node {
   uri: ID!
@@ -37,6 +40,7 @@ type Line implements Node {
   code: String!
   colour: String!
   routes: [Route!]!
+  formations: [Formation!]!
 }
 
 """
@@ -191,6 +195,48 @@ type DiagramPoint {
 }
 
 """
+A class of train: the cars of one design and the formations they run in. A
+root class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`formations` holds the stock's alternative formations in authored order,
+shortest first.
+"""
+type RollingStock implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  formations: [Formation!]!
+}
+
+"""
+A train as it runs: an ordered list of units, each possibly reversed. A root
+class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`units` lists the formation's units from its front, positions counted from 1
+with no gaps.
+
+`stock` is the rolling stock that lists the formation, and `lines` the lines
+run with it, in IRI order. Both are read as inverses of the stock's and the
+lines' `formations`, never stored.
+
+`length` and `capacity` are the sums of its units', computed by the provider
+and never stored. Lengths are whole millimetres, measured over couplers so
+they add up without gaps; capacity is passengers seated plus standing.
+"""
+type Formation implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  stock: RollingStock!
+  units: [UnitPosition!]!
+  length: Int!
+  capacity: Int!
+  lines: [Line!]!
+}
+
+"""
 A set of cars permanently coupled in order: the smallest part of a train that
 runs on its own. A root class in the TBox, reachable through `node(id:)` and
 `OntologyClass.instances`.
@@ -234,6 +280,22 @@ type CarType implements Node {
 }
 
 """
+One unit in a formation, at its place in the order. NOT a Node: a unit
+position exists only within its formation.
+
+`position` is counted from 1, with no gaps, starting at the formation's front.
+
+`reversed` is true when the unit runs last car first, so an asymmetric unit
+coupled back to back with another puts its cab at the far end of the train.
+"""
+type UnitPosition {
+  _meta: EntityMeta!
+  position: Int!
+  unit: Unit!
+  reversed: Boolean!
+}
+
+"""
 One car in a unit, at its place in the order. NOT a Node: a car position
 exists only within its unit.
 
@@ -241,8 +303,8 @@ exists only within its unit.
 
 `reversed` is true when the car's leading end faces the rear of its unit, so a
 driving car at the back of a unit with its cab facing outwards is reversed. A
-car's orientation in a train is its own `reversed` XOR whether its unit runs
-reversed in the train.
+car's orientation in a train is its own `reversed` XOR its unit's
+`UnitPosition.reversed`.
 """
 type CarPosition {
   _meta: EntityMeta!

@@ -1,6 +1,12 @@
 import { graphql } from "graphql";
 import { createExampleProvider } from "../lib/provider/index.js";
-import type { Network, NetworkLine, NetworkStation } from "./types.js";
+import { readWholePage } from "./readWholePage.js";
+import type {
+  InstancePage,
+  Network,
+  NetworkLine,
+  NetworkStation,
+} from "./types.js";
 
 /**
  * Every line and every station, in one query, as a client reads them. The
@@ -27,22 +33,6 @@ const NETWORK_QUERY = `{
   }
 }`;
 
-/** One class's instances, the way `NETWORK_QUERY` selects them. */
-interface InstancePage<T> {
-  readonly instances: {
-    readonly edges: readonly { readonly node: T }[];
-    readonly pageInfo: { readonly hasNextPage: boolean };
-  };
-}
-
-/** The nodes of a page, failing when the page did not hold them all. */
-const readWholePage = <T>(page: InstancePage<T>, name: string): T[] => {
-  if (page.instances.pageInfo.hasNextPage) {
-    throw new Error(`readNetwork: the ${name} page was truncated`);
-  }
-  return page.instances.edges.map((edge) => edge.node);
-};
-
 /**
  * Read the shipped network through the provider's GraphQL schema: every line
  * with its routes and calls, and every station with the lines it serves and
@@ -68,7 +58,7 @@ export const readNetwork = async (): Promise<Network> => {
     readonly stations: InstancePage<NetworkStation>;
   };
   return {
-    lines: readWholePage(data.lines, "lines"),
-    stations: readWholePage(data.stations, "stations"),
+    lines: readWholePage(data.lines, "readNetwork: the lines page"),
+    stations: readWholePage(data.stations, "readNetwork: the stations page"),
   };
 };

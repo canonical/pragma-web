@@ -128,6 +128,8 @@ export interface ExampleNetworkEntity extends ExampleEntityBase {
   readonly routes?: readonly ExampleRoute[];
   /** Where a routed station sits on the schematic network diagram. */
   readonly diagramPosition?: ExampleDiagramPoint;
+  /** IRIs of the formations a line is run with. */
+  readonly formations?: readonly string[];
 }
 
 /**
@@ -167,11 +169,41 @@ export interface ExampleUnit extends ExampleEntityBase {
   readonly cars: readonly ExampleCarPlacement[];
 }
 
+/** One unit in a formation: the unit it is, and which way round it runs. */
+export interface ExampleUnitPlacement {
+  /** IRI of the unit. */
+  readonly unit: string;
+  /** True when the unit runs last car first. */
+  readonly reversed: boolean;
+}
+
+/**
+ * A train as it runs: an ordered list of units, each possibly reversed. Its
+ * measures are its units' sums, computed by the provider rather than stored.
+ */
+export interface ExampleFormation extends ExampleEntityBase {
+  readonly typename: "Formation";
+  /** The formation's units, from its front. */
+  readonly units: readonly ExampleUnitPlacement[];
+}
+
+/** A class of train, and the formations it runs in. */
+export interface ExampleRollingStock extends ExampleEntityBase {
+  readonly typename: "RollingStock";
+  /** IRIs of the stock's alternative formations, shortest first. */
+  readonly formations: readonly string[];
+}
+
 /**
  * One instance-level record, discriminated by its GraphQL type name so each
  * type's required fields are required by the compiler.
  */
-export type ExampleEntity = ExampleNetworkEntity | ExampleCarType | ExampleUnit;
+export type ExampleEntity =
+  | ExampleNetworkEntity
+  | ExampleCarType
+  | ExampleUnit
+  | ExampleFormation
+  | ExampleRollingStock;
 
 /** The whole dataset: a TBox and an ABox. */
 export interface ExampleDataset {

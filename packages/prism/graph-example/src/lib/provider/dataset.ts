@@ -27,6 +27,7 @@ import {
   RDFS_NAMESPACE,
   RDFS_PREFIX,
   ROUTE_CLASS_URI,
+  UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
 import type { ExampleDataset } from "./types.js";
 
@@ -36,6 +37,8 @@ const INTERCHANGE = `${METRO_NAMESPACE}Interchange`;
 const LINE = `${METRO_NAMESPACE}Line`;
 const GEO_POINT = `${GEO_NAMESPACE}GeoPoint`;
 const ZONE = `${GEO_NAMESPACE}Zone`;
+const ROLLING_STOCK = `${METRO_NAMESPACE}RollingStock`;
+const FORMATION = `${METRO_NAMESPACE}Formation`;
 const UNIT = `${METRO_NAMESPACE}Unit`;
 const CAR_TYPE = `${METRO_NAMESPACE}CarType`;
 
@@ -67,6 +70,11 @@ const REVERSED = `${METRO_NAMESPACE}reversed`;
 const CARS = `${METRO_NAMESPACE}cars`;
 const HAS_CAB = `${METRO_NAMESPACE}hasCab`;
 const CAR_TYPE_PROPERTY = `${METRO_NAMESPACE}carType`;
+const FORMATIONS = `${METRO_NAMESPACE}formations`;
+const STOCK = `${METRO_NAMESPACE}stock`;
+const UNITS = `${METRO_NAMESPACE}units`;
+const LINES = `${METRO_NAMESPACE}lines`;
+const UNIT_PROPERTY = `${METRO_NAMESPACE}unit`;
 
 /** IRI of the entity carrying no descriptive predicates whatsoever. */
 export const BARE_ENTITY_URI = `${METRO_NAMESPACE}ghost`;
@@ -149,6 +157,7 @@ export const exampleDataset: ExampleDataset = {
         { property: CODE, required: true, singular: true },
         { property: COLOUR, required: true, singular: true },
         { property: ROUTES, required: true, singular: false },
+        { property: FORMATIONS, required: true, singular: false },
       ],
     },
     {
@@ -192,9 +201,37 @@ export const exampleDataset: ExampleDataset = {
       ],
     },
     {
-      // The fleet's classes are roots, like metro:Line. A unit's measures
-      // are its car types' sums, computed by the provider, so the TBox
+      // The fleet's classes are roots, like metro:Line. A formation's and a
+      // unit's measures are sums computed by the provider, so the TBox
       // declares them while the ABox stores them only on car types.
+      uri: ROLLING_STOCK,
+      labels: { "": "Rolling stock" },
+      definitions: {
+        "": "A class of train: cars of one design, and the formations they run in.",
+      },
+      isAbstract: false,
+      properties: [
+        { property: NAME, required: true, singular: true },
+        { property: FORMATIONS, required: true, singular: false },
+      ],
+    },
+    {
+      uri: FORMATION,
+      labels: { "": "Formation" },
+      definitions: {
+        "": "A train as it runs: an ordered list of units, each possibly reversed.",
+      },
+      isAbstract: false,
+      properties: [
+        { property: NAME, required: true, singular: true },
+        { property: STOCK, required: true, singular: true },
+        { property: UNITS, required: true, singular: false },
+        { property: LENGTH, required: true, singular: true },
+        { property: CAPACITY, required: true, singular: true },
+        { property: LINES, required: false, singular: false },
+      ],
+    },
+    {
       uri: UNIT,
       labels: { "": "Unit" },
       definitions: {
@@ -221,6 +258,21 @@ export const exampleDataset: ExampleDataset = {
         { property: HAS_CAB, required: true, singular: true },
         { property: LENGTH, required: true, singular: true },
         { property: CAPACITY, required: true, singular: true },
+      ],
+    },
+    {
+      // A value class, like metro:Call: a unit's place exists only within
+      // its formation.
+      uri: UNIT_POSITION_CLASS_URI,
+      labels: { "": "Unit position" },
+      definitions: {
+        "": "One unit in a formation, at its place in the order.",
+      },
+      isAbstract: false,
+      properties: [
+        { property: POSITION, required: true, singular: true },
+        { property: UNIT_PROPERTY, required: true, singular: true },
+        { property: REVERSED, required: true, singular: true },
       ],
     },
     {
@@ -497,6 +549,53 @@ export const exampleDataset: ExampleDataset = {
       functional: true,
     },
     {
+      // Global: a line and a rolling stock both answer to a `formations`
+      // field, so the property cannot name one inverse either.
+      uri: FORMATIONS,
+      labels: { "": "formations" },
+      definitions: {
+        "": "The formations a line is run with, or a rolling stock runs in.",
+      },
+      range: "metro:Formation",
+      kind: "OBJECT",
+      functional: false,
+    },
+    {
+      uri: STOCK,
+      labels: { "": "stock" },
+      definitions: { "": "The rolling stock that lists the formation." },
+      domain: FORMATION,
+      range: "metro:RollingStock",
+      kind: "OBJECT",
+      functional: true,
+    },
+    {
+      uri: UNITS,
+      labels: { "": "units" },
+      definitions: { "": "The units of a formation, from its front." },
+      domain: FORMATION,
+      range: "metro:UnitPosition",
+      kind: "OBJECT",
+      functional: false,
+    },
+    {
+      uri: LINES,
+      labels: { "": "lines" },
+      definitions: { "": "The lines run with the formation." },
+      domain: FORMATION,
+      range: "metro:Line",
+      kind: "OBJECT",
+      functional: false,
+    },
+    {
+      uri: UNIT_PROPERTY,
+      labels: { "": "unit" },
+      domain: UNIT_POSITION_CLASS_URI,
+      range: "metro:Unit",
+      kind: "OBJECT",
+      functional: true,
+    },
+    {
       uri: CARS,
       labels: { "": "cars" },
       definitions: { "": "The cars of a unit, from its front." },
@@ -533,7 +632,8 @@ export const exampleDataset: ExampleDataset = {
   // lines cover four topologies: linear lines (North, Coastal), a loop run
   // both ways (Circle), two linear lines closing a ring between shared
   // termini (Upland, Lowland), and a ring run by two lines in opposite
-  // directions (the two Ringways).
+  // directions (the two Ringways). Three rolling stocks run them, in four
+  // formations of three units over seven car types.
   // ---------------------------------------------------------------------
   entities: [
     {
@@ -544,6 +644,7 @@ export const exampleDataset: ExampleDataset = {
       definitions: { "": "Northgate to Marsh End, via the old cutting." },
       code: "1",
       colour: "#c8102e",
+      formations: [`${METRO_NAMESPACE}series-90-six-car`],
       routes: [
         {
           key: "southbound",
@@ -581,6 +682,7 @@ export const exampleDataset: ExampleDataset = {
       comments: { "": "Runs both directions; timetable is symmetric." },
       code: "2",
       colour: "#f2b705",
+      formations: [`${METRO_NAMESPACE}series-70-fixed`],
       routes: [
         {
           key: "clockwise",
@@ -619,6 +721,10 @@ export const exampleDataset: ExampleDataset = {
       labels: { "": "Coastal Line" },
       code: "3",
       colour: "#0072ce",
+      formations: [
+        `${METRO_NAMESPACE}series-90-six-car`,
+        `${METRO_NAMESPACE}series-50-four-car`,
+      ],
       routes: [
         {
           key: "eastbound",
@@ -660,6 +766,7 @@ export const exampleDataset: ExampleDataset = {
       },
       code: "4",
       colour: "#00843d",
+      formations: [`${METRO_NAMESPACE}series-90-three-car`],
       routes: [
         {
           key: "eastbound",
@@ -697,6 +804,7 @@ export const exampleDataset: ExampleDataset = {
       },
       code: "5",
       colour: "#8e3ba3",
+      formations: [`${METRO_NAMESPACE}series-50-four-car`],
       routes: [
         {
           key: "eastbound",
@@ -734,6 +842,7 @@ export const exampleDataset: ExampleDataset = {
       definitions: { "": "The southern ring, run clockwise only." },
       code: "R1",
       colour: "#c46a2b",
+      formations: [`${METRO_NAMESPACE}series-50-four-car`],
       routes: [
         {
           key: "clockwise",
@@ -758,6 +867,7 @@ export const exampleDataset: ExampleDataset = {
       definitions: { "": "The southern ring, run anticlockwise only." },
       code: "R2",
       colour: "#7a4b2a",
+      formations: [`${METRO_NAMESPACE}series-50-four-car`],
       routes: [
         {
           key: "anticlockwise",
@@ -1095,8 +1205,9 @@ export const exampleDataset: ExampleDataset = {
       ],
     },
 
-    // The fleet. Car types carry the measures; a unit's are its cars' sums,
-    // computed by the provider, so no unit states a length or a capacity.
+    // The fleet. Car types carry the measures; a unit's are its cars' sums
+    // and a formation's its units', computed by the provider, so neither
+    // states a length or a capacity.
     {
       uri: `${METRO_NAMESPACE}car-70-driving`,
       type: CAR_TYPE,
@@ -1205,6 +1316,72 @@ export const exampleDataset: ExampleDataset = {
         { carType: `${METRO_NAMESPACE}car-50-driving`, reversed: false },
         { carType: `${METRO_NAMESPACE}car-50-trailer`, reversed: false },
       ],
+    },
+
+    // Formations: a fixed one, one unit alone and coupled, and an asymmetric
+    // unit reversed against its partner. No formation states a length or a
+    // capacity; each is its units' sums.
+    {
+      uri: `${METRO_NAMESPACE}series-70-fixed`,
+      type: FORMATION,
+      typename: "Formation",
+      labels: { "": "Series 70 fixed formation" },
+      units: [{ unit: `${METRO_NAMESPACE}unit-70`, reversed: false }],
+    },
+    {
+      uri: `${METRO_NAMESPACE}series-90-three-car`,
+      type: FORMATION,
+      typename: "Formation",
+      labels: { "": "Series 90 three-car" },
+      units: [{ unit: `${METRO_NAMESPACE}unit-90`, reversed: false }],
+    },
+    {
+      uri: `${METRO_NAMESPACE}series-90-six-car`,
+      type: FORMATION,
+      typename: "Formation",
+      labels: { "": "Series 90 six-car" },
+      units: [
+        { unit: `${METRO_NAMESPACE}unit-90`, reversed: false },
+        { unit: `${METRO_NAMESPACE}unit-90`, reversed: false },
+      ],
+    },
+    {
+      // Two one-cab units back to back: the second runs last car first, so
+      // the train has a cab at each end and none in the middle.
+      uri: `${METRO_NAMESPACE}series-50-four-car`,
+      type: FORMATION,
+      typename: "Formation",
+      labels: { "": "Series 50 four-car" },
+      units: [
+        { unit: `${METRO_NAMESPACE}unit-50`, reversed: false },
+        { unit: `${METRO_NAMESPACE}unit-50`, reversed: true },
+      ],
+    },
+
+    // Rolling stocks, each listing its formations shortest first.
+    {
+      uri: `${METRO_NAMESPACE}series-70`,
+      type: ROLLING_STOCK,
+      typename: "RollingStock",
+      labels: { "": "Series 70" },
+      formations: [`${METRO_NAMESPACE}series-70-fixed`],
+    },
+    {
+      uri: `${METRO_NAMESPACE}series-90`,
+      type: ROLLING_STOCK,
+      typename: "RollingStock",
+      labels: { "": "Series 90" },
+      formations: [
+        `${METRO_NAMESPACE}series-90-three-car`,
+        `${METRO_NAMESPACE}series-90-six-car`,
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}series-50`,
+      type: ROLLING_STOCK,
+      typename: "RollingStock",
+      labels: { "": "Series 50" },
+      formations: [`${METRO_NAMESPACE}series-50-four-car`],
     },
   ],
 };

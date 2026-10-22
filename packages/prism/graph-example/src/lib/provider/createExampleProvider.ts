@@ -31,9 +31,11 @@ import {
   DIAGRAM_POINT_CLASS_URI,
   FIRST_CALL_POSITION,
   FIRST_CAR_POSITION,
+  FIRST_UNIT_POSITION,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
+  UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
 import { exampleDataset } from "./dataset.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
@@ -48,14 +50,17 @@ import type {
   ExampleDataset,
   ExampleDiagramPoint,
   ExampleEntity,
+  ExampleFormation,
   ExampleGeoPoint,
   ExampleMeasures,
   ExampleNetworkEntity,
   ExampleOntology,
   ExampleProperty,
   ExampleProvider,
+  ExampleRollingStock,
   ExampleRoute,
   ExampleUnit,
+  ExampleUnitPlacement,
   LangMap,
 } from "./types.js";
 
@@ -91,6 +96,12 @@ interface EntityRecord<E extends ExampleEntity = ExampleEntity> {
 interface ResolvedCarPlacement {
   readonly placement: ExampleCarPlacement;
   readonly carType: EntityRecord<ExampleCarType>;
+}
+
+/** One unit of a formation whose unit the ABox carries. */
+interface ResolvedUnitPlacement {
+  readonly placement: ExampleUnitPlacement;
+  readonly unit: EntityRecord<ExampleUnit>;
 }
 
 /** The namespace part of an IRI — everything before the local name. */
@@ -433,12 +444,35 @@ export const createExampleProvider = (
   }
 
   // -------------------------------------------------------------------
-  // The fleet. A unit's length and capacity are its car types' sums,
-  // computed here rather than stored, and thunked like every relation:
-  // the records they read are indexed after the views are built.
+  // The fleet. A unit's length and capacity are its car types' sums, and a
+  // formation's its units', computed here rather than stored, and thunked
+  // like every relation: the records they read are indexed after the views
+  // are built. A formation's stock and lines are read as the inverses of
+  // the stocks' and the lines' `formations`.
   // -------------------------------------------------------------------
 
+  const unitPositionClass = classByUri.get(UNIT_POSITION_CLASS_URI);
   const carPositionClass = classByUri.get(CAR_POSITION_CLASS_URI);
+
+  /** The formation with this IRI, or undefined when none is carried. */
+  const findFormationRecord = (
+    uri: string,
+  ): EntityRecord<ExampleFormation> | undefined => {
+    const record = recordByUri.get(uri);
+    return record?.entity.typename === "Formation"
+      ? { entity: record.entity, view: record.view }
+      : undefined;
+  };
+
+  /** The unit with this IRI, or undefined when none is carried. */
+  const findUnitRecord = (
+    uri: string,
+  ): EntityRecord<ExampleUnit> | undefined => {
+    const record = recordByUri.get(uri);
+    return record?.entity.typename === "Unit"
+      ? { entity: record.entity, view: record.view }
+      : undefined;
+  };
 
   /** The car type with this IRI, or undefined when none is carried. */
   const findCarTypeRecord = (
@@ -483,6 +517,83 @@ export const createExampleProvider = (
           reversed: resolved.placement.reversed,
         }));
 
+  /**
+   * A formation's units paired with their records. A unit the ABox does not
+   * carry is dropped, so the positions numbered from these keep no gap.
+   */
+  const resolveUnitPlacements = (
+    formation: ExampleFormation,
+  ): ResolvedUnitPlacement[] =>
+    formation.units.flatMap((placement) => {
+      const unit = findUnitRecord(placement.unit);
+      return unit === undefined ? [] : [{ placement, unit }];
+    });
+
+  /** A formation's length and capacity: the sums of its units'. */
+  const measureFormation = (formation: ExampleFormation): ExampleMeasures =>
+    sumMeasures(
+      resolveUnitPlacements(formation).map((resolved) =>
+        measureUnit(resolved.unit.entity),
+      ),
+    );
+
+  /** A formation's units, numbered from FIRST_UNIT_POSITION at its front. */
+  const buildUnitPositionViews = (formation: ExampleFormation): View[] =>
+    unitPositionClass === undefined
+      ? []
+      : resolveUnitPlacements(formation).map((resolved, index) => ({
+          _meta: () =>
+            metaView({
+              uri: null,
+              typename: "UnitPosition",
+              cls: unitPositionClass,
+            }),
+          position: FIRST_UNIT_POSITION + index,
+          unit: resolved.unit.view,
+          reversed: resolved.placement.reversed,
+        }));
+
+  /** The views of the formations with these IRIs, skipping any not carried. */
+  const findFormationViews = (uris: readonly string[]): View[] =>
+    uris.flatMap((uri) => {
+      const formation = findFormationRecord(uri);
+      return formation === undefined ? [] : [formation.view];
+    });
+
+  /**
+   * The rolling stock that lists the formation, or null when none does. No
+   * value is invented: `Formation.stock` is non-null, so graphql-js reports
+   * a formation no stock lists as a field error.
+   */
+  const findStockView = (formationUri: string): View | null =>
+    records.find(
+      (record) =>
+        record.entity.typename === "RollingStock" &&
+        record.entity.formations.includes(formationUri),
+    )?.view ?? null;
+
+  /** The lines run with the formation, in IRI order. */
+  const findLineViews = (formationUri: string): View[] =>
+    records
+      .filter(
+        (record) =>
+          record.entity.typename === "Line" &&
+          (record.entity.formations ?? []).includes(formationUri),
+      )
+      .map((record) => record.view);
+
+  const buildRollingStockFields = (stock: ExampleRollingStock): View => ({
+    formations: () => findFormationViews(stock.formations),
+  });
+
+  const buildFormationFields = (formation: ExampleFormation): View => ({
+    stock: () => findStockView(formation.uri),
+    units: () => buildUnitPositionViews(formation),
+    length: () => measureFormation(formation).length,
+    capacity: () => measureFormation(formation).capacity,
+    lines: () => findLineViews(formation.uri),
+  });
+
   const buildCarTypeFields = (carType: ExampleCarType): View => ({
     code: carType.code,
     hasCab: carType.hasCab,
@@ -513,6 +624,7 @@ export const createExampleProvider = (
     transferMinutes: entity.transferMinutes ?? null,
     location: () => geoPointView(entity.location),
     diagramPosition: () => buildDiagramPointView(entity.diagramPosition),
+    formations: () => findFormationViews(entity.formations ?? []),
     inZone: () =>
       entity.inZone === undefined
         ? null
@@ -540,10 +652,15 @@ export const createExampleProvider = (
   /**
    * The fields particular to the entity's type. Split by type because the
    * same field name can mean different things on different types: a car
-   * type stores its `length`, a unit sums its cars'.
+   * type stores its `length`, a unit sums its cars', and a line's
+   * `formations` are its own while a stock's are its alternatives.
    */
   const buildTypeFields = (entity: ExampleEntity): View => {
     switch (entity.typename) {
+      case "RollingStock":
+        return buildRollingStockFields(entity);
+      case "Formation":
+        return buildFormationFields(entity);
       case "CarType":
         return buildCarTypeFields(entity);
       case "Unit":

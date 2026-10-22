@@ -320,11 +320,40 @@ describe("every value type has a title and a curie", () => {
 });
 
 // ---------------------------------------------------------------------------
-// The fleet's positions are value types too: a unit's cars are CarPositions.
-// Driven from the dataset's units, so a unit added anywhere is checked.
+// The fleet's positions are value types too: a formation's units are
+// UnitPositions and a unit's cars are CarPositions. Driven from the dataset's
+// formations and units, so a position added anywhere is checked.
 // ---------------------------------------------------------------------------
 
 describe("every fleet position has a title and a curie", () => {
+  const formations = exampleDataset.entities.filter(
+    (entity) => entity.typename === "Formation",
+  );
+
+  it("has formations in the dataset to check", () => {
+    expect(formations.length).toBeGreaterThan(0);
+  });
+
+  it.each(formations.map((entity) => entity.uri))("%s's units", async (uri) => {
+    const result = await execute(
+      `query V($id: ID!) {
+         node(id: $id) { ... on Formation { units { _meta { title curie } } } }
+       }`,
+      { id: uri },
+    );
+    expect(result.errors).toBeUndefined();
+    const units = (
+      result.data as {
+        node: { units: { _meta: { title: string; curie: string } }[] };
+      }
+    ).node.units;
+    expect(units.length).toBeGreaterThan(0);
+    for (const unit of units) {
+      expectUsableTitle(unit._meta.title);
+      expect(unit._meta.curie).toBe("UnitPosition");
+    }
+  });
+
   const units = exampleDataset.entities.filter(
     (entity) => entity.typename === "Unit",
   );

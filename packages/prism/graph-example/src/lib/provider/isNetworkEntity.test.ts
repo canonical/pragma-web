@@ -22,6 +22,8 @@ describe("isNetworkEntity", () => {
       capacity: 1,
     },
     { ...base, typename: "Unit", cars: [] },
+    { ...base, typename: "Formation", units: [] },
+    { ...base, typename: "RollingStock", formations: [] },
   ];
 
   it.each(fleet.map((entity) => [entity.typename, entity] as const))(
