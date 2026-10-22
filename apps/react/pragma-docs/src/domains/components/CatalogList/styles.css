@@ -10,12 +10,16 @@
   /* SUBGRID that spends the lens layout's columns (strict model): the tier
    * jump-links take the westmost 2 columns, the card grid takes the rest.
    * The card grid inside (.catalog-cards) is a leaf that runs its own
-   * auto-fill over its column span (INTRINSIC-GRID entry 7 — untouched). */
+   * auto-fill over its column span (INTRINSIC-GRID entry 7 — untouched).
+   * At four grid columns the card grid is one column wide, so a tier path
+   * or a component name with no break opportunity breaks anywhere rather
+   * than reaching past the canvas. */
   .ds.catalog-list {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     align-items: start;
+    overflow-wrap: anywhere;
   }
 
   /* The direct children of the list are the <nav> (tier jump-links) and the
