@@ -1,6 +1,9 @@
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { withRouter } from "../../../../../.storybook/decorators/index.js";
+import {
+  withProjections,
+  withRouter,
+} from "../../../../../.storybook/decorators/index.js";
 import DefinitionsExplorer from "./DefinitionsExplorer.js";
 
 const bareRoutes = {
@@ -18,7 +21,7 @@ const meta: Meta<typeof DefinitionsExplorer> = {
   title: "Definitions/DefinitionsExplorer",
   component: DefinitionsExplorer,
   tags: ["autodocs"],
-  decorators: [withRouter({ routes: bareRoutes })],
+  decorators: [withProjections(), withRouter({ routes: bareRoutes })],
   parameters: {
     relay: {
       mockResolvers: {

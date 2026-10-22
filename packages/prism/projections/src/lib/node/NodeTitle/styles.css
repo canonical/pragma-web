@@ -1,0 +1,21 @@
+/*
+ * NodeTitle — the page title of any node: its title and its compact address.
+ *
+ * Each design decision reads a component token bound to a semantic token,
+ * so a site retunes the title through either tier.
+ */
+
+@layer ds.prism {
+  :root {
+    --node-title-location-color-text: var(--color-text-muted);
+  }
+
+  .ds.node-title .title {
+    margin: 0;
+  }
+
+  .ds.node-title .location {
+    margin: 0;
+    color: var(--node-title-location-color-text);
+  }
+}

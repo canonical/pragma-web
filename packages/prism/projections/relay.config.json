@@ -1,0 +1,12 @@
+{
+  "src": ".",
+  "schema": "./node_modules/@canonical/prism-contract/schema/contract.graphql",
+  "language": "typescript",
+  "eagerEsModules": true,
+  "artifactDirectory": "./src/__generated__",
+  "excludes": ["**/node_modules/**", "**/__generated__/**"],
+  "schemaConfig": {
+    "nodeInterfaceIdField": "uri",
+    "nodeInterfaceIdVariableName": "id"
+  }
+}

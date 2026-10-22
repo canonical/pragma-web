@@ -1,0 +1,24 @@
+/*
+ * NodeCommand — the command of any node: its title and its compact address.
+ *
+ * Each design decision reads a component token bound to a semantic token,
+ * so a site retunes the command through either tier.
+ */
+
+@layer ds.prism {
+  :root {
+    --node-command-gap: var(--space-150, 0.75rem);
+    --node-command-location-color-text: var(--color-text-muted);
+  }
+
+  .ds.node-command {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--node-command-gap);
+  }
+
+  .ds.node-command .location {
+    color: var(--node-command-location-color-text);
+  }
+}

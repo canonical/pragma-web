@@ -1,0 +1,11 @@
+/*
+ * NodeChip — the chip of any node: an inline mention that reads as text in
+ * the flow of its sentence. A linked title takes the site's link styles.
+ */
+
+@layer ds.prism {
+  .ds.node-chip {
+    display: inline;
+    font: inherit;
+  }
+}

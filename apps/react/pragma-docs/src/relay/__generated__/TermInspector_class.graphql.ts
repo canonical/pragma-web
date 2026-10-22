@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e795f28b6d0d89e3c3e3dd0e4db5832a>>
+ * @generated SignedSource<<1c7c2b332da8f15783ff87ea832f615e>>
  * @lightSyntaxTransform
  */
 
@@ -18,12 +18,9 @@ export type TermInspector_class$data = {
       readonly node: {
         readonly _meta: {
           readonly curie: string;
-          readonly title: string;
-          readonly type: {
-            readonly uri: string;
-          };
         };
         readonly uri: string;
+        readonly " $fragmentSpreads": FragmentRefs<"EntityChip_node">;
       };
     }>;
     readonly pageInfo: {
@@ -256,28 +253,14 @@ return {
                       "kind": "ScalarField",
                       "name": "curie",
                       "storageKey": null
-                    },
-                    {
-                      "alias": null,
-                      "args": null,
-                      "kind": "ScalarField",
-                      "name": "title",
-                      "storageKey": null
-                    },
-                    {
-                      "alias": null,
-                      "args": null,
-                      "concreteType": "OntologyClass",
-                      "kind": "LinkedField",
-                      "name": "type",
-                      "plural": false,
-                      "selections": [
-                        (v0/*:: as any*/)
-                      ],
-                      "storageKey": null
                     }
                   ],
                   "storageKey": null
+                },
+                {
+                  "args": null,
+                  "kind": "FragmentSpread",
+                  "name": "EntityChip_node"
                 }
               ],
               "storageKey": null
@@ -312,6 +295,6 @@ return {
 };
 })();
 
-(node as any).hash = "d33dd0305b6da7d3100dc81584ccae1e";
+(node as any).hash = "2e4bc7628324b5265596cc76ce464edf";
 
 export default node;

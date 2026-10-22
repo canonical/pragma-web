@@ -1,3 +1,4 @@
+import { EntityChip } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type React from "react";
 import { graphql, useFragment } from "react-relay";
@@ -60,11 +61,8 @@ const termInspectorClassFragmentSource = (): unknown => graphql`
           uri
           _meta {
             curie
-            title
-            type {
-              uri
-            }
           }
+          ...EntityChip_node
         }
       }
       pageInfo {
@@ -107,13 +105,6 @@ const termInspectorPropertyFragmentSource = (): unknown => graphql`
 void termInspectorPropertyFragmentSource;
 
 const componentCssClassName = "ds term-inspector";
-
-/**
- * The class whose instances have a home of their own (`/components/:uri`).
- * Prefixed form: it is compared only after the instance's returned class IRI
- * has been brought to the prefixed form by `toPrefixedUri`.
- */
-const COMPONENT_CLASS_URI = "ds:Component";
 
 /** A term link for a related class/property, labelled by the graph. */
 const TermLink = ({
@@ -258,71 +249,21 @@ const PropertyTable = ({
 );
 
 /**
- * Instance links land only where a live route exists (the D31 landing
- * rule: a mention links to the noun's home, and only components have one
- * — `/components/:uri`). Every other instance renders as plain text until
- * its lens lands.
- *
- * WHAT DISCRIMINATES A COMPONENT is the instance's own CLASS, read off
- * `_meta.type.uri` and compared against `COMPONENT_CLASS_URI` —
- * never `__typename`. The contract's `NodeEdge.node` is `Node!` and a
- * conforming provider's concrete typenames are its own business, so a
- * `__typename === "Component"` test asks a question only pragma's compiled
- * schema can answer. `_meta.type` is the class the graph itself assigns,
- * and it is non-null on every node. The comparison runs through
- * `toPrefixedUri` because `ontologyClass(uri:)` echoes back the ABSOLUTE
- * IRI while the constant is stated prefixed: the two forms must be brought
- * onto the same footing before `===` means anything. `namespaces` already
- * rides this component as a prop and the query already fetches
- * `ontologies { prefix namespace }` — no new variable, no new round trip.
- *
- * The displayed name is `_meta.title`, which is TOTAL by construction (the
- * provider computes a fallback chain ending in the IRI local name, with the
- * whole IRI below it when there is no local name). There is no `?? curie`
- * branch because there is no
- * case that reaches it — a fallback on a total field is unreachable code
- * wearing defence's clothes.
- *
- * Every reader-facing string here is `_meta.curie`, NOT `uri`. Under the
- * converged base `uri` is the absolute IRI, and this lens is the one place
- * an ABox entity surfaces from a TBox route — so reading `uri` raw would
- * both print a 45-character IRI at a reader and mint a SECOND address for
- * an entity the catalog already addresses as `/components/ds%3A…`. One
- * entity, one canonical URL: the D31 rule is about where a mention lands,
- * and two spellings of the same landing is the same defect as none.
- * `uri` stays Relay's identity and stays the list key.
+ * One instance of the class, mentioned as an entity chip: it links to the
+ * page the site declares as the home of the instance's type and reads as
+ * text where the site declares none. Its compact address follows it, the
+ * same `_meta.curie` the chip's link addresses it by; `uri` stays Relay's
+ * identity and the list key.
  */
 const InstanceItem = ({
   node,
-  namespaces,
 }: {
-  readonly node: {
-    readonly _meta: {
-      readonly curie: string;
-      readonly title: string;
-      readonly type: { readonly uri: string };
-    };
-  };
-  readonly namespaces: readonly OntologyNamespace[];
-}): React.ReactElement => {
-  const curie = node._meta.curie;
-  const display = node._meta.title;
-  if (toPrefixedUri(node._meta.type.uri, namespaces) === COMPONENT_CLASS_URI) {
-    return (
-      <li>
-        <Link params={{ uri: curie }} to="componentEntity">
-          {display}
-        </Link>{" "}
-        <code>{curie}</code>
-      </li>
-    );
-  }
-  return (
-    <li>
-      {display} <code>{curie}</code>
-    </li>
-  );
-};
+  readonly node: TermInspector_class$data["instances"]["edges"][number]["node"];
+}): React.ReactElement => (
+  <li>
+    <EntityChip node={node} /> <code>{node._meta.curie}</code>
+  </li>
+);
 
 const ClassView = ({
   data,
@@ -412,7 +353,7 @@ const ClassView = ({
       <>
         <ul>
           {data.instances.edges.map(({ node }) => (
-            <InstanceItem key={node.uri} namespaces={namespaces} node={node} />
+            <InstanceItem key={node.uri} node={node} />
           ))}
         </ul>
         {data.instances.pageInfo.hasNextPage ? (

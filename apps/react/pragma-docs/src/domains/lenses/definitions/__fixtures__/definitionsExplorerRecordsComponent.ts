@@ -41,6 +41,11 @@
  * a re-capture would not carry it. `__typename` stays — Relay writes it on
  * every record regardless of the selection.
  *
+ * The instances are mentioned through `EntityChip_node`, a fragment on
+ * `Node`, so `client:__type:Component` carries `__isNode: true`: Relay's
+ * abstract-type discriminator, without which the chip's fragment does not
+ * match a `Component` record.
+ *
  * Regenerate: boot `dev:bun`, copy `relay.records` out of the
  * `__INITIAL_DATA__` script served at /definitions/ds%3AComponent.
  */
@@ -50,7 +55,7 @@ import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 const definitionsExplorerRecordsComponent = {
   "client:__type:Component": {
     __id: "client:__type:Component",
-    __isEntity: true,
+    __isNode: true,
     __typename: "__TypeSchema",
   },
   "client:https://ds.canonical.com/Component:instances(first:12)": {
