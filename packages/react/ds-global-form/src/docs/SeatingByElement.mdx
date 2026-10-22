@@ -47,7 +47,10 @@ Bare `p`, `.p`, and `h1`–`h6` — and anything inside an `.editorial` context 
 engine, which gives each tier a line-height snapped to the grid
 (`round(up, font-size × ratio, --baseline-height)`) and nudges the first line onto
 the nearest grid line. Because the snapped line-height is a whole baseline
-multiple, every wrapped line stays on the grid too.
+multiple, every wrapped line stays on the grid too. The single exception is bare
+prose inside a control marked `.control-seat` (an accordion header's heading):
+the shared layer exempts it from the engine's box and hands it the seat line,
+since the seat is the engine's nudge formula re-aimed at the density target.
 
 ### What was considered and dropped
 
@@ -203,7 +206,7 @@ dense's 16px line to 16.8px would knock every row off the grid.
 
 | Element | Box | `target` | border in the seat | Notable |
 | --- | --- | --- | --- | --- |
-| Prose / `.editorial` | — (engine-owned) | nearest grid line | — | Not density-seated; snapped line-height keeps every wrapped line on-grid |
+| Prose / `.editorial` | — (engine-owned) | nearest grid line | — | Not density-seated (except inside a `.control-seat` control); snapped line-height keeps every wrapped line on-grid |
 | Field label / description / error | bare text | `round(nearest, h × 2/3)` | 0 | The remaining `line-height: 1` crush seat |
 | Button | the button element | `round(nearest, h × 2/3)` | constant `--button-border-width`, colour-toggled | Intrinsic: no height; box closes to the cell |
 | Input (single-line, composite) | chrome wrapper + inner leaf | `round(nearest, h × 2/3)` | chrome border, folded into the shared `--seat-before` | Line floored at `1.2em` (the UA `<input>` floor); no drift knob |
