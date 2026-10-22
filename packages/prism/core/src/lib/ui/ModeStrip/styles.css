@@ -5,7 +5,9 @@
 @layer ds.components.global {
   /* The band's height is the density line plus one component padding on
    * each side, content-box: an empty strip and a one-row strip match, so
-   * the canvas below never jumps on a lens switch. */
+   * the canvas below never jumps on a lens switch. The band and its sockets
+   * may be narrower than their content, so a tenant wider than the band
+   * wraps inside it instead of pushing past its columns. */
   .ds.mode-strip {
     --mode-strip-gap: var(--grid-gutter);
     --mode-strip-min-block-size: var(--density-line-height);
@@ -26,6 +28,7 @@
     flex-wrap: wrap;
     box-sizing: content-box;
     min-block-size: var(--mode-strip-min-block-size);
+    min-inline-size: 0;
     gap: var(--mode-strip-gap);
     padding-block: var(--mode-strip-padding-block);
     padding-inline: var(--mode-strip-padding-inline);
@@ -35,6 +38,7 @@
   }
 
   .ds.mode-strip .context {
+    min-inline-size: 0;
     font-weight: var(--mode-strip-context-font-weight);
     white-space: nowrap;
   }
@@ -47,12 +51,15 @@
     align-items: center;
     justify-content: flex-end;
     flex-wrap: wrap;
+    min-inline-size: 0;
     gap: var(--mode-strip-spacing);
   }
 
   .ds.mode-strip .status {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    min-inline-size: 0;
     gap: var(--mode-strip-spacing);
     color: var(--mode-strip-status-color);
   }

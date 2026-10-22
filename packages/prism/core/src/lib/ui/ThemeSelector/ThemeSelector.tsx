@@ -4,6 +4,7 @@ import { usePreferredTheme } from "@canonical/react-hooks";
 import type { ChangeEvent, ReactElement } from "react";
 import { useMessages } from "../../i18n/index.js";
 import type { ThemeSelectorProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds theme-selector";
 
@@ -17,7 +18,9 @@ const componentCssClassName = "ds theme-selector";
  * the stored theme otherwise. Native `<select>` props pass through to the
  * root, a consumer `className` merges after the component's own, and an
  * `aria-label` (or an `aria-labelledby`, which takes precedence) replaces
- * the default accessible name.
+ * the default accessible name. The control may be narrower than its longest
+ * option, so the cell that holds it, such as the rail's theme cell, decides
+ * its width.
  *
  * `import { ThemeSelector } from "@canonical/prism-core";`
  *

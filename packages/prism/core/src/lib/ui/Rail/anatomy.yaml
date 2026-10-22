@@ -9,10 +9,16 @@
 # switcher with digit shortcuts, so it stays bespoke; each hint renders the
 # published KeyboardKey.
 #
+# The theme cell stretches the site's theme control to the rail's width and
+# lets it shrink below its content (`size.min.width: 0`); the control,
+# `prism.component.theme_selector`, declares the same of itself, so at one
+# column wide it truncates inside the rail instead of overflowing it.
+#
 # Reflow, bound in styles.css under `@container shell (width < 448px)`
-# (below one group): `label`, `kbd`, `caption` and `utilities-label` take
-# `layout.type: none`; every entry keeps its accessible name through
-# `aria-label`, and the brand link through `title`.
+# (below one group): `brand-word`, `label`, `kbd`, `caption` and
+# `utilities-label` take `layout.type: none`, so the one-column rail holds
+# only the brand dot and the icons; every entry keeps its accessible name
+# through `aria-label`, and the brand link through `title`.
 #
 # Every decision is read through a component token declared on the root
 # (`--rail-*`), bound to the symbol named here.
@@ -164,8 +170,13 @@ node:
               styles:
                 layout.type: grid
                 spacing.gap: grid.gutter
+                size.min.width: 0
                 spacing.internal.block.end: container.gap.tight
                 spacing.internal.inline.start: space.100
                 spacing.internal.inline.end: space.100
+              edges:
+                - node:
+                    uri: prism.component.theme_selector
+                  relation: { cardinality: "1", slotName: default }
             relation: { cardinality: "0..1", slotName: theme }
       relation: { cardinality: "0..1", slotName: utilities }

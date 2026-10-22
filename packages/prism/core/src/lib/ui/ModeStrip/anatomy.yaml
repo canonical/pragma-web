@@ -4,7 +4,10 @@
 # density line unit plus one component padding on each side, content-box,
 # so an empty strip and a one-row strip are the same height and the canvas
 # never jumps on a lens switch. It spans every column of the row the
-# archetype layout places it in.
+# archetype layout places it in. The band and each socket may be narrower
+# than their content (`size.min.width: 0`), and the band, the controls and
+# the status wrap, so a tenant wider than the strip's columns reflows inside
+# them instead of pushing past them.
 #
 # Every decision is read through a component token declared on the root
 # (`--mode-strip-*`), bound to the symbol named here.
@@ -27,6 +30,7 @@ node:
     layout.wrap: wrap
     layout.boxSizing: content-box
     size.min.block: density.line.height
+    size.min.width: 0
     spacing.gap: grid.gutter
     spacing.internal.block.start: component.padding.block
     spacing.internal.block.end: component.padding.block
@@ -39,6 +43,7 @@ node:
     - node:
         role: context socket
         styles:
+          size.min.width: 0
           typography.weight: typography.text.primary.bold.fontWeight
           typography.whiteSpace: nowrap
       relation: { cardinality: "1", slotName: context }
@@ -50,6 +55,7 @@ node:
           layout.align: center
           layout.justify: flex-end
           layout.wrap: wrap
+          size.min.width: 0
           spacing.gap: space.100
       relation: { cardinality: "1", slotName: controls }
     - node:
@@ -57,6 +63,8 @@ node:
         styles:
           layout.type: flex
           layout.align: center
+          layout.wrap: wrap
+          size.min.width: 0
           spacing.gap: space.100
           typography.color: color.text.muted
       relation: { cardinality: "1", slotName: status }

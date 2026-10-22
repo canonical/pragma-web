@@ -20,9 +20,10 @@ const componentCssClassName = "ds rail";
  * The rail is a leaf of the page grid: it does not place itself. An
  * archetype layout puts it in its `rail` region, which spans the first two
  * columns of every row and scrolls on its own; the rail fills that region
- * as a column stack. Below one group of columns its labels, hints, caption
- * and utility heading hide, leaving the icons; each entry keeps its name
- * through `aria-label`, and the brand link through `title`.
+ * as a column stack. Below one group of columns its wordmark, labels,
+ * hints, caption and utility heading hide, leaving the brand dot and the
+ * icons; each entry keeps its name through `aria-label`, and the brand link
+ * through `title`.
  *
  * The entries are whatever the caller passes, in the order given: a site
  * collects them off its route table with `collectLenses`, so a lens appears

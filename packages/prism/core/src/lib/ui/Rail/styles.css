@@ -140,18 +140,24 @@
     padding-inline-start: 0;
   }
 
-  /* The theme control's cell stretches the control to the rail's width. */
+  /* The theme control's cell stretches the control to the rail's width and
+   * lets it shrink with the rail, one column wide below one group: the cell
+   * may be narrower than its content, and the control declares it may be
+   * narrower than its longest option. */
   .ds.rail .theme {
     display: grid;
     gap: var(--rail-gap);
+    min-inline-size: 0;
     padding-block-end: var(--rail-entry-spacing);
     padding-inline: var(--rail-spacing);
   }
 
   /* Below one group the rail spans a single column and keeps its icons:
-   * the labels, hints, caption and utility heading leave the layout, and
-   * every entry keeps its name through aria-label. */
+   * the wordmark, the labels, hints, caption and utility heading leave the
+   * layout, the brand keeps its dot, and every entry keeps its name through
+   * aria-label, the brand link through its title. */
   @container shell (width < 448px) {
+    .ds.rail .brand-word,
     .ds.rail .label,
     .ds.rail .kbd,
     .ds.rail .caption,

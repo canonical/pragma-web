@@ -1,8 +1,13 @@
 ---
 # ThemeSelector — a native select with the three theme options, backed by
-# the stored preference. Binds no styles: the page's form styling applies.
+# the stored preference. The page's form styling applies; the one decision
+# bound here is that the control may be narrower than its longest option
+# (`size.min.width: 0`), so the cell that holds it decides its width and a
+# narrow cell truncates the option shown instead of overflowing.
 node:
   uri: prism.component.theme_selector
+  styles:
+    size.min.width: 0
   edges:
     - node:
         role: theme option
