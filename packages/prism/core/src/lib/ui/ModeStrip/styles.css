@@ -37,10 +37,17 @@
     border-bottom-color: var(--mode-strip-divider-color);
   }
 
+  /* The context stays on one line and never reaches past the band: a
+   * crumb wider than the socket, such as an identifier with no break
+   * opportunity, is clipped at the socket's inline end, with an ellipsis
+   * where the clipped content is the socket's own text. Clipped on the
+   * inline axis only, so a crumb's focus ring keeps its block extent. */
   .ds.mode-strip .context {
     min-inline-size: 0;
+    overflow-x: clip;
     font-weight: var(--mode-strip-context-font-weight);
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   /* The controls claim the middle of the band and pack east; empty, they
