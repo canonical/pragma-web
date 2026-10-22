@@ -130,7 +130,7 @@ const EXPECTED_LAYOUT: Readonly<Record<string, string>> = {
 
 /** The regions every layout renders, in document order. */
 const LAYOUT_REGIONS = [
-  'class="ds canvas-skip-link"',
+  'class="ds skip-link ds canvas-skip-link"',
   'data-region="primary-nav"',
   'data-region="mode-strip"',
   'data-region="canvas"',

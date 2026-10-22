@@ -16,6 +16,13 @@ describe("CanvasSkipLink", () => {
     render(<CanvasSkipLink className="is-quiet" id="skip" />);
     const link = screen.getByRole("link", { name: "Skip to content" });
     expect(link.id).toBe("skip");
-    expect(link.className).toBe("ds canvas-skip-link is-quiet");
+    expect(link.className).toBe("ds skip-link ds canvas-skip-link is-quiet");
+  });
+
+  it("is the published skip link, first in the tab order", () => {
+    render(<CanvasSkipLink />);
+    const link = screen.getByRole("link", { name: "Skip to content" });
+    expect(link).toHaveClass("ds", "skip-link");
+    expect(link).toHaveAttribute("tabindex", "0");
   });
 });

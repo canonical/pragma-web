@@ -1,28 +1,16 @@
 ---
-# CanvasSkipLink — the first focusable element of a layout: off-canvas until
-# focused, then a surface at the layout's top start corner. Absolutely
-# positioned, so it takes no cell. Physical `left` is used because
-# `layout.offset.inline.start` admits no primitive and -100rem is off-canvas
-# in either direction.
-#
-# Token ledger:
-#   --canvas-skip-link-hidden-offset: -100rem  off-canvas; not a design value.
-#   layout.stack 1: the one stacked element in core's chrome.
+# CanvasSkipLink — the first focusable element of a layout: the published
+# SkipLink (`global.pattern.skip_link`), targeting the canvas by its id and
+# labelled from the catalog. It binds no styles of its own: the published
+# pattern keeps the link off-screen until it is focused, then shows it at
+# the viewport's top start corner.
 node:
   uri: prism.component.canvas_skip_link
-  styles:
-    layout.position: absolute
-    layout.offset.top: space.100
-    layout.offset.left: -100rem
-    layout.offset.left@focus: space.100
-    layout.stack: 1
-    spacing.internal.block.start: component.padding.block
-    spacing.internal.block.end: component.padding.block
-    spacing.internal.inline.start: component.padding.inline
-    spacing.internal.inline.end: component.padding.inline
-    appearance.background: color.background.layer2
-    typography.color: color.text
   edges:
     - node:
-        role: label text
-      relation: { cardinality: "1", slotName: default }
+        uri: global.pattern.skip_link
+        edges:
+          - node:
+              role: label text
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: link }

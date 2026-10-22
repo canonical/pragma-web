@@ -7,7 +7,7 @@ import CanvasSkipLink from "./CanvasSkipLink.js";
 describe("CanvasSkipLink SSR", () => {
   it("server-renders the link to the canvas with its label", () => {
     expect(renderToString(<CanvasSkipLink />)).toBe(
-      '<a class="ds canvas-skip-link" href="#lens-canvas">Skip to content</a>',
+      '<a class="ds skip-link ds canvas-skip-link" href="#lens-canvas" tabindex="0">Skip to content</a>',
     );
   });
 });

@@ -6,10 +6,12 @@ import type { ComponentProps } from "react";
 type OwnProps = Record<never, never>;
 
 /**
- * Props accepted by `CanvasSkipLink`: the native props of its `<a>` root.
+ * Props accepted by `CanvasSkipLink`: the native props of its `<a>` root,
+ * which the published `SkipLink` renders.
  *
- * The native `href` and `children` are excluded because the link fixes both:
- * it always targets the canvas, and its label is the catalog's.
+ * The native `href`, `tabIndex` and `children` are excluded because the link
+ * fixes them: it always targets the canvas, it is always the first stop in
+ * the tab order, and its label is the catalog's.
  */
 export type CanvasSkipLinkProps = OwnProps &
-  Omit<ComponentProps<"a">, keyof OwnProps | "href" | "children">;
+  Omit<ComponentProps<"a">, keyof OwnProps | "href" | "tabIndex" | "children">;
