@@ -30,6 +30,7 @@ const Chip = (props: ChipProps): React.ReactElement => {
     <>
       {props.lead && <span className="lead">{props.lead}</span>}
       {props.value && <span className="value">{props.value}</span>}
+      {props.badge}
       {props.onDismiss && (
         <button
           type="button"
@@ -49,6 +50,7 @@ const Chip = (props: ChipProps): React.ReactElement => {
       release: _release,
       lead: _lead,
       value: _value,
+      badge: _badge,
       onDismiss: _onDismiss,
       className: _className,
       ...rest
@@ -69,6 +71,7 @@ const Chip = (props: ChipProps): React.ReactElement => {
     release: _release,
     lead: _lead,
     value: _value,
+    badge: _badge,
     onDismiss: _onDismiss,
     onClick: _onClick,
     className: _className,

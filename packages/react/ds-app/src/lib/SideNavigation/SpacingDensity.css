@@ -110,6 +110,39 @@
   color: var(--surface-color-text);
 }
 
+.chip-badge-case {
+  min-inline-size: 30rem;
+  padding: var(--ds-spacing-group);
+  background: var(--surface-color-background);
+  color: var(--surface-color-text);
+  overflow-x: auto;
+}
+
+.indicator-fit .chip-badge-case .side-navigation.indicator-fit-nav {
+  inline-size: 28rem;
+}
+
+.chip-badge-grid {
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+}
+
+.chip-badge-case > h2 {
+  margin-block-start: 0;
+}
+
+.chip-badge-pair {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: start;
+  gap: var(--ds-spacing-item-inline);
+  margin-block-end: var(--ds-spacing-group);
+}
+
+.chip-badge-pair > div {
+  display: flex;
+  align-items: flex-start;
+}
+
 .indicator-fit-case > h2 {
   margin-block-start: 0;
 }

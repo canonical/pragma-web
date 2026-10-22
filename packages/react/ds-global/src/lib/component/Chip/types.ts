@@ -1,5 +1,5 @@
 import type { ModifierFamily } from "@canonical/ds-types";
-import type { ComponentProps, MouseEventHandler } from "react";
+import type { ComponentProps, MouseEventHandler, ReactNode } from "react";
 
 /**
  * The Chip's design-system props, shared by both of its possible roots.
@@ -30,6 +30,9 @@ type OwnProps = {
 
   /** The chip’s value text. */
   value?: string;
+
+  /** Noninteractive Badge displayed after the value. */
+  badge?: ReactNode;
 
   /** Called when the chip is dismissed. */
   onDismiss?: () => void;

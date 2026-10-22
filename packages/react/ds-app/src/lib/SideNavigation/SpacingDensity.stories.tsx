@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Children,
   cloneElement,
+  type CSSProperties,
   Fragment,
   isValidElement,
   type ReactNode,
@@ -921,6 +922,190 @@ type IndicatorFitMetrics = {
   rowHeightDelta: number;
 };
 
+type ChipBadgePairMetrics = {
+  badgeBaselineDelta: number;
+  badgeBlockEndClearance: number;
+  badgeBlockStartClearance: number;
+  badgeCapsuleClearance: number;
+  badgeInlineEndClearance: number;
+  badgeInlineStartClearance: number;
+  chipHeightDelta: number;
+  rowHeightDelta: number;
+};
+
+function roundedCapsuleClearance(
+  chipRect: DOMRect,
+  badgeRect: DOMRect,
+  radius: number,
+  stroke: number,
+): number {
+  const halfWidth = chipRect.width / 2 - stroke;
+  const halfHeight = chipRect.height / 2 - stroke;
+  const innerRadius = Math.max(
+    0,
+    Math.min(radius, chipRect.width / 2, chipRect.height / 2) - stroke,
+  );
+  const centerX = chipRect.left + chipRect.width / 2;
+  const centerY = chipRect.top + chipRect.height / 2;
+  const corners = [
+    [badgeRect.left, badgeRect.top],
+    [badgeRect.right, badgeRect.top],
+    [badgeRect.right, badgeRect.bottom],
+    [badgeRect.left, badgeRect.bottom],
+  ] as const;
+  return Math.min(
+    ...corners.map(([x, y]) => {
+      const qx = Math.abs(x - centerX) - (halfWidth - innerRadius);
+      const qy = Math.abs(y - centerY) - (halfHeight - innerRadius);
+      const outside = Math.hypot(Math.max(qx, 0), Math.max(qy, 0));
+      const inside = Math.min(Math.max(qx, qy), 0);
+      return -(outside + inside - innerRadius);
+    }),
+  );
+}
+
+function measureChipBadgePair(
+  root: HTMLElement,
+  name: "standalone" | "navigation",
+): ChipBadgePairMetrics | null {
+  const plainChip = root.querySelector<HTMLElement>(`.${name}-plain-chip`);
+  const badgeChip = root.querySelector<HTMLElement>(`.${name}-badge-chip`);
+  const plainRow = root.querySelector<HTMLElement>(`.${name}-plain-row`);
+  const badgeRow = root.querySelector<HTMLElement>(`.${name}-badge-row`);
+  const label = badgeChip?.querySelector<HTMLElement>(".value");
+  const badge = badgeChip?.querySelector<HTMLElement>(".badge");
+  if (!plainChip || !badgeChip || !plainRow || !badgeRow || !label || !badge)
+    return null;
+
+  const badgeRect = badge.getBoundingClientRect();
+  const chipRect = badgeChip.getBoundingClientRect();
+  const stroke = Number.parseFloat(
+    getComputedStyle(badgeChip).getPropertyValue("--chip-border-width"),
+  );
+  const radius = Number.parseFloat(getComputedStyle(badgeChip).borderRadius);
+  return {
+    badgeBaselineDelta: baseline(badge) - baseline(label),
+    badgeBlockEndClearance: chipRect.bottom - stroke - badgeRect.bottom,
+    badgeBlockStartClearance: badgeRect.top - chipRect.top - stroke,
+    badgeCapsuleClearance: roundedCapsuleClearance(
+      chipRect,
+      badgeRect,
+      radius,
+      stroke,
+    ),
+    badgeInlineEndClearance: chipRect.right - stroke - badgeRect.right,
+    badgeInlineStartClearance: badgeRect.left - chipRect.left - stroke,
+    chipHeightDelta: chipRect.height - plainChip.getBoundingClientRect().height,
+    rowHeightDelta:
+      badgeRow.getBoundingClientRect().height -
+      plainRow.getBoundingClientRect().height,
+  };
+}
+
+function ChipBadgeTier({
+  density,
+  dir = "ltr",
+  tier,
+}: {
+  density: "default" | "dense" | "comfortable";
+  dir?: "ltr" | "rtl";
+  tier: "site" | "docs" | "app";
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [metrics, setMetrics] = useState<{
+    navigation: ChipBadgePairMetrics;
+    standalone: ChipBadgePairMetrics;
+  } | null>(null);
+  const densityClass = density === "default" ? "" : density;
+  const badgeValue = density === "comfortable" ? 132_456_455 : 7;
+  const badgeStyle =
+    tier === "app" && density === "comfortable"
+      ? ({ "--badge-color-background": "rgb(1 2 3)" } as CSSProperties)
+      : undefined;
+  const badge = () => (
+    <Badge
+      value={badgeValue}
+      criticality={density === "dense" ? "error" : undefined}
+      style={badgeStyle}
+    />
+  );
+
+  useEffect(() => {
+    let active = true;
+    void document.fonts.ready.then(() => {
+      requestAnimationFrame(() => {
+        const root = ref.current;
+        if (!active || !root) return;
+        const standalone = measureChipBadgePair(root, "standalone");
+        const navigation = measureChipBadgePair(root, "navigation");
+        if (standalone && navigation) setMetrics({ navigation, standalone });
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <section className={`${tier} ${densityClass} chip-badge-case`} dir={dir}>
+      <h2>{`${tier} · ${density}${dir === "rtl" ? " · RTL" : ""}`}</h2>
+      <div ref={ref}>
+        <div className="chip-badge-pair">
+          <div className="standalone-plain-row">
+            <Chip className="standalone-plain-chip" value="Machines" />
+          </div>
+          <div className="standalone-badge-row">
+            <Chip
+              className="standalone-badge-chip"
+              value="Machines"
+              badge={badge()}
+            />
+          </div>
+        </div>
+        <SideNavigation
+          className="indicator-fit-nav"
+          data-chip-badge-fit={`${tier}-${density}-${dir}`}
+          defaultExpanded
+          keyboardShortcut={false}
+          root={{
+            key: `${tier}-${density}-chip-badge`,
+            items: [
+              {
+                key: "chips",
+                items: [
+                  {
+                    className: "navigation-plain-row",
+                    key: "plain",
+                    label: "Machines",
+                    slot: (
+                      <Chip className="navigation-plain-chip" value="Machines" />
+                    ),
+                  },
+                  {
+                    className: "navigation-badge-row",
+                    key: "badge",
+                    label: "Machines",
+                    slot: (
+                      <Chip
+                        className="navigation-badge-chip"
+                        value="Machines"
+                        badge={badge()}
+                      />
+                    ),
+                  },
+                ],
+              },
+            ],
+          }}
+        />
+      </div>
+      <output hidden data-chip-badge-fit-result={`${tier}-${density}-${dir}`}>
+        {metrics ? JSON.stringify(metrics) : "pending"}
+      </output>
+    </section>
+  );
+}
+
 function IndicatorBadgeTier({
   density,
   dir = "ltr",
@@ -1050,6 +1235,24 @@ export const InvariantBadge: Story = {
         )}
         <IndicatorBadgeTier
           key="app-dense-rtl"
+          density="dense"
+          dir="rtl"
+          tier="app"
+        />
+      </div>
+      <h1>08 Density · Badge inside Chip</h1>
+      <div className="indicator-fit-grid chip-badge-grid">
+        {(["site", "docs", "app"] as const).flatMap((tier) =>
+          (["default", "dense", "comfortable"] as const).map((density) => (
+            <ChipBadgeTier
+              key={`${tier}-${density}-chip-badge`}
+              density={density}
+              tier={tier}
+            />
+          )),
+        )}
+        <ChipBadgeTier
+          key="app-dense-rtl-chip-badge"
           density="dense"
           dir="rtl"
           tier="app"

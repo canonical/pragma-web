@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import sideNavigationItemCss from "../../../react/ds-app/src/lib/SideNavigation/common/Item/styles.css?inline";
 import sideNavigationCss from "../../../react/ds-app/src/lib/SideNavigation/styles.css?inline";
 import badgeCss from "../../../react/ds-global/src/lib/component/Badge/styles.css?inline";
+import chipCss from "../../../react/ds-global/src/lib/component/Chip/styles.css?inline";
 import spacingRolesCss from "../../main/src/spacing-roles.css?raw";
 import {
   computed,
@@ -30,11 +31,43 @@ const close = (actual: number, expected: number, tolerance = 0.02): void => {
   expect(Math.abs(actual - expected)).toBeLessThanOrEqual(tolerance);
 };
 
+const roundedCapsuleClearance = (
+  chipRect: DOMRect,
+  badgeRect: DOMRect,
+  radius: number,
+  stroke: number,
+): number => {
+  const halfWidth = chipRect.width / 2 - stroke;
+  const halfHeight = chipRect.height / 2 - stroke;
+  const innerRadius = Math.max(
+    0,
+    Math.min(radius, chipRect.width / 2, chipRect.height / 2) - stroke,
+  );
+  const centerX = chipRect.left + chipRect.width / 2;
+  const centerY = chipRect.top + chipRect.height / 2;
+  const corners = [
+    [badgeRect.left, badgeRect.top],
+    [badgeRect.right, badgeRect.top],
+    [badgeRect.right, badgeRect.bottom],
+    [badgeRect.left, badgeRect.bottom],
+  ] as const;
+  return Math.min(
+    ...corners.map(([x, y]) => {
+      const qx = Math.abs(x - centerX) - (halfWidth - innerRadius);
+      const qy = Math.abs(y - centerY) - (halfHeight - innerRadius);
+      const outside = Math.hypot(Math.max(qx, 0), Math.max(qy, 0));
+      const inside = Math.min(Math.max(qx, qy), 0);
+      return -(outside + inside - innerRadius);
+    }),
+  );
+};
+
 const px = (value: string): number => Number.parseFloat(value);
 
 const baseline = (node: HTMLElement): number => {
   const before = node.getBoundingClientRect();
   const marker = node.ownerDocument.createElement("span");
+  marker.dataset.baselineMarker = "";
   marker.style.cssText =
     "display:inline-block;width:0;height:0;padding:0;margin:0;border:0;vertical-align:baseline";
   node.prepend(marker);
@@ -50,6 +83,7 @@ const baseline = (node: HTMLElement): number => {
   close(after.height, before.height);
   close(after.top, before.top);
   close(after.left, before.left);
+  expect(node.querySelector("[data-baseline-marker]")).toBeNull();
   return result;
 };
 
@@ -355,5 +389,218 @@ describe("Badge in the existing SideNavigation trailing slot", () => {
       plain.getBoundingClientRect().height,
     );
     close(baseline(badgeNode) - baseline(label), 0, 0.1);
+  });
+});
+
+const chipBadgeStyles = [
+  ...sideNavigationStyles,
+  chipCss,
+  `.chip-badge-test-row { display:flex; align-items:flex-start; inline-size:max-content }
+   .chip-badge-test-nav { position:relative; inset:auto; z-index:auto; min-block-size:0; block-size:auto; inline-size:20rem }
+   .chip-badge-test-list { list-style:none; margin:0; padding:0 }`,
+];
+
+const chip = (
+  id: string,
+  withBadge: boolean,
+  badgeValue: string,
+  badgeClass = "",
+  badgeStyle = "",
+): string => `<span
+  class="ds chip spacing-control-seat stroke-paint stroke"
+  data-ds-density-subscriber="static-chip"
+  id="${id}-chip"
+><span class="value" id="${id}-label">Machines</span>${
+  withBadge
+    ? badge(`${id}-badge`, badgeValue, badgeStyle).replace(
+        'class="ds badge"',
+        `class="ds badge${badgeClass ? ` ${badgeClass}` : ""}"`,
+      )
+    : ""
+}</span>`;
+
+const chipNavItem = (
+  id: string,
+  withBadge: boolean,
+  badgeValue: string,
+  badgeClass = "",
+  badgeStyle = "",
+): string => `
+  <li class="ds side-navigation-item" id="${id}-row">
+    <span class="ds row spacing-control-seat-metrics sidenav-static-chip-provider-v1">
+      <span class="start"></span>
+      <span class="ds side-navigation-label spacing-control-seat">${
+        withBadge ? "Badge Chip" : "Plain Chip"
+      }</span>
+      <span class="end slot">${chip(
+        id,
+        withBadge,
+        badgeValue,
+        badgeClass,
+        badgeStyle,
+      )}</span>
+    </span>
+  </li>`;
+
+const chipBadgeCase = (
+  tier: "site" | "docs" | "app",
+  density: "default" | "dense" | "comfortable",
+  dir: "ltr" | "rtl" = "ltr",
+): string => {
+  const id = `${tier}-${density}-${dir}`;
+  const densityClass = density === "default" ? "" : density;
+  const badgeValue = density === "comfortable" ? "132M+" : "7";
+  const badgeClass = density === "dense" ? "error" : "";
+  const badgeStyle =
+    tier === "app" && density === "comfortable"
+      ? "--badge-color-background:rgb(1 2 3)"
+      : "";
+  return `<section class="${tier} ${densityClass}" dir="${dir}" id="${id}-host">
+    <div class="chip-badge-test-row" id="${id}-standalone-plain-row">${chip(
+      `${id}-standalone-plain`,
+      false,
+      badgeValue,
+    )}</div>
+    <div class="chip-badge-test-row" id="${id}-standalone-badge-row">${chip(
+      `${id}-standalone-badge`,
+      true,
+      badgeValue,
+      badgeClass,
+      badgeStyle,
+    )}</div>
+    <div class="ds side-navigation chip-badge-test-nav">
+      <ul class="chip-badge-test-list">
+        ${chipNavItem(`${id}-navigation-plain`, false, badgeValue)}
+        ${chipNavItem(
+          `${id}-navigation-badge`,
+          true,
+          badgeValue,
+          badgeClass,
+          badgeStyle,
+        )}
+      </ul>
+    </div>
+  </section>`;
+};
+
+const assertChipBadgePair = (
+  doc: Document,
+  id: string,
+  placement: "standalone" | "navigation",
+  rootSize: number,
+): void => {
+  const plainId = `${id}-${placement}-plain`;
+  const badgeId = `${id}-${placement}-badge`;
+  const plainChip = doc.getElementById(`${plainId}-chip`);
+  const badgeChip = doc.getElementById(`${badgeId}-chip`);
+  const plainRow = doc.getElementById(`${plainId}-row`);
+  const badgeRow = doc.getElementById(`${badgeId}-row`);
+  const label = doc.getElementById(`${badgeId}-label`);
+  const badgeNode = doc.getElementById(`${badgeId}-badge`);
+  if (!plainChip || !badgeChip || !plainRow || !badgeRow || !label || !badgeNode)
+    throw new Error(`missing ${id} ${placement} fixture node`);
+
+  const plainChipRect = plainChip.getBoundingClientRect();
+  const chipRect = badgeChip.getBoundingClientRect();
+  const badgeRect = badgeNode.getBoundingClientRect();
+  const stroke = px(
+    computed(doc, badgeChip).getPropertyValue("--chip-border-width"),
+  );
+  const radius = px(computed(doc, badgeChip).borderRadius);
+  close(chipRect.height, plainChipRect.height);
+  close(
+    badgeRow.getBoundingClientRect().height,
+    plainRow.getBoundingClientRect().height,
+  );
+  close(baseline(badgeNode) - baseline(label), 0, 0.1);
+  expect(badgeRect.top - chipRect.top - stroke).toBeGreaterThan(0);
+  expect(chipRect.bottom - stroke - badgeRect.bottom).toBeGreaterThan(0);
+  expect(badgeRect.left - chipRect.left - stroke).toBeGreaterThan(0);
+  expect(chipRect.right - stroke - badgeRect.right).toBeGreaterThan(0);
+  expect(
+    roundedCapsuleClearance(chipRect, badgeRect, radius, stroke),
+  ).toBeGreaterThan(0);
+  close(px(computed(doc, badgeNode).fontSize), rootSize * 0.75);
+  close(px(computed(doc, badgeNode).lineHeight), rootSize);
+};
+
+describe("Badge in the public Chip slot", () => {
+  it("shares the Chip label baseline, preserves host sizes and clears every painted edge", async () => {
+    const cases = (["site", "docs", "app"] as const).flatMap((tier) =>
+      (["default", "dense", "comfortable"] as const).map((density) => ({
+        density,
+        id: `${tier}-${density}-ltr`,
+        tier,
+      })),
+    );
+    for (const rootSize of [14, 16, 20]) {
+      const doc = await render({
+        root: "",
+        styles: [
+          ...chipBadgeStyles,
+          `:root { font-size: ${rootSize}px; }`,
+        ],
+        body: cases.map(({ tier, density }) => chipBadgeCase(tier, density)).join(""),
+      });
+
+      for (const { id } of cases) {
+        assertChipBadgePair(doc, id, "standalone", rootSize);
+        assertChipBadgePair(doc, id, "navigation", rootSize);
+      }
+
+      if (rootSize === 16) {
+        const host = doc.getElementById("site-default-ltr-host");
+        const plainChip = doc.getElementById(
+          "site-default-ltr-standalone-plain-chip",
+        );
+        const badgeChip = doc.getElementById(
+          "site-default-ltr-standalone-badge-chip",
+        );
+        const badgeNode = doc.getElementById(
+          "site-default-ltr-standalone-badge-badge",
+        );
+        if (!host || !plainChip || !badgeChip || !badgeNode)
+          throw new Error("missing Chip mutation-sensitivity fixture node");
+        host.style.setProperty("--_typography-indicator-line-height", "3rem");
+        expect(badgeChip.getBoundingClientRect().height).toBeGreaterThan(
+          plainChip.getBoundingClientRect().height,
+        );
+        host.style.removeProperty("--_typography-indicator-line-height");
+        close(
+          badgeChip.getBoundingClientRect().height,
+          plainChip.getBoundingClientRect().height,
+        );
+        expect(computed(doc, badgeNode).lineHeight).toBe("16px");
+      }
+    }
+  });
+
+  it("keeps logical spacing and painted clearance in RTL", async () => {
+    const doc = await render({
+      root: "",
+      styles: chipBadgeStyles,
+      body: chipBadgeCase("app", "dense", "rtl"),
+    });
+    assertChipBadgePair(doc, "app-dense-rtl", "standalone", 16);
+    assertChipBadgePair(doc, "app-dense-rtl", "navigation", 16);
+  });
+
+  it("suppresses a custom Badge fill in forced colors without hiding its text", async () => {
+    await emulate({ forcedColors: "active" });
+    const doc = await render({
+      root: "",
+      styles: chipBadgeStyles,
+      body: `${chipBadgeCase("app", "comfortable")}<span id="chip-system-colors" style="background:Canvas;color:CanvasText">native</span>`,
+    });
+    const badgeNode = doc.getElementById(
+      "app-comfortable-ltr-standalone-badge-badge",
+    );
+    if (!badgeNode) throw new Error("missing forced-colors Chip Badge");
+    const style = computed(doc, badgeNode);
+    const system = computed(doc, "chip-system-colors");
+    expect(style.backgroundColor).toBe(system.backgroundColor);
+    expect(style.backgroundColor).not.toBe("rgb(1, 2, 3)");
+    expect(style.color).toBe(system.color);
+    expect(style.color).not.toBe("rgba(0, 0, 0, 0)");
   });
 });

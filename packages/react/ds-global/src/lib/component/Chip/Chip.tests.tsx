@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { Badge } from "../Badge/index.js";
 import Component from "./Chip.js";
 
 describe("Chip component", () => {
@@ -39,6 +40,47 @@ describe("Chip component", () => {
     expect(chipElement).toBeInTheDocument();
     expect(chipElement).toContainElement(leadElement);
     expect(chipElement).toContainElement(valueElement);
+  });
+
+  it("renders a Badge after the value and before dismiss", () => {
+    render(
+      <Component
+        value="Machines"
+        badge={<Badge value={42} />}
+        onDismiss={vi.fn()}
+      />,
+    );
+    const chip = screen.getByText("Machines").closest(".ds.chip");
+    const value = screen.getByText("Machines");
+    const badge = screen.getByText("42");
+    const dismiss = screen.getByRole("button", { name: "Dismiss" });
+
+    expect(chip).toContainElement(badge);
+    expect(value.compareDocumentPosition(badge)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(badge.compareDocumentPosition(dismiss)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it("supports the noninteractive Badge slot on an interactive Chip", () => {
+    const onClick = vi.fn();
+    render(
+      <Component
+        value="Machines"
+        badge={<Badge value={7} />}
+        onClick={onClick}
+        data-testid="chip"
+      />,
+    );
+
+    const chip = screen.getByTestId("chip");
+    expect(chip.tagName).toBe("BUTTON");
+    expect(chip).toContainElement(screen.getByText("7"));
+    expect(chip).not.toHaveAttribute("badge");
+    fireEvent.click(chip);
+    expect(onClick).toHaveBeenCalledOnce();
   });
 
   it("applies criticality modifier", () => {
@@ -106,6 +148,7 @@ describe("Chip component", () => {
       <Component
         lead={"Cloud"}
         value={"AWS"}
+        badge={<Badge value={42} />}
         criticality={"success"}
         release={"beta"}
         onDismiss={vi.fn()}
@@ -120,6 +163,7 @@ describe("Chip component", () => {
       "release",
       "lead",
       "value",
+      "badge",
       "ondismiss",
     ]) {
       expect(chip).not.toHaveAttribute(leaked);
@@ -146,6 +190,7 @@ describe("Chip component", () => {
       "release",
       "lead",
       "value",
+      "badge",
       "ondismiss",
     ]) {
       expect(chip).not.toHaveAttribute(leaked);
