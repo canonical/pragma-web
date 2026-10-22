@@ -1,7 +1,16 @@
 // @vitest-environment node
 
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import {
   NORTHGATE_CURIE,
   NORTHGATE_TITLE,
@@ -29,6 +38,10 @@ beforeAll(async () => {
 
 beforeEach(() => {
   graph.requests.length = 0;
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 afterAll(() => graph.close());
@@ -61,10 +74,15 @@ describe("prepareRelayData", () => {
   });
 
   it.each(["/nowhere", "/stations/%ZZ"])(
-    "prepares nothing for %s, dialling no graph",
+    "prepares nothing for %s, dialling no graph and logging no error",
     async (url) => {
+      // The prepare step logs a failure and resolves `undefined`, the same
+      // value as a URL with nothing to prepare, so only the log tells a
+      // path that failed to match from one the app routed as not found.
+      const logged = vi.spyOn(console, "error");
       await expect(prepareRelayData(url, graph.url)).resolves.toBeUndefined();
       expect(graph.requests).toHaveLength(0);
+      expect(logged).not.toHaveBeenCalled();
     },
   );
 });

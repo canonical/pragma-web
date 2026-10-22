@@ -73,6 +73,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 afterAll(() => graph.close());
@@ -114,11 +115,13 @@ describe("createAppRenderer", () => {
   });
 
   it.each(["/nowhere", "/stations/%ZZ"])(
-    "answers %s with the not-found page at 404, dialling no graph",
+    "answers %s with the not-found page at 404, dialling no graph and logging no error",
     async (url) => {
+      const logged = vi.spyOn(console, "error");
       const { html, initialData, statusCode } = await renderDocument(
         new Request(`http://localhost${url}`),
       );
+      expect(logged).not.toHaveBeenCalled();
       expect(graph.requests).toHaveLength(0);
       expect(statusCode).toBe(404);
       expect(initialData).toEqual({ url });
