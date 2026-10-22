@@ -9,7 +9,7 @@ describe("EntityCard SSR", () => {
     const html = renderToString(<EntityCard href="#layout" title="Layout" />);
     expect(html).toContain("ds entity-card");
     expect(html).toContain(
-      '<h3 class="title"><a href="#layout">Layout</a></h3>',
+      '<h3 class="title"><a class="link" href="#layout">Layout</a></h3>',
     );
   });
 

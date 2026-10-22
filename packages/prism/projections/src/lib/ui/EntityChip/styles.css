@@ -22,6 +22,10 @@
     /* No wider than the line that holds it. */
     --entity-chip-max-width: 100%;
     --entity-chip-lead-color: var(--color-text-muted);
+    /* The ring sits inside the value, on the pill's fill. */
+    --entity-chip-focus-ring-width: 2px;
+    --entity-chip-focus-ring-offset: -2px;
+    --entity-chip-focus-ring-color: var(--color-focus-ring);
     /* The matrix's 24px line, which every representation shares. */
     --entity-chip-line-height: var(--space-300);
 
@@ -49,6 +53,20 @@
    * line, rather than widening it. */
   .ds.entity-chip .value {
     overflow: hidden;
+    color: inherit;
+    text-decoration: none;
     text-overflow: ellipsis;
+  }
+
+  /* A linked value reads as the pill's text, underlined on approach. */
+  .ds.entity-chip .value[href]:hover {
+    text-decoration: underline;
+  }
+
+  .ds.entity-chip .value[href]:focus-visible {
+    outline-width: var(--entity-chip-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--entity-chip-focus-ring-color);
+    outline-offset: var(--entity-chip-focus-ring-offset);
   }
 }

@@ -45,7 +45,9 @@ export default function EntityCard({
     href === undefined ? (
       title
     ) : (
-      <LinkComponent href={href}>{title}</LinkComponent>
+      <LinkComponent className="link" href={href}>
+        {title}
+      </LinkComponent>
     );
   return (
     <Card

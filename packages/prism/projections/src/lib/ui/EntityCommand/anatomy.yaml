@@ -10,6 +10,10 @@
 # of its two lines truncates rather than wrapping, so a long title never
 # grows the row.
 #
+# A linked title reads as the row's text: the text's colour, underlined on
+# hover, its focus ring drawn inside it since the title clips; the states
+# apply to the link alone.
+#
 # Why not a published component: no published list entry exists. The
 # palette that lists these rows sets their role and their selection.
 #
@@ -19,6 +23,8 @@
 # Token ledger (no symbol to bind):
 #   space.050 (4px) for the block insets: a 56px row on two 24px lines; the
 #   shim's block component padding (8px) would make it 64px.
+#   --entity-command-focus-ring-width: 2px, --entity-command-focus-ring-offset: -2px
+#                                      the link's ring, drawn inside it since the title clips.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
 #
@@ -57,6 +63,13 @@ node:
                 typography.whiteSpace: nowrap
                 typography.overflow: ellipsis
                 typography.weight: typography.text.primary.bold.fontWeight
+                typography.color: inherit
+                typography.decoration: none
+                typography.decoration@hover: underline
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
             relation: { cardinality: "1", slotName: title }
           - node:
               role: context

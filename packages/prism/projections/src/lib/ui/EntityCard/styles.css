@@ -29,6 +29,10 @@
     --entity-card-parent-font-weight: var(
       --typography-text-primary-font-weight
     );
+    /* The ring sits inside the link, since the title clips. */
+    --entity-card-focus-ring-width: 2px;
+    --entity-card-focus-ring-offset: -2px;
+    --entity-card-focus-ring-color: var(--color-focus-ring);
     --entity-card-section-spacing: var(--container-gap-default);
     --entity-card-rule-width: 1px;
     --entity-card-rule-color: var(--color-border-muted);
@@ -88,6 +92,29 @@
     font-size: var(--entity-card-font-size);
     line-height: var(--entity-card-line-height);
     font-weight: var(--entity-card-title-font-weight);
+  }
+
+  /* The title's link reads as the title: the text's colour, underlined on
+   * approach. */
+  .ds.entity-card > .body > .description > .heading > .title > .link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ds.entity-card > .body > .description > .heading > .title > .link:hover {
+    text-decoration: underline;
+  }
+
+  .ds.entity-card
+    > .body
+    > .description
+    > .heading
+    > .title
+    > .link:focus-visible {
+    outline-width: var(--entity-card-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--entity-card-focus-ring-color);
+    outline-offset: var(--entity-card-focus-ring-offset);
   }
 
   .ds.entity-card > .body > .description > .heading > .title > .parent {

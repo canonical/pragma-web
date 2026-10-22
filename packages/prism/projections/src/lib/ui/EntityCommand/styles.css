@@ -22,6 +22,10 @@
       --typography-text-primary-smallcaps-letter-spacing
     );
     --entity-command-vital-color: var(--color-text-muted);
+    /* The ring sits inside the title, which clips. */
+    --entity-command-focus-ring-width: 2px;
+    --entity-command-focus-ring-offset: -2px;
+    --entity-command-focus-ring-color: var(--color-focus-ring);
 
     display: flex;
     align-items: flex-start;
@@ -44,12 +48,26 @@
     overflow: hidden;
   }
 
-  /* The title truncates on its line, as the second line does. */
+  /* The title truncates on its line, as the second line does; linked, it
+   * reads as the row's text, underlined on approach. */
   .ds.entity-command .title {
     overflow: hidden;
+    color: inherit;
     white-space: nowrap;
+    text-decoration: none;
     text-overflow: ellipsis;
     font-weight: var(--entity-command-title-font-weight);
+  }
+
+  .ds.entity-command .title[href]:hover {
+    text-decoration: underline;
+  }
+
+  .ds.entity-command .title[href]:focus-visible {
+    outline-width: var(--entity-command-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--entity-command-focus-ring-color);
+    outline-offset: var(--entity-command-focus-ring-offset);
   }
 
   /* The second line truncates rather than wrapping the row to a third. */

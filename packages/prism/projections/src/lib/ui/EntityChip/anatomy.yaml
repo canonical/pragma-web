@@ -11,6 +11,9 @@
 # margins a mention in a sentence cannot have. The badge and the icons are
 # the published Badge and Icon.
 #
+# A linked value reads as the pill's text: the text's colour, underlined
+# on hover, with a focus ring; the states apply to the link alone.
+#
 # The 28px: the matrix draws the border inside the pill, CSS draws it outside
 # the padding, so each block inset is the matrix's 2px less the border.
 #
@@ -25,6 +28,8 @@
 #                                      primitive dimension.stroke.thickness.*.
 #   --entity-chip-radius: 9999px       a full radius has only the primitive
 #                                      dimension.radius.full.
+#   --entity-chip-focus-ring-width: 2px, --entity-chip-focus-ring-offset: -2px
+#                                      the link's ring, drawn inside it and so inside the pill.
 #   --entity-chip-max-width: 100%      no wider than its line, so a long
 #                                      value truncates inside the pill.
 #   --entity-chip-padding-block: calc(var(--space-025) - var(--entity-chip-border-width))
@@ -66,6 +71,13 @@ node:
         styles:
           layout.overflow: hidden
           typography.overflow: ellipsis
+          typography.color: inherit
+          typography.decoration: none
+          typography.decoration@hover: underline
+          appearance.outline.width@focus: 2px
+          appearance.outline.style@focus: solid
+          appearance.outline.color@focus: color.focusRing
+          appearance.outline.offset@focus: -2px
       relation: { cardinality: "1", slotName: value }
     - node:
         uri: global.component.badge
