@@ -134,16 +134,15 @@
 
   // Orbit. Normally the pointer nudges the tilt around 9°/−3° by ±6°. Exploded, it orbits the board: top of the
   // screen looks down on it (15°), bottom looks along it (80°), and left to right swings it −50°…50°. A drag
-  // pins the view as it starts and turns it from there like a trackball: dragging down brings the eye up over
-  // the board, to straight down (0°); dragging up lowers it, to nearly edge-on (88°); the view holds after the
-  // drag until it is unpinned; Ctrl, Pin view and Escape pin and unpin; pinned, the arrow
+  // pins the view as it starts and turns it from there like a trackball, through flat and over the top to the far
+  // side (±88° on both axes), and the view holds after the drag until it is unpinned; Ctrl, Pin view and Escape pin and unpin; pinned, the arrow
   // keys turn it. On a phone a sideways drag orbits and a vertical one scrolls.
-  const RX = [0, 88], HOVER_RX = [15, 80], RY = [-50, 50];
+  const RX = [-88, 88], HOVER_RX = [15, 80], RY = [-88, 88], HOVER_RY = [-50, 50];
   const clamp = (v, [a, b]) => Math.max(a, Math.min(b, v));
   const angle = (name, fallback) => { const v = parseFloat(board.style.getPropertyValue(name)); return Number.isFinite(v) ? v : fallback; };
   const angles = () => [angle("--rx", exploded() ? 58 : 9), angle("--ry", exploded() ? -14 : -3)];
   const turn = (rx, ry) => { if (exploded()) { rx = clamp(rx, RX); ry = clamp(ry, RY); } board.style.setProperty("--rx", rx.toFixed(1) + "deg"); board.style.setProperty("--ry", ry.toFixed(1) + "deg"); };
-  const orbitTo = (x, y) => { if (exploded()) turn(HOVER_RX[0] + y * (HOVER_RX[1] - HOVER_RX[0]), RY[0] + x * (RY[1] - RY[0])); else turn(9 - (y - .5) * 6, -3 + (x - .5) * 6); };
+  const orbitTo = (x, y) => { if (exploded()) turn(HOVER_RX[0] + y * (HOVER_RX[1] - HOVER_RX[0]), HOVER_RY[0] + x * (HOVER_RY[1] - HOVER_RY[0])); else turn(9 - (y - .5) * 6, -3 + (x - .5) * 6); };
   const setPinned = (on) => { pinned = on; pinBtn.setAttribute("aria-pressed", String(on)); count(); };
   pinBtn.addEventListener("click", () => setPinned(!pinned));
   const follow = !matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -153,7 +152,7 @@
   let drag = null;
   // (not from a control inside an island, which keeps its focus and selection; elsewhere the default is suppressed so a drag never selects text)
   stage.addEventListener("pointerdown", ev => { if (!exploded()) return; const t = ev.composedPath()[0]; if (t?.closest?.("a, button, input, select, textarea, summary, label, details, [contenteditable]")) return; ev.preventDefault(); drag = { x: ev.clientX, y: ev.clientY, a: angles(), moved: false }; });
-  stage.addEventListener("pointermove", ev => { if (!drag) return; const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y; if (!drag.moved && Math.hypot(dx, dy) < 6) return; if (!drag.moved) { drag.moved = true; stage.setPointerCapture?.(ev.pointerId); setPinned(true); } ev.preventDefault(); const r = stage.getBoundingClientRect(); turn(drag.a[0] - (ev.pointerType === "touch" ? 0 : dy / innerHeight * (HOVER_RX[1] - HOVER_RX[0])), drag.a[1] + dx / r.width * (RY[1] - RY[0])); });
+  stage.addEventListener("pointermove", ev => { if (!drag) return; const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y; if (!drag.moved && Math.hypot(dx, dy) < 6) return; if (!drag.moved) { drag.moved = true; stage.setPointerCapture?.(ev.pointerId); setPinned(true); } ev.preventDefault(); const r = stage.getBoundingClientRect(); turn(drag.a[0] - (ev.pointerType === "touch" ? 0 : dy / innerHeight * (HOVER_RX[1] - HOVER_RX[0])), drag.a[1] + dx / r.width * (HOVER_RY[1] - HOVER_RY[0])); });
   // the click that ends a drag must not open a frame; the flag lives just long enough for that click
   const endDrag = () => { if (drag?.moved) { stage.dataset.dragged = ""; setTimeout(() => delete stage.dataset.dragged, 80); } drag = null; };
   stage.addEventListener("pointerup", endDrag); stage.addEventListener("pointercancel", endDrag);
