@@ -199,3 +199,20 @@ export const UNMEASURED_LINE: PlatformLine = {
   code: "U",
   stops: [{ title: "Delta", platformLength: null }],
 };
+
+/** The Series 90 rolling stock, by its compact address. */
+export const SERIES_90_CURIE = "metro:series-90";
+
+/** The Series 90 six-car formation, by its compact address. */
+export const SERIES_90_SIX_CAR_CURIE = "metro:series-90-six-car";
+
+/** The Series 90 six-car formation's IRI, the form `node(id:)` takes. */
+export const SERIES_90_SIX_CAR_IRI =
+  "https://metro.example/onto#series-90-six-car";
+
+/** The Series 50 four-car formation's IRI. */
+export const SERIES_50_FOUR_CAR_IRI =
+  "https://metro.example/onto#series-50-four-car";
+
+/** The Series 90 unit's IRI. */
+export const SERIES_90_UNIT_IRI = "https://metro.example/onto#unit-90";
