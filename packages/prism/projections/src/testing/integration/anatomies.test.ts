@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   assertAnatomy,
   assertScaffold,
+  assertStylesheets,
   assertStylesMatchAnatomy,
   listAnatomyFolders,
 } from "@canonical/prism-core/testing";
@@ -14,6 +15,12 @@ const PACKAGE_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
 /** Where the package's re-scaffolded components live. */
 const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
+
+/** The package's source tree, every stylesheet in it. */
+const LIBRARY_DIRECTORY = fileURLToPath(new URL("../../lib", import.meta.url));
+
+/** The semantic tokens the package's components read beyond the shim. */
+const EXTERNAL_TOKENS = ["--color-border-muted", "--color-text-muted"];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
 
@@ -33,4 +40,16 @@ describe("the package's components", () => {
       assertScaffold(folder, { packageRoot: PACKAGE_ROOT, testSuffix: "test" });
     });
   }
+});
+
+describe("the package's stylesheets", () => {
+  it("keep the design's token and grid rules", () => {
+    expect(() =>
+      assertStylesheets({
+        directory: LIBRARY_DIRECTORY,
+        layer: "ds.prism",
+        externalTokens: EXTERNAL_TOKENS,
+      }),
+    ).not.toThrow();
+  });
 });
