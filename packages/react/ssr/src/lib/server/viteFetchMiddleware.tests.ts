@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { Readable } from "node:stream";
 import { describe, expect, it, vi } from "vitest";
 import {
   type ViteMiddlewareServer,
@@ -57,6 +58,31 @@ describe("viteFetchMiddleware", () => {
     const response = await handle(new Request("http://localhost/asset.js"));
 
     expect(await response?.text()).toBe("hello world");
+  });
+
+  it("delivers a piped body larger than a socket buffer", async () => {
+    // Vite's static middleware streams files with `pipe()`, which waits for
+    // `drain` whenever `write()` reports a full buffer. The bridged response
+    // has no connected socket, so a write must never report one: a body past
+    // the 64 KiB high-water mark (a variable font, say) would otherwise stall
+    // and the request would never complete.
+    const body = Buffer.alloc(300 * 1024, 7);
+    const handle = viteFetchMiddleware(
+      fakeVite((_req, res) => {
+        res.statusCode = 200;
+        res.setHeader("content-type", "font/woff2");
+        Readable.from([
+          body.subarray(0, 150 * 1024),
+          body.subarray(150 * 1024),
+        ]).pipe(res);
+      }),
+    );
+
+    const response = await handle(new Request("http://localhost/font.woff2"));
+    const received = Buffer.from(await (response as Response).arrayBuffer());
+
+    expect(received.length).toBe(body.length);
+    expect(received.equals(body)).toBe(true);
   });
 
   it("propagates a non-200 status code", async () => {
