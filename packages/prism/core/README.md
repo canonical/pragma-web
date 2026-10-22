@@ -210,10 +210,12 @@ provider is a wiring bug, not a node without a home.
 A home is an ordinary href, so a component that renders it through a plain
 `<a>` loads the destination as a document. Hand such a component
 `RouterLink` as its `LinkComponent` (for the projections,
-`<ProjectionsProvider LinkComponent={RouterLink}>`) and a plain click on an
-href a route matches navigates on the client, while hovering it warms the
-destination. Any other href, a modified click, and a link with a `target`
-or `download` stay the browser's.
+`<ProjectionsProvider LinkComponent={RouterLink}>`) and a plain click on a
+path of the site (an href that starts with a single `/`) that a route
+matches navigates on the client, while hovering it warms the destination.
+Any other href (an absolute or protocol-relative URL, a relative href such
+as `#part`, a path no route matches), a modified click, and a link with a
+`target` or `download` stay the browser's.
 
 ## Entity bindings
 

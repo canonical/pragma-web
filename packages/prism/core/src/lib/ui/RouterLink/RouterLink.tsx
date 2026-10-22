@@ -8,6 +8,13 @@ import type { RouterLinkProps } from "./types.js";
 const componentCssClassName = "ds router-link";
 
 /**
+ * An href that is a path on the site's own origin: one leading `/`, not
+ * followed by a second `/` or a `\`, which a browser reads as the start of
+ * another host (`//host/path`, `/\host/path`).
+ */
+const SITE_PATH_PATTERN = /^\/(?![/\\])/;
+
+/**
  * Report whether a click asks the browser for something other than
  * following the link here: a button other than the primary one, or a
  * modifier key (a new tab, a new window, a download).
@@ -24,15 +31,20 @@ function isModifiedClick(event: MouseEvent<HTMLAnchorElement>): boolean {
 
 /**
  * Resolve an href to the named route it matches, with the params, search
- * and hash to navigate or warm it with; `null` when there is no href, or
- * when no route matches it (an unmatched href, or one only the not-found
- * route answers).
+ * and hash to navigate or warm it with; `null` when there is no href, when
+ * the href is not a path on this site (an absolute or protocol-relative URL,
+ * which may name another origin, or a relative one such as `#part` or
+ * `?q=1`), or when no route matches it (an unmatched href, or one only the
+ * not-found route answers).
  */
 function resolveRouteIntent(
   router: Router<RouteMap, AnyRoute>,
   href: string | undefined,
 ) {
-  const match = href === undefined ? null : router.match(href);
+  const match =
+    href === undefined || !SITE_PATH_PATTERN.test(href)
+      ? null
+      : router.match(href);
   if (match?.kind !== "route") {
     return null;
   }
@@ -51,9 +63,12 @@ function resolveRouteIntent(
  * as the entity projections through `ProjectionsProvider`. It renders the
  * anchor its caller asked for, the same markup on the server and the
  * client, and resolves the href against the route table only when the
- * reader acts on it: a plain click on an href a route matches navigates on
- * the client, and hovering it warms the destination, as router-react's
- * `Link` does. Any other href stays the browser's, and so does a click the
+ * reader acts on it: a plain click on a path of this site (an href that
+ * starts with a single `/`) that a route matches navigates on the client,
+ * and hovering it warms the destination, as router-react's `Link` does.
+ * Any other href stays the browser's (an absolute or protocol-relative URL,
+ * a relative href such as `#part`, a path no route matches), and so does a
+ * click the
  * caller's `onClick` prevented, a modified or non-primary click, and a link
  * that opens elsewhere (`target` other than `_self`) or downloads.
  *

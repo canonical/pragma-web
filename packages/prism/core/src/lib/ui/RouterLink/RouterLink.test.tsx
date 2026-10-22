@@ -203,6 +203,26 @@ describe("RouterLink", () => {
       expect(fireEvent.click(link)).toBe(true);
     });
 
+    it.each([
+      ["an absolute URL on another origin", "https://other.example/things/x"],
+      ["a protocol-relative URL", "//other.example/things/x"],
+      ["a backslash protocol-relative URL", "/\\other.example/things/x"],
+      ["a hash-only href", "#part"],
+      ["a query-only href", "?tab=usage"],
+      ["a relative path", "things/x"],
+    ])(
+      "leaves %s to the browser, though its path matches a route",
+      async (_, href) => {
+        const link = await renderWithRouter(
+          <RouterLink href={href}>Elsewhere</RouterLink>,
+        );
+        expect(fireEvent.click(link)).toBe(true);
+        await settle();
+        expect(screen.getByText("Home page")).toBeInTheDocument();
+        expect(screen.queryByText("Thing x")).toBeNull();
+      },
+    );
+
     it("leaves an href only the not-found route matches to the browser", async () => {
       const link = await renderWithRouter(
         <RouterLink href="/elsewhere/a/b">Elsewhere</RouterLink>,
@@ -224,6 +244,19 @@ describe("RouterLink", () => {
       fireEvent.mouseEnter(link);
       expect(onMouseEnter).toHaveBeenCalledTimes(1);
       await vi.waitFor(() => expect(warmThing).toHaveBeenCalledTimes(1));
+    });
+
+    it.each([
+      ["an absolute URL on another origin", "https://other.example/things/x"],
+      ["a protocol-relative URL", "//other.example/things/x"],
+    ])("warms nothing for %s", async (_, href) => {
+      warmThing.mockClear();
+      const link = await renderWithRouter(
+        <RouterLink href={href}>Elsewhere</RouterLink>,
+      );
+      fireEvent.mouseEnter(link);
+      await settle();
+      expect(warmThing).not.toHaveBeenCalled();
     });
 
     it("warms nothing for an href no route matches", async () => {
