@@ -15,7 +15,8 @@ const componentCssClassName = "ds top-bar";
  *
  * It sits above both page layouts: the public pages' constrained column and
  * the dashboard's application layout, whose side navigation lives one level
- * below it.
+ * below it. It is a `.surface`, so the selectors read the surface channels the
+ * design system's inputs expect.
  *
  * `import { TopBar } from "#lib/index.js";`
  */
@@ -28,7 +29,9 @@ export default function TopBar({
   return (
     <header
       {...props}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      className={[componentCssClassName, "surface", className]
+        .filter(Boolean)
+        .join(" ")}
     >
       <Link className="name" to="home">
         {t("app.name")}

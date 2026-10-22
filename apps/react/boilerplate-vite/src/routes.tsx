@@ -94,11 +94,15 @@ const topBarLayout = wrapper<ReactElement>({
   ),
 });
 
-/** The public pages' layout: one constrained column under the top bar. */
+/**
+ * The public pages' layout: one constrained column under the top bar. It is a
+ * `.surface`, the context the design system's components read their colours
+ * from.
+ */
 const publicLayout = wrapper<ReactElement>({
   id: "public-layout",
   component: ({ children }: { children: ReactNode }) => (
-    <main className="subgrid public-content">{children}</main>
+    <main className="subgrid public-content surface">{children}</main>
   ),
 });
 
@@ -112,7 +116,7 @@ function NotFoundPage(): ReactElement {
   const { t } = useTranslation();
 
   return (
-    <section>
+    <section className="surface">
       <Head title={t("notFound.heading")} />
       <h1>{t("notFound.heading")}</h1>
       <p>{t("notFound.body")}</p>

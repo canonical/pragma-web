@@ -17,6 +17,10 @@ const componentCssClassName = "ds application-shell";
  * active item, and `RouterLink` turns its links into client-side navigation.
  * `<main id="main-content">` is the side navigation's skip-link target.
  *
+ * The shell is a `.surface`: the design system's components read their
+ * colours from the surface channels it sets, and the side panels and modals
+ * opened inside it paint from them.
+ *
  * `import { ApplicationShell } from "#lib/index.js";`
  */
 export default function ApplicationShell({
@@ -33,7 +37,9 @@ export default function ApplicationShell({
   return (
     <div
       {...props}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      className={[componentCssClassName, "surface", className]
+        .filter(Boolean)
+        .join(" ")}
     >
       <ApplicationLayout
         navigation={

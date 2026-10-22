@@ -199,9 +199,9 @@ describe("server matrix (2×3) serves correctly", () => {
           }
 
           // SSR cells render the dashboard under the top bar, inside the
-          // application shell: its own title in <head>, the side navigation
-          // with the current page marked, and the design system's icons
-          // served at /icons, which the side navigation's items reference.
+          // application shell, each a surface: its own title in <head>, the
+          // side navigation with the current page marked, and the design
+          // system's icons served at /icons, which its items reference.
           if (cell.ssr) {
             const dashboard = await fetch(`${server.base}/dashboard`);
             expect(dashboard.status).toBe(200);
@@ -215,7 +215,10 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(dashboardHead).toContain(
               "<title>Dashboard — Boilerplate</title>",
             );
-            expect(dashboardHtml).toContain('class="ds top-bar"');
+            expect(dashboardHtml).toContain('class="ds top-bar surface"');
+            expect(dashboardHtml).toContain(
+              'class="ds application-shell surface"',
+            );
             expect(dashboardHtml).toContain('class="ds side-navigation"');
             expect(dashboardHtml).toContain(
               'aria-current="page" class="row" href="/dashboard"',

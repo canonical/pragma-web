@@ -63,6 +63,11 @@ describe("TopBar", () => {
   it("merges a consumer class with its own on the header", () => {
     renderWithProviders(<TopBar className="custom" />);
 
-    expect(screen.getByRole("banner")).toHaveClass("ds", "top-bar", "custom");
+    expect(screen.getByRole("banner")).toHaveClass(
+      "ds",
+      "top-bar",
+      "surface",
+      "custom",
+    );
   });
 });

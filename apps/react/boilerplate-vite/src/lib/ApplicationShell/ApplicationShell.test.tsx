@@ -110,6 +110,7 @@ describe("ApplicationShell", () => {
     expect(screen.getByTestId("shell")).toHaveClass(
       "ds",
       "application-shell",
+      "surface",
       "custom",
     );
     expect(container.firstElementChild).toBe(screen.getByTestId("shell"));
