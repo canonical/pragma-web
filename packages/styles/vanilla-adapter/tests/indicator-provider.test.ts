@@ -398,7 +398,6 @@ const tabsIndicatorStyles = [
   layersCss,
   tokensCss,
   badgeCss,
-  chipCss,
   tabsCss,
   tabsItemCss,
 ];
@@ -411,12 +410,11 @@ const tab = (
   <ul class="tabs-list" id="${id}-list">
     <li class="ds tabs-item" id="${id}-item"${active ? " data-active" : ""}>
       <a
-        class="ds tabs-link spacing-control-seat stroke-paint stroke-block-end${slot ? " tabs-static-chip-provider-v1" : ""}"
+        class="ds tabs-link spacing-control-seat stroke-paint stroke-block-end"
         href="#${id}"
         id="${id}-link"
-        ${slot ? 'data-ds-density-provider="tabs-static-chip" data-ds-density-policy-version="1"' : ""}
         ${active ? 'aria-current="page"' : ""}
-      >${slot ? '<span class="tabs-label">Machines</span>' : "Machines"}${slot ? `<span class="tabs-indicator">${slot}</span>` : ""}</a>
+      >${slot ? '<span class="tabs-label">Machines</span>' : "Machines"}${slot ? ` <span class="tabs-indicator">${slot}</span>` : ""}</a>
     </li>
   </ul>
 </nav>`;
@@ -428,20 +426,20 @@ const tabIndicatorCase = (
 ): string => {
   const id = `${tier}-${density}-${dir}`;
   const densityClass = density === "default" ? "" : density;
-  const staticChip = `<span class="neutral-indicator-wrapper"><span class="ds chip spacing-control-seat stroke-paint stroke" data-ds-density-subscriber="static-chip" id="${id}-chip"><span class="value">12</span></span></span>`;
   return `<section class="${tier} ${densityClass}" dir="${dir}" id="${id}-host">
     ${tab(`${id}-plain`)}
     ${tab(`${id}-badge`, badge(`${id}-badge-node`), true)}
-    ${tab(`${id}-chip`, staticChip, true)}
   </section>`;
 };
 
 describe("Tabs static indicator slot", () => {
   it("keeps a real Badge on the label baseline without growing the tab", async () => {
     const cases = (["site", "docs", "app"] as const).flatMap((tier) =>
-      (["default", "dense", "comfortable"] as const).map((density) => ({
-        id: `${tier}-${density}-ltr`,
-      })),
+      (["default", "dense", "comfortable"] as const).flatMap((density) =>
+        (["ltr", "rtl"] as const).map((dir) => ({
+          id: `${tier}-${density}-${dir}`,
+        })),
+      ),
     );
     for (const rootSize of [14, 16, 20]) {
       const doc = await render({
@@ -449,16 +447,22 @@ describe("Tabs static indicator slot", () => {
         styles: [...tabsIndicatorStyles, `:root { font-size: ${rootSize}px; }`],
         body: cases
           .map(({ id }) => {
-            const [tier, density] = id.split("-") as [
+            const [tier, density, dir] = id.split("-") as [
               "site" | "docs" | "app",
               "default" | "dense" | "comfortable",
+              "ltr" | "rtl",
             ];
-            return tabIndicatorCase(tier, density);
+            return tabIndicatorCase(tier, density, dir);
           })
           .join(""),
       });
 
       for (const { id } of cases) {
+        const [tier, density, dir] = id.split("-") as [
+          "site" | "docs" | "app",
+          "default" | "dense" | "comfortable",
+          "ltr" | "rtl",
+        ];
         const plainLink = doc.getElementById(`${id}-plain-link`);
         const badgeLink = doc.getElementById(`${id}-badge-link`);
         const plainTabs = doc.getElementById(`${id}-plain-tabs`);
@@ -483,6 +487,28 @@ describe("Tabs static indicator slot", () => {
           badgeTabs.getBoundingClientRect().height,
           plainTabs.getBoundingClientRect().height,
         );
+        if (density !== "default") {
+          const defaultPlainLink = doc.getElementById(
+            `${tier}-default-${dir}-plain-link`,
+          );
+          if (!defaultPlainLink)
+            throw new Error(`missing ${id} default plain comparison`);
+          const plainRect = plainLink.getBoundingClientRect();
+          const defaultRect = defaultPlainLink.getBoundingClientRect();
+          const plainStyle = computed(doc, plainLink);
+          const defaultStyle = computed(doc, defaultPlainLink);
+          close(plainRect.height, defaultRect.height);
+          close(plainRect.width, defaultRect.width);
+          close(
+            px(plainStyle.paddingBlockStart),
+            px(defaultStyle.paddingBlockStart),
+          );
+          close(
+            px(plainStyle.paddingBlockEnd),
+            px(defaultStyle.paddingBlockEnd),
+          );
+          close(px(plainStyle.lineHeight), px(defaultStyle.lineHeight));
+        }
         close(baseline(badgeNode) - baseline(badgeLabel), 0, 0.1);
 
         const linkStyle = computed(doc, badgeLink);
@@ -520,134 +546,29 @@ describe("Tabs static indicator slot", () => {
     }
   });
 
-  it("gives a wrapped static Chip the dense inset and positive host-edge clearance", async () => {
-    const body = (["site", "docs", "app"] as const)
-      .flatMap((tier) =>
-        (["default", "dense", "comfortable"] as const).map((density) =>
-          tabIndicatorCase(tier, density),
-        ),
-      )
-      .join("");
-    const doc = await render({ root: "", styles: tabsIndicatorStyles, body });
-
-    for (const tier of ["site", "docs", "app"] as const) {
-      for (const density of ["default", "dense", "comfortable"] as const) {
-        const id = `${tier}-${density}-ltr`;
-        const plainLink = doc.getElementById(`${id}-plain-link`);
-        const plainTabs = doc.getElementById(`${id}-plain-tabs`);
-        const link = doc.getElementById(`${id}-chip-link`);
-        const chipTabs = doc.getElementById(`${id}-chip-tabs`);
-        const chipNode = doc.getElementById(`${id}-chip`);
-        const label = link?.querySelector<HTMLElement>(".tabs-label");
-        if (
-          !plainLink ||
-          !plainTabs ||
-          !link ||
-          !chipTabs ||
-          !chipNode ||
-          !label
-        )
-          throw new Error(`missing ${id} Tabs Chip`);
-        const linkRect = link.getBoundingClientRect();
-        const chipRect = chipNode.getBoundingClientRect();
-
-        expect(chipRect.top - linkRect.top).toBeGreaterThan(0);
-        expect(linkRect.bottom - chipRect.bottom).toBeGreaterThan(0);
-        expect(chipRect.left - linkRect.left).toBeGreaterThan(0);
-        expect(linkRect.right - chipRect.right).toBeGreaterThan(0);
-        close(linkRect.height, plainLink.getBoundingClientRect().height);
-        close(
-          chipTabs.getBoundingClientRect().height,
-          plainTabs.getBoundingClientRect().height,
-        );
-        close(baseline(chipNode) - baseline(label), 0, 0.1);
-        expect(
-          privateValue(doc, `${id}-chip`, "--tabs-static-chip-inset"),
-        ).toBe("0.25rem");
-
-        const beforeFocus = link.getBoundingClientRect();
-        link.focus();
-        const afterFocus = link.getBoundingClientRect();
-        close(afterFocus.width, beforeFocus.width);
-        close(afterFocus.height, beforeFocus.height);
-      }
-    }
-
-    const oracleLink = doc.getElementById("app-default-ltr-chip-link");
-    const oracleChip = doc.getElementById("app-default-ltr-chip");
-    if (!oracleLink || !oracleChip)
-      throw new Error("missing Tabs Chip mutation fixture");
-    const originalHeight = oracleChip.getBoundingClientRect().height;
-    oracleLink.style.setProperty("--tabs-static-chip-inset", "1rem");
-    expect(oracleChip.getBoundingClientRect().height).toBeGreaterThan(
-      originalHeight,
-    );
-    oracleLink.style.removeProperty("--tabs-static-chip-inset");
-    close(oracleChip.getBoundingClientRect().height, originalHeight);
-  });
-
-  it("inherits through neutral wrappers and defensively resets at an unsupported nested product root", async () => {
-    const neutralChip = `<span class="neutral-one"><span class="neutral-two"><span class="ds chip spacing-control-seat stroke-paint stroke" data-ds-density-subscriber="static-chip" id="neutral-chip"><span class="value">12</span></span></span></span>`;
-    const resetChip = `<span class="site"><span class="ds chip spacing-control-seat stroke-paint stroke" data-ds-density-subscriber="static-chip" id="reset-chip"><span class="value">12</span></span></span>`;
-    const doc = await render({
-      root: "",
-      styles: tabsIndicatorStyles,
-      body: `<section class="app">
-        ${tab("neutral-provider", neutralChip)}
-        ${tab("reset-provider", resetChip)}
-      </section>`,
-    });
-    const neutral = doc.getElementById("neutral-chip");
-    const reset = doc.getElementById("reset-chip");
-    if (!neutral || !reset) throw new Error("missing Tabs boundary fixture");
-
-    expect(privateValue(doc, "neutral-chip", "--tabs-static-chip-inset")).toBe(
-      "0.25rem",
-    );
-    expect(privateValue(doc, "reset-chip", "--tabs-static-chip-inset")).toBe(
-      "",
-    );
-    expect(
-      Math.abs(
-        px(computed(doc, reset).paddingBlockStart) -
-          px(computed(doc, neutral).paddingBlockStart),
-      ),
-    ).toBeGreaterThan(0.1);
-  });
-
-  it("keeps Badge and wrapped static-Chip alignment in RTL", async () => {
+  it("does not expose component-owned density support from an indicator tab", async () => {
     const doc = await render({
       root: "",
       styles: tabsIndicatorStyles,
       body: tabIndicatorCase("app", "dense", "rtl"),
     });
-    const badgeLink = doc.getElementById("app-dense-rtl-badge-link");
+    const link = doc.getElementById("app-dense-rtl-badge-link");
     const badgeNode = doc.getElementById("app-dense-rtl-badge-node");
-    const chipLink = doc.getElementById("app-dense-rtl-chip-link");
-    const chipNode = doc.getElementById("app-dense-rtl-chip");
-    const badgeLabel = badgeLink?.querySelector<HTMLElement>(".tabs-label");
-    const chipLabel = chipLink?.querySelector<HTMLElement>(".tabs-label");
-    if (
-      !badgeLink ||
-      !badgeNode ||
-      !badgeLabel ||
-      !chipLink ||
-      !chipNode ||
-      !chipLabel
-    )
-      throw new Error("missing RTL Tabs indicator node");
+    const label = link?.querySelector<HTMLElement>(".tabs-label");
+    if (!link || !badgeNode || !label)
+      throw new Error("missing RTL Tabs Badge fixture node");
 
-    close(baseline(badgeNode) - baseline(badgeLabel), 0, 0.1);
-    close(baseline(chipNode) - baseline(chipLabel), 0, 0.1);
-    expect(badgeNode.getBoundingClientRect().right).toBeLessThan(
-      badgeLink.getBoundingClientRect().right,
-    );
-    expect(chipNode.getBoundingClientRect().left).toBeGreaterThan(
-      chipLink.getBoundingClientRect().left,
-    );
+    close(baseline(badgeNode) - baseline(label), 0, 0.1);
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
+    expect(link).not.toHaveAttribute("data-ds-density-policy-version");
+    expect(link.classList).not.toContain("tabs-static-chip-provider-v1");
+    expect(
+      computed(doc, link).getPropertyValue("--tabs-static-chip-inset").trim(),
+    ).toBe("");
+    expect(tabsItemCss).not.toContain("tabs-static-chip");
+    expect(link.querySelector(".chip")).toBeNull();
   });
 });
-
 const chipBadgeStyles = [
   ...sideNavigationStyles,
   chipCss,

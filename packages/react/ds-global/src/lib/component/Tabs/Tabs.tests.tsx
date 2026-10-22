@@ -147,9 +147,9 @@ describe("Tabs", () => {
     ]);
     expect(received).not.toHaveProperty("data-ds-density-provider");
     expect(received).not.toHaveProperty("data-ds-density-policy-version");
-    expect(screen.getByRole("link", { name: "Machines 42" })).toHaveClass(
-      "tabs-static-chip-provider-v1",
-    );
+    const link = screen.getByRole("link", { name: "Machines 42" });
+    expect(link).not.toHaveClass("tabs-static-chip-provider-v1");
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
   });
 
   it("applies custom classNames to the nav and list", () => {

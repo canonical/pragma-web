@@ -13,8 +13,9 @@ export type TabItem = _DistributiveOmit<Item, "items"> & {
   className?: string;
   /**
    * Noninteractive trailing content displayed beside the label, such as a
-   * Badge or static Chip. It remains part of the tab's single link or inert
-   * label and must not contain an independent action.
+   * Badge or static text indicator. It remains part of the tab's single link
+   * or inert label and must not contain an independent action. Chips are not
+   * supported in tabs.
    */
   slot?: ReactNode;
   /**

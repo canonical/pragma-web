@@ -1,5 +1,4 @@
 import type React from "react";
-import { tabsDensityPolicy } from "../densityPolicy.js";
 import type { ItemProps } from "./types.js";
 import "./styles.css";
 
@@ -23,12 +22,8 @@ const Item = ({
   const Link = LinkComponent;
   const inert = !url;
   const hasSlot = slot !== null && slot !== undefined && slot !== false;
-  const linkClassName = [
-    "ds tabs-link spacing-control-seat stroke-paint stroke-block-end",
-    hasSlot && tabsDensityPolicy.providerClassName,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const linkClassName =
+    "ds tabs-link spacing-control-seat stroke-paint stroke-block-end";
   const content = (
     <>
       {hasSlot ? <span className="tabs-label">{label}</span> : label}
@@ -36,13 +31,6 @@ const Item = ({
       {hasSlot ? <span className="tabs-indicator">{slot}</span> : null}
     </>
   );
-  const densityProps = hasSlot
-    ? {
-        "data-ds-density-provider": tabsDensityPolicy.provider,
-        "data-ds-density-policy-version": tabsDensityPolicy.version,
-      }
-    : {};
-  const linkDensityProps = LinkComponent === "a" ? densityProps : {};
   return (
     <li
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
@@ -53,7 +41,6 @@ const Item = ({
       {url ? (
         <Link
           className={linkClassName}
-          {...linkDensityProps}
           href={disabled ? undefined : url}
           aria-current={active ? "page" : undefined}
         >
@@ -62,7 +49,6 @@ const Item = ({
       ) : (
         <span
           className={linkClassName}
-          {...densityProps}
           aria-current={active ? "page" : undefined}
         >
           {content}

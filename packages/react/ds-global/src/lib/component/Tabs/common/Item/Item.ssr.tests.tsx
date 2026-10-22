@@ -29,8 +29,8 @@ describe("Tabs Item SSR", () => {
         />
       </ul>,
     );
-    expect(html).toContain("tabs-static-chip-provider-v1");
-    expect(html).toContain('data-ds-density-provider="tabs-static-chip"');
+    expect(html).not.toContain("tabs-static-chip-provider-v1");
+    expect(html).not.toContain("data-ds-density-provider");
     expect(html).toContain('<span class="tabs-indicator">');
     expect(html.indexOf("Machines")).toBeLessThan(html.indexOf("42"));
   });

@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import type React from "react";
 import { describe, expect, it } from "vitest";
-import { tabsDensityPolicy } from "../densityPolicy.js";
 import Item from "./Item.js";
 
 const inList = (ui: React.ReactElement) => render(<ul>{ui}</ul>);
@@ -96,15 +95,8 @@ describe("Tabs Item (internal renderer)", () => {
     expect(slot.parentElement).toHaveClass("tabs-indicator");
     expect(screen.getByRole("listitem")).not.toHaveAttribute("slot");
     expect(link).not.toHaveAttribute("slot");
-    expect(link).toHaveClass(tabsDensityPolicy.providerClassName);
-    expect(link).toHaveAttribute(
-      "data-ds-density-provider",
-      tabsDensityPolicy.provider,
-    );
-    expect(link).toHaveAttribute(
-      "data-ds-density-policy-version",
-      String(tabsDensityPolicy.version),
-    );
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
+    expect(link).not.toHaveAttribute("data-ds-density-policy-version");
   });
 
   it("keeps numeric zero as visible slot content", () => {
@@ -118,7 +110,7 @@ describe("Tabs Item (internal renderer)", () => {
     const link = screen.getByRole("link", { name: "Empty 0" });
 
     expect(link.querySelector(".tabs-indicator")).toHaveTextContent("0");
-    expect(link).toHaveClass(tabsDensityPolicy.providerClassName);
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
   });
 
   it("renders the slot in the same inert span when the tab has no url", () => {
@@ -160,7 +152,7 @@ describe("Tabs Item (internal renderer)", () => {
     expect(document.querySelectorAll("a")).toHaveLength(1);
   });
 
-  it("does not publish the private provider when no slot is present", () => {
+  it("does not publish a density provider when no slot is present", () => {
     inList(
       <Item
         item={{ url: "/specs", label: "Specs" }}
@@ -170,7 +162,6 @@ describe("Tabs Item (internal renderer)", () => {
     );
     const link = screen.getByRole("link", { name: "Specs" });
 
-    expect(link).not.toHaveClass(tabsDensityPolicy.providerClassName);
     expect(link).not.toHaveAttribute("data-ds-density-provider");
     expect(link).not.toHaveAttribute("data-ds-density-policy-version");
     expect(link.querySelector(".tabs-indicator")).toBeNull();
