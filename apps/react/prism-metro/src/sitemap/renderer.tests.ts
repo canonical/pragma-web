@@ -36,6 +36,14 @@ describe("createSitemapRenderer", () => {
     );
   });
 
+  it("falls back to localhost on PORT when BASE_URL is not HTTP(S)", async () => {
+    vi.stubEnv("BASE_URL", "mailto:metro@example.com");
+    vi.stubEnv("PORT", "6001");
+    expect(await renderSitemap()).toContain(
+      "<loc>http://localhost:6001/stations</loc>",
+    );
+  });
+
   it("falls back to the dev server's port when neither is set", async () => {
     vi.stubEnv("BASE_URL", undefined);
     vi.stubEnv("PORT", undefined);

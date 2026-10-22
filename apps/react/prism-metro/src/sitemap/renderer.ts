@@ -12,11 +12,18 @@ import { SitemapRenderer } from "@canonical/react-ssr/renderer";
 import { DEFAULT_PORT } from "#site";
 import getSitemapItems from "./getSitemapItems.js";
 
-/** True only for an absolute URL — the sitemap base must be one (relative `loc`
- * values are resolved against it). Guards against an empty or relative
- * `BASE_URL` (e.g. the `"/"` some tooling injects), which is not a valid base. */
+/** True only for an absolute HTTP(S) URL — the sitemap base must be one
+ * (relative `loc` values are resolved against it). Guards against an empty or
+ * relative `BASE_URL` (e.g. the `"/"` some tooling injects), which is not a
+ * valid base, and against an absolute URL of a non-hierarchical scheme such as
+ * `mailto:`: `URL.canParse` accepts it, but resolving a relative path against
+ * it throws, which would turn a misconfigured environment variable into a 500
+ * on `/sitemap.xml` rather than a fallback to localhost. A sitemap a crawler
+ * fetches over HTTP can only have an HTTP(S) base anyway. */
 function isAbsoluteUrl(value: string): boolean {
-  return URL.canParse(value);
+  if (!URL.canParse(value)) return false;
+  const { protocol } = new URL(value);
+  return protocol === "http:" || protocol === "https:";
 }
 
 /** Canonical base URL for the sitemap. Prefer an absolute `BASE_URL`; otherwise
