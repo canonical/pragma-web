@@ -57,9 +57,14 @@ each a subgrid over every column:
   columns the inspector moves into the published `SidePanel` drawer, which
   a trigger at the canvas's corner opens.
 - `DocumentLayout`: a page whose canvas is the one scrolling region, with
-  an optional `aside` in the last three columns of the body and an optional
-  `colophon` band under it. Below two groups of columns the aside moves
-  under the canvas.
+  an optional `aside` and an optional `colophon` band under the body. The
+  aside is the canvas's own: it holds the last three columns inside the
+  canvas's scroll, at the top of it, and below two groups of columns it
+  moves under the page.
+
+Each archetype's gap is the grid's gutter on both axes, so its rows sit one
+gutter apart. A region given a node that renders nothing (`null`, a
+boolean or the empty string) is left out, as if the prop were omitted.
 
 ```tsx
 import {
@@ -88,8 +93,8 @@ export function GlossaryLayout({ children }: { children: ReactNode }) {
 }
 ```
 
-Both render the skip link first, then a `.rail` region, a `.strip` region
-and the `Canvas`. Regions are placed by column count from the start and by
+Both render the skip link first (the published `SkipLink`, pointed at the
+canvas), then a `.rail` region, a `.strip` region and the `Canvas`. Regions are placed by column count from the start and by
 negative lines from the end, so they hold their places at any column
 count, and below one group of columns the rail narrows to one column.
 
@@ -100,8 +105,9 @@ columns and scrolls on its own. Its `children` render at its foot as the
 site's utility cluster, styled from a class contract: a `p.utilities-label`
 heading, a `ul.utilities` labelled by it, `a.item` links (a `span.icon`
 plus a `span.label`, as a lens entry) and an `li.theme` cell that stretches
-a control such as `ThemeSelector` to the rail's width. Below one group of
-columns the labels, hints and headings hide and the icons stay.
+a control such as `ThemeSelector` to the rail's width and lets it shrink
+with the rail. Below one group of columns the wordmark, labels, hints and
+headings hide and the brand dot and the icons stay.
 
 ### Stylesheets
 
@@ -111,11 +117,14 @@ imports needs no further setup. The rules sit in
 without specificity games. Load `@canonical/styles` first; it declares the
 layer order, the spacing shim and the grid presets the components read.
 
-Every component reads its spacing from the shim (`--container-gap-*`,
-`--component-padding-*`), its colours and weights from the semantic tier,
-and its line unit from the density channel, so a site puts its context and
-density classes (`docs comfortable`) on the document. A decision with no
-token to read is a component token on the component's root. The container
+Every design decision is read through a component token declared on the
+component's root (`--rail-gap`, `--mode-strip-divider-color`), bound to
+the spacing shim (`--grid-gutter`, `--container-gap-*`,
+`--component-padding-*`), to the semantic tier for colours and text styles,
+to the density channel for the line unit, or to a literal where no token
+exists; a site re-themes a component by overriding its tokens. Every grid
+and subgrid sets its gap from `--grid-gutter`. A site puts its context and
+density classes (`docs comfortable`) on the document. The container
 queries read the `shell` container a site's shell names.
 
 The stylesheets name no theme. The Chip's fallbacks are light values; a
@@ -133,7 +142,12 @@ Every component folder carries an `anatomy.yaml` in the anatomy DSL, and
 its stylesheet transcribes it. The experimental `@canonical/prism-core/testing`
 subpath holds the checks the prism packages and apps run over their own
 components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
-`assertStylesheets` and `listAnatomyFolders`.
+`assertStylesheets` and `listAnatomyFolders`. Its `testing/browser` subpath
+holds the browser side the apps' layout suites share: `launchBrowser`,
+`measurePage` and `measureLayout`, which read a page's grid, scroll model,
+overflow and spacing.
+
+Every component has its stories; `bun run storybook` serves them.
 
 ## Chip
 
