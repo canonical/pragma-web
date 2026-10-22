@@ -31,11 +31,14 @@ export const ZONE_CLASS_CURIE = "geo:Zone";
 /** A fare zone's title, as the graph names it. */
 export const ZONE_TITLE = "Central Zone";
 
-/** How many instances `metro:Station` has: 14 stations, 2 interchanges. */
-export const STATION_COUNT = 16;
+/**
+ * How many instances `metro:Station` has: 23 stations, two of them bare, and
+ * 4 interchanges.
+ */
+export const STATION_COUNT = 27;
 
 /** How many of the stations are interchanges. */
-export const INTERCHANGE_COUNT = 2;
+export const INTERCHANGE_COUNT = 4;
 
-/** How many lines the network runs. */
-export const LINE_COUNT = 3;
+/** How many lines the network runs: seven lines. */
+export const LINE_COUNT = 7;

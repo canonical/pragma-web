@@ -4,7 +4,17 @@
  * The lens variables are keyed by operation name and use metro-network IRIs
  * throughout — if a lens can only be satisfied by a pragma IRI, it is not
  * provider-neutral, and that is exactly what this gate is for.
+ *
+ * The line IRIs name one line, or pair of lines, per topology the network
+ * model has to carry, so each topology's test reads the line it is about
+ * rather than searching the network for something shaped right.
  */
+
+import { METRO_NAMESPACE } from "../lib/provider/constants.js";
+import {
+  BARE_ENTITY_URI,
+  EMPTY_LOCAL_NAME_URI,
+} from "../lib/provider/dataset.js";
 
 /** A class every lens that looks a term up can be pointed at. */
 export const SAMPLE_CLASS_URI = "metro:Station";
@@ -74,3 +84,33 @@ export const LENS_OPERATION_VARIABLES: Record<
   EntityNamespacesQuery: {},
   EntityPageQuery: { id: SAMPLE_ENTITY_URI, classUri: SAMPLE_CLASS_URI },
 };
+
+/** A line run both ways between two termini: two routes, each the other's reverse. */
+export const LINEAR_LINE_URI = `${METRO_NAMESPACE}north-line`;
+
+/** A loop run both ways: two loop routes from one first stop, each the other's reverse. */
+export const BIDIRECTIONAL_LOOP_LINE_URI = `${METRO_NAMESPACE}circle-line`;
+
+/**
+ * Two linear lines that share both termini and no other stop, so together
+ * they close a ring.
+ */
+export const HALF_RING_LINE_URIS = [
+  `${METRO_NAMESPACE}upland-line`,
+  `${METRO_NAMESPACE}lowland-line`,
+] as const;
+
+/**
+ * A ring run by two lines in opposite directions over the same stops: each
+ * line has one loop route and no reverse.
+ */
+export const DIRECTIONAL_RING_LINE_URIS = [
+  `${METRO_NAMESPACE}ringway-clockwise`,
+  `${METRO_NAMESPACE}ringway-anticlockwise`,
+] as const;
+
+/** The stations no route calls at, which therefore have no diagram position. */
+export const BARE_STATION_URIS = [
+  BARE_ENTITY_URI,
+  EMPTY_LOCAL_NAME_URI,
+] as const;

@@ -231,12 +231,24 @@ type Query {
 """
 A metro line. A root class in the TBox (no superclass), so it demonstrates
 that `OntologyClass.superclass` is legitimately null.
+
+`code` is the short code passengers know the line by ("1", "R1"), and
+`colour` is its colour on maps and signs, as a lowercase `#rrggbb` hex
+triplet. Both are non-null: a line without them cannot be drawn or signed.
+
+`routes` lists the directions the line runs. A line does not carry an order of
+its own; each route carries its ordered calls, because direction is data.
+`servedBy` is the set of stops those calls visit, read as the inverse of
+`Stop.servesLine`.
 """
 type Line implements Node {
   uri: ID!
   _meta: EntityMeta!
   name: String
   servedBy: [Stop!]!
+  code: String!
+  colour: String!
+  routes: [Route!]!
 }
 
 """
@@ -263,6 +275,7 @@ interface Stop implements Node {
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
 }
 
 """
@@ -279,6 +292,7 @@ type Station implements Node & Stop {
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
 }
 
 """
@@ -305,6 +319,7 @@ type Interchange implements Node & Stop {
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
   transferMinutes: Int
 }
 
@@ -323,5 +338,67 @@ type GeoPoint {
   _meta: EntityMeta!
   latitude: Float!
   longitude: Float!
+}
+
+"""
+One direction of a line's service. NOT a Node: a route has no IRI of its own
+and is reached only through `Line.routes`.
+
+Direction is data. The route, not the line, carries the ordered calls, so a
+line that runs both ways has two routes, each listing its calls in the order
+a passenger meets them.
+
+`label` is the route's name as shown to passengers ("To Marsh End",
+"Clockwise"). It is the route's `rdfs:label`, so it agrees with
+`_meta.label` and `_meta.title`.
+
+`isLoop` is true when the service continues from the last call back to the
+first. The first stop is never repeated at the end of `calls`; the closing
+segment is implied.
+
+`reverse` is the same line's route over the same stops the other way. For a
+loop that is the same first stop with the rest reversed. It is null when the
+line runs one direction only. A ring run by two lines in opposite directions
+is two lines with one route each, so neither route has a reverse.
+"""
+type Route {
+  _meta: EntityMeta!
+  label: String!
+  isLoop: Boolean!
+  calls: [Call!]!
+  reverse: Route
+}
+
+"""
+One stop on a route, at its place in the order. NOT a Node: a call exists
+only within its route.
+
+`position` is counted from 1, with no gaps, so the calls of a route are
+numbered 1 to n in the order the service makes them.
+"""
+type Call {
+  _meta: EntityMeta!
+  position: Int!
+  stop: Stop!
+}
+
+"""
+A place on the schematic network diagram. NOT a Node, and NOT a geography:
+`Stop.location` says where a station is on the ground, this says where it
+sits on the map passengers read.
+
+Coordinates are whole grid units. The origin is the north-west corner, `x`
+grows east and `y` grows south, the orientation of a screen, so a drawing
+needs no flip. The network is anchored so its smallest `x` and its smallest
+`y` are both 0.
+
+Every segment between consecutive calls of a route, and the closing segment
+of a loop, is horizontal, vertical or diagonal (octilinear). A station no
+route calls at has no position.
+"""
+type DiagramPoint {
+  _meta: EntityMeta!
+  x: Int!
+  y: Int!
 }
 

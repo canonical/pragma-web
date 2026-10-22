@@ -68,6 +68,31 @@ export interface ExampleGeoPoint {
   readonly longitude: number;
 }
 
+/** A point on the schematic network diagram, in whole grid units. */
+export interface ExampleDiagramPoint {
+  /** Grid columns east of the diagram's west edge. */
+  readonly x: number;
+  /** Grid rows south of the diagram's north edge. */
+  readonly y: number;
+}
+
+/**
+ * One direction of a line's service. No IRI: a route is a value inside its
+ * line, named within that line by `key`.
+ */
+export interface ExampleRoute {
+  /** Names the route within its line, so another route's `reverse` can point at it. */
+  readonly key: string;
+  /** The route's name as shown to passengers. Required: `Route.label` is non-null. */
+  readonly labels: LangMap;
+  /** True when the service continues from the last call back to the first. */
+  readonly isLoop: boolean;
+  /** Stop IRIs in call order. A loop does not repeat its first stop at the end. */
+  readonly calls: readonly string[];
+  /** `key` of the same line's route over the same stops the other way, if any. */
+  readonly reverse?: string;
+}
+
 /** One instance-level record. */
 export interface ExampleEntity {
   readonly uri: string;
@@ -85,6 +110,20 @@ export interface ExampleEntity {
   readonly servesLine?: readonly string[];
   /** IRI of the fare zone this station sits in — an entity in the geo namespace. */
   readonly inZone?: string;
+  /**
+   * The short code passengers know a line by. Required on a Line, because
+   * `Line.code` is non-null in the SDL.
+   */
+  readonly code?: string;
+  /**
+   * A line's colour, as a lowercase `#rrggbb` hex triplet. Required on a
+   * Line, because `Line.colour` is non-null in the SDL.
+   */
+  readonly colour?: string;
+  /** The directions a line runs, each with its ordered calls. */
+  readonly routes?: readonly ExampleRoute[];
+  /** Where a routed station sits on the schematic network diagram. */
+  readonly diagramPosition?: ExampleDiagramPoint;
 }
 
 /** The whole dataset: a TBox and an ABox. */
