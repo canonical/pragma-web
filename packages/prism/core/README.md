@@ -211,11 +211,12 @@ A home is an ordinary href, so a component that renders it through a plain
 `<a>` loads the destination as a document. Hand such a component
 `RouterLink` as its `LinkComponent` (for the projections,
 `<ProjectionsProvider LinkComponent={RouterLink}>`) and a plain click on a
-path of the site (an href that starts with a single `/`) that a route
-matches navigates on the client, while hovering it warms the destination.
-Any other href (an absolute or protocol-relative URL, a relative href such
-as `#part`, a path no route matches), a modified click, and a link with a
-`target` or `download` stay the browser's.
+path of the site (an href that starts with `/` and that the browser resolves
+to the page's own origin) that a route matches navigates on the client,
+while hovering it warms the destination. Any other href (an absolute or
+protocol-relative URL, a path that hides another host such as `/\host/path`,
+a relative href such as `#part`, a path no route matches), a modified click,
+and a link with a `target` or `download` stay the browser's.
 
 ## Entity bindings
 

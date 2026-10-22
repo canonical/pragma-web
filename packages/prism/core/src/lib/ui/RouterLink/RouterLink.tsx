@@ -9,13 +9,6 @@ import "./styles.css";
 const componentCssClassName = "ds router-link";
 
 /**
- * An href that is a path on the site's own origin: one leading `/`, not
- * followed by a second `/` or a `\`, which a browser reads as the start of
- * another host (`//host/path`, `/\host/path`).
- */
-const SITE_PATH_PATTERN = /^\/(?![/\\])/;
-
-/**
  * Report whether a click asks the browser for something other than
  * following the link here: a button other than the primary one, or a
  * modifier key (a new tab, a new window, a download).
@@ -31,21 +24,39 @@ function isModifiedClick(event: MouseEvent<HTMLAnchorElement>): boolean {
 }
 
 /**
- * Resolve an href to the named route it matches, with the params, search
- * and hash to navigate or warm it with; `null` when there is no href, when
- * the href is not a path on this site (an absolute or protocol-relative URL,
- * which may name another origin, or a relative one such as `#part` or
- * `?q=1`), or when no route matches it (an unmatched href, or one only the
- * not-found route answers).
+ * Report whether an anchor's href is a path on the page's own site: it
+ * starts with `/`, so it is neither an absolute URL nor a relative one such
+ * as `#part` or `?q=1`, and the browser resolves it to the document's own
+ * origin. The origin is the browser's reading of the href, so an authority
+ * hidden in a path (`//host/path`, `/\host/path`, or one the URL parser
+ * exposes by dropping a tab or a newline, `/\t/host/path`) counts as
+ * another site.
+ *
+ * @note Impure: reads the anchor's resolved URL and the document's location.
+ */
+function isSitePath(anchor: HTMLAnchorElement, href: string): boolean {
+  return (
+    href.startsWith("/") &&
+    anchor.origin === anchor.ownerDocument.location.origin
+  );
+}
+
+/**
+ * Resolve an anchor's href to the named route it matches, with the params,
+ * search and hash to navigate or warm it with; `null` when there is no
+ * href, when the href is not a path on this site (see `isSitePath`), or
+ * when no route matches it (an unmatched href, or one only the not-found
+ * route answers).
+ *
+ * @note Impure: reads the anchor's resolved URL and the document's location.
  */
 function resolveRouteIntent(
   router: Router<RouteMap, AnyRoute>,
+  anchor: HTMLAnchorElement,
   href: string | undefined,
 ) {
   const match =
-    href === undefined || !SITE_PATH_PATTERN.test(href)
-      ? null
-      : router.match(href);
+    href === undefined || !isSitePath(anchor, href) ? null : router.match(href);
   if (match?.kind !== "route") {
     return null;
   }
@@ -65,13 +76,14 @@ function resolveRouteIntent(
  * anchor its caller asked for, the same markup on the server and the
  * client, and resolves the href against the route table only when the
  * reader acts on it: a plain click on a path of this site (an href that
- * starts with a single `/`) that a route matches navigates on the client,
- * and hovering it warms the destination, as router-react's `Link` does.
- * Any other href stays the browser's (an absolute or protocol-relative URL,
- * a relative href such as `#part`, a path no route matches), and so does a
- * click the
- * caller's `onClick` prevented, a modified or non-primary click, and a link
- * that opens elsewhere (`target` other than `_self`) or downloads.
+ * starts with `/` and that the browser resolves to the page's own origin)
+ * that a route matches navigates on the client, and hovering it warms the
+ * destination, as router-react's `Link` does. Any other href stays the
+ * browser's (an absolute or protocol-relative URL, a path that hides another
+ * host, a relative href such as `#part`, a path no route matches), and so
+ * does a click the caller's `onClick` prevented, a modified or non-primary
+ * click, and a link that opens elsewhere (`target` other than `_self`) or
+ * downloads.
  *
  * The navigation is rebuilt from the match, so it keeps the hash and the
  * query the matched route declares. A site's homes build their hrefs from
@@ -109,7 +121,7 @@ export default function RouterLink({
     ) {
       return;
     }
-    const intent = resolveRouteIntent(router, href);
+    const intent = resolveRouteIntent(router, event.currentTarget, href);
     if (intent === null) {
       return;
     }
@@ -124,7 +136,7 @@ export default function RouterLink({
    */
   const handleMouseEnter = (event: MouseEvent<HTMLAnchorElement>): void => {
     onMouseEnter?.(event);
-    const intent = resolveRouteIntent(router, href);
+    const intent = resolveRouteIntent(router, event.currentTarget, href);
     if (intent !== null) {
       void router.warm(intent.name, intent.options);
     }

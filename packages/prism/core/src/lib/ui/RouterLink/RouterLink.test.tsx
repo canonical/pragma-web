@@ -244,6 +244,9 @@ describe("RouterLink", () => {
       ["an absolute URL on another origin", "https://other.example/things/x"],
       ["a protocol-relative URL", "//other.example/things/x"],
       ["a backslash protocol-relative URL", "/\\other.example/things/x"],
+      ["a host behind a tab", "/\t/other.example/things/x"],
+      ["a host behind a newline", "/\n/other.example/things/x"],
+      ["a host behind a tab and a backslash", "/\t\\other.example/things/x"],
       ["a hash-only href", "#part"],
       ["a query-only href", "?tab=usage"],
       ["a relative path", "things/x"],
@@ -286,6 +289,9 @@ describe("RouterLink", () => {
     it.each([
       ["an absolute URL on another origin", "https://other.example/things/x"],
       ["a protocol-relative URL", "//other.example/things/x"],
+      ["a backslash protocol-relative URL", "/\\other.example/things/x"],
+      ["a host behind a tab", "/\t/other.example/things/x"],
+      ["a host behind a newline", "/\n/other.example/things/x"],
     ])("warms nothing for %s", async (_, href) => {
       warmThing.mockClear();
       const link = await renderWithRouter(
