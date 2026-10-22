@@ -9,6 +9,7 @@ export const MESSAGES = {
   "rail.utilities": "Utilities",
   "lens.stations": "Stations",
   "lens.lines": "Lines",
+  "lens.network": "Network",
   "shell.loading": "Loading…",
   "notFound.title": "Page not found",
   "notFound.body": "No page of the metro docs lives at this address.",
