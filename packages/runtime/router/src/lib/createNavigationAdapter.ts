@@ -96,46 +96,64 @@ export default function createNavigationAdapter(
       return;
     }
 
-    // Intercept all same-origin navigations to prevent full page reloads.
-    // The router handles the URL update and re-render internally.  The
-    // handler hands the browser the router's in-flight load (tracked via
-    // trackLoad below), so native loading UI reflects the navigation.  It
-    // reads trackedLoad at call time — the router tracks the load
-    // synchronously during the navigate event (via publish() here, or right
-    // after its own navigation.navigate() call), and intercept handlers run
-    // on a later microtask.  A failed load still commits router state, so
-    // the handler never rejects — it must not mark the browser navigation
-    // as failed.
+    // The adapter intercepts two kinds of same-origin navigation, and leaves
+    // every other one to the browser:
     //
-    // A navigation the router asked for leaves scroll and focus to the
-    // router.  Left to the browser, an intercepted push or replace scrolls
-    // to the top and moves focus to <body> once the handler settles — also
-    // for `setSearchParams()`, where the router deliberately leaves the
-    // reader where they are — and would repeat what the router's own
-    // ScrollManager and FocusManager already did for a real navigation.
-    // That also matches the History API adapter, where the browser does
-    // neither.  Navigations the browser starts (back/forward, reload, a link
-    // the router did not handle) keep the browser's defaults.
-    event.intercept({
-      handler: () =>
-        Promise.resolve(trackedLoad).then(
-          () => undefined,
-          ignoreNavigationTransitionError,
-        ),
-      ...(navigatingForRouter
-        ? { focusReset: "manual", scroll: "manual" }
-        : undefined),
-    });
+    // - A navigation the router asked for (its own `navigate()` below).  The
+    //   router already loads and renders the route, so the interception only
+    //   keeps the browser from loading the document, and leaves scroll and
+    //   focus to the router.  Left to the browser, an intercepted push or
+    //   replace scrolls to the top and moves focus to <body> once the handler
+    //   settles — also for `setSearchParams()`, where the router deliberately
+    //   leaves the reader where they are — and would repeat what the router's
+    //   own ScrollManager and FocusManager already did.  That matches the
+    //   History API adapter, where the browser does neither.
+    // - A traversal (back, forward) or a reload.  The router has no other way
+    //   to learn of them, so the adapter publishes the destination to its
+    //   subscribers and keeps the browser's scroll and focus defaults.
+    //
+    // A push or replace the router did not start — a plain `<a>`, a form, a
+    // `location.assign()` — is not intercepted: the browser loads it as a
+    // document, as it does under the History API adapter.  Intercepting it
+    // without telling the router would change the URL and leave the old page
+    // on screen.
+    //
+    // The intercept handler hands the browser the router's in-flight load
+    // (tracked via trackLoad below), so native loading UI reflects the
+    // navigation.  It reads trackedLoad at call time — the router tracks the
+    // load synchronously during the navigate event (via publish() here, or
+    // right after its own navigation.navigate() call), and intercept handlers
+    // run on a later microtask.  A failed load still commits router state, so
+    // the handler never rejects — it must not mark the browser navigation as
+    // failed.
+    const waitForTrackedLoad = () =>
+      Promise.resolve(trackedLoad).then(
+        () => undefined,
+        ignoreNavigationTransitionError,
+      );
 
-    // A traversal or reload is published at its destination: inside the
-    // navigate event the browser has not committed the new URL yet, so
-    // `location.href` still names the entry being left.
-    if (
-      event.navigationType === "traverse" ||
-      event.navigationType === "reload"
-    ) {
-      publish(new URL(event.destination.url));
+    if (navigatingForRouter) {
+      event.intercept({
+        handler: waitForTrackedLoad,
+        focusReset: "manual",
+        scroll: "manual",
+      });
+      return;
     }
+
+    if (
+      event.navigationType !== "traverse" &&
+      event.navigationType !== "reload"
+    ) {
+      return;
+    }
+
+    event.intercept({ handler: waitForTrackedLoad });
+
+    // Inside the navigate event the browser has not committed the new URL
+    // yet, so `location.href` still names the entry being left: publish the
+    // destination instead.
+    publish(new URL(event.destination.url));
   }
 
   return {
