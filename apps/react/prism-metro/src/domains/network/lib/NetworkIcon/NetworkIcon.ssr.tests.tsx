@@ -6,8 +6,8 @@ import NetworkIcon from "./NetworkIcon.js";
 
 describe("NetworkIcon SSR", () => {
   it("renders without hydration errors", () => {
-    const html = renderToString(<NetworkIcon>Test content</NetworkIcon>);
-    expect(html).toContain("Test content");
-    expect(html).toContain("ds network-icon");
+    const html = renderToString(<NetworkIcon />);
+    expect(html).toContain('class="ds network-icon"');
+    expect(html).toContain('aria-hidden="true"');
   });
 });

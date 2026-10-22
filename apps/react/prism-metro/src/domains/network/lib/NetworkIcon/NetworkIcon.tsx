@@ -6,21 +6,37 @@ import "./styles.css";
 
 const componentCssClassName = "ds network-icon";
 
+/** The glyph's width and height when no size is given, in pixels. */
+const DEFAULT_SIZE = 16;
+
 /**
- * NetworkIcon component
+ * The network lens's rail glyph: two lines crossing at a station, a 16-unit
+ * stroke drawing in `currentColor`, rendered `size` pixels square.
+ *
+ * It is always `aria-hidden`: the rail entry's visible label names it.
+ *
+ * `import { NetworkIcon } from "./NetworkIcon/index.js";`
  */
 const NetworkIcon = ({
   className,
-  children,
+  size = DEFAULT_SIZE,
   ...props
 }: NetworkIconProps): React.ReactElement => {
   return (
-    <div
+    <svg
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       {...props}
+      aria-hidden="true"
+      fill="none"
+      height={size}
+      stroke="currentColor"
+      strokeWidth={1.6}
+      viewBox="0 0 16 16"
+      width={size}
     >
-      {children}
-    </div>
+      <path d="M2 4h5l6 8h1M2 12h4l6-8h2" />
+      <circle cx="9" cy="8" r="1.5" />
+    </svg>
   );
 };
 
