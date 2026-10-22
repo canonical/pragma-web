@@ -428,7 +428,7 @@ describe("server matrix (2×3) serves correctly", () => {
             // the figure can never flatter the graph. Both sides derive
             // from THIS response, with no pinned graph counts: the
             // abstract tally is read off the well's own abstract nodes.
-            const statusCaption = /<figcaption>([\s\S]*?)<\/figcaption>/
+            const statusCaption = /<figcaption class="caption">([\s\S]*?)<\/figcaption>/
               .exec(definitionsTermHtml)?.[1]
               ?.replaceAll("<!-- -->", "");
             const abstractNodeCount = (
