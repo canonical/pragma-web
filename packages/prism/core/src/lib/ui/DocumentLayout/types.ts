@@ -8,8 +8,9 @@ type OwnProps = {
   /** The lens's mode strip, rendered in the strip row; none when omitted. */
   readonly strip?: ReactNode;
   /**
-   * Content beside the page, in the last three columns of the body; no
-   * aside region when omitted or when it renders nothing.
+   * Content beside the page, such as a table of contents: the canvas's
+   * aside, in the last three columns of the body and inside the canvas's
+   * scroll; no aside when omitted or when it renders nothing.
    */
   readonly aside?: ReactNode;
   /**

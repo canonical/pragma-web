@@ -27,9 +27,9 @@ describe("DocumentLayout", () => {
     expect(document.querySelector(":scope > .strip")?.textContent).toBe(
       "Strip content",
     );
-    expect(document.querySelector(":scope > .aside")?.textContent).toBe(
-      "Aside content",
-    );
+    expect(
+      screen.getByRole("main").querySelector(":scope > .aside")?.textContent,
+    ).toBe("Aside content");
     expect(document.querySelector(":scope > .colophon")?.textContent).toBe(
       "Colophon",
     );
@@ -47,15 +47,32 @@ describe("DocumentLayout", () => {
     expect(canvas?.textContent).toBe("Routed page");
   });
 
+  it("puts the aside inside the canvas, so it is part of the canvas's scroll", () => {
+    render(
+      <DocumentLayout
+        aside={<p>Aside content</p>}
+        data-testid="document"
+        rail={null}
+      >
+        <p>Routed page</p>
+      </DocumentLayout>,
+    );
+    const aside = screen.getByText("Aside content").parentElement;
+    expect(aside?.className).toBe("aside");
+    expect(aside?.parentElement).toBe(screen.getByRole("main"));
+    expect(
+      screen.getByTestId("document").querySelector(":scope > .aside"),
+    ).toBeNull();
+  });
+
   it("renders no aside and no colophon region when given neither", () => {
     render(
       <DocumentLayout data-testid="document" rail={null}>
         <p>Routed page</p>
       </DocumentLayout>,
     );
-    const document = screen.getByTestId("document");
-    expect(document.querySelector(":scope > .aside")).toBeNull();
-    expect(document.querySelector(":scope > .colophon")).toBeNull();
+    expect(document.querySelector(".aside")).toBeNull();
+    expect(document.querySelector(".colophon")).toBeNull();
   });
 
   it.each([

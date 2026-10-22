@@ -34,51 +34,16 @@
     gap: var(--document-layout-gap);
   }
 
-  /* The one region that scrolls the document. */
+  /* The one region that scrolls the document, the aside included. */
   .ds.document-layout > .canvas {
     grid-column: 3 / -1;
     grid-row: 2;
     overflow: auto;
   }
 
-  /* The aside holds the last three columns of the body, at the viewport's
-   * height, and scrolls on its own. */
-  .ds.document-layout > .aside {
-    grid-column: -4 / -1;
-    grid-row: 2;
-    overflow-y: auto;
-    min-block-size: 0;
-  }
-
   .ds.document-layout > .colophon {
     grid-column: 3 / -1;
     grid-row: 3;
-  }
-
-  /* With an aside the canvas stops where the aside starts. */
-  .ds.document-layout:has(> .aside) > .canvas {
-    grid-column: 3 / -4;
-  }
-
-  /* Below two groups the aside takes a row of its own under the canvas,
-   * and the two share the free height. */
-  @container shell (width < 912px) {
-    .ds.document-layout:has(> .aside) {
-      grid-template-rows: min-content minmax(0, 1fr) minmax(0, 1fr) min-content;
-    }
-
-    .ds.document-layout:has(> .aside) > .canvas {
-      grid-column: 3 / -1;
-    }
-
-    .ds.document-layout > .aside {
-      grid-column: 3 / -1;
-      grid-row: 3;
-    }
-
-    .ds.document-layout:has(> .aside) > .colophon {
-      grid-row: 4;
-    }
   }
 
   /* Below one group the rail spans a single column, and every other
@@ -90,8 +55,6 @@
 
     .ds.document-layout > .strip,
     .ds.document-layout > .canvas,
-    .ds.document-layout:has(> .aside) > .canvas,
-    .ds.document-layout > .aside,
     .ds.document-layout > .colophon {
       grid-column: 2 / -1;
     }

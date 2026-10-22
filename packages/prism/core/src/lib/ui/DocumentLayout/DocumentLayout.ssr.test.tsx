@@ -21,7 +21,9 @@ describe("DocumentLayout SSR", () => {
     );
     expect(html).toContain('<div class="strip"></div>');
     expect(html).toContain('<main class="ds canvas canvas"');
-    expect(html).toContain('<div class="aside"><p>Aside content</p></div>');
+    expect(html).toContain(
+      '<div class="page"><p>Routed page</p></div><div class="aside"><p>Aside content</p></div></main>',
+    );
     expect(html).toContain(
       '<div class="colophon"><footer>Colophon</footer></div>',
     );

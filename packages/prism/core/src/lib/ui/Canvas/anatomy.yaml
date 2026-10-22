@@ -11,6 +11,16 @@
 # grids set the grid's gutter as their gap on both axes, through
 # `--canvas-gap`.
 #
+# An optional `aside` sits beside the page in the canvas's last three columns
+# and is part of the canvas's scroll, never a scroller of its own: it holds
+# its place at the top of the scroll (`position: sticky`, top 0).
+#
+# Reflow, bound in styles.css:
+#   `.ds.canvas:has(> .aside)` the rows follow their content (`auto`), so the
+#     aside's sticky range is the whole scroll, and the page spans 1 / -4.
+#   @container shell (width < 912px)   below two groups: the page spans
+#     1 / -1, and the aside takes row 2 under it, static.
+#
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: prism.component.canvas
@@ -37,3 +47,13 @@ node:
               role: routed page
             relation: { cardinality: "1", slotName: default }
       relation: { cardinality: "1", slotName: page }
+    - node:
+        role: aside region
+        styles:
+          layout.grid.column: "-4 / -1"
+          layout.grid.row: "1"
+          layout.alignSelf: start
+          layout.position: sticky
+          layout.offset.top: 0
+          size.min.width: 0
+      relation: { cardinality: "0..1", slotName: aside }

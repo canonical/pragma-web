@@ -11,18 +11,18 @@ const componentCssClassName = "ds document-layout";
 
 /**
  * The document archetype: a page whose one scrolling region is its canvas.
- * It is a subgrid of the shell's grid over every column, in three rows: the
- * strip row, the body row and the colophon row. The rail takes the first
- * two columns of every row and scrolls on its own; the strip and the
- * colophon span the rest of their rows; the canvas fills the body and
- * scrolls; and an aside, when there is one, holds the last three columns
- * of the body at the viewport's height and scrolls on its own.
+ * It is a subgrid of the shell's grid over every column, in three rows one
+ * gutter apart: the strip row, the body row and the colophon row. The rail
+ * takes the first two columns of every row and scrolls on its own; the
+ * strip and the colophon span the rest of their rows; and the canvas fills
+ * the body and scrolls. An aside, when there is one, is the canvas's own
+ * (see `Canvas`): it holds the canvas's last three columns inside the same
+ * scroll, at the top of it, and takes a row under the page below two groups
+ * of columns.
  *
- * Below two groups of columns the aside takes a row of its own under the
- * canvas, the two sharing the free height; below one group the rail
- * narrows to one column. Both are container queries on the shell. An aside
- * or a colophon that renders nothing (`null`, a boolean or the empty
- * string) leaves no region.
+ * Below one group of columns the rail narrows to one column, a container
+ * query on the shell. An aside or a colophon that renders nothing (`null`,
+ * a boolean or the empty string) leaves no region.
  *
  * `import { DocumentLayout } from "@canonical/prism-core";`
  *
@@ -45,8 +45,9 @@ export default function DocumentLayout({
       <CanvasSkipLink />
       <div className="rail">{rail}</div>
       <div className="strip">{strip}</div>
-      <Canvas className="canvas">{children}</Canvas>
-      {isRenderedNode(aside) ? <div className="aside">{aside}</div> : null}
+      <Canvas aside={aside} className="canvas">
+        {children}
+      </Canvas>
       {isRenderedNode(colophon) ? (
         <div className="colophon">{colophon}</div>
       ) : null}

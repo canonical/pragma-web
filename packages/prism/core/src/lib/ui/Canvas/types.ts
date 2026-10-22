@@ -5,11 +5,18 @@ import type { ComponentProps, ReactNode } from "react";
 type OwnProps = {
   /** The routed page, which the canvas holds in its full-width page wrapper. */
   readonly children?: ReactNode;
+  /**
+   * Content beside the page, such as a table of contents: the last three
+   * columns of the canvas, held in place at the top of the canvas's scroll,
+   * and a row of its own under the page below two groups of columns. No
+   * aside when omitted or when it renders nothing.
+   */
+  readonly aside?: ReactNode;
 };
 
 /**
- * Props accepted by `Canvas`: the page it holds, and the native props of its
- * `<main>` root.
+ * Props accepted by `Canvas`: the page it holds, the aside beside it, and the
+ * native props of its `<main>` root.
  *
  * The native `id` and `tabIndex` are excluded because the canvas fixes both:
  * the id is `CANVAS_ELEMENT_ID`, the skip link's target, and `tabIndex` is
