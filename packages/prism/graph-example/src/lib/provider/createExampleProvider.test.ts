@@ -1,8 +1,10 @@
 import { type ExecutionResult, graphql } from "graphql";
 import { beforeAll, describe, expect, it } from "vitest";
+import { assertPresent } from "../../testing/assertPresent.js";
 import { toCursor } from "./connection.js";
 import {
   CALL_CLASS_URI,
+  CAR_POSITION_CLASS_URI,
   DIAGRAM_POINT_CLASS_URI,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
@@ -16,6 +18,7 @@ import {
   MULTILINGUAL_ENTITY_URI,
   SECOND_NAMESPACE_ENTITY_URI,
 } from "./dataset.js";
+import { isNetworkEntity } from "./isNetworkEntity.js";
 import type { ExampleDataset } from "./types.js";
 
 const provider = createExampleProvider();
@@ -77,11 +80,15 @@ describe("the schema", () => {
       )
       .map((type) => type.name)
       .sort();
+    // The network's four types and the fleet's car types and units, which
+    // are Nodes so a client can address each one by its IRI.
     expect(names).toEqual([
+      "CarType",
       "Interchange",
       "Line",
       "OntologyClass",
       "Station",
+      "Unit",
       "Zone",
     ]);
   });
@@ -303,6 +310,18 @@ describe("OntologyClass.instances", () => {
     expect(data.interchange).toEqual({ instanceCount: 4 });
     // North, Circle and Coastal, plus Upland, Lowland and the two Ringways.
     expect(data.line).toEqual({ instanceCount: 7 });
+  });
+
+  it("counts the fleet's car types and units", async () => {
+    const data = await run(`{
+      carType: ontologyClass(uri: "metro:CarType") { instanceCount }
+      unit: ontologyClass(uri: "metro:Unit") { instanceCount }
+    }`);
+    // Driving, motor and trailer cars of Series 70; driving and trailer
+    // cars of Series 90 and of Series 50.
+    expect(data.carType).toEqual({ instanceCount: 7 });
+    // One unit per series: 70, 90 and 50.
+    expect(data.unit).toEqual({ instanceCount: 3 });
   });
 
   it("counts nothing for a class with no ABox members", async () => {
@@ -999,6 +1018,148 @@ describe("Stop.diagramPosition", () => {
   });
 });
 
+/** The part of a `_meta` selection the field round-trip reads. */
+interface PublishedFields {
+  readonly fields?: readonly { readonly name: string }[];
+  readonly field?: { readonly name: string } | null;
+}
+
+/** Reads `_meta` straight off a node. */
+const readNodeMeta = (node: unknown): PublishedFields =>
+  (node as { _meta: PublishedFields })._meta;
+
+/** Selects `_meta` straight on a node. */
+const selectOnNode = (meta: string): string => meta;
+
+/**
+ * Read every name a value's `_meta.fields` publishes, and pass each one back
+ * through `_meta.field(name:)`: every published name must answer with
+ * itself. `selection` places the `_meta` selection on the value under the
+ * node, and `readMeta` reads it back.
+ */
+const expectFieldsRoundTrip = async (
+  uri: string,
+  selection: (meta: string) => string,
+  readMeta: (node: unknown) => PublishedFields,
+): Promise<void> => {
+  const listed = await run(
+    `{ node(id: "${uri}") { ${selection("_meta { fields { name } }")} } }`,
+  );
+  const names = (readMeta(listed.node).fields ?? []).map((field) => field.name);
+  expect(names.length).toBeGreaterThan(0);
+  for (const name of names) {
+    const roundTrip = await run(
+      `{ node(id: "${uri}") { ${selection(`_meta { field(name: "${name}") { name } }`)} } }`,
+    );
+    expect(readMeta(roundTrip.node).field).toEqual({ name });
+  }
+};
+
+describe("CarType", () => {
+  const DRIVING_CAR = "https://metro.example/onto#car-90-driving";
+
+  it("serves its code, its cab and its measures", async () => {
+    const data = await run(`{
+      node(id: "${DRIVING_CAR}") {
+        __typename
+        ... on CarType { name code hasCab length capacity }
+      }
+    }`);
+    expect(data.node).toEqual({
+      __typename: "CarType",
+      name: "Series 90 driving motor car",
+      code: "DM",
+      hasCab: true,
+      length: 20000,
+      capacity: 160,
+    });
+  });
+
+  it("publishes its fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(DRIVING_CAR, selectOnNode, readNodeMeta);
+  });
+});
+
+describe("Unit.cars", () => {
+  const UNIT_90 = "https://metro.example/onto#unit-90";
+
+  it("numbers the cars from the front, each with its car type and its way round", async () => {
+    const data = await run(`{
+      node(id: "${UNIT_90}") {
+        ... on Unit { cars { position reversed carType { uri code } } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      cars: [
+        {
+          position: 1,
+          reversed: false,
+          carType: {
+            uri: "https://metro.example/onto#car-90-driving",
+            code: "DM",
+          },
+        },
+        {
+          position: 2,
+          reversed: false,
+          carType: {
+            uri: "https://metro.example/onto#car-90-trailer",
+            code: "T",
+          },
+        },
+        {
+          position: 3,
+          reversed: true,
+          carType: {
+            uri: "https://metro.example/onto#car-90-driving",
+            code: "DM",
+          },
+        },
+      ],
+    });
+  });
+
+  it("measures the unit as the sum of its cars' car types", async () => {
+    // 20000 + 20000 + 20000 mm, and 160 + 170 + 160 passengers.
+    const data = await run(`{
+      node(id: "${UNIT_90}") { ... on Unit { length capacity } }
+    }`);
+    expect(data.node).toEqual({ length: 60000, capacity: 490 });
+  });
+
+  it("describes a car position as a value of the CarPosition class", async () => {
+    const data = await run(`{
+      node(id: "${UNIT_90}") {
+        ... on Unit { cars { _meta { title curie type { uri } } } }
+      }
+    }`);
+    const car = (
+      data.node as { cars: { _meta: Record<string, unknown> }[] }
+    ).cars.at(0);
+    expect(car?._meta).toEqual({
+      title: "CarPosition",
+      curie: "CarPosition",
+      type: { uri: CAR_POSITION_CLASS_URI },
+    });
+  });
+
+  it("publishes the unit's fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(UNIT_90, selectOnNode, readNodeMeta);
+  });
+
+  it("publishes a car position's fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(
+      UNIT_90,
+      (meta) => `... on Unit { cars { ${meta} } }`,
+      (node) =>
+        assertPresent(
+          (node as { cars: { _meta: PublishedFields }[] }).cars.at(0),
+          "the unit has no car",
+        )._meta,
+    );
+  });
+});
+
 describe("defensive paths, exercised with purpose-built datasets", () => {
   const cls = {
     uri: "urn:C",
@@ -1350,6 +1511,80 @@ describe("defensive paths, exercised with purpose-built datasets", () => {
     });
   });
 
+  const carPositionClass = {
+    uri: CAR_POSITION_CLASS_URI,
+    isAbstract: false,
+    properties: [],
+  } as const;
+  const trailer = {
+    uri: "urn:trailer",
+    type: "urn:C",
+    typename: "CarType",
+    code: "T",
+    hasCab: false,
+    length: 15000,
+    capacity: 120,
+  } as const;
+  const unitQuery = `{ node(id: "urn:unit") {
+    ... on Unit { length capacity cars { position reversed carType { uri } } }
+  } }`;
+
+  it("serves no car positions when the CarPosition class is not declared", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls],
+        properties: [],
+        entities: [
+          trailer,
+          {
+            uri: "urn:unit",
+            type: "urn:C",
+            typename: "Unit",
+            cars: [{ carType: "urn:trailer", reversed: false }],
+          },
+        ],
+      },
+      unitQuery,
+    );
+    // The measures still count the car: only its position cannot be served.
+    expect(data.node).toEqual({ length: 15000, capacity: 120, cars: [] });
+  });
+
+  it("drops a car whose car type is missing or of another type, numbering the rest without a gap", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, carPositionClass],
+        properties: [],
+        entities: [
+          trailer,
+          { uri: "urn:station", type: "urn:C", typename: "Station" },
+          {
+            uri: "urn:unit",
+            type: "urn:C",
+            typename: "Unit",
+            cars: [
+              { carType: "urn:trailer", reversed: false },
+              { carType: "urn:gone", reversed: false },
+              { carType: "urn:station", reversed: false },
+              { carType: "urn:trailer", reversed: true },
+            ],
+          },
+        ],
+      },
+      unitQuery,
+    );
+    expect(data.node).toEqual({
+      length: 30000,
+      capacity: 240,
+      cars: [
+        { position: 1, reversed: false, carType: { uri: "urn:trailer" } },
+        { position: 2, reversed: true, carType: { uri: "urn:trailer" } },
+      ],
+    });
+  });
+
   it("leaves an IRI whose scheme is not a declared prefix alone", async () => {
     const data = await runWith(
       {
@@ -1384,9 +1619,9 @@ describe("the shipped dataset", () => {
     }
   });
 
-  const lines = exampleDataset.entities.filter(
-    (entity) => entity.typename === "Line",
-  );
+  const lines = exampleDataset.entities
+    .filter(isNetworkEntity)
+    .filter((entity) => entity.typename === "Line");
 
   it("gives every line a unique code and a unique lowercase hex colour", () => {
     // The SDL makes both non-null, and the type cannot: a Line without them
@@ -1409,6 +1644,38 @@ describe("the shipped dataset", () => {
           expect(byKey.get(route.reverse)?.reverse).toBe(route.key);
         }
       }
+    }
+  });
+});
+
+describe("the shipped fleet", () => {
+  const carTypeUris = new Set(
+    exampleDataset.entities
+      .filter((entity) => entity.typename === "CarType")
+      .map((entity) => entity.uri),
+  );
+
+  it("names a car type for every car of every unit", () => {
+    const units = exampleDataset.entities.flatMap((entity) =>
+      entity.typename === "Unit" ? [entity] : [],
+    );
+    expect(units.length).toBeGreaterThan(0);
+    for (const unit of units) {
+      expect(unit.cars.length, unit.uri).toBeGreaterThan(0);
+      for (const car of unit.cars) {
+        expect(carTypeUris, unit.uri).toContain(car.carType);
+      }
+    }
+  });
+
+  it("gives every car type a positive length and capacity", () => {
+    const carTypes = exampleDataset.entities.flatMap((entity) =>
+      entity.typename === "CarType" ? [entity] : [],
+    );
+    expect(carTypes.length).toBeGreaterThan(0);
+    for (const carType of carTypes) {
+      expect(carType.length, carType.uri).toBeGreaterThan(0);
+      expect(carType.capacity, carType.uri).toBeGreaterThan(0);
     }
   });
 });

@@ -44,6 +44,23 @@ export const DIAGRAM_POINT_CLASS_URI = `${METRO_NAMESPACE}DiagramPoint`;
 /** The position of a route's first call. Positions count up from here with no gaps. */
 export const FIRST_CALL_POSITION = 1;
 
+/** The class one car in a unit, at its place in the order, is an instance of. */
+export const CAR_POSITION_CLASS_URI = `${METRO_NAMESPACE}CarPosition`;
+
+/** The position of a unit's first car, at its front. Positions count up from here with no gaps. */
+export const FIRST_CAR_POSITION = 1;
+
+/**
+ * The GraphQL type names of the network's records: lines, stations,
+ * interchanges and fare zones. Every other record belongs to the fleet.
+ */
+export const NETWORK_TYPENAMES: ReadonlySet<string> = new Set([
+  "Line",
+  "Station",
+  "Interchange",
+  "Zone",
+]);
+
 /** Language `EntityMeta`'s arguments default to, per the contract SDL. */
 export const DEFAULT_LANG = "en";
 

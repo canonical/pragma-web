@@ -93,16 +93,20 @@ export interface ExampleRoute {
   readonly reverse?: string;
 }
 
-/** One instance-level record. */
-export interface ExampleEntity {
+/** What every instance-level record carries, whatever its type. */
+export interface ExampleEntityBase {
   readonly uri: string;
   /** IRI of this entity's class. Non-optional: EntityMeta.type is non-null. */
   readonly type: string;
-  /** GraphQL type name — what `defaultTypeResolver` reads off the view. */
-  readonly typename: "Line" | "Station" | "Interchange" | "Zone";
   readonly labels?: LangMap;
   readonly comments?: LangMap;
   readonly definitions?: LangMap;
+}
+
+/** A line, a station, an interchange or a fare zone: the network's records. */
+export interface ExampleNetworkEntity extends ExampleEntityBase {
+  /** GraphQL type name — what `defaultTypeResolver` reads off the view. */
+  readonly typename: "Line" | "Station" | "Interchange" | "Zone";
   readonly platformCount?: number;
   readonly transferMinutes?: number;
   readonly location?: ExampleGeoPoint;
@@ -125,6 +129,49 @@ export interface ExampleEntity {
   /** Where a routed station sits on the schematic network diagram. */
   readonly diagramPosition?: ExampleDiagramPoint;
 }
+
+/**
+ * How long a vehicle is and how many it carries. Lengths are whole
+ * millimetres, measured over couplers so they add up without gaps, and
+ * capacity counts passengers seated plus standing.
+ */
+export interface ExampleMeasures {
+  readonly length: number;
+  readonly capacity: number;
+}
+
+/** A kind of car: its code, whether it has a driving cab, and its measures. */
+export interface ExampleCarType extends ExampleEntityBase, ExampleMeasures {
+  readonly typename: "CarType";
+  /** The short code the car type is known by ("DM", "T"). */
+  readonly code: string;
+  /** True when the car has a driving cab at its leading end. */
+  readonly hasCab: boolean;
+}
+
+/** One car in a unit: the car type it is, and which way round it runs. */
+export interface ExampleCarPlacement {
+  /** IRI of the car type. */
+  readonly carType: string;
+  /** True when the car's leading end faces the rear of its unit. */
+  readonly reversed: boolean;
+}
+
+/**
+ * A set of cars permanently coupled in order. Its measures are its car
+ * types' sums, computed by the provider rather than stored.
+ */
+export interface ExampleUnit extends ExampleEntityBase {
+  readonly typename: "Unit";
+  /** The unit's cars, from its front. */
+  readonly cars: readonly ExampleCarPlacement[];
+}
+
+/**
+ * One instance-level record, discriminated by its GraphQL type name so each
+ * type's required fields are required by the compiler.
+ */
+export type ExampleEntity = ExampleNetworkEntity | ExampleCarType | ExampleUnit;
 
 /** The whole dataset: a TBox and an ABox. */
 export interface ExampleDataset {

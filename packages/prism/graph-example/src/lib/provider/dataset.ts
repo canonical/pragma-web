@@ -17,6 +17,7 @@
 
 import {
   CALL_CLASS_URI,
+  CAR_POSITION_CLASS_URI,
   DIAGRAM_POINT_CLASS_URI,
   GEO_NAMESPACE,
   GEO_PREFIX,
@@ -35,6 +36,8 @@ const INTERCHANGE = `${METRO_NAMESPACE}Interchange`;
 const LINE = `${METRO_NAMESPACE}Line`;
 const GEO_POINT = `${GEO_NAMESPACE}GeoPoint`;
 const ZONE = `${GEO_NAMESPACE}Zone`;
+const UNIT = `${METRO_NAMESPACE}Unit`;
+const CAR_TYPE = `${METRO_NAMESPACE}CarType`;
 
 const NAME = `${METRO_NAMESPACE}name`;
 const NOTE = `${METRO_NAMESPACE}note`;
@@ -58,6 +61,12 @@ const CALL_STOP = `${METRO_NAMESPACE}stop`;
 const DIAGRAM_POSITION = `${METRO_NAMESPACE}diagramPosition`;
 const X = `${METRO_NAMESPACE}x`;
 const Y = `${METRO_NAMESPACE}y`;
+const LENGTH = `${METRO_NAMESPACE}length`;
+const CAPACITY = `${METRO_NAMESPACE}capacity`;
+const REVERSED = `${METRO_NAMESPACE}reversed`;
+const CARS = `${METRO_NAMESPACE}cars`;
+const HAS_CAB = `${METRO_NAMESPACE}hasCab`;
+const CAR_TYPE_PROPERTY = `${METRO_NAMESPACE}carType`;
 
 /** IRI of the entity carrying no descriptive predicates whatsoever. */
 export const BARE_ENTITY_URI = `${METRO_NAMESPACE}ghost`;
@@ -180,6 +189,51 @@ export const exampleDataset: ExampleDataset = {
       properties: [
         { property: X, required: true, singular: true },
         { property: Y, required: true, singular: true },
+      ],
+    },
+    {
+      // The fleet's classes are roots, like metro:Line. A unit's measures
+      // are its car types' sums, computed by the provider, so the TBox
+      // declares them while the ABox stores them only on car types.
+      uri: UNIT,
+      labels: { "": "Unit" },
+      definitions: {
+        "": "A set of cars permanently coupled in order, which runs on its own.",
+      },
+      isAbstract: false,
+      properties: [
+        { property: NAME, required: true, singular: true },
+        { property: CARS, required: true, singular: false },
+        { property: LENGTH, required: true, singular: true },
+        { property: CAPACITY, required: true, singular: true },
+      ],
+    },
+    {
+      uri: CAR_TYPE,
+      labels: { "": "Car type" },
+      definitions: {
+        "": "A kind of car: its code, whether it has a driving cab, its length and how many it carries.",
+      },
+      isAbstract: false,
+      properties: [
+        { property: NAME, required: true, singular: true },
+        { property: CODE, required: true, singular: true },
+        { property: HAS_CAB, required: true, singular: true },
+        { property: LENGTH, required: true, singular: true },
+        { property: CAPACITY, required: true, singular: true },
+      ],
+    },
+    {
+      // A value class, like metro:Call: a car's place exists only within
+      // its unit.
+      uri: CAR_POSITION_CLASS_URI,
+      labels: { "": "Car position" },
+      definitions: { "": "One car in a unit, at its place in the order." },
+      isAbstract: false,
+      properties: [
+        { property: POSITION, required: true, singular: true },
+        { property: CAR_TYPE_PROPERTY, required: true, singular: true },
+        { property: REVERSED, required: true, singular: true },
       ],
     },
     {
@@ -314,10 +368,11 @@ export const exampleDataset: ExampleDataset = {
       functional: false,
     },
     {
+      // Global: a line and a car type both answer to a `code` field, and a
+      // property's local name is the field it projects.
       uri: CODE,
       labels: { "": "code" },
-      definitions: { "": "The short code passengers know the line by." },
-      domain: LINE,
+      definitions: { "": "The short code a line or a car type is known by." },
       range: "String",
       kind: "DATATYPE",
       functional: true,
@@ -369,9 +424,10 @@ export const exampleDataset: ExampleDataset = {
       inverse: REVERSE,
     },
     {
+      // Global: calls and car positions both answer to a `position` field.
       uri: POSITION,
       labels: { "": "position" },
-      domain: CALL_CLASS_URI,
+      definitions: { "": "A place in an ordered list, counted from 1." },
       range: "Int",
       kind: "DATATYPE",
       functional: true,
@@ -408,6 +464,64 @@ export const exampleDataset: ExampleDataset = {
       domain: DIAGRAM_POINT_CLASS_URI,
       range: "Int",
       kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      // Global, like metro:position: units and car types both measure a
+      // length.
+      uri: LENGTH,
+      labels: { "": "length" },
+      definitions: {
+        "": "A length in whole millimetres, measured over couplers.",
+      },
+      range: "Int",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: CAPACITY,
+      labels: { "": "capacity" },
+      definitions: { "": "The passengers carried, seated plus standing." },
+      range: "Int",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: REVERSED,
+      labels: { "": "reversed" },
+      definitions: {
+        "": "True when a car or a unit runs the other way round in its place.",
+      },
+      range: "Boolean",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: CARS,
+      labels: { "": "cars" },
+      definitions: { "": "The cars of a unit, from its front." },
+      domain: UNIT,
+      range: "metro:CarPosition",
+      kind: "OBJECT",
+      functional: false,
+    },
+    {
+      uri: HAS_CAB,
+      labels: { "": "has cab" },
+      definitions: {
+        "": "True when the car has a driving cab at its leading end.",
+      },
+      domain: CAR_TYPE,
+      range: "Boolean",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: CAR_TYPE_PROPERTY,
+      labels: { "": "car type" },
+      domain: CAR_POSITION_CLASS_URI,
+      range: "metro:CarType",
+      kind: "OBJECT",
       functional: true,
     },
   ],
@@ -978,6 +1092,118 @@ export const exampleDataset: ExampleDataset = {
       servesLine: [
         `${METRO_NAMESPACE}upland-line`,
         `${METRO_NAMESPACE}lowland-line`,
+      ],
+    },
+
+    // The fleet. Car types carry the measures; a unit's are its cars' sums,
+    // computed by the provider, so no unit states a length or a capacity.
+    {
+      uri: `${METRO_NAMESPACE}car-70-driving`,
+      type: CAR_TYPE,
+      typename: "CarType",
+      labels: { "": "Series 70 driving motor car" },
+      code: "DM",
+      hasCab: true,
+      length: 18400,
+      capacity: 140,
+    },
+    {
+      uri: `${METRO_NAMESPACE}car-70-motor`,
+      type: CAR_TYPE,
+      typename: "CarType",
+      labels: { "": "Series 70 motor car" },
+      code: "M",
+      hasCab: false,
+      length: 17600,
+      capacity: 150,
+    },
+    {
+      uri: `${METRO_NAMESPACE}car-70-trailer`,
+      type: CAR_TYPE,
+      typename: "CarType",
+      labels: { "": "Series 70 trailer car" },
+      code: "T",
+      hasCab: false,
+      length: 17600,
+      capacity: 150,
+    },
+    {
+      uri: `${METRO_NAMESPACE}car-90-driving`,
+      type: CAR_TYPE,
+      typename: "CarType",
+      labels: { "": "Series 90 driving motor car" },
+      code: "DM",
+      hasCab: true,
+      length: 20000,
+      capacity: 160,
+    },
+    {
+      uri: `${METRO_NAMESPACE}car-90-trailer`,
+      type: CAR_TYPE,
+      typename: "CarType",
+      labels: { "": "Series 90 trailer car" },
+      code: "T",
+      hasCab: false,
+      length: 20000,
+      capacity: 170,
+    },
+    {
+      uri: `${METRO_NAMESPACE}car-50-driving`,
+      type: CAR_TYPE,
+      typename: "CarType",
+      labels: { "": "Series 50 driving motor car" },
+      code: "DM",
+      hasCab: true,
+      length: 16000,
+      capacity: 110,
+    },
+    {
+      uri: `${METRO_NAMESPACE}car-50-trailer`,
+      type: CAR_TYPE,
+      typename: "CarType",
+      labels: { "": "Series 50 trailer car" },
+      code: "T",
+      hasCab: false,
+      length: 15000,
+      capacity: 120,
+    },
+    {
+      // A cab at each end: the rear driving car runs reversed, its cab
+      // facing outwards.
+      uri: `${METRO_NAMESPACE}unit-70`,
+      type: UNIT,
+      typename: "Unit",
+      labels: { "": "Series 70 unit" },
+      cars: [
+        { carType: `${METRO_NAMESPACE}car-70-driving`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-70-motor`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-70-trailer`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-70-trailer`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-70-motor`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-70-driving`, reversed: true },
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}unit-90`,
+      type: UNIT,
+      typename: "Unit",
+      labels: { "": "Series 90 unit" },
+      cars: [
+        { carType: `${METRO_NAMESPACE}car-90-driving`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-90-trailer`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-90-driving`, reversed: true },
+      ],
+    },
+    {
+      // Asymmetric: one cab, at the front. Two of these coupled back to back
+      // make a train with a cab at each end.
+      uri: `${METRO_NAMESPACE}unit-50`,
+      type: UNIT,
+      typename: "Unit",
+      labels: { "": "Series 50 unit" },
+      cars: [
+        { carType: `${METRO_NAMESPACE}car-50-driving`, reversed: false },
+        { carType: `${METRO_NAMESPACE}car-50-trailer`, reversed: false },
       ],
     },
   ],
