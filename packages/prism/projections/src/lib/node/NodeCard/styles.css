@@ -1,24 +1,29 @@
 /*
  * NodeCard — the card of any node: its title and its compact address.
  *
- * Each design decision reads a component token bound to a semantic token,
- * so a site retunes the card through either tier.
+ * Each design decision reads a component token declared on the card's root
+ * and bound to a semantic token, to the spacing shim, or to its own literal
+ * where no token exists, so a site retunes the card through either tier.
  */
 
 @layer ds.prism {
-  :root {
-    --node-card-gap: var(--space-050, 0.25rem);
-    --node-card-padding: var(--space-150, 0.75rem);
-    --node-card-border-width: var(--dimension-stroke-thickness-medium, 1px);
+  /* The gap between the title and its address is a `--space-*` step: the
+   * shim's container gaps are for layout containers, and no semantic name
+   * fits two lines of one entry. The border is a hairline: no stroke
+   * token exists, so it holds its own literal, `1px`. */
+  .ds.node-card {
+    --node-card-gap: var(--space-050);
+    --node-card-padding-block: var(--component-padding-block);
+    --node-card-padding-inline: var(--component-padding-inline);
+    --node-card-border-width: 1px;
     --node-card-color-border: var(--color-border-muted, currentColor);
     --node-card-location-color-text: var(--color-text-muted);
-  }
 
-  .ds.node-card {
     display: flex;
     flex-direction: column;
     gap: var(--node-card-gap);
-    padding: var(--node-card-padding);
+    padding-block: var(--node-card-padding-block);
+    padding-inline: var(--node-card-padding-inline);
     border: var(--node-card-border-width) solid var(--node-card-color-border);
   }
 
