@@ -117,18 +117,31 @@
       );
     }
 
+    /* Isolate the slotted content from this Chip's primary criticality channel.
+     * initial makes a neutral Badge fall back to the neutral primary surface;
+     * a critical Badge supplies its own generic channel on the Badge itself. */
+    & > .badge-slot {
+      --modifier-color-foreground-primary: initial;
+
+      display: contents;
+    }
+
     /* Context-specific styling for the public Badge slot. */
-    & .ds.badge {
-      /* Distinguish the default Badge surface from the Chip's secondary
-       * surface. Criticality channels and consumer overrides still win in
-       * Badge's own declarations. */
-      --badge-color-background: var(--color-foreground-primary);
+    & .badge-slot .ds.badge {
+      /* Own the local paint so the Chip's inherited secondary criticality
+       * channel cannot replace it. Consumer aliases remain overridable. */
+      --badge-color-background: var(
+        --modifier-color-foreground-primary,
+        var(--color-foreground-primary)
+      );
       --badge-color-text: var(--color-text-onForegroundPrimary);
 
       /* Pull the badge closer to the edge of a chip. */
       --badge-chip-margin-tweak: var(--dimension-025);
 
       align-self: baseline;
+      background-color: var(--badge-color-background);
+      color: var(--badge-color-text);
       margin-inline-start: var(--ds-spacing-mark);
       margin-inline-end: var(--badge-chip-margin-tweak);
     }

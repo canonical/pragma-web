@@ -1,6 +1,7 @@
 import { useRoute } from "@canonical/router-react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
+import { userEvent } from "storybook/test";
 import {
   machineTabsRoot,
   productTabsRoot,
@@ -196,6 +197,12 @@ export const StaticIndicators: Story = {
           aria-label="Static indicator API cases"
           navigationRoot={apiCoverageRoot}
         />
+        <p>
+          These are rendering and API examples, not additional geometry
+          configurations. The accessible name uses the visible shortened count
+          (for example, “Disabled 1.2M+”). The title also uses the shortened
+          count.
+        </p>
       </section>
     </main>
   ),
@@ -205,7 +212,8 @@ export const StaticIndicators: Story = {
     };
     const proofWindow = canvasElement.ownerDocument.defaultView as ProofWindow;
     const previous = proofWindow.__tabsBadgeProofQueue ?? Promise.resolve();
-    const current = previous.catch(() => undefined).then(async () => {
+    const settledPrevious = previous.catch(() => undefined);
+    const current = settledPrevious.then(async () => {
       const proofRoot = canvasElement.matches("main.tabs-indicator-proof")
         ? canvasElement
         : canvasElement.querySelector<HTMLElement>("main.tabs-indicator-proof");
@@ -216,10 +224,16 @@ export const StaticIndicators: Story = {
       delete proofRoot.dataset.tabsBadgePrimaryConfigurations;
       delete proofRoot.dataset.tabsBadgeCompatibilityObservations;
       delete proofRoot.dataset.tabsBadgeObservations;
+      delete proofRoot.dataset.tabsBadgeFixtureConformance;
 
       const documentRoot = canvasElement.ownerDocument.documentElement;
       const originalRootFontSize = documentRoot.style.fontSize;
+      const initialFocus =
+        canvasElement.ownerDocument.activeElement instanceof HTMLElement
+          ? canvasElement.ownerDocument.activeElement
+          : null;
       let mutationHost: HTMLElement | null = null;
+      let injectedChip: HTMLElement | null = null;
 
       const nextPaint = async (): Promise<void> => {
         await new Promise<void>((resolve) => {
@@ -246,6 +260,21 @@ export const StaticIndicators: Story = {
           throw new Error(`${label}: expected ${expected}, received ${actual}`);
         }
       };
+      const expectProofFailure = (proof: () => void, label: string): void => {
+        try {
+          proof();
+        } catch {
+          return;
+        }
+        throw new Error(`${label} mutation escaped its proof oracle`);
+      };
+      const assertFixtureContainsNoChip = (root: ParentNode): void => {
+        if (root.querySelector(".tabs .chip")) {
+          throw new Error(
+            "StaticIndicators fixture contains an unsupported Chip",
+          );
+        }
+      };
       const baseline = (element: HTMLElement, label: string): number => {
         const before = element.getBoundingClientRect();
         const marker = element.ownerDocument.createElement("span");
@@ -262,6 +291,72 @@ export const StaticIndicators: Story = {
         near(after.width, before.width, `${label} marker width`);
         near(after.height, before.height, `${label} marker height`);
         return value;
+      };
+      const assertTabBadgeBaseline = (
+        badge: HTMLElement,
+        label: HTMLElement,
+        proofLabel: string,
+      ): void => {
+        near(
+          baseline(badge, `${proofLabel} Badge`) -
+            baseline(label, `${proofLabel} label`),
+          0,
+          `${proofLabel} baseline`,
+        );
+      };
+      const assertTabBadgeFontSize = (
+        badge: HTMLElement,
+        rootSize: number,
+        proofLabel: string,
+      ): void => {
+        near(
+          px(
+            proofWindow.getComputedStyle(badge).fontSize,
+            `${proofLabel} Badge font size`,
+          ),
+          rootSize * 0.75,
+          `${proofLabel} Badge font size`,
+        );
+      };
+      const assertTabBadgeBodyLine = (
+        link: HTMLElement,
+        badge: HTMLElement,
+        proofLabel: string,
+      ): void => {
+        const linkStyle = proofWindow.getComputedStyle(link);
+        const linkRect = link.getBoundingClientRect();
+        const badgeRect = badge.getBoundingClientRect();
+        const lineStart =
+          linkRect.top +
+          px(linkStyle.paddingBlockStart, `${proofLabel} padding start`);
+        const lineEnd =
+          lineStart +
+          px(linkStyle.lineHeight, `${proofLabel} label line height`);
+        if (
+          badgeRect.top < lineStart - 0.5 ||
+          badgeRect.bottom > lineEnd + 0.5
+        ) {
+          throw new Error(`${proofLabel} Badge escapes the label body line`);
+        }
+      };
+      const assertTabBadgeClearance = (
+        link: HTMLElement,
+        badge: HTMLElement,
+        proofLabel: string,
+      ): void => {
+        const linkRect = link.getBoundingClientRect();
+        const badgeRect = badge.getBoundingClientRect();
+        const blockStartClearance = finite(
+          badgeRect.top - linkRect.top,
+          `${proofLabel} block-start clearance`,
+        );
+        const blockEndClearance = finite(
+          linkRect.bottom - badgeRect.bottom,
+          `${proofLabel} block-end clearance`,
+        );
+        if (blockStartClearance <= 0 || blockEndClearance <= 0) {
+          throw new Error(`${proofLabel} Badge touches the tab edge`);
+        }
       };
 
       try {
@@ -285,18 +380,15 @@ export const StaticIndicators: Story = {
                 );
                 const plainTabs = tabs?.item(0);
                 const badgeTabs = tabs?.item(1);
-                const plainLink = plainTabs?.querySelector<HTMLElement>(
-                  ".tabs-link",
-                );
-                const badgeLink = badgeTabs?.querySelector<HTMLElement>(
-                  ".tabs-link",
-                );
+                const plainLink =
+                  plainTabs?.querySelector<HTMLElement>(".tabs-link");
+                const badgeLink =
+                  badgeTabs?.querySelector<HTMLElement>(".tabs-link");
                 const badge = badgeLink?.querySelector<HTMLElement>(
                   ".tabs-indicator .badge",
                 );
-                const label = badgeLink?.querySelector<HTMLElement>(
-                  ".tabs-label",
-                );
+                const label =
+                  badgeLink?.querySelector<HTMLElement>(".tabs-label");
                 if (
                   !section ||
                   !plainTabs ||
@@ -311,7 +403,6 @@ export const StaticIndicators: Story = {
 
                 const plainLinkRect = plainLink.getBoundingClientRect();
                 const badgeLinkRect = badgeLink.getBoundingClientRect();
-                const badgeRect = badge.getBoundingClientRect();
                 const plainLinkStyle = proofWindow.getComputedStyle(plainLink);
                 near(
                   badgeLinkRect.height,
@@ -361,68 +452,32 @@ export const StaticIndicators: Story = {
                     );
                   }
                 }
+                assertTabBadgeBaseline(badge, label, id);
+                assertTabBadgeFontSize(badge, rootSize, id);
                 near(
-                  baseline(badge, `${id} Badge`) -
-                    baseline(label, `${id} label`),
-                  0,
-                  `${id} baseline`,
-                );
-
-                const badgeStyle = proofWindow.getComputedStyle(badge);
-                near(
-                  px(badgeStyle.fontSize, `${id} Badge font size`),
-                  rootSize * 0.75,
-                  `${id} Badge font size`,
-                );
-                near(
-                  px(badgeStyle.lineHeight, `${id} Badge line height`),
+                  px(
+                    proofWindow.getComputedStyle(badge).lineHeight,
+                    `${id} Badge line height`,
+                  ),
                   rootSize,
                   `${id} Badge line height`,
                 );
+                assertTabBadgeBodyLine(badgeLink, badge, id);
+                assertTabBadgeClearance(badgeLink, badge, id);
 
                 const linkStyle = proofWindow.getComputedStyle(badgeLink);
-                const lineStart =
-                  badgeLinkRect.top +
-                  px(linkStyle.paddingBlockStart, `${id} padding start`);
-                const lineEnd =
-                  lineStart + px(linkStyle.lineHeight, `${id} label line height`);
-                const blockStartClearance = finite(
-                  badgeRect.top - badgeLinkRect.top,
-                  `${id} block-start clearance`,
-                );
-                const blockEndClearance = finite(
-                  badgeLinkRect.bottom - badgeRect.bottom,
-                  `${id} block-end clearance`,
-                );
-                if (blockStartClearance <= 0 || blockEndClearance <= 0) {
-                  throw new Error(`${id} Badge touches the tab edge`);
-                }
-                if (
-                  badgeRect.top < lineStart - 0.5 ||
-                  badgeRect.bottom > lineEnd + 0.5
-                ) {
-                  throw new Error(`${id} Badge escapes the label body line`);
-                }
 
                 if (
                   badgeLink.hasAttribute("data-ds-density-provider") ||
                   badgeLink.hasAttribute("data-ds-density-policy-version") ||
-                  badgeLink.classList.contains("tabs-static-chip-provider-v1") ||
-                  linkStyle
-                    .getPropertyValue("--tabs-static-chip-inset")
-                    .trim()
+                  badgeLink.classList.contains(
+                    "tabs-static-chip-provider-v1",
+                  ) ||
+                  linkStyle.getPropertyValue("--tabs-static-chip-inset").trim()
                 ) {
                   throw new Error(`${id} exposes removed Tab density support`);
                 }
-                if (badgeLink.querySelector(".chip")) {
-                  throw new Error(`${id} contains an unsupported Chip`);
-                }
-
-                const beforeFocus = badgeLink.getBoundingClientRect();
-                badgeLink.focus();
-                const afterFocus = badgeLink.getBoundingClientRect();
-                near(afterFocus.width, beforeFocus.width, `${id} focus width`);
-                near(afterFocus.height, beforeFocus.height, `${id} focus height`);
+                assertFixtureContainsNoChip(badgeTabs);
               }
             }
           }
@@ -460,10 +515,138 @@ export const StaticIndicators: Story = {
               originalHeight,
               "restored Tabs Badge height",
             );
+            const badge = badgeLink.querySelector<HTMLElement>(".badge");
+            const label = badgeLink.querySelector<HTMLElement>(".tabs-label");
+            if (!badge || !label) {
+              throw new Error("missing Tabs Badge causal-oracle node");
+            }
+            const originalBadgeStyle = badge.getAttribute("style");
+            try {
+              badge.style.position = "relative";
+              badge.style.top = "-2px";
+              expectProofFailure(
+                () => assertTabBadgeBaseline(badge, label, "mutated"),
+                "Tabs Badge baseline",
+              );
+              badge.style.removeProperty("position");
+              badge.style.removeProperty("top");
+
+              badge.style.fontSize = "1rem";
+              expectProofFailure(
+                () => assertTabBadgeFontSize(badge, 16, "mutated"),
+                "Tabs Badge font size",
+              );
+              badge.style.removeProperty("font-size");
+
+              badge.style.transform = "translateY(-8px)";
+              expectProofFailure(
+                () => assertTabBadgeBodyLine(badgeLink, badge, "mutated"),
+                "Tabs Badge body line",
+              );
+              badge.style.removeProperty("transform");
+
+              badge.style.transform = "translateY(-100px)";
+              expectProofFailure(
+                () => assertTabBadgeClearance(badgeLink, badge, "mutated"),
+                "Tabs Badge edge clearance",
+              );
+            } finally {
+              if (originalBadgeStyle === null) badge.removeAttribute("style");
+              else badge.setAttribute("style", originalBadgeStyle);
+            }
+            assertTabBadgeBaseline(badge, label, "restored");
+            assertTabBadgeFontSize(badge, 16, "restored");
+            assertTabBadgeBodyLine(badgeLink, badge, "restored");
+            assertTabBadgeClearance(badgeLink, badge, "restored");
             mutationHost = null;
           }
         }
+        documentRoot.style.fontSize = "16px";
+        await nextPaint();
+        const focusLinks = proofRoot.querySelectorAll<HTMLElement>(
+          '[data-tabs-indicator-case="site-default-ltr"] .tabs-link',
+        );
+        const focusPlainLink = focusLinks.item(0);
+        const focusBadgeLink = focusLinks.item(1);
+        if (!focusPlainLink || !focusBadgeLink) {
+          throw new Error("missing representative keyboard focus fixture");
+        }
+        focusPlainLink.focus();
+        const beforeKeyboardFocus = focusBadgeLink.getBoundingClientRect();
+        await userEvent.tab();
+        await nextPaint();
+        if (canvasElement.ownerDocument.activeElement !== focusBadgeLink) {
+          throw new Error("keyboard Tab did not focus the Badge tab");
+        }
+        if (!focusBadgeLink.matches(":focus-visible")) {
+          throw new Error(
+            "keyboard-focused Badge tab does not match :focus-visible",
+          );
+        }
+        const focusStyle = proofWindow.getComputedStyle(focusBadgeLink);
+        const focusOutlineWidth = px(
+          focusStyle.outlineWidth,
+          "focus outline width",
+        );
+        const focusOutlineOffset = px(
+          focusStyle.outlineOffset,
+          "focus outline offset",
+        );
+        if (
+          focusStyle.outlineStyle === "none" ||
+          focusOutlineWidth <= 0 ||
+          focusOutlineOffset >= 0 ||
+          focusStyle.outlineColor === "transparent" ||
+          focusStyle.outlineColor === "rgba(0, 0, 0, 0)"
+        ) {
+          throw new Error(
+            "keyboard-focused Badge tab has no inward visible outline paint",
+          );
+        }
+        near(
+          focusOutlineOffset,
+          -focusOutlineWidth,
+          "focus outline inward offset",
+        );
+        const afterKeyboardFocus = focusBadgeLink.getBoundingClientRect();
+        near(
+          afterKeyboardFocus.width,
+          beforeKeyboardFocus.width,
+          "keyboard focus width",
+        );
+        near(
+          afterKeyboardFocus.height,
+          beforeKeyboardFocus.height,
+          "keyboard focus height",
+        );
+
+        const indicator =
+          focusBadgeLink.querySelector<HTMLElement>(".tabs-indicator");
+        if (!indicator) throw new Error("missing no-Chip fixture target");
+        injectedChip = canvasElement.ownerDocument.createElement("span");
+        injectedChip.className = "ds chip";
+        indicator.append(injectedChip);
+        expectProofFailure(
+          () => assertFixtureContainsNoChip(proofRoot),
+          "no-Chip fixture conformance",
+        );
+        injectedChip.remove();
+        injectedChip = null;
+        assertFixtureContainsNoChip(proofRoot);
+        proofRoot.dataset.tabsBadgeFixtureConformance = "passed";
       } finally {
+        injectedChip?.remove();
+        const activeElement = canvasElement.ownerDocument.activeElement;
+        if (activeElement instanceof HTMLElement) {
+          activeElement.blur();
+        }
+        if (
+          initialFocus?.isConnected &&
+          initialFocus !== canvasElement.ownerDocument.body &&
+          initialFocus !== canvasElement.ownerDocument.documentElement
+        ) {
+          initialFocus.focus();
+        }
         mutationHost?.style.removeProperty(
           "--_typography-indicator-line-height",
         );

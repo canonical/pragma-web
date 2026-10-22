@@ -2,8 +2,8 @@ import { Badge, Button, Chip } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Children,
-  cloneElement,
   type CSSProperties,
+  cloneElement,
   Fragment,
   isValidElement,
   type ReactNode,
@@ -1015,9 +1015,78 @@ function assertNear(
   tolerance = 0.1,
 ): void {
   if (!Number.isFinite(actual) || !Number.isFinite(expected))
-    throw new Error(`${label}: expected finite values, received ${actual} and ${expected}`);
+    throw new Error(
+      `${label}: expected finite values, received ${actual} and ${expected}`,
+    );
   if (Math.abs(actual - expected) > tolerance)
     throw new Error(`${label}: expected ${expected}, received ${actual}`);
+}
+
+function assertRenderedChipBadgeBaseline(
+  label: HTMLElement,
+  badge: HTMLElement,
+  proofLabel: string,
+): void {
+  assertNear(baseline(badge), baseline(label), `${proofLabel} Badge baseline`);
+}
+
+function assertRenderedChipBadgeFontSize(
+  badge: HTMLElement,
+  rootSize: number,
+  proofLabel: string,
+): void {
+  assertNear(
+    Number.parseFloat(getComputedStyle(badge).fontSize),
+    rootSize * 0.75,
+    `${proofLabel} Badge font size`,
+  );
+}
+
+function assertRenderedChipBadgeBodyLine(
+  chip: HTMLElement,
+  badge: HTMLElement,
+  proofLabel: string,
+): void {
+  const chipStyle = getComputedStyle(chip);
+  const chipRect = chip.getBoundingClientRect();
+  const badgeRect = badge.getBoundingClientRect();
+  const lineStart =
+    chipRect.top +
+    Number.parseFloat(chipStyle.borderTopWidth) +
+    Number.parseFloat(chipStyle.paddingBlockStart);
+  const lineEnd = lineStart + Number.parseFloat(chipStyle.lineHeight);
+  if (
+    !Number.isFinite(lineStart) ||
+    !Number.isFinite(lineEnd) ||
+    badgeRect.top < lineStart - 0.1 ||
+    badgeRect.bottom > lineEnd + 0.1
+  ) {
+    throw new Error(`${proofLabel} Badge escapes the Chip body line`);
+  }
+}
+
+function assertRenderedChipBadgeClearance(
+  chip: HTMLElement,
+  badge: HTMLElement,
+  proofLabel: string,
+): void {
+  const chipStyle = getComputedStyle(chip);
+  const chipRect = chip.getBoundingClientRect();
+  const badgeRect = badge.getBoundingClientRect();
+  const stroke = Number.parseFloat(
+    chipStyle.getPropertyValue("--chip-border-width"),
+  );
+  const radius = Number.parseFloat(chipStyle.borderRadius);
+  const clearances = [
+    badgeRect.top - chipRect.top - stroke,
+    chipRect.bottom - stroke - badgeRect.bottom,
+    badgeRect.left - chipRect.left - stroke,
+    chipRect.right - stroke - badgeRect.right,
+    roundedCapsuleClearance(chipRect, badgeRect, radius, stroke),
+  ];
+  if (clearances.some((value) => !Number.isFinite(value) || value <= 0)) {
+    throw new Error(`${proofLabel} Badge must clear every rounded Chip edge`);
+  }
 }
 
 function assertChipBadgeRenderedPair(
@@ -1036,8 +1105,7 @@ function assertChipBadgeRenderedPair(
 
   const chipRectBefore = badgeChip.getBoundingClientRect();
   const badgeRectBefore = badge.getBoundingClientRect();
-  const labelBaseline = baseline(label);
-  const badgeBaseline = baseline(badge);
+  assertRenderedChipBadgeBaseline(label, badge, placement);
   const chipRect = badgeChip.getBoundingClientRect();
   const badgeRect = badge.getBoundingClientRect();
   for (const [key, before, after] of [
@@ -1050,30 +1118,30 @@ function assertChipBadgeRenderedPair(
 
   const style = getComputedStyle(badge);
   const chipStyle = getComputedStyle(badgeChip);
-  const stroke = Number.parseFloat(
-    chipStyle.getPropertyValue("--chip-border-width"),
-  );
-  const radius = Number.parseFloat(chipStyle.borderRadius);
   const isRtl = chipStyle.direction === "rtl";
   const labelRect = label.getBoundingClientRect();
   const labelToBadgeGap = isRtl
     ? labelRect.left - badgeRect.right
     : badgeRect.left - labelRect.right;
-  const clearances = [
-    badgeRect.top - chipRect.top - stroke,
-    chipRect.bottom - stroke - badgeRect.bottom,
-    badgeRect.left - chipRect.left - stroke,
-    chipRect.right - stroke - badgeRect.right,
-    roundedCapsuleClearance(chipRect, badgeRect, radius, stroke),
-  ];
 
-  assertNear(chipRect.height, plainChip.getBoundingClientRect().height, `${placement} Chip height`);
-  assertNear(badgeRow.getBoundingClientRect().height, plainRow.getBoundingClientRect().height, `${placement} row height`);
-  assertNear(badgeBaseline, labelBaseline, `${placement} Badge baseline`);
-  assertNear(Number.parseFloat(style.fontSize), rootSize * 0.75, `${placement} Badge font size`);
-  assertNear(Number.parseFloat(style.lineHeight), rootSize, `${placement} Badge line height`);
-  if (clearances.some((value) => !Number.isFinite(value) || value <= 0))
-    throw new Error(`${placement} Badge must clear every rounded Chip edge`);
+  assertNear(
+    chipRect.height,
+    plainChip.getBoundingClientRect().height,
+    `${placement} Chip height`,
+  );
+  assertNear(
+    badgeRow.getBoundingClientRect().height,
+    plainRow.getBoundingClientRect().height,
+    `${placement} row height`,
+  );
+  assertRenderedChipBadgeFontSize(badge, rootSize, placement);
+  assertRenderedChipBadgeBodyLine(badgeChip, badge, placement);
+  assertRenderedChipBadgeClearance(badgeChip, badge, placement);
+  assertNear(
+    Number.parseFloat(style.lineHeight),
+    rootSize,
+    `${placement} Badge line height`,
+  );
   const marginInlineStart = Number.parseFloat(style.marginInlineStart);
   if (
     !Number.isFinite(marginInlineStart) ||
@@ -1084,19 +1152,35 @@ function assertChipBadgeRenderedPair(
     throw new Error(`${placement} Badge must have a defined logical label gap`);
 }
 
-async function playInvariantBadgeProof(canvasElement: HTMLElement): Promise<void> {
+async function playInvariantBadgeProof(
+  canvasElement: HTMLElement,
+): Promise<void> {
   await document.fonts.ready;
   delete canvasElement.dataset.chipBadgeProof;
+  delete canvasElement.dataset.chipBadgeCriticalPaintObservations;
+  delete canvasElement.dataset.chipBadgeNeutralCriticalObservations;
+  delete canvasElement.dataset.chipBadgeStandaloneCriticalObservations;
+  delete canvasElement.dataset.chipBadgeCustomAliasObservations;
   const documentRoot = document.documentElement;
   const originalRootSize = documentRoot.style.fontSize;
-  const primary = [...canvasElement.querySelectorAll<HTMLElement>("[data-chip-badge-primary]")];
+  const originalColorScheme = documentRoot.style.colorScheme;
+  const primary = [
+    ...canvasElement.querySelectorAll<HTMLElement>("[data-chip-badge-primary]"),
+  ];
+  let causalBoundary: HTMLElement | null = null;
   const compatibility = [
-    ...canvasElement.querySelectorAll<HTMLElement>("[data-chip-badge-compatibility]"),
+    ...canvasElement.querySelectorAll<HTMLElement>(
+      "[data-chip-badge-compatibility]",
+    ),
   ];
   if (primary.length !== 6)
-    throw new Error(`Expected 6 tier/direction primary cases, received ${primary.length}`);
+    throw new Error(
+      `Expected 6 tier/direction primary cases, received ${primary.length}`,
+    );
   if (compatibility.length !== 6)
-    throw new Error(`Expected 6 compatibility-class cases, received ${compatibility.length}`);
+    throw new Error(
+      `Expected 6 compatibility-class cases, received ${compatibility.length}`,
+    );
 
   try {
     for (const rootSize of [14, 16, 20]) {
@@ -1124,10 +1208,9 @@ async function playInvariantBadgeProof(canvasElement: HTMLElement): Promise<void
       if (!compatibilityCase || !tier || !defaultCase)
         throw new Error("Missing compatibility or default Chip comparison");
       for (const placement of ["standalone", "navigation"] as const) {
-        const compatibilityChip =
-          compatibilityCase.querySelector<HTMLElement>(
-            `.${placement}-plain-chip`,
-          );
+        const compatibilityChip = compatibilityCase.querySelector<HTMLElement>(
+          `.${placement}-plain-chip`,
+        );
         const defaultChip = defaultCase.querySelector<HTMLElement>(
           `.${placement}-plain-chip`,
         );
@@ -1164,6 +1247,141 @@ async function playInvariantBadgeProof(canvasElement: HTMLElement): Promise<void
       }
     }
 
+    const paintProbe = (
+      className: string,
+      background: string,
+      color: string,
+    ): { backgroundColor: string; color: string } => {
+      const probe = document.createElement("span");
+      probe.className = className;
+      probe.style.backgroundColor = background;
+      probe.style.color = color;
+      document.body.append(probe);
+      const style = getComputedStyle(probe);
+      const result = {
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+      };
+      probe.remove();
+      return result;
+    };
+    const assertCriticalBadgePaint = (
+      criticality: (typeof chipBadgeCriticalities)[number],
+      kind: "neutral" | "same" | "neutral-chip-critical",
+    ): void => {
+      const host = canvasElement.querySelector<HTMLElement>(
+        `[data-chip-badge-criticality="${criticality}"]`,
+      );
+      const chipSelector = {
+        neutral: ".critical-chip-neutral",
+        same: ".critical-chip-same",
+        "neutral-chip-critical": ".neutral-chip-critical",
+      }[kind];
+      const chip = host?.querySelector<HTMLElement>(chipSelector);
+      const badge = chip?.querySelector<HTMLElement>(".badge");
+      if (!chip || !badge)
+        throw new Error(`${criticality} ${kind} appearance node is missing`);
+      const expected = paintProbe(
+        kind === "neutral" ? "" : criticality,
+        kind === "neutral"
+          ? "var(--color-foreground-primary)"
+          : "var(--modifier-color-foreground-primary)",
+        "var(--color-text-onForegroundPrimary)",
+      );
+      const actual = getComputedStyle(badge);
+      if (actual.backgroundColor !== expected.backgroundColor)
+        throw new Error(
+          `${criticality} ${kind} Badge background: expected ${expected.backgroundColor}, received ${actual.backgroundColor}`,
+        );
+      if (actual.color !== expected.color)
+        throw new Error(
+          `${criticality} ${kind} Badge text: expected ${expected.color}, received ${actual.color}`,
+        );
+      if (actual.backgroundColor === getComputedStyle(chip).backgroundColor)
+        throw new Error(`${criticality} ${kind} Badge merged into its Chip`);
+    };
+    const assertStandaloneCriticalBadgePaint = (
+      criticality: (typeof chipBadgeCriticalities)[number],
+    ): void => {
+      const badge = canvasElement.querySelector<HTMLElement>(
+        `[data-chip-badge-criticality="${criticality}"] .standalone-critical-badge`,
+      );
+      if (!badge) throw new Error(`Missing ${criticality} standalone Badge`);
+      const expected = paintProbe(
+        criticality,
+        "var(--modifier-color-foreground-secondary)",
+        "var(--modifier-color-text-onForegroundSecondary)",
+      );
+      const actual = getComputedStyle(badge);
+      if (
+        actual.backgroundColor !== expected.backgroundColor ||
+        actual.color !== expected.color
+      ) {
+        throw new Error(
+          `${criticality} standalone Badge lost its secondary roles`,
+        );
+      }
+    };
+    const assertCustomBadgePaint = (
+      criticality: (typeof chipBadgeCriticalities)[number],
+    ): void => {
+      const badge = canvasElement.querySelector<HTMLElement>(
+        `[data-chip-badge-criticality="${criticality}"] .critical-chip-custom .badge`,
+      );
+      if (!badge) throw new Error(`Missing ${criticality} custom Badge`);
+      const actual = getComputedStyle(badge);
+      if (
+        actual.backgroundColor !== "rgb(1, 2, 3)" ||
+        actual.color !== "rgb(250, 251, 252)"
+      ) {
+        throw new Error(`${criticality} custom Badge aliases were lost`);
+      }
+    };
+    const expectProofFailure = (proof: () => void, label: string): void => {
+      try {
+        proof();
+      } catch {
+        return;
+      }
+      throw new Error(`${label} mutation escaped its proof oracle`);
+    };
+
+    for (const colorScheme of ["light", "dark"] as const) {
+      documentRoot.style.colorScheme = colorScheme;
+      await nextPaint();
+      for (const criticality of chipBadgeCriticalities) {
+        assertCriticalBadgePaint(criticality, "neutral");
+        assertCriticalBadgePaint(criticality, "same");
+        assertCriticalBadgePaint(criticality, "neutral-chip-critical");
+        assertStandaloneCriticalBadgePaint(criticality);
+        assertCustomBadgePaint(criticality);
+      }
+    }
+    canvasElement.dataset.chipBadgeCriticalPaintObservations = "16";
+    canvasElement.dataset.chipBadgeNeutralCriticalObservations = "8";
+    canvasElement.dataset.chipBadgeStandaloneCriticalObservations = "8";
+    canvasElement.dataset.chipBadgeCustomAliasObservations = "8";
+
+    const causalBadge = canvasElement.querySelector<HTMLElement>(
+      '[data-chip-badge-criticality="error"] .critical-chip-neutral .badge',
+    );
+    causalBoundary = causalBadge?.parentElement ?? null;
+    if (!causalBadge || !causalBoundary)
+      throw new Error("Missing inherited-channel mutation node");
+    causalBoundary.style.setProperty(
+      "--modifier-color-foreground-primary",
+      "inherit",
+    );
+    expectProofFailure(
+      () => assertCriticalBadgePaint("error", "neutral"),
+      "inherited primary channel",
+    );
+    causalBoundary.style.removeProperty("--modifier-color-foreground-primary");
+    assertCriticalBadgePaint("error", "neutral");
+    causalBoundary = null;
+    documentRoot.style.colorScheme = originalColorScheme;
+    await nextPaint();
+
     const defaultHost = canvasElement.querySelector<HTMLElement>(
       '[data-chip-badge-case="site-default-ltr"]',
     );
@@ -1182,48 +1400,129 @@ async function playInvariantBadgeProof(canvasElement: HTMLElement): Promise<void
     );
     const criticalBadge = criticalChip?.querySelector<HTMLElement>(".badge");
     const customBadge = customHost?.querySelector<HTMLElement>(".badge");
-    if (!defaultHost || !defaultChip || !defaultBadge || !criticalChip || !criticalBadge || !customBadge)
+    if (
+      !defaultHost ||
+      !defaultChip ||
+      !defaultBadge ||
+      !criticalChip ||
+      !criticalBadge ||
+      !customBadge
+    )
       throw new Error("Missing appearance or mutation proof nodes");
 
     const defaultBadgeStyle = getComputedStyle(defaultBadge);
-    if (defaultBadgeStyle.backgroundColor === getComputedStyle(defaultChip).backgroundColor)
-      throw new Error("Default Badge fill must remain visible on the default Chip fill");
+    if (
+      defaultBadgeStyle.backgroundColor ===
+      getComputedStyle(defaultChip).backgroundColor
+    )
+      throw new Error(
+        "Default Badge fill must remain visible on the default Chip fill",
+      );
     if (defaultBadgeStyle.color === defaultBadgeStyle.backgroundColor)
       throw new Error("Default Badge text must remain visible");
 
     const criticalStyle = getComputedStyle(criticalBadge);
-    if (!criticalBadge.classList.contains("error") || criticalStyle.backgroundColor === getComputedStyle(criticalChip).backgroundColor)
+    if (
+      !criticalBadge.classList.contains("error") ||
+      criticalStyle.backgroundColor ===
+        getComputedStyle(criticalChip).backgroundColor
+    )
       throw new Error("Criticality must retain a distinct Badge fill");
     if (criticalStyle.color === criticalStyle.backgroundColor)
       throw new Error("Critical Badge text must remain visible");
 
     const customStyle = getComputedStyle(customBadge);
     if (customStyle.backgroundColor !== "rgb(1, 2, 3)")
-      throw new Error(`Custom Badge fill was lost: ${customStyle.backgroundColor}`);
-    if (customStyle.color === customStyle.backgroundColor)
-      throw new Error("Custom Badge text must remain visible");
+      throw new Error(
+        `Custom Badge fill was lost: ${customStyle.backgroundColor}`,
+      );
+    if (customStyle.color !== "rgb(250, 251, 252)")
+      throw new Error(`Custom Badge text was lost: ${customStyle.color}`);
 
     const plainChip = defaultHost.querySelector<HTMLElement>(
       ".standalone-plain-chip",
     );
     if (!plainChip) throw new Error("Missing mutation comparison Chip");
     const originalChipHeight = defaultChip.getBoundingClientRect().height;
-    defaultHost.style.setProperty("--_typography-indicator-line-height", "3rem");
+    defaultHost.style.setProperty(
+      "--_typography-indicator-line-height",
+      "3rem",
+    );
     await nextPaint();
-    if (defaultChip.getBoundingClientRect().height <= plainChip.getBoundingClientRect().height)
+    if (
+      defaultChip.getBoundingClientRect().height <=
+      plainChip.getBoundingClientRect().height
+    )
       throw new Error("Indicator mutation did not grow the Chip proof fixture");
     defaultHost.style.removeProperty("--_typography-indicator-line-height");
     await nextPaint();
-    assertNear(defaultChip.getBoundingClientRect().height, originalChipHeight, "restored Chip height");
+    assertNear(
+      defaultChip.getBoundingClientRect().height,
+      originalChipHeight,
+      "restored Chip height",
+    );
+    const defaultLabel = defaultChip.querySelector<HTMLElement>(".value");
+    if (!defaultLabel) throw new Error("Missing React mutation label");
+    const originalBadgeStyle = defaultBadge.getAttribute("style");
+    try {
+      defaultBadge.style.position = "relative";
+      defaultBadge.style.top = "-2px";
+      expectProofFailure(
+        () =>
+          assertRenderedChipBadgeBaseline(
+            defaultLabel,
+            defaultBadge,
+            "mutated",
+          ),
+        "React Badge baseline",
+      );
+      defaultBadge.style.removeProperty("position");
+      defaultBadge.style.removeProperty("top");
+
+      defaultBadge.style.fontSize = "1rem";
+      expectProofFailure(
+        () => assertRenderedChipBadgeFontSize(defaultBadge, 16, "mutated"),
+        "React Badge font size",
+      );
+      defaultBadge.style.removeProperty("font-size");
+
+      defaultBadge.style.transform = "translateY(-8px)";
+      expectProofFailure(
+        () =>
+          assertRenderedChipBadgeBodyLine(defaultChip, defaultBadge, "mutated"),
+        "React Badge body line",
+      );
+      defaultBadge.style.removeProperty("transform");
+
+      defaultBadge.style.transform = "translateX(100px)";
+      expectProofFailure(
+        () =>
+          assertRenderedChipBadgeClearance(
+            defaultChip,
+            defaultBadge,
+            "mutated",
+          ),
+        "React Badge rounded clearance",
+      );
+    } finally {
+      if (originalBadgeStyle === null) defaultBadge.removeAttribute("style");
+      else defaultBadge.setAttribute("style", originalBadgeStyle);
+    }
+    assertRenderedChipBadgeBaseline(defaultLabel, defaultBadge, "restored");
+    assertRenderedChipBadgeFontSize(defaultBadge, 16, "restored");
+    assertRenderedChipBadgeBodyLine(defaultChip, defaultBadge, "restored");
+    assertRenderedChipBadgeClearance(defaultChip, defaultBadge, "restored");
     if (canvasElement.querySelector(".chip-badge-baseline-marker"))
       throw new Error("Baseline marker leaked into the rendered story");
   } finally {
+    causalBoundary?.style.removeProperty("--modifier-color-foreground-primary");
     documentRoot.style.fontSize = originalRootSize;
+    documentRoot.style.colorScheme = originalColorScheme;
     canvasElement
       .querySelectorAll<HTMLElement>("[data-chip-badge-case]")
-      .forEach((host) =>
-        host.style.removeProperty("--_typography-indicator-line-height"),
-      );
+      .forEach((host) => {
+        host.style.removeProperty("--_typography-indicator-line-height");
+      });
     await nextPaint();
   }
   canvasElement.dataset.chipBadgeProof = "passed";
@@ -1263,7 +1562,10 @@ function ChipBadgeTier({
   const badgeValue = density === "comfortable" ? 132_456_455 : 7;
   const badgeStyle =
     tier === "app" && density === "comfortable"
-      ? ({ "--badge-color-background": "rgb(1 2 3)" } as CSSProperties)
+      ? ({
+          "--badge-color-background": "rgb(1 2 3)",
+          "--badge-color-text": "rgb(250 251 252)",
+        } as CSSProperties)
       : undefined;
   const badge = () => (
     <Badge
@@ -1325,7 +1627,10 @@ function ChipBadgeTier({
                     key: "plain",
                     label: "Machines",
                     slot: (
-                      <Chip className="navigation-plain-chip" value="Machines" />
+                      <Chip
+                        className="navigation-plain-chip"
+                        value="Machines"
+                      />
                     ),
                   },
                   {
@@ -1349,6 +1654,79 @@ function ChipBadgeTier({
       <output hidden data-chip-badge-fit-result={`${tier}-${density}-${dir}`}>
         {metrics ? JSON.stringify(metrics) : "pending"}
       </output>
+    </section>
+  );
+}
+
+const chipBadgeCriticalities = [
+  "error",
+  "warning",
+  "success",
+  "information",
+] as const;
+
+function ChipBadgeCriticalityPair({
+  criticality,
+}: {
+  criticality: (typeof chipBadgeCriticalities)[number];
+}) {
+  return (
+    <section
+      className="site chip-badge-case"
+      data-chip-badge-criticality={criticality}
+    >
+      <h2>{criticality}</h2>
+      <div className="chip-badge-pair">
+        <div>
+          <Chip
+            className="critical-chip-neutral"
+            criticality={criticality}
+            value="Neutral Badge"
+            badge={<Badge value={7} />}
+          />
+        </div>
+        <div>
+          <Chip
+            className="critical-chip-same"
+            criticality={criticality}
+            value="Same criticality"
+            badge={<Badge criticality={criticality} value={7} />}
+          />
+        </div>
+        <div>
+          <Chip
+            className="neutral-chip-critical"
+            value="Critical Badge"
+            badge={<Badge criticality={criticality} value={7} />}
+          />
+        </div>
+        <div>
+          <Chip
+            className="critical-chip-custom"
+            criticality={criticality}
+            value="Custom Badge"
+            badge={
+              <Badge
+                value={7}
+                style={
+                  {
+                    "--badge-color-background": "rgb(1 2 3)",
+                    "--badge-color-text": "rgb(250 251 252)",
+                  } as CSSProperties
+                }
+              />
+            }
+          />
+        </div>
+        <div>
+          <span>Standalone </span>
+          <Badge
+            className="standalone-critical-badge"
+            criticality={criticality}
+            value={7}
+          />
+        </div>
+      </div>
     </section>
   );
 }
@@ -1506,6 +1884,15 @@ export const InvariantBadge: Story = {
             </div>
           )),
         )}
+      </div>
+      <h1>08 Density · critical Chip paint ownership</h1>
+      <div className="indicator-fit-grid chip-badge-grid">
+        {chipBadgeCriticalities.map((criticality) => (
+          <ChipBadgeCriticalityPair
+            key={criticality}
+            criticality={criticality}
+          />
+        ))}
       </div>
       <h1>08 Density · compatibility classes</h1>
       <div className="indicator-fit-grid chip-badge-grid">

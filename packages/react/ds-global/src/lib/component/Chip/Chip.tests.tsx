@@ -62,6 +62,10 @@ describe("Chip component", () => {
     expect(badge.compareDocumentPosition(dismiss)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
+    const slot = badge.parentElement;
+    expect(slot).toHaveClass("badge-slot");
+    expect(slot?.parentElement).toBe(chip);
+    expect(slot?.querySelectorAll("a, button")).toHaveLength(0);
   });
 
   it("supports the noninteractive Badge slot on an interactive Chip", () => {

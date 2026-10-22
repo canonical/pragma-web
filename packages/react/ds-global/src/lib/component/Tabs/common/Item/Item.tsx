@@ -21,7 +21,11 @@ const Item = ({
   const { url, label, disabled, className, slot } = item;
   const Link = LinkComponent;
   const inert = !url;
-  const hasSlot = slot !== null && slot !== undefined && slot !== false;
+  const hasSlot =
+    slot !== null &&
+    slot !== undefined &&
+    slot !== "" &&
+    typeof slot !== "boolean";
   const linkClassName =
     "ds tabs-link spacing-control-seat stroke-paint stroke-block-end";
   const content = (

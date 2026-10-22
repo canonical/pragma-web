@@ -113,6 +113,24 @@ describe("Tabs Item (internal renderer)", () => {
     expect(link).not.toHaveAttribute("data-ds-density-provider");
   });
 
+  it.each([
+    ["an empty string", ""],
+    ["a boolean", true],
+  ] as const)("does not create an indicator gap for %s", (_label, slot) => {
+    const { container } = inList(
+      <Item
+        item={{ url: "/empty", label: "Empty", slot }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const link = screen.getByRole("link", { name: "Empty" });
+
+    expect(link.querySelector(".tabs-indicator")).toBeNull();
+    expect(link.querySelector(".tabs-label")).toBeNull();
+    expect(container.querySelector(".tabs-link")).toHaveTextContent("Empty");
+  });
+
   it("renders the slot in the same inert span when the tab has no url", () => {
     inList(
       <Item

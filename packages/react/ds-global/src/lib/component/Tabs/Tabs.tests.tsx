@@ -1,9 +1,20 @@
+import type { Item as NavigationItem } from "@canonical/ds-types";
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import type { LinkComponentProps } from "../../types/link.js";
 import Tabs from "./Tabs.js";
 import type { TabItem } from "./types.js";
+
+const ordinaryItemTree: NavigationItem = {
+  key: "root",
+  items: [
+    { url: "/overview", label: "Overview" },
+    { key: "soon", label: "Coming soon" },
+  ],
+};
+const asTabItem = (item: NavigationItem): TabItem => item;
+const recursiveTabTree: TabItem = asTabItem(ordinaryItemTree);
 
 const root: TabItem = {
   key: "root",
@@ -15,6 +26,13 @@ const root: TabItem = {
 };
 
 describe("Tabs", () => {
+  it("accepts an ordinary recursive Item tree without weakening item identity", () => {
+    expectTypeOf<NavigationItem>().toMatchTypeOf<TabItem>();
+    expectTypeOf(recursiveTabTree).toMatchTypeOf<TabItem>();
+    expect(recursiveTabTree.items?.[0]).toHaveProperty("url", "/overview");
+    expect(recursiveTabTree.items?.[1]).toHaveProperty("key", "soon");
+  });
+
   it("renders a navigation landmark with its accessible name", () => {
     render(<Tabs aria-label="Sections" navigationRoot={root} />);
     expect(
