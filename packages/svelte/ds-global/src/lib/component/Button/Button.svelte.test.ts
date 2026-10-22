@@ -2,6 +2,7 @@ import type { Locator } from "@vitest/browser/context";
 import type { ComponentProps } from "svelte";
 import { createRawSnippet } from "svelte";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import { commands } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import "../../../../.storybook/styles.css";
@@ -321,6 +322,37 @@ describe("Button component", () => {
       });
       expect(page.container.querySelector(".icon")).not.toBeNull();
       expect(page.container.querySelector(".loading-spinner")).not.toBeNull();
+    });
+
+    // TODO: move to the Spinner tests once the inline spinner is replaced by
+    // the shared Spinner.
+    describe("motion preference", () => {
+      const renderSpinner = async (
+        reducedMotion: "reduce" | "no-preference",
+      ) => {
+        await commands.emulateMedia({ reducedMotion });
+        // The emulation outlives this test and applies to every test file
+        // sharing the page, so restore Playwright's default afterwards.
+        onTestFinished(() =>
+          commands.emulateMedia({ reducedMotion: "no-preference" }),
+        );
+        const page = await render(Component, { ...baseProps, loading: true });
+        const spinner = page.container.querySelector(
+          ".loading-spinner .spinner",
+        );
+        if (!spinner) throw new Error("spinner not rendered");
+        return getComputedStyle(spinner);
+      };
+
+      it("spins the spinner when no motion preference is set", async () => {
+        const style = await renderSpinner("no-preference");
+        expect(style.animationName).toBe("ds-button-spinner-rotate");
+      });
+
+      it("holds the spinner still under reduced motion", async () => {
+        const style = await renderSpinner("reduce");
+        expect(style.animationName).toBe("none");
+      });
     });
 
     it("is not disabled when not loading", async () => {

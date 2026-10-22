@@ -31,6 +31,8 @@
 
   /* Reads the modifier channels generically: --modifier-surface, --modifier-outline (0/1) and --modifier-color-*; interaction states read the per-state channels. */
 
+  /* TODO: move the spinner's keyframes, sizing, animation and reduced-motion
+     rule to the shared Spinner once it replaces the inline spinner. */
   @keyframes ds-button-spinner-rotate {
     to {
       transform: rotate(360deg);
@@ -179,13 +181,12 @@
     border: 0;
   }
 
+  /* Transitions need no override: the motion durations drop to 0s under
+     reduced motion. The selector matches the one that starts the animation,
+     so it wins on order. */
   @media (prefers-reduced-motion: reduce) {
-    .ds.button {
-      transition: none;
-
-      & .spinner {
-        animation: none;
-      }
+    .ds.button.loading .spinner {
+      animation: none;
     }
   }
 

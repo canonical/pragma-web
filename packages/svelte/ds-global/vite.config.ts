@@ -19,6 +19,16 @@ export default defineConfig({
               { browser: "firefox" },
               { browser: "webkit" },
             ],
+            commands: {
+              // Emulation is page-wide, so it reaches every test file running
+              // in parallel. Keep it to features no other test depends on.
+              emulateMedia: async (
+                { page },
+                media: { reducedMotion: "reduce" | "no-preference" },
+              ) => {
+                await page.emulateMedia(media);
+              },
+            },
           },
           include: ["src/**/*.svelte.test.{js,ts}"],
           setupFiles: ["./vitest-setup-client.ts"],
