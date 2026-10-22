@@ -74,6 +74,33 @@ describe("the component checks", () => {
       );
     });
 
+    it("names a font-variant-caps that differs from its typography.variant.caps", () => {
+      const folder = locate(DRIFTED, "StyleDrift");
+      expect(() =>
+        assertStylesMatchAnatomy(folder, assertAnatomy(folder)),
+      ).toThrow(
+        /\.label typography\.variant\.caps: css primitive:small-caps, anatomy primitive:all-small-caps/,
+      );
+    });
+
+    it("refuses a child chain that leaves the anatomy's path to its slot", () => {
+      const folder = locate(DRIFTED, "StyleDrift");
+      expect(() =>
+        assertStylesMatchAnatomy(folder, assertAnatomy(folder)),
+      ).toThrow(
+        /"\.ds\.style-drift > \.label > \.link" does not follow the anatomy's path to \.link, \.ds\.style-drift > \.body > \.link/,
+      );
+    });
+
+    it("refuses a descendant selector that reaches deeper than one child", () => {
+      const folder = locate(DRIFTED, "StyleDrift");
+      expect(() =>
+        assertStylesMatchAnatomy(folder, assertAnatomy(folder)),
+      ).toThrow(
+        /"\.ds\.style-drift \.body \.link\[href\]:hover" reaches deeper than one child/,
+      );
+    });
+
     it("refuses a stylesheet in another layer", () => {
       const folder = locate(DRIFTED, "WrongLayer");
       expect(() =>

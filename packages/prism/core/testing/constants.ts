@@ -190,15 +190,16 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":focus-visible": "focus",
   ":hover": "hover",
   '[aria-current="page"]': "selected",
+  '[aria-selected="true"]': "selected",
   "[open]": "expanded",
 };
 
 /**
- * The selector qualifiers a component root may carry without naming a
- * state: `[href]` scopes the link-only rules of a component that renders a
- * link or inert text.
+ * The selector qualifiers a component root or one of its slots may carry
+ * without naming a state: `[href]` scopes the link-only rules of an element
+ * that renders a link or inert text.
  */
-export const ROOT_QUALIFIERS: readonly string[] = ["[href]"];
+export const LINK_QUALIFIERS: readonly string[] = ["[href]"];
 
 /**
  * The properties no style key binds, because they set no design decision:
