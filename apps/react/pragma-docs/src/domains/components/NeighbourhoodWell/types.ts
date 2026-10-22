@@ -1,13 +1,27 @@
-import type { Box, Kind } from "#lib/Chip";
+import type { Box, Kind } from "@canonical/prism-core";
 import type { NeighbourhoodWell_component$key } from "#relay/__generated__/NeighbourhoodWell_component.graphql.js";
 import type { EdgeFamily, RelationSpec, Sector } from "./constants.js";
 
 export interface NeighbourhoodWellProps {
   /** The entity page's fragment ref. */
   readonly component: NeighbourhoodWell_component$key;
+  /**
+   * The provider's namespace prefixes, in its `ontologies { prefix }`
+   * order: the chips tint by them.
+   */
+  readonly prefixes: readonly string[];
   /** Additional CSS classes. */
   readonly className?: string;
 }
+
+/**
+ * A neighbour's landing href, by its compact URI and its kind, or
+ * `undefined` when that kind has no home.
+ */
+export type NeighbourHrefResolver = (
+  uri: string,
+  kind: Kind,
+) => string | undefined;
 
 /** One neighbour before layout: identity plus its relation's row. */
 export interface NeighbourInput {

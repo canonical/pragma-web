@@ -4,7 +4,7 @@
  * The Express dev server imports the app's route modules NATIVELY (see
  * `prepareRelayData.ts` — the data pass runs to completion before the render
  * pass, which is what lives behind `ssrLoadModule`), and that import chain
- * carries client CSS side-effect imports (e.g. `src/lib/Chip/styles.css`),
+ * carries client CSS side-effect imports (e.g. a lens layout's `styles.css`),
  * which Node cannot load (ERR_UNKNOWN_FILE_EXTENSION — tsx transforms
  * TS/TSX only). Vite is not in that chain, so the styles are dropped
  * harmlessly: the render world still loads through Vite, which processes

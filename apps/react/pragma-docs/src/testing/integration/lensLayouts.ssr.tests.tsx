@@ -371,7 +371,7 @@ const splitAtCanvas = (body: string): { chrome: string; canvas: string } => {
  * full identity (class + data-slot), so it can never latch onto a sibling.
  */
 const STRIP_CONTEXT_PATTERN =
-  /(<div class="strip-context" data-slot="context">)([\s\S]*?)(<\/div><div class="strip-controls")/;
+  /(<div class="context" data-slot="context">)([\s\S]*?)(<\/div><div class="controls")/;
 
 /**
  * The controls and status slots. Like `context`, these hold ELEMENTS
@@ -380,9 +380,9 @@ const STRIP_CONTEXT_PATTERN =
  * full identity, so it can never latch onto a sibling.
  */
 const STRIP_CONTROLS_PATTERN =
-  /(<div class="strip-controls" data-slot="controls">)([\s\S]*?)(<\/div><div class="strip-status")/;
+  /(<div class="controls" data-slot="controls">)([\s\S]*?)(<\/div><div class="status")/;
 const STRIP_STATUS_PATTERN =
-  /(<div class="strip-status" data-slot="status">)([\s\S]*?)(<\/div><\/header>)/;
+  /(<div class="status" data-slot="status">)([\s\S]*?)(<\/div><\/header>)/;
 
 /**
  * A strip slot's raw inner markup: the content group (the second capture) of

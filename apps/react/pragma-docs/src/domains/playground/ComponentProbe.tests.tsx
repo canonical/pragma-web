@@ -5,12 +5,12 @@
  * against an empty store does hit the network.
  */
 
+import { createEnvironment } from "@canonical/prism-core";
 import { render, screen } from "@testing-library/react";
 import { Suspense } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import { createEnvironment } from "#relay";
 import componentProbeRecords from "./__fixtures__/componentProbeRecords.js";
 import ComponentProbe from "./ComponentProbe.js";
 import { PROBE_URI } from "./probeQuery.js";

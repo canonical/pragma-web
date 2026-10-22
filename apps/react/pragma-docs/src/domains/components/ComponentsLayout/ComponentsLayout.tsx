@@ -1,8 +1,10 @@
+import {
+  Canvas,
+  CanvasSkipLink,
+  ModeStrip,
+  makeLensContext,
+} from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { Canvas } from "#lib/Canvas";
-import { CanvasSkipLink } from "#lib/CanvasSkipLink";
-import { makeLensContext } from "#lib/LensBreadcrumbs";
-import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import type { ComponentsLayoutProps } from "./types.js";
@@ -16,7 +18,6 @@ const componentCssClassName = "ds components-layout";
  * route param (the prefixed URI), so the trail reads no query.
  */
 const ComponentsContext = makeLensContext({
-  lensLabel: "Components",
   lensRouteName: "components",
   paramKey: "uri",
 });
@@ -43,7 +44,7 @@ export default function ComponentsLayout({
       <CanvasSkipLink />
       <SiteRail />
       <div className="viewport">
-        <ModeStrip context={<ComponentsContext />} />
+        <ModeStrip context={<ComponentsContext lensLabel="Components" />} />
         <Canvas>{children}</Canvas>
         <SiteColophon />
       </div>

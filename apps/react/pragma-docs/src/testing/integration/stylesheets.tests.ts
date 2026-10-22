@@ -9,9 +9,11 @@
  * - no grid template is authored in the app: each lens layout's root reads
  *   the design system's intrinsic columns (`var(--grid-intrinsic)`), and
  *   every other grid is a subgrid;
- * - exactly one LAYOUT-CAPABLE conditional at-rule exists: the sanctioned
- *   AX.1 collapse in Rail/styles.css. Feature queries that cannot reflow
- *   layout (`prefers-color-scheme`, `forced-colors`,
+ * - no LAYOUT-CAPABLE conditional at-rule exists in the app: the one
+ *   sanctioned small-viewport collapse is the rail's, and the rail's
+ *   stylesheet ships with `@canonical/prism-core`, whose own stylesheet
+ *   census holds the package to that one. Feature queries that
+ *   cannot reflow layout (`prefers-color-scheme`, `forced-colors`,
  *   `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
  *   file — and only while no other condition rides along in the prelude.
  */
@@ -130,9 +132,7 @@ describe("the app stylesheets", () => {
       },
     );
 
-  it("allows exactly one layout-capable conditional at-rule — the sanctioned AX.1 collapse", () => {
-    const conditionals = layoutCapableConditionals();
-    expect(conditionals).toHaveLength(1);
-    expect(conditionals.at(0)).toMatch(/^@media[^{]*max-width/);
+  it("authors no layout-capable conditional at-rule — the rail's collapse ships with prism-core", () => {
+    expect(layoutCapableConditionals()).toEqual([]);
   });
 });

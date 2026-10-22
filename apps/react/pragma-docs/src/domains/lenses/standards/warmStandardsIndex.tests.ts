@@ -1,5 +1,8 @@
+import {
+  createEnvironment,
+  setPrefetchEnvironment,
+} from "@canonical/prism-core";
 import { afterEach, describe, expect, it } from "vitest";
-import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
 import { standardsIndexVariables } from "./standardsIndexQuery.js";
 import warmStandardsIndex from "./warmStandardsIndex.js";

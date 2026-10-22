@@ -21,11 +21,11 @@
  * Restoring the byte-exact comparator makes it pass.
  */
 
+import { createStaticRouter } from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { type ReactElement, useState } from "react";
 import { describe, expect, it } from "vitest";
-import { createStaticRouter } from "#lib/router";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import { JOURNEY_MODEL } from "../__fixtures__/journeyModel.js";
 import {

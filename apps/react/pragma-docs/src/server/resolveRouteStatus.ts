@@ -1,4 +1,4 @@
-import { createStaticRouter } from "#lib/router";
+import { createStaticRouter } from "@canonical/prism-core";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
 
 /**

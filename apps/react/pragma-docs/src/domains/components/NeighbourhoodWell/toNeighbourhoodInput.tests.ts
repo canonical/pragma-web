@@ -17,6 +17,17 @@ import {
   deriveClassTerm,
   toNeighbourhoodInput,
 } from "./toNeighbourhoodInput.js";
+import type { NeighbourHrefResolver } from "./types.js";
+
+/**
+ * A stand-in for the well's router-built resolver: components and terms
+ * have homes, every other kind has none.
+ */
+const resolveHref: NeighbourHrefResolver = (uri, kind) => {
+  if (kind === "component") return `/components/${encodeURIComponent(uri)}`;
+  if (kind === "term") return `/definitions/${encodeURIComponent(uri)}`;
+  return undefined;
+};
 
 const emptyConnection = {
   edges: [],
@@ -92,6 +103,7 @@ describe("toNeighbourhoodInput", () => {
       payload({
         variants: connectionOf(["ds:global.component.card+dense"]),
       }),
+      resolveHref,
     );
     const byUri = new Map(
       input.neighbours.map((neighbour) => [neighbour.uri, neighbour]),
@@ -103,12 +115,29 @@ describe("toNeighbourhoodInput", () => {
     expect(byUri.get("ds:tier.global")?.href).toBeUndefined();
   });
 
+  it("keeps a linkable neighbour inert when its kind has no home", () => {
+    // A `variants` edge is linkable, but this one delivers a pattern, and
+    // the resolver knows no home for patterns.
+    const { input } = toNeighbourhoodInput(
+      payload({
+        variants: connectionOf(["ds:global.pattern.modal-form"]),
+      }),
+      resolveHref,
+    );
+    const pattern = input.neighbours.find(
+      (neighbour) => neighbour.uri === "ds:global.pattern.modal-form",
+    );
+    expect(pattern?.kind).toBe("pattern");
+    expect(pattern?.href).toBeUndefined();
+  });
+
   it("keeps one node per entity however many relations name it", () => {
     const { input } = toNeighbourhoodInput(
       payload({
         variants: connectionOf(["ds:global.component.twin"]),
         subcomponents: connectionOf(["ds:global.component.twin"]),
       }),
+      resolveHref,
     );
     expect(
       input.neighbours.filter(
@@ -122,6 +151,7 @@ describe("toNeighbourhoodInput", () => {
       payload({
         variantOfs: connectionOf(["ds:global.component.card"]),
       }),
+      resolveHref,
     );
     // Asserted as the EXACT list, not as the absence of one string. The
     // dedup seed is the centre's `_meta.curie`, so an extraction that
@@ -144,6 +174,7 @@ describe("toNeighbourhoodInput", () => {
           true,
         ),
       }),
+      resolveHref,
     );
     expect(truncated).toEqual(["subcomponent"]);
   });
@@ -160,6 +191,7 @@ describe("toNeighbourhoodInput", () => {
           },
         },
       }),
+      resolveHref,
     );
     const classNode = input.neighbours.find(
       (neighbour) => neighbour.spec.key === "type",

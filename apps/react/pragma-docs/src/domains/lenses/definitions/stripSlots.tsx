@@ -1,9 +1,8 @@
+import { ErrorBoundary, makeLensContext } from "@canonical/prism-core";
 import { useRouterState } from "@canonical/router-react";
 import type React from "react";
 import { Suspense } from "react";
 import { useLazyLoadQuery } from "react-relay";
-import ErrorBoundary from "#lib/ErrorBoundary";
-import { makeLensContext } from "#lib/LensBreadcrumbs";
 import type { DefinitionsExplorerQuery } from "#relay/__generated__/DefinitionsExplorerQuery.graphql.js";
 import definitionsExplorerQueryNode from "#relay/__generated__/DefinitionsExplorerQuery.graphql.js";
 import {
@@ -141,7 +140,6 @@ const StatusContent = (): React.ReactElement => {
  * needs no Suspense guard (unlike the chip toolbar and the figure above).
  */
 const Context = makeLensContext({
-  lensLabel: "Definitions",
   lensRouteName: "definitions",
   paramKey: "term",
 });

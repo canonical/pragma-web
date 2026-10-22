@@ -31,6 +31,10 @@
 
 import "../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
 import {
+  createEnvironment,
+  setPrefetchEnvironment,
+} from "@canonical/prism-core";
+import {
   createBrowserAdapter,
   createRouter,
   type Router,
@@ -40,7 +44,6 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Shell } from "#lib/Shell";
-import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import mergeRecordMaps from "../../../testing/mergeRecordMaps.js";
 import definitionsExplorerRecords from "../../domains/lenses/definitions/__fixtures__/definitionsExplorerRecords.js";
@@ -105,7 +108,7 @@ const keepSurvivors = (
 /** Click the rail's entry for `href`, through the real router. */
 const clickRail = async (container: HTMLElement, href: string) => {
   const link = container.querySelector<HTMLAnchorElement>(
-    `nav[data-region="primary-nav"] .rail-lenses a[href="${href}"]`,
+    `nav[data-region="primary-nav"] .lenses a[href="${href}"]`,
   );
   expect(link, `the rail links ${href}`).not.toBeNull();
   await act(async () => {

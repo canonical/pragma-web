@@ -1,7 +1,6 @@
+import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { ComponentsIcon } from "#lib/Rail";
-import { routeLensFacet } from "#lib/routeLens";
-import { routeShortcutFacet } from "#lib/routeShortcut";
+import { ComponentsIcon } from "#lib/LensIcons";
 import { ComponentEntityPage } from "./ComponentEntityPage/index.js";
 import { ComponentsCatalogPage } from "./ComponentsCatalogPage/index.js";
 import warmCatalog from "./warmCatalog.js";

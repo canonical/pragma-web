@@ -1,7 +1,5 @@
+import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { Canvas } from "#lib/Canvas";
-import { CanvasSkipLink } from "#lib/CanvasSkipLink";
-import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import { LensFilterProvider } from "../lensFilterContext.js";
@@ -45,7 +43,7 @@ export default function DefinitionsLayout({
         <SiteRail />
         <div className="viewport">
           <ModeStrip
-            context={<Context />}
+            context={<Context lensLabel="Definitions" />}
             controls={<Controls />}
             status={<Status />}
           />

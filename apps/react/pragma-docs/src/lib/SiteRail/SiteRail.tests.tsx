@@ -23,7 +23,7 @@ describe("SiteRail", () => {
     renderSiteRail();
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(
-      [...nav.querySelectorAll(".rail-lenses .rail-label")].map(
+      [...nav.querySelectorAll(".lenses .label")].map(
         (label) => label.textContent,
       ),
     ).toEqual([
@@ -40,7 +40,7 @@ describe("SiteRail", () => {
     renderSiteRail();
     const brand = screen
       .getByRole("navigation", { name: "Primary" })
-      .querySelector(".rail-brand");
+      .querySelector(".brand");
     expect(brand).toHaveAttribute("href", "/");
     expect(brand?.textContent).toBe("Pragmadesign system docs");
   });
@@ -50,5 +50,31 @@ describe("SiteRail", () => {
     const nav = screen.getByRole("navigation", { name: "Primary" });
     expect(nav.id).toBe("site-rail");
     expect(nav).toHaveClass("is-pinned");
+  });
+
+  it("keeps the utility cluster out of the lens list", () => {
+    renderSiteRail();
+    const lenses = screen
+      .getByRole("navigation", { name: "Primary" })
+      .querySelector(".lenses");
+    const utilities = screen.getByRole("list", { name: "Utilities" });
+    expect(lenses?.contains(utilities)).toBe(false);
+    expect(
+      utilities.contains(screen.getByRole("link", { name: "Playground" })),
+    ).toBe(true);
+    expect(
+      utilities.contains(screen.getByRole("link", { name: "Demo sign-in" })),
+    ).toBe(true);
+    expect(
+      utilities.contains(screen.getByRole("combobox", { name: "Color theme" })),
+    ).toBe(true);
+  });
+
+  it("links the demo sign-in to the account route with the demo credential", () => {
+    renderSiteRail();
+    expect(screen.getByRole("link", { name: "Demo sign-in" })).toHaveAttribute(
+      "href",
+      "/account?auth=1",
+    );
   });
 });

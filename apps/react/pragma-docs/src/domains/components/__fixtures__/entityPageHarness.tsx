@@ -1,21 +1,24 @@
 /**
  * Shared harness for the entity view's warm-store tests: the REAL
  * `ComponentEntityPage` under the real provider stack (Relay environment
- * seeded — or not — plus `HeadProvider`), so every section test exercises
- * the exact fragment fan-out production renders. No router: the entity view
- * renders no `Link`s in v1 (ruling R5 keeps relations chip-free).
+ * seeded — or not — `HeadProvider`, and a static router over the app's
+ * routes at the entity's address), so every section test exercises the
+ * exact fragment fan-out production renders. The router is there for the
+ * neighbourhood well, whose chips build their hrefs through it.
  *
  * Lives in `__fixtures__` beside the captured record maps: imported by
  * tests, never collected as one.
  */
 
+import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import { HeadProvider } from "@canonical/react-head";
+import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { createEnvironment } from "#relay";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
+import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import { ComponentEntityPage } from "../ComponentEntityPage/index.js";
 
 /** The two captured exemplars' URIs. */
@@ -36,7 +39,15 @@ export const entityPageAt = (
     <RelayEnvironmentProvider
       environment={createEnvironment({ records, fetchFn })}
     >
-      <ComponentEntityPage params={{ uri }} />
+      <RouterProvider
+        router={createStaticRouter(
+          appRoutes,
+          `/components/${encodeURIComponent(uri)}`,
+          { middleware: [...middleware], notFound: notFoundRoute },
+        )}
+      >
+        <ComponentEntityPage params={{ uri }} />
+      </RouterProvider>
     </RelayEnvironmentProvider>
   </HeadProvider>
 );

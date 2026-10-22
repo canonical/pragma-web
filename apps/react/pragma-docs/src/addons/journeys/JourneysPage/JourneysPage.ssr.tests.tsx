@@ -3,14 +3,13 @@
  * cold render can never take the canvas down (the entry.tests precedent).
  */
 
+import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
 import { renderToString } from "react-dom/server";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import { createStaticRouter } from "#lib/router";
-import { createEnvironment } from "#relay";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import JourneysPage from "./JourneysPage.js";

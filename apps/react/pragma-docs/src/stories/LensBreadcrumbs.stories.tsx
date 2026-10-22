@@ -1,0 +1,44 @@
+/**
+ * `@canonical/prism-core`'s chrome ships no Storybook of its own; its
+ * stories live in the docs site, rendered over the site's styles.
+ */
+
+import { LensBreadcrumbs as Component } from "@canonical/prism-core";
+import { route } from "@canonical/router-core";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { withRouter } from "../../.storybook/decorators/index.js";
+
+/** Name-compatible bare routes so the back-link crumb's `to={lensRouteName}`
+ * resolves without mounting the app's real pages. */
+const bareRoutes = {
+  home: route({ url: "/", content: () => null }),
+  components: route({ url: "/components", content: () => null }),
+  definitions: route({ url: "/definitions", content: () => null }),
+  standards: route({ url: "/standards", content: () => null }),
+  journeys: route({ url: "/journeys", content: () => null }),
+} as const;
+
+const meta: Meta<typeof Component> = {
+  title: "Prism/LensBreadcrumbs",
+  component: Component,
+  tags: ["autodocs"],
+  decorators: [withRouter({ routes: bareRoutes })],
+};
+
+export default meta;
+type Story = StoryObj<typeof Component>;
+
+/** A lens index: one crumb, the lens name, the current page (text). */
+export const Index: Story = {
+  args: { lensLabel: "Components", lensRouteName: "components" },
+};
+
+/** An entity page: the lens crumb links back to the index, the entity crumb
+ * is the current page. The crumb text is the URL-derived identity. */
+export const Entity: Story = {
+  args: {
+    lensLabel: "Components",
+    lensRouteName: "components",
+    current: "ds:global.component.button",
+  },
+};

@@ -4,11 +4,11 @@
  */
 
 import "../../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
+import { createStaticRouter } from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import { createStaticRouter } from "#lib/router";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import {
   BROWSE_JOB,

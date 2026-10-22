@@ -1,7 +1,5 @@
+import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { Canvas } from "#lib/Canvas";
-import { CanvasSkipLink } from "#lib/CanvasSkipLink";
-import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import { JourneyViewProvider } from "../journeyViewContext.js";
@@ -44,7 +42,10 @@ export default function JourneysLayout({
         <CanvasSkipLink />
         <SiteRail />
         <div className="viewport">
-          <ModeStrip context={<Context />} controls={<Controls />} />
+          <ModeStrip
+            context={<Context lensLabel="Journeys" />}
+            controls={<Controls />}
+          />
           <Canvas>{children}</Canvas>
           <SiteColophon />
         </div>

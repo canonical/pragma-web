@@ -1,5 +1,5 @@
+import { makeLensContext } from "@canonical/prism-core";
 import type React from "react";
-import { makeLensContext } from "#lib/LensBreadcrumbs";
 import { JourneyViewSwitch } from "./JourneyViewSwitch/index.js";
 import { useJourneyView } from "./journeyViewContext.js";
 
@@ -32,7 +32,6 @@ const ControlsContent = (): React.ReactElement => {
  * suspends the layout.
  */
 const Context = makeLensContext({
-  lensLabel: "Journeys",
   lensRouteName: "journeys",
   paramKey: "job",
 });

@@ -7,14 +7,18 @@
  * server already serialised" guarantee lives on this exact read chain.
  */
 
+import {
+  createEnvironment,
+  setPrefetchEnvironment,
+} from "@canonical/prism-core";
 import { createBrowserAdapter, createRouter } from "@canonical/router-core";
 import {
   type HydrationOptions,
   hydrateRoot,
   type Root,
 } from "react-dom/client";
+import { resolveGraphqlUrl } from "#graphql-endpoint";
 import { Shell } from "#lib/Shell";
-import { createEnvironment, setPrefetchEnvironment } from "#relay";
 import type { InitialData } from "#server";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
 
@@ -43,6 +47,7 @@ export const hydrateApp = (
   ).__INITIAL_DATA__;
 
   const relayEnvironment = createEnvironment({
+    graphqlUrl: resolveGraphqlUrl(),
     records: initialData?.relay?.records,
   });
 

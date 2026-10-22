@@ -1,8 +1,10 @@
+import {
+  Canvas,
+  CanvasSkipLink,
+  ModeStrip,
+  makeLensContext,
+} from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { Canvas } from "#lib/Canvas";
-import { CanvasSkipLink } from "#lib/CanvasSkipLink";
-import { makeLensContext } from "#lib/LensBreadcrumbs";
-import { ModeStrip } from "#lib/ModeStrip";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import type { StandardsLayoutProps } from "./types.js";
@@ -16,7 +18,6 @@ const componentCssClassName = "ds standards-layout";
  * entity's absolute IRI), so the trail reads no query.
  */
 const StandardsContext = makeLensContext({
-  lensLabel: "Standards",
   lensRouteName: "standards",
   paramKey: "uri",
 });
@@ -43,7 +44,7 @@ export default function StandardsLayout({
       <CanvasSkipLink />
       <SiteRail />
       <div className="viewport">
-        <ModeStrip context={<StandardsContext />} />
+        <ModeStrip context={<StandardsContext lensLabel="Standards" />} />
         <Canvas>{children}</Canvas>
         <SiteColophon />
       </div>

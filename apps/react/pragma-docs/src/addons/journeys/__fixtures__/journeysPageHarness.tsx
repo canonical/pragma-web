@@ -21,14 +21,13 @@
  * tests, never collected as one.
  */
 
+import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { createStaticRouter } from "#lib/router";
-import { createEnvironment } from "#relay";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import { JourneysLayout } from "../JourneysLayout/index.js";

@@ -12,12 +12,17 @@
  * every well. Within a sector, neighbours spread evenly across the span on
  * an ellipse (wider than tall — the well borrows the reading column's
  * horizontal room); crowded sectors stagger onto an outer ring. The
- * shared bounded relaxation pass (`#lib/WellGeometry`) then separates any
+ * shared bounded relaxation pass (`relaxBoxes`) then separates any
  * boxes that still collide — organic packing, deterministic by
  * construction (fixed iteration count, stable pair order, centre pinned).
  */
 
-import { edgeEndpoint, quadArc, relaxBoxes, settle } from "#lib/WellGeometry";
+import {
+  buildQuadArc,
+  findEdgeEndpoint,
+  relaxBoxes,
+  settle,
+} from "@canonical/prism-core";
 import {
   CENTRE_EXTRA_WIDTH,
   CENTRE_NODE_HEIGHT,
@@ -43,7 +48,7 @@ import type {
   WellNode,
 } from "./types.js";
 
-export { edgeEndpoint } from "#lib/WellGeometry";
+export { findEdgeEndpoint } from "@canonical/prism-core";
 
 /** A node mid-layout: mutable position, frozen identity. */
 interface WorkingNode extends Omit<WellNode, "x" | "y"> {
@@ -150,8 +155,8 @@ export const buildNeighbourhood = (
     if (target === undefined) continue;
     const from = neighbour.spec.direction === "out" ? settledCentre : target;
     const to = neighbour.spec.direction === "out" ? target : settledCentre;
-    const start = edgeEndpoint(from, to, 3);
-    const end = edgeEndpoint(to, from, 7);
+    const start = findEdgeEndpoint(from, to, 3);
+    const end = findEdgeEndpoint(to, from, 7);
     if (neighbour.spec.family === "structural") {
       edges.push({
         id: `${neighbour.spec.key}:${neighbour.uri}`,
@@ -162,7 +167,7 @@ export const buildNeighbourhood = (
       });
       continue;
     }
-    const arc = quadArc(start, end, EDGE_BOW);
+    const arc = buildQuadArc(start, end, EDGE_BOW);
     edges.push({
       id: `${neighbour.spec.key}:${neighbour.uri}`,
       neighbourUri: neighbour.uri,
