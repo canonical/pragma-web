@@ -1,31 +1,6 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import { createServer } from "node:net";
-
-/**
- * A spawned server under test.
- */
-export interface RunningServer {
-  /** Base URL, e.g. `http://localhost:54123`. */
-  readonly base: string;
-  /** Stop the server and its whole process group. */
-  readonly stop: () => Promise<void>;
-}
-
-/** Options for `startServer`. */
-export interface StartServerOptions {
-  /** How long the server may take to answer its first request. */
-  readonly timeoutMs?: number;
-  /** Extra environment variables for the script. */
-  readonly env?: Readonly<Record<string, string>>;
-  /** The variable the script reads its port from. */
-  readonly portEnv?: string;
-  /**
-   * The host the server is probed and addressed on. A server bound to the
-   * IPv4 loopback alone must be probed at `127.0.0.1`, because `localhost`
-   * may resolve to `::1` first.
-   */
-  readonly hostname?: string;
-}
+import type { RunningServer, StartServerOptions } from "./types.js";
 
 /**
  * Reserve a free TCP port by opening an ephemeral listener and reading it
@@ -34,7 +9,7 @@ export interface StartServerOptions {
  * @returns The port.
  * @note Impure: opens and closes a socket.
  */
-export function getFreePort(): Promise<number> {
+function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const srv = createServer();
     srv.unref();
@@ -94,7 +69,7 @@ async function waitForServer(
  * @returns The running server.
  * @note Impure: spawns a process and performs network requests.
  */
-export async function startServer(
+export default async function startServer(
   script: string,
   cwd: string,
   {

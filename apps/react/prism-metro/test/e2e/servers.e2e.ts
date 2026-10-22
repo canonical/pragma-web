@@ -12,7 +12,8 @@
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { DEV_READY_MS, GRAPH_READY_MS, PREVIEW_READY_MS } from "./constants.js";
-import { type RunningServer, startServer } from "./serverHarness.js";
+import startServer from "./startServer.js";
+import type { RunningServer } from "./types.js";
 
 const CWD = process.cwd();
 
