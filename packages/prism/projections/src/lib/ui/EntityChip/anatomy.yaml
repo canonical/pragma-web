@@ -1,0 +1,70 @@
+---
+# EntityChip — the inline mention of an entity: a 28px pill in running text.
+# Reference: the projection matrix's chip (a 24px line, 2px block insets, 8px
+# before the value and 4px after the last slot, 4px between slots, a full
+# radius and a 1px border), with the segmented chip's icon and chevron. Slot
+# order, left to right: lead (the key, then the catalog's separator), value,
+# badge, icon, chevron.
+#
+# Why not a published component: the published Chip renders a span or a
+# button, never a link, has no badge, icon or chevron slot, and carries outer
+# margins a mention in a sentence cannot have. The badge and the icons are
+# the published Badge and Icon.
+#
+# The 28px: the matrix draws the border inside the pill, CSS draws it outside
+# the padding, so each block inset is the matrix's 2px less the border.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-chip-*`), bound to the symbol or the literal named here.
+#
+# Token ledger (no symbol to bind):
+#   --entity-chip-border-width: 1px    stroke thickness has only the
+#                                      primitive dimension.stroke.thickness.*.
+#   --entity-chip-radius: 9999px       a full radius has only the primitive
+#                                      dimension.radius.full.
+#   --entity-chip-padding-block: calc(var(--space-025) - var(--entity-chip-border-width))
+#                                      the matrix's 2px inset less the border.
+#   space.100 (8px) and space.050 (4px) for the inline insets and space.050
+#   for the gap: the shim's inline component padding (16px) is a surface's,
+#   not a pill's, and no gap may read a container gap.
+#
+# Roster namespaces (accepted and tracked): space.100, space.050.
+node:
+  uri: prism.component.entity_chip
+  styles:
+    layout.type: inline-flex
+    layout.align: center
+    spacing.gap: space.050
+    spacing.internal.inline.start: space.100
+    spacing.internal.inline.end: space.050
+    spacing.internal.block.start: "calc(var(--space-025) - var(--entity-chip-border-width))"
+    spacing.internal.block.end: "calc(var(--space-025) - var(--entity-chip-border-width))"
+    appearance.background: color.foreground.secondary
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.color: color.border
+    appearance.radius: 9999px
+    typography.whiteSpace: nowrap
+  edges:
+    - node:
+        role: lead
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: lead }
+    - node:
+        role: value
+        styles:
+          layout.overflow: hidden
+          typography.overflow: ellipsis
+      relation: { cardinality: "1", slotName: value }
+    - node:
+        uri: global.component.badge
+      relation: { cardinality: "0..1", slotName: badge }
+    - node:
+        uri: global.component.icon
+      relation: { cardinality: "0..1", slotName: icon }
+    - node:
+        uri: global.component.icon
+        props:
+          icon: chevron-down
+      relation: { cardinality: "0..1", slotName: chevron }

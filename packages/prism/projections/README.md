@@ -21,6 +21,19 @@ lens spreads it in its query and hands the component the key. The
 representations select only what the contract guarantees on every node
 (`_meta { title curie type { uri } }`).
 
+## Slotted representations
+
+Each representation is also a slotted component that reads no Relay
+fragment and no context: it renders the slots it is given, in the order its
+anatomy fixes, and links its title to `href` through `LinkComponent` (the
+intrinsic `"a"` by default) or renders it as inert text without one. Each
+folder under `src/lib/ui/` carries its `anatomy.yaml`, the design contract
+its stylesheet transcribes.
+
+- **`EntityChip`**: the inline mention, a 28px pill in running text: an
+  optional lead filed before the catalog's separator, the value, then an
+  optional badge, icon and disclosure chevron.
+
 ## Installation
 
 ```bash
@@ -204,6 +217,7 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
   `CardProjectionProps`, `CommandProjectionProps`.
+- Representations: `EntityChip`; types `EntityChipProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

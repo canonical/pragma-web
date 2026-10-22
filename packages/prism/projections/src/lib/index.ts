@@ -31,3 +31,5 @@ export {
 } from "./projections/index.js";
 export type { RowProjectionProps } from "./RowProjection/index.js";
 export { RowProjection } from "./RowProjection/index.js";
+export type { EntityChipProps } from "./ui/index.js";
+export { EntityChip } from "./ui/index.js";
