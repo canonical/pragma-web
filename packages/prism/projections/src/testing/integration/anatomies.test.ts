@@ -31,6 +31,7 @@ const UI_TOKENS = [
   "--color-background-layer2",
   "--color-border",
   "--color-border-muted",
+  "--color-foreground-ghost-hover",
   "--color-foreground-secondary",
   "--color-text-muted",
   "--typography-text-primary-bold-font-weight",
@@ -47,6 +48,7 @@ describe("the package's components", () => {
     expect(folders.map((folder) => basename(folder))).toEqual([
       "EntityCard",
       "EntityChip",
+      "EntityCommand",
       "EntityRow",
     ]);
   });

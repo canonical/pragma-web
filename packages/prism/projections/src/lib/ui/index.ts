@@ -2,4 +2,5 @@
 
 export * from "./EntityCard/index.js";
 export * from "./EntityChip/index.js";
+export * from "./EntityCommand/index.js";
 export * from "./EntityRow/index.js";

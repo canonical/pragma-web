@@ -39,6 +39,8 @@ its stylesheet transcribes.
   title and the entity it belongs to, kind, summary, key values and the
   footer's vitals, and an optional sidecar beside them, two columns wide,
   for a rendered example of the entity.
+- **`EntityCommand`**: the command-palette result, a 56px row: the title
+  over "kind in location", and one vital at the end.
 
 ## Installation
 
@@ -223,9 +225,9 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
   `CardProjectionProps`, `CommandProjectionProps`.
-- Representations: `EntityChip`, `EntityRow`, `EntityCard`; types
-  `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
-  `EntityCardKeyValue`.
+- Representations: `EntityChip`, `EntityRow`, `EntityCard`,
+  `EntityCommand`; types `EntityChipProps`, `EntityRowProps`,
+  `EntityCardProps`, `EntityCardKeyValue`, `EntityCommandProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

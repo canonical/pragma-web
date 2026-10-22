@@ -35,6 +35,12 @@ export type {
   EntityCardKeyValue,
   EntityCardProps,
   EntityChipProps,
+  EntityCommandProps,
   EntityRowProps,
 } from "./ui/index.js";
-export { EntityCard, EntityChip, EntityRow } from "./ui/index.js";
+export {
+  EntityCard,
+  EntityChip,
+  EntityCommand,
+  EntityRow,
+} from "./ui/index.js";
