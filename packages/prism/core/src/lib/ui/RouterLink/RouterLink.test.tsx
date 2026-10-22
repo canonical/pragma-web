@@ -150,12 +150,19 @@ describe("RouterLink", () => {
       expect(screen.queryByText("Thing ds:Button")).toBeNull();
     });
 
-    it("leaves a modified click to the browser", async () => {
+    it.each([
+      ["metaKey", { metaKey: true }],
+      ["ctrlKey", { ctrlKey: true }],
+      ["altKey", { altKey: true }],
+      ["shiftKey", { shiftKey: true }],
+    ])("leaves a click with %s to the browser", async (_, modifier) => {
       const link = await renderWithRouter(
         <RouterLink href="/things/ds%3AButton">Button</RouterLink>,
       );
-      expect(fireEvent.click(link, { metaKey: true })).toBe(true);
+      expect(fireEvent.click(link, modifier)).toBe(true);
+      await settle();
       expect(screen.getByText("Home page")).toBeInTheDocument();
+      expect(screen.queryByText("Thing ds:Button")).toBeNull();
     });
 
     it("leaves a non-primary click to the browser", async () => {
