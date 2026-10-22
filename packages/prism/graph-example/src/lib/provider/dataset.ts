@@ -16,6 +16,7 @@
  */
 
 import {
+  CALL_CLASS_URI,
   GEO_NAMESPACE,
   GEO_PREFIX,
   META_CLASS_URI,
@@ -23,6 +24,7 @@ import {
   METRO_PREFIX,
   RDFS_NAMESPACE,
   RDFS_PREFIX,
+  ROUTE_CLASS_URI,
 } from "./constants.js";
 import type { ExampleDataset } from "./types.js";
 
@@ -43,6 +45,15 @@ const LOCATION = `${GEO_NAMESPACE}location`;
 const LATITUDE = `${GEO_NAMESPACE}latitude`;
 const LONGITUDE = `${GEO_NAMESPACE}longitude`;
 const IN_ZONE = `${GEO_NAMESPACE}inZone`;
+const LABEL = `${RDFS_NAMESPACE}label`;
+const CODE = `${METRO_NAMESPACE}code`;
+const COLOUR = `${METRO_NAMESPACE}colour`;
+const ROUTES = `${METRO_NAMESPACE}routes`;
+const IS_LOOP = `${METRO_NAMESPACE}isLoop`;
+const CALLS = `${METRO_NAMESPACE}calls`;
+const REVERSE = `${METRO_NAMESPACE}reverse`;
+const POSITION = `${METRO_NAMESPACE}position`;
+const CALL_STOP = `${METRO_NAMESPACE}stop`;
 
 /** IRI of the entity carrying no descriptive predicates whatsoever. */
 export const BARE_ENTITY_URI = `${METRO_NAMESPACE}ghost`;
@@ -104,7 +115,9 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: INTERCHANGE,
       labels: { "": "Interchange" },
-      definitions: { "": "A station where two or more lines meet." },
+      definitions: {
+        "": "A station where lines serving different stops meet, so passengers change there.",
+      },
       superclass: STATION,
       isAbstract: false,
       properties: [
@@ -114,11 +127,40 @@ export const exampleDataset: ExampleDataset = {
     {
       uri: LINE,
       labels: { "": "Line" },
-      definitions: { "": "A named route through the network." },
+      definitions: { "": "A named service over one or more routes." },
       isAbstract: false,
       properties: [
         { property: NAME, required: true, singular: true },
         { property: SERVED_BY, required: false, singular: false },
+        { property: CODE, required: true, singular: true },
+        { property: COLOUR, required: true, singular: true },
+        { property: ROUTES, required: true, singular: false },
+      ],
+    },
+    {
+      // A value class, like geo:GeoPoint: routes have no IRI and no
+      // instances of their own, and are reached only through their line.
+      uri: ROUTE_CLASS_URI,
+      labels: { "": "Route" },
+      definitions: {
+        "": "One direction of a line's service: the stops it calls at, in order.",
+      },
+      isAbstract: false,
+      properties: [
+        { property: LABEL, required: true, singular: true },
+        { property: IS_LOOP, required: true, singular: true },
+        { property: CALLS, required: true, singular: false },
+        { property: REVERSE, required: false, singular: true },
+      ],
+    },
+    {
+      uri: CALL_CLASS_URI,
+      labels: { "": "Call" },
+      definitions: { "": "One stop on a route, at its place in the order." },
+      isAbstract: false,
+      properties: [
+        { property: POSITION, required: true, singular: true },
+        { property: CALL_STOP, required: true, singular: true },
       ],
     },
     {
@@ -242,12 +284,97 @@ export const exampleDataset: ExampleDataset = {
       kind: "OBJECT",
       functional: true,
     },
+    {
+      // Global, like metro:name. A route's label is its rdfs:label, which is
+      // also what `_meta.label` serves, so the two cannot disagree.
+      uri: LABEL,
+      labels: { "": "label" },
+      definitions: { "": "The human-readable name of a resource." },
+      range: "String",
+      kind: "ANNOTATION",
+      functional: false,
+    },
+    {
+      uri: CODE,
+      labels: { "": "code" },
+      definitions: { "": "The short code passengers know the line by." },
+      domain: LINE,
+      range: "String",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: COLOUR,
+      labels: { "": "colour" },
+      definitions: {
+        "": "The line's colour on maps and signs, as a hex triplet.",
+      },
+      domain: LINE,
+      range: "String",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: ROUTES,
+      labels: { "": "routes" },
+      domain: LINE,
+      range: "metro:Route",
+      kind: "OBJECT",
+      functional: false,
+    },
+    {
+      uri: IS_LOOP,
+      labels: { "": "is loop" },
+      domain: ROUTE_CLASS_URI,
+      range: "Boolean",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: CALLS,
+      labels: { "": "calls" },
+      domain: ROUTE_CLASS_URI,
+      range: "metro:Call",
+      kind: "OBJECT",
+      functional: false,
+    },
+    {
+      // Symmetric: a route's reverse has that route as its reverse, so the
+      // property is its own inverse.
+      uri: REVERSE,
+      labels: { "": "reverse" },
+      domain: ROUTE_CLASS_URI,
+      range: "metro:Route",
+      kind: "OBJECT",
+      functional: true,
+      inverse: REVERSE,
+    },
+    {
+      uri: POSITION,
+      labels: { "": "position" },
+      domain: CALL_CLASS_URI,
+      range: "Int",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: CALL_STOP,
+      labels: { "": "stop" },
+      domain: CALL_CLASS_URI,
+      range: "metro:Stop",
+      kind: "OBJECT",
+      functional: true,
+    },
   ],
 
   // ---------------------------------------------------------------------
-  // ABox. Fourteen direct Stations plus two Interchanges, so `instances`
-  // paging has more than one page to page over and `hasNextPage` is a real
-  // answer rather than a constant.
+  // ABox. Seven lines over twenty-three direct Stations (two of them bare)
+  // plus four Interchanges, so `instances` paging has more than one page to
+  // page over and `hasNextPage` is a real answer rather than a constant. The
+  // lines cover four topologies: linear lines (North, Coastal), a loop run
+  // both ways (Circle), two linear lines closing a ring between shared
+  // termini (Upland, Lowland), and a ring run by two lines in opposite
+  // directions (the two Ringways).
   // ---------------------------------------------------------------------
   entities: [
     {
@@ -256,6 +383,36 @@ export const exampleDataset: ExampleDataset = {
       typename: "Line",
       labels: { "": "North Line" },
       definitions: { "": "Northgate to Marsh End, via the old cutting." },
+      code: "1",
+      colour: "#c8102e",
+      routes: [
+        {
+          key: "southbound",
+          labels: { "": "To Marsh End" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}northgate`,
+            `${METRO_NAMESPACE}verge-park`,
+            `${METRO_NAMESPACE}foundry-row`,
+            `${METRO_NAMESPACE}central-exchange`,
+            `${METRO_NAMESPACE}marsh-end`,
+          ],
+          reverse: "northbound",
+        },
+        {
+          key: "northbound",
+          labels: { "": "To Northgate" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}marsh-end`,
+            `${METRO_NAMESPACE}central-exchange`,
+            `${METRO_NAMESPACE}foundry-row`,
+            `${METRO_NAMESPACE}verge-park`,
+            `${METRO_NAMESPACE}northgate`,
+          ],
+          reverse: "southbound",
+        },
+      ],
     },
     {
       uri: `${METRO_NAMESPACE}circle-line`,
@@ -263,12 +420,200 @@ export const exampleDataset: ExampleDataset = {
       typename: "Line",
       labels: { "": "Circle Line", fr: "Ligne Circulaire" },
       comments: { "": "Runs both directions; timetable is symmetric." },
+      code: "2",
+      colour: "#f2b705",
+      routes: [
+        {
+          key: "clockwise",
+          labels: { "": "Clockwise" },
+          isLoop: true,
+          calls: [
+            `${METRO_NAMESPACE}central-exchange`,
+            `${METRO_NAMESPACE}kilnwood`,
+            `${METRO_NAMESPACE}quarry-hill`,
+            `${METRO_NAMESPACE}tannery-lane`,
+            `${METRO_NAMESPACE}willowbank`,
+            `${METRO_NAMESPACE}riverside-junction`,
+          ],
+          reverse: "anticlockwise",
+        },
+        {
+          key: "anticlockwise",
+          labels: { "": "Anticlockwise" },
+          isLoop: true,
+          calls: [
+            `${METRO_NAMESPACE}central-exchange`,
+            `${METRO_NAMESPACE}riverside-junction`,
+            `${METRO_NAMESPACE}willowbank`,
+            `${METRO_NAMESPACE}tannery-lane`,
+            `${METRO_NAMESPACE}quarry-hill`,
+            `${METRO_NAMESPACE}kilnwood`,
+          ],
+          reverse: "clockwise",
+        },
+      ],
     },
     {
       uri: `${METRO_NAMESPACE}coastal-line`,
       type: LINE,
       typename: "Line",
       labels: { "": "Coastal Line" },
+      code: "3",
+      colour: "#0072ce",
+      routes: [
+        {
+          key: "eastbound",
+          labels: { "": "To Eastcliff" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}central-exchange`,
+            `${METRO_NAMESPACE}riverside-junction`,
+            `${METRO_NAMESPACE}harbourside`,
+            `${METRO_NAMESPACE}saltford`,
+            `${METRO_NAMESPACE}greenhithe`,
+            `${METRO_NAMESPACE}eastcliff`,
+          ],
+          reverse: "westbound",
+        },
+        {
+          key: "westbound",
+          labels: { "": "To Central Exchange" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}eastcliff`,
+            `${METRO_NAMESPACE}greenhithe`,
+            `${METRO_NAMESPACE}saltford`,
+            `${METRO_NAMESPACE}harbourside`,
+            `${METRO_NAMESPACE}riverside-junction`,
+            `${METRO_NAMESPACE}central-exchange`,
+          ],
+          reverse: "eastbound",
+        },
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}upland-line`,
+      type: LINE,
+      typename: "Line",
+      labels: { "": "Upland Line" },
+      definitions: {
+        "": "Tannery Lane to Eastwick Cross over the hills; with the Lowland Line it closes the eastern ring.",
+      },
+      code: "4",
+      colour: "#00843d",
+      routes: [
+        {
+          key: "eastbound",
+          labels: { "": "To Eastwick Cross" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}tannery-lane`,
+            `${METRO_NAMESPACE}larkrise`,
+            `${METRO_NAMESPACE}highmoor`,
+            `${METRO_NAMESPACE}eastwick-cross`,
+          ],
+          reverse: "westbound",
+        },
+        {
+          key: "westbound",
+          labels: { "": "To Tannery Lane" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}eastwick-cross`,
+            `${METRO_NAMESPACE}highmoor`,
+            `${METRO_NAMESPACE}larkrise`,
+            `${METRO_NAMESPACE}tannery-lane`,
+          ],
+          reverse: "eastbound",
+        },
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}lowland-line`,
+      type: LINE,
+      typename: "Line",
+      labels: { "": "Lowland Line" },
+      definitions: {
+        "": "Tannery Lane to Eastwick Cross through the valley; with the Upland Line it closes the eastern ring.",
+      },
+      code: "5",
+      colour: "#8e3ba3",
+      routes: [
+        {
+          key: "eastbound",
+          labels: { "": "To Eastwick Cross" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}tannery-lane`,
+            `${METRO_NAMESPACE}millford`,
+            `${METRO_NAMESPACE}reedmere`,
+            `${METRO_NAMESPACE}eastwick-cross`,
+          ],
+          reverse: "westbound",
+        },
+        {
+          key: "westbound",
+          labels: { "": "To Tannery Lane" },
+          isLoop: false,
+          calls: [
+            `${METRO_NAMESPACE}eastwick-cross`,
+            `${METRO_NAMESPACE}reedmere`,
+            `${METRO_NAMESPACE}millford`,
+            `${METRO_NAMESPACE}tannery-lane`,
+          ],
+          reverse: "eastbound",
+        },
+      ],
+    },
+    {
+      // A ring run by two lines in opposite directions over the same stops:
+      // each line has one loop route and no reverse.
+      uri: `${METRO_NAMESPACE}ringway-clockwise`,
+      type: LINE,
+      typename: "Line",
+      labels: { "": "Ringway Clockwise" },
+      definitions: { "": "The southern ring, run clockwise only." },
+      code: "R1",
+      colour: "#c46a2b",
+      routes: [
+        {
+          key: "clockwise",
+          labels: { "": "Clockwise" },
+          isLoop: true,
+          calls: [
+            `${METRO_NAMESPACE}dyers-green`,
+            `${METRO_NAMESPACE}fernside`,
+            `${METRO_NAMESPACE}nettlebed`,
+            `${METRO_NAMESPACE}orchard-gate`,
+            `${METRO_NAMESPACE}pinfold`,
+            `${METRO_NAMESPACE}ropewalk`,
+          ],
+        },
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}ringway-anticlockwise`,
+      type: LINE,
+      typename: "Line",
+      labels: { "": "Ringway Anticlockwise" },
+      definitions: { "": "The southern ring, run anticlockwise only." },
+      code: "R2",
+      colour: "#7a4b2a",
+      routes: [
+        {
+          key: "anticlockwise",
+          labels: { "": "Anticlockwise" },
+          isLoop: true,
+          calls: [
+            `${METRO_NAMESPACE}dyers-green`,
+            `${METRO_NAMESPACE}ropewalk`,
+            `${METRO_NAMESPACE}pinfold`,
+            `${METRO_NAMESPACE}orchard-gate`,
+            `${METRO_NAMESPACE}nettlebed`,
+            `${METRO_NAMESPACE}fernside`,
+          ],
+        },
+      ],
     },
 
     // Entities in the geo namespace. Their curies must come out `geo:…`
@@ -346,14 +691,6 @@ export const exampleDataset: ExampleDataset = {
       servesLine: [`${METRO_NAMESPACE}coastal-line`],
     },
     {
-      uri: `${METRO_NAMESPACE}tannery-lane`,
-      type: STATION,
-      typename: "Station",
-      labels: { "": "Tannery Lane" },
-      platformCount: 2,
-      servesLine: [`${METRO_NAMESPACE}circle-line`],
-    },
-    {
       uri: `${METRO_NAMESPACE}verge-park`,
       type: STATION,
       typename: "Station",
@@ -394,6 +731,110 @@ export const exampleDataset: ExampleDataset = {
       labels: { "": "Greenhithe" },
       platformCount: 1,
       servesLine: [`${METRO_NAMESPACE}coastal-line`],
+    },
+
+    // The eastern ring: the Upland and Lowland lines leave Tannery Lane on
+    // different stops and meet again at Eastwick Cross.
+    {
+      uri: `${METRO_NAMESPACE}larkrise`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Larkrise" },
+      platformCount: 2,
+      servesLine: [`${METRO_NAMESPACE}upland-line`],
+    },
+    {
+      uri: `${METRO_NAMESPACE}highmoor`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Highmoor" },
+      platformCount: 2,
+      servesLine: [`${METRO_NAMESPACE}upland-line`],
+    },
+    {
+      uri: `${METRO_NAMESPACE}millford`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Millford" },
+      platformCount: 2,
+      servesLine: [`${METRO_NAMESPACE}lowland-line`],
+    },
+    {
+      uri: `${METRO_NAMESPACE}reedmere`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Reedmere" },
+      platformCount: 1,
+      servesLine: [`${METRO_NAMESPACE}lowland-line`],
+    },
+
+    // The southern ring. Both Ringway lines call at every one of these, over
+    // the same stops, so none of them is an interchange.
+    {
+      uri: `${METRO_NAMESPACE}dyers-green`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Dyers Green" },
+      platformCount: 2,
+      servesLine: [
+        `${METRO_NAMESPACE}ringway-clockwise`,
+        `${METRO_NAMESPACE}ringway-anticlockwise`,
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}fernside`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Fernside" },
+      platformCount: 2,
+      servesLine: [
+        `${METRO_NAMESPACE}ringway-clockwise`,
+        `${METRO_NAMESPACE}ringway-anticlockwise`,
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}nettlebed`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Nettlebed" },
+      platformCount: 2,
+      servesLine: [
+        `${METRO_NAMESPACE}ringway-clockwise`,
+        `${METRO_NAMESPACE}ringway-anticlockwise`,
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}orchard-gate`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Orchard Gate" },
+      platformCount: 2,
+      servesLine: [
+        `${METRO_NAMESPACE}ringway-clockwise`,
+        `${METRO_NAMESPACE}ringway-anticlockwise`,
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}pinfold`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Pinfold" },
+      platformCount: 2,
+      servesLine: [
+        `${METRO_NAMESPACE}ringway-clockwise`,
+        `${METRO_NAMESPACE}ringway-anticlockwise`,
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}ropewalk`,
+      type: STATION,
+      typename: "Station",
+      labels: { "": "Ropewalk" },
+      platformCount: 2,
+      servesLine: [
+        `${METRO_NAMESPACE}ringway-clockwise`,
+        `${METRO_NAMESPACE}ringway-anticlockwise`,
+      ],
     },
 
     // The awkward two. Neither has a single descriptive predicate, and the
@@ -440,6 +881,33 @@ export const exampleDataset: ExampleDataset = {
       servesLine: [
         `${METRO_NAMESPACE}circle-line`,
         `${METRO_NAMESPACE}coastal-line`,
+      ],
+    },
+    {
+      // Where the Circle meets the eastern ring: four routes leave it on four
+      // different stops.
+      uri: `${METRO_NAMESPACE}tannery-lane`,
+      type: INTERCHANGE,
+      typename: "Interchange",
+      labels: { "": "Tannery Lane" },
+      platformCount: 2,
+      transferMinutes: 3,
+      servesLine: [
+        `${METRO_NAMESPACE}circle-line`,
+        `${METRO_NAMESPACE}upland-line`,
+        `${METRO_NAMESPACE}lowland-line`,
+      ],
+    },
+    {
+      uri: `${METRO_NAMESPACE}eastwick-cross`,
+      type: INTERCHANGE,
+      typename: "Interchange",
+      labels: { "": "Eastwick Cross" },
+      platformCount: 4,
+      transferMinutes: 2,
+      servesLine: [
+        `${METRO_NAMESPACE}upland-line`,
+        `${METRO_NAMESPACE}lowland-line`,
       ],
     },
   ],

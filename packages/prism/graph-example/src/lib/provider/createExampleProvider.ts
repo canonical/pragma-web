@@ -25,9 +25,12 @@ import {
   toCursor,
 } from "./connection.js";
 import {
+  CALL_CLASS_URI,
   DEFAULT_LANG,
+  FIRST_CALL_POSITION,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
+  ROUTE_CLASS_URI,
 } from "./constants.js";
 import { exampleDataset } from "./dataset.js";
 import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
@@ -41,6 +44,7 @@ import type {
   ExampleOntology,
   ExampleProperty,
   ExampleProvider,
+  ExampleRoute,
   LangMap,
 } from "./types.js";
 
@@ -333,6 +337,65 @@ export const createExampleProvider = (
           longitude: point.longitude,
         };
 
+  // -------------------------------------------------------------------
+  // Routes and calls. Value types like GeoPoint: no IRI, so `_meta.title`
+  // reaches the label or the typename and `_meta.curie` is the typename. A
+  // value whose class the TBox lacks is not served, for the same reason an
+  // entity of an undeclared class is not: `_meta.type` is non-null.
+  // -------------------------------------------------------------------
+
+  const routeClass = classByUri.get(ROUTE_CLASS_URI);
+  const callClass = classByUri.get(CALL_CLASS_URI);
+
+  /**
+   * A route's calls, numbered from FIRST_CALL_POSITION. A call to a stop the
+   * ABox does not carry is dropped before numbering, as `servesLine` drops a
+   * dangling line, so the positions keep no gap.
+   */
+  const buildCallViews = (route: ExampleRoute): View[] =>
+    callClass === undefined
+      ? []
+      : route.calls
+          .flatMap((uri) => {
+            const stop = viewByUri.get(uri);
+            return stop === undefined ? [] : [stop];
+          })
+          .map((stop, index) => ({
+            _meta: () =>
+              metaView({ uri: null, typename: "Call", cls: callClass }),
+            position: FIRST_CALL_POSITION + index,
+            stop,
+          }));
+
+  /**
+   * One route of a line. `siblings` is the line's whole route list, which is
+   * where `reverse` looks its partner up by key.
+   */
+  function buildRouteView(
+    siblings: readonly ExampleRoute[],
+    route: ExampleRoute,
+    cls: ExampleClass,
+  ): View {
+    return {
+      _meta: () =>
+        metaView({ labels: route.labels, uri: null, typename: "Route", cls }),
+      // The same chain `_meta.title` runs, so the two always agree and the
+      // non-null label is total even for a route whose labels are empty.
+      label: resolveTitle(route.labels, DEFAULT_LANG, null, "Route"),
+      isLoop: route.isLoop,
+      calls: () => buildCallViews(route),
+      reverse: () => {
+        const reverse =
+          route.reverse === undefined
+            ? undefined
+            : siblings.find((other) => other.key === route.reverse);
+        return reverse === undefined
+          ? null
+          : buildRouteView(siblings, reverse, cls);
+      },
+    };
+  }
+
   const entityView = (entity: ExampleEntity, cls: ExampleClass): View => ({
     __typename: entity.typename,
     uri: entity.uri,
@@ -347,6 +410,17 @@ export const createExampleProvider = (
       }),
     name: resolveLabel(entity.labels, DEFAULT_LANG),
     platformCount: entity.platformCount ?? null,
+    // No fallback: the SDL makes both non-null on a Line, so a Line record
+    // missing either is an invalid dataset, and graphql-js reports it as a
+    // field error rather than this view inventing a value.
+    code: entity.code,
+    colour: entity.colour,
+    routes: () => {
+      const routes = entity.routes ?? [];
+      return routeClass === undefined
+        ? []
+        : routes.map((route) => buildRouteView(routes, route, routeClass));
+    },
     transferMinutes: entity.transferMinutes ?? null,
     location: () => geoPointView(entity.location),
     inZone: () =>

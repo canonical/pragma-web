@@ -1,7 +1,12 @@
 import { type ExecutionResult, graphql } from "graphql";
 import { beforeAll, describe, expect, it } from "vitest";
 import { toCursor } from "./connection.js";
-import { GEO_POINT_CLASS_URI, META_CLASS_URI } from "./constants.js";
+import {
+  CALL_CLASS_URI,
+  GEO_POINT_CLASS_URI,
+  META_CLASS_URI,
+  ROUTE_CLASS_URI,
+} from "./constants.js";
 import { createExampleProvider } from "./createExampleProvider.js";
 import {
   BARE_ENTITY_URI,
@@ -285,9 +290,15 @@ describe("OntologyClass.instances", () => {
       interchange: ontologyClass(uri: "metro:Interchange") { instanceCount }
       line: ontologyClass(uri: "metro:Line") { instanceCount }
     }`);
-    expect(data.station).toEqual({ instanceCount: 16 });
-    expect(data.interchange).toEqual({ instanceCount: 2 });
-    expect(data.line).toEqual({ instanceCount: 3 });
+    // 23 direct stations, two of them bare, plus 4 interchanges: the five
+    // lines added for the eastern and southern rings brought 11 stations,
+    // one of them the interchange Eastwick Cross, and Tannery Lane became an
+    // interchange where the Circle meets the eastern ring.
+    expect(data.station).toEqual({ instanceCount: 27 });
+    // Central Exchange, Riverside Junction, Tannery Lane, Eastwick Cross.
+    expect(data.interchange).toEqual({ instanceCount: 4 });
+    // North, Circle and Coastal, plus Upland, Lowland and the two Ringways.
+    expect(data.line).toEqual({ instanceCount: 7 });
   });
 
   it("counts nothing for a class with no ABox members", async () => {
@@ -417,6 +428,17 @@ describe("Query.ontologyProperty", () => {
   it("is null for an unknown property", async () => {
     const data = await run(`{ ontologyProperty(uri: "metro:nope") { uri } }`);
     expect(data.ontologyProperty).toBeNull();
+  });
+
+  it("makes metro:reverse its own inverse, since it is symmetric", async () => {
+    const data = await run(`{
+      ontologyProperty(uri: "metro:reverse") { uri functional inverse { uri } }
+    }`);
+    expect(data.ontologyProperty).toEqual({
+      uri: "https://metro.example/onto#reverse",
+      functional: true,
+      inverse: { uri: "https://metro.example/onto#reverse" },
+    });
   });
 });
 
@@ -804,6 +826,141 @@ describe("the provider's own relational fields", () => {
   });
 });
 
+describe("Line.routes", () => {
+  const NORTH_LINE = "https://metro.example/onto#north-line";
+
+  it("serves the line's code, colour and both directions with numbered calls", async () => {
+    const data = await run(`{
+      node(id: "${NORTH_LINE}") {
+        ... on Line {
+          code colour
+          routes {
+            label isLoop
+            calls { position stop { __typename uri } }
+          }
+        }
+      }
+    }`);
+    const node = data.node as {
+      code: string;
+      colour: string;
+      routes: {
+        label: string;
+        isLoop: boolean;
+        calls: {
+          position: number;
+          stop: { __typename: string; uri: string };
+        }[];
+      }[];
+    };
+    expect(node.code).toBe("1");
+    expect(node.colour).toBe("#c8102e");
+    expect(node.routes.map((route) => [route.label, route.isLoop])).toEqual([
+      ["To Marsh End", false],
+      ["To Northgate", false],
+    ]);
+    for (const route of node.routes) {
+      expect(route.calls.map((call) => call.position)).toEqual([1, 2, 3, 4, 5]);
+    }
+    expect(node.routes.at(0)?.calls.at(3)?.stop).toEqual({
+      __typename: "Interchange",
+      uri: "https://metro.example/onto#central-exchange",
+    });
+  });
+
+  it("leads a route's reverse back to the route", async () => {
+    const data = await run(`{
+      node(id: "${NORTH_LINE}") {
+        ... on Line { routes { label reverse { label reverse { label } } } }
+      }
+    }`);
+    const node = data.node as {
+      routes: {
+        label: string;
+        reverse: { label: string; reverse: { label: string } };
+      }[];
+    };
+    for (const route of node.routes) {
+      expect(route.reverse.reverse.label).toBe(route.label);
+      expect(route.reverse.label).not.toBe(route.label);
+    }
+  });
+
+  it("describes a route as a value: titled by its label, curie its typename", async () => {
+    const data = await run(`{
+      node(id: "${NORTH_LINE}") {
+        ... on Line { routes { label _meta { title label curie type { uri } } } }
+      }
+    }`);
+    const route = (
+      data.node as {
+        routes: {
+          label: string;
+          _meta: {
+            title: string;
+            label: string;
+            curie: string;
+            type: { uri: string };
+          };
+        }[];
+      }
+    ).routes.at(0);
+    expect(route?._meta).toEqual({
+      title: route?.label,
+      label: route?.label,
+      curie: "Route",
+      type: { uri: ROUTE_CLASS_URI },
+    });
+  });
+
+  it("publishes the route's fields, and each one round-trips", async () => {
+    const data = await run(`{
+      node(id: "${NORTH_LINE}") {
+        ... on Line { routes { _meta { fields { name } } } }
+      }
+    }`);
+    const names = (
+      data.node as { routes: { _meta: { fields: { name: string }[] } }[] }
+    ).routes
+      .at(0)
+      ?._meta.fields.map((field) => field.name);
+    expect(names).toEqual(["label", "isLoop", "calls", "reverse"]);
+    for (const name of names ?? []) {
+      const roundTrip = await run(`{
+        node(id: "${NORTH_LINE}") {
+          ... on Line { routes { _meta { field(name: "${name}") { name } } } }
+        }
+      }`);
+      const field = (
+        roundTrip.node as {
+          routes: { _meta: { field: { name: string } | null } }[];
+        }
+      ).routes.at(0)?._meta.field;
+      expect(field).toEqual({ name });
+    }
+  });
+
+  it("describes a call as a value of the Call class", async () => {
+    const data = await run(`{
+      node(id: "${NORTH_LINE}") {
+        ... on Line { routes { calls { _meta { title curie type { uri } } } } }
+      }
+    }`);
+    const call = (
+      data.node as {
+        routes: { calls: { _meta: Record<string, unknown> }[] }[];
+      }
+    ).routes
+      .at(0)
+      ?.calls.at(0);
+    expect(call?._meta).toEqual({
+      title: "Call",
+      curie: "Call",
+      type: { uri: CALL_CLASS_URI },
+    });
+  });
+});
+
 describe("defensive paths, exercised with purpose-built datasets", () => {
   const cls = {
     uri: "urn:C",
@@ -990,6 +1147,151 @@ describe("defensive paths, exercised with purpose-built datasets", () => {
     expect(data.node).toEqual({ servesLine: [{ uri: "urn:e2" }] });
   });
 
+  const routeClass = {
+    uri: ROUTE_CLASS_URI,
+    isAbstract: false,
+    properties: [],
+  } as const;
+  const callClass = { uri: CALL_CLASS_URI, isAbstract: false, properties: [] };
+  const lineQuery = `{ node(id: "urn:line") {
+    ... on Line { routes { label calls { position stop { uri } } reverse { label } } }
+  } }`;
+
+  it("serves no routes when the Route class is not declared", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, callClass],
+        properties: [],
+        entities: [
+          {
+            uri: "urn:line",
+            type: "urn:C",
+            typename: "Line",
+            routes: [
+              { key: "out", labels: { "": "Out" }, isLoop: false, calls: [] },
+            ],
+          },
+        ],
+      },
+      lineQuery,
+    );
+    expect(data.node).toEqual({ routes: [] });
+  });
+
+  it("serves no routes for a line that declares none", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, routeClass, callClass],
+        properties: [],
+        entities: [{ uri: "urn:line", type: "urn:C", typename: "Line" }],
+      },
+      lineQuery,
+    );
+    expect(data.node).toEqual({ routes: [] });
+  });
+
+  it("serves no calls when the Call class is not declared", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, routeClass],
+        properties: [],
+        entities: [
+          {
+            uri: "urn:line",
+            type: "urn:C",
+            typename: "Line",
+            routes: [
+              {
+                key: "out",
+                labels: { "": "Out" },
+                isLoop: false,
+                calls: ["urn:s1"],
+              },
+            ],
+          },
+          { uri: "urn:s1", type: "urn:C", typename: "Station" },
+        ],
+      },
+      lineQuery,
+    );
+    expect(data.node).toEqual({
+      routes: [{ label: "Out", calls: [], reverse: null }],
+    });
+  });
+
+  it("drops a call to a stop that is not served, and numbers the rest without a gap", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, routeClass, callClass],
+        properties: [],
+        entities: [
+          {
+            uri: "urn:line",
+            type: "urn:C",
+            typename: "Line",
+            routes: [
+              {
+                key: "out",
+                labels: { "": "Out" },
+                isLoop: false,
+                calls: ["urn:s1", "urn:gone", "urn:s2"],
+              },
+            ],
+          },
+          { uri: "urn:s1", type: "urn:C", typename: "Station" },
+          { uri: "urn:s2", type: "urn:C", typename: "Station" },
+        ],
+      },
+      lineQuery,
+    );
+    expect(data.node).toEqual({
+      routes: [
+        {
+          label: "Out",
+          calls: [
+            { position: 1, stop: { uri: "urn:s1" } },
+            { position: 2, stop: { uri: "urn:s2" } },
+          ],
+          reverse: null,
+        },
+      ],
+    });
+  });
+
+  it("answers a null reverse when the key names no route on the line", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, routeClass, callClass],
+        properties: [],
+        entities: [
+          {
+            uri: "urn:line",
+            type: "urn:C",
+            typename: "Line",
+            routes: [
+              {
+                key: "out",
+                labels: { "": "Out" },
+                isLoop: false,
+                calls: [],
+                reverse: "gone",
+              },
+            ],
+          },
+        ],
+      },
+      lineQuery,
+    );
+    expect(data.node).toEqual({
+      routes: [{ label: "Out", calls: [], reverse: null }],
+    });
+  });
+
   it("leaves an IRI whose scheme is not a declared prefix alone", async () => {
     const data = await runWith(
       {
@@ -1020,6 +1322,34 @@ describe("the shipped dataset", () => {
     for (const each of exampleDataset.classes) {
       for (const cp of each.properties) {
         expect(declared).toContain(cp.property);
+      }
+    }
+  });
+
+  const lines = exampleDataset.entities.filter(
+    (entity) => entity.typename === "Line",
+  );
+
+  it("gives every line a unique code and a unique lowercase hex colour", () => {
+    // The SDL makes both non-null, and the type cannot: a Line without them
+    // would fail the field at query time.
+    for (const line of lines) {
+      expect(line.code).toEqual(expect.any(String));
+      expect(line.colour).toMatch(/^#[0-9a-f]{6}$/);
+    }
+    expect(new Set(lines.map((line) => line.code)).size).toBe(lines.length);
+    expect(new Set(lines.map((line) => line.colour)).size).toBe(lines.length);
+  });
+
+  it("keys routes uniquely per line and pairs every reverse both ways", () => {
+    for (const line of lines) {
+      const routes = line.routes ?? [];
+      const byKey = new Map(routes.map((route) => [route.key, route]));
+      expect(byKey.size).toBe(routes.length);
+      for (const route of routes) {
+        if (route.reverse !== undefined) {
+          expect(byKey.get(route.reverse)?.reverse).toBe(route.key);
+        }
       }
     }
   });
