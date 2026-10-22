@@ -1,6 +1,7 @@
 import {
   createEnvironment,
   createStaticRouter,
+  getPrefetchEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
 import { act } from "react";
@@ -139,6 +140,12 @@ describe("hydrateApp", () => {
         liveText,
       );
       expect(fetch).not.toHaveBeenCalled();
+      // The routes' `warm` prefetches into the published environment, which
+      // must be the seeded one the page hydrated from.
+      const published = getPrefetchEnvironment()?.getStore().getSource();
+      expect(published?.getRecordIDs()).toEqual(
+        expect.arrayContaining(Object.keys(records)),
+      );
     },
   );
 
@@ -146,9 +153,11 @@ describe("hydrateApp", () => {
     const url = "/lines";
     const serverHtml = renderServerHtml(url, recordsByUrl.get(url) ?? {});
     window.history.pushState({}, "", url);
-    // No `__INITIAL_DATA__`: the store starts cold and the route's `warm`
-    // goes to the graph, which the zero-fetch cases above rule out.
+    // No `__INITIAL_DATA__`: the store starts cold, so the page's data goes
+    // to the graph, which the zero-fetch cases above rule out. The
+    // environment is still published, so later navigations prefetch too.
     await hydrateInto(serverHtml);
     expect(fetch).toHaveBeenCalled();
+    expect(getPrefetchEnvironment()).toBeDefined();
   });
 });
