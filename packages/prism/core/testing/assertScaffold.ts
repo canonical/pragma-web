@@ -44,13 +44,13 @@ function readPackageName(packageRoot: string): string {
  * `componentCssClassName` as `"ds <kebab>"`, has a default export and
  * imports its stylesheet exactly when there is one; `types.ts` writes
  * `<Name>Props` as `OwnProps & Omit<ComponentProps<…>, keyof OwnProps…>`
- * (or a union of such intersections, one per root element), or states in one line that the component renders no element of its own
- * (then no class name is asked for); `index.ts` re-exports the default
- * export and every type; the anatomy, the test and the SSR test are
- * present, and the stories exactly when the package runs Storybook; a
- * stylesheet opens with the generator's banner, the layer comment and the
- * package's layer, then the root rule; and the only subfolders are
- * `common/` and `hooks/`.
+ * (or a union of such intersections, one per root element), or states in
+ * one line that the component renders no element of its own (then no class
+ * name is asked for); `index.ts` re-exports the default export and every
+ * type; the anatomy, the test, the SSR test and the stories are present,
+ * whatever the package; a stylesheet opens with the generator's banner,
+ * the layer comment and the package's layer, then the root rule; and the
+ * only subfolders are `common/` and `hooks/`.
  *
  * @param folder - The component's folder.
  * @param options - The package root and the package's test suffix.
@@ -122,20 +122,14 @@ export default function assertScaffold(
     }
   }
 
-  const storybook = existsSync(join(packageRoot, ".storybook"));
   const required = [
     "anatomy.yaml",
     `${name}.${testSuffix}.tsx`,
     `${name}.ssr.${testSuffix}.tsx`,
-    ...(storybook ? [`${name}.stories.tsx`] : []),
+    `${name}.stories.tsx`,
   ];
   for (const file of required) {
     if (!existsSync(join(folder, file))) problems.push(`${file} is missing`);
-  }
-  if (!storybook && existsSync(join(folder, `${name}.stories.tsx`))) {
-    problems.push(
-      `${name}.stories.tsx is there, and the package runs no Storybook`,
-    );
   }
 
   if (stylesheet !== undefined) {

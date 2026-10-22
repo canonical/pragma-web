@@ -97,6 +97,15 @@ describe("the component checks", () => {
       ).toThrow(/anatomy\.yaml is missing/);
     });
 
+    it("refuses a component folder with no stories, in any package", () => {
+      expect(() =>
+        assertScaffold(locate(DRIFTED, "MissingAnatomy"), {
+          packageRoot: DRIFTED,
+          testSuffix: "test",
+        }),
+      ).toThrow(/MissingAnatomy\.stories\.tsx is missing/);
+    });
+
     it("refuses a read of a dimension primitive", () => {
       expect(() =>
         assertStylesheets({

@@ -23,7 +23,7 @@ export interface GraphStub {
 export interface AssertScaffoldOptions {
   /**
    * The root of the package the folder belongs to: placement is read
-   * relative to it, and a `.storybook` folder there asks for stories.
+   * relative to it, and the stylesheet's layer from its manifest.
    */
   readonly packageRoot: string;
   /** The package's test-file suffix: `test` in packages, `tests` in apps. */
