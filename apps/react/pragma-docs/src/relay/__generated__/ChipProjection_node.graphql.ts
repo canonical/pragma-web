@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<48dbd60b6aa9535ecf4b94c747dfb852>>
+ * @generated SignedSource<<39d61372f4b619ebaf0e13ebaea3e665>>
  * @lightSyntaxTransform
  */
 
@@ -9,24 +9,24 @@
 
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type EntityChip_node$data = {
+export type ChipProjection_node$data = {
   readonly __typename: string;
   readonly _meta: {
     readonly curie: string;
   };
   readonly " $fragmentSpreads": FragmentRefs<"NodeChip_node">;
-  readonly " $fragmentType": "EntityChip_node";
+  readonly " $fragmentType": "ChipProjection_node";
 };
-export type EntityChip_node$key = {
-  readonly " $data"?: EntityChip_node$data;
-  readonly " $fragmentSpreads": FragmentRefs<"EntityChip_node">;
+export type ChipProjection_node$key = {
+  readonly " $data"?: ChipProjection_node$data;
+  readonly " $fragmentSpreads": FragmentRefs<"ChipProjection_node">;
 };
 
 const node: ReaderFragment = {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
-  "name": "EntityChip_node",
+  "name": "ChipProjection_node",
   "selections": [
     {
       "alias": null,
@@ -63,6 +63,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "407232bc1527dcce2fb2f714f67a161a";
+(node as any).hash = "cdd420dbf54a1f41c82204f08bd96d92";
 
 export default node;

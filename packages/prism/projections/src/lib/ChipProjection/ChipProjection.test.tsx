@@ -8,8 +8,8 @@ import {
   STATION_NODE,
 } from "../../../testing/fixtures.js";
 import { defaultProjectionMaps } from "../node/index.js";
-import EntityChip from "./EntityChip.js";
-import type { EntityChipArmProps } from "./types.js";
+import ChipProjection from "./ChipProjection.js";
+import type { ChipArmProps } from "./types.js";
 
 /** A type's own chip arm: prints what dispatch handed it. */
 const StationChip = ({
@@ -17,7 +17,7 @@ const StationChip = ({
   href,
   children,
   ...props
-}: EntityChipArmProps): ReactElement => (
+}: ChipArmProps): ReactElement => (
   <span {...props} data-arm="station">
     {node._meta.curie} {href ?? "no home"} {children}
   </span>
@@ -28,10 +28,10 @@ const stationMaps = {
   chip: { ...defaultProjectionMaps.chip, Station: StationChip },
 };
 
-describe("EntityChip", () => {
+describe("ChipProjection", () => {
   it("renders a node of a type no map names through the Node arm", () => {
     const { container } = render(
-      createNodePage(STATION_NODE, (node) => <EntityChip node={node} />),
+      createNodePage(STATION_NODE, (node) => <ChipProjection node={node} />),
     );
     expect(container.querySelector(".ds.node-chip")).not.toBeNull();
     expect(screen.getByText("King's Cross")).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe("EntityChip", () => {
 
   it("renders a node through its type's own arm when the map names one", () => {
     const { container } = render(
-      createNodePage(STATION_NODE, (node) => <EntityChip node={node} />, {
+      createNodePage(STATION_NODE, (node) => <ChipProjection node={node} />, {
         maps: stationMaps,
       }),
     );
@@ -49,7 +49,9 @@ describe("EntityChip", () => {
 
   it("hands the arm the node's home", () => {
     render(
-      createNodePage(ONTOLOGY_CLASS_NODE, (node) => <EntityChip node={node} />),
+      createNodePage(ONTOLOGY_CLASS_NODE, (node) => (
+        <ChipProjection node={node} />
+      )),
     );
     expect(
       screen.getByRole("link", { name: "UI Block" }).getAttribute("href"),
@@ -58,7 +60,7 @@ describe("EntityChip", () => {
 
   it("hands the arm no home when the site declares none for the type", () => {
     render(
-      createNodePage(STATION_NODE, (node) => <EntityChip node={node} />, {
+      createNodePage(STATION_NODE, (node) => <ChipProjection node={node} />, {
         maps: stationMaps,
       }),
     );
@@ -70,7 +72,7 @@ describe("EntityChip", () => {
   it("forwards native props to the arm's root and merges its className", () => {
     const { container } = render(
       createNodePage(ONTOLOGY_CLASS_NODE, (node) => (
-        <EntityChip className="mention" data-testid="chip" node={node} />
+        <ChipProjection className="mention" data-testid="chip" node={node} />
       )),
     );
     const root = screen.getByTestId("chip");
@@ -81,7 +83,7 @@ describe("EntityChip", () => {
   it("renders its children in place of the node's title", () => {
     render(
       createNodePage(ONTOLOGY_CLASS_NODE, (node) => (
-        <EntityChip node={node}>the block</EntityChip>
+        <ChipProjection node={node}>the block</ChipProjection>
       )),
     );
     expect(

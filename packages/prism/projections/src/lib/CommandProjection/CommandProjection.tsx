@@ -1,9 +1,9 @@
 import { useHome } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import entityCommandFragmentNode from "../../__generated__/EntityCommand_node.graphql.js";
+import commandProjectionFragmentNode from "../../__generated__/CommandProjection_node.graphql.js";
 import { useProjectionMaps } from "../projections/index.js";
-import type { EntityCommandProps } from "./types.js";
+import type { CommandProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
@@ -11,8 +11,8 @@ import type { EntityCommandProps } from "./types.js";
  * arm's fragment, spread at the top level because `Node` is the one arm
  * the command map holds.
  */
-const entityCommandFragmentSource = (): unknown => graphql`
-  fragment EntityCommand_node on Node {
+const commandProjectionFragmentSource = (): unknown => graphql`
+  fragment CommandProjection_node on Node {
     __typename
     _meta {
       curie
@@ -20,7 +20,7 @@ const entityCommandFragmentSource = (): unknown => graphql`
     ...NodeCommand_node
   }
 `;
-void entityCommandFragmentSource;
+void commandProjectionFragmentSource;
 /* v8 ignore stop */
 
 /**
@@ -30,13 +30,13 @@ void entityCommandFragmentSource;
  *
  * It renders no element of its own; the arm renders the root, an `<li>`.
  *
- * `import { EntityCommand } from "@canonical/prism-projections";`
+ * `import { CommandProjection } from "@canonical/prism-projections";`
  */
-export default function EntityCommand({
+export default function CommandProjection({
   node,
   ...props
-}: EntityCommandProps): ReactElement {
-  const data = useFragment(entityCommandFragmentNode, node);
+}: CommandProjectionProps): ReactElement {
+  const data = useFragment(commandProjectionFragmentNode, node);
   const map = useProjectionMaps().command;
   const href = useHome({
     __typename: data.__typename,

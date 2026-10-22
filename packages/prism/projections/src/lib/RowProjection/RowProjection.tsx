@@ -1,9 +1,9 @@
 import { useHome } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import entityRowFragmentNode from "../../__generated__/EntityRow_node.graphql.js";
+import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.graphql.js";
 import { useProjectionMaps } from "../projections/index.js";
-import type { EntityRowProps } from "./types.js";
+import type { RowProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
@@ -11,8 +11,8 @@ import type { EntityRowProps } from "./types.js";
  * arm's fragment, spread at the top level because `Node` is the one arm
  * the row map holds.
  */
-const entityRowFragmentSource = (): unknown => graphql`
-  fragment EntityRow_node on Node {
+const rowProjectionFragmentSource = (): unknown => graphql`
+  fragment RowProjection_node on Node {
     __typename
     _meta {
       curie
@@ -20,7 +20,7 @@ const entityRowFragmentSource = (): unknown => graphql`
     ...NodeRow_node
   }
 `;
-void entityRowFragmentSource;
+void rowProjectionFragmentSource;
 /* v8 ignore stop */
 
 /**
@@ -30,13 +30,13 @@ void entityRowFragmentSource;
  *
  * It renders no element of its own; the arm renders the root, an `<li>`.
  *
- * `import { EntityRow } from "@canonical/prism-projections";`
+ * `import { RowProjection } from "@canonical/prism-projections";`
  */
-export default function EntityRow({
+export default function RowProjection({
   node,
   ...props
-}: EntityRowProps): ReactElement {
-  const data = useFragment(entityRowFragmentNode, node);
+}: RowProjectionProps): ReactElement {
+  const data = useFragment(rowProjectionFragmentNode, node);
   const map = useProjectionMaps().row;
   const href = useHome({
     __typename: data.__typename,

@@ -10,74 +10,76 @@ import {
 import type { NodePayload } from "../../../testing/types.js";
 import { defaultProjectionMaps } from "../node/index.js";
 import type { ProjectionMaps } from "../projections/index.js";
-import EntityCard from "./EntityCard.js";
-import type { EntityCardArmProps } from "./types.js";
+import RowProjection from "./RowProjection.js";
+import type { RowArmProps } from "./types.js";
 
-/** A type's own card arm: prints what dispatch handed it. */
-const ProbeCard = ({
-  node,
-  href,
-  ...props
-}: EntityCardArmProps): ReactElement => (
-  <article {...props} data-arm="probe">
+/** A type's own row arm: prints what dispatch handed it. */
+const ProbeRow = ({ node, href, ...props }: RowArmProps): ReactElement => (
+  <li {...props} data-arm="probe">
     {node._meta.curie} {href ?? "no home"}
-  </article>
+  </li>
 );
 
 const probeMaps = {
   ...defaultProjectionMaps,
-  card: {
-    ...defaultProjectionMaps.card,
-    OntologyClass: ProbeCard,
-    Station: ProbeCard,
+  row: {
+    ...defaultProjectionMaps.row,
+    OntologyClass: ProbeRow,
+    Station: ProbeRow,
   },
 };
 
-/** Render `node`'s card, under `maps` when given. */
-const renderCard = (
+/** Render `node`'s row, under `maps` when given. */
+const renderRow = (
   node: NodePayload,
   maps?: ProjectionMaps,
-  props: Partial<Omit<EntityCardArmProps, "node" | "href">> = {},
+  props: Partial<Omit<RowArmProps, "node" | "href">> = {},
 ) =>
   render(
-    createNodePage(node, (key) => <EntityCard {...props} node={key} />, {
-      maps,
-    }),
+    createNodePage(
+      node,
+      (key) => (
+        <ul>
+          <RowProjection {...props} node={key} />
+        </ul>
+      ),
+      { maps },
+    ),
   );
 
-describe("EntityCard", () => {
+describe("RowProjection", () => {
   it("renders a node of a type no map names through the Node arm", () => {
-    const { container } = renderCard(STATION_NODE);
-    expect(container.querySelector(".ds.node-card")).not.toBeNull();
+    const { container } = renderRow(STATION_NODE);
+    expect(container.querySelector(".ds.node-row")).not.toBeNull();
   });
 
   it("renders a node through its type's own arm when the map names one", () => {
-    const { container } = renderCard(STATION_NODE, probeMaps);
+    const { container } = renderRow(STATION_NODE, probeMaps);
     expect(container.querySelector("[data-arm='probe']")).not.toBeNull();
-    expect(container.querySelector(".ds.node-card")).toBeNull();
+    expect(container.querySelector(".ds.node-row")).toBeNull();
   });
 
   it("hands the arm the node's home", () => {
-    renderCard(ONTOLOGY_CLASS_NODE, probeMaps);
+    renderRow(ONTOLOGY_CLASS_NODE, probeMaps);
     expect(
       screen.getByText(`ds:UIBlock ${ONTOLOGY_CLASS_HREF}`),
     ).toBeInTheDocument();
   });
 
   it("hands the arm no home when the site declares none for the type", () => {
-    renderCard(STATION_NODE, probeMaps);
+    renderRow(STATION_NODE, probeMaps);
     expect(
       screen.getByText("metro:station/kings-cross no home"),
     ).toBeInTheDocument();
   });
 
   it("forwards native props to the arm's root and merges its className", () => {
-    renderCard(ONTOLOGY_CLASS_NODE, undefined, {
+    renderRow(ONTOLOGY_CLASS_NODE, undefined, {
       className: "listing",
-      id: "the-card",
+      id: "the-row",
     });
-    const root = document.getElementById("the-card");
-    expect(root?.tagName).toBe("ARTICLE");
-    expect(root?.className).toBe("ds node-card listing");
+    const root = document.getElementById("the-row");
+    expect(root?.tagName).toBe("LI");
+    expect(root?.className).toBe("ds node-row listing");
   });
 });

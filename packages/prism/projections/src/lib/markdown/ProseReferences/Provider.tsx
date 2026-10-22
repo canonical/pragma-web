@@ -18,7 +18,7 @@ const proseReferencesFragmentSource = (): unknown => graphql`
         _meta {
           curie
         }
-        ...EntityChip_node
+        ...ChipProjection_node
       }
     }
   }

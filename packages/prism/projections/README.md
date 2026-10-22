@@ -6,10 +6,11 @@ results of a search, the entities a passage of prose links to. Each
 representation renders any node, whatever its type, through the arm its
 site maps to the node's `__typename`, and links it to the node's home.
 
-- **`EntityChip`**: the inline mention, a node named in running text.
-- **`EntityRow`**: the list row, a node as one entry of a list of results.
-- **`EntityCard`**: the card, a node as a self-contained tile in a grid.
-- **`EntityCommand`**: the command-palette entry, a node offered as a
+- **`ChipProjection`**: the inline mention, a node named in running text.
+- **`RowProjection`**: the list row, a node as one entry of a list of
+  results.
+- **`CardProjection`**: the card, a node as a self-contained tile in a grid.
+- **`CommandProjection`**: the command-palette entry, a node offered as a
   destination to jump to.
 - **`EntityTitle`**: the page title, the heading of the page a node owns.
 
@@ -86,14 +87,14 @@ outside the site's `src`, so they keep their own artifact imports.
 ## Representations
 
 ```tsx
-import { EntityChip, EntityRow } from "@canonical/prism-projections";
+import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 
 <p>
-  Built on <EntityChip node={node} />.
+  Built on <ChipProjection node={node} />.
 </p>
 <ul>
   {edges.map(({ node }) => (
-    <EntityRow key={node.uri} node={node} />
+    <RowProjection key={node.uri} node={node} />
   ))}
 </ul>
 ```
@@ -104,10 +105,10 @@ representation's native props are that tag's:
 
 | Representation | Root | `children` |
 |---|---|---|
-| `EntityChip` | `<span>` | the mention's text, in place of the node's title |
-| `EntityRow` | `<li>` | none: the arm renders the slots |
-| `EntityCard` | `<article>` | none |
-| `EntityCommand` | `<li>` | none |
+| `ChipProjection` | `<span>` | the mention's text, in place of the node's title |
+| `RowProjection` | `<li>` | none: the arm renders the slots |
+| `CardProjection` | `<article>` | none |
+| `CommandProjection` | `<li>` | none |
 | `EntityTitle` | `<hgroup>` | none |
 
 ### Slots
@@ -182,8 +183,8 @@ resolves the nodes a passage links to and serves them as a `NodeConnection`;
 the page spreads `ProseReferencesProvider_references` on it and provides it
 around the prose. `markdownComponents` is the element-override map a
 Markdown renderer takes: its `a` renders a link whose href names one of the
-references as that node's `EntityChip`, labelled with the author's text and
-linked to the node's home, and any other link as the plain anchor its
+references as that node's `ChipProjection`, labelled with the author's
+text and linked to the node's home, and any other link as the plain anchor its
 author wrote.
 
 ```tsx
@@ -204,9 +205,10 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 
 ## Public API
 
-- Representations: `EntityChip`, `EntityRow`, `EntityCard`,
-  `EntityCommand`, `EntityTitle`; types `EntityChipProps`, `EntityRowProps`,
-  `EntityCardProps`, `EntityCommandProps`, `EntityTitleProps`.
+- Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
+  `CommandProjection`, `EntityTitle`; types `ChipProjectionProps`,
+  `RowProjectionProps`, `CardProjectionProps`, `CommandProjectionProps`,
+  `EntityTitleProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

@@ -7,11 +7,11 @@ import {
   ONTOLOGY_CLASS_HREF,
   ONTOLOGY_CLASS_NODE,
 } from "../../../testing/fixtures.js";
-import { EntityCard } from "../EntityCard/index.js";
-import { EntityChip } from "../EntityChip/index.js";
-import { EntityCommand } from "../EntityCommand/index.js";
-import { EntityRow } from "../EntityRow/index.js";
+import { CardProjection } from "../CardProjection/index.js";
+import { ChipProjection } from "../ChipProjection/index.js";
+import { CommandProjection } from "../CommandProjection/index.js";
 import { defaultProjectionMaps } from "../node/index.js";
+import { RowProjection } from "../RowProjection/index.js";
 import useProjectionMaps from "./hooks/useProjectionMaps.js";
 import ProjectionsProvider from "./Provider.js";
 
@@ -49,12 +49,12 @@ describe("ProjectionsProvider", () => {
         ONTOLOGY_CLASS_NODE,
         (node) => (
           <>
-            <EntityChip node={node} />
+            <ChipProjection node={node} />
             <ul>
-              <EntityRow node={node} />
-              <EntityCommand node={node} />
+              <RowProjection node={node} />
+              <CommandProjection node={node} />
             </ul>
-            <EntityCard node={node} />
+            <CardProjection node={node} />
           </>
         ),
         { LinkComponent: RouterLink },

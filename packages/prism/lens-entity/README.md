@@ -171,8 +171,8 @@ runs over its files, and a site compiles nothing of the lens unless its own
 documents spread a lens fragment.
 
 The package's `relay.config.json` reads the projections package's fragments
-as a base project, because the index spreads `EntityRow_node` and
-`EntityCard_node` and the page `EntityTitle_node` and `EntityChip_node`; only
+as a base project, because the index spreads `RowProjection_node` and
+`CardProjection_node` and the page `EntityTitle_node` and `ChipProjection_node`; only
 the lens's own artifacts land in `src/__generated__`. `check:tier1` runs
 `relay-compiler --validate` against the contract SDL alone: it fails when a
 selection leaves the contract and when the artifacts are stale. Run

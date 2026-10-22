@@ -10,15 +10,15 @@ import {
 import type { NodePayload } from "../../../testing/types.js";
 import { defaultProjectionMaps } from "../node/index.js";
 import type { ProjectionMaps } from "../projections/index.js";
-import EntityRow from "./EntityRow.js";
-import type { EntityRowArmProps } from "./types.js";
+import CommandProjection from "./CommandProjection.js";
+import type { CommandArmProps } from "./types.js";
 
-/** A type's own row arm: prints what dispatch handed it. */
-const ProbeRow = ({
+/** A type's own command arm: prints what dispatch handed it. */
+const ProbeCommand = ({
   node,
   href,
   ...props
-}: EntityRowArmProps): ReactElement => (
+}: CommandArmProps): ReactElement => (
   <li {...props} data-arm="probe">
     {node._meta.curie} {href ?? "no home"}
   </li>
@@ -26,64 +26,64 @@ const ProbeRow = ({
 
 const probeMaps = {
   ...defaultProjectionMaps,
-  row: {
-    ...defaultProjectionMaps.row,
-    OntologyClass: ProbeRow,
-    Station: ProbeRow,
+  command: {
+    ...defaultProjectionMaps.command,
+    OntologyClass: ProbeCommand,
+    Station: ProbeCommand,
   },
 };
 
-/** Render `node`'s row, under `maps` when given. */
-const renderRow = (
+/** Render `node`'s command, under `maps` when given. */
+const renderCommand = (
   node: NodePayload,
   maps?: ProjectionMaps,
-  props: Partial<Omit<EntityRowArmProps, "node" | "href">> = {},
+  props: Partial<Omit<CommandArmProps, "node" | "href">> = {},
 ) =>
   render(
     createNodePage(
       node,
       (key) => (
         <ul>
-          <EntityRow {...props} node={key} />
+          <CommandProjection {...props} node={key} />
         </ul>
       ),
       { maps },
     ),
   );
 
-describe("EntityRow", () => {
+describe("CommandProjection", () => {
   it("renders a node of a type no map names through the Node arm", () => {
-    const { container } = renderRow(STATION_NODE);
-    expect(container.querySelector(".ds.node-row")).not.toBeNull();
+    const { container } = renderCommand(STATION_NODE);
+    expect(container.querySelector(".ds.node-command")).not.toBeNull();
   });
 
   it("renders a node through its type's own arm when the map names one", () => {
-    const { container } = renderRow(STATION_NODE, probeMaps);
+    const { container } = renderCommand(STATION_NODE, probeMaps);
     expect(container.querySelector("[data-arm='probe']")).not.toBeNull();
-    expect(container.querySelector(".ds.node-row")).toBeNull();
+    expect(container.querySelector(".ds.node-command")).toBeNull();
   });
 
   it("hands the arm the node's home", () => {
-    renderRow(ONTOLOGY_CLASS_NODE, probeMaps);
+    renderCommand(ONTOLOGY_CLASS_NODE, probeMaps);
     expect(
       screen.getByText(`ds:UIBlock ${ONTOLOGY_CLASS_HREF}`),
     ).toBeInTheDocument();
   });
 
   it("hands the arm no home when the site declares none for the type", () => {
-    renderRow(STATION_NODE, probeMaps);
+    renderCommand(STATION_NODE, probeMaps);
     expect(
       screen.getByText("metro:station/kings-cross no home"),
     ).toBeInTheDocument();
   });
 
   it("forwards native props to the arm's root and merges its className", () => {
-    renderRow(ONTOLOGY_CLASS_NODE, undefined, {
+    renderCommand(ONTOLOGY_CLASS_NODE, undefined, {
       className: "listing",
-      id: "the-row",
+      id: "the-command",
     });
-    const root = document.getElementById("the-row");
+    const root = document.getElementById("the-command");
     expect(root?.tagName).toBe("LI");
-    expect(root?.className).toBe("ds node-row listing");
+    expect(root?.className).toBe("ds node-command listing");
   });
 });

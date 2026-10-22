@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3b33b2e2c0cf2d2f0dbb976cbffbc826>>
+ * @generated SignedSource<<f0230d84805f1b00842f0817a9a5db62>>
  * @lightSyntaxTransform
  */
 
@@ -9,24 +9,24 @@
 
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type EntityCard_node$data = {
+export type CardProjection_node$data = {
   readonly __typename: string;
   readonly _meta: {
     readonly curie: string;
   };
   readonly " $fragmentSpreads": FragmentRefs<"NodeCard_node">;
-  readonly " $fragmentType": "EntityCard_node";
+  readonly " $fragmentType": "CardProjection_node";
 };
-export type EntityCard_node$key = {
-  readonly " $data"?: EntityCard_node$data;
-  readonly " $fragmentSpreads": FragmentRefs<"EntityCard_node">;
+export type CardProjection_node$key = {
+  readonly " $data"?: CardProjection_node$data;
+  readonly " $fragmentSpreads": FragmentRefs<"CardProjection_node">;
 };
 
 const node: ReaderFragment = {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
-  "name": "EntityCard_node",
+  "name": "CardProjection_node",
   "selections": [
     {
       "alias": null,
@@ -63,6 +63,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "718a7c258eb6bb1a3ac533aa9f5875b2";
+(node as any).hash = "b4ee313abc430097ffb04279fd45d06f";
 
 export default node;

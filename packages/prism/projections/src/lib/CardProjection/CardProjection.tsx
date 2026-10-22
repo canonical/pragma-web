@@ -1,9 +1,9 @@
 import { useHome } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import entityCardFragmentNode from "../../__generated__/EntityCard_node.graphql.js";
+import cardProjectionFragmentNode from "../../__generated__/CardProjection_node.graphql.js";
 import { useProjectionMaps } from "../projections/index.js";
-import type { EntityCardProps } from "./types.js";
+import type { CardProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
@@ -11,8 +11,8 @@ import type { EntityCardProps } from "./types.js";
  * arm's fragment, spread at the top level because `Node` is the one arm
  * the card map holds.
  */
-const entityCardFragmentSource = (): unknown => graphql`
-  fragment EntityCard_node on Node {
+const cardProjectionFragmentSource = (): unknown => graphql`
+  fragment CardProjection_node on Node {
     __typename
     _meta {
       curie
@@ -20,7 +20,7 @@ const entityCardFragmentSource = (): unknown => graphql`
     ...NodeCard_node
   }
 `;
-void entityCardFragmentSource;
+void cardProjectionFragmentSource;
 /* v8 ignore stop */
 
 /**
@@ -30,13 +30,13 @@ void entityCardFragmentSource;
  *
  * It renders no element of its own; the arm renders the root, an `<article>`.
  *
- * `import { EntityCard } from "@canonical/prism-projections";`
+ * `import { CardProjection } from "@canonical/prism-projections";`
  */
-export default function EntityCard({
+export default function CardProjection({
   node,
   ...props
-}: EntityCardProps): ReactElement {
-  const data = useFragment(entityCardFragmentNode, node);
+}: CardProjectionProps): ReactElement {
+  const data = useFragment(cardProjectionFragmentNode, node);
   const map = useProjectionMaps().card;
   const href = useHome({
     __typename: data.__typename,

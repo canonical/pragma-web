@@ -7,13 +7,13 @@ import {
   STATION_NODE,
 } from "../../../../testing/fixtures.js";
 import type { NodePayload } from "../../../../testing/types.js";
-import { EntityChip } from "../../EntityChip/index.js";
+import { ChipProjection } from "../../ChipProjection/index.js";
 
 /** Render `node`'s chip under the default maps, and return its root. */
 const renderChip = (node: NodePayload, children?: string): Element => {
   const { container } = render(
     createNodePage(node, (key) => (
-      <EntityChip node={key}>{children}</EntityChip>
+      <ChipProjection node={key}>{children}</ChipProjection>
     )),
   );
   const root = container.querySelector(".ds.node-chip");

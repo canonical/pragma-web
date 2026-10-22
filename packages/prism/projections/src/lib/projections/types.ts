@@ -1,10 +1,10 @@
 import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ReactNode } from "react";
-import type { EntityCardArm } from "../EntityCard/index.js";
-import type { EntityChipArm } from "../EntityChip/index.js";
-import type { EntityCommandArm } from "../EntityCommand/index.js";
-import type { EntityRowArm } from "../EntityRow/index.js";
+import type { CardArm } from "../CardProjection/index.js";
+import type { ChipArm } from "../ChipProjection/index.js";
+import type { CommandArm } from "../CommandProjection/index.js";
 import type { EntityTitleArm } from "../EntityTitle/index.js";
+import type { RowArm } from "../RowProjection/index.js";
 
 /**
  * One representation's arms, keyed by the `__typename` each renders. `Node`
@@ -17,13 +17,13 @@ export type ProjectionMap<TArm> = { readonly Node: TArm } & {
 /** The arms of every representation, one map each. */
 export interface ProjectionMaps {
   /** The inline mention: a node named in running text. */
-  readonly chip: ProjectionMap<EntityChipArm>;
+  readonly chip: ProjectionMap<ChipArm>;
   /** The list row: a node as one entry of a list of results. */
-  readonly row: ProjectionMap<EntityRowArm>;
+  readonly row: ProjectionMap<RowArm>;
   /** The card: a node as a self-contained tile in a grid of entities. */
-  readonly card: ProjectionMap<EntityCardArm>;
+  readonly card: ProjectionMap<CardArm>;
   /** The command-palette entry: a node offered as a destination. */
-  readonly command: ProjectionMap<EntityCommandArm>;
+  readonly command: ProjectionMap<CommandArm>;
   /** The page title: the heading of the page a node owns. */
   readonly title: ProjectionMap<EntityTitleArm>;
 }

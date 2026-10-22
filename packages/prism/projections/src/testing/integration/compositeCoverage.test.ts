@@ -1,10 +1,10 @@
 import type { ReaderFragment, ReaderSelection } from "relay-runtime";
 import { describe, expect, it } from "vitest";
-import entityCardFragmentNode from "../../__generated__/EntityCard_node.graphql.js";
-import entityChipFragmentNode from "../../__generated__/EntityChip_node.graphql.js";
-import entityCommandFragmentNode from "../../__generated__/EntityCommand_node.graphql.js";
-import entityRowFragmentNode from "../../__generated__/EntityRow_node.graphql.js";
+import cardProjectionFragmentNode from "../../__generated__/CardProjection_node.graphql.js";
+import chipProjectionFragmentNode from "../../__generated__/ChipProjection_node.graphql.js";
+import commandProjectionFragmentNode from "../../__generated__/CommandProjection_node.graphql.js";
 import entityTitleFragmentNode from "../../__generated__/EntityTitle_node.graphql.js";
+import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.graphql.js";
 import { defaultProjectionMaps, type ProjectionMaps } from "../../lib/index.js";
 
 /** Each representation's map, beside the composite fragment it dispatches over. */
@@ -12,10 +12,10 @@ const COMPOSITES: readonly {
   readonly representation: keyof ProjectionMaps;
   readonly fragment: ReaderFragment;
 }[] = [
-  { representation: "chip", fragment: entityChipFragmentNode },
-  { representation: "row", fragment: entityRowFragmentNode },
-  { representation: "card", fragment: entityCardFragmentNode },
-  { representation: "command", fragment: entityCommandFragmentNode },
+  { representation: "chip", fragment: chipProjectionFragmentNode },
+  { representation: "row", fragment: rowProjectionFragmentNode },
+  { representation: "card", fragment: cardProjectionFragmentNode },
+  { representation: "command", fragment: commandProjectionFragmentNode },
   { representation: "title", fragment: entityTitleFragmentNode },
 ];
 

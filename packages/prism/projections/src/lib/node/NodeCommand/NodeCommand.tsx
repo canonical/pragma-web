@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import type { NodeCommand_node$key } from "../../../__generated__/NodeCommand_node.graphql.js";
 import nodeCommandFragmentNode from "../../../__generated__/NodeCommand_node.graphql.js";
-import type { EntityCommandArmProps } from "../../EntityCommand/index.js";
+import type { CommandArmProps } from "../../CommandProjection/index.js";
 import { useProjectionLink } from "../../projections/index.js";
 import "./styles.css";
 
@@ -42,7 +42,7 @@ export default function NodeCommand({
   href,
   className,
   ...props
-}: EntityCommandArmProps): ReactElement {
+}: CommandArmProps): ReactElement {
   const data = useFragment<NodeCommand_node$key>(nodeCommandFragmentNode, node);
   const LinkComponent = useProjectionLink();
   return (

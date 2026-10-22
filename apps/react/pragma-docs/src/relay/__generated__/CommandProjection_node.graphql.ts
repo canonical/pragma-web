@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5017b5c5d5c10c8766db38faa4961ca2>>
+ * @generated SignedSource<<af42e1c82295b710150d34480f7e0dcd>>
  * @lightSyntaxTransform
  */
 
@@ -9,24 +9,24 @@
 
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type EntityRow_node$data = {
+export type CommandProjection_node$data = {
   readonly __typename: string;
   readonly _meta: {
     readonly curie: string;
   };
-  readonly " $fragmentSpreads": FragmentRefs<"NodeRow_node">;
-  readonly " $fragmentType": "EntityRow_node";
+  readonly " $fragmentSpreads": FragmentRefs<"NodeCommand_node">;
+  readonly " $fragmentType": "CommandProjection_node";
 };
-export type EntityRow_node$key = {
-  readonly " $data"?: EntityRow_node$data;
-  readonly " $fragmentSpreads": FragmentRefs<"EntityRow_node">;
+export type CommandProjection_node$key = {
+  readonly " $data"?: CommandProjection_node$data;
+  readonly " $fragmentSpreads": FragmentRefs<"CommandProjection_node">;
 };
 
 const node: ReaderFragment = {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
-  "name": "EntityRow_node",
+  "name": "CommandProjection_node",
   "selections": [
     {
       "alias": null,
@@ -56,13 +56,13 @@ const node: ReaderFragment = {
     {
       "args": null,
       "kind": "FragmentSpread",
-      "name": "NodeRow_node"
+      "name": "NodeCommand_node"
     }
   ],
   "type": "Node",
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "2053cd3bfc789f5d5050943d240b96b3";
+(node as any).hash = "3f896202b00f948b2276c6c1caff7b61";
 
 export default node;

@@ -1,9 +1,9 @@
 import { useHome } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import entityChipFragmentNode from "../../__generated__/EntityChip_node.graphql.js";
+import chipProjectionFragmentNode from "../../__generated__/ChipProjection_node.graphql.js";
 import { useProjectionMaps } from "../projections/index.js";
-import type { EntityChipProps } from "./types.js";
+import type { ChipProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
@@ -11,8 +11,8 @@ import type { EntityChipProps } from "./types.js";
  * arm's fragment, spread at the top level because `Node` is the one arm
  * the chip map holds.
  */
-const entityChipFragmentSource = (): unknown => graphql`
-  fragment EntityChip_node on Node {
+const chipProjectionFragmentSource = (): unknown => graphql`
+  fragment ChipProjection_node on Node {
     __typename
     _meta {
       curie
@@ -20,7 +20,7 @@ const entityChipFragmentSource = (): unknown => graphql`
     ...NodeChip_node
   }
 `;
-void entityChipFragmentSource;
+void chipProjectionFragmentSource;
 /* v8 ignore stop */
 
 /**
@@ -30,14 +30,14 @@ void entityChipFragmentSource;
  *
  * It renders no element of its own; the arm renders the root, a `<span>`.
  *
- * `import { EntityChip } from "@canonical/prism-projections";`
+ * `import { ChipProjection } from "@canonical/prism-projections";`
  */
-export default function EntityChip({
+export default function ChipProjection({
   node,
   children,
   ...props
-}: EntityChipProps): ReactElement {
-  const data = useFragment(entityChipFragmentNode, node);
+}: ChipProjectionProps): ReactElement {
+  const data = useFragment(chipProjectionFragmentNode, node);
   const map = useProjectionMaps().chip;
   const href = useHome({
     __typename: data.__typename,
