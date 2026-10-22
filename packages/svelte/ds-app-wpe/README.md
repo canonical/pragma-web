@@ -19,6 +19,26 @@ import "@canonical/styles";
 
 Each component brings its own stylesheet when you import it.
 
+### Every component stylesheet is in `ds.components.apps-workplaceengineering`
+
+Every component stylesheet under `src/lib` is wrapped in one cascade layer:
+
+```css
+@layer ds.components.apps-workplaceengineering {
+  .ds.button {
+    /* … */
+  }
+}
+```
+
+The name comes from the tier this package implements. Component layers follow the design system's tier tree, one flat name per tier: `ds.components.global` for the components every application gets, `ds.components.apps` for the ones Canonical applications share, and `ds.components.apps-workplaceengineering` for this package, which specialises them. `@canonical/styles` names the tiers one level up, so a name like this one is appended after them and sorts above the tier it specialises.
+
+`src/lib/index.css`, published as `@canonical/svelte-ds-app-wpe/styles.css`, names the layer as its first rule and then imports every component stylesheet. It does not import `@canonical/styles`: the application imports that once, first, as above. `.storybook/styles.css` is the Storybook harness, so it imports `@canonical/styles` and is not wrapped.
+
+An application's own **unlayered** CSS beats every rule in this package, whatever the selectors on either side, because an unlayered author rule outranks every layered one. That is the deliberate escape hatch; an application that does *not* want to win by accident puts its CSS in `@layer app`.
+
+**Rule for contributors:** every component stylesheet under `src/lib` opens with that wrapper, and `src/lib/index.css` imports the new sheet. `@keyframes` and a component's own `:root` token defaults go inside the wrapper; `@property` and `@font-face` registrations stay outside, above the block, because no layer sorts a registration. Never reach for `!important` to win a fight — an important declaration inverts the layer order, so it cannot be arbitrated by layers at all.
+
 ## Dependency notes
 
 This section documents non-trivial runtime dependencies in this package.

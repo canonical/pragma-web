@@ -1,2 +1,34 @@
-/* TODO(jmuzina): remove this file once pragma tokens are ready and used in the project */
-@import "./styles/index.css";
+/* @canonical/svelte-ds-app-wpe — every component stylesheet in one import.
+ *
+ * The first rule is this package's own cascade layer. A layer takes its place
+ * in the order the first time its name is seen, so naming it here — before any
+ * component sheet can open a block with it — is what keeps that place the same
+ * whichever sheet a bundler emits first.
+ *
+ * The name comes from the tier this package implements, which is why it is a
+ * single flat name and not a nesting of one. `@canonical/styles` names the
+ * tiers one level up, so a name like this one is appended after them and sits
+ * above the tier it specialises. See "Cascade layers" in the
+ * `@canonical/styles` README.
+ *
+ * The imports below carry no `layer()` keyword on purpose: each sheet opens its
+ * own block with the same name, and the keyword would nest it one level deeper.
+ *
+ * Importing a component already brings its own stylesheet, so this file is for
+ * a consumer who wants every component's CSS without importing every component.
+ */
+@layer ds.components.apps-workplaceengineering;
+
+@import url("./_work_in_progress/Rule/styles.css");
+@import url("./components/Button/styles.css");
+@import url("./components/Card/common/Content/styles.css");
+@import url("./components/Card/common/Footer/styles.css");
+@import url("./components/Card/common/Header/styles.css");
+@import url("./components/Card/common/Image/styles.css");
+@import url("./components/Card/styles.css");
+@import url("./components/Example/styles.css");
+@import url("./components/KeyboardKey/styles.css");
+@import url("./components/Section/styles.css");
+@import url("./group/Cards/styles.css");
+@import url("./group/KeyboardKeys/styles.css");
+@import url("./subcomponent/Spinner/styles.css");
