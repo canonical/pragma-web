@@ -10,7 +10,8 @@
     "#projections": "./src/projections/index.ts",
     "#relay": "./src/relay/index.ts",
     "#server": "./src/server/index.ts",
-    "#shell": "./src/shell/index.ts"
+    "#shell": "./src/shell/index.ts",
+    "#sitemap": "./src/sitemap/index.ts"
   },
   "scripts": {
     "graph": "bun src/server/graph.ts",

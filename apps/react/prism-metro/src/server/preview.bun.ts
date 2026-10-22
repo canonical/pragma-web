@@ -28,7 +28,7 @@ import createAppRenderer from "../../dist/server/renderer.js";
 import createSitemapRenderer from "../../dist/server/sitemap.js";
 
 type CreateAppRenderer = typeof import("./renderer.js").default;
-type CreateSitemapRenderer = typeof import("../sitemap/renderer.js").default;
+type CreateSitemapRenderer = typeof import("#sitemap").createSitemapRenderer;
 
 const PORT = Number(process.env.PORT) || 5178;
 const staticMount = parseStaticPair(":dist/client");
