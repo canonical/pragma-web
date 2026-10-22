@@ -1,0 +1,19 @@
+---
+# Probe — a fixture the checks run against: a root with one labelled
+# child, a hover state and a reflow below one group.
+node:
+  uri: prism.component.probe
+  styles:
+    layout.type: flex
+    spacing.gap: container.gap.tight
+    spacing.internal.inline.start: space.100
+    spacing.internal.inline.end: space.100
+    appearance.radius: 0.25rem
+    typography.color: color.text
+    typography.color@hover: color.text.muted
+  edges:
+    - node:
+        role: label
+        styles:
+          typography.weight: typography.weight.bold
+      relation: { cardinality: "1", slotName: label }
