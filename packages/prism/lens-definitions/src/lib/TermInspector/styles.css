@@ -1,0 +1,125 @@
+/*
+ * TermInspector — the explorer's east panel. The panel's width comes from
+ * the explorer's grid; this file styles only the inspector's interior,
+ * the parts its views render included.
+ *
+ * Each design decision reads a component token. The colours and spacing
+ * read the design system's semantic tokens. The design system has no
+ * semantic token for the type sizes, the tracking, the border width or the
+ * radius, so those component tokens hold the lens's own value and only they
+ * retune it.
+ */
+
+@layer ds.prism {
+  :root {
+    --term-inspector-font-size: 0.875rem;
+    --term-inspector-padding: var(--space-200, 1rem);
+    --term-inspector-border-width: 1px;
+    --term-inspector-border-color: var(--color-border-muted);
+    --term-inspector-radius: 0.5rem;
+    --term-inspector-muted-color: var(--color-text-muted);
+    --term-inspector-heading-gap: var(--space-200, 1rem);
+    --term-inspector-heading-margin-end: var(--space-050, 0.25rem);
+    --term-inspector-label-font-size: 0.75rem;
+    --term-inspector-label-letter-spacing: 0.05em;
+    --term-inspector-list-indent: var(--space-200, 1rem);
+    --term-inspector-cell-padding-block: var(--space-050, 0.25rem);
+    --term-inspector-cell-padding-inline: var(--space-100, 0.5rem);
+    --term-inspector-definition-font-size: 0.8125rem;
+    --term-inspector-details-gap: var(--space-050, 0.25rem);
+  }
+
+  .ds.term-inspector {
+    font-size: var(--term-inspector-font-size);
+    padding: var(--term-inspector-padding);
+    border: var(--term-inspector-border-width) solid
+      var(--term-inspector-border-color);
+    border-radius: var(--term-inspector-radius);
+  }
+
+  /* Present for assistive tech and as the article's `aria-labelledby` target
+   * (`term-inspector-title`), absent from the layout: the mode strip's trail
+   * carries the selected term as its terminal crumb. The visually hidden
+   * idiom; the term and namespace line below stays visible. */
+  .ds.term-inspector .heading {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ds.term-inspector .address {
+    margin-block: 0;
+    color: var(--term-inspector-muted-color);
+  }
+
+  .ds.term-inspector .subheading {
+    margin-block: var(--term-inspector-heading-gap)
+      var(--term-inspector-heading-margin-end);
+    font-size: var(--term-inspector-label-font-size);
+    text-transform: uppercase;
+    letter-spacing: var(--term-inspector-label-letter-spacing);
+    color: var(--term-inspector-muted-color);
+  }
+
+  .ds.term-inspector .list {
+    margin-block: 0;
+    padding-inline-start: var(--term-inspector-list-indent);
+  }
+
+  .ds.term-inspector .identifier {
+    overflow-wrap: anywhere;
+  }
+
+  /* The property table scrolls inside the panel rather than propping the
+   * panel, and the lens layout, open. */
+  .ds.term-inspector .table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    max-inline-size: 100%;
+  }
+
+  .ds.term-inspector .cell {
+    padding: var(--term-inspector-cell-padding-block)
+      var(--term-inspector-cell-padding-inline);
+    border-block-end: var(--term-inspector-border-width) solid
+      var(--term-inspector-border-color);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  /* A property's definition: a full-width row beneath its property, quieter
+   * than the property's own row, so it reads as that row's continuation. */
+  .ds.term-inspector .definition {
+    padding-block-start: 0;
+    color: var(--term-inspector-muted-color);
+    font-size: var(--term-inspector-definition-font-size);
+  }
+
+  .ds.term-inspector .details {
+    margin-block: 0;
+    display: grid;
+    gap: var(--term-inspector-details-gap);
+  }
+
+  .ds.term-inspector .key {
+    color: var(--term-inspector-muted-color);
+    font-size: var(--term-inspector-label-font-size);
+    text-transform: uppercase;
+    letter-spacing: var(--term-inspector-label-letter-spacing);
+  }
+
+  .ds.term-inspector .value {
+    margin-inline-start: 0;
+  }
+
+  .ds.term-inspector .empty {
+    margin-block: 0;
+    color: var(--term-inspector-muted-color);
+  }
+}

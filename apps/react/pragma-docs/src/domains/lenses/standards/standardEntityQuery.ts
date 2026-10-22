@@ -22,8 +22,8 @@
  * "is not accepted by `node(id:)`"). So the route param is now
  * `http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23react.component.props`.
  *
- * Keeping the curie in the URL and expanding it client-side via `toFullUri`
- * + `Query.ontologies` was considered and rejected: it needs the namespace
+ * Keeping the curie in the URL and expanding it client-side against
+ * `Query.ontologies`' namespaces was considered and rejected: it needs the namespace
  * inventory SYNCHRONOUSLY, on both server and client, before routing —
  * `standardEntityVariables` is a synchronous pure function the route's
  * `warm` calls directly, and on the server that `warm` must start its fetch

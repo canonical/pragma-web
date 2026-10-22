@@ -320,11 +320,11 @@ describe("server matrix (2×3) serves correctly", () => {
             // A second subcomponent — the list, not just one row.
             expect(cardHtml).toContain("Card.Header");
 
-            // 5c. Definitions block (P-5): the ontology explorer SSRs
-            //     from the live graph. The term page carries the
-            //     inspector's class record, the React Flow well's
-            //     server-rendered node DOM, and the serialised store —
-            //     all in the raw HTML, before any client JS.
+            // 5c. Definitions block: the ontology explorer SSRs from the
+            //     live graph. The term page carries the inspector's class
+            //     record, the well's server-rendered node DOM, and the
+            //     serialised store — all in the raw HTML, before any
+            //     client JS.
             const definitionsTerm = await fetch(
               `${server.base}/definitions/ds%3AUIBlock`,
             );
@@ -332,7 +332,7 @@ describe("server matrix (2×3) serves correctly", () => {
             const definitionsTermHtml = await definitionsTerm.text();
             expect(definitionsTermHtml).toContain("UI Block");
             expect(definitionsTermHtml).toContain("ds:UIBlock");
-            expect(definitionsTermHtml).toContain("react-flow__node-term");
+            expect(definitionsTermHtml).toContain('class="ds term-node');
             expect(definitionsTermHtml).toContain("__INITIAL_DATA__");
             expect(definitionsTermHtml).toContain('"records"');
 
@@ -346,30 +346,29 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(definitionsHtml).toContain("__INITIAL_DATA__");
             expect(definitionsHtml).toContain('"records"');
 
-            // 5d. Silent-rot closures (the AV-330 review round). The
-            //     well's node/edge DOM could rot to zero or partial while
-            //     every literal above still matched. Never pin graph
-            //     counts (the components lens's 111→108 lesson) — instead:
-            //     the well draws exactly one node per class the rail
-            //     lists, so the node count must equal the rail's
-            //     class-link count, both derived from THIS response
+            // 5d. Silent-rot closures. The well's node and edge DOM could
+            //     rot to zero or partial while every literal above still
+            //     matched. Graph counts are never pinned, since the live
+            //     graph grows; instead the well draws exactly one node per
+            //     class the rail lists, so the node count must equal the
+            //     rail's class-link count, both derived from THIS response
             //     (drift-proof, catches a partial well). Floors catch the
             //     both-surfaces-rot-to-zero case the equality alone would
-            //     wave through (0 === 0), and edges stay strictly below
-            //     nodes — each edge is one non-root class's superclass
-            //     link, and every non-empty ontology has a root.
+            //     wave through (0 === 0), and structural edges stay
+            //     strictly below nodes — each is one non-root class's
+            //     superclass link, and every non-empty ontology has a root.
             const wellNodeCount = (
-              definitionsTermHtml.match(/react-flow__node-term/g) ?? []
+              definitionsTermHtml.match(/class="ds term-node/g) ?? []
             ).length;
             const wellEdgeCount = (
-              definitionsTermHtml.match(/react-flow__edge-path/g) ?? []
+              definitionsTermHtml.match(/class="edge structural/g) ?? []
             ).length;
             const railClassLinkCount =
-              // The headings now carry a match count ("Classes 17 of 17"),
+              // The headings carry a match count ("Classes 17 of 17"),
               // so the opening tag is matched loosely up to its close.
               (
                 definitionsTermHtml.match(
-                  /<h3>Classes[\s\S]*?<h3>Properties/g,
+                  /<h3 class="subheading">Classes[\s\S]*?<h3 class="subheading">Properties/g,
                 ) ?? []
               )
                 .map(
@@ -381,20 +380,20 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(wellNodeCount).toBeGreaterThan(20);
             expect(wellEdgeCount).toBeGreaterThan(10);
             expect(wellEdgeCount).toBeLessThan(wellNodeCount);
+            //     The semantic arcs, the object properties between drawn
+            //     classes, are in the server markup too.
+            expect(definitionsTermHtml).toContain('class="edge semantic');
 
-            // 5d-bis (AV-274). The exhibit's heuristics, asserted against
-            // the LIVE graph rather than a fixture.
-            //
-            //   THE SELECTION'S EGO-FADE IS SERVER-RENDERED. The term is
+            //   THE SELECTION'S EGO-FADE IS SERVER-RENDERED, asserted
+            //   against the LIVE graph rather than a fixture. The term is
             //   in the URL, so the fade is a pure function of data both
             //   sides hold and belongs in the first paint. Some nodes fade
             //   and some do NOT — a fade that swallowed everything would
             //   convey nothing, so the spared one-hop neighbourhood is
             //   what proves the rule is a neighbourhood and not a wash.
             const fadedNodeCount = (
-              definitionsTermHtml.match(
-                /react-flow__node-term[^"]*is-faded/g,
-              ) ?? []
+              definitionsTermHtml.match(/class="ds term-node[^"]*is-faded/g) ??
+              []
             ).length;
             expect(fadedNodeCount).toBeGreaterThan(0);
             expect(fadedNodeCount).toBeLessThan(wellNodeCount);
@@ -408,13 +407,12 @@ describe("server matrix (2×3) serves correctly", () => {
             //   THE RAIL DIMS, IT NEVER HIDES. Server-side the filter is
             //   the no-op, so no rail item may carry the dim marker while
             //   every class the well draws is still listed (asserted by
-            //   the equality above). The marker itself must exist in the
-            //   stylesheet's vocabulary — proven by the chips below.
-            expect(definitionsTermHtml).not.toContain('data-dimmed="true"');
+            //   the equality above).
+            expect(definitionsTermHtml).not.toContain("is-dimmed");
 
-            //   THE STRIP IS CLAIMED AND USEFUL (R5): both sockets carry
-            //   real content in the server HTML, the chips offer one per
-            //   live ontology, and the status figure counts real classes.
+            //   THE STRIP IS CLAIMED AND USEFUL: both sockets carry real
+            //   content in the server HTML, the chips offer one per live
+            //   ontology, and the status figure counts real classes.
             expect(definitionsTermHtml).toContain(
               'data-slot="explorer-controls"',
             );
@@ -422,39 +420,43 @@ describe("server matrix (2×3) serves correctly", () => {
               'data-slot="explorer-status"',
             );
             const chipCount = (
-              definitionsTermHtml.match(/class="explorer-chip"/g) ?? []
+              definitionsTermHtml.match(/<button[^>]*class="chip"/g) ?? []
             ).length;
             // Two abstraction chips plus one per ontology (three live).
             expect(chipCount).toBeGreaterThanOrEqual(4);
             // The figure's counts agree with the graph the well drew, so
             // the figure can never flatter the graph. Both sides derive
-            // from THIS response — no pinned graph counts (the components
-            // lens's 111→108 lesson): the abstract tally is read off the
-            // well's own ABSTRACT tags.
-            const statusCaption = /<figcaption>([\s\S]*?)<\/figcaption>/
-              .exec(definitionsTermHtml)?.[1]
-              ?.replaceAll("<!-- -->", "");
+            // from THIS response, with no pinned graph counts: the
+            // abstract tally is read off the well's own abstract nodes.
+            const statusCaption =
+              /<figcaption class="caption">([\s\S]*?)<\/figcaption>/
+                .exec(definitionsTermHtml)?.[1]
+                ?.replaceAll("<!-- -->", "");
             const abstractNodeCount = (
-              definitionsTermHtml.match(/hierarchy-node-tag/g) ?? []
+              definitionsTermHtml.match(/class="ds term-node abstract/g) ?? []
             ).length;
             expect(abstractNodeCount).toBeGreaterThan(0);
             // Unfiltered server render: visible === total, and the
-            // abstract clause matches the tags the graph actually drew.
+            // abstract clause matches the nodes the graph actually drew,
+            // each of which carries its ABSTRACT tag in real text.
             expect(statusCaption).toBe(
               `${wellNodeCount} of ${wellNodeCount} classes · ${abstractNodeCount} abstract`,
             );
+            expect(
+              (definitionsTermHtml.match(/<span class="tag">/g) ?? []).length,
+            ).toBe(abstractNodeCount);
 
-            //   THE FURNITURE floats over the canvas (the legend and the
-            //   hint), and abstract classes are marked in real text.
-            expect(definitionsTermHtml).toContain("hierarchy-legend");
-            expect(definitionsTermHtml).toContain("hierarchy-hint");
-            expect(definitionsTermHtml).toContain("hierarchy-node-tag");
+            //   THE FURNITURE floats over the canvas: the legend and the
+            //   hint.
+            expect(definitionsTermHtml).toContain('class="ds well-legend"');
+            expect(definitionsTermHtml).toContain('<p class="hint">');
 
-            //     The class inspector's relations and property rows SSR
+            //     The class inspector's lineage and property rows SSR
             //     from the live graph: `hasVariant` is a ds:UIBlock
             //     ClassProperty the unit fixture freezes, so an upstream
             //     rename rots loudly here, not silently.
-            expect(definitionsTermHtml).toContain("Superclasses");
+            expect(definitionsTermHtml).toContain("Lineage");
+            expect(definitionsTermHtml).toContain('class="ds lineage"');
             expect(definitionsTermHtml).toContain("hasVariant");
 
             //     The property view (the term lookup's other arm)
@@ -468,8 +470,9 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(definitionsPropertyHtml).toContain("Functional");
             expect(definitionsPropertyHtml).toContain("Inverse");
 
-            //     Instance links land on the components lens (the D31
-            //     landing rule), proved against the live graph:
+            //     Instance chips link to the components lens, the home the
+            //     site declares for a component, proved against the live
+            //     graph:
             const definitionsClass = await fetch(
               `${server.base}/definitions/ds%3AComponent`,
             );

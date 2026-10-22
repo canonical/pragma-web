@@ -1,0 +1,327 @@
+# =============================================================================
+# The Prism data contract.
+#
+# The MINIMAL GraphQL surface any provider must offer for the docsite to run.
+# It is derived from a ke-graphql emission in its DEFAULT configuration — the
+# part no ontology choice can vary:
+#
+#   - the Node interface and PageInfo (compiler/compose.ts)
+#   - NodeConnection / NodeEdge (compiler/compose.ts, the connection factory)
+#   - the hand-written TBox (lib/tbox/buildTBoxSchema.ts): Ontology,
+#     OntologyClass, ClassProperty, OntologyProperty, PropertyKind, EntityMeta
+#   - root fields ontologies / ontology / ontologyClass / ontologyProperty
+#     (buildTBoxSchema.ts) and node(id:) (compiler/wireRelay.ts)
+#
+# Identity is `uri: ID!` — the entity's ABSOLUTE IRI — and every descriptive
+# fact lives behind `_meta: EntityMeta!`. There is no `id`, no `kind`, and no
+# top-level label/comment/definition on Node: the interface is identity plus
+# self-description and nothing else. `_meta.title` is TOTAL (the provider
+# computes a fallback), `_meta.label` is asserted-only and may be null.
+#
+# The contract names NO ontology terms — every type and field here is
+# structural. It is therefore independent of the provider's field-name
+# `prefixing` knob: a schema compiled with `prefixing: "all"` satisfies it
+# exactly as one compiled with `prefixing: "none"` does.
+#
+# Not every compiler option is neutral, though. `relay: false` skips the pass
+# that wires `node(id:)`, so a schema compiled that way fails this contract by
+# exactly that one field. An option that withholds part of the surface the
+# docsite needs produces a non-conforming provider by construction; the relay
+# control in satisfiesContract.test.ts pins that it fails by that field and no
+# other.
+#
+# Deliberately NOT in the contract:
+#
+#   - @defer / @stream. Conditional on `incremental: true`, so a provider that
+#     runs without incremental delivery is still conformant.
+#   - Every ontology-derived type (Component, Job, CodeStandard, ...). Those
+#     depend on which ontology a provider loaded and are not universal.
+#   - Provider extension fields such as OntologyProperty.acceptanceCriteria /
+#     .completionGuidance. Annotation-derived, provider-specific — extensions,
+#     not base.
+#
+# EntityMeta IS in the contract: `Node` selects it through `_meta`, and the
+# compiler puts `_meta: EntityMeta!` on every generated type, so no provider
+# can omit the type.
+#
+# A provider satisfies this contract when its schema is a SUPERSET of it —
+# see satisfiesContract(). Extra types, extra fields and extra optional
+# arguments are all fine; anything this file names must be present, at least
+# as permissive, and at least as wide.
+# =============================================================================
+
+"""
+Everything addressable by an absolute IRI. Every non-embeddable type the
+compiler generates implements this: identity plus self-description, nothing
+else.
+"""
+interface Node {
+  "The entity's absolute IRI — the primary key."
+  uri: ID!
+  "Self-describing TBox access for this entity."
+  _meta: EntityMeta!
+}
+
+"""
+Self-describing TBox access attached to every Node, plus the generic
+descriptive fields a lens renders without knowing the concrete type. `title`
+is total: the provider computes a fallback chain whose tail is the IRI LOCAL
+NAME (`…#Film` answers "Film"), with the whole IRI below it for the degenerate
+case of an IRI that ends in a separator and so has no local name. `label`,
+`comment`, and
+`definition` are asserted-only and null when nothing is asserted.
+
+`curie` is the DISPLAY form of `uri`, and it lives here rather than beside
+`uri` on `Node` for the reason every derived value does: `uri` is asserted
+identity, `curie` is computed from the provider's namespace inventory, and
+`_meta` is where computed things go. It never replaces `uri` — an address a
+consumer stores, sends, or compares must be the absolute IRI.
+"""
+type EntityMeta {
+  """
+  Compact display form of `uri`: `prefix:local` when the provider's namespace
+  inventory has a match, else the absolute IRI unchanged, else — for a value
+  with no IRI at all (an embedded blank node) — the GraphQL type name. TOTAL,
+  exactly like `title`, and never an identity: `uri` is the only address.
+  """
+  curie: String!
+  title(lang: String = "en"): String!
+  label(lang: String = "en"): String
+  comment(lang: String = "en"): String
+  definition(lang: String = "en"): String
+  type: OntologyClass!
+  fields: [ClassProperty!]!
+  field(name: String!): ClassProperty
+}
+
+"Relay cursor pagination metadata."
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+"Relay connection over the Node interface."
+type NodeConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+}
+
+"One edge of a NodeConnection."
+type NodeEdge {
+  node: Node!
+  cursor: String!
+}
+
+"A loaded ontology namespace."
+type Ontology {
+  prefix: String!
+  namespace: String!
+  label: String
+  classes: [OntologyClass!]!
+  properties: [OntologyProperty!]!
+}
+
+"""
+A class in the TBox — itself a Node, so classes resolve through `node(id:)`
+and appear in NodeConnections like any other entity.
+"""
+type OntologyClass implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  label: String
+  definition: String
+  superclass: OntologyClass
+  superclasses: [OntologyClass!]!
+  subclasses: [OntologyClass!]!
+  properties: [ClassProperty!]!
+  instances(
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): NodeConnection!
+  instanceCount: Int!
+  isAbstract: Boolean!
+  namespace: String!
+}
+
+"""
+Class-scoped view of a property: SHACL cardinality is a fact about a
+(class, property) pair, not about the property alone — and so is `name`.
+"""
+type ClassProperty {
+  """
+  The field name this property answers to ON THIS CLASS — the exact string
+  `EntityMeta.field(name:)` accepts, so `fields { name }` and `field(name:)`
+  round-trip. Class-scoped because the name is: per-class cardinality decides
+  whether the field is pluralized, so one property can be `part` on one class
+  and `parts` on another, and no consumer can derive that from `property.uri`.
+
+  When the property projects no field on this class at all (a provider may
+  omit one — SHACL `sh:maxCount 0`, an unexposed range, an unprojected class)
+  there is no name `field(name:)` would accept; the OWL local name is returned
+  as a label. It tells a consumer nothing `property.uri` did not already, which
+  is the point: the fallback never fabricates a plausible-but-wrong field name.
+  """
+  name: String!
+  property: OntologyProperty!
+  required: Boolean!
+  singular: Boolean!
+  inherited: Boolean!
+}
+
+"A property in the TBox. Not a Node — it has identity but no `_meta`."
+type OntologyProperty {
+  uri: ID!
+  label: String
+  definition: String
+  domain: OntologyClass
+  range: String!
+  kind: PropertyKind!
+  functional: Boolean!
+  inverse: OntologyProperty
+  namespace: String!
+}
+
+"How a property relates its subject to its object."
+enum PropertyKind {
+  DATATYPE
+  OBJECT
+  ANNOTATION
+}
+
+"""
+The universal root fields. A provider adds its own ontology-derived fields.
+
+`ontologyClass(uri:)` and `ontologyProperty(uri:)` take `String!`, not `ID!`:
+these arguments accept the PREFIXED convenience form ("ds:Component") as well
+as the absolute IRI, and live client operations already declare
+`$uri: String!` — promoting the argument to `ID!` would invalidate them
+(String is not a subtype of ID). `node(id:)` is the strict lookup: its
+argument keeps Relay's name `id` and its value is the absolute IRI.
+"""
+type Query {
+  node(id: ID!): Node
+  ontologies: [Ontology!]!
+  ontology(prefix: String!): Ontology
+  ontologyClass(uri: String!): OntologyClass
+  ontologyProperty(uri: String!): OntologyProperty
+}
+
+# =============================================================================
+# This provider's own types, appended to the authored contract SDL.
+#
+# WHY THIS FILE EXISTS AT ALL. The contract declares exactly one type that
+# `implements Node` — OntologyClass. A NodeConnection built from the contract
+# alone can therefore contain nothing but ontology classes: there is no type
+# an ABox entity could be. Every provider must extend the contract SDL with
+# its own concrete Node implementers, and that extension is precisely what the
+# contract's superset rule is for (contract.graphql:39-42). `buildSchema` over
+# the contract alone cannot serve instance data.
+#
+# NOTE WHAT IS ABSENT: there is no `extend type Query`. Every type below is
+# reachable through the contract's own root fields — `node(id:)` and
+# `OntologyClass.instances`. Adding provider root fields would have been
+# easier and would have proved less: the point is that the contract's five
+# roots suffice.
+# =============================================================================
+
+"""
+A metro line. A root class in the TBox (no superclass), so it demonstrates
+that `OntologyClass.superclass` is legitimately null.
+"""
+type Line implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  servedBy: [Stop!]!
+}
+
+"""
+Anything that serves a line: the GraphQL face of the TBox's `metro:Stop`
+class, which `Station` and its subclass `Interchange` both instantiate.
+
+WHY IT HAS TO EXIST. `Line.servedBy` walks the inverse of `servesLine`, and
+both concrete types carry that property — so the list genuinely holds a mix.
+Declaring it `[Station!]!` said otherwise: an `Interchange` came back through
+it dressed as a `Station`, `... on Interchange` could not be written against
+it, and the schema disagreed with the values it served. GraphQL has no type
+inheritance, so the TBox's subclassing cannot carry the list; an interface
+can, and this is the smallest one that does.
+
+It does NOT try to mirror the class tree. `Stop` is one interface over the
+fields both implementers share; the hierarchy itself still lives in the TBox
+and shows up through `superclasses` / `subclasses` / `inherited`.
+"""
+interface Stop implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  platformCount: Int
+  location: GeoPoint
+  servesLine: [Line!]!
+  inZone: Zone
+}
+
+"""
+A station on the network. `name` is nullable in GraphQL even though the TBox
+marks `metro:name` required on this class: SHACL cardinality is an assertion
+about the data, and this dataset deliberately contains stations that violate
+it so `_meta.title`'s fallback chain has something to fall back from.
+"""
+type Station implements Node & Stop {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  platformCount: Int
+  location: GeoPoint
+  servesLine: [Line!]!
+  inZone: Zone
+}
+
+"""
+A fare band. Lives in the SECOND namespace (`geo:`), which is the point: with
+entities in only one namespace, a `_meta.curie` implementation could hardcode
+a single prefix and still look correct on every row.
+"""
+type Zone implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+}
+
+"""
+A station where two or more lines meet — a subclass of Station in the TBox.
+GraphQL has no type inheritance, so the relationship lives entirely in the
+TBox and shows up through `superclasses` / `subclasses` / `inherited`.
+"""
+type Interchange implements Node & Stop {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  platformCount: Int
+  location: GeoPoint
+  servesLine: [Line!]!
+  inZone: Zone
+  transferMinutes: Int
+}
+
+"""
+A latitude/longitude pair. NOT a Node: it has no IRI, so it is unreachable
+through `node(id:)` and can never appear in a NodeConnection.
+
+The contract does not require an embeddable — nothing in it references a
+non-Node value type. This one exists to probe the last tier of `_meta.title`'s
+fallback chain (the typename tier, reached only when there is no IRI to fall
+back to) and to show that a provider may add value types freely. Note that it
+still carries `_meta: EntityMeta!`, and EntityMeta.type is non-null, so even a
+coordinate pair needs a class in the TBox.
+"""
+type GeoPoint {
+  _meta: EntityMeta!
+  latitude: Float!
+  longitude: Float!
+}
+

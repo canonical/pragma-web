@@ -1,0 +1,41 @@
+/**
+ * The metro nodes the app's tests address, and the counts the graph's
+ * dataset gives them. Every suite speaks about the same nodes, so a change
+ * to an exemplar is made once.
+ */
+
+/** The stations exemplar: Northgate, by its compact address. */
+export const NORTHGATE_CURIE = "metro:northgate";
+
+/** Northgate's title, as the graph names it. */
+export const NORTHGATE_TITLE = "Northgate";
+
+/** An interchange, the station subclass the graph serves as its own type. */
+export const CENTRAL_EXCHANGE_CURIE = "metro:central-exchange";
+
+/** Central Exchange's title, as the graph names it. */
+export const CENTRAL_EXCHANGE_TITLE = "Central Exchange";
+
+/** The lines exemplar: the Circle Line, by its compact address. */
+export const CIRCLE_LINE_CURIE = "metro:circle-line";
+
+/** The Circle Line's title, as the graph names it. */
+export const CIRCLE_LINE_TITLE = "Circle Line";
+
+/** The definitions exemplar: the station class, by its compact address. */
+export const STATION_CLASS_CURIE = "metro:Station";
+
+/** The fare zone class, whose instances have no home on this site. */
+export const ZONE_CLASS_CURIE = "geo:Zone";
+
+/** A fare zone's title, as the graph names it. */
+export const ZONE_TITLE = "Central Zone";
+
+/** How many instances `metro:Station` has: 14 stations, 2 interchanges. */
+export const STATION_COUNT = 16;
+
+/** How many of the stations are interchanges. */
+export const INTERCHANGE_COUNT = 2;
+
+/** How many lines the network runs. */
+export const LINE_COUNT = 3;

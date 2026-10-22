@@ -4,7 +4,7 @@
  * interior suspends without taking the marker with it.
  */
 
-import "../../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
+import "../../../../testing/stubReactFlowGlobals.js";
 import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";

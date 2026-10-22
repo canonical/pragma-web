@@ -2,9 +2,10 @@
 // THE ACCEPTANCE GATE: every CORE lens operation the docsite ships must
 // execute against a provider that has never heard of pragma.
 //
-// WHAT THE SCANNED DIRECTORY MEANS, AND WHAT IT DOES NOT.
-// `apps/react/pragma-docs/src/domains/lenses/**` is the docsite's CORE LENS
-// SET, and this gate's subject is exactly that directory — never a
+// WHAT THE SCANNED DIRECTORIES MEAN, AND WHAT THEY DO NOT.
+// `apps/react/pragma-docs/src/domains/lenses/**` and the `src` of every lens
+// package (`packages/prism/lens-*/src/**`) are the docsite's CORE LENS SET,
+// and this gate's subject is exactly those directories — never a
 // hand-maintained allowlist. Membership of the core set IS the obligation to
 // be provider-neutral: put a lens there and it must execute here, the day it
 // lands.
@@ -21,8 +22,8 @@
 //   src/addons/journeys      JourneysExplorerQuery
 //
 // The first five select `Component` or `Query.component` — pragma-ontology
-// terms this provider's dataset has no class for — so widening the root to
-// `src/domains` would turn this gate red today. That red would be a to-do
+// terms this provider's dataset has no class for — so widening the app's root
+// to `src/domains` would turn this gate red today. That red would be a to-do
 // list rather than a defect in the gate, and widening is the intended
 // direction; `lensOperations.ts` carries the same enumeration beside the path
 // constant so the two cannot drift.
@@ -41,7 +42,7 @@
 // move there. If a lens is meant to be part of the core set and cannot execute
 // against this provider, the answer is to despecialise the operation — the
 // failure report below is the to-do list. Relocating a core operation out of
-// the scanned directory is "narrowing the operation set" under another name,
+// the scanned directories is "narrowing the operation set" under another name,
 // and it is exactly the failure mode this gate exists to catch. Only an owner
 // reclassifying a view as an add-on can move one, and the move must land with
 // that reasoning written down (see `src/addons/journeys/index.ts`, which
@@ -53,8 +54,8 @@
 // returns the value of an arbitrary property on an arbitrary entity. Generic
 // instance-level relation traversal is all that lens is.
 //
-// SO WHAT THIS GATE PROVES, EXACTLY: the four operations under
-// `src/domains/lenses` are provider-neutral. It does not establish that the
+// SO WHAT THIS GATE PROVES, EXACTLY: the four core lens operations, under
+// `src/domains/lenses` and the lens packages, are provider-neutral. It does not establish that the
 // docsite as a whole runs against any conformant provider — five mounted
 // routes, the home page among them, currently do not.
 //
@@ -78,8 +79,9 @@ import { describe, expect, it } from "vitest";
 import { createExampleProvider } from "../../lib/provider/index.js";
 import { LENS_OPERATION_VARIABLES } from "../fixtures.js";
 import {
-  APP_ROOT,
+  collectLensSources,
   discoverLensOperationNames,
+  discoverLensOperations,
   readOperationText,
 } from "../lensOperations.js";
 
@@ -222,7 +224,8 @@ const buildReport = (failures: readonly OperationFailure[]): string =>
       "",
     ]),
     `Provider: @canonical/prism-graph-example (metro network, zero pragma vocabulary)`,
-    `Operations harvested at run time from: ${APP_ROOT}`,
+    "Operations harvested at run time from:",
+    ...collectLensSources().map(({ directory }) => `  ${directory}`),
     "",
     `WAITING ON: ${BLOCKING_LANE}`,
     "",
@@ -239,6 +242,18 @@ describe("the lens operations", () => {
 
   it("discovers at least one operation (anti-vacuity)", () => {
     expect(names.length).toBeGreaterThan(0);
+  });
+
+  it("harvests the lens packages beside the app", () => {
+    // The core lens set spans the app's lens tree and the lens packages; a
+    // scan that silently dropped the packages would still find the app's
+    // operations and pass.
+    const fromPackages = [...discoverLensOperations()]
+      .filter(([, source]) =>
+        source.directory.includes("/packages/prism/lens-"),
+      )
+      .map(([name]) => name);
+    expect(fromPackages).toContain("DefinitionsExplorerQuery");
   });
 
   it("has variables declared for every discovered operation", () => {

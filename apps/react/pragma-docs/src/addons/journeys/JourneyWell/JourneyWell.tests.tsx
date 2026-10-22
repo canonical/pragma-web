@@ -3,7 +3,7 @@
  * (ruling R2) asserted where a reader would see it: in the rendered graph.
  */
 
-import "../../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
+import "../../../../testing/stubReactFlowGlobals.js";
 import { createStaticRouter } from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import { render, screen } from "@testing-library/react";

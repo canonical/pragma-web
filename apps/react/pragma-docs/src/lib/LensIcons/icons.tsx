@@ -1,6 +1,7 @@
 /**
- * The site's lens glyphs — 16px stroke glyphs, one per lens, that each lens
- * passes as its `icon` in `routeLensFacet.of`. Inline SVG (no asset
+ * The site's lens glyphs — 16px stroke glyphs, one per lens the site
+ * declares (a lens package carries its own), that each lens passes as its
+ * `icon` in `routeLensFacet.of`. Inline SVG (no asset
  * pipeline), `currentColor`, and always `aria-hidden`: the accessible name
  * is the rail entry's visible label. The icons are what survives the rail's
  * small-viewport collapse, so every lens must carry one.
@@ -36,22 +37,6 @@ export const ComponentsIcon = ({ size = 16 }: IconProps): ReactElement => (
     <rect height="4.6" rx="1" width="4.6" x="9" y="2.5" />
     <rect height="4.6" rx="1" width="4.6" x="2.5" y="9" />
     <rect height="4.6" rx="2.3" width="4.6" x="9" y="9" />
-  </svg>
-);
-
-/**
- * Definitions: three linked nodes, the Definitions lens's rail glyph.
- *
- * A stroke glyph `size` pixels square (16 by default), drawn in
- * `currentColor` and `aria-hidden`: the rail entry's visible label names
- * it. A lens passes it as its `icon` in `routeLensFacet.of`.
- */
-export const DefinitionsIcon = ({ size = 16 }: IconProps): ReactElement => (
-  <svg aria-hidden="true" {...buildGlyphProps(size)}>
-    <circle cx="4" cy="4" r="2" />
-    <circle cx="12" cy="5" r="2" />
-    <circle cx="7" cy="12" r="2" />
-    <path d="M5.7 5.2 7 10M6 4.4l4-.2M10.8 6.6 8 10.6" />
   </svg>
 );
 
