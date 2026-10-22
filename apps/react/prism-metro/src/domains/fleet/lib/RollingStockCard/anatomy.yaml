@@ -1,0 +1,77 @@
+# RollingStockCard: a rolling stock on the generic entity card, filling location, identifier, kind, key values, vitals and preview.
+# Location is the lines its formations run on; the vital counts its formations; the preview draws its formations at one scale.
+# It adds no styles: the generic component owns them.
+node:
+  uri: metro.fleet.rolling-stock-card
+  projection:
+    on: RollingStock
+  edges:
+    - node:
+        uri: prism.projections.entity-card
+      relation:
+        cardinality: "1"
+        slotName: default
+    - node:
+        role: title
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "1"
+        slotName: title
+    - node:
+        role: identifier
+        projection:
+          field: _meta.curie
+      relation:
+        cardinality: "1"
+        slotName: identifier
+    - node:
+        role: kind
+        projection:
+          field: _meta.type._meta.title
+      relation:
+        cardinality: "1"
+        slotName: kind
+    - node:
+        role: line title
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "0..*"
+        slotName: location
+        projection:
+          field: formations.lines
+    - node:
+        role: formation length
+        projection:
+          field: length
+      relation:
+        cardinality: "1..*"
+        slotName: keyValues
+        projection:
+          field: formations
+    - node:
+        role: formation capacity
+        projection:
+          field: capacity
+      relation:
+        cardinality: "1..*"
+        slotName: keyValues
+        projection:
+          field: formations
+    - node:
+        role: formation count
+        projection:
+          field: uri
+      relation:
+        cardinality: "1..*"
+        slotName: meta
+        projection:
+          field: formations
+    - node:
+        uri: metro.fleet.formation-side-view
+      relation:
+        cardinality: "1..*"
+        slotName: preview
+        projection:
+          field: formations

@@ -1,0 +1,35 @@
+# UnitRow: a unit on the generic entity row, filling title, kind and location left, one vital right, in a 32px row.
+# It adds no styles: the generic component owns them.
+node:
+  uri: metro.fleet.unit-row
+  projection:
+    on: Unit
+  edges:
+    - node:
+        uri: prism.projections.entity-row
+      relation:
+        cardinality: "1"
+        slotName: default
+    - node:
+        role: title
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "1"
+        slotName: title
+    - node:
+        role: kind
+        projection:
+          field: _meta.type._meta.title
+      relation:
+        cardinality: "1"
+        slotName: kind
+    - node:
+        role: car count
+        projection:
+          field: position
+      relation:
+        cardinality: "1..*"
+        slotName: meta
+        projection:
+          field: cars

@@ -1,0 +1,47 @@
+# One formation: title, its stock as location, its side view with the
+# platform-fit marks of every line it runs on, the units in order, and the
+# platform fit per line. Facts (length, capacity, cars, units) in the aside.
+node:
+  uri: metro.fleet.formation-page
+  projection:
+    on: Formation
+  styles:
+    layout.type: grid
+    spacing.gap: container.gap.loose
+  edges:
+    - node:
+        role: heading
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "1"
+        slotName: heading
+    - node:
+        uri: metro.fleet.rolling-stock-chip
+      relation:
+        cardinality: "1"
+        slotName: location
+        projection:
+          field: stock
+    - node:
+        uri: metro.fleet.formation-side-view
+      relation:
+        cardinality: "1"
+        slotName: diagram
+    - node:
+        uri: metro.fleet.unit-row
+      relation:
+        cardinality: "1..*"
+        slotName: units
+        projection:
+          field: units.unit
+    - node:
+        uri: metro.fleet.platform-fit
+      relation:
+        cardinality: "1"
+        slotName: platformFit
+    - node:
+        uri: global.component.description-list
+      relation:
+        cardinality: "1"
+        slotName: facts

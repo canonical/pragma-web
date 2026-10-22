@@ -1,0 +1,57 @@
+# One rolling stock: its title and kind, its formations drawn at one scale
+# with each formation linked to its page, then its car types. Its facts
+# (formations, length range, capacity range, lines) go to the layout's aside
+# as a description list aligned to the aside's subgrid rows.
+node:
+  uri: metro.fleet.stock-page
+  projection:
+    on: RollingStock
+  styles:
+    layout.type: grid
+    spacing.gap: container.gap.loose
+  edges:
+    - node:
+        role: heading
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "1"
+        slotName: heading
+    - node:
+        role: formations section
+        styles:
+          layout.type: grid
+          spacing.gap: container.gap.default
+        edges:
+          - node:
+              uri: metro.fleet.formation-row       # title linked to the formation page
+            relation:
+              cardinality: "1..*"
+              projection:
+                field: formations
+          - node:
+              uri: metro.fleet.formation-side-view
+            relation:
+              cardinality: "1"
+      relation:
+        cardinality: "1"
+        slotName: formations
+    - node:
+        role: car types section
+        edges:
+          - node:
+              uri: metro.fleet.car-type-row
+            relation:
+              cardinality: "1..*"
+              projection:
+                field: formations.units.unit.cars.carType
+      relation:
+        cardinality: "1"
+        slotName: carTypes
+    - node:
+        uri: global.component.description-list
+        projection:
+          field: formations
+      relation:
+        cardinality: "1"
+        slotName: facts

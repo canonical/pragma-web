@@ -1,0 +1,26 @@
+# FormationGraphNode: a formation on the generic entity graph node, filling its title and its kind.
+# It adds no styles: the generic component owns them.
+node:
+  uri: metro.fleet.formation-graph-node
+  projection:
+    on: Formation
+  edges:
+    - node:
+        uri: prism.projections.entity-graph-node
+      relation:
+        cardinality: "1"
+        slotName: default
+    - node:
+        role: title
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "1"
+        slotName: title
+    - node:
+        role: kind
+        projection:
+          field: _meta.type._meta.title
+      relation:
+        cardinality: "1"
+        slotName: kind

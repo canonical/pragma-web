@@ -1,0 +1,32 @@
+# The fleet lens's index: every rolling stock as a card whose preview draws
+# its formations at one scale. The cards sit on the main column's subgrid.
+node:
+  uri: metro.fleet.fleet-index
+  projection:
+    on: Query
+  styles:
+    layout.type: grid
+    spacing.gap: container.gap.loose
+  edges:
+    - node:
+        role: heading
+      relation:
+        cardinality: "1"
+        slotName: heading
+    - node:
+        role: card list
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: 1 / -1
+          spacing.internal.inline.start: 0
+          layout.listStyle: none
+        edges:
+          - node:
+              uri: metro.fleet.rolling-stock-card
+            relation:
+              cardinality: "0..*"
+              projection:
+                field: ontologyClass.instances
+      relation:
+        cardinality: "1"

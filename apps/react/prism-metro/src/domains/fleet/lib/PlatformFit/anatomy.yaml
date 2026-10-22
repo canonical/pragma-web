@@ -1,0 +1,38 @@
+# Per line a formation runs on: the line, its shortest platform, and every
+# station whose platform the formation overhangs, with the excess. The
+# marks in the side view draw the same facts.
+node:
+  uri: metro.fleet.platform-fit
+  styles:
+    layout.type: grid
+    spacing.gap: container.gap.default
+    spacing.internal.inline.start: 0
+    layout.listStyle: none
+  edges:
+    - node:
+        role: line entry
+        styles:
+          layout.type: grid
+          spacing.gap: container.gap.tight
+        edges:
+          - node:
+              uri: metro.line-chip            # S7's Line chip projection
+            relation:
+              cardinality: "1"
+              slotName: line
+          - node:
+              uri: global.component.badge     # "Fits" or "Overhangs at n stations"
+            relation:
+              cardinality: "1"
+              slotName: verdict
+          - node:
+              role: overhang list
+              styles:
+                spacing.internal.inline.start: 0
+                layout.listStyle: none
+                typography.color: color.text.muted
+            relation:
+              cardinality: "0..*"
+              slotName: overhangs
+      relation:
+        cardinality: "0..*"

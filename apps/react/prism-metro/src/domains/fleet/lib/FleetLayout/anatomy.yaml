@@ -1,0 +1,33 @@
+# The fleet lens's layout: the document archetype with the metro rail, the
+# fleet trail in the strip, the routed page in the main column and the
+# page's facts in the aside. Bespoke only in what it binds: DocumentLayout
+# owns the grid, the regions and the scroll model, so this adds no styles.
+node:
+  uri: metro.fleet.fleet-layout
+  edges:
+    - node:
+        uri: prism.core.document-layout
+      relation:
+        cardinality: "1"
+        slotName: default
+      # DocumentLayout's own slots, filled by FleetLayout:
+    - node:
+        uri: metro.metro-rail
+      relation:
+        cardinality: "1"
+        slotName: rail
+    - node:
+        uri: prism.core.lens-breadcrumbs
+      relation:
+        cardinality: "1"
+        slotName: context
+    - node:
+        role: routed page
+      relation:
+        cardinality: "1"
+        slotName: main
+    - node:
+        role: page facts
+      relation:
+        cardinality: "0..1"
+        slotName: aside
