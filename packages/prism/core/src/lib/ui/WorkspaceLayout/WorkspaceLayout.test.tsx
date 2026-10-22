@@ -99,6 +99,29 @@ describe("WorkspaceLayout", () => {
     ).toBe("Inspector content");
   });
 
+  it("keeps the drawer closed when an inspector that left comes back", () => {
+    const renderWithInspector = (hasInspector: boolean) => (
+      <WorkspaceLayout
+        data-testid="workspace"
+        inspector={hasInspector && <p>Inspector content</p>}
+        rail={null}
+      >
+        <p>Routed page</p>
+      </WorkspaceLayout>
+    );
+    const { rerender } = render(renderWithInspector(true));
+    fireEvent.click(screen.getByRole("button", { name: "Details" }));
+    expect(screen.getByRole("dialog", { name: "Details" })).toBeInTheDocument();
+    rerender(renderWithInspector(false));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    rerender(renderWithInspector(true));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(
+      screen.getByTestId("workspace").querySelector(":scope > .inspector")
+        ?.textContent,
+    ).toBe("Inspector content");
+  });
+
   it("renders no inspector region and no trigger without an inspector", () => {
     render(
       <WorkspaceLayout data-testid="workspace" rail={null}>

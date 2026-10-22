@@ -45,13 +45,17 @@ export default function WorkspaceLayout({
   const t = useMessages();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawer = useRef<SidePanelHandle>(null);
+  const hasInspector = isRenderedNode(inspector);
+
+  // The drawer unmounts with the inspector without firing its close
+  // event, so the open state is cleared here, during the render, or the
+  // drawer would reopen by itself when an inspector comes back.
+  if (isDrawerOpen && !hasInspector) setIsDrawerOpen(false);
 
   // The drawer is a dialog its handle opens: once it mounts, open it.
   useEffect(() => {
     if (isDrawerOpen) drawer.current?.open();
   }, [isDrawerOpen]);
-
-  const hasInspector = isRenderedNode(inspector);
 
   return (
     <div
