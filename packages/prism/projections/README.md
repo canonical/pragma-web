@@ -44,6 +44,11 @@ its stylesheet transcribes.
 - **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a 50-unit
   box and two lines of `<text>`, the title over "kind in location", for a
   graph to place with a transform inside its `<svg>`.
+- **`EntityList`**: the shared list view of an index: a toolbar with the
+  count line and the cards and rows toggle, then its children as cards in
+  the published `Cards` group (two columns each) or as rows in an ordered
+  list, or one line when it has none. It keeps no view of its own: its
+  consumer passes `view` and takes the reader's pick from `onViewChange`.
 
 ## Installation
 
@@ -229,9 +234,10 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
   `CardProjectionProps`, `CommandProjectionProps`.
 - Representations: `EntityChip`, `EntityRow`, `EntityCard`,
-  `EntityCommand`, `EntityGraphNode`; types `EntityChipProps`,
-  `EntityRowProps`, `EntityCardProps`, `EntityCardKeyValue`,
-  `EntityCommandProps`, `EntityGraphNodeProps`.
+  `EntityCommand`, `EntityGraphNode`, `EntityList`; types
+  `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
+  `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
+  `EntityListProps`, `EntityListView`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

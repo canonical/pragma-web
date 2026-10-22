@@ -51,6 +51,7 @@ describe("the package's components", () => {
       "EntityChip",
       "EntityCommand",
       "EntityGraphNode",
+      "EntityList",
       "EntityRow",
     ]);
   });

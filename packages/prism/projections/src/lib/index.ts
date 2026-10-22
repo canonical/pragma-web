@@ -37,6 +37,8 @@ export type {
   EntityChipProps,
   EntityCommandProps,
   EntityGraphNodeProps,
+  EntityListProps,
+  EntityListView,
   EntityRowProps,
 } from "./ui/index.js";
 export {
@@ -44,5 +46,6 @@ export {
   EntityChip,
   EntityCommand,
   EntityGraphNode,
+  EntityList,
   EntityRow,
 } from "./ui/index.js";
