@@ -8,8 +8,9 @@
  * Chromium lays each out at 1440px, 1000px and 390px. What is asserted is
  * what the container queries promise: which region shows, whether the
  * drawer's trigger shows, which columns the canvas spans, where the aside
- * sits and whether it holds its place in the canvas's scroll, the gutter
- * between the rows, and that nothing reaches past the viewport.
+ * sits, that it scrolls with the page and that every entry of an aside
+ * taller than the viewport can be scrolled into view, the gutter between
+ * the rows, and that nothing reaches past the viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -46,6 +47,12 @@ const UI_DIRECTORY = fileURLToPath(
 const PARAGRAPHS = Array.from(
   { length: 60 },
   (_, index) => `Paragraph ${index + 1}.`,
+);
+
+/** Entries enough to make the aside taller than every viewport. */
+const ASIDE_ENTRIES = Array.from(
+  { length: 60 },
+  (_, index) => `Section ${index + 1}`,
 );
 
 /** What `measureLayout` is asked to read on these pages. */
@@ -103,10 +110,16 @@ const workspaceLayout = (
   </WorkspaceLayout>
 );
 
-/** A document long enough to scroll, with an aside. */
+/** A document long enough to scroll, with an aside taller than the viewport. */
 const documentLayout = (
   <DocumentLayout
-    aside={<p>On this page</p>}
+    aside={
+      <ul>
+        {ASIDE_ENTRIES.map((text) => (
+          <li key={text}>{text}</li>
+        ))}
+      </ul>
+    }
     colophon={<p>Colophon</p>}
     rail={<nav aria-label="Rail">Rail</nav>}
     strip={<ModeStrip context="Document" />}
@@ -157,6 +170,35 @@ function readPlacement(page: Page) {
       trigger: read(".inspector-trigger"),
       aside: read("main.ds.canvas > .aside"),
     };
+  });
+}
+
+/**
+ * Scroll the canvas from its top to its end, a fraction of its height at a
+ * time, and return how many of the aside's entries were fully inside the
+ * canvas at one position or another.
+ *
+ * @note Impure: scrolls the page's canvas and reads its boxes.
+ */
+function countReachableAsideEntries(page: Page) {
+  return page.evaluate(() => {
+    const canvas = document.querySelector("main.ds.canvas");
+    if (canvas === null) return 0;
+    const entries = [...canvas.querySelectorAll(":scope > .aside li")];
+    const reached = new Set<Element>();
+    const step = canvas.clientHeight / 4;
+    for (let top = 0; top <= canvas.scrollHeight; top += step) {
+      canvas.scrollTop = top;
+      const frame = canvas.getBoundingClientRect();
+      for (const entry of entries) {
+        const box = entry.getBoundingClientRect();
+        if (box.top >= frame.top && box.bottom <= frame.bottom) {
+          reached.add(entry);
+        }
+      }
+    }
+    canvas.scrollTop = 0;
+    return reached.size;
   });
 }
 
@@ -217,27 +259,25 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
         viewport.width < 448 ? "2" : "3",
         "-1",
       ]);
+      expect(before.aside?.position).toBe("static");
       if (viewport.asideBeside) {
-        expect(before.aside?.position).toBe("sticky");
         expect(before.aside?.column).toEqual(["-4", "-1"]);
         expect(before.page?.column).toEqual(["1", "-4"]);
+        expect(before.aside?.top).toBe(before.canvas?.top);
       } else {
-        expect(before.aside?.position).toBe("static");
         expect(before.aside?.row).toBe("2");
         expect(before.page?.column).toEqual(["1", "-1"]);
       }
 
+      // Beside or under the page, the aside moves with the scroll.
       await page.evaluate((distance) => {
         document.querySelector("main.ds.canvas")?.scrollBy(0, distance);
       }, SCROLL_PX);
       const after = await readPlacement(page);
-      if (viewport.asideBeside) {
-        // Sticky at the top of the canvas's scroll: it holds its place.
-        expect(after.aside?.top).toBe(before.canvas?.top);
-      } else {
-        // Under the page, it moves with the scroll.
-        expect(after.aside?.top).toBeLessThan(before.aside?.top ?? 0);
-      }
+      expect(after.aside?.top).toBe((before.aside?.top ?? 0) - SCROLL_PX);
+
+      // An aside taller than the viewport has no entry out of reach.
+      expect(await countReachableAsideEntries(page)).toBe(ASIDE_ENTRIES.length);
 
       const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
       expect(measure.overflow).toEqual([]);

@@ -7,7 +7,7 @@ type OwnProps = {
   readonly children?: ReactNode;
   /**
    * Content beside the page, such as a table of contents: the last three
-   * columns of the canvas, held in place at the top of the canvas's scroll,
+   * columns of the canvas, at the top of the page and scrolling with it,
    * and a row of its own under the page below two groups of columns. No
    * aside when omitted or when it renders nothing.
    */

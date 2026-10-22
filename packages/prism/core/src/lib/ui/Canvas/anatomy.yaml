@@ -11,15 +11,18 @@
 # grids set the grid's gutter as their gap on both axes, through
 # `--canvas-gap`.
 #
-# An optional `aside` sits beside the page in the canvas's last three columns
-# and is part of the canvas's scroll, never a scroller of its own: it holds
-# its place at the top of the scroll (`position: sticky`, top 0).
+# An optional `aside` sits beside the page in the canvas's last three columns,
+# at the top of the page, and is part of the canvas's scroll, never a
+# scroller of its own: it scrolls with the page. It is not sticky: an aside
+# taller than the canvas (a long table of contents) would keep its middle
+# out of reach at every scroll position.
 #
 # Reflow, bound in styles.css:
 #   `.ds.canvas:has(> .aside)` the rows follow their content (`auto`), so the
-#     aside's sticky range is the whole scroll, and the page spans 1 / -4.
+#     scroll covers the longer of the page and the aside, and the page spans
+#     1 / -4.
 #   @container shell (width < 912px)   below two groups: the page spans
-#     1 / -1, and the aside takes row 2 under it, static.
+#     1 / -1, and the aside takes row 2 under it.
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -53,7 +56,5 @@ node:
           layout.grid.column: "-4 / -1"
           layout.grid.row: "1"
           layout.alignSelf: start
-          layout.position: sticky
-          layout.offset.top: 0
           size.min.width: 0
       relation: { cardinality: "0..1", slotName: aside }

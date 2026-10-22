@@ -17,8 +17,8 @@ const componentCssClassName = "ds document-layout";
  * strip and the colophon span the rest of their rows; and the canvas fills
  * the body and scrolls. An aside, when there is one, is the canvas's own
  * (see `Canvas`): it holds the canvas's last three columns inside the same
- * scroll, at the top of it, and takes a row under the page below two groups
- * of columns.
+ * scroll, starting at the top of the page and scrolling with it, and takes
+ * a row under the page below two groups of columns.
  *
  * Below one group of columns the rail narrows to one column, a container
  * query on the shell. An aside or a colophon that renders nothing (`null`,

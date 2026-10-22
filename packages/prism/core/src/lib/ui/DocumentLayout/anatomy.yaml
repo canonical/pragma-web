@@ -4,7 +4,7 @@
 # on both axes. The rail takes columns 1 / span 2 on every row and scrolls on
 # its own; only the canvas scrolls the document; an optional aside is the
 # canvas's own (`prism.component.canvas`, slot `aside`), so it is part of the
-# canvas's scroll and holds its place at the top of it; the colophon is a
+# canvas's scroll and scrolls with the page; the colophon is a
 # band under the body.
 #
 # Reflow, bound in styles.css:

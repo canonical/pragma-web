@@ -19,7 +19,7 @@ export const Default: Story = {
   },
 };
 
-/** A page with an aside beside it, held at the top of the canvas's scroll. */
+/** A page with an aside beside it, scrolling with it in the canvas. */
 export const WithAside: Story = {
   args: {
     children: <p style={{ gridColumn: "1 / -1" }}>The routed page.</p>,

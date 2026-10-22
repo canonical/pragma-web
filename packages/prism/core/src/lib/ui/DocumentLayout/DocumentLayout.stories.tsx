@@ -43,7 +43,7 @@ type Story = StoryObj<typeof DocumentLayout>;
 /** The rail, the strip, the scrolling canvas and the colophon. */
 export const Default: Story = {};
 
-/** With an aside held at the top of the canvas's scroll. */
+/** With an aside beside the page, in the canvas's scroll. */
 export const WithAside: Story = {
   args: {
     aside: <p>On this page</p>,

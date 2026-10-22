@@ -51,5 +51,5 @@ export const SHELL_RULES = `
 body { margin: 0; }
 `;
 
-/** How far the canvas is scrolled to see whether the aside holds its place. */
+/** How far the canvas is scrolled to see that the aside moves with it. */
 export const SCROLL_PX = 400;

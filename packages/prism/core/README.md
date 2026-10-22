@@ -59,8 +59,8 @@ each a subgrid over every column:
 - `DocumentLayout`: a page whose canvas is the one scrolling region, with
   an optional `aside` and an optional `colophon` band under the body. The
   aside is the canvas's own: it holds the last three columns inside the
-  canvas's scroll, at the top of it, and below two groups of columns it
-  moves under the page.
+  canvas's scroll, starting at the top of the page and scrolling with it,
+  and below two groups of columns it moves under the page.
 
 Each archetype's gap is the grid's gutter on both axes, so its rows sit one
 gutter apart. A region given a node that renders nothing (`null`, a

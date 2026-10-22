@@ -19,9 +19,9 @@ const componentCssClassName = "ds canvas";
  *
  * An `aside` sits beside the page, in the canvas's last three columns, and
  * is part of the same scroll: the canvas's rows then follow their content,
- * and the aside holds its place at the top of the scroll while the page
- * moves under it. Below two groups of columns it takes a row of its own
- * under the page. An aside that renders nothing (`null`, a boolean or the
+ * and the aside starts at the top of the page and scrolls with it, so every
+ * entry of a long aside can be reached. Below two groups of columns it
+ * takes a row of its own under the page. An aside that renders nothing (`null`, a boolean or the
  * empty string) leaves no region.
  *
  * `import { Canvas } from "@canonical/prism-core";`

@@ -34,20 +34,20 @@
     min-inline-size: 0;
   }
 
-  /* The aside holds the canvas's last three columns and its place at the
-   * top of the canvas's scroll: it is part of the page's scroll, never a
-   * scroller of its own. */
+  /* The aside holds the canvas's last three columns at the top of the
+   * page and scrolls with it: it is part of the page's scroll, never a
+   * scroller of its own. Not sticky: an aside taller than the canvas would
+   * keep its middle out of reach at every scroll position. */
   .ds.canvas > .aside {
     grid-column: -4 / -1;
     grid-row: 1;
     align-self: start;
-    position: sticky;
-    top: 0;
     min-inline-size: 0;
   }
 
-  /* With an aside the rows follow their content, so the aside's sticky
-   * range is the whole scroll, and the page stops where the aside starts. */
+  /* With an aside the rows follow their content, so the scroll covers the
+   * longer of the page and the aside, and the page stops where the aside
+   * starts. */
   .ds.canvas:has(> .aside) {
     grid-template-rows: auto;
   }
@@ -56,8 +56,7 @@
     grid-column: 1 / -4;
   }
 
-  /* Below two groups the aside takes a row of its own under the page and
-   * scrolls with it. */
+  /* Below two groups the aside takes a row of its own under the page. */
   @container shell (width < 912px) {
     .ds.canvas:has(> .aside) > .page {
       grid-column: 1 / -1;
@@ -66,7 +65,6 @@
     .ds.canvas > .aside {
       grid-column: 1 / -1;
       grid-row: 2;
-      position: static;
     }
   }
 }
