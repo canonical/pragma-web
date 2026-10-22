@@ -1,5 +1,6 @@
 // @vitest-environment node
 
+import { launchBrowser } from "@canonical/prism-core/testing/browser";
 /**
  * The lenses in a real browser, end to end: the metro graph in its own
  * process, each server-rendering web cell pointed at it, and Chromium reading
@@ -22,7 +23,6 @@ import {
   GRAPH_READY_MS,
   PREVIEW_READY_MS,
 } from "./constants.js";
-import launchBrowser from "./launchBrowser.js";
 import startServer from "./startServer.js";
 import type { RunningServer } from "./types.js";
 
