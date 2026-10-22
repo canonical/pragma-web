@@ -15,12 +15,11 @@
  * `build:server`; the `preview:bun` script does both. The app renderer reads
  * the graph's address from `VITE_GRAPHQL_URL` at run time.
  */
-import * as process from "node:process";
 import {
   parseStaticPair,
   resolveStaticFile,
 } from "@canonical/react-ssr/server";
-import { DEFAULT_PORT } from "#site";
+import { resolvePort } from "#site";
 // The build output has no `.d.ts`; each default export matches its source
 // factory, typed below from the source.
 // @ts-expect-error — importing a build artifact with no declarations
@@ -31,7 +30,7 @@ import createSitemapRenderer from "../../dist/server/sitemap.js";
 type CreateAppRenderer = typeof import("./renderer.js").default;
 type CreateSitemapRenderer = typeof import("#sitemap").createSitemapRenderer;
 
-const PORT = Number(process.env.PORT) || DEFAULT_PORT;
+const PORT = resolvePort();
 const staticMount = parseStaticPair(":dist/client");
 
 Bun.serve({

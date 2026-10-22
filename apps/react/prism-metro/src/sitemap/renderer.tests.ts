@@ -44,6 +44,17 @@ describe("createSitemapRenderer", () => {
     );
   });
 
+  it.each([
+    ["empty", ""],
+    ["not a number", "abc"],
+  ])("falls back to the dev server's port when PORT is %s", async (_, port) => {
+    vi.stubEnv("BASE_URL", undefined);
+    vi.stubEnv("PORT", port);
+    expect(await renderSitemap()).toContain(
+      `<loc>http://localhost:${DEFAULT_PORT}/stations</loc>`,
+    );
+  });
+
   it("falls back to the dev server's port when neither is set", async () => {
     vi.stubEnv("BASE_URL", undefined);
     vi.stubEnv("PORT", undefined);

@@ -21,15 +21,14 @@
  * plain data, the serialised records, crosses between the two.
  */
 import fs from "node:fs";
-import * as process from "node:process";
 import { viteFetchMiddleware } from "@canonical/react-ssr/server";
 import { createServer as createViteServer } from "vite";
 import { resolveGraphqlUrl } from "#relay";
-import { DEFAULT_PORT } from "#site";
+import { resolvePort } from "#site";
 import prepareRelayData from "./prepareRelayData.js";
 import resolveRouteStatus from "./resolveRouteStatus.js";
 
-const PORT = Number(process.env.PORT) || DEFAULT_PORT;
+const PORT = resolvePort();
 
 // Resolved once, so every request prepares against the same graph.
 const graphqlUrl = resolveGraphqlUrl();
