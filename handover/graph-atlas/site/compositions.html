@@ -23,8 +23,12 @@
   .toolbar button, .toolbar select { font: inherit; font-size: .75rem; padding: .25rem .5rem; background: var(--color-background); color: var(--color-text); border: 1px solid var(--color-border); cursor: pointer; }
   .toolbar button[aria-pressed="true"] { background: var(--color-text); color: var(--color-background); }
   .toolbar .sep { width: 1px; height: 1.25rem; background: var(--color-border-disabled); }
+  .toolbar .range { display: inline-flex; align-items: center; gap: .375rem; font-size: .75rem; } .toolbar .range input { width: 6rem; margin: 0; accent-color: var(--color-text); }
   .stage { perspective: 2200px; perspective-origin: 50% 40%; padding: 2rem 3.5rem 4rem 2.5rem; margin-inline: -1rem; overflow: clip; background: var(--color-background-layer2); }
   .board { position: relative; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  .exploded .board { transition-duration: .35s; }
+  /* exploded, the stage is an orbit: horizontal drags turn the board and vertical ones still scroll the page */
+  .stage.exploded { touch-action: pan-y; }
   .stage:not(.tilted) { perspective: none; }
   .tilted .board { transform: rotateX(var(--rx, 9deg)) rotateY(var(--ry, -3deg)) translateZ(-80px); }
   /* Exploded: a teardown. The frames lie flat on the board as the chassis and every nested layer rises in big
@@ -57,22 +61,23 @@
   <div class="page-head">
     <div class="eyebrow">16 / 16 · the real components, composed</div>
     <h1>Fifteen screens' worth of the system, on one board</h1>
-    <p class="lede">The same published components as the previous board, but composed the way a product uses them and filled with plausible data: an application shell with the real side navigation, a side panel and a modal, a page header, a create form, a sign-in, status tiles, release cards, an activity feed, settings, shortcuts, feedback, a maintenance schedule, a danger zone and an empty state. No labels on the frames; click one for the blocks it is made of. Elevation is the HTML depth from each composition's root, and with layering on every nested element rises by its own depth, so a form field's input floats above its label and a card's buttons above the card. Exploded pulls the components far apart, one step per level of component nesting, with the frames as the base.</p>
+    <p class="lede">The same published components as the previous board, but composed the way a product uses them and filled with plausible data: an application shell with the real side navigation, a side panel and a modal, a page header, a create form, a sign-in, status tiles, release cards, an activity feed, settings, shortcuts, feedback, a maintenance schedule, a danger zone and an empty state. No labels on the frames; click one for the blocks it is made of. Elevation is the HTML depth from each composition's root, and with layering on every nested element rises by its own depth, so a form field's input floats above its label and a card's buttons above the card. Exploded pulls the components far apart, one step per level of component nesting, with the frames as the base; move the pointer to orbit the board, Ctrl pins the view and the arrow keys turn it.</p>
   </div>
   <section class="block" style="border-top:0;padding-top:0">
     <div class="toolbar">
       <button id="indexBtn">☰ Index</button><span class="sep"></span>
       <button id="tilt" aria-pressed="true">3D tilt</button>
       <button id="explode" aria-pressed="false" title="Pull the layers apart (x)">Exploded</button>
+      <button id="pin" aria-pressed="false" title="Hold the view where it is (Ctrl); arrows turn it" hidden>Pin view</button>
       <select id="layer" aria-label="Layering"><option value="elements" selected>Layer: every element</option><option value="components">Layer: components only</option><option value="">Layer: off</option></select>
-      <select id="scale" aria-label="Depth scale"><option value="1">Depth: subtle</option><option value="2" selected>Depth: medium</option><option value="3.5">Depth: strong</option></select>
+      <label class="range" title="How far the layers stand apart">Distance <input type="range" id="scale" min="0.5" max="5" step="0.1" value="2" aria-label="Distance between layers"></label>
       <span class="sep"></span>
       <select id="theme" aria-label="Theme"><option value="">Theme: follow page</option><option value="light">Theme: light</option><option value="dark">Theme: dark</option></select>
       <select id="context" aria-label="Context"><option value="app">Context: app</option><option value="site">Context: site</option><option value="docs">Context: docs</option></select>
       <span class="sep"></span><span class="small muted" id="count"></span>
     </div>
     <div class="stage tilted" id="stage"><div class="board app" id="board"></div></div>
-    <p class="small muted">Move the pointer to tilt; switch the tilt off for a flat capture. Exploded (or the x key) pulls every composition apart into its components, a card above the frame and its buttons above the card, seen from above; the Depth select sets how far. Each frame is a Shadow DOM island that loads only pragma's stylesheet, so the components render exactly as their own CSS says, untouched by this page. Everything is live DOM: the inputs accept typing, the accordion opens, the hover states are the real ones. Click a frame to see which components it is made of.</p>
+    <p class="small muted">Move the pointer to tilt; switch the tilt off for a flat capture. Exploded (or the x key) pulls every composition apart into its components, a card above the frame and its buttons above the card, and the pointer orbits the board (drag sideways on a phone); Ctrl or Pin view holds it still, and the arrow keys turn it from there. The Distance slider sets how far apart. Each frame is a Shadow DOM island that loads only pragma's stylesheet, so the components render exactly as their own CSS says, untouched by this page. Everything is live DOM: the inputs accept typing, the accordion opens, the hover states are the real ones. Click a frame to see which components it is made of.</p>
   </section>
 </main>
 <footer class="colophon wrap"></footer>
@@ -98,11 +103,12 @@
   let maxAll = 0;
   islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); const max = A.depthOf(sr); f.style.setProperty("--depth", max); f.dataset.depth = max; maxAll = Math.max(maxAll, max); });
   // a frame's lift is its depth relative to the deepest frame, so the deepest rises a fixed 45px per scale step;
-  // exploded, the step per level is 14px × k instead of 1.5px × k and the CSS pins the lift to 0, so the frames are the base
+  // exploded, the step per level is 18px × k instead of 1.5px × k and the CSS pins the lift to 0, so the frames are the base
   const exploded = () => stage.classList.contains("exploded");
-  const applyScale = (k) => { islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); f.style.setProperty("--lift", (45 * k * (+f.dataset.depth) / maxAll).toFixed(1) + "px"); A.islandSet(sr, { dz2: ((exploded() ? 14 : 1.5) * k) + "px" }); }); };
+  let pinned = false; // the orbit is held still
+  const applyScale = (k) => { islands.forEach((sr, i) => { const f = document.getElementById("f-" + i); f.style.setProperty("--lift", (45 * k * (+f.dataset.depth) / maxAll).toFixed(1) + "px"); A.islandSet(sr, { dz2: ((exploded() ? 18 : 1.5) * k) + "px", exploded: exploded() }); }); };
   applyScale(2);
-  const count = () => { document.getElementById("count").textContent = `${comps.length} compositions · HTML depth 1…${maxAll}${exploded() ? " · exploded" : ""}`; };
+  const count = () => { document.getElementById("count").textContent = `${comps.length} compositions · HTML depth 1…${maxAll}${exploded() ? " · exploded" : ""}${pinned ? " · pinned" : ""}`; };
   count();
   // the chassis rows get more air when the stacks above them rise
   const pack = (x = exploded()) => A.packBoard(board, [...board.querySelectorAll(".frame")], { minCol: 170, gap: x ? 56 : 32 });
@@ -110,23 +116,48 @@
   const relayout = () => { const t = stage.classList.contains("tilted"), x = exploded(); stage.classList.remove("tilted", "exploded"); pack(x); if (x) stage.classList.add("exploded"); if (t) stage.classList.add("tilted"); };
   let lastW = 0; const onResize = () => { const w = board.clientWidth; if (w === lastW) return; lastW = w; relayout(); };
   onResize(); new ResizeObserver(onResize).observe(document.body); document.fonts?.ready.then(() => { lastW = 0; onResize(); });
-  const tiltBtn = document.getElementById("tilt"), explodeBtn = document.getElementById("explode"), layerSel = document.getElementById("layer"), scaleSel = document.getElementById("scale");
+  const tiltBtn = document.getElementById("tilt"), explodeBtn = document.getElementById("explode"), pinBtn = document.getElementById("pin"), layerSel = document.getElementById("layer"), scaleSel = document.getElementById("scale");
   const setTilt = (on) => { tiltBtn.setAttribute("aria-pressed", String(on)); stage.classList.toggle("tilted", on); if (!on && exploded()) setExploded(false); };
   // exploded needs the tilt (a flat exploded board shows nothing) and layers by component: lifting every element
   // would carry a button's label away from its background. The layer picked before is restored on the way out.
   let layerBefore = layerSel.value;
   const setLayer = (v) => { layerSel.value = v; islands.forEach(sr => A.islandSet(sr, { layer: v })); };
-  const setExploded = (on) => { explodeBtn.setAttribute("aria-pressed", String(on)); stage.classList.toggle("exploded", on); board.style.removeProperty("--rx"); board.style.removeProperty("--ry");
+  const setExploded = (on) => { explodeBtn.setAttribute("aria-pressed", String(on)); stage.classList.toggle("exploded", on); board.style.removeProperty("--rx"); board.style.removeProperty("--ry"); setPinned(false); pinBtn.hidden = !on;
     if (on) { if (!stage.classList.contains("tilted")) setTilt(true); layerBefore = layerSel.value; setLayer("components"); } else setLayer(layerBefore);
     applyScale(+scaleSel.value); count(); lastW = 0; onResize(); pivot(); };
   tiltBtn.addEventListener("click", () => setTilt(tiltBtn.getAttribute("aria-pressed") !== "true"));
   explodeBtn.addEventListener("click", () => setExploded(!exploded()));
-  document.addEventListener("keydown", e => { if (e.key === "x" && !e.altKey && !e.ctrlKey && !e.metaKey && !e.composedPath().some(el => el.matches && el.matches("input, textarea, select, [contenteditable]"))) setExploded(!exploded()); });
+  const typing = (e) => e.composedPath().some(el => el.matches && el.matches("input, textarea, select, [contenteditable]"));
+  document.addEventListener("keydown", e => { if (e.key === "x" && !e.altKey && !e.ctrlKey && !e.metaKey && !typing(e)) setExploded(!exploded()); });
   layerSel.addEventListener("change", e => islands.forEach(sr => A.islandSet(sr, { layer: e.target.value })));
-  scaleSel.addEventListener("change", e => applyScale(+e.target.value));
+  scaleSel.addEventListener("input", e => applyScale(+e.target.value));
 
-  // the pointer nudges the tilt around the mode's base angle: a gentle 9°/−3° normally, a steep 58°/−14° exploded
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) stage.addEventListener("pointermove", ev => { const r = stage.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - .5, y = (ev.clientY - r.top) / r.height - .5; const [bx, by, range] = exploded() ? [58, -14, 20] : [9, -3, 6]; board.style.setProperty("--rx", (bx - y * range).toFixed(1) + "deg"); board.style.setProperty("--ry", (by + x * range).toFixed(1) + "deg"); });
+  // Orbit. Normally the pointer nudges the tilt around 9°/−3° by ±6°. Exploded, it orbits the board: top of the
+  // stage looks down on it (20°), bottom looks along it (78°), and left to right swings it −50°…50°. Ctrl pins
+  // the view; pinned, the arrow keys turn it. On a phone a sideways drag orbits and a vertical one scrolls.
+  const RX = [20, 78], RY = [-50, 50];
+  const clamp = (v, [a, b]) => Math.max(a, Math.min(b, v));
+  const angle = (name, fallback) => { const v = parseFloat(board.style.getPropertyValue(name)); return Number.isFinite(v) ? v : fallback; };
+  const angles = () => [angle("--rx", exploded() ? 58 : 9), angle("--ry", exploded() ? -14 : -3)];
+  const turn = (rx, ry) => { if (exploded()) { rx = clamp(rx, RX); ry = clamp(ry, RY); } board.style.setProperty("--rx", rx.toFixed(1) + "deg"); board.style.setProperty("--ry", ry.toFixed(1) + "deg"); };
+  const orbitTo = (x, y) => { if (exploded()) turn(RX[0] + y * (RX[1] - RX[0]), RY[0] + x * (RY[1] - RY[0])); else turn(9 - (y - .5) * 6, -3 + (x - .5) * 6); };
+  const setPinned = (on) => { pinned = on; pinBtn.setAttribute("aria-pressed", String(on)); count(); };
+  pinBtn.addEventListener("click", () => setPinned(!pinned));
+  const follow = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // x is the pointer's place across the stage, y its place down the viewport (the stage is far taller than the screen)
+  stage.addEventListener("pointermove", ev => { if (pinned || ev.pointerType !== "mouse" || !follow || ev.buttons) return; const r = stage.getBoundingClientRect(); orbitTo((ev.clientX - r.left) / r.width, ev.clientY / innerHeight); });
+  // a drag (touch, or a held mouse button) orbits from where it started; a click that did not drag still opens a frame
+  let drag = null;
+  // (not from a control inside an island, which keeps its focus and selection; elsewhere the default is suppressed so a drag never selects text)
+  stage.addEventListener("pointerdown", ev => { if (pinned || !exploded()) return; const t = ev.composedPath()[0]; if (t?.closest?.("a, button, input, select, textarea, summary, label, details, [contenteditable]")) return; ev.preventDefault(); drag = { x: ev.clientX, y: ev.clientY, a: angles(), moved: false }; });
+  stage.addEventListener("pointermove", ev => { if (!drag || pinned) return; const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y; if (!drag.moved && Math.hypot(dx, dy) < 6) return; if (!drag.moved) { drag.moved = true; stage.setPointerCapture?.(ev.pointerId); } ev.preventDefault(); const r = stage.getBoundingClientRect(); turn(drag.a[0] - (ev.pointerType === "touch" ? 0 : dy / innerHeight * (RX[1] - RX[0])), drag.a[1] + dx / r.width * (RY[1] - RY[0])); });
+  // the click that ends a drag must not open a frame; the flag lives just long enough for that click
+  const endDrag = () => { if (drag?.moved) { stage.dataset.dragged = ""; setTimeout(() => delete stage.dataset.dragged, 80); } drag = null; };
+  stage.addEventListener("pointerup", endDrag); stage.addEventListener("pointercancel", endDrag);
+  document.addEventListener("keydown", e => { if (typing(e)) return;
+    if (e.key === "Control" && exploded() && !e.repeat) setPinned(!pinned);
+    else if (e.key === "Escape" && pinned) setPinned(false);
+    else if (pinned && e.key.startsWith("Arrow")) { e.preventDefault(); const [rx, ry] = angles(), d = e.shiftKey ? 12 : 4; turn(rx + (e.key === "ArrowUp" ? -d : e.key === "ArrowDown" ? d : 0), ry + (e.key === "ArrowLeft" ? -d : e.key === "ArrowRight" ? d : 0)); } });
   document.getElementById("context").addEventListener("change", e => { islands.forEach(sr => A.islandSet(sr, { context: e.target.value })); lastW = 0; onResize(); });
   // keep the tilt pivot and the viewer on the part of the board in view
   // (exploded, the pivot sits higher: at 58° the board above it tips away and shrinks, so less should be above it)
@@ -143,7 +174,7 @@
   const byName = new Map(); for (const b of bl.blocks) { const k = b.name.toLowerCase().replace(/[^a-z0-9]/g, ""); if (!byName.has(k) || A.local(b.tier || "") === "global") byName.set(k, b); }
   function details(i) { const c = comps[i]; const el = document.getElementById("f-" + i); const n = islands[i].querySelectorAll(".island *").length;
     A.showPanel(c.title, `composition · ${c.uses.length} components · HTML depth ${el.dataset.depth} · ${n} elements`, `<h4>Made of</h4><ul class="facts">${c.uses.map(u => { const b = byName.get(u.toLowerCase()); return `<li><span class="p">${A.esc(u)}</span><span class="o">${b ? `<code>${A.esc(A.curie(b.b))}</code> · ${A.local(b.class).toLowerCase()}` : "<span class='muted'>no block in the graph</span>"}</span></li>`; }).join("")}</ul>${A.cmd(c.uses.filter(u => byName.get(u.toLowerCase())).slice(0, 3).map(u => `pragma block lookup "${byName.get(u.toLowerCase()).name}"`).join("\n"))}`); }
-  board.addEventListener("click", e => { const t = e.composedPath()[0]; if (t && t.closest && t.closest("a, button, input, select, textarea, summary, label, details")) return; const f = e.target.closest(".frame"); if (f) details(+f.dataset.i); });
+  board.addEventListener("click", e => { if ("dragged" in stage.dataset) { delete stage.dataset.dragged; return; } const t = e.composedPath()[0]; if (t && t.closest && t.closest("a, button, input, select, textarea, summary, label, details")) return; const f = e.target.closest(".frame"); if (f) details(+f.dataset.i); });
   board.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.classList.contains("frame")) details(+e.target.dataset.i); });
 })();
 </script>

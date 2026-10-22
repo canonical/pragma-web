@@ -167,6 +167,12 @@ window.Atlas = (() => {
 .island[data-layer] .surface :is(.ds.card, .ds.tile, .ds.accordion, .ds.modal, .ds.modal-content, .ds.side-navigation .ds.content) { overflow: visible; }
 .island[data-layer="elements"] .surface * { translate: 0 0 var(--dz2, 2px); }
 .island[data-layer="components"] .surface .ds { translate: 0 0 var(--dz2, 2px); }
+/* exploded: a component with its own background or border is a slab, and casts a light shadow whose offset
+   and blur grow with its height (--lvl component levels × the step), as a real shadow softens with distance;
+   transparent wrappers (a form, a field) get nothing, so they never turn into boxes */
+.island.exploded .surface .ds[data-solid] { --shadow: rgba(0,0,0,.14); box-shadow: 0 calc(var(--lvl, 1) * var(--dz2, 2px) * .18) calc(var(--lvl, 1) * var(--dz2, 2px) * .55) var(--shadow); }
+.island.exploded.dark .surface .ds[data-solid] { --shadow: rgba(0,0,0,.5); }
+@media (prefers-color-scheme: dark) { .island.exploded:not(.light) .surface .ds[data-solid] { --shadow: rgba(0,0,0,.5); } }
 /* an overlay floats above the page it covers, whatever that page's depth */
 .island[data-layer] .surface.screen > .screen-scrim { translate: 0 0 calc(var(--dz2, 2px) * 5); }
 .island[data-layer] .surface.screen > dialog[open] { translate: 0 0 calc(var(--dz2, 2px) * 6); }`;
@@ -175,11 +181,15 @@ window.Atlas = (() => {
     const cls = ["island", "comfortable", opts.context || "app", opts.scheme || ""].filter(Boolean).join(" ");
     sr.innerHTML = `<style>@layer helpers;</style><link rel="stylesheet" href="pragma-island.css"><style>${ISLAND_CSS}</style><div class="${cls}"${opts.layer ? ` data-layer="${opts.layer}"` : ""}><div class="surface${opts.screen ? " screen" : ""}"${opts.screen ? ` style="--screen:${opts.screen}px"` : ""}>${html}</div></div>`;
     const link = sr.querySelector("link");
-    return new Promise(res => { const done = () => res(sr); if (link.sheet) done(); else { link.addEventListener("load", done, { once: true }); link.addEventListener("error", done, { once: true }); } });
+    // once pragma's styles apply, mark the components that paint something of their own (the exploded view's slabs)
+    const mark = () => { const surf = sr.querySelector(".surface"); for (const el of sr.querySelectorAll(".surface .ds")) { const cs = getComputedStyle(el); if (!cs.backgroundColor.endsWith(", 0)") && cs.backgroundColor !== "transparent" || cs.borderTopStyle !== "none") el.dataset.solid = "";
+      let lvl = 0; for (let e = el; e && e !== surf; e = e.parentElement) if (e.classList.contains("ds")) lvl++; el.style.setProperty("--lvl", lvl); } };
+    return new Promise(res => { const done = () => { mark(); res(sr); }; if (link.sheet) done(); else { link.addEventListener("load", done, { once: true }); link.addEventListener("error", done, { once: true }); } });
   }
   const islandRoot = (sr) => sr.querySelector(".island");
-  function islandSet(sr, { context, scheme, layer, dz2 } = {}) {
+  function islandSet(sr, { context, scheme, layer, dz2, exploded } = {}) {
     const el = islandRoot(sr);
+    if (exploded !== undefined) el.classList.toggle("exploded", !!exploded);
     if (context) { el.classList.remove("app", "site", "docs"); el.classList.add(context); }
     if (scheme !== undefined) { el.classList.remove("light", "dark"); if (scheme) el.classList.add(scheme); }
     if (layer !== undefined) { if (layer) el.dataset.layer = layer; else delete el.dataset.layer; }
