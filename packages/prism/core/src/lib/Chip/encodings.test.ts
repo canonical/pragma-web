@@ -162,6 +162,17 @@ describe("resolveNamespaceTint", () => {
     );
     expect(resolveNamespaceTint("ds", [])).toContain("--chip-tint-unknown");
   });
+
+  it("gives the neutral tint the lightness every namespace tint falls back to", () => {
+    expect(
+      readHookFallback(
+        resolveNamespaceTint("mystery", prefixes),
+        "--chip-tint-l",
+      ),
+    ).toBe(
+      readHookFallback(resolveNamespaceTint("ds", prefixes), "--chip-tint-l"),
+    );
+  });
 });
 
 describe("buildChipChannelStyle", () => {
@@ -273,10 +284,12 @@ function compositeOver(
   alpha: number,
   background: Srgb,
 ): Srgb {
+  const [foregroundRed, foregroundGreen, foregroundBlue] = foreground;
+  const [backgroundRed, backgroundGreen, backgroundBlue] = background;
   return [
-    alpha * foreground[0] + (1 - alpha) * background[0],
-    alpha * foreground[1] + (1 - alpha) * background[1],
-    alpha * foreground[2] + (1 - alpha) * background[2],
+    alpha * foregroundRed + (1 - alpha) * backgroundRed,
+    alpha * foregroundGreen + (1 - alpha) * backgroundGreen,
+    alpha * foregroundBlue + (1 - alpha) * backgroundBlue,
   ];
 }
 

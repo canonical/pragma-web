@@ -147,6 +147,36 @@ describe("Rail", () => {
     });
   });
 
+  it("renders no hint for a lens whose route allocates no key", () => {
+    // Catalog carries a lens claim and no shortcut claim; the other lenses
+    // keep theirs.
+    const routes = {
+      ...LENS_ROUTES,
+      catalog: {
+        ...LENS_ROUTES.catalog,
+        meta: routeLensFacet.of({
+          label: "Catalog",
+          icon: Icon,
+          order: 2,
+          tier: 1,
+        }),
+      },
+    };
+    renderRailOver(routes);
+
+    const catalog = screen.getByRole("link", { name: "Catalog" });
+    expect(catalog.querySelector("kbd")).toBeNull();
+    expect(catalog).not.toHaveAttribute("aria-keyshortcuts");
+    for (const [label, hint] of [
+      ["Home", "1"],
+      ["Glossary", "3"],
+    ] as const) {
+      const link = screen.getByRole("link", { name: label });
+      expect(link).toHaveAttribute("aria-keyshortcuts", hint);
+      expect(link.querySelector("kbd")?.textContent).toBe(hint);
+    }
+  });
+
   it("lists the entries in the order the lenses declare, not the table's", () => {
     // Orders 10, 2, 7 declared in table order: the rail must sort them, and
     // the gaps must not matter.
