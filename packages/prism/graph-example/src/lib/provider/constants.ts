@@ -38,6 +38,9 @@ export const ROUTE_CLASS_URI = `${METRO_NAMESPACE}Route`;
 /** The class one stop on a route, at its place in the order, is an instance of. */
 export const CALL_CLASS_URI = `${METRO_NAMESPACE}Call`;
 
+/** The class a point on the schematic network diagram is an instance of. */
+export const DIAGRAM_POINT_CLASS_URI = `${METRO_NAMESPACE}DiagramPoint`;
+
 /** The position of a route's first call. Positions count up from here with no gaps. */
 export const FIRST_CALL_POSITION = 1;
 

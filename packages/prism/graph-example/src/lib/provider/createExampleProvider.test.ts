@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { toCursor } from "./connection.js";
 import {
   CALL_CLASS_URI,
+  DIAGRAM_POINT_CLASS_URI,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
@@ -268,6 +269,12 @@ describe("Query.ontologyClass", () => {
         property: { uri: "https://geo.example/onto#inZone" },
       },
       {
+        required: false,
+        singular: true,
+        inherited: false,
+        property: { uri: "https://metro.example/onto#diagramPosition" },
+      },
+      {
         required: true,
         singular: true,
         inherited: true,
@@ -511,6 +518,10 @@ describe("_meta", () => {
             property: { uri: "https://geo.example/onto#inZone" },
           },
           {
+            inherited: false,
+            property: { uri: "https://metro.example/onto#diagramPosition" },
+          },
+          {
             inherited: true,
             property: { uri: "https://metro.example/onto#name" },
           },
@@ -563,6 +574,7 @@ describe("_meta", () => {
       "servesLine",
       "location",
       "inZone",
+      "diagramPosition",
       "name",
       // Declared on the abstract `Stop` and inherited by every station. No
       // concrete type in `schema/extension.graphql` exposes a `note` field,
@@ -585,6 +597,7 @@ describe("_meta", () => {
       "servesLine",
       "location",
       "inZone",
+      "diagramPosition",
       "name",
     ];
     for (const name of projected) {
@@ -961,6 +974,34 @@ describe("Line.routes", () => {
   });
 });
 
+describe("Stop.diagramPosition", () => {
+  it("places a routed station on the schematic grid, as a value", async () => {
+    const data = await run(`{
+      node(id: "${MULTILINGUAL_ENTITY_URI}") {
+        ... on Stop { diagramPosition { x y _meta { title curie type { uri } } } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      diagramPosition: {
+        x: 0,
+        y: 0,
+        _meta: {
+          title: "DiagramPoint",
+          curie: "DiagramPoint",
+          type: { uri: DIAGRAM_POINT_CLASS_URI },
+        },
+      },
+    });
+  });
+
+  it("answers null for a station no route calls at", async () => {
+    const data = await run(`{
+      node(id: "${BARE_ENTITY_URI}") { ... on Stop { diagramPosition { x } } }
+    }`);
+    expect(data.node).toEqual({ diagramPosition: null });
+  });
+});
+
 describe("defensive paths, exercised with purpose-built datasets", () => {
   const cls = {
     uri: "urn:C",
@@ -1092,6 +1133,26 @@ describe("defensive paths, exercised with purpose-built datasets", () => {
       `{ node(id: "urn:e1") { ... on Station { location { latitude } } } }`,
     );
     expect(data.node).toEqual({ location: null });
+  });
+
+  it("omits the diagram position when its class is not declared", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls],
+        properties: [],
+        entities: [
+          {
+            uri: "urn:e1",
+            type: "urn:C",
+            typename: "Station",
+            diagramPosition: { x: 1, y: 2 },
+          },
+        ],
+      },
+      `{ node(id: "urn:e1") { ... on Station { diagramPosition { x } } } }`,
+    );
+    expect(data.node).toEqual({ diagramPosition: null });
   });
 
   it("nulls a zone reference that points at nothing", async () => {

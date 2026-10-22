@@ -63,6 +63,7 @@ interface Stop implements Node {
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
 }
 
 """
@@ -79,6 +80,7 @@ type Station implements Node & Stop {
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
 }
 
 """
@@ -105,6 +107,7 @@ type Interchange implements Node & Stop {
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
   transferMinutes: Int
 }
 
@@ -165,4 +168,24 @@ type Call {
   _meta: EntityMeta!
   position: Int!
   stop: Stop!
+}
+
+"""
+A place on the schematic network diagram. NOT a Node, and NOT a geography:
+`Stop.location` says where a station is on the ground, this says where it
+sits on the map passengers read.
+
+Coordinates are whole grid units. The origin is the north-west corner, `x`
+grows east and `y` grows south, the orientation of a screen, so a drawing
+needs no flip. The network is anchored so its smallest `x` and its smallest
+`y` are both 0.
+
+Every segment between consecutive calls of a route, and the closing segment
+of a loop, is horizontal, vertical or diagonal (octilinear). A station no
+route calls at has no position.
+"""
+type DiagramPoint {
+  _meta: EntityMeta!
+  x: Int!
+  y: Int!
 }

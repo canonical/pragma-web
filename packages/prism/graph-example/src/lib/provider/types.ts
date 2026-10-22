@@ -68,6 +68,14 @@ export interface ExampleGeoPoint {
   readonly longitude: number;
 }
 
+/** A point on the schematic network diagram, in whole grid units. */
+export interface ExampleDiagramPoint {
+  /** Grid columns east of the diagram's west edge. */
+  readonly x: number;
+  /** Grid rows south of the diagram's north edge. */
+  readonly y: number;
+}
+
 /**
  * One direction of a line's service. No IRI: a route is a value inside its
  * line, named within that line by `key`.
@@ -114,6 +122,8 @@ export interface ExampleEntity {
   readonly colour?: string;
   /** The directions a line runs, each with its ordered calls. */
   readonly routes?: readonly ExampleRoute[];
+  /** Where a routed station sits on the schematic network diagram. */
+  readonly diagramPosition?: ExampleDiagramPoint;
 }
 
 /** The whole dataset: a TBox and an ABox. */

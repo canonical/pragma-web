@@ -237,9 +237,9 @@ describe("curies actually compact, and resolve per namespace", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Routes and calls are value types: `_meta` is non-null on them as on
-// GeoPoint, and with no IRI the curie tier is the typename. Driven from the
-// dataset's lines, so a route added anywhere is checked.
+// Routes, calls and diagram points are value types: `_meta` is non-null on
+// them as on GeoPoint, and with no IRI the curie tier is the typename. Driven
+// from the dataset's lines and stations, so a value added anywhere is checked.
 // ---------------------------------------------------------------------------
 
 describe("every value type has a title and a curie", () => {
@@ -251,7 +251,7 @@ describe("every value type has a title and a curie", () => {
     expect(routed.length).toBeGreaterThan(0);
   });
 
-  it.each(routed.map((entity) => entity.uri))("%s", async (uri) => {
+  it.each(routed.map((entity) => entity.uri))("%s's routes", async (uri) => {
     const result = await execute(
       `query V($id: ID!) {
          node(id: $id) { ... on Line { routes {
@@ -285,6 +285,37 @@ describe("every value type has a title and a curie", () => {
       }
     }
   });
+
+  const positioned = exampleDataset.entities.filter(
+    (entity) => entity.diagramPosition !== undefined,
+  );
+
+  it("has positioned stations in the dataset to check", () => {
+    expect(positioned.length).toBeGreaterThan(0);
+  });
+
+  it.each(positioned.map((entity) => entity.uri))(
+    "%s's diagram position",
+    async (uri) => {
+      const result = await execute(
+        `query V($id: ID!) {
+         node(id: $id) { ... on Stop { diagramPosition { _meta { title curie } } } }
+       }`,
+        { id: uri },
+      );
+      expect(result.errors).toBeUndefined();
+      const point = (
+        result.data as {
+          node: {
+            diagramPosition: { _meta: { title: string; curie: string } } | null;
+          };
+        }
+      ).node.diagramPosition;
+      expect(point).not.toBeNull();
+      expectUsableTitle(point?._meta.title);
+      expect(point?._meta.curie).toBe("DiagramPoint");
+    },
+  );
 });
 
 describe("the two entities that have nothing to be titled from", () => {

@@ -13,14 +13,15 @@ const NETWORK_QUERY = `{
       edges { node { uri ... on Line {
         code colour servedBy { uri }
         routes { label isLoop reverse { label }
-                 calls { position stop { uri } } }
+                 calls { position stop { uri diagramPosition { x y } } } }
       } } }
       pageInfo { hasNextPage }
     }
   }
   stations: ontologyClass(uri: "metro:Station") {
     instances(first: 100) {
-      edges { node { __typename uri ... on Stop { servesLine { uri } } } }
+      edges { node { __typename uri
+        ... on Stop { servesLine { uri } diagramPosition { x y } } } }
       pageInfo { hasNextPage }
     }
   }
@@ -44,7 +45,8 @@ const readWholePage = <T>(page: InstancePage<T>, name: string): T[] => {
 
 /**
  * Read the shipped network through the provider's GraphQL schema: every line
- * with its routes and calls, and every station with the lines it serves.
+ * with its routes and calls, and every station with the lines it serves and
+ * its place on the schematic diagram.
  *
  * Throws when the query reports an error or a list does not fit one page, so
  * a test built on it can never pass over a partial network.

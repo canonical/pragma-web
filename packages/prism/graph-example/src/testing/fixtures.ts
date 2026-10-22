@@ -11,6 +11,10 @@
  */
 
 import { METRO_NAMESPACE } from "../lib/provider/constants.js";
+import {
+  BARE_ENTITY_URI,
+  EMPTY_LOCAL_NAME_URI,
+} from "../lib/provider/dataset.js";
 
 /** A class every lens that looks a term up can be pointed at. */
 export const SAMPLE_CLASS_URI = "metro:Station";
@@ -103,4 +107,10 @@ export const HALF_RING_LINE_URIS = [
 export const DIRECTIONAL_RING_LINE_URIS = [
   `${METRO_NAMESPACE}ringway-clockwise`,
   `${METRO_NAMESPACE}ringway-anticlockwise`,
+] as const;
+
+/** The stations no route calls at, which therefore have no diagram position. */
+export const BARE_STATION_URIS = [
+  BARE_ENTITY_URI,
+  EMPTY_LOCAL_NAME_URI,
 ] as const;

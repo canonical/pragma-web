@@ -27,6 +27,7 @@ import {
 import {
   CALL_CLASS_URI,
   DEFAULT_LANG,
+  DIAGRAM_POINT_CLASS_URI,
   FIRST_CALL_POSITION,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
@@ -39,6 +40,7 @@ import type {
   ExampleClass,
   ExampleClassProperty,
   ExampleDataset,
+  ExampleDiagramPoint,
   ExampleEntity,
   ExampleGeoPoint,
   ExampleOntology,
@@ -337,6 +339,25 @@ export const createExampleProvider = (
           longitude: point.longitude,
         };
 
+  const diagramPointClass = classByUri.get(DIAGRAM_POINT_CLASS_URI);
+
+  /** A station's place on the schematic, or null when it has none to serve. */
+  const buildDiagramPointView = (
+    point: ExampleDiagramPoint | undefined,
+  ): View | null =>
+    point === undefined || diagramPointClass === undefined
+      ? null
+      : {
+          _meta: () =>
+            metaView({
+              uri: null,
+              typename: "DiagramPoint",
+              cls: diagramPointClass,
+            }),
+          x: point.x,
+          y: point.y,
+        };
+
   // -------------------------------------------------------------------
   // Routes and calls. Value types like GeoPoint: no IRI, so `_meta.title`
   // reaches the label or the typename and `_meta.curie` is the typename. A
@@ -423,6 +444,7 @@ export const createExampleProvider = (
     },
     transferMinutes: entity.transferMinutes ?? null,
     location: () => geoPointView(entity.location),
+    diagramPosition: () => buildDiagramPointView(entity.diagramPosition),
     inZone: () =>
       entity.inZone === undefined
         ? null

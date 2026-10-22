@@ -17,6 +17,7 @@
 
 import {
   CALL_CLASS_URI,
+  DIAGRAM_POINT_CLASS_URI,
   GEO_NAMESPACE,
   GEO_PREFIX,
   META_CLASS_URI,
@@ -54,6 +55,9 @@ const CALLS = `${METRO_NAMESPACE}calls`;
 const REVERSE = `${METRO_NAMESPACE}reverse`;
 const POSITION = `${METRO_NAMESPACE}position`;
 const CALL_STOP = `${METRO_NAMESPACE}stop`;
+const DIAGRAM_POSITION = `${METRO_NAMESPACE}diagramPosition`;
+const X = `${METRO_NAMESPACE}x`;
+const Y = `${METRO_NAMESPACE}y`;
 
 /** IRI of the entity carrying no descriptive predicates whatsoever. */
 export const BARE_ENTITY_URI = `${METRO_NAMESPACE}ghost`;
@@ -110,6 +114,7 @@ export const exampleDataset: ExampleDataset = {
         { property: SERVES_LINE, required: true, singular: false },
         { property: LOCATION, required: false, singular: true },
         { property: IN_ZONE, required: false, singular: true },
+        { property: DIAGRAM_POSITION, required: false, singular: true },
       ],
     },
     {
@@ -161,6 +166,20 @@ export const exampleDataset: ExampleDataset = {
       properties: [
         { property: POSITION, required: true, singular: true },
         { property: CALL_STOP, required: true, singular: true },
+      ],
+    },
+    {
+      // A value class, like geo:GeoPoint: a place on the schematic, held by
+      // the station it positions.
+      uri: DIAGRAM_POINT_CLASS_URI,
+      labels: { "": "Diagram point" },
+      definitions: {
+        "": "A place on the schematic network diagram, in grid units.",
+      },
+      isAbstract: false,
+      properties: [
+        { property: X, required: true, singular: true },
+        { property: Y, required: true, singular: true },
       ],
     },
     {
@@ -363,6 +382,32 @@ export const exampleDataset: ExampleDataset = {
       domain: CALL_CLASS_URI,
       range: "metro:Stop",
       kind: "OBJECT",
+      functional: true,
+    },
+    {
+      uri: DIAGRAM_POSITION,
+      labels: { "": "diagram position" },
+      domain: STATION,
+      range: "metro:DiagramPoint",
+      kind: "OBJECT",
+      functional: true,
+    },
+    {
+      uri: X,
+      labels: { "": "x" },
+      definitions: { "": "Grid columns east of the diagram's west edge." },
+      domain: DIAGRAM_POINT_CLASS_URI,
+      range: "Int",
+      kind: "DATATYPE",
+      functional: true,
+    },
+    {
+      uri: Y,
+      labels: { "": "y" },
+      definitions: { "": "Grid rows south of the diagram's north edge." },
+      domain: DIAGRAM_POINT_CLASS_URI,
+      range: "Int",
+      kind: "DATATYPE",
       functional: true,
     },
   ],
@@ -644,6 +689,7 @@ export const exampleDataset: ExampleDataset = {
       definitions: { "": "The northern terminus." },
       platformCount: 4,
       location: { latitude: 51.5412, longitude: -0.1435 },
+      diagramPosition: { x: 0, y: 0 },
       servesLine: [`${METRO_NAMESPACE}north-line`],
     },
     {
@@ -655,6 +701,7 @@ export const exampleDataset: ExampleDataset = {
       comments: { "": "Step-free to all platforms." },
       platformCount: 2,
       location: { latitude: 51.5008, longitude: -0.1246 },
+      diagramPosition: { x: 9, y: 18 },
       servesLine: [`${METRO_NAMESPACE}coastal-line`],
     },
     {
@@ -663,6 +710,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Kilnwood" },
       platformCount: 2,
+      diagramPosition: { x: 4, y: 5 },
       servesLine: [`${METRO_NAMESPACE}circle-line`],
     },
     {
@@ -671,6 +719,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Marsh End" },
       platformCount: 1,
+      diagramPosition: { x: 0, y: 12 },
       servesLine: [`${METRO_NAMESPACE}north-line`],
     },
     {
@@ -679,6 +728,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Quarry Hill" },
       platformCount: 2,
+      diagramPosition: { x: 10, y: 5 },
       servesLine: [`${METRO_NAMESPACE}circle-line`],
     },
     {
@@ -688,6 +738,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Saltford" },
       platformCount: 3,
+      diagramPosition: { x: 13, y: 18 },
       servesLine: [`${METRO_NAMESPACE}coastal-line`],
     },
     {
@@ -696,6 +747,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Verge Park" },
       platformCount: 2,
+      diagramPosition: { x: 0, y: 3 },
       servesLine: [`${METRO_NAMESPACE}north-line`],
     },
     {
@@ -704,6 +756,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Willowbank" },
       platformCount: 1,
+      diagramPosition: { x: 10, y: 13 },
       servesLine: [`${METRO_NAMESPACE}circle-line`],
     },
     {
@@ -714,6 +767,7 @@ export const exampleDataset: ExampleDataset = {
       labels: { "": "Eastcliff" },
       platformCount: 2,
       location: { latitude: 51.4934, longitude: 0.0098 },
+      diagramPosition: { x: 21, y: 18 },
       servesLine: [`${METRO_NAMESPACE}coastal-line`],
     },
     {
@@ -722,6 +776,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Foundry Row" },
       platformCount: 2,
+      diagramPosition: { x: 0, y: 6 },
       servesLine: [`${METRO_NAMESPACE}north-line`],
     },
     {
@@ -730,6 +785,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Greenhithe" },
       platformCount: 1,
+      diagramPosition: { x: 17, y: 18 },
       servesLine: [`${METRO_NAMESPACE}coastal-line`],
     },
 
@@ -741,6 +797,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Larkrise" },
       platformCount: 2,
+      diagramPosition: { x: 18, y: 5 },
       servesLine: [`${METRO_NAMESPACE}upland-line`],
     },
     {
@@ -749,6 +806,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Highmoor" },
       platformCount: 2,
+      diagramPosition: { x: 24, y: 5 },
       servesLine: [`${METRO_NAMESPACE}upland-line`],
     },
     {
@@ -757,6 +815,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Millford" },
       platformCount: 2,
+      diagramPosition: { x: 18, y: 13 },
       servesLine: [`${METRO_NAMESPACE}lowland-line`],
     },
     {
@@ -765,6 +824,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Reedmere" },
       platformCount: 1,
+      diagramPosition: { x: 24, y: 13 },
       servesLine: [`${METRO_NAMESPACE}lowland-line`],
     },
 
@@ -776,6 +836,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Dyers Green" },
       platformCount: 2,
+      diagramPosition: { x: 11, y: 22 },
       servesLine: [
         `${METRO_NAMESPACE}ringway-clockwise`,
         `${METRO_NAMESPACE}ringway-anticlockwise`,
@@ -787,6 +848,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Fernside" },
       platformCount: 2,
+      diagramPosition: { x: 19, y: 22 },
       servesLine: [
         `${METRO_NAMESPACE}ringway-clockwise`,
         `${METRO_NAMESPACE}ringway-anticlockwise`,
@@ -798,6 +860,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Nettlebed" },
       platformCount: 2,
+      diagramPosition: { x: 23, y: 26 },
       servesLine: [
         `${METRO_NAMESPACE}ringway-clockwise`,
         `${METRO_NAMESPACE}ringway-anticlockwise`,
@@ -809,6 +872,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Orchard Gate" },
       platformCount: 2,
+      diagramPosition: { x: 19, y: 30 },
       servesLine: [
         `${METRO_NAMESPACE}ringway-clockwise`,
         `${METRO_NAMESPACE}ringway-anticlockwise`,
@@ -820,6 +884,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Pinfold" },
       platformCount: 2,
+      diagramPosition: { x: 11, y: 30 },
       servesLine: [
         `${METRO_NAMESPACE}ringway-clockwise`,
         `${METRO_NAMESPACE}ringway-anticlockwise`,
@@ -831,6 +896,7 @@ export const exampleDataset: ExampleDataset = {
       typename: "Station",
       labels: { "": "Ropewalk" },
       platformCount: 2,
+      diagramPosition: { x: 7, y: 26 },
       servesLine: [
         `${METRO_NAMESPACE}ringway-clockwise`,
         `${METRO_NAMESPACE}ringway-anticlockwise`,
@@ -865,6 +931,7 @@ export const exampleDataset: ExampleDataset = {
       platformCount: 8,
       transferMinutes: 4,
       location: { latitude: 51.5074, longitude: -0.1278 },
+      diagramPosition: { x: 0, y: 9 },
       servesLine: [
         `${METRO_NAMESPACE}north-line`,
         `${METRO_NAMESPACE}circle-line`,
@@ -878,6 +945,7 @@ export const exampleDataset: ExampleDataset = {
       labels: { "": "Riverside Junction" },
       platformCount: 5,
       transferMinutes: 7,
+      diagramPosition: { x: 4, y: 13 },
       servesLine: [
         `${METRO_NAMESPACE}circle-line`,
         `${METRO_NAMESPACE}coastal-line`,
@@ -892,6 +960,7 @@ export const exampleDataset: ExampleDataset = {
       labels: { "": "Tannery Lane" },
       platformCount: 2,
       transferMinutes: 3,
+      diagramPosition: { x: 14, y: 9 },
       servesLine: [
         `${METRO_NAMESPACE}circle-line`,
         `${METRO_NAMESPACE}upland-line`,
@@ -905,6 +974,7 @@ export const exampleDataset: ExampleDataset = {
       labels: { "": "Eastwick Cross" },
       platformCount: 4,
       transferMinutes: 2,
+      diagramPosition: { x: 28, y: 9 },
       servesLine: [
         `${METRO_NAMESPACE}upland-line`,
         `${METRO_NAMESPACE}lowland-line`,
