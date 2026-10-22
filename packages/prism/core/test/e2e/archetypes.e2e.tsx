@@ -10,7 +10,8 @@
  * drawer's trigger shows, which columns the canvas spans, where the aside
  * sits, that it scrolls with the page and that every entry of an aside
  * taller than the viewport can be scrolled into view, the gutter between
- * the rows, and that nothing reaches past the viewport.
+ * the rows, that a document with no colophon ends its canvas flush with
+ * the viewport, and that nothing reaches past the viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -37,6 +38,7 @@ import {
   COMPONENT_STYLESHEETS,
   SCROLL_PX,
   SHELL_RULES,
+  SKIP_LINK_STYLESHEET,
 } from "./constants.js";
 
 /** The package's own components, two levels up from this file. */
@@ -73,7 +75,8 @@ const MEASURE_OPTIONS: MeasureLayoutOptions = {
 /**
  * Read the stylesheets a site loads before the archetypes': the layer
  * order, the primitive tokens the shim resolves to, the spacing shim and
- * the grid presets, then the core components' own.
+ * the grid presets, the published skip link's, which takes the link out of
+ * the flow, then the core components' own.
  *
  * @note Impure: reads the stylesheets from the file system.
  */
@@ -88,6 +91,7 @@ function readStylesheets(): string {
     tokens,
     join(styles, "src", "spacing.css"),
     join(styles, "src", "grid.css"),
+    require.resolve(`@canonical/react-ds-global/${SKIP_LINK_STYLESHEET}`),
     ...COMPONENT_STYLESHEETS.map((name) =>
       join(UI_DIRECTORY, name, "styles.css"),
     ),
@@ -134,9 +138,19 @@ const documentLayout = (
   </DocumentLayout>
 );
 
+/** A document with a strip and no colophon, as a site with no footer renders it. */
+const bareDocumentLayout = (
+  <DocumentLayout
+    rail={<nav aria-label="Rail">Rail</nav>}
+    strip={<ModeStrip context="Document" />}
+  >
+    <p>Page</p>
+  </DocumentLayout>
+);
+
 /**
  * Read the computed placement and display of the elements a reflow moves,
- * and the layout's row gap.
+ * the layout's row gap and its rows.
  *
  * @note Impure: reads the page's computed styles and boxes.
  */
@@ -153,6 +167,7 @@ function readPlacement(page: Page) {
         column: [style.gridColumnStart, style.gridColumnEnd],
         row: style.gridRowStart,
         top: box.top,
+        bottom: box.bottom,
         left: box.left,
         right: box.right,
       };
@@ -162,6 +177,10 @@ function readPlacement(page: Page) {
     );
     return {
       rowGap: layout === null ? "" : getComputedStyle(layout).rowGap,
+      rows:
+        layout === null
+          ? 0
+          : getComputedStyle(layout).gridTemplateRows.split(" ").length,
       columns: getComputedStyle(
         document.querySelector(".ds.shell") ?? document.body,
       ).gridTemplateColumns.split(" ").length,
@@ -286,6 +305,21 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       for (const scroller of measure.scrollers) {
         expect(["main.ds.canvas", "div.rail"]).toContain(scroller);
       }
+
+      // The colophon takes a row of its own, one gutter under the canvas.
+      expect(before.rows).toBe(3);
+      expect(before.canvas?.bottom).toBeLessThan(viewport.height);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("ends the canvas of a document with no colophon flush with the viewport", async () => {
+    const page = await open(bareDocumentLayout);
+    try {
+      const placement = await readPlacement(page);
+      expect(placement.rows).toBe(2);
+      expect(placement.canvas?.bottom).toBe(viewport.height);
     } finally {
       await page.close();
     }

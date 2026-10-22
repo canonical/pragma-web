@@ -3,19 +3,25 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* A subgrid of the shell over every column: the strip row, the body row
-   * and the colophon row. Its gap is the grid's gutter on both axes, the
-   * shell's own, so the strip, the body and the colophon sit one gutter
-   * apart. */
+  /* A subgrid of the shell over every column: the strip row and the body
+   * row, and a colophon row only when there is a colophon, so a document
+   * without one keeps no empty track and no gutter under its canvas. Its
+   * gap is the grid's gutter on both axes, the shell's own, so the strip,
+   * the body and the colophon sit one gutter apart. */
   .ds.document-layout {
     --document-layout-gap: var(--grid-gutter);
 
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-    grid-template-rows: min-content minmax(0, 1fr) min-content;
+    grid-template-rows: min-content minmax(0, 1fr);
     gap: var(--document-layout-gap);
     min-block-size: 0;
+  }
+
+  /* With a colophon, a third row under the body holds it. */
+  .ds.document-layout:has(> .colophon) {
+    grid-template-rows: min-content minmax(0, 1fr) min-content;
   }
 
   /* The rail's first two columns, on every row; it scrolls on its own. */

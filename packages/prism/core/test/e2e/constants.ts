@@ -42,6 +42,14 @@ export const COMPONENT_STYLESHEETS = [
 ] as const;
 
 /**
+ * The published skip link's stylesheet, within `@canonical/react-ds-global`:
+ * it takes the link every layout renders first out of the flow, as a site
+ * that loads the package's styles has it.
+ */
+export const SKIP_LINK_STYLESHEET =
+  "dist/esm/lib/_work_in_progress/SkipLink/styles.css";
+
+/**
  * The site-level rules a shell carries: the intrinsic grid's narrow column
  * floor and the shell's own grid, the one query container.
  */

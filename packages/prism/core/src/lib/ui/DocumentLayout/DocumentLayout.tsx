@@ -11,11 +11,12 @@ const componentCssClassName = "ds document-layout";
 
 /**
  * The document archetype: a page whose one scrolling region is its canvas.
- * It is a subgrid of the shell's grid over every column, in three rows one
- * gutter apart: the strip row, the body row and the colophon row. The rail
- * takes the first two columns of every row and scrolls on its own; the
- * strip and the colophon span the rest of their rows; and the canvas fills
- * the body and scrolls. An aside, when there is one, is the canvas's own
+ * It is a subgrid of the shell's grid over every column, in rows one gutter
+ * apart: the strip row, the body row and, only when there is a colophon,
+ * the colophon row, so a document without one ends flush with the
+ * viewport. The rail takes the first two columns of every row and scrolls
+ * on its own; the strip and the colophon span the rest of their rows; and
+ * the canvas fills the body and scrolls. An aside, when there is one, is the canvas's own
  * (see `Canvas`): it holds the canvas's last three columns inside the same
  * scroll, starting at the top of the page and scrolling with it, and takes
  * a row under the page below two groups of columns.
