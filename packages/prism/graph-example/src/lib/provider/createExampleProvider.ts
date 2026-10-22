@@ -610,6 +610,7 @@ export const createExampleProvider = (
   /** The fields of a line, a station, an interchange or a fare zone. */
   const buildNetworkFields = (entity: ExampleNetworkEntity): View => ({
     platformCount: entity.platformCount ?? null,
+    platformLength: entity.platformLength ?? null,
     // No fallback: the SDL makes both non-null on a Line, so a Line record
     // missing either is an invalid dataset, and graphql-js reports it as a
     // field error rather than this view inventing a value.

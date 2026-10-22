@@ -115,17 +115,33 @@ export interface FleetStock {
   readonly formations: readonly NetworkReference[];
 }
 
-/** A line, with the formations it is run with. */
+/** A station or an interchange, with the length of its shortest platform. */
+export interface FleetStop {
+  readonly uri: string;
+  readonly platformLength: number | null;
+}
+
+/** One stop on a route, for the platform it offers a train. */
+export interface FleetCall {
+  readonly stop: FleetStop;
+}
+
+/** A line, with the formations it is run with and the stops its routes call at. */
 export interface FleetLine {
   readonly uri: string;
   readonly formations: readonly NetworkReference[];
+  readonly routes: readonly { readonly calls: readonly FleetCall[] }[];
 }
 
-/** Every rolling stock, formation, unit and car type, and every line. */
+/**
+ * Every rolling stock, formation, unit and car type, every line, and every
+ * station with its platform length.
+ */
 export interface Fleet {
   readonly stocks: readonly FleetStock[];
   readonly formations: readonly FleetFormation[];
   readonly units: readonly FleetUnit[];
   readonly carTypes: readonly FleetCarType[];
   readonly lines: readonly FleetLine[];
+  readonly stations: readonly FleetStop[];
 }

@@ -261,6 +261,14 @@ describe("Query.ontologyClass", () => {
         inherited: false,
         property: { uri: "https://metro.example/onto#platformCount" },
       },
+      // Declared after platformCount: the length of the shortest platform,
+      // which a formation's length is compared with.
+      {
+        required: false,
+        singular: true,
+        inherited: false,
+        property: { uri: "https://metro.example/onto#platformLength" },
+      },
       {
         required: true,
         singular: false,
@@ -531,6 +539,12 @@ describe("_meta", () => {
             inherited: false,
             property: { uri: "https://metro.example/onto#platformCount" },
           },
+          // platformLength follows platformCount, as the Station class
+          // declares them.
+          {
+            inherited: false,
+            property: { uri: "https://metro.example/onto#platformLength" },
+          },
           {
             inherited: false,
             property: { uri: "https://metro.example/onto#servesLine" },
@@ -595,8 +609,11 @@ describe("_meta", () => {
     const names = (
       data.node as { _meta: { fields: { name: string }[] } }
     )._meta.fields.map((field) => field.name);
+    // platformLength follows platformCount, as the Station class declares
+    // them.
     expect(names).toEqual([
       "platformCount",
+      "platformLength",
       "servesLine",
       "location",
       "inZone",
@@ -618,8 +635,10 @@ describe("_meta", () => {
     // accept; the OWL local name is returned as a label", so the round-trip
     // must NOT close. Answering with metadata there would hand a consumer a
     // field name it can never select.
+    // platformLength is a field on Station, so it is projected too.
     const projected = [
       "platformCount",
+      "platformLength",
       "servesLine",
       "location",
       "inZone",
@@ -1308,6 +1327,24 @@ describe("Unit.cars", () => {
           "the unit has no car",
         )._meta,
     );
+  });
+});
+
+describe("Stop.platformLength", () => {
+  it("serves the length of the station's shortest platform, in millimetres", async () => {
+    const data = await run(`{
+      node(id: "https://metro.example/onto#marsh-end") {
+        ... on Stop { platformLength }
+      }
+    }`);
+    expect(data.node).toEqual({ platformLength: 100000 });
+  });
+
+  it("answers null for a station no route calls at", async () => {
+    const data = await run(`{
+      node(id: "${BARE_ENTITY_URI}") { ... on Stop { platformLength } }
+    }`);
+    expect(data.node).toEqual({ platformLength: null });
   });
 });
 

@@ -7,13 +7,15 @@ import type {
   FleetFormation,
   FleetLine,
   FleetStock,
+  FleetStop,
   FleetUnit,
   InstancePage,
 } from "./types.js";
 
 /**
  * Every rolling stock, formation, unit and car type with every field the
- * schema serves on them, and every line with its formations, in one query.
+ * schema serves on them, every line with its formations and the platforms
+ * its routes call at, and every station's platform length, in one query.
  * The page size covers the whole dataset, and a page that reports more is a
  * failure rather than a silent truncation.
  */
@@ -52,7 +54,16 @@ const FLEET_QUERY = `{
   }
   lines: ontologyClass(uri: "metro:Line") {
     instances(first: 100) {
-      edges { node { uri ... on Line { formations { uri } } } }
+      edges { node { uri ... on Line {
+        formations { uri }
+        routes { calls { stop { uri platformLength } } }
+      } } }
+      pageInfo { hasNextPage }
+    }
+  }
+  stations: ontologyClass(uri: "metro:Station") {
+    instances(first: 100) {
+      edges { node { uri ... on Stop { platformLength } } }
       pageInfo { hasNextPage }
     }
   }
@@ -60,8 +71,9 @@ const FLEET_QUERY = `{
 
 /**
  * Read the shipped fleet through the provider's GraphQL schema: every
- * rolling stock, formation, unit and car type, and every line with the
- * formations it is run with.
+ * rolling stock, formation, unit and car type, every line with the
+ * formations it is run with and the stops its routes call at, and every
+ * station with its platform length.
  *
  * Throws when the query reports an error or a list does not fit one page, so
  * a test built on it can never pass over a partial fleet.
@@ -84,6 +96,7 @@ export const readFleet = async (): Promise<Fleet> => {
     readonly units: InstancePage<FleetUnit>;
     readonly carTypes: InstancePage<FleetCarType>;
     readonly lines: InstancePage<FleetLine>;
+    readonly stations: InstancePage<FleetStop>;
   };
   return {
     stocks: readWholePage(data.stocks, "readFleet: the stocks page"),
@@ -94,5 +107,6 @@ export const readFleet = async (): Promise<Fleet> => {
     units: readWholePage(data.units, "readFleet: the units page"),
     carTypes: readWholePage(data.carTypes, "readFleet: the car types page"),
     lines: readWholePage(data.lines, "readFleet: the lines page"),
+    stations: readWholePage(data.stations, "readFleet: the stations page"),
   };
 };

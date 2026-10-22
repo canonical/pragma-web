@@ -108,6 +108,8 @@ export interface ExampleNetworkEntity extends ExampleEntityBase {
   /** GraphQL type name — what `defaultTypeResolver` reads off the view. */
   readonly typename: "Line" | "Station" | "Interchange" | "Zone";
   readonly platformCount?: number;
+  /** The usable length of the station's shortest platform, in millimetres. */
+  readonly platformLength?: number;
   readonly transferMinutes?: number;
   readonly location?: ExampleGeoPoint;
   /** IRIs of the lines this station serves. */

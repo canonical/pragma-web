@@ -3,11 +3,12 @@
 // they are computed from: a unit's measures against its car types', a
 // formation's against its units', and a formation's stock and lines against
 // the stocks and lines that list it. A computed field that drifts from its
-// source fails here.
+// source fails here, and so does a routed station without a platform length.
 // =============================================================================
 
 import { beforeAll, describe, expect, it } from "vitest";
 import { assertPresent } from "../assertPresent.js";
+import { BARE_STATION_URIS } from "../fixtures.js";
 import { readFleet } from "../readFleet.js";
 import type { Fleet, NetworkReference } from "../types.js";
 
@@ -85,6 +86,30 @@ describe("fleet membership", () => {
         .map((line) => line.uri)
         .sort();
       expect(sortUris(formation.lines), formation.uri).toEqual(listing);
+    }
+  });
+});
+
+describe("platform lengths", () => {
+  it("measures a platform at every station a route calls at", () => {
+    const calls = fleet.lines.flatMap((line) =>
+      line.routes.flatMap((route) => route.calls),
+    );
+    expect(calls.length).toBeGreaterThan(0);
+    for (const call of calls) {
+      expect(call.stop.platformLength, call.stop.uri).toBeGreaterThan(0);
+    }
+  });
+
+  it("measures none at the two stations no route calls at", () => {
+    const bare = fleet.stations.filter((station) =>
+      BARE_STATION_URIS.some((uri) => uri === station.uri),
+    );
+    expect(bare.map((station) => station.uri).sort()).toEqual(
+      [...BARE_STATION_URIS].sort(),
+    );
+    for (const station of bare) {
+      expect(station.platformLength, station.uri).toBeNull();
     }
   });
 });
