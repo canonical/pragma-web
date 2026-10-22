@@ -297,10 +297,7 @@ describe("OntologyClass.instances", () => {
       interchange: ontologyClass(uri: "metro:Interchange") { instanceCount }
       line: ontologyClass(uri: "metro:Line") { instanceCount }
     }`);
-    // 23 direct stations, two of them bare, plus 4 interchanges: the five
-    // lines added for the eastern and southern rings brought 11 stations,
-    // one of them the interchange Eastwick Cross, and Tannery Lane became an
-    // interchange where the Circle meets the eastern ring.
+    // 23 direct stations, two of them bare, plus 4 interchanges.
     expect(data.station).toEqual({ instanceCount: 27 });
     // Central Exchange, Riverside Junction, Tannery Lane, Eastwick Cross.
     expect(data.interchange).toEqual({ instanceCount: 4 });
