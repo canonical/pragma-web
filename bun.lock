@@ -478,6 +478,20 @@
         "vitest": "^5.0.0",
         "yaml": "^2.8.1",
       },
+      "peerDependencies": {
+        "@canonical/anatomy-dsl": "0.43.0",
+        "@canonical/summon-core": "0.43.0",
+        "playwright": "^1.61.1",
+        "vitest": "^5.0.0",
+        "yaml": "^2.8.1",
+      },
+      "optionalPeers": [
+        "@canonical/anatomy-dsl",
+        "@canonical/summon-core",
+        "playwright",
+        "vitest",
+        "yaml",
+      ],
     },
     "packages/prism/graph-example": {
       "name": "@canonical/prism-graph-example",

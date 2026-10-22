@@ -146,7 +146,10 @@ components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
 `assertStylesheets` and `listAnatomyFolders`. Its `testing/browser` subpath
 holds the browser side the apps' layout suites share: `launchBrowser`,
 `measurePage` and `measureLayout`, which read a page's grid, scroll model,
-overflow and spacing.
+overflow and spacing. Both subpaths ship as TypeScript source and import
+what only a test run needs, so a consumer installs those optional peer
+dependencies itself: `@canonical/anatomy-dsl`, `@canonical/summon-core`,
+`vitest` and `yaml` for `testing`, and `playwright` for `testing/browser`.
 
 Every component has its stories; `bun run storybook` serves them.
 

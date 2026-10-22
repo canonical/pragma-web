@@ -70,6 +70,30 @@
     "relay-runtime": "^21.0.1",
     "relay-runtime-network": "^0.1.0"
   },
+  "peerDependencies": {
+    "@canonical/anatomy-dsl": "0.43.0",
+    "@canonical/summon-core": "0.43.0",
+    "playwright": "^1.61.1",
+    "vitest": "^5.0.0",
+    "yaml": "^2.8.1"
+  },
+  "peerDependenciesMeta": {
+    "@canonical/anatomy-dsl": {
+      "optional": true
+    },
+    "@canonical/summon-core": {
+      "optional": true
+    },
+    "playwright": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    },
+    "yaml": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "@canonical/anatomy-dsl": "0.43.0",
