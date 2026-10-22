@@ -306,7 +306,7 @@ The definition is the input shape with `wrappers` made required (defaulted to `[
 
 ### Composition — `wrapper`, `group`
 
-A **wrapper** is a reusable layout shell; **`group`** applies one wrapper to a list of routes. This replaces nested layout routes.
+A **wrapper** is a reusable layout shell; **`group`** applies one wrapper to a list or a record of routes. This replaces nested layout routes.
 
 #### `wrapper`
 
@@ -353,6 +353,11 @@ function group<TWrapper extends AnyWrapper, TRoutes extends readonly AnyRoute[]>
   nextWrapper: TWrapper,
   routes: TRoutes,
 ): GroupedRoutes<TWrapper, TRoutes>;
+
+function group<TWrapper extends AnyWrapper, TRoutes extends RouteMap>(
+  nextWrapper: TWrapper,
+  routes: TRoutes,
+): GroupedRouteMap<TWrapper, TRoutes>;
 ```
 
 Prepends `nextWrapper` to every route's `wrappers` array and returns the rewrapped list (positionally typed, so destructuring preserves each route's type). Nest `group(...)` calls to stack wrappers (outermost wrapper outermost).
@@ -364,6 +369,15 @@ const [account, login] = group(publicLayout, [
 ] as const);
 ```
 
+Given a record of named routes, `group` prepends `nextWrapper` to every route and keeps every key, so a domain's route record joins the app's route map without destructuring. The result is typed as `GroupedRouteMap<TWrapper, TRoutes>`, whose every value is `PrependWrapper<TWrapper, TRoutes[K]>`. An object literal needs no `as const`: its keys and route types are inferred as written. The record form nests like the list form (outermost call, outermost wrapper), and neither form changes its input: both return new route objects.
+
+```ts
+const appRoutes = {
+  ...group(publicLayout, accountRoutes),
+  ...group(publicLayout, marketingRoutes),
+} as const;
+```
+
 #### The publicLayout pattern
 
 Assemble routes flat, attach shared layout with `group`, then collect into a route map:
@@ -373,6 +387,13 @@ const [guide, home] = group(publicLayout, [marketingRoutes.guide, marketingRoute
 const [account, login] = group(publicLayout, [accountRoutes.account, accountRoutes.login] as const);
 
 const appRoutes = { guide, home, account, login } as const;
+export type AppRoutes = typeof appRoutes;
+```
+
+When each domain exports a route record, the record form of `group` does the same without destructuring:
+
+```ts
+const appRoutes = { ...group(publicLayout, marketingRoutes), ...group(publicLayout, accountRoutes) } as const;
 export type AppRoutes = typeof appRoutes;
 ```
 
@@ -878,6 +899,21 @@ The raw router from the nearest provider. Throws if no provider is present. Use 
 ```ts
 const router = useRouter();
 router.navigate("home");
+```
+
+#### `useHref`
+
+```ts
+function useHref<
+  TRoutes extends RouteMap = RegisteredRouteMap,
+  TName extends RouteName<TRoutes> = RouteName<TRoutes>,
+>(name: TName, ...args: RouteArgs<TRoutes, TName>): string;
+```
+
+Resolves the href of a named route through the nearest provider's `buildPath`. It takes the same name and build options as `Link`'s `to`/`params`/`search`/`hash`, checked against [`PathBuildOptions`](#supporting-types) the same way, so use it where a component needs an href but renders its own anchor (a `LinkComponent` adapter), or for `window.open` or a form `action`. It does not subscribe to router state: the href depends only on the route table and the arguments. Throws if no provider is present. Like `buildPath`, a union of names requires the options as soon as one member declares params; pass one literal name for full checking. With explicit generics, name the route too (`useHref<AppRoutes, "guide">`): a route map alone leaves `TName` at the union of every name.
+
+```ts
+const href = useHref("guide", { params: { slug: "intro" }, hash: "setup" });
 ```
 
 #### `useRoute`

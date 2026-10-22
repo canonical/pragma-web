@@ -9,10 +9,12 @@
 import { describe, expectTypeOf, it } from "vitest";
 import createRouter from "./createRouter.js";
 import createRouterStore from "./createRouterStore.js";
+import group from "./group.js";
 import type { RedirectTarget, ValidPath } from "./route.js";
 import route from "./route.js";
 import type {
   AnyRoute,
+  GroupedRoutes,
   InferOutput,
   InferParams,
   InferSearch,
@@ -25,7 +27,9 @@ import type {
   StandardSchemaIssue,
   StandardSchemaResult,
   StandardSchemaV1,
+  WrapperDefinition,
 } from "./types.js";
+import wrapper from "./wrapper.js";
 
 /** Standard Schema v1 test double; `TInput` defaults to `TOutput`. */
 function testSchema<TOutput, TInput = TOutput>(
@@ -412,6 +416,92 @@ describe("router surface", () => {
       router.buildPath(name);
 
       router.buildPath(name, { params: { id: "1" } });
+    });
+  });
+});
+
+describe("group", () => {
+  // Distinct rendered types make wrapper order visible to the type system:
+  // two wrappers of the same rendered type are indistinguishable.
+  const appLayout = wrapper<string>({
+    id: "app:layout",
+    component: ({ children }) => children,
+  });
+  const sectionLayout = wrapper<number>({
+    id: "section:layout",
+    component: ({ children }) => children,
+  });
+
+  const grouped = group(appLayout, {
+    profile: route({ url: "/profile", content: () => "profile" }),
+    user: route({ url: "/users/:id", content: () => "user" }),
+    section: route({
+      url: "/section",
+      content: () => "section",
+      wrappers: [sectionLayout] as const,
+    }),
+  });
+
+  it("keeps each literal key of a route record", () => {
+    expectTypeOf<keyof typeof grouped>().toEqualTypeOf<
+      "profile" | "user" | "section"
+    >();
+  });
+
+  it("prepends the wrapper to each route's wrapper tuple", () => {
+    expectTypeOf<(typeof grouped)["user"]["wrappers"]>().toEqualTypeOf<
+      readonly [WrapperDefinition<string>]
+    >();
+    expectTypeOf<(typeof grouped)["section"]["wrappers"]>().toEqualTypeOf<
+      readonly [WrapperDefinition<string>, WrapperDefinition<number>]
+    >();
+  });
+
+  it("keeps each route's own params", () => {
+    expectTypeOf<ParamsOf<(typeof grouped)["user"]>>().toEqualTypeOf<{
+      readonly id: string;
+    }>();
+  });
+
+  it("stacks nested record groups outermost first", () => {
+    const nested = group(
+      appLayout,
+      group(sectionLayout, {
+        section: route({ url: "/section", content: () => "section" }),
+      }),
+    );
+
+    expectTypeOf<(typeof nested)["section"]["wrappers"]>().toEqualTypeOf<
+      readonly [WrapperDefinition<string>, WrapperDefinition<number>]
+    >();
+  });
+
+  it("builds paths by name from a grouped record", () => {
+    void (() => {
+      const router = createRouter(grouped);
+
+      router.buildPath("user", { params: { id: "1" } });
+
+      // @ts-expect-error — the grouped record declares no route named 'nope'
+      router.buildPath("nope");
+      // @ts-expect-error — a params route requires its options argument
+      router.buildPath("user");
+    });
+  });
+
+  it("still resolves a tuple to the tuple overload", () => {
+    const home = route({ url: "/", content: () => "home" });
+    const user = route({ url: "/users/:id", content: () => "user" });
+
+    expectTypeOf(group(appLayout, [home, user] as const)).toEqualTypeOf<
+      GroupedRoutes<typeof appLayout, readonly [typeof home, typeof user]>
+    >();
+  });
+
+  it("rejects a value that is neither a route tuple nor a route record", () => {
+    void (() => {
+      // @ts-expect-error — a string is not a route
+      group(appLayout, { home: "nope" });
     });
   });
 });
