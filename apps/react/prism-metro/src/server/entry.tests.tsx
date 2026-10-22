@@ -58,6 +58,15 @@ describe("EntryServer", () => {
     expect(html).toContain("<title>Page not found — Metro</title>");
   });
 
+  it("renders the not-found page in the document archetype, with the rail", async () => {
+    const html = await renderAndSettle({ url: "/nowhere" });
+    expect(html).toContain('class="ds document-layout"');
+    expect(html).toContain('data-region="primary-nav"');
+    expect(html).toMatch(
+      /<main class="ds canvas canvas"[^>]*><div class="page"><section class="ds not-found-page">/,
+    );
+  });
+
   it.each(["/stations", "/lines", "/definitions"])(
     "renders %s from a cold store without reaching the network",
     async (url) => {
