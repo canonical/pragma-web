@@ -90,8 +90,9 @@ src/
 │                   `graph.ts` — TRANSPORT ONLY. The graph is not assembled
 │                   here; it comes from @canonical/prism-pragma-provider.
 ├── domains/        Feature domains (each owns its routes and pages).
-│                   `domains/lenses/` is the CORE lens set — every operation
-│                   under it must execute against any provider implementing
+│                   The CORE lens set is `domains/lenses/` plus the
+│                   `@canonical/prism-lens-*` packages — every operation in
+│                   either must execute against any provider implementing
 │                   @canonical/prism-contract, and a gate enforces that.
 │                   `domains/playground/` carries one pragma-specific probe
 │                   URI (`probeQuery.ts`); it is neither a lens nor a

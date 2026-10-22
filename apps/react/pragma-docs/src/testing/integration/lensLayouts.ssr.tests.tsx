@@ -36,11 +36,11 @@ import { renderToString } from "react-dom/server";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
 import { EntryServer } from "#server";
+import { definitionsExplorerRecords } from "../../../testing/definitionsRecords.js";
 import journeysExplorerRecords from "../../addons/journeys/__fixtures__/journeysExplorerRecords.js";
 import journeysExplorerRecordsJob from "../../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import catalogRecords from "../../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../../domains/components/__fixtures__/componentEntityRecordsButton.js";
-import definitionsExplorerRecords from "../../domains/lenses/definitions/__fixtures__/definitionsExplorerRecords.js";
 import standardEntityRecords from "../../domains/lenses/standards/__fixtures__/standardEntityRecords.js";
 import standardsIndexRecords from "../../domains/lenses/standards/__fixtures__/standardsIndexRecords.js";
 import { LINK_COMPONENT_URI } from "../../domains/lenses/standards/__fixtures__/standardsPageHarness.js";
@@ -464,11 +464,9 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     // term-less canvas carries the honest empty inspector.
     expect(mustGet("/definitions").canvas).toContain("Select a term");
     expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain(
-      '<h2 id="term-inspector-title">UI Block</h2>',
+      '<h2 class="heading" id="term-inspector-title">UI Block</h2>',
     );
-    expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain(
-      "hierarchy-node-shell",
-    );
+    expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain("ds term-node");
     expect(mustGet("/standards").canvas).toContain('id="lens-standards-title"');
     // The standards canvases render REAL content from their fixture
     // records: the index carries a grouped standard link, the reading

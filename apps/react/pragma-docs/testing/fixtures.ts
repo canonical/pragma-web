@@ -40,7 +40,7 @@ export const COMPONENT_PROBE_RESPONSE = {
  * A class URI in prefixed form, `prefix:Local`: a declared prefix and a
  * local name, never a scheme followed by `//`. The graph-class constants
  * must match it, because `ontologyClass(uri:)` echoes back the absolute IRI
- * and an absolute constant would silently defeat every `toPrefixedUri`
+ * and an absolute constant would silently defeat every prefixed-form
  * comparison written against it.
  */
 export const PREFIXED_CURIE_PATTERN = /^[A-Za-z][\w.-]*:[^/][^\s]*$/;

@@ -1,0 +1,45 @@
+import type { ComponentProps } from "react";
+import type { TermRail_ontologies$key } from "../../__generated__/TermRail_ontologies.graphql.js";
+import type { LensFilter } from "../types.js";
+
+type OwnProps = {
+  /**
+   * The lens's ephemeral filter, owned by `DefinitionsExplorer` so the
+   * rail, the well and the strip's controls all read one value. The rail
+   * only ever DIMS on it — it never removes an item (see the component).
+   */
+  readonly filter: LensFilter;
+  /** Plural fragment ref over the query root's `ontologies` list. */
+  readonly ontologies: TermRail_ontologies$key;
+  /**
+   * Superclass depth per class, keyed by FULL IRI — the same measure the
+   * well stacks its layers by (`computeClassDepths`), computed once by
+   * `DefinitionsExplorer` and passed down, so the rail's fragment does not
+   * select `superclass` a second time in the operation whose well fragment
+   * already selects it. A URI absent from the map reads as depth 0.
+   */
+  readonly depthByUri: ReadonlyMap<string, number>;
+  /**
+   * The transient hover/focus centre — the shared ego centre this lens
+   * lifts into `DefinitionsExplorer`. CLIENT-ONLY: `undefined` on
+   * the server and on the first client paint, so the rail's initial markup
+   * matches the server's byte for byte. When it names a rail term, that
+   * item takes `is-hovered` (distinct from `.active`/`aria-current`
+   * selection). The prefixed term address, matching the item's own id.
+   */
+  readonly hoverCentre: string | undefined;
+  /**
+   * Raise (or clear) a term as the shared ego centre — the rail's half of
+   * the bidirectional hover. Called on pointer-enter/leave and keyboard
+   * focus/blur of an item; the well reads the same centre and fades to its
+   * 1-hop neighbourhood, exactly as a graph-node hover does.
+   */
+  readonly onHoverTerm: (term: string | undefined) => void;
+};
+
+/**
+ * Props accepted by `TermRail`: the ontologies it lists, the filter it dims
+ * by and the shared hover centre, and the native props of its root `<nav>`.
+ */
+export type TermRailProps = OwnProps &
+  Omit<ComponentProps<"nav">, keyof OwnProps>;

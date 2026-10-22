@@ -1,0 +1,64 @@
+/*
+ * ExplorerStatus — the Definitions strip's status figure
+ * (slot.explorer-status). It lives INSIDE the strip band, whose height is
+ * stationary frame, so nothing here may change it.
+ *
+ * Each design decision reads a component token. The colours, spacing and
+ * motion read the design system's semantic tokens. The design system has no
+ * semantic token for the type size or the bar's radius, so those component
+ * tokens hold the lens's own value and only they retune it.
+ */
+
+@layer ds.prism {
+  :root {
+    --explorer-status-gap: var(--space-100, 0.5rem);
+    --explorer-status-font-size: 0.75rem;
+    --explorer-status-color: var(--color-text-muted);
+    --explorer-status-bar-inline-size: var(--space-800, 4rem);
+    --explorer-status-bar-block-size: calc(1.5 * var(--space-050, 0.25rem));
+    --explorer-status-bar-radius: 999px;
+    --explorer-status-bar-background: var(--color-border-muted);
+    --explorer-status-fill-background: var(--color-text-muted);
+    --explorer-status-transition-duration: var(--motion-duration-fast, 0.15s);
+  }
+
+  .ds.explorer-status {
+    display: flex;
+    align-items: center;
+    gap: var(--explorer-status-gap);
+    margin: 0;
+    font-size: var(--explorer-status-font-size);
+    color: var(--explorer-status-color);
+    white-space: nowrap;
+  }
+
+  .ds.explorer-status .caption {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The proportion bar. Its fill width IS the ratio the caption states, so
+   * the two can never disagree; the caption is the accessible channel and
+   * the bar the glanceable one. The share is set inline, as the one computed
+   * value no stylesheet can hold. */
+  .ds.explorer-status .bar {
+    inline-size: var(--explorer-status-bar-inline-size);
+    block-size: var(--explorer-status-bar-block-size);
+    border-radius: var(--explorer-status-bar-radius);
+    background: var(--explorer-status-bar-background);
+    overflow: hidden;
+  }
+
+  .ds.explorer-status .fill {
+    display: block;
+    block-size: 100%;
+    inline-size: var(--explorer-status-share, 100%);
+    background: var(--explorer-status-fill-background);
+    transition: inline-size var(--explorer-status-transition-duration) ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds.explorer-status .fill {
+      transition: none;
+    }
+  }
+}

@@ -319,9 +319,11 @@ contradict the premise that this contract is implementable without pragma's mach
 ## The lens gate, and the two things it does not guard
 
 `src/testing/integration/lensOperations.test.ts` harvests **every** query operation
-declared under `apps/react/pragma-docs/src/domains/lenses/**` — the docsite's **core lens
-set** — at run time, from the committed Relay artifacts, never from a snapshot, and
-executes each one against this provider.
+declared under its two scan roots — `apps/react/pragma-docs/src/domains/lenses/**` and the
+`src` of every lens package, `packages/prism/lens-*/src/**`, together the docsite's **core
+lens set** — at run time, from the Relay artifacts, never from a snapshot, and executes each
+one against this provider. The app's artifacts are committed; a lens package's are build
+outputs its `build` script compiles at install, so the gate needs a `bun install` first.
 
 It started life red by design, as a to-do list. **It is now green.** The definitions lens
 and the standards lens were despecialised onto the contract and execute here:
@@ -330,7 +332,7 @@ and the standards lens were despecialised onto the contract and execute here:
 
 **Four out of the docsite's ten shipped query operations.** That denominator
 belongs next to the numerator, because the other six do not execute against
-this provider and the scan root does not say so on its own:
+this provider and the scan roots do not say so on their own:
 
 | Where | Operations | Why they do not run here |
 | --- | --- | --- |
@@ -341,10 +343,10 @@ this provider and the scan root does not say so on its own:
 
 All six name pragma-ontology terms this provider's dataset has no class for.
 So what this gate establishes is narrow and worth stating narrowly: **the four
-operations under `src/domains/lenses` are provider-neutral.** It does not
+core lens operations are provider-neutral.** It does not
 establish that the docsite as a whole runs against any conformant provider —
 five mounted routes, the home page among them, currently do not. Widening the
-scan root to `src/domains` is the intended direction and would turn this gate
+app's scan root to `src/domains` is the intended direction and would turn this gate
 red today; that red would be the to-do list, which is the state this gate was
 designed to be useful in.
 
@@ -365,8 +367,8 @@ Nothing was deleted. `src/addons/**` is the docsite's home for views that are op
 pragma-specific and make no neutrality claim; journeys is expected to become a plugin
 proper once the docsite has a plugin mechanism.
 
-That distinction is the whole point, so state it plainly: **the scanned directory defines
-an obligation.** Membership of `src/domains/lenses/**` *is* the promise to be
+That distinction is the whole point, so state it plainly: **the scanned directories define
+an obligation.** Membership of `src/domains/lenses/**` or of a lens package *is* the promise to be
 provider-neutral. A view either makes that promise and must execute here, or it is an
 add-on and does not. There is no third state, and nothing sits in the lens tree with an
 exemption.

@@ -1,7 +1,7 @@
 /**
  * Every story renders without erroring.
  *
- * WHY THIS EXISTS. The app ships 29 `*.stories.tsx` files and, until this
+ * WHY THIS EXISTS. The app ships 25 `*.stories.tsx` files and, until this
  * gate, nothing executed any of them. `@storybook/addon-vitest` is registered
  * in the shared Storybook config but the app declares no `storybookTest`
  * project, and no Chromatic workflow exists for this app — so the stories were
@@ -50,7 +50,7 @@
  * without anyone deciding that it should.
  */
 
-import "../../domains/lenses/definitions/__fixtures__/stubReactFlowGlobals.js";
+import "../../../testing/stubReactFlowGlobals.js";
 import * as relayAddonAnnotations from "@canonical/storybook-addon-relay/preview";
 import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
 import { act, render, waitFor } from "@testing-library/react";
@@ -105,12 +105,15 @@ const DOCS_ONLY = new Set([
 
 describe("the story corpus", () => {
   it("is discovered from the tree, and has not shrunk", () => {
-    expect(modulePaths.length).toBeGreaterThanOrEqual(29);
+    // The Definitions lens's rail, well, inspector and explorer have no
+    // story here: `@canonical/prism-lens-definitions` exports none of them,
+    // and its page story renders all four over the site's styles.
+    expect(modulePaths.length).toBeGreaterThanOrEqual(25);
   });
 
   it("composes to stories, and has not silently stopped", () => {
     // The module floor above counts FILES. If a rename or an API change made
-    // `composeStories` stop recognising story exports, all 29 files would
+    // `composeStories` stop recognising story exports, all 25 files would
     // still be on disk and the render loop would iterate zero times — the
     // suite would go green having rendered nothing. This is the floor that
     // notices.
@@ -118,7 +121,7 @@ describe("the story corpus", () => {
       (count, composed) => count + Object.keys(composed).length,
       0,
     );
-    expect(total).toBeGreaterThanOrEqual(54);
+    expect(total).toBeGreaterThanOrEqual(47);
   });
 
   it("carries no allowlist entry for a module that is not in the tree", () => {

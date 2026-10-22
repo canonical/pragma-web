@@ -1,7 +1,6 @@
 export { buildGlyphProps } from "./buildGlyphProps.js";
 export {
   ComponentsIcon,
-  DefinitionsIcon,
   GuidesIcon,
   HomeIcon,
   JourneysIcon,

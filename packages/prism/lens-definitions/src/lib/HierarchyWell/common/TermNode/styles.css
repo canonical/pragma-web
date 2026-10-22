@@ -1,0 +1,121 @@
+/*
+ * TermNode — one class on the well's floor: a positioned box whose
+ * estimated geometry the layout assigns inline, holding the term link and,
+ * for an abstract class, a small tag at its foot outside the link, so the
+ * node's accessible name stays the term alone.
+ *
+ * Each design decision reads a component token. The colours, spacing and
+ * motion read the design system's semantic tokens. The design system has no
+ * semantic token for the type sizes, weight and tracking, the border
+ * widths, the radius or the fade's opacity, so those component tokens hold
+ * the lens's own value and only they retune it.
+ *
+ * At-rules: one `prefers-reduced-motion` block, which cannot reflow layout.
+ */
+
+@layer ds.prism {
+  :root {
+    --term-node-padding-inline: var(--space-100, 0.5rem);
+    --term-node-background: var(--color-background);
+    --term-node-border-width: 1px;
+    --term-node-border-color: var(--color-border-muted);
+    --term-node-radius: 0.5rem;
+    --term-node-color: var(--color-text);
+    --term-node-font-size: 0.875rem;
+    --term-node-shadow: drop-shadow(
+      0 1px 2px color-mix(in oklab, var(--color-text) 12%, transparent)
+    );
+    --term-node-selected-border-color: var(--color-text);
+    --term-node-selected-border-width: 2px;
+    --term-node-selected-background: color-mix(
+      in oklab,
+      var(--color-text) 6%,
+      var(--color-background)
+    );
+    --term-node-selected-font-weight: 600;
+    --term-node-tag-font-size: 0.5rem;
+    --term-node-tag-offset: calc(1.2 * var(--space-150, 0.75rem));
+    --term-node-tag-letter-spacing: 0.08em;
+    --term-node-tag-color: var(--color-text-muted);
+    --term-node-faded-opacity: 0.16;
+    --term-node-transition-duration: var(--motion-duration-fast, 0.15s);
+  }
+
+  .ds.term-node {
+    position: absolute;
+    transition: opacity var(--term-node-transition-duration) ease;
+  }
+
+  /* Nodes float as raised chips on the well floor: the drop shadow makes
+   * them read as floating in the depression rather than printed on it. */
+  .ds.term-node .link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 100%;
+    block-size: 100%;
+    padding-inline: var(--term-node-padding-inline);
+    background: var(--term-node-background);
+    border: var(--term-node-border-width) solid var(--term-node-border-color);
+    border-radius: var(--term-node-radius);
+    color: var(--term-node-color);
+    text-decoration: none;
+    font-size: var(--term-node-font-size);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    filter: var(--term-node-shadow);
+    transition:
+      opacity var(--term-node-transition-duration) ease,
+      border-color var(--term-node-transition-duration) ease,
+      background-color var(--term-node-transition-duration) ease;
+  }
+
+  /* Abstract classes: a dashed border and an italic label, plus the tag
+   * below. Real text, not colour, so the distinction survives with styling
+   * ignored. */
+  .ds.term-node.abstract .link {
+    border-style: dashed;
+    font-style: italic;
+  }
+
+  .ds.term-node .tag {
+    position: absolute;
+    inset-block-end: calc(-1 * var(--term-node-tag-offset));
+    inset-inline: 0;
+    text-align: center;
+    font-size: var(--term-node-tag-font-size);
+    letter-spacing: var(--term-node-tag-letter-spacing);
+    text-transform: uppercase;
+    color: var(--term-node-tag-color);
+    pointer-events: none;
+  }
+
+  /* Selection is the address: the router stamps aria-current on the current
+   * term's link. A thicker stroke AND a tinted fill keep the selected node
+   * legible inside a faded neighbourhood. */
+  .ds.term-node .link[aria-current="page"] {
+    border-color: var(--term-node-selected-border-color);
+    border-width: var(--term-node-selected-border-width);
+    font-weight: var(--term-node-selected-font-weight);
+    background: var(--term-node-selected-background);
+  }
+
+  /* Outside the ego centre's neighbourhood a node recedes but stays
+   * readable. */
+  .ds.term-node.is-faded {
+    opacity: var(--term-node-faded-opacity);
+  }
+
+  /* The graph HIDES what the filter excludes; the node keeps its place. */
+  .ds.term-node.is-hidden {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds.term-node,
+    .ds.term-node .link {
+      transition: none;
+    }
+  }
+}

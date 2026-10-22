@@ -9,11 +9,11 @@ import {
   routeLensFacet,
   routeShortcutFacet,
 } from "@canonical/prism-core";
+import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   ComponentsIcon,
-  DefinitionsIcon,
   GuidesIcon,
   HomeIcon,
   JourneysIcon,
@@ -28,7 +28,8 @@ import { withRouter } from "../../.storybook/decorators/index.js";
  * They carry the lens and shortcut facets: the rail's entries are collected
  * off this table and its digits off the router's, so a route without the
  * annotations renders no entry or no `kbd`. Keep these six in step with the
- * real route modules.
+ * real route modules; the Definitions entry reads the lens package's own
+ * declaration, so it cannot drift.
  */
 const bareRoutes = {
   home: route({
@@ -60,15 +61,7 @@ const bareRoutes = {
   definitions: route({
     url: "/definitions",
     content: () => null,
-    meta: {
-      ...routeShortcutFacet.of("3"),
-      ...routeLensFacet.of({
-        label: "Definitions",
-        icon: DefinitionsIcon,
-        order: 3,
-        tier: 1,
-      }),
-    },
+    meta: definitionsRoutes.definitions.meta,
   }),
   standards: route({
     url: "/standards",

@@ -1,0 +1,38 @@
+/*
+ * DefinitionsPage — the lens heading over the explorer triptych. The page
+ * fills the canvas region's height (a heading row over a released 1fr row),
+ * so the triptych's PANELS own their scroll rather than the canvas: every
+ * link of the chain canvas → page → explorer → panel releases its block
+ * claim with `min-block-size: 0`.
+ */
+
+@layer ds.prism {
+  /* A SUBGRID pass-through: the page authors no columns of its own — it
+   * inherits the lens layout's intrinsic columns and re-emits them to the
+   * explorer, so the chain layout → canvas → page → explorer is unbroken and
+   * the term rail lands on the same lines every other lens's rail does. It
+   * owns only the block axis: the visually hidden heading row over the
+   * explorer's released row. */
+  .ds.definitions-page {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    grid-template-rows: min-content minmax(0, 1fr);
+    block-size: 100%;
+    min-block-size: 0;
+  }
+
+  /* Present for assistive tech and as the section's `aria-labelledby` target
+   * (`lens-definitions-title`), absent from the layout: the mode strip's
+   * breadcrumb trail carries the visible title. The visually hidden idiom. */
+  .ds.definitions-page > .heading {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
