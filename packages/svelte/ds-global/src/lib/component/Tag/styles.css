@@ -1,0 +1,53 @@
+@layer ds.components.global {
+  .ds.tag {
+    --tag-color-text: var(
+      --modifier-color-text,
+      var(
+        --modifier-color-text-onForegroundSecondary,
+        var(--color-text-onForegroundSecondary)
+      )
+    );
+    --tag-color-background: var(
+      --modifier-surface,
+      var(
+        --modifier-color-foreground-secondary,
+        var(--color-foreground-secondary)
+      )
+    );
+    --tag-padding-block: var(--density-padding-block, var(--dimension-025));
+
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--dimension-radius-full);
+    padding-block: var(--tag-padding-block);
+    padding-inline: var(--dimension-100);
+    font:
+      var(--typography-text-secondary-font-weight)
+      var(--typography-text-secondary-font-size) /
+      var(--typography-text-secondary-line-height)
+      var(--typography-text-secondary-font-family);
+    gap: var(--dimension-050);
+    color: var(--tag-color-text);
+    background-color: var(--tag-color-background);
+    white-space: nowrap;
+
+    > .icon,
+    > .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    > .lead {
+      font-variant-caps: all-small-caps;
+      font-variant-numeric: oldstyle-nums;
+      letter-spacing: var(--dimension-letterSpacing-wide);
+    }
+
+    > .value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
