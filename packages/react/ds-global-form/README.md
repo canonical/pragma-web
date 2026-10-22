@@ -183,11 +183,13 @@ import { SelectInput } from "@canonical/react-ds-global-form";
   value={locale}
   onChange={(event) => setLocale(event.target.value)}
   options={[
-    { value: "en", label: "English" },
-    { value: "fr", label: "français" },
+    { value: "en", label: "English", lang: "en" },
+    { value: "fr", label: "français", lang: "fr" },
   ]}
 />
 ```
+
+An option's optional `lang` marks a label written in another language, so assistive technology pronounces it correctly.
 
 ## Middleware Pattern
 
