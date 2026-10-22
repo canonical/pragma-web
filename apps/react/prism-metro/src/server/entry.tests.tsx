@@ -36,13 +36,13 @@ const renderAndSettle = async (initialData: InitialData): Promise<string> => {
 describe("EntryServer", () => {
   it("declares the app context and density on <html>", async () => {
     const html = await renderAndSettle({ url: "/stations" });
-    expect(html).toContain('<html class="ds site-document app comfortable">');
+    expect(html).toContain('<html class="ds site-document docs comfortable">');
   });
 
   it("adds the reader's theme beside them", async () => {
     const html = await renderAndSettle({ url: "/stations", theme: "dark" });
     expect(html).toContain(
-      '<html class="ds site-document app comfortable dark">',
+      '<html class="ds site-document docs comfortable dark">',
     );
   });
 

@@ -17,7 +17,7 @@ const renderDocument = (props: SiteDocumentProps): Document =>
 describe("SiteDocument", () => {
   it("declares the site's context and density on <html>", () => {
     const { documentElement } = renderDocument({});
-    expect(documentElement.className).toBe("ds site-document app comfortable");
+    expect(documentElement.className).toBe("ds site-document docs comfortable");
   });
 
   it("adds the reader's theme, then the caller's class", () => {
@@ -26,7 +26,7 @@ describe("SiteDocument", () => {
       theme: "dark",
     });
     expect(documentElement.className).toBe(
-      "ds site-document app comfortable dark is-printing",
+      "ds site-document docs comfortable dark is-printing",
     );
   });
 

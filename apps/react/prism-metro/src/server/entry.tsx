@@ -5,8 +5,7 @@
 import "../styles/app.css";
 import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import type { ServerEntrypointProps } from "@canonical/react-ssr/renderer";
-import { SiteDocument } from "#lib/ui";
-import { Shell } from "#shell";
+import { Shell, SiteDocument } from "#lib/ui";
 import { appRoutes, notFoundRoute } from "../routes.js";
 import selectRoutableUrl from "../selectRoutableUrl.js";
 import type { InitialData } from "./types.js";
