@@ -40,7 +40,7 @@ export interface ButtonProps extends BaseProps {
   icon?: Snippet;
   /**
    * Whether the button is in a loading (busy) state. Overlays a spinner,
-   * marks the button `aria-busy` and `aria-disabled`, and blocks activation
+   * marks the button `aria-disabled`, and blocks activation
    * (clicks and form submission) so the action cannot be triggered again
    * while it is in flight. The button stays focusable, so keyboard focus is
    * not lost when loading starts.

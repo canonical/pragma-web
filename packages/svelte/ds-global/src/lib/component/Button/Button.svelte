@@ -32,7 +32,7 @@
 
   $effect(() => {
     if (
-      import.meta.env.DEV &&
+      import.meta.env?.DEV &&
       (icon || loading) &&
       !children &&
       !rest["aria-label"] &&
@@ -69,7 +69,6 @@
     loading && "loading",
     className,
   ]}
-  aria-busy={loading || undefined}
   aria-disabled={isBlocked || undefined}
   {disabled}
   {...rest}

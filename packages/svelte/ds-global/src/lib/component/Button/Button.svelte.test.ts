@@ -261,11 +261,8 @@ describe("Button component", () => {
       expect(spinner).not.toBeNull();
     });
 
-    it("marks the button aria-busy and aria-disabled", async () => {
+    it("marks the button aria-disabled", async () => {
       const page = await render(Component, { ...baseProps, loading: true });
-      await expect
-        .element(componentLocator(page))
-        .toHaveAttribute("aria-busy", "true");
       await expect
         .element(componentLocator(page))
         .toHaveAttribute("aria-disabled", "true");
@@ -326,10 +323,9 @@ describe("Button component", () => {
       expect(page.container.querySelector(".loading-spinner")).not.toBeNull();
     });
 
-    it("is neither busy nor disabled when not loading", async () => {
+    it("is not disabled when not loading", async () => {
       const page = await render(Component, { ...baseProps });
       const root = componentLocator(page).element() as HTMLButtonElement;
-      expect(root.hasAttribute("aria-busy")).toBe(false);
       expect(root.hasAttribute("aria-disabled")).toBe(false);
       expect(root.disabled).toBe(false);
     });
