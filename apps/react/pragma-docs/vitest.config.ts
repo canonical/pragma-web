@@ -15,6 +15,13 @@ export default mergeConfig(
       setupFiles: ["./vitest.setup.ts"],
       // Repo convention: test files are named *.tests.ts(x)
       include: ["src/**/*.tests.ts", "src/**/*.tests.tsx"],
+      // The pragma provider is a workspace package, so vitest runs it through
+      // Vite, while ke-graphql sits in node_modules and would be loaded by
+      // Node directly. The two then resolve `graphql` under different export
+      // conditions (its CJS and ESM builds), and the Prose types the provider
+      // builds are refused by ke-graphql as coming from another module.
+      // Running ke-graphql through Vite as well gives both one `graphql`.
+      server: { deps: { inline: ["@canonical/ke-graphql"] } },
       coverage: {
         provider: "v8",
         // The denominator is the SOURCE TREE, not the import graph. Without

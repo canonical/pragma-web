@@ -1,0 +1,11 @@
+import type { ComponentProps } from "react";
+
+type OwnProps = {
+  /** The class the site binds the lens to, as its binding names it. */
+  readonly classUri: string;
+};
+
+/** Props accepted by `StandardsPage`: the bound class, and the native props
+ * of its root `<section>`. */
+export type StandardsPageProps = OwnProps &
+  Omit<ComponentProps<"section">, keyof OwnProps>;

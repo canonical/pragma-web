@@ -100,3 +100,11 @@ packages/prism/projections/src/__generated__/
 # never shipped; neither is committed
 packages/prism/lens-definitions/src/__generated__/
 packages/prism/lens-definitions/.relay/
+
+# relay-compiler artifacts of the source-shipped Standards lens: its own,
+# built by its `build` script at install and shipped in its tarball, and,
+# under .relay, the schema its `schema` script writes and the projections
+# fragments its spreads resolve against, compiled beside them and never
+# shipped; none is committed
+packages/prism/lens-standards/src/__generated__/
+packages/prism/lens-standards/.relay/

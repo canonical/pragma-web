@@ -1,0 +1,22 @@
+# The Prose extension the Standards lens reads: long-form Markdown authored
+# for an entity, with the entities it links to resolved by the provider. It
+# is no part of the contract, so the lens is Tier 2: it runs on a provider
+# that serves this extension beside the contract. `scripts/writeSchema.ts`
+# merges it into the contract SDL for the lens's relay project.
+
+"Long-form Markdown authored for one entity, per language."
+type Prose {
+  "The text in `lang`, else in the request's locale, else in the default language."
+  markdown(lang: String): String!
+  "The language `markdown` serves without `lang`: the request's locale when authored, else the default."
+  lang: String!
+  "Every authored language, the default first, then the rest in code-point order."
+  availableLanguages: [String!]!
+  "Entities the prose links to across its languages, in order of first mention; destinations node(id:) does not resolve are dropped."
+  references: NodeConnection!
+}
+
+extend type Query {
+  "The prose authored for the entity `uri` names (an absolute IRI), or null when it has none."
+  prose(uri: ID!): Prose
+}

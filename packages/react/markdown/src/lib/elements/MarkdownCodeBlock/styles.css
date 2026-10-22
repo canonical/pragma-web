@@ -1,0 +1,20 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.markdown-code-block {
+    --markdown-code-block-color-background: var(--color-foreground-secondary);
+    --markdown-code-block-padding: var(--dimension-100);
+    --markdown-code-block-border-radius: var(--dimension-radius-small);
+
+    /* The `<code>` inside is an inline code element. Re-pointing its tokens at
+       the block's own surface makes it blend into the block rather than draw
+       a second chip of background and padding on every line. */
+    --inline-code-color-background: var(--markdown-code-block-color-background);
+    --inline-code-padding-inline: 0;
+
+    overflow-x: auto;
+    padding: var(--markdown-code-block-padding);
+    border-radius: var(--markdown-code-block-border-radius);
+    background-color: var(--markdown-code-block-color-background);
+  }
+}

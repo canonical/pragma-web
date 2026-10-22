@@ -51,7 +51,7 @@ import {
   definitionsExplorerRecordsProperty,
 } from "../../../testing/definitionsRecords.js";
 import mergeRecordMaps from "../../../testing/mergeRecordMaps.js";
-import standardsIndexRecords from "../../domains/lenses/standards/__fixtures__/standardsIndexRecords.js";
+import { standardsIndexRecords } from "../../../testing/standardsRecords.js";
 import { appRoutes, middleware, notFoundRoute } from "../../routes.js";
 
 (

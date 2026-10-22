@@ -1,0 +1,33 @@
+/**
+ * The composed index on the server: a warm store renders the group section
+ * and the pagination affordance to static markup, with no client script. No
+ * jump-link nav: the captured store is a single group, and the nav renders
+ * only when there is more than one.
+ */
+
+import { renderToString } from "react-dom/server";
+import { describe, expect, it } from "vitest";
+import createFetchSpy from "../../../testing/createFetchSpy.js";
+import createStandardsPage from "../../../testing/createStandardsPage.js";
+import { STANDARDS_BINDING_FIXTURE } from "../../../testing/fixtures.js";
+import standardsIndexRecords from "../../../testing/records/standardsIndexRecords.js";
+import { StandardsPage } from "../StandardsPage/index.js";
+
+describe("StandardsIndex on the server", () => {
+  it("renders the group section and Load more", () => {
+    const fetchFn = createFetchSpy();
+    const html = renderToString(
+      createStandardsPage(
+        "/standards",
+        standardsIndexRecords,
+        fetchFn,
+        <StandardsPage classUri={STANDARDS_BINDING_FIXTURE.classUri} />,
+      ),
+    );
+    expect(html).toContain('data-region="canvas"');
+    expect(html).toContain('id="standards-group-codestandard"');
+    expect(html).not.toContain('data-region="secondary-nav"');
+    expect(html).toContain("Load more");
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+});

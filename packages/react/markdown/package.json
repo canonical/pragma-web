@@ -1,0 +1,99 @@
+{
+  "name": "@canonical/react-markdown",
+  "description": "Renders Markdown and MDX through design-system elements, with one components map for both",
+  "version": "0.44.1",
+  "type": "module",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js"
+    },
+    "./mdx": {
+      "types": "./dist/types/lib/MdxProvider/index.d.ts",
+      "import": "./dist/esm/lib/MdxProvider/index.js"
+    },
+    "./mdx/vite": {
+      "types": "./dist/types/lib/createMdxVitePreset/index.d.ts",
+      "import": "./dist/esm/lib/createMdxVitePreset/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "author": {
+    "email": "webteam@canonical.com",
+    "name": "Canonical Webteam"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/canonical/pragma-web"
+  },
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/canonical/pragma-web/issues"
+  },
+  "homepage": "https://github.com/canonical/pragma-web#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && copyfiles -u 1 'src/lib/{,**/}*.css' dist/esm",
+    "build:all": "bun run build",
+    "check": "bun run check:biome && bun run check:ts && bun run check:webarchitect",
+    "check:webarchitect": "webarchitect package-react",
+    "check:fix": "bun run check:biome:fix && bun run check:ts",
+    "check:biome": "biome check",
+    "check:biome:fix": "biome check --write",
+    "check:ts": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@canonical/react-ds-global": "^0.44.1",
+    "@mdx-js/rollup": "^3.1.1",
+    "@types/hast": "^3.0.4",
+    "@types/mdast": "^4.0.4",
+    "hast-util-to-string": "^3.0.1",
+    "react": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "rehype-sanitize": "^6.0.0",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0"
+  },
+  "peerDependencies": {
+    "vite": "^8.0.1"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0",
+    "@canonical/typescript-config-react": "^0.44.1",
+    "@canonical/vitest-config-react": "^0.44.1",
+    "@canonical/webarchitect": "0.43.0",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.0",
+    "@vitest/coverage-v8": "^5.0.0",
+    "copyfiles": "^2.4.1",
+    "jsdom": "^28.1.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.0.1",
+    "vitest": "^5.0.0"
+  }
+}

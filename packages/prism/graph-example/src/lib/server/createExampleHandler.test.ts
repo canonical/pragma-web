@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createExampleProvider } from "../provider/index.js";
+import {
+  createExampleProvider,
+  LOCALE_HEADER,
+  MULTILINGUAL_ENTITY_URI,
+} from "../provider/index.js";
 import { createExampleHandler } from "./createExampleHandler.js";
 
 const provider = createExampleProvider();
@@ -78,6 +82,39 @@ describe("POST", () => {
   });
 });
 
+describe("the request's locale", () => {
+  const PROSE = `{ prose(uri: "${MULTILINGUAL_ENTITY_URI}") { lang markdown } }`;
+
+  /** POST the prose query with `headers` and return its `prose`. */
+  const askProse = async (headers: Record<string, string>) => {
+    const handler = createExampleHandler(provider);
+    const response = await handler(
+      post(
+        { query: PROSE },
+        { headers: { "Content-Type": "application/json", ...headers } },
+      ),
+    );
+    const body = (await response.json()) as {
+      data: { prose: { lang: string; markdown: string } };
+    };
+    return body.data.prose;
+  };
+
+  it("reaches Prose.lang and Prose.markdown through x-prism-locale", async () => {
+    const prose = await askProse({ "x-prism-locale": "fr" });
+    expect(prose.lang).toBe("fr");
+    expect(prose.markdown).toContain("Porte-Nord");
+  });
+
+  it("falls back to the default language without the header", async () => {
+    expect((await askProse({})).lang).toBe("en");
+  });
+
+  it("treats a malformed header as no header", async () => {
+    expect((await askProse({ "x-prism-locale": "FR" })).lang).toBe("en");
+  });
+});
+
 describe("GET", () => {
   it("serves GraphiQL when enabled", async () => {
     const handler = createExampleHandler(provider, { graphiql: true });
@@ -118,6 +155,19 @@ describe("CORS", () => {
     expect(response.headers.get("Access-Control-Allow-Methods")).toBe(
       "GET, POST, OPTIONS",
     );
+  });
+
+  it("allows the locale header in a preflight", async () => {
+    const handler = createExampleHandler(provider, { cors: true });
+    const response = await handler(
+      new Request("http://localhost/graphql", { method: "OPTIONS" }),
+    );
+    expect(
+      response.headers
+        .get("Access-Control-Allow-Headers")
+        ?.split(",")
+        .map((name) => name.trim().toLowerCase()),
+    ).toEqual(["content-type", "accept", LOCALE_HEADER]);
   });
 
   it("sends no allow headers when disabled", async () => {

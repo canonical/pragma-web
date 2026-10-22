@@ -300,6 +300,27 @@ export const exampleDataset: ExampleDataset = {
       platformCount: 4,
       location: { latitude: 51.5412, longitude: -0.1435 },
       servesLine: [`${METRO_NAMESPACE}north-line`],
+      // Two languages again, so `Prose.lang` and `markdown(lang:)` have a
+      // choice to make. The links cover every way a reference is written: a
+      // CURIE, a CURIE in the second namespace, a full IRI and a class. The
+      // code span and the external link must not resolve.
+      prose: {
+        en: `# Northgate
+
+The northern terminus of the [North Line](metro:north-line), in the
+[Central Zone](geo:central-zone). Change at Central Exchange for the
+[Circle Line](https://metro.example/onto#circle-line).
+
+Like every [station](metro:Station), it is written
+\`[Coastal Line](metro:coastal-line)\` in a timetable's source.
+
+Fares are set by the [transport authority](https://transport.example/fares).
+`,
+        fr: `# Porte-Nord
+
+Le terminus nord de la [ligne Nord](metro:north-line).
+`,
+      },
     },
     {
       uri: `${METRO_NAMESPACE}harbourside`,

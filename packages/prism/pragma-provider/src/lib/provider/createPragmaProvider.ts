@@ -67,11 +67,18 @@ import { relative } from "node:path";
 import { createStore, type Plugin } from "@canonical/ke";
 import {
   createSchemaPlugin,
+  createStoreQueryFn,
   type SchemaPluginApi,
 } from "@canonical/ke-graphql";
 import { createGraphQLHandler } from "@canonical/ke-graphql/http";
 import type { PragmaProvider, PragmaProviderOptions } from "../config/index.js";
 import {
+  bindProseSidecars,
+  createProseExtensions,
+  readRequestLocale,
+} from "../prose/index.js";
+import {
+  collectProseSidecars,
   collectTtlSources,
   describeRefRoots,
   harvestPrefixes,
@@ -91,7 +98,8 @@ const PROVIDER = "@canonical/prism-pragma-provider";
 /**
  * Boot the store, compile the schema, and build the fetch handler.
  *
- * @note Impure — reads the source cache, boots an Oxigraph WASM store, and
+ * @note Impure — reads the source cache and the prose sidecars beside it,
+ * boots an Oxigraph WASM store, queries it once to bind the sidecars, and
  * writes the emitted SDL **only** when `sdlOutput` is given.
  */
 export const createPragmaProvider = async (
@@ -104,8 +112,12 @@ export const createPragmaProvider = async (
     // the caller saying "the ref packages alone", and is passed through.
     semRoot: options.semRoot === undefined ? resolveSemRoot() : options.semRoot,
   });
+  const sidecars = collectProseSidecars(refRoots);
   const prefixes = harvestPrefixes(sources);
   const graphql = createSchemaPlugin({
+    // `Prose` and `Query.prose(uri:)`: Markdown sidecars served beside the
+    // compiled graph. See `createProseExtensions` for why a root field.
+    extensions: createProseExtensions(),
     incremental: true,
     mode: MODE,
     prefixing: PREFIXING,
@@ -134,8 +146,25 @@ export const createPragmaProvider = async (
   if (!api) {
     throw new Error("ke-graphql plugin did not register its API");
   }
+  const binding = await bindProseSidecars({
+    sidecars,
+    sources,
+    prefixes,
+    query: createStoreQueryFn(store),
+  });
+  for (const path of binding.unbound) {
+    console.warn(
+      `[graphql] prose sidecar ${path} names no entity in the graph and is not served. A sidecar is named after the local name of an entity the Turtle in its directory declares (<name>.md, or <name>.<lang>.md for a translation).`,
+    );
+  }
   const handle = createGraphQLHandler(api.schema, {
-    context: () => api.createContext(store),
+    // A fresh context per request: ke-graphql's loaders, plus what the prose
+    // resolvers read. The locale comes from the request, never from state.
+    context: (request) => ({
+      ...api.createContext(store),
+      locale: readRequestLocale(request),
+      proseIndex: binding.index,
+    }),
     graphiql: true,
     cors: true,
     incremental: true,
@@ -145,7 +174,7 @@ export const createPragmaProvider = async (
       ? "SDL output disabled (no sdlOutput given)"
       : `SDL written to ${relative(process.cwd(), options.sdlOutput)}`;
   console.info(
-    `[graphql] schema compiled from ${sources.length} TTL sources (${api.diagnostics.length} diagnostics) — ${destination}`,
+    `[graphql] schema compiled from ${sources.length} TTL sources (${api.diagnostics.length} diagnostics), ${sidecars.length - binding.unbound.length} prose sidecars bound — ${destination}`,
   );
   return { handle, api };
 };
