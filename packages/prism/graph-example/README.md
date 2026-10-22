@@ -64,8 +64,10 @@ implementers. That extension is precisely what the contract's superset rule exis
 const sdl = readContractSdl() + readExtensionSdl();   // src/lib/provider/providerSdl.ts
 ```
 
-`schema/extension.graphql` adds `Line`, `Station`, `Interchange`, `Zone` and the
-embeddable `GeoPoint`. `findBreakingChanges(contractOnly, extended)` returns zero, and
+`schema/extension.graphql` adds the `Node` implementers `Line`, `Station`,
+`Interchange` and `Zone`, the `Stop` interface over the two station types, and four
+value types with no IRI of their own: the embeddable `GeoPoint`, and `Route`, `Call` and
+`DiagramPoint`, which carry the network model (see below). `findBreakingChanges(contractOnly, extended)` returns zero, and
 `satisfiesContract(readProviderSdl())` returns **zero violations**.
 
 **Note what the extension does *not* contain: `extend type Query`.** Every type this
@@ -98,7 +100,10 @@ and a data file" literally true.
 | `rdfs:Class`, the metaclass | `EntityMeta.type` on an `OntologyClass` — see Finding B |
 | `geo:Zone` with real instances, in the **second** namespace | `_meta.curie` must resolve a prefix per entity, not hardcode one |
 | `metro:name` (DATATYPE, no domain), `metro:servesLine` (OBJECT, with `inverse`), `metro:note` (ANNOTATION) | all three `PropertyKind` values, `functional`, `inverse`, nullable `domain` |
-| 14 stations + 2 interchanges + 2 fare zones | `instances(first/after/last/before)` with real `hasNextPage` |
+| 23 stations + 4 interchanges + 2 fare zones, 7 lines | `instances(first/after/last/before)` with real `hasNextPage` |
+| four line topologies: linear lines (North, Coastal), a loop run both ways (Circle), two linear lines closing a ring between shared termini (Upland, Lowland), a ring run by two lines in opposite directions (Ringway Clockwise, Ringway Anticlockwise) | the network model a map or a line strip needs — see the network section |
+| `metro:Route`, `metro:Call`, `metro:DiagramPoint`, value classes with no instances | `_meta` on a value type: `type` resolved, `curie` the typename, `title` the label or the typename |
+| `metro:reverse`, declared its own `inverse` | a symmetric property: `OntologyProperty.inverse` pointing at itself |
 | `metro:ghost` — **no descriptive predicates at all** | the local-name tier of `_meta.title` |
 | `https://metro.example/onto#` — **IRI with an empty local name** | the whole-IRI tier of `_meta.title` |
 | `geo:GeoPoint`, an embeddable with no `uri` | the typename tier of `_meta.title` |
@@ -108,6 +113,45 @@ and a data file" literally true.
 The embeddable is **not required by the contract** — nothing in the contract references a
 non-Node value type. It is here to reach `_meta.title`'s last tier and to show that a
 provider may add value types freely.
+
+---
+
+## The network: routes, calls and the diagram
+
+The lines carry enough structure to draw a schematic map and a line strip from GraphQL
+alone. The model is a provider extension: the contract is unchanged, and every type is
+reached through `node(id:)` and `OntologyClass.instances` like the rest.
+
+- **Direction is data.** A `Line` has `routes`, and each `Route` is one direction of the
+  line's service. The route, not the line, carries the ordered `calls`, so a line that
+  runs both ways has two routes, each in the order a passenger meets the stops.
+- **`Route.label`** is the name shown to passengers ("To Marsh End", "Clockwise"). It is
+  the route's `rdfs:label`, so it agrees with `_meta.label` and `_meta.title`.
+- **`Route.isLoop`** means the service continues from the last call back to the first.
+  The first stop is never repeated at the end.
+- **`Route.reverse`** is the same line's route over the same stops the other way. For a
+  loop that is the same first stop with the rest reversed. It is null when the line runs
+  one direction only: a ring run by two lines in opposite directions is two lines, so
+  neither route has a reverse. `metro:reverse` is symmetric, and declared its own
+  inverse.
+- **`Call.position`** counts from 1, with no gaps.
+- **`Line.code`** is the short code passengers know the line by, and **`Line.colour`** a
+  lowercase `#rrggbb` triplet. Both are non-null.
+- **`Stop.diagramPosition`** is a `DiagramPoint` in whole grid units on a schematic, not
+  a geography (`Stop.location` is the geography). The origin is the north-west corner,
+  `x` grows east and `y` grows south, the orientation of a screen, so a drawing needs no
+  flip; the network is anchored so its smallest `x` and `y` are both 0. Every segment
+  between consecutive calls, and the closing segment of a loop, is horizontal, vertical
+  or diagonal. The 25 routed stations have a position; the two bare stations have none.
+- **`servesLine` and `servedBy` agree with the calls.** Each is stated in the dataset,
+  and `src/testing/integration/lineMembership.test.ts` derives each from the routes and
+  requires them to match. A station where lines serving different stops meet is an
+  interchange; the Ringway stations are served by two lines over the same stops, so they
+  stay plain stations.
+
+One integration test per topology (`lineTopologies.test.ts`) and one for the diagram's
+geometry (`networkDiagram.test.ts`) read the network through GraphQL, never from the
+dataset file.
 
 ---
 
@@ -156,14 +200,17 @@ it is a *consequence*, and it should be stated rather than discovered. Measured 
 
 | Region | Code lines |
 | --- | --- |
-| TBox views and traversal (`ancestorsOf`, `fieldsOf`, `propertyView`, `classPropertyView`, `classView`, `nullableClassView`, `superclassOf`) | **94** |
-| the `_meta` wrapper itself (`metaView`) | **17** |
-| **total attributable to the non-null TBox** | **111** |
-| everything else in the function body (entities, connections, ontologies, root fields) | 122 |
+| TBox views and traversal (`ancestorsOf`, `fieldsOf`, `propertyView`, `classPropertyView`, `classView`, `nullableClassView`, `superclassOf`) | **95** |
+| the `_meta` wrapper itself (`metaView`) | **20** |
+| **total attributable to the non-null TBox** | **115** |
+| everything else in the function body (entities, routes, calls, diagram points, connections, ontologies, root fields) | 206 |
 
-Nearly half the provider is TBox machinery that exists only because those two fields are
-non-null. A `type: OntologyClass` (nullable) and `fields: [ClassProperty!]` (nullable)
-would let a flat-record provider conform in roughly half the code.
+Each region counts the code lines from a declaration to the next one in the function
+body, with the filter given under Size below. More than a third of the function body
+(115 of 321 lines) is TBox machinery that exists only because those two fields are
+non-null. A `type: OntologyClass` (nullable) and
+`fields: [ClassProperty!]` (nullable) would let a flat-record provider conform with
+roughly a third less code.
 
 One side effect worth naming: because `OntologyClass` itself implements `Node`, a class
 needs a class. This dataset declares `rdfs:Class` for that, which is an instance of
@@ -252,21 +299,32 @@ The ticket's premise was "a provider is ~150–200 lines and a data file". Here 
 actually took. Code lines exclude blank lines and comments; "with docs" is the physical
 file length in this repo's TSDoc-heavy house style.
 
+The counts are taken with these commands, from the package root, so they can be taken
+again rather than estimated:
+
+```bash
+grep -cvE '^\s*($|//|/\*|\*)' src/lib/provider/createExampleProvider.ts   # TypeScript
+awk '/^"""/{d=!d;next} !d && !/^[[:space:]]*(#|$)/' schema/extension.graphql | wc -l   # SDL
+wc -l src/lib/provider/createExampleProvider.ts   # with docs
+```
+
 | Module set | Code | With docs |
 | --- | --- | --- |
-| `createExampleProvider.ts` | 304 | 466 |
-| `connection.ts` (Relay paging) | 47 | 90 |
-| `providerSdl.ts` (SDL loading) | 33 | 70 |
-| `descriptive.ts` (**the whole `_meta.title` chain**) | **26** | 54 |
-| barrels | 10 | 10 |
-| **provider runtime total** | **420** | **690** |
-| `dataset.ts` (the data file — inert records) | 372 | 446 |
-| `types.ts` + `constants.ts` (declarations only) | 71 | 153 |
-| HTTP server (`createExampleHandler` + GraphiQL) | 95 | 140 |
-| `schema/extension.graphql` | 82 | 88 |
-| tests + test infrastructure | 1836 | 2208 |
+| `createExampleProvider.ts` | 374 | 573 |
+| `connection.ts` (Relay paging) | 58 | 126 |
+| `providerSdl.ts` (SDL loading) | 33 | 79 |
+| `descriptive.ts` (**the whole `_meta.title` chain**) | **28** | 64 |
+| barrels (the four `index.ts`) | 16 | 53 |
+| **provider runtime total** | **509** | **895** |
+| `dataset.ts` (the data file — inert records) | 888 | 984 |
+| `types.ts` + `constants.ts` (declarations only) | 90 | 204 |
+| HTTP server (`createExampleHandler` + GraphiQL) | 95 | 161 |
+| `schema/extension.graphql` | 67 | 191 |
+| tests + test infrastructure (every `*.test.ts` and `src/testing/*.ts`) | 2959 | 3842 |
 
-**420 code lines against a 150–200 target — roughly 2.1×.**
+**509 code lines against a 150–200 target — roughly 2.5×.** 69 of them serve this
+provider's own network model (routes, calls and diagram points) rather than the contract;
+without it the provider is 440 lines, roughly 2.2×.
 Where it goes, and which parts are anybody's fault:
 
 1. **The contract declares 54 fields** across `Node`, `EntityMeta`, `PageInfo`,
@@ -277,14 +335,14 @@ Where it goes, and which parts are anybody's fault:
    to have been set without counting the contract's surface. That is the main correction
    to the original estimate, and it means the target should be restated as a function of
    the contract's size rather than as a constant.
-2. **The mandatory TBox (Finding B) is 111 of those lines** — 95 of TBox views and
-   traversal plus the 16-line `_meta` wrapper, out of a 258-line function body. This is
+2. **The mandatory TBox (Finding B) is 115 of those lines** — 95 of TBox views and
+   traversal plus the 20-line `_meta` wrapper, out of a 321-line function body. This is
    the one number that is genuinely evidence *about the converged base*, and the only one
    a contract change could meaningfully reduce.
-3. **Relay paging is 47 lines and is not the base's fault.** `first/after/last/before` on
+3. **Relay paging is 58 lines and is not the base's fault.** `first/after/last/before` on
    `OntologyClass.instances` is Relay's cost and would be present in any
    connection-shaped specification.
-4. **`_meta.title` is 26 lines including all five fallback tiers and its TSDoc**, and
+4. **`_meta.title` is 28 code lines including all five fallback tiers**, and
    **`_meta.curie` is 8** — the two totality obligations the ticket most suspected both
    came out cheap. The expensive obligation was the one nobody flagged: the non-null TBox.
 5. **The two new fields cost ~12 lines of permanent code between them** (`curieOf` 8,
