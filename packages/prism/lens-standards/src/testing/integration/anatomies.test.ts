@@ -18,8 +18,14 @@ const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
 const folders = listAnatomyFolders([UI_DIRECTORY]);
 
 describe("the lens's components", () => {
-  it("are listed from src/lib/ui, where each carries its anatomy", () => {
-    expect(Array.isArray(folders)).toBe(true);
+  // The lens's components still sit directly under src/lib, with no anatomy
+  // and no stories, and none has been scaffolded under src/lib/ui yet; their
+  // stylesheets are held to the lens's own stylesheet census meanwhile. The
+  // list is pinned empty, so the first component scaffolded under src/lib/ui
+  // fails here until this expectation names it, and from then on every one is
+  // checked below.
+  it("are none under src/lib/ui yet", () => {
+    expect(folders).toEqual([]);
   });
 
   for (const folder of folders) {
