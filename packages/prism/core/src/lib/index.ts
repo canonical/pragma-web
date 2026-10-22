@@ -40,8 +40,6 @@ export type {
 export { LensBreadcrumbs, makeLensContext } from "./LensBreadcrumbs/index.js";
 export type { ModeStripProps } from "./ModeStrip/index.js";
 export { ModeStrip } from "./ModeStrip/index.js";
-export type { RailBrand, RailProps } from "./Rail/index.js";
-export { Rail } from "./Rail/index.js";
 export type {
   CreateEnvironmentOptions,
   PreparedRelayData,
@@ -63,8 +61,8 @@ export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
 export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
 export { ThemeSelector } from "./ThemeSelector/index.js";
-export type { RouterLinkProps } from "./ui/index.js";
-export { RouterLink } from "./ui/index.js";
+export type { RailBrand, RailProps, RouterLinkProps } from "./ui/index.js";
+export { Rail, RouterLink } from "./ui/index.js";
 export type {
   QuadArc,
   RelaxOptions,

@@ -72,12 +72,14 @@ export function GlossaryLayout() {
 ```
 
 The rail reads its lenses from the route table it is given and wires each
-lens's shortcut key itself. Its `children` render at its foot as the site's
-utility cluster, styled from a class contract: a `p.utilities-label`
-heading, a `ul.utilities` labelled by it, `a.item.util`
-links (icon plus `span.label`) and an `li.theme` for a control
-such as `ThemeSelector`, whose `.ds.theme-selector` root shrinks with the
-collapsed rail.
+lens's shortcut key itself, showing each key as a `KeyboardKey`. It does
+not place itself: a layout puts it in a region that spans the first two
+columns and scrolls on its own. Its `children` render at its foot as the
+site's utility cluster, styled from a class contract: a `p.utilities-label`
+heading, a `ul.utilities` labelled by it, `a.item` links (a `span.icon`
+plus a `span.label`, as a lens entry) and an `li.theme` cell that stretches
+a control such as `ThemeSelector` to the rail's width. Below one group of
+columns the labels, hints and headings hide and the icons stay.
 
 ### Stylesheets
 

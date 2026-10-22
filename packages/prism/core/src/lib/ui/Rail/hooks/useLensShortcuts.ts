@@ -2,7 +2,7 @@ import { usePreferredShortcuts } from "@canonical/react-hooks";
 import type { RouteName } from "@canonical/router-core";
 import { type RegisteredRouteMap, useRouter } from "@canonical/router-react";
 import { useEffect, useMemo } from "react";
-import { collectShortcuts } from "../../routeShortcut/index.js";
+import { collectShortcuts } from "../../../routeShortcut/index.js";
 import type { UseLensShortcutsResult } from "./types.js";
 
 /** Whether a keystroke landed in a control the reader is typing into. */
