@@ -9,6 +9,12 @@
 @layer app {
   /* Every page: the top bar, then the area a page layout fills. */
   .page-frame {
+    /* The top bar's height, shared with the application shell so the side
+       panels it opens start below the bar rather than over it. Twelve
+       baseline units: the selectors' 40px chrome plus the bar's padding. */
+    --top-bar-block-size: calc(var(--space-baseline) * 12);
+    --application-shell-overlay-inset-block-start: var(--top-bar-block-size);
+
     display: grid;
     grid-template-rows: auto 1fr;
     min-block-size: 100dvh;

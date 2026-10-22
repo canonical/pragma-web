@@ -170,19 +170,17 @@ export default function InstancesPage(): ReactElement {
           </Form>
         </SidePanel.Content>
         <SidePanel.Footer>
-          <div className="actions">
-            <Button onClick={() => panelRef.current?.close()}>
-              {t("dashboard.cancel")}
-            </Button>
-            <Button
-              anticipation="constructive"
-              form="create-instance"
-              importance="primary"
-              type="submit"
-            >
-              {t("dashboard.instances.create")}
-            </Button>
-          </div>
+          <Button onClick={() => panelRef.current?.close()}>
+            {t("dashboard.cancel")}
+          </Button>
+          <Button
+            anticipation="constructive"
+            form="create-instance"
+            importance="primary"
+            type="submit"
+          >
+            {t("dashboard.instances.create")}
+          </Button>
         </SidePanel.Footer>
       </SidePanel>
     </ViewLayout>

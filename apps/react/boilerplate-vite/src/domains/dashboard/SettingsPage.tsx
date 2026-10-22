@@ -104,19 +104,17 @@ export default function SettingsPage(): ReactElement {
           </p>
         </Modal.Content>
         <Modal.Footer>
-          <div className="actions">
-            <Button importance="tertiary" onClick={closeModal}>
-              {t("dashboard.cancel")}
-            </Button>
-            <Button
-              anticipation="destructive"
-              icon="delete"
-              importance="primary"
-              onClick={closeModal}
-            >
-              {t("dashboard.settings.delete")}
-            </Button>
-          </div>
+          <Button importance="tertiary" onClick={closeModal}>
+            {t("dashboard.cancel")}
+          </Button>
+          <Button
+            anticipation="destructive"
+            icon="delete"
+            importance="primary"
+            onClick={closeModal}
+          >
+            {t("dashboard.settings.delete")}
+          </Button>
         </Modal.Footer>
       </Modal>
     </ViewLayout>

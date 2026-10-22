@@ -1,11 +1,14 @@
 @layer app {
   .ds.top-bar {
+    /* Exactly the height the page reserves for it, border included, with the
+       content centred in it; on a phone it grows with its wrapped rows. */
+    box-sizing: border-box;
+    block-size: var(--top-bar-block-size, auto);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--container-gap-default);
     padding-inline: var(--grid-margin);
-    padding-block: var(--space-100);
     border-block-end: var(--dimension-stroke-thickness-medium) solid
       var(--color-border);
 
@@ -36,6 +39,8 @@
 
     /* On a phone the name takes its own row above the links. */
     @media (width < 620px) {
+      block-size: auto;
+      padding-block: var(--space-100);
       flex-direction: column;
       align-items: stretch;
       gap: var(--space-100);
