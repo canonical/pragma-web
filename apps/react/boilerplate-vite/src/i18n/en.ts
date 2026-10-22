@@ -10,6 +10,7 @@ import type { Messages } from "@canonical/i18n-core";
  * `vars.count` through `Intl.PluralRules`.
  */
 const en = {
+  "app.name": "Boilerplate",
   "nav.label": "Main",
   "nav.home": "Home",
   "nav.guide": "Guide",

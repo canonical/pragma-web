@@ -7,20 +7,20 @@
  * this file lands after it. Keep that import first. */
 
 @layer app {
-  .app-shell {
+  /* Every page: the top bar, then the area a page layout fills. */
+  .page-frame {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-block-size: 100dvh;
+  }
+
+  /* The public pages: one constrained column. */
+  .public-content {
+    box-sizing: border-box;
+    inline-size: 100%;
     max-width: 1280px;
     margin: 0 auto;
-    padding-inline: var(--grid-gap, 1.5rem);
-    padding-block: var(--container-gap-loose, 1.5rem);
-  }
-
-  .shell-header {
-    padding-block-end: var(--container-gap-default, 1rem);
-  }
-
-  .shell-header nav {
-    grid-column: 1 / -1;
-    display: flex;
-    gap: var(--container-gap-default, 1rem);
+    padding-inline: var(--grid-margin);
+    padding-block: var(--container-gap-loose);
   }
 }

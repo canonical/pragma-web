@@ -6,6 +6,7 @@ import type { MessageKey } from "./en.js";
  * never drift apart silently.
  */
 const fr: Record<MessageKey, MessageValue> = {
+  "app.name": "Boilerplate",
   "nav.label": "Principale",
   "nav.home": "Accueil",
   "nav.guide": "Guide",

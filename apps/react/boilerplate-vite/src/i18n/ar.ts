@@ -10,6 +10,7 @@ import type { MessageKey } from "./en.js";
  * which `Intl.PluralRules("ar")` selects from at runtime.
  */
 const ar: Record<MessageKey, MessageValue> = {
+  "app.name": "Boilerplate",
   "nav.label": "رئيسي",
   "nav.home": "الرئيسية",
   "nav.guide": "الدليل",

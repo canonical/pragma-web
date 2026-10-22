@@ -17,7 +17,7 @@ import { PAGE_SIZE, productListQuery } from "#domains/catalog/ProductList.js";
 import catalogRoutes from "#domains/catalog/routes.js";
 import contactRoutes from "#domains/contact/routes.js";
 import marketingRoutes from "#domains/marketing/routes.js";
-import Navigation from "#lib/Navigation/index.js";
+import TopBar from "#lib/TopBar/index.js";
 import type { RelaySeedPayload } from "#relay/environment.js";
 
 const protectedPaths = new Set(["/account"]);
@@ -78,15 +78,25 @@ export function withAuth(loginPath: string): RouteMiddleware {
   };
 }
 
+/**
+ * The outer frame of every page except the 404: the top bar, then whichever
+ * page layout the route's group adds inside it.
+ */
+const topBarLayout = wrapper<ReactElement>({
+  id: "top-bar-layout",
+  component: ({ children }: { children: ReactNode }) => (
+    <div className="page-frame">
+      <TopBar />
+      {children}
+    </div>
+  ),
+});
+
+/** The public pages' layout: one constrained column under the top bar. */
 const publicLayout = wrapper<ReactElement>({
   id: "public-layout",
   component: ({ children }: { children: ReactNode }) => (
-    <div className="subgrid app-shell">
-      <header className="subgrid shell-header">
-        <Navigation />
-      </header>
-      <main className="subgrid">{children}</main>
-    </div>
+    <main className="subgrid public-content">{children}</main>
   ),
 });
 
@@ -107,19 +117,25 @@ const notFoundRoute = route({
   content: NotFoundPage,
 });
 
-const [guide, home] = group(publicLayout, [
-  marketingRoutes.guide,
-  marketingRoutes.home,
-] as const);
+const [guide, home] = group(
+  topBarLayout,
+  group(publicLayout, [marketingRoutes.guide, marketingRoutes.home] as const),
+);
 
-const [account, login] = group(publicLayout, [
-  accountRoutes.account,
-  accountRoutes.login,
-] as const);
+const [account, login] = group(
+  topBarLayout,
+  group(publicLayout, [accountRoutes.account, accountRoutes.login] as const),
+);
 
-const [contact] = group(publicLayout, [contactRoutes.contact] as const);
+const [contact] = group(
+  topBarLayout,
+  group(publicLayout, [contactRoutes.contact] as const),
+);
 
-const [catalog] = group(publicLayout, [catalogRoutes.catalog] as const);
+const [catalog] = group(
+  topBarLayout,
+  group(publicLayout, [catalogRoutes.catalog] as const),
+);
 
 // Static redirect route: matched entirely from the URL, no content — the
 // router (and the SSR disposition helper) answers with a real 301. Static
