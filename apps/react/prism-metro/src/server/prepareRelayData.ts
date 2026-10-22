@@ -3,7 +3,7 @@ import {
   prepareRelayData as prepareRouteData,
 } from "@canonical/prism-core";
 import { appRoutes, notFoundRoute } from "../routes.js";
-import selectRoutableUrl from "./selectRoutableUrl.js";
+import selectRoutableUrl from "../selectRoutableUrl.js";
 
 /**
  * The site's server-side data prepare step: prism-core's prepare step bound

@@ -1,6 +1,6 @@
 import { createStaticRouter } from "@canonical/prism-core";
 import { appRoutes, notFoundRoute } from "../routes.js";
-import selectRoutableUrl from "./selectRoutableUrl.js";
+import selectRoutableUrl from "../selectRoutableUrl.js";
 
 /**
  * The HTTP status the routed document deserves: the matched route's status,
