@@ -35,6 +35,10 @@ its stylesheet transcribes.
   optional badge, icon and disclosure chevron.
 - **`EntityRow`**: the list entry, a 32px row of an index: the namespace
   prefix and the title, then one muted word at the end.
+- **`EntityCard`**: the card, built on the published `Card`: location, the
+  title and the entity it belongs to, kind, summary, key values and the
+  footer's vitals, and an optional sidecar beside them, two columns wide,
+  for a rendered example of the entity.
 
 ## Installation
 
@@ -219,8 +223,9 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
   `CardProjectionProps`, `CommandProjectionProps`.
-- Representations: `EntityChip`, `EntityRow`; types `EntityChipProps`,
-  `EntityRowProps`.
+- Representations: `EntityChip`, `EntityRow`, `EntityCard`; types
+  `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
+  `EntityCardKeyValue`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

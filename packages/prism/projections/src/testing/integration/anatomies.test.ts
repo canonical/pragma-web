@@ -27,11 +27,17 @@ const NODE_TOKENS = ["--color-border-muted", "--color-text-muted"];
 
 /** The semantic tokens the generic representations read beyond the shim. */
 const UI_TOKENS = [
+  "--card-span",
+  "--color-background-layer2",
   "--color-border",
+  "--color-border-muted",
   "--color-foreground-secondary",
   "--color-text-muted",
+  "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-font-size",
+  "--typography-text-primary-font-weight",
   "--typography-text-primary-line-height-dimension",
+  "--typography-text-primary-smallcaps-letter-spacing",
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
@@ -39,6 +45,7 @@ const folders = listAnatomyFolders([UI_DIRECTORY]);
 describe("the package's components", () => {
   it("are the generic representations, each under src/lib/ui", () => {
     expect(folders.map((folder) => basename(folder))).toEqual([
+      "EntityCard",
       "EntityChip",
       "EntityRow",
     ]);
