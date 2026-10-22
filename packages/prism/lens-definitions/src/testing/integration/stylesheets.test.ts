@@ -14,7 +14,8 @@
  *   is a subgrid, so the explorer lands on the same ruler as the site;
  * - no theme is named: a site's theme activates through its own classes;
  * - every component token reads another token, save the ones named here that
- *   hold the lens's own value where the design system has no semantic token;
+ *   hold the lens's own value where the design system has no semantic token,
+ *   each pinned to that value;
  * - the tokens read from outside the lens are exactly the ones named here,
  *   each a semantic token of the design system or a hook the site defines,
  *   so a misspelt, invented or primitive name cannot sit unnoticed behind
@@ -22,13 +23,16 @@
  * - every selector reaches a child through a role class, never through
  *   its element type, so a changed heading level or list element keeps
  *   its styling;
+ * - every class a selector names is one the component's own sources write,
+ *   or another lens component's root class, so a renamed role class cannot
+ *   leave a rule that styles nothing;
  * - no rule declaration holds a unit-bearing literal, so every length, time
  *   and percentage that is a design decision lives in a component token,
  *   save the unthemable declarations named here.
  */
 
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
@@ -53,74 +57,76 @@ const files = collectCss(LIBRARY_DIRECTORY);
 
 /**
  * The component tokens that hold the lens's own value, because the design
- * system has no semantic token for the decision: two layout measures, and
- * the type sizes, the font families, the weights, the tracking, the line
- * heights, the radii, the stroke and edge widths, the focus ring, the
- * arrowhead, the opacities and the indicator size.
+ * system has no semantic token for the decision, each with that value: two
+ * layout measures, and the type sizes, the font families, the weights, the
+ * tracking, the line heights, the radii, the stroke and edge widths, the
+ * focus ring, the arrowhead, the opacities and the indicator size. Pinning
+ * the value, not only the name, makes a changed corner, stroke or type size
+ * a deliberate edit here rather than a silent one in a stylesheet.
  */
-const LITERAL_TOKENS = [
-  "--definitions-explorer-divider-width",
-  "--definitions-explorer-search-font-size",
-  "--definitions-explorer-well-min-block-size",
-  "--explorer-controls-chip-border-width",
-  "--explorer-controls-chip-font-size",
-  "--explorer-controls-chip-line-height",
-  "--explorer-controls-chip-outline-offset",
-  "--explorer-controls-chip-outline-width",
-  "--explorer-controls-chip-radius",
-  "--explorer-controls-swatch-size",
-  "--explorer-status-bar-radius",
-  "--explorer-status-font-size",
-  "--hierarchy-well-accent-width",
-  "--hierarchy-well-ambient-opacity",
-  "--hierarchy-well-caption-font-size",
-  "--hierarchy-well-caption-font-weight",
-  "--hierarchy-well-caption-letter-spacing",
-  "--hierarchy-well-caption-opacity",
-  "--hierarchy-well-edge-faded-opacity",
-  "--hierarchy-well-hint-font-size",
-  "--hierarchy-well-hint-radius",
-  "--hierarchy-well-label-font-family",
-  "--hierarchy-well-label-font-size",
-  "--hierarchy-well-label-halo-width",
-  "--hierarchy-well-line-width",
-  "--lineage-line-height",
-  "--lineage-self-font-weight",
-  "--term-inspector-border-width",
-  "--term-inspector-definition-font-size",
-  "--term-inspector-font-size",
-  "--term-inspector-label-font-size",
-  "--term-inspector-label-letter-spacing",
-  "--term-inspector-radius",
-  "--term-node-border-width",
-  "--term-node-faded-opacity",
-  "--term-node-font-size",
-  "--term-node-radius",
-  "--term-node-selected-border-width",
-  "--term-node-selected-font-weight",
-  "--term-node-tag-font-size",
-  "--term-node-tag-letter-spacing",
-  "--term-rail-count-opacity",
-  "--term-rail-current-font-weight",
-  "--term-rail-depth-font-family",
-  "--term-rail-depth-line-height",
-  "--term-rail-dimmed-opacity",
-  "--term-rail-font-size",
-  "--term-rail-item-radius",
-  "--term-rail-label-font-size",
-  "--term-rail-label-letter-spacing",
-  "--term-rail-mark-border-width",
-  "--term-rail-mark-size",
-  "--term-rail-title-font-size",
-  "--well-legend-arrow-half-width",
-  "--well-legend-arrow-length",
-  "--well-legend-arrow-overhang",
-  "--well-legend-border-width",
-  "--well-legend-font-size",
-  "--well-legend-max-inline-size",
-  "--well-legend-radius",
-  "--well-legend-swatch-radius",
-];
+const LITERAL_TOKENS: Readonly<Record<string, string>> = {
+  "--definitions-explorer-divider-width": "1px",
+  "--definitions-explorer-search-font-size": "0.875rem",
+  "--definitions-explorer-well-min-block-size": "12rem",
+  "--explorer-controls-chip-border-width": "1px",
+  "--explorer-controls-chip-font-size": "0.75rem",
+  "--explorer-controls-chip-line-height": "1.4",
+  "--explorer-controls-chip-outline-offset": "2px",
+  "--explorer-controls-chip-outline-width": "2px",
+  "--explorer-controls-chip-radius": "999px",
+  "--explorer-controls-swatch-size": "0.5rem",
+  "--explorer-status-bar-radius": "999px",
+  "--explorer-status-font-size": "0.75rem",
+  "--hierarchy-well-accent-width": "1.8",
+  "--hierarchy-well-ambient-opacity": "0.35",
+  "--hierarchy-well-caption-font-size": "0.9rem",
+  "--hierarchy-well-caption-font-weight": "700",
+  "--hierarchy-well-caption-letter-spacing": "0.12em",
+  "--hierarchy-well-caption-opacity": "0.55",
+  "--hierarchy-well-edge-faded-opacity": "0.06",
+  "--hierarchy-well-hint-font-size": "0.75rem",
+  "--hierarchy-well-hint-radius": "999px",
+  "--hierarchy-well-label-font-family": '"Ubuntu Mono", monospace',
+  "--hierarchy-well-label-font-size": "0.6875rem",
+  "--hierarchy-well-label-halo-width": "3px",
+  "--hierarchy-well-line-width": "1.4",
+  "--lineage-line-height": "1.6",
+  "--lineage-self-font-weight": "600",
+  "--term-inspector-border-width": "1px",
+  "--term-inspector-definition-font-size": "0.8125rem",
+  "--term-inspector-font-size": "0.875rem",
+  "--term-inspector-label-font-size": "0.75rem",
+  "--term-inspector-label-letter-spacing": "0.05em",
+  "--term-inspector-radius": "0.5rem",
+  "--term-node-border-width": "1px",
+  "--term-node-faded-opacity": "0.16",
+  "--term-node-font-size": "0.875rem",
+  "--term-node-radius": "0.5rem",
+  "--term-node-selected-border-width": "2px",
+  "--term-node-selected-font-weight": "600",
+  "--term-node-tag-font-size": "0.5rem",
+  "--term-node-tag-letter-spacing": "0.08em",
+  "--term-rail-count-opacity": "0.75",
+  "--term-rail-current-font-weight": "600",
+  "--term-rail-depth-font-family": "ui-monospace, monospace",
+  "--term-rail-depth-line-height": "1",
+  "--term-rail-dimmed-opacity": "0.38",
+  "--term-rail-font-size": "0.875rem",
+  "--term-rail-item-radius": "0.4375rem",
+  "--term-rail-label-font-size": "0.75rem",
+  "--term-rail-label-letter-spacing": "0.05em",
+  "--term-rail-mark-border-width": "1px",
+  "--term-rail-mark-size": "0.5rem",
+  "--term-rail-title-font-size": "1rem",
+  "--well-legend-arrow-half-width": "3px",
+  "--well-legend-arrow-length": "5px",
+  "--well-legend-arrow-overhang": "1px",
+  "--well-legend-border-width": "1px",
+  "--well-legend-font-size": "0.6875rem",
+  "--well-legend-max-inline-size": "15rem",
+  "--well-legend-radius": "0.5rem",
+  "--well-legend-swatch-radius": "0.1875rem",
+};
 
 /**
  * The tokens the lens reads from outside itself: the design system's
@@ -186,12 +192,18 @@ function listExternalTokens(css: string): string[] {
     .filter((name) => !LENS_PROPERTY.test(name));
 }
 
-/** List the component tokens a stylesheet's `:root` declares with no `var()`. */
-function listLiteralTokens(css: string): string[] {
+/**
+ * List the component tokens a stylesheet's `:root` declares with no `var()`,
+ * as `[name, value]` pairs with the value's whitespace collapsed.
+ */
+function listLiteralTokens(css: string): [string, string][] {
   const root = css.match(/:root\s*\{([^}]*)\}/)?.at(1) ?? "";
   return [...root.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
-    .filter((match) => !(match.at(2) ?? "").includes("var("))
-    .map((match) => match.at(1) ?? "");
+    .map((match): [string, string] => [
+      match.at(1) ?? "",
+      (match.at(2) ?? "").replaceAll(/\s+/g, " ").trim(),
+    ])
+    .filter(([, value]) => !value.includes("var("));
 }
 
 /**
@@ -251,6 +263,60 @@ function listLayoutCapableConditionals(css: string): string[] {
   );
 }
 
+/** Collect the non-test TypeScript sources under `directory`, recursively. */
+function collectSources(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const full = join(directory, entry.name);
+    if (entry.isDirectory()) return collectSources(full);
+    return /\.tsx?$/.test(entry.name) && !/\.test\.tsx?$/.test(entry.name)
+      ? [full]
+      : [];
+  });
+}
+
+/**
+ * List the class-shaped words a source's string literals hold: every quoted
+ * and template string, split on anything a class name cannot contain.
+ */
+function listStringWords(source: string): string[] {
+  return [...source.matchAll(/"([^"\n]*)"|'([^'\n]*)'|`([^`]*)`/g)].flatMap(
+    (match) =>
+      (match.at(1) ?? match.at(2) ?? match.at(3) ?? "").split(/[^a-z0-9-]+/),
+  );
+}
+
+/**
+ * List the classes a stylesheet's rule selectors name, the `ds` namespace
+ * left out. At-rule preludes and the `:root` token block name none.
+ */
+function listSelectedClasses(css: string): string[] {
+  const rules = css.replace(/:root\s*\{[^}]*\}/, "");
+  return [...rules.matchAll(/([^{};]+)\{/g)]
+    .map((match) => (match.at(1) ?? "").trim())
+    .filter((prelude) => !prelude.startsWith("@"))
+    .flatMap((prelude) => [...prelude.matchAll(/\.([a-z][a-z0-9-]*)/g)])
+    .map((match) => match.at(1) ?? "")
+    .filter((name) => name !== "ds");
+}
+
+/** List the root classes a stylesheet names: each compounded with `.ds`. */
+function listRootClasses(css: string): string[] {
+  return [...css.matchAll(/\.ds\.([a-z][a-z0-9-]*)/g)].map(
+    (match) => match.at(1) ?? "",
+  );
+}
+
+/**
+ * The directory of the component a stylesheet belongs to: the top-level
+ * folder under the library, so a part under `common/` shares its owner's
+ * sources (a state class may be named in the owner's constants).
+ */
+function resolveComponentDirectory(file: string): string {
+  const component = relative(LIBRARY_DIRECTORY, file).split(sep).at(0);
+  if (component === undefined) throw new Error(`${file} is outside the lens`);
+  return join(LIBRARY_DIRECTORY, component);
+}
+
 describe("the lens stylesheets", () => {
   it("are found", () => {
     expect(files.length).toBeGreaterThanOrEqual(10);
@@ -287,9 +353,11 @@ describe("the lens stylesheets", () => {
     }
   });
 
-  it("bind every component token to another token", () => {
+  it("bind every component token to another token, save the pinned literals", () => {
     const literal = files.flatMap((file) => listLiteralTokens(readCss(file)));
-    expect(literal.toSorted()).toEqual(LITERAL_TOKENS);
+    expect(Object.fromEntries(literal)).toEqual(LITERAL_TOKENS);
+    // Two stylesheets declaring one name would collapse into one entry above.
+    expect(literal.length).toBe(Object.keys(LITERAL_TOKENS).length);
   });
 
   it("read from outside the lens exactly the tokens named here", () => {
@@ -325,6 +393,37 @@ describe("the lens stylesheets", () => {
         ":root { --probe-width: 2px; } .ds.probe { margin: -1px; --probe-gap: 1rem; }",
       ),
     ).toEqual([]);
+  });
+
+  it("select only the classes the components write", () => {
+    const roots = new Set(
+      files.flatMap((file) => listRootClasses(readCss(file))),
+    );
+    const unwritten = files.flatMap((file) => {
+      const written = new Set(
+        collectSources(resolveComponentDirectory(file)).flatMap((source) =>
+          listStringWords(readFileSync(source, "utf8")),
+        ),
+      );
+      return [...new Set(listSelectedClasses(readCss(file)))]
+        .filter((name) => !written.has(name) && !roots.has(name))
+        .map((name) => `${relative(LIBRARY_DIRECTORY, file)}: .${name}`);
+    });
+    expect(unwritten).toEqual([]);
+  });
+
+  it("tell a selected class from a written one", () => {
+    expect(
+      listSelectedClasses(
+        "@layer ds.prism { :root { --probe: 0; } .ds.probe .subhead:hover, .ds.probe.is-on { margin: 0; } }",
+      ),
+    ).toEqual(["probe", "subhead", "probe", "is-on"]);
+    expect(
+      listStringWords('<h3 className="subheading">{`ds probe`}</h3>'),
+    ).toEqual(expect.arrayContaining(["subheading", "ds", "probe"]));
+    expect(listStringWords('<h3 className="subheading" />')).not.toContain(
+      "subhead",
+    );
   });
 
   it("paint in the prism layer, never in a site's", () => {

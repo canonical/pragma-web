@@ -266,7 +266,8 @@ site's own catalog, and the factory holds no reader-facing string.
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
   `ThemeSelectorProps`.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
-  `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `RelaxOptions`, `QuadArc`.
+  `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
+  `RelaxOptions`, `QuadArc`.
 
 - Facets: `defineFacet`, `collectFacet`, `routeLensFacet`, `collectLenses`,
   `routeShortcutFacet`, `collectShortcuts`; types `RouteFacet`, `RouteMeta`,
