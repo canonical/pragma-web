@@ -161,7 +161,8 @@ describe("a directional ring pair", () => {
   });
 
   it("has no other line calling at its stations", () => {
-    const ringStops = new Set(listStops(readRings()[0]));
+    const [clockwise] = readRings();
+    const ringStops = new Set(listStops(clockwise));
     const others = network.lines.filter(
       (line) =>
         !(DIRECTIONAL_RING_LINE_URIS as readonly string[]).includes(line.uri),
