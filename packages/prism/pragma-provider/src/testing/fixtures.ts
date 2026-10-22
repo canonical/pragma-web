@@ -5,7 +5,8 @@
  * coverage (vitest.config.ts).
  */
 
-import type { ExtractionCase } from "./types.js";
+import type { SearchEntry } from "../lib/search/types.js";
+import type { ExtractionCase, RankingCase } from "./types.js";
 
 /** The corpus's design-system namespace, which `ds:` names. */
 const DS = "https://design.example.org/ontology#";
@@ -176,5 +177,98 @@ export const EXTRACTION_CASES: readonly ExtractionCase[] = [
     name: "orders references by first mention",
     markdown: "[c](ex:thing) [a](ds:button) [b](ds:Component) [a2](ds:button)",
     expected: [`${EX}thing`, `${DS}button`, `${DS}Component`],
+  },
+];
+
+/**
+ * A search index written so every ranking key decides at least one case:
+ * a CURIE and a definition each matching earlier than a title, two titles
+ * matching at different positions, two titles of different lengths, two of
+ * the same length that differ only in case, and two identical titles.
+ * Listed out of rank order, so the order is the ranking's, not the index's.
+ */
+export const SEARCH_ENTRIES: readonly SearchEntry[] = [
+  {
+    uri: `${DS}alert`,
+    title: "Alert",
+    curie: "ds:alert",
+    definition: "Tells the reader something happened.",
+  },
+  {
+    uri: `${DS}alert-banner`,
+    title: "Alert banner",
+    curie: "ds:alert-banner",
+    definition: "An alert pinned to the top of the page.",
+  },
+  {
+    uri: `${DS}banner-group`,
+    title: "Banner group",
+    curie: "ds:banner-group",
+    definition: null,
+  },
+  { uri: `${DS}banner`, title: "Banner", curie: "ds:banner", definition: null },
+  {
+    uri: `${DS}toast`,
+    title: "Toast",
+    curie: "ds:toast",
+    definition: "Notice of an event that dismisses itself.",
+  },
+  {
+    uri: `${DS}callout`,
+    title: "Callout",
+    curie: "ds:notice-callout",
+    definition: null,
+  },
+  { uri: `${DS}notice`, title: "Notice", curie: "ds:notice", definition: null },
+  { uri: `${DS}a-tabs`, title: "tabs", curie: "ds:a-tabs", definition: null },
+  { uri: `${DS}z-tabs`, title: "Tabs", curie: "ds:z-tabs", definition: null },
+  {
+    uri: `${DS}chip-legacy`,
+    title: "Chip",
+    curie: "ds:chip-legacy",
+    definition: null,
+  },
+  { uri: `${DS}chip`, title: "Chip", curie: "ds:chip", definition: null },
+];
+
+/** The cases `rankSearchEntries` is held to over {@link SEARCH_ENTRIES}. */
+export const RANKING_CASES: readonly RankingCase[] = [
+  { name: "matches nothing for empty text", text: "", expected: [] },
+  { name: "matches nothing for whitespace", text: "   ", expected: [] },
+  { name: "matches nothing for text no entry holds", text: "zz", expected: [] },
+  {
+    name: "ranks a title match, then a CURIE match, then a definition match, wherever each falls",
+    text: "notice",
+    expected: [`${DS}notice`, `${DS}callout`, `${DS}toast`],
+  },
+  {
+    name: "ranks an earlier match first among titles of one length",
+    text: "banner",
+    expected: [`${DS}banner`, `${DS}banner-group`, `${DS}alert-banner`],
+  },
+  {
+    name: "ranks a shorter title first among matches at one position",
+    text: "alert",
+    expected: [`${DS}alert`, `${DS}alert-banner`],
+  },
+  {
+    name: "orders titles of one length by code point, capitals first",
+    text: "tabs",
+    expected: [`${DS}z-tabs`, `${DS}a-tabs`],
+  },
+  {
+    name: "orders identical titles by IRI",
+    text: "chip",
+    expected: [`${DS}chip`, `${DS}chip-legacy`],
+  },
+  {
+    name: "ignores the case of the text",
+    text: "ALERT",
+    expected: [`${DS}alert`, `${DS}alert-banner`],
+  },
+  {
+    name: "trims the text",
+    text: "  alert\t",
+    expected: [`${DS}alert`, `${DS}alert-banner`],
   },
 ];

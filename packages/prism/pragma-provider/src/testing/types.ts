@@ -29,3 +29,13 @@ export interface ProbeSchemaResolvers {
     info: GraphQLResolveInfo,
   ) => unknown;
 }
+
+/**
+ * One ranking case: search text and the IRIs `rankSearchEntries` must
+ * return for it over the search fixtures, best first.
+ */
+export interface RankingCase {
+  readonly name: string;
+  readonly text: string;
+  readonly expected: readonly string[];
+}
