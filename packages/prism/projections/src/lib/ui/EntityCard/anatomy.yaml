@@ -17,6 +17,9 @@
 # The card sets its text in the context's primary tier, so its key values
 # and its vitals sit on the context's line, as its paragraphs do.
 #
+# Every rule reaches its slot through the slot's whole path from the root,
+# so nothing a consumer renders in the sidecar or in a slot is restyled.
+#
 # The sidecar carries a rendered example of the entity beside the body: the
 # entity type decides whether it has one (UI blocks), and its consumer fills
 # it. It comes first in the DOM so the body's sections keep the Card's

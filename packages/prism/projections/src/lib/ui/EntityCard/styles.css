@@ -5,7 +5,8 @@
 @layer ds.components.global {
   /* The published Card's root: its row subgrid, border, radius and section
    * insets are the Card's own, so this root sets only its text tier and the
-   * tokens its slots read. */
+   * tokens its slots read. Every slot below is reached through its whole
+   * path, so nothing in the sidecar or inside a slot's content matches. */
   .ds.entity-card {
     --entity-card-gap: var(--grid-gutter);
     /* The span the published Cards group gives every card, and the two
@@ -64,7 +65,7 @@
     background: var(--entity-card-sidecar-background);
   }
 
-  .ds.entity-card .location {
+  .ds.entity-card > .body > .description > .heading > .location {
     margin-block: 0;
     color: var(--entity-card-location-color);
     font-variant-caps: all-small-caps;
@@ -72,52 +73,52 @@
   }
 
   /* A heading at the text size: the card's hierarchy is weight, not size. */
-  .ds.entity-card .title {
+  .ds.entity-card > .body > .description > .heading > .title {
     margin-block: 0;
     font-size: var(--entity-card-font-size);
     line-height: var(--entity-card-line-height);
     font-weight: var(--entity-card-title-font-weight);
   }
 
-  .ds.entity-card .parent {
+  .ds.entity-card > .body > .description > .heading > .title > .parent {
     font-weight: var(--entity-card-parent-font-weight);
   }
 
-  .ds.entity-card .kind {
+  .ds.entity-card > .body > .description > .heading > .kind {
     margin-block: 0;
   }
 
-  .ds.entity-card .summary {
+  .ds.entity-card > .body > .description > .summary {
     margin-block-start: var(--entity-card-section-spacing);
     margin-block-end: 0;
   }
 
-  .ds.entity-card .key-values {
+  .ds.entity-card > .body > .key-values {
     margin-block-start: var(--entity-card-section-spacing);
     margin-block-end: 0;
   }
 
   /* Two equal halves under a rule. */
-  .ds.entity-card .pair {
+  .ds.entity-card > .body > .key-values > .pair {
     display: flex;
     border-block-start-width: var(--entity-card-rule-width);
     border-block-start-style: solid;
     border-block-start-color: var(--entity-card-rule-color);
   }
 
-  .ds.entity-card .key {
+  .ds.entity-card > .body > .key-values > .pair > .key {
     flex-grow: 1;
     flex-basis: 0;
     color: var(--entity-card-key-color);
   }
 
-  .ds.entity-card .value {
+  .ds.entity-card > .body > .key-values > .pair > .value {
     flex-grow: 1;
     flex-basis: 0;
     margin-inline-start: 0;
   }
 
-  .ds.entity-card .vital {
+  .ds.entity-card > .footer > .vital {
     color: var(--entity-card-vital-color);
   }
 }
