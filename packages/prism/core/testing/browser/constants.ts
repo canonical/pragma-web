@@ -51,6 +51,15 @@ export const REGION_SELECTOR = [
 ].join(", ");
 
 /**
+ * The layout's frame: the archetypes' strips, in which nothing may scroll
+ * sideways.
+ */
+export const FRAME_SELECTOR = [
+  ".ds.workspace-layout > .strip",
+  ".ds.document-layout > .strip",
+].join(", ");
+
+/**
  * The chrome the spacing histogram measures: the shell, the archetypes and
  * their regions, and the core components every layout places. A select's
  * options are left out: the browser lays them out in its own popup.

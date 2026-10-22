@@ -27,6 +27,7 @@ import {
   WorkspaceLayout,
 } from "../../src/lib/ui/index.js";
 import {
+  FRAME_SELECTOR,
   launchBrowser,
   type MeasureLayoutOptions,
   measureLayout,
@@ -63,6 +64,7 @@ const MEASURE_OPTIONS: MeasureLayoutOptions = {
     ".ds.document-layout > *",
     "main.ds.canvas",
   ].join(", "),
+  frameSelector: FRAME_SELECTOR,
   step: 4,
   tolerance: 0.5,
   clippingOverflows: ["auto", "scroll", "hidden", "clip"],

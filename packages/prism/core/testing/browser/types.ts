@@ -12,6 +12,17 @@ export interface MeasureLayoutOptions {
   readonly chromeSelector: string;
   /** The layout's regions, which never excuse an overflow. */
   readonly regionSelector: string;
+  /**
+   * The layout's frame, its strips: nothing in it may scroll sideways, so a
+   * control cut by a scroller of its own counts as an overflow.
+   */
+  readonly frameSelector: string;
+  /**
+   * The elements that must fill the rows of the canvas's page from its
+   * inline start to its end, such as a catalog's cards; left out, nothing
+   * is measured.
+   */
+  readonly fillSelector?: string;
   /** The grid every spacing sits on, in pixels. */
   readonly step: number;
   /** How far past the viewport an edge may round, in pixels. */
@@ -39,8 +50,9 @@ export interface LayoutMeasure {
    * What reaches past the viewport's inline end or past its own region,
    * each as `element right=…`: the shell's content (which the shell clips,
    * so the document never shows it), a region whose content is wider than
-   * the region, and every element whose box ends past the viewport and that
-   * no element of its own scrolls or clips.
+   * the region, every element whose box ends past the viewport and that
+   * no element of its own scrolls or clips, and every element of the frame
+   * that scrolls its content sideways.
    */
   readonly overflow: readonly string[];
   /** The elements that scroll: a scrolling overflow and content past it. */
@@ -50,6 +62,23 @@ export interface LayoutMeasure {
     readonly overflow: string;
     readonly scrollHeight: number;
     readonly clientHeight: number;
+  };
+  /**
+   * The canvas's page, in pixels: its inline size, its column gap, the
+   * inline size of its first element, which spans the page's columns, and
+   * how far from the page's inline start the leftmost element of
+   * `fillSelector` starts and how far short of its inline end the
+   * rightmost stops. A size is -1 when its element is absent; the
+   * shortfall is null when no element matches or none was asked for.
+   */
+  readonly canvasPage: {
+    readonly width: number;
+    readonly columnGap: number;
+    readonly firstChildWidth: number;
+    readonly fillShortfall: {
+      readonly start: number;
+      readonly end: number;
+    } | null;
   };
   /** The block overflow of the layout's rail and inspector regions. */
   readonly regionOverflow: Readonly<Record<string, string | null>>;
@@ -83,4 +112,6 @@ export interface MeasurePageOptions {
   readonly origins: readonly string[];
   /** How long the page may take to settle, in milliseconds. */
   readonly timeoutMs: number;
+  /** The elements that must fill the page's rows, as `measureLayout` reads them. */
+  readonly fillSelector?: string;
 }

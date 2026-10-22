@@ -2,6 +2,7 @@ import type { Browser } from "playwright";
 import {
   CHROME_SELECTOR,
   CLIPPING_OVERFLOWS,
+  FRAME_SELECTOR,
   OVERFLOW_TOLERANCE_PX,
   REGION_SELECTOR,
   SPACING_STEP_PX,
@@ -18,13 +19,14 @@ import type { MeasurePageOptions, ThemedMeasure } from "./types.js";
  * live-reload socket is left unconnected.
  *
  * @param browser - The browser to open the page in.
- * @param options - The URL, the viewport, the origins and the settle time.
+ * @param options - The URL, the viewport, the origins, the settle time and
+ *   the elements that must fill the page's rows.
  * @returns The layout's measure in each theme, in `THEMES` order.
  * @note Impure: opens a browser tab, which it closes.
  */
 export default async function measurePage(
   browser: Browser,
-  { url, viewport, origins, timeoutMs }: MeasurePageOptions,
+  { url, viewport, origins, timeoutMs, fillSelector }: MeasurePageOptions,
 ): Promise<readonly ThemedMeasure[]> {
   const page = await browser.newPage({
     viewport: { width: viewport.width, height: viewport.height },
@@ -51,6 +53,8 @@ export default async function measurePage(
       const measure = await page.evaluate(measureLayout, {
         chromeSelector: CHROME_SELECTOR,
         regionSelector: REGION_SELECTOR,
+        frameSelector: FRAME_SELECTOR,
+        fillSelector,
         step: SPACING_STEP_PX,
         tolerance: OVERFLOW_TOLERANCE_PX,
         clippingOverflows: CLIPPING_OVERFLOWS,

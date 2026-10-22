@@ -11,19 +11,23 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  * and every element's box are compared with the space they have, and an
  * element is excused only by an element of its own that scrolls or clips
  * it, such as a code block that scrolls sideways, never by a region or the
- * shell.
+ * shell. The frame excuses nothing: an element of the strip that scrolls
+ * sideways is itself an overflow, since the controls it cuts can only be
+ * reached by scrolling a strip a phone's width wide.
  *
  * The chrome's spacing excludes what resolves to a measure rather than a
  * choice: an auto margin, which takes the free space, and the typography
  * engine's baseline nudges on text blocks.
  *
  * @param options - The selectors, the spacing step and the overflow rules.
- * @returns The page's grids, scrollers, overflow and spacing.
+ * @returns The page's grids, scrollers, overflow, canvas page and spacing.
  * @note Impure: reads the page's document and its computed styles.
  */
 export default function measureLayout({
   chromeSelector,
   regionSelector,
+  frameSelector,
+  fillSelector,
   step,
   tolerance,
   clippingOverflows,
@@ -77,6 +81,16 @@ export default function measureLayout({
         (element) =>
           `${describe(element)} right=${element.getBoundingClientRect().right}`,
       ),
+    ...[...document.querySelectorAll(frameSelector)]
+      .flatMap((frame) => [frame, ...frame.querySelectorAll("*")])
+      .filter((element) => {
+        const { overflowX } = getComputedStyle(element);
+        return (
+          (overflowX === "auto" || overflowX === "scroll") &&
+          element.scrollWidth > element.clientWidth
+        );
+      })
+      .map((element) => `${describe(element)} scrolls=${element.scrollWidth}`),
   ];
 
   const scrollers = [...document.querySelectorAll("body *")]
@@ -94,6 +108,14 @@ export default function measureLayout({
     return region === null ? null : getComputedStyle(region).overflowY;
   };
   const trigger = document.querySelector(".inspector-trigger");
+  const canvasPage = document.querySelector("main.ds.canvas > .page");
+  const pageBox = canvasPage?.getBoundingClientRect();
+  const fillBoxes =
+    fillSelector === undefined || canvasPage === null
+      ? []
+      : [...canvasPage.querySelectorAll(fillSelector)].map((element) =>
+          element.getBoundingClientRect(),
+        );
 
   const histogram: Record<string, number> = {};
   const offGrid: string[] = [];
@@ -146,6 +168,25 @@ export default function measureLayout({
         ":is(.ds.workspace-layout, .ds.document-layout) > .rail",
       ),
       inspector: readOverflow(".ds.workspace-layout > .inspector"),
+    },
+    canvasPage: {
+      width: pageBox?.width ?? -1,
+      columnGap:
+        canvasPage === null
+          ? -1
+          : Number.parseFloat(getComputedStyle(canvasPage).columnGap),
+      firstChildWidth:
+        canvasPage?.firstElementChild?.getBoundingClientRect().width ?? -1,
+      fillShortfall:
+        pageBox === undefined || fillBoxes.length === 0
+          ? null
+          : {
+              start:
+                Math.min(...fillBoxes.map(({ left }) => left)) - pageBox.left,
+              end:
+                pageBox.right -
+                Math.max(...fillBoxes.map(({ right }) => right)),
+            },
     },
     triggerShown:
       trigger !== null && getComputedStyle(trigger).display !== "none",
