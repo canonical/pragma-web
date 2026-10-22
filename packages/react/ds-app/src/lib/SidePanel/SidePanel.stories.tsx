@@ -594,7 +594,10 @@ const TooltippedButton = withTooltip(
 
 /**
  * Content taller than the panel scrolls the content pane itself; the header
- * and footer stay pinned.
+ * and footer stay pinned. Scroll the pane and its edges tell you where the
+ * rest of the content is: at the top only the bottom line shows, in the
+ * middle both do, and at the bottom only the top one (contrast the
+ * `Default` story, whose content fits and shows neither).
  */
 export const TallContent: Story = {
   render: () => (

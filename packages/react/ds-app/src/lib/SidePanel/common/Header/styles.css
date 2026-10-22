@@ -40,9 +40,7 @@
     padding-block: var(--side-panel-header-padding-block);
     /*
       Inline padding, not margin: nothing here needs the header's box itself
-      inset, and padding keeps it full panel width. The footer is the
-      exception — its border spans the padding box, so it insets with margin
-      (see Footer/styles.css).
+      inset, and padding keeps it full panel width.
     */
     padding-inline: var(--side-panel-padding-inline);
 

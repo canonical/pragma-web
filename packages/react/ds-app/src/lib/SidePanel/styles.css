@@ -32,11 +32,17 @@
 
     --side-panel-border-radius: var(--dimension-radius-medium);
     /*
-      The hairline closing the scroll region is a divider, not a boundary, so it
-      takes the muted border rather than the default one — gray-100 in light mode
-      against gray-520, and gray-820 in dark so it stays pale either way.
+      The colour of the scroll region's divider lines, kept muted.
     */
     --side-panel-color-border: var(--color-border-muted);
+    /*
+      The edge lines marking the scroll region when the content pane
+      overflows. The design calls for 2px; design-tokens ships no stroke
+      token at that width (the scale jumps from 1px to 3px), so this is a
+      literal.
+      TODO: replace with a token when one exists.
+    */
+    --side-panel-overflow-line-thickness: 2px;
     /* One inline padding, read by the header, content and footer alike. */
     --side-panel-padding-inline: var(--dimension-300);
     /* Block padding of the two pinned regions, so the rhythm is tunable. */
