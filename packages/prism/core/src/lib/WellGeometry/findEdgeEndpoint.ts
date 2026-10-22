@@ -1,4 +1,4 @@
-import type { WellBox } from "./types.js";
+import type { WellBox, WellPoint } from "./types.js";
 
 /**
  * Find the point where the segment from `towards` to `box`'s centre crosses
@@ -13,9 +13,9 @@ import type { WellBox } from "./types.js";
  */
 export default function findEdgeEndpoint(
   box: Readonly<WellBox>,
-  towards: { readonly x: number; readonly y: number },
+  towards: WellPoint,
   gap: number,
-): { x: number; y: number } {
+): WellPoint {
   const dx = towards.x - box.x;
   const dy = towards.y - box.y;
   if (dx === 0 && dy === 0) return { x: box.x, y: box.y };
