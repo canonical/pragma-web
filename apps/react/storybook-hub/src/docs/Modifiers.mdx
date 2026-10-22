@@ -185,7 +185,7 @@ Modifiers compose through nesting. An `.error` context can contain a `.success` 
 
 <Canvas of={Stories.NestingOverride} />
 
-The inner `.success` overrides `--modifier-color-text` for its descendants, while the outer `.error` continues to apply elsewhere. CSS custom property inheritance handles this automatically — the closest ancestor setting a channel variable wins.
+The inner `.success` overrides `--modifier-color-text` for its descendants, while the outer `.error` continues to apply elsewhere. CSS custom property inheritance handles this automatically — the closest ancestor setting a channel variable wins. The `default` badge beside it shows the other override shape: `criticality="default"` rebinds every channel to its initial base-token binding **on the element itself**, so the element renders neutral instead of inheriting the `.error` context.
 
 ## What modifiers do not do
 

@@ -1,0 +1,70 @@
+/* @canonical/styles — Default modifier SHIM (temporary)
+ *
+ * Every colour modifier family (anticipation, criticality, emphasis, lifecycle,
+ * release) now defines a `default` VALUE: the choice that rebinds the family's
+ * channels to their base tokens ON THE ELEMENT ITSELF, so a component wearing
+ * the class opts out of a modifier context an ancestor established. A custom
+ * property declared on the element beats the value inherited from an ancestor,
+ * so a Chip inside a Card marked `.error` renders neutral when it wears
+ * `.default`, instead of falling through the `var(--modifier-color-text,
+ * var(--chip-color-text))` fallback to the Card's inherited error channel.
+ *
+ * `default` is OPT-IN, never implicit: a component that names no modifier keeps
+ * inheriting its ancestors' context, which stays the intended composition
+ * mechanism. See `packages/react/tokens/src/lib/docs/ModifierContract.mdx`,
+ * "Opting out of an inherited modifier".
+ *
+ * The generated `@canonical/design-tokens/dist/modifiers.<family>.css` files at
+ * the pinned version do not yet carry the `.default` rule — the rule ships with
+ * the next release of that package, which synthesizes one declaration per
+ * channel the family emits. This shim stands in for it until the pin is
+ * bumped, and binds the UNION of the channels the five families emit (12
+ * channels — they are deliberately shared, so a component that supports one
+ * modifier supports them all), plus the two channels the criticality shim owns
+ * (`--modifier-icon`, `--modifier-color-text-onForegroundSecondary`). Remove
+ * the overlapping channel bindings once the pin carries the generated rule;
+ * the two shim-owned channels then move to the criticality shim's own
+ * `.default` block.
+ *
+ * Design contract — components listen to the CHANNEL, never to the class. A
+ * consumer must not key off `.default`; it reads the generic channels, which
+ * this class re-points at the base semantic tokens, so every component that
+ * already supports modifiers supports `default` for free.
+ *
+ * Layer: ds.modifiers, beside the generated modifier families and their shims,
+ * imported after them. Custom properties only, so nothing here styles an
+ * element beyond the class it selects.
+ */
+
+@layer ds.modifiers {
+  .default {
+    --modifier-color-border: var(--color-border);
+    --modifier-color-focus-ring: var(--color-focus-ring);
+    --modifier-color-foreground-checkbox-unselected: var(
+      --color-foreground-checkbox-unselected
+    );
+    --modifier-color-foreground-ghost: var(--color-foreground-ghost);
+    --modifier-color-foreground-input: var(--color-foreground-input);
+    --modifier-color-foreground-primary: var(--color-foreground-primary);
+    --modifier-color-foreground-radio-unselected: var(
+      --color-foreground-radio-unselected
+    );
+    --modifier-color-foreground-secondary: var(--color-foreground-secondary);
+    --modifier-color-icon: var(--color-icon);
+    --modifier-color-icon-on-foreground-secondary: var(
+      --color-icon-on-foreground-secondary
+    );
+    --modifier-color-text: var(--color-text);
+    --modifier-color-text-on-foreground-secondary: var(
+      --color-text-on-foreground-secondary
+    );
+
+    /* Channels owned by the criticality shim, neutralized: no criticality
+     * glyph, and the on-surface text pairing for a surface a component seats
+     * on the neutral secondary foreground. */
+    --modifier-icon: none;
+    --modifier-color-text-onForegroundSecondary: var(
+      --color-text-onForegroundSecondary
+    );
+  }
+}
