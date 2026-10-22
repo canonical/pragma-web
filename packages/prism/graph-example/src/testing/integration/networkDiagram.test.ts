@@ -11,6 +11,7 @@
 // =============================================================================
 
 import { beforeAll, describe, expect, it } from "vitest";
+import { assertPresent } from "../assertPresent.js";
 import { BARE_STATION_URIS } from "../fixtures.js";
 import { readNetwork } from "../readNetwork.js";
 import type { Network, NetworkPoint, NetworkRoute } from "../types.js";
@@ -33,10 +34,12 @@ const formatPoint = (point: NetworkPoint): string => `${point.x},${point.y}`;
 
 /** The position of every call on a route, failing the test on a missing one. */
 const listPoints = (route: NetworkRoute): NetworkPoint[] =>
-  route.calls.map((call) => {
-    expect(call.stop.diagramPosition, call.stop.uri).not.toBeNull();
-    return call.stop.diagramPosition as NetworkPoint;
-  });
+  route.calls.map((call) =>
+    assertPresent(
+      call.stop.diagramPosition,
+      `${call.stop.uri} has no diagram position`,
+    ),
+  );
 
 /** The segments of a route, the closing one of a loop included. */
 const listSegments = (route: NetworkRoute): Segment[] => {
@@ -45,7 +48,10 @@ const listSegments = (route: NetworkRoute): Segment[] => {
   return ends.map((from, index) => ({
     label: `${route.label} ${index + 1}`,
     from,
-    to: points.at((index + 1) % points.length) as NetworkPoint,
+    to: assertPresent(
+      points.at((index + 1) % points.length),
+      `${route.label} has no call after ${index + 1}`,
+    ),
   }));
 };
 

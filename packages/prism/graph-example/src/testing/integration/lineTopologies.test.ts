@@ -12,6 +12,7 @@
 // =============================================================================
 
 import { beforeAll, describe, expect, it } from "vitest";
+import { assertPresent } from "../assertPresent.js";
 import {
   BIDIRECTIONAL_LOOP_LINE_URI,
   DIRECTIONAL_RING_LINE_URIS,
@@ -28,18 +29,15 @@ beforeAll(async () => {
 });
 
 /** The line with this IRI, failing the test when the network lacks it. */
-const findLine = (uri: string): NetworkLine => {
-  const line = network.lines.find((candidate) => candidate.uri === uri);
-  expect(line, uri).toBeDefined();
-  return line as NetworkLine;
-};
+const findLine = (uri: string): NetworkLine =>
+  assertPresent(
+    network.lines.find((candidate) => candidate.uri === uri),
+    `the network has no line ${uri}`,
+  );
 
 /** The route at `index` of a line, failing the test when there is none. */
-const findRoute = (line: NetworkLine, index: number): NetworkRoute => {
-  const route = line.routes.at(index);
-  expect(route, `${line.uri} route ${index}`).toBeDefined();
-  return route as NetworkRoute;
-};
+const findRoute = (line: NetworkLine, index: number): NetworkRoute =>
+  assertPresent(line.routes.at(index), `${line.uri} has no route ${index}`);
 
 /** The stop IRIs a route calls at, in call order. */
 const listStops = (route: NetworkRoute): string[] =>
@@ -96,10 +94,11 @@ describe("a bidirectional loop", () => {
 
 describe("two half-rings closing a ring", () => {
   const readOutbound = (): [string[], string[]] => {
-    const [first, second] = HALF_RING_LINE_URIS.map((uri) =>
-      listStops(findRoute(findLine(uri), 0)),
-    );
-    return [first as string[], second as string[]];
+    const [first, second] = HALF_RING_LINE_URIS;
+    return [
+      listStops(findRoute(findLine(first), 0)),
+      listStops(findRoute(findLine(second), 0)),
+    ];
   };
 
   it("are two linear lines", () => {
@@ -130,13 +129,8 @@ describe("two half-rings closing a ring", () => {
 
 describe("a directional ring pair", () => {
   const readRings = (): [NetworkRoute, NetworkRoute] => {
-    const [first, second] = DIRECTIONAL_RING_LINE_URIS.map((uri) =>
-      findLine(uri),
-    );
-    return [
-      findRoute(first as NetworkLine, 0),
-      findRoute(second as NetworkLine, 0),
-    ];
+    const [first, second] = DIRECTIONAL_RING_LINE_URIS;
+    return [findRoute(findLine(first), 0), findRoute(findLine(second), 0)];
   };
 
   it("is two lines with one loop route each and no reverse", () => {
@@ -149,13 +143,11 @@ describe("a directional ring pair", () => {
   });
 
   it("runs the same stops in opposite cyclic order", () => {
-    const [clockwise, anticlockwise] = readRings().map(listStops) as [
-      string[],
-      string[],
-    ];
-    const [first, ...rest] = clockwise;
-    expect(rotateTo(anticlockwise, first as string)).toEqual([
-      first,
+    const [clockwise, anticlockwise] = readRings();
+    const [first, ...rest] = listStops(clockwise);
+    const start = assertPresent(first, `${clockwise.label} calls nowhere`);
+    expect(rotateTo(listStops(anticlockwise), start)).toEqual([
+      start,
       ...rest.reverse(),
     ]);
   });
