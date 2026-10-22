@@ -1,0 +1,35 @@
+.tabs-indicator-proof {
+  padding: var(--ds-spacing-surface-block) var(--ds-spacing-surface-inline);
+}
+
+.tabs-indicator-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: var(--ds-spacing-group);
+}
+
+.tabs-indicator-case {
+  min-width: 0;
+}
+
+.tabs-indicator-case h2 {
+  margin-block: 0 var(--ds-spacing-item-block);
+}
+
+.tabs-indicator-pair {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: start;
+  gap: var(--ds-spacing-item-inline);
+  margin-block-end: var(--ds-spacing-item-block);
+  overflow-x: auto;
+}
+
+.tabs-indicator-pair .tabs {
+  inline-size: max-content;
+}
+
+.tabs-indicator-api-cases {
+  margin-block-start: var(--ds-spacing-section);
+  overflow: auto;
+}

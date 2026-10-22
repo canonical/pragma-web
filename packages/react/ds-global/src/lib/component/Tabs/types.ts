@@ -1,5 +1,5 @@
-import type { Item } from "@canonical/ds-types";
-import type { ComponentProps } from "react";
+import type { _DistributiveOmit, Item } from "@canonical/ds-types";
+import type { ComponentProps, ReactNode } from "react";
 import type { LinkComponent } from "../../types/link.js";
 
 /**
@@ -8,9 +8,20 @@ import type { LinkComponent } from "../../types/link.js";
  * `label` (visible text), `key` (identity when there is no url), and
  * `disabled`. Nested `items` are ignored (tabs cannot nest).
  */
-export type TabItem = Item & {
+export type TabItem = _DistributiveOmit<Item, "items"> & {
   /** CSS class name applied to this tab's `<li>`, in addition to the base classes. */
   className?: string;
+  /**
+   * Noninteractive trailing content displayed beside the label, such as a
+   * Badge or static Chip. It remains part of the tab's single link or inert
+   * label and must not contain an independent action.
+   */
+  slot?: ReactNode;
+  /**
+   * Child tabs when this item is used as `navigationRoot`. Tabs renders only
+   * the root's direct children; items nested below those children are ignored.
+   */
+  items?: TabItem[];
 };
 
 type OwnProps = {

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import type React from "react";
 import { describe, expect, it } from "vitest";
+import { tabsDensityPolicy } from "../densityPolicy.js";
 import Item from "./Item.js";
 
 const inList = (ui: React.ReactElement) => render(<ul>{ui}</ul>);
@@ -68,5 +69,110 @@ describe("Tabs Item (internal renderer)", () => {
     );
     expect(screen.getByText("A").closest("a")).not.toHaveAttribute("href");
     expect(screen.getByRole("listitem")).toHaveAttribute("data-disabled");
+  });
+
+  it("renders a trailing slot inside the existing tab action after its label", () => {
+    inList(
+      <Item
+        item={{
+          url: "/machines",
+          label: "Machines",
+          slot: <span>42</span>,
+        }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const link = screen.getByRole("link", { name: "Machines 42" });
+    const slot = screen.getByText("42");
+    const label = screen.getByText("Machines");
+
+    expect(link).toContainElement(slot);
+    expect(link.querySelectorAll("a, button")).toHaveLength(0);
+    expect(label).toHaveClass("tabs-label");
+    expect(label.compareDocumentPosition(slot)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(slot.parentElement).toHaveClass("tabs-indicator");
+    expect(screen.getByRole("listitem")).not.toHaveAttribute("slot");
+    expect(link).not.toHaveAttribute("slot");
+    expect(link).toHaveClass(tabsDensityPolicy.providerClassName);
+    expect(link).toHaveAttribute(
+      "data-ds-density-provider",
+      tabsDensityPolicy.provider,
+    );
+    expect(link).toHaveAttribute(
+      "data-ds-density-policy-version",
+      String(tabsDensityPolicy.version),
+    );
+  });
+
+  it("keeps numeric zero as visible slot content", () => {
+    inList(
+      <Item
+        item={{ url: "/empty", label: "Empty", slot: 0 }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const link = screen.getByRole("link", { name: "Empty 0" });
+
+    expect(link.querySelector(".tabs-indicator")).toHaveTextContent("0");
+    expect(link).toHaveClass(tabsDensityPolicy.providerClassName);
+  });
+
+  it("renders the slot in the same inert span when the tab has no url", () => {
+    inList(
+      <Item
+        item={{ key: "soon", label: "Coming soon", slot: <span>3</span> }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const slot = screen.getByText("3");
+    const tab = slot.closest(".tabs-link");
+
+    expect(tab?.tagName).toBe("SPAN");
+    expect(tab).toContainElement(slot);
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  it("keeps a disabled slot inside the existing anchor surface without an action", () => {
+    inList(
+      <Item
+        item={{
+          url: "/blocked",
+          label: "Blocked",
+          disabled: true,
+          slot: <span>7</span>,
+        }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const slot = screen.getByText("7");
+    const anchor = slot.closest("a");
+
+    expect(anchor).not.toHaveAttribute("href");
+    expect(anchor).toContainElement(slot);
+    expect(screen.getByRole("listitem")).toHaveAttribute("data-disabled");
+    expect(screen.queryAllByRole("button")).toHaveLength(0);
+    expect(document.querySelectorAll("a")).toHaveLength(1);
+  });
+
+  it("does not publish the private provider when no slot is present", () => {
+    inList(
+      <Item
+        item={{ url: "/specs", label: "Specs" }}
+        active={false}
+        LinkComponent="a"
+      />,
+    );
+    const link = screen.getByRole("link", { name: "Specs" });
+
+    expect(link).not.toHaveClass(tabsDensityPolicy.providerClassName);
+    expect(link).not.toHaveAttribute("data-ds-density-provider");
+    expect(link).not.toHaveAttribute("data-ds-density-policy-version");
+    expect(link.querySelector(".tabs-indicator")).toBeNull();
   });
 });

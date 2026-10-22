@@ -1,5 +1,6 @@
 @import url("@canonical/styles/spacing-seat.css");
 @import url("@canonical/styles/stroke-paint.css");
+@import url("../density.css");
 
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
@@ -50,6 +51,19 @@
        UA default outline. Inset offset so the ring hugs the tab and the row's
        `overflow` never clips it; :focus-visible only, so pointer clicks stay
        quiet. */
+  }
+
+  /* The indicator remains content of the existing tab action. Baseline
+     alignment is enabled only when the slot exists, leaving ordinary tabs on
+     their established single-label layout. */
+  .ds.tabs-item .tabs-link:has(> .tabs-indicator) {
+    align-items: baseline;
+  }
+
+  .ds.tabs-item .tabs-indicator {
+    display: inline-flex;
+    align-items: baseline;
+    margin-inline-start: var(--ds-spacing-mark);
   }
 
   /* Hover: a muted bottom border hints the tab is navigable, and settles faster

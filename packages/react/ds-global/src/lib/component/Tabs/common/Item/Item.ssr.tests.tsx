@@ -14,4 +14,24 @@ describe("Tabs Item SSR", () => {
     expect(html).toContain('aria-current="page"');
     expect(html).toContain("A");
   });
+
+  it("renders a static slot inside the tab action", () => {
+    const html = renderToString(
+      <ul>
+        <Item
+          item={{
+            url: "/machines",
+            label: "Machines",
+            slot: <span className="count">42</span>,
+          }}
+          active={false}
+          LinkComponent="a"
+        />
+      </ul>,
+    );
+    expect(html).toContain("tabs-static-chip-provider-v1");
+    expect(html).toContain('data-ds-density-provider="tabs-static-chip"');
+    expect(html).toContain('<span class="tabs-indicator">');
+    expect(html.indexOf("Machines")).toBeLessThan(html.indexOf("42"));
+  });
 });
