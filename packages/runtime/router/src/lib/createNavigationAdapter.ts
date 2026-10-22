@@ -80,9 +80,12 @@ export default function createNavigationAdapter(
     return new URL(navigationWindow.location.href);
   }
 
-  function notify(): void {
-    const location = getLocation();
-
+  /**
+   * Hand a location to every subscriber, each its own copy.
+   *
+   * @note Impure: calls the subscribers, which load and render the route.
+   */
+  function publish(location: URL): void {
     for (const subscriber of subscribers) {
       subscriber(new URL(location.href));
     }
@@ -98,7 +101,7 @@ export default function createNavigationAdapter(
     // handler hands the browser the router's in-flight load (tracked via
     // trackLoad below), so native loading UI reflects the navigation.  It
     // reads trackedLoad at call time — the router tracks the load
-    // synchronously during the navigate event (via notify() here, or right
+    // synchronously during the navigate event (via publish() here, or right
     // after its own navigation.navigate() call), and intercept handlers run
     // on a later microtask.  A failed load still commits router state, so
     // the handler never rejects — it must not mark the browser navigation
@@ -124,11 +127,14 @@ export default function createNavigationAdapter(
         : undefined),
     });
 
+    // A traversal or reload is published at its destination: inside the
+    // navigate event the browser has not committed the new URL yet, so
+    // `location.href` still names the entry being left.
     if (
       event.navigationType === "traverse" ||
       event.navigationType === "reload"
     ) {
-      notify();
+      publish(new URL(event.destination.url));
     }
   }
 
@@ -152,7 +158,7 @@ export default function createNavigationAdapter(
       result?.committed?.catch(ignoreNavigationTransitionError);
       result?.finished?.catch(ignoreNavigationTransitionError);
 
-      notify();
+      publish(getLocation());
     },
     trackLoad(load) {
       trackedLoad = load;

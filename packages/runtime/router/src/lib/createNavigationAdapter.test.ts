@@ -59,7 +59,7 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
     },
     lastInterceptOptions: undefined as FakeInterceptOptions | undefined,
     dispatchNavigate(nextHref: string, navigationType: string = "traverse") {
-      navigationWindow.location.href = nextHref;
+      // As in the browser, the navigate event fires before the URL commits.
       navigateListener?.({
         navigationType,
         destination: { url: nextHref },
@@ -69,6 +69,7 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
           navigationWindow.lastInterceptOptions = options;
         },
       });
+      navigationWindow.location.href = nextHref;
     },
     dispatchNavigateRaw(
       event: Parameters<NonNullable<typeof navigateListener>>[0],
@@ -131,6 +132,30 @@ describe("createNavigationAdapter (Navigation API)", () => {
     expect(secondListener).toHaveBeenLastCalledWith(
       expect.objectContaining({ pathname: "/next" }),
     );
+  });
+
+  it("publishes a traversal at its destination before the URL commits", () => {
+    const navigationWindow = createFakeNavigationWindow(
+      "https://example.com/stations/metro%3Akilnwood",
+    );
+    const adapter = createNavigationAdapter(navigationWindow);
+    const hrefsAtPublish: string[] = [];
+    const listener = vi.fn<(location: string | URL) => void>(() => {
+      hrefsAtPublish.push(navigationWindow.location.href);
+    });
+
+    adapter.subscribe(listener);
+    navigationWindow.dispatchNavigate(
+      "https://example.com/stations",
+      "traverse",
+    );
+
+    expect(listener).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: "/stations" }),
+    );
+    expect(hrefsAtPublish).toEqual([
+      "https://example.com/stations/metro%3Akilnwood",
+    ]);
   });
 
   it("intercepts push and replace events without notifying subscribers", () => {
