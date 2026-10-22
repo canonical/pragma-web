@@ -7,9 +7,11 @@ import { ADMONITION_MARKER } from "./constants.js";
  * removing the marker from its content.
  *
  * The marker's text node is trimmed, and dropped when nothing else is left in
- * it; the opening paragraph is dropped when the marker was all it held. The
- * kind is recorded as the `dataAdmonition` property of the blockquote's hast
- * element, so it reaches the renderer as a `data-admonition` attribute.
+ * it, together with the hard break that trailing spaces or a backslash after
+ * the marker produce; the opening paragraph is dropped when the marker was all
+ * it held. The kind is recorded as the `dataAdmonition` property of the
+ * blockquote's hast element, so it reaches the renderer as a `data-admonition`
+ * attribute.
  *
  * @note Mutates `blockquote` in place: unified transformers edit the tree they
  * are handed rather than return a copy.
@@ -24,7 +26,10 @@ function markAdmonition(blockquote: Blockquote): void {
 
   const [marker, kind] = match;
   text.value = text.value.slice(marker.length);
-  if (text.value === "") paragraph.children.shift();
+  if (text.value === "") {
+    paragraph.children.shift();
+    if (paragraph.children.at(0)?.type === "break") paragraph.children.shift();
+  }
   if (paragraph.children.length === 0) blockquote.children.shift();
 
   blockquote.data = {

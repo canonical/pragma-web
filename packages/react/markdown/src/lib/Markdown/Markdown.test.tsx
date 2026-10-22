@@ -7,6 +7,7 @@ import {
   duplicateHeadingsDocument,
   footnoteDocument,
   gfmDocument,
+  hardBreakAdmonitionDocument,
   hostileDocument,
 } from "../../../testing/fixtures.js";
 import type { MarkdownElementProps } from "../types.js";
@@ -70,6 +71,16 @@ describe("Markdown", () => {
       expect(container.querySelector("blockquote")?.textContent?.trim()).toBe(
         "Just a quote.",
       );
+    });
+
+    it("opens an admonition's content with its body when the marker line ends in a hard break", () => {
+      const { container } = render(
+        <Markdown source={hardBreakAdmonitionDocument} />,
+      );
+
+      const content = container.querySelector(".ds.announcement .content");
+      expect(content?.textContent?.trim()).toBe("A note.");
+      expect(content?.querySelector("br")).toBeNull();
     });
   });
 
