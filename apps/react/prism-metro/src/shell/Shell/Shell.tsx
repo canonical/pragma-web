@@ -1,4 +1,4 @@
-import { HomesProvider } from "@canonical/prism-core";
+import { HomesProvider, RouterLink } from "@canonical/prism-core";
 import { ProjectionsProvider } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import type { AnyRoute, RouteMap } from "@canonical/router-core";
@@ -20,8 +20,9 @@ import type { ShellProps } from "./types.js";
  * so the hydrated tree and the server markup share one nest. Each lens's
  * layout renders below it, through the `Outlet`.
  *
- * The projections render a home through the intrinsic `"a"`, so following a
- * mention loads the page as a document.
+ * The projections render a home through prism-core's `RouterLink`, so every
+ * mention navigates on the client through the router: a plain click loads
+ * and renders the destination in place, and hovering it warms its data.
  *
  * Generic over the route map rather than bound to `AppRoutes`, so the test
  * harnesses mount it over route tables of their own. Renders no element of
@@ -38,7 +39,10 @@ export default function Shell<
       <RelayEnvironmentProvider environment={environment}>
         <RouterProvider router={router}>
           <HomesProvider homes={homes}>
-            <ProjectionsProvider maps={metroProjectionMaps}>
+            <ProjectionsProvider
+              LinkComponent={RouterLink}
+              maps={metroProjectionMaps}
+            >
               <Outlet fallback={<p>{MESSAGES["shell.loading"]}</p>} />
             </ProjectionsProvider>
           </HomesProvider>

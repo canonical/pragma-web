@@ -1,5 +1,5 @@
 import { setPrefetchEnvironment } from "@canonical/prism-core";
-import { screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   CIRCLE_LINE_TITLE,
@@ -54,6 +54,20 @@ describe("the stations lens", () => {
     const fields = await screen.findByRole("table");
     expect(within(fields).getByText("servesLine")).toBeInTheDocument();
   });
+
+  it("opens a station from the stations index on the client", async () => {
+    renderLensPage("/stations", graph.url);
+    await findIndexRows();
+    // The router took the click: the browser's own navigation was prevented
+    // and the station's page rendered in place.
+    expect(
+      fireEvent.click(screen.getByRole("link", { name: NORTHGATE_TITLE })),
+    ).toBe(false);
+    expect(
+      await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole("table")).toBeInTheDocument();
+  });
 });
 
 describe("the lines lens", () => {
@@ -63,6 +77,18 @@ describe("the lines lens", () => {
     expect(
       screen.getByRole("link", { name: CIRCLE_LINE_TITLE }),
     ).toHaveAttribute("href", "/lines/metro%3Acircle-line");
+  });
+
+  it("opens a line from the lines index on the client", async () => {
+    renderLensPage("/lines", graph.url);
+    await findIndexRows();
+    expect(
+      fireEvent.click(screen.getByRole("link", { name: CIRCLE_LINE_TITLE })),
+    ).toBe(false);
+    expect(
+      await screen.findByRole("heading", { level: 1, name: CIRCLE_LINE_TITLE }),
+    ).toBeInTheDocument();
+    expect(await screen.findByRole("table")).toBeInTheDocument();
   });
 });
 
