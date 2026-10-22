@@ -12,6 +12,7 @@ import { resolveGraphqlUrl } from "#relay";
 import type { InitialData } from "#server";
 import { Shell } from "#shell";
 import { appRoutes, notFoundRoute } from "../routes.js";
+import createRoutableAdapter from "./createRoutableAdapter.js";
 
 /**
  * Hydrate the app into `container` over the server's markup, returning the
@@ -25,7 +26,9 @@ import { appRoutes, notFoundRoute } from "../routes.js";
  *
  * The environment is published for the routes' `warm` before the router
  * exists: creating the browser router runs the initial load, whose `warm`
- * must already find the seeded store.
+ * must already find the seeded store. The router reads the location as the
+ * server routed it, so a path that does not percent-decode hydrates the
+ * not-found page the server answered it with.
  *
  * @param container - The element the server rendered the app into.
  * @param options - Passed through to `hydrateRoot`; tests pass
@@ -50,7 +53,7 @@ export default function hydrateApp(
   setPrefetchEnvironment(relayEnvironment);
 
   const router = createRouter(appRoutes, {
-    adapter: createBrowserAdapter(),
+    adapter: createRoutableAdapter(createBrowserAdapter()),
     notFound: notFoundRoute,
   });
 

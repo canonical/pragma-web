@@ -18,6 +18,7 @@ import {
   it,
   vi,
 } from "vitest";
+import { MESSAGES } from "#i18n";
 import type { InitialData } from "#server";
 import { prepareRelayData } from "#server";
 import { Shell } from "#shell";
@@ -25,6 +26,7 @@ import { CIRCLE_LINE_TITLE, NORTHGATE_TITLE } from "../../testing/fixtures.js";
 import startMetroGraph from "../../testing/startMetroGraph.js";
 import type { MetroGraph } from "../../testing/types.js";
 import { appRoutes, notFoundRoute } from "../routes.js";
+import selectRoutableUrl from "../selectRoutableUrl.js";
 import hydrateApp from "./hydrateApp.js";
 
 // Driving `act` directly, without Testing Library's wrapper, needs the flag.
@@ -65,7 +67,9 @@ const renderServerHtml = (url: string, records: RecordMap): string =>
         records,
         fetchFn: () => Promise.reject(new Error("the server store missed")),
       })}
-      router={createStaticRouter(appRoutes, url, { notFound: notFoundRoute })}
+      router={createStaticRouter(appRoutes, selectRoutableUrl(url), {
+        notFound: notFoundRoute,
+      })}
     />,
   );
 
@@ -148,6 +152,23 @@ describe("hydrateApp", () => {
       );
     },
   );
+
+  it("hydrates the not-found page at a path that does not decode", async () => {
+    const url = "/stations/%ZZ";
+    const serverHtml = renderServerHtml(url, {});
+    expect(serverHtml).toContain(MESSAGES["notFound.title"]);
+
+    window.history.pushState({}, "", url);
+    (window as TestWindow).__INITIAL_DATA__ = { url };
+    const { container, onRecoverableError } = await hydrateInto(serverHtml);
+
+    expect(window.location.pathname).toBe(url);
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    expect(container.querySelector("h1")?.textContent).toBe(
+      MESSAGES["notFound.title"],
+    );
+    expect(fetch).not.toHaveBeenCalled();
+  });
 
   it("fetches when the page carries no initial data", async () => {
     const url = "/lines";
