@@ -1,6 +1,12 @@
 import { type ExecutionResult, graphql } from "graphql";
 import { beforeAll, describe, expect, it } from "vitest";
 import { assertPresent } from "../../testing/assertPresent.js";
+import {
+  expectFieldsRoundTrip,
+  readNodeMeta,
+  selectOnNode,
+} from "../../testing/expectFieldsRoundTrip.js";
+import type { PublishedFields } from "../../testing/types.js";
 import { toCursor } from "./connection.js";
 import {
   CALL_CLASS_URI,
@@ -1047,43 +1053,6 @@ describe("Stop.diagramPosition", () => {
   });
 });
 
-/** The part of a `_meta` selection the field round-trip reads. */
-interface PublishedFields {
-  readonly fields?: readonly { readonly name: string }[];
-  readonly field?: { readonly name: string } | null;
-}
-
-/** Reads `_meta` straight off a node. */
-const readNodeMeta = (node: unknown): PublishedFields =>
-  (node as { _meta: PublishedFields })._meta;
-
-/** Selects `_meta` straight on a node. */
-const selectOnNode = (meta: string): string => meta;
-
-/**
- * Read every name a value's `_meta.fields` publishes, and pass each one back
- * through `_meta.field(name:)`: every published name must answer with
- * itself. `selection` places the `_meta` selection on the value under the
- * node, and `readMeta` reads it back.
- */
-const expectFieldsRoundTrip = async (
-  uri: string,
-  selection: (meta: string) => string,
-  readMeta: (node: unknown) => PublishedFields,
-): Promise<void> => {
-  const listed = await run(
-    `{ node(id: "${uri}") { ${selection("_meta { fields { name } }")} } }`,
-  );
-  const names = (readMeta(listed.node).fields ?? []).map((field) => field.name);
-  expect(names.length).toBeGreaterThan(0);
-  for (const name of names) {
-    const roundTrip = await run(
-      `{ node(id: "${uri}") { ${selection(`_meta { field(name: "${name}") { name } }`)} } }`,
-    );
-    expect(readMeta(roundTrip.node).field).toEqual({ name });
-  }
-};
-
 describe("RollingStock.formations", () => {
   const SERIES_90 = "https://metro.example/onto#series-90";
 
@@ -1111,7 +1080,7 @@ describe("RollingStock.formations", () => {
   });
 
   it("publishes its fields, and each one round-trips", async () => {
-    await expectFieldsRoundTrip(SERIES_90, selectOnNode, readNodeMeta);
+    await expectFieldsRoundTrip(run, SERIES_90, selectOnNode, readNodeMeta);
   });
 });
 
@@ -1187,11 +1156,12 @@ describe("Formation", () => {
   });
 
   it("publishes its fields, and each one round-trips", async () => {
-    await expectFieldsRoundTrip(SIX_CAR, selectOnNode, readNodeMeta);
+    await expectFieldsRoundTrip(run, SIX_CAR, selectOnNode, readNodeMeta);
   });
 
   it("publishes a unit position's fields, and each one round-trips", async () => {
     await expectFieldsRoundTrip(
+      run,
       SIX_CAR,
       (meta) => `... on Formation { units { ${meta} } }`,
       (node) =>
@@ -1246,7 +1216,7 @@ describe("CarType", () => {
   });
 
   it("publishes its fields, and each one round-trips", async () => {
-    await expectFieldsRoundTrip(DRIVING_CAR, selectOnNode, readNodeMeta);
+    await expectFieldsRoundTrip(run, DRIVING_CAR, selectOnNode, readNodeMeta);
   });
 });
 
@@ -1314,11 +1284,12 @@ describe("Unit.cars", () => {
   });
 
   it("publishes the unit's fields, and each one round-trips", async () => {
-    await expectFieldsRoundTrip(UNIT_90, selectOnNode, readNodeMeta);
+    await expectFieldsRoundTrip(run, UNIT_90, selectOnNode, readNodeMeta);
   });
 
   it("publishes a car position's fields, and each one round-trips", async () => {
     await expectFieldsRoundTrip(
+      run,
       UNIT_90,
       (meta) => `... on Unit { cars { ${meta} } }`,
       (node) =>

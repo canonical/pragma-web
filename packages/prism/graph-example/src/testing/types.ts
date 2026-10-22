@@ -2,7 +2,8 @@
  * The shapes the test readers return, as a client reads them through
  * GraphQL: `readNetwork`'s lines with their routes and calls and stations
  * with their lines and diagram places, and `readFleet`'s rolling stocks,
- * formations, units and car types with the lines they run. Test-only, and
+ * formations, units and car types with the lines they run; and the part
+ * of a `_meta` selection the field round-trip reads. Test-only, and
  * type-only.
  */
 
@@ -12,6 +13,12 @@ export interface InstancePage<T> {
     readonly edges: readonly { readonly node: T }[];
     readonly pageInfo: { readonly hasNextPage: boolean };
   };
+}
+
+/** The part of a `_meta` selection the field round-trip reads. */
+export interface PublishedFields {
+  readonly fields?: readonly { readonly name: string }[];
+  readonly field?: { readonly name: string } | null;
 }
 
 /** A reference to a node by its IRI, the way a selection of `{ uri }` answers. */
