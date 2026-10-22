@@ -21,8 +21,8 @@ const Item = ({
   disabled = false,
   className,
   LinkComponent = "a",
-  // Destructure Item props we don't spread to DOM
-  key: _key,
+  // Destructure Item props we don't spread to DOM. React keeps `key` out of
+  // props, so reading it here would only log a warning.
   items: _items,
   Component: _Component,
   ...props
