@@ -15,6 +15,7 @@ export default function Navigation(): ReactElement {
       </Link>
       <Link to="catalog">{t("nav.catalog")}</Link>
       <Link to="contact">{t("nav.contact")}</Link>
+      <Link to="dashboard">{t("nav.dashboard")}</Link>
       <Link search={{ auth: "1" }} to="account">
         {t("nav.signIn")}
       </Link>

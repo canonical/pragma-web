@@ -197,6 +197,37 @@ describe("server matrix (2×3) serves correctly", () => {
             const home = await fetch(`${server.base}/`);
             expect(await home.text()).not.toContain("relayPayloads");
           }
+
+          // SSR cells render the dashboard under the top bar, inside the
+          // application shell, each a surface: its own title in <head>, the
+          // side navigation with the current page marked, and the design
+          // system's icons served at /icons, which its items reference.
+          if (cell.ssr) {
+            const dashboard = await fetch(`${server.base}/dashboard`);
+            expect(dashboard.status).toBe(200);
+            const dashboardHtml = await dashboard.text();
+            const dashboardHead = dashboardHtml.slice(
+              0,
+              dashboardHtml.indexOf("</head>"),
+            );
+
+            expect(dashboardHead.match(/<title>/g)?.length ?? 0).toBe(1);
+            expect(dashboardHead).toContain(
+              "<title>Dashboard — Boilerplate</title>",
+            );
+            expect(dashboardHtml).toContain('class="ds top-bar surface"');
+            expect(dashboardHtml).toContain(
+              'class="ds application-shell surface"',
+            );
+            expect(dashboardHtml).toContain('class="ds side-navigation"');
+            expect(dashboardHtml).toContain(
+              'aria-current="page" class="row" href="/dashboard"',
+            );
+
+            const icon = await fetch(`${server.base}/icons/containers.svg`);
+            expect(icon.status).toBe(200);
+            expect(icon.headers.get("content-type")).toMatch(/svg/);
+          }
         } finally {
           await server.stop();
         }

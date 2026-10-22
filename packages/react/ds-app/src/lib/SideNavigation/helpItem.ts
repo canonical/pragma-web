@@ -10,6 +10,7 @@ import type { ExpandableNavItem } from "./types.js";
  * into their `root`.
  *
  * @param legalUrl The external URL to legal information.
+ * @param options.label Label for the Help item itself. Defaults to `"Help"`.
  * @param options.legalLabel Label for the legal link. Defaults to `"Legal information"`.
  * @param options.additionalItems Further leaf items under "Help", after the
  * legal link (e.g. a documentation or support link).
@@ -17,12 +18,13 @@ import type { ExpandableNavItem } from "./types.js";
 export const createHelpItem = (
   legalUrl: string,
   options: {
+    label?: string;
     legalLabel?: string;
     additionalItems?: ExpandableNavItem["items"];
   } = {},
 ): ExpandableNavItem => ({
   key: "help",
-  label: "Help",
+  label: options.label ?? "Help",
   icon: "help",
   items: [
     {

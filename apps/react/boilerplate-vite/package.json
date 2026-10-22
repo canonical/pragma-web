@@ -38,8 +38,11 @@
   },
   "dependencies": {
     "@canonical/ds-assets": "^0.44.1",
+    "@canonical/ds-types": "^0.44.1",
+    "@canonical/ds-utils": "^0.44.1",
     "@canonical/i18n-core": "^0.44.1",
     "@canonical/i18n-react": "^0.44.1",
+    "@canonical/react-ds-app": "^0.44.1",
     "@canonical/react-ds-global": "^0.44.1",
     "@canonical/react-ds-global-form": "^0.44.1",
     "@canonical/react-head": "^0.44.1",

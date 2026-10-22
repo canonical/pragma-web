@@ -7,20 +7,33 @@
  * this file lands after it. Keep that import first. */
 
 @layer app {
-  .app-shell {
+  /* Every page: the top bar, then the area a page layout fills. */
+  .page-frame {
+    /* The top bar's height, shared with the application shell so the side
+       panels it opens start below the bar rather than over it. Twelve
+       baseline units: the selectors' 40px chrome plus the bar's padding. */
+    --top-bar-block-size: calc(var(--space-baseline) * 12);
+    --application-shell-overlay-inset-block-start: var(--top-bar-block-size);
+
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-block-size: 100dvh;
+  }
+
+  /* Under an application shell the page is exactly the viewport's height:
+     the side navigation and the page scroll inside the shell, not the
+     document. */
+  .page-frame:has(> .ds.application-shell) {
+    block-size: 100dvh;
+  }
+
+  /* The public pages: one constrained column. */
+  .public-content {
+    box-sizing: border-box;
+    inline-size: 100%;
     max-width: 1280px;
     margin: 0 auto;
-    padding-inline: var(--grid-gap, 1.5rem);
-    padding-block: var(--container-gap-loose, 1.5rem);
-  }
-
-  .shell-header {
-    padding-block-end: var(--container-gap-default, 1rem);
-  }
-
-  .shell-header nav {
-    grid-column: 1 / -1;
-    display: flex;
-    gap: var(--container-gap-default, 1rem);
+    padding-inline: var(--grid-margin);
+    padding-block: var(--container-gap-loose);
   }
 }

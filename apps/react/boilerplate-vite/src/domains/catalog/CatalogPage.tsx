@@ -3,6 +3,7 @@ import { Head } from "@canonical/react-head";
 import { type ReactElement, Suspense } from "react";
 import { useRelayEnvironment } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
+import { CodeMessage } from "#lib/index.js";
 import ErrorBoundary from "./ErrorBoundary.js";
 import ProductList, { PAGE_SIZE, productListQuery } from "./ProductList.js";
 
@@ -22,18 +23,7 @@ export default function CatalogPage(): ReactElement {
     <section aria-labelledby="catalog-title">
       <Head title={t("catalog.title")} />
       <h1 id="catalog-title">{t("catalog.heading")}</h1>
-      {/*
-        Developer documentation rather than user-facing copy (file names,
-        APIs), so it deliberately stays out of the message catalogs.
-      */}
-      <p>
-        This page demonstrates the Relay data layer. <code>ProductList</code>{" "}
-        issues a <code>useLazyLoadQuery</code>, each <code>ProductCard</code>{" "}
-        reads its own <code>useFragment</code>, and the environment resolves
-        operations against the local mock schema in{" "}
-        <code>src/relay/schema.ts</code> — set <code>VITE_GRAPHQL_URL</code> to
-        point it at a real endpoint instead.
-      </p>
+      <CodeMessage message={t("catalog.intro")} />
       {/*
         SSR: the server prefetches this route's declared query (see
         `serverQueries` in src/routes.tsx) and seeds both render environments

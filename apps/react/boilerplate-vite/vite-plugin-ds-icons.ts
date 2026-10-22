@@ -1,7 +1,7 @@
 import { createReadStream, existsSync } from "node:fs";
 import { cp, mkdir } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { Plugin, ResolvedConfig } from "vite";
 
 /**
@@ -18,7 +18,12 @@ import type { Plugin, ResolvedConfig } from "vite";
 const iconsDir = () =>
   join(
     dirname(
-      fileURLToPath(import.meta.resolve("@canonical/ds-assets/package.json")),
+      // `require.resolve` rather than `import.meta.resolve`: Vite bundles this
+      // file with the config, and under the Bun dev server the bundled config
+      // cannot resolve `import.meta.resolve`, so every icon answered 404.
+      createRequire(import.meta.url).resolve(
+        "@canonical/ds-assets/package.json",
+      ),
     ),
     "icons",
   );

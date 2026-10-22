@@ -17,6 +17,7 @@ import {
 import { hydrateRoot } from "react-dom/client";
 import { RelayEnvironmentProvider } from "react-relay";
 import { catalogs, i18nConfig } from "#i18n/index.js";
+import LoadingMessage from "#lib/LoadingMessage/index.js";
 import { getBrowserEnvironment } from "#relay/environment.js";
 import formatDocumentTitle from "../formatDocumentTitle.js";
 import {
@@ -92,7 +93,7 @@ hydrateRoot(
     <HeadProvider titleTemplate={formatDocumentTitle}>
       <RelayEnvironmentProvider environment={relayEnvironment}>
         <RouterProvider router={router}>
-          <Outlet fallback={<p>Loading…</p>} />
+          <Outlet fallback={<LoadingMessage />} />
         </RouterProvider>
       </RelayEnvironmentProvider>
     </HeadProvider>

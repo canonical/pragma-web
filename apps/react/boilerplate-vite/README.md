@@ -106,14 +106,15 @@ src/
 │   ├── marketing/        Home, guides
 │   ├── account/          Account, login
 │   ├── catalog/          Product catalog — the Relay data-layer example
-│   └── contact/          Contact form (present when scaffolded with forms)
+│   ├── contact/          Contact form (present when scaffolded with forms)
+│   └── dashboard/        An LXD-style application: side navigation, views,
+│                         a side panel and a modal
 ├── i18n/                 Locale configuration and message catalogs (en/fr/ar)
-├── lib/                  Shared components (Navigation, ThemeSelector, …)
+├── lib/                  Shared components (TopBar, ApplicationShell, …)
 ├── relay/                Relay environment factory, executable mock schema,
 │                         and generated artifacts (__generated__/)
 ├── styles/               Application CSS
 ├── assets/               Assets imported in code (bundled and hashed by Vite)
-├── Application.tsx       Application shell
 └── routes.tsx            Root route map
 public/                   Files served verbatim at a fixed URL (favicon, robots.txt)
 test/e2e/                 The 2×3 server-matrix end-to-end suite
@@ -124,6 +125,27 @@ adding a feature is adding a domain rather than threading changes through shared
 files. `src/assets/` and `public/` both ship by default — the former for assets
 referenced in code, the latter for fixed-URL files — and either may be removed if
 an application uses only one.
+
+### Page layouts
+
+Layouts are router wrappers, applied to routes with `group()` in
+`src/routes.tsx`, so a page never renders its own frame. Every page except the
+404 sits under `topBarLayout`: a top bar with the app's name, one link per area
+of the boilerplate, and the theme and language selectors. The links are demo
+navigation for exploring what the boilerplate ships — replace them with your
+own. Under the top bar a page takes one of two layouts:
+
+- `publicLayout` — the public pages: one constrained column.
+- `applicationLayout` — the dashboard: `ApplicationShell` from `src/lib`,
+  which is the design system's `ApplicationLayout` with its `SideNavigation`.
+  Each dashboard page renders `ViewLayout` and `ContentLayout` inside it.
+
+The dashboard's navigation is one tree of navigation items, built in
+`src/domains/dashboard/hooks/useDashboardNavigation.ts`. The side navigation
+renders it, and the breadcrumbs are projected from it: a page's trail is its
+path in the tree, so a page never states its own position. `RouterLink` is the
+`LinkComponent` that lets design-system components which render their own links
+navigate through the router.
 
 ## Data layer (Relay)
 
@@ -193,13 +215,18 @@ from there. The type error you get until the catalog is complete is the point.
 logical properties (`margin-inline-start`, `text-align: start`) so layouts
 mirror structurally.
 
-**What is (and is not) translated.** UI chrome — navigation, selector labels,
-page headings and taglines, the catalog's loading/error/stock/rating strings —
-comes from the catalogs. Product names and taglines are data, not chrome, and
-render untranslated; the identifier-heavy developer prose on the home and
-catalog pages stays in English deliberately. Prices and ratings go through
-`useFormatters`, so the same data renders as `$125.00` in English and
-`125,00 $US` in French.
+**What is (and is not) translated.** Everything a reader sees comes from the
+catalogs: navigation, headings, labels, buttons, status words, the dashboard's
+sample data, the design system's built-in text (the side navigation's skip
+link and collapse toggle, landmark names, close buttons) and the developer
+prose on the home and catalog pages. What stays as written is names, which are
+the same in every language — the app's name, people, products, instances and
+projects — and the product data the catalog's API returns. Code names inside
+translated prose sit between backticks in every catalog, and `CodeMessage`
+(`src/lib/CodeMessage`) renders them as code. Numbers, sizes, prices and
+relative times go through `useFormatters`, so the same data renders as
+`2.4 TB` and `2 minutes ago` in English, `2,4 To` and `il y a 2 minutes` in
+French.
 
 In Storybook, every story is wrapped in the provider by a `withI18n` decorator
 and the toolbar's Locale menu (globe icon) switches the story's language.
@@ -209,6 +236,7 @@ and the toolbar's Locale menu (globe icon) switches the story's language.
 Path aliases (`#lib`, `#domains`, `#relay`, `#styles`) are Node subpath
 imports declared in `package.json`, resolved natively by Vite and TypeScript
 without a resolver plugin. Linting and formatting run through Biome (`bun run check`). The
-application is built on `@canonical/react-ds-global`, `@canonical/react-ssr`,
+application is built on `@canonical/react-ds-global`, `@canonical/react-ds-global-form`,
+`@canonical/react-ds-app`, `@canonical/react-ssr`,
 `@canonical/router-react`, and the shared design tokens — the same packages every
 Canonical application uses, so conventions carry across projects.

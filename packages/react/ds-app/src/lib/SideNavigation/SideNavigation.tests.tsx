@@ -44,6 +44,47 @@ describe("SideNavigation", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders its built-in text from messages, for translation", () => {
+    render(
+      <SideNavigation
+        root={root}
+        messages={{
+          skipToContent: () => "Aller au contenu principal",
+          navigation: () => "Navigation principale",
+          collapseNavigation: () => "Réduire la navigation",
+          closeMenu: () => "Fermer le menu",
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Aller au contenu principal" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Navigation principale" }),
+    ).toBeInTheDocument();
+    const toggle = screen.getByRole("button", {
+      name: "Réduire la navigation",
+    });
+    expect(toggle).toHaveTextContent("Fermer le menu");
+  });
+
+  it("keeps the English default for any message left out", () => {
+    render(
+      <SideNavigation
+        root={root}
+        messages={{ navigation: () => "Navigation principale" }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Skip to main content" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Collapse navigation" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders the skip link first in DOM order", () => {
     const { container } = render(<SideNavigation root={root} />);
     const first = container.firstElementChild?.firstElementChild;

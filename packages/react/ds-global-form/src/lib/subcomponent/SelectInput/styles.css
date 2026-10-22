@@ -41,5 +41,16 @@
      * room for the chevron. */
     padding-inline-start: var(--form-input-padding-inline);
     padding-inline-end: calc(var(--form-input-padding-inline) * 2 + 1em);
+
+    /* The padding above is logical, so in right-to-left text the room for
+       the chevron opens on the left; `background-position` has no logical
+       keywords, so the chevron moves there explicitly. Mirrored, the two
+       gradient squares swap halves: the 45deg square is the outer one. */
+    &:dir(rtl) {
+      background-position:
+        left var(--form-input-padding-inline) center,
+        left calc(var(--form-input-padding-inline) + var(--select-caret-half))
+        center;
+    }
   }
 }
