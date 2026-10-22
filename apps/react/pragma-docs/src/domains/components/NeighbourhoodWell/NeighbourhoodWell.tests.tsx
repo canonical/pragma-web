@@ -70,7 +70,7 @@ describe("NeighbourhoodWell", () => {
   });
 
   it("tints its chips by the provider's prefixes, in the provider's order", () => {
-    const tintOfCentre = (well: HTMLElement): string =>
+    const readCentreTint = (well: HTMLElement): string =>
       (
         well.querySelector(
           `[data-well-uri="${BUTTON_URI}"] .chip`,
@@ -78,7 +78,7 @@ describe("NeighbourhoodWell", () => {
       ).style.getPropertyValue("--chip-tint");
 
     // The captured provider lists `ds` first: the first hue on the wheel.
-    expect(tintOfCentre(renderWell())).toMatch(/ 0\)$/);
+    expect(readCentreTint(renderWell())).toMatch(/ 0\)$/);
 
     // The same well over a provider that lists `cs` before `ds` takes the
     // second hue for `ds`: the order is the provider's, not the app's.
@@ -93,7 +93,7 @@ describe("NeighbourhoodWell", () => {
         prefix: "ds",
       },
     });
-    expect(tintOfCentre(reordered)).toMatch(/ 138\)$/);
+    expect(readCentreTint(reordered)).toMatch(/ 138\)$/);
   });
 
   it("generates the legend from the edge-family table (it cannot drift)", () => {

@@ -63,7 +63,12 @@ export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
 export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
 export { ThemeSelector } from "./ThemeSelector/index.js";
-export type { QuadArc, RelaxOptions, WellBox } from "./WellGeometry/index.js";
+export type {
+  QuadArc,
+  RelaxOptions,
+  WellBox,
+  WellPoint,
+} from "./WellGeometry/index.js";
 export {
   buildQuadArc,
   buildSelfLoop,

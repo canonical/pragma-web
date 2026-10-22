@@ -13,4 +13,4 @@ export { default as buildSelfLoop } from "./buildSelfLoop.js";
 export { default as findEdgeEndpoint } from "./findEdgeEndpoint.js";
 export { default as relaxBoxes } from "./relaxBoxes.js";
 export { default as settle } from "./settle.js";
-export type { QuadArc, RelaxOptions, WellBox } from "./types.js";
+export type { QuadArc, RelaxOptions, WellBox, WellPoint } from "./types.js";

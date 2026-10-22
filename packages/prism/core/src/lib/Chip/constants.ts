@@ -44,11 +44,22 @@ export const DEFAULT_LIFECYCLE: Lifecycle = "none";
 export const GOLDEN_ANGLE_DEGREES = 137.508;
 
 /**
+ * The oklch lightness every namespace tint shares when the theme sets no
+ * `--chip-tint-l`.
+ */
+export const TINT_LIGHTNESS_FALLBACK = 0.45;
+
+/**
+ * The oklch chroma every namespace tint shares when the theme sets no
+ * `--chip-tint-c`.
+ */
+export const TINT_CHROMA_FALLBACK = 0.12;
+
+/**
  * The tint of a mention whose namespace is not one of the site's prefixes:
  * the tint lightness with no chroma, behind its own theme hook.
  */
-export const UNKNOWN_NAMESPACE_TINT =
-  "var(--chip-tint-unknown, oklch(var(--chip-tint-l, 0.45) 0 0))";
+export const UNKNOWN_NAMESPACE_TINT = `var(--chip-tint-unknown, oklch(var(--chip-tint-l, ${TINT_LIGHTNESS_FALLBACK}) 0 0))`;
 
 /**
  * The shape channel's encoding, one row per {@link KINDS} value, each row's

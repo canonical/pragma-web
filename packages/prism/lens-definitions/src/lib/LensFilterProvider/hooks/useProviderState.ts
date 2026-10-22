@@ -13,6 +13,8 @@ import type { UseProviderStateResult } from "./types.js";
  * Nothing here may be seeded from `localStorage`, `window` or the query
  * string.
  *
+ * @note Impure: holds the filter in React state, so the value it returns
+ *   changes across renders once `setFilter` is called.
  * @returns The filter and its setter, stable until the filter changes.
  */
 export default function useProviderState(): UseProviderStateResult {

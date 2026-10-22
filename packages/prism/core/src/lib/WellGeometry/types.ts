@@ -16,8 +16,14 @@ export interface RelaxOptions {
   readonly pinned?: ReadonlySet<number>;
 }
 
+/** A point in a well's coordinate space, in px. */
+export interface WellPoint {
+  readonly x: number;
+  readonly y: number;
+}
+
 /** A quadratic arc's path plus its label anchor (the apex, lifted). */
 export interface QuadArc {
   readonly d: string;
-  readonly labelAt: { readonly x: number; readonly y: number };
+  readonly labelAt: WellPoint;
 }
