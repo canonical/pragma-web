@@ -15,6 +15,7 @@ import {
   createExampleProvider,
   EMPTY_LOCAL_NAME_URI,
   exampleDataset,
+  isNetworkEntity,
 } from "../../lib/provider/index.js";
 
 const provider = createExampleProvider();
@@ -71,9 +72,9 @@ describe("every class in the dataset has a title", () => {
 });
 
 describe("the embeddable has a title despite having no IRI", () => {
-  const embedded = exampleDataset.entities.filter(
-    (entity) => entity.location !== undefined,
-  );
+  const embedded = exampleDataset.entities
+    .filter(isNetworkEntity)
+    .filter((entity) => entity.location !== undefined);
 
   it("has at least one embeddable in the dataset to check", () => {
     expect(embedded.length).toBeGreaterThan(0);
@@ -177,9 +178,9 @@ describe("every class in the dataset has a curie", () => {
 });
 
 describe("the embeddable has a curie despite having no IRI", () => {
-  const embedded = exampleDataset.entities.filter(
-    (entity) => entity.location !== undefined,
-  );
+  const embedded = exampleDataset.entities
+    .filter(isNetworkEntity)
+    .filter((entity) => entity.location !== undefined);
 
   it.each(embedded.map((entity) => entity.uri))("%s", async (uri) => {
     const result = await execute(
@@ -243,9 +244,9 @@ describe("curies actually compact, and resolve per namespace", () => {
 // ---------------------------------------------------------------------------
 
 describe("every value type has a title and a curie", () => {
-  const routed = exampleDataset.entities.filter(
-    (entity) => (entity.routes ?? []).length > 0,
-  );
+  const routed = exampleDataset.entities
+    .filter(isNetworkEntity)
+    .filter((entity) => (entity.routes ?? []).length > 0);
 
   it("has routed lines in the dataset to check", () => {
     expect(routed.length).toBeGreaterThan(0);
@@ -286,9 +287,9 @@ describe("every value type has a title and a curie", () => {
     }
   });
 
-  const positioned = exampleDataset.entities.filter(
-    (entity) => entity.diagramPosition !== undefined,
-  );
+  const positioned = exampleDataset.entities
+    .filter(isNetworkEntity)
+    .filter((entity) => entity.diagramPosition !== undefined);
 
   it("has positioned stations in the dataset to check", () => {
     expect(positioned.length).toBeGreaterThan(0);
@@ -316,6 +317,70 @@ describe("every value type has a title and a curie", () => {
       expect(point?._meta.curie).toBe("DiagramPoint");
     },
   );
+});
+
+// ---------------------------------------------------------------------------
+// The fleet's positions are value types too: a formation's units are
+// UnitPositions and a unit's cars are CarPositions. Driven from the dataset's
+// formations and units, so a position added anywhere is checked.
+// ---------------------------------------------------------------------------
+
+describe("every fleet position has a title and a curie", () => {
+  const formations = exampleDataset.entities.filter(
+    (entity) => entity.typename === "Formation",
+  );
+
+  it("has formations in the dataset to check", () => {
+    expect(formations.length).toBeGreaterThan(0);
+  });
+
+  it.each(formations.map((entity) => entity.uri))("%s's units", async (uri) => {
+    const result = await execute(
+      `query V($id: ID!) {
+         node(id: $id) { ... on Formation { units { _meta { title curie } } } }
+       }`,
+      { id: uri },
+    );
+    expect(result.errors).toBeUndefined();
+    const units = (
+      result.data as {
+        node: { units: { _meta: { title: string; curie: string } }[] };
+      }
+    ).node.units;
+    expect(units.length).toBeGreaterThan(0);
+    for (const unit of units) {
+      expectUsableTitle(unit._meta.title);
+      expect(unit._meta.curie).toBe("UnitPosition");
+    }
+  });
+
+  const units = exampleDataset.entities.filter(
+    (entity) => entity.typename === "Unit",
+  );
+
+  it("has units in the dataset to check", () => {
+    expect(units.length).toBeGreaterThan(0);
+  });
+
+  it.each(units.map((entity) => entity.uri))("%s's cars", async (uri) => {
+    const result = await execute(
+      `query V($id: ID!) {
+         node(id: $id) { ... on Unit { cars { _meta { title curie } } } }
+       }`,
+      { id: uri },
+    );
+    expect(result.errors).toBeUndefined();
+    const cars = (
+      result.data as {
+        node: { cars: { _meta: { title: string; curie: string } }[] };
+      }
+    ).node.cars;
+    expect(cars.length).toBeGreaterThan(0);
+    for (const car of cars) {
+      expectUsableTitle(car._meta.title);
+      expect(car._meta.curie).toBe("CarPosition");
+    }
+  });
 });
 
 describe("the two entities that have nothing to be titled from", () => {

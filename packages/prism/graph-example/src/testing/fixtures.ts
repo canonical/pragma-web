@@ -6,7 +6,8 @@
  * provider-neutral, and that is exactly what this gate is for.
  *
  * The line IRIs name one line, or pair of lines, per topology the network
- * model has to carry, so each topology's test reads the line it is about
+ * model has to carry, and the fleet IRIs one stock, formation, unit or line
+ * per formation case, so each case's test reads the record it is about
  * rather than searching the network for something shaped right.
  */
 
@@ -114,3 +115,36 @@ export const BARE_STATION_URIS = [
   BARE_ENTITY_URI,
   EMPTY_LOCAL_NAME_URI,
 ] as const;
+
+/** A rolling stock that runs in one fixed formation of one unit. */
+export const FIXED_FORMATION_STOCK_URI = `${METRO_NAMESPACE}series-70`;
+
+/** A rolling stock that runs its unit alone or two coupled together. */
+export const COUPLED_STOCK_URI = `${METRO_NAMESPACE}series-90`;
+
+/** {@link COUPLED_STOCK_URI}'s formation of one unit. */
+export const SINGLE_UNIT_FORMATION_URI = `${METRO_NAMESPACE}series-90-three-car`;
+
+/** {@link COUPLED_STOCK_URI}'s formation of two units coupled together. */
+export const COUPLED_FORMATION_URI = `${METRO_NAMESPACE}series-90-six-car`;
+
+/** A unit with a driving cab at its front only. */
+export const ASYMMETRIC_UNIT_URI = `${METRO_NAMESPACE}unit-50`;
+
+/**
+ * A formation of two {@link ASYMMETRIC_UNIT_URI} units back to back, the
+ * second reversed, so the train has a cab at each end.
+ */
+export const REVERSED_UNIT_FORMATION_URI = `${METRO_NAMESPACE}series-50-four-car`;
+
+/** A line run by two rolling stocks. */
+export const MIXED_STOCK_LINE_URI = `${METRO_NAMESPACE}coastal-line`;
+
+/** The one formation longer than a platform it calls at. */
+export const OVERLONG_FORMATION_URI = COUPLED_FORMATION_URI;
+
+/** The line {@link OVERLONG_FORMATION_URI} overhangs a platform on. */
+export const OVERLONG_LINE_URI = `${METRO_NAMESPACE}north-line`;
+
+/** The station whose platform {@link OVERLONG_FORMATION_URI} overhangs. */
+export const SHORT_PLATFORM_STATION_URI = `${METRO_NAMESPACE}marsh-end`;

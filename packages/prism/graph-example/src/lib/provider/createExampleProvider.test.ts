@@ -1,12 +1,31 @@
 import { type ExecutionResult, graphql } from "graphql";
 import { beforeAll, describe, expect, it } from "vitest";
+import { assertPresent } from "../../testing/assertPresent.js";
+import {
+  expectFieldsRoundTrip,
+  readNodeMeta,
+  selectOnNode,
+} from "../../testing/expectFieldsRoundTrip.js";
+import {
+  ASYMMETRIC_UNIT_URI,
+  COUPLED_FORMATION_URI,
+  COUPLED_STOCK_URI,
+  MIXED_STOCK_LINE_URI,
+  OVERLONG_LINE_URI,
+  REVERSED_UNIT_FORMATION_URI,
+  SHORT_PLATFORM_STATION_URI,
+  SINGLE_UNIT_FORMATION_URI,
+} from "../../testing/fixtures.js";
+import type { PublishedFields } from "../../testing/types.js";
 import { toCursor } from "./connection.js";
 import {
   CALL_CLASS_URI,
+  CAR_POSITION_CLASS_URI,
   DIAGRAM_POINT_CLASS_URI,
   GEO_POINT_CLASS_URI,
   META_CLASS_URI,
   ROUTE_CLASS_URI,
+  UNIT_POSITION_CLASS_URI,
 } from "./constants.js";
 import { createExampleProvider } from "./createExampleProvider.js";
 import {
@@ -16,6 +35,7 @@ import {
   MULTILINGUAL_ENTITY_URI,
   SECOND_NAMESPACE_ENTITY_URI,
 } from "./dataset.js";
+import { isNetworkEntity } from "./isNetworkEntity.js";
 import type { ExampleDataset } from "./types.js";
 
 const provider = createExampleProvider();
@@ -77,11 +97,18 @@ describe("the schema", () => {
       )
       .map((type) => type.name)
       .sort();
+    // The network's four types and the fleet's four (rolling stocks, their
+    // formations, units and car types), which are Nodes so a client can
+    // address each one by its IRI.
     expect(names).toEqual([
+      "CarType",
+      "Formation",
       "Interchange",
       "Line",
       "OntologyClass",
+      "RollingStock",
       "Station",
+      "Unit",
       "Zone",
     ]);
   });
@@ -250,6 +277,14 @@ describe("Query.ontologyClass", () => {
         inherited: false,
         property: { uri: "https://metro.example/onto#platformCount" },
       },
+      // Declared after platformCount: the length of the shortest platform,
+      // which a formation's length is compared with.
+      {
+        required: false,
+        singular: true,
+        inherited: false,
+        property: { uri: "https://metro.example/onto#platformLength" },
+      },
       {
         required: true,
         singular: false,
@@ -303,6 +338,24 @@ describe("OntologyClass.instances", () => {
     expect(data.interchange).toEqual({ instanceCount: 4 });
     // North, Circle and Coastal, plus Upland, Lowland and the two Ringways.
     expect(data.line).toEqual({ instanceCount: 7 });
+  });
+
+  it("counts the fleet's stocks, formations, car types and units", async () => {
+    const data = await run(`{
+      stock: ontologyClass(uri: "metro:RollingStock") { instanceCount }
+      formation: ontologyClass(uri: "metro:Formation") { instanceCount }
+      carType: ontologyClass(uri: "metro:CarType") { instanceCount }
+      unit: ontologyClass(uri: "metro:Unit") { instanceCount }
+    }`);
+    // Series 70, Series 90 and Series 50.
+    expect(data.stock).toEqual({ instanceCount: 3 });
+    // Series 70 fixed, Series 90 three-car and six-car, Series 50 four-car.
+    expect(data.formation).toEqual({ instanceCount: 4 });
+    // Driving, motor and trailer cars of Series 70; driving and trailer
+    // cars of Series 90 and of Series 50.
+    expect(data.carType).toEqual({ instanceCount: 7 });
+    // One unit per series: 70, 90 and 50.
+    expect(data.unit).toEqual({ instanceCount: 3 });
   });
 
   it("counts nothing for a class with no ABox members", async () => {
@@ -502,6 +555,12 @@ describe("_meta", () => {
             inherited: false,
             property: { uri: "https://metro.example/onto#platformCount" },
           },
+          // platformLength follows platformCount, as the Station class
+          // declares them.
+          {
+            inherited: false,
+            property: { uri: "https://metro.example/onto#platformLength" },
+          },
           {
             inherited: false,
             property: { uri: "https://metro.example/onto#servesLine" },
@@ -566,8 +625,11 @@ describe("_meta", () => {
     const names = (
       data.node as { _meta: { fields: { name: string }[] } }
     )._meta.fields.map((field) => field.name);
+    // platformLength follows platformCount, as the Station class declares
+    // them.
     expect(names).toEqual([
       "platformCount",
+      "platformLength",
       "servesLine",
       "location",
       "inZone",
@@ -589,8 +651,10 @@ describe("_meta", () => {
     // accept; the OWL local name is returned as a label", so the round-trip
     // must NOT close. Answering with metadata there would hand a consumer a
     // field name it can never select.
+    // platformLength is a field on Station, so it is projected too.
     const projected = [
       "platformCount",
+      "platformLength",
       "servesLine",
       "location",
       "inZone",
@@ -999,6 +1063,274 @@ describe("Stop.diagramPosition", () => {
   });
 });
 
+describe("RollingStock.formations", () => {
+  it("lists the stock's alternative formations in authored order, shortest first", async () => {
+    const data = await run(`{
+      node(id: "${COUPLED_STOCK_URI}") {
+        __typename
+        ... on RollingStock { name formations { uri length } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      __typename: "RollingStock",
+      name: "Series 90",
+      formations: [
+        {
+          uri: SINGLE_UNIT_FORMATION_URI,
+          length: 60000,
+        },
+        {
+          uri: COUPLED_FORMATION_URI,
+          length: 120000,
+        },
+      ],
+    });
+  });
+
+  it("publishes its fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(
+      run,
+      COUPLED_STOCK_URI,
+      selectOnNode,
+      readNodeMeta,
+    );
+  });
+});
+
+describe("Formation", () => {
+  it("names the stock that lists it", async () => {
+    const data = await run(`{
+      node(id: "${COUPLED_FORMATION_URI}") { ... on Formation { stock { uri } } }
+    }`);
+    expect(data.node).toEqual({
+      stock: { uri: COUPLED_STOCK_URI },
+    });
+  });
+
+  it("numbers its units from the front, each with its way round", async () => {
+    const data = await run(`{
+      node(id: "${REVERSED_UNIT_FORMATION_URI}") {
+        ... on Formation { units { position reversed unit { uri } } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      units: [
+        {
+          position: 1,
+          reversed: false,
+          unit: { uri: ASYMMETRIC_UNIT_URI },
+        },
+        {
+          position: 2,
+          reversed: true,
+          unit: { uri: ASYMMETRIC_UNIT_URI },
+        },
+      ],
+    });
+  });
+
+  it("measures the formation as the sum of its units", async () => {
+    // Two units of 60000 mm and 490 passengers each.
+    const data = await run(`{
+      node(id: "${COUPLED_FORMATION_URI}") { ... on Formation { length capacity } }
+    }`);
+    expect(data.node).toEqual({ length: 120000, capacity: 980 });
+  });
+
+  it("lists the lines run with it, in IRI order", async () => {
+    const data = await run(`{
+      node(id: "${COUPLED_FORMATION_URI}") { ... on Formation { lines { uri } } }
+    }`);
+    expect(data.node).toEqual({
+      lines: [{ uri: MIXED_STOCK_LINE_URI }, { uri: OVERLONG_LINE_URI }],
+    });
+  });
+
+  it("describes a unit position as a value of the UnitPosition class", async () => {
+    const data = await run(`{
+      node(id: "${COUPLED_FORMATION_URI}") {
+        ... on Formation { units { _meta { title curie type { uri } } } }
+      }
+    }`);
+    const unit = (
+      data.node as { units: { _meta: Record<string, unknown> }[] }
+    ).units.at(0);
+    expect(unit?._meta).toEqual({
+      title: "UnitPosition",
+      curie: "UnitPosition",
+      type: { uri: UNIT_POSITION_CLASS_URI },
+    });
+  });
+
+  it("publishes its fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(
+      run,
+      COUPLED_FORMATION_URI,
+      selectOnNode,
+      readNodeMeta,
+    );
+  });
+
+  it("publishes a unit position's fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(
+      run,
+      COUPLED_FORMATION_URI,
+      (meta) => `... on Formation { units { ${meta} } }`,
+      (node) =>
+        assertPresent(
+          (node as { units: { _meta: PublishedFields }[] }).units.at(0),
+          "the formation has no unit",
+        )._meta,
+    );
+  });
+});
+
+describe("Line.formations", () => {
+  it("lists the formations a line is run with, in authored order", async () => {
+    const data = await run(`{
+      node(id: "${MIXED_STOCK_LINE_URI}") {
+        ... on Line { formations { uri stock { uri } } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      formations: [
+        {
+          uri: COUPLED_FORMATION_URI,
+          stock: { uri: COUPLED_STOCK_URI },
+        },
+        {
+          uri: REVERSED_UNIT_FORMATION_URI,
+          stock: { uri: "https://metro.example/onto#series-50" },
+        },
+      ],
+    });
+  });
+});
+
+describe("CarType", () => {
+  const DRIVING_CAR = "https://metro.example/onto#car-90-driving";
+
+  it("serves its code, its cab and its measures", async () => {
+    const data = await run(`{
+      node(id: "${DRIVING_CAR}") {
+        __typename
+        ... on CarType { name code hasCab length capacity }
+      }
+    }`);
+    expect(data.node).toEqual({
+      __typename: "CarType",
+      name: "Series 90 driving motor car",
+      code: "DM",
+      hasCab: true,
+      length: 20000,
+      capacity: 160,
+    });
+  });
+
+  it("publishes its fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(run, DRIVING_CAR, selectOnNode, readNodeMeta);
+  });
+});
+
+describe("Unit.cars", () => {
+  const UNIT_90 = "https://metro.example/onto#unit-90";
+
+  it("numbers the cars from the front, each with its car type and its way round", async () => {
+    const data = await run(`{
+      node(id: "${UNIT_90}") {
+        ... on Unit { cars { position reversed carType { uri code } } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      cars: [
+        {
+          position: 1,
+          reversed: false,
+          carType: {
+            uri: "https://metro.example/onto#car-90-driving",
+            code: "DM",
+          },
+        },
+        {
+          position: 2,
+          reversed: false,
+          carType: {
+            uri: "https://metro.example/onto#car-90-trailer",
+            code: "T",
+          },
+        },
+        {
+          position: 3,
+          reversed: true,
+          carType: {
+            uri: "https://metro.example/onto#car-90-driving",
+            code: "DM",
+          },
+        },
+      ],
+    });
+  });
+
+  it("measures the unit as the sum of its cars' car types", async () => {
+    // 20000 + 20000 + 20000 mm, and 160 + 170 + 160 passengers.
+    const data = await run(`{
+      node(id: "${UNIT_90}") { ... on Unit { length capacity } }
+    }`);
+    expect(data.node).toEqual({ length: 60000, capacity: 490 });
+  });
+
+  it("describes a car position as a value of the CarPosition class", async () => {
+    const data = await run(`{
+      node(id: "${UNIT_90}") {
+        ... on Unit { cars { _meta { title curie type { uri } } } }
+      }
+    }`);
+    const car = (
+      data.node as { cars: { _meta: Record<string, unknown> }[] }
+    ).cars.at(0);
+    expect(car?._meta).toEqual({
+      title: "CarPosition",
+      curie: "CarPosition",
+      type: { uri: CAR_POSITION_CLASS_URI },
+    });
+  });
+
+  it("publishes the unit's fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(run, UNIT_90, selectOnNode, readNodeMeta);
+  });
+
+  it("publishes a car position's fields, and each one round-trips", async () => {
+    await expectFieldsRoundTrip(
+      run,
+      UNIT_90,
+      (meta) => `... on Unit { cars { ${meta} } }`,
+      (node) =>
+        assertPresent(
+          (node as { cars: { _meta: PublishedFields }[] }).cars.at(0),
+          "the unit has no car",
+        )._meta,
+    );
+  });
+});
+
+describe("Stop.platformLength", () => {
+  it("serves the length of the station's shortest platform, in millimetres", async () => {
+    const data = await run(`{
+      node(id: "${SHORT_PLATFORM_STATION_URI}") {
+        ... on Stop { platformLength }
+      }
+    }`);
+    expect(data.node).toEqual({ platformLength: 100000 });
+  });
+
+  it("answers null for a station no route calls at", async () => {
+    const data = await run(`{
+      node(id: "${BARE_ENTITY_URI}") { ... on Stop { platformLength } }
+    }`);
+    expect(data.node).toEqual({ platformLength: null });
+  });
+});
+
 describe("defensive paths, exercised with purpose-built datasets", () => {
   const cls = {
     uri: "urn:C",
@@ -1350,6 +1682,244 @@ describe("defensive paths, exercised with purpose-built datasets", () => {
     });
   });
 
+  const carPositionClass = {
+    uri: CAR_POSITION_CLASS_URI,
+    isAbstract: false,
+    properties: [],
+  } as const;
+  const trailer = {
+    uri: "urn:trailer",
+    type: "urn:C",
+    typename: "CarType",
+    code: "T",
+    hasCab: false,
+    length: 15000,
+    capacity: 120,
+  } as const;
+  const unitQuery = `{ node(id: "urn:unit") {
+    ... on Unit { length capacity cars { position reversed carType { uri } } }
+  } }`;
+
+  it("serves no car positions when the CarPosition class is not declared", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls],
+        properties: [],
+        entities: [
+          trailer,
+          {
+            uri: "urn:unit",
+            type: "urn:C",
+            typename: "Unit",
+            cars: [{ carType: "urn:trailer", reversed: false }],
+          },
+        ],
+      },
+      unitQuery,
+    );
+    // The measures still count the car: only its position cannot be served.
+    expect(data.node).toEqual({ length: 15000, capacity: 120, cars: [] });
+  });
+
+  it("drops a car whose car type is missing or of another type, numbering the rest without a gap", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, carPositionClass],
+        properties: [],
+        entities: [
+          trailer,
+          { uri: "urn:station", type: "urn:C", typename: "Station" },
+          {
+            uri: "urn:unit",
+            type: "urn:C",
+            typename: "Unit",
+            cars: [
+              { carType: "urn:trailer", reversed: false },
+              { carType: "urn:gone", reversed: false },
+              { carType: "urn:station", reversed: false },
+              { carType: "urn:trailer", reversed: true },
+            ],
+          },
+        ],
+      },
+      unitQuery,
+    );
+    expect(data.node).toEqual({
+      length: 30000,
+      capacity: 240,
+      cars: [
+        { position: 1, reversed: false, carType: { uri: "urn:trailer" } },
+        { position: 2, reversed: true, carType: { uri: "urn:trailer" } },
+      ],
+    });
+  });
+
+  const unitPositionClass = {
+    uri: UNIT_POSITION_CLASS_URI,
+    isAbstract: false,
+    properties: [],
+  } as const;
+  const trailerUnit = {
+    uri: "urn:unit",
+    type: "urn:C",
+    typename: "Unit",
+    cars: [{ carType: "urn:trailer", reversed: false }],
+  } as const;
+  const formationQuery = `{ node(id: "urn:formation") {
+    ... on Formation { length capacity units { position reversed unit { uri } } }
+  } }`;
+
+  it("serves no unit positions when the UnitPosition class is not declared", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls],
+        properties: [],
+        entities: [
+          trailer,
+          trailerUnit,
+          {
+            uri: "urn:formation",
+            type: "urn:C",
+            typename: "Formation",
+            units: [{ unit: "urn:unit", reversed: false }],
+          },
+        ],
+      },
+      formationQuery,
+    );
+    expect(data.node).toEqual({ length: 15000, capacity: 120, units: [] });
+  });
+
+  it("drops a unit that is missing or of another type, numbering the rest without a gap", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls, unitPositionClass],
+        properties: [],
+        entities: [
+          trailer,
+          trailerUnit,
+          {
+            uri: "urn:formation",
+            type: "urn:C",
+            typename: "Formation",
+            units: [
+              { unit: "urn:unit", reversed: false },
+              { unit: "urn:gone", reversed: false },
+              { unit: "urn:trailer", reversed: false },
+              { unit: "urn:unit", reversed: true },
+            ],
+          },
+        ],
+      },
+      formationQuery,
+    );
+    expect(data.node).toEqual({
+      length: 30000,
+      capacity: 240,
+      units: [
+        { position: 1, reversed: false, unit: { uri: "urn:unit" } },
+        { position: 2, reversed: true, unit: { uri: "urn:unit" } },
+      ],
+    });
+  });
+
+  it("skips a line's or a stock's formation reference that points at nothing", async () => {
+    const formation = {
+      uri: "urn:formation",
+      type: "urn:C",
+      typename: "Formation",
+      units: [],
+    } as const;
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls],
+        properties: [],
+        entities: [
+          formation,
+          { uri: "urn:station", type: "urn:C", typename: "Station" },
+          {
+            uri: "urn:line",
+            type: "urn:C",
+            typename: "Line",
+            formations: ["urn:gone", "urn:station", "urn:formation"],
+          },
+          {
+            uri: "urn:stock",
+            type: "urn:C",
+            typename: "RollingStock",
+            formations: ["urn:formation", "urn:gone"],
+          },
+        ],
+      },
+      `{ line: node(id: "urn:line") { ... on Line { formations { uri } } }
+         stock: node(id: "urn:stock") { ... on RollingStock { formations { uri } } } }`,
+    );
+    expect(data.line).toEqual({ formations: [{ uri: "urn:formation" }] });
+    expect(data.stock).toEqual({ formations: [{ uri: "urn:formation" }] });
+  });
+
+  it("serves no formations for a line that declares none, and runs none on it", async () => {
+    const data = await runWith(
+      {
+        ontologies: [],
+        classes: [cls],
+        properties: [],
+        entities: [
+          { uri: "urn:line", type: "urn:C", typename: "Line" },
+          {
+            uri: "urn:formation",
+            type: "urn:C",
+            typename: "Formation",
+            units: [],
+          },
+        ],
+      },
+      `{ line: node(id: "urn:line") { ... on Line { formations { uri } } }
+         formation: node(id: "urn:formation") { ... on Formation { lines { uri } } } }`,
+    );
+    expect(data.line).toEqual({ formations: [] });
+    expect(data.formation).toEqual({ lines: [] });
+  });
+
+  it("fails the non-null stock of a formation no stock lists, inventing none", async () => {
+    // Asserted on `errors`, not through `runWith`: the failure is the
+    // outcome under test. `stock` is non-null, so its null propagates up and
+    // nulls the node.
+    const custom = createExampleProvider({
+      ontologies: [],
+      classes: [cls],
+      properties: [],
+      entities: [
+        {
+          uri: "urn:formation",
+          type: "urn:C",
+          typename: "Formation",
+          units: [],
+        },
+        {
+          uri: "urn:stock",
+          type: "urn:C",
+          typename: "RollingStock",
+          formations: [],
+        },
+      ],
+    });
+    const result = await graphql({
+      schema: custom.schema,
+      source: `{ node(id: "urn:formation") { ... on Formation { stock { uri } } } }`,
+      rootValue: custom.rootValue,
+    });
+    expect(result.errors?.map((error) => error.message)).toEqual([
+      "Cannot return null for non-nullable field Formation.stock.",
+    ]);
+    expect(result.data).toEqual({ node: null });
+  });
+
   it("leaves an IRI whose scheme is not a declared prefix alone", async () => {
     const data = await runWith(
       {
@@ -1384,9 +1954,9 @@ describe("the shipped dataset", () => {
     }
   });
 
-  const lines = exampleDataset.entities.filter(
-    (entity) => entity.typename === "Line",
-  );
+  const lines = exampleDataset.entities
+    .filter(isNetworkEntity)
+    .filter((entity) => entity.typename === "Line");
 
   it("gives every line a unique code and a unique lowercase hex colour", () => {
     // The SDL makes both non-null, and the type cannot: a Line without them
@@ -1409,6 +1979,82 @@ describe("the shipped dataset", () => {
           expect(byKey.get(route.reverse)?.reverse).toBe(route.key);
         }
       }
+    }
+  });
+});
+
+describe("the shipped fleet", () => {
+  /** The IRIs of the shipped records of one type. */
+  const collectUris = (typename: string): Set<string> =>
+    new Set(
+      exampleDataset.entities
+        .filter((entity) => entity.typename === typename)
+        .map((entity) => entity.uri),
+    );
+
+  const carTypeUris = collectUris("CarType");
+  const unitUris = collectUris("Unit");
+  const formations = exampleDataset.entities.flatMap((entity) =>
+    entity.typename === "Formation" ? [entity] : [],
+  );
+  const stocks = exampleDataset.entities.flatMap((entity) =>
+    entity.typename === "RollingStock" ? [entity] : [],
+  );
+  const lines = exampleDataset.entities.flatMap((entity) =>
+    entity.typename === "Line" ? [entity] : [],
+  );
+
+  it("runs every line with at least one formation", () => {
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) {
+      expect(line.formations ?? [], line.uri).not.toEqual([]);
+    }
+  });
+
+  it("lists every formation in exactly one stock and runs it on at least one line", () => {
+    expect(formations.length).toBeGreaterThan(0);
+    for (const formation of formations) {
+      const listing = stocks.filter((stock) =>
+        stock.formations.includes(formation.uri),
+      );
+      expect(listing, formation.uri).toHaveLength(1);
+      const running = lines.filter((line) =>
+        (line.formations ?? []).includes(formation.uri),
+      );
+      expect(running.length, formation.uri).toBeGreaterThan(0);
+    }
+  });
+
+  it("names a unit for every unit of every formation", () => {
+    for (const formation of formations) {
+      expect(formation.units.length, formation.uri).toBeGreaterThan(0);
+      for (const placement of formation.units) {
+        expect(unitUris, formation.uri).toContain(placement.unit);
+      }
+    }
+  });
+
+  it("names a car type for every car of every unit", () => {
+    const units = exampleDataset.entities.flatMap((entity) =>
+      entity.typename === "Unit" ? [entity] : [],
+    );
+    expect(units.length).toBeGreaterThan(0);
+    for (const unit of units) {
+      expect(unit.cars.length, unit.uri).toBeGreaterThan(0);
+      for (const car of unit.cars) {
+        expect(carTypeUris, unit.uri).toContain(car.carType);
+      }
+    }
+  });
+
+  it("gives every car type a positive length and capacity", () => {
+    const carTypes = exampleDataset.entities.flatMap((entity) =>
+      entity.typename === "CarType" ? [entity] : [],
+    );
+    expect(carTypes.length).toBeGreaterThan(0);
+    for (const carType of carTypes) {
+      expect(carType.length, carType.uri).toBeGreaterThan(0);
+      expect(carType.capacity, carType.uri).toBeGreaterThan(0);
     }
   });
 });
