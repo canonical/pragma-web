@@ -1,5 +1,5 @@
 import settle from "./settle.js";
-import type { QuadArc } from "./types.js";
+import type { QuadArc, WellPoint } from "./types.js";
 
 /**
  * Build a semantic arc: a quadratic bowing `bow` px off its chord, wearing
@@ -12,8 +12,8 @@ import type { QuadArc } from "./types.js";
  * @returns The SVG path and the label anchor, settled.
  */
 export default function buildQuadArc(
-  start: { readonly x: number; readonly y: number },
-  end: { readonly x: number; readonly y: number },
+  start: WellPoint,
+  end: WellPoint,
   bow: number,
 ): QuadArc {
   const middleX = (start.x + end.x) / 2;
