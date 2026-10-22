@@ -22,7 +22,7 @@ describe("StandardsLayout on the server", () => {
       ),
     );
 
-    expect(html).toContain('class="ds standards-layout"');
+    expect(html).toContain('class="ds document-layout"');
     expect(html).toContain('aria-label="Site rail"');
     expect(html).toContain('data-slot="context"');
     expect(html).toContain(LINK_COMPONENT_URI);

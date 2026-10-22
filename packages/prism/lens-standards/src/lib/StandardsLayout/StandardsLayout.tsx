@@ -1,10 +1,7 @@
-import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
+import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { Trail } from "./common/Trail/index.js";
 import type { StandardsLayoutProps } from "./types.js";
-import "./styles.css";
-
-const componentCssClassName = "ds standards-layout";
 
 /**
  * The Standards lens's page layout: the site's rail and colophon around the
@@ -12,32 +9,22 @@ const componentCssClassName = "ds standards-layout";
  * strip's controls and status stay empty: the lens has no filter and no
  * figure to put there.
  *
- * Its root is the layout's own page grid: the rail in the west columns,
- * then a viewport stacking the strip, the canvas and the colophon. The rail
- * and the colophon are the site's own, so a site binds them once, in the
- * wrapper it groups the lens's routes under.
+ * The layout is the document archetype: the rail in its rail region, the
+ * strip in the top row, the page in the canvas, the one region that
+ * scrolls, and the colophon in the band under it. The rail and the colophon
+ * are the site's own, so a site binds them once, in the wrapper it groups
+ * the lens's routes under. The layout renders no element of its own:
+ * `DocumentLayout` renders the root, and the layout's native props reach it.
  *
  * `import { StandardsLayout } from "@canonical/prism-lens-standards";`
  */
 export default function StandardsLayout({
   children,
-  className,
-  colophon,
-  rail,
   ...props
 }: StandardsLayoutProps): ReactElement {
   return (
-    <div
-      {...props}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
-    >
-      <CanvasSkipLink />
-      {rail}
-      <div className="viewport">
-        <ModeStrip context={<Trail />} />
-        <Canvas>{children}</Canvas>
-        {colophon}
-      </div>
-    </div>
+    <DocumentLayout {...props} strip={<ModeStrip context={<Trail />} />}>
+      {children}
+    </DocumentLayout>
   );
 }
