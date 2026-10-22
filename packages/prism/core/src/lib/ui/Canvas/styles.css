@@ -6,11 +6,15 @@
   /* A subgrid, so the layout's column lines pass through to the page. Not a
    * query container: size containment would sever the subgrid. One row of
    * the free height, here and in the page wrapper, so a page that fills its
-   * height resolves against the canvas's. */
+   * height resolves against the canvas's. Both set the grid's gutter as
+   * their gap, the layout's own. */
   .ds.canvas {
+    --canvas-gap: var(--grid-gutter);
+
     display: grid;
     grid-template-columns: subgrid;
     grid-template-rows: minmax(0, 1fr);
+    gap: var(--canvas-gap);
     min-block-size: 0;
     min-inline-size: 0;
   }
@@ -26,6 +30,8 @@
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     grid-template-rows: minmax(0, 1fr);
+    gap: var(--canvas-gap);
     min-inline-size: 0;
   }
+
 }

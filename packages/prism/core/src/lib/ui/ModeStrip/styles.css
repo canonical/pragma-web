@@ -7,7 +7,16 @@
    * each side, content-box: an empty strip and a one-row strip match, so
    * the canvas below never jumps on a lens switch. */
   .ds.mode-strip {
+    --mode-strip-gap: var(--grid-gutter);
+    --mode-strip-min-block-size: var(--density-line-height);
+    --mode-strip-padding-block: var(--component-padding-block);
+    --mode-strip-padding-inline: var(--component-padding-inline);
     --mode-strip-divider-width: 1px;
+    --mode-strip-divider-color: var(--color-border-muted);
+    --mode-strip-context-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+    --mode-strip-status-color: var(--color-text-muted);
     /* One baseline pair, between controls and between readouts. */
     --mode-strip-spacing: var(--space-100);
 
@@ -16,17 +25,17 @@
     align-items: center;
     flex-wrap: wrap;
     box-sizing: content-box;
-    min-block-size: var(--density-line-height);
-    gap: var(--container-gap-default);
-    padding-block: var(--component-padding-block);
-    padding-inline: var(--component-padding-inline);
+    min-block-size: var(--mode-strip-min-block-size);
+    gap: var(--mode-strip-gap);
+    padding-block: var(--mode-strip-padding-block);
+    padding-inline: var(--mode-strip-padding-inline);
     border-bottom-width: var(--mode-strip-divider-width);
     border-bottom-style: solid;
-    border-bottom-color: var(--color-border-muted);
+    border-bottom-color: var(--mode-strip-divider-color);
   }
 
   .ds.mode-strip .context {
-    font-weight: var(--typography-weight-medium);
+    font-weight: var(--mode-strip-context-font-weight);
     white-space: nowrap;
   }
 
@@ -45,6 +54,6 @@
     display: flex;
     align-items: center;
     gap: var(--mode-strip-spacing);
-    color: var(--color-text-muted);
+    color: var(--mode-strip-status-color);
   }
 }

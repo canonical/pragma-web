@@ -4,12 +4,17 @@
 
 @layer ds.components.global {
   /* A subgrid of the shell over every column: the strip row, then the body
-   * row the canvas fills. Gutters are the shell's, so no gap is set. */
+   * row the canvas fills. Its gap is the grid's gutter on both axes, the
+   * shell's own, so the strip and the body sit one gutter apart. */
   .ds.workspace-layout {
+    --workspace-layout-gap: var(--grid-gutter);
+    --workspace-layout-trigger-offset: var(--container-gap-default);
+
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     grid-template-rows: min-content minmax(0, 1fr);
+    gap: var(--workspace-layout-gap);
     min-block-size: 0;
   }
 
@@ -26,6 +31,7 @@
     grid-row: 1;
     display: grid;
     grid-template-columns: subgrid;
+    gap: var(--workspace-layout-gap);
   }
 
   /* The canvas fills the body between the rail and the inspector, and
@@ -57,7 +63,7 @@
     grid-row: 2;
     align-self: start;
     margin-inline-start: auto;
-    margin-block-start: var(--container-gap-default);
+    margin-block-start: var(--workspace-layout-trigger-offset);
     z-index: 1;
   }
 

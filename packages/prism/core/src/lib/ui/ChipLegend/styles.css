@@ -4,43 +4,48 @@
 
 @layer ds.components.global {
   .ds.chip-legend {
+    --chip-legend-gap: var(--grid-gutter);
+    /* Under a group's title and its summary: tighter than the gutter, so
+     * the three read as one group. */
+    --chip-legend-tight-spacing: var(--container-gap-tight);
     /* One baseline pair between a group's entries. */
     --chip-legend-spacing: var(--space-100);
+    --chip-legend-title-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+    --chip-legend-muted-color: var(--color-text-muted);
 
     display: grid;
-    gap: var(--container-gap-default);
-  }
-
-  .ds.chip-legend .group {
-    display: grid;
-    gap: var(--container-gap-tight);
+    gap: var(--chip-legend-gap);
   }
 
   .ds.chip-legend .title {
-    margin-block: 0;
-    font-weight: var(--typography-weight-semi-bold);
+    margin-block-start: 0;
+    margin-block-end: var(--chip-legend-tight-spacing);
+    font-weight: var(--chip-legend-title-font-weight);
   }
 
   .ds.chip-legend .summary {
-    margin-block: 0;
-    color: var(--color-text-muted);
+    margin-block-start: 0;
+    margin-block-end: var(--chip-legend-tight-spacing);
+    color: var(--chip-legend-muted-color);
   }
 
   .ds.chip-legend .entries {
     list-style: none;
     margin: 0;
     padding-inline-start: 0;
-    display: grid;
-    gap: var(--chip-legend-spacing);
   }
 
+  /* Each entry carries the space after it: the list sets no gap. */
   .ds.chip-legend .entry {
     display: flex;
     align-items: baseline;
-    gap: var(--container-gap-default);
+    gap: var(--chip-legend-gap);
+    margin-block-end: var(--chip-legend-spacing);
   }
 
   .ds.chip-legend .note {
-    color: var(--color-text-muted);
+    color: var(--chip-legend-muted-color);
   }
 }

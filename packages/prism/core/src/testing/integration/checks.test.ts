@@ -27,7 +27,7 @@ const locate = (packageRoot: string, name: string): string =>
 const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-muted",
-  "--typography-weight-bold",
+  "--typography-text-primary-bold-font-weight",
 ];
 
 describe("the component checks", () => {
@@ -104,6 +104,44 @@ describe("the component checks", () => {
           layer: "ds.components.global",
         }),
       ).toThrow(/reads a --dimension-\* primitive/);
+    });
+
+    it("refuses a property that reads a token other than its component's own", () => {
+      expect(() =>
+        assertStylesheets({
+          directory: locate(DRIFTED, "DirectRead"),
+          layer: "ds.components.global",
+          externalTokens: EXTERNAL_TOKENS,
+        }),
+      ).toThrow(/color reads --color-text, not through a component token/);
+    });
+
+    it("refuses a primitive font weight, even one named as external", () => {
+      expect(() =>
+        assertStylesheets({
+          directory: locate(DRIFTED, "PrimitiveWeight"),
+          layer: "ds.components.global",
+          externalTokens: ["--typography-weight-bold"],
+        }),
+      ).toThrow(/reads a --typography-weight-\* primitive/);
+    });
+
+    it("refuses a grid whose gap is a container gap", () => {
+      expect(() =>
+        assertStylesheets({
+          directory: locate(DRIFTED, "ContainerGapGrid"),
+          layer: "ds.components.global",
+        }),
+      ).toThrow(/"\.ds\.container-gap-grid" sets gap from a container gap/);
+    });
+
+    it("refuses a grid that sets no gap", () => {
+      expect(() =>
+        assertStylesheets({
+          directory: locate(DRIFTED, "GaplessGrid"),
+          layer: "ds.components.global",
+        }),
+      ).toThrow(/"\.ds\.gapless-grid" lays out a grid and sets no gap/);
     });
 
     it("refuses a query threshold that is no whole group", () => {

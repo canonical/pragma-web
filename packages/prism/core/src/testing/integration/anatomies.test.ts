@@ -17,21 +17,20 @@ const PACKAGE_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
 
 /**
- * The semantic tokens the components read beyond the spacing shim and the
- * density channel: the colours and weights of the semantic tier.
+ * The semantic tokens the components' tokens bind beyond the spacing shim
+ * and the density channel: the colours and the text styles of the semantic
+ * tier.
  */
 const EXTERNAL_TOKENS = [
-  "--color-background",
   "--color-background-layer2",
   "--color-border-muted",
   "--color-brand-primary",
   "--color-focus-ring",
   "--color-text",
   "--color-text-muted",
-  "--typography-weight-bold",
-  "--typography-weight-medium",
-  "--typography-weight-regular",
-  "--typography-weight-semi-bold",
+  "--typography-text-primary-bold-font-weight",
+  "--typography-text-secondary-font-size",
+  "--typography-text-secondary-font-weight",
 ];
 
 /**

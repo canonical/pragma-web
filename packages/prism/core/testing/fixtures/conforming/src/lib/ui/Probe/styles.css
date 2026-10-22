@@ -4,22 +4,26 @@
 
 @layer ds.components.global {
   .ds.probe {
+    --probe-gap: var(--grid-gutter);
     --probe-radius: 0.25rem;
     --probe-inset: var(--space-100);
+    --probe-color: var(--color-text);
+    --probe-hover-color: var(--color-text-muted);
+    --probe-label-font-weight: var(--typography-text-primary-bold-font-weight);
 
-    display: flex;
-    gap: var(--container-gap-tight);
+    display: grid;
+    gap: var(--probe-gap);
     padding-inline: var(--probe-inset);
     border-radius: var(--probe-radius);
-    color: var(--color-text);
+    color: var(--probe-color);
   }
 
   .ds.probe:hover {
-    color: var(--color-text-muted);
+    color: var(--probe-hover-color);
   }
 
   .ds.probe .label {
-    font-weight: var(--typography-weight-bold);
+    font-weight: var(--probe-label-font-weight);
   }
 
   /* Below one group the label hides. */

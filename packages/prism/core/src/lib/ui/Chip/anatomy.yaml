@@ -13,6 +13,9 @@
 # forced-color-adjust and the link colour; an exempt feature query, bound
 # in styles.css and not expressible here.
 #
+# Every other decision is read through a component token declared on the
+# root (`--chip-*`), bound to the symbol or the literal named here.
+#
 # Token ledger:
 #   --chip-radius-fallback: 0.375em  (kind radii in constants.ts: component
 #     0.375em, pattern 1.25em, standard 0, concept 1em 0.25em, term 0.25em 1em,

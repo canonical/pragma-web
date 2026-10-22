@@ -1,8 +1,13 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 import {
+  CONTAINER_GAP,
   EXEMPT_MEDIA_FEATURES,
+  GAP_PROPERTIES,
+  GRID_DISPLAYS,
+  GRID_GAP_TOKEN,
   GROUP_THRESHOLDS,
+  PRIMITIVE_TOKENS,
   QUERY_CONTAINER_NAME,
   SHIM_TOKENS,
   SPACE_STEP,
@@ -96,6 +101,57 @@ function listTypeSelectors(rule: StyleRule): string[] {
   );
 }
 
+/**
+ * Follow a value through the component tokens a root declares: a value that
+ * is one `var()` of a declared token is that token's own value, followed in
+ * turn; anything else is itself.
+ */
+function resolveTokens(
+  value: string,
+  tokens: ReadonlyMap<string, string>,
+): string {
+  const name = /^var\(\s*(--[a-zA-Z0-9-]+)\s*\)$/.exec(value.trim())?.at(1);
+  const declared = name === undefined ? undefined : tokens.get(name);
+  return declared === undefined
+    ? value.trim()
+    : resolveTokens(declared, tokens);
+}
+
+/**
+ * Describe what is wrong with a rule's gaps, if anything: a rule that lays
+ * out a grid or a subgrid sets its gap, and from the grid's gutter alone,
+ * and no gap anywhere reads the shim's container gaps.
+ */
+function describeGapProblems(
+  rule: StyleRule,
+  tokens: ReadonlyMap<string, string>,
+): string[] {
+  const selector = rule.selectors.join(", ");
+  const isGrid = rule.declarations.some(
+    ({ property, value }) =>
+      (property === "display" && GRID_DISPLAYS.includes(value)) ||
+      (property === "grid-template-columns" && value === "subgrid"),
+  );
+  const gaps = rule.declarations.filter(({ property }) =>
+    GAP_PROPERTIES.includes(property),
+  );
+  const gutter = `var(${GRID_GAP_TOKEN})`;
+  const problems = gaps.flatMap(({ property, value }) => {
+    const resolved = resolveTokens(value, tokens);
+    if (listReads(resolved).some((read) => CONTAINER_GAP.test(read))) {
+      return [`"${selector}" sets ${property} from a container gap`];
+    }
+    if (isGrid && resolved !== gutter) {
+      return [`"${selector}" sets its grid's ${property} from ${resolved}`];
+    }
+    return [];
+  });
+  const hasGap = gaps.some(({ property }) => property === "gap");
+  return isGrid && !hasGap
+    ? [...problems, `"${selector}" lays out a grid and sets no gap`]
+    : problems;
+}
+
 /** List the classes a selector names, the `ds` namespace left out. */
 function listSelectedClasses(selector: string): string[] {
   return [...selector.matchAll(/\.([a-z][a-z0-9-]*)/g)]
@@ -105,19 +161,24 @@ function listSelectedClasses(selector: string): string[] {
 
 /**
  * Assert a package's component stylesheets keep the rules the design rests
- * on. Each file is one `@layer <layer>` block; nothing reads a
- * `--dimension-*` primitive; every `grid-template-columns` is a subgrid, the
- * shell's grid being a preset class; `@media` queries only the exempt
- * features; `@container` queries only the shell, below a whole number of
- * four-column groups, under a comment naming the count; a `:root` block
- * declares only the document tokens named; a component token is declared on
- * its root rule and once; a rule holds no unit-bearing literal but a zero
- * or an unthemable one, so every length is a token; a `--space-*` step is
- * read only inside a component token; every other read is the component's
- * own, a shim name, the density channel or a named external token; no theme
- * is named; no selector addresses an element by its type; and every class a
- * selector names is written by the component's own sources, unless the
- * selector is one of the named reaches into another component.
+ * on. Each file is one `@layer <layer>` block; nothing reads a primitive
+ * (`--dimension-*`, `--typography-weight-*`, `--typography-font-family-*`);
+ * every `grid-template-columns` is a subgrid, the shell's grid being a
+ * preset class; every rule that lays out a grid or a subgrid sets its
+ * `gap`, and every gap of a grid resolves to `--grid-gutter`, while no gap
+ * anywhere resolves to a `--container-gap-*`; `@media` queries only the
+ * exempt features; `@container` queries only the shell, below a whole
+ * number of four-column groups, under a comment naming the count; a
+ * `:root` block declares only the document tokens named; a component token
+ * is declared on its root rule and once; a rule holds no unit-bearing
+ * literal but a zero or an unthemable one, so every length is a token;
+ * every design decision is read through a component token, so a property
+ * reads only the component's own custom properties, and a component token
+ * reads a shim name, a `--space-*` step, the density channel, a named
+ * external token or another of its own; no theme is named; no selector
+ * addresses an element by its type; and every class a selector names is
+ * written by the component's own sources, unless the selector is one of
+ * the named reaches into another component.
  *
  * @param options - The folder, the layer and what the stylesheets may read,
  *   declare at the root and reach.
@@ -157,6 +218,18 @@ export default function assertStylesheets({
     const { kebab } = nameComponent(dirname(file));
     const rootSelector = `.ds.${kebab}`;
     const prefix = `--${kebab}-`;
+    const rootTokens = new Map(
+      sheet.rules
+        .filter(
+          ({ selectors, conditions }) =>
+            conditions.length === 0 &&
+            selectors.length === 1 &&
+            selectors.at(0) === rootSelector,
+        )
+        .flatMap(({ declarations }) => declarations)
+        .filter(({ property }) => property.startsWith("--"))
+        .map(({ property, value }) => [property, value] as const),
+    );
     const written = new Set(
       collectFiles(
         dirname(file),
@@ -170,8 +243,8 @@ export default function assertStylesheets({
     if (sheet.layers.some((name) => name !== layer)) {
       report(`paints in @layer ${sheet.layers.join(", ")}, not ${layer}`);
     }
-    if (css.includes("--dimension-")) {
-      report("reads a --dimension-* primitive");
+    for (const { pattern, name } of PRIMITIVE_TOKENS) {
+      if (pattern.test(css)) report(`reads a ${name} primitive`);
     }
     if (/\.(?:dark|light)\b|prefers-color-scheme/.test(css)) {
       report("names a theme");
@@ -194,6 +267,9 @@ export default function assertStylesheets({
       }
       for (const selector of listTypeSelectors(rule)) {
         report(`"${selector}" addresses an element by its type`);
+      }
+      for (const problem of describeGapProblems(rule, rootTokens)) {
+        report(problem);
       }
       const isDocumentRoot =
         rule.selectors.length === 1 && rule.selectors.at(0) === ":root";
@@ -245,10 +321,11 @@ export default function assertStylesheets({
         }
         for (const read of listReads(value)) {
           if (read.startsWith(prefix)) continue;
-          if (SPACE_STEP.test(read)) {
-            if (!isToken) report(`${property} reads ${read} outside a token`);
+          if (!isToken) {
+            report(`${property} reads ${read}, not through a component token`);
             continue;
           }
+          if (SPACE_STEP.test(read)) continue;
           if (!SHIM_TOKENS.includes(read) && !externalTokens.includes(read)) {
             report(`reads ${read}, which is neither the shim nor named`);
           }

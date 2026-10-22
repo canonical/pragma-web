@@ -4,34 +4,53 @@
 
 @layer ds.components.global {
   .ds.rail {
-    --rail-item-radius: 0.25rem;
-    --rail-small-font-size: 0.875rem;
-    --rail-focus-ring-width: 2px;
-    --rail-focus-ring-offset: -2px;
-    --rail-brand-dot-size: 0.5rem;
-    --rail-divider-width: 1px;
+    --rail-gap: var(--grid-gutter);
+    --rail-padding-block: var(--component-padding-block);
     /* One baseline pair: the inline inset and the gap inside an entry. */
     --rail-spacing: var(--space-100);
+    /* Between the entries of a list: tighter than the gutter, so the list
+     * reads as one group. */
+    --rail-entry-spacing: var(--container-gap-tight);
+    --rail-divider-width: 1px;
+    --rail-divider-color: var(--color-border-muted);
+    --rail-brand-font-weight: var(--typography-text-primary-bold-font-weight);
+    --rail-brand-color: var(--color-text);
+    --rail-brand-dot-size: 0.5rem;
+    --rail-brand-dot-color: var(--color-brand-primary);
+    --rail-caption-font-weight: var(--typography-text-secondary-font-weight);
+    --rail-caption-font-size: var(--typography-text-secondary-font-size);
+    --rail-caption-color: var(--color-text-muted);
+    --rail-item-min-block-size: var(--density-line-height);
+    --rail-item-radius: 0.25rem;
+    --rail-item-color: var(--color-text-muted);
+    --rail-item-active-color: var(--color-text);
+    --rail-item-active-background: var(--color-background-layer2);
+    --rail-item-current-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+    --rail-focus-ring-width: 2px;
+    --rail-focus-ring-color: var(--color-focus-ring);
+    --rail-focus-ring-offset: -2px;
 
     display: flex;
     flex-direction: column;
-    gap: var(--container-gap-tight);
+    gap: var(--rail-gap);
     min-block-size: 100%;
-    padding-block: var(--component-padding-block);
+    padding-block: var(--rail-padding-block);
     padding-inline: var(--rail-spacing);
     border-inline-end-width: var(--rail-divider-width);
     border-inline-end-style: solid;
-    border-inline-end-color: var(--color-border-muted);
+    border-inline-end-color: var(--rail-divider-color);
   }
 
   .ds.rail .brand {
     display: flex;
     align-items: center;
     gap: var(--rail-spacing);
-    padding-block: var(--component-padding-block);
+    padding-block: var(--rail-padding-block);
     padding-inline: var(--rail-spacing);
-    font-weight: var(--typography-weight-bold);
-    color: var(--color-text);
+    font-weight: var(--rail-brand-font-weight);
+    color: var(--rail-brand-color);
     text-decoration: none;
   }
 
@@ -39,47 +58,46 @@
     width: var(--rail-brand-dot-size);
     height: var(--rail-brand-dot-size);
     border-radius: 50%;
-    background: var(--color-brand-primary);
+    background: var(--rail-brand-dot-color);
     flex-shrink: 0;
   }
 
   .ds.rail .caption {
     display: block;
-    font-weight: var(--typography-weight-regular);
-    font-size: var(--rail-small-font-size);
-    color: var(--color-text-muted);
+    font-weight: var(--rail-caption-font-weight);
+    font-size: var(--rail-caption-font-size);
+    color: var(--rail-caption-color);
   }
 
   .ds.rail .lenses {
-    display: flex;
-    flex-direction: column;
-    gap: var(--container-gap-tight);
     list-style: none;
     margin: 0;
     padding-inline-start: 0;
   }
 
+  /* Each entry carries the space after it: the list sets no gap. */
   .ds.rail .item {
     display: flex;
     align-items: center;
     gap: var(--rail-spacing);
-    min-block-size: var(--density-line-height);
+    min-block-size: var(--rail-item-min-block-size);
+    margin-block-end: var(--rail-entry-spacing);
     padding-inline: var(--rail-spacing);
     border-radius: var(--rail-item-radius);
-    color: var(--color-text-muted);
+    color: var(--rail-item-color);
     text-decoration: none;
   }
 
   .ds.rail .item:hover {
-    color: var(--color-text);
-    background: var(--color-background-layer2);
+    color: var(--rail-item-active-color);
+    background: var(--rail-item-active-background);
   }
 
   /* The active lens, from the router's own attribute. */
   .ds.rail .item[aria-current="page"] {
-    color: var(--color-text);
-    background: var(--color-background-layer2);
-    font-weight: var(--typography-weight-medium);
+    color: var(--rail-item-active-color);
+    background: var(--rail-item-active-background);
+    font-weight: var(--rail-item-current-font-weight);
   }
 
   /* The ring sits inside the padding box, so the rail's scrolling region
@@ -87,7 +105,7 @@
   .ds.rail .item:focus-visible {
     outline-width: var(--rail-focus-ring-width);
     outline-style: solid;
-    outline-color: var(--color-focus-ring);
+    outline-color: var(--rail-focus-ring-color);
     outline-offset: var(--rail-focus-ring-offset);
   }
 
@@ -108,19 +126,15 @@
     flex-grow: 1;
   }
 
+  /* The heading sits one gutter above its list, the rail's own gap. */
   .ds.rail .utilities-label {
     margin-block: 0;
-    padding-block-start: var(--component-padding-block);
-    padding-block-end: var(--container-gap-tight);
     padding-inline: var(--rail-spacing);
-    font-size: var(--rail-small-font-size);
-    color: var(--color-text-muted);
+    font-size: var(--rail-caption-font-size);
+    color: var(--rail-caption-color);
   }
 
   .ds.rail .utilities {
-    display: flex;
-    flex-direction: column;
-    gap: var(--container-gap-tight);
     list-style: none;
     margin: 0;
     padding-inline-start: 0;
@@ -129,7 +143,8 @@
   /* The theme control's cell stretches the control to the rail's width. */
   .ds.rail .theme {
     display: grid;
-    padding-block: var(--container-gap-tight);
+    gap: var(--rail-gap);
+    padding-block-end: var(--rail-entry-spacing);
     padding-inline: var(--rail-spacing);
   }
 

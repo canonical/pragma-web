@@ -22,6 +22,7 @@
     --chip-stroke-width: 1px;
     --chip-focus-ring-width: 2px;
     --chip-focus-ring-offset: 2px;
+    --chip-focus-ring-color: var(--color-focus-ring);
 
     display: inline;
     font: inherit;
@@ -53,7 +54,7 @@
   .ds.chip[href]:focus-visible {
     outline-width: var(--chip-focus-ring-width);
     outline-style: solid;
-    outline-color: var(--color-focus-ring);
+    outline-color: var(--chip-focus-ring-color);
     outline-offset: var(--chip-focus-ring-offset);
   }
 

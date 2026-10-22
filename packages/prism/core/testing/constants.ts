@@ -164,14 +164,16 @@ export const SHORTHAND_PROPERTIES: readonly string[] = [
 /**
  * The multi-word segments a token symbol spells in camelCase, as the token
  * graph names them: a custom property `--color-focus-ring` is the symbol
- * `color.focusRing`, and `--typography-weight-semi-bold` is
- * `typography.weight.semiBold`. Every other hyphen is a dot.
+ * `color.focusRing`, and `--typography-text-secondary-font-size` is
+ * `typography.text.secondary.fontSize`. Every other hyphen is a dot.
  */
 export const CAMEL_LIFTS: readonly (readonly [string, string])[] = [
   ["extra-bold", "extraBold"],
   ["extra-light", "extraLight"],
   ["focus-ring", "focusRing"],
   ["font-family", "fontFamily"],
+  ["font-size", "fontSize"],
+  ["font-weight", "fontWeight"],
   ["semi-bold", "semiBold"],
 ];
 
@@ -256,9 +258,8 @@ export const EXEMPT_MEDIA_FEATURES: readonly string[] = [
 
 /**
  * The spacing shim of `@canonical/styles` and the density channel: the
- * names a stylesheet reads spacing and structure through without listing
- * them. A `--space-*` step is read only inside a component token, which
- * gives the step its role.
+ * names a component token binds spacing and structure to without listing
+ * them. A `--space-*` step is bound too, the token giving the step its role.
  */
 export const SHIM_TOKENS: readonly string[] = [
   "--component-padding-block",
@@ -273,6 +274,39 @@ export const SHIM_TOKENS: readonly string[] = [
 
 /** A spacing step of the shim's scale, read only through a component token. */
 export const SPACE_STEP = /^--space-\d+$/;
+
+/**
+ * The primitive tiers a stylesheet never reads, each with the name a
+ * finding gives it: a component token binds the semantic tier or the shim
+ * above them, never the primitive below.
+ */
+export const PRIMITIVE_TOKENS: readonly {
+  readonly pattern: RegExp;
+  readonly name: string;
+}[] = [
+  { pattern: /(?<![\w-])--dimension-/, name: "--dimension-*" },
+  { pattern: /(?<![\w-])--typography-weight-/, name: "--typography-weight-*" },
+  {
+    pattern: /(?<![\w-])--typography-font-family-/,
+    name: "--typography-font-family-*",
+  },
+];
+
+/** The one variable every grid and subgrid sets its gap from, on both axes. */
+export const GRID_GAP_TOKEN = "--grid-gutter";
+
+/** The shim's gaps between items, which no gap of a layout container reads. */
+export const CONTAINER_GAP = /^--container-gap-/;
+
+/** The properties that set a gap, on one axis or both. */
+export const GAP_PROPERTIES: readonly string[] = [
+  "gap",
+  "row-gap",
+  "column-gap",
+];
+
+/** The `display` values that lay out a grid. */
+export const GRID_DISPLAYS: readonly string[] = ["grid", "inline-grid"];
 
 /** A number with a unit: a length, a time, an angle or a percentage. */
 export const UNIT_LITERAL =

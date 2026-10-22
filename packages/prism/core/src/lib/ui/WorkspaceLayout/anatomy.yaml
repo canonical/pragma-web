@@ -3,8 +3,9 @@
 # every column, two rows (strip, body). The rail takes columns 1 / span 2 on
 # both rows and scrolls on its own; the strip row spans the rest; the canvas
 # fills the body row and never scrolls; the inspector is a persistent region
-# in the last three columns that scrolls on its own. Gutters are inherited:
-# no gap is set.
+# in the last three columns that scrolls on its own. Its gap is the grid's
+# gutter on both axes, so the strip and the body sit one gutter apart; the
+# strip region, a subgrid, sets the same gap.
 #
 # Reflow, bound in styles.css:
 #   `.ds.workspace-layout:not(:has(> .inspector))` the canvas spans 3 / -1:
@@ -16,8 +17,13 @@
 #   @container shell (width < 448px)   below one group: the rail spans one
 #     column; strip and canvas start at line 2.
 #
+# Every decision is read through a component token declared on the root
+# (`--workspace-layout-*`), bound to the symbol named here.
+#
 # Token ledger:
 #   layout.stack 1 on the trigger: it floats over the canvas.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, container.gap.default.
 node:
   uri: prism.component.workspace_layout
   styles:
@@ -25,6 +31,7 @@ node:
     layout.grid.columns: subgrid
     layout.grid.column: "1 / -1"
     layout.grid.rows: "min-content minmax(0, 1fr)"
+    spacing.gap: grid.gutter
     size.min.block: 0
   edges:
     - node:
@@ -49,6 +56,7 @@ node:
           layout.grid.row: "1"
           layout.type: grid
           layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
         edges:
           - node:
               uri: prism.component.mode_strip

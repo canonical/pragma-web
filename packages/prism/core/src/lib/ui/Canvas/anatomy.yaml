@@ -7,13 +7,18 @@
 # subgrid (verified in Chromium). The canvas and the wrapper each hold one row
 # of the free height, so a page that fills its height (`block-size: 100%`)
 # resolves against the canvas's, not its own content's: a workspace page
-# then fits the canvas, and a document page overflows into its scroll.
+# then fits the canvas, and a document page overflows into its scroll. Both
+# grids set the grid's gutter as their gap on both axes, through
+# `--canvas-gap`.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: prism.component.canvas
   styles:
     layout.type: grid
     layout.grid.columns: subgrid
     layout.grid.rows: "minmax(0, 1fr)"
+    spacing.gap: grid.gutter
     size.min.block: 0
     size.min.width: 0
     appearance.outline.style@focus: none
@@ -25,6 +30,7 @@ node:
           layout.grid.columns: subgrid
           layout.grid.column: "1 / -1"
           layout.grid.rows: "minmax(0, 1fr)"
+          spacing.gap: grid.gutter
           size.min.width: 0
         edges:
           - node:
