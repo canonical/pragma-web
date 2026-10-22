@@ -41,6 +41,9 @@ its stylesheet transcribes.
   for a rendered example of the entity.
 - **`EntityCommand`**: the command-palette result, a 56px row: the title
   over "kind in location", and one vital at the end.
+- **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a 50-unit
+  box and two lines of `<text>`, the title over "kind in location", for a
+  graph to place with a transform inside its `<svg>`.
 
 ## Installation
 
@@ -226,8 +229,9 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
   `CardProjectionProps`, `CommandProjectionProps`.
 - Representations: `EntityChip`, `EntityRow`, `EntityCard`,
-  `EntityCommand`; types `EntityChipProps`, `EntityRowProps`,
-  `EntityCardProps`, `EntityCardKeyValue`, `EntityCommandProps`.
+  `EntityCommand`, `EntityGraphNode`; types `EntityChipProps`,
+  `EntityRowProps`, `EntityCardProps`, `EntityCardKeyValue`,
+  `EntityCommandProps`, `EntityGraphNodeProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

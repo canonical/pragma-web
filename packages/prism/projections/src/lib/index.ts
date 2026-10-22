@@ -36,11 +36,13 @@ export type {
   EntityCardProps,
   EntityChipProps,
   EntityCommandProps,
+  EntityGraphNodeProps,
   EntityRowProps,
 } from "./ui/index.js";
 export {
   EntityCard,
   EntityChip,
   EntityCommand,
+  EntityGraphNode,
   EntityRow,
 } from "./ui/index.js";

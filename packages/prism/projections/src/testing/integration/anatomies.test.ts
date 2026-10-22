@@ -28,6 +28,7 @@ const NODE_TOKENS = ["--color-border-muted", "--color-text-muted"];
 /** The semantic tokens the generic representations read beyond the shim. */
 const UI_TOKENS = [
   "--card-span",
+  "--color-background",
   "--color-background-layer2",
   "--color-border",
   "--color-border-muted",
@@ -49,6 +50,7 @@ describe("the package's components", () => {
       "EntityCard",
       "EntityChip",
       "EntityCommand",
+      "EntityGraphNode",
       "EntityRow",
     ]);
   });
