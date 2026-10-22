@@ -228,6 +228,18 @@ describe("KNOWN GAP: an entity route cold serves no title", () => {
   });
 });
 
+describe("EntryServer's not-found page", () => {
+  it("renders in the document archetype, with the rail and the colophon", async () => {
+    const html = await renderColdAndSettle("/nowhere");
+    expect(html).toContain('class="ds document-layout"');
+    expect(html).toContain('data-region="primary-nav"');
+    expect(html).toContain('<div class="colophon">');
+    expect(html).toMatch(
+      /<main class="ds canvas canvas"[^>]*><div class="page"><section class="ds not-found-page">/,
+    );
+  });
+});
+
 describe("EntryServer's document element", () => {
   it("paints the docs context and comfortable density, then the theme", async () => {
     const html = renderToString(

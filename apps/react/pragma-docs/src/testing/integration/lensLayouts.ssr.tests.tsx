@@ -694,20 +694,13 @@ describe("the lens layouts, rendered through the SSR entry", () => {
 });
 
 /**
- * The 404 route (AV-334 gap #2). `notFoundRoute` is wired into every router
- * construction across six test files and was never exercised by any of
- * them.
- *
- * It is deliberately NOT a member of MEASURED_URLS. The suite above
- * measures pages rendered inside a lens layout — its `splitAtCanvas`
- * requires exactly one `<main data-region="canvas">`, which is the
- * layout's. `notFoundRoute` is declared OUTSIDE every `group(...)` in
- * routes.tsx, so it renders bare: zero `<main>`, no rail, no strip. So the
- * honest test is this one — it pins what the 404 route ACTUALLY is today,
- * including that no layout wraps it, which is the fact a future reader most
- * needs to know.
+ * The not-found route. It is deliberately NOT a member of MEASURED_URLS,
+ * which lists the lens pages: `notFoundRoute` is declared outside every
+ * `group(...)` in routes.tsx and renders the document archetype itself, with
+ * the site's rail and colophon and no strip, so a reader who lands there
+ * keeps the grid and a way back.
  */
-describe("the not-found route renders (AV-334 gap #2)", () => {
+describe("the not-found route", () => {
   const body = extractBody(renderPage("/no-such-page"));
 
   it("renders the not-found copy for an unrouted URL", () => {
@@ -715,19 +708,17 @@ describe("the not-found route renders (AV-334 gap #2)", () => {
     expect(body).toContain("The page you are looking for does not exist.");
   });
 
-  it("renders outside every lens layout — no canvas, no chrome", () => {
-    // The structural claim that keeps it out of MEASURED_URLS. If the 404
-    // is ever grouped under a lens layout (a reasonable future change),
-    // this fails loudly and points at the decision above rather than
-    // letting the suite above break mysteriously.
-    expect(body.split("<main").length - 1).toBe(0);
-    expect(body).not.toContain('data-region="primary-nav"');
-    expect(body).not.toContain('data-region="canvas"');
+  it("renders in the document archetype, with the rail, the canvas and the colophon", () => {
+    expect(body).toContain('class="ds document-layout"');
+    expect(body.split("<main").length - 1).toBe(1);
+    expect(countOccurrences(body, 'data-region="primary-nav"')).toBe(1);
+    expect(countOccurrences(body, 'data-region="canvas"')).toBe(1);
+    expect(countOccurrences(body, 'data-region="footer"')).toBe(1);
+    expect(body).toContain('<section class="ds not-found-page">');
   });
 
   it("renders content distinct from every measured lens canvas", () => {
-    // The distinctness the brief asks for, stated against the real
-    // structure: the 404 body matches no lens canvas.
+    // The not-found page matches no lens canvas.
     const canvases = [...getPages().values()].map(({ canvas }) => canvas);
     for (const canvas of canvases) {
       expect(canvas).not.toBe(body);
