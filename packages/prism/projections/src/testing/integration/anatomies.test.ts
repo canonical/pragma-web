@@ -38,7 +38,6 @@ const UI_TOKENS = [
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-font-size",
   "--typography-text-primary-font-weight",
-  "--typography-text-primary-line-height-dimension",
   "--typography-text-primary-smallcaps-letter-spacing",
 ];
 

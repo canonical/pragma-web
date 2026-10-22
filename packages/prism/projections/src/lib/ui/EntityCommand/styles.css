@@ -11,9 +11,8 @@
     --entity-command-padding-inline: var(--component-padding-inline);
     --entity-command-padding-block: var(--space-050);
     --entity-command-font-size: var(--typography-text-primary-font-size);
-    --entity-command-line-height: var(
-      --typography-text-primary-line-height-dimension
-    );
+    /* The matrix's 24px line, which every representation shares. */
+    --entity-command-line-height: var(--space-300);
     --entity-command-hover-background: var(--color-foreground-ghost-hover);
     --entity-command-title-font-weight: var(
       --typography-text-primary-bold-font-weight

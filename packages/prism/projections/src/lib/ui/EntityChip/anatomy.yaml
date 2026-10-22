@@ -17,6 +17,9 @@
 # Every decision is read through a component token declared on the root
 # (`--entity-chip-*`), bound to the symbol or the literal named here.
 #
+# The pill sets its text on the matrix's 24px line, the line every
+# representation shares, so it is 28px in every context.
+#
 # Token ledger (no symbol to bind):
 #   --entity-chip-border-width: 1px    stroke thickness has only the
 #                                      primitive dimension.stroke.thickness.*.
@@ -27,8 +30,11 @@
 #   space.100 (8px) and space.050 (4px) for the inline insets and space.050
 #   for the gap: the shim's inline component padding (16px) is a surface's,
 #   not a pill's, and no gap may read a container gap.
+#   space.300 (24px) for the line height: the matrix's line; no typography
+#   token is 24px in every context (the docs' primary line is 20px).
 #
-# Roster namespaces (accepted and tracked): space.100, space.050.
+# Roster namespaces (accepted and tracked): space.100, space.050, space.300
+# (a line height).
 node:
   uri: prism.component.entity_chip
   styles:
@@ -44,6 +50,7 @@ node:
     appearance.border.style: solid
     appearance.border.color: color.border
     appearance.radius: 9999px
+    typography.lineHeight: space.300
     typography.whiteSpace: nowrap
   edges:
     - node:

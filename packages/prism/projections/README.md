@@ -31,10 +31,11 @@ A representation reads no Relay fragment and no context: it renders the
 slots it is given, in the order its anatomy fixes, and links its title to
 `href` through `LinkComponent` (the intrinsic `"a"` by default) or renders
 it as inert text without one. Each folder under `src/lib/ui/` carries its
-`anatomy.yaml`, the design contract its stylesheet transcribes. The rows
-and the cards set their text in the context's primary tier, so their
-heights follow the context's line: a row is that line and 4px above and
-below it, 32px in a site and 28px in the docs. The package's Storybook
+`anatomy.yaml`, the design contract its stylesheet transcribes. The chip,
+the row, the command and the card set the context's primary text on the
+matrix's 24px line, as the graph node draws its two lines, so each keeps
+its height in every context: the chip 28px, the row 32px, the command
+56px. The package's Storybook
 lays the five representations of each type out as one matrix, under
 `Documentation/Projection matrix`.
 

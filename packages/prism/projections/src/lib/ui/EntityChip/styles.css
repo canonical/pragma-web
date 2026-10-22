@@ -20,6 +20,8 @@
     --entity-chip-border-color: var(--color-border);
     --entity-chip-radius: 9999px;
     --entity-chip-lead-color: var(--color-text-muted);
+    /* The matrix's 24px line, which every representation shares. */
+    --entity-chip-line-height: var(--space-300);
 
     display: inline-flex;
     align-items: center;
@@ -32,6 +34,7 @@
     border-style: solid;
     border-color: var(--entity-chip-border-color);
     border-radius: var(--entity-chip-radius);
+    line-height: var(--entity-chip-line-height);
     white-space: nowrap;
   }
 

@@ -4,7 +4,7 @@
 
 @layer ds.components.global {
   /* The published Card's root: its row subgrid, border, radius and section
-   * insets are the Card's own, so this root sets only its text tier and the
+   * insets are the Card's own, so this root sets only its text and the
    * tokens its slots read. Every slot below is reached through its whole
    * path, so nothing in the sidecar or inside a slot's content matches. */
   .ds.entity-card {
@@ -21,9 +21,8 @@
       --typography-text-primary-smallcaps-letter-spacing
     );
     --entity-card-font-size: var(--typography-text-primary-font-size);
-    --entity-card-line-height: var(
-      --typography-text-primary-line-height-dimension
-    );
+    /* The matrix's 24px line, which every representation shares. */
+    --entity-card-line-height: var(--space-300);
     --entity-card-title-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
@@ -66,8 +65,13 @@
     background: var(--entity-card-sidecar-background);
   }
 
+  /* The heading's paragraphs and the summary set no baseline nudge and
+   * take the card's line back from the typography layer, so each line is
+   * the card's own. */
   .ds.entity-card > .body > .description > .heading > .location {
     margin-block: 0;
+    padding-block: 0;
+    line-height: var(--entity-card-line-height);
     color: var(--entity-card-location-color);
     font-variant-caps: all-small-caps;
     letter-spacing: var(--entity-card-location-letter-spacing);
@@ -76,6 +80,7 @@
   /* A heading at the text size: the card's hierarchy is weight, not size. */
   .ds.entity-card > .body > .description > .heading > .title {
     margin-block: 0;
+    padding-block: 0;
     font-size: var(--entity-card-font-size);
     line-height: var(--entity-card-line-height);
     font-weight: var(--entity-card-title-font-weight);
@@ -87,11 +92,15 @@
 
   .ds.entity-card > .body > .description > .heading > .kind {
     margin-block: 0;
+    padding-block: 0;
+    line-height: var(--entity-card-line-height);
   }
 
   .ds.entity-card > .body > .description > .summary {
     margin-block-start: var(--entity-card-section-spacing);
     margin-block-end: 0;
+    padding-block: 0;
+    line-height: var(--entity-card-line-height);
   }
 
   .ds.entity-card > .body > .key-values {
