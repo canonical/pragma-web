@@ -33,6 +33,8 @@ import {
   GOLDEN_ANGLE_DEGREES,
   KIND_INDEX,
   LIFECYCLE_INDEX,
+  TINT_CHROMA_FALLBACK,
+  TINT_LIGHTNESS_FALLBACK,
   UNKNOWN_NAMESPACE_TINT,
 } from "./constants.js";
 import type {
@@ -137,7 +139,7 @@ export function resolveNamespaceTint(
   const index = namespace === undefined ? -1 : prefixes.indexOf(namespace);
   if (index === -1) return UNKNOWN_NAMESPACE_TINT;
   const hue = Math.round(index * GOLDEN_ANGLE_DEGREES) % 360;
-  return `oklch(var(--chip-tint-l, 0.45) var(--chip-tint-c, 0.12) ${hue})`;
+  return `oklch(var(--chip-tint-l, ${TINT_LIGHTNESS_FALLBACK}) var(--chip-tint-c, ${TINT_CHROMA_FALLBACK}) ${hue})`;
 }
 
 /**

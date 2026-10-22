@@ -162,6 +162,17 @@ describe("resolveNamespaceTint", () => {
     );
     expect(resolveNamespaceTint("ds", [])).toContain("--chip-tint-unknown");
   });
+
+  it("gives the neutral tint the lightness every namespace tint falls back to", () => {
+    expect(
+      readHookFallback(
+        resolveNamespaceTint("mystery", prefixes),
+        "--chip-tint-l",
+      ),
+    ).toBe(
+      readHookFallback(resolveNamespaceTint("ds", prefixes), "--chip-tint-l"),
+    );
+  });
 });
 
 describe("buildChipChannelStyle", () => {
