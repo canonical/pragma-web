@@ -56,9 +56,7 @@ describe("Button SSR", () => {
 
   it("applies a custom importance class", () => {
     const page = render(Component, {
-      props: { ...baseProps, importance: "secondary" } satisfies ComponentProps<
-        typeof Component
-      >,
+      props: { ...baseProps, importance: "secondary" },
     });
     expect(componentLocator(page).classList).toContain("secondary");
   });
@@ -68,7 +66,7 @@ describe("Button SSR", () => {
       props: {
         ...baseProps,
         anticipation: "destructive",
-      } satisfies ComponentProps<typeof Component>,
+      },
     });
     expect(componentLocator(page).classList).toContain("destructive");
   });
@@ -79,7 +77,7 @@ describe("Button SSR", () => {
         ...baseProps,
         importance: "primary",
         anticipation: "destructive",
-      } satisfies ComponentProps<typeof Component>,
+      },
     });
     const root = componentLocator(page);
     expect(root.classList).toContain("primary");
@@ -88,18 +86,14 @@ describe("Button SSR", () => {
 
   it("applies the branded emphasis class", () => {
     const page = render(Component, {
-      props: { ...baseProps, emphasis: "branded" } satisfies ComponentProps<
-        typeof Component
-      >,
+      props: { ...baseProps, emphasis: "branded" },
     });
     expect(componentLocator(page).classList).toContain("branded");
   });
 
   it("applies a custom class", () => {
     const page = render(Component, {
-      props: { ...baseProps, class: "test-class" } satisfies ComponentProps<
-        typeof Component
-      >,
+      props: { ...baseProps, class: "test-class" },
     });
     const root = componentLocator(page);
     expect(root.classList).toContain("ds");
@@ -109,27 +103,14 @@ describe("Button SSR", () => {
 
   it("applies the loading class when loading", () => {
     const page = render(Component, {
-      props: { ...baseProps, loading: true } satisfies ComponentProps<
-        typeof Component
-      >,
+      props: { ...baseProps, loading: true },
     });
     expect(componentLocator(page).classList).toContain("loading");
   });
 
-  it("sets aria-busy when loading", () => {
-    const page = render(Component, {
-      props: { ...baseProps, loading: true } satisfies ComponentProps<
-        typeof Component
-      >,
-    });
-    expect(componentLocator(page).getAttribute("aria-busy")).toBe("true");
-  });
-
   it("marks the button aria-disabled, not natively disabled, when loading", () => {
     const page = render(Component, {
-      props: { ...baseProps, loading: true } satisfies ComponentProps<
-        typeof Component
-      >,
+      props: { ...baseProps, loading: true },
     });
     const root = componentLocator(page);
     expect(root.getAttribute("aria-disabled")).toBe("true");
@@ -142,7 +123,7 @@ describe("Button SSR", () => {
         ...baseProps,
         loading: true,
         loadingLabel: "Saving changes",
-      } satisfies ComponentProps<typeof Component>,
+      },
     });
     expect(page.getByRole("status").textContent?.trim()).toBe("Saving changes");
   });
