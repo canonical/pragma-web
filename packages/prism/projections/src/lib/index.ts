@@ -11,8 +11,6 @@ export type { ChipProjectionProps } from "./ChipProjection/index.js";
 export { ChipProjection } from "./ChipProjection/index.js";
 export type { CommandProjectionProps } from "./CommandProjection/index.js";
 export { CommandProjection } from "./CommandProjection/index.js";
-export type { EntityTitleProps } from "./EntityTitle/index.js";
-export { EntityTitle } from "./EntityTitle/index.js";
 export type {
   ProseLinkProps,
   ProseReferencesProviderProps,

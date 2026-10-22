@@ -1,4 +1,3 @@
-import { EntityTitle } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
 import { useLazyLoadQuery } from "react-relay";
@@ -65,7 +64,12 @@ export default function EntityDetail({
       <Head
         title={t("page.title.entity", { title: node._meta.title, lens: label })}
       />
-      <EntityTitle className="title" node={node} />
+      <hgroup className="heading">
+        <h1 className="title">{node._meta.title}</h1>
+        <p className="location">
+          <code>{node._meta.curie}</code>
+        </p>
+      </hgroup>
       <EntitySummary node={node} />
       <FieldsTable meta={node._meta} namespaces={ontologies} />
       <Relations meta={node._meta} namespaces={ontologies} />

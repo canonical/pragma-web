@@ -12,7 +12,6 @@ site maps to the node's `__typename`, and links it to the node's home.
 - **`CardProjection`**: the card, a node as a self-contained tile in a grid.
 - **`CommandProjection`**: the command-palette entry, a node offered as a
   destination to jump to.
-- **`EntityTitle`**: the page title, the heading of the page a node owns.
 
 Prose links to graph nodes render as chips too, through the element
 overrides a Markdown renderer takes.
@@ -109,7 +108,6 @@ representation's native props are that tag's:
 | `RowProjection` | `<li>` | none: the arm renders the slots |
 | `CardProjection` | `<article>` | none |
 | `CommandProjection` | `<li>` | none |
-| `EntityTitle` | `<hgroup>` | none |
 
 ### Slots
 
@@ -123,8 +121,7 @@ The `Node` arms fill the two every node can: `.title` (`_meta.title`) and
 `.location` (`_meta.curie`, the node's compact address). Each root carries
 the node's class IRI as `data-type`, for styling by class. The title links
 to the node's home when it has one and reads as inert text when it has
-none, except in `EntityTitle`, which never links: a title names the page it
-heads.
+none.
 
 | Arm | Root class | Renders |
 |---|---|---|
@@ -132,7 +129,6 @@ heads.
 | row | `.ds.node-row` | `.title`, then `<code class="location">` |
 | card | `.ds.node-card` | `<h3 class="title">`, then `<p class="location">` |
 | command | `.ds.node-command` | `.title`, then `<span class="location">` |
-| title | `.ds.node-title` | `<h1 class="title">`, then `<p class="location">` |
 
 ## Maps and arms
 
@@ -206,9 +202,8 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 ## Public API
 
 - Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
-  `CommandProjection`, `EntityTitle`; types `ChipProjectionProps`,
-  `RowProjectionProps`, `CardProjectionProps`, `CommandProjectionProps`,
-  `EntityTitleProps`.
+  `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
+  `CardProjectionProps`, `CommandProjectionProps`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

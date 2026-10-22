@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import cardProjectionFragmentNode from "../../__generated__/CardProjection_node.graphql.js";
 import chipProjectionFragmentNode from "../../__generated__/ChipProjection_node.graphql.js";
 import commandProjectionFragmentNode from "../../__generated__/CommandProjection_node.graphql.js";
-import entityTitleFragmentNode from "../../__generated__/EntityTitle_node.graphql.js";
 import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.graphql.js";
 import { defaultProjectionMaps, type ProjectionMaps } from "../../lib/index.js";
 
@@ -16,7 +15,6 @@ const COMPOSITES: readonly {
   { representation: "row", fragment: rowProjectionFragmentNode },
   { representation: "card", fragment: cardProjectionFragmentNode },
   { representation: "command", fragment: commandProjectionFragmentNode },
-  { representation: "title", fragment: entityTitleFragmentNode },
 ];
 
 /** List the types a composite's inline fragments arm with a fragment spread. */

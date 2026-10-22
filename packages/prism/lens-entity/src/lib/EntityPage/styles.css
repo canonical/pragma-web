@@ -10,6 +10,7 @@
   :root {
     --entity-page-gap: var(--space-300, 1.5rem);
     --entity-page-status-color: var(--color-text-muted);
+    --entity-page-location-color: var(--color-text-muted);
   }
 
   .ds.entity-page {
@@ -23,6 +24,16 @@
   .ds.entity-page > * {
     grid-column: 1 / -1;
     min-inline-size: 0;
+  }
+
+  /* The page's heading: the entity's title over its compact address. */
+  .ds.entity-page .heading .title,
+  .ds.entity-page .heading .location {
+    margin: 0;
+  }
+
+  .ds.entity-page .heading .location {
+    color: var(--entity-page-location-color);
   }
 
   .ds.entity-page > .not-found,

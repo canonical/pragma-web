@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import type { CardArm } from "../CardProjection/index.js";
 import type { ChipArm } from "../ChipProjection/index.js";
 import type { CommandArm } from "../CommandProjection/index.js";
-import type { EntityTitleArm } from "../EntityTitle/index.js";
 import type { RowArm } from "../RowProjection/index.js";
 
 /**
@@ -24,8 +23,6 @@ export interface ProjectionMaps {
   readonly card: ProjectionMap<CardArm>;
   /** The command-palette entry: a node offered as a destination. */
   readonly command: ProjectionMap<CommandArm>;
-  /** The page title: the heading of the page a node owns. */
-  readonly title: ProjectionMap<EntityTitleArm>;
 }
 
 /** Props accepted by `ProjectionsProvider`. */

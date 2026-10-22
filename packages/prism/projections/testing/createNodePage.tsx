@@ -20,7 +20,6 @@ const createNodePageQuerySource = (): unknown => graphql`
       ...RowProjection_node
       ...CardProjection_node
       ...CommandProjection_node
-      ...EntityTitle_node
     }
   }
 `;
