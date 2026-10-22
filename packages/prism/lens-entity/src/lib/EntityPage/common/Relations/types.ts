@@ -1,0 +1,18 @@
+import type { ComponentProps } from "react";
+import type { Relations_meta$key } from "../../../../__generated__/Relations_meta.graphql.js";
+import type { OntologyNamespace } from "../../../types.js";
+
+type OwnProps = {
+  /** The entity's self-description, as a fragment key. */
+  readonly meta: Relations_meta$key;
+  /** The graph's namespaces, which compact the range classes. */
+  readonly namespaces: readonly OntologyNamespace[];
+};
+
+/**
+ * Props accepted by `Relations`: the entity's description and the graph's
+ * namespaces, and the native props of its `<section>` root. The native
+ * `children` are excluded: the section renders the class's relations.
+ */
+export type RelationsProps = OwnProps &
+  Omit<ComponentProps<"section">, keyof OwnProps | "children">;

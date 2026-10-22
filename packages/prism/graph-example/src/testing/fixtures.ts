@@ -61,4 +61,16 @@ export const LENS_OPERATION_VARIABLES: Record<
     count: 5,
     cursor: null,
   },
+  // The entity lens's operations, under `packages/prism/lens-entity`: the
+  // bound class's index and its pagination, the namespaces lookup that
+  // expands a compact address, and the entity page, which takes the
+  // absolute IRI `node(id:)` accepts.
+  EntityIndexQuery: { classUri: SAMPLE_CLASS_URI, count: 5, cursor: null },
+  EntityIndexPaginationQuery: {
+    classUri: SAMPLE_CLASS_URI,
+    count: 5,
+    cursor: null,
+  },
+  EntityNamespacesQuery: {},
+  EntityPageQuery: { id: SAMPLE_ENTITY_URI, classUri: SAMPLE_CLASS_URI },
 };

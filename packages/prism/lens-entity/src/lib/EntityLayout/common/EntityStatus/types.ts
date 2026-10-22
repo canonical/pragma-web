@@ -1,0 +1,15 @@
+import type { EntityBinding } from "@canonical/prism-core";
+import type { ComponentProps } from "react";
+
+type OwnProps = {
+  /** The binding whose class the index lists. */
+  readonly binding: EntityBinding;
+};
+
+/**
+ * Props accepted by `EntityStatus`: the binding whose index it counts, and
+ * the native props of its `<output>` root. The native `children` are
+ * excluded: the output renders the count.
+ */
+export type EntityStatusProps = OwnProps &
+  Omit<ComponentProps<"output">, keyof OwnProps | "children">;
