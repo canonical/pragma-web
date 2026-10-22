@@ -1,4 +1,4 @@
-import { HomesProvider } from "@canonical/prism-core";
+import { HomesProvider, RouterLink } from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
@@ -8,7 +8,6 @@ import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RouterLink } from "#lib/RouterLink";
 import formatDocumentTitle from "../../formatDocumentTitle.js";
 import { homes } from "../../homes.js";
 import type { ShellProps } from "./types.js";

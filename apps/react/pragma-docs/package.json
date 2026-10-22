@@ -13,7 +13,6 @@
     "#domains/playground": "./src/domains/playground/index.ts",
     "#graphql-endpoint": "./src/relay/graphqlEndpoint.ts",
     "#lib/LensIcons": "./src/lib/LensIcons/index.ts",
-    "#lib/RouterLink": "./src/lib/RouterLink/index.ts",
     "#lib/Shell": "./src/lib/Shell/index.ts",
     "#lib/SiteColophon": "./src/lib/SiteColophon/index.ts",
     "#lib/SiteRail": "./src/lib/SiteRail/index.ts",

@@ -207,6 +207,14 @@ type nor `Node` has a resolver. Mount `HomesProvider` inside the router and
 above all routed content: `useHome` throws without one, because a missing
 provider is a wiring bug, not a node without a home.
 
+A home is an ordinary href, so a component that renders it through a plain
+`<a>` loads the destination as a document. Hand such a component
+`RouterLink` as its `LinkComponent` (for the projections,
+`<ProjectionsProvider LinkComponent={RouterLink}>`) and a plain click on an
+href a route matches navigates on the client, while hovering it warms the
+destination. Any other href, a modified click, and a link with a `target`
+or `download` stay the browser's.
+
 ## Entity bindings
 
 ```ts
@@ -274,6 +282,7 @@ site's own catalog, and the factory holds no reader-facing string.
   `FacetBearer`, `LensEntry`, `LensTier`, `CollectedLens`,
   `ShortcutAllocation`.
 - Router: `createStaticRouter`.
+- Links: `RouterLink`; types `RouterLinkProps`.
 - Homes: `HomesProvider`, `useHome`; types `Homes`, `HomeResolver`,
   `HomeNode`, `HomesProviderProps`.
 - Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`; types

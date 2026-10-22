@@ -63,6 +63,8 @@ export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
 export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
 export { ThemeSelector } from "./ThemeSelector/index.js";
+export type { RouterLinkProps } from "./ui/index.js";
+export { RouterLink } from "./ui/index.js";
 export type {
   QuadArc,
   RelaxOptions,
