@@ -159,11 +159,12 @@ window.Atlas = (() => {
 .surface.screen { position: relative; block-size: var(--screen); contain: layout; }
 .surface.screen > dialog[open].ds.modal { position: absolute; inset: 0; margin: auto; block-size: fit-content; }
 .surface.screen > dialog[open].ds.side-panel { position: absolute; inset-block: 0; inset-inline-end: 0; inset-inline-start: auto; margin: 0; block-size: 100%; }
-.island[data-layer] .surface, .island[data-layer] .surface * { transform-style: preserve-3d; }
+/* The whole chain from the host down must preserve 3D: one flat element flattens everything below it into
+   its own plane, and the island root is between the frame and the surface. */
+.island[data-layer], .island[data-layer] .surface, .island[data-layer] .surface * { transform-style: preserve-3d; }
 /* pragma clips these with overflow: hidden (auto on modal content), which flattens their 3D descendants into
-   one plane; clip keeps the clipping and lets the layers through. No composition's modal is tall enough to scroll. */
-.island[data-layer] .surface :is(.ds.card, .ds.tile, .ds.accordion, .ds.modal, .ds.side-navigation .ds.content) { overflow: clip; }
-.island[data-layer] .surface .ds.modal-content { overflow: visible; }
+   one plane. Their radius resolves to 0 and none of them has content to scroll, so nothing visible is lost. */
+.island[data-layer] .surface :is(.ds.card, .ds.tile, .ds.accordion, .ds.modal, .ds.modal-content, .ds.side-navigation .ds.content) { overflow: visible; }
 .island[data-layer="elements"] .surface * { translate: 0 0 var(--dz2, 2px); }
 .island[data-layer="components"] .surface .ds { translate: 0 0 var(--dz2, 2px); }
 /* an overlay floats above the page it covers, whatever that page's depth */
