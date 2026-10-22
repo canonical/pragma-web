@@ -58,12 +58,13 @@ const LITERAL_TOKENS = ["--standard-article-max-inline-size"];
 
 /**
  * The tokens the lens reads from outside itself: the design system's
- * semantic colour and space tokens. No primitive
+ * semantic colour and space tokens, and the grid's gutter. No primitive
  * token is among them: a component token reads the semantic tier or holds
  * its own value.
  */
 const EXTERNAL_TOKENS = [
   "--color-text-muted",
+  "--grid-gutter",
   "--space-100",
   "--space-200",
   "--space-300",
