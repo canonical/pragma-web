@@ -4,15 +4,21 @@
 
 @layer ds.components.global {
   /* The site's one grid: the `grid intrinsic` presets give it the intrinsic
-   * columns and the gutters; the shell names it the one query container,
-   * gives it one viewport-high row, and never scrolls. */
+   * columns; the shell sets its gap from the grid's gutter on both axes,
+   * names it the one query container, gives it one viewport-high row, and
+   * never scrolls. */
   .ds.shell {
+    --shell-gap: var(--grid-gutter);
+    --shell-background: var(--color-background);
+    --shell-color: var(--color-text);
+
     container: shell / inline-size;
     grid-template-rows: minmax(0, 1fr);
+    gap: var(--shell-gap);
     block-size: 100dvh;
     overflow: clip;
-    background: var(--color-background);
-    color: var(--color-text);
+    background: var(--shell-background);
+    color: var(--shell-color);
   }
 
   .ds.shell > .loading {
