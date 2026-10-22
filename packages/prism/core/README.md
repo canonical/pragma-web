@@ -5,11 +5,11 @@ set of lenses over one knowledge graph: each lens is a domain with its own
 routes and page layout, and every lens reads the graph through Relay. This
 package holds the parts every such site needs and none of them owns:
 
-- **Lens chrome**: the components a lens layout composes — `Rail`,
-  `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`), `Canvas`,
-  `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page needs,
-  `ErrorBoundary` and `ClientOnly`. There is no shared frame: each lens's
-  layout arranges these as it needs.
+- **Lens chrome**: the two page archetypes every lens layout is built on,
+  `WorkspaceLayout` and `DocumentLayout`, the components they place —
+  `Rail`, `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`),
+  `Canvas`, `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page
+  needs, `ErrorBoundary` and `ClientOnly`.
 - **Chip**: the inline mention of a graph entity, tinted by its namespace,
   shaped by its kind, filled or outlined by class vs instance, and dotted by
   lifecycle; `ChipLegend` explains the grammar.
@@ -44,32 +44,54 @@ Requires React 19 and `@canonical/router-core` / `@canonical/router-react`.
 
 ## Lens chrome
 
+A site renders one grid: its shell's root carries the `grid intrinsic`
+classes of `@canonical/styles` and is the one query container, named
+`shell`. Every layout below it is a subgrid of that grid, so every page
+reads against the same columns. A lens layout is one of two archetypes,
+each a subgrid over every column:
+
+- `WorkspaceLayout`: a page that fills the viewport and never scrolls. The
+  rail takes the first two columns, the strip the rest of the top row, the
+  canvas the body, and an `inspector` the last three columns of the body;
+  the rail and the inspector scroll on their own. Below three groups of
+  columns the inspector moves into the published `SidePanel` drawer, which
+  a trigger at the canvas's corner opens.
+- `DocumentLayout`: a page whose canvas is the one scrolling region, with
+  an optional `aside` in the last three columns of the body and an optional
+  `colophon` band under it. Below two groups of columns the aside moves
+  under the canvas.
+
 ```tsx
 import {
-  Canvas,
-  CanvasSkipLink,
   collectLenses,
+  DocumentLayout,
   ModeStrip,
   Rail,
 } from "@canonical/prism-core";
-import { Outlet, useRouter } from "@canonical/router-react";
+import { useRouter } from "@canonical/router-react";
+import type { ReactNode } from "react";
 
-export function GlossaryLayout() {
+export function GlossaryLayout({ children }: { children: ReactNode }) {
   const { routes } = useRouter();
   return (
-    <div className="glossary-layout">
-      <CanvasSkipLink />
-      <Rail brand={{ label: "Atlas", to: "home" }} entries={collectLenses(routes)}>
-        {/* the site's utility cluster */}
-      </Rail>
-      <ModeStrip context={<GlossaryContext />} />
-      <Canvas>
-        <Outlet />
-      </Canvas>
-    </div>
+    <DocumentLayout
+      rail={
+        <Rail brand={{ label: "Atlas", to: "home" }} entries={collectLenses(routes)}>
+          {/* the site's utility cluster */}
+        </Rail>
+      }
+      strip={<ModeStrip context={<GlossaryContext lensLabel="Glossary" />} />}
+    >
+      {children}
+    </DocumentLayout>
   );
 }
 ```
+
+Both render the skip link first, then a `.rail` region, a `.strip` region
+and the `Canvas`. Regions are placed by column count from the start and by
+negative lines from the end, so they hold their places at any column
+count, and below one group of columns the rail narrows to one column.
 
 The rail reads its lenses from the route table it is given and wires each
 lens's shortcut key itself, showing each key as a `KeyboardKey`. It does
@@ -84,24 +106,34 @@ columns the labels, hints and headings hide and the icons stay.
 ### Stylesheets
 
 Each component imports its own stylesheet, so a bundler that handles CSS
-imports needs no further setup. The rules sit in `@layer ds.prism`: below a
-site's own `app` layer, above `ds.components.global`, so a site overrides
-them without specificity games. Load `@canonical/styles` first; it declares
-the layer order.
+imports needs no further setup. The rules sit in
+`@layer ds.components.global`, so a site's `app` layer overrides them
+without specificity games. Load `@canonical/styles` first; it declares the
+layer order, the spacing shim and the grid presets the components read.
 
-The stylesheets read the site's layout tokens and fall back when a site
-does not define them: `--strip-h` (the strip's height), `--z-plate`,
-`--z-chrome` and `--z-overlay` (the z-axis strata) and `--rail-span` (the
-rail's column span over the layout's `--grid-intrinsic` columns).
+Every component reads its spacing from the shim (`--container-gap-*`,
+`--component-padding-*`), its colours and weights from the semantic tier,
+and its line unit from the density channel, so a site puts its context and
+density classes (`docs comfortable`) on the document. A decision with no
+token to read is a component token on the component's root. The container
+queries read the `shell` container a site's shell names.
 
-The stylesheets name no theme. Their fallbacks are light values; a site's
-dark theme (whatever class or query activates it) defines the Chip's hooks:
-`--chip-tint-l` and `--chip-tint-c` (every namespace tint's lightness and
-chroma), `--chip-fill-weight-instance` (an instance's fill, 15% by
-default), and `--chip-dot-canonical`, `--chip-dot-beta` and
+The stylesheets name no theme. The Chip's fallbacks are light values; a
+site's dark theme (whatever class or query activates it) defines the Chip's
+hooks: `--chip-tint-l` and `--chip-tint-c` (every namespace tint's
+lightness and chroma), `--chip-fill-weight-instance` (an instance's fill,
+15% by default), and `--chip-dot-canonical`, `--chip-dot-beta` and
 `--chip-dot-deprecated` (the lifecycle dots). The site keeps an instance's
 text-on-fill contrast at 4.5:1 or above for every hue at its values; the
 light fallbacks are held to that floor here.
+
+### Component checks
+
+Every component folder carries an `anatomy.yaml` in the anatomy DSL, and
+its stylesheet transcribes it. The experimental `@canonical/prism-core/testing`
+subpath holds the checks the prism packages and apps run over their own
+components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
+`assertStylesheets` and `listAnatomyFolders`.
 
 ## Chip
 
@@ -271,6 +303,8 @@ site's own catalog, and the factory holds no reader-facing string.
 
 ## Public API
 
+- Layouts: `WorkspaceLayout`, `DocumentLayout`; types
+  `WorkspaceLayoutProps`, `DocumentLayoutProps`.
 - Components: `Chip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`, `ClientOnly`,
   `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`; types `ChipProps`,

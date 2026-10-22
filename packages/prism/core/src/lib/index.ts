@@ -43,6 +43,7 @@ export type {
   ChipLegendProps,
   ChipProps,
   ClientOnlyProps,
+  DocumentLayoutProps,
   ErrorBoundaryProps,
   Kind,
   LensBreadcrumbsProps,
@@ -53,6 +54,7 @@ export type {
   RailProps,
   RouterLinkProps,
   ThemeSelectorProps,
+  WorkspaceLayoutProps,
 } from "./ui/index.js";
 export {
   Canvas,
@@ -60,6 +62,7 @@ export {
   Chip,
   ChipLegend,
   ClientOnly,
+  DocumentLayout,
   ErrorBoundary,
   LensBreadcrumbs,
   ModeStrip,
@@ -67,6 +70,7 @@ export {
   Rail,
   RouterLink,
   ThemeSelector,
+  WorkspaceLayout,
 } from "./ui/index.js";
 export type {
   QuadArc,
