@@ -31,3 +31,6 @@ export const COUPLING_GAP = 1000;
 
 /** The gap drawn between two cars of one unit, taken from both cars. */
 export const GANGWAY_GAP = 300;
+
+/** How far a platform mark drops below the cars, to hold the overhang. */
+export const MARK_DROP = 1200;

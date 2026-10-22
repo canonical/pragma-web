@@ -6,6 +6,7 @@
  */
 
 export { default as buildTrainGeometry } from "./buildTrainGeometry.js";
+export * from "./FormationSideView/index.js";
 export { default as findScaleLength } from "./findScaleLength.js";
 export { default as formatLength } from "./formatLength.js";
 export { default as measurePlatformFit } from "./measurePlatformFit.js";
