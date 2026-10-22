@@ -4,4 +4,4 @@
  * @module
  */
 
-export { MESSAGES } from "./constants.js";
+export { LOCALE, MESSAGES } from "./constants.js";
