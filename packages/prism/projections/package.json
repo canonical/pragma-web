@@ -61,6 +61,7 @@
     }
   },
   "dependencies": {
+    "@canonical/i18n-core": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/react-ds-global": "^0.44.1",
     "react": "^19.2.4",
