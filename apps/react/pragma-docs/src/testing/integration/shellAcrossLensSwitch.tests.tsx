@@ -43,7 +43,7 @@ import { fireEvent, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Shell } from "#lib/Shell";
+import { Shell } from "#lib/ui";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
 import {
   definitionsExplorerRecords,

@@ -39,19 +39,15 @@ describe("the app stylesheets", () => {
     expect(cssFiles.length).toBeGreaterThanOrEqual(4);
   });
 
-  // The metric tokens that SURVIVE the strict intrinsic-grid model: the
-  // strip's block-axis height and the four z-axis strata. Each defined
-  // exactly once, in styles/app.css.
-  it.each([
-    "--strip-h",
-    "--z-underground",
-    "--z-plate",
-    "--z-chrome",
-    "--z-overlay",
-  ])("defines %s exactly once across src/**/*.css", (token) => {
-    const definitions = allCss.match(new RegExp(`${token}\\s*:`, "g")) ?? [];
-    expect(definitions).toHaveLength(1);
-  });
+  // The four z-axis strata the explorers read. Each defined exactly once,
+  // in styles/app.css.
+  it.each(["--z-underground", "--z-plate", "--z-chrome", "--z-overlay"])(
+    "defines %s exactly once across src/**/*.css",
+    (token) => {
+      const definitions = allCss.match(new RegExp(`${token}\\s*:`, "g")) ?? [];
+      expect(definitions).toHaveLength(1);
+    },
+  );
 
   // The inline-axis WIDTH tokens are DISSOLVED under the strict
   // intrinsic-grid model (owner ruling 2026-07-22): there are no named

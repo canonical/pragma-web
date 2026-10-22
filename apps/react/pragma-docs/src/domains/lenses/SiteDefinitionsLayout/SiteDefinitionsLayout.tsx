@@ -13,7 +13,5 @@ import type { SiteDefinitionsLayoutProps } from "./types.js";
 export default function SiteDefinitionsLayout({
   children,
 }: SiteDefinitionsLayoutProps): ReactElement {
-  return (
-    <DefinitionsLayout rail={<SiteRail />}>{children}</DefinitionsLayout>
-  );
+  return <DefinitionsLayout rail={<SiteRail />}>{children}</DefinitionsLayout>;
 }
