@@ -37,6 +37,12 @@ export const admonitionDocument = `> [!NOTE]
 `;
 
 /**
+ * An admonition whose marker line ends in two spaces, which Markdown reads as
+ * a hard line break.
+ */
+export const hardBreakAdmonitionDocument = "> [!NOTE]  \n> A note.\n";
+
+/**
  * Markup a sanitiser must neutralise: a script element, an event-handler
  * attribute and a `javascript:` link.
  */

@@ -42,6 +42,18 @@ describe("remarkAdmonitions", () => {
     ]);
   });
 
+  it.each([
+    ["trailing spaces", "> [!NOTE]  \n> Body."],
+    ["a backslash", "> [!NOTE]\\\n> Body."],
+  ])("removes the hard break left by %s after the marker", (_, source) => {
+    const quote = transformQuote(source);
+
+    expect(quote.data?.hProperties?.dataAdmonition).toBe("note");
+    expect(quote.children).toMatchObject([
+      { type: "paragraph", children: [{ type: "text", value: "Body." }] },
+    ]);
+  });
+
   it("removes a paragraph that held nothing but the marker", () => {
     const quote = transformQuote("> [!TIP]\n>\n> Second paragraph.");
 
