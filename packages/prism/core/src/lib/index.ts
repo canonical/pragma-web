@@ -10,10 +10,6 @@ export {
   assertBindingsLive,
   defineBinding,
 } from "./bindings/index.js";
-export type { ClientOnlyProps } from "./ClientOnly/index.js";
-export { ClientOnly } from "./ClientOnly/index.js";
-export type { ErrorBoundaryProps } from "./ErrorBoundary/index.js";
-export { ErrorBoundary } from "./ErrorBoundary/index.js";
 export type {
   HomeNode,
   HomeResolver,
@@ -40,14 +36,14 @@ export { collectLenses, routeLensFacet } from "./routeLens/index.js";
 export { createStaticRouter } from "./router/index.js";
 export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
-export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
-export { ThemeSelector } from "./ThemeSelector/index.js";
 export type {
   Box,
   CanvasProps,
   CanvasSkipLinkProps,
   ChipLegendProps,
   ChipProps,
+  ClientOnlyProps,
+  ErrorBoundaryProps,
   Kind,
   LensBreadcrumbsProps,
   LensContextProps,
@@ -56,17 +52,21 @@ export type {
   RailBrand,
   RailProps,
   RouterLinkProps,
+  ThemeSelectorProps,
 } from "./ui/index.js";
 export {
   Canvas,
   CanvasSkipLink,
   Chip,
   ChipLegend,
+  ClientOnly,
+  ErrorBoundary,
   LensBreadcrumbs,
   ModeStrip,
   makeLensContext,
   Rail,
   RouterLink,
+  ThemeSelector,
 } from "./ui/index.js";
 export type {
   QuadArc,

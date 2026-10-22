@@ -1,0 +1,9 @@
+---
+# ThemeSelector — a native select with the three theme options, backed by
+# the stored preference. Binds no styles: the page's form styling applies.
+node:
+  uri: prism.component.theme_selector
+  edges:
+    - node:
+        role: theme option
+      relation: { cardinality: "3", slotName: option }

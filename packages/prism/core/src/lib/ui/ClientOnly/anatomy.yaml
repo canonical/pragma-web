@@ -1,0 +1,14 @@
+---
+# ClientOnly — renders the fallback on the server and the first client pass,
+# then the children. It renders no element of its own.
+node:
+  uri: prism.component.client_only
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: fallback
+          - node:
+              role: children
+      relation: { cardinality: "1", slotName: default }
