@@ -29,14 +29,14 @@ export default mergeConfig(
           "**/*.tests.tsx",
           // relay-compiler output, ignored by git and read by nothing.
           "src/relay/__generated__/**",
-          // Process entry points: executed, never imported, so a unit test
-          // cannot load one without starting a server or rewriting the
-          // committed schema. The e2e suite runs each of them.
+          // Thin process entry points with no dispatch of their own: the
+          // bundle entry hydrates `#root`, the graph hands every request to
+          // the example package's handler, and the schema script rewrites
+          // the committed SDL. The e2e suite runs each of them. The two Bun
+          // web servers dispatch requests, so their suites count.
           "src/client/entry.tsx",
           "src/server/graph.ts",
           "src/server/schema.ts",
-          "src/server/server.bun.ts",
-          "src/server/preview.bun.ts",
         ],
         thresholds: {
           statements: 100,
