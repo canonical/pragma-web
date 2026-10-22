@@ -15,6 +15,7 @@
 
 import { beforeAll, describe, expect, it } from "vitest";
 import { assertPresent } from "../assertPresent.js";
+import { findByUri } from "../findByUri.js";
 import {
   ASYMMETRIC_UNIT_URI,
   COUPLED_FORMATION_URI,
@@ -35,7 +36,6 @@ import type {
   FleetLine,
   FleetStock,
   FleetUnit,
-  NetworkReference,
 } from "../types.js";
 
 let fleet: Fleet;
@@ -43,16 +43,6 @@ let fleet: Fleet;
 beforeAll(async () => {
   fleet = await readFleet();
 });
-
-/** The record with this IRI in a list, failing the test when it is absent. */
-const findByUri = <T extends NetworkReference>(
-  records: readonly T[],
-  uri: string,
-): T =>
-  assertPresent(
-    records.find((record) => record.uri === uri),
-    `the fleet has no ${uri}`,
-  );
 
 /** A driving cab in a train: which car it is in, and which end it faces. */
 interface CabEnd {
@@ -139,10 +129,11 @@ describe("a unit run alone or coupled", () => {
 });
 
 describe("an asymmetric unit reversed in its formation", () => {
-  const unit = (): FleetUnit => findByUri(fleet.units, ASYMMETRIC_UNIT_URI);
+  const findAsymmetricUnit = (): FleetUnit =>
+    findByUri(fleet.units, ASYMMETRIC_UNIT_URI);
 
   it("has a driving cab at one end only, its front", () => {
-    const cabs = unit().cars.filter(
+    const cabs = findAsymmetricUnit().cars.filter(
       (car) => findByUri(fleet.carTypes, car.carType.uri).hasCab,
     );
     expect(cabs.map((car) => [car.position, car.reversed])).toEqual([

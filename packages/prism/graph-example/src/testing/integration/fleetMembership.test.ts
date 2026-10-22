@@ -7,7 +7,7 @@
 // =============================================================================
 
 import { beforeAll, describe, expect, it } from "vitest";
-import { assertPresent } from "../assertPresent.js";
+import { findByUri } from "../findByUri.js";
 import { BARE_STATION_URIS } from "../fixtures.js";
 import { readFleet } from "../readFleet.js";
 import type { Fleet, NetworkReference } from "../types.js";
@@ -21,16 +21,6 @@ beforeAll(async () => {
 /** The sorted IRIs of a list of references, for order-free comparison. */
 const sortUris = (references: readonly NetworkReference[]): string[] =>
   references.map((reference) => reference.uri).sort();
-
-/** The record with this IRI in a list, failing the test when it is absent. */
-const findByUri = <T extends NetworkReference>(
-  records: readonly T[],
-  uri: string,
-): T =>
-  assertPresent(
-    records.find((record) => record.uri === uri),
-    `the fleet has no ${uri}`,
-  );
 
 describe("fleet membership", () => {
   it("has stocks, formations, units and car types to compare", () => {
