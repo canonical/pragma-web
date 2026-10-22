@@ -7,9 +7,11 @@
  * width, measuring it in the light and the dark theme. What is asserted is
  * what the layout promises: one intrinsic grid, the shell, which is the one
  * query container; no page scroll, and nothing reaching past the viewport
- * or past its region, at 390px too; twelve columns at 1440px and four at
- * 390px; a workspace canvas that never scrolls; a document whose only
- * scrolling regions are its canvas and its rail; and every gap, padding and
+ * or past its region, and nothing in the strip scrolling sideways, at
+ * 390px too; twelve columns at 1440px and four at 390px; a workspace canvas
+ * that never scrolls; a document whose only scrolling regions are its
+ * canvas and its rail, and whose page's first element spans the whole main
+ * column; a catalog whose cards fill their rows; and every gap, padding and
  * margin of the chrome a multiple of 4px.
  */
 import {
@@ -21,9 +23,14 @@ import {
 import type { Browser } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  CATALOG_CARD_SELECTOR,
+  CATALOG_PATH,
   DEV_READY_MS,
   DOCUMENT_PATHS,
   PAGE_SETTLE_MS,
+  STANDARDS_INDEX_PATH,
+  STANDARDS_INDEX_ROW_SELECTOR,
+  WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
 } from "./constants.js";
 import { type RunningServer, startServer } from "./serverHarness.js";
@@ -45,16 +52,21 @@ afterAll(async () => {
 
 describe.each(VIEWPORTS)("at $name px", (viewport) => {
   /**
-   * Open `path` once at this viewport and measure it in every theme.
+   * Open `path` once at this viewport and measure it in every theme, with
+   * the elements that must fill the page's rows, if any.
    *
    * @note Impure: opens a browser tab, which it closes.
    */
-  const measure = (path: string): Promise<readonly ThemedMeasure[]> =>
+  const measure = (
+    path: string,
+    fillSelector?: string,
+  ): Promise<readonly ThemedMeasure[]> =>
     measurePage(browser, {
       url: new URL(path, server.base).href,
       viewport,
       origins: [new URL(server.base).origin, new URL(server.graphBase).origin],
       timeoutMs: PAGE_SETTLE_MS,
+      fillSelector,
     });
 
   /** Assert what every page promises, in each theme it was measured in. */
@@ -105,7 +117,45 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         for (const scroller of layout.scrollers) {
           expect(["main.ds.canvas", "div.rail"], theme).toContain(scroller);
         }
+        // The page's first element spans the whole main column, never
+        // one track of it.
+        expect(layout.canvasPage.width, theme).toBeGreaterThan(0);
+        expect(
+          Math.abs(layout.canvasPage.firstChildWidth - layout.canvasPage.width),
+          theme,
+        ).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
       }
     },
   );
+
+  // Past one group the canvas holds an even number of columns, which the
+  // catalog's two-column cards fill; at four columns the canvas holds
+  // three, so a row's one card leaves the last.
+  it.runIf(viewport.columns > 4)(
+    "fills the catalog's rows with cards to the canvas's end",
+    async () => {
+      const measures = await measure(CATALOG_PATH, CATALOG_CARD_SELECTOR);
+      for (const { theme, measure: layout } of measures) {
+        const shortfall = layout.canvasPage.fillShortfall;
+        expect(shortfall, theme).not.toBeNull();
+        expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+        expect(shortfall?.end, theme).toBeLessThanOrEqual(
+          layout.canvasPage.columnGap,
+        );
+      }
+    },
+  );
+
+  it("spans the standards index's links and lists over the main column", async () => {
+    const measures = await measure(
+      STANDARDS_INDEX_PATH,
+      STANDARDS_INDEX_ROW_SELECTOR,
+    );
+    for (const { theme, measure: layout } of measures) {
+      const shortfall = layout.canvasPage.fillShortfall;
+      expect(shortfall, theme).not.toBeNull();
+      expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+      expect(shortfall?.end, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+    }
+  });
 });
