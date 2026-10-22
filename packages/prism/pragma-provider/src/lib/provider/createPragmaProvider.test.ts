@@ -215,6 +215,27 @@ describe("the pinned compiler options", () => {
   });
 });
 
+describe("prose sidecars", () => {
+  it("announces a sidecar that names no entity, and binds the rest", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    await createPragmaProvider({
+      refsRoot: CORPUS_REFS_ROOT,
+      semRoot: CORPUS_SEM_ROOT,
+    });
+    const warnings = warn.mock.calls.map((call) => String(call.at(0)));
+    const infos = info.mock.calls.map((call) => String(call.at(0)));
+    warn.mockRestore();
+    info.mockRestore();
+    expect(warnings.filter((line) => line.includes("prose sidecar"))).toEqual([
+      expect.stringContaining(
+        "prose sidecar design-system/definitions/NOTES.md names no entity in the graph",
+      ),
+    ]);
+    expect(infos.join("\n")).toContain("2 prose sidecars bound");
+  });
+});
+
 describe("sdlOutput", () => {
   it("writes nothing and says so when it is absent", async () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});

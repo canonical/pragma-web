@@ -48,7 +48,8 @@
   },
   "dependencies": {
     "@canonical/prism-contract": "^0.44.1",
-    "graphql": "^16.11.0"
+    "graphql": "^16.11.0",
+    "mdast-util-from-markdown": "^2.0.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
@@ -56,6 +57,7 @@
     "@canonical/typescript-config": "0.43.0",
     "@canonical/webarchitect": "0.43.0",
     "@types/bun": "^1.3.10",
+    "@types/mdast": "^4.0.4",
     "@types/node": "^26.0.0",
     "@vitest/coverage-v8": "^5.0.0",
     "typescript": "^7.0.2",

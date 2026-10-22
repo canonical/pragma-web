@@ -14,6 +14,14 @@ export interface TtlSource {
   readonly content: string;
 }
 
+/** One Markdown prose sidecar, keyed by its path the way a TTL source is. */
+export interface ProseSidecar {
+  /** Store-visible path: `<package>/<relative path>`, forward slashes. */
+  readonly path: string;
+  /** The Markdown text, as written. */
+  readonly content: string;
+}
+
 /**
  * One source package resolved to a directory on disk.
  *

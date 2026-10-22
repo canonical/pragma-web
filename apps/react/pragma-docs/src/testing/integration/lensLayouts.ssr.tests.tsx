@@ -37,13 +37,15 @@ import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it } from "vitest";
 import { EntryServer } from "#server";
 import { definitionsExplorerRecords } from "../../../testing/definitionsRecords.js";
+import {
+  LINK_COMPONENT_URI,
+  standardEntityRecords,
+  standardsIndexRecords,
+} from "../../../testing/standardsRecords.js";
 import journeysExplorerRecords from "../../addons/journeys/__fixtures__/journeysExplorerRecords.js";
 import journeysExplorerRecordsJob from "../../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import catalogRecords from "../../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../../domains/components/__fixtures__/componentEntityRecordsButton.js";
-import standardEntityRecords from "../../domains/lenses/standards/__fixtures__/standardEntityRecords.js";
-import standardsIndexRecords from "../../domains/lenses/standards/__fixtures__/standardsIndexRecords.js";
-import { LINK_COMPONENT_URI } from "../../domains/lenses/standards/__fixtures__/standardsPageHarness.js";
 import lobbyRecords from "../../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../../domains/playground/__fixtures__/componentProbeRecords.js";
 
@@ -478,10 +480,20 @@ describe("the lens layouts, rendered through the SSR entry", () => {
       'data-view="standard-reading"',
     );
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
-      '<h1 id="standard-reading-title">react.component.link_component</h1>',
+      '<h1 class="heading" id="standard-reading-title">react.component.link_component</h1>',
     );
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
       'data-slot="reading-canvas"',
+    );
+    // The standard's prose renders with its references as chips, from the
+    // same warm store: the two links the prose writes to them, one by its
+    // compact address and one by its absolute IRI.
+    expect(
+      mustGet(STANDARD_READING_URL).canvas.match(/class="ds node-chip"/g),
+    ).toHaveLength(2);
+    // …and a chip of a standard links to that standard's reading page.
+    expect(mustGet(STANDARD_READING_URL).canvas).toContain(
+      `href="/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#react.component.props")}"`,
     );
     // The journeys canvases render REAL content from the fixture records:
     // the index carries the PRIMARY-SURFACE table (AV-351). The table and

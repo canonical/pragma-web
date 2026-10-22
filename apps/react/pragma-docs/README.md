@@ -91,9 +91,12 @@ src/
 │                   here; it comes from @canonical/prism-pragma-provider.
 ├── domains/        Feature domains (each owns its routes and pages).
 │                   The CORE lens set is `domains/lenses/` plus the
-│                   `@canonical/prism-lens-*` packages — every operation in
-│                   either must execute against any provider implementing
-│                   @canonical/prism-contract, and a gate enforces that.
+│                   `@canonical/prism-lens-*` packages it mounts
+│                   (`prism-lens-definitions`, `prism-lens-standards`) —
+│                   every operation in either must execute against any
+│                   provider implementing @canonical/prism-contract, and the
+│                   Standards lens's against any that also serves the Prose
+│                   extension (Tier 2); a gate enforces both.
 │                   `domains/playground/` carries one pragma-specific probe
 │                   URI (`probeQuery.ts`); it is neither a lens nor a
 │                   declared add-on, so no gate scans it.

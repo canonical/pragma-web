@@ -54,10 +54,18 @@
 // returns the value of an arbitrary property on an arbitrary entity. Generic
 // instance-level relation traversal is all that lens is.
 //
-// SO WHAT THIS GATE PROVES, EXACTLY: the four core lens operations, under
-// `src/domains/lenses` and the lens packages, are provider-neutral. It does not establish that the
-// docsite as a whole runs against any conformant provider — five mounted
+// SO WHAT THIS GATE PROVES, EXACTLY: the four core lens operations, all of
+// them in the lens packages, are provider-neutral. It does not establish that
+// the docsite as a whole runs against any conformant provider — five mounted
 // routes, the home page among them, currently do not.
+//
+// EACH OPERATION CARRIES ITS LENS'S TIER, read off the lens facet. The
+// Definitions lens is Tier 1: it compiles against the contract alone. The
+// Standards lens is Tier 2: it also selects the Prose extension, and its
+// operations execute here because this provider serves that extension. A
+// Tier 2 operation running green is the expected, documented result, not a
+// failure, and the failure report below names each operation's tier so a red
+// one says what it asked of the provider.
 //
 // It is otherwise implemented at FULL STRENGTH. It is not filtered to
 // the operations that happen to validate, not marked `it.fails`, not
@@ -101,6 +109,7 @@ const BLOCKING_LANE =
 
 interface OperationFailure {
   readonly name: string;
+  readonly tier: 1 | 2 | undefined;
   readonly problems: readonly string[];
 }
 
@@ -109,10 +118,12 @@ const describeErrors = (errors: readonly GraphQLError[]): string[] =>
 
 /** Validate, then execute, one operation. Returns its problems, if any. */
 const checkOperation = async (name: string): Promise<OperationFailure> => {
+  const tier = discoverLensOperations().get(name)?.tier;
   const variables = LENS_OPERATION_VARIABLES[name];
   if (variables === undefined) {
     return {
       name,
+      tier,
       problems: [
         "No entry in LENS_OPERATION_VARIABLES. A lens nobody wrote variables " +
           "for is a lens nobody tested — add one to src/testing/fixtures.ts.",
@@ -128,13 +139,14 @@ const checkOperation = async (name: string): Promise<OperationFailure> => {
   } catch (error) {
     return {
       name,
+      tier,
       problems: [`Operation text does not parse: ${String(error)}`],
     };
   }
 
   const validationErrors = validate(provider.schema, document);
   if (validationErrors.length > 0) {
-    return { name, problems: describeErrors(validationErrors) };
+    return { name, tier, problems: describeErrors(validationErrors) };
   }
   /**
    * Did a resolved root field actually look something up? An empty connection
@@ -176,11 +188,12 @@ const checkOperation = async (name: string): Promise<OperationFailure> => {
   });
 
   if (result.errors !== undefined && result.errors.length > 0) {
-    return { name, problems: describeErrors(result.errors) };
+    return { name, tier, problems: describeErrors(result.errors) };
   }
   if (result.data === null || result.data === undefined) {
     return {
       name,
+      tier,
       problems: ["Executed without errors but returned no data."],
     };
   }
@@ -203,6 +216,7 @@ const checkOperation = async (name: string): Promise<OperationFailure> => {
   ) {
     return {
       name,
+      tier,
       problems: [
         "Every root field resolved to null or to an empty result — the " +
           "operation ran but looked nothing up. Check " +
@@ -210,7 +224,7 @@ const checkOperation = async (name: string): Promise<OperationFailure> => {
       ],
     };
   }
-  return { name, problems: [] };
+  return { name, tier, problems: [] };
 };
 
 const buildReport = (failures: readonly OperationFailure[]): string =>
@@ -219,7 +233,7 @@ const buildReport = (failures: readonly OperationFailure[]): string =>
       "contract-conformant provider.",
     "",
     ...failures.flatMap((failure) => [
-      `  ${failure.name} — ${failure.problems.length} problem(s)`,
+      `  ${failure.name} [Tier ${failure.tier}] — ${failure.problems.length} problem(s)`,
       ...failure.problems.map((problem) => `    - ${problem}`),
       "",
     ]),
@@ -254,6 +268,27 @@ describe("the lens operations", () => {
       )
       .map(([name]) => name);
     expect(fromPackages).toContain("DefinitionsExplorerQuery");
+  });
+
+  it("reads each operation's tier off its lens's facet", () => {
+    const tiers = new Map(
+      [...discoverLensOperations()].map(([name, source]) => [
+        name,
+        source.tier,
+      ]),
+    );
+    expect(Object.fromEntries(tiers)).toMatchObject({
+      DefinitionsExplorerQuery: 1,
+      StandardsIndexQuery: 2,
+      StandardsIndexPaginationQuery: 2,
+      StandardEntityQuery: 2,
+    });
+    // Every discovered operation has a tier: a root with operations and no
+    // lens facet would be measured without saying what it asks of a
+    // provider.
+    expect(
+      [...tiers].filter(([, tier]) => tier === undefined).map(([name]) => name),
+    ).toEqual([]);
   });
 
   it("has variables declared for every discovered operation", () => {

@@ -41,20 +41,6 @@ export const ComponentsIcon = ({ size = 16 }: IconProps): ReactElement => (
 );
 
 /**
- * Standards: a shield with a check, the Standards lens's rail glyph.
- *
- * A stroke glyph `size` pixels square (16 by default), drawn in
- * `currentColor` and `aria-hidden`: the rail entry's visible label names
- * it. A lens passes it as its `icon` in `routeLensFacet.of`.
- */
-export const StandardsIcon = ({ size = 16 }: IconProps): ReactElement => (
-  <svg aria-hidden="true" {...buildGlyphProps(size)}>
-    <path d="M8 2 13 4v4c0 3.2-2.2 5.3-5 6-2.8-.7-5-2.8-5-6V4l5-2z" />
-    <path d="M5.8 8l1.6 1.6L10.5 6.5" />
-  </svg>
-);
-
-/**
  * Guides: a page with two lines of text, the Guides lens's rail glyph.
  *
  * A stroke glyph `size` pixels square (16 by default), drawn in
