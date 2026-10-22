@@ -127,3 +127,27 @@ export interface ExampleProvider {
   /** The exact SDL `schema` was built from — contract first, extension after. */
   readonly sdl: string;
 }
+
+/** One node as search reads it: what text search matches against. */
+export interface SearchEntry {
+  /** The node's absolute IRI. */
+  readonly uri: string;
+  /** `_meta.title` in the default language. */
+  readonly title: string;
+  /** `_meta.curie`. */
+  readonly curie: string;
+  /** `_meta.definition` in the default language, or null when it has none. */
+  readonly definition: string | null;
+}
+
+/** How one entry matches a search: which field, and where in it. */
+export interface SearchMatch {
+  /** The entry's absolute IRI. */
+  readonly uri: string;
+  /** The field that matched: 0 the title, 1 the CURIE, 2 the definition. */
+  readonly tier: number;
+  /** Where in that field the text starts, lowercased. */
+  readonly position: number;
+  /** The entry's title, which breaks ties between equal matches. */
+  readonly title: string;
+}
