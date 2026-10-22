@@ -49,6 +49,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   font: ["typography.font"],
   "font-family": ["typography.fontFamily"],
   "font-size": ["typography.size"],
+  "font-variant-caps": ["typography.variant.caps"],
   "font-weight": ["typography.weight"],
   gap: ["spacing.gap"],
   "grid-area": ["layout.grid.area"],
