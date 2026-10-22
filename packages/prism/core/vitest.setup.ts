@@ -9,7 +9,7 @@ expect.extend(matchers as unknown as Parameters<typeof expect.extend>[0]);
 // exists. A minimal always-false stub is the standard shim; node-environment
 // suites have no window and exercise the hook's server branch instead.
 if (typeof window !== "undefined" && typeof window.matchMedia === "undefined") {
-  const matchMediaStub = (query: string): MediaQueryList =>
+  const stubMatchMedia = (query: string): MediaQueryList =>
     ({
       addEventListener: () => {},
       addListener: () => {},
@@ -20,7 +20,7 @@ if (typeof window !== "undefined" && typeof window.matchMedia === "undefined") {
       removeEventListener: () => {},
       removeListener: () => {},
     }) as unknown as MediaQueryList;
-  window.matchMedia = matchMediaStub;
+  window.matchMedia = stubMatchMedia;
 }
 
 afterEach(() => {
