@@ -1,0 +1,33 @@
+---
+# Canvas — the page's one `<main>` (the skip link's target), a subgrid that
+# passes the layout's columns to the routed page it holds, which it wraps in
+# a full-width subgrid `page`. Whether the canvas scrolls (document) or
+# never scrolls (workspace) is the archetype layout's decision, bound there
+# on the `canvas` slot. No `container-type`: size containment would sever the
+# subgrid (verified in Chromium). The canvas and the wrapper each hold one row
+# of the free height, so a page that fills its height (`block-size: 100%`)
+# resolves against the canvas's, not its own content's: a workspace page
+# then fits the canvas, and a document page overflows into its scroll.
+node:
+  uri: prism.component.canvas
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.rows: "minmax(0, 1fr)"
+    size.min.block: 0
+    size.min.width: 0
+    appearance.outline.style@focus: none
+  edges:
+    - node:
+        role: routed page wrapper
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          layout.grid.rows: "minmax(0, 1fr)"
+          size.min.width: 0
+        edges:
+          - node:
+              role: routed page
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: page }

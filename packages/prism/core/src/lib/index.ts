@@ -10,10 +10,6 @@ export {
   assertBindingsLive,
   defineBinding,
 } from "./bindings/index.js";
-export type { CanvasProps } from "./Canvas/index.js";
-export { Canvas } from "./Canvas/index.js";
-export type { CanvasSkipLinkProps } from "./CanvasSkipLink/index.js";
-export { CanvasSkipLink } from "./CanvasSkipLink/index.js";
 export type {
   Box,
   ChipLegendProps,
@@ -55,6 +51,8 @@ export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
 export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
 export { ThemeSelector } from "./ThemeSelector/index.js";
 export type {
+  CanvasProps,
+  CanvasSkipLinkProps,
   LensBreadcrumbsProps,
   LensContextProps,
   ModeStripProps,
@@ -63,6 +61,8 @@ export type {
   RouterLinkProps,
 } from "./ui/index.js";
 export {
+  Canvas,
+  CanvasSkipLink,
   LensBreadcrumbs,
   ModeStrip,
   makeLensContext,
