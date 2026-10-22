@@ -11,7 +11,15 @@ export const PAGE_SETTLE_MS = 30_000;
 export const WORKSPACE_PATH = "/definitions";
 
 /**
- * A page on the document archetype: the lobby, whose canvas scrolls at a
- * phone's width.
+ * Pages on the document archetype: the lobby, whose canvas scrolls at a
+ * phone's width; the Components catalog and the Standards index, whose
+ * columns must fit four grid columns; and a standard's entity page, whose
+ * current crumb is the standard's IRI, an identifier with no break
+ * opportunity.
  */
-export const DOCUMENT_PATH = "/";
+export const DOCUMENT_PATHS = [
+  "/",
+  "/components",
+  "/standards",
+  `/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#code.api.stability")}`,
+] as const;

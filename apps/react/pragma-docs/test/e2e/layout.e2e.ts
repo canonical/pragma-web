@@ -2,15 +2,15 @@
 
 /**
  * The page grid and the scroll model, measured in a real browser: the dev
- * cell (its graph server alongside) serves a workspace page and a document
- * page, and Chromium lays each out once at a desktop and a phone width,
- * measuring it in the light and the dark theme. What is asserted is what the
- * layout promises: one intrinsic grid, the shell, which is the one query
- * container; no page scroll, and nothing reaching past the viewport or past
- * its region, at 390px too; twelve columns at 1440px and four at 390px; a
- * workspace canvas that never scrolls; a document whose only scrolling
- * regions are its canvas and its rail; and every gap, padding and margin of
- * the chrome a multiple of 4px.
+ * cell (its graph server alongside) serves a workspace page and several
+ * document pages, and Chromium lays each out once at a desktop and a phone
+ * width, measuring it in the light and the dark theme. What is asserted is
+ * what the layout promises: one intrinsic grid, the shell, which is the one
+ * query container; no page scroll, and nothing reaching past the viewport
+ * or past its region, at 390px too; twelve columns at 1440px and four at
+ * 390px; a workspace canvas that never scrolls; a document whose only
+ * scrolling regions are its canvas and its rail; and every gap, padding and
+ * margin of the chrome a multiple of 4px.
  */
 import {
   launchBrowser,
@@ -22,7 +22,7 @@ import type { Browser } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   DEV_READY_MS,
-  DOCUMENT_PATH,
+  DOCUMENT_PATHS,
   PAGE_SETTLE_MS,
   WORKSPACE_PATH,
 } from "./constants.js";
@@ -95,14 +95,17 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
-  it("lays the document on the one grid, scrolling only its canvas and its rail", async () => {
-    const measures = await measure(DOCUMENT_PATH);
-    expectGrid(measures);
-    for (const { theme, measure: layout } of measures) {
-      expect(layout.canvas.overflow, theme).toBe("auto");
-      for (const scroller of layout.scrollers) {
-        expect(["main.ds.canvas", "div.rail"], theme).toContain(scroller);
+  it.each(DOCUMENT_PATHS)(
+    "lays the document at %s on the one grid, scrolling only its canvas and its rail",
+    async (path) => {
+      const measures = await measure(path);
+      expectGrid(measures);
+      for (const { theme, measure: layout } of measures) {
+        expect(layout.canvas.overflow, theme).toBe("auto");
+        for (const scroller of layout.scrollers) {
+          expect(["main.ds.canvas", "div.rail"], theme).toContain(scroller);
+        }
       }
-    }
-  });
+    },
+  );
 });
