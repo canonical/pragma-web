@@ -19,12 +19,15 @@
     --entity-chip-border-width: 1px;
     --entity-chip-border-color: var(--color-border);
     --entity-chip-radius: 9999px;
+    /* No wider than the line that holds it. */
+    --entity-chip-max-width: 100%;
     --entity-chip-lead-color: var(--color-text-muted);
     /* The matrix's 24px line, which every representation shares. */
     --entity-chip-line-height: var(--space-300);
 
     display: inline-flex;
     align-items: center;
+    max-width: var(--entity-chip-max-width);
     gap: var(--entity-chip-gap);
     padding-inline-start: var(--entity-chip-padding-inline-start);
     padding-inline-end: var(--entity-chip-padding-inline-end);
@@ -42,7 +45,8 @@
     color: var(--entity-chip-lead-color);
   }
 
-  /* A long value truncates inside the pill rather than widening it. */
+  /* A long value truncates inside the pill, which is no wider than its
+   * line, rather than widening it. */
   .ds.entity-chip .value {
     overflow: hidden;
     text-overflow: ellipsis;

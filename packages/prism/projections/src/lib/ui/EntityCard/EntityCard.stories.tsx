@@ -108,7 +108,7 @@ export const ModifierFamily: Story = {
   args: toCardArgs(MODIFIER_FAMILY_ENTITY),
 };
 
-/** A code standard: its one-word name runs to the card's edge. */
+/** A code standard: its one-word name ends in an ellipsis at the card's edge. */
 export const Standard: Story = { args: toCardArgs(STANDARD_ENTITY) };
 
 /**

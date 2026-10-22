@@ -44,7 +44,11 @@
     overflow: hidden;
   }
 
+  /* The title truncates on its line, as the second line does. */
   .ds.entity-command .title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-weight: var(--entity-command-title-font-weight);
   }
 

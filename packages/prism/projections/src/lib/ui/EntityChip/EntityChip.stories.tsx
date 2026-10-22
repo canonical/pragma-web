@@ -46,6 +46,17 @@ export const ModifierFamily: Story = {
 /** A code standard, filed under its prefix. */
 export const Standard: Story = { args: toChipArgs(STANDARD_ENTITY) };
 
+/**
+ * A value longer than the line that holds it: the pill stops at the line's
+ * width and the value ends in an ellipsis.
+ */
+export const LongValue: Story = {
+  args: {
+    ...toChipArgs(STANDARD_ENTITY),
+    value: "react.component.subcomponent_export_api.server_rendering",
+  },
+};
+
 /** The segmented chip: an icon, then the disclosure chevron. */
 export const Chevron: Story = {
   args: {

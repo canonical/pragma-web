@@ -25,6 +25,8 @@
 #                                      primitive dimension.stroke.thickness.*.
 #   --entity-chip-radius: 9999px       a full radius has only the primitive
 #                                      dimension.radius.full.
+#   --entity-chip-max-width: 100%      no wider than its line, so a long
+#                                      value truncates inside the pill.
 #   --entity-chip-padding-block: calc(var(--space-025) - var(--entity-chip-border-width))
 #                                      the matrix's 2px inset less the border.
 #   space.100 (8px) and space.050 (4px) for the inline insets and space.050
@@ -40,6 +42,7 @@ node:
   styles:
     layout.type: inline-flex
     layout.align: center
+    size.max.width: 100%
     spacing.gap: space.050
     spacing.internal.inline.start: space.100
     spacing.internal.inline.end: space.050

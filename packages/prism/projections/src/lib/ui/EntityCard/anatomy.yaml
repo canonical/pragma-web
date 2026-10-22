@@ -23,6 +23,9 @@
 #
 # Every rule reaches its slot through the slot's whole path from the root,
 # so nothing a consumer renders in the sidecar or in a slot is restyled.
+# A word longer than its box, an identifier most often, ends in an ellipsis
+# in the title, the key values and the vitals rather than running under the
+# Card's clipped edge; the roster has no key for breaking inside a word.
 #
 # The sidecar carries a rendered example of the entity beside the body: the
 # entity type decides whether it has one (UI blocks), and its consumer fills
@@ -49,6 +52,7 @@
 #                                       20px).
 #   --entity-card-rule-width: 1px       the rule above each key value;
 #                                       stroke thickness is primitive only.
+#   --entity-card-vital-max-width: 100%  a vital no wider than the footer.
 #   --entity-card-sidecar-span: 2       the sidecar's columns: two at least,
 #                                       wide enough for a component example.
 #   --entity-card-body-span: var(--card-span, 1)  the span the published
@@ -109,6 +113,8 @@ node:
                             spacing.external.block.end: 0
                             spacing.internal.block.start: 0
                             spacing.internal.block.end: 0
+                            layout.overflow: hidden
+                            typography.overflow: ellipsis
                             typography.size: typography.text.primary.fontSize
                             typography.lineHeight: space.300
                             typography.weight: typography.text.primary.bold.fontWeight
@@ -158,6 +164,8 @@ node:
                           styles:
                             layout.flex.grow: 1
                             layout.flex.basis: 0
+                            layout.overflow: hidden
+                            typography.overflow: ellipsis
                             typography.color: color.text.muted
                         relation: { cardinality: "1", slotName: key }
                       - node:
@@ -165,6 +173,8 @@ node:
                           styles:
                             layout.flex.grow: 1
                             layout.flex.basis: 0
+                            layout.overflow: hidden
+                            typography.overflow: ellipsis
                             spacing.external.inline.start: 0
                         relation: { cardinality: "1", slotName: value }
                   relation: { cardinality: "1..*", slotName: pair }
@@ -176,6 +186,9 @@ node:
           - node:
               role: vital
               styles:
+                size.max.width: 100%
+                layout.overflow: hidden
+                typography.overflow: ellipsis
                 typography.color: color.text.muted
             relation: { cardinality: "1..*", slotName: vital }
       relation: { cardinality: "0..1", slotName: footer }

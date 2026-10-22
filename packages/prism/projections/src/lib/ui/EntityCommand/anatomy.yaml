@@ -6,7 +6,9 @@
 # then kind and location on the second line; the vital at the end.
 #
 # The row sets the context's primary text on the matrix's 24px line, the
-# line every representation shares, so it is 56px in every context.
+# line every representation shares, so it is 56px in every context. Each
+# of its two lines truncates rather than wrapping, so a long title never
+# grows the row.
 #
 # Why not a published component: no published list entry exists. The
 # palette that lists these rows sets their role and their selection.
@@ -51,6 +53,9 @@ node:
           - node:
               role: title
               styles:
+                layout.overflow: hidden
+                typography.whiteSpace: nowrap
+                typography.overflow: ellipsis
                 typography.weight: typography.text.primary.bold.fontWeight
             relation: { cardinality: "1", slotName: title }
           - node:

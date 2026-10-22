@@ -33,6 +33,7 @@
     --entity-card-rule-width: 1px;
     --entity-card-rule-color: var(--color-border-muted);
     --entity-card-key-color: var(--color-text-muted);
+    --entity-card-vital-max-width: 100%;
     --entity-card-vital-color: var(--color-text-muted);
 
     font-size: var(--entity-card-font-size);
@@ -77,10 +78,13 @@
     letter-spacing: var(--entity-card-location-letter-spacing);
   }
 
-  /* A heading at the text size: the card's hierarchy is weight, not size. */
+  /* A heading at the text size: the card's hierarchy is weight, not size.
+   * A word longer than the card ends in an ellipsis. */
   .ds.entity-card > .body > .description > .heading > .title {
     margin-block: 0;
     padding-block: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-size: var(--entity-card-font-size);
     line-height: var(--entity-card-line-height);
     font-weight: var(--entity-card-title-font-weight);
@@ -119,16 +123,24 @@
   .ds.entity-card > .body > .key-values > .pair > .key {
     flex-grow: 1;
     flex-basis: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--entity-card-key-color);
   }
 
   .ds.entity-card > .body > .key-values > .pair > .value {
     flex-grow: 1;
     flex-basis: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     margin-inline-start: 0;
   }
 
+  /* A vital no wider than the footer, a long word ending in an ellipsis. */
   .ds.entity-card > .footer > .vital {
+    max-width: var(--entity-card-vital-max-width);
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--entity-card-vital-color);
   }
 }
