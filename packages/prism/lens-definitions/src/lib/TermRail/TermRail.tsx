@@ -122,6 +122,10 @@ const MAX_INDENT_DEPTH = 6;
  * hovering any item prefetches its term through the route's warm-up seam.
  *
  * `import { TermRail } from "../TermRail/index.js";`
+ *
+ * @note Impure: reads the ontologies from the Relay store through
+ *   `useFragment`, which subscribes to their updates, and renders router
+ *   links, which read the current address and prefetch on hover.
  */
 export default function TermRail({
   className,
