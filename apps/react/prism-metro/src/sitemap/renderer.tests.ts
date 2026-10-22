@@ -1,6 +1,7 @@
 // @vitest-environment node
 
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { DEFAULT_PORT } from "#site";
 
 /**
  * Load the renderer factory afresh, so it reads `BASE_URL` and `PORT` as the
@@ -39,7 +40,7 @@ describe("createSitemapRenderer", () => {
     vi.stubEnv("BASE_URL", undefined);
     vi.stubEnv("PORT", undefined);
     expect(await renderSitemap()).toContain(
-      "<loc>http://localhost:5178/stations</loc>",
+      `<loc>http://localhost:${DEFAULT_PORT}/stations</loc>`,
     );
   });
 });

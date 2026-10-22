@@ -11,6 +11,7 @@
     "#relay": "./src/relay/index.ts",
     "#server": "./src/server/index.ts",
     "#shell": "./src/shell/index.ts",
+    "#site": "./src/site/index.ts",
     "#sitemap": "./src/sitemap/index.ts"
   },
   "scripts": {

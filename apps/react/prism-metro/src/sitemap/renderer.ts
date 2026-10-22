@@ -9,6 +9,7 @@
  * relative `loc` values resolve to absolute, crawlable URLs.
  */
 import { SitemapRenderer } from "@canonical/react-ssr/renderer";
+import { DEFAULT_PORT } from "#site";
 import getSitemapItems from "./getSitemapItems.js";
 
 /** True only for an absolute URL — the sitemap base must be one (relative `loc`
@@ -25,7 +26,7 @@ const fromEnv = process.env.BASE_URL;
 const baseUrl =
   fromEnv && isAbsoluteUrl(fromEnv)
     ? fromEnv
-    : `http://localhost:${process.env.PORT ?? 5178}`;
+    : `http://localhost:${process.env.PORT ?? DEFAULT_PORT}`;
 
 /**
  * Per-request factory mirroring the JSX app's `createRenderer` contract, so the
