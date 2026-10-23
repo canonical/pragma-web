@@ -25,12 +25,12 @@ const declareFleetIndexQuery = (): unknown => graphql`
         edges {
           node {
             __typename
-            uri
-            _meta {
-              title
-              curie
-            }
             ... on RollingStock {
+              uri
+              _meta {
+                title
+                curie
+              }
               formations {
                 uri
                 length
@@ -49,12 +49,14 @@ const declareFleetIndexQuery = (): unknown => graphql`
 `;
 void declareFleetIndexQuery;
 
-/** A stock's page: its formations, drawn at one scale, and their lines. */
+/**
+ * A stock's page: its formations, drawn at one scale, with their measures
+ * and lines, and the car types its units are made of.
+ */
 const declareStockPageQuery = (): unknown => graphql`
   query StockPageQuery($id: ID!) {
     node(id: $id) {
       __typename
-      uri
       ... on RollingStock {
         _meta {
           title
@@ -68,8 +70,25 @@ const declareStockPageQuery = (): unknown => graphql`
             title
             curie
           }
+          lines {
+            uri
+          }
+          units {
+            unit {
+              cars {
+                carType {
+                  uri
+                  code
+                  length
+                  _meta {
+                    title
+                    curie
+                  }
+                }
+              }
+            }
+          }
           ...readFormationTrain_formation
-          ...readFormationLines_formation
         }
       }
     }
@@ -77,12 +96,14 @@ const declareStockPageQuery = (): unknown => graphql`
 `;
 void declareStockPageQuery;
 
-/** A formation's page: its stock, its side view and its platform fit. */
+/**
+ * A formation's page: its stock, its measures, its units in order, its side
+ * view and its fit at the platforms of every line it runs on.
+ */
 const declareFormationPageQuery = (): unknown => graphql`
   query FormationPageQuery($id: ID!) {
     node(id: $id) {
       __typename
-      uri
       ... on Formation {
         length
         capacity
@@ -97,6 +118,18 @@ const declareFormationPageQuery = (): unknown => graphql`
             curie
           }
         }
+        units {
+          position
+          reversed
+          unit {
+            uri
+            length
+            _meta {
+              title
+              curie
+            }
+          }
+        }
         ...readFormationTrain_formation @alias
         ...readFormationLines_formation @alias
       }
@@ -104,4 +137,43 @@ const declareFormationPageQuery = (): unknown => graphql`
   }
 `;
 void declareFormationPageQuery;
+
+/** A unit's page: its measures and its cars, drawn as a train of one unit. */
+const declareUnitPageQuery = (): unknown => graphql`
+  query UnitPageQuery($id: ID!) {
+    node(id: $id) {
+      __typename
+      ... on Unit {
+        length
+        capacity
+        _meta {
+          title
+          curie
+        }
+        ...readUnitCars_unit @alias
+      }
+    }
+  }
+`;
+void declareUnitPageQuery;
+
+/** A car type's page: its code, its cab and its measures. */
+const declareCarTypePageQuery = (): unknown => graphql`
+  query CarTypePageQuery($id: ID!) {
+    node(id: $id) {
+      __typename
+      ... on CarType {
+        code
+        hasCab
+        length
+        capacity
+        _meta {
+          title
+          curie
+        }
+      }
+    }
+  }
+`;
+void declareCarTypePageQuery;
 /* v8 ignore stop */
