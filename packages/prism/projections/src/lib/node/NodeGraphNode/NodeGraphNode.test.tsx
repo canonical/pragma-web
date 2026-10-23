@@ -92,6 +92,9 @@ describe("NodeGraphNode", () => {
     expect(container.querySelector(".title")?.textContent).toBe(
       "ds:global.component.icon-button",
     );
+    expect(
+      container.querySelector(".title tspan.identifier")?.textContent,
+    ).toBe("ds:global.component.icon-button");
     expect(container.querySelector(".context")?.textContent).toBe(
       "Component in ds",
     );

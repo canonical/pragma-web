@@ -67,7 +67,7 @@ export default function OntologyClassGraphNode({
       kind={t(data.isAbstract ? "class.kind.abstract" : "class.kind")}
       LinkComponent={LinkComponent}
       location={findCuriePrefix(curie)}
-      title={curie}
+      title={<tspan className="identifier">{curie}</tspan>}
     />
   );
 }

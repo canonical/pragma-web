@@ -68,7 +68,7 @@ export default function NodeGraphNode({
       kind={type._meta.title}
       LinkComponent={LinkComponent}
       location={findCuriePrefix(curie)}
-      title={curie}
+      title={<tspan className="identifier">{curie}</tspan>}
     />
   );
 }
