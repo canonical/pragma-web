@@ -2,7 +2,7 @@
 
 import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
-import { type ReactElement, useId } from "react";
+import type { ReactElement } from "react";
 import {
   LATTICE,
   PHONE,
@@ -41,13 +41,16 @@ export default function PhoneGraph({
 }: PhoneGraphProps): ReactElement {
   const t = useMessages();
   const { phone } = layout;
-  const latticeId = `phone-graph-lattice-${useId().replaceAll(/[^\w-]/g, "")}`;
+  const label = t("well.phone.label");
+  // A pattern's id is document-wide and must read the same on the server and
+  // the client, so it is named after the drawing, not React's tree position.
+  const latticeId = `phone-graph-lattice-${label.toLowerCase().replaceAll(/[^\p{L}\p{N}]+/gu, "-")}`;
   const headerBaseline = findCentredBaseline(PHONE.header, REGION_LABEL_SIZE);
   return (
     // biome-ignore lint/a11y/useSemanticElements: an SVG drawing has no native grouping element; `group` names the drawing and keeps its links reachable.
     <svg
       {...props}
-      aria-label={t("well.phone.label")}
+      aria-label={label}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       role="group"
       viewBox={`0 0 ${phone.width} ${phone.height}`}
