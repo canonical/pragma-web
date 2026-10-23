@@ -1,0 +1,16 @@
+---
+# NotFoundPage — the page every URL no route matches renders, in the
+# document archetype's canvas: its title (also the document's) and one line
+# of copy. It spans every column of the canvas's page grid; the heading and
+# the line take the typography's own styles.
+node:
+  uri: docs.component.not_found_page
+  styles:
+    layout.grid.column: "1 / -1"
+  edges:
+    - node:
+        role: page title
+      relation: { cardinality: "1", slotName: title }
+    - node:
+        role: page copy
+      relation: { cardinality: "1", slotName: body }

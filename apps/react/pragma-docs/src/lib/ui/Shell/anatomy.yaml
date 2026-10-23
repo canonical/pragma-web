@@ -1,0 +1,43 @@
+---
+# Shell — the provider nest and the one element it renders: the site's
+# single `.grid.intrinsic` root (the presets `grid` and `intrinsic` from
+# @canonical/styles give it `display: grid` and the intrinsic column
+# template), its gap the grid's gutter on both axes, the only query container
+# (`shell`), one viewport-high row that never scrolls. Every lens layout
+# below it is a subgrid.
+#
+# styles.css also declares `:root { --grid-col-min: min(100px,
+# calc((100% - 3 * var(--grid-gutter)) / 4)) }`: the preset's own token at
+# the scope the preset reads it (grid.css substitutes --grid-intrinsic on
+# :root; verified in Chromium that an element-level value is never read). It
+# keeps one group of four columns on a 390px viewport with no overflow.
+#
+# Every decision is read through a component token declared on the root
+# (`--shell-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   size.block 100dvh: the viewport, unthemable.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: docs.component.shell
+  styles:
+    layout.container: "shell / inline-size"
+    layout.grid.rows: "minmax(0, 1fr)"
+    spacing.gap: grid.gutter
+    size.block: 100dvh
+    layout.overflow: clip
+    appearance.background: color.background
+    typography.color: color.text
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - uri: prism.component.workspace_layout
+          - uri: prism.component.document_layout
+      relation: { cardinality: "1", slotName: default }
+    - node:
+        role: outlet loading fallback
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: loading }

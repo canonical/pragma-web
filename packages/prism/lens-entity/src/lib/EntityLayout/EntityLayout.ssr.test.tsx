@@ -30,7 +30,7 @@ describe("EntityLayout on the server", () => {
       }),
     );
 
-    expect(html).toContain('class="ds entity-layout"');
+    expect(html).toContain('class="ds document-layout"');
     expect(html).toContain('aria-label="Site rail"');
     expect(html).toContain('data-slot="entity-controls"');
     // React separates adjacent text nodes with `<!-- -->` markers.

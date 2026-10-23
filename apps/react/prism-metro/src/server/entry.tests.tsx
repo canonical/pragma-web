@@ -36,12 +36,14 @@ const renderAndSettle = async (initialData: InitialData): Promise<string> => {
 describe("EntryServer", () => {
   it("declares the app context and density on <html>", async () => {
     const html = await renderAndSettle({ url: "/stations" });
-    expect(html).toContain('<html class="app comfortable">');
+    expect(html).toContain('<html class="ds site-document docs comfortable">');
   });
 
   it("adds the reader's theme beside them", async () => {
     const html = await renderAndSettle({ url: "/stations", theme: "dark" });
-    expect(html).toContain('<html class="app comfortable dark">');
+    expect(html).toContain(
+      '<html class="ds site-document docs comfortable dark">',
+    );
   });
 
   it("renders / when the renderer hands it no initial data", async () => {
@@ -54,6 +56,15 @@ describe("EntryServer", () => {
   it("renders the not-found page for a path that does not decode", async () => {
     const html = await renderAndSettle({ url: "/stations/%ZZ" });
     expect(html).toContain("<title>Page not found — Metro</title>");
+  });
+
+  it("renders the not-found page in the document archetype, with the rail", async () => {
+    const html = await renderAndSettle({ url: "/nowhere" });
+    expect(html).toContain('class="ds document-layout"');
+    expect(html).toContain('data-region="primary-nav"');
+    expect(html).toMatch(
+      /<main class="ds canvas canvas"[^>]*><div class="page"><section class="ds not-found-page">/,
+    );
   });
 
   it.each(["/stations", "/lines", "/definitions"])(

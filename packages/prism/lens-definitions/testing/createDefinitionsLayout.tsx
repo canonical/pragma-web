@@ -17,8 +17,6 @@ export interface DefinitionsLayoutSetup {
   readonly fetchFn: FetchFunction;
   /** The site's rail. */
   readonly rail: ReactNode;
-  /** The site's footer band, if any. */
-  readonly colophon?: ReactNode;
   /** The routed page the router would hand the layout. */
   readonly children: ReactNode;
   /** Class names a site adds to the layout's root. */
@@ -39,7 +37,6 @@ export default function createDefinitionsLayout({
   records,
   fetchFn,
   rail,
-  colophon,
   children,
   className,
 }: DefinitionsLayoutSetup): ReactElement {
@@ -48,11 +45,7 @@ export default function createDefinitionsLayout({
       environment={createEnvironment({ records, fetchFn })}
     >
       <RouterProvider router={createStaticRouter(definitionsRoutes, url)}>
-        <DefinitionsLayout
-          className={className}
-          colophon={colophon}
-          rail={rail}
-        >
+        <DefinitionsLayout className={className} rail={rail}>
           {children}
         </DefinitionsLayout>
       </RouterProvider>

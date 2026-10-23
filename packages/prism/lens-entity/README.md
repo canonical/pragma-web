@@ -199,8 +199,8 @@ widths, the controls' radius and focus ring, and how many columns a card
 spans (`--entity-index-card-span`). No component token reads a primitive
 token.
 
-The layout's root also reads `--grid-intrinsic`, the intrinsic column
-template from `@canonical/styles`; every other grid is a subgrid of it.
+`EntityLayout` is the core's `DocumentLayout`: every grid in the lens is a
+subgrid of the site's one intrinsic grid, and only the canvas scrolls.
 
 ## Public API
 

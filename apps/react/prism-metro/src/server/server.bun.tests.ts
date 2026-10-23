@@ -177,13 +177,17 @@ describe("the Bun dev server", { timeout: BOOT_TIMEOUT_MS }, () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toMatch(/text\/html/);
     expect(graph.requests).toHaveLength(1);
-    expect(html).toContain('<html class="app comfortable dark"');
+    expect(html).toMatch(
+      /<html [^>]*class="ds site-document docs comfortable dark"/,
+    );
     expect(html).toContain(`>${NORTHGATE_TITLE}</a>`);
   });
 
   it("drops a theme the site does not know", async () => {
     const response = await request(await bootServer(), "/lines", "theme=sepia");
-    expect(await response.text()).toContain('<html class="app comfortable"');
+    expect(await response.text()).toMatch(
+      /<html [^>]*class="ds site-document docs comfortable"/,
+    );
   });
 
   it("answers an unknown URL with the not-found page at 404, dialling no graph", async () => {

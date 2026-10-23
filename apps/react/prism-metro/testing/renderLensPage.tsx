@@ -4,7 +4,7 @@ import {
 } from "@canonical/prism-core";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { type RenderResult, render } from "@testing-library/react";
-import { Shell } from "#shell";
+import { Shell } from "#lib/ui";
 import { appRoutes, notFoundRoute } from "../src/routes.js";
 
 /**

@@ -1,0 +1,66 @@
+---
+# ChipLegend — the generated legend: one group per channel, each a title, a
+# summary and a list of entries, each entry a real MentionChip and its note. The
+# legend is a grid of its groups, its gap the grid's gutter; inside a group
+# the title, the summary and the entries sit tighter than the gutter, so
+# each carries the space after it as external spacing and the group sets no
+# gap.
+#
+# Every decision is read through a component token declared on the root
+# (`--chip-legend-*`), bound to the symbol named here.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, container.gap.tight,
+# space.100 and the semantic typography symbol
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.chip_legend
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: channel group
+        edges:
+          - node:
+              role: group title
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: container.gap.tight
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: group summary
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: container.gap.tight
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: summary }
+          - node:
+              role: entry list
+              styles:
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.external.inline.start: 0
+                spacing.external.inline.end: 0
+                spacing.internal.inline.start: 0
+              edges:
+                - node:
+                    role: legend entry
+                    styles:
+                      layout.type: flex
+                      layout.align: baseline
+                      spacing.gap: grid.gutter
+                      spacing.external.block.end: space.100
+                    edges:
+                      - node:
+                          uri: prism.component.mention_chip
+                        relation: { cardinality: "1", slotName: swatch }
+                      - node:
+                          role: entry note
+                          styles:
+                            typography.color: color.text.muted
+                        relation: { cardinality: "1", slotName: note }
+                  relation: { cardinality: "1..*", slotName: entry }
+            relation: { cardinality: "1", slotName: entries }
+      relation: { cardinality: "1..*", slotName: group }

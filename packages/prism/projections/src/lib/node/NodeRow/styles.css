@@ -1,17 +1,19 @@
 /*
  * NodeRow — the row of any node: its title and its compact address.
  *
- * Each design decision reads a component token bound to a semantic token,
- * so a site retunes the row through either tier.
+ * Each design decision reads a component token declared on the row's root
+ * and bound to a semantic token or a spacing step, so a site retunes the
+ * row through either tier.
  */
 
 @layer ds.prism {
-  :root {
-    --node-row-gap: var(--space-100, 0.5rem);
-    --node-row-location-color-text: var(--color-text-muted);
-  }
-
+  /* The gap between the title and its address is a `--space-*` step: the
+   * shim's container gaps are for layout containers, and no semantic name
+   * fits two parts of one entry. */
   .ds.node-row {
+    --node-row-gap: var(--space-100);
+    --node-row-location-color-text: var(--color-text-muted);
+
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;

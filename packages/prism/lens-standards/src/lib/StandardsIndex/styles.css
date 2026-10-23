@@ -1,8 +1,8 @@
 /*
- * StandardsIndex — the index's composed layout: category jump links west
- * and the grouped reading lists east, each a span of the lens layout's
- * intrinsic columns. The east column is plain flow, not a card grid: an
- * index of rules reads as lists.
+ * StandardsIndex — the index's composed layout: the category jump links,
+ * when there is more than one category, over the grouped reading lists,
+ * each across every column of the lens layout. The lists are plain flow,
+ * not a card grid: an index of rules reads as lists.
  *
  * Each design decision reads a component token. The colour and the spacing
  * read the design system's semantic tokens.
@@ -10,6 +10,7 @@
 
 @layer ds.prism {
   :root {
+    --standards-index-gap: var(--grid-gutter);
     --standards-index-list-gap: var(--space-100, 0.5rem);
     --standards-index-link-color: var(--color-text-muted);
     --standards-index-heading-margin-start: var(--space-300, 1.5rem);
@@ -17,21 +18,27 @@
     --standards-index-more-margin-start: var(--space-300, 1.5rem);
   }
 
-  /* A SUBGRID that spends the lens layout's columns: the category links take
-   * the westmost two, the grouped lists the rest. */
+  /* A SUBGRID over the lens layout's columns. The category links and the
+   * grouped lists each take a row across every column, the links first:
+   * a column of their own beside the lists would leave the lists one grid
+   * column wide at four columns, and empty columns beside the lists when
+   * there is a single category and no links. The rows sit one gutter
+   * apart, the grid's own gap. A standard's identifier has no break
+   * opportunity, and the longest are wider than the canvas at four
+   * columns, so one breaks where it would overflow, never past the canvas;
+   * nothing that fits its line breaks. */
   .ds.standards-index {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     align-items: start;
+    gap: var(--standards-index-gap);
+    overflow-wrap: anywhere;
   }
 
-  .ds.standards-index > .categories {
-    grid-column: span 2;
-  }
-
+  .ds.standards-index > .categories,
   .ds.standards-index > .groups {
-    grid-column: 3 / -1;
+    grid-column: 1 / -1;
     min-inline-size: 0;
   }
 

@@ -65,8 +65,8 @@ void declareStandardsIndexFragment;
 const componentCssClassName = "ds standards-index";
 
 /**
- * The index's composed layout: group jump links west, grouped reading lists
- * east. Pagination is Relay's connection machinery, surfaced as an explicit
+ * The index's composed layout: group jump links over the grouped reading
+ * lists, each across the whole main column. Pagination is Relay's connection machinery, surfaced as an explicit
  * "Load more" button rather than an invisible truncation; cursors are opaque
  * server state, never derived here.
  *

@@ -5,3 +5,10 @@
  * requests.
  */
 export const SSR_HEADERS = { "x-pragma-ssr": "1" } as const;
+
+/**
+ * The styles context and density every page renders in, on `<html>`: the
+ * `docs` context at `comfortable` density, which together choose the
+ * `--density-*` channel the chrome's line unit reads.
+ */
+export const DOCUMENT_CONTEXT_CLASS_NAME = "docs comfortable";

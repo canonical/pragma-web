@@ -4,9 +4,4 @@
 import "../styles/index.css";
 import hydrateApp from "./hydrateApp.js";
 
-const root = document.getElementById("root");
-if (!root) {
-  throw new Error('Root element "#root" not found');
-}
-
-hydrateApp(root);
+hydrateApp(document);

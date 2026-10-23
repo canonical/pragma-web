@@ -35,7 +35,7 @@ import { renderToString } from "react-dom/server";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Shell } from "#lib/Shell";
+import { Shell } from "#lib/ui";
 import type { InitialData } from "#server";
 import mergeRecordMaps from "../../testing/mergeRecordMaps.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";

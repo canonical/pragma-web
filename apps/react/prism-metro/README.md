@@ -71,7 +71,12 @@ the production build, on the same port and against the same graph.
   integration suites start their own metro graph on a free port.
   `bun run test:coverage` enforces full coverage.
 - `bun run test:e2e`: starts the metro graph and each web server script, and
-  checks the pages they serve. The preview cells build the app first.
+  checks the pages they serve. The preview cells build the app first. The
+  browser suite reads the pages in headless Chromium: a click on a station
+  or a line opens its page without loading a new document, Back returns to
+  the index, and every page hydrates without a console error. It launches
+  the Chromium Playwright installed (`bunx playwright install chromium`), or
+  the binary named by `E2E_CHROMIUM_EXECUTABLE_PATH`.
 
 ## The schema
 
