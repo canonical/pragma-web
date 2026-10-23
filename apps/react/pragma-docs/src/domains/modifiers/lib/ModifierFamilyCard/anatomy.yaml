@@ -1,0 +1,91 @@
+---
+# ModifierFamilyCard: a modifier family as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 505:2228 (the location above
+# "Anticipation", the kind "Modifier family", the summary, the key value
+# "Members: 5" under its rule, and "5 modifiers" in the footer). The
+# location is the compact address's prefix (the schema gives a family no
+# tier); both counts are the number of the family's modifiers.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. A family has no sidecar. The home is the link the title renders
+# through, resolved from the compact address; a family has no home yet and
+# reads as inert text.
+node:
+  uri: docs.component.modifier_family_card
+  projection:
+    on: ModifierFamily
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: summary
+              projection:
+                field: summary
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+          - node:
+              role: key values
+              edges:
+                - node:
+                    role: members
+                    edges:
+                      - node:
+                          role: member
+                          projection:
+                            field: uri
+                        relation:
+                          cardinality: "0..*"
+                          projection:
+                            field: modifiers
+                  relation:
+                    cardinality: "1"
+            relation:
+              cardinality: "1"
+              slotName: key-values
+          - node:
+              role: vital
+              edges:
+                - node:
+                    role: member
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..*"
+                    projection:
+                      field: modifiers
+            relation:
+              cardinality: "1"
+              slotName: footer
+      relation:
+        cardinality: "1"
