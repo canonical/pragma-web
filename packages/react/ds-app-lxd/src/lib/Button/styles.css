@@ -12,6 +12,8 @@
    *   --button-font-{size,weight} and --button-line-height
    *   (the legacy --button-margin-left name maps to logical inline-end)
    * - logical edges: --button-padding-inline-{start,end}
+   * Legacy --button-padding-vertical and --button-line-height overrides opt
+   * out of baseline-grid closure.
    * Logical edge hooks take precedence over legacy horizontal padding. The
    * explicit link boundary remains unboxed: external margins still apply, while
    * legacy vertical/horizontal padding is deliberately ignored. */
