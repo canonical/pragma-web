@@ -41,12 +41,13 @@ describe("the class graph of the real ontology", () => {
       "G3: fit 0.715 at 48px channels; 0.723 at 32px",
       "G3: opens on a legible window, the rest a pan away",
     ]);
-    // The window ends half a lattice step past the ds region's third
-    // column, the last whose boxes all end before the legible width, and
-    // crosses boxes only at its bottom edge, where more lies below.
-    expect(layout.view).toMatchObject({ x: -16, y: -16, w: 536 });
-    expect(layout.view.h).toBeCloseTo(
-      (536 * DESIGN_CANVAS.h) / DESIGN_CANVAS.w,
+    // The widest legible window that cuts no box on two sides ends half a
+    // lattice step past the ds region's second column, and its bottom edge
+    // falls half a step above Tag Category, in the gap before it: one
+    // ending past the third column would cut Anonymous Node in its corner.
+    expect(layout.view).toMatchObject({ x: -16, y: -16, h: 488 });
+    expect(layout.view.w).toBeCloseTo(
+      (488 * DESIGN_CANVAS.w) / DESIGN_CANVAS.h,
       10,
     );
     const zoom = Math.min(
@@ -54,21 +55,18 @@ describe("the class graph of the real ontology", () => {
       DESIGN_CANVAS.h / layout.view.h,
     );
     expect(zoom).toBeGreaterThanOrEqual(MIN_FIT);
-    expect(zoom).toBeCloseTo(1.1007, 4);
+    expect(zoom).toBeCloseTo(1.5943, 4);
     const right = layout.view.x + layout.view.w;
     const bottom = layout.view.y + layout.view.h;
     const inView = [...layout.nodes.values()].filter(
       (node) => node.x < right && node.y < bottom,
     );
-    const whole = inView.filter((node) => node.y + node.h <= bottom);
-    expect(whole.filter((node) => node.x + node.w > right)).toEqual([]);
-    expect(whole).toHaveLength(16);
     expect(
-      inView
-        .filter((node) => node.y + node.h > bottom)
-        .map((node) => node.label)
-        .sort(),
-    ).toEqual(["Anonymous Node", "Node"]);
+      inView.filter(
+        (node) => node.x + node.w > right || node.y + node.h > bottom,
+      ),
+    ).toEqual([]);
+    expect(inView).toHaveLength(10);
   });
 
   it("covers the canvas densely, with no holes", () => {

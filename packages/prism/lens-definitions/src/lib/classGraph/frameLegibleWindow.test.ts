@@ -33,7 +33,8 @@ const zoomOf = (canvas: { w: number; h: number }, window: Rect): number =>
 
 /**
  * The boxes a window cuts with its left, top or right edge: every box in
- * view lies wholly in it, but for those its bottom edge crosses.
+ * view lies wholly in it, but for those its bottom edge crosses within its
+ * width.
  */
 const findSideCuts = (window: Rect): Rect[] =>
   OBSTACLES.filter((box) => {
@@ -49,7 +50,10 @@ const findSideCuts = (window: Rect): Rect[] =>
       box.x + box.w <= right + 1e-6 &&
       box.y >= window.y - 1e-6 &&
       box.y + box.h <= bottom + 1e-6;
-    const openBelow = box.y >= window.y && box.y + box.h > bottom;
+    const openBelow =
+      box.y >= window.y &&
+      box.x + box.w <= right + 1e-6 &&
+      box.y + box.h > bottom;
     return inView && !inside && !openBelow;
   });
 

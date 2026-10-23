@@ -68,8 +68,9 @@ interface ExplorerMeasure {
   /** Whether the drawer trigger and the rail's search field intersect. */
   readonly triggerCoversSearch: boolean;
   /**
-   * The canvas's classes the viewport's left, top or right edge cuts: none,
-   * a class the bottom edge crosses showing that more lies below.
+   * The canvas's classes the viewport's left, top or right edge cuts, the
+   * bottom-right corner included: none, a class the bottom edge crosses
+   * within the viewport's width showing that more lies below.
    */
   readonly cut: readonly string[];
   /** How many of the canvas's classes lie wholly in its viewport. */
@@ -154,8 +155,7 @@ function measureExplorer({
               box.bottom > viewport.top + tolerance &&
               (box.left < viewport.left - tolerance ||
                 box.top < viewport.top - tolerance ||
-                (box.right > viewport.right + tolerance &&
-                  box.bottom <= viewport.bottom)),
+                box.right > viewport.right + tolerance),
           )
           .map(({ label }) => label);
   const inView =

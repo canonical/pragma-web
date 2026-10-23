@@ -28,8 +28,9 @@ function containsRect(outer: Rect, inner: Rect): boolean {
  * fits there at the legible zoom, so every 14px label renders at 12px or
  * more; else a window at the legible zoom or the least zoom above it whose
  * left, top and right edges cut through no class's box and no region's
- * label, and whose bottom edge crosses only boxes that continue below, the
- * sign that more of the graph lies there. When one more zoom step also
+ * label, and whose bottom edge crosses only boxes that continue below
+ * within its width, the sign that more of the graph lies there; a box in
+ * the bottom-right corner is never cut on two sides. When one more zoom step also
  * keeps the bottom edge clear of every box, the window takes it.
  *
  * The window runs from the graph's top-left corner, or, for a class
@@ -70,15 +71,16 @@ export default function frameLegibleWindow(
   const isFramed = (window: Rect): boolean =>
     obstacles.some((box) => containsRect(window, box)) &&
     (arrival === undefined || containsRect(window, arrival));
-  // A box the bottom edge crosses shows that more lies below, and may run
-  // on past the right edge in the corner; every other box in view lies
-  // wholly in the window.
+  // A box the bottom edge crosses shows that more lies below, as long as
+  // it lies within the window's width; every other box in view lies wholly
+  // in the window, so no corner cuts a box on two sides.
   const isOpenBelow = (window: Rect): boolean =>
     obstacles.every(
       (box) =>
         !intersectsRect(window, box) ||
         containsRect(window, box) ||
         (box.x >= window.x - TOLERANCE &&
+          box.x + box.w <= window.x + window.w + TOLERANCE &&
           box.y >= window.y - TOLERANCE &&
           box.y + box.h > window.y + window.h),
     );
@@ -90,7 +92,8 @@ export default function frameLegibleWindow(
   // The window from a top-left corner: the legible width, then the widths
   // at which the right edge falls half a lattice step past a box's right
   // side, in the gap after it, or the bottom edge on or half a step past a
-  // box's bottom, from the widest down.
+  // box's bottom, or half a step above a box's top, in the gap before it,
+  // from the widest down.
   const searchFrom = (x: number, y: number): Rect | undefined => {
     const windows = [
       ...new Set([
@@ -99,6 +102,7 @@ export default function frameLegibleWindow(
           box.x + box.w + LATTICE / 2 - x,
           (box.y + box.h - y) / aspect,
           (box.y + box.h + LATTICE / 2 - y) / aspect,
+          (box.y - LATTICE / 2 - y) / aspect,
         ]),
       ]),
     ]
