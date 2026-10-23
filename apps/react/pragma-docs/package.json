@@ -12,6 +12,7 @@
     "#domains/marketing": "./src/domains/marketing/index.ts",
     "#domains/playground": "./src/domains/playground/index.ts",
     "#graphql-endpoint": "./src/relay/graphqlEndpoint.ts",
+    "#i18n": "./src/i18n/index.ts",
     "#lib/LensIcons": "./src/lib/LensIcons/index.ts",
     "#lib/SiteColophon": "./src/lib/SiteColophon/index.ts",
     "#lib/SiteRail": "./src/lib/SiteRail/index.ts",
