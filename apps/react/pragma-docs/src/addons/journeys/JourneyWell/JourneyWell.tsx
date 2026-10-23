@@ -226,7 +226,16 @@ const JourneyWell = ({
         .join(" ")}
       data-slot="journeys-canvas"
     >
+      {/* The ONE floating hint over the graph, which the canvas hangs under
+          its controls bar. Its text is a pure function of `job` (the URL —
+          identical on server and client), so it costs the hydration
+          argument nothing. */}
       <GraphCanvas
+        hint={
+          job === undefined
+            ? "Showing the default coordinate — select a job, from the rail or the diagram, to centre the graph on it"
+            : "Drag to pan · scroll to zoom · select a job to inspect it"
+        }
         label="Journeys from demand to surface"
         reveal={selected}
         viewBox={viewBox}
@@ -250,14 +259,6 @@ const JourneyWell = ({
           ))}
         </g>
       </GraphCanvas>
-      {/* Canvas-local furniture: the ONE floating hint over the graph. Its
-          text is a pure function of `job` (the URL — identical on server and
-          client), so it costs the hydration argument nothing. */}
-      <p className="journey-furniture journey-hint">
-        {job === undefined
-          ? "Showing the default coordinate — select a job, from the rail or the diagram, to centre the graph on it"
-          : "Drag to pan · scroll to zoom · select a job to inspect it"}
-      </p>
       <JourneyLegend />
     </div>
   );

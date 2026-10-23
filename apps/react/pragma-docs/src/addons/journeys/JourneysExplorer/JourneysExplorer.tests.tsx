@@ -121,11 +121,11 @@ describe("JourneysExplorer view switch — the strip drives the canvas", () => {
 
     // The empty-selection guidance now rides the well's OWN floating hint
     // (the separate band above the graph is gone — the graph is the
-    // background, owner ruling), so it is asserted on `.journey-hint`. Its
+    // background, owner ruling), so it is asserted on the canvas's hint. Its
     // "centre the graph" phrasing is unique to the well, so this proves the
     // graph's hint specifically, not the inspector's empty state (which also
     // says "Select a job").
-    expect(document.querySelector(".journey-hint")?.textContent).toMatch(
+    expect(document.querySelector(".journey-well .hint")?.textContent).toMatch(
       /centre the graph/,
     );
 

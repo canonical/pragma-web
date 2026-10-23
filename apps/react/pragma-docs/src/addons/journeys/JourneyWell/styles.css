@@ -95,31 +95,12 @@
     stroke-dasharray: 4 3;
   }
 
-  /* Floating furniture: the hint at top centre, the legend at bottom left —
-   * absolutely positioned against the well, raised to --z-plate, never fixed. */
+  /* Floating furniture: the legend at bottom left — absolutely positioned
+   * against the well, raised to --z-plate, never fixed. The hint is the
+   * canvas's own, hung under its controls bar. */
   .ds.journey-well .journey-furniture {
     position: absolute;
     z-index: var(--z-plate);
-  }
-
-  .ds.journey-well .journey-hint {
-    inset-block-start: 3.5rem;
-    inset-inline: 0;
-    margin-inline: auto;
-    inline-size: fit-content;
-    max-inline-size: calc(100% - var(--space-300, 1.5rem));
-    margin-block: 0;
-    padding-block: var(--space-050, 0.25rem);
-    padding-inline: var(--space-150, 0.75rem);
-    border-radius: 999px;
-    background: color-mix(
-      in oklab,
-      var(--color-background, #fff) 85%,
-      transparent
-    );
-    font-size: 0.75rem;
-    color: var(--color-text-muted, #666);
-    pointer-events: none;
   }
 
   .ds.journey-well .journey-legend {
