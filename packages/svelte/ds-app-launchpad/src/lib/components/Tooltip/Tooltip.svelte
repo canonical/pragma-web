@@ -151,7 +151,7 @@
 Tooltip requires JavaScript to function correctly. If JavaScript is disabled, the tooltip content will not be accessible.
 TODO(no-js): Investigate how to handle tooltips without JavaScript.
 
-The tooltip enables a short "chaining" window (~350ms) after it closes. If any tooltip's trigger is hovered or focused within this window, the tooltip bypasses `delay` and opens immediately.
+The tooltip enables "chaining" while it is visible and for a short window (~350ms) after the last tooltip closes. If any tooltip's trigger is hovered or focused during this time, the tooltip bypasses `delay` and opens immediately.
 
 ## Example Usage
 ```svelte
