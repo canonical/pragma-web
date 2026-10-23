@@ -45,7 +45,8 @@ lays the five representations of each type out as one matrix, under
 - **`EntityRow`**: the list entry, one row of an index: the namespace
   prefix and the title, then one muted word at the end.
 - **`EntityCard`**: the card, built on the published `Card`: location, the
-  title and the entity it belongs to, kind, summary, key values and the
+  title and the entity it belongs to (after `∈`, or after `⊂` with
+  `parentRelation="subclass"`), kind, summary, key values and the
   footer's vitals, and an optional sidecar beside them, two columns wide,
   for a rendered example of the entity.
 - **`EntityCommand`**: the command-palette result, a two-line row: the title

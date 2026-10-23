@@ -10,6 +10,7 @@
 export const MESSAGES = {
   "chip.lead": "{lead}:",
   "entity.parent": "{title} ∈ {parent}",
+  "entity.subclass": "{title} ⊂ {parent}",
   "entity.context": "{kind} in {location}",
   "list.count": "{count} {kind}",
   "list.empty": "Nothing to list.",

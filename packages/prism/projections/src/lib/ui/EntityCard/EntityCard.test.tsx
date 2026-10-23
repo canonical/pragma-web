@@ -63,6 +63,19 @@ describe("EntityCard", () => {
       expect(heading.textContent).toBe("IconButton ∈ Button");
       expect(heading.querySelector(".parent")?.textContent).toBe("Button");
     });
+
+    it("follows a subclass's title with its superclass after the catalog's ⊂", () => {
+      render(
+        <EntityCard
+          parent="UIBlock"
+          parentRelation="subclass"
+          title="Layout"
+        />,
+      );
+      const heading = screen.getByRole("heading", { level: 3 });
+      expect(heading.textContent).toBe("Layout ⊂ UIBlock");
+      expect(heading.querySelector(".parent")?.textContent).toBe("UIBlock");
+    });
   });
 
   describe("href and LinkComponent", () => {
