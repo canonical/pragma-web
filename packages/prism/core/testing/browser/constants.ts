@@ -62,7 +62,7 @@ export const FRAME_SELECTOR = [
 /**
  * The layout's bands: the strip's band and the colophon region, each of
  * which must run from the rail's border to the viewport's edge while its
- * content starts on the canvas's first column line.
+ * content starts on the canvas's first column line and ends on the last.
  */
 export const BAND_SELECTOR = [
   ".ds.workspace-layout > .strip > *",

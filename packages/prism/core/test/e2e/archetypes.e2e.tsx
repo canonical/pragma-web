@@ -14,8 +14,9 @@
  * the viewport, that a layout with no strip starts its canvas flush with
  * the viewport's top, that a page's tiles fill their rows to the canvas's
  * end, that the strip's and the colophon's bands run from the rail's
- * border to the viewport's edge with their content on the canvas's first
- * column line, and that nothing reaches past the viewport.
+ * border to the viewport's edge with their content between the canvas's
+ * first column line and its last, and that nothing reaches past the
+ * viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -296,7 +297,9 @@ function countReachableAsideEntries(page: Page) {
 
 /**
  * Assert every band of a measured layout runs from the rail's border to
- * the viewport's edge, its content starting where the canvas starts.
+ * the viewport's edge, its content starting where the canvas starts and
+ * ending on the last column line, the viewport's edge on a shell with no
+ * outer margin.
  */
 function expectBands(
   measure: LayoutMeasure,
@@ -311,6 +314,7 @@ function expectBands(
       measure.edges.canvasStart,
       1,
     );
+    expect(band.contentEnd, band.element).toBeCloseTo(width, 1);
   }
 }
 

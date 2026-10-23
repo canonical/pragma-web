@@ -13,10 +13,11 @@
 # across the gutter at its inline start to meet the rail's border (a
 # negative inline margin of one gutter, compensated by the same padding),
 # so the rule runs edge to edge while the colophon's content sits on the
-# canvas's first column line. Its inline end is the viewport's edge, the
-# last column line, since the shell sets no outer margin, and a component
-# padding keeps the content off the edge. The band's placement keeps its
-# columns; it never takes a wider span.
+# canvas's first column line. Its inline end is the last column line; on a
+# shell with no outer grid margin that line is the viewport's edge, so
+# there is nothing to bleed across and the band takes no end padding: its
+# content ends on the line, like the canvas's. The band's placement keeps
+# its columns; it never takes a wider span.
 #
 # Every decision is read through a component token declared on the root
 # (`--document-layout-*`), bound to the symbol named here.
@@ -37,7 +38,7 @@
 #     column; every other region starts at line 2.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
-# component.padding.block, component.padding.inline.
+# component.padding.block.
 node:
   uri: prism.component.document_layout
   styles:
@@ -92,7 +93,7 @@ node:
           spacing.internal.block.end: component.padding.block
           spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
           spacing.internal.inline.start: grid.gutter
-          spacing.internal.inline.end: component.padding.inline
+          spacing.internal.inline.end: 0
           appearance.border.width: 1px
           appearance.border.style: solid
           appearance.border.block.start.color: color.border.muted

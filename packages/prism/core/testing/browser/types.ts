@@ -100,13 +100,14 @@ export interface LayoutMeasure {
   };
   /**
    * Each band of `bandSelector`, in pixels: its border box's inline start
-   * and end, and where its content box starts.
+   * and end, and where its content box starts and ends.
    */
   readonly bands: readonly {
     readonly element: string;
     readonly start: number;
     readonly end: number;
     readonly contentStart: number;
+    readonly contentEnd: number;
   }[];
   /** The block overflow of the layout's rail and inspector regions. */
   readonly regionOverflow: Readonly<Record<string, string | null>>;

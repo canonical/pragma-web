@@ -136,6 +136,10 @@ export default function measureLayout({
         box.left +
         Number.parseFloat(style.borderLeftWidth) +
         Number.parseFloat(style.paddingLeft),
+      contentEnd:
+        box.right -
+        Number.parseFloat(style.borderRightWidth) -
+        Number.parseFloat(style.paddingRight),
     };
   });
 
