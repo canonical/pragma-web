@@ -3,3 +3,4 @@
 export * from "./CanvasPage/index.js";
 export * from "./NotFoundPage/index.js";
 export * from "./Shell/index.js";
+export * from "./SiteColophon/index.js";
