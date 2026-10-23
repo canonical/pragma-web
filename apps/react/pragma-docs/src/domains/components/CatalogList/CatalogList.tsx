@@ -1,3 +1,4 @@
+import { CANVAS_PAGE_TILE_CLASS_NAME } from "@canonical/prism-core";
 import type React from "react";
 import { graphql, usePaginationFragment } from "react-relay";
 import type { CatalogList_query$key } from "#relay/__generated__/CatalogList_query.graphql.js";
@@ -115,7 +116,11 @@ const CatalogList = ({
             <h2 id={`${tierAnchorId(tierName)}-title`}>{tierName}</h2>
             <ul className="catalog-cards">
               {(groups.get(tierName) ?? []).map((node) => (
-                <CatalogItem component={node} key={node.uri} />
+                <CatalogItem
+                  className={CANVAS_PAGE_TILE_CLASS_NAME}
+                  component={node}
+                  key={node.uri}
+                />
               ))}
             </ul>
           </section>

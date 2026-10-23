@@ -3,15 +3,20 @@
 /**
  * The page grid and the scroll model, measured in a real browser: the metro
  * graph in its own process and the dev cell pointed at it serve a workspace
- * page and two document pages, a station's page and the landing, and
- * Chromium lays each out once at a desktop and
- * a phone width, measuring it in the light and the dark theme. What is
+ * page and three document pages, a station's page, the landing and the
+ * not-found page, and Chromium lays each out once at a desktop and a phone
+ * width, measuring it in the light and the dark theme. What is
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
  * viewport or past its region, at 390px too; twelve columns at 1440px and
  * four at 390px; a workspace canvas that never scrolls; a document whose
- * only scrolling regions are its canvas and its rail; and every gap,
- * padding and margin of the chrome a multiple of 4px.
+ * only scrolling regions are its canvas and its rail; a canvas that starts
+ * one gutter under the strip, or at the viewport's top with no strip, as on
+ * the landing and the not-found page, its page then starting one gutter
+ * down; a strip whose band runs from the rail's
+ * border to the viewport's edge with its content from the canvas's first
+ * column line to its last; and every gap, padding and margin of the chrome
+ * a multiple of 4px.
  */
 import {
   launchBrowser,
@@ -33,12 +38,15 @@ import type { RunningServer } from "./types.js";
 
 const CWD = process.cwd();
 
-/** The pages on the document archetype: a station's entity page and the
- * landing. */
+/**
+ * Pages on the document archetype: a station's page, under its lens's
+ * strip, and the landing and the not-found page, which have no strip.
+ */
 const DOCUMENT_PATHS = [
   `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
   "/",
-] as const;
+  "/not-found",
+];
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -95,6 +103,37 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       );
       expect(layout.overflow, theme).toEqual([]);
       expect(layout.regionOverflow.rail, theme).toBe("auto");
+      const { edges } = layout;
+      expect(edges.canvasTop, theme).toBeCloseTo(
+        edges.stripBottom === null ? 0 : edges.stripBottom + edges.rowGap,
+        1,
+      );
+      // With no strip the page itself starts one gutter under the
+      // viewport's top, as a page under a strip starts under its rule.
+      if (edges.stripBottom === null) {
+        expect(layout.canvasPage.firstChildTop, theme).toBeCloseTo(
+          edges.rowGap,
+          1,
+        );
+      }
+      for (const band of layout.bands) {
+        expect(band.start, `${theme} ${band.element}`).toBeCloseTo(
+          edges.railEnd,
+          1,
+        );
+        expect(band.end, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
+        expect(band.contentStart, `${theme} ${band.element}`).toBeCloseTo(
+          edges.canvasStart,
+          1,
+        );
+        expect(band.contentEnd, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
+      }
       expect(
         layout.offGrid,
         `${theme} spacing histogram: ${JSON.stringify(layout.histogram)}`,
@@ -119,7 +158,7 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
   });
 
   it.each(DOCUMENT_PATHS)(
-    "lays the document %s on the one grid, scrolling only its canvas and its rail",
+    "lays the document at %s on the one grid, scrolling only its canvas and its rail",
     async (path) => {
       const measures = await measure(path);
       expectGrid(measures);

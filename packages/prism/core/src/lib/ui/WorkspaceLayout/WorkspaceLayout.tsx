@@ -27,8 +27,10 @@ const componentCssClassName = "ds workspace-layout";
  * shell's container queries, never by script, so the server renders the
  * closed state at every width. The inspector remounts on each move, so any
  * state inside it resets: it is a read-only view. Below one group the rail
- * narrows to one column. An inspector that renders nothing (`null`, a
- * boolean or the empty string) leaves no region and no trigger.
+ * narrows to one column. A strip that renders nothing (`null`, a boolean
+ * or the empty string) leaves no strip row, and the canvas starts flush
+ * with the viewport; an inspector that renders nothing leaves no region and
+ * no trigger.
  *
  * `import { WorkspaceLayout } from "@canonical/prism-core";`
  *
@@ -64,7 +66,7 @@ export default function WorkspaceLayout({
     >
       <CanvasSkipLink />
       <div className="rail">{rail}</div>
-      <div className="strip">{strip}</div>
+      {isRenderedNode(strip) ? <div className="strip">{strip}</div> : null}
       <Canvas className="canvas">{children}</Canvas>
       {!hasInspector ? null : isDrawerOpen ? (
         <SidePanel onClose={() => setIsDrawerOpen(false)} ref={drawer}>
