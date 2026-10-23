@@ -7,7 +7,9 @@
 # line. The pairs stand one gutter apart, each a 1px rule directly over a
 # 24px line: 25px, as the key-value reference draws it. The key and the
 # value sit on the matrix's 24px line, the line every representation
-# shares.
+# shares. A key wraps between its words; a word longer than its two
+# columns clips at the end of its track with an ellipsis, as the card's
+# key values clip, rather than run under the value or widen the page.
 #
 # Below two groups of columns the main column holds two columns, so a pair
 # stacks, the key over the value, both across the column: one container
@@ -27,6 +29,9 @@
 #     columns.
 #   Border sides "solid none none": a keyword vocabulary; only the rule
 #     above the pair is drawn. The 0 resets on the list and the value.
+#   The key's clip (layout.overflow.inline clip, size.min.width 0,
+#     typography.overflow ellipsis): keywords. The stylesheet check maps
+#     no overflow-wrap, so the key clips rather than breaking anywhere.
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)   below two groups: the key and the
@@ -61,6 +66,9 @@ node:
               role: key (the term)
               styles:
                 layout.grid.column: "1 / span 2"
+                layout.overflow.inline: clip
+                size.min.width: 0
+                typography.overflow: ellipsis
                 typography.lineHeight: space.300
             relation: { cardinality: "1", slotName: key }
           - node:

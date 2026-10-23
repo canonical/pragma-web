@@ -16,7 +16,9 @@
  * down; a strip whose band runs from the rail's
  * border to the viewport's edge with its content from the canvas's first
  * column line to its last; and every gap, padding and margin of the chrome
- * a multiple of 4px.
+ * a multiple of 4px. A station page is measured once more with a field
+ * name longer than its key's track, which must clip there rather than run
+ * under the value or widen the canvas.
  */
 import {
   launchBrowser,
@@ -24,12 +26,13 @@ import {
   type ThemedMeasure,
   VIEWPORTS,
 } from "@canonical/prism-core/testing/browser";
-import type { Browser } from "playwright";
+import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { NORTHGATE_CURIE } from "../../testing/fixtures.js";
 import {
   DEV_READY_MS,
   GRAPH_READY_MS,
+  LONG_FIELD_NAME,
   PAGE_SETTLE_MS,
   WORKSPACE_PATH,
 } from "./constants.js";
@@ -38,15 +41,54 @@ import type { RunningServer } from "./types.js";
 
 const CWD = process.cwd();
 
+/** A station's page, whose fields are key values. */
+const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
+
 /**
  * Pages on the document archetype: a station's page, under its lens's
  * strip, and the landing and the not-found page, which have no strip.
  */
-const DOCUMENT_PATHS = [
-  `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
-  "/",
-  "/not-found",
-] as const;
+const DOCUMENT_PATHS = [STATION_PATH, "/", "/not-found"] as const;
+
+/**
+ * Set `name` as the text of the page's first key and measure the pair: the
+ * key's overflow, its end and the value's start and top, the key's bottom,
+ * and the canvas's scroll and client widths. It runs in the page.
+ *
+ * @param name - The field name to set.
+ * @returns The measurements.
+ * @note Impure: rewrites the page's first key.
+ */
+function placeLongKey(name: string): {
+  readonly overflowX: string;
+  readonly keyEnd: number;
+  readonly keyBottom: number;
+  readonly valueStart: number;
+  readonly valueTop: number;
+  readonly canvasScrollWidth: number;
+  readonly canvasClientWidth: number;
+} {
+  const pair = document.querySelector(".ds.key-value-list > .pair");
+  const key = pair?.querySelector(".key");
+  const code = key?.querySelector("code");
+  const value = pair?.querySelector(".value");
+  const canvas = document.querySelector("main.ds.canvas");
+  if (!key || !code || !value || !canvas) {
+    throw new Error("the page has no key value to measure");
+  }
+  code.textContent = name;
+  const keyBox = key.getBoundingClientRect();
+  const valueBox = value.getBoundingClientRect();
+  return {
+    overflowX: getComputedStyle(key).overflowX,
+    keyEnd: keyBox.right,
+    keyBottom: keyBox.bottom,
+    valueStart: valueBox.left,
+    valueTop: valueBox.top,
+    canvasScrollWidth: canvas.scrollWidth,
+    canvasClientWidth: canvas.clientWidth,
+  };
+}
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -87,6 +129,35 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       origins: [new URL(server.base).origin, new URL(graph.base).origin],
       timeoutMs: PAGE_SETTLE_MS,
     });
+
+  /**
+   * Open `path` at this viewport, serving only the app's and the graph's
+   * origins and leaving the live-reload socket unconnected.
+   *
+   * @note Impure: opens a browser tab, which the caller closes.
+   */
+  const open = async (path: string): Promise<Page> => {
+    const page = await browser.newPage({
+      viewport: { width: viewport.width, height: viewport.height },
+    });
+    const origins = [new URL(server.base).origin, new URL(graph.base).origin];
+    await page.route("**/*", (route) =>
+      origins.includes(new URL(route.request().url()).origin)
+        ? route.continue()
+        : route.fulfill({ status: 204, body: "" }),
+    );
+    await page.routeWebSocket(
+      () => true,
+      () => {
+        // Left unconnected, the dev server's live-reload socket stays silent.
+      },
+    );
+    await page.goto(new URL(path, server.base).href, {
+      waitUntil: "networkidle",
+      timeout: PAGE_SETTLE_MS,
+    });
+    return page;
+  };
 
   /** Assert what every page promises, in each theme it was measured in. */
   const expectGrid = (measures: readonly ThemedMeasure[]): void => {
@@ -170,4 +241,22 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       }
     },
   );
+
+  it("clips a key longer than its track there, the canvas not scrolling sideways", async () => {
+    const page = await open(STATION_PATH);
+    try {
+      const pair = await page.evaluate(placeLongKey, LONG_FIELD_NAME);
+      expect(pair.overflowX).toBe("clip");
+      expect(pair.canvasScrollWidth).toBeLessThanOrEqual(
+        pair.canvasClientWidth,
+      );
+      // Side by side, the key ends before its value starts; stacked below
+      // two groups, the value starts under the key.
+      if (pair.valueTop < pair.keyBottom) {
+        expect(pair.keyEnd).toBeLessThanOrEqual(pair.valueStart);
+      }
+    } finally {
+      await page.close();
+    }
+  });
 });

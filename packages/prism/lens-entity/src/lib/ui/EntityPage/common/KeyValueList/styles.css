@@ -31,9 +31,14 @@
     border-block-start-color: var(--key-value-list-rule-color);
   }
 
-  /* Every key on the first two column lines, every value from the third. */
+  /* Every key on the first two column lines, every value from the third.
+   * A word longer than the key's track clips at its end with an ellipsis
+   * rather than running under the value. */
   .ds.key-value-list .key {
     grid-column: 1 / span 2;
+    overflow-x: clip;
+    min-width: 0;
+    text-overflow: ellipsis;
     line-height: var(--key-value-list-line-height);
   }
 
