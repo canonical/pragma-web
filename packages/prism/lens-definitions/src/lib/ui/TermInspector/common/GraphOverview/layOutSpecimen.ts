@@ -6,11 +6,8 @@ import {
 import layOutClassGraph from "../../../../classGraph/layOutClassGraph.js";
 import type { ClassGraphLayout, Rect } from "../../../../classGraph/types.js";
 import type { Translate } from "../../../../i18n/index.js";
-import {
-  SPECIMEN_MARGIN,
-  SPECIMEN_PREFIX,
-  type Specimen,
-} from "./constants.js";
+import { SPECIMEN_MARGIN, SPECIMEN_PREFIX } from "./constants.js";
+import type { Specimen } from "./types.js";
 
 /**
  * Lay a legend specimen out with the graph's own layout and keep only what

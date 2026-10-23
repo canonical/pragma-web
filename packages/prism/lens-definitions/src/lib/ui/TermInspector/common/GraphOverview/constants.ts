@@ -1,30 +1,4 @@
-import type { MessageKey } from "../../../../i18n/index.js";
-
-/** One specimen class: a key, its label's message, and its facets. */
-interface SpecimenClass {
-  readonly key: string;
-  readonly label: MessageKey;
-  readonly abstract?: boolean;
-  readonly superclass?: string;
-  readonly instanceCount?: number;
-}
-
-/** One specimen relation: its predicate's message, domain and range keys. */
-interface SpecimenRelation {
-  readonly label: MessageKey;
-  readonly domain: string;
-  readonly range: string;
-}
-
-/** One row of the legend: a tiny graph drawn by the graph's own code. */
-export interface Specimen {
-  /** The legend row's meaning, from the catalog. */
-  readonly meaning: MessageKey;
-  readonly classes: readonly SpecimenClass[];
-  readonly relations: readonly SpecimenRelation[];
-  /** The one class to draw, alone, when the rest only make it what it is. */
-  readonly only?: string;
-}
+import type { Specimen } from "./types.js";
 
 /**
  * The legend's rows, in order: a concrete class with its count, an
