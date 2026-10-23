@@ -7,11 +7,13 @@ import "./styles.css";
 const componentCssClassName = "ds probe";
 
 /**
- * A fixture component: a box holding its label.
+ * A fixture component: a box holding its label, and its link when it has
+ * an `href`.
  */
 export default function Probe({
   className,
   label,
+  href,
   ...props
 }: ProbeProps): ReactElement {
   return (
@@ -20,6 +22,13 @@ export default function Probe({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <span className="label">{label}</span>
+      <span className="body">
+        {href === undefined ? null : (
+          <a className="link" href={href}>
+            {label}
+          </a>
+        )}
+      </span>
     </div>
   );
 }

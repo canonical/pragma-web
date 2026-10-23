@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7e9a22a27a831188c9496c86b2a6275e>>
+ * @generated SignedSource<<ad3b3c47d3c8d8bca4b5af3266754067>>
  * @lightSyntaxTransform
  */
 
@@ -16,7 +16,7 @@ export type ProseReferencesProvider_references$data = {
         readonly curie: string;
       };
       readonly uri: string;
-      readonly " $fragmentSpreads": FragmentRefs<"EntityChip_node">;
+      readonly " $fragmentSpreads": FragmentRefs<"ChipProjection_node">;
     };
   }>;
   readonly " $fragmentType": "ProseReferencesProvider_references";
@@ -76,7 +76,7 @@ const node: ReaderFragment = {
             {
               "args": null,
               "kind": "FragmentSpread",
-              "name": "EntityChip_node"
+              "name": "ChipProjection_node"
             }
           ],
           "storageKey": null
@@ -89,6 +89,6 @@ const node: ReaderFragment = {
   "abstractKey": null
 };
 
-(node as any).hash = "1d1965509e1d9ec06a6d54fefcebc67d";
+(node as any).hash = "e5a49e7e61aca6b1614c2096910183c7";
 
 export default node;

@@ -20,6 +20,5 @@ describe("metroProjectionMaps", () => {
     expect(metroProjectionMaps.row.Node).toBe(defaultProjectionMaps.row.Node);
     expect(metroProjectionMaps.chip).toBe(defaultProjectionMaps.chip);
     expect(metroProjectionMaps.command).toBe(defaultProjectionMaps.command);
-    expect(metroProjectionMaps.title).toBe(defaultProjectionMaps.title);
   });
 });

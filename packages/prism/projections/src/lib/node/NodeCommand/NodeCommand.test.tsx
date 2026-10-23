@@ -7,14 +7,14 @@ import {
   STATION_NODE,
 } from "../../../../testing/fixtures.js";
 import type { NodePayload } from "../../../../testing/types.js";
-import { EntityCommand } from "../../EntityCommand/index.js";
+import { CommandProjection } from "../../CommandProjection/index.js";
 
 /** Render `node`'s command under the default maps, and return its root. */
 const renderCommand = (node: NodePayload): Element => {
   const { container } = render(
     createNodePage(node, (key) => (
       <ul>
-        <EntityCommand node={key} />
+        <CommandProjection node={key} />
       </ul>
     )),
   );

@@ -10,6 +10,8 @@
     "src",
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
+    "!src/**/*.stories.tsx",
+    "!src/docs",
     "!src/testing",
     "!src/__generated__/createNodePageQuery.graphql.ts",
     "!src/__generated__/createReferencesPageQuery.graphql.ts"
@@ -32,7 +34,8 @@
   },
   "scripts": {
     "build": "bun run relay",
-    "build:all": "bun run relay",
+    "build:all": "bun run relay && bun run build:storybook",
+    "build:storybook": "storybook build",
     "relay": "mkdir -p src/__generated__ && relay-compiler",
     "check": "bun run relay && bun run check:biome && bun run check:ts",
     "check:fix": "bun run check:biome:fix && bun run check:ts",
@@ -41,7 +44,8 @@
     "check:ts": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6012 --no-open --host 0.0.0.0"
   },
   "nx": {
     "targets": {
@@ -52,12 +56,14 @@
       },
       "build:all": {
         "outputs": [
-          "{projectRoot}/src/__generated__"
+          "{projectRoot}/src/__generated__",
+          "{projectRoot}/storybook-static"
         ]
       }
     }
   },
   "dependencies": {
+    "@canonical/i18n-core": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/react-ds-global": "^0.44.1",
     "react": "^19.2.4",
@@ -70,8 +76,12 @@
     "@canonical/prism-contract": "^0.44.1",
     "@canonical/router-core": "^0.44.1",
     "@canonical/router-react": "^0.44.1",
+    "@canonical/storybook-config": "^0.44.1",
+    "@canonical/styles": "^0.44.1",
     "@canonical/typescript-config-react": "^0.44.1",
     "@canonical/vitest-config-react": "^0.44.1",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/react-vite": "^10.6.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.0.0",
@@ -84,6 +94,7 @@
     "jsdom": "^28.1.0",
     "react-dom": "^19.2.4",
     "relay-compiler": "^21.0.1",
+    "storybook": "^10.6.0",
     "typescript": "^7.0.2",
     "vite": "^8.0.1",
     "vitest": "^5.0.0"

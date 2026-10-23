@@ -1,4 +1,4 @@
-import { EntityChip } from "@canonical/prism-projections";
+import { ChipProjection } from "@canonical/prism-projections";
 import type React from "react";
 import type { InstanceItemProps } from "./types.js";
 
@@ -17,7 +17,7 @@ export default function InstanceItem({
 }: InstanceItemProps): React.ReactElement {
   return (
     <li {...props}>
-      <EntityChip node={node} />{" "}
+      <ChipProjection node={node} />{" "}
       <code className="identifier">{node._meta.curie}</code>
     </li>
   );

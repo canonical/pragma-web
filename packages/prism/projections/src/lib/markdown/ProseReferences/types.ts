@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
-import type { EntityChip_node$key } from "../../../__generated__/EntityChip_node.graphql.js";
+import type { ChipProjection_node$key } from "../../../__generated__/ChipProjection_node.graphql.js";
 import type { ProseReferencesProvider_references$key } from "../../../__generated__/ProseReferencesProvider_references.graphql.js";
 
 /**
  * A page's prose references, keyed by every address an author may write for
  * one: its absolute IRI and its compact form.
  */
-export type ProseReferenceIndex = ReadonlyMap<string, EntityChip_node$key>;
+export type ProseReferenceIndex = ReadonlyMap<string, ChipProjection_node$key>;
 
 /** The part of a referenced node the index reads: its two addresses. */
 export interface ProseReferenceNode {

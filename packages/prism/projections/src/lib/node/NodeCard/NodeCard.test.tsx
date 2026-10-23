@@ -7,12 +7,12 @@ import {
   STATION_NODE,
 } from "../../../../testing/fixtures.js";
 import type { NodePayload } from "../../../../testing/types.js";
-import { EntityCard } from "../../EntityCard/index.js";
+import { CardProjection } from "../../CardProjection/index.js";
 
 /** Render `node`'s card under the default maps, and return its root. */
 const renderCard = (node: NodePayload): Element => {
   const { container } = render(
-    createNodePage(node, (key) => <EntityCard node={key} />),
+    createNodePage(node, (key) => <CardProjection node={key} />),
   );
   const root = container.querySelector(".ds.node-card");
   if (root === null) {

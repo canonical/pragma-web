@@ -1,0 +1,108 @@
+---
+# EntityCommand — an entity as a command-palette result: a 56px row.
+# Reference: the projection matrix's highlighted palette row (the title over
+# "kind in LOCATION", one vital right-aligned on the second line, two 24px
+# lines with 4px block insets and 16px inline insets). Slot order: title,
+# then kind and location on the second line; the vital at the end.
+#
+# The row sets the context's primary text on the matrix's 24px line, the
+# line every representation shares, so it is 56px in every context. Each
+# of its two lines truncates rather than wrapping, so a long title never
+# grows the row.
+#
+# The identity and the title clip along their line only, so nothing they
+# hold is cut above or below: a chip in the title is 28px, and its line
+# grows to hold it (the row is then 60px).
+#
+# A linked title reads as the row's text: the text's colour, underlined on
+# hover, its focus ring drawn inside it since the title clips; the states
+# apply to the link alone.
+#
+# Why not a published component: no published list entry exists. The
+# palette that lists these rows sets their role and their selection: the
+# selected result, `aria-selected="true"`, reads as a hovered one, so the
+# keyboard's selection shows as the pointer's does.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-command-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind):
+#   space.050 (4px) for the block insets: a 56px row on two 24px lines; the
+#   shim's block component padding (8px) would make it 64px.
+#   --entity-command-focus-ring-width: 2px, --entity-command-focus-ring-offset: -2px
+#                                      the link's ring, drawn inside it since the title clips.
+#   space.300 (24px) for the line height: the matrix's line; no typography
+#   token is 24px in every context (the docs' primary line is 20px).
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# component.padding.inline, space.050, space.300 (a line height), and the
+# semantic typography symbols typography.text.primary.fontSize,
+# typography.text.primary.bold.fontWeight and
+# typography.text.primary.smallcaps.letter.spacing.
+node:
+  uri: prism.component.entity_command
+  styles:
+    layout.type: flex
+    layout.align: flex-start
+    layout.justify: space-between
+    spacing.gap: grid.gutter
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+    spacing.internal.block.start: space.050
+    spacing.internal.block.end: space.050
+    layout.listStyle: none
+    typography.size: typography.text.primary.fontSize
+    typography.lineHeight: space.300
+    appearance.background@hover: color.foreground.ghost.hover
+    appearance.background@selected: color.foreground.ghost.hover
+  edges:
+    - node:
+        role: identity
+        styles:
+          layout.type: flex
+          layout.direction: column
+          layout.overflow.inline: clip
+          size.min.width: 0
+        edges:
+          - node:
+              role: title
+              styles:
+                layout.overflow.inline: clip
+                typography.whiteSpace: nowrap
+                typography.overflow: ellipsis
+                typography.weight: typography.text.primary.bold.fontWeight
+                typography.color: inherit
+                typography.decoration: none
+                typography.decoration@hover: underline
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: context
+              styles:
+                layout.overflow: hidden
+                typography.color: color.text.muted
+                typography.whiteSpace: nowrap
+                typography.overflow: ellipsis
+              edges:
+                - node:
+                    role: kind
+                  relation: { cardinality: "0..1", slotName: kind }
+                - node:
+                    role: location
+                    styles:
+                      typography.variant.caps: all-small-caps
+                      typography.letterSpacing: typography.text.primary.smallcaps.letter.spacing
+                  relation: { cardinality: "0..1", slotName: location }
+            relation: { cardinality: "0..1", slotName: context }
+      relation: { cardinality: "1", slotName: identity }
+    - node:
+        role: vital
+        styles:
+          layout.alignSelf: flex-end
+          typography.color: color.text.muted
+          typography.align: end
+          typography.whiteSpace: nowrap
+      relation: { cardinality: "0..1", slotName: vital }

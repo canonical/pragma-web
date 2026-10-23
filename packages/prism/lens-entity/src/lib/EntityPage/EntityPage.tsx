@@ -42,6 +42,7 @@ const declareEntityPageQueries = (): unknown => [
         uri
         _meta {
           title
+          curie
           type {
             uri
             superclasses {
@@ -51,7 +52,6 @@ const declareEntityPageQueries = (): unknown => [
           ...FieldsTable_meta
           ...Relations_meta
         }
-        ...EntityTitle_node
         ...EntitySummary_node
       }
     }

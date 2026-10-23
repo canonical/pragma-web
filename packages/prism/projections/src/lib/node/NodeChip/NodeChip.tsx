@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import type { NodeChip_node$key } from "../../../__generated__/NodeChip_node.graphql.js";
 import nodeChipFragmentNode from "../../../__generated__/NodeChip_node.graphql.js";
-import type { EntityChipArmProps } from "../../EntityChip/index.js";
+import type { ChipArmProps } from "../../ChipProjection/index.js";
 import { useProjectionLink } from "../../projections/index.js";
 import "./styles.css";
 
@@ -44,7 +44,7 @@ export default function NodeChip({
   children,
   className,
   ...props
-}: EntityChipArmProps): ReactElement {
+}: ChipArmProps): ReactElement {
   const data = useFragment<NodeChip_node$key>(nodeChipFragmentNode, node);
   const LinkComponent = useProjectionLink();
   const label = children ?? data._meta.title;
