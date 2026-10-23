@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { CSSProperties, ReactElement } from "react";
+import type { ReactElement } from "react";
 import { createPortal } from "react-dom";
 import { userEvent } from "storybook/test";
 import Component from "./Breadcrumbs.js";
@@ -8,10 +8,17 @@ import type { ItemProps } from "./common/Item/types.js";
 import type { LinkComponentProps } from "./types.js";
 
 type Tier = "site" | "docs" | "app";
+type ExtraContext = "default" | "global" | "os";
+type SpacingContext = Tier | ExtraContext;
 type Direction = "ltr" | "rtl";
 
 const tiers = ["site", "docs", "app"] as const;
+const extraContexts = ["default", "global", "os"] as const;
+const spacingContexts = [...tiers, ...extraContexts] as const;
 const directions = ["ltr", "rtl"] as const;
+
+const paragraphText =
+  "Home server documentation installation and advanced guidance help people understand their current location.";
 
 const defaultItems = [
   { url: "/", label: "Home" },
@@ -58,13 +65,13 @@ const ProofCase = ({
   tier,
   direction,
 }: {
-  tier: Tier;
+  tier: SpacingContext;
   direction: Direction;
 }): ReactElement => {
   const id = `${tier}-${direction}`;
   return (
     <section
-      className={tier}
+      className={tier === "default" ? undefined : tier}
       data-breadcrumb-spacing-case={id}
       dir={direction}
       style={{ display: "grid", gap: "0.5rem", maxInlineSize: "48rem" }}
@@ -74,10 +81,29 @@ const ProofCase = ({
       <Component data-breadcrumb-proof-default="" items={defaultItems} />
       <h3 style={{ margin: 0 }}>Wrapped</h3>
       <div
-        data-breadcrumb-proof-wrap=""
-        style={{ inlineSize: "18rem", maxInlineSize: "100%" }}
+        style={{
+          alignItems: "flex-start",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "2rem",
+        }}
       >
-        <Component data-breadcrumb-proof-wrapped="" items={wrappedItems} />
+        <div style={{ inlineSize: "18rem", maxInlineSize: "100%" }}>
+          <h4 style={{ marginBlockStart: 0 }}>Breadcrumb</h4>
+          <div
+            className="p"
+            data-breadcrumb-proof-wrap=""
+            style={{ margin: 0 }}
+          >
+            <Component data-breadcrumb-proof-wrapped="" items={wrappedItems} />
+          </div>
+        </div>
+        <div style={{ inlineSize: "18rem", maxInlineSize: "100%" }}>
+          <h4 style={{ marginBlockStart: 0 }}>Paragraph (reference)</h4>
+          <p className="p" data-breadcrumb-proof-paragraph="">
+            {paragraphText}
+          </p>
+        </div>
       </div>
       <h3 style={{ margin: 0 }}>Custom separator and components</h3>
       <Component
@@ -99,44 +125,56 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Real Breadcrumbs at the three product tiers. The play checks 18 primary
- * configurations: three tiers by three root sizes by two directions. The
- * state and custom-API observations repeat those configurations and are
- * reported separately.
+ * Real Breadcrumbs at the three official product tiers plus the untiered,
+ * global, and experimental OS contexts. The play reports 18 official primary
+ * configurations separately from 18 extra-context comparisons. State and
+ * custom-API observations repeat only the official configurations.
  */
 export const SpacingRoles: Story = {
   args: { items: [] },
-  render: () => (
-    <main
-      className="breadcrumb-spacing-proof"
-      data-breadcrumb-spacing-proof-root=""
-      style={{ display: "grid", gap: "2rem" }}
-    >
-      <a
-        data-breadcrumb-proof-focus-start=""
-        href="#breadcrumb-proof-focus-start"
-        id="breadcrumb-proof-focus-start"
+  tags: ["!autodocs"],
+  render: () =>
+    createPortal(
+      <main
+        className="breadcrumb-spacing-proof"
+        data-breadcrumb-spacing-proof-root=""
         style={{
-          blockSize: "1px",
-          clipPath: "inset(50%)",
-          inlineSize: "1px",
-          overflow: "hidden",
+          boxSizing: "border-box",
+          display: "grid",
+          gap: "2rem",
+          inlineSize: "100%",
+          insetBlockStart: 0,
+          insetInlineStart: 0,
+          padding: "1rem",
           position: "absolute",
         }}
       >
-        Focus start
-      </a>
-      {tiers.flatMap((tier) =>
-        directions.map((direction) => (
-          <ProofCase
-            direction={direction}
-            key={`${tier}-${direction}`}
-            tier={tier}
-          />
-        )),
-      )}
-    </main>
-  ),
+        <a
+          data-breadcrumb-proof-focus-start=""
+          href="#breadcrumb-proof-focus-start"
+          id="breadcrumb-proof-focus-start"
+          style={{
+            blockSize: "1px",
+            clipPath: "inset(50%)",
+            inlineSize: "1px",
+            overflow: "hidden",
+            position: "absolute",
+          }}
+        >
+          Focus start
+        </a>
+        {spacingContexts.flatMap((tier) =>
+          directions.map((direction) => (
+            <ProofCase
+              direction={direction}
+              key={`${tier}-${direction}`}
+              tier={tier}
+            />
+          )),
+        )}
+      </main>,
+      document.body,
+    ),
   play: async ({ canvasElement }) => {
     type ProofWindow = Window & {
       __breadcrumbSpacingProofQueue?: Promise<void>;
@@ -150,13 +188,10 @@ export const SpacingRoles: Story = {
     const current = previous
       .catch(() => undefined)
       .then(async () => {
-        const proofRoot = canvasElement.matches(
-          "[data-breadcrumb-spacing-proof-root]",
-        )
-          ? (canvasElement as HTMLElement)
-          : canvasElement.querySelector<HTMLElement>(
-              "[data-breadcrumb-spacing-proof-root]",
-            );
+        const proofRoot =
+          canvasElement.ownerDocument.querySelector<HTMLElement>(
+            "[data-breadcrumb-spacing-proof-root]",
+          );
         if (!proofRoot) throw new Error("missing Breadcrumbs proof root");
 
         for (const key of [
@@ -168,6 +203,7 @@ export const SpacingRoles: Story = {
           "breadcrumbCustomCompatibilityConfigurations",
           "breadcrumbForcedColors",
           "breadcrumbForcedColorReadabilityConfigurations",
+          "breadcrumbExtraContextConfigurations",
         ] as const) {
           delete proofRoot.dataset[key];
         }
@@ -189,6 +225,7 @@ export const SpacingRoles: Story = {
         let stateCompatibilityConfigurations = 0;
         let customCompatibilityConfigurations = 0;
         let forcedColorReadabilityConfigurations = 0;
+        let extraContextConfigurations = 0;
 
         const nextPaint = async (): Promise<void> => {
           await new Promise<void>((resolve) => {
@@ -291,6 +328,22 @@ export const SpacingRoles: Story = {
               finite(row.top - rows[index].bottom, `${label} row gap`),
             );
         };
+        const textLineRects = (node: HTMLElement, label: string): DOMRect[] => {
+          const range = proofDocument.createRange();
+          range.selectNodeContents(node);
+          const lines: DOMRect[] = [];
+          for (const rect of Array.from(range.getClientRects())) {
+            if (rect.width <= 0 || rect.height <= 0) continue;
+            if (!lines.some((line) => Math.abs(line.top - rect.top) <= 0.75)) {
+              lines.push(rect);
+            }
+          }
+          range.detach();
+          if (lines.length < 2) {
+            throw new Error(`${label} did not wrap naturally`);
+          }
+          return lines.sort((a, b) => a.top - b.top);
+        };
         const assertVisibleText = (node: HTMLElement, label: string): void => {
           const style = proofWindow.getComputedStyle(node);
           if (
@@ -322,13 +375,14 @@ export const SpacingRoles: Story = {
             throw new Error(`${label} matches the forced Canvas background`);
           }
         };
-        const expectedItemBlock = (tier: Tier, rootSize: number): number =>
-          rootSize * (tier === "site" ? 0.5 : 0.25);
-        const expectedMark = (rootSize: number): number => rootSize * 0.5;
+        const expectedMark = (
+          context: SpacingContext,
+          rootSize: number,
+        ): number => rootSize * (context === "os" ? 0.25 : 0.5);
 
         const assertCase = (
           section: HTMLElement,
-          tier: Tier,
+          tier: SpacingContext,
           rootSize: number,
           direction: Direction,
         ): void => {
@@ -345,45 +399,85 @@ export const SpacingRoles: Story = {
           const customNav = section.querySelector<HTMLElement>(
             "[data-breadcrumb-proof-custom]",
           );
+          const paragraph = section.querySelector<HTMLElement>(
+            "[data-breadcrumb-proof-paragraph]",
+          );
           const defaultList = defaultNav?.querySelector<HTMLElement>(".list");
           const wrappedList = wrappedNav?.querySelector<HTMLElement>(".list");
+          const firstWrappedLink =
+            wrappedList?.querySelector<HTMLElement>(".link");
           if (
             !defaultNav ||
             !wrappedNav ||
             !wrap ||
             !customNav ||
+            !paragraph ||
             !defaultList ||
-            !wrappedList
+            !wrappedList ||
+            !firstWrappedLink
           ) {
             throw new Error(`${id} fixture is incomplete`);
           }
 
-          const itemBlock = resolveLength(
-            section,
-            "--ds-spacing-item-block",
-            `${id} item-block role`,
-          );
           const mark = resolveLength(
             section,
             "--ds-spacing-mark",
             `${id} mark role`,
           );
-          near(
-            itemBlock,
-            expectedItemBlock(tier, rootSize),
-            `${id} item-block role`,
-          );
-          near(mark, expectedMark(rootSize), `${id} mark role`);
+          near(mark, expectedMark(tier, rootSize), `${id} mark role`);
           near(
             px(
               proofWindow.getComputedStyle(wrappedList).rowGap,
               `${id} computed row gap`,
             ),
-            itemBlock,
+            0,
             `${id} computed row gap`,
           );
           for (const [index, gap] of actualRowGaps(wrappedList, id).entries()) {
-            near(gap, itemBlock, `${id} physical row gap ${index}`);
+            near(gap, 0, `${id} physical row gap ${index}`);
+          }
+
+          const rows = rowsFor(wrappedList);
+          const paragraphLines = textLineRects(paragraph, `${id} paragraph`);
+          const linkStyle = proofWindow.getComputedStyle(firstWrappedLink);
+          const paragraphStyle = proofWindow.getComputedStyle(paragraph);
+          for (const property of [
+            "fontFamily",
+            "fontSize",
+            "fontWeight",
+            "letterSpacing",
+            "lineHeight",
+          ] as const) {
+            if (linkStyle[property] !== paragraphStyle[property]) {
+              throw new Error(
+                `${id} paragraph ${property} differs from Breadcrumb`,
+              );
+            }
+          }
+          const lineHeight = px(linkStyle.lineHeight, `${id} line height`);
+          if (tier === "site") {
+            near(lineHeight, rootSize * 1.5, `${id} official line height`);
+          } else if (tier === "docs" || tier === "app") {
+            near(lineHeight, rootSize * 1.25, `${id} official line height`);
+          }
+          const paragraphPitch = finite(
+            paragraphLines[1].top - paragraphLines[0].top,
+            `${id} paragraph pitch`,
+          );
+          near(paragraphPitch, lineHeight, `${id} paragraph line pitch`);
+          for (let index = 1; index < paragraphLines.length; index += 1) {
+            near(
+              paragraphLines[index].top - paragraphLines[index - 1].top,
+              paragraphPitch,
+              `${id} paragraph pitch ${index}`,
+            );
+          }
+          for (let index = 1; index < rows.length; index += 1) {
+            near(
+              rows[index].top - rows[index - 1].top,
+              paragraphPitch,
+              `${id} Breadcrumb row pitch ${index}`,
+            );
           }
           if (rowsFor(defaultList).length !== 1) {
             throw new Error(`${id} default Breadcrumbs unexpectedly wrapped`);
@@ -566,12 +660,26 @@ export const SpacingRoles: Story = {
                 }
                 assertCase(section, tier, rootSize, direction);
                 primaryConfigurations += 1;
-                roleObservations += 2;
+                roleObservations += 1;
                 stateCompatibilityConfigurations += 1;
                 customCompatibilityConfigurations += 1;
                 if (forcedColorsActive) {
                   forcedColorReadabilityConfigurations += 1;
                 }
+              }
+            }
+            for (const context of extraContexts) {
+              for (const direction of directions) {
+                const section = proofRoot.querySelector<HTMLElement>(
+                  `[data-breadcrumb-spacing-case="${context}-${direction}"]`,
+                );
+                if (!section) {
+                  throw new Error(
+                    `missing ${context}-${direction} Breadcrumbs case`,
+                  );
+                }
+                assertCase(section, context, rootSize, direction);
+                extraContextConfigurations += 1;
               }
             }
           }
@@ -628,21 +736,18 @@ export const SpacingRoles: Story = {
             near(
               px(
                 proofWindow.getComputedStyle(mutationList).rowGap,
-                "mutated physical row gap",
+                "item-block-independent row gap",
               ),
-              13,
-              "mutated computed row gap",
+              0,
+              "item-block-independent row gap",
             );
             for (const gap of actualRowGaps(
               mutationList,
-              "mutated Breadcrumbs",
+              "item-block-independent Breadcrumbs",
             )) {
-              near(gap, 13, "mutated physical row separation");
+              near(gap, 0, "item-block-independent physical row gap");
             }
-            expectProofFailure(
-              () => assertCase(mutationSection, "docs", 16, "ltr"),
-              "item-block role",
-            );
+            assertCase(mutationSection, "docs", 16, "ltr");
           } finally {
             restoreStyle(mutationSection);
             await nextPaint();
@@ -859,6 +964,9 @@ export const SpacingRoles: Story = {
           : "none";
         proofRoot.dataset.breadcrumbForcedColorReadabilityConfigurations =
           String(forcedColorReadabilityConfigurations);
+        proofRoot.dataset.breadcrumbExtraContextConfigurations = String(
+          extraContextConfigurations,
+        );
         proofRoot.dataset.breadcrumbSpacingProof = "passed";
       });
 
@@ -867,24 +975,26 @@ export const SpacingRoles: Story = {
   },
 };
 
+const contextLabels: Record<SpacingContext, string> = {
+  default: "No tier selected",
+  global: "Global",
+  site: "Sites",
+  docs: "Documentation",
+  app: "Applications",
+  os: "OS (experimental)",
+};
+
 const DefaultContextFixture = ({
-  before,
+  context,
 }: {
-  before?: boolean;
+  context: SpacingContext;
 }): ReactElement => (
   <section
-    data-breadcrumb-default-context={before ? "before" : "current"}
-    style={
-      {
-        inlineSize: "38rem",
-        maxInlineSize: "100%",
-        ...(before ? { "--ds-spacing-item-block": "0.25rem" } : {}),
-      } as CSSProperties
-    }
+    className={context === "default" ? undefined : context}
+    data-breadcrumb-default-context={context}
+    style={{ inlineSize: "38rem", maxInlineSize: "100%" }}
   >
-    <h2 style={{ marginBlockStart: 0 }}>
-      {before ? "Before — 4px" : "Preview — 8px"}
-    </h2>
+    <h2 style={{ marginBlockStart: 0 }}>{contextLabels[context]}</h2>
     <div
       style={{
         alignItems: "flex-start",
@@ -898,11 +1008,7 @@ const DefaultContextFixture = ({
         style={{ inlineSize: "18rem", maxInlineSize: "100%" }}
       >
         <h3 style={{ marginBlockStart: 0 }}>Breadcrumb</h3>
-        <div
-          className="p"
-          data-breadcrumb-default-context-leading=""
-          style={{ margin: 0 }}
-        >
+        <div className="p" style={{ margin: 0 }}>
           <Component items={wrappedItems} />
         </div>
       </div>
@@ -912,8 +1018,7 @@ const DefaultContextFixture = ({
       >
         <h3 style={{ marginBlockStart: 0 }}>Paragraph (reference)</h3>
         <p className="p" style={{ margin: 0 }}>
-          Home server documentation installation and advanced guidance help
-          people understand their current location.
+          {paragraphText}
         </p>
       </div>
     </div>
@@ -921,18 +1026,16 @@ const DefaultContextFixture = ({
 );
 
 /**
- * Untiered means that the page has not selected Sites, Documentation, or
- * Applications. The current preview changes only wrapped Breadcrumbs to 8px
- * between rows; single-line Breadcrumbs are unaffected, while Documentation
- * and Applications remain at 4px. The “Before” peer uses a demonstration-only
- * role override to show the previous 4px wrapping effect.
+ * Wrapped Breadcrumb rows follow the paragraph line rhythm in every supported
+ * product context. Breadcrumb items wrap as whole links; paragraph text wraps
+ * by words. Single-line Breadcrumbs are unaffected.
  */
 export const DefaultContext: Story = {
   args: { items: [] },
   tags: ["!autodocs"],
   // The shared Storybook decorator always assigns an official product context
   // to its mount point. A body portal deliberately bypasses that preview-only
-  // ancestor so this story can show the real unscoped :root default.
+  // ancestor so the first case shows the real unscoped :root default.
   render: () =>
     createPortal(
       <main
@@ -948,14 +1051,14 @@ export const DefaultContext: Story = {
         }}
       >
         <p>
-          <strong>Page with no tier selected.</strong> The current preview uses
-          8px between wrapped rows. Single-line Breadcrumbs are unaffected, and
-          Documentation and Applications remain at 4px. Breadcrumb items wrap as
-          whole links, while paragraph text wraps by words.
+          <strong>Current paragraph rhythm.</strong> Each Breadcrumb uses the
+          selected context’s paragraph typography and advances wrapped rows by
+          the same line height.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem" }}>
-          <DefaultContextFixture before />
-          <DefaultContextFixture />
+          {spacingContexts.map((context) => (
+            <DefaultContextFixture context={context} key={context} />
+          ))}
         </div>
       </main>,
       document.body,
@@ -975,9 +1078,7 @@ export const DefaultContext: Story = {
     const proofRoot = proofRoots[0];
     delete proofRoot.dataset.breadcrumbDefaultContextProof;
     delete proofRoot.dataset.breadcrumbDefaultContextProofError;
-    delete proofRoot.dataset.breadcrumbParagraphPitch;
-    delete proofRoot.dataset.breadcrumbBeforePitch;
-    delete proofRoot.dataset.breadcrumbPreviewPitch;
+    delete proofRoot.dataset.breadcrumbDefaultContextConfigurations;
     const originalRootStyle =
       proofDocument.documentElement.getAttribute("style");
     const originalFocus = proofDocument.activeElement;
@@ -996,17 +1097,6 @@ export const DefaultContext: Story = {
         throw new Error(`${label}: expected ${expected}, received ${actual}`);
       }
     };
-    const roleLength = (owner: HTMLElement, property: string): number => {
-      const probe = proofDocument.createElement("span");
-      probe.style.cssText = `position:fixed;visibility:hidden;display:block;inline-size:var(${property});block-size:0`;
-      owner.append(probe);
-      const result = readPx(
-        proofWindow.getComputedStyle(probe).inlineSize,
-        `${property} role`,
-      );
-      probe.remove();
-      return result;
-    };
     const textLineRects = (node: HTMLElement, label: string): DOMRect[] => {
       const range = proofDocument.createRange();
       range.selectNodeContents(node);
@@ -1018,248 +1108,133 @@ export const DefaultContext: Story = {
         }
       }
       range.detach();
-      if (lines.length === 0)
-        throw new Error(`${label} text has no line boxes`);
+      if (lines.length < 2) throw new Error(`${label} did not wrap naturally`);
       return lines.sort((a, b) => a.top - b.top);
-    };
-    const metrics = (fixture: HTMLElement, label: string) => {
-      const list = fixture.querySelector<HTMLElement>(".list");
-      const componentWrapper = fixture.querySelector<HTMLElement>(
-        "[data-breadcrumb-default-context-component]",
-      );
-      const paragraphWrapper = fixture.querySelector<HTMLElement>(
-        "[data-breadcrumb-default-context-paragraph]",
-      );
-      const componentLeading = fixture.querySelector<HTMLElement>(
-        "[data-breadcrumb-default-context-leading]",
-      );
-      const paragraph = fixture.querySelector<HTMLElement>(
-        "[data-breadcrumb-default-context-paragraph] > .p",
-      );
-      const firstLink = list?.querySelector<HTMLElement>(".link");
-      if (
-        !list ||
-        !componentWrapper ||
-        !paragraphWrapper ||
-        !componentLeading ||
-        !paragraph ||
-        !firstLink
-      ) {
-        throw new Error(`${label} comparison is incomplete`);
-      }
-      if (paragraph.childElementCount !== 0 || paragraph.querySelector("br")) {
-        throw new Error(`${label} paragraph is not naturally wrapping text`);
-      }
-      const items = Array.from(
-        list.querySelectorAll<HTMLElement>(".breadcrumbs-item"),
-      );
-      if (items.length !== wrappedItems.length) {
-        throw new Error(`${label} item anatomy changed`);
-      }
-      const rows: Array<{ top: number; bottom: number }> = [];
-      for (const item of items) {
-        const rect = item.getBoundingClientRect();
-        const row = rows.find(
-          (candidate) => Math.abs(candidate.top - rect.top) <= 0.75,
-        );
-        if (row) row.bottom = Math.max(row.bottom, rect.bottom);
-        else rows.push({ top: rect.top, bottom: rect.bottom });
-      }
-      rows.sort((a, b) => a.top - b.top);
-      if (rows.length < 2) throw new Error(`${label} did not wrap naturally`);
-      const separator = Array.from(
-        fixture.querySelectorAll<HTMLElement>(".separator"),
-      ).find((node) => proofWindow.getComputedStyle(node).display !== "none");
-      if (!separator) throw new Error(`${label} visible separator is missing`);
-      const separatorStyle = proofWindow.getComputedStyle(separator);
-      const linkStyle = proofWindow.getComputedStyle(firstLink);
-      const paragraphStyle = proofWindow.getComputedStyle(paragraph);
-      const componentLeadingStyle =
-        proofWindow.getComputedStyle(componentLeading);
-      for (const property of [
-        "fontFamily",
-        "fontSize",
-        "fontWeight",
-        "letterSpacing",
-        "lineHeight",
-      ] as const) {
-        if (linkStyle[property] !== paragraphStyle[property]) {
-          throw new Error(
-            `${label} paragraph ${property} differs from Breadcrumb`,
-          );
-        }
-      }
-      const breadcrumbText = textLineRects(firstLink, `${label} Breadcrumb`)[0];
-      const paragraphLines = textLineRects(paragraph, `${label} paragraph`);
-      if (!breadcrumbText || paragraphLines.length < 2 || !paragraphLines[0]) {
-        throw new Error(`${label} paragraph did not wrap naturally`);
-      }
-      const componentRect = componentWrapper.getBoundingClientRect();
-      const paragraphRect = paragraphWrapper.getBoundingClientRect();
-      return {
-        breadcrumbPitch: rows[1]?.top - rows[0]?.top,
-        componentPaddingStart: readPx(
-          componentLeadingStyle.paddingBlockStart,
-          `${label} Breadcrumb start padding`,
-        ),
-        firstBreadcrumbText: breadcrumbText,
-        firstParagraphText: paragraphLines[0],
-        itemMetrics: items.map((item) => {
-          const rect = item.getBoundingClientRect();
-          const style = proofWindow.getComputedStyle(item);
-          return {
-            alignItems: style.alignItems,
-            display: style.display,
-            fontSize: style.fontSize,
-            height: rect.height,
-            lineHeight: style.lineHeight,
-            width: rect.width,
-          };
-        }),
-        markEnd: readPx(separatorStyle.marginInlineEnd, `${label} mark end`),
-        markRole: roleLength(fixture, "--ds-spacing-mark"),
-        markStart: readPx(
-          separatorStyle.marginInlineStart,
-          `${label} mark start`,
-        ),
-        physicalGaps: rows
-          .slice(1)
-          .map((row, index) => row.top - rows[index].bottom),
-        paragraphPitches: paragraphLines
-          .slice(1)
-          .map((line, index) => line.top - paragraphLines[index].top),
-        paragraphPaddingStart: readPx(
-          paragraphStyle.paddingBlockStart,
-          `${label} paragraph start padding`,
-        ),
-        paragraphWidth: paragraph.getBoundingClientRect().width,
-        role: roleLength(fixture, "--ds-spacing-item-block"),
-        rowGap: readPx(
-          proofWindow.getComputedStyle(list).rowGap,
-          `${label} gap`,
-        ),
-        sideBySide:
-          componentRect.right <= paragraphRect.left &&
-          componentRect.top < paragraphRect.bottom &&
-          paragraphRect.top < componentRect.bottom,
-        width: list.getBoundingClientRect().width,
-        lineHeight: readPx(linkStyle.lineHeight, `${label} line height`),
-      };
     };
 
     try {
       await proofDocument.fonts.ready;
-      const before = proofRoot.querySelector<HTMLElement>(
-        '[data-breadcrumb-default-context="before"]',
-      );
-      const current = proofRoot.querySelector<HTMLElement>(
-        '[data-breadcrumb-default-context="current"]',
-      );
-      if (!before || !current)
-        throw new Error("comparison fixtures are missing");
-      if (
-        before.closest(".site, .docs, .app, .global, .os") ||
-        current.closest(".site, .docs, .app, .global, .os")
-      ) {
-        throw new Error("default-context fixture selected a product tier");
-      }
-      if (
-        current.style.getPropertyValue("--ds-spacing-item-block") !== "" ||
-        before.style.getPropertyValue("--ds-spacing-item-block") !== "0.25rem"
-      ) {
-        throw new Error("demonstration role override boundary changed");
-      }
-
       const rootSize = readPx(
         proofWindow.getComputedStyle(proofDocument.documentElement).fontSize,
         "root font size",
       );
-      near(rootSize, 16, "default-context root size");
-      const beforeMetrics = metrics(before, "before");
-      const currentMetrics = metrics(current, "current");
-      for (const [label, values, expectedGap] of [
-        ["before", beforeMetrics, rootSize * 0.25],
-        ["current", currentMetrics, rootSize * 0.5],
-      ] as const) {
-        near(values.role, expectedGap, `${label} item-block role`);
-        near(values.rowGap, expectedGap, `${label} computed row gap`);
-        for (const gap of values.physicalGaps) {
-          near(gap, expectedGap, `${label} physical row gap`);
-        }
-        near(
-          values.breadcrumbPitch,
-          values.lineHeight + expectedGap,
-          `${label} Breadcrumb row pitch`,
+      let configurations = 0;
+      for (const context of spacingContexts) {
+        const fixture = proofRoot.querySelector<HTMLElement>(
+          `[data-breadcrumb-default-context="${context}"]`,
         );
-        for (const pitch of values.paragraphPitches) {
-          near(pitch, values.lineHeight, `${label} paragraph line pitch`);
-        }
-        if (values.sideBySide) {
-          near(
-            values.firstBreadcrumbText.top,
-            values.firstParagraphText.top,
-            `${label} first text line top`,
-          );
-          near(
-            values.firstBreadcrumbText.bottom,
-            values.firstParagraphText.bottom,
-            `${label} first text line bottom`,
-          );
-        }
-        near(
-          values.componentPaddingStart,
-          values.paragraphPaddingStart,
-          `${label} reference leading`,
+        const list = fixture?.querySelector<HTMLElement>(".list");
+        const paragraph = fixture?.querySelector<HTMLElement>(
+          "[data-breadcrumb-default-context-paragraph] > .p",
         );
-        near(values.width, values.paragraphWidth, `${label} peer width`);
-        near(values.markRole, rootSize * 0.5, `${label} mark role`);
-        near(values.markStart, rootSize * 0.5, `${label} mark start`);
-        near(values.markEnd, rootSize * 0.5, `${label} mark end`);
-      }
-      near(
-        beforeMetrics.paragraphPitches[0] ?? Number.NaN,
-        currentMetrics.paragraphPitches[0] ?? Number.NaN,
-        "paragraph reference pitch",
-      );
-      near(beforeMetrics.width, currentMetrics.width, "peer list width");
-      for (
-        let index = 0;
-        index < beforeMetrics.itemMetrics.length;
-        index += 1
-      ) {
-        const beforeItem = beforeMetrics.itemMetrics[index];
-        const currentItem = currentMetrics.itemMetrics[index];
-        if (!beforeItem || !currentItem)
-          throw new Error(`item ${index} is missing`);
-        near(beforeItem.width, currentItem.width, `item ${index} width`);
-        near(beforeItem.height, currentItem.height, `item ${index} height`);
+        const firstLink = list?.querySelector<HTMLElement>(".link");
+        if (!fixture || !list || !paragraph || !firstLink) {
+          throw new Error(`${context} comparison is incomplete`);
+        }
         if (
-          beforeItem.fontSize !== currentItem.fontSize ||
-          beforeItem.lineHeight !== currentItem.lineHeight ||
-          beforeItem.display !== currentItem.display ||
-          beforeItem.alignItems !== currentItem.alignItems
+          context === "default" &&
+          fixture.closest(".site, .docs, .app, .global, .os")
         ) {
-          throw new Error(`item ${index} layout or type changed`);
+          throw new Error("untiered comparison selected a product context");
         }
+        if (fixture.style.getPropertyValue("--ds-spacing-item-block") !== "") {
+          throw new Error(`${context} comparison overrides item-block spacing`);
+        }
+
+        const items = Array.from(
+          list.querySelectorAll<HTMLElement>(".breadcrumbs-item"),
+        );
+        const rows: Array<{ top: number; bottom: number }> = [];
+        for (const item of items) {
+          const rect = item.getBoundingClientRect();
+          const row = rows.find(
+            (candidate) => Math.abs(candidate.top - rect.top) <= 0.75,
+          );
+          if (row) row.bottom = Math.max(row.bottom, rect.bottom);
+          else rows.push({ top: rect.top, bottom: rect.bottom });
+        }
+        rows.sort((a, b) => a.top - b.top);
+        if (rows.length < 2) {
+          throw new Error(`${context} Breadcrumb did not wrap naturally`);
+        }
+        const paragraphLines = textLineRects(paragraph, `${context} paragraph`);
+        const linkStyle = proofWindow.getComputedStyle(firstLink);
+        const paragraphStyle = proofWindow.getComputedStyle(paragraph);
+        for (const property of [
+          "fontFamily",
+          "fontSize",
+          "fontWeight",
+          "letterSpacing",
+          "lineHeight",
+        ] as const) {
+          if (linkStyle[property] !== paragraphStyle[property]) {
+            throw new Error(
+              `${context} paragraph ${property} differs from Breadcrumb`,
+            );
+          }
+        }
+        const lineHeight = readPx(
+          linkStyle.lineHeight,
+          `${context} line height`,
+        );
+        near(
+          readPx(
+            proofWindow.getComputedStyle(list).rowGap,
+            `${context} row gap`,
+          ),
+          0,
+          `${context} row gap`,
+        );
+        const paragraphPitch = paragraphLines[1].top - paragraphLines[0].top;
+        near(paragraphPitch, lineHeight, `${context} paragraph pitch`);
+        for (let index = 1; index < rows.length; index += 1) {
+          near(
+            rows[index].top - rows[index - 1].top,
+            paragraphPitch,
+            `${context} Breadcrumb pitch ${index}`,
+          );
+          near(
+            rows[index].top - rows[index - 1].bottom,
+            0,
+            `${context} physical row gap ${index}`,
+          );
+        }
+        for (let index = 1; index < paragraphLines.length; index += 1) {
+          near(
+            paragraphLines[index].top - paragraphLines[index - 1].top,
+            paragraphPitch,
+            `${context} paragraph pitch ${index}`,
+          );
+        }
+        const expectedMark = rootSize * (context === "os" ? 0.25 : 0.5);
+        const separator = Array.from(
+          list.querySelectorAll<HTMLElement>(".separator"),
+        ).find((node) => proofWindow.getComputedStyle(node).display !== "none");
+        if (!separator) {
+          throw new Error(`${context} visible separator is missing`);
+        }
+        const separatorStyle = proofWindow.getComputedStyle(separator);
+        near(
+          readPx(separatorStyle.marginInlineStart, `${context} mark start`),
+          expectedMark,
+          `${context} mark start`,
+        );
+        near(
+          readPx(separatorStyle.marginInlineEnd, `${context} mark end`),
+          expectedMark,
+          `${context} mark end`,
+        );
+        configurations += 1;
       }
       if (
         proofDocument.documentElement.getAttribute("style") !==
           originalRootStyle ||
         proofDocument.activeElement !== originalFocus
       ) {
-        throw new Error(
-          "default-context proof did not preserve document state",
-        );
+        throw new Error("default-context proof changed document state");
       }
-      proofRoot.dataset.breadcrumbParagraphPitch = String(
-        currentMetrics.paragraphPitches[0],
-      );
-      proofRoot.dataset.breadcrumbBeforePitch = String(
-        beforeMetrics.breadcrumbPitch,
-      );
-      proofRoot.dataset.breadcrumbPreviewPitch = String(
-        currentMetrics.breadcrumbPitch,
-      );
+      proofRoot.dataset.breadcrumbDefaultContextConfigurations =
+        String(configurations);
       proofRoot.dataset.breadcrumbDefaultContextProof = "passed";
     } catch (error) {
       proofRoot.dataset.breadcrumbDefaultContextProofError =

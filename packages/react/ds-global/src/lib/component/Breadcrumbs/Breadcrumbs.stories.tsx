@@ -53,7 +53,7 @@ export const ManyLevels: Story = {
 /**
  * Breadcrumbs wrapping in a constrained container. On overflow each separator
  * wraps together with its following link, so the slash starts the second line
- * (and does not trail the first), using the tier's item-block row gap.
+ * (and does not trail the first), retaining the paragraph's line rhythm.
  */
 export const Overflow: Story = {
   decorators: [

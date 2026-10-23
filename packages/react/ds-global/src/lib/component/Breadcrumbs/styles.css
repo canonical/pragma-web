@@ -20,8 +20,8 @@
       flex-direction: row;
       flex-wrap: wrap;
 
-      /* Wrapped rows follow the product context's item-block relationship. */
-      row-gap: var(--ds-spacing-item-block, var(--dimension-050));
+      /* Wrapped rows retain the paragraph's native line advance. */
+      row-gap: 0;
 
       /* layout.align: center */
       align-items: center;
