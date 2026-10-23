@@ -5,9 +5,13 @@
 @layer ds.components.global {
   /* A subgrid of the canvas's page grid over every column, its gap the
    * grid's gutter on both axes. It does not stretch to the canvas's
-   * height, so a short page packs at the top. */
+   * height, so a short page packs at the top. The landing renders no
+   * strip, so the canvas starts at the viewport's top; the page starts one
+   * gutter under it, where a page under a strip starts under the strip's
+   * rule. */
   .ds.home-page {
     --home-page-gap: var(--grid-gutter);
+    --home-page-spacing-block-start: var(--grid-gutter);
     --home-page-padding-block: var(--container-gap-loose);
     --home-page-lead-color: var(--color-text-muted);
     /* One further step of block space between the intro and the doors. */
@@ -19,7 +23,7 @@
     grid-column: 1 / -1;
     align-self: start;
     gap: var(--home-page-gap);
-    padding-block-start: var(--home-page-padding-block);
+    margin-block-start: var(--home-page-spacing-block-start);
     padding-block-end: var(--home-page-padding-block);
   }
 

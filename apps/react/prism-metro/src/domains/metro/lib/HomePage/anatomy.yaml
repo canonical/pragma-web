@@ -14,6 +14,10 @@
 # further step of block space below the intro, external spacing on the
 # region, so the intro and the doors read as two groups. The root does not
 # stretch to the canvas's height, so a short page packs at the top. The
+# landing renders no strip, so the canvas starts at the viewport's top: the
+# page carries one gutter of external spacing above it, so its title sits
+# one gutter under the viewport's top as a page under a strip sits one
+# gutter under the strip's rule. The
 # doors region holds the loading line while the counts are on their way,
 # the alert when they fail, then the doors themselves. Bespoke: no
 # published component is a landing page.
@@ -36,7 +40,7 @@ node:
     layout.grid.column: "1 / -1"
     layout.alignSelf: start
     spacing.gap: grid.gutter
-    spacing.internal.block.start: container.gap.loose
+    spacing.external.block.start: grid.gutter
     spacing.internal.block.end: container.gap.loose
   edges:
     - node:
