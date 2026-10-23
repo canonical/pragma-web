@@ -1,0 +1,122 @@
+---
+# CommandPalette — the site's command palette: a modal over the page that
+# finds any node of the graph by text and opens its canonical home. Cmd+K
+# or Ctrl+K opens it from anywhere on the site; Escape, a click on the
+# backdrop or a chosen result closes it, and it opens empty every time.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, frames 502:1753 and 502:1827 (the
+# palette: the field across the top, the 56px result rows on the left, the
+# highlighted result's card on the right, six intrinsic columns wide, four
+# for the results and two for the card) and 504:327 (the row's slots), as
+# the plan's command-palette section and the S3 anatomies record them.
+# Slot order: the search (field, results, preview), then the key hints.
+#
+# Built on the published Modal (global.pattern.modal): this root IS the
+# Modal's <dialog> with the command-palette class added, opened with
+# showModal(), so the backdrop, the focus trap, the page's inertness and
+# Escape are the platform's, and a backdrop click closes it
+# (closeOnBackdropClick). It composes none of Modal.Header, Modal.Content
+# or Modal.Footer: the field takes the header's place and is no title, so
+# the dialog carries its own aria-label; the results scroll on their own
+# beside a preview that does not, where Modal.Content scrolls as one pane;
+# and the hints sit flush left, where Modal.Footer justifies its actions to
+# the end.
+#
+# The dialog sits in the top layer, out of the shell's grid, so it cannot be
+# a subgrid of it: it is as wide as six of the shell's columns and their
+# five gutters, read from the grid's own variables, and never wider than the
+# viewport less one gutter at each side. It hangs one grid margin below the
+# viewport's top rather than centred, so the field stays put while the
+# results grow and shrink under it. The rules that size and place it apply
+# while it is open (`[open]`, the expanded state), where they outrank the
+# Modal's own rule on the same element.
+#
+# The search renders in the browser only (prism-core's ClientOnly): its
+# combobox and listbox contracts are wired by script, so the server sends
+# the closed dialog and the hints alone (cs:ui_blocks.nojs.aria_contracts).
+# A search that fails renders one line in its place until the palette
+# closes; the next opening starts a fresh search. The boundary renders the
+# search or, once it has caught, the failure line, never both.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)   below two groups: the shell holds
+#     four columns, and the open palette is four columns and three gutters
+#     wide.
+#
+# Every decision is read through a component token declared on the root
+# (`--command-palette-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind):
+#   --command-palette-width: calc(6 * var(--grid-col-min) + 5 * var(--grid-gutter))
+#                            six intrinsic columns; no token spans columns.
+#   --command-palette-narrow-width: calc(4 * var(--grid-col-min) + 3 * var(--grid-gutter))
+#                            four intrinsic columns, below two groups.
+#   --command-palette-max-width: calc(100% - 2 * var(--grid-gutter))
+#                            the viewport less one gutter at each side.
+#   --command-palette-offset-block-end: auto
+#                            the keyword that hangs the dialog from its top.
+#   --command-palette-rule-width: 1px   stroke thickness has no semantic token.
+#   space.300 (24px) for the line height: the matrix's line, which every
+#   representation shares; no typography token is 24px in every context.
+#   space.050 (4px) between a key and the words of its hint: the shim's
+#   tight gap is 4px too, but no gap may read a container gap.
+#
+# Roster namespaces (accepted and tracked): grid.margin, grid.gutter,
+# component.padding.block, component.padding.inline, space.050, space.300
+# (a line height), typography.text.primary.fontSize.
+node:
+  uri: prism.component.command_palette
+  styles:
+    typography.size: typography.text.primary.fontSize
+    typography.lineHeight: space.300
+    size.width@expanded: "calc(6 * var(--grid-col-min) + 5 * var(--grid-gutter))"
+    size.max.width@expanded: "calc(100% - 2 * var(--grid-gutter))"
+    spacing.external.block.start@expanded: grid.margin
+    spacing.external.block.end@expanded: auto
+  edges:
+    - node:
+        uri: prism.component.client_only
+        edges:
+          - node:
+              uri: prism.component.error_boundary
+              edges:
+                - node:
+                    uri: prism.component.command_palette_search
+                  relation: { cardinality: "0..1" }
+                - node:
+                    role: failure
+                    styles:
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.block.end: component.padding.block
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                      typography.color: color.text.error
+                  relation: { cardinality: "0..1", slotName: failure }
+            relation: { cardinality: "1" }
+      relation: { cardinality: "1", slotName: search }
+    - node:
+        role: hints
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: grid.gutter
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.top.width: 1px
+          appearance.border.style: "solid none none"
+          appearance.border.block.start.color: color.border.muted
+          typography.color: color.text.muted
+        edges:
+          - node:
+              role: hint
+              styles:
+                layout.type: inline-flex
+                layout.align: center
+                spacing.gap: space.050
+              edges:
+                - node:
+                    uri: global.component.keyboard_key
+                  relation: { cardinality: "1..*" }
+            relation: { cardinality: "3", slotName: hint }
+      relation: { cardinality: "1", slotName: hints }

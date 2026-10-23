@@ -76,6 +76,8 @@ const componentCssClassName = "ds command-palette-search";
  *
  * The field's text, trimmed, reaches the graph's search deferred: while the
  * next results load, the last ones stay on screen and the listbox is busy.
+ * Each session of the palette searches afresh, so a failed search is
+ * retried once the palette reopens.
  * An empty field sends no query and shows a one-line hint; a text nothing
  * matches shows one line naming it. Groups follow the ranking: a type's
  * group sits where its best result ranks, under the type's title.
@@ -96,6 +98,7 @@ const componentCssClassName = "ds command-palette-search";
  */
 export default function CommandPaletteSearch({
   onChoose,
+  session,
   className,
   ...props
 }: CommandPaletteSearchProps): ReactElement {
@@ -106,11 +109,11 @@ export default function CommandPaletteSearch({
   const [highlighted, setHighlighted] = useState(0);
   const activeOption = useRef<HTMLLIElement>(null);
   const searched = useDeferredValue(text.trim());
-  const data = useLazyLoadQuery<CommandPaletteSearchQuery>(searchQuery, {
-    text: searched,
-    first: SEARCH_PAGE_SIZE,
-    searching: searched !== "",
-  });
+  const data = useLazyLoadQuery<CommandPaletteSearchQuery>(
+    searchQuery,
+    { text: searched, first: SEARCH_PAGE_SIZE, searching: searched !== "" },
+    { fetchKey: session },
+  );
   const nodes = data.search?.edges.map(({ node }) => node) ?? [];
   const groups = groupResultsByType(nodes);
   const results = groups.flatMap((group) => group.results);

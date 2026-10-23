@@ -43,6 +43,7 @@ const findFolder = (name: string): string => {
 describe("the package's components", () => {
   it("are the palette's parts, each under src/lib/ui", () => {
     expect(folders.map((folder) => basename(folder))).toEqual([
+      "CommandPalette",
       "CommandPaletteResult",
       "CommandPaletteSearch",
       "CommandPaletteTitle",

@@ -14,7 +14,9 @@ describe("CommandPaletteSearch SSR", () => {
       createSiteTree({
         environment,
         router: createSiteRouter(),
-        children: <CommandPaletteSearch onChoose={() => undefined} />,
+        children: (
+          <CommandPaletteSearch onChoose={() => undefined} session={0} />
+        ),
       }),
     );
     expect(html).toContain('class="ds command-palette-search"');

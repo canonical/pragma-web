@@ -35,7 +35,7 @@ const renderSearch = () => {
       router,
       children: (
         <Suspense fallback={null}>
-          <CommandPaletteSearch onChoose={onChoose} />
+          <CommandPaletteSearch onChoose={onChoose} session={0} />
         </Suspense>
       ),
     }),
@@ -245,6 +245,7 @@ describe("CommandPaletteSearch", () => {
             className="custom-class"
             data-testid="search"
             onChoose={() => undefined}
+            session={0}
           />
         ),
       }),

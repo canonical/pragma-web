@@ -8,4 +8,5 @@
  * @module
  */
 
-export {};
+export type { CommandPaletteProps } from "./ui/index.js";
+export { CommandPalette } from "./ui/index.js";

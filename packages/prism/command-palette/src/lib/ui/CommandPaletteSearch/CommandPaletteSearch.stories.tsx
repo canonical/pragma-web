@@ -25,7 +25,7 @@ const meta: Meta<typeof Component> = {
   tags: ["autodocs"],
   decorators: [withPaletteSite(), withRelayEnvironment],
   parameters: { relay: answerWith(RANKED_RESULTS) },
-  args: { onChoose: () => undefined },
+  args: { onChoose: () => undefined, session: 0 },
   render: (args) => (
     <Suspense fallback={null}>
       <Component {...args} />

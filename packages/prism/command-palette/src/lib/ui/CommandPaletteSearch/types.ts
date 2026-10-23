@@ -8,6 +8,12 @@ type OwnProps = {
    * its home: the palette closes on it.
    */
   readonly onChoose: () => void;
+  /**
+   * The opening of the palette the search belongs to. A search runs afresh
+   * in each session, so a text a failed search sent is sent again once the
+   * palette reopens, rather than failing from the store's memory.
+   */
+  readonly session: number;
 };
 
 /**
