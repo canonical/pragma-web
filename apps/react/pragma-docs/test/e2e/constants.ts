@@ -65,6 +65,19 @@ export const DEFINITIONS_PATHS = [
 ] as const;
 
 /**
+ * Desktops shorter than the 1440 by 900 the layout is designed for, once
+ * the browser's chrome is taken: a laptop's 1440 by 780 and a 1280 by 720,
+ * where the inspector moves into its drawer.
+ */
+export const SHORT_DESKTOP_VIEWPORTS = [
+  { name: "1440x780", width: 1440, height: 780 },
+  { name: "1280x720", width: 1280, height: 720 },
+] as const;
+
+/** How long a camera move a control asks for takes to settle, in ms. */
+export const CAMERA_SETTLE_MS = 600;
+
+/**
  * The smallest size any text may render at on screen, in pixels: the
  * graph heuristics' legibility floor.
  */

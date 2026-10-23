@@ -2,13 +2,16 @@
 
 /**
  * The Definitions explorer in a real browser, served by the built preview
- * cell as a reader gets it, at a desktop and a phone width: it hydrates
- * with no console error; it opens at a zoom where every
- * text of the graph renders at 12px or more on screen, the phone view
- * included; every class's label fits its box in the font the page ships;
- * the term rail's ontology headings are laid out; and, on a phone, the
- * inspector's drawer trigger covers nothing of the explorer, its search
- * field least of all.
+ * cell as a reader gets it, at a desktop and a phone width and at two
+ * shorter desktops: it hydrates with no console error; it opens at a zoom
+ * where every text of the graph renders at 12px or more on screen, the
+ * phone view included, on a window whose left, top and right edges cut
+ * through no class; every class's label fits its box in the font the page
+ * ships; the term rail's ontology headings are laid out; and, on a phone,
+ * the inspector's drawer trigger covers nothing of the explorer, its search
+ * field least of all. A filter chip's refit keeps every class in view
+ * labelled; Fit brings every class into view; and the inspector's field
+ * rows put their ranges on one column line.
  */
 import {
   launchBrowser,
@@ -17,11 +20,14 @@ import {
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  CAMERA_SETTLE_MS,
   DEFINITIONS_PATHS,
   GRAPH_NODE_TEXT_INSET,
   MIN_SCREEN_TEXT_PX,
   PAGE_SETTLE_MS,
   PREVIEW_READY_MS,
+  SHORT_DESKTOP_VIEWPORTS,
+  WIDTH_TOLERANCE_PX,
 } from "./constants.js";
 import { type RunningServer, startServer } from "./serverHarness.js";
 
@@ -61,15 +67,34 @@ interface ExplorerMeasure {
   readonly railHeadingHeights: readonly number[];
   /** Whether the drawer trigger and the rail's search field intersect. */
   readonly triggerCoversSearch: boolean;
+  /**
+   * The canvas's classes the viewport's left, top or right edge cuts: none,
+   * a class the bottom edge crosses showing that more lies below.
+   */
+  readonly cut: readonly string[];
+  /** How many of the canvas's classes lie wholly in its viewport. */
+  readonly inView: number;
+  /** How many classes the canvas draws and does not hide. */
+  readonly drawn: number;
+  /** The left edge of each field row's range in the inspector, in px. */
+  readonly rangeLefts: readonly number[];
 }
 
 /**
  * Measure the explorer in the page, as the graph heuristics' reviewer
  * does: every visible SVG text's computed size times its screen scale,
  * every graph node's label against its box, the rail's headings and the
- * trigger against the search field.
+ * trigger against the search field, the classes the viewport's edges cut,
+ * to within the tolerance of sub-pixel rounding, and the inspector's field
+ * ranges.
  */
-function measureExplorer(inset: number): ExplorerMeasure {
+function measureExplorer({
+  inset,
+  tolerance,
+}: {
+  readonly inset: number;
+  readonly tolerance: number;
+}): ExplorerMeasure {
   const isShown = (element: Element): boolean => {
     const box = element.getBoundingClientRect();
     return box.width > 0 && box.height > 0;
@@ -110,6 +135,42 @@ function measureExplorer(inset: number): ExplorerMeasure {
       box.bottom <= viewport.bottom;
     return inView && node.querySelector(".title") === null;
   }).length;
+  const canvasNodes = [
+    ...document.querySelectorAll(".ds.graph-canvas .node:not(.is-hidden)"),
+  ].map((node) => ({
+    label: node.getAttribute("data-id") ?? "",
+    box: (node.querySelector(".surface") ?? node).getBoundingClientRect(),
+  }));
+  const shown = canvasNodes.filter(({ box }) => box.width > 0);
+  const cut =
+    viewport === undefined
+      ? []
+      : shown
+          .filter(
+            ({ box }) =>
+              box.left < viewport.right - tolerance &&
+              box.right > viewport.left + tolerance &&
+              box.top < viewport.bottom - tolerance &&
+              box.bottom > viewport.top + tolerance &&
+              (box.left < viewport.left - tolerance ||
+                box.top < viewport.top - tolerance ||
+                (box.right > viewport.right + tolerance &&
+                  box.bottom <= viewport.bottom)),
+          )
+          .map(({ label }) => label);
+  const inView =
+    viewport === undefined
+      ? 0
+      : shown.filter(
+          ({ box }) =>
+            box.left >= viewport.left &&
+            box.right <= viewport.right &&
+            box.top >= viewport.top &&
+            box.bottom <= viewport.bottom,
+        ).length;
+  const rangeLefts = [
+    ...document.querySelectorAll(".inspector .ds.field-list .range"),
+  ].map((range) => range.getBoundingClientRect().left);
   const trigger = document.querySelector(".inspector-trigger");
   const search = document.querySelector(".ds.term-rail input");
   const a = trigger?.getBoundingClientRect();
@@ -134,6 +195,10 @@ function measureExplorer(inset: number): ExplorerMeasure {
       .filter((heading) => heading.getClientRects().length > 0)
       .map((heading) => heading.getBoundingClientRect().height),
     triggerCoversSearch,
+    cut,
+    inView,
+    drawn: shown.length,
+    rangeLefts,
   };
 }
 
@@ -146,6 +211,7 @@ function measureExplorer(inset: number): ExplorerMeasure {
 const openExplorer = async (
   path: string,
   viewport: { readonly width: number; readonly height: number },
+  act?: (page: Page) => Promise<void>,
 ): Promise<{ errors: string[]; measure: ExplorerMeasure }> => {
   const page: Page = await browser.newPage({ viewport });
   const errors: string[] = [];
@@ -176,30 +242,80 @@ const openExplorer = async (
       timeout: PAGE_SETTLE_MS,
     });
     await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    if (act !== undefined) {
+      await act(page);
+      await page.waitForTimeout(CAMERA_SETTLE_MS);
+    }
     return {
       errors,
-      measure: await page.evaluate(measureExplorer, GRAPH_NODE_TEXT_INSET),
+      measure: await page.evaluate(measureExplorer, {
+        inset: GRAPH_NODE_TEXT_INSET,
+        tolerance: WIDTH_TOLERANCE_PX,
+      }),
     };
   } finally {
     await page.close();
   }
 };
 
-describe.each(VIEWPORTS)("at $name px", (viewport) => {
-  it.each(DEFINITIONS_PATHS)(
-    "hydrates %s silently, with every graph text legible and every label in its box",
-    async (path) => {
-      const { errors, measure } = await openExplorer(path, viewport);
-      expect(errors).toEqual([]);
-      expect(measure.fontLoaded).toBe(true);
-      expect(measure.textCount).toBeGreaterThan(0);
-      expect(measure.unlabelled).toBe(0);
-      expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
-      expect(measure.overflowing).toEqual([]);
-      for (const height of measure.railHeadingHeights) {
-        expect(height).toBeGreaterThan(MIN_SCREEN_TEXT_PX);
-      }
-      expect(measure.triggerCoversSearch).toBe(false);
-    },
-  );
+describe.each([...VIEWPORTS, ...SHORT_DESKTOP_VIEWPORTS])(
+  "at $name px",
+  (viewport) => {
+    it.each(DEFINITIONS_PATHS)(
+      "hydrates %s silently, with every graph text legible, every label in its box and no class cut",
+      async (path) => {
+        const { errors, measure } = await openExplorer(path, viewport);
+        expect(errors).toEqual([]);
+        expect(measure.fontLoaded).toBe(true);
+        expect(measure.textCount).toBeGreaterThan(0);
+        expect(measure.unlabelled).toBe(0);
+        expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+        expect(measure.overflowing).toEqual([]);
+        expect(measure.cut).toEqual([]);
+        for (const height of measure.railHeadingHeights) {
+          expect(height).toBeGreaterThan(MIN_SCREEN_TEXT_PX);
+        }
+        expect(measure.triggerCoversSearch).toBe(false);
+      },
+    );
+  },
+);
+
+describe("at 1440 px", () => {
+  const [desktop] = VIEWPORTS;
+
+  it("keeps every class in view labelled when a chip hides some and the camera refits", async () => {
+    const { errors, measure } = await openExplorer(
+      "/definitions",
+      desktop,
+      (page) =>
+        page.getByRole("button", { name: "Abstract", exact: true }).click(),
+    );
+    expect(errors).toEqual([]);
+    expect(measure.inView).toBeGreaterThan(0);
+    expect(measure.unlabelled).toBe(0);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+  });
+
+  it("brings every class into view on Fit", async () => {
+    const { errors, measure } = await openExplorer(
+      "/definitions",
+      desktop,
+      (page) => page.getByRole("button", { name: "Fit", exact: true }).click(),
+    );
+    expect(errors).toEqual([]);
+    expect(measure.inView).toBe(measure.drawn);
+  });
+
+  it("puts the inspector's field ranges on one column line", async () => {
+    const { measure } = await openExplorer(
+      `/definitions/${encodeURIComponent("ds:Component")}`,
+      desktop,
+    );
+    expect(measure.rangeLefts.length).toBeGreaterThan(1);
+    const [first = 0] = measure.rangeLefts;
+    for (const left of measure.rangeLefts) {
+      expect(Math.abs(left - first)).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+    }
+  });
 });
