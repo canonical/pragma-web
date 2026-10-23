@@ -7,7 +7,8 @@
    * gutter on both axes, with the list's UA margins cleared. */
   .ds.key-value-list {
     --key-value-list-gap: var(--grid-gutter);
-    --key-value-list-pair-inset-block-start: var(--component-padding-block);
+    /* The matrix's 24px line, which every representation shares. */
+    --key-value-list-line-height: var(--space-300);
     --key-value-list-rule-width: 1px;
     --key-value-list-rule-color: var(--color-border-muted);
 
@@ -18,14 +19,13 @@
     margin-block: 0;
   }
 
-  /* Each pair is a subgrid row under a hairline, its content one block
-   * inset below the rule. */
+  /* Each pair is a subgrid row directly under a hairline: a 1px rule over
+   * a 24px line. */
   .ds.key-value-list > .pair {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     gap: var(--key-value-list-gap);
-    padding-block-start: var(--key-value-list-pair-inset-block-start);
     border-block-start-width: var(--key-value-list-rule-width);
     border-block-start-style: solid;
     border-block-start-color: var(--key-value-list-rule-color);
@@ -34,11 +34,13 @@
   /* Every key on the first two column lines, every value from the third. */
   .ds.key-value-list .key {
     grid-column: 1 / span 2;
+    line-height: var(--key-value-list-line-height);
   }
 
   .ds.key-value-list .value {
     grid-column: 3 / -1;
     margin-inline-start: 0;
+    line-height: var(--key-value-list-line-height);
   }
 
   /* Below two groups the main column holds two columns, so a pair stacks,

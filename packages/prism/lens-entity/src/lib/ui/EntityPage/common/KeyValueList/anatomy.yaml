@@ -4,8 +4,10 @@
 # rule above it (the key-value reference: a pair with a hairline rule over
 # it), the key on the first two columns and the value from the third to the
 # end, so every key and every value on the page starts on the same column
-# line. The pairs stand one gutter apart, each a component's block inset
-# under its rule.
+# line. The pairs stand one gutter apart, each a 1px rule directly over a
+# 24px line: 25px, as the key-value reference draws it. The key and the
+# value sit on the matrix's 24px line, the line every representation
+# shares.
 #
 # Below two groups of columns the main column holds two columns, so a pair
 # stacks, the key over the value, both across the column: one container
@@ -18,6 +20,9 @@
 #
 # Token ledger:
 #   1px: the hairline over each pair; stroke width has only primitives.
+#   space.300 (24px) for the key's and the value's line height: the
+#     matrix's line; no typography token is 24px in every context (the
+#     docs' primary line is 20px).
 #   layout.grid.column "1 / -1", "1 / span 2", "3 / -1": structure, spans in
 #     columns.
 #   appearance.border.style solid: a keyword; the 0 resets on the list and
@@ -27,8 +32,8 @@
 #   @container shell (width < 912px)   below two groups: the key and the
 #     value each span the whole column, the key over the value.
 #
-# Roster namespaces (accepted and tracked): grid.gutter,
-# component.padding.block.
+# Roster namespaces (accepted and tracked): grid.gutter, space.300 (a line
+# height).
 node:
   uri: prism.subcomponent.key_value_list
   styles:
@@ -46,7 +51,6 @@ node:
           layout.grid.columns: subgrid
           layout.grid.column: "1 / -1"
           spacing.gap: grid.gutter
-          spacing.internal.block.start: component.padding.block
           appearance.border.width: 1px
           appearance.border.style: solid
           appearance.border.block.start.color: color.border.muted
@@ -55,11 +59,13 @@ node:
               role: key (the term)
               styles:
                 layout.grid.column: "1 / span 2"
+                typography.lineHeight: space.300
             relation: { cardinality: "1", slotName: key }
           - node:
               role: value (the description)
               styles:
                 layout.grid.column: "3 / -1"
                 spacing.external.inline.start: 0
+                typography.lineHeight: space.300
             relation: { cardinality: "1", slotName: value }
       relation: { cardinality: "1..*", slotName: pair }

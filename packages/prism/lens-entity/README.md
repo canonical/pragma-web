@@ -213,9 +213,9 @@ never on `:root`, bound to a semantic token, to the spacing shim of
   `--color-border-muted`, `--color-focus-ring`;
 - type: `--typography-text-secondary-font-size`, for the strip's controls
   and status and the inherited tag;
-- space: `--grid-gutter`, `--container-gap-default`, `--container-gap-loose`,
-  `--component-padding-block` and, where no semantic name fits, a
-  `--space-*` step, which the anatomy names with its reason;
+- space: `--grid-gutter`, `--container-gap-default`, `--container-gap-loose`
+  and, where no semantic name fits, a `--space-*` step, which the anatomy
+  names with its reason (the key values' 24px line is `--space-300`);
 - literals: the 1px hairlines and the 2px focus ring, which no semantic
   token sizes.
 
