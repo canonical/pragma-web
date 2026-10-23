@@ -15,8 +15,9 @@ const componentCssClassName = "ds lens-card";
  * machine whatever words the catalog puts around it.
  *
  * Its root is the Card's own root with the lens-card class added, so the
- * card's tracks, border and section insets are the Card's; inside a `Cards`
- * group its sections line up with its neighbours'.
+ * card's border and section insets are the Card's; inside a `Cards` group
+ * its sections line up with its neighbours', the header over the image's
+ * track and the content over the footer's, since a door has neither.
  *
  * `import { LensCard } from "#lib/ui";`
  *
@@ -37,12 +38,12 @@ export default function LensCard({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <Card.Header>
+      <Card.Header className="header">
         <h2 className="title">
           <LinkComponent href={href}>{label}</LinkComponent>
         </h2>
       </Card.Header>
-      <Card.Content>
+      <Card.Content className="content">
         <p className="count">
           <data value={String(count)}>{countText}</data>
         </p>
