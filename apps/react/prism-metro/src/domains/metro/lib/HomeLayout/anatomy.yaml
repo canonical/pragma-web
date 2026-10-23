@@ -1,0 +1,19 @@
+---
+# HomeLayout — the landing on the document archetype: the site's rail, and
+# the routed page in the canvas, the only region that scrolls. The landing
+# has no strip (it is not a lens: nothing to search, no mode) and no aside.
+# It renders no element of its own: DocumentLayout is the root, so this
+# anatomy binds no styles and the folder has no stylesheet.
+node:
+  uri: metro.component.home_layout
+  edges:
+    - node:
+        uri: prism.component.document_layout
+        edges:
+          - node:
+              uri: metro.component.metro_rail
+            relation: { cardinality: "1", slotName: rail }
+          - node:
+              uri: metro.component.home_page
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: layout }
