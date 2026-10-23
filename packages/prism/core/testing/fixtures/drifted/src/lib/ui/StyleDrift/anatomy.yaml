@@ -1,7 +1,7 @@
 ---
 # StyleDrift — a fixture the checks run against: a root with one labelled
-# child and a link reached through its body, a hover state and a reflow
-# below one group.
+# child and a link reached through its body, a hover state, a reflow
+# below one group and one that re-values a colour.
 node:
   uri: prism.component.style_drift
   styles:

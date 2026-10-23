@@ -41,6 +41,11 @@
     text-decoration: underline;
   }
 
+  /* A label the body follows draws no rule below it. */
+  .ds.probe:has(> .label + .body) > .label {
+    border-block-end-width: 0;
+  }
+
   /* Below one group the label hides. */
   @container shell (width < 448px) {
     .ds.probe .label {

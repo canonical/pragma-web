@@ -83,6 +83,13 @@ describe("the component checks", () => {
       );
     });
 
+    it("refuses a reflow that re-values anything but placement, size, spacing, visibility or border width", () => {
+      const folder = locate(DRIFTED, "StyleDrift");
+      expect(() =>
+        assertStylesMatchAnatomy(folder, assertAnatomy(folder)),
+      ).toThrow(/\.label: a reflow re-values appearance\.border\.color/);
+    });
+
     it("refuses a child chain that leaves the anatomy's path to its slot", () => {
       const folder = locate(DRIFTED, "StyleDrift");
       expect(() =>

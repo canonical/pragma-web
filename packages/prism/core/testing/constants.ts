@@ -18,6 +18,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   background: ["appearance.background"],
   "background-color": ["appearance.background"],
   "block-size": ["size.block"],
+  "border-block-end-width": ["appearance.border.width"],
   "border-block-start-color": ["appearance.border.block.start.color"],
   "border-block-start-style": ["appearance.border.style"],
   "border-block-start-width": ["appearance.border.width"],
@@ -224,15 +225,18 @@ export const UNTHEMABLE_DECLARATIONS: readonly string[] = [
 ];
 
 /**
- * The style-key families a reflow may re-value: placement, size, spacing
- * and whether an element shows. A container query or a `:has()` rule that
- * re-values anything else is a second design, not a reflow.
+ * The style-key families a reflow may re-value: placement, size, spacing,
+ * whether an element shows, and whether a border shows, as a divider
+ * between sections does when what follows them changes. A container query
+ * or a `:has()` rule that re-values anything else is a second design, not
+ * a reflow.
  */
 export const REFLOW_KEY_FAMILIES: readonly string[] = [
   "layout.",
   "size.",
   "spacing.",
   "appearance.visibility",
+  "appearance.border.width",
 ];
 
 /**

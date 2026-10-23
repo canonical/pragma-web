@@ -342,7 +342,8 @@ function listChannels(folder: string, prefix: string): string[] {
  * declares is followed to its value; a `var()` chain is read as its symbols
  * and its terminal literal. Rules under `@container`, and rules that re-flow
  * the root through `:has()` or `:not()`, are reflow: each must style a slot that exists
- * and may only re-value placement, size, spacing and visibility. Rules under
+ * and may only re-value placement, size, spacing, visibility and border
+ * width (`REFLOW_KEY_FAMILIES`). Rules under
  * `@media` (the exempt feature queries) and the `:root` block are left to
  * `assertStylesheets`.
  *
