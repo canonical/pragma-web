@@ -5,4 +5,5 @@
  * @module
  */
 
+export { networkLayout } from "./layouts.js";
 export { networkRoutes } from "./routes.js";

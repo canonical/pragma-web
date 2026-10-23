@@ -9,6 +9,7 @@ import {
   stationsLayout,
   stationsRoutes,
 } from "#domains/lenses";
+import { networkLayout, networkRoutes } from "#domains/network";
 import { NotFoundPage } from "#lib/ui";
 
 /**
@@ -29,6 +30,12 @@ export const notFoundRoute = route({
 // share a wrapper, and the wrapper renders the rail, the lens's strip and any
 // provider the strip and the page share. Above every layout sits `Shell`, the
 // provider nest the client and server entries mount.
+
+// The network lens's map is a workspace and shares its wrapper; its station
+// and line pages are documents that render their own archetype, so they sit
+// in the table directly.
+const [network] = group(networkLayout, [networkRoutes.network] as const);
+const { networkStation, networkLine } = networkRoutes;
 
 const [definitions, definitionsTerm] = group(definitionsLayout, [
   definitionsRoutes.definitions,
@@ -51,12 +58,15 @@ const [lines, linesEntity] = group(linesLayout, [
  * so the table keeps each lens's keys as the lens returns them.
  */
 export const appRoutes = {
+  network,
   definitions,
   stations,
   lines,
   definitionsTerm,
   stationsEntity,
   linesEntity,
+  networkStation,
+  networkLine,
 } as const;
 
 /**

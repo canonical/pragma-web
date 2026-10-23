@@ -1,60 +1,169 @@
 ---
-# LineStrip — one direction of a line as a passenger reads it above the
-# doors: the stops in order on one rule in the line's colour, the current
-# stop marked, interchanges with the lines they meet. A loop shows a
-# "continues" marker at both ends. Bespoke: no published component draws a
-# route. An <ol>, so the order is the markup's; CSS lays it out.
+# LineStrip — one route of a line as a passenger reads it above the doors:
+# the stops in order on one rule in the line's colour, each with its tick (a
+# hollow ring at an interchange), its name linking to its page, the other
+# lines it meets and the transfer time; a loop shows a "continues" marker at
+# both ends. Where the line runs both ways, both directions render without
+# script, and with script a toggle shows one at a time. Bespoke: no
+# published component draws a route. Each stop is where the CallStop
+# projection will render (marked `data-placeholder="CallStop"`).
 #
-# Below three groups (912px) the strip reads top to bottom: under the
-# shell's container query the stop list re-values three of its keys,
-# layout.direction to column, appearance.border.width to "0 0 0 4px" and
-# spacing.internal.block.start to 0. The DSL has no query construct, so this
-# comment is their record.
+# The strip spans the page's columns. Its track bleeds one gutter into the
+# gutters on either side, the bleed compensated by padding, so the rule runs
+# from the rail's border to the aside's edge. The stops share the strip
+# equally, so the rule's ticks fall at equal spacing.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups the strip reads top to
+#     bottom: the stops stack, each stop lays its tick beside its name, and
+#     the rule turns vertical through the ticks' centres.
+#
+# Every decision is read through a component token declared on the root
+# (`--line-strip-*`), bound to the symbol named here. The line's colour
+# reaches the rule and the ticks through `--line-strip-colour`, and each
+# connection's swatch through `--line-strip-connection-colour`, inline
+# channels set from the graph's data.
+#
+# Token ledger:
+#   size.block 0.25rem on the rule, size.width / size.height 0.75rem on a
+#     tick and an interchange ring and 0.5rem on a connection swatch: no stroke or icon-size
+#     tokens.
+#   layout.offset.block.start reads the space.050 step on the rule: half the
+#     difference between a tick and the rule, so the rule runs through the
+#     ticks; no semantic name fits.
+#   appearance.border.width 2px on an interchange ring: no stroke token.
+#   typography.fontFamily on a connection's code: the monospace family has
+#     no semantic token.
 node:
   uri: metro.component.line_strip
   styles:
     layout.type: grid
     layout.grid.column: "1 / -1"
-    spacing.gap.block: container.gap.tight
-    spacing.external.block.end: container.gap.loose
+    spacing.gap: grid.gutter
   edges:
     - node:
-        role: heading
-        # the route's label ("To Marsh End", "Clockwise")
-        styles:
-          typography.weight: typography.weight.semiBold
-      relation:
-        cardinality: "1"
-        slotName: label
-    - node:
-        role: stop list
-        # the <ol>; the rule is its block-start border, coloured by the
-        # route's line, which the root receives as --line-strip-colour
-        # from data
+        role: direction toggle
+        # a <fieldset> of two buttons with aria-pressed, rendered only with
+        # script, its native border, padding and margin cleared
         styles:
           layout.type: flex
-          layout.direction: row
-          spacing.gap.inline: container.gap.default
-          spacing.internal.block.start: container.gap.default
-          spacing.internal.inline.start: container.gap.default
-          appearance.border.width: "4px 0 0 0"
+          spacing.gap: space.100
+          appearance.border.style: none
+          spacing.internal.block.start: 0
+          spacing.internal.block.end: 0
+          spacing.internal.inline.start: 0
+          spacing.internal.inline.end: 0
+          spacing.external.inline.start: 0
+          spacing.external.inline.end: 0
+      relation: { cardinality: "0..1", slotName: toggle }
+    - node:
+        role: direction
+        # the route's label (<h2>), then its track
+        styles:
+          layout.type: grid
+          spacing.gap: grid.gutter
+      relation: { cardinality: "1..2", slotName: direction }
+    - node:
+        role: track
+        styles:
+          layout.position: relative
+          spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+          spacing.external.inline.end: "calc(-1 * var(--grid-gutter))"
+          spacing.internal.inline.start: grid.gutter
+          spacing.internal.inline.end: grid.gutter
+      relation: { cardinality: "1..2", slotName: track }
+    - node:
+        role: rule
+        styles:
+          layout.position: absolute
+          layout.offset.inline.start: 0
+          size.inline: 100%
+          layout.offset.block.start: space.050
+          size.block: 0.25rem
+          appearance.background: [line.strip.colour, color.border]
+      relation: { cardinality: "1..2", slotName: rule }
+    - node:
+        role: stop list
+        # the <ol>, over the rule
+        styles:
+          layout.position: relative
+          layout.type: flex
+          spacing.gap: grid.gutter
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+      relation: { cardinality: "1..2", slotName: stops }
+    - node:
+        role: stop
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.100
+          layout.flex.grow: 1
+          layout.flex.shrink: 1
+          layout.flex.basis: 0
+          size.min.width: 0
+      relation: { cardinality: "1..*", slotName: stop }
+    - node:
+        role: tick
+        styles:
+          size.width: 0.75rem
+          size.height: 0.75rem
+          appearance.radius: 50%
+          appearance.background: [line.strip.colour, color.border]
+      relation: { cardinality: "0..*", slotName: tick }
+    - node:
+        role: interchange ring
+        styles:
+          size.width: 0.75rem
+          size.height: 0.75rem
+          appearance.radius: 50%
+          appearance.background: color.background
+          appearance.border.width: 2px
           appearance.border.style: solid
           appearance.border.color: [line.strip.colour, color.border]
-          layout.overflow.inline: auto
-        edges:
-          - node:
-              role: continues marker
-              # first and last <li>, aria-hidden text "…continues"; a loop only
-              styles:
-                typography.color: color.text.muted
-            relation:
-              cardinality: "0..2"
-              slotName: continues
-          - node:
-              role: stop
-              # the slotted <li>s, filled by CallStop
-            relation:
-              cardinality: "1..*"
-              slotName: default
-      relation:
-        cardinality: "1"
+      relation: { cardinality: "0..*", slotName: interchange }
+    - node:
+        role: connections
+        # the other lines the stop meets
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: space.100
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+      relation: { cardinality: "0..*", slotName: connections }
+    - node:
+        role: connection
+        # a line's swatch and code
+        styles:
+          layout.type: flex
+          layout.align: center
+          spacing.gap: space.050
+          typography.fontFamily: "ui-monospace, monospace"
+      relation: { cardinality: "0..*", slotName: connection }
+    - node:
+        role: connection swatch
+        styles:
+          size.width: 0.5rem
+          size.height: 0.5rem
+          appearance.background: [line.strip.connection.colour, color.border]
+      relation: { cardinality: "0..*", slotName: swatch }
+    - node:
+        role: transfer time
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: transfer }
+    - node:
+        role: continues marker
+        # first and last item of a loop's stops, aria-hidden
+        # set below the rule by a tick's height and a stop's inner gap, so it
+        # reads on the stops' names' line
+        styles:
+          typography.color: color.text.muted
+          layout.flex.shrink: 0
+          spacing.internal.block.start: "calc(0.75rem + var(--space-100))"
+      relation: { cardinality: "0..2", slotName: continues }

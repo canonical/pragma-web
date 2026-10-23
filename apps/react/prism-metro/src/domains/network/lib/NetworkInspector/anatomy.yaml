@@ -1,0 +1,85 @@
+---
+# NetworkInspector — the network workspace's inspector: a one-line hint,
+# then the network's lines and its stations, each linking to its page.
+# Bespoke as the inspector's arrangement. The lines are where the shared
+# EntityList/NodeList view will render (an EntityPlaceholder holds them
+# until then), and each station row is where an EntityRow will render
+# (marked `data-placeholder="EntityRow"`).
+#
+# Every decision is read through a component token declared on the root
+# (`--network-inspector-*`), bound to the symbol named here. A row's block
+# padding and the space between a swatch and its code read `--space-*`
+# steps: no semantic name of the shim fits the inside of a list row.
+#
+# Token ledger:
+#   size.width / size.height 0.75rem on a line's swatch: no icon-size token.
+#   typography.fontFamily on a line code: the monospace family has no
+#     semantic token.
+node:
+  uri: metro.component.network_inspector
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+  edges:
+    - node:
+        role: hint
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: hint }
+    - node:
+        role: section
+        # the lines, then the stations, each under its heading
+        styles:
+          layout.type: grid
+          spacing.gap: grid.gutter
+      relation: { cardinality: "2", slotName: section }
+    - node:
+        role: line list
+        styles:
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+      relation: { cardinality: "1", slotName: lines }
+    - node:
+        role: line row
+        # a link to the line's page: its swatch, its code, its name
+        styles:
+          layout.type: flex
+          layout.align: center
+          spacing.gap: space.100
+          spacing.internal.block.start: space.050
+          spacing.internal.block.end: space.050
+      relation: { cardinality: "1..*", slotName: line }
+    - node:
+        role: line swatch
+        # the line's colour, an inline channel from the graph's data
+        styles:
+          size.width: 0.75rem
+          size.height: 0.75rem
+          appearance.background: [network.inspector.line.colour, color.border]
+      relation: { cardinality: "1..*", slotName: swatch }
+    - node:
+        role: line code
+        styles:
+          typography.fontFamily: "ui-monospace, monospace"
+      relation: { cardinality: "1..*", slotName: code }
+    - node:
+        role: station list
+        styles:
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+      relation: { cardinality: "1", slotName: stations }
+    - node:
+        role: station row
+        # a link to the station's page, where an EntityRow will render
+        styles:
+          spacing.internal.block.start: space.050
+          spacing.internal.block.end: space.050
+      relation: { cardinality: "1..*", slotName: station }

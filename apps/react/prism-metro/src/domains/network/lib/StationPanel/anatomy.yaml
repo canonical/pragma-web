@@ -1,57 +1,129 @@
 ---
-# StationPanel — the network workspace's inspector. Without a station it says
-# what to do and lists every routed station; with one it shows where the
-# station sits on each route: the stop before and after it, and the
-# transfer time at an interchange. Composes DescriptionList for the facts;
-# bespoke only as the inspector's arrangement.
+# StationPanel — a station's place on the network, the main column of its
+# page: its title and kind, its facts (fare zone, platforms, transfer time
+# at an interchange), and for every route of every line serving it the stop
+# before and the stop after it. A subgrid of the page over every column, so
+# each fact and each route aligns to the grid's lines: the term or the line
+# in the first two columns, the value or the neighbours in the rest. Bespoke
+# as the page's arrangement; each route's line is where an EntityChip will
+# render (marked `data-placeholder="EntityChip"`).
+#
+# Every decision is read through a component token declared on the root
+# (`--station-panel-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   size.width / size.height 0.75rem on a line's swatch: no icon-size token.
+#   typography.fontFamily on a line code: the monospace family has no
+#     semantic token.
 node:
   uri: metro.component.station_panel
   styles:
     layout.type: grid
-    spacing.gap.block: container.gap.default
-    spacing.internal.block.start: component.padding.block
-    spacing.internal.inline.start: component.padding.inline
-    spacing.internal.inline.end: component.padding.inline
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
   edges:
-    - switch:
-        on: props
-        cases:
-          - node:
-              role: empty state
-              # hint paragraph and the station list
-              edges:
-                - node:
-                    role: hint
-                    styles:
-                      typography.color: color.text.muted
-                  relation: { cardinality: "1" }
-                - node:
-                    uri: prism.component.entity_row
-                    # S7's Station/Interchange row projection, via the map
-                  relation:
-                    cardinality: "1..*"
-                    slotName: stations
-          - node:
-              role: station detail
-              edges:
-                - node:
-                    role: title
-                    # <h2>, the station's _meta.title
-                  relation: { cardinality: "1", slotName: title }
-                - node:
-                    uri: global.component.description_list
-                    # zone, platforms, transfer minutes (interchanges)
-                  relation: { cardinality: "1", slotName: facts }
-                - node:
-                    role: route neighbours
-                    # one <section> per route calling here: the route label,
-                    # previous stop, next stop (links to their homes); a loop
-                    # wraps, a terminus shows none on its open side
-                    styles:
-                      layout.type: grid
-                      spacing.gap.block: container.gap.tight
-                  relation:
-                    cardinality: "1..*"
-                    slotName: routes
-      relation:
-        cardinality: "1"
+    - node:
+        role: header
+        # the station's title (<h1>) and its kind
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: kind
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: kind }
+    - node:
+        role: facts
+        # a <dl>, a subgrid of the panel
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "1", slotName: facts }
+    - node:
+        role: fact
+        # one term and its value, a subgrid row
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+      relation: { cardinality: "0..3", slotName: fact }
+    - node:
+        role: term
+        styles:
+          layout.grid.column: "1 / span 2"
+          typography.color: color.text.muted
+      relation: { cardinality: "0..3", slotName: term }
+    - node:
+        role: value
+        styles:
+          layout.grid.column: "3 / -1"
+          spacing.external.inline.start: 0
+      relation: { cardinality: "0..3", slotName: value }
+    - node:
+        role: routes
+        # the routes' heading and one row per route, a subgrid of the panel
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+      relation: { cardinality: "1", slotName: routes }
+    - node:
+        role: routes heading
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: route
+        # one route's row, a subgrid
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+      relation: { cardinality: "1..*", slotName: route }
+    - node:
+        role: line
+        # the route's line, linking to its page: swatch, code and name
+        styles:
+          layout.grid.column: "1 / span 2"
+          layout.type: flex
+          layout.align: center
+          spacing.gap: space.100
+      relation: { cardinality: "1..*", slotName: line }
+    - node:
+        role: line swatch
+        styles:
+          size.width: 0.75rem
+          size.height: 0.75rem
+          appearance.background: [station.panel.line.colour, color.border]
+      relation: { cardinality: "1..*", slotName: swatch }
+    - node:
+        role: line code
+        styles:
+          typography.fontFamily: "ui-monospace, monospace"
+      relation: { cardinality: "1..*", slotName: code }
+    - node:
+        role: neighbours
+        # the route's label, then the stop before and the stop after, a
+        # wrapping row a --space-* step apart: no semantic name of the shim
+        # fits the gap between the parts of one line of text
+        styles:
+          layout.grid.column: "3 / -1"
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: space.200
+      relation: { cardinality: "1..*", slotName: neighbours }
+    - node:
+        role: neighbour label
+        # "Previous", "Next", "Terminus"
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1..*", slotName: muted }

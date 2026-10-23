@@ -1,30 +1,35 @@
 ---
-# NetworkLinePage — the content of /network/lines/:uri, the main column of
-# the line route's document layout: the line's title with its code, then one
-# strip per route the line draws, each with its direction toggle where the
-# route has a reverse; or the not-found, loading or error status in their
-# place. Binds no styles of its own: the strips carry their spacing.
+# NetworkLinePage — the content of /network/lines/:uri, a document. It
+# renders prism-core's DocumentLayout with the metro rail and, in the
+# three-column aside, the line's LinePanel; its own root is the main
+# column: a subgrid of the canvas's page over every column, holding the
+# line's title and one LineStrip per route the line draws, or its
+# not-found, loading or error status. It renders its own archetype because
+# its aside reads the line's own data.
+#
+# Every decision is read through a component token declared on the root
+# (`--network-line-page-*`), bound to the symbol named here.
 node:
   uri: metro.component.network_line_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
   edges:
-    - switch:
-        on: internal
-        cases:
-          - node:
-              role: line
-              edges:
-                - node:
-                    role: line heading
-                    # <h1>: the line's title, then its code
-                  relation: { cardinality: "1", slotName: title }
-                - node:
-                    uri: metro.component.route_strip
-                  relation: { cardinality: "1..*", slotName: routes }
-          - node:
-              role: not-found status
-          - node:
-              role: loading status
-          - node:
-              role: error status
-      relation:
-        cardinality: "1"
+    - node:
+        role: line title
+        # the page's <h1>
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: title }
+    - node:
+        uri: metro.component.line_strip
+      relation: { cardinality: "0..*", slotName: strips }
+    - node:
+        role: status
+        # not found, loading or error, in place of the line
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: status }

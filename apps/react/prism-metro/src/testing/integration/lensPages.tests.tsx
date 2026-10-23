@@ -42,7 +42,7 @@ describe("the stations lens", () => {
     expect(await findIndexRows()).toHaveLength(STATION_COUNT);
     expect(screen.getByRole("link", { name: NORTHGATE_TITLE })).toHaveAttribute(
       "href",
-      "/stations/metro%3Anorthgate",
+      "/network/stations/metro%3Anorthgate",
     );
   });
 
@@ -55,18 +55,21 @@ describe("the stations lens", () => {
     expect(within(fields).getByText("servesLine")).toBeInTheDocument();
   });
 
-  it("opens a station from the stations index on the client", async () => {
+  it("opens a station's network page from the stations index on the client", async () => {
     renderLensPage("/stations", graph.url);
     await findIndexRows();
     // The router took the click: the browser's own navigation was prevented
-    // and the station's page rendered in place.
+    // and the station's page in the network lens, its home, rendered in
+    // place.
     expect(
       fireEvent.click(screen.getByRole("link", { name: NORTHGATE_TITLE })),
     ).toBe(false);
     expect(
       await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Routes" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -76,10 +79,10 @@ describe("the lines lens", () => {
     expect(await findIndexRows()).toHaveLength(LINE_COUNT);
     expect(
       screen.getByRole("link", { name: CIRCLE_LINE_TITLE }),
-    ).toHaveAttribute("href", "/lines/metro%3Acircle-line");
+    ).toHaveAttribute("href", "/network/lines/metro%3Acircle-line");
   });
 
-  it("opens a line from the lines index on the client", async () => {
+  it("opens a line's network page from the lines index on the client", async () => {
     renderLensPage("/lines", graph.url);
     await findIndexRows();
     expect(
@@ -88,12 +91,14 @@ describe("the lines lens", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: CIRCLE_LINE_TITLE }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Clockwise" }),
+    ).toBeInTheDocument();
   });
 });
 
 describe("the Definitions lens", () => {
-  it("inspects the station class, with its instances linked to the stations lens", async () => {
+  it("inspects the station class, with its instances linked to the network lens", async () => {
     const { container } = renderLensPage(
       "/definitions/metro%3AStation",
       graph.url,
@@ -110,14 +115,17 @@ describe("the Definitions lens", () => {
     ];
     expect(chips.length).toBeGreaterThan(0);
     for (const chip of chips) {
-      expect(chip.getAttribute("href")).toMatch(/^\/stations\/metro%3A[\w-]*$/);
+      expect(chip.getAttribute("href")).toMatch(
+        /^\/network\/stations\/metro%3A[\w-]*$/,
+      );
     }
     // The inspector shows the first page of instances in IRI order, which
     // Central Exchange is on and Northgate, past the first page, is not.
     expect(
       chips.some(
         (chip) =>
-          chip.getAttribute("href") === "/stations/metro%3Acentral-exchange",
+          chip.getAttribute("href") ===
+          "/network/stations/metro%3Acentral-exchange",
       ),
     ).toBe(true);
   });

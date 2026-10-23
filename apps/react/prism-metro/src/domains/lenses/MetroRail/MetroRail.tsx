@@ -12,11 +12,11 @@ import type { MetroRailProps } from "./types.js";
 const METRO_BRAND: RailBrand = {
   label: MESSAGES["site.name"],
   caption: MESSAGES["site.caption"],
-  to: "stations",
+  to: "network",
 };
 
 /**
- * The metro site's rail: the site brand, linked to the stations lens, every
+ * The metro site's rail: the site brand, linked to the network map, every
  * lens the running router's table declares, in rail order, and the site's
  * utility cluster, which holds the theme control.
  *

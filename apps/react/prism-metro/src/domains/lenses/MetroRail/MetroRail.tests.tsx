@@ -26,15 +26,15 @@ describe("MetroRail", () => {
       [...nav.querySelectorAll(".lenses .label")].map(
         (label) => label.textContent,
       ),
-    ).toEqual(["Stations", "Lines", "Definitions"]);
+    ).toEqual(["Network", "Stations", "Lines", "Definitions"]);
   });
 
-  it("links the site brand to the stations lens", () => {
+  it("links the site brand to the network map", () => {
     renderMetroRail();
     const brand = screen
       .getByRole("navigation", { name: "Primary" })
       .querySelector(".brand");
-    expect(brand).toHaveAttribute("href", "/stations");
+    expect(brand).toHaveAttribute("href", "/network");
     expect(brand?.textContent).toBe("Metronetwork docs");
   });
 

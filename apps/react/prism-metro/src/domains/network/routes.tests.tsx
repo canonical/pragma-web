@@ -6,9 +6,11 @@ import {
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
 import { createRouter } from "@canonical/router-core";
-import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 import createMetroFetch from "../../../testing/createMetroFetch.js";
+import { NetworkLinePage } from "./lib/NetworkLinePage/index.js";
+import { NetworkMap } from "./lib/NetworkMap/index.js";
+import { NetworkStationPage } from "./lib/NetworkStationPage/index.js";
 import { networkRoutes } from "./routes.js";
 
 afterEach(() => {
@@ -50,25 +52,23 @@ describe("networkRoutes", () => {
   });
 
   it("renders the map on the lens's own route", () => {
-    const map = networkRoutes.network.content;
-    expect(renderToString(map({ params: {}, search: {} }))).toContain(
-      'class="ds network-map"',
-    );
+    const map = networkRoutes.network.content({ params: {}, search: {} });
+    expect(map.type).toBe(NetworkMap);
   });
 
   it("hands each page the address its route matched", () => {
-    const station = networkRoutes.networkStation.content;
-    const line = networkRoutes.networkLine.content;
-    expect(
-      renderToString(
-        station({ params: { uri: "metro:tannery-lane" }, search: {} }),
-      ),
-    ).toContain('data-address="metro:tannery-lane"');
-    expect(
-      renderToString(
-        line({ params: { uri: "metro:circle-line" }, search: {} }),
-      ),
-    ).toContain('data-address="metro:circle-line"');
+    const station = networkRoutes.networkStation.content({
+      params: { uri: "metro:tannery-lane" },
+      search: {},
+    });
+    const line = networkRoutes.networkLine.content({
+      params: { uri: "metro:circle-line" },
+      search: {},
+    });
+    expect(station.type).toBe(NetworkStationPage);
+    expect(station.props).toEqual({ address: "metro:tannery-lane" });
+    expect(line.type).toBe(NetworkLinePage);
+    expect(line.props).toEqual({ address: "metro:circle-line" });
   });
 
   it("warms each route through its own operation", async () => {

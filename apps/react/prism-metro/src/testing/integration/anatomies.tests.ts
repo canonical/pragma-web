@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -23,10 +23,18 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
   withFileTypes: true,
 })
   .filter((entry) => entry.isDirectory())
-  .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"));
+  .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"))
+  .filter((directory) => existsSync(directory));
 
 /** The semantic tokens the app's components read beyond the shim. */
-const EXTERNAL_TOKENS = ["--color-background", "--color-text"];
+const EXTERNAL_TOKENS = [
+  "--color-background",
+  "--color-border",
+  "--color-focus-ring",
+  "--color-text",
+  "--color-text-link",
+  "--color-text-muted",
+];
 
 /**
  * The document tokens the shell declares on `:root`: the intrinsic grid's
@@ -49,14 +57,17 @@ describe("the app's components", () => {
     },
   );
 
-  it("keep the design's token and grid rules in their stylesheets", () => {
-    expect(() =>
-      assertStylesheets({
-        directory: UI_DIRECTORY,
-        layer: "ds.components.global",
-        externalTokens: EXTERNAL_TOKENS,
-        documentTokens: DOCUMENT_TOKENS,
-      }),
-    ).not.toThrow();
-  });
+  it.each([UI_DIRECTORY, ...DOMAIN_LIBRARIES])(
+    "under %s keep the design's token and grid rules in their stylesheets",
+    (directory) => {
+      expect(() =>
+        assertStylesheets({
+          directory,
+          layer: "ds.components.global",
+          externalTokens: EXTERNAL_TOKENS,
+          documentTokens: DOCUMENT_TOKENS,
+        }),
+      ).not.toThrow();
+    },
+  );
 });

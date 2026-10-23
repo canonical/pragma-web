@@ -56,8 +56,14 @@ const renderShell = () =>
       router={createRouter(
         {
           probe: route({ url: "/", content: Probe }),
-          stationsEntity: route({ url: "/stations/:uri", content: () => null }),
-          linesEntity: route({ url: "/lines/:uri", content: () => null }),
+          networkStation: route({
+            url: "/network/stations/:uri",
+            content: () => null,
+          }),
+          networkLine: route({
+            url: "/network/lines/:uri",
+            content: () => null,
+          }),
           definitionsTerm: route({
             url: "/definitions/:term",
             content: () => null,
@@ -97,10 +103,12 @@ describe("Shell", () => {
   it("provides the site's homes", async () => {
     renderShell();
     expect(
-      await screen.findByText("Station home: /stations/metro%3Anorthgate"),
+      await screen.findByText(
+        "Station home: /network/stations/metro%3Anorthgate",
+      ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Line home: /lines/metro%3Acircle-line"),
+      screen.getByText("Line home: /network/lines/metro%3Acircle-line"),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Class home: /definitions/metro%3AStation"),

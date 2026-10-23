@@ -3,7 +3,47 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The drawing spans every column of the canvas's page and fills its
+   * height, and paints through currentColor: each slot sets the colour its
+   * shapes fill or stroke with. */
   .ds.schematic-map {
-    /* Component styles */
+    --schematic-map-color: var(--color-text);
+    --schematic-map-station-color: var(--color-text);
+    --schematic-map-station-hover-color: var(--color-text-link);
+    --schematic-map-focus-color: var(--color-focus-ring);
+    --schematic-map-focus-width: 2px;
+    --schematic-map-fill-color: var(--color-background);
+
+    display: block;
+    grid-column: 1 / -1;
+    inline-size: 100%;
+    block-size: 100%;
+    color: var(--schematic-map-color);
+  }
+
+  .ds.schematic-map .station {
+    color: var(--schematic-map-station-color);
+  }
+
+  .ds.schematic-map .station:hover {
+    color: var(--schematic-map-station-hover-color);
+  }
+
+  .ds.schematic-map .station:focus-visible {
+    outline-color: var(--schematic-map-focus-color);
+    outline-style: solid;
+    outline-width: var(--schematic-map-focus-width);
+  }
+
+  .ds.schematic-map .fill {
+    color: var(--schematic-map-fill-color);
+  }
+
+  /* Below two groups the names would render under 12px, so they hide; each
+   * mark keeps its name as its accessible title. */
+  @container shell (width < 912px) {
+    .ds.schematic-map .label {
+      visibility: hidden;
+    }
   }
 }

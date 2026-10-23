@@ -1,0 +1,69 @@
+---
+# LinePanel — a line's facts, the aside of its page: its code with its
+# colour, its service (a loop, or end to end with its two ends), how many
+# stops it calls at, and the interchanges on it with their transfer times,
+# each stop linking to its page. Bespoke as the aside's arrangement; a
+# line's EntityCard may later carry its strip in its sidecar.
+#
+# Every decision is read through a component token declared on the root
+# (`--line-panel-*`), bound to the symbol named here. The line's colour
+# reaches the swatch through `--line-panel-colour`, an inline channel set
+# from the graph's data.
+#
+# Token ledger:
+#   size.width / size.height 0.75rem on the swatch: no icon-size token.
+#   typography.fontFamily on the code: the monospace family has no semantic
+#     token.
+node:
+  uri: metro.component.line_panel
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: heading
+        # the swatch, the code and the line's name
+        styles:
+          layout.type: flex
+          layout.align: center
+          spacing.gap: space.100
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: swatch
+        styles:
+          size.width: 0.75rem
+          size.height: 0.75rem
+          appearance.background: [line.panel.colour, color.border]
+      relation: { cardinality: "1", slotName: swatch }
+    - node:
+        role: code
+        styles:
+          typography.fontFamily: "ui-monospace, monospace"
+      relation: { cardinality: "1", slotName: code }
+    - node:
+        role: facts
+        # a <dl>: each term above its value
+        styles:
+          layout.type: grid
+          spacing.gap: grid.gutter
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "1", slotName: facts }
+    - node:
+        role: term
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "3..4", slotName: term }
+    - node:
+        role: value
+        styles:
+          spacing.external.inline.start: 0
+      relation: { cardinality: "3..5", slotName: value }
+    - node:
+        role: interchange list
+        styles:
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+      relation: { cardinality: "0..1", slotName: interchanges }
