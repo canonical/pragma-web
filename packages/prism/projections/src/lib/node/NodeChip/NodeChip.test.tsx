@@ -1,55 +1,118 @@
-import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import createNodePage from "../../../../testing/createNodePage.js";
-import {
-  ONTOLOGY_CLASS_HREF,
-  ONTOLOGY_CLASS_NODE,
-  STATION_NODE,
-} from "../../../../testing/fixtures.js";
-import type { NodePayload } from "../../../../testing/types.js";
-import { ChipProjection } from "../../ChipProjection/index.js";
+// Scaffolded by @canonical/summon-component:react v0.43.0
 
-/** Render `node`'s chip under the default maps, and return its root. */
-const renderChip = (node: NodePayload, children?: string): Element => {
-  const { container } = render(
-    createNodePage(node, (key) => (
-      <ChipProjection node={key}>{children}</ChipProjection>
-    )),
-  );
-  const root = container.querySelector(".ds.node-chip");
-  if (root === null) {
-    throw new Error("no node chip rendered");
+import { render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { graphql, useLazyLoadQuery } from "react-relay";
+import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
+import { describe, expect, it, vi } from "vitest";
+import createSiteTree from "../../../../testing/createSiteTree.js";
+import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
+import testQuery, {
+  type NodeChipTestQuery,
+} from "../../../__generated__/NodeChipTestQuery.graphql.js";
+import NodeChip from "./NodeChip.js";
+import type { NodeChipProps } from "./types.js";
+
+/**
+ * The operation the tests render NodeChip under: one
+ * Node, read through the `node` field. The spread is aliased because that
+ * field is typed by an interface, so a node of another type reads as null
+ * instead of as a key that does not match.
+ */
+const declareTestQuery = (): unknown => graphql`
+  query NodeChipTestQuery @relay_test_operation {
+    node(id: "test") {
+      ...NodeChip_node @alias
+    }
   }
-  return root;
+`;
+void declareTestQuery;
+
+/** Run the test operation and render `children` with the fragment key it returns. */
+const NodeChipTestNode = ({
+  children,
+}: {
+  children: (node: NodeChipProps["node"]) => ReactElement;
+}): ReactElement => {
+  const data = useLazyLoadQuery<NodeChipTestQuery>(testQuery, {});
+  const node = data.node?.NodeChip_node;
+  if (!node) {
+    throw new Error("the mock environment resolved no Node");
+  }
+  return children(node);
+};
+
+/**
+ * Render `children` with the key of the Node a Relay mock environment answers,
+ * under the site's providers: `entity` over the matrix's UI block IconButton.
+ */
+const renderWithNode = (
+  children: (node: NodeChipProps["node"]) => ReactElement,
+  entity: Readonly<Record<string, unknown>> = {},
+) => {
+  // relay-test-utils wraps the mock environment's methods in `jest.fn` when
+  // NODE_ENV is "test"; vitest's `vi` offers the same surface.
+  vi.stubGlobal("jest", vi);
+  const environment = createMockEnvironment();
+  environment.mock.queueOperationResolver((operation) =>
+    MockPayloadGenerator.generate(operation, {
+      Node: resolveRoot({ ...MOCK_NODE, ...entity }),
+    }),
+  );
+  return render(
+    createSiteTree(
+      environment,
+      <NodeChipTestNode>{children}</NodeChipTestNode>,
+    ),
+  );
 };
 
 describe("NodeChip", () => {
-  it("links its title to the node's home", () => {
-    const title = renderChip(ONTOLOGY_CLASS_NODE).querySelector(".title");
-    expect(title?.tagName).toBe("A");
-    expect(title?.getAttribute("href")).toBe(ONTOLOGY_CLASS_HREF);
-    expect(title?.textContent).toBe("UI Block");
-  });
-
-  it("renders its title as inert text when the node has no home", () => {
-    const title = renderChip(STATION_NODE).querySelector(".title");
-    expect(title?.tagName).toBe("SPAN");
-    expect(title?.hasAttribute("href")).toBe(false);
-    expect(title?.textContent).toBe("King's Cross");
-  });
-
-  it("carries the node's class as data-type and its compact address as title", () => {
-    const root = renderChip(STATION_NODE);
-    expect(root.tagName).toBe("SPAN");
-    expect(root.getAttribute("data-type")).toBe(
-      "https://metro.example/Station",
+  it("reads the Node through its fragment", () => {
+    const { container } = renderWithNode((node) => <NodeChip node={node} />);
+    expect(container.querySelector(".ds.node-chip")).toHaveAttribute(
+      "data-type",
+      "Component",
     );
-    expect(root.getAttribute("title")).toBe("metro:station/kings-cross");
   });
 
-  it("labels the mention with the text it is given", () => {
-    expect(renderChip(STATION_NODE, "the station").textContent).toBe(
-      "the station",
+  it("shows its title as inert text when the site does not home its type", () => {
+    const { container } = renderWithNode((node) => <NodeChip node={node} />);
+    expect(container.querySelector(".value")?.tagName).toBe("SPAN");
+    expect(container.querySelector(".value")?.textContent).toBe("IconButton");
+  });
+
+  it("links its title to the home of a type the site homes", () => {
+    renderWithNode((node) => <NodeChip node={node} />, {
+      __typename: "OntologyClass",
+    });
+    expect(
+      screen.getByRole("link", { name: "IconButton" }).getAttribute("href"),
+    ).toBe("/things/ds%3Aglobal.component.icon-button");
+  });
+
+  it("shows a passage's own link text in place of the title", () => {
+    const { container } = renderWithNode((node) => (
+      <NodeChip node={node}>the icon button</NodeChip>
+    ));
+    expect(container.querySelector(".value")?.textContent).toBe(
+      "the icon button",
     );
+  });
+
+  it("applies custom className", () => {
+    const { container } = renderWithNode((node) => (
+      <NodeChip className="custom-class" node={node} />
+    ));
+    expect(
+      container.querySelector(".ds.node-chip")?.getAttribute("class"),
+    ).toBe("ds entity-chip ds node-chip custom-class");
+  });
+
+  it("passes through additional props", () => {
+    renderWithNode((node) => (
+      <NodeChip data-testid="test-component" node={node} />
+    ));
+    expect(screen.getByTestId("test-component").tagName).toBe("SPAN");
   });
 });

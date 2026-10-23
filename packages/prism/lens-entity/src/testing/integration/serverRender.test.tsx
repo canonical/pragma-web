@@ -25,7 +25,9 @@ describe("server rendering", () => {
       LAYOUT,
     );
 
-    expect(html.match(/class="ds node-row"/g)).toHaveLength(STATION_COUNT);
+    expect(html.match(/class="ds entity-row ds node-row"/g)).toHaveLength(
+      STATION_COUNT,
+    );
     expect(html).toContain('href="/stations/metro%3Anorthgate"');
     expect(html).toMatch(/data-slot="entity-status">16 of 16 entries</);
     expect(requestsAfterWarm).toBe(0);

@@ -1,56 +1,147 @@
-import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import createNodePage from "../../../../testing/createNodePage.js";
-import {
-  ONTOLOGY_CLASS_HREF,
-  ONTOLOGY_CLASS_NODE,
-  STATION_NODE,
-} from "../../../../testing/fixtures.js";
-import type { NodePayload } from "../../../../testing/types.js";
-import { CommandProjection } from "../../CommandProjection/index.js";
+// Scaffolded by @canonical/summon-component:react v0.43.0
 
-/** Render `node`'s command under the default maps, and return its root. */
-const renderCommand = (node: NodePayload): Element => {
-  const { container } = render(
-    createNodePage(node, (key) => (
-      <ul>
-        <CommandProjection node={key} />
-      </ul>
-    )),
-  );
-  const root = container.querySelector(".ds.node-command");
-  if (root === null) {
-    throw new Error("no node command rendered");
+import { render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { graphql, useLazyLoadQuery } from "react-relay";
+import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
+import { describe, expect, it, vi } from "vitest";
+import createSiteTree from "../../../../testing/createSiteTree.js";
+import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
+import testQuery, {
+  type NodeCommandTestQuery,
+} from "../../../__generated__/NodeCommandTestQuery.graphql.js";
+import NodeCommand from "./NodeCommand.js";
+import type { NodeCommandProps } from "./types.js";
+
+/**
+ * The operation the tests render NodeCommand under: one
+ * Node, read through the `node` field. The spread is aliased because that
+ * field is typed by an interface, so a node of another type reads as null
+ * instead of as a key that does not match.
+ */
+const declareTestQuery = (): unknown => graphql`
+  query NodeCommandTestQuery @relay_test_operation {
+    node(id: "test") {
+      ...NodeCommand_node @alias
+    }
   }
-  return root;
+`;
+void declareTestQuery;
+
+/** Run the test operation and render `children` with the fragment key it returns. */
+const NodeCommandTestNode = ({
+  children,
+}: {
+  children: (node: NodeCommandProps["node"]) => ReactElement;
+}): ReactElement => {
+  const data = useLazyLoadQuery<NodeCommandTestQuery>(testQuery, {});
+  const node = data.node?.NodeCommand_node;
+  if (!node) {
+    throw new Error("the mock environment resolved no Node");
+  }
+  return children(node);
+};
+
+/**
+ * Render `children` with the key of the Node a Relay mock environment answers,
+ * under the site's providers: `entity` over the matrix's UI block IconButton.
+ */
+const renderWithNode = (
+  children: (node: NodeCommandProps["node"]) => ReactElement,
+  entity: Readonly<Record<string, unknown>> = {},
+) => {
+  // relay-test-utils wraps the mock environment's methods in `jest.fn` when
+  // NODE_ENV is "test"; vitest's `vi` offers the same surface.
+  vi.stubGlobal("jest", vi);
+  const environment = createMockEnvironment();
+  environment.mock.queueOperationResolver((operation) =>
+    MockPayloadGenerator.generate(operation, {
+      Node: resolveRoot({ ...MOCK_NODE, ...entity }),
+    }),
+  );
+  return render(
+    createSiteTree(
+      environment,
+      <NodeCommandTestNode>{children}</NodeCommandTestNode>,
+    ),
+  );
 };
 
 describe("NodeCommand", () => {
-  it("links its title to the node's home", () => {
-    const title = renderCommand(ONTOLOGY_CLASS_NODE).querySelector(".title");
-    expect(title?.tagName).toBe("A");
-    expect(title?.getAttribute("href")).toBe(ONTOLOGY_CLASS_HREF);
-    expect(title?.textContent).toBe("UI Block");
-  });
-
-  it("renders its title as inert text when the node has no home", () => {
-    const title = renderCommand(STATION_NODE).querySelector(".title");
-    expect(title?.tagName).toBe("SPAN");
-    expect(title?.hasAttribute("href")).toBe(false);
-    expect(title?.textContent).toBe("King's Cross");
-  });
-
-  it("renders the node's compact address as its location", () => {
-    const location = renderCommand(STATION_NODE).querySelector(".location");
-    expect(location?.tagName).toBe("SPAN");
-    expect(location?.textContent).toBe("metro:station/kings-cross");
-  });
-
-  it("carries the node's class as data-type on its li root", () => {
-    const root = renderCommand(STATION_NODE);
-    expect(root.tagName).toBe("LI");
-    expect(root.getAttribute("data-type")).toBe(
-      "https://metro.example/Station",
+  it("reads the Node through its fragment", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <NodeCommand node={node} />
+      </ul>
+    ));
+    expect(container.querySelector(".ds.node-command")).toHaveAttribute(
+      "data-type",
+      "Component",
     );
+  });
+
+  it("fills the result's slots from the node, in the anatomy's order", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <NodeCommand node={node} />
+      </ul>
+    ));
+    expect(
+      [...container.querySelectorAll(".title, .kind, .location")].map(
+        (slot) => slot.textContent,
+      ),
+    ).toEqual(["IconButton", "Component", "ds"]);
+    expect(container.querySelector(".vital")).toBeNull();
+  });
+
+  it("links its title to the home of a type the site homes", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <NodeCommand node={node} />
+        </ul>
+      ),
+      { __typename: "OntologyClass" },
+    );
+    expect(container.querySelector(".title")?.getAttribute("href")).toBe(
+      "/things/ds%3Aglobal.component.icon-button",
+    );
+  });
+
+  it("names its class alone when the node's address did not compact", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <NodeCommand node={node} />
+        </ul>
+      ),
+      {
+        _meta: {
+          ...MOCK_NODE._meta,
+          curie: "https://ds.canonical.com/global/component/icon-button",
+        },
+      },
+    );
+    expect(container.querySelector(".context")?.textContent).toBe("Component");
+  });
+
+  it("applies custom className", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <NodeCommand className="custom-class" node={node} />
+      </ul>
+    ));
+    expect(
+      container.querySelector(".ds.node-command")?.getAttribute("class"),
+    ).toBe("ds entity-command ds node-command custom-class");
+  });
+
+  it("passes through additional props", () => {
+    renderWithNode((node) => (
+      <ul>
+        <NodeCommand data-testid="test-component" node={node} />
+      </ul>
+    ));
+    expect(screen.getByTestId("test-component").tagName).toBe("LI");
   });
 });

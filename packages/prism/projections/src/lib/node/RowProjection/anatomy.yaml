@@ -1,0 +1,24 @@
+---
+# RowProjection: any graph node as the 32px list entry, dispatched on its
+# type.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
+# matrix: one EntityRow per type, each type filling the slots it has).
+# It renders no element of its own: the case its node's type selects
+# renders the root. A type the package projects reads through its own
+# projection; every other type through the Node projection, from what every
+# node carries. The cases are the composite fragment's aliased spreads, one
+# per type, and the map's arms, by the same names.
+node:
+  uri: prism.component.row_projection
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: prism.component.node_row
+              projection:
+                on: Node
+      relation:
+        cardinality: "1"

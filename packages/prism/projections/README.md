@@ -240,9 +240,13 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 
 ## Public API
 
-- Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
+- Dispatchers: `ChipProjection`, `RowProjection`, `CardProjection`,
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
-  `CardProjectionProps`, `CommandProjectionProps`.
+  `CardProjectionProps`, `CommandProjectionProps`, `ChipArmNative`,
+  `RowArmNative`, `CardArmNative`, `CommandArmNative`.
+- Node projections: `NodeChip`, `NodeRow`, `NodeCard`, `NodeCommand`,
+  `NodeGraphNode`; types `NodeChipProps`, `NodeRowProps`, `NodeCardProps`,
+  `NodeCommandProps`, `NodeGraphNodeProps`.
 - Class projections: `OntologyClassChip`, `OntologyClassRow`,
   `OntologyClassCard`, `OntologyClassCommand`,
   `OntologyClassGraphNode`; types `OntologyClassChipProps`,
@@ -259,7 +263,8 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListView`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
-  `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
-  `ProjectionsProviderProps`.
+  `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
+  `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,
+  `SiteArmProps`.
 - Prose: `markdownComponents`, `ProseReferencesProvider`; types
   `ProseLinkProps`, `ProseReferencesProviderProps`.

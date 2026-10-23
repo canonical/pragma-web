@@ -1,0 +1,57 @@
+---
+# NodeCard: any graph node as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 and 505:2254 (the
+# instance card: the namespace on top, the title, its class, the summary).
+# The location is the compact address's prefix; the kind is the node's
+# class; the summary its asserted definition. Any node carries no key
+# values, vitals or preview, so those slots stay empty.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address; a node without one reads as inert text.
+node:
+  uri: prism.component.node_card
+  projection:
+    on: Node
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: summary
+              projection:
+                field: _meta.definition
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+      relation:
+        cardinality: "1"

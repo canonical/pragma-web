@@ -95,22 +95,29 @@ export const MOCK_ONTOLOGY_PROPERTY_HREF =
 /** A node of a type the site homes: an ontology class. */
 export const ONTOLOGY_CLASS_NODE: NodePayload = {
   __typename: "OntologyClass",
+  __isNode: "OntologyClass",
   uri: "https://ds.canonical.com/UIBlock",
   _meta: {
     curie: "ds:UIBlock",
     title: "UI Block",
-    type: { uri: "http://www.w3.org/2002/07/owl#Class" },
+    definition: "A UI block is a part of an interface a designer composes.",
+    type: {
+      uri: "http://www.w3.org/2002/07/owl#Class",
+      _meta: { title: "Class" },
+    },
   },
 };
 
 /** A node of a type no map names and the site does not home. */
 export const STATION_NODE: NodePayload = {
   __typename: "Station",
+  __isNode: "Station",
   uri: "https://metro.example/station/kings-cross",
   _meta: {
     curie: "metro:station/kings-cross",
     title: "King's Cross",
-    type: { uri: "https://metro.example/Station" },
+    definition: null,
+    type: { uri: "https://metro.example/Station", _meta: { title: "Station" } },
   },
 };
 

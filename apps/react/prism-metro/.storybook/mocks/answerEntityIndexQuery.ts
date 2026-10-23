@@ -12,8 +12,8 @@ const ENTITY_INDEX_QUERY = "EntityIndexQuery";
  * gives every abstract field a placeholder type name, so the site's
  * projection maps would dispatch the entry to the `Node` arm. This answer
  * spells the whole payload instead: the bound class, a count of one, the
- * entry with its type name, its address, its title, its compact address and
- * its class, and no further page.
+ * entry with its type name, its address, its title, its compact address, no
+ * definition, and its class titled by the type name, and no further page.
  *
  * @param entry - The one instance the index lists.
  * @returns The payload builder. It throws on any other operation, so a story
@@ -62,7 +62,11 @@ export default function answerEntityIndexQuery(entry: {
                   _meta: {
                     title: entry.title,
                     curie: entry.curie,
-                    type: { uri: entry.typeUri },
+                    definition: null,
+                    type: {
+                      uri: entry.typeUri,
+                      _meta: { title: entry.typename },
+                    },
                   },
                 },
               },

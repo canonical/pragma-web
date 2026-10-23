@@ -1,6 +1,6 @@
 {
   "name": "@canonical/prism-projections",
-  "description": "The Entity representations of a Prism documentation site: chip, row, card, command and title projections of any graph node, dispatched on its type",
+  "description": "The Entity projections of a Prism documentation site: chip, row, card, command and graph-node components, the Relay projections that fill them from the contract's types, and the dispatchers that render any graph node through its type's arm",
   "version": "0.44.1",
   "type": "module",
   "exports": {

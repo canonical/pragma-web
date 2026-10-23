@@ -117,7 +117,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     const { status, html } = await fetchPage(script, "/lines");
     expect(status).toBe(200);
     expect(html).toMatch(
-      /<li class="ds node-row ds line-row"[^>]*>.*?Circle Line/s,
+      /<li class="ds entity-row ds node-row ds line-row"[^>]*>.*?Circle Line/s,
     );
   });
 

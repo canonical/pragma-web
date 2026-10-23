@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { ChipProjection } from "../../ChipProjection/index.js";
+import { ChipProjection } from "../../node/index.js";
 import { useProseReference } from "../ProseReferences/index.js";
 import type { ProseLinkProps } from "./types.js";
 

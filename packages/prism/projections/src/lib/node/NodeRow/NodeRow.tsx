@@ -1,63 +1,83 @@
+// Scaffolded by @canonical/summon-component:react v0.43.0
+
+import { useHome } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import type { NodeRow_node$key } from "../../../__generated__/NodeRow_node.graphql.js";
-import nodeRowFragmentNode from "../../../__generated__/NodeRow_node.graphql.js";
+import nodeFragment from "../../../__generated__/NodeRow_node.graphql.js";
 import { useProjectionLink } from "../../projections/index.js";
-import type { RowArmProps } from "../../RowProjection/index.js";
+import { EntityRow } from "../../ui/index.js";
+import { findCuriePrefix } from "../../utils/index.js";
+import type { NodeRowProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
-/** What the row of any node reads: the fields every node carries. */
-const nodeRowFragmentSource = (): unknown => graphql`
+/**
+ * The fields NodeRow reads from the Node it renders, which every node
+ * carries: its title, its compact address and its class's title.
+ */
+const declareNodeFragment = (): unknown => graphql`
   fragment NodeRow_node on Node {
+    __typename
     _meta {
       title
       curie
       type {
-        uri
+        _meta {
+          title
+        }
       }
     }
   }
 `;
-void nodeRowFragmentSource;
+void declareNodeFragment;
 /* v8 ignore stop */
 
 const componentCssClassName = "ds node-row";
 
 /**
- * The row of any node: its title, linked to its home when it has one and
- * inert text when it has none, then its compact address as `.location`.
+ * Any graph node as a 32px list entry, from what every node carries: its
+ * namespace prefix, muted with its colon, before its title, linked to its
+ * home when the site has one and inert text when it has none; and its
+ * class's title at the end. A node whose address did not compact has no
+ * prefix.
  *
- * The root carries the node's class IRI as `data-type`, for styling by
- * class; it is the arm's own and wins over the same attribute passed in.
+ * It is the row's `Node` arm: `RowProjection` renders it for every type no
+ * other arm takes.
  *
- * The link renders through the `LinkComponent` the nearest
- * `ProjectionsProvider` holds, so a site's router handles the navigation.
+ * Native props reach the row's `<li>` root; a consumer `className` merges
+ * after the projection's own, and the root carries the typename as
+ * `data-type`.
  *
- * Reachable as `defaultProjectionMaps.row.Node`.
+ * `import { NodeRow } from "@canonical/prism-projections";`
+ *
+ * @implements prism.component.node_row
+ * @note Impure: reads its node from the Relay store, its home from the
+ *   site's homes and its link from the projection provider.
  */
 export default function NodeRow({
   node,
-  href,
   className,
   ...props
-}: RowArmProps): ReactElement {
-  const data = useFragment<NodeRow_node$key>(nodeRowFragmentNode, node);
+}: NodeRowProps): ReactElement {
+  const data = useFragment(nodeFragment, node);
+  const { curie, title, type } = data._meta;
+  const href = useHome({ __typename: data.__typename, uri: curie });
   const LinkComponent = useProjectionLink();
+  const prefix = findCuriePrefix(curie);
   return (
-    <li
+    <EntityRow
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      data-type={data._meta.type.uri}
-    >
-      {href === undefined ? (
-        <span className="title">{data._meta.title}</span>
-      ) : (
-        <LinkComponent className="title" href={href}>
-          {data._meta.title}
-        </LinkComponent>
-      )}{" "}
-      <code className="location">{data._meta.curie}</code>
-    </li>
+      data-type={data.__typename}
+      href={href}
+      LinkComponent={LinkComponent}
+      location={
+        prefix === undefined ? undefined : (
+          <code>{curie.slice(0, prefix.length + 1)}</code>
+        )
+      }
+      meta={type._meta.title}
+      title={title}
+    />
   );
 }

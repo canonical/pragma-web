@@ -37,13 +37,10 @@ const FRAGMENTS = new Map(
   ]),
 );
 
-/** Where the `Node` arms live, still in the package's own layer. */
+/** Where the projections of any node and the dispatchers live. */
 const NODE_DIRECTORY = fileURLToPath(
   new URL("../../lib/node", import.meta.url),
 );
-
-/** The semantic tokens the `Node` arms read beyond the shim. */
-const NODE_TOKENS = ["--color-border-muted", "--color-text-muted"];
 
 /** The semantic tokens the generic representations read beyond the shim. */
 const UI_TOKENS = [
@@ -64,7 +61,10 @@ const UI_TOKENS = [
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);
 
-const projectionFolders = listAnatomyFolders([ONTOLOGY_DIRECTORY]);
+const projectionFolders = listAnatomyFolders([
+  NODE_DIRECTORY,
+  ONTOLOGY_DIRECTORY,
+]);
 
 describe("the package's components", () => {
   it("are the generic representations, each under src/lib/ui", () => {
@@ -78,8 +78,17 @@ describe("the package's components", () => {
     ]);
   });
 
-  it("and the projections, each under its type's subject folder", () => {
+  it("and the projections and dispatchers, each under its type's subject folder", () => {
     expect(projectionFolders.map((folder) => basename(folder))).toEqual([
+      "CardProjection",
+      "ChipProjection",
+      "CommandProjection",
+      "NodeCard",
+      "NodeChip",
+      "NodeCommand",
+      "NodeGraphNode",
+      "NodeRow",
+      "RowProjection",
       "OntologyClassCard",
       "OntologyClassChip",
       "OntologyClassCommand",
@@ -122,22 +131,11 @@ describe("the package's stylesheets", () => {
     ).not.toThrow();
   });
 
-  it("keep the design's token and grid rules in the projections", () => {
-    expect(() =>
-      assertStylesheets({
-        directory: ONTOLOGY_DIRECTORY,
-        layer: "ds.components.global",
-      }),
-    ).not.toThrow();
-  });
-
-  it("keep the design's token and grid rules in the Node arms", () => {
-    expect(() =>
-      assertStylesheets({
-        directory: NODE_DIRECTORY,
-        layer: "ds.prism",
-        externalTokens: NODE_TOKENS,
-      }),
-    ).not.toThrow();
-  });
+  for (const directory of [NODE_DIRECTORY, ONTOLOGY_DIRECTORY]) {
+    it(`keep the design's token and grid rules in ${basename(directory)}'s projections`, () => {
+      expect(() =>
+        assertStylesheets({ directory, layer: "ds.components.global" }),
+      ).not.toThrow();
+    });
+  }
 });

@@ -33,16 +33,15 @@ describe("the station card", () => {
     const { container } = renderLensPage("/stations", graph.url);
     fireEvent.click(await screen.findByRole("button", { name: "Cards" }));
     await waitFor(() => {
-      expect(container.querySelectorAll("article.station-card")).toHaveLength(
+      expect(container.querySelectorAll(".ds.station-card")).toHaveLength(
         STATION_COUNT,
       );
     });
     expect(
-      container.querySelectorAll("article.station-card.interchange"),
+      container.querySelectorAll(".ds.station-card.interchange"),
     ).toHaveLength(INTERCHANGE_COUNT);
     expect(
-      container.querySelector("article.station-card.interchange h3")
-        ?.textContent,
+      container.querySelector(".ds.station-card.interchange h3")?.textContent,
     ).toBe(CENTRAL_EXCHANGE_TITLE);
   });
 });
@@ -76,7 +75,7 @@ describe("a fare zone", () => {
     expect(chips.map((chip) => chip.textContent)).toContain(ZONE_TITLE);
     for (const chip of chips) {
       expect(chip.querySelector("a")).toBeNull();
-      expect(chip.className).toBe("ds node-chip");
+      expect(chip.className).toBe("ds entity-chip ds node-chip");
     }
   });
 });

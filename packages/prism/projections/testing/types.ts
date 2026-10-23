@@ -1,13 +1,22 @@
 import type { ReactNode } from "react";
 
-/** A node payload as a provider answers it: what every representation reads. */
+/**
+ * A node payload as a provider answers it: what every dispatcher reads,
+ * with the typename again under `__isNode`, the key an operation asks the
+ * type by for a spread on the `Node` interface.
+ */
 export interface NodePayload {
   readonly __typename: string;
+  readonly __isNode: string;
   readonly uri: string;
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: { readonly uri: string };
+    readonly definition: string | null;
+    readonly type: {
+      readonly uri: string;
+      readonly _meta: { readonly title: string };
+    };
   };
 }
 

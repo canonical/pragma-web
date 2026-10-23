@@ -7,11 +7,13 @@ import {
   ONTOLOGY_CLASS_HREF,
   ONTOLOGY_CLASS_NODE,
 } from "../../../testing/fixtures.js";
-import { CardProjection } from "../CardProjection/index.js";
-import { ChipProjection } from "../ChipProjection/index.js";
-import { CommandProjection } from "../CommandProjection/index.js";
-import { defaultProjectionMaps } from "../node/index.js";
-import { RowProjection } from "../RowProjection/index.js";
+import {
+  CardProjection,
+  ChipProjection,
+  CommandProjection,
+  defaultProjectionMaps,
+  RowProjection,
+} from "../node/index.js";
 import useProjectionMaps from "./hooks/useProjectionMaps.js";
 import ProjectionsProvider from "./Provider.js";
 
@@ -34,7 +36,7 @@ const RouterLink = ({
 );
 
 describe("ProjectionsProvider", () => {
-  it("hands its maps to every representation below it", () => {
+  it("hands its maps to every dispatcher below it", () => {
     render(
       <ProjectionsProvider maps={defaultProjectionMaps}>
         <MapsProbe />
@@ -43,7 +45,7 @@ describe("ProjectionsProvider", () => {
     expect(screen.getByText("default maps")).toBeInTheDocument();
   });
 
-  it("renders every representation's link to a home through its LinkComponent", () => {
+  it("renders every form's link to a home through its LinkComponent", () => {
     const { container } = render(
       createNodePage(
         ONTOLOGY_CLASS_NODE,

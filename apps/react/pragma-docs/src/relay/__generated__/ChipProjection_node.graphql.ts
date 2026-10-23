@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<39d61372f4b619ebaf0e13ebaea3e665>>
+ * @generated SignedSource<<f202fdf81e5ac185e0538ae12186091f>>
  * @lightSyntaxTransform
  */
 
@@ -11,10 +11,9 @@ import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type ChipProjection_node$data = {
   readonly __typename: string;
-  readonly _meta: {
-    readonly curie: string;
+  readonly Node: {
+    readonly " $fragmentSpreads": FragmentRefs<"NodeChip_node">;
   };
-  readonly " $fragmentSpreads": FragmentRefs<"NodeChip_node">;
   readonly " $fragmentType": "ChipProjection_node";
 };
 export type ChipProjection_node$key = {
@@ -36,33 +35,26 @@ const node: ReaderFragment = {
       "storageKey": null
     },
     {
-      "alias": null,
-      "args": null,
-      "concreteType": "EntityMeta",
-      "kind": "LinkedField",
-      "name": "_meta",
-      "plural": false,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "curie",
-          "storageKey": null
-        }
-      ],
-      "storageKey": null
-    },
-    {
-      "args": null,
-      "kind": "FragmentSpread",
-      "name": "NodeChip_node"
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "NodeChip_node"
+          }
+        ],
+        "type": "Node",
+        "abstractKey": "__isNode"
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "Node"
     }
   ],
   "type": "Node",
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "cdd420dbf54a1f41c82204f08bd96d92";
+(node as any).hash = "69bdb5a05f727063c83ea8f4bea72893";
 
 export default node;
