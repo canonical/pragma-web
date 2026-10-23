@@ -271,10 +271,12 @@ dispatcher the site renders itself, takes a name of its own, need not
 spread the slot, and then arms no type under `siteTypes`; a map that does
 over a composite with no slot throws on the first such node.
 
-A site with types of its own compiles the package's documents against its
-own schema, excludes `src/lib/site/` from its compile, and defines the
-five fragments itself, each spreading its arms' fragments aliased by the
-type they are on:
+A site with types of its own takes three steps: it compiles the
+package's documents against its own schema, excluding `src/lib/site/`
+from its compile; it defines the five fragments itself; and it makes its
+bundler run the package's dispatchers on its own compile, as the last
+paragraph of this section describes. Each fragment spreads its arms'
+fragments aliased by the type they are on:
 
 ```graphql
 fragment SiteCardSlot_node on Node {
@@ -300,10 +302,16 @@ const maps: ProjectionMaps = {
 ```
 
 The package's dispatchers import the composites' artifacts their own
-compile writes, so a site runs them on its own compile: its bundler
-resolves the package's artifact imports to the artifacts of the same
-name the site's compile writes, so the package's queries fetch what the
-site's arms read.
+compile writes, which spread the default slots. A site that defines the
+slots must therefore configure its bundler to resolve the package's
+artifact imports, `…/__generated__/<Name>.graphql.js` from any package
+source its `relay.config.json` lists, to the artifacts of the same name
+its own compile writes; without that step its arms find no data under
+their slot and throw on the first node. The package does not ship this
+step: a bundler loads its configuration under Node, which does not run
+a source-shipped package's TypeScript. The metro app's Vite plugin,
+`apps/react/prism-metro/src/relay/redirectPackageArtifacts.ts`, is the
+reference implementation a site copies.
 
 ## List view
 
