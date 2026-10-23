@@ -134,15 +134,23 @@ a drawer below three groups of columns.
   hollow head at each superclass, relations bundled per pair with a filled
   head at each range, self-relations as one loop, hubs taller. It is drawn
   as native SVG, each class an `EntityGraphNode`, inside prism-core's
-  `GraphCanvas`, which fits the graph on first paint and pans and zooms with
-  `d3-zoom` on the client. Text below 12px on screen is not drawn. Pointing
+  `GraphCanvas`, which pans and zooms with `d3-zoom` on the client. The
+  canvas opens on the whole graph when it fits there at a zoom where every
+  label renders at 12px or more, else on a legible window of it, around the
+  class a term page selects, whose left, top and right edges cut through no
+  box; once the client has measured the canvas it opens on the window that
+  size calls for. A filter's refit or a picked namespace never zooms a
+  legible view out to an illegible one; Fit fits the whole. Text below
+  12px on screen is not drawn. Pointing
   at or focusing a class fades everything outside its neighbourhood and
   labels its relations; the selection is ringed and its lineage drawn; the
   arrows move along the tree. Below one group of columns the graph becomes
   rows in rail order for a phone.
 - **The term inspector** shows the selected term in sections (lineage,
   definition, subclasses, fields, relations, instances for a class; kind,
-  range, domain and inverse for a property), every reference a term link.
+  range, domain and inverse for a property), every reference a term link,
+  on the inspector region's three columns: a key or a field's name on the
+  first, its value on the rest, row after row.
   With no term it explains the graph with a legend drawn by the graph's own
   code, a row per namespace that fits the camera to it, and the gestures.
 
@@ -162,6 +170,8 @@ the decision, so a site also retunes those through its theme:
   `--color-background-layer2`, `--color-border`, `--color-border-muted`,
   `--color-focus-ring`;
 - type: the semantic `--typography-text-*` sizes, weights and code family;
+- motion: `--motion-duration-fast`, the graph's fade, which reduced motion
+  zeroes;
 - space: `--component-padding-*`, `--container-gap-*`, `--grid-gutter` and
   the `--space-*` steps.
 
