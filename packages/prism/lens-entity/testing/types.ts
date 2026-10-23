@@ -1,4 +1,5 @@
 import type { EntityBinding } from "@canonical/prism-core";
+import type { MemoryAdapter } from "@canonical/router-core";
 import type { ReactNode } from "react";
 import type {
   Environment,
@@ -70,6 +71,12 @@ export interface EntitySiteSetup {
    * server renders with, when omitted.
    */
   readonly navigable?: boolean;
+  /**
+   * The memory history a navigable router runs over, handed in so a test
+   * can read the address and walk the history back; a fresh one at `url`
+   * when omitted.
+   */
+  readonly history?: MemoryAdapter;
 }
 
 /** What a server render of one page hands the client. */
