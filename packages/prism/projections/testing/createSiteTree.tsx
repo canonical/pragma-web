@@ -1,17 +1,6 @@
-import {
-  createEnvironment,
-  type HomeNode,
-  type HomeResolver,
-  type Homes,
-  HomesProvider,
-} from "@canonical/prism-core";
+import { createEnvironment, HomesProvider } from "@canonical/prism-core";
 import type { LinkComponent } from "@canonical/react-ds-global";
-import {
-  createMemoryAdapter,
-  createRouter,
-  type Router,
-  route,
-} from "@canonical/router-core";
+import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
@@ -21,25 +10,7 @@ import {
   type ProjectionMaps,
   ProjectionsProvider,
 } from "../src/lib/projections/index.js";
-
-/** A site's route table with one entity page, addressed by the entity. */
-const THING_ROUTES = {
-  thing: route({ url: "/things/:uri", content: () => null }),
-} as const;
-
-/** Build the thing page's href for `node`, through the router. */
-const buildThingPath = (
-  node: HomeNode,
-  router: Router<typeof THING_ROUTES>,
-): string => router.buildPath("thing", { params: { uri: node.uri } });
-
-/**
- * The site's homes: ontology classes live on the thing page. Typed over the
- * fixture table: a site registers its own route map, a test cannot.
- */
-const HOMES: Homes = {
-  OntologyClass: buildThingPath as unknown as HomeResolver,
-};
+import { HOMES, THING_ROUTES } from "./fixtures.js";
 
 /** Options for `createSiteTree`. */
 export interface SiteTreeOptions {
