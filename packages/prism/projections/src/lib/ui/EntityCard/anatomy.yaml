@@ -48,6 +48,10 @@
 # after them on the page, so a reader and the keyboard reach the title
 # before the example's own controls. It is placed on every row track, so a
 # tall example grows the card's body and footer.
+# The example must fit two intrinsic columns, the sidecar's width at every
+# size of the grid less its inline insets (138px at a phone's width): a
+# component with its default props fits; a strip of its variants as tabs
+# does not, and would hide its last tabs out of view.
 #
 # The Card draws a divider under every section but its last child. With
 # the sidecar last, the section it follows, the footer or a body without
