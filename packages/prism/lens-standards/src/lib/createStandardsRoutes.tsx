@@ -1,10 +1,10 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
 import { MESSAGES } from "./i18n/index.js";
-import { StandardReadingPage } from "./StandardReadingPage/index.js";
-import { StandardsIcon } from "./StandardsIcon/index.js";
-import { StandardsPage } from "./StandardsPage/index.js";
 import type { StandardsBinding, StandardsRoutes } from "./types.js";
+import { StandardReadingPage } from "./ui/StandardReadingPage/index.js";
+import { StandardsIcon } from "./ui/StandardsIcon/index.js";
+import { StandardsPage } from "./ui/StandardsPage/index.js";
 import warmStandardEntity from "./warmStandardEntity.js";
 import warmStandardsIndex from "./warmStandardsIndex.js";
 
