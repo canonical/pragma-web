@@ -3,7 +3,8 @@
 /**
  * The page grid and the scroll model, measured in a real browser: the metro
  * graph in its own process and the dev cell pointed at it serve a workspace
- * page and a document page, and Chromium lays each out once at a desktop and
+ * page and two document pages, a station's page and the landing, and
+ * Chromium lays each out once at a desktop and
  * a phone width, measuring it in the light and the dark theme. What is
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
@@ -32,8 +33,12 @@ import type { RunningServer } from "./types.js";
 
 const CWD = process.cwd();
 
-/** A page on the document archetype: a station's entity page. */
-const DOCUMENT_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
+/** The pages on the document archetype: a station's entity page and the
+ * landing. */
+const DOCUMENT_PATHS = [
+  `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
+  "/",
+] as const;
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -113,14 +118,17 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
-  it("lays the document on the one grid, scrolling only its canvas and its rail", async () => {
-    const measures = await measure(DOCUMENT_PATH);
-    expectGrid(measures);
-    for (const { theme, measure: layout } of measures) {
-      expect(layout.canvas.overflow, theme).toBe("auto");
-      for (const scroller of layout.scrollers) {
-        expect(["main.ds.canvas", "div.rail"], theme).toContain(scroller);
+  it.each(DOCUMENT_PATHS)(
+    "lays the document %s on the one grid, scrolling only its canvas and its rail",
+    async (path) => {
+      const measures = await measure(path);
+      expectGrid(measures);
+      for (const { theme, measure: layout } of measures) {
+        expect(layout.canvas.overflow, theme).toBe("auto");
+        for (const scroller of layout.scrollers) {
+          expect(["main.ds.canvas", "div.rail"], theme).toContain(scroller);
+        }
       }
-    }
-  });
+    },
+  );
 });

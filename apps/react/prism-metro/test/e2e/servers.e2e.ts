@@ -95,7 +95,15 @@ describe("the server matrix serves correctly", () => {
             expect(sitemap.headers.get("content-type")).toMatch(/xml/);
             const xml = await sitemap.text();
             expect(xml).toContain("<urlset");
+            expect(xml).toMatch(/<loc>https?:\/\/[^/<]+\/<\/loc>/);
             expect(xml).toContain("/stations</loc>");
+
+            // 6. The landing answers at the root, under its own title.
+            const landing = await fetch(`${server.base}/`);
+            expect(landing.status).toBe(200);
+            expect(await landing.text()).toContain(
+              "<title>Overview — Metro</title>",
+            );
           }
         } finally {
           await server.stop();
