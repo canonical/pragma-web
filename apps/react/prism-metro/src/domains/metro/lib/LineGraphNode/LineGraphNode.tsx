@@ -7,7 +7,7 @@ import {
 } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import nodeFragment from "../../../../relay/__generated__/LineGraphNode_node.graphql.js";
+import nodeFragment from "#relay/__generated__/LineGraphNode_node.graphql.js";
 import type { LineGraphNodeProps } from "./types.js";
 import "./styles.css";
 

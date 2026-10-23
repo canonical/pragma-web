@@ -5,15 +5,15 @@ import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
+import testQuery, {
+  type LineCardTestQuery,
+} from "#relay/__generated__/LineCardTestQuery.graphql.js";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import {
   MOCK_LINE,
   MOCK_LOOP_LINE,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import testQuery, {
-  type LineCardTestQuery,
-} from "../../../../relay/__generated__/LineCardTestQuery.graphql.js";
 import LineCard from "./LineCard.js";
 import type { LineCardProps } from "./types.js";
 

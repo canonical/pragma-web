@@ -5,11 +5,11 @@ import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
-import createProjectionTree from "../../../../../testing/createProjectionTree.js";
-import { MOCK_LINE, resolveRoot } from "../../../../../testing/fixtures.js";
 import testQuery, {
   type LineRowTestQuery,
-} from "../../../../relay/__generated__/LineRowTestQuery.graphql.js";
+} from "#relay/__generated__/LineRowTestQuery.graphql.js";
+import createProjectionTree from "../../../../../testing/createProjectionTree.js";
+import { MOCK_LINE, resolveRoot } from "../../../../../testing/fixtures.js";
 import LineRow from "./LineRow.js";
 import type { LineRowProps } from "./types.js";
 

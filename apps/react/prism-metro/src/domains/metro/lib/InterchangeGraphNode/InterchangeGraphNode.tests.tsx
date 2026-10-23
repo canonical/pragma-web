@@ -5,14 +5,14 @@ import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
+import testQuery, {
+  type InterchangeGraphNodeTestQuery,
+} from "#relay/__generated__/InterchangeGraphNodeTestQuery.graphql.js";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import {
   MOCK_INTERCHANGE,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import testQuery, {
-  type InterchangeGraphNodeTestQuery,
-} from "../../../../relay/__generated__/InterchangeGraphNodeTestQuery.graphql.js";
 import InterchangeGraphNode from "./InterchangeGraphNode.js";
 import type { InterchangeGraphNodeProps } from "./types.js";
 

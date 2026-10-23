@@ -7,14 +7,14 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type LineChipStoryQuery,
+} from "#relay/__generated__/LineChipStoryQuery.graphql.js";
 import {
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
 import { MOCK_LINE, resolveRoot } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type LineChipStoryQuery,
-} from "../../../../relay/__generated__/LineChipStoryQuery.graphql.js";
 import Component from "./LineChip.js";
 import type { LineChipProps } from "./types.js";
 

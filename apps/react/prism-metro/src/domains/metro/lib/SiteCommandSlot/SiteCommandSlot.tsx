@@ -2,7 +2,7 @@
 
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import nodeFragment from "../../../../relay/__generated__/SiteCommandSlot_node.graphql.js";
+import nodeFragment from "#relay/__generated__/SiteCommandSlot_node.graphql.js";
 import assertSiteKey from "../../assertSiteKey.js";
 import { InterchangeCommand } from "../InterchangeCommand/index.js";
 import { LineCommand } from "../LineCommand/index.js";

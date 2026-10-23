@@ -5,6 +5,9 @@ import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import testQuery, {
+  type SiteChipSlotTestQuery,
+} from "#relay/__generated__/SiteChipSlotTestQuery.graphql.js";
 import createProjectionTree from "../../../../../testing/createProjectionTree.js";
 import {
   MOCK_INTERCHANGE,
@@ -13,9 +16,6 @@ import {
   MOCK_ZONE,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import testQuery, {
-  type SiteChipSlotTestQuery,
-} from "../../../../relay/__generated__/SiteChipSlotTestQuery.graphql.js";
 import SiteChipSlot from "./SiteChipSlot.js";
 import type { SiteChipSlotProps } from "./types.js";
 

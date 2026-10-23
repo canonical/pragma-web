@@ -7,6 +7,9 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type SiteGraphNodeSlotStoryQuery,
+} from "#relay/__generated__/SiteGraphNodeSlotStoryQuery.graphql.js";
 import {
   withProjections,
   withRouter,
@@ -19,9 +22,6 @@ import {
   MOCK_ZONE,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type SiteGraphNodeSlotStoryQuery,
-} from "../../../../relay/__generated__/SiteGraphNodeSlotStoryQuery.graphql.js";
 import Component from "./SiteGraphNodeSlot.js";
 import type { SiteGraphNodeSlotProps } from "./types.js";
 

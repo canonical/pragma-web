@@ -5,7 +5,7 @@ import { EntityCard, useProjectionLink } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
-import nodeFragment from "../../../../relay/__generated__/StationCard_node.graphql.js";
+import nodeFragment from "#relay/__generated__/StationCard_node.graphql.js";
 import buildStopKeyValues from "../../buildStopKeyValues.js";
 import type { StationCardProps } from "./types.js";
 import "./styles.css";

@@ -1,7 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import type { ComponentProps } from "react";
-import type { LineRow_node$key } from "../../../../relay/__generated__/LineRow_node.graphql.js";
+import type { LineRow_node$key } from "#relay/__generated__/LineRow_node.graphql.js";
 
 type OwnProps = {
   /**

@@ -7,6 +7,9 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type InterchangeRowStoryQuery,
+} from "#relay/__generated__/InterchangeRowStoryQuery.graphql.js";
 import {
   withList,
   withProjections,
@@ -16,9 +19,6 @@ import {
   MOCK_INTERCHANGE,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type InterchangeRowStoryQuery,
-} from "../../../../relay/__generated__/InterchangeRowStoryQuery.graphql.js";
 import Component from "./InterchangeRow.js";
 import type { InterchangeRowProps } from "./types.js";
 

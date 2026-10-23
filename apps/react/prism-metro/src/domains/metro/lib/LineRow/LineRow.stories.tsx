@@ -7,6 +7,9 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type LineRowStoryQuery,
+} from "#relay/__generated__/LineRowStoryQuery.graphql.js";
 import {
   withList,
   withProjections,
@@ -17,9 +20,6 @@ import {
   MOCK_LOOP_LINE,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type LineRowStoryQuery,
-} from "../../../../relay/__generated__/LineRowStoryQuery.graphql.js";
 import Component from "./LineRow.js";
 import type { LineRowProps } from "./types.js";
 

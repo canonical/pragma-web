@@ -10,11 +10,11 @@ import {
 import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import { metroProjectionMaps } from "#domains/metro";
-import siteCardSlotNode from "../../relay/__generated__/SiteCardSlot_node.graphql.js";
-import siteChipSlotNode from "../../relay/__generated__/SiteChipSlot_node.graphql.js";
-import siteCommandSlotNode from "../../relay/__generated__/SiteCommandSlot_node.graphql.js";
-import siteGraphNodeSlotNode from "../../relay/__generated__/SiteGraphNodeSlot_node.graphql.js";
-import siteRowSlotNode from "../../relay/__generated__/SiteRowSlot_node.graphql.js";
+import siteCardSlotNode from "#relay/__generated__/SiteCardSlot_node.graphql.js";
+import siteChipSlotNode from "#relay/__generated__/SiteChipSlot_node.graphql.js";
+import siteCommandSlotNode from "#relay/__generated__/SiteCommandSlot_node.graphql.js";
+import siteGraphNodeSlotNode from "#relay/__generated__/SiteGraphNodeSlot_node.graphql.js";
+import siteRowSlotNode from "#relay/__generated__/SiteRowSlot_node.graphql.js";
 
 /** Where the metro domain's components live. */
 const METRO_LIBRARY = fileURLToPath(

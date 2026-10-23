@@ -7,6 +7,9 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type LineCardStoryQuery,
+} from "#relay/__generated__/LineCardStoryQuery.graphql.js";
 import {
   withProjections,
   withRouter,
@@ -16,9 +19,6 @@ import {
   MOCK_LOOP_LINE,
   resolveRoot,
 } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type LineCardStoryQuery,
-} from "../../../../relay/__generated__/LineCardStoryQuery.graphql.js";
 import Component from "./LineCard.js";
 import type { LineCardProps } from "./types.js";
 

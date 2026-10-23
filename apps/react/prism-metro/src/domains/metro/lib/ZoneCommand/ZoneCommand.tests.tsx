@@ -5,11 +5,11 @@ import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
-import createProjectionTree from "../../../../../testing/createProjectionTree.js";
-import { MOCK_ZONE, resolveRoot } from "../../../../../testing/fixtures.js";
 import testQuery, {
   type ZoneCommandTestQuery,
-} from "../../../../relay/__generated__/ZoneCommandTestQuery.graphql.js";
+} from "#relay/__generated__/ZoneCommandTestQuery.graphql.js";
+import createProjectionTree from "../../../../../testing/createProjectionTree.js";
+import { MOCK_ZONE, resolveRoot } from "../../../../../testing/fixtures.js";
 import type { ZoneCommandProps } from "./types.js";
 import ZoneCommand from "./ZoneCommand.js";
 

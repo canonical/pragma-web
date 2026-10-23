@@ -7,15 +7,15 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type StationCommandStoryQuery,
+} from "#relay/__generated__/StationCommandStoryQuery.graphql.js";
 import {
   withList,
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
 import { MOCK_STATION, resolveRoot } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type StationCommandStoryQuery,
-} from "../../../../relay/__generated__/StationCommandStoryQuery.graphql.js";
 import Component from "./StationCommand.js";
 import type { StationCommandProps } from "./types.js";
 

@@ -5,7 +5,7 @@ import { EntityCommand, useProjectionLink } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
-import nodeFragment from "../../../../relay/__generated__/LineCommand_node.graphql.js";
+import nodeFragment from "#relay/__generated__/LineCommand_node.graphql.js";
 import type { LineCommandProps } from "./types.js";
 import "./styles.css";
 

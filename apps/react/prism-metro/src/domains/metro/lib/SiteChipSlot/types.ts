@@ -1,7 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import type { ComponentProps, ReactNode } from "react";
-import type { SiteChipSlot_node$key } from "../../../../relay/__generated__/SiteChipSlot_node.graphql.js";
+import type { SiteChipSlot_node$key } from "#relay/__generated__/SiteChipSlot_node.graphql.js";
 
 type OwnProps = {
   /**

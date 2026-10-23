@@ -2,7 +2,7 @@
 
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import nodeFragment from "../../../../relay/__generated__/SiteCardSlot_node.graphql.js";
+import nodeFragment from "#relay/__generated__/SiteCardSlot_node.graphql.js";
 import assertSiteKey from "../../assertSiteKey.js";
 import { InterchangeCard } from "../InterchangeCard/index.js";
 import { LineCard } from "../LineCard/index.js";

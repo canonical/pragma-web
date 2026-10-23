@@ -11,6 +11,7 @@
     "#lib/site": "./src/lib/site/index.ts",
     "#lib/ui": "./src/lib/ui/index.ts",
     "#relay": "./src/relay/index.ts",
+    "#relay/__generated__/*": "./src/relay/__generated__/*",
     "#server": "./src/server/index.ts",
     "#sitemap": "./src/sitemap/index.ts"
   },

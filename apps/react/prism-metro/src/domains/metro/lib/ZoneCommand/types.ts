@@ -1,7 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import type { ComponentProps } from "react";
-import type { ZoneCommand_node$key } from "../../../../relay/__generated__/ZoneCommand_node.graphql.js";
+import type { ZoneCommand_node$key } from "#relay/__generated__/ZoneCommand_node.graphql.js";
 
 type OwnProps = {
   /**

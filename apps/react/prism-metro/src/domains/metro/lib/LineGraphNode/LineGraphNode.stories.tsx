@@ -7,15 +7,15 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type LineGraphNodeStoryQuery,
+} from "#relay/__generated__/LineGraphNodeStoryQuery.graphql.js";
 import {
   withProjections,
   withRouter,
   withSvg,
 } from "../../../../../.storybook/decorators/index.js";
 import { MOCK_LINE, resolveRoot } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type LineGraphNodeStoryQuery,
-} from "../../../../relay/__generated__/LineGraphNodeStoryQuery.graphql.js";
 import Component from "./LineGraphNode.js";
 import type { LineGraphNodeProps } from "./types.js";
 

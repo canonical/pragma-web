@@ -7,14 +7,14 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
+import storyQuery, {
+  type ZoneCardStoryQuery,
+} from "#relay/__generated__/ZoneCardStoryQuery.graphql.js";
 import {
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
 import { MOCK_ZONE, resolveRoot } from "../../../../../testing/fixtures.js";
-import storyQuery, {
-  type ZoneCardStoryQuery,
-} from "../../../../relay/__generated__/ZoneCardStoryQuery.graphql.js";
 import type { ZoneCardProps } from "./types.js";
 import Component from "./ZoneCard.js";
 

@@ -4,7 +4,7 @@ import { useHome } from "@canonical/prism-core";
 import { EntityChip, useProjectionLink } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
-import nodeFragment from "../../../../relay/__generated__/StationChip_node.graphql.js";
+import nodeFragment from "#relay/__generated__/StationChip_node.graphql.js";
 import type { StationChipProps } from "./types.js";
 import "./styles.css";
 
