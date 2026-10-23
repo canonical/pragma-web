@@ -2,7 +2,8 @@
 # GraphOverview — the inspector with no selection: the legend, each row a
 # tiny graph drawn by the graph's own layout and drawing over what it
 # means, scaled down to the inspector's width where it is wider; a row per namespace with its figures, each a button that fits the
-# graph's camera to that region; and how to move about the graph. Its
+# graph's camera to that region; and how to move about the graph. A
+# subgrid of the inspector's columns, its rows spanning them all; its
 # sections and their labels are the inspector's.
 # Reference: the graph heuristics' empty inspector (G29).
 #
@@ -20,13 +21,19 @@
 #     semantic gap is admitted inside a row.
 #
 # Roster namespaces (accepted and tracked): container.gap.tight,
-# space.050, space.100, and the semantic typography symbols.
+# grid.gutter, space.050, space.100, and the semantic typography symbols.
 node:
   uri: prism.component.graph_overview
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
   edges:
     - node:
         role: legend
         styles:
+          layout.grid.column: "1 / -1"
           layout.type: flex
           layout.direction: column
           spacing.gap: space.100
@@ -64,6 +71,7 @@ node:
     - node:
         role: namespaces
         styles:
+          layout.grid.column: "1 / -1"
           layout.type: flex
           layout.direction: column
           spacing.gap: space.050
@@ -115,6 +123,7 @@ node:
     - node:
         role: gestures
         styles:
+          layout.grid.column: "1 / -1"
           spacing.external.block.start: 0
           spacing.external.block.end: 0
       relation: { cardinality: "1", slotName: gestures }

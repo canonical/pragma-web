@@ -42,21 +42,23 @@ export default function RelationList({
               uri={predicate.uri}
             />
           </span>
-          <span aria-hidden="true" className="arrow">
-            {direction === "outgoing"
-              ? DIRECTION_ARROWS.right
-              : DIRECTION_ARROWS.left}
-          </span>
-          <span className="other">
-            {other === null ? (
-              t("inspector.domain.unstated")
-            ) : (
-              <TermLink
-                label={other.label}
-                namespaces={namespaces}
-                uri={other.uri}
-              />
-            )}
+          <span className="end">
+            <span aria-hidden="true" className="arrow">
+              {direction === "outgoing"
+                ? DIRECTION_ARROWS.right
+                : DIRECTION_ARROWS.left}
+            </span>
+            <span className="other">
+              {other === null ? (
+                t("inspector.domain.unstated")
+              ) : (
+                <TermLink
+                  label={other.label}
+                  namespaces={namespaces}
+                  uri={other.uri}
+                />
+              )}
+            </span>
           </span>
         </li>
       ))}

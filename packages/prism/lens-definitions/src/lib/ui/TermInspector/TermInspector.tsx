@@ -149,9 +149,11 @@ const componentCssClassName = "ds term-inspector";
  * section model, its class view or its property view, whichever the lookup
  * resolved; with no selection, an overview of the graph (its legend, its
  * namespaces, its gestures); and an alert for a term the graph does not
- * know. It stacks its sections in one column, every row breaking where the
- * inspector's width runs out, and it announces a new term politely as it
- * swaps its content in place.
+ * know. It is a subgrid of the inspector region's three columns, and its
+ * views, sections and lists are subgrids of them in turn, so a key or a
+ * field's name sits on the first column and its value on the rest, row
+ * after row; it announces a new term politely as it swaps its content in
+ * place.
  *
  * `import { TermInspector } from "../TermInspector/index.js";`
  *
@@ -188,6 +190,7 @@ export default function TermInspector({
   } else if (classData) {
     body = (
       <ClassView
+        className="view"
         data={classData}
         namespaces={namespaces}
         ontologies={ontologyData}
@@ -196,7 +199,12 @@ export default function TermInspector({
     );
   } else if (propertyData) {
     body = (
-      <PropertyView data={propertyData} namespaces={namespaces} term={term} />
+      <PropertyView
+        className="view"
+        data={propertyData}
+        namespaces={namespaces}
+        term={term}
+      />
     );
   } else {
     body = (

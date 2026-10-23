@@ -16,6 +16,6 @@ describe("PropertyView SSR", () => {
         <InspectorProbe term={PROPERTY_TERM} />,
       ),
     );
-    expect(html).toContain('class="ds property-view"');
+    expect(html).toContain('class="ds property-view view"');
   });
 });

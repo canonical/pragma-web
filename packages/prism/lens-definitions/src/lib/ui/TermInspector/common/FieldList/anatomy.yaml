@@ -1,7 +1,11 @@
 ---
 # FieldList — a class's fields in the inspector: one row each, the field's
 # link, its range as code and its notes, its definition beneath, quieter.
-# Rows wrap where the inspector's width runs out.
+# A subgrid of the inspector's three columns, and each row a subgrid of
+# it: the name on the first column, the range on the second, the notes on
+# the third, the definition across all three, so every row's cells line up
+# with the rows above; a cell wraps inside its column. Its gap is the
+# grid's gutter.
 # Reference: the ontology explorer's inspector field rows.
 #
 # Why not a published component: the published lists carry no record
@@ -10,15 +14,15 @@
 # Every decision is read through a component token declared on the root
 # (`--field-list-*`), bound to the symbol named here.
 #
-# Token ledger:
-#   space.100: the gap between a row's parts; no semantic gap is admitted
-#     inside a row.
-#
-# Roster namespaces (accepted and tracked): container.gap.tight,
-# space.100, and the semantic typography symbols.
+# Roster namespaces (accepted and tracked): grid.gutter, and the semantic
+# typography symbols.
 node:
   uri: prism.component.field_list
   styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
     spacing.external.block.start: 0
     spacing.external.block.end: 0
     spacing.internal.inline.start: 0
@@ -27,31 +31,35 @@ node:
     - node:
         role: row
         styles:
-          layout.type: flex
-          layout.wrap: wrap
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
           layout.align: baseline
-          spacing.gap: space.100
-          spacing.internal.block.start: container.gap.tight
-          spacing.internal.block.end: container.gap.tight
+          spacing.gap: grid.gutter
         edges:
           - node:
               role: field
               styles:
+                layout.grid.column: "1 / span 1"
                 typography.wrap: anywhere
             relation: { cardinality: "1", slotName: field }
           - node:
               role: range
+              styles:
+                layout.grid.column: "2 / span 1"
+                typography.wrap: anywhere
             relation: { cardinality: "1", slotName: range }
           - node:
               role: notes
               styles:
+                layout.grid.column: "3 / -1"
                 typography.size: typography.text.secondary.fontSize
                 typography.color: color.text.muted
             relation: { cardinality: "1", slotName: notes }
           - node:
               role: definition
               styles:
-                layout.flex.basis: 100%
+                layout.grid.column: "1 / -1"
                 typography.size: typography.text.secondary.fontSize
                 typography.color: color.text.muted
             relation: { cardinality: "0..1", slotName: definition }

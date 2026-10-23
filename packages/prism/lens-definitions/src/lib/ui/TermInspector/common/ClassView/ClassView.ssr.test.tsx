@@ -16,6 +16,6 @@ describe("ClassView SSR", () => {
         <InspectorProbe term={UIBLOCK_TERM} />,
       ),
     );
-    expect(html).toContain('class="ds class-view"');
+    expect(html).toContain('class="ds class-view view"');
   });
 });

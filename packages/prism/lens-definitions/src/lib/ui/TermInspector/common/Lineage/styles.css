@@ -7,6 +7,7 @@
     --lineage-self-font-weight: var(--typography-text-primary-bold-font-weight);
     --lineage-glyph-color: var(--color-text-muted);
 
+    grid-column: 1 / -1;
     margin-block: 0;
   }
 

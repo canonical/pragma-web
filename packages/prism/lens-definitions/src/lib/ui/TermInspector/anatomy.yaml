@@ -3,8 +3,11 @@
 # the explorer's section model (tags, name and address in a header, then
 # sections each under a small-caps label), the class view or the property
 # view; with no selection, the graph's overview; and an alert for a term
-# the graph does not know. One column: every row breaks where the
-# inspector's width runs out.
+# the graph does not know. A subgrid of the inspector region's three
+# columns, and so is each view, section, group and key-value list inside
+# it, so every row sits on the same lines: a key on the first column, its
+# value on the other two; a field's name, range and notes one column each.
+# A cell wraps inside its column. Its gap is the grid's gutter.
 # Reference: the ontology explorer's inspector (a header of tags, name and
 # address over labelled sections, references as links).
 #
@@ -31,13 +34,16 @@
 #     semantic gap is admitted inside a row.
 #
 # Roster namespaces (accepted and tracked): component.padding.block,
-# component.padding.inline, container.gap.tight, container.gap.default,
-# container.gap.loose, space.050, space.100, and the semantic typography
-# symbols.
+# component.padding.inline, container.gap.default, grid.gutter, space.050,
+# space.100, and the semantic typography symbols.
 node:
   uri: prism.component.term_inspector
   styles:
-    layout.type: block
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignContent: start
+    spacing.gap: grid.gutter
     spacing.internal.block.start: component.padding.block
     spacing.internal.block.end: component.padding.block
     spacing.internal.inline.start: component.padding.inline
@@ -46,10 +52,16 @@ node:
   edges:
     - node:
         role: view (the class view or the property view)
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
         edges:
           - node:
               role: header
               styles:
+                layout.grid.column: "1 / -1"
                 layout.type: flex
                 layout.direction: column
                 spacing.gap: space.050
@@ -98,7 +110,10 @@ node:
           - node:
               role: section
               styles:
-                spacing.external.block.start: container.gap.default
+                layout.type: grid
+                layout.grid.columns: subgrid
+                layout.grid.column: "1 / -1"
+                spacing.gap: grid.gutter
                 spacing.external.inline.start: "calc(-1 * var(--component-padding-inline))"
                 spacing.external.inline.end: "calc(-1 * var(--component-padding-inline))"
                 spacing.internal.block.start: container.gap.default
@@ -111,8 +126,9 @@ node:
                 - node:
                     role: label
                     styles:
+                      layout.grid.column: "1 / -1"
                       spacing.external.block.start: 0
-                      spacing.external.block.end: container.gap.tight
+                      spacing.external.block.end: 0
                       typography.size: typography.text.secondary.fontSize
                       typography.weight: typography.text.secondary.fontWeight
                       typography.variant.caps: all-small-caps
@@ -121,12 +137,14 @@ node:
                 - node:
                     role: prose
                     styles:
+                      layout.grid.column: "1 / -1"
                       spacing.external.block.start: 0
                       spacing.external.block.end: 0
                   relation: { cardinality: "0..2", slotName: prose }
                 - node:
                     role: terms
                     styles:
+                      layout.grid.column: "1 / -1"
                       layout.type: flex
                       layout.wrap: wrap
                       spacing.gap: space.100
@@ -138,13 +156,17 @@ node:
                 - node:
                     role: group
                     styles:
-                      spacing.external.block.start: container.gap.tight
+                      layout.type: grid
+                      layout.grid.columns: subgrid
+                      layout.grid.column: "1 / -1"
+                      spacing.gap: grid.gutter
                     edges:
                       - node:
                           role: group label
                           styles:
+                            layout.grid.column: "1 / -1"
                             spacing.external.block.start: 0
-                            spacing.external.block.end: container.gap.tight
+                            spacing.external.block.end: 0
                             typography.size: typography.text.secondary.fontSize
                             typography.weight: typography.text.secondary.fontWeight
                             typography.color: color.text.muted
@@ -154,13 +176,17 @@ node:
           - node:
               role: details
               styles:
-                spacing.external.block.start: container.gap.default
+                layout.type: grid
+                layout.grid.columns: subgrid
+                layout.grid.column: "1 / -1"
+                spacing.gap: grid.gutter
+                spacing.external.block.start: 0
                 spacing.external.block.end: 0
               edges:
                 - node:
                     role: key
                     styles:
-                      spacing.external.block.start: container.gap.tight
+                      layout.grid.column: "1 / span 1"
                       typography.size: typography.text.secondary.fontSize
                       typography.weight: typography.text.secondary.fontWeight
                       typography.variant.caps: all-small-caps
@@ -169,17 +195,19 @@ node:
                 - node:
                     role: value
                     styles:
+                      layout.grid.column: "2 / -1"
                       spacing.external.inline.start: 0
                       typography.wrap: anywhere
                   relation: { cardinality: "1..*", slotName: value }
             relation: { cardinality: "0..1", slotName: details }
-      relation: { cardinality: "0..1" }
+      relation: { cardinality: "0..1", slotName: view }
     - node:
         uri: prism.component.graph_overview
       relation: { cardinality: "0..1" }
     - node:
         role: unknown
         styles:
+          layout.grid.column: "1 / -1"
           spacing.external.block.start: 0
           spacing.external.block.end: 0
       relation: { cardinality: "0..1", slotName: unknown }

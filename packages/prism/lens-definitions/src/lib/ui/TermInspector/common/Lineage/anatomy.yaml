@@ -1,7 +1,8 @@
 ---
 # Lineage — a class's ancestry as one breadcrumb chain, the class itself
 # first, each ancestor a term link after a subset-of glyph, wrapping on a
-# narrow inspector; a glyph never wraps away from the link it precedes.
+# narrow inspector; a glyph never wraps away from the link it precedes. It
+# spans every column of the inspector's section.
 # Reference: the ontology explorer's inspector lineage.
 #
 # Why not a published component: the published breadcrumbs read a path
@@ -15,6 +16,7 @@
 node:
   uri: prism.component.lineage
   styles:
+    layout.grid.column: "1 / -1"
     spacing.external.block.start: 0
     spacing.external.block.end: 0
   edges:

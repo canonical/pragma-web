@@ -1,7 +1,10 @@
 ---
 # RelationList — a class's relations one way in the inspector: one row
 # each, the property's link, an arrow for the direction, the class at the
-# other end. Rows wrap where the inspector's width runs out.
+# other end. A subgrid of the inspector's three columns, and each row a
+# subgrid of it: the property on the first column, the arrow and the class
+# at the other end on the other two, so the rows line up with the field
+# rows; a cell wraps inside its column. Its gap is the grid's gutter.
 # Reference: the ontology explorer's inspector relation rows.
 #
 # Why not a published component: the published lists carry no relation
@@ -11,14 +14,18 @@
 # (`--relation-list-*`), bound to the symbol named here.
 #
 # Token ledger:
-#   space.100: the gap between a row's parts; no semantic gap is admitted
-#     inside a row.
+#   space.100: the gap between the arrow and the class it points to; no
+#     semantic gap is admitted inside a cell.
 #
-# Roster namespaces (accepted and tracked): container.gap.tight,
-# space.100, and the semantic colour symbols.
+# Roster namespaces (accepted and tracked): grid.gutter, space.100, and
+# the semantic colour symbols.
 node:
   uri: prism.component.relation_list
   styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
     spacing.external.block.start: 0
     spacing.external.block.end: 0
     spacing.internal.inline.start: 0
@@ -27,26 +34,35 @@ node:
     - node:
         role: row
         styles:
-          layout.type: flex
-          layout.wrap: wrap
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
           layout.align: baseline
-          spacing.gap: space.100
-          spacing.internal.block.start: container.gap.tight
-          spacing.internal.block.end: container.gap.tight
+          spacing.gap: grid.gutter
         edges:
           - node:
               role: predicate
               styles:
+                layout.grid.column: "1 / span 1"
                 typography.wrap: anywhere
             relation: { cardinality: "1", slotName: predicate }
           - node:
-              role: arrow
+              role: end
               styles:
-                typography.color: color.text.muted
-            relation: { cardinality: "1", slotName: arrow }
-          - node:
-              role: other
-              styles:
-                typography.wrap: anywhere
-            relation: { cardinality: "1", slotName: other }
+                layout.grid.column: "2 / -1"
+                layout.type: flex
+                layout.align: baseline
+                spacing.gap: space.100
+              edges:
+                - node:
+                    role: arrow
+                    styles:
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: arrow }
+                - node:
+                    role: other
+                    styles:
+                      typography.wrap: anywhere
+                  relation: { cardinality: "1", slotName: other }
+            relation: { cardinality: "1", slotName: end }
       relation: { cardinality: "1..*", slotName: row }
