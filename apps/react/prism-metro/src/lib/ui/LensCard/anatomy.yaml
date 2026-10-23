@@ -1,0 +1,92 @@
+---
+# LensCard — one lens of the site as a door on its landing page: the lens's
+# name as a link to its index, how many things it shows as the graph counts
+# them, and one line on what it is for.
+#
+# Reference: the Figma projection matrix's card (ZwVhG78TEaKIDLCdIdQ9Fi,
+# 484:264: the title, then the vitals, on the text size; insets 16 above
+# the title, 8 between the title and the content, 16 below; 209px wide at
+# two intrinsic columns, the span the landing gives each door) and the
+# atlas compositions' card groups (cards in a published Cards group, their
+# sections on its shared tracks). Slot order: link, count, summary.
+#
+# Built on the published Card (global.component.card): this root IS the
+# Card's root with the lens-card class added, its sections are Card.Header
+# and Card.Content, and the card's border, radius and section insets are
+# the Card's own. The title is a level-2 heading set at the text size and
+# line, so the page's level-1 heading leads; the door's hierarchy is weight
+# (the title, bold), then the count at the text's regular weight, then
+# colour (the summary, muted), never a box or a size of this component's
+# own. The title's link reads as the title: the text's colour, underlined
+# on hover.
+#
+# The door has no image and no footer, so the header takes the image's
+# track with its own (`1 / 3`) and starts at the card's edge, and the
+# content takes the footer's track with its own (`3 / -1`) and ends at the
+# card's edge; the content reaches back across the gutter the holding grid
+# sets between its track and the header's (a block-start margin of minus
+# the gutter), so the two sections meet as the Card's header and content
+# do, and the card is no taller than its text with the Card's insets.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 448px)   below one group: the door spans every
+#     column of its grid (`1 / -1`), so no column beside it stays empty.
+#
+# Every decision is read through a component token declared on the root
+# (`--lens-card-*`), bound to the symbol or the literal named here.
+#
+# Token ledger (no symbol to bind):
+#   --lens-card-content-overlap: calc(-1 * var(--grid-gutter))
+#                                  the content reaches back across the
+#                                  gutter between its track and the
+#                                  header's; no symbol is a negative gutter.
+#   --lens-card-link-decoration: none, --lens-card-link-hover-decoration:
+#     underline                    the title's link is underlined only on
+#                                  approach; no symbol names a decoration.
+#   layout.grid.row "1 / 3" (header), "3 / -1" (content): structure, the
+#     Card's row tracks each section takes.
+#
+# Roster namespaces (accepted and tracked): the semantic typography symbols
+# typography.text.primary.fontSize, typography.text.primary.line.height and
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: metro.component.lens_card
+  edges:
+    - node:
+        uri: global.subcomponent.card-header
+        styles:
+          layout.grid.row: "1 / 3"
+        edges:
+          - node:
+              role: title (a level-2 heading)
+              styles:
+                # A heading at the text size and line: the door's hierarchy
+                # is weight, not size.
+                typography.size: typography.text.primary.fontSize
+                typography.lineHeight: typography.text.primary.line.height
+                typography.weight: typography.text.primary.bold.fontWeight
+              edges:
+                - node:
+                    role: link to the lens's index
+                    styles:
+                      typography.color: color.text
+                      typography.decoration: none
+                      typography.decoration@hover: underline
+                  relation: { cardinality: "1", slotName: link }
+            relation: { cardinality: "1", slotName: title }
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        uri: global.subcomponent.card-content
+        styles:
+          layout.grid.row: "3 / -1"
+          spacing.external.block.start: "calc(-1 * var(--grid-gutter))"
+        edges:
+          - node:
+              role: count (a paragraph holding a data element)
+            relation: { cardinality: "1", slotName: count }
+          - node:
+              role: summary
+              styles:
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: summary }
+      relation: { cardinality: "1", slotName: content }
