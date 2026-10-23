@@ -1,0 +1,5 @@
+---
+# UIProbe — a fixture named with an acronym whose class name and URI run
+# the acronym into the next word (`uiprobe`), as no generator spells it.
+node:
+  uri: prism.component.uiprobe

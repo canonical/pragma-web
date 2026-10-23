@@ -1,0 +1,15 @@
+// Scaffolded by @canonical/summon-component:react v0.43.0
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import UIProbe from "./UIProbe.js";
+
+const meta: Meta<typeof UIProbe> = {
+  title: "Components/UIProbe",
+  component: UIProbe,
+  tags: ["autodocs"],
+};
+
+export default meta;
+type Story = StoryObj<typeof UIProbe>;
+
+export const Default: Story = {};

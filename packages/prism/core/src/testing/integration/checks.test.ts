@@ -50,6 +50,7 @@ describe("the component checks", () => {
       ).toEqual([
         locate(CONFORMING, "Probe"),
         locate(CONFORMING, "ScaffoldedProbe"),
+        locate(CONFORMING, "UIProbe"),
       ]);
     });
   });
@@ -92,6 +93,28 @@ describe("the component checks", () => {
           testSuffix: "test",
         }),
       ).toThrow(/ForeignBanner\.tsx does not open with the generator's banner/);
+    });
+  });
+
+  describe("on a component named with an acronym", () => {
+    it("spells its class name and URI with the acronym as one word", () => {
+      const folder = locate(CONFORMING, "UIProbe");
+      expect(assertAnatomy(folder).root.uri).toBe("prism.component.ui_probe");
+      expect(() =>
+        assertScaffold(folder, { packageRoot: CONFORMING, testSuffix: "test" }),
+      ).not.toThrow();
+    });
+
+    it("refuses a class name and a URI that run the acronym into the next word", () => {
+      const folder = locate(DRIFTED, "UIProbe");
+      expect(() =>
+        assertScaffold(folder, { packageRoot: DRIFTED, testSuffix: "test" }),
+      ).toThrow(
+        /UIProbe\.tsx does not define componentCssClassName as "ds ui-probe"/,
+      );
+      expect(() => assertAnatomy(folder)).toThrow(
+        /the root URI "prism\.component\.uiprobe" does not end in "ui_probe"/,
+      );
     });
   });
 
