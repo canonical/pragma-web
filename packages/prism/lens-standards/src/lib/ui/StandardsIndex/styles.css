@@ -45,6 +45,15 @@
     grid-column: 1 / -1;
   }
 
+  /* A row's compact address shrinks with its title and clips at the end of
+   * its line, so a long address stays on a phone's column; the whole
+   * address stays in the text. */
+  .ds.standards-index .meta {
+    overflow-x: clip;
+    min-width: 0;
+    text-overflow: ellipsis;
+  }
+
   .ds.standards-index > .more {
     grid-column: 1 / -1;
   }

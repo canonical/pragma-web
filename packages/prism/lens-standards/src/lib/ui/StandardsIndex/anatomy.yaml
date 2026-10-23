@@ -18,7 +18,10 @@
 # grids' gap the grid's gutter on both axes. Each group stands one default
 # step of block space below what precedes it, external spacing on the
 # group, so its heading reads with the entries under it rather than the
-# group above. The category links wrap, one gutter apart.
+# group above. The category links wrap, one gutter apart. A row's compact
+# address shrinks with its title and clips with an ellipsis at the end of
+# its line, so the longest address stays inside a phone's column; the
+# whole address stays in the text.
 #
 # Every decision is read through a component token declared on the root
 # (`--standards-index-*`), bound to the symbol named here.
@@ -27,6 +30,8 @@
 #   layout.grid.column "1 / -1": structure, a span in columns.
 #   layout.alignSelf start, layout.wrap wrap, layout.listStyle none:
 #     layout keywords; the 0 resets on the category links' list.
+#   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
+#     size.min.width 0 lets the row's meta shrink below its content.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
 # container.gap.default.
@@ -82,6 +87,10 @@ node:
                     edges:
                       - node:
                           uri: global.component.inline_code
+                          styles:
+                            layout.overflow.inline: clip
+                            size.min.width: 0
+                            typography.overflow: ellipsis
                         relation: { cardinality: "1", slotName: meta }
                   relation: { cardinality: "1..*", slotName: items }
             relation: { cardinality: "1" }
