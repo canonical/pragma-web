@@ -15,7 +15,7 @@ interface WithRouterOptions {
  * document-title template, as `Shell` does.
  *
  * The router holds the app's real route table, so the rail lists the site's
- * lenses, the brand links to the stations lens, and every home builds its
+ * lenses, the brand links to the landing, and every home builds its
  * href. It starts at `url` on a memory adapter, so a story mounts at a
  * lens's address without a server and without touching the page's own
  * location. The decorator renders no `Outlet`: the story renders the

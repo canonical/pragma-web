@@ -51,7 +51,7 @@ bun run dev:bun
 ```
 
 and open `http://localhost:5178/`. `PORT` moves the app to another port.
-`/` is the landing.
+`/` is the landing; the brand in the rail leads there.
 
 To read from a graph somewhere else, name its endpoint:
 

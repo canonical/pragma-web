@@ -29,12 +29,12 @@ describe("MetroRail", () => {
     ).toEqual(["Stations", "Lines", "Definitions"]);
   });
 
-  it("links the site brand to the stations lens", () => {
+  it("links the site brand to the landing", () => {
     renderMetroRail();
     const brand = screen
       .getByRole("navigation", { name: "Primary" })
       .querySelector(".brand");
-    expect(brand).toHaveAttribute("href", "/stations");
+    expect(brand).toHaveAttribute("href", "/");
     expect(brand?.textContent).toBe("Metronetwork docs");
   });
 
