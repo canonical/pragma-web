@@ -259,7 +259,9 @@ shared `LinkComponentProps` of `@canonical/react-ds-global` and defaulting
 to the intrinsic `"a"`. A plain anchor follows a mention with a full
 document load, so a site with a client-side router passes an adapter that
 renders the router's own link for an `href`; the router then navigates on
-the client and the page keeps its state.
+the client and the page keeps its state. A site's own projections read the
+same link with `useProjectionLink`, so their homes navigate as the
+package's arms do.
 
 A node's or a class's home is resolved with its compact address
 (`_meta.curie`) as the `uri` a site's home resolver receives, so one
@@ -337,7 +339,7 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
   `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListView`.
-- Maps: `ProjectionsProvider`, `useProjectionMaps`,
+- Maps: `ProjectionsProvider`, `useProjectionMaps`, `useProjectionLink`,
   `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
   `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,
   `SiteArmProps`.
