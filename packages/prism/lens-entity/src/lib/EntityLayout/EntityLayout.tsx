@@ -11,10 +11,11 @@ import type { EntityLayoutProps } from "./types.js";
 /**
  * The entity lens's page layout: the site's rail and colophon around the
  * routed page, with the strip carrying the breadcrumb trail and, on the
- * index, the search box, the view toggle and the count of entries shown.
+ * index, the search box and the count of entries shown.
  *
  * `EntityFilterProvider` encloses the whole layout because the strip's
- * controls and the index in the canvas are siblings that share one filter.
+ * search box and the index in the canvas are siblings that share one
+ * filter.
  * The router remounts the layout whenever the matched route changes, so the
  * filter starts from its default on every visit to the index.
  *

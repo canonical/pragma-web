@@ -9,6 +9,7 @@ import { ENTITY_ROUTE_SUFFIX } from "./constants.js";
 import { EntityIcon } from "./EntityIcon/index.js";
 import { EntityIndexPage } from "./EntityIndexPage/index.js";
 import { EntityPage } from "./EntityPage/index.js";
+import entityIndexSearch from "./entityIndexSearch.js";
 import readUriParam from "./readUriParam.js";
 import type { EntityLensOptions, EntityRoutes } from "./types.js";
 import warmEntity from "./warmEntity.js";
@@ -19,7 +20,8 @@ import warmEntityIndex from "./warmEntityIndex.js";
  * site's route table keeps them by:
  *
  * - `${id}`, at `/${id}`: the bound class's index, which declares the lens
- *   (`routeLensFacet`), so the rail and the trail link to it;
+ *   (`routeLensFacet`), so the rail and the trail link to it, and keeps
+ *   its view in a search parameter (`/${id}?view=cards`);
  * - `${id}Entity`, at `/${id}/:uri`: one instance, the address compact
  *   (`/stations/metro%3Anorthgate`, the form the site's homes build from
  *   `_meta.curie`) or absolute.
@@ -63,6 +65,7 @@ export default function createEntityRoutes<const TId extends string>(
 
   const index = route({
     url: `/${id}`,
+    search: entityIndexSearch,
     content: EntityIndexContent,
     warm: () => warmEntityIndex(binding),
     meta: routeLensFacet.of({ label, icon, order, tier: 1 }),

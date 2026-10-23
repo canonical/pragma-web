@@ -55,7 +55,7 @@ export interface EntitySiteLayout {
 
 /** What `createEntitySite` mounts. */
 export interface EntitySiteSetup {
-  /** The URL the static router matches. */
+  /** The URL the router starts at. */
   readonly url: string;
   /** The Relay environment the site reads from. */
   readonly environment: Environment;
@@ -64,6 +64,12 @@ export interface EntitySiteSetup {
   readonly children?: ReactNode;
   /** The lens layout to wrap the content in; none when omitted. */
   readonly layout?: EntitySiteLayout;
+  /**
+   * Whether the router navigates, over a memory history, so a search
+   * parameter the page writes reaches the address; a static router, as the
+   * server renders with, when omitted.
+   */
+  readonly navigable?: boolean;
 }
 
 /** What a server render of one page hands the client. */

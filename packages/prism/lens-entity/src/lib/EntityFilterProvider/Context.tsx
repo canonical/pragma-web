@@ -7,8 +7,8 @@ import type { EntityFilterValue } from "./types.js";
  *
  * The mode strip is rendered by the lens's own layout (`EntityLayout`) as a
  * sibling of the routed page, not a descendant, so no prop path runs from
- * the index across to the search box and the view toggle. Context crosses
- * that boundary and is the smallest bridge that does.
+ * the index across to the search box. Context crosses that boundary and is
+ * the smallest bridge that does.
  *
  * It holds only the reader's ephemeral choices, never graph data: data the
  * index announced could only arrive in an effect, so the strip would render
@@ -16,7 +16,7 @@ import type { EntityFilterValue } from "./types.js";
  * index's own operation from the warm store instead.
  *
  * Its default is the no-op filter with an inert setter, so a consumer outside
- * any provider degrades to "show everything, as rows" rather than throwing.
+ * any provider degrades to "show everything" rather than throwing.
  */
 const EntityFilterContext = createContext<EntityFilterValue>({
   filter: DEFAULT_ENTITY_FILTER,

@@ -1,8 +1,6 @@
 import type { ReactElement } from "react";
-import { ENTITY_VIEWS } from "../../../constants.js";
 import { useEntityFilter } from "../../../EntityFilterProvider/index.js";
 import { useMessages } from "../../../i18n/index.js";
-import { VIEW_MESSAGES } from "./constants.js";
 import type { EntityControlsProps } from "./types.js";
 import "./styles.css";
 
@@ -10,8 +8,9 @@ const componentCssClassName = "ds entity-controls";
 
 /**
  * The strip's `controls` tenant on the index: the search box that narrows
- * the loaded entries, and the toggle between the rows and the cards views.
- * Both write the shared filter, which the index in the canvas reads.
+ * the loaded entries. It writes the shared filter, which the index in the
+ * canvas reads; the toggle between the rows and the cards views is the
+ * index's own list view's.
  *
  * It reads no query, so it needs no `SocketGuard`: the search box stands
  * even while the index loads.
@@ -37,27 +36,12 @@ export default function EntityControls({
         aria-label={t("controls.search.label")}
         className="search"
         onChange={(event) => {
-          setFilter({ ...filter, text: event.currentTarget.value });
+          setFilter({ text: event.currentTarget.value });
         }}
         placeholder={t("controls.search.placeholder")}
         type="search"
         value={filter.text}
       />
-      <fieldset aria-label={t("controls.view.label")} className="views">
-        {ENTITY_VIEWS.map((view) => (
-          <button
-            aria-pressed={filter.view === view}
-            className="view"
-            key={view}
-            onClick={() => {
-              setFilter({ ...filter, view });
-            }}
-            type="button"
-          >
-            {t(VIEW_MESSAGES[view])}
-          </button>
-        ))}
-      </fieldset>
     </div>
   );
 }

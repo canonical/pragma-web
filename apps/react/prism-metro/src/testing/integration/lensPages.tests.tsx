@@ -27,11 +27,13 @@ afterEach(() => {
 
 afterAll(() => graph.close());
 
-/** The rows of the entity index once its query has answered. */
+/** The rows of the entity index's list view once its query has answered. */
 const findIndexRows = async (): Promise<HTMLElement[]> => {
   const canvas = await screen.findByRole("main");
   await waitFor(() => {
-    expect(canvas.querySelector(".entity-index .rows")).not.toBeNull();
+    expect(
+      canvas.querySelector(".entity-index .entity-list .items"),
+    ).not.toBeNull();
   });
   return within(canvas).getAllByRole("listitem");
 };

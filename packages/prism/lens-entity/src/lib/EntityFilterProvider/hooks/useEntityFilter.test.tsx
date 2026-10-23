@@ -10,7 +10,7 @@ describe("useEntityFilter", () => {
 
     expect(result.current.filter).toBe(DEFAULT_ENTITY_FILTER);
     act(() => {
-      result.current.setFilter({ text: "north", view: "cards" });
+      result.current.setFilter({ text: "north" });
     });
     expect(result.current.filter).toBe(DEFAULT_ENTITY_FILTER);
   });
@@ -22,8 +22,8 @@ describe("useEntityFilter", () => {
 
     expect(result.current.filter).toBe(DEFAULT_ENTITY_FILTER);
     act(() => {
-      result.current.setFilter({ text: "north", view: "cards" });
+      result.current.setFilter({ text: "north" });
     });
-    expect(result.current.filter).toEqual({ text: "north", view: "cards" });
+    expect(result.current.filter).toEqual({ text: "north" });
   });
 });

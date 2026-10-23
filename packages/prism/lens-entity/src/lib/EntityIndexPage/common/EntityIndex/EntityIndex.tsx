@@ -1,4 +1,11 @@
-import { CardProjection, RowProjection } from "@canonical/prism-projections";
+import {
+  CardProjection,
+  EntityList,
+  type EntityListView,
+  RowProjection,
+} from "@canonical/prism-projections";
+import { Button } from "@canonical/react-ds-global";
+import { useRouter, useSearchParam } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery, usePaginationFragment } from "react-relay";
 import type { EntityIndex_query$key } from "../../../../__generated__/EntityIndex_query.graphql.js";
@@ -7,10 +14,15 @@ import type { EntityIndexPaginationQuery } from "../../../../__generated__/Entit
 import type { EntityIndexQuery } from "../../../../__generated__/EntityIndexQuery.graphql.js";
 import entityIndexQueryNode from "../../../../__generated__/EntityIndexQuery.graphql.js";
 import buildEntityIndexVariables from "../../../buildEntityIndexVariables.js";
-import { ENTITY_PAGE_SIZE } from "../../../constants.js";
+import {
+  DEFAULT_ENTITY_VIEW,
+  ENTITY_PAGE_SIZE,
+  ENTITY_VIEW_PARAM,
+} from "../../../constants.js";
 import { useEntityFilter } from "../../../EntityFilterProvider/index.js";
 import { useMessages } from "../../../i18n/index.js";
 import matchesEntityText from "../../../matchesEntityText.js";
+import readEntityView from "../../../readEntityView.js";
 import type { EntityIndexProps } from "./types.js";
 import "./styles.css";
 
@@ -60,21 +72,30 @@ void declareEntityIndexFragment;
 const componentCssClassName = "ds entity-index";
 
 /**
- * The bound class's loaded instances, as a list of rows or a grid of cards,
- * narrowed by the strip's search. It reads the index's one operation from
- * the warm store, with the same variables builder the route's warm uses, and
- * pages through the class with an explicit "Load more" while the graph has
- * more: cursors are the graph's own, never derived here.
+ * The bound class's loaded instances in the shared list view, as rows or as
+ * cards, narrowed by the strip's search. It reads the index's one operation
+ * from the warm store, with the same variables builder the route's warm
+ * uses, and pages through the class with an explicit "Load more" while the
+ * graph has more: cursors are the graph's own, never derived here.
+ *
+ * The view is the address's: the list's toggle writes it to the index's
+ * search parameter, replacing the history entry, and the index reads it
+ * back, so a view survives a reload and travels with a link, and the server
+ * renders the view the address names.
  *
  * Each entry renders through the site's projections (`RowProjection`,
  * `CardProjection`), so a site that maps an arm for the class's type renders its
  * entries its own way, and links each to its home.
  *
  * A class the graph does not know (`ontologyClass` is null) and a class with
- * no instances both render the empty state; a search that hides every
+ * no instances both render the list's empty line; a search that hides every
  * loaded entry says so instead.
  *
  * `import { EntityIndex } from "./common/EntityIndex/index.js";`
+ *
+ * @note Impure: reads the Relay store, the router, the filter and the
+ *   translator in scope, writes the view to the address, and suspends while
+ *   the store does not hold the index.
  */
 export default function EntityIndex({
   binding,
@@ -82,6 +103,8 @@ export default function EntityIndex({
   ...props
 }: EntityIndexProps): ReactElement {
   const t = useMessages();
+  const router = useRouter();
+  const view = readEntityView(useSearchParam(ENTITY_VIEW_PARAM));
   const { filter } = useEntityFilter();
   const query = useLazyLoadQuery<EntityIndexQuery>(
     entityIndexQueryNode,
@@ -96,40 +119,44 @@ export default function EntityIndex({
     matchesEntityText(filter.text, node._meta),
   );
 
+  const changeView = (next: EntityListView): void => {
+    router.setSearchParams(
+      { [ENTITY_VIEW_PARAM]: next === DEFAULT_ENTITY_VIEW ? null : next },
+      { replace: true },
+    );
+  };
+
   return (
     <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      data-view={filter.view}
+      data-view={view}
     >
-      {edges.length === 0 ? (
-        <p className="empty">{t("index.empty")}</p>
-      ) : visible.length === 0 ? (
-        <p className="empty">{t("index.noMatch")}</p>
-      ) : filter.view === "rows" ? (
-        <ul className="rows">
-          {visible.map(({ node }) => (
-            <RowProjection key={node.uri} node={node} />
-          ))}
-        </ul>
-      ) : (
-        <div className="cards">
-          {visible.map(({ node }) => (
+      <EntityList
+        empty={edges.length === 0 ? t("index.empty") : t("index.noMatch")}
+        onViewChange={changeView}
+        view={view}
+      >
+        {visible.map(({ node }) =>
+          view === "cards" ? (
             <CardProjection key={node.uri} node={node} />
-          ))}
-        </div>
-      )}
+          ) : (
+            <RowProjection key={node.uri} node={node} />
+          ),
+        )}
+      </EntityList>
       {hasNext ? (
         <p className="more">
-          <button
-            disabled={isLoadingNext}
+          <Button
+            importance="secondary"
+            loading={isLoadingNext}
             onClick={() => {
               loadNext(ENTITY_PAGE_SIZE);
             }}
             type="button"
           >
-            {isLoadingNext ? t("index.loadingMore") : t("index.more")}
-          </button>
+            {t("index.more")}
+          </Button>
         </p>
       ) : null}
     </div>

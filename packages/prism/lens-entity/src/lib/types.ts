@@ -1,4 +1,7 @@
-import type { DataRouteDefinition } from "@canonical/router-core";
+import type {
+  DataRouteDefinition,
+  StandardSchemaV1,
+} from "@canonical/router-core";
 import type { ComponentType, ReactElement } from "react";
 import type { ENTITY_VIEWS } from "./constants.js";
 
@@ -7,16 +10,30 @@ import type { ENTITY_VIEWS } from "./constants.js";
 export type EntityView = (typeof ENTITY_VIEWS)[number];
 
 /**
- * The reader's ephemeral view of the index, shared by the strip's controls
- * and the canvas. It starts from `DEFAULT_ENTITY_FILTER` and is never seeded
- * from the URL or the browser.
+ * The reader's ephemeral narrowing of the index, shared by the strip's
+ * search box and the canvas. It starts from `DEFAULT_ENTITY_FILTER` and is
+ * never seeded from the URL or the browser; the view, which a reader may
+ * want to keep, lives in the address instead (`ENTITY_VIEW_PARAM`).
  */
 export interface EntityFilter {
   /** The search box's text, as typed. */
   readonly text: string;
-  /** The view the index renders. */
+}
+
+/** The index route's search values: the view it shows. */
+export interface EntityIndexSearch {
+  /** The view the address names, or the default view. */
   readonly view: EntityView;
 }
+
+/**
+ * The index route's search schema: it reads the view from the address's
+ * search parameters, whatever they hold.
+ */
+export type EntityIndexSearchSchema = StandardSchemaV1<
+  Readonly<Record<string, unknown>>,
+  EntityIndexSearch
+>;
 
 /** One ontology's addressing identity, as the graph states it. */
 export interface OntologyNamespace {
@@ -39,10 +56,13 @@ export interface EntityLensOptions {
   readonly icon?: ComponentType;
 }
 
-/** The lens's index route: `/${TId}`, the class's instances. */
+/**
+ * The lens's index route: `/${TId}`, the class's instances, in the view its
+ * search parameters name.
+ */
 export type EntityIndexRoute<TId extends string> = DataRouteDefinition<
   `/${TId}`,
-  undefined,
+  EntityIndexSearchSchema,
   ReactElement
 >;
 

@@ -1,5 +1,11 @@
 import { createEnvironment } from "@canonical/prism-core";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createEntitySite from "../../../testing/createEntitySite.js";
 import createFetchSpy from "../../../testing/createFetchSpy.js";
@@ -167,7 +173,7 @@ describe("EntityLayout", () => {
     );
   });
 
-  it("switches the canvas between rows and cards", {
+  it("keeps the search when the reader switches the index's view", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
@@ -176,26 +182,25 @@ describe("EntityLayout", () => {
         url: "/stations",
         environment,
         layout: STATIONS_LAYOUT,
+        navigable: true,
       }),
     );
-    const rows = screen.getByRole("button", {
-      name: MESSAGES["controls.view.rows"],
-    });
-    const cards = screen.getByRole("button", {
-      name: MESSAGES["controls.view.cards"],
-    });
-    expect(rows).toHaveAttribute("aria-pressed", "true");
-    expect(cards).toHaveAttribute("aria-pressed", "false");
-
-    fireEvent.click(cards);
-    expect(cards).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
-
-    fireEvent.click(rows);
-    expect(screen.queryAllByRole("article")).toHaveLength(0);
+    // The strip holds the search alone: the view toggle is the index's.
     expect(
-      within(screen.getByRole("main")).getAllByRole("listitem"),
-    ).toHaveLength(STATION_COUNT);
+      within(readSocket("controls")).queryByRole("button"),
+    ).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole("searchbox"), {
+      target: { value: "northgate" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
+    await waitFor(() => {
+      expect(screen.getAllByRole("article")).toHaveLength(1);
+    });
+    expect(screen.getByRole("searchbox")).toHaveValue("northgate");
+    expect(readSocket("status")).toHaveTextContent(
+      `1 of ${STATION_COUNT} entries`,
+    );
   });
 
   it("counts nothing for a class the graph does not know", {

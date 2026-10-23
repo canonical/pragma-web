@@ -17,12 +17,8 @@ export const MESSAGES = {
   "index.empty": "The graph holds no entries of this class.",
   "index.noMatch": "No loaded entry matches the search.",
   "index.more": "Load more",
-  "index.loadingMore": "Loading more…",
   "controls.search.label": "Filter entries",
   "controls.search.placeholder": "Search entries…",
-  "controls.view.label": "View",
-  "controls.view.rows": "Rows",
-  "controls.view.cards": "Cards",
   "status.count": {
     one: "{visible} of {count} entry",
     other: "{visible} of {count} entries",

@@ -42,7 +42,24 @@ describe("EntityIndexPage", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("renders the cards view as one article per station", {
+  it("renders the cards view the address names, one article per station", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { environment } = await createWarmEnvironment("/stations");
+    render(createEntitySite({ url: "/stations?view=cards", environment }));
+
+    expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+    expect(document.querySelector(".ds.entity-index")).toHaveAttribute(
+      "data-view",
+      "cards",
+    );
+    expect(screen.getByRole("button", { name: "Cards" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("keeps the view the reader picks in the address", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
@@ -50,22 +67,28 @@ describe("EntityIndexPage", () => {
       createEntitySite({
         url: "/stations",
         environment,
-        layout: { binding: STATIONS_BINDING, label: "Stations" },
+        navigable: true,
         children: (
           <EntityIndexPage binding={STATIONS_BINDING} label="Stations" />
         ),
       }),
     );
-    fireEvent.click(
-      screen.getByRole("button", { name: MESSAGES["controls.view.cards"] }),
-    );
+    const rows = screen.getByRole("button", { name: "Rows" });
+    expect(rows).toHaveAttribute("aria-pressed", "true");
 
-    expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
-    expect(within(screen.getByRole("main")).queryByRole("list")).toBeNull();
-    expect(document.querySelector(".ds.entity-index")).toHaveAttribute(
-      "data-view",
-      "cards",
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
+    await waitFor(() => {
+      expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+    });
+    expect(screen.queryByRole("list")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Rows" }));
+    await waitFor(() => {
+      expect(screen.queryAllByRole("article")).toHaveLength(0);
+    });
+    expect(
+      within(screen.getByRole("list")).getAllByRole("listitem"),
+    ).toHaveLength(STATION_COUNT);
   });
 
   it("pages through the class with an explicit Load more", {

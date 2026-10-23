@@ -53,7 +53,7 @@ const files = collectCss(LIBRARY_DIRECTORY);
 /**
  * The component tokens that hold the lens's own value, because the design
  * system has no semantic token for the decision: the type sizes, the border
- * widths, the radius, the focus ring, and how many columns a card spans.
+ * widths, the radius and the focus ring.
  */
 const LITERAL_TOKENS = [
   "--entity-controls-border-width",
@@ -61,7 +61,6 @@ const LITERAL_TOKENS = [
   "--entity-controls-outline-offset",
   "--entity-controls-outline-width",
   "--entity-controls-radius",
-  "--entity-index-card-span",
   "--entity-status-font-size",
   "--fields-table-border-width",
   "--fields-table-inherited-font-size",
@@ -80,7 +79,6 @@ const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-muted",
   "--space-025",
-  "--space-050",
   "--space-100",
   "--space-150",
   "--space-200",

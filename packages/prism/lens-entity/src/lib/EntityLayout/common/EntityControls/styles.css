@@ -1,7 +1,6 @@
 /*
  * EntityControls — the entity lens's strip toolbar on the index: a search
- * box and a two-button view toggle. It lives inside the strip band, whose
- * height is stationary frame, so its metrics are small and fixed.
+ * box. It lives inside the strip band, whose height is stationary frame, so its metrics are small and fixed.
  *
  * The design system has no semantic token for the type size, the border
  * width, the radius, or the focus ring's width and offset, so those
@@ -11,15 +10,13 @@
 @layer ds.prism {
   :root {
     --entity-controls-gap: var(--space-200, 1rem);
-    --entity-controls-group-gap: var(--space-050, 0.25rem);
     --entity-controls-padding-block: var(--space-025, 0.125rem);
     --entity-controls-padding-inline: var(--space-100, 0.5rem);
     --entity-controls-font-size: 0.75rem;
     --entity-controls-border-width: 1px;
     --entity-controls-border-color: var(--color-border-muted);
     --entity-controls-radius: 999px;
-    --entity-controls-color: var(--color-text-muted);
-    --entity-controls-color-pressed: var(--color-text);
+    --entity-controls-color: var(--color-text);
     --entity-controls-background: var(--color-background);
     --entity-controls-outline-color: var(
       --color-background-contrasted,
@@ -36,8 +33,7 @@
     min-inline-size: 0;
   }
 
-  .ds.entity-controls .search,
-  .ds.entity-controls .view {
+  .ds.entity-controls .search {
     padding: var(--entity-controls-padding-block)
       var(--entity-controls-padding-inline);
     border: var(--entity-controls-border-width) solid
@@ -47,35 +43,10 @@
     color: var(--entity-controls-color);
     font: inherit;
     font-size: var(--entity-controls-font-size);
-  }
-
-  .ds.entity-controls .search {
     min-inline-size: 0;
-    color: var(--entity-controls-color-pressed);
   }
 
-  /* A fieldset groups the two toggles for assistive tech; the UA's border,
-   * margin and padding are cleared, since the grouping is not a visible
-   * box. */
-  .ds.entity-controls .views {
-    display: flex;
-    gap: var(--entity-controls-group-gap);
-    margin: 0;
-    padding: 0;
-    border: none;
-  }
-
-  .ds.entity-controls .view {
-    cursor: pointer;
-  }
-
-  .ds.entity-controls .view[aria-pressed="true"] {
-    border-color: currentColor;
-    color: var(--entity-controls-color-pressed);
-  }
-
-  .ds.entity-controls .search:focus-visible,
-  .ds.entity-controls .view:focus-visible {
+  .ds.entity-controls .search:focus-visible {
     outline: var(--entity-controls-outline-width) solid
       var(--entity-controls-outline-color);
     outline-offset: var(--entity-controls-outline-offset);

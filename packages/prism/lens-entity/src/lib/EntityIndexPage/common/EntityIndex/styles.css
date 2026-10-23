@@ -1,18 +1,12 @@
 /*
- * EntityIndex — the class's entries, as a list of rows or a grid of cards,
- * over the "Load more" button.
- *
- * The cards view is a subgrid of the lens layout's intrinsic columns, each
- * card spanning `--entity-index-card-span` of them, so the card count per
- * line falls out of the canvas width with no query anywhere.
+ * EntityIndex — the class's entries in the shared list view, which lays out
+ * its rows and cards on the lens layout's columns, over the "Load more"
+ * button.
  */
 
 @layer ds.prism {
   :root {
     --entity-index-gap: var(--space-200, 1rem);
-    --entity-index-row-gap: var(--space-100, 0.5rem);
-    --entity-index-card-span: 2;
-    --entity-index-empty-color: var(--color-text-muted);
   }
 
   .ds.entity-index {
@@ -25,30 +19,6 @@
   .ds.entity-index > * {
     grid-column: 1 / -1;
     min-inline-size: 0;
-  }
-
-  .ds.entity-index .rows {
-    display: grid;
-    row-gap: var(--entity-index-row-gap);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .ds.entity-index .cards {
-    display: grid;
-    grid-template-columns: subgrid;
-    gap: var(--entity-index-gap);
-  }
-
-  .ds.entity-index .cards > * {
-    grid-column: span var(--entity-index-card-span);
-    min-inline-size: 0;
-  }
-
-  .ds.entity-index .empty {
-    margin: 0;
-    color: var(--entity-index-empty-color);
   }
 
   .ds.entity-index .more {

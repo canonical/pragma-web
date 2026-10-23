@@ -17,9 +17,9 @@ describe("useProviderState", () => {
     expect(result.current).toBe(first);
 
     act(() => {
-      first.setFilter({ ...DEFAULT_ENTITY_FILTER, view: "cards" });
+      first.setFilter({ text: "north" });
     });
     expect(result.current).not.toBe(first);
-    expect(result.current.filter.view).toBe("cards");
+    expect(result.current.filter.text).toBe("north");
   });
 });

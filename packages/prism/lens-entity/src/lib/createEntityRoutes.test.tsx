@@ -72,7 +72,7 @@ describe("createEntityRoutes", () => {
     setPrefetchEnvironment(createEnvironment({ fetchFn }));
     void SITE_ROUTES.lines.warm?.(
       {},
-      {},
+      { view: "rows" },
       {
         signal: new AbortController().signal,
       },
