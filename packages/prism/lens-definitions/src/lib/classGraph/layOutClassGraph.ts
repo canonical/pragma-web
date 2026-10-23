@@ -1,5 +1,6 @@
 import buildClassGraphModel from "./buildClassGraphModel.js";
 import {
+  ALIGNMENT_SEARCH_LIMIT,
   BUS_OFFSET,
   CHANNEL,
   DESIGN_CANVAS,
@@ -134,9 +135,10 @@ function countEmptyCells(
  * Place packed regions on their shelves, 48px apart in both directions, on
  * the lattice. A shelf narrower than the packing may sit flush left, in
  * the middle or flush right, and a region shorter than its shelf at the
- * shelf's middle, top or bottom: every combination is tried, in those
- * orders, and the first that leaves the fewest empty cells on the canvas
- * is kept.
+ * shelf's middle, top or bottom: every combination of the first
+ * `ALIGNMENT_SEARCH_LIMIT` choices (the shelves', then the regions') is
+ * tried, in those orders, the rest keeping their first share, and the
+ * first that leaves the fewest empty cells on the canvas is kept.
  */
 function alignShelves(
   sized: readonly SizedRegion[],
@@ -187,8 +189,11 @@ function alignShelves(
           requireAt(choices, choice),
           Math.floor(pick / 3 ** choice) % 3,
         );
+  // The first choices are searched together; any past the limit keep their
+  // first share, as a pick below 3 to the limit reads 0 for them.
+  const picks = 3 ** Math.min(choices.length, ALIGNMENT_SEARCH_LIMIT);
   let best: { places: Map<string, RegionPlace>; empty: number } | undefined;
-  for (let pick = 0; pick < 3 ** choices.length; pick += 1) {
+  for (let pick = 0; pick < picks; pick += 1) {
     const places = new Map<string, RegionPlace>();
     entries.forEach((entry, at) => {
       const shift = roundTo(

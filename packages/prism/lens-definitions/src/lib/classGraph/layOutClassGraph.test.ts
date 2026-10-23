@@ -150,6 +150,20 @@ describe("layOutClassGraph", () => {
     expect(relative(grown, "anatomy")).toEqual(relative(real, "anatomy"));
   });
 
+  it("lays twenty namespaces out, one class tree each", () => {
+    const many = layOutClassGraph({
+      classes: Array.from({ length: 20 }, (_, index) => [
+        defineClass(`n${index}:Root`, `Root ${index}`),
+        defineClass(`n${index}:Leaf`, `Leaf ${index}`, {
+          superclass: `n${index}:Root`,
+        }),
+      ]).flat(),
+      relations: [],
+    });
+    expect(many.regions).toHaveLength(20);
+    expect(countOverlaps(many).collisions).toBe(0);
+  });
+
   it("lays an input with no class out as an empty floor", () => {
     const empty = layOutClassGraph({ classes: [], relations: [] });
     expect(empty.nodes.size).toBe(0);

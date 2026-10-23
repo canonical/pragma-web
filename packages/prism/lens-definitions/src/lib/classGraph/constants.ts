@@ -80,6 +80,13 @@ export const REGION_ALIGNMENTS: readonly number[] = [0.5, 0, 1];
  */
 export const SHELF_ALIGNMENTS: readonly number[] = [0, 0.5, 1];
 
+/**
+ * How many alignment choices the placement searches together: three
+ * shares each, so at most 3 to this power placements are scored, however
+ * many regions a site has.
+ */
+export const ALIGNMENT_SEARCH_LIMIT = 6;
+
 /** The smallest zoom at which every 14px label renders at 12px or more. */
 export const MIN_FIT = 12 / 14;
 

@@ -25,6 +25,16 @@ describe("packShelves", () => {
     ).toEqual([[0, 1]]);
   });
 
+  it("packs forty regions, in order, without trying every break", () => {
+    const sizes = Array.from({ length: 40 }, (_, index) => ({
+      w: 16 * (5 + ((index * 7) % 30)),
+      h: 16 * (5 + ((index * 11) % 30)),
+    }));
+    const packing = packShelves(sizes);
+    expect(packing.shelves.flat()).toEqual(sizes.map((_, index) => index));
+    expect(packing.fit).toBeGreaterThan(0);
+  });
+
   it("refuses to pack nothing", () => {
     expect(() => packShelves([])).toThrow(/no region to pack/);
   });
