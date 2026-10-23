@@ -53,7 +53,7 @@ describe("StandardProse", () => {
     const chip = [...renderProse().querySelectorAll(".ds.node-chip")].at(0);
 
     expect(chip?.textContent).toBe("one prop");
-    expect(chip?.getAttribute("title")).toBe("cs:react.component.props");
+    expect(chip?.getAttribute("data-type")).toBe("CodeStandard");
     expect(chip?.querySelector("a")?.getAttribute("href")).toBe(
       buildReadingHref(PROPS_STANDARD_URI),
     );

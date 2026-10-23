@@ -6,7 +6,8 @@ import type { ComponentProps, ReactNode } from "react";
 type OwnProps = {
   /**
    * The namespace the entity sits in, leading the title: the compact
-   * address's prefix with its colon.
+   * address's prefix with its colon. An identifier in it is a
+   * `<code className="identifier">`, which keeps the row's line.
    */
   readonly location?: ReactNode;
   /** The entity's name. */

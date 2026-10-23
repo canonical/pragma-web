@@ -3,7 +3,7 @@
  * on it, and the path that handler serves.
  *
  * The internal cross-domain surface — the dataset, the connection helpers, the
- * descriptive fallback chain, the SDL readers and the eleven constants — is
+ * descriptive fallback chain, the SDL readers and the constants — is
  * deliberately NOT re-exported. This package exists to be BOOTED and pointed
  * at, not to have its internals composed by a caller; its own tests reach them
  * by relative path, which is the right amount of access for them to have.

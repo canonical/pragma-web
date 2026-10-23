@@ -1,0 +1,61 @@
+---
+# OntologyPropertyGraphNode: an ontology property as a node of a graph.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2357 and 566:2433 (the
+# graph node: the name, then "kind in location" muted). The kind is the
+# property's kind; the location the class it is declared on.
+# Projected onto EntityGraphNode, which carries every style: this anatomy
+# binds none. It is not dispatched: a property is not a Node.
+# The name is the label, or the local name of the IRI when the property has
+# none (a property carries no computed title). The home is the link the
+# name renders through, resolved from the absolute IRI, a property's only
+# address; a property without one reads as inert text.
+node:
+  uri: prism.component.ontology_property_graph_node
+  projection:
+    on: OntologyProperty
+  edges:
+    - node:
+        uri: prism.component.entity_graph_node
+        edges:
+          - node:
+              role: title
+              edges:
+                - node:
+                    role: label
+                    projection:
+                      field: label
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: local name
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: home
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: kind
+            relation:
+              cardinality: "1"
+              slotName: kind
+          - node:
+              role: location
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "0..1"
+              slotName: location
+              projection:
+                field: domain
+      relation:
+        cardinality: "1"

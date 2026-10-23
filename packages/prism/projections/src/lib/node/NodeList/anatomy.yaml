@@ -1,0 +1,43 @@
+---
+# NodeList: an index of graph nodes as the shared list view, each node
+# through its form's dispatcher.
+# Reference: the projection matrix's cards (two intrinsic columns each) and
+# list entries (32px rows), laid on the main column the list fills, as
+# EntityList draws them.
+# Projected onto EntityList, which carries every style: this anatomy binds
+# none. The context is each node of the list. Its items are the card
+# dispatcher's cards in the cards view and the row dispatcher's rows in the
+# rows view, so each node reads through the arm its site maps to its type;
+# each item is keyed by the node's address, so a re-render keeps it. The
+# view, the count and the empty line are the lens's: it holds the view in
+# the page's address and passes it back.
+node:
+  uri: prism.component.node_list
+  projection:
+    on: Node
+  edges:
+    - node:
+        uri: prism.component.entity_list
+        edges:
+          - switch:
+              on: props
+              cases:
+                - node:
+                    uri: prism.component.card_projection
+                    projection:
+                      on: Node
+                - node:
+                    uri: prism.component.row_projection
+                    projection:
+                      on: Node
+            relation:
+              cardinality: "0..*"
+              slotName: items
+          - node:
+              role: item key
+              projection:
+                field: uri
+            relation:
+              cardinality: "0..*"
+      relation:
+        cardinality: "1"

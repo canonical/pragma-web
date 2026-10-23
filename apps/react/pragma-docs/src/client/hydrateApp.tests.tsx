@@ -105,7 +105,7 @@ const SEEDED_PAGES = [
     name: "standard reading",
     url: `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
     records: standardEntityRecords,
-    serverMarker: 'class="ds node-chip"',
+    serverMarker: 'class="ds entity-chip ds node-chip"',
     liveSelector: ".ds.standard-prose .ds.node-chip",
     liveText: "one prop",
   },

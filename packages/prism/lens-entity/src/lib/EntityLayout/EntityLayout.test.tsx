@@ -189,10 +189,12 @@ describe("EntityLayout", () => {
 
     fireEvent.click(cards);
     expect(cards).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+    expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
+      STATION_COUNT,
+    );
 
     fireEvent.click(rows);
-    expect(screen.queryAllByRole("article")).toHaveLength(0);
+    expect(document.querySelectorAll(".ds.node-card")).toHaveLength(0);
     expect(
       within(screen.getByRole("main")).getAllByRole("listitem"),
     ).toHaveLength(STATION_COUNT);

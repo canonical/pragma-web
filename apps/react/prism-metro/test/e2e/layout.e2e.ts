@@ -3,15 +3,16 @@
 /**
  * The page grid and the scroll model, measured in a real browser: the metro
  * graph in its own process and the dev cell pointed at it serve a workspace
- * page and a document page, and Chromium lays each out once at a desktop and
- * a phone width, measuring it in the light and the dark theme. What is
+ * page and three document pages, a station's page, the landing and the
+ * not-found page, and Chromium lays each out once at a desktop and a phone
+ * width, measuring it in the light and the dark theme. What is
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
  * viewport or past its region, at 390px too; twelve columns at 1440px and
  * four at 390px; a workspace canvas that never scrolls; a document whose
  * only scrolling regions are its canvas and its rail; a canvas that starts
  * one gutter under the strip, or at the viewport's top with no strip, as on
- * the lobby and the not-found page, its page then starting one gutter
+ * the landing and the not-found page, its page then starting one gutter
  * down; a strip whose band runs from the rail's
  * border to the viewport's edge with its content from the canvas's first
  * column line to its last; and every gap, padding and margin of the chrome
@@ -39,13 +40,13 @@ const CWD = process.cwd();
 
 /**
  * Pages on the document archetype: a station's page, under its lens's
- * strip, and the lobby and the not-found page, which have no strip.
+ * strip, and the landing and the not-found page, which have no strip.
  */
 const DOCUMENT_PATHS = [
   `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
   "/",
   "/not-found",
-];
+] as const;
 
 let graph: RunningServer;
 let server: RunningServer;

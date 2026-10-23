@@ -42,7 +42,7 @@ describe("EntityIndexPage", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("renders the cards view as one article per station", {
+  it("renders the cards view as one card per station", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
@@ -60,7 +60,9 @@ describe("EntityIndexPage", () => {
       screen.getByRole("button", { name: MESSAGES["controls.view.cards"] }),
     );
 
-    expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+    expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
+      STATION_COUNT,
+    );
     expect(within(screen.getByRole("main")).queryByRole("list")).toBeNull();
     expect(document.querySelector(".ds.entity-index")).toHaveAttribute(
       "data-view",

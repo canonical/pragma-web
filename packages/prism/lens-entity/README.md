@@ -207,3 +207,4 @@ subgrid of the site's one intrinsic grid, and only the canvas scrolls.
 - Routes: `createEntityRoutes`; types `EntityRoutes`, `EntityLensOptions`.
 - Layout: `EntityLayout`; types `EntityLayoutProps`.
 - Pages: `EntityIndexPage`, `EntityPage`; types `EntityIndexPageProps`, `EntityPageProps`.
+- Addresses, for a site's own routes that take an entity's address the way the lens's do: `expandAddress`, `readUriParam`; types `OntologyNamespace`.

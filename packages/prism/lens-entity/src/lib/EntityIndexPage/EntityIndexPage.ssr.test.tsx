@@ -18,7 +18,9 @@ describe("EntityIndexPage on the server", () => {
 
     expect(html).toContain('class="ds entity-index-page"');
     expect(html).toMatch(/<h1 class="heading" id="[^"]+">Stations<\/h1>/);
-    expect(html.match(/class="ds node-row"/g)).toHaveLength(STATION_COUNT);
+    expect(html.match(/class="ds entity-row ds node-row"/g)).toHaveLength(
+      STATION_COUNT,
+    );
     expect(html).toContain('href="/stations/metro%3Anorthgate"');
     expect(fetchFn).not.toHaveBeenCalled();
   });

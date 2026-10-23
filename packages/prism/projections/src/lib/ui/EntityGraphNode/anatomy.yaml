@@ -24,6 +24,10 @@
 # underlined on hover, its focus ring drawn inside it since the node clips
 # its lines.
 #
+# An identifier in the title, a `<tspan class="identifier">`, sets the
+# monospace face: an SVG `<text>` takes no face from a `<code>`, so the
+# node names the face the reset gives `code`.
+#
 # Every decision is read through a component token declared on the root
 # (`--entity-graph-node-*`), bound to the symbol named here.
 #
@@ -34,6 +38,10 @@
 #   --entity-graph-node-focus-ring-width: 2px,
 #   --entity-graph-node-focus-ring-offset: -2px
 #                                      the link's ring, drawn inside it.
+#   --entity-graph-node-identifier-font-family: ui-monospace, monospace
+#                                      the identifier's face: no token names
+#                                      the monospace face; the reset's list
+#                                      for `code`.
 #
 # Roster namespaces (accepted and tracked): the semantic typography symbols
 # typography.text.primary.fontSize and
@@ -69,6 +77,11 @@ node:
                 appearance.outline.color@focus: color.focusRing
                 appearance.outline.offset@focus: -2px
             relation: { cardinality: "0..1", slotName: link }
+          - node:
+              role: identifier
+              styles:
+                typography.fontFamily: "ui-monospace, monospace"
+            relation: { cardinality: "0..*", slotName: identifier }
       relation: { cardinality: "1", slotName: title }
     - node:
         role: context

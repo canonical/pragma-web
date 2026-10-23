@@ -4,7 +4,11 @@ import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
-  /** The entity's name, on the first line. */
+  /**
+   * The entity's name, on the first line. An identifier in it is a
+   * `<tspan className="identifier">`, which sets the monospace face an SVG
+   * `<text>` takes from no `<code>`.
+   */
   readonly title: ReactNode;
   /**
    * The entity's home: with one the title links to it, without one the title

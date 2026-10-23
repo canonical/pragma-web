@@ -20,9 +20,10 @@ afterEach(() => {
 });
 
 describe("createSitemapRenderer", () => {
-  it("lists the index of each lens against an absolute BASE_URL", async () => {
+  it("lists the landing and the index of each lens against an absolute BASE_URL", async () => {
     vi.stubEnv("BASE_URL", "https://metro.example");
     const xml = await renderSitemap();
+    expect(xml).toContain("<loc>https://metro.example/</loc>");
     expect(xml).toContain("<loc>https://metro.example/stations</loc>");
     expect(xml).toContain("<loc>https://metro.example/lines</loc>");
     expect(xml).toContain("<loc>https://metro.example/definitions</loc>");

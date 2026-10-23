@@ -1,0 +1,34 @@
+---
+# ScaffoldedProbe — the conforming Probe as the next generator release opens
+# its files, "Scaffolded by": a grid with one labelled
+# child and a link reached through its body, a hover and a selected state,
+# a reflow below one group and one that drops the label's rule when the
+# body follows it, every decision read through a component token.
+node:
+  uri: prism.component.scaffolded_probe
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+    spacing.internal.inline.start: space.100
+    spacing.internal.inline.end: space.100
+    appearance.radius: 0.25rem
+    typography.color: color.text
+    typography.color@hover: color.text.muted
+    typography.color@selected: color.text.muted
+  edges:
+    - node:
+        role: label
+        styles:
+          typography.weight: typography.text.primary.bold.fontWeight
+          typography.variant.caps: all-small-caps
+      relation: { cardinality: "1", slotName: label }
+    - node:
+        role: body
+        edges:
+          - node:
+              role: link
+              styles:
+                typography.decoration: none
+                typography.decoration@hover: underline
+            relation: { cardinality: "0..1", slotName: link }
+      relation: { cardinality: "1" }

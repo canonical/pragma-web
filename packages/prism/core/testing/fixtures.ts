@@ -4,7 +4,7 @@
 
 import { route } from "@canonical/router-core";
 import { createElement, type ReactElement } from "react";
-import type { ConcreteRequest } from "relay-runtime";
+import type { ConcreteRequest, ReaderFragment } from "relay-runtime";
 import { prefetchQuery } from "../src/lib/relay/index.js";
 import { routeLensFacet } from "../src/lib/routeLens/index.js";
 import { routeShortcutFacet } from "../src/lib/routeShortcut/index.js";
@@ -317,3 +317,148 @@ type Query {
   thing: Thing
 }
 `;
+
+/**
+ * A projected anatomy, as its `anatomy.yaml` spells it: a class's title,
+ * linked to its home, and its superclass's title read through a traversal.
+ */
+export const PROJECTED_ANATOMY = `---
+node:
+  uri: prism.component.class_probe
+  projection:
+    on: OntologyClass
+  edges:
+    - node:
+        role: title
+        projection:
+          field: _meta.title
+        edges:
+          - node:
+              role: home
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+      relation:
+        cardinality: "1"
+        slotName: title
+    - node:
+        role: parent
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "0..1"
+        slotName: parent
+        projection:
+          field: superclass
+`;
+
+/**
+ * The compiled reader artifact of the fragment {@link PROJECTED_ANATOMY}
+ * derives, with the typename and a spread beside its fields:
+ * `fragment ClassProbe_node on OntologyClass { __typename _meta { title curie } superclass { _meta { title } } ...Other_node }`.
+ */
+export const PROJECTED_FRAGMENT: ReaderFragment = {
+  kind: "Fragment",
+  name: "ClassProbe_node",
+  type: "OntologyClass",
+  metadata: null,
+  argumentDefinitions: [],
+  selections: [
+    { kind: "ScalarField", name: "__typename" },
+    {
+      kind: "LinkedField",
+      name: "_meta",
+      plural: false,
+      selections: [
+        { kind: "ScalarField", name: "title" },
+        { kind: "ScalarField", name: "curie" },
+      ],
+    },
+    {
+      kind: "LinkedField",
+      name: "superclass",
+      plural: false,
+      selections: [
+        {
+          kind: "LinkedField",
+          name: "_meta",
+          plural: false,
+          selections: [{ kind: "ScalarField", name: "title" }],
+        },
+      ],
+    },
+    { kind: "FragmentSpread", name: "Other_node" },
+  ],
+};
+
+/**
+ * A projected anatomy that dispatches on its node's type, as a dispatcher's
+ * `anatomy.yaml` spells it: one case reads a class's abstraction, the other
+ * the title every node carries, each in the scope the switch sits in.
+ */
+export const SWITCHED_ANATOMY = `---
+node:
+  uri: prism.component.switch_probe
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: abstract
+              projection:
+                on: OntologyClass
+                field: isAbstract
+          - node:
+              role: title
+              projection:
+                on: Node
+                field: _meta.title
+      relation:
+        cardinality: "1"
+`;
+
+/**
+ * The compiled reader artifact of the fragment {@link SWITCHED_ANATOMY}
+ * derives, its title under a condition and the class's abstraction under an
+ * inline fragment:
+ * `fragment SwitchProbe_node on Node @argumentDefinitions(withTitle: { type: "Boolean!" }) { __typename _meta @include(if: $withTitle) { title } ... on OntologyClass { isAbstract } }`.
+ */
+export const SWITCHED_FRAGMENT: ReaderFragment = {
+  kind: "Fragment",
+  name: "SwitchProbe_node",
+  type: "Node",
+  abstractKey: "__isNode",
+  metadata: null,
+  argumentDefinitions: [
+    {
+      kind: "LocalArgument",
+      name: "withTitle",
+      defaultValue: null,
+    },
+  ],
+  selections: [
+    { kind: "ScalarField", name: "__typename" },
+    {
+      kind: "Condition",
+      passingValue: true,
+      condition: "withTitle",
+      selections: [
+        {
+          kind: "LinkedField",
+          name: "_meta",
+          plural: false,
+          selections: [{ kind: "ScalarField", name: "title" }],
+        },
+      ],
+    },
+    {
+      kind: "InlineFragment",
+      type: "OntologyClass",
+      abstractKey: null,
+      selections: [{ kind: "ScalarField", name: "isAbstract" }],
+    },
+  ],
+};

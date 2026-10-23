@@ -1,0 +1,22 @@
+---
+# LineRow — a line of the network as a 32px list entry: the `Node`
+# projection's row, marked as a line's.
+# Reference: the projection matrix's list entry (Figma ZwVhG78TEaKIDLCdIdQ9Fi,
+# 547:2201), which NodeRow fills and EntityRow draws: a 24px line with 4px
+# block insets, on the subgrid of the list that holds it.
+#
+# A site arm: the row map renders it for lines, and it renders no root of
+# its own; its class joins NodeRow's `<li>`. It binds no style: the row
+# keeps EntityRow's insets, so it is 32px like every index's rows, and the
+# list's gutter sets one line apart from the next. A rule under each row is
+# not drawn: a border would make the row 33px, off the 4px lattice, and the
+# roster has no key that draws a rule without taking space.
+#
+# Token ledger: none; the row's decisions are EntityRow's.
+node:
+  uri: metro.component.line_row
+  edges:
+    - node:
+        uri: prism.component.node_row
+      relation:
+        cardinality: "1"

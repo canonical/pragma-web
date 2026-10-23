@@ -59,7 +59,6 @@ describe("createProseExtensions", () => {
 
   it("refuses a schema with no Node interface", () => {
     const factory = createProseExtensions();
-    if (typeof factory !== "function") throw new Error("not a factory");
     expect(() =>
       factory({ type: () => undefined, iface: () => undefined }),
     ).toThrow("the compiled schema has no Node interface");
@@ -158,7 +157,7 @@ describe("createProseExtensions", () => {
       { proseIndex: new Map([["x", LINKING]]) },
     );
     expect(result.errors?.map((error) => error.message)).toEqual([
-      "the schema has no Query.node resolver to resolve prose references through",
+      "the schema has no Query.node resolver to resolve nodes through",
     ]);
   });
 });

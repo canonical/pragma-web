@@ -122,6 +122,7 @@ describe("Shell", () => {
       {
         node: {
           __typename: "OntologyClass",
+          __isNode: "OntologyClass",
           uri: variables.id,
           _meta: {
             title: "Component",

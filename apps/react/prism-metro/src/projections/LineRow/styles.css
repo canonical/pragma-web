@@ -1,21 +1,12 @@
 /*
- * LineRow — a line's row: the Node arm's row with room around it and a
- * rule below it, so each line of the network reads as its own entry.
- *
- * Each design decision reads a component token bound to a semantic token,
- * so the site retunes the row through either tier.
+ * LineRow — a line's row: the Node arm's row, marked as a line's. It binds
+ * no style: the row keeps EntityRow's 4px block insets, so it is 32px on
+ * its list's subgrid like every index's rows, and the list's gutter sets
+ * one line apart from the next.
  */
 
 @layer app {
-  :root {
-    --line-row-padding-block: var(--space-100, 0.5rem);
-    --line-row-border-width: var(--dimension-stroke-thickness-medium, 1px);
-    --line-row-color-border: var(--color-border-muted, currentColor);
-  }
-
   .ds.line-row {
-    padding-block: var(--line-row-padding-block);
-    border-block-end: var(--line-row-border-width) solid
-      var(--line-row-color-border);
+    /* Component styles */
   }
 }

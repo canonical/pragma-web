@@ -1,38 +1,9 @@
-/*
- * NodeCard — the card of any node: its title and its compact address.
- *
- * Each design decision reads a component token declared on the card's root
- * and bound to a semantic token, to the spacing shim, or to its own literal
- * where no token exists, so a site retunes the card through either tier.
- */
+/* Scaffolded by @canonical/summon-component:react v0.43.0 */
 
-@layer ds.prism {
-  /* The gap between the title and its address is a `--space-*` step: the
-   * shim's container gaps are for layout containers, and no semantic name
-   * fits two lines of one entry. The border is a hairline: no stroke
-   * token exists, so it holds its own literal, `1px`. */
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
   .ds.node-card {
-    --node-card-gap: var(--space-050);
-    --node-card-padding-block: var(--component-padding-block);
-    --node-card-padding-inline: var(--component-padding-inline);
-    --node-card-border-width: 1px;
-    --node-card-color-border: var(--color-border-muted, currentColor);
-    --node-card-location-color-text: var(--color-text-muted);
-
-    display: flex;
-    flex-direction: column;
-    gap: var(--node-card-gap);
-    padding-block: var(--node-card-padding-block);
-    padding-inline: var(--node-card-padding-inline);
-    border: var(--node-card-border-width) solid var(--node-card-color-border);
-  }
-
-  .ds.node-card .title {
-    margin: 0;
-  }
-
-  .ds.node-card .location {
-    margin: 0;
-    color: var(--node-card-location-color-text);
+    /* Component styles */
   }
 }

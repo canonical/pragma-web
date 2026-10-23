@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<6610bb1cd86976b942c25817a8c2f9ce>>
+ * @generated SignedSource<<1b13bbb5e59de87e844cd31400ff6fa0>>
  * @lightSyntaxTransform
  */
 
@@ -36,14 +36,7 @@ v1 = [
     "name": "id",
     "variableName": "id"
   }
-],
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "uri",
-  "storageKey": null
-};
+];
 return {
   "fragment": {
     "argumentDefinitions": (v0/*:: as any*/),
@@ -108,44 +101,38 @@ return {
                 "alias": null,
                 "args": null,
                 "kind": "ScalarField",
-                "name": "curie",
-                "storageKey": null
-              },
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
                 "name": "title",
                 "storageKey": null
               },
               {
                 "alias": null,
                 "args": null,
-                "concreteType": "OntologyClass",
-                "kind": "LinkedField",
-                "name": "type",
-                "plural": false,
-                "selections": [
-                  (v2/*:: as any*/)
-                ],
+                "kind": "ScalarField",
+                "name": "curie",
                 "storageKey": null
               }
             ],
             "storageKey": null
           },
-          (v2/*:: as any*/)
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "uri",
+            "storageKey": null
+          }
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "9737c5930c001e28499335fae3c1a68b",
+    "cacheID": "04b61d612939c84a367e4f876126c7fc",
     "id": null,
     "metadata": {},
     "name": "ShellTestsQuery",
     "operationKind": "query",
-    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    curie\n  }\n  ...NodeChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  _meta {\n    title\n    curie\n    type {\n      uri\n    }\n  }\n}\n"
+    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...OntologyClassChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n"
   }
 };
 })();

@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -18,15 +18,26 @@ const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 /** Where the app's general components live. */
 const UI_DIRECTORY = join(APP_ROOT, "src", "lib", "ui");
 
-/** Where each domain's own components live: `src/domains/<subject>/lib`. */
+/**
+ * Where each domain's own components live, `src/domains/<subject>/lib`, for
+ * the domains that have any.
+ */
 const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
   withFileTypes: true,
 })
   .filter((entry) => entry.isDirectory())
-  .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"));
+  .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"))
+  .filter((directory) => existsSync(directory));
 
 /** The semantic tokens the app's components read beyond the shim. */
-const EXTERNAL_TOKENS = ["--color-background", "--color-text"];
+const EXTERNAL_TOKENS = [
+  "--color-background",
+  "--color-text",
+  "--color-text-muted",
+  "--typography-text-primary-bold-font-weight",
+  "--typography-text-primary-font-size",
+  "--typography-text-primary-line-height",
+];
 
 /**
  * The document tokens the shell declares on `:root`: the intrinsic grid's
@@ -35,6 +46,15 @@ const EXTERNAL_TOKENS = ["--color-background", "--color-text"];
 const DOCUMENT_TOKENS = ["--grid-col-min"];
 
 const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
+
+/**
+ * The private subcomponents, each in its parent's `common/` folder. The
+ * scaffold check places a component only under `src/lib/ui` or a domain's
+ * `lib`, so these keep their anatomy and their styles, not that check.
+ */
+const subcomponentFolders = listAnatomyFolders(
+  folders.map((folder) => join(folder, "common")),
+);
 
 describe("the app's components", () => {
   it("are found, the shell among them", () => {
@@ -49,14 +69,45 @@ describe("the app's components", () => {
     },
   );
 
-  it("keep the design's token and grid rules in their stylesheets", () => {
-    expect(() =>
-      assertStylesheets({
-        directory: UI_DIRECTORY,
-        layer: "ds.components.global",
-        externalTokens: EXTERNAL_TOKENS,
-        documentTokens: DOCUMENT_TOKENS,
-      }),
-    ).not.toThrow();
+  it("are found in the domains too, the landing among them", () => {
+    expect(folders).toContain(
+      join(APP_ROOT, "src", "domains", "metro", "lib", "HomePage"),
+    );
   });
+
+  it("have their subcomponents found, the landing's doors among them", () => {
+    expect(subcomponentFolders).toContain(
+      join(
+        APP_ROOT,
+        "src",
+        "domains",
+        "metro",
+        "lib",
+        "HomePage",
+        "common",
+        "LensCards",
+      ),
+    );
+  });
+
+  it.each(subcomponentFolders)(
+    "%s keeps its anatomy and its styles",
+    (folder) => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
+    },
+  );
+
+  it.each([UI_DIRECTORY, ...DOMAIN_LIBRARIES])(
+    "keep the design's token and grid rules in the stylesheets under %s",
+    (directory) => {
+      expect(() =>
+        assertStylesheets({
+          directory,
+          layer: "ds.components.global",
+          externalTokens: EXTERNAL_TOKENS,
+          documentTokens: DOCUMENT_TOKENS,
+        }),
+      ).not.toThrow();
+    },
+  );
 });

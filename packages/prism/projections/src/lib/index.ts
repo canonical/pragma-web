@@ -1,16 +1,12 @@
 /**
- * The Entity representations of a Prism documentation site: each renders
- * any graph node through the arm its site maps to the node's type.
+ * The Entity projections of a Prism documentation site: generic slotted
+ * components for the five forms an entity takes, the projections that fill
+ * them from a type's Relay fragment, and the dispatchers that render any
+ * graph node through the arm its site maps to the node's type.
  *
  * @module
  */
 
-export type { CardProjectionProps } from "./CardProjection/index.js";
-export { CardProjection } from "./CardProjection/index.js";
-export type { ChipProjectionProps } from "./ChipProjection/index.js";
-export { ChipProjection } from "./ChipProjection/index.js";
-export type { CommandProjectionProps } from "./CommandProjection/index.js";
-export { CommandProjection } from "./CommandProjection/index.js";
 export type {
   ProseLinkProps,
   ProseReferencesProviderProps,
@@ -19,18 +15,74 @@ export {
   markdownComponents,
   ProseReferencesProvider,
 } from "./markdown/index.js";
-export { defaultProjectionMaps } from "./node/index.js";
 export type {
+  CardArmNative,
+  CardProjectionProps,
+  ChipArmNative,
+  ChipProjectionProps,
+  CommandArmNative,
+  CommandProjectionProps,
+  GraphNodeArmNative,
+  GraphNodeProjectionProps,
+  NodeCardProps,
+  NodeChipProps,
+  NodeCommandProps,
+  NodeGraphNodeProps,
+  NodeListProps,
+  NodeRowProps,
+  RowArmNative,
+  RowProjectionProps,
+} from "./node/index.js";
+export {
+  CardProjection,
+  ChipProjection,
+  CommandProjection,
+  defaultProjectionMaps,
+  GraphNodeProjection,
+  NodeCard,
+  NodeChip,
+  NodeCommand,
+  NodeGraphNode,
+  NodeList,
+  NodeRow,
+  RowProjection,
+} from "./node/index.js";
+export type {
+  OntologyClassCardProps,
+  OntologyClassChipProps,
+  OntologyClassCommandProps,
+  OntologyClassGraphNodeProps,
+  OntologyClassRowProps,
+  OntologyPropertyCardProps,
+  OntologyPropertyChipProps,
+  OntologyPropertyCommandProps,
+  OntologyPropertyGraphNodeProps,
+  OntologyPropertyRowProps,
+} from "./ontology/index.js";
+export {
+  OntologyClassCard,
+  OntologyClassChip,
+  OntologyClassCommand,
+  OntologyClassGraphNode,
+  OntologyClassRow,
+  OntologyPropertyCard,
+  OntologyPropertyChip,
+  OntologyPropertyCommand,
+  OntologyPropertyGraphNode,
+  OntologyPropertyRow,
+} from "./ontology/index.js";
+export type {
+  ArmProps,
+  ProjectionArm,
   ProjectionMap,
   ProjectionMaps,
   ProjectionsProviderProps,
+  SiteArmProps,
 } from "./projections/index.js";
 export {
   ProjectionsProvider,
   useProjectionMaps,
 } from "./projections/index.js";
-export type { RowProjectionProps } from "./RowProjection/index.js";
-export { RowProjection } from "./RowProjection/index.js";
 export type {
   EntityCardKeyValue,
   EntityCardProps,

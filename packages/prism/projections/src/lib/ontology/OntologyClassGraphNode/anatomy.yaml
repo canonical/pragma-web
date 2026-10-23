@@ -1,0 +1,53 @@
+---
+# OntologyClassGraphNode: an ontology class as a node of a graph.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 566:2357 (the classes row's
+# graph node: "ds:Layout" in the identifier face, then "Abstract class in
+# design-system" muted). The title is the compact address; the kind names
+# the class's abstraction; the location is the address's prefix.
+# Projected onto EntityGraphNode, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved from
+# the compact address; a class without one reads as inert text.
+node:
+  uri: prism.component.ontology_class_graph_node
+  projection:
+    on: OntologyClass
+  edges:
+    - node:
+        uri: prism.component.entity_graph_node
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.curie
+              edges:
+                # The compact address is set in the identifier face.
+                - node:
+                    role: identifier
+                  relation:
+                    cardinality: "1"
+                    slotName: identifier
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: isAbstract
+            relation:
+              cardinality: "1"
+              slotName: kind
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+      relation:
+        cardinality: "1"

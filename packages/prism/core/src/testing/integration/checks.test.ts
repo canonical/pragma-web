@@ -2,9 +2,18 @@
 
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseAnatomyYAML } from "@canonical/anatomy-dsl";
+import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import {
+  PROJECTED_ANATOMY,
+  PROJECTED_FRAGMENT,
+  SWITCHED_ANATOMY,
+  SWITCHED_FRAGMENT,
+} from "../../../testing/fixtures.js";
+import {
   assertAnatomy,
+  assertProjectionMatchesFragment,
   assertScaffold,
   assertStylesheets,
   assertStylesMatchAnatomy,
@@ -38,7 +47,10 @@ describe("the component checks", () => {
           join(CONFORMING, "src", "lib", "ui"),
           join(CONFORMING, "src", "domains"),
         ]),
-      ).toEqual([locate(CONFORMING, "Probe")]);
+      ).toEqual([
+        locate(CONFORMING, "Probe"),
+        locate(CONFORMING, "ScaffoldedProbe"),
+      ]);
     });
   });
 
@@ -61,6 +73,143 @@ describe("the component checks", () => {
           externalTokens: EXTERNAL_TOKENS,
         }),
       ).not.toThrow();
+    });
+  });
+
+  describe("on a component the next generator release scaffolds", () => {
+    const folder = locate(CONFORMING, "ScaffoldedProbe");
+
+    it("passes the scaffold check with the Scaffolded by banner", () => {
+      expect(() =>
+        assertScaffold(folder, { packageRoot: CONFORMING, testSuffix: "test" }),
+      ).not.toThrow();
+    });
+
+    it("refuses a banner that names another generator", () => {
+      expect(() =>
+        assertScaffold(locate(DRIFTED, "ForeignBanner"), {
+          packageRoot: DRIFTED,
+          testSuffix: "test",
+        }),
+      ).toThrow(/ForeignBanner\.tsx does not open with the generator's banner/);
+    });
+  });
+
+  describe("on a component grouped under a library's subject folder", () => {
+    it("passes the scaffold check one folder below src/lib", () => {
+      expect(() =>
+        assertScaffold(
+          join(CONFORMING, "src", "lib", "probes", "SubjectProbe"),
+          { packageRoot: CONFORMING, testSuffix: "test" },
+        ),
+      ).not.toThrow();
+    });
+
+    it("refuses a folder two levels below src/lib", () => {
+      expect(() =>
+        assertScaffold(
+          join(DRIFTED, "src", "lib", "probes", "deep", "DeepProbe"),
+          { packageRoot: DRIFTED, testSuffix: "test" },
+        ),
+      ).toThrow(
+        /src\/lib\/probes\/deep\/DeepProbe is not a component placement/,
+      );
+    });
+  });
+
+  describe("assertProjectionMatchesFragment", () => {
+    const specification = parseAnatomyYAML(PROJECTED_ANATOMY);
+
+    it("passes when the anatomy and the fragment read the same fields", () => {
+      expect(() =>
+        assertProjectionMatchesFragment(specification, PROJECTED_FRAGMENT),
+      ).not.toThrow();
+    });
+
+    it("names the path each side reads and the other does not", () => {
+      const withoutCurie: ReaderFragment = {
+        ...PROJECTED_FRAGMENT,
+        selections: PROJECTED_FRAGMENT.selections.map((selection) =>
+          selection.kind === "LinkedField" && selection.name === "_meta"
+            ? {
+                ...selection,
+                selections: selection.selections.filter(
+                  (inner) =>
+                    !(inner.kind === "ScalarField" && inner.name === "curie"),
+                ),
+              }
+            : selection,
+        ),
+      };
+      const withoutParent = {
+        root: {
+          ...specification.root,
+          edges: specification.root.edges?.filter(
+            (edge) => edge.relation.slotName !== "parent",
+          ),
+        },
+      };
+      expect(() =>
+        assertProjectionMatchesFragment(withoutParent, withoutCurie),
+      ).toThrow(
+        /the anatomy reads _meta\.curie, which ClassProbe_node does not\nClassProbe_node reads superclass\._meta\.title, which the anatomy does not/,
+      );
+    });
+
+    it("refuses a fragment on another type than the anatomy projects on", () => {
+      expect(() =>
+        assertProjectionMatchesFragment(specification, {
+          ...PROJECTED_FRAGMENT,
+          type: "Node",
+        }),
+      ).toThrow(
+        /prism\.component\.class_probe projects on OntologyClass, but ClassProbe_node is on Node/,
+      );
+    });
+
+    describe("through a switch, an inline fragment and a condition", () => {
+      const switched = parseAnatomyYAML(SWITCHED_ANATOMY);
+
+      it("passes when each case reads what the fragment reads under its type or condition", () => {
+        expect(() =>
+          assertProjectionMatchesFragment(switched, SWITCHED_FRAGMENT),
+        ).not.toThrow();
+      });
+
+      it("names a case's field the fragment drops and a conditional field no case reads", () => {
+        const withoutInlineFragment: ReaderFragment = {
+          ...SWITCHED_FRAGMENT,
+          selections: SWITCHED_FRAGMENT.selections.filter(
+            (selection) => selection.kind !== "InlineFragment",
+          ),
+        };
+        const withoutTitleCase = {
+          root: {
+            ...switched.root,
+            edges: switched.root.edges?.map((edge) =>
+              "cases" in edge.target
+                ? {
+                    ...edge,
+                    target: {
+                      ...edge.target,
+                      cases: edge.target.cases.filter(
+                        ({ node }) => node.projection?.field !== "_meta.title",
+                      ),
+                    },
+                  }
+                : edge,
+            ),
+          },
+        };
+        expect(() =>
+          assertProjectionMatchesFragment(
+            withoutTitleCase,
+            withoutInlineFragment,
+          ),
+        ).toThrow(
+          /the anatomy reads isAbstract, which SwitchProbe_node does not\nSwitchProbe_node reads _meta\.title, which the anatomy does not/,
+        );
+      });
     });
   });
 

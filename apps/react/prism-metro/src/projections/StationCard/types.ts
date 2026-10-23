@@ -1,9 +1,8 @@
-import type { ProjectionMaps } from "@canonical/prism-projections";
-import type { ComponentProps } from "react";
+import type { NodeCardProps, SiteArmProps } from "@canonical/prism-projections";
 
 /**
- * Props accepted by `StationCard`: the props every card arm receives, the
- * node read through the card's composite fragment and its home, then the
- * native props of the `<article>` the `Node` arm renders as the root.
+ * Props accepted by `StationCard`, a site arm: the props of the `Node`
+ * projection's card it wraps, the node's key and the native props of its
+ * `<div>` root, and the node's typename.
  */
-export type StationCardProps = ComponentProps<ProjectionMaps["card"]["Node"]>;
+export type StationCardProps = SiteArmProps<NodeCardProps>;

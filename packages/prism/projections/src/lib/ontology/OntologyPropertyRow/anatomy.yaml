@@ -1,0 +1,53 @@
+---
+# OntologyPropertyRow: an ontology property as a 32px list entry.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 547:2201 (the list entry:
+# the name, and one muted word at the end). The word is the property's
+# kind: object, datatype or annotation. A property's address has no
+# compact form in the contract, so the row carries no prefix.
+# Projected onto EntityRow, which carries every style: this anatomy binds
+# none. It is not dispatched: a property is not a Node.
+# The name is the label, or the local name of the IRI when the property has
+# none (a property carries no computed title). The home is the link the
+# name renders through, resolved from the absolute IRI, a property's only
+# address; a property without one reads as inert text.
+node:
+  uri: prism.component.ontology_property_row
+  projection:
+    on: OntologyProperty
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: title
+              edges:
+                - node:
+                    role: label
+                    projection:
+                      field: label
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: local name
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: home
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: meta
+              projection:
+                field: kind
+            relation:
+              cardinality: "1"
+              slotName: meta
+      relation:
+        cardinality: "1"

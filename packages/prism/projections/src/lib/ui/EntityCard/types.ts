@@ -2,12 +2,16 @@
 
 import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode } from "react";
+import type { PARENT_MESSAGES } from "./constants.js";
 
 /** One key value of a card: the key is its React key too, so it is a string. */
 export interface EntityCardKeyValue {
   /** What the value is, muted on the left half. */
   readonly key: string;
-  /** The value, on the right half. */
+  /**
+   * The value, on the right half. An identifier in it is a
+   * `<code className="identifier">`, which keeps the pair's line.
+   */
   readonly value: ReactNode;
 }
 
@@ -16,8 +20,16 @@ type OwnProps = {
   readonly location?: ReactNode;
   /** The entity's name: the card's heading. */
   readonly title: ReactNode;
-  /** The entity the title belongs to, after the catalog's `∈`. */
+  /**
+   * The entity the title belongs to, after the catalog's `∈`, or after its
+   * `⊂` for a subclass.
+   */
   readonly parent?: ReactNode;
+  /**
+   * How the title relates to its parent: an instance of it (`∈`, the
+   * default) or a subclass of it (`⊂`).
+   */
+  readonly parentRelation?: keyof typeof PARENT_MESSAGES;
   /**
    * The entity's home: with one the title links to it, without one the title
    * is inert text.

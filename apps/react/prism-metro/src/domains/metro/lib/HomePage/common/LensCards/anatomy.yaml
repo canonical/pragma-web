@@ -1,0 +1,32 @@
+---
+# LensCards — the landing's doors, a subcomponent of HomePage: one LensCard per lens the route table
+# declares, in rail order, each with the count the graph gives it, read from
+# the landing's one query, which the route's warm puts in the store first.
+#
+# Reference: the atlas compositions' card groups and the Figma card's width
+# (ZwVhG78TEaKIDLCdIdQ9Fi, 484:264: 209px wide, two intrinsic columns), so
+# each door spans two columns of the page's subgrid; a narrower subgrid
+# clamps the span, so a door never overflows.
+#
+# It renders no element of its own: the published Cards group
+# (global.group.cards) is the root, a subgrid at `1 / -1` whose shared row
+# tracks line the doors' sections up across a row; the two-column span is
+# Cards' own `cardSpan`. This anatomy binds no styles and the folder has no
+# stylesheet. Not a projection: the doors come from the route table, and
+# the Definitions figure is a sum over every ontology's classes, which no
+# single field renders. Not the shared entity list either: a lens is not a
+# node of the graph.
+#
+# Token ledger: Cards' `cardSpan` 2, a component-local count (the roster's
+# own why on layout.grid.column): two intrinsic columns, the Figma card's
+# width.
+node:
+  uri: metro.subcomponent.lens_cards
+  edges:
+    - node:
+        uri: global.group.cards
+        edges:
+          - node:
+              uri: metro.component.lens_card
+            relation: { cardinality: "1..*", slotName: default }
+      relation: { cardinality: "1", slotName: group }

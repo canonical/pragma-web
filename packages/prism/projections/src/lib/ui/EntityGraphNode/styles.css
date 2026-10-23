@@ -17,6 +17,8 @@
     --entity-graph-node-focus-ring-width: 2px;
     --entity-graph-node-focus-ring-offset: -2px;
     --entity-graph-node-focus-ring-color: var(--color-focus-ring);
+    /* No token names the monospace face: the reset's list for `code`. */
+    --entity-graph-node-identifier-font-family: ui-monospace, monospace;
 
     font-size: var(--entity-graph-node-font-size);
   }
@@ -49,6 +51,12 @@
     outline-style: solid;
     outline-color: var(--entity-graph-node-focus-ring-color);
     outline-offset: var(--entity-graph-node-focus-ring-offset);
+  }
+
+  /* An identifier sets the monospace face, which an SVG `<text>` takes
+   * from no `<code>`. */
+  .ds.entity-graph-node .identifier {
+    font-family: var(--entity-graph-node-identifier-font-family);
   }
 
   .ds.entity-graph-node .context {
