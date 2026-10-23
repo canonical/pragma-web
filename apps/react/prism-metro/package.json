@@ -11,7 +11,6 @@
     "#lib/ui": "./src/lib/ui/index.ts",
     "#projections": "./src/projections/index.ts",
     "#relay": "./src/relay/index.ts",
-    "#relay/__generated__/*": "./src/relay/__generated__/*",
     "#server": "./src/server/index.ts",
     "#site": "./src/site/index.ts",
     "#sitemap": "./src/sitemap/index.ts"

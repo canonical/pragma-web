@@ -36,6 +36,6 @@ export type {
   MetroHomeQuery,
   MetroHomeQuery$data,
   MetroHomeQuery$variables,
-} from "#relay/__generated__/MetroHomeQuery.graphql.js";
+} from "#relay";
 /** The compiled `MetroHomeQuery`. */
-export { default as homeQueryNode } from "#relay/__generated__/MetroHomeQuery.graphql.js";
+export { metroHomeQueryNode as homeQueryNode } from "#relay";
