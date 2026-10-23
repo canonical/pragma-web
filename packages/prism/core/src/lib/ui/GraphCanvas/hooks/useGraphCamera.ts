@@ -7,6 +7,7 @@ import computeFitTransform from "../computeFitTransform.js";
 import computeRevealTransform from "../computeRevealTransform.js";
 import {
   CAMERA_MOVE_MS,
+  CLICK_DISTANCE,
   PAN_MARGIN,
   REDUCED_MOTION_QUERY,
   ZOOM_EXTENT,
@@ -65,7 +66,9 @@ function prefersReducedMotion(): boolean {
 /**
  * Bind a d3-zoom camera to a graph canvas's viewport: drag to pan, wheel or
  * pinch to zoom toward the pointer, within the zoom extent and a pan margin
- * of twice the graph's size. The camera writes its transform straight to
+ * of twice the graph's size. A press that moves less than the click
+ * distance is a click, so a link under it still follows, and a double
+ * click never zooms. The camera writes its transform straight to
  * the camera group, so React never renders one and the server's markup,
  * at the identity, hydrates unchanged.
  *
@@ -178,6 +181,7 @@ export default function useGraphCamera({
     };
     const active: ViewportZoom = zoom<SVGSVGElement, unknown>()
       .scaleExtent([...ZOOM_EXTENT])
+      .clickDistance(CLICK_DISTANCE)
       .extent((): [[number, number], [number, number]] => {
         const { visible } = measureViewport(svg, latest.current.viewBox);
         return [
@@ -201,7 +205,8 @@ export default function useGraphCamera({
         readScale();
       });
     const selection = select(svg);
-    selection.call(active);
+    // A double click selects what it lands on; it never zooms the camera.
+    selection.call(active).on("dblclick.zoom", null);
     behaviour.current = active;
     readScale();
     const observer =

@@ -2,12 +2,14 @@
 
 import {
   act,
+  createEvent,
   fireEvent,
   render,
   screen,
   waitFor,
 } from "@testing-library/react";
 import { select } from "d3-selection";
+import type { MouseEvent } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import GraphCanvas from "./GraphCanvas.js";
 import useGraphZoomBucket from "./hooks/useGraphZoomBucket.js";
@@ -42,6 +44,29 @@ function stubViewportSize(width: number, height: number): void {
     toJSON: () => ({}),
   });
 }
+
+/**
+ * Fire a primary-button mouse event at a point, with the window as its
+ * view, as d3-zoom's drag handling reads it.
+ */
+function press(
+  target: Element | Window,
+  type: "mouseDown" | "mouseMove" | "mouseUp",
+  clientX: number,
+  clientY: number,
+): void {
+  const event = createEvent[type](target, { button: 0, clientX, clientY });
+  Object.defineProperty(event, "view", { value: window });
+  fireEvent(target, event);
+}
+
+/** A link handler that records the click and stays on the page. */
+const follow =
+  (onClick: () => void) =>
+  (event: MouseEvent<Element>): void => {
+    event.preventDefault();
+    onClick();
+  };
 
 const renderCanvas = (props: { fit?: GraphBox; reveal?: GraphBox } = {}) =>
   render(
@@ -150,6 +175,54 @@ describe("GraphCanvas", () => {
       clientY: 0,
     });
     expect(readCamera()).toBe("translate(0,0) scale(2)");
+  });
+
+  it("keeps a press that jitters under the click distance a click", () => {
+    const onClick = vi.fn();
+    render(
+      <GraphCanvas label="Class graph" viewBox={VIEW_BOX}>
+        <a data-testid="target" href="/class" onClick={follow(onClick)}>
+          <rect height={32} width={96} />
+        </a>
+      </GraphCanvas>,
+    );
+    const target = screen.getByTestId("target");
+    press(target, "mouseDown", 10, 10);
+    press(window, "mouseMove", 11, 11);
+    press(window, "mouseUp", 11, 11);
+    fireEvent.click(target, { clientX: 11, clientY: 11 });
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("treats a press that travels past the click distance as a pan", async () => {
+    const onClick = vi.fn();
+    render(
+      <GraphCanvas label="Class graph" viewBox={VIEW_BOX}>
+        <a data-testid="target" href="/class" onClick={follow(onClick)}>
+          <rect height={32} width={96} />
+        </a>
+      </GraphCanvas>,
+    );
+    const target = screen.getByTestId("target");
+    press(target, "mouseDown", 10, 10);
+    press(window, "mouseMove", 40, 10);
+    press(window, "mouseUp", 40, 10);
+    fireEvent.click(target, { clientX: 40, clientY: 10 });
+    expect(onClick).not.toHaveBeenCalled();
+    expect(readCamera()).toBe("translate(30,0) scale(1)");
+    // d3 swallows the window's next click until its timer releases it.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  it("never zooms on a double click", async () => {
+    renderCanvas();
+    fireEvent.dblClick(screen.getByTestId("bucket"), {
+      clientX: 100,
+      clientY: 100,
+    });
+    // d3's own double-click zoom would be a transition well under way.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(readCamera()).toBeNull();
   });
 
   it("hides the lattice and every text below the overview threshold", () => {

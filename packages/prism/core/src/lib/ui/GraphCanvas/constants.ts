@@ -25,6 +25,12 @@ export const LATTICE_DOT_RADIUS = 1;
  */
 export const PAN_MARGIN = 2;
 
+/**
+ * How far, in screen pixels, a press may move and still be a click rather
+ * than a pan: the jitter of a hand on a trackpad.
+ */
+export const CLICK_DISTANCE = 4;
+
 /** How long a camera move a control or a prop asks for takes, in ms. */
 export const CAMERA_MOVE_MS = 200;
 
