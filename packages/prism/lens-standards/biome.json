@@ -2,6 +2,7 @@
   "extends": ["@canonical/biome-config"],
   "files": {
     "includes": [
+      ".storybook",
       "src",
       "testing",
       "scripts",
