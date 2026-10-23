@@ -11,7 +11,7 @@ describe("useLensFilter", () => {
     expect(result.current.filter).toBe(DEFAULT_LENS_FILTER);
     act(() => {
       result.current.setFilter({ ...DEFAULT_LENS_FILTER, text: "block" });
-      result.current.setRegion("ds");
+      result.current.requestRegion("ds");
     });
     expect(result.current.filter).toBe(DEFAULT_LENS_FILTER);
     expect(result.current.region).toBeUndefined();

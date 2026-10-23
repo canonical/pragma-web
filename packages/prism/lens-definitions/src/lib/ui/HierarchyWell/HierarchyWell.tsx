@@ -57,8 +57,9 @@ function readClosest(
  * the graph or the rail, makes it the focus: everything outside its
  * neighbourhood fades and its relations show their labels. Pointing at a
  * relation shows its label and rings its ends. The filter's chips hide
- * classes, and the camera fits what is left; the search and the instances
- * axis dim. A region a reader picks in the inspector is fitted too.
+ * classes, and the camera fits what is left, which the Fit control
+ * restores; the search and the instances axis dim. A region a reader picks
+ * in the inspector is fitted once per pick.
  *
  * The graph is one tab stop: the arrows move along the tree (up and down
  * in a column, left to the superclass, right to the first subclass, Home
@@ -127,9 +128,14 @@ export default function HierarchyWell({
         };
   }, [activeEdge, focus, layout, t]);
   const fit = useMemo(
-    () => measureVisibleBox(layout, hidden, region),
-    [hidden, layout, region],
+    () => measureVisibleBox(layout, hidden, undefined),
+    [hidden, layout],
   );
+  const frame = useMemo(() => {
+    if (region === undefined) return undefined;
+    const box = measureVisibleBox(layout, hidden, region.prefix);
+    return box === undefined ? undefined : { box, serial: region.serial };
+  }, [hidden, layout, region]);
   const selectedNode =
     selected === undefined ? undefined : layout.nodes.get(selected);
   const reveal =
@@ -191,6 +197,7 @@ export default function HierarchyWell({
       <GraphCanvas
         className="desktop"
         fit={fit}
+        frame={frame}
         label={t("well.label")}
         reveal={reveal}
         viewBox={{

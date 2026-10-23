@@ -23,7 +23,9 @@ function Overview(): ReactElement {
   const { region } = useLensFilter();
   return (
     <>
-      <output aria-label="Region">{region ?? "all"}</output>
+      <output aria-label="Region">
+        {region === undefined ? "all" : `${region.prefix} #${region.serial}`}
+      </output>
       <GraphOverview
         className="custom-class"
         data-testid="overview"
@@ -73,13 +75,18 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     expect(buttons.at(1)?.textContent).toMatch(/^cs3 classes/);
   });
 
-  it("asks the graph to fit the namespace a reader picks", () => {
+  it("asks the graph to fit the namespace a reader picks, each time", () => {
     const overview = renderOverview();
-    fireEvent.click(
-      within(overview).getByRole("button", { name: "Fit the graph to cs" }),
-    );
+    const cs = within(overview).getByRole("button", {
+      name: "Fit the graph to cs",
+    });
+    fireEvent.click(cs);
     expect(screen.getByRole("status", { name: "Region" }).textContent).toBe(
-      "cs",
+      "cs #1",
+    );
+    fireEvent.click(cs);
+    expect(screen.getByRole("status", { name: "Region" }).textContent).toBe(
+      "cs #2",
     );
   });
 

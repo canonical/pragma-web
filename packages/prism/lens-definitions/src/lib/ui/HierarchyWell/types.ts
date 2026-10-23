@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import type { ClassGraphLayout } from "../../classGraph/types.js";
-import type { LensFilter } from "../../types.js";
+import type { LensFilter, RegionRequest } from "../../types.js";
 
 type OwnProps = {
   /** The class graph laid out. */
@@ -23,8 +23,8 @@ type OwnProps = {
   readonly hoverCentre: string | undefined;
   /** Raise or clear the shared hover centre from a graph interaction. */
   readonly onHoverTerm: (term: string | undefined) => void;
-  /** The prefix of a region a reader asked the camera to fit. */
-  readonly region?: string;
+  /** The latest request to fit the camera to a region, fitted once each. */
+  readonly region?: RegionRequest;
 };
 
 /**

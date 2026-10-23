@@ -29,8 +29,23 @@ describe("useProviderState's region", () => {
     const { result } = renderHook(() => useProviderState());
     expect(result.current.region).toBeUndefined();
     act(() => {
-      result.current.setRegion("cs");
+      result.current.requestRegion("cs");
     });
-    expect(result.current.region).toBe("cs");
+    expect(result.current.region).toEqual({ prefix: "cs", serial: 1 });
+  });
+
+  it("numbers a second pick of the same region as a new request", () => {
+    const { result } = renderHook(() => useProviderState());
+    act(() => {
+      result.current.requestRegion("cs");
+    });
+    act(() => {
+      result.current.requestRegion("cs");
+    });
+    expect(result.current.region).toEqual({ prefix: "cs", serial: 2 });
+    act(() => {
+      result.current.requestRegion("ds");
+    });
+    expect(result.current.region).toEqual({ prefix: "ds", serial: 3 });
   });
 });

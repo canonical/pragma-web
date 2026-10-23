@@ -33,6 +33,17 @@ export interface LensFilterState extends Omit<LensFilter, "namespaces"> {
   readonly namespaces?: readonly string[] | undefined;
 }
 
+/**
+ * A reader's request to fit the graph's camera to one region: a new
+ * `serial` is a new request, so picking the same region twice fits it twice.
+ */
+export interface RegionRequest {
+  /** The prefix of the region to fit. */
+  readonly prefix: string;
+  /** The request's number, counting up from 1. */
+  readonly serial: number;
+}
+
 /** One ontology's addressing identity, as the graph states it. */
 export interface OntologyNamespace {
   /** The compact prefix, e.g. `ds`. */

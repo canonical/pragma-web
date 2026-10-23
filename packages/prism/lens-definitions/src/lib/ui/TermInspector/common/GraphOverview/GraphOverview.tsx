@@ -33,7 +33,7 @@ export default function GraphOverview({
   ...props
 }: GraphOverviewProps): ReactElement {
   const t = useMessages();
-  const { setRegion } = useLensFilter();
+  const { requestRegion } = useLensFilter();
   const specimens = useMemo(
     () =>
       SPECIMENS.map((specimen) => ({
@@ -79,7 +79,7 @@ export default function GraphOverview({
                   prefix: ontology.prefix,
                 })}
                 className="namespace"
-                onClick={() => setRegion(ontology.prefix)}
+                onClick={() => requestRegion(ontology.prefix)}
                 type="button"
               >
                 <span className="abbreviation">{ontology.prefix}</span>

@@ -4,8 +4,8 @@ import type { LensFilterValue } from "./types.js";
 
 /**
  * The one context in the lens: the reader's filter, shared by the strip's
- * chips, the explorer and the inspector, and the region a reader asked the
- * graph to fit from the inspector.
+ * chips, the explorer and the inspector, and the latest region a reader
+ * asked the graph to fit from the inspector.
  *
  * The mode strip is rendered by the lens's own layout (`DefinitionsLayout`)
  * as a sibling of the routed page, not a descendant: the router hands the
@@ -30,7 +30,7 @@ const LensFilterContext = createContext<LensFilterValue>({
   filter: DEFAULT_LENS_FILTER,
   setFilter: () => {},
   region: undefined,
-  setRegion: () => {},
+  requestRegion: () => {},
 });
 
 export default LensFilterContext;

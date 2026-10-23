@@ -50,4 +50,4 @@ export const Filtered: Story = {
 };
 
 /** A region a reader asked the camera to fit. */
-export const Region: Story = { args: { region: "cs" } };
+export const Region: Story = { args: { region: { prefix: "cs", serial: 1 } } };
