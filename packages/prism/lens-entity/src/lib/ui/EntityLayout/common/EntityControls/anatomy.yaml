@@ -1,0 +1,55 @@
+---
+# EntityControls — the strip's controls tenant on the index: a native search
+# box, labelled from the catalog, that narrows the loaded entries by
+# writing the shared filter.
+#
+# Bespoke: the published TextInput reads the form tier's density tokens
+# and frame, which a strip outside a Form does not carry. The box sits in
+# the strip band, whose height is fixed chrome, so its insets are compact
+# steps of the spacing scale and its text the secondary size; the shim's
+# component padding (8px block, 16px inline) is a surface's. Square
+# corners: radius has no semantic token, so none is set. A keyboard focus
+# draws the focus ring on its edge.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-controls-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   space.050 (4px) block and space.100 (8px) inline insets: the strip's
+#     compact control; no semantic inset is that small.
+#   1px: the box's hairline frame; stroke width has only primitives.
+#   2px: the focus ring's width; there is no semantic focus-ring width.
+#   size.min.width 0, appearance.outline.offset 0: resets.
+#   typography.font inherit, appearance.border.style solid: keywords.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050,
+# space.100, and the semantic typography symbol
+# typography.text.secondary.fontSize.
+node:
+  uri: prism.subcomponent.entity_controls
+  styles:
+    layout.type: flex
+    layout.align: center
+    spacing.gap: grid.gutter
+    size.min.width: 0
+  edges:
+    - node:
+        role: search (a native search input, labelled from the catalog)
+        styles:
+          size.min.width: 0
+          spacing.internal.block.start: space.050
+          spacing.internal.block.end: space.050
+          spacing.internal.inline.start: space.100
+          spacing.internal.inline.end: space.100
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.color: color.border.muted
+          appearance.background: color.background
+          typography.font: inherit
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text
+          appearance.outline.width@focus: 2px
+          appearance.outline.style@focus: solid
+          appearance.outline.color@focus: color.focusRing
+          appearance.outline.offset@focus: 0
+      relation: { cardinality: "1", slotName: search }

@@ -1,0 +1,51 @@
+---
+# EntityIndex — the bound class's loaded instances, narrowed by the strip's
+# search, in the shared list view (EntityList): its toolbar's toggle
+# switches between the rows and the cards views and keeps the view in the
+# address, and its entries are the site's row or card projections, which
+# dispatch on each node's type, so a site's arm renders its entries and
+# links each to its home. The rows view lists 32px entries; the cards view
+# is the published Cards group at two columns a card. A class with no
+# instance, or a search that hides every loaded one, shows the list view's
+# empty line. Then the explicit "Load more", the published Button at
+# secondary importance, busy while the next page loads, while the graph
+# has more.
+#
+# A subgrid of the page over every column, its gap the grid's gutter on
+# both axes: the list view and the Load more line each span the whole main
+# column.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-index-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure, a span in columns.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: prism.subcomponent.entity_index
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        uri: prism.component.entity_list
+        edges:
+          - switch:
+              on: props
+              cases:
+                - uri: prism.component.row_projection
+                - uri: prism.component.card_projection
+            relation: { cardinality: "0..*", slotName: items }
+      relation: { cardinality: "1", slotName: list }
+    - node:
+        role: more (holds the Load more button at its own width)
+        styles:
+          layout.grid.column: "1 / -1"
+        edges:
+          - node:
+              uri: global.component.button
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1", slotName: more }

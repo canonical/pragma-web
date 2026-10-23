@@ -1,4 +1,5 @@
 import type { EntityBinding } from "@canonical/prism-core";
+import type { MemoryAdapter } from "@canonical/router-core";
 import type { ReactNode } from "react";
 import type {
   Environment,
@@ -55,7 +56,7 @@ export interface EntitySiteLayout {
 
 /** What `createEntitySite` mounts. */
 export interface EntitySiteSetup {
-  /** The URL the static router matches. */
+  /** The URL the router starts at. */
   readonly url: string;
   /** The Relay environment the site reads from. */
   readonly environment: Environment;
@@ -64,6 +65,18 @@ export interface EntitySiteSetup {
   readonly children?: ReactNode;
   /** The lens layout to wrap the content in; none when omitted. */
   readonly layout?: EntitySiteLayout;
+  /**
+   * Whether the router navigates, over a memory history, so a search
+   * parameter the page writes reaches the address; a static router, as the
+   * server renders with, when omitted.
+   */
+  readonly navigable?: boolean;
+  /**
+   * The memory history a navigable router runs over, handed in so a test
+   * can read the address and walk the history back; a fresh one at `url`
+   * when omitted.
+   */
+  readonly history?: MemoryAdapter;
 }
 
 /** What a server render of one page hands the client. */
