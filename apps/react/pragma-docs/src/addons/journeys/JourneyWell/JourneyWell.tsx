@@ -4,6 +4,7 @@ import type React from "react";
 import { useMemo } from "react";
 import { buildJourneyGraph } from "./buildJourneyGraph.js";
 import { TAG_OFFSET, VIEW_MARGIN } from "./constants.js";
+import requireHop from "./requireHop.js";
 import truncateLabel from "./truncateLabel.js";
 import type {
   JourneyGraphEdge,
@@ -113,14 +114,15 @@ const Hop = ({
 /**
  * An edge's path: from its source's right middle to its target's left
  * middle, a cubic that leaves and lands horizontally. The layout connects
- * only hops it has placed, so both ends are in `byId`.
+ * only hops it has placed, so both ends are in `byId`; an end that is not
+ * fails at `requireHop`.
  */
 const drawEdge = (
   edge: JourneyGraphEdge,
   byId: ReadonlyMap<string, JourneyGraphNode>,
 ): string => {
-  const source = byId.get(edge.source) as JourneyGraphNode;
-  const target = byId.get(edge.target) as JourneyGraphNode;
+  const source = requireHop(byId, edge.source);
+  const target = requireHop(byId, edge.target);
   const x1 = source.x + source.width;
   const y1 = source.y + source.height / 2;
   const x2 = target.x;
