@@ -163,73 +163,71 @@ The projections fill the five representations from the graph, one type in
 one form each, with the slots that type has: any node from what every node
 carries, an ontology class as the classes row draws it, and an ontology
 property. Each reads the entity a mock environment answers, through its own
-Relay fragment, and links its title to the entity's home.
+Relay fragment, and links its title to the entity's home. Each type is a
+section, with the five forms in the matrix's order.
 
-<table>
-  <thead>
-    <tr>
-      <th scope="col">Type</th>
-      <th scope="col">Graph node</th>
-      <th scope="col">Chip</th>
-      <th scope="col">Card</th>
-      <th scope="col">List entry</th>
-      <th scope="col">Command</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row"><code>Node</code></th>
-      <td>
-        <Canvas of={NodeGraphNodeStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={NodeChipStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={NodeCardStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={NodeRowStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={NodeCommandStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-    </tr>
-    <tr>
-      <th scope="row"><code>OntologyClass</code></th>
-      <td>
-        <Canvas of={OntologyClassGraphNodeStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyClassChipStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyClassCardStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyClassRowStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyClassCommandStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-    </tr>
-    <tr>
-      <th scope="row"><code>OntologyProperty</code></th>
-      <td>
-        <Canvas of={OntologyPropertyGraphNodeStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyPropertyChipStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyPropertyCardStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyPropertyRowStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-      <td>
-        <Canvas of={OntologyPropertyCommandStories.Default} sourceState="none" withToolbar={false} />
-      </td>
-    </tr>
-  </tbody>
-</table>
+### `Node`
+
+**Graph node**
+
+<Canvas of={NodeGraphNodeStories.Default} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={NodeChipStories.Default} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={NodeCardStories.Default} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={NodeRowStories.Default} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={NodeCommandStories.Default} sourceState="none" withToolbar={false} />
+
+### `OntologyClass`
+
+**Graph node**
+
+<Canvas of={OntologyClassGraphNodeStories.Default} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={OntologyClassChipStories.Default} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={OntologyClassCardStories.Default} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={OntologyClassRowStories.Default} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={OntologyClassCommandStories.Default} sourceState="none" withToolbar={false} />
+
+### `OntologyProperty`
+
+**Graph node**
+
+<Canvas of={OntologyPropertyGraphNodeStories.Default} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={OntologyPropertyChipStories.Default} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={OntologyPropertyCardStories.Default} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={OntologyPropertyRowStories.Default} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={OntologyPropertyCommandStories.Default} sourceState="none" withToolbar={false} />
