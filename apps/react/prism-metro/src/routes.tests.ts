@@ -15,7 +15,7 @@ import { appRoutes, notFoundRoute } from "./routes.js";
 const router = createRouter(appRoutes, { notFound: notFoundRoute });
 
 describe("appRoutes", () => {
-  it("declares the site's three lenses, in rail order", () => {
+  it("declares the site's four lenses, in rail order", () => {
     expect(
       collectLenses(appRoutes).map(({ name, label, order, tier }) => ({
         name,
@@ -27,6 +27,7 @@ describe("appRoutes", () => {
       { name: "stations", label: "Stations", order: 1, tier: 1 },
       { name: "lines", label: "Lines", order: 2, tier: 1 },
       { name: "definitions", label: "Definitions", order: 3, tier: 1 },
+      { name: "fleet", label: "Fleet", order: 5, tier: 2 },
     ]);
   });
 
@@ -48,6 +49,31 @@ describe("appRoutes", () => {
       "/definitions",
       "/definitions/metro%3AStation",
     ]);
+  });
+
+  it("builds the fleet lens's five route names", () => {
+    expect([
+      router.buildPath("fleet"),
+      router.buildPath("fleetStock", { params: { uri: "metro:series-90" } }),
+      router.buildPath("fleetFormation", {
+        params: { uri: "metro:series-90-six-car" },
+      }),
+      router.buildPath("fleetUnit", { params: { uri: "metro:unit-90" } }),
+      router.buildPath("fleetCarType", {
+        params: { uri: "metro:car-90-driving" },
+      }),
+    ]).toEqual([
+      "/fleet",
+      "/fleet/metro%3Aseries-90",
+      "/fleet/formations/metro%3Aseries-90-six-car",
+      "/fleet/units/metro%3Aunit-90",
+      "/fleet/car-types/metro%3Acar-90-driving",
+    ]);
+  });
+
+  it("matches a formation's address to its page, not to a stock's", () => {
+    const match = router.match("/fleet/formations/metro%3Aseries-90-six-car");
+    expect(match?.kind === "route" && match.name).toBe("fleetFormation");
   });
 
   it("lands an unknown URL on the not-found route", () => {

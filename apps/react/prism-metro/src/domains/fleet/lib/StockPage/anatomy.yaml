@@ -1,57 +1,79 @@
-# One rolling stock: its title and kind, its formations drawn at one scale
-# with each formation linked to its page, then its car types. Its facts
-# (formations, length range, capacity range, lines) go to the layout's aside
-# as a description list aligned to the aside's subgrid rows.
+---
+# StockPage — the fleet lens's page of one rolling stock, in the document
+# archetype's canvas, beside its facts in the aside: its title, then
+# its formations, each linked to its page and drawn at one scale with the others, then the car types its units are made of. Sections sit a loose step apart, more than the gutter
+# between the items inside them. While the page's data is on its way it
+# says so in one muted line; a failed read says so as an alert; an address
+# naming nothing of its type says that nothing lives there.
+#
+# Entries name their node by its title, linked to its home, where a
+# projection will go; each such element carries `data-placeholder`.
+#
+# Token ledger: container.gap.loose between sections, an item's external
+# spacing, never a gap; space.100 (8px) between the words of an entry, an
+# inline run, one baseline pair; "ui-monospace, monospace" for car codes:
+# no monospace family token sits above the primitive tier.
 node:
-  uri: metro.fleet.stock-page
-  projection:
-    on: RollingStock
+  uri: metro.component.stock_page
   styles:
+    layout.grid.column: "1 / -1"
     layout.type: grid
-    spacing.gap: container.gap.loose
+    spacing.gap: grid.gutter
+    layout.alignSelf: start
   edges:
     - node:
-        role: heading
-        projection:
-          field: _meta.title
-      relation:
-        cardinality: "1"
-        slotName: heading
+        role: page title
+      relation: { cardinality: "0..1", slotName: title }
     - node:
-        role: formations section
+        role: section
+        styles:
+          spacing.external.block.start: container.gap.loose
+          layout.type: grid
+          spacing.gap: grid.gutter
+      relation: { cardinality: "0..*", slotName: section }
+    - node:
+        role: list of entries
         styles:
           layout.type: grid
-          spacing.gap: container.gap.default
-        edges:
-          - node:
-              uri: metro.fleet.formation-row       # title linked to the formation page
-            relation:
-              cardinality: "1..*"
-              projection:
-                field: formations
-          - node:
-              uri: metro.fleet.formation-side-view
-            relation:
-              cardinality: "1"
-      relation:
-        cardinality: "1"
-        slotName: formations
+          spacing.gap: grid.gutter
+          spacing.internal.inline.start: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          layout.listStyle: none
+      relation: { cardinality: "0..*", slotName: list }
     - node:
-        role: car types section
-        edges:
-          - node:
-              uri: metro.fleet.car-type-row
-            relation:
-              cardinality: "1..*"
-              projection:
-                field: formations.units.unit.cars.carType
-      relation:
-        cardinality: "1"
-        slotName: carTypes
+        role: entry, a node named by its title (placeholder for its projection)
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap: space.100
+      relation: { cardinality: "0..*", slotName: entry }
     - node:
-        uri: global.component.description-list
-        projection:
-          field: formations
-      relation:
-        cardinality: "1"
-        slotName: facts
+        role: vital
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: vital }
+    - node:
+        role: car code
+        styles:
+          typography.fontFamily: "ui-monospace, monospace"
+      relation: { cardinality: "0..*", slotName: code }
+    - node:
+        uri: metro.component.formation_side_view
+      relation: { cardinality: "0..*", slotName: side-view }
+    - node:
+        role: loading line
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: loading }
+    - node:
+        role: not-found line
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: not-found }
+    - node:
+        role: error alert
+        styles:
+          typography.color: color.text.error
+      relation: { cardinality: "0..1", slotName: error }

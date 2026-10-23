@@ -1,6 +1,7 @@
 import { DocumentLayout } from "@canonical/prism-core";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { group, route } from "@canonical/router-core";
+import { fleetLayout, fleetRoutes } from "#domains/fleet";
 import {
   definitionsLayout,
   linesLayout,
@@ -45,6 +46,17 @@ const [lines, linesEntity] = group(linesLayout, [
   linesRoutes.linesEntity,
 ] as const);
 
+const [fleet, fleetStock, fleetFormation, fleetUnit, fleetCarType] = group(
+  fleetLayout,
+  [
+    fleetRoutes.fleet,
+    fleetRoutes.fleetStock,
+    fleetRoutes.fleetFormation,
+    fleetRoutes.fleetUnit,
+    fleetRoutes.fleetCarType,
+  ] as const,
+);
+
 /**
  * The route table. The router ranks patterns by specificity and falls back
  * to this key order between equals. The lens packages link by these names,
@@ -54,9 +66,14 @@ export const appRoutes = {
   definitions,
   stations,
   lines,
+  fleet,
   definitionsTerm,
   stationsEntity,
   linesEntity,
+  fleetFormation,
+  fleetUnit,
+  fleetCarType,
+  fleetStock,
 } as const;
 
 /**

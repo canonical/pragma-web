@@ -216,3 +216,12 @@ export const SERIES_50_FOUR_CAR_IRI =
 
 /** The Series 90 unit's IRI. */
 export const SERIES_90_UNIT_IRI = "https://metro.example/onto#unit-90";
+
+/** The Series 90 unit, by its compact address. */
+export const SERIES_90_UNIT_CURIE = "metro:unit-90";
+
+/** The Series 90 driving motor car type, by its compact address. */
+export const SERIES_90_DRIVING_CURIE = "metro:car-90-driving";
+
+/** How many rolling stocks the graph's fleet has. */
+export const ROLLING_STOCK_COUNT = 3;
