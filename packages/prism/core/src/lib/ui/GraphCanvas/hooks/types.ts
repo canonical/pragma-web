@@ -14,6 +14,8 @@ export interface UseGraphCameraProps {
   readonly camera: RefObject<SVGGElement | null>;
   /** The viewport's viewBox: the graph's bounds plus its margin. */
   readonly viewBox: GraphBox;
+  /** The whole graph's box, which bounds the pan. */
+  readonly bounds: GraphBox;
   /** The box Fit fits, and the camera fits when it changes. */
   readonly fit: GraphBox | undefined;
   /** The box the camera fits once each time the request changes. */
@@ -33,7 +35,7 @@ export interface UseGraphCameraResult {
    * the client has measured the viewport.
    */
   readonly percent: number | undefined;
-  /** Fit the fit box, or the whole viewBox. */
+  /** Fit the fit box, or the graph's whole bounds. */
   readonly fitView: () => void;
   /** Zoom in one step, about the viewport's centre. */
   readonly zoomIn: () => void;

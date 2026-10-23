@@ -380,6 +380,36 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(0,0) scale(0.25)");
   });
 
+  it("pans and zooms over the graph's whole bounds once Fit shows more than the viewBox", async () => {
+    const bounds: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
+    render(
+      <GraphCanvas
+        bounds={bounds}
+        fit={bounds}
+        label="Class graph"
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    const viewport = screen.getByRole("group");
+    expect(document.querySelector(".floor")?.getAttribute("width")).toBe(
+      String(5 * bounds.width),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
+    // The wheel zooms toward the pointer at the far corner, unclamped.
+    fireEvent.wheel(viewport, { deltaY: -500, clientX: 800, clientY: 600 });
+    expect(readCamera()).toBe("translate(-800,-600) scale(0.5)");
+    // A drag pans by the distance it travels.
+    press(viewport, "mouseDown", 400, 300);
+    press(window, "mouseMove", 440, 300);
+    press(window, "mouseUp", 440, 300);
+    expect(readCamera()).toBe("translate(-760,-600) scale(0.5)");
+    // d3 swallows the window's next click until its timer releases it.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
   it("never refits a legible view to an illegible one, and Fit fits whole", () => {
     const large: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
     const { rerender } = renderCanvas();

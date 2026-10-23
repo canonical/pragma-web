@@ -75,7 +75,8 @@ function prefersReducedMotion(): boolean {
 /**
  * Bind a d3-zoom camera to a graph canvas's viewport: drag to pan, wheel or
  * pinch to zoom toward the pointer, within the zoom extent and a pan margin
- * of twice the graph's size. A press that moves less than the click
+ * of twice the size of the graph's whole bounds, so a viewBox that opens on
+ * a window of a large graph still lets the reader reach all of it. A press that moves less than the click
  * distance is a click, so a link under it still follows, and a double
  * click never zooms. The camera writes its transform straight to
  * the camera group, so React never renders one and the server's markup,
@@ -102,6 +103,7 @@ export default function useGraphCamera({
   viewport,
   camera,
   viewBox,
+  bounds,
   fit,
   frame,
   reveal,
@@ -113,10 +115,11 @@ export default function useGraphCamera({
   const current = useRef<GraphTransform>(zoomIdentity);
   // The latest targets, read by the listeners and the controls; the effects
   // that act on a change compare the boxes' values, never their identity.
-  const latest = useRef({ viewBox, fit, frame, reveal, opening });
-  latest.current = { viewBox, fit, frame, reveal, opening };
+  const latest = useRef({ viewBox, bounds, fit, frame, reveal, opening });
+  latest.current = { viewBox, bounds, fit, frame, reveal, opening };
 
   const viewBoxKey = formatBox(viewBox);
+  const boundsKey = formatBox(bounds);
   const fitKey = fit === undefined ? undefined : formatBox(fit);
   const revealKey = reveal === undefined ? undefined : formatBox(reveal);
   const frameKey = frame?.serial;
@@ -148,21 +151,20 @@ export default function useGraphCamera({
     [viewport],
   );
 
-  // Fit a box, or the whole viewBox, into the visible area; a refit that
-  // keeps the view legible zooms no lower than the legible zoom when the
-  // camera is legible now.
+  // Fit a box, or the graph's whole bounds, into the visible area; a refit
+  // that keeps the view legible zooms no lower than the legible zoom when
+  // the camera is legible now.
   const fitBox = useCallback(
     (box: GraphBox | undefined, keepLegible: boolean): void => {
       const svg = viewport.current;
       /* v8 ignore next -- only a mounted canvas fits, and its viewport ref is attached */
       if (svg === null) return;
-      const { viewBox: bounds } = latest.current;
-      const { scale, visible } = measureViewport(svg, bounds);
+      const { scale, visible } = measureViewport(svg, latest.current.viewBox);
       const legible = scale * current.current.k >= HUBS_SCALE;
       moveTo(
         computeFitTransform(
           visible,
-          box ?? bounds,
+          box ?? latest.current.bounds,
           keepLegible && legible ? (HUBS_SCALE * LEGIBLE_NUDGE) / scale : 0,
         ),
       );
@@ -192,13 +194,13 @@ export default function useGraphCamera({
     [moveTo, viewport],
   );
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the camera rebinds when the viewBox's values change, not its identity
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the camera rebinds when the viewBox's or the bounds' values change, not their identity
   useEffect(() => {
     const svg = viewport.current;
     const group = camera.current;
     /* v8 ignore next -- React attaches both refs before it runs an effect */
     if (svg === null || group === null) return;
-    const { viewBox: bounds } = latest.current;
+    const { bounds: extent } = latest.current;
     // A new viewBox opens anew, once the viewport has been measured.
     let opened = false;
     // Read the zoom's scale against the viewport's size into the bucket and
@@ -238,12 +240,12 @@ export default function useGraphCamera({
       })
       .translateExtent([
         [
-          bounds.x - PAN_MARGIN * bounds.width,
-          bounds.y - PAN_MARGIN * bounds.height,
+          extent.x - PAN_MARGIN * extent.width,
+          extent.y - PAN_MARGIN * extent.height,
         ],
         [
-          bounds.x + (PAN_MARGIN + 1) * bounds.width,
-          bounds.y + (PAN_MARGIN + 1) * bounds.height,
+          extent.x + (PAN_MARGIN + 1) * extent.width,
+          extent.y + (PAN_MARGIN + 1) * extent.height,
         ],
       ])
       .on("zoom", (event: { readonly transform: GraphTransform }) => {
@@ -266,7 +268,7 @@ export default function useGraphCamera({
       selection.on(".zoom", null);
       behaviour.current = undefined;
     };
-  }, [viewBoxKey]);
+  }, [viewBoxKey, boundsKey]);
 
   const lastFit = useRef(fitKey);
   // biome-ignore lint/correctness/useExhaustiveDependencies: the camera refits when the fit box's values change, not its identity

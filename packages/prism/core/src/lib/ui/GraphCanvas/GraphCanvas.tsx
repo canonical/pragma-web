@@ -27,7 +27,9 @@ function nameLattice(label: string): string {
  * floats the optional hint just under itself, over the viewport; below
  * it the viewport, an SVG whose viewBox is the graph's bounds, so the first
  * paint fits the whole graph flush top-left with no measurement; inside it,
- * in world space, a 16px dot lattice and the drawing.
+ * in world space, a 16px dot lattice and the drawing. The camera pans as
+ * far as twice the graph's `bounds` past them, and the lattice reaches as
+ * far, however small a window of the graph the viewBox opens on.
  *
  * Drag pans, the wheel or a pinch zooms toward the pointer, and `+`, `-`
  * and `0` zoom in, out and back to the fit while focus is inside the
@@ -54,6 +56,7 @@ function nameLattice(label: string): string {
 export default function GraphCanvas({
   label,
   viewBox,
+  bounds = viewBox,
   opening,
   fit,
   frame,
@@ -71,6 +74,7 @@ export default function GraphCanvas({
     viewport,
     camera,
     viewBox,
+    bounds,
     fit,
     frame,
     reveal,
@@ -166,10 +170,10 @@ export default function GraphCanvas({
             <rect
               className="floor"
               fill={`url(#${latticeId})`}
-              height={(2 * PAN_MARGIN + 1) * viewBox.height}
-              width={(2 * PAN_MARGIN + 1) * viewBox.width}
-              x={viewBox.x - PAN_MARGIN * viewBox.width}
-              y={viewBox.y - PAN_MARGIN * viewBox.height}
+              height={(2 * PAN_MARGIN + 1) * bounds.height}
+              width={(2 * PAN_MARGIN + 1) * bounds.width}
+              x={bounds.x - PAN_MARGIN * bounds.width}
+              y={bounds.y - PAN_MARGIN * bounds.height}
             />
           )}
           <Context.Provider value={bucket}>{children}</Context.Provider>

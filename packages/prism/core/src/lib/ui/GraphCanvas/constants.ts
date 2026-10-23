@@ -32,7 +32,7 @@ export const LATTICE_DOT_RADIUS = 1;
 
 /**
  * How far past the graph the camera may pan, and the lattice reaches, as a
- * multiple of the viewBox's size on each side.
+ * multiple of the graph's bounds on each side.
  */
 export const PAN_MARGIN = 2;
 

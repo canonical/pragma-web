@@ -59,6 +59,12 @@ type OwnProps = {
    */
   readonly viewBox: GraphBox;
   /**
+   * The whole graph's box, which may be larger than a viewBox that opens on
+   * a window of it: the camera pans as far as twice its size past it, and
+   * the lattice covers as far. The viewBox when omitted.
+   */
+  readonly bounds?: GraphBox;
+  /**
    * Where the camera opens once the client has measured the viewport, such
    * as a legible window of a graph whose viewBox would draw its labels
    * below 12px on this screen. The identity, the server's paint, when
@@ -68,8 +74,8 @@ type OwnProps = {
   /**
    * The box the Fit control and the `0` key fit whole, and the camera fits
    * whenever it changes, never zooming a legible view out to an illegible
-   * one: the visible part of the graph under a filter. The whole viewBox
-   * when omitted.
+   * one: the visible part of the graph under a filter. The graph's whole
+   * bounds when omitted.
    */
   readonly fit?: GraphBox;
   /**
