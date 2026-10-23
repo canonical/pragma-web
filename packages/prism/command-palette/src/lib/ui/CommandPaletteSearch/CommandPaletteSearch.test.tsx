@@ -80,6 +80,7 @@ const readPreviewTitle = (): string | null =>
     .textContent;
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
@@ -156,6 +157,19 @@ describe("CommandPaletteSearch", () => {
     expect(screen.getAllByRole("option", { selected: true })).toHaveLength(1);
   });
 
+  it("scrolls each newly highlighted result into the results' view", async () => {
+    await renderResults("lay");
+    const scrollIntoView = vi.spyOn(Element.prototype, "scrollIntoView");
+    const field = screen.getByRole("combobox");
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView.mock.contexts.at(0)).toBe(findActiveOption());
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ block: "nearest" });
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    expect(scrollIntoView).toHaveBeenCalledTimes(2);
+    expect(scrollIntoView.mock.contexts.at(1)).toBe(findActiveOption());
+  });
+
   it("highlights the result a pointer moves over", async () => {
     await renderResults("lay");
     const options = screen.getAllByRole("option");
@@ -219,6 +233,24 @@ describe("CommandPaletteSearch", () => {
     });
     expect(screen.getByRole("listbox")).toHaveAttribute("aria-busy", "false");
     expect(screen.getAllByRole("option")).toHaveLength(1);
+  });
+
+  it("keeps the highlight on the list when fewer results replace those it was on", async () => {
+    const { environment } = await renderResults("lay");
+    type("layo");
+    fireEvent.pointerMove(screen.getAllByRole("option").at(2) as HTMLElement);
+    await act(async () => {
+      environment.mock.resolveMostRecentOperation(
+        answerSearch([COMPONENT_NODE]),
+      );
+    });
+    const option = screen.getByRole("option");
+    expect(option).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "aria-activedescendant",
+      option.id,
+    );
+    expect(readPreviewTitle()).toBe("Layout switcher");
   });
 
   it("holds each row's title as text and links the preview's title home", async () => {
