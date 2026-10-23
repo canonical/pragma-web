@@ -25,8 +25,8 @@
 #     docs' primary line is 20px).
 #   layout.grid.column "1 / -1", "1 / span 2", "3 / -1": structure, spans in
 #     columns.
-#   appearance.border.style solid: a keyword; the 0 resets on the list and
-#     the value.
+#   Border sides "solid none none": a keyword vocabulary; only the rule
+#     above the pair is drawn. The 0 resets on the list and the value.
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)   below two groups: the key and the
@@ -51,8 +51,10 @@ node:
           layout.grid.columns: subgrid
           layout.grid.column: "1 / -1"
           spacing.gap: grid.gutter
-          appearance.border.width: 1px
-          appearance.border.style: solid
+          # One rule above the pair: the top side alone has a width and a
+          # style, every other side none.
+          appearance.border.top.width: 1px
+          appearance.border.style: "solid none none"
           appearance.border.block.start.color: color.border.muted
         edges:
           - node:

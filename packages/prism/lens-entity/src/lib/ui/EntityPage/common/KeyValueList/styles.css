@@ -20,14 +20,14 @@
   }
 
   /* Each pair is a subgrid row directly under a hairline: a 1px rule over
-   * a 24px line. */
+   * a 24px line, the top side alone drawn. */
   .ds.key-value-list > .pair {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     gap: var(--key-value-list-gap);
-    border-block-start-width: var(--key-value-list-rule-width);
-    border-block-start-style: solid;
+    border-top-width: var(--key-value-list-rule-width);
+    border-style: solid none none;
     border-block-start-color: var(--key-value-list-rule-color);
   }
 
