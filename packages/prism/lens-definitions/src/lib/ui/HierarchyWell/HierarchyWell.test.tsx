@@ -331,6 +331,38 @@ describe("HierarchyWell", () => {
       expect(readCamera(container)).toBe(fitted);
     });
 
+    it("refits what the chips leave to a legible window that cuts no class", () => {
+      const canvas = { w: 590.67, h: 778 };
+      stubViewport(canvas);
+      const { container, rerender } = render(drawWell({}));
+      rerender(drawWell({ filter: createAllNamespacesFilter(["ds"]) }));
+      const [, x, y, k] = (
+        /translate\(([^,]+),([^)]+)\) scale\(([^)]+)\)/.exec(
+          readCamera(container) ?? "",
+        ) ?? []
+      ).map(Number);
+      const viewBox = frameOpeningView(layout, undefined);
+      const { scale } = measureScale(canvas.w, canvas.h);
+      expect(scale * (k ?? 0)).toBeGreaterThanOrEqual(MIN_FIT);
+      const toWorld = (user: number, shift: number | undefined): number =>
+        (user - (shift ?? 0)) / (k ?? 1);
+      const left = toWorld(viewBox.x, x);
+      const top = toWorld(viewBox.y, y);
+      const right = toWorld(viewBox.x + canvas.w / scale, x);
+      const bottom = toWorld(viewBox.y + canvas.h / scale, y);
+      const cut = [...layout.nodes.values()]
+        .filter((node) => node.region === "ds")
+        .filter(
+          (node) =>
+            node.x < right &&
+            node.x + node.w > left &&
+            node.y < bottom &&
+            node.y + node.h > top &&
+            (node.x < left || node.y < top || node.x + node.w > right),
+        );
+      expect(cut).toEqual([]);
+    });
+
     it("fits a picked region once per pick, and Fit restores the graph", () => {
       stubViewport();
       const { container, rerender } = render(drawWell({}));

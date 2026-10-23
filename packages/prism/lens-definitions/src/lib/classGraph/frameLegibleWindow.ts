@@ -7,7 +7,7 @@ import {
   VIEW_MARGIN,
 } from "./constants.js";
 import { intersectsRect, measureRegionLabelWidth } from "./geometry.js";
-import type { ClassGraphLayout, Rect } from "./types.js";
+import type { ClassGraphLayout, LegibleWindowOptions, Rect } from "./types.js";
 
 /** How far a rectangle may overrun another and still count as inside it. */
 const TOLERANCE = 1e-6;
@@ -24,35 +24,38 @@ function containsRect(outer: Rect, inner: Rect): boolean {
 
 /**
  * Frame the window of the class graph a canvas of a given size opens on,
- * in world units and in the canvas's own aspect: the whole viewBox when it
- * fits there at the legible zoom, so every 14px label renders at 12px or
- * more; else a window at the legible zoom or the least zoom above it whose
- * left, top and right edges cut through no class's box and no region's
- * label, and whose bottom edge crosses only boxes that continue below
- * within its width, the sign that more of the graph lies there; a box in
- * the bottom-right corner is never cut on two sides. When one more zoom step also
- * keeps the bottom edge clear of every box, the window takes it.
+ * or refits to, in world units and in the canvas's own aspect: the box it
+ * frames when that fits there at the legible zoom, so every 14px label
+ * renders at 12px or more; else a window at the legible zoom or the least
+ * zoom above it whose left, top and right edges cut through no class's box
+ * and no region's label, and whose bottom edge crosses only boxes that
+ * continue below within its width, the sign that more of the graph lies
+ * there; a box in the bottom-right corner is never cut on two sides. When
+ * one more zoom step also keeps the bottom edge clear of every box, the
+ * window takes it.
  *
- * The window runs from the graph's top-left corner, or, for a class
- * selected on arrival, from the corner in the gaps before the boxes that
- * gives the widest such window holding the class, the one that centres it
- * best among equals, so a term page opens on its term. When no zoom frames
- * it so, the window is the legible one, from the top-left corner or
- * centred on the class.
+ * The box it frames is the whole viewBox, or the one `within` names, such as
+ * the classes a filter leaves or a region a reader picked, and runs from
+ * its top-left corner, or, for a class selected on arrival, from the
+ * corner in the gaps before the boxes that gives the widest such window
+ * holding the class, the one that centres it best among equals, so a term
+ * page opens on its term. When no zoom frames it so, the window is the
+ * legible one, from the top-left corner or centred on the class.
  *
- * @param layout - The class graph's boxes, regions and viewBox.
+ * @param layout - The class graph's boxes, regions and viewBox; only the
+ *   boxes drawn, when a filter hides some.
  * @param canvas - The canvas's size, in screen pixels.
- * @param arrival - The box of the class selected on arrival, if any.
+ * @param options - The box of the class selected on arrival, if any, and
+ *   the box to frame, the whole viewBox when omitted.
  * @returns The window.
  */
 export default function frameLegibleWindow(
   layout: Pick<ClassGraphLayout, "nodes" | "regions" | "viewBox">,
   canvas: { readonly w: number; readonly h: number },
-  arrival?: Rect,
+  { arrival, within: frame = layout.viewBox }: LegibleWindowOptions = {},
 ): Rect {
-  const { viewBox } = layout;
-  if (Math.min(canvas.w / viewBox.w, canvas.h / viewBox.h) >= MIN_FIT) {
-    return viewBox;
+  if (Math.min(canvas.w / frame.w, canvas.h / frame.h) >= MIN_FIT) {
+    return frame;
   }
   const obstacles: Rect[] = [
     ...[...layout.nodes.values()].map(({ x, y, w, h }) => ({ x, y, w, h })),
@@ -124,9 +127,9 @@ export default function frameLegibleWindow(
 
   if (arrival === undefined) {
     return (
-      searchFrom(viewBox.x, viewBox.y) ?? {
-        x: viewBox.x,
-        y: viewBox.y,
+      searchFrom(frame.x, frame.y) ?? {
+        x: frame.x,
+        y: frame.y,
         w: least.w,
         h: least.w * aspect,
       }
@@ -148,14 +151,14 @@ export default function frameLegibleWindow(
     );
   const xs = corners(
     obstacles.map((box) => box.x),
-    viewBox.x,
+    frame.x,
     arrival.x,
     arrival.x + arrival.w,
     least.w,
   );
   const ys = corners(
     obstacles.map((box) => box.y),
-    viewBox.y,
+    frame.y,
     arrival.y,
     arrival.y + arrival.h,
     least.h,
@@ -187,8 +190,8 @@ export default function frameLegibleWindow(
   ): number =>
     Math.min(Math.max(from + size / 2 - span / 2, start), start + room - span);
   return {
-    x: centre(arrival.x, arrival.w, least.w, viewBox.x, viewBox.w),
-    y: centre(arrival.y, arrival.h, least.h, viewBox.y, viewBox.h),
+    x: centre(arrival.x, arrival.w, least.w, frame.x, frame.w),
+    y: centre(arrival.y, arrival.h, least.h, frame.y, frame.h),
     w: least.w,
     h: least.w * aspect,
   };

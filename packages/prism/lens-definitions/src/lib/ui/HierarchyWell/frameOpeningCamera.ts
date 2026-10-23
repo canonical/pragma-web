@@ -23,7 +23,7 @@ export default function frameOpeningCamera(
   scale: number,
 ): GraphTransform {
   const canvas = { w: visible.width * scale, h: visible.height * scale };
-  const window = frameLegibleWindow(layout, canvas, selected);
+  const window = frameLegibleWindow(layout, canvas, { arrival: selected });
   const k = Math.min(canvas.w / window.w, canvas.h / window.h) / scale;
   return { k, x: visible.x - k * window.x, y: visible.y - k * window.y };
 }

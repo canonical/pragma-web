@@ -23,6 +23,7 @@ import classifyClasses from "./classifyClasses.js";
 import { PhoneGraph } from "./common/PhoneGraph/index.js";
 import frameOpeningCamera from "./frameOpeningCamera.js";
 import frameOpeningView from "./frameOpeningView.js";
+import frameRefitWindow from "./frameRefitWindow.js";
 import measureVisibleBox from "./measureVisibleBox.js";
 import type { HierarchyWellProps } from "./types.js";
 import "./styles.css";
@@ -72,7 +73,8 @@ function readClosest(
  * classes, and the camera fits what is left, which the Fit control
  * restores; the search and the instances axis dim. A region a reader picks
  * in the inspector is fitted once per pick. Neither refit zooms a legible
- * view out to an illegible one.
+ * view out to an illegible one: what is too large for the legible zoom
+ * shows from its top-left corner, in a window whose edges cut no class.
  *
  * The graph is one tab stop: the arrows move along the tree (up and down
  * in a column, left to the superclass, right to the first subclass, Home
@@ -169,6 +171,11 @@ export default function HierarchyWell({
     () => measureVisibleBox(layout, hidden, undefined) ?? bounds,
     [bounds, hidden, layout],
   );
+  const legibleWindow = useCallback(
+    (box: GraphBox, visible: GraphBox, scale: number): GraphBox =>
+      frameRefitWindow(layout, hidden, box, visible, scale),
+    [hidden, layout],
+  );
   const frame = useMemo(() => {
     if (region === undefined) return undefined;
     const box = measureVisibleBox(layout, hidden, region.prefix);
@@ -238,6 +245,7 @@ export default function HierarchyWell({
         fit={fit}
         frame={frame}
         label={t("well.label")}
+        legibleWindow={legibleWindow}
         opening={opening}
         reveal={reveal}
         viewBox={viewBox}

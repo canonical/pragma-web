@@ -18,6 +18,8 @@ export default function frameOpeningView(
   layout: ClassGraphLayout,
   selected: Rect | undefined,
 ): GraphBox {
-  const { x, y, w, h } = frameLegibleWindow(layout, DESIGN_CANVAS, selected);
+  const { x, y, w, h } = frameLegibleWindow(layout, DESIGN_CANVAS, {
+    arrival: selected,
+  });
   return { x, y, width: w, height: h };
 }

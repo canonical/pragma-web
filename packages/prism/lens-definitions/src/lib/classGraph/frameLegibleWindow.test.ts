@@ -3,7 +3,7 @@ import createClassGraphSetup from "../../../testing/createClassGraphSetup.js";
 import { MIN_FIT, REGION_LABEL_ROW } from "./constants.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
 import { measureRegionLabelWidth } from "./geometry.js";
-import { requireEntry } from "./require.js";
+import { requireDefined, requireEntry } from "./require.js";
 import type { Rect } from "./types.js";
 
 const { layout, uris } = createClassGraphSetup();
@@ -85,7 +85,7 @@ describe("frameLegibleWindow", () => {
         layout.nodes,
         requireEntry(uris, "ds:UIBlock"),
       );
-      const window = frameLegibleWindow(layout, canvas, arrival);
+      const window = frameLegibleWindow(layout, canvas, { arrival });
       expect(zoomOf(canvas, window)).toBeGreaterThanOrEqual(MIN_FIT);
       expect(window.x).toBeLessThanOrEqual(arrival.x);
       expect(window.x + window.w).toBeGreaterThanOrEqual(arrival.x + arrival.w);
@@ -101,7 +101,7 @@ describe("frameLegibleWindow", () => {
       layout.nodes,
       requireEntry(uris, "ds:UIBlock"),
     );
-    const window = frameLegibleWindow(layout, canvas, arrival);
+    const window = frameLegibleWindow(layout, canvas, { arrival });
     // A view margin before the second column's boxes, which start at 144.
     expect(window).toMatchObject({ x: 128, y: 16 });
     expect(zoomOf(canvas, window)).toBeCloseTo(MIN_FIT, 5);
@@ -113,7 +113,7 @@ describe("frameLegibleWindow", () => {
       layout.nodes,
       requireEntry(uris, "ds:UIBlock"),
     );
-    const window = frameLegibleWindow(layout, canvas, arrival);
+    const window = frameLegibleWindow(layout, canvas, { arrival });
     expect(zoomOf(canvas, window)).toBeCloseTo(MIN_FIT, 5);
     expect(window.x + window.w / 2).toBeCloseTo(arrival.x + arrival.w / 2, 6);
     expect(window.y + window.h / 2).toBeCloseTo(arrival.y + arrival.h / 2, 6);
@@ -130,6 +130,26 @@ describe("frameLegibleWindow", () => {
           box.y + box.h > bottom,
       ),
     ).toEqual([]);
+  });
+
+  it("frames a box it is given whole where it fits legibly, and else from its corner", () => {
+    const region = requireDefined(
+      layout.regions.find((candidate) => candidate.prefix === "cs"),
+      "the cs region",
+    );
+    expect(
+      frameLegibleWindow(layout, { w: 1200, h: 1400 }, { within: region }),
+    ).toBe(region);
+    const ds = requireDefined(
+      layout.regions.find((candidate) => candidate.prefix === "ds"),
+      "the ds region",
+    );
+    const within = { x: ds.x - 16, y: ds.y - 16, w: ds.w + 32, h: ds.h + 32 };
+    const canvas = { w: 590.67, h: 778 };
+    const window = frameLegibleWindow(layout, canvas, { within });
+    expect(window).toMatchObject({ x: within.x, y: within.y });
+    expect(zoomOf(canvas, window)).toBeGreaterThanOrEqual(MIN_FIT);
+    expect(findSideCuts(window)).toEqual([]);
   });
 
   it("falls back to the legible window on a canvas too small to hold a box", () => {

@@ -23,7 +23,7 @@ describe("frameOpeningView", () => {
       requireEntry(uris, "cs:CodeStandard"),
     );
     const box = frameOpeningView(layout, leaf);
-    const window = frameLegibleWindow(layout, DESIGN_CANVAS, leaf);
+    const window = frameLegibleWindow(layout, DESIGN_CANVAS, { arrival: leaf });
     expect(box).toEqual({
       x: window.x,
       y: window.y,

@@ -34,6 +34,21 @@ describe("measureVisibleBox", () => {
     expect(box?.x).toBe(left - VIEW_MARGIN);
   });
 
+  it("holds the label row of each region the classes it fits lie in", () => {
+    const hidden = new Set(
+      nodes.filter((node) => node.region !== "ds").map((node) => node.uri),
+    );
+    const ds = layout.regions.find((candidate) => candidate.prefix === "ds");
+    if (ds === undefined) throw new Error("no ds region");
+    const top = Math.min(
+      ...nodes.filter((node) => node.region === "ds").map((node) => node.y),
+    );
+    expect(top).toBeGreaterThan(ds.y);
+    expect(measureVisibleBox(layout, hidden, undefined)?.y).toBe(
+      ds.y - VIEW_MARGIN,
+    );
+  });
+
   it("fits the whole graph when the filter hides every class", () => {
     const hidden = new Set(nodes.map((node) => node.uri));
     expect(measureVisibleBox(layout, hidden, undefined)).toBeUndefined();

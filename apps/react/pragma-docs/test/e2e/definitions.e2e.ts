@@ -9,10 +9,10 @@
  * through no class; every class's label fits its box in the font the page
  * ships; the term rail's ontology headings are laid out; and, on a phone,
  * the inspector's drawer trigger covers nothing of the explorer, its search
- * field least of all. A filter chip's refit keeps every class in view
- * labelled; Fit brings every class into view, unlabelled where the whole
- * fits only below the overview zoom; and the inspector's field
- * rows put their ranges on one column line.
+ * field least of all. A filter chip's refit and a namespace's keep every
+ * class in view labelled and cut none; Fit brings every class into view,
+ * unlabelled where the whole fits only below the overview zoom; and the
+ * inspector's field rows put their ranges on one column line.
  */
 import {
   launchBrowser,
@@ -285,7 +285,7 @@ describe.each([...VIEWPORTS, ...SHORT_DESKTOP_VIEWPORTS])(
 describe("at 1440 px", () => {
   const [desktop] = VIEWPORTS;
 
-  it("keeps every class in view labelled when a chip hides some and the camera refits", async () => {
+  it("keeps every class in view labelled and none cut when a chip hides some and the camera refits", async () => {
     const { errors, measure } = await openExplorer(
       "/definitions",
       desktop,
@@ -296,6 +296,20 @@ describe("at 1440 px", () => {
     expect(measure.inView).toBeGreaterThan(0);
     expect(measure.unlabelled).toBe(0);
     expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    expect(measure.cut).toEqual([]);
+  });
+
+  it("fits a namespace a reader picks legibly, cutting no class", async () => {
+    const { errors, measure } = await openExplorer(
+      "/definitions",
+      desktop,
+      (page) =>
+        page.getByRole("button", { name: "Fit the graph to ds" }).click(),
+    );
+    expect(errors).toEqual([]);
+    expect(measure.inView).toBeGreaterThan(0);
+    expect(measure.unlabelled).toBe(0);
+    expect(measure.cut).toEqual([]);
   });
 
   it("brings every class into view on Fit, as boxes without their labels", async () => {

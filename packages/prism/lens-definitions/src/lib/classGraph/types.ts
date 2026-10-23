@@ -336,6 +336,14 @@ export interface RegionEdge {
 }
 
 /** One region laid out in its own coordinates, its top-left at the origin. */
+/** What a legible window frames, beyond the graph and the canvas. */
+export interface LegibleWindowOptions {
+  /** The box of the class selected on arrival, which the window holds. */
+  readonly arrival?: Rect | undefined;
+  /** The box to frame; the graph's whole viewBox when omitted. */
+  readonly within?: Rect;
+}
+
 /**
  * Where one end of a relation between two regions meets its box: the side
  * that faces the other end, and the port's ideal offset from the box's top,
