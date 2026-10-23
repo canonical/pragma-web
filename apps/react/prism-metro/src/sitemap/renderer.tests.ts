@@ -1,7 +1,7 @@
 // @vitest-environment node
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_PORT } from "#site";
+import { DEFAULT_PORT } from "#lib/site";
 
 /**
  * Load the renderer factory afresh, so it reads `BASE_URL` and `PORT` as the

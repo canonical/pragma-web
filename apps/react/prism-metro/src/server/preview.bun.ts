@@ -19,7 +19,7 @@ import {
   parseStaticPair,
   resolveStaticFile,
 } from "@canonical/react-ssr/server";
-import { resolvePort } from "#site";
+import { resolvePort } from "#lib/site";
 // The build output has no `.d.ts`; each default export matches its source
 // factory, typed below from the source.
 // @ts-expect-error — importing a build artifact with no declarations

@@ -23,8 +23,8 @@
 import fs from "node:fs";
 import { viteFetchMiddleware } from "@canonical/react-ssr/server";
 import { createServer as createViteServer } from "vite";
+import { resolvePort } from "#lib/site";
 import { resolveGraphqlUrl } from "#relay";
-import { resolvePort } from "#site";
 import prepareRelayData from "./prepareRelayData.js";
 import resolveRouteStatus from "./resolveRouteStatus.js";
 

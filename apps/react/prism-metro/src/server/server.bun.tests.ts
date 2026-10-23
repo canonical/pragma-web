@@ -19,8 +19,8 @@ import {
   it,
   vi,
 } from "vitest";
+import { DEFAULT_PORT } from "#lib/site";
 import { GRAPHQL_URL_ENV_VAR } from "#relay";
-import { DEFAULT_PORT } from "#site";
 import { NORTHGATE_TITLE } from "../../testing/fixtures.js";
 import startMetroGraph from "../../testing/startMetroGraph.js";
 import type { MetroGraph } from "../../testing/types.js";
