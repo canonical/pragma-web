@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../../../testing/createRouterHarness.js";
@@ -68,6 +68,39 @@ describe("PhoneGraph", () => {
     expect(phone.querySelector('[data-id="ds:Component"]')).toHaveClass(
       "row is-dimmed",
     );
+  });
+
+  it("hides the arcs that end at a hidden class, and a guide with its parent or all its children", () => {
+    const tag = requireEntry(uris, "ds:Tag");
+    const uiBlock = requireEntry(uris, "ds:UIBlock");
+    const phone = renderPhone({ hidden: new Set([tag, uiBlock]) });
+    const arcs = layout.phone.edges.filter(
+      (edge) => edge.from === tag || edge.to.includes(tag),
+    );
+    expect(arcs.length).toBeGreaterThan(0);
+    for (const edge of layout.phone.edges) {
+      const ends = [edge.from, ...edge.to];
+      expect(phone.querySelector(`.edge[data-edge="${edge.id}"]`)).toHaveClass(
+        ends.includes(tag) || ends.includes(uiBlock)
+          ? "edge is-hidden"
+          : "edge",
+        { exact: true },
+      );
+    }
+    expect(phone.querySelector('.guide[data-from="ds:UIBlock"]')).toHaveClass(
+      "guide is-hidden",
+      { exact: true },
+    );
+    expect(phone.querySelector('.guide[data-from="ds:Entity"]')).toHaveClass(
+      "guide",
+      { exact: true },
+    );
+    cleanup();
+    const children = [...requireEntry(layout.model.children, uiBlock)];
+    const orphaned = renderPhone({ hidden: new Set(children) });
+    expect(
+      orphaned.querySelector('.guide[data-from="ds:UIBlock"]'),
+    ).toHaveClass("guide is-hidden", { exact: true });
   });
 
   it("merges a class name and passes native props to its root", () => {

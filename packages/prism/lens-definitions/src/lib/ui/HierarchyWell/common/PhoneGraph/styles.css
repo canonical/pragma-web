@@ -60,8 +60,16 @@
     color: var(--phone-graph-muted-color);
   }
 
+  .ds.phone-graph .guide.is-hidden {
+    display: none;
+  }
+
   .ds.phone-graph .edge {
     color: var(--phone-graph-edge-color);
+  }
+
+  .ds.phone-graph .edge.is-hidden {
+    display: none;
   }
 
   .ds.phone-graph .row.is-dimmed {

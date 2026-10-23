@@ -4,7 +4,8 @@
 # indented by its depth to a spine, the subclass structure as the indent
 # and a guide, the relations as arcs right of the spine, all on the
 # canvas's 16px lattice. No edge labels: a tap selects a class and the
-# inspector lists its relations.
+# inspector lists its relations. The filter hides a row, the arcs that end
+# at it, and a guide whose parent or every child it hides.
 # Reference: the graph heuristics' phone view (G28).
 #
 # Why not a published component: no published component draws a graph;
@@ -67,15 +68,29 @@ node:
                 typography.color: color.text.muted
             relation: { cardinality: "1", slotName: count }
       relation: { cardinality: "0..*", slotName: header }
-    - node:
-        role: guide
-        styles:
-          typography.color: color.text.muted
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: guide
+              styles:
+                typography.color: color.text.muted
+          - node:
+              role: hidden guide (.is-hidden)
+              styles:
+                layout.type: none
       relation: { cardinality: "0..*", slotName: guide }
-    - node:
-        role: edge
-        styles:
-          typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: edge
+              styles:
+                typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+          - node:
+              role: hidden edge (.is-hidden)
+              styles:
+                layout.type: none
       relation: { cardinality: "0..*", slotName: edge }
     - switch:
         on: internal
