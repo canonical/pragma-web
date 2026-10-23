@@ -2,12 +2,14 @@ import {
   OntologyClassCard,
   OntologyClassChip,
   OntologyClassCommand,
+  OntologyClassGraphNode,
   OntologyClassRow,
 } from "../ontology/index.js";
 import type { ProjectionMaps } from "../projections/index.js";
 import { NodeCard } from "./NodeCard/index.js";
 import { NodeChip } from "./NodeChip/index.js";
 import { NodeCommand } from "./NodeCommand/index.js";
+import { NodeGraphNode } from "./NodeGraphNode/index.js";
 import { NodeRow } from "./NodeRow/index.js";
 
 /**
@@ -24,5 +26,9 @@ export const defaultProjectionMaps: ProjectionMaps = {
   command: {
     Node: NodeCommand,
     types: { OntologyClass: OntologyClassCommand },
+  },
+  graphNode: {
+    Node: NodeGraphNode,
+    types: { OntologyClass: OntologyClassGraphNode },
   },
 };

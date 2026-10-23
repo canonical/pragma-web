@@ -12,6 +12,7 @@ import {
   ChipProjection,
   CommandProjection,
   defaultProjectionMaps,
+  GraphNodeProjection,
   RowProjection,
 } from "../node/index.js";
 import useProjectionMaps from "./hooks/useProjectionMaps.js";
@@ -57,13 +58,16 @@ describe("ProjectionsProvider", () => {
               <CommandProjection node={node} />
             </ul>
             <CardProjection node={node} />
+            <svg aria-label="Graph" role="img">
+              <GraphNodeProjection node={node} />
+            </svg>
           </>
         ),
         { LinkComponent: RouterLink },
       ),
     );
     const links = [...container.querySelectorAll("a")];
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(5);
     for (const link of links) {
       expect(link.hasAttribute("data-router-link")).toBe(true);
       expect(link.getAttribute("href")).toBe(ONTOLOGY_CLASS_HREF);

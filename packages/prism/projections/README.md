@@ -241,9 +241,10 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 ## Public API
 
 - Dispatchers: `ChipProjection`, `RowProjection`, `CardProjection`,
-  `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
-  `CardProjectionProps`, `CommandProjectionProps`, `ChipArmNative`,
-  `RowArmNative`, `CardArmNative`, `CommandArmNative`.
+  `CommandProjection`, `GraphNodeProjection`; types `ChipProjectionProps`,
+  `RowProjectionProps`, `CardProjectionProps`, `CommandProjectionProps`,
+  `GraphNodeProjectionProps`, `ChipArmNative`, `RowArmNative`,
+  `CardArmNative`, `CommandArmNative`, `GraphNodeArmNative`.
 - Node projections: `NodeChip`, `NodeRow`, `NodeCard`, `NodeCommand`,
   `NodeGraphNode`; types `NodeChipProps`, `NodeRowProps`, `NodeCardProps`,
   `NodeCommandProps`, `NodeGraphNodeProps`.

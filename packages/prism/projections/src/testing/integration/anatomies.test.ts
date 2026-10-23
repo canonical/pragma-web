@@ -83,6 +83,7 @@ describe("the package's components", () => {
       "CardProjection",
       "ChipProjection",
       "CommandProjection",
+      "GraphNodeProjection",
       "NodeCard",
       "NodeChip",
       "NodeCommand",

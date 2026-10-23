@@ -13,6 +13,7 @@ export * from "./CardProjection/index.js";
 export * from "./ChipProjection/index.js";
 export * from "./CommandProjection/index.js";
 export { defaultProjectionMaps } from "./constants.js";
+export * from "./GraphNodeProjection/index.js";
 export * from "./NodeCard/index.js";
 export * from "./NodeChip/index.js";
 export * from "./NodeCommand/index.js";

@@ -3,11 +3,13 @@ import type { ComponentType, ReactNode } from "react";
 import type { CardProjection_node$data } from "../../__generated__/CardProjection_node.graphql.js";
 import type { ChipProjection_node$data } from "../../__generated__/ChipProjection_node.graphql.js";
 import type { CommandProjection_node$data } from "../../__generated__/CommandProjection_node.graphql.js";
+import type { GraphNodeProjection_node$data } from "../../__generated__/GraphNodeProjection_node.graphql.js";
 import type { RowProjection_node$data } from "../../__generated__/RowProjection_node.graphql.js";
 import type {
   CardArmNative,
   ChipArmNative,
   CommandArmNative,
+  GraphNodeArmNative,
   RowArmNative,
 } from "../node/index.js";
 
@@ -82,6 +84,11 @@ export interface ProjectionMaps {
   readonly command: ProjectionMap<
     CommandProjection_node$data,
     CommandArmNative
+  >;
+  /** The graph node: a node of a graph, native SVG. */
+  readonly graphNode: ProjectionMap<
+    GraphNodeProjection_node$data,
+    GraphNodeArmNative
   >;
 }
 

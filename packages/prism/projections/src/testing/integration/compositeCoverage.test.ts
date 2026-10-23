@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import cardProjectionFragmentNode from "../../__generated__/CardProjection_node.graphql.js";
 import chipProjectionFragmentNode from "../../__generated__/ChipProjection_node.graphql.js";
 import commandProjectionFragmentNode from "../../__generated__/CommandProjection_node.graphql.js";
+import graphNodeProjectionFragmentNode from "../../__generated__/GraphNodeProjection_node.graphql.js";
 import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.graphql.js";
 import { defaultProjectionMaps, type ProjectionMaps } from "../../lib/index.js";
 
@@ -38,6 +39,11 @@ const COMPOSITES: readonly {
     form: "command",
     fragment: commandProjectionFragmentNode,
     dispatcher: "CommandProjection",
+  },
+  {
+    form: "graphNode",
+    fragment: graphNodeProjectionFragmentNode,
+    dispatcher: "GraphNodeProjection",
   },
 ];
 
