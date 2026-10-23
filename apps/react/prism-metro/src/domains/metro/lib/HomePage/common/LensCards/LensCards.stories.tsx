@@ -4,11 +4,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Suspense } from "react";
 import { withRouter } from "../../../../../../../.storybook/decorators/index.js";
 import { answerMetroHomeQuery } from "../../../../../../../.storybook/mocks/index.js";
-import LensCards from "./LensCards.js";
+import Component from "./LensCards.js";
 
 const meta = {
-  title: "Components/LensCards",
-  component: LensCards,
+  title: "Components/HomePage/LensCards",
+  component: Component,
   tags: ["autodocs"],
   // The doors read the lenses off the router's table, and suspend until the
   // mock environment answers the landing's query.
@@ -26,7 +26,7 @@ const meta = {
     grid: "intrinsic",
     relay: { generateFunction: answerMetroHomeQuery() },
   },
-} satisfies Meta<typeof LensCards>;
+} satisfies Meta<typeof Component>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -3,11 +3,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withRouter } from "../../../../../.storybook/decorators/index.js";
 import { answerMetroHomeQuery } from "../../../../../.storybook/mocks/index.js";
-import HomePage from "./HomePage.js";
+import Component from "./HomePage.js";
 
 const meta = {
   title: "Components/HomePage",
-  component: HomePage,
+  component: Component,
   tags: ["autodocs"],
   // The doors read the lenses off the router's table, so the story mounts
   // the site's router at the landing's address.
@@ -18,7 +18,7 @@ const meta = {
     grid: "intrinsic",
     relay: { generateFunction: answerMetroHomeQuery() },
   },
-} satisfies Meta<typeof HomePage>;
+} satisfies Meta<typeof Component>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -3,11 +3,11 @@
 import { Cards } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ElementType } from "react";
-import LensCard from "./LensCard.js";
+import Component from "./LensCard.js";
 
 const meta = {
   title: "Components/LensCard",
-  component: LensCard,
+  component: Component,
   tags: ["autodocs"],
   // A card is an item of a grid: in the published Cards group, at the two
   // columns the landing gives each door, on an intrinsic grid.
@@ -26,7 +26,7 @@ const meta = {
     countText: "16 stations",
     summary: "Every stop on the network, with the lines that call at it.",
   },
-} satisfies Meta<typeof LensCard>;
+} satisfies Meta<typeof Component>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

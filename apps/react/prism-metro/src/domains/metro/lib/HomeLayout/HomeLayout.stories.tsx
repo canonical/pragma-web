@@ -4,11 +4,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withRouter } from "../../../../../.storybook/decorators/index.js";
 import { answerMetroHomeQuery } from "../../../../../.storybook/mocks/index.js";
 import { HomePage } from "../HomePage/index.js";
-import HomeLayout from "./HomeLayout.js";
+import Component from "./HomeLayout.js";
 
 const meta = {
   title: "Components/HomeLayout",
-  component: HomeLayout,
+  component: Component,
   tags: ["autodocs"],
   decorators: [withRouter({ url: "/" })],
   parameters: {
@@ -21,7 +21,7 @@ const meta = {
   args: {
     children: <HomePage />,
   },
-} satisfies Meta<typeof HomeLayout>;
+} satisfies Meta<typeof Component>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
