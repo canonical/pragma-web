@@ -80,24 +80,39 @@ export interface Track {
   readonly path: string;
 }
 
-/** Where a station's name sits, and which way the text runs from it. */
-export interface LabelPlacement extends DrawingPoint {
-  readonly anchor: "start" | "middle" | "end";
-}
+/** A straight piece of a drawn track, between two of its vertices. */
+export type TrackSegment = readonly [DrawingPoint, DrawingPoint];
 
-/**
- * A station's mark: a dot where one track passes, a capsule where several
- * pass side by side or lines meet.
- */
-export interface StationMark {
-  readonly stop: DiagramStop;
-  readonly shape: "dot" | "capsule";
-  /** The mark's box, the corner radius rounding it into a dot or a capsule. */
+/** An axis-aligned box in the drawing. */
+export interface Box {
   readonly x: number;
   readonly y: number;
   readonly width: number;
   readonly height: number;
+}
+
+/**
+ * Where a station's name sits: its anchor point, which way the text runs
+ * from it, and the box the text is estimated to fill.
+ */
+export interface LabelPlacement extends DrawingPoint {
+  readonly anchor: "start" | "middle" | "end";
+  readonly box: Box;
+}
+
+/**
+ * A station's mark before its label is placed: a dot where one track
+ * passes, a capsule where several pass side by side or lines meet, as a box
+ * with the corner radius that rounds it.
+ */
+export interface MarkBox extends Box {
+  readonly stop: DiagramStop;
+  readonly shape: "dot" | "capsule";
   readonly radius: number;
+}
+
+/** A station's mark with its label placed. */
+export interface StationMark extends MarkBox {
   readonly label: LabelPlacement;
 }
 
@@ -119,14 +134,4 @@ export interface NetworkGeometry {
   readonly viewBox: string;
   readonly tracks: readonly Track[];
   readonly marks: readonly StationMark[];
-}
-
-/** One stop's place along a line strip's rule, as fractions of its length. */
-export interface StripSpacing {
-  /** Where the rule starts. */
-  readonly ruleStart: number;
-  /** Where the rule ends. */
-  readonly ruleEnd: number;
-  /** Where each stop sits, in calling order. */
-  readonly stops: readonly number[];
 }

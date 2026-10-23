@@ -7,7 +7,14 @@ import {
   ROUTED_STATION_COUNT,
 } from "../../../../../testing/fixtures.js";
 import buildNetworkGeometry from "./buildNetworkGeometry.js";
-import type { StationMark, Track } from "./types.js";
+import type { Box, StationMark, Track } from "./types.js";
+
+/** Whether two boxes overlap. */
+const isOverlapping = (a: Box, b: Box): boolean =>
+  a.x < b.x + b.width &&
+  b.x < a.x + a.width &&
+  a.y < b.y + b.height &&
+  b.y < a.y + a.height;
 
 const geometry = buildNetworkGeometry(buildNetworkLines());
 
@@ -55,9 +62,25 @@ describe("buildNetworkGeometry", () => {
     }
   });
 
-  it("fits the viewBox around the drawing", () => {
-    const [minX, minY, width, height] = geometry.viewBox.split(" ").map(Number);
+  it("places no name over another name or another station's mark", () => {
     for (const mark of geometry.marks) {
+      for (const other of geometry.marks.filter((each) => each !== mark)) {
+        expect(isOverlapping(mark.label.box, other)).toBe(false);
+        expect(isOverlapping(mark.label.box, other.label.box)).toBe(false);
+      }
+    }
+  });
+
+  it("places every name the same way each time", () => {
+    expect(buildNetworkGeometry(buildNetworkLines())).toEqual(geometry);
+  });
+
+  it("fits the viewBox around every mark and name", () => {
+    const [minX, minY, width, height] = geometry.viewBox.split(" ").map(Number);
+    for (const mark of [
+      ...geometry.marks,
+      ...geometry.marks.map((each) => each.label.box),
+    ]) {
       expect(mark.x).toBeGreaterThanOrEqual(minX as number);
       expect(mark.y).toBeGreaterThanOrEqual(minY as number);
       expect(mark.x + mark.width).toBeLessThanOrEqual(

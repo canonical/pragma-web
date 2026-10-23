@@ -17,11 +17,31 @@ export const DOT_RADIUS = 4;
 /** The half-height of an interchange's capsule, which reads larger than a dot. */
 export const INTERCHANGE_RADIUS = 6;
 
+/** The width of a mark's outline: how far its fill sits inside its edge. */
+export const MARK_INSET = 1.5;
+
 /** The gap between a mark's edge and its station's name. */
 export const LABEL_GAP = 6;
 
-/** The space around the network in the viewBox, room for the outer names. */
-export const MARGIN = 96;
+/**
+ * A station name's font size. The drawing is about 900 units wide, so in a
+ * canvas of 680 pixels, its narrowest while the map shows names (two groups
+ * of columns), a name renders at no less than 12 pixels.
+ */
+export const LABEL_SIZE = 17;
+
+/**
+ * A name's estimated width per character, as a fraction of its font size:
+ * the drawing places names before any font has loaded, so it estimates
+ * rather than measures.
+ */
+export const LABEL_CHARACTER_WIDTH = 0.55;
+
+/**
+ * The space around the drawing in the viewBox, beyond its outermost track,
+ * mark or name.
+ */
+export const MARGIN = 24;
 
 /**
  * The directions a station's name may sit in, in the order they are tried:
