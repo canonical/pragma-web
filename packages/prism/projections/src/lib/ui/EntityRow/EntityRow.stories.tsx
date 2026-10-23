@@ -14,7 +14,12 @@ import Component from "./EntityRow.js";
 import type { EntityRowProps } from "./types.js";
 
 /** The row's slots for one entity of the matrix. */
-function toRowArgs({ prefix, title, href, meta }: StoryEntity): EntityRowProps {
+function pickRowArgs({
+  prefix,
+  title,
+  href,
+  meta,
+}: StoryEntity): EntityRowProps {
   return { location: prefix, title, href, meta };
 }
 
@@ -29,21 +34,21 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** A class, marked abstract. */
-export const Class: Story = { args: toRowArgs(CLASS_ENTITY) };
+export const Class: Story = { args: pickRowArgs(CLASS_ENTITY) };
 
 /** A UI block, marked by its stage. */
-export const UIBlock: Story = { args: toRowArgs(UI_BLOCK_ENTITY) };
+export const UIBlock: Story = { args: pickRowArgs(UI_BLOCK_ENTITY) };
 
 /** A modifier. */
-export const Modifier: Story = { args: toRowArgs(MODIFIER_ENTITY) };
+export const Modifier: Story = { args: pickRowArgs(MODIFIER_ENTITY) };
 
 /** A modifier family. */
 export const ModifierFamily: Story = {
-  args: toRowArgs(MODIFIER_FAMILY_ENTITY),
+  args: pickRowArgs(MODIFIER_FAMILY_ENTITY),
 };
 
 /** A code standard, its long name truncating on the row's one line. */
-export const Standard: Story = { args: toRowArgs(STANDARD_ENTITY) };
+export const Standard: Story = { args: pickRowArgs(STANDARD_ENTITY) };
 
 /** The five types as one index: each row 32px, flush on the list's line. */
 export const List: Story = {
@@ -56,7 +61,7 @@ export const List: Story = {
         MODIFIER_FAMILY_ENTITY,
         STANDARD_ENTITY,
       ].map((entity) => (
-        <Component key={entity.href} {...toRowArgs(entity)} />
+        <Component key={entity.href} {...pickRowArgs(entity)} />
       ))}
     </>
   ),

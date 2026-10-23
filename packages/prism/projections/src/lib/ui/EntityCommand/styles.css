@@ -49,7 +49,7 @@
   }
 
   /* The identity and the title clip only along their line, so a chip in
-   * the title keeps the pill's border where it overhangs the line. */
+   * the title keeps its whole pill, and the line grows to hold it. */
   .ds.entity-command .identity {
     display: flex;
     flex-direction: column;

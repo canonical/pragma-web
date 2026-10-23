@@ -32,6 +32,8 @@ const componentCssClassName = "ds entity-list";
  * `import { EntityList } from "@canonical/prism-projections";`
  *
  * @implements prism.component.entity_list
+ * @note Impure: reads the translator context in scope for its count line,
+ *   its view toggles and its empty line.
  */
 export default function EntityList({
   view = DEFAULT_ENTITY_LIST_VIEW,

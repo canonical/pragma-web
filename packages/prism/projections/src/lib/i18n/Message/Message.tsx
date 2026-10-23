@@ -13,6 +13,9 @@ import type { MessageProps } from "./types.js";
  * place of each of those, and a placeholder no element names stays as text.
  *
  * `import { Message } from "../i18n/index.js";`
+ *
+ * @note Impure: reads the translator context in scope, so the same props
+ *   render the sentence of whichever catalog the site provides.
  */
 export default function Message({
   id,

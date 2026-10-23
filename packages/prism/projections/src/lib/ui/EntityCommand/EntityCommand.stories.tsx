@@ -14,7 +14,7 @@ import Component from "./EntityCommand.js";
 import type { EntityCommandProps } from "./types.js";
 
 /** The result's slots for one entity of the matrix. */
-function toCommandArgs({
+function pickCommandArgs({
   title,
   href,
   kind,
@@ -35,21 +35,21 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** A class, with its usage as the vital. */
-export const Class: Story = { args: toCommandArgs(CLASS_ENTITY) };
+export const Class: Story = { args: pickCommandArgs(CLASS_ENTITY) };
 
 /** A UI block, with its version as the vital. */
-export const UIBlock: Story = { args: toCommandArgs(UI_BLOCK_ENTITY) };
+export const UIBlock: Story = { args: pickCommandArgs(UI_BLOCK_ENTITY) };
 
 /** A modifier. */
-export const Modifier: Story = { args: toCommandArgs(MODIFIER_ENTITY) };
+export const Modifier: Story = { args: pickCommandArgs(MODIFIER_ENTITY) };
 
 /** A modifier family, with its member count as the vital. */
 export const ModifierFamily: Story = {
-  args: toCommandArgs(MODIFIER_FAMILY_ENTITY),
+  args: pickCommandArgs(MODIFIER_FAMILY_ENTITY),
 };
 
 /** A code standard, its long name truncating on the first line. */
-export const Standard: Story = { args: toCommandArgs(STANDARD_ENTITY) };
+export const Standard: Story = { args: pickCommandArgs(STANDARD_ENTITY) };
 
 /**
  * The result the keyboard selection rests on, highlighted as a hovered one
@@ -57,7 +57,7 @@ export const Standard: Story = { args: toCommandArgs(STANDARD_ENTITY) };
  * the attribute is styled but not yet announced.
  */
 export const Selected: Story = {
-  args: { ...toCommandArgs(UI_BLOCK_ENTITY), "aria-selected": true },
+  args: { ...pickCommandArgs(UI_BLOCK_ENTITY), "aria-selected": true },
 };
 
 /** The five types as one list of results, each 56px. */
@@ -71,7 +71,7 @@ export const List: Story = {
         MODIFIER_FAMILY_ENTITY,
         STANDARD_ENTITY,
       ].map((entity) => (
-        <Component key={entity.href} {...toCommandArgs(entity)} />
+        <Component key={entity.href} {...pickCommandArgs(entity)} />
       ))}
     </>
   ),

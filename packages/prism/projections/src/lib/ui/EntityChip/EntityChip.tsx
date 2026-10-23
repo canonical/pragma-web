@@ -15,7 +15,7 @@ const componentCssClassName = "ds entity-chip";
  * entity's home through `LinkComponent`; without one it is inert text.
  *
  * It renders only the slots it is given, in their fixed order: lead, value,
- * badge, icon, chevron. It reads no context, so it renders anywhere.
+ * badge, icon, chevron, so it renders anywhere.
  *
  * Native props reach the `<span>` root; a consumer `className` merges after
  * the chip's own.
@@ -23,6 +23,8 @@ const componentCssClassName = "ds entity-chip";
  * `import { EntityChip } from "@canonical/prism-projections";`
  *
  * @implements prism.component.entity_chip
+ * @note Impure: reads the translator context in scope, through `Message`,
+ *   for the lead and its separator.
  */
 export default function EntityChip({
   lead,

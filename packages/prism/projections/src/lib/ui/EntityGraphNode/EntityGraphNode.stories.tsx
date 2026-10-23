@@ -15,7 +15,7 @@ import Component from "./EntityGraphNode.js";
 import type { EntityGraphNodeProps } from "./types.js";
 
 /** The node's slots for one entity of the matrix. */
-function toNodeArgs({
+function pickNodeArgs({
   title,
   href,
   kind,
@@ -48,21 +48,21 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** A class. */
-export const Class: Story = { args: toNodeArgs(CLASS_ENTITY) };
+export const Class: Story = { args: pickNodeArgs(CLASS_ENTITY) };
 
 /** A UI block. */
-export const UIBlock: Story = { args: toNodeArgs(UI_BLOCK_ENTITY) };
+export const UIBlock: Story = { args: pickNodeArgs(UI_BLOCK_ENTITY) };
 
 /** A modifier. */
-export const Modifier: Story = { args: toNodeArgs(MODIFIER_ENTITY) };
+export const Modifier: Story = { args: pickNodeArgs(MODIFIER_ENTITY) };
 
 /** A modifier family. */
 export const ModifierFamily: Story = {
-  args: toNodeArgs(MODIFIER_FAMILY_ENTITY),
+  args: pickNodeArgs(MODIFIER_FAMILY_ENTITY),
 };
 
 /** A code standard, its long name clipped at the box's inner edge. */
-export const Standard: Story = { args: toNodeArgs(STANDARD_ENTITY) };
+export const Standard: Story = { args: pickNodeArgs(STANDARD_ENTITY) };
 
 /** The five types as a graph lays them out: each node placed by a transform. */
 export const Column: Story = {
@@ -77,7 +77,7 @@ export const Column: Story = {
       {ENTITIES.map((entity, index) => (
         <Component
           key={entity.href}
-          {...toNodeArgs(entity)}
+          {...pickNodeArgs(entity)}
           transform={`translate(0 ${index * (GRAPH_NODE_HEIGHT + COLUMN_GAP)})`}
         />
       ))}
