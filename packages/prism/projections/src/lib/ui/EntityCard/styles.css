@@ -44,6 +44,7 @@
     --entity-card-rule-width: 1px;
     --entity-card-rule-color: var(--color-border-muted);
     --entity-card-key-color: var(--color-text-muted);
+    --entity-card-identifier-vertical-align: top;
     --entity-card-vital-max-width: 100%;
     --entity-card-vital-color: var(--color-text-muted);
 
@@ -210,6 +211,14 @@
     min-width: 0;
     text-overflow: ellipsis;
     margin-inline-start: 0;
+  }
+
+  /* An identifier in a value sets the monospace face on the pair's line:
+   * its box is the line's, aligned to the line's top, so the face's other
+   * metrics never grow the pair. */
+  .ds.entity-card > .body > .key-values > .pair > .value > .identifier {
+    vertical-align: var(--entity-card-identifier-vertical-align);
+    line-height: var(--entity-card-line-height);
   }
 
   /* A vital no wider than the footer, a long word ending in an ellipsis. */

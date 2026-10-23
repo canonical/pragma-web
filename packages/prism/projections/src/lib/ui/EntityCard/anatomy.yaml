@@ -44,6 +44,10 @@
 # A key and its value clip along their line only, so nothing they hold is
 # cut above or below: a chip in a value is 28px, and the pair's line grows
 # to hold it.
+# An identifier in a value, a `<code class="identifier">`, sets the
+# monospace face on the pair's line: its box is the line's 24px, aligned to
+# the line's top, so the face's other ascent and descent never grow the
+# pair.
 # The title's link reads as the title: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the title clips.
 #
@@ -98,6 +102,8 @@
 #   --entity-card-focus-ring-width: 2px, --entity-card-focus-ring-offset: -2px
 #                                      the link's ring, drawn inside it.
 #   --entity-card-vital-max-width: 100%  a vital no wider than the footer.
+#   --entity-card-identifier-vertical-align: top  the identifier's
+#                                       alignment, a keyword.
 #   --entity-card-sidecar-divider-width: 1px  the Card's divider under the
 #                                       sidecar; stroke thickness is
 #                                       primitive only.
@@ -250,6 +256,13 @@ node:
                             size.min.width: 0
                             typography.overflow: ellipsis
                             spacing.external.inline.start: 0
+                          edges:
+                            - node:
+                                role: identifier
+                                styles:
+                                  layout.verticalAlign: top
+                                  typography.lineHeight: space.300
+                              relation: { cardinality: "0..*", slotName: identifier }
                         relation: { cardinality: "1", slotName: value }
                   relation: { cardinality: "1..*", slotName: pair }
             relation: { cardinality: "0..1", slotName: key-values }

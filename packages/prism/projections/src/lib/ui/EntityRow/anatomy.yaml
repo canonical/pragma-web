@@ -15,6 +15,11 @@
 # or below: a chip in the title is 28px, and its line grows to hold it (the
 # row is then 36px).
 #
+# An identifier in the location, a `<code class="identifier">`, sets the
+# monospace face on the row's line: its box is the line's 24px, aligned to
+# the line's top, so the face's other ascent and descent never grow the
+# line past 24px and the row stays 32px.
+#
 # A linked title reads as the row's text: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the identity clips; the
 # states apply to the link alone.
@@ -31,6 +36,8 @@
 #                                      the link's ring, drawn inside it since the identity clips.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
+#   --entity-row-identifier-vertical-align: top
+#                                      the identifier's alignment, a keyword.
 #
 # Roster namespaces (accepted and tracked): grid.gutter, space.050,
 # space.300 (a line height), and the semantic typography symbol
@@ -60,6 +67,13 @@ node:
               role: location
               styles:
                 typography.color: color.text.muted
+              edges:
+                - node:
+                    role: identifier
+                    styles:
+                      layout.verticalAlign: top
+                      typography.lineHeight: space.300
+                  relation: { cardinality: "0..*", slotName: identifier }
             relation: { cardinality: "0..1", slotName: location }
           - node:
               role: title

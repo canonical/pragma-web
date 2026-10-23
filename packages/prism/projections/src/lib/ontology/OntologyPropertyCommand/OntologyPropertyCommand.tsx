@@ -77,7 +77,7 @@ export default function OntologyPropertyCommand({
       LinkComponent={LinkComponent}
       location={data.domain?._meta.title}
       title={data.label ?? findLocalName(data.uri)}
-      vital={<code>{data.range}</code>}
+      vital={<code className="identifier">{data.range}</code>}
     />
   );
 }

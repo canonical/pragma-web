@@ -8,7 +8,10 @@ import type { PARENT_MESSAGES } from "./constants.js";
 export interface EntityCardKeyValue {
   /** What the value is, muted on the left half. */
   readonly key: string;
-  /** The value, on the right half. */
+  /**
+   * The value, on the right half. An identifier in it is a
+   * `<code className="identifier">`, which keeps the pair's line.
+   */
   readonly value: ReactNode;
 }
 

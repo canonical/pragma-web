@@ -99,7 +99,9 @@ describe("OntologyClassRow", () => {
         (slot) => slot.textContent,
       ),
     ).toEqual(["ds:", "Layout", "abstract"]);
-    expect(container.querySelector(".location code")?.textContent).toBe("ds:");
+    expect(
+      container.querySelector(".location code.identifier")?.textContent,
+    ).toBe("ds:");
     expect(container.querySelector(".title")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_CLASS_HREF,
     );

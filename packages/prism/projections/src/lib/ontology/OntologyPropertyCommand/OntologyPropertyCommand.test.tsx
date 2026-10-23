@@ -116,7 +116,7 @@ describe("OntologyPropertyCommand", () => {
     expect(container.querySelector(".title")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_PROPERTY_HREF,
     );
-    expect(container.querySelector(".vital code")?.textContent).toBe(
+    expect(container.querySelector(".vital code.identifier")?.textContent).toBe(
       "ds:Modifier",
     );
   });

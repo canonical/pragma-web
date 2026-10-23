@@ -112,7 +112,7 @@ describe("OntologyPropertyCard", () => {
       "Inverse",
       "Modifies",
     ]);
-    expect(container.querySelector(".value code")?.textContent).toBe(
+    expect(container.querySelector(".value code.identifier")?.textContent).toBe(
       "ds:Modifier",
     );
     expect(container.querySelector(".location")).toBeNull();

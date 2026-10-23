@@ -73,7 +73,9 @@ export default function NodeRow({
       LinkComponent={LinkComponent}
       location={
         prefix === undefined ? undefined : (
-          <code>{curie.slice(0, prefix.length + 1)}</code>
+          <code className="identifier">
+            {curie.slice(0, prefix.length + 1)}
+          </code>
         )
       }
       meta={type._meta.title}

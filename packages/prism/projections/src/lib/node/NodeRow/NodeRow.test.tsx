@@ -91,7 +91,9 @@ describe("NodeRow", () => {
         (slot) => slot.textContent,
       ),
     ).toEqual(["ds:", "IconButton", "Component"]);
-    expect(container.querySelector(".location code")?.textContent).toBe("ds:");
+    expect(
+      container.querySelector(".location code.identifier")?.textContent,
+    ).toBe("ds:");
     expect(container.querySelector(".title")?.tagName).toBe("SPAN");
   });
 

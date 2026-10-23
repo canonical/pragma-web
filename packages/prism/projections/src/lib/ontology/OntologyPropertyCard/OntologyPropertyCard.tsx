@@ -85,7 +85,10 @@ export default function OntologyPropertyCard({
       data-type={data.__typename}
       href={href}
       keyValues={[
-        { key: t("property.range"), value: <code>{data.range}</code> },
+        {
+          key: t("property.range"),
+          value: <code className="identifier">{data.range}</code>,
+        },
         ...(inverse == null
           ? []
           : [
