@@ -125,7 +125,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     const { status, html } = await fetchPage(script, "/definitions");
     expect(status).toBe(200);
     expect(html).toMatch(
-      /class="ds term-rail".*?href="\/definitions\/metro%3AStation">Station<\/a>/s,
+      /class="ds term-rail[^"]*".*?href="\/definitions\/metro%3AStation">Station<\/a>/s,
     );
     const embedded = INITIAL_DATA_PATTERN.exec(html)?.at(1);
     const records = JSON.parse(String(embedded)).relay?.records ?? {};
