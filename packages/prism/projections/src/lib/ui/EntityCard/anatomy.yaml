@@ -55,8 +55,12 @@
 # body's three row tracks (`1 / 4`), and never on the footer's: a tall
 # example grows the body's tracks, the title stays on top, and the footer
 # keeps its own height, in this card and in the cards beside it in a
-# Cards group. Without a footer it reaches back across the gutter before
-# the footer's track as the body does, so the two end together.
+# Cards group. It rests on the Card's divider (1px, color.border.muted),
+# drawn on its block-end edge as the body draws its own across the body's
+# span, and the footer runs under both, across the card, so no corner of
+# the card is left empty beside the footer. Without a footer it reaches
+# back across the gutter before the footer's track as the body does, so
+# the two end together.
 # The example must fit two intrinsic columns, the sidecar's width at every
 # size of the grid less its inline insets (138px at a phone's width): a
 # component with its default props fits; a strip of its variants as tabs
@@ -68,15 +72,18 @@
 # under `.ds.entity-card:has(> .footer + .sidecar)` and
 # `.ds.entity-card:has(> .body + .sidecar)` sets that section's
 # `border-block-end-width` to 0, so the card's dividers are the ones it
-# draws without a sidecar.
+# draws without a sidecar. Without a footer the sidecar's own divider
+# would lie along that edge as well; the second reflow sets its
+# `border-block-end-width` to 0 too.
 #
 # With-sidecar reflow, bound in styles.css under
 # `.ds.entity-card:has(> .sidecar)` (the DSL's states re-value channels and
 # never add structure, so the sidecar's presence is a reflow): the card turns
 # into a column subgrid as wide as its own span plus the sidecar's two
-# columns, its gap the grid's gutter; the body and the footer keep the card's
-# own span (`1 / span var(--entity-card-body-span)`); the sidecar takes the
-# last two columns of the body's row tracks.
+# columns, its gap the grid's gutter; the body keeps the card's own span
+# (`1 / span var(--entity-card-body-span)`); the sidecar takes the last two
+# columns of the body's row tracks; the footer spans the whole card
+# (`1 / -1`), under the body and the sidecar.
 #
 # Every decision is read through a component token declared on the root
 # (`--entity-card-*`), bound to the symbol or the literal named here.
@@ -91,6 +98,9 @@
 #   --entity-card-focus-ring-width: 2px, --entity-card-focus-ring-offset: -2px
 #                                      the link's ring, drawn inside it.
 #   --entity-card-vital-max-width: 100%  a vital no wider than the footer.
+#   --entity-card-sidecar-divider-width: 1px  the Card's divider under the
+#                                       sidecar; stroke thickness is
+#                                       primitive only.
 #   --entity-card-sidecar-span: 2       the sidecar's columns: two at least,
 #                                       wide enough for a component example.
 #   --entity-card-body-span: var(--card-span, 1)  the span the published
@@ -125,6 +135,9 @@ node:
           spacing.internal.block.end: component.padding.block
           spacing.internal.inline.start: component.padding.inline
           spacing.internal.inline.end: component.padding.inline
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.bottom.color: color.border.muted
           appearance.background: color.background.layer2
       relation: { cardinality: "0..1", slotName: sidecar }
     - node:

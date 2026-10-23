@@ -20,6 +20,9 @@
     --entity-card-sidecar-padding-block: var(--component-padding-block);
     --entity-card-sidecar-padding-inline: var(--component-padding-inline);
     --entity-card-sidecar-background: var(--color-background-layer2);
+    /* The Card's divider, drawn under the sidecar where the footer follows. */
+    --entity-card-sidecar-divider-width: 1px;
+    --entity-card-sidecar-divider-color: var(--color-border-muted);
     --entity-card-location-color: var(--color-text-muted);
     --entity-card-location-letter-spacing: var(
       --typography-text-primary-smallcaps-letter-spacing
@@ -60,19 +63,24 @@
   }
 
   /* Beside the body, on its tracks and never on the footer's: a tall
-   * example grows the body, and the footer keeps its own height. */
+   * example grows the body, and the footer keeps its own height. It rests
+   * on the Card's divider, as the body does, so the footer below runs
+   * under both. */
   .ds.entity-card > .sidecar {
     grid-column: span var(--entity-card-sidecar-span) / -1;
     grid-row: 1 / 4;
     min-width: 0;
     padding-block: var(--entity-card-sidecar-padding-block);
     padding-inline: var(--entity-card-sidecar-padding-inline);
+    border-bottom-width: var(--entity-card-sidecar-divider-width);
+    border-bottom-style: solid;
+    border-bottom-color: var(--entity-card-sidecar-divider-color);
     background: var(--entity-card-sidecar-background);
   }
 
-  /* With a sidecar the card turns into a column subgrid: the body and the
-   * footer keep the card's own span, and the sidecar takes two columns
-   * after them. */
+  /* With a sidecar the card turns into a column subgrid: the body keeps
+   * the card's own span, the sidecar takes two columns after it, and the
+   * footer runs under both, across the card. */
   .ds.entity-card:has(> .sidecar) {
     grid-column: span
       calc(var(--entity-card-body-span) + var(--entity-card-sidecar-span));
@@ -80,9 +88,12 @@
     gap: var(--entity-card-gap);
   }
 
-  .ds.entity-card:has(> .sidecar) > .body,
-  .ds.entity-card:has(> .sidecar) > .footer {
+  .ds.entity-card:has(> .sidecar) > .body {
     grid-column: 1 / span var(--entity-card-body-span);
+  }
+
+  .ds.entity-card:has(> .sidecar) > .footer {
+    grid-column: 1 / -1;
   }
 
   /* Without vitals there is no footer: the body, and the sidecar beside
@@ -97,8 +108,10 @@
 
   /* The sidecar comes after the card's sections, so the section it follows
    * is no longer the Card's last child and would draw a divider along the
-   * card's bottom edge: it draws none, as the Card's last section does. */
+   * card's bottom edge: it draws none, as the Card's last section does.
+   * Without a footer the sidecar ends at that edge too, and draws none. */
   .ds.entity-card:has(> .body + .sidecar) > .body,
+  .ds.entity-card:has(> .body + .sidecar) > .sidecar,
   .ds.entity-card:has(> .footer + .sidecar) > .footer {
     border-block-end-width: 0;
   }
