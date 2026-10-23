@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c5b06cf1da599107378c49a8d3de106c>>
+ * @generated SignedSource<<b34d652dc5281ac32f75afb8af632dd8>>
  * @lightSyntaxTransform
  */
 
@@ -37,7 +37,14 @@ v1 = {
   "name": "uri",
   "storageKey": null
 },
-v2 = [
+v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "title",
+  "storageKey": null
+},
+v3 = [
   {
     "alias": null,
     "args": null,
@@ -46,31 +53,25 @@ v2 = [
     "name": "_meta",
     "plural": false,
     "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "title",
-        "storageKey": null
-      }
+      (v2/*:: as any*/)
     ],
     "storageKey": null
   },
   (v1/*:: as any*/)
 ],
-v3 = {
+v4 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v4 = {
+v5 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "EntityMeta"
 },
-v5 = {
+v6 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -147,6 +148,7 @@ return {
                 "name": "_meta",
                 "plural": false,
                 "selections": [
+                  (v2/*:: as any*/),
                   {
                     "alias": null,
                     "args": null,
@@ -161,7 +163,7 @@ return {
                     "kind": "LinkedField",
                     "name": "type",
                     "plural": false,
-                    "selections": (v2/*:: as any*/),
+                    "selections": (v3/*:: as any*/),
                     "storageKey": null
                   }
                 ],
@@ -174,7 +176,7 @@ return {
                 "kind": "LinkedField",
                 "name": "tier",
                 "plural": false,
-                "selections": (v2/*:: as any*/),
+                "selections": (v3/*:: as any*/),
                 "storageKey": null
               }
             ],
@@ -187,7 +189,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b316ed26042ef5771a31ba66cc9ec3f0",
+    "cacheID": "6ab3a642744c3bde9df23e76c560839e",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -197,34 +199,35 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__isUIBlock": (v3/*:: as any*/),
-        "node.__typename": (v3/*:: as any*/),
-        "node._meta": (v4/*:: as any*/),
-        "node._meta.curie": (v3/*:: as any*/),
+        "node.__isUIBlock": (v4/*:: as any*/),
+        "node.__typename": (v4/*:: as any*/),
+        "node._meta": (v5/*:: as any*/),
+        "node._meta.curie": (v4/*:: as any*/),
+        "node._meta.title": (v4/*:: as any*/),
         "node._meta.type": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
           "type": "OntologyClass"
         },
-        "node._meta.type._meta": (v4/*:: as any*/),
-        "node._meta.type._meta.title": (v3/*:: as any*/),
-        "node._meta.type.uri": (v5/*:: as any*/),
+        "node._meta.type._meta": (v5/*:: as any*/),
+        "node._meta.type._meta.title": (v4/*:: as any*/),
+        "node._meta.type.uri": (v6/*:: as any*/),
         "node.tier": {
           "enumValues": null,
           "nullable": true,
           "plural": false,
           "type": "Tier"
         },
-        "node.tier._meta": (v4/*:: as any*/),
-        "node.tier._meta.title": (v3/*:: as any*/),
-        "node.tier.uri": (v5/*:: as any*/),
-        "node.uri": (v5/*:: as any*/)
+        "node.tier._meta": (v5/*:: as any*/),
+        "node.tier._meta.title": (v4/*:: as any*/),
+        "node.tier.uri": (v6/*:: as any*/),
+        "node.uri": (v6/*:: as any*/)
       }
     },
     "name": "UIBlockGraphNodeSsrTestQuery",
     "operationKind": "query",
-    "text": "query UIBlockGraphNodeSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...UIBlockGraphNode_node\n    uri\n  }\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
+    "text": "query UIBlockGraphNodeSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...UIBlockGraphNode_node\n    uri\n  }\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
   }
 };
 })();

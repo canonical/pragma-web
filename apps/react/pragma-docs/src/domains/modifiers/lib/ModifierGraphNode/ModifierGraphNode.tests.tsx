@@ -90,9 +90,8 @@ describe("ModifierGraphNode", () => {
         <ModifierGraphNode node={node} />
       </svg>
     ));
-    expect(
-      container.querySelector(".title tspan.identifier")?.textContent,
-    ).toBe("ds:global.modifier.danger");
+    expect(container.querySelector(".title")?.textContent).toBe("Danger");
+    expect(container.querySelector(".title .identifier")).toBeNull();
     expect(container.querySelector(".context")?.textContent).toBe(
       "Modifier in ds",
     );

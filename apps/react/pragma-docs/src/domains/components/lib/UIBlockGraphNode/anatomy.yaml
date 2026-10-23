@@ -1,8 +1,9 @@
 ---
 # UIBlockGraphNode: a UI block as a node of a graph, two lines tall.
 # Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2433 and 566:2357 (the
-# compact address as the title, in the identifier face, then "kind in
-# location" muted). The kind is the block's class; the location its tier.
+# title, then "kind in location" muted). The title is the block's title,
+# not its compact address, which is wider than the node and would be
+# clipped. The kind is the block's class; the location its tier.
 # Projected onto EntityGraphNode, native SVG, which carries every style:
 # this anatomy binds none. The home is the link the title renders through,
 # resolved from the compact address; a block whose type has no home reads
@@ -18,14 +19,8 @@ node:
           - node:
               role: title
               projection:
-                field: _meta.curie
+                field: _meta.title
               edges:
-                # The compact address is set in the identifier face.
-                - node:
-                    role: identifier
-                  relation:
-                    cardinality: "1"
-                    slotName: identifier
                 - node:
                     role: home
                     projection:

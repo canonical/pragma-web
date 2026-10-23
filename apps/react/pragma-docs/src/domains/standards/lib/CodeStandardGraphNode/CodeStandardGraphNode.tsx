@@ -15,12 +15,13 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields CodeStandardGraphNode reads from the CodeStandard it
- * renders: its compact address and class.
+ * renders: its title, compact address and class.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment CodeStandardGraphNode_node on CodeStandard {
     __typename
     _meta {
+      title
       curie
       type {
         _meta {
@@ -36,10 +37,9 @@ void declareNodeFragment;
 const componentCssClassName = "ds code-standard-graph-node";
 
 /**
- * A code standard as a node of a graph, native SVG: its compact address
- * (`cs:react.component.subcomponent_export_api`) on the first line, in the
- * identifier face, linked to its home when the site has one and inert text when
- * it has none, then its class in its namespace's prefix muted (`Code Standard
+ * A code standard as a node of a graph, native SVG: its title (`Public and
+ * private subcomponent exports`) on the first line, linked to its home when
+ * the site has one and inert text when it has none, then its class in its namespace's prefix muted (`Code Standard
  * in cs`). A standard whose address did not compact names its class alone.
  *
  * Native props reach the node's SVG `<g>` root, where a graph sets its
@@ -70,7 +70,7 @@ export default function CodeStandardGraphNode({
       kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
       location={findCuriePrefix(curie)}
-      title={<tspan className="identifier">{curie}</tspan>}
+      title={data._meta.title}
     />
   );
 }

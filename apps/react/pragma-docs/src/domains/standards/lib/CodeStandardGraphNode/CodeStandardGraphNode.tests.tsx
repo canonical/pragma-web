@@ -93,9 +93,10 @@ describe("CodeStandardGraphNode", () => {
         <CodeStandardGraphNode node={node} />
       </svg>
     ));
-    expect(
-      container.querySelector(".title tspan.identifier")?.textContent,
-    ).toBe("cs:react.component.subcomponent_export_api");
+    expect(container.querySelector(".title")?.textContent).toBe(
+      "Public and private subcomponent exports",
+    );
+    expect(container.querySelector(".title .identifier")).toBeNull();
     expect(container.querySelector(".context")?.textContent).toBe(
       "Code Standard in cs",
     );

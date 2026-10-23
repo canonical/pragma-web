@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<047f6b88db30267c8bb314c97b3c1629>>
+ * @generated SignedSource<<23b0c184d6fac9f9e4e41598be4c0813>>
  * @lightSyntaxTransform
  */
 
@@ -38,18 +38,25 @@ v1 = {
   "storageKey": null
 },
 v2 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "String"
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "title",
+  "storageKey": null
 },
 v3 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
-  "type": "EntityMeta"
+  "type": "String"
 },
 v4 = {
+  "enumValues": null,
+  "nullable": false,
+  "plural": false,
+  "type": "EntityMeta"
+},
+v5 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -126,6 +133,7 @@ return {
                 "name": "_meta",
                 "plural": false,
                 "selections": [
+                  (v2/*:: as any*/),
                   {
                     "alias": null,
                     "args": null,
@@ -149,13 +157,7 @@ return {
                         "name": "_meta",
                         "plural": false,
                         "selections": [
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "title",
-                            "storageKey": null
-                          }
+                          (v2/*:: as any*/)
                         ],
                         "storageKey": null
                       },
@@ -176,7 +178,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "83892f946f84f7443c3b0ec369a54de0",
+    "cacheID": "6fdaea5b67ecba8d052ca0934a585181",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -186,24 +188,25 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__typename": (v2/*:: as any*/),
-        "node._meta": (v3/*:: as any*/),
-        "node._meta.curie": (v2/*:: as any*/),
+        "node.__typename": (v3/*:: as any*/),
+        "node._meta": (v4/*:: as any*/),
+        "node._meta.curie": (v3/*:: as any*/),
+        "node._meta.title": (v3/*:: as any*/),
         "node._meta.type": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
           "type": "OntologyClass"
         },
-        "node._meta.type._meta": (v3/*:: as any*/),
-        "node._meta.type._meta.title": (v2/*:: as any*/),
-        "node._meta.type.uri": (v4/*:: as any*/),
-        "node.uri": (v4/*:: as any*/)
+        "node._meta.type._meta": (v4/*:: as any*/),
+        "node._meta.type._meta.title": (v3/*:: as any*/),
+        "node._meta.type.uri": (v5/*:: as any*/),
+        "node.uri": (v5/*:: as any*/)
       }
     },
     "name": "CodeStandardGraphNodeTestQuery",
     "operationKind": "query",
-    "text": "query CodeStandardGraphNodeTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...CodeStandardGraphNode_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n"
+    "text": "query CodeStandardGraphNodeTestQuery {\n  node(id: \"test\") {\n    __typename\n    ...CodeStandardGraphNode_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n"
   }
 };
 })();

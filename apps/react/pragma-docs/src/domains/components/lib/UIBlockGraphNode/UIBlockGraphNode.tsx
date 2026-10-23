@@ -14,12 +14,13 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields UIBlockGraphNode reads from the UIBlock it renders: its
- * compact address and class, and its tier's title.
+ * title, compact address and class, and its tier's title.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment UIBlockGraphNode_node on UIBlock {
     __typename
     _meta {
+      title
       curie
       type {
         _meta {
@@ -40,10 +41,11 @@ void declareNodeFragment;
 const componentCssClassName = "ds ui-block-graph-node";
 
 /**
- * A UI block as a node of a graph, native SVG: its compact address
- * (`ds:global.component.button`) on the first line, in the identifier face,
- * linked to its home when the site has one and inert text when it has none,
- * then its class in its tier muted (`Component in Global`).
+ * A UI block as a node of a graph, native SVG: its title (`IconButton`) on
+ * the first line, linked to its home when the site has one and inert text
+ * when it has none, then its class in its tier muted (`Component in
+ * Global`). The title, not the compact address, names the node, since an
+ * address is wider than the node and would be clipped.
  *
  * Native props reach the node's SVG `<g>` root, where a graph sets its
  * transform; a consumer `className` merges after the projection's own, and the
@@ -73,7 +75,7 @@ export default function UIBlockGraphNode({
       kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
       location={data.tier?._meta.title}
-      title={<tspan className="identifier">{curie}</tspan>}
+      title={data._meta.title}
     />
   );
 }

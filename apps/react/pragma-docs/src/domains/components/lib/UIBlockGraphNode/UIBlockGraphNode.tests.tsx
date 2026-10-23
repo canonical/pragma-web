@@ -93,9 +93,8 @@ describe("UIBlockGraphNode", () => {
         <UIBlockGraphNode node={node} />
       </svg>
     ));
-    expect(
-      container.querySelector(".title tspan.identifier")?.textContent,
-    ).toBe("ds:global.component.icon_button");
+    expect(container.querySelector(".title")?.textContent).toBe("IconButton");
+    expect(container.querySelector(".title .identifier")).toBeNull();
     expect(container.querySelector(".context")?.textContent).toBe(
       "Component in Global",
     );

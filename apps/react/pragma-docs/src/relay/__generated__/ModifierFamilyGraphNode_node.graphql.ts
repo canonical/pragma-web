@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<882ca976f2200d685a6bd3968ed68bc6>>
+ * @generated SignedSource<<2d832142db935ac194fdeead3caef1e1>>
  * @lightSyntaxTransform
  */
 
@@ -13,6 +13,7 @@ export type ModifierFamilyGraphNode_node$data = {
   readonly __typename: "ModifierFamily";
   readonly _meta: {
     readonly curie: string;
+    readonly title: string;
     readonly type: {
       readonly _meta: {
         readonly title: string;
@@ -26,7 +27,15 @@ export type ModifierFamilyGraphNode_node$key = {
   readonly " $fragmentSpreads": FragmentRefs<"ModifierFamilyGraphNode_node">;
 };
 
-const node: ReaderFragment = {
+const node: ReaderFragment = (function(){
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "title",
+  "storageKey": null
+};
+return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -47,6 +56,7 @@ const node: ReaderFragment = {
       "name": "_meta",
       "plural": false,
       "selections": [
+        (v0/*:: as any*/),
         {
           "alias": null,
           "args": null,
@@ -70,13 +80,7 @@ const node: ReaderFragment = {
               "name": "_meta",
               "plural": false,
               "selections": [
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "title",
-                  "storageKey": null
-                }
+                (v0/*:: as any*/)
               ],
               "storageKey": null
             }
@@ -90,7 +94,8 @@ const node: ReaderFragment = {
   "type": "ModifierFamily",
   "abstractKey": null
 };
+})();
 
-(node as any).hash = "1b93643278212487b4da74e541015d31";
+(node as any).hash = "1b171b71832ad6e0855459ff5d0c2c4e";
 
 export default node;

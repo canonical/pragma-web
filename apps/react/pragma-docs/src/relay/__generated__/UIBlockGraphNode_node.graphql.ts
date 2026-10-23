@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e0338ee96b828406ea47ea13d4841bf6>>
+ * @generated SignedSource<<ac0f53dbeb10280650110c7175335c59>>
  * @lightSyntaxTransform
  */
 
@@ -13,6 +13,7 @@ export type UIBlockGraphNode_node$data = {
   readonly __typename: string;
   readonly _meta: {
     readonly curie: string;
+    readonly title: string;
     readonly type: {
       readonly _meta: {
         readonly title: string;
@@ -32,7 +33,14 @@ export type UIBlockGraphNode_node$key = {
 };
 
 const node: ReaderFragment = (function(){
-var v0 = [
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "title",
+  "storageKey": null
+},
+v1 = [
   {
     "alias": null,
     "args": null,
@@ -41,13 +49,7 @@ var v0 = [
     "name": "_meta",
     "plural": false,
     "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "title",
-        "storageKey": null
-      }
+      (v0/*:: as any*/)
     ],
     "storageKey": null
   }
@@ -73,6 +75,7 @@ return {
       "name": "_meta",
       "plural": false,
       "selections": [
+        (v0/*:: as any*/),
         {
           "alias": null,
           "args": null,
@@ -87,7 +90,7 @@ return {
           "kind": "LinkedField",
           "name": "type",
           "plural": false,
-          "selections": (v0/*:: as any*/),
+          "selections": (v1/*:: as any*/),
           "storageKey": null
         }
       ],
@@ -100,7 +103,7 @@ return {
       "kind": "LinkedField",
       "name": "tier",
       "plural": false,
-      "selections": (v0/*:: as any*/),
+      "selections": (v1/*:: as any*/),
       "storageKey": null
     }
   ],
@@ -109,6 +112,6 @@ return {
 };
 })();
 
-(node as any).hash = "9abd6cf6808781e19254da7612a9c3d9";
+(node as any).hash = "6210917eef0fbac1b10b985d087847b8";
 
 export default node;

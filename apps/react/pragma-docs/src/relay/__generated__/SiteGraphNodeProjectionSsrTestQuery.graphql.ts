@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<eec692036bfeb64b96730944365c40f5>>
+ * @generated SignedSource<<af819b937839b1ab0154d3da177961ab>>
  * @lightSyntaxTransform
  */
 
@@ -33,35 +33,37 @@ var v0 = [
 v1 = {
   "alias": null,
   "args": null,
+  "concreteType": "EntityMeta",
+  "kind": "LinkedField",
+  "name": "_meta",
+  "plural": false,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "title",
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
+v2 = {
+  "alias": null,
+  "args": null,
   "kind": "ScalarField",
   "name": "uri",
   "storageKey": null
 },
-v2 = [
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "EntityMeta",
-    "kind": "LinkedField",
-    "name": "_meta",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "title",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
-  },
-  (v1/*:: as any*/)
-],
 v3 = [
+  (v1/*:: as any*/),
+  (v2/*:: as any*/)
+],
+v4 = [
   {
     "kind": "InlineFragment",
     "selections": [
+      (v1/*:: as any*/),
       {
         "alias": null,
         "args": null,
@@ -69,7 +71,7 @@ v3 = [
         "kind": "LinkedField",
         "name": "tier",
         "plural": false,
-        "selections": (v2/*:: as any*/),
+        "selections": (v3/*:: as any*/),
         "storageKey": null
       }
     ],
@@ -77,19 +79,22 @@ v3 = [
     "abstractKey": "__isUIBlock"
   }
 ],
-v4 = {
+v5 = [
+  (v1/*:: as any*/)
+],
+v6 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "String"
 },
-v5 = {
+v7 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
   "type": "EntityMeta"
 },
-v6 = {
+v8 = {
   "enumValues": null,
   "nullable": false,
   "plural": false,
@@ -180,13 +185,13 @@ return {
                 "kind": "LinkedField",
                 "name": "type",
                 "plural": false,
-                "selections": (v2/*:: as any*/),
+                "selections": (v3/*:: as any*/),
                 "storageKey": null
               }
             ],
             "storageKey": null
           },
-          (v1/*:: as any*/),
+          (v2/*:: as any*/),
           {
             "kind": "InlineFragment",
             "selections": [
@@ -203,20 +208,38 @@ return {
           },
           {
             "kind": "InlineFragment",
-            "selections": (v3/*:: as any*/),
+            "selections": (v4/*:: as any*/),
             "type": "Component",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v3/*:: as any*/),
+            "selections": (v4/*:: as any*/),
             "type": "Pattern",
             "abstractKey": null
           },
           {
             "kind": "InlineFragment",
-            "selections": (v3/*:: as any*/),
+            "selections": (v4/*:: as any*/),
             "type": "Layout",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": (v5/*:: as any*/),
+            "type": "Modifier",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": (v5/*:: as any*/),
+            "type": "ModifierFamily",
+            "abstractKey": null
+          },
+          {
+            "kind": "InlineFragment",
+            "selections": (v5/*:: as any*/),
+            "type": "CodeStandard",
             "abstractKey": null
           }
         ],
@@ -225,7 +248,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "2f5a5023981656bec0039c77d6538cca",
+    "cacheID": "68f5d15704f83a6b98a348f7bfa2c402",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -235,20 +258,21 @@ return {
           "plural": false,
           "type": "Node"
         },
-        "node.__isNode": (v4/*:: as any*/),
-        "node.__isUIBlock": (v4/*:: as any*/),
-        "node.__typename": (v4/*:: as any*/),
-        "node._meta": (v5/*:: as any*/),
-        "node._meta.curie": (v4/*:: as any*/),
+        "node.__isNode": (v6/*:: as any*/),
+        "node.__isUIBlock": (v6/*:: as any*/),
+        "node.__typename": (v6/*:: as any*/),
+        "node._meta": (v7/*:: as any*/),
+        "node._meta.curie": (v6/*:: as any*/),
+        "node._meta.title": (v6/*:: as any*/),
         "node._meta.type": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
           "type": "OntologyClass"
         },
-        "node._meta.type._meta": (v5/*:: as any*/),
-        "node._meta.type._meta.title": (v4/*:: as any*/),
-        "node._meta.type.uri": (v6/*:: as any*/),
+        "node._meta.type._meta": (v7/*:: as any*/),
+        "node._meta.type._meta.title": (v6/*:: as any*/),
+        "node._meta.type.uri": (v8/*:: as any*/),
         "node.isAbstract": {
           "enumValues": null,
           "nullable": false,
@@ -261,15 +285,15 @@ return {
           "plural": false,
           "type": "Tier"
         },
-        "node.tier._meta": (v5/*:: as any*/),
-        "node.tier._meta.title": (v4/*:: as any*/),
-        "node.tier.uri": (v6/*:: as any*/),
-        "node.uri": (v6/*:: as any*/)
+        "node.tier._meta": (v7/*:: as any*/),
+        "node.tier._meta.title": (v6/*:: as any*/),
+        "node.tier.uri": (v8/*:: as any*/),
+        "node.uri": (v8/*:: as any*/)
       }
     },
     "name": "SiteGraphNodeProjectionSsrTestQuery",
     "operationKind": "query",
-    "text": "query SiteGraphNodeProjectionSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...SiteGraphNodeProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment GraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeGraphNode_node\n  ...OntologyClassGraphNode_node\n}\n\nfragment ModifierFamilyGraphNode_node on ModifierFamily {\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment ModifierGraphNode_node on Modifier {\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment NodeGraphNode_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassGraphNode_node on OntologyClass {\n  __typename\n  isAbstract\n  _meta {\n    curie\n  }\n}\n\nfragment SiteGraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...GraphNodeProjection_node\n  ... on Component {\n    ...UIBlockGraphNode_node\n  }\n  ... on Pattern {\n    ...UIBlockGraphNode_node\n  }\n  ... on Layout {\n    ...UIBlockGraphNode_node\n  }\n  ...ModifierGraphNode_node\n  ...ModifierFamilyGraphNode_node\n  ...CodeStandardGraphNode_node\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
+    "text": "query SiteGraphNodeProjectionSsrTestQuery {\n  node(id: \"ssr\") {\n    __typename\n    ...SiteGraphNodeProjection_node\n    uri\n  }\n}\n\nfragment CodeStandardGraphNode_node on CodeStandard {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment GraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeGraphNode_node\n  ...OntologyClassGraphNode_node\n}\n\nfragment ModifierFamilyGraphNode_node on ModifierFamily {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment ModifierGraphNode_node on Modifier {\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment NodeGraphNode_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n}\n\nfragment OntologyClassGraphNode_node on OntologyClass {\n  __typename\n  isAbstract\n  _meta {\n    curie\n  }\n}\n\nfragment SiteGraphNodeProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...GraphNodeProjection_node\n  ... on Component {\n    ...UIBlockGraphNode_node\n  }\n  ... on Pattern {\n    ...UIBlockGraphNode_node\n  }\n  ... on Layout {\n    ...UIBlockGraphNode_node\n  }\n  ...ModifierGraphNode_node\n  ...ModifierFamilyGraphNode_node\n  ...CodeStandardGraphNode_node\n}\n\nfragment UIBlockGraphNode_node on UIBlock {\n  __isUIBlock: __typename\n  __typename\n  _meta {\n    title\n    curie\n    type {\n      _meta {\n        title\n      }\n      uri\n    }\n  }\n  tier {\n    _meta {\n      title\n    }\n    uri\n  }\n}\n"
   }
 };
 })();

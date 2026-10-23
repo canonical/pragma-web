@@ -15,12 +15,13 @@ import "./styles.css";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields ModifierGraphNode reads from the Modifier it renders: its
- * compact address and class.
+ * title, compact address and class.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment ModifierGraphNode_node on Modifier {
     __typename
     _meta {
+      title
       curie
       type {
         _meta {
@@ -36,9 +37,9 @@ void declareNodeFragment;
 const componentCssClassName = "ds modifier-graph-node";
 
 /**
- * A modifier as a node of a graph, native SVG: its compact address
- * (`ds:global.modifier.danger`) on the first line, in the identifier face,
- * linked to its home when the site has one and inert text when it has none,
+ * A modifier as a node of a graph, native SVG: its title (`Danger`) on the
+ * first line, linked to its home when the site has one and inert text when
+ * it has none,
  * then its class in its namespace's prefix muted (`Modifier in ds`). A modifier
  * whose address did not compact names its class alone.
  *
@@ -70,7 +71,7 @@ export default function ModifierGraphNode({
       kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
       location={findCuriePrefix(curie)}
-      title={<tspan className="identifier">{curie}</tspan>}
+      title={data._meta.title}
     />
   );
 }
