@@ -2,6 +2,7 @@ import type { RefObject } from "react";
 import type {
   GraphBox,
   GraphFrameRequest,
+  GraphLegibleWindow,
   GraphOpening,
   GraphZoomBucket,
 } from "../types.js";
@@ -20,6 +21,8 @@ export interface UseGraphCameraProps {
   readonly fit: GraphBox | undefined;
   /** The box the camera fits once each time the request changes. */
   readonly frame: GraphFrameRequest | undefined;
+  /** The window a legible refit shows of a box too large for it. */
+  readonly legibleWindow: GraphLegibleWindow | undefined;
   /** The box the camera pans into view when it changes. */
   readonly reveal: GraphBox | undefined;
   /** Where the camera opens once the viewport is measured. */

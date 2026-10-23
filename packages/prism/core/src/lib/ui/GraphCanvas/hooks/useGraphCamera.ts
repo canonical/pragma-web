@@ -90,8 +90,8 @@ function prefersReducedMotion(): boolean {
  * anything has moved the camera since. When `fit` changes it fits that
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
- * illegible one: a box too large for the legible zoom is shown from its
- * top-left corner at it. Fit and `0` fit the fit box whole, however small
+ * illegible one: a box too large for the legible zoom shows the window of
+ * it `legibleWindow` chooses, or its top-left corner at that zoom. Fit and `0` fit the fit box whole, however small
  * that makes the zoom, and the zoom extent's floor follows them down. When
  * `reveal` changes it pans that box into view, without zooming, only if it
  * is not already in view. Every move a control or a prop asks for takes
@@ -108,6 +108,7 @@ export default function useGraphCamera({
   bounds,
   fit,
   frame,
+  legibleWindow,
   reveal,
   opening,
 }: UseGraphCameraProps): UseGraphCameraResult {
@@ -117,8 +118,24 @@ export default function useGraphCamera({
   const current = useRef<GraphTransform>(zoomIdentity);
   // The latest targets, read by the listeners and the controls; the effects
   // that act on a change compare the boxes' values, never their identity.
-  const latest = useRef({ viewBox, bounds, fit, frame, reveal, opening });
-  latest.current = { viewBox, bounds, fit, frame, reveal, opening };
+  const latest = useRef({
+    viewBox,
+    bounds,
+    fit,
+    frame,
+    legibleWindow,
+    reveal,
+    opening,
+  });
+  latest.current = {
+    viewBox,
+    bounds,
+    fit,
+    frame,
+    legibleWindow,
+    reveal,
+    opening,
+  };
 
   const viewBoxKey = formatBox(viewBox);
   const boundsKey = formatBox(bounds);
@@ -155,21 +172,29 @@ export default function useGraphCamera({
 
   // Fit a box, or the graph's whole bounds, into the visible area; a refit
   // that keeps the view legible zooms no lower than the legible zoom when
-  // the camera is legible now.
+  // the camera is legible now, and shows the legible window of a box too
+  // large for that zoom.
   const fitBox = useCallback(
     (box: GraphBox | undefined, keepLegible: boolean): void => {
       const svg = viewport.current;
       /* v8 ignore next -- only a mounted canvas fits, and its viewport ref is attached */
       if (svg === null) return;
       const { scale, visible } = measureViewport(svg, latest.current.viewBox);
-      const legible = scale * current.current.k >= HUBS_SCALE;
-      moveTo(
-        computeFitTransform(
-          visible,
-          box ?? latest.current.bounds,
-          keepLegible && legible ? (HUBS_SCALE * LEGIBLE_NUDGE) / scale : 0,
-        ),
-      );
+      const target = box ?? latest.current.bounds;
+      const least =
+        keepLegible && scale * current.current.k >= HUBS_SCALE
+          ? (HUBS_SCALE * LEGIBLE_NUDGE) / scale
+          : 0;
+      const fitsLegibly =
+        Math.min(
+          visible.width / target.width,
+          visible.height / target.height,
+        ) >= least;
+      const shown =
+        fitsLegibly || latest.current.legibleWindow === undefined
+          ? target
+          : latest.current.legibleWindow(target, visible, scale);
+      moveTo(computeFitTransform(visible, shown, least));
     },
     [moveTo, viewport],
   );

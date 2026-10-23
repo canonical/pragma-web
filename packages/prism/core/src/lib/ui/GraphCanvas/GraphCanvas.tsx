@@ -39,7 +39,8 @@ function nameLattice(label: string): string {
  * camera moves to where `opening` asks, if anywhere. When `fit` changes the
  * camera fits it, and the Fit control and `0` fit it again, whole; a
  * `frame` request fits its box once per serial; neither a changed `fit`
- * nor a frame zooms a legible view out to an illegible one. When `reveal`
+ * nor a frame zooms a legible view out to an illegible one, showing the
+ * window of a box too large for it that `legibleWindow` chooses. When `reveal`
  * changes the camera pans it into view if it is not already.
  *
  * The drawing reads the zoom bucket through `useGraphZoomBucket`, so it
@@ -60,6 +61,7 @@ export default function GraphCanvas({
   opening,
   fit,
   frame,
+  legibleWindow,
   reveal,
   hint,
   className,
@@ -77,6 +79,7 @@ export default function GraphCanvas({
     bounds,
     fit,
     frame,
+    legibleWindow,
     reveal,
     opening,
   });

@@ -43,6 +43,20 @@ export type GraphOpening = (
 ) => GraphTransform | undefined;
 
 /**
+ * Choose the window of a box the camera shows instead of the box when a
+ * refit that keeps the view legible could fit the box only below the
+ * legible zoom: from the box, the area of user space the viewport shows at
+ * the identity and the on-screen size of one user unit there, a window in
+ * world space small enough to show at the legible zoom, such as one whose
+ * edges cut through nothing the drawing holds.
+ */
+export type GraphLegibleWindow = (
+  box: GraphBox,
+  visible: GraphBox,
+  scale: number,
+) => GraphBox;
+
+/**
  * How much text the drawing can show at the current zoom, so no text is
  * drawn below 12px on screen: `overview` below 0.75 (shapes and edges only),
  * `hubs` below 12/14 (16px text only), `full` above (all text).
@@ -84,6 +98,12 @@ type OwnProps = {
    * control still restores `fit` afterwards.
    */
   readonly frame?: GraphFrameRequest;
+  /**
+   * The window a refit of `fit` or `frame` shows when the box fits only
+   * below the legible zoom. Without one, such a box is shown from its
+   * top-left corner at the legible zoom.
+   */
+  readonly legibleWindow?: GraphLegibleWindow;
   /**
    * A box the camera brings into view whenever it changes, by panning
    * without zooming, and only when the box is not already fully in view:

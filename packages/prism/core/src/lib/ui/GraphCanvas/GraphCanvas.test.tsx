@@ -485,6 +485,33 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(0,0) scale(0.5)");
   });
 
+  it("shows the legible window of a box too large to refit legibly", () => {
+    const large: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
+    const window: GraphBox = { x: 160, y: 80, width: 800, height: 600 };
+    const legibleWindow = vi.fn(() => window);
+    const draw = (fit: GraphBox | undefined) => (
+      <GraphCanvas
+        fit={fit}
+        label="Class graph"
+        legibleWindow={legibleWindow}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>
+    );
+    const { rerender } = render(draw(undefined));
+    // A box that fits legibly is fitted whole, with no window.
+    rerender(draw({ x: 0, y: 0, width: 400, height: 300 }));
+    expect(legibleWindow).not.toHaveBeenCalled();
+    rerender(draw(large));
+    expect(legibleWindow).toHaveBeenCalledExactlyOnceWith(large, VIEW_BOX, 1);
+    expect(readCamera()).toBe("translate(-160,-80) scale(1)");
+    // Fit still fits the whole box.
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
+    expect(legibleWindow).toHaveBeenCalledOnce();
+  });
+
   it("never frames a region from a legible view into an illegible one", () => {
     render(
       <GraphCanvas

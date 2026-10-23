@@ -47,6 +47,7 @@ export type {
   GraphBox,
   GraphCanvasProps,
   GraphFrameRequest,
+  GraphLegibleWindow,
   GraphOpening,
   GraphTransform,
   GraphZoomBucket,
