@@ -4,7 +4,9 @@ import type { Specimen } from "./types.js";
  * The legend's rows, in order: a concrete class with its count, an
  * abstract class, a hub, a subclass bus, a relation, a bundle of an
  * opposite pair, and a self-loop. Each is laid out and drawn by the same
- * code as the graph, so the legend cannot drift from it.
+ * code as the graph, so the legend cannot drift from it. The specimens
+ * are named for their role and carry small counts, never a class of any
+ * one site's ontology, so the legend reads the same over every graph.
  */
 export const SPECIMENS: readonly Specimen[] = [
   {
@@ -13,7 +15,7 @@ export const SPECIMENS: readonly Specimen[] = [
       {
         key: "concrete",
         label: "legend.specimen.concrete",
-        instanceCount: 139,
+        instanceCount: 12,
       },
     ],
     relations: [],
@@ -59,8 +61,8 @@ export const SPECIMENS: readonly Specimen[] = [
   {
     meaning: "legend.relation",
     classes: [
-      { key: "domain", label: "legend.specimen.domain", instanceCount: 44 },
-      { key: "range", label: "legend.specimen.range", instanceCount: 8 },
+      { key: "domain", label: "legend.specimen.domain", instanceCount: 6 },
+      { key: "range", label: "legend.specimen.range", instanceCount: 3 },
     ],
     relations: [
       { label: "legend.specimen.predicate", domain: "domain", range: "range" },
@@ -69,8 +71,8 @@ export const SPECIMENS: readonly Specimen[] = [
   {
     meaning: "legend.bundle",
     classes: [
-      { key: "family", label: "legend.specimen.family", instanceCount: 11 },
-      { key: "member", label: "legend.specimen.member", instanceCount: 33 },
+      { key: "family", label: "legend.specimen.family", instanceCount: 5 },
+      { key: "member", label: "legend.specimen.member", instanceCount: 9 },
     ],
     relations: [
       { label: "legend.specimen.has", domain: "family", range: "member" },
@@ -83,7 +85,7 @@ export const SPECIMENS: readonly Specimen[] = [
       {
         key: "standard",
         label: "legend.specimen.standard",
-        instanceCount: 147,
+        instanceCount: 7,
       },
     ],
     relations: [

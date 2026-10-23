@@ -6,9 +6,12 @@ import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
 import createStripHarness from "../../../../../../testing/createStripHarness.js";
 import { DEFINITIONS_TEST_TIMEOUT_MS } from "../../../../../../testing/fixtures.js";
 import definitionsExplorerRecords from "../../../../../../testing/records/definitionsExplorerRecords.js";
+import metroGraph from "../../../../../../testing/records/metroGraph.js";
+import ontologyGraph from "../../../../../../testing/records/ontologyGraph.js";
 import useCapturedExplorer from "../../../../../../testing/useCapturedExplorer.js";
 import type { TermInspector_ontologies$key } from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
 import termInspectorOntologiesFragmentNode from "../../../../../__generated__/TermInspector_ontologies.graphql.js";
+import { MESSAGES } from "../../../../i18n/index.js";
 import { useLensFilter } from "../../../LensFilterProvider/index.js";
 import { SPECIMENS } from "./constants.js";
 import GraphOverview from "./GraphOverview.js";
@@ -62,6 +65,23 @@ describe("GraphOverview", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
     );
     // The hub specimen draws its hub alone.
     expect(entries.item(2).querySelectorAll(".node")).toHaveLength(1);
+  });
+
+  it("names its specimens for their role, never after a class of a site's ontology", () => {
+    const classes = new Set(
+      [ontologyGraph, metroGraph].flatMap((graph) =>
+        graph.classes.map((klass) => klass.label),
+      ),
+    );
+    const labels = SPECIMENS.flatMap((specimen) =>
+      specimen.classes.map((klass) => String(MESSAGES[klass.label])),
+    );
+    expect(labels.length).toBeGreaterThan(0);
+    expect(labels.filter((label) => classes.has(label))).toEqual([]);
+    const overview = renderOverview();
+    for (const title of overview.querySelectorAll(".entry .title")) {
+      expect(classes.has(title.textContent ?? "")).toBe(false);
+    }
   });
 
   it("counts each namespace's classes, instances and relations", () => {
