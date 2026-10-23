@@ -339,6 +339,11 @@ export default function layOutClassGraph(
     );
 
   // Cross-region routes: orthogonal, through the gaps between regions.
+  const shelfTops = [
+    ...new Set([...placed.values()].map((place) => place.shelfY)),
+  ].sort((a, b) => a - b);
+  const shelfIndexOf = (prefix: string): number =>
+    shelfTops.indexOf(originOf(prefix).shelfY);
   const crossEdges: LaidOutEdge[] = [];
   for (const bundle of model.bundles.filter((candidate) => candidate.cross)) {
     const a = nodeOf(bundle.a);
@@ -364,16 +369,22 @@ export default function layOutClassGraph(
         : originOf(b.region).ox +
           requireAt(toRegion.layout.columnX, b.col) -
           channel / 2;
+    // The gap that joins the two shelves: the one above a shared shelf or
+    // above the lower of two adjacent ones. Only shelves further apart go
+    // round the packing's left margin.
+    const step = shelfIndexOf(b.region) - shelfIndexOf(a.region);
+    const joiningGap =
+      step === 1 ? toGap : step === 0 || step === -1 ? fromGap : undefined;
     const commands: PathCommand[] = [
       ["M", a.x + a.w, portA],
       ["H", exitX],
-      ["V", fromGap],
-      ...(fromGap === toGap
-        ? []
-        : ([
+      ...(joiningGap === undefined
+        ? ([
+            ["V", fromGap],
             ["H", -SHELF_GAP / 2],
             ["V", toGap],
-          ] as PathCommand[])),
+          ] as PathCommand[])
+        : ([["V", joiningGap]] as PathCommand[])),
       ["H", entryX],
       ["V", portB],
       ["H", b.x],
@@ -410,6 +421,27 @@ export default function layOutClassGraph(
       BUS_OFFSET;
     const joinGap = joined.shelfY - SHELF_GAP / 2;
     const targetGap = originOf(target.region).shelfY - SHELF_GAP / 2;
+    // As a relation: a superclass on the shelf below is reached down the
+    // bus through the gap above it, one on the same shelf or the shelf
+    // above through the gap above the joined region; only shelves further
+    // apart go round the packing's left margin.
+    const step = shelfIndexOf(target.region) - shelfIndexOf(join.prefix);
+    const route: PathCommand[] =
+      step === 1
+        ? [
+            ["M", busX, Math.max(...middles)],
+            ["V", targetGap],
+          ]
+        : [
+            ["M", busX, Math.min(...middles)],
+            ["V", joinGap],
+            ...(step === 0 || step === -1
+              ? []
+              : ([
+                  ["H", -SHELF_GAP / 2],
+                  ["V", targetGap],
+                ] as PathCommand[])),
+          ];
     const commands: PathCommand[] = [
       ["M", busX, Math.min(...middles)],
       ["V", Math.max(...middles)],
@@ -417,14 +449,7 @@ export default function layOutClassGraph(
         ["M", busX, requireAt(middles, index)],
         ["H", nodeOf(root).x],
       ]),
-      ["M", busX, Math.min(...middles)],
-      ["V", joinGap],
-      ...(joinGap === targetGap
-        ? []
-        : ([
-            ["H", -SHELF_GAP / 2],
-            ["V", targetGap],
-          ] as PathCommand[])),
+      ...route,
       ["H", targetBusX],
       ["V", targetY],
       ["H", target.x + target.w],

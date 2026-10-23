@@ -13,8 +13,10 @@ import {
   measurePhone,
 } from "../../../testing/measureClassGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
-import { DESIGN_CANVAS, MIN_FIT, PHONE } from "./constants.js";
+import { BUS_OFFSET, DESIGN_CANVAS, MIN_FIT, PHONE } from "./constants.js";
+import { measurePathBounds } from "./geometry.js";
 import layOutClassGraph from "./layOutClassGraph.js";
+import { requireDefined } from "./require.js";
 
 describe("layOutClassGraph", () => {
   const layout = layOutClassGraph(CROSS_REGION_GRAPH);
@@ -238,5 +240,52 @@ describe("layOutClassGraph", () => {
     expect(
       tangled.edges.find((edge) => edge.id === "join:yy ex:Remark")?.heads,
     ).toHaveLength(1);
+  });
+
+  it("routes between two shelves through the gap that joins them, never round the margin", () => {
+    const tangled = layOutClassGraph(TANGLED_GRAPH);
+    const regionOf = (id: string) =>
+      requireDefined(
+        tangled.regions.find(
+          (region) => region.prefix === tangled.nodes.get(id)?.region,
+        ),
+        "the class's region",
+      );
+    // Two regions on one shelf share some of their height; regions on two
+    // shelves share none.
+    const crossing = tangled.edges.filter((edge) => {
+      const [first, ...rest] = [edge.from, ...edge.to].map(regionOf);
+      return rest.some(
+        (region) =>
+          region.y >= first.y + first.h || first.y >= region.y + region.h,
+      );
+    });
+    expect(crossing.map((edge) => edge.id).sort()).toEqual([
+      "join:yy ex:Remark",
+      "join:zz ex:Thing",
+      "rel:ex:Long yy:Solo",
+      "rel:ex:Note yy:Solo",
+      "rel:ex:Whole zz:Leaf",
+    ]);
+    for (const edge of crossing) {
+      const ends = [edge.from, ...edge.to].map(regionOf);
+      // The two regions, their channels and buses beside them, and the gap
+      // between their shelves.
+      const left = Math.min(...ends.map((region) => region.x)) - BUS_OFFSET;
+      const right =
+        Math.max(...ends.map((region) => region.x + region.w)) +
+        tangled.channel / 2;
+      const top = Math.min(...ends.map((region) => region.y));
+      const bottom = Math.max(...ends.map((region) => region.y + region.h));
+      const bounds = measurePathBounds(edge.d);
+      expect([bounds.x >= left, bounds.x + bounds.w <= right]).toEqual([
+        true,
+        true,
+      ]);
+      expect([bounds.y >= top, bounds.y + bounds.h <= bottom]).toEqual([
+        true,
+        true,
+      ]);
+    }
   });
 });
