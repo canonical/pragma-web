@@ -10,11 +10,11 @@ import {
 import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import { metroProjectionMaps } from "#domains/metro";
-import siteCardProjectionNode from "../../relay/__generated__/SiteCardProjection_node.graphql.js";
-import siteChipProjectionNode from "../../relay/__generated__/SiteChipProjection_node.graphql.js";
-import siteCommandProjectionNode from "../../relay/__generated__/SiteCommandProjection_node.graphql.js";
-import siteGraphNodeProjectionNode from "../../relay/__generated__/SiteGraphNodeProjection_node.graphql.js";
-import siteRowProjectionNode from "../../relay/__generated__/SiteRowProjection_node.graphql.js";
+import siteCardSlotNode from "../../relay/__generated__/SiteCardSlot_node.graphql.js";
+import siteChipSlotNode from "../../relay/__generated__/SiteChipSlot_node.graphql.js";
+import siteCommandSlotNode from "../../relay/__generated__/SiteCommandSlot_node.graphql.js";
+import siteGraphNodeSlotNode from "../../relay/__generated__/SiteGraphNodeSlot_node.graphql.js";
+import siteRowSlotNode from "../../relay/__generated__/SiteRowSlot_node.graphql.js";
 
 /** Where the metro domain's components live. */
 const METRO_LIBRARY = fileURLToPath(
@@ -29,11 +29,11 @@ const SITE_SLOTS: readonly {
   readonly form: keyof ProjectionMaps;
   readonly fragment: ReaderFragment;
 }[] = [
-  { form: "chip", fragment: siteChipProjectionNode },
-  { form: "row", fragment: siteRowProjectionNode },
-  { form: "card", fragment: siteCardProjectionNode },
-  { form: "command", fragment: siteCommandProjectionNode },
-  { form: "graphNode", fragment: siteGraphNodeProjectionNode },
+  { form: "chip", fragment: siteChipSlotNode },
+  { form: "row", fragment: siteRowSlotNode },
+  { form: "card", fragment: siteCardSlotNode },
+  { form: "command", fragment: siteCommandSlotNode },
+  { form: "graphNode", fragment: siteGraphNodeSlotNode },
 ];
 
 /**

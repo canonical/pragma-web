@@ -36,6 +36,13 @@ const SiteProbe = ({
   </p>
 );
 
+/** A site's arm over a composite with no site slot, which has no key. */
+const SlotlessSiteProbe = ({
+  typename,
+}: SiteArmProps<ArmProps<unknown, ProbeNative>>): ReactElement => (
+  <p>site {typename}</p>
+);
+
 const MAP: ProjectionMap<ProbeData, ProbeNative> = {
   Node: createProbe("node"),
   types: { OntologyClass: createProbe("class") },
@@ -107,6 +114,31 @@ describe("renderArm", () => {
       ),
     );
     expect(screen.getByText("site site-key toString")).toBeInTheDocument();
+  });
+
+  it("renders the Node arm over a composite that spreads no site slot", () => {
+    render(
+      renderArm<Omit<ProbeData, "Site">, ProbeNative>(
+        { Node: MAP.Node, types: MAP.types },
+        { __typename: "Station", Node: "node-key", OntologyClass: null },
+        {},
+      ),
+    );
+    expect(screen.getByText("node node-key")).toBeInTheDocument();
+  });
+
+  it("throws when a site arm is listed but the composite spreads no slot", () => {
+    expect(() =>
+      renderArm<Omit<ProbeData, "Site">, ProbeNative>(
+        {
+          Node: MAP.Node,
+          types: MAP.types,
+          siteTypes: { Station: SlotlessSiteProbe },
+        },
+        { __typename: "Station", Node: "node-key", OntologyClass: null },
+        {},
+      ),
+    ).toThrow("renderArm: the map arms Station under siteTypes");
   });
 
   it("hands the arm the dispatcher's native props", () => {

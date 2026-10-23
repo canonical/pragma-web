@@ -2,11 +2,11 @@ import {
   defaultProjectionMaps,
   type ProjectionMaps,
 } from "@canonical/prism-projections";
-import { SiteCardProjection } from "./lib/SiteCardProjection/index.js";
-import { SiteChipProjection } from "./lib/SiteChipProjection/index.js";
-import { SiteCommandProjection } from "./lib/SiteCommandProjection/index.js";
-import { SiteGraphNodeProjection } from "./lib/SiteGraphNodeProjection/index.js";
-import { SiteRowProjection } from "./lib/SiteRowProjection/index.js";
+import { SiteCardSlot } from "./lib/SiteCardSlot/index.js";
+import { SiteChipSlot } from "./lib/SiteChipSlot/index.js";
+import { SiteCommandSlot } from "./lib/SiteCommandSlot/index.js";
+import { SiteGraphNodeSlot } from "./lib/SiteGraphNodeSlot/index.js";
+import { SiteRowSlot } from "./lib/SiteRowSlot/index.js";
 import type { HomeLensMessages } from "./types.js";
 
 /**
@@ -32,7 +32,7 @@ export const HOME_LENS_MESSAGES = {
  * The site's projection maps: the default maps for every form, with the
  * metro types armed under `siteTypes`. Each form's site dispatcher reads
  * the package's site slot, the app's own compile of
- * `Site<Form>Projection_node`, and renders the station's, the
+ * `Site<Form>Slot_node`, and renders the station's, the
  * interchange's, the line's or the fare zone's projection; every other
  * type keeps the package's arms.
  */
@@ -40,46 +40,46 @@ export const metroProjectionMaps: ProjectionMaps = {
   chip: {
     ...defaultProjectionMaps.chip,
     siteTypes: {
-      Station: SiteChipProjection,
-      Interchange: SiteChipProjection,
-      Line: SiteChipProjection,
-      Zone: SiteChipProjection,
+      Station: SiteChipSlot,
+      Interchange: SiteChipSlot,
+      Line: SiteChipSlot,
+      Zone: SiteChipSlot,
     },
   },
   row: {
     ...defaultProjectionMaps.row,
     siteTypes: {
-      Station: SiteRowProjection,
-      Interchange: SiteRowProjection,
-      Line: SiteRowProjection,
-      Zone: SiteRowProjection,
+      Station: SiteRowSlot,
+      Interchange: SiteRowSlot,
+      Line: SiteRowSlot,
+      Zone: SiteRowSlot,
     },
   },
   card: {
     ...defaultProjectionMaps.card,
     siteTypes: {
-      Station: SiteCardProjection,
-      Interchange: SiteCardProjection,
-      Line: SiteCardProjection,
-      Zone: SiteCardProjection,
+      Station: SiteCardSlot,
+      Interchange: SiteCardSlot,
+      Line: SiteCardSlot,
+      Zone: SiteCardSlot,
     },
   },
   command: {
     ...defaultProjectionMaps.command,
     siteTypes: {
-      Station: SiteCommandProjection,
-      Interchange: SiteCommandProjection,
-      Line: SiteCommandProjection,
-      Zone: SiteCommandProjection,
+      Station: SiteCommandSlot,
+      Interchange: SiteCommandSlot,
+      Line: SiteCommandSlot,
+      Zone: SiteCommandSlot,
     },
   },
   graphNode: {
     ...defaultProjectionMaps.graphNode,
     siteTypes: {
-      Station: SiteGraphNodeProjection,
-      Interchange: SiteGraphNodeProjection,
-      Line: SiteGraphNodeProjection,
-      Zone: SiteGraphNodeProjection,
+      Station: SiteGraphNodeSlot,
+      Interchange: SiteGraphNodeSlot,
+      Line: SiteGraphNodeSlot,
+      Zone: SiteGraphNodeSlot,
     },
   },
 };

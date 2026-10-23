@@ -17,8 +17,8 @@ import testQuery, {
   type GraphNodeProjectionTestQuery,
 } from "../../../__generated__/GraphNodeProjectionTestQuery.graphql.js";
 import siteFragment, {
-  type SiteGraphNodeProjection_node$key,
-} from "../../../__generated__/SiteGraphNodeProjection_node.graphql.js";
+  type SiteGraphNodeSlot_node$key,
+} from "../../../__generated__/SiteGraphNodeSlot_node.graphql.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import GraphNodeProjection from "./GraphNodeProjection.js";
@@ -122,7 +122,7 @@ describe("GraphNodeProjection", () => {
       typename,
       ...props
     }: SiteArmProps<
-      ArmProps<SiteGraphNodeProjection_node$key, GraphNodeArmNative>
+      ArmProps<SiteGraphNodeSlot_node$key, GraphNodeArmNative>
     >): ReactElement => {
       const data = useFragment(siteFragment, node);
       return (

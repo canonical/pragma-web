@@ -17,8 +17,8 @@ import testQuery, {
   type RowProjectionTestQuery,
 } from "../../../__generated__/RowProjectionTestQuery.graphql.js";
 import siteFragment, {
-  type SiteRowProjection_node$key,
-} from "../../../__generated__/SiteRowProjection_node.graphql.js";
+  type SiteRowSlot_node$key,
+} from "../../../__generated__/SiteRowSlot_node.graphql.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import RowProjection from "./RowProjection.js";
@@ -123,7 +123,7 @@ describe("RowProjection", () => {
       typename,
       ...props
     }: SiteArmProps<
-      ArmProps<SiteRowProjection_node$key, RowArmNative>
+      ArmProps<SiteRowSlot_node$key, RowArmNative>
     >): ReactElement => {
       const data = useFragment(siteFragment, node);
       return (

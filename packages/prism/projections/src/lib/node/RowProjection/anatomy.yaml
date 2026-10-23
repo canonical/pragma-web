@@ -9,7 +9,7 @@
 # node carries. The cases are the composite fragment's aliased spreads, one
 # per type, and the map's arms, by the same names.
 # A site's own types read through the site slot, the site's own compile
-# of `SiteRowProjection_node`, for the typenames its map lists under
+# of `SiteRowSlot_node`, for the typenames its map lists under
 # `siteTypes`.
 node:
   uri: prism.component.row_projection
@@ -28,7 +28,7 @@ node:
               projection:
                 on: Node
           - node:
-              uri: prism.component.site_row_projection
+              uri: prism.component.site_row_slot
               projection:
                 on: Node
       relation:

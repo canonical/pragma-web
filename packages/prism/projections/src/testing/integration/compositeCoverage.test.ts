@@ -12,38 +12,45 @@ import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.gr
 import { defaultProjectionMaps, type ProjectionMaps } from "../../lib/index.js";
 
 /**
- * Each form's map, beside the composite fragment its dispatcher reads and
- * the dispatcher's folder, whose anatomy names its cases.
+ * Each form's map, beside the composite fragment its dispatcher reads, the
+ * dispatcher's folder, whose anatomy names its cases, and the site slot the
+ * composite spreads.
  */
 const COMPOSITES: readonly {
   readonly form: keyof ProjectionMaps;
   readonly fragment: ReaderFragment;
   readonly dispatcher: string;
+  readonly slot: string;
 }[] = [
   {
     form: "chip",
     fragment: chipProjectionFragmentNode,
     dispatcher: "ChipProjection",
+    slot: "SiteChipSlot_node",
   },
   {
     form: "row",
     fragment: rowProjectionFragmentNode,
     dispatcher: "RowProjection",
+    slot: "SiteRowSlot_node",
   },
   {
     form: "card",
     fragment: cardProjectionFragmentNode,
     dispatcher: "CardProjection",
+    slot: "SiteCardSlot_node",
   },
   {
     form: "command",
     fragment: commandProjectionFragmentNode,
     dispatcher: "CommandProjection",
+    slot: "SiteCommandSlot_node",
   },
   {
     form: "graphNode",
     fragment: graphNodeProjectionFragmentNode,
     dispatcher: "GraphNodeProjection",
+    slot: "SiteGraphNodeSlot_node",
   },
 ];
 
@@ -109,7 +116,7 @@ function listCaseTypes(dispatcher: string): string[] {
 }
 
 describe("each form's composite fragment", () => {
-  for (const { form, fragment, dispatcher } of COMPOSITES) {
+  for (const { form, fragment, dispatcher, slot } of COMPOSITES) {
     describe(fragment.name, () => {
       const arms = listArms(fragment);
 
@@ -132,7 +139,7 @@ describe("each form's composite fragment", () => {
         expect(arms).toContainEqual({
           alias: "Site",
           type: "Node",
-          spread: `Site${dispatcher}_node`,
+          spread: slot,
         });
       });
 

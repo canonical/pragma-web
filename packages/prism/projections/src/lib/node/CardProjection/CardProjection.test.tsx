@@ -17,8 +17,8 @@ import testQuery, {
   type CardProjectionTestQuery,
 } from "../../../__generated__/CardProjectionTestQuery.graphql.js";
 import siteFragment, {
-  type SiteCardProjection_node$key,
-} from "../../../__generated__/SiteCardProjection_node.graphql.js";
+  type SiteCardSlot_node$key,
+} from "../../../__generated__/SiteCardSlot_node.graphql.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import CardProjection from "./CardProjection.js";
@@ -117,7 +117,7 @@ describe("CardProjection", () => {
       typename,
       ...props
     }: SiteArmProps<
-      ArmProps<SiteCardProjection_node$key, CardArmNative>
+      ArmProps<SiteCardSlot_node$key, CardArmNative>
     >): ReactElement => {
       const data = useFragment(siteFragment, node);
       return (

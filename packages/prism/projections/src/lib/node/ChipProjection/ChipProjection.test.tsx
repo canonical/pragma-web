@@ -17,8 +17,8 @@ import testQuery, {
   type ChipProjectionTestQuery,
 } from "../../../__generated__/ChipProjectionTestQuery.graphql.js";
 import siteFragment, {
-  type SiteChipProjection_node$key,
-} from "../../../__generated__/SiteChipProjection_node.graphql.js";
+  type SiteChipSlot_node$key,
+} from "../../../__generated__/SiteChipSlot_node.graphql.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import ChipProjection from "./ChipProjection.js";
@@ -117,7 +117,7 @@ describe("ChipProjection", () => {
       typename,
       ...props
     }: SiteArmProps<
-      ArmProps<SiteChipProjection_node$key, ChipArmNative>
+      ArmProps<SiteChipSlot_node$key, ChipArmNative>
     >): ReactElement => {
       const data = useFragment(siteFragment, node);
       return (

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3781326919b7f5d2da598a24046b0551>>
+ * @generated SignedSource<<695c346f032f18def001337acb37fe98>>
  * @lightSyntaxTransform
  */
 
@@ -18,7 +18,7 @@ export type CardProjection_node$data = {
     readonly " $fragmentSpreads": FragmentRefs<"OntologyClassCard_node">;
   } | null | undefined;
   readonly Site: {
-    readonly " $fragmentSpreads": FragmentRefs<"SiteCardProjection_node">;
+    readonly " $fragmentSpreads": FragmentRefs<"SiteCardSlot_node">;
   };
   readonly " $fragmentType": "CardProjection_node";
 };
@@ -63,7 +63,7 @@ const node: ReaderFragment = {
           {
             "args": null,
             "kind": "FragmentSpread",
-            "name": "SiteCardProjection_node"
+            "name": "SiteCardSlot_node"
           }
         ],
         "type": "Node",
@@ -93,6 +93,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "5d0824dcdf81acdeca3fb23758b45e49";
+(node as any).hash = "48e4108b15100a85448aabe40b1aee26";
 
 export default node;

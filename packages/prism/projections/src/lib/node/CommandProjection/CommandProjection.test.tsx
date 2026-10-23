@@ -17,8 +17,8 @@ import testQuery, {
   type CommandProjectionTestQuery,
 } from "../../../__generated__/CommandProjectionTestQuery.graphql.js";
 import siteFragment, {
-  type SiteCommandProjection_node$key,
-} from "../../../__generated__/SiteCommandProjection_node.graphql.js";
+  type SiteCommandSlot_node$key,
+} from "../../../__generated__/SiteCommandSlot_node.graphql.js";
 import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
 import CommandProjection from "./CommandProjection.js";
@@ -122,7 +122,7 @@ describe("CommandProjection", () => {
       typename,
       ...props
     }: SiteArmProps<
-      ArmProps<SiteCommandProjection_node$key, CommandArmNative>
+      ArmProps<SiteCommandSlot_node$key, CommandArmNative>
     >): ReactElement => {
       const data = useFragment(siteFragment, node);
       return (

@@ -211,7 +211,7 @@ A dispatcher reads a composite fragment: the node's typename, each arm's
 fragment spread aliased by the type it projects,
 `...NodeCard_node @alias(as: "Node")` and
 `...OntologyClassCard_node @alias(as: "OntologyClass")`, and the site slot,
-`...SiteCardProjection_node @alias(as: "Site")`. Each form's map holds the
+`...SiteCardSlot_node @alias(as: "Site")`. Each form's map holds the
 arms:
 
 - `Node`: the arm of every type no other arm takes.
@@ -262,10 +262,14 @@ entity has one address; a property's with its IRI, its only address.
 
 A site projects its own types, a metro site's stations or a docsite's
 components, through the site slot every composite spreads:
-`...Site<Form>Projection_node @alias(as: "Site")`, a fragment on `Node`.
+`...Site<Form>Slot_node @alias(as: "Site")`, a fragment on `Node`.
 The package ships a default of each, in `src/lib/site/`, that reads the
 typename alone, for a site with no types of its own; the package, the lens
 packages and any site that compiles the package's documents compile it.
+The slot's names are the package's: a site's own composite, for a
+dispatcher the site renders itself, takes a name of its own, need not
+spread the slot, and then arms no type under `siteTypes`; a map that does
+over a composite with no slot throws on the first such node.
 
 A site with types of its own compiles the package's documents against its
 own schema, excludes `src/lib/site/` from its compile, and defines the
@@ -273,7 +277,7 @@ five fragments itself, each spreading its arms' fragments aliased by the
 type they are on:
 
 ```graphql
-fragment SiteCardProjection_node on Node {
+fragment SiteCardSlot_node on Node {
   __typename
   ...StationCard_node @alias(as: "Station")
   ...LineCard_node @alias(as: "Line")
@@ -290,7 +294,7 @@ const maps: ProjectionMaps = {
   ...defaultProjectionMaps,
   card: {
     ...defaultProjectionMaps.card,
-    siteTypes: { Station: SiteCardProjection, Line: SiteCardProjection },
+    siteTypes: { Station: SiteCardSlot, Line: SiteCardSlot },
   },
 };
 ```

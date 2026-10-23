@@ -115,9 +115,9 @@ out. A station, an interchange and a line link to their page; a fare zone
 has no home on the site, so its name reads as inert text.
 
 The package's dispatchers render them through the site slot every
-composite spreads, `...Site<Form>Projection_node @alias(as: "Site")`. The
-app defines the five slots itself, `SiteChipProjection` to
-`SiteGraphNodeProjection` in `src/domains/metro/lib/`, each spreading its
+composite spreads, `...Site<Form>Slot_node @alias(as: "Site")`. The
+app defines the five slots itself, `SiteChipSlot` to
+`SiteGraphNodeSlot` in `src/domains/metro/lib/`, each spreading its
 form's four arms aliased by their type and rendering the one the node's
 typename selects; `relay.config.json` leaves the package's default slots
 out of the app's compile. `metroProjectionMaps`, exported from

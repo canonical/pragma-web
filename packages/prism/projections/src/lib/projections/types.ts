@@ -16,12 +16,14 @@ import type {
 /**
  * What a composite fragment's data holds: the typename dispatch reads, the
  * `Node` arm's key, spread aliased as `Node`, and the site slot's key,
- * spread aliased as `Site`.
+ * spread aliased as `Site`. Every composite the package writes spreads the
+ * slot; a site's own composite, dispatched through `renderArm`, may spread
+ * none, and then arms no type under `siteTypes`.
  */
 export interface DispatchedNode {
   readonly __typename: string;
   readonly Node: unknown;
-  readonly Site: unknown;
+  readonly Site?: unknown;
 }
 
 /**
@@ -69,13 +71,13 @@ export interface ProjectionMap<TData extends DispatchedNode, TNative> {
   };
   /**
    * A site's arms for its own types, by typename: each reads the site
-   * slot's key, the site's own compile of `Site<Form>Projection_node`
+   * slot's key, the site's own compile of `Site<Form>Slot_node`
    * spread aliased as `Site`, and takes the node's typename.
    */
   readonly siteTypes?: Readonly<
     Record<
       string,
-      ComponentType<SiteArmProps<ArmProps<TData["Site"], TNative>>>
+      ComponentType<SiteArmProps<ArmProps<NonNullable<TData["Site"]>, TNative>>>
     >
   >;
 }

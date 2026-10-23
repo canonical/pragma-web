@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1b610489abe47ff1b27e5b02e0959efa>>
+ * @generated SignedSource<<a413a16f6bf4f625018c90caa0421b04>>
  * @lightSyntaxTransform
  */
 
@@ -127,12 +127,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b7b1fcccfd485dc87b8eabe7881b264b",
+    "cacheID": "a40c636ea4d4bad5f3ce1b20df274699",
     "id": null,
     "metadata": {},
     "name": "ShellTestsQuery",
     "operationKind": "query",
-    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipProjection_node\n  ...OntologyClassChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n}\n"
+    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  ...NodeChip_node\n  ...SiteChipSlot_node\n  ...OntologyClassChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment OntologyClassChip_node on OntologyClass {\n  __typename\n  _meta {\n    title\n    curie\n  }\n}\n\nfragment SiteChipSlot_node on Node {\n  __isNode: __typename\n  __typename\n}\n"
   }
 };
 })();

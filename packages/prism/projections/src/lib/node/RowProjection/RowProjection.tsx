@@ -12,13 +12,13 @@ import type { RowProjectionProps } from "./types.js";
  * The fields RowProjection reads from the Node it dispatches: its typename, and
  * each arm's fragment, spread aliased by the type the arm projects, `Node` for
  * every type no other arm takes, and the site slot, the arms of the site's own
- * types: `SiteRowProjection_node` spread aliased as `Site`.
+ * types: `SiteRowSlot_node` spread aliased as `Site`.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment RowProjection_node on Node {
     __typename
     ...NodeRow_node @alias(as: "Node")
-    ...SiteRowProjection_node @alias(as: "Site")
+    ...SiteRowSlot_node @alias(as: "Site")
     ...OntologyClassRow_node @alias(as: "OntologyClass")
   }
 `;
@@ -30,7 +30,7 @@ void declareNodeFragment;
  * arm the site's row map holds for the node's typename, or the `Node` arm,
  * `NodeRow`, for every type no other arm takes. A site's arm for a type of its
  * own renders over the site slot's key, the site's own compile of
- * `SiteRowProjection_node`.
+ * `SiteRowSlot_node`.
  *
  * It renders no element of its own: the arm renders the root, an `<li>`, and
  * every native prop reaches it.
