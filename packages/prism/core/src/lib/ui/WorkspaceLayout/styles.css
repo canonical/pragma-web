@@ -9,7 +9,6 @@
    * apart. */
   .ds.workspace-layout {
     --workspace-layout-gap: var(--grid-gutter);
-    --workspace-layout-trigger-offset: var(--container-gap-default);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -61,22 +60,29 @@
     grid-column: 3 / -1;
   }
 
-  /* The drawer's trigger floats at the canvas's top end corner, and shows
-   * only while the inspector region is hidden. It may span the last two
-   * columns, so a phone's narrow column never pushes it past the edge. */
+  /* The drawer's trigger shows only while the inspector region is hidden,
+   * at the end of a row of its own over the canvas, so it never covers
+   * what the canvas holds. It may span the last two columns, so a phone's
+   * narrow column never pushes it past the edge. */
   .ds.workspace-layout > .inspector-trigger {
     display: none;
     grid-column: -3 / -1;
-    grid-row: -2 / -1;
-    align-self: start;
+    grid-row: -3 / -2;
     margin-inline-start: auto;
-    margin-block-start: var(--workspace-layout-trigger-offset);
-    z-index: 1;
   }
 
   /* Below three groups the inspector leaves the grid for the drawer: the
-   * canvas takes every column east of the rail, and the trigger shows. */
+   * canvas takes every column east of the rail, and the trigger shows on
+   * its own row between the strip and the body. */
   @container shell (width < 1376px) {
+    .ds.workspace-layout:has(> .inspector-trigger) {
+      grid-template-rows: min-content min-content minmax(0, 1fr);
+    }
+
+    .ds.workspace-layout:has(> .inspector-trigger):not(:has(> .strip)) {
+      grid-template-rows: min-content minmax(0, 1fr);
+    }
+
     .ds.workspace-layout > .canvas {
       grid-column: 3 / -1;
     }

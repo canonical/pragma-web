@@ -198,6 +198,10 @@ export default function measureLayout({
       canvasStart: canvasBox?.left ?? -1,
       canvasTop: canvasBox?.top ?? -1,
       stripBottom: strip?.getBoundingClientRect().bottom ?? null,
+      triggerBottom:
+        trigger === null || getComputedStyle(trigger).display === "none"
+          ? null
+          : trigger.getBoundingClientRect().bottom,
       rowGap:
         layout === null
           ? -1

@@ -17,17 +17,17 @@
 #   @container shell (width < 1376px)  below three groups: the canvas spans
 #     3 / -1; the inspector region is hidden and its content renders in the
 #     published SidePanel drawer, opened by `inspector-trigger` (shown only
-#     here, floating at the canvas's top end corner).
+#     here, at the end of a row of its own between the strip and the body:
+#     the rows become `min-content min-content minmax(0, 1fr)`, or
+#     `min-content minmax(0, 1fr)` with no strip, so it covers nothing the
+#     canvas holds).
 #   @container shell (width < 448px)   below one group: the rail spans one
 #     column; strip and canvas start at line 2.
 #
 # Every decision is read through a component token declared on the root
 # (`--workspace-layout-*`), bound to the symbol named here.
 #
-# Token ledger:
-#   layout.stack 1 on the trigger: it floats over the canvas.
-#
-# Roster namespaces (accepted and tracked): grid.gutter, container.gap.default.
+# Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: prism.component.workspace_layout
   styles:
@@ -91,9 +91,6 @@ node:
         styles:
           layout.type: none
           layout.grid.column: "-3 / -1"
-          layout.grid.row: "-2 / -1"
-          layout.alignSelf: start
+          layout.grid.row: "-3 / -2"
           spacing.external.inline.start: auto
-          spacing.external.block.start: container.gap.default
-          layout.stack: 1
       relation: { cardinality: "0..1", slotName: inspector-trigger }
