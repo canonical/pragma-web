@@ -49,6 +49,10 @@ export const MESSAGES = {
   "line.ends": "Ends",
   "line.ends.value": "{first} to {last}",
   "line.loop": "loop",
+  "zone.stations.count": {
+    one: "{count} station",
+    other: "{count} stations",
+  },
   "notFound.title": "Page not found",
   "notFound.body": "No page of the metro docs lives at this address.",
 } as const;
