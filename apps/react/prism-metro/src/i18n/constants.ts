@@ -37,6 +37,13 @@ export const MESSAGES = {
   "station.zone": "Zone",
   "station.lines": "Lines",
   "station.lines.separator": ", ",
+  "interchange.word": "interchange",
+  "interchange.transfer": "Transfer",
+  "interchange.transfer.minutes": {
+    one: "{count} minute",
+    other: "{count} minutes",
+  },
+  "interchange.lines.count": { one: "{count} line", other: "{count} lines" },
   "notFound.title": "Page not found",
   "notFound.body": "No page of the metro docs lives at this address.",
 } as const;

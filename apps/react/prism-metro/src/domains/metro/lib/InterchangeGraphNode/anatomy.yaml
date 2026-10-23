@@ -1,0 +1,31 @@
+---
+# InterchangeGraphNode: an interchange as a node of a graph, two lines tall.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2357 and 566:2433 (the
+# title, then "kind in location" muted). Best guess: the title is the
+# interchange's name, the location its fare zone.
+# Projected onto EntityGraphNode, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved
+# from the compact address.
+node:
+  uri: metro.component.interchange_graph_node
+  projection: { on: Interchange }
+  edges:
+    - node:
+        uri: prism.component.entity_graph_node
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: location
+              projection: { field: _meta.title }
+            relation: { cardinality: "0..1", slotName: location, projection: { field: inZone } }
+      relation: { cardinality: "1" }
