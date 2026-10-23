@@ -4,7 +4,9 @@
 # @canonical/styles give it `display: grid` and the intrinsic column
 # template), its gap the grid's gutter on both axes, the only query container
 # (`shell`), one viewport-high row that never scrolls. Every lens layout
-# below it is a subgrid.
+# below it is a subgrid. After the routed content it holds the site's
+# command palette, mounted once: a dialog that is not displayed while closed
+# and sits in the top layer while open, so it is never a grid item.
 #
 # styles.css also declares `:root { --grid-col-min: min(100px,
 # calc((100% - 3 * var(--grid-gutter)) / 4)) }`: the preset's own token at
@@ -41,3 +43,6 @@ node:
         styles:
           layout.grid.column: "1 / -1"
       relation: { cardinality: "0..1", slotName: loading }
+    - node:
+        uri: prism.component.command_palette
+      relation: { cardinality: "1", slotName: palette }
