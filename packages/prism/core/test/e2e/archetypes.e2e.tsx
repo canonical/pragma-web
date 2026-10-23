@@ -240,6 +240,20 @@ function readPlacement(page: Page) {
       columns: getComputedStyle(
         document.querySelector(".ds.shell") ?? document.body,
       ).gridTemplateColumns.split(" ").length,
+      columnStarts: (() => {
+        const shell = getComputedStyle(
+          document.querySelector(".ds.shell") ?? document.body,
+        );
+        const gap = Number.parseFloat(shell.columnGap);
+        const widths = shell.gridTemplateColumns
+          .split(" ")
+          .map((width) => Number.parseFloat(width));
+        return widths.map((_, index) =>
+          widths
+            .slice(0, index)
+            .reduce((start, width) => start + width + gap, 0),
+        );
+      })(),
       rail: read(":is(.ds.workspace-layout, .ds.document-layout) > .rail"),
       canvas: read("main.ds.canvas"),
       page: read("main.ds.canvas > .page"),
@@ -335,10 +349,20 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
         !viewport.inspectorShown,
       );
       expect(placement.canvas?.column).toEqual(viewport.canvasColumns);
+      // On the shell's column lines: the canvas from the rail's edge to the
+      // inspector, which takes the last three columns; without the region,
+      // the canvas runs to the viewport's edge.
+      const starts = placement.columnStarts;
       if (viewport.inspectorShown) {
-        expect(placement.canvas?.right).toBeLessThanOrEqual(
-          placement.inspector?.left ?? 0,
+        expect(placement.canvas?.left).toBeCloseTo(starts.at(2) ?? -1, 1);
+        expect(placement.inspector?.left).toBeCloseTo(starts.at(-3) ?? -1, 1);
+        expect(placement.inspector?.right).toBeCloseTo(viewport.width, 1);
+        expect(placement.canvas?.right).toBeCloseTo(
+          (starts.at(-3) ?? -1) - 16,
+          1,
         );
+      } else {
+        expect(placement.canvas?.right).toBeCloseTo(viewport.width, 1);
       }
       const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
       expect(measure.overflow).toEqual([]);
@@ -363,6 +387,13 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
         expect(before.aside?.column).toEqual(["-4", "-1"]);
         expect(before.page?.column).toEqual(["1", "-4"]);
         expect(before.aside?.top).toBe(before.canvas?.top);
+        // On the shell's column lines: the page from the rail's edge to the
+        // aside, which takes the last three columns to the viewport's edge.
+        const starts = before.columnStarts;
+        expect(before.page?.left).toBeCloseTo(starts.at(2) ?? -1, 1);
+        expect(before.page?.right).toBeCloseTo((starts.at(-3) ?? -1) - 16, 1);
+        expect(before.aside?.left).toBeCloseTo(starts.at(-3) ?? -1, 1);
+        expect(before.aside?.right).toBeCloseTo(viewport.width, 1);
       } else {
         expect(before.aside?.row).toBe("2");
         expect(before.page?.column).toEqual(["1", "-1"]);
