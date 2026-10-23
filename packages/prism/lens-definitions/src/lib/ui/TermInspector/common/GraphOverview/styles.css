@@ -43,14 +43,17 @@
 
   .ds.graph-overview .entry {
     display: flex;
-    align-items: center;
-    gap: var(--graph-overview-gap);
+    flex-direction: column;
+    align-items: start;
+    gap: var(--graph-overview-row-gap);
   }
 
   /* A specimen sits on the canvas's floor, so its hollow heads read as on
-   * the canvas. */
+   * the canvas, and scales down to the inspector's width where it is
+   * wider. */
   .ds.graph-overview .specimen {
-    flex-shrink: 0;
+    max-inline-size: 100%;
+    height: auto;
     background: var(--graph-overview-floor-color);
   }
 

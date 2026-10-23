@@ -1,7 +1,7 @@
 ---
 # GraphOverview — the inspector with no selection: the legend, each row a
-# tiny graph drawn by the graph's own layout and drawing beside what it
-# means; a row per namespace with its figures, each a button that fits the
+# tiny graph drawn by the graph's own layout and drawing over what it
+# means, scaled down to the inspector's width where it is wider; a row per namespace with its figures, each a button that fits the
 # graph's camera to that region; and how to move about the graph. Its
 # sections and their labels are the inspector's.
 # Reference: the graph heuristics' empty inspector (G29).
@@ -39,13 +39,15 @@ node:
               role: entry
               styles:
                 layout.type: flex
-                layout.align: center
-                spacing.gap: space.100
+                layout.direction: column
+                layout.align: start
+                spacing.gap: space.050
               edges:
                 - node:
                     role: specimen
                     styles:
-                      layout.flex.shrink: 0
+                      size.max.width: 100%
+                      size.height: auto
                       appearance.background: "light-dark(oklch(94% 0 0), var(--color-background-container))"
                     edges:
                       - node:
