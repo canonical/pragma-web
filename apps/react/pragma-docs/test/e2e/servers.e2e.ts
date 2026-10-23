@@ -449,6 +449,23 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(definitionsTermHtml).toContain('class="ds graph-canvas');
             expect(definitionsTermHtml).toContain(">Fit<");
 
+            //   THE LATTICE: a 16px dot pattern floors the drawing, and
+            //   every class and region of the live graph sits on its dots,
+            //   so a layout change that leaves the lattice shows here.
+            expect(definitionsTermHtml).toMatch(
+              /<pattern class="lattice"[^>]*height="16"[^>]*width="16"/,
+            );
+            expect(definitionsTermHtml).toMatch(
+              /<rect class="floor" fill="url\(#graph-canvas-lattice-/,
+            );
+            const placements = [
+              ...definitionsTermHtml.matchAll(
+                /<g class="(?:node|region)[ "][^>]*data-x="(-?\d+)" data-y="(-?\d+)"/g,
+              ),
+            ].flatMap(([, x, y]) => [Number(x), Number(y)]);
+            expect(placements.length).toBeGreaterThan(2 * wellNodeCount);
+            expect(placements.filter((value) => value % 16 !== 0)).toEqual([]);
+
             //     The class inspector's lineage and property rows SSR
             //     from the live graph: `hasVariant` is a ds:UIBlock
             //     ClassProperty the unit fixture freezes, so an upstream
