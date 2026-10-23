@@ -94,9 +94,11 @@ const ProofCase = ({
 
 /**
  * Product Button control-layout proof. The 18 geometry configurations are
- * three tiers by three root sizes by two directions. Repeated appearance,
- * state and legacy-density observations are reported separately. Mark spacing
- * remains open because this API owns no icon/label anatomy.
+ * three tiers by three root sizes by two directions. The 72 appearance
+ * compatibility observations repeat four public appearance names across those
+ * configurations; they are not 72 distinct paint designs. State, legacy API
+ * and density observations are reported separately. Mark spacing remains open
+ * because this API owns no icon/label anatomy.
  */
 export const SpacingRoles: Story = {
   args: { children: "" },
@@ -155,6 +157,9 @@ export const SpacingRoles: Story = {
           "productButtonProofError",
           "productButtonGeometryConfigurations",
           "productButtonAppearanceObservations",
+          "productButtonAppearanceCompatibilityObservations",
+          "productButtonForcedColors",
+          "productButtonForcedColorVisibilityObservations",
           "productButtonLinkObservations",
           "productButtonDisabledObservations",
           "productButtonCustomPaintObservations",
@@ -169,6 +174,9 @@ export const SpacingRoles: Story = {
           canvasElement.ownerDocument.activeElement instanceof HTMLElement
             ? canvasElement.ownerDocument.activeElement
             : null;
+        const forcedColorsActive = proofWindow.matchMedia(
+          "(forced-colors: active)",
+        ).matches;
         const activeMutations = new Map<HTMLElement, string | null>();
 
         const nextPaint = async (): Promise<void> => {
@@ -475,14 +483,33 @@ export const SpacingRoles: Story = {
           ) {
             throw new Error(`${label} lost square static construction`);
           }
-          if (
-            resolveLength(
-              button,
-              "--ds-stroke-width",
-              `${label} stroke width`,
-            ) <= 0 ||
-            style.boxShadow === "none"
-          ) {
+          const strokeWidth = resolveLength(
+            button,
+            "--ds-stroke-width",
+            `${label} stroke width`,
+          );
+          if (strokeWidth <= 0) {
+            throw new Error(`${label} lost paint-only stroke width`);
+          }
+          if (forcedColorsActive) {
+            near(
+              px(style.outlineWidth, `${label} forced outline width`),
+              strokeWidth,
+              `${label} forced outline width`,
+            );
+            near(
+              px(style.outlineOffset, `${label} forced outline offset`),
+              -strokeWidth,
+              `${label} forced outline offset`,
+            );
+            if (
+              style.outlineStyle !== "solid" ||
+              style.outlineColor === "transparent" ||
+              style.outlineColor === "rgba(0, 0, 0, 0)"
+            ) {
+              throw new Error(`${label} lost forced-colors outline fallback`);
+            }
+          } else if (style.boxShadow === "none") {
             throw new Error(`${label} lost paint-only stroke`);
           }
         };
@@ -518,6 +545,8 @@ export const SpacingRoles: Story = {
             ["padding inline end", style.paddingInlineEnd],
             ["margin block start", style.marginBlockStart],
             ["margin block end", style.marginBlockEnd],
+            ["margin inline start", style.marginInlineStart],
+            ["margin inline end", style.marginInlineEnd],
             ["border top", style.borderTopWidth],
             ["border right", style.borderRightWidth],
             ["border bottom", style.borderBottomWidth],
@@ -526,7 +555,8 @@ export const SpacingRoles: Story = {
             near(px(value, `${label} ${name}`), 0, `${label} ${name}`);
           }
           if (
-            style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+            (!forcedColorsActive &&
+              style.backgroundColor !== "rgba(0, 0, 0, 0)") ||
             style.boxShadow !== "none"
           ) {
             throw new Error(`${label} link retained boxed paint`);
@@ -537,6 +567,15 @@ export const SpacingRoles: Story = {
           label: string,
         ): void => {
           const style = proofWindow.getComputedStyle(button);
+          if (forcedColorsActive) {
+            if (
+              style.color === "transparent" ||
+              style.color === "rgba(0, 0, 0, 0)"
+            ) {
+              throw new Error(`${label} lost visible forced-colors text`);
+            }
+            return;
+          }
           if (
             style.backgroundColor !== "rgb(173, 216, 230)" ||
             style.color !== "rgb(25, 25, 112)" ||
@@ -547,6 +586,99 @@ export const SpacingRoles: Story = {
             ) !== "rgb(25, 25, 112)"
           ) {
             throw new Error(`${label} custom paint aliases were lost`);
+          }
+        };
+        const assertPublicHookValues = (
+          button: HTMLButtonElement,
+          expected: {
+            fontSize: number;
+            lineHeight: number;
+            paddingBlock: number;
+            paddingInlineStart: number;
+            paddingInlineEnd: number;
+            marginBlockEnd: number;
+            marginInlineEnd: number;
+            strokeWidth: number;
+          },
+          label: string,
+        ): void => {
+          const style = proofWindow.getComputedStyle(button);
+          for (const [name, actual, value] of [
+            ["font size", style.fontSize, expected.fontSize],
+            ["line height", style.lineHeight, expected.lineHeight],
+            [
+              "padding block start",
+              style.paddingBlockStart,
+              expected.paddingBlock,
+            ],
+            ["padding block end", style.paddingBlockEnd, expected.paddingBlock],
+            [
+              "padding inline start",
+              style.paddingInlineStart,
+              expected.paddingInlineStart,
+            ],
+            [
+              "padding inline end",
+              style.paddingInlineEnd,
+              expected.paddingInlineEnd,
+            ],
+            ["margin block end", style.marginBlockEnd, expected.marginBlockEnd],
+            [
+              "margin inline end",
+              style.marginInlineEnd,
+              expected.marginInlineEnd,
+            ],
+          ] as const) {
+            near(px(actual, `${label} ${name}`), value, `${label} ${name}`);
+          }
+          near(
+            resolveLength(button, "--ds-stroke-width", `${label} stroke width`),
+            expected.strokeWidth,
+            `${label} stroke width`,
+          );
+          for (const width of [
+            style.borderTopWidth,
+            style.borderRightWidth,
+            style.borderBottomWidth,
+            style.borderLeftWidth,
+          ]) {
+            near(
+              px(width, `${label} layout border`),
+              0,
+              `${label} layout border`,
+            );
+          }
+        };
+        const assertLinkPublicHookValues = (
+          button: HTMLButtonElement,
+          expected: {
+            fontSize: number;
+            lineHeight: number;
+            marginBlockEnd: number;
+            marginInlineEnd: number;
+          },
+          label: string,
+        ): void => {
+          const style = proofWindow.getComputedStyle(button);
+          for (const [name, actual, value] of [
+            ["font size", style.fontSize, expected.fontSize],
+            ["line height", style.lineHeight, expected.lineHeight],
+            ["margin block end", style.marginBlockEnd, expected.marginBlockEnd],
+            [
+              "margin inline end",
+              style.marginInlineEnd,
+              expected.marginInlineEnd,
+            ],
+          ] as const) {
+            near(px(actual, `${label} ${name}`), value, `${label} ${name}`);
+          }
+          for (const [name, actual] of [
+            ["padding block start", style.paddingBlockStart],
+            ["padding block end", style.paddingBlockEnd],
+            ["padding inline start", style.paddingInlineStart],
+            ["padding inline end", style.paddingInlineEnd],
+          ] as const) {
+            near(px(actual, `${label} ${name}`), 0, `${label} ${name}`);
           }
         };
         const assertFocusPaint = (
@@ -573,10 +705,11 @@ export const SpacingRoles: Story = {
         try {
           assertStylesheetIsolation();
           let geometryConfigurations = 0;
-          let appearanceObservations = 0;
+          let appearanceCompatibilityObservations = 0;
           let linkObservations = 0;
           let disabledObservations = 0;
           let customPaintObservations = 0;
+          let forcedColorVisibilityObservations = 0;
           let densityObservations = 0;
 
           for (const rootSize of [14, 16, 20]) {
@@ -650,7 +783,7 @@ export const SpacingRoles: Story = {
                     px(neutralStyle.marginBlockEnd, `${id} neutral margin`),
                     `${id} ${appearance} closure`,
                   );
-                  appearanceObservations += 1;
+                  appearanceCompatibilityObservations += 1;
                 }
 
                 assertLinkBoundary(link, tier, rootSize, `${id} link`);
@@ -662,8 +795,11 @@ export const SpacingRoles: Story = {
                 disabledObservations += 1;
                 assertBoxedControl(custom, tier, rootSize, `${id} custom`);
                 assertCustomPaint(custom, `${id} custom`);
-
-                customPaintObservations += 1;
+                if (forcedColorsActive) {
+                  forcedColorVisibilityObservations += 1;
+                } else {
+                  customPaintObservations += 1;
+                }
 
                 for (const button of densityButtons) {
                   assertBoxedControl(
@@ -713,10 +849,15 @@ export const SpacingRoles: Story = {
             representative?.querySelector<HTMLButtonElement>(
               "[data-button-proof-custom]",
             );
+          const representativeLink =
+            representative?.querySelector<HTMLButtonElement>(
+              "[data-button-proof-link]",
+            );
           if (
             !representative ||
             !representativeButton ||
-            !representativeCustom
+            !representativeCustom ||
+            !representativeLink
           ) {
             throw new Error("missing representative Button mutation case");
           }
@@ -832,6 +973,190 @@ export const SpacingRoles: Story = {
             "restored consumer stroke override",
           );
 
+          rememberStyle(representative);
+          try {
+            for (const [property, value] of [
+              ["--button-font-size", "18px"],
+              ["--button-line-height", "24px"],
+              ["--button-padding-vertical", "5px"],
+              ["--button-padding-horizontal", "9px"],
+              ["--button-margin-left", "7px"],
+              ["--button-margin-bottom", "11px"],
+              ["--button-border-width", "2px"],
+            ] as const) {
+              representative.style.setProperty(property, value);
+            }
+            await nextPaint();
+            assertPublicHookValues(
+              representativeButton,
+              {
+                fontSize: 18,
+                lineHeight: 24,
+                paddingBlock: 5,
+                paddingInlineStart: 9,
+                paddingInlineEnd: 9,
+                marginBlockEnd: 11,
+                marginInlineEnd: 7,
+                strokeWidth: 2,
+              },
+              "inherited legacy hooks",
+            );
+            assertLinkPublicHookValues(
+              representativeLink,
+              {
+                fontSize: 18,
+                lineHeight: 24,
+                marginBlockEnd: 11,
+                marginInlineEnd: 7,
+              },
+              "inherited legacy link hooks",
+            );
+          } finally {
+            restoreStyle(representative);
+            await nextPaint();
+          }
+          assertBoxedControl(
+            representativeButton,
+            "docs",
+            16,
+            "restored inherited legacy hooks",
+          );
+          assertLinkBoundary(
+            representativeLink,
+            "docs",
+            16,
+            "restored inherited legacy link hooks",
+          );
+
+          rememberStyle(representative);
+          try {
+            representative.style.setProperty(
+              "--ds-control-seat-margin-block-end",
+              "13px",
+            );
+            await nextPaint();
+            near(
+              px(
+                proofWindow.getComputedStyle(representativeButton)
+                  .marginBlockEnd,
+                "inherited helper margin",
+              ),
+              13,
+              "inherited helper margin",
+            );
+            near(
+              px(
+                proofWindow.getComputedStyle(representativeLink).marginBlockEnd,
+                "link ignores helper margin",
+              ),
+              0,
+              "link ignores helper margin",
+            );
+            representative.style.setProperty("--button-margin-bottom", "11px");
+            await nextPaint();
+            near(
+              px(
+                proofWindow.getComputedStyle(representativeButton)
+                  .marginBlockEnd,
+                "legacy margin precedence",
+              ),
+              11,
+              "legacy margin precedence",
+            );
+          } finally {
+            restoreStyle(representative);
+            await nextPaint();
+          }
+          assertBoxedControl(
+            representativeButton,
+            "docs",
+            16,
+            "restored helper margin input",
+          );
+
+          rememberStyle(representativeButton);
+          try {
+            for (const [property, value] of [
+              ["--button-font-size", "17px"],
+              ["--button-line-height", "23px"],
+              ["--button-padding-vertical", "4px"],
+              ["--button-padding-horizontal", "8px"],
+              ["--button-margin-left", "6px"],
+              ["--button-margin-bottom", "10px"],
+              ["--button-border-width", "3px"],
+            ] as const) {
+              representativeButton.style.setProperty(property, value);
+            }
+            await nextPaint();
+            assertPublicHookValues(
+              representativeButton,
+              {
+                fontSize: 17,
+                lineHeight: 23,
+                paddingBlock: 4,
+                paddingInlineStart: 8,
+                paddingInlineEnd: 8,
+                marginBlockEnd: 10,
+                marginInlineEnd: 6,
+                strokeWidth: 3,
+              },
+              "inline legacy hooks",
+            );
+          } finally {
+            restoreStyle(representativeButton);
+            await nextPaint();
+          }
+          assertBoxedControl(
+            representativeButton,
+            "docs",
+            16,
+            "restored inline legacy hooks",
+          );
+
+          rememberStyle(representative);
+          try {
+            representative.style.setProperty(
+              "--button-padding-horizontal",
+              "8px",
+            );
+            representative.style.setProperty(
+              "--button-padding-inline-start",
+              "13px",
+            );
+            representative.style.setProperty(
+              "--button-padding-inline-end",
+              "15px",
+            );
+            await nextPaint();
+            const edgeStyle =
+              proofWindow.getComputedStyle(representativeButton);
+            near(
+              px(edgeStyle.paddingInlineStart, "logical start precedence"),
+              13,
+              "logical start precedence",
+            );
+            near(
+              px(edgeStyle.paddingInlineEnd, "logical end precedence"),
+              15,
+              "logical end precedence",
+            );
+            assertLinkBoundary(
+              representativeLink,
+              "docs",
+              16,
+              "logical edge link boundary",
+            );
+          } finally {
+            restoreStyle(representative);
+            await nextPaint();
+          }
+          assertBoxedControl(
+            representativeButton,
+            "docs",
+            16,
+            "restored logical edge precedence",
+          );
+
           for (const [property, value, label] of [
             ["--button-padding-inline-start", "0px", "action"],
             ["--ds-control-seat-padding-block", "0px", "control"],
@@ -866,49 +1191,61 @@ export const SpacingRoles: Story = {
               "[data-button-proof-appearance]",
             ),
           );
-          for (const button of paintCases) {
-            const appearance = button.dataset.buttonProofAppearance ?? "";
-            const style = proofWindow.getComputedStyle(button);
-            const expected = independentPaint(
-              appearance,
-              "var(--modifier-color, var(--button-color-background))",
-              "var(--modifier-color-text, var(--button-color-text))",
-            );
-            if (
-              style.backgroundColor !== expected.backgroundColor ||
-              style.color !== expected.color
-            ) {
-              throw new Error(`${appearance} changed legacy paint channels`);
+          if (forcedColorsActive) {
+            for (const button of paintCases) {
+              const style = proofWindow.getComputedStyle(button);
+              if (
+                style.color === "transparent" ||
+                style.color === "rgba(0, 0, 0, 0)"
+              ) {
+                throw new Error("forced-colors Button text is not visible");
+              }
             }
-            const expectedStroke = independentPaint(
-              appearance,
-              "transparent",
-              "var(--modifier-color-border, currentColor)",
-            ).color;
-            if (
-              resolveColor(
-                button,
-                "var(--ds-stroke-color)",
-                `${appearance} stroke`,
-              ) !== expectedStroke
-            ) {
-              throw new Error(`${appearance} changed legacy stroke channel`);
+          } else {
+            for (const button of paintCases) {
+              const appearance = button.dataset.buttonProofAppearance ?? "";
+              const style = proofWindow.getComputedStyle(button);
+              const expected = independentPaint(
+                appearance,
+                "var(--modifier-color, var(--button-color-background))",
+                "var(--modifier-color-text, var(--button-color-text))",
+              );
+              if (
+                style.backgroundColor !== expected.backgroundColor ||
+                style.color !== expected.color
+              ) {
+                throw new Error(`${appearance} changed legacy paint channels`);
+              }
+              const expectedStroke = independentPaint(
+                appearance,
+                "transparent",
+                "var(--modifier-color-border, currentColor)",
+              ).color;
+              if (
+                resolveColor(
+                  button,
+                  "var(--ds-stroke-color)",
+                  `${appearance} stroke`,
+                ) !== expectedStroke
+              ) {
+                throw new Error(`${appearance} changed legacy stroke channel`);
+              }
             }
-          }
 
-          rememberStyle(representativeCustom);
-          try {
-            representativeCustom.style.setProperty(
-              "--button-color-background",
-              "transparent",
-            );
-            expectProofFailure(
-              () =>
-                assertCustomPaint(representativeCustom, "mutated appearance"),
-              "appearance channel",
-            );
-          } finally {
-            restoreStyle(representativeCustom);
+            rememberStyle(representativeCustom);
+            try {
+              representativeCustom.style.setProperty(
+                "--button-color-background",
+                "transparent",
+              );
+              expectProofFailure(
+                () =>
+                  assertCustomPaint(representativeCustom, "mutated appearance"),
+                "appearance channel",
+              );
+            } finally {
+              restoreStyle(representativeCustom);
+            }
           }
           assertCustomPaint(representativeCustom, "restored appearance");
 
@@ -1005,9 +1342,11 @@ export const SpacingRoles: Story = {
           proofRoot.dataset.productButtonGeometryConfigurations = String(
             geometryConfigurations,
           );
-          proofRoot.dataset.productButtonAppearanceObservations = String(
-            appearanceObservations,
-          );
+          proofRoot.dataset.productButtonAppearanceCompatibilityObservations =
+            String(appearanceCompatibilityObservations);
+          proofRoot.dataset.productButtonForcedColors = forcedColorsActive
+            ? "active"
+            : "none";
           proofRoot.dataset.productButtonLinkObservations =
             String(linkObservations);
           proofRoot.dataset.productButtonDisabledObservations =
@@ -1015,6 +1354,8 @@ export const SpacingRoles: Story = {
           proofRoot.dataset.productButtonCustomPaintObservations = String(
             customPaintObservations,
           );
+          proofRoot.dataset.productButtonForcedColorVisibilityObservations =
+            String(forcedColorVisibilityObservations);
           proofRoot.dataset.productButtonDensityObservations =
             String(densityObservations);
           proofRoot.dataset.productButtonProof = "passed";

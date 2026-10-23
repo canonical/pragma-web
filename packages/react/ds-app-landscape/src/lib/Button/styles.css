@@ -5,15 +5,33 @@
  * Layer: ds.components.apps-landscape (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.apps-landscape {
+  /* Public hooks inherit from a consumer wrapper or may be set inline:
+   * - paint: --button-color-{background,text,border} and hover/active variants
+   * - legacy geometry: --button-margin-{left,bottom},
+   *   --button-padding-{vertical,horizontal}, --button-border-width,
+   *   --button-font-{size,weight} and --button-line-height
+   *   (the legacy --button-margin-left name maps to logical inline-end)
+   * - logical edges: --button-padding-inline-{start,end}
+   * Logical edge hooks take precedence over legacy horizontal padding. The
+   * explicit link boundary remains unboxed: external margins still apply, while
+   * legacy vertical/horizontal padding is deliberately ignored. */
   .ds.button {
-    --button-font-size: var(--ds-typography-body-font-size);
-    --button-line-height: var(--ds-typography-body-line-height);
-    --button-padding-inline-start: var(--ds-spacing-action);
-    --button-padding-inline-end: var(--ds-spacing-action);
-    --button-border-width: var(--dimension-stroke-thickness-medium);
-    --ds-control-seat-font-size: var(--button-font-size);
-    --ds-control-seat-line-height: var(--button-line-height);
-    --ds-stroke-width: var(--button-border-width);
+    --ds-control-seat-font-size: var(
+      --button-font-size,
+      var(--ds-typography-body-font-size)
+    );
+    --ds-control-seat-line-height: var(
+      --button-line-height,
+      var(--ds-typography-body-line-height)
+    );
+    --ds-control-seat-padding-block: var(
+      --button-padding-vertical,
+      var(--ds-control-padding-block)
+    );
+    --ds-stroke-width: var(
+      --button-border-width,
+      var(--dimension-stroke-thickness-medium)
+    );
     --ds-stroke-color: var(
       --modifier-color-border,
       var(--button-color-border, currentColor)
@@ -33,8 +51,22 @@
     background-color: var(--modifier-color, var(--button-color-background));
     border-radius: 0;
     font-weight: var(--button-font-weight);
-    padding-inline: var(--button-padding-inline-start)
-      var(--button-padding-inline-end);
+    margin-block-end: var(
+      --button-margin-bottom,
+      var(
+        --ds-control-seat-margin-block-end,
+        var(--ds-control-grid-compensation)
+      )
+    );
+    margin-inline-end: var(--button-margin-left, 0);
+    padding-inline-start: var(
+      --button-padding-inline-start,
+      var(--button-padding-horizontal, var(--ds-spacing-action))
+    );
+    padding-inline-end: var(
+      --button-padding-inline-end,
+      var(--button-padding-horizontal, var(--ds-spacing-action))
+    );
 
     text-align: left;
     text-decoration: none;
@@ -68,9 +100,13 @@
     background-color: transparent;
     border: 0;
     box-shadow: none;
-    font-size: var(--button-font-size);
-    line-height: var(--button-line-height);
-    margin-block: 0;
+    font-size: var(--button-font-size, var(--ds-typography-body-font-size));
+    line-height: var(
+      --button-line-height,
+      var(--ds-typography-body-line-height)
+    );
+    margin-block: 0 var(--button-margin-bottom, 0);
+    margin-inline: 0 var(--button-margin-left, 0);
     padding: 0;
     text-decoration: underline;
 
