@@ -104,13 +104,17 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       expect(layout.overflow, theme).toEqual([]);
       expect(layout.regionOverflow.rail, theme).toBe("auto");
       const { edges } = layout;
+      // The canvas starts one gutter under the row above it: the drawer
+      // trigger's own row while it shows, else the strip's; so the trigger
+      // covers nothing the canvas holds.
+      const above = edges.triggerBottom ?? edges.stripBottom;
       expect(edges.canvasTop, theme).toBeCloseTo(
-        edges.stripBottom === null ? 0 : edges.stripBottom + edges.rowGap,
+        above === null ? 0 : above + edges.rowGap,
         1,
       );
-      // With no strip the page itself starts one gutter under the
+      // With no row above, the page itself starts one gutter under the
       // viewport's top, as a page under a strip starts under its rule.
-      if (edges.stripBottom === null) {
+      if (above === null) {
         expect(layout.canvasPage.firstChildTop, theme).toBeCloseTo(
           edges.rowGap,
           1,
