@@ -15,7 +15,7 @@ import {
   orderBy,
   samplePath,
 } from "./geometry.js";
-import { requireEntry } from "./require.js";
+import { requireAt, requireEntry } from "./require.js";
 import type {
   ClassGraphModel,
   LaidOutEdge,
@@ -23,6 +23,7 @@ import type {
   PathCommand,
   PhoneLayout,
   PhoneRow,
+  Point,
   Rect,
 } from "./types.js";
 
@@ -77,6 +78,11 @@ export default function layOutPhoneView(
       (requireEntry(nodes, row.id).loop ? PHONE.loop : 0),
     h: row.h + 2 * COLLISION_MARGIN,
   });
+  // Each row's collision box, drawn in from its margin, measured once.
+  const obstacles = [...rows.values()].map((row) => ({
+    id: row.id,
+    rect: insetRect(collisionOf(row), 2),
+  }));
   const edges: LaidOutEdge[] = [];
   const arcs = model.bundles
     .filter((bundle) => !bundle.self)
@@ -127,19 +133,40 @@ export default function layOutPhoneView(
         ["C", spine + bulge, arc.b, spine + bulge, arc.b, spine, arc.b],
       ];
     };
+    // An arc never leaves its span, so only the rows across it can block
+    // it; top first, so a sample finds the rows at its height by halving.
+    const across = obstacles
+      .filter(
+        ({ id, rect }) =>
+          id !== arc.bundle.a &&
+          id !== arc.bundle.b &&
+          rect.y <= arc.high &&
+          arc.low <= rect.y + rect.h,
+      )
+      .map(({ rect }) => rect)
+      .sort((p, q) => p.y - q.y);
+    const tallest = Math.max(0, ...across.map((rect) => rect.h));
+    const isBlocked = (sample: Point): boolean => {
+      let low = 0;
+      let high = across.length;
+      while (low < high) {
+        const middle = Math.floor((low + high) / 2);
+        if (requireAt(across, middle).y < sample[1]) low = middle + 1;
+        else high = middle;
+      }
+      for (let at = low - 1; at >= 0; at -= 1) {
+        const rect = requireAt(across, at);
+        if (rect.y + tallest <= sample[1]) return false;
+        if (containsPoint(sample, rect)) return true;
+      }
+      return false;
+    };
     const base = Math.min(ARC_BASE + ARC_NEST * level, PHONE.arcCap);
     let chosen: PathCommand[] = route(base);
     for (let bulge = base; bulge <= PHONE.arcCap; bulge += ROUTE_STEP) {
       const commands = route(bulge);
       const samples = samplePath(formatPathData(commands), ROUTE_STEP);
-      const blocked = [...rows.values()].some(
-        (row) =>
-          row.id !== arc.bundle.a &&
-          row.id !== arc.bundle.b &&
-          samples.some((sample) =>
-            containsPoint(sample, insetRect(collisionOf(row), 2)),
-          ),
-      );
+      const blocked = samples.some(isBlocked);
       if (!blocked) {
         chosen = commands;
         break;
