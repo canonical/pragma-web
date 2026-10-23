@@ -1,10 +1,17 @@
 /**
- * The Definitions lens's domain constants: the abstraction axis, the
- * filter's no-op default and the catalog key of each property kind.
+ * The Definitions lens's domain constants: its routes' patterns, the
+ * abstraction axis, the filter's no-op default and the catalog key of each
+ * property kind.
  */
 
 import type { MessageKey } from "./i18n/index.js";
 import type { LensFilterState } from "./types.js";
+
+/** The pattern of the lens's index, the explorer with no term selected. */
+export const DEFINITIONS_URL = "/definitions";
+
+/** The pattern of a term's view: the term as a percent-encoded compact address. */
+export const DEFINITIONS_TERM_URL = "/definitions/:term";
 
 /** The abstraction axis: the two states `isAbstract` can take, plus the
  * unfiltered default. Chips toggle membership, never a tri-state. */

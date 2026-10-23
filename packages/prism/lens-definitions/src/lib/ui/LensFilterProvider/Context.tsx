@@ -20,7 +20,8 @@ import type { LensFilterValue } from "./types.js";
  * the strip would render empty on the server and populated on the client: a
  * hydration mismatch in the strip itself. The strip reads the same Relay
  * operation from the same warm store instead (see `DefinitionsLayout`'s `useExplorerQuery`), and
- * this context holds only the reader's ephemeral choices.
+ * this context holds only the reader's choices and where the graph's camera
+ * stood.
  *
  * Its default is the no-op filter with an inert setter, so a consumer
  * outside any provider degrades to "show everything" rather than throwing,
@@ -29,8 +30,11 @@ import type { LensFilterValue } from "./types.js";
 const LensFilterContext = createContext<LensFilterValue>({
   filter: DEFAULT_LENS_FILTER,
   setFilter: () => {},
+  search: "",
+  setSearch: () => {},
   region: undefined,
   requestRegion: () => {},
+  camera: undefined,
 });
 
 export default LensFilterContext;

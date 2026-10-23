@@ -18,14 +18,15 @@ import type { DefinitionsLayoutProps } from "./types.js";
  * persistent region in the last three columns, a drawer below three groups.
  *
  * `LensFilterProvider` encloses the whole layout because the chips, the
- * explorer and the inspector are siblings that share one filter and one
- * region request. The provider lives as long as the layout, which the
- * router remounts whenever the matched route changes: the filter survives a
- * move from one term to another (the same route, new params) and resets on
- * a move to the lens index or to another lens. The strip's tenants and the
- * inspector read the explorer's own operation from the warm store
- * (`useExplorerQuery`), each inside its own `SocketGuard`, so a cold store
- * empties their sockets and nothing else.
+ * explorer and the inspector are siblings that share one filter, one
+ * search and one region request. The router mounts the layout again
+ * whenever the matched route changes, so the provider keeps those choices,
+ * and where the graph's camera stood, in the router's session: a move from
+ * the lens index to a term or back keeps the chips, the search, the zoom
+ * and the pan, and the graph only pans the selected class into view. The
+ * strip's tenants and the inspector read the explorer's own operation from
+ * the warm store (`useExplorerQuery`), each inside its own `SocketGuard`,
+ * so a cold store empties their sockets and nothing else.
  *
  * The rail is the site's own, so a site binds it once, in the wrapper it
  * groups the lens's routes under. The layout renders no element of its own:

@@ -9,7 +9,7 @@ import definitionsExplorerQueryNode from "../../../__generated__/DefinitionsExpl
 import layOutClassGraph from "../../classGraph/layOutClassGraph.js";
 import compactUri from "../../compactUri.js";
 import { buildDefinitionsExplorerVariables } from "../../definitionsQuery.js";
-import { normalizeFilterText, resolveFilter } from "../../lensFilter.js";
+import { resolveFilter } from "../../lensFilter.js";
 import { HierarchyWell } from "../HierarchyWell/index.js";
 import { useLensFilter } from "../LensFilterProvider/index.js";
 import { TermRail } from "../TermRail/index.js";
@@ -101,11 +101,12 @@ const componentCssClassName = "ds definitions-explorer";
  * operation with the variables the route's warm-up used, so the server's
  * store fulfils it, and lays the graph out once, the same on both sides.
  *
- * It owns what the rail and the graph share: the search box's raw text,
- * written into the lens's filter normalised, and the hover centre, the
- * term a reader points at or focuses in either, client-only and empty at
- * first paint. The filter and the region a reader asks the graph to fit
- * come from the lens's provider, which the strip and the inspector share.
+ * It owns the hover centre the rail and the graph share, the term a
+ * reader points at or focuses in either, client-only and empty at first
+ * paint. The filter, the search box's text, the region a reader asks the
+ * graph to fit and the memory of the graph's camera come from the lens's
+ * provider, which the strip and the inspector share and which keeps them
+ * across the lens's routes.
  *
  * `import { DefinitionsExplorer } from "../DefinitionsExplorer/index.js";`
  *
@@ -148,12 +149,11 @@ export default function DefinitionsExplorer({
     () => data.ontologies.map((ontology) => ontology.prefix),
     [data.ontologies],
   );
-  const { filter: shared, setFilter, region } = useLensFilter();
+  const { filter: shared, search, setSearch, region, camera } = useLensFilter();
   const filter = useMemo(
     () => resolveFilter(shared, prefixes),
     [shared, prefixes],
   );
-  const [searchText, setSearchText] = useState("");
   const [hoverCentre, setHoverCentre] = useState<string | undefined>(undefined);
   const onHoverTerm = useCallback((next: string | undefined) => {
     setHoverCentre(next);
@@ -170,14 +170,12 @@ export default function DefinitionsExplorer({
         hoverCentre={hoverCentre}
         layout={layout}
         onHoverTerm={onHoverTerm}
-        onSearchChange={(raw) => {
-          setSearchText(raw);
-          setFilter({ ...shared, text: normalizeFilterText(raw) });
-        }}
+        onSearchChange={setSearch}
         ontologies={data.ontologies}
-        searchText={searchText}
+        searchText={search}
       />
       <HierarchyWell
+        cameraMemory={camera}
         className="explorer-well"
         filter={filter}
         hoverCentre={hoverCentre}

@@ -1,5 +1,6 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
+import { DEFINITIONS_TERM_URL, DEFINITIONS_URL } from "./constants.js";
 import { MESSAGES } from "./i18n/index.js";
 import { DefinitionsIcon } from "./ui/DefinitionsIcon/index.js";
 import { DefinitionsPage } from "./ui/DefinitionsPage/index.js";
@@ -33,7 +34,7 @@ import warmDefinitions from "./warmDefinitions.js";
  */
 export const definitionsRoutes = {
   definitions: route({
-    url: "/definitions",
+    url: DEFINITIONS_URL,
     content: DefinitionsPage,
     warm: warmDefinitions,
     meta: {
@@ -49,7 +50,7 @@ export const definitionsRoutes = {
     },
   }),
   definitionsTerm: route({
-    url: "/definitions/:term",
+    url: DEFINITIONS_TERM_URL,
     content: DefinitionsPage,
     warm: warmDefinitions,
   }),

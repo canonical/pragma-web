@@ -66,9 +66,12 @@ function readClosest(
  *
  * One selection is kept in step with the rail and the inspector: the URL's
  * term is ringed in the accent, its lineage drawn, and the camera pans it
- * into view when it is out of view. Pointing at a class or focusing it, in
- * the graph or the rail, makes it the focus: everything outside its
- * neighbourhood fades and its relations show their labels. Pointing at a
+ * into view when it is out of view. Given a camera memory, a well mounted
+ * again, as on another of the lens's routes, resumes the reader's view and
+ * pans the selected class into view in place of the opening. Pointing at
+ * a class or focusing it, in the graph or the rail, makes it the focus:
+ * everything outside its neighbourhood fades and its relations show their
+ * labels. Pointing at a
  * relation shows its label and rings its ends. The filter's chips hide
  * classes, and the camera fits what is left, which the Fit control
  * restores; the search and the instances axis dim. A region a reader picks
@@ -98,6 +101,7 @@ export default function HierarchyWell({
   hoverCentre,
   onHoverTerm,
   region,
+  cameraMemory,
   className,
   onKeyDown,
   ...props
@@ -246,6 +250,7 @@ export default function HierarchyWell({
         frame={frame}
         label={t("well.label")}
         legibleWindow={legibleWindow}
+        memory={cameraMemory}
         opening={opening}
         reveal={reveal}
         viewBox={viewBox}
