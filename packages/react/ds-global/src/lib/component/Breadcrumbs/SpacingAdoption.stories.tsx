@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactElement } from "react";
+import type { CSSProperties, ReactElement } from "react";
+import { createPortal } from "react-dom";
 import { userEvent } from "storybook/test";
 import Component from "./Breadcrumbs.js";
 import Item from "./common/Item/Item.js";
@@ -863,5 +864,248 @@ export const SpacingRoles: Story = {
 
     proofWindow.__breadcrumbSpacingProofQueue = current;
     await current;
+  },
+};
+
+const DefaultContextFixture = ({
+  before,
+}: {
+  before?: boolean;
+}): ReactElement => (
+  <section
+    data-breadcrumb-default-context={before ? "before" : "current"}
+    style={
+      {
+        inlineSize: "18rem",
+        maxInlineSize: "100%",
+        ...(before ? { "--ds-spacing-item-block": "0.25rem" } : {}),
+      } as CSSProperties
+    }
+  >
+    <h2 style={{ marginBlockStart: 0 }}>
+      {before ? "Before — 4px" : "Preview — 8px"}
+    </h2>
+    <Component items={wrappedItems} />
+  </section>
+);
+
+/**
+ * Untiered means that the page has not selected Sites, Documentation, or
+ * Applications. The current preview changes only wrapped Breadcrumbs to 8px
+ * between rows; single-line Breadcrumbs are unaffected, while Documentation
+ * and Applications remain at 4px. The “Before” peer uses a demonstration-only
+ * role override to show the previous 4px wrapping effect.
+ */
+export const DefaultContext: Story = {
+  args: { items: [] },
+  tags: ["!autodocs"],
+  // The shared Storybook decorator always assigns an official product context
+  // to its mount point. A body portal deliberately bypasses that preview-only
+  // ancestor so this story can show the real unscoped :root default.
+  render: () =>
+    createPortal(
+      <main
+        data-breadcrumb-default-context-proof=""
+        style={{
+          boxSizing: "border-box",
+          display: "flow-root",
+          inlineSize: "100%",
+          insetBlockStart: 0,
+          insetInlineStart: 0,
+          padding: "1rem",
+          position: "absolute",
+        }}
+      >
+        <p>
+          <strong>Page with no tier selected.</strong> The current preview uses
+          8px between wrapped rows. Single-line Breadcrumbs are unaffected, and
+          Documentation and Applications remain at 4px.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem" }}>
+          <DefaultContextFixture before />
+          <DefaultContextFixture />
+        </div>
+      </main>,
+      document.body,
+    ),
+  play: async ({ canvasElement }) => {
+    const proofDocument = canvasElement.ownerDocument;
+    const proofWindow = proofDocument.defaultView;
+    if (!proofWindow) throw new Error("missing default-context proof window");
+    const proofRoots = proofDocument.querySelectorAll<HTMLElement>(
+      "[data-breadcrumb-default-context-proof]",
+    );
+    if (proofRoots.length !== 1 || !proofRoots[0]) {
+      throw new Error(
+        `expected one default-context proof root, received ${proofRoots.length}`,
+      );
+    }
+    const proofRoot = proofRoots[0];
+    delete proofRoot.dataset.breadcrumbDefaultContextProof;
+    delete proofRoot.dataset.breadcrumbDefaultContextProofError;
+    const originalRootStyle =
+      proofDocument.documentElement.getAttribute("style");
+    const originalFocus = proofDocument.activeElement;
+
+    const readPx = (value: string, label: string): number => {
+      const result = Number.parseFloat(value);
+      if (!Number.isFinite(result)) throw new Error(`${label} is not finite`);
+      return result;
+    };
+    const near = (actual: number, expected: number, label: string): void => {
+      if (
+        !Number.isFinite(actual) ||
+        !Number.isFinite(expected) ||
+        Math.abs(actual - expected) > 0.55
+      ) {
+        throw new Error(`${label}: expected ${expected}, received ${actual}`);
+      }
+    };
+    const roleLength = (owner: HTMLElement, property: string): number => {
+      const probe = proofDocument.createElement("span");
+      probe.style.cssText = `position:fixed;visibility:hidden;display:block;inline-size:var(${property});block-size:0`;
+      owner.append(probe);
+      const result = readPx(
+        proofWindow.getComputedStyle(probe).inlineSize,
+        `${property} role`,
+      );
+      probe.remove();
+      return result;
+    };
+    const metrics = (fixture: HTMLElement, label: string) => {
+      const list = fixture.querySelector<HTMLElement>(".list");
+      if (!list) throw new Error(`${label} list is missing`);
+      const items = Array.from(
+        list.querySelectorAll<HTMLElement>(".breadcrumbs-item"),
+      );
+      if (items.length !== wrappedItems.length) {
+        throw new Error(`${label} item anatomy changed`);
+      }
+      const rows: Array<{ top: number; bottom: number }> = [];
+      for (const item of items) {
+        const rect = item.getBoundingClientRect();
+        const row = rows.find(
+          (candidate) => Math.abs(candidate.top - rect.top) <= 0.75,
+        );
+        if (row) row.bottom = Math.max(row.bottom, rect.bottom);
+        else rows.push({ top: rect.top, bottom: rect.bottom });
+      }
+      rows.sort((a, b) => a.top - b.top);
+      if (rows.length < 2) throw new Error(`${label} did not wrap naturally`);
+      const separator = Array.from(
+        fixture.querySelectorAll<HTMLElement>(".separator"),
+      ).find((node) => proofWindow.getComputedStyle(node).display !== "none");
+      if (!separator) throw new Error(`${label} visible separator is missing`);
+      const separatorStyle = proofWindow.getComputedStyle(separator);
+      return {
+        itemMetrics: items.map((item) => {
+          const rect = item.getBoundingClientRect();
+          const style = proofWindow.getComputedStyle(item);
+          return {
+            alignItems: style.alignItems,
+            display: style.display,
+            fontSize: style.fontSize,
+            height: rect.height,
+            lineHeight: style.lineHeight,
+            width: rect.width,
+          };
+        }),
+        markEnd: readPx(separatorStyle.marginInlineEnd, `${label} mark end`),
+        markRole: roleLength(fixture, "--ds-spacing-mark"),
+        markStart: readPx(
+          separatorStyle.marginInlineStart,
+          `${label} mark start`,
+        ),
+        physicalGaps: rows
+          .slice(1)
+          .map((row, index) => row.top - rows[index].bottom),
+        role: roleLength(fixture, "--ds-spacing-item-block"),
+        rowGap: readPx(
+          proofWindow.getComputedStyle(list).rowGap,
+          `${label} gap`,
+        ),
+        width: list.getBoundingClientRect().width,
+      };
+    };
+
+    try {
+      await proofDocument.fonts.ready;
+      const before = proofRoot.querySelector<HTMLElement>(
+        '[data-breadcrumb-default-context="before"]',
+      );
+      const current = proofRoot.querySelector<HTMLElement>(
+        '[data-breadcrumb-default-context="current"]',
+      );
+      if (!before || !current)
+        throw new Error("comparison fixtures are missing");
+      if (
+        before.closest(".site, .docs, .app, .global, .os") ||
+        current.closest(".site, .docs, .app, .global, .os")
+      ) {
+        throw new Error("default-context fixture selected a product tier");
+      }
+      if (
+        current.style.getPropertyValue("--ds-spacing-item-block") !== "" ||
+        before.style.getPropertyValue("--ds-spacing-item-block") !== "0.25rem"
+      ) {
+        throw new Error("demonstration role override boundary changed");
+      }
+
+      const rootSize = readPx(
+        proofWindow.getComputedStyle(proofDocument.documentElement).fontSize,
+        "root font size",
+      );
+      near(rootSize, 16, "default-context root size");
+      const beforeMetrics = metrics(before, "before");
+      const currentMetrics = metrics(current, "current");
+      for (const [label, values, expectedGap] of [
+        ["before", beforeMetrics, rootSize * 0.25],
+        ["current", currentMetrics, rootSize * 0.5],
+      ] as const) {
+        near(values.role, expectedGap, `${label} item-block role`);
+        near(values.rowGap, expectedGap, `${label} computed row gap`);
+        for (const gap of values.physicalGaps) {
+          near(gap, expectedGap, `${label} physical row gap`);
+        }
+        near(values.markRole, rootSize * 0.5, `${label} mark role`);
+        near(values.markStart, rootSize * 0.5, `${label} mark start`);
+        near(values.markEnd, rootSize * 0.5, `${label} mark end`);
+      }
+      near(beforeMetrics.width, currentMetrics.width, "peer list width");
+      for (
+        let index = 0;
+        index < beforeMetrics.itemMetrics.length;
+        index += 1
+      ) {
+        const beforeItem = beforeMetrics.itemMetrics[index];
+        const currentItem = currentMetrics.itemMetrics[index];
+        if (!beforeItem || !currentItem)
+          throw new Error(`item ${index} is missing`);
+        near(beforeItem.width, currentItem.width, `item ${index} width`);
+        near(beforeItem.height, currentItem.height, `item ${index} height`);
+        if (
+          beforeItem.fontSize !== currentItem.fontSize ||
+          beforeItem.lineHeight !== currentItem.lineHeight ||
+          beforeItem.display !== currentItem.display ||
+          beforeItem.alignItems !== currentItem.alignItems
+        ) {
+          throw new Error(`item ${index} layout or type changed`);
+        }
+      }
+      if (
+        proofDocument.documentElement.getAttribute("style") !==
+          originalRootStyle ||
+        proofDocument.activeElement !== originalFocus
+      ) {
+        throw new Error(
+          "default-context proof did not preserve document state",
+        );
+      }
+      proofRoot.dataset.breadcrumbDefaultContextProof = "passed";
+    } catch (error) {
+      proofRoot.dataset.breadcrumbDefaultContextProofError =
+        error instanceof Error ? error.message : String(error);
+      throw error;
+    }
   },
 };
