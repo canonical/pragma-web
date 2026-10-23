@@ -19,7 +19,9 @@
  * a multiple of 4px. The station index is measured in both its views (the
  * cards view as a known overflow), and a station page once more with a
  * field name longer than its key's track, which must clip there rather
- * than run under the value or widen the canvas.
+ * than run under the value or widen the canvas, and once for its fields'
+ * keys, a key carrying the inherited tag on the same line height as a
+ * plain one.
  */
 import {
   launchBrowser,
@@ -98,6 +100,24 @@ function placeLongKey(name: string): {
     valueTop: valueBox.top,
     canvasScrollWidth: canvas.scrollWidth,
     canvasClientWidth: canvas.clientWidth,
+  };
+}
+
+/**
+ * Measure the height of every key of the page's fields, split by whether
+ * the key carries the inherited tag. It runs in the page.
+ *
+ * @returns The heights of the tagged keys and of the plain ones.
+ */
+function measureFieldKeys(): {
+  readonly tagged: readonly number[];
+  readonly plain: readonly number[];
+} {
+  const keys = [...document.querySelectorAll(".ds.field-list .key")];
+  const heightOf = (key: Element): number => key.getBoundingClientRect().height;
+  return {
+    tagged: keys.filter((key) => key.querySelector(".inherited")).map(heightOf),
+    plain: keys.filter((key) => !key.querySelector(".inherited")).map(heightOf),
   };
 }
 
@@ -273,6 +293,19 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       if (pair.valueTop < pair.keyBottom) {
         expect(pair.keyEnd).toBeLessThanOrEqual(pair.valueStart);
       }
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("keeps a key carrying the inherited tag on a plain key's line", async () => {
+    const page = await open(STATION_PATH);
+    try {
+      const { tagged, plain } = await page.evaluate(measureFieldKeys);
+      expect(tagged.length).toBeGreaterThan(0);
+      expect(plain.length).toBeGreaterThan(0);
+      expect(new Set([...plain, ...tagged])).toEqual(new Set(plain));
+      expect(new Set(plain).size).toBe(1);
     } finally {
       await page.close();
     }

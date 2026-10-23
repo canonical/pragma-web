@@ -26,6 +26,7 @@ const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-muted",
   "--typography-text-secondary-font-size",
+  "--typography-text-secondary-line-height",
 ];
 
 /**

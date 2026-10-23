@@ -13,6 +13,9 @@
     --field-list-inherited-font-size: var(
       --typography-text-secondary-font-size
     );
+    --field-list-inherited-line-height: var(
+      --typography-text-secondary-line-height
+    );
     --field-list-inherited-color: var(--color-text-muted);
 
     display: grid;
@@ -31,10 +34,12 @@
     color: var(--field-list-empty-color);
   }
 
-  /* The inherited tag reads with the field's name, set apart and smaller. */
+  /* The inherited tag reads with the field's name, set apart and smaller,
+   * on the smaller size's own line so it does not grow the key's line. */
   .ds.field-list .inherited {
     margin-inline-start: var(--field-list-inherited-margin-inline-start);
     font-size: var(--field-list-inherited-font-size);
+    line-height: var(--field-list-inherited-line-height);
     color: var(--field-list-inherited-color);
   }
 }

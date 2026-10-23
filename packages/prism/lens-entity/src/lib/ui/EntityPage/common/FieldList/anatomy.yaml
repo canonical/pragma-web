@@ -13,7 +13,9 @@
 # line span it, and the key values place themselves. The section stands
 # one default step of block space below what precedes it, external spacing
 # on the section, so it reads as its own part of the page. The inherited
-# tag sits a small step after the name, at the secondary size.
+# tag sits a small step after the name, at the secondary size and on the
+# secondary size's own line, which fits inside the key's line, so a key
+# carrying the tag keeps its pair at the height of every other pair.
 #
 # Every decision is read through a component token declared on the root
 # (`--field-list-*`), bound to the symbol named here.
@@ -23,8 +25,9 @@
 #   layout.grid.column "1 / -1": structure, a span in columns.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
-# container.gap.default, space.100, and the semantic typography symbol
-# typography.text.secondary.fontSize.
+# container.gap.default, space.100, and the semantic typography symbols
+# typography.text.secondary.fontSize and
+# typography.text.secondary.line.height.
 node:
   uri: prism.subcomponent.field_list
   styles:
@@ -53,6 +56,7 @@ node:
               styles:
                 spacing.external.inline.start: space.100
                 typography.size: typography.text.secondary.fontSize
+                typography.lineHeight: typography.text.secondary.line.height
                 typography.color: color.text.muted
             relation: { cardinality: "0..*", slotName: inherited }
       relation: { cardinality: "0..1", slotName: key-values }
