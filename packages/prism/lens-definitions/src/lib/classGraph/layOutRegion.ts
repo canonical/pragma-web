@@ -81,6 +81,7 @@ export default function layOutRegion(
 ): RegionLayout {
   const { byId } = model;
   const findings: string[] = [];
+  let crowdedArcs = 0;
   const inRegion = new Set(ids);
   const classOf = (id: string) => requireEntry(byId, id);
   const parentOf = (id: string): string | undefined => model.parent.get(id);
@@ -770,9 +771,14 @@ export default function layOutRegion(
       ["C", edgeX + bulge, portB, edgeX + bulge, portB, edgeX, portB],
     );
     if (b.x + b.w < edgeX) commands.push(["H", b.x + b.w]);
-    findings.push(
-      ...describeArcNesting(bundle.id, bulge, channel, a.col < lastColumn),
+    const nesting = describeArcNesting(
+      bundle.id,
+      bulge,
+      channel,
+      a.col < lastColumn,
     );
+    crowdedArcs += nesting.length;
+    findings.push(...nesting);
     edges.push({
       id: `rel:${bundle.id}`,
       kind: "relation",
@@ -810,6 +816,7 @@ export default function layOutRegion(
     ports,
     content,
     findings,
+    crowdedArcs,
     columnOf,
     depthOf,
     predecessorsOf,

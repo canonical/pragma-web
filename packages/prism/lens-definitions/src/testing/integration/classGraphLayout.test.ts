@@ -41,6 +41,9 @@ describe("the class graph of the real ontology", () => {
       "G3: fit 0.715 at 48px channels; 0.723 at 32px",
       "G3: opens on a legible window, the rest a pan away",
     ]);
+    // The 32px channels would lift the fit a little but nest three arcs
+    // past them, so the 48px channels stay.
+    expect(layout.channel).toBe(48);
     // The widest legible window that cuts no box on two sides ends half a
     // lattice step past the ds region's second column, and its bottom edge
     // falls half a step above Tag Category, in the gap before it: one
@@ -168,16 +171,17 @@ describe("the class graph of the metro ontology", () => {
 
   // A short, wide graph: one five-column region over two one-column ones.
   // On the 1440 well it fits only by width, below the legible zoom even at
-  // 32px channels, and fills too little of the canvas's height; these
-  // numbers pin that shape, which the layered recipe keeps on a well this
-  // narrow.
-  it("fits the 1440 well by its width only, below the legible zoom, and says so", () => {
+  // 32px channels, which it keeps because they lift the fit and crowd no
+  // arc, and fills too little of the canvas's height; these numbers pin
+  // that shape, which the layered recipe keeps on a well this narrow.
+  it("fits the 1440 well by its width only, below the legible zoom, at 32px channels, and says so", () => {
     const fit = measureFit(metro);
     expect(fit.zoom).toBeLessThan(MIN_FIT);
-    expect(fit.zoom).toBeCloseTo(0.7682, 4);
+    expect(fit.zoom).toBeCloseTo(0.8381, 4);
     expect(fit.binding).toBe("width");
-    expect(fit.otherFill).toBeCloseTo(0.4266, 4);
-    expect(metro.viewBox).toEqual({ x: -16, y: -16, w: 768, h: 432 });
+    expect(fit.otherFill).toBeCloseTo(0.4654, 4);
+    expect(metro.channel).toBe(32);
+    expect(metro.viewBox).toEqual({ x: -16, y: -16, w: 704, h: 432 });
     expect(metro.findings).toEqual([
       "G3: fit 0.768 at 48px channels; 0.838 at 32px",
       "G3: opens on a legible window, the rest a pan away",
@@ -192,16 +196,17 @@ describe("the class graph of the metro ontology", () => {
   });
 
   it("covers the canvas sparsely, with empty cells below it", () => {
-    expect(measureAreaRatio(metro)).toBeCloseTo(0.0718, 4);
+    expect(measureAreaRatio(metro)).toBeCloseTo(0.0854, 4);
     expect(countEmptyCells(metro)).toBe(8);
   });
 
-  it("opens on a legible window that cuts no box", () => {
-    expect(metro.view).toMatchObject({ x: -16, y: -16, w: 616 });
+  it("opens on a legible window that holds every class", () => {
+    expect(metro.view).toMatchObject({ x: -16, y: -16 });
+    expect(DESIGN_CANVAS.w / metro.view.w).toBeCloseTo(MIN_FIT, 4);
     const right = metro.view.x + metro.view.w;
     const inView = [...metro.nodes.values()].filter((node) => node.x < right);
     expect(inView.filter((node) => node.x + node.w > right)).toEqual([]);
-    expect(inView).toHaveLength(14);
+    expect(inView).toHaveLength(metro.nodes.size);
   });
 
   it("overlaps nothing, crosses fewer edges than the label-sorted order, and keeps the rail's order", () => {
@@ -210,8 +215,8 @@ describe("the class graph of the metro ontology", () => {
       edgesThroughBoxes: [],
       textOverlaps: 0,
     });
-    expect(countCrossings(metro).total).toBe(2);
-    expect(countCrossings(layOutClassGraph(metroGraph, 0)).total).toBe(7);
+    expect(countCrossings(metro).total).toBe(1);
+    expect(countCrossings(layOutClassGraph(metroGraph, 0)).total).toBe(4);
     expect(followsRailOrder(metro)).toBe(true);
   });
 

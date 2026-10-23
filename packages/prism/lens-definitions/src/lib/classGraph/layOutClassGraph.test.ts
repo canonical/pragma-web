@@ -100,17 +100,27 @@ describe("layOutClassGraph", () => {
     expect(layOutClassGraph(CROSS_REGION_GRAPH, 0).rail).toHaveLength(8);
   });
 
-  it("retries a graph too wide for the canvas, and opens on a legible window", () => {
+  it("retries a graph too wide for the canvas, keeps the narrower channels that lift its fit, and opens on a legible window", () => {
     const wide = layOutClassGraph(WIDE_GRAPH);
-    expect(wide.channel).toBe(48);
+    expect(wide.channel).toBe(32);
     expect(wide.findings).toEqual([
       "G3: fit 0.281 at 48px channels; 0.307 at 32px",
       "G3: opens on a legible window, the rest a pan away",
     ]);
-    // The legible window's right edge already falls between two boxes.
-    expect(wide.view).toMatchObject({ x: -16, y: -16 });
-    expect(wide.view.w).toBeCloseTo(DESIGN_CANVAS.w / MIN_FIT, 2);
-    expect(wide.view.h).toBeCloseTo(DESIGN_CANVAS.h / MIN_FIT, 2);
+    // The window ends half a lattice step past the last box that ends
+    // before the legible width, at a zoom above the legible one.
+    expect(wide.view).toMatchObject({ x: -16, y: -16, w: 632 });
+    expect(wide.view.h).toBeCloseTo(
+      (632 * DESIGN_CANVAS.h) / DESIGN_CANVAS.w,
+      10,
+    );
+    expect(DESIGN_CANVAS.w / wide.view.w).toBeGreaterThanOrEqual(MIN_FIT);
+    const right = wide.view.x + wide.view.w;
+    expect(
+      [...wide.nodes.values()].filter(
+        (node) => node.x < right && node.x + node.w > right,
+      ),
+    ).toEqual([]);
   });
 
   it("settles on the narrower channels when they make the graph fit", () => {

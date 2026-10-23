@@ -349,6 +349,8 @@ export interface RegionLayout {
   readonly content: Rect;
   /** Every rule the region could not keep, in words. */
   readonly findings: readonly string[];
+  /** How many same-column arcs nest past the channel into the next column. */
+  readonly crowdedArcs: number;
   /** A class's column. */
   readonly columnOf: (id: string) => number;
   /** A class's superclass hops to its root. */

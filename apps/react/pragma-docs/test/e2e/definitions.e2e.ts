@@ -10,7 +10,8 @@
  * ships; the term rail's ontology headings are laid out; and, on a phone,
  * the inspector's drawer trigger covers nothing of the explorer, its search
  * field least of all. A filter chip's refit keeps every class in view
- * labelled; Fit brings every class into view; and the inspector's field
+ * labelled; Fit brings every class into view, unlabelled where the whole
+ * fits only below the overview zoom; and the inspector's field
  * rows put their ranges on one column line.
  */
 import {
@@ -297,7 +298,7 @@ describe("at 1440 px", () => {
     expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
   });
 
-  it("brings every class into view on Fit", async () => {
+  it("brings every class into view on Fit, as boxes without their labels", async () => {
     const { errors, measure } = await openExplorer(
       "/definitions",
       desktop,
@@ -305,6 +306,10 @@ describe("at 1440 px", () => {
     );
     expect(errors).toEqual([]);
     expect(measure.inView).toBe(measure.drawn);
+    // Fit trades the labels for the whole graph: at 1440 the docsite's
+    // graph fits only below the overview zoom, so every class in view is
+    // drawn as its box alone until the reader zooms in.
+    expect(measure.unlabelled).toBe(measure.inView);
   });
 
   it("puts the inspector's field ranges on one column line", async () => {

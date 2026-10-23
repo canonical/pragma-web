@@ -52,7 +52,10 @@ interface SizedRegion {
   readonly h: number;
 }
 
-/** Lay every region out at a channel and pack them into shelves. */
+/**
+ * Lay every region out at a channel and pack them into shelves, saying
+ * whether any arc nests past the channel.
+ */
 function packRegions(
   model: ClassGraphModel,
   channel: number,
@@ -60,6 +63,7 @@ function packRegions(
 ): {
   readonly regions: readonly SizedRegion[];
   readonly packing: ShelfPacking;
+  readonly crowded: boolean;
 } {
   const regions = model.regionOrder.map(({ prefix, ids }) => {
     const layout = layOutRegion(model, ids, channel, sweeps);
@@ -78,7 +82,11 @@ function packRegions(
       ),
     };
   });
-  return { regions, packing: packShelves(regions) };
+  return {
+    regions,
+    packing: packShelves(regions),
+    crowded: regions.some((region) => region.layout.crowdedArcs > 0),
+  };
 }
 
 /** Where a region sits: its top-left corner and its shelf's top. */
@@ -215,8 +223,8 @@ function alignShelves(
  * Lay the class graph out: each namespace region in its own layered
  * columns, the regions packed into shelves for the largest fit on the
  * design canvas (retried with narrower channels when the fit would put
- * 14px labels below 12px, which are kept only when they lift it to the
- * legible zoom), placed on the lattice, then the cross-region
+ * 14px labels below 12px, which are kept whenever they lift the fit and
+ * no arc nests past them), placed on the lattice, then the cross-region
  * relations and subclass joins routed through the gaps, the rail order,
  * the keyboard's moves, the viewBox with its margin, the view the canvas
  * opens on (the whole viewBox, or a legible window of it whose edges cut no
@@ -265,10 +273,9 @@ export default function layOutClassGraph(
     findings.push(
       `G3: fit ${packed.packing.fit.toFixed(3)} at ${CHANNEL}px channels; ${retry.packing.fit.toFixed(3)} at ${FALLBACK_CHANNEL}px`,
     );
-    // The narrower channels crowd the arcs that nest in them, so they are
-    // taken only when they bring the graph to the legible zoom; short of
-    // it, the canvas opens on a window either way.
-    if (retry.packing.fit >= MIN_FIT) {
+    // The narrower channels are taken whenever they lift the fit, unless an
+    // arc that nests in them would then run into the next column.
+    if (retry.packing.fit > packed.packing.fit && !retry.crowded) {
       packed = retry;
       channel = FALLBACK_CHANNEL;
     }
