@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
+
+### Features
+
+* **react-boilerplate-vite:** add an LXD-style dashboard on the application shell ([#1506](https://github.com/canonical/pragma-web/issues/1506)) ([bcb9870](https://github.com/canonical/pragma-web/commit/bcb98708051f549fb866f15868536abb42cd3687))
+
+
 ## [0.44.1](https://github.com/canonical/pragma-web/compare/v0.44.0...v0.44.1) (2026-10-08)
 
 **Note:** Version bump only for package @canonical/react-ds-app

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
+
+### Features
+
+* **svelte-ds-global:** adds Badge ([#1400](https://github.com/canonical/pragma-web/issues/1400)) ([69ba309](https://github.com/canonical/pragma-web/commit/69ba3095fea252e827a6e9731bd44e745d5c301c))
+
+
 ## [0.44.1](https://github.com/canonical/pragma-web/compare/v0.44.0...v0.44.1) (2026-10-08)
 
 **Note:** Version bump only for package @canonical/styles

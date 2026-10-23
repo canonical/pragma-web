@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
+
+### Bug Fixes
+
+* **ds-global:** render Modal header and footer as divs to avoid page-… ([#1453](https://github.com/canonical/pragma-web/issues/1453)) ([e46607c](https://github.com/canonical/pragma-web/commit/e46607cb3b2a46ad4d878d8f57a1a893f4a9c273)), closes [#1386](https://github.com/canonical/pragma-web/issues/1386)
+* **react-ds-global:** make @canonical/design-tokens a devDependency ([#1459](https://github.com/canonical/pragma-web/issues/1459)) ([027216c](https://github.com/canonical/pragma-web/commit/027216c747cbeb97b11631cb35977426808de1f7))
+
+### Features
+
+* **react-boilerplate-vite:** add an LXD-style dashboard on the application shell ([#1506](https://github.com/canonical/pragma-web/issues/1506)) ([bcb9870](https://github.com/canonical/pragma-web/commit/bcb98708051f549fb866f15868536abb42cd3687))
+* **svelte-ds-global:** add Modal trigger snippet ([#1419](https://github.com/canonical/pragma-web/issues/1419)) ([7ded359](https://github.com/canonical/pragma-web/commit/7ded359c31aa8c4239fa04c7c2502100435b428e))
+* **svelte-ds-global:** adds Badge ([#1400](https://github.com/canonical/pragma-web/issues/1400)) ([69ba309](https://github.com/canonical/pragma-web/commit/69ba3095fea252e827a6e9731bd44e745d5c301c))
+* **svelte-ds-global:** adds the Modal pattern ([#1418](https://github.com/canonical/pragma-web/issues/1418)) ([9d4f251](https://github.com/canonical/pragma-web/commit/9d4f251a259c014cb397bb8575c20a0d9736da3d))
+
+
 ## [0.44.1](https://github.com/canonical/pragma-web/compare/v0.44.0...v0.44.1) (2026-10-08)
 
 ### Bug Fixes

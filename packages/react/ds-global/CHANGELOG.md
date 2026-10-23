@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
+
+### Bug Fixes
+
+* **ds-global:** render Modal header and footer as divs to avoid page-… ([#1453](https://github.com/canonical/pragma-web/issues/1453)) ([e46607c](https://github.com/canonical/pragma-web/commit/e46607cb3b2a46ad4d878d8f57a1a893f4a9c273)), closes [#1386](https://github.com/canonical/pragma-web/issues/1386)
+* **react-ds-global:** make @canonical/design-tokens a devDependency ([#1459](https://github.com/canonical/pragma-web/issues/1459)) ([027216c](https://github.com/canonical/pragma-web/commit/027216c747cbeb97b11631cb35977426808de1f7))
+
+
 ## [0.44.1](https://github.com/canonical/pragma-web/compare/v0.44.0...v0.44.1) (2026-10-08)
 
 **Note:** Version bump only for package @canonical/react-ds-global
