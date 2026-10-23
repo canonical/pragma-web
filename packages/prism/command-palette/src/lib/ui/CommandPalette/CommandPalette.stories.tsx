@@ -42,9 +42,12 @@ export const Closed: Story = {};
  */
 export const Open: Story = {
   play: async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    // The search mounts once the page has hydrated, inside the closed
+    // dialog; the chord is pressed once it is there.
+    const field = await body.findByRole("combobox", { hidden: true });
     await userEvent.keyboard("{Control>}k{/Control}");
-    const dialog = within(canvasElement.ownerDocument.body).getByRole("dialog");
-    const field = within(dialog).getByRole("combobox");
+    const dialog = body.getByRole("dialog");
     await expect(field).toHaveFocus();
     await userEvent.type(field, "lay");
     await expect(
