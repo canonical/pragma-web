@@ -113,6 +113,13 @@ describe("GraphCanvas", () => {
     );
   });
 
+  it("names the lattice after its label, so the server and client agree", () => {
+    renderCanvas();
+    expect(document.querySelector("pattern.lattice")?.id).toBe(
+      "graph-canvas-lattice-class-graph",
+    );
+  });
+
   it("hangs an optional hint from the controls bar, and none without one", () => {
     const { rerender } = render(
       <GraphCanvas hint="Drag to pan" label="Class graph" viewBox={VIEW_BOX}>
