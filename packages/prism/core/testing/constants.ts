@@ -13,6 +13,7 @@
  * style keys: the side is the colour key's to name.
  */
 export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
+  "align-content": ["layout.alignContent"],
   "align-items": ["layout.align"],
   "align-self": ["layout.alignSelf"],
   background: ["appearance.background"],
