@@ -77,8 +77,8 @@ const DEFINITIONS_TERM_URL = "/definitions/ds%3AUIBlock";
 const STANDARD_READING_URL = `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`;
 
 /** The AV-351 journeys exemplar: the job view — a fourth non-lens URL,
- * and the second whose canvas carries a React Flow well's server-rendered
- * node DOM. Same R3 posture: no rail entry is exact-current here. */
+ * and the second whose canvas can carry a graph well's server-rendered
+ * SVG. Same R3 posture: no rail entry is exact-current here. */
 const JOURNEYS_JOB_URL = "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3";
 
 /** A guide's reading page: a non-lens URL of the marketing domain that
@@ -195,10 +195,7 @@ const EXPECTED_ARIA_CURRENT: Readonly<Record<string, readonly string[]>> = {
   // canvas, outside the chrome measured here; the workspace's inspector
   // does not: UI Block's four relations to itself are listed outgoing and
   // incoming, each reaching the term's own view.
-  [DEFINITIONS_TERM_URL]: Array.from(
-    { length: 8 },
-    () => DEFINITIONS_TERM_URL,
-  ),
+  [DEFINITIONS_TERM_URL]: Array.from({ length: 8 }, () => DEFINITIONS_TERM_URL),
   // Same R3 posture: the rail's Standards entry is NOT current at a
   // reading URL.
   [STANDARD_READING_URL]: [],
@@ -548,12 +545,12 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet("/journeys").canvas).not.toContain(
       'id="journey-inspector-title"',
     );
-    // HONEST: the well (react-flow node DOM) is NOT in the default output —
+    // HONEST: the well (its hops' SVG) is NOT in the default output —
     // the graph is the non-default view, reached by the client switch. This
     // used to assert the node DOM was present because the well SSR'd
     // alongside the table; with one-view-at-a-time and table-default, the
     // default canvas is the table alone.
-    expect(mustGet("/journeys").canvas).not.toContain("react-flow__node-hop");
+    expect(mustGet("/journeys").canvas).not.toContain('class="hop');
     // The job canvas defaults to the table too (the view is ephemeral, not
     // URL-derived), so it carries the TABLE — not the inspector (dropped in
     // table mode, RULING 2) and not the well's node DOM (the non-default
@@ -565,9 +562,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain(
       'id="journey-inspector-title"',
     );
-    expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain(
-      "react-flow__node-hop",
-    );
+    expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain('class="hop');
     expect(mustGet("/guides").canvas).toContain('id="lens-guides-title"');
     // The entity page renders its REAL data from the fixture records, not
     // a loading state — the whole view SSRs from a warm store.

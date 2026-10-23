@@ -21,14 +21,8 @@ import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Shell } from "#lib/ui";
-import createFetchSpy from "../../testing/createFetchSpy.js";
-import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
-import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
-// Definitions block: the captured explorer records, plus the jsdom shims
-// React Flow needs when the well MOUNTS (ResizeObserver/DOMMatrix —
-// side-effect import, no test behaviour of its own).
-import "../../testing/stubReactFlowGlobals.js";
 import type { InitialData } from "#server";
+import createFetchSpy from "../../testing/createFetchSpy.js";
 import { definitionsExplorerRecords } from "../../testing/definitionsRecords.js";
 import {
   LINK_COMPONENT_URI,
@@ -36,6 +30,8 @@ import {
 } from "../../testing/standardsRecords.js";
 import journeysExplorerRecords from "../addons/journeys/__fixtures__/journeysExplorerRecords.js";
 import journeysExplorerRecordsJob from "../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
+import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
+import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
 import lobbyRecords from "../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../domains/playground/__fixtures__/componentProbeRecords.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";

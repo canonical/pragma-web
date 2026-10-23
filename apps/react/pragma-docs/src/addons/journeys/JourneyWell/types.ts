@@ -1,4 +1,3 @@
-import type { Edge, Node } from "@xyflow/react";
 import type { JourneyCoordinate } from "./buildJourneyGraph.js";
 
 /**
@@ -34,7 +33,7 @@ export type HopKind = (typeof HOP_KINDS)[number];
  * - `href` is the docsite route this surface actually lives at, when one
  *   exists; absent for every surface the site does not render.
  */
-export interface JourneyNodeData extends Record<string, unknown> {
+export interface JourneyNodeData {
   /** The node's own graph URI — its identity and its address. */
   readonly uri: string;
   /** The display label: the graph's own label, never invented. */
@@ -51,9 +50,24 @@ export interface JourneyNodeData extends Record<string, unknown> {
   readonly href?: string | undefined;
 }
 
-/** The well's node/edge shapes (React Flow's, narrowed to this graph). */
-export type JourneyFlowNode = Node<JourneyNodeData, "hop">;
-export type JourneyFlowEdge = Edge;
+/** One hop placed: its top-left corner, its size and its payload. */
+export interface JourneyGraphNode {
+  /** The hop's graph URI. */
+  readonly id: string;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly data: JourneyNodeData;
+}
+
+/** One edge between two hops, with the class its pairing decorates it by. */
+export interface JourneyGraphEdge {
+  readonly id: string;
+  readonly source: string;
+  readonly target: string;
+  readonly className?: string;
+}
 
 export interface JourneyWellProps {
   /** Additional CSS class names. */

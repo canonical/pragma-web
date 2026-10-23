@@ -731,10 +731,10 @@ describe("server matrix (2×3) serves correctly", () => {
             //     must be non-trivial. Floors catch the both-rot-to-zero
             //     case that a bare equality would wave through.
             const hopNodeCount = (
-              journeyJobHtml.match(/react-flow__node-hop/g) ?? []
+              journeyJobHtml.match(/<g class="hop[ "]/g) ?? []
             ).length;
             const hopEdgeCount = (
-              journeyJobHtml.match(/react-flow__edge-path/g) ?? []
+              journeyJobHtml.match(/<path class="edge[ "]/g) ?? []
             ).length;
             expect(hopNodeCount).toBeGreaterThan(5);
             expect(hopEdgeCount).toBeGreaterThan(5);
@@ -757,7 +757,7 @@ describe("server matrix (2×3) serves correctly", () => {
               journeysHtml.match(/class="journey-rail-job"/g) ?? []
             ).length;
             const drawnNodeCount = (
-              journeysHtml.match(/react-flow__node-hop/g) ?? []
+              journeysHtml.match(/<g class="hop[ "]/g) ?? []
             ).length;
             expect(railJobLinkCount).toBeGreaterThan(drawnNodeCount);
             //     …and the model is big enough that the default view is

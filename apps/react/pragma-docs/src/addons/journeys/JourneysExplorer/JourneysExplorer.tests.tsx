@@ -26,7 +26,6 @@
  * strip's switch performs.
  */
 
-import "../../../../testing/stubReactFlowGlobals.js";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { FetchFunction } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
@@ -48,9 +47,9 @@ const graphOption = (): HTMLElement =>
 const tableOption = (): HTMLElement =>
   screen.getByRole("button", { name: "Table" });
 
-/** Is the well's React Flow node DOM currently mounted? */
+/** Is the well's graph currently mounted? */
 const wellPresent = (): boolean =>
-  document.querySelector(".react-flow__node-hop") !== null;
+  document.querySelector(".ds.journey-well .hop") !== null;
 
 /** Is the table's grid currently mounted? */
 const tablePresent = (): boolean =>

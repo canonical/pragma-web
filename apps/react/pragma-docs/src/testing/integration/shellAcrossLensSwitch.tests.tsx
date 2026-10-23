@@ -1,5 +1,4 @@
 /**
-import "../../../testing/stubReactFlowGlobals.js";
  * The shell stays mounted across navigation; a lens switch remounts the lens
  * layout.
  *

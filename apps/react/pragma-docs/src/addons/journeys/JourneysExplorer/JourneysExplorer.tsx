@@ -149,7 +149,7 @@ const componentCssClassName = "ds journeys-explorer";
  *
  * THE SCALE RULING, and why the default view is filtered. The full model
  * is ~260 nodes across five columns — unreadable at once, and
- * virtualisation is not open to us: React Flow SSRs only the nodes it is
+ * virtualisation is not open to us: the well SSRs only the nodes it is
  * given, so virtualising would break the determinism contract the well
  * depends on. So the lens DEFAULTS to one coordinate (the first by URI
  * order) and the rail offers the rest. That default is a pure function of
