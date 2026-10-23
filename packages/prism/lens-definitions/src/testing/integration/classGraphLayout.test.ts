@@ -21,8 +21,10 @@ import {
   measurePhone,
   measurePorts,
 } from "../../../testing/measureClassGraph.js";
+import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import { DESIGN_CANVAS, MIN_FIT } from "../../lib/classGraph/constants.js";
+import { measurePathBounds } from "../../lib/classGraph/geometry.js";
 import layOutClassGraph from "../../lib/classGraph/layOutClassGraph.js";
 
 const layout = layOutClassGraph(ontologyGraph);
@@ -160,5 +162,66 @@ describe("the class graph of the real ontology", () => {
       arcsThroughRows: 0,
       maxSpinePorts: 2,
     });
+  });
+});
+
+describe("the class graph of the metro ontology", () => {
+  const metro = layOutClassGraph(metroGraph);
+
+  // A short, wide graph: one five-column region over two one-column ones.
+  // On the 1440 well it fits only by width, below the legible zoom even at
+  // 32px channels, and fills too little of the canvas's height; these
+  // numbers pin that shape, which the layered recipe keeps on a well this
+  // narrow.
+  it("fits the 1440 well by its width only, below the legible zoom, and says so", () => {
+    const fit = measureFit(metro);
+    expect(fit.zoom).toBeLessThan(MIN_FIT);
+    expect(fit.zoom).toBeCloseTo(0.7682, 4);
+    expect(fit.binding).toBe("width");
+    expect(fit.otherFill).toBeCloseTo(0.4266, 4);
+    expect(metro.viewBox).toEqual({ x: -16, y: -16, w: 768, h: 432 });
+    expect(metro.findings).toEqual([
+      "G3: fit 0.768 at 48px channels; 0.838 at 32px",
+      "G3: opens on a legible window, the rest a pan away",
+    ]);
+    expect(
+      metro.regions.map((region) => [region.prefix, region.columns]),
+    ).toEqual([
+      ["metro", 5],
+      ["geo", 1],
+      ["rdfs", 1],
+    ]);
+  });
+
+  it("covers the canvas sparsely, with empty cells below it", () => {
+    expect(measureAreaRatio(metro)).toBeCloseTo(0.0718, 4);
+    expect(countEmptyCells(metro)).toBe(8);
+  });
+
+  it("opens on a legible window that cuts no box", () => {
+    expect(metro.view).toMatchObject({ x: -16, y: -16, w: 616 });
+    const right = metro.view.x + metro.view.w;
+    const inView = [...metro.nodes.values()].filter((node) => node.x < right);
+    expect(inView.filter((node) => node.x + node.w > right)).toEqual([]);
+    expect(inView).toHaveLength(14);
+  });
+
+  it("overlaps nothing, crosses fewer edges than the label-sorted order, and keeps the rail's order", () => {
+    expect(countOverlaps(metro)).toEqual({
+      collisions: 0,
+      edgesThroughBoxes: [],
+      textOverlaps: 0,
+    });
+    expect(countCrossings(metro).total).toBe(2);
+    expect(countCrossings(layOutClassGraph(metroGraph, 0)).total).toBe(7);
+    expect(followsRailOrder(metro)).toBe(true);
+  });
+
+  it("routes a relation between its shelves through the gap between them", () => {
+    const crossing = metro.edges.filter((edge) => edge.bundle?.cross === true);
+    expect(crossing).toHaveLength(2);
+    for (const edge of crossing) {
+      expect(measurePathBounds(edge.d).x).toBeGreaterThanOrEqual(0);
+    }
   });
 });
