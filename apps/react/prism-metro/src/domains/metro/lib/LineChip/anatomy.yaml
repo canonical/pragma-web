@@ -1,0 +1,24 @@
+---
+# LineChip: a line as an inline mention, a 28px pill in running text.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 449:22408 (the chip's
+# slots) and 505:2304 (the classes row's chip: the title alone in the pill,
+# no key, badge, icon or chevron), the order every metro chip keeps. A
+# passage's own link text, when given, stands in for the title.
+# Projected onto EntityChip, which carries every style: this anatomy binds
+# none. The home is the link the value renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.line_chip
+  projection: { on: Line }
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: value
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: value }
+      relation: { cardinality: "1" }

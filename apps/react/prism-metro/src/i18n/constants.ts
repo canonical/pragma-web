@@ -44,6 +44,11 @@ export const MESSAGES = {
     other: "{count} minutes",
   },
   "interchange.lines.count": { one: "{count} line", other: "{count} lines" },
+  "line.stops": "Stops",
+  "line.stops.count": { one: "{count} stop", other: "{count} stops" },
+  "line.ends": "Ends",
+  "line.ends.value": "{first} to {last}",
+  "line.loop": "loop",
   "notFound.title": "Page not found",
   "notFound.body": "No page of the metro docs lives at this address.",
 } as const;
