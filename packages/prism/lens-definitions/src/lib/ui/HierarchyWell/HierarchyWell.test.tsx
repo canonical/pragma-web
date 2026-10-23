@@ -87,6 +87,16 @@ describe("HierarchyWell", () => {
     );
   });
 
+  it("lays the lattice under the whole graph, however small the window it opens on", () => {
+    const { container } = renderWell();
+    const floor = container.querySelector(".desktop .floor");
+    expect(floor?.getAttribute("x")).toBe(
+      String(layout.viewBox.x - 2 * layout.viewBox.w),
+    );
+    expect(floor?.getAttribute("width")).toBe(String(5 * layout.viewBox.w));
+    expect(floor?.getAttribute("height")).toBe(String(5 * layout.viewBox.h));
+  });
+
   it("gives the graph one tab stop, on the first class without a selection", () => {
     const { container } = renderWell();
     const stops = container.querySelectorAll('.desktop a[tabindex="0"]');

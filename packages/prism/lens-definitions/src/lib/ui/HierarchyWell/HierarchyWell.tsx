@@ -59,8 +59,9 @@ function readClosest(
  * window of it, around the class selected on arrival, when the whole fits
  * only below the legible zoom; the window's edges cut through no box, and
  * once the client has measured the canvas it opens on the window that size
- * calls for. On a phone, below one group of columns, the same graph as
- * rows in rail order.
+ * calls for. The camera pans over the whole graph, however small the
+ * window it opens on. On a phone, below one group of columns, the same
+ * graph as rows in rail order.
  *
  * One selection is kept in step with the rail and the inspector: the URL's
  * term is ringed in the accent, its lineage drawn, and the camera pans it
@@ -155,15 +156,18 @@ export default function HierarchyWell({
       frameOpeningCamera(layout, arrivalNode, visible, scale),
     [arrivalNode, layout],
   );
+  const bounds = useMemo(
+    () => ({
+      x: layout.viewBox.x,
+      y: layout.viewBox.y,
+      width: layout.viewBox.w,
+      height: layout.viewBox.h,
+    }),
+    [layout],
+  );
   const fit = useMemo(
-    () =>
-      measureVisibleBox(layout, hidden, undefined) ?? {
-        x: layout.viewBox.x,
-        y: layout.viewBox.y,
-        width: layout.viewBox.w,
-        height: layout.viewBox.h,
-      },
-    [hidden, layout],
+    () => measureVisibleBox(layout, hidden, undefined) ?? bounds,
+    [bounds, hidden, layout],
   );
   const frame = useMemo(() => {
     if (region === undefined) return undefined;
@@ -229,6 +233,7 @@ export default function HierarchyWell({
       onMouseOver={raiseFrom}
     >
       <GraphCanvas
+        bounds={bounds}
         className="desktop"
         fit={fit}
         frame={frame}
