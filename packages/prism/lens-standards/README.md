@@ -171,8 +171,8 @@ The design system has no semantic token for a reading measure, so
 `--standard-article-max-inline-size` holds the lens's own value and only the
 component token retunes it. No component token reads a primitive token.
 
-The layout's root also reads `--grid-intrinsic`, the intrinsic column
-template from `@canonical/styles`, which is not a design decision.
+`StandardsLayout` is the core's `DocumentLayout`: every grid in the lens is
+a subgrid of the site's one intrinsic grid, and only the canvas scrolls.
 
 ## Public API
 

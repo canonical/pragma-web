@@ -1,0 +1,16 @@
+---
+# CanvasSkipLink — the first focusable element of a layout: the published
+# SkipLink (`global.pattern.skip_link`), targeting the canvas by its id and
+# labelled from the catalog. It binds no styles of its own: the published
+# pattern keeps the link off-screen until it is focused, then shows it at
+# the viewport's top start corner.
+node:
+  uri: prism.component.canvas_skip_link
+  edges:
+    - node:
+        uri: global.pattern.skip_link
+        edges:
+          - node:
+              role: label text
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: link }

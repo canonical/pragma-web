@@ -1,0 +1,100 @@
+---
+# DocumentLayout — the document archetype: a subgrid of the shell spanning
+# every column, its gap the grid's gutter on both axes, with a row for the
+# body and a row above it for the strip and one under it for the colophon
+# only when there is one: a region given nothing that renders leaves no
+# track and no gutter. The rail takes columns 1 / span 2 on every row and
+# scrolls on its own; only the canvas scrolls the document; an optional
+# aside is the canvas's own (`prism.component.canvas`, slot `aside`), so it
+# is part of the canvas's scroll and scrolls with the page; the colophon is
+# a band under the body, in the last row.
+#
+# The colophon region draws the band: a hairline on its top edge, bled
+# across the gutter at its inline start to meet the rail's border (a
+# negative inline margin of one gutter, compensated by the same padding),
+# so the rule runs edge to edge while the colophon's content sits on the
+# canvas's first column line. Its inline end is the last column line; on a
+# shell with no outer grid margin that line is the viewport's edge, so
+# there is nothing to bleed across and the band takes no end padding: its
+# content ends on the line, like the canvas's. The band's placement keeps
+# its columns; it never takes a wider span.
+#
+# Every decision is read through a component token declared on the root
+# (`--document-layout-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   --document-layout-colophon-divider-width: 1px  a hairline above the band.
+#   --document-layout-bleed: calc(-1 * var(--grid-gutter))  the negation of
+#   grid.gutter, which the DSL cannot spell as a symbol.
+#
+# Reflow, bound in styles.css:
+#   `.ds.document-layout:has(> .colophon)` the rows are
+#     `min-content minmax(0, 1fr) min-content`: the colophon takes a row of
+#     its own; without one the canvas ends flush with the viewport.
+#   `.ds.document-layout:not(:has(> .strip))` the rows are
+#     `minmax(0, 1fr)`, and `minmax(0, 1fr) min-content` with a colophon;
+#     the canvas takes row 1, so it starts flush with the viewport's top.
+#   @container shell (width < 448px)   below one group: the rail spans one
+#     column; every other region starts at line 2.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# component.padding.block.
+node:
+  uri: prism.component.document_layout
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.grid.rows: "min-content minmax(0, 1fr)"
+    spacing.gap: grid.gutter
+    size.min.block: 0
+  edges:
+    - node:
+        uri: prism.component.canvas_skip_link
+      relation: { cardinality: "1", slotName: skip-link }
+    - node:
+        role: rail region
+        styles:
+          layout.grid.column: "1 / span 2"
+          layout.grid.row: "1 / -1"
+          layout.overflow.block: auto
+          size.min.block: 0
+        edges:
+          - node:
+              uri: prism.component.rail
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: rail }
+    - node:
+        role: strip region
+        styles:
+          layout.grid.column: "3 / -1"
+          layout.grid.row: "1"
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              uri: prism.component.mode_strip
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "0..1", slotName: strip }
+    - node:
+        uri: prism.component.canvas
+        styles:
+          layout.grid.column: "3 / -1"
+          layout.grid.row: "2"
+          layout.overflow: auto
+      relation: { cardinality: "1", slotName: canvas }
+    - node:
+        role: colophon region
+        styles:
+          layout.grid.column: "3 / -1"
+          layout.grid.row: "-2 / -1"
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+          spacing.internal.inline.start: grid.gutter
+          spacing.internal.inline.end: 0
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.block.start.color: color.border.muted
+      relation: { cardinality: "0..1", slotName: colophon }

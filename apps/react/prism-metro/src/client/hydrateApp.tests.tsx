@@ -177,7 +177,7 @@ describe("hydrateApp", () => {
     expect(onRecoverableError).not.toHaveBeenCalled();
     expect(consoleError).not.toHaveBeenCalled();
     expect(document.documentElement.className).toBe(
-      "ds site-document app comfortable dark",
+      "ds site-document docs comfortable dark",
     );
     expect(document.documentElement.lang).toBe("en");
     expect(document.title).toContain("Lines");

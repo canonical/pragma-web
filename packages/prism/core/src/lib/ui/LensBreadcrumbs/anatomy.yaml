@@ -1,0 +1,18 @@
+---
+# LensBreadcrumbs — the strip's context tenant: the published Breadcrumbs
+# with the lens crumb (linked through the router on an entity page, current
+# on the index) and the current page's crumb. It binds no styles of its own:
+# the published pattern carries them.
+node:
+  uri: prism.component.lens_breadcrumbs
+  edges:
+    - node:
+        uri: global.component.breadcrumbs
+        edges:
+          - node:
+              role: lens crumb
+            relation: { cardinality: "1", slotName: lens }
+          - node:
+              role: current page crumb
+            relation: { cardinality: "0..1", slotName: current }
+      relation: { cardinality: "1" }

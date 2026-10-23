@@ -77,9 +77,9 @@
 
   /* ---- the node layer -------------------------------------------------- */
 
-  /* Each node wraps one Chip at its settled box. Nodes float raised on the
-   * well floor (AX.3: content ON the floor renders lifted) — the shadow is
-   * the lift. */
+  /* Each node wraps one MentionChip at its settled box. Nodes float raised on
+   * the well floor (AX.3: content ON the floor renders lifted) — the shadow
+   * is the lift. */
   .ds.neighbourhood-well .well-node {
     position: absolute;
     display: flex;
@@ -87,7 +87,7 @@
     transition: opacity var(--duration-snap, 160ms) ease;
   }
 
-  .ds.neighbourhood-well .well-node .ds.chip {
+  .ds.neighbourhood-well .well-node .ds.mention-chip {
     inline-size: 100%;
     justify-content: center;
     overflow: hidden;

@@ -1,17 +1,19 @@
 /*
  * NodeCommand — the command of any node: its title and its compact address.
  *
- * Each design decision reads a component token bound to a semantic token,
- * so a site retunes the command through either tier.
+ * Each design decision reads a component token declared on the command's
+ * root and bound to a semantic token or a spacing step, so a site retunes
+ * the command through either tier.
  */
 
 @layer ds.prism {
-  :root {
-    --node-command-gap: var(--space-150, 0.75rem);
-    --node-command-location-color-text: var(--color-text-muted);
-  }
-
+  /* The gap between the title and its address is a `--space-*` step: the
+   * shim's container gaps are for layout containers, and no semantic name
+   * fits two parts of one entry. */
   .ds.node-command {
+    --node-command-gap: var(--space-150);
+    --node-command-location-color-text: var(--color-text-muted);
+
     display: flex;
     justify-content: space-between;
     align-items: baseline;

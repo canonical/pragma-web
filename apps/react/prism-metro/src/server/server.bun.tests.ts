@@ -178,7 +178,7 @@ describe("the Bun dev server", { timeout: BOOT_TIMEOUT_MS }, () => {
     expect(response.headers.get("content-type")).toMatch(/text\/html/);
     expect(graph.requests).toHaveLength(1);
     expect(html).toMatch(
-      /<html [^>]*class="ds site-document app comfortable dark"/,
+      /<html [^>]*class="ds site-document docs comfortable dark"/,
     );
     expect(html).toContain(`>${NORTHGATE_TITLE}</a>`);
   });
@@ -186,7 +186,7 @@ describe("the Bun dev server", { timeout: BOOT_TIMEOUT_MS }, () => {
   it("drops a theme the site does not know", async () => {
     const response = await request(await bootServer(), "/lines", "theme=sepia");
     expect(await response.text()).toMatch(
-      /<html [^>]*class="ds site-document app comfortable"/,
+      /<html [^>]*class="ds site-document docs comfortable"/,
     );
   });
 

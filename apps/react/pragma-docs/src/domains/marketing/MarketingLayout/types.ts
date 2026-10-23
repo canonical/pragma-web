@@ -1,11 +1,8 @@
 import type { WrapperComponentProps } from "@canonical/router-core";
-import type { ComponentProps, ReactNode } from "react";
-
-type OwnProps = WrapperComponentProps<ReactNode>;
+import type { ReactNode } from "react";
 
 /**
- * Props accepted by `MarketingLayout`: the routed page the router hands its
- * wrapper, and the native props of the layout's root `<div>`.
+ * Props accepted by `MarketingLayout`, which renders no element of its own: the
+ * routed page the router hands its wrapper.
  */
-export type MarketingLayoutProps = OwnProps &
-  Omit<ComponentProps<"div">, keyof OwnProps>;
+export type MarketingLayoutProps = WrapperComponentProps<ReactNode>;

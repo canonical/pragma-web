@@ -18,7 +18,7 @@ import {
   type Root,
 } from "react-dom/client";
 import { resolveGraphqlUrl } from "#graphql-endpoint";
-import { Shell } from "#lib/Shell";
+import { Shell } from "#lib/ui";
 import type { InitialData } from "#server";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
 

@@ -24,9 +24,10 @@ export default mergeConfig(
           "**/index.ts",
           "**/types.ts",
           "src/vite-env.d.ts",
-          // The tests themselves.
+          // The tests themselves, and the stories, which render in Storybook.
           "**/*.tests.ts",
           "**/*.tests.tsx",
+          "**/*.stories.tsx",
           // relay-compiler output, ignored by git and read by nothing.
           "src/relay/__generated__/**",
           // Thin process entry points with no dispatch of their own: the

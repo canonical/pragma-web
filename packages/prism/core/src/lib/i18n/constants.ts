@@ -10,6 +10,8 @@ export const MESSAGES = {
   "themeSelector.system": "System",
   "themeSelector.light": "Light",
   "themeSelector.dark": "Dark",
+  "workspaceLayout.inspectorTrigger": "Details",
+  "workspaceLayout.inspectorTitle": "Details",
   "chip.summaryWithLifecycle": "{summary} ({lifecycle})",
   "chip.legend.namespace.label": "{prefix}:",
   "chip.legend.namespace.description":

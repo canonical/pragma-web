@@ -16,13 +16,13 @@ export const DEV_READY_MS = 30_000;
 export const PREVIEW_READY_MS = 120_000;
 
 /**
- * The environment variable naming the Chromium binary the browser suites
- * launch. Left unset, Playwright launches the browser it installed itself.
- */
-export const CHROMIUM_EXECUTABLE_PATH_ENV_VAR = "E2E_CHROMIUM_EXECUTABLE_PATH";
-
-/**
  * How long a click may take to put its destination on screen: the router's
  * load, the graph's answer and the render.
  */
 export const CLICK_SETTLE_MS = 15_000;
+
+/** How long a page may take to settle once it is requested. */
+export const PAGE_SETTLE_MS = 30_000;
+
+/** A page on the workspace archetype: the Definitions explorer. */
+export const WORKSPACE_PATH = "/definitions";

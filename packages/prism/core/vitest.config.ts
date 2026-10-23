@@ -10,7 +10,8 @@ export default defineConfig({
   test: reactTestConfig({
     glob: "test",
     ssr: true,
-    coverage: true,
+    // Stories render in Storybook, not under test.
+    coverage: { exclude: ["**/*.stories.tsx"] },
     plugins,
     setupFiles: ["./vitest.setup.ts"],
   }),

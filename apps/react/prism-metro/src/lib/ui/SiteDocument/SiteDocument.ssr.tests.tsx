@@ -13,7 +13,7 @@ describe("SiteDocument SSR", () => {
       </SiteDocument>,
     );
     expect(html).toBe(
-      '<html lang="en" class="ds site-document app comfortable light">' +
+      '<html lang="en" class="ds site-document docs comfortable light">' +
         '<head><meta charSet="utf-8"/></head>' +
         '<body><div id="root"><main>Stations</main></div></body></html>',
     );

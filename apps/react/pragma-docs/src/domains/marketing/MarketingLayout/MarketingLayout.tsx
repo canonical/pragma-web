@@ -1,16 +1,12 @@
 import {
-  Canvas,
-  CanvasSkipLink,
+  DocumentLayout,
   ModeStrip,
   makeLensContext,
 } from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
+import { SiteColophon } from "#lib/ui/SiteColophon";
 import type { MarketingLayoutProps } from "./types.js";
-import "./styles.css";
-
-const componentCssClassName = "ds marketing-layout";
 
 /**
  * The strip's breadcrumb trail: a single `Home` crumb. The lobby has one
@@ -24,28 +20,23 @@ const HomeContext = makeLensContext({
  * The Home lens's page layout: the site rail and colophon around the lobby,
  * with the strip carrying its single `Home` crumb.
  *
- * Its root is the layout's own page grid: the rail in the west columns,
- * then a viewport stacking the strip, the canvas and the colophon.
+ * The layout is the document archetype: the rail in its rail region, the
+ * strip in the top row, the page in the canvas, the one region that
+ * scrolls, and the colophon in the band under it. It renders no element of
+ * its own: `DocumentLayout` renders the root.
  *
  * `import { MarketingLayout } from "./MarketingLayout/index.js";`
  */
 export default function MarketingLayout({
   children,
-  className,
-  ...props
 }: MarketingLayoutProps): ReactElement {
   return (
-    <div
-      {...props}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    <DocumentLayout
+      colophon={<SiteColophon />}
+      rail={<SiteRail />}
+      strip={<ModeStrip context={<HomeContext lensLabel="Home" />} />}
     >
-      <CanvasSkipLink />
-      <SiteRail />
-      <div className="viewport">
-        <ModeStrip context={<HomeContext lensLabel="Home" />} />
-        <Canvas>{children}</Canvas>
-        <SiteColophon />
-      </div>
-    </div>
+      {children}
+    </DocumentLayout>
   );
 }

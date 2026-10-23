@@ -9,10 +9,11 @@
  *   reflow layout (`prefers-color-scheme`, `forced-colors`,
  *   `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
  *   file, and only while no other condition rides along in the prelude;
- * - no grid template is authored but the layout's root, which reads the
- *   design system's intrinsic columns: every other `grid-template-columns`
- *   is a subgrid, so the index lands on the same ruler as the site;
+ * - no grid template is authored: every `grid-template-columns` is a
+ *   subgrid, so the index lands on the same ruler as the site's shell;
  * - no theme is named: a site's theme activates through its own classes;
+ * - every component token is declared on its component's root class, never
+ *   on `:root`, so a token re-valued for one component re-values no other;
  * - every component token reads another token, save the ones named here that
  *   hold the lens's own value where the design system has no semantic token;
  * - the tokens read from outside the lens are exactly the ones named here,
@@ -59,15 +60,13 @@ const LITERAL_TOKENS = ["--standard-article-max-inline-size"];
 
 /**
  * The tokens the lens reads from outside itself: the design system's
- * semantic colour and space tokens, and the site's grid preset. No primitive
+ * semantic colour and space tokens, and the grid's gutter. No primitive
  * token is among them: a component token reads the semantic tier or holds
  * its own value.
  */
 const EXTERNAL_TOKENS = [
-  "--color-background",
-  "--color-text",
   "--color-text-muted",
-  "--grid-intrinsic",
+  "--grid-gutter",
   "--space-100",
   "--space-200",
   "--space-300",
@@ -78,11 +77,10 @@ const LENS_PROPERTY = /^--(?:standards-|standard-)/;
 
 /**
  * The rule declarations that may hold a unit-bearing literal, because none
- * is a design decision: the visually hidden idiom's one-pixel clip and the
- * layout root filling the viewport. A bare `0` carries no unit.
+ * is a design decision: the visually hidden idiom's one-pixel clip. A bare
+ * `0` carries no unit.
  */
 const UNTHEMABLE_DECLARATIONS = [
-  "block-size: 100dvh",
   "block-size: 1px",
   "clip-path: inset(50%)",
   "inline-size: 1px",
@@ -105,22 +103,29 @@ function listExternalTokens(css: string): string[] {
     .filter((name) => !LENS_PROPERTY.test(name));
 }
 
-/** List the component tokens a stylesheet's `:root` declares with no `var()`. */
+/** List the component tokens a stylesheet declares with no `var()`. */
 function listLiteralTokens(css: string): string[] {
-  const root = css.match(/:root\s*\{([^}]*)\}/)?.at(1) ?? "";
-  return [...root.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
+  return [...css.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
     .filter((match) => !(match.at(2) ?? "").includes("var("))
     .map((match) => match.at(1) ?? "");
 }
 
+/** List the custom properties a stylesheet's `:root` blocks declare. */
+function listRootTokens(css: string): string[] {
+  return [...css.matchAll(/:root\s*\{([^}]*)\}/g)].flatMap((block) =>
+    [...(block.at(1) ?? "").matchAll(/(--[a-z0-9-]+)\s*:/g)].map(
+      (match) => match.at(1) ?? "",
+    ),
+  );
+}
+
 /**
- * List the rule declarations, outside the `:root` component tokens, that
- * hold a unit-bearing literal, as `property: value`, the unthemable
- * declarations and literals left out.
+ * List the rule declarations, the component tokens left out, that hold a
+ * unit-bearing literal, as `property: value`, the unthemable declarations
+ * and literals left out.
  */
 function listRawDecisions(css: string): string[] {
-  const rules = css.replace(/:root\s*\{[^}]*\}/, "");
-  return [...rules.matchAll(/(-{0,2}[a-z][a-z0-9-]*)\s*:\s*([^;{}]+);/g)]
+  return [...css.matchAll(/(-{0,2}[a-z][a-z0-9-]*)\s*:\s*([^;{}]+);/g)]
     .filter((match) => !(match.at(1) ?? "").startsWith("--"))
     .map(
       (match) =>
@@ -172,7 +177,7 @@ function listLayoutCapableConditionals(css: string): string[] {
 
 describe("the lens stylesheets", () => {
   it("are found", () => {
-    expect(files.length).toBeGreaterThanOrEqual(5);
+    expect(files.length).toBeGreaterThanOrEqual(4);
   });
 
   it("carry no layout-capable conditional at-rule", () => {
@@ -181,21 +186,13 @@ describe("the lens stylesheets", () => {
     ).toEqual([]);
   });
 
-  it("author no grid template but the layout root's intrinsic columns", () => {
+  it("author no grid template: every template is a subgrid", () => {
     const templates = files.flatMap((file) =>
       [...readCss(file).matchAll(/grid-template-columns:\s*([^;]+);/g)].map(
-        (match) => ({ file, value: (match.at(1) ?? "").trim() }),
+        (match) => (match.at(1) ?? "").trim(),
       ),
     );
-    const authored = templates.filter(({ value }) => value !== "subgrid");
-
-    expect(templates.length).toBeGreaterThan(authored.length);
-    expect(authored).toEqual([
-      {
-        file: join(LIBRARY_DIRECTORY, "StandardsLayout", "styles.css"),
-        value: "var(--grid-intrinsic)",
-      },
-    ]);
+    expect(templates.filter((value) => value !== "subgrid")).toEqual([]);
   });
 
   it("name no theme", () => {
@@ -204,6 +201,10 @@ describe("the lens stylesheets", () => {
       expect(css, file).not.toMatch(/\.(?:dark|light)\b/);
       expect(css, file).not.toMatch(/prefers-color-scheme/);
     }
+  });
+
+  it("declare each component's tokens on its root, never on :root", () => {
+    expect(files.flatMap((file) => listRootTokens(readCss(file)))).toEqual([]);
   });
 
   it("bind every component token to another token", () => {
