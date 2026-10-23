@@ -1,33 +1,36 @@
-# The fleet lens's layout: the document archetype with the metro rail, the
-# fleet trail in the strip, the routed page in the main column and the
-# page's facts in the aside. Bespoke only in what it binds: DocumentLayout
-# owns the grid, the regions and the scroll model, so this adds no styles.
+---
+# FleetLayout — the fleet lens's layout: the document archetype with the
+# metro rail, the fleet trail in the mode strip, the routed page in the
+# canvas, and the page's facts in the aside, the canvas's last three
+# columns, so the page fills the columns up to it. Its own decision is the
+# bar's bleed: the strip's rule runs one gutter west of the strip region
+# and meets the rail's border, and the strip's inline-start padding grows
+# by the same gutter, so its content stays where it was.
+#
+# Token ledger: the bleed is a calc over the shim (one gutter); no token
+# names a negative gutter.
 node:
-  uri: metro.fleet.fleet-layout
+  uri: metro.component.fleet_layout
   edges:
     - node:
-        uri: prism.core.document-layout
-      relation:
-        cardinality: "1"
-        slotName: default
-      # DocumentLayout's own slots, filled by FleetLayout:
+        uri: prism.component.document_layout
+      relation: { cardinality: "1", slotName: default }
     - node:
-        uri: metro.metro-rail
-      relation:
-        cardinality: "1"
-        slotName: rail
+        uri: metro.component.metro_rail
+      relation: { cardinality: "1", slotName: rail }
     - node:
-        uri: prism.core.lens-breadcrumbs
-      relation:
-        cardinality: "1"
-        slotName: context
+        uri: prism.component.mode_strip
+        styles:
+          spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+          spacing.internal.inline.start: "calc(var(--component-padding-inline) + var(--grid-gutter))"
+        edges:
+          - node:
+              uri: prism.component.lens_breadcrumbs
+            relation: { cardinality: "1", slotName: context }
+      relation: { cardinality: "1", slotName: bar }
     - node:
         role: routed page
-      relation:
-        cardinality: "1"
-        slotName: main
+      relation: { cardinality: "1", slotName: page }
     - node:
-        role: page facts
-      relation:
-        cardinality: "0..1"
-        slotName: aside
+        uri: metro.component.fleet_facts
+      relation: { cardinality: "0..1", slotName: aside }

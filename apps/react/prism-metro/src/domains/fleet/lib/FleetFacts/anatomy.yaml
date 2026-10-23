@@ -1,0 +1,41 @@
+---
+# FleetFacts — the facts of the fleet node a page shows, in the layout's
+# aside: a heading, then each fact as its term over its value, the facts one
+# gutter apart. The terms are muted, the values in the text colour; the
+# heading takes the typography's own style. While the page's data is on its
+# way the list is empty, and a failed read leaves the heading alone.
+#
+# The list is a definition list, each term and value grouped, so the groups
+# are the grid's items and every gap is the grid's gutter.
+node:
+  uri: metro.component.fleet_facts
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: heading
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: fact list
+        styles:
+          layout.type: grid
+          spacing.gap: grid.gutter
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+        edges:
+          - node:
+              role: term and value
+            relation: { cardinality: "0..*", slotName: fact }
+      relation: { cardinality: "1", slotName: facts }
+    - node:
+        role: fact term
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: term }
+    - node:
+        role: fact value
+        styles:
+          spacing.external.inline.start: 0
+          typography.color: color.text
+      relation: { cardinality: "0..*", slotName: value }

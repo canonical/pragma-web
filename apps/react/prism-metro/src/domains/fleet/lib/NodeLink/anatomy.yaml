@@ -1,0 +1,14 @@
+---
+# NodeLink — a fleet node named by its title, linked to its home when the
+# site gives its type one and plain text when it does not. It stands where
+# a node's chip or row projection will go, and takes its type from the
+# text around it, so it binds no style of its own.
+node:
+  uri: metro.component.node_link
+  edges:
+    - node:
+        uri: prism.component.router_link
+      relation: { cardinality: "0..1", slotName: link }
+    - node:
+        role: title
+      relation: { cardinality: "1", slotName: title }

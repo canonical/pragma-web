@@ -1,38 +1,69 @@
-# Per line a formation runs on: the line, its shortest platform, and every
-# station whose platform the formation overhangs, with the excess. The
-# marks in the side view draw the same facts.
+---
+# PlatformFit — how a formation fits the platforms of each line it runs on:
+# per line, the line (a placeholder for the Line chip projection, its code
+# and its title), its shortest known platform, the verdict (fits, or
+# overhangs with a count badge of the stations), and each station overhung
+# with how far the train runs past its platform. A formation no line runs
+# says so in one muted line instead.
+#
+# Token ledger: space.100 (8px) between the words of a line's entry, an
+# inline run, one baseline pair; no gutter, since the entry is no grid.
 node:
-  uri: metro.fleet.platform-fit
+  uri: metro.component.platform_fit
   styles:
     layout.type: grid
-    spacing.gap: container.gap.default
-    spacing.internal.inline.start: 0
-    layout.listStyle: none
+    spacing.gap: grid.gutter
   edges:
+    - node:
+        role: line list
+        styles:
+          layout.type: grid
+          spacing.gap: grid.gutter
+          spacing.internal.inline.start: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          layout.listStyle: none
+      relation: { cardinality: "0..1", slotName: lines }
     - node:
         role: line entry
         styles:
-          layout.type: grid
-          spacing.gap: container.gap.tight
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap: space.100
+      relation: { cardinality: "0..*", slotName: line }
+    - node:
+        role: line, as its code and its title (placeholder for the Line chip)
+      relation: { cardinality: "1", slotName: line-name }
+    - node:
+        role: line code
+        styles:
+          typography.fontFamily: "ui-monospace, monospace"
+      relation: { cardinality: "1", slotName: code }
+    - node:
+        role: shortest platform
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: shortest }
+    - node:
+        role: verdict
         edges:
           - node:
-              uri: metro.line-chip            # S7's Line chip projection
-            relation:
-              cardinality: "1"
-              slotName: line
-          - node:
-              uri: global.component.badge     # "Fits" or "Overhangs at n stations"
-            relation:
-              cardinality: "1"
-              slotName: verdict
-          - node:
-              role: overhang list
-              styles:
-                spacing.internal.inline.start: 0
-                layout.listStyle: none
-                typography.color: color.text.muted
-            relation:
-              cardinality: "0..*"
-              slotName: overhangs
-      relation:
-        cardinality: "0..*"
+              uri: global.component.badge
+            relation: { cardinality: "0..1", slotName: count }
+      relation: { cardinality: "1", slotName: verdict }
+    - node:
+        role: stations overhung
+        styles:
+          layout.flex.basis: 100%
+          spacing.internal.inline.start: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          layout.listStyle: none
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: overhangs }
+    - node:
+        role: no line runs the formation
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: empty }
