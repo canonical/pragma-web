@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { EntityChip } from "../../EntityChip/index.js";
+import { ChipProjection } from "../../ChipProjection/index.js";
 import { useProseReference } from "../ProseReferences/index.js";
 import type { ProseLinkProps } from "./types.js";
 
@@ -29,5 +29,5 @@ export default function ProseLink({
       </a>
     );
   }
-  return <EntityChip node={reference}>{children}</EntityChip>;
+  return <ChipProjection node={reference}>{children}</ChipProjection>;
 }

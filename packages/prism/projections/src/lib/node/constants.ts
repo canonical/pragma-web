@@ -3,7 +3,6 @@ import { NodeCard } from "./NodeCard/index.js";
 import { NodeChip } from "./NodeChip/index.js";
 import { NodeCommand } from "./NodeCommand/index.js";
 import { NodeRow } from "./NodeRow/index.js";
-import { NodeTitle } from "./NodeTitle/index.js";
 
 /**
  * The maps a site mounts: each representation renders any node through its
@@ -16,5 +15,4 @@ export const defaultProjectionMaps: ProjectionMaps = {
   row: { Node: NodeRow },
   card: { Node: NodeCard },
   command: { Node: NodeCommand },
-  title: { Node: NodeTitle },
 };

@@ -1,25 +1,63 @@
 # @canonical/prism-projections
 
-The Entity representations of a Prism documentation site. A lens mentions
-graph nodes it knows nothing about: an ontology class's instances, the
+The Entity representations of a Prism documentation site, in two layers.
+The representations (`EntityChip`, `EntityRow`, `EntityCard`,
+`EntityCommand`, `EntityGraphNode` and the `EntityList` that lists them)
+are slotted components that read no Relay fragment: a lens or a story
+fills their slots with whatever it has. The projections mention graph
+nodes a lens knows nothing about: an ontology class's instances, the
 results of a search, the entities a passage of prose links to. Each
-representation renders any node, whatever its type, through the arm its
-site maps to the node's `__typename`, and links it to the node's home.
+projection renders any node, whatever its type, through the arm its site
+maps to the node's `__typename`, and links it to the node's home.
 
-- **`EntityChip`**: the inline mention, a node named in running text.
-- **`EntityRow`**: the list row, a node as one entry of a list of results.
-- **`EntityCard`**: the card, a node as a self-contained tile in a grid.
-- **`EntityCommand`**: the command-palette entry, a node offered as a
+- **`ChipProjection`**: the inline mention, a node named in running text.
+- **`RowProjection`**: the list row, a node as one entry of a list of
+  results.
+- **`CardProjection`**: the card, a node as a self-contained tile in a grid.
+- **`CommandProjection`**: the command-palette entry, a node offered as a
   destination to jump to.
-- **`EntityTitle`**: the page title, the heading of the page a node owns.
 
 Prose links to graph nodes render as chips too, through the element
 overrides a Markdown renderer takes.
 
-Every representation reads its node through a fragment of its own, so a
-lens spreads it in its query and hands the component the key. The
-representations select only what the contract guarantees on every node
+Every projection reads its node through a fragment of its own, so a lens
+spreads it in its query and hands the component the key. The projections
+select only what the contract guarantees on every node
 (`_meta { title curie type { uri } }`).
+
+## Slotted representations
+
+A representation reads no Relay fragment and no context: it renders the
+slots it is given, in the order its anatomy fixes, and links its title to
+`href` through `LinkComponent` (the intrinsic `"a"` by default) or renders
+it as inert text without one. Each folder under `src/lib/ui/` carries its
+`anatomy.yaml`, the design contract its stylesheet transcribes. The chip,
+the row, the command and the card set the context's primary text on the
+matrix's 24px line, as the graph node draws its two lines, so each keeps
+its height in every context: the chip 28px, the row 32px, the command
+56px. The package's Storybook
+lays the five representations of each type out as one matrix, under
+`Documentation/Projection matrix`.
+
+- **`EntityChip`**: the inline mention, a pill in running text: an
+  optional lead filed before the catalog's separator, the value, then an
+  optional badge, icon and disclosure chevron.
+- **`EntityRow`**: the list entry, one row of an index: the namespace
+  prefix and the title, then one muted word at the end.
+- **`EntityCard`**: the card, built on the published `Card`: location, the
+  title and the entity it belongs to, kind, summary, key values and the
+  footer's vitals, and an optional sidecar beside them, two columns wide,
+  for a rendered example of the entity.
+- **`EntityCommand`**: the command-palette result, a two-line row: the title
+  over "kind in location", and one vital at the end.
+- **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a 50-unit
+  box and two lines of `<text>`, the title over "kind in location", for a
+  graph to place with a transform inside its `<svg>`.
+- **`EntityList`**: the shared list view of an index: a toolbar with the
+  count line and the cards and rows toggle, then its children as cards in
+  the published `Cards` group (two columns each) or as rows in an ordered
+  list, or one line when it has none. It keeps no view of its own: its
+  consumer passes `view` and takes the reader's pick from `onViewChange`.
 
 ## Installation
 
@@ -83,32 +121,31 @@ relay({
 The plugin rewrites the site's tags only. The package's files resolve
 outside the site's `src`, so they keep their own artifact imports.
 
-## Representations
+## Projections
 
 ```tsx
-import { EntityChip, EntityRow } from "@canonical/prism-projections";
+import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 
 <p>
-  Built on <EntityChip node={node} />.
+  Built on <ChipProjection node={node} />.
 </p>
 <ul>
   {edges.map(({ node }) => (
-    <EntityRow key={node.uri} node={node} />
+    <RowProjection key={node.uri} node={node} />
   ))}
 </ul>
 ```
 
-A representation renders no element of its own: its arm renders the root,
-and every arm of one representation renders the same root tag, so the
-representation's native props are that tag's:
+A projection renders no element of its own: its arm renders the root, and
+every arm of one projection renders the same root tag, so the projection's
+native props are that tag's:
 
-| Representation | Root | `children` |
+| Projection | Root | `children` |
 |---|---|---|
-| `EntityChip` | `<span>` | the mention's text, in place of the node's title |
-| `EntityRow` | `<li>` | none: the arm renders the slots |
-| `EntityCard` | `<article>` | none |
-| `EntityCommand` | `<li>` | none |
-| `EntityTitle` | `<hgroup>` | none |
+| `ChipProjection` | `<span>` | the mention's text, in place of the node's title |
+| `RowProjection` | `<li>` | none: the arm renders the slots |
+| `CardProjection` | `<article>` | none |
+| `CommandProjection` | `<li>` | none |
 
 ### Slots
 
@@ -122,8 +159,7 @@ The `Node` arms fill the two every node can: `.title` (`_meta.title`) and
 `.location` (`_meta.curie`, the node's compact address). Each root carries
 the node's class IRI as `data-type`, for styling by class. The title links
 to the node's home when it has one and reads as inert text when it has
-none, except in `EntityTitle`, which never links: a title names the page it
-heads.
+none.
 
 | Arm | Root class | Renders |
 |---|---|---|
@@ -131,7 +167,6 @@ heads.
 | row | `.ds.node-row` | `.title`, then `<code class="location">` |
 | card | `.ds.node-card` | `<h3 class="title">`, then `<p class="location">` |
 | command | `.ds.node-command` | `.title`, then `<span class="location">` |
-| title | `.ds.node-title` | `<h1 class="title">`, then `<p class="location">` |
 
 ## Maps and arms
 
@@ -182,8 +217,8 @@ resolves the nodes a passage links to and serves them as a `NodeConnection`;
 the page spreads `ProseReferencesProvider_references` on it and provides it
 around the prose. `markdownComponents` is the element-override map a
 Markdown renderer takes: its `a` renders a link whose href names one of the
-references as that node's `EntityChip`, labelled with the author's text and
-linked to the node's home, and any other link as the plain anchor its
+references as that node's `ChipProjection`, labelled with the author's
+text and linked to the node's home, and any other link as the plain anchor its
 author wrote.
 
 ```tsx
@@ -204,9 +239,14 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 
 ## Public API
 
+- Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
+  `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
+  `CardProjectionProps`, `CommandProjectionProps`.
 - Representations: `EntityChip`, `EntityRow`, `EntityCard`,
-  `EntityCommand`, `EntityTitle`; types `EntityChipProps`, `EntityRowProps`,
-  `EntityCardProps`, `EntityCommandProps`, `EntityTitleProps`.
+  `EntityCommand`, `EntityGraphNode`, `EntityList`; types
+  `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
+  `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
+  `EntityListProps`, `EntityListView`.
 - Maps: `ProjectionsProvider`, `useProjectionMaps`,
   `defaultProjectionMaps`; types `ProjectionMap`, `ProjectionMaps`,
   `ProjectionsProviderProps`.

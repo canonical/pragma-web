@@ -1,4 +1,4 @@
-import { EntityCard, EntityRow } from "@canonical/prism-projections";
+import { CardProjection, RowProjection } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery, usePaginationFragment } from "react-relay";
 import type { EntityIndex_query$key } from "../../../../__generated__/EntityIndex_query.graphql.js";
@@ -46,8 +46,8 @@ const declareEntityIndexFragment = (): unknown => graphql`
               title
               curie
             }
-            ...EntityRow_node
-            ...EntityCard_node
+            ...RowProjection_node
+            ...CardProjection_node
           }
         }
       }
@@ -66,8 +66,8 @@ const componentCssClassName = "ds entity-index";
  * pages through the class with an explicit "Load more" while the graph has
  * more: cursors are the graph's own, never derived here.
  *
- * Each entry renders through the site's projections (`EntityRow`,
- * `EntityCard`), so a site that maps an arm for the class's type renders its
+ * Each entry renders through the site's projections (`RowProjection`,
+ * `CardProjection`), so a site that maps an arm for the class's type renders its
  * entries its own way, and links each to its home.
  *
  * A class the graph does not know (`ontologyClass` is null) and a class with
@@ -109,13 +109,13 @@ export default function EntityIndex({
       ) : filter.view === "rows" ? (
         <ul className="rows">
           {visible.map(({ node }) => (
-            <EntityRow key={node.uri} node={node} />
+            <RowProjection key={node.uri} node={node} />
           ))}
         </ul>
       ) : (
         <div className="cards">
           {visible.map(({ node }) => (
-            <EntityCard key={node.uri} node={node} />
+            <CardProjection key={node.uri} node={node} />
           ))}
         </div>
       )}

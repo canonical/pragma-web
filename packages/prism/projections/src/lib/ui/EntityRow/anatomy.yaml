@@ -1,0 +1,82 @@
+---
+# EntityRow — the list entry of an entity: a 32px row in an index.
+# Reference: the projection matrix's in-page list entry (the namespace prefix
+# muted, the title, and a muted word right-aligned, on a 24px line with 4px
+# block insets). Slot order: location, title, then meta at the end.
+#
+# The row sets the context's primary text on the matrix's 24px line, the
+# line every representation shares, so it is 32px in every context.
+#
+# The matrix's 24px and 8px inline insets are its navigation's indentation;
+# the row sets none, so its text sits on the column line of the list that
+# holds it.
+#
+# The identity clips along its line only, so nothing it holds is cut above
+# or below: a chip in the title is 28px, and its line grows to hold it (the
+# row is then 36px).
+#
+# A linked title reads as the row's text: the text's colour, underlined on
+# hover, its focus ring drawn inside it since the identity clips; the
+# states apply to the link alone.
+#
+# Why not a published component: no published list entry exists.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-row-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind):
+#   space.050 (4px) for the block insets: a 32px entry on a 24px line; the
+#   shim's block component padding (8px) would make it 40px.
+#   --entity-row-focus-ring-width: 2px, --entity-row-focus-ring-offset: -2px
+#                                      the link's ring, drawn inside it since the identity clips.
+#   space.300 (24px) for the line height: the matrix's line; no typography
+#   token is 24px in every context (the docs' primary line is 20px).
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050,
+# space.300 (a line height), and the semantic typography symbol
+# typography.text.primary.fontSize.
+node:
+  uri: prism.component.entity_row
+  styles:
+    layout.type: flex
+    layout.align: baseline
+    layout.justify: space-between
+    spacing.gap: grid.gutter
+    spacing.internal.block.start: space.050
+    spacing.internal.block.end: space.050
+    layout.listStyle: none
+    typography.size: typography.text.primary.fontSize
+    typography.lineHeight: space.300
+  edges:
+    - node:
+        role: identity
+        styles:
+          layout.overflow.inline: clip
+          size.min.width: 0
+          typography.overflow: ellipsis
+          typography.whiteSpace: nowrap
+        edges:
+          - node:
+              role: location
+              styles:
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: location }
+          - node:
+              role: title
+              styles:
+                typography.color: inherit
+                typography.decoration: none
+                typography.decoration@hover: underline
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
+            relation: { cardinality: "1", slotName: title }
+      relation: { cardinality: "1", slotName: identity }
+    - node:
+        role: meta
+        styles:
+          typography.color: color.text.muted
+          typography.align: end
+          typography.whiteSpace: nowrap
+      relation: { cardinality: "0..1", slotName: meta }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<da205336a4a0498ac4e5bad9133cd9dc>>
+ * @generated SignedSource<<6610bb1cd86976b942c25817a8c2f9ce>>
  * @lightSyntaxTransform
  */
 
@@ -14,7 +14,7 @@ export type ShellTestsQuery$variables = {
 };
 export type ShellTestsQuery$data = {
   readonly node: {
-    readonly " $fragmentSpreads": FragmentRefs<"EntityChip_node">;
+    readonly " $fragmentSpreads": FragmentRefs<"ChipProjection_node">;
   } | null | undefined;
 };
 export type ShellTestsQuery = {
@@ -62,7 +62,7 @@ return {
           {
             "args": null,
             "kind": "FragmentSpread",
-            "name": "EntityChip_node"
+            "name": "ChipProjection_node"
           }
         ],
         "storageKey": null
@@ -140,16 +140,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "8f4ba50404cd473b3f5c3412397f9945",
+    "cacheID": "9737c5930c001e28499335fae3c1a68b",
     "id": null,
     "metadata": {},
     "name": "ShellTestsQuery",
     "operationKind": "query",
-    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...EntityChip_node\n    uri\n  }\n}\n\nfragment EntityChip_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    curie\n  }\n  ...NodeChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  _meta {\n    title\n    curie\n    type {\n      uri\n    }\n  }\n}\n"
+    "text": "query ShellTestsQuery(\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...ChipProjection_node\n    uri\n  }\n}\n\nfragment ChipProjection_node on Node {\n  __isNode: __typename\n  __typename\n  _meta {\n    curie\n  }\n  ...NodeChip_node\n}\n\nfragment NodeChip_node on Node {\n  __isNode: __typename\n  _meta {\n    title\n    curie\n    type {\n      uri\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "8de286debcd39f25d301389635fc9a61";
+(node as any).hash = "b3e95482039812dd5b6b4fda0893ec66";
 
 export default node;

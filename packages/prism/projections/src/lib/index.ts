@@ -5,16 +5,12 @@
  * @module
  */
 
-export type { EntityCardProps } from "./EntityCard/index.js";
-export { EntityCard } from "./EntityCard/index.js";
-export type { EntityChipProps } from "./EntityChip/index.js";
-export { EntityChip } from "./EntityChip/index.js";
-export type { EntityCommandProps } from "./EntityCommand/index.js";
-export { EntityCommand } from "./EntityCommand/index.js";
-export type { EntityRowProps } from "./EntityRow/index.js";
-export { EntityRow } from "./EntityRow/index.js";
-export type { EntityTitleProps } from "./EntityTitle/index.js";
-export { EntityTitle } from "./EntityTitle/index.js";
+export type { CardProjectionProps } from "./CardProjection/index.js";
+export { CardProjection } from "./CardProjection/index.js";
+export type { ChipProjectionProps } from "./ChipProjection/index.js";
+export { ChipProjection } from "./ChipProjection/index.js";
+export type { CommandProjectionProps } from "./CommandProjection/index.js";
+export { CommandProjection } from "./CommandProjection/index.js";
 export type {
   ProseLinkProps,
   ProseReferencesProviderProps,
@@ -33,3 +29,23 @@ export {
   ProjectionsProvider,
   useProjectionMaps,
 } from "./projections/index.js";
+export type { RowProjectionProps } from "./RowProjection/index.js";
+export { RowProjection } from "./RowProjection/index.js";
+export type {
+  EntityCardKeyValue,
+  EntityCardProps,
+  EntityChipProps,
+  EntityCommandProps,
+  EntityGraphNodeProps,
+  EntityListProps,
+  EntityListView,
+  EntityRowProps,
+} from "./ui/index.js";
+export {
+  EntityCard,
+  EntityChip,
+  EntityCommand,
+  EntityGraphNode,
+  EntityList,
+  EntityRow,
+} from "./ui/index.js";

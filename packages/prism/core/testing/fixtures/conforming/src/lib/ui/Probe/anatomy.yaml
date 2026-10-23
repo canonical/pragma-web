@@ -1,7 +1,8 @@
 ---
 # Probe — a fixture the checks run against: a grid with one labelled
-# child, a hover state and a reflow below one group, every decision read
-# through a component token.
+# child and a link reached through its body, a hover and a selected state,
+# a reflow below one group and one that drops the label's rule when the
+# body follows it, every decision read through a component token.
 node:
   uri: prism.component.probe
   styles:
@@ -12,9 +13,21 @@ node:
     appearance.radius: 0.25rem
     typography.color: color.text
     typography.color@hover: color.text.muted
+    typography.color@selected: color.text.muted
   edges:
     - node:
         role: label
         styles:
           typography.weight: typography.text.primary.bold.fontWeight
+          typography.variant.caps: all-small-caps
       relation: { cardinality: "1", slotName: label }
+    - node:
+        role: body
+        edges:
+          - node:
+              role: link
+              styles:
+                typography.decoration: none
+                typography.decoration@hover: underline
+            relation: { cardinality: "0..1", slotName: link }
+      relation: { cardinality: "1" }
