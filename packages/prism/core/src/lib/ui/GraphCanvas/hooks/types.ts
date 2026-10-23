@@ -1,6 +1,7 @@
 import type { RefObject } from "react";
 import type {
   GraphBox,
+  GraphCameraMemory,
   GraphFrameRequest,
   GraphLegibleWindow,
   GraphOpening,
@@ -27,6 +28,8 @@ export interface UseGraphCameraProps {
   readonly reveal: GraphBox | undefined;
   /** Where the camera opens once the viewport is measured. */
   readonly opening: GraphOpening | undefined;
+  /** Where the camera keeps its place and resumes it from. */
+  readonly memory: RefObject<GraphCameraMemory | undefined> | undefined;
 }
 
 /** What `useGraphCamera` returns: the zoom's reading and its controls. */

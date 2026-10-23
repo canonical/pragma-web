@@ -85,9 +85,11 @@ function prefersReducedMotion(): boolean {
  * It reads the zoom bucket and the percentage from the world's on-screen
  * scale, measured on the client, and re-measures when the viewport
  * resizes. The first time it measures the viewport it moves, at once, to
- * the camera `opening` chooses, if any, and it opens again for the new size
- * when a resize shrinks the on-screen scale below the legible zoom before
- * anything has moved the camera since. When `fit` changes it fits that
+ * the camera `memory` keeps, with `reveal` panned into view, or else to
+ * the camera `opening` chooses, if any, and it opens again for the new
+ * size when a resize shrinks the on-screen scale below the legible zoom
+ * before anything has moved the camera since. It keeps every camera it
+ * measures in `memory`, in screen terms. When `fit` changes it fits that
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
  * illegible one: a box too large for the legible zoom shows the window of
@@ -98,8 +100,8 @@ function prefersReducedMotion(): boolean {
  * 200ms, and is instant under reduced motion.
  *
  * @note Impure: attaches d3-zoom's listeners and a resize observer to the
- *   viewport in an effect, removed on unmount, measures the viewport, and
- *   writes the camera group's `transform` attribute.
+ *   viewport in an effect, removed on unmount, measures the viewport,
+ *   writes the camera group's `transform` attribute and the memory's camera.
  */
 export default function useGraphCamera({
   viewport,
@@ -111,6 +113,7 @@ export default function useGraphCamera({
   legibleWindow,
   reveal,
   opening,
+  memory,
 }: UseGraphCameraProps): UseGraphCameraResult {
   const [bucket, setBucket] = useState<GraphZoomBucket>("full");
   const [percent, setPercent] = useState<number | undefined>(undefined);
@@ -126,6 +129,7 @@ export default function useGraphCamera({
     legibleWindow,
     reveal,
     opening,
+    memory,
   });
   latest.current = {
     viewBox,
@@ -135,6 +139,7 @@ export default function useGraphCamera({
     legibleWindow,
     reveal,
     opening,
+    memory,
   };
 
   const viewBoxKey = formatBox(viewBox);
@@ -233,35 +238,72 @@ export default function useGraphCamera({
     // Whether the camera still stands where it opened: no gesture, control
     // or target has moved it since.
     let unmoved = false;
-    // Whether the camera is moving to its opening, which moves nothing the
-    // reader chose.
+    // Whether the camera is moving to its opening or resuming, which moves
+    // nothing the reader chose.
     let isOpening = false;
     // The on-screen scale of the last reading, against which a resize is
     // judged to have shrunk the view.
     let lastScreen: number | undefined;
-    // Move the camera, at once, to where `opening` asks for the visible
-    // area and scale; nowhere when it asks for nothing. Either way the
-    // camera then stands unmoved.
+    // Move the camera, at once, to a target nothing the reader chose,
+    // lowering the zoom's floor to it when it lies below.
+    const place = (target: GraphTransform): void => {
+      const [floor, ceiling] = active.scaleExtent();
+      active.scaleExtent([Math.min(floor, target.k), ceiling]);
+      isOpening = true;
+      active.transform(
+        select(svg),
+        zoomIdentity.translate(target.x, target.y).scale(target.k),
+      );
+      isOpening = false;
+    };
+    // Resume the camera the memory keeps, for the visible area and scale,
+    // with the revealed box panned into view; say whether there was one.
+    const resume = (visible: GraphBox, scale: number): boolean => {
+      const kept = latest.current.memory?.current;
+      if (kept === undefined) return false;
+      const restored: GraphTransform = {
+        k: kept.camera.k / scale,
+        x: kept.camera.x / scale + visible.x,
+        y: kept.camera.y / scale + visible.y,
+      };
+      const box = latest.current.reveal;
+      const revealed =
+        box === undefined
+          ? undefined
+          : computeRevealTransform(visible, restored, box);
+      unmoved = !kept.moved && revealed === undefined;
+      place(revealed ?? restored);
+      return true;
+    };
+    // Move the camera to where `opening` asks for the visible area and
+    // scale; nowhere when it asks for nothing. Either way the camera then
+    // stands unmoved.
     const open = (visible: GraphBox, scale: number): boolean => {
       const target = latest.current.opening?.(visible, scale);
-      if (target !== undefined) {
-        const [floor, ceiling] = active.scaleExtent();
-        active.scaleExtent([Math.min(floor, target.k), ceiling]);
-        isOpening = true;
-        active.transform(
-          select(svg),
-          zoomIdentity.translate(target.x, target.y).scale(target.k),
-        );
-        isOpening = false;
-      }
       unmoved = true;
+      if (target !== undefined) place(target);
       return target !== undefined;
+    };
+    // Keep the camera in the memory, in screen terms.
+    const remember = (visible: GraphBox, scale: number): void => {
+      const memory = latest.current.memory;
+      if (memory === undefined) return;
+      const { k, x, y } = current.current;
+      memory.current = {
+        camera: {
+          k: k * scale,
+          x: (x - visible.x) * scale,
+          y: (y - visible.y) * scale,
+        },
+        moved: !unmoved,
+      };
     };
     // Read the zoom's scale against the viewport's size into the bucket and
     // the percentage; each changes state only when its value changes. The
-    // first measured reading opens the camera where `opening` asks, and so
-    // does a resize that shrinks an unmoved camera's view below the
-    // legible zoom.
+    // first measured reading resumes the camera the memory keeps or opens
+    // it where `opening` asks, and a resize that shrinks an unmoved
+    // camera's view below the legible zoom opens it again. Every measured
+    // reading keeps the camera in the memory.
     const readScale = (): void => {
       const { scale, visible, measured } = measureViewport(
         svg,
@@ -274,10 +316,12 @@ export default function useGraphCamera({
         screen < lastScreen &&
         screen < HUBS_SCALE;
       if (measured && !isOpening && (!opened || shrunk)) {
+        const resumed = !opened && resume(visible, scale);
         opened = true;
-        if (open(visible, scale)) return;
+        if (resumed || open(visible, scale)) return;
       }
       lastScreen = screen;
+      if (measured) remember(visible, scale);
       setBucket(classifyZoomBucket(screen));
       setPercent(Math.round(screen * 100));
     };

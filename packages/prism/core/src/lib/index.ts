@@ -45,6 +45,7 @@ export type {
   DocumentLayoutProps,
   ErrorBoundaryProps,
   GraphBox,
+  GraphCameraMemory,
   GraphCanvasProps,
   GraphFrameRequest,
   GraphLegibleWindow,

@@ -41,7 +41,10 @@ function nameLattice(label: string): string {
  * `frame` request fits its box once per serial; neither a changed `fit`
  * nor a frame zooms a legible view out to an illegible one, showing the
  * window of a box too large for it that `legibleWindow` chooses. When `reveal`
- * changes the camera pans it into view if it is not already.
+ * changes the camera pans it into view if it is not already. A canvas given
+ * a `memory` keeps its camera there, and a canvas mounted again on it
+ * resumes the reader's view, panning `reveal` into view, in place of the
+ * opening.
  *
  * The drawing reads the zoom bucket through `useGraphZoomBucket`, so it
  * shows only the text that renders at 12px or more on screen; the lattice
@@ -62,6 +65,7 @@ export default function GraphCanvas({
   fit,
   frame,
   legibleWindow,
+  memory,
   reveal,
   hint,
   className,
@@ -82,6 +86,7 @@ export default function GraphCanvas({
     legibleWindow,
     reveal,
     opening,
+    memory,
   });
   const latticeId = nameLattice(label);
 

@@ -13,7 +13,7 @@ import type { MouseEvent } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import GraphCanvas from "./GraphCanvas.js";
 import useGraphZoomBucket from "./hooks/useGraphZoomBucket.js";
-import type { GraphBox } from "./types.js";
+import type { GraphBox, GraphCameraMemory } from "./types.js";
 
 const VIEW_BOX: GraphBox = { x: 0, y: 0, width: 800, height: 600 };
 
@@ -574,6 +574,107 @@ describe("GraphCanvas", () => {
       </GraphCanvas>,
     );
     expect(readCamera()).toBe("translate(-680,-492) scale(1.44)");
+  });
+
+  it("keeps its camera in a memory, in screen terms, and resumes it when mounted again", () => {
+    const memory: { current: GraphCameraMemory | undefined } = {
+      current: undefined,
+    };
+    const opening = vi.fn(() => ({ k: 1, x: 0, y: 0 }));
+    const first = render(
+      <GraphCanvas
+        label="Class graph"
+        memory={memory}
+        opening={opening}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(memory.current).toEqual({
+      camera: { k: 1, x: 0, y: 0 },
+      moved: false,
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(memory.current).toEqual({
+      camera: { k: 1.2, x: -80, y: -60 },
+      moved: true,
+    });
+    first.unmount();
+    opening.mockClear();
+    // A viewBox twice the size halves the scale, so the same view on screen
+    // is twice the zoom in user units.
+    render(
+      <GraphCanvas
+        label="Class graph"
+        memory={memory}
+        opening={opening}
+        viewBox={{ x: 0, y: 0, width: 1600, height: 1200 }}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(opening).not.toHaveBeenCalled();
+    expect(readCamera()).toBe("translate(-160,-120) scale(2.4)");
+    expect(screen.getByRole("status").textContent).toBe("120%");
+  });
+
+  it("counts a resumed camera nothing had moved as unmoved", () => {
+    let resize: () => void = () => undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      },
+    );
+    const memory: { current: GraphCameraMemory | undefined } = {
+      current: { camera: { k: 1, x: 0, y: 0 }, moved: false },
+    };
+    const opening = vi.fn((_visible: GraphBox, scale: number) => ({
+      k: 1 / scale,
+      x: 0,
+      y: 0,
+    }));
+    render(
+      <GraphCanvas
+        label="Class graph"
+        memory={memory}
+        opening={opening}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(opening).not.toHaveBeenCalled();
+    stubViewportSize(400, 300);
+    act(() => resize());
+    expect(opening).toHaveBeenCalledExactlyOnceWith(VIEW_BOX, 0.5);
+  });
+
+  it("pans the revealed box into view as it resumes, without zooming", () => {
+    const memory: { current: GraphCameraMemory | undefined } = {
+      current: { camera: { k: 1.2, x: -80, y: -60 }, moved: true },
+    };
+    render(
+      <GraphCanvas
+        label="Class graph"
+        memory={memory}
+        reveal={{ x: 700, y: 500, width: 100, height: 100 }}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(readCamera()).toMatch(/ scale\(1\.2\)$/);
+    expect(readCamera()).not.toBe("translate(-80,-60) scale(1.2)");
+    const { camera } = memory.current ?? { camera: { k: 0, x: 0, y: 0 } };
+    // The box's far corner lies inside the viewport.
+    expect(800 * camera.k + camera.x).toBeLessThanOrEqual(800);
+    expect(600 * camera.k + camera.y).toBeLessThanOrEqual(600);
   });
 
   it("moves the camera in a short transition without reduced motion", async () => {

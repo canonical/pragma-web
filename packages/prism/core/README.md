@@ -345,7 +345,9 @@ site's own catalog, and the factory holds no reader-facing string.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
   lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
   show only the text that renders at 12px or more; types
-  `GraphCanvasProps`, `GraphBox`, `GraphFrameRequest` (a one-off fit the
+  `GraphCanvasProps`, `GraphBox`, `GraphCameraMemory` (where a camera
+  stood, in screen terms, which a canvas mounted again on the same memory
+  resumes), `GraphFrameRequest` (a one-off fit the
   camera makes once per serial), `GraphLegibleWindow` (the window a refit
   shows of a box too large for the legible zoom), `GraphOpening` (the
   camera a canvas opens on once the client has measured it, and again when
