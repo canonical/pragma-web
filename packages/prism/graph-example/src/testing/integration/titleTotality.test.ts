@@ -13,10 +13,10 @@ import { describe, expect, it } from "vitest";
 import {
   BARE_ENTITY_URI,
   createExampleProvider,
-  EMPTY_LOCAL_NAME_URI,
   exampleDataset,
   isNetworkEntity,
 } from "../../lib/provider/index.js";
+import { EMPTY_LOCAL_NAME_DATASET, EMPTY_LOCAL_NAME_URI } from "../fixtures.js";
 
 const provider = createExampleProvider();
 
@@ -396,9 +396,12 @@ describe("the two entities that have nothing to be titled from", () => {
   });
 
   it("titles the entity whose IRI has an empty local name", async () => {
-    const result = await execute(
-      `{ node(id: "${EMPTY_LOCAL_NAME_URI}") { _meta { title } } }`,
-    );
+    const custom = createExampleProvider(EMPTY_LOCAL_NAME_DATASET);
+    const result = await graphql({
+      schema: custom.schema,
+      source: `{ node(id: "${EMPTY_LOCAL_NAME_URI}") { _meta { title } } }`,
+      rootValue: custom.rootValue,
+    });
     expect(result.data).toEqual({
       node: { _meta: { title: EMPTY_LOCAL_NAME_URI } },
     });

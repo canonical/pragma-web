@@ -32,10 +32,10 @@ export const ZONE_CLASS_CURIE = "geo:Zone";
 export const ZONE_TITLE = "Central Zone";
 
 /**
- * How many instances `metro:Station` has: 23 stations, two of them bare, and
+ * How many instances `metro:Station` has: 22 stations, one of them bare, and
  * 4 interchanges.
  */
-export const STATION_COUNT = 27;
+export const STATION_COUNT = 26;
 
 /** How many of the stations are interchanges. */
 export const INTERCHANGE_COUNT = 4;

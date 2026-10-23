@@ -103,7 +103,7 @@ and a data file" literally true.
 | `rdfs:Class`, the metaclass | `EntityMeta.type` on an `OntologyClass` — see Finding B |
 | `geo:Zone` with real instances, in the **second** namespace | `_meta.curie` must resolve a prefix per entity, not hardcode one |
 | `metro:name` (DATATYPE, no domain), `metro:servesLine` (OBJECT, with `inverse`), `metro:note` (ANNOTATION) | all three `PropertyKind` values, `functional`, `inverse`, nullable `domain` |
-| 23 stations + 4 interchanges + 2 fare zones, 7 lines | `instances(first/after/last/before)` with real `hasNextPage` |
+| 22 stations + 4 interchanges + 2 fare zones, 7 lines | `instances(first/after/last/before)` with real `hasNextPage` |
 | four line topologies: linear lines (North, Coastal), a loop run both ways (Circle), two linear lines closing a ring between shared termini (Upland, Lowland), a ring run by two lines in opposite directions (Ringway Clockwise, Ringway Anticlockwise) | the network model a map or a line strip needs — see the network section |
 | `metro:Route`, `metro:Call`, `metro:DiagramPoint`, `metro:UnitPosition`, `metro:CarPosition`, value classes with no instances | `_meta` on a value type: `type` resolved, `curie` the typename, `title` the label or the typename |
 | `metro:RollingStock`, `metro:Formation`, `metro:Unit`, `metro:CarType`, further root classes: 3 stocks, 4 formations, 3 units and 7 car types | Nodes beyond the network, reached through `node(id:)` and `OntologyClass.instances` alone |
@@ -111,7 +111,7 @@ and a data file" literally true.
 | `metro:code`, `metro:position`, `metro:formations`, `metro:length`, `metro:capacity`, `metro:reversed`, global properties two types answer to | a property's local name is the field it projects, so a field two types share is one property with no `domain` |
 | `metro:reverse`, declared its own `inverse` | a symmetric property: `OntologyProperty.inverse` pointing at itself |
 | `metro:ghost` — **no descriptive predicates at all** | the local-name tier of `_meta.title` |
-| `https://metro.example/onto#` — **IRI with an empty local name** | the whole-IRI tier of `_meta.title` |
+| a test-only station at `https://metro.example/onto#` — **IRI with an empty local name**, never served: the namespace IRI is the ontology's own address | the whole-IRI tier of `_meta.title` |
 | `geo:GeoPoint`, an embeddable with no `uri` | the typename tier of `_meta.title` |
 | a station labelled `{"": "Northgate", "fr": "Porte-Nord"}` | `title(lang:)` / `label(lang:)` are genuinely implemented, not accepted and ignored |
 | instance IRIs that live **inside** the declared namespaces | `_meta.curie` can compact at all — see the curie section |
@@ -148,7 +148,7 @@ reached through `node(id:)` and `OntologyClass.instances` like the rest.
   `x` grows east and `y` grows south, the orientation of a screen, so a drawing needs no
   flip; the network is anchored so its smallest `x` and `y` are both 0. Every segment
   between consecutive calls, and the closing segment of a loop, is horizontal, vertical
-  or diagonal. The 25 routed stations have a position; the two bare stations have none.
+  or diagonal. The 25 routed stations have a position; the bare station has none.
 - **`servesLine` and `servedBy` agree with the calls.** Each is stated in the dataset,
   and `src/testing/integration/lineMembership.test.ts` derives each from the routes and
   requires them to match. A station where lines serving different stops meet is an

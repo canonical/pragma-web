@@ -14,11 +14,8 @@
  */
 
 import { METRO_NAMESPACE } from "../lib/provider/constants.js";
-import {
-  BARE_ENTITY_URI,
-  EMPTY_LOCAL_NAME_URI,
-} from "../lib/provider/dataset.js";
-import type { SearchEntry } from "../lib/provider/types.js";
+import { BARE_ENTITY_URI, exampleDataset } from "../lib/provider/dataset.js";
+import type { ExampleDataset, SearchEntry } from "../lib/provider/types.js";
 import type { ExtractionCase, RankingCase } from "./types.js";
 
 /** A class every lens that looks a term up can be pointed at. */
@@ -399,10 +396,31 @@ export const DIRECTIONAL_RING_LINE_URIS = [
 ] as const;
 
 /** The stations no route calls at, which therefore have no diagram position. */
-export const BARE_STATION_URIS = [
-  BARE_ENTITY_URI,
-  EMPTY_LOCAL_NAME_URI,
-] as const;
+export const BARE_STATION_URIS = [BARE_ENTITY_URI] as const;
+
+/**
+ * An IRI whose local name is empty: the metro namespace itself. The served
+ * graph holds no entity here, since the address is the ontology's own; only
+ * {@link EMPTY_LOCAL_NAME_DATASET} does.
+ */
+export const EMPTY_LOCAL_NAME_URI = METRO_NAMESPACE;
+
+/**
+ * The example dataset plus one station at {@link EMPTY_LOCAL_NAME_URI}, the
+ * deepest fallback tier of a Node: its curie compacts to a bare `metro:` and
+ * its title falls through to the whole IRI.
+ */
+export const EMPTY_LOCAL_NAME_DATASET: ExampleDataset = {
+  ...exampleDataset,
+  entities: [
+    ...exampleDataset.entities,
+    {
+      uri: EMPTY_LOCAL_NAME_URI,
+      type: `${METRO_NAMESPACE}Station`,
+      typename: "Station",
+    },
+  ],
+};
 
 /** A rolling stock that runs in one fixed formation of one unit. */
 export const FIXED_FORMATION_STOCK_URI = `${METRO_NAMESPACE}series-70`;
