@@ -47,10 +47,15 @@
     overflow: hidden;
   }
 
-  /* The inspector holds the last three columns and scrolls on its own. */
+  /* The inspector holds the last three columns and scrolls on its own; it
+   * is a subgrid of them, so what it holds can sit on their lines. */
   .ds.workspace-layout > .inspector {
     grid-column: -4 / -1;
     grid-row: -2 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    align-content: start;
+    gap: var(--workspace-layout-gap);
     overflow-y: auto;
     min-block-size: 0;
   }

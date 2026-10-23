@@ -52,8 +52,9 @@ each a subgrid over every column:
 
 - `WorkspaceLayout`: a page that fills the viewport and never scrolls. The
   rail takes the first two columns, the strip the rest of the top row, the
-  canvas the body, and an `inspector` the last three columns of the body;
-  the rail and the inspector scroll on their own. Below three groups of
+  canvas the body, and an `inspector` the last three columns of the body,
+  a subgrid of them its content can sit on; the rail and the inspector
+  scroll on their own. Below three groups of
   columns the inspector moves into the published `SidePanel` drawer, which
   a trigger at the canvas's corner opens.
 - `DocumentLayout`: a page whose canvas is the one scrolling region, with

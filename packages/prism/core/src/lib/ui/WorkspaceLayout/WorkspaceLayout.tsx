@@ -18,7 +18,8 @@ const componentCssClassName = "ds workspace-layout";
  * rows: the strip row and the body row. The rail takes the first two
  * columns of both rows and scrolls on its own; the strip spans the rest of
  * its row; the canvas fills the body and never scrolls; and the inspector
- * holds the last three columns of the body and scrolls on its own.
+ * holds the last three columns of the body, as a subgrid of them that its
+ * content can sit on, and scrolls on its own.
  *
  * Below three groups of columns the inspector region leaves the grid, the
  * canvas takes every column east of the rail, and a trigger at the end of
