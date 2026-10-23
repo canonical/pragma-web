@@ -21,6 +21,11 @@ export {
 } from "./markdown/index.js";
 export { defaultProjectionMaps } from "./node/index.js";
 export type {
+  OntologyClassCardProps,
+  OntologyClassChipProps,
+  OntologyClassCommandProps,
+  OntologyClassGraphNodeProps,
+  OntologyClassRowProps,
   OntologyPropertyCardProps,
   OntologyPropertyChipProps,
   OntologyPropertyCommandProps,
@@ -28,6 +33,11 @@ export type {
   OntologyPropertyRowProps,
 } from "./ontology/index.js";
 export {
+  OntologyClassCard,
+  OntologyClassChip,
+  OntologyClassCommand,
+  OntologyClassGraphNode,
+  OntologyClassRow,
   OntologyPropertyCard,
   OntologyPropertyChip,
   OntologyPropertyCommand,

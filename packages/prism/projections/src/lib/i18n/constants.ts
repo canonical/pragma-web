@@ -12,6 +12,13 @@ export const MESSAGES = {
   "entity.parent": "{title} ∈ {parent}",
   "entity.subclass": "{title} ⊂ {parent}",
   "entity.context": "{kind} in {location}",
+  "class.kind": "Class",
+  "class.kind.abstract": "Abstract class",
+  "class.abstract": "abstract",
+  "class.instances": {
+    one: "used in {count} instance",
+    other: "used in {count} instances",
+  },
   "property.kind.object": "Object property",
   "property.kind.datatype": "Datatype property",
   "property.kind.annotation": "Annotation property",

@@ -80,6 +80,11 @@ describe("the package's components", () => {
 
   it("and the projections, each under its type's subject folder", () => {
     expect(projectionFolders.map((folder) => basename(folder))).toEqual([
+      "OntologyClassCard",
+      "OntologyClassChip",
+      "OntologyClassCommand",
+      "OntologyClassGraphNode",
+      "OntologyClassRow",
       "OntologyPropertyCard",
       "OntologyPropertyChip",
       "OntologyPropertyCommand",
