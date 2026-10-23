@@ -1,66 +1,82 @@
+@import url("@canonical/styles/spacing-seat.css");
+@import url("@canonical/styles/stroke-paint.css");
+
 /* component styles
  * Layer: ds.components.apps-lxd (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.apps-lxd {
-  /* component variables
-      --button-color-background: background color of the button
-      --button-color-background-hover: background color of the button on hover
-      --button-color-background-active: background color of the button on active
-      --button-color-text: text color of the button
-      --button-color-border: border color of the button
-      --button-color-border-hover: border color of the button on hover
-      --button-color-border-active: border color of the button on active
-
-      --button-margin-left: left margin of the button
-      --button-margin-bottom: bottom margin of the button
-      --button-padding-vertical: vertical padding of the button
-      --button-padding-horizontal: horizontal padding of the button
-      --button-border-width: border width of the button
-      --button-font-size: font size of the button
-      --button-font-weight: font weight of the button
-      --button-line-height: line height of the button
-  */
   .ds.button {
+    --button-font-size: var(--ds-typography-body-font-size);
+    --button-line-height: var(--ds-typography-body-line-height);
+    --button-padding-inline-start: var(--ds-spacing-action);
+    --button-padding-inline-end: var(--ds-spacing-action);
+    --button-border-width: var(--dimension-stroke-thickness-medium);
+    --ds-control-seat-font-size: var(--button-font-size);
+    --ds-control-seat-line-height: var(--button-line-height);
+    --ds-stroke-width: var(--button-border-width);
+    --ds-stroke-color: var(
+      --modifier-color-border,
+      var(--button-color-border, currentColor)
+    );
+    --ds-focus-width: var(--focus-outline-width, 2px);
+    --ds-focus-color: var(
+      --modifier-color-focus-ring,
+      var(--color-focus-ring, currentColor)
+    );
+    --ds-focus-offset: var(--focus-outline-offset, 2px);
+
+    box-sizing: border-box;
     display: inline-block;
     cursor: pointer;
 
     color: var(--modifier-color-text, var(--button-color-text));
     background-color: var(--modifier-color, var(--button-color-background));
-    border-color: var(--modifier-color-border, var(--button-color-border));
-    border-style: solid;
-    border-width: var(--button-border-width);
-    font-size: var(--button-font-size);
+    border-radius: 0;
     font-weight: var(--button-font-weight);
-    line-height: var(--button-line-height);
-    margin-block-end: var(--button-margin-bottom);
-    margin-inline-end: var(--button-margin-left);
-    padding-block: var(--button-padding-vertical);
-    padding-inline: var(--button-padding-horizontal);
+    padding-inline: var(--button-padding-inline-start)
+      var(--button-padding-inline-end);
 
     text-align: left;
     text-decoration: none;
 
-    /* component states */
     &:hover {
+      --ds-stroke-color: var(
+        --modifier-color-border-hover,
+        var(--button-color-border-hover, currentColor)
+      );
+
       background-color: var(
         --modifier-color-hover,
         var(--button-color-background-hover)
       );
-      border-color: var(
-        --modifier-color-border-hover,
-        var(--button-color-border-hover)
-      );
     }
 
     &:active {
+      --ds-stroke-color: var(
+        --modifier-color-border-active,
+        var(--button-color-border-active, currentColor)
+      );
+
       background-color: var(
         --modifier-color-active,
         var(--button-color-background-active)
       );
-      border-color: var(
-        --modifier-color-border-active,
-        var(--button-color-border-active)
-      );
+    }
+  }
+
+  .ds.button.link {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    font-size: var(--button-font-size);
+    line-height: var(--button-line-height);
+    margin-block: 0;
+    padding: 0;
+    text-decoration: underline;
+
+    &:hover,
+    &:active {
+      background-color: transparent;
     }
   }
 }

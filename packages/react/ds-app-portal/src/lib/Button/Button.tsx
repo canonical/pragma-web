@@ -13,7 +13,13 @@ const Button = ({
   return (
     <button
       id={id}
-      className={["ds", "button", appearance, className]
+      className={[
+        "ds",
+        "button",
+        appearance,
+        appearance !== "link" && "spacing-control-seat stroke-paint stroke",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
       style={style}
