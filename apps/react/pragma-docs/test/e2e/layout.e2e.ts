@@ -11,8 +11,11 @@
  * 390px too; twelve columns at 1440px and four at 390px; a workspace canvas
  * that never scrolls; a document whose only scrolling regions are its
  * canvas and its rail, and whose page's first element spans the whole main
- * column; a catalog whose cards fill their rows; and every gap, padding and
- * margin of the chrome a multiple of 4px.
+ * column; a catalog whose cards fill their rows; a canvas that starts one
+ * gutter under the strip, or at the viewport's top with no strip; bands,
+ * the strip's and the colophon's, that run from the rail's border to the
+ * viewport's edge with their content on the canvas's first column line;
+ * and every gap, padding and margin of the chrome a multiple of 4px.
  */
 import {
   launchBrowser,
@@ -84,6 +87,25 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       );
       expect(layout.overflow, theme).toEqual([]);
       expect(layout.regionOverflow.rail, theme).toBe("auto");
+      const { edges } = layout;
+      expect(edges.canvasTop, theme).toBeCloseTo(
+        edges.stripBottom === null ? 0 : edges.stripBottom + edges.rowGap,
+        1,
+      );
+      for (const band of layout.bands) {
+        expect(band.start, `${theme} ${band.element}`).toBeCloseTo(
+          edges.railEnd,
+          1,
+        );
+        expect(band.end, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
+        expect(band.contentStart, `${theme} ${band.element}`).toBeCloseTo(
+          edges.canvasStart,
+          1,
+        );
+      }
       expect(
         layout.offGrid,
         `${theme} spacing histogram: ${JSON.stringify(layout.histogram)}`,
