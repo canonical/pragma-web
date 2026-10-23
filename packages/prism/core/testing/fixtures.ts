@@ -462,3 +462,79 @@ export const SWITCHED_FRAGMENT: ReaderFragment = {
     },
   ],
 };
+
+/**
+ * A projected anatomy that reads through a connection, as an anatomy spells
+ * it: a family's title and each member's URI, the relation naming the
+ * connection's field alone, never its edges and nodes.
+ */
+export const CONNECTION_ANATOMY = `---
+node:
+  uri: prism.component.connection_probe
+  projection:
+    on: Family
+  edges:
+    - node:
+        role: title
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "1"
+        slotName: title
+    - node:
+        role: member
+        projection:
+          field: uri
+      relation:
+        cardinality: "0..*"
+        slotName: members
+        projection:
+          field: members
+`;
+
+/**
+ * The compiled reader artifact of the fragment {@link CONNECTION_ANATOMY}
+ * derives, its members read as a connection:
+ * `fragment ConnectionProbe_node on Family { __typename _meta { title } members(first: 2) { edges { node { uri } } } }`.
+ */
+export const CONNECTION_FRAGMENT: ReaderFragment = {
+  kind: "Fragment",
+  name: "ConnectionProbe_node",
+  type: "Family",
+  metadata: null,
+  argumentDefinitions: [],
+  selections: [
+    { kind: "ScalarField", name: "__typename" },
+    {
+      kind: "LinkedField",
+      name: "_meta",
+      plural: false,
+      selections: [{ kind: "ScalarField", name: "title" }],
+    },
+    {
+      kind: "LinkedField",
+      name: "members",
+      args: [{ kind: "Literal", name: "first", value: 2 }],
+      concreteType: "MemberConnection",
+      plural: false,
+      storageKey: "members(first:2)",
+      selections: [
+        {
+          kind: "LinkedField",
+          name: "edges",
+          concreteType: "MemberEdge",
+          plural: true,
+          selections: [
+            {
+              kind: "LinkedField",
+              name: "node",
+              concreteType: "Member",
+              plural: false,
+              selections: [{ kind: "ScalarField", name: "uri" }],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};

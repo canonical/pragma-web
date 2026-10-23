@@ -6,6 +6,8 @@ import { parseAnatomyYAML } from "@canonical/anatomy-dsl";
 import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import {
+  CONNECTION_ANATOMY,
+  CONNECTION_FRAGMENT,
   PROJECTED_ANATOMY,
   PROJECTED_FRAGMENT,
   SWITCHED_ANATOMY,
@@ -188,6 +190,69 @@ describe("the component checks", () => {
       ).toThrow(
         /prism\.component\.class_probe projects on OntologyClass, but ClassProbe_node is on Node/,
       );
+    });
+
+    describe("through a connection", () => {
+      const connection = parseAnatomyYAML(CONNECTION_ANATOMY);
+
+      it("reads a connection's nodes in the scope of its field", () => {
+        expect(() =>
+          assertProjectionMatchesFragment(connection, CONNECTION_FRAGMENT),
+        ).not.toThrow();
+      });
+
+      it("names an edge's selection beside its node", () => {
+        const withCursor: ReaderFragment = {
+          ...CONNECTION_FRAGMENT,
+          selections: CONNECTION_FRAGMENT.selections.map((selection) =>
+            selection.kind === "LinkedField" && selection.name === "members"
+              ? {
+                  ...selection,
+                  selections: selection.selections.map((edges) =>
+                    edges.kind === "LinkedField"
+                      ? {
+                          ...edges,
+                          selections: [
+                            ...edges.selections,
+                            { kind: "ScalarField", name: "cursor" },
+                          ],
+                        }
+                      : edges,
+                  ),
+                }
+              : selection,
+          ),
+        };
+        expect(() =>
+          assertProjectionMatchesFragment(connection, withCursor),
+        ).toThrow(
+          /ConnectionProbe_node reads members\.edges\.cursor, which the anatomy does not$/,
+        );
+      });
+
+      it("names the member's path when the anatomy drops the connection's field", () => {
+        const withoutTraversal = {
+          root: {
+            ...connection.root,
+            edges: connection.root.edges?.map((edge) =>
+              edge.relation.slotName === "members"
+                ? {
+                    ...edge,
+                    relation: { ...edge.relation, projection: undefined },
+                  }
+                : edge,
+            ),
+          },
+        };
+        expect(() =>
+          assertProjectionMatchesFragment(
+            withoutTraversal,
+            CONNECTION_FRAGMENT,
+          ),
+        ).toThrow(
+          /the anatomy reads uri, which ConnectionProbe_node does not\nConnectionProbe_node reads members\.uri, which the anatomy does not/,
+        );
+      });
     });
 
     describe("through a switch, an inline fragment and a condition", () => {
