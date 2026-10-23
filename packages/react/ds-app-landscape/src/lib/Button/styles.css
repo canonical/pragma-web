@@ -41,7 +41,10 @@
       --modifier-color-focus-ring,
       var(--color-focus-ring, currentColor)
     );
-    --ds-focus-offset: var(--focus-outline-offset, 2px);
+    --ds-focus-offset: var(
+      --focus-outline-offset,
+      calc(-1 * var(--ds-focus-width))
+    );
 
     box-sizing: border-box;
     display: inline-block;

@@ -48,8 +48,17 @@ const ProofCase = ({
           Action
         </Component>
       ))}
-      <Component appearance="link" data-button-proof-link="">
-        Link action
+      <Component
+        data-button-proof-border-free=""
+        style={
+          {
+            "--button-color-background": "rgb(173, 216, 230)",
+            "--button-color-text": "rgb(25, 25, 112)",
+            "--button-color-border": "transparent",
+          } as React.CSSProperties
+        }
+      >
+        Action
       </Component>
       <Component appearance="base" data-button-proof-disabled="" disabled>
         Disabled
@@ -88,6 +97,20 @@ const ProofCase = ({
         <span>Arbitrary</span>
         <span>children</span>
       </Component>
+      <div
+        data-button-proof-link-row=""
+        style={{
+          alignItems: "baseline",
+          display: "flex",
+          flexBasis: "100%",
+          gap: "0.5rem",
+        }}
+      >
+        <span>Inline link appearance (no padding)</span>
+        <Component appearance="link" data-button-proof-link="">
+          Link action
+        </Component>
+      </div>
     </section>
   );
 };
@@ -96,8 +119,10 @@ const ProofCase = ({
  * Product Button control-layout proof. The 18 geometry configurations are
  * three tiers by three root sizes by two directions. The 72 appearance
  * compatibility observations repeat four public appearance names across those
- * configurations; they are not 72 distinct paint designs. State, legacy API
- * and density observations are reported separately. Mark spacing remains open
+ * configurations; they are not 72 distinct paint designs. Eighteen same-label
+ * border-free observations compare one normal-mode transparent-stroke filled peer with the
+ * neutral boxed control. State, legacy API and density observations are
+ * reported separately. Mark spacing remains open
  * because this API owns no icon/label anatomy.
  */
 export const SpacingRoles: Story = {
@@ -116,9 +141,14 @@ export const SpacingRoles: Story = {
         <a href="#button-proof-focus-start" id="button-proof-focus-start">
           Focus start
         </a>
-        <Component appearance="base" data-button-proof-focus-boxed="">
-          Boxed focus
-        </Component>
+        <span
+          data-button-proof-focus-clip=""
+          style={{ display: "inline-flex", overflow: "hidden" }}
+        >
+          <Component appearance="base" data-button-proof-focus-boxed="">
+            Boxed focus
+          </Component>
+        </span>
         <Component appearance="link" data-button-proof-focus-link="">
           Link focus
         </Component>
@@ -158,6 +188,7 @@ export const SpacingRoles: Story = {
           "productButtonGeometryConfigurations",
           "productButtonAppearanceObservations",
           "productButtonAppearanceCompatibilityObservations",
+          "productButtonBorderFreeCompatibilityObservations",
           "productButtonForcedColors",
           "productButtonForcedColorVisibilityObservations",
           "productButtonLinkObservations",
@@ -247,13 +278,14 @@ export const SpacingRoles: Story = {
           owner: HTMLElement,
           value: string,
           label: string,
+          allowTransparent = false,
         ): string => {
           const probe = owner.ownerDocument.createElement("span");
           probe.style.cssText = `position:fixed;visibility:hidden;display:block;color:${value}`;
           owner.append(probe);
           const result = proofWindow.getComputedStyle(probe).color;
           probe.remove();
-          if (!result || result === "rgba(0, 0, 0, 0)") {
+          if (!result || (!allowTransparent && result === "rgba(0, 0, 0, 0)")) {
             throw new Error(`${label} is not visible`);
           }
           return result;
@@ -684,6 +716,7 @@ export const SpacingRoles: Story = {
         const assertFocusPaint = (
           button: HTMLButtonElement,
           label: string,
+          inwardBoxed = false,
         ): void => {
           if (
             canvasElement.ownerDocument.activeElement !== button ||
@@ -692,13 +725,24 @@ export const SpacingRoles: Story = {
             throw new Error(`${label} did not receive keyboard focus-visible`);
           }
           const style = proofWindow.getComputedStyle(button);
+          const focusWidth = px(style.outlineWidth, `${label} outline width`);
           if (
-            px(style.outlineWidth, `${label} outline width`) <= 0 ||
+            focusWidth <= 0 ||
             style.outlineStyle === "none" ||
             style.outlineColor === "transparent" ||
             style.outlineColor === "rgba(0, 0, 0, 0)"
           ) {
             throw new Error(`${label} focus paint is not visible`);
+          }
+          if (inwardBoxed) {
+            const focusOffset = px(
+              style.outlineOffset,
+              `${label} outline offset`,
+            );
+            near(focusOffset, -focusWidth, `${label} inward outline offset`);
+            if (focusOffset + focusWidth > 0) {
+              throw new Error(`${label} focus paint escapes its visual bounds`);
+            }
           }
         };
 
@@ -706,6 +750,7 @@ export const SpacingRoles: Story = {
           assertStylesheetIsolation();
           let geometryConfigurations = 0;
           let appearanceCompatibilityObservations = 0;
+          let borderFreeCompatibilityObservations = 0;
           let linkObservations = 0;
           let disabledObservations = 0;
           let customPaintObservations = 0;
@@ -731,8 +776,14 @@ export const SpacingRoles: Story = {
                   (button) =>
                     button.dataset.buttonProofAppearance === "neutral",
                 );
+                const borderFree = section.querySelector<HTMLButtonElement>(
+                  "[data-button-proof-border-free]",
+                );
                 const link = section.querySelector<HTMLButtonElement>(
                   "[data-button-proof-link]",
+                );
+                const linkRow = section.querySelector<HTMLElement>(
+                  "[data-button-proof-link-row]",
                 );
                 const disabled = section.querySelector<HTMLButtonElement>(
                   "[data-button-proof-disabled]",
@@ -750,7 +801,9 @@ export const SpacingRoles: Story = {
                 );
                 if (
                   !neutral ||
+                  !borderFree ||
                   !link ||
+                  !linkRow ||
                   !disabled ||
                   !custom ||
                   !arbitrary ||
@@ -786,6 +839,88 @@ export const SpacingRoles: Story = {
                   appearanceCompatibilityObservations += 1;
                 }
 
+                assertBoxedControl(
+                  borderFree,
+                  tier,
+                  rootSize,
+                  `${id} border-free`,
+                );
+                const borderFreeStyle =
+                  proofWindow.getComputedStyle(borderFree);
+                for (const [label, actual, expected] of [
+                  [
+                    "width",
+                    borderFree.getBoundingClientRect().width,
+                    neutral.getBoundingClientRect().width,
+                  ],
+                  [
+                    "height",
+                    borderFree.getBoundingClientRect().height,
+                    neutral.getBoundingClientRect().height,
+                  ],
+                  [
+                    "padding block start",
+                    px(
+                      borderFreeStyle.paddingBlockStart,
+                      `${id} border-free block start`,
+                    ),
+                    px(
+                      neutralStyle.paddingBlockStart,
+                      `${id} neutral block start`,
+                    ),
+                  ],
+                  [
+                    "padding block end",
+                    px(
+                      borderFreeStyle.paddingBlockEnd,
+                      `${id} border-free block end`,
+                    ),
+                    px(neutralStyle.paddingBlockEnd, `${id} neutral block end`),
+                  ],
+                  [
+                    "padding inline start",
+                    px(
+                      borderFreeStyle.paddingInlineStart,
+                      `${id} border-free start`,
+                    ),
+                    px(neutralStyle.paddingInlineStart, `${id} neutral start`),
+                  ],
+                  [
+                    "padding inline end",
+                    px(
+                      borderFreeStyle.paddingInlineEnd,
+                      `${id} border-free end`,
+                    ),
+                    px(neutralStyle.paddingInlineEnd, `${id} neutral end`),
+                  ],
+                ] as const) {
+                  near(actual, expected, `${id} border-free ${label}`);
+                }
+                if (
+                  !forcedColorsActive &&
+                  (borderFreeStyle.backgroundColor !== "rgb(173, 216, 230)" ||
+                    borderFreeStyle.color !== "rgb(25, 25, 112)" ||
+                    resolveColor(
+                      borderFree,
+                      "var(--ds-stroke-color)",
+                      `${id} border-free stroke`,
+                      true,
+                    ) !== "rgba(0, 0, 0, 0)")
+                ) {
+                  throw new Error(
+                    `${id} border-free public paint hooks were lost`,
+                  );
+                }
+                borderFreeCompatibilityObservations += 1;
+
+                if (
+                  proofWindow.getComputedStyle(linkRow).flexBasis !== "100%" ||
+                  !linkRow.textContent?.includes(
+                    "Inline link appearance (no padding)",
+                  )
+                ) {
+                  throw new Error(`${id} link clarification row was lost`);
+                }
                 assertLinkBoundary(link, tier, rootSize, `${id} link`);
                 linkObservations += 1;
                 assertBoxedControl(disabled, tier, rootSize, `${id} disabled`);
@@ -1252,19 +1387,29 @@ export const SpacingRoles: Story = {
           const focusStart = proofRoot.querySelector<HTMLElement>(
             "#button-proof-focus-start",
           );
+          const boxedFocusClip = proofRoot.querySelector<HTMLElement>(
+            "[data-button-proof-focus-clip]",
+          );
           const boxedFocus = proofRoot.querySelector<HTMLButtonElement>(
             "[data-button-proof-focus-boxed]",
           );
           const linkFocus = proofRoot.querySelector<HTMLButtonElement>(
             "[data-button-proof-focus-link]",
           );
-          if (!focusStart || !boxedFocus || !linkFocus) {
+          if (!focusStart || !boxedFocusClip || !boxedFocus || !linkFocus) {
             throw new Error("missing Button focus proof controls");
+          }
+          if (
+            proofWindow.getComputedStyle(boxedFocusClip).overflow !== "hidden"
+          ) {
+            throw new Error(
+              "boxed Button focus clipping fixture is not active",
+            );
           }
           focusStart.focus();
           const boxedBefore = boxedFocus.getBoundingClientRect();
           await userEvent.tab();
-          assertFocusPaint(boxedFocus, "boxed Button");
+          assertFocusPaint(boxedFocus, "boxed Button", true);
           near(
             boxedFocus.getBoundingClientRect().width,
             boxedBefore.width,
@@ -1280,13 +1425,55 @@ export const SpacingRoles: Story = {
           try {
             boxedFocus.style.setProperty("--ds-focus-width", "0px");
             expectProofFailure(
-              () => assertFocusPaint(boxedFocus, "mutated boxed Button"),
+              () => assertFocusPaint(boxedFocus, "mutated boxed Button", true),
               "focus role",
             );
           } finally {
             restoreStyle(boxedFocus);
           }
-          assertFocusPaint(boxedFocus, "restored boxed Button");
+          assertFocusPaint(boxedFocus, "restored boxed Button", true);
+
+          rememberStyle(boxedFocus);
+          try {
+            boxedFocus.style.setProperty("--focus-outline-offset", "5px");
+            await nextPaint();
+            const overrideStyle = proofWindow.getComputedStyle(boxedFocus);
+            near(
+              px(
+                overrideStyle.getPropertyValue("--focus-outline-offset"),
+                "consumer focus offset property",
+              ),
+              5,
+              "consumer focus offset property",
+            );
+            const computedOverrideOffset = px(
+              overrideStyle.outlineOffset,
+              "computed consumer focus offset",
+            );
+            if (
+              Math.abs(computedOverrideOffset - 5) >
+              1 / proofWindow.devicePixelRatio + 0.01
+            ) {
+              throw new Error(
+                `consumer focus offset exceeded one device pixel: ${computedOverrideOffset}`,
+              );
+            }
+            assertFocusPaint(boxedFocus, "consumer-offset boxed Button");
+            near(
+              boxedFocus.getBoundingClientRect().width,
+              boxedBefore.width,
+              "consumer focus offset width",
+            );
+            near(
+              boxedFocus.getBoundingClientRect().height,
+              boxedBefore.height,
+              "consumer focus offset height",
+            );
+          } finally {
+            restoreStyle(boxedFocus);
+            await nextPaint();
+          }
+          assertFocusPaint(boxedFocus, "restored consumer offset", true);
 
           const linkBefore = linkFocus.getBoundingClientRect();
           await userEvent.tab();
@@ -1344,6 +1531,8 @@ export const SpacingRoles: Story = {
           );
           proofRoot.dataset.productButtonAppearanceCompatibilityObservations =
             String(appearanceCompatibilityObservations);
+          proofRoot.dataset.productButtonBorderFreeCompatibilityObservations =
+            String(borderFreeCompatibilityObservations);
           proofRoot.dataset.productButtonForcedColors = forcedColorsActive
             ? "active"
             : "none";
