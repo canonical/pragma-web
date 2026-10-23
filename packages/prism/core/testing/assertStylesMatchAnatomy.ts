@@ -10,6 +10,7 @@ import {
 import {
   CAMEL_LIFTS,
   LINK_QUALIFIERS,
+  MODIFIER_ROLE,
   PROPERTY_KEYS,
   REFLOW_KEY_FAMILIES,
   SHORTHAND_PROPERTIES,
@@ -75,9 +76,21 @@ function liftSymbol(name: string): string {
 }
 
 /**
+ * Read the modifier class a node's role names, `.is-faded` for the role
+ * `faded node (.is-faded)`, or `""` when the role names none or the node is
+ * a named component.
+ */
+function readModifier(node: Node): string {
+  if (node.type !== "anonymous") return "";
+  return MODIFIER_ROLE.exec(node.role)?.at(1) ?? "";
+}
+
+/**
  * Collect the styles of every slot of an anatomy, the root under `""`: a
  * slot is an edge's `slotName`, and a switch's cases share their edge's
- * slot.
+ * slot. A case whose role ends in a modifier class in parentheses holds the
+ * styles the slot takes with that class, filed under the slot and the class
+ * (`node.is-faded`).
  */
 function collectSlots(root: Node): Map<string, Style[]> {
   const slots = new Map<string, Style[]>([["", [...(root.styles ?? [])]]]);
@@ -86,8 +99,10 @@ function collectSlots(root: Node): Map<string, Style[]> {
       const nodes = listEdgeTargets(edge);
       const slot = edge.relation.slotName;
       if (slot !== undefined) {
-        const styles = nodes.flatMap((child) => child.styles ?? []);
-        slots.set(slot, [...(slots.get(slot) ?? []), ...styles]);
+        for (const child of nodes) {
+          const key = `${slot}${readModifier(child)}`;
+          slots.set(key, [...(slots.get(key) ?? []), ...(child.styles ?? [])]);
+        }
       }
       nodes.forEach(visit);
     }
@@ -241,8 +256,10 @@ function stripLinkQualifiers(suffix: string): string {
  * whether a descendant or a child combinator reaches it, or the slot's whole
  * path from the root through child combinators, one role class per node the
  * anatomy places between them, so a rule reaches nothing a slot's content or
- * another slot holds. The slot may carry `[href]`; either may end in one
- * state selector. A root qualified by `:has(…)` or `:not(…)` re-flows.
+ * another slot holds. The slot may carry one modifier class its anatomy
+ * declares a case for (`.node.is-faded`, see `MODIFIER_ROLE`) and `[href]`;
+ * either may end in one state selector. A root qualified by `:has(…)` or
+ * `:not(…)` re-flows.
  */
 function mapSelector(
   selector: string,
@@ -274,8 +291,11 @@ function mapSelector(
   if (child !== undefined && childMatch === null) {
     return `"${selector}" addresses a child by anything but its role class`;
   }
-  const slot = childMatch?.at(1) ?? "";
-  const suffix = stripLinkQualifiers(childMatch?.at(2) ?? "");
+  const modifier = /^\.[a-z][a-z0-9-]*/.exec(childMatch?.at(2) ?? "")?.at(0) ?? "";
+  const slot = `${childMatch?.at(1) ?? ""}${modifier}`;
+  const suffix = stripLinkQualifiers(
+    (childMatch?.at(2) ?? "").slice(modifier.length),
+  );
   if (child !== undefined && rootSuffix !== "") {
     return `"${selector}" puts a state on the root and reaches a child`;
   }
@@ -287,7 +307,7 @@ function mapSelector(
   if (!slots.has(slot)) {
     return `"${selector}" styles .${slot}, which no anatomy slot names`;
   }
-  const path = paths.get(slot) ?? [];
+  const path = paths.get(childMatch?.at(1) ?? "") ?? [];
   if (
     between.length > 0 &&
     between.map((compound) => compound.slice(1)).join(" ") !== path.join(" ")

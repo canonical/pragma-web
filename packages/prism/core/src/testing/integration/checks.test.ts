@@ -99,6 +99,15 @@ describe("the component checks", () => {
       );
     });
 
+    it("refuses a modifier class the anatomy declares no case for", () => {
+      const folder = locate(DRIFTED, "StyleDrift");
+      expect(() =>
+        assertStylesMatchAnatomy(folder, assertAnatomy(folder)),
+      ).toThrow(
+        /"\.ds\.style-drift \.label\.is-loud" styles \.label\.is-loud, which no anatomy slot names/,
+      );
+    });
+
     it("refuses a descendant selector that reaches deeper than one child", () => {
       const folder = locate(DRIFTED, "StyleDrift");
       expect(() =>

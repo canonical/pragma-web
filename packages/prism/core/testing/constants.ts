@@ -180,7 +180,8 @@ export const CAMEL_LIFTS: readonly (readonly [string, string])[] = [
 ];
 
 /**
- * The selector suffix each anatomy interaction state binds. `:focus` serves
+ * The selector suffix each anatomy interaction state binds; a pressed
+ * toggle button is selected, as a current link is. `:focus` serves
  * an element that takes focus only by script, which never shows a keyboard
  * ring; every other focusable element binds `:focus-visible`.
  */
@@ -191,9 +192,18 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":focus-visible": "focus",
   ":hover": "hover",
   '[aria-current="page"]': "selected",
+  '[aria-pressed="true"]': "selected",
   '[aria-selected="true"]': "selected",
   "[open]": "expanded",
 };
+
+/**
+ * How an anatomy names a custom state a modifier class marks: a `switch`
+ * case whose role ends in the class in parentheses, such as
+ * `faded node (.is-faded)`. The stylesheet writes the state as the slot's
+ * class followed by the modifier, `.node.is-faded`.
+ */
+export const MODIFIER_ROLE = /\((\.[a-z][a-z0-9-]*)\)\s*$/;
 
 /**
  * The selector qualifiers a component root or one of its slots may carry
