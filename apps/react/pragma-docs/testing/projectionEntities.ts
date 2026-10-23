@@ -3,7 +3,8 @@
  * over, as a Relay mock environment answers a `Node`, read off the
  * projection matrix's rows: a UI block, a UI block the published package
  * renders, a modifier, a modifier family and a code standard, each with the
- * href the site's homes build for it; and the routes those homes build
+ * href the site's homes build for it; an ontology class and a tier, which
+ * the site hands to the package's arms; and the routes those homes build
  * them through.
  *
  * `resolveRoot` crosses a package boundary on purpose: it is the projection
@@ -120,6 +121,34 @@ export const MOCK_CODE_STANDARD = {
  */
 export const MOCK_CODE_STANDARD_HREF =
   "/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23react.component.subcomponent_export_api";
+
+/**
+ * The abstract class Layout: an ontology class, which the site's
+ * dispatchers hand to the package's own arm.
+ */
+export const MOCK_ONTOLOGY_CLASS = {
+  __typename: "OntologyClass",
+  isAbstract: true,
+  instanceCount: 88,
+  definition:
+    "Layouts are an opinionated division of space to navigate a domain of information.",
+  _meta: { title: "Layout", curie: "ds:Layout" },
+  superclass: { _meta: { title: "UIBlock" } },
+} as const;
+
+/**
+ * The tier Global: a node no arm of the site or the package takes, which
+ * renders through the package's `Node` arm.
+ */
+export const MOCK_TIER = {
+  __typename: "Tier",
+  _meta: {
+    title: "Global",
+    curie: "ds:global",
+    definition: null,
+    type: { _meta: { title: "Tier" } },
+  },
+} as const;
 
 /**
  * The routes the site's homes build their hrefs through, each with no

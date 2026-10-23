@@ -1,0 +1,49 @@
+---
+# SiteGraphNodeProjection: any graph node as the node of a graph on this
+# site, dispatched on its type.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
+# matrix: one EntityGraphNode per type, each type filling the slots it has).
+# It renders no element of its own: the case its node's type selects
+# renders the root. A design-system type reads through the site's own
+# projection; every other type through the package's dispatcher, which
+# takes ontology classes and any node from the site's provided maps. The
+# cases are the site composite's aliased arms and the site map's arms, by
+# the same names; the three UI-block types share one projection.
+node:
+  uri: docs.component.site_graph_node_projection
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: docs.component.ui_block_graph_node
+              projection:
+                on: Component
+          - node:
+              uri: docs.component.ui_block_graph_node
+              projection:
+                on: Pattern
+          - node:
+              uri: docs.component.ui_block_graph_node
+              projection:
+                on: Layout
+          - node:
+              uri: docs.component.modifier_graph_node
+              projection:
+                on: Modifier
+          - node:
+              uri: docs.component.modifier_family_graph_node
+              projection:
+                on: ModifierFamily
+          - node:
+              uri: docs.component.code_standard_graph_node
+              projection:
+                on: CodeStandard
+          - node:
+              uri: prism.component.graph_node_projection
+              projection:
+                on: Node
+      relation:
+        cardinality: "1"
