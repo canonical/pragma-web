@@ -11,6 +11,11 @@
 # the row sets none, so its text sits on the column line of the list that
 # holds it.
 #
+# The row may be narrower than its content (`size.min.width: 0`): as a
+# grid item or flex item its minimum would otherwise be its content's, so a
+# long identity would widen the track that holds the row past its column
+# instead of truncating.
+#
 # The identity clips along its line only, so nothing it holds is cut above
 # or below: a chip in the title is 28px, and its line grows to hold it (the
 # row is then 36px).
@@ -48,6 +53,7 @@ node:
     layout.type: flex
     layout.align: baseline
     layout.justify: space-between
+    size.min.width: 0
     spacing.gap: grid.gutter
     spacing.internal.block.start: space.050
     spacing.internal.block.end: space.050

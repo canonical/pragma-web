@@ -6,7 +6,8 @@
   /* One entry of an index: the identity on the left, one muted word on the
    * right, on one 24px line of the context's primary text with 4px above
    * and below it: 32px. It sets no inline inset, so its text sits on the column line
-   * of its list. */
+   * of its list. It may be narrower than its content, so a long identity
+   * never widens the track that holds it: the identity truncates instead. */
   .ds.entity-row {
     --entity-row-gap: var(--grid-gutter);
     --entity-row-padding-block: var(--space-050);
@@ -24,6 +25,7 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+    min-width: 0;
     gap: var(--entity-row-gap);
     padding-block: var(--entity-row-padding-block);
     list-style: none;
