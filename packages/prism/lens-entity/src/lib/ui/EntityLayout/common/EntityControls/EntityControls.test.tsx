@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   EntityFilterProvider,
   useEntityFilter,
-} from "../../../../EntityFilterProvider/index.js";
+} from "../../../EntityFilterProvider/index.js";
 import EntityControls from "./EntityControls.js";
 
 /** Show the shared filter's text, as the index reads it. */

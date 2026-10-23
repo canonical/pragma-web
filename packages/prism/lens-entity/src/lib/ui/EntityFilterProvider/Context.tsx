@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { DEFAULT_ENTITY_FILTER } from "../constants.js";
+import { DEFAULT_ENTITY_FILTER } from "../../constants.js";
 import type { EntityFilterValue } from "./types.js";
 
 /**

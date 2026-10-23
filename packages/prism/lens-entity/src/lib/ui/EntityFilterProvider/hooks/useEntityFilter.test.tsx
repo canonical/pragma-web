@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_ENTITY_FILTER } from "../../constants.js";
+import { DEFAULT_ENTITY_FILTER } from "../../../constants.js";
 import EntityFilterProvider from "../Provider.js";
 import useEntityFilter from "./useEntityFilter.js";
 

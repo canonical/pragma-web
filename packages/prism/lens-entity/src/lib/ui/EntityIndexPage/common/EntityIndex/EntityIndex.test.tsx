@@ -13,7 +13,7 @@ import {
   STATION_COUNT,
   STATIONS_BINDING,
 } from "../../../../../../testing/fixtures.js";
-import { EntityFilterProvider } from "../../../../EntityFilterProvider/index.js";
+import { EntityFilterProvider } from "../../../EntityFilterProvider/index.js";
 import EntityIndex from "./EntityIndex.js";
 
 /**

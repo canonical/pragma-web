@@ -4,8 +4,8 @@ import entityIndexFragmentNode from "../../../../__generated__/EntityIndex_query
 import type { EntityIndexQuery } from "../../../../__generated__/EntityIndexQuery.graphql.js";
 import entityIndexQueryNode from "../../../../__generated__/EntityIndexQuery.graphql.js";
 import buildEntityIndexVariables from "../../../buildEntityIndexVariables.js";
-import { useEntityFilter } from "../../../EntityFilterProvider/index.js";
 import matchesEntityText from "../../../matchesEntityText.js";
+import { useEntityFilter } from "../../EntityFilterProvider/index.js";
 import type {
   UseIndexStripQueryProps,
   UseIndexStripQueryResult,

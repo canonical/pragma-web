@@ -1,5 +1,6 @@
 // @vitest-environment node
 
+import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -27,7 +28,37 @@ const EXTERNAL_TOKENS = [
   "--typography-text-secondary-font-size",
 ];
 
+/**
+ * The context providers among the lens's components. A provider follows
+ * its own file structure (cs:react.component.structure.context): its main
+ * file is `Provider.tsx`, beside `Context.tsx` and its state hook, with no
+ * stylesheet and no stories, so the generator's scaffold check does not
+ * apply to it; its own file set is checked instead.
+ */
+const PROVIDER_NAMES: readonly string[] = ["EntityFilterProvider"];
+
+/** The files a context provider's folder holds. */
+const PROVIDER_FILES = [
+  "anatomy.yaml",
+  "Context.tsx",
+  "Provider.tsx",
+  "hooks/types.ts",
+  "hooks/useProviderState.ts",
+  "index.ts",
+  "types.ts",
+];
+
 const folders = listAnatomyFolders([UI_DIRECTORY]);
+
+/** The lens's components that the generator scaffolds. */
+const componentFolders = folders.filter(
+  (folder) => !PROVIDER_NAMES.includes(basename(folder)),
+);
+
+/** The lens's context providers. */
+const providerFolders = folders.filter((folder) =>
+  PROVIDER_NAMES.includes(basename(folder)),
+);
 
 /**
  * The private subcomponents, each in its parent's `common/` folder. The
@@ -41,6 +72,7 @@ const subcomponentFolders = listAnatomyFolders(
 describe("the lens's components", () => {
   it("are every component of the lens, each under src/lib/ui", () => {
     expect(folders.map((folder) => basename(folder))).toEqual([
+      "EntityFilterProvider",
       "EntityIcon",
       "EntityIndexPage",
       "EntityLayout",
@@ -64,11 +96,23 @@ describe("the lens's components", () => {
     ]);
   });
 
-  it.each(folders)(
+  it.each(componentFolders)(
     "%s keeps its anatomy, its styles and its scaffold",
     (folder) => {
       assertStylesMatchAnatomy(folder, assertAnatomy(folder));
       assertScaffold(folder, { packageRoot: PACKAGE_ROOT, testSuffix: "test" });
+    },
+  );
+
+  it.each(providerFolders)(
+    "%s keeps its anatomy and the provider's file structure",
+    (folder) => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
+      expect(
+        PROVIDER_FILES.filter((file) => !existsSync(join(folder, file))),
+      ).toEqual([]);
+      expect(existsSync(join(folder, `${basename(folder)}.tsx`))).toBe(false);
+      expect(existsSync(join(folder, "styles.css"))).toBe(false);
     },
   );
 

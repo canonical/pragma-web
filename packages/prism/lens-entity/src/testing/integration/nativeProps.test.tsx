@@ -19,7 +19,7 @@ import {
 import type { EntityPageQuery } from "../../__generated__/EntityPageQuery.graphql.js";
 import entityPageQueryNode from "../../__generated__/EntityPageQuery.graphql.js";
 import buildEntityPageVariables from "../../lib/buildEntityPageVariables.js";
-import { EntityFilterProvider } from "../../lib/EntityFilterProvider/index.js";
+import { EntityFilterProvider } from "../../lib/ui/EntityFilterProvider/index.js";
 import { EntityIndex } from "../../lib/ui/EntityIndexPage/common/index.js";
 import { EntityIndexPage } from "../../lib/ui/EntityIndexPage/index.js";
 import {

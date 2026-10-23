@@ -3,7 +3,7 @@
 import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
 import { useRouterState } from "@canonical/router-react";
 import type { ReactElement } from "react";
-import { EntityFilterProvider } from "../../EntityFilterProvider/index.js";
+import { EntityFilterProvider } from "../EntityFilterProvider/index.js";
 import {
   EntityControls,
   EntityStatus,

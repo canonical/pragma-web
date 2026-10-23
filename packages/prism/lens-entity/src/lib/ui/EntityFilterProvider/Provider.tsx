@@ -12,7 +12,7 @@ import type { EntityFilterProviderProps } from "./types.js";
  * It renders no element of its own (a context provider), so it takes no
  * native props.
  *
- * `import { EntityFilterProvider } from "./EntityFilterProvider/index.js";`
+ * `import { EntityFilterProvider } from "./ui/EntityFilterProvider/index.js";`
  */
 export default function EntityFilterProvider({
   children,

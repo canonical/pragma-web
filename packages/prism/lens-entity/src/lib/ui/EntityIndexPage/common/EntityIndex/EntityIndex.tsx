@@ -21,10 +21,10 @@ import {
   ENTITY_PAGE_SIZE,
   ENTITY_VIEW_PARAM,
 } from "../../../../constants.js";
-import { useEntityFilter } from "../../../../EntityFilterProvider/index.js";
 import { useMessages } from "../../../../i18n/index.js";
 import matchesEntityText from "../../../../matchesEntityText.js";
 import readEntityView from "../../../../readEntityView.js";
+import { useEntityFilter } from "../../../EntityFilterProvider/index.js";
 import type { EntityIndexProps } from "./types.js";
 import "./styles.css";
 

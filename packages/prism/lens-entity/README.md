@@ -199,8 +199,9 @@ selection leaves the contract and when the artifacts are stale. Run
 ## Styling
 
 Every component sits in `src/lib/ui/`, scaffolded by the component
-generator, and carries an `anatomy.yaml`: its slots and every style
-decision, bound to a token. Its `styles.css` transcribes the anatomy, in the
+generator (the filter provider keeps a context provider's own files:
+`Provider.tsx`, `Context.tsx` and its state hook), and carries an
+`anatomy.yaml`: its slots and every style decision, bound to a token. Its `styles.css` transcribes the anatomy, in the
 `ds.components.global` cascade layer, and the package's tests check that it
 does (`@canonical/prism-core/testing`).
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { EntityFilter } from "../types.js";
+import type { EntityFilter } from "../../types.js";
 
 /** What the lens's consumers share: the filter and the way to change it. */
 export interface EntityFilterValue {

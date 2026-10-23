@@ -7,7 +7,7 @@ import { HeadProvider } from "@canonical/react-head";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ElementType, ReactElement } from "react";
-import { EntityFilterProvider } from "../../src/lib/EntityFilterProvider/index.js";
+import { EntityFilterProvider } from "../../src/lib/ui/EntityFilterProvider/index.js";
 import { HOMES, SITE_ROUTES } from "../../testing/fixtures.js";
 
 /** A site's document title template: the page's title, then the site's. */

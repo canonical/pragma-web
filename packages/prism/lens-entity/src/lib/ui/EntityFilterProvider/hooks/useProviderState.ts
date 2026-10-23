@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { DEFAULT_ENTITY_FILTER } from "../../constants.js";
-import type { EntityFilter } from "../../types.js";
+import { DEFAULT_ENTITY_FILTER } from "../../../constants.js";
+import type { EntityFilter } from "../../../types.js";
 import type { UseProviderStateResult } from "./types.js";
 
 /**
