@@ -489,11 +489,14 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain("ds term-node");
     expect(mustGet("/standards").canvas).toContain('id="lens-standards-title"');
     // The standards canvases render REAL content from their fixture
-    // records: the index carries a grouped standard link, the reading
-    // canvas carries the article's identity h1 (`_meta.title`, which for a
-    // standard with no asserted name is the IRI's local name) inside
-    // layout.reading's prose column.
-    expect(mustGet("/standards").canvas).toContain("cs:code.array.safe_access");
+    // records: the index carries a grouped standard's row, its namespace's
+    // prefix leading its title, the reading canvas carries the article's
+    // identity h1 (`_meta.title`, which for a standard with no asserted name
+    // is the IRI's local name) inside layout.reading's prose column.
+    expect(mustGet("/standards").canvas).toContain(
+      '<span class="location">cs:</span>',
+    );
+    expect(mustGet("/standards").canvas).toContain(">code.array.safe_access<");
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
       'data-view="standard-reading"',
     );

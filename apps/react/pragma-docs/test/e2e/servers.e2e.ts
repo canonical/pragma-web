@@ -564,14 +564,19 @@ describe("server matrix (2×3) serves correctly", () => {
             //     (a) the COMPACT identity. The link text is `_meta.title`
             //     and the href is the absolute IRI, so without this the
             //     reader could lose the `cs:` form entirely while every
-            //     href assertion still passed.
-            expect(standardsIndexHtml).toContain(">cs:code.array.safe_access<");
+            //     href assertion still passed: each row leads its title
+            //     with the namespace's prefix.
+            expect(standardsIndexHtml).toContain(
+              '<span class="location">cs:</span>',
+            );
             //     (b) the reading page's class line — the article's one
             //     piece of graph metadata outside the prose, and what
             //     replaced the category line when `categories` turned out
-            //     to be untraversable through the contract. React splits
-            //     the text node, hence the comment marker.
-            expect(standardReadingHtml).toContain("class: <!-- -->");
+            //     to be untraversable through the contract. The catalog
+            //     fills the class into one sentence.
+            expect(standardReadingHtml).toContain(
+              '<span class="class">class: ',
+            );
             //     (c) the pagination affordance. The live graph carries
             //     131 standards against this app's 100-item page size, so
             //     `hasNextPage` is true and the button MUST render. If the

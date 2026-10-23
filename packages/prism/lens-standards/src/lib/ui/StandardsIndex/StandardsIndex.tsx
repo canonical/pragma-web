@@ -2,7 +2,7 @@
 
 import { RouterLink } from "@canonical/prism-core";
 import { EntityList, EntityRow } from "@canonical/prism-projections";
-import { Button, InlineCode } from "@canonical/react-ds-global";
+import { Button } from "@canonical/react-ds-global";
 import { useRouter } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery, usePaginationFragment } from "react-relay";
@@ -16,6 +16,7 @@ import { useMessages } from "../../i18n/index.js";
 import { buildStandardsIndexVariables } from "../../standardsIndexQuery.js";
 import buildGroupAnchorId from "./buildGroupAnchorId.js";
 import groupByClass from "./groupByClass.js";
+import readCuriePrefix from "./readCuriePrefix.js";
 import type { StandardsIndexProps } from "./types.js";
 import "./styles.css";
 
@@ -89,8 +90,9 @@ const componentCssClassName = "ds standards-index";
  * The index of the bound class's instances, grouped by their own class:
  * jump links between the groups when there is more than one, then each
  * group's heading over its entries in the shared list view, one 32px row
- * per standard, its title linked to its reading page and its compact
- * address at the end of the row.
+ * per standard: its namespace's prefix, muted, leading its title, which
+ * links to its reading page and truncates rather than widen a narrow
+ * column.
  *
  * It runs the index's one operation with the variables the route's warm
  * prefetched, so a warm store fulfils it, and pages through the class with
@@ -176,7 +178,7 @@ export default function StandardsIndex({
                   })}
                   key={node.uri}
                   LinkComponent={RouterLink}
-                  meta={<InlineCode>{node._meta.curie}</InlineCode>}
+                  location={readCuriePrefix(node._meta.curie)}
                   title={node._meta.title}
                 />
               ))}
