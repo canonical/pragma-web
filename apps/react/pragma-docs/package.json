@@ -52,6 +52,7 @@
     "storybook": "storybook dev -p 6010 --no-open --host 0.0.0.0"
   },
   "dependencies": {
+    "@canonical/prism-command-palette": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-lens-definitions": "^0.44.1",
     "@canonical/prism-lens-standards": "^0.44.1",
