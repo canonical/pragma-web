@@ -16,7 +16,7 @@ import Component from "./EntityCard.js";
 import type { EntityCardProps } from "./types.js";
 
 /** The card's slots for one entity of the matrix. */
-function toCardArgs({
+function pickCardArgs({
   location,
   title,
   parent,
@@ -71,17 +71,17 @@ export default meta;
 type Story = StoryObj<typeof Component>;
 
 /** A class, with its instances counted. */
-export const Class: Story = { args: toCardArgs(CLASS_ENTITY) };
+export const Class: Story = { args: pickCardArgs(CLASS_ENTITY) };
 
 /** A UI block under its parent, without a sidecar. */
-export const UIBlock: Story = { args: toCardArgs(UI_BLOCK_ENTITY) };
+export const UIBlock: Story = { args: pickCardArgs(UI_BLOCK_ENTITY) };
 
 /**
  * A modifier family without vitals: the card has no footer, and its body
  * reaches the card's bottom edge.
  */
 export const WithoutVitals: Story = {
-  args: { ...toCardArgs(MODIFIER_FAMILY_ENTITY), vitals: undefined },
+  args: { ...pickCardArgs(MODIFIER_FAMILY_ENTITY), vitals: undefined },
 };
 
 /**
@@ -92,9 +92,9 @@ export const WithoutVitals: Story = {
 export const MixedVitals: Story = {
   render: () => (
     <>
-      <Component {...toCardArgs(MODIFIER_ENTITY)} />
+      <Component {...pickCardArgs(MODIFIER_ENTITY)} />
       <Component
-        {...toCardArgs(MODIFIER_FAMILY_ENTITY)}
+        {...pickCardArgs(MODIFIER_FAMILY_ENTITY)}
         summary={Array.from(
           { length: 4 },
           () => MODIFIER_FAMILY_ENTITY.summary,
@@ -111,7 +111,7 @@ export const MixedVitals: Story = {
  */
 export const WithMention: Story = {
   args: {
-    ...toCardArgs(MODIFIER_ENTITY),
+    ...pickCardArgs(MODIFIER_ENTITY),
     keyValues: [
       { key: "Class", value: "Modifier" },
       {
@@ -124,7 +124,7 @@ export const WithMention: Story = {
 
 /** A UI block with its sidecar: the rendered example beside the body. */
 export const UIBlockWithSidecar: Story = {
-  args: { ...toCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },
+  args: { ...pickCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },
 };
 
 /**
@@ -133,19 +133,19 @@ export const UIBlockWithSidecar: Story = {
  * height.
  */
 export const UIBlockWithTallSidecar: Story = {
-  args: { ...toCardArgs(UI_BLOCK_ENTITY), sidecar: TALL_EXAMPLE },
+  args: { ...pickCardArgs(UI_BLOCK_ENTITY), sidecar: TALL_EXAMPLE },
 };
 
 /** A modifier, with its class and family. */
-export const Modifier: Story = { args: toCardArgs(MODIFIER_ENTITY) };
+export const Modifier: Story = { args: pickCardArgs(MODIFIER_ENTITY) };
 
 /** A modifier family, with its members counted. */
 export const ModifierFamily: Story = {
-  args: toCardArgs(MODIFIER_FAMILY_ENTITY),
+  args: pickCardArgs(MODIFIER_FAMILY_ENTITY),
 };
 
 /** A code standard: its one-word name ends in an ellipsis at the card's edge. */
-export const Standard: Story = { args: toCardArgs(STANDARD_ENTITY) };
+export const Standard: Story = { args: pickCardArgs(STANDARD_ENTITY) };
 
 /**
  * The five types side by side, each card at two columns, and the UI block
@@ -161,9 +161,9 @@ export const Matrix: Story = {
         MODIFIER_FAMILY_ENTITY,
         STANDARD_ENTITY,
       ].map((entity) => (
-        <Component key={entity.href} {...toCardArgs(entity)} />
+        <Component key={entity.href} {...pickCardArgs(entity)} />
       ))}
-      <Component {...toCardArgs(UI_BLOCK_ENTITY)} sidecar={BUTTON_EXAMPLE} />
+      <Component {...pickCardArgs(UI_BLOCK_ENTITY)} sidecar={BUTTON_EXAMPLE} />
     </>
   ),
 };
