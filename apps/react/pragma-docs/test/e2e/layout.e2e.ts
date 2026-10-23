@@ -136,10 +136,11 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         layout.canvas.clientHeight,
       );
       expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
-      // The Definitions lens gives its workspace no inspector: no region
-      // and no drawer trigger.
-      expect(layout.regionOverflow.inspector, theme).toBeNull();
-      expect(layout.triggerShown, theme).toBe(false);
+      // The Definitions lens gives its workspace an inspector: a region
+      // that scrolls on its own from three groups of columns, a drawer
+      // behind its trigger below them.
+      expect(layout.regionOverflow.inspector, theme).toBe("auto");
+      expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
     }
   });
 
