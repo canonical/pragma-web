@@ -1,0 +1,16 @@
+---
+# CanvasPage — a page of the canvas whose content is plain flow: a section
+# that spans every column of the canvas's page grid, so its prose, its code
+# and its examples take the whole main column and never one track of it. A
+# page with a grid of its own lays itself out instead. The heading and the
+# paragraphs take the typography's own styles; the section may be narrower
+# than its content, so a long identifier wraps inside it.
+node:
+  uri: docs.component.canvas_page
+  styles:
+    layout.grid.column: "1 / -1"
+    size.min.width: 0
+  edges:
+    - node:
+        role: page content
+      relation: { cardinality: "1..*", slotName: default }
