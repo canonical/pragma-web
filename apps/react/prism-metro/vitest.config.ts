@@ -28,7 +28,8 @@ export default mergeConfig(
           "**/*.tests.ts",
           "**/*.tests.tsx",
           "**/*.stories.tsx",
-          // relay-compiler output, ignored by git and read by nothing.
+          // relay-compiler output, generated before every run and ignored by
+          // git.
           "src/relay/__generated__/**",
           // Thin process entry points with no dispatch of their own: the
           // bundle entry hydrates the document, the graph hands every request

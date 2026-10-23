@@ -63,10 +63,11 @@ the production build, on the same port and against the same graph.
 
 ## Checks and tests
 
-- `bun run check`: lint, type-check, the schema check, and a Relay compile of
-  the lens and projection packages' documents against this app's schema,
-  which fails when a lens selects something the metro provider does not
-  serve.
+- `bun run check`: the schema check, a Relay compile, lint and type-check.
+  `bun run relay` compiles the app's own query together with the lens and
+  projection packages' documents against this app's schema, and fails when a
+  document selects something the metro provider does not serve. Its output
+  is not committed: `build`, `check` and every test script run it first.
 - `bun run test`: the unit and integration suites; the server and
   integration suites start their own metro graph on a free port.
   `bun run test:coverage` enforces full coverage.
