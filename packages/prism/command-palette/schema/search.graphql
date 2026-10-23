@@ -1,0 +1,10 @@
+# The search extension the command palette reads: the graph's nodes by text,
+# ranked. It is no part of the contract, so the package is Tier 2: it runs
+# on a provider that serves this extension beside the contract.
+# `scripts/writeSchema.ts` merges it into the contract SDL for the package's
+# relay project.
+
+extend type Query {
+  "Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en."
+  search(text: String!, first: Int, after: String): NodeConnection!
+}
