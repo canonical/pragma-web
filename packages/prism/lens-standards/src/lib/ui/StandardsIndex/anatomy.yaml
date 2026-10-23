@@ -6,11 +6,10 @@
 #
 # Reference: the projection matrix's list entry. Each group's entries are
 # the shared list view (EntityList, rows view, no toolbar) of the
-# projections' 32px list entries (EntityRow): the standard's namespace
-# prefix as the row's muted location, leading its title, which links to its
-# reading page through core's RouterLink and truncates on its line rather
-# than widen a narrow column. A graph with no standard shows the list view's
-# empty line. "Load more" is
+# projections' 32px list entries (EntityRow): the standard's title linked
+# to its reading page through core's RouterLink, and its compact address,
+# in the published InlineCode, as the muted word at the end of the row. A
+# graph with no standard shows the list view's empty line. "Load more" is
 # the published Button at secondary importance, busy while the next page
 # loads. Bespoke in its arrangement only.
 #
@@ -80,6 +79,10 @@ node:
               edges:
                 - node:
                     uri: prism.component.entity_row
+                    edges:
+                      - node:
+                          uri: global.component.inline_code
+                        relation: { cardinality: "1", slotName: meta }
                   relation: { cardinality: "1..*", slotName: items }
             relation: { cardinality: "1" }
       relation: { cardinality: "0..*", slotName: group }

@@ -564,11 +564,8 @@ describe("server matrix (2×3) serves correctly", () => {
             //     (a) the COMPACT identity. The link text is `_meta.title`
             //     and the href is the absolute IRI, so without this the
             //     reader could lose the `cs:` form entirely while every
-            //     href assertion still passed: each row leads its title
-            //     with the namespace's prefix.
-            expect(standardsIndexHtml).toContain(
-              '<span class="location">cs:</span>',
-            );
+            //     href assertion still passed.
+            expect(standardsIndexHtml).toContain(">cs:code.array.safe_access<");
             //     (b) the reading page's class line — the article's one
             //     piece of graph metadata outside the prose, and what
             //     replaced the category line when `categories` turned out

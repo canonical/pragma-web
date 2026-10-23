@@ -323,14 +323,11 @@ describe("StandardsIndex grouping", () => {
       ).toBe(
         "/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23code.api.stability",
       );
-      // …and the reader still sees the compact form: the namespace's
-      // prefix leads the title in each entry, the projections' list entry.
-      const row = screen
-        .getByRole("link", { name: "code.api.stability" })
-        .closest("li");
-      expect(row).toHaveClass("ds", "entity-row");
-      expect(row?.textContent).toBe("cs:code.api.stability");
-      expect(row?.querySelector(".location")?.textContent).toBe("cs:");
+      // …and the reader still sees the compact form at the end of its row,
+      // in code voice: each entry is the projections' list entry.
+      const compact = screen.getByText("cs:code.api.stability");
+      expect(compact).toHaveClass("ds", "inline-code");
+      expect(compact.closest("li")).toHaveClass("ds", "entity-row");
       expect(fetchFn).not.toHaveBeenCalled();
     },
     STANDARDS_TEST_TIMEOUT_MS,

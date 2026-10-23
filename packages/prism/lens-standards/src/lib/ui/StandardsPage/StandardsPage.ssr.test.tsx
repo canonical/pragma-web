@@ -26,10 +26,9 @@ describe("StandardsPage on the server", () => {
       ),
     );
     expect(html).toContain('id="lens-standards-title"');
-    // The compact identity, the namespace's prefix leading each title, and
-    // the absolute IRI in the href: both, because they are different
-    // strings.
-    expect(html).toContain('<span class="location">cs:</span>');
+    // The compact identity beside each link, and the absolute IRI in the
+    // href: both, because they are different strings.
+    expect(html).toContain("cs:code.array.safe_access");
     expect(html).toContain(
       "/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23code.array.safe_access",
     );
