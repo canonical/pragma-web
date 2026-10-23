@@ -1156,11 +1156,25 @@ async function playInvariantBadgeProof(
   canvasElement: HTMLElement,
 ): Promise<void> {
   await document.fonts.ready;
-  delete canvasElement.dataset.chipBadgeProof;
-  delete canvasElement.dataset.chipBadgeCriticalPaintObservations;
-  delete canvasElement.dataset.chipBadgeNeutralCriticalObservations;
-  delete canvasElement.dataset.chipBadgeStandaloneCriticalObservations;
-  delete canvasElement.dataset.chipBadgeCustomAliasObservations;
+  for (const key of [
+    "chipBadgeProof",
+    "chipBadgeProofError",
+    "chipBadgePrimaryConfigurations",
+    "chipBadgeCriticalPaintObservations",
+    "chipBadgeNeutralCriticalObservations",
+    "chipBadgeStandaloneCriticalObservations",
+    "chipBadgeCustomAliasObservations",
+    "chipBadgeForcedColors",
+    "chipBadgeForcedOutlineObservations",
+    "chipBadgeForcedTextObservations",
+    "chipBadgeForcedStandaloneTextObservations",
+  ] as const)
+    delete canvasElement.dataset[key];
+  const proofWindow = canvasElement.ownerDocument.defaultView;
+  if (!proofWindow) throw new Error("Missing Chip Badge proof window");
+  const forcedColorsActive = proofWindow.matchMedia(
+    "(forced-colors: active)",
+  ).matches;
   const documentRoot = document.documentElement;
   const originalRootSize = documentRoot.style.fontSize;
   const originalColorScheme = documentRoot.style.colorScheme;
@@ -1345,42 +1359,172 @@ async function playInvariantBadgeProof(
       }
       throw new Error(`${label} mutation escaped its proof oracle`);
     };
+    const assertForcedChipOutline = (
+      chip: HTMLElement,
+      systemTextColor: string,
+      label: string,
+    ): void => {
+      const style = getComputedStyle(chip);
+      const strokeWidth = Number.parseFloat(
+        style.getPropertyValue("--chip-border-width"),
+      );
+      if (!Number.isFinite(strokeWidth) || strokeWidth <= 0)
+        throw new Error(`${label} forced outline stroke is not positive`);
+      assertNear(
+        Number.parseFloat(style.outlineWidth),
+        strokeWidth,
+        `${label} forced outline width`,
+      );
+      assertNear(
+        Number.parseFloat(style.outlineOffset),
+        -strokeWidth,
+        `${label} forced outline offset`,
+      );
+      if (
+        style.outlineStyle !== "solid" ||
+        style.outlineColor !== systemTextColor
+      )
+        throw new Error(`${label} lost the forced-colors system outline`);
+    };
+    const assertForcedBadgeText = (
+      badge: HTMLElement,
+      systemTextColor: string,
+      label: string,
+    ): void => {
+      const style = getComputedStyle(badge);
+      const rect = badge.getBoundingClientRect();
+      if (
+        !badge.textContent?.trim() ||
+        rect.width <= 0 ||
+        rect.height <= 0 ||
+        style.forcedColorAdjust !== "auto" ||
+        style.color !== systemTextColor
+      )
+        throw new Error(`${label} lost rendered system-color Badge text`);
+    };
 
-    for (const colorScheme of ["light", "dark"] as const) {
-      documentRoot.style.colorScheme = colorScheme;
-      await nextPaint();
-      for (const criticality of chipBadgeCriticalities) {
-        assertCriticalBadgePaint(criticality, "neutral");
-        assertCriticalBadgePaint(criticality, "same");
-        assertCriticalBadgePaint(criticality, "neutral-chip-critical");
-        assertStandaloneCriticalBadgePaint(criticality);
-        assertCustomBadgePaint(criticality);
+    if (forcedColorsActive) {
+      const systemTextColor = paintProbe("", "Canvas", "CanvasText").color;
+      const chips = [
+        ...canvasElement.querySelectorAll<HTMLElement>(
+          ".ds.chip.stroke-paint.stroke",
+        ),
+      ];
+      const badges = [
+        ...canvasElement.querySelectorAll<HTMLElement>(
+          ".ds.chip .badge-slot .ds.badge",
+        ),
+      ];
+      const standaloneCriticalBadges = [
+        ...canvasElement.querySelectorAll<HTMLElement>(
+          "[data-chip-badge-criticality] .standalone-critical-badge",
+        ),
+      ];
+      if (chips.length !== 64)
+        throw new Error(
+          `Expected 64 forced-colors Chip outlines, received ${chips.length}`,
+        );
+      if (badges.length !== 40)
+        throw new Error(
+          `Expected 40 forced-colors Chip Badge texts, received ${badges.length}`,
+        );
+      if (standaloneCriticalBadges.length !== 4)
+        throw new Error(
+          `Expected 4 forced-colors standalone Badge texts, received ${standaloneCriticalBadges.length}`,
+        );
+      chips.forEach((chip, index) => {
+        assertForcedChipOutline(chip, systemTextColor, `Chip ${index + 1}`);
+      });
+      badges.forEach((badge, index) => {
+        assertForcedBadgeText(badge, systemTextColor, `Badge ${index + 1}`);
+      });
+      standaloneCriticalBadges.forEach((badge, index) => {
+        assertForcedBadgeText(
+          badge,
+          systemTextColor,
+          `Standalone Badge ${index + 1}`,
+        );
+      });
+
+      const causalChip = chips[0];
+      if (!causalChip) throw new Error("Missing forced-colors causal Chip");
+      const originalCausalStyle = causalChip.getAttribute("style");
+      try {
+        causalChip.style.setProperty("--chip-border-width", "0px");
+        await nextPaint();
+        expectProofFailure(
+          () =>
+            assertForcedChipOutline(
+              causalChip,
+              systemTextColor,
+              "mutated Chip",
+            ),
+          "forced-colors Chip outline",
+        );
+      } finally {
+        if (originalCausalStyle === null) causalChip.removeAttribute("style");
+        else causalChip.setAttribute("style", originalCausalStyle);
+        await nextPaint();
       }
-    }
-    canvasElement.dataset.chipBadgeCriticalPaintObservations = "16";
-    canvasElement.dataset.chipBadgeNeutralCriticalObservations = "8";
-    canvasElement.dataset.chipBadgeStandaloneCriticalObservations = "8";
-    canvasElement.dataset.chipBadgeCustomAliasObservations = "8";
+      assertForcedChipOutline(causalChip, systemTextColor, "restored Chip");
+      canvasElement.dataset.chipBadgeCriticalPaintObservations = "0";
+      canvasElement.dataset.chipBadgeNeutralCriticalObservations = "0";
+      canvasElement.dataset.chipBadgeStandaloneCriticalObservations = "0";
+      canvasElement.dataset.chipBadgeCustomAliasObservations = "0";
+      canvasElement.dataset.chipBadgeForcedOutlineObservations = String(
+        chips.length,
+      );
+      canvasElement.dataset.chipBadgeForcedTextObservations = String(
+        badges.length,
+      );
+      canvasElement.dataset.chipBadgeForcedStandaloneTextObservations = String(
+        standaloneCriticalBadges.length,
+      );
+    } else {
+      for (const colorScheme of ["light", "dark"] as const) {
+        documentRoot.style.colorScheme = colorScheme;
+        await nextPaint();
+        for (const criticality of chipBadgeCriticalities) {
+          assertCriticalBadgePaint(criticality, "neutral");
+          assertCriticalBadgePaint(criticality, "same");
+          assertCriticalBadgePaint(criticality, "neutral-chip-critical");
+          assertStandaloneCriticalBadgePaint(criticality);
+          assertCustomBadgePaint(criticality);
+        }
+      }
+      canvasElement.dataset.chipBadgeCriticalPaintObservations = "16";
+      canvasElement.dataset.chipBadgeNeutralCriticalObservations = "8";
+      canvasElement.dataset.chipBadgeStandaloneCriticalObservations = "8";
+      canvasElement.dataset.chipBadgeCustomAliasObservations = "8";
+      canvasElement.dataset.chipBadgeForcedOutlineObservations = "0";
+      canvasElement.dataset.chipBadgeForcedTextObservations = "0";
+      canvasElement.dataset.chipBadgeForcedStandaloneTextObservations = "0";
 
-    const causalBadge = canvasElement.querySelector<HTMLElement>(
-      '[data-chip-badge-criticality="error"] .critical-chip-neutral .badge',
-    );
-    causalBoundary = causalBadge?.parentElement ?? null;
-    if (!causalBadge || !causalBoundary)
-      throw new Error("Missing inherited-channel mutation node");
-    causalBoundary.style.setProperty(
-      "--modifier-color-foreground-primary",
-      "inherit",
-    );
-    expectProofFailure(
-      () => assertCriticalBadgePaint("error", "neutral"),
-      "inherited primary channel",
-    );
-    causalBoundary.style.removeProperty("--modifier-color-foreground-primary");
-    assertCriticalBadgePaint("error", "neutral");
-    causalBoundary = null;
-    documentRoot.style.colorScheme = originalColorScheme;
-    await nextPaint();
+      const causalBadge = canvasElement.querySelector<HTMLElement>(
+        '[data-chip-badge-criticality="error"] .critical-chip-neutral .badge',
+      );
+      causalBoundary = causalBadge?.parentElement ?? null;
+      if (!causalBadge || !causalBoundary)
+        throw new Error("Missing inherited-channel mutation node");
+      causalBoundary.style.setProperty(
+        "--modifier-color-foreground-primary",
+        "inherit",
+      );
+      expectProofFailure(
+        () => assertCriticalBadgePaint("error", "neutral"),
+        "inherited primary channel",
+      );
+      causalBoundary.style.removeProperty(
+        "--modifier-color-foreground-primary",
+      );
+      assertCriticalBadgePaint("error", "neutral");
+      causalBoundary = null;
+      documentRoot.style.colorScheme = originalColorScheme;
+      await nextPaint();
+    }
+    canvasElement.dataset.chipBadgeForcedColors = forcedColorsActive
+      ? "active"
+      : "none";
 
     const defaultHost = canvasElement.querySelector<HTMLElement>(
       '[data-chip-badge-case="site-default-ltr"]',
@@ -1410,34 +1554,36 @@ async function playInvariantBadgeProof(
     )
       throw new Error("Missing appearance or mutation proof nodes");
 
-    const defaultBadgeStyle = getComputedStyle(defaultBadge);
-    if (
-      defaultBadgeStyle.backgroundColor ===
-      getComputedStyle(defaultChip).backgroundColor
-    )
-      throw new Error(
-        "Default Badge fill must remain visible on the default Chip fill",
-      );
-    if (defaultBadgeStyle.color === defaultBadgeStyle.backgroundColor)
-      throw new Error("Default Badge text must remain visible");
+    if (!forcedColorsActive) {
+      const defaultBadgeStyle = getComputedStyle(defaultBadge);
+      if (
+        defaultBadgeStyle.backgroundColor ===
+        getComputedStyle(defaultChip).backgroundColor
+      )
+        throw new Error(
+          "Default Badge fill must remain visible on the default Chip fill",
+        );
+      if (defaultBadgeStyle.color === defaultBadgeStyle.backgroundColor)
+        throw new Error("Default Badge text must remain visible");
 
-    const criticalStyle = getComputedStyle(criticalBadge);
-    if (
-      !criticalBadge.classList.contains("error") ||
-      criticalStyle.backgroundColor ===
-        getComputedStyle(criticalChip).backgroundColor
-    )
-      throw new Error("Criticality must retain a distinct Badge fill");
-    if (criticalStyle.color === criticalStyle.backgroundColor)
-      throw new Error("Critical Badge text must remain visible");
+      const criticalStyle = getComputedStyle(criticalBadge);
+      if (
+        !criticalBadge.classList.contains("error") ||
+        criticalStyle.backgroundColor ===
+          getComputedStyle(criticalChip).backgroundColor
+      )
+        throw new Error("Criticality must retain a distinct Badge fill");
+      if (criticalStyle.color === criticalStyle.backgroundColor)
+        throw new Error("Critical Badge text must remain visible");
 
-    const customStyle = getComputedStyle(customBadge);
-    if (customStyle.backgroundColor !== "rgb(1, 2, 3)")
-      throw new Error(
-        `Custom Badge fill was lost: ${customStyle.backgroundColor}`,
-      );
-    if (customStyle.color !== "rgb(250, 251, 252)")
-      throw new Error(`Custom Badge text was lost: ${customStyle.color}`);
+      const customStyle = getComputedStyle(customBadge);
+      if (customStyle.backgroundColor !== "rgb(1, 2, 3)")
+        throw new Error(
+          `Custom Badge fill was lost: ${customStyle.backgroundColor}`,
+        );
+      if (customStyle.color !== "rgb(250, 251, 252)")
+        throw new Error(`Custom Badge text was lost: ${customStyle.color}`);
+    }
 
     const plainChip = defaultHost.querySelector<HTMLElement>(
       ".standalone-plain-chip",
