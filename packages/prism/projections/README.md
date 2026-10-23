@@ -243,6 +243,11 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Projections: `ChipProjection`, `RowProjection`, `CardProjection`,
   `CommandProjection`; types `ChipProjectionProps`, `RowProjectionProps`,
   `CardProjectionProps`, `CommandProjectionProps`.
+- Property projections: `OntologyPropertyChip`, `OntologyPropertyRow`,
+  `OntologyPropertyCard`, `OntologyPropertyCommand`,
+  `OntologyPropertyGraphNode`; types `OntologyPropertyChipProps`,
+  `OntologyPropertyRowProps`, `OntologyPropertyCardProps`,
+  `OntologyPropertyCommandProps`, `OntologyPropertyGraphNodeProps`.
 - Representations: `EntityChip`, `EntityRow`, `EntityCard`,
   `EntityCommand`, `EntityGraphNode`, `EntityList`; types
   `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,

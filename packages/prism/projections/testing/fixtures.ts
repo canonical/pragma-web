@@ -1,12 +1,12 @@
 /**
  * Static fixtures shared by the package's suites and stories: graph payloads
- * exactly as a provider answers them, the mock resolvers that answer them in
- * a Relay mock environment, and the site the projections link into.
+ * exactly as a provider answers them, the entities a Relay mock environment
+ * answers, and the site the projections link into.
  */
 
 import type { HomeNode, HomeResolver, Homes } from "@canonical/prism-core";
 import { type Router, route } from "@canonical/router-core";
-import type { MockResolvers } from "relay-test-utils";
+import type { MockResolver } from "relay-test-utils";
 import type { NodePayload } from "./types.js";
 
 /** A site's route table with one entity page, addressed by the entity. */
@@ -31,43 +31,66 @@ export const HOMES: Homes = {
 };
 
 /**
- * The entities the stories render, one per type the package projects, read
- * off the projection matrix: as a Relay mock environment's resolvers, by the
- * GraphQL type each answers. A `Node` is a UI block; an `OntologyClass` the
- * abstract class Layout; an `OntologyProperty` the object property
- * `modifier`.
+ * A UI block as a Relay mock environment answers a `Node`: what every node
+ * carries, read off the projection matrix's instance row.
  */
-export const MOCK_RESOLVERS: MockResolvers = {
-  Node: () => ({
-    __typename: "Component",
-    _meta: {
-      title: "IconButton",
-      curie: "ds:global.component.icon-button",
-      definition: "A button is an interactive element that triggers a command.",
-      type: { _meta: { title: "Component" } },
-    },
-  }),
-  OntologyClass: () => ({
-    __typename: "OntologyClass",
-    isAbstract: true,
-    instanceCount: 88,
-    definition:
-      "Layouts are an opinionated division of space to navigate a domain of information.",
-    _meta: { title: "Layout", curie: "ds:Layout" },
-    superclass: { _meta: { title: "UIBlock" } },
-  }),
-  OntologyProperty: () => ({
-    __typename: "OntologyProperty",
-    uri: "https://ds.canonical.com/modifier",
-    label: "modifier",
-    kind: "OBJECT",
-    range: "ds:Modifier",
-    functional: false,
-    definition: "The modifier that changes how a block looks or behaves.",
-    domain: { _meta: { title: "UIBlock" } },
-    inverse: { uri: "https://ds.canonical.com/modifies", label: "modifies" },
-  }),
-};
+export const MOCK_NODE = {
+  __typename: "Component",
+  _meta: {
+    title: "IconButton",
+    curie: "ds:global.component.icon-button",
+    definition: "A button is an interactive element that triggers a command.",
+    type: { _meta: { title: "Component" } },
+  },
+} as const;
+
+/**
+ * The abstract class Layout as a Relay mock environment answers an
+ * `OntologyClass`, read off the projection matrix's classes row.
+ */
+export const MOCK_ONTOLOGY_CLASS = {
+  __typename: "OntologyClass",
+  isAbstract: true,
+  instanceCount: 88,
+  definition:
+    "Layouts are an opinionated division of space to navigate a domain of information.",
+  _meta: { title: "Layout", curie: "ds:Layout" },
+  superclass: { _meta: { title: "UIBlock" } },
+} as const;
+
+/**
+ * The object property `modifier` as a Relay mock environment answers an
+ * `OntologyProperty`: declared on UIBlock, its inverse `modifies`.
+ */
+export const MOCK_ONTOLOGY_PROPERTY = {
+  __typename: "OntologyProperty",
+  uri: "https://ds.canonical.com/modifier",
+  label: "modifier",
+  kind: "OBJECT",
+  range: "ds:Modifier",
+  functional: false,
+  definition: "The modifier that changes how a block looks or behaves.",
+  domain: { _meta: { title: "UIBlock" } },
+  inverse: { uri: "https://ds.canonical.com/modifies", label: "modifies" },
+} as const;
+
+/**
+ * A mock resolver that answers `entity` for the operation's root field
+ * only. A mock environment resolves every object of a type through that
+ * type's resolver, so without it a property's inverse, itself a property,
+ * would answer as the property, over the values its parent gives it.
+ */
+export const resolveRoot =
+  (entity: object): MockResolver =>
+  (context) =>
+    context.path?.length === 1 ? entity : undefined;
+
+/** The href the site's `thing` route builds for `MOCK_ONTOLOGY_CLASS`. */
+export const MOCK_ONTOLOGY_CLASS_HREF = "/things/ds%3ALayout";
+
+/** The href the site's `thing` route builds for `MOCK_ONTOLOGY_PROPERTY`. */
+export const MOCK_ONTOLOGY_PROPERTY_HREF =
+  "/things/https%3A%2F%2Fds.canonical.com%2Fmodifier";
 
 /** A node of a type the site homes: an ontology class. */
 export const ONTOLOGY_CLASS_NODE: NodePayload = {

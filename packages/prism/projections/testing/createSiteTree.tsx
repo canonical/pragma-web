@@ -4,7 +4,7 @@ import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import type { Environment } from "relay-runtime";
+import type { Environment, IEnvironment } from "relay-runtime";
 import { defaultProjectionMaps } from "../src/lib/node/index.js";
 import {
   type ProjectionMaps,
@@ -34,7 +34,7 @@ export const createStoreOnlyEnvironment = (): Environment =>
  * router over one entity page, the site's homes and the projection maps.
  */
 export default function createSiteTree(
-  environment: Environment,
+  environment: IEnvironment,
   children: ReactNode,
   { maps = defaultProjectionMaps, LinkComponent }: SiteTreeOptions = {},
 ): ReactElement {
