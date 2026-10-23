@@ -1,29 +1,19 @@
 /*
- * App-level global styles: the tokens every lens layout and its regions
- * read, the underground surface hook, and the page preparation for a
- * full-viewport layout. Each lens layout owns its own grid and regions in
- * its own stylesheet; this file is the single definition site for what they
- * share:
+ * App-level global styles: the tokens the lens explorers read, the
+ * underground surface hook, and the page preparation for a full-viewport
+ * shell. The shell renders the site's one intrinsic grid and every lens
+ * layout is a subgrid of it; this file is the single definition site for
+ * what the explorers share:
  *
- *   block-axis metric      --strip-h
  *   z-axis tokens (AX.7)   --z-underground < --z-plate < --z-chrome < --z-overlay
  *   underground surface    --surface-underground-* (AX.3)
  *
- * Regions consume the tokens (the ModeStrip reads --strip-h); nothing may
- * hard-code these metrics, and nothing may re-define the tokens — the
- * stylesheet census asserts each is defined exactly once across the app's
- * stylesheets.
+ * Nothing may re-define the tokens: the stylesheet census asserts each is
+ * defined exactly once across the app's stylesheets.
  */
 
 @layer app {
   :root {
-    /* The strip band's height (AX.6): a block-axis metric, orthogonal to the
-     * column model, so it stays a token. There are no inline-axis width
-     * tokens: every lens layout reads the intrinsic columns
-     * (`--grid-intrinsic`, from @canonical/styles) and every region claims
-     * its width by SPANNING some count of them. */
-    --strip-h: 53px;
-
     /* ── Z-axis tokens: the semantic strata (AX.7), ordered ──
      * underground = specimen (wells you look INTO: graph canvases, stages);
      * plate       = document (the canvas sheet the mode renders on);
@@ -66,31 +56,31 @@
    * Deeper wells: the same 5% step that reads as a clear depression on paper
    * is invisible on near-black, so the knob turns up.
    *
-   * Chip hooks (`@canonical/prism-core`'s Chip falls back to its light
-   * values): every namespace tint is `oklch(--chip-tint-l --chip-tint-c
-   * <hue>)`, so the two tint hooks move every namespace at once. The
-   * instance fill drops from 15% to 8%, so the lighter dark tints keep
-   * text-vs-fill contrast above the 4.5:1 AA floor for every hue with room
-   * to spare (`chipContrast.tests`). */
+   * MentionChip hooks (`@canonical/prism-core`'s MentionChip falls back to
+   * its light values): every namespace tint is `oklch(--mention-chip-tint-l
+   * --mention-chip-tint-c <hue>)`, so the two tint hooks move every namespace
+   * at once. The instance fill drops from 15% to 8%, so the lighter dark
+   * tints keep text-vs-fill contrast above the 4.5:1 AA floor for every hue
+   * with room to spare (`chipContrast.tests`). */
   :root.dark {
     --underground-depth: 30%;
-    --chip-tint-l: 0.78;
-    --chip-tint-c: 0.11;
-    --chip-dot-canonical: oklch(0.7 0.14 150);
-    --chip-dot-beta: oklch(0.78 0.14 85);
-    --chip-dot-deprecated: oklch(0.68 0.17 25);
-    --chip-fill-weight-instance: 8%;
+    --mention-chip-tint-l: 0.78;
+    --mention-chip-tint-c: 0.11;
+    --mention-chip-dot-canonical: oklch(0.7 0.14 150);
+    --mention-chip-dot-beta: oklch(0.78 0.14 85);
+    --mention-chip-dot-deprecated: oklch(0.68 0.17 25);
+    --mention-chip-fill-weight-instance: 8%;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not(.light) {
       --underground-depth: 30%;
-      --chip-tint-l: 0.78;
-      --chip-tint-c: 0.11;
-      --chip-dot-canonical: oklch(0.7 0.14 150);
-      --chip-dot-beta: oklch(0.78 0.14 85);
-      --chip-dot-deprecated: oklch(0.68 0.17 25);
-      --chip-fill-weight-instance: 8%;
+      --mention-chip-tint-l: 0.78;
+      --mention-chip-tint-c: 0.11;
+      --mention-chip-dot-canonical: oklch(0.7 0.14 150);
+      --mention-chip-dot-beta: oklch(0.78 0.14 85);
+      --mention-chip-dot-deprecated: oklch(0.68 0.17 25);
+      --mention-chip-fill-weight-instance: 8%;
     }
   }
 
@@ -109,9 +99,9 @@
   }
 
   /* normalize.css zeroes this too, but inside `@layer normalize`, where any
-   * higher layer could override it. Each lens layout's viewport discipline
-   * (a 100dvh layout, the page never scrolls) depends on a zero-margin body,
-   * so the app asserts it in `app`, above every design-system layer. */
+   * higher layer could override it. The shell's viewport discipline (a 100dvh
+   * grid, the page never scrolls) depends on a zero-margin body, so the app
+   * asserts it in `app`, above every design-system layer. */
   body {
     margin: 0;
   }

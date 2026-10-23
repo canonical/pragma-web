@@ -36,7 +36,7 @@ Component styles are not here. They live beside their component, in the componen
 
 ## `packages/react`: The React Implementation
 
-React components and React-only libraries: the tiered component packages (`ds-global`, `ds-global-form`, `ds-app` and the product-specific `ds-app-*`), the hooks, the head manager, the token-explorer components, and server-side rendering with its deployment adapters. The React bindings of a framework-agnostic engine also live here, beside their siblings rather than beside their core (`router`, `i18n`).
+React components and React-only libraries: the tiered component packages (`ds-global`, `ds-global-form`, `ds-app` and the product-specific `ds-app-*`), the hooks, the head manager, the Markdown renderer, the token-explorer components, and server-side rendering with its deployment adapters. The React bindings of a framework-agnostic engine also live here, beside their siblings rather than beside their core (`router`, `i18n`).
 
 What does not belong: logic no React consumer needs. If more than one framework would want it, it belongs in `packages/runtime/`.
 
@@ -52,6 +52,7 @@ What does not belong: logic no React consumer needs. If more than one framework 
 | `react/ds-app-portal` | `@canonical/react-ds-app-portal` | same |
 | `react/hooks` | `@canonical/react-hooks` | same |
 | `react/head` | `@canonical/react-head` | same |
+| `react/markdown` | `@canonical/react-markdown` | same |
 | `react/tokens` | `@canonical/react-tokens` | same |
 | `react/ssr` | `@canonical/react-ssr` | same |
 | `react/ssr-adapter-cloudflare` (internal) | `@canonical/ssr-adapter-cloudflare` | `react-ssr-adapter-cloudflare` |

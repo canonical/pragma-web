@@ -1,4 +1,4 @@
-import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
+import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
 import { useRouterState } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { EntityFilterProvider } from "../EntityFilterProvider/index.js";
@@ -7,9 +7,6 @@ import { EntityStatus } from "./common/EntityStatus/index.js";
 import { SocketGuard } from "./common/SocketGuard/index.js";
 import { Trail } from "./common/Trail/index.js";
 import type { EntityLayoutProps } from "./types.js";
-import "./styles.css";
-
-const componentCssClassName = "ds entity-layout";
 
 /**
  * The entity lens's page layout: the site's rail and colophon around the
@@ -27,33 +24,28 @@ const componentCssClassName = "ds entity-layout";
  * `SocketGuard`, so a cold store empties its socket and nothing else; the
  * trail reads only the URL.
  *
- * Its root is the layout's own page grid: the rail in the west columns,
- * then a viewport stacking the strip, the canvas and the colophon. The rail
- * and the colophon are the site's own, so a site binds them once, in the
- * wrapper it groups the lens's routes under.
+ * The layout is the document archetype: the rail in its rail region, the
+ * strip in the top row, the routed page in the canvas, the one region that
+ * scrolls, and the colophon in the band under it. The rail and the colophon
+ * are the site's own, so a site binds them once, in the wrapper it groups
+ * the lens's routes under. The layout renders no element of its own:
+ * `DocumentLayout` renders the root, and the layout's native props reach it.
  *
  * `import { EntityLayout } from "@canonical/prism-lens-entity";`
  */
 export default function EntityLayout({
   binding,
   children,
-  className,
-  colophon,
   label,
-  rail,
   ...props
 }: EntityLayoutProps): ReactElement {
   const { match } = useRouterState();
   const onIndex = match?.kind === "route" && match.name === binding.id;
   return (
     <EntityFilterProvider>
-      <div
+      <DocumentLayout
         {...props}
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      >
-        <CanvasSkipLink />
-        {rail}
-        <div className="viewport">
+        strip={
           <ModeStrip
             context={<Trail binding={binding} label={label} />}
             controls={onIndex ? <EntityControls /> : null}
@@ -65,10 +57,10 @@ export default function EntityLayout({
               ) : null
             }
           />
-          <Canvas>{children}</Canvas>
-          {colophon}
-        </div>
-      </div>
+        }
+      >
+        {children}
+      </DocumentLayout>
     </EntityFilterProvider>
   );
 }

@@ -7,11 +7,11 @@
   "imports": {
     "#domains/lenses": "./src/domains/lenses/index.ts",
     "#i18n": "./src/i18n/index.ts",
+    "#lib/ui": "./src/lib/ui/index.ts",
     "#projections": "./src/projections/index.ts",
     "#relay": "./src/relay/index.ts",
     "#relay/__generated__/*": "./src/relay/__generated__/*",
     "#server": "./src/server/index.ts",
-    "#shell": "./src/shell/index.ts",
     "#site": "./src/site/index.ts",
     "#sitemap": "./src/sitemap/index.ts"
   },
@@ -25,9 +25,10 @@
     "preview": "bun run build:client && vite preview --outDir dist/client",
     "preview:bun": "bun run build:client && bun run build:server && bun src/server/preview.bun.ts",
     "build": "bun run relay && bun run build:client",
-    "build:all": "bun run build:client && bun run build:server",
+    "build:all": "bun run relay && bun run build:client && bun run build:server && bun run build:storybook",
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --mode server",
+    "build:storybook": "storybook build",
     "check": "bun run check:biome && bun run schema:check && bun run relay && bun run check:ts",
     "check:fix": "bun run check:biome:fix && bun run check:ts",
     "check:biome": "biome check",
@@ -36,7 +37,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "vitest run --config vitest.e2e.config.ts"
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "storybook": "storybook dev -p 6011 --no-open --host 0.0.0.0"
   },
   "dependencies": {
     "@canonical/prism-core": "^0.44.1",
@@ -50,6 +52,8 @@
     "@canonical/react-ssr": "^0.44.1",
     "@canonical/router-core": "^0.44.1",
     "@canonical/router-react": "^0.44.1",
+    "@canonical/storybook-addon-relay": "^0.44.1",
+    "@canonical/storybook-config": "^0.44.1",
     "@canonical/styles": "^0.44.1",
     "graphql": "^16.11.0",
     "react": "^19.2.4",
@@ -61,6 +65,7 @@
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
     "@canonical/typescript-config-react": "^0.44.1",
+    "@storybook/react-vite": "^10.6.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.0.0",
@@ -74,7 +79,10 @@
     "bun-types": "^1.3.9",
     "jsdom": "^28.1.0",
     "lightningcss": "^1.32.0",
+    "playwright": "^1.61.1",
     "relay-compiler": "^21.0.1",
+    "relay-test-utils": "^21.0.1",
+    "storybook": "^10.6.0",
     "typescript": "^7.0.2",
     "vite": "^8.0.1",
     "vitest": "^5.0.0"

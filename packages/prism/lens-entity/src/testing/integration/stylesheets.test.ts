@@ -9,14 +9,13 @@
  *   reflow layout (`prefers-color-scheme`, `forced-colors`,
  *   `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
  *   file, and only while no other condition rides along in the prelude;
- * - no grid template is authored but the layout's root, which reads the
- *   design system's intrinsic columns: every other `grid-template-columns`
- *   is a subgrid, so the index's cards land on the same ruler as the site;
+ * - no grid template is authored: every `grid-template-columns` is a
+ *   subgrid, so the index's cards land on the same ruler as the site's shell;
  * - no theme is named: a site's theme activates through its own classes;
  * - every component token reads another token, save the ones named here that
  *   hold the lens's own value where the design system has no semantic token;
  * - the tokens read from outside the lens are exactly the ones named here,
- *   each a semantic token of the design system or the site's grid preset,
+ *   each a semantic token of the design system,
  *   so a misspelt, invented or primitive name cannot sit unnoticed behind
  *   its fallback;
  * - every selector reaches a child through a role class, never through
@@ -70,7 +69,7 @@ const LITERAL_TOKENS = [
 
 /**
  * The tokens the lens reads from outside itself: the design system's
- * semantic colour and space tokens, and the site's grid preset. No
+ * semantic colour and space tokens. No
  * primitive token is among them: a component token reads the semantic tier
  * or holds its own value.
  */
@@ -80,7 +79,6 @@ const EXTERNAL_TOKENS = [
   "--color-border-muted",
   "--color-text",
   "--color-text-muted",
-  "--grid-intrinsic",
   "--space-025",
   "--space-050",
   "--space-100",
@@ -95,10 +93,9 @@ const LENS_PROPERTY = /^--(?:entity-|fields-table-|relations-)/;
 
 /**
  * The rule declarations that may hold a unit-bearing literal, because none
- * is a design decision: the layout root filling the viewport. A bare `0`
- * carries no unit.
+ * is a design decision; the lens has none. A bare `0` carries no unit.
  */
-const UNTHEMABLE_DECLARATIONS = ["block-size: 100dvh"];
+const UNTHEMABLE_DECLARATIONS: readonly string[] = [];
 
 /**
  * The literals unthemable in any declaration: `100%` fills the containing
@@ -183,7 +180,7 @@ function listLayoutCapableConditionals(css: string): string[] {
 
 describe("the lens stylesheets", () => {
   it("are found", () => {
-    expect(files.length).toBeGreaterThanOrEqual(9);
+    expect(files.length).toBeGreaterThanOrEqual(8);
   });
 
   it("carry no layout-capable conditional at-rule", () => {
@@ -192,21 +189,14 @@ describe("the lens stylesheets", () => {
     ).toEqual([]);
   });
 
-  it("author no grid template but the layout root's intrinsic columns", () => {
+  it("author no grid template: every template is a subgrid", () => {
     const templates = files.flatMap((file) =>
       [...readCss(file).matchAll(/grid-template-columns:\s*([^;]+);/g)].map(
-        (match) => ({ file, value: (match.at(1) ?? "").trim() }),
+        (match) => (match.at(1) ?? "").trim(),
       ),
     );
-    const authored = templates.filter(({ value }) => value !== "subgrid");
-
-    expect(templates.length).toBeGreaterThan(authored.length);
-    expect(authored).toEqual([
-      {
-        file: join(LIBRARY_DIRECTORY, "EntityLayout", "styles.css"),
-        value: "var(--grid-intrinsic)",
-      },
-    ]);
+    expect(templates.length).toBeGreaterThan(0);
+    expect(templates.filter((value) => value !== "subgrid")).toEqual([]);
   });
 
   it("name no theme", () => {
@@ -252,7 +242,7 @@ describe("the lens stylesheets", () => {
     ).toEqual(["outline: 2px solid red"]);
     expect(
       listRawDecisions(
-        ":root { --probe-width: 2px; } .ds.probe { block-size: 100dvh; --probe-gap: 1rem; }",
+        ":root { --probe-width: 2px; } .ds.probe { margin: 0; --probe-gap: 1rem; }",
       ),
     ).toEqual([]);
   });

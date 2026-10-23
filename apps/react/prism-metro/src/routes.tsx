@@ -1,24 +1,27 @@
+import { DocumentLayout } from "@canonical/prism-core";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
-import { Head } from "@canonical/react-head";
 import { group, route } from "@canonical/router-core";
 import {
   definitionsLayout,
   linesLayout,
   linesRoutes,
+  MetroRail,
   stationsLayout,
   stationsRoutes,
 } from "#domains/lenses";
-import { MESSAGES } from "#i18n";
+import { NotFoundPage } from "#lib/ui";
 
-/** The page every URL no route matches renders, at its own `/not-found`. */
+/**
+ * The page every URL no route matches renders, at its own `/not-found`: the
+ * document archetype with the site's rail, so a reader who lands there keeps
+ * the grid and a way back.
+ */
 export const notFoundRoute = route({
   url: "/not-found",
   content: () => (
-    <section>
-      <Head title={MESSAGES["notFound.title"]} />
-      <h1>{MESSAGES["notFound.title"]}</h1>
-      <p>{MESSAGES["notFound.body"]}</p>
-    </section>
+    <DocumentLayout rail={<MetroRail />}>
+      <NotFoundPage />
+    </DocumentLayout>
   ),
 });
 

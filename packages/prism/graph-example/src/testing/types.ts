@@ -4,8 +4,9 @@
  * with their lines and diagram places, and `readFleet`'s rolling stocks,
  * formations, units and car types with the lines they run; the cars and
  * cabs of a formation in train order, as the fleet tests derive them; and
- * the part of a `_meta` selection the field round-trip reads. Test-only,
- * and type-only.
+ * the part of a `_meta` selection the field round-trip reads; and the
+ * reference-extraction cases `extractReferences` is held to. Test-only, and
+ * type-only.
  */
 
 /** One class's instances page, the way the readers select it. */
@@ -166,4 +167,14 @@ export interface Fleet {
   readonly carTypes: readonly FleetCarType[];
   readonly lines: readonly FleetLine[];
   readonly stations: readonly FleetStop[];
+}
+
+/**
+ * One reference-extraction case: a CommonMark document and the IRIs it must
+ * yield, in order.
+ */
+export interface ExtractionCase {
+  readonly name: string;
+  readonly markdown: string;
+  readonly expected: readonly string[];
 }

@@ -1,0 +1,11 @@
+---
+# RouterLink — the anchor a link-injecting component renders through the
+# router. It binds no styles of its own: the caller's className carries them.
+node:
+  uri: prism.component.router_link
+  edges:
+    - node:
+        role: link content
+      relation:
+        cardinality: "1"
+        slotName: default

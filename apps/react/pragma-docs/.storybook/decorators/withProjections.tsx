@@ -1,10 +1,9 @@
-import { HomesProvider } from "@canonical/prism-core";
+import { HomesProvider, RouterLink } from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
 } from "@canonical/prism-projections";
 import type { ElementType } from "react";
-import { RouterLink } from "#lib/RouterLink";
 import { homes } from "../../src/homes.js";
 
 /**

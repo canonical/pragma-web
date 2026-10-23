@@ -1,0 +1,20 @@
+---
+# Probe — a fixture the checks run against: a grid with one labelled
+# child, a hover state and a reflow below one group, every decision read
+# through a component token.
+node:
+  uri: prism.component.probe
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+    spacing.internal.inline.start: space.100
+    spacing.internal.inline.end: space.100
+    appearance.radius: 0.25rem
+    typography.color: color.text
+    typography.color@hover: color.text.muted
+  edges:
+    - node:
+        role: label
+        styles:
+          typography.weight: typography.text.primary.bold.fontWeight
+      relation: { cardinality: "1", slotName: label }

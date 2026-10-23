@@ -20,7 +20,7 @@ describe("appRoutes", () => {
       { name: "home", label: "Home", tier: 2 },
       { name: "components", label: "Components", tier: 2 },
       { name: "definitions", label: "Definitions", tier: 1 },
-      { name: "standards", label: "Standards", tier: 1 },
+      { name: "standards", label: "Standards", tier: 2 },
       { name: "journeys", label: "Journeys", tier: 2 },
       { name: "guides", label: "Guides", tier: 1 },
     ]);

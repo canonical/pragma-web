@@ -10,6 +10,7 @@ export {
   DEFAULT_SEM_ROOT,
   EXCLUDED_SOURCES,
   PREFIX_DECL,
+  PROSE_EXTENSION,
   REF_NAME,
   REF_PACKAGES,
   REF_SCOPE,
@@ -19,6 +20,7 @@ export {
 export type {
   PragmaProvider,
   PragmaProviderOptions,
+  ProseSidecar,
   RefRoot,
   SourceRoots,
   TtlSource,

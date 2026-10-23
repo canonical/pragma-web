@@ -129,7 +129,7 @@ describe("native props", () => {
         {null}
       </EntityLayout>,
     );
-    expectRoot("layout", "entity-layout");
+    expectRoot("layout", "document-layout");
   });
 
   it("reach the root of the strip's controls and status", {
