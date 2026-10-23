@@ -35,7 +35,10 @@ const componentCssClassName = "ds command-palette";
  * The search renders in the browser only: its combobox and listbox are
  * wired by script, so the server sends the closed dialog and the key hints
  * alone. A search that fails renders one line in its place until the
- * palette closes; each opening starts a fresh search.
+ * palette closes, and the line takes the focus the field held, so it
+ * stays in the dialog; while it shows, only the hint to close remains,
+ * since nothing is left to move through or open. Each opening starts a
+ * fresh search.
  *
  * Mount it once, inside the site's providers: the Relay environment, whose
  * provider serves the search extension; the router; the homes; and the
@@ -48,7 +51,8 @@ const componentCssClassName = "ds command-palette";
  *
  * @implements prism.component.command_palette
  * @note Impure: reads the translator in scope, attaches the shortcut's
- *   listener to the document, and opens and closes its dialog.
+ *   listener to the document, opens and closes its dialog, and focuses a
+ *   failure's line.
  */
 export default function CommandPalette({
   className,
@@ -58,7 +62,20 @@ export default function CommandPalette({
   const t = useMessages();
   const dialog = useRef<HTMLDialogElement>(null);
   const [session, setSession] = useState(0);
+  const [failed, setFailed] = useState(false);
   useOpenShortcut(dialog);
+
+  /**
+   * Hold the failure line while the search's boundary shows it: focus it
+   * as it mounts, since the field that held the focus is gone, and keep
+   * the hints to move and to open off while it shows.
+   *
+   * @note Impure: moves the focus and sets the component's state.
+   */
+  const attachFailure = useCallback((failure: HTMLDivElement | null): void => {
+    failure?.focus();
+    setFailed(failure !== null);
+  }, []);
 
   /**
    * Tell the consumer the palette closed, then start the next opening's
@@ -92,7 +109,12 @@ export default function CommandPalette({
       <ClientOnly>
         <ErrorBoundary
           fallback={
-            <div className="failure" role="alert">
+            <div
+              className="failure"
+              ref={attachFailure}
+              role="alert"
+              tabIndex={-1}
+            >
               {t("palette.failure")}
             </div>
           }
@@ -108,21 +130,25 @@ export default function CommandPalette({
         </ErrorBoundary>
       </ClientOnly>
       <div className="hints">
-        <span className="hint">
-          <Message
-            elements={{
-              up: <KeyboardKey keyValue="up" />,
-              down: <KeyboardKey keyValue="down" />,
-            }}
-            id="hints.move"
-          />
-        </span>
-        <span className="hint">
-          <Message
-            elements={{ enter: <KeyboardKey keyValue="enter" /> }}
-            id="hints.open"
-          />
-        </span>
+        {failed ? null : (
+          <>
+            <span className="hint">
+              <Message
+                elements={{
+                  up: <KeyboardKey keyValue="up" />,
+                  down: <KeyboardKey keyValue="down" />,
+                }}
+                id="hints.move"
+              />
+            </span>
+            <span className="hint">
+              <Message
+                elements={{ enter: <KeyboardKey keyValue="enter" /> }}
+                id="hints.open"
+              />
+            </span>
+          </>
+        )}
         <span className="hint">
           <Message
             elements={{ escape: <KeyboardKey keyValue="escape" /> }}

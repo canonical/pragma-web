@@ -35,7 +35,11 @@
 # the closed dialog and the hints alone (cs:ui_blocks.nojs.aria_contracts).
 # A search that fails renders one line in its place until the palette
 # closes; the next opening starts a fresh search. The boundary renders the
-# search or, once it has caught, the failure line, never both.
+# search or, once it has caught, the failure line, never both. The line
+# takes the focus as it mounts (tabindex -1), since the field that held it
+# is gone, so the focus stays in the dialog; while it shows, the hints to
+# move and to open are not rendered, nothing being left to move through or
+# open, and the hint to close alone remains (the hint slot's 1..3).
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)   below two groups: the shell holds
@@ -118,5 +122,5 @@ node:
                 - node:
                     uri: global.component.keyboard_key
                   relation: { cardinality: "1..*" }
-            relation: { cardinality: "3", slotName: hint }
+            relation: { cardinality: "1..3", slotName: hint }
       relation: { cardinality: "1", slotName: hints }

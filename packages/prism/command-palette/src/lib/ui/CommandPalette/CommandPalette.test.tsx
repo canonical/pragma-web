@@ -43,6 +43,12 @@ const open = (): void => {
   fireEvent.keyDown(document, { key: "k", ctrlKey: true });
 };
 
+/** The text of each key hint the palette shows, in order. */
+const readHints = (): (string | null)[] =>
+  [...findDialog().querySelectorAll(".hints > .hint")].map(
+    (hint) => hint.textContent,
+  );
+
 /** Type `text` in the palette's field. */
 const type = (text: string): void => {
   fireEvent.change(screen.getByRole("combobox"), { target: { value: text } });
@@ -60,12 +66,7 @@ describe("CommandPalette", () => {
     expect(dialog.open).toBe(false);
     expect(dialog).toHaveAttribute("aria-label", "Search the graph");
     expect(dialog.className).toBe("ds modal ds command-palette");
-    const hints = container.querySelectorAll(".hints > .hint");
-    expect([...hints].map((hint) => hint.textContent)).toEqual([
-      "↑ ↓ to move",
-      "↵ to open",
-      "Esc to close",
-    ]);
+    expect(readHints()).toEqual(["↑ ↓ to move", "↵ to open", "Esc to close"]);
     expect(container.querySelectorAll(".hints kbd")).toHaveLength(4);
   });
 
@@ -127,7 +128,7 @@ describe("CommandPalette", () => {
     });
   });
 
-  it("shows one line when the search fails, and searches again once reopened", async () => {
+  it("shows one focused line and the close hint alone when the search fails, and searches again once reopened", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const { environment } = renderPalette();
     open();
@@ -137,15 +138,19 @@ describe("CommandPalette", () => {
         new Error("the graph is down"),
       );
     });
-    expect(screen.getByRole("alert")).toHaveTextContent(
+    const failure = screen.getByRole("alert");
+    expect(failure).toHaveTextContent(
       "The search failed. Close the palette and open it again to retry.",
     );
     expect(screen.queryByRole("combobox")).toBeNull();
+    expect(failure).toHaveFocus();
+    expect(readHints()).toEqual(["Esc to close"]);
     act(() => {
       findDialog().close();
     });
     open();
     expect(screen.queryByRole("alert")).toBeNull();
+    expect(readHints()).toEqual(["↑ ↓ to move", "↵ to open", "Esc to close"]);
     type("lay");
     expect(environment.mock.getAllOperations()).toHaveLength(1);
     await act(async () => {

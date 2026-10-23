@@ -105,7 +105,9 @@ palette.
 While the next results load, the last ones stay on screen and the listbox
 is busy (`aria-busy`). An empty field shows a one-line hint and sends no
 query; a text nothing matches shows one line naming it; both are a `status`
-region. A search that fails renders one `alert` line in its place.
+region. A search that fails renders one `alert` line in its place, which
+takes the focus the field held, so it stays in the dialog; while it shows,
+the hints to move and to open are gone and the hint to close remains.
 
 The search renders in the browser only: its combobox and listbox are wired
 by script, so the server sends the closed dialog and the key hints alone.
