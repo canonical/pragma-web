@@ -74,7 +74,8 @@ function prefersReducedMotion(): boolean {
  *
  * It reads the zoom bucket and the percentage from the world's on-screen
  * scale, measured on the client, and re-measures when the viewport
- * resizes. When `fit` changes it fits that box; when `reveal` changes it
+ * resizes. When `fit` changes it fits that box; when `frame`'s serial
+ * changes it fits the frame's box, once; when `reveal` changes it
  * pans that box into view, without zooming, only if it is not already in
  * view. Every move a control or a prop asks for takes 200ms, and is instant
  * under reduced motion.
@@ -88,6 +89,7 @@ export default function useGraphCamera({
   camera,
   viewBox,
   fit,
+  frame,
   reveal,
 }: UseGraphCameraProps): UseGraphCameraResult {
   const [bucket, setBucket] = useState<GraphZoomBucket>("full");
@@ -96,12 +98,13 @@ export default function useGraphCamera({
   const current = useRef<GraphTransform>(zoomIdentity);
   // The latest targets, read by the listeners and the controls; the effects
   // that act on a change compare the boxes' values, never their identity.
-  const latest = useRef({ viewBox, fit, reveal });
-  latest.current = { viewBox, fit, reveal };
+  const latest = useRef({ viewBox, fit, frame, reveal });
+  latest.current = { viewBox, fit, frame, reveal };
 
   const viewBoxKey = formatBox(viewBox);
   const fitKey = fit === undefined ? undefined : formatBox(fit);
   const revealKey = reveal === undefined ? undefined : formatBox(reveal);
+  const frameKey = frame?.serial;
 
   // Move the camera to a transform: at once under reduced motion, else in a
   // short transition.
@@ -228,6 +231,15 @@ export default function useGraphCamera({
     lastFit.current = fitKey;
     fitBox(latest.current.fit);
   }, [fitKey]);
+
+  const lastFrame = useRef(frameKey);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the camera fits a frame once per request, when its serial changes
+  useEffect(() => {
+    if (lastFrame.current === frameKey) return;
+    lastFrame.current = frameKey;
+    const request = latest.current.frame;
+    if (request !== undefined) fitBox(request.box);
+  }, [frameKey]);
 
   const lastReveal = useRef(revealKey);
   // biome-ignore lint/correctness/useExhaustiveDependencies: the camera pans when the reveal box's values change, not its identity

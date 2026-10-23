@@ -46,6 +46,7 @@ export type {
   ErrorBoundaryProps,
   GraphBox,
   GraphCanvasProps,
+  GraphFrameRequest,
   GraphTransform,
   GraphZoomBucket,
   Kind,

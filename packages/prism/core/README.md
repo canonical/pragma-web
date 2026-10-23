@@ -344,7 +344,8 @@ site's own catalog, and the factory holds no reader-facing string.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
   lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
   show only the text that renders at 12px or more; types
-  `GraphCanvasProps`, `GraphBox`, `GraphTransform`, `GraphZoomBucket`.
+  `GraphCanvasProps`, `GraphBox`, `GraphFrameRequest` (a one-off fit the
+  camera makes once per serial), `GraphTransform`, `GraphZoomBucket`.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.

@@ -22,8 +22,10 @@ const componentCssClassName = "ds graph-canvas";
  * and `0` zoom in, out and back to the fit while focus is inside the
  * canvas. The camera's transform is written by d3-zoom on the client and
  * never by React, so the server renders the identity and hydration has
- * nothing to reconcile. When `fit` changes the camera fits it; when
- * `reveal` changes the camera pans it into view if it is not already.
+ * nothing to reconcile. When `fit` changes the camera fits it, and the Fit
+ * control and `0` fit it again; a `frame` request fits its box once per
+ * serial; when `reveal` changes the camera pans it into view if it is not
+ * already.
  *
  * The drawing reads the zoom bucket through `useGraphZoomBucket`, so it
  * shows only the text that renders at 12px or more on screen; the lattice
@@ -40,6 +42,7 @@ export default function GraphCanvas({
   label,
   viewBox,
   fit,
+  frame,
   reveal,
   className,
   children,
@@ -54,6 +57,7 @@ export default function GraphCanvas({
     camera,
     viewBox,
     fit,
+    frame,
     reveal,
   });
   // A pattern is addressed by a document-wide id; React's ids carry

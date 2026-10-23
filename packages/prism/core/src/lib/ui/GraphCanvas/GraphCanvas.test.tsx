@@ -273,6 +273,35 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(0,0) scale(1)");
   });
 
+  it("fits a frame once per request, and Fit restores the fit box", () => {
+    const box: GraphBox = { x: 400, y: 0, width: 400, height: 300 };
+    const draw = (serial: number) => (
+      <GraphCanvas
+        frame={{ box, serial }}
+        label="Class graph"
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>
+    );
+    const { rerender } = render(draw(0));
+    expect(readCamera()).toBeNull();
+    rerender(draw(1));
+    expect(readCamera()).toBe("translate(-800,0) scale(2)");
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    rerender(draw(1));
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    rerender(draw(2));
+    expect(readCamera()).toBe("translate(-800,0) scale(2)");
+    rerender(
+      <GraphCanvas label="Class graph" viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(readCamera()).toBe("translate(-800,0) scale(2)");
+  });
+
   it("pans a revealed box into view only when it is out of view", () => {
     const { rerender } = renderCanvas({
       reveal: { x: 10, y: 10, width: 96, height: 32 },

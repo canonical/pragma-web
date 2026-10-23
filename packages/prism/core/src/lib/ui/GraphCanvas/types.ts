@@ -21,6 +21,17 @@ export interface GraphTransform {
 }
 
 /**
+ * A one-off request to fit the camera to a box: the camera fits `box` each
+ * time `serial` changes, so asking twice for the same box fits it twice.
+ */
+export interface GraphFrameRequest {
+  /** The box to fit. */
+  readonly box: GraphBox;
+  /** The request's number; a new number is a new request. */
+  readonly serial: number;
+}
+
+/**
  * How much text the drawing can show at the current zoom, so no text is
  * drawn below 12px on screen: `overview` below 0.75 (shapes and edges only),
  * `hubs` below 12/14 (16px text only), `full` above (all text).
@@ -36,11 +47,16 @@ type OwnProps = {
    */
   readonly viewBox: GraphBox;
   /**
-   * The box the Fit control fits, and the camera fits whenever it changes:
-   * the visible part of the graph under a filter, or a region a reader
-   * asked for. The whole viewBox when omitted.
+   * The box the Fit control and the `0` key fit, and the camera fits
+   * whenever it changes: the visible part of the graph under a filter. The
+   * whole viewBox when omitted.
    */
   readonly fit?: GraphBox;
+  /**
+   * A box the camera fits once per request, such as a region a reader
+   * picked; the Fit control still restores `fit` afterwards.
+   */
+  readonly frame?: GraphFrameRequest;
   /**
    * A box the camera brings into view whenever it changes, by panning
    * without zooming, and only when the box is not already fully in view:
