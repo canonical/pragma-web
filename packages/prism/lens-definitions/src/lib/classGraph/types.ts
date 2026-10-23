@@ -259,6 +259,12 @@ export interface ClassGraphLayout {
   readonly rail: readonly string[];
   /** The graph's bounds plus the view margin. */
   readonly viewBox: Rect;
+  /**
+   * The box the canvas opens on: the viewBox when it fits the design canvas
+   * at the legible zoom, else the viewBox's top-left window that the design
+   * canvas shows at that zoom.
+   */
+  readonly view: Rect;
   /** The zoom at which the viewBox fits the design canvas. */
   readonly fitZoom: number;
   /** The channel the packer settled on. */

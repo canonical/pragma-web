@@ -12,6 +12,7 @@ import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js"
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
 import { requireEntry } from "../../classGraph/require.js";
+import frameOpeningView from "./frameOpeningView.js";
 import HierarchyWell from "./HierarchyWell.js";
 import type { HierarchyWellProps } from "./types.js";
 
@@ -66,6 +67,23 @@ describe("HierarchyWell", () => {
     expect(
       container.querySelector(".class-graph")?.getAttribute("data-fit-zoom"),
     ).toBe(layout.fitZoom.toFixed(4));
+  });
+
+  it("opens on the layout's view, or a window around the class on arrival", () => {
+    const viewBoxOf = (container: HTMLElement) =>
+      container.querySelector(".desktop svg.viewport")?.getAttribute("viewBox");
+    const { view } = layout;
+    expect(viewBoxOf(renderWell().container)).toBe(
+      `${view.x} ${view.y} ${view.w} ${view.h}`,
+    );
+    const term = "cs:CodeStandard";
+    const opened = frameOpeningView(
+      layout,
+      layout.nodes.get(requireEntry(uris, term)),
+    );
+    expect(viewBoxOf(renderWell({ term }).container)).toBe(
+      `${opened.x} ${opened.y} ${opened.width} ${opened.height}`,
+    );
   });
 
   it("gives the graph one tab stop, on the first class without a selection", () => {
@@ -267,12 +285,14 @@ describe("HierarchyWell", () => {
     it("fits a picked region once per pick, and Fit restores the graph", () => {
       stubViewport();
       const { container, rerender } = render(drawWell({}));
+      fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+      const whole = readCamera(container);
       rerender(drawWell({ region: { prefix: "cs", serial: 1 } }));
       const region = readCamera(container);
       expect(region).not.toBeNull();
-      expect(region).not.toBe("translate(0,0) scale(1)");
+      expect(region).not.toBe(whole);
       fireEvent.click(screen.getByRole("button", { name: "Fit" }));
-      expect(readCamera(container)).toBe("translate(0,0) scale(1)");
+      expect(readCamera(container)).toBe(whole);
       rerender(drawWell({ region: { prefix: "cs", serial: 2 } }));
       expect(readCamera(container)).toBe(region);
     });

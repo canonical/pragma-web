@@ -16,6 +16,7 @@ import { useMessages } from "../../i18n/index.js";
 import { ClassGraph } from "../ClassGraph/index.js";
 import classifyClasses from "./classifyClasses.js";
 import { PhoneGraph } from "./common/PhoneGraph/index.js";
+import frameOpeningView from "./frameOpeningView.js";
 import measureVisibleBox from "./measureVisibleBox.js";
 import type { HierarchyWellProps } from "./types.js";
 import "./styles.css";
@@ -48,8 +49,10 @@ function readClosest(
 
 /**
  * The explorer's centre region: the class graph on its lattice, in a
- * canvas that pans and zooms, fitted on first paint; on a phone, below one
- * group of columns, the same graph as rows in rail order.
+ * canvas that pans and zooms, fitted on first paint, or opened on a legible
+ * window of it around the class selected on arrival when the whole fits
+ * only below the legible zoom; on a phone, below one group of columns, the
+ * same graph as rows in rail order.
  *
  * One selection is kept in step with the rail and the inspector: the URL's
  * term is ringed in the accent, its lineage drawn, and the camera pans it
@@ -128,8 +131,25 @@ export default function HierarchyWell({
           omitted: [],
         };
   }, [activeEdge, focus, hidden, layout, t]);
+  // The canvas opens on the whole graph, or on a legible window of it
+  // around the class selected on arrival; Fit always fits the whole.
+  const [arrival] = useState(selected);
+  const viewBox = useMemo(
+    () =>
+      frameOpeningView(
+        layout,
+        arrival === undefined ? undefined : layout.nodes.get(arrival),
+      ),
+    [arrival, layout],
+  );
   const fit = useMemo(
-    () => measureVisibleBox(layout, hidden, undefined),
+    () =>
+      measureVisibleBox(layout, hidden, undefined) ?? {
+        x: layout.viewBox.x,
+        y: layout.viewBox.y,
+        width: layout.viewBox.w,
+        height: layout.viewBox.h,
+      },
     [hidden, layout],
   );
   const frame = useMemo(() => {
@@ -201,12 +221,7 @@ export default function HierarchyWell({
         frame={frame}
         label={t("well.label")}
         reveal={reveal}
-        viewBox={{
-          x: layout.viewBox.x,
-          y: layout.viewBox.y,
-          width: layout.viewBox.w,
-          height: layout.viewBox.h,
-        }}
+        viewBox={viewBox}
       >
         <ClassGraph
           active={hovered}

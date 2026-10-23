@@ -174,20 +174,14 @@ export const WIDE_GRAPH: ClassGraphInput = {
 };
 
 /**
- * A chain of seven classes that fits the design canvas only once the
- * channels narrow to 32px.
+ * A chain of five classes that fits the design canvas at the legible zoom
+ * only once the channels narrow to 32px.
  */
 export const NARROWING_GRAPH: ClassGraphInput = {
-  classes: [
-    "Alpha",
-    "Beta",
-    "Gamma",
-    "Delta",
-    "Epsilon",
-    "Zeta Twelve Long",
-    "Eta Fifteen Long",
-  ].map((label, index) => defineClass(`ex:N${index}`, label)),
-  relations: Array.from({ length: 6 }, (_, index) => ({
+  classes: ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"].map((label, index) =>
+    defineClass(`ex:N${index}`, label),
+  ),
+  relations: Array.from({ length: 4 }, (_, index) => ({
     uri: `ex:follows${index}`,
     label: `follows${index}`,
     domain: `ex:N${index}`,

@@ -63,10 +63,14 @@ export const REGION_LABEL_GAP = 8;
 export const VIEW_MARGIN = 16;
 
 /**
- * The canvas the layout is fitted for: the Definitions well at 1440 by 900,
- * in px. The packer keeps the shelf break with the largest fit on it.
+ * The canvas the layout is fitted for, in px: the Definitions well's
+ * viewport at 1440 by 900, as measured in the browser (590.67 by 778),
+ * where the site's
+ * rail takes two columns, the term rail two and the inspector three, under
+ * the canvas's controls bar. The packer keeps the shelf break with the
+ * largest fit on it.
  */
-export const DESIGN_CANVAS = { w: 868, h: 798 } as const;
+export const DESIGN_CANVAS = { w: 590, h: 778 } as const;
 
 /**
  * Where a region shorter than its shelf may sit, as a share of the room

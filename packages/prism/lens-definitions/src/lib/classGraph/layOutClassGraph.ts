@@ -221,9 +221,13 @@ function alignShelves(
  * Lay the class graph out: each namespace region in its own layered
  * columns, the regions packed into shelves for the largest fit on the
  * design canvas (retried with narrower channels when the fit would put
- * 14px labels below 12px), placed on the lattice, then the cross-region
+ * 14px labels below 12px, which are kept only when they lift it to the
+ * legible zoom), placed on the lattice, then the cross-region
  * relations and subclass joins routed through the gaps, the rail order,
- * the keyboard's moves, the viewBox with its margin and the phone view.
+ * the keyboard's moves, the viewBox with its margin, the view the canvas
+ * opens on (the whole viewBox, or its top-left window at the legible zoom
+ * when the whole fits only below it, which the findings record) and the
+ * phone view.
  *
  * It is total over what a provider serves: superclass cycles are broken
  * and an input with no class lays out as an empty floor. It is a pure
@@ -252,6 +256,7 @@ export default function layOutClassGraph(
       regions: [],
       rail: [],
       viewBox: { x: 0, y: 0, w: DESIGN_CANVAS.w, h: DESIGN_CANVAS.h },
+      view: { x: 0, y: 0, w: DESIGN_CANVAS.w, h: DESIGN_CANVAS.h },
       fitZoom: 1,
       channel: CHANNEL,
       findings: [],
@@ -266,12 +271,15 @@ export default function layOutClassGraph(
     findings.push(
       `G3: fit ${packed.packing.fit.toFixed(3)} at ${CHANNEL}px channels; ${retry.packing.fit.toFixed(3)} at ${FALLBACK_CHANNEL}px`,
     );
-    if (retry.packing.fit > packed.packing.fit) {
+    // The narrower channels crowd the arcs that nest in them, so they are
+    // taken only when they bring the graph to the legible zoom; short of
+    // it, the canvas opens on a window either way.
+    if (retry.packing.fit >= MIN_FIT) {
       packed = retry;
       channel = FALLBACK_CHANNEL;
     }
     if (packed.packing.fit < MIN_FIT)
-      findings.push("G3: accepted the overview bucket");
+      findings.push("G3: opens on a legible window, the rest a pan away");
   }
   const { regions: sized, packing } = packed;
 
@@ -511,6 +519,29 @@ export default function layOutClassGraph(
   const orderedNodes = new Map(
     [...nodes.entries()].sort(([a], [b]) => compareText(a, b)),
   );
+  const fitZoom = Math.min(
+    DESIGN_CANVAS.w / viewBox.w,
+    DESIGN_CANVAS.h / viewBox.h,
+  );
+  // A graph that fits only below the legible zoom opens on its top-left
+  // window at that zoom, so no first paint drops the labels: the window
+  // is cut down to the lattice, which keeps it clear of the threshold
+  // when the real canvas rounds a pixel short of the design canvas.
+  const view =
+    fitZoom >= MIN_FIT
+      ? viewBox
+      : {
+          x: viewBox.x,
+          y: viewBox.y,
+          w: Math.min(
+            viewBox.w,
+            Math.floor(DESIGN_CANVAS.w / MIN_FIT / LATTICE) * LATTICE,
+          ),
+          h: Math.min(
+            viewBox.h,
+            Math.floor(DESIGN_CANVAS.h / MIN_FIT / LATTICE) * LATTICE,
+          ),
+        };
   return {
     model,
     nodes: orderedNodes,
@@ -518,7 +549,8 @@ export default function layOutClassGraph(
     regions,
     rail,
     viewBox,
-    fitZoom: Math.min(DESIGN_CANVAS.w / viewBox.w, DESIGN_CANVAS.h / viewBox.h),
+    view,
+    fitZoom,
     channel,
     findings,
     phone: layOutPhoneView(model, orderedNodes, rail, regions),

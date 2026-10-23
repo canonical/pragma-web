@@ -1,28 +1,29 @@
 import { describe, expect, it } from "vitest";
+import { DESIGN_CANVAS, VIEW_MARGIN } from "./constants.js";
 import packShelves from "./packShelves.js";
 
 describe("packShelves", () => {
   it("keeps the shelf break that fits the design canvas at the largest zoom", () => {
     const beside = packShelves([
-      { w: 400, h: 400 },
-      { w: 400, h: 400 },
+      { w: 200, h: 600 },
+      { w: 200, h: 600 },
     ]);
-    expect(beside).toMatchObject({ shelves: [[0, 1]], w: 848, h: 400 });
+    expect(beside).toMatchObject({ shelves: [[0, 1]], w: 448, h: 600 });
     const stacked = packShelves([
-      { w: 800, h: 96 },
-      { w: 800, h: 96 },
+      { w: 500, h: 96 },
+      { w: 500, h: 96 },
     ]);
-    expect(stacked).toMatchObject({ shelves: [[0], [1]], w: 800, h: 240 });
-    expect(stacked.fit).toBeCloseTo(868 / 832);
+    expect(stacked).toMatchObject({ shelves: [[0], [1]], w: 500, h: 240 });
+    expect(stacked.fit).toBeCloseTo(DESIGN_CANVAS.w / (500 + 2 * VIEW_MARGIN));
   });
 
   it("prefers fewer shelves on a tie", () => {
-    expect(
-      packShelves([
-        { w: 16, h: 16 },
-        { w: 16, h: 16 },
-      ]).shelves,
-    ).toEqual([[0, 1]]);
+    // Beside, the pair is bound by its width; stacked, by its height: both
+    // at a zoom of 2 on the design canvas.
+    const tall = { w: DESIGN_CANVAS.w / 2 - 96, h: DESIGN_CANVAS.h / 2 - 96 };
+    const packing = packShelves([tall, { w: 16, h: 16 }]);
+    expect(packing.fit).toBeCloseTo(2);
+    expect(packing.shelves).toEqual([[0, 1]]);
   });
 
   it("packs forty regions, in order, without trying every break", () => {

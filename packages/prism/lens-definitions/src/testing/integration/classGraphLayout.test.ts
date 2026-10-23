@@ -22,27 +22,38 @@ import {
   measurePorts,
 } from "../../../testing/measureClassGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
+import { DESIGN_CANVAS, MIN_FIT } from "../../lib/classGraph/constants.js";
 import layOutClassGraph from "../../lib/classGraph/layOutClassGraph.js";
 
 const layout = layOutClassGraph(ontologyGraph);
 
 describe("the class graph of the real ontology", () => {
-  it("fits the design canvas at a zoom where every 14px label reads at 12px", () => {
+  it("fits the 1440 well only below the legible zoom, says so, and opens on a legible window", () => {
     const fit = measureFit(layout);
-    expect(fit.zoom).toBeGreaterThanOrEqual(12 / 14);
-    expect(fit.zoom).toBeCloseTo(0.8599, 4);
+    expect(fit.zoom).toBeLessThan(MIN_FIT);
+    expect(fit.zoom).toBeCloseTo(0.7151, 4);
     expect(fit.binding).toBe("height");
     expect(fit.otherFill).toBeGreaterThanOrEqual(0.6);
-    expect(layout.viewBox).toEqual({ x: -16, y: -16, w: 864, h: 928 });
-    expect(layout.findings).toEqual([]);
+    expect(layout.viewBox).toEqual({ x: -16, y: -16, w: 752, h: 1088 });
+    expect(layout.findings).toEqual([
+      "G3: fit 0.715 at 48px channels; 0.723 at 32px",
+      "G3: opens on a legible window, the rest a pan away",
+    ]);
+    expect(layout.view).toEqual({ x: -16, y: -16, w: 688, h: 896 });
+    expect(
+      Math.min(
+        DESIGN_CANVAS.w / layout.view.w,
+        DESIGN_CANVAS.h / layout.view.h,
+      ),
+    ).toBeGreaterThanOrEqual(MIN_FIT);
   });
 
   it("covers the canvas densely, with no holes", () => {
     const area = measureAreaRatio(layout);
     expect(area).toBeGreaterThanOrEqual(0.12);
     expect(area).toBeLessThanOrEqual(0.3);
-    expect(area).toBeCloseTo(0.1429, 4);
-    expect(countEmptyCells(layout)).toBe(2);
+    expect(area).toBeCloseTo(0.1491, 4);
+    expect(countEmptyCells(layout)).toBe(1);
   });
 
   it("keeps 16px within a column, a 48px channel and a wider gap between regions", () => {
@@ -82,7 +93,7 @@ describe("the class graph of the real ontology", () => {
     const crossings = countCrossings(layout);
     const baseline = countCrossings(layOutClassGraph(ontologyGraph, 0));
     expect(crossings.total).toBe(14);
-    expect(baseline.total).toBe(40);
+    expect(baseline.total).toBe(42);
     expect(crossings.total).toBeLessThanOrEqual(baseline.total);
     expect(crossings.total / crossings.relationPaths).toBeLessThanOrEqual(1);
     expect(crossings.subclass).toBe(0);

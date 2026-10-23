@@ -13,7 +13,7 @@ import {
   measurePhone,
 } from "../../../testing/measureClassGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
-import { PHONE } from "./constants.js";
+import { DESIGN_CANVAS, MIN_FIT, PHONE } from "./constants.js";
 import layOutClassGraph from "./layOutClassGraph.js";
 
 describe("layOutClassGraph", () => {
@@ -92,29 +92,34 @@ describe("layOutClassGraph", () => {
     expect(layOutClassGraph(CROSS_REGION_GRAPH, 0).rail).toHaveLength(8);
   });
 
-  it("retries a graph too wide for the canvas with narrower channels, and says so", () => {
+  it("retries a graph too wide for the canvas, and opens on a legible window", () => {
     const wide = layOutClassGraph(WIDE_GRAPH);
-    expect(wide.channel).toBe(32);
+    expect(wide.channel).toBe(48);
     expect(wide.findings).toEqual([
-      "G3: fit 0.414 at 48px channels; 0.452 at 32px",
-      "G3: accepted the overview bucket",
+      "G3: fit 0.281 at 48px channels; 0.307 at 32px",
+      "G3: opens on a legible window, the rest a pan away",
     ]);
+    expect(wide.view).toEqual({ x: -16, y: -16, w: 688, h: 96 });
+    expect(
+      Math.min(DESIGN_CANVAS.w / wide.view.w, DESIGN_CANVAS.h / wide.view.h),
+    ).toBeGreaterThanOrEqual(MIN_FIT);
   });
 
   it("settles on the narrower channels when they make the graph fit", () => {
     const narrowed = layOutClassGraph(NARROWING_GRAPH);
     expect(narrowed.channel).toBe(32);
     expect(narrowed.findings).toEqual([
-      "G3: fit 0.810 at 48px channels; 0.889 at 32px",
+      "G3: fit 0.838 at 48px channels; 0.922 at 32px",
     ]);
+    expect(narrowed.view).toEqual(narrowed.viewBox);
   });
 
   it("keeps the 48px channels when narrower ones do not help", () => {
     const tall = layOutClassGraph(TALL_GRAPH);
     expect(tall.channel).toBe(48);
     expect(tall.findings).toEqual([
-      "G3: fit 0.536 at 48px channels; 0.536 at 32px",
-      "G3: accepted the overview bucket",
+      "G3: fit 0.523 at 48px channels; 0.523 at 32px",
+      "G3: opens on a legible window, the rest a pan away",
     ]);
   });
 
@@ -205,7 +210,10 @@ describe("layOutClassGraph", () => {
 
   it("routes a tangled graph across shelves and regions with nothing overlapping", () => {
     const tangled = layOutClassGraph(TANGLED_GRAPH);
-    expect(tangled.findings).toEqual([]);
+    expect(tangled.channel).toBe(32);
+    expect(tangled.findings).toEqual([
+      "G3: fit 0.838 at 48px channels; 0.899 at 32px",
+    ]);
     expect(countOverlaps(tangled)).toEqual({
       collisions: 0,
       edgesThroughBoxes: [],
