@@ -25,8 +25,9 @@
  *   keeps the layout's root node and its filter chips. The store the
  *   environment holds serves every page (the network is never called), and
  *   the head carries exactly one `<title>`.
- * - THE LAYOUT REMOUNTS. Each change of route yields a new Definitions root,
- *   with the chips back at their default.
+ * - THE LAYOUT REMOUNTS. Each change of route yields a new Definitions root;
+ *   the reader's chips survive a move to the lens index, and come back at
+ *   their default after a visit to another lens.
  */
 
 import {
@@ -242,20 +243,23 @@ describe("Shell across a lens switch", () => {
       expect(readStatus(container)).toBe(filteredStatus);
 
       // The lens index: another route of the same lens, so the layout and its
-      // filter provider remount and the chips start over, while the nest above
-      // the layout stays. The subscriptions that outlive the move are the
-      // nest's own.
+      // filter provider remount, the reader's chips kept, while the nest
+      // above the layout stays. The subscriptions that outlive the move are
+      // the nest's own.
       const liveOnTerm = new Set(liveSubscriptions);
       await act(async () => {
         router.navigate("definitions");
       });
-      await waitFor(() => expect(readStatus(container)).toContain("35 of 35"));
+      await waitFor(() =>
+        expect(window.location.pathname).toBe("/definitions"),
+      );
       const definitionsIndexLayout = container.querySelector(
         ".ds.workspace-layout",
       );
       expect(definitionsIndexLayout).not.toBeNull();
       expect(definitionsIndexLayout).not.toBe(definitionsLayout);
-      expect(countChipsOff(container)).toBe(0);
+      expect(countChipsOff(container)).toBe(1);
+      expect(readStatus(container)).toBe(filteredStatus);
       const nestSubscriptions = keepSurvivors(liveOnTerm, liveSubscriptions);
       expect(nestSubscriptions.size).toBeGreaterThan(0);
 

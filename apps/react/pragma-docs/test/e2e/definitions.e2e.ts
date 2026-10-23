@@ -11,8 +11,9 @@
  * the inspector's drawer trigger covers nothing of the explorer, its search
  * field least of all. A filter chip's refit and a namespace's keep every
  * class in view labelled and cut none; Fit brings every class into view,
- * unlabelled where the whole fits only below the overview zoom; and the
- * inspector's field rows put their ranges on one column line.
+ * unlabelled where the whole fits only below the overview zoom; a pick in
+ * the rail keeps the chips, the search and the zoom; and the inspector's
+ * field rows put their ranges on one column line.
  */
 import {
   launchBrowser,
@@ -20,6 +21,7 @@ import {
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { DEFAULT_GRAPHQL_URL } from "../../src/relay/graphqlEndpoint.js";
 import {
   CAMERA_SETTLE_MS,
   DEFINITIONS_PATHS,
@@ -227,11 +229,21 @@ const openExplorer = async (
       new URL(server.base).origin,
       new URL(server.graphBase).origin,
     ];
-    await page.route("**/*", (route) =>
-      origins.includes(new URL(route.request().url()).origin)
+    // The built client asks the default graph address, which the preview
+    // cell's graph does not listen on; a client navigation's fetch is sent
+    // on to the cell's own graph.
+    const fallbackGraph = new URL(DEFAULT_GRAPHQL_URL).origin;
+    await page.route("**/*", (route) => {
+      const url = new URL(route.request().url());
+      if (url.origin === fallbackGraph) {
+        return route.continue({
+          url: new URL(url.pathname, server.graphBase).href,
+        });
+      }
+      return origins.includes(url.origin)
         ? route.continue()
-        : route.fulfill({ status: 204, body: "" }),
-    );
+        : route.fulfill({ status: 204, body: "" });
+    });
     await page.routeWebSocket(
       () => true,
       () => {
@@ -310,6 +322,49 @@ describe("at 1440 px", () => {
     expect(measure.inView).toBeGreaterThan(0);
     expect(measure.unlabelled).toBe(0);
     expect(measure.cut).toEqual([]);
+  });
+
+  it("keeps the chips, the search and the zoom when a rail pick moves to a term", async () => {
+    const view: {
+      before?: string | null;
+      pressed?: string | null;
+      search?: string;
+      after?: string | null;
+      path?: string;
+    } = {};
+    const zoomLevel = ".ds.graph-canvas .zoom-level";
+    const { errors, measure } = await openExplorer(
+      "/definitions",
+      desktop,
+      async (page) => {
+        await page
+          .getByRole("button", { name: "Abstract", exact: true })
+          .click();
+        await page.getByRole("button", { name: "Zoom in" }).click();
+        await page.getByRole("button", { name: "Zoom in" }).click();
+        await page.getByRole("searchbox").fill("st");
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        view.before = await page.locator(zoomLevel).textContent();
+        await page
+          .locator(".ds.term-rail")
+          .getByRole("link", { name: "Concept", exact: true })
+          .click();
+        await page.waitForURL(/\/definitions\/ds%3AConcept$/);
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        view.path = new URL(page.url()).pathname;
+        view.pressed = await page
+          .getByRole("button", { name: "Abstract", exact: true })
+          .getAttribute("aria-pressed");
+        view.search = await page.getByRole("searchbox").inputValue();
+        view.after = await page.locator(zoomLevel).textContent();
+      },
+    );
+    expect(errors).toEqual([]);
+    expect(view.path).toBe("/definitions/ds%3AConcept");
+    expect(view.pressed).toBe("false");
+    expect(view.search).toBe("st");
+    expect(view.after).toBe(view.before);
+    expect(measure.inView).toBeGreaterThan(0);
   });
 
   it("brings every class into view on Fit, as boxes without their labels", async () => {
