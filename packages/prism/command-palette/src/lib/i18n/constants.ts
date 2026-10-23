@@ -20,4 +20,5 @@ export const MESSAGES = {
   "search.empty": "Nothing in the graph matches “{text}”.",
   "search.results": "Results",
   "search.preview": "Preview",
+  "result.homeless": "This result has no page on this site.",
 } as const;

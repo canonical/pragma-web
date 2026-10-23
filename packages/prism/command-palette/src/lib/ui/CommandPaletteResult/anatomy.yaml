@@ -4,8 +4,10 @@
 # for its type, a 56px EntityCommand row. Choosing it, by a click on the
 # row or by Enter in the field while it is highlighted, closes the palette
 # and opens the node's canonical home (useHome) through the router. A node
-# whose site gives its type no home is a disabled option: it is listed and
-# previewed, and choosing it does nothing.
+# whose site gives its type no home is a disabled option, described as
+# having no page on the site (aria-description): it is listed, muted by
+# EntityCommand's disabled state, and previewed, and choosing it does
+# nothing.
 # Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 (the highlighted
 # row) and 504:327 (the row's slots).
 #

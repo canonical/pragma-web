@@ -108,6 +108,7 @@ describe("CommandPaletteResult", () => {
     expect(option).toHaveAttribute("aria-selected", "true");
     expect(option).toHaveClass("ontology-class-command");
     expect(option).not.toHaveAttribute("aria-disabled");
+    expect(option).not.toHaveAttribute("aria-description");
   });
 
   it("holds its title as text, never as a link", () => {
@@ -128,11 +129,14 @@ describe("CommandPaletteResult", () => {
     });
   });
 
-  it("is a disabled option that does nothing when its type has no home", () => {
+  it("is a disabled option, described as having no page, that does nothing when its type has no home", () => {
     const { router, onChoose } = renderResult(STATION_NODE);
     const navigate = vi.spyOn(router, "navigate");
     const option = screen.getByRole("option", { name: /Layton/ });
     expect(option).toHaveAttribute("aria-disabled", "true");
+    expect(option).toHaveAccessibleDescription(
+      "This result has no page on this site.",
+    );
     fireEvent.click(option);
     expect(onChoose).not.toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();

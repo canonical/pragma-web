@@ -52,8 +52,8 @@ import { CommandPalette } from "@canonical/prism-command-palette";
   search extension.
 - `RouterProvider`: a chosen result navigates the router to its home.
 - `HomesProvider`: a result's home is the one the site gives its type; a
-  result whose type has no home is listed and previewed as a disabled
-  option, and choosing it does nothing.
+  result whose type has no home is listed, muted, and previewed as a
+  disabled option, and choosing it does nothing.
 - `ProjectionsProvider`: each row is the site's command projection for its
   result's type, and the preview its card projection, so a site's own arms
   render there as everywhere else.
@@ -97,7 +97,7 @@ takes its press): it is expanded and controls the listbox
 while there are results, and names the highlighted option as its active
 descendant. Each group of results is a `group` named by its type's heading;
 each result is an `option`, selected while highlighted, disabled when its
-type has no home. An option is chosen as a whole, so the title it holds is
+type has no home, and then described as having no page on the site. An option is chosen as a whole, so the title it holds is
 text, never a link of its own; the preview's title links to the result's
 home, and following it chooses the result as its row does, closing the
 palette.

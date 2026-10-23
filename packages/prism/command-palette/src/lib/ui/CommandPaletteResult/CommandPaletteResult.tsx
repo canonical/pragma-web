@@ -7,6 +7,7 @@ import { useRouter } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/CommandPaletteResult_node.graphql.js";
+import { useMessages } from "../../i18n/index.js";
 import type { CommandPaletteResultProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -33,8 +34,9 @@ void declareNodeFragment;
  * 56px row. Choosing it, by a click on the row or by Enter in the field
  * while it is highlighted, calls `onChoose`, which closes the palette, and
  * then navigates the router to the node's canonical home. A node whose type
- * the site gives no home is a disabled option (`aria-disabled`): it is
- * listed and previewed, and choosing it does nothing.
+ * the site gives no home is a disabled option (`aria-disabled`), described
+ * as having no page on the site: it is listed, muted, and previewed, and
+ * choosing it does nothing.
  *
  * It renders no element of its own: the arm its node's type selects renders
  * the row's `<li>`, and every native prop reaches it.
@@ -43,14 +45,15 @@ void declareNodeFragment;
  *
  * @implements prism.component.command_palette_result
  * @note Impure: reads its node from the Relay store, its home from the
- *   site's homes and the router from its provider, and navigates the
- *   router when chosen.
+ *   site's homes, the router from its provider and the translator in
+ *   scope, and navigates the router when chosen.
  */
 export default function CommandPaletteResult({
   node,
   onChoose,
   ...props
 }: CommandPaletteResultProps): ReactElement {
+  const t = useMessages();
   const data = useFragment(nodeFragment, node);
   const href = useHome({ __typename: data.__typename, uri: data._meta.curie });
   const router = useRouter<RouteMap, AnyRoute>();
@@ -82,6 +85,7 @@ export default function CommandPaletteResult({
   return (
     <CommandProjection
       {...props}
+      aria-description={href === undefined ? t("result.homeless") : undefined}
       aria-disabled={href === undefined || undefined}
       node={data}
       onClick={choose}
