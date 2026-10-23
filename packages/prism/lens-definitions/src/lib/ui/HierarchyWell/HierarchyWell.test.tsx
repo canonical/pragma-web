@@ -10,6 +10,7 @@ import { describe, expect, it, vi } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
+import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
 import { requireEntry } from "../../classGraph/require.js";
 import HierarchyWell from "./HierarchyWell.js";
 import type { HierarchyWellProps } from "./types.js";
@@ -205,6 +206,29 @@ describe("HierarchyWell", () => {
     expect(container.querySelectorAll(".phone .row.is-hidden")).toHaveLength(
       12,
     );
+  });
+
+  it("labels no relation whose edge the chips hide", () => {
+    const cross = createClassGraphSetup(CROSS_REGION_GRAPH);
+    const drawCross = (namespaces: readonly string[]) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={createAllNamespacesFilter(namespaces)}
+          hoverCentre="ex:Whole"
+          layout={cross.layout}
+          onHoverTerm={() => {}}
+          term={undefined}
+          terms={cross.terms}
+        />,
+      );
+    const crossing = '.desktop .label-layer [data-edge="rel:ex:Whole zz:Leaf"]';
+    const { container, rerender } = render(drawCross(["ex", "zz"]));
+    expect(container.querySelector(crossing)).not.toBeNull();
+    rerender(drawCross(["ex"]));
+    expect(
+      container.querySelector('.desktop path[class~="is-hidden"]'),
+    ).not.toBeNull();
+    expect(container.querySelector(crossing)).toBeNull();
   });
 
   it("merges a class name and passes native props to its root", () => {

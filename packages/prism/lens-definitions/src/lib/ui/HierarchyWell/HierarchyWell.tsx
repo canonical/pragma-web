@@ -110,8 +110,9 @@ export default function HierarchyWell({
     const centre = edge?.from ?? focus;
     if (centre === undefined) return undefined;
     const near = findNeighbourhood(layout, centre).nodes;
+    // A hidden class is no obstacle, and an edge it ends has no label.
     const faded = new Set(
-      [...layout.nodes.keys()].filter((id) => !near.has(id)),
+      [...layout.nodes.keys()].filter((id) => !near.has(id) || hidden.has(id)),
     );
     const placement = placeEdgeLabels(
       layout,
@@ -126,7 +127,7 @@ export default function HierarchyWell({
           placed: placement.placed.filter((label) => label.edge === edge.id),
           omitted: [],
         };
-  }, [activeEdge, focus, layout, t]);
+  }, [activeEdge, focus, hidden, layout, t]);
   const fit = useMemo(
     () => measureVisibleBox(layout, hidden, undefined),
     [hidden, layout],

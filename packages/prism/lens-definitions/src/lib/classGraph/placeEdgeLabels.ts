@@ -74,11 +74,14 @@ function measureRegionLabel(region: LaidOutRegion, classCount: string): Rect {
  * below each end box (the range end first), flush with the side the edge
  * leaves from. The first position that stays inside the viewBox and clears
  * every unfaded box, every region's label and every label already placed
- * wins; an edge whose label finds none is left to the inspector.
+ * wins; an edge whose label finds none is left to the inspector. An edge
+ * that is not drawn, its source or every target faded or hidden, gets no
+ * label.
  *
  * @param layout - The class graph's layout.
  * @param focus - The focus class's IRI.
- * @param faded - The classes outside the focus's neighbourhood.
+ * @param faded - The classes not drawn at full strength: outside the
+ *   focus's neighbourhood, or hidden by the filter.
  * @param formatCount - How "‹n› relations" reads, from the catalog.
  * @param formatClassCount - How a region's "‹n› classes" reads.
  * @returns The placed and the omitted labels.
@@ -104,7 +107,9 @@ export default function placeEdgeLabels(
     .filter(
       (edge) =>
         edge.kind === "relation" &&
-        (edge.from === focus || edge.to.includes(focus)),
+        (edge.from === focus || edge.to.includes(focus)) &&
+        !faded.has(edge.from) &&
+        !edge.to.every((id) => faded.has(id)),
     )
     .sort((a, b) =>
       orderBy(
