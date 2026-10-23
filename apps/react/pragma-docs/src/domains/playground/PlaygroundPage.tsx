@@ -8,12 +8,13 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, Suspense } from "react";
+import { CanvasPage } from "#lib/ui";
 import ComponentProbe from "./ComponentProbe.js";
 import { PROBE_URI } from "./probeQuery.js";
 
 export default function PlaygroundPage(): ReactElement {
   return (
-    <section aria-labelledby="playground-title">
+    <CanvasPage aria-labelledby="playground-title">
       <Head title="Playground" />
       <h1 id="playground-title">Playground</h1>
       <p>
@@ -42,6 +43,6 @@ export default function PlaygroundPage(): ReactElement {
           <ComponentProbe uri={PROBE_URI} />
         </Suspense>
       </ErrorBoundary>
-    </section>
+    </CanvasPage>
   );
 }

@@ -1,5 +1,6 @@
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
+import { CanvasPage } from "#lib/ui";
 
 interface LoginSearch {
   readonly from?: string;
@@ -11,7 +12,7 @@ export default function LoginPage({
   search: LoginSearch;
 }): ReactElement {
   return (
-    <section aria-labelledby="login-title">
+    <CanvasPage aria-labelledby="login-title">
       <Head title="Login" />
       <h1 id="login-title">Login</h1>
       <p>
@@ -21,6 +22,6 @@ export default function LoginPage({
       {search.from && (
         <p>You will be redirected to {search.from} after login.</p>
       )}
-    </section>
+    </CanvasPage>
   );
 }
