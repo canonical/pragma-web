@@ -42,7 +42,6 @@
 #     sits between 0.45 and 0.64.
 #   1rem: the region prefix; the docs context has no 16px text size.
 #   0.16, 0.06, 0.4: the faded class, the faded edge, the dimmed class.
-#   120ms: the fade; no motion token exists.
 #   In constants.ts and the layout's constants (attributes, not CSS): the
 #   1px and 2px strokes, the ring's 2px offset, the 6px halo stroke, the
 #   8px hover target.
@@ -79,7 +78,7 @@ node:
               styles:
                 typography.color: color.text.muted
                 motion.property: opacity
-                motion.duration: 120ms
+                motion.duration: motion.duration.fast
           - node:
               role: faded subclass (.is-faded)
               styles:
@@ -127,7 +126,7 @@ node:
               styles:
                 typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
                 motion.property: opacity
-                motion.duration: 120ms
+                motion.duration: motion.duration.fast
           - node:
               role: focus relation (.is-focus)
               styles:
@@ -173,7 +172,7 @@ node:
               role: node
               styles:
                 motion.property: opacity
-                motion.duration: 120ms
+                motion.duration: motion.duration.fast
               edges:
                 - node:
                     uri: prism.component.entity_graph_node

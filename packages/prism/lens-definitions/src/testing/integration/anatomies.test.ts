@@ -19,8 +19,8 @@ const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
 
 /**
  * The semantic tokens the lens's stylesheets read beyond the spacing shim
- * and the density channel: the colours and the text styles of the
- * semantic tier.
+ * and the density channel: the colours, the text styles and the motion
+ * of the semantic tier.
  */
 const EXTERNAL_TOKENS = [
   "--color-background",
@@ -32,6 +32,7 @@ const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-branded",
   "--color-text-muted",
+  "--motion-duration-fast",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-code-font-family",
   "--typography-text-primary-font-size",

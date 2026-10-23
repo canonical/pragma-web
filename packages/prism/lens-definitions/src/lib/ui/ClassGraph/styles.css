@@ -33,8 +33,8 @@
     --class-graph-faded-node-opacity: 0.16;
     --class-graph-faded-edge-opacity: 0.06;
     --class-graph-dimmed-opacity: 0.4;
-    /* No motion token exists. */
-    --class-graph-fade-duration: 120ms;
+    /* The fade; zero under reduced motion. */
+    --class-graph-fade-duration: var(--motion-duration-fast);
   }
 
   .ds.class-graph .rule {
@@ -174,13 +174,5 @@
 
   .ds.class-graph .edge-label.is-focus {
     color: var(--class-graph-accent-color);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ds.class-graph .subclass,
-    .ds.class-graph .relation,
-    .ds.class-graph .node {
-      transition-property: none;
-    }
   }
 }
