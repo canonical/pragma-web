@@ -15,8 +15,8 @@ import {
 import {
   HOME_ROUTES,
   MOCK_MODIFIER_FAMILY,
-  resolveRoot,
 } from "../../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../../testing/resolveRoot.js";
 import storyQuery, {
   type ModifierFamilyCommandStoryQuery,
 } from "../../../../relay/__generated__/ModifierFamilyCommandStoryQuery.graphql.js";

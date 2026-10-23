@@ -10,8 +10,8 @@ import {
   MOCK_UI_BLOCK,
   MOCK_UI_BLOCK_HREF,
   MOCK_UI_BLOCK_WITH_EXAMPLE,
-  resolveRoot,
 } from "../../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../../testing/resolveRoot.js";
 import testQuery, {
   type UIBlockCardTestQuery,
 } from "../../../../relay/__generated__/UIBlockCardTestQuery.graphql.js";

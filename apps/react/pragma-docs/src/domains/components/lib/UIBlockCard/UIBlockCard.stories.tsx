@@ -16,8 +16,8 @@ import {
   HOME_ROUTES,
   MOCK_UI_BLOCK,
   MOCK_UI_BLOCK_WITH_EXAMPLE,
-  resolveRoot,
 } from "../../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../../testing/resolveRoot.js";
 import storyQuery, {
   type UIBlockCardStoryQuery,
 } from "../../../../relay/__generated__/UIBlockCardStoryQuery.graphql.js";

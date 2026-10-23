@@ -9,8 +9,8 @@ import createSiteTree from "../../../../../testing/createSiteTree.js";
 import {
   MOCK_UI_BLOCK,
   MOCK_UI_BLOCK_HREF,
-  resolveRoot,
 } from "../../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../../testing/resolveRoot.js";
 import testQuery, {
   type UIBlockRowTestQuery,
 } from "../../../../relay/__generated__/UIBlockRowTestQuery.graphql.js";

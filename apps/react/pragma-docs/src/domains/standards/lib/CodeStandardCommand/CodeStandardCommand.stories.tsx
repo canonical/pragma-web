@@ -15,8 +15,8 @@ import {
 import {
   HOME_ROUTES,
   MOCK_CODE_STANDARD,
-  resolveRoot,
 } from "../../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../../testing/resolveRoot.js";
 import storyQuery, {
   type CodeStandardCommandStoryQuery,
 } from "../../../../relay/__generated__/CodeStandardCommandStoryQuery.graphql.js";

@@ -9,8 +9,8 @@ import createSiteTree from "../../../../../testing/createSiteTree.js";
 import {
   MOCK_CODE_STANDARD,
   MOCK_CODE_STANDARD_HREF,
-  resolveRoot,
 } from "../../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../../testing/resolveRoot.js";
 import ssrTestQuery, {
   type CodeStandardCommandSsrTestQuery,
 } from "../../../../relay/__generated__/CodeStandardCommandSsrTestQuery.graphql.js";

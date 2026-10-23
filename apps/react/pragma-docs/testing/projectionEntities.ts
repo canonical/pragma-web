@@ -6,17 +6,9 @@
  * href the site's homes build for it; an ontology class and a tier, which
  * the site hands to the package's arms; and the routes those homes build
  * them through.
- *
- * `resolveRoot` crosses a package boundary on purpose: it is the projection
- * package's own resolver for a mock environment's root field, kept in that
- * package's `testing/` directory, which it neither publishes nor exports.
- * The path is relative to this monorepo's layout, so a resolver that moves
- * fails this app's type check at this one import.
  */
 
 import { route } from "@canonical/router-core";
-
-export { resolveRoot } from "../../../../packages/prism/projections/testing/fixtures.js";
 
 /**
  * The component IconButton: a block of the global tier under Button, at

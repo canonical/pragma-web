@@ -13,8 +13,8 @@ import {
   MOCK_ONTOLOGY_CLASS,
   MOCK_TIER,
   MOCK_UI_BLOCK,
-  resolveRoot,
 } from "../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../testing/resolveRoot.js";
 import testQuery, {
   type SiteChipProjectionTestQuery,
 } from "../../../relay/__generated__/SiteChipProjectionTestQuery.graphql.js";

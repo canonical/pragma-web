@@ -6,10 +6,8 @@ import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree from "../../../../../testing/createSiteTree.js";
-import {
-  MOCK_MODIFIER_FAMILY,
-  resolveRoot,
-} from "../../../../../testing/projectionEntities.js";
+import { MOCK_MODIFIER_FAMILY } from "../../../../../testing/projectionEntities.js";
+import resolveRoot from "../../../../../testing/resolveRoot.js";
 import testQuery, {
   type ModifierFamilyCommandTestQuery,
 } from "../../../../relay/__generated__/ModifierFamilyCommandTestQuery.graphql.js";
