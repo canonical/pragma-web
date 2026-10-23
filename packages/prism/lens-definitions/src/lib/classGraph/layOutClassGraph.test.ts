@@ -248,6 +248,86 @@ describe("layOutClassGraph", () => {
     ).toHaveLength(1);
   });
 
+  it("joins a root to its superclass on the shelf below down the gap between them", () => {
+    // A chain too wide to share its shelf, its root a subclass of the one
+    // class of a smaller namespace, which takes the shelf below.
+    const below = layOutClassGraph({
+      classes: [
+        defineClass("bb:Base", "Base"),
+        ...["One", "Two", "Three", "Four", "Five", "Six"].map((label, index) =>
+          defineClass(`aa:${label}`, label, {
+            superclass:
+              index === 0
+                ? "bb:Base"
+                : `aa:${["One", "Two", "Three", "Four", "Five"].at(index - 1)}`,
+          }),
+        ),
+      ],
+      relations: [],
+    });
+    const [upper, lower] = ["aa", "bb"].map((prefix) =>
+      requireDefined(
+        below.regions.find((region) => region.prefix === prefix),
+        "the region",
+      ),
+    );
+    expect(lower.y).toBeGreaterThan(upper.y + upper.h);
+    const join = requireDefined(
+      below.edges.find((edge) => edge.id === "join:aa bb:Base"),
+      "the join",
+    );
+    const bounds = measurePathBounds(join.d);
+    expect(bounds.x).toBeGreaterThanOrEqual(upper.x - BUS_OFFSET);
+    expect(bounds.y).toBeGreaterThanOrEqual(upper.y);
+    expect(bounds.y + bounds.h).toBeLessThanOrEqual(lower.y + lower.h);
+  });
+
+  it("routes between shelves with a shelf between them round the packing's left margin", () => {
+    // Three chains each too wide to share a shelf, so each takes its own.
+    const chain = (prefix: string) =>
+      ["One", "Two", "Three", "Four", "Five"].map((label, index) =>
+        defineClass(`${prefix}:${label}`, `${prefix} ${label}`, {
+          ...(index === 0
+            ? {}
+            : {
+                superclass: `${prefix}:${["One", "Two", "Three", "Four"].at(index - 1)}`,
+              }),
+        }),
+      );
+    const stacked = layOutClassGraph({
+      classes: [
+        ...chain("aa"),
+        ...chain("bb"),
+        ...chain("cc"),
+        defineClass("dd:Root", "Root", { superclass: "aa:One" }),
+        defineClass("dd:Leaf", "Leaf", { superclass: "dd:Root" }),
+        defineClass("dd:Spare", "Spare"),
+        defineClass("dd:Other", "Other"),
+        defineClass("dd:More", "More"),
+      ],
+      relations: [
+        { uri: "aa:far", label: "far", domain: "aa:Two", range: "cc:Two" },
+      ],
+    });
+    const shelfOf = (prefix: string): number =>
+      requireDefined(
+        stacked.regions.find((region) => region.prefix === prefix),
+        "the region",
+      ).y;
+    expect(new Set(["aa", "bb", "cc"].map(shelfOf)).size).toBe(3);
+    const far = requireDefined(
+      stacked.edges.find((edge) => edge.id === "rel:aa:Two cc:Two"),
+      "the far relation",
+    );
+    const join = requireDefined(
+      stacked.edges.find((edge) => edge.id === "join:dd aa:One"),
+      "the far join",
+    );
+    for (const edge of [far, join]) {
+      expect(measurePathBounds(edge.d).x).toBe(-SHELF_GAP / 2);
+    }
+  });
+
   it("routes between two shelves through the gap that joins them, never round the margin", () => {
     const tangled = layOutClassGraph(TANGLED_GRAPH);
     const regionOf = (id: string) =>
