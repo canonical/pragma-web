@@ -14,61 +14,65 @@ describe("ChainingManager", () => {
     vi.useRealTimers();
   });
 
-  it("should initialize with chaining set to false", () => {
+  it("initializes with chaining disabled", () => {
     expect(chainingManager.chaining).toBe(false);
   });
 
-  describe("chaining setter", () => {
-    it("should set chaining to true", () => {
-      chainingManager.chaining = true;
-      expect(chainingManager.chaining).toBe(true);
-    });
+  it("keeps chaining active while a tooltip is registered", () => {
+    const release = chainingManager.acquire();
+    expect(chainingManager.chaining).toBe(true);
 
-    it("should set chaining to false", () => {
-      chainingManager.chaining = true;
-      chainingManager.chaining = false;
-      expect(chainingManager.chaining).toBe(false);
-    });
-
-    it("should automatically reset chaining to false after threshold time", () => {
-      chainingManager.chaining = true;
-      expect(chainingManager.chaining).toBe(true);
-
-      // Fast forward time by the threshold amount
-      vi.advanceTimersByTime(CHAINING_THRESHOLD);
-
-      expect(chainingManager.chaining).toBe(false);
-    });
-
-    it("should restart timeout when setting chaining to true multiple times", () => {
-      chainingManager.chaining = true;
-
-      // Advance time partially
-      vi.advanceTimersByTime(CHAINING_THRESHOLD / 2);
-      expect(chainingManager.chaining).toBe(true);
-
-      // Set chaining again (should restart timeout)
-      chainingManager.chaining = true;
-
-      // Advance by another half threshold (should still be true)
-      vi.advanceTimersByTime(CHAINING_THRESHOLD / 2);
-      expect(chainingManager.chaining).toBe(true);
-
-      // Advance by remaining time (should now be false)
-      vi.advanceTimersByTime(CHAINING_THRESHOLD / 2);
-      expect(chainingManager.chaining).toBe(false);
-    });
+    vi.advanceTimersByTime(CHAINING_THRESHOLD * 3);
+    expect(chainingManager.chaining).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+    release();
   });
 
-  describe("chaining getter", () => {
-    it("should return the current chaining state", () => {
-      expect(chainingManager.chaining).toBe(false);
+  it("expires exactly one threshold after the last tooltip closes", () => {
+    const releaseFirst = chainingManager.acquire();
+    const releaseSecond = chainingManager.acquire();
 
-      chainingManager.chaining = true;
-      expect(chainingManager.chaining).toBe(true);
+    releaseSecond();
+    vi.advanceTimersByTime(CHAINING_THRESHOLD * 2);
+    expect(chainingManager.chaining).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
 
-      chainingManager.chaining = false;
-      expect(chainingManager.chaining).toBe(false);
-    });
+    releaseFirst();
+    vi.advanceTimersByTime(CHAINING_THRESHOLD - 1);
+    expect(chainingManager.chaining).toBe(true);
+    vi.advanceTimersByTime(1);
+    expect(chainingManager.chaining).toBe(false);
+  });
+
+  it("cancels cooldown on acquisition and restarts it on release", () => {
+    chainingManager.acquire()();
+    vi.advanceTimersByTime(CHAINING_THRESHOLD / 2);
+
+    const release = chainingManager.acquire();
+    expect(vi.getTimerCount()).toBe(0);
+    vi.advanceTimersByTime(CHAINING_THRESHOLD * 2);
+    expect(chainingManager.chaining).toBe(true);
+
+    release();
+    vi.advanceTimersByTime(CHAINING_THRESHOLD - 1);
+    expect(chainingManager.chaining).toBe(true);
+    vi.advanceTimersByTime(1);
+    expect(chainingManager.chaining).toBe(false);
+  });
+
+  it("releases each registration only once", () => {
+    const releaseFirst = chainingManager.acquire();
+    const releaseSecond = chainingManager.acquire();
+
+    releaseFirst();
+    releaseFirst();
+    expect(vi.getTimerCount()).toBe(0);
+    expect(chainingManager.chaining).toBe(true);
+
+    releaseSecond();
+    vi.advanceTimersByTime(CHAINING_THRESHOLD - 1);
+    releaseSecond();
+    vi.advanceTimersByTime(1);
+    expect(chainingManager.chaining).toBe(false);
   });
 });

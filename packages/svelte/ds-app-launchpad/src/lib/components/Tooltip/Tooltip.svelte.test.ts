@@ -1,30 +1,32 @@
 /* @canonical/generator-ds 0.17.1 */
 
 import type { ComponentProps } from "svelte";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Locator } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import Component from "./Tooltip.svelte";
 import { children, trigger } from "./test.fixtures.svelte";
-import { ChainingManager } from "./utils/ChainingManager.js";
+import type { ChainingManager } from "./utils/ChainingManager.js";
 
 vi.mock("./utils/ChainingManager.js", async (importActual) => {
   const { ChainingManager: OriginalChainingManager } = await importActual<{
     ChainingManager: typeof ChainingManager;
   }>();
 
-  class Mock extends OriginalChainingManager {
-    static lastInstance: Mock | null = null;
-    constructor() {
-      super(350);
-      Mock.lastInstance = this;
+  let manager = new OriginalChainingManager(350);
+
+  beforeEach(() => {
+    manager = new OriginalChainingManager(350);
+  });
+
+  class Mock implements Pick<ChainingManager, keyof ChainingManager> {
+    get chaining() {
+      return manager.chaining;
     }
 
-    static resetChaining() {
-      if (Mock.lastInstance) {
-        Mock.lastInstance.chaining = false;
-      }
+    acquire() {
+      return manager.acquire();
     }
   }
 
@@ -34,10 +36,8 @@ vi.mock("./utils/ChainingManager.js", async (importActual) => {
 });
 
 describe("Tooltip component", () => {
-  beforeEach(() => {
-    (
-      ChainingManager as unknown as { resetChaining: () => void }
-    ).resetChaining();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   const baseProps = {
@@ -109,7 +109,7 @@ describe("Tooltip component", () => {
     });
   });
 
-  describe("Is shown", () => {
+  describe("is shown", () => {
     // Seems like `button.hover()` is very flaky in firefox, so it needs some retries. If this is really bad, maybe we should skip hover tests in firefox altogether?
     it("on trigger hover", { retry: 3 }, async () => {
       const page = await render(Component, { ...baseProps, delay: 0 });
@@ -169,23 +169,53 @@ describe("Tooltip component", () => {
       vi.useRealTimers();
     });
 
-    it("immediately if in chaining", async () => {
+    it("immediately while another tooltip is visible or during the chaining window", async () => {
       vi.useFakeTimers();
-      const page = await render(Component, { ...baseProps, delay: 350 });
-      const button = page.getByRole("button", { name: "Tooltip trigger" });
-      await expect
-        .element(page.getByRole("tooltip", { includeHidden: true }))
-        .not.toBeVisible();
-      await button.hover();
+      const first = await render(Component, { ...baseProps, delay: 350 });
+      const second = await render(Component, { ...baseProps, delay: 350 });
+      const firstButton = first
+        .getByRole("button", { name: "Tooltip trigger" })
+        .nth(0);
+      const secondButton = second
+        .getByRole("button", { name: "Tooltip trigger" })
+        .nth(1);
+      const firstTooltip = first
+        .getByRole("tooltip", { includeHidden: true })
+        .nth(0);
+      const secondTooltip = second
+        .getByRole("tooltip", { includeHidden: true })
+        .nth(1);
+
+      (firstButton.element() as HTMLElement).focus();
+      await expect.element(firstTooltip).not.toBeVisible();
       vi.advanceTimersByTime(350);
-      await expect.element(page.getByRole("tooltip")).toBeVisible();
-      await button.unhover();
-      await expect
-        .element(page.getByRole("tooltip", { includeHidden: true }))
-        .not.toBeVisible();
+      await expect.element(firstTooltip).toBeVisible();
+      vi.advanceTimersByTime(1000);
+
+      await secondButton.hover();
+      await expect.element(secondTooltip).toBeVisible();
+      await expect.element(firstTooltip).toBeVisible();
+
+      await secondButton.unhover();
+      await expect.element(secondTooltip).not.toBeVisible();
+      vi.advanceTimersByTime(1000);
+      await secondButton.hover();
+      await expect.element(secondTooltip).toBeVisible();
+
+      await secondButton.unhover();
+      await expect.element(secondTooltip).not.toBeVisible();
+      (firstButton.element() as HTMLElement).blur();
+      await expect.element(firstTooltip).not.toBeVisible();
       vi.advanceTimersByTime(100);
-      await button.hover();
-      await expect.element(page.getByRole("tooltip")).toBeVisible();
+      await secondButton.hover();
+      await expect.element(secondTooltip).toBeVisible();
+      await secondButton.unhover();
+      await expect.element(secondTooltip).not.toBeVisible();
+      vi.advanceTimersByTime(350);
+      await secondButton.hover();
+      await expect.element(secondTooltip).not.toBeVisible();
+      vi.advanceTimersByTime(350);
+      await expect.element(secondTooltip).toBeVisible();
       vi.useRealTimers();
     });
   });
