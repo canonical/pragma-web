@@ -58,6 +58,7 @@
     }
   },
   "dependencies": {
+    "@canonical/i18n-core": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-graph-example": "^0.44.1",
     "@canonical/prism-lens-definitions": "^0.44.1",
