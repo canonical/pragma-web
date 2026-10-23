@@ -38,7 +38,10 @@ describe("the component checks", () => {
           join(CONFORMING, "src", "lib", "ui"),
           join(CONFORMING, "src", "domains"),
         ]),
-      ).toEqual([locate(CONFORMING, "Probe")]);
+      ).toEqual([
+        locate(CONFORMING, "Probe"),
+        locate(CONFORMING, "ScaffoldedProbe"),
+      ]);
     });
   });
 
@@ -61,6 +64,25 @@ describe("the component checks", () => {
           externalTokens: EXTERNAL_TOKENS,
         }),
       ).not.toThrow();
+    });
+  });
+
+  describe("on a component the next generator release scaffolds", () => {
+    const folder = locate(CONFORMING, "ScaffoldedProbe");
+
+    it("passes the scaffold check with the Scaffolded by banner", () => {
+      expect(() =>
+        assertScaffold(folder, { packageRoot: CONFORMING, testSuffix: "test" }),
+      ).not.toThrow();
+    });
+
+    it("refuses a banner that names another generator", () => {
+      expect(() =>
+        assertScaffold(locate(DRIFTED, "ForeignBanner"), {
+          packageRoot: DRIFTED,
+          testSuffix: "test",
+        }),
+      ).toThrow(/ForeignBanner\.tsx does not open with the generator's banner/);
     });
   });
 
