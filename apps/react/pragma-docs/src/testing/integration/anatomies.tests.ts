@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -23,7 +23,8 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
   withFileTypes: true,
 })
   .filter((entry) => entry.isDirectory())
-  .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"));
+  .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"))
+  .filter((library) => existsSync(library));
 
 /** The semantic tokens the app's components read beyond the shim. */
 const EXTERNAL_TOKENS = [
@@ -58,14 +59,25 @@ describe("the app's components", () => {
     },
   );
 
-  it("keep the design's token and grid rules in their stylesheets", () => {
-    expect(() =>
-      assertStylesheets({
-        directory: UI_DIRECTORY,
-        layer: "ds.components.global",
-        externalTokens: EXTERNAL_TOKENS,
-        documentTokens: DOCUMENT_TOKENS,
-      }),
-    ).not.toThrow();
+  it("are found in every domain library", () => {
+    expect(DOMAIN_LIBRARIES).toEqual(
+      ["components", "modifiers", "standards"].map((domain) =>
+        join(APP_ROOT, "src", "domains", domain, "lib"),
+      ),
+    );
   });
+
+  it.each([UI_DIRECTORY, ...DOMAIN_LIBRARIES])(
+    "%s keeps the design's token and grid rules in its stylesheets",
+    (directory) => {
+      expect(() =>
+        assertStylesheets({
+          directory,
+          layer: "ds.components.global",
+          externalTokens: EXTERNAL_TOKENS,
+          documentTokens: DOCUMENT_TOKENS,
+        }),
+      ).not.toThrow();
+    },
+  );
 });
