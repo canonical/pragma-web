@@ -9,6 +9,8 @@
     --entity-list-gap: var(--grid-gutter);
     --entity-list-views-gap: var(--space-050);
     --entity-list-muted-color: var(--color-text-muted);
+    /* The matrix's 24px line, which the rows and cards share. */
+    --entity-list-line-height: var(--space-300);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -24,8 +26,12 @@
     gap: var(--entity-list-gap);
   }
 
+  /* The count line and the empty line set no baseline nudge and take the
+   * list's 24px line back from the typography layer. */
   .ds.entity-list .count {
     margin-block: 0;
+    padding-block: 0;
+    line-height: var(--entity-list-line-height);
     color: var(--entity-list-muted-color);
   }
 
@@ -51,6 +57,8 @@
   .ds.entity-list .empty {
     grid-column: 1 / -1;
     margin-block: 0;
+    padding-block: 0;
+    line-height: var(--entity-list-line-height);
     color: var(--entity-list-muted-color);
   }
 }
