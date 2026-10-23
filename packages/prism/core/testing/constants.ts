@@ -13,6 +13,7 @@
  * style keys: the side is the colour key's to name.
  */
 export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
+  "align-content": ["layout.alignContent"],
   "align-items": ["layout.align"],
   "align-self": ["layout.alignSelf"],
   background: ["appearance.background"],
@@ -51,9 +52,11 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "font-family": ["typography.fontFamily"],
   "font-size": ["typography.size"],
   "font-variant-caps": ["typography.variant.caps"],
+  "font-variant-numeric": ["typography.variant.numeric"],
   "font-weight": ["typography.weight"],
   gap: ["spacing.gap"],
   "grid-area": ["layout.grid.area"],
+  "grid-auto-rows": ["layout.grid.autoRows"],
   "grid-column": ["layout.grid.column"],
   "grid-row": ["layout.grid.row"],
   "grid-template-columns": ["layout.grid.columns"],
@@ -142,6 +145,10 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "text-overflow": ["typography.overflow"],
   "text-wrap": ["typography.wrap"],
   top: ["layout.offset.top"],
+  "transition-duration": ["motion.duration"],
+  "transition-property": ["motion.property"],
+  "transition-timing-function": ["motion.easing"],
+  "user-select": ["interaction.select"],
   "vertical-align": ["layout.verticalAlign"],
   visibility: ["appearance.visibility"],
   "white-space": ["typography.whiteSpace"],
