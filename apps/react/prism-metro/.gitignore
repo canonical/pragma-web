@@ -15,5 +15,6 @@ dist-ssr
 
 # relay-compiler output: the app's own query and the lens and projection
 # packages' documents, compiled against this app's schema by `bun run relay`,
-# which `build`, `check` and every test script run first
+# which every script that loads the app's code or its types runs first (all
+# but `relay`, the schema scripts and the Biome scripts)
 src/relay/__generated__/

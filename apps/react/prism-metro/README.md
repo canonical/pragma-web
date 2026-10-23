@@ -68,7 +68,9 @@ the production build, on the same port and against the same graph.
   `bun run relay` compiles the app's own query together with the lens and
   projection packages' documents against this app's schema, and fails when a
   document selects something the metro provider does not serve. Its output
-  is not committed: `build`, `check` and every test script run it first.
+  is not committed: every script that loads the app's code or its types
+  runs it first (the dev, graph, build, preview, type-check, test and
+  Storybook scripts), so only the schema and Biome scripts run without it.
 - `bun run test`: the unit and integration suites; the server and
   integration suites start their own metro graph on a free port.
   `bun run test:coverage` enforces full coverage.

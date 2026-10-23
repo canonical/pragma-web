@@ -3,7 +3,7 @@
  * overrides it, and the resolver every reader of the endpoint calls; and
  * the app's own compiled operation, `MetroHomeQuery`, which relay-compiler
  * writes to `__generated__/` (a directory it owns and writes no barrel for)
- * before every build, check and test.
+ * before every package script that loads the app's code.
  *
  * @module
  */
