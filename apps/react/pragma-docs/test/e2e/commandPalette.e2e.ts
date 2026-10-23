@@ -7,9 +7,10 @@
  * title lists its matches with the first highlighted and its card in the
  * preview; the arrow keys move the highlight and the preview with it; Enter
  * opens the highlighted result's home without loading a new document and
- * closes the palette; Cmd+K reopens it empty and Escape closes it. On a
- * phone the open palette fits the viewport less a gutter at each side,
- * scrolls nothing sideways, and shows no preview.
+ * closes the palette, as following the preview's link does; Cmd+K reopens
+ * it empty and Escape closes it. On a phone the open palette fits the
+ * viewport less a gutter at each side, scrolls nothing sideways, and shows
+ * no preview.
  */
 import {
   launchBrowser,
@@ -174,6 +175,27 @@ describe("the command palette", () => {
     const home = await findPreviewLink(page).getAttribute("href");
     expect(home).not.toBeNull();
     await page.keyboard.press("Enter");
+    await page.waitForURL((url) => url.pathname === home, {
+      timeout: PAGE_SETTLE_MS,
+    });
+    expect(await readOpen(page)).toBe(false);
+    expect(
+      await page.evaluate(
+        (marker) => Reflect.get(window, marker),
+        DOCUMENT_MARKER,
+      ),
+    ).toBe(true);
+  });
+
+  it("closes when the preview's link is followed, opening its home in place", async () => {
+    const page = await openLobby();
+    await page.evaluate((marker) => {
+      Reflect.set(window, marker, true);
+    }, DOCUMENT_MARKER);
+    await search(page, COMPONENT_TITLE);
+    const home = await findPreviewLink(page).getAttribute("href");
+    expect(home).not.toBeNull();
+    await findPreviewLink(page).click();
     await page.waitForURL((url) => url.pathname === home, {
       timeout: PAGE_SETTLE_MS,
     });
