@@ -1,0 +1,58 @@
+---
+# FieldList — the fields the entity's class declares, its own and its
+# superclasses', as key values: the key is the field's name in the
+# published InlineCode, with a muted "inherited" after an inherited one;
+# the value is one sentence from the catalog: the property it answers to
+# and the range of its values (both compact, in InlineCode), its kind and
+# its cardinality on the class. It describes the class's schema, the
+# fields an instance may carry, not this instance's values. A class with no
+# field says so.
+#
+# A section labelled by its heading, a subgrid of the page over every
+# column, its gap the grid's gutter on both axes; the heading and the empty
+# line span it, and the key values place themselves. The section stands
+# one default step of block space below what precedes it, external spacing
+# on the section, so it reads as its own part of the page. The inherited
+# tag sits a small step after the name, at the secondary size.
+#
+# Every decision is read through a component token declared on the root
+# (`--field-list-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   space.100 (8px) before the inherited tag: it reads with the name.
+#   layout.grid.column "1 / -1": structure, a span in columns.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# container.gap.default, space.100, and the semantic typography symbol
+# typography.text.secondary.fontSize.
+node:
+  uri: prism.subcomponent.field_list
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+    spacing.external.block.start: container.gap.default
+  edges:
+    - node:
+        role: heading (the level-2 heading)
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: empty (the class declares no field)
+        styles:
+          layout.grid.column: "1 / -1"
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: empty }
+    - node:
+        uri: prism.subcomponent.key_value_list
+        edges:
+          - node:
+              role: inherited (the catalog's tag, in a pair's key)
+              styles:
+                spacing.external.inline.start: space.100
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+            relation: { cardinality: "0..*", slotName: inherited }
+      relation: { cardinality: "0..1", slotName: key-values }

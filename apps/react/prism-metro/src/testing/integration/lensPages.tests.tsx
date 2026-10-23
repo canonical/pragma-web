@@ -53,7 +53,7 @@ describe("the stations lens", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
     ).toBeInTheDocument();
-    const fields = await screen.findByRole("table");
+    const fields = await screen.findByRole("region", { name: "Fields" });
     expect(within(fields).getByText("servesLine")).toBeInTheDocument();
   });
 
@@ -68,7 +68,9 @@ describe("the stations lens", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("region", { name: "Fields" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -90,7 +92,9 @@ describe("the lines lens", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: CIRCLE_LINE_TITLE }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("region", { name: "Fields" }),
+    ).toBeInTheDocument();
   });
 });
 

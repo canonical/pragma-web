@@ -7,7 +7,7 @@ import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import { EntityLayout } from "../src/lib/EntityLayout/index.js";
+import { EntityLayout } from "../src/lib/ui/EntityLayout/index.js";
 import { HOMES, SITE_ROUTES } from "./fixtures.js";
 import type { EntitySiteSetup } from "./types.js";
 

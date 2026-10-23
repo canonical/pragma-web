@@ -6,12 +6,12 @@ import {
 import { route } from "@canonical/router-core";
 import type { ReactElement } from "react";
 import { ENTITY_ROUTE_SUFFIX } from "./constants.js";
-import { EntityIcon } from "./EntityIcon/index.js";
-import { EntityIndexPage } from "./EntityIndexPage/index.js";
-import { EntityPage } from "./EntityPage/index.js";
 import entityIndexSearch from "./entityIndexSearch.js";
 import readUriParam from "./readUriParam.js";
 import type { EntityLensOptions, EntityRoutes } from "./types.js";
+import { EntityIcon } from "./ui/EntityIcon/index.js";
+import { EntityIndexPage } from "./ui/EntityIndexPage/index.js";
+import { EntityPage } from "./ui/EntityPage/index.js";
 import warmEntity from "./warmEntity.js";
 import warmEntityIndex from "./warmEntityIndex.js";
 

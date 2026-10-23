@@ -1,0 +1,14 @@
+---
+# EntityIcon — the lens's default rail glyph, three list entries, each a
+# bullet and a line: a 16-unit stroke drawing in currentColor, always
+# aria-hidden, since the rail entry's label names it. It is sized by its
+# `size` prop and coloured by its context, so it binds no style.
+node:
+  uri: prism.component.entity_icon
+  edges:
+    - node:
+        role: bullet (a circle)
+      relation: { cardinality: "3" }
+    - node:
+        role: lines (a path)
+      relation: { cardinality: "1" }

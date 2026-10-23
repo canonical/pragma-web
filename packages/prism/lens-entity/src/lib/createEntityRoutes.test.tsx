@@ -14,7 +14,7 @@ import {
   STATIONS_LENS,
 } from "../../testing/fixtures.js";
 import createEntityRoutes from "./createEntityRoutes.js";
-import { EntityIcon } from "./EntityIcon/index.js";
+import { EntityIcon } from "./ui/EntityIcon/index.js";
 
 afterEach(() => {
   // The prefetch environment is module state shared across this file's tests.
