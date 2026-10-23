@@ -58,10 +58,14 @@ vi.mock("@canonical/react-ssr/server", async (importOriginal) => ({
 
 /**
  * Load a module the way the dev server's `ssrLoadModule` would, through
- * vitest's registry: the render entry, the sitemap factory, or a package.
+ * vitest's registry: the render entry, the prepare step, the sitemap
+ * factory, or a package.
  */
 const loadModule = async (id: string): Promise<unknown> => {
   if (id === "/src/server/entry.tsx") return import("./entry.js");
+  if (id === "/src/server/prepareRelayData.ts") {
+    return import("./prepareRelayData.js");
+  }
   if (id === "/src/sitemap/renderer.ts") {
     const { createSitemapRenderer } = await import("#sitemap");
     return { default: createSitemapRenderer };
