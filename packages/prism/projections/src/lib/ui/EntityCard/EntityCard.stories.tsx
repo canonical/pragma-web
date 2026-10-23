@@ -11,6 +11,7 @@ import {
   UI_BLOCK_ENTITY,
 } from "../../../../testing/entities.js";
 import type { StoryEntity } from "../../../../testing/types.js";
+import EntityChip from "../EntityChip/EntityChip.js";
 import Component from "./EntityCard.js";
 import type { EntityCardProps } from "./types.js";
 
@@ -93,6 +94,23 @@ export const UIBlock: Story = { args: toCardArgs(UI_BLOCK_ENTITY) };
  */
 export const WithoutVitals: Story = {
   args: { ...toCardArgs(MODIFIER_FAMILY_ENTITY), vitals: undefined },
+};
+
+/**
+ * A modifier whose family is a mention: the chip in the key value keeps its
+ * whole pill, its border drawn where it overhangs the line.
+ */
+export const WithMention: Story = {
+  args: {
+    ...toCardArgs(MODIFIER_ENTITY),
+    keyValues: [
+      { key: "Class", value: "Modifier" },
+      {
+        key: "Family",
+        value: <EntityChip href="#anticipation" value="Anticipation" />,
+      },
+    ],
+  },
 };
 
 /** A UI block with its sidecar: the rendered example beside the body. */

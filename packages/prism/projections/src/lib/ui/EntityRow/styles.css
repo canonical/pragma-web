@@ -30,9 +30,12 @@
     line-height: var(--entity-row-line-height);
   }
 
-  /* The identity truncates on its one line rather than wrapping the row. */
+  /* The identity truncates on its one line rather than wrapping the row.
+   * It clips only along its line, so a chip in it keeps the pill's border
+   * where it overhangs the line. */
   .ds.entity-row .identity {
-    overflow: hidden;
+    overflow-x: clip;
+    min-width: 0;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

@@ -167,7 +167,8 @@
     margin-block-end: 0;
   }
 
-  /* Two equal halves under a rule. */
+  /* Two equal halves under a rule. Each clips only along its line, so a
+   * chip in a value keeps the pill's border where it overhangs the line. */
   .ds.entity-card > .body > .key-values > .pair {
     display: flex;
     border-block-start-width: var(--entity-card-rule-width);
@@ -178,7 +179,8 @@
   .ds.entity-card > .body > .key-values > .pair > .key {
     flex-grow: 1;
     flex-basis: 0;
-    overflow: hidden;
+    overflow-x: clip;
+    min-width: 0;
     text-overflow: ellipsis;
     color: var(--entity-card-key-color);
   }
@@ -186,7 +188,8 @@
   .ds.entity-card > .body > .key-values > .pair > .value {
     flex-grow: 1;
     flex-basis: 0;
-    overflow: hidden;
+    overflow-x: clip;
+    min-width: 0;
     text-overflow: ellipsis;
     margin-inline-start: 0;
   }

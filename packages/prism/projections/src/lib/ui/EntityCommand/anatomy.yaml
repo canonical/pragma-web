@@ -10,6 +10,10 @@
 # of its two lines truncates rather than wrapping, so a long title never
 # grows the row.
 #
+# The identity and the title clip along their line only: a chip in the
+# title overhangs the 24px line by 2px above and below, and keeps its
+# border there.
+#
 # A linked title reads as the row's text: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the title clips; the states
 # apply to the link alone.
@@ -57,12 +61,13 @@ node:
         styles:
           layout.type: flex
           layout.direction: column
-          layout.overflow: hidden
+          layout.overflow.inline: clip
+          size.min.width: 0
         edges:
           - node:
               role: title
               styles:
-                layout.overflow: hidden
+                layout.overflow.inline: clip
                 typography.whiteSpace: nowrap
                 typography.overflow: ellipsis
                 typography.weight: typography.text.primary.bold.fontWeight

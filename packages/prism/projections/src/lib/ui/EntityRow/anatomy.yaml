@@ -11,6 +11,9 @@
 # the row sets none, so its text sits on the column line of the list that
 # holds it.
 #
+# The identity clips along its line only: a chip in the title overhangs the
+# 24px line by 2px above and below, and keeps its border there.
+#
 # A linked title reads as the row's text: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the identity clips; the
 # states apply to the link alone.
@@ -47,7 +50,8 @@ node:
     - node:
         role: identity
         styles:
-          layout.overflow: hidden
+          layout.overflow.inline: clip
+          size.min.width: 0
           typography.overflow: ellipsis
           typography.whiteSpace: nowrap
         edges:

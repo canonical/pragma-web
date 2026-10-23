@@ -36,6 +36,9 @@
 # A word longer than its box, an identifier most often, ends in an ellipsis
 # in the title, the key values and the vitals rather than running under the
 # Card's clipped edge; the roster has no key for breaking inside a word.
+# A key and its value clip along their line only: a chip in a value
+# overhangs the 24px line by 2px above and below, and keeps its border
+# there.
 # The title's link reads as the title: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the title clips.
 #
@@ -204,7 +207,8 @@ node:
                           styles:
                             layout.flex.grow: 1
                             layout.flex.basis: 0
-                            layout.overflow: hidden
+                            layout.overflow.inline: clip
+                            size.min.width: 0
                             typography.overflow: ellipsis
                             typography.color: color.text.muted
                         relation: { cardinality: "1", slotName: key }
@@ -213,7 +217,8 @@ node:
                           styles:
                             layout.flex.grow: 1
                             layout.flex.basis: 0
-                            layout.overflow: hidden
+                            layout.overflow.inline: clip
+                            size.min.width: 0
                             typography.overflow: ellipsis
                             spacing.external.inline.start: 0
                         relation: { cardinality: "1", slotName: value }

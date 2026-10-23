@@ -48,16 +48,19 @@
     background: var(--entity-command-selected-background);
   }
 
+  /* The identity and the title clip only along their line, so a chip in
+   * the title keeps the pill's border where it overhangs the line. */
   .ds.entity-command .identity {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-x: clip;
+    min-width: 0;
   }
 
   /* The title truncates on its line, as the second line does; linked, it
    * reads as the row's text, underlined on approach. */
   .ds.entity-command .title {
-    overflow: hidden;
+    overflow-x: clip;
     color: inherit;
     white-space: nowrap;
     text-decoration: none;
