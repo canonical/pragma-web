@@ -11,8 +11,9 @@
 # the row sets none, so its text sits on the column line of the list that
 # holds it.
 #
-# The identity clips along its line only: a chip in the title overhangs the
-# 24px line by 2px above and below, and keeps its border there.
+# The identity clips along its line only, so nothing it holds is cut above
+# or below: a chip in the title is 28px, and its line grows to hold it (the
+# row is then 36px).
 #
 # A linked title reads as the row's text: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the identity clips; the

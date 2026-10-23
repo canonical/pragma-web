@@ -14,11 +14,15 @@
     --entity-card-body-span: var(--card-span, 1);
     --entity-card-sidecar-span: 2;
     /* The footer reaches back across the gutter the holding grid sets
-     * between its track and the body's, so the two sections meet. */
+     * between its track and the body's, so the two sections meet; a body
+     * without a footer reaches across the same gutter. */
     --entity-card-footer-overlap: calc(-1 * var(--grid-gutter));
     --entity-card-sidecar-padding-block: var(--component-padding-block);
     --entity-card-sidecar-padding-inline: var(--component-padding-inline);
     --entity-card-sidecar-background: var(--color-background-layer2);
+    /* The Card's divider, drawn under the sidecar where the footer follows. */
+    --entity-card-sidecar-divider-width: 1px;
+    --entity-card-sidecar-divider-color: var(--color-border-muted);
     --entity-card-location-color: var(--color-text-muted);
     --entity-card-location-letter-spacing: var(
       --typography-text-primary-smallcaps-letter-spacing
@@ -53,20 +57,30 @@
     grid-row: 1 / 4;
   }
 
-  /* Without vitals there is no footer: the body takes the footer's track
-   * and the gutter before it too, so the card ends where its body does. */
-  .ds.entity-card:not(:has(> .footer)) > .body {
-    grid-row: 1 / -1;
-  }
-
   /* The footer meets the body at the body's divider. */
   .ds.entity-card > .footer {
     margin-block-start: var(--entity-card-footer-overlap);
   }
 
-  /* With a sidecar the card turns into a column subgrid: the body and the
-   * footer keep the card's own span, and the sidecar takes two columns
-   * after them. */
+  /* Beside the body, on its tracks and never on the footer's: a tall
+   * example grows the body, and the footer keeps its own height. It rests
+   * on the Card's divider, as the body does, so the footer below runs
+   * under both. */
+  .ds.entity-card > .sidecar {
+    grid-column: span var(--entity-card-sidecar-span) / -1;
+    grid-row: 1 / 4;
+    min-width: 0;
+    padding-block: var(--entity-card-sidecar-padding-block);
+    padding-inline: var(--entity-card-sidecar-padding-inline);
+    border-bottom-width: var(--entity-card-sidecar-divider-width);
+    border-bottom-style: solid;
+    border-bottom-color: var(--entity-card-sidecar-divider-color);
+    background: var(--entity-card-sidecar-background);
+  }
+
+  /* With a sidecar the card turns into a column subgrid: the body keeps
+   * the card's own span, the sidecar takes two columns after it, and the
+   * footer runs under both, across the card. */
   .ds.entity-card:has(> .sidecar) {
     grid-column: span
       calc(var(--entity-card-body-span) + var(--entity-card-sidecar-span));
@@ -74,28 +88,32 @@
     gap: var(--entity-card-gap);
   }
 
-  .ds.entity-card:has(> .sidecar) > .body,
-  .ds.entity-card:has(> .sidecar) > .footer {
+  .ds.entity-card:has(> .sidecar) > .body {
     grid-column: 1 / span var(--entity-card-body-span);
+  }
+
+  .ds.entity-card:has(> .sidecar) > .footer {
+    grid-column: 1 / -1;
+  }
+
+  /* Without vitals there is no footer: the body, and the sidecar beside
+   * it, reach back across the gutter before the footer's track, as the
+   * footer does, so a card alone ends where its body does. They keep their
+   * own tracks, so they never size the footer's track a Cards group shares
+   * with cards that have vitals. */
+  .ds.entity-card:not(:has(> .footer)) > .body,
+  .ds.entity-card:not(:has(> .footer)) > .sidecar {
+    margin-block-end: var(--entity-card-footer-overlap);
   }
 
   /* The sidecar comes after the card's sections, so the section it follows
    * is no longer the Card's last child and would draw a divider along the
-   * card's bottom edge: it draws none, as the Card's last section does. */
+   * card's bottom edge: it draws none, as the Card's last section does.
+   * Without a footer the sidecar ends at that edge too, and draws none. */
   .ds.entity-card:has(> .body + .sidecar) > .body,
+  .ds.entity-card:has(> .body + .sidecar) > .sidecar,
   .ds.entity-card:has(> .footer + .sidecar) > .footer {
     border-block-end-width: 0;
-  }
-
-  /* Beside the body and the footer, on every track: a tall example grows
-   * them. */
-  .ds.entity-card > .sidecar {
-    grid-column: span var(--entity-card-sidecar-span) / -1;
-    grid-row: 1 / -1;
-    min-width: 0;
-    padding-block: var(--entity-card-sidecar-padding-block);
-    padding-inline: var(--entity-card-sidecar-padding-inline);
-    background: var(--entity-card-sidecar-background);
   }
 
   /* The heading's paragraphs and the summary set no baseline nudge and
@@ -168,11 +186,11 @@
   }
 
   /* Two equal halves under a rule. Each clips only along its line, so a
-   * chip in a value keeps the pill's border where it overhangs the line. */
+   * chip in a value keeps its whole pill, and the line grows to hold it. */
   .ds.entity-card > .body > .key-values > .pair {
     display: flex;
-    border-block-start-width: var(--entity-card-rule-width);
-    border-block-start-style: solid;
+    border-top-width: var(--entity-card-rule-width);
+    border-style: solid none none;
     border-block-start-color: var(--entity-card-rule-color);
   }
 

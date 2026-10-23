@@ -37,8 +37,7 @@ const CONTEXT_Y = TITLE_Y + GRAPH_NODE_LINE;
  * With an `href` the title's text links to the entity's home through
  * `LinkComponent`, an SVG link inside the title's `<text>`; without one it
  * is inert text. A line longer than the box is clipped at the inner inset.
- * It renders only the slots it is given and reads no context, so it renders
- * anywhere in an SVG.
+ * It renders only the slots it is given, so it renders anywhere in an SVG.
  *
  * Native props reach the `<g>` root; a consumer `className` merges after
  * the node's own.
@@ -46,6 +45,9 @@ const CONTEXT_Y = TITLE_Y + GRAPH_NODE_LINE;
  * `import { EntityGraphNode } from "@canonical/prism-projections";`
  *
  * @implements prism.component.entity_graph_node
+ * @note Impure: reads React's id for the clip path each instance draws
+ *   its lines through, and the translator context in scope, through
+ *   `Message`, for the "kind in location" line.
  */
 export default function EntityGraphNode({
   title,

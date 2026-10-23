@@ -4,8 +4,8 @@
 
 @layer ds.components.global {
   /* A pill on the line of the sentence that holds it: its height is the
-   * matrix's 24px line plus its 2px insets, and it overhangs the sentence's
-   * line rather than sizing it. */
+   * matrix's 24px line plus its 2px insets, and the line grows to hold it
+   * rather than letting it paint over the lines around it. */
   .ds.entity-chip {
     --entity-chip-gap: var(--space-050);
     --entity-chip-padding-inline-start: var(--space-100);
@@ -15,13 +15,6 @@
     --entity-chip-padding-block: calc(
       var(--space-025) -
       var(--entity-chip-border-width)
-    );
-    /* The overhang: the matrix's 2px inset and 4px of its line, so the
-     * margin box is 16px, the docs' smallest line, and no line of text
-     * grows to hold the pill. */
-    --entity-chip-margin-block: calc(
-      -1 *
-      (var(--space-025) + var(--space-050))
     );
     --entity-chip-background: var(--color-foreground-secondary);
     --entity-chip-border-width: 1px;
@@ -44,7 +37,6 @@
     padding-inline-start: var(--entity-chip-padding-inline-start);
     padding-inline-end: var(--entity-chip-padding-inline-end);
     padding-block: var(--entity-chip-padding-block);
-    margin-block: var(--entity-chip-margin-block);
     background: var(--entity-chip-background);
     border-width: var(--entity-chip-border-width);
     border-style: solid;
