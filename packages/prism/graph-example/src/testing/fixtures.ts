@@ -6,9 +6,18 @@
  * provider-neutral, and that is exactly what this gate is for. The
  * reference-extraction cases are written in the same vocabulary, for the
  * same reason.
+ *
+ * The line IRIs name one line, or pair of lines, per topology the network
+ * model has to carry, and the fleet IRIs one stock, formation, unit or line
+ * per formation case, so each case's test reads the record it is about
+ * rather than searching the network for something shaped right.
  */
 
 import { METRO_NAMESPACE } from "../lib/provider/constants.js";
+import {
+  BARE_ENTITY_URI,
+  EMPTY_LOCAL_NAME_URI,
+} from "../lib/provider/dataset.js";
 import type { SearchEntry } from "../lib/provider/types.js";
 import type { ExtractionCase, RankingCase } from "./types.js";
 
@@ -364,3 +373,66 @@ export const RANKING_CASES: readonly RankingCase[] = [
     expected: [`${M}depot`, `${M}depot-sidings`],
   },
 ];
+
+/** A line run both ways between two termini: two routes, each the other's reverse. */
+export const LINEAR_LINE_URI = `${METRO_NAMESPACE}north-line`;
+
+/** A loop run both ways: two loop routes from one first stop, each the other's reverse. */
+export const BIDIRECTIONAL_LOOP_LINE_URI = `${METRO_NAMESPACE}circle-line`;
+
+/**
+ * Two linear lines that share both termini and no other stop, so together
+ * they close a ring.
+ */
+export const HALF_RING_LINE_URIS = [
+  `${METRO_NAMESPACE}upland-line`,
+  `${METRO_NAMESPACE}lowland-line`,
+] as const;
+
+/**
+ * A ring run by two lines in opposite directions over the same stops: each
+ * line has one loop route and no reverse.
+ */
+export const DIRECTIONAL_RING_LINE_URIS = [
+  `${METRO_NAMESPACE}ringway-clockwise`,
+  `${METRO_NAMESPACE}ringway-anticlockwise`,
+] as const;
+
+/** The stations no route calls at, which therefore have no diagram position. */
+export const BARE_STATION_URIS = [
+  BARE_ENTITY_URI,
+  EMPTY_LOCAL_NAME_URI,
+] as const;
+
+/** A rolling stock that runs in one fixed formation of one unit. */
+export const FIXED_FORMATION_STOCK_URI = `${METRO_NAMESPACE}series-70`;
+
+/** A rolling stock that runs its unit alone or two coupled together. */
+export const COUPLED_STOCK_URI = `${METRO_NAMESPACE}series-90`;
+
+/** {@link COUPLED_STOCK_URI}'s formation of one unit. */
+export const SINGLE_UNIT_FORMATION_URI = `${METRO_NAMESPACE}series-90-three-car`;
+
+/** {@link COUPLED_STOCK_URI}'s formation of two units coupled together. */
+export const COUPLED_FORMATION_URI = `${METRO_NAMESPACE}series-90-six-car`;
+
+/** A unit with a driving cab at its front only. */
+export const ASYMMETRIC_UNIT_URI = `${METRO_NAMESPACE}unit-50`;
+
+/**
+ * A formation of two {@link ASYMMETRIC_UNIT_URI} units back to back, the
+ * second reversed, so the train has a cab at each end.
+ */
+export const REVERSED_UNIT_FORMATION_URI = `${METRO_NAMESPACE}series-50-four-car`;
+
+/** A line run by two rolling stocks. */
+export const MIXED_STOCK_LINE_URI = `${METRO_NAMESPACE}coastal-line`;
+
+/** The one formation longer than a platform it calls at. */
+export const OVERLONG_FORMATION_URI = COUPLED_FORMATION_URI;
+
+/** The line {@link OVERLONG_FORMATION_URI} overhangs a platform on. */
+export const OVERLONG_LINE_URI = `${METRO_NAMESPACE}north-line`;
+
+/** The station whose platform {@link OVERLONG_FORMATION_URI} overhangs. */
+export const SHORT_PLATFORM_STATION_URI = `${METRO_NAMESPACE}marsh-end`;

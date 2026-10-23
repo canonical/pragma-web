@@ -25,12 +25,28 @@
 """
 A metro line. A root class in the TBox (no superclass), so it demonstrates
 that `OntologyClass.superclass` is legitimately null.
+
+`code` is the short code passengers know the line by ("1", "R1"), and
+`colour` is its colour on maps and signs, as a lowercase `#rrggbb` hex
+triplet. Both are non-null: a line without them cannot be drawn or signed.
+
+`routes` lists the directions the line runs. A line does not carry an order of
+its own; each route carries its ordered calls, because direction is data.
+`servedBy` is the set of stops those calls visit, read as the inverse of
+`Stop.servesLine`.
+
+`formations` lists the formations the line is run with, in authored order. A
+line may be run by more than one rolling stock.
 """
 type Line implements Node {
   uri: ID!
   _meta: EntityMeta!
   name: String
   servedBy: [Stop!]!
+  code: String!
+  colour: String!
+  routes: [Route!]!
+  formations: [Formation!]!
 }
 
 """
@@ -48,15 +64,21 @@ can, and this is the smallest one that does.
 It does NOT try to mirror the class tree. `Stop` is one interface over the
 fields both implementers share; the hierarchy itself still lives in the TBox
 and shows up through `superclasses` / `subclasses` / `inherited`.
+
+`platformLength` is the usable length of the station's shortest platform, in
+whole millimetres, the unit a formation's `length` is measured in, so the two
+compare directly. It is null for a station no route calls at.
 """
 interface Stop implements Node {
   uri: ID!
   _meta: EntityMeta!
   name: String
   platformCount: Int
+  platformLength: Int
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
 }
 
 """
@@ -70,9 +92,11 @@ type Station implements Node & Stop {
   _meta: EntityMeta!
   name: String
   platformCount: Int
+  platformLength: Int
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
 }
 
 """
@@ -96,9 +120,11 @@ type Interchange implements Node & Stop {
   _meta: EntityMeta!
   name: String
   platformCount: Int
+  platformLength: Int
   location: GeoPoint
   servesLine: [Line!]!
   inZone: Zone
+  diagramPosition: DiagramPoint
   transferMinutes: Int
 }
 
@@ -136,4 +162,185 @@ extend type Query {
   prose(uri: ID!): Prose
   "Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en."
   search(text: String!, first: Int, after: String): NodeConnection!
+}
+
+"""
+One direction of a line's service. NOT a Node: a route has no IRI of its own
+and is reached only through `Line.routes`.
+
+Direction is data. The route, not the line, carries the ordered calls, so a
+line that runs both ways has two routes, each listing its calls in the order
+a passenger meets them.
+
+`label` is the route's name as shown to passengers ("To Marsh End",
+"Clockwise"). It is the route's `rdfs:label`, so it agrees with
+`_meta.label` and `_meta.title`.
+
+`isLoop` is true when the service continues from the last call back to the
+first. The first stop is never repeated at the end of `calls`; the closing
+segment is implied.
+
+`reverse` is the same line's route over the same stops the other way. For a
+loop that is the same first stop with the rest reversed. It is null when the
+line runs one direction only. A ring run by two lines in opposite directions
+is two lines with one route each, so neither route has a reverse.
+"""
+type Route {
+  _meta: EntityMeta!
+  label: String!
+  isLoop: Boolean!
+  calls: [Call!]!
+  reverse: Route
+}
+
+"""
+One stop on a route, at its place in the order. NOT a Node: a call exists
+only within its route.
+
+`position` is counted from 1, with no gaps, so the calls of a route are
+numbered 1 to n in the order the service makes them.
+"""
+type Call {
+  _meta: EntityMeta!
+  position: Int!
+  stop: Stop!
+}
+
+"""
+A place on the schematic network diagram. NOT a Node, and NOT a geography:
+`Stop.location` says where a station is on the ground, this says where it
+sits on the map passengers read.
+
+Coordinates are whole grid units. The origin is the north-west corner, `x`
+grows east and `y` grows south, the orientation of a screen, so a drawing
+needs no flip. The network is anchored so its smallest `x` and its smallest
+`y` are both 0.
+
+Every segment between consecutive calls of a route, and the closing segment
+of a loop, is horizontal, vertical or diagonal (octilinear). A station no
+route calls at has no position.
+"""
+type DiagramPoint {
+  _meta: EntityMeta!
+  x: Int!
+  y: Int!
+}
+
+"""
+A class of train: the cars of one design and the formations they run in. A
+root class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`formations` holds the stock's alternative formations in authored order,
+shortest first.
+"""
+type RollingStock implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  formations: [Formation!]!
+}
+
+"""
+A train as it runs: an ordered list of units, each possibly reversed. A root
+class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`units` lists the formation's units from its front, positions counted from 1
+with no gaps.
+
+`stock` is the rolling stock that lists the formation, and `lines` the lines
+run with it, in IRI order. Both are read as inverses of the stock's and the
+lines' `formations`, never stored.
+
+`length` and `capacity` are the sums of its units', computed by the provider
+and never stored. Lengths are whole millimetres, measured over couplers so
+they add up without gaps; capacity is passengers seated plus standing.
+"""
+type Formation implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  stock: RollingStock!
+  units: [UnitPosition!]!
+  length: Int!
+  capacity: Int!
+  lines: [Line!]!
+}
+
+"""
+A set of cars permanently coupled in order: the smallest part of a train that
+runs on its own. A root class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`cars` lists the unit's cars from its front, positions counted from 1 with no
+gaps.
+
+`length` and `capacity` are the sums of its cars' car types, computed by the
+provider and never stored. Lengths are whole millimetres, measured over
+couplers so they add up without gaps; capacity is passengers seated plus
+standing.
+"""
+type Unit implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  cars: [CarPosition!]!
+  length: Int!
+  capacity: Int!
+}
+
+"""
+A kind of car. A root class in the TBox, reachable through `node(id:)` and
+`OntologyClass.instances`.
+
+`code` is the short code the car type is known by ("DM" for a driving motor
+car, "M" for a motor car, "T" for a trailer). `hasCab` is true when the car
+has a driving cab at its leading end.
+
+`length` is in whole millimetres, measured over couplers, and `capacity` is
+passengers seated plus standing.
+"""
+type CarType implements Node {
+  uri: ID!
+  _meta: EntityMeta!
+  name: String
+  code: String!
+  hasCab: Boolean!
+  length: Int!
+  capacity: Int!
+}
+
+"""
+One unit in a formation, at its place in the order. NOT a Node: a unit
+position exists only within its formation.
+
+`position` is counted from 1, with no gaps, starting at the formation's front.
+
+`reversed` is true when the unit runs last car first, so an asymmetric unit
+coupled back to back with another puts its cab at the far end of the train.
+"""
+type UnitPosition {
+  _meta: EntityMeta!
+  position: Int!
+  unit: Unit!
+  reversed: Boolean!
+}
+
+"""
+One car in a unit, at its place in the order. NOT a Node: a car position
+exists only within its unit.
+
+`position` is counted from 1, with no gaps, starting at the unit's front.
+
+`reversed` is true when the car's leading end faces the rear of its unit, so a
+driving car at the back of a unit with its cab facing outwards is reversed. A
+car's orientation in a train is its own `reversed` XOR its unit's
+`UnitPosition.reversed`.
+"""
+type CarPosition {
+  _meta: EntityMeta!
+  position: Int!
+  carType: CarType!
+  reversed: Boolean!
 }

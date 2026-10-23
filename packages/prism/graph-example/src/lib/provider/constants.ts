@@ -32,6 +32,41 @@ export const META_CLASS_URI = `${RDFS_NAMESPACE}Class`;
 /** The class the embeddable coordinate pair is an instance of. */
 export const GEO_POINT_CLASS_URI = `${GEO_NAMESPACE}GeoPoint`;
 
+/** The class a line's route, one direction of its service, is an instance of. */
+export const ROUTE_CLASS_URI = `${METRO_NAMESPACE}Route`;
+
+/** The class one stop on a route, at its place in the order, is an instance of. */
+export const CALL_CLASS_URI = `${METRO_NAMESPACE}Call`;
+
+/** The class a point on the schematic network diagram is an instance of. */
+export const DIAGRAM_POINT_CLASS_URI = `${METRO_NAMESPACE}DiagramPoint`;
+
+/** The position of a route's first call. Positions count up from here with no gaps. */
+export const FIRST_CALL_POSITION = 1;
+
+/** The class one car in a unit, at its place in the order, is an instance of. */
+export const CAR_POSITION_CLASS_URI = `${METRO_NAMESPACE}CarPosition`;
+
+/** The position of a unit's first car, at its front. Positions count up from here with no gaps. */
+export const FIRST_CAR_POSITION = 1;
+
+/** The class one unit in a formation, at its place in the order, is an instance of. */
+export const UNIT_POSITION_CLASS_URI = `${METRO_NAMESPACE}UnitPosition`;
+
+/** The position of a formation's first unit, at its front. Positions count up from here with no gaps. */
+export const FIRST_UNIT_POSITION = 1;
+
+/**
+ * The GraphQL type names of the network's records: lines, stations,
+ * interchanges and fare zones. Every other record belongs to the fleet.
+ */
+export const NETWORK_TYPENAMES: ReadonlySet<string> = new Set([
+  "Line",
+  "Station",
+  "Interchange",
+  "Zone",
+]);
+
 /** Language `EntityMeta`'s arguments default to, per the contract SDL. */
 export const DEFAULT_LANG = "en";
 
