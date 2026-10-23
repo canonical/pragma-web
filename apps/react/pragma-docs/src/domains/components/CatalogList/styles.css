@@ -93,11 +93,10 @@
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-    /* The lens layout runs zero column gap, so a subgrid inherits none — the cards
-     * would touch. A subgrid may set its OWN gap over the inherited tracks:
-     * this gives the cards a gutter without disturbing the column lines. */
-    column-gap: var(--space-200, 1rem);
-    row-gap: var(--space-200, 1rem);
+    /* The grid's gutter on both axes, the list's one gap: the same gap the
+     * subgrid inherits, so the cards sit one gutter apart and each card's
+     * two-column span lands on the canvas's column lines. */
+    gap: var(--catalog-list-gap);
   }
   /* The span, and the card's leave to shrink to it, are the canvas's: each
    * card is a page tile. */
