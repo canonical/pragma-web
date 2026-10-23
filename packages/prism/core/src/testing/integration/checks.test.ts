@@ -8,6 +8,8 @@ import { describe, expect, it } from "vitest";
 import {
   PROJECTED_ANATOMY,
   PROJECTED_FRAGMENT,
+  SWITCHED_ANATOMY,
+  SWITCHED_FRAGMENT,
 } from "../../../testing/fixtures.js";
 import {
   assertAnatomy,
@@ -163,6 +165,51 @@ describe("the component checks", () => {
       ).toThrow(
         /prism\.component\.class_probe projects on OntologyClass, but ClassProbe_node is on Node/,
       );
+    });
+
+    describe("through a switch, an inline fragment and a condition", () => {
+      const switched = parseAnatomyYAML(SWITCHED_ANATOMY);
+
+      it("passes when each case reads what the fragment reads under its type or condition", () => {
+        expect(() =>
+          assertProjectionMatchesFragment(switched, SWITCHED_FRAGMENT),
+        ).not.toThrow();
+      });
+
+      it("names a case's field the fragment drops and a conditional field no case reads", () => {
+        const withoutInlineFragment: ReaderFragment = {
+          ...SWITCHED_FRAGMENT,
+          selections: SWITCHED_FRAGMENT.selections.filter(
+            (selection) => selection.kind !== "InlineFragment",
+          ),
+        };
+        const withoutTitleCase = {
+          root: {
+            ...switched.root,
+            edges: switched.root.edges?.map((edge) =>
+              "cases" in edge.target
+                ? {
+                    ...edge,
+                    target: {
+                      ...edge.target,
+                      cases: edge.target.cases.filter(
+                        ({ node }) => node.projection?.field !== "_meta.title",
+                      ),
+                    },
+                  }
+                : edge,
+            ),
+          },
+        };
+        expect(() =>
+          assertProjectionMatchesFragment(
+            withoutTitleCase,
+            withoutInlineFragment,
+          ),
+        ).toThrow(
+          /the anatomy reads isAbstract, which SwitchProbe_node does not\nSwitchProbe_node reads _meta\.title, which the anatomy does not/,
+        );
+      });
     });
   });
 

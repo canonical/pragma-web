@@ -391,3 +391,74 @@ export const PROJECTED_FRAGMENT: ReaderFragment = {
     { kind: "FragmentSpread", name: "Other_node" },
   ],
 };
+
+/**
+ * A projected anatomy that dispatches on its node's type, as a dispatcher's
+ * `anatomy.yaml` spells it: one case reads a class's abstraction, the other
+ * the title every node carries, each in the scope the switch sits in.
+ */
+export const SWITCHED_ANATOMY = `---
+node:
+  uri: prism.component.switch_probe
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: abstract
+              projection:
+                on: OntologyClass
+                field: isAbstract
+          - node:
+              role: title
+              projection:
+                on: Node
+                field: _meta.title
+      relation:
+        cardinality: "1"
+`;
+
+/**
+ * The compiled reader artifact of the fragment {@link SWITCHED_ANATOMY}
+ * derives, its title under a condition and the class's abstraction under an
+ * inline fragment:
+ * `fragment SwitchProbe_node on Node @argumentDefinitions(withTitle: { type: "Boolean!" }) { __typename _meta @include(if: $withTitle) { title } ... on OntologyClass { isAbstract } }`.
+ */
+export const SWITCHED_FRAGMENT: ReaderFragment = {
+  kind: "Fragment",
+  name: "SwitchProbe_node",
+  type: "Node",
+  abstractKey: "__isNode",
+  metadata: null,
+  argumentDefinitions: [
+    {
+      kind: "LocalArgument",
+      name: "withTitle",
+      defaultValue: null,
+    },
+  ],
+  selections: [
+    { kind: "ScalarField", name: "__typename" },
+    {
+      kind: "Condition",
+      passingValue: true,
+      condition: "withTitle",
+      selections: [
+        {
+          kind: "LinkedField",
+          name: "_meta",
+          plural: false,
+          selections: [{ kind: "ScalarField", name: "title" }],
+        },
+      ],
+    },
+    {
+      kind: "InlineFragment",
+      type: "OntologyClass",
+      abstractKey: null,
+      selections: [{ kind: "ScalarField", name: "isAbstract" }],
+    },
+  ],
+};
