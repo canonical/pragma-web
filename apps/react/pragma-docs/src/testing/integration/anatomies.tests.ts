@@ -42,8 +42,11 @@ const DOCUMENT_TOKENS = ["--grid-col-min"];
 const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
 
 describe("the app's components", () => {
-  it("are found, the shell among them", () => {
+  it("are found, the shell and a domain library's among them", () => {
     expect(folders).toContain(join(UI_DIRECTORY, "Shell"));
+    expect(folders).toContain(
+      join(APP_ROOT, "src", "domains", "components", "lib", "UIBlockCard"),
+    );
   });
 
   it.each(folders)(

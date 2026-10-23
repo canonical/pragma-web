@@ -1,0 +1,72 @@
+---
+# UIBlockCommand: a UI block as a 56px command-palette result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
+# title over "kind in location", one vital at the end) and the palette's
+# result rows 502:1753 and 502:1827. The kind is the block's class; the
+# location its tier; the vital its version when it has one, else its first
+# documentation stage: the first of the card's vitals.
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved from
+# the compact address; a block whose type has no home reads as inert text.
+node:
+  uri: docs.component.ui_block_command
+  projection:
+    on: UIBlock
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: location
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "0..1"
+              slotName: location
+              projection:
+                field: tier
+          - node:
+              role: vital
+              edges:
+                - node:
+                    role: version
+                    projection:
+                      field: version
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: stage
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: documentationStages
+            relation:
+              cardinality: "0..1"
+              slotName: vital
+      relation:
+        cardinality: "1"

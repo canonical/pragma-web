@@ -1,0 +1,103 @@
+---
+# UIBlockCard: a UI block as a card in a grid of entities, with its
+# rendered example beside the body.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 and 505:2254 (the
+# tier above the title, "IconButton ∈ Button", the kind, the summary, the
+# footer's vitals "v2.1" and the stage) and 502:1749 (the side panel). The
+# location is the block's tier; the parent the first block it inherits
+# from, after the catalog's ∈; the kind the block's class; the vitals its
+# version, when it has one, then its first documentation stage.
+# The sidecar renders the actual component: the published React component
+# of the block with its default props, given only what it cannot render
+# without, server-rendered. A block the published package does not
+# implement has no sidecar, and its card lays out as any card without one.
+# Projected onto EntityCard, which carries every style, the sidecar's
+# subgrid and its two columns included: this anatomy binds none. The home
+# is the link the title renders through, resolved from the compact address;
+# a block whose type has no home reads as inert text.
+node:
+  uri: docs.component.ui_block_card
+  projection:
+    on: UIBlock
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: location
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "0..1"
+              slotName: location
+              projection:
+                field: tier
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: parent
+              projection:
+                field: _meta.title
+            relation:
+              # The first block it inherits from: the title names one parent.
+              cardinality: "0..1"
+              slotName: parent
+              projection:
+                field: inheritsFroms
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: summary
+              projection:
+                field: summary
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+          - node:
+              role: vitals
+              edges:
+                - node:
+                    role: version
+                    projection:
+                      field: version
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: stage
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: documentationStages
+            relation:
+              cardinality: "0..1"
+              slotName: footer
+          - node:
+              uri: docs.component.ui_block_example
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: sidecar
+      relation:
+        cardinality: "1"

@@ -3,7 +3,8 @@
  * over, as a Relay mock environment answers a `Node`, read off the
  * projection matrix's rows: a UI block, a UI block the published package
  * renders, a modifier, a modifier family and a code standard, each with the
- * href the site's homes build for it.
+ * href the site's homes build for it; and the routes those homes build
+ * them through.
  *
  * `resolveRoot` crosses a package boundary on purpose: it is the projection
  * package's own resolver for a mock environment's root field, kept in that
@@ -11,6 +12,8 @@
  * The path is relative to this monorepo's layout, so a resolver that moves
  * fails this app's type check at this one import.
  */
+
+import { route } from "@canonical/router-core";
 
 export { resolveRoot } from "../../../../packages/prism/projections/testing/fixtures.js";
 
@@ -117,3 +120,14 @@ export const MOCK_CODE_STANDARD = {
  */
 export const MOCK_CODE_STANDARD_HREF =
   "/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23react.component.subcomponent_export_api";
+
+/**
+ * The routes the site's homes build their hrefs through, each with no
+ * content: a story's router names them as the site does, so a homed entity
+ * links to its page, without mounting the page under the story.
+ */
+export const HOME_ROUTES = {
+  componentEntity: route({ url: "/components/:uri", content: () => null }),
+  definitionsTerm: route({ url: "/definitions/:term", content: () => null }),
+  standardEntity: route({ url: "/standards/:uri", content: () => null }),
+} as const;

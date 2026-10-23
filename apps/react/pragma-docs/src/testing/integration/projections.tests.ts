@@ -49,7 +49,13 @@ const PROJECTIONS = listAnatomyFolders([
 
 describe("the app's projections", () => {
   it("are found in its domain libraries and its general components", () => {
-    expect(PROJECTIONS.map((folder) => basename(folder))).toEqual([]);
+    expect(PROJECTIONS.map((folder) => basename(folder))).toEqual([
+      "UIBlockCard",
+      "UIBlockChip",
+      "UIBlockCommand",
+      "UIBlockGraphNode",
+      "UIBlockRow",
+    ]);
   });
 
   it.each(PROJECTIONS)("%s reads what its fragment reads", (folder) => {

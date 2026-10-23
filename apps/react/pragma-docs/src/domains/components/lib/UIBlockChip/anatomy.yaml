@@ -1,0 +1,37 @@
+---
+# UIBlockChip: a UI block (a component, a pattern or a layout) as an inline
+# mention.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 449:22408 (the chip's slots)
+# and the UI-blocks row's chip ("IconButton" alone in the pill: no key,
+# badge, icon or chevron). A passage's own link text, when given, stands in
+# for the title.
+# One projection serves every UI-block type: it reads only what the UIBlock
+# interface declares, and the site's maps arm it for Component, Pattern and
+# Layout.
+# Projected onto EntityChip, which carries every style: this anatomy binds
+# none. The home is the link the value renders through, resolved from the
+# compact address; a block whose type has no home reads as inert text.
+node:
+  uri: docs.component.ui_block_chip
+  projection:
+    on: UIBlock
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: value
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: value
+      relation:
+        cardinality: "1"

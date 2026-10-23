@@ -8,4 +8,9 @@
  * @module
  */
 
+export * from "./UIBlockCard/index.js";
+export * from "./UIBlockChip/index.js";
+export * from "./UIBlockCommand/index.js";
 export * from "./UIBlockExample/index.js";
+export * from "./UIBlockGraphNode/index.js";
+export * from "./UIBlockRow/index.js";
