@@ -1,0 +1,18 @@
+---
+# StandardProse — a standard's prose, rendered from Markdown in the language
+# the provider served it in (its `lang`), inside the projections'
+# references provider, so a link to a referenced entity renders as that
+# entity's chip and every other link stays the author's. Headings render
+# one level down, under the article's title. Its root carries `.editorial`
+# and `.content-flow`: the typography layer gives the prose's headings and
+# paragraphs their space after, and the last block none. It binds no style
+# of its own; the article places it.
+node:
+  uri: prism.subcomponent.standard_prose
+  edges:
+    - node:
+        role: markdown block (a heading one level down, a paragraph, a list, code)
+      relation: { cardinality: "0..*", slotName: default }
+    - node:
+        uri: prism.component.chip_projection
+      relation: { cardinality: "0..*" }

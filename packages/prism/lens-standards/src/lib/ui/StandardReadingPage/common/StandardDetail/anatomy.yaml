@@ -1,0 +1,37 @@
+---
+# StandardDetail — the reading page's data-bearing interior: it reads the
+# page's one operation from the warm store and renders the standard's
+# article or, for an address that is not one of the bound class's
+# instances, an alert naming the address in the published InlineCode. It
+# sets the document title either way.
+#
+# A subgrid of the page over every column, its gap the grid's gutter on
+# both axes; the alert spans it, and the article places itself.
+#
+# Every decision is read through a component token declared on the root
+# (`--standard-detail-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure, a span in columns.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: prism.subcomponent.standard_detail
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: missing (the not-found alert, role alert)
+        styles:
+          layout.grid.column: "1 / -1"
+        edges:
+          - node:
+              uri: global.component.inline_code
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1", slotName: missing }
+    - node:
+        uri: prism.component.standard_article
+      relation: { cardinality: "0..1", slotName: default }
