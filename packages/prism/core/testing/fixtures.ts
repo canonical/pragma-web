@@ -4,7 +4,7 @@
 
 import { route } from "@canonical/router-core";
 import { createElement, type ReactElement } from "react";
-import type { ConcreteRequest } from "relay-runtime";
+import type { ConcreteRequest, ReaderFragment } from "relay-runtime";
 import { prefetchQuery } from "../src/lib/relay/index.js";
 import { routeLensFacet } from "../src/lib/routeLens/index.js";
 import { routeShortcutFacet } from "../src/lib/routeShortcut/index.js";
@@ -317,3 +317,77 @@ type Query {
   thing: Thing
 }
 `;
+
+/**
+ * A projected anatomy, as its `anatomy.yaml` spells it: a class's title,
+ * linked to its home, and its superclass's title read through a traversal.
+ */
+export const PROJECTED_ANATOMY = `---
+node:
+  uri: prism.component.class_probe
+  projection:
+    on: OntologyClass
+  edges:
+    - node:
+        role: title
+        projection:
+          field: _meta.title
+        edges:
+          - node:
+              role: home
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+      relation:
+        cardinality: "1"
+        slotName: title
+    - node:
+        role: parent
+        projection:
+          field: _meta.title
+      relation:
+        cardinality: "0..1"
+        slotName: parent
+        projection:
+          field: superclass
+`;
+
+/**
+ * The compiled reader artifact of the fragment {@link PROJECTED_ANATOMY}
+ * derives, with the typename and a spread beside its fields:
+ * `fragment ClassProbe_node on OntologyClass { __typename _meta { title curie } superclass { _meta { title } } ...Other_node }`.
+ */
+export const PROJECTED_FRAGMENT: ReaderFragment = {
+  kind: "Fragment",
+  name: "ClassProbe_node",
+  type: "OntologyClass",
+  metadata: null,
+  argumentDefinitions: [],
+  selections: [
+    { kind: "ScalarField", name: "__typename" },
+    {
+      kind: "LinkedField",
+      name: "_meta",
+      plural: false,
+      selections: [
+        { kind: "ScalarField", name: "title" },
+        { kind: "ScalarField", name: "curie" },
+      ],
+    },
+    {
+      kind: "LinkedField",
+      name: "superclass",
+      plural: false,
+      selections: [
+        {
+          kind: "LinkedField",
+          name: "_meta",
+          plural: false,
+          selections: [{ kind: "ScalarField", name: "title" }],
+        },
+      ],
+    },
+    { kind: "FragmentSpread", name: "Other_node" },
+  ],
+};

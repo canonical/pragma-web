@@ -2,9 +2,16 @@
 
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseAnatomyYAML } from "@canonical/anatomy-dsl";
+import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 import {
+  PROJECTED_ANATOMY,
+  PROJECTED_FRAGMENT,
+} from "../../../testing/fixtures.js";
+import {
   assertAnatomy,
+  assertProjectionMatchesFragment,
   assertScaffold,
   assertStylesheets,
   assertStylesMatchAnatomy,
@@ -104,6 +111,57 @@ describe("the component checks", () => {
         ),
       ).toThrow(
         /src\/lib\/probes\/deep\/DeepProbe is not a component placement/,
+      );
+    });
+  });
+
+  describe("assertProjectionMatchesFragment", () => {
+    const specification = parseAnatomyYAML(PROJECTED_ANATOMY);
+
+    it("passes when the anatomy and the fragment read the same fields", () => {
+      expect(() =>
+        assertProjectionMatchesFragment(specification, PROJECTED_FRAGMENT),
+      ).not.toThrow();
+    });
+
+    it("names the path each side reads and the other does not", () => {
+      const withoutCurie: ReaderFragment = {
+        ...PROJECTED_FRAGMENT,
+        selections: PROJECTED_FRAGMENT.selections.map((selection) =>
+          selection.kind === "LinkedField" && selection.name === "_meta"
+            ? {
+                ...selection,
+                selections: selection.selections.filter(
+                  (inner) =>
+                    !(inner.kind === "ScalarField" && inner.name === "curie"),
+                ),
+              }
+            : selection,
+        ),
+      };
+      const withoutParent = {
+        root: {
+          ...specification.root,
+          edges: specification.root.edges?.filter(
+            (edge) => edge.relation.slotName !== "parent",
+          ),
+        },
+      };
+      expect(() =>
+        assertProjectionMatchesFragment(withoutParent, withoutCurie),
+      ).toThrow(
+        /the anatomy reads _meta\.curie, which ClassProbe_node does not\nClassProbe_node reads superclass\._meta\.title, which the anatomy does not/,
+      );
+    });
+
+    it("refuses a fragment on another type than the anatomy projects on", () => {
+      expect(() =>
+        assertProjectionMatchesFragment(specification, {
+          ...PROJECTED_FRAGMENT,
+          type: "Node",
+        }),
+      ).toThrow(
+        /prism\.component\.class_probe projects on OntologyClass, but ClassProbe_node is on Node/,
       );
     });
   });
