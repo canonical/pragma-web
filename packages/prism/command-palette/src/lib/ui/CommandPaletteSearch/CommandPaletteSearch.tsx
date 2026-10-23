@@ -8,6 +8,7 @@ import {
 import {
   type ChangeEvent,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactElement,
   useCallback,
   useDeferredValue,
@@ -26,6 +27,13 @@ import { ARROW_STEPS, SEARCH_PAGE_SIZE } from "./constants.js";
 import groupResultsByType from "./groupResultsByType.js";
 import type { CommandPaletteSearchProps } from "./types.js";
 import "./styles.css";
+
+/**
+ * Whether `target`, where a pointer pressed or clicked, is a link or lies
+ * inside one.
+ */
+const isWithinLink = (target: EventTarget): boolean =>
+  target instanceof Element && target.closest("a") !== null;
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
@@ -72,7 +80,8 @@ const componentCssClassName = "ds command-palette-search";
  * highlighted option of the listbox it controls (`aria-activedescendant`),
  * wrapping at both ends; Enter chooses the highlighted result, opening its
  * home; a pointer moving over a result highlights it. Escape is the
- * dialog's.
+ * dialog's. A pointer pressing anywhere under the field but on a link
+ * leaves the focus in the field, so the keys keep reaching it.
  *
  * The field's text, trimmed, reaches the graph's search deferred: while the
  * next results load, the last ones stay on screen and the listbox is busy.
@@ -93,8 +102,8 @@ const componentCssClassName = "ds command-palette-search";
  *
  * @implements prism.component.command_palette_search
  * @note Impure: fetches the search through Relay, reads the projection maps
- *   and the translator in scope, and clicks and scrolls the highlighted
- *   option's element.
+ *   and the translator in scope, clicks and scrolls the highlighted
+ *   option's element, and prevents a pointer's press from moving the focus.
  */
 export default function CommandPaletteSearch({
   onChoose,
@@ -144,6 +153,18 @@ export default function CommandPaletteSearch({
   };
 
   /**
+   * Keep the focus in the field when a pointer presses a heading, the
+   * preview, an option or the status line: none of them takes the focus,
+   * which would otherwise fall to the dialog and leave the arrow keys and
+   * the typing nowhere. A link keeps its press, to be followed.
+   *
+   * @note Impure: prevents the press's default action.
+   */
+  const handleBodyMouseDown = (event: MouseEvent<HTMLDivElement>): void => {
+    if (!isWithinLink(event.target)) event.preventDefault();
+  };
+
+  /**
    * Move the highlight with the arrow keys, wrapping at both ends, and
    * choose the highlighted result with Enter, unless an input method is
    * composing text.
@@ -185,7 +206,8 @@ export default function CommandPaletteSearch({
         type="text"
         value={text}
       />
-      <div className="body">
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: the body only keeps a pointer's press from taking the focus out of the field; the field is the control and takes the keys. */}
+      <div className="body" onMouseDown={handleBodyMouseDown}>
         {listed ? (
           <ProjectionsProvider LinkComponent={CommandPaletteTitle} maps={maps}>
             <div

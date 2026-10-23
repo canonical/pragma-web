@@ -164,6 +164,25 @@ describe("CommandPaletteSearch", () => {
     expect(options.at(0)).toHaveAttribute("aria-selected", "false");
   });
 
+  it("keeps the focus in the field when a pointer presses under it, but on a link", async () => {
+    const { container } = await renderResults("lay");
+    const field = screen.getByRole("combobox");
+    field.focus();
+    const heading = container.querySelector(".heading");
+    if (heading === null) throw new Error("no group heading is rendered");
+    expect(fireEvent.mouseDown(heading)).toBe(false);
+    expect(
+      fireEvent.mouseDown(screen.getByRole("region", { name: "Preview" })),
+    ).toBe(false);
+    expect(field).toHaveFocus();
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    expect(findActiveOption()).toHaveTextContent("Player layout");
+    const link = within(
+      screen.getByRole("region", { name: "Preview" }),
+    ).getByRole("link");
+    expect(fireEvent.mouseDown(link)).toBe(true);
+  });
+
   it("chooses the highlighted result with Enter, opening its home", async () => {
     const { router, onChoose } = await renderResults("lay");
     const field = screen.getByRole("combobox");

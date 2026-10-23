@@ -91,7 +91,9 @@ are the platform's, and the dialog's focusing steps put the focus in the
 field. The dialog is named by its `aria-label`, "Search the graph".
 
 The search is the ARIA combobox pattern with a listbox popup. The field is
-the combobox and keeps the focus: it is expanded and controls the listbox
+the combobox and keeps the focus, even when a pointer presses a heading,
+the preview, a disabled option or the status line under it (a link alone
+takes its press): it is expanded and controls the listbox
 while there are results, and names the highlighted option as its active
 descendant. Each group of results is a `group` named by its type's heading;
 each result is an `option`, selected while highlighted, disabled when its
