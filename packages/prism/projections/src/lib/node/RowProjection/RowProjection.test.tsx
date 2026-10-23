@@ -37,7 +37,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the fragment key it returns. */
+/**
+ * Run the test operation and render `children` with the fragment key it
+ * returns.
+ */
 const RowProjectionTestNode = ({
   children,
 }: {
@@ -109,7 +112,10 @@ describe("RowProjection", () => {
   });
 
   it("renders a type the site arms through the site's arm, over the Node key", () => {
-    /** A site's arm for its own type: the Node projection, marked with the typename. */
+    /**
+     * A site's arm for its own type: the Node projection, marked with the
+     * typename.
+     */
     const SiteNodeRow = ({
       typename,
       ...props

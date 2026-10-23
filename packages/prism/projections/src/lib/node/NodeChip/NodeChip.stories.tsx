@@ -67,7 +67,10 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** A UI block: its title alone in the pill, inert since the site does not home it. */
+/**
+ * A UI block: its title alone in the pill, inert since the site does not home
+ * it.
+ */
 export const Default: Story = {};
 
 /**

@@ -85,7 +85,9 @@ export const Unlabelled: Story = {
   parameters: { relay: mockEntity({ label: null }) },
 };
 
-/** A functional datatype property with no inverse: "functional" in its footer. */
+/**
+ * A functional datatype property with no inverse: "functional" in its footer.
+ */
 export const Functional: Story = {
   parameters: {
     relay: mockEntity({

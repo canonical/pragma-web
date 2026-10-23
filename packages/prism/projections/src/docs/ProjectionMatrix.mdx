@@ -5,6 +5,21 @@ import * as CommandStories from "../lib/ui/EntityCommand/EntityCommand.stories";
 import * as GraphNodeStories from "../lib/ui/EntityGraphNode/EntityGraphNode.stories";
 import * as ListStories from "../lib/ui/EntityList/EntityList.stories";
 import * as RowStories from "../lib/ui/EntityRow/EntityRow.stories";
+import * as NodeGraphNodeStories from "../lib/node/NodeGraphNode/NodeGraphNode.stories";
+import * as NodeChipStories from "../lib/node/NodeChip/NodeChip.stories";
+import * as NodeCardStories from "../lib/node/NodeCard/NodeCard.stories";
+import * as NodeRowStories from "../lib/node/NodeRow/NodeRow.stories";
+import * as NodeCommandStories from "../lib/node/NodeCommand/NodeCommand.stories";
+import * as OntologyClassGraphNodeStories from "../lib/ontology/OntologyClassGraphNode/OntologyClassGraphNode.stories";
+import * as OntologyClassChipStories from "../lib/ontology/OntologyClassChip/OntologyClassChip.stories";
+import * as OntologyClassCardStories from "../lib/ontology/OntologyClassCard/OntologyClassCard.stories";
+import * as OntologyClassRowStories from "../lib/ontology/OntologyClassRow/OntologyClassRow.stories";
+import * as OntologyClassCommandStories from "../lib/ontology/OntologyClassCommand/OntologyClassCommand.stories";
+import * as OntologyPropertyGraphNodeStories from "../lib/ontology/OntologyPropertyGraphNode/OntologyPropertyGraphNode.stories";
+import * as OntologyPropertyChipStories from "../lib/ontology/OntologyPropertyChip/OntologyPropertyChip.stories";
+import * as OntologyPropertyCardStories from "../lib/ontology/OntologyPropertyCard/OntologyPropertyCard.stories";
+import * as OntologyPropertyRowStories from "../lib/ontology/OntologyPropertyRow/OntologyPropertyRow.stories";
+import * as OntologyPropertyCommandStories from "../lib/ontology/OntologyPropertyCommand/OntologyPropertyCommand.stories";
 
 <Meta title="Documentation/Projection matrix" />
 
@@ -141,3 +156,80 @@ An index of entities renders through `EntityList`: the count line and the
 view toggle, then the entities as cards or as rows.
 
 <Canvas of={ListStories.Toggle} sourceState="none" />
+
+## Projections
+
+The projections fill the five representations from the graph, one type in
+one form each, with the slots that type has: any node from what every node
+carries, an ontology class as the classes row draws it, and an ontology
+property. Each reads the entity a mock environment answers, through its own
+Relay fragment, and links its title to the entity's home.
+
+<table>
+  <thead>
+    <tr>
+      <th scope="col">Type</th>
+      <th scope="col">Graph node</th>
+      <th scope="col">Chip</th>
+      <th scope="col">Card</th>
+      <th scope="col">List entry</th>
+      <th scope="col">Command</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><code>Node</code></th>
+      <td>
+        <Canvas of={NodeGraphNodeStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={NodeChipStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={NodeCardStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={NodeRowStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={NodeCommandStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+    </tr>
+    <tr>
+      <th scope="row"><code>OntologyClass</code></th>
+      <td>
+        <Canvas of={OntologyClassGraphNodeStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyClassChipStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyClassCardStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyClassRowStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyClassCommandStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+    </tr>
+    <tr>
+      <th scope="row"><code>OntologyProperty</code></th>
+      <td>
+        <Canvas of={OntologyPropertyGraphNodeStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyPropertyChipStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyPropertyCardStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyPropertyRowStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+      <td>
+        <Canvas of={OntologyPropertyCommandStories.Default} sourceState="none" withToolbar={false} />
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -16,7 +16,9 @@ import { HOMES, THING_ROUTES } from "./fixtures.js";
 export interface SiteTreeOptions {
   /** The maps to provide, in place of `defaultProjectionMaps`. */
   readonly maps?: ProjectionMaps;
-  /** The link a node's home renders through, in place of the provider's default. */
+  /**
+   * The link a node's home renders through, in place of the provider's default.
+   */
   readonly LinkComponent?: LinkComponent;
 }
 

@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import type { OntologyClassGraphNode_node$key } from "../../../__generated__/OntologyClassGraphNode_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the OntologyClass to render, from an operation that spreads `...OntologyClassGraphNode_node`. */
+  /**
+   * The Relay fragment key of the OntologyClass to render, from an operation
+   * that spreads `...OntologyClassGraphNode_node`.
+   */
   readonly node: OntologyClassGraphNode_node$key;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;

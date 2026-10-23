@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import type { CommandProjection_node$key } from "../../../__generated__/CommandProjection_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the Node to dispatch, from an operation that spreads `...CommandProjection_node`. */
+  /**
+   * The Relay fragment key of the Node to dispatch, from an operation that
+   * spreads `...CommandProjection_node`.
+   */
   readonly node: CommandProjection_node$key;
 };
 
@@ -16,5 +19,8 @@ type OwnProps = {
 export type CommandProjectionProps = OwnProps &
   Omit<ComponentProps<"li">, keyof OwnProps | "children">;
 
-/** What every command arm receives beside its key: the dispatcher's native props. */
+/**
+ * What every command arm receives beside its key: the dispatcher's native
+ * props.
+ */
 export type CommandArmNative = Omit<CommandProjectionProps, "node">;

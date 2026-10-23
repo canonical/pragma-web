@@ -47,7 +47,9 @@ const COMPOSITES: readonly {
   },
 ];
 
-/** One arm a composite spreads: the alias it is read by and the type it is on. */
+/**
+ * One arm a composite spreads: the alias it is read by and the type it is on.
+ */
 interface Arm {
   readonly alias: string;
   readonly type: string;

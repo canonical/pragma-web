@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import type { RowProjection_node$key } from "../../../__generated__/RowProjection_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the Node to dispatch, from an operation that spreads `...RowProjection_node`. */
+  /**
+   * The Relay fragment key of the Node to dispatch, from an operation that
+   * spreads `...RowProjection_node`.
+   */
   readonly node: RowProjection_node$key;
 };
 
@@ -16,5 +19,7 @@ type OwnProps = {
 export type RowProjectionProps = OwnProps &
   Omit<ComponentProps<"li">, keyof OwnProps | "children">;
 
-/** What every row arm receives beside its key: the dispatcher's native props. */
+/**
+ * What every row arm receives beside its key: the dispatcher's native props.
+ */
 export type RowArmNative = Omit<RowProjectionProps, "node">;

@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import type { NodeCard_node$key } from "../../../__generated__/NodeCard_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the Node to render, from an operation that spreads `...NodeCard_node`. */
+  /**
+   * The Relay fragment key of the Node to render, from an operation that
+   * spreads `...NodeCard_node`.
+   */
   readonly node: NodeCard_node$key;
 };
 

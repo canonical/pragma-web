@@ -10,16 +10,16 @@ import "./styles.css";
 const componentCssClassName = "ds entity-card";
 
 /**
- * An entity as a card in a grid of entities: where it is defined, its title
- * and the entity it belongs to (an instance of it, or a subclass), its kind, a summary, its key values and its
- * vitals, and optionally a sidecar beside them that shows a rendered example
- * of it. With an `href` the title links to the entity's home through
- * `LinkComponent`; without one it is inert text.
+ * An entity as a card in a grid of entities: where it is defined, its title and
+ * the entity it belongs to (an instance of it, or a subclass), its kind, a
+ * summary, its key values and its vitals, and optionally a sidecar beside them
+ * that shows a rendered example of it. With an `href` the title links to the
+ * entity's home through `LinkComponent`; without one it is inert text.
  *
  * It is the published `Card`: a row subgrid of its grid's section tracks, so
  * cards in a `Cards` group line their sections up. With a sidecar it also
- * becomes a column subgrid two columns wider. It renders only the slots it
- * is given, so it renders anywhere inside a grid.
+ * becomes a column subgrid two columns wider. It renders only the slots it is
+ * given, so it renders anywhere inside a grid.
  *
  * Native props reach the Card's `<div>` root; a consumer `className` merges
  * after the card's own.
@@ -27,8 +27,8 @@ const componentCssClassName = "ds entity-card";
  * `import { EntityCard } from "@canonical/prism-projections";`
  *
  * @implements prism.component.entity_card
- * @note Impure: reads the translator context in scope, through `Message`,
- *   for the title with its parent.
+ * @note Impure: reads the translator context in scope, through `Message`, for
+ *   the title with its parent.
  */
 export default function EntityCard({
   location,

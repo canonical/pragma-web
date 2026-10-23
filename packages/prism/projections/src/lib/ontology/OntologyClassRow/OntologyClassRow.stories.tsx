@@ -74,7 +74,10 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The abstract class Layout: `ds:` muted before its title, "abstract" at the end. */
+/**
+ * The abstract class Layout: `ds:` muted before its title, "abstract" at the
+ * end.
+ */
 export const Default: Story = {};
 
 /** A concrete class: its kind is "Class". */

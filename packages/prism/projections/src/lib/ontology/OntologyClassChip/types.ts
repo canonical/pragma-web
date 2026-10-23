@@ -4,7 +4,10 @@ import type { ComponentProps, ReactNode } from "react";
 import type { OntologyClassChip_node$key } from "../../../__generated__/OntologyClassChip_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the OntologyClass to render, from an operation that spreads `...OntologyClassChip_node`. */
+  /**
+   * The Relay fragment key of the OntologyClass to render, from an operation
+   * that spreads `...OntologyClassChip_node`.
+   */
   readonly node: OntologyClassChip_node$key;
   /** The mention's text, in place of the class's title. */
   readonly children?: ReactNode;

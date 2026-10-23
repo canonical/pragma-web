@@ -75,5 +75,7 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The abstract class Layout: its title alone in the pill, linked to its home. */
+/**
+ * The abstract class Layout: its title alone in the pill, linked to its home.
+ */
 export const Default: Story = {};

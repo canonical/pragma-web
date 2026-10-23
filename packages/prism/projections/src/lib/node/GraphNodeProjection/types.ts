@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import type { GraphNodeProjection_node$key } from "../../../__generated__/GraphNodeProjection_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the Node to dispatch, from an operation that spreads `...GraphNodeProjection_node`. */
+  /**
+   * The Relay fragment key of the Node to dispatch, from an operation that
+   * spreads `...GraphNodeProjection_node`.
+   */
   readonly node: GraphNodeProjection_node$key;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;
@@ -19,5 +22,8 @@ type OwnProps = {
 export type GraphNodeProjectionProps = OwnProps &
   Omit<ComponentProps<"g">, keyof OwnProps | "children">;
 
-/** What every graph-node arm receives beside its key: the dispatcher's native props. */
+/**
+ * What every graph-node arm receives beside its key: the dispatcher's native
+ * props.
+ */
 export type GraphNodeArmNative = Omit<GraphNodeProjectionProps, "node">;

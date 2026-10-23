@@ -96,7 +96,10 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** Three nodes as cards, each through its type's arm; the toggle switches the view. */
+/**
+ * Three nodes as cards, each through its type's arm; the toggle switches the
+ * view.
+ */
 export const Cards: Story = {
   args: { count: 3, kind: "instances" },
 };

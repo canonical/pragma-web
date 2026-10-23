@@ -4,7 +4,10 @@ import type { ComponentProps, ReactNode } from "react";
 import type { ChipProjection_node$key } from "../../../__generated__/ChipProjection_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the Node to dispatch, from an operation that spreads `...ChipProjection_node`. */
+  /**
+   * The Relay fragment key of the Node to dispatch, from an operation that
+   * spreads `...ChipProjection_node`.
+   */
   readonly node: ChipProjection_node$key;
   /** The mention's text, in place of the node's own name. */
   readonly children?: ReactNode;
@@ -18,5 +21,7 @@ type OwnProps = {
 export type ChipProjectionProps = OwnProps &
   Omit<ComponentProps<"span">, keyof OwnProps>;
 
-/** What every chip arm receives beside its key: the dispatcher's native props. */
+/**
+ * What every chip arm receives beside its key: the dispatcher's native props.
+ */
 export type ChipArmNative = Omit<ChipProjectionProps, "node">;

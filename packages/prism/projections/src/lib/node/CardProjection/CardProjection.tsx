@@ -24,13 +24,13 @@ void declareNodeFragment;
 /* v8 ignore stop */
 
 /**
- * Any graph node as the card in a grid of entities, dispatched on its type: it renders the arm the
- * site's card map holds for the node's typename, or the `Node` arm,
- * `NodeCard`, for every type no other arm takes. A site's arm for a type of
- * its own renders over the `Node` arm's key.
+ * Any graph node as the card in a grid of entities, dispatched on its type: it
+ * renders the arm the site's card map holds for the node's typename, or the
+ * `Node` arm, `NodeCard`, for every type no other arm takes. A site's arm for a
+ * type of its own renders over the `Node` arm's key.
  *
- * It renders no element of its own: the arm renders the root, a `<div>`,
- * and every native prop reaches it.
+ * It renders no element of its own: the arm renders the root, a `<div>`, and
+ * every native prop reaches it.
  *
  * `import { CardProjection } from "@canonical/prism-projections";`
  *

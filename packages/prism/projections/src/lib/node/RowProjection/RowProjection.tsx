@@ -24,13 +24,13 @@ void declareNodeFragment;
 /* v8 ignore stop */
 
 /**
- * Any graph node as the 32px list entry, dispatched on its type: it renders the arm the
- * site's row map holds for the node's typename, or the `Node` arm,
- * `NodeRow`, for every type no other arm takes. A site's arm for a type of
- * its own renders over the `Node` arm's key.
+ * Any graph node as the 32px list entry, dispatched on its type: it renders the
+ * arm the site's row map holds for the node's typename, or the `Node` arm,
+ * `NodeRow`, for every type no other arm takes. A site's arm for a type of its
+ * own renders over the `Node` arm's key.
  *
- * It renders no element of its own: the arm renders the root, an `<li>`,
- * and every native prop reaches it.
+ * It renders no element of its own: the arm renders the root, an `<li>`, and
+ * every native prop reaches it.
  *
  * `import { RowProjection } from "@canonical/prism-projections";`
  *

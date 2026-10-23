@@ -24,13 +24,13 @@ void declareNodeFragment;
 /* v8 ignore stop */
 
 /**
- * Any graph node as the inline mention, dispatched on its type: it renders the arm the
- * site's chip map holds for the node's typename, or the `Node` arm,
- * `NodeChip`, for every type no other arm takes. A site's arm for a type of
- * its own renders over the `Node` arm's key.
+ * Any graph node as the inline mention, dispatched on its type: it renders the
+ * arm the site's chip map holds for the node's typename, or the `Node` arm,
+ * `NodeChip`, for every type no other arm takes. A site's arm for a type of its
+ * own renders over the `Node` arm's key.
  *
- * It renders no element of its own: the arm renders the root, a `<span>`,
- * and every native prop reaches it.
+ * It renders no element of its own: the arm renders the root, a `<span>`, and
+ * every native prop reaches it.
  *
  * `import { ChipProjection } from "@canonical/prism-projections";`
  *

@@ -4,5 +4,8 @@
  */
 export const PREFIX_NAME = /^[A-Za-z_][\w.-]*$/;
 
-/** An IRI up to and through its last `#`, `/` or `:`, which its local name follows. */
+/**
+ * An IRI up to and through its last `#`, `/` or `:`, which its local name
+ * follows.
+ */
 export const THROUGH_LAST_SEPARATOR = /^.*[#/:]/;

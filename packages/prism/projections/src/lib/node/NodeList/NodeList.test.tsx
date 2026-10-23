@@ -36,7 +36,10 @@ const declareTestQuery = (): unknown => graphql`
 `;
 void declareTestQuery;
 
-/** Run the test operation and render `children` with the fragment keys it returns. */
+/**
+ * Run the test operation and render `children` with the fragment keys it
+ * returns.
+ */
 const NodeListTestNodes = ({
   children,
 }: {

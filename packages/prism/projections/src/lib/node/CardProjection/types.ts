@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import type { CardProjection_node$key } from "../../../__generated__/CardProjection_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the Node to dispatch, from an operation that spreads `...CardProjection_node`. */
+  /**
+   * The Relay fragment key of the Node to dispatch, from an operation that
+   * spreads `...CardProjection_node`.
+   */
   readonly node: CardProjection_node$key;
 };
 
@@ -16,5 +19,7 @@ type OwnProps = {
 export type CardProjectionProps = OwnProps &
   Omit<ComponentProps<"div">, keyof OwnProps | "children">;
 
-/** What every card arm receives beside its key: the dispatcher's native props. */
+/**
+ * What every card arm receives beside its key: the dispatcher's native props.
+ */
 export type CardArmNative = Omit<CardProjectionProps, "node">;

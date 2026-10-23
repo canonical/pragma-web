@@ -32,7 +32,10 @@ export type ArmedTypename<TData> = Exclude<
 > &
   string;
 
-/** What an arm receives: the dispatcher's native props, and its own fragment key. */
+/**
+ * What an arm receives: the dispatcher's native props, and its own fragment
+ * key.
+ */
 export type ArmProps<TKey, TNative> = TNative & { readonly node: TKey };
 
 /** An arm: the projection of one type in one form. */
@@ -48,7 +51,9 @@ export type SiteArmProps<TProps> = TProps & { readonly typename: string };
 
 /** One form's arms. */
 export interface ProjectionMap<TData extends DispatchedNode, TNative> {
-  /** The arm of every type no other arm takes, reading what every node carries. */
+  /**
+   * The arm of every type no other arm takes, reading what every node carries.
+   */
   readonly Node: ProjectionArm<TData["Node"], TNative>;
   /**
    * One arm per type the composite arms, each reading its own aliased key:

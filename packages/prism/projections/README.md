@@ -1,29 +1,30 @@
 # @canonical/prism-projections
 
-The Entity representations of a Prism documentation site, in two layers.
+The Entity projections of a Prism documentation site, in two layers.
 The representations (`EntityChip`, `EntityRow`, `EntityCard`,
 `EntityCommand`, `EntityGraphNode` and the `EntityList` that lists them)
 are slotted components that read no Relay fragment: a lens or a story
-fills their slots with whatever it has. The projections mention graph
-nodes a lens knows nothing about: an ontology class's instances, the
-results of a search, the entities a passage of prose links to. Each
-projection renders any node, whatever its type, through the arm its site
-maps to the node's `__typename`, and links it to the node's home.
+fills their slots with whatever it has. The projections fill them from the
+graph: each is one type in one form, reads its own fragment, and renders
+the representation of its form with the slots its type has, linked to the
+entity's home.
 
-- **`ChipProjection`**: the inline mention, a node named in running text.
-- **`RowProjection`**: the list row, a node as one entry of a list of
-  results.
-- **`CardProjection`**: the card, a node as a self-contained tile in a grid.
-- **`CommandProjection`**: the command-palette entry, a node offered as a
-  destination to jump to.
+- **Node projections** (`NodeChip`, `NodeRow`, `NodeCard`, `NodeCommand`,
+  `NodeGraphNode`): any graph node, from what every node carries.
+- **Class projections** (`OntologyClassChip`, …, `OntologyClassGraphNode`):
+  an ontology class, as the projection matrix's classes row draws it.
+- **Property projections** (`OntologyPropertyChip`, …,
+  `OntologyPropertyGraphNode`): an ontology property, which is not a node,
+  so a lens spreads its projection where it selects the property.
 
-Prose links to graph nodes render as chips too, through the element
-overrides a Markdown renderer takes.
-
-Every projection reads its node through a fragment of its own, so a lens
-spreads it in its query and hands the component the key. The projections
-select only what the contract guarantees on every node
-(`_meta { title curie type { uri } }`).
+A lens that mentions nodes it knows nothing about (an ontology class's
+instances, the results of a search, the entities a passage of prose links
+to) renders them through a **dispatcher**, one per form: `ChipProjection`,
+`RowProjection`, `CardProjection`, `CommandProjection` and
+`GraphNodeProjection` render a node through the arm its site maps to the
+node's `__typename`. `NodeList` lists any nodes through the card and row
+dispatchers, as the shared list view. Prose links to graph nodes render as
+chips too, through the element overrides a Markdown renderer takes.
 
 ## Slotted representations
 
@@ -122,7 +123,69 @@ relay({
 The plugin rewrites the site's tags only. The package's files resolve
 outside the site's `src`, so they keep their own artifact imports.
 
+Each projection's tests, SSR test and stories colocate the operations they
+render it under. A site's compiler need not read them, so its config
+excludes the package's test and story files:
+
+```json
+"excludes": [
+  "**/node_modules/**",
+  "**/__generated__/**",
+  "packages/prism/*/src/**/*.test.tsx",
+  "packages/prism/*/src/**/*.stories.tsx"
+]
+```
+
 ## Projections
+
+A projection reads its own fragment, `<Name>_node`, so a lens spreads it in
+its query and hands the component the key. It renders the representation
+of its form, whose native props it takes (the chip's `<span>`, the row's
+and the command's `<li>`, the card's `<div>`, the graph node's SVG `<g>`),
+and merges its own class after the representation's:
+`ds entity-card ds ontology-class-card`. Its root carries the typename as
+`data-type`. It computes its own home, so a lens may render one directly:
+
+```tsx
+import { OntologyClassCard } from "@canonical/prism-projections";
+
+<OntologyClassCard node={data.ontologyClass} />;
+```
+
+### Slots
+
+Each projection fills the slots its type has, in the representation's
+order, and leaves the others empty. A node's prefix is the compact
+address's (`ds` in `ds:Layout`); an address the provider could not compact
+has none.
+
+| Projection | Slots |
+|---|---|
+| `NodeChip` | the title, or the passage's own text |
+| `NodeRow` | `ds:` muted, the title, the node's class at the end |
+| `NodeCard` | the prefix, the title, the class, the definition |
+| `NodeCommand` | the title over "class in prefix" |
+| `NodeGraphNode` | the compact address over "class in prefix" |
+| `OntologyClassChip` | the title, or the passage's own text |
+| `OntologyClassRow` | `ds:` muted, the title, "abstract" for an abstract class |
+| `OntologyClassCard` | "title ⊂ superclass", "Abstract class in ds", the definition |
+| `OntologyClassCommand` | the title over "Abstract class in ds", "used in 88 instances" |
+| `OntologyClassGraphNode` | the compact address over "Abstract class in ds" |
+| `OntologyPropertyChip` | the name, or the passage's own text |
+| `OntologyPropertyRow` | the name, its kind's word (object, datatype, annotation) |
+| `OntologyPropertyCard` | the name, "kind in domain", the definition, the range and the inverse, "functional" |
+| `OntologyPropertyCommand` | the name over "kind in domain", the range at the end |
+| `OntologyPropertyGraphNode` | the name over "kind in domain" |
+
+A property's name is its label, or the local name of its IRI when it has
+none. Every word a reader sees comes from the package's catalog.
+
+Each projection's folder carries a projected `anatomy.yaml`: its root
+projects `on` its type, and each slot names the field it reads. The
+anatomies suite holds each anatomy's field paths to the compiled
+fragment's.
+
+## Dispatchers and maps
 
 ```tsx
 import { ChipProjection, RowProjection } from "@canonical/prism-projections";
@@ -137,39 +200,28 @@ import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 </ul>
 ```
 
-A projection renders no element of its own: its arm renders the root, and
-every arm of one projection renders the same root tag, so the projection's
-native props are that tag's:
+A dispatcher renders no element of its own: its arm renders the root, and
+every arm of one form renders the same representation, so the
+dispatcher's native props are that root's. The chip takes `children`, the
+mention's text in place of the name.
 
-| Projection | Root | `children` |
-|---|---|---|
-| `ChipProjection` | `<span>` | the mention's text, in place of the node's title |
-| `RowProjection` | `<li>` | none: the arm renders the slots |
-| `CardProjection` | `<article>` | none |
-| `CommandProjection` | `<li>` | none |
+A dispatcher reads a composite fragment: the node's typename, and each
+arm's fragment spread aliased by the type it projects,
+`...NodeCard_node @alias(as: "Node")` and
+`...OntologyClassCard_node @alias(as: "OntologyClass")`. Each form's map
+holds the arms:
 
-### Slots
+- `Node`: the arm of every type no other arm takes.
+- `types`: one arm per aliased spread besides `Node`, each typed against
+  that alias's key, so a wrong or missing arm does not compile.
+- `siteTypes`: a site's arms for its own types, by typename. A site cannot
+  add a spread to the package's composites, so a site arm reads the `Node`
+  key; it receives the node's typename beside it (`SiteArmProps`), and
+  usually wraps the `Node` projection.
 
-An arm fills its root from a shared vocabulary of slots, each a child
-element whose class names its role: `.title`, `.kind`, `.location`,
-`.summary`, `.meta`, `.key-values`, `.usage` and `.preview`. A site styles
-a slot once for every type of node, and an arm renders the slots its type
-can fill.
-
-The `Node` arms fill the two every node can: `.title` (`_meta.title`) and
-`.location` (`_meta.curie`, the node's compact address). Each root carries
-the node's class IRI as `data-type`, for styling by class. The title links
-to the node's home when it has one and reads as inert text when it has
-none.
-
-| Arm | Root class | Renders |
-|---|---|---|
-| chip | `.ds.node-chip` | `.title`; the root's `title` is the compact address |
-| row | `.ds.node-row` | `.title`, then `<code class="location">` |
-| card | `.ds.node-card` | `<h3 class="title">`, then `<p class="location">` |
-| command | `.ds.node-command` | `.title`, then `<span class="location">` |
-
-## Maps and arms
+A typed arm wins, then a site arm, then the `Node` arm. The package's
+tests hold each composite's aliases, its map's `types` and its
+dispatcher's anatomy cases to one set.
 
 Mount the maps once, inside the router and beside the site's homes, with
 the site's router link adapter:
@@ -188,27 +240,46 @@ import {
 </HomesProvider>;
 ```
 
-Every link to a node's home renders through `LinkComponent`, typed against
-the shared `LinkComponentProps` of `@canonical/react-ds-global` and
-defaulting to the intrinsic `"a"`. A plain anchor follows a mention with a
-full document load, so a site with a client-side router passes an adapter
-that renders the router's own link for an `href`; the router then navigates
-on the client and the page keeps its state.
+A site with types of its own extends the defaults:
 
-A map is keyed by `__typename`; `Node` is the arm for every type the map
-does not name. An arm receives the node as its representation's composite
-fragment reads it, the node's home as `href` (`undefined` when it has
-none), and the native props of the root it renders.
+```tsx
+const maps: ProjectionMaps = {
+  ...defaultProjectionMaps,
+  card: {
+    ...defaultProjectionMaps.card,
+    siteTypes: { Station: StationCard },
+  },
+};
+```
 
-The composites are the package's own: each selects what dispatch reads
-plus the `Node` arm's fragment, spread at the top level, and the package's
-tests hold each map's keys and its composite's arms in step. A site cannot
-add a spread to a composite, so an arm a site wrote for a type of its own
-would see only what the composite already selects. A site therefore mounts
-`defaultProjectionMaps`, whose arms are the `Node` arms.
+Every link to a home renders through `LinkComponent`, typed against the
+shared `LinkComponentProps` of `@canonical/react-ds-global` and defaulting
+to the intrinsic `"a"`. A plain anchor follows a mention with a full
+document load, so a site with a client-side router passes an adapter that
+renders the router's own link for an `href`; the router then navigates on
+the client and the page keeps its state.
 
-A node's home is resolved with its compact address (`_meta.curie`) as the
-`uri` a site's home resolver receives, so one entity has one address.
+A node's or a class's home is resolved with its compact address
+(`_meta.curie`) as the `uri` a site's home resolver receives, so one
+entity has one address; a property's with its IRI, its only address.
+
+## List view
+
+`NodeList` renders an index of nodes as `EntityList`: a plural fragment on
+`Node` spreads the card and the row composites, and each node renders as a
+card in the cards view and as a row in the rows view, through its type's
+arm. It keeps no view of its own: the lens holds the view in the page's
+address and passes it back with the count line and the empty line.
+
+```tsx
+<NodeList
+  count={data.instanceCount}
+  kind={t("index.kind")}
+  nodes={data.instances.edges.map(({ node }) => node)}
+  onViewChange={setView}
+  view={view}
+/>
+```
 
 ## Prose links
 

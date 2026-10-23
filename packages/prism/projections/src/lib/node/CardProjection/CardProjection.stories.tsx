@@ -73,10 +73,14 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** Any node of a type no arm takes, a UI block here: the Node arm renders it. */
+/**
+ * Any node of a type no arm takes, a UI block here: the Node arm renders it.
+ */
 export const AnyNode: Story = {};
 
-/** An ontology class, the abstract class Layout: the class's own arm renders it. */
+/**
+ * An ontology class, the abstract class Layout: the class's own arm renders it.
+ */
 export const ClassNode: Story = {
   parameters: { relay: mockEntity(MOCK_ONTOLOGY_CLASS) },
 };

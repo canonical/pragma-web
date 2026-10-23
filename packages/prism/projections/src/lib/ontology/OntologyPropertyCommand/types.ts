@@ -4,7 +4,10 @@ import type { ComponentProps } from "react";
 import type { OntologyPropertyCommand_node$key } from "../../../__generated__/OntologyPropertyCommand_node.graphql.js";
 
 type OwnProps = {
-  /** The Relay fragment key of the OntologyProperty to render, from an operation that spreads `...OntologyPropertyCommand_node`. */
+  /**
+   * The Relay fragment key of the OntologyProperty to render, from an operation
+   * that spreads `...OntologyPropertyCommand_node`.
+   */
   readonly node: OntologyPropertyCommand_node$key;
 };
 

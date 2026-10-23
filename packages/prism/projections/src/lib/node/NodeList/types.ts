@@ -5,7 +5,10 @@ import type { NodeList_node$key } from "../../../__generated__/NodeList_node.gra
 import type { EntityListProps } from "../../ui/index.js";
 
 type OwnProps = {
-  /** The Relay fragment keys of the nodes to list, from an operation that spreads `...NodeList_node` on a list of nodes. */
+  /**
+   * The Relay fragment keys of the nodes to list, from an operation that
+   * spreads `...NodeList_node` on a list of nodes.
+   */
   readonly nodes: NodeList_node$key;
 } & Pick<EntityListProps, "view" | "onViewChange" | "count" | "kind" | "empty">;
 
