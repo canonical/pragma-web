@@ -11,12 +11,10 @@
  */
 
 @layer ds.prism {
-  :root {
+  .ds.standard-reading {
     --standard-reading-breadcrumb-margin-end: var(--space-300, 1.5rem);
     --standard-reading-breadcrumb-color: var(--color-text-muted);
-  }
 
-  .ds.standard-reading {
     grid-column: 1 / -1;
   }
 

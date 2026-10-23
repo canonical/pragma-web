@@ -8,8 +8,11 @@ import relay from "vite-plugin-relay-lite";
 
 // Path aliases are declared as Node subpath imports in package.json "imports",
 // resolved natively by Vite — no resolver plugin. There is one per domain and
-// each names that domain's barrel (#lib/ui, #domains/lenses, #server). Two
-// declared exceptions: #relay/__generated__/* is the sole wildcard, because
+// each names that domain's barrel (#lib/ui, #domains/lenses, #server). A
+// component of #lib/ui that the pages or their layouts render has an alias
+// of its own (#lib/ui/CanvasPage, #lib/ui/SiteColophon): the #lib/ui barrel
+// exports the Shell, whose homes reach the pages, so a page importing the
+// barrel would close a cycle. Two declared exceptions: #relay/__generated__/* is the sole wildcard, because
 // relay-compiler owns that directory and writes no barrel for it; and
 // #graphql-endpoint points at a FILE, because graphqlEndpoint.ts must keep its
 // zero imports — the graph process pins graphql v17, and importing it through

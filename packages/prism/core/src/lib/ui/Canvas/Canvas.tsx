@@ -24,6 +24,11 @@ const componentCssClassName = "ds canvas";
  * takes a row of its own under the page. An aside that renders nothing (`null`, a boolean or the
  * empty string) leaves no region.
  *
+ * A page that lays a collection on the page grid, such as a catalog's
+ * cards, gives each item `CANVAS_PAGE_TILE_CLASS_NAME`: the canvas spans
+ * each tile over two columns, and over the whole row below one group of
+ * columns, where the canvas holds three.
+ *
  * `import { Canvas } from "@canonical/prism-core";`
  *
  * @implements prism.component.canvas

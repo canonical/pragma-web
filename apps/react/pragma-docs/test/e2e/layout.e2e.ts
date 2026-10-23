@@ -11,8 +11,13 @@
  * 390px too; twelve columns at 1440px and four at 390px; a workspace canvas
  * that never scrolls; a document whose only scrolling regions are its
  * canvas and its rail, and whose page's first element spans the whole main
- * column; a catalog whose cards fill their rows; and every gap, padding and
- * margin of the chrome a multiple of 4px.
+ * column; a catalog whose cards fill their rows; a canvas that starts one
+ * gutter under the strip, or at the viewport's top with no strip, its
+ * page then starting one gutter down; bands,
+ * the strip's and the colophon's, that run from the rail's border to the
+ * viewport's edge with their content from the canvas's first column line
+ * to its last;
+ * and every gap, padding and margin of the chrome a multiple of 4px.
  */
 import {
   launchBrowser,
@@ -84,6 +89,37 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       );
       expect(layout.overflow, theme).toEqual([]);
       expect(layout.regionOverflow.rail, theme).toBe("auto");
+      const { edges } = layout;
+      expect(edges.canvasTop, theme).toBeCloseTo(
+        edges.stripBottom === null ? 0 : edges.stripBottom + edges.rowGap,
+        1,
+      );
+      // With no strip the page itself starts one gutter under the
+      // viewport's top, as a page under a strip starts under its rule.
+      if (edges.stripBottom === null) {
+        expect(layout.canvasPage.firstChildTop, theme).toBeCloseTo(
+          edges.rowGap,
+          1,
+        );
+      }
+      for (const band of layout.bands) {
+        expect(band.start, `${theme} ${band.element}`).toBeCloseTo(
+          edges.railEnd,
+          1,
+        );
+        expect(band.end, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
+        expect(band.contentStart, `${theme} ${band.element}`).toBeCloseTo(
+          edges.canvasStart,
+          1,
+        );
+        expect(band.contentEnd, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
+      }
       expect(
         layout.offGrid,
         `${theme} spacing histogram: ${JSON.stringify(layout.histogram)}`,
@@ -130,21 +166,17 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
 
   // Past one group the canvas holds an even number of columns, which the
   // catalog's two-column cards fill; at four columns the canvas holds
-  // three, so a row's one card leaves the last.
-  it.runIf(viewport.columns > 4)(
-    "fills the catalog's rows with cards to the canvas's end",
-    async () => {
-      const measures = await measure(CATALOG_PATH, CATALOG_CARD_SELECTOR);
-      for (const { theme, measure: layout } of measures) {
-        const shortfall = layout.canvasPage.fillShortfall;
-        expect(shortfall, theme).not.toBeNull();
-        expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
-        expect(shortfall?.end, theme).toBeLessThanOrEqual(
-          layout.canvasPage.columnGap,
-        );
-      }
-    },
-  );
+  // three, and each card takes the whole row. Either way the cards reach
+  // the canvas's end.
+  it("fills the catalog's rows with cards to the canvas's end", async () => {
+    const measures = await measure(CATALOG_PATH, CATALOG_CARD_SELECTOR);
+    for (const { theme, measure: layout } of measures) {
+      const shortfall = layout.canvasPage.fillShortfall;
+      expect(shortfall, theme).not.toBeNull();
+      expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+      expect(shortfall?.end, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+    }
+  });
 
   it("spans the standards index's links and lists over the main column", async () => {
     const measures = await measure(
