@@ -1,4 +1,5 @@
 /**
+import "../../../testing/stubReactFlowGlobals.js";
  * The shell stays mounted across navigation; a lens switch remounts the lens
  * layout.
  *
@@ -29,7 +30,6 @@
  *   with the chips back at their default.
  */
 
-import "../../../testing/stubReactFlowGlobals.js";
 import {
   createEnvironment,
   setPrefetchEnvironment,
@@ -68,10 +68,13 @@ const readCurrentCrumb = (container: HTMLElement): string | undefined =>
   container.querySelector('[data-slot="context"] [aria-current="page"]')
     ?.textContent ?? undefined;
 
-/** How many of the strip's filter chips are turned off. */
+/**
+ * How many of the strip's abstraction and ontology chips are turned off:
+ * each of them starts on, unlike the instances chip, which starts off.
+ */
 const countChipsOff = (container: HTMLElement): number =>
   container.querySelectorAll(
-    '[data-slot="controls"] button[aria-pressed="false"]',
+    '[data-slot="controls"] fieldset:not([aria-label="Filter by instances"]) button[aria-pressed="false"]',
   ).length;
 
 /**
@@ -191,7 +194,7 @@ describe("Shell across a lens switch", () => {
     });
 
     // A Definitions term, unfiltered: every class is visible.
-    await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
+    await waitFor(() => expect(readStatus(container)).toContain("35 of 35"));
     // The shell is the one intrinsic grid, and the lens's layout, the
     // workspace archetype, is its child.
     const shell = container.querySelector(".ds.shell.grid.intrinsic");
@@ -211,7 +214,7 @@ describe("Shell across a lens switch", () => {
     });
     expect(countChipsOff(container)).toBe(1);
     const filteredStatus = readStatus(container);
-    expect(filteredStatus).not.toContain("60 of 60");
+    expect(filteredStatus).not.toContain("35 of 35");
 
     // Another term of the same lens: the same layout node, and the chip
     // stays off, so nothing above the layout remounted.
@@ -239,7 +242,7 @@ describe("Shell across a lens switch", () => {
     await act(async () => {
       router.navigate("definitions");
     });
-    await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
+    await waitFor(() => expect(readStatus(container)).toContain("35 of 35"));
     const definitionsIndexLayout = container.querySelector(
       ".ds.workspace-layout",
     );
@@ -259,7 +262,7 @@ describe("Shell across a lens switch", () => {
 
     // And back: a new layout, with the chips at their default.
     await clickRail(container, "/definitions");
-    await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
+    await waitFor(() => expect(readStatus(container)).toContain("35 of 35"));
     const definitionsLayoutAgain = container.querySelector(
       ".ds.workspace-layout",
     );

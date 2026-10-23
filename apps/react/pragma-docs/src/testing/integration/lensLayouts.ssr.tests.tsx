@@ -66,8 +66,8 @@ const LENS_URLS = [
 const BUTTON_ENTITY_URL = "/components/ds%3Aglobal.component.button";
 
 /** The P-5 definitions exemplar: the term view — a second non-lens URL,
- * and the one whose canvas carries the React Flow well's server-rendered
- * node DOM. Same R3 posture: no rail entry is exact-current here. */
+ * and the one whose canvas carries the class graph's server-rendered SVG.
+ * Same R3 posture: no rail entry is exact-current here. */
 const DEFINITIONS_TERM_URL = "/definitions/ds%3AUIBlock";
 
 /** The P-5 standards exemplar: the reading page — a third non-lens URL,
@@ -191,9 +191,14 @@ const EXPECTED_ARIA_CURRENT: Readonly<Record<string, readonly string[]>> = {
   "/guides": ["/guides"],
   [BUTTON_ENTITY_URL]: [],
   // Exact-match linking (R3): the rail's Definitions entry is NOT current
-  // at a term URL. The term links that ARE current live in the canvas
-  // (rail item + well node), outside the chrome measured here.
-  [DEFINITIONS_TERM_URL]: [],
+  // at a term URL. The term rail's item and the graph's node live in the
+  // canvas, outside the chrome measured here; the workspace's inspector
+  // does not: UI Block's four relations to itself are listed outgoing and
+  // incoming, each reaching the term's own view.
+  [DEFINITIONS_TERM_URL]: Array.from(
+    { length: 8 },
+    () => DEFINITIONS_TERM_URL,
+  ),
   // Same R3 posture: the rail's Standards entry is NOT current at a
   // reading URL.
   [STANDARD_READING_URL]: [],
@@ -479,14 +484,17 @@ describe("the lens layouts, rendered through the SSR entry", () => {
       'id="lens-definitions-title"',
     );
     // The definitions canvases render REAL explorer content from the
-    // fixture records: the term canvas carries the inspector's class
-    // record AND the React Flow well's server-rendered node DOM; the
-    // term-less canvas carries the honest empty inspector.
-    expect(mustGet("/definitions").canvas).toContain("Select a term");
+    // fixture records: the class graph's server-rendered nodes, the term's
+    // ringed; the workspace's inspector, outside the canvas, carries the
+    // term's class record, or the graph's overview with no term.
+    expect(mustGet("/definitions").canvas).toContain('<g class="node"');
+    expect(mustGet("/definitions").chrome).toContain("Reading the graph");
     expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain(
-      '<h2 class="heading" id="term-inspector-title">UI Block</h2>',
+      'class="ring is-selected"',
     );
-    expect(mustGet(DEFINITIONS_TERM_URL).canvas).toContain("ds term-node");
+    expect(mustGet(DEFINITIONS_TERM_URL).chrome).toContain(
+      '<h2 class="name" id="term-inspector-title">UI Block</h2>',
+    );
     expect(mustGet("/standards").canvas).toContain('id="lens-standards-title"');
     // The standards canvases render REAL content from their fixture
     // records: the index carries a grouped standard link, the reading

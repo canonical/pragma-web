@@ -81,15 +81,15 @@ const SEEDED_PAGES = [
     liveSelector: 'a[href="/components/ds%3Aglobal.component.button"]',
     liveText: "Button",
   },
-  // Definitions block (P-5): THE React Flow SSR gate — the term page's
-  // server HTML carries the well's full node DOM, and hydrating over it
+  // Definitions block (P-5): the graph's SSR gate — the term page's
+  // server HTML carries the class graph's full SVG, and hydrating over it
   // must stay mismatch-silent and network-silent like every other
   // seeded page.
   {
     name: "definitions term",
     url: "/definitions/ds%3AUIBlock",
     records: definitionsExplorerRecords,
-    serverMarker: '<h2 class="heading" id="term-inspector-title">UI Block</h2>',
+    serverMarker: '<h2 class="name" id="term-inspector-title">UI Block</h2>',
     liveSelector: "#term-inspector-title",
     liveText: "UI Block",
   },
