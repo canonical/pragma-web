@@ -182,3 +182,51 @@ its `patchedDependencies` entry once a fixed version is published.
 **Not yet on npm.** `@canonical/storybook-addon-relay` and the fixed
 `relay-runtime-network` release have not been published yet, so a fresh
 install of this app will not fully resolve until they land on npm.
+
+## Projections
+
+The site renders every graph node in five forms, chip, row, card, command
+and graph node, through `@canonical/prism-projections`. The `Shell` provides
+the package's `defaultProjectionMaps`, so the lenses' mentions and indexes
+dispatch as the package does. The design-system types the site's own graph
+serves get projections of their own, one folder each under the domain
+libraries, each filling the package's generic `Entity*` component from its
+own Relay fragment and checked against its `anatomy.yaml`:
+
+- `src/domains/components/lib/`: `UIBlockChip`, `UIBlockRow`, `UIBlockCard`,
+  `UIBlockCommand` and `UIBlockGraphNode`, on the `UIBlock` interface, so one
+  projection serves a component, a pattern and a layout; and
+  `UIBlockExample`, the published React component a block's card renders in
+  its sidecar, server-rendered, for a block the package implements.
+- `src/domains/modifiers/lib/`: the `Modifier*` and `ModifierFamily*`
+  projections.
+- `src/domains/standards/lib/`: the `CodeStandard*` projections.
+
+A projection reads only what its own fragment spreads, and the package's
+composites spread only the contract's types, so the site dispatches these
+types itself: `SiteChipProjection`, `SiteRowProjection`,
+`SiteCardProjection`, `SiteCommandProjection` and `SiteGraphNodeProjection`
+in `src/lib/ui/` each read a composite of the site's own. It spreads the
+package's dispatcher of that form aliased as `Node`, and each design-system
+projection aliased by the type it is on; the three UI-block types narrow to
+their type with an aliased inline fragment
+(`... on Component @alias(as: "Component") { ...UIBlockCard_node }`), so
+each alias holds a key for its own type alone. `siteProjectionMaps`
+(`src/lib/ui/constants.ts`) holds the arms by the same names and dispatches
+through the package's `renderArm`: a design-system type renders through
+its projection, and every other node through the package's dispatcher,
+which renders ontology classes and any type the provided maps arm.
+
+```tsx
+import { SiteCardProjection } from "#lib/ui";
+
+<SiteCardProjection node={node} />;
+```
+
+`src/testing/integration/projections.tests.ts` holds each composite's
+aliases, its map's arms and its dispatcher anatomy's cases to one set, and
+every projection's fragment to the fields its anatomy reads.
+
+The site's own strings, these projections' words among them, come from its
+catalog (`src/i18n/constants.ts`) through `useMessages` from `#i18n`, whose
+default translator reads the English catalog.
