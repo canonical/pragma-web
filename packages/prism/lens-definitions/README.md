@@ -123,7 +123,11 @@ selection leaves the contract and when the artifacts are stale. Run
 `DefinitionsLayout` lays the lens on `WorkspaceLayout`: the site's rail, the
 mode strip (the breadcrumb trail, the filter chips and the status figure),
 the explorer in the canvas and the term inspector in the inspector region,
-a drawer below three groups of columns.
+a drawer below three groups of columns. The router mounts the layout
+again on each of the lens's routes, so the lens keeps the reader's chips,
+search, zoom and pan for the router's life while the reader stays in the
+lens: a pick in the rail pans the graph to the selection and changes
+nothing else, and a visit to another lens and back starts afresh.
 
 - **The term rail** lists each ontology's classes in the graph's own order,
   a parent before its children, each with its depth and its kind's mark,
@@ -138,10 +142,13 @@ a drawer below three groups of columns.
   canvas opens on the whole graph when it fits there at a zoom where every
   label renders at 12px or more, else on a legible window of it, around the
   class a term page selects, whose left, top and right edges cut through no
-  box; once the client has measured the canvas it opens on the window that
-  size calls for. A filter's refit or a picked namespace never zooms a
-  legible view out to an illegible one; Fit fits the whole. Text below
-  12px on screen is not drawn. Pointing
+  box, with no box cut on two sides in its corner; once the client has
+  measured the canvas it opens on the window that size calls for, and
+  again when a resize shrinks a view nothing has moved below the legible
+  zoom. A filter's refit or a picked namespace never zooms a legible view
+  out to an illegible one: what is too large shows from its corner in a
+  window that cuts no box. Fit fits the whole, and the camera pans over all
+  of it. Text below 12px on screen is not drawn. Pointing
   at or focusing a class fades everything outside its neighbourhood and
   labels its relations; the selection is ringed and its lineage drawn; the
   arrows move along the tree. Below one group of columns the graph becomes
