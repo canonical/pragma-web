@@ -30,16 +30,16 @@ function pickCardArgs({
 }
 
 /**
- * A UI block's sidecar: the component rendered with its default props, an
+ * A UI block's sidecar: the published Button with its default props, given
+ * only its label and the native type that keeps it from submitting, an
  * example that fits the sidecar's two columns at every width.
  */
-const BUTTON_EXAMPLE = (
-  <Button anticipation="constructive" type="button">
-    Submit
-  </Button>
-);
+const BUTTON_EXAMPLE = <Button type="button">Submit</Button>;
 
-/** A sidecar example taller than the card's body: one button per variant. */
+/**
+ * A sidecar example taller than the card's body: eight Buttons with their
+ * default props, one per label.
+ */
 const TALL_EXAMPLE = (
   <>
     {[
