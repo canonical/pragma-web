@@ -1,10 +1,11 @@
 # @canonical/prism-lens-entity
 
 The class-bound docs view of a Prism documentation site. For each class a
-site binds, the lens gives two pages: an index of the class's instances, as
-rows or cards, with a search over the loaded entries, and a page per
-instance with its title, its definition and comment, its class, the fields
-its class declares and the relations among them.
+site binds, the lens gives two pages: an index of the class's instances in
+the shared list view of `@canonical/prism-projections`, as rows or cards,
+with a search over the loaded entries, and a page per instance with its
+title, its definition and comment, its class, and the fields and the
+relations its class declares, as key values on the page's grid.
 
 The lens is **Tier 1**: its four operations (`EntityIndexQuery` and its
 pagination query, `EntityNamespacesQuery`, `EntityPageQuery`) and their
@@ -71,7 +72,21 @@ The lens renders inside the site's provider nest: `HeadProvider`,
 `HomesProvider` and `ProjectionsProvider`, which the index's rows and cards
 and the page's title and class chip read their homes and arms from.
 `EntityLayout` mounts the lens's own filter provider, shared by the strip's
-controls and the index.
+search box and the index.
+
+The layout is core's `DocumentLayout`, the document archetype: the site's
+rail, the mode strip, the routed page in the canvas, the one region that
+scrolls, and the colophon in the band under it. On the index the strip
+carries the search box and the count of the entries shown. The layout
+renders no element of its own; its native props reach the document layout's
+root.
+
+The index keeps its view in its route's `view` search parameter
+(`/stations?view=cards`; the rows view, the default, carries none): the list
+view's toggle writes it, replacing the history entry, so a view survives a
+reload, travels with a link, and is the view the server renders. The index
+route declares the parameter's search schema, so a site's register carries
+the key.
 
 On the server, a site prepares the store through each route's `warm`, which
 fetches the route's operations into the published prefetch environment; the
@@ -135,16 +150,19 @@ instances. Check it at three points:
 
 ## What the entity page shows
 
-- The entity's title and compact address, through the site's title
-  projection.
+- The entity's title as the page's heading over its compact address.
 - Its definition and its comment, each when the graph asserts one.
 - The class it is an instance of, mentioned through the site's chip
   projection.
-- The fields its class declares, own and inherited: each field's name, the
-  property it answers to and the range of its values in compact form, the
-  property's kind and the field's cardinality.
-- Its relations: each field of object kind, with the class its values belong
-  to and its cardinality.
+- The fields its class declares, own and inherited, as key values: each
+  field's name as the key, and as the value one sentence with the property it
+  answers to and the range of its values in compact form, the property's
+  kind and the field's cardinality.
+- Its relations, as key values: each field of object kind, with the class
+  its values belong to and its cardinality.
+
+Every key starts on the main column's first line and every value on its
+third; below two groups of columns a pair stacks, the key over the value.
 
 An address nothing in the graph answers to, and a node that is not an
 instance of the bound class or of one of its subclasses, render a not-found
@@ -180,30 +198,38 @@ selection leaves the contract and when the artifacts are stale. Run
 
 ## Styling
 
-The stylesheets sit in the `ds.prism` cascade layer. Each design decision
-reads a component token, declared on `:root` and named for its component
-(`--entity-index-gap`, `--fields-table-border-color`, …), so a site retunes
-the lens by setting component tokens. Where the design system has a semantic
-token for the decision, the component token reads it, so a site also retunes
-those decisions through its theme:
+Every component sits in `src/lib/ui/`, scaffolded by the component
+generator (the filter provider keeps a context provider's own files:
+`Provider.tsx`, `Context.tsx` and its state hook), and carries an
+`anatomy.yaml`: its slots and every style decision, bound to a token. Its `styles.css` transcribes the anatomy, in the
+`ds.components.global` cascade layer, and the package's tests check that it
+does (`@canonical/prism-core/testing`).
+
+Each design decision reads a component token declared on its component's
+root class (`.ds.key-value-list { --key-value-list-rule-width: 1px; … }`),
+never on `:root`, bound to a semantic token, to the spacing shim of
+`@canonical/styles`, or to a literal the anatomy's ledger names:
 
 - colour: `--color-text`, `--color-text-muted`, `--color-background`,
-  `--color-background-contrasted`, `--color-border-muted`;
-- space: `--space-025` to `--space-300`, each with the lens's own default as
-  its fallback.
+  `--color-border-muted`, `--color-focus-ring`;
+- type: `--typography-text-secondary-font-size`, for the strip's controls
+  and status and the inherited tag;
+- space: `--grid-gutter`, `--container-gap-default`, `--container-gap-loose`
+  and, where no semantic name fits, a `--space-*` step, which the anatomy
+  names with its reason (the key values' 24px line is `--space-300`);
+- literals: the 1px hairlines and the 2px focus ring, which no semantic
+  token sizes.
 
-The design system has no semantic token for the rest, so the component token
-holds the lens's own value and only the component token retunes it: the type
-sizes of the strip's controls and status and of the inherited tag, the border
-widths, the controls' radius and focus ring, and how many columns a card
-spans (`--entity-index-card-span`). No component token reads a primitive
-token.
-
-`EntityLayout` is the core's `DocumentLayout`: every grid in the lens is a
-subgrid of the site's one intrinsic grid, and only the canvas scrolls.
+Every page is a subgrid of the canvas's page grid over the whole main
+column, and every grid sets its gap from `--grid-gutter` on both axes. Only
+an entity's summary holds a reading measure, the first six columns of the
+main column, which a narrower main column clamps. The key values stack below
+two groups of columns through the one container query on the shell, at
+912px.
 
 ## Public API
 
 - Routes: `createEntityRoutes`; types `EntityRoutes`, `EntityLensOptions`.
 - Layout: `EntityLayout`; types `EntityLayoutProps`.
 - Pages: `EntityIndexPage`, `EntityPage`; types `EntityIndexPageProps`, `EntityPageProps`.
+- Addresses, for a site's own routes that take an entity's address the way the lens's do: `expandAddress`, `readUriParam`; types `OntologyNamespace`.

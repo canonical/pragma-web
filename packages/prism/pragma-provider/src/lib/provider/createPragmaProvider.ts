@@ -77,6 +77,7 @@ import {
   createProseExtensions,
   readRequestLocale,
 } from "../prose/index.js";
+import { createSearchExtensions, indexSearch } from "../search/index.js";
 import {
   collectProseSidecars,
   collectTtlSources,
@@ -85,6 +86,7 @@ import {
   resolveRefRoots,
   resolveSemRoot,
 } from "../sources/index.js";
+import { composeExtensions } from "./composeExtensions.js";
 
 /** Projection mode, pinned — see this module's header. */
 const MODE = "annotated";
@@ -99,8 +101,9 @@ const PROVIDER = "@canonical/prism-pragma-provider";
  * Boot the store, compile the schema, and build the fetch handler.
  *
  * @note Impure — reads the source cache and the prose sidecars beside it,
- * boots an Oxigraph WASM store, queries it once to bind the sidecars, and
- * writes the emitted SDL **only** when `sdlOutput` is given.
+ * boots an Oxigraph WASM store, queries it once to bind the sidecars,
+ * executes one query per typed subject to index search, and writes the
+ * emitted SDL **only** when `sdlOutput` is given.
  */
 export const createPragmaProvider = async (
   options: PragmaProviderOptions = {},
@@ -116,8 +119,12 @@ export const createPragmaProvider = async (
   const prefixes = harvestPrefixes(sources);
   const graphql = createSchemaPlugin({
     // `Prose` and `Query.prose(uri:)`: Markdown sidecars served beside the
-    // compiled graph. See `createProseExtensions` for why a root field.
-    extensions: createProseExtensions(),
+    // compiled graph; `Query.search`: text search over every node. See
+    // `createProseExtensions` for why each is a root field.
+    extensions: composeExtensions([
+      createProseExtensions(),
+      createSearchExtensions(),
+    ]),
     incremental: true,
     mode: MODE,
     prefixing: PREFIXING,
@@ -146,24 +153,35 @@ export const createPragmaProvider = async (
   if (!api) {
     throw new Error("ke-graphql plugin did not register its API");
   }
+  const query = createStoreQueryFn(store);
   const binding = await bindProseSidecars({
     sidecars,
     sources,
     prefixes,
-    query: createStoreQueryFn(store),
+    query,
   });
   for (const path of binding.unbound) {
     console.warn(
       `[graphql] prose sidecar ${path} names no entity in the graph and is not served. A sidecar is named after the local name of an entity the Turtle in its directory declares (<name>.md, or <name>.<lang>.md for a translation).`,
     );
   }
+  // Built once, here, from the compiled schema itself: what search matches
+  // is exactly what `_meta` serves, and a node that fails to read fails the
+  // boot rather than the first search.
+  const searchIndex = await indexSearch({
+    schema: api.schema,
+    context: api.createContext(store),
+    query,
+  });
   const handle = createGraphQLHandler(api.schema, {
     // A fresh context per request: ke-graphql's loaders, plus what the prose
-    // resolvers read. The locale comes from the request, never from state.
+    // and search resolvers read. The locale comes from the request, never
+    // from state.
     context: (request) => ({
       ...api.createContext(store),
       locale: readRequestLocale(request),
       proseIndex: binding.index,
+      searchIndex,
     }),
     graphiql: true,
     cors: true,
@@ -174,7 +192,7 @@ export const createPragmaProvider = async (
       ? "SDL output disabled (no sdlOutput given)"
       : `SDL written to ${relative(process.cwd(), options.sdlOutput)}`;
   console.info(
-    `[graphql] schema compiled from ${sources.length} TTL sources (${api.diagnostics.length} diagnostics), ${sidecars.length - binding.unbound.length} prose sidecars bound — ${destination}`,
+    `[graphql] schema compiled from ${sources.length} TTL sources (${api.diagnostics.length} diagnostics), ${sidecars.length - binding.unbound.length} prose sidecars bound, ${searchIndex.length} nodes indexed for search — ${destination}`,
   );
   return { handle, api };
 };

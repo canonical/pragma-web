@@ -16,6 +16,7 @@ describe("walkFiles", () => {
   it("collects the files with the extension, descending into directories", () => {
     expect(walkRelative(DESIGN_SYSTEM, ".ttl")).toEqual([
       "data/instances.ttl",
+      "data/search.ttl",
       "data/tokens/colors.ttl",
       "definitions/ontology.ttl",
     ]);

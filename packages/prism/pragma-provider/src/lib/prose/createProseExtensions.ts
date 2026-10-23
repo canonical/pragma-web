@@ -1,19 +1,18 @@
-import {
-  type CompilerContext,
-  type SchemaExtensions,
-  type SchemaExtensionsInput,
-  toBase64,
-} from "@canonical/ke-graphql";
+import type { CompilerContext } from "@canonical/ke-graphql";
 import {
   type GraphQLFieldConfig,
   GraphQLID,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-  type GraphQLResolveInfo,
   GraphQLString,
 } from "graphql";
-import { findNodeConnection } from "./findNodeConnection.js";
+import {
+  type ExtensionFactory,
+  findNodeConnection,
+  resolveNodeEdges,
+  toNodeConnection,
+} from "../extensions/index.js";
 import { selectProseLanguage } from "./selectProseLanguage.js";
 import type { ProseDocument, ProseIndex } from "./types.js";
 
@@ -42,42 +41,6 @@ const readProseContext = (context: CompilerContext): ProseContext => {
   return {
     proseIndex,
     locale: typeof locale === "string" ? locale : undefined,
-  };
-};
-
-/**
- * Resolve each reference through the schema's own `Query.node`, so a
- * reference resolves exactly as `node(id:)` would, class IRIs included, and
- * keep the ones it finds as one page holding every edge.
- *
- * @throws When the schema has no `Query.node` resolver.
- */
-const resolveReferences = async (
-  document: ProseDocument,
-  context: CompilerContext,
-  info: GraphQLResolveInfo,
-): Promise<unknown> => {
-  const resolveNode = info.schema.getQueryType()?.getFields().node?.resolve;
-  if (resolveNode === undefined) {
-    throw new Error(
-      "the schema has no Query.node resolver to resolve prose references through",
-    );
-  }
-  const edges = await Promise.all(
-    document.references.map(async (iri) => ({
-      node: await resolveNode(undefined, { id: iri }, context, info),
-      cursor: toBase64(iri),
-    })),
-  );
-  const found = edges.filter((edge) => edge.node != null);
-  return {
-    edges: found,
-    pageInfo: {
-      hasNextPage: false,
-      hasPreviousPage: false,
-      startCursor: found.at(0)?.cursor ?? null,
-      endCursor: found.at(-1)?.cursor ?? null,
-    },
   };
 };
 
@@ -117,8 +80,8 @@ const resolveReferences = async (
  * @throws From the factory, when the compiled schema has no `Node` interface.
  */
 export const createProseExtensions =
-  (): SchemaExtensionsInput =>
-  ({ iface }): SchemaExtensions => {
+  (): ExtensionFactory =>
+  ({ iface }) => {
     const node = iface("Node");
     if (node === undefined) {
       throw new Error(
@@ -160,8 +123,11 @@ export const createProseExtensions =
           type: new GraphQLNonNull(findNodeConnection(node)),
           description:
             "Entities the prose links to across its languages, in order of first mention; destinations node(id:) does not resolve are dropped.",
-          resolve: (document, _args, context, info) =>
-            resolveReferences(document, context, info),
+          resolve: async (document, _args, context, info) =>
+            toNodeConnection(
+              await resolveNodeEdges(document.references, context, info),
+              { hasNextPage: false, hasPreviousPage: false },
+            ),
         },
       }),
     });

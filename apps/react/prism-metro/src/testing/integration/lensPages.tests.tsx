@@ -27,11 +27,13 @@ afterEach(() => {
 
 afterAll(() => graph.close());
 
-/** The rows of the entity index once its query has answered. */
+/** The rows of the entity index's list view once its query has answered. */
 const findIndexRows = async (): Promise<HTMLElement[]> => {
   const canvas = await screen.findByRole("main");
   await waitFor(() => {
-    expect(canvas.querySelector(".entity-index .rows")).not.toBeNull();
+    expect(
+      canvas.querySelector(".entity-index .entity-list .items"),
+    ).not.toBeNull();
   });
   return within(canvas).getAllByRole("listitem");
 };
@@ -51,7 +53,7 @@ describe("the stations lens", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
     ).toBeInTheDocument();
-    const fields = await screen.findByRole("table");
+    const fields = await screen.findByRole("region", { name: "Fields" });
     expect(within(fields).getByText("servesLine")).toBeInTheDocument();
   });
 
@@ -66,7 +68,9 @@ describe("the stations lens", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("region", { name: "Fields" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -88,7 +92,9 @@ describe("the lines lens", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: CIRCLE_LINE_TITLE }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("region", { name: "Fields" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -112,9 +118,12 @@ describe("the Definitions lens", () => {
     for (const chip of chips) {
       expect(chip.getAttribute("href")).toMatch(/^\/stations\/metro%3A[\w-]*$/);
     }
+    // The inspector shows the first page of instances in IRI order, which
+    // Central Exchange is on and Northgate, past the first page, is not.
     expect(
       chips.some(
-        (chip) => chip.getAttribute("href") === "/stations/metro%3Anorthgate",
+        (chip) =>
+          chip.getAttribute("href") === "/stations/metro%3Acentral-exchange",
       ),
     ).toBe(true);
   });

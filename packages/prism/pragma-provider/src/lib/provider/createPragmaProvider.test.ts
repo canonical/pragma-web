@@ -236,6 +236,23 @@ describe("prose sidecars", () => {
   });
 });
 
+describe("search index", () => {
+  it("indexes every node node(id:) resolves at boot, and says how many", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    await createPragmaProvider({
+      refsRoot: CORPUS_REFS_ROOT,
+      semRoot: CORPUS_SEM_ROOT,
+    });
+    const infos = info.mock.calls.map((call) => String(call.at(0)));
+    info.mockRestore();
+    // Five components, three classes from the first root and `sur:Job`
+    // from the second; the properties the graph types are left out.
+    expect(infos.join("\n")).toContain(
+      "2 prose sidecars bound, 9 nodes indexed for search",
+    );
+  });
+});
+
 describe("sdlOutput", () => {
   it("writes nothing and says so when it is absent", async () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});

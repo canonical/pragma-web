@@ -16,6 +16,9 @@ It has three lenses:
 - **Definitions**: the explorer over the metro and geo ontologies' classes
   and properties (`@canonical/prism-lens-definitions`).
 
+Its landing, at `/`, opens a door to each lens: one card per lens with how
+many things it shows, counted from the graph.
+
 ## Before you start
 
 Install from the repository root with the Bun version in `.bun-version`. The
@@ -47,10 +50,8 @@ cd apps/react/prism-metro
 bun run dev:bun
 ```
 
-and open `http://localhost:5178/stations`, `http://localhost:5178/lines` or
-`http://localhost:5178/definitions`. `PORT` moves the app to another port.
-The site has no page at `/`: the brand in the rail links to the stations
-lens.
+and open `http://localhost:5178/`. `PORT` moves the app to another port.
+`/` is the landing; the brand in the rail leads there.
 
 To read from a graph somewhere else, name its endpoint:
 
@@ -63,18 +64,23 @@ the production build, on the same port and against the same graph.
 
 ## Checks and tests
 
-- `bun run check`: lint, type-check, the schema check, and a Relay compile of
-  the lens and projection packages' documents against this app's schema,
-  which fails when a lens selects something the metro provider does not
-  serve.
+- `bun run check`: the schema check, a Relay compile, lint and type-check.
+  `bun run relay` compiles the app's own query together with the lens and
+  projection packages' documents against this app's schema, and fails when a
+  document selects something the metro provider does not serve. Its output
+  is not committed: every script that loads the app's code or its types
+  runs it first (the dev, graph, build, preview, type-check, test and
+  Storybook scripts), so only the schema and Biome scripts run without it.
 - `bun run test`: the unit and integration suites; the server and
   integration suites start their own metro graph on a free port.
   `bun run test:coverage` enforces full coverage.
 - `bun run test:e2e`: starts the metro graph and each web server script, and
-  checks the pages they serve. The preview cells build the app first. The
-  browser suite reads the pages in headless Chromium: a click on a station
-  or a line opens its page without loading a new document, Back returns to
-  the index, and every page hydrates without a console error. It launches
+  checks the pages they serve, the landing with its counted doors among
+  them. The preview cells build the app first. The browser suite reads the
+  pages in headless Chromium: a click on a landing's door, a station or a
+  line opens its page without loading a new document, the rail's brand
+  leads back to the landing, Back returns to the index, and every page
+  hydrates without a console error. It launches
   the Chromium Playwright installed (`bunx playwright install chromium`), or
   the binary named by `E2E_CHROMIUM_EXECUTABLE_PATH`.
 
@@ -92,6 +98,7 @@ The lens packages link by route name, so the site's route table and its
 
 | Name              | URL                  |
 | ----------------- | -------------------- |
+| `home`            | `/`                  |
 | `stations`        | `/stations`          |
 | `stationsEntity`  | `/stations/:uri`     |
 | `lines`           | `/lines`             |

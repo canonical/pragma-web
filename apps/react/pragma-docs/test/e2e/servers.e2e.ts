@@ -569,9 +569,11 @@ describe("server matrix (2×3) serves correctly", () => {
             //     (b) the reading page's class line — the article's one
             //     piece of graph metadata outside the prose, and what
             //     replaced the category line when `categories` turned out
-            //     to be untraversable through the contract. React splits
-            //     the text node, hence the comment marker.
-            expect(standardReadingHtml).toContain("class: <!-- -->");
+            //     to be untraversable through the contract. The catalog
+            //     fills the class into one sentence.
+            expect(standardReadingHtml).toContain(
+              '<span class="class">class: ',
+            );
             //     (c) the pagination affordance. The live graph carries
             //     131 standards against this app's 100-item page size, so
             //     `hasNextPage` is true and the button MUST render. If the
