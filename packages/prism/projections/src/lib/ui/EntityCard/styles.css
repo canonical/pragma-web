@@ -13,6 +13,9 @@
      * columns a sidecar adds beside it. */
     --entity-card-body-span: var(--card-span, 1);
     --entity-card-sidecar-span: 2;
+    /* The footer reaches back across the gutter the holding grid sets
+     * between its track and the body's, so the two sections meet. */
+    --entity-card-footer-overlap: calc(-1 * var(--grid-gutter));
     --entity-card-sidecar-padding-block: var(--component-padding-block);
     --entity-card-sidecar-padding-inline: var(--component-padding-inline);
     --entity-card-sidecar-background: var(--color-background-layer2);
@@ -44,6 +47,17 @@
     line-height: var(--entity-card-line-height);
   }
 
+  /* The card has no image and no header: the body takes their tracks with
+   * its own, so it starts at the card's edge. */
+  .ds.entity-card > .body {
+    grid-row: 1 / 4;
+  }
+
+  /* The footer meets the body at the body's divider. */
+  .ds.entity-card > .footer {
+    margin-block-start: var(--entity-card-footer-overlap);
+  }
+
   /* With a sidecar the card turns into a column subgrid: the body and the
    * footer keep the card's own span, and the sidecar takes two columns
    * after them. */
@@ -59,11 +73,11 @@
     grid-column: 1 / span var(--entity-card-body-span);
   }
 
-  /* Beside the body and the footer, on their two tracks only: a tall
-   * example grows them, never the empty tracks above the title. */
+  /* Beside the body and the footer, on every track: a tall example grows
+   * them. */
   .ds.entity-card > .sidecar {
     grid-column: span var(--entity-card-sidecar-span) / -1;
-    grid-row: 3 / -1;
+    grid-row: 1 / -1;
     min-width: 0;
     padding-block: var(--entity-card-sidecar-padding-block);
     padding-inline: var(--entity-card-sidecar-padding-inline);
