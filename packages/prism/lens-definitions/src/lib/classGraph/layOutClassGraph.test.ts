@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   CROSS_REGION_GRAPH,
+  defineClass,
   NARROWING_GRAPH,
   TALL_GRAPH,
   TANGLED_GRAPH,
@@ -147,6 +148,30 @@ describe("layOutClassGraph", () => {
     };
     expect(relative(grown, "ds")).toEqual(relative(real, "ds"));
     expect(relative(grown, "anatomy")).toEqual(relative(real, "anatomy"));
+  });
+
+  it("lays an input with no class out as an empty floor", () => {
+    const empty = layOutClassGraph({ classes: [], relations: [] });
+    expect(empty.nodes.size).toBe(0);
+    expect(empty.rail).toEqual([]);
+    expect(empty.viewBox.w).toBeGreaterThan(0);
+    expect(empty.phone.rows.size).toBe(0);
+  });
+
+  it("breaks a superclass cycle at its least IRI, and a self-superclass", () => {
+    const looped = layOutClassGraph({
+      classes: [
+        defineClass("ex:Root", "Root"),
+        defineClass("ex:A", "A", { superclass: "ex:B" }),
+        defineClass("ex:B", "B", { superclass: "ex:A" }),
+        defineClass("ex:Self", "Self", { superclass: "ex:Self" }),
+      ],
+      relations: [],
+    });
+    expect(looped.nodes.size).toBe(4);
+    expect(looped.model.parent.get("ex:B")).toBe("ex:A");
+    expect(looped.model.parent.has("ex:A")).toBe(false);
+    expect(looped.model.parent.has("ex:Self")).toBe(false);
   });
 
   it("lays the phone view out in rail order inside its column", () => {

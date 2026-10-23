@@ -12,6 +12,7 @@ import {
   DEFINITIONS_TEST_TIMEOUT_MS,
   UIBLOCK_TERM,
 } from "../../../../testing/fixtures.js";
+import patchRecords from "../../../../testing/patchRecords.js";
 import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
 
 describe("DefinitionsExplorer", {
@@ -61,6 +62,40 @@ describe("DefinitionsExplorer", {
     expect(
       screen.getByRole("link", { name: "Component" }).closest("li"),
     ).toHaveClass("is-dimmed");
+  });
+
+  it("draws an empty explorer for ontologies with no class", () => {
+    const empty = { classes: { __refs: [] }, properties: { __refs: [] } };
+    const { container } = render(
+      createDefinitionsPage(
+        undefined,
+        patchRecords(definitionsExplorerRecords, {
+          "client:root:ontologies:0": empty,
+          "client:root:ontologies:1": empty,
+          "client:root:ontologies:2": empty,
+        }),
+        createFetchSpy(),
+      ),
+    );
+    expect(container.querySelector(".ds.definitions-explorer")).not.toBeNull();
+    expect(container.querySelectorAll(".desktop .node")).toHaveLength(0);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("draws every class of a fragment whose superclass chain loops", () => {
+    const { container } = render(
+      createDefinitionsPage(
+        undefined,
+        patchRecords(definitionsExplorerRecords, {
+          "client:root:ontologies:0:classes:1:superclass": {
+            uri: "https://ds.canonical.com/ConceptType",
+          },
+        }),
+        createFetchSpy(),
+      ),
+    );
+    expect(container.querySelectorAll(".desktop .node")).toHaveLength(35);
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("suspends over a cold store and fetches the one operation", () => {

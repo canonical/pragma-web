@@ -220,7 +220,9 @@ function alignShelves(
  * relations and subclass joins routed through the gaps, the rail order,
  * the keyboard's moves, the viewBox with its margin and the phone view.
  *
- * It is a pure function of the input, sorted by IRI: no randomness, no
+ * It is total over what a provider serves: superclass cycles are broken
+ * and an input with no class lays out as an empty floor. It is a pure
+ * function of the input, sorted by IRI: no randomness, no
  * trigonometry and no browser measurement, so the server and the client
  * lay out the same graph byte for byte, and every coordinate is an
  * integer.
@@ -235,6 +237,22 @@ export default function layOutClassGraph(
   sweeps: number = SWEEPS,
 ): ClassGraphLayout {
   const model = buildClassGraphModel(input);
+  // An ontology with no class is data a provider may serve: it lays out
+  // as an empty floor the size of the design canvas.
+  if (model.byId.size === 0) {
+    return {
+      model,
+      nodes: new Map(),
+      edges: [],
+      regions: [],
+      rail: [],
+      viewBox: { x: 0, y: 0, w: DESIGN_CANVAS.w, h: DESIGN_CANVAS.h },
+      fitZoom: 1,
+      channel: CHANNEL,
+      findings: [],
+      phone: layOutPhoneView(model, new Map(), [], []),
+    };
+  }
   const findings: string[] = [];
   let channel = CHANNEL;
   let packed = packRegions(model, channel, sweeps);

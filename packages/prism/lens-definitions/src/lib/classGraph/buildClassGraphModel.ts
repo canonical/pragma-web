@@ -14,7 +14,7 @@ import {
   WRAPPED_HEIGHT,
 } from "./constants.js";
 import { ceilTo, compareText, measureTextWidth, orderBy } from "./geometry.js";
-import { requireEntry } from "./require.js";
+import { requireAt, requireEntry } from "./require.js";
 import type {
   Bundle,
   ClassGraphInput,
@@ -130,8 +130,49 @@ function bundleRelations(
 }
 
 /**
- * Build the class graph's model from its input: the classes by IRI, the
- * subclass hierarchy split into in-region parents and cross-region joins,
+ * Break every cycle in the superclass chains: the ontology is data from
+ * outside, and a class that is its own superclass, or two classes that
+ * subclass each other, would leave chains that never reach a root. Each
+ * cycle loses the link of its least IRI, which becomes a root; every other
+ * class keeps its superclass.
+ *
+ * @param classes - The classes, in IRI order.
+ * @returns The classes, those whose link closed a cycle with no superclass.
+ */
+function breakSuperclassCycles(
+  classes: readonly GraphClassInput[],
+): GraphClassInput[] {
+  const superclassOf = new Map(
+    classes.map((klass) => [klass.uri, klass.superclass]),
+  );
+  const acyclic = new Set<string>();
+  for (const klass of classes) {
+    let path: string[] = [];
+    let at: string | null | undefined = klass.uri;
+    while (at !== null && at !== undefined && !acyclic.has(at)) {
+      const seen = path.indexOf(at);
+      if (seen >= 0) {
+        const cycle = path.slice(seen).sort(compareText);
+        superclassOf.set(requireAt(cycle, 0), null);
+        path = [];
+        at = klass.uri;
+        continue;
+      }
+      path.push(at);
+      at = superclassOf.get(at);
+    }
+    for (const uri of path) acyclic.add(uri);
+  }
+  return classes.map((klass) =>
+    superclassOf.get(klass.uri) === klass.superclass
+      ? klass
+      : { ...klass, superclass: null },
+  );
+}
+
+/**
+ * Build the class graph's model from its input: the classes by IRI, every
+ * superclass cycle broken, the subclass hierarchy split into in-region parents and cross-region joins,
  * the drawn relations (both ends drawn) bundled by pair, the hubs (four or
  * more incident edges after bundling, at most six, the subclass roots
  * always) and the regions, largest first.
@@ -141,7 +182,9 @@ function bundleRelations(
 export default function buildClassGraphModel(
   input: ClassGraphInput,
 ): ClassGraphModel {
-  const classes = [...input.classes].sort((a, b) => compareText(a.uri, b.uri));
+  const classes = breakSuperclassCycles(
+    [...input.classes].sort((a, b) => compareText(a.uri, b.uri)),
+  );
   const inputs = new Map(classes.map((klass) => [klass.uri, klass]));
   const prefixOf = (uri: string): string => requireEntry(inputs, uri).prefix;
 

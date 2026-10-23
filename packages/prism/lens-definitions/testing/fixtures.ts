@@ -40,7 +40,7 @@ export const HOMES: Homes = {
 };
 
 /** A class of a synthetic class graph: its IRI is `ex:<local>` or `zz:<local>`. */
-function defineClass(
+export function defineClass(
   uri: string,
   label: string,
   options: {
