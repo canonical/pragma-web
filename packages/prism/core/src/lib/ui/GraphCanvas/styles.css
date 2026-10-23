@@ -14,6 +14,9 @@
     --graph-canvas-controls-gap: var(--space-100);
     --graph-canvas-controls-padding-block: var(--component-padding-block);
     --graph-canvas-controls-padding-inline: var(--component-padding-inline);
+    /* The bar bleeds back over the gutter before the canvas, so its rule
+     * meets the divider of the region beside it, as the strip's does. */
+    --graph-canvas-controls-bleed: calc(-1 * var(--grid-gutter));
     --graph-canvas-controls-rule-color: var(--color-border-muted);
     --graph-canvas-controls-rule-width: 1px;
     --graph-canvas-controls-background: var(--color-background);
@@ -41,13 +44,14 @@
   }
 
   /* The controls, flush with the end edge, over a hairline that spans the
-   * canvas edge to edge. */
+   * canvas edge to edge and the gutter before it. */
   .ds.graph-canvas .controls {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: var(--graph-canvas-controls-gap);
+    margin-inline-start: var(--graph-canvas-controls-bleed);
     padding-block-start: var(--graph-canvas-controls-padding-block);
     padding-block-end: var(--graph-canvas-controls-padding-block);
     padding-inline-start: var(--graph-canvas-controls-padding-inline);

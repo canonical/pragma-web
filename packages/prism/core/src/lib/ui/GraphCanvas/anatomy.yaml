@@ -10,7 +10,7 @@
 #
 # Structure, top to bottom: a controls bar (the zoom level, then Fit, zoom
 # out and zoom in, flush with the end edge, over a hairline that spans the
-# canvas edge to edge; an optional one-line hint hangs from its lower edge,
+# canvas edge to edge and the gutter before it; an optional one-line hint hangs from its lower edge,
 # centred over the viewport, so it clears the controls whatever their
 # height), then the viewport, an SVG whose viewBox is the
 # graph's own bounds with `xMinYMin meet`, so the first paint fits flush
@@ -40,6 +40,10 @@
 #   appearance.border.width 1px: the controls bar's hairline and the hint's
 #     border.
 #   appearance.radius 999px: the hint's pill; no semantic radius exists.
+#   --graph-canvas-controls-bleed: calc(-1 * var(--grid-gutter))  the
+#     negation of grid.gutter, which the DSL cannot spell as a symbol: the
+#     bar bleeds over the gutter before the canvas, so its rule meets the
+#     divider of the region beside it, as the mode strip's does.
 #   spacing.gap space.100: between the controls; no semantic gap is
 #     admitted for a row of controls.
 #   In constants.ts, SVG geometry (attributes, not CSS): LATTICE_PITCH 16,
@@ -65,6 +69,7 @@ node:
           layout.align: center
           layout.justify: flex-end
           spacing.gap: space.100
+          spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
           spacing.internal.block.start: component.padding.block
           spacing.internal.block.end: component.padding.block
           spacing.internal.inline.start: component.padding.inline
