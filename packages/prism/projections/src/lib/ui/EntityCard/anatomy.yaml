@@ -21,8 +21,13 @@
 # margin of minus the gutter), so it meets the body at the body's divider,
 # as the Card's sections meet, and the card is no taller than its content.
 # A card without vitals has no footer; a reflow under
-# `.ds.entity-card:not(:has(> .footer))` gives the body every row track
-# (`layout.grid.row: 1 / -1`), so no empty strip stays below it.
+# `.ds.entity-card:not(:has(> .footer))` has the body reach back across
+# the gutter before the footer's track as the footer does
+# (`spacing.external.block.end: calc(-1 * var(--grid-gutter))`), so a card
+# alone ends where its body does and no empty strip stays below it. The
+# body keeps its own three tracks: it never sizes the footer's track, so in
+# a Cards group a card without vitals leaves the footer of a card with
+# vitals beside it at the footer's own height.
 #
 # The card sets its text on the matrix's 24px line, the line every
 # representation shares (the graph node draws on it too), so its heading
@@ -89,8 +94,9 @@
 #   --entity-card-footer-overlap: calc(-1 * var(--grid-gutter))
 #                                       the footer reaches back across the
 #                                       gutter between its track and the
-#                                       body's; no symbol is a negative
-#                                       gutter.
+#                                       body's, and a body without a
+#                                       footer across the same gutter; no
+#                                       symbol is a negative gutter.
 #
 # Roster namespaces (accepted and tracked): container.gap.default,
 # component.padding.block, component.padding.inline, space.300 (a line

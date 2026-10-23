@@ -14,7 +14,8 @@
     --entity-card-body-span: var(--card-span, 1);
     --entity-card-sidecar-span: 2;
     /* The footer reaches back across the gutter the holding grid sets
-     * between its track and the body's, so the two sections meet. */
+     * between its track and the body's, so the two sections meet; a body
+     * without a footer reaches across the same gutter. */
     --entity-card-footer-overlap: calc(-1 * var(--grid-gutter));
     --entity-card-sidecar-padding-block: var(--component-padding-block);
     --entity-card-sidecar-padding-inline: var(--component-padding-inline);
@@ -53,10 +54,12 @@
     grid-row: 1 / 4;
   }
 
-  /* Without vitals there is no footer: the body takes the footer's track
-   * and the gutter before it too, so the card ends where its body does. */
+  /* Without vitals there is no footer: the body reaches back across the
+   * gutter before the footer's track, as the footer does, so a card alone
+   * ends where its body does. It keeps its own tracks, so it never sizes
+   * the footer's track a Cards group shares with cards that have vitals. */
   .ds.entity-card:not(:has(> .footer)) > .body {
-    grid-row: 1 / -1;
+    margin-block-end: var(--entity-card-footer-overlap);
   }
 
   /* The footer meets the body at the body's divider. */

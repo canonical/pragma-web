@@ -85,6 +85,27 @@ export const WithoutVitals: Story = {
 };
 
 /**
+ * A card with vitals beside a card without them whose summary runs long:
+ * the card without vitals grows its body only, and the footer beside it
+ * keeps its own height.
+ */
+export const MixedVitals: Story = {
+  render: () => (
+    <>
+      <Component {...toCardArgs(MODIFIER_ENTITY)} />
+      <Component
+        {...toCardArgs(MODIFIER_FAMILY_ENTITY)}
+        summary={Array.from(
+          { length: 4 },
+          () => MODIFIER_FAMILY_ENTITY.summary,
+        ).join(" ")}
+        vitals={undefined}
+      />
+    </>
+  ),
+};
+
+/**
  * A modifier whose family is a mention: the chip in the key value keeps its
  * whole pill, its border drawn where it overhangs the line.
  */

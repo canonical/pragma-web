@@ -30,7 +30,10 @@ const MODIFIER = {
   vitals: ["v1.11", "Stable"],
 } as const;
 
-/** The stylesheet's reflow that gives a card without a footer's body every track. */
+/**
+ * The stylesheet's reflow that has a card without a footer's body reach
+ * across the gutter before the footer's track.
+ */
 const NO_FOOTER_BODY = ".ds.entity-card:not(:has(> .footer)) > .body";
 
 describe("EntityCard", () => {
@@ -119,7 +122,7 @@ describe("EntityCard", () => {
       ).toEqual(["Modifier", "Anticipation"]);
     });
 
-    it("renders no footer without vitals, so the body takes every track", () => {
+    it("renders no footer without vitals, so the body reaches the card's edge", () => {
       render(<EntityCard data-testid="card" {...MODIFIER} vitals={[]} />);
       const card = screen.getByTestId("card");
       expect(card.querySelector(".card-footer")).toBeNull();
