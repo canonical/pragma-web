@@ -1,15 +1,17 @@
 // @vitest-environment node
 
 import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertAnatomy,
+  assertProjectionMatchesFragment,
   assertScaffold,
   assertStylesheets,
   assertStylesMatchAnatomy,
   listAnatomyFolders,
 } from "@canonical/prism-core/testing";
+import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 
 /** The app's root, three levels up from this file. */
@@ -48,6 +50,27 @@ const DOCUMENT_TOKENS = ["--grid-col-min"];
 const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
 
 /**
+ * The app's compiled fragments, by name: the reader artifact of each
+ * component's `<Name>_node`.
+ */
+const fragments = Object.fromEntries(
+  Object.values(
+    import.meta.glob<{ readonly default: ReaderFragment }>(
+      "../../relay/__generated__/*_node.graphql.ts",
+      { eager: true },
+    ),
+  ).map((module) => [module.default.name, module.default]),
+);
+
+/**
+ * The projections among the components: those whose anatomy's root
+ * narrows to a type through `projection.on`.
+ */
+const projectionFolders = folders.filter(
+  (folder) => assertAnatomy(folder).root.projection?.on !== undefined,
+);
+
+/**
  * The private subcomponents, each in its parent's `common/` folder. The
  * scaffold check places a component only under `src/lib/ui` or a domain's
  * `lib`, so these keep their anatomy and their styles, not that check.
@@ -66,6 +89,24 @@ describe("the app's components", () => {
     (folder) => {
       assertStylesMatchAnatomy(folder, assertAnatomy(folder));
       assertScaffold(folder, { packageRoot: APP_ROOT, testSuffix: "tests" });
+    },
+  );
+
+  it("have their projections found, the station card among them", () => {
+    expect(projectionFolders).toContain(
+      join(APP_ROOT, "src", "domains", "metro", "lib", "StationCard"),
+    );
+  });
+
+  it.each(projectionFolders)(
+    "%s reads the fields its fragment reads",
+    (folder) => {
+      const name = `${basename(folder)}_node`;
+      const fragment = fragments[name];
+      if (fragment === undefined) {
+        throw new Error(`${name} is not compiled: run \`bun run relay\``);
+      }
+      assertProjectionMatchesFragment(assertAnatomy(folder), fragment);
     },
   );
 
