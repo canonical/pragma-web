@@ -60,6 +60,15 @@ export const Selected: Story = {
   args: { ...pickCommandArgs(UI_BLOCK_ENTITY), "aria-selected": true },
 };
 
+/**
+ * A result the palette cannot open, since the site gives its type no home:
+ * its whole text is muted. On this bare list item the attribute is styled
+ * but not yet announced.
+ */
+export const Disabled: Story = {
+  args: { ...pickCommandArgs(UI_BLOCK_ENTITY), "aria-disabled": true },
+};
+
 /** The five types as one list of results, each 56px. */
 export const List: Story = {
   render: () => (
