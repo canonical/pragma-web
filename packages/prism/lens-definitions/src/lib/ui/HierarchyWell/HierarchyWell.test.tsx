@@ -6,7 +6,7 @@
  */
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
@@ -206,6 +206,95 @@ describe("HierarchyWell", () => {
     expect(container.querySelectorAll(".phone .row.is-hidden")).toHaveLength(
       12,
     );
+  });
+
+  describe("the camera", () => {
+    /** Lay the viewport out at the viewBox's size and move it at once. */
+    const stubViewport = (): void => {
+      vi.stubGlobal(
+        "matchMedia",
+        (query: string) =>
+          ({ matches: true, media: query }) as unknown as MediaQueryList,
+      );
+      const { w, h } = layout.viewBox;
+      vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
+        width: w,
+        height: h,
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0,
+        right: w,
+        bottom: h,
+        toJSON: () => ({}),
+      });
+    };
+    const readCamera = (container: HTMLElement): string | null =>
+      container.querySelector(".desktop .camera")?.getAttribute("transform") ??
+      null;
+    /** The well under the router, with the given targets. */
+    const drawWell = (props: Partial<HierarchyWellProps>) =>
+      createRouterHarness(
+        <HierarchyWell
+          filter={ALL}
+          hoverCentre={undefined}
+          layout={layout}
+          onHoverTerm={() => {}}
+          term={undefined}
+          terms={terms}
+          {...props}
+        />,
+      );
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    it("fits the classes the chips leave, and Fit restores them", () => {
+      stubViewport();
+      const { container, rerender } = render(drawWell({}));
+      expect(readCamera(container)).toBeNull();
+      rerender(drawWell({ filter: createAllNamespacesFilter(["cs"]) }));
+      const fitted = readCamera(container);
+      expect(fitted).not.toBeNull();
+      expect(fitted).not.toBe("translate(0,0) scale(1)");
+      fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+      fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+      expect(readCamera(container)).toBe(fitted);
+    });
+
+    it("fits a picked region once per pick, and Fit restores the graph", () => {
+      stubViewport();
+      const { container, rerender } = render(drawWell({}));
+      rerender(drawWell({ region: { prefix: "cs", serial: 1 } }));
+      const region = readCamera(container);
+      expect(region).not.toBeNull();
+      expect(region).not.toBe("translate(0,0) scale(1)");
+      fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+      expect(readCamera(container)).toBe("translate(0,0) scale(1)");
+      rerender(drawWell({ region: { prefix: "cs", serial: 2 } }));
+      expect(readCamera(container)).toBe(region);
+    });
+
+    it("leaves the camera alone for a region the graph does not draw", () => {
+      stubViewport();
+      const { container, rerender } = render(drawWell({}));
+      rerender(drawWell({ region: { prefix: "zz", serial: 1 } }));
+      expect(readCamera(container)).toBeNull();
+    });
+
+    it("pans the selected class into view when it is out of view", () => {
+      stubViewport();
+      const { container, rerender } = render(drawWell({}));
+      for (let step = 0; step < 4; step += 1) {
+        fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+      }
+      const zoomed = readCamera(container);
+      const last = requireEntry(terms, layout.rail.at(-1) ?? "");
+      rerender(drawWell({ term: last }));
+      expect(readCamera(container)).not.toBe(zoomed);
+    });
   });
 
   it("labels no relation whose edge the chips hide", () => {
