@@ -54,17 +54,20 @@
     grid-row: 1 / 4;
   }
 
-  /* Without vitals there is no footer: the body reaches back across the
-   * gutter before the footer's track, as the footer does, so a card alone
-   * ends where its body does. It keeps its own tracks, so it never sizes
-   * the footer's track a Cards group shares with cards that have vitals. */
-  .ds.entity-card:not(:has(> .footer)) > .body {
-    margin-block-end: var(--entity-card-footer-overlap);
-  }
-
   /* The footer meets the body at the body's divider. */
   .ds.entity-card > .footer {
     margin-block-start: var(--entity-card-footer-overlap);
+  }
+
+  /* Beside the body, on its tracks and never on the footer's: a tall
+   * example grows the body, and the footer keeps its own height. */
+  .ds.entity-card > .sidecar {
+    grid-column: span var(--entity-card-sidecar-span) / -1;
+    grid-row: 1 / 4;
+    min-width: 0;
+    padding-block: var(--entity-card-sidecar-padding-block);
+    padding-inline: var(--entity-card-sidecar-padding-inline);
+    background: var(--entity-card-sidecar-background);
   }
 
   /* With a sidecar the card turns into a column subgrid: the body and the
@@ -82,23 +85,22 @@
     grid-column: 1 / span var(--entity-card-body-span);
   }
 
+  /* Without vitals there is no footer: the body, and the sidecar beside
+   * it, reach back across the gutter before the footer's track, as the
+   * footer does, so a card alone ends where its body does. They keep their
+   * own tracks, so they never size the footer's track a Cards group shares
+   * with cards that have vitals. */
+  .ds.entity-card:not(:has(> .footer)) > .body,
+  .ds.entity-card:not(:has(> .footer)) > .sidecar {
+    margin-block-end: var(--entity-card-footer-overlap);
+  }
+
   /* The sidecar comes after the card's sections, so the section it follows
    * is no longer the Card's last child and would draw a divider along the
    * card's bottom edge: it draws none, as the Card's last section does. */
   .ds.entity-card:has(> .body + .sidecar) > .body,
   .ds.entity-card:has(> .footer + .sidecar) > .footer {
     border-block-end-width: 0;
-  }
-
-  /* Beside the body and the footer, on every track: a tall example grows
-   * them. */
-  .ds.entity-card > .sidecar {
-    grid-column: span var(--entity-card-sidecar-span) / -1;
-    grid-row: 1 / -1;
-    min-width: 0;
-    padding-block: var(--entity-card-sidecar-padding-block);
-    padding-inline: var(--entity-card-sidecar-padding-inline);
-    background: var(--entity-card-sidecar-background);
   }
 
   /* The heading's paragraphs and the summary set no baseline nudge and

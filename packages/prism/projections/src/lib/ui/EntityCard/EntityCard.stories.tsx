@@ -129,7 +129,8 @@ export const UIBlockWithSidecar: Story = {
 
 /**
  * A UI block whose example is taller than its body: the card grows its body
- * and footer to hold it, and the title stays at the top.
+ * to hold it, the title stays at the top, and the footer keeps its own
+ * height.
  */
 export const UIBlockWithTallSidecar: Story = {
   args: { ...toCardArgs(UI_BLOCK_ENTITY), sidecar: TALL_EXAMPLE },
