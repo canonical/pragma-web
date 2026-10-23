@@ -53,7 +53,7 @@ export default function PhoneGraph({
   // children, an arc with either of its ends.
   const isGuideHidden = (parent: string): boolean =>
     hidden.has(parent) ||
-    (layout.model.children.get(parent) ?? []).every((child) =>
+    requireEntry(layout.model.children, parent).every((child) =>
       hidden.has(child),
     );
   const isEdgeHidden = (edge: LaidOutEdge): boolean =>
