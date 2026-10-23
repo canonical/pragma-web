@@ -1,7 +1,6 @@
 import { compareText, orderBy } from "./geometry.js";
-import type { RegionLayout } from "./layOutRegion.js";
 import { requireAt, requireEntry } from "./require.js";
-import type { ClassGraphModel } from "./types.js";
+import type { ClassGraphModel, RegionLayout } from "./types.js";
 
 /**
  * Order a region's classes for the rail: the subclass forest in pre-order,

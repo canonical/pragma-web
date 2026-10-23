@@ -1,17 +1,7 @@
 import { DESIGN_CANVAS, SHELF_GAP, VIEW_MARGIN } from "./constants.js";
 import { orderBy } from "./geometry.js";
 import { requireAt } from "./require.js";
-
-/** A packing of regions into shelves. */
-export interface ShelfPacking {
-  /** Each shelf's regions, by index into the sizes. */
-  readonly shelves: readonly (readonly number[])[];
-  /** The packed width and height, in px. */
-  readonly w: number;
-  readonly h: number;
-  /** The zoom at which the packing, with its margin, fits the design canvas. */
-  readonly fit: number;
-}
+import type { ShelfPacking } from "./types.js";
 
 /** Count the set bits of a mask: the shelf breaks it makes. */
 function countBits(mask: number): number {

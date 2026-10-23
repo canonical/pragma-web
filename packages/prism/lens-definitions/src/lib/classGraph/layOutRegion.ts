@@ -1,4 +1,4 @@
-import allocatePorts, { type FixedPort } from "./allocatePorts.js";
+import allocatePorts from "./allocatePorts.js";
 import {
   ARC_BASE,
   ARC_NEST,
@@ -24,59 +24,12 @@ import { requireAt, requireEntry } from "./require.js";
 import type {
   Bundle,
   ClassGraphModel,
+  FixedPort,
   PathCommand,
-  Point,
-  Rect,
+  RegionEdge,
+  RegionLayout,
+  RegionNode,
 } from "./types.js";
-
-/** A box placed in its region's own coordinates. */
-export interface RegionNode {
-  readonly id: string;
-  readonly col: number;
-  readonly x: number;
-  readonly y: number;
-  readonly w: number;
-  readonly h: number;
-  /** Its place in its column, top first. */
-  readonly order: number;
-}
-
-/** An edge routed in its region's own coordinates. */
-export interface RegionEdge {
-  readonly id: string;
-  readonly kind: "subclass" | "relation";
-  readonly from: string;
-  readonly to: readonly string[];
-  readonly commands: readonly PathCommand[];
-  readonly heads: readonly (readonly PathCommand[])[];
-  readonly bundle?: Bundle;
-  readonly busX?: number;
-  readonly self?: boolean;
-  readonly arc?: boolean;
-  readonly apex?: Point;
-}
-
-/** One region laid out in its own coordinates, its top-left at the origin. */
-export interface RegionLayout {
-  readonly nodes: ReadonlyMap<string, RegionNode>;
-  readonly edges: readonly RegionEdge[];
-  /** Each column's items, top first: class IRIs and waypoint ids. */
-  readonly columns: readonly (readonly string[])[];
-  readonly columnX: readonly number[];
-  readonly columnWidth: readonly number[];
-  /** Each relation port's height, by `<bundle> <class>`. */
-  readonly ports: ReadonlyMap<string, number>;
-  /** The box that holds every node, loop and edge. */
-  readonly content: Rect;
-  /** Every rule the region could not keep, in words. */
-  readonly findings: readonly string[];
-  /** A class's column. */
-  readonly columnOf: (id: string) => number;
-  /** A class's superclass hops to its root. */
-  readonly depthOf: (id: string) => number;
-  /** A relation-placed class's predecessors, back edges removed. */
-  readonly predecessorsOf: (id: string) => readonly string[];
-}
 
 /** An item of a column's stack: a class's box or a waypoint's slot. */
 interface StackItem {

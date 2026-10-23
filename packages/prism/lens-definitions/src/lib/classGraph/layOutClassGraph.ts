@@ -27,9 +27,9 @@ import {
   uniteRects,
 } from "./geometry.js";
 import layOutPhoneView from "./layOutPhoneView.js";
-import layOutRegion, { type RegionLayout } from "./layOutRegion.js";
+import layOutRegion from "./layOutRegion.js";
 import orderRail from "./orderRail.js";
-import packShelves, { type ShelfPacking } from "./packShelves.js";
+import packShelves from "./packShelves.js";
 import { requireAt, requireDefined, requireEntry } from "./require.js";
 import type {
   ClassGraphInput,
@@ -40,6 +40,8 @@ import type {
   LaidOutRegion,
   NodeNavigation,
   PathCommand,
+  RegionLayout,
+  ShelfPacking,
 } from "./types.js";
 
 /** A region laid out in its own coordinates, with its packed size. */

@@ -1,20 +1,6 @@
 import { PORT_LEVELS } from "./constants.js";
 import { requireAt } from "./require.js";
-
-/** A line already fixed on a box's side: a subclass tick or a loop's end. */
-export interface FixedPort {
-  readonly kind: "tick" | "loop";
-  /** Its offset from the box's top, in px. */
-  readonly y: number;
-}
-
-/** The ports a side was given and the spacing level it needed. */
-export interface PortAllocation {
-  /** Each request's offset from the box's top, in the requests' order. */
-  readonly ys: readonly number[];
-  /** The index of the level in `PORT_LEVELS` the side needed. */
-  readonly level: number;
-}
+import type { FixedPort, PortAllocation } from "./types.js";
 
 /**
  * Allocate a box side's relation ports: the requests, already ordered by
