@@ -126,6 +126,29 @@ describe("CodeStandardCard", () => {
     expect(summary?.querySelector("p")).toBeNull();
   });
 
+  it("ends the summary at a list that follows its opening line", () => {
+    const { container } = renderWithNode(
+      (node) => <CodeStandardCard node={node} />,
+      {
+        description:
+          "Icon files must:\n- Use kebab-case naming\n- Use semantic identifiers",
+      },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.textContent).toBe("Icon files must:");
+    expect(summary?.querySelector("ul")).toBeNull();
+  });
+
+  it("ends the summary at a blank line written with CRLF", () => {
+    const { container } = renderWithNode(
+      (node) => <CodeStandardCard node={node} />,
+      { description: "The **first** paragraph.\r\n\r\nThe second." },
+    );
+    expect(container.querySelector(".summary")?.textContent).toBe(
+      "The first paragraph.",
+    );
+  });
+
   it("has no key value when the standard has no category", () => {
     const { container } = renderWithNode(
       (node) => <CodeStandardCard node={node} />,

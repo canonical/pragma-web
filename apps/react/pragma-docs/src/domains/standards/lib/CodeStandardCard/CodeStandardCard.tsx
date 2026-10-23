@@ -6,16 +6,12 @@ import {
   findCuriePrefix,
   useProjectionLink,
 } from "@canonical/prism-projections";
-import {
-  defaultComponents,
-  Markdown,
-  type MarkdownComponents,
-} from "@canonical/react-markdown";
+import { Markdown } from "@canonical/react-markdown";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
+import { findFirstParagraph, SUMMARY_COMPONENTS } from "#lib/markdown";
 import nodeFragment from "../../../../relay/__generated__/CodeStandardCard_node.graphql.js";
-import findFirstParagraph from "./findFirstParagraph.js";
 import type { CodeStandardCardProps } from "./types.js";
 import "./styles.css";
 
@@ -51,15 +47,6 @@ const declareNodeFragment = (): unknown => graphql`
 `;
 void declareNodeFragment;
 /* v8 ignore stop */
-
-/**
- * The elements the summary renders through: the default ones, with a
- * paragraph as a span, since the card's summary is a paragraph already.
- */
-const SUMMARY_COMPONENTS: MarkdownComponents = {
-  ...defaultComponents,
-  p: "span",
-};
 
 const componentCssClassName = "ds code-standard-card";
 

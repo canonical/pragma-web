@@ -44,22 +44,44 @@ const CodeStandardCardSsrTestNode = (): ReactElement => {
   return <CodeStandardCard node={node} />;
 };
 
+/**
+ * Render CodeStandardCard to a string over the CodeStandard a Relay mock
+ * environment answers: `entity` over the standard on public and private
+ * subcomponent exports.
+ */
+const renderCardToString = (
+  entity: Readonly<Record<string, unknown>> = {},
+): string => {
+  // relay-test-utils wraps the mock environment's methods in `jest.fn` when
+  // NODE_ENV is "test"; vitest's `vi` offers the same surface.
+  vi.stubGlobal("jest", vi);
+  const environment = createMockEnvironment();
+  environment.mock.queueOperationResolver((operation) =>
+    MockPayloadGenerator.generate(operation, {
+      Node: resolveRoot({ ...MOCK_CODE_STANDARD, ...entity }),
+    }),
+  );
+  return renderToString(
+    createSiteTree(environment, <CodeStandardCardSsrTestNode />),
+  );
+};
+
 describe("CodeStandardCard SSR", () => {
   it("renders its title as a link to the standard's reading page", () => {
-    // relay-test-utils wraps the mock environment's methods in `jest.fn` when
-    // NODE_ENV is "test"; vitest's `vi` offers the same surface.
-    vi.stubGlobal("jest", vi);
-    const environment = createMockEnvironment();
-    environment.mock.queueOperationResolver((operation) =>
-      MockPayloadGenerator.generate(operation, {
-        Node: resolveRoot(MOCK_CODE_STANDARD),
-      }),
-    );
-    const html = renderToString(
-      createSiteTree(environment, <CodeStandardCardSsrTestNode />),
-    );
+    const html = renderCardToString();
     expect(html).toContain("ds card ds entity-card ds code-standard-card");
     expect(html).toContain('data-type="CodeStandard"');
     expect(html).toContain(`href="${MOCK_CODE_STANDARD_HREF}"`);
+  });
+
+  it("puts no block inside the summary's paragraph for a list-led description", () => {
+    const html = renderCardToString({
+      description:
+        "Icon files must:\n- Use kebab-case naming\n- Use semantic identifiers",
+    });
+    expect(html).toMatch(
+      /<p class="summary"><span>Icon files must:<\/span><\/p>/,
+    );
+    expect(html).not.toMatch(/<(ul|ol|li)[\s>]/);
   });
 });
