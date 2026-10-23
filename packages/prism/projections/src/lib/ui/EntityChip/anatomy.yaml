@@ -23,11 +23,15 @@
 # The pill sets its text on the matrix's 24px line, the line every
 # representation shares, so it is 28px in every context.
 #
-# It overhangs the line that holds it instead of sizing it, as a mention
-# in a sentence does: its block margins take back the matrix's 2px inset
-# (border included) and 4px of its 24px line, so its margin box is 16px,
-# the docs' smallest line (tertiary text), and a paragraph keeps its own
-# line pitch around it.
+# The line that holds it holds the whole pill: it sets no block margins,
+# so the line box grows to the pill's 28px where a mention sits (8px over
+# the docs' 20px line, 4px over the matrix's 24px line, a key value's
+# included) and nothing of the pill paints over the lines above and below
+# it. A pill that overhung its line instead painted over the descenders of
+# the line above and the ascenders of the line below in the docs' text;
+# clipping it inside the slots that hold it would cut its border. A
+# paragraph with a mention has one taller line, its other lines keep their
+# pitch.
 #
 # Token ledger (no symbol to bind):
 #   --entity-chip-border-width: 1px    stroke thickness has only the
@@ -45,12 +49,9 @@
 #   not a pill's, and no gap may read a container gap.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
-#   --entity-chip-margin-block: calc(-1 * (var(--space-025) + var(--space-050)))
-#                                      the overhang above; no symbol is a
-#                                      negative space.
 #
 # Roster namespaces (accepted and tracked): space.100, space.050, space.300
-# (a line height), space.025 and space.050 in the overhang.
+# (a line height), space.025 in the block insets.
 node:
   uri: prism.component.entity_chip
   styles:
@@ -62,8 +63,6 @@ node:
     spacing.internal.inline.end: space.050
     spacing.internal.block.start: "calc(var(--space-025) - var(--entity-chip-border-width))"
     spacing.internal.block.end: "calc(var(--space-025) - var(--entity-chip-border-width))"
-    spacing.external.block.start: "calc(-1 * (var(--space-025) + var(--space-050)))"
-    spacing.external.block.end: "calc(-1 * (var(--space-025) + var(--space-050)))"
     appearance.background: color.foreground.secondary
     appearance.border.width: 1px
     appearance.border.style: solid

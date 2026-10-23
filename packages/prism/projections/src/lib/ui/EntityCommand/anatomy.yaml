@@ -10,9 +10,9 @@
 # of its two lines truncates rather than wrapping, so a long title never
 # grows the row.
 #
-# The identity and the title clip along their line only: a chip in the
-# title overhangs the 24px line by 2px above and below, and keeps its
-# border there.
+# The identity and the title clip along their line only, so nothing they
+# hold is cut above or below: a chip in the title is 28px, and its line
+# grows to hold it (the row is then 60px).
 #
 # A linked title reads as the row's text: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the title clips; the states

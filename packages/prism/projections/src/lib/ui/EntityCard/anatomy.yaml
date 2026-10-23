@@ -41,9 +41,9 @@
 # A word longer than its box, an identifier most often, ends in an ellipsis
 # in the title, the key values and the vitals rather than running under the
 # Card's clipped edge; the roster has no key for breaking inside a word.
-# A key and its value clip along their line only: a chip in a value
-# overhangs the 24px line by 2px above and below, and keeps its border
-# there.
+# A key and its value clip along their line only, so nothing they hold is
+# cut above or below: a chip in a value is 28px, and the pair's line grows
+# to hold it.
 # The title's link reads as the title: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the title clips.
 #

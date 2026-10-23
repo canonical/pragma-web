@@ -107,7 +107,7 @@ export const MixedVitals: Story = {
 
 /**
  * A modifier whose family is a mention: the chip in the key value keeps its
- * whole pill, its border drawn where it overhangs the line.
+ * whole pill, and the pair's line grows to hold it.
  */
 export const WithMention: Story = {
   args: {

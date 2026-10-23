@@ -173,7 +173,7 @@
   }
 
   /* Two equal halves under a rule. Each clips only along its line, so a
-   * chip in a value keeps the pill's border where it overhangs the line. */
+   * chip in a value keeps its whole pill, and the line grows to hold it. */
   .ds.entity-card > .body > .key-values > .pair {
     display: flex;
     border-block-start-width: var(--entity-card-rule-width);
