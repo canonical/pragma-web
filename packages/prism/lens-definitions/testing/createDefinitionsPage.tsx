@@ -12,9 +12,9 @@ import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { DefinitionsPage } from "../src/lib/DefinitionsPage/index.js";
-import { LensFilterProvider } from "../src/lib/LensFilterProvider/index.js";
 import { definitionsRoutes } from "../src/lib/routes.js";
+import { DefinitionsPage } from "../src/lib/ui/DefinitionsPage/index.js";
+import { LensFilterProvider } from "../src/lib/ui/LensFilterProvider/index.js";
 import { HOMES } from "./fixtures.js";
 
 /**
@@ -58,7 +58,10 @@ export default function createDefinitionsPage(
         <HomesProvider homes={HOMES}>
           <ProjectionsProvider maps={defaultProjectionMaps}>
             <LensFilterProvider>
-              <DefinitionsPage params={term === undefined ? {} : { term }} />
+              <DefinitionsPage
+                params={term === undefined ? {} : { term }}
+                search={{}}
+              />
             </LensFilterProvider>
           </ProjectionsProvider>
         </HomesProvider>

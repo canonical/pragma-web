@@ -1,0 +1,118 @@
+---
+# GraphOverview — the inspector with no selection: the legend, each row a
+# tiny graph drawn by the graph's own layout and drawing beside what it
+# means; a row per namespace with its figures, each a button that fits the
+# graph's camera to that region; and how to move about the graph. Its
+# sections and their labels are the inspector's.
+# Reference: the graph heuristics' empty inspector (G29).
+#
+# Why not a published component: no published component is a graph
+# legend; the specimens are this lens's ClassGraph.
+#
+# Every decision is read through a component token declared on the root
+# (`--graph-overview-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   light-dark(oklch(94% 0 0), var(--color-background-container)): a
+#     specimen's floor, as on the canvas.
+#   1px, 2px: the namespace button's hairline and focus ring.
+#   space.050, space.100: the gaps between rows and inside a row; no
+#     semantic gap is admitted inside a row.
+#
+# Roster namespaces (accepted and tracked): container.gap.tight,
+# space.050, space.100, and the semantic typography symbols.
+node:
+  uri: prism.component.graph_overview
+  edges:
+    - node:
+        role: legend
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.100
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+          layout.listStyle: none
+        edges:
+          - node:
+              role: entry
+              styles:
+                layout.type: flex
+                layout.align: center
+                spacing.gap: space.100
+              edges:
+                - node:
+                    role: specimen
+                    styles:
+                      layout.flex.shrink: 0
+                      appearance.background: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                    edges:
+                      - node:
+                          uri: prism.component.class_graph
+                        relation: { cardinality: "1" }
+                  relation: { cardinality: "1", slotName: specimen }
+                - node:
+                    role: meaning
+                    styles:
+                      typography.size: typography.text.secondary.fontSize
+                  relation: { cardinality: "1", slotName: meaning }
+            relation: { cardinality: "1..*", slotName: entry }
+      relation: { cardinality: "1", slotName: legend }
+    - node:
+        role: namespaces
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.050
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+          layout.listStyle: none
+        edges:
+          - node:
+              role: namespace
+              styles:
+                layout.type: flex
+                layout.wrap: wrap
+                layout.align: baseline
+                layout.justify: space-between
+                spacing.gap: space.100
+                size.inline: 100%
+                spacing.internal.block.start: container.gap.tight
+                spacing.internal.block.end: container.gap.tight
+                spacing.internal.inline.start: container.gap.tight
+                spacing.internal.inline.end: container.gap.tight
+                appearance.background: color.background
+                appearance.background@hover: color.background.layer2
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border.muted
+                typography.font: inherit
+                typography.color: color.text
+                typography.align: start
+                interaction.cursor: pointer
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+              edges:
+                - node:
+                    role: abbreviation
+                    styles:
+                      typography.weight: typography.text.primary.bold.fontWeight
+                  relation: { cardinality: "1", slotName: abbreviation }
+                - node:
+                    role: figures
+                    styles:
+                      typography.size: typography.text.secondary.fontSize
+                      typography.color: color.text.muted
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "1", slotName: figures }
+            relation: { cardinality: "1..*", slotName: namespace }
+      relation: { cardinality: "1", slotName: namespaces }
+    - node:
+        role: gestures
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "1", slotName: gestures }

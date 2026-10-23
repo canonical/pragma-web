@@ -7,9 +7,9 @@
 import { render, screen, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import createFetchSpy from "../../../../../testing/createFetchSpy.js";
-import createStripHarness from "../../../../../testing/createStripHarness.js";
-import definitionsExplorerRecords from "../../../../../testing/records/definitionsExplorerRecords.js";
+import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
+import createStripHarness from "../../../../../../testing/createStripHarness.js";
+import definitionsExplorerRecords from "../../../../../../testing/records/definitionsExplorerRecords.js";
 import { Controls } from "./index.js";
 
 describe("Controls", () => {
@@ -44,6 +44,6 @@ describe("Controls", () => {
       within(screen.getByRole("group", { name: "Filter by ontology" }))
         .getAllByRole("button")
         .map((button) => button.textContent),
-    ).toEqual(["surface", "ds", "cs", "anatomy"]);
+    ).toEqual(["ds", "cs", "anatomy"]);
   });
 });

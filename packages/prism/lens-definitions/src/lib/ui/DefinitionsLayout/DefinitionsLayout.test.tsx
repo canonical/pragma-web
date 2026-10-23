@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createDefinitionsLayout from "../../../testing/createDefinitionsLayout.js";
-import createFetchSpy from "../../../testing/createFetchSpy.js";
-import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
+import createDefinitionsLayout from "../../../../testing/createDefinitionsLayout.js";
+import createFetchSpy from "../../../../testing/createFetchSpy.js";
+import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
 import { useLensFilter } from "../LensFilterProvider/index.js";
 
 /** A routed page that prints the namespaces the shared filter allows. */
@@ -71,7 +71,7 @@ describe("DefinitionsLayout", () => {
 
     expect(screen.getByRole("status")).toHaveTextContent("untouched");
     fireEvent.click(screen.getByRole("button", { name: "anatomy" }));
-    expect(screen.getByRole("status")).toHaveTextContent("surface,ds,cs");
+    expect(screen.getByRole("status")).toHaveTextContent("ds,cs");
   });
 
   it("turns every ontology off when the reader presses the last lit chip", () => {
@@ -97,7 +97,41 @@ describe("DefinitionsLayout", () => {
       chips.map(() => "false"),
     );
     expect(screen.getByRole("status").textContent).toBe("");
-    expect(screen.getByRole("figure").textContent).toContain("0 of 60");
+    expect(screen.getByRole("figure").textContent).toContain("0 of 35");
+  });
+
+  it("puts the term inspector in the workspace's inspector region", () => {
+    const { container } = render(
+      createDefinitionsLayout({
+        url: "/definitions/ds%3AUIBlock",
+        records: definitionsExplorerRecords,
+        fetchFn: createFetchSpy(),
+        rail: null,
+        children: null,
+      }),
+    );
+    const inspector = screen.getByRole("complementary", {
+      name: "Term inspector",
+    });
+    expect(container.querySelector(".ds.workspace-layout")).toContainElement(
+      inspector,
+    );
+    expect(
+      within(inspector).getByRole("heading", { level: 2, name: "UI Block" }),
+    ).toBeInTheDocument();
+  });
+
+  it("waits with a loading line in the inspector over a cold store", () => {
+    render(
+      createDefinitionsLayout({
+        url: "/definitions",
+        records: undefined,
+        fetchFn: createFetchSpy(),
+        rail: null,
+        children: null,
+      }),
+    );
+    expect(screen.getByText("Loading the ontologies…")).toBeInTheDocument();
   });
 
   it("merges the site's class names after its own on its root", () => {

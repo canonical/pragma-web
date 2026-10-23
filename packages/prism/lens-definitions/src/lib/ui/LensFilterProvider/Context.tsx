@@ -1,10 +1,11 @@
 import { createContext } from "react";
-import { DEFAULT_LENS_FILTER } from "../constants.js";
+import { DEFAULT_LENS_FILTER } from "../../constants.js";
 import type { LensFilterValue } from "./types.js";
 
 /**
  * The one context in the lens: the reader's filter, shared by the strip's
- * chips and the explorer.
+ * chips, the explorer and the inspector, and the region a reader asked the
+ * graph to fit from the inspector.
  *
  * The mode strip is rendered by the lens's own layout (`DefinitionsLayout`)
  * as a sibling of the routed page, not a descendant: the router hands the
@@ -18,7 +19,7 @@ import type { LensFilterValue } from "./types.js";
  * explorer could only arrive in an effect, client-only and after paint, so
  * the strip would render empty on the server and populated on the client: a
  * hydration mismatch in the strip itself. The strip reads the same Relay
- * operation from the same warm store instead (see `DefinitionsLayout`'s `useStripQuery`), and
+ * operation from the same warm store instead (see `DefinitionsLayout`'s `useExplorerQuery`), and
  * this context holds only the reader's ephemeral choices.
  *
  * Its default is the no-op filter with an inert setter, so a consumer
@@ -28,6 +29,8 @@ import type { LensFilterValue } from "./types.js";
 const LensFilterContext = createContext<LensFilterValue>({
   filter: DEFAULT_LENS_FILTER,
   setFilter: () => {},
+  region: undefined,
+  setRegion: () => {},
 });
 
 export default LensFilterContext;

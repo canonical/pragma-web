@@ -1,0 +1,103 @@
+---
+# PhoneGraph — the class graph below one group of columns: one column the
+# page scrolls, a header row per namespace, a row per class in rail order
+# indented by its depth to a spine, the subclass structure as the indent
+# and a guide, the relations as arcs right of the spine, all on the
+# canvas's 16px lattice. No edge labels: a tap selects a class and the
+# inspector lists its relations.
+# Reference: the graph heuristics' phone view (G28).
+#
+# Why not a published component: no published component draws a graph;
+# its classes are the published projection's EntityGraphNode.
+#
+# SVG paints through currentColor: each shape's colour is bound as its
+# `typography.color`.
+#
+# Every decision is read through a component token declared on the root
+# (`--phone-graph-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   light-dark(oklch(94% 0 0), var(--color-background-container)): the
+#     floor, as on the canvas.
+#   light-dark(var(--color-border), oklch(54.86% 0 0)): the relation arcs,
+#     as on the canvas.
+#   1rem: the namespace prefix; the docs context has no 16px text size.
+#   0.4: a dimmed class.
+#   In the layout's constants (attributes, not CSS): the 358-unit column,
+#     the 48-unit rows, the 1px strokes and rules.
+#
+# Roster namespaces (accepted and tracked): the semantic typography
+# symbols typography.text.secondary.fontSize and
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.phone_graph
+  styles:
+    layout.type: block
+    size.inline: 100%
+  edges:
+    - node:
+        role: lattice
+        styles:
+          typography.color: color.border.muted
+      relation: { cardinality: "1", slotName: lattice }
+    - node:
+        role: floor
+        styles:
+          typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+      relation: { cardinality: "1", slotName: floor }
+    - node:
+        role: rule
+        styles:
+          typography.color: color.border.muted
+      relation: { cardinality: "0..*", slotName: rule }
+    - node:
+        role: header
+        edges:
+          - node:
+              role: prefix
+              styles:
+                typography.size: 1rem
+                typography.weight: typography.text.primary.bold.fontWeight
+                typography.color: color.text
+            relation: { cardinality: "1", slotName: prefix }
+          - node:
+              role: count
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: count }
+      relation: { cardinality: "0..*", slotName: header }
+    - node:
+        role: guide
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: guide }
+    - node:
+        role: edge
+        styles:
+          typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+      relation: { cardinality: "0..*", slotName: edge }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: row
+              edges:
+                - node:
+                    role: target
+                    styles:
+                      interaction.cursor: pointer
+                    edges:
+                      - node:
+                          uri: prism.component.entity_graph_node
+                        relation: { cardinality: "1" }
+                  relation: { cardinality: "1", slotName: target }
+          - node:
+              role: dimmed row (.is-dimmed)
+              styles:
+                appearance.opacity: 0.4
+          - node:
+              role: hidden row (.is-hidden)
+              styles:
+                layout.type: none
+      relation: { cardinality: "0..*", slotName: row }

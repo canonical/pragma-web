@@ -8,8 +8,8 @@
 
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createAllNamespacesFilter from "../../../testing/createAllNamespacesFilter.js";
-import type { LensFilter } from "../types.js";
+import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
+import type { LensFilter } from "../../types.js";
 import ExplorerControls from "./ExplorerControls.js";
 
 const NAMESPACES = [
@@ -97,5 +97,48 @@ describe("ExplorerControls", () => {
     // Canonical order, not append order — chips must not jump around
     // under the cursor as they are toggled.
     expect([...next.namespaces]).toEqual(["ds", "cs"]);
+  });
+
+  it("toggles an abstraction chip, carrying the ontologies through", () => {
+    const filter = createAllNamespacesFilter(["ds", "cs"]);
+    const { onFilterChange } = renderControls(filter);
+
+    fireEvent.click(screen.getByRole("button", { name: "Abstract" }));
+
+    const next = onFilterChange.mock.calls[0]?.[0] as LensFilter;
+    expect([...next.abstractions]).toEqual(["concrete"]);
+    expect([...next.namespaces]).toEqual(["ds", "cs"]);
+  });
+
+  it("turns the instances axis on and off, reporting it as pressed", () => {
+    const filter = createAllNamespacesFilter(["ds", "cs"]);
+    const { onFilterChange } = renderControls(filter);
+    const chip = within(
+      screen.getByRole("group", { name: "Filter by instances" }),
+    ).getByRole("button", { name: "With instances" });
+    expect(chip).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(chip);
+
+    expect(onFilterChange).toHaveBeenCalledWith({
+      ...filter,
+      withInstances: true,
+    });
+  });
+
+  it("merges a class name and passes native props to its root", () => {
+    const { container } = render(
+      <ExplorerControls
+        className="custom-class"
+        data-testid="controls"
+        filter={createAllNamespacesFilter(["ds"])}
+        namespaceLabels={NAMESPACES}
+        onFilterChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("controls")).toBe(container.firstChild);
+    expect(screen.getByTestId("controls").className).toBe(
+      "ds explorer-controls custom-class",
+    );
   });
 });

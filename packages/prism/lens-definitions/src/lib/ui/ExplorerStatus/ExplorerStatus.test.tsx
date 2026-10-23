@@ -34,4 +34,19 @@ describe("ExplorerStatus", () => {
     render(<ExplorerStatus abstract={1} total={29} visible={17} />);
     expect(screen.getByRole("figure")).toHaveAttribute("aria-live", "polite");
   });
+
+  it("merges a class name and passes native props to its root", () => {
+    render(
+      <ExplorerStatus
+        abstract={0}
+        className="custom-class"
+        data-testid="status"
+        total={2}
+        visible={1}
+      />,
+    );
+    expect(screen.getByTestId("status").className).toBe(
+      "ds explorer-status custom-class",
+    );
+  });
 });

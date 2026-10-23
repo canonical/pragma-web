@@ -7,16 +7,16 @@
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createDefinitionsPage from "../../../testing/createDefinitionsPage.js";
-import createFetchSpy from "../../../testing/createFetchSpy.js";
+import createDefinitionsPage from "../../../../testing/createDefinitionsPage.js";
+import createFetchSpy from "../../../../testing/createFetchSpy.js";
 import {
   DEFINITIONS_TEST_TIMEOUT_MS,
   UIBLOCK_TERM,
-} from "../../../testing/fixtures.js";
-import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
+} from "../../../../testing/fixtures.js";
+import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
 
 describe("DefinitionsPage at /definitions (no term)", () => {
-  it("renders the full explorer with the empty inspector, no fetch", {
+  it("renders the full explorer with nothing selected, no fetch", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
     // The captured term fixture is a superset of the term-less operation's
@@ -33,8 +33,9 @@ describe("DefinitionsPage at /definitions (no term)", () => {
     expect(
       screen.getByRole("navigation", { name: "Ontology terms" }),
     ).toBeInTheDocument();
-    // The honest empty state — an invitation, never an alert.
-    expect(screen.getByText(/Select a term/)).toBeInTheDocument();
+    // Nothing is selected: no class is ringed, no link is current.
+    expect(document.querySelector(".ring")).toBeNull();
+    expect(screen.queryByRole("link", { current: "page" })).toBeNull();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(fetchFn).not.toHaveBeenCalled();
   });
@@ -77,5 +78,20 @@ describe("DefinitionsPage's document title", () => {
     expect(document.querySelector("title")?.textContent).toBe(
       "ds:UIBlock — Definitions",
     );
+  });
+});
+
+describe("DefinitionsPage's root", () => {
+  it("labels its section by its heading, and keeps the router's search off it", () => {
+    render(
+      createDefinitionsPage(
+        undefined,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    const section = screen.getByRole("region", { name: "Definitions" });
+    expect(section.className).toBe("ds definitions-page");
+    expect(section).not.toHaveAttribute("search");
   });
 });

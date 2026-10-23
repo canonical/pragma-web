@@ -1,78 +1,72 @@
 /**
- * The explorer triptych's warm-store proof: the captured
- * `/definitions/ds%3AUIBlock` records render the rail's groups, the
- * well's node graph, and the inspector's class record WITHOUT the network
- * being consulted — with teeth, because the same render against an empty
- * store does hit the network exactly once (the one route operation).
- * The warm mount is consolidated (the full-triptych render is heavy) and
- * carries an explicit timeout for fully-parallel runs.
+ * The explorer over the captured store: the rail and the graph read one
+ * layout of the same operation, with no fetch while the store is warm, and
+ * the search box dims both.
  */
 
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createDefinitionsPage from "../../../testing/createDefinitionsPage.js";
-import createFetchSpy from "../../../testing/createFetchSpy.js";
+import createDefinitionsPage from "../../../../testing/createDefinitionsPage.js";
+import createFetchSpy from "../../../../testing/createFetchSpy.js";
 import {
   DEFINITIONS_TEST_TIMEOUT_MS,
   UIBLOCK_TERM,
-} from "../../../testing/fixtures.js";
-import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
+} from "../../../../testing/fixtures.js";
+import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
 
-/** A fetch spy that never settles: any call means "the network was hit". */
-describe("DefinitionsExplorer against a warm store", () => {
-  it("renders the triptych — rail groups, well nodes, inspector — with no fetch, selection marked", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
+describe("DefinitionsExplorer", {
+  timeout: DEFINITIONS_TEST_TIMEOUT_MS,
+}, () => {
+  it("draws the rail and the graph from the warm store, the selection current in both", () => {
     const fetchFn = createFetchSpy();
-    render(
+    const { container } = render(
       createDefinitionsPage(UIBLOCK_TERM, definitionsExplorerRecords, fetchFn),
     );
-
-    // The a11y floor: each panel announces itself.
-    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
-    expect(rail.getAttribute("data-slot")).toBe("explorer-rail");
+    const explorer = container.querySelector(".ds.definitions-explorer");
     expect(
-      screen.getByRole("complementary", { name: "Term inspector" }),
-    ).toBeInTheDocument();
-
-    // Rail: the three live ontologies, each a labelled group.
+      explorer?.querySelector(".ds.term-rail.explorer-rail"),
+    ).not.toBeNull();
+    expect(
+      explorer?.querySelector(".ds.hierarchy-well.explorer-well"),
+    ).not.toBeNull();
     for (const prefix of ["ds", "cs", "anatomy"]) {
       expect(screen.getByRole("region", { name: prefix })).toBeInTheDocument();
     }
-
-    // Well + rail: "UI Block" appears as BOTH the rail item and the
-    // well node — same term address, and both carry the router's
-    // aria-current for the selected term.
-    const uiBlockLinks = screen.getAllByRole("link", { name: "UI Block" });
-    expect(uiBlockLinks.length).toBe(2);
-    for (const link of uiBlockLinks) {
-      expect(link.getAttribute("href")).toBe("/definitions/ds%3AUIBlock");
-      expect(link.getAttribute("aria-current")).toBe("page");
-    }
-
-    // Inspector: the class record's fields.
-    expect(
-      screen.getByRole("heading", { level: 2, name: "UI Block" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/category of visual or abstract entity/),
-    ).toBeInTheDocument();
-
-    // …and the network was NEVER consulted.
+    expect(container.querySelectorAll(".desktop .node")).toHaveLength(35);
+    const current = screen
+      .getAllByRole("link", { current: "page" })
+      .map((link) => link.getAttribute("href"));
+    expect(new Set(current)).toEqual(new Set(["/definitions/ds%3AUIBlock"]));
+    expect(current.length).toBeGreaterThanOrEqual(2);
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("has teeth: the same render against an empty store fetches once", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
+  it("dims the rail and the graph as the reader searches, and keeps the raw text", () => {
+    const { container } = render(
+      createDefinitionsPage(
+        undefined,
+        definitionsExplorerRecords,
+        createFetchSpy(),
+      ),
+    );
+    const field = screen.getByRole("searchbox", { name: "Filter terms" });
+    fireEvent.change(field, { target: { value: "  Tag " } });
+    expect(field).toHaveValue("  Tag ");
+    expect(
+      container.querySelector('.desktop .node[data-id="ds:Component"]'),
+    ).toHaveClass("is-dimmed");
+    expect(
+      container.querySelector('.desktop .node[data-id="ds:Tag"]'),
+    ).not.toHaveClass("is-dimmed");
+    expect(
+      screen.getByRole("link", { name: "Component" }).closest("li"),
+    ).toHaveClass("is-dimmed");
+  });
+
+  it("suspends over a cold store and fetches the one operation", () => {
     const fetchFn = createFetchSpy();
     render(createDefinitionsPage(UIBLOCK_TERM, undefined, fetchFn));
-
     expect(screen.getByText("Loading the ontologies…")).toBeInTheDocument();
-    // The static lens marker still stands while the interior suspends.
-    expect(
-      screen.getByRole("heading", { level: 1, name: "Definitions" }),
-    ).toBeInTheDocument();
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 });

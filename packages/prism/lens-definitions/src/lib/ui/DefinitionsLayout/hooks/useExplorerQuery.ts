@@ -1,35 +1,34 @@
 import { useRouterState } from "@canonical/router-react";
 import { useLazyLoadQuery } from "react-relay";
-import type { DefinitionsExplorerQuery } from "../../../__generated__/DefinitionsExplorerQuery.graphql.js";
-import definitionsExplorerQueryNode from "../../../__generated__/DefinitionsExplorerQuery.graphql.js";
+import type { DefinitionsExplorerQuery } from "../../../../__generated__/DefinitionsExplorerQuery.graphql.js";
+import definitionsExplorerQueryNode from "../../../../__generated__/DefinitionsExplorerQuery.graphql.js";
 import {
   buildDefinitionsExplorerVariables,
   readTermParam,
-} from "../../definitionsQuery.js";
+} from "../../../definitionsQuery.js";
+import { resolveFilter } from "../../../lensFilter.js";
 import { useLensFilter } from "../../LensFilterProvider/index.js";
-import { resolveFilter } from "../../lensFilter.js";
-import type { UseStripQueryResult } from "./types.js";
+import type { UseExplorerQueryResult } from "./types.js";
 
 /**
- * Read what the strip's chips and status figure show: the explorer's own
- * operation and the shared filter resolved against the ontologies it returns.
+ * Read the explorer's operation where the layout renders, beside the
+ * routed page: the strip's chips and status figure and the inspector.
  *
- * The strip renders in the layout, beside the routed page, so nothing the
- * page holds can reach it as a prop, and data the explorer announced could
- * only arrive in an effect: the strip would render empty on the server and
- * populated on the client, a hydration mismatch. So this reads the SAME
- * operation with the SAME variables, the current term read off the route
- * exactly as the page reads it, from the store the route's `warm` filled.
- * The read is a store hit on both sides and no second request exists. It
- * resolves the filter through the same `resolveFilter` the explorer uses, so
- * the chips, the figure and the graph cannot disagree.
+ * Nothing the page holds can reach them as a prop, and data the page
+ * announced could only arrive in an effect: they would render empty on the
+ * server and populated on the client, a hydration mismatch. So this reads
+ * the SAME operation with the SAME variables, the term read off the route
+ * exactly as the page reads it, from the store the route's `warm` filled: a
+ * store hit on both sides, and no second request. It resolves the filter
+ * through the same `resolveFilter` the page uses, so the strip, the graph
+ * and the inspector cannot disagree.
  *
- * @note Impure: reads the router, the Relay store and the filter context, and
- *   suspends while the store does not hold the operation.
- * @returns The ontologies, their prefixes, and the resolved filter with its
- *   setter.
+ * @note Impure: reads the router, the Relay store and the filter context,
+ *   and suspends while the store does not hold the operation.
+ * @returns The term, the operation's data, the ontologies' prefixes and
+ *   namespaces, and the resolved filter with its setter.
  */
-export default function useStripQuery(): UseStripQueryResult {
+export default function useExplorerQuery(): UseExplorerQueryResult {
   const { match } = useRouterState();
   const term = readTermParam(
     match?.kind === "route"
@@ -43,8 +42,13 @@ export default function useStripQuery(): UseStripQueryResult {
   const { filter, setFilter } = useLensFilter();
   const prefixes = data.ontologies.map((ontology) => ontology.prefix);
   return {
-    ontologies: data.ontologies,
+    term,
+    data,
     prefixes,
+    namespaces: data.ontologies.map(({ prefix, namespace }) => ({
+      prefix,
+      namespace,
+    })),
     filter: resolveFilter(filter, prefixes),
     setFilter,
   };

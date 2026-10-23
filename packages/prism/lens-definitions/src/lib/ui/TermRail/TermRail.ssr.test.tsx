@@ -6,10 +6,10 @@
 
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import createDefinitionsPage from "../../../testing/createDefinitionsPage.js";
-import createFetchSpy from "../../../testing/createFetchSpy.js";
-import { UIBLOCK_TERM } from "../../../testing/fixtures.js";
-import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
+import createDefinitionsPage from "../../../../testing/createDefinitionsPage.js";
+import createFetchSpy from "../../../../testing/createFetchSpy.js";
+import { UIBLOCK_TERM } from "../../../../testing/fixtures.js";
+import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
 
 describe("TermRail SSR", () => {
   it("renders the groups and percent-encoded term hrefs", () => {

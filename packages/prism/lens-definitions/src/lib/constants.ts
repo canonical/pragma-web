@@ -18,6 +18,7 @@ export const ABSTRACTION_VALUES = ["abstract", "concrete"] as const;
 export const DEFAULT_LENS_FILTER: LensFilterState = {
   text: "",
   abstractions: ABSTRACTION_VALUES,
+  withInstances: false,
 };
 
 /**

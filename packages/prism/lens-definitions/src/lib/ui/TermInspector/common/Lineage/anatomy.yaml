@@ -1,0 +1,31 @@
+---
+# Lineage — a class's ancestry as one breadcrumb chain, the class itself
+# first, each ancestor a term link after a subset-of glyph, wrapping on a
+# narrow inspector; a glyph never wraps away from the link it precedes.
+# Reference: the ontology explorer's inspector lineage.
+#
+# Why not a published component: the published breadcrumbs read a path
+# from the root down; this chain reads from the class up.
+#
+# Every decision is read through a component token declared on the root
+# (`--lineage-*`), bound to the symbol named here.
+#
+# Roster namespaces (accepted and tracked): the semantic typography
+# symbol typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.lineage
+  styles:
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+  edges:
+    - node:
+        role: self
+        styles:
+          typography.weight: typography.text.primary.bold.fontWeight
+      relation: { cardinality: "1", slotName: self }
+    - node:
+        role: glyph
+        styles:
+          typography.color: color.text.muted
+          typography.whiteSpace: nowrap
+      relation: { cardinality: "0..*", slotName: glyph }

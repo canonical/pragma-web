@@ -1,284 +1,213 @@
 /**
- * The rail's contracts, driven through the real page over the captured
- * records: per-ontology Classes/Properties grouping with prefixed term
- * addresses, and — the load-bearing one — THE ASYMMETRY: the rail DIMS
- * under a filter and never HIDES, so the index stays complete and stable
- * while the graph is what disappears. The filter itself stays EPHEMERAL
- * (component state — the URL never changes while
- * filtering). Mounts are consolidated (the full-triptych render is heavy)
- * and carry explicit timeouts for fully-parallel runs.
+ * The rail over the captured store: per-ontology classes and properties
+ * as term links, the classes in the graph's rail order at their depth; it
+ * dims under every filter and never hides, and it raises the shared focus
+ * from either input modality.
  */
 
 import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { RelayEnvironmentProvider, useLazyLoadQuery } from "react-relay";
-import { describe, expect, it } from "vitest";
-import createDefinitionsPage from "../../../testing/createDefinitionsPage.js";
-import createFetchSpy from "../../../testing/createFetchSpy.js";
-import {
-  DEFINITIONS_TEST_TIMEOUT_MS,
-  UIBLOCK_TERM,
-} from "../../../testing/fixtures.js";
-import patchRecords from "../../../testing/patchRecords.js";
-import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
-import type { DefinitionsExplorerQuery } from "../../__generated__/DefinitionsExplorerQuery.graphql.js";
-import definitionsExplorerQueryNode from "../../__generated__/DefinitionsExplorerQuery.graphql.js";
-import { DEFAULT_LENS_FILTER } from "../constants.js";
-import { buildDefinitionsExplorerVariables } from "../definitionsQuery.js";
-import { definitionsRoutes } from "../routes.js";
+import { RelayEnvironmentProvider } from "react-relay";
+import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
+import { describe, expect, it, vi } from "vitest";
+import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFilter.js";
+import createFetchSpy from "../../../../testing/createFetchSpy.js";
+import { DEFINITIONS_TEST_TIMEOUT_MS } from "../../../../testing/fixtures.js";
+import patchRecords from "../../../../testing/patchRecords.js";
+import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
+import useCapturedExplorer from "../../../../testing/useCapturedExplorer.js";
+import { definitionsRoutes } from "../../routes.js";
+import type { LensFilter } from "../../types.js";
 import TermRail from "./TermRail.js";
+import type { TermRailProps } from "./types.js";
 
-/** The rail alone over the warm store, handed an empty depth map. */
-const RailWithoutDepths = () => {
-  const data = useLazyLoadQuery<DefinitionsExplorerQuery>(
-    definitionsExplorerQueryNode,
-    buildDefinitionsExplorerVariables(undefined),
-  );
+const ALL = createAllNamespacesFilter(["ds", "cs", "anatomy"]);
+
+/** The rail over the store, laid out as the explorer lays it out. */
+function Rail({
+  filter,
+  ...props
+}: Partial<TermRailProps> & { readonly filter: LensFilter }) {
+  const { data, layout } = useCapturedExplorer();
   return (
     <TermRail
-      depthByUri={new Map()}
-      filter={{ ...DEFAULT_LENS_FILTER, namespaces: ["ds"] }}
+      filter={filter}
       hoverCentre={undefined}
+      layout={layout}
       onHoverTerm={() => {}}
+      onSearchChange={() => {}}
       ontologies={data.ontologies}
+      searchText=""
+      {...props}
     />
   );
-};
+}
 
-const renderRail = (): HTMLElement => {
+/** Mount the rail over `records` at the explorer's address. */
+function renderRail(
+  props: Partial<TermRailProps> & { readonly filter?: LensFilter } = {},
+  records: RecordMap = definitionsExplorerRecords,
+): HTMLElement {
   render(
-    createDefinitionsPage(
-      UIBLOCK_TERM,
-      definitionsExplorerRecords,
-      createFetchSpy(),
-    ),
+    <RelayEnvironmentProvider
+      environment={createEnvironment({ records, fetchFn: createFetchSpy() })}
+    >
+      <RouterProvider
+        router={createStaticRouter(
+          definitionsRoutes,
+          "/definitions/ds%3AUIBlock",
+        )}
+      >
+        <Rail filter={ALL} {...props} />
+      </RouterProvider>
+    </RelayEnvironmentProvider>,
   );
   return screen.getByRole("navigation", { name: "Ontology terms" });
-};
+}
 
-describe("TermRail", () => {
-  it("groups terms per ontology with prefixed addresses; abstractness is a note, not a name", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
+/** The rail item that holds the link named `name`. */
+function itemOf(rail: HTMLElement, name: string): HTMLElement {
+  const item = within(rail).getByRole("link", { name }).closest("li");
+  if (item === null) throw new Error(`no item holds ${name}`);
+  return item;
+}
+
+describe("TermRail", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
+  it("groups the terms per ontology, each a link to its compact address", () => {
     const rail = renderRail();
-
-    // The ds group: a class link and a property link, both prefixed.
-    const dsGroup = within(rail).getByRole("region", { name: "ds" });
+    const ds = within(rail).getByRole("region", { name: "ds" });
+    expect(within(ds).getByRole("link", { name: "Component" })).toHaveAttribute(
+      "href",
+      "/definitions/ds%3AComponent",
+    );
     expect(
-      within(dsGroup)
-        .getByRole("link", { name: "Component" })
-        .getAttribute("href"),
-    ).toBe("/definitions/ds%3AComponent");
+      within(ds).getByRole("link", { name: "hasSubcomponent" }),
+    ).toHaveAttribute("href", "/definitions/ds%3AhasSubcomponent");
     expect(
-      within(dsGroup)
-        .getByRole("link", { name: "hasSubcomponent" })
-        .getAttribute("href"),
-    ).toBe("/definitions/ds%3AhasSubcomponent");
-
-    // The other two ontologies group their own terms.
-    const csGroup = within(rail).getByRole("region", { name: "cs" });
-    expect(
-      within(csGroup)
-        .getByRole("link", { name: "Code Standard" })
-        .getAttribute("href"),
-    ).toBe("/definitions/cs%3ACodeStandard");
-    const anatomyGroup = within(rail).getByRole("region", {
-      name: "anatomy",
-    });
-    expect(
-      within(anatomyGroup)
-        .getByRole("link", { name: "Named Node" })
-        .getAttribute("href"),
-    ).toBe("/definitions/anatomy%3ANamedNode");
-
-    // Abstractness rides beside the link, never inside its name.
-    const uiBlockItem = within(rail)
-      .getByRole("link", { name: "UI Block" })
-      .closest("li");
-    expect(uiBlockItem).not.toBeNull();
-    expect(uiBlockItem?.textContent).toContain("abstract");
+      within(within(rail).getByRole("region", { name: "anatomy" })).getByRole(
+        "link",
+        { name: "Named Node" },
+      ),
+    ).toHaveAttribute("href", "/definitions/anatomy%3ANamedNode");
+    expect(itemOf(rail, "hasSubcomponent").textContent).toContain("object");
   });
 
-  it("marks each class's abstraction axis — the real one — never a faked status", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
+  it("lists the classes in the graph's rail order, each at its depth", () => {
     const rail = renderRail();
-
-    // UI Block is abstract; its item renders a marker glyph carrying the
-    // abstraction axis as a modifier. This is the same distinction the
-    // graph draws (dashed border), restated honestly in the index.
-    const abstractItem = within(rail)
-      .getByRole("link", { name: "UI Block" })
-      .closest("li");
-    expect(abstractItem?.querySelector(".mark.abstract")).not.toBeNull();
-
-    // A concrete class carries the other value — the axis is total over
-    // isAbstract, never a third invented "status".
-    const concreteItem = within(rail)
-      .getByRole("link", { name: "Component" })
-      .closest("li");
-    expect(concreteItem?.querySelector(".mark")).not.toBeNull();
-    expect(concreteItem?.querySelector(".mark.abstract")).toBeNull();
+    const ds = within(rail).getByRole("region", { name: "ds" });
+    const classes = within(ds).getAllByRole("list").at(0);
+    const names = within(classes as HTMLElement)
+      .getAllByRole("link")
+      .map((link) => link.textContent);
+    expect(names.at(0)).toBe("Entity");
+    expect(names.indexOf("UI Block")).toBeLessThan(names.indexOf("Component"));
+    expect(itemOf(rail, "Entity").querySelector(".depth")?.textContent).toBe(
+      "",
+    );
+    expect(itemOf(rail, "Component").querySelector(".depth")).toHaveTextContent(
+      "···",
+    );
   });
 
-  it("shows superclass depth — a class under its parent carries a deeper indent than a root", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
+  it("marks a class's kind as the graph draws it, and its instance count", () => {
     const rail = renderRail();
-
-    // Component descends from UI Block (← Entity): it must sit DEEPER than
-    // a root. The depth is the well's own superclass measure, handed to the
-    // rail as data (the fragment cannot carry `superclass`).
-    const componentItem = within(rail)
-      .getByRole("link", { name: "Component" })
-      .closest("li");
-    const componentDepth = Number(
-      componentItem?.getAttribute("data-depth") ?? "0",
-    );
-    expect(componentDepth).toBeGreaterThan(0);
-
-    // …and the depth glyph (a monospace dot-run) is rendered,
-    // one dot per TRUE hop (the indent clamps, the glyph does not), and
-    // aria-hidden so it never enters the accessible name.
-    const glyph = componentItem?.querySelector(".depth");
-    expect(glyph?.textContent?.length ?? 0).toBeGreaterThanOrEqual(
-      componentDepth,
-    );
-    expect(glyph?.textContent?.length ?? 0).toBeGreaterThan(0);
-    expect(glyph).toHaveAttribute("aria-hidden", "true");
-
-    // A root class has no depth and shows an empty glyph cell.
-    const rootItem = within(rail)
-      .getByRole("link", { name: "Entity" })
-      .closest("li");
-    expect(rootItem).toHaveAttribute("data-depth", "0");
+    const abstract = itemOf(rail, "UI Block");
+    expect(abstract.querySelector(".mark")?.className).toBe("mark is-abstract");
+    expect(abstract.textContent).toContain("abstract");
+    const concrete = itemOf(rail, "Code Standard");
+    expect(concrete.querySelector(".mark")?.className).toBe("mark");
+    expect(concrete.querySelector(".note")?.textContent).toMatch(/^\d+$/);
   });
 
-  it("DIMS under a filter and never HIDES — the index stays complete", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
-    render(
-      createDefinitionsPage(
-        UIBLOCK_TERM,
-        definitionsExplorerRecords,
-        createFetchSpy(),
-      ),
-    );
-    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
-    const urlBefore = window.location.pathname;
-    const countAll = within(rail).getAllByRole("link").length;
-    expect(countAll).toBeGreaterThan(1);
-
-    fireEvent.change(screen.getByLabelText("Filter terms"), {
-      target: { value: "UI Block" },
-    });
-
-    // NOTHING is removed: the same number of links is still mounted, in
-    // the same document order. This is the exact behaviour the previous
-    // implementation got backwards, and the TTL contract's demand.
-    expect(within(rail).getAllByRole("link")).toHaveLength(countAll);
-    const match = within(rail).getByRole("link", { name: "UI Block" });
-    const nonMatch = within(rail).getByRole("link", { name: "Code Standard" });
-    expect(nonMatch).toBeInTheDocument();
-
-    // The non-match is DIMMED; the match is not.
-    expect(nonMatch.closest("li")).toHaveClass("is-dimmed");
-    expect(match.closest("li")).not.toHaveClass("is-dimmed");
-    // …and it is dimmed, NOT disabled. The link still works and is still
-    // focusable, so announcing it as unavailable would be a false state; the
-    // heading counts are what tell a screen reader the filter did something.
-    expect(nonMatch.closest("li")).not.toHaveAttribute("aria-disabled");
-    expect(nonMatch).not.toHaveAttribute("aria-disabled");
-
-    // The filter is view state, never address state.
-    expect(window.location.pathname).toBe(urlBefore);
-
-    // Clearing un-dims everything.
-    fireEvent.change(screen.getByLabelText("Filter terms"), {
-      target: { value: "" },
-    });
+  it("marks the selected term current", () => {
+    const rail = renderRail();
     expect(
-      within(rail).getByRole("link", { name: "Code Standard" }).closest("li"),
-    ).not.toHaveClass("is-dimmed");
+      within(rail).getByRole("link", { name: "UI Block" }),
+    ).toHaveAttribute("aria-current", "page");
   });
 
-  it("reports each group's match count in words, not only in opacity", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
-    render(
-      createDefinitionsPage(
-        UIBLOCK_TERM,
-        definitionsExplorerRecords,
-        createFetchSpy(),
-      ),
-    );
-    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
-    const dsGroup = within(rail).getByRole("region", { name: "ds" });
-    const classCount = within(dsGroup)
-      .getByRole("heading", { name: /^Classes/ })
-      .textContent?.replace("Classes", "")
-      .trim();
-    // Unfiltered: every class in the group matches.
-    expect(classCount).toMatch(/^(\d+) of \1$/);
-
-    fireEvent.change(screen.getByLabelText("Filter terms"), {
-      target: { value: "UI Block" },
-    });
-
-    // Filtered: the numerator drops, the denominator (what EXISTS) does
-    // not — the count says how many match, never how many there are.
-    const filtered = within(dsGroup)
-      .getByRole("heading", { name: /^Classes/ })
-      .textContent?.replace("Classes", "")
-      .trim();
-    expect(filtered).toBe(`1 of ${classCount?.split(" of ").at(1)}`);
-  });
-
-  it("names an unlabelled ontology and class by their compact addresses", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
-    render(
-      createDefinitionsPage(
-        UIBLOCK_TERM,
-        patchRecords(definitionsExplorerRecords, {
-          "client:root:ontologies:1": { label: null },
-          "https://ds.canonical.com/UIBlock": { label: null },
-        }),
-        createFetchSpy(),
-      ),
-    );
-    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
-    const dsGroup = within(rail).getByRole("region", { name: "ds" });
-
+  it("dims under the search and never hides, counting the matches in words", () => {
+    const rail = renderRail({ filter: { ...ALL, text: "ui block" } });
+    const ds = within(rail).getByRole("region", { name: "ds" });
+    expect(itemOf(rail, "UI Block")).not.toHaveClass("is-dimmed");
+    expect(itemOf(rail, "Code Standard")).toHaveClass("is-dimmed");
+    expect(itemOf(rail, "hasSubcomponent")).toHaveClass("is-dimmed");
     expect(
-      within(dsGroup).getByRole("link", { name: "ds:UIBlock" }),
+      within(ds).getByRole("heading", { name: /^Classes/ }).textContent,
+    ).toMatch(/^Classes1 of 20$/);
+  });
+
+  it("dims the classes a chip or the instances axis leaves out", () => {
+    const rail = renderRail({
+      filter: {
+        ...createAllNamespacesFilter(["ds", "cs"]),
+        abstractions: ["concrete"],
+        withInstances: true,
+      },
+    });
+    expect(itemOf(rail, "Named Node")).toHaveClass("is-dimmed");
+    expect(itemOf(rail, "UI Block")).toHaveClass("is-dimmed");
+    expect(itemOf(rail, "Code Standard")).not.toHaveClass("is-dimmed");
+    // A property dims with its ontology's chip.
+    const anatomy = within(rail).getByRole("region", { name: "anatomy" });
+    for (const item of within(anatomy).getAllByRole("listitem")) {
+      expect(item).toHaveClass("is-dimmed");
+    }
+  });
+
+  it("takes the hover fill when the shared focus names its term", () => {
+    const rail = renderRail({ hoverCentre: "ds:Component" });
+    expect(itemOf(rail, "Component")).toHaveClass("item is-hovered");
+    expect(itemOf(rail, "UI Block")).not.toHaveClass("is-hovered");
+  });
+
+  it("raises and clears the shared focus from the pointer and the keyboard", () => {
+    const onHoverTerm = vi.fn();
+    const rail = renderRail({ onHoverTerm });
+    const item = itemOf(rail, "Component");
+    fireEvent.mouseEnter(item);
+    fireEvent.mouseLeave(item);
+    fireEvent.focus(within(item).getByRole("link"));
+    fireEvent.blur(within(item).getByRole("link"));
+    expect(onHoverTerm.mock.calls).toEqual([
+      ["ds:Component"],
+      [undefined],
+      ["ds:Component"],
+      [undefined],
+    ]);
+  });
+
+  it("hands the search box's edits up, raw", () => {
+    const onSearchChange = vi.fn();
+    renderRail({ onSearchChange, searchText: "ui" });
+    const field = screen.getByRole("searchbox", { name: "Filter terms" });
+    expect(field).toHaveValue("ui");
+    fireEvent.change(field, { target: { value: "UI B" } });
+    expect(onSearchChange).toHaveBeenCalledWith("UI B");
+  });
+
+  it("names an unlabelled ontology and term by their compact addresses", () => {
+    const rail = renderRail(
+      {},
+      patchRecords(definitionsExplorerRecords, {
+        "client:root:ontologies:0": { label: null },
+        "client:root:ontologies:0:classes:17": { label: null },
+        "client:root:ontologies:0:properties:0": { label: null },
+      }),
+    );
+    const ds = within(rail).getByRole("region", { name: "ds" });
+    expect(
+      within(ds).getByRole("link", { name: "ds:UIBlock" }),
+    ).toBeInTheDocument();
+    expect(
+      within(ds).getByRole("link", { name: "ds:viaBlock" }),
     ).toBeInTheDocument();
   });
 
-  it("reads a class the depth map does not name as a root", {
-    timeout: DEFINITIONS_TEST_TIMEOUT_MS,
-  }, () => {
-    render(
-      <RelayEnvironmentProvider
-        environment={createEnvironment({
-          records: definitionsExplorerRecords,
-          fetchFn: createFetchSpy(),
-        })}
-      >
-        <RouterProvider
-          router={createStaticRouter(definitionsRoutes, "/definitions")}
-        >
-          <RailWithoutDepths />
-        </RouterProvider>
-      </RelayEnvironmentProvider>,
-    );
-    const rail = screen.getByRole("navigation", { name: "Ontology terms" });
-
-    expect(
-      [...rail.querySelectorAll("li[data-depth]")].map((item) =>
-        item.getAttribute("data-depth"),
-      ),
-    ).not.toContain("1");
+  it("merges a class name and passes native props to its root", () => {
+    const rail = renderRail({ className: "custom-class", id: "rail" });
+    expect(rail.className).toBe("ds term-rail custom-class");
+    expect(rail.id).toBe("rail");
   });
 });

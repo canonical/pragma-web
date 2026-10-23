@@ -1,8 +1,8 @@
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import createDefinitionsLayout from "../../../testing/createDefinitionsLayout.js";
-import createFetchSpy from "../../../testing/createFetchSpy.js";
-import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
+import createDefinitionsLayout from "../../../../testing/createDefinitionsLayout.js";
+import createFetchSpy from "../../../../testing/createFetchSpy.js";
+import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
 
 describe("DefinitionsLayout on the server", () => {
   it("server-renders the rail, the claimed strip and the canvas from a warm store", () => {
@@ -22,6 +22,7 @@ describe("DefinitionsLayout on the server", () => {
     expect(html).toContain('data-slot="explorer-controls"');
     expect(html).toContain('data-slot="explorer-status"');
     expect(html).toContain("ds:UIBlock");
+    expect(html).toContain('data-slot="explorer-inspector"');
     expect(html).toContain("<p>Routed page</p>");
     expect(fetchFn).not.toHaveBeenCalled();
   });

@@ -17,6 +17,8 @@ export interface LensFilter {
   readonly abstractions: readonly Abstraction[];
   /** Allowed ontology prefixes (`ds`, `cs`, `anatomy`). */
   readonly namespaces: readonly string[];
+  /** Whether the classes with no instances are dimmed. */
+  readonly withInstances: boolean;
 }
 
 /**

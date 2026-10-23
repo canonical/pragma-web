@@ -1,0 +1,10 @@
+---
+# Inspector — the workspace's inspector region: the term inspector over the
+# warm explorer query and the route's term. It renders no element of its
+# own.
+node:
+  uri: prism.component.inspector
+  edges:
+    - node:
+        uri: prism.component.term_inspector
+      relation: { cardinality: "1" }

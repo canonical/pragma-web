@@ -1,0 +1,177 @@
+---
+# TermInspector — the workspace's inspector: the selected term's record in
+# the explorer's section model (tags, name and address in a header, then
+# sections each under a small-caps label), the class view or the property
+# view; with no selection, the graph's overview; and an alert for a term
+# the graph does not know. One column: every row breaks where the
+# inspector's width runs out.
+# Reference: the ontology explorer's inspector (a header of tags, name and
+# address over labelled sections, references as links).
+#
+# Why not a published component: no published component is a record
+# inspector; its addresses are the published InlineCode. Its tags are its
+# own: the published Chip reads spacing tokens the styles no longer define.
+#
+# The class view and the property view are the inspector's own parts and
+# write these slots; the field list, the relation list, the lineage and
+# the overview style their own rows.
+#
+# Every decision is read through a component token declared on the root
+# (`--term-inspector-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   1rem: the term's name; the docs context has no 16px text size.
+#   1px: the hairline above each section and around each tag.
+#   999px: a tag's pill; no radius token is a pill.
+#   space.050, space.100: the gaps between tags and between links; no
+#     semantic gap is admitted inside a row.
+#
+# Roster namespaces (accepted and tracked): component.padding.block,
+# component.padding.inline, container.gap.tight, container.gap.default,
+# container.gap.loose, space.050, space.100, and the semantic typography
+# symbols.
+node:
+  uri: prism.component.term_inspector
+  styles:
+    layout.type: block
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+    typography.size: typography.text.primary.fontSize
+  edges:
+    - node:
+        role: view (the class view or the property view)
+        edges:
+          - node:
+              role: header
+              styles:
+                layout.type: flex
+                layout.direction: column
+                spacing.gap: space.050
+              edges:
+                - node:
+                    role: tags
+                    styles:
+                      layout.type: flex
+                      layout.wrap: wrap
+                      spacing.gap: space.050
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                    edges:
+                      - node:
+                          role: tag
+                          styles:
+                            spacing.internal.inline.start: space.100
+                            spacing.internal.inline.end: space.100
+                            appearance.border.width: 1px
+                            appearance.border.style: solid
+                            appearance.border.color: color.border
+                            appearance.radius: 999px
+                            typography.size: typography.text.secondary.fontSize
+                            typography.variant.caps: all-small-caps
+                            typography.color: color.text.muted
+                        relation: { cardinality: "1..2", slotName: tag }
+                  relation: { cardinality: "1", slotName: tags }
+                - node:
+                    role: name
+                    styles:
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      typography.size: 1rem
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      typography.wrap: anywhere
+                  relation: { cardinality: "1", slotName: name }
+                - node:
+                    role: address
+                    styles:
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      typography.size: typography.text.secondary.fontSize
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: address }
+            relation: { cardinality: "1", slotName: header }
+          - node:
+              role: section
+              styles:
+                spacing.external.block.start: container.gap.default
+                spacing.internal.block.start: container.gap.default
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.block.start.color: color.border.muted
+              edges:
+                - node:
+                    role: label
+                    styles:
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: container.gap.tight
+                      typography.size: typography.text.secondary.fontSize
+                      typography.weight: typography.text.secondary.fontWeight
+                      typography.variant.caps: all-small-caps
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: label }
+                - node:
+                    role: prose
+                    styles:
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                  relation: { cardinality: "0..2", slotName: prose }
+                - node:
+                    role: terms
+                    styles:
+                      layout.type: flex
+                      layout.wrap: wrap
+                      spacing.gap: space.100
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      spacing.internal.inline.start: 0
+                      layout.listStyle: none
+                  relation: { cardinality: "0..1", slotName: terms }
+                - node:
+                    role: group
+                    styles:
+                      spacing.external.block.start: container.gap.tight
+                    edges:
+                      - node:
+                          role: group label
+                          styles:
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: container.gap.tight
+                            typography.size: typography.text.secondary.fontSize
+                            typography.weight: typography.text.secondary.fontWeight
+                            typography.color: color.text.muted
+                        relation: { cardinality: "1", slotName: group-label }
+                  relation: { cardinality: "0..*", slotName: group }
+            relation: { cardinality: "1..*", slotName: section }
+          - node:
+              role: details
+              styles:
+                spacing.external.block.start: container.gap.default
+                spacing.external.block.end: 0
+              edges:
+                - node:
+                    role: key
+                    styles:
+                      spacing.external.block.start: container.gap.tight
+                      typography.size: typography.text.secondary.fontSize
+                      typography.weight: typography.text.secondary.fontWeight
+                      typography.variant.caps: all-small-caps
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1..*", slotName: key }
+                - node:
+                    role: value
+                    styles:
+                      spacing.external.inline.start: 0
+                      typography.wrap: anywhere
+                  relation: { cardinality: "1..*", slotName: value }
+            relation: { cardinality: "0..1", slotName: details }
+      relation: { cardinality: "0..1" }
+    - node:
+        uri: prism.component.graph_overview
+      relation: { cardinality: "0..1" }
+    - node:
+        role: unknown
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "0..1", slotName: unknown }

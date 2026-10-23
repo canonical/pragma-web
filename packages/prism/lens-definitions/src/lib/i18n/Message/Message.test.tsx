@@ -27,7 +27,7 @@ describe("Message", () => {
     const { container } = render(
       <Message
         elements={{ term: <code>ds:Button</code>, namespace: <code>ds</code> }}
-        id="inspector.property.address"
+        id="inspector.address"
       />,
       { wrapper },
     );

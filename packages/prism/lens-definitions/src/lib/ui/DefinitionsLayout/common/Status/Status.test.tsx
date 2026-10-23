@@ -7,9 +7,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import createFetchSpy from "../../../../../testing/createFetchSpy.js";
-import createStripHarness from "../../../../../testing/createStripHarness.js";
-import definitionsExplorerRecords from "../../../../../testing/records/definitionsExplorerRecords.js";
+import createFetchSpy from "../../../../../../testing/createFetchSpy.js";
+import createStripHarness from "../../../../../../testing/createStripHarness.js";
+import definitionsExplorerRecords from "../../../../../../testing/records/definitionsExplorerRecords.js";
 import { Controls } from "../Controls/index.js";
 import { Status } from "./index.js";
 
@@ -31,8 +31,8 @@ describe("Status", () => {
     const caption = /<figcaption class="caption">([\s\S]*?)<\/figcaption>/
       .exec(html)?.[1]
       ?.replaceAll("<!-- -->", "");
-    // 60 live classes across the four ontologies, 5 of them abstract.
-    expect(caption).toBe("60 of 60 classes · 5 abstract");
+    // 35 live classes across the three ontologies, 4 of them abstract.
+    expect(caption).toBe("35 of 35 classes · 4 abstract");
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
@@ -50,12 +50,12 @@ describe("Status", () => {
     );
 
     // Unfiltered: everything is shown, so visible === total.
-    expect(screen.getByRole("figure").textContent).toContain("60 of 60");
+    expect(screen.getByRole("figure").textContent).toContain("35 of 35");
 
     // Turn the anatomy ontology off; the count drops by exactly that
-    // ontology's 9 classes, and the denominator never moves.
+    // ontology's 12 classes, and the denominator never moves.
     fireEvent.click(screen.getByRole("button", { name: "anatomy" }));
-    expect(screen.getByRole("figure").textContent).toContain("51 of 60");
+    expect(screen.getByRole("figure").textContent).toContain("23 of 35");
   });
 
   it("reads no term from a URL the lens does not route", () => {

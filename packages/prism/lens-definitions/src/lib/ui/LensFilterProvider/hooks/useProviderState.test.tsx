@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_LENS_FILTER } from "../../constants.js";
+import { DEFAULT_LENS_FILTER } from "../../../constants.js";
 import useProviderState from "./useProviderState.js";
 
 describe("useProviderState", () => {
@@ -21,5 +21,16 @@ describe("useProviderState", () => {
     });
     expect(result.current).not.toBe(first);
     expect(result.current.filter.namespaces).toEqual(["ds"]);
+  });
+});
+
+describe("useProviderState's region", () => {
+  it("asks for no region at first, then holds the one a reader picks", () => {
+    const { result } = renderHook(() => useProviderState());
+    expect(result.current.region).toBeUndefined();
+    act(() => {
+      result.current.setRegion("cs");
+    });
+    expect(result.current.region).toBe("cs");
   });
 });

@@ -1,0 +1,84 @@
+---
+# ExplorerControls — the explorer's chip toolbar in the mode strip: one
+# fieldset per axis the graph carries per class (abstraction, ontology,
+# instances), each chip a toggle button. Where the strip is narrower than
+# the chips, the groups and their chips wrap onto further lines: every chip
+# stays whole, and the strip is as tall at a width whatever is pressed.
+# Reference: the ontology explorer's filter chips.
+#
+# Why not a published component: the published Chip is not a toggle
+# button; a pressed chip carries `aria-pressed`.
+#
+# A pressed chip takes the text colour, a border in that colour and a
+# filled surface: on and off differ by fill, never by hue alone.
+#
+# Every decision is read through a component token declared on the root
+# (`--explorer-controls-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   1px: the chip's hairline.
+#   2px: the focus ring's width and offset.
+#   999px: the chip's pill; no radius token is a pill.
+#   space.050, space.200: the gaps between chips and between groups; no
+#     semantic gap is admitted inside the strip's band.
+#
+# Roster namespaces (accepted and tracked): component.padding.block,
+# container.gap.tight, space.050, space.200, and the semantic typography
+# symbols.
+node:
+  uri: prism.component.explorer_controls
+  styles:
+    layout.type: flex
+    layout.wrap: wrap
+    layout.align: center
+    spacing.gap: space.200
+    size.min.width: 0
+  edges:
+    - node:
+        role: chip group
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: center
+          spacing.gap: space.050
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.external.inline.start: 0
+          spacing.external.inline.end: 0
+          spacing.internal.block.start: 0
+          spacing.internal.block.end: 0
+          spacing.internal.inline.start: 0
+          spacing.internal.inline.end: 0
+          appearance.border.width: 0
+          size.min.width: 0
+        edges:
+          - node:
+              role: chip
+              styles:
+                layout.type: inline-flex
+                layout.align: center
+                layout.flex.shrink: 0
+                spacing.internal.block.start: container.gap.tight
+                spacing.internal.block.end: container.gap.tight
+                spacing.internal.inline.start: component.padding.block
+                spacing.internal.inline.end: component.padding.block
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border.muted
+                appearance.border.color@selected: currentColor
+                appearance.radius: 999px
+                appearance.background: transparent
+                appearance.background@selected: color.background.layer2
+                typography.font: inherit
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+                typography.color@hover: color.text
+                typography.color@selected: color.text
+                typography.whiteSpace: nowrap
+                interaction.cursor: pointer
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: 2px
+            relation: { cardinality: "1..*", slotName: chip }
+      relation: { cardinality: "3", slotName: chip-group }

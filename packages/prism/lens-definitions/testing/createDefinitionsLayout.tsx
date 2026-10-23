@@ -4,8 +4,8 @@ import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { DefinitionsLayout } from "../src/lib/DefinitionsLayout/index.js";
 import { definitionsRoutes } from "../src/lib/routes.js";
+import { DefinitionsLayout } from "../src/lib/ui/DefinitionsLayout/index.js";
 
 /** What `createDefinitionsLayout` mounts the layout with. */
 export interface DefinitionsLayoutSetup {
