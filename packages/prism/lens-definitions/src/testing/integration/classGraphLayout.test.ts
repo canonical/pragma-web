@@ -133,7 +133,7 @@ describe("the class graph of the real ontology", () => {
 
   it("fits the phone view in its column, in rail order, two spine ports a row", () => {
     expect(measurePhone(layout)).toEqual({
-      maxX: 320,
+      maxX: 256,
       inRailOrder: true,
       collisions: 0,
       arcsThroughRows: 0,

@@ -19,7 +19,7 @@ const componentCssClassName = "ds phone-graph";
 
 /**
  * The class graph on a phone, in place of the canvas below one group of
- * columns: a column 358 units wide that the page scrolls, each namespace a
+ * columns: a column 288 units wide that the page scrolls, each namespace a
  * header row, then one row per class in rail order, indented by its depth
  * and running to a spine, the subclass structure drawn as the indent and a
  * guide, the relations as arcs right of the spine. It has no labels on its

@@ -28,7 +28,7 @@ import type {
 } from "./types.js";
 
 /**
- * Lay the class graph out for a phone: a 358px column, each region a header
+ * Lay the class graph out for a phone: a 288px column, each region a header
  * row and then one row per class in rail order on a 48px pitch, each box
  * indented 16px per depth and running to the spine, the subclass structure
  * drawn as the indent and a guide at each parent's indent, the relations

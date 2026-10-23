@@ -168,14 +168,18 @@ export const PORT_LEVELS: readonly PortLevel[] = [
   { name: "below the hub clearance", corner: 4, tick: 2, spacing: 2 },
 ];
 
-/** The phone view: a 358px column, boxes ending at the spine, arcs right of it. */
+/**
+ * The phone view: a 288px column, the well's width at 390 by 844 beside
+ * the site's one-column rail, so its 14px labels render at 14px there;
+ * boxes ending at the spine, arcs right of it.
+ */
 export const PHONE = {
-  width: 358,
-  spine: 256,
+  width: 288,
+  spine: 192,
   header: 48,
   pitch: 48,
   indent: 16,
-  arcCap: 96,
+  arcCap: 88,
   inPort: 8,
   outPort: 24,
   loop: 16,

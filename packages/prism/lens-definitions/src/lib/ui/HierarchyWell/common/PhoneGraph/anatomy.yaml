@@ -23,7 +23,7 @@
 #     as on the canvas.
 #   1rem: the namespace prefix; the docs context has no 16px text size.
 #   0.4: a dimmed class.
-#   In the layout's constants (attributes, not CSS): the 358-unit column,
+#   In the layout's constants (attributes, not CSS): the 288-unit column,
 #     the 48-unit rows, the 1px strokes and rules.
 #
 # Roster namespaces (accepted and tracked): the semantic typography
