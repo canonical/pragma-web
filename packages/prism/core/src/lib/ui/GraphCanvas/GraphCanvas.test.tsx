@@ -380,6 +380,48 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(0,0) scale(0.25)");
   });
 
+  it("opens again when a resize shrinks an unmoved camera's view below the legible zoom", () => {
+    let resize: () => void = () => undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      },
+    );
+    const opening = vi.fn((_visible: GraphBox, scale: number) => ({
+      k: 1 / scale,
+      x: 0,
+      y: 0,
+    }));
+    render(
+      <GraphCanvas label="Class graph" opening={opening} viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(opening).toHaveBeenCalledExactlyOnceWith(VIEW_BOX, 1);
+    // A larger viewport keeps the camera where it opened.
+    stubViewportSize(1600, 1200);
+    act(() => resize());
+    expect(opening).toHaveBeenCalledOnce();
+    expect(screen.getByRole("status").textContent).toBe("200%");
+    stubViewportSize(400, 300);
+    act(() => resize());
+    expect(opening).toHaveBeenLastCalledWith(VIEW_BOX, 0.5);
+    expect(readCamera()).toBe("translate(0,0) scale(2)");
+    expect(screen.getByRole("status").textContent).toBe("100%");
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
+    // Once the reader moves the camera, a resize leaves it where it is.
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    stubViewportSize(200, 150);
+    act(() => resize());
+    expect(opening).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole("status").textContent).toBe("42%");
+  });
+
   it("pans and zooms over the graph's whole bounds once Fit shows more than the viewBox", async () => {
     const bounds: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
     render(

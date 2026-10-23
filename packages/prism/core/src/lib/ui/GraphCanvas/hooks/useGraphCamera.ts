@@ -85,7 +85,9 @@ function prefersReducedMotion(): boolean {
  * It reads the zoom bucket and the percentage from the world's on-screen
  * scale, measured on the client, and re-measures when the viewport
  * resizes. The first time it measures the viewport it moves, at once, to
- * the camera `opening` chooses, if any. When `fit` changes it fits that
+ * the camera `opening` chooses, if any, and it opens again for the new size
+ * when a resize shrinks the on-screen scale below the legible zoom before
+ * anything has moved the camera since. When `fit` changes it fits that
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
  * illegible one: a box too large for the legible zoom is shown from its
@@ -203,28 +205,54 @@ export default function useGraphCamera({
     const { bounds: extent } = latest.current;
     // A new viewBox opens anew, once the viewport has been measured.
     let opened = false;
+    // Whether the camera still stands where it opened: no gesture, control
+    // or target has moved it since.
+    let unmoved = false;
+    // Whether the camera is moving to its opening, which moves nothing the
+    // reader chose.
+    let isOpening = false;
+    // The on-screen scale of the last reading, against which a resize is
+    // judged to have shrunk the view.
+    let lastScreen: number | undefined;
+    // Move the camera, at once, to where `opening` asks for the visible
+    // area and scale; nowhere when it asks for nothing. Either way the
+    // camera then stands unmoved.
+    const open = (visible: GraphBox, scale: number): boolean => {
+      const target = latest.current.opening?.(visible, scale);
+      if (target !== undefined) {
+        const [floor, ceiling] = active.scaleExtent();
+        active.scaleExtent([Math.min(floor, target.k), ceiling]);
+        isOpening = true;
+        active.transform(
+          select(svg),
+          zoomIdentity.translate(target.x, target.y).scale(target.k),
+        );
+        isOpening = false;
+      }
+      unmoved = true;
+      return target !== undefined;
+    };
     // Read the zoom's scale against the viewport's size into the bucket and
     // the percentage; each changes state only when its value changes. The
-    // first measured reading opens the camera where `opening` asks.
+    // first measured reading opens the camera where `opening` asks, and so
+    // does a resize that shrinks an unmoved camera's view below the
+    // legible zoom.
     const readScale = (): void => {
       const { scale, visible, measured } = measureViewport(
         svg,
         latest.current.viewBox,
       );
-      if (measured && !opened) {
-        opened = true;
-        const target = latest.current.opening?.(visible, scale);
-        if (target !== undefined) {
-          const [floor, ceiling] = active.scaleExtent();
-          active.scaleExtent([Math.min(floor, target.k), ceiling]);
-          active.transform(
-            select(svg),
-            zoomIdentity.translate(target.x, target.y).scale(target.k),
-          );
-          return;
-        }
-      }
       const screen = scale * current.current.k;
+      const shrunk =
+        unmoved &&
+        lastScreen !== undefined &&
+        screen < lastScreen &&
+        screen < HUBS_SCALE;
+      if (measured && !isOpening && (!opened || shrunk)) {
+        opened = true;
+        if (open(visible, scale)) return;
+      }
+      lastScreen = screen;
       setBucket(classifyZoomBucket(screen));
       setPercent(Math.round(screen * 100));
     };
@@ -249,6 +277,7 @@ export default function useGraphCamera({
         ],
       ])
       .on("zoom", (event: { readonly transform: GraphTransform }) => {
+        if (!isOpening) unmoved = false;
         current.current = event.transform;
         group.setAttribute("transform", event.transform.toString());
         readScale();
