@@ -3,13 +3,18 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* A subgrid of the shell over every column: the strip row and the body
-   * row, and a colophon row only when there is a colophon, so a document
-   * without one keeps no empty track and no gutter under its canvas. Its
-   * gap is the grid's gutter on both axes, the shell's own, so the strip,
-   * the body and the colophon sit one gutter apart. */
+  /* A subgrid of the shell over every column: the body row, with a strip
+   * row above it and a colophon row under it only when there is a strip
+   * or a colophon, so a document without one keeps no empty track and no
+   * gutter beside its canvas. Its gap is the grid's gutter on both axes,
+   * the shell's own, so the strip, the body and the colophon sit one
+   * gutter apart. */
   .ds.document-layout {
     --document-layout-gap: var(--grid-gutter);
+    --document-layout-bleed: calc(-1 * var(--grid-gutter));
+    --document-layout-colophon-padding-block: var(--component-padding-block);
+    --document-layout-colophon-divider-width: 1px;
+    --document-layout-colophon-divider-color: var(--color-border-muted);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -22,6 +27,15 @@
   /* With a colophon, a third row under the body holds it. */
   .ds.document-layout:has(> .colophon) {
     grid-template-rows: min-content minmax(0, 1fr) min-content;
+  }
+
+  /* With no strip, the body is the first row, flush with the top. */
+  .ds.document-layout:not(:has(> .strip)) {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .ds.document-layout:not(:has(> .strip)):has(> .colophon) {
+    grid-template-rows: minmax(0, 1fr) min-content;
   }
 
   /* The rail's first two columns, on every row; it scrolls on its own. */
@@ -47,9 +61,26 @@
     overflow: auto;
   }
 
+  .ds.document-layout:not(:has(> .strip)) > .canvas {
+    grid-row: 1;
+  }
+
+  /* The colophon takes the last row, whichever rows there are. Its band
+   * bleeds across the gutter at its start to meet the rail's border, and
+   * the same padding puts its content back on the canvas's first column
+   * line. Its end is the last column line, the viewport's edge on a shell
+   * with no outer margin, so it takes no end padding and its content ends
+   * on that line. */
   .ds.document-layout > .colophon {
     grid-column: 3 / -1;
-    grid-row: 3;
+    grid-row: -2 / -1;
+    padding-block: var(--document-layout-colophon-padding-block);
+    margin-inline-start: var(--document-layout-bleed);
+    padding-inline-start: var(--document-layout-gap);
+    padding-inline-end: 0;
+    border-block-start-width: var(--document-layout-colophon-divider-width);
+    border-block-start-style: solid;
+    border-block-start-color: var(--document-layout-colophon-divider-color);
   }
 
   /* Below one group the rail spans a single column, and every other

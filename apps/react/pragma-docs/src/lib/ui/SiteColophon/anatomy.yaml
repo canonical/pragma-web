@@ -1,0 +1,26 @@
+---
+# SiteColophon — the docs site's colophon: the footer a lens layout places
+# in its colophon region, under the canvas, carrying the site's one-line
+# statement. It draws no band of its own: the layout's colophon region draws
+# the rule, bleeds it to the rail's border and insets the content onto the
+# canvas's column lines. The statement is set in the secondary size and the
+# muted colour, and sits flush in the region's padding. No published
+# component is a site footer of one line, so it stays bespoke.
+#
+# Every decision is read through a component token declared on the root
+# (`--site-colophon-*`), bound to the symbol named here.
+#
+# Roster namespaces (accepted and tracked): the semantic typography symbol
+# typography.text.secondary.fontSize.
+node:
+  uri: docs.component.site_colophon
+  styles:
+    typography.size: typography.text.secondary.fontSize
+    typography.color: color.text.muted
+  edges:
+    - node:
+        role: statement
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "1", slotName: statement }

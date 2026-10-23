@@ -3,8 +3,14 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* A page of the canvas: it spans every column of the page grid. */
+  /* A page of the canvas: it spans every column of the page grid. The
+   * not-found route renders no strip, so the canvas starts at the
+   * viewport's top; the page starts one gutter under it, where a page
+   * under a strip starts under the strip's rule. */
   .ds.not-found-page {
+    --not-found-page-spacing-block-start: var(--grid-gutter);
+
     grid-column: 1 / -1;
+    margin-block-start: var(--not-found-page-spacing-block-start);
   }
 }

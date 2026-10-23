@@ -12,6 +12,8 @@
  * - no grid template is authored: every `grid-template-columns` is a
  *   subgrid, so the index lands on the same ruler as the site's shell;
  * - no theme is named: a site's theme activates through its own classes;
+ * - every component token is declared on its component's root class, never
+ *   on `:root`, so a token re-valued for one component re-values no other;
  * - every component token reads another token, save the ones named here that
  *   hold the lens's own value where the design system has no semantic token;
  * - the tokens read from outside the lens are exactly the ones named here,
@@ -101,22 +103,29 @@ function listExternalTokens(css: string): string[] {
     .filter((name) => !LENS_PROPERTY.test(name));
 }
 
-/** List the component tokens a stylesheet's `:root` declares with no `var()`. */
+/** List the component tokens a stylesheet declares with no `var()`. */
 function listLiteralTokens(css: string): string[] {
-  const root = css.match(/:root\s*\{([^}]*)\}/)?.at(1) ?? "";
-  return [...root.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
+  return [...css.matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)]
     .filter((match) => !(match.at(2) ?? "").includes("var("))
     .map((match) => match.at(1) ?? "");
 }
 
+/** List the custom properties a stylesheet's `:root` blocks declare. */
+function listRootTokens(css: string): string[] {
+  return [...css.matchAll(/:root\s*\{([^}]*)\}/g)].flatMap((block) =>
+    [...(block.at(1) ?? "").matchAll(/(--[a-z0-9-]+)\s*:/g)].map(
+      (match) => match.at(1) ?? "",
+    ),
+  );
+}
+
 /**
- * List the rule declarations, outside the `:root` component tokens, that
- * hold a unit-bearing literal, as `property: value`, the unthemable
- * declarations and literals left out.
+ * List the rule declarations, the component tokens left out, that hold a
+ * unit-bearing literal, as `property: value`, the unthemable declarations
+ * and literals left out.
  */
 function listRawDecisions(css: string): string[] {
-  const rules = css.replace(/:root\s*\{[^}]*\}/, "");
-  return [...rules.matchAll(/(-{0,2}[a-z][a-z0-9-]*)\s*:\s*([^;{}]+);/g)]
+  return [...css.matchAll(/(-{0,2}[a-z][a-z0-9-]*)\s*:\s*([^;{}]+);/g)]
     .filter((match) => !(match.at(1) ?? "").startsWith("--"))
     .map(
       (match) =>
@@ -192,6 +201,10 @@ describe("the lens stylesheets", () => {
       expect(css, file).not.toMatch(/\.(?:dark|light)\b/);
       expect(css, file).not.toMatch(/prefers-color-scheme/);
     }
+  });
+
+  it("declare each component's tokens on its root, never on :root", () => {
+    expect(files.flatMap((file) => listRootTokens(readCss(file)))).toEqual([]);
   });
 
   it("bind every component token to another token", () => {

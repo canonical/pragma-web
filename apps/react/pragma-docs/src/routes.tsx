@@ -16,9 +16,9 @@ import {
 import { marketingLayout, marketingRoutes } from "#domains/marketing";
 import { playgroundLayout, playgroundRoutes } from "#domains/playground";
 import { withAuth } from "#lib/authGuard";
-import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import { NotFoundPage } from "#lib/ui";
+import { SiteColophon } from "#lib/ui/SiteColophon";
 
 /**
  * The page every URL no route matches renders, at its own `/not-found`: the
