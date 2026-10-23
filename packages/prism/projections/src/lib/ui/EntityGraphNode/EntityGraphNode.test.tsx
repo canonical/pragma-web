@@ -91,10 +91,10 @@ describe("EntityGraphNode", () => {
       const node = renderNode(
         <EntityGraphNode href="#layout" title="Layout" />,
       );
-      const link = node.querySelector("a");
+      const link = node.querySelector(".title > a.link");
       expect(link?.namespaceURI).toBe("http://www.w3.org/2000/svg");
       expect(link?.getAttribute("href")).toBe("#layout");
-      expect(link?.querySelector(".title")?.textContent).toBe("Layout");
+      expect(link?.textContent).toBe("Layout");
     });
 
     it("links only the title, through the LinkComponent it is given", () => {
@@ -109,6 +109,7 @@ describe("EntityGraphNode", () => {
       const links = node.querySelectorAll("a");
       expect(links).toHaveLength(1);
       expect(links.item(0).hasAttribute("data-router")).toBe(true);
+      expect(links.item(0).getAttribute("class")).toBe("link");
       expect(links.item(0).textContent).toBe("Danger");
     });
   });

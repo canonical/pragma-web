@@ -26,8 +26,9 @@ const CONTEXT_Y = TITLE_Y + GRAPH_NODE_LINE;
  * draws hundreds of them under pan and zoom; it goes inside an `<svg>`, and
  * the graph places it with a transform on it or on a group around it.
  *
- * With an `href` the title links to the entity's home through
- * `LinkComponent`, an SVG link; without one it is inert text. A line longer
+ * With an `href` the title's text links to the entity's home through
+ * `LinkComponent`, an SVG link inside the title's `<text>`; without one it
+ * is inert text. A line longer
  * than the box is clipped at the inner inset. It renders only the slots it
  * is given and reads no context, so it renders anywhere in an SVG.
  *
@@ -65,7 +66,13 @@ export default function EntityGraphNode({
       x={TEXT_X}
       y={TITLE_Y}
     >
-      {title}
+      {href === undefined ? (
+        title
+      ) : (
+        <LinkComponent className="link" href={href}>
+          {title}
+        </LinkComponent>
+      )}
     </text>
   );
   return (
@@ -98,11 +105,7 @@ export default function EntityGraphNode({
         y={GRAPH_NODE_STROKE / 2}
       />
       <g clipPath={`url(#${clipId})`}>
-        {href === undefined ? (
-          titleText
-        ) : (
-          <LinkComponent href={href}>{titleText}</LinkComponent>
-        )}
+        {titleText}
         {kindSlot === undefined && locationSlot === undefined ? null : (
           <text
             className="context"

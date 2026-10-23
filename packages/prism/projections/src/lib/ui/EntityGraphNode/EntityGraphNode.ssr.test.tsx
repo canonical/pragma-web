@@ -12,7 +12,7 @@ describe("EntityGraphNode SSR", () => {
       </svg>,
     );
     expect(html).toContain('<g class="ds entity-graph-node">');
-    expect(html).toContain('<a href="#layout"><text class="title"');
+    expect(html).toContain('<a class="link" href="#layout">Layout</a></text>');
     expect(html).not.toContain("foreignObject");
   });
 

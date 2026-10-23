@@ -19,6 +19,11 @@
 # node's own 24-unit lines. A long line is clipped at the inner inset, since
 # SVG text does not truncate.
 #
+# A linked title is an SVG link inside the title's `<text>`, and reads as
+# the title, as every representation's link does: the text's colour,
+# underlined on hover, its focus ring drawn inside it since the node clips
+# its lines.
+#
 # Every decision is read through a component token declared on the root
 # (`--entity-graph-node-*`), bound to the symbol named here.
 #
@@ -26,6 +31,9 @@
 #   GRAPH_NODE_HEIGHT 50, GRAPH_NODE_LINE 24, GRAPH_NODE_INSET 8,
 #   GRAPH_NODE_STROKE 1 and the default GRAPH_NODE_WIDTH 192, in SVG user
 #   units: SVG geometry is attributes, not CSS.
+#   --entity-graph-node-focus-ring-width: 2px,
+#   --entity-graph-node-focus-ring-offset: -2px
+#                                      the link's ring, drawn inside it.
 #
 # Roster namespaces (accepted and tracked): the semantic typography symbols
 # typography.text.primary.fontSize and
@@ -49,6 +57,18 @@ node:
         role: title
         styles:
           typography.weight: typography.text.primary.bold.fontWeight
+        edges:
+          - node:
+              role: link
+              styles:
+                typography.color: inherit
+                typography.decoration: none
+                typography.decoration@hover: underline
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
+            relation: { cardinality: "0..1", slotName: link }
       relation: { cardinality: "1", slotName: title }
     - node:
         role: context
