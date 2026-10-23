@@ -1,4 +1,5 @@
 import {
+  GRID_UNIT,
   LABEL_BLOCKED_COSINE,
   LABEL_CHARACTER_WIDTH,
   LABEL_DIRECTIONS,
@@ -71,21 +72,42 @@ const isCrossing = (box: Box, segment: TrackSegment): boolean => {
 };
 
 /**
- * Place a name in one direction from its mark: the anchor sits one gap
- * beyond the mark's edge (and half a line further above or below, so the
- * text clears the mark), and the text runs away from the mark.
+ * Snap a coordinate onto the lattice, away from the mark along the
+ * direction's axis (up when `direction` is positive, down when negative),
+ * and to the nearest dot across it.
+ */
+const snapToLattice = (value: number, direction: number): number => {
+  const units = value / GRID_UNIT;
+  const snapped =
+    direction > 0
+      ? Math.ceil(units)
+      : direction < 0
+        ? Math.floor(units)
+        : Math.round(units);
+  return snapped * GRID_UNIT;
+};
+
+/**
+ * Place a name in one direction from its mark: the anchor sits on the first
+ * lattice dot at least one gap beyond the mark's edge (and half a line
+ * further above or below, so the text clears the mark), and the text runs
+ * away from the mark.
  */
 const placeInDirection = (
   mark: MarkBox,
   direction: DrawingPoint,
   width: number,
 ): LabelPlacement => {
-  const x =
-    mark.x + mark.width / 2 + direction.x * (mark.width / 2 + LABEL_GAP);
-  const y =
+  const x = snapToLattice(
+    mark.x + mark.width / 2 + direction.x * (mark.width / 2 + LABEL_GAP),
+    direction.x,
+  );
+  const y = snapToLattice(
     mark.y +
-    mark.height / 2 +
-    direction.y * (mark.height / 2 + LABEL_GAP + LABEL_SIZE / 2);
+      mark.height / 2 +
+      direction.y * (mark.height / 2 + LABEL_GAP + LABEL_SIZE / 2),
+    direction.y,
+  );
   const anchor = direction.x > 0 ? "start" : direction.x < 0 ? "end" : "middle";
   const left =
     anchor === "start" ? x : anchor === "end" ? x - width : x - width / 2;

@@ -20,10 +20,18 @@
 # The drawing is an item of the canvas's page, a subgrid, so it spans every
 # column of it and fills its height.
 #
+# Under the drawing lies the map's lattice, FigJam style: a 1-unit dot every
+# 16 units, an SVG pattern in the drawing's own space, so it scales with it.
+# Every station, interchange capsule, line vertex and name anchor sits on a
+# dot: the dataset's diagram positions are lattice units. Until prism-core's
+# GraphCanvas owns the lattice, the fit and the pan and zoom, the map draws
+# it itself.
+#
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)  below two groups the names hide: at
 #     that size they would render under 12px. Each mark keeps its name as
-#     its accessible title.
+#     its accessible title. The lattice hides too: the drawing is scaled
+#     below 0.75 there, and its dots would blur into a tint.
 #
 # Every decision is read through a component token declared on the root
 # (`--schematic-map-*`), bound to the symbol named here.
@@ -31,6 +39,8 @@
 # Token ledger:
 #   appearance.outline.width@focus 2px on a station: no semantic stroke
 #     thickness token.
+#   appearance.opacity 0.5 on the lattice: no opacity token; the dots read
+#     as a ground under the drawing, not as marks.
 node:
   uri: metro.component.schematic_map
   styles:
@@ -44,6 +54,14 @@ node:
         role: title
         # the <svg>'s <title>, its accessible name
       relation: { cardinality: "1" }
+    - node:
+        role: lattice
+        # a <rect> over the viewBox, filled with the dot pattern; its dots
+        # fill with currentColor
+        styles:
+          typography.color: color.border
+          appearance.opacity: 0.5
+      relation: { cardinality: "1", slotName: lattice }
     - node:
         role: line track
         # one <path> per drawn track, stroked in its line's colour

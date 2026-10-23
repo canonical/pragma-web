@@ -2,7 +2,13 @@
 
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useId } from "react";
-import { LABEL_SIZE, MARK_INSET, STROKE_WIDTH } from "../geometry/index.js";
+import {
+  GRID_UNIT,
+  LABEL_SIZE,
+  LATTICE_DOT_RADIUS,
+  MARK_INSET,
+  STROKE_WIDTH,
+} from "../geometry/index.js";
 import type { SchematicMapProps } from "./types.js";
 import "./styles.css";
 
@@ -10,10 +16,13 @@ const componentCssClassName = "ds schematic-map";
 
 /**
  * The network as an octilinear diagram, drawn as SVG on the server from the
- * geometry module's output: one track per line in its own colour, lines
- * sharing a stretch side by side, and each station a dot or a capsule with
- * its name, linking to the station's page in the network lens. It scales to
- * fill its region, the whole network in view.
+ * geometry module's output, over a lattice of dots 16 units apart: one track
+ * per line in its own colour, lines sharing a stretch side by side, and each
+ * station a dot or a capsule with its name, linking to the station's page in
+ * the network lens. Every station, vertex and name anchor sits on a lattice
+ * dot. The pattern draws a quarter dot in each corner of its tile, so the
+ * tiles meet in whole dots on the lattice's points. It scales to fill its
+ * region, the whole network in view.
  *
  * Each station mark is where `EntityGraphNode` will render; until then it
  * is the map's own, marked `data-placeholder="EntityGraphNode"`.
@@ -30,6 +39,8 @@ export default function SchematicMap({
 }: SchematicMapProps): ReactElement {
   const router = useRouter();
   const titleId = useId();
+  const latticeId = useId();
+  const [minX, minY, width, height] = geometry.viewBox.split(" ").map(Number);
   return (
     <svg
       {...props}
@@ -39,6 +50,34 @@ export default function SchematicMap({
       viewBox={geometry.viewBox}
     >
       <title id={titleId}>{title}</title>
+      <defs>
+        <pattern
+          height={GRID_UNIT}
+          id={latticeId}
+          patternUnits="userSpaceOnUse"
+          width={GRID_UNIT}
+        >
+          {[0, GRID_UNIT].flatMap((cy) =>
+            [0, GRID_UNIT].map((cx) => (
+              <circle
+                cx={cx}
+                cy={cy}
+                fill="currentColor"
+                key={`${cx} ${cy}`}
+                r={LATTICE_DOT_RADIUS}
+              />
+            )),
+          )}
+        </pattern>
+      </defs>
+      <rect
+        className="lattice"
+        fill={`url(#${latticeId})`}
+        height={height}
+        width={width}
+        x={minX}
+        y={minY}
+      />
       {geometry.tracks.map((track) => (
         <path
           d={track.path}

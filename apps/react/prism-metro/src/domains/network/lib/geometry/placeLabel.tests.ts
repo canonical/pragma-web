@@ -1,11 +1,16 @@
 // @vitest-environment node
 
 import { describe, expect, it } from "vitest";
-import { LABEL_CHARACTER_WIDTH, LABEL_GAP, LABEL_SIZE } from "./constants.js";
+import {
+  GRID_UNIT,
+  LABEL_CHARACTER_WIDTH,
+  LABEL_GAP,
+  LABEL_SIZE,
+} from "./constants.js";
 import placeLabel from "./placeLabel.js";
 import type { DrawingPoint, MarkBox } from "./types.js";
 
-/** A four-unit-square mark centred on (100, 50), for a station named `title`. */
+/** An eight-unit-square mark centred on the dot (96, 48), for a station named `title`. */
 const makeMark = (title = "Kiln"): MarkBox => ({
   stop: {
     uri: "urn:kiln",
@@ -15,8 +20,8 @@ const makeMark = (title = "Kiln"): MarkBox => ({
     position: { x: 0, y: 0 },
   },
   shape: "dot",
-  x: 96,
-  y: 46,
+  x: 92,
+  y: 44,
   width: 8,
   height: 8,
   radius: 4,
@@ -36,30 +41,47 @@ const DIAGONALS = [
 const EVERY_DIRECTION = [EAST, WEST, NORTH, SOUTH, ...DIAGONALS];
 
 describe("placeLabel", () => {
-  it("puts the name east, starting one gap past the mark", () => {
+  it("puts the name east, on the first dot a gap past the mark", () => {
+    // 96 + 4 + 2 = 102, so the first dot east is 112.
     expect(placeLabel(makeMark(), [WEST], [])).toEqual({
-      x: 104 + LABEL_GAP,
-      y: 50,
+      x: 112,
+      y: 48,
       anchor: "start",
       box: {
-        x: 104 + LABEL_GAP,
-        y: 50 - LABEL_SIZE / 2,
+        x: 112,
+        y: 48 - LABEL_SIZE / 2,
         width: WIDTH,
         height: LABEL_SIZE,
       },
     });
   });
 
-  it("puts the name west, ending at the mark, when a track leaves east", () => {
+  it("puts the name west, ending on a dot, when a track leaves east", () => {
+    // 96 - 4 - 2 = 90, so the first dot west is 80.
     const label = placeLabel(makeMark(), [EAST], []);
-    expect(label).toMatchObject({ x: 96 - LABEL_GAP, anchor: "end" });
-    expect(label.box.x).toBeCloseTo(96 - LABEL_GAP - WIDTH);
+    expect(label).toMatchObject({ x: 80, y: 48, anchor: "end" });
+    expect(label.box.x).toBeCloseTo(80 - WIDTH);
   });
 
   it("centres the name above a station on a horizontal track, clear of it", () => {
     const label = placeLabel(makeMark(), [EAST, WEST], []);
-    expect(label.anchor).toBe("middle");
-    expect(label.box.y + label.box.height).toBe(46 - LABEL_GAP);
+    // 48 - 4 - 2 - 6.5 = 35.5, so the first dot north is 32.
+    expect(label).toMatchObject({ x: 96, y: 32, anchor: "middle" });
+    expect(label.box.y + label.box.height).toBeLessThanOrEqual(44 - LABEL_GAP);
+  });
+
+  it("anchors every name on a lattice dot", () => {
+    for (const tracks of [
+      [],
+      [WEST],
+      [EAST],
+      [EAST, WEST],
+      [EAST, WEST, NORTH],
+    ]) {
+      const { x, y } = placeLabel(makeMark(), tracks, []);
+      expect(Math.abs(x % GRID_UNIT)).toBe(0);
+      expect(Math.abs(y % GRID_UNIT)).toBe(0);
+    }
   });
 
   it("treats a track within 22.5° of a direction as blocking it", () => {

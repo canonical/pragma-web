@@ -7,6 +7,7 @@ import {
   ROUTED_STATION_COUNT,
 } from "../../../../../testing/fixtures.js";
 import buildNetworkGeometry from "./buildNetworkGeometry.js";
+import { GRID_UNIT } from "./constants.js";
 import type { Box, StationMark, Track } from "./types.js";
 
 /** Whether two boxes overlap. */
@@ -68,6 +69,15 @@ describe("buildNetworkGeometry", () => {
         expect(isOverlapping(mark.label.box, other)).toBe(false);
         expect(isOverlapping(mark.label.box, other.label.box)).toBe(false);
       }
+    }
+  });
+
+  it("sits every station and every name's anchor on a lattice dot", () => {
+    for (const mark of geometry.marks) {
+      expect((mark.x + mark.width / 2) % GRID_UNIT).toBeCloseTo(0);
+      expect((mark.y + mark.height / 2) % GRID_UNIT).toBeCloseTo(0);
+      expect(Math.abs(mark.label.x % GRID_UNIT)).toBe(0);
+      expect(Math.abs(mark.label.y % GRID_UNIT)).toBe(0);
     }
   });
 

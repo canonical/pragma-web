@@ -2,8 +2,12 @@
 // They size the drawing, not the page: the SVG scales to its region, so
 // none of them is a CSS length.
 
-/** User units per grid unit of a stop's diagram position. */
-export const GRID_UNIT = 24;
+/**
+ * User units per grid unit of a stop's diagram position: the map's lattice,
+ * a dot every 16 units, on which every station, line vertex and label
+ * anchor sits.
+ */
+export const GRID_UNIT = 16;
 
 /** The distance between the centres of two tracks drawn side by side. */
 export const TRACK_SPACING = 6;
@@ -20,15 +24,22 @@ export const INTERCHANGE_RADIUS = 6;
 /** The width of a mark's outline: how far its fill sits inside its edge. */
 export const MARK_INSET = 1.5;
 
-/** The gap between a mark's edge and its station's name. */
-export const LABEL_GAP = 6;
+/**
+ * The least gap between a mark's edge and its station's name. Names snap
+ * outward to the next lattice dot, so the gap stays small enough that the
+ * next dot is the one beside the mark.
+ */
+export const LABEL_GAP = 2;
 
 /**
- * A station name's font size. The drawing is about 900 units wide, so in a
+ * A station name's font size. The drawing is about 650 units wide, so in a
  * canvas of 680 pixels, its narrowest while the map shows names (two groups
  * of columns), a name renders at no less than 12 pixels.
  */
-export const LABEL_SIZE = 17;
+export const LABEL_SIZE = 13;
+
+/** The radius of a lattice dot: a dot one unit across. */
+export const LATTICE_DOT_RADIUS = 0.5;
 
 /**
  * A name's estimated width per character, as a fraction of its font size:

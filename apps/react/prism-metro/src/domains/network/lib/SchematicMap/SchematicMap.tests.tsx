@@ -52,6 +52,20 @@ describe("SchematicMap", () => {
     expect(tannery).toHaveAttribute("data-placeholder", "EntityGraphNode");
   });
 
+  it("lays the lattice under the drawing, over the whole viewBox", () => {
+    const { container } = renderWithSite(
+      <SchematicMap geometry={GEOMETRY} title="The network" />,
+    );
+    const pattern = container.querySelector("pattern");
+    expect(pattern).toHaveAttribute("patternUnits", "userSpaceOnUse");
+    expect(pattern).toHaveAttribute("width", "16");
+    const lattice = container.querySelector("rect.lattice");
+    expect(lattice?.getAttribute("fill")).toBe(`url(#${pattern?.id})`);
+    const [minX, , width] = GEOMETRY.viewBox.split(" ");
+    expect(lattice).toHaveAttribute("x", minX);
+    expect(lattice).toHaveAttribute("width", width);
+  });
+
   it("names each station at its placed anchor", () => {
     const { container } = renderWithSite(
       <SchematicMap geometry={GEOMETRY} title="The network" />,
