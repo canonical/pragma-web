@@ -152,7 +152,7 @@ export default function CommandPaletteSearch({
    *   actions in the field, and clicks the highlighted option.
    */
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
-    const step = ARROW_STEPS[event.key];
+    const step = ARROW_STEPS.get(event.key);
     if (step !== undefined && active !== undefined) {
       event.preventDefault();
       setHighlighted((active.index + step + results.length) % results.length);
