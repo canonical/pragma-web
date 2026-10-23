@@ -59,7 +59,9 @@ describe("HiddenEvents component", () => {
   describe("Renders", () => {
     it("hidden events number", async () => {
       const page = await render(Component, { ...baseProps, numHidden: 888 });
-      await expect.element(componentLocator(page)).toHaveTextContent("888");
+      await expect
+        .element(componentLocator(page))
+        .toHaveTextContent("888 hidden");
     });
 
     describe("Links", () => {
