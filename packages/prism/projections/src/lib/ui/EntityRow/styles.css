@@ -15,7 +15,8 @@
     /* The matrix's 24px line, which every representation shares. */
     --entity-row-line-height: var(--space-300);
     --entity-row-location-color: var(--color-text-muted);
-    --entity-row-identifier-vertical-align: top;
+    --entity-row-identifier-vertical-align: baseline;
+    --entity-row-identifier-line-height: 0;
     --entity-row-meta-color: var(--color-text-muted);
     /* The ring sits inside the title, since the identity clips. */
     --entity-row-focus-ring-width: 2px;
@@ -64,12 +65,12 @@
     color: var(--entity-row-location-color);
   }
 
-  /* An identifier sets the monospace face on the row's line: its box is the
-   * line's, aligned to the line's top, so the face's other metrics never
-   * grow the line. */
+  /* An identifier sets the monospace face on the row's line and stands on
+   * the sans text's baseline: its inline box takes no height, so the face's
+   * other metrics never grow the line. */
   .ds.entity-row .identifier {
     vertical-align: var(--entity-row-identifier-vertical-align);
-    line-height: var(--entity-row-line-height);
+    line-height: var(--entity-row-identifier-line-height);
   }
 
   .ds.entity-row .meta {

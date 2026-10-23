@@ -23,7 +23,8 @@
       --typography-text-primary-smallcaps-letter-spacing
     );
     --entity-command-vital-color: var(--color-text-muted);
-    --entity-command-identifier-vertical-align: top;
+    --entity-command-identifier-vertical-align: baseline;
+    --entity-command-identifier-line-height: 0;
     /* The ring sits inside the title, which clips. */
     --entity-command-focus-ring-width: 2px;
     --entity-command-focus-ring-offset: -2px;
@@ -100,11 +101,11 @@
     white-space: nowrap;
   }
 
-  /* An identifier sets the monospace face on the row's line: its box is the
-   * line's, aligned to the line's top, so the face's other metrics never
-   * grow the line. */
+  /* An identifier sets the monospace face on the row's line and stands on
+   * the sans text's baseline: its inline box takes no height, so the face's
+   * other metrics never grow the line. */
   .ds.entity-command .identifier {
     vertical-align: var(--entity-command-identifier-vertical-align);
-    line-height: var(--entity-command-line-height);
+    line-height: var(--entity-command-identifier-line-height);
   }
 }
