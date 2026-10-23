@@ -112,9 +112,12 @@ describe("the Definitions lens", () => {
     for (const chip of chips) {
       expect(chip.getAttribute("href")).toMatch(/^\/stations\/metro%3A[\w-]*$/);
     }
+    // The inspector shows the first page of instances in IRI order, which
+    // Central Exchange is on and Northgate, past the first page, is not.
     expect(
       chips.some(
-        (chip) => chip.getAttribute("href") === "/stations/metro%3Anorthgate",
+        (chip) =>
+          chip.getAttribute("href") === "/stations/metro%3Acentral-exchange",
       ),
     ).toBe(true);
   });

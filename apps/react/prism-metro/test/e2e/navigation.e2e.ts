@@ -2,11 +2,12 @@
 
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
 /**
- * The lenses in a real browser, end to end: the metro graph in its own
- * process, each server-rendering web cell pointed at it, and Chromium reading
- * the pages. What is asserted is what a reader sees: a click on an index
- * entry opens its page without loading a new document, Back returns to the
- * index, and every page hydrates without a console error.
+ * The landing and the lenses in a real browser, end to end: the metro graph
+ * in its own process, each server-rendering web cell pointed at it, and
+ * Chromium reading the pages. What is asserted is what a reader sees: a
+ * click on a door of the landing or on an index entry opens its page without
+ * loading a new document, the rail's brand leads back to the landing, Back
+ * returns to the index, and every page hydrates without a console error.
  */
 import type { Browser, Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
@@ -39,8 +40,10 @@ const NORTHGATE_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
 /** The line page a click on the lines index opens. */
 const CIRCLE_LINE_PATH = `/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`;
 
-/** Every route kind of each lens, which must all hydrate silently. */
+/** The landing and every route kind of each lens, which must all hydrate
+ * silently. */
 const HYDRATED_PATHS = [
+  "/",
   "/stations",
   "/lines",
   NORTHGATE_PATH,
@@ -124,20 +127,29 @@ const loadPage = async (page: Page, base: string, path: string) => {
 };
 
 /**
+ * Mark the current document, then follow the first link `selector` finds,
+ * and wait for the destination's level-1 heading.
+ *
+ * @note Impure: drives the tab.
+ */
+const followLink = async (page: Page, selector: string, title: string) => {
+  await page.evaluate((marker) => {
+    Reflect.set(window, marker, true);
+  }, DOCUMENT_MARKER);
+  await page.locator(selector).first().click();
+  await page
+    .getByRole("heading", { level: 1, name: title })
+    .waitFor({ timeout: CLICK_SETTLE_MS });
+};
+
+/**
  * Mark the current document, then follow the index entry linking to
  * `href`, and wait for the destination's level-1 heading.
  *
  * @note Impure: drives the tab.
  */
-const followIndexEntry = async (page: Page, href: string, title: string) => {
-  await page.evaluate((marker) => {
-    Reflect.set(window, marker, true);
-  }, DOCUMENT_MARKER);
-  await page.locator(`a[href="${href}"]`).first().click();
-  await page
-    .getByRole("heading", { level: 1, name: title })
-    .waitFor({ timeout: CLICK_SETTLE_MS });
-};
+const followIndexEntry = (page: Page, href: string, title: string) =>
+  followLink(page, `a[href="${href}"]`, title);
 
 /** Whether the tab still shows the document `followIndexEntry` marked. */
 const readDocumentMarker = (page: Page): Promise<unknown> =>
@@ -179,6 +191,24 @@ afterAll(async () => {
 });
 
 describe.each(CELLS)("$script in a browser", ({ script }) => {
+  it("opens a lens from its door without reloading the document", async () => {
+    const { page, base } = await openTab(script);
+    await loadPage(page, base, "/");
+    // Scoped to the door: the rail links to the same index first in the
+    // document's order.
+    await followLink(page, '.ds.lens-card a[href="/stations"]', "Stations");
+    expect(new URL(page.url()).pathname).toBe("/stations");
+    expect(await readDocumentMarker(page)).toBe(true);
+  });
+
+  it("leads home from the rail's brand without reloading the document", async () => {
+    const { page, base } = await openTab(script);
+    await loadPage(page, base, "/stations");
+    await followLink(page, ".ds.rail .brand", "Overview");
+    expect(new URL(page.url()).pathname).toBe("/");
+    expect(await readDocumentMarker(page)).toBe(true);
+  });
+
   it("opens a station from the stations index without reloading the document", async () => {
     const { page, base } = await openTab(script);
     await loadPage(page, base, "/stations");

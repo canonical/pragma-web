@@ -17,10 +17,12 @@ const PORT = Number(process.env.PORT) || undefined;
 // command (`dev`, `build:client`, `preview`) uses the default mode and the
 // client build (`--ssrManifest --outDir dist/client`).
 export default defineConfig(({ mode }) => ({
-  // No Relay transform: this app writes no `graphql` tags of its own. The
-  // lens and projection packages import the artifacts their own builds
-  // compile, so nothing here needs rewriting; `bun run relay` compiles their
-  // documents against this app's schema only to prove they hold over it.
+  // No Relay transform: the app's one document, the homepage's query, is
+  // declared as the lens packages declare theirs, a tag nothing calls beside
+  // an import of its compiled artifact, so nothing needs rewriting. The lens
+  // and projection packages import the artifacts their own builds compile;
+  // `bun run relay` compiles their documents against this app's schema to
+  // prove they hold over it.
   plugins: [react()],
   // Honour the PORT env var for `dev` and `preview`, as the SSR servers do.
   server: { port: PORT },
