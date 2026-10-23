@@ -1,0 +1,54 @@
+---
+# LensCard — one lens of the site as a door on its landing page: the lens's
+# name as a link to its index, how many things it shows as the graph counts
+# them, and one line on what it is for.
+#
+# Reference: the Figma projection matrix's card (ZwVhG78TEaKIDLCdIdQ9Fi,
+# 484:264: the title, then the vitals; 209px wide at two intrinsic columns,
+# the span the landing gives each door) and the atlas compositions' card
+# groups (cards in a published Cards group, their sections on its shared
+# tracks). Slot order: label, count, summary.
+#
+# Built on the published Card (global.component.card): this root IS the
+# Card's root with the lens-card class added, its sections are Card.Header
+# and Card.Content, and the card's row tracks, border, radius and section
+# insets are the Card's own. The label is the page's second heading level,
+# sized by the typography engine; hierarchy below it is weight (the count)
+# and colour (the summary), never a box or a size of this component's own.
+#
+# Every decision is read through a component token declared on the root
+# (`--lens-card-*`), bound to the symbol named here.
+#
+# Token ledger: none of this component's own.
+#
+# Roster namespaces (accepted and tracked): the semantic typography symbol
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: metro.component.lens_card
+  edges:
+    - node:
+        uri: global.subcomponent.card-header
+        edges:
+          - node:
+              role: title (a level-2 heading)
+              edges:
+                - node:
+                    role: link to the lens's index
+                  relation: { cardinality: "1", slotName: label }
+            relation: { cardinality: "1", slotName: title }
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        uri: global.subcomponent.card-content
+        edges:
+          - node:
+              role: count (a paragraph holding a data element)
+              styles:
+                # The figure reads before the summary by weight alone.
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "1", slotName: count }
+          - node:
+              role: summary
+              styles:
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: summary }
+      relation: { cardinality: "1", slotName: content }
