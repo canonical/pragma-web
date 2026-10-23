@@ -94,7 +94,10 @@ export function GlossaryLayout({ children }: { children: ReactNode }) {
 ```
 
 Both render the skip link first (the published `SkipLink`, pointed at the
-canvas), then a `.rail` region, a `.strip` region and the `Canvas`. Regions are placed by column count from the start and by
+canvas), then a `.rail` region, a `.strip` region and the `Canvas`. A
+strip, an inspector, an aside or a colophon that renders nothing leaves no
+region, and no row or gutter for it: a layout with no strip starts its
+canvas at the viewport's top. Regions are placed by column count from the start and by
 negative lines from the end, so they hold their places at any column
 count, and below one group of columns the rail narrows to one column.
 

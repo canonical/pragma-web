@@ -1,16 +1,21 @@
 ---
 # DocumentLayout — the document archetype: a subgrid of the shell spanning
-# every column, two rows (strip, body) and a third for the colophon only when
-# there is one, its gap the grid's gutter on both axes. The rail takes columns 1 / span 2 on every row and scrolls on
-# its own; only the canvas scrolls the document; an optional aside is the
-# canvas's own (`prism.component.canvas`, slot `aside`), so it is part of the
-# canvas's scroll and scrolls with the page; the colophon is a
-# band under the body.
+# every column, its gap the grid's gutter on both axes, with a row for the
+# body and a row above it for the strip and one under it for the colophon
+# only when there is one: a region given nothing that renders leaves no
+# track and no gutter. The rail takes columns 1 / span 2 on every row and
+# scrolls on its own; only the canvas scrolls the document; an optional
+# aside is the canvas's own (`prism.component.canvas`, slot `aside`), so it
+# is part of the canvas's scroll and scrolls with the page; the colophon is
+# a band under the body, in the last row.
 #
 # Reflow, bound in styles.css:
 #   `.ds.document-layout:has(> .colophon)` the rows are
 #     `min-content minmax(0, 1fr) min-content`: the colophon takes a row of
 #     its own; without one the canvas ends flush with the viewport.
+#   `.ds.document-layout:not(:has(> .strip))` the rows are
+#     `minmax(0, 1fr)`, and `minmax(0, 1fr) min-content` with a colophon;
+#     the canvas takes row 1, so it starts flush with the viewport's top.
 #   @container shell (width < 448px)   below one group: the rail spans one
 #     column; every other region starts at line 2.
 #
@@ -51,8 +56,8 @@ node:
         edges:
           - node:
               uri: prism.component.mode_strip
-            relation: { cardinality: "0..1", slotName: default }
-      relation: { cardinality: "1", slotName: strip }
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "0..1", slotName: strip }
     - node:
         uri: prism.component.canvas
         styles:
@@ -64,5 +69,5 @@ node:
         role: colophon region
         styles:
           layout.grid.column: "3 / -1"
-          layout.grid.row: "3"
+          layout.grid.row: "-2 / -1"
       relation: { cardinality: "0..1", slotName: colophon }

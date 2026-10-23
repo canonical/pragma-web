@@ -11,7 +11,8 @@
  * sits, that it scrolls with the page and that every entry of an aside
  * taller than the viewport can be scrolled into view, the gutter between
  * the rows, that a document with no colophon ends its canvas flush with
- * the viewport, and that nothing reaches past the viewport.
+ * the viewport, that a layout with no strip starts its canvas flush with
+ * the viewport's top, and that nothing reaches past the viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -148,6 +149,26 @@ const bareDocumentLayout = (
   </DocumentLayout>
 );
 
+/** A document with a colophon and no strip, as a site's lobby renders it. */
+const striplessDocumentLayout = (
+  <DocumentLayout
+    colophon={<p>Colophon</p>}
+    rail={<nav aria-label="Rail">Rail</nav>}
+  >
+    <p>Page</p>
+  </DocumentLayout>
+);
+
+/** A workspace with an inspector and no strip. */
+const striplessWorkspaceLayout = (
+  <WorkspaceLayout
+    inspector={<p>Inspector</p>}
+    rail={<nav aria-label="Rail">Rail</nav>}
+  >
+    <p>Canvas</p>
+  </WorkspaceLayout>
+);
+
 /**
  * Read the computed placement and display of the elements a reflow moves,
  * the layout's row gap and its rows.
@@ -190,6 +211,7 @@ function readPlacement(page: Page) {
       inspector: read(".ds.workspace-layout > .inspector"),
       trigger: read(".inspector-trigger"),
       aside: read("main.ds.canvas > .aside"),
+      colophon: read(".ds.document-layout > .colophon"),
     };
   });
 }
@@ -320,6 +342,36 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       const placement = await readPlacement(page);
       expect(placement.rows).toBe(2);
       expect(placement.canvas?.bottom).toBe(viewport.height);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("starts the canvas of a document with no strip flush with the viewport's top", async () => {
+    const page = await open(striplessDocumentLayout);
+    try {
+      const placement = await readPlacement(page);
+      expect(placement.rows).toBe(2);
+      expect(placement.canvas?.top).toBe(0);
+      expect(placement.colophon?.bottom).toBe(viewport.height);
+      expect(placement.colophon?.top).toBe(
+        (placement.canvas?.bottom ?? 0) + 16,
+      );
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("starts the canvas of a workspace with no strip flush with the viewport's top", async () => {
+    const page = await open(striplessWorkspaceLayout);
+    try {
+      const placement = await readPlacement(page);
+      expect(placement.rows).toBe(1);
+      expect(placement.canvas?.top).toBe(0);
+      expect(placement.canvas?.bottom).toBe(viewport.height);
+      if (viewport.inspectorShown) {
+        expect(placement.inspector?.top).toBe(0);
+      }
     } finally {
       await page.close();
     }

@@ -5,7 +5,10 @@ import type { ComponentProps, ReactNode } from "react";
 type OwnProps = {
   /** The site's rail, rendered in the rail region. */
   readonly rail: ReactNode;
-  /** The lens's mode strip, rendered in the strip row; none when omitted. */
+  /**
+   * The lens's mode strip, rendered in the strip row; no strip row when
+   * omitted or when it renders nothing.
+   */
   readonly strip?: ReactNode;
   /**
    * Content beside the page, such as a table of contents: the canvas's

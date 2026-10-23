@@ -153,6 +153,22 @@ describe("WorkspaceLayout", () => {
     },
   );
 
+  it.each([
+    ["omitted", undefined],
+    ["null", null],
+    ["false", false],
+    ["the empty string", ""],
+  ])("renders no strip region for a strip %s", (_name, node) => {
+    render(
+      <WorkspaceLayout data-testid="workspace" rail={null} strip={node}>
+        <p>Routed page</p>
+      </WorkspaceLayout>,
+    );
+    expect(
+      screen.getByTestId("workspace").querySelector(":scope > .strip"),
+    ).toBeNull();
+  });
+
   it("merges a consumer className after its own and passes native props", () => {
     render(
       <WorkspaceLayout aria-label="Workspace" className="site" rail={null}>

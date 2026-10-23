@@ -12,9 +12,10 @@ const componentCssClassName = "ds document-layout";
 /**
  * The document archetype: a page whose one scrolling region is its canvas.
  * It is a subgrid of the shell's grid over every column, in rows one gutter
- * apart: the strip row, the body row and, only when there is a colophon,
- * the colophon row, so a document without one ends flush with the
- * viewport. The rail takes the first two columns of every row and scrolls
+ * apart: the body row, with the strip row above it only when there is a
+ * strip and the colophon row under it only when there is a colophon, so a
+ * document without them starts or ends flush with the viewport. The rail
+ * takes the first two columns of every row and scrolls
  * on its own; the strip and the colophon span the rest of their rows; and
  * the canvas fills the body and scrolls. An aside, when there is one, is the canvas's own
  * (see `Canvas`): it holds the canvas's last three columns inside the same
@@ -22,8 +23,8 @@ const componentCssClassName = "ds document-layout";
  * a row under the page below two groups of columns.
  *
  * Below one group of columns the rail narrows to one column, a container
- * query on the shell. An aside or a colophon that renders nothing (`null`,
- * a boolean or the empty string) leaves no region.
+ * query on the shell. A strip, an aside or a colophon that renders nothing
+ * (`null`, a boolean or the empty string) leaves no region.
  *
  * `import { DocumentLayout } from "@canonical/prism-core";`
  *
@@ -45,7 +46,7 @@ export default function DocumentLayout({
     >
       <CanvasSkipLink />
       <div className="rail">{rail}</div>
-      <div className="strip">{strip}</div>
+      {isRenderedNode(strip) ? <div className="strip">{strip}</div> : null}
       <Canvas aside={aside} className="canvas">
         {children}
       </Canvas>
