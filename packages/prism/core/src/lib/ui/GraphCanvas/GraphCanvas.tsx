@@ -33,10 +33,12 @@ function nameLattice(label: string): string {
  * and `0` zoom in, out and back to the fit while focus is inside the
  * canvas. The camera's transform is written by d3-zoom on the client and
  * never by React, so the server renders the identity and hydration has
- * nothing to reconcile. When `fit` changes the camera fits it, and the Fit
- * control and `0` fit it again; a `frame` request fits its box once per
- * serial; when `reveal` changes the camera pans it into view if it is not
- * already.
+ * nothing to reconcile; once the client has measured the viewport the
+ * camera moves to where `opening` asks, if anywhere. When `fit` changes the
+ * camera fits it, and the Fit control and `0` fit it again, whole; a
+ * `frame` request fits its box once per serial; neither a changed `fit`
+ * nor a frame zooms a legible view out to an illegible one. When `reveal`
+ * changes the camera pans it into view if it is not already.
  *
  * The drawing reads the zoom bucket through `useGraphZoomBucket`, so it
  * shows only the text that renders at 12px or more on screen; the lattice
@@ -52,6 +54,7 @@ function nameLattice(label: string): string {
 export default function GraphCanvas({
   label,
   viewBox,
+  opening,
   fit,
   frame,
   reveal,
@@ -71,6 +74,7 @@ export default function GraphCanvas({
     fit,
     frame,
     reveal,
+    opening,
   });
   const latticeId = nameLattice(label);
 

@@ -1,5 +1,10 @@
 import type { RefObject } from "react";
-import type { GraphBox, GraphFrameRequest, GraphZoomBucket } from "../types.js";
+import type {
+  GraphBox,
+  GraphFrameRequest,
+  GraphOpening,
+  GraphZoomBucket,
+} from "../types.js";
 
 /** What `useGraphCamera` reads: the canvas's elements and its targets. */
 export interface UseGraphCameraProps {
@@ -15,6 +20,8 @@ export interface UseGraphCameraProps {
   readonly frame: GraphFrameRequest | undefined;
   /** The box the camera pans into view when it changes. */
   readonly reveal: GraphBox | undefined;
+  /** Where the camera opens once the viewport is measured. */
+  readonly opening: GraphOpening | undefined;
 }
 
 /** What `useGraphCamera` returns: the zoom's reading and its controls. */

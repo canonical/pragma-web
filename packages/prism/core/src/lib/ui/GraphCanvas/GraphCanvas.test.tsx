@@ -325,6 +325,124 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(-800,0) scale(2)");
   });
 
+  it("opens where `opening` asks once the viewport is measured, and only then", () => {
+    let resize: () => void = () => undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      },
+    );
+    stubViewportSize(0, 0);
+    const opening = vi.fn(() => ({ k: 1.5, x: -40, y: -30 }));
+    render(
+      <GraphCanvas label="Class graph" opening={opening} viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(opening).not.toHaveBeenCalled();
+    expect(readCamera()).toBeNull();
+    stubViewportSize(400, 300);
+    act(() => resize());
+    expect(opening).toHaveBeenCalledExactlyOnceWith(VIEW_BOX, 0.5);
+    expect(readCamera()).toBe("translate(-40,-30) scale(1.5)");
+    expect(screen.getByRole("status").textContent).toBe("75%");
+    act(() => resize());
+    expect(opening).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the identity when `opening` asks for nothing", () => {
+    const opening = vi.fn(() => undefined);
+    render(
+      <GraphCanvas label="Class graph" opening={opening} viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(opening).toHaveBeenCalledExactlyOnceWith(VIEW_BOX, 1);
+    expect(readCamera()).toBeNull();
+  });
+
+  it("opens below the zoom extent's floor when `opening` asks", () => {
+    render(
+      <GraphCanvas
+        label="Class graph"
+        opening={() => ({ k: 0.25, x: 0, y: 0 })}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
+  });
+
+  it("never refits a legible view to an illegible one, and Fit fits whole", () => {
+    const large: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
+    const { rerender } = renderCanvas();
+    rerender(
+      <GraphCanvas fit={large} label="Class graph" viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    expect(readCamera()).toBe("translate(0,0) scale(0.8571437142857141)");
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
+    expect(screen.getByTestId("bucket").textContent).toBe("overview");
+    // The floor followed the fit down: zooming out stays there, and in
+    // steps up from it.
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(readCamera()).toBe("translate(-80,-60) scale(0.3)");
+    // From an illegible view a refit fits whole.
+    rerender(
+      <GraphCanvas
+        fit={{ ...large, width: 1600, height: 1200 }}
+        label="Class graph"
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(readCamera()).toBe("translate(0,0) scale(0.5)");
+  });
+
+  it("never frames a region from a legible view into an illegible one", () => {
+    render(
+      <GraphCanvas
+        frame={{
+          box: { x: 100, y: 50, width: 1600, height: 1200 },
+          serial: 0,
+        }}
+        label="Class graph"
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    ).rerender(
+      <GraphCanvas
+        frame={{
+          box: { x: 100, y: 50, width: 1600, height: 1200 },
+          serial: 1,
+        }}
+        label="Class graph"
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
+    expect(readCamera()).toBe(
+      "translate(-85.71437142857141,-42.857185714285706) scale(0.8571437142857141)",
+    );
+  });
+
   it("pans a revealed box into view only when it is out of view", () => {
     const { rerender } = renderCanvas({
       reveal: { x: 10, y: 10, width: 96, height: 32 },

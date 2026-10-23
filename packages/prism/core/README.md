@@ -345,7 +345,10 @@ site's own catalog, and the factory holds no reader-facing string.
   lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
   show only the text that renders at 12px or more; types
   `GraphCanvasProps`, `GraphBox`, `GraphFrameRequest` (a one-off fit the
-  camera makes once per serial), `GraphTransform`, `GraphZoomBucket`.
+  camera makes once per serial), `GraphOpening` (the camera a canvas opens
+  on once the client has measured it), `GraphTransform`, `GraphZoomBucket`.
+  A refit never zooms a legible view out to an illegible one; Fit fits the
+  whole graph, below the wheel's floor when it must.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.

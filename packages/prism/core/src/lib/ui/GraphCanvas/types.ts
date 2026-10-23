@@ -32,6 +32,17 @@ export interface GraphFrameRequest {
 }
 
 /**
+ * Choose the camera a canvas opens on once the client has measured its
+ * viewport: from the area of user space the viewport shows at the identity
+ * and the on-screen size of one user unit there, the camera to open on, or
+ * `undefined` to keep the identity, the server's paint.
+ */
+export type GraphOpening = (
+  visible: GraphBox,
+  scale: number,
+) => GraphTransform | undefined;
+
+/**
  * How much text the drawing can show at the current zoom, so no text is
  * drawn below 12px on screen: `overview` below 0.75 (shapes and edges only),
  * `hubs` below 12/14 (16px text only), `full` above (all text).
@@ -48,14 +59,23 @@ type OwnProps = {
    */
   readonly viewBox: GraphBox;
   /**
-   * The box the Fit control and the `0` key fit, and the camera fits
-   * whenever it changes: the visible part of the graph under a filter. The
-   * whole viewBox when omitted.
+   * Where the camera opens once the client has measured the viewport, such
+   * as a legible window of a graph whose viewBox would draw its labels
+   * below 12px on this screen. The identity, the server's paint, when
+   * omitted.
+   */
+  readonly opening?: GraphOpening;
+  /**
+   * The box the Fit control and the `0` key fit whole, and the camera fits
+   * whenever it changes, never zooming a legible view out to an illegible
+   * one: the visible part of the graph under a filter. The whole viewBox
+   * when omitted.
    */
   readonly fit?: GraphBox;
   /**
    * A box the camera fits once per request, such as a region a reader
-   * picked; the Fit control still restores `fit` afterwards.
+   * picked, never zooming a legible view out to an illegible one; the Fit
+   * control still restores `fit` afterwards.
    */
   readonly frame?: GraphFrameRequest;
   /**

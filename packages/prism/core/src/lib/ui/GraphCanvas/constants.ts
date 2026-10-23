@@ -1,4 +1,8 @@
-/** The narrowest and widest zoom the camera takes, from the fitted view. */
+/**
+ * The narrowest and widest zoom the wheel and the buttons take, from the
+ * viewBox's own scale; Fit may go below the narrowest to fit a large
+ * graph whole, and the floor follows it.
+ */
 export const ZOOM_EXTENT: readonly [number, number] = [0.5, 2.4];
 
 /** The factor one press of zoom in or zoom out applies. */
@@ -12,6 +16,13 @@ export const OVERVIEW_SCALE = 12 / 16;
 
 /** The on-screen scale below which only 16px text shows: 14px text is 12px. */
 export const HUBS_SCALE = 12 / 14;
+
+/**
+ * How far above the legible scale a refit that keeps the view legible
+ * sets it, as a factor, so neither the rounding of the scale's product nor
+ * the browser's single-precision transforms read it a bucket lower.
+ */
+export const LEGIBLE_NUDGE = 1 + 1e-6;
 
 /** The lattice's pitch, in world units: everything a graph draws sits on it. */
 export const LATTICE_PITCH = 16;

@@ -8,6 +8,8 @@ import computeRevealTransform from "../computeRevealTransform.js";
 import {
   CAMERA_MOVE_MS,
   CLICK_DISTANCE,
+  HUBS_SCALE,
+  LEGIBLE_NUDGE,
   PAN_MARGIN,
   REDUCED_MOTION_QUERY,
   ZOOM_EXTENT,
@@ -28,17 +30,23 @@ function formatBox(box: GraphBox): string {
  * Measure the viewport: the viewBox's on-screen scale under
  * `xMinYMin meet`, and the area of its user space the viewport shows, which
  * is wider or taller than the viewBox when the aspect ratios differ. An
- * unmeasured viewport (zero-sized, as before layout) shows the viewBox at
- * scale 1.
+ * unmeasured viewport (zero-sized, as before layout or while hidden) shows
+ * the viewBox at scale 1, and says it is unmeasured.
  *
  * @note Impure: reads the viewport's layout box.
  */
 function measureViewport(
   svg: SVGSVGElement,
   viewBox: GraphBox,
-): { readonly scale: number; readonly visible: GraphBox } {
+): {
+  readonly scale: number;
+  readonly visible: GraphBox;
+  readonly measured: boolean;
+} {
   const { width, height } = svg.getBoundingClientRect();
-  if (width === 0 || height === 0) return { scale: 1, visible: viewBox };
+  if (width === 0 || height === 0) {
+    return { scale: 1, visible: viewBox, measured: false };
+  }
   const scale = Math.min(width / viewBox.width, height / viewBox.height);
   return {
     scale,
@@ -48,6 +56,7 @@ function measureViewport(
       width: width / scale,
       height: height / scale,
     },
+    measured: true,
   };
 }
 
@@ -74,11 +83,16 @@ function prefersReducedMotion(): boolean {
  *
  * It reads the zoom bucket and the percentage from the world's on-screen
  * scale, measured on the client, and re-measures when the viewport
- * resizes. When `fit` changes it fits that box; when `frame`'s serial
- * changes it fits the frame's box, once; when `reveal` changes it
- * pans that box into view, without zooming, only if it is not already in
- * view. Every move a control or a prop asks for takes 200ms, and is instant
- * under reduced motion.
+ * resizes. The first time it measures the viewport it moves, at once, to
+ * the camera `opening` chooses, if any. When `fit` changes it fits that
+ * box; when `frame`'s serial changes it fits the frame's box, once; neither
+ * refit zooms a legible view (every 14px text at 12px or more) out to an
+ * illegible one: a box too large for the legible zoom is shown from its
+ * top-left corner at it. Fit and `0` fit the fit box whole, however small
+ * that makes the zoom, and the zoom extent's floor follows them down. When
+ * `reveal` changes it pans that box into view, without zooming, only if it
+ * is not already in view. Every move a control or a prop asks for takes
+ * 200ms, and is instant under reduced motion.
  *
  * @note Impure: attaches d3-zoom's listeners and a resize observer to the
  *   viewport in an effect, removed on unmount, measures the viewport, and
@@ -91,6 +105,7 @@ export default function useGraphCamera({
   fit,
   frame,
   reveal,
+  opening,
 }: UseGraphCameraProps): UseGraphCameraResult {
   const [bucket, setBucket] = useState<GraphZoomBucket>("full");
   const [percent, setPercent] = useState<number | undefined>(undefined);
@@ -98,8 +113,8 @@ export default function useGraphCamera({
   const current = useRef<GraphTransform>(zoomIdentity);
   // The latest targets, read by the listeners and the controls; the effects
   // that act on a change compare the boxes' values, never their identity.
-  const latest = useRef({ viewBox, fit, frame, reveal });
-  latest.current = { viewBox, fit, frame, reveal };
+  const latest = useRef({ viewBox, fit, frame, reveal, opening });
+  latest.current = { viewBox, fit, frame, reveal, opening };
 
   const viewBoxKey = formatBox(viewBox);
   const fitKey = fit === undefined ? undefined : formatBox(fit);
@@ -117,6 +132,10 @@ export default function useGraphCamera({
       const transform = zoomIdentity
         .translate(target.x, target.y)
         .scale(target.k);
+      // A fit below the extent's floor lowers the floor to it, so the
+      // wheel and the buttons zoom on from where the fit left the camera.
+      const [floor, ceiling] = active.scaleExtent();
+      if (target.k < floor) active.scaleExtent([target.k, ceiling]);
       if (prefersReducedMotion()) {
         active.transform(select(svg), transform);
         return;
@@ -129,17 +148,22 @@ export default function useGraphCamera({
     [viewport],
   );
 
-  // Fit a box, or the whole viewBox, into the visible area.
+  // Fit a box, or the whole viewBox, into the visible area; a refit that
+  // keeps the view legible zooms no lower than the legible zoom when the
+  // camera is legible now.
   const fitBox = useCallback(
-    (box: GraphBox | undefined): void => {
+    (box: GraphBox | undefined, keepLegible: boolean): void => {
       const svg = viewport.current;
       /* v8 ignore next -- only a mounted canvas fits, and its viewport ref is attached */
       if (svg === null) return;
       const { viewBox: bounds } = latest.current;
+      const { scale, visible } = measureViewport(svg, bounds);
+      const legible = scale * current.current.k >= HUBS_SCALE;
       moveTo(
         computeFitTransform(
-          measureViewport(svg, bounds).visible,
+          visible,
           box ?? bounds,
+          keepLegible && legible ? (HUBS_SCALE * LEGIBLE_NUDGE) / scale : 0,
         ),
       );
     },
@@ -150,10 +174,11 @@ export default function useGraphCamera({
   const zoomBy = useCallback(
     (factor: number): void => {
       const svg = viewport.current;
-      /* v8 ignore next -- only a mounted canvas zooms, and its viewport ref is attached */
-      if (svg === null) return;
+      const active = behaviour.current;
+      /* v8 ignore next -- only a mounted canvas zooms, and its viewport ref is attached and its camera bound */
+      if (svg === null || active === undefined) return;
       const { visible } = measureViewport(svg, latest.current.viewBox);
-      const [minZoom, maxZoom] = ZOOM_EXTENT;
+      const [minZoom, maxZoom] = active.scaleExtent();
       const { k, x, y } = current.current;
       const next = Math.min(maxZoom, Math.max(minZoom, k * factor));
       const centreX = visible.x + visible.width / 2;
@@ -174,11 +199,30 @@ export default function useGraphCamera({
     /* v8 ignore next -- React attaches both refs before it runs an effect */
     if (svg === null || group === null) return;
     const { viewBox: bounds } = latest.current;
+    // A new viewBox opens anew, once the viewport has been measured.
+    let opened = false;
     // Read the zoom's scale against the viewport's size into the bucket and
-    // the percentage; each changes state only when its value changes.
+    // the percentage; each changes state only when its value changes. The
+    // first measured reading opens the camera where `opening` asks.
     const readScale = (): void => {
-      const screen =
-        measureViewport(svg, latest.current.viewBox).scale * current.current.k;
+      const { scale, visible, measured } = measureViewport(
+        svg,
+        latest.current.viewBox,
+      );
+      if (measured && !opened) {
+        opened = true;
+        const target = latest.current.opening?.(visible, scale);
+        if (target !== undefined) {
+          const [floor, ceiling] = active.scaleExtent();
+          active.scaleExtent([Math.min(floor, target.k), ceiling]);
+          active.transform(
+            select(svg),
+            zoomIdentity.translate(target.x, target.y).scale(target.k),
+          );
+          return;
+        }
+      }
+      const screen = scale * current.current.k;
       setBucket(classifyZoomBucket(screen));
       setPercent(Math.round(screen * 100));
     };
@@ -229,7 +273,7 @@ export default function useGraphCamera({
   useEffect(() => {
     if (lastFit.current === fitKey) return;
     lastFit.current = fitKey;
-    fitBox(latest.current.fit);
+    fitBox(latest.current.fit, true);
   }, [fitKey]);
 
   const lastFrame = useRef(frameKey);
@@ -238,7 +282,7 @@ export default function useGraphCamera({
     if (lastFrame.current === frameKey) return;
     lastFrame.current = frameKey;
     const request = latest.current.frame;
-    if (request !== undefined) fitBox(request.box);
+    if (request !== undefined) fitBox(request.box, true);
   }, [frameKey]);
 
   const lastReveal = useRef(revealKey);
@@ -260,7 +304,7 @@ export default function useGraphCamera({
   return {
     bucket,
     percent,
-    fitView: useCallback(() => fitBox(latest.current.fit), [fitBox]),
+    fitView: useCallback(() => fitBox(latest.current.fit, false), [fitBox]),
     zoomIn: useCallback(() => zoomBy(ZOOM_STEP), [zoomBy]),
     zoomOut: useCallback(() => zoomBy(1 / ZOOM_STEP), [zoomBy]),
   };
