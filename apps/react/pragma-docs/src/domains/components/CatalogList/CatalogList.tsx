@@ -60,8 +60,8 @@ const compareTiers = (a: string, b: string): number => {
 };
 
 /**
- * The catalog's composed layout: tier jump-links west (the mode's
- * secondary nav), tier-grouped card grid east. Pagination is Relay's
+ * The catalog's composed layout: tier jump-links (the mode's secondary
+ * nav) over the tier-grouped card grid. Pagination is Relay's
  * connection machinery over the schema's hard 100-item page cap
  * (ke-graphql MAX_PAGE_SIZE — not configurable), surfaced as an explicit
  * "Load more" button rather than an invisible truncation (ruling R1);

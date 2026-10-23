@@ -1,8 +1,8 @@
 /*
  * The Journeys lens's mode-strip tenant: the Table ⇄ Graph switch
- * (slot.journeys-view). It lives INSIDE the strip band, whose height
- * (--strip-h) is stationary frame — nothing here may change it, or the canvas
- * would jump on a lens switch (AX.6). Hence the fixed small metrics and
+ * (slot.journeys-view). It lives INSIDE the strip band, whose height (the
+ * density line unit and its padding) is stationary frame — nothing here may
+ * change it, or the canvas would jump on a lens switch (AX.6). Hence the fixed small metrics and
  * `min-block-size: 0` postures, mirroring the Definitions explorer-controls
  * tenant.
  *

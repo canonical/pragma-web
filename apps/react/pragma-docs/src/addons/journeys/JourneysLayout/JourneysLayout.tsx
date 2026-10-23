@@ -1,13 +1,10 @@
-import { Canvas, CanvasSkipLink, ModeStrip } from "@canonical/prism-core";
+import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
 import { JourneyViewProvider } from "../journeyViewContext.js";
 import { journeysStripSlots } from "../stripSlots.js";
 import type { JourneysLayoutProps } from "./types.js";
-import "./styles.css";
-
-const componentCssClassName = "ds journeys-layout";
 
 const { Context, Controls } = journeysStripSlots;
 
@@ -23,33 +20,30 @@ const { Context, Controls } = journeysStripSlots;
  * job to another (the same route, new params) and resets on a move to the
  * lens index or to another lens.
  *
- * Its root is the layout's own page grid: the rail in the west columns,
- * then a viewport stacking the strip, the canvas and the colophon.
+ * The layout is the document archetype: the rail in its rail region, the
+ * strip in the top row, the page in the canvas, the one region that
+ * scrolls, and the colophon in the band under it. It renders no element of
+ * its own: `DocumentLayout` renders the root.
  *
  * `import { JourneysLayout } from "./JourneysLayout/index.js";`
  */
 export default function JourneysLayout({
   children,
-  className,
-  ...props
 }: JourneysLayoutProps): ReactElement {
   return (
     <JourneyViewProvider>
-      <div
-        {...props}
-        className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      >
-        <CanvasSkipLink />
-        <SiteRail />
-        <div className="viewport">
+      <DocumentLayout
+        colophon={<SiteColophon />}
+        rail={<SiteRail />}
+        strip={
           <ModeStrip
             context={<Context lensLabel="Journeys" />}
             controls={<Controls />}
           />
-          <Canvas>{children}</Canvas>
-          <SiteColophon />
-        </div>
-      </div>
+        }
+      >
+        {children}
+      </DocumentLayout>
     </JourneyViewProvider>
   );
 }

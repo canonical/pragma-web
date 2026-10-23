@@ -4,8 +4,9 @@ import "../styles/app.css";
 import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import type { ServerEntrypointProps } from "@canonical/react-ssr/renderer";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
-import { Shell } from "#lib/Shell";
+import { Shell } from "#lib/ui";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
+import { DOCUMENT_CONTEXT_CLASS_NAME } from "./constants.js";
 
 interface InitialData extends Record<string, unknown> {
   readonly url?: string;
@@ -69,11 +70,17 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
       ),
   });
 
-  // Paint the cookie-resolved theme on <html> for a flash-free first render —
-  // the same element `usePreferredTheme` toggles on the client, and one React
-  // does not hydrate (only `#root` is), so there is no mismatch to reconcile.
+  // Paint the styles context and density, and the cookie-resolved theme, on
+  // <html> for a flash-free first render — the same element
+  // `usePreferredTheme` toggles on the client, and one React does not
+  // hydrate (only `#root` is), so there is no mismatch to reconcile.
   return (
-    <html lang={props.lang} className={initialData.theme}>
+    <html
+      className={[DOCUMENT_CONTEXT_CLASS_NAME, initialData.theme]
+        .filter(Boolean)
+        .join(" ")}
+      lang={props.lang}
+    >
       <head>
         {props.otherHeadElements}
         {props.scriptElements}

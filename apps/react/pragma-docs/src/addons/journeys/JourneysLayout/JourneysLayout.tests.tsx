@@ -22,7 +22,7 @@ describe("JourneysLayout", () => {
       journeysLayoutAt(undefined, journeysExplorerRecords, fetchFn),
     );
 
-    const layout = container.querySelector(".ds.journeys-layout");
+    const layout = container.querySelector(".ds.document-layout");
     expect(layout).not.toBeNull();
     const strip = layout?.querySelector('[data-region="mode-strip"]');
     const graphOption = screen.getByRole("button", { name: "Graph" });

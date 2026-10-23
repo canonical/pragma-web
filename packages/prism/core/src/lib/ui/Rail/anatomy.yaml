@@ -1,0 +1,182 @@
+---
+# Rail — prism's primary navigation: the brand, the lens entries with their
+# keyboard hints, a spacer, then the site's utility cluster (`children`). A
+# leaf of the grid: the archetype layouts place it in their `rail` slot
+# (columns 1 / span 2, every row) and scroll it; the rail itself is a column
+# stack whose gap is the grid's gutter. The entries of a list sit tighter
+# than the gutter, so each entry carries that space after it as external
+# spacing and the lists set no gap. No published component is a lens
+# switcher with digit shortcuts, so it stays bespoke; each hint renders the
+# published KeyboardKey.
+#
+# The theme cell stretches the site's theme control to the rail's width and
+# lets it shrink below its content (`size.min.width: 0`); the control,
+# `prism.component.theme_selector`, declares the same of itself, so at one
+# column wide it truncates inside the rail instead of overflowing it.
+#
+# Reflow, bound in styles.css under `@container shell (width < 448px)`
+# (below one group): `brand-word`, `label`, `kbd`, `caption` and
+# `utilities-label` take `layout.type: none`, so the one-column rail holds
+# only the brand dot and the icons; every entry keeps its accessible name
+# through `aria-label`, and the brand link through `title`.
+#
+# Every decision is read through a component token declared on the root
+# (`--rail-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind):
+#   --rail-item-radius: 0.25rem   no semantic radius symbol; dimension.radius.*
+#                                 is the primitive tier. Upstream request.
+#   --rail-focus-ring-width: 2px  dimension.stroke.thickness.* is primitive.
+#   --rail-focus-ring-offset: -2px  keeps the ring inside the scroll box.
+#   --rail-brand-dot-size: 0.5rem a glyph size, not an inset.
+#   --rail-divider-width: 1px     a hairline.
+#   space.100 (8px) for inline insets: the shim has no semantic 8px inline
+#   inset, and component.padding.inline (16px) is a fifth of a column at
+#   one group.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, container.gap.tight,
+# component.padding.block, space.100, density.line.height and the semantic
+# typography symbols typography.text.primary.bold.fontWeight,
+# typography.text.secondary.fontWeight and typography.text.secondary.fontSize.
+node:
+  uri: prism.component.rail
+  styles:
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
+    size.min.block: 100%
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.internal.inline.start: space.100
+    spacing.internal.inline.end: space.100
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.inline.end.color: color.border.muted
+  edges:
+    - node:
+        role: brand link
+        styles:
+          layout.type: flex
+          layout.align: center
+          spacing.gap: space.100
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: space.100
+          spacing.internal.inline.end: space.100
+          typography.weight: typography.text.primary.bold.fontWeight
+          typography.color: color.text
+          typography.decoration: none
+        edges:
+          - node:
+              role: brand dot
+              styles:
+                size.width: 0.5rem
+                size.height: 0.5rem
+                appearance.radius: 50%
+                appearance.background: color.brand.primary
+                layout.flex.shrink: 0
+            relation: { cardinality: "1", slotName: brand-dot }
+          - node:
+              role: wordmark and caption
+              edges:
+                - node:
+                    role: caption line
+                    styles:
+                      layout.type: block
+                      typography.weight: typography.text.secondary.fontWeight
+                      typography.size: typography.text.secondary.fontSize
+                      typography.color: color.text.muted
+                  relation: { cardinality: "0..1", slotName: caption }
+            relation: { cardinality: "1", slotName: brand-word }
+      relation: { cardinality: "1", slotName: brand }
+    - node:
+        role: lens list
+        styles:
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.external.inline.start: 0
+          spacing.external.inline.end: 0
+          spacing.internal.inline.start: 0
+        edges:
+          - node:
+              role: lens entry link
+              styles:
+                layout.type: flex
+                layout.align: center
+                spacing.gap: space.100
+                size.min.block: density.line.height
+                spacing.external.block.end: container.gap.tight
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+                appearance.radius: 0.25rem
+                typography.color: color.text.muted
+                typography.decoration: none
+                typography.color@hover: color.text
+                appearance.background@hover: color.background.layer2
+                typography.color@selected: color.text
+                appearance.background@selected: color.background.layer2
+                typography.weight@selected: typography.text.primary.bold.fontWeight
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
+              edges:
+                - node:
+                    role: lens icon
+                    styles:
+                      layout.type: inline-flex
+                      layout.flex.shrink: 0
+                  relation: { cardinality: "1", slotName: icon }
+                - node:
+                    role: lens label
+                    styles:
+                      typography.whiteSpace: nowrap
+                  relation: { cardinality: "1", slotName: label }
+                - node:
+                    uri: global.component.keyboard-key
+                    styles:
+                      spacing.external.inline.start: auto
+                  relation: { cardinality: "0..1", slotName: kbd }
+            relation: { cardinality: "1..*", slotName: item }
+      relation: { cardinality: "1", slotName: lenses }
+    - node:
+        role: spacer
+        styles:
+          layout.flex.grow: 1
+      relation: { cardinality: "1", slotName: spacer }
+    - node:
+        role: utility cluster heading
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: space.100
+          spacing.internal.inline.end: space.100
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: utilities-label }
+    - node:
+        role: utility list
+        styles:
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.external.inline.start: 0
+          spacing.external.inline.end: 0
+          spacing.internal.inline.start: 0
+        edges:
+          - node:
+              role: theme control cell
+              styles:
+                layout.type: grid
+                spacing.gap: grid.gutter
+                size.min.width: 0
+                spacing.internal.block.end: container.gap.tight
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+              edges:
+                - node:
+                    uri: prism.component.theme_selector
+                  relation: { cardinality: "1", slotName: default }
+            relation: { cardinality: "0..1", slotName: theme }
+      relation: { cardinality: "0..1", slotName: utilities }

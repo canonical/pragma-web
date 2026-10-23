@@ -42,19 +42,23 @@ export default function SiteRail(props: SiteRailProps): ReactElement {
       <ul aria-labelledby="rail-utilities-label" className="utilities">
         <li>
           {/* The SSR-certified demo canvas keeps a door. */}
-          <Link className="item util" title="Playground" to="playground">
-            <PlaygroundIcon />
+          <Link className="item" title="Playground" to="playground">
+            <span aria-hidden="true" className="icon">
+              <PlaygroundIcon />
+            </span>
             <span className="label">Playground</span>
           </Link>
         </li>
         <li>
           <Link
-            className="item util"
+            className="item"
             search={{ auth: "1" }}
             title="Demo sign-in"
             to="account"
           >
-            <SignInIcon />
+            <span aria-hidden="true" className="icon">
+              <SignInIcon />
+            </span>
             <span className="label">Demo sign-in</span>
           </Link>
         </li>

@@ -1,6 +1,4 @@
 import {
-  createEnvironment,
-  createStaticRouter,
   getPrefetchEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
@@ -16,17 +14,15 @@ import {
   describe,
   expect,
   it,
+  type MockInstance,
   vi,
 } from "vitest";
 import { MESSAGES } from "#i18n";
 import type { InitialData } from "#server";
-import { prepareRelayData } from "#server";
-import { Shell } from "#shell";
+import { EntryServer, prepareRelayData } from "#server";
 import { CIRCLE_LINE_TITLE, NORTHGATE_TITLE } from "../../testing/fixtures.js";
 import startMetroGraph from "../../testing/startMetroGraph.js";
 import type { MetroGraph } from "../../testing/types.js";
-import { appRoutes, notFoundRoute } from "../routes.js";
-import selectRoutableUrl from "../selectRoutableUrl.js";
 import hydrateApp from "./hydrateApp.js";
 
 // Driving `act` directly, without Testing Library's wrapper, needs the flag.
@@ -57,21 +53,11 @@ let graph: MetroGraph;
 const recordsByUrl = new Map<string, RecordMap>();
 
 /**
- * Render the app tree at `url` from a store seeded with `records`, the
- * composition `EntryServer` renders inside `#root`.
+ * Render the whole document the server entry renders for `initialData`,
+ * from a store seeded with its records, as the renderer does.
  */
-const renderServerHtml = (url: string, records: RecordMap): string =>
-  renderToString(
-    <Shell
-      environment={createEnvironment({
-        records,
-        fetchFn: () => Promise.reject(new Error("the server store missed")),
-      })}
-      router={createStaticRouter(appRoutes, selectRoutableUrl(url), {
-        notFound: notFoundRoute,
-      })}
-    />,
-  );
+const renderServerHtml = (initialData: InitialData): string =>
+  renderToString(<EntryServer initialData={initialData} lang="en" />);
 
 beforeAll(async () => {
   graph = await startMetroGraph();
@@ -88,13 +74,17 @@ afterAll(() => graph.close());
 
 describe("hydrateApp", () => {
   const roots: Root[] = [];
-  const containers: HTMLElement[] = [];
+  let browserDocumentElement: HTMLElement | undefined;
+  let consoleError: MockInstance<typeof console.error>;
 
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
       vi.fn(() => new Promise<never>(() => {})),
     );
+    // React reports an attribute that differs from the server's through
+    // console.error, not through onRecoverableError.
+    consoleError = vi.spyOn(console, "error");
   });
 
   afterEach(async () => {
@@ -103,44 +93,58 @@ describe("hydrateApp", () => {
         root.unmount();
       });
     }
-    for (const container of containers.splice(0)) {
-      container.remove();
+    if (browserDocumentElement !== undefined) {
+      document.replaceChild(browserDocumentElement, document.documentElement);
+      browserDocumentElement = undefined;
     }
+    // biome-ignore lint/suspicious/noDocumentCookie: clears the test's cookie
+    document.cookie = "theme=; path=/; max-age=0";
     delete (window as TestWindow).__INITIAL_DATA__;
     window.history.pushState({}, "", "/");
     // `hydrateApp` publishes its environment in the module-scope prefetch
     // slot; clearing it keeps the next test's static router from warming
     // into this test's store.
     setPrefetchEnvironment(undefined);
+    consoleError.mockRestore();
     vi.unstubAllGlobals();
   });
 
-  /** Hydrate over `serverHtml` through the seam; returns the mismatch spy. */
-  const hydrateInto = async (serverHtml: string) => {
-    const container = document.createElement("div");
-    container.innerHTML = serverHtml;
-    document.body.appendChild(container);
-    containers.push(container);
+  /**
+   * Load the server's document in place of the browser's own `<html>`, then
+   * hydrate it through the seam; returns the mismatch spy.
+   */
+  const hydrateDocument = async (serverHtml: string) => {
+    const parsed = new DOMParser().parseFromString(
+      `<!doctype html>${serverHtml}`,
+      "text/html",
+    );
+    browserDocumentElement = document.documentElement;
+    document.replaceChild(
+      document.adoptNode(parsed.documentElement),
+      browserDocumentElement,
+    );
     const onRecoverableError = vi.fn();
     await act(async () => {
-      roots.push(hydrateApp(container, { onRecoverableError }));
+      roots.push(hydrateApp(document, { onRecoverableError }));
     });
-    return { container, onRecoverableError };
+    return { onRecoverableError };
   };
 
   it.each(SEEDED_PAGES)(
-    "hydrates the $name from the seeded store: no recoverable error, no fetch",
+    "hydrates the $name from the seeded store: no mismatch, no fetch",
     async ({ url, liveText }) => {
       const records = recordsByUrl.get(url) ?? {};
-      const serverHtml = renderServerHtml(url, records);
+      const initialData: InitialData = { url, relay: { records } };
+      const serverHtml = renderServerHtml(initialData);
       expect(serverHtml).toContain(liveText);
 
       window.history.pushState({}, "", url);
-      (window as TestWindow).__INITIAL_DATA__ = { url, relay: { records } };
-      const { container, onRecoverableError } = await hydrateInto(serverHtml);
+      (window as TestWindow).__INITIAL_DATA__ = initialData;
+      const { onRecoverableError } = await hydrateDocument(serverHtml);
 
       expect(onRecoverableError).not.toHaveBeenCalled();
-      expect(container.querySelector("#lens-canvas")?.textContent).toContain(
+      expect(consoleError).not.toHaveBeenCalled();
+      expect(document.querySelector("#lens-canvas")?.textContent).toContain(
         liveText,
       );
       expect(fetch).not.toHaveBeenCalled();
@@ -153,18 +157,45 @@ describe("hydrateApp", () => {
     },
   );
 
+  it("keeps the head the server rendered and the reader's theme", async () => {
+    const url = "/lines";
+    const initialData: InitialData = {
+      url,
+      theme: "dark",
+      relay: { records: recordsByUrl.get(url) ?? {} },
+    };
+    // The reader's cookie, which the server resolved the theme from and the
+    // theme control reads again in the browser.
+    // biome-ignore lint/suspicious/noDocumentCookie: sets the reader's cookie
+    document.cookie = "theme=dark; path=/";
+    window.history.pushState({}, "", url);
+    (window as TestWindow).__INITIAL_DATA__ = initialData;
+    const { onRecoverableError } = await hydrateDocument(
+      renderServerHtml(initialData),
+    );
+
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(document.documentElement.className).toBe(
+      "ds site-document docs comfortable dark",
+    );
+    expect(document.documentElement.lang).toBe("en");
+    expect(document.title).toContain("Lines");
+  });
+
   it("hydrates the not-found page at a path that does not decode", async () => {
     const url = "/stations/%ZZ";
-    const serverHtml = renderServerHtml(url, {});
+    const serverHtml = renderServerHtml({ url });
     expect(serverHtml).toContain(MESSAGES["notFound.title"]);
 
     window.history.pushState({}, "", url);
     (window as TestWindow).__INITIAL_DATA__ = { url };
-    const { container, onRecoverableError } = await hydrateInto(serverHtml);
+    const { onRecoverableError } = await hydrateDocument(serverHtml);
 
     expect(window.location.pathname).toBe(url);
     expect(onRecoverableError).not.toHaveBeenCalled();
-    expect(container.querySelector("h1")?.textContent).toBe(
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(document.querySelector("h1")?.textContent).toBe(
       MESSAGES["notFound.title"],
     );
     expect(fetch).not.toHaveBeenCalled();
@@ -172,12 +203,15 @@ describe("hydrateApp", () => {
 
   it("fetches when the page carries no initial data", async () => {
     const url = "/lines";
-    const serverHtml = renderServerHtml(url, recordsByUrl.get(url) ?? {});
+    const serverHtml = renderServerHtml({
+      url,
+      relay: { records: recordsByUrl.get(url) ?? {} },
+    });
     window.history.pushState({}, "", url);
     // No `__INITIAL_DATA__`: the store starts cold, so the page's data goes
     // to the graph, which the zero-fetch cases above rule out. The
     // environment is still published, so later navigations prefetch too.
-    await hydrateInto(serverHtml);
+    await hydrateDocument(serverHtml);
     expect(fetch).toHaveBeenCalled();
     expect(getPrefetchEnvironment()).toBeDefined();
   });

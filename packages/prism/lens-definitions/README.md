@@ -22,7 +22,7 @@ Requires React 19, Relay 21, `@canonical/prism-core`,
 ## Mounting the lens
 
 A site groups the lens's two routes under a router wrapper of
-`DefinitionsLayout`, binding its own rail and colophon to the layout once:
+`DefinitionsLayout`, binding its own rail to the layout once:
 
 ```tsx
 import {
@@ -33,7 +33,7 @@ import { group, wrapper, type WrapperComponentProps } from "@canonical/router-co
 import type { ReactElement, ReactNode } from "react";
 
 const SiteDefinitionsLayout = ({ children }: WrapperComponentProps<ReactNode>) => (
-  <DefinitionsLayout colophon={<SiteColophon />} rail={<SiteRail />}>
+  <DefinitionsLayout rail={<SiteRail />}>
     {children}
   </DefinitionsLayout>
 );
@@ -152,8 +152,6 @@ token.
 
 The stylesheets also read custom properties that are not design decisions:
 
-- `--grid-intrinsic`, the intrinsic column template from `@canonical/styles`,
-  which the layout's root reads;
 - `--z-plate` and `--z-underground`, the strata the well's floating hint and
   legend are raised to and the well itself sits on, and
   `--surface-underground-background`, the well floor's tint, which the site

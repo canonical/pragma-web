@@ -4,9 +4,9 @@
  * `window.__INITIAL_DATA__` — with no React 19 recoverable error and no
  * network request, proving the render is served entirely from the seeded
  * store. React 19 reports hydration mismatches through `onRecoverableError`
- * (a `console.error` spy does NOT catch them — see `Chip.ssr.tests.tsx`), so
- * the spy rides the seam's `hydrateRoot` options; two deliberate-breakage
- * controls prove both spies can fail.
+ * (a `console.error` spy does NOT catch them — see `MentionChip.ssr.test.tsx`
+ * in prism-core), so the spy rides the seam's `hydrateRoot` options; two
+ * deliberate-breakage controls prove both spies can fail.
  */
 
 import {
@@ -20,7 +20,7 @@ import { renderToString } from "react-dom/server";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Shell } from "#lib/Shell";
+import { Shell } from "#lib/ui";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
@@ -30,10 +30,12 @@ import componentEntityRecordsButton from "../domains/components/__fixtures__/com
 import "../../testing/stubReactFlowGlobals.js";
 import type { InitialData } from "#server";
 import { definitionsExplorerRecords } from "../../testing/definitionsRecords.js";
+import {
+  LINK_COMPONENT_URI,
+  standardEntityRecords,
+} from "../../testing/standardsRecords.js";
 import journeysExplorerRecords from "../addons/journeys/__fixtures__/journeysExplorerRecords.js";
 import journeysExplorerRecordsJob from "../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
-import standardEntityRecords from "../domains/lenses/standards/__fixtures__/standardEntityRecords.js";
-import { LINK_COMPONENT_URI } from "../domains/lenses/standards/__fixtures__/standardsPageHarness.js";
 import lobbyRecords from "../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../domains/playground/__fixtures__/componentProbeRecords.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
@@ -91,21 +93,21 @@ const SEEDED_PAGES = [
     liveSelector: "#term-inspector-title",
     liveText: "UI Block",
   },
-  // Standards block (P-5): the reading page — the server HTML carries
-  // the article's identity h1 (`_meta.title`, which for a standard with no
-  // asserted name is the IRI's local name) and hydrating over it must stay
-  // mismatch-silent and network-silent like every other seeded page. The
-  // URL is the ABSOLUTE IRI percent-encoded: `node(id:)` accepts nothing
-  // else, and this pin is where the two halves of that address — the
-  // server's variables and the client's — have to agree byte for byte.
+  // Standards block: the reading page — the server HTML carries the
+  // standard's prose with its first reference already a chip (the link the
+  // prose writes as a compact address), and hydrating over it must stay
+  // mismatch-silent and network-silent like every other seeded page: the
+  // chip's data rides the reading page's own operation. The URL is the
+  // ABSOLUTE IRI percent-encoded: `node(id:)` accepts nothing else, and this
+  // pin is where the two halves of that address — the server's variables
+  // and the client's — have to agree byte for byte.
   {
     name: "standard reading",
     url: `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
     records: standardEntityRecords,
-    serverMarker:
-      '<h1 id="standard-reading-title">react.component.link_component</h1>',
-    liveSelector: "#standard-reading-title",
-    liveText: "react.component.link_component",
+    serverMarker: 'class="ds node-chip"',
+    liveSelector: ".ds.standard-prose .ds.node-chip",
+    liveText: "one prop",
   },
   // Journeys job block (AV-351 / RULING 1 + 2): the view is EPHEMERAL, not
   // URL-derived, so the job page — like the index — defaults to the TABLE.

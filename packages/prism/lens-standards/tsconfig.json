@@ -1,0 +1,22 @@
+{
+  "extends": "@canonical/typescript-config-react",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "types": [
+      "node",
+      "react",
+      "react-dom",
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "testing/**/*.ts",
+    "testing/**/*.tsx",
+    "scripts/**/*.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts"
+  ]
+}

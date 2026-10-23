@@ -38,6 +38,7 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
           canIntercept: true,
           hashChange: false,
           intercept: (interceptOptions?: FakeInterceptOptions) => {
+            navigationWindow.interceptCount += 1;
             navigationWindow.lastInterceptOptions = interceptOptions;
           },
         });
@@ -58,17 +59,20 @@ function createFakeNavigationWindow(initialHref = "https://example.com/") {
       },
     },
     lastInterceptOptions: undefined as FakeInterceptOptions | undefined,
+    interceptCount: 0,
     dispatchNavigate(nextHref: string, navigationType: string = "traverse") {
-      navigationWindow.location.href = nextHref;
+      // As in the browser, the navigate event fires before the URL commits.
       navigateListener?.({
         navigationType,
         destination: { url: nextHref },
         canIntercept: true,
         hashChange: false,
         intercept: (options?: FakeInterceptOptions) => {
+          navigationWindow.interceptCount += 1;
           navigationWindow.lastInterceptOptions = options;
         },
       });
+      navigationWindow.location.href = nextHref;
     },
     dispatchNavigateRaw(
       event: Parameters<NonNullable<typeof navigateListener>>[0],
@@ -133,7 +137,31 @@ describe("createNavigationAdapter (Navigation API)", () => {
     );
   });
 
-  it("intercepts push and replace events without notifying subscribers", () => {
+  it("publishes a traversal at its destination before the URL commits", () => {
+    const navigationWindow = createFakeNavigationWindow(
+      "https://example.com/stations/metro%3Akilnwood",
+    );
+    const adapter = createNavigationAdapter(navigationWindow);
+    const hrefsAtPublish: string[] = [];
+    const listener = vi.fn<(location: string | URL) => void>(() => {
+      hrefsAtPublish.push(navigationWindow.location.href);
+    });
+
+    adapter.subscribe(listener);
+    navigationWindow.dispatchNavigate(
+      "https://example.com/stations",
+      "traverse",
+    );
+
+    expect(listener).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: "/stations" }),
+    );
+    expect(hrefsAtPublish).toEqual([
+      "https://example.com/stations/metro%3Akilnwood",
+    ]);
+  });
+
+  it("leaves a push or replace it did not start to the browser", () => {
     const navigationWindow = createFakeNavigationWindow();
     const adapter = createNavigationAdapter(navigationWindow);
     const listener = vi.fn<(location: string | URL) => void>();
@@ -142,8 +170,8 @@ describe("createNavigationAdapter (Navigation API)", () => {
     navigationWindow.dispatchNavigate("https://example.com/push", "push");
     navigationWindow.dispatchNavigate("https://example.com/replace", "replace");
 
-    // Push/replace events are intercepted (preventing full reload) but don't
-    // notify subscribers — the router's navigate() method handles notification.
+    // Not intercepted, so the browser loads each as a document.
+    expect(navigationWindow.interceptCount).toBe(0);
     expect(listener).toHaveBeenCalledTimes(0);
   });
 
@@ -231,7 +259,7 @@ describe("createNavigationAdapter (Navigation API)", () => {
     });
 
     adapter.trackLoad?.(load);
-    navigationWindow.dispatchNavigate("https://example.com/docs", "push");
+    navigationWindow.dispatchNavigate("https://example.com/docs", "traverse");
 
     const handler = navigationWindow.lastInterceptOptions?.handler;
 
@@ -263,7 +291,7 @@ describe("createNavigationAdapter (Navigation API)", () => {
 
       adapter.subscribe(() => {});
       adapter.trackLoad?.(Promise.reject(new Error("load failed")));
-      navigationWindow.dispatchNavigate("https://example.com/docs", "push");
+      navigationWindow.dispatchNavigate("https://example.com/docs", "traverse");
 
       const handler = navigationWindow.lastInterceptOptions?.handler;
 
@@ -282,7 +310,7 @@ describe("createNavigationAdapter (Navigation API)", () => {
     const adapter = createNavigationAdapter(navigationWindow);
 
     adapter.subscribe(() => {});
-    navigationWindow.dispatchNavigate("https://example.com/docs", "push");
+    navigationWindow.dispatchNavigate("https://example.com/docs", "traverse");
 
     const handler = navigationWindow.lastInterceptOptions?.handler;
 
@@ -318,12 +346,14 @@ describe("createNavigationAdapter (Navigation API)", () => {
     adapter.subscribe(() => {});
     adapter.navigate("/docs");
 
-    for (const navigationType of ["traverse", "push", "replace", "reload"]) {
+    for (const navigationType of ["traverse", "reload"]) {
+      navigationWindow.lastInterceptOptions = undefined;
       navigationWindow.dispatchNavigate(
         "https://example.com/elsewhere",
         navigationType,
       );
 
+      expect(navigationWindow.lastInterceptOptions).toBeDefined();
       expect(navigationWindow.lastInterceptOptions).not.toHaveProperty(
         "focusReset",
       );

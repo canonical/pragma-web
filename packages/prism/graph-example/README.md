@@ -72,10 +72,11 @@ types with no IRI of their own: the embeddable `GeoPoint`; `Route`, `Call` and
 which carry the fleet model (see both below). `findBreakingChanges(contractOnly, extended)` returns zero, and
 `satisfiesContract(readProviderSdl())` returns **zero violations**.
 
-**Note what the extension does *not* contain: `extend type Query`.** Every type this
-provider declares is reachable through the contract's own five root fields — `node(id:)`
-and `OntologyClass.instances`. Adding provider root fields would have been easier and
-would have demonstrated less.
+**The extension adds exactly one root field, `prose`, and no other.** Every entity type
+this provider declares is reachable through the contract's own five root fields —
+`node(id:)` and `OntologyClass.instances`. Adding provider root fields for them would
+have been easier and would have demonstrated less. `prose` is the exception because it is
+not part of the contract (see below).
 
 ---
 
@@ -401,6 +402,38 @@ Where it goes, and which parts are anybody's fault:
    `ClassProperty.name` 1, `_meta.curie` 1, the `inZone` relation 3). Adding fields to
    this contract is cheap for providers; it is the *non-null* ones that carry structure
    behind them that are not.
+
+---
+
+## Prose — a provider extension, hand-written
+
+`Query.prose(uri: ID!): Prose` serves long-form Markdown for an entity, the same
+extension the pragma provider serves, written here by hand:
+
+```graphql
+type Prose {
+  markdown(lang: String): String!
+  lang: String!
+  availableLanguages: [String!]!
+  references: NodeConnection!
+}
+```
+
+It is a root field rather than a field on `Station` because a compiled provider can
+extend only the object types it generates and `Query`, never `Node`; a root field is the
+one position a reader can select the same way against both providers. An `extend type
+Query` in a schema file reads as a client extension to relay-compiler, so a consumer
+that compiles operations against this provider prints the built schema rather than
+reading `schema/extension.graphql` raw.
+
+Northgate (`metro:northgate`) carries prose in English and French. The text in `lang`
+is served when authored, else the language the request's `x-prism-locale` header names,
+else English, the default every entity with prose must have; matching is exact, with no
+subtag fallback. Links whose destination is a declared-prefix CURIE (`metro:north-line`,
+`geo:central-zone`) or an absolute IRI are references, resolved as `node(id:)` would
+resolve them, class IRIs included; links in code, and links to anything the dataset does
+not hold, are not. `extractReferences.ts` is the pragma provider's function, copied rather
+than imported so the two packages stay independent.
 
 ---
 

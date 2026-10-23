@@ -14,7 +14,9 @@
  * 🔴 WHAT THE SCAN ROOTS ARE, AND WHAT THEY ARE NOT. The roots are the
  * docsite's `src/domains/lenses` and the `src` of every lens package beside
  * this one (`packages/prism/lens-*`), the core lenses the docsite mounts. They
- * declare FOUR of the docsite's ten shipped query operations. The other six do
+ * declare FOUR of the docsite's ten shipped query operations, all of them in
+ * the lens packages: the app's own lens tree mounts only the Guides stub,
+ * which declares none. The other six do
  * not execute against this provider, and it would be dishonest to let the
  * scan roots imply otherwise, so they are named here with the reason:
  *
@@ -47,6 +49,14 @@
  * committed: the repository's `prepare` hook compiles them at install, so a
  * fresh checkout has them once `bun install` has run.
  *
+ * 🔴 TIERS. Each scan root's lens declares its tier on its lens facet
+ * (`routeLensFacet.of({ …, tier })`), and every operation the root declares
+ * carries it. A Tier 1 lens compiles against `@canonical/prism-contract`
+ * alone; a Tier 2 lens also selects the Prose extension. Tier 2 operations
+ * execute here because this provider serves that extension: their running
+ * green is the expected result, and their tier says what they ask of a
+ * provider, not that they failed to ask less.
+ *
  * Test infrastructure: excluded from the build (tsconfig.build.json) and from
  * coverage (vitest.config.ts).
  */
@@ -75,14 +85,34 @@ const PRISM_PACKAGES_ROOT: string = resolve(HERE, PRISM_PACKAGES_RELATIVE_PATH);
 
 /**
  * One scan root: a directory whose `graphql` tags declare lens operations,
- * and the directory where relay-compiler writes those operations' artifacts.
+ * the directory where relay-compiler writes those operations' artifacts, and
+ * the tier its lens declares.
  */
 export interface LensSource {
   /** The tree scanned for `graphql` tags. */
   readonly directory: string;
   /** The relay-compiler output holding each declared operation's text. */
   readonly artifactDirectory: string;
+  /**
+   * The tier the root's lens facet declares: 1 for a lens that compiles
+   * against the contract alone, 2 for one that also selects the Prose
+   * extension. `undefined` for a root that declares no lens.
+   */
+  readonly tier: 1 | 2 | undefined;
 }
+
+/**
+ * The opening of a lens declaration, up to and including the `{` of the
+ * object a `routeLensFacet.of({ … })` call is given. The object itself is
+ * read by brace depth, since it may nest braces of its own.
+ */
+const LENS_FACET_OPENING_PATTERN = /routeLensFacet\.of\(\s*\{/g;
+
+/** A literal tier inside a lens declaration. */
+const LITERAL_TIER_PATTERN = /\btier:\s*([12])\b/;
+
+/** A test file, which may declare lenses of its own as fixtures. */
+const TEST_FILE_PATTERN = /\.tests?\.tsx?$/;
 
 /**
  * Every scan root, the app's core lenses first: the docsite's
@@ -115,17 +145,79 @@ export const collectLensSources = (): readonly LensSource[] => {
       );
     }
   }
+  const appLenses = join(APP_ROOT, "src/domains/lenses");
   return [
     {
-      directory: join(APP_ROOT, "src/domains/lenses"),
+      directory: appLenses,
       artifactDirectory: join(APP_ROOT, "src/relay/__generated__"),
+      tier: readLensTier(appLenses),
     },
     ...packages.map((packageRoot) => ({
       directory: join(packageRoot, "src"),
       artifactDirectory: join(packageRoot, "src/__generated__"),
+      tier: readLensTier(join(packageRoot, "src")),
     })),
   ];
 };
+
+/**
+ * The tier a scan root's lens declares, read off the `routeLensFacet.of({…})`
+ * calls in its non-test sources: a literal `tier: 1` or `tier: 2`.
+ *
+ * Throws when a declaration carries no literal tier, since its operations'
+ * tier could not then be read, and when one root declares two tiers, since
+ * the root's operations would then carry neither. A root that declares no
+ * lens has no tier. A root that does not exist has none either:
+ * `discoverLensOperations` refuses a missing app root on its own terms.
+ *
+ * @note Impure: reads the filesystem.
+ */
+export const readLensTier = (directory: string): 1 | 2 | undefined => {
+  if (!existsSync(directory)) return undefined;
+  const tiers = new Set<1 | 2>();
+  for (const file of tsxFilesUnder(directory)) {
+    if (TEST_FILE_PATTERN.test(file)) continue;
+    for (const body of readLensFacetBodies(readFileSync(file, "utf8"))) {
+      const tier = LITERAL_TIER_PATTERN.exec(body)?.at(1);
+      if (tier === undefined) {
+        throw new Error(
+          `A lens facet in ${file} declares no literal tier. Each operation ` +
+            "this gate measures carries its lens's tier, read off the facet " +
+            "as `tier: 1` or `tier: 2`.",
+        );
+      }
+      tiers.add(tier === "1" ? 1 : 2);
+    }
+  }
+  if (tiers.size > 1) {
+    throw new Error(
+      `The lenses under ${directory} declare more than one tier. Every ` +
+        "operation under one scan root carries one tier, so a root's lenses " +
+        "must agree on it.",
+    );
+  }
+  return [...tiers].at(0);
+};
+
+/**
+ * The text of every object a `routeLensFacet.of({ … })` call in `source` is
+ * given, without its outer braces. Each object ends at the `}` that brings
+ * the brace depth back to zero, so nested objects and template-literal
+ * placeholders stay inside it. An object that never closes reads as empty,
+ * so it declares no tier and is refused like any other facet without one.
+ */
+const readLensFacetBodies = (source: string): string[] =>
+  [...source.matchAll(LENS_FACET_OPENING_PATTERN)].map((opening) => {
+    const start = source.indexOf("{", opening.index) + 1;
+    let depth = 1;
+    for (let index = start; index < source.length; index += 1) {
+      const character = source.charAt(index);
+      if (character === "{") depth += 1;
+      if (character === "}") depth -= 1;
+      if (depth === 0) return source.slice(start, index);
+    }
+    return "";
+  });
 
 const tsxFilesUnder = (directory: string): string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

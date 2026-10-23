@@ -1,4 +1,4 @@
-import { Chip, type Kind } from "@canonical/prism-core";
+import { type Kind, MentionChip } from "@canonical/prism-core";
 import type { Router } from "@canonical/router-core";
 import {
   type RegisteredNotFound,
@@ -313,7 +313,7 @@ const NeighbourhoodWell = ({
                     blockSize: node.height,
                   }}
                 >
-                  <Chip
+                  <MentionChip
                     box={node.box}
                     href={node.isCentre ? undefined : node.href}
                     kind={node.kind}

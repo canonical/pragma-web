@@ -167,3 +167,13 @@ export interface Fleet {
   readonly lines: readonly FleetLine[];
   readonly stations: readonly FleetStop[];
 }
+
+/**
+ * One reference-extraction case: a CommonMark document and the IRIs it must
+ * yield, in order.
+ */
+export interface ExtractionCase {
+  readonly name: string;
+  readonly markdown: string;
+  readonly expected: readonly string[];
+}

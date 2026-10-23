@@ -4,7 +4,7 @@ import { browserslistToTargets } from "lightningcss";
 import { defineConfig } from "vite";
 
 // Path aliases are declared as Node subpath imports in package.json
-// "imports", one per domain, each naming that domain's barrel (#shell,
+// "imports", one per domain, each naming that domain's barrel (#lib/ui,
 // #domains/lenses, #server, …), and Vite resolves them natively: no resolver
 // plugin.
 const PORT = Number(process.env.PORT) || undefined;

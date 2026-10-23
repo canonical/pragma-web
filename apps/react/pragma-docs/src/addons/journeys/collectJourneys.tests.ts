@@ -20,6 +20,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { describe, expect, it } from "vitest";
+import { standardsRoutes } from "#domains/lenses";
 import {
   axisTerm,
   collectJourneys,
@@ -233,15 +234,16 @@ describe("ROUTE_BY_SURFACE", () => {
       "components/routes.ts",
       "marketing/routes.ts",
       "lenses/routes.tsx",
-      "lenses/standards/routes.ts",
     ].map((file) => readFileSync(`${routesDir}${file}`, "utf-8"));
-    // The Definitions lens ships as a package, so its routes are read off
-    // the records it exports rather than off a source file.
+    // The Definitions and Standards lenses ship as packages, so their routes
+    // are read off the records the site builds from them rather than off a
+    // source file.
     const declared = new Set([
       ...sources.flatMap((source) =>
         [...source.matchAll(/url:\s*"([^"]+)"/g)].map((match) => match[1]),
       ),
       ...Object.values(definitionsRoutes).map(({ url }) => url),
+      ...Object.values(standardsRoutes).map(({ url }) => url),
     ]);
     for (const href of Object.values(ROUTE_BY_SURFACE)) {
       expect(declared.has(href), `${href} must be a declared route`).toBe(true);

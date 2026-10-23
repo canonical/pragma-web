@@ -3,12 +3,12 @@
 /**
  * The docs site's dark chip values hold the AA floor.
  *
- * `@canonical/prism-core`'s Chip draws an instance's text in its namespace
- * tint and its fill in that same tint at the fill weight, composited over the
- * page; the package guards its light fallbacks, and the dark values are this
- * site's, defined in `styles/app.css`. Every namespace shares one lightness
- * and one chroma and differs only in hue, so the property is that EVERY hue
- * clears 4.5:1 at the dark hooks.
+ * `@canonical/prism-core`'s MentionChip draws an instance's text in its
+ * namespace tint and its fill in that same tint at the fill weight,
+ * composited over the page; the package guards its light fallbacks, and the
+ * dark values are this site's, defined in `styles/app.css`. Every namespace
+ * shares one lightness and one chroma and differs only in hue, so the
+ * property is that EVERY hue clears 4.5:1 at the dark hooks.
  *
  * oklch → sRGB uses Björn Ottosson's published OKLab ↔ linear-sRGB matrices;
  * compositing happens in gamma-encoded sRGB, where the browser composites;
@@ -94,11 +94,12 @@ function measureContrast(first: Srgb, second: Srgb): number {
 
 describe("the dark chip hooks", () => {
   it("keep instance text-vs-composited-fill at ≥ 4.5:1 for every hue", () => {
-    const lightness = Number(readDarkHook("--chip-tint-l"));
-    const chroma = Number(readDarkHook("--chip-tint-c"));
+    const lightness = Number(readDarkHook("--mention-chip-tint-l"));
+    const chroma = Number(readDarkHook("--mention-chip-tint-c"));
     const alpha =
-      Number(readDarkHook("--chip-fill-weight-instance").replace("%", "")) /
-      100;
+      Number(
+        readDarkHook("--mention-chip-fill-weight-instance").replace("%", ""),
+      ) / 100;
     const background = convertOklchToSrgb(DARK_BACKGROUND_OKLCH);
 
     for (let hue = 0; hue < 360; hue += 15) {

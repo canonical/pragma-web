@@ -1,8 +1,31 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import Breadcrumbs from "./Breadcrumbs.js";
 
 describe("Breadcrumbs", () => {
+  // React logs the `key` warning once per module instance, so this case runs
+  // before any other render in the file.
+  it("renders keyed items without reading key from props", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      render(
+        <Breadcrumbs
+          items={[
+            { key: "home", url: "/", label: "Home" },
+            { key: "current", label: "Current", current: true },
+          ]}
+        />,
+      );
+
+      expect(consoleError).not.toHaveBeenCalled();
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
   it("renders items", () => {
     render(
       <Breadcrumbs

@@ -9,9 +9,8 @@
  *   reflow layout (`prefers-color-scheme`, `forced-colors`,
  *   `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
  *   file, and only while no other condition rides along in the prelude;
- * - no grid template is authored but the layout's root, which reads the
- *   design system's intrinsic columns: every other `grid-template-columns`
- *   is a subgrid, so the explorer lands on the same ruler as the site;
+ * - no grid template is authored: every `grid-template-columns` is a
+ *   subgrid, so the explorer lands on the same ruler as the site's shell;
  * - no theme is named: a site's theme activates through its own classes;
  * - every component token reads another token, save the ones named here that
  *   hold the lens's own value where the design system has no semantic token,
@@ -142,7 +141,6 @@ const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-branded",
   "--color-text-muted",
-  "--grid-intrinsic",
   "--motion-duration-fast",
   "--space-025",
   "--space-050",
@@ -328,21 +326,14 @@ describe("the lens stylesheets", () => {
     ).toEqual([]);
   });
 
-  it("author no grid template but the layout root's intrinsic columns", () => {
+  it("author no grid template: every template is a subgrid", () => {
     const templates = files.flatMap((file) =>
       [...readCss(file).matchAll(/grid-template-columns:\s*([^;]+);/g)].map(
-        (match) => ({ file, value: (match.at(1) ?? "").trim() }),
+        (match) => (match.at(1) ?? "").trim(),
       ),
     );
-    const authored = templates.filter(({ value }) => value !== "subgrid");
-
-    expect(templates.length).toBeGreaterThan(authored.length);
-    expect(authored).toEqual([
-      {
-        file: join(LIBRARY_DIRECTORY, "DefinitionsLayout", "styles.css"),
-        value: "var(--grid-intrinsic)",
-      },
-    ]);
+    expect(templates.length).toBeGreaterThan(0);
+    expect(templates.filter((value) => value !== "subgrid")).toEqual([]);
   });
 
   it("name no theme", () => {

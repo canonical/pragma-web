@@ -221,11 +221,16 @@ type Query {
 # contract's superset rule is for (contract.graphql:39-42). `buildSchema` over
 # the contract alone cannot serve instance data.
 #
-# NOTE WHAT IS ABSENT: there is no `extend type Query`. Every type below is
-# reachable through the contract's own root fields — `node(id:)` and
-# `OntologyClass.instances`. Adding provider root fields would have been
-# easier and would have proved less: the point is that the contract's five
-# roots suffice.
+# ONE ROOT FIELD IS ADDED, AND ONLY ONE: `prose`, at the end of this file.
+# Every entity type below is reachable through the contract's own root
+# fields — `node(id:)` and `OntologyClass.instances` — and adding a root
+# field for them would have been easier and would have proved less: the
+# point is that the contract's five roots suffice for the graph. Prose is not
+# part of the contract; it is a provider extension, and it is a root field
+# because that is the one position a reader can select the same way against
+# every provider that offers it. A compiled provider can add fields only to
+# the object types it generates and to Query, never to `Node`, so a field on
+# each concrete type would need a type-specific fragment to read.
 # =============================================================================
 
 """
@@ -530,5 +535,22 @@ type CarPosition {
   position: Int!
   carType: CarType!
   reversed: Boolean!
+}
+
+"Long-form Markdown authored for one entity, per language."
+type Prose {
+  "The text in `lang`, else in the request's locale, else in the default language."
+  markdown(lang: String): String!
+  "The language `markdown` serves without `lang`: the request's locale when authored, else the default."
+  lang: String!
+  "Every authored language, the default first, then the rest in code-point order."
+  availableLanguages: [String!]!
+  "Entities the prose links to across its languages, in order of first mention; destinations node(id:) does not resolve are dropped."
+  references: NodeConnection!
+}
+
+extend type Query {
+  "The prose authored for the entity `uri` names (an absolute IRI), or null when it has none."
+  prose(uri: ID!): Prose
 }
 

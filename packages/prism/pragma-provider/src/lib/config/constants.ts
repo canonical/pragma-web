@@ -60,8 +60,14 @@ export const SEM_PACKAGES: readonly string[] = [
   "design-system-docs",
 ];
 
-/** The package subdirectories scanned for `.ttl` sources. */
+/** The package subdirectories scanned for `.ttl` sources and their `.md` sidecars. */
 export const TTL_DIRS: readonly string[] = ["definitions", "data"];
+
+/**
+ * The extension of a prose sidecar: a Markdown file beside the Turtle that
+ * describes the entity its name names (`button.md`, `button.fr.md`).
+ */
+export const PROSE_EXTENSION = ".md";
 
 /**
  * Sources excluded from the semantic root.
