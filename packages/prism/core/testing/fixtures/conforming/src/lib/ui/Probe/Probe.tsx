@@ -30,7 +30,9 @@ export default function Probe({
           </a>
         )}
       </span>
-      <span className={["mark", muted ? "is-muted" : ""].filter(Boolean).join(" ")} />
+      <span
+        className={["mark", muted ? "is-muted" : ""].filter(Boolean).join(" ")}
+      />
     </div>
   );
 }

@@ -44,6 +44,10 @@ export type {
   ClientOnlyProps,
   DocumentLayoutProps,
   ErrorBoundaryProps,
+  GraphBox,
+  GraphCanvasProps,
+  GraphTransform,
+  GraphZoomBucket,
   Kind,
   LensBreadcrumbsProps,
   LensContextProps,
@@ -64,6 +68,7 @@ export {
   ClientOnly,
   DocumentLayout,
   ErrorBoundary,
+  GraphCanvas,
   LensBreadcrumbs,
   MentionChip,
   ModeStrip,
@@ -71,6 +76,7 @@ export {
   Rail,
   RouterLink,
   ThemeSelector,
+  useGraphZoomBucket,
   WorkspaceLayout,
 } from "./ui/index.js";
 export type {

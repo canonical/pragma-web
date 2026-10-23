@@ -291,7 +291,8 @@ function mapSelector(
   if (child !== undefined && childMatch === null) {
     return `"${selector}" addresses a child by anything but its role class`;
   }
-  const modifier = /^\.[a-z][a-z0-9-]*/.exec(childMatch?.at(2) ?? "")?.at(0) ?? "";
+  const modifier =
+    /^\.[a-z][a-z0-9-]*/.exec(childMatch?.at(2) ?? "")?.at(0) ?? "";
   const slot = `${childMatch?.at(1) ?? ""}${modifier}`;
   const suffix = stripLinkQualifiers(
     (childMatch?.at(2) ?? "").slice(modifier.length),
