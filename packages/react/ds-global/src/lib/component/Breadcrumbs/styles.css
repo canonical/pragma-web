@@ -20,8 +20,8 @@
       flex-direction: row;
       flex-wrap: wrap;
 
-      /* Guidelines: 4px vertical distance between wrapped rows */
-      row-gap: var(--dimension-050);
+      /* Wrapped rows follow the product context's item-block relationship. */
+      row-gap: var(--ds-spacing-item-block, var(--dimension-050));
 
       /* layout.align: center */
       align-items: center;

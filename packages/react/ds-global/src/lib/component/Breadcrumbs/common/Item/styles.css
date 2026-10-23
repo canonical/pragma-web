@@ -11,9 +11,8 @@
    * - layout.align: center -> align-items: center
    *
    * Tokens follow the Figma spec: links use color-text-link, the current item
-   * and the separator use color-text, and the separator margin uses the
-   * dimension scale (Figma specs 6px, which is not on the scale; the nearest
-   * token is dimension-100 = 8px).
+   * and the separator use color-text. The separator margins follow the
+   * product context's mark-inline relationship.
    */
   .ds.breadcrumbs-item {
     /* Component tokens — pure aliases to semantic tokens, component-scoped
@@ -22,7 +21,10 @@
     --breadcrumbs-item-current-color: var(--color-text);
     --breadcrumbs-item-disabled-color: var(--color-text-disabled);
     --breadcrumbs-item-separator-color: var(--color-text);
-    --breadcrumbs-item-separator-margin: var(--dimension-100);
+    --breadcrumbs-item-separator-margin: var(
+      --ds-spacing-mark,
+      var(--dimension-100)
+    );
     --breadcrumbs-item-focus-color: var(--color-text-link);
 
     /* layout.type: flow, layout.direction: horizontal */
