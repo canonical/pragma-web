@@ -18,7 +18,7 @@ const componentCssClassName = "ds entity-card";
  * It is the published `Card`: a row subgrid of its grid's section tracks, so
  * cards in a `Cards` group line their sections up. With a sidecar it also
  * becomes a column subgrid two columns wider. It renders only the slots it
- * is given and reads no context, so it renders anywhere inside a grid.
+ * is given, so it renders anywhere inside a grid.
  *
  * Native props reach the Card's `<div>` root; a consumer `className` merges
  * after the card's own.
@@ -26,6 +26,8 @@ const componentCssClassName = "ds entity-card";
  * `import { EntityCard } from "@canonical/prism-projections";`
  *
  * @implements prism.component.entity_card
+ * @note Impure: reads the translator context in scope, through `Message`,
+ *   for the title with its parent.
  */
 export default function EntityCard({
   location,

@@ -16,8 +16,8 @@ const componentCssClassName = "ds entity-command";
  * It renders only the slots it is given: with both a kind and a location
  * the second line is the catalog's one sentence, with one of them it is
  * that one alone, and with neither there is no second line. It is a list
- * item; the palette that lists it sets its role and its selection. It reads
- * no context, so it renders anywhere.
+ * item; the palette that lists it sets its role and its selection, so it
+ * renders anywhere.
  *
  * Native props reach the `<li>` root; a consumer `className` merges after
  * the row's own.
@@ -25,6 +25,8 @@ const componentCssClassName = "ds entity-command";
  * `import { EntityCommand } from "@canonical/prism-projections";`
  *
  * @implements prism.component.entity_command
+ * @note Impure: reads the translator context in scope, through `Message`,
+ *   for the "kind in location" line.
  */
 export default function EntityCommand({
   title,
