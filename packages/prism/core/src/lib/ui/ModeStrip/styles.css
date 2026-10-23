@@ -7,12 +7,18 @@
    * each side, content-box: an empty strip and a one-row strip match, so
    * the canvas below never jumps on a lens switch. The band and its sockets
    * may be narrower than their content, so a tenant wider than the band
-   * wraps inside it instead of pushing past its columns. */
+   * wraps inside it instead of pushing past its columns. The band bleeds
+   * across the gutter at its start to meet the rail's border, and the same
+   * padding puts its context back on the canvas's first column line; its
+   * end is the viewport's edge, which a component padding keeps the status
+   * off. */
   .ds.mode-strip {
     --mode-strip-gap: var(--grid-gutter);
     --mode-strip-min-block-size: var(--density-line-height);
     --mode-strip-padding-block: var(--component-padding-block);
-    --mode-strip-padding-inline: var(--component-padding-inline);
+    --mode-strip-bleed: calc(-1 * var(--grid-gutter));
+    --mode-strip-padding-inline-start: var(--grid-gutter);
+    --mode-strip-padding-inline-end: var(--component-padding-inline);
     --mode-strip-divider-width: 1px;
     --mode-strip-divider-color: var(--color-border-muted);
     --mode-strip-context-font-weight: var(
@@ -31,7 +37,9 @@
     min-inline-size: 0;
     gap: var(--mode-strip-gap);
     padding-block: var(--mode-strip-padding-block);
-    padding-inline: var(--mode-strip-padding-inline);
+    margin-inline-start: var(--mode-strip-bleed);
+    padding-inline-start: var(--mode-strip-padding-inline-start);
+    padding-inline-end: var(--mode-strip-padding-inline-end);
     border-bottom-width: var(--mode-strip-divider-width);
     border-bottom-style: solid;
     border-bottom-color: var(--mode-strip-divider-color);

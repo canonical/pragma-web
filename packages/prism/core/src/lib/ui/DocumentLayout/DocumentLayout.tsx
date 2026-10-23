@@ -16,7 +16,9 @@ const componentCssClassName = "ds document-layout";
  * strip and the colophon row under it only when there is a colophon, so a
  * document without them starts or ends flush with the viewport. The rail
  * takes the first two columns of every row and scrolls
- * on its own; the strip and the colophon span the rest of their rows; and
+ * on its own; the strip and the colophon span the rest of their rows, each
+ * band bleeding across the gutter to meet the rail's border while its
+ * content keeps to the canvas's column lines; and
  * the canvas fills the body and scrolls. An aside, when there is one, is the canvas's own
  * (see `Canvas`): it holds the canvas's last three columns inside the same
  * scroll, starting at the top of the page and scrolling with it, and takes

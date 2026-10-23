@@ -103,7 +103,11 @@ strip, an inspector, an aside or a colophon that renders nothing leaves no
 region, and no row or gutter for it: a layout with no strip starts its
 canvas at the viewport's top. Regions are placed by column count from the start and by
 negative lines from the end, so they hold their places at any column
-count, and below one group of columns the rail narrows to one column.
+count, and below one group of columns the rail narrows to one column. The
+bands, the `ModeStrip` and the colophon region, keep their columns but
+bleed across the gutter to meet the rail's border, a negative inline
+margin of one gutter compensated by the same padding, so their rules run
+edge to edge while their content sits on the canvas's first column line.
 
 The rail reads its lenses from the route table it is given and wires each
 lens's shortcut key itself, showing each key as a `KeyboardKey`. It does

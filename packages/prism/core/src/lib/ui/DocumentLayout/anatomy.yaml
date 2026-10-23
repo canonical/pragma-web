@@ -9,6 +9,23 @@
 # is part of the canvas's scroll and scrolls with the page; the colophon is
 # a band under the body, in the last row.
 #
+# The colophon region draws the band: a hairline on its top edge, bled
+# across the gutter at its inline start to meet the rail's border (a
+# negative inline margin of one gutter, compensated by the same padding),
+# so the rule runs edge to edge while the colophon's content sits on the
+# canvas's first column line. Its inline end is the viewport's edge, the
+# last column line, since the shell sets no outer margin, and a component
+# padding keeps the content off the edge. The band's placement keeps its
+# columns; it never takes a wider span.
+#
+# Every decision is read through a component token declared on the root
+# (`--document-layout-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   --document-layout-colophon-divider-width: 1px  a hairline above the band.
+#   --document-layout-bleed: calc(-1 * var(--grid-gutter))  the negation of
+#   grid.gutter, which the DSL cannot spell as a symbol.
+#
 # Reflow, bound in styles.css:
 #   `.ds.document-layout:has(> .colophon)` the rows are
 #     `min-content minmax(0, 1fr) min-content`: the colophon takes a row of
@@ -19,7 +36,8 @@
 #   @container shell (width < 448px)   below one group: the rail spans one
 #     column; every other region starts at line 2.
 #
-# Roster namespaces (accepted and tracked): grid.gutter.
+# Roster namespaces (accepted and tracked): grid.gutter,
+# component.padding.block, component.padding.inline.
 node:
   uri: prism.component.document_layout
   styles:
@@ -70,4 +88,12 @@ node:
         styles:
           layout.grid.column: "3 / -1"
           layout.grid.row: "-2 / -1"
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+          spacing.internal.inline.start: grid.gutter
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.block.start.color: color.border.muted
       relation: { cardinality: "0..1", slotName: colophon }

@@ -60,6 +60,17 @@ export const FRAME_SELECTOR = [
 ].join(", ");
 
 /**
+ * The layout's bands: the strip's band and the colophon region, each of
+ * which must run from the rail's border to the viewport's edge while its
+ * content starts on the canvas's first column line.
+ */
+export const BAND_SELECTOR = [
+  ".ds.workspace-layout > .strip > *",
+  ".ds.document-layout > .strip > *",
+  ".ds.document-layout > .colophon",
+].join(", ");
+
+/**
  * The chrome the spacing histogram measures: the shell, the archetypes and
  * their regions, and the core components every layout places. A select's
  * options are left out: the browser lays them out in its own popup.

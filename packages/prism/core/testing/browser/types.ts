@@ -18,6 +18,11 @@ export interface MeasureLayoutOptions {
    */
   readonly frameSelector: string;
   /**
+   * The layout's bands, whose edges and content start are measured against
+   * the rail's border, the viewport's edge and the canvas's start.
+   */
+  readonly bandSelector: string;
+  /**
    * The elements that must fill the rows of the canvas's page from its
    * inline start to its end, such as a catalog's cards; left out, nothing
    * is measured.
@@ -80,6 +85,29 @@ export interface LayoutMeasure {
       readonly end: number;
     } | null;
   };
+  /**
+   * The layout's edges, in pixels: the inline end of its rail region, the
+   * inline start and the top of its canvas, the bottom of its strip region
+   * (null when the layout renders none) and its row gap. An edge is -1
+   * when its element is absent.
+   */
+  readonly edges: {
+    readonly railEnd: number;
+    readonly canvasStart: number;
+    readonly canvasTop: number;
+    readonly stripBottom: number | null;
+    readonly rowGap: number;
+  };
+  /**
+   * Each band of `bandSelector`, in pixels: its border box's inline start
+   * and end, and where its content box starts.
+   */
+  readonly bands: readonly {
+    readonly element: string;
+    readonly start: number;
+    readonly end: number;
+    readonly contentStart: number;
+  }[];
   /** The block overflow of the layout's rail and inspector regions. */
   readonly regionOverflow: Readonly<Record<string, string | null>>;
   /** Whether the inspector's drawer trigger shows. */

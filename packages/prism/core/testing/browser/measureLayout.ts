@@ -20,13 +20,15 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  * engine's baseline nudges on text blocks.
  *
  * @param options - The selectors, the spacing step and the overflow rules.
- * @returns The page's grids, scrollers, overflow, canvas page and spacing.
+ * @returns The page's grids, scrollers, overflow, canvas page, edges,
+ *   bands and spacing.
  * @note Impure: reads the page's document and its computed styles.
  */
 export default function measureLayout({
   chromeSelector,
   regionSelector,
   frameSelector,
+  bandSelector,
   fillSelector,
   step,
   tolerance,
@@ -117,6 +119,26 @@ export default function measureLayout({
           element.getBoundingClientRect(),
         );
 
+  const layout = document.querySelector(
+    ".ds.workspace-layout, .ds.document-layout",
+  );
+  const rail = layout?.querySelector(":scope > .rail");
+  const strip = layout?.querySelector(":scope > .strip");
+  const canvasBox = canvas?.getBoundingClientRect();
+  const bands = [...document.querySelectorAll(bandSelector)].map((band) => {
+    const box = band.getBoundingClientRect();
+    const style = getComputedStyle(band);
+    return {
+      element: describe(band),
+      start: box.left,
+      end: box.right,
+      contentStart:
+        box.left +
+        Number.parseFloat(style.borderLeftWidth) +
+        Number.parseFloat(style.paddingLeft),
+    };
+  });
+
   const histogram: Record<string, number> = {};
   const offGrid: string[] = [];
   const properties = [
@@ -163,6 +185,17 @@ export default function measureLayout({
       scrollHeight: canvas?.scrollHeight ?? -1,
       clientHeight: canvas?.clientHeight ?? -1,
     },
+    edges: {
+      railEnd: rail?.getBoundingClientRect().right ?? -1,
+      canvasStart: canvasBox?.left ?? -1,
+      canvasTop: canvasBox?.top ?? -1,
+      stripBottom: strip?.getBoundingClientRect().bottom ?? null,
+      rowGap:
+        layout === null
+          ? -1
+          : Number.parseFloat(getComputedStyle(layout).rowGap),
+    },
+    bands,
     regionOverflow: {
       rail: readOverflow(
         ":is(.ds.workspace-layout, .ds.document-layout) > .rail",

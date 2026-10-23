@@ -13,7 +13,9 @@
  * the rows, that a document with no colophon ends its canvas flush with
  * the viewport, that a layout with no strip starts its canvas flush with
  * the viewport's top, that a page's tiles fill their rows to the canvas's
- * end, and that nothing reaches past the viewport.
+ * end, that the strip's and the colophon's bands run from the rail's
+ * border to the viewport's edge with their content on the canvas's first
+ * column line, and that nothing reaches past the viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -31,7 +33,9 @@ import {
   WorkspaceLayout,
 } from "../../src/lib/ui/index.js";
 import {
+  BAND_SELECTOR,
   FRAME_SELECTOR,
+  type LayoutMeasure,
   launchBrowser,
   type MeasureLayoutOptions,
   measureLayout,
@@ -70,6 +74,7 @@ const MEASURE_OPTIONS: MeasureLayoutOptions = {
     "main.ds.canvas",
   ].join(", "),
   frameSelector: FRAME_SELECTOR,
+  bandSelector: BAND_SELECTOR,
   step: 4,
   tolerance: 0.5,
   clippingOverflows: ["auto", "scroll", "hidden", "clip"],
@@ -275,6 +280,26 @@ function countReachableAsideEntries(page: Page) {
   });
 }
 
+/**
+ * Assert every band of a measured layout runs from the rail's border to
+ * the viewport's edge, its content starting where the canvas starts.
+ */
+function expectBands(
+  measure: LayoutMeasure,
+  width: number,
+  count: number,
+): void {
+  expect(measure.bands).toHaveLength(count);
+  for (const band of measure.bands) {
+    expect(band.start, band.element).toBeCloseTo(measure.edges.railEnd, 1);
+    expect(band.end, band.element).toBeCloseTo(width, 1);
+    expect(band.contentStart, band.element).toBeCloseTo(
+      measure.edges.canvasStart,
+      1,
+    );
+  }
+}
+
 let browser: Browser;
 let css: string;
 
@@ -318,6 +343,7 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
       expect(measure.overflow).toEqual([]);
       expect(measure.scrollers).not.toContain("main.ds.canvas");
+      expectBands(measure, viewport.width, 1);
     } finally {
       await page.close();
     }
@@ -357,6 +383,7 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       for (const scroller of measure.scrollers) {
         expect(["main.ds.canvas", "div.rail"]).toContain(scroller);
       }
+      expectBands(measure, viewport.width, 2);
 
       // The colophon takes a row of its own, one gutter under the canvas.
       expect(before.rows).toBe(3);
