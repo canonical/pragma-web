@@ -16,8 +16,8 @@
  * down; a strip whose band runs from the rail's
  * border to the viewport's edge with its content from the canvas's first
  * column line to its last; and every gap, padding and margin of the chrome
- * a multiple of 4px. The station index is measured in both its views (the
- * cards view as a known overflow), and a station page once more with a
+ * a multiple of 4px. The station index is measured in both its views, and
+ * a station page once more with a
  * field name longer than its key's track, which must clip there rather
  * than run under the value or widen the canvas, and once for its fields'
  * keys, a key carrying the inherited tag on the same line height as a
@@ -48,20 +48,17 @@ const CWD = process.cwd();
 const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
 
 /**
- * Pages on the document archetype: the station index in its rows view and
+ * Pages on the document archetype: the station index in both its views and
  * a station's page, under their lens's strip, and the landing and the
  * not-found page, which have no strip.
  */
-const DOCUMENT_PATHS = ["/stations", STATION_PATH, "/", "/not-found"] as const;
-
-/**
- * The station index in its cards view, which runs past the canvas: the
- * `Node` card arm renders its own one-column card, which ignores the
- * `Cards` group's two-column span. It is measured as an expected failure:
- * the test turns red once the arm renders the projections' `EntityCard`,
- * and the path then moves to `DOCUMENT_PATHS`.
- */
-const OVERFLOWING_DOCUMENT_PATHS = ["/stations?view=cards"] as const;
+const DOCUMENT_PATHS = [
+  "/stations",
+  "/stations?view=cards",
+  STATION_PATH,
+  "/",
+  "/not-found",
+] as const;
 
 /**
  * Set `name` as the text of the page's first key and measure the pair: the
@@ -270,13 +267,6 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
           expect(["main.ds.canvas", "div.rail"], theme).toContain(scroller);
         }
       }
-    },
-  );
-
-  it.fails.each(OVERFLOWING_DOCUMENT_PATHS)(
-    "runs the document at %s past its canvas until its cards span two columns",
-    async (path) => {
-      expectGrid(await measure(path));
     },
   );
 

@@ -1,7 +1,7 @@
 import { HomesProvider, RouterLink } from "@canonical/prism-core";
 import { ProjectionsProvider } from "@canonical/prism-projections";
 import type { ElementType, ReactElement } from "react";
-import { metroProjectionMaps } from "#projections";
+import { metroProjectionMaps } from "#domains/metro";
 import { homes } from "../../src/homes.js";
 
 /**

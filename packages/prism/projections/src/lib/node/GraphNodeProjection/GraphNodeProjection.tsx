@@ -11,12 +11,15 @@ import type { GraphNodeProjectionProps } from "./types.js";
 /**
  * The fields GraphNodeProjection reads from the Node it dispatches: its
  * typename, and each arm's fragment, spread aliased by the type the arm
- * projects, `Node` for every type no other arm takes.
+ * projects, `Node` for every type no other arm takes, and the site slot, the
+ * arms of the site's own types: `SiteGraphNodeProjection_node` spread aliased
+ * as `Site`.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment GraphNodeProjection_node on Node {
     __typename
     ...NodeGraphNode_node @alias(as: "Node")
+    ...SiteGraphNodeProjection_node @alias(as: "Site")
     ...OntologyClassGraphNode_node @alias(as: "OntologyClass")
   }
 `;
@@ -24,10 +27,11 @@ void declareNodeFragment;
 /* v8 ignore stop */
 
 /**
- * Any graph node as the node of a graph, dispatched on its type: it renders
- * the arm the site's graph-node map holds for the node's typename, or the
- * `Node` arm, `NodeGraphNode`, for every type no other arm takes. A site's
- * arm for a type of its own renders over the `Node` arm's key.
+ * Any graph node as the node of a graph, dispatched on its type: it renders the
+ * arm the site's graph-node map holds for the node's typename, or the `Node`
+ * arm, `NodeGraphNode`, for every type no other arm takes. A site's arm for a
+ * type of its own renders over the site slot's key, the site's own compile of
+ * `SiteGraphNodeProjection_node`.
  *
  * It renders no element of its own: the arm renders the root, an SVG
  * `<g>`, and every native prop reaches it, the graph's transform and the

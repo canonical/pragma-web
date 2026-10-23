@@ -106,12 +106,12 @@ describe("the Definitions lens", () => {
     );
     await waitFor(() => {
       expect(
-        container.querySelector(".term-inspector .node-chip a"),
+        container.querySelector(".term-inspector .entity-chip a"),
       ).not.toBeNull();
     });
     const chips = [
       ...container.querySelectorAll<HTMLAnchorElement>(
-        ".term-inspector .node-chip a",
+        ".term-inspector .entity-chip a",
       ),
     ];
     expect(chips.length).toBeGreaterThan(0);

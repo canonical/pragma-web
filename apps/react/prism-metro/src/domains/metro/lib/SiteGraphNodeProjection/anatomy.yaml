@@ -1,0 +1,21 @@
+---
+# SiteGraphNodeProjection: a metro node as the node of a graph, dispatched
+# on its type inside the package's graph node dispatcher.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the matrix: one
+# EntityGraphNode per type). It fills the package's site slot: the graph
+# node dispatcher renders it over the slot's key for every typename the
+# site's graph node map lists, and it renders the case that typename
+# selects. It renders no element of its own. The cases are its fragment's
+# aliased spreads and the site map's graph node keys, by the same names.
+node:
+  uri: metro.component.site_graph_node_projection
+  projection: { on: Node }
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node: { uri: metro.component.station_graph_node, projection: { on: Station } }
+          - node: { uri: metro.component.interchange_graph_node, projection: { on: Interchange } }
+          - node: { uri: metro.component.line_graph_node, projection: { on: Line } }
+          - node: { uri: metro.component.zone_graph_node, projection: { on: Zone } }
+      relation: { cardinality: "1" }

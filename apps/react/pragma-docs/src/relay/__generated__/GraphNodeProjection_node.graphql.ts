@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<75fcfc45d7bb5051fae0e7048c1038db>>
+ * @generated SignedSource<<6634a309acbf89251cb54348b1f7a11d>>
  * @lightSyntaxTransform
  */
 
@@ -17,6 +17,9 @@ export type GraphNodeProjection_node$data = {
   readonly OntologyClass: {
     readonly " $fragmentSpreads": FragmentRefs<"OntologyClassGraphNode_node">;
   } | null | undefined;
+  readonly Site: {
+    readonly " $fragmentSpreads": FragmentRefs<"SiteGraphNodeProjection_node">;
+  };
   readonly " $fragmentType": "GraphNodeProjection_node";
 };
 export type GraphNodeProjection_node$key = {
@@ -60,6 +63,22 @@ const node: ReaderFragment = {
           {
             "args": null,
             "kind": "FragmentSpread",
+            "name": "SiteGraphNodeProjection_node"
+          }
+        ],
+        "type": "Node",
+        "abstractKey": "__isNode"
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "Site"
+    },
+    {
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
             "name": "OntologyClassGraphNode_node"
           }
         ],
@@ -74,6 +93,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "52522f219cfb561c752e3fe870950b19";
+(node as any).hash = "8844cd7b8f408d45257fe5c407fc479f";
 
 export default node;

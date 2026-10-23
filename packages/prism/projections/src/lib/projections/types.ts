@@ -14,21 +14,23 @@ import type {
 } from "../node/index.js";
 
 /**
- * What a composite fragment's data holds: the typename dispatch reads, and
- * the `Node` arm's key, spread aliased as `Node`.
+ * What a composite fragment's data holds: the typename dispatch reads, the
+ * `Node` arm's key, spread aliased as `Node`, and the site slot's key,
+ * spread aliased as `Site`.
  */
 export interface DispatchedNode {
   readonly __typename: string;
   readonly Node: unknown;
+  readonly Site: unknown;
 }
 
 /**
- * The typenames a composite arms besides `Node`: its other spreads, each
- * aliased by the type it is on.
+ * The typenames a composite arms besides `Node`: its other spreads but the
+ * site slot, each aliased by the type it is on.
  */
 export type ArmedTypename<TData> = Exclude<
   keyof TData,
-  "__typename" | "Node" | " $fragmentType"
+  "__typename" | "Node" | "Site" | " $fragmentType"
 > &
   string;
 
@@ -44,8 +46,8 @@ export type ProjectionArm<TKey, TNative> = ComponentType<
 >;
 
 /**
- * What a site's arm receives: the props of the `Node` projection it wraps,
- * and the typename of the node it renders.
+ * What a site's arm receives: an arm's props over the site slot's key, and
+ * the typename of the node it renders.
  */
 export type SiteArmProps<TProps> = TProps & { readonly typename: string };
 
@@ -66,13 +68,14 @@ export interface ProjectionMap<TData extends DispatchedNode, TNative> {
     >;
   };
   /**
-   * A site's arms for types the composite does not arm, by typename: each
-   * reads the `Node` key, and takes the node's typename.
+   * A site's arms for its own types, by typename: each reads the site
+   * slot's key, the site's own compile of `Site<Form>Projection_node`
+   * spread aliased as `Site`, and takes the node's typename.
    */
   readonly siteTypes?: Readonly<
     Record<
       string,
-      ComponentType<SiteArmProps<ArmProps<TData["Node"], TNative>>>
+      ComponentType<SiteArmProps<ArmProps<TData["Site"], TNative>>>
     >
   >;
 }

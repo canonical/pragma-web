@@ -8,6 +8,7 @@ import type { ArmProps, ProjectionMap, SiteArmProps } from "./types.js";
 interface ProbeData {
   readonly __typename: string;
   readonly Node: string;
+  readonly Site: string;
   readonly OntologyClass: string | null;
 }
 
@@ -50,22 +51,29 @@ describe("renderArm", () => {
     renderData({
       __typename: "OntologyClass",
       Node: "node-key",
+      Site: "site-key",
       OntologyClass: "class-key",
     });
     expect(screen.getByText("class class-key")).toBeInTheDocument();
   });
 
-  it("renders a site's arm over the Node key, with the typename", () => {
+  it("renders a site's arm over the site slot's key, with the typename", () => {
     renderData({
       __typename: "Station",
       Node: "node-key",
+      Site: "site-key",
       OntologyClass: null,
     });
-    expect(screen.getByText("site node-key Station")).toBeInTheDocument();
+    expect(screen.getByText("site site-key Station")).toBeInTheDocument();
   });
 
   it("renders the Node arm for a type no other arm takes", () => {
-    renderData({ __typename: "Zone", Node: "node-key", OntologyClass: null });
+    renderData({
+      __typename: "Zone",
+      Node: "node-key",
+      Site: "site-key",
+      OntologyClass: null,
+    });
     expect(screen.getByText("node node-key")).toBeInTheDocument();
   });
 
@@ -73,7 +81,12 @@ describe("renderArm", () => {
     render(
       renderArm<ProbeData, ProbeNative>(
         { Node: MAP.Node, types: MAP.types },
-        { __typename: "OntologyClass", Node: "node-key", OntologyClass: null },
+        {
+          __typename: "OntologyClass",
+          Node: "node-key",
+          Site: "site-key",
+          OntologyClass: null,
+        },
         {},
       ),
     );
@@ -84,16 +97,26 @@ describe("renderArm", () => {
     render(
       renderArm<ProbeData, ProbeNative>(
         { ...MAP, siteTypes: { toString: SiteProbe } },
-        { __typename: "toString", Node: "node-key", OntologyClass: null },
+        {
+          __typename: "toString",
+          Node: "node-key",
+          Site: "site-key",
+          OntologyClass: null,
+        },
         {},
       ),
     );
-    expect(screen.getByText("site node-key toString")).toBeInTheDocument();
+    expect(screen.getByText("site site-key toString")).toBeInTheDocument();
   });
 
   it("hands the arm the dispatcher's native props", () => {
     renderData(
-      { __typename: "Zone", Node: "node-key", OntologyClass: null },
+      {
+        __typename: "Zone",
+        Node: "node-key",
+        Site: "site-key",
+        OntologyClass: null,
+      },
       { id: "the-arm" },
     );
     expect(document.getElementById("the-arm")?.textContent).toBe(

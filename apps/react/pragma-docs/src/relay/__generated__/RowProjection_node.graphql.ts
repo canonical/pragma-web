@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a32f4490fc38f1da9043fccaf593fb33>>
+ * @generated SignedSource<<05db9e44a90d56e8f9b8f62732e54673>>
  * @lightSyntaxTransform
  */
 
@@ -17,6 +17,9 @@ export type RowProjection_node$data = {
   readonly OntologyClass: {
     readonly " $fragmentSpreads": FragmentRefs<"OntologyClassRow_node">;
   } | null | undefined;
+  readonly Site: {
+    readonly " $fragmentSpreads": FragmentRefs<"SiteRowProjection_node">;
+  };
   readonly " $fragmentType": "RowProjection_node";
 };
 export type RowProjection_node$key = {
@@ -60,6 +63,22 @@ const node: ReaderFragment = {
           {
             "args": null,
             "kind": "FragmentSpread",
+            "name": "SiteRowProjection_node"
+          }
+        ],
+        "type": "Node",
+        "abstractKey": "__isNode"
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "Site"
+    },
+    {
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
             "name": "OntologyClassRow_node"
           }
         ],
@@ -74,6 +93,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "a3695f9884b5df1c21faf895fd57c185";
+(node as any).hash = "46f9e4caac17ac636a3ba2a037ae2342";
 
 export default node;

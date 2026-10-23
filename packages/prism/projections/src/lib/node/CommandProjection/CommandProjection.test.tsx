@@ -2,7 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { graphql, useLazyLoadQuery } from "react-relay";
+import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
@@ -16,11 +16,13 @@ import {
 import testQuery, {
   type CommandProjectionTestQuery,
 } from "../../../__generated__/CommandProjectionTestQuery.graphql.js";
-import type { SiteArmProps } from "../../projections/index.js";
+import siteFragment, {
+  type SiteCommandProjection_node$key,
+} from "../../../__generated__/SiteCommandProjection_node.graphql.js";
+import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
-import { NodeCommand, type NodeCommandProps } from "../NodeCommand/index.js";
 import CommandProjection from "./CommandProjection.js";
-import type { CommandProjectionProps } from "./types.js";
+import type { CommandArmNative, CommandProjectionProps } from "./types.js";
 
 /**
  * The operation the tests render CommandProjection under: one
@@ -110,17 +112,28 @@ describe("CommandProjection", () => {
     expect(container.querySelector(".ds.node-command")).toBeNull();
   });
 
-  it("renders a type the site arms through the site's arm, over the Node key", () => {
+  it("renders a type the site arms through the site's arm, over the site slot's key", () => {
     /**
-     * A site's arm for its own type: the Node projection, marked with the
-     * typename.
+     * A site's arm for its own type: it reads the site slot's key and marks
+     * its root with the typename it was handed and the one it read.
      */
-    const SiteNodeCommand = ({
+    const SiteProbe = ({
+      node,
       typename,
       ...props
-    }: SiteArmProps<NodeCommandProps>): ReactElement => (
-      <NodeCommand {...props} data-site-type={typename} />
-    );
+    }: SiteArmProps<
+      ArmProps<SiteCommandProjection_node$key, CommandArmNative>
+    >): ReactElement => {
+      const data = useFragment(siteFragment, node);
+      return (
+        <li
+          {...props}
+          className="site-probe"
+          data-site-type={typename}
+          data-typename={data.__typename}
+        />
+      );
+    };
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -133,16 +146,15 @@ describe("CommandProjection", () => {
           ...defaultProjectionMaps,
           command: {
             ...defaultProjectionMaps.command,
-            siteTypes: { Component: SiteNodeCommand },
+            siteTypes: { Component: SiteProbe },
           },
         },
       },
     );
-    expect(
-      container
-        .querySelector(".ds.node-command")
-        ?.getAttribute("data-site-type"),
-    ).toBe("Component");
+    const probe = container.querySelector(".site-probe");
+    expect(probe?.getAttribute("data-site-type")).toBe("Component");
+    expect(probe?.getAttribute("data-typename")).toBe("Component");
+    expect(container.querySelector(".ds.node-command")).toBeNull();
   });
 
   it("renders a type the site arms for another typename through the Node arm", () => {

@@ -45,12 +45,12 @@ function renderTypeArm<
 /**
  * Render the arm a node's typename selects in one form's map: the typed arm
  * for its type when the map has one and its alias resolved, else the
- * site's arm for its typename, else the `Node` arm, which reads what every
- * node carries.
+ * site's arm for its typename over the site slot's key, else the `Node`
+ * arm, which reads what every node carries.
  *
  * @param map - The form's arms.
- * @param data - The composite fragment's data: the typename and every
- *   arm's aliased key.
+ * @param data - The composite fragment's data: the typename, every arm's
+ *   aliased key and the site slot's key.
  * @param native - The dispatcher's native props, handed to the arm.
  * @returns The arm's element.
  */
@@ -69,7 +69,7 @@ export default function renderArm<
   if (typed !== undefined) return typed;
   const SiteArm = map.siteTypes?.[typename];
   if (SiteArm !== undefined) {
-    return <SiteArm {...native} node={data.Node} typename={typename} />;
+    return <SiteArm {...native} node={data.Site} typename={typename} />;
   }
   const NodeArm = map.Node;
   return <NodeArm {...native} node={data.Node} />;

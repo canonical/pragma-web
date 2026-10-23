@@ -1,0 +1,21 @@
+---
+# SiteChipProjection: a metro node as the inline mention, dispatched on its
+# type inside the package's chip dispatcher.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the matrix: one
+# EntityChip per type). It fills the package's site slot: the chip
+# dispatcher renders it over the slot's key for every typename the site's
+# chip map lists, and it renders the case that typename selects. It renders
+# no element of its own. The cases are its fragment's aliased spreads and
+# the site map's chip keys, by the same names.
+node:
+  uri: metro.component.site_chip_projection
+  projection: { on: Node }
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node: { uri: metro.component.station_chip, projection: { on: Station } }
+          - node: { uri: metro.component.interchange_chip, projection: { on: Interchange } }
+          - node: { uri: metro.component.line_chip, projection: { on: Line } }
+          - node: { uri: metro.component.zone_chip, projection: { on: Zone } }
+      relation: { cardinality: "1" }

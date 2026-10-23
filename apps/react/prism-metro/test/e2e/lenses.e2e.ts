@@ -19,7 +19,7 @@ const INITIAL_DATA_PATTERN = /window\.__INITIAL_DATA__ = (.*?)<\/script>/s;
 
 /** An instance chip of the term inspector, linking to the stations lens. */
 const INSTANCE_CHIP_PATTERN =
-  /<a class="ds router-link title" href="(\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
+  /<a class="ds router-link value" href="(\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
 
 const CELLS = [
   { script: "dev:bun", timeoutMs: DEV_READY_MS },
@@ -117,7 +117,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     const { status, html } = await fetchPage(script, "/lines");
     expect(status).toBe(200);
     expect(html).toMatch(
-      /<li class="ds entity-row ds node-row ds line-row"[^>]*>.*?Circle Line/s,
+      /<li [^>]*class="ds entity-row ds line-row"[^>]*>.*?Circle Line/s,
     );
   });
 

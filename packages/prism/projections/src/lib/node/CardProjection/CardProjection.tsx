@@ -11,12 +11,14 @@ import type { CardProjectionProps } from "./types.js";
 /**
  * The fields CardProjection reads from the Node it dispatches: its typename,
  * and each arm's fragment, spread aliased by the type the arm projects, `Node`
- * for every type no other arm takes.
+ * for every type no other arm takes, and the site slot, the arms of the site's
+ * own types: `SiteCardProjection_node` spread aliased as `Site`.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment CardProjection_node on Node {
     __typename
     ...NodeCard_node @alias(as: "Node")
+    ...SiteCardProjection_node @alias(as: "Site")
     ...OntologyClassCard_node @alias(as: "OntologyClass")
   }
 `;
@@ -27,7 +29,8 @@ void declareNodeFragment;
  * Any graph node as the card in a grid of entities, dispatched on its type: it
  * renders the arm the site's card map holds for the node's typename, or the
  * `Node` arm, `NodeCard`, for every type no other arm takes. A site's arm for a
- * type of its own renders over the `Node` arm's key.
+ * type of its own renders over the site slot's key, the site's own compile of
+ * `SiteCardProjection_node`.
  *
  * It renders no element of its own: the arm renders the root, a `<div>`, and
  * every native prop reaches it.

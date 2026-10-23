@@ -207,19 +207,19 @@ every arm of one form renders the same representation, so the
 dispatcher's native props are that root's. The chip takes `children`, the
 mention's text in place of the name.
 
-A dispatcher reads a composite fragment: the node's typename, and each
-arm's fragment spread aliased by the type it projects,
+A dispatcher reads a composite fragment: the node's typename, each arm's
+fragment spread aliased by the type it projects,
 `...NodeCard_node @alias(as: "Node")` and
-`...OntologyClassCard_node @alias(as: "OntologyClass")`. Each form's map
-holds the arms:
+`...OntologyClassCard_node @alias(as: "OntologyClass")`, and the site slot,
+`...SiteCardProjection_node @alias(as: "Site")`. Each form's map holds the
+arms:
 
 - `Node`: the arm of every type no other arm takes.
 - `types`: one arm per aliased spread besides `Node`, each typed against
   that alias's key, so a wrong or missing arm does not compile.
-- `siteTypes`: a site's arms for its own types, by typename. A site cannot
-  add a spread to the package's composites, so a site arm reads the `Node`
-  key; it receives the node's typename beside it (`SiteArmProps`), and
-  usually wraps the `Node` projection.
+- `siteTypes`: a site's arms for its own types, by typename. Each reads
+  the site slot's key and receives the node's typename beside it
+  (`SiteArmProps`); see "Site arms" below.
 
 A typed arm wins, then a site arm, then the `Node` arm. The package's
 tests hold each composite's aliases, its map's `types` and its
@@ -242,17 +242,8 @@ import {
 </HomesProvider>;
 ```
 
-A site with types of its own extends the defaults:
-
-```tsx
-const maps: ProjectionMaps = {
-  ...defaultProjectionMaps,
-  card: {
-    ...defaultProjectionMaps.card,
-    siteTypes: { Station: StationCard },
-  },
-};
-```
+A site with types of its own extends the defaults, as "Site arms" below
+describes.
 
 Every link to a home renders through `LinkComponent`, typed against the
 shared `LinkComponentProps` of `@canonical/react-ds-global` and defaulting
@@ -266,6 +257,49 @@ package's arms do.
 A node's or a class's home is resolved with its compact address
 (`_meta.curie`) as the `uri` a site's home resolver receives, so one
 entity has one address; a property's with its IRI, its only address.
+
+## Site arms
+
+A site projects its own types, a metro site's stations or a docsite's
+components, through the site slot every composite spreads:
+`...Site<Form>Projection_node @alias(as: "Site")`, a fragment on `Node`.
+The package ships a default of each, in `src/lib/site/`, that reads the
+typename alone, for a site with no types of its own; the package, the lens
+packages and any site that compiles the package's documents compile it.
+
+A site with types of its own compiles the package's documents against its
+own schema, excludes `src/lib/site/` from its compile, and defines the
+five fragments itself, each spreading its arms' fragments aliased by the
+type they are on:
+
+```graphql
+fragment SiteCardProjection_node on Node {
+  __typename
+  ...StationCard_node @alias(as: "Station")
+  ...LineCard_node @alias(as: "Line")
+}
+```
+
+The component that defines that fragment is the site's dispatcher for the
+form: it reads the slot's key, switches on the typename it receives, and
+renders the arm over that type's aliased key. The site lists it in its
+maps under `siteTypes`, once per typename it arms:
+
+```tsx
+const maps: ProjectionMaps = {
+  ...defaultProjectionMaps,
+  card: {
+    ...defaultProjectionMaps.card,
+    siteTypes: { Station: SiteCardProjection, Line: SiteCardProjection },
+  },
+};
+```
+
+The package's dispatchers import the composites' artifacts their own
+compile writes, so a site runs them on its own compile: its bundler
+resolves the package's artifact imports to the artifacts of the same
+name the site's compile writes, so the package's queries fetch what the
+site's arms read.
 
 ## List view
 

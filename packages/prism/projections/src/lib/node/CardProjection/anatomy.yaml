@@ -8,6 +8,9 @@
 # projection; every other type through the Node projection, from what every
 # node carries. The cases are the composite fragment's aliased spreads, one
 # per type, and the map's arms, by the same names.
+# A site's own types read through the site slot, the site's own compile
+# of `SiteCardProjection_node`, for the typenames its map lists under
+# `siteTypes`.
 node:
   uri: prism.component.card_projection
   projection:
@@ -22,6 +25,10 @@ node:
                 on: OntologyClass
           - node:
               uri: prism.component.node_card
+              projection:
+                on: Node
+          - node:
+              uri: prism.component.site_card_projection
               projection:
                 on: Node
       relation:
