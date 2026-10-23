@@ -337,9 +337,10 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
   `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListView`.
-- Maps: `ProjectionsProvider`, `useProjectionMaps`,
-  `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
+- Maps: `ProjectionsProvider`, `useProjectionMaps`, `useProjectionLink`,
+  `renderArm`, `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
   `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,
   `SiteArmProps`.
 - Prose: `markdownComponents`, `ProseReferencesProvider`; types
   `ProseLinkProps`, `ProseReferencesProviderProps`.
+- Addresses: `findCuriePrefix`.
