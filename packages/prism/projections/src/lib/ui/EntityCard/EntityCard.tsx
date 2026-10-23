@@ -54,7 +54,6 @@ export default function EntityCard({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      {sidecar === undefined ? null : <div className="sidecar">{sidecar}</div>}
       <Card.Content className="body">
         <div className="description">
           <div className="heading">
@@ -98,6 +97,7 @@ export default function EntityCard({
           ))}
         </Card.Footer>
       )}
+      {sidecar === undefined ? null : <div className="sidecar">{sidecar}</div>}
     </Card>
   );
 }

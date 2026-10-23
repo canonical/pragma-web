@@ -73,6 +73,14 @@
     grid-column: 1 / span var(--entity-card-body-span);
   }
 
+  /* The sidecar comes after the card's sections, so the section it follows
+   * is no longer the Card's last child and would draw a divider along the
+   * card's bottom edge: it draws none, as the Card's last section does. */
+  .ds.entity-card:has(> .body + .sidecar) > .body,
+  .ds.entity-card:has(> .footer + .sidecar) > .footer {
+    border-block-end-width: 0;
+  }
+
   /* Beside the body and the footer, on every track: a tall example grows
    * them. */
   .ds.entity-card > .sidecar {

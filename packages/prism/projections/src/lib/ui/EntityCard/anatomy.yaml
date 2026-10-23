@@ -38,9 +38,18 @@
 #
 # The sidecar carries a rendered example of the entity beside the body: the
 # entity type decides whether it has one (UI blocks), and its consumer fills
-# it. It comes first in the DOM so the body's sections keep the Card's
-# dividers, and it is placed after them, on every row track, so a tall
-# example grows the card's body and footer.
+# it. It comes last in the DOM, after the body and the footer, as it sits
+# after them on the page, so a reader and the keyboard reach the title
+# before the example's own controls. It is placed on every row track, so a
+# tall example grows the card's body and footer.
+#
+# The Card draws a divider under every section but its last child. With
+# the sidecar last, the section it follows, the footer or a body without
+# one, would draw that divider along the card's bottom edge; a reflow
+# under `.ds.entity-card:has(> .footer + .sidecar)` and
+# `.ds.entity-card:has(> .body + .sidecar)` sets that section's
+# `border-block-end-width` to 0, so the card's dividers are the ones it
+# draws without a sidecar.
 #
 # With-sidecar reflow, bound in styles.css under
 # `.ds.entity-card:has(> .sidecar)` (the DSL's states re-value channels and

@@ -125,7 +125,27 @@ describe("EntityCard", () => {
   });
 
   describe("sidecar", () => {
-    it("renders the sidecar first, beside the body, holding its content", () => {
+    it("renders the sidecar last, after the body and the footer, holding its content", () => {
+      render(
+        <EntityCard
+          data-testid="card"
+          sidecar={<button type="button">Submit</button>}
+          title="IconButton"
+          vitals={["v2.1"]}
+        />,
+      );
+      const card = screen.getByTestId("card");
+      expect([...card.children].map((section) => section.className)).toEqual([
+        "ds card-content body",
+        "ds card-footer footer",
+        "sidecar",
+      ]);
+      const sidecar = card.lastElementChild;
+      expect(sidecar?.className).toBe("sidecar");
+      expect(sidecar?.textContent).toBe("Submit");
+    });
+
+    it("follows the body with the sidecar when there are no vitals", () => {
       render(
         <EntityCard
           data-testid="card"
@@ -134,12 +154,23 @@ describe("EntityCard", () => {
         />,
       );
       const card = screen.getByTestId("card");
-      const sidecar = card.firstElementChild;
-      expect(sidecar?.className).toBe("sidecar");
-      expect(sidecar?.textContent).toBe("Submit");
-      expect(sidecar?.nextElementSibling?.classList.contains("body")).toBe(
-        true,
+      expect(card.firstElementChild?.classList.contains("body")).toBe(true);
+      expect(card.lastElementChild?.className).toBe("sidecar");
+    });
+
+    it("lets the keyboard reach the title before the sidecar's controls", () => {
+      render(
+        <EntityCard
+          href="/ds/icon-button"
+          sidecar={<button type="button">Submit</button>}
+          title="IconButton"
+        />,
       );
+      const link = screen.getByRole("link", { name: "IconButton" });
+      const button = screen.getByRole("button", { name: "Submit" });
+      expect(
+        link.compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
     });
   });
 
