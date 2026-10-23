@@ -87,6 +87,14 @@ export const Class: Story = { args: toCardArgs(CLASS_ENTITY) };
 /** A UI block under its parent, without a sidecar. */
 export const UIBlock: Story = { args: toCardArgs(UI_BLOCK_ENTITY) };
 
+/**
+ * A modifier family without vitals: the card has no footer, and its body
+ * reaches the card's bottom edge.
+ */
+export const WithoutVitals: Story = {
+  args: { ...toCardArgs(MODIFIER_FAMILY_ENTITY), vitals: undefined },
+};
+
 /** A UI block with its sidecar: the rendered example beside the body. */
 export const UIBlockWithSidecar: Story = {
   args: { ...toCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },

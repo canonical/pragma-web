@@ -20,6 +20,9 @@
 # tracks; the footer reaches back across the last one (a block-start
 # margin of minus the gutter), so it meets the body at the body's divider,
 # as the Card's sections meet, and the card is no taller than its content.
+# A card without vitals has no footer; a reflow under
+# `.ds.entity-card:not(:has(> .footer))` gives the body every row track
+# (`layout.grid.row: 1 / -1`), so no empty strip stays below it.
 #
 # The card sets its text on the matrix's 24px line, the line every
 # representation shares (the graph node draws on it too), so its heading

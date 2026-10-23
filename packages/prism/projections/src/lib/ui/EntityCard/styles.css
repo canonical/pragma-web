@@ -53,6 +53,12 @@
     grid-row: 1 / 4;
   }
 
+  /* Without vitals there is no footer: the body takes the footer's track
+   * and the gutter before it too, so the card ends where its body does. */
+  .ds.entity-card:not(:has(> .footer)) > .body {
+    grid-row: 1 / -1;
+  }
+
   /* The footer meets the body at the body's divider. */
   .ds.entity-card > .footer {
     margin-block-start: var(--entity-card-footer-overlap);

@@ -30,6 +30,9 @@ const MODIFIER = {
   vitals: ["v1.11", "Stable"],
 } as const;
 
+/** The stylesheet's reflow that gives a card without a footer's body every track. */
+const NO_FOOTER_BODY = ".ds.entity-card:not(:has(> .footer)) > .body";
+
 describe("EntityCard", () => {
   describe("title", () => {
     it("renders the title alone as the card's heading, as inert text", () => {
@@ -114,6 +117,22 @@ describe("EntityCard", () => {
       expect(
         screen.getAllByRole("definition").map((value) => value.textContent),
       ).toEqual(["Modifier", "Anticipation"]);
+    });
+
+    it("renders no footer without vitals, so the body takes every track", () => {
+      render(<EntityCard data-testid="card" {...MODIFIER} vitals={[]} />);
+      const card = screen.getByTestId("card");
+      expect(card.querySelector(".card-footer")).toBeNull();
+      expect(card.querySelector(NO_FOOTER_BODY)).toBe(
+        card.querySelector(":scope > .card-content"),
+      );
+    });
+
+    it("leaves the footer's track to the footer when there are vitals", () => {
+      render(<EntityCard data-testid="card" {...MODIFIER} />);
+      expect(
+        screen.getByTestId("card").querySelector(NO_FOOTER_BODY),
+      ).toBeNull();
     });
 
     it("puts the vitals in the published Card's footer", () => {
