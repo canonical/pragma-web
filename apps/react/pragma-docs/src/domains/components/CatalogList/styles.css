@@ -79,11 +79,13 @@
 
   /* The card grid is a SUBGRID (strict model — no leaf auto-fill template):
    * it inherits the section's columns (which are the lens layout's), and each
-   * card claims two of them. Past one group the canvas holds an even number
-   * of columns (10 at twelve, 6 at eight, 14 at sixteen), so the cards fill
-   * every row to the canvas's end: 5, 3 and 7 a row. The count falls out of
-   * the live column count, aligned to the ruler, with no template of its own
-   * and no query. */
+   * card is a tile of the canvas's page, which claims two of them. Past one
+   * group the canvas holds an even number of columns (10 at twelve, 6 at
+   * eight, 14 at sixteen), so the cards fill every row to the canvas's end:
+   * 5, 3 and 7 a row; below one group the canvas holds three, and the
+   * canvas gives each card the whole row. The count falls out of the live
+   * column count, aligned to the ruler, with no template and no query of the
+   * catalog's own. */
   .ds.catalog-list .catalog-cards {
     margin: 0;
     padding: 0;
@@ -97,13 +99,9 @@
     column-gap: var(--space-200, 1rem);
     row-gap: var(--space-200, 1rem);
   }
+  /* The span, and the card's leave to shrink to it, are the canvas's: each
+   * card is a page tile. */
   .ds.catalog-list .catalog-cards > li {
-    grid-column: span 2;
-    /* Obey the span: without this the card's content min-content (title +
-     * teaser) props the track wider than its 2 columns and the tiling breaks
-     * to fewer-per-row. min-inline-size:0 lets the card shrink to its span and
-     * the teaser wrap/ellipsis instead. */
-    min-inline-size: 0;
     gap: var(--space-100, 0.5rem);
   }
 

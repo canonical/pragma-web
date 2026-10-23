@@ -130,21 +130,17 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
 
   // Past one group the canvas holds an even number of columns, which the
   // catalog's two-column cards fill; at four columns the canvas holds
-  // three, so a row's one card leaves the last.
-  it.runIf(viewport.columns > 4)(
-    "fills the catalog's rows with cards to the canvas's end",
-    async () => {
-      const measures = await measure(CATALOG_PATH, CATALOG_CARD_SELECTOR);
-      for (const { theme, measure: layout } of measures) {
-        const shortfall = layout.canvasPage.fillShortfall;
-        expect(shortfall, theme).not.toBeNull();
-        expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
-        expect(shortfall?.end, theme).toBeLessThanOrEqual(
-          layout.canvasPage.columnGap,
-        );
-      }
-    },
-  );
+  // three, and each card takes the whole row. Either way the cards reach
+  // the canvas's end.
+  it("fills the catalog's rows with cards to the canvas's end", async () => {
+    const measures = await measure(CATALOG_PATH, CATALOG_CARD_SELECTOR);
+    for (const { theme, measure: layout } of measures) {
+      const shortfall = layout.canvasPage.fillShortfall;
+      expect(shortfall, theme).not.toBeNull();
+      expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+      expect(shortfall?.end, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+    }
+  });
 
   it("spans the standards index's links and lists over the main column", async () => {
     const measures = await measure(
