@@ -176,8 +176,8 @@
    * chip in a value keeps its whole pill, and the line grows to hold it. */
   .ds.entity-card > .body > .key-values > .pair {
     display: flex;
-    border-block-start-width: var(--entity-card-rule-width);
-    border-block-start-style: solid;
+    border-top-width: var(--entity-card-rule-width);
+    border-style: solid none none;
     border-block-start-color: var(--entity-card-rule-color);
   }
 

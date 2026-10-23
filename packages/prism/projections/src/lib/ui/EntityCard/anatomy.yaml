@@ -211,9 +211,11 @@ node:
                 - node:
                     role: pair
                     styles:
+                      # One rule above the pair: the top side alone has
+                      # a width and a style, every other side none.
                       layout.type: flex
-                      appearance.border.width: 1px
-                      appearance.border.style: solid
+                      appearance.border.top.width: 1px
+                      appearance.border.style: "solid none none"
                       appearance.border.block.start.color: color.border.muted
                     edges:
                       - node:
