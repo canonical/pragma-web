@@ -60,18 +60,20 @@ export const MOCK_ONTOLOGY_CLASS = {
 
 /**
  * The object property `modifier` as a Relay mock environment answers an
- * `OntologyProperty`: declared on UIBlock, its inverse `modifies`.
+ * `OntologyProperty`: declared on UIBlock, its inverse `modifies`. Each
+ * label differs from its IRI's local name, so a form that names a property
+ * by its local name while it has a label reads the wrong text.
  */
 export const MOCK_ONTOLOGY_PROPERTY = {
   __typename: "OntologyProperty",
   uri: "https://ds.canonical.com/modifier",
-  label: "modifier",
+  label: "Modifier",
   kind: "OBJECT",
   range: "ds:Modifier",
   functional: false,
   definition: "The modifier that changes how a block looks or behaves.",
   domain: { _meta: { title: "UIBlock" } },
-  inverse: { uri: "https://ds.canonical.com/modifies", label: "modifies" },
+  inverse: { uri: "https://ds.canonical.com/modifies", label: "Modifies" },
 } as const;
 
 /**

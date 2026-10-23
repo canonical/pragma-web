@@ -108,7 +108,7 @@ describe("OntologyPropertyGraphNode", () => {
         <OntologyPropertyGraphNode node={node} />
       </svg>
     ));
-    expect(container.querySelector(".title")?.textContent).toBe("modifier");
+    expect(container.querySelector(".title")?.textContent).toBe("Modifier");
     expect(container.querySelector(".context")?.textContent).toBe(
       "Object property in UIBlock",
     );

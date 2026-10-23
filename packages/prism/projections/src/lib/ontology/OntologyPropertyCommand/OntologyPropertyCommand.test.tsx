@@ -112,7 +112,7 @@ describe("OntologyPropertyCommand", () => {
       [...container.querySelectorAll(".title, .kind, .location, .vital")].map(
         (slot) => slot.textContent,
       ),
-    ).toEqual(["modifier", "Object property", "UIBlock", "ds:Modifier"]);
+    ).toEqual(["Modifier", "Object property", "UIBlock", "ds:Modifier"]);
     expect(container.querySelector(".title")?.getAttribute("href")).toBe(
       MOCK_ONTOLOGY_PROPERTY_HREF,
     );

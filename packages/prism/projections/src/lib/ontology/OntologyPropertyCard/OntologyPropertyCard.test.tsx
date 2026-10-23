@@ -104,13 +104,13 @@ describe("OntologyPropertyCard", () => {
         ...container.querySelectorAll(".title, .kind, .summary, .key, .value"),
       ].map((slot) => slot.textContent),
     ).toEqual([
-      "modifier",
+      "Modifier",
       "Object property in UIBlock",
       "The modifier that changes how a block looks or behaves.",
       "Range",
       "ds:Modifier",
       "Inverse",
-      "modifies",
+      "Modifies",
     ]);
     expect(container.querySelector(".value code")?.textContent).toBe(
       "ds:Modifier",
@@ -122,7 +122,7 @@ describe("OntologyPropertyCard", () => {
   it("links its name to the property's home", () => {
     renderWithNode((node) => <OntologyPropertyCard node={node} />);
     expect(
-      screen.getByRole("link", { name: "modifier" }).getAttribute("href"),
+      screen.getByRole("link", { name: "Modifier" }).getAttribute("href"),
     ).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
   });
 

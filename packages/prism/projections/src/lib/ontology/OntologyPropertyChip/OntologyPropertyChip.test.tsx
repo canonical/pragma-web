@@ -87,7 +87,7 @@ describe("OntologyPropertyChip", () => {
   it("links its label to the property's home", () => {
     renderWithNode((node) => <OntologyPropertyChip node={node} />);
     expect(
-      screen.getByRole("link", { name: "modifier" }).getAttribute("href"),
+      screen.getByRole("link", { name: "Modifier" }).getAttribute("href"),
     ).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
   });
 

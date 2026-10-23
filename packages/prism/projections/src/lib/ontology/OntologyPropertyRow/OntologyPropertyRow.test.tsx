@@ -105,7 +105,7 @@ describe("OntologyPropertyRow", () => {
     ));
     const title = container.querySelector(".title");
     expect(title?.tagName).toBe("A");
-    expect(title?.textContent).toBe("modifier");
+    expect(title?.textContent).toBe("Modifier");
     expect(title?.getAttribute("href")).toBe(MOCK_ONTOLOGY_PROPERTY_HREF);
     expect(container.querySelector(".meta")?.textContent).toBe("object");
     expect(container.querySelector(".location")).toBeNull();
