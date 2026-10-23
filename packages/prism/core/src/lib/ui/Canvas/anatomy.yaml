@@ -17,12 +17,20 @@
 # taller than the canvas (a long table of contents) would keep its middle
 # out of reach at every scroll position.
 #
+# A page that lays a collection on the page grid, such as a catalog's
+# cards, gives each item the `page-tile` class (`CANVAS_PAGE_TILE_CLASS_NAME`)
+# on a subgrid of the page's columns: the canvas spans each tile over two
+# columns, so past one group, where the canvas holds an even number of
+# columns, the tiles fill every row to the canvas's end.
+#
 # Reflow, bound in styles.css:
 #   `.ds.canvas:has(> .aside)` the rows follow their content (`auto`), so the
 #     scroll covers the longer of the page and the aside, and the page spans
 #     1 / -4.
 #   @container shell (width < 912px)   below two groups: the page spans
 #     1 / -1, and the aside takes row 2 under it.
+#   @container shell (width < 448px)   below one group: the canvas holds
+#     three columns, and each page tile spans 1 / -1, the whole row.
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -48,6 +56,13 @@ node:
         edges:
           - node:
               role: routed page
+              edges:
+                - node:
+                    role: page tile
+                    styles:
+                      layout.grid.column: "span 2"
+                      size.min.width: 0
+                  relation: { cardinality: "0..*", slotName: page-tile }
             relation: { cardinality: "1", slotName: default }
       relation: { cardinality: "1", slotName: page }
     - node:

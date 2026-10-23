@@ -60,7 +60,11 @@ each a subgrid over every column:
   an optional `aside` and an optional `colophon` band under the body. The
   aside is the canvas's own: it holds the last three columns inside the
   canvas's scroll, starting at the top of the page and scrolling with it,
-  and below two groups of columns it moves under the page.
+  and below two groups of columns it moves under the page. A page that
+  lays a collection on the page grid, such as a catalog's cards, gives
+  each item `CANVAS_PAGE_TILE_CLASS_NAME`: the canvas spans each tile over
+  two columns, and over the whole row below one group of columns, where
+  the canvas holds three.
 
 Each archetype's gap is the grid's gutter on both axes, so its rows sit one
 gutter apart. A region given a node that renders nothing (`null`, a
@@ -327,7 +331,7 @@ site's own catalog, and the factory holds no reader-facing string.
 - Layouts: `WorkspaceLayout`, `DocumentLayout`; types
   `WorkspaceLayoutProps`, `DocumentLayoutProps`.
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
-  `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+  `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`; types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,

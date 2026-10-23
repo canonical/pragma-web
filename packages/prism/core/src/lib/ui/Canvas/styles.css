@@ -56,6 +56,14 @@
     grid-column: 1 / -4;
   }
 
+  /* A tile of a collection the page lays on its grid spans two columns,
+   * so the tiles fill every row of an even number of columns. It may be
+   * narrower than its content. */
+  .ds.canvas .page-tile {
+    grid-column: span 2;
+    min-inline-size: 0;
+  }
+
   /* Below two groups the aside takes a row of its own under the page. */
   @container shell (width < 912px) {
     .ds.canvas:has(> .aside) > .page {
@@ -65,6 +73,14 @@
     .ds.canvas > .aside {
       grid-column: 1 / -1;
       grid-row: 2;
+    }
+  }
+
+  /* Below one group the canvas holds three columns, which two-column
+   * tiles cannot fill: each tile takes the whole row. */
+  @container shell (width < 448px) {
+    .ds.canvas .page-tile {
+      grid-column: 1 / -1;
     }
   }
 }

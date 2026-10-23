@@ -12,7 +12,8 @@
  * taller than the viewport can be scrolled into view, the gutter between
  * the rows, that a document with no colophon ends its canvas flush with
  * the viewport, that a layout with no strip starts its canvas flush with
- * the viewport's top, and that nothing reaches past the viewport.
+ * the viewport's top, that a page's tiles fill their rows to the canvas's
+ * end, and that nothing reaches past the viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -24,6 +25,7 @@ import type { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  CANVAS_PAGE_TILE_CLASS_NAME,
   DocumentLayout,
   ModeStrip,
   WorkspaceLayout,
@@ -156,6 +158,34 @@ const striplessDocumentLayout = (
     rail={<nav aria-label="Rail">Rail</nav>}
   >
     <p>Page</p>
+  </DocumentLayout>
+);
+
+/** Items enough to fill several rows of tiles at every width. */
+const TILES = Array.from({ length: 12 }, (_, index) => `Tile ${index + 1}`);
+
+/**
+ * A document whose page lays a collection of tiles on a subgrid of its
+ * columns, as a catalog does.
+ */
+const tiledDocumentLayout = (
+  <DocumentLayout rail={<nav aria-label="Rail">Rail</nav>}>
+    <ul
+      style={{
+        display: "grid",
+        gridTemplateColumns: "subgrid",
+        gridColumn: "1 / -1",
+        gap: "var(--grid-gutter)",
+        margin: 0,
+        padding: 0,
+      }}
+    >
+      {TILES.map((text) => (
+        <li className={CANVAS_PAGE_TILE_CLASS_NAME} key={text}>
+          {text}
+        </li>
+      ))}
+    </ul>
   </DocumentLayout>
 );
 
@@ -357,6 +387,37 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       expect(placement.colophon?.top).toBe(
         (placement.canvas?.bottom ?? 0) + 16,
       );
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("spans each page tile over two columns, or the whole row below one group", async () => {
+    const page = await open(tiledDocumentLayout);
+    try {
+      const { canvas, tiles } = await page.evaluate((selector) => {
+        const box = (element: Element | null) => {
+          const rect = element?.getBoundingClientRect();
+          return { left: rect?.left ?? -1, right: rect?.right ?? -1 };
+        };
+        return {
+          canvas: box(document.querySelector("main.ds.canvas")),
+          tiles: [...document.querySelectorAll(selector)].map((tile) => ({
+            ...box(tile),
+            column: `${getComputedStyle(tile).gridColumnStart} / ${getComputedStyle(tile).gridColumnEnd}`,
+          })),
+        };
+      }, `.${CANVAS_PAGE_TILE_CLASS_NAME}`);
+      expect(tiles).toHaveLength(TILES.length);
+      for (const tile of tiles) {
+        expect(tile.column).toBe(
+          viewport.width < 448 ? "1 / -1" : "span 2 / auto",
+        );
+      }
+      expect(Math.min(...tiles.map(({ left }) => left))).toBe(canvas.left);
+      expect(
+        canvas.right - Math.max(...tiles.map(({ right }) => right)),
+      ).toBeLessThanOrEqual(0.5);
     } finally {
       await page.close();
     }
