@@ -28,6 +28,7 @@ export type {
   NodeChipProps,
   NodeCommandProps,
   NodeGraphNodeProps,
+  NodeListProps,
   NodeRowProps,
   RowArmNative,
   RowProjectionProps,
@@ -42,6 +43,7 @@ export {
   NodeChip,
   NodeCommand,
   NodeGraphNode,
+  NodeList,
   NodeRow,
   RowProjection,
 } from "./node/index.js";

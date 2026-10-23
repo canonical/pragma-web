@@ -127,3 +127,11 @@ describe("each form's composite fragment", () => {
     });
   }
 });
+
+describe("the list view's two dispatchers", () => {
+  it("arm the same types, so a list's cards and rows project each node alike", () => {
+    expect(Object.keys(defaultProjectionMaps.row.types).sort()).toEqual(
+      Object.keys(defaultProjectionMaps.card.types).sort(),
+    );
+  });
+});

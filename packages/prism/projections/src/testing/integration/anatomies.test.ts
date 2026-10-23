@@ -88,6 +88,7 @@ describe("the package's components", () => {
       "NodeChip",
       "NodeCommand",
       "NodeGraphNode",
+      "NodeList",
       "NodeRow",
       "RowProjection",
       "OntologyClassCard",

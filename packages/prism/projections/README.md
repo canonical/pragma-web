@@ -248,6 +248,7 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
 - Node projections: `NodeChip`, `NodeRow`, `NodeCard`, `NodeCommand`,
   `NodeGraphNode`; types `NodeChipProps`, `NodeRowProps`, `NodeCardProps`,
   `NodeCommandProps`, `NodeGraphNodeProps`.
+- List view: `NodeList`; types `NodeListProps`.
 - Class projections: `OntologyClassChip`, `OntologyClassRow`,
   `OntologyClassCard`, `OntologyClassCommand`,
   `OntologyClassGraphNode`; types `OntologyClassChipProps`,
