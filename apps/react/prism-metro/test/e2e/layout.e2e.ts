@@ -159,6 +159,14 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       // behind its trigger below them.
       expect(layout.regionOverflow.inspector, theme).toBe("auto");
       expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
+      // The page never scrolls, a phone's included: below one group of
+      // columns the class graph's rows scroll inside the explorer's well,
+      // under the strip and the rail's search, as every region of the
+      // workspace scrolls on its own; above it the well pans instead.
+      expect(
+        layout.scrollers.includes("div.ds.hierarchy-well.explorer-well"),
+        theme,
+      ).toBe(viewport.width < 448);
     }
   });
 
