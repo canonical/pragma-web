@@ -1,0 +1,103 @@
+---
+# StandardsIndex — the bound class's instances, grouped by their own class:
+# an inline row of jump links to the groups, only when there is more than
+# one, then each group, its level-2 heading over its entries in the shared
+# list view, then the explicit "Load more" while the graph has more.
+#
+# Reference: the projection matrix's list entry. Each group's entries are
+# the shared list view (EntityList, rows view, no toolbar) of the
+# projections' 32px list entries (EntityRow): the standard's title linked
+# to its reading page through core's RouterLink, and its compact address,
+# in the published InlineCode, as the muted word at the end of the row. A
+# graph with no standard shows the list view's empty line. "Load more" is
+# the published Button at secondary importance, busy while the next page
+# loads. Bespoke in its arrangement only.
+#
+# The index uses the whole main column: the root, each group and the
+# category links' region are subgrids or items over every column, the
+# grids' gap the grid's gutter on both axes. Each group stands one default
+# step of block space below what precedes it, external spacing on the
+# group, so its heading reads with the entries under it rather than the
+# group above. The category links wrap, one gutter apart. An entry whose
+# title and address do not share a line, as on a phone, keeps its title
+# whole and moves its address to a line of its own: the row's own
+# behaviour, which the index does not restyle.
+#
+# Every decision is read through a component token declared on the root
+# (`--standards-index-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure, a span in columns.
+#   layout.alignSelf start, layout.wrap wrap, layout.listStyle none:
+#     layout keywords; the 0 resets on the category links' list.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# container.gap.default.
+node:
+  uri: prism.component.standards_index
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: categories (the jump-link navigation, labelled from the catalog)
+        styles:
+          layout.grid.column: "1 / -1"
+        edges:
+          - node:
+              role: category links (an inline list that wraps)
+              styles:
+                layout.type: flex
+                layout.wrap: wrap
+                spacing.gap: grid.gutter
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+              edges:
+                - node:
+                    role: category link (an in-page link to its group)
+                  relation: { cardinality: "2..*" }
+            relation: { cardinality: "1", slotName: category-links }
+      relation: { cardinality: "0..1", slotName: categories }
+    - node:
+        role: group (a section per class, labelled by its heading)
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+          spacing.external.block.start: container.gap.default
+        edges:
+          - node:
+              role: group heading (the level-2 heading, the class's title)
+              styles:
+                layout.grid.column: "1 / -1"
+            relation: { cardinality: "1", slotName: group-heading }
+          - node:
+              uri: prism.component.entity_list
+              edges:
+                - node:
+                    uri: prism.component.entity_row
+                    edges:
+                      - node:
+                          uri: global.component.inline_code
+                        relation: { cardinality: "1", slotName: meta }
+                  relation: { cardinality: "1..*", slotName: items }
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..*", slotName: group }
+    - node:
+        uri: prism.component.entity_list
+      relation: { cardinality: "0..1", slotName: empty }
+    - node:
+        role: more (holds the Load more button at its own width)
+        styles:
+          layout.grid.column: "1 / -1"
+        edges:
+          - node:
+              uri: global.component.button
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1", slotName: more }

@@ -1,0 +1,50 @@
+---
+# EntityDetail — the entity page's data-bearing interior: it reads the
+# graph's namespaces and the page's one operation from the warm store and
+# renders the entity, its heading, its summary, then the fields and the
+# relations its class declares as key values; or, for an address nothing in
+# the graph answers to or a node outside the bound class, a status line
+# naming the address in the published InlineCode. It sets the document
+# title either way.
+#
+# A subgrid of the page over every column, its gap the grid's gutter on
+# both axes: the status line spans it, and each part places itself, the
+# summary alone on the reading measure.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-detail-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure, a span in columns.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: prism.subcomponent.entity_detail
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: not found (a status line, role status)
+        styles:
+          layout.grid.column: "1 / -1"
+          typography.color: color.text.muted
+        edges:
+          - node:
+              uri: global.component.inline_code
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1", slotName: not-found }
+    - node:
+        uri: prism.subcomponent.entity_heading
+      relation: { cardinality: "0..1", slotName: heading }
+    - node:
+        uri: prism.subcomponent.entity_summary
+      relation: { cardinality: "0..1", slotName: summary }
+    - node:
+        uri: prism.subcomponent.field_list
+      relation: { cardinality: "0..1", slotName: fields }
+    - node:
+        uri: prism.subcomponent.relations
+      relation: { cardinality: "0..1", slotName: relations }

@@ -1,0 +1,32 @@
+---
+# StandardsLayout — the Standards lens on the document archetype: the
+# site's rail, the mode strip carrying the lens's breadcrumb trail, the
+# routed page (the index or a reading page) in the one scrolling canvas,
+# and the site's colophon under it. It renders no element of its own:
+# core's DocumentLayout is the root and takes the layout's native props, so
+# this anatomy binds no style and the folder has no stylesheet. The strip's
+# controls and status stay empty: the lens has no filter and no figure. No
+# aside: a standard is one short document with nothing to set beside it.
+node:
+  uri: prism.component.standards_layout
+  edges:
+    - node:
+        uri: prism.component.document_layout
+        edges:
+          - node:
+              role: rail (the site's own)
+            relation: { cardinality: "1", slotName: rail }
+          - node:
+              uri: prism.component.mode_strip
+              edges:
+                - node:
+                    uri: prism.subcomponent.trail
+                  relation: { cardinality: "1", slotName: context }
+            relation: { cardinality: "1", slotName: strip }
+          - node:
+              role: routed page (the index or a reading page)
+            relation: { cardinality: "1", slotName: default }
+          - node:
+              role: colophon (the site's own footer band)
+            relation: { cardinality: "0..1", slotName: colophon }
+      relation: { cardinality: "1" }

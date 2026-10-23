@@ -110,7 +110,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     );
     expect(status).toBe(200);
     expect(html).toMatch(/<h1[^>]*>Northgate<\/h1>/);
-    expect(html).toContain('class="ds fields-table"');
+    expect(html).toContain('class="ds field-list"');
   });
 
   it("renders the lines index with the line rows", async () => {

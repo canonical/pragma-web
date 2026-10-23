@@ -17,7 +17,10 @@
  * the strip's and the colophon's, that run from the rail's border to the
  * viewport's edge with their content from the canvas's first column line
  * to its last;
- * and every gap, padding and margin of the chrome a multiple of 4px.
+ * and every gap, padding and margin of the chrome a multiple of 4px. The
+ * standards index's entries keep every title whole, at 390px too, an
+ * entry whose title and address do not share a line moving its address
+ * to a line of its own.
  */
 import {
   launchBrowser,
@@ -41,6 +44,44 @@ import {
 import { type RunningServer, startServer } from "./serverHarness.js";
 
 const CWD = process.cwd();
+
+/**
+ * Count the standards index's entries, those whose title is cut, and those
+ * whose address is cut on the title's line. It runs in the page.
+ *
+ * @returns The counts.
+ * @throws When an entry has no title or no address.
+ */
+function countCutEntries(): {
+  readonly entries: number;
+  readonly cutTitles: number;
+  readonly cutBesideTitle: number;
+} {
+  const rows = [
+    ...document.querySelectorAll(".ds.standards-index .ds.entity-row"),
+  ];
+  const measured = rows.map((row) => {
+    const identity = row.querySelector(".identity");
+    const meta = row.querySelector(".meta");
+    if (!identity || !meta) {
+      throw new Error("an entry has no title or no address");
+    }
+    return {
+      titleCut: identity.scrollWidth > identity.clientWidth,
+      addressCut: meta.scrollWidth > meta.clientWidth,
+      addressBeside:
+        meta.getBoundingClientRect().top ===
+        identity.getBoundingClientRect().top,
+    };
+  });
+  return {
+    entries: measured.length,
+    cutTitles: measured.filter(({ titleCut }) => titleCut).length,
+    cutBesideTitle: measured.filter(
+      ({ addressCut, addressBeside }) => addressCut && addressBeside,
+    ).length,
+  };
+}
 
 let server: RunningServer;
 let browser: Browser;
@@ -188,6 +229,34 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       expect(shortfall, theme).not.toBeNull();
       expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
       expect(shortfall?.end, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+    }
+  });
+
+  it("keeps every standards index title whole, its address on its own line where they do not fit", async () => {
+    const page = await browser.newPage({
+      viewport: { width: viewport.width, height: viewport.height },
+    });
+    try {
+      const origins = [
+        new URL(server.base).origin,
+        new URL(server.graphBase).origin,
+      ];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.goto(new URL(STANDARDS_INDEX_PATH, server.base).href, {
+        waitUntil: "networkidle",
+        timeout: PAGE_SETTLE_MS,
+      });
+      const counts = await page.evaluate(countCutEntries);
+      expect(counts.entries).toBeGreaterThan(0);
+      expect(counts.cutTitles).toBe(0);
+      // An address is cut only on a line of its own, longer than the row.
+      expect(counts.cutBesideTitle).toBe(0);
+    } finally {
+      await page.close();
     }
   });
 });

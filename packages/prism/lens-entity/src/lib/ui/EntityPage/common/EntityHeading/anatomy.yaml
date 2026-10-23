@@ -1,0 +1,35 @@
+---
+# EntityHeading — the entity's title as the page's level-1 heading over its
+# compact address in the published InlineCode, muted: an hgroup across the
+# whole main column. Hierarchy by size and position alone; the title and
+# the address stack one small step apart, so they read as one heading.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-heading-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   space.100 (8px) between the title and the address: they read as one
+#     heading; no gap may read a container gap.
+#   layout.grid.column "1 / -1": structure, a span in columns.
+#
+# Roster namespaces (accepted and tracked): space.100.
+node:
+  uri: prism.subcomponent.entity_heading
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: space.100
+  edges:
+    - node:
+        role: title (the page's level-1 heading)
+      relation: { cardinality: "1", slotName: title }
+    - node:
+        role: address (the compact address, muted)
+        styles:
+          typography.color: color.text.muted
+        edges:
+          - node:
+              uri: global.component.inline_code
+            relation: { cardinality: "1" }
+      relation: { cardinality: "1", slotName: address }

@@ -1,0 +1,48 @@
+---
+# EntityLayout — one entity lens on the document archetype: the site's
+# rail, the mode strip, the routed page (the index or an entity page) in
+# the one scrolling canvas, and the site's colophon under it. On the index
+# the strip carries the search box and the count of entries shown; on an
+# entity page only the trail. The filter provider encloses the whole layout
+# because the strip and the index are siblings that share one filter. It
+# renders no element of its own: core's DocumentLayout is the root and
+# takes the layout's native props, so this anatomy binds no style and the
+# folder has no stylesheet. No aside: an entity's page has nothing to set
+# beside it.
+node:
+  uri: prism.component.entity_layout
+  edges:
+    - node:
+        uri: prism.component.entity_filter_provider
+        edges:
+          - node:
+              uri: prism.component.document_layout
+              edges:
+                - node:
+                    role: rail (the site's own)
+                  relation: { cardinality: "1", slotName: rail }
+                - node:
+                    uri: prism.component.mode_strip
+                    edges:
+                      - node:
+                          uri: prism.subcomponent.trail
+                        relation: { cardinality: "1", slotName: context }
+                      - node:
+                          uri: prism.subcomponent.entity_controls
+                        relation: { cardinality: "0..1", slotName: controls }
+                      - node:
+                          uri: prism.subcomponent.socket_guard
+                          edges:
+                            - node:
+                                uri: prism.subcomponent.entity_status
+                              relation: { cardinality: "1", slotName: tenant }
+                        relation: { cardinality: "0..1", slotName: status }
+                  relation: { cardinality: "1", slotName: strip }
+                - node:
+                    role: routed page (the index or an entity page)
+                  relation: { cardinality: "1", slotName: default }
+                - node:
+                    role: colophon (the site's own footer band)
+                  relation: { cardinality: "0..1", slotName: colophon }
+            relation: { cardinality: "1", slotName: layout }
+      relation: { cardinality: "1" }
