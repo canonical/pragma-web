@@ -17,7 +17,8 @@
 # constants (constants.ts): an SVG rect and text are placed by attributes,
 # which no style key binds. Its text is the context's primary size, on the
 # node's own 24-unit lines. A long line is clipped at the inner inset, since
-# SVG text does not truncate.
+# SVG text does not truncate, by a nested SVG viewport over the inner box:
+# a clip path's document-wide id could differ between server and client.
 #
 # A linked title is an SVG link inside the title's `<text>`, and reads as
 # the title, as every representation's link does: the text's colour,

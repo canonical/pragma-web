@@ -53,11 +53,15 @@ describe("EntityGraphNode", () => {
       expect(node.querySelector(".frame")?.getAttribute("width")).toBe("239");
     });
 
-    it("clips its lines to the box with an id of its own", () => {
-      const node = renderNode(<EntityGraphNode title="Layout" />);
-      const id = node.querySelector("clipPath")?.id ?? "";
-      expect(id).toMatch(/^entity-graph-node-[\w-]+$/);
-      expect(node.querySelector(`[clip-path="url(#${id})"]`)).not.toBeNull();
+    it("clips its lines at the inner inset with no document-wide id", () => {
+      const node = renderNode(<EntityGraphNode title="Layout" width={160} />);
+      const lines = node.querySelector("svg.lines");
+      expect(lines?.getAttribute("x")).toBe("9");
+      expect(lines?.getAttribute("width")).toBe("142");
+      expect(lines?.getAttribute("viewBox")).toBe("9 0 142 50");
+      expect(lines?.getAttribute("overflow")).toBe("hidden");
+      expect(lines?.querySelector(".title")).not.toBeNull();
+      expect(node.querySelector("[id]")).toBeNull();
     });
   });
 
