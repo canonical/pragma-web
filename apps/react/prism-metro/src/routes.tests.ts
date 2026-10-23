@@ -3,12 +3,12 @@
 import { collectLenses } from "@canonical/prism-core";
 import { createRouter } from "@canonical/router-core";
 import { describe, expect, it } from "vitest";
+import { HOME_LENS_MESSAGES } from "#domains/metro";
 import {
   CIRCLE_LINE_CURIE,
   NORTHGATE_CURIE,
   STATION_CLASS_CURIE,
 } from "../testing/fixtures.js";
-import { HOME_LENS_MESSAGES } from "./domains/metro/constants.js";
 import { appRoutes, notFoundRoute } from "./routes.js";
 
 // Without an adapter the router is a pure matcher: building it runs no load
