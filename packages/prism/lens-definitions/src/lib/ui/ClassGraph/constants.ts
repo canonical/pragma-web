@@ -1,9 +1,13 @@
-/** The stroke of an edge at rest, and of a focus relation or a lineage, in px. */
+/** The stroke of an edge at rest, in px. */
 export const EDGE_STROKE = 1;
+
+/** The stroke of a focus relation or a lineage, in px. */
 export const FOCUS_STROKE = 2;
 
-/** The stroke of a node's ring, and its offset outside the box, in px. */
+/** The stroke of a node's ring, in px. */
 export const RING_STROKE = 2;
+
+/** How far a node's ring sits outside its box, in px. */
 export const RING_OFFSET = 2;
 
 /** The halo an edge label is drawn on, as its stroke width, in px. */

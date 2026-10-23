@@ -23,8 +23,10 @@ export const HUB_HEIGHT = 48;
 /** A box whose label wraps to two lines, in px. */
 export const WRAPPED_HEIGHT = 64;
 
-/** The narrowest and widest a box is drawn, in px. */
+/** The narrowest a box is drawn, in px. */
 export const BOX_MIN_WIDTH = 96;
+
+/** The widest a box is drawn, in px; a longer label wraps to two lines. */
 export const BOX_MAX_WIDTH = 208;
 
 /** The inset between a box's edge and its text, in px. */
@@ -81,8 +83,10 @@ export const SHELF_ALIGNMENTS: readonly number[] = [0, 0.5, 1];
 /** The smallest zoom at which every 14px label renders at 12px or more. */
 export const MIN_FIT = 12 / 14;
 
-/** A self-loop's extent above and right of its box, in px; a hub's. */
+/** A self-loop's extent above and right of its box, in px. */
 export const LOOP_EXTENT = 16;
+
+/** A hub's self-loop's extent above and right of its box, in px. */
 export const HUB_LOOP_EXTENT = 32;
 
 /** Where a self-loop leaves the top side and returns to the right side, in px from the top-right corner. */
@@ -103,8 +107,10 @@ export const HUB_CAP = 6;
 /** An arrowhead's length and width, in px. */
 export const HEAD_SIZE = 8;
 
-/** A same-column arc's least bulge, and the bulge each nesting level adds, in px. */
+/** A same-column arc's least bulge, in px. */
 export const ARC_BASE = 16;
+
+/** The bulge each nesting level adds to a same-column arc, in px. */
 export const ARC_NEST = 8;
 
 /** How far a same-column arc running beside a subclass bus keeps from it, in px. */
@@ -113,13 +119,19 @@ export const BUS_CLEARANCE = 12;
 /** The step a route's variant moves by, and the path sampling step, in px. */
 export const ROUTE_STEP = 4;
 
-/** The type sizes on the canvas: labels and counts, then hubs and regions, in px. */
+/** The type size of the canvas's labels and counts, in px. */
 export const LABEL_SIZE = 14;
+
+/** The type size of a hub's label, in px. */
 export const HUB_LABEL_SIZE = 16;
+
+/** The type size of a region's prefix, in px. */
 export const REGION_LABEL_SIZE = 16;
 
-/** The pitch of an edge label's stacked lines, and its halo, in px. */
+/** The pitch of an edge label's stacked lines, in px. */
 export const LABEL_LINE_PITCH = 16;
+
+/** The halo around an edge label's text, in px. */
 export const LABEL_HALO = 3;
 
 /** How far above or below its anchor an edge label may sit, in px. */
