@@ -8,7 +8,7 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, Suspense } from "react";
-import { CanvasPage } from "#lib/ui";
+import { CanvasPage } from "#lib/ui/CanvasPage";
 import ComponentProbe from "./ComponentProbe.js";
 import { PROBE_URI } from "./probeQuery.js";
 

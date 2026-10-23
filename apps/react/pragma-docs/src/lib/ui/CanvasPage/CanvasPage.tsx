@@ -12,7 +12,7 @@ const componentCssClassName = "ds canvas-page";
  * column of the canvas's page grid, so its content takes the whole main
  * column instead of the one track a grid item gets by default.
  *
- * `import { CanvasPage } from "#lib/ui";`
+ * `import { CanvasPage } from "#lib/ui/CanvasPage";`
  */
 export default function CanvasPage({
   className,

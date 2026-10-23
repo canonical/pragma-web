@@ -1,6 +1,6 @@
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
-import { CanvasPage } from "#lib/ui";
+import { CanvasPage } from "#lib/ui/CanvasPage";
 
 interface LensPlaceholderProps {
   /** The lens's name, as the rail shows it. */
