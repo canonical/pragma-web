@@ -876,7 +876,7 @@ const DefaultContextFixture = ({
     data-breadcrumb-default-context={before ? "before" : "current"}
     style={
       {
-        inlineSize: "18rem",
+        inlineSize: "38rem",
         maxInlineSize: "100%",
         ...(before ? { "--ds-spacing-item-block": "0.25rem" } : {}),
       } as CSSProperties
@@ -885,7 +885,38 @@ const DefaultContextFixture = ({
     <h2 style={{ marginBlockStart: 0 }}>
       {before ? "Before — 4px" : "Preview — 8px"}
     </h2>
-    <Component items={wrappedItems} />
+    <div
+      style={{
+        alignItems: "flex-start",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "2rem",
+      }}
+    >
+      <div
+        data-breadcrumb-default-context-component=""
+        style={{ inlineSize: "18rem", maxInlineSize: "100%" }}
+      >
+        <h3 style={{ marginBlockStart: 0 }}>Breadcrumb</h3>
+        <div
+          className="p"
+          data-breadcrumb-default-context-leading=""
+          style={{ margin: 0 }}
+        >
+          <Component items={wrappedItems} />
+        </div>
+      </div>
+      <div
+        data-breadcrumb-default-context-paragraph=""
+        style={{ inlineSize: "18rem", maxInlineSize: "100%" }}
+      >
+        <h3 style={{ marginBlockStart: 0 }}>Paragraph (reference)</h3>
+        <p className="p" style={{ margin: 0 }}>
+          Home server documentation installation and advanced guidance help
+          people understand their current location.
+        </p>
+      </div>
+    </div>
   </section>
 );
 
@@ -919,7 +950,8 @@ export const DefaultContext: Story = {
         <p>
           <strong>Page with no tier selected.</strong> The current preview uses
           8px between wrapped rows. Single-line Breadcrumbs are unaffected, and
-          Documentation and Applications remain at 4px.
+          Documentation and Applications remain at 4px. Breadcrumb items wrap as
+          whole links, while paragraph text wraps by words.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem" }}>
           <DefaultContextFixture before />
@@ -943,6 +975,9 @@ export const DefaultContext: Story = {
     const proofRoot = proofRoots[0];
     delete proofRoot.dataset.breadcrumbDefaultContextProof;
     delete proofRoot.dataset.breadcrumbDefaultContextProofError;
+    delete proofRoot.dataset.breadcrumbParagraphPitch;
+    delete proofRoot.dataset.breadcrumbBeforePitch;
+    delete proofRoot.dataset.breadcrumbPreviewPitch;
     const originalRootStyle =
       proofDocument.documentElement.getAttribute("style");
     const originalFocus = proofDocument.activeElement;
@@ -972,9 +1007,49 @@ export const DefaultContext: Story = {
       probe.remove();
       return result;
     };
+    const textLineRects = (node: HTMLElement, label: string): DOMRect[] => {
+      const range = proofDocument.createRange();
+      range.selectNodeContents(node);
+      const lines: DOMRect[] = [];
+      for (const rect of Array.from(range.getClientRects())) {
+        if (rect.width <= 0 || rect.height <= 0) continue;
+        if (!lines.some((line) => Math.abs(line.top - rect.top) <= 0.75)) {
+          lines.push(rect);
+        }
+      }
+      range.detach();
+      if (lines.length === 0)
+        throw new Error(`${label} text has no line boxes`);
+      return lines.sort((a, b) => a.top - b.top);
+    };
     const metrics = (fixture: HTMLElement, label: string) => {
       const list = fixture.querySelector<HTMLElement>(".list");
-      if (!list) throw new Error(`${label} list is missing`);
+      const componentWrapper = fixture.querySelector<HTMLElement>(
+        "[data-breadcrumb-default-context-component]",
+      );
+      const paragraphWrapper = fixture.querySelector<HTMLElement>(
+        "[data-breadcrumb-default-context-paragraph]",
+      );
+      const componentLeading = fixture.querySelector<HTMLElement>(
+        "[data-breadcrumb-default-context-leading]",
+      );
+      const paragraph = fixture.querySelector<HTMLElement>(
+        "[data-breadcrumb-default-context-paragraph] > .p",
+      );
+      const firstLink = list?.querySelector<HTMLElement>(".link");
+      if (
+        !list ||
+        !componentWrapper ||
+        !paragraphWrapper ||
+        !componentLeading ||
+        !paragraph ||
+        !firstLink
+      ) {
+        throw new Error(`${label} comparison is incomplete`);
+      }
+      if (paragraph.childElementCount !== 0 || paragraph.querySelector("br")) {
+        throw new Error(`${label} paragraph is not naturally wrapping text`);
+      }
       const items = Array.from(
         list.querySelectorAll<HTMLElement>(".breadcrumbs-item"),
       );
@@ -997,7 +1072,38 @@ export const DefaultContext: Story = {
       ).find((node) => proofWindow.getComputedStyle(node).display !== "none");
       if (!separator) throw new Error(`${label} visible separator is missing`);
       const separatorStyle = proofWindow.getComputedStyle(separator);
+      const linkStyle = proofWindow.getComputedStyle(firstLink);
+      const paragraphStyle = proofWindow.getComputedStyle(paragraph);
+      const componentLeadingStyle =
+        proofWindow.getComputedStyle(componentLeading);
+      for (const property of [
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "letterSpacing",
+        "lineHeight",
+      ] as const) {
+        if (linkStyle[property] !== paragraphStyle[property]) {
+          throw new Error(
+            `${label} paragraph ${property} differs from Breadcrumb`,
+          );
+        }
+      }
+      const breadcrumbText = textLineRects(firstLink, `${label} Breadcrumb`)[0];
+      const paragraphLines = textLineRects(paragraph, `${label} paragraph`);
+      if (!breadcrumbText || paragraphLines.length < 2 || !paragraphLines[0]) {
+        throw new Error(`${label} paragraph did not wrap naturally`);
+      }
+      const componentRect = componentWrapper.getBoundingClientRect();
+      const paragraphRect = paragraphWrapper.getBoundingClientRect();
       return {
+        breadcrumbPitch: rows[1]?.top - rows[0]?.top,
+        componentPaddingStart: readPx(
+          componentLeadingStyle.paddingBlockStart,
+          `${label} Breadcrumb start padding`,
+        ),
+        firstBreadcrumbText: breadcrumbText,
+        firstParagraphText: paragraphLines[0],
         itemMetrics: items.map((item) => {
           const rect = item.getBoundingClientRect();
           const style = proofWindow.getComputedStyle(item);
@@ -1019,12 +1125,25 @@ export const DefaultContext: Story = {
         physicalGaps: rows
           .slice(1)
           .map((row, index) => row.top - rows[index].bottom),
+        paragraphPitches: paragraphLines
+          .slice(1)
+          .map((line, index) => line.top - paragraphLines[index].top),
+        paragraphPaddingStart: readPx(
+          paragraphStyle.paddingBlockStart,
+          `${label} paragraph start padding`,
+        ),
+        paragraphWidth: paragraph.getBoundingClientRect().width,
         role: roleLength(fixture, "--ds-spacing-item-block"),
         rowGap: readPx(
           proofWindow.getComputedStyle(list).rowGap,
           `${label} gap`,
         ),
+        sideBySide:
+          componentRect.right <= paragraphRect.left &&
+          componentRect.top < paragraphRect.bottom &&
+          paragraphRect.top < componentRect.bottom,
         width: list.getBoundingClientRect().width,
+        lineHeight: readPx(linkStyle.lineHeight, `${label} line height`),
       };
     };
 
@@ -1067,10 +1186,41 @@ export const DefaultContext: Story = {
         for (const gap of values.physicalGaps) {
           near(gap, expectedGap, `${label} physical row gap`);
         }
+        near(
+          values.breadcrumbPitch,
+          values.lineHeight + expectedGap,
+          `${label} Breadcrumb row pitch`,
+        );
+        for (const pitch of values.paragraphPitches) {
+          near(pitch, values.lineHeight, `${label} paragraph line pitch`);
+        }
+        if (values.sideBySide) {
+          near(
+            values.firstBreadcrumbText.top,
+            values.firstParagraphText.top,
+            `${label} first text line top`,
+          );
+          near(
+            values.firstBreadcrumbText.bottom,
+            values.firstParagraphText.bottom,
+            `${label} first text line bottom`,
+          );
+        }
+        near(
+          values.componentPaddingStart,
+          values.paragraphPaddingStart,
+          `${label} reference leading`,
+        );
+        near(values.width, values.paragraphWidth, `${label} peer width`);
         near(values.markRole, rootSize * 0.5, `${label} mark role`);
         near(values.markStart, rootSize * 0.5, `${label} mark start`);
         near(values.markEnd, rootSize * 0.5, `${label} mark end`);
       }
+      near(
+        beforeMetrics.paragraphPitches[0] ?? Number.NaN,
+        currentMetrics.paragraphPitches[0] ?? Number.NaN,
+        "paragraph reference pitch",
+      );
       near(beforeMetrics.width, currentMetrics.width, "peer list width");
       for (
         let index = 0;
@@ -1101,6 +1251,15 @@ export const DefaultContext: Story = {
           "default-context proof did not preserve document state",
         );
       }
+      proofRoot.dataset.breadcrumbParagraphPitch = String(
+        currentMetrics.paragraphPitches[0],
+      );
+      proofRoot.dataset.breadcrumbBeforePitch = String(
+        beforeMetrics.breadcrumbPitch,
+      );
+      proofRoot.dataset.breadcrumbPreviewPitch = String(
+        currentMetrics.breadcrumbPitch,
+      );
       proofRoot.dataset.breadcrumbDefaultContextProof = "passed";
     } catch (error) {
       proofRoot.dataset.breadcrumbDefaultContextProofError =
