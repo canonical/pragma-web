@@ -16,7 +16,8 @@ import { graphql } from "react-relay";
  * line serving it, in calling order, for the stops either side of it.
  *
  * `NetworkLineQuery` reads one line: its title, code and colour, and its
- * routes, each paired with its reverse.
+ * routes, each paired with its reverse, with every call's stop, the other
+ * lines it meets and, at an interchange, the time a transfer takes.
  */
 const declareNetworkQueries = (): unknown => [
   graphql`
@@ -84,6 +85,7 @@ const declareNetworkQueries = (): unknown => [
             colour
             _meta {
               title
+              curie
             }
             routes {
               label
@@ -123,6 +125,29 @@ const declareNetworkQueries = (): unknown => [
             isLoop
             reverse {
               label
+            }
+            calls {
+              position
+              stop {
+                uri
+                __typename
+                _meta {
+                  title
+                  curie
+                }
+                servesLine {
+                  uri
+                  code
+                  colour
+                  _meta {
+                    title
+                    curie
+                  }
+                }
+                ... on Interchange {
+                  transferMinutes
+                }
+              }
             }
           }
         }

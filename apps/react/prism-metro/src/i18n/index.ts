@@ -5,3 +5,4 @@
  */
 
 export { MESSAGES } from "./constants.js";
+export { default as formatMessage } from "./formatMessage.js";
