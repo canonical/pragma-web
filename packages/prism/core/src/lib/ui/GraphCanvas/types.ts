@@ -42,8 +42,9 @@ type OwnProps = {
   /** The drawing's accessible name. */
   readonly label: string;
   /**
-   * The graph's bounds plus its margin: the viewport's viewBox, so the
-   * first paint fits the whole graph flush top-left with no measurement.
+   * The box of world space the first paint shows, flush top-left with no
+   * measurement: the viewport's viewBox, the graph's bounds plus its
+   * margin, or a window of them that keeps the graph legible.
    */
   readonly viewBox: GraphBox;
   /**
