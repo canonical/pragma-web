@@ -214,6 +214,8 @@ export default function measureLayout({
           : Number.parseFloat(getComputedStyle(canvasPage).columnGap),
       firstChildWidth:
         canvasPage?.firstElementChild?.getBoundingClientRect().width ?? -1,
+      firstChildTop:
+        canvasPage?.firstElementChild?.getBoundingClientRect().top ?? -1,
       fillShortfall:
         pageBox === undefined || fillBoxes.length === 0
           ? null
