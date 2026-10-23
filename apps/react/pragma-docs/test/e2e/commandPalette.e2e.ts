@@ -28,7 +28,10 @@ const CWD = process.cwd();
 const DOCUMENT_MARKER = "__docsDocumentMarker";
 
 /** The phone's viewport, where the palette re-flows. */
-const PHONE = VIEWPORTS[1];
+const PHONE = VIEWPORTS.at(1);
+if (PHONE === undefined) {
+  throw new Error("the browser constants list no phone viewport");
+}
 
 /** The gutter the open palette leaves at each side of a phone's viewport. */
 const PHONE_GUTTER_PX = 16;
