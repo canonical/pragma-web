@@ -1,75 +1,70 @@
-# FormationSideView: a server-rendered side view of one train, against a
-# scale it may share with the trains drawn beside it. Each car is drawn to
-# its length, with a slanted nose at each cab end the car's orientation
-# puts it and a gap at each coupling; optional platform marks drop a tick
-# at each line's shortest platform and underline the part of the train
-# that overhangs it. The ordered list after the drawing carries the same
-# content as text. Bespoke: no published component draws to scale.
+---
+# FormationSideView — a server-rendered side view of one train against a
+# scale it may share with the trains drawn beside it: each car over its
+# length, a slanted nose at each cab end the car's orientation puts it, a
+# gap at each coupling. With platform fits, a tick at each line's shortest
+# platform and the overhang underlined. The ordered list after the drawing
+# carries the same content as text. Bespoke: no published component draws
+# to scale.
 #
 # The drawing paints with currentColor, set in the markup as the SVG's
-# fill and stroke, since no style key binds SVG paint: each painted group's
-# colour is its typography.color.
+# fill and stroke, because no style key binds SVG paint: each painted
+# group's colour is its typography.color.
+#
+# Token ledger (no semantic token exists):
+#   size.max.width 100%: the drawing never overflows its column.
+#   typography.fontFamily "ui-monospace, monospace": no monospace family
+#     token outside the primitive tier.
+#   space.100 (8px) between a unit's label and its car codes: an inline run
+#     of words, one baseline pair; no gutter, since it is no grid.
 node:
-  uri: metro.fleet.formation-side-view
+  uri: metro.component.formation_side_view
   styles:
     layout.type: grid
-    spacing.gap: container.gap.tight
+    spacing.gap: grid.gutter
   edges:
     - node:
         role: drawing
         styles:
           layout.type: block
           size.max.width: 100%
-        edges:
-          - node:
-              role: train
-              styles:
-                typography.color: color.text
-              edges:
-                - node:
-                    role: car body
-                  relation:
-                    cardinality: "1..*"
-            relation:
-              cardinality: "1"
-          - node:
-              role: platform mark
-              styles:
-                typography.color: color.text.muted
-            relation:
-              cardinality: "0..*"
-          - node:
-              role: overhang
-              styles:
-                typography.color: color.text.error
-            relation:
-              cardinality: "0..*"
-      relation:
-        cardinality: "1"
+      relation: { cardinality: "1", slotName: drawing }
     - node:
-        role: train text
+        role: car bodies, front first
+        styles:
+          typography.color: color.text
+      relation: { cardinality: "1", slotName: train }
+    - node:
+        role: platform tick
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: mark }
+    - node:
+        role: overhang underline
+        styles:
+          typography.color: color.text.error
+      relation: { cardinality: "0..1", slotName: overhang }
+    - node:
+        role: train as text, unit by unit
         styles:
           layout.type: grid
-          spacing.gap: container.gap.tight
+          spacing.gap: grid.gutter
           spacing.internal.inline.start: 0
           layout.listStyle: none
-        edges:
-          - node:
-              role: unit entry
-              styles:
-                layout.type: flex
-                layout.wrap: wrap
-                spacing.gap.inline: container.gap.tight
-                typography.color: color.text.muted
-              edges:
-                - node:
-                    role: car code
-                    styles:
-                      typography.fontFamily: monospace
-                      typography.color: color.text
-                  relation:
-                    cardinality: "1..*"
-            relation:
-              cardinality: "1..*"
-      relation:
-        cardinality: "1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "1", slotName: train-text }
+    - node:
+        role: unit entry
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap.inline: space.100
+          typography.color: color.text.muted
+      relation: { cardinality: "1..*", slotName: unit }
+    - node:
+        role: car code
+        styles:
+          typography.fontFamily: "ui-monospace, monospace"
+          typography.color: color.text
+      relation: { cardinality: "1..*", slotName: code }

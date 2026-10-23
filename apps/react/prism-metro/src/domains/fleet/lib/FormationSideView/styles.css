@@ -3,44 +3,60 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The drawing over its text, one gutter apart. */
   .ds.formation-side-view {
+    --formation-side-view-gap: var(--grid-gutter);
+    --formation-side-view-drawing-max-inline-size: 100%;
+    --formation-side-view-train-color: var(--color-text);
+    --formation-side-view-mark-color: var(--color-text-muted);
+    --formation-side-view-overhang-color: var(--color-text-error);
+    --formation-side-view-unit-color: var(--color-text-muted);
+    /* One baseline pair between a unit's label and its car codes. */
+    --formation-side-view-unit-spacing: var(--space-100);
+    /* No monospace family token sits above the primitive tier. */
+    --formation-side-view-code-font-family: ui-monospace, monospace;
+    --formation-side-view-code-color: var(--color-text);
+
     display: grid;
-    gap: var(--container-gap-tight);
+    gap: var(--formation-side-view-gap);
   }
 
+  /* The drawing scales with its column and never overflows it. */
   .ds.formation-side-view .drawing {
     display: block;
-    max-width: 100%;
+    max-inline-size: var(--formation-side-view-drawing-max-inline-size);
   }
 
   .ds.formation-side-view .train {
-    color: var(--color-text);
+    color: var(--formation-side-view-train-color);
   }
 
   .ds.formation-side-view .mark {
-    color: var(--color-text-muted);
+    color: var(--formation-side-view-mark-color);
   }
 
   .ds.formation-side-view .overhang {
-    color: var(--color-text-error);
+    color: var(--formation-side-view-overhang-color);
   }
 
   .ds.formation-side-view .train-text {
     display: grid;
-    gap: var(--container-gap-tight);
+    gap: var(--formation-side-view-gap);
     padding-inline-start: 0;
     list-style: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
   }
 
   .ds.formation-side-view .unit {
     display: flex;
     flex-wrap: wrap;
-    column-gap: var(--container-gap-tight);
-    color: var(--color-text-muted);
+    column-gap: var(--formation-side-view-unit-spacing);
+    color: var(--formation-side-view-unit-color);
   }
 
   .ds.formation-side-view .code {
-    font-family: monospace;
-    color: var(--color-text);
+    font-family: var(--formation-side-view-code-font-family);
+    color: var(--formation-side-view-code-color);
   }
 }

@@ -1,4 +1,4 @@
-import type { Overhang, PlatformFit, PlatformLine } from "../types.js";
+import type { LineFit, Overhang, PlatformLine } from "../types.js";
 
 /**
  * Measure how a train fits the platforms of each line it runs on.
@@ -15,7 +15,7 @@ import type { Overhang, PlatformFit, PlatformLine } from "../types.js";
 export default function measurePlatformFit(
   length: number,
   lines: readonly PlatformLine[],
-): readonly PlatformFit[] {
+): readonly LineFit[] {
   return lines.map(({ title, code, stops }) => {
     const measured = stops.flatMap(({ title: stop, platformLength }) =>
       platformLength === null ? [] : [{ title: stop, platformLength }],

@@ -87,7 +87,7 @@ export interface Overhang {
 }
 
 /** How a train fits the platforms of one line. */
-export interface PlatformFit {
+export interface LineFit {
   /** The line's title. */
   readonly title: string;
   /** The line's short code. */
@@ -96,4 +96,13 @@ export interface PlatformFit {
   readonly shortest: number | null;
   /** Every stop the train overhangs, the largest excess first. */
   readonly overhangs: readonly Overhang[];
+}
+
+/** The kinds of fleet node that have a page of their own. */
+export type FleetNodeKind = "stock" | "formation" | "unit" | "carType";
+
+/** One fact of a fleet node: its term and its value, as a reader reads them. */
+export interface FleetFact {
+  readonly term: string;
+  readonly value: string;
 }
