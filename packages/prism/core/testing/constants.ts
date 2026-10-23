@@ -338,11 +338,14 @@ export const COMPONENT_SUBFOLDERS: readonly string[] = ["common", "hooks"];
 
 /**
  * Where a component folder may sit, relative to its package root: a general
- * component under `src/lib/ui`, a domain's under `src/domains/<subject>/lib`.
+ * component under `src/lib/ui`, a domain's under `src/domains/<subject>/lib`,
+ * and a library's components grouped by subject under `src/lib/<subject>`,
+ * such as the projections of one GraphQL type.
  */
 export const COMPONENT_PLACEMENTS: readonly RegExp[] = [
   /^src\/lib\/ui\/[^/]+$/,
   /^src\/domains\/[a-z][a-z0-9-]*\/lib\/[^/]+$/,
+  /^src\/lib\/[a-z][a-z0-9-]*\/[A-Z][A-Za-z0-9]*$/,
 ];
 
 /** A cardinality: one count, or a range whose upper bound may be `*`. */

@@ -39,8 +39,9 @@ function readPackageName(packageRoot: string): string {
 /**
  * Assert a component folder has the shape the React component generator
  * scaffolds, and sits where components are placed: the folder is
- * `src/lib/ui/<Name>` or `src/domains/<subject>/lib/<Name>` with a
- * PascalCase name; `<Name>.tsx` opens with the generator's banner, defines
+ * `src/lib/ui/<Name>`, `src/domains/<subject>/lib/<Name>` or, for a
+ * library's components grouped by subject, `src/lib/<subject>/<Name>`, with
+ * a PascalCase name; `<Name>.tsx` opens with the generator's banner, defines
  * `componentCssClassName` as `"ds <kebab>"`, has a default export and
  * imports its stylesheet exactly when there is one; `types.ts` writes
  * `<Name>Props` as `OwnProps & Omit<ComponentProps<…>, keyof OwnProps…>`

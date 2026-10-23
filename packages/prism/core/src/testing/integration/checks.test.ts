@@ -86,6 +86,28 @@ describe("the component checks", () => {
     });
   });
 
+  describe("on a component grouped under a library's subject folder", () => {
+    it("passes the scaffold check one folder below src/lib", () => {
+      expect(() =>
+        assertScaffold(
+          join(CONFORMING, "src", "lib", "probes", "SubjectProbe"),
+          { packageRoot: CONFORMING, testSuffix: "test" },
+        ),
+      ).not.toThrow();
+    });
+
+    it("refuses a folder two levels below src/lib", () => {
+      expect(() =>
+        assertScaffold(
+          join(DRIFTED, "src", "lib", "probes", "deep", "DeepProbe"),
+          { packageRoot: DRIFTED, testSuffix: "test" },
+        ),
+      ).toThrow(
+        /src\/lib\/probes\/deep\/DeepProbe is not a component placement/,
+      );
+    });
+  });
+
   describe("on a drifted component", () => {
     it("names each binding the stylesheet changed or dropped", () => {
       const folder = locate(DRIFTED, "StyleDrift");
