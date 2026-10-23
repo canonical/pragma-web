@@ -76,8 +76,8 @@ whenever the palette closes, however the reader closed it.
   and needs no switch to turn it off.
 - ↑ and ↓ in the field: move the highlight through the results, wrapping at
   both ends. A pointer moving over a result highlights it too.
-- Enter in the field: choose the highlighted result. A click on a result
-  chooses it too.
+- Enter in the field: choose the highlighted result. A click on a result,
+  or following the link of the preview's title, chooses it too.
 - Escape, or a click on the backdrop: close the palette.
 
 Every opening starts empty: the text, the results and a failure line from
@@ -99,7 +99,8 @@ descendant. Each group of results is a `group` named by its type's heading;
 each result is an `option`, selected while highlighted, disabled when its
 type has no home. An option is chosen as a whole, so the title it holds is
 text, never a link of its own; the preview's title links to the result's
-home.
+home, and following it chooses the result as its row does, closing the
+palette.
 
 While the next results load, the last ones stay on screen and the listbox
 is busy (`aria-busy`). An empty field shows a one-line hint and sends no

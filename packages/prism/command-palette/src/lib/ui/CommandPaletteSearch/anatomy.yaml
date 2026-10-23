@@ -30,7 +30,8 @@
 # palette's inert title (CommandPaletteTitle) as their link: an option is
 # chosen as a whole, so it holds no link of its own
 # (cs:react.component.link_component). The preview renders under the
-# site's own link, so its title links to the result's home. The preview
+# site's own link, so its title links to the result's home; following it
+# chooses the result as its row does, closing the palette. The preview
 # lays its card out as the published Cards group does, on four row tracks
 # with the gutter between them, in its two columns.
 #

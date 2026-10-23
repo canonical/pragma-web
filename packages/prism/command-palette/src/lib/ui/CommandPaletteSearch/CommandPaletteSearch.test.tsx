@@ -263,6 +263,18 @@ describe("CommandPaletteSearch", () => {
     ).toHaveAttribute("href", ONTOLOGY_CLASS_HREF);
   });
 
+  it("chooses the result when the preview's link is followed, and only then", async () => {
+    const { router, onChoose } = await renderResults("lay");
+    const preview = screen.getByRole("region", { name: "Preview" });
+    fireEvent.click(preview);
+    expect(onChoose).not.toHaveBeenCalled();
+    fireEvent.click(within(preview).getByRole("link"));
+    expect(onChoose).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(router.getState().location.pathname).toBe(COMPONENT_HREF);
+    });
+  });
+
   it("lists and previews a result its site gives no home, and Enter does nothing", async () => {
     const { router, onChoose } = await renderResults("layton", [STATION_NODE]);
     expect(screen.getByRole("option")).toHaveAttribute("aria-disabled", "true");

@@ -111,6 +111,22 @@ describe("CommandPalette", () => {
     });
   });
 
+  it("closes when the preview's link is followed, opening its home", async () => {
+    const { environment, router } = renderPalette();
+    open();
+    type("lay");
+    await act(async () => {
+      environment.mock.resolveMostRecentOperation(answerSearch(RANKED_RESULTS));
+    });
+    fireEvent.click(
+      within(screen.getByRole("region", { name: "Preview" })).getByRole("link"),
+    );
+    expect(findDialog().open).toBe(false);
+    await waitFor(() => {
+      expect(router.getState().location.pathname).toBe(COMPONENT_HREF);
+    });
+  });
+
   it("shows one line when the search fails, and searches again once reopened", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const { environment } = renderPalette();

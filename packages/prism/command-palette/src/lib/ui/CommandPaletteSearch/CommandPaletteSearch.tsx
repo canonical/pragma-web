@@ -93,7 +93,9 @@ const componentCssClassName = "ds command-palette-search";
  *
  * The rows render under the site's projection maps with the palette's inert
  * title as their link, since an option is chosen as a whole; the preview
- * renders under the site's own link, so its title links to the home.
+ * renders under the site's own link, so its title links to the home, and
+ * following a link in the preview chooses the result as its row does,
+ * closing the palette.
  *
  * Native props reach the root `<div>`; a consumer `className` merges after
  * the search's own.
@@ -162,6 +164,18 @@ export default function CommandPaletteSearch({
    */
   const handleBodyMouseDown = (event: MouseEvent<HTMLDivElement>): void => {
     if (!isWithinLink(event.target)) event.preventDefault();
+  };
+
+  /**
+   * Close the palette when the reader follows a link in the preview, by a
+   * click or by Enter on it: the link opens the result's home, as choosing
+   * its row does, and the palette must not stay open over the page it
+   * opens.
+   *
+   * @note Impure: calls the palette's handler, which closes it.
+   */
+  const handlePreviewClick = (event: MouseEvent<HTMLElement>): void => {
+    if (isWithinLink(event.target)) onChoose();
   };
 
   /**
@@ -259,7 +273,12 @@ export default function CommandPaletteSearch({
           </output>
         )}
         {active === undefined ? null : (
-          <section aria-label={t("search.preview")} className="preview">
+          // biome-ignore lint/a11y/useKeyWithClickEvents: the preview only hears the clicks its links bubble up, and Enter on a focused link fires one; the links take the keys.
+          <section
+            aria-label={t("search.preview")}
+            className="preview"
+            onClick={handlePreviewClick}
+          >
             <CardProjection node={active.node} />
           </section>
         )}
