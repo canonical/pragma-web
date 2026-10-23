@@ -127,6 +127,14 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(html).toMatch(
       /class="ds term-rail[^"]*".*?href="\/definitions\/metro%3AStation">Station<\/a>/s,
     );
+    expect(html).toMatch(/class="ds hierarchy-well[ "]/);
+    expect(html).toMatch(/class="ds class-graph[ "]/);
+    expect(html).toMatch(
+      /<svg[^>]*class="viewport"[^>]*viewBox="-?\d+ -?\d+ \d+ \d+"/,
+    );
+    expect(html).toMatch(
+      /<pattern class="lattice"[^>]*height="16"[^>]*width="16"/,
+    );
     const embedded = INITIAL_DATA_PATTERN.exec(html)?.at(1);
     const records = JSON.parse(String(embedded)).relay?.records ?? {};
     expect(Object.keys(records).length).toBeGreaterThan(0);
