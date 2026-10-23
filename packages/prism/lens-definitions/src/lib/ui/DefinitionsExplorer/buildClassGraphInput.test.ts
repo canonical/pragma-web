@@ -29,6 +29,13 @@ const ONTOLOGIES = [
         range: "https://ds.canonical.com/TagCategory",
       },
       {
+        uri: "https://ds.canonical.com/taggedBy",
+        label: "taggedBy",
+        kind: "OBJECT",
+        domain: { uri: "https://ds.canonical.com/Tag" },
+        range: "ds:Tag",
+      },
+      {
         uri: "https://ds.canonical.com/name",
         label: "name",
         kind: "DATATYPE",
@@ -54,13 +61,19 @@ describe("buildClassGraphInput", () => {
     ]);
   });
 
-  it("keeps the object properties as relations, an unstated domain as none", () => {
+  it("keeps the object properties as relations, an unstated domain as none and a compact range expanded", () => {
     expect(buildClassGraphInput(ONTOLOGIES).relations).toEqual([
       {
         uri: "https://ds.canonical.com/category",
         label: "ds:category",
         domain: null,
         range: "https://ds.canonical.com/TagCategory",
+      },
+      {
+        uri: "https://ds.canonical.com/taggedBy",
+        label: "taggedBy",
+        domain: "https://ds.canonical.com/Tag",
+        range: "https://ds.canonical.com/Tag",
       },
     ]);
   });

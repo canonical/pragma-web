@@ -2,6 +2,7 @@
 
 import { InlineCode } from "@canonical/react-ds-global";
 import type { ReactElement } from "react";
+import expandUri from "../../../../expandUri.js";
 import { Message, useMessages } from "../../../../i18n/index.js";
 import type { ClassPropertyEntry } from "../../types.js";
 import { FieldList } from "../FieldList/index.js";
@@ -72,13 +73,13 @@ export default function ClassView({
   const inheritedFields = groupByDeclaringClass(
     fields.filter((entry) => entry.inherited),
   );
-  const toOutgoing = (entry: ClassPropertyEntry): RelationEntry => ({
-    predicate: entry.property,
-    other: {
-      uri: entry.property.range,
-      label: labels.get(entry.property.range),
-    },
-  });
+  const toOutgoing = (entry: ClassPropertyEntry): RelationEntry => {
+    const range = expandUri(entry.property.range, namespaces);
+    return {
+      predicate: entry.property,
+      other: { uri: range, label: labels.get(range) },
+    };
+  };
   const relations = data.properties.filter(
     (entry) => entry.property.kind === "OBJECT",
   );
@@ -91,7 +92,9 @@ export default function ClassView({
   const incoming: RelationEntry[] = ontologies.flatMap((ontology) =>
     ontology.properties
       .filter(
-        (property) => property.kind === "OBJECT" && property.range === data.uri,
+        (property) =>
+          property.kind === "OBJECT" &&
+          expandUri(property.range, namespaces) === data.uri,
       )
       .map((property) => ({
         predicate: property,

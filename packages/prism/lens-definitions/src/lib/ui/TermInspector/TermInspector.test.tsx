@@ -22,6 +22,8 @@ import patchRecords from "../../../../testing/patchRecords.js";
 import definitionsExplorerRecords from "../../../../testing/records/definitionsExplorerRecords.js";
 import definitionsExplorerRecordsComponent from "../../../../testing/records/definitionsExplorerRecordsComponent.js";
 import definitionsExplorerRecordsProperty from "../../../../testing/records/definitionsExplorerRecordsProperty.js";
+import compactUri from "../../compactUri.js";
+import type { OntologyNamespace } from "../../types.js";
 
 const UNKNOWN_TERM = "ds:NoSuchTerm";
 
@@ -44,6 +46,29 @@ const unknownTermRecords = {
     [`ontologyProperty(uri:"${UNKNOWN_TERM}")`]: null,
   },
 } as unknown as RecordMap;
+
+/**
+ * The captured store as the metro provider shapes it: every property's
+ * range a compact term rather than the full IRI its class carries.
+ */
+function compactRanges(records: RecordMap): RecordMap {
+  const entries = Object.entries(
+    records as unknown as Record<string, Record<string, unknown> | null>,
+  );
+  const namespaces = entries.flatMap(([, record]): OntologyNamespace[] =>
+    typeof record?.prefix === "string" && typeof record.namespace === "string"
+      ? [{ prefix: record.prefix, namespace: record.namespace }]
+      : [],
+  );
+  return Object.fromEntries(
+    entries.map(([id, record]) => [
+      id,
+      typeof record?.range === "string"
+        ? { ...record, range: compactUri(record.range, namespaces) }
+        : record,
+    ]),
+  ) as unknown as RecordMap;
+}
 
 /** The Component store with its first instance repointed at `typename`. */
 function repointFirstInstance(typename: string): RecordMap {
@@ -171,6 +196,22 @@ describe("TermInspector", { timeout: DEFINITIONS_TEST_TIMEOUT_MS }, () => {
         "No named instances (0 recorded).",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("names both ends of a relation whose range is a compact term", () => {
+    const panel = renderInspector(
+      UIBLOCK_TERM,
+      compactRanges(definitionsExplorerRecords),
+    );
+    const relations = sectionOf(panel, /^Relations \(\d+\)$/);
+    expect(
+      within(relations).getByRole("heading", { level: 4, name: "Outgoing" })
+        .nextElementSibling?.textContent,
+    ).toContain("hasTokenBinding→Token Binding");
+    expect(
+      within(relations).getByRole("heading", { level: 4, name: "Incoming" })
+        .nextElementSibling?.textContent,
+    ).toContain("hasVariant←UI Block");
   });
 
   it("groups inherited relations under the class they come from", () => {
