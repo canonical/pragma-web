@@ -5,6 +5,7 @@ import resolveRouteStatus from "./resolveRouteStatus.js";
 
 describe("resolveRouteStatus", () => {
   it.each([
+    "/",
     "/stations",
     "/stations/metro%3Anorthgate",
     "/lines",
