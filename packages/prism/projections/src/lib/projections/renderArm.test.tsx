@@ -80,6 +80,17 @@ describe("renderArm", () => {
     expect(screen.getByText("node node-key")).toBeInTheDocument();
   });
 
+  it("takes no typed arm from a name the map inherits", () => {
+    render(
+      renderArm<ProbeData, ProbeNative>(
+        { ...MAP, siteTypes: { toString: SiteProbe } },
+        { __typename: "toString", Node: "node-key", OntologyClass: null },
+        {},
+      ),
+    );
+    expect(screen.getByText("site node-key toString")).toBeInTheDocument();
+  });
+
   it("hands the arm the dispatcher's native props", () => {
     renderData(
       { __typename: "Zone", Node: "node-key", OntologyClass: null },
