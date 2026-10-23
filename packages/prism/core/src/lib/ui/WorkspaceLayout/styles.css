@@ -62,10 +62,11 @@
   }
 
   /* The drawer's trigger floats at the canvas's top end corner, and shows
-   * only while the inspector region is hidden. */
+   * only while the inspector region is hidden. It may span the last two
+   * columns, so a phone's narrow column never pushes it past the edge. */
   .ds.workspace-layout > .inspector-trigger {
     display: none;
-    grid-column: -2 / -1;
+    grid-column: -3 / -1;
     grid-row: -2 / -1;
     align-self: start;
     margin-inline-start: auto;

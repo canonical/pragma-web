@@ -90,7 +90,7 @@ node:
         uri: global.component.button
         styles:
           layout.type: none
-          layout.grid.column: "-2 / -1"
+          layout.grid.column: "-3 / -1"
           layout.grid.row: "-2 / -1"
           layout.alignSelf: start
           spacing.external.inline.start: auto
