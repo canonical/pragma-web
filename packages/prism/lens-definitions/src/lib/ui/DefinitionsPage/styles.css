@@ -18,8 +18,9 @@
 
   /* Present for assistive technology and as the section's label, absent
    * from the layout: the strip's trail carries the visible title. An empty
-   * box out of the flow clips the heading's text. */
-  .ds.definitions-page .heading {
+   * box out of the flow clips the heading's text. A child combinator, so
+   * no heading of the explorer inside the page is hidden with it. */
+  .ds.definitions-page > .heading {
     position: absolute;
     inline-size: 0;
     block-size: 0;
