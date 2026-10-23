@@ -84,3 +84,55 @@ export const Column: Story = {
     </>
   ),
 };
+
+/** The height of a one-line node in a class graph, in SVG user units. */
+const GRAPH_ROW_HEIGHT = 32;
+
+/** The height of a hub in a class graph, in SVG user units. */
+const GRAPH_HUB_HEIGHT = 48;
+
+/** A concrete class in a class graph: one line, its instance count at the end. */
+export const WithCount: Story = {
+  parameters: { svg: { width: 160, height: GRAPH_ROW_HEIGHT } },
+  args: {
+    title: "Component",
+    count: 139,
+    width: 160,
+    height: GRAPH_ROW_HEIGHT,
+  },
+};
+
+/** An abstract class: a hollow box with an italic title, and no count. */
+export const Hollow: Story = {
+  parameters: { svg: { width: 128, height: GRAPH_ROW_HEIGHT } },
+  args: {
+    title: "UI Element",
+    hollow: true,
+    width: 128,
+    height: GRAPH_ROW_HEIGHT,
+  },
+};
+
+/** A hub: a taller box with a larger title. */
+export const Prominent: Story = {
+  parameters: { svg: { width: 96, height: GRAPH_HUB_HEIGHT } },
+  args: {
+    title: "Entity",
+    hollow: true,
+    prominent: true,
+    width: 96,
+    height: GRAPH_HUB_HEIGHT,
+  },
+};
+
+/** A graph zoomed out below its legible size draws the box alone. */
+export const WithoutText: Story = {
+  parameters: { svg: { width: 160, height: GRAPH_ROW_HEIGHT } },
+  args: {
+    title: "Component",
+    count: 139,
+    width: 160,
+    height: GRAPH_ROW_HEIGHT,
+    showText: false,
+  },
+};

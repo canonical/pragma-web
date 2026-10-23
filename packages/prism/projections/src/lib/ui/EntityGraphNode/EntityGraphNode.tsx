@@ -6,6 +6,7 @@ import {
   GRAPH_NODE_HEIGHT,
   GRAPH_NODE_INSET,
   GRAPH_NODE_LINE,
+  GRAPH_NODE_RADIUS,
   GRAPH_NODE_STROKE,
   GRAPH_NODE_WIDTH,
 } from "./constants.js";
@@ -20,17 +21,24 @@ const TITLE_Y = GRAPH_NODE_STROKE + GRAPH_NODE_LINE / 2;
 const CONTEXT_Y = TITLE_Y + GRAPH_NODE_LINE;
 
 /**
- * An entity as a node of a graph: a 50px box, two lines tall, with the
- * title on the first line and "kind in location" muted on the second. It is
- * native SVG, an SVG `<g>` of two rects and two lines of `<text>`, so a graph
- * draws hundreds of them under pan and zoom; it goes inside an `<svg>`, and
- * the graph places it with a transform on it or on a group around it.
+ * An entity as a node of a graph: a box with rounded corners, the title on
+ * the first line and "kind in location" muted on the second, or the title
+ * alone on the box's middle; the entity's vital, when it has one, ends the
+ * title's line in muted tabular figures. It is native SVG, an SVG `<g>` of
+ * two rects and `<text>`, so a graph draws hundreds of them under pan and
+ * zoom; it goes inside an `<svg>`, and the graph places it with a transform
+ * on it or on a group around it.
+ *
+ * A hollow node is drawn in the floor's colour with an italic title, and a
+ * prominent node sets its title one step larger: the encodings a graph
+ * gives a kind it marks apart and its hubs. A node without text draws its
+ * box alone, as a graph zoomed out below its legible size does.
  *
  * With an `href` the title's text links to the entity's home through
  * `LinkComponent`, an SVG link inside the title's `<text>`; without one it
- * is inert text. A line longer
- * than the box is clipped at the inner inset. It renders only the slots it
- * is given and reads no context, so it renders anywhere in an SVG.
+ * is inert text. A line longer than the box is clipped at the inner inset.
+ * It renders only the slots it is given and reads no context, so it renders
+ * anywhere in an SVG.
  *
  * Native props reach the `<g>` root; a consumer `className` merges after
  * the node's own.
@@ -45,36 +53,26 @@ export default function EntityGraphNode({
   LinkComponent = "a",
   kind,
   location,
+  count,
   width = GRAPH_NODE_WIDTH,
+  height = GRAPH_NODE_HEIGHT,
+  hollow = false,
+  prominent = false,
+  showText = true,
   className,
   ...props
 }: EntityGraphNodeProps): ReactElement {
   // A clip path is addressed by a document-wide id; React's ids carry
   // characters a `url(#…)` reference cannot hold unescaped.
   const clipId = `entity-graph-node-${useId().replaceAll(/[^\w-]/g, "")}`;
+  const hasContext = kind !== undefined || location !== undefined;
+  const titleY = hasContext ? TITLE_Y : height / 2;
   const kindSlot =
     kind === undefined ? undefined : <tspan className="kind">{kind}</tspan>;
   const locationSlot =
     location === undefined ? undefined : (
       <tspan className="location">{location}</tspan>
     );
-  const titleText = (
-    <text
-      className="title"
-      dominantBaseline="central"
-      fill="currentColor"
-      x={TEXT_X}
-      y={TITLE_Y}
-    >
-      {href === undefined ? (
-        title
-      ) : (
-        <LinkComponent className="link" href={href}>
-          {title}
-        </LinkComponent>
-      )}
-    </text>
-  );
   return (
     <g
       {...props}
@@ -82,49 +80,84 @@ export default function EntityGraphNode({
     >
       <clipPath id={clipId}>
         <rect
-          height={GRAPH_NODE_HEIGHT}
+          height={height}
           width={Math.max(0, width - 2 * TEXT_X)}
           x={TEXT_X}
           y={0}
         />
       </clipPath>
       <rect
-        className="surface"
+        className={["surface", hollow ? "is-hollow" : ""]
+          .filter(Boolean)
+          .join(" ")}
         fill="currentColor"
-        height={GRAPH_NODE_HEIGHT}
+        height={height}
+        rx={GRAPH_NODE_RADIUS}
         width={width}
       />
       <rect
         className="frame"
         fill="none"
-        height={GRAPH_NODE_HEIGHT - GRAPH_NODE_STROKE}
+        height={height - GRAPH_NODE_STROKE}
+        rx={GRAPH_NODE_RADIUS - GRAPH_NODE_STROKE / 2}
         stroke="currentColor"
         strokeWidth={GRAPH_NODE_STROKE}
         width={width - GRAPH_NODE_STROKE}
         x={GRAPH_NODE_STROKE / 2}
         y={GRAPH_NODE_STROKE / 2}
       />
-      <g clipPath={`url(#${clipId})`}>
-        {titleText}
-        {kindSlot === undefined && locationSlot === undefined ? null : (
+      {showText ? (
+        <g clipPath={`url(#${clipId})`}>
           <text
-            className="context"
+            className={["title", prominent ? "is-prominent" : ""]
+              .filter(Boolean)
+              .join(" ")}
             dominantBaseline="central"
             fill="currentColor"
+            fontStyle={hollow ? "italic" : undefined}
             x={TEXT_X}
-            y={CONTEXT_Y}
+            y={titleY}
           >
-            {kindSlot === undefined || locationSlot === undefined ? (
-              (kindSlot ?? locationSlot)
+            {href === undefined ? (
+              title
             ) : (
-              <Message
-                elements={{ kind: kindSlot, location: locationSlot }}
-                id="entity.context"
-              />
+              <LinkComponent className="link" href={href}>
+                {title}
+              </LinkComponent>
             )}
           </text>
-        )}
-      </g>
+          {count === undefined ? null : (
+            <text
+              className="count"
+              dominantBaseline="central"
+              fill="currentColor"
+              textAnchor="end"
+              x={width - TEXT_X}
+              y={titleY}
+            >
+              {count}
+            </text>
+          )}
+          {hasContext ? (
+            <text
+              className="context"
+              dominantBaseline="central"
+              fill="currentColor"
+              x={TEXT_X}
+              y={CONTEXT_Y}
+            >
+              {kindSlot === undefined || locationSlot === undefined ? (
+                (kindSlot ?? locationSlot)
+              ) : (
+                <Message
+                  elements={{ kind: kindSlot, location: locationSlot }}
+                  id="entity.context"
+                />
+              )}
+            </text>
+          ) : null}
+        </g>
+      ) : null}
     </g>
   );
 }
