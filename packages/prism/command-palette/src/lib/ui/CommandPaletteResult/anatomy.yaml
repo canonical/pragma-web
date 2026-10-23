@@ -1,0 +1,29 @@
+---
+# CommandPaletteResult — one result of the palette: a graph node as an
+# option of the results listbox, rendered as the site's command projection
+# for its type, a 56px EntityCommand row. Choosing it, by a click on the
+# row or by Enter in the field while it is highlighted, closes the palette
+# and opens the node's canonical home (useHome) through the router. A node
+# whose site gives its type no home is a disabled option: it is listed and
+# previewed, and choosing it does nothing.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 (the highlighted
+# row) and 504:327 (the row's slots).
+#
+# It renders no element of its own: the arm its node's type selects renders
+# the row's <li>, and the option's role, id, selection and handlers reach
+# it. Every size and spacing is EntityCommand's; nothing here binds a style.
+node:
+  uri: prism.component.command_palette_result
+  projection:
+    on: Node
+  edges:
+    - node:
+        uri: prism.component.command_projection
+        projection:
+          on: Node
+      relation: { cardinality: "1" }
+    - node:
+        role: home
+        projection:
+          field: _meta.curie
+      relation: { cardinality: "0..1" }

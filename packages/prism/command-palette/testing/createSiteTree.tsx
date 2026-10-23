@@ -3,11 +3,11 @@ import {
   defaultProjectionMaps,
   ProjectionsProvider,
 } from "@canonical/prism-projections";
-import type { AnyRoute, RouteMap, Router } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { IEnvironment } from "relay-runtime";
+import type createSiteRouter from "./createSiteRouter.js";
 import { HOMES } from "./fixtures.js";
 
 /** What `createSiteTree` mounts. */
@@ -15,7 +15,7 @@ export interface SiteTreeOptions {
   /** The store and network the palette searches through. */
   readonly environment: IEnvironment;
   /** The site's router, which a chosen result navigates. */
-  readonly router: Router<RouteMap, AnyRoute | undefined>;
+  readonly router: ReturnType<typeof createSiteRouter>;
   /** The content that reads the site's providers. */
   readonly children: ReactNode;
 }
