@@ -8,6 +8,7 @@ import {
   NORTHGATE_CURIE,
   STATION_CLASS_CURIE,
 } from "../testing/fixtures.js";
+import { HOME_LENS_MESSAGES } from "./domains/metro/constants.js";
 import { appRoutes, notFoundRoute } from "./routes.js";
 
 // Without an adapter the router is a pure matcher: building it runs no load
@@ -30,8 +31,9 @@ describe("appRoutes", () => {
     ]);
   });
 
-  it("builds the six route names the register carries", () => {
+  it("builds the seven route names the register carries", () => {
     expect([
+      router.buildPath("home"),
       router.buildPath("stations"),
       router.buildPath("stationsEntity", { params: { uri: NORTHGATE_CURIE } }),
       router.buildPath("lines"),
@@ -41,6 +43,7 @@ describe("appRoutes", () => {
         params: { term: STATION_CLASS_CURIE },
       }),
     ]).toEqual([
+      "/",
       "/stations",
       "/stations/metro%3Anorthgate",
       "/lines",
@@ -54,7 +57,21 @@ describe("appRoutes", () => {
     expect(router.match("/nowhere")?.kind).toBe("not-found");
   });
 
-  it("has no route at the root", () => {
-    expect(router.match("/")?.kind).toBe("not-found");
+  it("lands the root on the home route", () => {
+    const match = router.match("/");
+    expect(match?.kind).toBe("route");
+    expect(match?.kind === "route" ? match.name : undefined).toBe("home");
+  });
+
+  it("keeps the landing out of the rail", () => {
+    expect(collectLenses(appRoutes).map(({ name }) => name)).not.toContain(
+      "home",
+    );
+  });
+
+  it("gives every lens a door on the landing, in rail order", () => {
+    expect(collectLenses(appRoutes).map(({ name }) => name)).toEqual(
+      Object.keys(HOME_LENS_MESSAGES),
+    );
   });
 });

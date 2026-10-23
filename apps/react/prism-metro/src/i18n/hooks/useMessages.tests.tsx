@@ -12,6 +12,16 @@ describe("useMessages", () => {
     expect(result.current("site.name")).toBe(MESSAGES["site.name"]);
   });
 
+  it("selects a plural record's branch by count", () => {
+    const { result } = renderHook(() => useMessages());
+    expect(result.current("home.stations.count", { count: 1 })).toBe(
+      "1 station",
+    );
+    expect(result.current("home.stations.count", { count: 16 })).toBe(
+      "16 stations",
+    );
+  });
+
   it("reads through the translator a provider supplies", () => {
     const translate: Translate = (key) => `[${key}]`;
     const wrapper = ({ children }: { readonly children: ReactNode }) => (

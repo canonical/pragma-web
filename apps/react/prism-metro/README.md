@@ -16,6 +16,9 @@ It has three lenses:
 - **Definitions**: the explorer over the metro and geo ontologies' classes
   and properties (`@canonical/prism-lens-definitions`).
 
+Its landing, at `/`, opens a door to each lens: one card per lens with how
+many things it shows, counted from the graph.
+
 ## Before you start
 
 Install from the repository root with the Bun version in `.bun-version`. The
@@ -47,10 +50,8 @@ cd apps/react/prism-metro
 bun run dev:bun
 ```
 
-and open `http://localhost:5178/stations`, `http://localhost:5178/lines` or
-`http://localhost:5178/definitions`. `PORT` moves the app to another port.
-The site has no page at `/`: the brand in the rail links to the stations
-lens.
+and open `http://localhost:5178/`. `PORT` moves the app to another port.
+`/` is the landing.
 
 To read from a graph somewhere else, name its endpoint:
 
@@ -93,6 +94,7 @@ The lens packages link by route name, so the site's route table and its
 
 | Name              | URL                  |
 | ----------------- | -------------------- |
+| `home`            | `/`                  |
 | `stations`        | `/stations`          |
 | `stationsEntity`  | `/stations/:uri`     |
 | `lines`           | `/lines`             |
