@@ -126,11 +126,12 @@
   }
 
   /* Below two groups: the palette is four columns wide, the results take
-   * them all, and the preview is not shown. */
+   * them all, however wide their rows' titles run, and the preview is not
+   * shown. */
   @container shell (width < 912px) {
     .ds.command-palette-search > .body > .results {
       flex-grow: 1;
-      flex-basis: auto;
+      flex-basis: 0;
     }
 
     .ds.command-palette-search > .body > .preview {
