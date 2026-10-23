@@ -22,6 +22,10 @@
 # Token ledger:
 #   1rem: the term's name; the docs context has no 16px text size.
 #   1px: the hairline above each section and around each tag.
+#   calc(-1 * var(--component-padding-inline)): the section's bleed, the
+#     negation of component.padding.inline, which the DSL cannot spell as a
+#     symbol: each section's hairline runs edge to edge across the
+#     inspector, its content padded back onto the inspector's lines.
 #   999px: a tag's pill; no radius token is a pill.
 #   space.050, space.100: the gaps between tags and between links; no
 #     semantic gap is admitted inside a row.
@@ -95,7 +99,11 @@ node:
               role: section
               styles:
                 spacing.external.block.start: container.gap.default
+                spacing.external.inline.start: "calc(-1 * var(--component-padding-inline))"
+                spacing.external.inline.end: "calc(-1 * var(--component-padding-inline))"
                 spacing.internal.block.start: container.gap.default
+                spacing.internal.inline.start: component.padding.inline
+                spacing.internal.inline.end: component.padding.inline
                 appearance.border.width: 1px
                 appearance.border.style: solid
                 appearance.border.block.start.color: color.border.muted

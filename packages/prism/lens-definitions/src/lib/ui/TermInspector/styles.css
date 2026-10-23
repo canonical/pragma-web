@@ -21,6 +21,7 @@
     --term-inspector-rule-width: 1px;
     --term-inspector-padding-block: var(--component-padding-block);
     --term-inspector-padding-inline: var(--component-padding-inline);
+    --term-inspector-bleed: calc(-1 * var(--component-padding-inline));
     --term-inspector-tight: var(--container-gap-tight);
     --term-inspector-default: var(--container-gap-default);
     /* No semantic gap is admitted inside a row. */
@@ -77,10 +78,16 @@
     color: var(--term-inspector-muted-color);
   }
 
-  /* Each section opens on a hairline across the inspector. */
+  /* Each section opens on a hairline across the inspector, edge to edge:
+   * it bleeds over the inspector's inline padding and pads its content
+   * back onto the inspector's lines. */
   .ds.term-inspector .section {
     margin-block-start: var(--term-inspector-default);
+    margin-inline-start: var(--term-inspector-bleed);
+    margin-inline-end: var(--term-inspector-bleed);
     padding-block-start: var(--term-inspector-default);
+    padding-inline-start: var(--term-inspector-padding-inline);
+    padding-inline-end: var(--term-inspector-padding-inline);
     border-block-start-width: var(--term-inspector-rule-width);
     border-block-start-style: solid;
     border-block-start-color: var(--term-inspector-rule-color);
