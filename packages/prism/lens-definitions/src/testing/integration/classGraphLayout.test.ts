@@ -39,13 +39,34 @@ describe("the class graph of the real ontology", () => {
       "G3: fit 0.715 at 48px channels; 0.723 at 32px",
       "G3: opens on a legible window, the rest a pan away",
     ]);
-    expect(layout.view).toEqual({ x: -16, y: -16, w: 688, h: 896 });
+    // The window ends half a lattice step past the ds region's third
+    // column, the last whose boxes all end before the legible width, and
+    // crosses boxes only at its bottom edge, where more lies below.
+    expect(layout.view).toMatchObject({ x: -16, y: -16, w: 536 });
+    expect(layout.view.h).toBeCloseTo(
+      (536 * DESIGN_CANVAS.h) / DESIGN_CANVAS.w,
+      10,
+    );
+    const zoom = Math.min(
+      DESIGN_CANVAS.w / layout.view.w,
+      DESIGN_CANVAS.h / layout.view.h,
+    );
+    expect(zoom).toBeGreaterThanOrEqual(MIN_FIT);
+    expect(zoom).toBeCloseTo(1.1007, 4);
+    const right = layout.view.x + layout.view.w;
+    const bottom = layout.view.y + layout.view.h;
+    const inView = [...layout.nodes.values()].filter(
+      (node) => node.x < right && node.y < bottom,
+    );
+    const whole = inView.filter((node) => node.y + node.h <= bottom);
+    expect(whole.filter((node) => node.x + node.w > right)).toEqual([]);
+    expect(whole).toHaveLength(16);
     expect(
-      Math.min(
-        DESIGN_CANVAS.w / layout.view.w,
-        DESIGN_CANVAS.h / layout.view.h,
-      ),
-    ).toBeGreaterThanOrEqual(MIN_FIT);
+      inView
+        .filter((node) => node.y + node.h > bottom)
+        .map((node) => node.label)
+        .sort(),
+    ).toEqual(["Anonymous Node", "Node"]);
   });
 
   it("covers the canvas densely, with no holes", () => {

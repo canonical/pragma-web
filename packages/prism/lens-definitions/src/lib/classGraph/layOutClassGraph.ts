@@ -5,25 +5,23 @@ import {
   CHANNEL,
   DESIGN_CANVAS,
   FALLBACK_CHANNEL,
-  LABEL_SIZE,
   LATTICE,
   MIN_FIT,
   REGION_ALIGNMENTS,
-  REGION_LABEL_GAP,
   REGION_LABEL_ROW,
-  REGION_LABEL_SIZE,
   SHELF_ALIGNMENTS,
   SHELF_GAP,
   SWEEPS,
   VIEW_MARGIN,
 } from "./constants.js";
+import frameLegibleWindow from "./frameLegibleWindow.js";
 import {
   buildArrowhead,
   ceilTo,
   compareText,
   formatPathData,
   measurePathBounds,
-  measureTextWidth,
+  measureRegionLabelWidth,
   roundTo,
   uniteRects,
 } from "./geometry.js";
@@ -65,11 +63,7 @@ function packRegions(
 } {
   const regions = model.regionOrder.map(({ prefix, ids }) => {
     const layout = layOutRegion(model, ids, channel, sweeps);
-    const labelWidth = Math.ceil(
-      measureTextWidth(prefix.toUpperCase(), "bold", REGION_LABEL_SIZE) +
-        REGION_LABEL_GAP +
-        measureTextWidth(`${ids.length} classes`, "regular", LABEL_SIZE),
-    );
+    const labelWidth = measureRegionLabelWidth(prefix, ids.length);
     return {
       prefix,
       ids,
@@ -225,9 +219,9 @@ function alignShelves(
  * legible zoom), placed on the lattice, then the cross-region
  * relations and subclass joins routed through the gaps, the rail order,
  * the keyboard's moves, the viewBox with its margin, the view the canvas
- * opens on (the whole viewBox, or its top-left window at the legible zoom
- * when the whole fits only below it, which the findings record) and the
- * phone view.
+ * opens on (the whole viewBox, or a legible window of it whose edges cut no
+ * box when the whole fits only below the legible zoom, which the findings
+ * record) and the phone view.
  *
  * It is total over what a provider serves: superclass cycles are broken
  * and an input with no class lays out as an empty floor. It is a pure
@@ -548,25 +542,12 @@ export default function layOutClassGraph(
     DESIGN_CANVAS.w / viewBox.w,
     DESIGN_CANVAS.h / viewBox.h,
   );
-  // A graph that fits only below the legible zoom opens on its top-left
-  // window at that zoom, so no first paint drops the labels: the window
-  // is cut down to the lattice, which keeps it clear of the threshold
-  // when the real canvas rounds a pixel short of the design canvas.
-  const view =
-    fitZoom >= MIN_FIT
-      ? viewBox
-      : {
-          x: viewBox.x,
-          y: viewBox.y,
-          w: Math.min(
-            viewBox.w,
-            Math.floor(DESIGN_CANVAS.w / MIN_FIT / LATTICE) * LATTICE,
-          ),
-          h: Math.min(
-            viewBox.h,
-            Math.floor(DESIGN_CANVAS.h / MIN_FIT / LATTICE) * LATTICE,
-          ),
-        };
+  // A graph that fits only below the legible zoom opens on a legible
+  // window of it, so no first paint drops the labels.
+  const view = frameLegibleWindow(
+    { nodes: orderedNodes, regions, viewBox },
+    DESIGN_CANVAS,
+  );
   return {
     model,
     nodes: orderedNodes,

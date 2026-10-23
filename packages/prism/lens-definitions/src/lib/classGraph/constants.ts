@@ -94,6 +94,20 @@ export const ALIGNMENT_SEARCH_LIMIT = 6;
 /** The smallest zoom at which every 14px label renders at 12px or more. */
 export const MIN_FIT = 12 / 14;
 
+/**
+ * How far above the legible zoom a window opens, as a factor, so the
+ * browser's single-precision transforms never draw its 14px text a hair
+ * below 12px.
+ */
+export const LEGIBLE_MARGIN = 1 + 1e-6;
+
+/**
+ * How much further than its first clean window, as a factor, the canvas
+ * may zoom in to open on a window whose bottom edge crosses no box either:
+ * one step of the zoom buttons.
+ */
+export const CLEAN_EDGE_ZOOM = 1.2;
+
 /** A self-loop's extent above and right of its box, in px. */
 export const LOOP_EXTENT = 16;
 

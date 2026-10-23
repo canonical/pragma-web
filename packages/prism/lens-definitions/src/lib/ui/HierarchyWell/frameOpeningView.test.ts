@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
+import { DESIGN_CANVAS } from "../../classGraph/constants.js";
+import frameLegibleWindow from "../../classGraph/frameLegibleWindow.js";
 import { requireEntry } from "../../classGraph/require.js";
 import frameOpeningView from "./frameOpeningView.js";
 
@@ -15,24 +17,23 @@ describe("frameOpeningView", () => {
     });
   });
 
-  it("slides a window to centre the selected class, within the graph", () => {
+  it("opens on the design canvas's legible window around the selected class", () => {
     const leaf = requireEntry(
       layout.nodes,
       requireEntry(uris, "cs:CodeStandard"),
     );
     const box = frameOpeningView(layout, leaf);
-    expect(box.width).toBe(layout.view.w);
-    expect(box.height).toBe(layout.view.h);
+    const window = frameLegibleWindow(layout, DESIGN_CANVAS, leaf);
+    expect(box).toEqual({
+      x: window.x,
+      y: window.y,
+      width: window.w,
+      height: window.h,
+    });
     expect(box.x).toBeLessThanOrEqual(leaf.x);
     expect(box.x + box.width).toBeGreaterThanOrEqual(leaf.x + leaf.w);
     expect(box.y).toBeLessThanOrEqual(leaf.y);
     expect(box.y + box.height).toBeGreaterThanOrEqual(leaf.y + leaf.h);
-    expect(box.x + box.width).toBeLessThanOrEqual(
-      layout.viewBox.x + layout.viewBox.w,
-    );
-    expect(box.y + box.height).toBeLessThanOrEqual(
-      layout.viewBox.y + layout.viewBox.h,
-    );
   });
 
   it("keeps the whole graph when it fits, whatever is selected", () => {

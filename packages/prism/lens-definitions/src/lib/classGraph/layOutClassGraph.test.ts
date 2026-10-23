@@ -13,7 +13,13 @@ import {
   measurePhone,
 } from "../../../testing/measureClassGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
-import { BUS_OFFSET, DESIGN_CANVAS, MIN_FIT, PHONE } from "./constants.js";
+import {
+  BUS_OFFSET,
+  DESIGN_CANVAS,
+  MIN_FIT,
+  PHONE,
+  SHELF_GAP,
+} from "./constants.js";
 import { measurePathBounds } from "./geometry.js";
 import layOutClassGraph from "./layOutClassGraph.js";
 import { requireDefined } from "./require.js";
@@ -101,10 +107,10 @@ describe("layOutClassGraph", () => {
       "G3: fit 0.281 at 48px channels; 0.307 at 32px",
       "G3: opens on a legible window, the rest a pan away",
     ]);
-    expect(wide.view).toEqual({ x: -16, y: -16, w: 688, h: 96 });
-    expect(
-      Math.min(DESIGN_CANVAS.w / wide.view.w, DESIGN_CANVAS.h / wide.view.h),
-    ).toBeGreaterThanOrEqual(MIN_FIT);
+    // The legible window's right edge already falls between two boxes.
+    expect(wide.view).toMatchObject({ x: -16, y: -16 });
+    expect(wide.view.w).toBeCloseTo(DESIGN_CANVAS.w / MIN_FIT, 2);
+    expect(wide.view.h).toBeCloseTo(DESIGN_CANVAS.h / MIN_FIT, 2);
   });
 
   it("settles on the narrower channels when they make the graph fit", () => {

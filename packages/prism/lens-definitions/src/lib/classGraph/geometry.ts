@@ -7,7 +7,13 @@
  * measure the same drawing the same way.
  */
 
-import { FONT_METRICS, HEAD_SIZE } from "./constants.js";
+import {
+  FONT_METRICS,
+  HEAD_SIZE,
+  LABEL_SIZE,
+  REGION_LABEL_GAP,
+  REGION_LABEL_SIZE,
+} from "./constants.js";
 import { requireAt } from "./require.js";
 import type { FontFace, PathCommand, Point, Rect } from "./types.js";
 
@@ -32,6 +38,18 @@ export function measureTextWidth(
     units += advance;
   }
   return (units * size) / FONT_METRICS.unitsPerEm;
+}
+
+/**
+ * Measure a region's label: its prefix in 16px bold capitals, the gap,
+ * then its class count in 14px regular, rounded up to the pixel.
+ */
+export function measureRegionLabelWidth(prefix: string, count: number): number {
+  return Math.ceil(
+    measureTextWidth(prefix.toUpperCase(), "bold", REGION_LABEL_SIZE) +
+      REGION_LABEL_GAP +
+      measureTextWidth(`${count} classes`, "regular", LABEL_SIZE),
+  );
 }
 
 /** Measure the em box of a line of text set at `baseline`. */

@@ -260,9 +260,9 @@ export interface ClassGraphLayout {
   /** The graph's bounds plus the view margin. */
   readonly viewBox: Rect;
   /**
-   * The box the canvas opens on: the viewBox when it fits the design canvas
-   * at the legible zoom, else the viewBox's top-left window that the design
-   * canvas shows at that zoom.
+   * The box the canvas opens on at the design canvas: the viewBox when it
+   * fits there at the legible zoom, else the legible window from its
+   * top-left corner whose edges cut through no box.
    */
   readonly view: Rect;
   /** The zoom at which the viewBox fits the design canvas. */

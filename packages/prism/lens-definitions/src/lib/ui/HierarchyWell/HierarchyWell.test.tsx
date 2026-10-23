@@ -11,6 +11,7 @@ import createAllNamespacesFilter from "../../../../testing/createAllNamespacesFi
 import createClassGraphSetup from "../../../../testing/createClassGraphSetup.js";
 import createRouterHarness from "../../../../testing/createRouterHarness.js";
 import { CROSS_REGION_GRAPH } from "../../../../testing/fixtures.js";
+import { MIN_FIT } from "../../classGraph/constants.js";
 import { requireEntry } from "../../classGraph/require.js";
 import frameOpeningView from "./frameOpeningView.js";
 import HierarchyWell from "./HierarchyWell.js";
@@ -227,14 +228,18 @@ describe("HierarchyWell", () => {
   });
 
   describe("the camera", () => {
-    /** Lay the viewport out at the viewBox's size and move it at once. */
-    const stubViewport = (): void => {
+    /**
+     * Lay the viewport out at the whole graph's size, or the given one, and
+     * move it at once.
+     */
+    const stubViewport = (
+      { w, h } = { w: layout.viewBox.w, h: layout.viewBox.h },
+    ): void => {
       vi.stubGlobal(
         "matchMedia",
         (query: string) =>
           ({ matches: true, media: query }) as unknown as MediaQueryList,
       );
-      const { w, h } = layout.viewBox;
       vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
         width: w,
         height: h,
@@ -250,6 +255,17 @@ describe("HierarchyWell", () => {
     const readCamera = (container: HTMLElement): string | null =>
       container.querySelector(".desktop .camera")?.getAttribute("transform") ??
       null;
+    /** The camera's scale, read off its transform. */
+    const readTransform = (container: HTMLElement): { k: number } => ({
+      k: Number(/scale\(([^)]+)\)/.exec(readCamera(container) ?? "")?.at(1)),
+    });
+    /** The opening viewBox's on-screen scale in a viewport of a size. */
+    const measureScale = (w: number, h: number): { scale: number } => {
+      const viewBox = frameOpeningView(layout, undefined);
+      return {
+        scale: Math.min(w / viewBox.width, h / viewBox.height),
+      };
+    };
     /** The well under the router, with the given targets. */
     const drawWell = (props: Partial<HierarchyWellProps>) =>
       createRouterHarness(
@@ -269,14 +285,37 @@ describe("HierarchyWell", () => {
       vi.restoreAllMocks();
     });
 
+    it("opens on the whole graph where the canvas holds it legibly", () => {
+      stubViewport();
+      const { container } = render(drawWell({}));
+      const { k } = readTransform(container);
+      const { scale } = measureScale(layout.viewBox.w, layout.viewBox.h);
+      expect(scale * k).toBeCloseTo(1, 10);
+      expect(screen.getByRole("status").textContent).toBe("100%");
+    });
+
+    it.each([
+      { w: 590.67, h: 658 },
+      { w: 632, h: 546 },
+      { w: 504, h: 570 },
+    ])("opens a $w by $h canvas at a legible zoom", ({ w, h }) => {
+      stubViewport({ w, h });
+      const { container } = render(drawWell({}));
+      const { scale } = measureScale(w, h);
+      expect(scale * readTransform(container).k).toBeGreaterThanOrEqual(
+        MIN_FIT,
+      );
+    });
+
     it("fits the classes the chips leave, and Fit restores them", () => {
       stubViewport();
       const { container, rerender } = render(drawWell({}));
-      expect(readCamera(container)).toBeNull();
+      const opened = readCamera(container);
+      expect(opened).not.toBeNull();
       rerender(drawWell({ filter: createAllNamespacesFilter(["cs"]) }));
       const fitted = readCamera(container);
       expect(fitted).not.toBeNull();
-      expect(fitted).not.toBe("translate(0,0) scale(1)");
+      expect(fitted).not.toBe(opened);
       fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
       fireEvent.click(screen.getByRole("button", { name: "Fit" }));
       expect(readCamera(container)).toBe(fitted);
@@ -300,8 +339,9 @@ describe("HierarchyWell", () => {
     it("leaves the camera alone for a region the graph does not draw", () => {
       stubViewport();
       const { container, rerender } = render(drawWell({}));
+      const opened = readCamera(container);
       rerender(drawWell({ region: { prefix: "zz", serial: 1 } }));
-      expect(readCamera(container)).toBeNull();
+      expect(readCamera(container)).toBe(opened);
     });
 
     it("pans the selected class into view when it is out of view", () => {

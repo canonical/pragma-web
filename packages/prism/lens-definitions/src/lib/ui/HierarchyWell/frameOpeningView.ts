@@ -1,39 +1,23 @@
 import type { GraphBox } from "@canonical/prism-core";
-import type { ClassGraphLayout, LaidOutNode } from "../../classGraph/types.js";
+import { DESIGN_CANVAS } from "../../classGraph/constants.js";
+import frameLegibleWindow from "../../classGraph/frameLegibleWindow.js";
+import type { ClassGraphLayout, Rect } from "../../classGraph/types.js";
 
 /**
- * Frame the box the canvas opens on: the layout's view, which is the whole
- * graph when it fits at a legible zoom, else a window of it; a window
- * slides, within the graph, to centre the class selected on arrival, so a
- * term page opens on its term.
+ * Frame the box the canvas opens on, as the server paints it for the
+ * design canvas: the whole graph when it fits there at a legible zoom,
+ * else a legible window of it whose edges cut through no box, centred on
+ * the class selected on arrival when there is one, so a term page opens
+ * on its term.
  *
  * @param layout - The class graph's layout.
- * @param selected - The class selected on arrival, if any.
+ * @param selected - The box of the class selected on arrival, if any.
  * @returns The canvas's viewBox.
  */
 export default function frameOpeningView(
   layout: ClassGraphLayout,
-  selected: LaidOutNode | undefined,
+  selected: Rect | undefined,
 ): GraphBox {
-  const { view, viewBox } = layout;
-  const centre = (
-    start: number,
-    span: number,
-    from: number,
-    room: number,
-    size: number,
-  ): number =>
-    Math.min(
-      Math.max(Math.round(start + size / 2 - span / 2), from),
-      from + room - span,
-    );
-  const x =
-    selected === undefined
-      ? view.x
-      : centre(selected.x, view.w, viewBox.x, viewBox.w, selected.w);
-  const y =
-    selected === undefined
-      ? view.y
-      : centre(selected.y, view.h, viewBox.y, viewBox.h, selected.h);
-  return { x, y, width: view.w, height: view.h };
+  const { x, y, w, h } = frameLegibleWindow(layout, DESIGN_CANVAS, selected);
+  return { x, y, width: w, height: h };
 }
