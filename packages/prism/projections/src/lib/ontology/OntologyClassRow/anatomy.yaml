@@ -19,6 +19,13 @@ node:
               role: location
               projection:
                 field: _meta.curie
+              # The prefix is set in the identifier face.
+              edges:
+                - node:
+                    role: identifier
+                  relation:
+                    cardinality: "1"
+                    slotName: identifier
             relation:
               cardinality: "0..1"
               slotName: location

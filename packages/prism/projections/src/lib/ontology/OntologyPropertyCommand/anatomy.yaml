@@ -63,6 +63,13 @@ node:
               role: vital
               projection:
                 field: range
+              # The range is set in the identifier face.
+              edges:
+                - node:
+                    role: identifier
+                  relation:
+                    cardinality: "1"
+                    slotName: identifier
             relation:
               cardinality: "1"
               slotName: vital
