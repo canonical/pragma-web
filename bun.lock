@@ -136,6 +136,7 @@
         "@canonical/react-ds-global": "^0.44.1",
         "@canonical/react-head": "^0.44.1",
         "@canonical/react-hooks": "^0.44.1",
+        "@canonical/react-markdown": "^0.44.1",
         "@canonical/react-ssr": "^0.44.1",
         "@canonical/router-core": "^0.44.1",
         "@canonical/router-react": "^0.44.1",

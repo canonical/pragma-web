@@ -50,6 +50,11 @@ const PROJECTIONS = listAnatomyFolders([
 describe("the app's projections", () => {
   it("are found in its domain libraries and its general components", () => {
     expect(PROJECTIONS.map((folder) => basename(folder)).sort()).toEqual([
+      "CodeStandardCard",
+      "CodeStandardChip",
+      "CodeStandardCommand",
+      "CodeStandardGraphNode",
+      "CodeStandardRow",
       "ModifierCard",
       "ModifierChip",
       "ModifierCommand",

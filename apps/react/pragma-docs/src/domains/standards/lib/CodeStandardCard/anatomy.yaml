@@ -1,0 +1,75 @@
+---
+# CodeStandardCard: a code standard as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 505:2140 (the location above
+# the title, the kind "Code Standard", the summary with its emphasis kept,
+# and the key value "Category: React" under its rule). The location is the
+# compact address's prefix; the summary the first paragraph of the
+# standard's Markdown description, rendered inline, so its emphasis and
+# code read as they do in the standard; the Category value its first
+# category. The category already says what a footer would, so the card has
+# none.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. A standard has no sidecar. The home is the link the title renders
+# through, resolved from the compact address; a standard without one reads
+# as inert text.
+node:
+  uri: docs.component.code_standard_card
+  projection:
+    on: CodeStandard
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: summary
+              projection:
+                field: description
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+          - node:
+              role: key values
+              edges:
+                - node:
+                    role: category
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "1"
+                    projection:
+                      field: categories
+            relation:
+              cardinality: "0..1"
+              slotName: key-values
+      relation:
+        cardinality: "1"
