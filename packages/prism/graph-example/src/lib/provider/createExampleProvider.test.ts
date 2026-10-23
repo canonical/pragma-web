@@ -344,12 +344,14 @@ describe("Query.search", () => {
     });
     const middle = await search({
       text: "line",
-      first: 2,
+      first: 4,
       after: head.pageInfo.endCursor,
     });
     expect(middle.edges.map((edge) => edge.node.uri)).toEqual([
       `${M}circle-line`,
+      `${M}upland-line`,
       `${M}coastal-line`,
+      `${M}lowland-line`,
     ]);
     expect(middle.pageInfo).toMatchObject({
       hasNextPage: true,
@@ -357,17 +359,18 @@ describe("Query.search", () => {
     });
     const tail = await search({
       text: "line",
-      first: 2,
+      first: 4,
       after: middle.pageInfo.endCursor,
     });
     expect(tail.edges.map((edge) => edge.node)).toEqual([
       { __typename: "OntologyClass", uri: `${M}Interchange` },
+      { __typename: "OntologyClass", uri: `${M}Route` },
     ]);
     expect(tail.pageInfo).toEqual({
       hasNextPage: false,
       hasPreviousPage: true,
       startCursor: toCursor(`${M}Interchange`),
-      endCursor: toCursor(`${M}Interchange`),
+      endCursor: toCursor(`${M}Route`),
     });
   });
 
