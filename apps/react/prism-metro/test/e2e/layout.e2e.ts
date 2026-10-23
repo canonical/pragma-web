@@ -11,10 +11,11 @@
  * four at 390px; a workspace canvas that never scrolls; a document whose
  * only scrolling regions are its canvas and its rail; a canvas that starts
  * one gutter under the strip, or at the viewport's top with no strip, as on
- * the lobby and the not-found page; a strip whose band runs from the rail's
- * border to the viewport's edge with its content on the canvas's first
- * column line; and every gap, padding and margin of the chrome a multiple
- * of 4px.
+ * the lobby and the not-found page, its page then starting one gutter
+ * down; a strip whose band runs from the rail's
+ * border to the viewport's edge with its content from the canvas's first
+ * column line to its last; and every gap, padding and margin of the chrome
+ * a multiple of 4px.
  */
 import {
   launchBrowser,
@@ -106,6 +107,14 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         edges.stripBottom === null ? 0 : edges.stripBottom + edges.rowGap,
         1,
       );
+      // With no strip the page itself starts one gutter under the
+      // viewport's top, as a page under a strip starts under its rule.
+      if (edges.stripBottom === null) {
+        expect(layout.canvasPage.firstChildTop, theme).toBeCloseTo(
+          edges.rowGap,
+          1,
+        );
+      }
       for (const band of layout.bands) {
         expect(band.start, `${theme} ${band.element}`).toBeCloseTo(
           edges.railEnd,
@@ -117,6 +126,10 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         );
         expect(band.contentStart, `${theme} ${band.element}`).toBeCloseTo(
           edges.canvasStart,
+          1,
+        );
+        expect(band.contentEnd, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
           1,
         );
       }
