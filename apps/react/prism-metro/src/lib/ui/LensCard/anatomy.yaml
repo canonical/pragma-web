@@ -8,7 +8,7 @@
 # the title, 8 between the title and the content, 16 below; 209px wide at
 # two intrinsic columns, the span the landing gives each door) and the
 # atlas compositions' card groups (cards in a published Cards group, their
-# sections on its shared tracks). Slot order: label, count, summary.
+# sections on its shared tracks). Slot order: link, count, summary.
 #
 # Built on the published Card (global.component.card): this root IS the
 # Card's root with the lens-card class added, its sections are Card.Header
@@ -17,7 +17,8 @@
 # line, so the page's level-1 heading leads; the door's hierarchy is weight
 # (the title, bold), then the count at the text's regular weight, then
 # colour (the summary, muted), never a box or a size of this component's
-# own.
+# own. The title's link reads as the title: the text's colour, underlined
+# on hover.
 #
 # The door has no image and no footer, so the header takes the image's
 # track with its own (`1 / 3`) and starts at the card's edge, and the
@@ -39,6 +40,9 @@
 #                                  the content reaches back across the
 #                                  gutter between its track and the
 #                                  header's; no symbol is a negative gutter.
+#   --lens-card-link-decoration: none, --lens-card-link-hover-decoration:
+#     underline                    the title's link is underlined only on
+#                                  approach; no symbol names a decoration.
 #   layout.grid.row "1 / 3" (header), "3 / -1" (content): structure, the
 #     Card's row tracks each section takes.
 #
@@ -64,7 +68,11 @@ node:
               edges:
                 - node:
                     role: link to the lens's index
-                  relation: { cardinality: "1", slotName: label }
+                    styles:
+                      typography.color: color.text
+                      typography.decoration: none
+                      typography.decoration@hover: underline
+                  relation: { cardinality: "1", slotName: link }
             relation: { cardinality: "1", slotName: title }
       relation: { cardinality: "1", slotName: header }
     - node:

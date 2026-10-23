@@ -40,7 +40,9 @@ export default function LensCard({
     >
       <Card.Header className="header">
         <h2 className="title">
-          <LinkComponent href={href}>{label}</LinkComponent>
+          <LinkComponent className="link" href={href}>
+            {label}
+          </LinkComponent>
         </h2>
       </Card.Header>
       <Card.Content className="content">

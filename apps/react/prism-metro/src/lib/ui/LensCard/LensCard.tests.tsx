@@ -17,9 +17,13 @@ const STATIONS_DOOR: LensCardProps = {
 };
 
 /** A link renderer that marks the anchors it renders. */
-function MarkedLink({ href, children }: LinkComponentProps): ReactElement {
+function MarkedLink({
+  href,
+  className,
+  children,
+}: LinkComponentProps): ReactElement {
   return (
-    <a data-marked="" href={href}>
+    <a className={className} data-marked="" href={href}>
       {children}
     </a>
   );
@@ -39,6 +43,14 @@ describe("LensCard", () => {
     expect(screen.getByRole("link", { name: "Stations" })).toHaveAttribute(
       "data-marked",
     );
+  });
+
+  it.each([
+    ["the intrinsic anchor", "a" as const],
+    ["a given renderer", MarkedLink],
+  ])("gives its link the link class through %s", (_, renderer) => {
+    render(<LensCard {...STATIONS_DOOR} LinkComponent={renderer} />);
+    expect(screen.getByRole("link", { name: "Stations" })).toHaveClass("link");
   });
 
   it("states the count as a data element whose value is the number", () => {

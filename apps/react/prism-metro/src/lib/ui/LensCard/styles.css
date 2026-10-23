@@ -14,6 +14,9 @@
     --lens-card-title-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
+    --lens-card-link-color: var(--color-text);
+    --lens-card-link-decoration: none;
+    --lens-card-link-hover-decoration: underline;
     --lens-card-summary-color: var(--color-text-muted);
   }
 
@@ -29,6 +32,17 @@
     font-size: var(--lens-card-title-font-size);
     line-height: var(--lens-card-title-line-height);
     font-weight: var(--lens-card-title-font-weight);
+  }
+
+  /* The title's link reads as the title: the text's colour, underlined on
+   * approach. */
+  .ds.lens-card .link {
+    color: var(--lens-card-link-color);
+    text-decoration: var(--lens-card-link-decoration);
+  }
+
+  .ds.lens-card .link:hover {
+    text-decoration: var(--lens-card-link-hover-decoration);
   }
 
   /* The door has no footer: the content takes the footer's track with its

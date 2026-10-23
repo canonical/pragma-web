@@ -17,7 +17,7 @@ describe("LensCard SSR", () => {
     );
     expect(html).toContain('class="ds card ds lens-card"');
     expect(html).toContain(
-      '<h2 class="title"><a href="/stations">Stations</a>',
+      '<h2 class="title"><a class="link" href="/stations">Stations</a>',
     );
     expect(html).toContain('<data value="16">16 stations</data>');
   });
