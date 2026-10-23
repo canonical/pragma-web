@@ -17,6 +17,10 @@ node:
         on: internal
         cases:
           - node:
+              uri: prism.component.ontology_class_card
+              projection:
+                on: OntologyClass
+          - node:
               uri: prism.component.node_card
               projection:
                 on: Node

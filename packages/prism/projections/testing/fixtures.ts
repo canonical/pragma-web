@@ -7,7 +7,7 @@
 import type { HomeNode, HomeResolver, Homes } from "@canonical/prism-core";
 import { type Router, route } from "@canonical/router-core";
 import type { MockResolver } from "relay-test-utils";
-import type { NodePayload } from "./types.js";
+import type { ClassPayload, NodePayload } from "./types.js";
 
 /** A site's route table with one entity page, addressed by the entity. */
 export const THING_ROUTES = {
@@ -93,10 +93,14 @@ export const MOCK_ONTOLOGY_PROPERTY_HREF =
   "/things/https%3A%2F%2Fds.canonical.com%2Fmodifier";
 
 /** A node of a type the site homes: an ontology class. */
-export const ONTOLOGY_CLASS_NODE: NodePayload = {
+export const ONTOLOGY_CLASS_NODE: ClassPayload = {
   __typename: "OntologyClass",
   __isNode: "OntologyClass",
   uri: "https://ds.canonical.com/UIBlock",
+  isAbstract: true,
+  definition: "A UI block is a part of an interface a designer composes.",
+  instanceCount: 3,
+  superclass: null,
   _meta: {
     curie: "ds:UIBlock",
     title: "UI Block",

@@ -21,6 +21,20 @@ export interface NodePayload {
 }
 
 /**
+ * An ontology class's payload: what every dispatcher reads of a node, and
+ * what the class's own arms read of it.
+ */
+export interface ClassPayload extends NodePayload {
+  readonly isAbstract: boolean;
+  readonly definition: string | null;
+  readonly instanceCount: number;
+  readonly superclass: {
+    readonly uri: string;
+    readonly _meta: { readonly title: string };
+  } | null;
+}
+
+/**
  * One entity of the projection matrix as the stories render it: the text of
  * every slot each representation fills, so the five representations of one
  * type read the same entity.

@@ -9,14 +9,15 @@ import type { CardProjectionProps } from "./types.js";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
- * The fields CardProjection reads from the Node it dispatches: its typename, and
- * each arm's fragment, spread aliased by the type the arm projects, `Node`
+ * The fields CardProjection reads from the Node it dispatches: its typename,
+ * and each arm's fragment, spread aliased by the type the arm projects, `Node`
  * for every type no other arm takes.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment CardProjection_node on Node {
     __typename
     ...NodeCard_node @alias(as: "Node")
+    ...OntologyClassCard_node @alias(as: "OntologyClass")
   }
 `;
 void declareNodeFragment;

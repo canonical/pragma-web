@@ -8,7 +8,11 @@ import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
   type SiteTreeOptions,
 } from "../../../../testing/createSiteTree.js";
-import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
+import {
+  MOCK_NODE,
+  MOCK_ONTOLOGY_CLASS,
+  resolveRoot,
+} from "../../../../testing/fixtures.js";
 import testQuery, {
   type CardProjectionTestQuery,
 } from "../../../__generated__/CardProjectionTestQuery.graphql.js";
@@ -84,6 +88,18 @@ describe("CardProjection", () => {
       "data-type",
       "Component",
     );
+  });
+
+  it("renders an ontology class through the class's own arm", () => {
+    const { container } = renderWithNode(
+      (node) => <CardProjection node={node} />,
+      MOCK_ONTOLOGY_CLASS,
+    );
+    expect(container.querySelector(".ds.ontology-class-card")).toHaveAttribute(
+      "data-type",
+      "OntologyClass",
+    );
+    expect(container.querySelector(".ds.node-card")).toBeNull();
   });
 
   it("renders a type the site arms through the site's arm, over the Node key", () => {

@@ -8,7 +8,11 @@ import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
   type SiteTreeOptions,
 } from "../../../../testing/createSiteTree.js";
-import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
+import {
+  MOCK_NODE,
+  MOCK_ONTOLOGY_CLASS,
+  resolveRoot,
+} from "../../../../testing/fixtures.js";
 import testQuery, {
   type CommandProjectionTestQuery,
 } from "../../../__generated__/CommandProjectionTestQuery.graphql.js";
@@ -86,6 +90,21 @@ describe("CommandProjection", () => {
       "data-type",
       "Component",
     );
+  });
+
+  it("renders an ontology class through the class's own arm", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <CommandProjection node={node} />
+        </ul>
+      ),
+      MOCK_ONTOLOGY_CLASS,
+    );
+    expect(
+      container.querySelector(".ds.ontology-class-command"),
+    ).toHaveAttribute("data-type", "OntologyClass");
+    expect(container.querySelector(".ds.node-command")).toBeNull();
   });
 
   it("renders a type the site arms through the site's arm, over the Node key", () => {

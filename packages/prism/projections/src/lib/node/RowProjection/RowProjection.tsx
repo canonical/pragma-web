@@ -10,13 +10,14 @@ import type { RowProjectionProps } from "./types.js";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The fields RowProjection reads from the Node it dispatches: its typename, and
- * each arm's fragment, spread aliased by the type the arm projects, `Node`
- * for every type no other arm takes.
+ * each arm's fragment, spread aliased by the type the arm projects, `Node` for
+ * every type no other arm takes.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment RowProjection_node on Node {
     __typename
     ...NodeRow_node @alias(as: "Node")
+    ...OntologyClassRow_node @alias(as: "OntologyClass")
   }
 `;
 void declareNodeFragment;

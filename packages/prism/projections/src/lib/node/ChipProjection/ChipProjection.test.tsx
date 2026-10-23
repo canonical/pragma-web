@@ -8,7 +8,11 @@ import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
   type SiteTreeOptions,
 } from "../../../../testing/createSiteTree.js";
-import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
+import {
+  MOCK_NODE,
+  MOCK_ONTOLOGY_CLASS,
+  resolveRoot,
+} from "../../../../testing/fixtures.js";
 import testQuery, {
   type ChipProjectionTestQuery,
 } from "../../../__generated__/ChipProjectionTestQuery.graphql.js";
@@ -84,6 +88,18 @@ describe("ChipProjection", () => {
       "data-type",
       "Component",
     );
+  });
+
+  it("renders an ontology class through the class's own arm", () => {
+    const { container } = renderWithNode(
+      (node) => <ChipProjection node={node} />,
+      MOCK_ONTOLOGY_CLASS,
+    );
+    expect(container.querySelector(".ds.ontology-class-chip")).toHaveAttribute(
+      "data-type",
+      "OntologyClass",
+    );
+    expect(container.querySelector(".ds.node-chip")).toBeNull();
   });
 
   it("renders a type the site arms through the site's arm, over the Node key", () => {

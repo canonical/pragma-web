@@ -8,7 +8,11 @@ import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
   type SiteTreeOptions,
 } from "../../../../testing/createSiteTree.js";
-import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
+import {
+  MOCK_NODE,
+  MOCK_ONTOLOGY_CLASS,
+  resolveRoot,
+} from "../../../../testing/fixtures.js";
 import testQuery, {
   type RowProjectionTestQuery,
 } from "../../../__generated__/RowProjectionTestQuery.graphql.js";
@@ -86,6 +90,22 @@ describe("RowProjection", () => {
       "data-type",
       "Component",
     );
+  });
+
+  it("renders an ontology class through the class's own arm", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <RowProjection node={node} />
+        </ul>
+      ),
+      MOCK_ONTOLOGY_CLASS,
+    );
+    expect(container.querySelector(".ds.ontology-class-row")).toHaveAttribute(
+      "data-type",
+      "OntologyClass",
+    );
+    expect(container.querySelector(".ds.node-row")).toBeNull();
   });
 
   it("renders a type the site arms through the site's arm, over the Node key", () => {

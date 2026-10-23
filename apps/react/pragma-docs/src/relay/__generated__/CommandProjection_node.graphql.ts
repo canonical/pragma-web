@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0835e734c9f4584e8fcd3b36a136802e>>
+ * @generated SignedSource<<a01caa2511aeaf0d8dcdf862a9994d57>>
  * @lightSyntaxTransform
  */
 
@@ -14,6 +14,9 @@ export type CommandProjection_node$data = {
   readonly Node: {
     readonly " $fragmentSpreads": FragmentRefs<"NodeCommand_node">;
   };
+  readonly OntologyClass: {
+    readonly " $fragmentSpreads": FragmentRefs<"OntologyClassCommand_node">;
+  } | null | undefined;
   readonly " $fragmentType": "CommandProjection_node";
 };
 export type CommandProjection_node$key = {
@@ -49,12 +52,28 @@ const node: ReaderFragment = {
       },
       "kind": "AliasedInlineFragmentSpread",
       "name": "Node"
+    },
+    {
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "OntologyClassCommand_node"
+          }
+        ],
+        "type": "OntologyClass",
+        "abstractKey": null
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "OntologyClass"
     }
   ],
   "type": "Node",
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "17acb2674e9fcdff2d9ea9478ca0cd90";
+(node as any).hash = "603eebc5cf1d1698e505ed835103a1ac";
 
 export default node;

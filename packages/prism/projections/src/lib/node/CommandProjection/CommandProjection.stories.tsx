@@ -11,7 +11,11 @@ import {
   withList,
   withProjectionSite,
 } from "../../../../.storybook/decorators/index.js";
-import { MOCK_NODE, resolveRoot } from "../../../../testing/fixtures.js";
+import {
+  MOCK_NODE,
+  MOCK_ONTOLOGY_CLASS,
+  resolveRoot,
+} from "../../../../testing/fixtures.js";
 import storyQuery, {
   type CommandProjectionStoryQuery,
 } from "../../../__generated__/CommandProjectionStoryQuery.graphql.js";
@@ -71,3 +75,8 @@ type Story = StoryObj<typeof Component>;
 
 /** Any node of a type no arm takes, a UI block here: the Node arm renders it. */
 export const AnyNode: Story = {};
+
+/** An ontology class, the abstract class Layout: the class's own arm renders it. */
+export const ClassNode: Story = {
+  parameters: { relay: mockEntity(MOCK_ONTOLOGY_CLASS) },
+};

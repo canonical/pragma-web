@@ -1,3 +1,9 @@
+import {
+  OntologyClassCard,
+  OntologyClassChip,
+  OntologyClassCommand,
+  OntologyClassRow,
+} from "../ontology/index.js";
 import type { ProjectionMaps } from "../projections/index.js";
 import { NodeCard } from "./NodeCard/index.js";
 import { NodeChip } from "./NodeChip/index.js";
@@ -12,8 +18,11 @@ import { NodeRow } from "./NodeRow/index.js";
  * types under `siteTypes`.
  */
 export const defaultProjectionMaps: ProjectionMaps = {
-  chip: { Node: NodeChip, types: {} },
-  row: { Node: NodeRow, types: {} },
-  card: { Node: NodeCard, types: {} },
-  command: { Node: NodeCommand, types: {} },
+  chip: { Node: NodeChip, types: { OntologyClass: OntologyClassChip } },
+  row: { Node: NodeRow, types: { OntologyClass: OntologyClassRow } },
+  card: { Node: NodeCard, types: { OntologyClass: OntologyClassCard } },
+  command: {
+    Node: NodeCommand,
+    types: { OntologyClass: OntologyClassCommand },
+  },
 };
