@@ -22,6 +22,16 @@
     );
     --graph-canvas-zoom-level-color: var(--color-text-muted);
     --graph-canvas-lattice-color: var(--color-border-muted);
+    --graph-canvas-hint-offset: var(--container-gap-default);
+    --graph-canvas-hint-padding-block: var(--container-gap-tight);
+    --graph-canvas-hint-padding-inline: var(--component-padding-inline);
+    --graph-canvas-hint-background: var(--color-background);
+    --graph-canvas-hint-border-color: var(--color-border-muted);
+    --graph-canvas-hint-border-width: 1px;
+    /* A pill; no semantic radius token exists. */
+    --graph-canvas-hint-radius: 999px;
+    --graph-canvas-hint-font-size: var(--typography-text-secondary-font-size);
+    --graph-canvas-hint-color: var(--color-text-muted);
 
     display: flex;
     flex-direction: column;
@@ -33,6 +43,7 @@
   /* The controls, flush with the end edge, over a hairline that spans the
    * canvas edge to edge. */
   .ds.graph-canvas .controls {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -45,6 +56,38 @@
     border-bottom-width: var(--graph-canvas-controls-rule-width);
     border-bottom-style: solid;
     background: var(--graph-canvas-controls-background);
+  }
+
+  /* The hint hangs from the bar's lower edge across the viewport, so it
+   * clears the controls whatever their height, and centres its text; it
+   * never takes a pointer from the drawing. */
+  .ds.graph-canvas .hint {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    margin-block-start: var(--graph-canvas-hint-offset);
+    margin-block-end: 0;
+    padding-inline-start: var(--graph-canvas-hint-offset);
+    padding-inline-end: var(--graph-canvas-hint-offset);
+    pointer-events: none;
+  }
+
+  /* The text sits on a pill as wide as itself. */
+  .ds.graph-canvas .hint-text {
+    padding-block-start: var(--graph-canvas-hint-padding-block);
+    padding-block-end: var(--graph-canvas-hint-padding-block);
+    padding-inline-start: var(--graph-canvas-hint-padding-inline);
+    padding-inline-end: var(--graph-canvas-hint-padding-inline);
+    border-color: var(--graph-canvas-hint-border-color);
+    border-width: var(--graph-canvas-hint-border-width);
+    border-style: solid;
+    border-radius: var(--graph-canvas-hint-radius);
+    background: var(--graph-canvas-hint-background);
+    font-size: var(--graph-canvas-hint-font-size);
+    color: var(--graph-canvas-hint-color);
   }
 
   .ds.graph-canvas .zoom-level {

@@ -13,7 +13,8 @@ const componentCssClassName = "ds graph-canvas";
 
 /**
  * The pan-and-zoom SVG viewport a prism graph draws in. A controls bar
- * carries the zoom level and the Fit, zoom-out and zoom-in controls; below
+ * carries the zoom level and the Fit, zoom-out and zoom-in controls, and
+ * floats the optional hint just under itself, over the viewport; below
  * it the viewport, an SVG whose viewBox is the graph's bounds, so the first
  * paint fits the whole graph flush top-left with no measurement; inside it,
  * in world space, a 16px dot lattice and the drawing.
@@ -44,6 +45,7 @@ export default function GraphCanvas({
   fit,
   frame,
   reveal,
+  hint,
   className,
   children,
   onKeyDown,
@@ -90,6 +92,11 @@ export default function GraphCanvas({
       onKeyDown={handleKeyDown}
     >
       <div className="controls">
+        {hint === undefined ? null : (
+          <p className="hint">
+            <span className="hint-text">{hint}</span>
+          </p>
+        )}
         <output className="zoom-level">
           {percent === undefined
             ? null

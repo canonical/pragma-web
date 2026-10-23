@@ -63,6 +63,11 @@ type OwnProps = {
    * the node a reader selected elsewhere.
    */
   readonly reveal?: GraphBox;
+  /**
+   * One line floated over the top of the viewport, centred just under the
+   * controls bar: how to move about the graph. None when omitted.
+   */
+  readonly hint?: ReactNode;
   /** The drawing, in world space, inside the camera. */
   readonly children: ReactNode;
 };

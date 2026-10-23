@@ -113,6 +113,22 @@ describe("GraphCanvas", () => {
     );
   });
 
+  it("hangs an optional hint from the controls bar, and none without one", () => {
+    const { rerender } = render(
+      <GraphCanvas hint="Drag to pan" label="Class graph" viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    const hint = document.querySelector(".controls > .hint > .hint-text");
+    expect(hint?.textContent).toBe("Drag to pan");
+    rerender(
+      <GraphCanvas label="Class graph" viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(document.querySelector(".hint")).toBeNull();
+  });
+
   it("reads the world's on-screen scale as the zoom level", () => {
     renderCanvas();
     expect(screen.getByRole("status").textContent).toBe("100%");
