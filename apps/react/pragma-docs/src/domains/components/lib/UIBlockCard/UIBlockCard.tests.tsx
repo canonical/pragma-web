@@ -141,6 +141,22 @@ describe("UIBlockCard", () => {
     expect(container.querySelector(".sidecar")).toBeNull();
   });
 
+  it("renders the first paragraph of its Markdown summary, its emphasis kept", () => {
+    const { container } = renderWithNode(
+      (node) => <UIBlockCard node={node} />,
+      {
+        summary:
+          "The **Badge** component is a small, non-interactive visual element.\n\nIt shows a count.",
+      },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.textContent).toBe(
+      "The Badge component is a small, non-interactive visual element.",
+    );
+    expect(summary?.querySelector("strong")?.textContent).toBe("Badge");
+    expect(summary?.querySelector("p")).toBeNull();
+  });
+
   it("leaves out the slots a block with no tier, parent, summary, version or stage has no data for", () => {
     const { container } = renderWithNode(
       (node) => <UIBlockCard node={node} />,

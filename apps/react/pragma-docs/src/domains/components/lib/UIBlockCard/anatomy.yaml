@@ -5,8 +5,10 @@
 # tier above the title, "IconButton ∈ Button", the kind, the summary, the
 # footer's vitals "v2.1" and the stage) and 502:1749 (the side panel). The
 # location is the block's tier; the parent the first block it inherits
-# from, after the catalog's ∈; the kind the block's class; the vitals its
-# version, when it has one, then its first documentation stage.
+# from, after the catalog's ∈; the kind the block's class; the summary the
+# first paragraph of the block's Markdown summary, rendered inline, so its
+# emphasis and code read as they do in the block's documentation; the
+# vitals its version, when it has one, then its first documentation stage.
 # The sidecar renders the actual component: the published React component
 # of the block with its default props, given only what it cannot render
 # without, server-rendered. A block the published package does not

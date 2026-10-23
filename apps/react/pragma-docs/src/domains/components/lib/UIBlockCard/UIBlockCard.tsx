@@ -2,9 +2,11 @@
 
 import { useHome } from "@canonical/prism-core";
 import { EntityCard, useProjectionLink } from "@canonical/prism-projections";
+import { Markdown } from "@canonical/react-markdown";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
+import { findFirstParagraph, SUMMARY_COMPONENTS } from "#lib/markdown";
 import nodeFragment from "../../../../relay/__generated__/UIBlockCard_node.graphql.js";
 import { BLOCK_EXAMPLES, UIBlockExample } from "../UIBlockExample/index.js";
 import type { UIBlockCardProps } from "./types.js";
@@ -65,7 +67,9 @@ const componentCssClassName = "ds ui-block-card";
  * A UI block as a card in a grid of entities: its tier above the title,
  * the title linked to its home when the site has one and inert text when
  * it has none, after it the first block it inherits from (`IconButton ∈
- * Button`), then its class and its summary; the footer holds its version
+ * Button`), then its class and the first paragraph of its Markdown
+ * summary, rendered inline so its emphasis and code read as they do in
+ * the block's documentation; the footer holds its version
  * (`v2.1`), when it has one, then its first documentation stage. A block
  * the published package renders has that component beside the body, in
  * the card's sidecar, server-rendered; any other block has no sidecar,
@@ -99,6 +103,7 @@ export default function UIBlockCard({
     stage,
   ].filter((vital): vital is string => vital !== undefined);
   const example = BLOCK_EXAMPLES.get(curie);
+  const summary = findFirstParagraph(data.summary ?? "");
   return (
     <EntityCard
       {...props}
@@ -112,7 +117,11 @@ export default function UIBlockCard({
       sidecar={
         example === undefined ? undefined : <UIBlockExample example={example} />
       }
-      summary={data.summary ? data.summary : undefined}
+      summary={
+        summary === "" ? undefined : (
+          <Markdown components={SUMMARY_COMPONENTS} source={summary} />
+        )
+      }
       title={title}
       vitals={vitals}
     />
