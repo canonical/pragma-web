@@ -24,8 +24,16 @@ import {
 import metroGraph from "../../../testing/records/metroGraph.js";
 import ontologyGraph from "../../../testing/records/ontologyGraph.js";
 import { DESIGN_CANVAS, MIN_FIT } from "../../lib/classGraph/constants.js";
-import { measurePathBounds } from "../../lib/classGraph/geometry.js";
+import {
+  measurePathBounds,
+  parsePathData,
+} from "../../lib/classGraph/geometry.js";
 import layOutClassGraph from "../../lib/classGraph/layOutClassGraph.js";
+import {
+  requireAt,
+  requireDefined,
+  requireEntry,
+} from "../../lib/classGraph/require.js";
 
 const layout = layOutClassGraph(ontologyGraph);
 
@@ -215,8 +223,8 @@ describe("the class graph of the metro ontology", () => {
       edgesThroughBoxes: [],
       textOverlaps: 0,
     });
-    expect(countCrossings(metro).total).toBe(1);
-    expect(countCrossings(layOutClassGraph(metroGraph, 0)).total).toBe(4);
+    expect(countCrossings(metro).total).toBe(6);
+    expect(countCrossings(layOutClassGraph(metroGraph, 0)).total).toBe(7);
     expect(followsRailOrder(metro)).toBe(true);
   });
 
@@ -225,6 +233,51 @@ describe("the class graph of the metro ontology", () => {
     expect(crossing).toHaveLength(2);
     for (const edge of crossing) {
       expect(measurePathBounds(edge.d).x).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("leaves and enters a relation between shelves by the sides that face each other", () => {
+    const crossing = metro.edges.filter((edge) => edge.bundle?.cross === true);
+    const buses = metro.edges.filter((edge) => edge.kind === "subclass");
+    for (const edge of crossing) {
+      const from = requireEntry(metro.nodes, edge.from);
+      const to = requireEntry(metro.nodes, requireAt(edge.to, 0));
+      const segments = parsePathData(edge.d).flatMap(
+        (subpath) => subpath.segments,
+      );
+      const [start] = requireAt(segments, 0).points;
+      const [end] = requireAt(segments, -1).points.slice(-1);
+      // The range lies to the domain's left, so the path leaves the
+      // domain's left side and enters the range's right side.
+      expect(to.x + to.w).toBeLessThanOrEqual(from.x);
+      expect(requireDefined(start, "the path's start")[0]).toBe(from.x);
+      expect(requireDefined(end, "the path's end")[0]).toBe(to.x + to.w);
+      // Its run along the gap is no longer than the room between the two
+      // boxes and a channel on either side of it.
+      const runs = segments
+        .filter(({ points: [p, q] }) => p?.[1] === q?.[1])
+        .map(({ points: [p, q] }) => Math.abs((q?.[0] ?? 0) - (p?.[0] ?? 0)));
+      expect(Math.max(...runs)).toBeLessThanOrEqual(
+        from.x - (to.x + to.w) + 2 * metro.channel,
+      );
+      // No vertical of it runs within 16px of a subclass bus beside it.
+      for (const { points } of segments) {
+        const [p, q] = points;
+        if (p === undefined || q === undefined || p[0] !== q[0]) continue;
+        const [low, high] = [Math.min(p[1], q[1]), Math.max(p[1], q[1])];
+        for (const bus of buses) {
+          const spine = parsePathData(bus.d)
+            .flatMap((subpath) => subpath.segments)
+            .flatMap((segment) => segment.points)
+            .filter(([x]) => x === bus.busX)
+            .map(([, y]) => y);
+          const overlaps =
+            Math.min(...spine) <= high && low <= Math.max(...spine);
+          if (overlaps) {
+            expect(Math.abs(p[0] - (bus.busX ?? 0))).toBeGreaterThanOrEqual(16);
+          }
+        }
+      }
     }
   });
 });

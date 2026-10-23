@@ -336,6 +336,16 @@ export interface RegionEdge {
 }
 
 /** One region laid out in its own coordinates, its top-left at the origin. */
+/**
+ * Where one end of a relation between two regions meets its box: the side
+ * that faces the other end, and the port's ideal offset from the box's top,
+ * towards the other end's middle.
+ */
+export interface CrossPort {
+  readonly side: "left" | "right";
+  readonly ideal: number;
+}
+
 export interface RegionLayout {
   readonly nodes: ReadonlyMap<string, RegionNode>;
   readonly edges: readonly RegionEdge[];

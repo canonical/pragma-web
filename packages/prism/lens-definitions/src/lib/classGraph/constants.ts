@@ -50,6 +50,13 @@ export const FALLBACK_CHANNEL = 32;
 /** How far a subclass bus runs from its channel's left edge, in px. */
 export const BUS_OFFSET = 16;
 
+/**
+ * How far a relation between regions runs from a channel's left edge, in
+ * px: half a lattice step past the subclass bus, so the two never share a
+ * line at either channel width.
+ */
+export const CROSS_CHANNEL_OFFSET = BUS_OFFSET + LATTICE / 2;
+
 /** The gap between two regions, on a shelf and between shelves, in px. */
 export const SHELF_GAP = 48;
 

@@ -3,6 +3,7 @@ import {
   ALIGNMENT_SEARCH_LIMIT,
   BUS_OFFSET,
   CHANNEL,
+  CROSS_CHANNEL_OFFSET,
   DESIGN_CANVAS,
   FALLBACK_CHANNEL,
   LATTICE,
@@ -34,6 +35,7 @@ import type {
   ClassGraphInput,
   ClassGraphLayout,
   ClassGraphModel,
+  CrossPort,
   LaidOutEdge,
   LaidOutNode,
   LaidOutRegion,
@@ -52,6 +54,27 @@ interface SizedRegion {
   readonly h: number;
 }
 
+/** Size a laid-out region: its content and label row, on the lattice. */
+function sizeRegion(
+  prefix: string,
+  ids: readonly string[],
+  layout: RegionLayout,
+): SizedRegion {
+  return {
+    prefix,
+    ids,
+    layout,
+    w: ceilTo(
+      Math.max(
+        layout.content.x + layout.content.w,
+        measureRegionLabelWidth(prefix, ids.length),
+      ),
+      LATTICE,
+    ),
+    h: ceilTo(REGION_LABEL_ROW + layout.content.y + layout.content.h, LATTICE),
+  };
+}
+
 /**
  * Lay every region out at a channel and pack them into shelves, saying
  * whether any arc nests past the channel.
@@ -65,23 +88,9 @@ function packRegions(
   readonly packing: ShelfPacking;
   readonly crowded: boolean;
 } {
-  const regions = model.regionOrder.map(({ prefix, ids }) => {
-    const layout = layOutRegion(model, ids, channel, sweeps);
-    const labelWidth = measureRegionLabelWidth(prefix, ids.length);
-    return {
-      prefix,
-      ids,
-      layout,
-      w: ceilTo(
-        Math.max(layout.content.x + layout.content.w, labelWidth),
-        LATTICE,
-      ),
-      h: ceilTo(
-        REGION_LABEL_ROW + layout.content.y + layout.content.h,
-        LATTICE,
-      ),
-    };
-  });
+  const regions = model.regionOrder.map(({ prefix, ids }) =>
+    sizeRegion(prefix, ids, layOutRegion(model, ids, channel, sweeps)),
+  );
   return {
     regions,
     packing: packShelves(regions),
@@ -94,6 +103,54 @@ interface RegionPlace {
   readonly x: number;
   readonly y: number;
   readonly shelfY: number;
+}
+
+/**
+ * Choose where each end of a relation between two regions meets its box,
+ * from where the regions are placed: the side that faces the other end
+ * (the domain's left and the range's right when the range lies to the
+ * left, the right of both when the two boxes overlap across), with the
+ * port's ideal offset towards the other end's middle.
+ */
+function chooseCrossPorts(
+  model: ClassGraphModel,
+  sized: readonly SizedRegion[],
+  places: ReadonlyMap<string, RegionPlace>,
+): Map<string, CrossPort> {
+  const boxOf = (id: string) => {
+    const region = requireDefined(
+      sized.find((candidate) => candidate.layout.nodes.has(id)),
+      `the region of ${id}`,
+    );
+    const node = requireEntry(region.layout.nodes, id);
+    const place = requireEntry(places, region.prefix);
+    return {
+      x: node.x + place.x,
+      y: node.y + place.y + REGION_LABEL_ROW,
+      w: node.w,
+      h: node.h,
+    };
+  };
+  const ports = new Map<string, CrossPort>();
+  for (const bundle of model.bundles.filter((candidate) => candidate.cross)) {
+    const a = boxOf(bundle.a);
+    const b = boxOf(bundle.b);
+    const [sideA, sideB]: readonly ["left" | "right", "left" | "right"] =
+      b.x >= a.x + a.w
+        ? ["right", "left"]
+        : b.x + b.w <= a.x
+          ? ["left", "right"]
+          : ["right", "right"];
+    ports.set(`${bundle.id} ${bundle.a}`, {
+      side: sideA,
+      ideal: b.y + b.h / 2 - a.y,
+    });
+    ports.set(`${bundle.id} ${bundle.b}`, {
+      side: sideB,
+      ideal: a.y + a.h / 2 - b.y,
+    });
+  }
+  return ports;
 }
 
 /**
@@ -282,7 +339,27 @@ export default function layOutClassGraph(
     if (packed.packing.fit < MIN_FIT)
       findings.push("G3: opens on a legible window, the rest a pan away");
   }
-  const { regions: sized, packing } = packed;
+  const { regions: packedRegions } = packed;
+
+  // Each end of a relation between regions meets its box on the side that
+  // faces the other end where the regions first fall, so the regions such
+  // relations touch are laid out again with those ports and the regions
+  // packed and placed again at their sizes.
+  const crossPorts = chooseCrossPorts(
+    model,
+    packedRegions,
+    alignShelves(packedRegions, packed.packing),
+  );
+  const sized = packedRegions.map((region) =>
+    [...crossPorts.keys()].some((key) => region.layout.ports.has(key))
+      ? sizeRegion(
+          region.prefix,
+          region.ids,
+          layOutRegion(model, region.ids, channel, sweeps, crossPorts),
+        )
+      : region,
+  );
+  const packing = packShelves(sized);
 
   // Place the regions: shelves 48px apart, each region shorter than its
   // shelf aligned to its top, middle or bottom, whichever leaves the
@@ -357,19 +434,38 @@ export default function layOutClassGraph(
     const portB =
       requireEntry(toRegion.layout.ports, `${bundle.id} ${bundle.b}`) +
       originOf(b.region).oy;
-    const exitX =
-      originOf(a.region).ox +
-      requireAt(fromRegion.layout.columnX, a.col) +
-      requireAt(fromRegion.layout.columnWidth, a.col) +
-      channel / 2;
+    const sideA = requireEntry(crossPorts, `${bundle.id} ${bundle.a}`).side;
+    const sideB = requireEntry(crossPorts, `${bundle.id} ${bundle.b}`).side;
+    // The channel beside a box's column on one side: past a subclass bus
+    // on the right, before the next column's boxes, or the region's margin
+    // left of its first column.
+    const channelOf = (
+      node: Omit<LaidOutNode, "nav">,
+      region: SizedRegion,
+      side: "left" | "right",
+    ): number => {
+      const { ox, x } = originOf(node.region);
+      if (side === "right") {
+        return (
+          ox +
+          requireAt(region.layout.columnX, node.col) +
+          requireAt(region.layout.columnWidth, node.col) +
+          CROSS_CHANNEL_OFFSET
+        );
+      }
+      return node.col === 0
+        ? x - SHELF_GAP / 2
+        : ox +
+            requireAt(region.layout.columnX, node.col - 1) +
+            requireAt(region.layout.columnWidth, node.col - 1) +
+            CROSS_CHANNEL_OFFSET;
+    };
+    const startX = sideA === "right" ? a.x + a.w : a.x;
+    const endX = sideB === "right" ? b.x + b.w : b.x;
+    const exitX = channelOf(a, fromRegion, sideA);
     const fromGap = originOf(a.region).shelfY - SHELF_GAP / 2;
     const toGap = originOf(b.region).shelfY - SHELF_GAP / 2;
-    const entryX =
-      b.col === 0
-        ? originOf(b.region).x - SHELF_GAP / 2
-        : originOf(b.region).ox +
-          requireAt(toRegion.layout.columnX, b.col) -
-          channel / 2;
+    const entryX = channelOf(b, toRegion, sideB);
     // The gap that joins the two shelves: the one above a shared shelf or
     // above the lower of two adjacent ones. Only shelves further apart go
     // round the packing's left margin.
@@ -377,7 +473,7 @@ export default function layOutClassGraph(
     const joiningGap =
       step === 1 ? toGap : step === 0 || step === -1 ? fromGap : undefined;
     const commands: PathCommand[] = [
-      ["M", a.x + a.w, portA],
+      ["M", startX, portA],
       ["H", exitX],
       ...(joiningGap === undefined
         ? ([
@@ -388,13 +484,13 @@ export default function layOutClassGraph(
         : ([["V", joiningGap]] as PathCommand[])),
       ["H", entryX],
       ["V", portB],
-      ["H", b.x],
+      ["H", endX],
     ];
     const heads: PathCommand[][] = [];
     if (bundle.heads.has(bundle.a))
-      heads.push(buildArrowhead(a.x + a.w, portA, false));
+      heads.push(buildArrowhead(startX, portA, sideA === "left"));
     if (bundle.heads.has(bundle.b))
-      heads.push(buildArrowhead(b.x, portB, true));
+      heads.push(buildArrowhead(endX, portB, sideB === "left"));
     crossEdges.push({
       id: `rel:${bundle.id}`,
       kind: "relation",

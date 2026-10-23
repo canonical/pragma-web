@@ -24,6 +24,7 @@ import { requireAt, requireEntry } from "./require.js";
 import type {
   Bundle,
   ClassGraphModel,
+  CrossPort,
   FixedPort,
   PathCommand,
   RegionEdge,
@@ -71,6 +72,9 @@ interface StackItem {
  * @param ids - The region's classes, by IRI.
  * @param channel - The gap between columns, in px.
  * @param sweeps - How many barycentre sweeps run.
+ * @param crossPorts - The side and ideal offset of each end of a relation to
+ *   another region, by `<bundle> <class>`; an end not named leaves its
+ *   domain's right side or enters its range's left side, at the middle.
  * @returns The region's layout.
  */
 export default function layOutRegion(
@@ -78,6 +82,7 @@ export default function layOutRegion(
   ids: readonly string[],
   channel: number,
   sweeps: number,
+  crossPorts: ReadonlyMap<string, CrossPort> = new Map(),
 ): RegionLayout {
   const { byId } = model;
   const findings: string[] = [];
@@ -527,15 +532,18 @@ export default function layOutRegion(
   for (const bundle of model.bundles.filter((candidate) => candidate.cross)) {
     for (const id of [bundle.a, bundle.b]) {
       if (!inRegion.has(id)) continue;
-      requireEntry(sides, id)[id === bundle.a ? "right" : "left"].requests.push(
-        {
-          key: `${bundle.id} ${id}`,
-          otherY: centreOf(id),
-          otherLabel: "",
-          bundle: bundle.id,
-          ideal: nodeOf(id).h / 2,
-        },
-      );
+      const key = `${bundle.id} ${id}`;
+      const { side, ideal } = crossPorts.get(key) ?? {
+        side: id === bundle.a ? "right" : "left",
+        ideal: nodeOf(id).h / 2,
+      };
+      requireEntry(sides, id)[side].requests.push({
+        key,
+        otherY: nodeOf(id).y + ideal,
+        otherLabel: "",
+        bundle: bundle.id,
+        ideal,
+      });
     }
   }
   const ports = new Map<string, number>();
