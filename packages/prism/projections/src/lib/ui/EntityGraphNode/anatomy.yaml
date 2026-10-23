@@ -43,6 +43,13 @@
 #   GRAPH_NODE_STROKE 1, GRAPH_NODE_RADIUS 4 and the default
 #   GRAPH_NODE_WIDTH 192, in SVG user units: SVG geometry is attributes,
 #   not CSS.
+#   --entity-graph-node-hollow-surface-color:
+#     light-dark(oklch(94% 0 0), var(--color-background-container))
+#                                      the graph's floor, the literal the
+#                                      graph canvas ledgers: no background
+#                                      token sits 6 L* below the surface in
+#                                      light, so a hollow box reads as an
+#                                      outline on the floor.
 #   --entity-graph-node-prominent-font-size: 1rem
 #                                      a hub's title; the docs context has
 #                                      no 16px text size.
@@ -68,7 +75,7 @@ node:
           - node:
               role: hollow surface (.is-hollow)
               styles:
-                typography.color: color.background.container
+                typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
       relation: { cardinality: "1", slotName: surface }
     - node:
         role: frame

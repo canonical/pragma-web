@@ -8,7 +8,12 @@
   .ds.entity-graph-node {
     --entity-graph-node-font-size: var(--typography-text-primary-font-size);
     --entity-graph-node-surface-color: var(--color-background);
-    --entity-graph-node-hollow-surface-color: var(--color-background-container);
+    /* The graph's floor, as the canvas ledgers it: no background token sits
+     * 6 L* below the surface in light; the dark floor is the container. */
+    --entity-graph-node-hollow-surface-color: light-dark(
+      oklch(94% 0 0),
+      var(--color-background-container)
+    );
     --entity-graph-node-frame-color: var(--color-border);
     --entity-graph-node-title-font-weight: var(
       --typography-text-primary-bold-font-weight
