@@ -46,7 +46,6 @@
       --color-foreground-ghost-active
     );
 
-    --accordion-item-header-gap: var(--ds-spacing-mark);
     /* Header block padding in baseline multiples (dimension-100 = 1 bU). The
        apps/sites element-size sizing (6px → 36/32) is owned by the height bucket. */
     --accordion-item-header-padding-block: var(--dimension-100);
@@ -65,7 +64,7 @@
     --accordion-item-content-indent: calc(
       var(--accordion-item-header-padding-inline) +
       var(--accordion-item-chevron-size) +
-      var(--accordion-item-header-gap)
+      var(--accordion-item-header-gap, var(--ds-spacing-mark))
     );
   }
 
@@ -74,7 +73,7 @@
     --accordion-item-content-indent: calc(
       var(--accordion-item-header-padding-inline) +
       var(--accordion-item-chevron-size) +
-      var(--accordion-item-header-gap)
+      var(--accordion-item-header-gap, var(--ds-spacing-mark))
     );
     box-sizing: border-box;
 
@@ -94,7 +93,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--accordion-item-header-gap);
+    gap: var(--accordion-item-header-gap, var(--ds-spacing-mark));
 
     padding-block: var(--accordion-item-header-padding-block);
     padding-inline: var(--accordion-item-header-padding-inline);

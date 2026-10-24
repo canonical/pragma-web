@@ -37,9 +37,6 @@
     --tooltip-font-weight: var(--font-weight-default);
     --tooltip-line-height: var(--line-height-small, 20px);
     --tooltip-max-width: 284px;
-    /* Gap between an optional leading icon and the text (dimension-100). */
-    --tooltip-gap: var(--dimension-100);
-
     /* Arrow geometry, independent of `distance` (the gap to the trigger).
        Figma: 14px base (dimension-175) across the edge, 8px depth pointing out. */
     --tooltip-arrow-width: var(--dimension-175, 14px);
@@ -129,7 +126,7 @@
     & > .content {
       display: flex;
       align-items: flex-start;
-      gap: var(--tooltip-gap);
+      gap: var(--tooltip-gap, var(--ds-spacing-mark));
     }
 
     /* Leading icon: fixed 16px box, top-aligned with the first text line, purely
