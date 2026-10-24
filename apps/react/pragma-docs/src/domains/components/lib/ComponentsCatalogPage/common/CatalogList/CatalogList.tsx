@@ -77,7 +77,10 @@ const nameTierAnchor = (tier: string): string =>
  * page in the graph, a published Button loads the next hundred, and each
  * count says it holds only the components loaded so far: the connection
  * carries no total, so a bare count would state a tier's size it cannot
- * know.
+ * know. The jump links' navigation is named the same way while pages
+ * remain, since a tier may have no component loaded yet; a tier a later
+ * page brings takes its place in the same order, Global first and the rest
+ * alphabetically.
  *
  * It fills `EntityList` itself rather than rendering `NodeList`: NodeList's
  * fragment spreads the core card and row projections, which select only
@@ -120,7 +123,10 @@ export default function CatalogList({
       {tiers.length === 0 ? (
         <EntityList empty={t("catalog.empty")} />
       ) : (
-        <nav aria-label={t("catalog.tiers")} className="tiers">
+        <nav
+          aria-label={t(hasNext ? "catalog.tiersLoaded" : "catalog.tiers")}
+          className="tiers"
+        >
           <ul className="links">
             {tiers.map(({ tier }) => (
               <li key={tier}>

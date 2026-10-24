@@ -49,7 +49,9 @@ describe("CatalogList", () => {
           .getAllByRole("heading", { level: 2 })
           .map((heading) => heading.textContent),
       ).toEqual(["Global", "Apps/LXD", "Sites"]);
-      const tiers = screen.getByRole("navigation", { name: "Tiers" });
+      const tiers = screen.getByRole("navigation", {
+        name: "Tiers of the components loaded so far",
+      });
       expect(
         [...tiers.querySelectorAll("a")].map((anchor) =>
           anchor.getAttribute("href"),
@@ -76,6 +78,12 @@ describe("CatalogList", () => {
         "2 components loaded so far",
       ]);
       expect(screen.getByRole("button", { name: "Load more" })).toBeVisible();
+      expect(
+        screen.getByRole("navigation", {
+          name: "Tiers of the components loaded so far",
+        }),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("navigation", { name: "Tiers" })).toBeNull();
     },
     HARNESS_TEST_TIMEOUT_MS,
   );
@@ -89,6 +97,9 @@ describe("CatalogList", () => {
       }
       render(catalogPage(records as unknown as RecordMap, createFetchSpy()));
       expect(screen.queryByRole("button", { name: "Load more" })).toBeNull();
+      expect(
+        screen.getByRole("navigation", { name: "Tiers" }),
+      ).toBeInTheDocument();
       expect(readCounts()).toEqual([
         "3 components",
         "2 components",
@@ -182,7 +193,7 @@ describe("CatalogList", () => {
       }
       render(catalogPage(records as unknown as RecordMap, createFetchSpy()));
       expect(screen.getByText("No components in the graph.")).toBeVisible();
-      expect(screen.queryByRole("navigation", { name: "Tiers" })).toBeNull();
+      expect(screen.queryByRole("navigation")).toBeNull();
     },
     HARNESS_TEST_TIMEOUT_MS,
   );

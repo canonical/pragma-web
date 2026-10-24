@@ -84,6 +84,7 @@ export const MESSAGES = {
   "catalog.title": "Components",
   "catalog.loading": "Loading the catalog…",
   "catalog.tiers": "Tiers",
+  "catalog.tiersLoaded": "Tiers of the components loaded so far",
   "catalog.kind": { one: "component", other: "components" },
   "catalog.kindLoaded": {
     one: "component loaded so far",
