@@ -10,6 +10,15 @@
 # list view's empty line. When the graph holds more than one page, a
 # published Button loads the next hundred.
 #
+# Why EntityList and not NodeList, the shared projection over it: NodeList's
+# fragment spreads the core card and row projections, which select only the
+# contract's types, and a fragment's selection is fixed when the compiler
+# reads it, so no site arm can be handed to it at run time. Through it a UI
+# block would read as a plain node card: no tier, no vitals and no rendered
+# example in its sidecar. The catalog therefore fills the same EntityList
+# with the site's card and row projections, whose fragments spread the
+# design-system types' arms.
+#
 # The root is a subgrid of the page over every column, its gap the grid's
 # gutter on both axes; the jump links sit on one wrapping line, a gutter
 # apart, with no markers or insets.

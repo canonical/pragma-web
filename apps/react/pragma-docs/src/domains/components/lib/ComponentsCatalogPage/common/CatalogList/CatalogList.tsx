@@ -76,6 +76,13 @@ const nameTierAnchor = (tier: string): string =>
  * at the top; every tier's list carries its count. With more than one
  * page in the graph, a published Button loads the next hundred.
  *
+ * It fills `EntityList` itself rather than rendering `NodeList`: NodeList's
+ * fragment spreads the core card and row projections, which select only
+ * the contract's types, and a fragment's selection is fixed at compile
+ * time, so a UI block would lose its tier, its vitals and the rendered
+ * example in its card's sidecar. The site's projections, whose fragments
+ * spread the design-system types' arms, keep them.
+ *
  * It reads the catalog's operation, with the variables the route warms the
  * store with, so it renders from the warm store on the server and after
  * hydration; on a cold store it suspends.
