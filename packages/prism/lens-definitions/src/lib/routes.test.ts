@@ -1,8 +1,8 @@
 import { collectLenses, collectShortcuts } from "@canonical/prism-core";
 import { describe, expect, it } from "vitest";
-import { DefinitionsIcon } from "./DefinitionsIcon/index.js";
-import { DefinitionsPage } from "./DefinitionsPage/index.js";
 import { definitionsRoutes } from "./routes.js";
+import { DefinitionsIcon } from "./ui/DefinitionsIcon/index.js";
+import { DefinitionsPage } from "./ui/DefinitionsPage/index.js";
 import warmDefinitions from "./warmDefinitions.js";
 
 describe("definitionsRoutes", () => {

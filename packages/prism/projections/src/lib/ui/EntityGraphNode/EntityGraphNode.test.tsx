@@ -53,11 +53,15 @@ describe("EntityGraphNode", () => {
       expect(node.querySelector(".frame")?.getAttribute("width")).toBe("239");
     });
 
-    it("clips its lines to the box with an id of its own", () => {
-      const node = renderNode(<EntityGraphNode title="Layout" />);
-      const id = node.querySelector("clipPath")?.id ?? "";
-      expect(id).toMatch(/^entity-graph-node-[\w-]+$/);
-      expect(node.querySelector(`[clip-path="url(#${id})"]`)).not.toBeNull();
+    it("clips its lines at the inner inset with no document-wide id", () => {
+      const node = renderNode(<EntityGraphNode title="Layout" width={160} />);
+      const lines = node.querySelector("svg.lines");
+      expect(lines?.getAttribute("x")).toBe("9");
+      expect(lines?.getAttribute("width")).toBe("142");
+      expect(lines?.getAttribute("viewBox")).toBe("9 0 142 50");
+      expect(lines?.getAttribute("overflow")).toBe("hidden");
+      expect(lines?.querySelector(".title")).not.toBeNull();
+      expect(node.querySelector("[id]")).toBeNull();
     });
   });
 
@@ -83,6 +87,93 @@ describe("EntityGraphNode", () => {
         <EntityGraphNode location="design-system" title="Layout" />,
       );
       expect(node.querySelector(".context")?.textContent).toBe("design-system");
+    });
+  });
+
+  describe("height", () => {
+    it("draws the box at the height the graph gives it, the title on its middle", () => {
+      const node = renderNode(<EntityGraphNode height={32} title="Layout" />);
+      expect(node.querySelector(".surface")?.getAttribute("height")).toBe("32");
+      expect(node.querySelector(".frame")?.getAttribute("height")).toBe("31");
+      expect(node.querySelector(".title")?.getAttribute("y")).toBe("16");
+    });
+
+    it("keeps the title on the first line when a second line follows", () => {
+      const node = renderNode(
+        <EntityGraphNode height={64} kind="Class" title="Layout" />,
+      );
+      expect(node.querySelector(".title")?.getAttribute("y")).toBe("13");
+    });
+  });
+
+  describe("count", () => {
+    it("ends the title's line with the vital, anchored at the inner inset", () => {
+      const node = renderNode(
+        <EntityGraphNode
+          count={139}
+          height={32}
+          title="Component"
+          width={160}
+        />,
+      );
+      const count = node.querySelector(".count");
+      expect(count?.textContent).toBe("139");
+      expect(count?.getAttribute("text-anchor")).toBe("end");
+      expect(count?.getAttribute("x")).toBe("151");
+      expect(count?.getAttribute("y")).toBe("16");
+    });
+
+    it("renders no vital when it has none", () => {
+      const node = renderNode(<EntityGraphNode title="Layout" />);
+      expect(node.querySelector(".count")).toBeNull();
+    });
+  });
+
+  describe("hollow and prominent", () => {
+    it("draws a hollow box with an italic title", () => {
+      const node = renderNode(<EntityGraphNode hollow title="Entity" />);
+      expect(node.querySelector(".surface")?.getAttribute("class")).toBe(
+        "surface is-hollow",
+      );
+      expect(node.querySelector(".title")?.getAttribute("font-style")).toBe(
+        "italic",
+      );
+    });
+
+    it("sets a prominent node's title one step larger", () => {
+      const node = renderNode(<EntityGraphNode prominent title="Entity" />);
+      expect(node.querySelector(".title")?.getAttribute("class")).toBe(
+        "title is-prominent",
+      );
+      expect(node.querySelector(".surface")?.getAttribute("class")).toBe(
+        "surface",
+      );
+      expect(node.querySelector(".title")?.hasAttribute("font-style")).toBe(
+        false,
+      );
+    });
+
+    it("rounds the box's corners", () => {
+      const node = renderNode(<EntityGraphNode title="Layout" />);
+      expect(node.querySelector(".surface")?.getAttribute("rx")).toBe("4");
+      expect(node.querySelector(".frame")?.getAttribute("rx")).toBe("3.5");
+    });
+  });
+
+  describe("showText", () => {
+    it("draws the box alone, with no text and no link", () => {
+      const node = renderNode(
+        <EntityGraphNode
+          count={3}
+          href="#layout"
+          kind="Class"
+          showText={false}
+          title="Layout"
+        />,
+      );
+      expect(node.querySelector("text")).toBeNull();
+      expect(node.querySelector("a")).toBeNull();
+      expect(node.querySelector(".surface")).not.toBeNull();
     });
   });
 

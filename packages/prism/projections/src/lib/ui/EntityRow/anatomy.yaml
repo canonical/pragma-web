@@ -11,11 +11,6 @@
 # the row sets none, so its text sits on the column line of the list that
 # holds it.
 #
-# The row may be narrower than its content (`size.min.width: 0`): as a
-# grid item or flex item its minimum would otherwise be its content's, so a
-# long identity would widen the track that holds the row past its column
-# instead of truncating.
-#
 # When the identity and the meta do not fit on one line, as on a phone,
 # the row wraps: the meta moves to a line of its own under the identity,
 # flush left, with no space between the two lines (the row is then 56px),
@@ -26,6 +21,11 @@
 # line only, for a single word longer than the row, so nothing it holds is
 # cut above or below: a chip in the title is 28px, and its line grows to
 # hold it (the row is then 36px).
+#
+# The row may be narrower than its content (`size.min.width: 0`): as a
+# grid item or flex item its minimum would otherwise be its content's, so a
+# long identity would widen the track that holds the row past its column
+# instead of wrapping.
 #
 # An identifier in the location, a `<code class="identifier">`, sets the
 # monospace face on the row's line and stands on the sans text's baseline:
@@ -52,17 +52,16 @@
 #                                      the link's ring, drawn inside it since the identity clips.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
+#   space.0 for the gap between a wrapped row's lines: the meta reads with
+#   the identity above it, its lines the 24px line apart.
+#   layout.wrap wrap, typography.whiteSpace normal and nowrap,
+#   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
+#   size.min.width 0 lets the identity and the meta shrink to the row.
 #   --entity-row-identifier-vertical-align: baseline,
 #   --entity-row-identifier-line-height: 0
 #                                      the identifier on the text's baseline,
 #                                      its inline box of no height; a keyword
 #                                      and a number.
-#   space.0 for the gap between a wrapped row's lines: the meta reads with
-#   the identity above it, its lines the 24px line apart.
-#   layout.wrap wrap, typography.whiteSpace normal and nowrap,
-#   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
-#   size.min.width 0 lets the row shrink to its column, and the identity
-#   and the meta to the row.
 #
 # Roster namespaces (accepted and tracked): grid.gutter, space.0,
 # space.050, space.300 (a line height), and the semantic typography symbol
@@ -73,8 +72,8 @@ node:
     layout.type: flex
     layout.align: baseline
     layout.justify: space-between
-    size.min.width: 0
     layout.wrap: wrap
+    size.min.width: 0
     spacing.gap.inline: grid.gutter
     spacing.gap.block: space.0
     spacing.internal.block.start: space.050

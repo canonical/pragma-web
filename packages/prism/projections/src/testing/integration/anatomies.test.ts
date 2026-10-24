@@ -46,6 +46,7 @@ const NODE_DIRECTORY = fileURLToPath(
 const UI_TOKENS = [
   "--card-span",
   "--color-background",
+  "--color-background-container",
   "--color-background-layer2",
   "--color-border",
   "--color-border-muted",

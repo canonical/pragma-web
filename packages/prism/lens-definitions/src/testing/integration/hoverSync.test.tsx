@@ -1,5 +1,5 @@
 /**
- * BIDIRECTIONAL HOVER, PROVEN AT THE DOM. The ego centre lives in
+ * BIDIRECTIONAL HOVER, PROVEN AT THE DOM. The hover centre lives in
  * `DefinitionsExplorer`, shared by the rail and the well, so a hover on
  * EITHER surface reaches the OTHER.
  *
@@ -7,9 +7,9 @@
  * the actual cross-surface DOM change a reader would see. Both directions
  * read the real painted class, never an internal.
  *
- * - Hover a RAIL item → the matching GRAPH node keeps its ego standing
+ * - Hover a RAIL item → the matching GRAPH node keeps its focus standing
  *   (un-faded) while non-neighbours gain the faded class. A rail hover
- *   drives the graph's ego-fade, exactly as a node hover does.
+ *   drives the graph's fade, exactly as a node hover does.
  * - Hover a GRAPH node → the matching RAIL item gains its hover-highlight
  *   (`is-hovered`), distinct from the aria-current selection underneath.
  *
@@ -30,26 +30,27 @@ import {
   UIBLOCK_TERM,
 } from "../../../testing/fixtures.js";
 import definitionsExplorerRecords from "../../../testing/records/definitionsExplorerRecords.js";
-import { NODE_FADED_CLASS } from "../../lib/HierarchyWell/constants.js";
 
-/** The graph node whose term link points at `href` — the stable
+/** The class the focus's fade marks a graph node with. */
+const NODE_FADED_CLASS = "is-faded";
+
+/** The canvas's node whose term link points at `href`: the stable
  * cross-reference between a rail item and its node (both address the same
- * term). Returns the `.ds.term-node` wrapper that carries the
- * decoration class. */
+ * term). Returns the `.node` group that carries the state class. */
 const findNodeByHref = (well: HTMLElement, href: string): HTMLElement => {
   const link = well.querySelector<HTMLElement>(
-    `.ds.term-node a[href="${href}"]`,
+    `.desktop .node a[href="${href}"]`,
   );
-  const node = link?.closest<HTMLElement>(".ds.term-node");
+  const node = link?.closest<HTMLElement>(".node");
   if (!node) throw new Error(`no graph node for ${href}`);
   return node;
 };
 
-/** How many of the well's nodes the ego-fade currently dims. */
+/** How many of the canvas's nodes the focus's fade currently dims. */
 const countFadedNodes = (well: HTMLElement): number =>
-  well.querySelectorAll(`.ds.term-node.${NODE_FADED_CLASS}`).length;
+  well.querySelectorAll(`.desktop .node.${NODE_FADED_CLASS}`).length;
 
-describe("bidirectional hover — the rail and the graph share one ego centre", () => {
+describe("bidirectional hover — the rail and the graph share one focus", () => {
   it("a RAIL hover fades the GRAPH: the hovered term's node stays lit, a distant node fades", {
     timeout: DEFINITIONS_TEST_TIMEOUT_MS,
   }, () => {
@@ -80,7 +81,7 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
 
     expect(countFadedNodes(well)).toBeGreaterThan(0);
     const componentNode = findNodeByHref(well, "/definitions/ds%3AComponent");
-    // The hovered term itself is the ego centre — never faded.
+    // The hovered term itself is the focus: never faded.
     expect(componentNode.classList.contains(NODE_FADED_CLASS)).toBe(false);
     // CodeStandard is in a different ontology entirely — guaranteed distant.
     const distantNode = findNodeByHref(well, "/definitions/cs%3ACodeStandard");
@@ -114,9 +115,9 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
     // Nothing hovered yet: the rail item carries no hover highlight.
     expect(patternRailItem.classList.contains("is-hovered")).toBe(false);
 
-    // Hover the Pattern NODE in the graph (the well's node-enter path).
+    // Point at the Pattern NODE in the graph.
     const patternNode = findNodeByHref(well, "/definitions/ds%3APattern");
-    fireEvent.mouseEnter(patternNode);
+    fireEvent.mouseOver(patternNode);
 
     // THE CROSS-SURFACE CLAIM: the matching RAIL item lit up — a graph
     // hover reached the index. Distinct from selection (aria-current is
@@ -126,8 +127,8 @@ describe("bidirectional hover — the rail and the graph share one ego centre", 
       "aria-current",
     );
 
-    // Leaving the node clears it.
-    fireEvent.mouseLeave(patternNode);
+    // Leaving the graph clears it.
+    fireEvent.mouseLeave(well);
     expect(patternRailItem.classList.contains("is-hovered")).toBe(false);
   });
 

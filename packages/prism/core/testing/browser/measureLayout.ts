@@ -17,7 +17,7 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  *
  * The chrome's spacing excludes what resolves to a measure rather than a
  * choice: an auto margin, which takes the free space, and the typography
- * engine's baseline nudges on text blocks.
+ * engine's baseline nudges on text blocks and on the published button.
  *
  * @param options - The selectors, the spacing step and the overflow rules.
  * @returns The page's grids, scrollers, overflow, canvas page, edges,
@@ -159,7 +159,11 @@ export default function measureLayout({
   ];
   for (const element of document.querySelectorAll(chromeSelector)) {
     const style = getComputedStyle(element);
-    const isTextBlock = element.matches("p, .p, .code, h1, h2, h3, h4, h5, h6");
+    // The published button nudges its label onto the baseline grid with
+    // its block padding, as the engine nudges a text block.
+    const isTextBlock = element.matches(
+      "p, .p, .code, h1, h2, h3, h4, h5, h6, .ds.button",
+    );
     const hasAutoMargin = element.matches(".kbd, .inspector-trigger");
     for (const property of properties) {
       if (isTextBlock && /^padding-(top|bottom)$/.test(property)) continue;
@@ -194,6 +198,10 @@ export default function measureLayout({
       canvasStart: canvasBox?.left ?? -1,
       canvasTop: canvasBox?.top ?? -1,
       stripBottom: strip?.getBoundingClientRect().bottom ?? null,
+      triggerBottom:
+        trigger === null || getComputedStyle(trigger).display === "none"
+          ? null
+          : trigger.getBoundingClientRect().bottom,
       rowGap:
         layout === null
           ? -1

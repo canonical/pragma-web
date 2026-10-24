@@ -11,8 +11,8 @@ export default defineConfig({
     glob: "test",
     ssr: true,
     // The relay-compiler's artifacts are generated code, not runtime source
-    // written here.
-    coverage: { exclude: ["src/__generated__/**"] },
+    // written here; stories render in Storybook, not under test.
+    coverage: { exclude: ["src/__generated__/**", "**/*.stories.tsx"] },
     plugins,
     setupFiles: ["./vitest.setup.ts"],
   }),
