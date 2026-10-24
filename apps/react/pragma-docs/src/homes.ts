@@ -1,5 +1,5 @@
 import type { Homes } from "@canonical/prism-core";
-import { CODE_STANDARDS_NAMESPACE } from "#domains/lenses";
+import { CODE_STANDARDS_NAMESPACE } from "#domains/standards";
 
 /**
  * The site's homes: the page each kind of graph node lives on, so every

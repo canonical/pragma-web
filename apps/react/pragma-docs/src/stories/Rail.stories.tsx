@@ -12,7 +12,7 @@ import {
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { standardsRoutes } from "#domains/lenses";
+import { standardsRoutes } from "#domains/standards";
 import {
   ComponentsIcon,
   GuidesIcon,

@@ -1,10 +1,10 @@
 import { wrapper } from "@canonical/router-core";
 import type { ReactElement } from "react";
-import { SiteStandardsLayout } from "./SiteStandardsLayout/index.js";
+import { SiteDefinitionsLayout } from "./lib/SiteDefinitionsLayout/index.js";
 
 /** The router wrapper that renders every route grouped under it inside the
- * Standards lens's layout, with the site's rail and colophon. */
+ * Definitions lens's layout, with the site's rail. */
 export default wrapper<ReactElement>({
-  id: "standards-layout",
-  component: SiteStandardsLayout,
+  id: "definitions-layout",
+  component: SiteDefinitionsLayout,
 });

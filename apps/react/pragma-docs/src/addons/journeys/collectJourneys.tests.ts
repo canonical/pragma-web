@@ -20,7 +20,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { describe, expect, it } from "vitest";
-import { standardsRoutes } from "#domains/lenses";
+import { standardsRoutes } from "#domains/standards";
 import {
   axisTerm,
   collectJourneys,

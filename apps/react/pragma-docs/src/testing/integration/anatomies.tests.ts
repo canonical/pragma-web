@@ -107,7 +107,7 @@ describe("the app's components", () => {
 
   it("are found in every domain library", () => {
     expect(DOMAIN_LIBRARIES).toEqual(
-      ["components", "modifiers", "standards"].map((domain) =>
+      ["components", "definitions", "modifiers", "standards"].map((domain) =>
         join(APP_ROOT, "src", "domains", domain, "lib"),
       ),
     );

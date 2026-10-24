@@ -42,7 +42,6 @@ import {
 } from "vitest";
 import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#addons/journeys";
 import { CATALOG_PAGE_SIZE, RELATION_PAGE_SIZE } from "#domains/components";
-import { STANDARDS_BINDING } from "#domains/lenses";
 import {
   LOBBY_COMPONENT_CLASS,
   LOBBY_EXEMPLAR_COUNT,
@@ -53,6 +52,7 @@ import {
   RELATION_PAGE_SIZE as PROBE_RELATION_PAGE_SIZE,
   PROBE_URI,
 } from "#domains/playground";
+import { STANDARDS_BINDING } from "#domains/standards";
 import {
   COMPONENT_PROBE_RESPONSE,
   COMPONENT_URI,

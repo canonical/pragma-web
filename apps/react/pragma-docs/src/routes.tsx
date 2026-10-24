@@ -6,15 +6,11 @@ import { group, route } from "@canonical/router-core";
 import { journeysLayout, journeysRoutes } from "#addons/journeys";
 import { accountLayout, accountRoutes } from "#domains/account";
 import { componentsLayout, componentsRoutes } from "#domains/components";
-import {
-  definitionsLayout,
-  guidesLayout,
-  lensRoutes,
-  standardsLayout,
-  standardsRoutes,
-} from "#domains/lenses";
+import { definitionsLayout } from "#domains/definitions";
+import { guidesLayout, lensRoutes } from "#domains/lenses";
 import { marketingLayout, marketingRoutes } from "#domains/marketing";
 import { playgroundLayout, playgroundRoutes } from "#domains/playground";
+import { standardsLayout, standardsRoutes } from "#domains/standards";
 import { withAuth } from "#lib/authGuard";
 import { NotFoundPage } from "#lib/ui";
 import { SiteColophon } from "#lib/ui/SiteColophon";
