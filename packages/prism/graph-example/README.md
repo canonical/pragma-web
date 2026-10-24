@@ -487,7 +487,7 @@ contradict the premise that this contract is implementable without pragma's mach
 ## The lens gate, and the two things it does not guard
 
 `src/testing/integration/lensOperations.test.ts` harvests **every** query operation
-declared under its two scan roots — `apps/react/pragma-docs/src/domains/lenses/**` and the
+declared under its two scan roots — `apps/react/pragma-docs/src/domains/guides/**` and the
 `src` of every lens package, `packages/prism/lens-*/src/**`, together the docsite's **core
 lens set** — at run time, from the Relay artifacts, never from a snapshot, and executes each
 one against this provider. The app's artifacts are committed; a lens package's are build
@@ -507,7 +507,7 @@ this provider and the scan roots do not say so on their own:
 | `src/domains/components` | `ComponentsCatalogQuery`, `CatalogListPaginationQuery`, `ComponentEntityQuery` | select `Component` / `Query.component` |
 | `src/domains/marketing` | `LobbyQuery` (the home page) | selects `Component` |
 | `src/domains/playground` | `ComponentProbeQuery` | selects `Query.component` |
-| `src/addons/journeys` | `JourneysExplorerQuery` | selects `jobs` |
+| `src/domains/journeys` | `JourneysExplorerQuery` | selects `jobs` |
 
 All six name pragma-ontology terms this provider's dataset has no class for.
 So what this gate establishes is narrow and worth stating narrowly: **the four
@@ -529,24 +529,24 @@ README used to say the resolution was an owner's decision. **The owner decided**
 words: *"keep it on side for now, it will be an add-on plugin not a core view."*
 
 Journeys is therefore **no longer a core lens**. It lives at
-`apps/react/pragma-docs/src/addons/journeys/**`, which this gate does not scan — and it is
+`apps/react/pragma-docs/src/domains/journeys/**`, which this gate does not scan — and it is
 still fully built, routed, listed in the rail, and covered by its own tests in the app.
-Nothing was deleted. `src/addons/**` is the docsite's home for views that are openly
-pragma-specific and make no neutrality claim; journeys is expected to become a plugin
+Nothing was deleted. The journeys domain is a view that is openly
+pragma-specific and makes no neutrality claim; journeys is expected to become a plugin
 proper once the docsite has a plugin mechanism.
 
 That distinction is the whole point, so state it plainly: **the scanned directories define
-an obligation.** Membership of `src/domains/lenses/**` or of a lens package *is* the promise to be
+an obligation.** Membership of `src/domains/guides/**` or of a lens package *is* the promise to be
 provider-neutral. A view either makes that promise and must execute here, or it is an
 add-on and does not. There is no third state, and nothing sits in the lens tree with an
 exemption.
 
-**`src/addons/**` is not an escape hatch.** Do not make this gate green by narrowing the
+**An add-on domain is not an escape hatch.** Do not make this gate green by narrowing the
 operation set, marking it `it.fails`, adding `skipIf`, gating it behind an env var, or
 moving a core operation into the add-on tree — that last one is narrowing the set under a
 different name, and it is expressly forbidden. Only an owner reclassifying a view as an
 add-on may move one, and the move must land with the reasoning written down (see
-`src/addons/journeys/index.ts`). Every other route converts a real signal into a silent
+`src/domains/journeys/index.ts`). Every other route converts a real signal into a silent
 one, and the operation set must stay directory-derived so a new lens is covered the day it
 lands. The gate also asserts it discovered a non-zero number of operations, so it cannot
 pass vacuously if the app moves.
@@ -561,7 +561,7 @@ Two things it does **not** guard, both worth knowing before trusting a green run
 **It does not guard the app's runtime bindings.** The contract's root surface names no
 subject, so a lens that enumerates things is handed a class URI from outside the graph.
 This gate supplies its OWN (`metro:Station`, in `src/testing/fixtures.ts`); the app
-supplies its own from `apps/react/pragma-docs/src/domains/lenses/standards/constants.ts`. **The two must never
+supplies its own from `apps/react/pragma-docs/src/domains/standards/constants.ts`. **The two must never
 meet.** Importing the app's binding here would make the gate go green because the app
 agreed with itself, when the point is that the operation is neutral about which class it
 is pointed at. The consequence is that an operation can be contract-clean here and still

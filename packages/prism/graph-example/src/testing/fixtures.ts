@@ -48,7 +48,7 @@ export const LENS_OPERATION_VARIABLES: Record<
   DefinitionsExplorerQuery: { uri: SAMPLE_CLASS_URI, hasTerm: true },
   // `JourneysExplorerQuery` used to be listed here. Journeys is no longer a
   // core lens — an owner reclassified it as a pragma-specific add-on and it
-  // now lives in `apps/react/pragma-docs/src/addons/journeys`, outside the
+  // now lives in `apps/react/pragma-docs/src/domains/journeys`, outside the
   // scanned set — so the gate never discovers the operation and the entry was
   // dead config. Note the direction the gate checks: it walks DISCOVERED names
   // and demands a variables entry for each, so a leftover entry here would
@@ -58,7 +58,7 @@ export const LENS_OPERATION_VARIABLES: Record<
   // The standards lens now reaches its collection through the TBox, so it
   // needs a class binding — and this is the gate's OWN binding, never the
   // app's. The app's runtime binding lives in
-  // `apps/react/pragma-docs/src/domains/lenses/constants.ts`;
+  // `apps/react/pragma-docs/src/domains/standards/constants.ts`;
   // importing it here would couple the neutrality proof to the deployment it
   // exists to be independent of, and the gate would go green because the app
   // agreed with itself.
