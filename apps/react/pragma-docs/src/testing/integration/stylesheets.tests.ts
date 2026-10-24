@@ -9,13 +9,17 @@
  * - no grid template is authored in the app: the shell's root takes the
  *   design system's intrinsic columns from the `grid intrinsic` preset
  *   classes, and every grid below it is a subgrid;
- * - no LAYOUT-CAPABLE conditional at-rule exists in the app: the reflows
- *   are the archetype layouts' and the rail's container queries on the
- *   shell, which ship with `@canonical/prism-core` and its checks. Feature
- *   queries that
- *   cannot reflow layout (`prefers-color-scheme`, `forced-colors`,
- *   `prefers-reduced-motion`) are exempt, matched by query TEXT, never by
- *   file — and only while no other condition rides along in the prelude.
+ * - no conditional at-rule that can reflow layout exists in the app but a
+ *   container query on the shell at a whole number of column groups
+ *   (`@container shell (width < 448px)`, 912px or 1376px): a region that
+ *   must change shape below a group count asks the one query container
+ *   the layouts read, at the thresholds the archetypes use, and
+ *   `assertStylesheets` checks each such query's threshold and the comment
+ *   naming its group count. No `@media` query reflows and no `@supports`
+ *   gates layout. Feature queries that cannot reflow layout
+ *   (`prefers-color-scheme`, `forced-colors`, `prefers-reduced-motion`) are
+ *   exempt, matched by query TEXT, never by file — and only while no other
+ *   condition rides along in the prelude.
  */
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -91,16 +95,21 @@ describe("the app stylesheets", () => {
    * The layout-capable census. Every conditional at-rule prelude
    * (`@media` / `@container` / `@supports`) counts unless it is a media
    * query built ONLY of feature queries that cannot reflow layout by
-   * design: `prefers-color-scheme`, `forced-colors`,
-   * `prefers-reduced-motion`. The exemption matches query TEXT, never
-   * files: stripping the exempt features from the prelude must leave no
-   * condition behind, so an exempt feature riding with a width term is
-   * still caught. `@container` and `@supports` always count — both can
-   * gate layout.
+   * design (`prefers-color-scheme`, `forced-colors`,
+   * `prefers-reduced-motion`), or a container query on the shell at a
+   * whole number of column groups. The media exemption matches query TEXT,
+   * never files: stripping the exempt features from the prelude must leave
+   * no condition behind, so an exempt feature riding with a width term is
+   * still caught. `@supports` always counts: it can gate layout.
    */
   const layoutCapableConditionals = (): string[] =>
     (allCss.match(/@(?:media|container|supports)[^{]*/g) ?? []).filter(
       (prelude) => {
+        if (prelude.startsWith("@container")) {
+          return !/^@container shell \(width < (?:448|912|1376)px\)\s*$/.test(
+            prelude,
+          );
+        }
         if (!prelude.startsWith("@media")) return true;
         const residue = prelude.replaceAll(
           /\((?:prefers-color-scheme|forced-colors|prefers-reduced-motion)[^)]*\)/g,
@@ -110,7 +119,7 @@ describe("the app stylesheets", () => {
       },
     );
 
-  it("authors no layout-capable conditional at-rule — the reflows ship with prism-core", () => {
+  it("authors no layout-capable conditional at-rule but a shell query at a whole group", () => {
     expect(layoutCapableConditionals()).toEqual([]);
   });
 });

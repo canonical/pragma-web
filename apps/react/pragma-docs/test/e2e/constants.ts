@@ -4,6 +4,12 @@
  */
 export const DEV_READY_MS = 90_000;
 
+/**
+ * How long a preview cell may take to answer its first request: it builds
+ * the client and compiles the renderer before it serves.
+ */
+export const PREVIEW_READY_MS = 90_000;
+
 /** How long a page may take to settle once it is requested. */
 export const PAGE_SETTLE_MS = 30_000;
 
@@ -11,15 +17,24 @@ export const PAGE_SETTLE_MS = 30_000;
 export const WORKSPACE_PATH = "/definitions";
 
 /**
+ * The Journeys lens, on the workspace archetype too: its index and a job,
+ * both opening on the table, whose rows scroll inside its own region.
+ */
+export const JOURNEYS_PATHS = [
+  "/journeys",
+  `/journeys/${encodeURIComponent("sem://design-system-docs#job.l3")}`,
+] as const;
+
+/**
  * Pages on the document archetype: the lobby, whose canvas scrolls at a
  * phone's width; the Components catalog and the Standards index, whose
  * columns must fit four grid columns; a standard's entity page, whose
  * current crumb is the standard's IRI, an identifier with no break
- * opportunity; a component's entity page, whose identifiers and
- * properties table are wider than a phone; the not-found page; and the
- * pages of plain flow, the sign-in and account pages, a lens's
- * placeholder and the playground, whose sections must span the main
- * column like every other page.
+ * opportunity; two components' pages, whose identifiers, anatomy trees and
+ * properties tables are wider than a phone; the not-found page; and the
+ * pages of prose, the sign-in and account pages, the guides and a guide,
+ * and the playground, whose sections must span the main column like every
+ * other page.
  */
 export const DOCUMENT_PATHS = [
   "/",
@@ -27,10 +42,12 @@ export const DOCUMENT_PATHS = [
   "/standards",
   `/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#code.api.stability")}`,
   `/components/${encodeURIComponent("ds:global.component.accordion")}`,
+  `/components/${encodeURIComponent("ds:global.component.button")}`,
   "/not-found",
   "/login",
   "/account?auth=1",
   "/guides",
+  "/guides/router-core",
   "/playground",
 ] as const;
 
@@ -38,7 +55,29 @@ export const DOCUMENT_PATHS = [
 export const CATALOG_PATH = "/components";
 
 /** The catalog's cards, as the layout's fill check reads them. */
-export const CATALOG_CARD_SELECTOR = ".catalog-cards > li";
+export const CATALOG_CARD_SELECTOR =
+  ".ds.components-catalog-page .ds.entity-card";
+
+/**
+ * The widths the catalog's cards are measured at: a phone's, where the
+ * canvas holds three columns; one between one and two groups, where it
+ * holds two; and the desktop's.
+ */
+export const CATALOG_CARD_WIDTHS = [390, 600, 1440] as const;
+
+/**
+ * The widths below one group of the shell (448px) the catalog is measured
+ * at: the canvas holds three columns there, and every card, with an example
+ * or without, spans its whole row.
+ */
+export const CATALOG_WHOLE_ROW_WIDTHS = [390] as const;
+
+/**
+ * The narrowest a catalog card may render, in pixels: wide enough for its
+ * title and summary, and for a UI block's rendered example under or beside
+ * them.
+ */
+export const MIN_CATALOG_CARD_WIDTH_PX = 150;
 
 /** The Standards index, whose links and lists must span the main column. */
 export const STANDARDS_INDEX_PATH = "/standards";
@@ -51,3 +90,34 @@ export const STANDARDS_INDEX_ROW_SELECTOR = ".ds.standards-index > *";
  * same tracks may round: sub-pixel layout rounds each box on its own.
  */
 export const WIDTH_TOLERANCE_PX = 0.5;
+
+/** The Definitions explorer, with no term and on a class's page. */
+export const DEFINITIONS_PATHS = [
+  "/definitions",
+  `/definitions/${encodeURIComponent("ds:UIBlock")}`,
+] as const;
+
+/**
+ * Desktops shorter than the 1440 by 900 the layout is designed for, once
+ * the browser's chrome is taken: a laptop's 1440 by 780 and a 1280 by 720,
+ * where the inspector moves into its drawer.
+ */
+export const SHORT_DESKTOP_VIEWPORTS = [
+  { name: "1440x780", width: 1440, height: 780 },
+  { name: "1280x720", width: 1280, height: 720 },
+] as const;
+
+/** How long a camera move a control asks for takes to settle, in ms. */
+export const CAMERA_SETTLE_MS = 600;
+
+/**
+ * The smallest size any text may render at on screen, in pixels: the
+ * graph heuristics' legibility floor.
+ */
+export const MIN_SCREEN_TEXT_PX = 12;
+
+/**
+ * How far a graph node's text sits inside each side of its box, in SVG
+ * user units: the node's 1px border and its 8px inset.
+ */
+export const GRAPH_NODE_TEXT_INSET = 9;

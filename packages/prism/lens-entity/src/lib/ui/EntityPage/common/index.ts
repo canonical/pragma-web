@@ -4,5 +4,4 @@ export * from "./EntityDetail/index.js";
 export * from "./EntityHeading/index.js";
 export * from "./EntitySummary/index.js";
 export * from "./FieldList/index.js";
-export * from "./KeyValueList/index.js";
 export * from "./Relations/index.js";

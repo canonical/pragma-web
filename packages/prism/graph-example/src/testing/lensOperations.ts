@@ -12,7 +12,7 @@
  * this gate exists to prevent.
  *
  * 🔴 WHAT THE SCAN ROOTS ARE, AND WHAT THEY ARE NOT. The roots are the
- * docsite's `src/domains/lenses` and the `src` of every lens package beside
+ * docsite's `src/domains/guides` and the `src` of every lens package beside
  * this one (`packages/prism/lens-*`), the core lenses the docsite mounts. They
  * declare FOUR of the docsite's ten shipped query operations, all of them in
  * the lens packages: the app's own lens tree mounts only the Guides stub,
@@ -24,7 +24,7 @@
  *                            ComponentEntityQuery
  *   src/domains/marketing    LobbyQuery  (the home page)
  *   src/domains/playground   ComponentProbeQuery
- *   src/addons/journeys      JourneysExplorerQuery
+ *   src/domains/journeys     JourneysExplorerQuery
  *
  * The first five select `Component` or `Query.component` and the last selects
  * `jobs` — pragma-ontology terms this provider's dataset has no class for, so
@@ -115,8 +115,8 @@ const LITERAL_TIER_PATTERN = /\btier:\s*([12])\b/;
 const TEST_FILE_PATTERN = /\.tests?\.tsx?$/;
 
 /**
- * Every scan root, the app's core lenses first: the docsite's
- * `src/domains/lenses` with its committed artifacts, then each lens package
+ * Every scan root, the app's core lens first: the docsite's
+ * `src/domains/guides` with its committed artifacts, then each lens package
  * (`packages/prism/lens-*`) with the artifacts its `build` script compiles
  * into its own `src/__generated__`. The package list is read off the
  * directory, never written down, so a new lens package is scanned the day it
@@ -145,7 +145,7 @@ export const collectLensSources = (): readonly LensSource[] => {
       );
     }
   }
-  const appLenses = join(APP_ROOT, "src/domains/lenses");
+  const appLenses = join(APP_ROOT, "src/domains/guides");
   return [
     {
       directory: appLenses,

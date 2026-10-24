@@ -1,0 +1,14 @@
+---
+# JourneysIcon — the Journeys lens's rail glyph: a path stepping from one
+# stop down and across to another, stroked in currentColor on a 16-unit
+# box, rendered `size` pixels square and hidden from assistive tech. It
+# styles nothing.
+node:
+  uri: docs.component.journeys_icon
+  edges:
+    - node:
+        role: stop (the path's two ends)
+      relation: { cardinality: "2", slotName: stop }
+    - node:
+        role: path
+      relation: { cardinality: "1", slotName: path }

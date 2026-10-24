@@ -14,17 +14,19 @@ import { appRoutes } from "../src/routes.js";
 /**
  * Wrap `children` in the providers the site's `Shell` mounts around a
  * projection: the Relay environment, a router over the site's own routes at
- * `/`, the site's homes, and the default projection maps with the router's
- * link, so a homed entity's title links to its page as on the site.
+ * `url` (`/` by default), the site's homes, and the default projection maps
+ * with the router's link, so a homed entity's title links to its page as on
+ * the site.
  */
 export default function createSiteTree(
   environment: IEnvironment,
   children: ReactNode,
+  url = "/",
 ): ReactElement {
   return (
     <RelayEnvironmentProvider environment={environment}>
       <RouterProvider
-        router={createRouter(appRoutes, { adapter: createMemoryAdapter("/") })}
+        router={createRouter(appRoutes, { adapter: createMemoryAdapter(url) })}
       >
         <HomesProvider homes={homes}>
           <ProjectionsProvider

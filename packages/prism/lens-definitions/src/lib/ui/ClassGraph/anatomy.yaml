@@ -1,0 +1,231 @@
+---
+# ClassGraph — the Definitions class graph drawn in native SVG, in paint
+# order: namespace regions, subclass buses, relations, classes, labels.
+# Reference: the ontology explorer's graph (shape encodes kind, the
+# subclass edges grey with a hollow arrowhead, relations labelled on a
+# halo, the neighbourhood fade on hover, the selection raised), on the
+# layered layout of the graph heuristics.
+#
+# Why not a published component: no published component draws a graph.
+# Its classes are the published projection's EntityGraphNode; the canvas,
+# with its lattice and camera, is prism-core's GraphCanvas.
+#
+# Regions are a label row (the prefix in 16px bold capitals, the class
+# count in 14px muted) over a hairline rule in the line colour: no hull, no
+# fill, no tint. Subclass buses are 1px in the muted ink, each with one
+# hollow head at its superclass (a fill in the floor's colour under a
+# stroke). Relations are 1px in the edge colour with a filled head at each
+# range; a focus's relations draw in the accent at 2px (the width is an
+# attribute). A selection's lineage draws in the ink at 2px. Edge labels
+# are 14px, muted, or in the accent for the focus, on a 3px halo of the
+# floor's colour.
+#
+# States are modifier classes and never move anything: faded (16% for
+# classes, 6% for edges), dimmed by the search (40%), hidden by the filter.
+# A ring 2px outside a class marks the hovered or keyboard-focused class
+# in the focus colour, or the selected one in the accent. Text below 12px
+# on screen is not drawn: that follows the canvas's zoom bucket, in the
+# markup.
+#
+# SVG paints through currentColor: the roster has no fill or stroke key, so
+# each shape's colour is bound as its `typography.color`.
+#
+# Every decision is read through a component token declared on the root
+# (`--class-graph-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   light-dark(oklch(94% 0 0), var(--color-background-container)): the
+#     floor, under hollow heads and label halos: no background token sits
+#     6 L* below the surface in light.
+#   light-dark(var(--color-border), oklch(54.86% 0 0)): the relation edge
+#     colour, about 4:1 on the floor in both themes; no dark semantic token
+#     sits between 0.45 and 0.64.
+#   1rem: the region prefix; the docs context has no 16px text size.
+#   0.16, 0.06, 0.4: the faded class, the faded edge, the dimmed class.
+#   In constants.ts and the layout's constants (attributes, not CSS): the
+#   1px and 2px strokes, the ring's 2px offset, the 6px halo stroke, the
+#   8px hover target.
+#
+# Roster namespaces (accepted and tracked): the semantic typography
+# symbols typography.text.secondary.fontSize and
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.class_graph
+  edges:
+    - node:
+        role: rule
+        styles:
+          typography.color: color.border.muted
+      relation: { cardinality: "0..*", slotName: rule }
+    - node:
+        role: prefix
+        styles:
+          typography.size: 1rem
+          typography.weight: typography.text.primary.bold.fontWeight
+          typography.color: color.text
+      relation: { cardinality: "0..*", slotName: prefix }
+    - node:
+        role: count
+        styles:
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: count }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: subclass
+              styles:
+                typography.color: color.text.muted
+                motion.property: opacity
+                motion.duration: motion.duration.fast
+          - node:
+              role: faded subclass (.is-faded)
+              styles:
+                appearance.opacity: 0.06
+          - node:
+              role: hidden subclass (.is-hidden)
+              styles:
+                layout.type: none
+      relation: { cardinality: "0..*", slotName: subclass }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: hollow head
+              edges:
+                - node:
+                    role: head fill
+                    styles:
+                      typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+                  relation: { cardinality: "1", slotName: head-fill }
+                - node:
+                    role: head stroke
+                    styles:
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: head-stroke }
+          - node:
+              role: faded hollow head (.is-faded)
+              styles:
+                appearance.opacity: 0.06
+          - node:
+              role: hidden hollow head (.is-hidden)
+              styles:
+                layout.type: none
+      relation: { cardinality: "0..*", slotName: hollow-head }
+    - node:
+        role: chain
+        styles:
+          typography.color: color.text
+      relation: { cardinality: "0..*", slotName: chain }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: relation
+              styles:
+                typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+                motion.property: opacity
+                motion.duration: motion.duration.fast
+          - node:
+              role: focus relation (.is-focus)
+              styles:
+                typography.color: color.text.branded
+          - node:
+              role: faded relation (.is-faded)
+              styles:
+                appearance.opacity: 0.06
+          - node:
+              role: hidden relation (.is-hidden)
+              styles:
+                layout.type: none
+      relation: { cardinality: "0..*", slotName: relation }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: filled head
+              styles:
+                typography.color: "light-dark(var(--color-border), oklch(54.86% 0 0))"
+          - node:
+              role: focus filled head (.is-focus)
+              styles:
+                typography.color: color.text.branded
+          - node:
+              role: faded filled head (.is-faded)
+              styles:
+                appearance.opacity: 0.06
+          - node:
+              role: hidden filled head (.is-hidden)
+              styles:
+                layout.type: none
+      relation: { cardinality: "0..*", slotName: filled-head }
+    - node:
+        role: hit
+        styles:
+          interaction.cursor: pointer
+      relation: { cardinality: "0..*", slotName: hit }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: node
+              styles:
+                motion.property: opacity
+                motion.duration: motion.duration.fast
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+          - node:
+              role: faded node (.is-faded)
+              styles:
+                appearance.opacity: 0.16
+          - node:
+              role: dimmed node (.is-dimmed)
+              styles:
+                appearance.opacity: 0.4
+          - node:
+              role: hidden node (.is-hidden)
+              styles:
+                layout.type: none
+      relation: { cardinality: "0..*", slotName: node }
+    - node:
+        role: target
+        styles:
+          interaction.cursor: pointer
+          appearance.outline.style@focus: none
+      relation: { cardinality: "0..*", slotName: target }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: ring
+              styles:
+                typography.color: color.focusRing
+          - node:
+              role: selected ring (.is-selected)
+              styles:
+                typography.color: color.text.branded
+      relation: { cardinality: "0..*", slotName: ring }
+    - node:
+        role: label halo
+        styles:
+          typography.size: typography.text.secondary.fontSize
+          typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+          interaction.pointerEvents: none
+      relation: { cardinality: "0..*", slotName: label-halo }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: edge label
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+                interaction.pointerEvents: none
+          - node:
+              role: focus edge label (.is-focus)
+              styles:
+                typography.color: color.text.branded
+      relation: { cardinality: "0..*", slotName: edge-label }

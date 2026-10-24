@@ -1,0 +1,53 @@
+---
+# HomePage — the lobby: what the site is, as prose, then the graph's own
+# examples and the doors to the lenses, inside the error and loading
+# boundaries, so the prose stands while the graph loads. A page of the
+# document archetype. The root is a subgrid of the canvas's page grid over
+# every column, its gap the grid's gutter on both axes; it packs at the
+# top and ends one loose step above the canvas's end. The hero holds a
+# reading measure of six intrinsic columns from the column's first line and
+# carries `.editorial` and `.content-flow`; its level-1 heading is the
+# lobby's title. Bespoke: no published component is a lobby.
+#
+# Every decision is read through a component token declared on the root
+# (`--home-page-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / span 6", "1 / -1": structure. layout.alignSelf
+#   start: a keyword. The 0 resets.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# container.gap.loose.
+node:
+  uri: docs.component.home_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+    spacing.internal.block.end: container.gap.loose
+  edges:
+    - node:
+        role: hero (the lobby's title and pitch, carrying .editorial and .content-flow)
+        styles:
+          layout.grid.column: "1 / span 6"
+      relation: { cardinality: "1", slotName: hero }
+    - node:
+        role: status (the loading line)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: status }
+    - node:
+        role: alert (the error line, role alert)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "0..1", slotName: alert }
+    - node:
+        uri: docs.subcomponent.lobby
+      relation: { cardinality: "0..1", slotName: default }

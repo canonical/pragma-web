@@ -1,0 +1,120 @@
+---
+# CatalogList — the catalog: one jump link per tier, then each tier as a
+# page section whose content is the shared list view of its components,
+# each through the site's card projection in the cards view and the
+# site's row projection in the rows view, so a UI block's card keeps its
+# rendered example beside it. Tiers run Global first, the rest
+# alphabetically, untiered last. The first tier's list carries the view
+# toggle, so the toggle stands once at the top of the catalog; every tier's
+# list carries its own count. A graph with no components leaves the shared
+# list view's empty line. When the graph holds more than one page, a
+# published Button loads the next hundred, and each count reads as the
+# components loaded so far, since the connection carries no total; the
+# jump links' navigation is named as the tiers of the components loaded so
+# far while pages remain, a tier a later page brings taking its place in
+# the same order.
+#
+# Why EntityList and not NodeList, the shared projection over it: NodeList's
+# fragment spreads the core card and row projections, which select only the
+# contract's types, and a fragment's selection is fixed when the compiler
+# reads it, so no site arm can be handed to it at run time. Through it a UI
+# block would read as a plain node card: no tier, no vitals and no rendered
+# example in its sidecar. The catalog therefore fills the same EntityList
+# with the site's card and row projections, whose fragments spread the
+# design-system types' arms.
+#
+# The root is a subgrid of the page over every column, its gap the grid's
+# gutter on both axes; the jump links sit on one wrapping line, a gutter
+# apart, with no markers or insets.
+#
+# Every decision is read through a component token declared on the root
+# (`--catalog-list-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure. layout.wrap wrap,
+#   layout.listStyle none: keywords. The 0 resets on the list and the line.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: docs.subcomponent.catalog_list
+  projection:
+    on: Query
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: tiers (the jump links' navigation)
+        styles:
+          layout.grid.column: "1 / -1"
+        edges:
+          - node:
+              role: links
+              styles:
+                layout.type: flex
+                layout.wrap: wrap
+                spacing.gap: grid.gutter
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+              edges:
+                - node:
+                    role: tier link
+                    projection:
+                      field: tier.name
+                  relation:
+                    cardinality: "1..*"
+                    projection:
+                      field: components
+            relation: { cardinality: "1", slotName: links }
+      relation: { cardinality: "0..1", slotName: tiers }
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              role: tier name
+              projection:
+                field: tier.name
+            relation: { cardinality: "1" }
+          - node:
+              uri: prism.component.entity_list
+              edges:
+                - switch:
+                    on: props
+                    cases:
+                      - node:
+                          uri: docs.component.site_card_projection
+                          projection:
+                            on: Node
+                      - node:
+                          uri: docs.component.site_row_projection
+                          projection:
+                            on: Node
+                  relation: { cardinality: "1..*", slotName: items }
+                - node:
+                    role: item key
+                    projection:
+                      field: uri
+                  relation: { cardinality: "1..*" }
+            relation: { cardinality: "1" }
+      relation:
+        cardinality: "0..*"
+        projection:
+          field: components
+    - node:
+        uri: prism.component.entity_list
+      relation: { cardinality: "0..1" }
+    - node:
+        role: more (the load-more line)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+        edges:
+          - node:
+              uri: global.component.button
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1", slotName: more }

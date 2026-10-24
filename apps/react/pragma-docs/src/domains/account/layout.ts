@@ -1,6 +1,6 @@
 import { wrapper } from "@canonical/router-core";
 import type { ReactElement } from "react";
-import { AccountLayout } from "./AccountLayout/index.js";
+import { AccountLayout } from "./lib/AccountLayout/index.js";
 
 /** The router wrapper that renders every route grouped under it inside
  * `AccountLayout`. */

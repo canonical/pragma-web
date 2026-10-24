@@ -1,0 +1,55 @@
+---
+# JourneyHop — one placed hop of the journeys graph: a <g> at the hop's
+# corner holding the published projection's EntityGraphNode, 176 by 48
+# (two 24-unit lines), its label cut to the box, its column's name as its
+# kind and, on a surface, the surface's type as its location; a pairing is
+# hollow. The hop's full label rides in its <title>.
+#
+# The selected job's hop carries a ring 4 units off its box, 2 units wide,
+# in the branded colour.
+#
+# The box's text follows the canvas's zoom bucket: a hop's label is 14px,
+# so below 12/14 on screen (the overview and hubs buckets) the hop draws
+# its box alone, never shrunk text; at full zoom it draws its label, kind
+# and location. That is markup, not style: the bucket reaches the hop
+# through the canvas's context.
+#
+# Bespoke: no published component places a graph's node. SVG paints
+# through currentColor: the roster has no fill or stroke key, so the ring's
+# colour is bound as its typography.color. Stroke widths and offsets are
+# SVG attributes, not CSS.
+#
+# Every decision is read through a component token declared on the root
+# (`--journey-hop-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   In the well's constants.ts (SVG geometry is attributes, not CSS):
+#   LABEL_CHARACTERS 20, RING_OFFSET 4, RING_RADIUS 8,
+#   PRIMARY_EDGE_WIDTH 2 (the ring's stroke).
+node:
+  uri: docs.subcomponent.journey_hop
+  edges:
+    - node:
+        role: title (the hop's full label)
+      relation: { cardinality: "1", slotName: title }
+    - node:
+        role: ring (on the selected job's hop, .is-selected)
+        styles:
+          typography.color: color.text.branded
+      relation: { cardinality: "0..1", slotName: ring }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: box with its text (the full zoom bucket)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+          - node:
+              role: box alone (the overview and hubs buckets)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+      relation: { cardinality: "1", slotName: box }

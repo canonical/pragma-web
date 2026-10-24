@@ -1,0 +1,25 @@
+---
+# AccountLayout — the sign-in and account pages' layout: the document
+# archetype with the site's rail, the strip carrying the current page's
+# single crumb (`Login` or `Account`), the routed page in the canvas, and
+# the site's colophon. It renders no element of its own:
+# DocumentLayout renders the root.
+node:
+  uri: docs.component.account_layout
+  edges:
+    - node:
+        uri: prism.component.document_layout
+        edges:
+          - node:
+              uri: docs.component.site_rail
+            relation: { cardinality: "1", slotName: rail }
+          - node:
+              uri: prism.component.mode_strip
+            relation: { cardinality: "1", slotName: strip }
+          - node:
+              role: routed page
+            relation: { cardinality: "1", slotName: default }
+          - node:
+              uri: docs.component.site_colophon
+            relation: { cardinality: "1", slotName: colophon }
+      relation: { cardinality: "1" }

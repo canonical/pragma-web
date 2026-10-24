@@ -2,7 +2,10 @@
 
 import { Button } from "@canonical/react-ds-global";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { withCards } from "../../../../.storybook/decorators/index.js";
+import {
+  withCards,
+  withShellGrid,
+} from "../../../../.storybook/decorators/index.js";
 import {
   CLASS_ENTITY,
   MODIFIER_ENTITY,
@@ -63,8 +66,8 @@ const meta: Meta<typeof Component> = {
   title: "Components/EntityCard",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withCards()],
-  parameters: { grid: "intrinsic" },
+  decorators: [withCards(), withShellGrid()],
+  parameters: { grid: "none" },
 };
 
 export default meta;
@@ -134,6 +137,32 @@ export const WithMention: Story = {
 /** A UI block with its sidecar: the rendered example beside the body. */
 export const UIBlockWithSidecar: Story = {
   args: { ...pickCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },
+};
+
+/**
+ * A UI block with its sidecar below two groups of the shell, at a phone's
+ * width: the card spans the whole row and the example moves under the
+ * body, the two meeting where the body ends, the footer under both. Opened
+ * on its own in a frame narrower than two groups (912px), the story shows
+ * the same.
+ */
+export const UIBlockWithSidecarStacked: Story = {
+  args: { ...pickCardArgs(UI_BLOCK_ENTITY), sidecar: BUTTON_EXAMPLE },
+  globals: { viewport: { value: "mobile2", isRotated: false } },
+};
+
+/**
+ * A UI block with its sidecar and without vitals, below two groups of the
+ * shell: the card has no footer, the example sits under the body and ends
+ * at the card's bottom edge.
+ */
+export const UIBlockWithSidecarStackedWithoutVitals: Story = {
+  args: {
+    ...pickCardArgs(UI_BLOCK_ENTITY),
+    sidecar: BUTTON_EXAMPLE,
+    vitals: undefined,
+  },
+  globals: { viewport: { value: "mobile2", isRotated: false } },
 };
 
 /**

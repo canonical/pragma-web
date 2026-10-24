@@ -49,7 +49,7 @@ node:
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: empty }
     - node:
-        uri: prism.subcomponent.key_value_list
+        uri: prism.component.key_value_list
         edges:
           - node:
               role: inherited (the catalog's tag, in a pair's key)

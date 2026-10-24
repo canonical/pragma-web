@@ -2,8 +2,8 @@
  * Reading Markdown for the site's own components: the first paragraph of a
  * text, and the elements a summary renders it through.
  *
- * NOT barrelled from `#lib/index.js`: that barrel carries the app's
- * components, and nothing here is one. Import from `#lib/markdown`.
+ * Not barrelled from `#lib/ui`: nothing here is a component. Import from
+ * `#lib/markdown`.
  */
 
 export { SUMMARY_COMPONENTS } from "./constants.js";

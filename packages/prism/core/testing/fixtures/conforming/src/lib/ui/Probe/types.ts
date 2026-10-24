@@ -7,6 +7,8 @@ type OwnProps = {
   readonly label: string;
   /** Where the link leads; without one the box holds no link. */
   readonly href?: string;
+  /** Whether the mark is muted. */
+  readonly muted?: boolean;
 };
 
 /** Props accepted by `Probe`: its label, and its `<div>` root's own. */

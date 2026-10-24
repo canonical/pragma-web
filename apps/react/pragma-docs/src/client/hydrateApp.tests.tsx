@@ -1,44 +1,38 @@
 /**
  * The client-hydration seam, exercised end to end (P-2 Stage 1): the seeded
  * SSR output hydrates through the REAL seeding logic — `hydrateApp` reading
- * `window.__INITIAL_DATA__` — with no React 19 recoverable error and no
- * network request, proving the render is served entirely from the seeded
- * store. React 19 reports hydration mismatches through `onRecoverableError`
- * (a `console.error` spy does NOT catch them — see `MentionChip.ssr.test.tsx`
- * in prism-core), so the spy rides the seam's `hydrateRoot` options; two
- * deliberate-breakage controls prove both spies can fail.
+ * `window.__INITIAL_DATA__` — with no hydration mismatch and no network
+ * request, proving the render is served entirely from the seeded store.
+ *
+ * The server half is the real `EntryServer`, which renders the whole
+ * `<html>` document, and the client half hydrates its `#root` alone, as
+ * production does: an id taken from the tree's position (`useId`) differs
+ * between the two, and only this pairing shows it. React 19 reports a text
+ * or structure mismatch through `onRecoverableError` and an attribute
+ * mismatch only through `console.error`, so both are spied on; two
+ * deliberate-breakage controls prove the spies can fail.
  */
 
-import {
-  createEnvironment,
-  createStaticRouter,
-  setPrefetchEnvironment,
-} from "@canonical/prism-core";
+import { setPrefetchEnvironment } from "@canonical/prism-core";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Shell } from "#lib/ui";
-import createFetchSpy from "../../testing/createFetchSpy.js";
-import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
-import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
-// Definitions block: the captured explorer records, plus the jsdom shims
-// React Flow needs when the well MOUNTS (ResizeObserver/DOMMatrix —
-// side-effect import, no test behaviour of its own).
-import "../../testing/stubReactFlowGlobals.js";
 import type { InitialData } from "#server";
+import createFetchSpy from "../../testing/createFetchSpy.js";
 import { definitionsExplorerRecords } from "../../testing/definitionsRecords.js";
 import {
   LINK_COMPONENT_URI,
   standardEntityRecords,
 } from "../../testing/standardsRecords.js";
-import journeysExplorerRecords from "../addons/journeys/__fixtures__/journeysExplorerRecords.js";
-import journeysExplorerRecordsJob from "../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
+import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
+import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
+import journeysExplorerRecords from "../domains/journeys/__fixtures__/journeysExplorerRecords.js";
+import journeysExplorerRecordsJob from "../domains/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import lobbyRecords from "../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../domains/playground/__fixtures__/componentProbeRecords.js";
-import { appRoutes, middleware, notFoundRoute } from "../routes.js";
+import EntryServer from "../server/entry.js";
 import { hydrateApp } from "./hydrateApp.js";
 
 // Driving `act` directly (no Testing Library wrapper) needs the flag.
@@ -61,15 +55,16 @@ const SEEDED_PAGES = [
     name: "playground probe",
     url: PLAYGROUND_URL,
     records: componentProbeRecords,
-    serverMarker: "<h2>Button</h2>",
-    liveSelector: "h2",
+    serverMarker:
+      '<h2 class="heading" id="component-probe-forms-title">Its forms</h2>',
+    liveSelector: ".ds.ui-block-chip",
     liveText: "Button",
   },
   {
     name: "component entity",
     url: "/components/ds%3Aglobal.component.button",
     records: componentEntityRecordsButton,
-    serverMarker: '<h1 id="component-entity-title">Button</h1>',
+    serverMarker: '<h1 class="heading" id="component-entity-title">Button</h1>',
     liveSelector: "#component-entity-title",
     liveText: "Button",
   },
@@ -81,15 +76,15 @@ const SEEDED_PAGES = [
     liveSelector: 'a[href="/components/ds%3Aglobal.component.button"]',
     liveText: "Button",
   },
-  // Definitions block (P-5): THE React Flow SSR gate — the term page's
-  // server HTML carries the well's full node DOM, and hydrating over it
+  // Definitions block (P-5): the graph's SSR gate — the term page's
+  // server HTML carries the class graph's full SVG, and hydrating over it
   // must stay mismatch-silent and network-silent like every other
   // seeded page.
   {
     name: "definitions term",
     url: "/definitions/ds%3AUIBlock",
     records: definitionsExplorerRecords,
-    serverMarker: '<h2 class="heading" id="term-inspector-title">UI Block</h2>',
+    serverMarker: '<h2 class="name" id="term-inspector-title">UI Block</h2>',
     liveSelector: "#term-inspector-title",
     liveText: "UI Block",
   },
@@ -109,23 +104,31 @@ const SEEDED_PAGES = [
     liveSelector: ".ds.standard-prose .ds.node-chip",
     liveText: "one prop",
   },
-  // Journeys job block (AV-351 / RULING 1 + 2): the view is EPHEMERAL, not
-  // URL-derived, so the job page — like the index — defaults to the TABLE.
-  // Its server HTML therefore carries the table's primary surface, NOT the
-  // well's node DOM (the graph is the non-default view, a client transition)
-  // and NOT the inspector (dropped in table mode, RULING 2 — no third
-  // column). The selected job is still in the URL; it only surfaces when the
-  // reader flips the strip switch to the graph. Hydrating over the
-  // server-rendered table must stay mismatch-silent: the table's whole
-  // arrangement comes from a constant, so the first client render reproduces
-  // the server's markup by construction.
+  // Journeys job block: with no view in the address the job page, like
+  // the index, opens on the TABLE. Its server HTML therefore carries the
+  // table's primary surface, not the well's hops and not the inspector,
+  // which the workspace opens in the graph view alone. Hydrating over it
+  // must stay mismatch-silent: the table's whole arrangement comes from a
+  // constant, so the first client render reproduces the server's markup.
   {
     name: "journeys job",
     url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3",
     records: journeysExplorerRecordsJob,
-    serverMarker: 'data-slot="journeys-table"',
-    liveSelector: ".journey-table-group-control legend",
+    serverMarker: 'class="ds journey-table"',
+    liveSelector: ".journey-table .grouping-label",
     liveText: "Group by",
+  },
+  // Journeys GRAPH block: the address names the graph view, which the
+  // server reads from the same URL as the client, so the job page renders
+  // the well, its hops with the selected one ringed, and the job in the
+  // inspector on both sides, mismatch-silent.
+  {
+    name: "journeys job in the graph view",
+    url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3?view=graph",
+    records: journeysExplorerRecordsJob,
+    serverMarker: 'class="ds journey-hop is-selected"',
+    liveSelector: ".inspector #journey-inspector-title",
+    liveText: "job.l3",
   },
   // Journeys INDEX block (AV-351): the table is the lens's primary surface,
   // and its whole ephemeral arrangement — the default sort, the default
@@ -138,8 +141,8 @@ const SEEDED_PAGES = [
     name: "journeys index table",
     url: "/journeys",
     records: journeysExplorerRecords,
-    serverMarker: 'data-slot="journeys-table"',
-    liveSelector: ".journey-table-group-control legend",
+    serverMarker: 'class="ds journey-table"',
+    liveSelector: ".journey-table .grouping-label",
     liveText: "Group by",
   },
   // Home block (AV-350): the lobby — the front door's two projections
@@ -158,25 +161,27 @@ const SEEDED_PAGES = [
 ] as const;
 
 /**
- * Server HTML of the app tree at `url` from a store seeded with `records`
- * — the same composition `EntryServer` renders inside `#root` (static
- * router in, browser router out), so the seam hydrates the bytes a dev
- * server would actually serve.
+ * The server HTML of `#root` at `url`, from the real `EntryServer` over a
+ * store seeded with `records`: the bytes a dev server serves inside the
+ * element the client hydrates. The entry's own fetch guard rejects any
+ * operation the store does not hold, so a page that reached the network
+ * renders its failure state instead of the marker the tests look for.
  */
 const renderSeededServerHtml = (
-  fetchFn: FetchFunction,
   url: string = PLAYGROUND_URL,
   records: RecordMap = componentProbeRecords,
-): string =>
-  renderToString(
-    <Shell
-      environment={createEnvironment({ records, fetchFn })}
-      router={createStaticRouter(appRoutes, url, {
-        middleware: [...middleware],
-        notFound: notFoundRoute,
-      })}
-    />,
+): string => {
+  const documentHtml = renderToString(
+    <EntryServer initialData={{ url, relay: { records } }} />,
   );
+  const root = new DOMParser()
+    .parseFromString(documentHtml, "text/html")
+    .getElementById("root");
+  if (!root) {
+    throw new Error("EntryServer rendered no #root element");
+  }
+  return root.innerHTML;
+};
 
 type TestWindow = Window & { __INITIAL_DATA__?: InitialData };
 
@@ -236,27 +241,40 @@ describe("hydrateApp over the seeded SSR output", () => {
     vi.unstubAllGlobals();
   });
 
-  /** Hydrates via the seam over `serverHtml`; returns the mismatch spy. */
+  /**
+   * Hydrates via the seam over `serverHtml`; returns the recoverable-error
+   * spy and what reached `console.error`. The console spy is silenced, so a
+   * deliberate failure does not pollute the run's output, and its calls are
+   * copied out before it is restored, since restoring a spy clears them.
+   */
   async function hydrateInto(serverHtml: string) {
     const container = document.createElement("div");
+    container.id = "root";
     container.innerHTML = serverHtml;
     document.body.appendChild(container);
     containers.push(container);
     const onRecoverableError = vi.fn();
-    await act(async () => {
-      roots.push(hydrateApp(container, { onRecoverableError }));
-    });
-    return { container, onRecoverableError };
+    const consoleErrors: unknown[][] = [];
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    try {
+      await act(async () => {
+        roots.push(hydrateApp(container, { onRecoverableError }));
+      });
+    } finally {
+      consoleErrors.push(...consoleError.mock.calls);
+      consoleError.mockRestore();
+    }
+    return { container, onRecoverableError, consoleErrors };
   }
 
   it.each(SEEDED_PAGES)(
-    "hydrates the $name from the seeded store: no recoverable error, no fetch",
+    "hydrates the $name from the seeded store: no mismatch, no fetch",
     async ({ url, records, serverMarker, liveSelector, liveText }) => {
-      const serverFetchFn = createFetchSpy();
-      const serverHtml = renderSeededServerHtml(serverFetchFn, url, records);
+      const serverHtml = renderSeededServerHtml(url, records);
       // The server render itself came from the warm store, not the network.
       expect(serverHtml).toContain(serverMarker);
-      expect(serverFetchFn).not.toHaveBeenCalled();
 
       // The browser router reads the location the seam hydrates at.
       window.history.pushState({}, "", url);
@@ -264,10 +282,12 @@ describe("hydrateApp over the seeded SSR output", () => {
         url,
         relay: { records },
       };
-      const { container, onRecoverableError } = await hydrateInto(serverHtml);
+      const { container, onRecoverableError, consoleErrors } =
+        await hydrateInto(serverHtml);
 
-      // React 19's hydration-mismatch channel stayed silent…
+      // React 19's two hydration-mismatch channels stayed silent…
       expect(onRecoverableError).not.toHaveBeenCalled();
+      expect(consoleErrors).toEqual([]);
       // …the page's content is live in the hydrated tree…
       expect(container.querySelector(liveSelector)?.textContent).toBe(liveText);
       // …and the network was NEVER consulted: hydration read the records
@@ -282,7 +302,7 @@ describe("hydrateApp over the seeded SSR output", () => {
 
   it("control: discarding the seeded records makes hydration fetch", async () => {
     window.history.pushState({}, "", PLAYGROUND_URL);
-    const serverHtml = renderSeededServerHtml(createFetchSpy());
+    const serverHtml = renderSeededServerHtml();
     // No `__INITIAL_DATA__` on `window`: the seam finds no records, the
     // store starts cold, and the probe's query goes over HTTP — the exact
     // silent regression the green test's zero-fetch assertion guards.
@@ -294,23 +314,36 @@ describe("hydrateApp over the seeded SSR output", () => {
 
   it("control: hydrating over tampered server HTML reports a recoverable error", async () => {
     window.history.pushState({}, "", PLAYGROUND_URL);
-    const serverHtml = renderSeededServerHtml(createFetchSpy());
-    const tampered = serverHtml.replace("<h2>Button</h2>", "<h2>Impostor</h2>");
+    const serverHtml = renderSeededServerHtml();
+    const tampered = serverHtml.replace(
+      '<h2 class="heading" id="component-probe-forms-title">Its forms</h2>',
+      '<h2 class="heading" id="component-probe-forms-title">Impostor</h2>',
+    );
     expect(tampered).not.toBe(serverHtml);
     (window as TestWindow).__INITIAL_DATA__ = {
       url: PLAYGROUND_URL,
       relay: { records: componentProbeRecords },
     };
-    // React also prints the mismatch diff via console.error; silence it so
-    // the deliberate failure does not pollute the run's output.
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    try {
-      const { onRecoverableError } = await hydrateInto(tampered);
-      expect(onRecoverableError).toHaveBeenCalled();
-    } finally {
-      consoleError.mockRestore();
-    }
+    const { onRecoverableError } = await hydrateInto(tampered);
+    expect(onRecoverableError).toHaveBeenCalled();
+  });
+
+  it("control: an attribute the client renders differently reaches console.error", async () => {
+    window.history.pushState({}, "", PLAYGROUND_URL);
+    const serverHtml = renderSeededServerHtml();
+    const tampered = serverHtml.replace(
+      'id="component-probe-forms-title"',
+      'id="component-probe-forms-impostor"',
+    );
+    expect(tampered).not.toBe(serverHtml);
+    (window as TestWindow).__INITIAL_DATA__ = {
+      url: PLAYGROUND_URL,
+      relay: { records: componentProbeRecords },
+    };
+    const { onRecoverableError, consoleErrors } = await hydrateInto(tampered);
+    // An attribute mismatch is patched silently, not recovered from…
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    // …and only the console carries it.
+    expect(consoleErrors).not.toEqual([]);
   });
 });

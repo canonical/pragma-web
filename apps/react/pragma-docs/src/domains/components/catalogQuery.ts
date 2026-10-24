@@ -3,7 +3,7 @@
  * compiled `ComponentsCatalogQuery` operation plus the one variables
  * builder, shared by the route's `warmCatalog` and the page's hook.
  * Artifact-only imports — this module rides the server bricks' native
- * import chain; the tag lives in `ComponentsCatalogPage.tsx`.
+ * import chain; the tag lives beside `CatalogList`, which reads it.
  */
 
 import type { ComponentsCatalogQuery$variables } from "#relay/__generated__/ComponentsCatalogQuery.graphql.js";

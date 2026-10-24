@@ -2,12 +2,14 @@
  * The Definitions lens's EPHEMERAL view state — the one vocabulary the
  * rail, the well and the mode strip's controls all read.
  *
- * Two axes, both derived from what an `OntologyClass` ACTUALLY carries
+ * Its axes are all derived from what an `OntologyClass` ACTUALLY carries
  * (`lensFilter.test.ts` pins the shape contract):
  *
  * - `text` — a case-insensitive substring over a term's label OR its
- *   prefixed URI. Rail-only by contract: the search never touches the
- *   graph.
+ *   prefixed URI. It dims: the rail and the graph mark what it leaves out,
+ *   and neither hides anything for it.
+ * - `withInstances` — whether the classes with no instances are dimmed,
+ *   in the rail and the graph alike.
  * - `abstraction` / `namespaces` — the per-class facets the graph really
  *   has (`isAbstract`, `namespace`). There is no lifecycle, status or
  *   channel field on `OntologyClass`, and the `Tag` vocabulary (which does
@@ -75,9 +77,9 @@ export const matchesText = (
   prefixed.toLowerCase().includes(text);
 
 /**
- * Does a CLASS pass the chip axes? Text is deliberately NOT consulted:
- * the chips govern the graph, the search box governs the rail, and mixing
- * them would let a rail search silently re-shape the graph.
+ * Does a CLASS pass the chip axes, the ones the graph hides by? Text is
+ * deliberately NOT consulted: the search dims and never hides, so a search
+ * cannot re-shape the graph or move its camera.
  */
 export const matchesChips = (
   filter: LensFilter,
@@ -86,6 +88,19 @@ export const matchesChips = (
 ): boolean =>
   filter.abstractions.includes(classifyAbstraction(isAbstract)) &&
   filter.namespaces.includes(prefix);
+
+/**
+ * Does a class pass the dimming axes: the search text, and the instances
+ * axis when it is on?
+ */
+export const matchesDimming = (
+  filter: LensFilter,
+  label: string | null | undefined,
+  prefixed: string,
+  instanceCount: number,
+): boolean =>
+  matchesText(filter.text, label, prefixed) &&
+  (!filter.withInstances || instanceCount > 0);
 
 /** Toggle one value in an allow-list, preserving the canonical order. */
 export const toggleIn = <Value extends string>(

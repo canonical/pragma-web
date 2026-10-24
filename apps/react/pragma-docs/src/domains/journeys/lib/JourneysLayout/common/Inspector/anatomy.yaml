@@ -1,0 +1,10 @@
+---
+# Inspector — the journeys workspace's inspector tenant: the job inspector
+# over the warm explorer query and the route's job. It renders no element
+# of its own and styles nothing.
+node:
+  uri: docs.subcomponent.inspector
+  edges:
+    - node:
+        uri: docs.component.journey_inspector
+      relation: { cardinality: "1" }

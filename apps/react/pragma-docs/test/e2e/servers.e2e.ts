@@ -84,8 +84,9 @@ const JS_CONTENT_TYPE = /javascript/;
 const CONNECTION_PAGE_CAP = 100;
 
 /**
- * How many exemplars the lobby's strip asks the graph for (mirrors
- * `LOBBY_EXEMPLAR_COUNT` in `#domains/marketing/lobbyQuery.js`). Same
+ * How many exemplars the lobby's strip shows, one per name, chosen from
+ * the components it reads (mirrors `LOBBY_EXEMPLAR_COUNT` in
+ * `#domains/marketing/lobbyQuery.js`). Same
  * black-box rationale; a change there without a change here fails loudly
  * in the home block below, which is the intent.
  */
@@ -258,17 +259,19 @@ describe("server matrix (2×3) serves correctly", () => {
             const playground = await fetch(`${server.base}/playground`);
             expect(playground.status).toBe(200);
             const playgroundHtml = await playground.text();
-            // Server-rendered probe content: heading, URI, summary text.
-            expect(playgroundHtml).toContain("<h2>Button</h2>");
-            expect(playgroundHtml).toContain("ds:global.component.button");
+            // Server-rendered probe content: the Button in each form,
+            // linked to its page, and its card's summary. The fields the
+            // unit fixture (componentProbeRecords) freezes are asserted
+            // against the live graph here, so an upstream rename rots
+            // loudly, not silently.
+            expect(playgroundHtml).toContain(
+              'href="/components/ds%3Aglobal.component.button">Button</a>',
+            );
+            expect(playgroundHtml).toContain('class="ds entity-chip');
+            expect(playgroundHtml).toContain('class="ds card ds entity-card');
             expect(playgroundHtml).toContain(
               "Buttons trigger actions within an interface",
             );
-            // Modifier families too: every field the unit fixture
-            // (componentProbeRecords) freezes is asserted against the live
-            // graph here, so an upstream rename rots loudly, not silently.
-            expect(playgroundHtml).toContain("Anticipation");
-            expect(playgroundHtml).toContain("Importance");
             // The serialised record map is embedded for hydration.
             expect(playgroundHtml).toContain("__INITIAL_DATA__");
             expect(playgroundHtml).toContain('"relay"');
@@ -322,7 +325,7 @@ describe("server matrix (2×3) serves correctly", () => {
 
             // 5c. Definitions block: the ontology explorer SSRs from the
             //     live graph. The term page carries the inspector's class
-            //     record, the well's server-rendered node DOM, and the
+            //     record, the class graph's server-rendered SVG, and the
             //     serialised store — all in the raw HTML, before any
             //     client JS.
             const definitionsTerm = await fetch(
@@ -332,36 +335,37 @@ describe("server matrix (2×3) serves correctly", () => {
             const definitionsTermHtml = await definitionsTerm.text();
             expect(definitionsTermHtml).toContain("UI Block");
             expect(definitionsTermHtml).toContain("ds:UIBlock");
-            expect(definitionsTermHtml).toContain('class="ds term-node');
+            expect(definitionsTermHtml).toContain('class="ds class-graph"');
             expect(definitionsTermHtml).toContain("__INITIAL_DATA__");
             expect(definitionsTermHtml).toContain('"records"');
 
-            //     The term-less explorer: the full triptych with the
-            //     honest empty inspector (no default term, no redirect).
+            //     The term-less explorer: the rail and the graph, and the
+            //     inspector's overview of the graph (no default term, no
+            //     redirect).
             const definitions = await fetch(`${server.base}/definitions`);
             expect(definitions.status).toBe(200);
             const definitionsHtml = await definitions.text();
             expect(definitionsHtml).toContain('data-slot="explorer-rail"');
-            expect(definitionsHtml).toContain("Select a term");
+            expect(definitionsHtml).toContain("Reading the graph");
             expect(definitionsHtml).toContain("__INITIAL_DATA__");
             expect(definitionsHtml).toContain('"records"');
 
-            // 5d. Silent-rot closures. The well's node and edge DOM could
+            // 5d. Silent-rot closures. The graph's classes and edges could
             //     rot to zero or partial while every literal above still
             //     matched. Graph counts are never pinned, since the live
-            //     graph grows; instead the well draws exactly one node per
-            //     class the rail lists, so the node count must equal the
-            //     rail's class-link count, both derived from THIS response
-            //     (drift-proof, catches a partial well). Floors catch the
-            //     both-surfaces-rot-to-zero case the equality alone would
-            //     wave through (0 === 0), and structural edges stay
-            //     strictly below nodes — each is one non-root class's
-            //     superclass link, and every non-empty ontology has a root.
+            //     graph grows; instead the graph draws exactly one class
+            //     per class the rail lists, so the class count must equal
+            //     the rail's class-link count, both derived from THIS
+            //     response (drift-proof, catches a partial graph). Floors
+            //     catch the both-surfaces-rot-to-zero case the equality
+            //     alone would wave through (0 === 0), and subclass buses
+            //     stay strictly below classes — each joins a superclass to
+            //     its subclasses, and every non-empty ontology has a root.
             const wellNodeCount = (
-              definitionsTermHtml.match(/class="ds term-node/g) ?? []
+              definitionsTermHtml.match(/<g class="node[ "]/g) ?? []
             ).length;
             const wellEdgeCount = (
-              definitionsTermHtml.match(/class="edge structural/g) ?? []
+              definitionsTermHtml.match(/<path class="subclass[ "]/g) ?? []
             ).length;
             const railClassLinkCount =
               // The headings carry a match count ("Classes 17 of 17"),
@@ -378,26 +382,25 @@ describe("server matrix (2×3) serves correctly", () => {
                 .reduce((sum, count) => sum + count, 0);
             expect(wellNodeCount).toBe(railClassLinkCount);
             expect(wellNodeCount).toBeGreaterThan(20);
-            expect(wellEdgeCount).toBeGreaterThan(10);
+            expect(wellEdgeCount).toBeGreaterThan(3);
             expect(wellEdgeCount).toBeLessThan(wellNodeCount);
-            //     The semantic arcs, the object properties between drawn
+            //     The relations, the object properties between drawn
             //     classes, are in the server markup too.
-            expect(definitionsTermHtml).toContain('class="edge semantic');
+            expect(definitionsTermHtml).toMatch(/<path class="relation[ "]/);
 
-            //   THE SELECTION'S EGO-FADE IS SERVER-RENDERED, asserted
-            //   against the LIVE graph rather than a fixture. The term is
-            //   in the URL, so the fade is a pure function of data both
-            //   sides hold and belongs in the first paint. Some nodes fade
-            //   and some do NOT — a fade that swallowed everything would
-            //   convey nothing, so the spared one-hop neighbourhood is
-            //   what proves the rule is a neighbourhood and not a wash.
+            //   THE SELECTION'S FADE IS SERVER-RENDERED, asserted against
+            //   the LIVE graph rather than a fixture. The term is in the
+            //   URL, so the fade is a pure function of data both sides
+            //   hold and belongs in the first paint. Some classes fade and
+            //   some do NOT — a fade that swallowed everything would
+            //   convey nothing, so the spared neighbourhood is what proves
+            //   the rule is a neighbourhood and not a wash.
             const fadedNodeCount = (
-              definitionsTermHtml.match(/class="ds term-node[^"]*is-faded/g) ??
-              []
+              definitionsTermHtml.match(/<g class="node is-faded"/g) ?? []
             ).length;
             expect(fadedNodeCount).toBeGreaterThan(0);
             expect(fadedNodeCount).toBeLessThan(wellNodeCount);
-            expect(definitionsTermHtml).toContain("is-selected");
+            expect(definitionsTermHtml).toContain('class="ring is-selected"');
 
             //   …and the term-LESS address fades nothing, because nothing
             //   is selected. Same graph, no privileged centre.
@@ -406,7 +409,7 @@ describe("server matrix (2×3) serves correctly", () => {
 
             //   THE RAIL DIMS, IT NEVER HIDES. Server-side the filter is
             //   the no-op, so no rail item may carry the dim marker while
-            //   every class the well draws is still listed (asserted by
+            //   every class the graph draws is still listed (asserted by
             //   the equality above).
             expect(definitionsTermHtml).not.toContain("is-dimmed");
 
@@ -422,34 +425,49 @@ describe("server matrix (2×3) serves correctly", () => {
             const chipCount = (
               definitionsTermHtml.match(/<button[^>]*class="chip"/g) ?? []
             ).length;
-            // Two abstraction chips plus one per ontology (three live).
-            expect(chipCount).toBeGreaterThanOrEqual(4);
-            // The figure's counts agree with the graph the well drew, so
-            // the figure can never flatter the graph. Both sides derive
-            // from THIS response, with no pinned graph counts: the
-            // abstract tally is read off the well's own abstract nodes.
+            // Two abstraction chips, one per ontology (three live) and the
+            // instances chip.
+            expect(chipCount).toBeGreaterThanOrEqual(6);
+            // The figure's counts agree with the graph it drew, so the
+            // figure can never flatter the graph. Both sides derive from
+            // THIS response, with no pinned graph counts: the abstract
+            // tally is read off the graph's own abstract classes.
             const statusCaption =
               /<figcaption class="caption">([\s\S]*?)<\/figcaption>/
                 .exec(definitionsTermHtml)?.[1]
                 ?.replaceAll("<!-- -->", "");
             const abstractNodeCount = (
-              definitionsTermHtml.match(/class="ds term-node abstract/g) ?? []
+              definitionsTermHtml.match(
+                /<g class="node[^"]*"[^>]*data-kind="abstract"/g,
+              ) ?? []
             ).length;
             expect(abstractNodeCount).toBeGreaterThan(0);
             // Unfiltered server render: visible === total, and the
-            // abstract clause matches the nodes the graph actually drew,
-            // each of which carries its ABSTRACT tag in real text.
+            // abstract clause matches the classes the graph drew.
             expect(statusCaption).toBe(
               `${wellNodeCount} of ${wellNodeCount} classes · ${abstractNodeCount} abstract`,
             );
-            expect(
-              (definitionsTermHtml.match(/<span class="tag">/g) ?? []).length,
-            ).toBe(abstractNodeCount);
 
-            //   THE FURNITURE floats over the canvas: the legend and the
-            //   hint.
-            expect(definitionsTermHtml).toContain('class="ds well-legend"');
-            expect(definitionsTermHtml).toContain('<p class="hint">');
+            //   THE CANVAS carries its controls: the zoom level and Fit.
+            expect(definitionsTermHtml).toContain('class="ds graph-canvas');
+            expect(definitionsTermHtml).toContain(">Fit<");
+
+            //   THE LATTICE: a 16px dot pattern floors the drawing, and
+            //   every class and region of the live graph sits on its dots,
+            //   so a layout change that leaves the lattice shows here.
+            expect(definitionsTermHtml).toMatch(
+              /<pattern class="lattice"[^>]*height="16"[^>]*width="16"/,
+            );
+            expect(definitionsTermHtml).toMatch(
+              /<rect class="floor" fill="url\(#graph-canvas-lattice-/,
+            );
+            const placements = [
+              ...definitionsTermHtml.matchAll(
+                /<g class="(?:node|region)[ "][^>]*data-x="(-?\d+)" data-y="(-?\d+)"/g,
+              ),
+            ].flatMap(([, x, y]) => [Number(x), Number(y)]);
+            expect(placements.length).toBeGreaterThan(2 * wellNodeCount);
+            expect(placements.filter((value) => value % 16 !== 0)).toEqual([]);
 
             //     The class inspector's lineage and property rows SSR
             //     from the live graph: `hasVariant` is a ds:UIBlock
@@ -591,19 +609,19 @@ describe("server matrix (2×3) serves correctly", () => {
             const home = await fetch(`${server.base}/`);
             expect(home.status).toBe(200);
             const homeHtml = await home.text();
-            //     All three layout.lobby slots reached the HTML.
-            expect(homeHtml).toContain('data-slot="hero"');
-            expect(homeHtml).toContain('data-slot="examples"');
-            expect(homeHtml).toContain('data-slot="doors"');
+            //     The hero and both sections reached the HTML.
+            expect(homeHtml).toContain('id="lobby-title"');
+            expect(homeHtml).toContain('id="lobby-examples-title"');
+            expect(homeHtml).toContain('id="lobby-doors-title"');
             expect(homeHtml).toContain("__INITIAL_DATA__");
             expect(homeHtml).toContain('"records"');
 
-            //     Projection 1 — the exemplar strip. The strip asks the
-            //     graph for exactly LOBBY_EXEMPLAR_COUNT instances, so
+            //     Projection 1 — the exemplar strip. The strip shows
+            //     exactly LOBBY_EXEMPLAR_COUNT chips, one per name, so
             //     the rendered link count must equal it: fewer means the
             //     projection partially rendered, more means it stopped
-            //     honouring its own page size. Derived from this
-            //     response, not from a captured fixture.
+            //     honouring its own count. Derived from this response,
+            //     not from a captured fixture.
             const exemplarLinkCount = (
               homeHtml.match(/href="\/components\/ds%3A/g) ?? []
             ).length;
@@ -618,7 +636,7 @@ describe("server matrix (2×3) serves correctly", () => {
             //     to at most 100 and this snaps. The floor is the cap
             //     itself — never the live total.
             const standardsFigure = homeHtml.match(
-              /The graph holds <!-- -->(\d+)<!-- --> of them/,
+              /<span class="vital">(\d+) standards<\/span>/,
             );
             expect(standardsFigure).not.toBeNull();
             expect(Number(standardsFigure?.[1])).toBeGreaterThan(
@@ -631,7 +649,7 @@ describe("server matrix (2×3) serves correctly", () => {
             //     class by construction — patterns compose them), and
             //     both are non-trivial. Structural bounds, no pins.
             const componentsFigure = homeHtml.match(
-              /The graph holds <!-- -->(\d+)<!-- --> components and <!-- -->(\d+)<!-- -->/,
+              /<span class="vital">(\d+) components<\/span><span class="vital">(\d+) patterns<\/span>/,
             );
             expect(componentsFigure).not.toBeNull();
             const liveComponentCount = Number(componentsFigure?.[1]);
@@ -643,131 +661,69 @@ describe("server matrix (2×3) serves correctly", () => {
             //     The Definitions door is named WITHOUT a count (no
             //     cheap honest count exists for a lens whose quantity is
             //     "terms across ontologies"). If someone later invents
-            //     one, this is the tripwire — the door's own list item
-            //     must stay digit-free.
+            //     one, this is the tripwire: the door's card must stay
+            //     digit-free, its summary and any vital alike.
             const definitionsDoor = homeHtml.match(
-              /<a href="\/definitions">Definitions<\/a><p>([\s\S]*?)<\/p>/,
+              /href="\/definitions">Definitions<\/a>([\s\S]*?)<div class="ds card ds entity-card">/,
             );
             expect(definitionsDoor).not.toBeNull();
-            expect(definitionsDoor?.[1]).not.toMatch(/\d/);
+            expect(
+              definitionsDoor?.[1]?.replaceAll(/<[^>]*>/g, ""),
+            ).not.toMatch(/\d/);
 
-            // 5g. Journeys block (AV-351): the demand model SSRs from
-            //     the live graph. Every assertion here is DRIFT-PROOF —
-            //     never a pinned graph count (the 111->108 lesson, and
-            //     ds:Component drifted again today) — so counts are
-            //     either derived from THIS response and related to each
-            //     other, or bounded by SCHEMA constants.
+            // 5g. Journeys block: the demand model SSRs from the live
+            //     graph. Every assertion is drift-proof: never a pinned
+            //     graph count, so counts are either derived from this
+            //     response and related to each other, or bounded below.
             const journeys = await fetch(`${server.base}/journeys`);
             expect(journeys.status).toBe(200);
             const journeysHtml = await journeys.text();
-            expect(journeysHtml).toContain('data-slot="journeys-rail"');
-            expect(journeysHtml).toContain('data-slot="journeys-canvas"');
-            expect(journeysHtml).toContain('data-slot="journeys-inspector"');
-            //     The index's honest empty inspector (no default job).
-            expect(journeysHtml).toContain("Select a job");
+            expect(journeysHtml).toContain('class="ds workspace-layout');
+            expect(journeysHtml).toContain('class="ds journey-rail');
             expect(journeysHtml).toContain("__INITIAL_DATA__");
             expect(journeysHtml).toContain('"records"');
 
-            //     THE PRIMARY SURFACE, in the server HTML (AV-351). The
-            //     table is the lens's index now, and it SSRs whole: its
-            //     slot, its accessible structure (a row-header cell per
-            //     job, sortable column headers via aria-sort) and its
-            //     group-by control are all in the served markup, before any
-            //     client JS. A sortable data table that only becomes one
-            //     after hydration would fail a reader without JS; this
-            //     proves the table is real at first paint.
-            expect(journeysHtml).toContain('data-slot="journeys-table"');
+            //     The table is the default reading and SSRs whole: its row
+            //     headers, its sortable column headers and its grouping
+            //     control are in the served markup before any client
+            //     script, and its caption states its live counts.
+            expect(journeysHtml).toContain('class="ds journey-table"');
             expect(journeysHtml).toContain('scope="row"');
             expect(journeysHtml).toMatch(/aria-sort="(ascending|descending)"/);
             expect(journeysHtml).toContain("Group by");
-            //     THE DEFAULT SORT is in the server HTML, not applied later:
-            //     the table's caption states its live row count, so the
-            //     first paint carries the deterministic default arrangement
-            //     the pure constant names.
             expect(journeysHtml).toContain("Every job in the demand model");
+            //     The inspector opens with the graph view, so the table's
+            //     first paint carries none.
+            expect(journeysHtml).not.toContain('id="journey-inspector-title"');
 
-            //     DRIFT-PROOF COUNT RELATION (the ds:Component 108→111
-            //     lesson): never pin the model size. The table's row-header
-            //     cells and the rail's job links both index EVERY job in the
-            //     model, from the SAME response — so they must be equal.
-            //     This survives the model growing; it breaks only if the
-            //     table and the rail fall out of step, which is the real
-            //     failure worth catching.
+            //     The table's row headers and the rail's jobs both index
+            //     every job in the model, from the same response, so they
+            //     must be equal, and the model is big enough that the
+            //     graph's default coordinate filter is a real narrowing.
             const tableRowHeaderCount = (
-              journeysHtml.match(/class="journey-table-job"/g) ?? []
+              journeysHtml.match(/<th class="cell" scope="row">/g) ?? []
             ).length;
-            const railJobLinkCountIndex = (
-              journeysHtml.match(/class="journey-rail-job"/g) ?? []
-            ).length;
-            expect(tableRowHeaderCount).toBeGreaterThan(0);
-            expect(tableRowHeaderCount).toBe(railJobLinkCountIndex);
+            const railJobCount = (journeysHtml.match(/<li class="job">/g) ?? [])
+              .length;
+            expect(tableRowHeaderCount).toBeGreaterThan(40);
+            expect(tableRowHeaderCount).toBe(railJobCount);
 
-            //     THE PERSONA AXIS CONFESSES, in the server HTML. The
-            //     graph records no persona-to-job edge, so the filter is
-            //     approximate and the interface says so as real text. If
-            //     that caveat is ever dropped while the filter stays,
-            //     the lens starts quietly overstating what it knows.
+            //     The persona axis states its approximation as text.
             expect(journeysHtml).toContain("Approximate");
 
-            //     A JOB URL renders the selected journey. The address is
-            //     the job (P-D7), and the view it lands on must contain
-            //     that job — the diagram roots at its coordinate.
+            //     A job's address renders the table with that job's row
+            //     selected, its story verbatim in the row.
             const journeyJob = await fetch(
               `${server.base}/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3`,
             );
             expect(journeyJob.status).toBe(200);
             const journeyJobHtml = await journeyJob.text();
-            //     The story renders VERBATIM — the demand in the
-            //     reader's own words is the whole point of the model, so
-            //     an upstream rewording rots loudly here.
             expect(journeyJobHtml).toContain(
               "I want to browse and filter the full catalog",
             );
-            expect(journeyJobHtml).toContain('id="journey-inspector-title"');
-            //     Selection is server-rendered, because it comes from
-            //     the URL — exactly one node carries the marker.
-            expect((journeyJobHtml.match(/is-selected/g) ?? []).length).toBe(1);
-
-            //     Silent-rot closures, all derived from THIS response.
-            //     The well draws a left-to-right spine, so every node
-            //     beyond the first column is reached by an edge: edges
-            //     must be at least nodes minus the columns, and nodes
-            //     must be non-trivial. Floors catch the both-rot-to-zero
-            //     case that a bare equality would wave through.
-            const hopNodeCount = (
-              journeyJobHtml.match(/react-flow__node-hop/g) ?? []
-            ).length;
-            const hopEdgeCount = (
-              journeyJobHtml.match(/react-flow__edge-path/g) ?? []
-            ).length;
-            expect(hopNodeCount).toBeGreaterThan(5);
-            expect(hopEdgeCount).toBeGreaterThan(5);
-            //     A connected spine has strictly fewer roots than nodes.
-            expect(hopEdgeCount).toBeLessThan(hopNodeCount * 2);
-
-            //     HONEST ABSENCE (ruling R2), asserted against the LIVE
-            //     graph rather than a fixture: 50 of the 59 paired
-            //     surfaces compose no layout, so at least one row in any
-            //     real view ends at its surface — and the inspector says
-            //     so in words rather than leaving a blank.
-            expect(journeyJobHtml).toContain("composes no layout");
-
-            //     The rail is the complete index and it DIMS rather than
-            //     hides: the job-less view lists strictly more jobs than
-            //     the filtered diagram draws, both counted from their own
-            //     responses. (The rail links every job in the model; the
-            //     well draws one coordinate's worth by default.)
-            const railJobLinkCount = (
-              journeysHtml.match(/class="journey-rail-job"/g) ?? []
-            ).length;
-            const drawnNodeCount = (
-              journeysHtml.match(/react-flow__node-hop/g) ?? []
-            ).length;
-            expect(railJobLinkCount).toBeGreaterThan(drawnNodeCount);
-            //     …and the model is big enough that the default view is
-            //     genuinely a narrowing, which is the scale ruling's
-            //     whole premise.
-            expect(railJobLinkCount).toBeGreaterThan(40);
+            expect(
+              (journeyJobHtml.match(/class="row is-selected"/g) ?? []).length,
+            ).toBe(1);
 
             // 5h. WHO MADE THE REQUESTS. Everything above was fetched with
             //     plain `fetch` — no browser, no client JS — yet a dozen

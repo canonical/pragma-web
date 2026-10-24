@@ -5,7 +5,7 @@
 
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { standardsRoutes } from "#domains/lenses";
+import { standardsRoutes } from "#domains/standards";
 import {
   withProjections,
   withRouter,

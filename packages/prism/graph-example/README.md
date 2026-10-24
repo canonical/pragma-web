@@ -103,7 +103,7 @@ and a data file" literally true.
 | `rdfs:Class`, the metaclass | `EntityMeta.type` on an `OntologyClass` — see Finding B |
 | `geo:Zone` with real instances, in the **second** namespace | `_meta.curie` must resolve a prefix per entity, not hardcode one |
 | `metro:name` (DATATYPE, no domain), `metro:servesLine` (OBJECT, with `inverse`), `metro:note` (ANNOTATION) | all three `PropertyKind` values, `functional`, `inverse`, nullable `domain` |
-| 23 stations + 4 interchanges + 2 fare zones, 7 lines | `instances(first/after/last/before)` with real `hasNextPage` |
+| 22 stations + 4 interchanges + 2 fare zones, 7 lines | `instances(first/after/last/before)` with real `hasNextPage` |
 | four line topologies: linear lines (North, Coastal), a loop run both ways (Circle), two linear lines closing a ring between shared termini (Upland, Lowland), a ring run by two lines in opposite directions (Ringway Clockwise, Ringway Anticlockwise) | the network model a map or a line strip needs — see the network section |
 | `metro:Route`, `metro:Call`, `metro:DiagramPoint`, `metro:UnitPosition`, `metro:CarPosition`, value classes with no instances | `_meta` on a value type: `type` resolved, `curie` the typename, `title` the label or the typename |
 | `metro:RollingStock`, `metro:Formation`, `metro:Unit`, `metro:CarType`, further root classes: 3 stocks, 4 formations, 3 units and 7 car types | Nodes beyond the network, reached through `node(id:)` and `OntologyClass.instances` alone |
@@ -111,7 +111,7 @@ and a data file" literally true.
 | `metro:code`, `metro:position`, `metro:formations`, `metro:length`, `metro:capacity`, `metro:reversed`, global properties two types answer to | a property's local name is the field it projects, so a field two types share is one property with no `domain` |
 | `metro:reverse`, declared its own `inverse` | a symmetric property: `OntologyProperty.inverse` pointing at itself |
 | `metro:ghost` — **no descriptive predicates at all** | the local-name tier of `_meta.title` |
-| `https://metro.example/onto#` — **IRI with an empty local name** | the whole-IRI tier of `_meta.title` |
+| a test-only station at `https://metro.example/onto#` — **IRI with an empty local name**, never served: the namespace IRI is the ontology's own address | the whole-IRI tier of `_meta.title` |
 | `geo:GeoPoint`, an embeddable with no `uri` | the typename tier of `_meta.title` |
 | a station labelled `{"": "Northgate", "fr": "Porte-Nord"}` | `title(lang:)` / `label(lang:)` are genuinely implemented, not accepted and ignored |
 | instance IRIs that live **inside** the declared namespaces | `_meta.curie` can compact at all — see the curie section |
@@ -148,7 +148,7 @@ reached through `node(id:)` and `OntologyClass.instances` like the rest.
   `x` grows east and `y` grows south, the orientation of a screen, so a drawing needs no
   flip; the network is anchored so its smallest `x` and `y` are both 0. Every segment
   between consecutive calls, and the closing segment of a loop, is horizontal, vertical
-  or diagonal. The 25 routed stations have a position; the two bare stations have none.
+  or diagonal. The 25 routed stations have a position; the bare station has none.
 - **`servesLine` and `servedBy` agree with the calls.** Each is stated in the dataset,
   and `src/testing/integration/lineMembership.test.ts` derives each from the routes and
   requires them to match. A station where lines serving different stops meet is an
@@ -487,7 +487,7 @@ contradict the premise that this contract is implementable without pragma's mach
 ## The lens gate, and the two things it does not guard
 
 `src/testing/integration/lensOperations.test.ts` harvests **every** query operation
-declared under its two scan roots — `apps/react/pragma-docs/src/domains/lenses/**` and the
+declared under its two scan roots — `apps/react/pragma-docs/src/domains/guides/**` and the
 `src` of every lens package, `packages/prism/lens-*/src/**`, together the docsite's **core
 lens set** — at run time, from the Relay artifacts, never from a snapshot, and executes each
 one against this provider. The app's artifacts are committed; a lens package's are build
@@ -507,7 +507,7 @@ this provider and the scan roots do not say so on their own:
 | `src/domains/components` | `ComponentsCatalogQuery`, `CatalogListPaginationQuery`, `ComponentEntityQuery` | select `Component` / `Query.component` |
 | `src/domains/marketing` | `LobbyQuery` (the home page) | selects `Component` |
 | `src/domains/playground` | `ComponentProbeQuery` | selects `Query.component` |
-| `src/addons/journeys` | `JourneysExplorerQuery` | selects `jobs` |
+| `src/domains/journeys` | `JourneysExplorerQuery` | selects `jobs` |
 
 All six name pragma-ontology terms this provider's dataset has no class for.
 So what this gate establishes is narrow and worth stating narrowly: **the four
@@ -529,24 +529,24 @@ README used to say the resolution was an owner's decision. **The owner decided**
 words: *"keep it on side for now, it will be an add-on plugin not a core view."*
 
 Journeys is therefore **no longer a core lens**. It lives at
-`apps/react/pragma-docs/src/addons/journeys/**`, which this gate does not scan — and it is
+`apps/react/pragma-docs/src/domains/journeys/**`, which this gate does not scan — and it is
 still fully built, routed, listed in the rail, and covered by its own tests in the app.
-Nothing was deleted. `src/addons/**` is the docsite's home for views that are openly
-pragma-specific and make no neutrality claim; journeys is expected to become a plugin
+Nothing was deleted. The journeys domain is a view that is openly
+pragma-specific and makes no neutrality claim; journeys is expected to become a plugin
 proper once the docsite has a plugin mechanism.
 
 That distinction is the whole point, so state it plainly: **the scanned directories define
-an obligation.** Membership of `src/domains/lenses/**` or of a lens package *is* the promise to be
+an obligation.** Membership of `src/domains/guides/**` or of a lens package *is* the promise to be
 provider-neutral. A view either makes that promise and must execute here, or it is an
 add-on and does not. There is no third state, and nothing sits in the lens tree with an
 exemption.
 
-**`src/addons/**` is not an escape hatch.** Do not make this gate green by narrowing the
+**An add-on domain is not an escape hatch.** Do not make this gate green by narrowing the
 operation set, marking it `it.fails`, adding `skipIf`, gating it behind an env var, or
 moving a core operation into the add-on tree — that last one is narrowing the set under a
 different name, and it is expressly forbidden. Only an owner reclassifying a view as an
 add-on may move one, and the move must land with the reasoning written down (see
-`src/addons/journeys/index.ts`). Every other route converts a real signal into a silent
+`src/domains/journeys/index.ts`). Every other route converts a real signal into a silent
 one, and the operation set must stay directory-derived so a new lens is covered the day it
 lands. The gate also asserts it discovered a non-zero number of operations, so it cannot
 pass vacuously if the app moves.
@@ -561,7 +561,7 @@ Two things it does **not** guard, both worth knowing before trusting a green run
 **It does not guard the app's runtime bindings.** The contract's root surface names no
 subject, so a lens that enumerates things is handed a class URI from outside the graph.
 This gate supplies its OWN (`metro:Station`, in `src/testing/fixtures.ts`); the app
-supplies its own from `apps/react/pragma-docs/src/domains/lenses/standards/constants.ts`. **The two must never
+supplies its own from `apps/react/pragma-docs/src/domains/standards/constants.ts`. **The two must never
 meet.** Importing the app's binding here would make the gate go green because the app
 agreed with itself, when the point is that the operation is neutral about which class it
 is pointed at. The consequence is that an operation can be contract-clean here and still

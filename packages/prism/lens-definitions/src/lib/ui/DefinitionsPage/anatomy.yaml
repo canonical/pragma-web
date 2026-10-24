@@ -1,0 +1,43 @@
+---
+# DefinitionsPage — the content of both definitions routes: the lens's
+# visually hidden heading over the explorer, inside the error and loading
+# boundaries. A subgrid pass-through of the canvas's columns, one released
+# row, so the explorer lands on the page's own lines and the chain canvas,
+# page, explorer, region releases its block claim.
+#
+# Why not a published component: a route's content is the lens's own.
+#
+# The heading is hidden from sight and kept for assistive technology: an
+# empty box out of the flow that clips what it holds. No size token admits
+# the usual one-pixel box, and the empty box holds no decision.
+#
+# Every decision is read through a component token declared on the root
+# (`--definitions-page-*`), bound to the symbol named here.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: prism.component.definitions_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.grid.rows: "minmax(0, 1fr)"
+    spacing.gap: grid.gutter
+    size.block: 100%
+    size.min.block: 0
+  edges:
+    - node:
+        role: heading (visually hidden; the strip's trail is the visible title)
+        styles:
+          layout.position: absolute
+          size.inline: 0
+          size.block: 0
+          layout.overflow: hidden
+          typography.whiteSpace: nowrap
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: loading or error line
+      relation: { cardinality: "0..1" }
+    - node:
+        uri: prism.component.definitions_explorer
+      relation: { cardinality: "0..1", slotName: default }

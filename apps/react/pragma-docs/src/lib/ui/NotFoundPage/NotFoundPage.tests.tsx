@@ -15,7 +15,7 @@ describe("NotFoundPage", () => {
   it("passes native props through and merges a consumer className after its own", () => {
     render(<NotFoundPage className="is-quiet" data-testid="not-found" />);
     expect(screen.getByTestId("not-found").className).toBe(
-      "ds not-found-page is-quiet",
+      "ds prose-page ds not-found-page is-quiet",
     );
   });
 });

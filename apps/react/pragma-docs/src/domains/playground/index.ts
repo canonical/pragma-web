@@ -1,11 +1,14 @@
-export type { ComponentProbeProps } from "./ComponentProbe.js";
-export { default as ComponentProbe } from "./ComponentProbe.js";
+/**
+ * The playground domain: one component off the live graph in every form
+ * the site projects it in, its route, its warm step and its layout.
+ *
+ * @module
+ */
+
 export { default as playgroundLayout } from "./layout.js";
-export { default as PlaygroundPage } from "./PlaygroundPage.js";
 export {
   componentProbeQueryNode,
   componentProbeVariables,
   PROBE_URI,
-  RELATION_PAGE_SIZE,
 } from "./probeQuery.js";
 export { default as playgroundRoutes } from "./routes.js";

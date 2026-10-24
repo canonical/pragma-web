@@ -1,4 +1,9 @@
-export { default as AccountPage } from "./AccountPage.js";
-export { default as LoginPage } from "./LoginPage.js";
+/**
+ * The account domain: the demo sign-in page and the protected account page
+ * the demo guard keeps, and their layout.
+ *
+ * @module
+ */
+
 export { default as accountLayout } from "./layout.js";
 export { default as accountRoutes } from "./routes.js";

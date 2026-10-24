@@ -1,0 +1,247 @@
+// @vitest-environment node
+
+/**
+ * The journey join, pinned — and with it the two claims the lens makes
+ * that are easiest to get quietly wrong.
+ *
+ * 1. THE UNION IS COMPLETE. Pairings arrive as two overlapping windows,
+ *    and a pairing in both is one pairing. If the merge ever degraded to
+ *    concatenation the diagram would sprout duplicate rows; if it degraded
+ *    to "first window only" it would silently lose 13 of 51 jobs.
+ *
+ * 2. EVERY LINK GOES SOMEWHERE REAL. `SURFACE_ROUTES` is hand-written,
+ *    so it is exactly the kind of table that rots into dead links. The
+ *    route test below reads the app's own route table and asserts every
+ *    route the table names is one of its parameterless routes — a surface
+ *    with no route must render as text, never as a link to a 404.
+ */
+
+import { describe, expect, it } from "vitest";
+import { appRoutes } from "../../routes.js";
+import {
+  collectJourneys,
+  describeCoordinate,
+  findRouteForSurface,
+  type RawJob,
+  type RawPairing,
+  readAxisTerm,
+  readJobGist,
+  readLocalName,
+} from "./collectJourneys.js";
+import { SURFACE_ROUTES } from "./constants.js";
+
+const DOCS = "sem://design-system-docs#";
+
+const COORDINATE = {
+  uri: `${DOCS}coordinate.maker-duo`,
+  actors: { edges: [{ node: { uri: "surface:Human" } }] },
+  roles: {
+    edges: [
+      { node: { uri: `${DOCS}role.designer` } },
+      { node: { uri: `${DOCS}role.engineer` } },
+    ],
+  },
+  fluencies: { edges: [] },
+};
+
+const JOBS: readonly RawJob[] = [
+  {
+    uri: `${DOCS}job.l3`,
+    story: "When I browse, I want a catalog…",
+    acceptances: ["the grid lists every component"],
+    coordinates: COORDINATE,
+  },
+  {
+    uri: `${DOCS}job.b2`,
+    story: "When I integrate, I want usage…",
+    acceptances: [],
+    coordinates: COORDINATE,
+  },
+];
+
+const PAIRING_A: RawPairing = {
+  uri: `${DOCS}pairing.l3-components`,
+  pairingRole: { uri: "surface:Primary" },
+  forJob: { uri: `${DOCS}job.l3` },
+  arrivals: { edges: [{ node: { uri: "surface:ColdEntry" } }] },
+  pairsSurface: {
+    __typename: "Lens",
+    uri: `${DOCS}view.components`,
+    composes: {
+      edges: [{ node: { uri: `${DOCS}layout.catalog`, name: "Catalog" } }],
+    },
+  },
+};
+
+const PAIRING_B: RawPairing = {
+  uri: `${DOCS}pairing.b2-chips`,
+  pairingRole: { uri: "surface:Secondary" },
+  forJob: { uri: `${DOCS}job.b2` },
+  // No arrival — the honest 34-of-133 case.
+  arrivals: { edges: [] },
+  pairsSurface: {
+    __typename: "Mechanism",
+    uri: `${DOCS}view.chips`,
+    // Composes nothing — the honest majority case.
+    composes: { edges: [] },
+  },
+};
+
+describe("collectJourneys", () => {
+  it("merges the two windows by URI rather than concatenating", () => {
+    // PAIRING_A appears in BOTH windows, exactly as the real overlap does.
+    const result = collectJourneys(JOBS, [[PAIRING_A, PAIRING_B], [PAIRING_A]]);
+    const l3 = result[0]?.jobs.find((job) => job.uri === `${DOCS}job.l3`);
+    expect(l3?.pairings).toHaveLength(1);
+  });
+
+  it("groups every job under its coordinate", () => {
+    const result = collectJourneys(JOBS, [[PAIRING_A, PAIRING_B]]);
+    expect(result).toHaveLength(1);
+    expect(result[0]?.jobs.map((job) => job.uri).sort()).toStrictEqual([
+      `${DOCS}job.b2`,
+      `${DOCS}job.l3`,
+    ]);
+  });
+
+  it("keeps a job whose pairings are missing entirely", () => {
+    const result = collectJourneys(JOBS, [[PAIRING_A]]);
+    const b2 = result[0]?.jobs.find((job) => job.uri === `${DOCS}job.b2`);
+    // Demand nothing serves must survive the join — it is the finding.
+    expect(b2).toBeDefined();
+    expect(b2?.pairings).toStrictEqual([]);
+  });
+
+  it("carries absent arrival and absent layout through as undefined", () => {
+    const result = collectJourneys(JOBS, [[PAIRING_B]]);
+    const pairing = result[0]?.jobs.find((job) => job.uri === `${DOCS}job.b2`)
+      ?.pairings[0];
+    expect(pairing?.arrival).toBeUndefined();
+    expect(pairing?.surface?.layout).toBeUndefined();
+  });
+
+  it("drops a coordinate-less job rather than inventing a root", () => {
+    const orphan: RawJob = { uri: `${DOCS}job.nowhere`, coordinates: null };
+    const result = collectJourneys([...JOBS, orphan], [[PAIRING_A]]);
+    const all = result.flatMap((coordinate) => coordinate.jobs);
+    expect(all.some((job) => job.uri === `${DOCS}job.nowhere`)).toBe(false);
+  });
+});
+
+describe("describeCoordinate", () => {
+  it("spells the axes out in words", () => {
+    expect(describeCoordinate(COORDINATE)).toBe(
+      "Human × designer or engineer × any fluency",
+    );
+  });
+
+  it("reports an absent axis as 'any' — the ontology's own wildcard rule", () => {
+    // Not padding: the surface ontology states that an unconstrained role
+    // or fluency axis matches ANY value. "any role" reports that fact.
+    expect(describeCoordinate({ uri: "x", actors: null })).toBe(
+      "any actor × any role × any fluency",
+    );
+  });
+});
+
+describe("readLocalName", () => {
+  it("reads the local part of both URI forms", () => {
+    expect(readLocalName(`${DOCS}job.l3`)).toBe("job.l3");
+    expect(readLocalName("surface:Primary")).toBe("Primary");
+  });
+});
+
+describe("readJobGist — the rail's legible label (FIX 1)", () => {
+  it("leads with the story's first clause, not the filing slug", () => {
+    expect(
+      readJobGist({
+        uri: `${DOCS}job.a1`,
+        label: "job.a1",
+        story: "When I open a component cold, I want its anatomy first",
+      }),
+    ).toBe("When I open a component cold");
+  });
+
+  it("returns a short whole story unbroken", () => {
+    expect(
+      readJobGist({ uri: `${DOCS}job.s3`, story: "I want the tokens listed" }),
+    ).toBe("I want the tokens listed");
+  });
+
+  it("hard-caps a long clause with an ellipsis rather than the raw slug", () => {
+    const story =
+      "When I am integrating a brand new component into an existing product surface without any documentation at all";
+    const gist = readJobGist({ uri: `${DOCS}job.b10`, story });
+    expect(gist.endsWith("…")).toBe(true);
+    expect(gist.length).toBeLessThanOrEqual(74);
+    // The point of the fix: never the illegible slug when a story exists.
+    expect(gist).not.toBe("job.b10");
+  });
+
+  it("falls back to the slug for a storyless job — the honest last resort", () => {
+    expect(readJobGist({ uri: `${DOCS}job.orphan`, label: "job.orphan" })).toBe(
+      "job.orphan",
+    );
+    expect(readJobGist({ uri: `${DOCS}job.orphan`, story: "   " })).toBe(
+      "job.orphan",
+    );
+  });
+
+  it("prefers a real label over both story and slug when one is carried", () => {
+    expect(
+      readJobGist({
+        uri: `${DOCS}job.a1`,
+        label: "Browse the catalogue",
+        story: "When I browse, …",
+      }),
+    ).toBe("Browse the catalogue");
+  });
+});
+
+describe("collectJourneys threads the story to each job", () => {
+  it("carries a job's story through the join for the rail to read", () => {
+    const result = collectJourneys(JOBS, [[PAIRING_A]]);
+    const l3 = result[0]?.jobs.find((job) => job.uri === `${DOCS}job.l3`);
+    expect(l3?.story).toBe("When I browse, I want a catalog…");
+  });
+});
+
+describe("readAxisTerm", () => {
+  it("strips the graph's filing prefix to recover the ontology's word", () => {
+    // `role.designer` is a Turtle filing name; the ontology's label is
+    // "designer". Recovering it is reporting the graph, not renaming it.
+    expect(readAxisTerm(`${DOCS}role.designer`)).toBe("designer");
+    expect(readAxisTerm("surface:Newcomer")).toBe("Newcomer");
+  });
+
+  it("strips only the three known filing prefixes", () => {
+    // A term that genuinely contains a dot must keep it.
+    expect(readAxisTerm(`${DOCS}view.section-usage`)).toBe(
+      "view.section-usage",
+    );
+  });
+});
+
+describe("SURFACE_ROUTES", () => {
+  it("names only parameterless routes the app actually declares", () => {
+    // The table is hand-written; this reads the real route table, so a
+    // surface can never link to a page that does not exist, and a link
+    // built from a name alone never misses a parameter.
+    for (const name of SURFACE_ROUTES.values()) {
+      const route = appRoutes[name];
+      expect(route, `${name} must be a declared route`).toBeDefined();
+      expect(route.url, `${name} must take no parameter`).not.toContain(":");
+    }
+  });
+
+  it("finds the route a surface the site renders lands on", () => {
+    expect(findRouteForSurface(`${DOCS}view.components`)).toBe("components");
+    expect(findRouteForSurface("surface:view.home")).toBe("home");
+  });
+
+  it("returns undefined for a surface the site does not render", () => {
+    // Honest absence: the inspector renders these as text, not dead links.
+    expect(findRouteForSurface(`${DOCS}view.chips`)).toBeUndefined();
+    expect(findRouteForSurface(`${DOCS}view.editor`)).toBeUndefined();
+  });
+});

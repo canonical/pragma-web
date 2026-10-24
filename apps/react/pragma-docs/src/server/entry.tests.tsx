@@ -83,11 +83,11 @@ describe("EntryServer against a cold store", () => {
     // …and the lobby's authored prose, which sits OUTSIDE the Suspense
     // boundary precisely so it survives a graph miss.
     expect(html).toContain('id="lobby-title"');
-    expect(html).toContain('data-slot="hero"');
+    expect(html).toContain('class="hero editorial content-flow"');
 
     // The graph-dependent bands are honestly absent rather than faked.
-    expect(html).not.toContain('data-slot="doors"');
-    expect(html).not.toContain('data-slot="examples"');
+    expect(html).not.toContain('id="lobby-doors-title"');
+    expect(html).not.toContain('id="lobby-examples-title"');
   });
 
   it("does the same for the other data-bearing lens routes", async () => {
@@ -235,7 +235,7 @@ describe("EntryServer's not-found page", () => {
     expect(html).toContain('data-region="primary-nav"');
     expect(html).toContain('<div class="colophon">');
     expect(html).toMatch(
-      /<main class="ds canvas canvas"[^>]*><div class="page"><section class="ds not-found-page">/,
+      /<main class="ds canvas canvas"[^>]*><div class="page"><section aria-labelledby="not-found-title" class="ds prose-page ds not-found-page">/,
     );
   });
 });

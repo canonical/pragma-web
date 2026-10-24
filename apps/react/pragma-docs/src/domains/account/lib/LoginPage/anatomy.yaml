@@ -1,0 +1,17 @@
+---
+# LoginPage — the demo sign-in page: the prose page with its title, how to
+# simulate a sign-in, and, after a redirect, where the reader returns to.
+# It renders no element of its own: the prose page renders the root.
+node:
+  uri: docs.component.login_page
+  edges:
+    - node:
+        uri: docs.component.prose_page
+        edges:
+          - node:
+              role: title
+            relation: { cardinality: "1", slotName: heading }
+          - node:
+              role: copy (the instruction, then the return line when the address names one)
+            relation: { cardinality: "1", slotName: prose }
+      relation: { cardinality: "1" }

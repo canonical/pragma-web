@@ -91,7 +91,7 @@ describe("platform lengths", () => {
     }
   });
 
-  it("measures none at the two stations no route calls at", () => {
+  it("measures none at the station no route calls at", () => {
     const bare = fleet.stations.filter((station) =>
       BARE_STATION_URIS.some((uri) => uri === station.uri),
     );

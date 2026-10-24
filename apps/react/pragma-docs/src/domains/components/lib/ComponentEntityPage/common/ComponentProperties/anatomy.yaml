@@ -1,0 +1,132 @@
+---
+# ComponentProperties — the component page's third section: the block's
+# configurable properties as a table across the whole main column (name,
+# type, optional, default, constraints, summary), in plain text as the
+# graph holds them. A table wider than the column scrolls inside its own
+# region, never widening the page. Each cell sits on the matrix's 32px row
+# (4px block insets on the 24px line) under a hairline rule, one default
+# gap before the next column; header cells are bold and muted. A block
+# with no properties leaves one muted line. Its root is the page section's.
+#
+# Bespoke: no published table component.
+#
+# Every decision is read through a component token declared on the root
+# (`--component-properties-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   space.050 (4px) block insets: they stand a cell at 32px on a 24px line,
+#     the list entry's row; the shim's block padding (8px) would make 40px.
+#   appearance.border.width 1px: the rule. Border sides "none none solid":
+#     a keyword vocabulary, the bottom rule alone.
+#   layout.grid.column "1 / -1", size.width 100%: structure. The 0 resets.
+#
+# Roster namespaces (accepted and tracked): space.050,
+# container.gap.default, the semantic typography symbol
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: docs.subcomponent.component_properties
+  projection:
+    on: Component
+  edges:
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              role: absent (the catalog's line for a block with no properties)
+              styles:
+                layout.grid.column: "1 / -1"
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: absent }
+          - node:
+              role: scroll (the table's own scrolling region)
+              styles:
+                layout.grid.column: "1 / -1"
+                layout.overflow.inline: auto
+                size.min.width: 0
+              edges:
+                - node:
+                    role: table
+                    styles:
+                      size.width: 100%
+                      layout.table.collapse: collapse
+                    edges:
+                      - node:
+                          role: head (a column's header cell)
+                          styles:
+                            typography.align: start
+                            typography.color: color.text.muted
+                            typography.weight: typography.text.primary.bold.fontWeight
+                            spacing.internal.block.start: space.050
+                            spacing.internal.block.end: space.050
+                            spacing.internal.inline.start: 0
+                            spacing.internal.inline.end: container.gap.default
+                            appearance.border.width: 1px
+                            appearance.border.style: "none none solid"
+                            appearance.border.bottom.color: color.border.muted
+                        relation: { cardinality: "6", slotName: head }
+                      - node:
+                          role: property row
+                          edges:
+                            - node:
+                                role: name (the row's header cell)
+                                projection:
+                                  field: name
+                                styles:
+                                  typography.align: start
+                                  layout.verticalAlign: top
+                                  spacing.internal.block.start: space.050
+                                  spacing.internal.block.end: space.050
+                                  spacing.internal.inline.start: 0
+                                  spacing.internal.inline.end: container.gap.default
+                                  appearance.border.width: 1px
+                                  appearance.border.style: "none none solid"
+                                  appearance.border.bottom.color: color.border.muted
+                              relation: { cardinality: "1", slotName: name }
+                            - node:
+                                role: cell
+                                styles:
+                                  typography.align: start
+                                  layout.verticalAlign: top
+                                  spacing.internal.block.start: space.050
+                                  spacing.internal.block.end: space.050
+                                  spacing.internal.inline.start: 0
+                                  spacing.internal.inline.end: container.gap.default
+                                  appearance.border.width: 1px
+                                  appearance.border.style: "none none solid"
+                                  appearance.border.bottom.color: color.border.muted
+                                edges:
+                                  - node:
+                                      role: type
+                                      projection:
+                                        field: propertyType
+                                    relation: { cardinality: "0..1" }
+                                  - node:
+                                      role: optional
+                                      projection:
+                                        field: optional
+                                    relation: { cardinality: "0..1" }
+                                  - node:
+                                      role: default
+                                      projection:
+                                        field: defaultValue
+                                    relation: { cardinality: "0..1" }
+                                  - node:
+                                      role: constraints
+                                      projection:
+                                        field: constraints
+                                    relation: { cardinality: "0..1" }
+                                  - node:
+                                      role: summary
+                                      projection:
+                                        field: summary
+                                    relation: { cardinality: "0..1" }
+                              relation: { cardinality: "5", slotName: cell }
+                        relation:
+                          cardinality: "1..*"
+                          projection:
+                            field: properties
+                  relation: { cardinality: "1", slotName: table }
+            relation: { cardinality: "0..1", slotName: scroll }
+      relation: { cardinality: "1" }

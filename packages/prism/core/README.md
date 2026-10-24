@@ -9,7 +9,8 @@ package holds the parts every such site needs and none of them owns:
   `WorkspaceLayout` and `DocumentLayout`, the components they place —
   `Rail`, `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`),
   `Canvas`, `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page
-  needs, `ErrorBoundary` and `ClientOnly`.
+  needs, `ErrorBoundary` and `ClientOnly`; and `KeyValueList`, the key
+  values a page lays on its grid.
 - **MentionChip**: the inline mention of a graph entity, tinted by its
   namespace, shaped by its kind, filled or outlined by class vs instance,
   and dotted by lifecycle; `ChipLegend` explains the grammar.
@@ -52,8 +53,9 @@ each a subgrid over every column:
 
 - `WorkspaceLayout`: a page that fills the viewport and never scrolls. The
   rail takes the first two columns, the strip the rest of the top row, the
-  canvas the body, and an `inspector` the last three columns of the body;
-  the rail and the inspector scroll on their own. Below three groups of
+  canvas the body, and an `inspector` the last three columns of the body,
+  a subgrid of them its content can sit on; the rail and the inspector
+  scroll on their own. Below three groups of
   columns the inspector moves into the published `SidePanel` drawer, which
   a trigger at the canvas's corner opens.
 - `DocumentLayout`: a page whose canvas is the one scrolling region, with
@@ -336,11 +338,29 @@ site's own catalog, and the factory holds no reader-facing string.
   `WorkspaceLayoutProps`, `DocumentLayoutProps`.
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
   `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
-  `ModeStrip`, `Rail`, `ThemeSelector`; types `MentionChipProps`,
+  `ModeStrip`, `Rail`, `ThemeSelector`, `KeyValueList` (key values on the
+  page's grid, each key on the main column's first two columns and its
+  value from the third); types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
-  `ThemeSelectorProps`.
+  `ThemeSelectorProps`, `KeyValueListProps`, `KeyValuePair`.
+- Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
+  lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
+  show only the text that renders at 12px or more; types
+  `GraphCanvasProps`, `GraphBox`, `GraphCameraMemory` (where a camera
+  stood, in screen terms, which a canvas mounted again on the same memory
+  resumes), `GraphFrameRequest` (a one-off fit the
+  camera makes once per serial), `GraphLegibleWindow` (the window a refit
+  shows of a box too large for the legible zoom), `GraphOpening` (the
+  camera a canvas opens on once the client has measured it, and again when
+  a resize shrinks an unmoved camera's view below the legible zoom),
+  `GraphTransform`, `GraphZoomBucket`. A refit never zooms a legible view
+  out to an illegible one; Fit fits the whole graph, below the wheel's
+  floor when it must but never into the overview (a graph too large for
+  12/16 on screen shows from its top-left corner at that zoom, the rest a
+  pan away), and the camera pans over the graph's whole bounds however
+  small a window of it the viewBox opens on.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.

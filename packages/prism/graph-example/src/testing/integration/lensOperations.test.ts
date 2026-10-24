@@ -3,7 +3,7 @@
 // execute against a provider that has never heard of pragma.
 //
 // WHAT THE SCANNED DIRECTORIES MEAN, AND WHAT THEY DO NOT.
-// `apps/react/pragma-docs/src/domains/lenses/**` and the `src` of every lens
+// `apps/react/pragma-docs/src/domains/guides/**` and the `src` of every lens
 // package (`packages/prism/lens-*/src/**`) are the docsite's CORE LENS SET,
 // and this gate's subject is exactly those directories — never a
 // hand-maintained allowlist. Membership of the core set IS the obligation to
@@ -19,7 +19,7 @@
 //                            ComponentEntityQuery
 //   src/domains/marketing    LobbyQuery  (the home page)
 //   src/domains/playground   ComponentProbeQuery
-//   src/addons/journeys      JourneysExplorerQuery
+//   src/domains/journeys     JourneysExplorerQuery
 //
 // The first five select `Component` or `Query.component` — pragma-ontology
 // terms this provider's dataset has no class for — so widening the app's root
@@ -28,24 +28,24 @@
 // direction; `lensOperations.ts` carries the same enumeration beside the path
 // constant so the two cannot drift.
 //
-// The sixth is different in kind. `src/addons/**` holds views that are openly
-// pragma-specific — they read pragma's own ontology and make no claim to run
-// anywhere else — and are expected to become plugins once the docsite has a
-// plugin mechanism. An add-on is NOT a core lens, so it owes this gate
+// The sixth is different in kind. `src/domains/journeys` holds a view that
+// is openly pragma-specific — it reads pragma's own ontology and makes no
+// claim to run anywhere else — and is expected to become a plugin once the
+// docsite has a plugin mechanism. An add-on is NOT a core lens, so it owes this gate
 // nothing, while remaining fully built, routed and tested in the app.
 // `JourneysExplorerQuery` was moved there by an OWNER DECISION, recorded
 // verbatim: "keep it on side for now, it will be an add-on plugin not a core
 // view." It was reclassified because it is not a core view; it was not
 // reclassified because it was red.
 //
-// 🔴 `src/addons/**` IS NOT AN ESCAPE HATCH. A red operation does not get to
+// 🔴 AN ADD-ON DOMAIN IS NOT AN ESCAPE HATCH. A red operation does not get to
 // move there. If a lens is meant to be part of the core set and cannot execute
 // against this provider, the answer is to despecialise the operation — the
 // failure report below is the to-do list. Relocating a core operation out of
 // the scanned directories is "narrowing the operation set" under another name,
 // and it is exactly the failure mode this gate exists to catch. Only an owner
 // reclassifying a view as an add-on can move one, and the move must land with
-// that reasoning written down (see `src/addons/journeys/index.ts`, which
+// that reasoning written down (see `src/domains/journeys/index.ts`, which
 // states what the contract cannot express and why).
 //
 // Journeys is on side for a reason no rewrite can fix: the contract exposes an
@@ -245,7 +245,7 @@ const buildReport = (failures: readonly OperationFailure[]): string =>
     "",
     "Do NOT fix this by narrowing the operation set, by marking the test " +
       "`fails`, by gating it on an env var, or by relocating the operation " +
-      "into src/addons — that last one is narrowing the set under another " +
+      "into an add-on domain — that last one is narrowing the set under another " +
       "name, and only an owner reclassifying a view as a pragma-specific " +
       "add-on may move it. The list above IS the remaining despecialisation " +
       "work.",

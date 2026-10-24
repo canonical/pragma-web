@@ -1,0 +1,17 @@
+---
+# SiteDefinitionsLayout — the Definitions lens's layout with the site's
+# rail bound to it. It renders no element of its own: DefinitionsLayout
+# renders the root.
+node:
+  uri: docs.component.site_definitions_layout
+  edges:
+    - node:
+        uri: prism.component.definitions_layout
+        edges:
+          - node:
+              uri: docs.component.site_rail
+            relation: { cardinality: "1", slotName: rail }
+          - node:
+              role: routed page
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1" }
