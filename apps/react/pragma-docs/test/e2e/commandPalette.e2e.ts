@@ -5,12 +5,13 @@
  * graph server alongside) serves the lobby, and Chromium drives the palette
  * as a reader does. Ctrl+K opens it with the field focused; a component's
  * title lists its matches with the first highlighted and its card in the
- * preview; the arrow keys move the highlight and the preview with it; Enter
- * opens the highlighted result's home without loading a new document and
- * closes the palette, as following the preview's link does; Cmd+K reopens
- * it empty and Escape closes it. On a phone the open palette fits the
- * viewport less a gutter at each side, scrolls nothing sideways, and shows
- * no preview.
+ * preview; the arrow keys move the highlight and the preview with it; Tab
+ * leaves the field for the preview's link, never for the scrolling results;
+ * Enter opens the highlighted result's home without loading a new document
+ * and closes the palette, as following the preview's link does; Cmd+K
+ * reopens it empty and Escape closes it. On a phone the open palette fits
+ * the viewport less a gutter at each side, scrolls nothing sideways, and
+ * shows no preview.
  */
 import {
   launchBrowser,
@@ -167,6 +168,23 @@ describe("the command palette", () => {
     expect(await findPreviewLink(page).textContent()).toBe(
       await readSelectedTitle(page),
     );
+  });
+
+  it("tabs from the field to the preview's link past the scrolling results", async () => {
+    const page = await openLobby();
+    await search(page, COMPONENT_TITLE);
+    const results = findPalette(page).getByRole("listbox");
+    expect(
+      await results.evaluate(
+        (listbox) => listbox.scrollHeight > listbox.clientHeight,
+      ),
+    ).toBe(true);
+    await page.keyboard.press("Tab");
+    expect(
+      await findPreviewLink(page).evaluate(
+        (link) => link === document.activeElement,
+      ),
+    ).toBe(true);
   });
 
   it("opens the highlighted result's home with Enter, without loading a new document", async () => {
