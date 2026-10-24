@@ -77,6 +77,9 @@ export const MESSAGES = {
   "lobby.doors.guides.title": "Guides",
   "lobby.doors.guides.summary":
     "Long-form orientation. A placeholder for now — the reading views are not built yet.",
+  "lobby.doors.journeys.title": "Journeys",
+  "lobby.doors.journeys.summary":
+    "The jobs readers come to do, each traced to the surfaces that serve it, and the ones nothing serves yet.",
   "anatomy.slot": "{slot} · {cardinality}",
   "anatomy.cardinality": "{cardinality}",
   "anatomy.switch": "switch on {discriminator}",

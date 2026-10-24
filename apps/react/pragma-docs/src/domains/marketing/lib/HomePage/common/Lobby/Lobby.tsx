@@ -73,7 +73,10 @@ const componentCssClassName = "ds lobby";
  * to the lenses as cards in the shared list view, each linked to its lens
  * with a sentence on what it holds and the graph's count where the schema
  * gives one. A class the store lacks leaves its count out rather than
- * printing a zero; with no exemplars the first section is left out.
+ * printing a zero; with no exemplars the first section is left out. The
+ * Journeys door carries no count: the demand model is not in every graph
+ * the site reads, and a field the graph lacks would fail the whole
+ * operation, so the lobby never selects it.
  *
  * `import { Lobby } from "./common/index.js";`
  *
@@ -160,6 +163,12 @@ export default function Lobby({
             LinkComponent={RouterLink}
             summary={t("lobby.doors.guides.summary")}
             title={t("lobby.doors.guides.title")}
+          />
+          <EntityCard
+            href={router.buildPath("journeys")}
+            LinkComponent={RouterLink}
+            summary={t("lobby.doors.journeys.summary")}
+            title={t("lobby.doors.journeys.title")}
           />
         </EntityList>
       </PageSection>

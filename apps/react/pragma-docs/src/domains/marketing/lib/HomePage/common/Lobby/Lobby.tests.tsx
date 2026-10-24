@@ -73,7 +73,13 @@ describe("Lobby", () => {
       const cards = [...doors.querySelectorAll(".ds.entity-card")];
       expect(
         cards.map((card) => card.querySelector("a")?.getAttribute("href")),
-      ).toEqual(["/components", "/definitions", "/standards", "/guides"]);
+      ).toEqual([
+        "/components",
+        "/definitions",
+        "/standards",
+        "/guides",
+        "/journeys",
+      ]);
       const vitals = cards.map((card) =>
         [...card.querySelectorAll(".vital")].map((vital) => vital.textContent),
       );
@@ -84,6 +90,7 @@ describe("Lobby", () => {
         ],
         [],
         [`${readCapturedCount(LOBBY_STANDARD_CLASS)} standards`],
+        [],
         [],
       ]);
       // The standards figure is the one a capped edge count would have lied
