@@ -25,10 +25,12 @@
     --journey-table-small: var(--typography-text-secondary-font-size);
     --journey-table-bold: var(--typography-text-primary-bold-font-weight);
     --journey-table-regular: var(--typography-text-primary-font-weight);
-    --journey-table-expander-size: 1.5rem;
+    --journey-table-expander-size: var(--space-300);
     --journey-table-expander-radius: 0.25rem;
     --journey-table-pill-radius: 999px;
-    --journey-table-story-measure: 28rem;
+    /* One group of the intrinsic grid's columns: the measure follows the
+     * grid's column floor. */
+    --journey-table-story-measure: calc(4 * var(--grid-col-min));
 
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);

@@ -38,16 +38,19 @@
 #   space.050 (4px) block insets: they stand a cell at 32px on a 24px
 #     line, the list entry's row. space.050, space.100: the stacks' and the
 #     controls' gaps; flex gaps read no container gap.
+#   space.300 (24px): the expander's square, the line's height.
 #   1px: the hairlines. 0.25rem: the expander's corner. 999px: the state's
-#     pill; no radius token is a pill. 1.5rem: the expander's square.
-#     28rem: the story's measure in the job cell.
+#     pill; no radius token is a pill.
+#   size.max.width "calc(4 * var(--grid-col-min))": the story's measure in
+#     the job cell, one group of the intrinsic grid's columns, so it
+#     follows the grid's column floor.
 #   layout.grid.rows "auto minmax(0, 1fr)", size.width 100%,
 #     layout.position sticky, layout.table.collapse: structure. The 0
 #     resets and offsets. The hidden label is an empty box out of the flow
 #     that clips its text, the page heading's idiom.
 #
 # Roster namespaces (accepted and tracked): grid.gutter, space.050,
-# space.100, container.gap.default, component.padding.block,
+# space.100, space.300, container.gap.default, component.padding.block,
 # component.padding.inline, and the semantic typography symbols.
 node:
   uri: docs.component.journey_table
@@ -232,8 +235,8 @@ node:
                                         - node:
                                             role: expander (a square toggle)
                                             styles:
-                                              size.width: 1.5rem
-                                              size.height: 1.5rem
+                                              size.width: space.300
+                                              size.height: space.300
                                               spacing.internal.block.start: 0
                                               spacing.internal.block.end: 0
                                               spacing.internal.inline.start: 0
@@ -256,7 +259,7 @@ node:
                                             role: story (cut to one line)
                                             styles:
                                               layout.type: block
-                                              size.max.width: 28rem
+                                              size.max.width: "calc(4 * var(--grid-col-min))"
                                               layout.overflow: hidden
                                               typography.overflow: ellipsis
                                               typography.whiteSpace: nowrap

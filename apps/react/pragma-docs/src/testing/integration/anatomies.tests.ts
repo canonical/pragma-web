@@ -26,7 +26,11 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
   .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"))
   .filter((library) => existsSync(library));
 
-/** The semantic tokens the app's components read beyond the shim. */
+/**
+ * The tokens the app's components read beyond the shim: the semantic
+ * tokens, and the intrinsic grid's column floor, which a measure that
+ * follows the grid reads.
+ */
 const EXTERNAL_TOKENS = [
   "--color-background",
   "--color-background-container",
@@ -37,6 +41,7 @@ const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-branded",
   "--color-text-muted",
+  "--grid-col-min",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-code-font-family",
   "--typography-text-primary-font-weight",
