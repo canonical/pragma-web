@@ -41,9 +41,12 @@ export interface ViteMiddlewareServer {
  * instance is injected, not imported, keeping this module free of a runtime
  * Vite dependency.
  *
- * The response body is **buffered**: chunks written by the middleware are
- * collected and the `Response` resolves on `end`, with `status` and `headers`
- * read from the (by-then-final) `ServerResponse`. This is correct and robust
+ * The response body is **buffered**: chunks written by the middleware, text
+ * or binary, are collected and the `Response` resolves on `end`, with
+ * `status` and `headers` read from the (by-then-final) `ServerResponse`.
+ * Every `write` is accepted at once, so a file Vite's static middleware
+ * pipes from disk (a font, an image) arrives whole rather than stalling on
+ * backpressure from a response with no socket to drain into. This is correct and robust
  * for dev assets — transformed JS/CSS modules and source maps, which are small
  * and already in memory when Vite writes them. Streaming would buy near-zero
  * latency here (SSR render streaming goes through the renderer's
@@ -117,7 +120,6 @@ export function viteFetchMiddleware(
       const res = new ServerResponse(req);
 
       const chunks: Buffer[] = [];
-      const originalWrite = res.write.bind(res);
       const originalEnd = res.end.bind(res);
       const originalWriteHead = res.writeHead.bind(res);
 
@@ -139,12 +141,26 @@ export function viteFetchMiddleware(
         )(statusCode, ...rest);
       }) as ServerResponse["writeHead"];
 
+      // The response has no socket, so nothing ever drains what it holds:
+      // handing a chunk on to it would report backpressure once 16 KiB were
+      // pending, and a stream piped into it (Vite's static middleware pipes
+      // fonts, images and other files from disk) would pause for a `drain`
+      // that never comes, so the body would never end. The chunk is kept
+      // here instead, its callback called, and the writer told to go on.
       res.write = ((chunk: unknown, ...rest: unknown[]) => {
-        chunks.push(Buffer.from(chunk as Uint8Array));
-        return (originalWrite as (...args: unknown[]) => boolean)(
-          chunk,
-          ...rest,
+        const encoding = rest.find(
+          (arg): arg is BufferEncoding => typeof arg === "string",
         );
+        chunks.push(
+          typeof chunk === "string"
+            ? Buffer.from(chunk, encoding)
+            : Buffer.from(chunk as Uint8Array),
+        );
+        const callback = rest.find(
+          (arg): arg is () => void => typeof arg === "function",
+        );
+        if (callback !== undefined) queueMicrotask(callback);
+        return true;
       }) as ServerResponse["write"];
 
       res.end = ((chunk: unknown, ...rest: unknown[]) => {
