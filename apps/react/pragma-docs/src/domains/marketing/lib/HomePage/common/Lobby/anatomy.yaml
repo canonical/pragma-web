@@ -1,6 +1,10 @@
 ---
 # Lobby — the lobby's two projections of the graph, from one operation:
-#   - a few components, as the site's chips, in the graph's own order;
+#   - a few components, as the site's chips, in the graph's own order and
+#     one per title: where a title spans tiers the global tier's block
+#     stands for it, so no two chips read the same and lead to different
+#     pages. The chip stays the title alone, as the Figma's UI-block chip
+#     is; the choice is the lobby's, from the first components it reads;
 #   - the doors to the lenses, as cards in the shared list view: each lens
 #     linked to its page, with a sentence on what it holds and the graph's
 #     count where the schema gives one (no count for Definitions or

@@ -51,7 +51,7 @@ export const MESSAGES = {
   "lobby.loading": "Loading the graph’s shape…",
   "lobby.examples.title": "A few of the components",
   "lobby.examples.lead":
-    "Read live, in the graph’s own order. The names span tiers — global entries sit beside application ones, because the graph does not privilege either.",
+    "Read live, in the graph’s own order, one per name: where a name spans tiers, the global component stands for it.",
   "lobby.doors.title": "The lenses",
   "lobby.doors.components.title": "Components",
   "lobby.doors.components.summary":

@@ -7,6 +7,7 @@ export { default as marketingLayout } from "./layout.js";
 export { HomeIcon } from "./lib/HomeIcon/index.js";
 export {
   LOBBY_EXEMPLAR_COUNT,
+  LOBBY_EXEMPLAR_POOL,
   lobbyQueryNode,
   lobbyVariables,
 } from "./lobbyQuery.js";

@@ -84,8 +84,9 @@ const JS_CONTENT_TYPE = /javascript/;
 const CONNECTION_PAGE_CAP = 100;
 
 /**
- * How many exemplars the lobby's strip asks the graph for (mirrors
- * `LOBBY_EXEMPLAR_COUNT` in `#domains/marketing/lobbyQuery.js`). Same
+ * How many exemplars the lobby's strip shows, one per name, chosen from
+ * the components it reads (mirrors `LOBBY_EXEMPLAR_COUNT` in
+ * `#domains/marketing/lobbyQuery.js`). Same
  * black-box rationale; a change there without a change here fails loudly
  * in the home block below, which is the intent.
  */
@@ -615,12 +616,12 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(homeHtml).toContain("__INITIAL_DATA__");
             expect(homeHtml).toContain('"records"');
 
-            //     Projection 1 — the exemplar strip. The strip asks the
-            //     graph for exactly LOBBY_EXEMPLAR_COUNT instances, so
+            //     Projection 1 — the exemplar strip. The strip shows
+            //     exactly LOBBY_EXEMPLAR_COUNT chips, one per name, so
             //     the rendered link count must equal it: fewer means the
             //     projection partially rendered, more means it stopped
-            //     honouring its own page size. Derived from this
-            //     response, not from a captured fixture.
+            //     honouring its own count. Derived from this response,
+            //     not from a captured fixture.
             const exemplarLinkCount = (
               homeHtml.match(/href="\/components\/ds%3A/g) ?? []
             ).length;

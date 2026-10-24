@@ -10,14 +10,19 @@ import { PageSection } from "#lib/ui/PageSection";
 import { SiteChipProjection } from "#lib/ui/SiteChipProjection";
 import type { LobbyQuery } from "#relay/__generated__/LobbyQuery.graphql.js";
 import lobbyQueryNode from "#relay/__generated__/LobbyQuery.graphql.js";
-import { lobbyVariables } from "../../../../lobbyQuery.js";
+import {
+  LOBBY_EXEMPLAR_COUNT,
+  lobbyVariables,
+} from "../../../../lobbyQuery.js";
+import selectExemplars from "./selectExemplars.js";
 import type { LobbyProps } from "./types.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * The lobby's one operation: three classes' honest instance counts, and the
- * first few components, each through the site's chip. The hook reads the
+ * first components with their titles and tiers, each through the site's
+ * chip. The hook reads the
  * generated node, since this module sits on the server's native import
  * chain, where no transform rewrites tags.
  */
@@ -26,14 +31,22 @@ const declareLobbyQuery = (): unknown => graphql`
     $componentClass: String!
     $patternClass: String!
     $standardClass: String!
-    $exemplars: Int!
+    $exemplarPool: Int!
   ) {
     componentClass: ontologyClass(uri: $componentClass) {
       instanceCount
-      instances(first: $exemplars) {
+      instances(first: $exemplarPool) {
         edges {
           node {
             uri
+            _meta {
+              title
+            }
+            ... on Component {
+              tier {
+                name
+              }
+            }
             ...SiteChipProjection_node
           }
         }
@@ -54,7 +67,9 @@ const componentCssClassName = "ds lobby";
 
 /**
  * The lobby's two projections of the graph, from one operation: a few
- * components as the site's chips, in the graph's own order, then the doors
+ * components as the site's chips, in the graph's own order and one per
+ * title, the global tier's block standing for a title that spans tiers,
+ * so no two chips read the same and lead to different pages; then the doors
  * to the lenses as cards in the shared list view, each linked to its lens
  * with a sentence on what it holds and the graph's count where the schema
  * gives one. A class the store lacks leaves its count out rather than
@@ -76,7 +91,10 @@ export default function Lobby({
   const componentCount = data.componentClass?.instanceCount;
   const patternCount = data.patternClass?.instanceCount;
   const standardCount = data.standardClass?.instanceCount;
-  const exemplars = data.componentClass?.instances.edges ?? [];
+  const exemplars = selectExemplars(
+    (data.componentClass?.instances.edges ?? []).map(({ node }) => node),
+    LOBBY_EXEMPLAR_COUNT,
+  );
   return (
     <div
       {...props}
@@ -89,7 +107,7 @@ export default function Lobby({
         >
           <p className="lead">{t("lobby.examples.lead")}</p>
           <ul className="exemplars">
-            {exemplars.map(({ node }) => (
+            {exemplars.map((node) => (
               <li key={node.uri}>
                 <SiteChipProjection node={node} />
               </li>

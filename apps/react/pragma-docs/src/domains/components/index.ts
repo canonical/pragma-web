@@ -13,6 +13,7 @@ export {
   componentsCatalogVariables,
 } from "./catalogQuery.js";
 export { default as catalogSearch } from "./catalogSearch.js";
+export { GLOBAL_TIER } from "./constants.js";
 export {
   componentEntityQueryNode,
   componentEntityVariables,

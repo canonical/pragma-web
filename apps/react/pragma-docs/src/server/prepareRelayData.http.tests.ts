@@ -44,7 +44,7 @@ import { CATALOG_PAGE_SIZE, RELATION_PAGE_SIZE } from "#domains/components";
 import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#domains/journeys";
 import {
   LOBBY_COMPONENT_CLASS,
-  LOBBY_EXEMPLAR_COUNT,
+  LOBBY_EXEMPLAR_POOL,
   LOBBY_PATTERN_CLASS,
   LOBBY_STANDARD_CLASS,
 } from "#domains/marketing";
@@ -227,7 +227,7 @@ describe("prepareRelayData over HTTP", () => {
         componentClass: LOBBY_COMPONENT_CLASS,
         patternClass: LOBBY_PATTERN_CLASS,
         standardClass: LOBBY_STANDARD_CLASS,
-        exemplars: LOBBY_EXEMPLAR_COUNT,
+        exemplarPool: LOBBY_EXEMPLAR_POOL,
       },
     },
   ];

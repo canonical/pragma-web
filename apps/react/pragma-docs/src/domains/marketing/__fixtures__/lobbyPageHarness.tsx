@@ -34,9 +34,10 @@ import { HomePage } from "../lib/HomePage/index.js";
 
 /**
  * The first exemplar the captured fixture serves — the graph's own
- * ordering puts it first, and the fixture freezes that.
+ * ordering puts Accordion first, and of its blocks the global one stands
+ * for the title.
  */
-export const FIRST_EXEMPLAR_URI = "ds:apps_launchpad.component.accordion";
+export const FIRST_EXEMPLAR_URI = "ds:global.component.accordion";
 
 /** The same exemplar's display name. */
 export const FIRST_EXEMPLAR_NAME = "Accordion";

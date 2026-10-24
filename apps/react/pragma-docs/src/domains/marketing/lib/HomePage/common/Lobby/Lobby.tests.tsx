@@ -55,10 +55,12 @@ describe("Lobby", () => {
       expect(chips).toHaveLength(LOBBY_EXEMPLAR_COUNT);
       expect(
         within(examples)
-          .getAllByRole("link", { name: FIRST_EXEMPLAR_NAME })
-          .at(0)
-          ?.getAttribute("href"),
+          .getByRole("link", { name: FIRST_EXEMPLAR_NAME })
+          .getAttribute("href"),
       ).toBe(`/components/${encodeURIComponent(FIRST_EXEMPLAR_URI)}`);
+      // One chip per name: a name that spans tiers shows once.
+      const names = [...chips].map((chip) => chip.textContent);
+      expect(new Set(names).size).toBe(names.length);
     },
     LOBBY_TEST_TIMEOUT_MS,
   );
