@@ -1,0 +1,28 @@
+---
+# ZoneGraphNode: a fare zone as a node of a graph, two lines tall.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2357 and 566:2433 (the
+# title, then its kind muted). Best guess: the title is the zone's name,
+# the second line its class alone. A fare zone has no home on this site,
+# so its title reads as inert text.
+# Projected onto EntityGraphNode, which carries every style: this anatomy
+# binds none. The home is the link the title would render through,
+# resolved from the compact address.
+node:
+  uri: metro.component.zone_graph_node
+  projection: { on: Zone }
+  edges:
+    - node:
+        uri: prism.component.entity_graph_node
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+      relation: { cardinality: "1" }

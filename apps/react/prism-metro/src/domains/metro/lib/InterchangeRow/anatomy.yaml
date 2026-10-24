@@ -1,0 +1,26 @@
+---
+# InterchangeRow: an interchange as a 32px list entry.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 547:2201 (the classes
+# row's list entry, whose muted end word "abstract" marks the subtype).
+# Best guess: the muted end is the catalog's word "interchange", which sets
+# an interchange apart from the stations it is listed with.
+# Projected onto EntityRow, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.interchange_row
+  projection: { on: Interchange }
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node: { role: meta }
+            relation: { cardinality: "1", slotName: meta }
+      relation: { cardinality: "1" }

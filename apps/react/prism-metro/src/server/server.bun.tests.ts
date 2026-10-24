@@ -19,8 +19,8 @@ import {
   it,
   vi,
 } from "vitest";
+import { DEFAULT_PORT } from "#lib/site";
 import { GRAPHQL_URL_ENV_VAR } from "#relay";
-import { DEFAULT_PORT } from "#site";
 import { NORTHGATE_TITLE } from "../../testing/fixtures.js";
 import startMetroGraph from "../../testing/startMetroGraph.js";
 import type { MetroGraph } from "../../testing/types.js";
@@ -58,10 +58,14 @@ vi.mock("@canonical/react-ssr/server", async (importOriginal) => ({
 
 /**
  * Load a module the way the dev server's `ssrLoadModule` would, through
- * vitest's registry: the render entry, the sitemap factory, or a package.
+ * vitest's registry: the render entry, the prepare step, the sitemap
+ * factory, or a package.
  */
 const loadModule = async (id: string): Promise<unknown> => {
   if (id === "/src/server/entry.tsx") return import("./entry.js");
+  if (id === "/src/server/prepareRelayData.ts") {
+    return import("./prepareRelayData.js");
+  }
   if (id === "/src/sitemap/renderer.ts") {
     const { createSitemapRenderer } = await import("#sitemap");
     return { default: createSitemapRenderer };

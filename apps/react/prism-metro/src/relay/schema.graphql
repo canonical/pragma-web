@@ -315,11 +315,16 @@ type Station implements Node & Stop {
 A fare band. Lives in the SECOND namespace (`geo:`), which is the point: with
 entities in only one namespace, a `_meta.curie` implementation could hardcode
 a single prefix and still look correct on every row.
+
+`stops` lists the stations and interchanges inside the zone, read as the
+inverse of `Stop.inZone`, so it holds a mix of both types as
+`Line.servedBy` does.
 """
 type Zone implements Node {
   uri: ID!
   _meta: EntityMeta!
   name: String
+  stops: [Stop!]!
 }
 
 """

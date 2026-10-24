@@ -219,6 +219,7 @@
         "@types/react-dom": "^19.2.3",
         "@types/react-relay": "^18.2.1",
         "@types/relay-runtime": "^20.1.1",
+        "@types/relay-test-utils": "^19.0.0",
         "@vitejs/plugin-react": "^6.0.0",
         "@vitest/coverage-v8": "^5.0.0",
         "browserslist": "^4.28.1",

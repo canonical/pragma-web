@@ -451,6 +451,7 @@ describe("Query.ontologies / ontology", () => {
         { uri: "https://geo.example/onto#latitude" },
         { uri: "https://geo.example/onto#longitude" },
         { uri: "https://geo.example/onto#inZone" },
+        { uri: "https://geo.example/onto#stops" },
       ],
     });
   });
@@ -739,6 +740,29 @@ describe("Query.ontologyProperty", () => {
       kind: "ANNOTATION",
       functional: false,
       inverse: null,
+    });
+  });
+
+  it("round-trips a fare zone's stops and a station's zone as inverses", async () => {
+    const data = await run(`{
+      ontologyProperty(uri: "geo:stops") {
+        uri label range kind functional
+        domain { uri }
+        inverse { uri functional inverse { uri } }
+      }
+    }`);
+    expect(data.ontologyProperty).toEqual({
+      uri: "https://geo.example/onto#stops",
+      label: "stops",
+      range: "metro:Stop",
+      kind: "OBJECT",
+      functional: false,
+      domain: { uri: "https://geo.example/onto#Zone" },
+      inverse: {
+        uri: "https://geo.example/onto#inZone",
+        functional: true,
+        inverse: { uri: "https://geo.example/onto#stops" },
+      },
     });
   });
 
@@ -1159,6 +1183,28 @@ describe("the provider's own relational fields", () => {
       (stop) => stop.__typename === "Interchange",
     );
     expect(interchange?.transferMinutes).toEqual(expect.any(Number));
+  });
+});
+
+describe("Zone.stops", () => {
+  it("serves the stops inside a fare zone under their real types, in the dataset's order", async () => {
+    const data = await run(`{
+      node(id: "https://geo.example/onto#central-zone") {
+        ... on Zone { stops { __typename uri } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      stops: [
+        {
+          __typename: "Interchange",
+          uri: "https://metro.example/onto#central-exchange",
+        },
+        {
+          __typename: "Station",
+          uri: "https://metro.example/onto#northgate",
+        },
+      ],
+    });
   });
 });
 

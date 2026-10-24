@@ -9,7 +9,7 @@
  * relative `loc` values resolve to absolute, crawlable URLs.
  */
 import { SitemapRenderer } from "@canonical/react-ssr/renderer";
-import { resolvePort } from "#site";
+import { resolvePort } from "#lib/site";
 import getSitemapItems from "./getSitemapItems.js";
 
 /** True only for an absolute HTTP(S) URL — the sitemap base must be one

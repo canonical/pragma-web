@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4fa4f81767fe168b808d771bead5eb0a>>
+ * @generated SignedSource<<35e18dcf73c3a362e641de1d1e3bba1a>>
  * @lightSyntaxTransform
  */
 
@@ -17,6 +17,9 @@ export type ChipProjection_node$data = {
   readonly OntologyClass: {
     readonly " $fragmentSpreads": FragmentRefs<"OntologyClassChip_node">;
   } | null | undefined;
+  readonly Site: {
+    readonly " $fragmentSpreads": FragmentRefs<"SiteChipSlot_node">;
+  };
   readonly " $fragmentType": "ChipProjection_node";
 };
 export type ChipProjection_node$key = {
@@ -60,6 +63,22 @@ const node: ReaderFragment = {
           {
             "args": null,
             "kind": "FragmentSpread",
+            "name": "SiteChipSlot_node"
+          }
+        ],
+        "type": "Node",
+        "abstractKey": "__isNode"
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "Site"
+    },
+    {
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
             "name": "OntologyClassChip_node"
           }
         ],
@@ -74,6 +93,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "7e48e5c376c3553ebbeb5e74c43c61ee";
+(node as any).hash = "f7bc6843e1d0124dbe40393f0d9fcf4e";
 
 export default node;

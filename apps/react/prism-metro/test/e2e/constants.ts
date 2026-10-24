@@ -34,3 +34,15 @@ export const WORKSPACE_PATH = "/definitions";
  */
 export const LONG_FIELD_NAME =
   "hasAccessibleStepFreeInterchangeWithBusTerminal";
+
+/** The indexes that lay their entities out as cards. */
+export const CARDS_PATHS = [
+  "/stations?view=cards",
+  "/lines?view=cards",
+] as const;
+
+/** Every card of an index's cards view. */
+export const INDEX_CARD_SELECTOR = ".ds.entity-list .ds.entity-card";
+
+/** How far a measured edge may round from the edge it meets, in pixels. */
+export const WIDTH_TOLERANCE_PX = 0.5;

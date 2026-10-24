@@ -10,7 +10,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_PORT } from "#site";
+import { DEFAULT_PORT } from "#lib/site";
 
 /** The options the module passed to `Bun.serve`. */
 interface ServeOptions {

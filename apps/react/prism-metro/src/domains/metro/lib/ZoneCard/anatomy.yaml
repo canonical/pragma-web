@@ -1,0 +1,35 @@
+---
+# ZoneCard: a fare zone as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 484:264. Best guess: the
+# kind is the zone's class; the summary its definition; the one vital
+# counts the stations in the zone. A fare zone has no home on this site,
+# so its title reads as inert text.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none.
+node:
+  uri: metro.component.zone_card
+  projection: { on: Zone }
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: summary
+              projection: { field: _meta.definition }
+            relation: { cardinality: "0..1", slotName: summary }
+          - node:
+              role: vital
+              projection: { field: uri }
+            relation: { cardinality: "1", slotName: footer, projection: { field: stops } }
+      relation: { cardinality: "1" }
