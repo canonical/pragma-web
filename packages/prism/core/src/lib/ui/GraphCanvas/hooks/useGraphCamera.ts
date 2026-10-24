@@ -10,6 +10,7 @@ import {
   CLICK_DISTANCE,
   HUBS_SCALE,
   LEGIBLE_NUDGE,
+  OVERVIEW_SCALE,
   PAN_MARGIN,
   REDUCED_MOTION_QUERY,
   ZOOM_EXTENT,
@@ -93,8 +94,12 @@ function prefersReducedMotion(): boolean {
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
  * illegible one: a box too large for the legible zoom shows the window of
- * it `legibleWindow` chooses, or its top-left corner at that zoom. Fit and `0` fit the fit box whole, however small
- * that makes the zoom, and the zoom extent's floor follows them down. When
+ * it `legibleWindow` chooses, or its top-left corner at that zoom. Fit and
+ * `0` fit the fit box whole down to the overview's floor (12/16, where the
+ * 16px hub and region labels still render at 12px) and no further: a box
+ * too large for it shows from its top-left corner at that floor, the rest
+ * a pan away, and the zoom extent's floor follows them down. No fit lands
+ * in the overview. When
  * `reveal` changes it pans that box into view, without zooming, only if it
  * is not already in view. Every move a control or a prop asks for takes
  * 200ms, and is instant under reduced motion.
@@ -175,10 +180,12 @@ export default function useGraphCamera({
     [viewport],
   );
 
-  // Fit a box, or the graph's whole bounds, into the visible area; a refit
-  // that keeps the view legible zooms no lower than the legible zoom when
-  // the camera is legible now, and shows the legible window of a box too
-  // large for that zoom.
+  // Fit a box, or the graph's whole bounds, into the visible area, never
+  // into the overview: a box too large for the overview's floor shows from
+  // its top-left corner at that floor, the rest a pan away, so the hub and
+  // region labels stay. A refit that keeps the view legible zooms no lower
+  // than the legible zoom when the camera is legible now, and shows the
+  // legible window of a box too large for that zoom.
   const fitBox = useCallback(
     (box: GraphBox | undefined, keepLegible: boolean): void => {
       const svg = viewport.current;
@@ -186,17 +193,16 @@ export default function useGraphCamera({
       if (svg === null) return;
       const { scale, visible } = measureViewport(svg, latest.current.viewBox);
       const target = box ?? latest.current.bounds;
+      const legible = keepLegible && scale * current.current.k >= HUBS_SCALE;
       const least =
-        keepLegible && scale * current.current.k >= HUBS_SCALE
-          ? (HUBS_SCALE * LEGIBLE_NUDGE) / scale
-          : 0;
+        ((legible ? HUBS_SCALE : OVERVIEW_SCALE) * LEGIBLE_NUDGE) / scale;
       const fitsLegibly =
         Math.min(
           visible.width / target.width,
           visible.height / target.height,
         ) >= least;
       const shown =
-        fitsLegibly || latest.current.legibleWindow === undefined
+        fitsLegibly || !legible || latest.current.legibleWindow === undefined
           ? target
           : latest.current.legibleWindow(target, visible, scale);
       moveTo(computeFitTransform(visible, shown, least));

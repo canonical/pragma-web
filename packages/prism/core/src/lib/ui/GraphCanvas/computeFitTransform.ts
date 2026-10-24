@@ -4,9 +4,9 @@ import type { GraphBox, GraphTransform } from "./types.js";
 /**
  * Compute the camera that fits a world box into the visible part of the
  * viewport, flush with its top-left corner as the first paint sits, at
- * most at the zoom extent's widest. There is no narrowest: a box of any
- * size fits, however far below the wheel's floor that takes the zoom, so
- * Fit always shows the whole of a large graph. Fitting the viewBox itself
+ * most at the zoom extent's widest. The wheel's floor is no narrowest: a
+ * box of any size fits, however far below it that takes the zoom, unless
+ * a least zoom stops it. Fitting the viewBox itself
  * into a viewport that shows exactly the viewBox gives the identity.
  *
  * A least zoom keeps a fit from zooming out past it: a box too large to

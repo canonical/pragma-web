@@ -1,7 +1,7 @@
 /**
  * The narrowest and widest zoom the wheel and the buttons take, from the
  * viewBox's own scale; Fit may go below the narrowest to fit a large
- * graph whole, and the floor follows it.
+ * graph, down to the overview's floor on screen, and the floor follows it.
  */
 export const ZOOM_EXTENT: readonly [number, number] = [0.5, 2.4];
 
@@ -18,8 +18,8 @@ export const OVERVIEW_SCALE = 12 / 16;
 export const HUBS_SCALE = 12 / 14;
 
 /**
- * How far above the legible scale a refit that keeps the view legible
- * sets it, as a factor, so neither the rounding of the scale's product nor
+ * How far above a bucket's floor a refit that may go no lower sets the
+ * scale, as a factor, so neither the rounding of the scale's product nor
  * the browser's single-precision transforms read it a bucket lower.
  */
 export const LEGIBLE_NUDGE = 1 + 1e-6;

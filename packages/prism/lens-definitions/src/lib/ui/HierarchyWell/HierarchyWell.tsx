@@ -149,7 +149,8 @@ export default function HierarchyWell({
   }, [activeEdge, focus, hidden, layout, t]);
   // The server paints the whole graph, or a legible window of it around
   // the class selected on arrival, for the design canvas; the client opens
-  // on the window its own canvas calls for. Fit always fits the whole.
+  // on the window its own canvas calls for. Fit fits the whole, or shows it
+  // from its top-left corner at the overview's floor, never below.
   const [arrival] = useState(selected);
   const arrivalNode =
     arrival === undefined ? undefined : layout.nodes.get(arrival);
