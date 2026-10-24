@@ -12,22 +12,6 @@ import { buildGlyphProps } from "./buildGlyphProps.js";
 import type { IconProps } from "./types.js";
 
 /**
- * Components: a grid of four tiles, the Components lens's rail glyph.
- *
- * A stroke glyph `size` pixels square (16 by default), drawn in
- * `currentColor` and `aria-hidden`: the rail entry's visible label names
- * it. A lens passes it as its `icon` in `routeLensFacet.of`.
- */
-export const ComponentsIcon = ({ size = 16 }: IconProps): ReactElement => (
-  <svg aria-hidden="true" {...buildGlyphProps(size)}>
-    <rect height="4.6" rx="1" width="4.6" x="2.5" y="2.5" />
-    <rect height="4.6" rx="1" width="4.6" x="9" y="2.5" />
-    <rect height="4.6" rx="1" width="4.6" x="2.5" y="9" />
-    <rect height="4.6" rx="2.3" width="4.6" x="9" y="9" />
-  </svg>
-);
-
-/**
  * Journeys: a path stepping left to right, the Journeys lens's rail glyph.
  *
  * A stroke glyph `size` pixels square (16 by default), drawn in

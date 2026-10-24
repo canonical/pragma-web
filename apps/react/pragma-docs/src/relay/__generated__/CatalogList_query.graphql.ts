@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f5074ad2ff69e07f347da0ac5871760c>>
+ * @generated SignedSource<<603912ae1efebd510ceb0a26feb17279>>
  * @lightSyntaxTransform
  */
 
@@ -17,7 +17,7 @@ export type CatalogList_query$data = {
           readonly name: string | null | undefined;
         } | null | undefined;
         readonly uri: string;
-        readonly " $fragmentSpreads": FragmentRefs<"CatalogItem_component">;
+        readonly " $fragmentSpreads": FragmentRefs<"SiteCardProjection_node" | "SiteRowProjection_node">;
       };
     }>;
   };
@@ -124,7 +124,12 @@ return {
                 {
                   "args": null,
                   "kind": "FragmentSpread",
-                  "name": "CatalogItem_component"
+                  "name": "SiteCardProjection_node"
+                },
+                {
+                  "args": null,
+                  "kind": "FragmentSpread",
+                  "name": "SiteRowProjection_node"
                 },
                 {
                   "alias": null,
@@ -180,6 +185,6 @@ return {
 };
 })();
 
-(node as any).hash = "8fc104d6ec9f151a0865ca444e0a5919";
+(node as any).hash = "8776cbd6d368bf7ec6b8b8fe79efa330";
 
 export default node;

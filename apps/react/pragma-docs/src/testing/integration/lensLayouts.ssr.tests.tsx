@@ -481,7 +481,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     // The catalog canvas renders REAL cards from its fixture records.
     expect(mustGet("/components").canvas).toContain("Accordion");
     expect(mustGet("/components").canvas).toContain(
-      'data-region="secondary-nav"',
+      '<nav aria-label="Tiers" class="tiers">',
     );
     expect(mustGet("/definitions").canvas).toContain(
       'id="lens-definitions-title"',

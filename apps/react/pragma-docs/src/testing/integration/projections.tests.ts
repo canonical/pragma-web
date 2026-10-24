@@ -48,6 +48,40 @@ function readNodeFragment(folder: string, on?: string): ReaderFragment {
   return fragment;
 }
 
+/** A connection handle's field name, as relay-compiler names `@connection`'s. */
+const CONNECTION_HANDLE = /^__\w+_connection$/;
+
+/**
+ * Strip what `@connection` adds to a selection: a connection's handle field
+ * reads as the field it handles (its alias), with neither the page info nor
+ * each edge's cursor that the directive selects for the paginator. An
+ * anatomy names the connection's field and never its mechanism.
+ */
+function stripConnectionMechanics(
+  selections: readonly ReaderSelection[],
+  inConnection = false,
+): ReaderSelection[] {
+  return selections.flatMap((selection): ReaderSelection[] => {
+    if (selection.kind === "ScalarField") {
+      return inConnection && selection.name === "cursor" ? [] : [selection];
+    }
+    if (selection.kind !== "LinkedField") return [selection];
+    const isHandle =
+      CONNECTION_HANDLE.test(selection.name) && selection.alias !== null;
+    if (inConnection && selection.name === "pageInfo") return [];
+    return [
+      {
+        ...selection,
+        name: isHandle ? (selection.alias ?? selection.name) : selection.name,
+        selections: stripConnectionMechanics(
+          selection.selections,
+          isHandle || (inConnection && selection.name === "edges"),
+        ),
+      },
+    ];
+  });
+}
+
 /**
  * An arm of a site composite, as relay-compiler emits an `@alias` on an
  * inline fragment or a spread: relay-runtime's reader types do not name
@@ -143,6 +177,7 @@ const PROJECTIONS = [
 describe("the app's projections", () => {
   it("are found in its domain libraries and its general components", () => {
     expect(PROJECTIONS.map((folder) => basename(folder)).sort()).toEqual([
+      "CatalogList",
       "CodeStandardCard",
       "CodeStandardChip",
       "CodeStandardCommand",
@@ -173,10 +208,14 @@ describe("the app's projections", () => {
 
   it.each(PROJECTIONS)("%s reads what its fragment reads", (folder) => {
     const specification = assertAnatomy(folder);
-    assertProjectionMatchesFragment(
-      specification,
-      readNodeFragment(folder, specification.root.projection?.on),
+    const fragment = readNodeFragment(
+      folder,
+      specification.root.projection?.on,
     );
+    assertProjectionMatchesFragment(specification, {
+      ...fragment,
+      selections: stripConnectionMechanics(fragment.selections),
+    });
   });
 });
 

@@ -1,0 +1,13 @@
+---
+# ComponentsIcon — the Components lens's rail glyph: four tiles, the last
+# rounded, stroked in currentColor on a 16-unit box, rendered `size`
+# pixels square and hidden from assistive tech. It styles nothing.
+node:
+  uri: docs.component.components_icon
+  edges:
+    - node:
+        role: tile (square)
+      relation: { cardinality: "3", slotName: tile }
+    - node:
+        role: tile (round)
+      relation: { cardinality: "1", slotName: round-tile }

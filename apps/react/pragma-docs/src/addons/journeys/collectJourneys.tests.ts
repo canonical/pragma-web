@@ -231,7 +231,7 @@ describe("ROUTE_BY_SURFACE", () => {
     // outside the core lens tree, so it walks back into it explicitly.
     const routesDir = fileURLToPath(new URL("../../domains/", import.meta.url));
     const sources = [
-      "components/routes.ts",
+      "components/routes.tsx",
       "marketing/routes.tsx",
       "guides/routes.tsx",
     ].map((file) => readFileSync(`${routesDir}${file}`, "utf-8"));
