@@ -335,7 +335,6 @@ export interface RegionEdge {
   readonly apex?: Point;
 }
 
-/** One region laid out in its own coordinates, its top-left at the origin. */
 /** What a legible window frames, beyond the graph and the canvas. */
 export interface LegibleWindowOptions {
   /** The box of the class selected on arrival, which the window holds. */
@@ -354,6 +353,7 @@ export interface CrossPort {
   readonly ideal: number;
 }
 
+/** One region laid out in its own coordinates, its top-left at the origin. */
 export interface RegionLayout {
   readonly nodes: ReadonlyMap<string, RegionNode>;
   readonly edges: readonly RegionEdge[];
