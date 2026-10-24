@@ -148,7 +148,7 @@ node:
                     cardinality: "1..*"
                     slotName: group
                     projection:
-                      field: search.edges.node
+                      field: search
             relation: { cardinality: "0..1", slotName: results }
           - node:
               role: status
@@ -183,5 +183,5 @@ node:
               cardinality: "0..1"
               slotName: preview
               projection:
-                field: search.edges.node
+                field: search
       relation: { cardinality: "1", slotName: body }
