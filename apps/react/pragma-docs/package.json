@@ -18,7 +18,6 @@
     "#domains/standards/lib": "./src/domains/standards/lib/index.ts",
     "#graphql-endpoint": "./src/relay/graphqlEndpoint.ts",
     "#i18n": "./src/i18n/index.ts",
-    "#lib/LensIcons": "./src/lib/LensIcons/index.ts",
     "#lib/authGuard": "./src/lib/authGuard/index.ts",
     "#lib/graph": "./src/lib/graph/index.ts",
     "#lib/markdown": "./src/lib/markdown/index.ts",

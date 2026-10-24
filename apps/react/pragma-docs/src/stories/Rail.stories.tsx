@@ -14,9 +14,9 @@ import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ComponentsIcon } from "#domains/components";
 import { GuidesIcon } from "#domains/guides";
+import { JourneysIcon } from "#domains/journeys";
 import { HomeIcon } from "#domains/marketing";
 import { standardsRoutes } from "#domains/standards";
-import { JourneysIcon } from "#lib/LensIcons";
 import { withRouter } from "../../.storybook/decorators/index.js";
 
 /**
