@@ -474,7 +474,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet("/").canvas).toContain(
       'href="/components/ds%3Aglobal.component.accordion"',
     );
-    expect(mustGet("/").canvas).toContain('data-slot="doors"');
+    expect(mustGet("/").canvas).toContain('id="lobby-doors-title"');
     expect(mustGet("/components").canvas).toContain(
       'id="lens-components-title"',
     );

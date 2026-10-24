@@ -112,6 +112,7 @@ describe("the app's components", () => {
         "components",
         "definitions",
         "guides",
+        "marketing",
         "modifiers",
         "playground",
         "standards",

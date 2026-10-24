@@ -1,7 +1,7 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { HomeIcon } from "#lib/LensIcons";
-import HomePage from "./HomePage.js";
+import { HomeIcon } from "./lib/HomeIcon/index.js";
+import { HomePage } from "./lib/HomePage/index.js";
 import warmLobby from "./warmLobby.js";
 
 /**
@@ -22,7 +22,7 @@ import warmLobby from "./warmLobby.js";
 const routes = {
   home: route({
     url: "/",
-    content: HomePage,
+    content: () => <HomePage />,
     warm: warmLobby,
     meta: {
       ...routeShortcutFacet.of("1"),

@@ -232,7 +232,7 @@ describe("ROUTE_BY_SURFACE", () => {
     const routesDir = fileURLToPath(new URL("../../domains/", import.meta.url));
     const sources = [
       "components/routes.ts",
-      "marketing/routes.ts",
+      "marketing/routes.tsx",
       "guides/routes.tsx",
     ].map((file) => readFileSync(`${routesDir}${file}`, "utf-8"));
     // The Definitions and Standards lenses ship as packages, so their routes

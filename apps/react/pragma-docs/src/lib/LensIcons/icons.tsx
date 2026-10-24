@@ -12,19 +12,6 @@ import { buildGlyphProps } from "./buildGlyphProps.js";
 import type { IconProps } from "./types.js";
 
 /**
- * Home: a house, the Home lens's rail glyph.
- *
- * A stroke glyph `size` pixels square (16 by default), drawn in
- * `currentColor` and `aria-hidden`: the rail entry's visible label names
- * it. A lens passes it as its `icon` in `routeLensFacet.of`.
- */
-export const HomeIcon = ({ size = 16 }: IconProps): ReactElement => (
-  <svg aria-hidden="true" {...buildGlyphProps(size)}>
-    <path d="M2 8.5 8 3l6 5.5M4 7.5V13h8V7.5" />
-  </svg>
-);
-
-/**
  * Components: a grid of four tiles, the Components lens's rail glyph.
  *
  * A stroke glyph `size` pixels square (16 by default), drawn in

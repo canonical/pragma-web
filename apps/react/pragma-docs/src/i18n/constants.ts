@@ -42,6 +42,41 @@ export const MESSAGES = {
   "playground.probe.row": "List entry",
   "playground.probe.command": "Command",
   "playground.probe.graphNode": "Graph node",
+  "lobby.lens": "Home",
+  "lobby.title": "The design system, as a graph",
+  "lobby.pitch":
+    "This site reads a knowledge graph of the design system and renders it. Components, the vocabulary describing them, and the standards the code is held to are one body of data seen through different lenses — so a component’s anatomy, the class defining it, and the rule governing it are a link apart rather than three documents to reconcile.",
+  "lobby.provenance":
+    "Nothing here is written twice. Every name and number below is read from the graph as the page is served; the prose around them is the only authored part.",
+  "lobby.loading": "Loading the graph’s shape…",
+  "lobby.examples.title": "A few of the components",
+  "lobby.examples.lead":
+    "Read live, in the graph’s own order. The names span tiers — global entries sit beside application ones, because the graph does not privilege either.",
+  "lobby.doors.title": "The lenses",
+  "lobby.doors.components.title": "Components",
+  "lobby.doors.components.summary":
+    "Every block the design system describes — anatomy, properties, and the relations tying one to another.",
+  "lobby.doors.components.count": {
+    one: "{count} component",
+    other: "{count} components",
+  },
+  "lobby.doors.patterns.count": {
+    one: "{count} pattern",
+    other: "{count} patterns",
+  },
+  "lobby.doors.definitions.title": "Definitions",
+  "lobby.doors.definitions.summary":
+    "The vocabulary itself: the classes and properties the other lenses are written in, with the hierarchy drawn out.",
+  "lobby.doors.standards.title": "Standards",
+  "lobby.doors.standards.summary":
+    "The rules the code is held to, grouped by category and readable end to end.",
+  "lobby.doors.standards.count": {
+    one: "{count} standard",
+    other: "{count} standards",
+  },
+  "lobby.doors.guides.title": "Guides",
+  "lobby.doors.guides.summary":
+    "Long-form orientation. A placeholder for now — the reading views are not built yet.",
   "notFound.title": "Page not found",
   "notFound.body": "The page you are looking for does not exist.",
   "block.version": "v{version}",
