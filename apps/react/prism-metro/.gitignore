@@ -13,7 +13,8 @@ dist-ssr
 *.local
 *.tsbuildinfo
 
-# relay-compiler output: the lens packages' documents compiled against this
-# app's schema to prove they hold over the metro provider; the packages import
-# their own artifacts, so nothing here reads these
+# relay-compiler output: the app's own query and the lens and projection
+# packages' documents, compiled against this app's schema by `bun run relay`,
+# which every script that loads the app's code or its types runs first (all
+# but `relay`, the schema scripts and the Biome scripts)
 src/relay/__generated__/

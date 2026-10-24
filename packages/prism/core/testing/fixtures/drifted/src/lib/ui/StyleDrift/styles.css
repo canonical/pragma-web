@@ -27,6 +27,11 @@
     text-decoration: underline;
   }
 
+  /* A modifier the anatomy declares no case for. */
+  .ds.style-drift .label.is-loud {
+    display: none;
+  }
+
   /* A label the body follows changes its rule's colour: a second design. */
   .ds.style-drift:has(> .label + .body) > .label {
     border-color: var(--color-text-muted);

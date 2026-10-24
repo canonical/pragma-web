@@ -19,6 +19,31 @@ type OwnProps = {
   readonly location?: ReactNode;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;
+  /**
+   * The node's height in SVG user units; the graph's layout decides it. A
+   * node with no kind and no location sets its title on the box's middle.
+   */
+  readonly height?: number;
+  /**
+   * The entity's vital, such as its instance count: muted tabular figures
+   * at the end of the title's line.
+   */
+  readonly count?: ReactNode;
+  /**
+   * Whether the box is hollow: drawn in the floor's colour with an italic
+   * title, as a kind the graph marks apart (an abstract class) is.
+   */
+  readonly hollow?: boolean;
+  /**
+   * Whether the node is prominent, as a graph's hubs are: its title is set
+   * one step larger.
+   */
+  readonly prominent?: boolean;
+  /**
+   * Whether the node shows its text. A graph zoomed out below the size its
+   * text can be read at draws the boxes alone; the box then holds no link.
+   */
+  readonly showText?: boolean;
 };
 
 /**

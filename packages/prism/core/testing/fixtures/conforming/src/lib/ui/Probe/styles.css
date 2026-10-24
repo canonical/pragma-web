@@ -11,6 +11,8 @@
     --probe-hover-color: var(--color-text-muted);
     --probe-selected-color: var(--color-text-muted);
     --probe-label-font-weight: var(--typography-text-primary-bold-font-weight);
+    --probe-mark-opacity: 1;
+    --probe-muted-mark-opacity: 0.4;
 
     display: grid;
     gap: var(--probe-gap);
@@ -39,6 +41,15 @@
 
   .ds.probe > .body > .link[href]:hover {
     text-decoration: underline;
+  }
+
+  .ds.probe .mark {
+    opacity: var(--probe-mark-opacity);
+  }
+
+  /* The muted mark, a custom state its modifier class sets. */
+  .ds.probe .mark.is-muted {
+    opacity: var(--probe-muted-mark-opacity);
   }
 
   /* A label the body follows draws no rule below it. */

@@ -1,0 +1,24 @@
+# Labelled instances for text search. Each carries a title, and all but one
+# a definition, chosen so ranking is falsifiable: a title match against a
+# CURIE match against a definition match, an earlier match against a later
+# one, and a shorter title against a longer one.
+#
+# Only `ds:` is declared. `rdfs:label` and `skos:definition` are written as
+# full IRIs so the prefixes harvested from the corpus stay what they were.
+
+@prefix ds: <https://design.example.org/ontology#> .
+
+ds:card a ds:Component ;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Card" ;
+    <http://www.w3.org/2004/02/skos/core#definition> "A surface grouping a title, a summary and actions." .
+
+ds:card-grid a ds:Component ;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Card grid" ;
+    <http://www.w3.org/2004/02/skos/core#definition> "Lays cards out on the grid." .
+
+ds:tile a ds:Component ;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Tile" ;
+    <http://www.w3.org/2004/02/skos/core#definition> "A compact card for one figure." .
+
+ds:scorecard a ds:Component ;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Scorecard" .

@@ -1,11 +1,8 @@
 /**
- * The React Flow SSR keystone for this lens: the well renders its FULL
- * node and edge DOM to a string, with no browser API in the path.
- *
- * This works only because every node carries explicit `width`/`height`
- * and both `handles` from the deterministic layout, and because the
- * component holds no client-only state and never calls `fitView`. Each of
- * those is a real constraint, so each is asserted here rather than trusted.
+ * The SSR keystone for this lens: the well renders its FULL node and edge
+ * SVG to a string, with no browser API in the path, because every position
+ * comes from the deterministic layout and the component holds no
+ * client-only state.
  */
 
 import { createStaticRouter } from "@canonical/prism-core";
@@ -33,23 +30,12 @@ describe("JourneyWell SSR", () => {
     const html = renderWell(undefined);
     expect(html).toContain('data-slot="journeys-canvas"');
     // All eleven hops, server-rendered.
-    const nodeCount = (html.match(/react-flow__node-hop/g) ?? []).length;
-    expect(nodeCount).toBe(11);
-    // Edges too — the explicit handles make paths computable without
-    // measurement, which is the whole reason they exist.
-    expect(html).toContain("react-flow__edges");
-    expect(html).toContain("react-flow__edge");
-    // THE HANDLE DOM MUST BE PRESENT (the edges-vanish-on-hydration fix): the
-    // client re-measures handle positions from the DOM, so each node needs a
-    // source + target `<Handle>` or its edges disappear after hydration. Two
-    // per node → 22. Same fix and same SSR-visible proxy as the definitions
-    // well; the full survives-hydration proof needs a real browser.
-    // Handle ELEMENTS by position-modifier class (one per `<Handle>`; the
-    // bare class appears twice per element). Two per node (source right,
-    // target left).
-    expect(
-      (html.match(/react-flow__handle-(top|bottom|left|right)/g) ?? []).length,
-    ).toBe(nodeCount * 2);
+    expect((html.match(/<g class="hop[ "]/g) ?? []).length).toBe(11);
+    // Edges too: their paths are computed from the layout, no measurement.
+    expect(html).toContain('<g class="edges">');
+    expect(html).toMatch(/<path class="edge[ "][^>]* d="M /);
+    // The camera's transform is the client's to write.
+    expect(html).toContain('<g class="camera">');
   });
 
   it("server-renders the selection, because it comes from the URL", () => {

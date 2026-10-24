@@ -26,7 +26,6 @@
  * strip's switch performs.
  */
 
-import "../../../../testing/stubReactFlowGlobals.js";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { FetchFunction } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
@@ -48,9 +47,9 @@ const graphOption = (): HTMLElement =>
 const tableOption = (): HTMLElement =>
   screen.getByRole("button", { name: "Table" });
 
-/** Is the well's React Flow node DOM currently mounted? */
+/** Is the well's graph currently mounted? */
 const wellPresent = (): boolean =>
-  document.querySelector(".react-flow__node-hop") !== null;
+  document.querySelector(".ds.journey-well .hop") !== null;
 
 /** Is the table's grid currently mounted? */
 const tablePresent = (): boolean =>
@@ -122,11 +121,11 @@ describe("JourneysExplorer view switch — the strip drives the canvas", () => {
 
     // The empty-selection guidance now rides the well's OWN floating hint
     // (the separate band above the graph is gone — the graph is the
-    // background, owner ruling), so it is asserted on `.journey-hint`. Its
+    // background, owner ruling), so it is asserted on the canvas's hint. Its
     // "centre the graph" phrasing is unique to the well, so this proves the
     // graph's hint specifically, not the inspector's empty state (which also
     // says "Select a job").
-    expect(document.querySelector(".journey-hint")?.textContent).toMatch(
+    expect(document.querySelector(".journey-well .hint")?.textContent).toMatch(
       /centre the graph/,
     );
 

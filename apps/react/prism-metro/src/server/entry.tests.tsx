@@ -2,6 +2,7 @@
 
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MESSAGES } from "#i18n";
 import EntryServer from "./entry.js";
 import type { InitialData } from "./types.js";
 
@@ -47,10 +48,10 @@ describe("EntryServer", () => {
   });
 
   it("renders / when the renderer hands it no initial data", async () => {
-    // The site has no route at /, so the page is the not-found page.
+    // The root is the landing.
     const html = renderToString(<EntryServer />);
     expect(html).toContain('id="root"');
-    expect(html).toContain("<title>Page not found — Metro</title>");
+    expect(html).toContain("<title>Overview — Metro</title>");
   });
 
   it("renders the not-found page for a path that does not decode", async () => {
@@ -79,4 +80,14 @@ describe("EntryServer", () => {
       expect(fetch).not.toHaveBeenCalled();
     },
   );
+
+  it("renders the landing from a cold store without reaching the network", async () => {
+    const html = await renderAndSettle({ url: "/" });
+    // The heading stands and the doors' boundary holds its loading line,
+    // which the client resolves.
+    expect(html).toContain(MESSAGES["home.title"]);
+    expect(html).toContain(MESSAGES["home.loading"]);
+    expect(unhandled).toEqual([]);
+    expect(fetch).not.toHaveBeenCalled();
+  });
 });

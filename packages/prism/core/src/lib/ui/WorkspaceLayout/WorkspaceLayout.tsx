@@ -18,12 +18,13 @@ const componentCssClassName = "ds workspace-layout";
  * rows: the strip row and the body row. The rail takes the first two
  * columns of both rows and scrolls on its own; the strip spans the rest of
  * its row; the canvas fills the body and never scrolls; and the inspector
- * holds the last three columns of the body and scrolls on its own.
+ * holds the last three columns of the body, as a subgrid of them that its
+ * content can sit on, and scrolls on its own.
  *
  * Below three groups of columns the inspector region leaves the grid, the
- * canvas takes every column east of the rail, and a trigger floating at the
- * canvas's top end corner opens the inspector in the published `SidePanel`
- * drawer; closing the drawer puts it back. The width is read only by the
+ * canvas takes every column east of the rail, and a trigger at the end of
+ * a row of its own, between the strip and the body, opens the inspector in
+ * the published `SidePanel` drawer; closing the drawer puts it back. The width is read only by the
  * shell's container queries, never by script, so the server renders the
  * closed state at every width. The inspector remounts on each move, so any
  * state inside it resets: it is a read-only view. Below one group the rail

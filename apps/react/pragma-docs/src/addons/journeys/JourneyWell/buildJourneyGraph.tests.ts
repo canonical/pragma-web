@@ -2,9 +2,9 @@
  * The journey layout's determinism contract, pinned.
  *
  * `buildJourneyGraph` runs on the server (into the SSR markup) and again
- * on the client (into the hydrated tree). React Flow computes edge paths
- * from node positions and handles, so if the two runs disagreed by a
- * single pixel the hydration suite would see a mismatch. The property is
+ * on the client (into the hydrated tree). The well draws every node and
+ * edge from these positions, so if the two runs disagreed by a single
+ * pixel the hydration suite would see a mismatch. The property is
  * therefore not "looks right" but BYTE EQUALITY, asserted directly.
  *
  * The fixtures are deliberately shaped like the real graph's awkward
@@ -21,12 +21,16 @@ import {
   arrivalClassName,
   buildJourneyGraph,
   type JourneyCoordinate,
+  roleClassName,
+} from "./buildJourneyGraph.js";
+import {
+  COLUMN_GAP,
   NODE_HEIGHT,
   NODE_WIDTH,
   ROLE_PRIMARY_CLASS,
   ROLE_SECONDARY_CLASS,
-  roleClassName,
-} from "./buildJourneyGraph.js";
+  ROW_GAP,
+} from "./constants.js";
 
 const SURFACE = "sem://surface#";
 const DOCS = "sem://design-system-docs#";
@@ -134,9 +138,9 @@ describe("buildJourneyGraph", () => {
 
   it("places every node on its hop's column, never between", () => {
     const { nodes } = buildJourneyGraph(FIXTURE);
-    const stride = NODE_WIDTH + 72;
+    const stride = NODE_WIDTH + COLUMN_GAP;
     for (const node of nodes) {
-      expect(node.position.x % stride).toBe(0);
+      expect(node.x % stride).toBe(0);
       expect(node.width).toBe(NODE_WIDTH);
       expect(node.height).toBe(NODE_HEIGHT);
     }
@@ -149,17 +153,18 @@ describe("buildJourneyGraph", () => {
     // exactly-representable value. Asserted as: twice the row index is
     // always an integer.
     const { nodes } = buildJourneyGraph(FIXTURE);
-    const rowHeight = NODE_HEIGHT + 20;
+    const rowHeight = NODE_HEIGHT + ROW_GAP;
     for (const node of nodes) {
-      expect(Number.isInteger((node.position.y / rowHeight) * 2)).toBe(true);
+      expect(Number.isInteger((node.y / rowHeight) * 2)).toBe(true);
     }
   });
 
-  it("gives every node both handles, so edges render server-side", () => {
-    const { nodes } = buildJourneyGraph(FIXTURE);
-    for (const node of nodes) {
-      const types = (node.handles ?? []).map((handle) => handle.type).sort();
-      expect(types).toStrictEqual(["source", "target"]);
+  it("connects only nodes it places, so every edge can be drawn", () => {
+    const { nodes, edges } = buildJourneyGraph(FIXTURE);
+    const ids = new Set(nodes.map((node) => node.id));
+    for (const edge of edges) {
+      expect(ids.has(edge.source)).toBe(true);
+      expect(ids.has(edge.target)).toBe(true);
     }
   });
 

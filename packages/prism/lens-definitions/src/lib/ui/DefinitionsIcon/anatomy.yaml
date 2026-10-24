@@ -1,0 +1,14 @@
+---
+# DefinitionsIcon — the lens's rail glyph: three linked nodes stroked in
+# currentColor on a 16-unit box, rendered `size` pixels square and always
+# hidden from assistive tech, the rail entry's label naming it. It styles
+# nothing: the rail sets its colour.
+node:
+  uri: prism.component.definitions_icon
+  edges:
+    - node:
+        role: node
+      relation: { cardinality: "3", slotName: node }
+    - node:
+        role: link
+      relation: { cardinality: "1", slotName: link }

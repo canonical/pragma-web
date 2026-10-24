@@ -1,0 +1,9 @@
+---
+# Trail — the strip's context: the lens's breadcrumbs to the selected
+# term. It renders no element of its own: the breadcrumbs render it.
+node:
+  uri: prism.component.trail
+  edges:
+    - node:
+        uri: prism.component.lens_breadcrumbs
+      relation: { cardinality: "1" }

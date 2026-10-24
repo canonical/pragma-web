@@ -15,4 +15,10 @@ export type { EntityLayoutProps } from "./EntityLayout/index.js";
 export { EntityLayout } from "./EntityLayout/index.js";
 export type { EntityPageProps } from "./EntityPage/index.js";
 export { EntityPage } from "./EntityPage/index.js";
-export type { EntityLensOptions, EntityRoutes } from "./types.js";
+export { default as expandAddress } from "./expandAddress.js";
+export { default as readUriParam } from "./readUriParam.js";
+export type {
+  EntityLensOptions,
+  EntityRoutes,
+  OntologyNamespace,
+} from "./types.js";

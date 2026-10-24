@@ -1,0 +1,149 @@
+---
+# GraphCanvas — the pan-and-zoom SVG viewport every prism graph draws in:
+# the Definitions class graph, the journeys graph and the metro network map.
+# Reference: the ontology explorer's canvas (a graph on a tinted floor that
+# pans by drag and zooms by wheel), on a FigJam-style dot lattice.
+#
+# Why not a published component: no published component draws an SVG
+# viewport with a camera. The drawing is the consumer's; the canvas owns
+# the floor, the lattice, the camera and the zoom controls.
+#
+# Structure, top to bottom: a controls bar (the zoom level, then Fit, zoom
+# out and zoom in, flush with the end edge, over a hairline that spans the
+# canvas edge to edge and the gutter before it; an optional one-line hint hangs from its lower edge,
+# centred over the viewport, so it clears the controls whatever their
+# height), then the viewport, an SVG whose viewBox is the
+# graph's own bounds with `xMinYMin meet`, so the first paint fits flush
+# top-left with no measurement, and d3-zoom starts from the identity.
+# Inside it the camera group holds, in world space, the lattice (a 16px dot
+# pattern, hidden below the overview threshold, where it would shimmer)
+# and the drawing. The camera's transform is written by d3-zoom on the
+# client and never by React, so the server renders none.
+#
+# The zoom bucket (overview below 0.75 on screen, hubs below 12/14, full
+# above) is published to the drawing through `useGraphZoomBucket`, so a
+# drawing hides the text that would render below 12px instead of shrinking
+# it; it changes structure, not style, so it is no anatomy state.
+#
+# SVG paints through currentColor: the roster has no fill key, so the
+# lattice dots' colour is bound as the pattern's `typography.color`.
+#
+# Every decision is read through a component token declared on the root
+# (`--graph-canvas-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   appearance.background light-dark(oklch(94% 0 0), …container): the floor.
+#     Pragma has no background token 6 L* below the surface in light
+#     (container is 95.81%), so filled and hollow boxes would not separate;
+#     a contrasted canvas token is requested upstream. Dark reads
+#     color.background.container.
+#   appearance.border.width 1px: the controls bar's hairline and the hint's
+#     border.
+#   appearance.radius 999px: the hint's pill; no semantic radius exists.
+#   --graph-canvas-controls-bleed: calc(-1 * var(--grid-gutter))  the
+#     negation of grid.gutter, which the DSL cannot spell as a symbol: the
+#     bar bleeds over the gutter before the canvas, so its rule meets the
+#     divider of the region beside it, as the mode strip's does.
+#   spacing.gap space.100: between the controls; no semantic gap is
+#     admitted for a row of controls.
+#   In constants.ts, SVG geometry (attributes, not CSS): LATTICE_PITCH 16,
+#   LATTICE_DOT_RADIUS 1, the zoom extent [0.5, 2.4], the 1.2 zoom step,
+#   the 200ms camera move.
+#
+# Roster namespaces (accepted and tracked): component.padding.block,
+# component.padding.inline, container.gap.default, container.gap.tight,
+# space.100.
+node:
+  uri: prism.component.graph_canvas
+  styles:
+    layout.type: flex
+    layout.direction: column
+    size.block: 100%
+    size.min.block: 0
+    appearance.background: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+  edges:
+    - node:
+        role: controls
+        styles:
+          layout.type: flex
+          layout.align: center
+          layout.justify: flex-end
+          spacing.gap: space.100
+          spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.bottom.color: color.border.muted
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.background: color.background
+          layout.position: relative
+        edges:
+          - node:
+              role: hint
+              styles:
+                layout.position: absolute
+                layout.offset.top: 100%
+                layout.offset.left: 0
+                layout.offset.right: 0
+                layout.type: flex
+                layout.justify: center
+                spacing.external.block.start: container.gap.default
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: container.gap.default
+                spacing.internal.inline.end: container.gap.default
+                interaction.pointerEvents: none
+              edges:
+                - node:
+                    role: hint text
+                    styles:
+                      spacing.internal.block.start: container.gap.tight
+                      spacing.internal.block.end: container.gap.tight
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                      appearance.border.color: color.border.muted
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.radius: 999px
+                      appearance.background: color.background
+                      typography.size: typography.text.secondary.fontSize
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: hint-text }
+            relation: { cardinality: "0..1", slotName: hint }
+          - node:
+              role: zoom level
+              styles:
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: zoom-level }
+          - node:
+              uri: global.component.button
+            relation: { cardinality: "3" }
+      relation: { cardinality: "1", slotName: controls }
+    - node:
+        role: viewport
+        styles:
+          layout.type: block
+          layout.flex.grow: 1
+          size.inline: 100%
+          size.min.block: 0
+          interaction.cursor: grab
+          interaction.cursor@active: grabbing
+        edges:
+          - node:
+              role: lattice pattern
+              styles:
+                typography.color: color.border.muted
+            relation: { cardinality: "1", slotName: lattice }
+          - node:
+              role: camera
+              edges:
+                - node:
+                    role: lattice floor
+                  relation: { cardinality: "0..1", slotName: floor }
+                - node:
+                    role: the drawing
+                  relation: { cardinality: "1", slotName: default }
+            relation: { cardinality: "1", slotName: camera }
+      relation: { cardinality: "1", slotName: viewport }
