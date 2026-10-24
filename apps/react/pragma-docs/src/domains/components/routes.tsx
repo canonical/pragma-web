@@ -1,7 +1,7 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { ComponentEntityPage } from "./ComponentEntityPage/index.js";
 import catalogSearch from "./catalogSearch.js";
+import { ComponentEntityPage } from "./lib/ComponentEntityPage/index.js";
 import { ComponentsCatalogPage } from "./lib/ComponentsCatalogPage/index.js";
 import { ComponentsIcon } from "./lib/ComponentsIcon/index.js";
 import warmCatalog from "./warmCatalog.js";
@@ -41,7 +41,7 @@ const routes = {
   }),
   componentEntity: route({
     url: "/components/:uri",
-    content: ComponentEntityPage,
+    content: ({ params }) => <ComponentEntityPage params={params} />,
     warm: warmComponentEntity,
   }),
 } as const;

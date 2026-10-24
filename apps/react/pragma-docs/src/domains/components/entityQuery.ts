@@ -1,14 +1,14 @@
 /**
- * The component entity route's query contract, lifted to the route level
- * (the P-2 D3 pattern `probeQuery.ts` established): the compiled
+ * The component entity route's query contract, lifted to the route level,
+ * as `probeQuery.ts` lifts the playground's: the compiled
  * `ComponentEntityQuery` operation plus the one variables builder, exported
  * from one module so the route's `warmComponentEntity` and the page's hook
  * execute the same operation with byte-identical variables.
  *
  * This module imports the GENERATED artifact rather than declaring a tag:
  * it sits on the server bricks' native import chain (via `appRoutes`),
- * where no Vite transform rewrites tags. The tag lives next to the page
- * component (`ComponentEntityPage.tsx`) as relay-compiler's source of
+ * where no Vite transform rewrites tags. The tag lives next to the page's
+ * data-bearing interior (`ComponentDetail`) as relay-compiler's source of
  * truth.
  */
 

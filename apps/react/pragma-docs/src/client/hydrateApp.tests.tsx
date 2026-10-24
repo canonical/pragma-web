@@ -66,7 +66,7 @@ const SEEDED_PAGES = [
     name: "component entity",
     url: "/components/ds%3Aglobal.component.button",
     records: componentEntityRecordsButton,
-    serverMarker: '<h1 id="component-entity-title">Button</h1>',
+    serverMarker: '<h1 class="heading" id="component-entity-title">Button</h1>',
     liveSelector: "#component-entity-title",
     liveText: "Button",
   },

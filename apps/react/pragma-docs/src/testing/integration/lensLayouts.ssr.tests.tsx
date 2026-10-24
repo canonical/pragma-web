@@ -578,7 +578,13 @@ describe("the lens layouts, rendered through the SSR entry", () => {
       'data-view="component-entity"',
     );
     expect(mustGet(BUTTON_ENTITY_URL).canvas).toContain(
-      '<h1 id="component-entity-title">Button</h1>',
+      '<h1 class="heading" id="component-entity-title">Button</h1>',
+    );
+    expect(mustGet(BUTTON_ENTITY_URL).canvas).toContain(
+      '<figure aria-label="The anatomy of Button"',
+    );
+    expect(mustGet(BUTTON_ENTITY_URL).canvas).not.toContain(
+      "neighbourhood-well",
     );
     // The non-lens pages render their own page, not a fallback: the guide
     // its slug, the playground its probe from the warm store, and the
