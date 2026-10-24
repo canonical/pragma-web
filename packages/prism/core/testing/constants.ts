@@ -26,6 +26,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "border-bottom-color": ["appearance.border.bottom.color"],
   "border-bottom-style": ["appearance.border.style"],
   "border-bottom-width": ["appearance.border.width"],
+  "border-collapse": ["layout.table.collapse"],
   "border-color": ["appearance.border.color"],
   "border-inline-end-color": ["appearance.border.inline.end.color"],
   "border-inline-end-style": ["appearance.border.style"],
