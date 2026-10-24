@@ -12,6 +12,8 @@ type OwnProps = {
   readonly hidden: ReadonlySet<string>;
   /** The classes the search or the instances axis dims. */
   readonly dimmed: ReadonlySet<string>;
+  /** The selected class's IRI, whose row is ringed; none when omitted. */
+  readonly selected?: string;
 };
 
 /**

@@ -275,6 +275,7 @@ export default function HierarchyWell({
         dimmed={dimmed}
         hidden={hidden}
         layout={layout}
+        selected={selected}
         terms={terms}
       />
     </div>

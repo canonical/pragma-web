@@ -24,6 +24,7 @@ import {
   FOCUS_STROKE,
   LABEL_HALO_STROKE,
   RING_OFFSET,
+  RING_RADIUS,
   RING_STROKE,
 } from "./constants.js";
 import type { ClassGraphProps } from "./types.js";
@@ -230,7 +231,7 @@ export default function ClassGraph({
             )}
             fill="none"
             height={node.h + 2 * RING_OFFSET + RING_STROKE}
-            rx={4 + RING_OFFSET}
+            rx={RING_RADIUS}
             stroke="currentColor"
             strokeWidth={RING_STROKE}
             width={node.w + 2 * RING_OFFSET + RING_STROKE}

@@ -57,6 +57,34 @@ describe("PhoneGraph", () => {
     );
   });
 
+  it("rings the selected class's row in the accent, as the canvas does, and no other", () => {
+    const phone = renderPhone({ selected: requireEntry(uris, "ds:UIBlock") });
+    const row = phone.querySelector('.row[data-id="ds:UIBlock"]');
+    const box = requireEntry(
+      layout.phone.rows,
+      requireEntry(uris, "ds:UIBlock"),
+    );
+    expect(row).toHaveClass("row is-selected");
+    expect(phone.querySelectorAll(".row.is-selected")).toHaveLength(1);
+    const rings = phone.querySelectorAll(".ring");
+    expect(rings).toHaveLength(1);
+    const ring = row?.querySelector(":scope > .ring.is-selected");
+    expect(ring).not.toBeNull();
+    // 2px outside the box, its 2px stroke centred on that line.
+    expect(ring).toHaveAttribute("x", "-3");
+    expect(ring).toHaveAttribute("y", "-3");
+    expect(ring).toHaveAttribute("width", String(box.w + 6));
+    expect(ring).toHaveAttribute("height", String(box.h + 6));
+    expect(ring).toHaveAttribute("stroke-width", "2");
+    expect(ring).toHaveAttribute("fill", "none");
+  });
+
+  it("rings no row without a selection", () => {
+    const phone = renderPhone();
+    expect(phone.querySelector(".ring")).toBeNull();
+    expect(phone.querySelector(".row.is-selected")).toBeNull();
+  });
+
   it("hides and dims as the filter does", () => {
     const phone = renderPhone({
       hidden: new Set([requireEntry(uris, "ds:Tag")]),

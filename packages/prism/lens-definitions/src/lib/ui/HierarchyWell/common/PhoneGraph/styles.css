@@ -28,9 +28,12 @@
     --phone-graph-ink-color: var(--color-text);
     --phone-graph-muted-color: var(--color-text-muted);
     --phone-graph-dimmed-opacity: 0.4;
+    --phone-graph-accent-color: var(--color-text-branded);
 
     display: block;
     inline-size: 100%;
+    /* The selected row's ring reaches past the column's edge. */
+    overflow: visible;
   }
 
   .ds.phone-graph .lattice {
@@ -82,5 +85,9 @@
 
   .ds.phone-graph .target {
     cursor: pointer;
+  }
+
+  .ds.phone-graph .ring.is-selected {
+    color: var(--phone-graph-accent-color);
   }
 }

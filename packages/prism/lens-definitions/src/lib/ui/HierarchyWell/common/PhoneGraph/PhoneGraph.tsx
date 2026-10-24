@@ -13,6 +13,11 @@ import { findCentredBaseline } from "../../../../classGraph/geometry.js";
 import { requireEntry } from "../../../../classGraph/require.js";
 import type { LaidOutEdge } from "../../../../classGraph/types.js";
 import { useMessages } from "../../../../i18n/index.js";
+import {
+  RING_OFFSET,
+  RING_RADIUS,
+  RING_STROKE,
+} from "../../../ClassGraph/constants.js";
 import type { PhoneGraphProps } from "./types.js";
 import "./styles.css";
 
@@ -27,7 +32,8 @@ const componentCssClassName = "ds phone-graph";
  * edges: a tap selects a class, and the inspector lists its relations. It
  * sits on the same 16px lattice as the canvas. The filter hides a class's
  * row, the arcs that end at it, and its guide when it hides the parent or
- * every child.
+ * every child. The selected class's row is ringed in the accent, 2px
+ * outside its box, as the canvas rings it.
  *
  * `import { PhoneGraph } from "./common/PhoneGraph/index.js";`
  *
@@ -39,6 +45,7 @@ export default function PhoneGraph({
   terms,
   hidden,
   dimmed,
+  selected,
   className,
   ...props
 }: PhoneGraphProps): ReactElement {
@@ -138,10 +145,12 @@ export default function PhoneGraph({
         const row = requireEntry(phone.rows, uri);
         const node = requireEntry(layout.nodes, uri);
         const term = requireEntry(terms, uri);
+        const isSelected = uri === selected;
         return (
           <g
             className={[
               "row",
+              isSelected && "is-selected",
               hidden.has(uri) ? "is-hidden" : dimmed.has(uri) && "is-dimmed",
             ]
               .filter(Boolean)
@@ -159,6 +168,19 @@ export default function PhoneGraph({
                 width={row.w}
               />
             </Link>
+            {isSelected ? (
+              <rect
+                className="ring is-selected"
+                fill="none"
+                height={row.h + 2 * RING_OFFSET + RING_STROKE}
+                rx={RING_RADIUS}
+                stroke="currentColor"
+                strokeWidth={RING_STROKE}
+                width={row.w + 2 * RING_OFFSET + RING_STROKE}
+                x={-RING_OFFSET - RING_STROKE / 2}
+                y={-RING_OFFSET - RING_STROKE / 2}
+              />
+            ) : null}
           </g>
         );
       })}

@@ -5,7 +5,10 @@
 # and a guide, the relations as arcs right of the spine, all on the
 # canvas's 16px lattice. No edge labels: a tap selects a class and the
 # inspector lists its relations. The filter hides a row, the arcs that end
-# at it, and a guide whose parent or every child it hides.
+# at it, and a guide whose parent or every child it hides. The selected
+# class's row is ringed 2px outside its box in the accent, as on the
+# canvas; the ring may reach past the column's edge, so the drawing does
+# not clip it.
 # Reference: the graph heuristics' phone view (G28).
 #
 # Why not a published component: no published component draws a graph;
@@ -25,7 +28,8 @@
 #   1rem: the namespace prefix; the docs context has no 16px text size.
 #   0.4: a dimmed class.
 #   In the layout's constants (attributes, not CSS): the 288-unit column,
-#     the 48-unit rows, the 1px strokes and rules.
+#     the 48-unit rows, the 1px strokes and rules; in the class graph's,
+#     the ring's 2px stroke and 2px offset.
 #
 # Roster namespaces (accepted and tracked): the semantic typography
 # symbols typography.text.secondary.fontSize and
@@ -35,6 +39,7 @@ node:
   styles:
     layout.type: block
     size.inline: 100%
+    layout.overflow: visible
   edges:
     - node:
         role: lattice
@@ -107,6 +112,14 @@ node:
                           uri: prism.component.entity_graph_node
                         relation: { cardinality: "1" }
                   relation: { cardinality: "1", slotName: target }
+          - node:
+              role: selected row (.is-selected)
+              edges:
+                - node:
+                    role: selected ring (.is-selected)
+                    styles:
+                      typography.color: color.text.branded
+                  relation: { cardinality: "1", slotName: ring }
           - node:
               role: dimmed row (.is-dimmed)
               styles:

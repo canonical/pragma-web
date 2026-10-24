@@ -10,6 +10,9 @@ export const RING_STROKE = 2;
 /** How far a node's ring sits outside its box, in px. */
 export const RING_OFFSET = 2;
 
+/** The ring's corner radius, in px: the box's 4px corner, grown by the offset. */
+export const RING_RADIUS = 4 + RING_OFFSET;
+
 /** The halo an edge label is drawn on, as its stroke width, in px. */
 export const LABEL_HALO_STROKE = 6;
 

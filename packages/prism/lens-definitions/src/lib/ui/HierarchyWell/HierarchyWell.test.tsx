@@ -118,6 +118,12 @@ describe("HierarchyWell", () => {
       container.querySelectorAll(".desktop .node.is-faded").length,
     ).toBeGreaterThan(0);
     expect(linkOf(container, "ds:Component")).toHaveAttribute("tabindex", "0");
+    // The phone view rings the same row.
+    expect(
+      container.querySelector(
+        '.phone .row.is-selected[data-id="ds:Component"] > .ring.is-selected',
+      ),
+    ).not.toBeNull();
   });
 
   it("makes the shared hover centre the focus, ringed, with its labels", () => {
