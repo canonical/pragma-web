@@ -1,7 +1,7 @@
 import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { SiteRail } from "#lib/SiteRail";
 import { SiteColophon } from "#lib/ui/SiteColophon";
+import { SiteRail } from "#lib/ui/SiteRail";
 import type { GuidesLayoutProps } from "./types.js";
 
 /**

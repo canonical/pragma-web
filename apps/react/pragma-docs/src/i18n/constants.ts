@@ -10,6 +10,10 @@
  */
 export const MESSAGES = {
   "shell.loading": "Loading…",
+  "rail.caption": "design system docs",
+  "rail.utilities": "Utilities",
+  "rail.playground": "Playground",
+  "rail.signIn": "Demo sign-in",
   "colophon.statement":
     "Pragma — the design system, documented from its knowledge graph.",
   "notFound.title": "Page not found",

@@ -4,8 +4,8 @@ import {
   makeLensContext,
 } from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { SiteRail } from "#lib/SiteRail";
 import { SiteColophon } from "#lib/ui/SiteColophon";
+import { SiteRail } from "#lib/ui/SiteRail";
 import type { MarketingLayoutProps } from "./types.js";
 
 /**

@@ -1,6 +1,6 @@
 import { DefinitionsLayout } from "@canonical/prism-lens-definitions";
 import type { ReactElement } from "react";
-import { SiteRail } from "#lib/SiteRail";
+import { SiteRail } from "#lib/ui/SiteRail";
 import type { SiteDefinitionsLayoutProps } from "./types.js";
 
 /**

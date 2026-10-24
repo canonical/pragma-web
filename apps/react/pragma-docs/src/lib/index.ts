@@ -3,5 +3,4 @@
 export { ExampleComponent } from "./ExampleComponent/index.js";
 export { default as LazyComponent } from "./LazyComponent/index.js";
 export * from "./LensIcons/index.js";
-export * from "./SiteRail/index.js";
 export * from "./ui/index.js";

@@ -1,0 +1,11 @@
+---
+# PlaygroundIcon — the playground's rail glyph: two angle brackets stroked
+# in currentColor on a 16-unit box, rendered `size` pixels square and
+# hidden from assistive tech; the rail item's label names it. It styles
+# nothing: the rail sets its colour.
+node:
+  uri: docs.component.playground_icon
+  edges:
+    - node:
+        role: brackets
+      relation: { cardinality: "1", slotName: brackets }
