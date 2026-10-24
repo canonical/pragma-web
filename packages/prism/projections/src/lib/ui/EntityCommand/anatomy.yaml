@@ -30,7 +30,10 @@
 # Why not a published component: no published list entry exists. The
 # palette that lists these rows sets their role and their selection: the
 # selected result, `aria-selected="true"`, reads as a hovered one, so the
-# keyboard's selection shows as the pointer's does.
+# keyboard's selection shows as the pointer's does. A row the palette
+# cannot open, `aria-disabled="true"`, sets its whole text muted, the title
+# with the rest, so it reads apart from a row that opens a page; it keeps
+# the selected background, so the keyboard's selection still shows on it.
 #
 # Every decision is read through a component token declared on the root
 # (`--entity-command-*`), bound to the symbol named here.
@@ -69,6 +72,7 @@ node:
     typography.lineHeight: space.300
     appearance.background@hover: color.foreground.ghost.hover
     appearance.background@selected: color.foreground.ghost.hover
+    typography.color@disabled: color.text.muted
   edges:
     - node:
         role: identity

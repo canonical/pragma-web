@@ -112,6 +112,15 @@ describe("Shell", () => {
     expect(await screen.findByText("Metro maps")).toBeInTheDocument();
   });
 
+  it("mounts the command palette once, closed", async () => {
+    renderShell();
+    await screen.findByRole("heading", { name: "Probe content" });
+    const dialogs = screen.getAllByRole("dialog", { hidden: true });
+    expect(dialogs).toHaveLength(1);
+    expect(dialogs.at(0)).toHaveAttribute("aria-label", "Search the graph");
+    expect(dialogs.at(0)).not.toHaveAttribute("open");
+  });
+
   it("composes the page's title with the document title template", async () => {
     renderShell();
     await screen.findByRole("heading", { name: "Probe content" });

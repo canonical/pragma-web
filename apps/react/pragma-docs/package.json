@@ -58,6 +58,7 @@
   "dependencies": {
     "@canonical/anatomy-dsl": "0.43.0",
     "@canonical/i18n-core": "^0.44.1",
+    "@canonical/prism-command-palette": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-lens-definitions": "^0.44.1",
     "@canonical/prism-lens-standards": "^0.44.1",

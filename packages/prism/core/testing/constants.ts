@@ -201,6 +201,7 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":focus-visible": "focus",
   ":hover": "hover",
   '[aria-current="page"]': "selected",
+  '[aria-disabled="true"]': "disabled",
   '[aria-pressed="true"]': "selected",
   '[aria-selected="true"]': "selected",
   "[open]": "expanded",

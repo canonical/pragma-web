@@ -1,0 +1,187 @@
+---
+# CommandPaletteSearch — the palette's search: the field across the top,
+# the results on the left as 56px EntityCommand rows grouped by type, and
+# the highlighted result's EntityCard on the right. It is the ARIA
+# combobox pattern with a listbox popup: the field is the combobox and keeps
+# the focus; the arrow keys move the highlighted option of the listbox it
+# controls (aria-activedescendant), wrapping at both ends; Enter opens the
+# highlighted result's home; a pointer moving over a result highlights it.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, frames 502:1753 and 502:1827 (the
+# palette with its results and its preview) and 504:327 (the row's slots).
+# Slot order: query; then the results (each group a heading, then its rows)
+# or, in their place, one status line; then the preview. The results and the
+# status line never render together.
+#
+# It reads the graph through one query, Query.search(text:, first:), a
+# provider extension beside the contract (schema/search.graphql), so the
+# package is Tier 2. The field's text reaches the query deferred: while the
+# next results load, the last ones stay on screen and the listbox is busy.
+# An empty field sends no query (the root field is included only for a
+# text) and shows a one-line hint; a text nothing matches shows one line
+# naming it.
+#
+# Groups follow the ranking: a type's group sits where its best result
+# ranks, its heading is the type's title, and it keeps its results in rank
+# order. The highlighted result is one index over the rows in that order.
+#
+# The rows are the site's command projections, each through the arm its
+# type selects, rendered under the site's projection maps with the
+# palette's inert title (CommandPaletteTitle) as their link: an option is
+# chosen as a whole, so it holds no link of its own
+# (cs:react.component.link_component). The preview renders under the
+# site's own link, so its title links to the result's home; following it
+# chooses the result as its row does, closing the palette. The preview
+# lays its card out as the published Cards group does, on four row tracks
+# with the gutter between them, in its two columns.
+#
+# Why not a published component: react-ds-global ships no search field (the
+# design system's global.component.search_field is still to be defined and
+# global.subcomponent.search_input has no implementation), and the published
+# ComboboxInput is a form control with a popup of its own. The field follows
+# search_input's anatomy: its query slot; its clear slot is left out, since
+# Escape closes the palette and the palette opens empty.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)   below two groups: the palette is four
+#     columns wide, the results take them all, and the preview is not shown.
+#
+# Every decision is read through a component token declared on the root
+# (`--command-palette-search-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind):
+#   --command-palette-search-results-basis:
+#     calc(4 * var(--grid-col-min) + 3 * var(--grid-gutter))   four columns.
+#   --command-palette-search-rule-width: 1px   stroke thickness.
+#   --command-palette-search-focus-ring-width: 2px,
+#   --command-palette-search-focus-ring-offset: -2px
+#     the field's ring, drawn inside it, since the dialog clips.
+#   transparent, inherit: keywords, written raw. The field takes the
+#     dialog's surface and the palette's text; they are no design decision.
+#   space.300 (24px) for the line height: the matrix's line.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# component.padding.block, component.padding.inline, space.300 (a line
+# height), typography.text.primary.fontSize and
+# typography.text.primary.smallcaps.letter.spacing.
+node:
+  uri: prism.component.command_palette_search
+  projection:
+    on: Query
+  styles:
+    layout.type: flex
+    layout.direction: column
+    layout.flex.grow: 1
+    layout.flex.shrink: 1
+    size.min.block: 0
+    typography.size: typography.text.primary.fontSize
+    typography.lineHeight: space.300
+  edges:
+    - node:
+        role: query
+        styles:
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.width: 1px
+          appearance.border.style: "none none solid"
+          appearance.border.bottom.color: color.border.muted
+          appearance.background: transparent
+          typography.color: inherit
+          typography.fontFamily: inherit
+          typography.size: inherit
+          typography.lineHeight: inherit
+          appearance.outline.width@focus: 2px
+          appearance.outline.style@focus: solid
+          appearance.outline.color@focus: color.focusRing
+          appearance.outline.offset@focus: -2px
+      relation: { cardinality: "1", slotName: query }
+    - node:
+        role: body
+        styles:
+          layout.type: flex
+          spacing.gap: grid.gutter
+          layout.flex.grow: 1
+          layout.flex.shrink: 1
+          size.min.block: 0
+        edges:
+          - node:
+              role: results
+              styles:
+                layout.flex.grow: 0
+                layout.flex.shrink: 0
+                layout.flex.basis: "calc(4 * var(--grid-col-min) + 3 * var(--grid-gutter))"
+                layout.overflow.block: auto
+                spacing.internal.block.end: component.padding.block
+              edges:
+                - node:
+                    role: group
+                    styles:
+                      layout.listStyle: none
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      spacing.internal.inline.start: 0
+                    edges:
+                      - node:
+                          role: heading
+                          projection:
+                            field: _meta.type._meta.title
+                          styles:
+                            spacing.internal.block.start: component.padding.block
+                            spacing.internal.inline.start: component.padding.inline
+                            spacing.internal.inline.end: component.padding.inline
+                            typography.color: color.text.muted
+                            typography.variant.caps: all-small-caps
+                            typography.letterSpacing: typography.text.primary.smallcaps.letter.spacing
+                        relation: { cardinality: "1", slotName: heading }
+                      - node:
+                          uri: prism.component.command_palette_result
+                          projection:
+                            on: Node
+                        relation: { cardinality: "1..*", slotName: options }
+                      - node:
+                          role: option key
+                          projection:
+                            field: uri
+                        relation: { cardinality: "1..*" }
+                  relation:
+                    cardinality: "1..*"
+                    slotName: group
+                    projection:
+                      field: search.edges.node
+            relation: { cardinality: "0..1", slotName: results }
+          - node:
+              role: status
+              styles:
+                spacing.internal.block.start: component.padding.block
+                spacing.internal.block.end: component.padding.block
+                spacing.internal.inline.start: component.padding.inline
+                spacing.internal.inline.end: component.padding.inline
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: status }
+          - node:
+              role: preview
+              styles:
+                layout.type: grid
+                spacing.gap: grid.gutter
+                layout.alignContent: start
+                layout.flex.grow: 1
+                layout.flex.shrink: 1
+                layout.flex.basis: 0
+                size.min.width: 0
+                layout.overflow.block: auto
+                spacing.internal.block.start: component.padding.block
+                spacing.internal.block.end: component.padding.block
+                spacing.internal.inline.end: component.padding.inline
+              edges:
+                - node:
+                    uri: prism.component.card_projection
+                    projection:
+                      on: Node
+                  relation: { cardinality: "1" }
+            relation:
+              cardinality: "0..1"
+              slotName: preview
+              projection:
+                field: search.edges.node
+      relation: { cardinality: "1", slotName: body }
