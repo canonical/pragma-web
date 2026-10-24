@@ -1,0 +1,11 @@
+/* The narrow-screen rule the site's shell carries, for the stories, which
+ * have no shell: the intrinsic grid's column floor is never wider than a
+ * quarter of the row less its three gutters, so one group of four columns
+ * fits a phone-wide canvas without overflowing. It is declared on :root,
+ * where the grid preset substitutes it into --grid-intrinsic; a value on
+ * the story's .grid.intrinsic itself is never read. */
+@layer ds.components.global {
+  :root {
+    --grid-col-min: min(100px, calc((100% - 3 * var(--grid-gutter)) / 4));
+  }
+}
