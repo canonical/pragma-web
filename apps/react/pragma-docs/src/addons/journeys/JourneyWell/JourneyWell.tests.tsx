@@ -3,7 +3,6 @@
  * (ruling R2) asserted where a reader would see it: in the rendered graph.
  */
 
-import "../../../../testing/stubReactFlowGlobals.js";
 import { createStaticRouter } from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import { render, screen } from "@testing-library/react";
@@ -33,13 +32,24 @@ describe("JourneyWell", () => {
   it("draws one node per hop, and names the canvas", () => {
     render(wellAt(undefined));
     expect(
-      screen.getByLabelText("Journeys from demand to surface", {
-        selector: ".react-flow",
-      }),
+      screen.getByRole("group", { name: "Journeys from demand to surface" }),
     ).toBeInTheDocument();
     // Every hop the fixture implies is drawn: 2 coordinates, 3 jobs,
     // 3 pairings, 2 surfaces, 1 layout.
-    expect(document.querySelectorAll(".react-flow__node").length).toBe(11);
+    expect(document.querySelectorAll(".hop").length).toBe(11);
+    // Each edge is a path from one drawn hop to another.
+    const hops = new Set(
+      [...document.querySelectorAll(".hop")].map((hop) =>
+        hop.getAttribute("data-id"),
+      ),
+    );
+    const edges = [...document.querySelectorAll(".edge")];
+    expect(edges.length).toBeGreaterThan(0);
+    for (const edge of edges) {
+      expect(hops.has(edge.getAttribute("data-source"))).toBe(true);
+      expect(hops.has(edge.getAttribute("data-target"))).toBe(true);
+      expect(edge.getAttribute("d")).toMatch(/^M [\d.]+ [\d.]+ C /);
+    }
   });
 
   it("renders honest absence: no layout node where none is composed", () => {
@@ -47,12 +57,14 @@ describe("JourneyWell", () => {
     // `view.chips` composes no layout, so its row ENDS at the surface.
     // The only layout node in the graph is the catalog one.
     const layoutNodes = [
-      ...document.querySelectorAll('[data-kind="layout"]'),
-    ].map((node) => node.textContent);
+      ...document.querySelectorAll('[data-kind="layout"] title'),
+    ].map((title) => title.textContent);
     expect(layoutNodes).toEqual(["Catalog"]);
     // …and the chips surface is drawn, so its absence of a layout is a
     // gap in the row rather than a missing surface.
-    expect(screen.getByTitle("view.chips")).toBeInTheDocument();
+    expect(
+      screen.getByText("view.chips", { selector: ".label" }),
+    ).toBeInTheDocument();
   });
 
   it("links jobs to their own address, and surfaces only where a route exists", () => {
@@ -68,12 +80,14 @@ describe("JourneyWell", () => {
         .getAttribute("href"),
     ).toBe("/components");
     // …and one WITHOUT is plain text, never a dead link.
-    expect(screen.getByTitle("view.chips").tagName).toBe("SPAN");
+    expect(
+      screen.getByText("view.chips", { selector: ".label" }).closest("a"),
+    ).toBeNull();
   });
 
   it("marks the selected job, and nothing else", () => {
     render(wellAt(BROWSE_JOB));
-    const selected = document.querySelectorAll(".react-flow__node.is-selected");
+    const selected = document.querySelectorAll(".hop.is-selected");
     expect(selected.length).toBe(1);
     expect(selected[0]?.getAttribute("data-id")).toBe(BROWSE_JOB);
   });
@@ -85,9 +99,9 @@ describe("JourneyWell", () => {
     expect(
       screen.getByRole("link", { name: "job.orphan" }),
     ).toBeInTheDocument();
-    const orphanEdges = [...document.querySelectorAll(".react-flow__edge")]
-      .map((edge) => edge.getAttribute("data-id") ?? "")
-      .filter((id) => id.startsWith(ORPHAN_JOB));
+    const orphanEdges = [...document.querySelectorAll(".edge")]
+      .map((edge) => edge.getAttribute("data-source") ?? "")
+      .filter((id) => id === ORPHAN_JOB);
     expect(orphanEdges).toEqual([]);
   });
 });

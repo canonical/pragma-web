@@ -1,0 +1,9 @@
+---
+# InstanceItem — one instance of the class, mentioned as an entity chip,
+# its compact address after it.
+node:
+  uri: prism.component.instance_item
+  edges:
+    - node:
+        uri: prism.component.chip_projection
+      relation: { cardinality: "1" }

@@ -1,0 +1,6 @@
+---
+# TermLink — a link to a class's or a property's term view, labelled by
+# the graph, its compact address standing in where the graph has none. It
+# styles nothing: it reads as the inspector's links.
+node:
+  uri: prism.component.term_link

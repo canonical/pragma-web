@@ -7,13 +7,14 @@ import "./styles.css";
 const componentCssClassName = "ds probe";
 
 /**
- * A fixture component: a box holding its label, and its link when it has
- * an `href`.
+ * A fixture component: a box holding its label, its link when it has an
+ * `href`, and a mark, muted when `muted` is set.
  */
 export default function Probe({
   className,
   label,
   href,
+  muted = false,
   ...props
 }: ProbeProps): ReactElement {
   return (
@@ -29,6 +30,9 @@ export default function Probe({
           </a>
         )}
       </span>
+      <span
+        className={["mark", muted ? "is-muted" : ""].filter(Boolean).join(" ")}
+      />
     </div>
   );
 }

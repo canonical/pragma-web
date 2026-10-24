@@ -19,7 +19,7 @@ export default function StyleDrift({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <span className="label">{label}</span>
+      <span className="label is-loud">{label}</span>
       <span className="body">
         <a className="link" href="#drift">
           {label}
