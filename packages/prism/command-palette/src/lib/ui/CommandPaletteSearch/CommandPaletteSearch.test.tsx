@@ -235,6 +235,22 @@ describe("CommandPaletteSearch", () => {
     expect(screen.getAllByRole("option")).toHaveLength(1);
   });
 
+  it("highlights the first result again once the reader types", async () => {
+    const { environment } = await renderResults("lay");
+    const field = screen.getByRole("combobox");
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    expect(findActiveOption()).toHaveTextContent("Layout");
+    type("layo");
+    await act(async () => {
+      environment.mock.resolveMostRecentOperation(answerSearch(RANKED_RESULTS));
+    });
+    const first = screen.getAllByRole("option").at(0);
+    expect(first).toHaveAttribute("aria-selected", "true");
+    expect(field).toHaveAttribute("aria-activedescendant", first?.id);
+    expect(readPreviewTitle()).toBe("Layout switcher");
+  });
+
   it("keeps the highlight on the list when fewer results replace those it was on", async () => {
     const { environment } = await renderResults("lay");
     type("layo");
