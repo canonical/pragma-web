@@ -6,9 +6,11 @@ import {
   findCuriePrefix,
   useProjectionLink,
 } from "@canonical/prism-projections";
+import { Markdown } from "@canonical/react-markdown";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
+import { findFirstParagraph, SUMMARY_COMPONENTS } from "#lib/markdown";
 import nodeFragment from "../../../../relay/__generated__/ModifierFamilyCard_node.graphql.js";
 import type { ModifierFamilyCardProps } from "./types.js";
 import "./styles.css";
@@ -52,9 +54,11 @@ const componentCssClassName = "ds modifier-family-card";
  * A modifier family as a card in a grid of entities: its namespace
  * prefix above the title (the schema gives a family no tier), the title
  * linked to its home when the site has one and inert text when it has
- * none, then its class and its summary; the count of its modifiers as
- * its one key value (`Members: 5`) and in the footer (`5 modifiers`). An
- * empty summary is no summary. A family has no sidecar.
+ * none, then its class and the first paragraph of its Markdown summary,
+ * rendered inline so its emphasis, code and links read as they do in the
+ * family's documentation; the count of its modifiers as its one key value
+ * (`Members: 5`) and in the footer (`5 modifiers`). A summary with no
+ * paragraph is no summary. A family has no sidecar.
  *
  * Native props reach the card's `<div>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename
@@ -78,6 +82,7 @@ export default function ModifierFamilyCard({
   const LinkComponent = useProjectionLink();
   const t = useMessages();
   const count = data.modifiers.edges.length;
+  const summary = findFirstParagraph(data.summary ?? "");
   return (
     <EntityCard
       {...props}
@@ -88,7 +93,11 @@ export default function ModifierFamilyCard({
       kind={data._meta.type._meta.title}
       LinkComponent={LinkComponent}
       location={findCuriePrefix(curie)}
-      summary={data.summary ? data.summary : undefined}
+      summary={
+        summary === "" ? undefined : (
+          <Markdown components={SUMMARY_COMPONENTS} source={summary} />
+        )
+      }
       title={title}
       vitals={[t("family.modifiers", { count })]}
     />

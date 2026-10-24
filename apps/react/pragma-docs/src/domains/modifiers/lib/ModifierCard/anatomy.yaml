@@ -5,7 +5,9 @@
 # Class and Family, each under a rule, and the version in the footer). The
 # location is the compact address's prefix (the schema gives a modifier no
 # tier); the Class value is the modifier's class, the Family value its
-# family.
+# family; the summary the first paragraph of the modifier's Markdown
+# summary, rendered inline, so its emphasis, code and links read as they
+# do in the modifier's documentation.
 # Projected onto EntityCard, which carries every style: this anatomy binds
 # none. A modifier has no sidecar. The home is the link the title renders
 # through, resolved from the compact address; a modifier has no home yet

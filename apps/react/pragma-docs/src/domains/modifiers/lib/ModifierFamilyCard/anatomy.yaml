@@ -4,7 +4,10 @@
 # "Anticipation", the kind "Modifier family", the summary, the key value
 # "Members: 5" under its rule, and "5 modifiers" in the footer). The
 # location is the compact address's prefix (the schema gives a family no
-# tier); both counts are the number of the family's modifiers.
+# tier); both counts are the number of the family's modifiers; the
+# summary the first paragraph of the family's Markdown summary, rendered
+# inline, so its emphasis, code and links read as they do in the family's
+# documentation.
 # Projected onto EntityCard, which carries every style: this anatomy binds
 # none. A family has no sidecar. The home is the link the title renders
 # through, resolved from the compact address; a family has no home yet and

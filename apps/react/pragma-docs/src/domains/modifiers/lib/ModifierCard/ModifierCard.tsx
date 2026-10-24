@@ -6,9 +6,11 @@ import {
   findCuriePrefix,
   useProjectionLink,
 } from "@canonical/prism-projections";
+import { Markdown } from "@canonical/react-markdown";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
+import { findFirstParagraph, SUMMARY_COMPONENTS } from "#lib/markdown";
 import nodeFragment from "../../../../relay/__generated__/ModifierCard_node.graphql.js";
 import type { ModifierCardProps } from "./types.js";
 import "./styles.css";
@@ -48,10 +50,12 @@ const componentCssClassName = "ds modifier-card";
  * A modifier as a card in a grid of entities: its namespace prefix above
  * the title (the schema gives a modifier no tier), the title linked to
  * its home when the site has one and inert text when it has none, then
- * its class and its summary; its class and its family as the key values,
+ * its class and the first paragraph of its Markdown summary, rendered
+ * inline so its emphasis, code and links read as they do in the
+ * modifier's documentation; its class and its family as the key values,
  * each under a rule; and its version (`v1.11`) in the footer when it has
- * one. A modifier with no family has its class alone as a key value; an
- * empty summary is no summary. A modifier has no sidecar.
+ * one. A modifier with no family has its class alone as a key value; a
+ * summary with no paragraph is no summary. A modifier has no sidecar.
  *
  * Native props reach the card's `<div>` root; a consumer `className`
  * merges after the projection's own, and the root carries the typename
@@ -76,6 +80,7 @@ export default function ModifierCard({
   const t = useMessages();
   const kind = data._meta.type._meta.title;
   const family = data.modifierFamily?._meta.title;
+  const summary = findFirstParagraph(data.summary ?? "");
   return (
     <EntityCard
       {...props}
@@ -91,7 +96,11 @@ export default function ModifierCard({
       kind={kind}
       LinkComponent={LinkComponent}
       location={findCuriePrefix(curie)}
-      summary={data.summary ? data.summary : undefined}
+      summary={
+        summary === "" ? undefined : (
+          <Markdown components={SUMMARY_COMPONENTS} source={summary} />
+        )
+      }
       title={title}
       vitals={
         data.version ? [t("block.version", { version: data.version })] : []

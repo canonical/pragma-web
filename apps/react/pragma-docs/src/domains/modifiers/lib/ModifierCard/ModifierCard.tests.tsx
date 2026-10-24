@@ -108,6 +108,25 @@ describe("ModifierCard", () => {
     expect(screen.queryByRole("link")).toBeNull();
   });
 
+  it("renders the first paragraph of its Markdown summary, its links kept", () => {
+    const { container } = renderWithNode(
+      (node) => <ModifierCard node={node} />,
+      {
+        summary:
+          "A default [Badge](https://example.com/badge) is used informationally.\n  \nA second paragraph.",
+      },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.textContent).toBe(
+      "A default Badge is used informationally.",
+    );
+    expect(summary?.querySelector("a")).toHaveAttribute(
+      "href",
+      "https://example.com/badge",
+    );
+    expect(summary?.querySelector("p")).toBeNull();
+  });
+
   it("has its class alone as a key value when the modifier has no family", () => {
     const { container } = renderWithNode(
       (node) => <ModifierCard node={node} />,

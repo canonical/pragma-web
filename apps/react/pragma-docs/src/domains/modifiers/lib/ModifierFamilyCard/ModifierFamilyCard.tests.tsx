@@ -112,6 +112,25 @@ describe("ModifierFamilyCard", () => {
     expect(screen.queryByRole("link")).toBeNull();
   });
 
+  it("renders the first paragraph of its Markdown summary, its links kept", () => {
+    const { container } = renderWithNode(
+      (node) => <ModifierFamilyCard node={node} />,
+      {
+        summary:
+          "A default [Badge](https://example.com/badge) is used informationally.\n  \nA second paragraph.",
+      },
+    );
+    const summary = container.querySelector(".summary");
+    expect(summary?.textContent).toBe(
+      "A default Badge is used informationally.",
+    );
+    expect(summary?.querySelector("a")).toHaveAttribute(
+      "href",
+      "https://example.com/badge",
+    );
+    expect(summary?.querySelector("p")).toBeNull();
+  });
+
   it("counts one member in the singular", () => {
     const { container } = renderWithNode(
       (node) => <ModifierFamilyCard node={node} />,
