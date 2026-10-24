@@ -187,8 +187,38 @@ describe("CommandPalette", () => {
   it("closes on a click on its backdrop", () => {
     renderPalette();
     open();
-    fireEvent.click(findDialog());
-    expect(findDialog().open).toBe(false);
+    const dialog = findDialog();
+    fireEvent.pointerDown(dialog);
+    fireEvent.pointerUp(dialog);
+    fireEvent.click(dialog);
+    expect(dialog.open).toBe(false);
+  });
+
+  it("stays open when a press in the field is released on the backdrop", () => {
+    renderPalette();
+    open();
+    const dialog = findDialog();
+    fireEvent.pointerDown(screen.getByRole("combobox"));
+    fireEvent.pointerUp(dialog);
+    // A click's target is the nearest element holding the press and the
+    // release: here, the dialog.
+    fireEvent.click(dialog);
+    expect(dialog.open).toBe(true);
+  });
+
+  it("calls the consumer's pointer and click handlers", () => {
+    const onPointerDown = vi.fn();
+    const onPointerUp = vi.fn();
+    const onClick = vi.fn();
+    renderPalette({ onClick, onPointerDown, onPointerUp });
+    open();
+    const dialog = findDialog();
+    fireEvent.pointerDown(dialog);
+    fireEvent.pointerUp(dialog);
+    fireEvent.click(dialog);
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+    expect(onPointerUp).toHaveBeenCalledTimes(1);
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it("applies a custom className and passes through additional props", () => {

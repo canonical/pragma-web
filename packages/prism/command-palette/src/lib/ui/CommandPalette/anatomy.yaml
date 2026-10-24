@@ -12,8 +12,11 @@
 # Built on the published Modal (global.pattern.modal): this root IS the
 # Modal's <dialog> with the command-palette class added, opened with
 # showModal(), so the backdrop, the focus trap, the page's inertness and
-# Escape are the platform's, and a backdrop click closes it
-# (closeOnBackdropClick). It composes none of Modal.Header, Modal.Content
+# Escape are the platform's. A click on the backdrop closes it when its
+# press and its release both landed there, so a selection dragged out of
+# the field onto the backdrop leaves it open; the Modal's
+# closeOnBackdropClick reads the click's target alone, which is the dialog
+# in that case too. It composes none of Modal.Header, Modal.Content
 # or Modal.Footer: the field takes the header's place and is no title, so
 # the dialog carries its own aria-label; the results scroll on their own
 # beside a preview that does not, where Modal.Content scrolls as one pane;

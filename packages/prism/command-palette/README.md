@@ -78,7 +78,8 @@ whenever the palette closes, however the reader closed it.
   both ends. A pointer moving over a result highlights it too.
 - Enter in the field: choose the highlighted result. A click on a result,
   or following the link of the preview's title, chooses it too.
-- Escape, or a click on the backdrop: close the palette.
+- Escape, or a click on the backdrop (pressed and released there): close
+  the palette.
 
 Every opening starts empty: the text, the results and a failure line from
 the last opening are gone.

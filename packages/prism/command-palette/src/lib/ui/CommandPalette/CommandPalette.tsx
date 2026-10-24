@@ -12,6 +12,7 @@ import {
 import { flushSync } from "react-dom";
 import { Message, useMessages } from "../../i18n/index.js";
 import { CommandPaletteSearch } from "../CommandPaletteSearch/index.js";
+import useBackdropClose from "./hooks/useBackdropClose.js";
 import useOpenShortcut from "./hooks/useOpenShortcut.js";
 import type { CommandPaletteProps } from "./types.js";
 import "./styles.css";
@@ -31,6 +32,10 @@ const componentCssClassName = "ds command-palette";
  * platform's, and the dialog's focusing steps put the focus in the field.
  * It hangs one grid margin below the viewport's top, six of the shell's
  * columns wide, four below two groups.
+ *
+ * A click on the backdrop is one whose press and release both landed on
+ * it, so a selection dragged out of the field onto the backdrop leaves the
+ * palette open.
  *
  * The search renders in the browser only: its combobox and listbox are
  * wired by script, so the server sends the closed dialog and the key hints
@@ -53,11 +58,14 @@ const componentCssClassName = "ds command-palette";
  *
  * @implements prism.component.command_palette
  * @note Impure: reads the translator in scope, attaches the shortcut's
- *   listener to the document, opens and closes its dialog, and focuses a
- *   failure's line.
+ *   listener to the document, opens and closes its dialog, records a
+ *   pointer's gesture on it, and focuses a failure's line.
  */
 export default function CommandPalette({
   className,
+  onClick,
+  onPointerDown,
+  onPointerUp,
   ...props
 }: CommandPaletteProps): ReactElement {
   const t = useMessages();
@@ -92,20 +100,28 @@ export default function CommandPalette({
   }, []);
 
   /**
-   * Close the palette: the reader chose a result.
+   * Close the palette: the reader chose a result, or clicked the backdrop.
    *
    * @note Impure: closes the dialog.
    */
   const close = useCallback((): void => {
     dialog.current?.close();
   }, []);
+  const backdrop = useBackdropClose({
+    close,
+    onClick,
+    onPointerDown,
+    onPointerUp,
+  });
 
   return (
     <Modal
       {...props}
       aria-label={t("palette.label")}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      closeOnBackdropClick
+      onClick={backdrop.onClick}
+      onPointerDown={backdrop.onPointerDown}
+      onPointerUp={backdrop.onPointerUp}
       ref={dialog}
     >
       <ClientOnly>
