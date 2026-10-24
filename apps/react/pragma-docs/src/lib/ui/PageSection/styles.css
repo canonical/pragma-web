@@ -17,10 +17,12 @@
     margin-block-start: var(--page-section-spacing-block-start);
   }
 
-  /* The heading spans the column; the gutter alone sets it off the
-   * content, which places itself. */
+  /* The heading spans the column, wrapping anywhere so a long name never
+   * widens the page; the gutter alone sets it off the content, which
+   * places itself. */
   .ds.page-section > .heading {
     grid-column: 1 / -1;
     margin-block: 0;
+    overflow-wrap: anywhere;
   }
 }
