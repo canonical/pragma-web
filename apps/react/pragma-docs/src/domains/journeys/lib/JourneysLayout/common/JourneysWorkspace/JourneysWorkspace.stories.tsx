@@ -20,7 +20,7 @@ const meta: Meta<typeof Component> = {
     withRouter({ routes: SITE_ROUTES }),
     withRelayEnvironment,
   ],
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", grid: "intrinsic" },
   args: { children: <p>The routed page</p> },
 };
 

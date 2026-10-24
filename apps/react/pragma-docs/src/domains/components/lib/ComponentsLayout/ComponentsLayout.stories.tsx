@@ -10,7 +10,7 @@ const meta: Meta<typeof ComponentsLayout> = {
   component: ComponentsLayout,
   tags: ["autodocs"],
   decorators: [withRouter({ routes: SITE_ROUTES })],
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", grid: "intrinsic" },
   args: { children: <p>The routed page</p> },
 };
 

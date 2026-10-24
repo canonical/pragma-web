@@ -2,7 +2,10 @@
 
 import { withRelayEnvironment } from "@canonical/storybook-addon-relay";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { withRouter } from "../../../../../.storybook/decorators/index.js";
+import {
+  withRouter,
+  withShellGrid,
+} from "../../../../../.storybook/decorators/index.js";
 import { SITE_ROUTES } from "../../../../../.storybook/siteRoutes.js";
 import JourneysExplorer from "./JourneysExplorer.js";
 
@@ -10,9 +13,13 @@ const meta: Meta<typeof JourneysExplorer> = {
   title: "Components/JourneysExplorer",
   component: JourneysExplorer,
   tags: ["autodocs"],
-  decorators: [withRouter({ routes: SITE_ROUTES }), withRelayEnvironment],
+  decorators: [
+    withShellGrid(),
+    withRouter({ routes: SITE_ROUTES }),
+    withRelayEnvironment,
+  ],
   parameters: {
-    grid: "intrinsic",
+    grid: "none",
     relay: {
       mockResolvers: {
         Job: () => ({

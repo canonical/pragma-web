@@ -8,4 +8,12 @@
   :root {
     --grid-col-min: min(100px, calc((100% - 3 * var(--grid-gutter)) / 4));
   }
+
+  /* The shell grid a story of a region that changes shape sits in: the
+   * query container the site's shell names, its rows at their natural
+   * height. */
+  .story-shell {
+    container: shell / inline-size;
+    align-content: start;
+  }
 }
