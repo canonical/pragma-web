@@ -1,4 +1,4 @@
-import type { JourneyView } from "./types.js";
+import type { JourneyView, SurfaceRouteName } from "./types.js";
 
 /**
  * The kinds of hop a journey passes through, its columns from left to
@@ -23,3 +23,20 @@ export const JOURNEY_VIEWS: readonly JourneyView[] = ["table", "graph"];
  * client's first render agree.
  */
 export const DEFAULT_JOURNEY_VIEW: JourneyView = "table";
+
+/**
+ * The site routes the demand model's surfaces land on, by the surface
+ * URI's local name, as the docs graph writes it. A surface with no entry
+ * has no page on the site, and the inspector, the table and the graph show
+ * it as plain text rather than a dead link. Each entry is a route's name,
+ * never a path, so a link follows the router wherever it mounts the site.
+ * Hand-maintained and short: inventing a route from a URI pattern would
+ * produce links to pages that do not exist.
+ */
+export const SURFACE_ROUTES: ReadonlyMap<string, SurfaceRouteName> = new Map([
+  ["view.home", "home"],
+  ["view.components", "components"],
+  ["view.definitions", "definitions"],
+  ["view.standards", "standards"],
+  ["view.guides", "guides"],
+]);

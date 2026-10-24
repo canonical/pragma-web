@@ -19,7 +19,13 @@
  * one pairing.
  */
 
-import type { JourneyCoordinate, JourneyJob, JourneyPairing } from "./types.js";
+import { SURFACE_ROUTES } from "./constants.js";
+import type {
+  JourneyCoordinate,
+  JourneyJob,
+  JourneyPairing,
+  SurfaceRouteName,
+} from "./types.js";
 
 /** A pairing as either window delivers it. */
 export interface RawPairing {
@@ -171,27 +177,15 @@ export const describeCoordinate = (
 };
 
 /**
- * The docsite routes the demand model's surfaces actually land on. A
- * surface with no entry here HAS NO ROUTE — the inspector renders it as
- * plain text rather than a dead link, which is the honest rendering of a
- * surface the site does not (yet) build.
+ * Find the name of the site route a surface lands on, from
+ * `SURFACE_ROUTES`.
  *
- * Keyed by the surface URI's local name so the table reads as the docs
- * graph writes it. Deliberately hand-maintained and deliberately short:
- * inventing a route from a URI pattern would produce links to pages that
- * do not exist.
+ * @param uri - The surface's graph URI.
+ * @returns The route's name, or undefined when the site renders none.
  */
-export const ROUTE_BY_SURFACE: Readonly<Record<string, string>> = {
-  "view.home": "/",
-  "view.components": "/components",
-  "view.definitions": "/definitions",
-  "view.standards": "/standards",
-  "view.guides": "/guides",
-};
-
-/** The route for a surface, or undefined when the site renders none. */
-export const findRouteForSurface = (uri: string): string | undefined =>
-  ROUTE_BY_SURFACE[readLocalName(uri)];
+export const findRouteForSurface = (
+  uri: string,
+): SurfaceRouteName | undefined => SURFACE_ROUTES.get(readLocalName(uri));
 
 /**
  * Merge the two pairing windows by URI, then group into the coordinate →
@@ -235,7 +229,7 @@ export const collectJourneys = (
               uri: surface.uri,
               label: readLocalName(surface.uri),
               surfaceType: surface.__typename,
-              href: findRouteForSurface(surface.uri),
+              route: findRouteForSurface(surface.uri),
               layout:
                 layoutNode === undefined
                   ? undefined

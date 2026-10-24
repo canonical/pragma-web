@@ -142,10 +142,10 @@ export default function JourneyTable({
         <td className="cell">
           {row.surfaceLabel === undefined ? (
             <span className="absent">—</span>
-          ) : row.surfaceHref === undefined ? (
+          ) : row.surfaceRoute === undefined ? (
             <span>{row.surfaceLabel}</span>
           ) : (
-            <a href={row.surfaceHref}>{row.surfaceLabel}</a>
+            <Link to={row.surfaceRoute}>{row.surfaceLabel}</Link>
           )}
         </td>
         <td className="cell">

@@ -42,7 +42,11 @@
  */
 
 import { snapToLattice } from "#lib/graph";
-import type { HopKind, JourneyCoordinate } from "../../types.js";
+import type {
+  HopKind,
+  JourneyCoordinate,
+  SurfaceRouteName,
+} from "../../types.js";
 import {
   ARRIVAL_CLASS_PREFIX,
   COLUMN_PITCH,
@@ -99,7 +103,7 @@ interface Placement {
   readonly surfaceType?: string | undefined;
   readonly role?: string | undefined;
   readonly arrival?: string | undefined;
-  readonly href?: string | undefined;
+  readonly route?: SurfaceRouteName | undefined;
   readonly rows: number[];
 }
 
@@ -197,7 +201,7 @@ export const buildJourneyGraph = (
               kind: "surface",
               label: surface.label ?? surface.uri,
               surfaceType: surface.surfaceType ?? undefined,
-              href: surface.href ?? undefined,
+              route: surface.route ?? undefined,
             },
             row,
           );
@@ -239,7 +243,7 @@ export const buildJourneyGraph = (
         surfaceType: placement.surfaceType,
         role: placement.role,
         arrival: placement.arrival,
-        href: placement.href,
+        route: placement.route,
       },
     });
   }

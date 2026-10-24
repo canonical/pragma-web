@@ -9,29 +9,26 @@
  *    concatenation the diagram would sprout duplicate rows; if it degraded
  *    to "first window only" it would silently lose 13 of 51 jobs.
  *
- * 2. EVERY LINK GOES SOMEWHERE REAL. `ROUTE_BY_SURFACE` is hand-written,
+ * 2. EVERY LINK GOES SOMEWHERE REAL. `SURFACE_ROUTES` is hand-written,
  *    so it is exactly the kind of table that rots into dead links. The
- *    route test below reads the app's own route declarations and asserts
- *    every href in the table is one of them — a surface with no route
- *    must render as text, never as a link to a 404.
+ *    route test below reads the app's own route table and asserts every
+ *    route the table names is one of its parameterless routes — a surface
+ *    with no route must render as text, never as a link to a 404.
  */
 
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { describe, expect, it } from "vitest";
-import { standardsRoutes } from "#domains/standards";
+import { appRoutes } from "../../routes.js";
 import {
   collectJourneys,
   describeCoordinate,
   findRouteForSurface,
   type RawJob,
   type RawPairing,
-  ROUTE_BY_SURFACE,
   readAxisTerm,
   readJobGist,
   readLocalName,
 } from "./collectJourneys.js";
+import { SURFACE_ROUTES } from "./constants.js";
 
 const DOCS = "sem://design-system-docs#";
 
@@ -225,31 +222,21 @@ describe("readAxisTerm", () => {
   });
 });
 
-describe("ROUTE_BY_SURFACE", () => {
-  it("points only at routes the app actually declares", () => {
-    // The table is hand-written; this reads the real route declarations
-    // so a surface can never link to a page that does not exist.
-    // The route declarations live under `src/domains`; this add-on lives
-    // outside the core lens tree, so it walks back into it explicitly.
-    const routesDir = fileURLToPath(new URL("../../domains/", import.meta.url));
-    const sources = [
-      "components/routes.tsx",
-      "marketing/routes.tsx",
-      "guides/routes.tsx",
-    ].map((file) => readFileSync(`${routesDir}${file}`, "utf-8"));
-    // The Definitions and Standards lenses ship as packages, so their routes
-    // are read off the records the site builds from them rather than off a
-    // source file.
-    const declared = new Set([
-      ...sources.flatMap((source) =>
-        [...source.matchAll(/url:\s*"([^"]+)"/g)].map((match) => match[1]),
-      ),
-      ...Object.values(definitionsRoutes).map(({ url }) => url),
-      ...Object.values(standardsRoutes).map(({ url }) => url),
-    ]);
-    for (const href of Object.values(ROUTE_BY_SURFACE)) {
-      expect(declared.has(href), `${href} must be a declared route`).toBe(true);
+describe("SURFACE_ROUTES", () => {
+  it("names only parameterless routes the app actually declares", () => {
+    // The table is hand-written; this reads the real route table, so a
+    // surface can never link to a page that does not exist, and a link
+    // built from a name alone never misses a parameter.
+    for (const name of SURFACE_ROUTES.values()) {
+      const route = appRoutes[name];
+      expect(route, `${name} must be a declared route`).toBeDefined();
+      expect(route.url, `${name} must take no parameter`).not.toContain(":");
     }
+  });
+
+  it("finds the route a surface the site renders lands on", () => {
+    expect(findRouteForSurface(`${DOCS}view.components`)).toBe("components");
+    expect(findRouteForSurface("surface:view.home")).toBe("home");
   });
 
   it("returns undefined for a surface the site does not render", () => {

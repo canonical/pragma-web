@@ -7,6 +7,17 @@ import type { HOP_KINDS } from "./constants.js";
  */
 export type JourneyView = "table" | "graph";
 
+/**
+ * The name of a site route a surface can land on: every one takes no
+ * parameter, so a link builds its path from the name alone.
+ */
+export type SurfaceRouteName =
+  | "home"
+  | "components"
+  | "definitions"
+  | "standards"
+  | "guides";
+
 /** One of the journey's columns, from `HOP_KINDS`: what a hop stands for. */
 export type HopKind = (typeof HOP_KINDS)[number];
 
@@ -16,8 +27,8 @@ export interface JourneySurface {
   readonly label?: string | null | undefined;
   /** The concrete `Surface` implementor, such as `View` or `Port`. */
   readonly surfaceType?: string | null | undefined;
-  /** The docsite route the surface lives at, when the site renders one. */
-  readonly href?: string | null | undefined;
+  /** The name of the site route the surface lives at, when there is one. */
+  readonly route?: SurfaceRouteName | null | undefined;
   readonly layout?:
     | { readonly uri: string; readonly label?: string | null | undefined }
     | null
@@ -69,8 +80,8 @@ export interface JourneyNodeData {
   readonly role?: string | undefined;
   /** The pairing's arrival URI, for a pairing hop only; may be absent. */
   readonly arrival?: string | undefined;
-  /** The docsite route of a surface hop, when the site renders one. */
-  readonly href?: string | undefined;
+  /** The name of a surface hop's site route, when the site renders one. */
+  readonly route?: SurfaceRouteName | undefined;
 }
 
 /** The selected job, joined against the model: what the inspector shows. */

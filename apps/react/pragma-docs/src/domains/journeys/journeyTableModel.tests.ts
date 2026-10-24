@@ -45,7 +45,7 @@ const COORDINATES: readonly JourneyCoordinate[] = [
             surface: {
               uri: "sem://docs#view.components",
               label: "view.components",
-              href: "/components",
+              route: "components",
             },
           },
           {
@@ -74,7 +74,7 @@ const COORDINATES: readonly JourneyCoordinate[] = [
             surface: {
               uri: "sem://docs#view.home",
               label: "view.home",
-              href: "/",
+              route: "home",
             },
           },
         ],
@@ -113,7 +113,7 @@ describe("buildJourneyRows projects the model honestly", () => {
     // The reported surface is the first by URI order — deterministic,
     // never the graph's iteration order.
     expect(zebra?.surfaceLabel).toBe("view.components");
-    expect(zebra?.surfaceHref).toBe("/components");
+    expect(zebra?.surfaceRoute).toBe("components");
     expect(zebra?.served).toBe(true);
   });
 
@@ -122,7 +122,7 @@ describe("buildJourneyRows projects the model honestly", () => {
     expect(alpha?.served).toBe(false);
     expect(alpha?.pairings).toHaveLength(0);
     expect(alpha?.surfaceLabel).toBeUndefined();
-    expect(alpha?.surfaceHref).toBeUndefined();
+    expect(alpha?.surfaceRoute).toBeUndefined();
   });
 
   it("renders an unconstrained axis as the ontology's wildcard, not a gap", () => {

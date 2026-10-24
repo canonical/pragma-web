@@ -168,7 +168,9 @@ export default function JourneyWell({
             const href =
               data.kind === "job"
                 ? router.buildPath("journeysJob", { params: { job: data.uri } })
-                : data.href;
+                : data.route === undefined
+                  ? undefined
+                  : router.buildPath(data.route);
             return (
               <g
                 className={isSelected ? "hop is-selected" : "hop"}

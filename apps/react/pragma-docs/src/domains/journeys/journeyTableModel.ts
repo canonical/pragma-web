@@ -28,7 +28,11 @@
  */
 
 import { readAxisTerm, readLocalName } from "./collectJourneys.js";
-import type { JourneyCoordinate, JourneyPairing } from "./types.js";
+import type {
+  JourneyCoordinate,
+  JourneyPairing,
+  SurfaceRouteName,
+} from "./types.js";
 
 /** The columns the table can be ordered by. */
 export type JourneySortKey =
@@ -90,7 +94,8 @@ export interface JourneyRow {
   readonly secondaryCount: number;
   /** The first surface this job lands on, by URI order. */
   readonly surfaceLabel: string | undefined;
-  readonly surfaceHref: string | undefined;
+  /** The name of that surface's site route, when the site renders it. */
+  readonly surfaceRoute: SurfaceRouteName | undefined;
   /** Does ANY surface serve this job? The model's sharpest single fact. */
   readonly served: boolean;
 }
@@ -171,7 +176,7 @@ export const buildJourneyRows = (
           first === undefined
             ? undefined
             : (first.label ?? readLocalName(first.uri)),
-        surfaceHref: first?.href ?? undefined,
+        surfaceRoute: first?.route ?? undefined,
         served: job.pairings.length > 0,
       });
     }
