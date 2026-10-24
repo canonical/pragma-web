@@ -28,10 +28,7 @@
  */
 
 import { axisTerm, localName } from "./collectJourneys.js";
-import type {
-  JourneyCoordinate,
-  JourneyPairing,
-} from "./JourneyWell/buildJourneyGraph.js";
+import type { JourneyCoordinate, JourneyPairing } from "./types.js";
 
 /** The columns the table can be ordered by. */
 export type JourneySortKey =

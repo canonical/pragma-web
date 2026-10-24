@@ -7,8 +7,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { JOURNEY_MODEL } from "../__fixtures__/journeyModel.js";
+import type { InspectedJob } from "../types.js";
 import JourneyInspector from "./JourneyInspector.js";
-import type { InspectedJob } from "./types.js";
 
 const STORY =
   "When I don't yet know what exists, I want to browse and filter the full catalog, so I can find what exists and what it does, without reading source.";

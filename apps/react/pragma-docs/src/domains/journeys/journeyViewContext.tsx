@@ -5,10 +5,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import {
-  DEFAULT_JOURNEY_VIEW,
-  type JourneyView,
-} from "./JourneysExplorer/types.js";
+import { DEFAULT_JOURNEY_VIEW } from "./constants.js";
+import type { JourneyView } from "./types.js";
 
 /**
  * THE ONE CONTEXT IN THIS LENS, and the constraint that forced it (RULING 1,

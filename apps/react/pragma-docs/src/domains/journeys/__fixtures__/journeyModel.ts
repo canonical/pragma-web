@@ -14,7 +14,7 @@
  * never collected as one.
  */
 
-import type { JourneyCoordinate } from "../JourneyWell/buildJourneyGraph.js";
+import type { JourneyCoordinate } from "../types.js";
 
 const SURFACE = "sem://surface#";
 const DOCS = "sem://design-system-docs#";

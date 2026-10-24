@@ -41,6 +41,7 @@
  * which is exactly what it is.
  */
 
+import type { HopKind, JourneyCoordinate } from "../types.js";
 import {
   ARRIVAL_CLASS_PREFIX,
   COLUMN_GAP,
@@ -50,7 +51,7 @@ import {
   ROLE_SECONDARY_CLASS,
   ROW_GAP,
 } from "./constants.js";
-import type { HopKind, JourneyGraphEdge, JourneyGraphNode } from "./types.js";
+import type { JourneyGraphEdge, JourneyGraphNode } from "./types.js";
 
 /** The column index of each hop kind — the x axis, in one place. */
 const COLUMN_INDEX: Readonly<Record<HopKind, number>> = {
@@ -67,45 +68,6 @@ const columnX = (kind: HopKind): number =>
 
 /** A row's y: constant stride, no measurement. */
 const rowY = (row: number): number => row * (NODE_HEIGHT + ROW_GAP);
-
-/** One pairing as the fragment delivers it. */
-export interface JourneyPairing {
-  readonly uri: string;
-  readonly label?: string | null | undefined;
-  readonly role?: string | null | undefined;
-  readonly arrival?: string | null | undefined;
-  readonly surface?:
-    | {
-        readonly uri: string;
-        readonly label?: string | null | undefined;
-        readonly surfaceType?: string | null | undefined;
-        readonly href?: string | null | undefined;
-        readonly layout?:
-          | { readonly uri: string; readonly label?: string | null | undefined }
-          | null
-          | undefined;
-      }
-    | null
-    | undefined;
-}
-
-/** One job as the fragment delivers it. */
-export interface JourneyJob {
-  readonly uri: string;
-  readonly label?: string | null | undefined;
-  /** The job's story, VERBATIM — the reader's own sentence. Threaded so a
-   * surface (the rail) can show a legible line rather than the URI slug;
-   * undefined when the graph holds none. */
-  readonly story?: string | null | undefined;
-  readonly pairings: readonly JourneyPairing[];
-}
-
-/** One coordinate — the diagram's root (ruling R1: never the persona). */
-export interface JourneyCoordinate {
-  readonly uri: string;
-  readonly label?: string | null | undefined;
-  readonly jobs: readonly JourneyJob[];
-}
 
 /** The positioned graph the well draws, deterministic. */
 export interface JourneyGraph {

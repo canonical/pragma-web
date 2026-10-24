@@ -13,7 +13,6 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { JourneyCoordinate } from "./JourneyWell/buildJourneyGraph.js";
 import {
   ariaSortFor,
   axisText,
@@ -25,6 +24,7 @@ import {
   sortRows,
   toggleSort,
 } from "./journeyTableModel.js";
+import type { JourneyCoordinate } from "./types.js";
 
 /** A small model with the shapes that matter: a served job with two
  * pairings (one primary), an unserved job, a wildcard-axis job, and two

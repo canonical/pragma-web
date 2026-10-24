@@ -6,17 +6,6 @@ export interface JourneysExplorerProps {
 }
 
 /**
- * Which reading of the demand model the centre shows — the table (the
- * index) or the graph (one journey's spine). EPHEMERAL client state, never
- * the URL (P-D7); the default is a constant so the SSR first paint is fixed.
- */
-export type JourneyView = "table" | "graph";
-
-/** The default reading: the table, the lens's primary surface. A constant,
- * read from nothing — the strongest form of the SSR determinism argument. */
-export const DEFAULT_JOURNEY_VIEW: JourneyView = "table";
-
-/**
  * THE VIEW-DEPENDENT LAYOUT (RULING 2), now expressed the strict
  * intrinsic-grid way. The explorer no longer sets its own column TEMPLATE —
  * under the one-grid model it is a `grid-template-columns: subgrid` that

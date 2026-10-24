@@ -5,12 +5,12 @@
   "type": "module",
   "license": "GPL-3.0-only",
   "imports": {
-    "#addons/journeys": "./src/addons/journeys/index.ts",
     "#domains/account": "./src/domains/account/index.ts",
     "#domains/components": "./src/domains/components/index.ts",
     "#domains/components/lib": "./src/domains/components/lib/index.ts",
     "#domains/definitions": "./src/domains/definitions/index.ts",
     "#domains/guides": "./src/domains/guides/index.ts",
+    "#domains/journeys": "./src/domains/journeys/index.ts",
     "#domains/marketing": "./src/domains/marketing/index.ts",
     "#domains/modifiers/lib": "./src/domains/modifiers/lib/index.ts",
     "#domains/playground": "./src/domains/playground/index.ts",

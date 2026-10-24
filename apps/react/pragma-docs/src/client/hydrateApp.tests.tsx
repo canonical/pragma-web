@@ -28,10 +28,10 @@ import {
   LINK_COMPONENT_URI,
   standardEntityRecords,
 } from "../../testing/standardsRecords.js";
-import journeysExplorerRecords from "../addons/journeys/__fixtures__/journeysExplorerRecords.js";
-import journeysExplorerRecordsJob from "../addons/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
+import journeysExplorerRecords from "../domains/journeys/__fixtures__/journeysExplorerRecords.js";
+import journeysExplorerRecordsJob from "../domains/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import lobbyRecords from "../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../domains/playground/__fixtures__/componentProbeRecords.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";

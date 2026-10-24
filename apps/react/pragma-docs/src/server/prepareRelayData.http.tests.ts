@@ -40,8 +40,8 @@ import {
   it,
   vi,
 } from "vitest";
-import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#addons/journeys";
 import { CATALOG_PAGE_SIZE, RELATION_PAGE_SIZE } from "#domains/components";
+import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#domains/journeys";
 import {
   LOBBY_COMPONENT_CLASS,
   LOBBY_EXEMPLAR_COUNT,

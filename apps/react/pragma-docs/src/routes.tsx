@@ -3,11 +3,11 @@
 import { DocumentLayout } from "@canonical/prism-core";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { group, route } from "@canonical/router-core";
-import { journeysLayout, journeysRoutes } from "#addons/journeys";
 import { accountLayout, accountRoutes } from "#domains/account";
 import { componentsLayout, componentsRoutes } from "#domains/components";
 import { definitionsLayout } from "#domains/definitions";
 import { guidesLayout, guidesRoutes } from "#domains/guides";
+import { journeysLayout, journeysRoutes } from "#domains/journeys";
 import { marketingLayout, marketingRoutes } from "#domains/marketing";
 import { playgroundLayout, playgroundRoutes } from "#domains/playground";
 import { standardsLayout, standardsRoutes } from "#domains/standards";
@@ -69,14 +69,13 @@ const [standards, standardEntity] = group(standardsLayout, [
 ] as const);
 
 // Journeys is in this table but is NOT a core lens. It is a pragma-specific
-// ADD-ON (`#addons/journeys`, not a lens package) — an owner
-// reclassification, because it reads pragma's own ontology through generic
-// instance-level relation traversal, which the provider-neutral contract
-// cannot express. It is wired in BY HAND here, alongside the core lenses,
-// only because the docsite has no plugin mechanism yet; when one exists the
-// add-on registers its own routes and these lines go away. Until then it
-// stays live and addressable — the ruling was "keep it on side", not "hide
-// it". See `src/addons/journeys/index.ts`.
+// ADD-ON (`#domains/journeys`, not a lens package): it reads pragma's own
+// ontology through generic instance-level relation traversal, which the
+// provider-neutral contract cannot express. It is wired in BY HAND here,
+// alongside the core lenses, only because the docsite has no plugin
+// mechanism yet; when one exists the add-on registers its own routes and
+// these lines go away. Until then it stays live and addressable. See
+// `src/domains/journeys/index.ts`.
 const [journeys, journeysJob] = group(journeysLayout, [
   journeysRoutes.journeys,
   journeysRoutes.journeysJob,

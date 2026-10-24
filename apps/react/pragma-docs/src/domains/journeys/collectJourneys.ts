@@ -19,11 +19,7 @@
  * one pairing.
  */
 
-import type {
-  JourneyCoordinate,
-  JourneyJob,
-  JourneyPairing,
-} from "./JourneyWell/buildJourneyGraph.js";
+import type { JourneyCoordinate, JourneyJob, JourneyPairing } from "./types.js";
 
 /** A pairing as either window delivers it. */
 export interface RawPairing {

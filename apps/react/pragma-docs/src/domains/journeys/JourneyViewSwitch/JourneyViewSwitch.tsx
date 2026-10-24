@@ -1,5 +1,5 @@
 import type React from "react";
-import type { JourneyView } from "../JourneysExplorer/types.js";
+import type { JourneyView } from "../types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds journeys-view-switch";

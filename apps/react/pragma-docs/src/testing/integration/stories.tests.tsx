@@ -99,7 +99,7 @@ const composedByPath = new Map<string, Record<string, ComposedStory>>(
  * in a diff and someone has to defend it.
  */
 const DOCS_ONLY = new Set([
-  "../../addons/journeys/JourneysPage/JourneysPage.stories.tsx",
+  "../../domains/journeys/JourneysPage/JourneysPage.stories.tsx",
 ]);
 
 describe("the story corpus", () => {

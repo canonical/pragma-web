@@ -17,10 +17,10 @@
  */
 
 import { describe, expect, it } from "vitest";
+import type { JourneyCoordinate } from "../types.js";
 import {
   arrivalClassName,
   buildJourneyGraph,
-  type JourneyCoordinate,
   roleClassName,
 } from "./buildJourneyGraph.js";
 import {

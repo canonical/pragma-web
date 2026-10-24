@@ -1,5 +1,5 @@
-import type { JourneyCoordinate } from "../JourneyWell/buildJourneyGraph.js";
 import type { JourneyFilter } from "../journeyFilter.js";
+import type { JourneyCoordinate } from "../types.js";
 
 export interface JourneyRailProps {
   /** Additional CSS class names. */
