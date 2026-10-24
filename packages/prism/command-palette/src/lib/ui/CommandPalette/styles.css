@@ -33,6 +33,11 @@
     --command-palette-padding-block: var(--component-padding-block);
     --command-palette-padding-inline: var(--component-padding-inline);
     --command-palette-failure-color: var(--color-text-error);
+    /* The failure line's ring, the field's: inside it, since the dialog
+     * clips. */
+    --command-palette-failure-focus-ring-width: 2px;
+    --command-palette-failure-focus-ring-offset: -2px;
+    --command-palette-failure-focus-ring-color: var(--color-focus-ring);
     --command-palette-hints-gap: var(--grid-gutter);
     --command-palette-hint-gap: var(--space-050);
     /* The hints' hairline above them: stroke thickness has no token. */
@@ -58,6 +63,14 @@
     padding-block: var(--command-palette-padding-block);
     padding-inline: var(--command-palette-padding-inline);
     color: var(--command-palette-failure-color);
+  }
+
+  /* The line holds the focus once the search fails. */
+  .ds.command-palette > .failure:focus-visible {
+    outline-width: var(--command-palette-failure-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--command-palette-failure-focus-ring-color);
+    outline-offset: var(--command-palette-failure-focus-ring-offset);
   }
 
   /* The keys that move, open and close, flush left under a hairline. */
