@@ -39,13 +39,16 @@ describe("JourneysWorkspace", () => {
     ).toBeNull();
   });
 
-  it("opens the inspector region on the graph, its loading line while the store is cold", async () => {
+  it("opens the inspector region on the graph, empty while the store is cold", async () => {
     const { container } = renderWorkspace();
     fireEvent.click(screen.getByRole("button", { name: "Graph" }));
     await waitFor(() =>
       expect(
-        container.querySelector(".workspace-layout > .inspector")?.textContent,
-      ).toBe("Loading the demand model…"),
+        container.querySelector(".workspace-layout > .inspector"),
+      ).not.toBeNull(),
     );
+    expect(
+      container.querySelector(".workspace-layout > .inspector")?.textContent,
+    ).toBe("");
   });
 });

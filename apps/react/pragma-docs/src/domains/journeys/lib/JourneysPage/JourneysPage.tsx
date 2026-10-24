@@ -16,7 +16,8 @@ const componentCssClassName = "ds journeys-page";
  * the only difference is the decoded `job` param. The heading stays
  * outside the boundaries, so the section keeps its label while the
  * explorer loads, and the route content never suspends at the outlet,
- * which would swap the whole layout for the fallback.
+ * which would swap the whole layout for the fallback. The loading line and
+ * the error line span the page's columns, as the explorer does.
  *
  * No default job: `/journeys` renders the table of every job, never a
  * redirect.
@@ -53,10 +54,14 @@ export default function JourneysPage({
         {t("journeys.title")}
       </h1>
       <ErrorBoundary
-        fallback={<p role="alert">{t("page.queryFailed")}</p>}
+        fallback={
+          <p className="alert" role="alert">
+            {t("page.queryFailed")}
+          </p>
+        }
         resetKey={job}
       >
-        <Suspense fallback={<p>{t("journeys.loading")}</p>}>
+        <Suspense fallback={<p className="status">{t("journeys.loading")}</p>}>
           <JourneysExplorer job={job} />
         </Suspense>
       </ErrorBoundary>

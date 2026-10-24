@@ -33,7 +33,9 @@ const JourneysTrail = makeLensContext({
  *
  * The inspector reads the explorer's operation from the warm store inside
  * its own error boundary and Suspense: a cold store empties the region and
- * leaves the rail, the strip and the canvas standing.
+ * leaves the rail, the strip and the canvas standing. The region shows no
+ * loading line of its own: the page in the canvas reads the same operation
+ * and says it is loading across the canvas's columns.
  *
  * `import { JourneysWorkspace } from "./common/JourneysWorkspace/index.js";`
  *
@@ -51,7 +53,7 @@ export default function JourneysWorkspace({
       inspector={
         view === "graph" ? (
           <ErrorBoundary fallback={null}>
-            <Suspense fallback={<p>{t("journeys.loading")}</p>}>
+            <Suspense fallback={null}>
               <Inspector />
             </Suspense>
           </ErrorBoundary>

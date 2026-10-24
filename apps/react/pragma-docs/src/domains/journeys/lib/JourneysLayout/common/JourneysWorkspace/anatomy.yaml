@@ -6,8 +6,10 @@
 # the inspector region (a drawer below three groups). The table view has
 # no inspector, so the canvas takes its columns. The inspector reads the
 # store inside its own error and loading boundaries, so a cold store
-# empties its region and nothing else. It renders no element of its own:
-# the workspace renders the root.
+# empties its region and nothing else; the region shows no loading line of
+# its own, since the page in the canvas reads the same operation and says
+# it is loading across the canvas's columns. It renders no element of its
+# own: the workspace renders the root.
 node:
   uri: docs.subcomponent.journeys_workspace
   edges:
