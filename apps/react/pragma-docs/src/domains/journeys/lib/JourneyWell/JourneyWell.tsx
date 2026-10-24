@@ -80,7 +80,10 @@ function drawEdge(
  * pairing's role weighs its edge and never moves a hop.
  *
  * The rail lists every job this graph draws, so the graph is a spatial view
- * over the same nouns, never the only way to reach one.
+ * over the same nouns, never the only way to reach one. It has no phone
+ * view of its own: at a phone's width the journeys' reading is their
+ * table, the lens's default view, and the graph stays the same drawing
+ * the reader pans.
  *
  * `import { JourneyWell } from "../JourneyWell/index.js";`
  *

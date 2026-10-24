@@ -34,6 +34,16 @@
 # The root is a grid of one row, its gap the gutter as every grid's is:
 # the canvas takes the whole cell.
 #
+# No phone view, an exemption from the graph heuristics' phone reading
+# below 600px: the journeys' phone reading is their table, the lens's
+# default view, which lists every job with its coordinate and pairings
+# and scrolls in its own region. The graph stays the same pan-and-zoom
+# drawing at every width. Measured at 390 by 844 (the well's cell 289 by
+# 723 in the app): it opens at 86% with every label at the 12px floor,
+# showing about one and a half of its five columns; 9 of 11 hops in the
+# story lie outside the canvas, and the hops span 272% of its width, so a
+# reader pans to reach a surface.
+#
 # Bespoke: no published component draws a journey. SVG paints through
 # currentColor: the roster has no fill or stroke key, so each shape's
 # colour is bound as its typography.color. Stroke widths and dashes are
