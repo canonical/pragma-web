@@ -305,6 +305,15 @@ describe("CommandPaletteSearch", () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
+  it("keeps the scrolling results and preview out of the tab order", async () => {
+    await renderResults("lay");
+    expect(screen.getByRole("listbox")).toHaveAttribute("tabindex", "-1");
+    expect(screen.getByRole("region", { name: "Preview" })).toHaveAttribute(
+      "tabindex",
+      "-1",
+    );
+  });
+
   it("leaves the arrow keys to the field while nothing is listed", () => {
     const { onChoose } = renderSearch();
     const field = screen.getByRole("combobox");

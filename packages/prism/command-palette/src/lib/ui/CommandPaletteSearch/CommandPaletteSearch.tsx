@@ -230,6 +230,7 @@ export default function CommandPaletteSearch({
               className="results"
               id={listboxId}
               role="listbox"
+              tabIndex={-1}
             >
               {groups.map((group, position) => {
                 const headingId = `${listboxId}-group-${position}`;
@@ -278,6 +279,7 @@ export default function CommandPaletteSearch({
             aria-label={t("search.preview")}
             className="preview"
             onClick={handlePreviewClick}
+            tabIndex={-1}
           >
             <CardProjection node={active.node} />
           </section>
