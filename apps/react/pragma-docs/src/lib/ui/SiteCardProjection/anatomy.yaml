@@ -1,0 +1,49 @@
+---
+# SiteCardProjection: any graph node as the card in a grid of entities on
+# this site, dispatched on its type.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
+# matrix: one EntityCard per type, each type filling the slots it has).
+# It renders no element of its own: the case its node's type selects
+# renders the root. A design-system type reads through the site's own
+# projection; every other type through the package's dispatcher, which
+# takes ontology classes and any node from the site's provided maps. The
+# cases are the site composite's aliased arms and the site map's arms, by
+# the same names; the three UI-block types share one projection.
+node:
+  uri: docs.component.site_card_projection
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: docs.component.ui_block_card
+              projection:
+                on: Component
+          - node:
+              uri: docs.component.ui_block_card
+              projection:
+                on: Pattern
+          - node:
+              uri: docs.component.ui_block_card
+              projection:
+                on: Layout
+          - node:
+              uri: docs.component.modifier_card
+              projection:
+                on: Modifier
+          - node:
+              uri: docs.component.modifier_family_card
+              projection:
+                on: ModifierFamily
+          - node:
+              uri: docs.component.code_standard_card
+              projection:
+                on: CodeStandard
+          - node:
+              uri: prism.component.card_projection
+              projection:
+                on: Node
+      relation:
+        cardinality: "1"

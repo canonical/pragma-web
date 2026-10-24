@@ -1,0 +1,62 @@
+---
+# ModifierFamilyRow: a modifier family as a 32px list entry.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 547:2227 and 547:2201 (the
+# namespace prefix muted before the title, the muted count at the end). The
+# prefix is the compact address's, with its colon; the end counts the
+# family's modifiers ("5 modifiers").
+# Projected onto EntityRow, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address; a family has no home yet and reads as inert text.
+node:
+  uri: docs.component.modifier_family_row
+  projection:
+    on: ModifierFamily
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+              # The prefix is set in the identifier face.
+              edges:
+                - node:
+                    role: identifier
+                  relation:
+                    cardinality: "1"
+                    slotName: identifier
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: meta
+              edges:
+                # Each member counts once.
+                - node:
+                    role: member
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..*"
+                    projection:
+                      field: modifiers
+            relation:
+              cardinality: "1"
+              slotName: meta
+      relation:
+        cardinality: "1"

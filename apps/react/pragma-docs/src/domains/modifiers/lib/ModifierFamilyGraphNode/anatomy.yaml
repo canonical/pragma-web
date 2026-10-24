@@ -1,0 +1,51 @@
+---
+# ModifierFamilyGraphNode: a modifier family as a node of a graph.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2433 and 566:2357 (the
+# title, then "kind in location" muted). The title is the family's title,
+# not its compact address, which is wider than the node and would be
+# clipped.
+# The kind is the family's class; the location the address's prefix.
+# Projected onto EntityGraphNode, native SVG, which carries every style:
+# this anatomy binds none. The home is the link the title renders through,
+# resolved from the compact address; a family has no home yet and reads as
+# inert text.
+node:
+  uri: docs.component.modifier_family_graph_node
+  projection:
+    on: ModifierFamily
+  edges:
+    - node:
+        uri: prism.component.entity_graph_node
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+      relation:
+        cardinality: "1"

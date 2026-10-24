@@ -1,0 +1,90 @@
+---
+# ModifierCard: a modifier as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 462:478 and 502:1848 (the
+# location above "Danger", the kind "Modifier", the summary, the key values
+# Class and Family, each under a rule, and the version in the footer). The
+# location is the compact address's prefix (the schema gives a modifier no
+# tier); the Class value is the modifier's class, the Family value its
+# family; the summary the first paragraph of the modifier's Markdown
+# summary, rendered inline, so its emphasis, code and links read as they
+# do in the modifier's documentation.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. A modifier has no sidecar. The home is the link the title renders
+# through, resolved from the compact address; a modifier has no home yet
+# and reads as inert text.
+node:
+  uri: docs.component.modifier_card
+  projection:
+    on: Modifier
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: summary
+              projection:
+                field: summary
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+          - node:
+              role: key values
+              edges:
+                - node:
+                    role: class
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "1"
+                    projection:
+                      field: _meta.type
+                - node:
+                    role: family
+                    projection:
+                      field: _meta.title
+                  relation:
+                    cardinality: "0..1"
+                    projection:
+                      field: modifierFamily
+            relation:
+              cardinality: "1"
+              slotName: key-values
+          - node:
+              role: vital
+              projection:
+                field: version
+            relation:
+              cardinality: "0..1"
+              slotName: footer
+      relation:
+        cardinality: "1"

@@ -1,0 +1,38 @@
+---
+# EntitySummary — the entity's definition and its comment, each only when
+# the graph asserts one, the comment muted, then the class it is an
+# instance of, mentioned through the site's chip projection so it links to
+# the class's home. It is the page's prose, so it alone holds the reading
+# measure: six intrinsic columns from the column's first line (a narrower
+# subgrid clamps the span). Its paragraphs stack one gutter apart.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-summary-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / span 6": structure, a span in columns.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: prism.subcomponent.entity_summary
+  styles:
+    layout.grid.column: "1 / span 6"
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: definition
+      relation: { cardinality: "0..1", slotName: definition }
+    - node:
+        role: comment
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: comment }
+    - node:
+        role: type (the catalog's "Instance of" sentence)
+        edges:
+          - node:
+              uri: prism.component.chip_projection
+            relation: { cardinality: "1" }
+      relation: { cardinality: "1", slotName: type }

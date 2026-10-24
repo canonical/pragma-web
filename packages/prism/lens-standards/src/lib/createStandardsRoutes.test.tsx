@@ -16,7 +16,7 @@ import {
 import standardEntityRecords from "../../testing/records/standardEntityRecords.js";
 import standardsIndexRecords from "../../testing/records/standardsIndexRecords.js";
 import createStandardsRoutes from "./createStandardsRoutes.js";
-import { StandardsIcon } from "./StandardsIcon/index.js";
+import { StandardsIcon } from "./ui/StandardsIcon/index.js";
 
 afterEach(() => {
   // The prefetch environment is module state shared across this file's tests.

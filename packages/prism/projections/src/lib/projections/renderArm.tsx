@@ -46,7 +46,10 @@ function renderTypeArm<
  * Render the arm a node's typename selects in one form's map: the typed arm
  * for its type when the map has one and its alias resolved, else the
  * site's arm for its typename, else the `Node` arm, which reads what every
- * node carries.
+ * node carries. A site's own dispatcher calls it over a composite of its
+ * own, so its arms and the package's dispatch alike.
+ *
+ * `import { renderArm } from "@canonical/prism-projections";`
  *
  * @param map - The form's arms.
  * @param data - The composite fragment's data: the typename and every

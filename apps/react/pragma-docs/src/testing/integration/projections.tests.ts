@@ -1,0 +1,208 @@
+// @vitest-environment node
+
+import { readdirSync } from "node:fs";
+import { basename, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  assertAnatomy,
+  assertProjectionMatchesFragment,
+  listAnatomyFolders,
+} from "@canonical/prism-core/testing";
+import type { ReaderFragment, ReaderSelection } from "relay-runtime";
+import { describe, expect, it } from "vitest";
+import { siteProjectionMaps } from "../../lib/ui/constants.js";
+import type { SiteProjectionMaps } from "../../lib/ui/types.js";
+
+/** The app's root, three levels up from this file. */
+const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
+
+/** Where each domain's own components live: `src/domains/<subject>/lib`. */
+const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
+  withFileTypes: true,
+})
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => join(APP_ROOT, "src", "domains", entry.name, "lib"));
+
+/** Every compiled fragment of the app, by the artifact's file name. */
+const FRAGMENT_MODULES = import.meta.glob<{ default: ReaderFragment }>(
+  "../../relay/__generated__/*_node.graphql.ts",
+  { eager: true },
+);
+
+/**
+ * Read the compiled fragment a component's projection reads, `<Name>_node`.
+ *
+ * @throws When the app compiled no such fragment.
+ */
+function readNodeFragment(folder: string): ReaderFragment {
+  const path = `../../relay/__generated__/${basename(folder)}_node.graphql.ts`;
+  const fragment = FRAGMENT_MODULES[path]?.default;
+  if (fragment === undefined) {
+    throw new Error(`${folder}: the app compiled no ${basename(folder)}_node`);
+  }
+  return fragment;
+}
+
+/**
+ * An arm of a site composite, as relay-compiler emits an `@alias` on an
+ * inline fragment or a spread: relay-runtime's reader types do not name
+ * this selection yet.
+ */
+interface AliasedArm {
+  readonly kind: "AliasedInlineFragmentSpread";
+  readonly name: string;
+  readonly fragment: {
+    readonly type: string;
+    readonly selections: readonly ReaderSelection[];
+  };
+}
+
+/** Whether a selection is an aliased arm. */
+function isAliasedArm(selection: object): selection is AliasedArm {
+  return (
+    "kind" in selection && selection.kind === "AliasedInlineFragmentSpread"
+  );
+}
+
+/** Name a selection's kind, for a refusal. */
+function describeKind(selection: object): string {
+  return "kind" in selection ? String(selection.kind) : "a selection";
+}
+
+/**
+ * Read a site composite's arms: every top-level selection but the typename
+ * must be an aliased inline fragment named by the type it is on, so each
+ * arm's key is non-null for its own type alone.
+ *
+ * @returns Each alias, with the fragments its arm spreads.
+ * @throws With the first selection that is no such arm.
+ */
+function readCompositeArms(
+  fragment: ReaderFragment,
+): Map<string, readonly string[]> {
+  const selections: readonly object[] = fragment.selections;
+  return new Map(
+    selections
+      .filter(
+        (selection) =>
+          !("name" in selection && selection.name === "__typename"),
+      )
+      .map((selection) => {
+        if (
+          !isAliasedArm(selection) ||
+          selection.name !== selection.fragment.type
+        ) {
+          throw new Error(
+            `${fragment.name}: ${describeKind(selection)} is not an arm aliased by its type`,
+          );
+        }
+        return [
+          selection.name,
+          selection.fragment.selections.flatMap((inner) =>
+            inner.kind === "FragmentSpread" ? [inner.name] : [],
+          ),
+        ];
+      }),
+  );
+}
+
+/** The site's dispatcher of each form, by the form's key in its maps. */
+const SITE_DISPATCHERS: readonly (readonly [
+  keyof SiteProjectionMaps,
+  string,
+])[] = [
+  ["chip", "Chip"],
+  ["row", "Row"],
+  ["card", "Card"],
+  ["command", "Command"],
+  ["graphNode", "GraphNode"],
+];
+
+/** The app's projections: every component whose anatomy projects on a type. */
+const PROJECTIONS = listAnatomyFolders([
+  join(APP_ROOT, "src", "lib", "ui"),
+  ...DOMAIN_LIBRARIES,
+]).filter((folder) => assertAnatomy(folder).root.projection?.on !== undefined);
+
+describe("the app's projections", () => {
+  it("are found in its domain libraries and its general components", () => {
+    expect(PROJECTIONS.map((folder) => basename(folder)).sort()).toEqual([
+      "CodeStandardCard",
+      "CodeStandardChip",
+      "CodeStandardCommand",
+      "CodeStandardGraphNode",
+      "CodeStandardRow",
+      "ModifierCard",
+      "ModifierChip",
+      "ModifierCommand",
+      "ModifierFamilyCard",
+      "ModifierFamilyChip",
+      "ModifierFamilyCommand",
+      "ModifierFamilyGraphNode",
+      "ModifierFamilyRow",
+      "ModifierGraphNode",
+      "ModifierRow",
+      "SiteCardProjection",
+      "SiteChipProjection",
+      "SiteCommandProjection",
+      "SiteGraphNodeProjection",
+      "SiteRowProjection",
+      "UIBlockCard",
+      "UIBlockChip",
+      "UIBlockCommand",
+      "UIBlockGraphNode",
+      "UIBlockRow",
+    ]);
+  });
+
+  it.each(PROJECTIONS)("%s reads what its fragment reads", (folder) => {
+    assertProjectionMatchesFragment(
+      assertAnatomy(folder),
+      readNodeFragment(folder),
+    );
+  });
+});
+
+describe("the site's composites", () => {
+  it.each(SITE_DISPATCHERS)(
+    "the %s composite arms exactly what its map and its anatomy arm",
+    (form, word) => {
+      const name = `Site${word}Projection`;
+      const arms = readCompositeArms(
+        readNodeFragment(join(APP_ROOT, "src", "lib", "ui", name)),
+      );
+      expect(arms.get("Node")).toEqual([`${word}Projection_node`]);
+      const types = siteProjectionMaps[form].types;
+      const typed = [...arms.keys()].filter((alias) => alias !== "Node");
+      expect(typed.sort()).toEqual(Object.keys(types).sort());
+      for (const [alias, Arm] of Object.entries(types)) {
+        expect(arms.get(alias), alias).toEqual([`${Arm.name}_node`]);
+      }
+      const { root } = assertAnatomy(join(APP_ROOT, "src", "lib", "ui", name));
+      const cases = (root.edges ?? []).flatMap(({ target }) =>
+        "cases" in target
+          ? target.cases.map(({ node }) => node.projection?.on)
+          : [],
+      );
+      expect(cases.filter((on) => on !== "Node").sort()).toEqual(typed.sort());
+    },
+  );
+
+  it("refuses an arm spread without an alias", () => {
+    expect(() =>
+      readCompositeArms({
+        kind: "Fragment",
+        name: "Unaliased_node",
+        type: "Node",
+        metadata: null,
+        argumentDefinitions: [],
+        selections: [
+          { kind: "ScalarField", name: "__typename" },
+          { kind: "FragmentSpread", name: "ModifierCard_node", args: null },
+        ],
+      }),
+    ).toThrow(
+      /Unaliased_node: FragmentSpread is not an arm aliased by its type/,
+    );
+  });
+});

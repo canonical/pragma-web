@@ -5,6 +5,8 @@ import { PREFIX_NAME } from "./constants.js";
  * leaves an address it cannot compact as the absolute IRI, and an entity
  * with no IRI at all as its GraphQL type name; neither has a prefix.
  *
+ * `import { findCuriePrefix } from "@canonical/prism-projections";`
+ *
  * @param curie - The node's compact address, `_meta.curie`.
  * @returns The prefix, without its colon, or `undefined` when the address
  *   did not compact: it has no colon, its text before the first colon is no
