@@ -15,7 +15,6 @@
        (currently 0). Revisit once a 2px radius token lands. */
     --keyboard-key-border-radius: var(--dimension-radius-small);
     --keyboard-key-border-width: var(--dimension-stroke-thickness-medium);
-    --keyboard-key-padding-inline: var(--ds-spacing-field);
   }
 
   /* The `.code` baseline utility (from @canonical/styles) supplies the
@@ -45,6 +44,6 @@
     border-color: var(--keyboard-key-color-border);
     border-radius: var(--keyboard-key-border-radius);
 
-    padding-inline: var(--keyboard-key-padding-inline);
+    padding-inline: var(--keyboard-key-padding-inline, var(--ds-spacing-field));
   }
 }

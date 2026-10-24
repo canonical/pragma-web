@@ -4,7 +4,6 @@
   :root {
     --inline-code-color-text: var(--color-text);
     --inline-code-color-background: var(--color-foreground-secondary);
-    --inline-code-padding-inline: var(--ds-spacing-field);
     --inline-code-border-radius: var(--dimension-radius-small);
   }
 
@@ -16,7 +15,7 @@
     color: var(--inline-code-color-text);
     background-color: var(--inline-code-color-background);
 
-    padding-inline: var(--inline-code-padding-inline);
+    padding-inline: var(--inline-code-padding-inline, var(--ds-spacing-field));
     border-radius: var(--inline-code-border-radius);
   }
 }
