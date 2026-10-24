@@ -12,18 +12,20 @@ import type { UseOpenShortcutProps, UseOpenShortcutResult } from "./types.js";
  * the key is neither mid-IME-composition nor an auto-repeat (a held chord
  * opens once); neither Alt nor Shift is held, so those chords stay the
  * browser's; Cmd or Ctrl is held; the key is K; and the dialog is mounted.
- * The browser's own Ctrl+K is then prevented, and the dialog opens with
- * `showModal()` unless it is open already, since `showModal()` throws on an
- * open dialog. The chord carries a modifier, so it is no character-key
- * shortcut and needs no switch to turn it off (WCAG 2.1.4).
+ * The browser's own Ctrl+K is then prevented, and a closed dialog is
+ * opened: `onOpen` is called, then `showModal()`. An open dialog is left
+ * as it is, since `showModal()` throws on one. The chord carries a
+ * modifier, so it is no character-key shortcut and needs no switch to turn
+ * it off (WCAG 2.1.4).
  *
- * @param dialog - The palette's dialog.
+ * @param props - The palette's dialog, and what to do as it opens.
  * @note Impure: attaches a `keydown` listener to `document` while mounted,
  *   and opens the dialog when the chord fires.
  */
-export default function useOpenShortcut(
-  dialog: UseOpenShortcutProps,
-): UseOpenShortcutResult {
+export default function useOpenShortcut({
+  dialog,
+  onOpen,
+}: UseOpenShortcutProps): UseOpenShortcutResult {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.isComposing || event.repeat) return;
@@ -33,10 +35,12 @@ export default function useOpenShortcut(
       const element = dialog.current;
       if (element === null) return;
       event.preventDefault();
-      if (!element.open) element.showModal();
+      if (element.open) return;
+      onOpen();
+      element.showModal();
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [dialog]);
+  }, [dialog, onOpen]);
 }

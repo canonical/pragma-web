@@ -5,11 +5,11 @@ import { KeyboardKey, Modal } from "@canonical/react-ds-global";
 import {
   type ReactElement,
   Suspense,
-  type SyntheticEvent,
   useCallback,
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import { Message, useMessages } from "../../i18n/index.js";
 import { CommandPaletteSearch } from "../CommandPaletteSearch/index.js";
 import useOpenShortcut from "./hooks/useOpenShortcut.js";
@@ -35,10 +35,12 @@ const componentCssClassName = "ds command-palette";
  * The search renders in the browser only: its combobox and listbox are
  * wired by script, so the server sends the closed dialog and the key hints
  * alone. A search that fails renders one line in its place until the
- * palette closes, and the line takes the focus the field held, so it
+ * palette opens again, and the line takes the focus the field held, so it
  * stays in the dialog; while it shows, only the hint to close remains,
  * since nothing is left to move through or open. Each opening starts a
- * fresh search.
+ * fresh search, set up as the chord opens the dialog rather than when it
+ * closes, since the platform tells of a closing only in a later task,
+ * which a quick reopening can come before.
  *
  * Mount it once, inside the site's providers: the Relay environment, whose
  * provider serves the search extension; the router; the homes; and the
@@ -56,14 +58,26 @@ const componentCssClassName = "ds command-palette";
  */
 export default function CommandPalette({
   className,
-  onClose,
   ...props
 }: CommandPaletteProps): ReactElement {
   const t = useMessages();
   const dialog = useRef<HTMLDialogElement>(null);
   const [session, setSession] = useState(0);
   const [failed, setFailed] = useState(false);
-  useOpenShortcut(dialog);
+
+  /**
+   * Start the opening's session: a new, empty search, and a cleared
+   * failure. It is rendered at once, before the dialog opens, so the
+   * dialog's focusing steps find the new session's field.
+   *
+   * @note Impure: sets the session and renders it synchronously.
+   */
+  const startSession = useCallback((): void => {
+    flushSync(() => {
+      setSession((current) => current + 1);
+    });
+  }, []);
+  useOpenShortcut({ dialog, onOpen: startSession });
 
   /**
    * Hold the failure line while the search's boundary shows it: focus it
@@ -76,17 +90,6 @@ export default function CommandPalette({
     failure?.focus();
     setFailed(failure !== null);
   }, []);
-
-  /**
-   * Tell the consumer the palette closed, then start the next opening's
-   * session: a new, empty search, and a cleared failure.
-   *
-   * @note Impure: calls the consumer's handler and sets the session.
-   */
-  const handleClose = (event: SyntheticEvent<HTMLDialogElement>): void => {
-    onClose?.(event);
-    setSession((current) => current + 1);
-  };
 
   /**
    * Close the palette: the reader chose a result.
@@ -103,7 +106,6 @@ export default function CommandPalette({
       aria-label={t("palette.label")}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       closeOnBackdropClick
-      onClose={handleClose}
       ref={dialog}
     >
       <ClientOnly>

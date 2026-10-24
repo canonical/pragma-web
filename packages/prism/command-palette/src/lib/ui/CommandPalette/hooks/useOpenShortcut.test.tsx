@@ -3,14 +3,19 @@ import { type ReactElement, useRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import useOpenShortcut from "./useOpenShortcut.js";
 
-/** A dialog the shortcut opens, or none when `attached` is false. */
+/**
+ * A dialog the shortcut opens, or none when `attached` is false, calling
+ * `onOpen` as it opens.
+ */
 const Harness = ({
   attached = true,
+  onOpen = () => undefined,
 }: {
   readonly attached?: boolean;
+  readonly onOpen?: () => void;
 }): ReactElement => {
   const dialog = useRef<HTMLDialogElement>(null);
-  useOpenShortcut(dialog);
+  useOpenShortcut({ dialog, onOpen });
   return attached ? <dialog aria-label="Palette" ref={dialog} /> : <p />;
 };
 
@@ -53,12 +58,26 @@ describe("useOpenShortcut", () => {
     expect(findDialog(container).open).toBe(false);
   });
 
+  it("calls onOpen just before the closed dialog opens", () => {
+    const onOpen = vi.fn();
+    const { container } = render(<Harness onOpen={onOpen} />);
+    const dialog = findDialog(container);
+    onOpen.mockImplementation(() => {
+      expect(dialog.open).toBe(false);
+    });
+    press({ ctrlKey: true });
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    expect(dialog.open).toBe(true);
+  });
+
   it("does not open an open dialog again, and still takes the chord", () => {
-    const { container } = render(<Harness />);
+    const onOpen = vi.fn();
+    const { container } = render(<Harness onOpen={onOpen} />);
     press({ ctrlKey: true });
     const showModal = vi.spyOn(findDialog(container), "showModal");
     expect(press({ ctrlKey: true })).toBe(false);
     expect(showModal).not.toHaveBeenCalled();
+    expect(onOpen).toHaveBeenCalledTimes(1);
     expect(findDialog(container).open).toBe(true);
   });
 

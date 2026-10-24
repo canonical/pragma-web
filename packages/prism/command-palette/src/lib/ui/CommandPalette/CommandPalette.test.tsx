@@ -84,7 +84,7 @@ describe("CommandPalette", () => {
     expect(screen.getByRole("combobox")).toHaveFocus();
   });
 
-  it("opens empty after it closes, and tells the consumer it closed", () => {
+  it("opens empty after it closes, and tells the consumer it closed", async () => {
     const onClose = vi.fn();
     const { environment } = renderPalette({ onClose });
     open();
@@ -92,10 +92,34 @@ describe("CommandPalette", () => {
     act(() => {
       findDialog().close();
     });
-    expect(onClose).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
     open();
     expect(screen.getByRole("combobox")).toHaveValue("");
     expect(environment.mock.getAllOperations()).toHaveLength(1);
+  });
+
+  it("opens empty when it reopens before the platform tells of its closing", async () => {
+    const { environment } = renderPalette();
+    open();
+    type("lay");
+    await act(async () => {
+      environment.mock.resolveMostRecentOperation(answerSearch(RANKED_RESULTS));
+    });
+    act(() => {
+      findDialog().close();
+      open();
+    });
+    expect(findDialog().open).toBe(true);
+    expect(screen.getByRole("combobox")).toHaveValue("");
+    expect(screen.getByRole("combobox")).toHaveFocus();
+    expect(screen.queryAllByRole("option")).toHaveLength(0);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(findDialog().open).toBe(true);
+    expect(screen.getByRole("combobox")).toHaveValue("");
   });
 
   it("closes and opens a chosen result's home", async () => {
@@ -150,6 +174,7 @@ describe("CommandPalette", () => {
     });
     open();
     expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByRole("combobox")).toHaveFocus();
     expect(readHints()).toEqual(["↑ ↓ to move", "↵ to open", "Esc to close"]);
     type("lay");
     expect(environment.mock.getAllOperations()).toHaveLength(1);

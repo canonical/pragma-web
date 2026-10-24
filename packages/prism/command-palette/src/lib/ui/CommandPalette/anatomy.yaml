@@ -33,7 +33,7 @@
 # combobox and listbox contracts are wired by script, so the server sends
 # the closed dialog and the hints alone (cs:ui_blocks.nojs.aria_contracts).
 # A search that fails renders one line in its place until the palette
-# closes; the next opening starts a fresh search. The boundary renders the
+# opens again; each opening starts a fresh search. The boundary renders the
 # search or, once it has caught, the failure line, never both. The line
 # takes the focus as it mounts (tabindex -1), since the field that held it
 # is gone, so the focus stays in the dialog; while it shows, the hints to
