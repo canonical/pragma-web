@@ -38,31 +38,6 @@
     color: var(--journey-inspector-muted);
   }
 
-  /* The overview's counts, side by side a gutter apart, each its label
-   * over its figure. */
-  .ds.journey-inspector .counts {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--journey-inspector-gap);
-    margin-block: 0;
-  }
-
-  .ds.journey-inspector .count {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .ds.journey-inspector .count-label {
-    font-size: var(--journey-inspector-small);
-    color: var(--journey-inspector-muted);
-  }
-
-  .ds.journey-inspector .count-value {
-    margin-inline-start: 0;
-    font-weight: var(--journey-inspector-bold);
-  }
-
   /* The story, quoted verbatim under a start rule. */
   .ds.journey-inspector .story {
     grid-column: 1 / -1;

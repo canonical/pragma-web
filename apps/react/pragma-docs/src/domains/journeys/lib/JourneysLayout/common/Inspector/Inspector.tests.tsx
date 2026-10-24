@@ -43,7 +43,9 @@ describe("Inspector", () => {
       "id",
       "journey-inspector-title",
     );
-    expect(document.querySelectorAll(".count")).toHaveLength(3);
+    expect(
+      document.querySelectorAll(".ds.key-value-list > .pair"),
+    ).toHaveLength(3);
     expect(document.querySelectorAll(".legend-row")).toHaveLength(5);
   });
 });

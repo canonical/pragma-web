@@ -115,10 +115,17 @@ describe("JourneyInspector", () => {
         name: "any actor × writer × any fluency",
       }),
     ).toHaveAttribute("id", "journey-inspector-title");
-    const counts = [...document.querySelectorAll(".count")].map(
-      (count) => count.textContent,
-    );
-    expect(counts).toEqual(["Jobs3", "Served2", "Unserved1"]);
+    const counts = [
+      ...document.querySelectorAll(".ds.key-value-list > .pair"),
+    ].map((pair) => [
+      pair.querySelector(".key")?.textContent,
+      pair.querySelector(".value")?.textContent,
+    ]);
+    expect(counts).toEqual([
+      ["Jobs", "3"],
+      ["Served", "2"],
+      ["Unserved", "1"],
+    ]);
   });
 
   it("names every coordinate when the graph draws them all", () => {

@@ -12,8 +12,9 @@
 # With no job selected it is an overview of what the graph draws: the
 # drawn coordinate in words as the heading (or every coordinate), a muted
 # line saying it is what the graph holds, the counts (jobs, served,
-# unserved) side by side a gutter apart, each a small muted label over its
-# bold figure; then the legend section, one row per column, the hop drawn
+# unserved) as the shared key value list on the inspector's column lines,
+# each key on the first two and its figure on the third; then the legend
+# section, one row per column, the hop drawn
 # by the published EntityGraphNode at the graph's 176 by 48 over what the
 # column means, and a small muted note; and the small muted line on how to
 # move about the graph and select a job.
@@ -67,35 +68,12 @@ node:
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: coordinate }
     - node:
-        role: counts (the overview's jobs, served and unserved)
-        styles:
-          layout.grid.column: "1 / -1"
-          layout.type: flex
-          layout.wrap: wrap
-          spacing.gap: grid.gutter
-          spacing.external.block.start: 0
-          spacing.external.block.end: 0
+        uri: prism.component.key_value_list
         edges:
           - node:
-              role: count
-              styles:
-                layout.type: flex
-                layout.direction: column
-              edges:
-                - node:
-                    role: count-label
-                    styles:
-                      typography.size: typography.text.secondary.fontSize
-                      typography.color: color.text.muted
-                  relation: { cardinality: "1", slotName: count-label }
-                - node:
-                    role: count-value
-                    styles:
-                      spacing.external.inline.start: 0
-                      typography.weight: typography.text.primary.bold.fontWeight
-                  relation: { cardinality: "1", slotName: count-value }
-            relation: { cardinality: "3", slotName: count }
-      relation: { cardinality: "0..1", slotName: counts }
+              role: count (jobs, served, unserved; the key over its figure)
+            relation: { cardinality: "3" }
+      relation: { cardinality: "0..1" }
     - node:
         role: story (verbatim)
         styles:
