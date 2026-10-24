@@ -18,6 +18,7 @@ export const HOP_KINDS = [
   "layout",
 ] as const;
 
+/** One of the journey's columns, from `HOP_KINDS`: what a hop stands for. */
 export type HopKind = (typeof HOP_KINDS)[number];
 
 /**
@@ -69,6 +70,10 @@ export interface JourneyGraphEdge {
   readonly className?: string;
 }
 
+/**
+ * Props of the journey well: the coordinates it lays out and draws, and the
+ * job whose hop it marks as selected.
+ */
 export interface JourneyWellProps {
   /** Additional CSS class names. */
   className?: string;
