@@ -422,8 +422,39 @@ describe("GraphCanvas", () => {
     expect(screen.getByRole("status").textContent).toBe("42%");
   });
 
+  it("keeps an unmoved camera where it is when a resize shrinks its view but leaves it legible", () => {
+    let resize: () => void = () => undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      },
+    );
+    const opening = vi.fn((_visible: GraphBox, scale: number) => ({
+      k: 1 / scale,
+      x: 0,
+      y: 0,
+    }));
+    render(
+      <GraphCanvas label="Class graph" opening={opening} viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(opening).toHaveBeenCalledOnce();
+    // 90% of the viewport still renders 14px text at 12px or more.
+    stubViewportSize(720, 540);
+    act(() => resize());
+    expect(opening).toHaveBeenCalledOnce();
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    expect(screen.getByRole("status").textContent).toBe("90%");
+  });
+
   it("pans and zooms over the graph's whole bounds once Fit shows more than the viewBox", async () => {
-    const bounds: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
+    const bounds: GraphBox = { x: 0, y: 0, width: 1000, height: 750 };
     render(
       <GraphCanvas
         bounds={bounds}
@@ -439,20 +470,20 @@ describe("GraphCanvas", () => {
       String(5 * bounds.width),
     );
     fireEvent.click(screen.getByRole("button", { name: "Fit" }));
-    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
+    expect(readCamera()).toBe("translate(0,0) scale(0.8)");
     // The wheel zooms toward the pointer at the far corner, unclamped.
     fireEvent.wheel(viewport, { deltaY: -500, clientX: 800, clientY: 600 });
-    expect(readCamera()).toBe("translate(-800,-600) scale(0.5)");
+    expect(readCamera()).toBe("translate(-800,-600) scale(1.6)");
     // A drag pans by the distance it travels.
     press(viewport, "mouseDown", 400, 300);
     press(window, "mouseMove", 440, 300);
     press(window, "mouseUp", 440, 300);
-    expect(readCamera()).toBe("translate(-760,-600) scale(0.5)");
+    expect(readCamera()).toBe("translate(-760,-600) scale(1.6)");
     // d3 swallows the window's next click until its timer releases it.
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
-  it("never refits a legible view to an illegible one, and Fit fits whole", () => {
+  it("never refits a legible view to an illegible one, and Fit never into the overview", () => {
     const large: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
     const { rerender } = renderCanvas();
     rerender(
@@ -463,26 +494,54 @@ describe("GraphCanvas", () => {
     expect(screen.getByTestId("bucket").textContent).toBe("full");
     expect(screen.getByRole("status").textContent).toBe("86%");
     expect(readCamera()).toBe("translate(0,0) scale(0.8571437142857141)");
+    // The whole fits only at 25%, in the overview: Fit stops at its floor,
+    // from the top-left corner, where the hub and region labels still show.
     fireEvent.click(screen.getByRole("button", { name: "Fit" }));
-    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
-    expect(screen.getByTestId("bucket").textContent).toBe("overview");
-    // The floor followed the fit down: zooming out stays there, and in
-    // steps up from it.
-    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
-    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
-    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    expect(readCamera()).toBe("translate(-80,-60) scale(0.3)");
-    // From an illegible view a refit fits whole.
+    expect(readCamera()).toBe("translate(0,0) scale(0.7500007499999999)");
+    expect(screen.getByTestId("bucket").textContent).toBe("hubs");
+    expect(screen.getByRole("status").textContent).toBe("75%");
+    // From an illegible view a refit fits whole below the legible zoom.
     rerender(
       <GraphCanvas
-        fit={{ ...large, width: 1600, height: 1200 }}
+        fit={{ ...large, width: 1000, height: 750 }}
         label="Class graph"
         viewBox={VIEW_BOX}
       >
         <BucketProbe />
       </GraphCanvas>,
     );
-    expect(readCamera()).toBe("translate(0,0) scale(0.5)");
+    expect(readCamera()).toBe("translate(0,0) scale(0.8)");
+    // And a refit too large for the overview's floor stops there too.
+    rerender(
+      <GraphCanvas fit={large} label="Class graph" viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(readCamera()).toBe("translate(0,0) scale(0.7500007499999999)");
+  });
+
+  it("stops Fit at the overview's floor on screen, below the wheel's floor when it must", () => {
+    // The viewBox draws at twice its size, so the overview's floor on
+    // screen is a camera scale of 0.375, below the wheel's 0.5.
+    stubViewportSize(1600, 1200);
+    render(
+      <GraphCanvas
+        fit={{ x: 0, y: 0, width: 3200, height: 2400 }}
+        label="Class graph"
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Fit" }));
+    expect(readCamera()).toBe("translate(0,0) scale(0.37500037499999994)");
+    expect(screen.getByTestId("bucket").textContent).toBe("hubs");
+    // The floor followed the fit down: zooming out stays there, and in
+    // steps up from it.
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(readCamera()).toMatch(/ scale\(0\.37500037499999994\)$/);
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
   });
 
   it("shows the legible window of a box too large to refit legibly", () => {
@@ -506,9 +565,10 @@ describe("GraphCanvas", () => {
     rerender(draw(large));
     expect(legibleWindow).toHaveBeenCalledExactlyOnceWith(large, VIEW_BOX, 1);
     expect(readCamera()).toBe("translate(-160,-80) scale(1)");
-    // Fit still fits the whole box.
+    // Fit shows the whole box from its top-left corner at the overview's
+    // floor, with no window.
     fireEvent.click(screen.getByRole("button", { name: "Fit" }));
-    expect(readCamera()).toBe("translate(0,0) scale(0.25)");
+    expect(readCamera()).toBe("translate(0,0) scale(0.7500007499999999)");
     expect(legibleWindow).toHaveBeenCalledOnce();
   });
 
@@ -675,6 +735,43 @@ describe("GraphCanvas", () => {
     // The box's far corner lies inside the viewport.
     expect(800 * camera.k + camera.x).toBeLessThanOrEqual(800);
     expect(600 * camera.k + camera.y).toBeLessThanOrEqual(600);
+  });
+
+  it("counts a resumed camera that panned to reveal a box as moved", () => {
+    let resize: () => void = () => undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      },
+    );
+    const memory: { current: GraphCameraMemory | undefined } = {
+      current: { camera: { k: 1.2, x: -80, y: -60 }, moved: false },
+    };
+    const opening = vi.fn(() => ({ k: 1, x: 0, y: 0 }));
+    render(
+      <GraphCanvas
+        label="Class graph"
+        memory={memory}
+        opening={opening}
+        reveal={{ x: 700, y: 500, width: 100, height: 100 }}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(memory.current?.moved).toBe(true);
+    // The pan moved the camera, so a resize that shrinks the view below the
+    // legible zoom leaves it where the reveal put it.
+    const revealed = readCamera();
+    stubViewportSize(400, 300);
+    act(() => resize());
+    expect(opening).not.toHaveBeenCalled();
+    expect(readCamera()).toBe(revealed);
   });
 
   it("moves the camera in a short transition without reduced motion", async () => {

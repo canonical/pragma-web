@@ -354,8 +354,10 @@ site's own catalog, and the factory holds no reader-facing string.
   a resize shrinks an unmoved camera's view below the legible zoom),
   `GraphTransform`, `GraphZoomBucket`. A refit never zooms a legible view
   out to an illegible one; Fit fits the whole graph, below the wheel's
-  floor when it must, and the camera pans over the graph's whole bounds
-  however small a window of it the viewBox opens on.
+  floor when it must but never into the overview (a graph too large for
+  12/16 on screen shows from its top-left corner at that zoom, the rest a
+  pan away), and the camera pans over the graph's whole bounds however
+  small a window of it the viewBox opens on.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.

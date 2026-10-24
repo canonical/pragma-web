@@ -101,8 +101,9 @@ type OwnProps = {
   /**
    * The box the Fit control and the `0` key fit whole, and the camera fits
    * whenever it changes, never zooming a legible view out to an illegible
-   * one: the visible part of the graph under a filter. The graph's whole
-   * bounds when omitted.
+   * one, and never into the overview: a box too large for the overview's
+   * floor shows from its top-left corner at that floor. The visible part
+   * of the graph under a filter; the graph's whole bounds when omitted.
    */
   readonly fit?: GraphBox;
   /**

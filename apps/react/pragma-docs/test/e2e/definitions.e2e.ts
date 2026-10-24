@@ -10,8 +10,9 @@
  * ships; the term rail's ontology headings are laid out; and, on a phone,
  * the inspector's drawer trigger covers nothing of the explorer, its search
  * field least of all. A filter chip's refit and a namespace's keep every
- * class in view labelled and cut none; Fit brings every class into view,
- * unlabelled where the whole fits only below the overview zoom; a pick in
+ * class in view labelled and cut none; Fit brings the graph into view
+ * whole, or from its top-left corner at the overview's floor where the
+ * whole fits only below it, keeping the hub and region labels; a pick in
  * the rail keeps the chips, the search and the zoom; and the inspector's
  * field rows put their ranges on one column line.
  */
@@ -62,7 +63,7 @@ interface ExplorerMeasure {
    * opens at a zoom where every label is legible.
    */
   readonly unlabelled: number;
-  /** Whether the page's font face for 14px text has loaded. */
+  /** Whether the page's font face for 14px semibold text has loaded. */
   readonly fontLoaded: boolean;
   /** The labels whose title, and count, run past their box's insets. */
   readonly overflowing: readonly string[];
@@ -190,7 +191,7 @@ function measureExplorer({
     minTextPx: Math.min(...sizes),
     textCount: sizes.length,
     unlabelled,
-    fontLoaded: document.fonts.check('14px "Ubuntu Sans"'),
+    fontLoaded: document.fonts.check('600 14px "Ubuntu Sans"'),
     overflowing,
     // A phone hides the rail's lists, headings and all; a heading it shows
     // has a box, however thin.
@@ -367,18 +368,30 @@ describe("at 1440 px", () => {
     expect(measure.inView).toBeGreaterThan(0);
   });
 
-  it("brings every class into view on Fit, as boxes without their labels", async () => {
+  it("never fits into the overview: Fit keeps the hub and region labels", async () => {
+    const view: { zoom?: string | null } = {};
     const { errors, measure } = await openExplorer(
       "/definitions",
       desktop,
-      (page) => page.getByRole("button", { name: "Fit", exact: true }).click(),
+      async (page) => {
+        await page.getByRole("button", { name: "Fit", exact: true }).click();
+        await page.waitForTimeout(CAMERA_SETTLE_MS);
+        view.zoom = await page
+          .locator(".ds.graph-canvas .zoom-level")
+          .textContent();
+      },
     );
     expect(errors).toEqual([]);
-    expect(measure.inView).toBe(measure.drawn);
-    // Fit trades the labels for the whole graph: at 1440 the docsite's
-    // graph fits only below the overview zoom, so every class in view is
-    // drawn as its box alone until the reader zooms in.
-    expect(measure.unlabelled).toBe(measure.inView);
+    // At 1440 the docsite's graph fits whole only below the overview zoom,
+    // so Fit stops at its floor, from the graph's top-left corner, the rest
+    // a pan away: every class in view drawn, the hubs and the regions
+    // labelled, none cut on the left, top or right.
+    expect(Number.parseInt(view.zoom ?? "", 10)).toBeGreaterThanOrEqual(75);
+    expect(measure.inView).toBeGreaterThan(0);
+    expect(measure.inView).toBeLessThanOrEqual(measure.drawn);
+    expect(measure.textCount).toBeGreaterThan(0);
+    expect(measure.minTextPx).toBeGreaterThanOrEqual(MIN_SCREEN_TEXT_PX);
+    expect(measure.cut).toEqual([]);
   });
 
   it("puts the inspector's field ranges on one column line", async () => {

@@ -17,8 +17,9 @@
  * the strip's and the colophon's, that run from the rail's border to the
  * viewport's edge with their content from the canvas's first column line
  * to its last;
- * and every gap, padding and margin of the chrome a multiple of 4px. The
- * standards index's entries keep every title whole, at 390px too, an
+ * every gap, padding and margin of the chrome a multiple of 4px; and the
+ * workspace drawn in the face it ships, the dev cell delivering its font.
+ * The standards index's entries keep every title whole, at 390px too, an
  * entry whose title and address do not share a line moving its address
  * to a line of its own.
  */
@@ -171,6 +172,39 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       ).toEqual([]);
     }
   };
+
+  it("draws the workspace in the face it ships, Ubuntu Sans, delivered whole", async () => {
+    const page = await browser.newPage({ viewport });
+    try {
+      const origins = [
+        new URL(server.base).origin,
+        new URL(server.graphBase).origin,
+      ];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.goto(new URL(WORKSPACE_PATH, server.base).href, {
+        waitUntil: "load",
+        timeout: PAGE_SETTLE_MS,
+      });
+      // The graph's widths are measured from this face: a page that falls
+      // back to another draws its labels past their boxes.
+      const face = await page.evaluate(async () => {
+        const font = '600 14px "Ubuntu Sans"';
+        const faces = await document.fonts.load(font).catch(() => []);
+        return {
+          loaded: faces.filter((each) => each.status === "loaded").length,
+          checked: document.fonts.check(font),
+        };
+      });
+      expect(face.loaded).toBeGreaterThan(0);
+      expect(face.checked).toBe(true);
+    } finally {
+      await page.close();
+    }
+  });
 
   it("lays the workspace on the one grid with a canvas that never scrolls", async () => {
     const measures = await measure(WORKSPACE_PATH);

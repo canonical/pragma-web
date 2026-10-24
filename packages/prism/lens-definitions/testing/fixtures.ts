@@ -199,3 +199,29 @@ export const TALL_GRAPH: ClassGraphInput = {
   ),
   relations: [],
 };
+
+/**
+ * Two regions of three unrelated classes each, short enough to share one
+ * shelf side by side, and one relation from the left region's first class
+ * to the right region's: the range lies to the domain's right.
+ */
+export const SHELF_PAIR_GRAPH: ClassGraphInput = {
+  classes: [
+    ...["A0", "A1", "A2"].map((label) => defineClass(`aa:${label}`, label)),
+    ...["B0", "B1", "B2"].map((label) => defineClass(`bb:${label}`, label)),
+  ],
+  relations: [
+    { uri: "aa:reaches", label: "reaches", domain: "aa:A0", range: "bb:B0" },
+  ],
+};
+
+/**
+ * Two regions of one class each, stacked on two shelves at the packing's
+ * left margin, and one relation between them: the two boxes overlap across.
+ */
+export const STACKED_PAIR_GRAPH: ClassGraphInput = {
+  classes: [defineClass("aa:A", "A"), defineClass("bb:B", "B")],
+  relations: [
+    { uri: "aa:reaches", label: "reaches", domain: "aa:A", range: "bb:B" },
+  ],
+};
