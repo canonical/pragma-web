@@ -3,6 +3,8 @@ import {
   CROSS_REGION_GRAPH,
   defineClass,
   NARROWING_GRAPH,
+  SHELF_PAIR_GRAPH,
+  STACKED_PAIR_GRAPH,
   TALL_GRAPH,
   TANGLED_GRAPH,
   WIDE_GRAPH,
@@ -20,9 +22,10 @@ import {
   PHONE,
   SHELF_GAP,
 } from "./constants.js";
-import { measurePathBounds } from "./geometry.js";
+import { measurePathBounds, parsePathData } from "./geometry.js";
 import layOutClassGraph from "./layOutClassGraph.js";
-import { requireDefined } from "./require.js";
+import { requireAt, requireDefined, requireEntry } from "./require.js";
+import type { ClassGraphInput } from "./types.js";
 
 describe("layOutClassGraph", () => {
   const layout = layOutClassGraph(CROSS_REGION_GRAPH);
@@ -383,5 +386,61 @@ describe("layOutClassGraph", () => {
         true,
       ]);
     }
+  });
+
+  describe("the ports of a relation between regions", () => {
+    /**
+     * The relation's two boxes, their regions' tops and the x of its path's
+     * first and last point.
+     */
+    const measureCrossing = (graph: ClassGraphInput) => {
+      const laidOut = layOutClassGraph(graph);
+      const shelfOf = (prefix: string) =>
+        requireDefined(
+          laidOut.regions.find((region) => region.prefix === prefix),
+          "the class's region",
+        ).y;
+      const edge = requireDefined(
+        laidOut.edges.find((candidate) => candidate.bundle?.cross === true),
+        "the relation between regions",
+      );
+      const points = parsePathData(edge.d).flatMap((subpath) => [
+        subpath.start,
+        ...subpath.segments.flatMap((segment) => segment.points),
+      ]);
+      const from = requireEntry(laidOut.nodes, edge.from);
+      const to = requireEntry(laidOut.nodes, requireAt(edge.to, 0));
+      return {
+        from,
+        to,
+        fromShelf: shelfOf(from.region),
+        toShelf: shelfOf(to.region),
+        startX: requireAt(points, 0)[0],
+        endX: requireAt(points, -1)[0],
+      };
+    };
+
+    it("leaves the domain's right side and enters the range's left side when the range lies to its right on one shelf", () => {
+      const { from, to, fromShelf, toShelf, startX, endX } =
+        measureCrossing(SHELF_PAIR_GRAPH);
+      expect([from.uri, to.uri]).toEqual(["aa:A0", "bb:B0"]);
+      expect(toShelf).toBe(fromShelf);
+      expect(to.x).toBeGreaterThanOrEqual(from.x + from.w);
+      expect(startX).toBe(from.x + from.w);
+      expect(endX).toBe(to.x);
+    });
+
+    it("leaves and enters by the right side of both boxes when they overlap across", () => {
+      const { from, to, fromShelf, toShelf, startX, endX } =
+        measureCrossing(STACKED_PAIR_GRAPH);
+      expect([from.uri, to.uri]).toEqual(["aa:A", "bb:B"]);
+      expect(toShelf).toBeGreaterThan(fromShelf);
+      expect([to.x < from.x + from.w, from.x < to.x + to.w]).toEqual([
+        true,
+        true,
+      ]);
+      expect(startX).toBe(from.x + from.w);
+      expect(endX).toBe(to.x + to.w);
+    });
   });
 });
