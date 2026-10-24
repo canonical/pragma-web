@@ -14,7 +14,9 @@
 # without, server-rendered. A block the published package does not
 # implement has no sidecar, and its card lays out as any card without one.
 # Projected onto EntityCard, which carries every style, the sidecar's
-# subgrid and its two columns included: this anatomy binds none. The home
+# subgrid and its two columns included, but one: the summary breaks
+# anywhere, since its inline code cannot wrap at a space and would run
+# past a card at the end of a row. The home
 # is the link the title renders through, resolved from the compact address;
 # a block whose type has no home reads as inert text.
 node:
@@ -71,6 +73,8 @@ node:
               role: summary
               projection:
                 field: summary
+              styles:
+                typography.wrap: anywhere
             relation:
               cardinality: "0..1"
               slotName: summary
