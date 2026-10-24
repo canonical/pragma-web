@@ -44,6 +44,7 @@
  */
 
 import { snapToLattice } from "#lib/graph";
+import { readLocalName } from "../../collectJourneys.js";
 import type {
   HopKind,
   JourneyCoordinate,
@@ -282,21 +283,12 @@ function separateColumns(
 }
 
 /**
- * The local name of a vocabulary URI. The demand model's vocabulary terms
- * arrive in TWO forms depending on how the store resolved them — full
- * (`sem://surface#Primary`) or prefixed (`surface:Primary`) — so the
- * separator is either `#` or `:`. Splitting on both is what keeps the
- * mapping honest against real responses rather than against one sample.
- */
-const readLocalName = (uri: string): string | undefined => {
-  const local = uri.split(/[#:]/).at(-1);
-  return local === undefined || local.length === 0 ? undefined : local;
-};
-
-/**
  * Edge weight from the pairing's role. `PairingRole` is an OBJECT type
  * carrying a URI, not a GraphQL enum, so the mapping is by local name —
- * and an unrecognised role decorates nothing rather than guessing.
+ * and an unrecognised role decorates nothing rather than guessing. The
+ * demand model's vocabulary terms arrive in TWO forms depending on how the
+ * store resolved them — full (`sem://surface#Primary`) or prefixed
+ * (`surface:Primary`) — and `readLocalName` reads both.
  */
 export const classifyRole = (
   role: string | null | undefined,
@@ -319,6 +311,8 @@ export const classifyArrival = (
 ): string | undefined => {
   if (arrival == null) return undefined;
   const local = readLocalName(arrival);
-  if (local === undefined) return undefined;
+  // An arrival whose local name is empty names no term: the shared reading
+  // returns the whole URI then, which ends at its separator.
+  if (/[#:]$/.test(local)) return undefined;
   return `${ARRIVAL_CLASS_PREFIX}${local.toLowerCase()}`;
 };

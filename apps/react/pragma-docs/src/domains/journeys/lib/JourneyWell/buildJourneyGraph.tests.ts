@@ -311,4 +311,10 @@ describe("the role and arrival class mappings", () => {
     expect(classifyArrival(null)).toBeUndefined();
     expect(classifyArrival(undefined)).toBeUndefined();
   });
+
+  it("decorates nothing for a term whose local name is empty", () => {
+    expect(classifyArrival(SURFACE)).toBeUndefined();
+    expect(classifyArrival("surface:")).toBeUndefined();
+    expect(classifyRole(SURFACE)).toBeUndefined();
+  });
 });

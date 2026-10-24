@@ -27,7 +27,7 @@
  * `window` or the query string.
  */
 
-import type { RawJob } from "./collectJourneys.js";
+import { type RawJob, readLocalName } from "./collectJourneys.js";
 import type { JourneyCoordinate, JourneyFilterChoice } from "./types.js";
 
 /**
@@ -98,12 +98,6 @@ export const chooseDefaultJourneyFilter = (
   coordinate: selectedCoordinate ?? [...coordinateUris].sort().at(0),
   persona: undefined,
 });
-
-/** The local name of a URI — the display term the graph implies. */
-const readLocalName = (uri: string): string => {
-  const local = uri.split(/[#:]/).at(-1);
-  return local === undefined || local.length === 0 ? uri : local;
-};
 
 /** Strip the filing prefix a Turtle local name carries (`role.architect`
  * → `architect`, `persona.architect` → `architect`). */
