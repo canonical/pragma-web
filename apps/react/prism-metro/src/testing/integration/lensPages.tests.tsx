@@ -53,6 +53,17 @@ describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
     );
   });
 
+  it("lists no station at the ontology's own address", async () => {
+    renderLensPage("/stations", graph.url);
+    const hrefs = (await findIndexRows()).flatMap((row) =>
+      Array.from(row.querySelectorAll("a"), (link) =>
+        link.getAttribute("href"),
+      ),
+    );
+    expect(hrefs).toContain("/stations/metro%3Anorthgate");
+    expect(hrefs).not.toContain("/stations/metro%3A");
+  });
+
   it("shows a station's page with the fields its class declares", async () => {
     renderLensPage("/stations/metro%3Anorthgate", graph.url);
     expect(

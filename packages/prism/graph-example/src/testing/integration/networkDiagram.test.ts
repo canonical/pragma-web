@@ -97,7 +97,7 @@ describe("the network diagram", () => {
     }
   });
 
-  it("leaves both bare stations without a position", () => {
+  it("leaves the bare station without a position", () => {
     for (const uri of BARE_STATION_URIS) {
       const station = network.stations.find(
         (candidate) => candidate.uri === uri,
