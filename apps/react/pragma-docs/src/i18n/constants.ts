@@ -160,6 +160,25 @@ export const MESSAGES = {
   "journeys.column.pairings": "Pairings",
   "journeys.column.surface": "Surface",
   "journeys.column.served": "State",
+  "journeys.graph.label": "Journeys from demand to surface",
+  "journeys.graph.hint":
+    "Showing one coordinate: select a job, from the rail or the graph, to centre the graph on it",
+  "journeys.graph.hintSelected":
+    "Drag to pan · scroll to zoom · select a job to inspect it",
+  "journeys.hop.coordinate": "Coordinate",
+  "journeys.hop.job": "Job",
+  "journeys.hop.pairing": "Pairing",
+  "journeys.hop.surface": "Surface",
+  "journeys.hop.layout": "Layout",
+  "journeys.legend.title": "Reading a row",
+  "journeys.legend.coordinate":
+    "Coordinate: who, in what role, at what fluency",
+  "journeys.legend.job": "Job: the demand, in the reader’s own words",
+  "journeys.legend.pairing": "Pairing: the commitment that serves it",
+  "journeys.legend.surface": "Surface: where it is served",
+  "journeys.legend.layout": "Layout: the composition, where one is composed",
+  "journeys.legend.note":
+    "A row that ends at its surface composes no layout: that is the model’s own silence, not a missing link.",
   "journeys.inspector.label": "Job inspector",
   "journeys.inspector.empty":
     "Select a job to read its story, its acceptance criteria, and the surfaces that serve it.",

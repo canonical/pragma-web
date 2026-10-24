@@ -2,8 +2,8 @@
 
 /**
  * The journeys domain's own components: the lens's layout and page, the
- * explorer with its rail, table and inspector, the view the strip and the
- * canvas share with its switch, and the rail glyph.
+ * explorer with its rail, table, graph and inspector, the view the strip
+ * and the canvas share with its switch, and the rail glyph.
  *
  * @module
  */
@@ -17,3 +17,4 @@ export * from "./JourneysPage/index.js";
 export * from "./JourneyTable/index.js";
 export * from "./JourneyViewProvider/index.js";
 export * from "./JourneyViewSwitch/index.js";
+export * from "./JourneyWell/index.js";

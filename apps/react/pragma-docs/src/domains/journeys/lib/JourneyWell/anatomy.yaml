@@ -1,0 +1,129 @@
+---
+# JourneyWell — the journeys graph: the filtered coordinates' journeys,
+# coordinate to job to pairing to surface to layout, left to right, drawn
+# in native SVG inside prism-core's GraphCanvas, which pans and zooms it,
+# over a legend of what each column means. Server-rendered with nothing to
+# measure: positions come from the pure layout, and the first paint's
+# viewBox is the hops' bounds with a 16-unit margin.
+#
+# Each hop is the published projection's EntityGraphNode, 176 by 48 (two
+# 24-unit lines): its label cut to the box, its column's name as its kind
+# and, on a surface, the surface's type as its location. A pairing is
+# hollow. A job's title links to its own page, and a surface's to the
+# docsite page that renders it, where there is one; every other hop is
+# inert text. Columns stand 240 units apart and rows 64, and a hop shared
+# by several journeys stands on the mean of their rows, snapped to the
+# 16-unit lattice, so every corner is on a dot.
+#
+# The selected job's hop carries a ring 4 units off its box in the branded
+# colour. Edges leave a hop's right middle and land on the next's left
+# middle as horizontal cubics, 1 unit in the line colour; a primary
+# pairing's edge is 2 units in the text colour and a secondary pairing's is
+# dashed. A row that ends at its surface composes no layout, and the
+# legend says so. The legend sits under the canvas, small and muted.
+#
+# The root is a grid of two rows a gutter apart, the canvas taking the
+# rest of the cell; the legend's lines stack a tight step apart.
+#
+# Bespoke: no published component draws a journey. SVG paints through
+# currentColor: the roster has no fill or stroke key, so each shape's
+# colour is bound as its typography.color. Stroke widths and dashes are
+# SVG attributes, not CSS.
+#
+# Every decision is read through a component token declared on the root
+# (`--journey-well-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   space.050: the legend's gap; flex gaps read no container gap.
+#   layout.grid.rows "minmax(0, 1fr) auto": structure. The 0 resets.
+#   In constants.ts (SVG geometry is attributes, not CSS): NODE_WIDTH 176,
+#   NODE_HEIGHT 48, COLUMN_PITCH 240, ROW_PITCH 64, VIEW_MARGIN 16,
+#   LABEL_CHARACTERS 20, RING_OFFSET 4, RING_RADIUS 8, EDGE_WIDTH 1,
+#   PRIMARY_EDGE_WIDTH 2, SECONDARY_EDGE_DASH "4 4".
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050,
+# component.padding.inline, and the semantic typography symbols.
+node:
+  uri: docs.component.journey_well
+  styles:
+    layout.type: grid
+    layout.grid.rows: "minmax(0, 1fr) auto"
+    spacing.gap: grid.gutter
+    size.block: 100%
+    size.min.block: 0
+    size.min.width: 0
+  edges:
+    - node:
+        uri: prism.component.graph_canvas
+        styles:
+          size.min.block: 0
+        edges:
+          - node:
+              role: edges (one path per edge)
+              edges:
+                - switch:
+                    on: role
+                    cases:
+                      - node:
+                          role: edge
+                          styles:
+                            typography.color: color.border
+                      - node:
+                          role: primary edge (.is-primary)
+                          styles:
+                            typography.color: color.text
+                  relation: { cardinality: "0..*", slotName: edge }
+            relation: { cardinality: "1", slotName: edges }
+          - node:
+              role: hops
+              edges:
+                - switch:
+                    on: selection
+                    cases:
+                      - node:
+                          role: hop (a placed box, a <g transform>)
+                          edges:
+                            - node:
+                                uri: prism.component.entity_graph_node
+                              relation: { cardinality: "1" }
+                      - node:
+                          role: selected hop (.is-selected)
+                          edges:
+                            - node:
+                                role: ring
+                                styles:
+                                  typography.color: color.text.branded
+                              relation: { cardinality: "1", slotName: ring }
+                  relation: { cardinality: "0..*", slotName: hop }
+            relation: { cardinality: "1", slotName: hops }
+      relation: { cardinality: "1", slotName: graph }
+    - node:
+        role: legend
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.050
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text.muted
+        edges:
+          - node:
+              role: legend title
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "1", slotName: legend-title }
+          - node:
+              role: legend columns (one line per column)
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: component.padding.inline
+            relation: { cardinality: "1", slotName: legend-columns }
+          - node:
+              role: legend note
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+            relation: { cardinality: "1", slotName: legend-note }
+      relation: { cardinality: "1", slotName: legend }

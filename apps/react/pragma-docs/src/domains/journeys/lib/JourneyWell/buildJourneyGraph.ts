@@ -20,10 +20,10 @@
  * ROWS ARE ALLOCATED, NEVER MEASURED. Each journey (one coordinate → one
  * job → one pairing → …) claims a row; a node shared by several rows (the
  * coordinate every job hangs off, a surface two jobs both reach) is placed
- * ONCE, at the mean of the rows it serves, rounded. That keeps a shared
- * node visually between its dependents without any force simulation, and —
- * because the mean of a fixed integer set is a fixed rational — it stays
- * exactly reproducible.
+ * ONCE, at the mean of the rows it serves, snapped down to the 16-unit
+ * lattice. That keeps a shared node between its dependents without any
+ * force simulation, and it stays exactly reproducible. Columns are 240
+ * units apart and rows 64, so every corner sits on a lattice dot.
  *
  * SORTING IS EXPLICIT. The graph's result order is insertion order and is
  * byte-identical across fresh stores, but this function does not trust
@@ -31,7 +31,7 @@
  * silently depended on server iteration order would be a hydration bug
  * waiting for the day the store changes.
  *
- * HONEST ABSENCE (ruling R2). Most surfaces compose no layout — 16 of 133
+ * HONEST ABSENCE. Most surfaces compose no layout — 16 of 133
  * pairings reach one. Where a journey has no layout hop, this function
  * emits NO layout node and NO trailing edge, and the row simply ends at
  * its surface. It does NOT invent one by walking the `within` chain: the
@@ -41,15 +41,16 @@
  * which is exactly what it is.
  */
 
-import type { HopKind, JourneyCoordinate } from "../types.js";
+import { snapToLattice } from "#lib/graph";
+import type { HopKind, JourneyCoordinate } from "../../types.js";
 import {
   ARRIVAL_CLASS_PREFIX,
-  COLUMN_GAP,
+  COLUMN_PITCH,
   NODE_HEIGHT,
   NODE_WIDTH,
   ROLE_PRIMARY_CLASS,
   ROLE_SECONDARY_CLASS,
-  ROW_GAP,
+  ROW_PITCH,
 } from "./constants.js";
 import type { JourneyGraphEdge, JourneyGraphNode } from "./types.js";
 
@@ -63,11 +64,16 @@ const COLUMN_INDEX: Readonly<Record<HopKind, number>> = {
 };
 
 /** A node's x from its column: constant stride, no measurement. */
-const columnX = (kind: HopKind): number =>
-  COLUMN_INDEX[kind] * (NODE_WIDTH + COLUMN_GAP);
+const columnX = (kind: HopKind): number => COLUMN_INDEX[kind] * COLUMN_PITCH;
 
-/** A row's y: constant stride, no measurement. */
-const rowY = (row: number): number => row * (NODE_HEIGHT + ROW_GAP);
+/**
+ * A node's y from the mean of its rows, snapped down to the lattice. A
+ * mean that lands on a lattice step is a multiple of a quarter row, a
+ * binary fraction, so integer division computes it exactly and the snap is
+ * bit-identical wherever it runs; any other mean is floored well clear of
+ * a step.
+ */
+const rowY = (meanRow: number): number => snapToLattice(meanRow * ROW_PITCH);
 
 /** The positioned graph the well draws, deterministic. */
 export interface JourneyGraph {
@@ -213,23 +219,15 @@ export const buildJourneyGraph = (
 
   const nodes: JourneyGraphNode[] = [];
   for (const [uri, placement] of placements) {
-    // A shared node centres on the mean of its rows, SNAPPED TO THE HALF
-    // ROW. The snap is what makes this reproducible in the only way that
-    // matters: a raw mean is a float (1/3 of a row is 0.333…), and a float
-    // multiplied into a pixel position is exactly the kind of value that
-    // can differ in its last bit between two JS engines — the server's and
-    // the browser's. Rounding to halves collapses every mean onto a small
-    // set of exactly-representable values (x.0 and x.5 are both binary
-    // fractions), so the position is bit-identical wherever it is computed.
-    // Halves rather than whole rows because a node shared by two adjacent
-    // rows should sit BETWEEN them, which is the common case here.
+    // A shared node stands on the mean of its rows, between the journeys
+    // it serves, snapped to the lattice.
     const mean =
       placement.rows.reduce((sum, value) => sum + value, 0) /
       placement.rows.length;
     nodes.push({
       id: uri,
       x: columnX(placement.kind),
-      y: rowY(Math.round(mean * 2) / 2),
+      y: rowY(mean),
       width: NODE_WIDTH,
       height: NODE_HEIGHT,
       data: {

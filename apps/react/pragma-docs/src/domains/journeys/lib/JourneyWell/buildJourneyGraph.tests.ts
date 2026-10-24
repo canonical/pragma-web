@@ -17,19 +17,20 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { JourneyCoordinate } from "../types.js";
+import { LATTICE_PITCH } from "#lib/graph";
+import type { JourneyCoordinate } from "../../types.js";
 import {
   arrivalClassName,
   buildJourneyGraph,
   roleClassName,
 } from "./buildJourneyGraph.js";
 import {
-  COLUMN_GAP,
+  COLUMN_PITCH,
   NODE_HEIGHT,
   NODE_WIDTH,
   ROLE_PRIMARY_CLASS,
   ROLE_SECONDARY_CLASS,
-  ROW_GAP,
+  ROW_PITCH,
 } from "./constants.js";
 
 const SURFACE = "sem://surface#";
@@ -138,25 +139,35 @@ describe("buildJourneyGraph", () => {
 
   it("places every node on its hop's column, never between", () => {
     const { nodes } = buildJourneyGraph(FIXTURE);
-    const stride = NODE_WIDTH + COLUMN_GAP;
     for (const node of nodes) {
-      expect(node.x % stride).toBe(0);
+      expect(node.x % COLUMN_PITCH).toBe(0);
       expect(node.width).toBe(NODE_WIDTH);
       expect(node.height).toBe(NODE_HEIGHT);
     }
   });
 
-  it("snaps every y to a half-row, so no float survives into a position", () => {
-    // The determinism argument: a shared node's row is a MEAN, and a raw
-    // mean can be a non-terminating binary fraction whose last bit may
-    // differ between engines. Snapping to halves keeps every y on an
-    // exactly-representable value. Asserted as: twice the row index is
-    // always an integer.
+  it("sets every corner on the lattice, so no float survives into a position", () => {
+    // A shared node's row is a mean, and a raw mean can be a
+    // non-terminating binary fraction; snapping it to the lattice keeps
+    // every y an integer multiple of the pitch.
     const { nodes } = buildJourneyGraph(FIXTURE);
-    const rowHeight = NODE_HEIGHT + ROW_GAP;
     for (const node of nodes) {
-      expect(Number.isInteger((node.y / rowHeight) * 2)).toBe(true);
+      expect(node.x % LATTICE_PITCH).toBe(0);
+      expect(node.y % LATTICE_PITCH).toBe(0);
     }
+  });
+
+  it("stands a shared node on the mean of its rows, snapped down", () => {
+    const { nodes } = buildJourneyGraph(FIXTURE);
+    const yOf = (uri: string): number | undefined =>
+      nodes.find((node) => node.id === `${DOCS}${uri}`)?.y;
+    // Rows by URI order: job.b2 takes row 0, job.l3 rows 1 and 2, and
+    // job.orphan row 3, so the coordinate serving all four stands on row
+    // 1.5, as does job.l3.
+    expect(yOf("job.b2")).toBe(0);
+    expect(yOf("job.l3")).toBe(1.5 * ROW_PITCH);
+    expect(yOf("coordinate.maker-duo")).toBe(1.5 * ROW_PITCH);
+    expect(yOf("job.orphan")).toBe(3 * ROW_PITCH);
   });
 
   it("connects only nodes it places, so every edge can be drawn", () => {

@@ -23,7 +23,6 @@
  * @module
  */
 
-export * from "./JourneyWell/index.js";
 export {
   JOB_PAGE_SIZE,
   journeysExplorerQueryNode,

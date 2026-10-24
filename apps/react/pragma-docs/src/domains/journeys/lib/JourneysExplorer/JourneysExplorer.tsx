@@ -5,7 +5,6 @@ import { graphql, useLazyLoadQuery } from "react-relay";
 import type { JourneysExplorerQuery } from "#relay/__generated__/JourneysExplorerQuery.graphql.js";
 import journeysExplorerQueryNode from "#relay/__generated__/JourneysExplorerQuery.graphql.js";
 import { collectJourneys } from "../../collectJourneys.js";
-import { JourneyWell } from "../../JourneyWell/index.js";
 import {
   defaultJourneyFilter,
   type JourneyFilter,
@@ -20,6 +19,7 @@ import {
 import { JourneyRail } from "../JourneyRail/index.js";
 import { JourneyTable } from "../JourneyTable/index.js";
 import { useJourneyView } from "../JourneyViewProvider/index.js";
+import { JourneyWell } from "../JourneyWell/index.js";
 import type { JourneysExplorerProps } from "./types.js";
 import "./styles.css";
 
