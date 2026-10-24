@@ -15,6 +15,7 @@ import {
 import {
   HOME_ROUTES,
   MOCK_CODE_STANDARD,
+  MOCK_CODE_STANDARD_NODE_WIDTH,
 } from "../../../../../testing/projectionEntities.js";
 import resolveRoot from "../../../../../testing/resolveRoot.js";
 import storyQuery, {
@@ -76,12 +77,19 @@ const meta: Meta<typeof Component> = {
     withRouter({ routes: HOME_ROUTES }),
     withRelayEnvironment,
   ],
-  parameters: { relay: mockEntity(), svg: { width: 192, height: 50 } },
+  args: { width: MOCK_CODE_STANDARD_NODE_WIDTH },
+  parameters: {
+    relay: mockEntity(),
+    svg: { width: MOCK_CODE_STANDARD_NODE_WIDTH, height: 50 },
+  },
   render: (args) => <CodeStandardGraphNodeOverNode {...args} />,
 };
 
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The standard on subcomponent exports, linked to its reading page. */
+/**
+ * The standard on subcomponent exports, linked to its reading page, at the
+ * width that holds its title.
+ */
 export const Default: Story = {};

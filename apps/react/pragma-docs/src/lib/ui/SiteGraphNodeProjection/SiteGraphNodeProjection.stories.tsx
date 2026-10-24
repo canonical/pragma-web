@@ -15,6 +15,7 @@ import {
 import {
   HOME_ROUTES,
   MOCK_CODE_STANDARD,
+  MOCK_CODE_STANDARD_NODE_WIDTH,
   MOCK_MODIFIER,
   MOCK_MODIFIER_FAMILY,
   MOCK_ONTOLOGY_CLASS,
@@ -100,9 +101,16 @@ export const ModifierFamily: Story = {
   parameters: { relay: mockEntity(MOCK_MODIFIER_FAMILY) },
 };
 
-/** A code standard, through the standard's projection. */
+/**
+ * A code standard, through the standard's projection, at the width that
+ * holds its title.
+ */
 export const CodeStandard: Story = {
-  parameters: { relay: mockEntity(MOCK_CODE_STANDARD) },
+  args: { width: MOCK_CODE_STANDARD_NODE_WIDTH },
+  parameters: {
+    relay: mockEntity(MOCK_CODE_STANDARD),
+    svg: { width: MOCK_CODE_STANDARD_NODE_WIDTH, height: 50 },
+  },
 };
 
 /** An ontology class, through the package's own arm for a class. */

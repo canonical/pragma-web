@@ -115,6 +115,14 @@ export const MOCK_CODE_STANDARD_HREF =
   "/standards/http%3A%2F%2Fpragma.canonical.com%2Fcodestandards%23react.component.subcomponent_export_api";
 
 /**
+ * The width a graph node gives `MOCK_CODE_STANDARD` so its title, 270 units
+ * long in the node's face, fits inside the node's insets unclipped: the
+ * default width clips every standard's title, since a standard's title is a
+ * sentence. A multiple of the graph's 16-unit lattice.
+ */
+export const MOCK_CODE_STANDARD_NODE_WIDTH = 304;
+
+/**
  * The abstract class Layout: an ontology class, which the site's
  * dispatchers hand to the package's own arm.
  */

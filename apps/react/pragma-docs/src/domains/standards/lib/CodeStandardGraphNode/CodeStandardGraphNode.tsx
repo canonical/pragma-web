@@ -39,8 +39,14 @@ const componentCssClassName = "ds code-standard-graph-node";
 /**
  * A code standard as a node of a graph, native SVG: its title (`Public and
  * private subcomponent exports`) on the first line, linked to its home when
- * the site has one and inert text when it has none, then its class in its namespace's prefix muted (`Code Standard
- * in cs`). A standard whose address did not compact names its class alone.
+ * the site has one and inert text when it has none, then its class in its
+ * namespace's prefix muted (`Code Standard in cs`). A standard whose address
+ * did not compact names its class alone.
+ *
+ * A standard's title is a sentence, which the node's default width of 192
+ * units never holds: the graph's layout sizes a standard's node from its
+ * title and passes that `width`, or the title is clipped at the node's inner
+ * edge.
  *
  * Native props reach the node's SVG `<g>` root, where a graph sets its
  * transform; a consumer `className` merges after the projection's own, and the
