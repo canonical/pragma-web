@@ -1,0 +1,140 @@
+---
+# ComponentRelations — the component page's last section: the block's
+# neighbours, one group per relation the graph records, in a fixed order
+# (inherits from, specialized by, variants, variant of, subcomponents,
+# modifier families). Each group is its label over the shared list view in
+# its rows view: each neighbour a 32px row through the site's row
+# projection, so it links to its home where it has one. A relation with no
+# neighbours leaves no group; a block with none leaves one muted line.
+# Groups stand one default step apart. Its root is the page section's.
+#
+# Every decision is read through a component token declared on the root
+# (`--component-relations-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure. The 0 resets.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# container.gap.default, the semantic typography symbol
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: docs.subcomponent.component_relations
+  projection:
+    on: Component
+  edges:
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              role: absent (the catalog's line for a block with no relations)
+              styles:
+                layout.grid.column: "1 / -1"
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: absent }
+          - node:
+              role: group (one relation's label over its rows)
+              styles:
+                layout.type: grid
+                layout.grid.columns: subgrid
+                layout.grid.column: "1 / -1"
+                spacing.gap: grid.gutter
+                spacing.external.block.start: container.gap.default
+              edges:
+                - node:
+                    role: label (the relation's name, a level-3 heading)
+                    styles:
+                      layout.grid.column: "1 / -1"
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      typography.weight: typography.text.primary.bold.fontWeight
+                  relation: { cardinality: "1", slotName: label }
+                - node:
+                    uri: prism.component.entity_list
+                    edges:
+                      - switch:
+                          on: props
+                          cases:
+                            - node:
+                                role: inherits from
+                                edges:
+                                  - node:
+                                      uri: docs.component.site_row_projection
+                                      projection:
+                                        on: Node
+                                    relation: { cardinality: "1..*", projection: { field: inheritsFroms } }
+                                  - node:
+                                      role: item key
+                                      projection:
+                                        field: uri
+                                    relation: { cardinality: "1..*", projection: { field: inheritsFroms } }
+                            - node:
+                                role: specialized by
+                                edges:
+                                  - node:
+                                      uri: docs.component.site_row_projection
+                                      projection:
+                                        on: Node
+                                    relation: { cardinality: "1..*", projection: { field: specializedBies } }
+                                  - node:
+                                      role: item key
+                                      projection:
+                                        field: uri
+                                    relation: { cardinality: "1..*", projection: { field: specializedBies } }
+                            - node:
+                                role: variants
+                                edges:
+                                  - node:
+                                      uri: docs.component.site_row_projection
+                                      projection:
+                                        on: Node
+                                    relation: { cardinality: "1..*", projection: { field: variants } }
+                                  - node:
+                                      role: item key
+                                      projection:
+                                        field: uri
+                                    relation: { cardinality: "1..*", projection: { field: variants } }
+                            - node:
+                                role: variant of
+                                edges:
+                                  - node:
+                                      uri: docs.component.site_row_projection
+                                      projection:
+                                        on: Node
+                                    relation: { cardinality: "1..*", projection: { field: variantOfs } }
+                                  - node:
+                                      role: item key
+                                      projection:
+                                        field: uri
+                                    relation: { cardinality: "1..*", projection: { field: variantOfs } }
+                            - node:
+                                role: subcomponents
+                                edges:
+                                  - node:
+                                      uri: docs.component.site_row_projection
+                                      projection:
+                                        on: Node
+                                    relation: { cardinality: "1..*", projection: { field: subcomponents } }
+                                  - node:
+                                      role: item key
+                                      projection:
+                                        field: uri
+                                    relation: { cardinality: "1..*", projection: { field: subcomponents } }
+                            - node:
+                                role: modifier families
+                                edges:
+                                  - node:
+                                      uri: docs.component.site_row_projection
+                                      projection:
+                                        on: Node
+                                    relation: { cardinality: "1..*", projection: { field: modifierFamilies } }
+                                  - node:
+                                      role: item key
+                                      projection:
+                                        field: uri
+                                    relation: { cardinality: "1..*", projection: { field: modifierFamilies } }
+                        relation: { cardinality: "1..*", slotName: items }
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "0..6", slotName: group }
+      relation: { cardinality: "1" }

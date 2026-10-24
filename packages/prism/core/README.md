@@ -9,7 +9,8 @@ package holds the parts every such site needs and none of them owns:
   `WorkspaceLayout` and `DocumentLayout`, the components they place —
   `Rail`, `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`),
   `Canvas`, `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page
-  needs, `ErrorBoundary` and `ClientOnly`.
+  needs, `ErrorBoundary` and `ClientOnly`; and `KeyValueList`, the key
+  values a page lays on its grid.
 - **MentionChip**: the inline mention of a graph entity, tinted by its
   namespace, shaped by its kind, filled or outlined by class vs instance,
   and dotted by lifecycle; `ChipLegend` explains the grammar.
@@ -337,11 +338,13 @@ site's own catalog, and the factory holds no reader-facing string.
   `WorkspaceLayoutProps`, `DocumentLayoutProps`.
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
   `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
-  `ModeStrip`, `Rail`, `ThemeSelector`; types `MentionChipProps`,
+  `ModeStrip`, `Rail`, `ThemeSelector`, `KeyValueList` (key values on the
+  page's grid, each key on the main column's first two columns and its
+  value from the third); types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
-  `ThemeSelectorProps`.
+  `ThemeSelectorProps`, `KeyValueListProps`, `KeyValuePair`.
 - Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
   lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
   show only the text that renders at 12px or more; types

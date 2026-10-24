@@ -89,22 +89,13 @@ src/
 ├── server/         Server entry, compiled renderer, dev servers, sitemap, and
 │                   `graph.ts` — TRANSPORT ONLY. The graph is not assembled
 │                   here; it comes from @canonical/prism-pragma-provider.
-├── domains/        Feature domains (each owns its routes and pages).
-│                   The CORE lens set is `domains/lenses/` plus the
-│                   `@canonical/prism-lens-*` packages it mounts
-│                   (`prism-lens-definitions`, `prism-lens-standards`) —
-│                   every operation in either must execute against any
-│                   provider implementing @canonical/prism-contract, and the
-│                   Standards lens's against any that also serves the Prose
-│                   extension (Tier 2); a gate enforces both.
-│                   `domains/playground/` carries one pragma-specific probe
-│                   URI (`probeQuery.ts`); it is neither a lens nor a
-│                   declared add-on, so no gate scans it.
-├── addons/         pragma-SPECIFIC add-ons: views that read pragma's own
-│                   ontology and make no provider-neutrality claim, so they
-│                   are not core lenses. Wired by hand in routes.tsx until a
-│                   plugin mechanism exists. See addons/journeys/index.ts.
-├── lib/            Shared components
+├── domains/        Feature domains, each owning its routes, its layout,
+│                   its pages and, in `lib/`, its components (see below).
+├── lib/            Shared code: `ui/` (the shell, the site's rail and
+│                   colophon, the prose page and the site's projections),
+│                   `graph/` (the drawings' lattice and label cut),
+│                   `markdown/` and `authGuard/`
+├── i18n/           The app's message catalog and its translator hook
 ├── relay/          Relay environment factory, executable mock schema,
 │                   and generated artifacts (__generated__/)
 ├── styles/         Application CSS
@@ -114,6 +105,40 @@ public/             Files served verbatim at a fixed URL (favicon, robots.txt)
 test/e2e/           The 2×3 server-matrix end-to-end suite
 ```
 
+### Domains
+
+| Domain | Routes | Archetype | What it holds |
+| --- | --- | --- | --- |
+| `marketing` | `/` | document | The lobby: a few components and a door per lens. |
+| `components` | `/components`, `/components/:uri` | document | The catalog through the site's projections, and a component's page with its example, anatomy tree, properties and relations. |
+| `definitions` | `/definitions`, `/definitions/:term` | workspace | The site's rail bound to `@canonical/prism-lens-definitions`'s layout. |
+| `standards` | `/standards`, `/standards/:uri` | document | The site's rail and colophon bound to `@canonical/prism-lens-standards`'s layout. |
+| `guides` | `/guides`, `/guides/:slug` | document | Guides as editorial prose. |
+| `journeys` | `/journeys`, `/journeys/:job` | workspace | The demand model as a table, or as a graph of one coordinate's journeys with the job inspector. |
+| `playground` | `/playground` | document | One component probed in every projection. |
+| `account` | `/account`, `/login` | document | The demo sign-in and the account page. |
+| `modifiers` | none | none | The modifier and modifier family projections. |
+
+The core lenses are the `@canonical/prism-lens-*` packages and Guides:
+every operation in them must execute against any provider implementing
+`@canonical/prism-contract`, and the Standards lens's against any that also
+serves the Prose extension (Tier 2); a gate in `prism-graph-example`
+enforces both. `journeys` is a pragma-specific add-on: it reads pragma's
+own ontology and makes no neutrality claim, and it is wired into
+`routes.tsx` by hand until the docsite has a plugin mechanism (its
+`index.ts` says why). `playground` carries one pragma-specific probe URI
+(`probeQuery.ts`); it is neither a lens nor a declared add-on, so no gate
+scans it.
+
+Every component is scaffolded with the generator into `src/lib/ui/` or a
+domain's `lib/`, with an `anatomy.yaml` written before its code: its slots,
+cardinalities and style keys bound to tokens, transcribed into its
+stylesheet. A component's private parts sit in its `common/` folder, and a
+context provider follows the provider structure (`Provider.tsx`,
+`Context.tsx`, `hooks/`). `src/testing/integration/anatomies.tests.ts`
+checks every anatomy, its stylesheet and its scaffold, and the design's
+token and grid rules in every stylesheet.
+
 Domains are the unit of feature organisation: each owns its routes and pages, so
 adding a feature is adding a domain rather than threading changes through shared
 files. This app ships both `src/assets/` (assets imported in code) and `public/`
@@ -122,10 +147,11 @@ files. This app ships both `src/assets/` (assets imported in code) and `public/`
 ## Data layer (Relay)
 
 The `components` domain demonstrates the app's [Relay](https://relay.dev) data
-layer: `ComponentsCatalogPage` fetches a page of entities with
-`useLazyLoadQuery`, and each `CatalogItem` reads its own colocated
-`useFragment` — the component owns its field selection, the parent query just
-spreads it.
+layer: the catalog's list runs `ComponentsCatalogQuery`, pages through its
+`@connection` a hundred components at a time, and spreads the site's card and
+row projections' fragments, each of which reads its own fields with
+`useFragment`: a component owns its field selection, and the query that
+fetches it only spreads it.
 
 **The app needs a graph, and it runs as its own process.** `bun run graph`
 (`src/server/graph.ts`) starts the pragma provider

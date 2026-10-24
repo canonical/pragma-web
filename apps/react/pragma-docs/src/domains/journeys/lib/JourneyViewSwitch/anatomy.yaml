@@ -1,0 +1,37 @@
+---
+# JourneyViewSwitch — the journeys strip's controls: the two readings of
+# the demand model, the table and the graph, as two published Buttons in a
+# named group. The pressed reading is the secondary Button, the other the
+# tertiary one, so on and off differ by fill and border, never by hue
+# alone; each carries `aria-pressed`. It sits in the strip's band and never
+# grows it: the group is one line, its Buttons a tight step apart, with no
+# border, margin or inset of its own.
+#
+# Every decision is read through a component token declared on the root
+# (`--journey-view-switch-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   space.050: the gap between the Buttons; no semantic gap is admitted
+#     inside the strip's band. The 0 resets on the fieldset.
+#
+# Roster namespaces (accepted and tracked): space.050.
+node:
+  uri: docs.component.journey_view_switch
+  styles:
+    layout.type: flex
+    layout.align: center
+    spacing.gap: space.050
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+    spacing.external.inline.start: 0
+    spacing.external.inline.end: 0
+    spacing.internal.block.start: 0
+    spacing.internal.block.end: 0
+    spacing.internal.inline.start: 0
+    spacing.internal.inline.end: 0
+    appearance.border.width: 0
+    size.min.width: 0
+  edges:
+    - node:
+        uri: global.component.button
+      relation: { cardinality: "2", slotName: option }

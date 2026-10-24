@@ -1,0 +1,15 @@
+---
+# JourneysLayout — the Journeys lens's layout: the workspace under the
+# view provider the strip's switch, the explorer in the canvas and the
+# inspector share. It renders no element of its own: the workspace renders
+# the root.
+node:
+  uri: docs.component.journeys_layout
+  edges:
+    - node:
+        uri: docs.component.journey_view_provider
+        edges:
+          - node:
+              uri: docs.subcomponent.journeys_workspace
+            relation: { cardinality: "1" }
+      relation: { cardinality: "1" }

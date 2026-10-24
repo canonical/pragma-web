@@ -92,7 +92,6 @@ describe("the lens's components", () => {
       "EntityHeading",
       "EntitySummary",
       "FieldList",
-      "KeyValueList",
       "Relations",
     ]);
   });

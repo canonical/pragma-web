@@ -4,6 +4,7 @@
  * hook or a class of its own, which merges after the component's own.
  */
 
+import { KeyValueList } from "@canonical/prism-core";
 import { render } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { useLazyLoadQuery } from "react-relay";
@@ -32,7 +33,6 @@ import {
   EntityHeading,
   EntitySummary,
   FieldList,
-  KeyValueList,
   Relations,
 } from "../../lib/ui/EntityPage/common/index.js";
 import { EntityPage } from "../../lib/ui/EntityPage/index.js";

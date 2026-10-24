@@ -1,0 +1,101 @@
+---
+# JourneyWell — the journeys graph: the filtered coordinates' journeys,
+# coordinate to job to pairing to surface to layout, left to right, drawn
+# in native SVG inside prism-core's GraphCanvas, which pans and zooms it.
+# The legend and the line on how to move about the graph are the
+# inspector's overview (JourneyInspector), so nothing is drawn over the
+# canvas. Server-rendered with nothing to
+# measure: positions come from the pure layout. The canvas pans as far as
+# the hops' bounds with a 16-unit margin; the first paint's viewBox is
+# those bounds when they fit the design canvas at the legible zoom (12/14
+# on screen, where a 14px label renders at 12px), else the largest window
+# of them shown at that zoom, from the left edge and the top or around the
+# selected job, and the client opens on the same framing for its measured
+# canvas. Below that zoom a hop draws its box alone (JourneyHop).
+#
+# Each hop is a JourneyHop over the published projection's
+# EntityGraphNode, 176 by 48 (two 24-unit lines): its label cut to the
+# box, its column's name as its kind and, on a surface, the surface's type
+# as its location. A pairing is hollow. A job's title links to its own
+# page, and a surface's to the
+# docsite page that renders it, where there is one; every other hop is
+# inert text. Columns stand 240 units apart and rows 64, and a hop shared
+# by several journeys stands on the mean of their rows, snapped to the
+# 16-unit lattice, so every corner is on a dot; where that row is another
+# hop's in the same column, the lower hop moves down to the next free row,
+# so no two boxes overlap.
+#
+# The selected job's hop carries a ring (JourneyHop). Edges leave a hop's
+# right middle and land on the next's left middle as horizontal cubics,
+# 1 unit in the line colour; a primary
+# pairing's edge is 2 units in the text colour and a secondary pairing's is
+# dashed. A row that ends at its surface composes no layout.
+#
+# The root is a grid of one row, its gap the gutter as every grid's is:
+# the canvas takes the whole cell.
+#
+# No phone view, an exemption from the graph heuristics' phone reading
+# below 600px: the journeys' phone reading is their table, the lens's
+# default view, which lists every job with its coordinate and pairings
+# and scrolls in its own region. The graph stays the same pan-and-zoom
+# drawing at every width. Measured at 390 by 844 (the well's cell 289 by
+# 723 in the app): it opens at 86% with every label at the 12px floor,
+# showing about one and a half of its five columns; 9 of 11 hops in the
+# story lie outside the canvas, and the hops span 272% of its width, so a
+# reader pans to reach a surface.
+#
+# Bespoke: no published component draws a journey. SVG paints through
+# currentColor: the roster has no fill or stroke key, so each shape's
+# colour is bound as its typography.color. Stroke widths and dashes are
+# SVG attributes, not CSS.
+#
+# Every decision is read through a component token declared on the root
+# (`--journey-well-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   layout.grid.rows "minmax(0, 1fr)": structure. The 0 resets.
+#   In constants.ts (SVG geometry is attributes, not CSS): NODE_WIDTH 176,
+#   NODE_HEIGHT 48, COLUMN_PITCH 240, ROW_PITCH 64, VIEW_MARGIN 16,
+#   EDGE_WIDTH 1, PRIMARY_EDGE_WIDTH 2, SECONDARY_EDGE_DASH "4 4"; the
+#   camera's LEGIBLE_ZOOM 12/14 and DESIGN_CANVAS 576 by 736 px.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: docs.component.journey_well
+  styles:
+    layout.type: grid
+    layout.grid.rows: "minmax(0, 1fr)"
+    spacing.gap: grid.gutter
+    size.block: 100%
+    size.min.block: 0
+    size.min.width: 0
+  edges:
+    - node:
+        uri: prism.component.graph_canvas
+        styles:
+          size.min.block: 0
+        edges:
+          - node:
+              role: edges (one path per edge)
+              edges:
+                - switch:
+                    on: role
+                    cases:
+                      - node:
+                          role: edge
+                          styles:
+                            typography.color: color.border
+                      - node:
+                          role: primary edge (.is-primary)
+                          styles:
+                            typography.color: color.text
+                  relation: { cardinality: "0..*", slotName: edge }
+            relation: { cardinality: "1", slotName: edges }
+          - node:
+              role: hops
+              edges:
+                - node:
+                    uri: docs.subcomponent.journey_hop
+                  relation: { cardinality: "0..*", slotName: hop }
+            relation: { cardinality: "1", slotName: hops }
+      relation: { cardinality: "1", slotName: graph }

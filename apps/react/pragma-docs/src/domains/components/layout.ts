@@ -1,6 +1,6 @@
 import { wrapper } from "@canonical/router-core";
 import type { ReactElement } from "react";
-import { ComponentsLayout } from "./ComponentsLayout/index.js";
+import { ComponentsLayout } from "./lib/ComponentsLayout/index.js";
 
 /** The router wrapper that renders every route grouped under it inside
  * `ComponentsLayout`. */

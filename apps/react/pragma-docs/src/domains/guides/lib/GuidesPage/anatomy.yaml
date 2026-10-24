@@ -1,0 +1,17 @@
+---
+# GuidesPage — the guides index: the prose page with the lens's name and
+# what the guides will hold, in the catalog's words. It renders no element
+# of its own: the prose page renders the root.
+node:
+  uri: docs.component.guides_page
+  edges:
+    - node:
+        uri: docs.component.prose_page
+        edges:
+          - node:
+              role: title (the lens's name)
+            relation: { cardinality: "1", slotName: heading }
+          - node:
+              role: copy (what lands here)
+            relation: { cardinality: "1", slotName: prose }
+      relation: { cardinality: "1" }

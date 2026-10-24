@@ -1,0 +1,52 @@
+---
+# ComponentExample — the component page's first section: the block's
+# rendered example, the published React component in its default state
+# (UIBlockExample), server-rendered on a stage framed by a hairline that
+# spans the main column, with one loose step of space above and below the
+# component and one inline padding beside it. A block the published
+# package does not implement has no example: the section says so in one
+# muted line. Its root is the page section's.
+#
+# Every decision is read through a component token declared on the root
+# (`--component-example-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   appearance.border.width 1px: the stage's hairline; stroke width has
+#   only primitives. layout.grid.column "1 / -1": structure. The 0 resets.
+#
+# Roster namespaces (accepted and tracked): container.gap.loose,
+# component.padding.inline.
+node:
+  uri: docs.subcomponent.component_example
+  edges:
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              role: stage
+              styles:
+                layout.grid.column: "1 / -1"
+                layout.type: flex
+                layout.align: center
+                layout.wrap: wrap
+                spacing.internal.block.start: container.gap.loose
+                spacing.internal.block.end: container.gap.loose
+                spacing.internal.inline.start: component.padding.inline
+                spacing.internal.inline.end: component.padding.inline
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border.muted
+              edges:
+                - node:
+                    uri: docs.component.ui_block_example
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "0..1", slotName: stage }
+          - node:
+              role: absent (the catalog's line for a block with no example)
+              styles:
+                layout.grid.column: "1 / -1"
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: absent }
+      relation: { cardinality: "1" }

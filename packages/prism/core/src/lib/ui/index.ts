@@ -7,6 +7,7 @@ export * from "./ClientOnly/index.js";
 export * from "./DocumentLayout/index.js";
 export * from "./ErrorBoundary/index.js";
 export * from "./GraphCanvas/index.js";
+export * from "./KeyValueList/index.js";
 export * from "./LensBreadcrumbs/index.js";
 export * from "./MentionChip/index.js";
 export * from "./ModeStrip/index.js";

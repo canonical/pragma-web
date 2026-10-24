@@ -3,22 +3,18 @@
 import { DocumentLayout } from "@canonical/prism-core";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { group, route } from "@canonical/router-core";
-import { journeysLayout, journeysRoutes } from "#addons/journeys";
 import { accountLayout, accountRoutes } from "#domains/account";
 import { componentsLayout, componentsRoutes } from "#domains/components";
-import {
-  definitionsLayout,
-  guidesLayout,
-  lensRoutes,
-  standardsLayout,
-  standardsRoutes,
-} from "#domains/lenses";
+import { definitionsLayout } from "#domains/definitions";
+import { guidesLayout, guidesRoutes } from "#domains/guides";
+import { journeysLayout, journeysRoutes } from "#domains/journeys";
 import { marketingLayout, marketingRoutes } from "#domains/marketing";
 import { playgroundLayout, playgroundRoutes } from "#domains/playground";
+import { standardsLayout, standardsRoutes } from "#domains/standards";
 import { withAuth } from "#lib/authGuard";
-import { SiteRail } from "#lib/SiteRail";
 import { NotFoundPage } from "#lib/ui";
 import { SiteColophon } from "#lib/ui/SiteColophon";
+import { SiteRail } from "#lib/ui/SiteRail";
 
 /**
  * The page every URL no route matches renders, at its own `/not-found`: the
@@ -40,15 +36,12 @@ const notFoundRoute = route({
  * the colophon and any provider the strip and the page share. Above every
  * layout sits `Shell`, the provider nest the client and server entries
  * mount.
- *
- * `/guides/:slug` lives in the marketing domain but renders under the
- * Guides layout, beside the guides index it belongs to.
  */
 const [home] = group(marketingLayout, [marketingRoutes.home] as const);
 
 const [guides, guide] = group(guidesLayout, [
-  lensRoutes.guides,
-  marketingRoutes.guide,
+  guidesRoutes.guides,
+  guidesRoutes.guide,
 ] as const);
 
 const [account, login] = group(accountLayout, [
@@ -76,14 +69,13 @@ const [standards, standardEntity] = group(standardsLayout, [
 ] as const);
 
 // Journeys is in this table but is NOT a core lens. It is a pragma-specific
-// ADD-ON (`#addons/journeys`, not `#domains/lenses/…`) — an owner
-// reclassification, because it reads pragma's own ontology through generic
-// instance-level relation traversal, which the provider-neutral contract
-// cannot express. It is wired in BY HAND here, alongside the core lenses,
-// only because the docsite has no plugin mechanism yet; when one exists the
-// add-on registers its own routes and these lines go away. Until then it
-// stays live and addressable — the ruling was "keep it on side", not "hide
-// it". See `src/addons/journeys/index.ts`.
+// ADD-ON (`#domains/journeys`, not a lens package): it reads pragma's own
+// ontology through generic instance-level relation traversal, which the
+// provider-neutral contract cannot express. It is wired in BY HAND here,
+// alongside the core lenses, only because the docsite has no plugin
+// mechanism yet; when one exists the add-on registers its own routes and
+// these lines go away. Until then it stays live and addressable. See
+// `src/domains/journeys/index.ts`.
 const [journeys, journeysJob] = group(journeysLayout, [
   journeysRoutes.journeys,
   journeysRoutes.journeysJob,

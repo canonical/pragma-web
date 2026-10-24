@@ -7,7 +7,11 @@ import NotFoundPage from "./NotFoundPage.js";
 describe("NotFoundPage SSR", () => {
   it("server-renders its section with its heading", () => {
     const html = renderToString(<NotFoundPage />);
-    expect(html).toContain('<section class="ds not-found-page">');
-    expect(html).toContain("<h1>Page not found</h1>");
+    expect(html).toContain(
+      '<section aria-labelledby="not-found-title" class="ds prose-page ds not-found-page">',
+    );
+    expect(html).toContain(
+      '<h1 class="heading" id="not-found-title">Page not found</h1>',
+    );
   });
 });

@@ -1,0 +1,47 @@
+---
+# ComponentAnatomy — the component page's second section: the block's
+# anatomy, read from the graph's anatomy text, drawn as a tree
+# (AnatomyTree). Text the anatomy parser refuses, or a block with no
+# anatomy, leaves one muted line instead. Its root is the page section's.
+#
+# Every decision is read through a component token declared on the root
+# (`--component-anatomy-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure. The 0 resets.
+node:
+  uri: docs.subcomponent.component_anatomy
+  projection:
+    on: Component
+  edges:
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              role: subject (the name, else the address, naming the figure)
+              edges:
+                - node:
+                    role: name
+                    projection:
+                      field: name
+                  relation: { cardinality: "0..1" }
+                - node:
+                    role: address
+                    projection:
+                      field: _meta.curie
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "1" }
+          - node:
+              uri: docs.component.anatomy_tree
+              projection:
+                field: anatomyDsl
+            relation: { cardinality: "0..1" }
+          - node:
+              role: absent (the catalog's line for a block with no anatomy)
+              styles:
+                layout.grid.column: "1 / -1"
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: absent }
+      relation: { cardinality: "1" }

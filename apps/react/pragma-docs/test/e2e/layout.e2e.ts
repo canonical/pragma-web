@@ -2,7 +2,7 @@
 
 /**
  * The page grid and the scroll model, measured in a real browser: the dev
- * cell (its graph server alongside) serves a workspace page and several
+ * cell (its graph server alongside) serves the workspace pages and several
  * document pages, and Chromium lays each out once at a desktop and a phone
  * width, measuring it in the light and the dark theme. What is asserted is
  * what the layout promises: one intrinsic grid, the shell, which is the one
@@ -11,7 +11,9 @@
  * 390px too; twelve columns at 1440px and four at 390px; a workspace canvas
  * that never scrolls; a document whose only scrolling regions are its
  * canvas and its rail, and whose page's first element spans the whole main
- * column; a catalog whose cards fill their rows; a canvas that starts one
+ * column; a catalog whose cards fill their rows and stay inside the
+ * canvas, a UI block's example with them, at 390, 600 and 1440px, each
+ * card across the canvas's whole row at 390px; a canvas that starts one
  * gutter under the strip, or at the viewport's top with no strip, its
  * page then starting one gutter down; bands,
  * the strip's and the colophon's, that run from the rail's border to the
@@ -33,9 +35,13 @@ import type { Browser } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   CATALOG_CARD_SELECTOR,
+  CATALOG_CARD_WIDTHS,
   CATALOG_PATH,
+  CATALOG_WHOLE_ROW_WIDTHS,
   DEV_READY_MS,
   DOCUMENT_PATHS,
+  JOURNEYS_PATHS,
+  MIN_CATALOG_CARD_WIDTH_PX,
   PAGE_SETTLE_MS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
@@ -81,6 +87,76 @@ function countCutEntries(): {
     cutBesideTitle: measured.filter(
       ({ addressCut, addressBeside }) => addressCut && addressBeside,
     ).length,
+  };
+}
+
+/**
+ * Measure the catalog's cards against the canvas: each card's left and
+ * right edges, its width, and, for a card with a sidecar, the body's and
+ * the sidecar's widths. It runs in the page.
+ *
+ * @param selector - The catalog's cards.
+ * @returns The canvas's edges and each card's measures.
+ * @throws When the page has no canvas.
+ */
+function measureCatalogCards(selector: string): {
+  readonly canvas: { readonly left: number; readonly right: number };
+  readonly cards: readonly {
+    readonly left: number;
+    readonly right: number;
+    readonly width: number;
+    readonly sections: readonly number[];
+  }[];
+} {
+  const canvas = document.querySelector("main.ds.canvas");
+  if (!canvas) throw new Error("the page has no canvas");
+  const { left, right } = canvas.getBoundingClientRect();
+  return {
+    canvas: { left, right },
+    cards: [...document.querySelectorAll(selector)].map((card) => {
+      const box = card.getBoundingClientRect();
+      const sections =
+        card.querySelector(":scope > .sidecar") === null
+          ? []
+          : [...card.querySelectorAll(":scope > .body, :scope > .sidecar")];
+      return {
+        left: box.left,
+        right: box.right,
+        width: box.width,
+        sections: sections.map(
+          (section) => section.getBoundingClientRect().width,
+        ),
+      };
+    }),
+  };
+}
+
+/**
+ * Read what the journeys canvas holds: whether the explorer, its rail and
+ * one reading (the table or the graph) are mounted, the rail's own block
+ * overflow, and the alert the page shows when the graph's query failed. It
+ * runs in the page.
+ *
+ * @returns The explorer's parts, the rail's overflow and the alert's text.
+ */
+function readJourneysCanvas(): {
+  readonly explorer: boolean;
+  readonly rail: boolean;
+  readonly reading: boolean;
+  readonly railOverflow: string | null;
+  readonly alert: string | null;
+} {
+  const explorer = document.querySelector(".ds.journeys-explorer");
+  const rail = explorer?.querySelector(".ds.journey-rail") ?? null;
+  return {
+    explorer: explorer !== null,
+    rail: rail !== null,
+    reading:
+      explorer?.querySelector(".ds.journey-table, .ds.journey-well") != null,
+    railOverflow: rail === null ? null : getComputedStyle(rail).overflowY,
+    alert:
+      document.querySelector('main.ds.canvas [role="alert"]')?.textContent ??
+      null,
   };
 }
 
@@ -231,6 +307,57 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
+  it.each(JOURNEYS_PATHS)(
+    "lays the journeys at %s on the workspace, the table scrolling in its own region",
+    async (path) => {
+      // The layout is measured over the explorer, never over the page's
+      // failure state: a graph that serves no demand model fails here,
+      // loudly, before anything is measured.
+      const page = await browser.newPage({ viewport });
+      try {
+        const origins = [
+          new URL(server.base).origin,
+          new URL(server.graphBase).origin,
+        ];
+        await page.route("**/*", (route) =>
+          origins.includes(new URL(route.request().url()).origin)
+            ? route.continue()
+            : route.fulfill({ status: 204, body: "" }),
+        );
+        await page.goto(new URL(path, server.base).href, {
+          waitUntil: "networkidle",
+          timeout: PAGE_SETTLE_MS,
+        });
+        const canvas = await page.evaluate(readJourneysCanvas);
+        if (canvas.alert !== null) {
+          throw new Error(
+            `${path} shows "${canvas.alert}" in place of the explorer: the graph serves no demand model, so the journeys cannot be measured. Boot the graph with the semantics tree.`,
+          );
+        }
+        expect(canvas.explorer).toBe(true);
+        expect(canvas.rail).toBe(true);
+        expect(canvas.reading).toBe(true);
+        // The explorer's rail scrolls on its own, as every side region of
+        // the workspace does.
+        expect(canvas.railOverflow).toBe("auto");
+      } finally {
+        await page.close();
+      }
+      const measures = await measure(path);
+      expectGrid(measures);
+      for (const { theme, measure: layout } of measures) {
+        expect(layout.canvas.overflow, theme).toBe("hidden");
+        expect(layout.canvas.scrollHeight, theme).toBe(
+          layout.canvas.clientHeight,
+        );
+        expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
+        // The table opens without an inspector, so no drawer trigger shows
+        // at any width.
+        expect(layout.triggerShown, theme).toBe(false);
+      }
+    },
+  );
+
   it.each(DOCUMENT_PATHS)(
     "lays the document at %s on the one grid, scrolling only its canvas and its rail",
     async (path) => {
@@ -304,6 +431,78 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       expect(counts.cutBesideTitle).toBe(0);
     } finally {
       await page.close();
+    }
+  });
+});
+
+/**
+ * Open the catalog at a viewport width and measure its cards against the
+ * canvas, every request off the dev cell's own origins answered empty.
+ *
+ * @param width - The viewport's width, in pixels.
+ * @returns The canvas's edges and each card's measures.
+ */
+async function measureCatalogAt(
+  width: number,
+): Promise<ReturnType<typeof measureCatalogCards>> {
+  const page = await browser.newPage({ viewport: { width, height: 844 } });
+  try {
+    const origins = [
+      new URL(server.base).origin,
+      new URL(server.graphBase).origin,
+    ];
+    await page.route("**/*", (route) =>
+      origins.includes(new URL(route.request().url()).origin)
+        ? route.continue()
+        : route.fulfill({ status: 204, body: "" }),
+    );
+    await page.goto(new URL(CATALOG_PATH, server.base).href, {
+      waitUntil: "networkidle",
+      timeout: PAGE_SETTLE_MS,
+    });
+    return await page.evaluate(measureCatalogCards, CATALOG_CARD_SELECTOR);
+  } finally {
+    await page.close();
+  }
+}
+
+// A UI block's card carries its rendered example beside its body, four
+// columns where the canvas holds six or more; where it holds two or three
+// the card takes the whole row, its example under its body. At every width
+// each card stays inside the canvas, wide enough to read, and so do its
+// body and its example.
+describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
+  it("keeps every card, and a UI block's example, inside the canvas", async () => {
+    const { canvas, cards } = await measureCatalogAt(width);
+    expect(cards.length).toBeGreaterThan(0);
+    expect(cards.some(({ sections }) => sections.length === 2)).toBe(true);
+    for (const card of cards) {
+      expect(card.left).toBeGreaterThanOrEqual(
+        canvas.left - WIDTH_TOLERANCE_PX,
+      );
+      expect(card.right).toBeLessThanOrEqual(canvas.right + WIDTH_TOLERANCE_PX);
+      expect(card.width).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
+      for (const section of card.sections) {
+        expect(section).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
+      }
+    }
+  });
+});
+
+// Below one group the canvas holds three columns: a card at the Cards
+// group's two would leave the third empty on every row, so every card, with
+// an example or without, is as wide as the canvas.
+describe.each(CATALOG_WHOLE_ROW_WIDTHS)("the catalog at %i px", (width) => {
+  it("lays every card across the canvas's whole row", async () => {
+    const { canvas, cards } = await measureCatalogAt(width);
+    expect(cards.some(({ sections }) => sections.length === 0)).toBe(true);
+    for (const card of cards) {
+      expect(Math.abs(card.left - canvas.left)).toBeLessThanOrEqual(
+        WIDTH_TOLERANCE_PX,
+      );
+      expect(Math.abs(card.right - canvas.right)).toBeLessThanOrEqual(
+        WIDTH_TOLERANCE_PX,
+      );
     }
   });
 });

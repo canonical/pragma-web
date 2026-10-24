@@ -1,0 +1,13 @@
+---
+# SignInIcon — the demo sign-in's rail glyph: a head and shoulders stroked
+# in currentColor on a 16-unit box, rendered `size` pixels square and
+# hidden from assistive tech. It styles nothing.
+node:
+  uri: docs.component.sign_in_icon
+  edges:
+    - node:
+        role: head
+      relation: { cardinality: "1", slotName: head }
+    - node:
+        role: shoulders
+      relation: { cardinality: "1", slotName: shoulders }

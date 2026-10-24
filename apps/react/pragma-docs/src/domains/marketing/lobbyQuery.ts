@@ -53,6 +53,13 @@ import {
  */
 export const LOBBY_EXEMPLAR_COUNT = 6;
 
+/**
+ * How many components the lobby reads to choose its exemplars from: enough
+ * to find `LOBBY_EXEMPLAR_COUNT` distinct titles when a title spans tiers,
+ * the graph listing a title's blocks side by side. One read, never paged.
+ */
+export const LOBBY_EXEMPLAR_POOL = 24;
+
 /** The compiled operation (full text under `params.text`, `id: null`). */
 export { lobbyQueryNode };
 
@@ -65,5 +72,5 @@ export const lobbyVariables = (): LobbyQuery$variables => ({
   componentClass: LOBBY_COMPONENT_CLASS,
   patternClass: LOBBY_PATTERN_CLASS,
   standardClass: LOBBY_STANDARD_CLASS,
-  exemplars: LOBBY_EXEMPLAR_COUNT,
+  exemplarPool: LOBBY_EXEMPLAR_POOL,
 });

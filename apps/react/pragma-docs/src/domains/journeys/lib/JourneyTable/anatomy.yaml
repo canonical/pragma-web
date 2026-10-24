@@ -1,0 +1,375 @@
+---
+# JourneyTable — the journeys explorer's table: every job in the demand
+# model, sortable by any column and grouped by coordinate, role or served
+# state, or flat. Above the table, the grouping control: a fieldset with
+# no frame of its own, named by its label, and four published Buttons, the
+# pressed one secondary and the rest tertiary, each with `aria-pressed`;
+# grouping by role carries the persona caveat, since that axis inherits
+# its approximation.
+#
+# A real table, its semantics the accessibility: a caption naming it with
+# its live counts in muted text; a header cell per column, each holding the
+# column's sort button and a decorative direction mark, `aria-sort` on the
+# active column alone; one row group per group, opened by a header cell
+# scoped to the row group, its count beside its label; the job as each
+# row's header cell, its link bold over its story cut to one line; an
+# expander per row whose detail row follows its row in document order,
+# hidden until expanded, holding the story verbatim under a start rule, the
+# acceptance criteria and, for a job nothing serves, a plain statement. The
+# selected job's row takes the layered background. A wildcard axis reads
+# "any" in muted text; a count aligns to the end in tabular figures, its
+# primary and secondary split beside it; a job with no surface leaves a
+# muted dash; the state is a pill, branded when served, muted when not.
+#
+# The root is a grid of two rows a gutter apart: the controls, then the
+# table's own scrolling region, which takes the rest and scrolls on both
+# axes, never widening the page; its header row sticks to the region's top
+# on the plain background. Each cell sits on the matrix's 32px row (4px
+# block insets on the 24px line) under a hairline, one default gap before
+# the next column.
+#
+# Bespoke: no published table component. The expander is a bespoke square
+# toggle; the sort buttons are bare.
+#
+# Every decision is read through a component token declared on the root
+# (`--journey-table-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   space.050 (4px) block insets: they stand a cell at 32px on a 24px
+#     line, the list entry's row. space.050, space.100: the stacks' and the
+#     controls' gaps; flex gaps read no container gap.
+#   space.300 (24px): the expander's square, the line's height.
+#   1px: the hairlines. 0.25rem: the expander's corner. 999px: the state's
+#     pill; no radius token is a pill.
+#   size.max.width "calc(4 * var(--grid-col-min))": the story's measure in
+#     the job cell, one group of the intrinsic grid's columns, so it
+#     follows the grid's column floor.
+#   layout.grid.rows "auto minmax(0, 1fr)", size.width 100%,
+#     layout.position sticky, layout.table.collapse: structure. The 0
+#     resets and offsets. The hidden label is an empty box out of the flow
+#     that clips its text, the page heading's idiom.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050,
+# space.100, space.300, container.gap.default, component.padding.block,
+# component.padding.inline, and the semantic typography symbols.
+node:
+  uri: docs.component.journey_table
+  styles:
+    layout.type: grid
+    layout.grid.rows: "auto minmax(0, 1fr)"
+    spacing.gap: grid.gutter
+    size.min.block: 0
+    size.min.width: 0
+  edges:
+    - node:
+        role: controls
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap: space.100
+        edges:
+          - node:
+              role: grouping (the group-by control's named group)
+              styles:
+                layout.type: flex
+                layout.wrap: wrap
+                layout.align: baseline
+                spacing.gap: space.050
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.external.inline.start: 0
+                spacing.external.inline.end: 0
+                spacing.internal.block.start: 0
+                spacing.internal.block.end: 0
+                spacing.internal.inline.start: 0
+                spacing.internal.inline.end: 0
+                appearance.border.width: 0
+                size.min.width: 0
+              edges:
+                - node:
+                    role: grouping label
+                    styles:
+                      typography.size: typography.text.secondary.fontSize
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: grouping-label }
+                - node:
+                    uri: global.component.button
+                  relation: { cardinality: "4", slotName: option }
+            relation: { cardinality: "1", slotName: grouping }
+          - node:
+              role: note (the persona caveat, grouped by role)
+              styles:
+                layout.flex.basis: 100%
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: note }
+      relation: { cardinality: "1", slotName: controls }
+    - node:
+        role: scroll (the table's own scrolling region)
+        styles:
+          layout.overflow: auto
+          size.min.block: 0
+          size.min.width: 0
+        edges:
+          - node:
+              role: table
+              styles:
+                size.width: 100%
+                layout.table.collapse: collapse
+              edges:
+                - node:
+                    role: caption
+                    styles:
+                      typography.align: start
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      spacing.internal.block.start: space.050
+                      spacing.internal.block.end: space.050
+                    edges:
+                      - node:
+                          role: count (jobs and unserved jobs)
+                          styles:
+                            spacing.external.inline.start: space.100
+                            typography.weight: typography.text.primary.fontWeight
+                            typography.color: color.text.muted
+                            typography.variant.numeric: tabular-nums
+                        relation: { cardinality: "1", slotName: count }
+                  relation: { cardinality: "1", slotName: caption }
+                - node:
+                    role: head (a column's header cell)
+                    styles:
+                      layout.position: sticky
+                      layout.offset.block.start: 0
+                      appearance.background: color.background
+                      typography.align: start
+                      typography.whiteSpace: nowrap
+                      spacing.internal.block.start: space.050
+                      spacing.internal.block.end: space.050
+                      spacing.internal.inline.start: 0
+                      spacing.internal.inline.end: container.gap.default
+                      appearance.border.width: 1px
+                      appearance.border.style: "none none solid"
+                      appearance.border.bottom.color: color.border.muted
+                    edges:
+                      - node:
+                          role: sort (the column's sort button)
+                          styles:
+                            layout.type: inline-flex
+                            layout.align: baseline
+                            spacing.gap: space.050
+                            spacing.internal.block.start: 0
+                            spacing.internal.block.end: 0
+                            spacing.internal.inline.start: 0
+                            spacing.internal.inline.end: 0
+                            appearance.border.width: 0
+                            appearance.background: transparent
+                            typography.font: inherit
+                            typography.weight: typography.text.primary.bold.fontWeight
+                            typography.color: color.text.muted
+                            interaction.cursor: pointer
+                          edges:
+                            - node:
+                                role: sort mark (decorative)
+                                styles:
+                                  typography.color: color.text.muted
+                              relation: { cardinality: "1", slotName: sort-mark }
+                        relation: { cardinality: "0..1", slotName: sort }
+                      - node:
+                          role: hidden label
+                          styles:
+                            layout.position: absolute
+                            size.inline: 0
+                            size.block: 0
+                            layout.overflow: hidden
+                            typography.whiteSpace: nowrap
+                        relation: { cardinality: "0..1", slotName: hidden-label }
+                  relation: { cardinality: "8", slotName: head }
+                - node:
+                    role: group header (a row group's header cell)
+                    styles:
+                      typography.align: start
+                      typography.size: typography.text.secondary.fontSize
+                      typography.weight: typography.text.primary.bold.fontWeight
+                      typography.color: color.text.muted
+                      spacing.internal.block.start: container.gap.default
+                      spacing.internal.block.end: space.050
+                      spacing.internal.inline.start: 0
+                      spacing.internal.inline.end: 0
+                      appearance.border.width: 1px
+                      appearance.border.style: "none none solid"
+                      appearance.border.bottom.color: color.border.muted
+                    edges:
+                      - node:
+                          role: group count
+                          styles:
+                            spacing.external.inline.start: space.050
+                            typography.variant.numeric: tabular-nums
+                        relation: { cardinality: "1", slotName: group-count }
+                  relation: { cardinality: "0..*", slotName: group-header }
+                - switch:
+                    on: selection
+                    cases:
+                      - node:
+                          role: row
+                          edges:
+                            - switch:
+                                on: column
+                                cases:
+                                  - node:
+                                      role: cell
+                                      styles:
+                                        typography.align: start
+                                        typography.weight: typography.text.primary.fontWeight
+                                        layout.verticalAlign: top
+                                        spacing.internal.block.start: space.050
+                                        spacing.internal.block.end: space.050
+                                        spacing.internal.inline.start: 0
+                                        spacing.internal.inline.end: container.gap.default
+                                        appearance.border.width: 1px
+                                        appearance.border.style: "none none solid"
+                                        appearance.border.bottom.color: color.border.muted
+                                      edges:
+                                        - node:
+                                            role: expander (a square toggle)
+                                            styles:
+                                              size.width: space.300
+                                              size.height: space.300
+                                              spacing.internal.block.start: 0
+                                              spacing.internal.block.end: 0
+                                              spacing.internal.inline.start: 0
+                                              spacing.internal.inline.end: 0
+                                              appearance.border.width: 1px
+                                              appearance.border.style: solid
+                                              appearance.border.color: color.border.muted
+                                              appearance.radius: 0.25rem
+                                              appearance.background: transparent
+                                              typography.font: inherit
+                                              typography.color: color.text
+                                              interaction.cursor: pointer
+                                          relation: { cardinality: "0..1", slotName: expander }
+                                        - node:
+                                            role: link (to the job's page)
+                                            styles:
+                                              typography.weight: typography.text.primary.bold.fontWeight
+                                          relation: { cardinality: "0..1", slotName: link }
+                                        - node:
+                                            role: story (cut to one line)
+                                            styles:
+                                              layout.type: block
+                                              size.max.width: "calc(4 * var(--grid-col-min))"
+                                              layout.overflow: hidden
+                                              typography.overflow: ellipsis
+                                              typography.whiteSpace: nowrap
+                                              typography.size: typography.text.secondary.fontSize
+                                              typography.color: color.text.muted
+                                          relation: { cardinality: "0..1", slotName: story }
+                                        - node:
+                                            role: split (primary and secondary pairings)
+                                            styles:
+                                              spacing.external.inline.start: space.050
+                                              typography.size: typography.text.secondary.fontSize
+                                              typography.color: color.text.muted
+                                          relation: { cardinality: "0..1", slotName: split }
+                                        - node:
+                                            role: absent (a muted dash)
+                                            styles:
+                                              typography.color: color.text.muted
+                                          relation: { cardinality: "0..1", slotName: absent }
+                                        - switch:
+                                            on: served
+                                            cases:
+                                              - node:
+                                                  role: state (served)
+                                                  styles:
+                                                    layout.type: inline-block
+                                                    spacing.internal.inline.start: space.100
+                                                    spacing.internal.inline.end: space.100
+                                                    appearance.border.width: 1px
+                                                    appearance.border.style: solid
+                                                    appearance.border.color: currentColor
+                                                    appearance.radius: 999px
+                                                    typography.size: typography.text.secondary.fontSize
+                                                    typography.color: color.text.branded
+                                                    typography.whiteSpace: nowrap
+                                              - node:
+                                                  role: unserved state (.is-unserved)
+                                                  styles:
+                                                    appearance.border.color: color.border.muted
+                                                    typography.color: color.text.muted
+                                          relation: { cardinality: "0..1", slotName: state }
+                                  - node:
+                                      role: numeric cell (.is-numeric)
+                                      styles:
+                                        typography.align: end
+                                        typography.variant.numeric: tabular-nums
+                                  - node:
+                                      role: wildcard cell (.is-wildcard)
+                                      styles:
+                                        typography.color: color.text.muted
+                              relation: { cardinality: "8", slotName: cell }
+                      - node:
+                          role: selected row (.is-selected)
+                          styles:
+                            appearance.background: color.background.layer2
+                  relation: { cardinality: "1..*", slotName: row }
+                - node:
+                    role: detail (the detail row's one cell, hidden until expanded)
+                    styles:
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.block.end: component.padding.block
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                      appearance.background: color.background.layer2
+                      appearance.border.width: 1px
+                      appearance.border.style: "none none solid"
+                      appearance.border.bottom.color: color.border.muted
+                    edges:
+                      - node:
+                          role: detail body
+                          styles:
+                            layout.type: flex
+                            layout.direction: column
+                            spacing.gap: space.050
+                          edges:
+                            - node:
+                                role: detail story (verbatim)
+                                styles:
+                                  spacing.external.block.start: 0
+                                  spacing.external.block.end: 0
+                                  spacing.external.inline.start: 0
+                                  spacing.external.inline.end: 0
+                                  spacing.internal.inline.start: component.padding.block
+                                  appearance.border.width: 1px
+                                  appearance.border.style: "none none none solid"
+                                  appearance.border.color: color.border.muted
+                              relation: { cardinality: "0..1", slotName: detail-story }
+                            - node:
+                                role: detail heading
+                                styles:
+                                  spacing.external.block.start: 0
+                                  spacing.external.block.end: 0
+                                  typography.size: typography.text.secondary.fontSize
+                                  typography.weight: typography.text.primary.bold.fontWeight
+                                  typography.color: color.text.muted
+                              relation: { cardinality: "0..1", slotName: detail-heading }
+                            - node:
+                                role: acceptances
+                                styles:
+                                  spacing.external.block.start: 0
+                                  spacing.external.block.end: 0
+                                  spacing.internal.inline.start: component.padding.inline
+                              relation: { cardinality: "0..1", slotName: acceptances }
+                            - node:
+                                role: unserved (the plain statement that nothing serves the job)
+                                styles:
+                                  spacing.external.block.start: 0
+                                  spacing.external.block.end: 0
+                                  typography.color: color.text.muted
+                              relation: { cardinality: "0..1", slotName: unserved }
+                        relation: { cardinality: "1", slotName: detail-body }
+                  relation: { cardinality: "1..*", slotName: detail }
+            relation: { cardinality: "1", slotName: table }
+      relation: { cardinality: "1", slotName: scroll }

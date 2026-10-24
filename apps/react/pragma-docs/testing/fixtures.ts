@@ -29,9 +29,12 @@ export const JOB_URI = "sem://design-system-docs#job.l3";
 export const COMPONENT_PROBE_RESPONSE = {
   data: {
     component: {
+      __typename: "Component",
+      __isNode: "Component",
+      __isUIBlock: "Component",
       id: COMPONENT_URI,
       uri: COMPONENT_URI,
-      name: "Button",
+      _meta: { title: "Button", curie: COMPONENT_URI },
     },
   },
 } as const;
