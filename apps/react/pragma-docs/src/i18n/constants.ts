@@ -23,6 +23,12 @@ export const MESSAGES = {
     "This canvas is a placeholder: the frame around it is finished, and the guides land with the reading views.",
   "guides.documentTitle": "{slug} — Guides",
   "guides.guideCopy": "Guide content for {slug}.",
+  "account.title": "Account",
+  "account.signedIn": "Protected account page. You are signed in.",
+  "login.title": "Login",
+  "login.instruction":
+    "Demo login. Add {param} to any protected URL to simulate authentication.",
+  "login.from": "You will be redirected to {from} after login.",
   "notFound.title": "Page not found",
   "notFound.body": "The page you are looking for does not exist.",
   "block.version": "v{version}",

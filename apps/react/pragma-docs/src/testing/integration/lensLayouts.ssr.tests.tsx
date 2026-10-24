@@ -725,7 +725,7 @@ describe("the not-found route", () => {
     expect(countOccurrences(body, 'data-region="primary-nav"')).toBe(1);
     expect(countOccurrences(body, 'data-region="canvas"')).toBe(1);
     expect(countOccurrences(body, 'data-region="footer"')).toBe(1);
-    expect(body).toContain('<section class="ds not-found-page">');
+    expect(body).toContain('class="ds prose-page ds not-found-page"');
   });
 
   it("renders content distinct from every measured lens canvas", () => {

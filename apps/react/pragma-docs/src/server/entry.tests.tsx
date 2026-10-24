@@ -235,7 +235,7 @@ describe("EntryServer's not-found page", () => {
     expect(html).toContain('data-region="primary-nav"');
     expect(html).toContain('<div class="colophon">');
     expect(html).toMatch(
-      /<main class="ds canvas canvas"[^>]*><div class="page"><section class="ds not-found-page">/,
+      /<main class="ds canvas canvas"[^>]*><div class="page"><section aria-labelledby="not-found-title" class="ds prose-page ds not-found-page">/,
     );
   });
 });

@@ -6,8 +6,9 @@ import type { ComponentProps } from "react";
 type OwnProps = Record<never, never>;
 
 /**
- * Props accepted by `NotFoundPage`: the native props of its `<section>`
- * root. The native `children` are excluded because the page fixes its copy.
+ * Props accepted by `NotFoundPage`: the native props of the prose page's
+ * `<section>` root, which the prose page renders. The native `children` are
+ * excluded because the page fixes its copy.
  */
 export type NotFoundPageProps = OwnProps &
   Omit<ComponentProps<"section">, keyof OwnProps | "children">;

@@ -1,7 +1,7 @@
 import type { StandardSchemaV1 } from "@canonical/router-core";
 import { route } from "@canonical/router-core";
-import AccountPage from "./AccountPage.js";
-import LoginPage from "./LoginPage.js";
+import { AccountPage } from "./lib/AccountPage/index.js";
+import { LoginPage } from "./lib/LoginPage/index.js";
 
 function readString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
@@ -24,17 +24,19 @@ function readString(value: unknown): string | undefined {
  * inferred as `never`, which is why a `Link` passing `search` to either was
  * rejected too — the same defect, one hop downstream.
  */
-const searchSchema = <TOutput>(
+function searchSchema<TOutput>(
   parse: (record: Record<string, unknown>) => TOutput,
-): StandardSchemaV1<unknown, TOutput> => ({
-  "~standard": {
-    version: 1,
-    vendor: "pragma-docs",
-    validate: (value: unknown) => ({
-      value: parse((value ?? {}) as Record<string, unknown>),
-    }),
-  },
-});
+): StandardSchemaV1<unknown, TOutput> {
+  return {
+    "~standard": {
+      version: 1,
+      vendor: "pragma-docs",
+      validate: (value: unknown) => ({
+        value: parse((value ?? {}) as Record<string, unknown>),
+      }),
+    },
+  };
+}
 
 const accountSearchSchema = searchSchema((record) => ({
   auth: readString(record.auth),
@@ -48,12 +50,12 @@ const routes = {
   account: route({
     url: "/account",
     search: accountSearchSchema,
-    content: AccountPage,
+    content: () => <AccountPage />,
   }),
   login: route({
     url: "/login",
     search: loginSearchSchema,
-    content: LoginPage,
+    content: ({ search }) => <LoginPage search={search} />,
   }),
 } as const;
 
