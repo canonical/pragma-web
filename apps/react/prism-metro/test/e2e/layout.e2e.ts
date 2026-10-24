@@ -16,7 +16,8 @@
  * down; a strip whose band runs from the rail's
  * border to the viewport's edge with its content from the canvas's first
  * column line to its last; and every gap, padding and margin of the chrome
- * a multiple of 4px. The station index is measured in both its views, and
+ * a multiple of 4px. The station index is measured in both its views, the
+ * cards of the station and line indexes reaching the canvas's end, and
  * a station page once more with a
  * field name longer than its key's track, which must clip there rather
  * than run under the value or widen the canvas, and once for its fields'
@@ -33,10 +34,13 @@ import type { Browser, Page } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { NORTHGATE_CURIE } from "../../testing/fixtures.js";
 import {
+  CARDS_PATHS,
   DEV_READY_MS,
   GRAPH_READY_MS,
+  INDEX_CARD_SELECTOR,
   LONG_FIELD_NAME,
   PAGE_SETTLE_MS,
+  WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
 } from "./constants.js";
 import startServer from "./startServer.js";
@@ -146,16 +150,22 @@ afterAll(async () => {
 
 describe.each(VIEWPORTS)("at $name px", (viewport) => {
   /**
-   * Open `path` once at this viewport and measure it in every theme.
+   * Open `path` once at this viewport and measure it in every theme, with
+   * how far the elements `fillSelector` matches fall short of the page's
+   * edges when it is given.
    *
    * @note Impure: opens a browser tab, which it closes.
    */
-  const measure = (path: string): Promise<readonly ThemedMeasure[]> =>
+  const measure = (
+    path: string,
+    fillSelector?: string,
+  ): Promise<readonly ThemedMeasure[]> =>
     measurePage(browser, {
       url: new URL(path, server.base).href,
       viewport,
       origins: [new URL(server.base).origin, new URL(graph.base).origin],
       timeoutMs: PAGE_SETTLE_MS,
+      fillSelector,
     });
 
   /**
@@ -266,6 +276,22 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         for (const scroller of layout.scrollers) {
           expect(["main.ds.canvas", "div.rail"], theme).toContain(scroller);
         }
+      }
+    },
+  );
+
+  // Past one group the canvas holds an even number of columns, which the
+  // two-column cards fill; below it the canvas holds three, and each card
+  // takes the whole row. Either way the cards reach the canvas's end.
+  it.each(CARDS_PATHS)(
+    "fills the rows of %s with cards to the canvas's end",
+    async (path) => {
+      const measures = await measure(path, INDEX_CARD_SELECTOR);
+      for (const { theme, measure: layout } of measures) {
+        const shortfall = layout.canvasPage.fillShortfall;
+        expect(shortfall, theme).not.toBeNull();
+        expect(shortfall?.start, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
+        expect(shortfall?.end, theme).toBeLessThanOrEqual(WIDTH_TOLERANCE_PX);
       }
     },
   );
