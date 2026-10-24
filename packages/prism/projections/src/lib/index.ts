@@ -81,6 +81,8 @@ export type {
 } from "./projections/index.js";
 export {
   ProjectionsProvider,
+  renderArm,
+  useProjectionLink,
   useProjectionMaps,
 } from "./projections/index.js";
 export type {
@@ -101,3 +103,4 @@ export {
   EntityList,
   EntityRow,
 } from "./ui/index.js";
+export { findCuriePrefix } from "./utils/index.js";

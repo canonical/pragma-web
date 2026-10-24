@@ -1,0 +1,65 @@
+---
+# ModifierFamilyCommand: a modifier family as a 56px command-palette
+# result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 and
+# the palette's result rows 502:1753 and 502:1827 (the title over "kind in
+# location", one vital at the end). The kind is the family's class; the
+# location the compact address's prefix; the vital counts its modifiers.
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved
+# from the compact address; a family has no home yet and reads as inert
+# text.
+node:
+  uri: docs.component.modifier_family_command
+  projection:
+    on: ModifierFamily
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: vital
+              edges:
+                - node:
+                    role: member
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..*"
+                    projection:
+                      field: modifiers
+            relation:
+              cardinality: "1"
+              slotName: vital
+      relation:
+        cardinality: "1"

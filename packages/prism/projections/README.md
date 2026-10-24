@@ -269,6 +269,31 @@ A node's or a class's home is resolved with its compact address
 (`_meta.curie`) as the `uri` a site's home resolver receives, so one
 entity has one address; a property's with its IRI, its only address.
 
+### A site's own composites
+
+A site arm reads the `Node` key alone, so it can show only what every node
+carries. A site whose types need their own fields writes a composite of its
+own on `Node` and a dispatcher over it: the composite spreads the package's
+dispatcher of that form aliased as `Node`, and each of the site's
+projections aliased by the type it is on, narrowing an interface's
+projection to each type with an aliased inline fragment
+(`... on Component @alias(as: "Component") { ...UIBlockCard_node }`). Its
+map's `Node` arm is the package's dispatcher, so every other node, ontology
+classes included, still dispatches through the maps the site provides, and
+`renderArm` keeps one precedence and one compile-time check for both:
+
+```tsx
+import { renderArm } from "@canonical/prism-projections";
+
+export default function SiteCardProjection({ node, ...props }) {
+  const data = useFragment(nodeFragment, node);
+  return renderArm(siteProjectionMaps.card, data, props);
+}
+```
+
+A site's own projections read their link through `useProjectionLink` and
+their namespace prefix through `findCuriePrefix`, as the package's do.
+
 ## List view
 
 `NodeList` renders an index of nodes as `EntityList`: a plural fragment on
@@ -341,9 +366,10 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
   `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListView`.
-- Maps: `ProjectionsProvider`, `useProjectionMaps`,
-  `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
+- Maps: `ProjectionsProvider`, `useProjectionMaps`, `useProjectionLink`,
+  `renderArm`, `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
   `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,
   `SiteArmProps`.
 - Prose: `markdownComponents`, `ProseReferencesProvider`; types
   `ProseLinkProps`, `ProseReferencesProviderProps`.
+- Addresses: `findCuriePrefix`.

@@ -1,0 +1,41 @@
+---
+# CodeStandardChip: a code standard as an inline mention.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 449:22408 and 505:2140 (the
+# chip with its key before the separator: "cs: …"). The key is the compact
+# address's prefix, the value the standard's title; a passage's own link
+# text, when given, stands in for the title.
+# Projected onto EntityChip, which carries every style: this anatomy binds
+# none. The home is the link the value renders through, resolved from the
+# compact address (the site's home expands the prefix to the standard's
+# IRI); a standard without one reads as inert text.
+node:
+  uri: docs.component.code_standard_chip
+  projection:
+    on: CodeStandard
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: lead
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: lead
+          - node:
+              role: value
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: value
+      relation:
+        cardinality: "1"

@@ -1,0 +1,25 @@
+---
+# UIBlockExample: a UI block's rendered example, the published React
+# component of the block with its default props, given only what it cannot
+# render without (a label, a count, a key), server-rendered in the card's
+# sidecar.
+# Reference: heuristic 28 and Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 502:1749
+# (the side panel's component). Each case is one published component, and
+# fits the sidecar's two intrinsic columns at every width: a strip of
+# variants would not, so a case is the component alone.
+# It renders no element of its own: the published component is the root,
+# styled by its own package, so this anatomy binds no style.
+node:
+  uri: docs.component.ui_block_example
+  edges:
+    - switch:
+        on: props
+        cases:
+          - uri: global.component.badge
+          - uri: global.component.button
+          - uri: global.component.chip
+          - uri: global.component.inline_code
+          - uri: global.component.keyboard_key
+      relation:
+        cardinality: "1"
+        slotName: example

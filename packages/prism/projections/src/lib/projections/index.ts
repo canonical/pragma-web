@@ -8,6 +8,7 @@
 export { default as useProjectionLink } from "./hooks/useProjectionLink.js";
 export { default as useProjectionMaps } from "./hooks/useProjectionMaps.js";
 export { default as ProjectionsProvider } from "./Provider.js";
+export { default as renderArm } from "./renderArm.js";
 export type {
   ArmProps,
   ProjectionArm,

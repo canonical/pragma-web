@@ -1,0 +1,59 @@
+---
+# CodeStandardCommand: a code standard as a 56px command-palette result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1910, 502:1801 and
+# 504:327 and the palette's result rows 502:1753 and 502:1827 (the title
+# over "kind in location", one vital at the end). The kind is the
+# standard's class; the location the compact address's prefix; the vital
+# its first category.
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved
+# from the compact address; a standard without one reads as inert text.
+node:
+  uri: docs.component.code_standard_command
+  projection:
+    on: CodeStandard
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: vital
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "0..1"
+              slotName: vital
+              projection:
+                field: categories
+      relation:
+        cardinality: "1"

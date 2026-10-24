@@ -1,0 +1,58 @@
+---
+# UIBlockRow: a UI block as a 32px list entry.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 547:2227 and 547:2201 (the
+# namespace prefix muted before the title, one muted word at the end) and
+# the UI-blocks row ("ds:" before "IconButton", "experimental" at the end).
+# The prefix is the compact address's, with its colon; the word is the
+# block's first documentation stage.
+# Projected onto EntityRow, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address; a block whose type has no home reads as inert text.
+node:
+  uri: docs.component.ui_block_row
+  projection:
+    on: UIBlock
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+              # The prefix is set in the identifier face.
+              edges:
+                - node:
+                    role: identifier
+                  relation:
+                    cardinality: "1"
+                    slotName: identifier
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: meta
+              projection:
+                field: _meta.title
+            relation:
+              # The first stage only: the row ends in one word.
+              cardinality: "0..1"
+              slotName: meta
+              projection:
+                field: documentationStages
+      relation:
+        cardinality: "1"

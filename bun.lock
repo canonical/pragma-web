@@ -127,6 +127,7 @@
       "name": "@canonical/pragma-docs",
       "version": "0.44.1",
       "dependencies": {
+        "@canonical/i18n-core": "^0.44.1",
         "@canonical/prism-core": "^0.44.1",
         "@canonical/prism-lens-definitions": "^0.44.1",
         "@canonical/prism-lens-standards": "^0.44.1",
@@ -135,6 +136,7 @@
         "@canonical/react-ds-global": "^0.44.1",
         "@canonical/react-head": "^0.44.1",
         "@canonical/react-hooks": "^0.44.1",
+        "@canonical/react-markdown": "^0.44.1",
         "@canonical/react-ssr": "^0.44.1",
         "@canonical/router-core": "^0.44.1",
         "@canonical/router-react": "^0.44.1",

@@ -1,5 +1,9 @@
 import type { Edge, Node, Specification } from "@canonical/anatomy-dsl";
-import type { ReaderFragment, ReaderSelection } from "relay-runtime";
+import type {
+  ReaderFragment,
+  ReaderLinkedField,
+  ReaderSelection,
+} from "relay-runtime";
 
 /**
  * Join a scope and a field into one dot-delimited path.
@@ -37,8 +41,32 @@ function collectEdgePaths(edge: Edge, scope: string): string[] {
 }
 
 /**
+ * Whether a linked field is a connection's list of edges: a plural field
+ * named `edges`, the mechanism a connection pages its nodes through.
+ */
+function isConnectionEdges(field: ReaderLinkedField): boolean {
+  return field.name === "edges" && field.plural;
+}
+
+/**
+ * Collect the scalar paths a connection's edges read, in the scope of the
+ * connection's own field: each edge's `node` reads in that scope, since an
+ * anatomy names the connection's field and never its mechanism, and any
+ * other selection of an edge (its `cursor`) keeps its `edges` step, so no
+ * anatomy path can match it and the check names it.
+ */
+function collectEdgesPaths(edges: ReaderLinkedField, scope: string): string[] {
+  return edges.selections.flatMap((selection) =>
+    selection.kind === "LinkedField" && selection.name === "node"
+      ? collectFragmentPaths(selection.selections, scope)
+      : collectFragmentPaths([selection], joinPath(scope, edges.name)),
+  );
+}
+
+/**
  * Collect the scalar paths a fragment's selections read: a linked field
- * nests its selections under its name, a scalar field ends a path, and an
+ * nests its selections under its name, a connection's edges read their
+ * nodes in the connection field's scope, a scalar field ends a path, and an
  * inline fragment or a condition reads in the scope it sits in. The
  * typename and fragment spreads read no field the anatomy renders.
  */
@@ -53,6 +81,9 @@ function collectFragmentPaths(
           ? []
           : [joinPath(scope, selection.name)];
       case "LinkedField":
+        if (isConnectionEdges(selection)) {
+          return collectEdgesPaths(selection, scope);
+        }
         return collectFragmentPaths(
           selection.selections,
           joinPath(scope, selection.name),
@@ -72,7 +103,9 @@ function collectFragmentPaths(
  * `projection.on`, and the field paths the anatomy derives are exactly the
  * scalar paths the fragment reads. The anatomy derives its paths as the
  * DSL's derived fragment does: a relation's `field` shifts the scope, a
- * node's `field` is read in it, and a switch's cases inherit it.
+ * node's `field` is read in it, and a switch's cases inherit it. A
+ * connection reads as its field: the fragment's `edges` and `node` steps
+ * are the connection's mechanism, which an anatomy never names.
  *
  * @param specification - The component's parsed anatomy.
  * @param fragment - The compiled reader artifact of the component's

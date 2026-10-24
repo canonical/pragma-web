@@ -1,0 +1,49 @@
+---
+# ModifierFamilyChip: a modifier family as an inline mention, counted by
+# its members.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 449:22408 (the chip with its
+# badge: "Anticipation" and a count of 5). The badge is the published Badge
+# over the number of the family's modifiers; a passage's own link text,
+# when given, stands in for the title.
+# Projected onto EntityChip, which carries every style: this anatomy binds
+# none. The home is the link the value renders through, resolved from the
+# compact address; a family has no home yet and reads as inert text.
+node:
+  uri: docs.component.modifier_family_chip
+  projection:
+    on: ModifierFamily
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: value
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: value
+          - node:
+              uri: global.component.badge
+              edges:
+                # Each member counts once.
+                - node:
+                    role: member
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..*"
+                    projection:
+                      field: modifiers
+            relation:
+              cardinality: "1"
+              slotName: badge
+      relation:
+        cardinality: "1"

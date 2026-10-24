@@ -1,6 +1,7 @@
 /**
- * The package's internal helpers over graph addresses: a compact address's
- * prefix and an IRI's local name.
+ * The package's helpers over graph addresses: a compact address's prefix,
+ * which the package exports for a site's own projections, and an IRI's
+ * local name, which it keeps internal.
  *
  * @module
  */

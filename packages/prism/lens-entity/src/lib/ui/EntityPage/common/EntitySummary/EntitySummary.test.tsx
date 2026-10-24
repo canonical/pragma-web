@@ -28,6 +28,8 @@ describe("EntitySummary", () => {
     expect(summary?.querySelector(".type")?.textContent).toBe(
       "Instance of Station",
     );
-    expect(summary?.querySelector(".type .ds.entity-chip")).not.toBeNull();
+    expect(
+      summary?.querySelector(".type .ds.ontology-class-chip"),
+    ).not.toBeNull();
   });
 });
