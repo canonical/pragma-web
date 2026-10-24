@@ -1,40 +1,27 @@
 import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
-import { JourneysPage } from "./JourneysPage/index.js";
 import { JourneysIcon } from "./lib/JourneysIcon/index.js";
+import { JourneysPage } from "./lib/JourneysPage/index.js";
 import warmJourneys from "./warmJourneys.js";
 
 /**
- * The Journeys lens routes (AV-351): the diagram (`/journeys`, the lens
- * key the Rail links to) and the job view (`/journeys/:job`,
- * percent-encoded graph URI). Both mount the same page over the same ONE
- * operation (`journeysQuery.ts`), and both reach the store through
- * `warm: warmJourneys`, the one seam between the router and the data
- * layer:
+ * The Journeys lens routes: the lens index (`/journeys`, the key the rail
+ * links to) and a job (`/journeys/:job`, its percent-encoded graph URI).
+ * Both mount the same page over the same operation (`journeysQuery.ts`),
+ * and both reach the store through `warm: warmJourneys`, the one seam
+ * between the router and the data layer: on the server `prepareRelayData`
+ * awaits it and serialises the store for hydration; on hover and on the
+ * first browser load it does nothing when the store already holds the
+ * data.
  *
- * - on the server, `prepareRelayData` awaits it with a per-request
- *   environment and serialises the store for hydration;
- * - on hover (router-react's `Link`) and on the first browser load it runs
- *   against the browser environment, where it does nothing when the store
- *   already holds the data.
+ * The job is the addressable thing: a journey is a job's path through the
+ * surfaces that serve it, so the job is what a reader links to, cites and
+ * returns to. The coordinate the graph roots at is a way of looking, kept
+ * in the explorer's filter and never in the URL.
  *
- * THE JOB IS THE ADDRESSABLE THING (P-D7). A journey is a job's path
- * through the surfaces that serve it, so the job is what a reader links
- * to, cites and returns to. The COORDINATE roots the diagram (ruling R1)
- * but is a way of looking, not a place — it lives in the lens's ephemeral
- * filter, never in the URL.
- *
- * The diagram declares the lens (`routeLensFacet`) and its digit; both
- * routes render inside `JourneysLayout`, whose strip carries the `context`
- * AND `controls` sockets (RULING 1). The `controls` socket holds the
- * Table ⇄ Graph view switch — the one instrument that is genuinely a
- * strip-level toolbar: it chooses which reading of the demand model the
- * canvas shows, needs no explanatory caveat, and its labels are
- * data-independent, so the strip content is a stable string. (The lens's OTHER controls — the coordinate chooser and the
- * persona filter — stay in the rail: each needs its own explanatory text
- * (the persona axis is APPROXIMATE and says so), and a strip toolbar is the
- * wrong place for a caveat that must be read.) The `status` socket stays
- * empty — the lens has no single figure worth a live count.
+ * The index declares the lens (`routeLensFacet`) and its digit; both
+ * routes render inside `JourneysLayout`, whose strip carries the trail and
+ * the table and graph switch.
  */
 const routes = {
   journeys: route({

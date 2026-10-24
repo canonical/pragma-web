@@ -116,12 +116,12 @@ const EXPECTED_LAYOUT: Readonly<Record<string, string>> = {
   "/components": "document-layout",
   "/definitions": "workspace-layout",
   "/standards": "document-layout",
-  "/journeys": "document-layout",
+  "/journeys": "workspace-layout",
   "/guides": "document-layout",
   [BUTTON_ENTITY_URL]: "document-layout",
   [DEFINITIONS_TERM_URL]: "workspace-layout",
   [STANDARD_READING_URL]: "document-layout",
-  [JOURNEYS_JOB_URL]: "document-layout",
+  [JOURNEYS_JOB_URL]: "workspace-layout",
   [GUIDE_URL]: "document-layout",
   "/playground": "document-layout",
   [ACCOUNT_URL]: "document-layout",
@@ -523,51 +523,30 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(
       `href="/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#react.component.props")}"`,
     );
-    // The journeys canvases render REAL content from the fixture records:
-    // the index carries the PRIMARY-SURFACE table (AV-351). The table and
-    // the graph are ONE reading at a time (RULING 1), with the TABLE as the
-    // default — so the default SSR output is the table, and the well's node
-    // DOM is a client transition, NOT in the served markup.
+    // The journeys canvases render the fixture records: the table is the
+    // default reading, so both addresses serve the table, its row headers
+    // and its grouping control before any client script, and neither the
+    // graph's hops nor the inspector, which open with the graph view. The
+    // view switch is the strip's, not the canvas's.
     expect(mustGet("/journeys").canvas).toContain('id="lens-journeys-title"');
-    // The table is the lens's primary surface and the DEFAULT view, and it
-    // SSRs: its slot, its row-header cells and its group-by control are all
-    // in the served markup — the sortable data table exists before any
-    // client JS.
     expect(mustGet("/journeys").canvas).toContain('class="ds journey-table"');
     expect(mustGet("/journeys").canvas).toContain('scope="row"');
     expect(mustGet("/journeys").canvas).toContain("Group by");
-    // The view switch is NO LONGER in the canvas (RULING 1): it is the mode
-    // strip's `controls` tenant now, so it lands in the CHROME, not here. The
-    // strip claim is asserted by EXPECTED_STRIP_CLAIMS below; the canvas must
-    // NOT carry the switch.
     expect(mustGet("/journeys").canvas).not.toContain(
       'aria-label="Journey view"',
     );
-    // RULING 2: the DEFAULT (table) view drops the inspector column, so the
-    // inspector region is absent from the default canvas — no empty column,
-    // and no "Select a job" empty-inspector prompt in table mode.
-    expect(mustGet("/journeys").canvas).not.toContain(".journey-inspector");
-    expect(mustGet("/journeys").canvas).not.toContain(
-      'id="journey-inspector-title"',
-    );
-    // HONEST: the well (its hops' SVG) is NOT in the default output —
-    // the graph is the non-default view, reached by the client switch. This
-    // used to assert the node DOM was present because the well SSR'd
-    // alongside the table; with one-view-at-a-time and table-default, the
-    // default canvas is the table alone.
     expect(mustGet("/journeys").canvas).not.toContain('class="hop');
-    // The job canvas defaults to the table too (the view is ephemeral, not
-    // URL-derived), so it carries the TABLE — not the inspector (dropped in
-    // table mode, RULING 2) and not the well's node DOM (the non-default
-    // view). The selected job is still in the URL; it only surfaces once the
-    // reader flips to the graph.
     expect(mustGet(JOURNEYS_JOB_URL).canvas).toContain(
       'class="ds journey-table"',
     );
-    expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain(
-      'id="journey-inspector-title"',
+    expect(mustGet(JOURNEYS_JOB_URL).canvas).toContain(
+      'class="row is-selected"',
     );
     expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain('class="hop');
+    for (const url of ["/journeys", JOURNEYS_JOB_URL]) {
+      expect(mustGet(url).chrome).not.toContain('id="journey-inspector-title"');
+      expect(mustGet(url).chrome).not.toContain('class="inspector"');
+    }
     expect(mustGet("/guides").canvas).toContain('id="guides-title"');
     // The entity page renders its REAL data from the fixture records, not
     // a loading state — the whole view SSRs from a warm store.

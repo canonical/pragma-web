@@ -1,21 +1,17 @@
 /**
- * Shared harness for the Journeys lens's warm-store tests: the REAL
- * `JourneysPage` under the real provider stack — a seeded (or cold) Relay
- * environment, `HeadProvider`, and a static router over the REAL app routes
- * at the page's own URL, because the rail, the well's nodes and the
- * inspector all render router-react `Link`s whose hrefs (and `aria-current`
- * selection) must come from the actual `journeysJob` codec.
+ * Shared harness for the journeys domain's warm-store tests: the real
+ * `JourneysPage` under the real provider stack, a seeded (or cold) Relay
+ * environment, `HeadProvider`, and a static router over the real app
+ * routes at the page's own URL, because the rail, the table and the well
+ * render router links whose hrefs and `aria-current` come from the
+ * `journeysJob` route.
  *
- * The rail filter still lives inside the explorer's own `useState`. The VIEW
- * switch (RULING 1) does NOT: it moved to the mode strip's `controls` socket,
- * so its ephemeral state lives in `journeyViewContext` — a layout-spanning
- * provider, exactly like the Definitions lens's filter context. This harness
- * therefore wraps the page in `JourneyViewProvider` (as `JourneysLayout`
- * does), so the view is writable on every real render; `journeysStrip`
- * below additionally mounts the strip's own switch under the SAME provider,
- * the way the layout renders it as a sibling of the canvas.
- * `journeysLayoutAt` mounts the page inside the real `JourneysLayout`
- * instead, so the only view provider is the one the layout holds.
+ * The view the strip's switch and the canvas share lives in
+ * `JourneyViewProvider`, which the layout holds around both, so every
+ * render here is under one: `journeysStrip` mounts the strip's switch
+ * beside the page under the same provider, `journeysLayoutAt` mounts the
+ * page inside the real `JourneysLayout`, and `journeysTenantAt` mounts one
+ * of the layout's tenants alone.
  *
  * Lives in `__fixtures__` beside the captured record maps: imported by
  * tests, never collected as one.
@@ -30,16 +26,15 @@ import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
-import { JourneysLayout } from "../JourneysLayout/index.js";
-import { JourneysPage } from "../JourneysPage/index.js";
+import { Controls } from "../lib/JourneysLayout/common/Controls/index.js";
+import { JourneysLayout } from "../lib/JourneysLayout/index.js";
+import { JourneysPage } from "../lib/JourneysPage/index.js";
 import { JourneyViewProvider } from "../lib/JourneyViewProvider/index.js";
-import { journeysStripSlots } from "../stripSlots.js";
 
 /**
- * Contention insurance (the definitions/components precedent): these tests
- * mount the full provider stack + static router + the graph well, which can
- * overrun the 5s default under heavy parallel machine load. Per-test only —
- * the config default stands.
+ * These tests mount the full provider stack, a static router and the
+ * graph well, which can overrun the 5s default under heavy parallel load.
+ * Per test only: the config default stands.
  */
 export const JOURNEYS_TEST_TIMEOUT_MS = 20_000;
 
@@ -75,10 +70,10 @@ const renderUnderProviders = (
 );
 
 /**
- * The journeys page at `job` (undefined = the `/journeys` index) over an
- * environment seeded with `records` (`undefined` = cold store). The page
- * owns its Suspense/ErrorBoundary; the router exists for `Link` context and
- * selection only (no Outlet — the lens layout stays out of component tests).
+ * The journeys page at `job` (undefined for the `/journeys` index) over an
+ * environment seeded with `records` (undefined for a cold store). The page
+ * owns its boundaries; the router exists for the links and the selection
+ * only, with no outlet.
  */
 export const journeysPageAt = (
   job: string | undefined,
@@ -95,20 +90,16 @@ export const journeysPageAt = (
   );
 
 /**
- * The page AND the strip's view switch under ONE `JourneyViewProvider`, the
- * topology `JourneysLayout` renders: the switch sits in the layout's strip as
- * a sibling of the canvas, and context is the only path between them. Use
- * this when a test needs to drive the switch and observe the canvas react
- * (the interaction teeth). The strip tenant is mounted first, standing in for
- * the mode strip's `controls` socket.
+ * The page and the strip's view switch under one `JourneyViewProvider`, as
+ * the layout renders them: the switch is a sibling of the canvas. Use it
+ * when a test drives the switch and watches the canvas follow.
  */
 export const journeysStrip = (
   job: string | undefined,
   records: RecordMap | undefined,
   fetchFn: FetchFunction,
-): ReactElement => {
-  const { Controls } = journeysStripSlots;
-  return renderUnderProviders(
+): ReactElement =>
+  renderUnderProviders(
     job,
     records,
     fetchFn,
@@ -117,12 +108,11 @@ export const journeysStrip = (
       <JourneysPage params={job === undefined ? {} : { job }} />
     </JourneyViewProvider>,
   );
-};
 
 /**
  * The page inside the real `JourneysLayout`, with no provider of its own:
- * whatever view the strip's switch and the explorer share comes from the
- * layout alone.
+ * the view the strip's switch, the canvas and the inspector share comes
+ * from the layout alone.
  */
 export const journeysLayoutAt = (
   job: string | undefined,
@@ -136,4 +126,22 @@ export const journeysLayoutAt = (
     <JourneysLayout>
       <JourneysPage params={job === undefined ? {} : { job }} />
     </JourneysLayout>,
+  );
+
+/**
+ * One of the layout's tenants at `job` under the view provider the layout
+ * holds, with no page beside it: the inspector reads the explorer's
+ * operation from the store on its own.
+ */
+export const journeysTenantAt = (
+  job: string | undefined,
+  records: RecordMap | undefined,
+  fetchFn: FetchFunction,
+  children: ReactNode,
+): ReactElement =>
+  renderUnderProviders(
+    job,
+    records,
+    fetchFn,
+    <JourneyViewProvider>{children}</JourneyViewProvider>,
   );

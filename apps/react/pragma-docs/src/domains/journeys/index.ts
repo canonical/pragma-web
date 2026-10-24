@@ -23,8 +23,6 @@
  * @module
  */
 
-export * from "./JourneysExplorer/index.js";
-export * from "./JourneysPage/index.js";
 export * from "./JourneyWell/index.js";
 export {
   JOB_PAGE_SIZE,

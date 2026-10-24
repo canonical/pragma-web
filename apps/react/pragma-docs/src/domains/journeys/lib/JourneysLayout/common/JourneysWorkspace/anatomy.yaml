@@ -1,0 +1,36 @@
+---
+# JourneysWorkspace — the journeys layout's workspace: the workspace
+# archetype with the site's rail, a strip whose context is the trail to
+# the lens or to a job and whose controls are the view switch, the routed
+# page in the canvas, and, in the graph view alone, the job inspector in
+# the inspector region (a drawer below three groups). The table view has
+# no inspector, so the canvas takes its columns. The inspector reads the
+# store inside its own error and loading boundaries, so a cold store
+# empties its region and nothing else. It renders no element of its own:
+# the workspace renders the root.
+node:
+  uri: docs.subcomponent.journeys_workspace
+  edges:
+    - node:
+        uri: prism.component.workspace_layout
+        edges:
+          - node:
+              uri: docs.component.site_rail
+            relation: { cardinality: "1", slotName: rail }
+          - node:
+              uri: prism.component.mode_strip
+              edges:
+                - node:
+                    role: trail (the lens, then the job's address)
+                  relation: { cardinality: "1", slotName: context }
+                - node:
+                    uri: docs.subcomponent.controls
+                  relation: { cardinality: "1", slotName: controls }
+            relation: { cardinality: "1", slotName: strip }
+          - node:
+              uri: docs.subcomponent.inspector
+            relation: { cardinality: "0..1", slotName: inspector }
+          - node:
+              role: routed page
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1" }

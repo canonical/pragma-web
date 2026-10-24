@@ -1,6 +1,6 @@
 import { wrapper } from "@canonical/router-core";
 import type { ReactElement } from "react";
-import { JourneysLayout } from "./JourneysLayout/index.js";
+import { JourneysLayout } from "./lib/JourneysLayout/index.js";
 
 /** The router wrapper that renders every route grouped under it inside
  * `JourneysLayout`. */
