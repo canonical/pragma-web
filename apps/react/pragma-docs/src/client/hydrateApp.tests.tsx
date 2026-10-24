@@ -1,26 +1,24 @@
 /**
  * The client-hydration seam, exercised end to end (P-2 Stage 1): the seeded
  * SSR output hydrates through the REAL seeding logic — `hydrateApp` reading
- * `window.__INITIAL_DATA__` — with no React 19 recoverable error and no
- * network request, proving the render is served entirely from the seeded
- * store. React 19 reports hydration mismatches through `onRecoverableError`
- * (a `console.error` spy does NOT catch them — see `MentionChip.ssr.test.tsx`
- * in prism-core), so the spy rides the seam's `hydrateRoot` options; two
- * deliberate-breakage controls prove both spies can fail.
+ * `window.__INITIAL_DATA__` — with no hydration mismatch and no network
+ * request, proving the render is served entirely from the seeded store.
+ *
+ * The server half is the real `EntryServer`, which renders the whole
+ * `<html>` document, and the client half hydrates its `#root` alone, as
+ * production does: an id taken from the tree's position (`useId`) differs
+ * between the two, and only this pairing shows it. React 19 reports a text
+ * or structure mismatch through `onRecoverableError` and an attribute
+ * mismatch only through `console.error`, so both are spied on; two
+ * deliberate-breakage controls prove the spies can fail.
  */
 
-import {
-  createEnvironment,
-  createStaticRouter,
-  setPrefetchEnvironment,
-} from "@canonical/prism-core";
+import { setPrefetchEnvironment } from "@canonical/prism-core";
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Shell } from "#lib/ui";
 import type { InitialData } from "#server";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import { definitionsExplorerRecords } from "../../testing/definitionsRecords.js";
@@ -34,7 +32,7 @@ import journeysExplorerRecords from "../domains/journeys/__fixtures__/journeysEx
 import journeysExplorerRecordsJob from "../domains/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import lobbyRecords from "../domains/marketing/__fixtures__/lobbyRecords.js";
 import componentProbeRecords from "../domains/playground/__fixtures__/componentProbeRecords.js";
-import { appRoutes, middleware, notFoundRoute } from "../routes.js";
+import EntryServer from "../server/entry.js";
 import { hydrateApp } from "./hydrateApp.js";
 
 // Driving `act` directly (no Testing Library wrapper) needs the flag.
@@ -155,25 +153,27 @@ const SEEDED_PAGES = [
 ] as const;
 
 /**
- * Server HTML of the app tree at `url` from a store seeded with `records`
- * — the same composition `EntryServer` renders inside `#root` (static
- * router in, browser router out), so the seam hydrates the bytes a dev
- * server would actually serve.
+ * The server HTML of `#root` at `url`, from the real `EntryServer` over a
+ * store seeded with `records`: the bytes a dev server serves inside the
+ * element the client hydrates. The entry's own fetch guard rejects any
+ * operation the store does not hold, so a page that reached the network
+ * renders its failure state instead of the marker the tests look for.
  */
 const renderSeededServerHtml = (
-  fetchFn: FetchFunction,
   url: string = PLAYGROUND_URL,
   records: RecordMap = componentProbeRecords,
-): string =>
-  renderToString(
-    <Shell
-      environment={createEnvironment({ records, fetchFn })}
-      router={createStaticRouter(appRoutes, url, {
-        middleware: [...middleware],
-        notFound: notFoundRoute,
-      })}
-    />,
+): string => {
+  const documentHtml = renderToString(
+    <EntryServer initialData={{ url, relay: { records } }} />,
   );
+  const root = new DOMParser()
+    .parseFromString(documentHtml, "text/html")
+    .getElementById("root");
+  if (!root) {
+    throw new Error("EntryServer rendered no #root element");
+  }
+  return root.innerHTML;
+};
 
 type TestWindow = Window & { __INITIAL_DATA__?: InitialData };
 
@@ -233,27 +233,40 @@ describe("hydrateApp over the seeded SSR output", () => {
     vi.unstubAllGlobals();
   });
 
-  /** Hydrates via the seam over `serverHtml`; returns the mismatch spy. */
+  /**
+   * Hydrates via the seam over `serverHtml`; returns the recoverable-error
+   * spy and what reached `console.error`. The console spy is silenced, so a
+   * deliberate failure does not pollute the run's output, and its calls are
+   * copied out before it is restored, since restoring a spy clears them.
+   */
   async function hydrateInto(serverHtml: string) {
     const container = document.createElement("div");
+    container.id = "root";
     container.innerHTML = serverHtml;
     document.body.appendChild(container);
     containers.push(container);
     const onRecoverableError = vi.fn();
-    await act(async () => {
-      roots.push(hydrateApp(container, { onRecoverableError }));
-    });
-    return { container, onRecoverableError };
+    const consoleErrors: unknown[][] = [];
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    try {
+      await act(async () => {
+        roots.push(hydrateApp(container, { onRecoverableError }));
+      });
+    } finally {
+      consoleErrors.push(...consoleError.mock.calls);
+      consoleError.mockRestore();
+    }
+    return { container, onRecoverableError, consoleErrors };
   }
 
   it.each(SEEDED_PAGES)(
-    "hydrates the $name from the seeded store: no recoverable error, no fetch",
+    "hydrates the $name from the seeded store: no mismatch, no fetch",
     async ({ url, records, serverMarker, liveSelector, liveText }) => {
-      const serverFetchFn = createFetchSpy();
-      const serverHtml = renderSeededServerHtml(serverFetchFn, url, records);
+      const serverHtml = renderSeededServerHtml(url, records);
       // The server render itself came from the warm store, not the network.
       expect(serverHtml).toContain(serverMarker);
-      expect(serverFetchFn).not.toHaveBeenCalled();
 
       // The browser router reads the location the seam hydrates at.
       window.history.pushState({}, "", url);
@@ -261,10 +274,12 @@ describe("hydrateApp over the seeded SSR output", () => {
         url,
         relay: { records },
       };
-      const { container, onRecoverableError } = await hydrateInto(serverHtml);
+      const { container, onRecoverableError, consoleErrors } =
+        await hydrateInto(serverHtml);
 
-      // React 19's hydration-mismatch channel stayed silent…
+      // React 19's two hydration-mismatch channels stayed silent…
       expect(onRecoverableError).not.toHaveBeenCalled();
+      expect(consoleErrors).toEqual([]);
       // …the page's content is live in the hydrated tree…
       expect(container.querySelector(liveSelector)?.textContent).toBe(liveText);
       // …and the network was NEVER consulted: hydration read the records
@@ -279,7 +294,7 @@ describe("hydrateApp over the seeded SSR output", () => {
 
   it("control: discarding the seeded records makes hydration fetch", async () => {
     window.history.pushState({}, "", PLAYGROUND_URL);
-    const serverHtml = renderSeededServerHtml(createFetchSpy());
+    const serverHtml = renderSeededServerHtml();
     // No `__INITIAL_DATA__` on `window`: the seam finds no records, the
     // store starts cold, and the probe's query goes over HTTP — the exact
     // silent regression the green test's zero-fetch assertion guards.
@@ -291,7 +306,7 @@ describe("hydrateApp over the seeded SSR output", () => {
 
   it("control: hydrating over tampered server HTML reports a recoverable error", async () => {
     window.history.pushState({}, "", PLAYGROUND_URL);
-    const serverHtml = renderSeededServerHtml(createFetchSpy());
+    const serverHtml = renderSeededServerHtml();
     const tampered = serverHtml.replace(
       '<h2 class="heading" id="component-probe-forms-title">Its forms</h2>',
       '<h2 class="heading" id="component-probe-forms-title">Impostor</h2>',
@@ -301,16 +316,26 @@ describe("hydrateApp over the seeded SSR output", () => {
       url: PLAYGROUND_URL,
       relay: { records: componentProbeRecords },
     };
-    // React also prints the mismatch diff via console.error; silence it so
-    // the deliberate failure does not pollute the run's output.
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    try {
-      const { onRecoverableError } = await hydrateInto(tampered);
-      expect(onRecoverableError).toHaveBeenCalled();
-    } finally {
-      consoleError.mockRestore();
-    }
+    const { onRecoverableError } = await hydrateInto(tampered);
+    expect(onRecoverableError).toHaveBeenCalled();
+  });
+
+  it("control: an attribute the client renders differently reaches console.error", async () => {
+    window.history.pushState({}, "", PLAYGROUND_URL);
+    const serverHtml = renderSeededServerHtml();
+    const tampered = serverHtml.replace(
+      'id="component-probe-forms-title"',
+      'id="component-probe-forms-impostor"',
+    );
+    expect(tampered).not.toBe(serverHtml);
+    (window as TestWindow).__INITIAL_DATA__ = {
+      url: PLAYGROUND_URL,
+      relay: { records: componentProbeRecords },
+    };
+    const { onRecoverableError, consoleErrors } = await hydrateInto(tampered);
+    // An attribute mismatch is patched silently, not recovered from…
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    // …and only the console carries it.
+    expect(consoleErrors).not.toEqual([]);
   });
 });
