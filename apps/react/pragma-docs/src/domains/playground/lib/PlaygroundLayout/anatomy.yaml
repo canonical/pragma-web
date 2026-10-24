@@ -1,7 +1,7 @@
 ---
 # PlaygroundLayout — the playground's layout: the document archetype with
-# the site's rail, an empty strip, the routed page in the canvas, and the
-# site's colophon. It renders no element of its own: DocumentLayout renders
+# the site's rail, the strip carrying the single `Playground` crumb, the
+# routed page in the canvas, and the site's colophon. It renders no element of its own: DocumentLayout renders
 # the root.
 node:
   uri: docs.component.playground_layout

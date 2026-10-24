@@ -90,8 +90,8 @@ const GUIDE_URL = "/guides/getting-started";
  * page renders rather than redirecting to the login page. */
 const ACCOUNT_URL = "/account?auth=1";
 
-/** The pages that are not lenses: each renders under its layout with an
- * empty strip. */
+/** The pages that are not lenses: each renders under its layout, its strip
+ * carrying its trail and no controls or status. */
 const NON_LENS_URLS = [
   GUIDE_URL,
   "/playground",
@@ -272,8 +272,10 @@ const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
     current: "sem://design-system-docs#job.l3",
   }),
   // The playground and the account pages render under their own layouts,
-  // each leaving the trail out.
-  ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, ""])),
+  // each naming its single address as one current crumb.
+  "/playground": trail("Playground"),
+  [ACCOUNT_URL]: trail("Account"),
+  "/login": trail("Login"),
   [GUIDE_URL]: trail("Guides", {
     lensHref: "/guides",
     current: "getting-started",
@@ -282,8 +284,7 @@ const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
 
 /** Per-URL count of `aria-current="page"` carried INSIDE the strip context
  * slot: the breadcrumb trail's terminal (current) crumb carries exactly one,
- * on every URL whose layout renders a trail — i.e. every measured URL but
- * the playground and the account pages. The aria-current census
+ * on every URL, since every layout renders a trail. The aria-current census
  * below adds this to the rail's anchor count, because the current crumb is a
  * `<span>`, invisible to the anchor-scoped href model but real to a total
  * count over the whole chrome. */
@@ -298,8 +299,7 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
   [DEFINITIONS_TERM_URL]: 1,
   [STANDARD_READING_URL]: 1,
   [JOURNEYS_JOB_URL]: 1,
-  ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, 0])),
-  [GUIDE_URL]: 1,
+  ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, 1])),
 };
 
 /**

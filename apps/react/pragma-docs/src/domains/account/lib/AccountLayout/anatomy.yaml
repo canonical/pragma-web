@@ -1,7 +1,8 @@
 ---
 # AccountLayout — the sign-in and account pages' layout: the document
-# archetype with the site's rail, an empty strip, the routed page in the
-# canvas, and the site's colophon. It renders no element of its own:
+# archetype with the site's rail, the strip carrying the current page's
+# single crumb (`Login` or `Account`), the routed page in the canvas, and
+# the site's colophon. It renders no element of its own:
 # DocumentLayout renders the root.
 node:
   uri: docs.component.account_layout

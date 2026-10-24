@@ -34,4 +34,11 @@ describe("PlaygroundLayout", () => {
     expect(container.querySelector(".ds.document-layout")).not.toBeNull();
     expect(container.querySelector('[data-region="footer"]')).not.toBeNull();
   });
+
+  it("names the playground in the strip", () => {
+    renderLayout();
+    expect(
+      document.querySelector('[data-region="mode-strip"]')?.textContent,
+    ).toContain("Playground");
+  });
 });
