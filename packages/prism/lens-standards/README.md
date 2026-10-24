@@ -3,7 +3,9 @@
 The Standards lens of a Prism documentation site: a grouped index of the
 instances of the class a site binds it to, and a reading page for each. The
 index groups the standards by their own class, with jump links between the
-groups and an explicit "Load more" when the graph carries more than one page.
+groups, each group's entries in the shared list view of
+`@canonical/prism-projections`, and an explicit "Load more" when the graph
+carries more than one page.
 The reading page shows a standard's title, compact address and class, then
 its prose rendered as Markdown, and refuses an address whose node is not one
 of the bound class's instances. A standard with no prose shows its
@@ -75,10 +77,19 @@ const [standards, standardEntity] = group(standardsLayout, [
 ] as const);
 ```
 
+The layout is core's `DocumentLayout`, the document archetype: the site's
+rail, the mode strip carrying the lens's breadcrumb trail, the routed page in
+the canvas, the one region that scrolls, and the colophon in the band under
+it. The layout renders no element of its own; its native props reach the
+document layout's root.
+
 The lens renders inside the site's provider nest: `HeadProvider`,
 `RelayEnvironmentProvider`, `RouterProvider`, and inside the router
 `HomesProvider` and `ProjectionsProvider`, which the prose's chips read their
-homes and arms from.
+homes and arms from. The prose takes its space from the typography layer of
+`@canonical/styles`: it carries `.editorial` and `.content-flow`, so a site
+that mounts the lens loads that layer, or its prose has no paragraph
+spacing.
 
 ## Links in a standard's prose
 
@@ -156,23 +167,30 @@ editing a fragment.
 
 ## Styling
 
-The stylesheets sit in the `ds.prism` cascade layer. Each design decision
-reads a component token, declared on `:root` and named for its component
-(`--standards-index-link-color`, `--standard-article-meta-gap`, …), so a
-site retunes the lens by setting component tokens. Where the design system
-has a semantic token for the decision, the component token reads it, so a
-site also retunes those decisions through its theme:
+Every component sits in `src/lib/ui/`, scaffolded by the component
+generator, and carries an `anatomy.yaml`: its slots and every style
+decision, bound to a token. Its `styles.css` transcribes the anatomy, in the
+`ds.components.global` cascade layer, and the package's tests check that it
+does (`@canonical/prism-core/testing`).
 
-- colour: `--color-text`, `--color-text-muted`, `--color-background`;
-- space: `--space-100` to `--space-300`, each with the lens's own default
-  as its fallback.
+Each design decision reads a component token declared on its component's
+root class (`.ds.standard-article { --standard-article-header-gap: … }`),
+never on `:root`, bound to a semantic token or to the spacing shim of
+`@canonical/styles`:
 
-The design system has no semantic token for a reading measure, so
-`--standard-article-max-inline-size` holds the lens's own value and only the
-component token retunes it. No component token reads a primitive token.
+- colour: `--color-text-muted`;
+- space: `--grid-gutter`, `--container-gap-default`, `--container-gap-loose`
+  and, where no semantic name fits, a `--space-*` step, which the anatomy
+  names with its reason.
 
-`StandardsLayout` is the core's `DocumentLayout`: every grid in the lens is
-a subgrid of the site's one intrinsic grid, and only the canvas scrolls.
+Every page is a subgrid of the canvas's page grid over the whole main
+column, and every grid sets its gap from `--grid-gutter` on both axes. Only
+a standard's prose holds a reading measure, the first six columns of the
+main column, which a narrower main column clamps. A larger separation, above
+a group of the index, is external spacing on the group.
+
+The anatomies list what no token binds yet, the roster namespaces the shim's
+symbols fall outside of, in their ledgers.
 
 ## Public API
 

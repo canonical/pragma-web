@@ -1,0 +1,53 @@
+---
+# StationCard: a station as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 (location above
+# the title, the kind, the summary, the footer vitals) and 505:1956 (key
+# values, each pair under a rule). Best guess: the location is the fare
+# zone; the kind the station's class; the summary its definition; the key
+# values its platforms, its zone and the lines it serves; the one vital
+# its platform count. A value the graph does not assert leaves its pair or
+# vital out.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.station_card
+  projection: { on: Station }
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: location
+              projection: { field: _meta.title }
+            relation: { cardinality: "0..1", slotName: location, projection: { field: inZone } }
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: summary
+              projection: { field: _meta.definition }
+            relation: { cardinality: "0..1", slotName: summary }
+          - node:
+              role: key values
+              edges:
+                - node: { role: platforms, projection: { field: platformCount } }
+                  relation: { cardinality: "0..1" }
+                - node: { role: zone, projection: { field: _meta.title } }
+                  relation: { cardinality: "0..1", projection: { field: inZone } }
+                - node: { role: lines, projection: { field: _meta.title } }
+                  relation: { cardinality: "0..*", projection: { field: servesLine } }
+            relation: { cardinality: "0..1", slotName: key-values }
+          - node:
+              role: vital
+              projection: { field: platformCount }
+            relation: { cardinality: "0..1", slotName: footer }
+      relation: { cardinality: "1" }

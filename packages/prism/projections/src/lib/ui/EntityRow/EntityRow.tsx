@@ -9,6 +9,9 @@ const componentCssClassName = "ds entity-row";
 /**
  * The list entry of an entity: one 32px row of an index, its namespace
  * prefix and title on the left and one muted word about it on the right.
+ * Where the two do not share a line the word moves to a line of its own
+ * under the title, and a title longer than its line wraps rather than
+ * being cut.
  * With an `href` the title links to the entity's home through
  * `LinkComponent`; without one it is inert text.
  *

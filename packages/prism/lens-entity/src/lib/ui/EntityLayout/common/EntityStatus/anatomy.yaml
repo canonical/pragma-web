@@ -1,0 +1,25 @@
+---
+# EntityStatus — the strip's status tenant on the index: how many loaded
+# entries the search shows, out of how many instances the class has,
+# counted with the matcher the index filters by over the index's own
+# operation, and announced politely as the reader types (an output with
+# aria-live). Muted, at the secondary size, on one line.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-status-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   typography.whiteSpace nowrap: a keyword.
+#
+# Roster namespaces (accepted and tracked): the semantic typography symbol
+# typography.text.secondary.fontSize.
+node:
+  uri: prism.subcomponent.entity_status
+  styles:
+    typography.size: typography.text.secondary.fontSize
+    typography.color: color.text.muted
+    typography.whiteSpace: nowrap
+  edges:
+    - node:
+        role: count (the catalog's plural sentence)
+      relation: { cardinality: "1", slotName: default }

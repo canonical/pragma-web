@@ -19,16 +19,23 @@ import {
 import type { EntityPageQuery } from "../../__generated__/EntityPageQuery.graphql.js";
 import entityPageQueryNode from "../../__generated__/EntityPageQuery.graphql.js";
 import buildEntityPageVariables from "../../lib/buildEntityPageVariables.js";
-import { EntityFilterProvider } from "../../lib/EntityFilterProvider/index.js";
-import { EntityIndex } from "../../lib/EntityIndexPage/common/EntityIndex/index.js";
-import { EntityIndexPage } from "../../lib/EntityIndexPage/index.js";
-import { EntityControls } from "../../lib/EntityLayout/common/EntityControls/index.js";
-import { EntityStatus } from "../../lib/EntityLayout/common/EntityStatus/index.js";
-import { EntityLayout } from "../../lib/EntityLayout/index.js";
-import { EntitySummary } from "../../lib/EntityPage/common/EntitySummary/index.js";
-import { FieldsTable } from "../../lib/EntityPage/common/FieldsTable/index.js";
-import { Relations } from "../../lib/EntityPage/common/Relations/index.js";
-import { EntityPage } from "../../lib/EntityPage/index.js";
+import { EntityFilterProvider } from "../../lib/ui/EntityFilterProvider/index.js";
+import { EntityIndex } from "../../lib/ui/EntityIndexPage/common/index.js";
+import { EntityIndexPage } from "../../lib/ui/EntityIndexPage/index.js";
+import {
+  EntityControls,
+  EntityStatus,
+} from "../../lib/ui/EntityLayout/common/index.js";
+import { EntityLayout } from "../../lib/ui/EntityLayout/index.js";
+import {
+  EntityDetail,
+  EntityHeading,
+  EntitySummary,
+  FieldList,
+  KeyValueList,
+  Relations,
+} from "../../lib/ui/EntityPage/common/index.js";
+import { EntityPage } from "../../lib/ui/EntityPage/index.js";
 
 /** The native props each probed root receives, derived from `name`. */
 const nativeProps = (name: string) =>
@@ -54,8 +61,17 @@ const EntityPartsProbe = () => {
   if (node === null || node === undefined) throw new Error("no Northgate");
   return (
     <>
+      <EntityHeading
+        address={node._meta.curie}
+        title={node._meta.title}
+        {...nativeProps("heading")}
+      />
       <EntitySummary node={node} {...nativeProps("summary")} />
-      <FieldsTable
+      <KeyValueList
+        pairs={[{ id: "probe", term: "Term", value: "Value" }]}
+        {...nativeProps("key-values")}
+      />
+      <FieldList
         meta={node._meta}
         namespaces={METRO_NAMESPACES}
         {...nativeProps("fields")}
@@ -106,12 +122,21 @@ describe("native props", () => {
           uri={NORTHGATE_CURIE}
           {...nativeProps("page")}
         />
+        <EntityDetail
+          binding={STATIONS_BINDING}
+          label="Stations"
+          uri={NORTHGATE_CURIE}
+          {...nativeProps("detail")}
+        />
         <EntityPartsProbe />
       </>,
     );
     expectRoot("page", "entity-page");
+    expectRoot("detail", "entity-detail");
+    expectRoot("heading", "entity-heading");
     expectRoot("summary", "entity-summary");
-    expectRoot("fields", "fields-table");
+    expectRoot("key-values", "key-value-list");
+    expectRoot("fields", "field-list");
     expectRoot("relations", "relations");
   });
 

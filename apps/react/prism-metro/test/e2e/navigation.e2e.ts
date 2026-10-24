@@ -216,7 +216,7 @@ describe.each(CELLS)("$script in a browser", ({ script }) => {
     expect(new URL(page.url()).pathname).toBe(NORTHGATE_PATH);
     expect(await readDocumentMarker(page)).toBe(true);
     await expect(
-      page.locator(".ds.fields-table").first().isVisible(),
+      page.locator(".ds.field-list").first().isVisible(),
     ).resolves.toBe(true);
   });
 

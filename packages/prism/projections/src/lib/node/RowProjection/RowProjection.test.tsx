@@ -2,7 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { graphql, useLazyLoadQuery } from "react-relay";
+import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
@@ -16,11 +16,13 @@ import {
 import testQuery, {
   type RowProjectionTestQuery,
 } from "../../../__generated__/RowProjectionTestQuery.graphql.js";
-import type { SiteArmProps } from "../../projections/index.js";
+import siteFragment, {
+  type SiteRowSlot_node$key,
+} from "../../../__generated__/SiteRowSlot_node.graphql.js";
+import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
-import { NodeRow, type NodeRowProps } from "../NodeRow/index.js";
 import RowProjection from "./RowProjection.js";
-import type { RowProjectionProps } from "./types.js";
+import type { RowArmNative, RowProjectionProps } from "./types.js";
 
 /**
  * The operation the tests render RowProjection under: one
@@ -111,17 +113,28 @@ describe("RowProjection", () => {
     expect(container.querySelector(".ds.node-row")).toBeNull();
   });
 
-  it("renders a type the site arms through the site's arm, over the Node key", () => {
+  it("renders a type the site arms through the site's arm, over the site slot's key", () => {
     /**
-     * A site's arm for its own type: the Node projection, marked with the
-     * typename.
+     * A site's arm for its own type: it reads the site slot's key and marks
+     * its root with the typename it was handed and the one it read.
      */
-    const SiteNodeRow = ({
+    const SiteProbe = ({
+      node,
       typename,
       ...props
-    }: SiteArmProps<NodeRowProps>): ReactElement => (
-      <NodeRow {...props} data-site-type={typename} />
-    );
+    }: SiteArmProps<
+      ArmProps<SiteRowSlot_node$key, RowArmNative>
+    >): ReactElement => {
+      const data = useFragment(siteFragment, node);
+      return (
+        <li
+          {...props}
+          className="site-probe"
+          data-site-type={typename}
+          data-typename={data.__typename}
+        />
+      );
+    };
     const { container } = renderWithNode(
       (node) => (
         <ul>
@@ -134,14 +147,15 @@ describe("RowProjection", () => {
           ...defaultProjectionMaps,
           row: {
             ...defaultProjectionMaps.row,
-            siteTypes: { Component: SiteNodeRow },
+            siteTypes: { Component: SiteProbe },
           },
         },
       },
     );
-    expect(
-      container.querySelector(".ds.node-row")?.getAttribute("data-site-type"),
-    ).toBe("Component");
+    const probe = container.querySelector(".site-probe");
+    expect(probe?.getAttribute("data-site-type")).toBe("Component");
+    expect(probe?.getAttribute("data-typename")).toBe("Component");
+    expect(container.querySelector(".ds.node-row")).toBeNull();
   });
 
   it("renders a type the site arms for another typename through the Node arm", () => {

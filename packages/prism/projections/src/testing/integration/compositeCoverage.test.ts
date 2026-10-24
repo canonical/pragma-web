@@ -12,65 +12,84 @@ import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.gr
 import { defaultProjectionMaps, type ProjectionMaps } from "../../lib/index.js";
 
 /**
- * Each form's map, beside the composite fragment its dispatcher reads and
- * the dispatcher's folder, whose anatomy names its cases.
+ * Each form's map, beside the composite fragment its dispatcher reads, the
+ * dispatcher's folder, whose anatomy names its cases, and the site slot the
+ * composite spreads.
  */
 const COMPOSITES: readonly {
   readonly form: keyof ProjectionMaps;
   readonly fragment: ReaderFragment;
   readonly dispatcher: string;
+  readonly slot: string;
 }[] = [
   {
     form: "chip",
     fragment: chipProjectionFragmentNode,
     dispatcher: "ChipProjection",
+    slot: "SiteChipSlot_node",
   },
   {
     form: "row",
     fragment: rowProjectionFragmentNode,
     dispatcher: "RowProjection",
+    slot: "SiteRowSlot_node",
   },
   {
     form: "card",
     fragment: cardProjectionFragmentNode,
     dispatcher: "CardProjection",
+    slot: "SiteCardSlot_node",
   },
   {
     form: "command",
     fragment: commandProjectionFragmentNode,
     dispatcher: "CommandProjection",
+    slot: "SiteCommandSlot_node",
   },
   {
     form: "graphNode",
     fragment: graphNodeProjectionFragmentNode,
     dispatcher: "GraphNodeProjection",
+    slot: "SiteGraphNodeSlot_node",
   },
 ];
 
 /**
- * One arm a composite spreads: the alias it is read by and the type it is on.
+ * One arm a composite spreads: the alias it is read by, the type it is on
+ * and the fragment it spreads.
  */
 interface Arm {
   readonly alias: string;
   readonly type: string;
+  readonly spread: string | undefined;
 }
 
 /**
  * List the arms a composite spreads at its top level: each an aliased
- * inline fragment, read by its alias and on its type. relay-runtime's
- * reader types predate the aliased spread, so it is read by its shape.
+ * inline fragment, read by its alias, on its type, around the one fragment
+ * it spreads. relay-runtime's reader types predate the aliased spread, so
+ * it is read by its shape.
  */
 function listArms(fragment: ReaderFragment): Arm[] {
   return fragment.selections.flatMap((selection) => {
     const aliased = selection as {
       readonly kind: string;
       readonly name?: string;
-      readonly fragment?: { readonly type: string };
+      readonly fragment?: {
+        readonly type: string;
+        readonly selections: readonly { readonly name?: string }[];
+      };
     };
     return aliased.kind === "AliasedInlineFragmentSpread" &&
       aliased.name !== undefined &&
       aliased.fragment !== undefined
-      ? [{ alias: aliased.name, type: aliased.fragment.type }]
+      ? [
+          {
+            alias: aliased.name,
+            type: aliased.fragment.type,
+            spread: aliased.fragment.selections.at(0)?.name,
+          },
+        ]
       : [];
   });
 }
@@ -97,26 +116,38 @@ function listCaseTypes(dispatcher: string): string[] {
 }
 
 describe("each form's composite fragment", () => {
-  for (const { form, fragment, dispatcher } of COMPOSITES) {
+  for (const { form, fragment, dispatcher, slot } of COMPOSITES) {
     describe(fragment.name, () => {
       const arms = listArms(fragment);
 
-      it("spreads every arm aliased by the type it is on", () => {
+      it("spreads every arm but the site slot aliased by the type it is on", () => {
         expect(hasUnaliasedSpread(fragment)).toBe(false);
-        for (const { alias, type } of arms) {
+        for (const { alias, type } of arms.filter(
+          ({ alias }) => alias !== "Site",
+        )) {
           expect(alias).toBe(type);
         }
       });
 
       it("spreads the Node arm, which takes every other type", () => {
-        expect(arms).toContainEqual({ alias: "Node", type: "Node" });
+        expect(arms).toContainEqual(
+          expect.objectContaining({ alias: "Node", type: "Node" }),
+        );
+      });
+
+      it("spreads the site slot, a site's own fragment on Node", () => {
+        expect(arms).toContainEqual({
+          alias: "Site",
+          type: "Node",
+          spread: slot,
+        });
       });
 
       it(`arms exactly the types the ${form} map types`, () => {
         expect(
           arms
             .map(({ alias }) => alias)
-            .filter((alias) => alias !== "Node")
+            .filter((alias) => alias !== "Node" && alias !== "Site")
             .sort(),
         ).toEqual(Object.keys(defaultProjectionMaps[form].types).sort());
       });

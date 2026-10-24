@@ -2,7 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { graphql, useLazyLoadQuery } from "react-relay";
+import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
@@ -16,14 +16,13 @@ import {
 import testQuery, {
   type GraphNodeProjectionTestQuery,
 } from "../../../__generated__/GraphNodeProjectionTestQuery.graphql.js";
-import type { SiteArmProps } from "../../projections/index.js";
+import siteFragment, {
+  type SiteGraphNodeSlot_node$key,
+} from "../../../__generated__/SiteGraphNodeSlot_node.graphql.js";
+import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
-import {
-  NodeGraphNode,
-  type NodeGraphNodeProps,
-} from "../NodeGraphNode/index.js";
 import GraphNodeProjection from "./GraphNodeProjection.js";
-import type { GraphNodeProjectionProps } from "./types.js";
+import type { GraphNodeArmNative, GraphNodeProjectionProps } from "./types.js";
 
 /**
  * The operation the tests render GraphNodeProjection under: one
@@ -113,17 +112,28 @@ describe("GraphNodeProjection", () => {
     expect(container.querySelector(".ds.node-graph-node")).toBeNull();
   });
 
-  it("renders a type the site arms through the site's arm, over the Node key", () => {
+  it("renders a type the site arms through the site's arm, over the site slot's key", () => {
     /**
-     * A site's arm for its own type: the Node projection, marked with the
-     * typename.
+     * A site's arm for its own type: it reads the site slot's key and marks
+     * its root with the typename it was handed and the one it read.
      */
-    const SiteNodeGraphNode = ({
+    const SiteProbe = ({
+      node,
       typename,
       ...props
-    }: SiteArmProps<NodeGraphNodeProps>): ReactElement => (
-      <NodeGraphNode {...props} data-site-type={typename} />
-    );
+    }: SiteArmProps<
+      ArmProps<SiteGraphNodeSlot_node$key, GraphNodeArmNative>
+    >): ReactElement => {
+      const data = useFragment(siteFragment, node);
+      return (
+        <g
+          {...props}
+          className="site-probe"
+          data-site-type={typename}
+          data-typename={data.__typename}
+        />
+      );
+    };
     const { container } = renderWithNode(
       (node) => (
         <svg aria-label="Graph" role="img">
@@ -136,16 +146,15 @@ describe("GraphNodeProjection", () => {
           ...defaultProjectionMaps,
           graphNode: {
             ...defaultProjectionMaps.graphNode,
-            siteTypes: { Component: SiteNodeGraphNode },
+            siteTypes: { Component: SiteProbe },
           },
         },
       },
     );
-    expect(
-      container
-        .querySelector(".ds.node-graph-node")
-        ?.getAttribute("data-site-type"),
-    ).toBe("Component");
+    const probe = container.querySelector(".site-probe");
+    expect(probe?.getAttribute("data-site-type")).toBe("Component");
+    expect(probe?.getAttribute("data-typename")).toBe("Component");
+    expect(container.querySelector(".ds.node-graph-node")).toBeNull();
   });
 
   it("renders a type the site arms for another typename through the Node arm", () => {

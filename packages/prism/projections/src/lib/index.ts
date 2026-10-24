@@ -81,6 +81,7 @@ export type {
 } from "./projections/index.js";
 export {
   ProjectionsProvider,
+  useProjectionLink,
   useProjectionMaps,
 } from "./projections/index.js";
 export type {
