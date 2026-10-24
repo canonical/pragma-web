@@ -57,7 +57,9 @@ describe("EntityIndex", () => {
     const cards = container.querySelector(".ds.entity-list > .ds.cards");
     expect(cards).not.toBeNull();
     expect(cards?.getAttribute("style")).toContain("--card-span: 2");
-    expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+    expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
+      STATION_COUNT,
+    );
   });
 
   it("writes the cards view to the address in place of the entry", {
@@ -67,7 +69,9 @@ describe("EntityIndex", () => {
     await renderIndex("/stations", history);
     fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     await waitFor(() => {
-      expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+      expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
+        STATION_COUNT,
+      );
     });
     expect(history.getLocation().search).toBe("?view=cards");
     history.back();
@@ -81,7 +85,7 @@ describe("EntityIndex", () => {
     await renderIndex("/stations?view=cards", history);
     fireEvent.click(screen.getByRole("button", { name: "Rows" }));
     await waitFor(() => {
-      expect(screen.queryAllByRole("article")).toHaveLength(0);
+      expect(document.querySelectorAll(".ds.node-card")).toHaveLength(0);
     });
     expect(history.getLocation().pathname).toBe("/stations");
     expect(history.getLocation().search).toBe("");
