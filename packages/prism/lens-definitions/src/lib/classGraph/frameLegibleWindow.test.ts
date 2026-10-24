@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import createClassGraphSetup from "../../../testing/createClassGraphSetup.js";
-import { MIN_FIT, REGION_LABEL_ROW } from "./constants.js";
+import { CROSS_REGION_GRAPH } from "../../../testing/fixtures.js";
+import { LATTICE, MIN_FIT, REGION_LABEL_ROW } from "./constants.js";
 import frameLegibleWindow from "./frameLegibleWindow.js";
 import { measureRegionLabelWidth } from "./geometry.js";
+import layOutClassGraph from "./layOutClassGraph.js";
 import { requireDefined, requireEntry } from "./require.js";
 import type { Rect } from "./types.js";
 
@@ -130,6 +132,34 @@ describe("frameLegibleWindow", () => {
           box.y + box.h > bottom,
       ),
     ).toEqual([]);
+  });
+
+  it("puts its bottom edge in the gap above a box no wider window clears", () => {
+    // A small box at the top-left and, below it, a box wider than any
+    // legible window, which the bottom edge may neither cross nor hold: the
+    // widest window that clears it ends half a lattice step above it.
+    const [small, wide] = [
+      ...layOutClassGraph(CROSS_REGION_GRAPH).nodes.values(),
+    ];
+    const nodes = new Map([
+      [
+        "small",
+        { ...requireDefined(small, "a class"), x: 16, y: 16, w: 32, h: 32 },
+      ],
+      [
+        "wide",
+        { ...requireDefined(wide, "a class"), x: 0, y: 104, w: 200, h: 32 },
+      ],
+    ]);
+    const viewBox = { x: 0, y: 0, w: 240, h: 160 };
+    const window = frameLegibleWindow(
+      { nodes, regions: [], viewBox },
+      { w: 120, h: 120 },
+    );
+    expect(window).toEqual({ x: 0, y: 0, w: 96, h: 96 });
+    expect(window.y + window.h).toBe(
+      requireEntry(nodes, "wide").y - LATTICE / 2,
+    );
   });
 
   it("frames a box it is given whole where it fits legibly, and else from its corner", () => {
