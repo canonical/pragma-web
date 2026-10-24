@@ -13,7 +13,9 @@
 # docsite page that renders it, where there is one; every other hop is
 # inert text. Columns stand 240 units apart and rows 64, and a hop shared
 # by several journeys stands on the mean of their rows, snapped to the
-# 16-unit lattice, so every corner is on a dot.
+# 16-unit lattice, so every corner is on a dot; where that row is another
+# hop's in the same column, the lower hop moves down to the next free row,
+# so no two boxes overlap.
 #
 # The selected job's hop carries a ring 4 units off its box in the branded
 # colour. Edges leave a hop's right middle and land on the next's left

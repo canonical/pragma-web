@@ -22,8 +22,10 @@
  * coordinate every job hangs off, a surface two jobs both reach) is placed
  * ONCE, at the mean of the rows it serves, snapped down to the 16-unit
  * lattice. That keeps a shared node between its dependents without any
- * force simulation, and it stays exactly reproducible. Columns are 240
- * units apart and rows 64, so every corner sits on a lattice dot.
+ * force simulation, and it stays exactly reproducible. Where that mean is
+ * another node's row, the lower of the two moves down to the next free
+ * row of its column, so no two boxes overlap. Columns are 240 units apart
+ * and rows 64, so every corner sits on a lattice dot.
  *
  * SORTING IS EXPLICIT. The graph's result order is insertion order and is
  * byte-identical across fresh stores, but this function does not trust
@@ -248,8 +250,36 @@ export const buildJourneyGraph = (
     });
   }
 
-  return { nodes, edges };
+  return { nodes: separateColumns(nodes), edges };
 };
+
+/**
+ * Keep the hops of one column clear of each other. A shared hop stands on
+ * the mean of its rows, and that mean can be the very row another hop of
+ * its column stands on, so two boxes would be drawn one over the other.
+ * Walking each column from the top, a hop that starts less than a row's
+ * pitch below the hop above it moves down to that pitch: the next free
+ * lattice row, a box's height and a lattice step of gap below it. A hop's
+ * column never changes, and the walk takes the hops in the order of their
+ * rows, ties in the order the layout placed them, so the result stays a
+ * pure function of the data.
+ *
+ * @param nodes - The placed hops, in the order the layout placed them.
+ * @returns The hops by column, then from the top, none within a row's
+ *   pitch of the one above it.
+ */
+function separateColumns(
+  nodes: readonly JourneyGraphNode[],
+): readonly JourneyGraphNode[] {
+  const floors = new Map<number, number>();
+  return [...nodes]
+    .sort((a, b) => a.x - b.x || a.y - b.y)
+    .map((node) => {
+      const y = Math.max(node.y, floors.get(node.x) ?? node.y);
+      floors.set(node.x, y + ROW_PITCH);
+      return y === node.y ? node : { ...node, y };
+    });
+}
 
 /**
  * The local name of a vocabulary URI. The demand model's vocabulary terms

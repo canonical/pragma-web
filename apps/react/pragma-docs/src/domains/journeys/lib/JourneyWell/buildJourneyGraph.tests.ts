@@ -111,6 +111,43 @@ const FIXTURE: readonly JourneyCoordinate[] = [
   },
 ];
 
+/**
+ * Three jobs on one coordinate, the first and the last served by one
+ * surface and the middle one by another: the shared surface's mean row is
+ * the middle row, the very row the other surface stands on.
+ */
+const SHARED_ON_ANOTHERS_ROW: readonly JourneyCoordinate[] = [
+  {
+    uri: `${DOCS}coordinate.trio`,
+    jobs: ["a0", "a1", "a2"].map((name) => ({
+      uri: `${DOCS}job.${name}`,
+      pairings: [
+        {
+          uri: `${DOCS}pairing.${name}`,
+          surface: {
+            uri: `${DOCS}${name === "a1" ? "view.chips" : "view.components"}`,
+          },
+        },
+      ],
+    })),
+  },
+];
+
+/** Every pair of hops in one column that stand less than a row apart. */
+const findCollisions = (
+  coordinates: readonly JourneyCoordinate[],
+): readonly string[] => {
+  const { nodes } = buildJourneyGraph(coordinates);
+  return nodes.flatMap((node, index) =>
+    nodes
+      .slice(index + 1)
+      .filter(
+        (other) => other.x === node.x && Math.abs(other.y - node.y) < ROW_PITCH,
+      )
+      .map((other) => `${node.id} / ${other.id}`),
+  );
+};
+
 describe("buildJourneyGraph", () => {
   it("is byte-identical across repeated runs", () => {
     const first = buildJourneyGraph(FIXTURE);
@@ -168,6 +205,21 @@ describe("buildJourneyGraph", () => {
     expect(yOf("job.l3")).toBe(1.5 * ROW_PITCH);
     expect(yOf("coordinate.maker-duo")).toBe(1.5 * ROW_PITCH);
     expect(yOf("job.orphan")).toBe(3 * ROW_PITCH);
+  });
+
+  it("moves a hop down when a shared hop's mean row is its own", () => {
+    const { nodes } = buildJourneyGraph(SHARED_ON_ANOTHERS_ROW);
+    const yOf = (uri: string): number | undefined =>
+      nodes.find((node) => node.id === `${DOCS}${uri}`)?.y;
+    // view.components serves rows 0 and 2, so it stands on row 1, where
+    // view.chips would stand too; view.chips moves to the next free row.
+    expect(yOf("view.components")).toBe(ROW_PITCH);
+    expect(yOf("view.chips")).toBe(2 * ROW_PITCH);
+    expect(findCollisions(SHARED_ON_ANOTHERS_ROW)).toStrictEqual([]);
+  });
+
+  it("keeps every column's hops at least a row apart", () => {
+    expect(findCollisions(FIXTURE)).toStrictEqual([]);
   });
 
   it("connects only nodes it places, so every edge can be drawn", () => {
