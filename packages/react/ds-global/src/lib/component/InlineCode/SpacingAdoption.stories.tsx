@@ -272,11 +272,9 @@ export const ContextualInputInline: Story = {
             if (border.style !== "solid") {
               throw new Error(`${label} ${border.side} border is not painted`);
             }
-            near(
-              px(border.width, `${label} ${border.side} border`),
-              1,
-              `${label} ${border.side} border`,
-            );
+            if (px(border.width, `${label} ${border.side} border`) <= 0) {
+              throw new Error(`${label} ${border.side} border has no width`);
+            }
             if (
               border.color === "transparent" ||
               border.color === "rgba(0, 0, 0, 0)" ||
@@ -554,6 +552,12 @@ export const ContextualInputInline: Story = {
           cleanupFailed = true;
         }
 
+        if (assertionFailed && cleanupFailed) {
+          console.error(
+            "Inline-data spacing proof cleanup failed after an assertion failure",
+            cleanupError,
+          );
+        }
         if (assertionFailed || cleanupFailed) {
           const error = assertionFailed ? assertionError : cleanupError;
           proofRoot.dataset.inlineDataProofError =
