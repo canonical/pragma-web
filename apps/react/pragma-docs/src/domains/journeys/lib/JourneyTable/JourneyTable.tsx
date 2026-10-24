@@ -6,11 +6,11 @@ import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
 import {
   ANY_AXIS,
-  ariaSortFor,
-  axisText,
+  formatAxisText,
   groupRows,
   type JourneyGroup,
   type JourneyRow,
+  readAriaSort,
   toggleSort,
 } from "../../journeyTableModel.js";
 import {
@@ -31,7 +31,7 @@ function readSortMark(active: boolean, ascending: boolean): string {
 
 /** An axis's cell text: its terms, or the translated wildcard. */
 function formatAxis(terms: readonly string[], any: string): string {
-  return terms.length === 0 ? any : axisText(terms);
+  return terms.length === 0 ? any : formatAxisText(terms);
 }
 
 /**
@@ -223,7 +223,7 @@ export default function JourneyTable({
               </th>
               {JOURNEY_COLUMNS.map((column) => (
                 <th
-                  aria-sort={ariaSortFor(column.key, state)}
+                  aria-sort={readAriaSort(column.key, state)}
                   className="head"
                   key={column.key}
                   scope="col"

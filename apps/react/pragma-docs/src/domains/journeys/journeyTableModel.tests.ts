@@ -14,13 +14,13 @@
 
 import { describe, expect, it } from "vitest";
 import {
-  ariaSortFor,
-  axisText,
   buildJourneyRows,
   compareRows,
   DEFAULT_TABLE_STATE,
+  formatAxisText,
   groupRows,
   type JourneyTableState,
+  readAriaSort,
   sortRows,
   toggleSort,
 } from "./journeyTableModel.js";
@@ -131,10 +131,10 @@ describe("buildJourneyRows projects the model honestly", () => {
     // misreport it.
     const alpha = rows.find((row) => row.label === "job.alpha");
     expect(alpha?.roles).toHaveLength(0);
-    expect(axisText(alpha?.roles ?? [])).toBe("any");
+    expect(formatAxisText(alpha?.roles ?? [])).toBe("any");
     // …and a constrained axis reads as its bare term (filing prefix off).
     const zebra = rows.find((row) => row.label === "job.zebra");
-    expect(axisText(zebra?.roles ?? [])).toBe("architect");
+    expect(formatAxisText(zebra?.roles ?? [])).toBe("architect");
   });
 });
 
@@ -248,9 +248,9 @@ describe("the header controls' state algebra", () => {
   it("marks aria-sort on the ACTIVE column only", () => {
     // WAI-ARIA permits at most one column to claim a direction, and
     // deriving it (rather than storing per column) makes that structural.
-    expect(ariaSortFor("job", DEFAULT_TABLE_STATE)).toBe("ascending");
-    expect(ariaSortFor("coordinate", DEFAULT_TABLE_STATE)).toBe("none");
-    expect(ariaSortFor("pairings", DEFAULT_TABLE_STATE)).toBe("none");
+    expect(readAriaSort("job", DEFAULT_TABLE_STATE)).toBe("ascending");
+    expect(readAriaSort("coordinate", DEFAULT_TABLE_STATE)).toBe("none");
+    expect(readAriaSort("pairings", DEFAULT_TABLE_STATE)).toBe("none");
   });
 
   it("toggles direction on the same column and resets on a new one", () => {

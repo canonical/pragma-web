@@ -108,8 +108,8 @@ export interface JourneyRow {
  */
 export const ANY_AXIS = "any";
 
-/** An axis's cell text: its terms joined, or the wildcard word. */
-export const axisText = (terms: readonly string[]): string =>
+/** Format an axis's cell text: its terms joined, or the wildcard word. */
+export const formatAxisText = (terms: readonly string[]): string =>
   terms.length === 0 ? ANY_AXIS : terms.join(", ");
 
 /**
@@ -184,18 +184,21 @@ export const buildJourneyRows = (
   return rows;
 };
 
-/** The value a column sorts on. Strings compare by locale, numbers
+/** Read the value a column sorts on. Strings compare by locale, numbers
  * numerically, and the served axis as a boolean rendered 0/1. */
-const sortValue = (row: JourneyRow, key: JourneySortKey): string | number => {
+const readSortValue = (
+  row: JourneyRow,
+  key: JourneySortKey,
+): string | number => {
   switch (key) {
     case "job":
       return row.label;
     case "coordinate":
       return row.coordinateLabel;
     case "role":
-      return axisText(row.roles);
+      return formatAxisText(row.roles);
     case "fluency":
-      return axisText(row.fluencies);
+      return formatAxisText(row.fluencies);
     case "pairings":
       return row.pairings.length;
     case "surface":
@@ -221,8 +224,8 @@ const sortValue = (row: JourneyRow, key: JourneySortKey): string | number => {
 export const compareRows =
   (key: JourneySortKey, direction: SortDirection) =>
   (left: JourneyRow, right: JourneyRow): number => {
-    const a = sortValue(left, key);
-    const b = sortValue(right, key);
+    const a = readSortValue(left, key);
+    const b = readSortValue(right, key);
     let primary = 0;
     if (typeof a === "number" && typeof b === "number") primary = a - b;
     else primary = String(a).localeCompare(String(b));
@@ -245,8 +248,8 @@ export interface JourneyGroup {
   readonly rows: readonly JourneyRow[];
 }
 
-/** The group a row belongs to, per axis. */
-const groupOf = (
+/** Classify a row into its group, per axis: the group's key and label. */
+const classifyGroup = (
   row: JourneyRow,
   key: JourneyGroupKey,
 ): { key: string; label: string } => {
@@ -257,7 +260,10 @@ const groupOf = (
       // The APPROXIMATE persona axis, grouped honestly: a job with no
       // role axis groups under the wildcard word, not under a made-up
       // persona. The lens's persona note says why this axis is soft.
-      return { key: axisText(row.roles), label: axisText(row.roles) };
+      return {
+        key: formatAxisText(row.roles),
+        label: formatAxisText(row.roles),
+      };
     case "served":
       return row.served
         ? { key: "served", label: "Served" }
@@ -282,7 +288,7 @@ export const groupRows = (
   const ordered = sortRows(rows, state.sort, state.direction);
   const buckets = new Map<string, { label: string; rows: JourneyRow[] }>();
   for (const row of ordered) {
-    const { key, label } = groupOf(row, state.group);
+    const { key, label } = classifyGroup(row, state.group);
     const bucket = buckets.get(key) ?? { label, rows: [] };
     bucket.rows.push(row);
     buckets.set(key, bucket);
@@ -295,12 +301,12 @@ export const groupRows = (
 };
 
 /**
- * The `aria-sort` value for a column header — `ascending`/`descending` on
+ * Read the `aria-sort` value for a column header — `ascending`/`descending` on
  * the ACTIVE column, `none` everywhere else. WAI-ARIA is explicit that at
  * most one column may claim a direction at a time, so this is derived
  * rather than stored per column: it cannot get out of step.
  */
-export const ariaSortFor = (
+export const readAriaSort = (
   column: JourneySortKey,
   state: JourneyTableState,
 ): "ascending" | "descending" | "none" =>
