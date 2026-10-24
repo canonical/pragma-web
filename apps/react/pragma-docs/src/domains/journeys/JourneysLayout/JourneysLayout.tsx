@@ -2,7 +2,7 @@ import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
 import type { ReactElement } from "react";
 import { SiteColophon } from "#lib/ui/SiteColophon";
 import { SiteRail } from "#lib/ui/SiteRail";
-import { JourneyViewProvider } from "../journeyViewContext.js";
+import { JourneyViewProvider } from "../lib/JourneyViewProvider/index.js";
 import { journeysStripSlots } from "../stripSlots.js";
 import type { JourneysLayoutProps } from "./types.js";
 

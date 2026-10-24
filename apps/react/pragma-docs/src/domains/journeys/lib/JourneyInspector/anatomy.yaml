@@ -1,0 +1,171 @@
+---
+# JourneyInspector — the journeys workspace's inspector: everything the
+# model says about the selected job, and nothing it does not. Its label as
+# the level-2 heading; the coordinate in words, wildcards included; the
+# story quoted verbatim under a start rule; the acceptance criteria as a
+# bulleted list; then the pairings that serve it, each a card: the surface
+# (a link only where the docsite renders it) with its kind in muted text,
+# and its role, its arrival and its layout as muted facets. An arrival the
+# pairing does not carry is left out; a surface that composes no layout
+# says so. A job nothing serves says so plainly. With no job selected, one
+# muted line says what selecting one shows.
+#
+# The root is a subgrid of the inspector region's columns, packed at the
+# top, padded by the component padding, its rows a gutter apart; every part
+# spans it. A section's label is small, bold and muted; its list sits a
+# tight step under it.
+#
+# Bespoke: no published component is a record inspector.
+#
+# Every decision is read through a component token declared on the root
+# (`--journey-inspector-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   space.050: the stacks' gaps; flex gaps read no container gap.
+#   1px: the card's hairline and the story's rule. 0.25rem: the card's
+#     corner; no radius token is admitted here.
+#   layout.grid.column "1 / -1": structure. Border sides "none none none
+#     solid": the start rule alone. The 0 resets.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050,
+# component.padding.block, component.padding.inline, and the semantic
+# typography symbols.
+node:
+  uri: docs.component.journey_inspector
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignContent: start
+    spacing.gap: grid.gutter
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+  edges:
+    - node:
+        role: empty (the line with no job selected)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: empty }
+    - node:
+        role: title (the job's label, the level-2 heading)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "0..1", slotName: title }
+    - node:
+        role: coordinate (in words)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: coordinate }
+    - node:
+        role: story (verbatim)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.external.inline.start: 0
+          spacing.external.inline.end: 0
+          spacing.internal.inline.start: component.padding.block
+          appearance.border.width: 1px
+          appearance.border.style: "none none none solid"
+          appearance.border.color: color.border.muted
+      relation: { cardinality: "0..1", slotName: story }
+    - node:
+        role: section (the acceptance criteria, then the pairings)
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.050
+        edges:
+          - node:
+              role: label
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.size: typography.text.secondary.fontSize
+                typography.weight: typography.text.primary.bold.fontWeight
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: label }
+          - node:
+              role: acceptances
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: component.padding.inline
+            relation: { cardinality: "0..1", slotName: acceptances }
+          - node:
+              role: unserved (the plain statement that nothing serves the job)
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+            relation: { cardinality: "0..1", slotName: unserved }
+          - node:
+              role: pairings
+              styles:
+                layout.type: flex
+                layout.direction: column
+                spacing.gap: space.050
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+              edges:
+                - node:
+                    role: pairing (a card)
+                    styles:
+                      spacing.internal.block.start: component.padding.block
+                      spacing.internal.block.end: component.padding.block
+                      spacing.internal.inline.start: component.padding.inline
+                      spacing.internal.inline.end: component.padding.inline
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.color: color.border.muted
+                      appearance.radius: 0.25rem
+                    edges:
+                      - node:
+                          role: surface (a link where the docsite renders it, else text)
+                          styles:
+                            layout.type: flex
+                            layout.wrap: wrap
+                            layout.align: baseline
+                            spacing.gap: space.050
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            typography.weight: typography.text.primary.bold.fontWeight
+                          edges:
+                            - node:
+                                role: kind (the surface's type)
+                                styles:
+                                  typography.size: typography.text.secondary.fontSize
+                                  typography.weight: typography.text.primary.fontWeight
+                                  typography.color: color.text.muted
+                              relation: { cardinality: "0..1", slotName: kind }
+                        relation: { cardinality: "1", slotName: surface }
+                      - node:
+                          role: facets (role, arrival and layout)
+                          styles:
+                            layout.type: flex
+                            layout.wrap: wrap
+                            spacing.gap: space.050
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            typography.size: typography.text.secondary.fontSize
+                            typography.color: color.text.muted
+                          edges:
+                            - node:
+                                role: facet
+                              relation: { cardinality: "1..3", slotName: facet }
+                        relation: { cardinality: "1", slotName: facets }
+                  relation: { cardinality: "1..*", slotName: pairing }
+            relation: { cardinality: "0..1", slotName: pairings }
+      relation: { cardinality: "0..2", slotName: section }

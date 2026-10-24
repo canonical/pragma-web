@@ -48,15 +48,14 @@
  * personas match nothing by name, and half the jobs match every persona
  * by rule.
  *
- * This is why the axis is labelled APPROXIMATE in the interface rather
- * than presented as a filter that knows the answer. The alternative —
+ * This is why the axis is labelled approximate in the interface (the
+ * catalog's `journeys.personaNote`, under the rail's chips and over the
+ * table grouped by role) rather than presented as a filter that knows the
+ * answer. The alternative —
  * inventing a persona→job mapping the ontology does not state — would be
  * the lens asserting something it cannot support, which is the one thing
  * a documentation surface must not do.
  */
-export const PERSONA_MATCH_NOTE =
-  "Approximate: the graph records no persona-to-job edge. " +
-  "Matching is by role name only, and a job with no role axis matches every persona.";
 
 /** The lens's whole ephemeral state. */
 export interface JourneyFilter {
@@ -115,7 +114,7 @@ const bareTerm = (uri: string): string =>
  * an unconstrained axis is "any role", so an unconstrained coordinate
  * genuinely does serve every persona. Both readings are the data's, not
  * this module's invention; the approximation is in the name-matching step,
- * which `PERSONA_MATCH_NOTE` states plainly to the reader.
+ * which the interface states plainly to the reader.
  */
 export const personaMatchesCoordinate = (
   persona: string | undefined,

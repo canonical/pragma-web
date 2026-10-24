@@ -33,11 +33,13 @@ const EXTERNAL_TOKENS = [
   "--color-background-layer2",
   "--color-border",
   "--color-border-muted",
+  "--color-focus-ring",
   "--color-text",
   "--color-text-branded",
   "--color-text-muted",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-code-font-family",
+  "--typography-text-primary-font-weight",
   "--typography-text-secondary-font-size",
 ];
 
@@ -112,6 +114,7 @@ describe("the app's components", () => {
         "components",
         "definitions",
         "guides",
+        "journeys",
         "marketing",
         "modifiers",
         "playground",

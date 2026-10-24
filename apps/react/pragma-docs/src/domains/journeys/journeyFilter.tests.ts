@@ -13,7 +13,6 @@ import { describe, expect, it } from "vitest";
 import {
   ALL_JOURNEYS_FILTER,
   defaultJourneyFilter,
-  PERSONA_MATCH_NOTE,
   personaMatchesCoordinate,
   personaTerm,
 } from "./journeyFilter.js";
@@ -74,13 +73,6 @@ describe("personaMatchesCoordinate (the APPROXIMATE axis)", () => {
     // dimming it would be the lens contradicting the model.
     expect(personaMatchesCoordinate(`${DOCS}persona.agent`, [])).toBe(true);
     expect(personaMatchesCoordinate(`${DOCS}persona.designer`, [])).toBe(true);
-  });
-
-  it("states its approximation in text meant for the reader", () => {
-    // The axis is not exact and the interface has to say so; this pins
-    // that the confession exists and names the reason.
-    expect(PERSONA_MATCH_NOTE).toContain("Approximate");
-    expect(PERSONA_MATCH_NOTE).toContain("no persona-to-job edge");
   });
 });
 

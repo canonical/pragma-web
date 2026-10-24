@@ -8,9 +8,6 @@ import {
   describeCoordinate,
   localName,
 } from "../collectJourneys.js";
-import { JourneyInspector } from "../JourneyInspector/index.js";
-import { JourneyRail } from "../JourneyRail/index.js";
-import { JourneyTable } from "../JourneyTable/index.js";
 import { JourneyWell } from "../JourneyWell/index.js";
 import {
   defaultJourneyFilter,
@@ -23,7 +20,10 @@ import {
   DEFAULT_TABLE_STATE,
   type JourneyTableState,
 } from "../journeyTableModel.js";
-import { useJourneyView } from "../journeyViewContext.js";
+import { JourneyInspector } from "../lib/JourneyInspector/index.js";
+import { JourneyRail } from "../lib/JourneyRail/index.js";
+import { JourneyTable } from "../lib/JourneyTable/index.js";
+import { useJourneyView } from "../lib/JourneyViewProvider/index.js";
 import type { JourneysExplorerProps } from "./types.js";
 import "./styles.css";
 
@@ -380,7 +380,6 @@ const JourneysExplorer = ({
       <JourneyRail
         coordinates={coordinates}
         filter={filter}
-        job={job}
         onFilterChange={setFilter}
         personas={personas}
         rolesByCoordinate={rolesByCoordinate}

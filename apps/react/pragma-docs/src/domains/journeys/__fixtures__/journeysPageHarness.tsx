@@ -32,7 +32,7 @@ import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
 import { JourneysLayout } from "../JourneysLayout/index.js";
 import { JourneysPage } from "../JourneysPage/index.js";
-import { JourneyViewProvider } from "../journeyViewContext.js";
+import { JourneyViewProvider } from "../lib/JourneyViewProvider/index.js";
 import { journeysStripSlots } from "../stripSlots.js";
 
 /**

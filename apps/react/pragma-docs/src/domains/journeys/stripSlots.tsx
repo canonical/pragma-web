@@ -1,7 +1,7 @@
 import { makeLensContext } from "@canonical/prism-core";
 import type React from "react";
-import { JourneyViewSwitch } from "./JourneyViewSwitch/index.js";
-import { useJourneyView } from "./journeyViewContext.js";
+import { useJourneyView } from "./lib/JourneyViewProvider/index.js";
+import { JourneyViewSwitch } from "./lib/JourneyViewSwitch/index.js";
 
 /**
  * The Journeys lens's mode-strip tenant — the component `JourneysLayout`

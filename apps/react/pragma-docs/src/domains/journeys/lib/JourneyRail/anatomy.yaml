@@ -1,0 +1,221 @@
+---
+# JourneyRail — the journeys explorer's index: every coordinate the model
+# carries and, under each, every job it roots, with the persona chips and
+# their caveat above. It is the complete keyboard path through the lens:
+# it lists every job the graph draws, so the graph never has to be
+# traversed to reach anything.
+#
+# It dims and never hides: a coordinate a filter excludes stays where it
+# was at four tenths of its opacity, its controls still working, so the
+# index stays complete and the count beside the heading carries the
+# filter's effect in words. The persona axis is approximate (the graph
+# records no persona-to-job edge), and the caveat sits under the chips as
+# text. A pressed chip takes the text colour, a border in that colour and
+# a filled surface: on and off differ by fill, never by hue alone. The
+# current job's link is bold. A job's story leads its link; its filing
+# slug follows in muted code type, unless the slug is all the job has; a
+# job no surface serves is tagged.
+#
+# The root is a grid of one column, packed at the top, its rows a gutter
+# apart, set at the secondary type size. The controls and the lists stack
+# a tight step apart; a coordinate's jobs hang from a hairline, one
+# component padding in.
+#
+# Bespoke: the published Chip is not a toggle button; a pressed chip
+# carries `aria-pressed`. "Show every coordinate" is a published tertiary
+# Button.
+#
+# Every decision is read through a component token declared on the root
+# (`--journey-rail-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   space.050: the stacks' and the chips' gaps; flex gaps read no
+#     container gap. 0.4: a dimmed coordinate's opacity, the definitions
+#     rail's. 1px: the hairlines. 2px: the focus ring's width and offset.
+#     999px: the chip's pill; no radius token is a pill.
+#   layout.wrap, layout.listStyle, typography.wrap, typography.variant:
+#     keywords. Border sides "none none none solid": the start rule alone.
+#     The 0 resets on the lists, the fieldset and the coordinate's button.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050,
+# component.padding.block, container.gap.tight, and the semantic
+# typography symbols.
+node:
+  uri: docs.component.journey_rail
+  styles:
+    layout.type: grid
+    layout.alignContent: start
+    spacing.gap: grid.gutter
+    size.min.width: 0
+    typography.size: typography.text.secondary.fontSize
+  edges:
+    - node:
+        role: controls
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.050
+        edges:
+          - node:
+              role: heading
+              styles:
+                layout.type: flex
+                layout.align: baseline
+                layout.justify: space-between
+                spacing.gap: space.050
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.weight: typography.text.primary.bold.fontWeight
+              edges:
+                - node:
+                    role: count (shown of total)
+                    styles:
+                      typography.color: color.text.muted
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "1", slotName: count }
+            relation: { cardinality: "1", slotName: heading }
+          - node:
+              role: personas (the persona chips' named group)
+              styles:
+                layout.type: flex
+                layout.wrap: wrap
+                spacing.gap: space.050
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.external.inline.start: 0
+                spacing.external.inline.end: 0
+                spacing.internal.block.start: 0
+                spacing.internal.block.end: 0
+                spacing.internal.inline.start: 0
+                spacing.internal.inline.end: 0
+                appearance.border.width: 0
+                size.min.width: 0
+              edges:
+                - node:
+                    role: chip (everyone, then one per persona)
+                    styles:
+                      layout.type: inline-flex
+                      layout.align: center
+                      spacing.internal.block.start: container.gap.tight
+                      spacing.internal.block.end: container.gap.tight
+                      spacing.internal.inline.start: component.padding.block
+                      spacing.internal.inline.end: component.padding.block
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.color: color.border.muted
+                      appearance.border.color@selected: currentColor
+                      appearance.radius: 999px
+                      appearance.background: transparent
+                      appearance.background@selected: color.background.layer2
+                      typography.font: inherit
+                      typography.color: color.text.muted
+                      typography.color@hover: color.text
+                      typography.color@selected: color.text
+                      typography.whiteSpace: nowrap
+                      interaction.cursor: pointer
+                      appearance.outline.width@focus: 2px
+                      appearance.outline.style@focus: solid
+                      appearance.outline.color@focus: color.focusRing
+                      appearance.outline.offset@focus: 2px
+                  relation: { cardinality: "1..*", slotName: chip }
+            relation: { cardinality: "1", slotName: personas }
+          - node:
+              role: note (the persona axis's caveat)
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: note }
+          - node:
+              uri: global.component.button
+            relation: { cardinality: "0..1", slotName: clear }
+      relation: { cardinality: "1", slotName: controls }
+    - node:
+        role: coordinates (the index's list)
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.050
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+        edges:
+          - switch:
+              on: filter
+              cases:
+                - node:
+                    role: coordinate
+                    edges:
+                      - node:
+                          role: toggle (the coordinate's name, a toggle button)
+                          styles:
+                            layout.type: block
+                            size.inline: 100%
+                            spacing.internal.block.start: 0
+                            spacing.internal.block.end: 0
+                            spacing.internal.inline.start: 0
+                            spacing.internal.inline.end: 0
+                            appearance.border.width: 0
+                            appearance.background: transparent
+                            typography.font: inherit
+                            typography.weight: typography.text.primary.bold.fontWeight
+                            typography.color: color.text
+                            typography.color@selected: color.text.branded
+                            typography.align: start
+                            interaction.cursor: pointer
+                        relation: { cardinality: "1", slotName: toggle }
+                      - node:
+                          role: jobs (the coordinate's jobs)
+                          styles:
+                            layout.type: flex
+                            layout.direction: column
+                            spacing.gap: space.050
+                            layout.listStyle: none
+                            spacing.external.block.start: space.050
+                            spacing.external.block.end: 0
+                            spacing.internal.inline.start: component.padding.block
+                            appearance.border.width: 1px
+                            appearance.border.style: "none none none solid"
+                            appearance.border.color: color.border.muted
+                          edges:
+                            - node:
+                                role: job
+                                styles:
+                                  layout.type: flex
+                                  layout.align: baseline
+                                  spacing.gap: space.050
+                                edges:
+                                  - node:
+                                      role: link (to the job's page)
+                                      styles:
+                                        layout.type: block
+                                        typography.wrap: anywhere
+                                        typography.weight@selected: typography.text.primary.bold.fontWeight
+                                      edges:
+                                        - node:
+                                            role: gist (the story's first clause)
+                                            styles:
+                                              layout.type: block
+                                          relation: { cardinality: "1", slotName: gist }
+                                        - node:
+                                            role: slug (the job's filing name)
+                                            styles:
+                                              layout.type: block
+                                              typography.fontFamily: typography.text.primary.code.fontFamily
+                                              typography.color: color.text.muted
+                                          relation: { cardinality: "0..1", slotName: slug }
+                                    relation: { cardinality: "1", slotName: link }
+                                  - node:
+                                      role: unserved (the tag on a job no surface serves)
+                                      styles:
+                                        typography.color: color.text.muted
+                                    relation: { cardinality: "0..1", slotName: unserved }
+                              relation: { cardinality: "1..*", slotName: job }
+                        relation: { cardinality: "1", slotName: jobs }
+                - node:
+                    role: dimmed coordinate (.is-dimmed)
+                    styles:
+                      appearance.opacity: 0.4
+            relation: { cardinality: "0..*", slotName: coordinate }
+      relation: { cardinality: "1", slotName: coordinates }

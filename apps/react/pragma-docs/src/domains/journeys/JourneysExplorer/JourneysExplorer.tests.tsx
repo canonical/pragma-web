@@ -53,7 +53,7 @@ const wellPresent = (): boolean =>
 
 /** Is the table's grid currently mounted? */
 const tablePresent = (): boolean =>
-  document.querySelector('[data-slot="journeys-table"]') !== null;
+  document.querySelector(".ds.journey-table") !== null;
 
 /** Is the job inspector region currently mounted (RULING 2 — graph only)? */
 const inspectorPresent = (): boolean =>
