@@ -6,8 +6,7 @@
 # Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, frames 502:1753 and 502:1827 (the
 # palette: the field across the top, the 56px result rows on the left, the
 # highlighted result's card on the right, six intrinsic columns wide, four
-# for the results and two for the card) and 504:327 (the row's slots), as
-# the plan's command-palette section and the S3 anatomies record them.
+# for the results and two for the card) and 504:327 (the row's slots).
 # Slot order: the search (field, results, preview), then the key hints.
 #
 # Built on the published Modal (global.pattern.modal): this root IS the

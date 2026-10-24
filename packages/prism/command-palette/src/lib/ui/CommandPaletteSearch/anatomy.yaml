@@ -7,8 +7,7 @@
 # controls (aria-activedescendant), wrapping at both ends; Enter opens the
 # highlighted result's home; a pointer moving over a result highlights it.
 # Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, frames 502:1753 and 502:1827 (the
-# palette with its results and its preview) and 504:327 (the row's slots),
-# as the plan's command-palette section and the S3 anatomies record them.
+# palette with its results and its preview) and 504:327 (the row's slots).
 # Slot order: query; then the results (each group a heading, then its rows)
 # or, in their place, one status line; then the preview. The results and the
 # status line never render together.
