@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import Component from "./KeyValueList.js";
 
 const meta: Meta<typeof Component> = {
-  title: "Components/EntityPage/KeyValueList",
+  title: "Components/KeyValueList",
   component: Component,
   tags: ["autodocs"],
   parameters: { grid: "intrinsic" },

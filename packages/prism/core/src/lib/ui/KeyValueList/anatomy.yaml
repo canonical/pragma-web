@@ -15,7 +15,9 @@
 # stacks, the key over the value, both across the column: one container
 # query on the shell, at 912px.
 #
-# Bespoke: the design system publishes no description list.
+# Bespoke: the design system publishes no description list. It is shared
+# by the lens packages and the sites that render key values on a page's
+# grid.
 #
 # Every decision is read through a component token declared on the root
 # (`--key-value-list-*`), bound to the symbol named here.
@@ -40,7 +42,7 @@
 # Roster namespaces (accepted and tracked): grid.gutter, space.300 (a line
 # height).
 node:
-  uri: prism.subcomponent.key_value_list
+  uri: prism.component.key_value_list
   styles:
     layout.type: grid
     layout.grid.columns: subgrid

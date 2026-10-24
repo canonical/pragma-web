@@ -13,9 +13,9 @@ const componentCssClassName = "ds key-value-list";
  * starts on the same column line; below two groups of columns a pair stacks,
  * the key over the value. It reads no context, so it renders anywhere.
  *
- * `import { KeyValueList } from "../KeyValueList/index.js";`
+ * `import { KeyValueList } from "@canonical/prism-core";`
  *
- * @implements prism.subcomponent.key_value_list
+ * @implements prism.component.key_value_list
  * @throws When `pairs` is empty: the caller renders its own empty state.
  */
 export default function KeyValueList({
