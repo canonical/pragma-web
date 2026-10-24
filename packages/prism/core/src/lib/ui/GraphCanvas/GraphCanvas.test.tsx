@@ -422,6 +422,37 @@ describe("GraphCanvas", () => {
     expect(screen.getByRole("status").textContent).toBe("42%");
   });
 
+  it("keeps an unmoved camera where it is when a resize shrinks its view but leaves it legible", () => {
+    let resize: () => void = () => undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      },
+    );
+    const opening = vi.fn((_visible: GraphBox, scale: number) => ({
+      k: 1 / scale,
+      x: 0,
+      y: 0,
+    }));
+    render(
+      <GraphCanvas label="Class graph" opening={opening} viewBox={VIEW_BOX}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(opening).toHaveBeenCalledOnce();
+    // 90% of the viewport still renders 14px text at 12px or more.
+    stubViewportSize(720, 540);
+    act(() => resize());
+    expect(opening).toHaveBeenCalledOnce();
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    expect(screen.getByRole("status").textContent).toBe("90%");
+  });
+
   it("pans and zooms over the graph's whole bounds once Fit shows more than the viewBox", async () => {
     const bounds: GraphBox = { x: 0, y: 0, width: 3200, height: 2400 };
     render(
@@ -675,6 +706,43 @@ describe("GraphCanvas", () => {
     // The box's far corner lies inside the viewport.
     expect(800 * camera.k + camera.x).toBeLessThanOrEqual(800);
     expect(600 * camera.k + camera.y).toBeLessThanOrEqual(600);
+  });
+
+  it("counts a resumed camera that panned to reveal a box as moved", () => {
+    let resize: () => void = () => undefined;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      },
+    );
+    const memory: { current: GraphCameraMemory | undefined } = {
+      current: { camera: { k: 1.2, x: -80, y: -60 }, moved: false },
+    };
+    const opening = vi.fn(() => ({ k: 1, x: 0, y: 0 }));
+    render(
+      <GraphCanvas
+        label="Class graph"
+        memory={memory}
+        opening={opening}
+        reveal={{ x: 700, y: 500, width: 100, height: 100 }}
+        viewBox={VIEW_BOX}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(memory.current?.moved).toBe(true);
+    // The pan moved the camera, so a resize that shrinks the view below the
+    // legible zoom leaves it where the reveal put it.
+    const revealed = readCamera();
+    stubViewportSize(400, 300);
+    act(() => resize());
+    expect(opening).not.toHaveBeenCalled();
+    expect(readCamera()).toBe(revealed);
   });
 
   it("moves the camera in a short transition without reduced motion", async () => {
