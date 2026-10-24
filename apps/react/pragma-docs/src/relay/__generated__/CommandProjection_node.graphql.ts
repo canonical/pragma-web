@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<af42e1c82295b710150d34480f7e0dcd>>
+ * @generated SignedSource<<a01caa2511aeaf0d8dcdf862a9994d57>>
  * @lightSyntaxTransform
  */
 
@@ -11,10 +11,12 @@ import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type CommandProjection_node$data = {
   readonly __typename: string;
-  readonly _meta: {
-    readonly curie: string;
+  readonly Node: {
+    readonly " $fragmentSpreads": FragmentRefs<"NodeCommand_node">;
   };
-  readonly " $fragmentSpreads": FragmentRefs<"NodeCommand_node">;
+  readonly OntologyClass: {
+    readonly " $fragmentSpreads": FragmentRefs<"OntologyClassCommand_node">;
+  } | null | undefined;
   readonly " $fragmentType": "CommandProjection_node";
 };
 export type CommandProjection_node$key = {
@@ -36,33 +38,42 @@ const node: ReaderFragment = {
       "storageKey": null
     },
     {
-      "alias": null,
-      "args": null,
-      "concreteType": "EntityMeta",
-      "kind": "LinkedField",
-      "name": "_meta",
-      "plural": false,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "curie",
-          "storageKey": null
-        }
-      ],
-      "storageKey": null
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "NodeCommand_node"
+          }
+        ],
+        "type": "Node",
+        "abstractKey": "__isNode"
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "Node"
     },
     {
-      "args": null,
-      "kind": "FragmentSpread",
-      "name": "NodeCommand_node"
+      "fragment": {
+        "kind": "InlineFragment",
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "OntologyClassCommand_node"
+          }
+        ],
+        "type": "OntologyClass",
+        "abstractKey": null
+      },
+      "kind": "AliasedInlineFragmentSpread",
+      "name": "OntologyClass"
     }
   ],
   "type": "Node",
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "3f896202b00f948b2276c6c1caff7b61";
+(node as any).hash = "603eebc5cf1d1698e505ed835103a1ac";
 
 export default node;

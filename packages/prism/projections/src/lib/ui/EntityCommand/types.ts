@@ -17,7 +17,10 @@ type OwnProps = {
   readonly kind?: ReactNode;
   /** Where the entity is defined, in small capitals on the second line. */
   readonly location?: ReactNode;
-  /** The one vital at the end of the row: a version, a count. */
+  /**
+   * The one vital at the end of the row: a version, a count. An identifier
+   * in it is a `<code className="identifier">`, which keeps the row's line.
+   */
   readonly vital?: ReactNode;
 };
 

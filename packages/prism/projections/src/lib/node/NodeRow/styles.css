@@ -1,26 +1,9 @@
-/*
- * NodeRow — the row of any node: its title and its compact address.
- *
- * Each design decision reads a component token declared on the row's root
- * and bound to a semantic token or a spacing step, so a site retunes the
- * row through either tier.
- */
+/* Scaffolded by @canonical/summon-component:react v0.43.0 */
 
-@layer ds.prism {
-  /* The gap between the title and its address is a `--space-*` step: the
-   * shim's container gaps are for layout containers, and no semantic name
-   * fits two parts of one entry. */
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
   .ds.node-row {
-    --node-row-gap: var(--space-100);
-    --node-row-location-color-text: var(--color-text-muted);
-
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--node-row-gap);
-  }
-
-  .ds.node-row .location {
-    color: var(--node-row-location-color-text);
+    /* Component styles */
   }
 }

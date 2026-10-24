@@ -36,7 +36,7 @@ describe("StandardArticle on the server", () => {
     expect(html).toContain(
       'class="ds standard-prose editorial content-flow prose" lang="en"',
     );
-    expect(html.match(/class="ds node-chip"/g)).toHaveLength(2);
+    expect(html.match(/class="ds entity-chip ds node-chip"/g)).toHaveLength(2);
     expect(html).toContain(LINK_COMPONENT_CURIE);
     expect(html).toContain('<span class="class">class: CodeStandard</span>');
     expect(fetchFn).not.toHaveBeenCalled();

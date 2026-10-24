@@ -25,7 +25,7 @@ describe("ProseLink", () => {
     );
     const link = screen.getByRole("link", { name: "the block" });
     expect(link.getAttribute("href")).toBe(ONTOLOGY_CLASS_HREF);
-    expect(link.closest(".ds.node-chip")).not.toBeNull();
+    expect(link.closest(".ds.ontology-class-chip")).not.toBeNull();
     expect(container.innerHTML).not.toContain("UI Block");
   });
 
@@ -40,7 +40,7 @@ describe("ProseLink", () => {
     const link = screen.getByRole("link", { name: "elsewhere" });
     expect(link.getAttribute("href")).toBe(UNREFERENCED_HREF);
     expect(link.getAttribute("title")).toBe("Away");
-    expect(link.closest(".ds.node-chip")).toBeNull();
+    expect(link.closest(".ds.entity-chip")).toBeNull();
   });
 
   it("renders a link without an href as a bare anchor", () => {

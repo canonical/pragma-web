@@ -1,0 +1,4 @@
+---
+# ForeignBanner — a fixture whose files open with another generator's banner.
+node:
+  uri: prism.component.foreign_banner

@@ -22,6 +22,20 @@
 # cut above or below: a chip in the title is 28px, and its line grows to
 # hold it (the row is then 36px).
 #
+# The row may be narrower than its content (`size.min.width: 0`): as a
+# grid item or flex item its minimum would otherwise be its content's, so a
+# long identity would widen the track that holds the row past its column
+# instead of wrapping.
+#
+# An identifier in the location, a `<code class="identifier">`, sets the
+# monospace face on the row's line and stands on the sans text's baseline:
+# it is aligned to the baseline, so its glyphs share the line the title's
+# stand on, and its own line height is 0, so its inline box takes no height
+# and the face's other ascent and descent never grow the line past 24px:
+# the row stays 32px. (Aligning its box to the line's top would keep the
+# row at 32px too, but would leave the monospace baseline where that face's
+# metrics put it inside the box, below the sans text's.)
+#
 # A linked title reads as the row's text: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the identity clips; the
 # states apply to the link alone.
@@ -43,6 +57,11 @@
 #   layout.wrap wrap, typography.whiteSpace normal and nowrap,
 #   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
 #   size.min.width 0 lets the identity and the meta shrink to the row.
+#   --entity-row-identifier-vertical-align: baseline,
+#   --entity-row-identifier-line-height: 0
+#                                      the identifier on the text's baseline,
+#                                      its inline box of no height; a keyword
+#                                      and a number.
 #
 # Roster namespaces (accepted and tracked): grid.gutter, space.0,
 # space.050, space.300 (a line height), and the semantic typography symbol
@@ -54,6 +73,7 @@ node:
     layout.align: baseline
     layout.justify: space-between
     layout.wrap: wrap
+    size.min.width: 0
     spacing.gap.inline: grid.gutter
     spacing.gap.block: space.0
     spacing.internal.block.start: space.050
@@ -74,6 +94,13 @@ node:
               role: location
               styles:
                 typography.color: color.text.muted
+              edges:
+                - node:
+                    role: identifier
+                    styles:
+                      layout.verticalAlign: baseline
+                      typography.lineHeight: 0
+                  relation: { cardinality: "0..*", slotName: identifier }
             relation: { cardinality: "0..1", slotName: location }
           - node:
               role: title

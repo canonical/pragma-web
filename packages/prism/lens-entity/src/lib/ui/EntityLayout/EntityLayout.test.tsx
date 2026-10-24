@@ -197,7 +197,7 @@ describe("EntityLayout", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     await waitFor(() => {
-      expect(screen.getAllByRole("article")).toHaveLength(1);
+      expect(document.querySelectorAll(".ds.node-card")).toHaveLength(1);
     });
     expect(screen.getByRole("searchbox")).toHaveValue("northgate");
     expect(readSocket("status")).toHaveTextContent(

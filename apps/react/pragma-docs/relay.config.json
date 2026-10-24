@@ -7,6 +7,8 @@
   "excludes": [
     "**/node_modules/**",
     "**/__generated__/**",
+    "packages/prism/*/src/**/*.test.tsx",
+    "packages/prism/*/src/**/*.stories.tsx",
     "**/dist/**",
     "**/relay/extensions/**"
   ],

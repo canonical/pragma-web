@@ -1,0 +1,57 @@
+/* Scaffolded by @canonical/summon-component:react v0.43.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.scaffolded-probe {
+    --scaffolded-probe-gap: var(--grid-gutter);
+    --scaffolded-probe-radius: 0.25rem;
+    --scaffolded-probe-inset: var(--space-100);
+    --scaffolded-probe-color: var(--color-text);
+    --scaffolded-probe-hover-color: var(--color-text-muted);
+    --scaffolded-probe-selected-color: var(--color-text-muted);
+    --scaffolded-probe-label-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
+
+    display: grid;
+    gap: var(--scaffolded-probe-gap);
+    padding-inline: var(--scaffolded-probe-inset);
+    border-radius: var(--scaffolded-probe-radius);
+    color: var(--scaffolded-probe-color);
+  }
+
+  .ds.scaffolded-probe:hover {
+    color: var(--scaffolded-probe-hover-color);
+  }
+
+  .ds.scaffolded-probe[aria-selected="true"] {
+    color: var(--scaffolded-probe-selected-color);
+  }
+
+  .ds.scaffolded-probe .label {
+    font-weight: var(--scaffolded-probe-label-font-weight);
+    font-variant-caps: all-small-caps;
+  }
+
+  /* The link, reached through the body only, never through the label. */
+  .ds.scaffolded-probe > .body > .link {
+    text-decoration: none;
+  }
+
+  .ds.scaffolded-probe > .body > .link[href]:hover {
+    text-decoration: underline;
+  }
+
+  /* A label the body follows draws no rule below it. */
+  .ds.scaffolded-probe:has(> .label + .body) > .label {
+    border-block-end-width: 0;
+  }
+
+  /* Below one group the label hides. */
+  @container shell (width < 448px) {
+    .ds.scaffolded-probe .label {
+      display: none;
+    }
+  }
+}

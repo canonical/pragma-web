@@ -1,9 +1,8 @@
-import type { ProjectionMaps } from "@canonical/prism-projections";
-import type { ComponentProps } from "react";
+import type { NodeRowProps, SiteArmProps } from "@canonical/prism-projections";
 
 /**
- * Props accepted by `LineRow`: the props every row arm receives, the node
- * read through the row's composite fragment and its home, then the native
- * props of the `<li>` the `Node` arm renders as the root.
+ * Props accepted by `LineRow`, a site arm: the props of the `Node`
+ * projection's row it wraps, the node's key and the native props of its
+ * `<li>` root, and the node's typename.
  */
-export type LineRowProps = ComponentProps<ProjectionMaps["row"]["Node"]>;
+export type LineRowProps = SiteArmProps<NodeRowProps>;

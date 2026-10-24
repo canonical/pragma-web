@@ -14,6 +14,15 @@
 # hold is cut above or below: a chip in the title is 28px, and its line
 # grows to hold it (the row is then 60px).
 #
+# An identifier in the vital, a `<code class="identifier">`, sets the
+# monospace face on the row's line and stands on the sans text's baseline:
+# it is aligned to the baseline, so its glyphs share the line the context's
+# stand on, and its own line height is 0, so its inline box takes no height
+# and the face's other ascent and descent never grow the line past 24px.
+# (Aligning its box to the line's top would keep the line at 24px too, but
+# would leave the monospace baseline where that face's metrics put it
+# inside the box, below the sans text's.)
+#
 # A linked title reads as the row's text: the text's colour, underlined on
 # hover, its focus ring drawn inside it since the title clips; the states
 # apply to the link alone.
@@ -33,6 +42,11 @@
 #                                      the link's ring, drawn inside it since the title clips.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
+#   --entity-command-identifier-vertical-align: baseline,
+#   --entity-command-identifier-line-height: 0
+#                                      the identifier on the text's baseline,
+#                                      its inline box of no height; a keyword
+#                                      and a number.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
 # component.padding.inline, space.050, space.300 (a line height), and the
@@ -105,4 +119,11 @@ node:
           typography.color: color.text.muted
           typography.align: end
           typography.whiteSpace: nowrap
+        edges:
+          - node:
+              role: identifier
+              styles:
+                layout.verticalAlign: baseline
+                typography.lineHeight: 0
+            relation: { cardinality: "0..*", slotName: identifier }
       relation: { cardinality: "0..1", slotName: vital }

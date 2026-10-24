@@ -44,13 +44,15 @@ describe("EntityIndexPage", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("renders the cards view the address names, one article per station", {
+  it("renders the cards view the address names, one card per station", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
     render(createEntitySite({ url: "/stations?view=cards", environment }));
 
-    expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+    expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
+      STATION_COUNT,
+    );
     expect(document.querySelector(".ds.entity-index")).toHaveAttribute(
       "data-view",
       "cards",
@@ -80,13 +82,15 @@ describe("EntityIndexPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     await waitFor(() => {
-      expect(screen.getAllByRole("article")).toHaveLength(STATION_COUNT);
+      expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
+        STATION_COUNT,
+      );
     });
     expect(screen.queryByRole("list")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Rows" }));
     await waitFor(() => {
-      expect(screen.queryAllByRole("article")).toHaveLength(0);
+      expect(document.querySelectorAll(".ds.node-card")).toHaveLength(0);
     });
     expect(
       within(screen.getByRole("list")).getAllByRole("listitem"),

@@ -73,6 +73,15 @@ type Story = StoryObj<typeof Component>;
 /** A class, with its instances counted. */
 export const Class: Story = { args: pickCardArgs(CLASS_ENTITY) };
 
+/** A class under its superclass: the parent follows the subclass sign. */
+export const Subclass: Story = {
+  args: {
+    ...pickCardArgs(CLASS_ENTITY),
+    parent: "UIBlock",
+    parentRelation: "subclass",
+  },
+};
+
 /** A UI block under its parent, without a sidecar. */
 export const UIBlock: Story = { args: pickCardArgs(UI_BLOCK_ENTITY) };
 

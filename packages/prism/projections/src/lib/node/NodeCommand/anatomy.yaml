@@ -1,0 +1,49 @@
+---
+# NodeCommand: any graph node as a 56px command-palette result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
+# title over "kind in location", one vital at the end). The kind is the
+# node's class; the location the compact address's prefix. Any node
+# carries no vital, so that slot stays empty.
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved
+# from the compact address; a node without one reads as inert text.
+node:
+  uri: prism.component.node_command
+  projection:
+    on: Node
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+      relation:
+        cardinality: "1"

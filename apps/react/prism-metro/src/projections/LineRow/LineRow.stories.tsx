@@ -35,8 +35,8 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** A line's row: its title and its compact address, set apart from the
- * next line's. */
+/** A line's row: its title and its compact address, on the list's 32px
+ * row. */
 export const Default: Story = {
   parameters: {
     relay: {
