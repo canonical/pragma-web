@@ -2,7 +2,7 @@
 
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
-import { localName } from "../../collectJourneys.js";
+import { readLocalName } from "../../collectJourneys.js";
 import type { JourneyInspectorProps } from "./types.js";
 import "./styles.css";
 
@@ -10,7 +10,7 @@ const componentCssClassName = "ds journey-inspector";
 
 /** A vocabulary URI's display term, `surface:Primary` to `Primary`. */
 function readTerm(uri: string | null | undefined): string | undefined {
-  return uri == null ? undefined : localName(uri);
+  return uri == null ? undefined : readLocalName(uri);
 }
 
 /**

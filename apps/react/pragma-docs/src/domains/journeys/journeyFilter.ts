@@ -88,7 +88,7 @@ export const ALL_JOURNEYS_FILTER: JourneyFilter = {
  * have before the first render. It is the same input on both sides, unlike
  * `localStorage` or `window` — which remain forbidden here.
  */
-export const defaultJourneyFilter = (
+export const chooseDefaultJourneyFilter = (
   coordinateUris: readonly string[],
   selectedCoordinate?: string | undefined,
 ): JourneyFilter => ({
@@ -97,15 +97,15 @@ export const defaultJourneyFilter = (
 });
 
 /** The local name of a URI — the display term the graph implies. */
-const localName = (uri: string): string => {
+const readLocalName = (uri: string): string => {
   const local = uri.split(/[#:]/).at(-1);
   return local === undefined || local.length === 0 ? uri : local;
 };
 
 /** Strip the filing prefix a Turtle local name carries (`role.architect`
  * → `architect`, `persona.architect` → `architect`). */
-const bareTerm = (uri: string): string =>
-  localName(uri).replace(/^(?:persona|role|fluency|actor)\./, "");
+const readBareTerm = (uri: string): string =>
+  readLocalName(uri).replace(/^(?:persona|role|fluency|actor)\./, "");
 
 /**
  * Does a coordinate match a persona, APPROXIMATELY? True when the
@@ -122,9 +122,9 @@ export const personaMatchesCoordinate = (
 ): boolean => {
   if (persona === undefined) return true;
   if (roleUris.length === 0) return true;
-  const wanted = bareTerm(persona);
-  return roleUris.some((role) => bareTerm(role) === wanted);
+  const wanted = readBareTerm(persona);
+  return roleUris.some((role) => readBareTerm(role) === wanted);
 };
 
 /** A persona's display term, for chips and the rail's heading. */
-export const personaTerm = (uri: string): string => bareTerm(uri);
+export const readPersonaTerm = (uri: string): string => readBareTerm(uri);

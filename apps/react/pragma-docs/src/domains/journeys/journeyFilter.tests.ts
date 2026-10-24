@@ -12,16 +12,16 @@
 import { describe, expect, it } from "vitest";
 import {
   ALL_JOURNEYS_FILTER,
-  defaultJourneyFilter,
+  chooseDefaultJourneyFilter,
   personaMatchesCoordinate,
-  personaTerm,
+  readPersonaTerm,
 } from "./journeyFilter.js";
 
 const DOCS = "sem://design-system-docs#";
 
-describe("defaultJourneyFilter", () => {
+describe("chooseDefaultJourneyFilter", () => {
   it("defaults to ONE coordinate — the readable view, not all 260 nodes", () => {
-    const filter = defaultJourneyFilter([
+    const filter = chooseDefaultJourneyFilter([
       `${DOCS}coordinate.b`,
       `${DOCS}coordinate.a`,
     ]);
@@ -33,7 +33,7 @@ describe("defaultJourneyFilter", () => {
   it("prefers the SELECTED job's coordinate — a link must land on its job", () => {
     // The bug this prevents: following a link to a job and landing on a
     // diagram that does not contain it.
-    const filter = defaultJourneyFilter(
+    const filter = chooseDefaultJourneyFilter(
       [`${DOCS}coordinate.a`, `${DOCS}coordinate.z`],
       `${DOCS}coordinate.z`,
     );
@@ -42,7 +42,9 @@ describe("defaultJourneyFilter", () => {
 
   it("is stable — the same inputs give the same filter", () => {
     const uris = [`${DOCS}coordinate.b`, `${DOCS}coordinate.a`];
-    expect(defaultJourneyFilter(uris)).toEqual(defaultJourneyFilter(uris));
+    expect(chooseDefaultJourneyFilter(uris)).toEqual(
+      chooseDefaultJourneyFilter(uris),
+    );
   });
 });
 
@@ -76,9 +78,9 @@ describe("personaMatchesCoordinate (the APPROXIMATE axis)", () => {
   });
 });
 
-describe("personaTerm", () => {
+describe("readPersonaTerm", () => {
   it("recovers the ontology's own word from the filed local name", () => {
-    expect(personaTerm(`${DOCS}persona.architect`)).toBe("architect");
+    expect(readPersonaTerm(`${DOCS}persona.architect`)).toBe("architect");
   });
 });
 

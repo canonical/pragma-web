@@ -4,8 +4,11 @@ import { Button } from "@canonical/react-ds-global";
 import { Link } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
-import { jobGist, localName } from "../../collectJourneys.js";
-import { personaMatchesCoordinate, personaTerm } from "../../journeyFilter.js";
+import { readJobGist, readLocalName } from "../../collectJourneys.js";
+import {
+  personaMatchesCoordinate,
+  readPersonaTerm,
+} from "../../journeyFilter.js";
 import type { JourneyRailProps } from "./types.js";
 import "./styles.css";
 
@@ -94,7 +97,7 @@ export default function JourneyRail({
               }
               type="button"
             >
-              {personaTerm(persona)}
+              {readPersonaTerm(persona)}
             </button>
           ))}
         </fieldset>
@@ -134,8 +137,8 @@ export default function JourneyRail({
             </button>
             <ul className="jobs">
               {coordinate.jobs.map((entry) => {
-                const gist = jobGist(entry);
-                const slug = localName(entry.uri);
+                const gist = readJobGist(entry);
+                const slug = readLocalName(entry.uri);
                 const story = entry.story?.trim();
                 return (
                   <li className="job" key={entry.uri}>

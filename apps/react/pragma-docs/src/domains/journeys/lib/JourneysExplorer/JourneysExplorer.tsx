@@ -6,7 +6,7 @@ import type { JourneysExplorerQuery } from "#relay/__generated__/JourneysExplore
 import journeysExplorerQueryNode from "#relay/__generated__/JourneysExplorerQuery.graphql.js";
 import { collectJourneys } from "../../collectJourneys.js";
 import {
-  defaultJourneyFilter,
+  chooseDefaultJourneyFilter,
   type JourneyFilter,
   personaMatchesCoordinate,
 } from "../../journeyFilter.js";
@@ -218,7 +218,7 @@ export default function JourneysExplorer({
   );
 
   const [filter, setFilter] = useState<JourneyFilter>(() =>
-    defaultJourneyFilter(coordinateUris, selectedCoordinate),
+    chooseDefaultJourneyFilter(coordinateUris, selectedCoordinate),
   );
 
   // `/journeys/:job` is one route, so moving between jobs changes a param
@@ -228,7 +228,7 @@ export default function JourneysExplorer({
   const [renderedJob, setRenderedJob] = useState(job);
   if (job !== renderedJob) {
     setRenderedJob(job);
-    setFilter(defaultJourneyFilter(coordinateUris, selectedCoordinate));
+    setFilter(chooseDefaultJourneyFilter(coordinateUris, selectedCoordinate));
   }
 
   const drawn = useMemo(

@@ -27,7 +27,7 @@
  * `buildJourneyGraph` refuses to trust. A total order cannot drift.
  */
 
-import { axisTerm, localName } from "./collectJourneys.js";
+import { readAxisTerm, readLocalName } from "./collectJourneys.js";
 import type { JourneyCoordinate, JourneyPairing } from "./types.js";
 
 /** The columns the table can be ordered by. */
@@ -116,7 +116,7 @@ export const axisText = (terms: readonly string[]): string =>
  */
 const isPrimary = (pairing: JourneyPairing): boolean =>
   pairing.role != null &&
-  localName(pairing.role).toLowerCase().includes("primary");
+  readLocalName(pairing.role).toLowerCase().includes("primary");
 
 /**
  * Flatten the coordinate tree into rows — one row per job.
@@ -157,20 +157,20 @@ export const buildJourneyRows = (
       const primaryCount = job.pairings.filter(isPrimary).length;
       rows.push({
         uri: job.uri,
-        label: job.label ?? localName(job.uri),
+        label: job.label ?? readLocalName(job.uri),
         story: extra?.story,
         acceptances: extra?.acceptances ?? [],
         coordinateUri: coordinate.uri,
         coordinateLabel: coordinate.label ?? coordinate.uri,
-        roles: (extra?.roles ?? []).map(axisTerm),
-        fluencies: (extra?.fluencies ?? []).map(axisTerm),
+        roles: (extra?.roles ?? []).map(readAxisTerm),
+        fluencies: (extra?.fluencies ?? []).map(readAxisTerm),
         pairings: job.pairings,
         primaryCount,
         secondaryCount: job.pairings.length - primaryCount,
         surfaceLabel:
           first === undefined
             ? undefined
-            : (first.label ?? localName(first.uri)),
+            : (first.label ?? readLocalName(first.uri)),
         surfaceHref: first?.href ?? undefined,
         served: job.pairings.length > 0,
       });

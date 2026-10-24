@@ -20,9 +20,9 @@ import { describe, expect, it } from "vitest";
 import { LATTICE_PITCH } from "#lib/graph";
 import type { JourneyCoordinate } from "../../types.js";
 import {
-  arrivalClassName,
   buildJourneyGraph,
-  roleClassName,
+  classifyArrival,
+  classifyRole,
 } from "./buildJourneyGraph.js";
 import {
   COLUMN_PITCH,
@@ -231,11 +231,11 @@ describe("buildJourneyGraph", () => {
 
 describe("the role and arrival class mappings", () => {
   it("maps the two real roles and nothing else", () => {
-    expect(roleClassName(`${SURFACE}Primary`)).toBe(ROLE_PRIMARY_CLASS);
-    expect(roleClassName(`${SURFACE}Secondary`)).toBe(ROLE_SECONDARY_CLASS);
-    expect(roleClassName(`${SURFACE}Invented`)).toBeUndefined();
-    expect(roleClassName(null)).toBeUndefined();
-    expect(roleClassName(undefined)).toBeUndefined();
+    expect(classifyRole(`${SURFACE}Primary`)).toBe(ROLE_PRIMARY_CLASS);
+    expect(classifyRole(`${SURFACE}Secondary`)).toBe(ROLE_SECONDARY_CLASS);
+    expect(classifyRole(`${SURFACE}Invented`)).toBeUndefined();
+    expect(classifyRole(null)).toBeUndefined();
+    expect(classifyRole(undefined)).toBeUndefined();
   });
 
   it("maps the PREFIXED form the live graph actually returns", () => {
@@ -243,20 +243,20 @@ describe("the role and arrival class mappings", () => {
     // as `surface:Primary`, not `sem://surface#Primary`. Both forms must
     // map, or every edge would silently lose its weight in production
     // while the full-IRI unit fixtures stayed green.
-    expect(roleClassName("surface:Primary")).toBe(ROLE_PRIMARY_CLASS);
-    expect(roleClassName("surface:Secondary")).toBe(ROLE_SECONDARY_CLASS);
-    expect(arrivalClassName("surface:ColdEntry")).toBe("arrival-coldentry");
-    expect(arrivalClassName("surface:NoMove")).toBe("arrival-nomove");
+    expect(classifyRole("surface:Primary")).toBe(ROLE_PRIMARY_CLASS);
+    expect(classifyRole("surface:Secondary")).toBe(ROLE_SECONDARY_CLASS);
+    expect(classifyArrival("surface:ColdEntry")).toBe("arrival-coldentry");
+    expect(classifyArrival("surface:NoMove")).toBe("arrival-nomove");
   });
 
   it("maps each real arrival, and decorates nothing when absent", () => {
-    expect(arrivalClassName(`${SURFACE}ColdEntry`)).toBe("arrival-coldentry");
-    expect(arrivalClassName(`${SURFACE}SubjectKept`)).toBe(
+    expect(classifyArrival(`${SURFACE}ColdEntry`)).toBe("arrival-coldentry");
+    expect(classifyArrival(`${SURFACE}SubjectKept`)).toBe(
       "arrival-subjectkept",
     );
-    expect(arrivalClassName(`${SURFACE}NoMove`)).toBe("arrival-nomove");
+    expect(classifyArrival(`${SURFACE}NoMove`)).toBe("arrival-nomove");
     // The 34-of-133 case: no arrival is DATA, so it decorates nothing.
-    expect(arrivalClassName(null)).toBeUndefined();
-    expect(arrivalClassName(undefined)).toBeUndefined();
+    expect(classifyArrival(null)).toBeUndefined();
+    expect(classifyArrival(undefined)).toBeUndefined();
   });
 });

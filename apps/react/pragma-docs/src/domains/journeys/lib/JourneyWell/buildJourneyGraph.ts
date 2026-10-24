@@ -64,7 +64,8 @@ const COLUMN_INDEX: Readonly<Record<HopKind, number>> = {
 };
 
 /** A node's x from its column: constant stride, no measurement. */
-const columnX = (kind: HopKind): number => COLUMN_INDEX[kind] * COLUMN_PITCH;
+const findColumnX = (kind: HopKind): number =>
+  COLUMN_INDEX[kind] * COLUMN_PITCH;
 
 /**
  * A node's y from the mean of its rows, snapped down to the lattice. A
@@ -73,7 +74,8 @@ const columnX = (kind: HopKind): number => COLUMN_INDEX[kind] * COLUMN_PITCH;
  * bit-identical wherever it runs; any other mean is floored well clear of
  * a step.
  */
-const rowY = (meanRow: number): number => snapToLattice(meanRow * ROW_PITCH);
+const findRowY = (meanRow: number): number =>
+  snapToLattice(meanRow * ROW_PITCH);
 
 /** The positioned graph the well draws, deterministic. */
 export interface JourneyGraph {
@@ -82,7 +84,7 @@ export interface JourneyGraph {
 }
 
 /** Sort a collection by URI — the explicit order the layout depends on. */
-const byUri = <T extends { readonly uri: string }>(
+const sortByUri = <T extends { readonly uri: string }>(
   items: readonly T[],
 ): readonly T[] =>
   [...items].sort((a, b) => (a.uri < b.uri ? -1 : a.uri > b.uri ? 1 : 0));
@@ -149,9 +151,9 @@ export const buildJourneyGraph = (
     });
   };
 
-  for (const coordinate of byUri(coordinates)) {
-    for (const job of byUri(coordinate.jobs)) {
-      const pairings = byUri(job.pairings);
+  for (const coordinate of sortByUri(coordinates)) {
+    for (const job of sortByUri(coordinate.jobs)) {
+      const pairings = sortByUri(job.pairings);
       // A job with no pairings still earns a row: it is demand nothing
       // serves, which is precisely the thing worth seeing.
       if (pairings.length === 0) {
@@ -185,7 +187,7 @@ export const buildJourneyGraph = (
         );
         connect(coordinate.uri, job.uri);
         // Role decorates the edge into the pairing — weight, never position.
-        connect(job.uri, pairing.uri, roleClassName(pairing.role));
+        connect(job.uri, pairing.uri, classifyRole(pairing.role));
 
         const surface = pairing.surface;
         if (surface != null) {
@@ -199,7 +201,7 @@ export const buildJourneyGraph = (
             },
             row,
           );
-          connect(pairing.uri, surface.uri, arrivalClassName(pairing.arrival));
+          connect(pairing.uri, surface.uri, classifyArrival(pairing.arrival));
 
           // HONEST ABSENCE: only when the surface genuinely composes one.
           const layout = surface.layout;
@@ -226,8 +228,8 @@ export const buildJourneyGraph = (
       placement.rows.length;
     nodes.push({
       id: uri,
-      x: columnX(placement.kind),
-      y: rowY(mean),
+      x: findColumnX(placement.kind),
+      y: findRowY(mean),
       width: NODE_WIDTH,
       height: NODE_HEIGHT,
       data: {
@@ -252,7 +254,7 @@ export const buildJourneyGraph = (
  * separator is either `#` or `:`. Splitting on both is what keeps the
  * mapping honest against real responses rather than against one sample.
  */
-const localName = (uri: string): string | undefined => {
+const readLocalName = (uri: string): string | undefined => {
   const local = uri.split(/[#:]/).at(-1);
   return local === undefined || local.length === 0 ? undefined : local;
 };
@@ -262,11 +264,11 @@ const localName = (uri: string): string | undefined => {
  * carrying a URI, not a GraphQL enum, so the mapping is by local name —
  * and an unrecognised role decorates nothing rather than guessing.
  */
-export const roleClassName = (
+export const classifyRole = (
   role: string | null | undefined,
 ): string | undefined => {
   if (role == null) return undefined;
-  const local = localName(role);
+  const local = readLocalName(role);
   if (local === "Primary") return ROLE_PRIMARY_CLASS;
   if (local === "Secondary") return ROLE_SECONDARY_CLASS;
   return undefined;
@@ -278,11 +280,11 @@ export const roleClassName = (
  * and ports carry none by rule, so "no class" is the honest rendering of
  * a fact rather than a fallback.
  */
-export const arrivalClassName = (
+export const classifyArrival = (
   arrival: string | null | undefined,
 ): string | undefined => {
   if (arrival == null) return undefined;
-  const local = localName(arrival);
+  const local = readLocalName(arrival);
   if (local === undefined) return undefined;
   return `${ARRIVAL_CLASS_PREFIX}${local.toLowerCase()}`;
 };

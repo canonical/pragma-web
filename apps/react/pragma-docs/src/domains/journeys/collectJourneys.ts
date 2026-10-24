@@ -71,7 +71,7 @@ interface RawTermList {
 }
 
 /** The local name of a URI — the display label the graph implies. */
-export const localName = (uri: string): string => {
+export const readLocalName = (uri: string): string => {
   const local = uri.split(/[#:]/).at(-1);
   return local === undefined || local.length === 0 ? uri : local;
 };
@@ -90,8 +90,8 @@ export const localName = (uri: string): string => {
  */
 const AXIS_FILING_PREFIX = /^(?:role|fluency|actor)\./;
 
-export const axisTerm = (uri: string): string =>
-  localName(uri).replace(AXIS_FILING_PREFIX, "");
+export const readAxisTerm = (uri: string): string =>
+  readLocalName(uri).replace(AXIS_FILING_PREFIX, "");
 
 /** The length past which a story gist is cut and given an ellipsis. Chosen
  * to fit the rail's ~18rem column across two lines without wrapping the
@@ -118,12 +118,12 @@ const GIST_BREAK = /[.;,]/;
  * PURE: a job in, a string out, so the label is identical on the server and
  * the client and costs the SSR determinism argument nothing.
  */
-export const jobGist = (job: {
+export const readJobGist = (job: {
   readonly uri: string;
   readonly label?: string | null | undefined;
   readonly story?: string | null | undefined;
 }): string => {
-  const slug = localName(job.uri);
+  const slug = readLocalName(job.uri);
   // A label the graph carries beyond the filing slug leads outright.
   if (
     job.label != null &&
@@ -147,7 +147,7 @@ export const jobGist = (job: {
 };
 
 /** Read a connection's node URIs, tolerating an absent connection. */
-const uris = (list: RawTermList | null | undefined): readonly string[] =>
+const readUris = (list: RawTermList | null | undefined): readonly string[] =>
   (list?.edges ?? []).map((edge) => edge.node.uri);
 
 /**
@@ -160,9 +160,9 @@ export const describeCoordinate = (
   coordinate: RawCoordinate | null | undefined,
 ): string => {
   if (coordinate == null) return "no coordinate";
-  const actors = uris(coordinate.actors).map(axisTerm);
-  const roles = uris(coordinate.roles).map(axisTerm);
-  const fluencies = uris(coordinate.fluencies).map(axisTerm);
+  const actors = readUris(coordinate.actors).map(readAxisTerm);
+  const roles = readUris(coordinate.roles).map(readAxisTerm);
+  const fluencies = readUris(coordinate.fluencies).map(readAxisTerm);
   return [
     actors.length > 0 ? actors.join(" or ") : "any actor",
     roles.length > 0 ? roles.join(" or ") : "any role",
@@ -190,8 +190,8 @@ export const ROUTE_BY_SURFACE: Readonly<Record<string, string>> = {
 };
 
 /** The route for a surface, or undefined when the site renders none. */
-export const routeForSurface = (uri: string): string | undefined =>
-  ROUTE_BY_SURFACE[localName(uri)];
+export const findRouteForSurface = (uri: string): string | undefined =>
+  ROUTE_BY_SURFACE[readLocalName(uri)];
 
 /**
  * Merge the two pairing windows by URI, then group into the coordinate →
@@ -224,7 +224,7 @@ export const collectJourneys = (
     const list = pairingsByJob.get(jobUri) ?? [];
     list.push({
       uri: pairing.uri,
-      label: localName(pairing.uri),
+      label: readLocalName(pairing.uri),
       role: pairing.pairingRole?.uri,
       // One arrival at most in this model; absent is data (34 of 133).
       arrival: pairing.arrivals?.edges[0]?.node.uri,
@@ -233,15 +233,15 @@ export const collectJourneys = (
           ? undefined
           : {
               uri: surface.uri,
-              label: localName(surface.uri),
+              label: readLocalName(surface.uri),
               surfaceType: surface.__typename,
-              href: routeForSurface(surface.uri),
+              href: findRouteForSurface(surface.uri),
               layout:
                 layoutNode === undefined
                   ? undefined
                   : {
                       uri: layoutNode.uri,
-                      label: layoutNode.name ?? localName(layoutNode.uri),
+                      label: layoutNode.name ?? readLocalName(layoutNode.uri),
                     },
             },
     });
@@ -261,9 +261,9 @@ export const collectJourneys = (
     };
     bucket.jobs.push({
       uri: job.uri,
-      label: localName(job.uri),
+      label: readLocalName(job.uri),
       // The story rides through so the rail can show a legible line rather
-      // than the filing slug (jobGist); a pure projection of query data.
+      // than the filing slug (readJobGist); a pure projection of query data.
       story: job.story ?? undefined,
       pairings: pairingsByJob.get(job.uri) ?? [],
     });

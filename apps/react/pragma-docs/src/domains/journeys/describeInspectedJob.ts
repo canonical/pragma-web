@@ -1,7 +1,7 @@
 import {
   describeCoordinate,
-  localName,
   type RawJob,
+  readLocalName,
 } from "./collectJourneys.js";
 import type { InspectedJob, JourneyCoordinate } from "./types.js";
 
@@ -30,7 +30,7 @@ export default function describeInspectedJob(
   const raw = jobs.find((candidate) => candidate.uri === job);
   return {
     uri: entry.uri,
-    label: entry.label ?? localName(entry.uri),
+    label: entry.label ?? readLocalName(entry.uri),
     story: raw?.story ?? undefined,
     acceptances: (raw?.acceptances ?? []).filter(
       (value): value is string => typeof value === "string",

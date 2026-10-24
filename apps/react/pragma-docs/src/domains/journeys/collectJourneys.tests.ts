@@ -22,15 +22,15 @@ import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { describe, expect, it } from "vitest";
 import { standardsRoutes } from "#domains/standards";
 import {
-  axisTerm,
   collectJourneys,
   describeCoordinate,
-  jobGist,
-  localName,
+  findRouteForSurface,
   type RawJob,
   type RawPairing,
   ROUTE_BY_SURFACE,
-  routeForSurface,
+  readAxisTerm,
+  readJobGist,
+  readLocalName,
 } from "./collectJourneys.js";
 
 const DOCS = "sem://design-system-docs#";
@@ -147,17 +147,17 @@ describe("describeCoordinate", () => {
   });
 });
 
-describe("localName", () => {
+describe("readLocalName", () => {
   it("reads the local part of both URI forms", () => {
-    expect(localName(`${DOCS}job.l3`)).toBe("job.l3");
-    expect(localName("surface:Primary")).toBe("Primary");
+    expect(readLocalName(`${DOCS}job.l3`)).toBe("job.l3");
+    expect(readLocalName("surface:Primary")).toBe("Primary");
   });
 });
 
-describe("jobGist — the rail's legible label (FIX 1)", () => {
+describe("readJobGist — the rail's legible label (FIX 1)", () => {
   it("leads with the story's first clause, not the filing slug", () => {
     expect(
-      jobGist({
+      readJobGist({
         uri: `${DOCS}job.a1`,
         label: "job.a1",
         story: "When I open a component cold, I want its anatomy first",
@@ -167,14 +167,14 @@ describe("jobGist — the rail's legible label (FIX 1)", () => {
 
   it("returns a short whole story unbroken", () => {
     expect(
-      jobGist({ uri: `${DOCS}job.s3`, story: "I want the tokens listed" }),
+      readJobGist({ uri: `${DOCS}job.s3`, story: "I want the tokens listed" }),
     ).toBe("I want the tokens listed");
   });
 
   it("hard-caps a long clause with an ellipsis rather than the raw slug", () => {
     const story =
       "When I am integrating a brand new component into an existing product surface without any documentation at all";
-    const gist = jobGist({ uri: `${DOCS}job.b10`, story });
+    const gist = readJobGist({ uri: `${DOCS}job.b10`, story });
     expect(gist.endsWith("…")).toBe(true);
     expect(gist.length).toBeLessThanOrEqual(74);
     // The point of the fix: never the illegible slug when a story exists.
@@ -182,17 +182,17 @@ describe("jobGist — the rail's legible label (FIX 1)", () => {
   });
 
   it("falls back to the slug for a storyless job — the honest last resort", () => {
-    expect(jobGist({ uri: `${DOCS}job.orphan`, label: "job.orphan" })).toBe(
+    expect(readJobGist({ uri: `${DOCS}job.orphan`, label: "job.orphan" })).toBe(
       "job.orphan",
     );
-    expect(jobGist({ uri: `${DOCS}job.orphan`, story: "   " })).toBe(
+    expect(readJobGist({ uri: `${DOCS}job.orphan`, story: "   " })).toBe(
       "job.orphan",
     );
   });
 
   it("prefers a real label over both story and slug when one is carried", () => {
     expect(
-      jobGist({
+      readJobGist({
         uri: `${DOCS}job.a1`,
         label: "Browse the catalogue",
         story: "When I browse, …",
@@ -209,17 +209,19 @@ describe("collectJourneys threads the story to each job", () => {
   });
 });
 
-describe("axisTerm", () => {
+describe("readAxisTerm", () => {
   it("strips the graph's filing prefix to recover the ontology's word", () => {
     // `role.designer` is a Turtle filing name; the ontology's label is
     // "designer". Recovering it is reporting the graph, not renaming it.
-    expect(axisTerm(`${DOCS}role.designer`)).toBe("designer");
-    expect(axisTerm("surface:Newcomer")).toBe("Newcomer");
+    expect(readAxisTerm(`${DOCS}role.designer`)).toBe("designer");
+    expect(readAxisTerm("surface:Newcomer")).toBe("Newcomer");
   });
 
   it("strips only the three known filing prefixes", () => {
     // A term that genuinely contains a dot must keep it.
-    expect(axisTerm(`${DOCS}view.section-usage`)).toBe("view.section-usage");
+    expect(readAxisTerm(`${DOCS}view.section-usage`)).toBe(
+      "view.section-usage",
+    );
   });
 });
 
@@ -252,7 +254,7 @@ describe("ROUTE_BY_SURFACE", () => {
 
   it("returns undefined for a surface the site does not render", () => {
     // Honest absence: the inspector renders these as text, not dead links.
-    expect(routeForSurface(`${DOCS}view.chips`)).toBeUndefined();
-    expect(routeForSurface(`${DOCS}view.editor`)).toBeUndefined();
+    expect(findRouteForSurface(`${DOCS}view.chips`)).toBeUndefined();
+    expect(findRouteForSurface(`${DOCS}view.editor`)).toBeUndefined();
   });
 });
