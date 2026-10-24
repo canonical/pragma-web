@@ -19,6 +19,14 @@ export const MARGIN = 16;
 /** The radius of one of the lattice's dots, in SVG user units. */
 export const LATTICE_DOT_RADIUS = 1;
 
+/**
+ * The id of the lattice's dot pattern. It is a constant, not a `useId`
+ * value: the server renders the whole document while the client hydrates
+ * only `#root`, so a tree-position id would differ between the two. A
+ * component page draws one anatomy tree, so one id serves every page.
+ */
+export const LATTICE_PATTERN_ID = "anatomy-tree-lattice";
+
 /** The width of an edge's line, in SVG user units. */
 export const EDGE_WIDTH = 1;
 

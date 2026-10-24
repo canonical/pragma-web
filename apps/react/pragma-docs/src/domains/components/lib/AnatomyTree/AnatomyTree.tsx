@@ -2,13 +2,14 @@
 
 import { RouterLink } from "@canonical/prism-core";
 import { EntityGraphNode } from "@canonical/prism-projections";
-import { type ReactElement, useId, useMemo } from "react";
+import { type ReactElement, useMemo } from "react";
 import { useMessages } from "#i18n";
 import { LATTICE_PITCH, truncateLabel } from "#lib/graph";
 import {
   EDGE_WIDTH,
   LABEL_CHARACTERS,
   LATTICE_DOT_RADIUS,
+  LATTICE_PATTERN_ID,
   NODE_HEIGHT,
   NODE_WIDTH,
 } from "./constants.js";
@@ -50,7 +51,6 @@ export default function AnatomyTree({
   ...props
 }: AnatomyTreeProps): ReactElement {
   const t = useMessages();
-  const latticeId = useId();
   const { nodes, edges, width, height } = useMemo(
     () => layoutAnatomyTree(tree),
     [tree],
@@ -74,7 +74,7 @@ export default function AnatomyTree({
           <pattern
             className="lattice"
             height={LATTICE_PITCH}
-            id={latticeId}
+            id={LATTICE_PATTERN_ID}
             patternUnits="userSpaceOnUse"
             width={LATTICE_PITCH}
             x={-LATTICE_DOT_RADIUS}
@@ -88,7 +88,11 @@ export default function AnatomyTree({
             />
           </pattern>
         </defs>
-        <rect fill={`url(#${latticeId})`} height={height} width={width} />
+        <rect
+          fill={`url(#${LATTICE_PATTERN_ID})`}
+          height={height}
+          width={width}
+        />
         <g
           className="edges"
           fill="none"

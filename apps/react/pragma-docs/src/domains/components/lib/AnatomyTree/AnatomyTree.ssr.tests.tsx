@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { BUTTON_TREE } from "../../../../../testing/anatomyTrees.js";
 import createSiteTree from "../../../../../testing/createSiteTree.js";
 import AnatomyTree from "./AnatomyTree.js";
+import { LATTICE_PATTERN_ID } from "./constants.js";
 
 describe("AnatomyTree SSR", () => {
   it("server-renders the drawing, its lattice, its placed nodes and its links", () => {
@@ -21,5 +22,16 @@ describe("AnatomyTree SSR", () => {
     expect(html).toContain('<g class="node"');
     expect(html).toContain('transform="translate(');
     expect(html).toContain('href="/components/ds%3Aglobal.component.icon"');
+  });
+
+  it("names the lattice pattern by a constant, so the server and the client agree", () => {
+    const html = renderToString(
+      createSiteTree(
+        createMockEnvironment(),
+        <AnatomyTree label="The anatomy of Button" tree={BUTTON_TREE} />,
+      ),
+    );
+    expect(html).toContain(`id="${LATTICE_PATTERN_ID}"`);
+    expect(html).toContain(`fill="url(#${LATTICE_PATTERN_ID})"`);
   });
 });
