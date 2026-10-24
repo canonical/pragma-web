@@ -16,4 +16,11 @@
     container: shell / inline-size;
     align-content: start;
   }
+
+  /* The inspector region a story of an inspector sits in: the last three
+   * columns of the story's grid, where the workspace places its inspector,
+   * the `.subgrid` it carries spanning them. */
+  .story-inspector {
+    --subgrid-span: -4 / -1;
+  }
 }

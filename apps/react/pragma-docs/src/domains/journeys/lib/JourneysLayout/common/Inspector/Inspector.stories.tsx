@@ -2,7 +2,10 @@
 
 import { withRelayEnvironment } from "@canonical/storybook-addon-relay";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { withRouter } from "../../../../../../../.storybook/decorators/index.js";
+import {
+  withInspectorRegion,
+  withRouter,
+} from "../../../../../../../.storybook/decorators/index.js";
 import { SITE_ROUTES } from "../../../../../../../.storybook/siteRoutes.js";
 import Component from "./Inspector.js";
 
@@ -10,8 +13,12 @@ const meta: Meta<typeof Component> = {
   title: "Components/JourneysLayout/Inspector",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRouter({ routes: SITE_ROUTES }), withRelayEnvironment],
-  parameters: { relay: { mockResolvers: {} } },
+  decorators: [
+    withInspectorRegion(),
+    withRouter({ routes: SITE_ROUTES }),
+    withRelayEnvironment,
+  ],
+  parameters: { grid: "intrinsic", relay: { mockResolvers: {} } },
 };
 
 export default meta;
