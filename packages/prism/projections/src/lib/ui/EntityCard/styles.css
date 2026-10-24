@@ -13,9 +13,12 @@
      * columns a sidecar adds beside it. */
     --entity-card-body-span: var(--card-span, 1);
     --entity-card-sidecar-span: 2;
-    /* Below two groups, the columns a card with a sidecar spans: the whole
-     * row, since the canvas holds two or three columns there, too few for
-     * the body's span and the sidecar's two side by side. */
+    /* The whole row a card spans where the canvas holds too few columns
+     * for its usual span: below two groups with a sidecar, since the
+     * canvas holds two or three columns there, too few for the body's span
+     * and the sidecar's two side by side; below one group without one,
+     * since the canvas holds three columns there and a card on two would
+     * leave the last one empty on every row. */
     --entity-card-narrow-column: 1 / -1;
     /* The footer reaches back across the gutter the holding grid sets
      * between its track and the body's, so the two sections meet; a body
@@ -256,5 +259,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--entity-card-vital-color);
+  }
+
+  /* Below one group a card without a sidecar spans every column of the
+   * grid that holds it rather than the Cards group's span: the canvas
+   * beside the rail holds three columns there, and a card at two would
+   * leave the last one empty on every row. A card with a sidecar keeps
+   * its own reflow. */
+  @container shell (width < 448px) {
+    .ds.entity-card:not(:has(> .sidecar)) {
+      grid-column: var(--entity-card-narrow-column);
+    }
   }
 }

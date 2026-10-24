@@ -66,6 +66,13 @@ export const CATALOG_CARD_SELECTOR =
 export const CATALOG_CARD_WIDTHS = [390, 600, 1440] as const;
 
 /**
+ * The widths below one group of the shell (448px) the catalog is measured
+ * at: the canvas holds three columns there, and every card, with an example
+ * or without, spans its whole row.
+ */
+export const CATALOG_WHOLE_ROW_WIDTHS = [390] as const;
+
+/**
  * The narrowest a catalog card may render, in pixels: wide enough for its
  * title and summary, and for a UI block's rendered example under or beside
  * them.

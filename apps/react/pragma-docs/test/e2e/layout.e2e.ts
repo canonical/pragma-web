@@ -12,7 +12,8 @@
  * that never scrolls; a document whose only scrolling regions are its
  * canvas and its rail, and whose page's first element spans the whole main
  * column; a catalog whose cards fill their rows and stay inside the
- * canvas, a UI block's example with them, at 390, 600 and 1440px; a canvas that starts one
+ * canvas, a UI block's example with them, at 390, 600 and 1440px, each
+ * card across the canvas's whole row at 390px; a canvas that starts one
  * gutter under the strip, or at the viewport's top with no strip, its
  * page then starting one gutter down; bands,
  * the strip's and the colophon's, that run from the rail's border to the
@@ -36,6 +37,7 @@ import {
   CATALOG_CARD_SELECTOR,
   CATALOG_CARD_WIDTHS,
   CATALOG_PATH,
+  CATALOG_WHOLE_ROW_WIDTHS,
   DEV_READY_MS,
   DOCUMENT_PATHS,
   JOURNEYS_PATHS,
@@ -433,6 +435,37 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
   });
 });
 
+/**
+ * Open the catalog at a viewport width and measure its cards against the
+ * canvas, every request off the dev cell's own origins answered empty.
+ *
+ * @param width - The viewport's width, in pixels.
+ * @returns The canvas's edges and each card's measures.
+ */
+async function measureCatalogAt(
+  width: number,
+): Promise<ReturnType<typeof measureCatalogCards>> {
+  const page = await browser.newPage({ viewport: { width, height: 844 } });
+  try {
+    const origins = [
+      new URL(server.base).origin,
+      new URL(server.graphBase).origin,
+    ];
+    await page.route("**/*", (route) =>
+      origins.includes(new URL(route.request().url()).origin)
+        ? route.continue()
+        : route.fulfill({ status: 204, body: "" }),
+    );
+    await page.goto(new URL(CATALOG_PATH, server.base).href, {
+      waitUntil: "networkidle",
+      timeout: PAGE_SETTLE_MS,
+    });
+    return await page.evaluate(measureCatalogCards, CATALOG_CARD_SELECTOR);
+  } finally {
+    await page.close();
+  }
+}
+
 // A UI block's card carries its rendered example beside its body, four
 // columns where the canvas holds six or more; where it holds two or three
 // the card takes the whole row, its example under its body. At every width
@@ -440,41 +473,36 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
 // body and its example.
 describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
   it("keeps every card, and a UI block's example, inside the canvas", async () => {
-    const page = await browser.newPage({ viewport: { width, height: 844 } });
-    try {
-      const origins = [
-        new URL(server.base).origin,
-        new URL(server.graphBase).origin,
-      ];
-      await page.route("**/*", (route) =>
-        origins.includes(new URL(route.request().url()).origin)
-          ? route.continue()
-          : route.fulfill({ status: 204, body: "" }),
+    const { canvas, cards } = await measureCatalogAt(width);
+    expect(cards.length).toBeGreaterThan(0);
+    expect(cards.some(({ sections }) => sections.length === 2)).toBe(true);
+    for (const card of cards) {
+      expect(card.left).toBeGreaterThanOrEqual(
+        canvas.left - WIDTH_TOLERANCE_PX,
       );
-      await page.goto(new URL(CATALOG_PATH, server.base).href, {
-        waitUntil: "networkidle",
-        timeout: PAGE_SETTLE_MS,
-      });
-      const { canvas, cards } = await page.evaluate(
-        measureCatalogCards,
-        CATALOG_CARD_SELECTOR,
-      );
-      expect(cards.length).toBeGreaterThan(0);
-      expect(cards.some(({ sections }) => sections.length === 2)).toBe(true);
-      for (const card of cards) {
-        expect(card.left).toBeGreaterThanOrEqual(
-          canvas.left - WIDTH_TOLERANCE_PX,
-        );
-        expect(card.right).toBeLessThanOrEqual(
-          canvas.right + WIDTH_TOLERANCE_PX,
-        );
-        expect(card.width).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
-        for (const section of card.sections) {
-          expect(section).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
-        }
+      expect(card.right).toBeLessThanOrEqual(canvas.right + WIDTH_TOLERANCE_PX);
+      expect(card.width).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
+      for (const section of card.sections) {
+        expect(section).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
       }
-    } finally {
-      await page.close();
+    }
+  });
+});
+
+// Below one group the canvas holds three columns: a card at the Cards
+// group's two would leave the third empty on every row, so every card, with
+// an example or without, is as wide as the canvas.
+describe.each(CATALOG_WHOLE_ROW_WIDTHS)("the catalog at %i px", (width) => {
+  it("lays every card across the canvas's whole row", async () => {
+    const { canvas, cards } = await measureCatalogAt(width);
+    expect(cards.some(({ sections }) => sections.length === 0)).toBe(true);
+    for (const card of cards) {
+      expect(Math.abs(card.left - canvas.left)).toBeLessThanOrEqual(
+        WIDTH_TOLERANCE_PX,
+      );
+      expect(Math.abs(card.right - canvas.right)).toBeLessThanOrEqual(
+        WIDTH_TOLERANCE_PX,
+      );
     }
   });
 });
