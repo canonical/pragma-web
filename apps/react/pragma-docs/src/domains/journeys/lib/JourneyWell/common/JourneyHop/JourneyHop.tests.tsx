@@ -4,7 +4,7 @@ import { createStaticRouter } from "@canonical/prism-core";
 import { RouterProvider } from "@canonical/router-react";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   appRoutes,
   middleware,
@@ -12,6 +12,16 @@ import {
 } from "../../../../../../routes.js";
 import type { JourneyGraphNode } from "../../types.js";
 import JourneyHop from "./JourneyHop.js";
+
+/** The zoom bucket the canvas around the hop reports, set per test. */
+const zoom = vi.hoisted(() => ({
+  bucket: "full" as "full" | "hubs" | "overview",
+}));
+
+vi.mock("@canonical/prism-core", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@canonical/prism-core")>()),
+  useGraphZoomBucket: () => zoom.bucket,
+}));
 
 /** A placed surface hop, the shape the layout emits. */
 const SURFACE: JourneyGraphNode = {
@@ -44,6 +54,38 @@ const renderHop = (hop: ReactElement) =>
   );
 
 describe("JourneyHop", () => {
+  beforeEach(() => {
+    zoom.bucket = "full";
+  });
+
+  it("draws its box alone, with no text, below the legible zoom", () => {
+    for (const bucket of ["overview", "hubs"] as const) {
+      zoom.bucket = bucket;
+      const { unmount } = renderHop(
+        <JourneyHop href="/components" node={SURFACE} selected={false} />,
+      );
+      const hop = document.querySelector(".ds.journey-hop");
+      expect(
+        hop?.querySelector(".ds.entity-graph-node"),
+        bucket,
+      ).not.toBeNull();
+      expect(hop?.querySelector(".kind"), bucket).toBeNull();
+      expect(hop?.querySelector(".location"), bucket).toBeNull();
+      expect(hop?.querySelector("text"), bucket).toBeNull();
+      unmount();
+    }
+  });
+
+  it("draws its kind, location and title at the legible zoom", () => {
+    renderHop(
+      <JourneyHop href="/components" node={SURFACE} selected={false} />,
+    );
+    const hop = document.querySelector(".ds.journey-hop");
+    expect(hop?.querySelector(".kind")?.textContent).toBe("Surface");
+    expect(hop?.querySelector(".location")?.textContent).toBe("View");
+    expect(hop?.querySelector("a")?.textContent).toContain("view.components");
+  });
+
   it("places its box at the hop's corner and names its column", () => {
     renderHop(<JourneyHop href={undefined} node={SURFACE} selected={false} />);
     const hop = document.querySelector(".ds.journey-hop");
