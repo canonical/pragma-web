@@ -211,7 +211,12 @@ export default function JourneyTable({
           <caption className="caption">
             {t("journeys.table.caption")}{" "}
             <span className="count">
-              {t("journeys.table.count", { jobs: rows.length, unserved })}
+              {t("journeys.table.count", {
+                jobs: t("journeys.table.jobs", { count: rows.length }),
+                unserved: t("journeys.table.unservedCount", {
+                  count: unserved,
+                }),
+              })}
             </span>
           </caption>
           <thead>

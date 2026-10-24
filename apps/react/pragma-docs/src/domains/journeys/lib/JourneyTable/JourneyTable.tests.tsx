@@ -10,6 +10,7 @@ import { JOURNEY_MODEL } from "../../__fixtures__/journeyModel.js";
 import {
   buildJourneyRows,
   DEFAULT_TABLE_STATE,
+  type JourneyRow,
   type JourneyTableState,
 } from "../../journeyTableModel.js";
 import JourneyTable from "./JourneyTable.js";
@@ -29,6 +30,7 @@ const ROWS = buildJourneyRows(JOURNEY_MODEL, JOB_DETAIL);
 
 const renderTable = (
   state: JourneyTableState = DEFAULT_TABLE_STATE,
+  rows: readonly JourneyRow[] = ROWS,
 ): { onStateChange: ReturnType<typeof vi.fn> } => {
   const onStateChange = vi.fn();
   const tree: ReactElement = (
@@ -43,7 +45,7 @@ const renderTable = (
         job={undefined}
         onStateChange={onStateChange}
         onToggleExpanded={() => {}}
-        rows={ROWS}
+        rows={rows}
         state={state}
       />
     </RouterProvider>
@@ -59,6 +61,18 @@ describe("JourneyTable", () => {
     const caption = within(table).getByText(/Every job in the demand model/);
     // Three jobs in the fixture, one of them served by nothing.
     expect(caption).toHaveTextContent(`${ROWS.length} jobs, 1 unserved`);
+  });
+
+  it("counts a single job in the singular", () => {
+    const unservedRow = ROWS.find((row) => !row.served);
+    if (unservedRow === undefined) {
+      throw new Error("the journey model lost its unserved job");
+    }
+    renderTable(DEFAULT_TABLE_STATE, [unservedRow]);
+    const caption = within(screen.getByRole("table")).getByText(
+      /Every job in the demand model/,
+    );
+    expect(caption).toHaveTextContent("1 job, 1 unserved");
   });
 
   it("has a scope=col header for every sortable column plus the expander", () => {

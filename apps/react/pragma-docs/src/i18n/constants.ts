@@ -157,7 +157,12 @@ export const MESSAGES = {
   "journeys.table.group.served": "State",
   "journeys.table.group.none": "Flat",
   "journeys.table.caption": "Every job in the demand model",
-  "journeys.table.count": "{jobs} jobs, {unserved} unserved",
+  "journeys.table.count": "{jobs}, {unserved}",
+  "journeys.table.jobs": { one: "{count} job", other: "{count} jobs" },
+  "journeys.table.unservedCount": {
+    one: "{count} unserved",
+    other: "{count} unserved",
+  },
   "journeys.table.details": "Details",
   "journeys.table.detailsFor": "Details for {job}",
   "journeys.table.split": "{primary}P / {secondary}S",
