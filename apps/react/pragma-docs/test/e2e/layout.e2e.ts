@@ -85,6 +85,35 @@ function countCutEntries(): {
   };
 }
 
+/**
+ * Read what the journeys canvas holds: whether the explorer, its rail and
+ * one reading (the table or the graph) are mounted, the rail's own block
+ * overflow, and the alert the page shows when the graph's query failed. It
+ * runs in the page.
+ *
+ * @returns The explorer's parts, the rail's overflow and the alert's text.
+ */
+function readJourneysCanvas(): {
+  readonly explorer: boolean;
+  readonly rail: boolean;
+  readonly reading: boolean;
+  readonly railOverflow: string | null;
+  readonly alert: string | null;
+} {
+  const explorer = document.querySelector(".ds.journeys-explorer");
+  const rail = explorer?.querySelector(".ds.journey-rail") ?? null;
+  return {
+    explorer: explorer !== null,
+    rail: rail !== null,
+    reading:
+      explorer?.querySelector(".ds.journey-table, .ds.journey-well") != null,
+    railOverflow: rail === null ? null : getComputedStyle(rail).overflowY,
+    alert:
+      document.querySelector('main.ds.canvas [role="alert"]')?.textContent ??
+      null,
+  };
+}
+
 let server: RunningServer;
 let browser: Browser;
 
@@ -235,6 +264,39 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
   it.each(JOURNEYS_PATHS)(
     "lays the journeys at %s on the workspace, the table scrolling in its own region",
     async (path) => {
+      // The layout is measured over the explorer, never over the page's
+      // failure state: a graph that serves no demand model fails here,
+      // loudly, before anything is measured.
+      const page = await browser.newPage({ viewport });
+      try {
+        const origins = [
+          new URL(server.base).origin,
+          new URL(server.graphBase).origin,
+        ];
+        await page.route("**/*", (route) =>
+          origins.includes(new URL(route.request().url()).origin)
+            ? route.continue()
+            : route.fulfill({ status: 204, body: "" }),
+        );
+        await page.goto(new URL(path, server.base).href, {
+          waitUntil: "networkidle",
+          timeout: PAGE_SETTLE_MS,
+        });
+        const canvas = await page.evaluate(readJourneysCanvas);
+        if (canvas.alert !== null) {
+          throw new Error(
+            `${path} shows "${canvas.alert}" in place of the explorer: the graph serves no demand model, so the journeys cannot be measured. Boot the graph with the semantics tree.`,
+          );
+        }
+        expect(canvas.explorer).toBe(true);
+        expect(canvas.rail).toBe(true);
+        expect(canvas.reading).toBe(true);
+        // The explorer's rail scrolls on its own, as every side region of
+        // the workspace does.
+        expect(canvas.railOverflow).toBe("auto");
+      } finally {
+        await page.close();
+      }
       const measures = await measure(path);
       expectGrid(measures);
       for (const { theme, measure: layout } of measures) {
