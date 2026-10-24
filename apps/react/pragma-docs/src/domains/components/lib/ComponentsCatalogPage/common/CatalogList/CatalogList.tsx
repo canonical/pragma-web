@@ -74,7 +74,10 @@ const nameTierAnchor = (tier: string): string =>
  * the rows view. Tiers run Global first, the rest alphabetically, untiered
  * last. The first tier's list carries the view toggle, so it stands once
  * at the top; every tier's list carries its count. With more than one
- * page in the graph, a published Button loads the next hundred.
+ * page in the graph, a published Button loads the next hundred, and each
+ * count says it holds only the components loaded so far: the connection
+ * carries no total, so a bare count would state a tier's size it cannot
+ * know.
  *
  * It fills `EntityList` itself rather than rendering `NodeList`: NodeList's
  * fragment spreads the core card and row projections, which select only
@@ -136,7 +139,9 @@ export default function CatalogList({
         >
           <EntityList
             count={nodes.length}
-            kind={t("catalog.kind", { count: nodes.length })}
+            kind={t(hasNext ? "catalog.kindLoaded" : "catalog.kind", {
+              count: nodes.length,
+            })}
             onViewChange={index === 0 ? onViewChange : undefined}
             view={view}
           >

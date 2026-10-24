@@ -8,7 +8,8 @@
 # toggle, so the toggle stands once at the top of the catalog; every tier's
 # list carries its own count. A graph with no components leaves the shared
 # list view's empty line. When the graph holds more than one page, a
-# published Button loads the next hundred.
+# published Button loads the next hundred, and each count reads as the
+# components loaded so far, since the connection carries no total.
 #
 # Why EntityList and not NodeList, the shared projection over it: NodeList's
 # fragment spreads the core card and row projections, which select only the

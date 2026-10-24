@@ -85,6 +85,10 @@ export const MESSAGES = {
   "catalog.loading": "Loading the catalog…",
   "catalog.tiers": "Tiers",
   "catalog.kind": { one: "component", other: "components" },
+  "catalog.kindLoaded": {
+    one: "component loaded so far",
+    other: "components loaded so far",
+  },
   "catalog.empty": "No components in the graph.",
   "catalog.more": "Load more",
   "catalog.loadingMore": "Loading more…",

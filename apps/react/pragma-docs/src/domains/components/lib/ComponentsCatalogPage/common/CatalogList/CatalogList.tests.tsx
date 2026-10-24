@@ -32,6 +32,13 @@ const pageOneEndCursor = (() => {
   return pageInfo.endCursor;
 })();
 
+/** The count line of each tier's section, in page order. */
+const readCounts = () =>
+  screen
+    .getAllByRole("region")
+    .filter((region) => region.classList.contains("page-section"))
+    .map((region) => region.querySelector(".count")?.textContent);
+
 describe("CatalogList", () => {
   it(
     "lists the tiers, Global first and the rest alphabetically, with a jump link each",
@@ -60,14 +67,33 @@ describe("CatalogList", () => {
   );
 
   it(
-    "counts each tier and shows the view toggle on the first tier only",
+    "counts only the loaded components while the graph holds more pages",
     () => {
       render(catalogPage(catalogRecords, createFetchSpy()));
-      const counts = screen
-        .getAllByRole("region")
-        .filter((region) => region.classList.contains("page-section"))
-        .map((region) => region.querySelector(".count")?.textContent);
-      expect(counts).toEqual(["3 components", "2 components", "2 components"]);
+      expect(readCounts()).toEqual([
+        "3 components loaded so far",
+        "2 components loaded so far",
+        "2 components loaded so far",
+      ]);
+      expect(screen.getByRole("button", { name: "Load more" })).toBeVisible();
+    },
+    HARNESS_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "counts each tier and shows the view toggle on the first tier only",
+    () => {
+      const records = copyRecords();
+      for (const record of Object.values(records)) {
+        if (record.__typename === "PageInfo") record.hasNextPage = false;
+      }
+      render(catalogPage(records as unknown as RecordMap, createFetchSpy()));
+      expect(screen.queryByRole("button", { name: "Load more" })).toBeNull();
+      expect(readCounts()).toEqual([
+        "3 components",
+        "2 components",
+        "2 components",
+      ]);
       expect(screen.getAllByRole("button", { name: "Cards" })).toHaveLength(1);
       expect(
         within(screen.getByRole("region", { name: "Global" })).getByRole(
