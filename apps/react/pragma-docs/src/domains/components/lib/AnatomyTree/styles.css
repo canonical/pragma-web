@@ -3,9 +3,10 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The figure spans the main column on the graph's floor and scrolls its
-   * drawing inline when the tree is wider than the column, so no text
-   * shrinks below its size. */
+  /* The figure starts on the main column's first line and is as wide as
+   * its drawing, so the graph's floor and the lattice coincide; capped at
+   * the column, it scrolls its drawing inline when the tree is wider, so
+   * no text shrinks below its size. */
   .ds.anatomy-tree {
     /* No background token sits 6 L* below the surface in light; the dark
      * floor is the container, as the graph canvas ledgers it. */
@@ -17,6 +18,8 @@
     --anatomy-tree-edge-color: var(--color-border);
 
     grid-column: 1 / -1;
+    width: fit-content;
+    max-width: 100%;
     overflow-x: auto;
     min-width: 0;
     margin: 0;

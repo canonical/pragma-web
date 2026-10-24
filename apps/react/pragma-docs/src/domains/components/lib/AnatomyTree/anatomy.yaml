@@ -15,7 +15,8 @@
 #   - the count is the node's number of style declarations.
 # Every top-left corner is on a 16-unit dot lattice, drawn under the tree,
 # on the floor the graph canvas uses, so hollow and filled boxes read
-# apart. Edges are orthogonal, never curved: from a parent's right middle
+# apart. The figure is as wide as its drawing, capped at the main column,
+# so the floor never runs on past the lattice. Edges are orthogonal, never curved: from a parent's right middle
 # along to a bus half a column gap away, down the bus, then along to each
 # child's left middle, 1 unit in the line colour. A tree wider than the
 # main column scrolls inside the figure rather than shrinking its text
@@ -34,7 +35,8 @@
 #   appearance.background light-dark(oklch(94% 0 0),
 #     var(--color-background-container)): the floor, as GraphCanvas
 #     ledgers it (no background token sits 6 L* below the surface in light).
-#   layout.grid.column "1 / -1": structure. The figure's 0 margins.
+#   layout.grid.column "1 / -1", size.width fit-content, size.max.width
+#   100%: structure. The figure's 0 margins.
 #   In constants.ts (SVG geometry is attributes, not CSS): NODE_WIDTH 192,
 #   NODE_HEIGHT 48, COLUMN_GAP 48, ROW_PITCH 64, MARGIN 16, LATTICE_PITCH 16
 #   (from #lib/graph), LATTICE_DOT_RADIUS 1, EDGE_WIDTH 1,
@@ -43,6 +45,8 @@ node:
   uri: docs.component.anatomy_tree
   styles:
     layout.grid.column: "1 / -1"
+    size.width: fit-content
+    size.max.width: 100%
     layout.overflow.inline: auto
     size.min.width: 0
     spacing.external.block.start: 0
