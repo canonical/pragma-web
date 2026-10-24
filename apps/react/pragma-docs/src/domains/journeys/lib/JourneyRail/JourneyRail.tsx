@@ -4,11 +4,13 @@ import { Button } from "@canonical/react-ds-global";
 import { Link } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
+import buildViewSearch from "../../buildViewSearch.js";
 import { readJobGist, readLocalName } from "../../collectJourneys.js";
 import {
   personaMatchesCoordinate,
   readPersonaTerm,
 } from "../../journeyFilter.js";
+import { useJourneyView } from "../JourneyViewProvider/index.js";
 import type { JourneyRailProps } from "./types.js";
 import "./styles.css";
 
@@ -32,13 +34,15 @@ const componentCssClassName = "ds journey-rail";
  *
  * A job's link leads with the first clause of its story; its filing slug
  * follows unless the slug is all the job has, and the full story rides as
- * the link's title. The router stamps `aria-current` on the current job.
+ * the link's title, and the link carries the view, so the graph stays the
+ * graph on the job's page. The router stamps `aria-current` on the current
+ * job.
  *
  * `import { JourneyRail } from "../JourneyRail/index.js";`
  *
  * @implements docs.component.journey_rail
- * @note Impure: reads its words from the translator and its links' hrefs
- *   from the router in scope.
+ * @note Impure: reads its words from the translator, its links' hrefs from
+ *   the router and the view from the provider in scope.
  */
 export default function JourneyRail({
   coordinates,
@@ -50,6 +54,8 @@ export default function JourneyRail({
   ...props
 }: JourneyRailProps): ReactElement {
   const t = useMessages();
+  const { view } = useJourneyView();
+  const search = buildViewSearch(view);
   const rows = coordinates.map((coordinate) => ({
     coordinate,
     dimmed:
@@ -145,6 +151,7 @@ export default function JourneyRail({
                     <Link
                       className="link"
                       params={{ job: entry.uri }}
+                      search={search}
                       title={
                         story === undefined || story === "" ? undefined : story
                       }

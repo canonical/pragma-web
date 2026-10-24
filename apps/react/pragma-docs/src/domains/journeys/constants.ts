@@ -37,11 +37,13 @@ export const LEGEND_MESSAGES: Readonly<Record<HopKind, MessageKey>> = {
 export const JOURNEY_VIEWS: readonly JourneyView[] = ["table", "graph"];
 
 /**
- * The reading a page opens on: the table, the index of every job. It is a
- * constant, read from nothing, so the server's first paint and the
- * client's first render agree.
+ * The reading a page opens on when its address names none: the table, the
+ * index of every job.
  */
 export const DEFAULT_JOURNEY_VIEW: JourneyView = "table";
+
+/** The search parameter both journeys routes keep the view in. */
+export const JOURNEY_VIEW_PARAM = "view";
 
 /**
  * The site routes the demand model's surfaces land on, by the surface

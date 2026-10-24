@@ -11,11 +11,10 @@ import type { JourneysLayoutProps } from "./types.js";
  * explorer in the canvas and, in the graph view, the job inspector.
  *
  * `JourneyViewProvider` encloses the whole workspace because the switch,
- * the explorer and the inspector are siblings that share one view. The
- * provider lives as long as the layout, which the router remounts whenever
- * the matched route changes: the view survives a move from one job to
- * another and starts from the table on a move to the lens index or to
- * another lens. The layout renders no element of its own:
+ * the explorer and the inspector are siblings that share one view and one
+ * filter. The router remounts the layout whenever the matched route
+ * changes, so the provider reads the view from the address, where a move
+ * from the lens index to a job keeps it. The layout renders no element of its own:
  * `WorkspaceLayout` renders the root.
  *
  * `import { JourneysLayout } from "./lib/JourneysLayout/index.js";`

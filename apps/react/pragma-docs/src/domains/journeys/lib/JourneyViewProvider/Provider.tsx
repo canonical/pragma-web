@@ -5,11 +5,11 @@ import type { JourneyViewProviderProps } from "./types.js";
 
 /**
  * Provides the reading the journeys canvas shows, and the graph's filter,
- * to the strip's switch, the explorer and the inspector. `JourneysLayout` puts it around all three,
- * and it lives as long as the layout, which the router remounts whenever
- * the matched route changes: the view survives a move from one job to
- * another (the same route, new params) and starts from the table on a move
- * to the lens index or to another lens.
+ * to the strip's switch, the explorer and the inspector. `JourneysLayout`
+ * puts it around all three. The view is read from the address, so it
+ * survives the router remounting the layout on a move from the lens index
+ * to a job; the filter lives as long as the layout, and a choice holds
+ * only on the job it was made on.
  *
  * It renders no element of its own (a context provider), so it takes no
  * native props.

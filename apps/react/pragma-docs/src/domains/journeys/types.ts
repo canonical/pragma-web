@@ -1,12 +1,20 @@
+import type { StandardSchemaV1 } from "@canonical/router-core";
 import type { HOP_KINDS } from "./constants.js";
 import type { JourneyFilter } from "./journeyFilter.js";
 
 /**
  * Which reading of the demand model the canvas shows: the table, every job
- * at once, or the graph, the journeys of one coordinate. It is the
- * reader's passing choice and never enters the URL.
+ * at once, or the graph, the journeys of one coordinate. It lives in the
+ * address (`?view=graph`), so it survives a move from the lens index to a
+ * job, a reload and a shared link.
  */
 export type JourneyView = "table" | "graph";
+
+/** The journeys routes' search: the view, read from the address. */
+export type JourneysSearchSchema = StandardSchemaV1<
+  unknown,
+  { readonly view: JourneyView }
+>;
 
 /**
  * The name of a site route a surface can land on: every one takes no

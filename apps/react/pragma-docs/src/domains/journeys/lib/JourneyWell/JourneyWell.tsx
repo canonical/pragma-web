@@ -8,6 +8,8 @@ import {
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useCallback, useMemo } from "react";
 import { useMessages } from "#i18n";
+import buildViewSearch from "../../buildViewSearch.js";
+import { useJourneyView } from "../JourneyViewProvider/index.js";
 import { buildJourneyGraph } from "./buildJourneyGraph.js";
 import { JourneyHop } from "./common/index.js";
 import {
@@ -71,7 +73,7 @@ function drawEdge(
  * reproduces the server's markup.
  *
  * Each hop is a `JourneyHop` over an `EntityGraphNode`. A job's title
- * links to its own page,
+ * links to its own page, in the graph view,
  * since the job is the lens's addressable thing, and a surface's to the
  * docsite page that renders it, where there is one; coordinates, pairings
  * and layouts are not places on this site, so their titles are text. A
@@ -83,8 +85,8 @@ function drawEdge(
  * `import { JourneyWell } from "../JourneyWell/index.js";`
  *
  * @implements docs.component.journey_well
- * @note Impure: reads the router's paths and its words from the translator
- *   in scope.
+ * @note Impure: reads the router's paths, the view from the provider and
+ *   its words from the translator in scope.
  */
 export default function JourneyWell({
   coordinates,
@@ -94,6 +96,7 @@ export default function JourneyWell({
 }: JourneyWellProps): ReactElement {
   const t = useMessages();
   const router = useRouter();
+  const search = buildViewSearch(useJourneyView().view);
   const { nodes, edges } = useMemo(
     () => buildJourneyGraph(coordinates),
     [coordinates],
@@ -164,6 +167,7 @@ export default function JourneyWell({
                 node.data.kind === "job"
                   ? router.buildPath("journeysJob", {
                       params: { job: node.data.uri },
+                      search,
                     })
                   : node.data.route === undefined
                     ? undefined

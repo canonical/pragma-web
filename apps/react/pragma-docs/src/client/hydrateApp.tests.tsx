@@ -104,16 +104,12 @@ const SEEDED_PAGES = [
     liveSelector: ".ds.standard-prose .ds.node-chip",
     liveText: "one prop",
   },
-  // Journeys job block (AV-351 / RULING 1 + 2): the view is EPHEMERAL, not
-  // URL-derived, so the job page — like the index — defaults to the TABLE.
-  // Its server HTML therefore carries the table's primary surface, NOT the
-  // well's node DOM (the graph is the non-default view, a client transition)
-  // and NOT the inspector (dropped in table mode, RULING 2 — no third
-  // column). The selected job is still in the URL; it only surfaces when the
-  // reader flips the strip switch to the graph. Hydrating over the
-  // server-rendered table must stay mismatch-silent: the table's whole
-  // arrangement comes from a constant, so the first client render reproduces
-  // the server's markup by construction.
+  // Journeys job block: with no view in the address the job page, like
+  // the index, opens on the TABLE. Its server HTML therefore carries the
+  // table's primary surface, not the well's hops and not the inspector,
+  // which the workspace opens in the graph view alone. Hydrating over it
+  // must stay mismatch-silent: the table's whole arrangement comes from a
+  // constant, so the first client render reproduces the server's markup.
   {
     name: "journeys job",
     url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3",
@@ -121,6 +117,18 @@ const SEEDED_PAGES = [
     serverMarker: 'class="ds journey-table"',
     liveSelector: ".journey-table .grouping-label",
     liveText: "Group by",
+  },
+  // Journeys GRAPH block: the address names the graph view, which the
+  // server reads from the same URL as the client, so the job page renders
+  // the well, its hops with the selected one ringed, and the job in the
+  // inspector on both sides, mismatch-silent.
+  {
+    name: "journeys job in the graph view",
+    url: "/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3?view=graph",
+    records: journeysExplorerRecordsJob,
+    serverMarker: 'class="ds journey-hop is-selected"',
+    liveSelector: ".inspector #journey-inspector-title",
+    liveText: "job.l3",
   },
   // Journeys INDEX block (AV-351): the table is the lens's primary surface,
   // and its whole ephemeral arrangement — the default sort, the default
