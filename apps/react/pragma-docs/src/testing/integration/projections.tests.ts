@@ -25,20 +25,25 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
 
 /** Every compiled fragment of the app, by the artifact's file name. */
 const FRAGMENT_MODULES = import.meta.glob<{ default: ReaderFragment }>(
-  "../../relay/__generated__/*_node.graphql.ts",
+  [
+    "../../relay/__generated__/*_node.graphql.ts",
+    "../../relay/__generated__/*_query.graphql.ts",
+  ],
   { eager: true },
 );
 
 /**
- * Read the compiled fragment a component's projection reads, `<Name>_node`.
+ * Read the compiled fragment a component's projection reads: `<Name>_query`
+ * for a projection on the root `Query` type, `<Name>_node` for any other.
  *
  * @throws When the app compiled no such fragment.
  */
-function readNodeFragment(folder: string): ReaderFragment {
-  const path = `../../relay/__generated__/${basename(folder)}_node.graphql.ts`;
+function readNodeFragment(folder: string, on?: string): ReaderFragment {
+  const name = `${basename(folder)}_${on === "Query" ? "query" : "node"}`;
+  const path = `../../relay/__generated__/${name}.graphql.ts`;
   const fragment = FRAGMENT_MODULES[path]?.default;
   if (fragment === undefined) {
-    throw new Error(`${folder}: the app compiled no ${basename(folder)}_node`);
+    throw new Error(`${folder}: the app compiled no ${name}`);
   }
   return fragment;
 }
@@ -118,11 +123,22 @@ const SITE_DISPATCHERS: readonly (readonly [
   ["graphNode", "GraphNode"],
 ];
 
-/** The app's projections: every component whose anatomy projects on a type. */
-const PROJECTIONS = listAnatomyFolders([
+/** The app's component folders, with their private subcomponents. */
+const COMPONENT_FOLDERS = listAnatomyFolders([
   join(APP_ROOT, "src", "lib", "ui"),
   ...DOMAIN_LIBRARIES,
-]).filter((folder) => assertAnatomy(folder).root.projection?.on !== undefined);
+]);
+
+/**
+ * The app's projections: every component, or private subcomponent in its
+ * parent's `common/` folder, whose anatomy projects on a type.
+ */
+const PROJECTIONS = [
+  ...COMPONENT_FOLDERS,
+  ...listAnatomyFolders(
+    COMPONENT_FOLDERS.map((folder) => join(folder, "common")),
+  ),
+].filter((folder) => assertAnatomy(folder).root.projection?.on !== undefined);
 
 describe("the app's projections", () => {
   it("are found in its domain libraries and its general components", () => {
@@ -156,9 +172,10 @@ describe("the app's projections", () => {
   });
 
   it.each(PROJECTIONS)("%s reads what its fragment reads", (folder) => {
+    const specification = assertAnatomy(folder);
     assertProjectionMatchesFragment(
-      assertAnatomy(folder),
-      readNodeFragment(folder),
+      specification,
+      readNodeFragment(folder, specification.root.projection?.on),
     );
   });
 });

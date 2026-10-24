@@ -1,7 +1,7 @@
 // @vitest-environment node
 
 import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertAnatomy,
@@ -29,8 +29,15 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
 /** The semantic tokens the app's components read beyond the shim. */
 const EXTERNAL_TOKENS = [
   "--color-background",
+  "--color-background-container",
+  "--color-background-layer2",
+  "--color-border",
+  "--color-border-muted",
   "--color-text",
+  "--color-text-branded",
   "--color-text-muted",
+  "--typography-text-primary-bold-font-weight",
+  "--typography-text-primary-code-font-family",
   "--typography-text-secondary-font-size",
 ];
 
@@ -40,7 +47,35 @@ const EXTERNAL_TOKENS = [
  */
 const DOCUMENT_TOKENS = ["--grid-col-min"];
 
-const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
+/**
+ * The context providers among the app's components. A provider follows its
+ * own file structure (cs:react.component.structure.context): its main file
+ * is `Provider.tsx`, beside `Context.tsx` and its hook, with no stylesheet
+ * and no stories, so the generator's scaffold check does not apply to it;
+ * it keeps its anatomy.
+ */
+const PROVIDER_NAMES: readonly string[] = ["JourneyViewProvider"];
+
+const allFolders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
+
+/** The app's components that the generator scaffolds. */
+const folders = allFolders.filter(
+  (folder) => !PROVIDER_NAMES.includes(basename(folder)),
+);
+
+/** The app's context providers. */
+const providerFolders = allFolders.filter((folder) =>
+  PROVIDER_NAMES.includes(basename(folder)),
+);
+
+/**
+ * The private subcomponents, each in its parent's `common/` folder. The
+ * scaffold check places a component only under `src/lib/ui` or a domain's
+ * `lib`, so these keep their anatomy and their styles, not that check.
+ */
+const subcomponentFolders = listAnatomyFolders(
+  allFolders.map((folder) => join(folder, "common")),
+);
 
 describe("the app's components", () => {
   it("are found, the shell, a dispatcher and a domain library's among them", () => {
@@ -58,6 +93,17 @@ describe("the app's components", () => {
       assertScaffold(folder, { packageRoot: APP_ROOT, testSuffix: "tests" });
     },
   );
+
+  it.each(subcomponentFolders)(
+    "%s keeps its anatomy and its styles",
+    (folder) => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
+    },
+  );
+
+  it.each(providerFolders)("%s keeps its anatomy", (folder) => {
+    assertAnatomy(folder);
+  });
 
   it("are found in every domain library", () => {
     expect(DOMAIN_LIBRARIES).toEqual(
