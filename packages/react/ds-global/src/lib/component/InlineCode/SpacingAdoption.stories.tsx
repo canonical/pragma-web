@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { CSSProperties, ReactElement } from "react";
+import type { ReactElement } from "react";
 import { createPortal } from "react-dom";
 import { KeyboardKey } from "../KeyboardKey/index.js";
 import InlineCode from "./InlineCode.js";
@@ -47,9 +47,9 @@ const ProofCase = ({
       Run <InlineCode data-inline-data-code="">snap info juju</InlineCode>, then
       press <KeyboardKey data-inline-data-key-short="" keyValue="c" /> or the
       longer <KeyboardKey data-inline-data-key-long="" keyValue="backspace" />
-      key.
-      This surrounding sentence is deliberately long enough to wrap naturally
-      across multiple lines without fixture padding on either component.
+      key. This surrounding sentence is deliberately long enough to wrap
+      naturally across multiple lines without fixture padding on either
+      component.
     </p>
   </section>
 );
@@ -153,7 +153,8 @@ export const ContextualInputInline: Story = {
         };
         const px = (value: string, label: string): number => {
           const parsed = Number.parseFloat(value);
-          if (!Number.isFinite(parsed)) throw new Error(`${label} is not finite`);
+          if (!Number.isFinite(parsed))
+            throw new Error(`${label} is not finite`);
           return parsed;
         };
         const near = (
@@ -162,7 +163,9 @@ export const ContextualInputInline: Story = {
           label: string,
         ): void => {
           if (Math.abs(actual - expected) > 0.55) {
-            throw new Error(`${label}: expected ${expected}, received ${actual}`);
+            throw new Error(
+              `${label}: expected ${expected}, received ${actual}`,
+            );
           }
         };
         const readRolePx = (provider: HTMLElement, label: string): number => {
@@ -196,8 +199,16 @@ export const ContextualInputInline: Story = {
           label: string,
         ): void => {
           const style = proofWindow.getComputedStyle(node);
-          near(px(style.paddingInlineStart, `${label} start`), expected, `${label} start`);
-          near(px(style.paddingInlineEnd, `${label} end`), expected, `${label} end`);
+          near(
+            px(style.paddingInlineStart, `${label} start`),
+            expected,
+            `${label} start`,
+          );
+          near(
+            px(style.paddingInlineEnd, `${label} end`),
+            expected,
+            `${label} end`,
+          );
           const contents = proofDocument.createRange();
           contents.selectNodeContents(node);
           const contentRect = contents.getBoundingClientRect();
@@ -225,17 +236,70 @@ export const ContextualInputInline: Story = {
             throw new Error(`${label} text is unreadable in forced colors`);
           }
         };
+        const assertForcedKeyBorder = (
+          node: HTMLElement,
+          label: string,
+        ): void => {
+          const style = proofWindow.getComputedStyle(node);
+          const background = effectiveBackground(node);
+          const borders = [
+            {
+              color: style.borderTopColor,
+              side: "top",
+              style: style.borderTopStyle,
+              width: style.borderTopWidth,
+            },
+            {
+              color: style.borderRightColor,
+              side: "right",
+              style: style.borderRightStyle,
+              width: style.borderRightWidth,
+            },
+            {
+              color: style.borderBottomColor,
+              side: "bottom",
+              style: style.borderBottomStyle,
+              width: style.borderBottomWidth,
+            },
+            {
+              color: style.borderLeftColor,
+              side: "left",
+              style: style.borderLeftStyle,
+              width: style.borderLeftWidth,
+            },
+          ];
+          for (const border of borders) {
+            if (border.style !== "solid") {
+              throw new Error(`${label} ${border.side} border is not painted`);
+            }
+            near(
+              px(border.width, `${label} ${border.side} border`),
+              1,
+              `${label} ${border.side} border`,
+            );
+            if (
+              border.color === "transparent" ||
+              border.color === "rgba(0, 0, 0, 0)" ||
+              border.color === background
+            ) {
+              throw new Error(`${label} ${border.side} border is not visible`);
+            }
+          }
+        };
         const baselineOffset = (node: HTMLElement): number => {
           const probe = proofDocument.createElement("span");
           probe.style.cssText =
             "border:0;display:inline-block;block-size:0;inline-size:0;margin:0;padding:0;";
           node.after(probe);
           const offset =
-            probe.getBoundingClientRect().top - node.getBoundingClientRect().top;
+            probe.getBoundingClientRect().top -
+            node.getBoundingClientRect().top;
           probe.remove();
           return offset;
         };
-        const geometry = (node: HTMLElement): Record<string, string | number> => {
+        const geometry = (
+          node: HTMLElement,
+        ): Record<string, string | number> => {
           const style = proofWindow.getComputedStyle(node);
           return {
             baselineOffset: baselineOffset(node),
@@ -265,6 +329,8 @@ export const ContextualInputInline: Story = {
           }
         };
 
+        let assertionError: unknown;
+        let assertionFailed = false;
         try {
           await proofDocument.fonts.ready;
           for (const rootSize of rootSizes) {
@@ -286,7 +352,13 @@ export const ContextualInputInline: Story = {
                 const paragraph = fixture?.querySelector<HTMLElement>(
                   "[data-inline-data-paragraph]",
                 );
-                if (!fixture || !code || !keys || keys.length !== 2 || !paragraph) {
+                if (
+                  !fixture ||
+                  !code ||
+                  !keys ||
+                  keys.length !== 2 ||
+                  !paragraph
+                ) {
                   throw new Error(`${label} fixture is incomplete`);
                 }
                 if (
@@ -296,7 +368,9 @@ export const ContextualInputInline: Story = {
                   throw new Error("default fixture selected a product context");
                 }
                 if (code.tagName !== "CODE") {
-                  throw new Error(`${label} InlineCode lost native code semantics`);
+                  throw new Error(
+                    `${label} InlineCode lost native code semantics`,
+                  );
                 }
                 if (
                   Array.from(keys).some(
@@ -305,12 +379,19 @@ export const ContextualInputInline: Story = {
                       (!key.ariaLabel && !key.textContent?.trim()),
                   )
                 ) {
-                  throw new Error(`${label} KeyboardKey semantics are incomplete`);
+                  throw new Error(
+                    `${label} KeyboardKey semantics are incomplete`,
+                  );
                 }
                 near(readRolePx(fixture, label), expected, `${label} role`);
                 assertPadding(code, expected, `${label} InlineCode`);
                 for (const [index, key] of Array.from(keys).entries()) {
                   assertPadding(key, expected, `${label} KeyboardKey ${index}`);
+                  if (forcedColors) {
+                    // Only KeyboardKey has an existing border to verify in
+                    // forced colors.
+                    assertForcedKeyBorder(key, `${label} KeyboardKey ${index}`);
+                  }
                 }
                 consumerObservations += 1 + keys.length;
                 if (officialContexts.has(context)) primaryConfigurations += 1;
@@ -381,12 +462,12 @@ export const ContextualInputInline: Story = {
             }
             textNode = walker.nextNode();
           }
-          const lineTops = proseLineTops
-            .filter(
-              (top, index, values) =>
-                values.findIndex((candidate) => Math.abs(candidate - top) < 0.75) ===
-                index,
-            );
+          const lineTops = proseLineTops.filter(
+            (top, index, values) =>
+              values.findIndex(
+                (candidate) => Math.abs(candidate - top) < 0.75,
+              ) === index,
+          );
           if (lineTops.length < 2) {
             throw new Error("surrounding prose did not wrap naturally");
           }
@@ -442,12 +523,14 @@ export const ContextualInputInline: Story = {
           assertPadding(key, 8, "restored KeyboardKey context");
           assertGeometry(code, codeGeometry, "restored InlineCode");
           assertGeometry(key, keyGeometry, "restored KeyboardKey");
-
         } catch (error) {
-          proofRoot.dataset.inlineDataProofError =
-            error instanceof Error ? error.message : String(error);
-          throw error;
-        } finally {
+          assertionError = error;
+          assertionFailed = true;
+        }
+
+        let cleanupError: unknown;
+        let cleanupFailed = false;
+        try {
           for (const [node, style] of mutatedStyles) {
             if (style === null) node.removeAttribute("style");
             else node.setAttribute("style", style);
@@ -455,22 +538,32 @@ export const ContextualInputInline: Story = {
           if (originalRootStyle === null) documentRoot.removeAttribute("style");
           else documentRoot.setAttribute("style", originalRootStyle);
           await nextPaint();
-          if (documentRoot.getAttribute("style") !== originalRootStyle) {
-            const error = new Error("proof did not restore the document root");
-            proofRoot.dataset.inlineDataProofError = error.message;
-            throw error;
+          if (
+            (documentRoot.getAttribute("style") ?? "") !==
+            (originalRootStyle ?? "")
+          ) {
+            throw new Error("proof did not restore the document root");
           }
           for (const [node, style] of mutatedStyles) {
-            if (node.getAttribute("style") !== style) {
-              const error = new Error("proof did not restore a temporary hook");
-              proofRoot.dataset.inlineDataProofError = error.message;
-              throw error;
+            if ((node.getAttribute("style") ?? "") !== (style ?? "")) {
+              throw new Error("proof did not restore a temporary hook");
             }
           }
+        } catch (error) {
+          cleanupError = error;
+          cleanupFailed = true;
         }
 
-        proofRoot.dataset.inlineDataPrimaryConfigurations =
-          String(primaryConfigurations);
+        if (assertionFailed || cleanupFailed) {
+          const error = assertionFailed ? assertionError : cleanupError;
+          proofRoot.dataset.inlineDataProofError =
+            error instanceof Error ? error.message : String(error);
+          throw error;
+        }
+
+        proofRoot.dataset.inlineDataPrimaryConfigurations = String(
+          primaryConfigurations,
+        );
         proofRoot.dataset.inlineDataExtraConfigurations =
           String(extraConfigurations);
         proofRoot.dataset.inlineDataConsumerObservations =
