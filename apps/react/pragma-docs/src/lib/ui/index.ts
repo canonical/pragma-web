@@ -2,6 +2,8 @@
 
 export * from "./CanvasPage/index.js";
 export * from "./NotFoundPage/index.js";
+export * from "./PageSection/index.js";
+export * from "./ProsePage/index.js";
 export * from "./Shell/index.js";
 export * from "./SiteCardProjection/index.js";
 export * from "./SiteChipProjection/index.js";
