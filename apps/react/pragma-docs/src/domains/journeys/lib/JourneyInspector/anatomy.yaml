@@ -7,8 +7,16 @@
 # (a link only where the docsite renders it) with its kind in muted text,
 # and its role, its arrival and its layout as muted facets. An arrival the
 # pairing does not carry is left out; a surface that composes no layout
-# says so. A job nothing serves says so plainly. With no job selected, one
-# muted line says what selecting one shows.
+# says so. A job nothing serves says so plainly.
+#
+# With no job selected it is an overview of what the graph draws: the
+# drawn coordinate in words as the heading (or every coordinate), a muted
+# line saying it is what the graph holds, the counts (jobs, served,
+# unserved) side by side a gutter apart, each a small muted label over its
+# bold figure; then the legend section, one row per column, the hop drawn
+# by the published EntityGraphNode at the graph's 176 by 48 over what the
+# column means, and a small muted note; and the small muted line on how to
+# move about the graph and select a job.
 #
 # The root is a subgrid of the inspector region's columns, packed at the
 # top, padded by the component padding, its rows a gutter apart; every part
@@ -44,28 +52,50 @@ node:
     spacing.internal.inline.end: component.padding.inline
   edges:
     - node:
-        role: empty (the line with no job selected)
-        styles:
-          layout.grid.column: "1 / -1"
-          spacing.external.block.start: 0
-          spacing.external.block.end: 0
-          typography.color: color.text.muted
-      relation: { cardinality: "0..1", slotName: empty }
-    - node:
-        role: title (the job's label, the level-2 heading)
+        role: title (the job's label, or the drawn coordinate's, the level-2 heading)
         styles:
           layout.grid.column: "1 / -1"
           spacing.external.block.start: 0
           spacing.external.block.end: 0
       relation: { cardinality: "0..1", slotName: title }
     - node:
-        role: coordinate (in words)
+        role: coordinate (the job's in words, or the overview's line)
         styles:
           layout.grid.column: "1 / -1"
           spacing.external.block.start: 0
           spacing.external.block.end: 0
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: coordinate }
+    - node:
+        role: counts (the overview's jobs, served and unserved)
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: grid.gutter
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+        edges:
+          - node:
+              role: count
+              styles:
+                layout.type: flex
+                layout.direction: column
+              edges:
+                - node:
+                    role: count-label
+                    styles:
+                      typography.size: typography.text.secondary.fontSize
+                      typography.color: color.text.muted
+                  relation: { cardinality: "1", slotName: count-label }
+                - node:
+                    role: count-value
+                    styles:
+                      spacing.external.inline.start: 0
+                      typography.weight: typography.text.primary.bold.fontWeight
+                  relation: { cardinality: "1", slotName: count-value }
+            relation: { cardinality: "3", slotName: count }
+      relation: { cardinality: "0..1", slotName: counts }
     - node:
         role: story (verbatim)
         styles:
@@ -80,7 +110,7 @@ node:
           appearance.border.color: color.border.muted
       relation: { cardinality: "0..1", slotName: story }
     - node:
-        role: section (the acceptance criteria, then the pairings)
+        role: section (the acceptance criteria, then the pairings; or the legend)
         styles:
           layout.grid.column: "1 / -1"
           layout.type: flex
@@ -168,4 +198,53 @@ node:
                         relation: { cardinality: "1", slotName: facets }
                   relation: { cardinality: "1..*", slotName: pairing }
             relation: { cardinality: "0..1", slotName: pairings }
+          - node:
+              role: legend (one row per column)
+              styles:
+                layout.type: flex
+                layout.direction: column
+                spacing.gap: space.050
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+              edges:
+                - node:
+                    role: legend-row
+                    styles:
+                      layout.type: flex
+                      layout.direction: column
+                      spacing.gap: space.050
+                    edges:
+                      - node:
+                          role: glyph (the hop, drawn as the graph draws it)
+                          styles:
+                            layout.type: block
+                          edges:
+                            - node:
+                                uri: prism.component.entity_graph_node
+                              relation: { cardinality: "1" }
+                        relation: { cardinality: "1", slotName: glyph }
+                      - node:
+                          role: legend-text (what the column means)
+                        relation: { cardinality: "1", slotName: legend-text }
+                  relation: { cardinality: "5", slotName: legend-row }
+            relation: { cardinality: "0..1", slotName: legend }
+          - node:
+              role: note (a row that ends at its surface composes no layout)
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: note }
       relation: { cardinality: "0..2", slotName: section }
+    - node:
+        role: hint (how to move about the graph and select a job)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: hint }

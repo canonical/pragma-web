@@ -24,6 +24,15 @@ export const HOP_MESSAGES: Readonly<Record<HopKind, MessageKey>> = {
   layout: "journeys.hop.layout",
 };
 
+/** The legend's line for each hop kind: what its column means. */
+export const LEGEND_MESSAGES: Readonly<Record<HopKind, MessageKey>> = {
+  coordinate: "journeys.legend.coordinate",
+  job: "journeys.legend.job",
+  pairing: "journeys.legend.pairing",
+  surface: "journeys.legend.surface",
+  layout: "journeys.legend.layout",
+};
+
 /** The two readings of the demand model, in the switch's order. */
 export const JOURNEY_VIEWS: readonly JourneyView[] = ["table", "graph"];
 

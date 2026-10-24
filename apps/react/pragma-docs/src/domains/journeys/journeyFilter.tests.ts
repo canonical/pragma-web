@@ -11,10 +11,20 @@
 
 import { describe, expect, it } from "vitest";
 import {
+  BROWSE_JOB,
+  JOURNEY_MODEL,
+  MAKER_COORDINATE,
+  PERSONA_ARCHITECT,
+  ROLES_BY_COORDINATE,
+  WILDCARD_COORDINATE,
+} from "./__fixtures__/journeyModel.js";
+import type { RawJob } from "./collectJourneys.js";
+import {
   ALL_JOURNEYS_FILTER,
   chooseDefaultJourneyFilter,
   personaMatchesCoordinate,
   readPersonaTerm,
+  selectDrawnJourneys,
 } from "./journeyFilter.js";
 
 const DOCS = "sem://design-system-docs#";
@@ -90,5 +100,92 @@ describe("ALL_JOURNEYS_FILTER", () => {
       coordinate: undefined,
       persona: undefined,
     });
+  });
+});
+
+/** The fixture model's jobs as the operation delivers them, each carrying
+ * its coordinate's roles. */
+const RAW_JOBS: readonly RawJob[] = JOURNEY_MODEL.flatMap((coordinate) =>
+  coordinate.jobs.map((job) => ({
+    uri: job.uri,
+    coordinates: {
+      uri: coordinate.uri,
+      roles: {
+        edges: (ROLES_BY_COORDINATE[coordinate.uri] ?? []).map((uri) => ({
+          node: { uri },
+        })),
+      },
+    },
+  })),
+);
+
+/** The URIs of the coordinates a selection draws. */
+const drawnUris = (
+  selection: ReturnType<typeof selectDrawnJourneys>,
+): readonly string[] => selection.drawn.map((coordinate) => coordinate.uri);
+
+describe("selectDrawnJourneys", () => {
+  it("draws the default coordinate when the reader has chosen nothing", () => {
+    const selection = selectDrawnJourneys(
+      JOURNEY_MODEL,
+      RAW_JOBS,
+      undefined,
+      undefined,
+    );
+    const first = [MAKER_COORDINATE, WILDCARD_COORDINATE].sort().at(0);
+    expect(selection.filter.coordinate).toBe(first);
+    expect(drawnUris(selection)).toEqual([first]);
+  });
+
+  it("opens a job's page on the job's own coordinate", () => {
+    const selection = selectDrawnJourneys(
+      JOURNEY_MODEL,
+      RAW_JOBS,
+      undefined,
+      BROWSE_JOB,
+    );
+    expect(drawnUris(selection)).toEqual([MAKER_COORDINATE]);
+  });
+
+  it("follows the reader's choice made on the job on screen", () => {
+    const selection = selectDrawnJourneys(
+      JOURNEY_MODEL,
+      RAW_JOBS,
+      { job: undefined, filter: ALL_JOURNEYS_FILTER },
+      undefined,
+    );
+    expect(drawnUris(selection)).toEqual(
+      JOURNEY_MODEL.map((coordinate) => coordinate.uri),
+    );
+  });
+
+  it("leaves a choice made on another job's page behind", () => {
+    const selection = selectDrawnJourneys(
+      JOURNEY_MODEL,
+      RAW_JOBS,
+      { job: undefined, filter: ALL_JOURNEYS_FILTER },
+      BROWSE_JOB,
+    );
+    expect(drawnUris(selection)).toEqual([MAKER_COORDINATE]);
+  });
+
+  it("keeps only the coordinates the persona approximately matches", () => {
+    const selection = selectDrawnJourneys(
+      JOURNEY_MODEL,
+      RAW_JOBS,
+      {
+        job: undefined,
+        filter: { coordinate: undefined, persona: PERSONA_ARCHITECT },
+      },
+      undefined,
+    );
+    expect(drawnUris(selection)).toEqual(
+      JOURNEY_MODEL.filter((coordinate) =>
+        personaMatchesCoordinate(
+          PERSONA_ARCHITECT,
+          ROLES_BY_COORDINATE[coordinate.uri] ?? [],
+        ),
+      ).map((coordinate) => coordinate.uri),
+    );
   });
 });

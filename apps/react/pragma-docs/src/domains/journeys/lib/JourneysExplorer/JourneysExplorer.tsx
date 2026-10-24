@@ -6,9 +6,8 @@ import type { JourneysExplorerQuery } from "#relay/__generated__/JourneysExplore
 import journeysExplorerQueryNode from "#relay/__generated__/JourneysExplorerQuery.graphql.js";
 import { collectJourneys } from "../../collectJourneys.js";
 import {
-  chooseDefaultJourneyFilter,
   type JourneyFilter,
-  personaMatchesCoordinate,
+  selectDrawnJourneys,
 } from "../../journeyFilter.js";
 import { journeysExplorerVariables } from "../../journeysQuery.js";
 import {
@@ -150,16 +149,18 @@ const componentCssClassName = "ds journeys-explorer";
  * compute it alike. The rail dims and the table lists every job whatever
  * the filter; only the graph narrows.
  *
- * The table's arrangement and open details and the filter are the
- * reader's passing state, never the URL's, and start from constants or
- * from the data, so the first paint is the same on both sides.
+ * The table's arrangement and open details are the reader's passing
+ * state, never the URL's, and start from constants, so the first paint is
+ * the same on both sides. The filter the reader chooses lives in the view
+ * provider beside the view, where the inspector counts what the graph
+ * draws from it, and holds only on the job it was chosen on.
  *
  * `import { JourneysExplorer } from "../JourneysExplorer/index.js";`
  *
  * @implements docs.component.journeys_explorer
- * @note Impure: reads the Relay store and the view from the provider in
- *   scope, holds React state, and suspends while the store does not hold
- *   the operation.
+ * @note Impure: reads the Relay store, and the view and the filter from
+ *   the provider in scope, holds React state, and suspends while the store
+ *   does not hold the operation.
  */
 export default function JourneysExplorer({
   job,
@@ -200,49 +201,24 @@ export default function JourneysExplorer({
     [data.personas],
   );
 
-  const coordinateUris = useMemo(
-    () => coordinates.map((coordinate) => coordinate.uri),
-    [coordinates],
-  );
-
-  // The coordinate the selected job belongs to, so a link to a job lands
-  // on a graph that holds it.
-  const selectedCoordinate = useMemo(
-    () =>
-      job === undefined
-        ? undefined
-        : coordinates.find((coordinate) =>
-            coordinate.jobs.some((entry) => entry.uri === job),
-          )?.uri,
-    [coordinates, job],
-  );
-
-  const [filter, setFilter] = useState<JourneyFilter>(() =>
-    chooseDefaultJourneyFilter(coordinateUris, selectedCoordinate),
-  );
-
   // `/journeys/:job` is one route, so moving between jobs changes a param
-  // and does not remount the explorer. The filter follows the job here,
-  // during the render, so the graph never draws a coordinate without the
-  // selected job, and the table keeps its arrangement.
-  const [renderedJob, setRenderedJob] = useState(job);
-  if (job !== renderedJob) {
-    setRenderedJob(job);
-    setFilter(chooseDefaultJourneyFilter(coordinateUris, selectedCoordinate));
-  }
-
-  const drawn = useMemo(
+  // and does not remount the explorer. A choice of filter holds only on
+  // the job it was made on, so on another job the graph opens on that
+  // job's coordinate, and the table keeps its arrangement.
+  const { view, filter: choice, setFilter: setChoice } = useJourneyView();
+  const { filter, drawn } = useMemo(
     () =>
-      coordinates.filter(
-        (coordinate) =>
-          (filter.coordinate === undefined ||
-            filter.coordinate === coordinate.uri) &&
-          personaMatchesCoordinate(
-            filter.persona,
-            rolesByCoordinate[coordinate.uri] ?? [],
-          ),
+      selectDrawnJourneys(
+        coordinates,
+        data.jobs.edges.map((edge) => edge.node),
+        choice,
+        job,
       ),
-    [coordinates, filter, rolesByCoordinate],
+    [choice, coordinates, data.jobs, job],
+  );
+  const setFilter = useCallback(
+    (next: JourneyFilter) => setChoice({ job, filter: next }),
+    [job, setChoice],
   );
 
   const rows = useMemo(() => {
@@ -272,7 +248,6 @@ export default function JourneysExplorer({
     return buildJourneyRows(coordinates, detail);
   }, [coordinates, data.jobs]);
 
-  const { view } = useJourneyView();
   const [tableState, setTableState] =
     useState<JourneyTableState>(DEFAULT_TABLE_STATE);
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(

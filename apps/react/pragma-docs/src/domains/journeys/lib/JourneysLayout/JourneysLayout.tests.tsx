@@ -63,4 +63,22 @@ describe("JourneysLayout", () => {
     expect(inspector?.querySelector("#journey-inspector-title")).not.toBeNull();
     expect(fetchFn).not.toHaveBeenCalled();
   });
+
+  it("counts in the inspector what the explorer's filter draws", {
+    timeout: JOURNEYS_TEST_TIMEOUT_MS,
+  }, () => {
+    const { container } = render(
+      journeysLayoutAt(undefined, journeysExplorerRecords, createFetchSpy()),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Graph" }));
+    const heading = () =>
+      container.querySelector(".inspector #journey-inspector-title")
+        ?.textContent;
+    // The graph opens on one coordinate, and the overview names it.
+    expect(heading()).not.toBe("Every coordinate");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Show every coordinate" }),
+    );
+    expect(heading()).toBe("Every coordinate");
+  });
 });

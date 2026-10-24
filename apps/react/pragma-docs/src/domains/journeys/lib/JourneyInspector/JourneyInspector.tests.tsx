@@ -7,7 +7,7 @@ import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 import { appRoutes, middleware, notFoundRoute } from "../../../../routes.js";
 import { JOURNEY_MODEL } from "../../__fixtures__/journeyModel.js";
-import type { InspectedJob } from "../../types.js";
+import type { InspectedJob, JourneyScope } from "../../types.js";
 import JourneyInspector from "./JourneyInspector.js";
 
 const STORY =
@@ -36,14 +36,22 @@ const render = (element: ReactElement) =>
     </RouterProvider>,
   );
 
+/** The graph's scope: one coordinate's three jobs, one unserved. */
+const SCOPE: JourneyScope = {
+  coordinate: "any actor × writer × any fluency",
+  jobs: 3,
+  served: 2,
+  unserved: 1,
+};
+
 describe("JourneyInspector", () => {
   it("renders the story verbatim", () => {
-    render(<JourneyInspector job={BROWSE} />);
+    render(<JourneyInspector job={BROWSE} scope={SCOPE} />);
     expect(screen.getByText(STORY)).toBeInTheDocument();
   });
 
   it("lists the acceptance criteria and spells the coordinate out in words", () => {
-    render(<JourneyInspector job={BROWSE} />);
+    render(<JourneyInspector job={BROWSE} scope={SCOPE} />);
     expect(
       screen.getByText("listing + filters; Cmd-K; agents get listEntities"),
     ).toBeInTheDocument();
@@ -55,7 +63,7 @@ describe("JourneyInspector", () => {
   });
 
   it("shows each pairing's role and leaves out an absent arrival", () => {
-    render(<JourneyInspector job={BROWSE} />);
+    render(<JourneyInspector job={BROWSE} scope={SCOPE} />);
     const facets = [...document.querySelectorAll("[data-facet]")].map(
       (node) => `${node.getAttribute("data-facet")}:${node.textContent}`,
     );
@@ -70,13 +78,13 @@ describe("JourneyInspector", () => {
   });
 
   it("says in words that a surface composes no layout", () => {
-    render(<JourneyInspector job={BROWSE} />);
+    render(<JourneyInspector job={BROWSE} scope={SCOPE} />);
     expect(screen.getByText("composes no layout")).toBeInTheDocument();
     expect(screen.getByText("Catalog")).toBeInTheDocument();
   });
 
   it("links a surface only where the docsite renders one", () => {
-    render(<JourneyInspector job={BROWSE} />);
+    render(<JourneyInspector job={BROWSE} scope={SCOPE} />);
     expect(
       screen
         .getByRole("link", { name: "view.components" })
@@ -91,6 +99,7 @@ describe("JourneyInspector", () => {
     render(
       <JourneyInspector
         job={{ ...BROWSE, label: "job.orphan", pairings: [] }}
+        scope={SCOPE}
       />,
     );
     expect(
@@ -98,15 +107,55 @@ describe("JourneyInspector", () => {
     ).toBeInTheDocument();
   });
 
-  it("says what selecting a job shows when none is selected", () => {
-    render(<JourneyInspector job={undefined} />);
+  it("heads its overview with the drawn coordinate and counts its jobs", () => {
+    render(<JourneyInspector job={undefined} scope={SCOPE} />);
     expect(
-      screen.getByText(/Select a job to read its story/),
+      screen.getByRole("heading", {
+        level: 2,
+        name: "any actor × writer × any fluency",
+      }),
+    ).toHaveAttribute("id", "journey-inspector-title");
+    const counts = [...document.querySelectorAll(".count")].map(
+      (count) => count.textContent,
+    );
+    expect(counts).toEqual(["Jobs3", "Served2", "Unserved1"]);
+  });
+
+  it("names every coordinate when the graph draws them all", () => {
+    render(
+      <JourneyInspector
+        job={undefined}
+        scope={{ ...SCOPE, coordinate: undefined }}
+      />,
+    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Every coordinate" }),
     ).toBeInTheDocument();
   });
 
+  it("draws the legend's hops as the graph does, and says how to move about it", () => {
+    render(<JourneyInspector job={undefined} scope={SCOPE} />);
+    const rows = [...document.querySelectorAll(".legend-row")];
+    expect(rows.map((row) => row.getAttribute("data-kind"))).toEqual([
+      "coordinate",
+      "job",
+      "pairing",
+      "surface",
+      "layout",
+    ]);
+    for (const row of rows) {
+      expect(
+        row.querySelector("svg.glyph .ds.entity-graph-node"),
+      ).not.toBeNull();
+    }
+    expect(
+      document.querySelector('[data-kind="pairing"] .surface.is-hollow'),
+    ).not.toBeNull();
+    expect(screen.getByText(/Drag to pan/)).toBeInTheDocument();
+  });
+
   it("names its region and its job's heading", () => {
-    render(<JourneyInspector job={BROWSE} />);
+    render(<JourneyInspector job={BROWSE} scope={SCOPE} />);
     expect(
       screen.getByRole("complementary", { name: "Job inspector" }),
     ).toBeInTheDocument();
@@ -121,6 +170,7 @@ describe("JourneyInspector", () => {
         className="is-quiet"
         data-testid="inspector"
         job={undefined}
+        scope={SCOPE}
       />,
     );
     expect(screen.getByTestId("inspector").className).toBe(

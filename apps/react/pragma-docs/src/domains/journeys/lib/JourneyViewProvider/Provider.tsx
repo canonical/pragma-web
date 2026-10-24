@@ -4,8 +4,8 @@ import useProviderState from "./hooks/useProviderState.js";
 import type { JourneyViewProviderProps } from "./types.js";
 
 /**
- * Provides the reading the journeys canvas shows to the strip's switch, the
- * explorer and the inspector. `JourneysLayout` puts it around all three,
+ * Provides the reading the journeys canvas shows, and the graph's filter,
+ * to the strip's switch, the explorer and the inspector. `JourneysLayout` puts it around all three,
  * and it lives as long as the layout, which the router remounts whenever
  * the matched route changes: the view survives a move from one job to
  * another (the same route, new params) and starts from the table on a move

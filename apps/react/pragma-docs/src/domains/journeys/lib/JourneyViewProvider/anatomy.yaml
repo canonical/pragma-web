@@ -1,7 +1,8 @@
 ---
 # JourneyViewProvider — the reading the journeys canvas shows (the table
-# or the graph), shared by the strip's switch, the explorer and the
-# inspector; it starts from the table on every visit to the lens. A context
+# or the graph) and the graph's filter as the reader chose it, shared by
+# the strip's switch, the explorer and the inspector; it starts from the
+# table and no choice on every visit to the lens. A context
 # provider: it renders no element and binds no style, and it follows the
 # provider structure (Provider.tsx, Context.tsx, hooks/), so the folder has
 # no stylesheet and no stories.

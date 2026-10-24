@@ -7,9 +7,7 @@ import {
 } from "@canonical/prism-core";
 import { useRouter } from "@canonical/router-react";
 import { type ReactElement, useCallback, useMemo } from "react";
-import { type MessageKey, useMessages } from "#i18n";
-import { HOP_KINDS } from "../../constants.js";
-import type { HopKind } from "../../types.js";
+import { useMessages } from "#i18n";
 import { buildJourneyGraph } from "./buildJourneyGraph.js";
 import { JourneyHop } from "./common/index.js";
 import {
@@ -32,15 +30,6 @@ import type {
 import "./styles.css";
 
 const componentCssClassName = "ds journey-well";
-
-/** The legend's line for each hop kind. */
-const LEGEND_MESSAGES: Readonly<Record<HopKind, MessageKey>> = {
-  coordinate: "journeys.legend.coordinate",
-  job: "journeys.legend.job",
-  pairing: "journeys.legend.pairing",
-  surface: "journeys.legend.surface",
-  layout: "journeys.legend.layout",
-};
 
 /**
  * An edge's path: from its source's right middle to its target's left
@@ -65,8 +54,9 @@ function drawEdge(
 /**
  * The journeys graph: the filtered coordinates' journeys, coordinate to
  * job to pairing to surface to layout, left to right, drawn in SVG inside
- * `GraphCanvas`, which pans and zooms it, over a legend of what each
- * column means.
+ * `GraphCanvas`, which pans and zooms it. The legend and the line on how
+ * to move about the graph are the inspector's, beside the canvas, so
+ * nothing is drawn over the graph.
  *
  * It server-renders with nothing to measure: positions come from
  * `buildJourneyGraph`, pure over the data; hop sizes are constants; the
@@ -140,11 +130,6 @@ export default function JourneyWell({
     >
       <GraphCanvas
         className="graph"
-        hint={
-          job === undefined
-            ? t("journeys.graph.hint")
-            : t("journeys.graph.hintSelected")
-        }
         bounds={bounds}
         label={t("journeys.graph.label")}
         opening={opening}
@@ -191,15 +176,6 @@ export default function JourneyWell({
           ))}
         </g>
       </GraphCanvas>
-      <div className="legend">
-        <p className="legend-title">{t("journeys.legend.title")}</p>
-        <ol className="legend-columns">
-          {HOP_KINDS.map((kind) => (
-            <li key={kind}>{t(LEGEND_MESSAGES[kind])}</li>
-          ))}
-        </ol>
-        <p className="legend-note">{t("journeys.legend.note")}</p>
-      </div>
     </div>
   );
 }

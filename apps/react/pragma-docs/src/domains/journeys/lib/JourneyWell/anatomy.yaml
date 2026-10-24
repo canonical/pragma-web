@@ -1,8 +1,10 @@
 ---
 # JourneyWell — the journeys graph: the filtered coordinates' journeys,
 # coordinate to job to pairing to surface to layout, left to right, drawn
-# in native SVG inside prism-core's GraphCanvas, which pans and zooms it,
-# over a legend of what each column means. Server-rendered with nothing to
+# in native SVG inside prism-core's GraphCanvas, which pans and zooms it.
+# The legend and the line on how to move about the graph are the
+# inspector's overview (JourneyInspector), so nothing is drawn over the
+# canvas. Server-rendered with nothing to
 # measure: positions come from the pure layout. The canvas pans as far as
 # the hops' bounds with a 16-unit margin; the first paint's viewBox is
 # those bounds when they fit the design canvas at the legible zoom (12/14
@@ -27,11 +29,10 @@
 # right middle and land on the next's left middle as horizontal cubics,
 # 1 unit in the line colour; a primary
 # pairing's edge is 2 units in the text colour and a secondary pairing's is
-# dashed. A row that ends at its surface composes no layout, and the
-# legend says so. The legend sits under the canvas, small and muted.
+# dashed. A row that ends at its surface composes no layout.
 #
-# The root is a grid of two rows a gutter apart, the canvas taking the
-# rest of the cell; the legend's lines stack a tight step apart.
+# The root is a grid of one row, its gap the gutter as every grid's is:
+# the canvas takes the whole cell.
 #
 # Bespoke: no published component draws a journey. SVG paints through
 # currentColor: the roster has no fill or stroke key, so each shape's
@@ -42,20 +43,18 @@
 # (`--journey-well-*`), bound to the symbol or the literal named here.
 #
 # Token ledger:
-#   space.050: the legend's gap; flex gaps read no container gap.
-#   layout.grid.rows "minmax(0, 1fr) auto": structure. The 0 resets.
+#   layout.grid.rows "minmax(0, 1fr)": structure. The 0 resets.
 #   In constants.ts (SVG geometry is attributes, not CSS): NODE_WIDTH 176,
 #   NODE_HEIGHT 48, COLUMN_PITCH 240, ROW_PITCH 64, VIEW_MARGIN 16,
 #   EDGE_WIDTH 1, PRIMARY_EDGE_WIDTH 2, SECONDARY_EDGE_DASH "4 4"; the
 #   camera's LEGIBLE_ZOOM 12/14 and DESIGN_CANVAS 576 by 736 px.
 #
-# Roster namespaces (accepted and tracked): grid.gutter, space.050,
-# component.padding.inline, and the semantic typography symbols.
+# Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: docs.component.journey_well
   styles:
     layout.type: grid
-    layout.grid.rows: "minmax(0, 1fr) auto"
+    layout.grid.rows: "minmax(0, 1fr)"
     spacing.gap: grid.gutter
     size.block: 100%
     size.min.block: 0
@@ -90,33 +89,3 @@ node:
                   relation: { cardinality: "0..*", slotName: hop }
             relation: { cardinality: "1", slotName: hops }
       relation: { cardinality: "1", slotName: graph }
-    - node:
-        role: legend
-        styles:
-          layout.type: flex
-          layout.direction: column
-          spacing.gap: space.050
-          typography.size: typography.text.secondary.fontSize
-          typography.color: color.text.muted
-        edges:
-          - node:
-              role: legend title
-              styles:
-                spacing.external.block.start: 0
-                spacing.external.block.end: 0
-                typography.weight: typography.text.primary.bold.fontWeight
-            relation: { cardinality: "1", slotName: legend-title }
-          - node:
-              role: legend columns (one line per column)
-              styles:
-                spacing.external.block.start: 0
-                spacing.external.block.end: 0
-                spacing.internal.inline.start: component.padding.inline
-            relation: { cardinality: "1", slotName: legend-columns }
-          - node:
-              role: legend note
-              styles:
-                spacing.external.block.start: 0
-                spacing.external.block.end: 0
-            relation: { cardinality: "1", slotName: legend-note }
-      relation: { cardinality: "1", slotName: legend }

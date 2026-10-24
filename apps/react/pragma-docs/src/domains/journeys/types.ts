@@ -1,4 +1,5 @@
 import type { HOP_KINDS } from "./constants.js";
+import type { JourneyFilter } from "./journeyFilter.js";
 
 /**
  * Which reading of the demand model the canvas shows: the table, every job
@@ -96,4 +97,28 @@ export interface InspectedJob {
   readonly coordinate: string;
   /** Every pairing that serves the job. */
   readonly pairings: readonly JourneyPairing[];
+}
+
+/**
+ * The filter a reader chose for the graph, with the job on screen when
+ * they chose it: a choice made on one job's page does not carry over to
+ * another job's, which opens on its own coordinate.
+ */
+export interface JourneyFilterChoice {
+  /** The selected job's URI when the choice was made, if any. */
+  readonly job: string | undefined;
+  /** The filter chosen. */
+  readonly filter: JourneyFilter;
+}
+
+/** What the graph draws, counted: the inspector's overview with no job. */
+export interface JourneyScope {
+  /** The drawn coordinate's words, or undefined when every one is drawn. */
+  readonly coordinate: string | undefined;
+  /** How many jobs the graph draws. */
+  readonly jobs: number;
+  /** How many of them a surface serves. */
+  readonly served: number;
+  /** How many of them nothing serves. */
+  readonly unserved: number;
 }

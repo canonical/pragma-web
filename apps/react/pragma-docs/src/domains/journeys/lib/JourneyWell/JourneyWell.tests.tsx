@@ -161,10 +161,10 @@ describe("JourneyWell", () => {
     }
   });
 
-  it("explains its columns in a legend under the graph", () => {
+  it("draws nothing over the graph: no legend and no hint", () => {
     render(wellAt(undefined));
-    expect(screen.getByText("Reading a row")).toBeInTheDocument();
-    expect(document.querySelectorAll(".legend-columns li").length).toBe(5);
+    expect(document.querySelector(".legend")).toBeNull();
+    expect(document.querySelector(".hint")).toBeNull();
   });
 
   it("opens on the whole graph when it fits the design canvas legibly", () => {

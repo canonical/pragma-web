@@ -11,6 +11,14 @@ const meta: Meta<typeof JourneyInspector> = {
   component: JourneyInspector,
   tags: ["autodocs"],
   decorators: [withRouter({ routes: SITE_ROUTES })],
+  args: {
+    scope: {
+      coordinate: "any actor × writer × any fluency",
+      jobs: 3,
+      served: 2,
+      unserved: 1,
+    },
+  },
 };
 
 export default meta;
@@ -45,5 +53,14 @@ export const Unserved: Story = {
   },
 };
 
-/** No job selected: one line says what selecting one shows. */
+/** No job selected: an overview of what the graph draws, its counts and
+ * its legend, and the line on how to move about the graph. */
 export const NoSelection: Story = { args: { job: undefined } };
+
+/** No job selected, every coordinate drawn. */
+export const NoSelectionEveryCoordinate: Story = {
+  args: {
+    job: undefined,
+    scope: { coordinate: undefined, jobs: 52, served: 51, unserved: 1 },
+  },
+};

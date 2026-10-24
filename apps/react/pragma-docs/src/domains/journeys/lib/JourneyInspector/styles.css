@@ -27,12 +27,6 @@
     padding-inline: var(--journey-inspector-padding-inline);
   }
 
-  .ds.journey-inspector .empty {
-    grid-column: 1 / -1;
-    margin-block: 0;
-    color: var(--journey-inspector-muted);
-  }
-
   .ds.journey-inspector .title {
     grid-column: 1 / -1;
     margin-block: 0;
@@ -42,6 +36,31 @@
     grid-column: 1 / -1;
     margin-block: 0;
     color: var(--journey-inspector-muted);
+  }
+
+  /* The overview's counts, side by side a gutter apart, each its label
+   * over its figure. */
+  .ds.journey-inspector .counts {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--journey-inspector-gap);
+    margin-block: 0;
+  }
+
+  .ds.journey-inspector .count {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ds.journey-inspector .count-label {
+    font-size: var(--journey-inspector-small);
+    color: var(--journey-inspector-muted);
+  }
+
+  .ds.journey-inspector .count-value {
+    margin-inline-start: 0;
+    font-weight: var(--journey-inspector-bold);
   }
 
   /* The story, quoted verbatim under a start rule. */
@@ -117,6 +136,40 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--journey-inspector-stack-gap);
+    margin-block: 0;
+    font-size: var(--journey-inspector-small);
+    color: var(--journey-inspector-muted);
+  }
+
+  /* The legend: one row per column, the hop as the graph draws it over
+   * what the column means. */
+  .ds.journey-inspector .legend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--journey-inspector-stack-gap);
+    list-style: none;
+    margin-block: 0;
+    padding-inline-start: 0;
+  }
+
+  .ds.journey-inspector .legend-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--journey-inspector-stack-gap);
+  }
+
+  .ds.journey-inspector .glyph {
+    display: block;
+  }
+
+  .ds.journey-inspector .note {
+    margin-block: 0;
+    font-size: var(--journey-inspector-small);
+    color: var(--journey-inspector-muted);
+  }
+
+  .ds.journey-inspector .hint {
+    grid-column: 1 / -1;
     margin-block: 0;
     font-size: var(--journey-inspector-small);
     color: var(--journey-inspector-muted);

@@ -28,7 +28,7 @@ describe("Inspector", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("says what selecting a job shows on the lens index", {
+  it("gives an overview of what the graph draws on the lens index", {
     timeout: JOURNEYS_TEST_TIMEOUT_MS,
   }, () => {
     render(
@@ -39,8 +39,11 @@ describe("Inspector", () => {
         <Inspector />,
       ),
     );
-    expect(
-      screen.getByText(/Select a job to read its story/),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2 })).toHaveAttribute(
+      "id",
+      "journey-inspector-title",
+    );
+    expect(document.querySelectorAll(".count")).toHaveLength(3);
+    expect(document.querySelectorAll(".legend-row")).toHaveLength(5);
   });
 });

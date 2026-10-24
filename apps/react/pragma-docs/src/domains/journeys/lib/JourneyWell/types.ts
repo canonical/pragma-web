@@ -35,7 +35,7 @@ type OwnProps = {
 /**
  * Props accepted by `JourneyWell`: the coordinates and the selected job,
  * then the native props of its `<div>` root. The native `children` are
- * excluded: the well renders the graph and its legend.
+ * excluded: the well renders the graph.
  */
 export type JourneyWellProps = OwnProps &
   Omit<ComponentProps<"div">, keyof OwnProps | "children">;

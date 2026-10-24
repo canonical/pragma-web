@@ -162,9 +162,7 @@ export const MESSAGES = {
   "journeys.column.served": "State",
   "journeys.graph.label": "Journeys from demand to surface",
   "journeys.graph.hint":
-    "Showing one coordinate: select a job, from the rail or the graph, to centre the graph on it",
-  "journeys.graph.hintSelected":
-    "Drag to pan · scroll to zoom · select a job to inspect it",
+    "Drag to pan · scroll to zoom · select a job, from the rail or the graph, to inspect it",
   "journeys.hop.coordinate": "Coordinate",
   "journeys.hop.job": "Job",
   "journeys.hop.pairing": "Pairing",
@@ -180,8 +178,9 @@ export const MESSAGES = {
   "journeys.legend.note":
     "A row that ends at its surface composes no layout: that is the model’s own silence, not a missing link.",
   "journeys.inspector.label": "Job inspector",
-  "journeys.inspector.empty":
-    "Select a job to read its story, its acceptance criteria, and the surfaces that serve it.",
+  "journeys.scope.all": "Every coordinate",
+  "journeys.scope.label": "In the graph",
+  "journeys.scope.jobs": "Jobs",
   "journeys.inspector.servedBy": "Served by",
   "journeys.inspector.noLayout": "composes no layout",
   "notFound.title": "Page not found",

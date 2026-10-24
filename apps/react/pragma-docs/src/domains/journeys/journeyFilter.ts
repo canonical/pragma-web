@@ -27,6 +27,9 @@
  * `window` or the query string.
  */
 
+import type { RawJob } from "./collectJourneys.js";
+import type { JourneyCoordinate, JourneyFilterChoice } from "./types.js";
+
 /**
  * The persona axis, and the honest statement of what it can and cannot do.
  *
@@ -124,6 +127,61 @@ export const personaMatchesCoordinate = (
   if (roleUris.length === 0) return true;
   const wanted = readBareTerm(persona);
   return roleUris.some((role) => readBareTerm(role) === wanted);
+};
+
+/**
+ * Select what the graph draws: the filter in force, the reader's choice
+ * when it was made on the job now on screen, else the default for that
+ * job, and the coordinates it keeps. The explorer draws them and the
+ * inspector counts them, each from the same data, so the two agree on the
+ * server and on the client.
+ *
+ * @param coordinates - The coordinate tree `collectJourneys` builds.
+ * @param jobs - The operation's jobs, which carry each coordinate's roles.
+ * @param choice - The reader's choice, if any.
+ * @param job - The selected job's URI, or undefined on the lens index.
+ * @returns The filter in force and the coordinates it keeps.
+ */
+export const selectDrawnJourneys = (
+  coordinates: readonly JourneyCoordinate[],
+  jobs: readonly RawJob[],
+  choice: JourneyFilterChoice | undefined,
+  job: string | undefined,
+): {
+  readonly filter: JourneyFilter;
+  readonly drawn: readonly JourneyCoordinate[];
+} => {
+  const selectedCoordinate =
+    job === undefined
+      ? undefined
+      : coordinates.find((coordinate) =>
+          coordinate.jobs.some((entry) => entry.uri === job),
+        )?.uri;
+  const filter =
+    choice !== undefined && choice.job === job
+      ? choice.filter
+      : chooseDefaultJourneyFilter(
+          coordinates.map((coordinate) => coordinate.uri),
+          selectedCoordinate,
+        );
+  const rolesByCoordinate = new Map<string, readonly string[]>();
+  for (const { coordinates: coordinate } of jobs) {
+    if (coordinate == null) continue;
+    rolesByCoordinate.set(
+      coordinate.uri,
+      (coordinate.roles?.edges ?? []).map((edge) => edge.node.uri),
+    );
+  }
+  const drawn = coordinates.filter(
+    (coordinate) =>
+      (filter.coordinate === undefined ||
+        filter.coordinate === coordinate.uri) &&
+      personaMatchesCoordinate(
+        filter.persona,
+        rolesByCoordinate.get(coordinate.uri) ?? [],
+      ),
+  );
+  return { filter, drawn };
 };
 
 /** A persona's display term, for chips and the rail's heading. */

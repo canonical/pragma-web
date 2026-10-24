@@ -22,6 +22,14 @@ const renderToString = (element: ReactElement): string =>
     </RouterProvider>,
   );
 
+/** The graph's scope: one coordinate's three jobs, one unserved. */
+const SCOPE = {
+  coordinate: "any actor × writer × any fluency",
+  jobs: 3,
+  served: 2,
+  unserved: 1,
+} as const;
+
 describe("JourneyInspector SSR", () => {
   it("renders the job's story and pairings to a string", () => {
     const html = renderToString(
@@ -34,6 +42,7 @@ describe("JourneyInspector SSR", () => {
           coordinate: "any actor × writer × any fluency",
           pairings: JOURNEY_MODEL[0]?.jobs[0]?.pairings ?? [],
         }}
+        scope={SCOPE}
       />,
     );
 
@@ -42,8 +51,11 @@ describe("JourneyInspector SSR", () => {
     expect(html).toContain("composes no layout");
   });
 
-  it("renders the empty line with no selection", () => {
-    const html = renderToString(<JourneyInspector job={undefined} />);
-    expect(html).toContain("Select a job");
+  it("renders the overview of the graph with no selection", () => {
+    const html = renderToString(
+      <JourneyInspector job={undefined} scope={SCOPE} />,
+    );
+    expect(html).toContain("any actor × writer × any fluency");
+    expect(html).toContain('class="legend-row"');
   });
 });
