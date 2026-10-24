@@ -11,6 +11,7 @@ import storyQuery, {
   type LineCardStoryQuery,
 } from "#relay/__generated__/LineCardStoryQuery.graphql.js";
 import {
+  withCards,
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
@@ -63,8 +64,13 @@ const meta: Meta<typeof Component> = {
   title: "Components/LineCard",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRelayEnvironment, withProjections(), withRouter()],
-  parameters: { relay: mockEntity() },
+  decorators: [
+    withCards(),
+    withRelayEnvironment,
+    withProjections(),
+    withRouter(),
+  ],
+  parameters: { relay: mockEntity(), grid: "intrinsic" },
   render: (args) => <LineCardOverNode {...args} />,
 };
 

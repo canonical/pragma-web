@@ -11,6 +11,7 @@ import storyQuery, {
   type InterchangeCardStoryQuery,
 } from "#relay/__generated__/InterchangeCardStoryQuery.graphql.js";
 import {
+  withCards,
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
@@ -66,8 +67,13 @@ const meta: Meta<typeof Component> = {
   title: "Components/InterchangeCard",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRelayEnvironment, withProjections(), withRouter()],
-  parameters: { relay: mockEntity() },
+  decorators: [
+    withCards(),
+    withRelayEnvironment,
+    withProjections(),
+    withRouter(),
+  ],
+  parameters: { relay: mockEntity(), grid: "intrinsic" },
   render: (args) => <InterchangeCardOverNode {...args} />,
 };
 

@@ -11,6 +11,7 @@ import storyQuery, {
   type ZoneCardStoryQuery,
 } from "#relay/__generated__/ZoneCardStoryQuery.graphql.js";
 import {
+  withCards,
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
@@ -59,8 +60,13 @@ const meta: Meta<typeof Component> = {
   title: "Components/ZoneCard",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRelayEnvironment, withProjections(), withRouter()],
-  parameters: { relay: mockEntity() },
+  decorators: [
+    withCards(),
+    withRelayEnvironment,
+    withProjections(),
+    withRouter(),
+  ],
+  parameters: { relay: mockEntity(), grid: "intrinsic" },
   render: (args) => <ZoneCardOverNode {...args} />,
 };
 

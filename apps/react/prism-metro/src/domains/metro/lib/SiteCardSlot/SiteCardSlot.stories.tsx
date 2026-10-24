@@ -11,6 +11,7 @@ import storyQuery, {
   type SiteCardSlotStoryQuery,
 } from "#relay/__generated__/SiteCardSlotStoryQuery.graphql.js";
 import {
+  withCards,
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
@@ -60,9 +61,14 @@ const meta: Meta<typeof Component> = {
   title: "Components/SiteCardSlot",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRelayEnvironment, withProjections(), withRouter()],
+  decorators: [
+    withCards(),
+    withRelayEnvironment,
+    withProjections(),
+    withRouter(),
+  ],
   args: { typename: "Station" },
-  parameters: { relay: mockEntity(MOCK_STATION) },
+  parameters: { relay: mockEntity(MOCK_STATION), grid: "intrinsic" },
   render: (args) => <SiteCardSlotOverNode {...args} />,
 };
 

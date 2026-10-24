@@ -11,6 +11,7 @@ import storyQuery, {
   type StationCardStoryQuery,
 } from "#relay/__generated__/StationCardStoryQuery.graphql.js";
 import {
+  withCards,
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
@@ -61,8 +62,13 @@ const meta: Meta<typeof Component> = {
   title: "Components/StationCard",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRelayEnvironment, withProjections(), withRouter()],
-  parameters: { relay: mockEntity() },
+  decorators: [
+    withCards(),
+    withRelayEnvironment,
+    withProjections(),
+    withRouter(),
+  ],
+  parameters: { relay: mockEntity(), grid: "intrinsic" },
   render: (args) => <StationCardOverNode {...args} />,
 };
 
