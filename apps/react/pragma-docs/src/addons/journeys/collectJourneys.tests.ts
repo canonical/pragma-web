@@ -233,7 +233,7 @@ describe("ROUTE_BY_SURFACE", () => {
     const sources = [
       "components/routes.ts",
       "marketing/routes.ts",
-      "lenses/routes.tsx",
+      "guides/routes.tsx",
     ].map((file) => readFileSync(`${routesDir}${file}`, "utf-8"));
     // The Definitions and Standards lenses ship as packages, so their routes
     // are read off the records the site builds from them rather than off a

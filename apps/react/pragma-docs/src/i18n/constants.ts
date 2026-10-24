@@ -16,6 +16,13 @@ export const MESSAGES = {
   "rail.signIn": "Demo sign-in",
   "colophon.statement":
     "Pragma — the design system, documented from its knowledge graph.",
+  "guides.title": "Guides",
+  "guides.lands":
+    "Long-form reading: foundations, setup, the analog map — prose that references entities through chips.",
+  "guides.placeholder":
+    "This canvas is a placeholder: the frame around it is finished, and the guides land with the reading views.",
+  "guides.documentTitle": "{slug} — Guides",
+  "guides.guideCopy": "Guide content for {slug}.",
   "notFound.title": "Page not found",
   "notFound.body": "The page you are looking for does not exist.",
   "block.version": "v{version}",

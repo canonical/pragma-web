@@ -221,8 +221,9 @@ const EXPECTED_ARIA_CURRENT: Readonly<Record<string, readonly string[]>> = {
  * an ENTITY page is the lens crumb (a router link back to the index) plus
  * the current crumb, whose text is the ROUTE PARAM (a prefixed URI/slug),
  * not a fetched display name — so the assertion stays stable across ontology
- * edits, and a wrong trail (or a stub suddenly rendering one) fails here.
- * `/guides` renders under `GuidesLayout`, whose context slot is empty.
+ * edits, and a wrong trail fails here. A guide's page shows the guides'
+ * crumb and the guide's slug, as an entity page shows its lens and its
+ * address.
  */
 
 /** Build the exact breadcrumb markup a `LensBreadcrumbs` renders in the
@@ -245,13 +246,13 @@ const trail = (
 const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
   // The lobby shows its lens name too (AV-350) — "Home", exactly as the
   // lens declaration labels it; on its single address it is one current
-  // crumb. Only `/guides` (still a stub) shows nothing.
+  // crumb.
   "/": trail("Home"),
   "/components": trail("Components"),
   "/definitions": trail("Definitions"),
   "/standards": trail("Standards"),
   "/journeys": trail("Journeys"),
-  "/guides": "",
+  "/guides": trail("Guides"),
   // Entity pages: the lens crumb links back to the index, the terminal
   // crumb is the ROUTE PARAM (percent-decoded), never a live display name.
   [BUTTON_ENTITY_URL]: trail("Components", {
@@ -270,15 +271,19 @@ const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
     lensHref: "/journeys",
     current: "sem://design-system-docs#job.l3",
   }),
-  // The guide page renders under the Guides layout, the playground and the
-  // account pages under their own: every one of them leaves the trail out.
+  // The playground and the account pages render under their own layouts,
+  // each leaving the trail out.
   ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, ""])),
+  [GUIDE_URL]: trail("Guides", {
+    lensHref: "/guides",
+    current: "getting-started",
+  }),
 };
 
 /** Per-URL count of `aria-current="page"` carried INSIDE the strip context
  * slot: the breadcrumb trail's terminal (current) crumb carries exactly one,
  * on every URL whose layout renders a trail — i.e. every measured URL but
- * `/guides` (the lone stub with an empty context). The aria-current census
+ * the playground and the account pages. The aria-current census
  * below adds this to the rail's anchor count, because the current crumb is a
  * `<span>`, invisible to the anchor-scoped href model but real to a total
  * count over the whole chrome. */
@@ -288,12 +293,13 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
   "/definitions": 1,
   "/standards": 1,
   "/journeys": 1,
-  "/guides": 0,
+  "/guides": 1,
   [BUTTON_ENTITY_URL]: 1,
   [DEFINITIONS_TERM_URL]: 1,
   [STANDARD_READING_URL]: 1,
   [JOURNEYS_JOB_URL]: 1,
   ...Object.fromEntries(NON_LENS_URLS.map((url) => [url, 0])),
+  [GUIDE_URL]: 1,
 };
 
 /**
@@ -565,7 +571,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
       'id="journey-inspector-title"',
     );
     expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain('class="hop');
-    expect(mustGet("/guides").canvas).toContain('id="lens-guides-title"');
+    expect(mustGet("/guides").canvas).toContain('id="guides-title"');
     // The entity page renders its REAL data from the fixture records, not
     // a loading state — the whole view SSRs from a warm store.
     expect(mustGet(BUTTON_ENTITY_URL).canvas).toContain(
@@ -578,7 +584,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     // its slug, the playground its probe from the warm store, and the
     // account and login pages their copy.
     expect(mustGet(GUIDE_URL).canvas).toContain(
-      '<h1 id="guide-title">getting-started</h1>',
+      '<h1 class="heading" id="guide-title">getting-started</h1>',
     );
     expect(mustGet("/playground").canvas).toContain('id="playground-title"');
     expect(mustGet("/playground").canvas).not.toContain("Loading the graph");
@@ -644,7 +650,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     // The total is the rail's exact-match anchors PLUS the strip
     // breadcrumb's terminal (current) crumb — a `<span aria-current="page">`
     // the anchor model above cannot see, present on every URL that claims a
-    // Context (all but `/guides`). Both carriers are modelled, so an
+    // Context (all but the pages with no trail). Both carriers are modelled, so an
     // unaccounted-for third would break this.
     for (const [url, { chrome }] of getPages()) {
       expect(

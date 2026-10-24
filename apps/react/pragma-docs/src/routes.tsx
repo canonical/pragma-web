@@ -7,7 +7,7 @@ import { journeysLayout, journeysRoutes } from "#addons/journeys";
 import { accountLayout, accountRoutes } from "#domains/account";
 import { componentsLayout, componentsRoutes } from "#domains/components";
 import { definitionsLayout } from "#domains/definitions";
-import { guidesLayout, lensRoutes } from "#domains/lenses";
+import { guidesLayout, guidesRoutes } from "#domains/guides";
 import { marketingLayout, marketingRoutes } from "#domains/marketing";
 import { playgroundLayout, playgroundRoutes } from "#domains/playground";
 import { standardsLayout, standardsRoutes } from "#domains/standards";
@@ -36,15 +36,12 @@ const notFoundRoute = route({
  * the colophon and any provider the strip and the page share. Above every
  * layout sits `Shell`, the provider nest the client and server entries
  * mount.
- *
- * `/guides/:slug` lives in the marketing domain but renders under the
- * Guides layout, beside the guides index it belongs to.
  */
 const [home] = group(marketingLayout, [marketingRoutes.home] as const);
 
 const [guides, guide] = group(guidesLayout, [
-  lensRoutes.guides,
-  marketingRoutes.guide,
+  guidesRoutes.guides,
+  guidesRoutes.guide,
 ] as const);
 
 const [account, login] = group(accountLayout, [
@@ -72,7 +69,7 @@ const [standards, standardEntity] = group(standardsLayout, [
 ] as const);
 
 // Journeys is in this table but is NOT a core lens. It is a pragma-specific
-// ADD-ON (`#addons/journeys`, not `#domains/lenses/…`) — an owner
+// ADD-ON (`#addons/journeys`, not a lens package) — an owner
 // reclassification, because it reads pragma's own ontology through generic
 // instance-level relation traversal, which the provider-neutral contract
 // cannot express. It is wired in BY HAND here, alongside the core lenses,

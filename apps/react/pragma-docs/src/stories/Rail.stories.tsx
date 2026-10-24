@@ -12,13 +12,9 @@ import {
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { route } from "@canonical/router-core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { GuidesIcon } from "#domains/guides";
 import { standardsRoutes } from "#domains/standards";
-import {
-  ComponentsIcon,
-  GuidesIcon,
-  HomeIcon,
-  JourneysIcon,
-} from "#lib/LensIcons";
+import { ComponentsIcon, HomeIcon, JourneysIcon } from "#lib/LensIcons";
 import { withRouter } from "../../.storybook/decorators/index.js";
 
 /**

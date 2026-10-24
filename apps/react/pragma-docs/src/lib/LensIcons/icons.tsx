@@ -41,20 +41,6 @@ export const ComponentsIcon = ({ size = 16 }: IconProps): ReactElement => (
 );
 
 /**
- * Guides: a page with two lines of text, the Guides lens's rail glyph.
- *
- * A stroke glyph `size` pixels square (16 by default), drawn in
- * `currentColor` and `aria-hidden`: the rail entry's visible label names
- * it. A lens passes it as its `icon` in `routeLensFacet.of`.
- */
-export const GuidesIcon = ({ size = 16 }: IconProps): ReactElement => (
-  <svg aria-hidden="true" {...buildGlyphProps(size)}>
-    <path d="M3 3h7a3 3 0 0 1 3 3v7H6a3 3 0 0 1-3-3V3z" />
-    <path d="M6 6h4M6 9h4" />
-  </svg>
-);
-
-/**
  * Journeys: a path stepping left to right, the Journeys lens's rail glyph.
  *
  * A stroke glyph `size` pixels square (16 by default), drawn in

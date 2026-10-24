@@ -1,0 +1,17 @@
+---
+# GuidePage — a guide's reading page: the prose page with the guide's
+# address as its title and its text. It renders no element of its own: the
+# prose page renders the root.
+node:
+  uri: docs.component.guide_page
+  edges:
+    - node:
+        uri: docs.component.prose_page
+        edges:
+          - node:
+              role: title (the guide's address)
+            relation: { cardinality: "1", slotName: heading }
+          - node:
+              role: copy (the guide's text)
+            relation: { cardinality: "1", slotName: prose }
+      relation: { cardinality: "1" }
