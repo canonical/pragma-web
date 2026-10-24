@@ -1,4 +1,5 @@
-import type { JourneyView, SurfaceRouteName } from "./types.js";
+import type { MessageKey } from "#i18n";
+import type { HopKind, JourneyView, SurfaceRouteName } from "./types.js";
 
 /**
  * The kinds of hop a journey passes through, its columns from left to
@@ -13,6 +14,15 @@ export const HOP_KINDS = [
   "surface",
   "layout",
 ] as const;
+
+/** The message naming each hop kind: a hop's kind, and its legend row's. */
+export const HOP_MESSAGES: Readonly<Record<HopKind, MessageKey>> = {
+  coordinate: "journeys.hop.coordinate",
+  job: "journeys.hop.job",
+  pairing: "journeys.hop.pairing",
+  surface: "journeys.hop.surface",
+  layout: "journeys.hop.layout",
+};
 
 /** The two readings of the demand model, in the switch's order. */
 export const JOURNEY_VIEWS: readonly JourneyView[] = ["table", "graph"];

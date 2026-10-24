@@ -11,7 +11,32 @@ import {
   JOURNEY_MODEL,
   ORPHAN_JOB,
 } from "../../__fixtures__/journeyModel.js";
+import type { JourneyCoordinate } from "../../types.js";
+import { DESIGN_CANVAS, LEGIBLE_ZOOM, VIEW_MARGIN } from "./constants.js";
 import JourneyWell from "./JourneyWell.js";
+
+/** One coordinate of twenty jobs, each served by its own surface: a graph
+ * far taller than the design canvas holds at the legible zoom. */
+const TALL_MODEL: readonly JourneyCoordinate[] = [
+  {
+    uri: "sem://design-system-docs#coordinate.crowd",
+    jobs: Array.from({ length: 20 }, (_, index) => ({
+      uri: `sem://design-system-docs#job.c${String(index).padStart(2, "0")}`,
+      pairings: [
+        {
+          uri: `sem://design-system-docs#pairing.c${index}`,
+          surface: { uri: `sem://design-system-docs#view.c${index}` },
+        },
+      ],
+    })),
+  },
+];
+
+/** The canvas's viewBox, as four numbers. */
+const readViewBox = (): readonly number[] =>
+  (document.querySelector("svg.viewport")?.getAttribute("viewBox") ?? "")
+    .split(" ")
+    .map(Number);
 
 /** The well under a real router — its job nodes are router links. */
 const wellAt = (job: string | undefined): ReactElement => (
@@ -33,10 +58,10 @@ describe("JourneyWell", () => {
     ).toBeInTheDocument();
     // Every hop the fixture implies is drawn: 2 coordinates, 3 jobs,
     // 3 pairings, 2 surfaces, 1 layout.
-    expect(document.querySelectorAll(".hop").length).toBe(11);
+    expect(document.querySelectorAll(".journey-hop").length).toBe(11);
     // Each edge is a path from one drawn hop to another.
     const hops = new Set(
-      [...document.querySelectorAll(".hop")].map((hop) =>
+      [...document.querySelectorAll(".journey-hop")].map((hop) =>
         hop.getAttribute("data-id"),
       ),
     );
@@ -84,7 +109,7 @@ describe("JourneyWell", () => {
 
   it("marks the selected job, and nothing else", () => {
     render(wellAt(BROWSE_JOB));
-    const selected = document.querySelectorAll(".hop.is-selected");
+    const selected = document.querySelectorAll(".journey-hop.is-selected");
     expect(selected.length).toBe(1);
     expect(selected[0]?.getAttribute("data-id")).toBe(BROWSE_JOB);
   });
@@ -114,7 +139,9 @@ describe("JourneyWell", () => {
   it("rings the selected job and weighs its edges by role", () => {
     render(wellAt(BROWSE_JOB));
     expect(document.querySelectorAll(".ring").length).toBe(1);
-    expect(document.querySelector(".hop.is-selected .ring")).not.toBeNull();
+    expect(
+      document.querySelector(".journey-hop.is-selected .ring"),
+    ).not.toBeNull();
     const primary = document.querySelector(".edge.is-primary");
     expect(primary?.getAttribute("stroke-width")).toBe("2");
     const secondary = document.querySelector(".edge.is-secondary");
@@ -123,7 +150,7 @@ describe("JourneyWell", () => {
 
   it("sets every hop's corner on the lattice", () => {
     render(wellAt(undefined));
-    for (const hop of document.querySelectorAll(".hop")) {
+    for (const hop of document.querySelectorAll(".journey-hop")) {
       const [x, y] = (hop.getAttribute("transform") ?? "")
         .replace(/[^\d. ]/g, "")
         .trim()
@@ -138,6 +165,37 @@ describe("JourneyWell", () => {
     render(wellAt(undefined));
     expect(screen.getByText("Reading a row")).toBeInTheDocument();
     expect(document.querySelectorAll(".legend-columns li").length).toBe(5);
+  });
+
+  it("opens on the whole graph when it fits the design canvas legibly", () => {
+    render(wellAt(undefined));
+    const [x, y] = readViewBox();
+    expect(x).toBe(-VIEW_MARGIN);
+    expect(y).toBe(-VIEW_MARGIN);
+  });
+
+  it("opens a graph too tall to fit legibly on a window at the legible zoom", () => {
+    render(
+      <RouterProvider
+        router={createStaticRouter(appRoutes, "/journeys", {
+          middleware: [...middleware],
+          notFound: notFoundRoute,
+        })}
+      >
+        <JourneyWell coordinates={TALL_MODEL} job={undefined} />
+      </RouterProvider>,
+    );
+    const [x, y, width, height] = readViewBox();
+    expect(x).toBe(-VIEW_MARGIN);
+    expect(y).toBe(-VIEW_MARGIN);
+    // At the design canvas the window draws one unit at the legible zoom:
+    // a 14px label at 12px, never smaller.
+    expect(
+      Math.min(
+        DESIGN_CANVAS.width / (width ?? 0),
+        DESIGN_CANVAS.height / (height ?? 0),
+      ),
+    ).toBeCloseTo(LEGIBLE_ZOOM, 9);
   });
 
   it("passes native props through and merges a consumer className after its own", () => {

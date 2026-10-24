@@ -25,7 +25,7 @@ describe("JourneyWell SSR", () => {
     const html = renderWell(undefined);
     expect(html).toContain('class="ds journey-well"');
     // All eleven hops, server-rendered.
-    expect((html.match(/<g class="hop[ "]/g) ?? []).length).toBe(11);
+    expect((html.match(/<g class="ds journey-hop[ "]/g) ?? []).length).toBe(11);
     // Edges too: their paths are computed from the layout, no measurement.
     expect(html).toContain('<g class="edges"');
     expect(html).toMatch(/<path class="edge[ "][^>]* d="M /);

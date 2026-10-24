@@ -14,7 +14,7 @@ const JOB = "sem://design-system-docs#job.l3";
 
 /** Is the well's graph mounted? */
 const wellPresent = (): boolean =>
-  document.querySelector(".ds.journey-well .hop") !== null;
+  document.querySelector(".ds.journey-well .journey-hop") !== null;
 
 /** Is the table mounted? */
 const tablePresent = (): boolean =>
@@ -80,7 +80,7 @@ describe("JourneysExplorer", () => {
     expect(pressed).not.toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Graph" }));
     expect(
-      document.querySelector(".ds.journey-well .hop.is-selected"),
+      document.querySelector(".ds.journey-well .journey-hop.is-selected"),
     ).not.toBeNull();
   });
 });

@@ -3,13 +3,19 @@
 # coordinate to job to pairing to surface to layout, left to right, drawn
 # in native SVG inside prism-core's GraphCanvas, which pans and zooms it,
 # over a legend of what each column means. Server-rendered with nothing to
-# measure: positions come from the pure layout, and the first paint's
-# viewBox is the hops' bounds with a 16-unit margin.
+# measure: positions come from the pure layout. The canvas pans as far as
+# the hops' bounds with a 16-unit margin; the first paint's viewBox is
+# those bounds when they fit the design canvas at the legible zoom (12/14
+# on screen, where a 14px label renders at 12px), else the largest window
+# of them shown at that zoom, from the left edge and the top or around the
+# selected job, and the client opens on the same framing for its measured
+# canvas. Below that zoom a hop draws its box alone (JourneyHop).
 #
-# Each hop is the published projection's EntityGraphNode, 176 by 48 (two
-# 24-unit lines): its label cut to the box, its column's name as its kind
-# and, on a surface, the surface's type as its location. A pairing is
-# hollow. A job's title links to its own page, and a surface's to the
+# Each hop is a JourneyHop over the published projection's
+# EntityGraphNode, 176 by 48 (two 24-unit lines): its label cut to the
+# box, its column's name as its kind and, on a surface, the surface's type
+# as its location. A pairing is hollow. A job's title links to its own
+# page, and a surface's to the
 # docsite page that renders it, where there is one; every other hop is
 # inert text. Columns stand 240 units apart and rows 64, and a hop shared
 # by several journeys stands on the mean of their rows, snapped to the
@@ -17,9 +23,9 @@
 # hop's in the same column, the lower hop moves down to the next free row,
 # so no two boxes overlap.
 #
-# The selected job's hop carries a ring 4 units off its box in the branded
-# colour. Edges leave a hop's right middle and land on the next's left
-# middle as horizontal cubics, 1 unit in the line colour; a primary
+# The selected job's hop carries a ring (JourneyHop). Edges leave a hop's
+# right middle and land on the next's left middle as horizontal cubics,
+# 1 unit in the line colour; a primary
 # pairing's edge is 2 units in the text colour and a secondary pairing's is
 # dashed. A row that ends at its surface composes no layout, and the
 # legend says so. The legend sits under the canvas, small and muted.
@@ -40,8 +46,8 @@
 #   layout.grid.rows "minmax(0, 1fr) auto": structure. The 0 resets.
 #   In constants.ts (SVG geometry is attributes, not CSS): NODE_WIDTH 176,
 #   NODE_HEIGHT 48, COLUMN_PITCH 240, ROW_PITCH 64, VIEW_MARGIN 16,
-#   LABEL_CHARACTERS 20, RING_OFFSET 4, RING_RADIUS 8, EDGE_WIDTH 1,
-#   PRIMARY_EDGE_WIDTH 2, SECONDARY_EDGE_DASH "4 4".
+#   EDGE_WIDTH 1, PRIMARY_EDGE_WIDTH 2, SECONDARY_EDGE_DASH "4 4"; the
+#   camera's LEGIBLE_ZOOM 12/14 and DESIGN_CANVAS 576 by 736 px.
 #
 # Roster namespaces (accepted and tracked): grid.gutter, space.050,
 # component.padding.inline, and the semantic typography symbols.
@@ -79,23 +85,8 @@ node:
           - node:
               role: hops
               edges:
-                - switch:
-                    on: selection
-                    cases:
-                      - node:
-                          role: hop (a placed box, a <g transform>)
-                          edges:
-                            - node:
-                                uri: prism.component.entity_graph_node
-                              relation: { cardinality: "1" }
-                      - node:
-                          role: selected hop (.is-selected)
-                          edges:
-                            - node:
-                                role: ring
-                                styles:
-                                  typography.color: color.text.branded
-                              relation: { cardinality: "1", slotName: ring }
+                - node:
+                    uri: docs.subcomponent.journey_hop
                   relation: { cardinality: "0..*", slotName: hop }
             relation: { cardinality: "1", slotName: hops }
       relation: { cardinality: "1", slotName: graph }

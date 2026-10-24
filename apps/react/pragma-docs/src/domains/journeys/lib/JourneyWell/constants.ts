@@ -49,3 +49,19 @@ export const ROLE_SECONDARY_CLASS = "is-secondary";
 
 /** The prefix of the class the layout gives an edge for its pairing's arrival. */
 export const ARRIVAL_CLASS_PREFIX = "arrival-";
+
+/**
+ * The lowest on-screen zoom the graph opens at: a hop's 14px label renders
+ * at 12px there, the legibility floor. The factor above one keeps the
+ * camera's own rounding from reading it as the bucket below, where the
+ * labels hide.
+ */
+export const LEGIBLE_ZOOM = (12 / 14) * (1 + 1e-6);
+
+/**
+ * The canvas the server paints the graph for, in px, before the client has
+ * measured its own: the well's viewport at 1440 by 900 in the graph view,
+ * where the site's rail takes two columns, the explorer's rail two and the
+ * inspector three, under the canvas's controls bar.
+ */
+export const DESIGN_CANVAS = { width: 576, height: 736 } as const;

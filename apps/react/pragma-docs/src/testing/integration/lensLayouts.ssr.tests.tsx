@@ -535,14 +535,16 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     expect(mustGet("/journeys").canvas).not.toContain(
       'aria-label="Journey view"',
     );
-    expect(mustGet("/journeys").canvas).not.toContain('class="hop');
+    expect(mustGet("/journeys").canvas).not.toContain('class="ds journey-hop');
     expect(mustGet(JOURNEYS_JOB_URL).canvas).toContain(
       'class="ds journey-table"',
     );
     expect(mustGet(JOURNEYS_JOB_URL).canvas).toContain(
       'class="row is-selected"',
     );
-    expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain('class="hop');
+    expect(mustGet(JOURNEYS_JOB_URL).canvas).not.toContain(
+      'class="ds journey-hop',
+    );
     for (const url of ["/journeys", JOURNEYS_JOB_URL]) {
       expect(mustGet(url).chrome).not.toContain('id="journey-inspector-title"');
       expect(mustGet(url).chrome).not.toContain('class="inspector"');

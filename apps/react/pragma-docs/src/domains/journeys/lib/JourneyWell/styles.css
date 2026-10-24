@@ -10,7 +10,6 @@
     --journey-well-stack-gap: var(--space-050);
     --journey-well-edge-color: var(--color-border);
     --journey-well-primary-edge-color: var(--color-text);
-    --journey-well-ring-color: var(--color-text-branded);
     --journey-well-small: var(--typography-text-secondary-font-size);
     --journey-well-muted: var(--color-text-muted);
     --journey-well-bold: var(--typography-text-primary-bold-font-weight);
@@ -35,11 +34,6 @@
 
   .ds.journey-well .edge.is-primary {
     color: var(--journey-well-primary-edge-color);
-  }
-
-  /* The selected job's ring, in the branded colour. */
-  .ds.journey-well .ring {
-    color: var(--journey-well-ring-color);
   }
 
   .ds.journey-well .legend {
