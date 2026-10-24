@@ -77,6 +77,10 @@ export const MESSAGES = {
   "lobby.doors.guides.title": "Guides",
   "lobby.doors.guides.summary":
     "Long-form orientation. A placeholder for now — the reading views are not built yet.",
+  "anatomy.slot": "{slot} · {cardinality}",
+  "anatomy.cardinality": "{cardinality}",
+  "anatomy.switch": "switch on {discriminator}",
+  "anatomy.case": "case {value}",
   "notFound.title": "Page not found",
   "notFound.body": "The page you are looking for does not exist.",
   "block.version": "v{version}",
