@@ -93,6 +93,18 @@
 # columns of the body's row tracks; the footer spans the whole card
 # (`1 / -1`), under the body and the sidecar.
 #
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)   below two groups, under
+#     `.ds.entity-card:has(> .sidecar)`: the card spans every column of the
+#     grid that holds it (`--entity-card-narrow-column`, `1 / -1`), since
+#     the canvas beside the rail holds two or three columns there, too few
+#     for the body's span and the sidecar's two side by side; the body spans the
+#     card (`1 / -1`) on its first two row tracks (`1 / 3`) with no
+#     block-end margin, and the sidecar spans the card on the third
+#     (`3 / 4`), reaching back across the gutter between them
+#     (`--entity-card-footer-overlap`) so the two meet. The footer stays
+#     under both.
+#
 # Every decision is read through a component token declared on the root
 # (`--entity-card-*`), bound to the symbol or the literal named here.
 #
@@ -117,6 +129,9 @@
 #                                       wide enough for a component example.
 #   --entity-card-body-span: var(--card-span, 1)  the span the published
 #                                       Cards group gives every card.
+#   --entity-card-narrow-column: 1 / -1  the whole row a card with a
+#                                       sidecar spans below two groups;
+#                                       grid lines, not a length.
 #   --entity-card-footer-overlap: calc(-1 * var(--grid-gutter))
 #                                       the footer reaches back across the
 #                                       gutter between its track and the

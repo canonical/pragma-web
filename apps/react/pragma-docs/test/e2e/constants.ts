@@ -58,6 +58,20 @@ export const CATALOG_PATH = "/components";
 export const CATALOG_CARD_SELECTOR =
   ".ds.components-catalog-page .ds.entity-card";
 
+/**
+ * The widths the catalog's cards are measured at: a phone's, where the
+ * canvas holds three columns; one between one and two groups, where it
+ * holds two; and the desktop's.
+ */
+export const CATALOG_CARD_WIDTHS = [390, 600, 1440] as const;
+
+/**
+ * The narrowest a catalog card may render, in pixels: wide enough for its
+ * title and summary, and for a UI block's rendered example under or beside
+ * them.
+ */
+export const MIN_CATALOG_CARD_WIDTH_PX = 150;
+
 /** The Standards index, whose links and lists must span the main column. */
 export const STANDARDS_INDEX_PATH = "/standards";
 

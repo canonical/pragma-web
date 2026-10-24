@@ -11,7 +11,8 @@
  * 390px too; twelve columns at 1440px and four at 390px; a workspace canvas
  * that never scrolls; a document whose only scrolling regions are its
  * canvas and its rail, and whose page's first element spans the whole main
- * column; a catalog whose cards fill their rows; a canvas that starts one
+ * column; a catalog whose cards fill their rows and stay inside the
+ * canvas, a UI block's example with them, at 390, 600 and 1440px; a canvas that starts one
  * gutter under the strip, or at the viewport's top with no strip, its
  * page then starting one gutter down; bands,
  * the strip's and the colophon's, that run from the rail's border to the
@@ -33,10 +34,12 @@ import type { Browser } from "playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   CATALOG_CARD_SELECTOR,
+  CATALOG_CARD_WIDTHS,
   CATALOG_PATH,
   DEV_READY_MS,
   DOCUMENT_PATHS,
   JOURNEYS_PATHS,
+  MIN_CATALOG_CARD_WIDTH_PX,
   PAGE_SETTLE_MS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
@@ -82,6 +85,47 @@ function countCutEntries(): {
     cutBesideTitle: measured.filter(
       ({ addressCut, addressBeside }) => addressCut && addressBeside,
     ).length,
+  };
+}
+
+/**
+ * Measure the catalog's cards against the canvas: each card's left and
+ * right edges, its width, and, for a card with a sidecar, the body's and
+ * the sidecar's widths. It runs in the page.
+ *
+ * @param selector - The catalog's cards.
+ * @returns The canvas's edges and each card's measures.
+ * @throws When the page has no canvas.
+ */
+function measureCatalogCards(selector: string): {
+  readonly canvas: { readonly left: number; readonly right: number };
+  readonly cards: readonly {
+    readonly left: number;
+    readonly right: number;
+    readonly width: number;
+    readonly sections: readonly number[];
+  }[];
+} {
+  const canvas = document.querySelector("main.ds.canvas");
+  if (!canvas) throw new Error("the page has no canvas");
+  const { left, right } = canvas.getBoundingClientRect();
+  return {
+    canvas: { left, right },
+    cards: [...document.querySelectorAll(selector)].map((card) => {
+      const box = card.getBoundingClientRect();
+      const sections =
+        card.querySelector(":scope > .sidecar") === null
+          ? []
+          : [...card.querySelectorAll(":scope > .body, :scope > .sidecar")];
+      return {
+        left: box.left,
+        right: box.right,
+        width: box.width,
+        sections: sections.map(
+          (section) => section.getBoundingClientRect().width,
+        ),
+      };
+    }),
   };
 }
 
@@ -383,6 +427,52 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       expect(counts.cutTitles).toBe(0);
       // An address is cut only on a line of its own, longer than the row.
       expect(counts.cutBesideTitle).toBe(0);
+    } finally {
+      await page.close();
+    }
+  });
+});
+
+// A UI block's card carries its rendered example beside its body, four
+// columns where the canvas holds six or more; where it holds two or three
+// the card takes the whole row, its example under its body. At every width
+// each card stays inside the canvas, wide enough to read, and so do its
+// body and its example.
+describe.each(CATALOG_CARD_WIDTHS)("the catalog at %i px", (width) => {
+  it("keeps every card, and a UI block's example, inside the canvas", async () => {
+    const page = await browser.newPage({ viewport: { width, height: 844 } });
+    try {
+      const origins = [
+        new URL(server.base).origin,
+        new URL(server.graphBase).origin,
+      ];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.goto(new URL(CATALOG_PATH, server.base).href, {
+        waitUntil: "networkidle",
+        timeout: PAGE_SETTLE_MS,
+      });
+      const { canvas, cards } = await page.evaluate(
+        measureCatalogCards,
+        CATALOG_CARD_SELECTOR,
+      );
+      expect(cards.length).toBeGreaterThan(0);
+      expect(cards.some(({ sections }) => sections.length === 2)).toBe(true);
+      for (const card of cards) {
+        expect(card.left).toBeGreaterThanOrEqual(
+          canvas.left - WIDTH_TOLERANCE_PX,
+        );
+        expect(card.right).toBeLessThanOrEqual(
+          canvas.right + WIDTH_TOLERANCE_PX,
+        );
+        expect(card.width).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
+        for (const section of card.sections) {
+          expect(section).toBeGreaterThanOrEqual(MIN_CATALOG_CARD_WIDTH_PX);
+        }
+      }
     } finally {
       await page.close();
     }
