@@ -15,6 +15,7 @@
     --entity-command-line-height: var(--space-300);
     --entity-command-hover-background: var(--color-foreground-ghost-hover);
     --entity-command-selected-background: var(--color-foreground-ghost-hover);
+    --entity-command-disabled-color: var(--color-text-muted);
     --entity-command-title-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
@@ -48,6 +49,12 @@
   /* The result the keyboard selection rests on reads as a hovered one. */
   .ds.entity-command[aria-selected="true"] {
     background: var(--entity-command-selected-background);
+  }
+
+  /* A result the palette cannot open reads muted throughout, its title with
+   * the rest; it keeps the selected background, so the selection shows. */
+  .ds.entity-command[aria-disabled="true"] {
+    color: var(--entity-command-disabled-color);
   }
 
   /* The identity and the title clip only along their line, so a chip in

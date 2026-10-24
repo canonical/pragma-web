@@ -1,0 +1,17 @@
+{
+  "extends": ["@canonical/biome-config"],
+  "files": {
+    "includes": [
+      ".storybook",
+      "src",
+      "testing",
+      "scripts",
+      "schema",
+      "*.json",
+      "vitest.config.ts",
+      "vitest.setup.ts",
+      "!src/__generated__",
+      "!.relay"
+    ]
+  }
+}

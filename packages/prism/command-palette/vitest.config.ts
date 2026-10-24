@@ -1,0 +1,19 @@
+import { reactTestConfig } from "@canonical/vitest-config-react";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vitest/config";
+
+// biome-ignore lint/suspicious/noExplicitAny: Vite 8 plugin types are incompatible with vitest's Vite 7 re-exports
+const plugins: any[] = [react()];
+
+export default defineConfig({
+  plugins,
+  test: reactTestConfig({
+    glob: "test",
+    ssr: true,
+    // The relay-compiler's artifacts are generated code, not runtime source
+    // written here; stories render in Storybook, not under test.
+    coverage: { exclude: ["src/__generated__/**", "**/*.stories.tsx"] },
+    plugins,
+    setupFiles: ["./vitest.setup.ts"],
+  }),
+});

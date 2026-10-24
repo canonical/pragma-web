@@ -1,0 +1,11 @@
+---
+# SocketGuard — keeps a strip tenant that reads the store from taking the
+# layout down: its own error boundary and Suspense, both falling back to
+# nothing, so a cold store empties the socket and nothing else. It renders
+# no element and binds no style.
+node:
+  uri: prism.subcomponent.socket_guard
+  edges:
+    - node:
+        role: tenant (rendered only while the store answers)
+      relation: { cardinality: "0..1", slotName: default }

@@ -16,9 +16,16 @@
 # long identity would widen the track that holds the row past its column
 # instead of truncating.
 #
-# The identity clips along its line only, so nothing it holds is cut above
-# or below: a chip in the title is 28px, and its line grows to hold it (the
-# row is then 36px).
+# When the identity and the meta do not fit on one line, as on a phone,
+# the row wraps: the meta moves to a line of its own under the identity,
+# flush left, with no space between the two lines (the row is then 56px),
+# and a title longer than its line wraps between its words rather than
+# being cut, so the title is always whole. The meta stays on its one line
+# and clips at its end with an ellipsis only when it alone is longer than
+# the row; the whole word stays in the text. The identity clips along its
+# line only, for a single word longer than the row, so nothing it holds is
+# cut above or below: a chip in the title is 28px, and its line grows to
+# hold it (the row is then 36px).
 #
 # An identifier in the location, a `<code class="identifier">`, sets the
 # monospace face on the row's line and stands on the sans text's baseline:
@@ -50,9 +57,15 @@
 #                                      the identifier on the text's baseline,
 #                                      its inline box of no height; a keyword
 #                                      and a number.
+#   space.0 for the gap between a wrapped row's lines: the meta reads with
+#   the identity above it, its lines the 24px line apart.
+#   layout.wrap wrap, typography.whiteSpace normal and nowrap,
+#   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
+#   size.min.width 0 lets the row shrink to its column, and the identity
+#   and the meta to the row.
 #
-# Roster namespaces (accepted and tracked): grid.gutter, space.050,
-# space.300 (a line height), and the semantic typography symbol
+# Roster namespaces (accepted and tracked): grid.gutter, space.0,
+# space.050, space.300 (a line height), and the semantic typography symbol
 # typography.text.primary.fontSize.
 node:
   uri: prism.component.entity_row
@@ -61,7 +74,9 @@ node:
     layout.align: baseline
     layout.justify: space-between
     size.min.width: 0
-    spacing.gap: grid.gutter
+    layout.wrap: wrap
+    spacing.gap.inline: grid.gutter
+    spacing.gap.block: space.0
     spacing.internal.block.start: space.050
     spacing.internal.block.end: space.050
     layout.listStyle: none
@@ -74,7 +89,7 @@ node:
           layout.overflow.inline: clip
           size.min.width: 0
           typography.overflow: ellipsis
-          typography.whiteSpace: nowrap
+          typography.whiteSpace: normal
         edges:
           - node:
               role: location
@@ -106,4 +121,7 @@ node:
           typography.color: color.text.muted
           typography.align: end
           typography.whiteSpace: nowrap
+          layout.overflow.inline: clip
+          size.min.width: 0
+          typography.overflow: ellipsis
       relation: { cardinality: "0..1", slotName: meta }

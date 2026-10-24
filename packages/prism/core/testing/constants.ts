@@ -13,6 +13,7 @@
  * style keys: the side is the colour key's to name.
  */
 export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
+  "align-content": ["layout.alignContent"],
   "align-items": ["layout.align"],
   "align-self": ["layout.alignSelf"],
   background: ["appearance.background"],
@@ -191,6 +192,7 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":focus-visible": "focus",
   ":hover": "hover",
   '[aria-current="page"]': "selected",
+  '[aria-disabled="true"]': "disabled",
   '[aria-selected="true"]': "selected",
   "[open]": "expanded",
 };

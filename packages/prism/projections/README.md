@@ -44,7 +44,9 @@ lays the five representations of each type out as one matrix, under
   optional lead filed before the catalog's separator, the value, then an
   optional badge, icon and disclosure chevron.
 - **`EntityRow`**: the list entry, one row of an index: the namespace
-  prefix and the title, then one muted word at the end.
+  prefix and the title, then one muted word at the end. Where the two do
+  not share a line, as on a phone, the word moves to a line of its own
+  under the title (56px) and a long title wraps, so it is never cut.
 - **`EntityCard`**: the card, built on the published `Card`: location, the
   title and the entity it belongs to (after `∈`, or after `⊂` with
   `parentRelation="subclass"`), kind, summary, key values and the
