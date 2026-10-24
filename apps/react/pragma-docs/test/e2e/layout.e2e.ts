@@ -2,7 +2,7 @@
 
 /**
  * The page grid and the scroll model, measured in a real browser: the dev
- * cell (its graph server alongside) serves a workspace page and several
+ * cell (its graph server alongside) serves the workspace pages and several
  * document pages, and Chromium lays each out once at a desktop and a phone
  * width, measuring it in the light and the dark theme. What is asserted is
  * what the layout promises: one intrinsic grid, the shell, which is the one
@@ -36,6 +36,7 @@ import {
   CATALOG_PATH,
   DEV_READY_MS,
   DOCUMENT_PATHS,
+  JOURNEYS_PATHS,
   PAGE_SETTLE_MS,
   STANDARDS_INDEX_PATH,
   STANDARDS_INDEX_ROW_SELECTOR,
@@ -230,6 +231,24 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       ).toBe(viewport.width < 448);
     }
   });
+
+  it.each(JOURNEYS_PATHS)(
+    "lays the journeys at %s on the workspace, the table scrolling in its own region",
+    async (path) => {
+      const measures = await measure(path);
+      expectGrid(measures);
+      for (const { theme, measure: layout } of measures) {
+        expect(layout.canvas.overflow, theme).toBe("hidden");
+        expect(layout.canvas.scrollHeight, theme).toBe(
+          layout.canvas.clientHeight,
+        );
+        expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
+        // The table opens without an inspector, so no drawer trigger shows
+        // at any width.
+        expect(layout.triggerShown, theme).toBe(false);
+      }
+    },
+  );
 
   it.each(DOCUMENT_PATHS)(
     "lays the document at %s on the one grid, scrolling only its canvas and its rail",

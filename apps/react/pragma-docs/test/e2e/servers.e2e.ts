@@ -666,123 +666,59 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(definitionsDoor).not.toBeNull();
             expect(definitionsDoor?.[1]).not.toMatch(/\d/);
 
-            // 5g. Journeys block (AV-351): the demand model SSRs from
-            //     the live graph. Every assertion here is DRIFT-PROOF —
-            //     never a pinned graph count (the 111->108 lesson, and
-            //     ds:Component drifted again today) — so counts are
-            //     either derived from THIS response and related to each
-            //     other, or bounded by SCHEMA constants.
+            // 5g. Journeys block: the demand model SSRs from the live
+            //     graph. Every assertion is drift-proof: never a pinned
+            //     graph count, so counts are either derived from this
+            //     response and related to each other, or bounded below.
             const journeys = await fetch(`${server.base}/journeys`);
             expect(journeys.status).toBe(200);
             const journeysHtml = await journeys.text();
-            expect(journeysHtml).toContain('data-slot="journeys-rail"');
-            expect(journeysHtml).toContain('data-slot="journeys-canvas"');
-            expect(journeysHtml).toContain('data-slot="journeys-inspector"');
-            //     The index's honest empty inspector (no default job).
-            expect(journeysHtml).toContain("Select a job");
+            expect(journeysHtml).toContain('class="ds workspace-layout');
+            expect(journeysHtml).toContain('class="ds journey-rail');
             expect(journeysHtml).toContain("__INITIAL_DATA__");
             expect(journeysHtml).toContain('"records"');
 
-            //     THE PRIMARY SURFACE, in the server HTML (AV-351). The
-            //     table is the lens's index now, and it SSRs whole: its
-            //     slot, its accessible structure (a row-header cell per
-            //     job, sortable column headers via aria-sort) and its
-            //     group-by control are all in the served markup, before any
-            //     client JS. A sortable data table that only becomes one
-            //     after hydration would fail a reader without JS; this
-            //     proves the table is real at first paint.
-            expect(journeysHtml).toContain('data-slot="journeys-table"');
+            //     The table is the default reading and SSRs whole: its row
+            //     headers, its sortable column headers and its grouping
+            //     control are in the served markup before any client
+            //     script, and its caption states its live counts.
+            expect(journeysHtml).toContain('class="ds journey-table"');
             expect(journeysHtml).toContain('scope="row"');
             expect(journeysHtml).toMatch(/aria-sort="(ascending|descending)"/);
             expect(journeysHtml).toContain("Group by");
-            //     THE DEFAULT SORT is in the server HTML, not applied later:
-            //     the table's caption states its live row count, so the
-            //     first paint carries the deterministic default arrangement
-            //     the pure constant names.
             expect(journeysHtml).toContain("Every job in the demand model");
+            //     The inspector opens with the graph view, so the table's
+            //     first paint carries none.
+            expect(journeysHtml).not.toContain('id="journey-inspector-title"');
 
-            //     DRIFT-PROOF COUNT RELATION (the ds:Component 108→111
-            //     lesson): never pin the model size. The table's row-header
-            //     cells and the rail's job links both index EVERY job in the
-            //     model, from the SAME response — so they must be equal.
-            //     This survives the model growing; it breaks only if the
-            //     table and the rail fall out of step, which is the real
-            //     failure worth catching.
+            //     The table's row headers and the rail's jobs both index
+            //     every job in the model, from the same response, so they
+            //     must be equal, and the model is big enough that the
+            //     graph's default coordinate filter is a real narrowing.
             const tableRowHeaderCount = (
-              journeysHtml.match(/class="journey-table-job"/g) ?? []
+              journeysHtml.match(/<th class="cell" scope="row">/g) ?? []
             ).length;
-            const railJobLinkCountIndex = (
-              journeysHtml.match(/class="journey-rail-job"/g) ?? []
-            ).length;
-            expect(tableRowHeaderCount).toBeGreaterThan(0);
-            expect(tableRowHeaderCount).toBe(railJobLinkCountIndex);
+            const railJobCount = (journeysHtml.match(/<li class="job">/g) ?? [])
+              .length;
+            expect(tableRowHeaderCount).toBeGreaterThan(40);
+            expect(tableRowHeaderCount).toBe(railJobCount);
 
-            //     THE PERSONA AXIS CONFESSES, in the server HTML. The
-            //     graph records no persona-to-job edge, so the filter is
-            //     approximate and the interface says so as real text. If
-            //     that caveat is ever dropped while the filter stays,
-            //     the lens starts quietly overstating what it knows.
+            //     The persona axis states its approximation as text.
             expect(journeysHtml).toContain("Approximate");
 
-            //     A JOB URL renders the selected journey. The address is
-            //     the job (P-D7), and the view it lands on must contain
-            //     that job — the diagram roots at its coordinate.
+            //     A job's address renders the table with that job's row
+            //     selected, its story verbatim in the row.
             const journeyJob = await fetch(
               `${server.base}/journeys/sem%3A%2F%2Fdesign-system-docs%23job.l3`,
             );
             expect(journeyJob.status).toBe(200);
             const journeyJobHtml = await journeyJob.text();
-            //     The story renders VERBATIM — the demand in the
-            //     reader's own words is the whole point of the model, so
-            //     an upstream rewording rots loudly here.
             expect(journeyJobHtml).toContain(
               "I want to browse and filter the full catalog",
             );
-            expect(journeyJobHtml).toContain('id="journey-inspector-title"');
-            //     Selection is server-rendered, because it comes from
-            //     the URL — exactly one node carries the marker.
-            expect((journeyJobHtml.match(/is-selected/g) ?? []).length).toBe(1);
-
-            //     Silent-rot closures, all derived from THIS response.
-            //     The well draws a left-to-right spine, so every node
-            //     beyond the first column is reached by an edge: edges
-            //     must be at least nodes minus the columns, and nodes
-            //     must be non-trivial. Floors catch the both-rot-to-zero
-            //     case that a bare equality would wave through.
-            const hopNodeCount = (
-              journeyJobHtml.match(/<g class="hop[ "]/g) ?? []
-            ).length;
-            const hopEdgeCount = (
-              journeyJobHtml.match(/<path class="edge[ "]/g) ?? []
-            ).length;
-            expect(hopNodeCount).toBeGreaterThan(5);
-            expect(hopEdgeCount).toBeGreaterThan(5);
-            //     A connected spine has strictly fewer roots than nodes.
-            expect(hopEdgeCount).toBeLessThan(hopNodeCount * 2);
-
-            //     HONEST ABSENCE (ruling R2), asserted against the LIVE
-            //     graph rather than a fixture: 50 of the 59 paired
-            //     surfaces compose no layout, so at least one row in any
-            //     real view ends at its surface — and the inspector says
-            //     so in words rather than leaving a blank.
-            expect(journeyJobHtml).toContain("composes no layout");
-
-            //     The rail is the complete index and it DIMS rather than
-            //     hides: the job-less view lists strictly more jobs than
-            //     the filtered diagram draws, both counted from their own
-            //     responses. (The rail links every job in the model; the
-            //     well draws one coordinate's worth by default.)
-            const railJobLinkCount = (
-              journeysHtml.match(/class="journey-rail-job"/g) ?? []
-            ).length;
-            const drawnNodeCount = (
-              journeysHtml.match(/<g class="hop[ "]/g) ?? []
-            ).length;
-            expect(railJobLinkCount).toBeGreaterThan(drawnNodeCount);
-            //     …and the model is big enough that the default view is
-            //     genuinely a narrowing, which is the scale ruling's
-            //     whole premise.
-            expect(railJobLinkCount).toBeGreaterThan(40);
+            expect(
+              (journeyJobHtml.match(/class="row is-selected"/g) ?? []).length,
+            ).toBe(1);
 
             // 5h. WHO MADE THE REQUESTS. Everything above was fetched with
             //     plain `fetch` — no browser, no client JS — yet a dozen
