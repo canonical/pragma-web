@@ -258,17 +258,19 @@ describe("server matrix (2×3) serves correctly", () => {
             const playground = await fetch(`${server.base}/playground`);
             expect(playground.status).toBe(200);
             const playgroundHtml = await playground.text();
-            // Server-rendered probe content: heading, URI, summary text.
-            expect(playgroundHtml).toContain("<h2>Button</h2>");
-            expect(playgroundHtml).toContain("ds:global.component.button");
+            // Server-rendered probe content: the Button in each form,
+            // linked to its page, and its card's summary. The fields the
+            // unit fixture (componentProbeRecords) freezes are asserted
+            // against the live graph here, so an upstream rename rots
+            // loudly, not silently.
+            expect(playgroundHtml).toContain(
+              'href="/components/ds%3Aglobal.component.button">Button</a>',
+            );
+            expect(playgroundHtml).toContain('class="ds entity-chip');
+            expect(playgroundHtml).toContain('class="ds card ds entity-card');
             expect(playgroundHtml).toContain(
               "Buttons trigger actions within an interface",
             );
-            // Modifier families too: every field the unit fixture
-            // (componentProbeRecords) freezes is asserted against the live
-            // graph here, so an upstream rename rots loudly, not silently.
-            expect(playgroundHtml).toContain("Anticipation");
-            expect(playgroundHtml).toContain("Importance");
             // The serialised record map is embedded for hydration.
             expect(playgroundHtml).toContain("__INITIAL_DATA__");
             expect(playgroundHtml).toContain('"relay"');
@@ -606,10 +608,10 @@ describe("server matrix (2×3) serves correctly", () => {
             const home = await fetch(`${server.base}/`);
             expect(home.status).toBe(200);
             const homeHtml = await home.text();
-            //     All three layout.lobby slots reached the HTML.
-            expect(homeHtml).toContain('data-slot="hero"');
-            expect(homeHtml).toContain('data-slot="examples"');
-            expect(homeHtml).toContain('data-slot="doors"');
+            //     The hero and both sections reached the HTML.
+            expect(homeHtml).toContain('id="lobby-title"');
+            expect(homeHtml).toContain('id="lobby-examples-title"');
+            expect(homeHtml).toContain('id="lobby-doors-title"');
             expect(homeHtml).toContain("__INITIAL_DATA__");
             expect(homeHtml).toContain('"records"');
 
@@ -633,7 +635,7 @@ describe("server matrix (2×3) serves correctly", () => {
             //     to at most 100 and this snaps. The floor is the cap
             //     itself — never the live total.
             const standardsFigure = homeHtml.match(
-              /The graph holds <!-- -->(\d+)<!-- --> of them/,
+              /<span class="vital">(\d+) standards<\/span>/,
             );
             expect(standardsFigure).not.toBeNull();
             expect(Number(standardsFigure?.[1])).toBeGreaterThan(
@@ -646,7 +648,7 @@ describe("server matrix (2×3) serves correctly", () => {
             //     class by construction — patterns compose them), and
             //     both are non-trivial. Structural bounds, no pins.
             const componentsFigure = homeHtml.match(
-              /The graph holds <!-- -->(\d+)<!-- --> components and <!-- -->(\d+)<!-- -->/,
+              /<span class="vital">(\d+) components<\/span><span class="vital">(\d+) patterns<\/span>/,
             );
             expect(componentsFigure).not.toBeNull();
             const liveComponentCount = Number(componentsFigure?.[1]);
@@ -658,13 +660,15 @@ describe("server matrix (2×3) serves correctly", () => {
             //     The Definitions door is named WITHOUT a count (no
             //     cheap honest count exists for a lens whose quantity is
             //     "terms across ontologies"). If someone later invents
-            //     one, this is the tripwire — the door's own list item
-            //     must stay digit-free.
+            //     one, this is the tripwire: the door's card must stay
+            //     digit-free, its summary and any vital alike.
             const definitionsDoor = homeHtml.match(
-              /<a href="\/definitions">Definitions<\/a><p>([\s\S]*?)<\/p>/,
+              /href="\/definitions">Definitions<\/a>([\s\S]*?)<div class="ds card ds entity-card">/,
             );
             expect(definitionsDoor).not.toBeNull();
-            expect(definitionsDoor?.[1]).not.toMatch(/\d/);
+            expect(
+              definitionsDoor?.[1]?.replaceAll(/<[^>]*>/g, ""),
+            ).not.toMatch(/\d/);
 
             // 5g. Journeys block: the demand model SSRs from the live
             //     graph. Every assertion is drift-proof: never a pinned
