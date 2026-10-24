@@ -1,11 +1,11 @@
 import { route } from "@canonical/router-core";
-import PlaygroundPage from "./PlaygroundPage.js";
+import { PlaygroundPage } from "./lib/PlaygroundPage/index.js";
 import warmPlayground from "./warmPlayground.js";
 
 const routes = {
   playground: route({
     url: "/playground",
-    content: PlaygroundPage,
+    content: () => <PlaygroundPage />,
     // The probe's data reaches the store through `warmPlayground`: the
     // server's prepare step awaits it and serialises the resulting store
     // into `__INITIAL_DATA__.relay.records` (see

@@ -48,10 +48,7 @@ import {
   LOBBY_PATTERN_CLASS,
   LOBBY_STANDARD_CLASS,
 } from "#domains/marketing";
-import {
-  RELATION_PAGE_SIZE as PROBE_RELATION_PAGE_SIZE,
-  PROBE_URI,
-} from "#domains/playground";
+import { PROBE_URI } from "#domains/playground";
 import { STANDARDS_BINDING } from "#domains/standards";
 import {
   COMPONENT_PROBE_RESPONSE,
@@ -134,10 +131,7 @@ describe("prepareRelayData over HTTP", () => {
     expect(request.body.operationName).toBe("ComponentProbeQuery");
     expect(typeof request.body.query).toBe("string");
     expect(request.body.query).toContain("query ComponentProbeQuery");
-    expect(request.body.variables).toEqual({
-      uri: PROBE_URI,
-      count: PROBE_RELATION_PAGE_SIZE,
-    });
+    expect(request.body.variables).toEqual({ uri: PROBE_URI });
 
     // …and marked as server-side traffic, which is what lets the graph
     // server's hit log distinguish an SSR render from a browser.
@@ -162,7 +156,7 @@ describe("prepareRelayData over HTTP", () => {
     {
       url: "/playground",
       operationName: "ComponentProbeQuery",
-      variables: { uri: PROBE_URI, count: PROBE_RELATION_PAGE_SIZE },
+      variables: { uri: PROBE_URI },
     },
     {
       url: "/components",

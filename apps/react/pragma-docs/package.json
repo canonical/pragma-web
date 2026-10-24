@@ -24,7 +24,6 @@
     "#lib/markdown": "./src/lib/markdown/index.ts",
     "#lib/ui": "./src/lib/ui/index.ts",
     "#lib/ui/*": "./src/lib/ui/*/index.ts",
-    "#lib/ui/CanvasPage": "./src/lib/ui/CanvasPage/index.ts",
     "#relay/__generated__/*": "./src/relay/__generated__/*",
     "#server": "./src/server/index.ts"
   },

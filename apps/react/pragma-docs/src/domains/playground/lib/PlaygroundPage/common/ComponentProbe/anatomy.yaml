@@ -1,0 +1,88 @@
+---
+# ComponentProbe — one component straight off the graph in every form the
+# site projects it in: the chip, the list entry, the command and the graph
+# node as key values (each form named on the left, its rendering on the
+# right), then the card in the shared list view, its rendered example
+# beside it. An address the graph does not answer to leaves an alert. A
+# subgrid of the page over every column, its gap the grid's gutter; the
+# list entry and the command each sit in an unmarked list of one, the list
+# they belong to, with no markers or insets; the graph node draws inside an
+# SVG of its own size, a block, so no baseline gap opens under it.
+#
+# Every decision is read through a component token declared on the root
+# (`--component-probe-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure. layout.listStyle none: a
+#   keyword. The 0 resets.
+#   In constants.ts: PROBE_NODE_WIDTH 192, PROBE_NODE_HEIGHT 50 (the graph
+#   node's own defaults, as SVG attributes).
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: docs.subcomponent.component_probe
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: alert (the address the graph does not answer to)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+        edges:
+          - node:
+              uri: global.component.inline_code
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1", slotName: alert }
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              uri: prism.component.key_value_list
+              edges:
+                - node:
+                    uri: docs.component.site_chip_projection
+                  relation: { cardinality: "1" }
+                - node:
+                    role: entry (an unmarked list of one, around the list entry or the command)
+                    styles:
+                      layout.listStyle: none
+                      spacing.external.block.start: 0
+                      spacing.external.block.end: 0
+                      spacing.internal.inline.start: 0
+                    edges:
+                      - switch:
+                          on: internal
+                          cases:
+                            - node:
+                                uri: docs.component.site_row_projection
+                            - node:
+                                uri: docs.component.site_command_projection
+                        relation: { cardinality: "1" }
+                  relation: { cardinality: "2", slotName: entry }
+                - node:
+                    role: graph frame (an SVG of the node's size)
+                    styles:
+                      layout.type: block
+                    edges:
+                      - node:
+                          uri: docs.component.site_graph_node_projection
+                        relation: { cardinality: "1" }
+                  relation: { cardinality: "1", slotName: graph-frame }
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1" }
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              uri: prism.component.entity_list
+              edges:
+                - node:
+                    uri: docs.component.site_card_projection
+                  relation: { cardinality: "1", slotName: items }
+            relation: { cardinality: "1" }
+      relation: { cardinality: "0..1" }

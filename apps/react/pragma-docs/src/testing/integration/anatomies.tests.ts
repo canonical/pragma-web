@@ -113,6 +113,7 @@ describe("the app's components", () => {
         "definitions",
         "guides",
         "modifiers",
+        "playground",
         "standards",
       ].map((domain) => join(APP_ROOT, "src", "domains", domain, "lib")),
     );

@@ -57,8 +57,9 @@ const SEEDED_PAGES = [
     name: "playground probe",
     url: PLAYGROUND_URL,
     records: componentProbeRecords,
-    serverMarker: "<h2>Button</h2>",
-    liveSelector: "h2",
+    serverMarker:
+      '<h2 class="heading" id="component-probe-forms-title">Its forms</h2>',
+    liveSelector: ".ds.ui-block-chip",
     liveText: "Button",
   },
   {
@@ -291,7 +292,10 @@ describe("hydrateApp over the seeded SSR output", () => {
   it("control: hydrating over tampered server HTML reports a recoverable error", async () => {
     window.history.pushState({}, "", PLAYGROUND_URL);
     const serverHtml = renderSeededServerHtml(createFetchSpy());
-    const tampered = serverHtml.replace("<h2>Button</h2>", "<h2>Impostor</h2>");
+    const tampered = serverHtml.replace(
+      '<h2 class="heading" id="component-probe-forms-title">Its forms</h2>',
+      '<h2 class="heading" id="component-probe-forms-title">Impostor</h2>',
+    );
     expect(tampered).not.toBe(serverHtml);
     (window as TestWindow).__INITIAL_DATA__ = {
       url: PLAYGROUND_URL,

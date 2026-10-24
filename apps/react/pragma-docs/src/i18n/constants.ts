@@ -10,6 +10,9 @@
  */
 export const MESSAGES = {
   "shell.loading": "Loading…",
+  "page.loading": "Loading the graph…",
+  "page.queryFailed":
+    "The graph query failed. Is the dev backend up? Reload to retry.",
   "rail.caption": "design system docs",
   "rail.utilities": "Utilities",
   "rail.playground": "Playground",
@@ -29,6 +32,16 @@ export const MESSAGES = {
   "login.instruction":
     "Demo login. Add {param} to any protected URL to simulate authentication.",
   "login.from": "You will be redirected to {from} after login.",
+  "playground.title": "Playground",
+  "playground.intro":
+    "One component straight off the live graph, Button, in every form the site projects it in: the chip, the list entry, the command, the graph node and the card.",
+  "playground.probe.notFound": "No component found at {address}.",
+  "playground.probe.forms": "Its forms",
+  "playground.probe.card": "Its card",
+  "playground.probe.chip": "Chip",
+  "playground.probe.row": "List entry",
+  "playground.probe.command": "Command",
+  "playground.probe.graphNode": "Graph node",
   "notFound.title": "Page not found",
   "notFound.body": "The page you are looking for does not exist.",
   "block.version": "v{version}",
