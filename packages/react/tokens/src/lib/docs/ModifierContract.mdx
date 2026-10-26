@@ -55,11 +55,13 @@ The system defines several modifier families, each setting the same channel vari
 
 | Family | Classes | Purpose |
 |--------|---------|---------|
-| **Criticality** | `.error`, `.warning`, `.success`, `.information` | Feedback states for forms and alerts |
-| **Emphasis** | `.muted`, `.branded` | Visual prominence adjustment |
-| **Anticipation** | `.constructive`, `.destructive`, `.caution` | Expected outcome of an action |
+| **Criticality** | `.default`, `.error`, `.warning`, `.success`, `.information` | Feedback states for forms and alerts |
+| **Emphasis** | `.default`, `.muted`, `.branded` | Visual prominence adjustment |
+| **Anticipation** | `.default`, `.constructive`, `.destructive`, `.caution` | Expected outcome of an action |
+| **Lifecycle** | `.default`, `.planned`, `.inProgress`, `.completed`, `.failed` | Stage of a tracked item |
+| **Release** | `.default`, `.experimental`, `.alpha`, `.beta`, `.stable` | Maturity of a feature |
 
-All families set the same channel variables. This uniformity means a component that supports `.error` automatically supports `.constructive`, `.branded`, and every other modifier — the component does not distinguish between them.
+All families set the same channel variables. This uniformity means a component that supports `.error` automatically supports `.constructive`, `.branded`, and every other modifier — the component does not distinguish between them. Every family also carries `.default`, which sets the channels to their **base semantic tokens** rather than an intent-specific value; see the next section.
 
 ## Why this matters for composition
 
@@ -92,6 +94,47 @@ Modifiers can nest. An `.error` form might contain a `.success` badge:
 The inner `.success` sets `--modifier-color-text` to the success text color, overriding the `.error` value for its descendants. CSS custom property inheritance handles this automatically — the closest ancestor setting a channel variable wins.
 
 This means modifiers compose without special logic: the last modifier in the DOM tree determines the visual output.
+
+## Opting out of an inherited modifier
+
+The fallback chain only runs when **no ancestor** set the channel. Inside a `.error` form, a chip with no criticality of its own inherits the error channel and renders error-tinted — misleading for a component that states one attribute of an object, and the cascade has no way to say "nothing" once an ancestor has said something. Neutral cannot be expressed by absence there.
+
+`.default` is how a component says it. The class rebinds every channel the family emits to its own base semantic token, **on the element itself**:
+
+```css
+@layer ds.modifiers {
+  .default {
+    --modifier-color-text: var(--color-text);
+    --modifier-color-border: var(--color-border);
+    /* … every channel the family emits … */
+  }
+}
+```
+
+A custom property declared on the element beats the value inherited from an ancestor, by the CSS custom-property cascade — the same rule that makes nesting work, used in the opposite direction. So:
+
+```html
+<form class="error">
+  <span class="chip">error-tinted — inherits the form's channel</span>
+  <span class="chip default">neutral — the element's own binding wins</span>
+  <span class="chip success">success — a closer class still wins</span>
+</form>
+```
+
+For a component whose modifier prop maps straight to the class, the value is `default`:
+
+```jsx
+<Chip criticality="default" /> // neutral, whatever the ancestors say
+<Chip />                        // inherits the ancestor context, if any
+```
+
+Three behaviours follow, and they are the acceptance criteria:
+
+- `criticality="error"` inside an `.error` card: **error** — the element's own class wins.
+- `criticality="default"` inside an `.error` card: **neutral** — the element's own binding beats the inherited channel.
+- no criticality inside an `.error` card: **inherits the error context** — the cascade is the default behaviour, and `.default` is an explicit opt-out, never the implicit choice.
+
+The channel set is derived from what the family's real contexts emit, so the rule tracks the family as it gains or loses channels. Interaction states need no separate reset: `states.css` derives hover/active/disabled per element from `var(--modifier-color-X, …)`, which resolves to the neutral token on an element wearing `.default`. Channels that live only in the `@canonical/styles` shims (the criticality glyph channel, the camelCase on-surface text channel) are reset by the shim itself, beside its own classes.
 
 ## What modifiers do not do
 
