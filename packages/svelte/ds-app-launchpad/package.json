@@ -87,7 +87,7 @@
   "dependencies": {
     "@canonical/design-tokens": "0.43.0",
     "@canonical/styles": "^0.45.0",
-    "@canonical/svelte-icons": "^0.0.9",
+    "@canonical/svelte-icons": "^0.1.0",
     "@floating-ui/dom": "^1.7.6"
   },
   "peerDependencies": {
