@@ -1,13 +1,17 @@
 // @vitest-environment node
 
 /**
- * The landing and the three lenses against the metro provider, end to end:
+ * The landing and the four lenses against the metro provider, end to end:
  * the metro graph in its own process, and each server-rendering web cell
  * pointed at it. Each page is fetched as a crawler would, so what is
  * asserted is the HTML the server rendered from the data it prepared.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { LINE_COUNT, STATION_COUNT } from "../../testing/fixtures.js";
+import {
+  LINE_COUNT,
+  ROLLING_STOCK_COUNT,
+  STATION_COUNT,
+} from "../../testing/fixtures.js";
 import { DEV_READY_MS, GRAPH_READY_MS, PREVIEW_READY_MS } from "./constants.js";
 import startServer from "./startServer.js";
 import type { RunningServer } from "./types.js";
@@ -79,10 +83,11 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     const { status, html } = await fetchPage(script, "/");
     expect(status).toBe(200);
     const doors = html.split('class="ds card ds lens-card"').slice(1);
-    expect(doors).toHaveLength(3);
+    expect(doors).toHaveLength(4);
     expect(doors.at(0)).toContain('href="/stations"');
     expect(doors.at(1)).toContain('href="/lines"');
     expect(doors.at(2)).toContain('href="/definitions"');
+    expect(doors.at(3)).toContain('href="/fleet"');
     expect(html).toContain(
       `<data value="${STATION_COUNT}">${STATION_COUNT} stations</data>`,
     );
@@ -130,7 +135,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(html).toMatch(/class="ds hierarchy-well[ "]/);
     expect(html).toMatch(/class="ds class-graph[ "]/);
     expect(html).toMatch(
-      /<svg[^>]*class="viewport"[^>]*viewBox="-?\d+ -?\d+ \d+ \d+"/,
+      /<svg[^>]*class="viewport"[^>]*viewBox="-?[\d.]+ -?[\d.]+ [\d.]+ [\d.]+"/,
     );
     expect(html).toMatch(
       /<pattern class="lattice"[^>]*height="16"[^>]*width="16"/,
@@ -155,11 +160,59 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(landing.html).toContain(String(title));
   });
 
-  it.each(["/nowhere", "/stations/%ZZ", "/definitions/%E0%A4%A"])(
-    "answers %s with 404",
-    async (path) => {
-      const { status } = await fetchPage(script, path);
-      expect(status).toBe(404);
-    },
-  );
+  it("renders the fleet index as cards, each drawing its formations", async () => {
+    const { status, html } = await fetchPage(script, "/fleet");
+    expect(status).toBe(200);
+    const cards = html
+      .split('class="ds card ds entity-card ds rolling-stock-card"')
+      .slice(1);
+    expect(cards).toHaveLength(ROLLING_STOCK_COUNT);
+    expect(html).toContain('href="/fleet/metro%3Aseries-90"');
+    expect(html).toMatch(
+      /class="sidecar".*?class="ds formation-stack".*?<svg[^>]*class="drawing"[^>]*viewBox="0 0 120000 3600"/s,
+    );
+  });
+
+  it("renders the fleet index as rows when the address asks", async () => {
+    const { status, html } = await fetchPage(script, "/fleet?view=rows");
+    expect(status).toBe(200);
+    expect(html).toMatch(
+      /<li [^>]*class="ds entity-row ds rolling-stock-row"[^>]*>.*?Series 90/s,
+    );
+    expect(html).not.toContain("rolling-stock-card");
+  });
+
+  it("renders a formation's page with its fit at the platforms", async () => {
+    const { status, html } = await fetchPage(
+      script,
+      "/fleet/formations/metro%3Aseries-90-six-car",
+    );
+    expect(status).toBe(200);
+    expect(html).toMatch(/<h1[^>]*>Series 90 six-car<\/h1>/);
+    expect(html).toContain('class="ds platform-fit"');
+    expect(html).toMatch(/class="ds entity-chip ds rolling-stock-chip"/);
+    expect(html).toContain('class="mark"');
+  });
+
+  it("renders a car type's page with the car drawn alone", async () => {
+    const { status, html } = await fetchPage(
+      script,
+      "/fleet/car-types/metro%3Acar-90-driving",
+    );
+    expect(status).toBe(200);
+    expect(html).toMatch(/<h1[^>]*>Series 90 driving motor car<\/h1>/);
+    const train = /<g class="train"[^>]*>(.*?)<\/g>/s.exec(html)?.at(1);
+    expect(train?.split('class="car"').length).toBe(2);
+  });
+
+  it.each([
+    "/nowhere",
+    "/stations/%ZZ",
+    "/definitions/%E0%A4%A",
+    "/fleet/%ZZ",
+    "/fleet/formations/%ZZ",
+  ])("answers %s with 404", async (path) => {
+    const { status } = await fetchPage(script, path);
+    expect(status).toBe(404);
+  });
 });
