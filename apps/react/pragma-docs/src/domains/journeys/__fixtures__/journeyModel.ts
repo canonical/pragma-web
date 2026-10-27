@@ -14,7 +14,7 @@
  * never collected as one.
  */
 
-import type { JourneyCoordinate } from "../types.js";
+import type { JourneyCoordinate, JourneyJob } from "../types.js";
 
 const SURFACE = "sem://surface#";
 const DOCS = "sem://design-system-docs#";
@@ -40,57 +40,64 @@ export const ROLES_BY_COORDINATE: Readonly<Record<string, readonly string[]>> =
     [WILDCARD_COORDINATE]: [],
   };
 
+/** The browse job: two pairings, one with no arrival whose surface
+ * composes no layout. */
+export const BROWSE_JOURNEY_JOB: JourneyJob = {
+  uri: BROWSE_JOB,
+  label: "job.l3",
+  // A full sentence in the reader's voice — the legible rail label is
+  // its first clause, not the `job.l3` filing slug.
+  story:
+    "When I browse the component catalogue, I want the whole set at a glance",
+  pairings: [
+    {
+      uri: `${DOCS}pairing.l3-components`,
+      label: "pairing.l3-components",
+      role: `${SURFACE}Primary`,
+      arrival: `${SURFACE}ColdEntry`,
+      surface: {
+        uri: `${DOCS}view.components`,
+        label: "view.components",
+        surfaceType: "Lens",
+        route: "components",
+        layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
+      },
+    },
+    {
+      // No arrival, and a surface composing NO layout — the row
+      // must end at its surface with no trailing edge.
+      uri: `${DOCS}pairing.l3-chips`,
+      label: "pairing.l3-chips",
+      role: `${SURFACE}Secondary`,
+      arrival: null,
+      surface: {
+        uri: `${DOCS}view.chips`,
+        label: "view.chips",
+        surfaceType: "Mechanism",
+        route: null,
+        layout: null,
+      },
+    },
+  ],
+};
+
+/** The maker coordinate: the browse job and a job nothing serves. */
+export const MAKER_JOURNEY: JourneyCoordinate = {
+  uri: MAKER_COORDINATE,
+  label: "any actor × writer × any fluency",
+  jobs: [
+    BROWSE_JOURNEY_JOB,
+    {
+      // Demand nothing serves — it must still earn a row.
+      uri: ORPHAN_JOB,
+      label: "job.orphan",
+      pairings: [],
+    },
+  ],
+};
+
 export const JOURNEY_MODEL: readonly JourneyCoordinate[] = [
-  {
-    uri: MAKER_COORDINATE,
-    label: "any actor × writer × any fluency",
-    jobs: [
-      {
-        uri: BROWSE_JOB,
-        label: "job.l3",
-        // A full sentence in the reader's voice — the legible rail label is
-        // its first clause, not the `job.l3` filing slug.
-        story:
-          "When I browse the component catalogue, I want the whole set at a glance",
-        pairings: [
-          {
-            uri: `${DOCS}pairing.l3-components`,
-            label: "pairing.l3-components",
-            role: `${SURFACE}Primary`,
-            arrival: `${SURFACE}ColdEntry`,
-            surface: {
-              uri: `${DOCS}view.components`,
-              label: "view.components",
-              surfaceType: "Lens",
-              route: "components",
-              layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
-            },
-          },
-          {
-            // No arrival, and a surface composing NO layout — the row
-            // must end at its surface with no trailing edge.
-            uri: `${DOCS}pairing.l3-chips`,
-            label: "pairing.l3-chips",
-            role: `${SURFACE}Secondary`,
-            arrival: null,
-            surface: {
-              uri: `${DOCS}view.chips`,
-              label: "view.chips",
-              surfaceType: "Mechanism",
-              route: null,
-              layout: null,
-            },
-          },
-        ],
-      },
-      {
-        // Demand nothing serves — it must still earn a row.
-        uri: ORPHAN_JOB,
-        label: "job.orphan",
-        pairings: [],
-      },
-    ],
-  },
+  MAKER_JOURNEY,
   {
     uri: WILDCARD_COORDINATE,
     label: "any actor × any role × any fluency",

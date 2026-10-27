@@ -7,6 +7,7 @@
    * both axes; each tier's section places itself. */
   .ds.catalog-list {
     --catalog-list-gap: var(--grid-gutter);
+    --catalog-list-partial-color: var(--color-text-muted);
 
     display: grid;
     grid-template-columns: subgrid;
@@ -14,8 +15,21 @@
     gap: var(--catalog-list-gap);
   }
 
+  /* The navigation's line and its links wrap on one line, a gutter apart,
+   * on a shared baseline. */
   .ds.catalog-list > .tiers {
     grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--catalog-list-gap);
+  }
+
+  /* While pages remain, a muted line names the links as the tiers loaded
+   * so far. */
+  .ds.catalog-list > .tiers > .partial {
+    margin-block: 0;
+    color: var(--catalog-list-partial-color);
   }
 
   /* The jump links sit on one wrapping line, a gutter apart, with no

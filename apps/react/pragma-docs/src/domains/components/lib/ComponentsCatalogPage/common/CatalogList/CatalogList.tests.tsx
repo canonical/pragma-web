@@ -78,11 +78,13 @@ describe("CatalogList", () => {
         "2 components loaded so far",
       ]);
       expect(screen.getByRole("button", { name: "Load more" })).toBeVisible();
+      const tiers = screen.getByRole("navigation", {
+        name: "Tiers of the components loaded so far",
+      });
+      // The partial reading is visible, not only announced.
       expect(
-        screen.getByRole("navigation", {
-          name: "Tiers of the components loaded so far",
-        }),
-      ).toBeInTheDocument();
+        within(tiers).getByText("Tiers of the components loaded so far"),
+      ).toBeVisible();
       expect(screen.queryByRole("navigation", { name: "Tiers" })).toBeNull();
     },
     HARNESS_TEST_TIMEOUT_MS,
@@ -97,9 +99,9 @@ describe("CatalogList", () => {
       }
       render(catalogPage(records as unknown as RecordMap, createFetchSpy()));
       expect(screen.queryByRole("button", { name: "Load more" })).toBeNull();
-      expect(
-        screen.getByRole("navigation", { name: "Tiers" }),
-      ).toBeInTheDocument();
+      const tiers = screen.getByRole("navigation", { name: "Tiers" });
+      // With every page loaded, the links stand alone.
+      expect(tiers.querySelector(".partial")).toBeNull();
       expect(readCounts()).toEqual([
         "3 components",
         "2 components",

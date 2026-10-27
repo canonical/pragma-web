@@ -3,7 +3,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withRouter } from "../../../../../.storybook/decorators/index.js";
 import { SITE_ROUTES } from "../../../../../.storybook/siteRoutes.js";
-import { BROWSE_JOB, JOURNEY_MODEL } from "../../__fixtures__/journeyModel.js";
+import {
+  BROWSE_JOB,
+  BROWSE_JOURNEY_JOB,
+  JOURNEY_MODEL,
+  MAKER_JOURNEY,
+} from "../../__fixtures__/journeyModel.js";
 import JourneyWell from "./JourneyWell.js";
 
 const meta: Meta<typeof JourneyWell> = {
@@ -41,11 +46,11 @@ export const HonestAbsence: Story = {
   args: {
     coordinates: [
       {
-        ...JOURNEY_MODEL[0],
+        ...MAKER_JOURNEY,
         jobs: [
           {
-            ...JOURNEY_MODEL[0].jobs[0],
-            pairings: JOURNEY_MODEL[0].jobs[0].pairings.slice(1),
+            ...BROWSE_JOURNEY_JOB,
+            pairings: BROWSE_JOURNEY_JOB.pairings.slice(1),
           },
         ],
       },

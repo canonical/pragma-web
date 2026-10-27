@@ -6,7 +6,7 @@ import {
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
 import { SITE_ROUTES } from "../../../../../.storybook/siteRoutes.js";
-import { JOURNEY_MODEL } from "../../__fixtures__/journeyModel.js";
+import { BROWSE_JOURNEY_JOB } from "../../__fixtures__/journeyModel.js";
 import JourneyInspector from "./JourneyInspector.js";
 
 const meta: Meta<typeof JourneyInspector> = {
@@ -38,7 +38,7 @@ export const Default: Story = {
         "When I don't yet know what exists, I want to browse and filter the full catalog, so I can find what exists and what it does, without reading source.",
       acceptances: ["listing + filters; Cmd-K; agents get listEntities"],
       coordinate: "any actor × writer × any fluency",
-      pairings: JOURNEY_MODEL[0].jobs[0].pairings,
+      pairings: BROWSE_JOURNEY_JOB.pairings,
     },
   },
 };

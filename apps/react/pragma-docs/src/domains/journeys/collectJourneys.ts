@@ -214,14 +214,14 @@ export const collectJourneys = (
     // in the live model (all 51 paired jobs are within a single 100-page).
     if (jobUri === undefined) continue;
     const surface = pairing.pairsSurface;
-    const layoutNode = surface?.composes?.edges[0]?.node;
+    const layoutNode = surface?.composes?.edges.at(0)?.node;
     const list = pairingsByJob.get(jobUri) ?? [];
     list.push({
       uri: pairing.uri,
       label: readLocalName(pairing.uri),
       role: pairing.pairingRole?.uri,
       // One arrival at most in this model; absent is data (34 of 133).
-      arrival: pairing.arrivals?.edges[0]?.node.uri,
+      arrival: pairing.arrivals?.edges.at(0)?.node.uri,
       surface:
         surface == null
           ? undefined
