@@ -1,0 +1,29 @@
+---
+# FleetLayout — the fleet lens's layout: the document archetype with the
+# metro rail, the fleet trail in the mode strip, the routed page in the
+# canvas, and the page's facts in the aside, the canvas's last three
+# columns, so the page fills the columns up to it. The mode strip bleeds
+# to the rail's border on its own, so this anatomy binds no styles and the
+# folder has no stylesheet.
+node:
+  uri: metro.component.fleet_layout
+  edges:
+    - node:
+        uri: prism.component.document_layout
+      relation: { cardinality: "1", slotName: default }
+    - node:
+        uri: metro.component.metro_rail
+      relation: { cardinality: "1", slotName: rail }
+    - node:
+        uri: prism.component.mode_strip
+        edges:
+          - node:
+              uri: prism.component.lens_breadcrumbs
+            relation: { cardinality: "1", slotName: context }
+      relation: { cardinality: "1", slotName: bar }
+    - node:
+        role: routed page
+      relation: { cardinality: "1", slotName: page }
+    - node:
+        uri: metro.component.fleet_facts
+      relation: { cardinality: "0..1", slotName: aside }

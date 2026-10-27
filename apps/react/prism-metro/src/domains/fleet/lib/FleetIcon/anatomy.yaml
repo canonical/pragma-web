@@ -1,0 +1,12 @@
+---
+# FleetIcon — the fleet lens's glyph in the rail: a train's side, two cars
+# coupled with a cab nose at the front, drawn in currentColor on the 16-unit
+# icon grid, decorative and hidden from assistive technology. Bespoke: the
+# published icon set has no train. It takes its colour and its size from
+# where the rail places it, so it binds no style of its own.
+node:
+  uri: metro.component.fleet_icon
+  edges:
+    - node:
+        role: car outline
+      relation: { cardinality: "2", slotName: car }

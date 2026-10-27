@@ -1,0 +1,16 @@
+---
+# FormationStack — several trains drawn at one scale, one side view each, a
+# gutter apart: the longest sets the scale, so every train reads against
+# it. A rolling stock's card carries it as its sidecar, its formations side
+# by side. Bespoke: no published component draws trains to scale.
+node:
+  uri: metro.component.formation_stack
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        uri: metro.component.formation_side_view
+        styles:
+          spacing.external.block.end: container.gap.default
+      relation: { cardinality: "0..*", slotName: formation }

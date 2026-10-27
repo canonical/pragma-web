@@ -13,7 +13,7 @@ describe("assertHomeLens", () => {
   );
 
   it("throws for a lens the landing has no words for, naming it", () => {
-    expect(() => assertHomeLens("fleet")).toThrow(/"fleet"/);
+    expect(() => assertHomeLens("network")).toThrow(/"network"/);
   });
 
   it("throws for a name only the object prototype holds", () => {

@@ -26,7 +26,7 @@ describe("MetroRail", () => {
       [...nav.querySelectorAll(".lenses .label")].map(
         (label) => label.textContent,
       ),
-    ).toEqual(["Network", "Stations", "Lines", "Definitions"]);
+    ).toEqual(["Network", "Stations", "Lines", "Definitions", "Fleet"]);
   });
 
   it("links the site brand to the landing", () => {

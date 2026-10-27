@@ -9,6 +9,7 @@ const buildData = (
   interchanges: number | null,
   stations: number | null,
   lines: number | null,
+  fleet: number | null,
   classesPerOntology: readonly number[],
 ): MetroHomeQuery$data => ({
   interchanges:
@@ -20,6 +21,8 @@ const buildData = (
       ? null
       : { uri: "metro:Station", instanceCount: stations },
   lines: lines === null ? null : { uri: "metro:Line", instanceCount: lines },
+  fleet:
+    fleet === null ? null : { uri: "metro:RollingStock", instanceCount: fleet },
   ontologies: classesPerOntology.map((count, index) => ({
     prefix: `ontology${index}`,
     classes: Array.from({ length: count }, (_, position) => ({
@@ -30,24 +33,26 @@ const buildData = (
 
 describe("readLensCounts", () => {
   it("reads each class's instances and sums every ontology's classes", () => {
-    expect(readLensCounts(buildData(4, 16, 3, [7, 2]))).toEqual({
+    expect(readLensCounts(buildData(4, 16, 3, 3, [7, 2]))).toEqual({
       network: 4,
       stations: 16,
       lines: 3,
       definitions: 9,
+      fleet: 3,
     });
   });
 
   it("counts 0 for a class the graph does not know", () => {
-    expect(readLensCounts(buildData(null, null, null, [1]))).toEqual({
+    expect(readLensCounts(buildData(null, null, null, null, [1]))).toEqual({
       network: 0,
       stations: 0,
       lines: 0,
       definitions: 1,
+      fleet: 0,
     });
   });
 
   it("counts no definitions when the graph loads no ontology", () => {
-    expect(readLensCounts(buildData(1, 1, 1, [])).definitions).toBe(0);
+    expect(readLensCounts(buildData(1, 1, 1, 1, [])).definitions).toBe(0);
   });
 });

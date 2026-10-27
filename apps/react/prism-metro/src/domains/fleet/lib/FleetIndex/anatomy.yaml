@@ -1,0 +1,40 @@
+---
+# FleetIndex — the fleet lens's index, in the document archetype's canvas:
+# its heading, then every rolling stock in the shared list view of nodes,
+# as cards that draw each stock's formations at one scale, or as rows.
+# While the fleet is on its way it says so in one muted line; a failed read
+# says so as an alert; a graph with no rolling stock says that in the
+# list's own empty line.
+#
+# The root is a subgrid of the canvas over every column, so the list view's
+# cards bind to the canvas's columns; the heading and the lines span them
+# all.
+node:
+  uri: metro.component.fleet_index
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: grid
+    layout.grid.columns: subgrid
+    spacing.gap: grid.gutter
+    layout.alignSelf: start
+  edges:
+    - node:
+        role: heading
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "1", slotName: title }
+    - node:
+        uri: metro.subcomponent.stock_list
+      relation: { cardinality: "0..1", slotName: list }
+    - node:
+        role: loading line
+        styles:
+          layout.grid.column: "1 / -1"
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: status }
+    - node:
+        role: error alert
+        styles:
+          layout.grid.column: "1 / -1"
+          typography.color: color.text.error
+      relation: { cardinality: "0..1", slotName: error }

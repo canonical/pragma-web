@@ -1,0 +1,16 @@
+---
+# UnitDetail — a unit's page once its data is in the store, a subcomponent
+# of UnitPage: its title, then its side view, the unit drawn as a train of
+# its own, front first. An address naming no unit says nothing lives there.
+#
+# It renders no element of its own and binds no styles: its elements land
+# in UnitPage's grid, which styles each by its slot.
+node:
+  uri: metro.subcomponent.unit_detail
+  edges:
+    - node: { role: page title }
+      relation: { cardinality: "0..1", slotName: title }
+    - node: { uri: metro.component.formation_side_view }
+      relation: { cardinality: "0..1", slotName: side-view }
+    - node: { role: not-found line }
+      relation: { cardinality: "0..1", slotName: not-found }

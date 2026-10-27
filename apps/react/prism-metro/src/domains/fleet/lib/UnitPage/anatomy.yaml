@@ -1,0 +1,35 @@
+---
+# UnitPage — the fleet lens's page of one unit, in the document archetype's
+# canvas, beside its facts in the aside: its title, then its side view, the
+# unit drawn as a train of its own. While the page's data is on its way it
+# says so in one muted line; a failed read says so as an alert; an address
+# naming nothing of its type says that nothing lives there.
+node:
+  uri: metro.component.unit_page
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: grid
+    spacing.gap: grid.gutter
+    layout.alignSelf: start
+  edges:
+    - node:
+        role: page title
+      relation: { cardinality: "0..1", slotName: title }
+    - node:
+        uri: metro.component.formation_side_view
+      relation: { cardinality: "0..*", slotName: side-view }
+    - node:
+        role: loading line
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: loading }
+    - node:
+        role: not-found line
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: not-found }
+    - node:
+        role: error alert
+        styles:
+          typography.color: color.text.error
+      relation: { cardinality: "0..1", slotName: error }

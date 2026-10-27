@@ -1,0 +1,25 @@
+---
+# CarTypeChip: a car type as an inline mention.
+# Best guess: the car type's code as the pill's lead, then its name.
+# Projected onto EntityChip, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.car_type_chip
+  projection: { on: CarType }
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: code
+              projection: { field: code }
+            relation: { cardinality: "1", slotName: lead }
+          - node:
+              role: value
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: value }
+      relation: { cardinality: "1" }

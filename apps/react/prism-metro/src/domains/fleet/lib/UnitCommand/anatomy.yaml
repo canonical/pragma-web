@@ -1,0 +1,29 @@
+---
+# UnitCommand: a unit as a 56px command-palette entry.
+# Best guess: "‹name› Unit", then its length.
+# Projected onto EntityCommand, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.unit_command
+  projection: { on: Unit }
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: vital
+              projection: { field: length }
+            relation: { cardinality: "1", slotName: vital }
+      relation: { cardinality: "1" }

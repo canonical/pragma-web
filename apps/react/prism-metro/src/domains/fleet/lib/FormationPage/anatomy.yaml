@@ -1,0 +1,73 @@
+---
+# FormationPage — the fleet lens's page of one formation, in the document
+# archetype's canvas, beside its facts in the aside: its title, then
+# its stock's chip, its side view with a tick at each line's shortest
+# platform, its units in order, each named by its chip, then its fit at
+# the platforms of every line it runs on, each line named by its chip.
+# Sections sit a loose step apart, more than the gutter
+# between the items inside them. While the page's data is on its way it
+# says so in one muted line; a failed read says so as an alert; an address
+# naming nothing of its type says that nothing lives there.
+#
+# Token ledger: container.gap.loose between sections, an item's external
+# spacing, never a gap; space.100 (8px) between the words of an entry, an
+# inline run, one baseline pair.
+node:
+  uri: metro.component.formation_page
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: grid
+    spacing.gap: grid.gutter
+    layout.alignSelf: start
+  edges:
+    - node:
+        role: page title
+      relation: { cardinality: "0..1", slotName: title }
+    - node:
+        role: section
+        styles:
+          spacing.external.block.start: container.gap.loose
+          layout.type: grid
+          spacing.gap: grid.gutter
+      relation: { cardinality: "0..*", slotName: section }
+    - node:
+        role: list of entries
+        styles:
+          layout.type: grid
+          spacing.gap: grid.gutter
+          spacing.internal.inline.start: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          layout.listStyle: none
+      relation: { cardinality: "0..*", slotName: list }
+    - node:
+        role: entry, a node's chip and its vitals
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap: space.100
+      relation: { cardinality: "0..*", slotName: entry }
+    - node:
+        role: vital
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..*", slotName: vital }
+    - node:
+        uri: metro.component.formation_side_view
+      relation: { cardinality: "0..*", slotName: side-view }
+    - node:
+        role: loading line
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: loading }
+    - node:
+        role: not-found line
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: not-found }
+    - node:
+        role: error alert
+        styles:
+          typography.color: color.text.error
+      relation: { cardinality: "0..1", slotName: error }

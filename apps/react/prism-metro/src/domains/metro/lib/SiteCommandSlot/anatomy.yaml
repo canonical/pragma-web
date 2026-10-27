@@ -18,4 +18,8 @@ node:
           - node: { uri: metro.component.interchange_command, projection: { on: Interchange } }
           - node: { uri: metro.component.line_command, projection: { on: Line } }
           - node: { uri: metro.component.zone_command, projection: { on: Zone } }
+          - node: { uri: metro.component.rolling_stock_command, projection: { on: RollingStock } }
+          - node: { uri: metro.component.formation_command, projection: { on: Formation } }
+          - node: { uri: metro.component.unit_command, projection: { on: Unit } }
+          - node: { uri: metro.component.car_type_command, projection: { on: CarType } }
       relation: { cardinality: "1" }
