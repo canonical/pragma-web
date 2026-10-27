@@ -234,14 +234,28 @@
     color: var(--entity-card-vital-color);
   }
 
-  /* Below one group a card without a sidecar spans every column of the
-   * grid that holds it rather than the Cards group's span: the canvas
-   * beside the rail holds three columns there, and a card at two would
-   * leave the last one empty on every row. A card with a sidecar keeps
-   * its own reflow. */
+  /* Below one group a card spans every column of the grid that holds it
+   * rather than the Cards group's span: the canvas beside the rail holds
+   * three columns there, and a card at two would leave the last one empty
+   * on every row, while a card with a sidecar would need four. A sidecar
+   * then stacks under the body, on the body's last track, meeting it at
+   * the body's divider as the footer does, and the body keeps the two
+   * tracks before it; the footer runs under both. */
   @container shell (width < 448px) {
-    .ds.entity-card:not(:has(> .sidecar)) {
+    .ds.entity-card,
+    .ds.entity-card:has(> .sidecar) {
       grid-column: var(--entity-card-narrow-column);
+    }
+
+    .ds.entity-card:has(> .sidecar) > .body {
+      grid-column: 1 / -1;
+      grid-row: 1 / 3;
+    }
+
+    .ds.entity-card:has(> .sidecar) > .sidecar {
+      grid-column: 1 / -1;
+      grid-row: 3 / 4;
+      margin-block-start: var(--entity-card-footer-overlap);
     }
   }
 }
