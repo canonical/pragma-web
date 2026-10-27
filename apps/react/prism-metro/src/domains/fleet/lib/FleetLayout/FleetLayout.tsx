@@ -14,7 +14,6 @@ import { useMessages } from "#i18n";
 import { FLEET_ROUTES, KIND_BY_ROUTE } from "../../constants.js";
 import { FleetFacts } from "../FleetFacts/index.js";
 import type { FleetLayoutProps } from "./types.js";
-import "./styles.css";
 
 const componentCssClassName = "ds fleet-layout";
 
@@ -63,12 +62,7 @@ const FleetLayout = ({
       }
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       rail={<MetroRail />}
-      strip={
-        <ModeStrip
-          className="bar"
-          context={<FleetTrail lensLabel={t("lens.fleet")} />}
-        />
-      }
+      strip={<ModeStrip context={<FleetTrail lensLabel={t("lens.fleet")} />} />}
     >
       {children}
     </DocumentLayout>

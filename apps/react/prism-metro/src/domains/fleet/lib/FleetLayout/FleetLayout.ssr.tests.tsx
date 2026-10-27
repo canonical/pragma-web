@@ -19,6 +19,6 @@ describe("FleetLayout SSR", () => {
       />,
     );
     expect(html).toContain("ds fleet-layout");
-    expect(html).toMatch(/class="ds mode-strip bar"/);
+    expect(html).toMatch(/class="ds mode-strip"/);
   });
 });

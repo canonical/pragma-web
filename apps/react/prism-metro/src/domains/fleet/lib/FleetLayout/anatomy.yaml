@@ -2,13 +2,9 @@
 # FleetLayout — the fleet lens's layout: the document archetype with the
 # metro rail, the fleet trail in the mode strip, the routed page in the
 # canvas, and the page's facts in the aside, the canvas's last three
-# columns, so the page fills the columns up to it. Its own decision is the
-# bar's bleed: the strip's rule runs one gutter west of the strip region
-# and meets the rail's border, and the strip's inline-start padding grows
-# by the same gutter, so its content stays where it was.
-#
-# Token ledger: the bleed is a calc over the shim (one gutter); no token
-# names a negative gutter.
+# columns, so the page fills the columns up to it. The mode strip bleeds
+# to the rail's border on its own, so this anatomy binds no styles and the
+# folder has no stylesheet.
 node:
   uri: metro.component.fleet_layout
   edges:
@@ -20,9 +16,6 @@ node:
       relation: { cardinality: "1", slotName: rail }
     - node:
         uri: prism.component.mode_strip
-        styles:
-          spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
-          spacing.internal.inline.start: "calc(var(--component-padding-inline) + var(--grid-gutter))"
         edges:
           - node:
               uri: prism.component.lens_breadcrumbs

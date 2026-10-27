@@ -39,5 +39,5 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The layout around a rolling stock's page: the rail with the fleet current, the trail in the bleeding bar, the page in the canvas and its facts in the aside. */
+/** The layout around a rolling stock's page: the rail with the fleet current, the trail in the mode strip, the page in the canvas and its facts in the aside. */
 export const Default: Story = {};

@@ -23,7 +23,7 @@ describe("FleetLayout", () => {
       "aria-current",
       "page",
     );
-    expect(root?.querySelector(".strip > .bar")).not.toBeNull();
+    expect(root?.querySelector(".strip > .ds.mode-strip")).not.toBeNull();
     await screen.findByRole("heading", { level: 1, name: "Fleet" });
     expect(root?.querySelector(".aside")).toBeNull();
   });
@@ -41,7 +41,7 @@ describe("FleetLayout", () => {
       `/fleet/${encodeURIComponent(SERIES_90_CURIE)}`,
     );
     await screen.findByRole("heading", { level: 1, name: "Series 90" });
-    const trail = container.querySelector(".bar") as HTMLElement;
+    const trail = container.querySelector(".ds.mode-strip") as HTMLElement;
     expect(trail).toHaveTextContent(SERIES_90_CURIE);
     expect(within(trail).getByRole("link", { name: "Fleet" })).toHaveAttribute(
       "href",
