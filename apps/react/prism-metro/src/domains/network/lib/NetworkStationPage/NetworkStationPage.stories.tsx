@@ -2,7 +2,10 @@
 
 import type { RelayParameters } from "@canonical/storybook-addon-relay";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { withRouter } from "../../../../../.storybook/decorators/index.js";
+import {
+  withProjections,
+  withRouter,
+} from "../../../../../.storybook/decorators/index.js";
 import { answerNetworkQueries } from "../../../../../.storybook/mocks/index.js";
 import Component from "./NetworkStationPage.js";
 
@@ -10,7 +13,10 @@ const meta = {
   title: "Components/NetworkStationPage",
   component: Component,
   tags: ["autodocs"],
-  decorators: [withRouter({ url: "/network/stations/metro%3Atannery-lane" })],
+  decorators: [
+    withProjections(),
+    withRouter({ url: "/network/stations/metro%3Atannery-lane" }),
+  ],
   parameters: {
     layout: "fullscreen",
     grid: "intrinsic",

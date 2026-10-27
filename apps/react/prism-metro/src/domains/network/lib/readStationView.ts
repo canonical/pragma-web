@@ -1,4 +1,4 @@
-import type { NetworkStationQuery$data } from "../../../relay/__generated__/NetworkStationQuery.graphql.js";
+import type { NetworkStationQuery$data } from "#relay/__generated__/NetworkStationQuery.graphql.js";
 import findRouteNeighbours from "./findRouteNeighbours.js";
 import type { NodeRef, RouteNeighbourView, StationView } from "./types.js";
 

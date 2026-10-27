@@ -1,11 +1,11 @@
 // @vitest-environment node
 
 import { describe, expect, it } from "vitest";
-import createMetroExecute from "../../../../testing/createMetroExecute.js";
-import { METRO_NAMESPACE } from "../../../../testing/fixtures.js";
 import networkLineQueryNode, {
   type NetworkLineQuery$data,
-} from "../../../relay/__generated__/NetworkLineQuery.graphql.js";
+} from "#relay/__generated__/NetworkLineQuery.graphql.js";
+import createMetroExecute from "../../../../testing/createMetroExecute.js";
+import { METRO_NAMESPACE } from "../../../../testing/fixtures.js";
 import readLineView from "./readLineView.js";
 
 /** Read the node at `local` through the line query. */

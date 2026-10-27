@@ -1,4 +1,4 @@
-import type { NetworkLineQuery$data } from "../../../relay/__generated__/NetworkLineQuery.graphql.js";
+import type { NetworkLineQuery$data } from "#relay/__generated__/NetworkLineQuery.graphql.js";
 import type {
   LineView,
   NodeRef,

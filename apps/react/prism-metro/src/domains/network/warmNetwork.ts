@@ -1,5 +1,5 @@
 import { prefetchQuery } from "@canonical/prism-core";
-import networkMapQueryNode from "../../relay/__generated__/NetworkMapQuery.graphql.js";
+import networkMapQueryNode from "#relay/__generated__/NetworkMapQuery.graphql.js";
 import buildNetworkMapVariables from "./buildNetworkMapVariables.js";
 
 /**

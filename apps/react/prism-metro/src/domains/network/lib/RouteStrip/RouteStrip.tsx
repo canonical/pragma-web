@@ -73,9 +73,7 @@ export default function RouteStrip({
   const t = useMessages();
   const route = useFragment(nodeFragment, node);
   const [showsReverse, setShowsReverse] = useState(false);
-  const { reverse } = route;
-  const directions: readonly Direction[] =
-    reverse === null || reverse === undefined ? [route] : [route, reverse];
+  const reverse = route.reverse ?? undefined;
 
   const renderContinues = (): ReactElement | null =>
     route.isLoop ? (
@@ -114,15 +112,15 @@ export default function RouteStrip({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       style={{ ...style, "--route-strip-colour": colour } as CSSProperties}
     >
-      {directions.length === 1 ? (
+      {reverse === undefined ? (
         renderDirection(route)
       ) : (
-        <ClientOnly fallback={directions.map(renderDirection)}>
+        <ClientOnly fallback={[route, reverse].map(renderDirection)}>
           <fieldset
             aria-label={t("network.strip.direction")}
             className="toggle"
           >
-            {directions.map((direction, index) => (
+            {[route, reverse].map((direction, index) => (
               <Button
                 aria-pressed={showsReverse === (index === 1)}
                 importance={
@@ -136,7 +134,7 @@ export default function RouteStrip({
               </Button>
             ))}
           </fieldset>
-          {renderDirection(directions[showsReverse ? 1 : 0] ?? route)}
+          {renderDirection(showsReverse ? reverse : route)}
         </ClientOnly>
       )}
     </section>

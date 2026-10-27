@@ -1,4 +1,4 @@
-import type { NetworkMapQuery$variables } from "../../relay/__generated__/NetworkMapQuery.graphql.js";
+import type { NetworkMapQuery$variables } from "#relay/__generated__/NetworkMapQuery.graphql.js";
 import { LINE_CLASS_URI, LINE_PAGE_SIZE } from "./constants.js";
 
 /**

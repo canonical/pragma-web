@@ -38,6 +38,19 @@ describe("readNetworkIndex", () => {
     expect(titles).toEqual([...titles].sort((a, b) => a.localeCompare(b)));
   });
 
+  it("leaves out an instance that is not a line", () => {
+    const [first] = MAP.ontologyClass?.instances.edges ?? [];
+    const notALine = {
+      ...first?.node,
+      code: undefined,
+      routes: undefined,
+    } as unknown as NonNullable<typeof first>["node"];
+    const { lines } = readNetworkIndex({
+      ontologyClass: { instances: { edges: [{ node: notALine }] } },
+    });
+    expect(lines).toEqual([]);
+  });
+
   it("lists nothing when the graph has no line class", () => {
     expect(readNetworkIndex({ ontologyClass: null })).toEqual({
       lines: [],

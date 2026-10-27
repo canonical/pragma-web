@@ -1,11 +1,11 @@
 // @vitest-environment node
 
 import { describe, expect, it } from "vitest";
-import buildNetworkLines from "../../../../testing/buildNetworkLines.js";
-import createMetroExecute from "../../../../testing/createMetroExecute.js";
 import networkMapQueryNode, {
   type NetworkMapQuery$data,
-} from "../../../relay/__generated__/NetworkMapQuery.graphql.js";
+} from "#relay/__generated__/NetworkMapQuery.graphql.js";
+import buildNetworkLines from "../../../../testing/buildNetworkLines.js";
+import createMetroExecute from "../../../../testing/createMetroExecute.js";
 import buildNetworkMapVariables from "../buildNetworkMapVariables.js";
 import type { DiagramLine } from "./geometry/index.js";
 import readDiagramLines from "./readDiagramLines.js";

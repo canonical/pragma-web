@@ -1,5 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
+import { HomesProvider } from "@canonical/prism-core";
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
@@ -67,6 +68,26 @@ describe("CallStop", () => {
       "Circle Line",
     );
     expect(stop.querySelector(".transfer")?.textContent).toBe("4 min");
+  });
+
+  it("names a stop with no home as text", () => {
+    renderWithSite(
+      <HomesProvider homes={{}}>
+        <ol>
+          {NORTHGATE === undefined ? null : (
+            <CallStop
+              colour={NORTH.colour}
+              lineUri={NORTH.uri}
+              node={NORTHGATE}
+            />
+          )}
+        </ol>
+      </HomesProvider>,
+      "/network",
+      RECORDED,
+    );
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(screen.getByText("Northgate")).toHaveClass("name");
   });
 
   it("sets the line's colour on its channel, keeping the caller's style", () => {

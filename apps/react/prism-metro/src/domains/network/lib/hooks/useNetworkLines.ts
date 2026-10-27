@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useLazyLoadQuery } from "react-relay";
 import networkMapQueryNode, {
   type NetworkMapQuery,
-} from "../../../../relay/__generated__/NetworkMapQuery.graphql.js";
+} from "#relay/__generated__/NetworkMapQuery.graphql.js";
 import buildNetworkMapVariables from "../../buildNetworkMapVariables.js";
 import readDiagramLines from "../readDiagramLines.js";
 import type { UseNetworkLinesResult } from "./types.js";

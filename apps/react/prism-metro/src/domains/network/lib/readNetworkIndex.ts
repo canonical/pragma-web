@@ -19,13 +19,17 @@ export default function readNetworkIndex(
   const lines = (data.ontologyClass?.instances.edges ?? [])
     .map(({ node }) => node)
     .filter(
-      (node): node is LineNode & { readonly code: string } =>
-        typeof node.code === "string",
+      (
+        node,
+      ): node is LineNode & {
+        readonly code: string;
+        readonly routes: NonNullable<LineNode["routes"]>;
+      } => typeof node.code === "string" && node.routes !== undefined,
     )
     .sort((a, b) => a.code.localeCompare(b.code, "en", { numeric: true }));
   const stops = new Map(
     lines.flatMap((line) =>
-      (line.routes ?? []).flatMap((route) =>
+      line.routes.flatMap((route) =>
         route.calls.map(({ stop }) => [stop.uri, stop] as const),
       ),
     ),

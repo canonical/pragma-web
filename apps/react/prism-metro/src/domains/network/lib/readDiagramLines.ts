@@ -1,4 +1,4 @@
-import type { NetworkMapQuery$data } from "../../../relay/__generated__/NetworkMapQuery.graphql.js";
+import type { NetworkMapQuery$data } from "#relay/__generated__/NetworkMapQuery.graphql.js";
 import type {
   DiagramLine,
   DiagramRoute,
