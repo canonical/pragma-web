@@ -87,4 +87,15 @@
   .ds.station-panel .muted {
     color: var(--station-panel-muted-color);
   }
+
+  /* Below two groups a term or a route's line takes the whole row, and its
+   * value or neighbours the row below. */
+  @container shell (width < 912px) {
+    .ds.station-panel .term,
+    .ds.station-panel .value,
+    .ds.station-panel .line,
+    .ds.station-panel .neighbours {
+      grid-column: 1 / -1;
+    }
+  }
 }

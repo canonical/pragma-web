@@ -69,23 +69,25 @@ export default function LinePanel({
           <dt className="term">{t("network.line.stops")}</dt>
           <dd className="value">{line.stopCount}</dd>
         </div>
-        <div>
-          <dt className="term">{t("network.line.interchanges")}</dt>
-          <dd className="value">
-            <ul className="interchanges">
-              {line.interchanges.map((stop) => (
-                <li key={stop.curie}>
-                  {linkStop(stop)}{" "}
-                  {stop.transferMinutes === undefined
-                    ? null
-                    : t("network.station.minutes", {
-                        minutes: stop.transferMinutes,
-                      })}
-                </li>
-              ))}
-            </ul>
-          </dd>
-        </div>
+        {line.interchanges.length === 0 ? null : (
+          <div>
+            <dt className="term">{t("network.line.interchanges")}</dt>
+            <dd className="value">
+              <ul className="interchanges">
+                {line.interchanges.map((stop) => (
+                  <li key={stop.curie}>
+                    {linkStop(stop)}{" "}
+                    {stop.transferMinutes === undefined
+                      ? null
+                      : t("network.stop.transfer", {
+                          minutes: stop.transferMinutes,
+                        })}
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        )}
       </dl>
     </section>
   );

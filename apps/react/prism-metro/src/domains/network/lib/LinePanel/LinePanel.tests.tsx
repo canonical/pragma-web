@@ -54,9 +54,9 @@ describe("LinePanel", () => {
         (item) => item.textContent,
       ),
     ).toEqual([
-      "Central Exchange 4 min",
-      "Tannery Lane 3 min",
-      "Riverside Junction 7 min",
+      "Central Exchange 4 min transfer",
+      "Tannery Lane 3 min transfer",
+      "Riverside Junction 7 min transfer",
     ]);
   });
 
@@ -73,6 +73,15 @@ describe("LinePanel", () => {
     expect(container.querySelector(".interchanges li")?.textContent).toBe(
       "Tannery Lane ",
     );
+  });
+
+  it("names no interchanges on a line that calls at none", () => {
+    renderWithSite(
+      <LinePanel line={{ ...CIRCLE, interchanges: [] }} />,
+      "/network",
+      RECORDED,
+    );
+    expect(screen.queryByText("Interchanges")).not.toBeInTheDocument();
   });
 
   it("sets the line's colour on its channel", () => {

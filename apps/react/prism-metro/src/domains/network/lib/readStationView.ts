@@ -7,7 +7,7 @@ type StationNode = NonNullable<NetworkStationQuery$data["node"]>;
 /**
  * Read the station query's node into the station page's view: its facts,
  * and, for every route of every line serving it, the stops either side of
- * it. A route that does not call at the station is left out.
+ * it in calling order. A route that does not call at the station is left out.
  *
  * @param node - The station query's node.
  * @returns The view, or undefined when the node is not a station.
@@ -24,14 +24,15 @@ export default function readStationView(
   }
   const routes = servesLine.flatMap((line) =>
     line.routes.flatMap((route): RouteNeighbourView[] => {
+      const calls = [...route.calls].sort((a, b) => a.position - b.position);
       const refs = new Map<string, NodeRef>(
-        route.calls.map(({ stop }) => [
+        calls.map(({ stop }) => [
           stop.uri,
           { curie: stop._meta.curie, title: stop._meta.title },
         ]),
       );
       const neighbours = findRouteNeighbours(
-        route.calls.map(({ stop }) => stop.uri),
+        calls.map(({ stop }) => stop.uri),
         route.isLoop,
         node.uri,
       );

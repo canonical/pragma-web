@@ -33,10 +33,10 @@ export const MESSAGES = {
   "network.station.unrouted":
     "{title} is in the graph, but no route calls at it, so the map does not draw it.",
   "network.station.unrouted.link": "Read its entry in the stations lens",
+  "network.station.unrouted.map": "Back to the network map",
   "network.station.previous": "Previous",
   "network.station.next": "Next",
   "network.station.terminus": "Terminus",
-  "network.line.code": "Code",
   "network.line.service": "Service",
   "network.line.loop": "Loop",
   "network.line.linear": "End to end",
@@ -45,6 +45,7 @@ export const MESSAGES = {
   "network.line.interchanges": "Interchanges",
   "network.strip.direction": "Direction",
   "network.strip.continues": "continues",
+  "network.stop.transfer": "{minutes} min transfer",
   "shell.loading": "Loading…",
   "home.title": "Overview",
   "home.lead":

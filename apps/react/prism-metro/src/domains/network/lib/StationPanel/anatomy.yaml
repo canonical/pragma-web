@@ -8,6 +8,11 @@
 # as the page's arrangement; each route's line is the line's chip, as its
 # site projects it.
 #
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups a term or a route's
+#     line takes the whole row, its value or neighbours the row below, so
+#     nothing is squeezed into the narrow columns' remainder.
+#
 # Every decision is read through a component token declared on the root
 # (`--station-panel-*`), bound to the symbol named here.
 node:

@@ -63,14 +63,16 @@ export default function StationPanel({
         <h1>{station.title}</h1>
         <p className="kind">{t(`network.station.kind.${station.kind}`)}</p>
       </header>
-      <dl className="facts">
-        {facts.map(([term, value]) => (
-          <div className="fact" key={term}>
-            <dt className="term">{term}</dt>
-            <dd className="value">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      {facts.length === 0 ? null : (
+        <dl className="facts">
+          {facts.map(([term, value]) => (
+            <div className="fact" key={term}>
+              <dt className="term">{term}</dt>
+              <dd className="value">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       <section className="routes">
         <h2 className="heading">{t("network.station.routes")}</h2>
         {station.routes.map((route) => (

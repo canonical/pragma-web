@@ -5,7 +5,9 @@ import { useProjectionLink } from "@canonical/prism-projections";
 import type { CSSProperties, ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import { useMessages } from "#i18n";
-import nodeFragment from "#relay/__generated__/CallStop_node.graphql.js";
+import nodeFragment, {
+  type CallStop_node$data,
+} from "#relay/__generated__/CallStop_node.graphql.js";
 import type { CallStopProps } from "./types.js";
 import "./styles.css";
 
@@ -24,11 +26,12 @@ const declareNodeFragment = (): unknown => graphql`
         curie
       }
       servesLine {
+        __typename
         uri
-        code
         colour
         _meta {
           title
+          curie
         }
       }
       ... on Interchange {
@@ -42,11 +45,44 @@ void declareNodeFragment;
 
 const componentCssClassName = "ds call-stop";
 
+/** Another line the stop meets, as the fragment reads it. */
+type ConnectionLine = CallStop_node$data["stop"]["servesLine"][number];
+
+/**
+ * Another line the stop meets: a swatch of its colour and its name,
+ * linking to its home when it has one.
+ */
+const Connection = ({
+  line,
+}: {
+  readonly line: ConnectionLine;
+}): ReactElement => {
+  const href = useHome({ __typename: line.__typename, uri: line._meta.curie });
+  const LinkComponent = useProjectionLink();
+  return (
+    <li className="connection">
+      <span
+        aria-hidden="true"
+        className="swatch"
+        style={
+          { "--call-stop-connection-colour": line.colour } as CSSProperties
+        }
+      />
+      {href === undefined ? (
+        line._meta.title
+      ) : (
+        <LinkComponent href={href}>{line._meta.title}</LinkComponent>
+      )}
+    </li>
+  );
+};
+
 /**
  * One call of a route as a door card reads it: a tick on the strip's rule
  * in the line's colour (a hollow ring at an interchange), the stop's name
- * linking to its home, the other lines it meets, each by its code beside a
- * swatch of its colour, and at an interchange the time a transfer takes.
+ * linking to its home, the other lines it meets, each by its name beside a
+ * swatch of its colour and linking to its home, and at an interchange the
+ * time a transfer takes.
  * Below two groups of columns it lays its tick beside its name.
  *
  * Native props reach the `<li>` root; a consumer `className` merges after
@@ -93,25 +129,14 @@ export default function CallStop({
       {connections.length > 0 ? (
         <ul className="connections">
           {connections.map((line) => (
-            <li className="connection" key={line.uri}>
-              <span
-                aria-hidden="true"
-                className="swatch"
-                style={
-                  {
-                    "--call-stop-connection-colour": line.colour,
-                  } as CSSProperties
-                }
-              />
-              <abbr title={line._meta.title}>{line.code}</abbr>
-            </li>
+            <Connection key={line.uri} line={line} />
           ))}
         </ul>
       ) : null}
       {stop.transferMinutes === undefined ||
       stop.transferMinutes === null ? null : (
         <span className="transfer">
-          {t("network.station.minutes", { minutes: stop.transferMinutes })}
+          {t("network.stop.transfer", { minutes: stop.transferMinutes })}
         </span>
       )}
     </li>

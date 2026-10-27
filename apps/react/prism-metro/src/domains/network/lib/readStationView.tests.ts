@@ -34,6 +34,31 @@ describe("readStationView", () => {
     });
   });
 
+  it("reads the neighbours in calling order whatever order the calls arrive in", async () => {
+    const node = await readNode("tannery-lane");
+    const reversed = {
+      ...node,
+      servesLine: node.servesLine?.map((line) => ({
+        ...line,
+        routes: line.routes.map((route) => ({
+          ...route,
+          calls: [...route.calls].reverse(),
+        })),
+      })),
+    };
+    /** Each route as a reader sees it: its line, label and neighbours. */
+    const readRoutes = (view: ReturnType<typeof readStationView>) =>
+      view?.routes.map(({ line, label, previous, next }) => ({
+        line: line.curie,
+        label,
+        previous,
+        next,
+      }));
+    expect(readRoutes(readStationView(reversed))).toEqual(
+      readRoutes(readStationView(node)),
+    );
+  });
+
   it("finds the stops either side on every route of every line", async () => {
     const view = readStationView(await readNode("tannery-lane"));
     expect(view?.routes).toHaveLength(6);

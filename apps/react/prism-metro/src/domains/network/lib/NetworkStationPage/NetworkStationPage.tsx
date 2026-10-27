@@ -71,6 +71,11 @@ const StationMain = ({
             {t("network.station.unrouted.link")}
           </a>
         </p>
+        <p>
+          <a href={router.buildPath("network")}>
+            {t("network.station.unrouted.map")}
+          </a>
+        </p>
       </section>
     );
   }

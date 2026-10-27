@@ -52,7 +52,20 @@ describe("NetworkStationPage", () => {
         .getByRole("link", { name: "Read its entry in the stations lens" })
         .getAttribute("href"),
     ).toBe("/stations/metro%3Aghost");
+    expect(
+      screen.getByRole("link", { name: "Back to the network map" }),
+    ).toHaveAttribute("href", "/network");
     expect(heading.textContent).not.toBe("Not on the network");
+  });
+
+  it("says so when the address names a line, not a station", async () => {
+    renderWithSite(<NetworkStationPage address="metro:circle-line" />);
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Not on the network",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("carries its address on its main column", () => {

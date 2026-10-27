@@ -35,7 +35,9 @@ describe("readNetworkIndex", () => {
     const titles = stations.map(
       (stop) => (stop as unknown as { _meta: { title: string } })._meta.title,
     );
-    expect(titles).toEqual([...titles].sort((a, b) => a.localeCompare(b)));
+    expect(titles).toEqual(
+      [...titles].sort((a, b) => a.localeCompare(b, "en")),
+    );
   });
 
   it("leaves out an instance that is not a line", () => {

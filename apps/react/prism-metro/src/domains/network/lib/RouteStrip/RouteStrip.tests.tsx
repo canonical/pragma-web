@@ -34,9 +34,9 @@ describe("RouteStrip", () => {
       .getByRole("heading", { name: "To Marsh End" })
       .closest(".direction") as HTMLElement;
     expect(
-      within(southbound)
-        .getAllByRole("link")
-        .map((link) => link.textContent),
+      [...southbound.querySelectorAll(".call-stop > .name")].map(
+        (name) => name.textContent,
+      ),
     ).toEqual([
       "Northgate",
       "Verge Park",

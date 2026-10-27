@@ -35,7 +35,7 @@ export default function readNetworkIndex(
     ),
   );
   const stations = [...stops.values()].sort((a, b) =>
-    a._meta.title.localeCompare(b._meta.title),
+    a._meta.title.localeCompare(b._meta.title, "en"),
   );
   return { lines, stations };
 }

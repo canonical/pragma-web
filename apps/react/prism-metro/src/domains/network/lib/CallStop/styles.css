@@ -14,7 +14,6 @@
     --call-stop-ring-width: 2px;
     --call-stop-ring-fill: var(--color-background);
     --call-stop-swatch-size: 0.5rem;
-    --call-stop-code-font: ui-monospace, monospace;
     --call-stop-muted-color: var(--color-text-muted);
 
     display: flex;
@@ -55,7 +54,6 @@
     display: flex;
     align-items: center;
     gap: var(--call-stop-swatch-gap);
-    font-family: var(--call-stop-code-font);
   }
 
   .ds.call-stop .swatch {

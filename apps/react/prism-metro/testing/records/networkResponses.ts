@@ -2927,6 +2927,7 @@ export default [
                   isLoop: true,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#central-exchange",
@@ -2937,6 +2938,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#kilnwood",
@@ -2947,6 +2949,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#quarry-hill",
@@ -2957,6 +2960,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#tannery-lane",
@@ -2967,6 +2971,7 @@ export default [
                       },
                     },
                     {
+                      position: 5,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#willowbank",
@@ -2977,6 +2982,7 @@ export default [
                       },
                     },
                     {
+                      position: 6,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#riverside-junction",
@@ -2993,6 +2999,7 @@ export default [
                   isLoop: true,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#central-exchange",
@@ -3003,6 +3010,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#riverside-junction",
@@ -3013,6 +3021,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#willowbank",
@@ -3023,6 +3032,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#tannery-lane",
@@ -3033,6 +3043,7 @@ export default [
                       },
                     },
                     {
+                      position: 5,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#quarry-hill",
@@ -3043,6 +3054,7 @@ export default [
                       },
                     },
                     {
+                      position: 6,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#kilnwood",
@@ -3072,6 +3084,7 @@ export default [
                   isLoop: false,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#tannery-lane",
@@ -3082,6 +3095,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#larkrise",
@@ -3092,6 +3106,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#highmoor",
@@ -3102,6 +3117,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#eastwick-cross",
@@ -3118,6 +3134,7 @@ export default [
                   isLoop: false,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#eastwick-cross",
@@ -3128,6 +3145,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#highmoor",
@@ -3138,6 +3156,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#larkrise",
@@ -3148,6 +3167,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#tannery-lane",
@@ -3177,6 +3197,7 @@ export default [
                   isLoop: false,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#tannery-lane",
@@ -3187,6 +3208,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#millford",
@@ -3197,6 +3219,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#reedmere",
@@ -3207,6 +3230,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#eastwick-cross",
@@ -3223,6 +3247,7 @@ export default [
                   isLoop: false,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#eastwick-cross",
@@ -3233,6 +3258,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#reedmere",
@@ -3243,6 +3269,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#millford",
@@ -3253,6 +3280,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#tannery-lane",
@@ -3318,6 +3346,7 @@ export default [
                   isLoop: false,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#northgate",
@@ -3328,6 +3357,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#verge-park",
@@ -3338,6 +3368,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#foundry-row",
@@ -3348,6 +3379,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#central-exchange",
@@ -3358,6 +3390,7 @@ export default [
                       },
                     },
                     {
+                      position: 5,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#marsh-end",
@@ -3374,6 +3407,7 @@ export default [
                   isLoop: false,
                   calls: [
                     {
+                      position: 1,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#marsh-end",
@@ -3384,6 +3418,7 @@ export default [
                       },
                     },
                     {
+                      position: 2,
                       stop: {
                         __typename: "Interchange",
                         uri: "https://metro.example/onto#central-exchange",
@@ -3394,6 +3429,7 @@ export default [
                       },
                     },
                     {
+                      position: 3,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#foundry-row",
@@ -3404,6 +3440,7 @@ export default [
                       },
                     },
                     {
+                      position: 4,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#verge-park",
@@ -3414,6 +3451,7 @@ export default [
                       },
                     },
                     {
+                      position: 5,
                       stop: {
                         __typename: "Station",
                         uri: "https://metro.example/onto#northgate",
@@ -3466,27 +3504,30 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          code: "3",
                           colour: "#0072ce",
                           _meta: {
                             title: "Coastal Line",
+                            curie: "metro:coastal-line",
                           },
                         },
                       ],
@@ -3504,19 +3545,21 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          code: "3",
                           colour: "#0072ce",
                           _meta: {
                             title: "Coastal Line",
+                            curie: "metro:coastal-line",
                           },
                         },
                       ],
@@ -3534,11 +3577,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                       ],
@@ -3555,27 +3599,30 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#upland-line",
-                          code: "4",
                           colour: "#00843d",
                           _meta: {
                             title: "Upland Line",
+                            curie: "metro:upland-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#lowland-line",
-                          code: "5",
                           colour: "#8e3ba3",
                           _meta: {
                             title: "Lowland Line",
+                            curie: "metro:lowland-line",
                           },
                         },
                       ],
@@ -3593,11 +3640,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                       ],
@@ -3614,11 +3662,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                       ],
@@ -3638,31 +3687,34 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        code: "3",
                         colour: "#0072ce",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        code: "3",
                       },
                     ],
                     transferMinutes: 4,
@@ -3679,13 +3731,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                     ],
                     uri: "https://metro.example/onto#kilnwood",
@@ -3701,13 +3754,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                     ],
                     uri: "https://metro.example/onto#quarry-hill",
@@ -3723,31 +3777,34 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#upland-line",
-                        code: "4",
                         colour: "#00843d",
                         _meta: {
                           title: "Upland Line",
                           curie: "metro:upland-line",
                         },
+                        code: "4",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#lowland-line",
-                        code: "5",
                         colour: "#8e3ba3",
                         _meta: {
                           title: "Lowland Line",
                           curie: "metro:lowland-line",
                         },
+                        code: "5",
                       },
                     ],
                     transferMinutes: 3,
@@ -3764,13 +3821,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                     ],
                     uri: "https://metro.example/onto#willowbank",
@@ -3786,22 +3844,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        code: "3",
                         colour: "#0072ce",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        code: "3",
                       },
                     ],
                     transferMinutes: 7,
@@ -3826,27 +3886,30 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          code: "3",
                           colour: "#0072ce",
                           _meta: {
                             title: "Coastal Line",
+                            curie: "metro:coastal-line",
                           },
                         },
                       ],
@@ -3864,11 +3927,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                       ],
@@ -3885,11 +3949,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                       ],
@@ -3906,27 +3971,30 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#upland-line",
-                          code: "4",
                           colour: "#00843d",
                           _meta: {
                             title: "Upland Line",
+                            curie: "metro:upland-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#lowland-line",
-                          code: "5",
                           colour: "#8e3ba3",
                           _meta: {
                             title: "Lowland Line",
+                            curie: "metro:lowland-line",
                           },
                         },
                       ],
@@ -3944,11 +4012,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                       ],
@@ -3965,19 +4034,21 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          code: "3",
                           colour: "#0072ce",
                           _meta: {
                             title: "Coastal Line",
+                            curie: "metro:coastal-line",
                           },
                         },
                       ],
@@ -3998,31 +4069,34 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        code: "3",
                         colour: "#0072ce",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        code: "3",
                       },
                     ],
                     transferMinutes: 4,
@@ -4039,22 +4113,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        code: "3",
                         colour: "#0072ce",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        code: "3",
                       },
                     ],
                     transferMinutes: 7,
@@ -4071,13 +4147,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                     ],
                     uri: "https://metro.example/onto#willowbank",
@@ -4093,31 +4170,34 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#upland-line",
-                        code: "4",
                         colour: "#00843d",
                         _meta: {
                           title: "Upland Line",
                           curie: "metro:upland-line",
                         },
+                        code: "4",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#lowland-line",
-                        code: "5",
                         colour: "#8e3ba3",
                         _meta: {
                           title: "Lowland Line",
                           curie: "metro:lowland-line",
                         },
+                        code: "5",
                       },
                     ],
                     transferMinutes: 3,
@@ -4134,13 +4214,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                     ],
                     uri: "https://metro.example/onto#quarry-hill",
@@ -4156,13 +4237,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                     ],
                     uri: "https://metro.example/onto#kilnwood",
@@ -4208,11 +4290,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4229,27 +4312,30 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          code: "3",
                           colour: "#0072ce",
                           _meta: {
                             title: "Coastal Line",
+                            curie: "metro:coastal-line",
                           },
                         },
                       ],
@@ -4267,11 +4353,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4288,11 +4375,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4309,11 +4397,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4333,13 +4422,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#northgate",
@@ -4355,13 +4445,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#verge-park",
@@ -4377,13 +4468,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#foundry-row",
@@ -4399,31 +4491,34 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        code: "3",
                         colour: "#0072ce",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        code: "3",
                       },
                     ],
                     transferMinutes: 4,
@@ -4440,13 +4535,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#marsh-end",
@@ -4470,11 +4566,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4491,11 +4588,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4512,11 +4610,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4533,27 +4632,30 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#circle-line",
-                          code: "2",
                           colour: "#f2b705",
                           _meta: {
                             title: "Circle Line",
+                            curie: "metro:circle-line",
                           },
                         },
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#coastal-line",
-                          code: "3",
                           colour: "#0072ce",
                           _meta: {
                             title: "Coastal Line",
+                            curie: "metro:coastal-line",
                           },
                         },
                       ],
@@ -4571,11 +4673,12 @@ export default [
                       },
                       servesLine: [
                         {
+                          __typename: "Line",
                           uri: "https://metro.example/onto#north-line",
-                          code: "1",
                           colour: "#c8102e",
                           _meta: {
                             title: "North Line",
+                            curie: "metro:north-line",
                           },
                         },
                       ],
@@ -4595,13 +4698,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#marsh-end",
@@ -4617,31 +4721,34 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#circle-line",
-                        code: "2",
                         colour: "#f2b705",
                         _meta: {
                           title: "Circle Line",
                           curie: "metro:circle-line",
                         },
+                        code: "2",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#coastal-line",
-                        code: "3",
                         colour: "#0072ce",
                         _meta: {
                           title: "Coastal Line",
                           curie: "metro:coastal-line",
                         },
+                        code: "3",
                       },
                     ],
                     transferMinutes: 4,
@@ -4658,13 +4765,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#foundry-row",
@@ -4680,13 +4788,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#verge-park",
@@ -4702,13 +4811,14 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#north-line",
-                        code: "1",
                         colour: "#c8102e",
                         _meta: {
                           title: "North Line",
                           curie: "metro:north-line",
                         },
+                        code: "1",
                       },
                     ],
                     uri: "https://metro.example/onto#northgate",
@@ -4753,22 +4863,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        code: "R1",
                         colour: "#c46a2b",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        code: "R1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        code: "R2",
                         colour: "#7a4b2a",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        code: "R2",
                       },
                     ],
                     uri: "https://metro.example/onto#dyers-green",
@@ -4784,22 +4896,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        code: "R1",
                         colour: "#c46a2b",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        code: "R1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        code: "R2",
                         colour: "#7a4b2a",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        code: "R2",
                       },
                     ],
                     uri: "https://metro.example/onto#fernside",
@@ -4815,22 +4929,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        code: "R1",
                         colour: "#c46a2b",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        code: "R1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        code: "R2",
                         colour: "#7a4b2a",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        code: "R2",
                       },
                     ],
                     uri: "https://metro.example/onto#nettlebed",
@@ -4846,22 +4962,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        code: "R1",
                         colour: "#c46a2b",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        code: "R1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        code: "R2",
                         colour: "#7a4b2a",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        code: "R2",
                       },
                     ],
                     uri: "https://metro.example/onto#orchard-gate",
@@ -4877,22 +4995,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        code: "R1",
                         colour: "#c46a2b",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        code: "R1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        code: "R2",
                         colour: "#7a4b2a",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        code: "R2",
                       },
                     ],
                     uri: "https://metro.example/onto#pinfold",
@@ -4908,22 +5028,24 @@ export default [
                     },
                     servesLine: [
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-clockwise",
-                        code: "R1",
                         colour: "#c46a2b",
                         _meta: {
                           title: "Ringway Clockwise",
                           curie: "metro:ringway-clockwise",
                         },
+                        code: "R1",
                       },
                       {
+                        __typename: "Line",
                         uri: "https://metro.example/onto#ringway-anticlockwise",
-                        code: "R2",
                         colour: "#7a4b2a",
                         _meta: {
                           title: "Ringway Anticlockwise",
                           curie: "metro:ringway-anticlockwise",
                         },
+                        code: "R2",
                       },
                     ],
                     uri: "https://metro.example/onto#ropewalk",

@@ -107,6 +107,7 @@ const declareNetworkQueries = (): unknown => [
               label
               isLoop
               calls {
+                position
                 stop {
                   uri
                   _meta {

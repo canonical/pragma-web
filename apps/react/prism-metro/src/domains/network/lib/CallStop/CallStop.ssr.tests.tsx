@@ -53,6 +53,6 @@ describe("CallStop SSR", () => {
     expect(html).toContain('class="ds call-stop"');
     expect(html).toContain('class="ring"');
     expect(html).toContain('href="/network/stations/metro%3Acentral-exchange"');
-    expect(html).toContain("4 min");
+    expect(html).toContain("4 min transfer");
   });
 });

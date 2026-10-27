@@ -41,6 +41,16 @@ describe("NetworkLinePage", () => {
     expect(container.querySelector(".canvas > .aside")?.textContent).toBe("");
   });
 
+  it("says so when the address names a station, not a line", async () => {
+    renderWithSite(<NetworkLinePage address="metro:northgate" />);
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Not on the network",
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("carries its address on its main column", () => {
     const { container } = renderWithSite(
       <NetworkLinePage address="metro:circle-line" />,

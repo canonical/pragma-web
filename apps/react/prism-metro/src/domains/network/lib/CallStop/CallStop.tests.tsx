@@ -1,7 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
 import { HomesProvider } from "@canonical/prism-core";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
   createRecordedEnvironment,
@@ -62,12 +62,11 @@ describe("CallStop", () => {
     expect(stop.querySelector(".tick")).toBeNull();
     expect(
       [...stop.querySelectorAll(".connection")].map((each) => each.textContent),
-    ).toEqual(["2", "3"]);
-    expect(stop.querySelector(".connection abbr")).toHaveAttribute(
-      "title",
-      "Circle Line",
-    );
-    expect(stop.querySelector(".transfer")?.textContent).toBe("4 min");
+    ).toEqual(["Circle Line", "Coastal Line"]);
+    expect(
+      within(stop).getByRole("link", { name: "Circle Line" }),
+    ).toHaveAttribute("href", "/network/lines/metro%3Acircle-line");
+    expect(stop.querySelector(".transfer")?.textContent).toBe("4 min transfer");
   });
 
   it("names a stop with no home as text", () => {
@@ -88,6 +87,28 @@ describe("CallStop", () => {
     );
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(screen.getByText("Northgate")).toHaveClass("name");
+  });
+
+  it("names a connecting line with no home as text", () => {
+    renderWithSite(
+      <HomesProvider homes={{ Interchange: () => "/somewhere" }}>
+        <ol>
+          {CENTRAL_EXCHANGE === undefined ? null : (
+            <CallStop
+              colour={NORTH.colour}
+              lineUri={NORTH.uri}
+              node={CENTRAL_EXCHANGE}
+            />
+          )}
+        </ol>
+      </HomesProvider>,
+      "/network",
+      RECORDED,
+    );
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+    expect(screen.getByText("Circle Line").closest("li")).toHaveClass(
+      "connection",
+    );
   });
 
   it("sets the line's colour on its channel, keeping the caller's style", () => {

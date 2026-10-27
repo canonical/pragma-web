@@ -2,8 +2,8 @@
 # CallStop — one call of a route as a door card reads it: a tick on the
 # strip's rule in the line's colour (a hollow ring at an interchange), the
 # stop's name linking to its home, the other lines it meets, each by its
-# code beside a swatch of its colour, and at an interchange the time a
-# transfer takes. A Relay projection of a Call; RouteStrip lays the calls
+# name beside a swatch of its colour and linking to its home, and at an
+# interchange the time a transfer takes. A Relay projection of a Call; RouteStrip lays the calls
 # out along its rule. Bespoke: no published component reads a call.
 #
 # Reflow, bound in styles.css:
@@ -21,8 +21,6 @@
 #   size.width / size.height 0.75rem on a tick and a ring and 0.5rem on a
 #     connection swatch: no icon-size tokens.
 #   appearance.border.width 2px on a ring: no stroke token.
-#   typography.fontFamily on a connection's code: the monospace family has
-#     no semantic token.
 node:
   uri: metro.component.call_stop
   projection:
@@ -77,19 +75,18 @@ node:
       relation: { cardinality: "0..1", slotName: connections }
     - node:
         role: connection
-        # a line's swatch and code, its name the code's title; the stop's
-        # own line, matched by its IRI, is left out
-        projection: { field: code }
+        # a line's swatch and its name, linking to its home; the stop's own
+        # line, matched by its IRI, is left out
+        projection: { field: _meta.title }
         styles:
           layout.type: flex
           layout.align: center
           spacing.gap: space.050
-          typography.fontFamily: "ui-monospace, monospace"
         edges:
           - node: { role: line identity, projection: { field: uri } }
             relation: { cardinality: "1" }
-          - node: { role: line name, projection: { field: _meta.title } }
-            relation: { cardinality: "1" }
+          - node: { role: line home, projection: { field: _meta.curie } }
+            relation: { cardinality: "0..1" }
           - node:
               role: connection swatch
               projection: { field: colour }

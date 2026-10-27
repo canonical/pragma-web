@@ -49,7 +49,7 @@ describe("NetworkInspector", () => {
       .map((link) => link.textContent);
     expect(names).toHaveLength(ROUTED_STATION_COUNT);
     expect(names).toEqual(
-      [...names].sort((a, b) => String(a).localeCompare(String(b))),
+      [...names].sort((a, b) => String(a).localeCompare(String(b), "en")),
     );
   });
 

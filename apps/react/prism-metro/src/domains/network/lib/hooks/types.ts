@@ -1,9 +1,6 @@
 import type { DiagramLine } from "../geometry/index.js";
 import type { LineView, NetworkIndex, StationView } from "../types.js";
 
-/** `useNetworkLines` takes nothing: the map query reads the whole network. */
-export type UseNetworkLinesProps = Record<string, never>;
-
 /** The network's lines, as the map draws them. */
 export type UseNetworkLinesResult = readonly DiagramLine[];
 

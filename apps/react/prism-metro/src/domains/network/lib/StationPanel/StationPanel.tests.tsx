@@ -56,7 +56,7 @@ describe("StationPanel", () => {
       "/network",
       RECORDED,
     );
-    expect(container.querySelectorAll(".fact")).toHaveLength(0);
+    expect(container.querySelector(".facts")).toBeNull();
   });
 
   it("links each route's line and the stops either side", () => {
