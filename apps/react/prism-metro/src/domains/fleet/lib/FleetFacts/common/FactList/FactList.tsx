@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { type ReactElement, useId } from "react";
 import { useMessages } from "#i18n";
 import carTypePageQueryNode from "#relay/__generated__/CarTypePageQuery.graphql.js";
 import formationPageQueryNode from "#relay/__generated__/FormationPageQuery.graphql.js";
@@ -19,17 +19,18 @@ const QUERY_BY_KIND = {
 } as const;
 
 /**
- * The node's facts under their heading, as a definition list, each term
- * and value grouped. It reads the page's operation for the node, so it
+ * The node's facts in a section named by their heading, as a definition
+ * list, each term and value grouped. It reads the page's operation for the node, so it
  * suspends until the store holds it; an address naming nothing of the
  * page's type has no facts, and renders nothing.
  */
 export default function FactList({
   kind,
   address,
-  headingId,
+  ...props
 }: FactListProps): ReactElement | null {
   const t = useMessages();
+  const headingId = useId();
   const { node } = useFleetNode<
     FleetNodeOperation & { response: { node: FleetPageNode } }
   >({
@@ -44,7 +45,7 @@ export default function FactList({
       : [];
   if (facts.length === 0) return null;
   return (
-    <>
+    <section {...props} aria-labelledby={headingId}>
       <h2 className="heading" id={headingId}>
         {t("fleet.facts")}
       </h2>
@@ -56,6 +57,6 @@ export default function FactList({
           </div>
         ))}
       </dl>
-    </>
+    </section>
   );
 }

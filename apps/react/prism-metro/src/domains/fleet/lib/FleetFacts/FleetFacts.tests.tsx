@@ -54,7 +54,7 @@ describe("FleetFacts", () => {
     });
     await fetchFn.mock.results.at(0)?.value;
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(container.querySelector(".ds.fleet-facts")).toBeEmptyDOMElement();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it("renders nothing when the facts cannot be read", async () => {
@@ -66,15 +66,12 @@ describe("FleetFacts", () => {
     await vi.waitFor(() => {
       expect(console.error).toHaveBeenCalled();
     });
-    expect(container.querySelector(".ds.fleet-facts")).toBeEmptyDOMElement();
+    expect(container).toBeEmptyDOMElement();
   });
 
-  it("passes native props to its section and merges its class", () => {
-    const { container } = renderFacts(
-      { kind: "stock", address: "metro:series-90", className: "x" },
-      vi.fn().mockReturnValue(new Promise(() => {})),
-    );
-    expect(container.querySelector("section")).toHaveClass(
+  it("passes native props to its section and merges its class", async () => {
+    renderFacts({ kind: "stock", address: "metro:series-90", className: "x" });
+    expect(await screen.findByRole("region", { name: "Facts" })).toHaveClass(
       "ds",
       "fleet-facts",
       "x",

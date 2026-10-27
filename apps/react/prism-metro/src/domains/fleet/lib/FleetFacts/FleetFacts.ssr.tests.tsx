@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import FleetFacts from "./FleetFacts.js";
 
 describe("FleetFacts SSR", () => {
-  it("renders its section, and no heading, before the data", () => {
+  it("renders no section before the data", () => {
     const html = renderToString(
       <RelayEnvironmentProvider
         environment={createEnvironment({
@@ -15,7 +15,7 @@ describe("FleetFacts SSR", () => {
         <FleetFacts address="metro:series-90" kind="stock" />
       </RelayEnvironmentProvider>,
     );
-    expect(html).toContain('class="ds fleet-facts"');
+    expect(html).not.toContain("<section");
     expect(html).not.toContain("Facts</h2>");
   });
 });

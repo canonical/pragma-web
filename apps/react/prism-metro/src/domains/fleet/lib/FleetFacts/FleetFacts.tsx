@@ -2,7 +2,7 @@
 
 import { ErrorBoundary } from "@canonical/prism-core";
 import type React from "react";
-import { Suspense, useId } from "react";
+import { Suspense } from "react";
 import FactList from "./common/FactList/FactList.js";
 import type { FleetFactsProps } from "./types.js";
 import "./styles.css";
@@ -13,9 +13,10 @@ const componentCssClassName = "ds fleet-facts";
  * The facts of the fleet node a page shows, for the layout's aside: a
  * heading, then the node's facts as a definition list, read from the same
  * operation as the page, so a page the server rendered answers both from
- * the store. The heading stands only over facts: while the data is on its
- * way, for an address naming nothing of the page's type, and after a
- * failed read the section is empty, the page saying what is wrong.
+ * the store. The section stands only around facts: while the data is on
+ * its way, for an address naming nothing of the page's type, and after a
+ * failed read the aside is empty, the page saying what is wrong. Native
+ * props reach the section.
  *
  * `import { FleetFacts } from "./FleetFacts/index.js";`
  */
@@ -24,21 +25,17 @@ const FleetFacts = ({
   address,
   className,
   ...props
-}: FleetFactsProps): React.ReactElement => {
-  const headingId = useId();
-  return (
-    <section
-      {...props}
-      aria-labelledby={headingId}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
-    >
-      <ErrorBoundary fallback={null} resetKey={`${kind} ${address}`}>
-        <Suspense fallback={null}>
-          <FactList address={address} headingId={headingId} kind={kind} />
-        </Suspense>
-      </ErrorBoundary>
-    </section>
-  );
-};
+}: FleetFactsProps): React.ReactElement => (
+  <ErrorBoundary fallback={null} resetKey={`${kind} ${address}`}>
+    <Suspense fallback={null}>
+      <FactList
+        {...props}
+        address={address}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
+        kind={kind}
+      />
+    </Suspense>
+  </ErrorBoundary>
+);
 
 export default FleetFacts;
