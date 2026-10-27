@@ -21,9 +21,9 @@ const CWD = process.cwd();
 /** The bootstrap script the renderer embeds the initial data with. */
 const INITIAL_DATA_PATTERN = /window\.__INITIAL_DATA__ = (.*?)<\/script>/s;
 
-/** An instance chip of the term inspector, linking to the stations lens. */
+/** An instance chip of the term inspector, linking to the network lens. */
 const INSTANCE_CHIP_PATTERN =
-  /<a class="ds router-link value" href="(\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
+  /<a class="ds router-link value" href="(\/network\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
 
 const CELLS = [
   { script: "dev:bun", timeoutMs: DEV_READY_MS },
@@ -83,11 +83,12 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     const { status, html } = await fetchPage(script, "/");
     expect(status).toBe(200);
     const doors = html.split('class="ds card ds lens-card"').slice(1);
-    expect(doors).toHaveLength(4);
-    expect(doors.at(0)).toContain('href="/stations"');
-    expect(doors.at(1)).toContain('href="/lines"');
-    expect(doors.at(2)).toContain('href="/definitions"');
-    expect(doors.at(3)).toContain('href="/fleet"');
+    expect(doors).toHaveLength(5);
+    expect(doors.at(0)).toContain('href="/network"');
+    expect(doors.at(1)).toContain('href="/stations"');
+    expect(doors.at(2)).toContain('href="/lines"');
+    expect(doors.at(3)).toContain('href="/definitions"');
+    expect(doors.at(4)).toContain('href="/fleet"');
     expect(html).toContain(
       `<data value="${STATION_COUNT}">${STATION_COUNT} stations</data>`,
     );
@@ -102,7 +103,9 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
   it("renders the stations index with its data", async () => {
     const { status, html } = await fetchPage(script, "/stations");
     expect(status).toBe(200);
-    expect(html).toContain('href="/stations/metro%3Anorthgate">Northgate</a>');
+    expect(html).toContain(
+      'href="/network/stations/metro%3Anorthgate">Northgate</a>',
+    );
     const embedded = INITIAL_DATA_PATTERN.exec(html)?.at(1);
     const records = JSON.parse(String(embedded)).relay?.records ?? {};
     expect(Object.keys(records).length).toBeGreaterThan(0);
@@ -145,7 +148,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(Object.keys(records).length).toBeGreaterThan(0);
   });
 
-  it("lands an instance chip of the term inspector on the stations lens", async () => {
+  it("lands an instance chip of the term inspector on the network lens", async () => {
     const { status, html } = await fetchPage(
       script,
       "/definitions/metro%3AStation",
