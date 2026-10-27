@@ -3,8 +3,8 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The index spans the canvas's page columns; its items stack a gutter
-   * apart. */
+  /* A subgrid of the canvas over every column, so the list view's cards
+   * bind to its columns; its items stack a gutter apart. */
   .ds.fleet-index {
     --fleet-index-gap: var(--grid-gutter);
     --fleet-index-secondary-color: var(--color-text-muted);
@@ -12,15 +12,22 @@
 
     grid-column: 1 / -1;
     display: grid;
+    grid-template-columns: subgrid;
     gap: var(--fleet-index-gap);
     align-self: start;
   }
 
+  .ds.fleet-index .title {
+    grid-column: 1 / -1;
+  }
+
   .ds.fleet-index .status {
+    grid-column: 1 / -1;
     color: var(--fleet-index-secondary-color);
   }
 
   .ds.fleet-index .error {
+    grid-column: 1 / -1;
     color: var(--fleet-index-error-color);
   }
 }
