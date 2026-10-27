@@ -41,6 +41,36 @@ const readCapturedCount = (classUri: string): number => {
   return count;
 };
 
+/**
+ * The captured fixture with one class's root link set to null, as the
+ * store holds a class the graph lacks.
+ */
+const dropClass = (classUri: string): typeof lobbyRecords => {
+  const records = structuredClone(lobbyRecords) as unknown as Record<
+    string,
+    Record<string, unknown>
+  >;
+  const root = records["client:root"];
+  const key = `ontologyClass(uri:"${classUri}")`;
+  if (root === undefined || !(key in root)) {
+    throw new Error(`lobbyRecords lost its root link for ${classUri}`);
+  }
+  root[key] = null;
+  return records as unknown as typeof lobbyRecords;
+};
+
+/** Each door's vitals, in the doors' order. */
+const readDoorVitals = (): string[][] =>
+  [
+    ...screen
+      .getByRole("region", { name: "The lenses" })
+      .querySelectorAll(".ds.entity-card"),
+  ].map((card) =>
+    [...card.querySelectorAll(".vital")].map(
+      (vital) => vital.textContent ?? "",
+    ),
+  );
+
 describe("Lobby", () => {
   it(
     "lists a few components as the site's chips, each linking to its page",
@@ -96,6 +126,57 @@ describe("Lobby", () => {
       // The standards figure is the one a capped edge count would have lied
       // about: the connection maxes at 100 per page.
       expect(readCapturedCount(LOBBY_STANDARD_CLASS)).toBeGreaterThan(100);
+    },
+    LOBBY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "leaves the components count and the examples out when the store lacks the class",
+    () => {
+      render(lobbyPage(dropClass(LOBBY_COMPONENT_CLASS), createFetchSpy()));
+      expect(
+        screen.queryByRole("region", { name: "A few of the components" }),
+      ).toBeNull();
+      expect(readDoorVitals()).toEqual([
+        [`${readCapturedCount(LOBBY_PATTERN_CLASS)} patterns`],
+        [],
+        [`${readCapturedCount(LOBBY_STANDARD_CLASS)} standards`],
+        [],
+        [],
+      ]);
+    },
+    LOBBY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "leaves the patterns count out when the store lacks the class",
+    () => {
+      render(lobbyPage(dropClass(LOBBY_PATTERN_CLASS), createFetchSpy()));
+      expect(readDoorVitals()).toEqual([
+        [`${readCapturedCount(LOBBY_COMPONENT_CLASS)} components`],
+        [],
+        [`${readCapturedCount(LOBBY_STANDARD_CLASS)} standards`],
+        [],
+        [],
+      ]);
+    },
+    LOBBY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "leaves the standards count out when the store lacks the class",
+    () => {
+      render(lobbyPage(dropClass(LOBBY_STANDARD_CLASS), createFetchSpy()));
+      expect(readDoorVitals()).toEqual([
+        [
+          `${readCapturedCount(LOBBY_COMPONENT_CLASS)} components`,
+          `${readCapturedCount(LOBBY_PATTERN_CLASS)} patterns`,
+        ],
+        [],
+        [],
+        [],
+        [],
+      ]);
     },
     LOBBY_TEST_TIMEOUT_MS,
   );
