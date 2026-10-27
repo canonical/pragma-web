@@ -60,6 +60,7 @@ describe("collectTtlSources over both roots", () => {
     expect(paths).toStrictEqual([
       "anatomy-dsl/definitions/anatomy.ttl",
       "design-system/data/instances.ttl",
+      "design-system/data/search.ttl",
       "design-system/data/tokens/colors.ttl",
       "design-system/definitions/ontology.ttl",
       "surface/definitions/surface.ttl",
@@ -130,6 +131,7 @@ describe("collectTtlSources without the semantics tree", () => {
     expect(paths).toStrictEqual([
       "anatomy-dsl/definitions/anatomy.ttl",
       "design-system/data/instances.ttl",
+      "design-system/data/search.ttl",
       "design-system/data/tokens/colors.ttl",
       "design-system/definitions/ontology.ttl",
     ]);
@@ -164,6 +166,7 @@ describe("collectTtlSources with a semantics tree that is there but wrong", () =
     expect(paths).toStrictEqual([
       "anatomy-dsl/definitions/anatomy.ttl",
       "design-system/data/instances.ttl",
+      "design-system/data/search.ttl",
       "design-system/data/tokens/colors.ttl",
       "design-system/definitions/ontology.ttl",
     ]);
@@ -183,6 +186,7 @@ describe("collectTtlSources with the semantics tree skipped on purpose", () => {
     expect(paths).toStrictEqual([
       "anatomy-dsl/definitions/anatomy.ttl",
       "design-system/data/instances.ttl",
+      "design-system/data/search.ttl",
       "design-system/data/tokens/colors.ttl",
       "design-system/definitions/ontology.ttl",
     ]);

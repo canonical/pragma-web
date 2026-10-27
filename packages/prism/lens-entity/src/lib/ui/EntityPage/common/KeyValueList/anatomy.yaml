@@ -1,0 +1,81 @@
+---
+# KeyValueList — key values on the page's grid. A description list that is
+# a subgrid of the main column; each pair is a subgrid row with a hairline
+# rule above it (the key-value reference: a pair with a hairline rule over
+# it), the key on the first two columns and the value from the third to the
+# end, so every key and every value on the page starts on the same column
+# line. The pairs stand one gutter apart, each a 1px rule directly over a
+# 24px line: 25px, as the key-value reference draws it. The key and the
+# value sit on the matrix's 24px line, the line every representation
+# shares. A key wraps between its words; a word longer than its two
+# columns clips at the end of its track with an ellipsis, as the card's
+# key values clip, rather than run under the value or widen the page.
+#
+# Below two groups of columns the main column holds two columns, so a pair
+# stacks, the key over the value, both across the column: one container
+# query on the shell, at 912px.
+#
+# Bespoke: the design system publishes no description list.
+#
+# Every decision is read through a component token declared on the root
+# (`--key-value-list-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   1px: the hairline over each pair; stroke width has only primitives.
+#   space.300 (24px) for the key's and the value's line height: the
+#     matrix's line; no typography token is 24px in every context (the
+#     docs' primary line is 20px).
+#   layout.grid.column "1 / -1", "1 / span 2", "3 / -1": structure, spans in
+#     columns.
+#   Border sides "solid none none": a keyword vocabulary; only the rule
+#     above the pair is drawn. The 0 resets on the list and the value.
+#   The key's clip (layout.overflow.inline clip, size.min.width 0,
+#     typography.overflow ellipsis): keywords. The stylesheet check maps
+#     no overflow-wrap, so the key clips rather than breaking anywhere.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)   below two groups: the key and the
+#     value each span the whole column, the key over the value.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.300 (a line
+# height).
+node:
+  uri: prism.subcomponent.key_value_list
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+  edges:
+    - node:
+        role: pair (a key and its value, under a hairline)
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+          # One rule above the pair: the top side alone has a width and a
+          # style, every other side none.
+          appearance.border.top.width: 1px
+          appearance.border.style: "solid none none"
+          appearance.border.block.start.color: color.border.muted
+        edges:
+          - node:
+              role: key (the term)
+              styles:
+                layout.grid.column: "1 / span 2"
+                layout.overflow.inline: clip
+                size.min.width: 0
+                typography.overflow: ellipsis
+                typography.lineHeight: space.300
+            relation: { cardinality: "1", slotName: key }
+          - node:
+              role: value (the description)
+              styles:
+                layout.grid.column: "3 / -1"
+                spacing.external.inline.start: 0
+                typography.lineHeight: space.300
+            relation: { cardinality: "1", slotName: value }
+      relation: { cardinality: "1..*", slotName: pair }

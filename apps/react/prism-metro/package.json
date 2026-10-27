@@ -7,41 +7,59 @@
   "imports": {
     "#domains/fleet": "./src/domains/fleet/index.ts",
     "#domains/lenses": "./src/domains/lenses/index.ts",
+    "#domains/metro": "./src/domains/metro/index.ts",
     "#i18n": "./src/i18n/index.ts",
+    "#lib/site": "./src/lib/site/index.ts",
     "#lib/ui": "./src/lib/ui/index.ts",
-    "#projections": "./src/projections/index.ts",
     "#relay": "./src/relay/index.ts",
     "#relay/__generated__/*": "./src/relay/__generated__/*",
     "#server": "./src/server/index.ts",
-    "#site": "./src/site/index.ts",
     "#sitemap": "./src/sitemap/index.ts"
   },
   "scripts": {
-    "graph": "bun src/server/graph.ts",
+    "graph": "bun run relay && bun src/server/graph.ts",
     "schema": "bun src/server/schema.ts",
     "schema:check": "bun run schema && git diff --exit-code -- src/relay/schema.graphql",
     "relay": "relay-compiler",
-    "dev": "vite",
-    "dev:bun": "bun src/server/server.bun.ts",
+    "dev": "bun run relay && vite",
+    "dev:bun": "bun run relay && bun src/server/server.bun.ts",
     "preview": "bun run build:client && vite preview --outDir dist/client",
     "preview:bun": "bun run build:client && bun run build:server && bun src/server/preview.bun.ts",
-    "build": "bun run relay && bun run build:client",
-    "build:all": "bun run relay && bun run build:client && bun run build:server && bun run build:storybook",
-    "build:client": "vite build --ssrManifest --outDir dist/client",
-    "build:server": "vite build --mode server",
-    "build:storybook": "storybook build",
-    "check": "bun run check:biome && bun run schema:check && bun run relay && bun run check:ts",
+    "build": "bun run build:client",
+    "build:all": "bun run build:client && bun run build:server && bun run build:storybook",
+    "build:client": "bun run relay && vite build --ssrManifest --outDir dist/client",
+    "build:server": "bun run relay && vite build --mode server",
+    "build:storybook": "bun run relay && storybook build",
+    "check": "bun run schema:check && bun run check:biome && bun run check:ts",
     "check:fix": "bun run check:biome:fix && bun run check:ts",
     "check:biome": "biome check",
     "check:biome:fix": "biome check --write",
-    "check:ts": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "vitest run --config vitest.e2e.config.ts",
-    "storybook": "storybook dev -p 6011 --no-open --host 0.0.0.0"
+    "check:ts": "bun run relay && tsc --noEmit",
+    "test": "bun run relay && vitest run",
+    "test:watch": "bun run relay && vitest",
+    "test:coverage": "bun run relay && vitest run --coverage",
+    "test:e2e": "bun run relay && vitest run --config vitest.e2e.config.ts",
+    "storybook": "bun run relay && storybook dev -p 6011 --no-open --host 0.0.0.0"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/dist",
+          "{projectRoot}/src/relay/__generated__"
+        ]
+      },
+      "build:all": {
+        "outputs": [
+          "{projectRoot}/dist",
+          "{projectRoot}/storybook-static",
+          "{projectRoot}/src/relay/__generated__"
+        ]
+      }
+    }
   },
   "dependencies": {
+    "@canonical/i18n-core": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-graph-example": "^0.44.1",
     "@canonical/prism-lens-definitions": "^0.44.1",
@@ -74,6 +92,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-relay": "^18.2.1",
     "@types/relay-runtime": "^20.1.1",
+    "@types/relay-test-utils": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/coverage-v8": "^5.0.0",
     "browserslist": "^4.28.1",

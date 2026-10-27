@@ -1,0 +1,21 @@
+---
+# SiteCardSlot: a metro node as the card, dispatched on its type
+# inside the package's card dispatcher.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the matrix: one
+# EntityCard per type). It fills the package's site slot: the card
+# dispatcher renders it over the slot's key for every typename the site's
+# card map lists, and it renders the case that typename selects. It renders
+# no element of its own. The cases are its fragment's aliased spreads and
+# the site map's card keys, by the same names.
+node:
+  uri: metro.component.site_card_slot
+  projection: { on: Node }
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node: { uri: metro.component.station_card, projection: { on: Station } }
+          - node: { uri: metro.component.interchange_card, projection: { on: Interchange } }
+          - node: { uri: metro.component.line_card, projection: { on: Line } }
+          - node: { uri: metro.component.zone_card, projection: { on: Zone } }
+      relation: { cardinality: "1" }

@@ -57,6 +57,7 @@ export type {
   WorkspaceLayoutProps,
 } from "./ui/index.js";
 export {
+  CANVAS_PAGE_TILE_CLASS_NAME,
   Canvas,
   CanvasSkipLink,
   ChipLegend,

@@ -9,6 +9,7 @@
     --probe-inset: var(--space-100);
     --probe-color: var(--color-text);
     --probe-hover-color: var(--color-text-muted);
+    --probe-selected-color: var(--color-text-muted);
     --probe-label-font-weight: var(--typography-text-primary-bold-font-weight);
 
     display: grid;
@@ -22,8 +23,27 @@
     color: var(--probe-hover-color);
   }
 
+  .ds.probe[aria-selected="true"] {
+    color: var(--probe-selected-color);
+  }
+
   .ds.probe .label {
     font-weight: var(--probe-label-font-weight);
+    font-variant-caps: all-small-caps;
+  }
+
+  /* The link, reached through the body only, never through the label. */
+  .ds.probe > .body > .link {
+    text-decoration: none;
+  }
+
+  .ds.probe > .body > .link[href]:hover {
+    text-decoration: underline;
+  }
+
+  /* A label the body follows draws no rule below it. */
+  .ds.probe:has(> .label + .body) > .label {
+    border-block-end-width: 0;
   }
 
   /* Below one group the label hides. */

@@ -2015,6 +2015,11 @@ type Query {
   """
   prose(uri: ID!): Prose
 
+  """
+  Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en.
+  """
+  search(text: String!, first: Int, after: String): NodeConnection!
+
   # ---- from src/relay/extensions/journeys.graphql ----
   validity(uri: String!): Validity
 

@@ -100,3 +100,11 @@ export const GRAPHQL_PATH = "/graphql";
  * and the graph decides whether it resolves.
  */
 export const REFERENCE_IRI = /^[A-Za-z][A-Za-z0-9+.-]*:[^\s<>"{}|\\^`]+$/;
+
+/**
+ * The fields of a search entry that text search reads, best first. A
+ * match's tier is its field's place in this list: a title match (tier 0)
+ * ranks before a CURIE match (tier 1), and a CURIE match before a
+ * definition match (tier 2), so reordering the list reorders every result.
+ */
+export const SEARCH_FIELDS = ["title", "curie", "definition"] as const;

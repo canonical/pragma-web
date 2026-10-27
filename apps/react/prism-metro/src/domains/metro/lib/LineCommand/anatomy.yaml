@@ -1,0 +1,32 @@
+---
+# LineCommand: a line as a 56px command-palette result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
+# title over its kind, one vital at the end). Best guess: the kind is the
+# line's class, with no location, since a line has no place of its own;
+# the vital counts the stops it serves: "North Line / Line · 5 stops".
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved
+# from the compact address.
+node:
+  uri: metro.component.line_command
+  projection: { on: Line }
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: vital
+              projection: { field: uri }
+            relation: { cardinality: "1", slotName: vital, projection: { field: servedBy } }
+      relation: { cardinality: "1" }

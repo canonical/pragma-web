@@ -1,0 +1,300 @@
+---
+# EntityCard — an entity as a card in a grid of entities: 209x345 at two
+# intrinsic columns.
+# Reference: the projection matrix's cards (location, title with its parent,
+# kind, summary, the key values with a rule above each pair, the footer's
+# muted vitals) and its side panel, the sidecar. Slot order: location,
+# title with parent, kind, summary, key values, vitals; the sidecar, when
+# there is one, beside them.
+#
+# Built on the published Card (global.component.card): this root IS the
+# Card's root with the entity-card class added, the body is its
+# Card.Content and the vitals its Card.Footer, so the card's border, radius,
+# dividers and section insets (8 above, 16 below and inline) are the Card's
+# own. Card.Content's 8px gap and the summary's and key values' 16px make
+# the matrix's 16 to the summary and 24 to the key values.
+#
+# The card has no image and no header, so the body takes the Card's first
+# three row tracks (`1 / 4`) and starts at the card's edge, its text 8px
+# below it. The grid that holds the card sets its gutter between those
+# tracks; the footer reaches back across the last one (a block-start
+# margin of minus the gutter), so it meets the body at the body's divider,
+# as the Card's sections meet, and the card is no taller than its content.
+# A card without vitals has no footer; a reflow under
+# `.ds.entity-card:not(:has(> .footer))` has the body reach back across
+# the gutter before the footer's track as the footer does
+# (`spacing.external.block.end: calc(-1 * var(--grid-gutter))`), so a card
+# alone ends where its body does and no empty strip stays below it. The
+# body keeps its own three tracks: it never sizes the footer's track, so in
+# a Cards group a card without vitals leaves the footer of a card with
+# vitals beside it at the footer's own height.
+#
+# The card sets its text on the matrix's 24px line, the line every
+# representation shares (the graph node draws on it too), so its heading
+# lines, its key values and its vitals sit on one rhythm. Its paragraphs and
+# its heading set no block insets and take the card's line back: the
+# typography layer would set its own line on each of them, and add a
+# baseline nudge of 4px that the key values do not have.
+#
+# Every rule reaches its slot through the slot's whole path from the root,
+# so nothing a consumer renders in the sidecar or in a slot is restyled.
+# A word longer than its box, an identifier most often, ends in an ellipsis
+# in the title, the key values and the vitals rather than running under the
+# Card's clipped edge; the roster has no key for breaking inside a word.
+# A key and its value clip along their line only, so nothing they hold is
+# cut above or below: a chip in a value is 28px, and the pair's line grows
+# to hold it.
+# An identifier in a value, a `<code class="identifier">`, sets the
+# monospace face on the pair's line and stands on the sans text's baseline:
+# it is aligned to the baseline, so its glyphs share the line the key's
+# stand on, and its own line height is 0, so its inline box takes no height
+# and the face's other ascent and descent never grow the pair. (Aligning
+# its box to the line's top would keep the pair's height too, but would
+# leave the monospace baseline where that face's metrics put it inside the
+# box, below the sans text's.)
+# The title's link reads as the title: the text's colour, underlined on
+# hover, its focus ring drawn inside it since the title clips.
+#
+# The sidecar carries a rendered example of the entity beside the body: the
+# entity type decides whether it has one (UI blocks), and its consumer fills
+# it. It comes last in the DOM, after the body and the footer, as it sits
+# after them on the page, so a reader and the keyboard reach the title
+# before the example's own controls. It sits beside the body, on the
+# body's three row tracks (`1 / 4`), and never on the footer's: a tall
+# example grows the body's tracks, the title stays on top, and the footer
+# keeps its own height, in this card and in the cards beside it in a
+# Cards group. It rests on the Card's divider (1px, color.border.muted),
+# drawn on its block-end edge as the body draws its own across the body's
+# span, and the footer runs under both, across the card, so no corner of
+# the card is left empty beside the footer. Without a footer it reaches
+# back across the gutter before the footer's track as the body does, so
+# the two end together.
+# The example must fit two intrinsic columns, the sidecar's width at every
+# size of the grid less its inline insets (138px at a phone's width): a
+# component with its default props fits; a strip of its variants as tabs
+# does not, and would hide its last tabs out of view.
+#
+# The Card draws a divider under every section but its last child. With
+# the sidecar last, the section it follows, the footer or a body without
+# one, would draw that divider along the card's bottom edge; a reflow
+# under `.ds.entity-card:has(> .footer + .sidecar)` and
+# `.ds.entity-card:has(> .body + .sidecar)` sets that section's
+# `border-block-end-width` to 0, so the card's dividers are the ones it
+# draws without a sidecar. Without a footer the sidecar's own divider
+# would lie along that edge as well; the second reflow sets its
+# `border-block-end-width` to 0 too.
+#
+# With-sidecar reflow, bound in styles.css under
+# `.ds.entity-card:has(> .sidecar)` (the DSL's states re-value channels and
+# never add structure, so the sidecar's presence is a reflow): the card turns
+# into a column subgrid as wide as its own span plus the sidecar's two
+# columns, its gap the grid's gutter; the body keeps the card's own span
+# (`1 / span var(--entity-card-body-span)`); the sidecar takes the last two
+# columns of the body's row tracks; the footer spans the whole card
+# (`1 / -1`), under the body and the sidecar.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 448px)   below one group, under
+#     `.ds.entity-card:not(:has(> .sidecar))`: the card spans every column
+#     of the grid that holds it (`--entity-card-narrow-column`, `1 / -1`)
+#     instead of the Cards group's span, since the canvas beside the rail
+#     holds three columns there and a card at two would leave the last one
+#     empty on every row. A card with a sidecar keeps its own reflow.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-card-*`), bound to the symbol or the literal named here.
+#
+# Token ledger (no symbol to bind):
+#   --entity-card-line-height: space.300  the matrix's 24px line; no
+#                                       typography token is 24px in every
+#                                       context (the docs' primary line is
+#                                       20px).
+#   --entity-card-rule-width: 1px       the rule above each key value;
+#                                       stroke thickness is primitive only.
+#   --entity-card-focus-ring-width: 2px, --entity-card-focus-ring-offset: -2px
+#                                      the link's ring, drawn inside it.
+#   --entity-card-vital-max-width: 100%  a vital no wider than the footer.
+#   --entity-card-identifier-vertical-align: baseline,
+#   --entity-card-identifier-line-height: 0  the identifier on the text's
+#                                       baseline, its inline box of no
+#                                       height; a keyword and a number.
+#   --entity-card-sidecar-divider-width: 1px  the Card's divider under the
+#                                       sidecar; stroke thickness is
+#                                       primitive only.
+#   --entity-card-sidecar-span: 2       the sidecar's columns: two at least,
+#                                       wide enough for a component example.
+#   --entity-card-body-span: var(--card-span, 1)  the span the published
+#                                       Cards group gives every card.
+#   --entity-card-narrow-column: 1 / -1  the whole row a card without a
+#                                       sidecar spans below one group;
+#                                       grid lines, not a length.
+#   --entity-card-footer-overlap: calc(-1 * var(--grid-gutter))
+#                                       the footer reaches back across the
+#                                       gutter between its track and the
+#                                       body's, and a body without a
+#                                       footer across the same gutter; no
+#                                       symbol is a negative gutter.
+#
+# Roster namespaces (accepted and tracked): container.gap.default,
+# component.padding.block, component.padding.inline, space.300 (a line
+# height), and the semantic typography symbols
+# typography.text.primary.smallcaps.letter.spacing,
+# typography.text.primary.fontSize,
+# typography.text.primary.bold.fontWeight and
+# typography.text.primary.fontWeight.
+node:
+  uri: prism.component.entity_card
+  styles:
+    typography.size: typography.text.primary.fontSize
+    typography.lineHeight: space.300
+  edges:
+    - node:
+        role: sidecar
+        styles:
+          layout.grid.column: "span var(--entity-card-sidecar-span) / -1"
+          layout.grid.row: "1 / 4"
+          size.min.width: 0
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.bottom.color: color.border.muted
+          appearance.background: color.background.layer2
+      relation: { cardinality: "0..1", slotName: sidecar }
+    - node:
+        uri: global.subcomponent.card-content
+        styles:
+          layout.grid.row: "1 / 4"
+        edges:
+          - node:
+              role: description
+              edges:
+                - node:
+                    role: heading
+                    edges:
+                      - node:
+                          role: location
+                          styles:
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            spacing.internal.block.start: 0
+                            spacing.internal.block.end: 0
+                            typography.lineHeight: space.300
+                            typography.color: color.text.muted
+                            typography.variant.caps: all-small-caps
+                            typography.letterSpacing: typography.text.primary.smallcaps.letter.spacing
+                        relation: { cardinality: "0..1", slotName: location }
+                      - node:
+                          role: title
+                          styles:
+                            # A heading at the text size: the card's
+                            # hierarchy is weight, not size.
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            spacing.internal.block.start: 0
+                            spacing.internal.block.end: 0
+                            layout.overflow: hidden
+                            typography.overflow: ellipsis
+                            typography.size: typography.text.primary.fontSize
+                            typography.lineHeight: space.300
+                            typography.weight: typography.text.primary.bold.fontWeight
+                          edges:
+                            - node:
+                                role: link
+                                styles:
+                                  typography.color: inherit
+                                  typography.decoration: none
+                                  typography.decoration@hover: underline
+                                  appearance.outline.width@focus: 2px
+                                  appearance.outline.style@focus: solid
+                                  appearance.outline.color@focus: color.focusRing
+                                  appearance.outline.offset@focus: -2px
+                              relation: { cardinality: "0..1", slotName: link }
+                            - node:
+                                role: parent
+                                styles:
+                                  typography.weight: typography.text.primary.fontWeight
+                              relation: { cardinality: "0..1", slotName: parent }
+                        relation: { cardinality: "1", slotName: title }
+                      - node:
+                          role: kind
+                          styles:
+                            spacing.external.block.start: 0
+                            spacing.external.block.end: 0
+                            spacing.internal.block.start: 0
+                            spacing.internal.block.end: 0
+                            typography.lineHeight: space.300
+                        relation: { cardinality: "0..1", slotName: kind }
+                  relation: { cardinality: "1" }
+                - node:
+                    role: summary
+                    styles:
+                      spacing.external.block.start: container.gap.default
+                      spacing.external.block.end: 0
+                      spacing.internal.block.start: 0
+                      spacing.internal.block.end: 0
+                      typography.lineHeight: space.300
+                  relation: { cardinality: "0..1", slotName: summary }
+            relation: { cardinality: "1" }
+          - node:
+              role: key values
+              styles:
+                spacing.external.block.start: container.gap.default
+                spacing.external.block.end: 0
+              edges:
+                - node:
+                    role: pair
+                    styles:
+                      # One rule above the pair: the top side alone has
+                      # a width and a style, every other side none.
+                      layout.type: flex
+                      appearance.border.top.width: 1px
+                      appearance.border.style: "solid none none"
+                      appearance.border.block.start.color: color.border.muted
+                    edges:
+                      - node:
+                          role: key
+                          styles:
+                            layout.flex.grow: 1
+                            layout.flex.basis: 0
+                            layout.overflow.inline: clip
+                            size.min.width: 0
+                            typography.overflow: ellipsis
+                            typography.color: color.text.muted
+                        relation: { cardinality: "1", slotName: key }
+                      - node:
+                          role: value
+                          styles:
+                            layout.flex.grow: 1
+                            layout.flex.basis: 0
+                            layout.overflow.inline: clip
+                            size.min.width: 0
+                            typography.overflow: ellipsis
+                            spacing.external.inline.start: 0
+                          edges:
+                            - node:
+                                role: identifier
+                                styles:
+                                  layout.verticalAlign: baseline
+                                  typography.lineHeight: 0
+                              relation: { cardinality: "0..*", slotName: identifier }
+                        relation: { cardinality: "1", slotName: value }
+                  relation: { cardinality: "1..*", slotName: pair }
+            relation: { cardinality: "0..1", slotName: key-values }
+      relation: { cardinality: "1", slotName: body }
+    - node:
+        uri: global.subcomponent.card-footer
+        styles:
+          spacing.external.block.start: "calc(-1 * var(--grid-gutter))"
+        edges:
+          - node:
+              role: vital
+              styles:
+                size.max.width: 100%
+                layout.overflow: hidden
+                typography.overflow: ellipsis
+                typography.color: color.text.muted
+            relation: { cardinality: "1..*", slotName: vital }
+      relation: { cardinality: "0..1", slotName: footer }

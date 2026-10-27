@@ -57,7 +57,7 @@ const declareTermInspectorClassFragment = (): unknown => graphql`
           _meta {
             curie
           }
-          ...EntityChip_node
+          ...ChipProjection_node
         }
       }
       pageInfo {

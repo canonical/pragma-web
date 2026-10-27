@@ -1,20 +1,12 @@
 /**
- * The Entity representations of a Prism documentation site: each renders
- * any graph node through the arm its site maps to the node's type.
+ * The Entity projections of a Prism documentation site: generic slotted
+ * components for the five forms an entity takes, the projections that fill
+ * them from a type's Relay fragment, and the dispatchers that render any
+ * graph node through the arm its site maps to the node's type.
  *
  * @module
  */
 
-export type { EntityCardProps } from "./EntityCard/index.js";
-export { EntityCard } from "./EntityCard/index.js";
-export type { EntityChipProps } from "./EntityChip/index.js";
-export { EntityChip } from "./EntityChip/index.js";
-export type { EntityCommandProps } from "./EntityCommand/index.js";
-export { EntityCommand } from "./EntityCommand/index.js";
-export type { EntityRowProps } from "./EntityRow/index.js";
-export { EntityRow } from "./EntityRow/index.js";
-export type { EntityTitleProps } from "./EntityTitle/index.js";
-export { EntityTitle } from "./EntityTitle/index.js";
 export type {
   ProseLinkProps,
   ProseReferencesProviderProps,
@@ -23,13 +15,90 @@ export {
   markdownComponents,
   ProseReferencesProvider,
 } from "./markdown/index.js";
-export { defaultProjectionMaps } from "./node/index.js";
 export type {
+  CardArmNative,
+  CardProjectionProps,
+  ChipArmNative,
+  ChipProjectionProps,
+  CommandArmNative,
+  CommandProjectionProps,
+  GraphNodeArmNative,
+  GraphNodeProjectionProps,
+  NodeCardProps,
+  NodeChipProps,
+  NodeCommandProps,
+  NodeGraphNodeProps,
+  NodeListProps,
+  NodeRowProps,
+  RowArmNative,
+  RowProjectionProps,
+} from "./node/index.js";
+export {
+  CardProjection,
+  ChipProjection,
+  CommandProjection,
+  defaultProjectionMaps,
+  GraphNodeProjection,
+  NodeCard,
+  NodeChip,
+  NodeCommand,
+  NodeGraphNode,
+  NodeList,
+  NodeRow,
+  RowProjection,
+} from "./node/index.js";
+export type {
+  OntologyClassCardProps,
+  OntologyClassChipProps,
+  OntologyClassCommandProps,
+  OntologyClassGraphNodeProps,
+  OntologyClassRowProps,
+  OntologyPropertyCardProps,
+  OntologyPropertyChipProps,
+  OntologyPropertyCommandProps,
+  OntologyPropertyGraphNodeProps,
+  OntologyPropertyRowProps,
+} from "./ontology/index.js";
+export {
+  OntologyClassCard,
+  OntologyClassChip,
+  OntologyClassCommand,
+  OntologyClassGraphNode,
+  OntologyClassRow,
+  OntologyPropertyCard,
+  OntologyPropertyChip,
+  OntologyPropertyCommand,
+  OntologyPropertyGraphNode,
+  OntologyPropertyRow,
+} from "./ontology/index.js";
+export type {
+  ArmProps,
+  ProjectionArm,
   ProjectionMap,
   ProjectionMaps,
   ProjectionsProviderProps,
+  SiteArmProps,
 } from "./projections/index.js";
 export {
   ProjectionsProvider,
+  useProjectionLink,
   useProjectionMaps,
 } from "./projections/index.js";
+export type {
+  EntityCardKeyValue,
+  EntityCardProps,
+  EntityChipProps,
+  EntityCommandProps,
+  EntityGraphNodeProps,
+  EntityListProps,
+  EntityListView,
+  EntityRowProps,
+} from "./ui/index.js";
+export {
+  EntityCard,
+  EntityChip,
+  EntityCommand,
+  EntityGraphNode,
+  EntityList,
+  EntityRow,
+} from "./ui/index.js";

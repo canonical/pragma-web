@@ -1,52 +1,170 @@
-import type { ReaderFragment, ReaderSelection } from "relay-runtime";
+// @vitest-environment node
+
+import { fileURLToPath } from "node:url";
+import { assertAnatomy } from "@canonical/prism-core/testing";
+import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
-import entityCardFragmentNode from "../../__generated__/EntityCard_node.graphql.js";
-import entityChipFragmentNode from "../../__generated__/EntityChip_node.graphql.js";
-import entityCommandFragmentNode from "../../__generated__/EntityCommand_node.graphql.js";
-import entityRowFragmentNode from "../../__generated__/EntityRow_node.graphql.js";
-import entityTitleFragmentNode from "../../__generated__/EntityTitle_node.graphql.js";
+import cardProjectionFragmentNode from "../../__generated__/CardProjection_node.graphql.js";
+import chipProjectionFragmentNode from "../../__generated__/ChipProjection_node.graphql.js";
+import commandProjectionFragmentNode from "../../__generated__/CommandProjection_node.graphql.js";
+import graphNodeProjectionFragmentNode from "../../__generated__/GraphNodeProjection_node.graphql.js";
+import rowProjectionFragmentNode from "../../__generated__/RowProjection_node.graphql.js";
 import { defaultProjectionMaps, type ProjectionMaps } from "../../lib/index.js";
 
-/** Each representation's map, beside the composite fragment it dispatches over. */
+/**
+ * Each form's map, beside the composite fragment its dispatcher reads, the
+ * dispatcher's folder, whose anatomy names its cases, and the site slot the
+ * composite spreads.
+ */
 const COMPOSITES: readonly {
-  readonly representation: keyof ProjectionMaps;
+  readonly form: keyof ProjectionMaps;
   readonly fragment: ReaderFragment;
+  readonly dispatcher: string;
+  readonly slot: string;
 }[] = [
-  { representation: "chip", fragment: entityChipFragmentNode },
-  { representation: "row", fragment: entityRowFragmentNode },
-  { representation: "card", fragment: entityCardFragmentNode },
-  { representation: "command", fragment: entityCommandFragmentNode },
-  { representation: "title", fragment: entityTitleFragmentNode },
+  {
+    form: "chip",
+    fragment: chipProjectionFragmentNode,
+    dispatcher: "ChipProjection",
+    slot: "SiteChipSlot_node",
+  },
+  {
+    form: "row",
+    fragment: rowProjectionFragmentNode,
+    dispatcher: "RowProjection",
+    slot: "SiteRowSlot_node",
+  },
+  {
+    form: "card",
+    fragment: cardProjectionFragmentNode,
+    dispatcher: "CardProjection",
+    slot: "SiteCardSlot_node",
+  },
+  {
+    form: "command",
+    fragment: commandProjectionFragmentNode,
+    dispatcher: "CommandProjection",
+    slot: "SiteCommandSlot_node",
+  },
+  {
+    form: "graphNode",
+    fragment: graphNodeProjectionFragmentNode,
+    dispatcher: "GraphNodeProjection",
+    slot: "SiteGraphNodeSlot_node",
+  },
 ];
 
-/** List the types a composite's inline fragments arm with a fragment spread. */
-function listInlineArms(selections: readonly ReaderSelection[]): string[] {
-  return selections.flatMap((selection) =>
-    selection.kind === "InlineFragment" &&
-    selection.selections.some((inner) => inner.kind === "FragmentSpread")
-      ? [selection.type]
+/**
+ * One arm a composite spreads: the alias it is read by, the type it is on
+ * and the fragment it spreads.
+ */
+interface Arm {
+  readonly alias: string;
+  readonly type: string;
+  readonly spread: string | undefined;
+}
+
+/**
+ * List the arms a composite spreads at its top level: each an aliased
+ * inline fragment, read by its alias, on its type, around the one fragment
+ * it spreads. relay-runtime's reader types predate the aliased spread, so
+ * it is read by its shape.
+ */
+function listArms(fragment: ReaderFragment): Arm[] {
+  return fragment.selections.flatMap((selection) => {
+    const aliased = selection as {
+      readonly kind: string;
+      readonly name?: string;
+      readonly fragment?: {
+        readonly type: string;
+        readonly selections: readonly { readonly name?: string }[];
+      };
+    };
+    return aliased.kind === "AliasedInlineFragmentSpread" &&
+      aliased.name !== undefined &&
+      aliased.fragment !== undefined
+      ? [
+          {
+            alias: aliased.name,
+            type: aliased.fragment.type,
+            spread: aliased.fragment.selections.at(0)?.name,
+          },
+        ]
+      : [];
+  });
+}
+
+/** Whether a composite spreads a fragment at its top level without an alias. */
+function hasUnaliasedSpread(fragment: ReaderFragment): boolean {
+  return fragment.selections.some(
+    (selection) => selection.kind === "FragmentSpread",
+  );
+}
+
+/** List the types a dispatcher's anatomy narrows its switch's cases to. */
+function listCaseTypes(dispatcher: string): string[] {
+  const folder = fileURLToPath(
+    new URL(`../../lib/node/${dispatcher}`, import.meta.url),
+  );
+  return (assertAnatomy(folder).root.edges ?? []).flatMap(({ target }) =>
+    "cases" in target
+      ? target.cases.flatMap(({ node }) =>
+          node.projection?.on === undefined ? [] : [node.projection.on],
+        )
       : [],
   );
 }
 
-/** Whether a composite spreads a fragment at its top level: the Node arm. */
-function hasTopLevelSpread(selections: readonly ReaderSelection[]): boolean {
-  return selections.some((selection) => selection.kind === "FragmentSpread");
-}
-
-describe("each representation's composite fragment", () => {
-  for (const { representation, fragment } of COMPOSITES) {
+describe("each form's composite fragment", () => {
+  for (const { form, fragment, dispatcher, slot } of COMPOSITES) {
     describe(fragment.name, () => {
-      it("spreads the Node arm's fragment at its top level", () => {
-        expect(hasTopLevelSpread(fragment.selections)).toBe(true);
+      const arms = listArms(fragment);
+
+      it("spreads every arm but the site slot aliased by the type it is on", () => {
+        expect(hasUnaliasedSpread(fragment)).toBe(false);
+        for (const { alias, type } of arms.filter(
+          ({ alias }) => alias !== "Site",
+        )) {
+          expect(alias).toBe(type);
+        }
       });
 
-      it(`arms exactly the types the ${representation} map names, each with a spread`, () => {
-        const mapped = Object.keys(defaultProjectionMaps[representation])
-          .filter((typename) => typename !== "Node")
-          .sort();
-        expect(listInlineArms(fragment.selections).sort()).toEqual(mapped);
+      it("spreads the Node arm, which takes every other type", () => {
+        expect(arms).toContainEqual(
+          expect.objectContaining({ alias: "Node", type: "Node" }),
+        );
+      });
+
+      it("spreads the site slot, a site's own fragment on Node", () => {
+        expect(arms).toContainEqual({
+          alias: "Site",
+          type: "Node",
+          spread: slot,
+        });
+      });
+
+      it(`arms exactly the types the ${form} map types`, () => {
+        expect(
+          arms
+            .map(({ alias }) => alias)
+            .filter((alias) => alias !== "Node" && alias !== "Site")
+            .sort(),
+        ).toEqual(Object.keys(defaultProjectionMaps[form].types).sort());
+      });
+
+      it(`arms exactly the cases ${dispatcher}'s anatomy switches on`, () => {
+        expect(arms.map(({ type }) => type).sort()).toEqual(
+          listCaseTypes(dispatcher).sort(),
+        );
       });
     });
   }
+});
+
+describe("the list view's two dispatchers", () => {
+  it("arm the same types, so a list's cards and rows project each node alike", () => {
+    expect(Object.keys(defaultProjectionMaps.row.types).sort()).toEqual(
+      Object.keys(defaultProjectionMaps.card.types).sort(),
+    );
+  });
 });

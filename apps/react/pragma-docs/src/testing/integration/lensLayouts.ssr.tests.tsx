@@ -507,7 +507,9 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     // same warm store: the two links the prose writes to them, one by its
     // compact address and one by its absolute IRI.
     expect(
-      mustGet(STANDARD_READING_URL).canvas.match(/class="ds node-chip"/g),
+      mustGet(STANDARD_READING_URL).canvas.match(
+        /class="ds entity-chip ds node-chip"/g,
+      ),
     ).toHaveLength(2);
     // …and a chip of a standard links to that standard's reading page.
     expect(mustGet(STANDARD_READING_URL).canvas).toContain(

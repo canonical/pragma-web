@@ -1,0 +1,35 @@
+---
+# CommandProjection: any graph node as the 56px command-palette result,
+# dispatched on its type.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, canvas 449:22295 (the projection
+# matrix: one EntityCommand per type, each type filling the slots it has).
+# It renders no element of its own: the case its node's type selects
+# renders the root. A type the package projects reads through its own
+# projection; every other type through the Node projection, from what every
+# node carries. The cases are the composite fragment's aliased spreads, one
+# per type, and the map's arms, by the same names.
+# A site's own types read through the site slot, the site's own compile
+# of `SiteCommandSlot_node`, for the typenames its map lists under
+# `siteTypes`.
+node:
+  uri: prism.component.command_projection
+  projection:
+    on: Node
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: prism.component.ontology_class_command
+              projection:
+                on: OntologyClass
+          - node:
+              uri: prism.component.node_command
+              projection:
+                on: Node
+          - node:
+              uri: prism.component.site_command_slot
+              projection:
+                on: Node
+      relation:
+        cardinality: "1"

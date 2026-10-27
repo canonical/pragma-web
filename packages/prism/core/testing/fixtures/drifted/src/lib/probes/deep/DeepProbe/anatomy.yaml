@@ -1,0 +1,4 @@
+---
+# DeepProbe — a fixture two folders below src/lib, where no component sits.
+node:
+  uri: prism.component.deep_probe

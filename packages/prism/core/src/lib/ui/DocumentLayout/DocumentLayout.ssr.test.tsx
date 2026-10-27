@@ -19,7 +19,6 @@ describe("DocumentLayout SSR", () => {
     expect(html).toContain(
       '<div class="rail"><nav aria-label="Site rail"></nav></div>',
     );
-    expect(html).toContain('<div class="strip"></div>');
     expect(html).toContain('<main class="ds canvas canvas"');
     expect(html).toContain(
       '<div class="page"><p>Routed page</p></div><div class="aside"><p>Aside content</p></div></main>',
@@ -29,12 +28,13 @@ describe("DocumentLayout SSR", () => {
     );
   });
 
-  it("server-renders no aside and no colophon for a node that renders nothing", () => {
+  it("server-renders no strip, no aside and no colophon for a node that renders nothing", () => {
     const html = renderToString(
-      <DocumentLayout aside={false} colophon="" rail={null}>
+      <DocumentLayout aside={false} colophon="" rail={null} strip={null}>
         <p>Routed page</p>
       </DocumentLayout>,
     );
+    expect(html).not.toContain('class="strip"');
     expect(html).not.toContain('class="aside"');
     expect(html).not.toContain('class="colophon"');
   });

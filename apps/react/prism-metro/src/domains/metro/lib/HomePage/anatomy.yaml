@@ -1,0 +1,89 @@
+---
+# HomePage — the site's landing, the content of the route at `/`: the page's
+# title and a lead over one door per lens, each with its live count. It is a
+# page of the document archetype: the canvas is the only region that
+# scrolls, and nothing here sets a height.
+#
+# Reference: the document archetype and the Swiss rules: flush left, ragged
+# right. The page uses the whole main column: the title and the doors span
+# it, and only the lead holds a reading measure of six intrinsic columns
+# from the column's first line (a narrower subgrid clamps the span). The
+# root, the intro and the doors region are subgrids of the canvas's page
+# grid, so every line of the page sits on the canvas's columns, and each
+# sets its gap from the grid's gutter on both axes. The doors stand one
+# further step of block space below the intro, external spacing on the
+# region, so the intro and the doors read as two groups. The root does not
+# stretch to the canvas's height, so a short page packs at the top. The
+# landing renders no strip, so the canvas starts at the viewport's top: the
+# page carries one gutter of external spacing above it, so its title sits
+# one gutter under the viewport's top as a page under a strip sits one
+# gutter under the strip's rule. The
+# doors region holds the loading line while the counts are on their way,
+# the alert when they fail, then the doors themselves. Bespoke: no
+# published component is a landing page.
+#
+# Every decision is read through a component token declared on the root
+# (`--home-page-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1" (root, title, doors, loading, error) and
+#     "1 / span 6" (lead): structure, a span in columns.
+#   layout.alignSelf start: a layout keyword.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, container.gap.loose
+# and container.gap.default.
+node:
+  uri: metro.component.home_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+    spacing.external.block.start: grid.gutter
+    spacing.internal.block.end: container.gap.loose
+  edges:
+    - node:
+        role: intro (a header)
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              role: title (the page's level-1 heading)
+              styles:
+                layout.grid.column: "1 / -1"
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: lead
+              styles:
+                layout.grid.column: "1 / span 6"
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: lead }
+      relation: { cardinality: "1", slotName: intro }
+    - node:
+        role: doors region
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+          spacing.external.block.start: container.gap.default
+        edges:
+          - node:
+              role: loading state (a paragraph, while the counts are on their way)
+              styles:
+                layout.grid.column: "1 / -1"
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: loading }
+          - node:
+              role: error state (an alert paragraph)
+              styles:
+                layout.grid.column: "1 / -1"
+            relation: { cardinality: "0..1", slotName: error }
+          - node:
+              uri: metro.subcomponent.lens_cards
+            relation: { cardinality: "0..1", slotName: cards }
+      relation: { cardinality: "1", slotName: doors }

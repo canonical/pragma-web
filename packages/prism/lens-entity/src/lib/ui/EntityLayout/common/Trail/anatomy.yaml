@@ -1,0 +1,12 @@
+---
+# Trail — the strip's context tenant, the lens's breadcrumb trail: the
+# lens's label on the index, then the label and the entity's address on an
+# entity page, read off the URL alone; its first crumb links to the
+# binding's index route. It renders core's lens context, whose own anatomy
+# owns the markup, so it binds no style.
+node:
+  uri: prism.subcomponent.trail
+  edges:
+    - node:
+        uri: prism.component.lens_breadcrumbs
+      relation: { cardinality: "1" }

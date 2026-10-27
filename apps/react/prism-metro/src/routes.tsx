@@ -10,6 +10,7 @@ import {
   stationsLayout,
   stationsRoutes,
 } from "#domains/lenses";
+import { homeLayout, homeRoutes } from "#domains/metro";
 import { NotFoundPage } from "#lib/ui";
 
 /**
@@ -28,8 +29,12 @@ export const notFoundRoute = route({
 
 // Each lens renders its routes inside its own layout: the routes of one group
 // share a wrapper, and the wrapper renders the rail, the lens's strip and any
-// provider the strip and the page share. Above every layout sits `Shell`, the
-// provider nest the client and server entries mount.
+// provider the strip and the page share. The landing renders inside its own
+// wrapper too, the document archetype with the rail; it is not a lens and
+// declares none. Above every layout sits `Shell`, the provider nest the
+// client and server entries mount.
+
+const [home] = group(homeLayout, [homeRoutes.home] as const);
 
 const [definitions, definitionsTerm] = group(definitionsLayout, [
   definitionsRoutes.definitions,
@@ -63,6 +68,7 @@ const [fleet, fleetStock, fleetFormation, fleetUnit, fleetCarType] = group(
  * so the table keeps each lens's keys as the lens returns them.
  */
 export const appRoutes = {
+  home,
   definitions,
   stations,
   lines,

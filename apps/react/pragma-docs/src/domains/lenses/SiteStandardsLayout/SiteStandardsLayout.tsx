@@ -1,7 +1,7 @@
 import { StandardsLayout } from "@canonical/prism-lens-standards";
 import type { ReactElement } from "react";
-import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
+import { SiteColophon } from "#lib/ui/SiteColophon";
 import type { SiteStandardsLayoutProps } from "./types.js";
 
 /**

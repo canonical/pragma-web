@@ -1,0 +1,56 @@
+---
+# InterchangeCard: an interchange as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 and 505:1956, as
+# the station card. Best guess: a station's card, plus the transfer time
+# as a fourth key value and the count of the lines that meet there as a
+# second vital.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.interchange_card
+  projection: { on: Interchange }
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: location
+              projection: { field: _meta.title }
+            relation: { cardinality: "0..1", slotName: location, projection: { field: inZone } }
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: summary
+              projection: { field: _meta.definition }
+            relation: { cardinality: "0..1", slotName: summary }
+          - node:
+              role: key values
+              edges:
+                - node: { role: platforms, projection: { field: platformCount } }
+                  relation: { cardinality: "0..1" }
+                - node: { role: zone, projection: { field: _meta.title } }
+                  relation: { cardinality: "0..1", projection: { field: inZone } }
+                - node: { role: lines, projection: { field: _meta.title } }
+                  relation: { cardinality: "0..*", projection: { field: servesLine } }
+                - node: { role: transfer, projection: { field: transferMinutes } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "0..1", slotName: key-values }
+          - node:
+              role: vitals
+              edges:
+                - node: { role: platforms, projection: { field: platformCount } }
+                  relation: { cardinality: "0..1" }
+                - node: { role: lines, projection: { field: _meta.title } }
+                  relation: { cardinality: "0..*", projection: { field: servesLine } }
+            relation: { cardinality: "0..1", slotName: footer }
+      relation: { cardinality: "1" }

@@ -1,0 +1,46 @@
+---
+# OntologyPropertyChip: an ontology property as an inline mention.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 505:2304 and 449:22408 (the
+# chip as the classes row draws it: the name alone in the pill). A
+# passage's own link text, when given, stands in for the name.
+# Projected onto EntityChip, which carries every style: this anatomy binds
+# none. It is not dispatched: a property is not a Node, so a lens spreads
+# its fragment where it selects the property.
+# The name is the label, or the local name of the IRI when the property has
+# none (a property carries no computed title). The home is the link the
+# name renders through, resolved from the absolute IRI, a property's only
+# address; a property without one reads as inert text.
+node:
+  uri: prism.component.ontology_property_chip
+  projection:
+    on: OntologyProperty
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: value
+              edges:
+                - node:
+                    role: label
+                    projection:
+                      field: label
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: local name
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
+                - node:
+                    role: home
+                    projection:
+                      field: uri
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: value
+      relation:
+        cardinality: "1"

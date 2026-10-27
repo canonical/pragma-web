@@ -77,7 +77,7 @@ describe("the schema", () => {
     expect(provider.sdl).toContain("type Station implements Node");
   });
 
-  it("adds exactly one root field, prose, to the contract's five", () => {
+  it("adds two root fields, prose and search, to the contract's five", () => {
     const query = provider.schema.getQueryType();
     expect(Object.keys(query?.getFields() ?? {}).sort()).toEqual([
       "node",
@@ -86,6 +86,7 @@ describe("the schema", () => {
       "ontologyClass",
       "ontologyProperty",
       "prose",
+      "search",
     ]);
   });
 
@@ -277,6 +278,146 @@ describe("Query.prose", () => {
   });
 });
 
+describe("Query.search", () => {
+  const M = "https://metro.example/onto#";
+  const GEO = "https://geo.example/onto#";
+
+  /** The page selection every case reads. */
+  const SEARCH = `query Search($text: String!, $first: Int, $after: String) {
+    search(text: $text, first: $first, after: $after) {
+      edges { cursor node { __typename uri } }
+      pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+    }
+  }`;
+
+  /** The page `search` answers with. */
+  interface SearchPage {
+    readonly edges: readonly {
+      readonly cursor: string;
+      readonly node: { readonly __typename: string; readonly uri: string };
+    }[];
+    readonly pageInfo: Record<string, unknown>;
+  }
+
+  /** Run `SEARCH` with `variables`; the page must come back without errors. */
+  const search = async (
+    variables: Record<string, unknown>,
+  ): Promise<SearchPage> =>
+    ((await run(SEARCH, variables)) as { search: SearchPage }).search;
+
+  /** The nodes of the page for `text`, in rank order. */
+  const rank = async (text: string) =>
+    (await search({ text })).edges.map((edge) => edge.node);
+
+  it("ranks titles matching at one position by length, shortest first", async () => {
+    expect(await rank("north")).toEqual([
+      { __typename: "Station", uri: `${M}northgate` },
+      { __typename: "Line", uri: `${M}north-line` },
+    ]);
+  });
+
+  it("orders titles of one length by code point", async () => {
+    expect(await rank("coastal")).toEqual([
+      { __typename: "Line", uri: `${M}coastal-line` },
+      { __typename: "Zone", uri: `${GEO}coastal-zone` },
+    ]);
+  });
+
+  it("ranks a title match, a class's included, before a definition match", async () => {
+    expect(await rank("fare")).toEqual([
+      { __typename: "OntologyClass", uri: `${GEO}Zone` },
+      { __typename: "Zone", uri: `${GEO}central-zone` },
+    ]);
+  });
+
+  it("pages the ranking with first and after", async () => {
+    const head = await search({ text: "line", first: 2 });
+    expect(head.edges.map((edge) => edge.node.uri)).toEqual([
+      `${M}Line`,
+      `${M}north-line`,
+    ]);
+    expect(head.pageInfo).toEqual({
+      hasNextPage: true,
+      hasPreviousPage: false,
+      startCursor: toCursor(`${M}Line`),
+      endCursor: toCursor(`${M}north-line`),
+    });
+    const middle = await search({
+      text: "line",
+      first: 4,
+      after: head.pageInfo.endCursor,
+    });
+    expect(middle.edges.map((edge) => edge.node.uri)).toEqual([
+      `${M}circle-line`,
+      `${M}upland-line`,
+      `${M}coastal-line`,
+      `${M}lowland-line`,
+    ]);
+    expect(middle.pageInfo).toMatchObject({
+      hasNextPage: true,
+      hasPreviousPage: true,
+    });
+    const tail = await search({
+      text: "line",
+      first: 4,
+      after: middle.pageInfo.endCursor,
+    });
+    expect(tail.edges.map((edge) => edge.node)).toEqual([
+      { __typename: "OntologyClass", uri: `${M}Interchange` },
+      { __typename: "OntologyClass", uri: `${M}Route` },
+    ]);
+    expect(tail.pageInfo).toEqual({
+      hasNextPage: false,
+      hasPreviousPage: true,
+      startCursor: toCursor(`${M}Interchange`),
+      endCursor: toCursor(`${M}Route`),
+    });
+  });
+
+  it("trims the text and ignores its case", async () => {
+    expect(await rank("  NORTH  ")).toEqual(await rank("north"));
+  });
+
+  it("answers empty text with the empty page", async () => {
+    expect(await search({ text: "" })).toEqual({
+      edges: [],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      },
+    });
+  });
+
+  it("finds an entity with no labels by the local name its title falls back to", async () => {
+    expect(await rank("ghost")).toEqual([
+      { __typename: "Station", uri: BARE_ENTITY_URI },
+    ]);
+  });
+
+  it("starts from the head after a cursor it does not know", async () => {
+    const page = await search({
+      text: "north",
+      first: 1,
+      after: toCursor(`${M}nowhere`),
+    });
+    expect(page.edges.map((edge) => edge.node.uri)).toEqual([`${M}northgate`]);
+  });
+
+  it("refuses a negative first", async () => {
+    const result = await graphql({
+      schema: provider.schema,
+      source: SEARCH,
+      rootValue: provider.rootValue,
+      variableValues: { text: "north", first: -1 },
+    });
+    expect(result.errors?.map((error) => error.message)).toEqual([
+      "first must not be negative (received -1)",
+    ]);
+  });
+});
+
 describe("Query.ontologies / ontology", () => {
   it("returns every loaded namespace", async () => {
     const data = await run(`{ ontologies { prefix namespace label } }`);
@@ -309,6 +450,7 @@ describe("Query.ontologies / ontology", () => {
         { uri: "https://geo.example/onto#latitude" },
         { uri: "https://geo.example/onto#longitude" },
         { uri: "https://geo.example/onto#inZone" },
+        { uri: "https://geo.example/onto#stops" },
       ],
     });
   });
@@ -599,6 +741,29 @@ describe("Query.ontologyProperty", () => {
       kind: "ANNOTATION",
       functional: false,
       inverse: null,
+    });
+  });
+
+  it("round-trips a fare zone's stops and a station's zone as inverses", async () => {
+    const data = await run(`{
+      ontologyProperty(uri: "geo:stops") {
+        uri label range kind functional
+        domain { uri }
+        inverse { uri functional inverse { uri } }
+      }
+    }`);
+    expect(data.ontologyProperty).toEqual({
+      uri: "https://geo.example/onto#stops",
+      label: "stops",
+      range: "metro:Stop",
+      kind: "OBJECT",
+      functional: false,
+      domain: { uri: "https://geo.example/onto#Zone" },
+      inverse: {
+        uri: "https://geo.example/onto#inZone",
+        functional: true,
+        inverse: { uri: "https://geo.example/onto#stops" },
+      },
     });
   });
 
@@ -1017,6 +1182,28 @@ describe("the provider's own relational fields", () => {
       (stop) => stop.__typename === "Interchange",
     );
     expect(interchange?.transferMinutes).toEqual(expect.any(Number));
+  });
+});
+
+describe("Zone.stops", () => {
+  it("serves the stops inside a fare zone under their real types, in the dataset's order", async () => {
+    const data = await run(`{
+      node(id: "https://geo.example/onto#central-zone") {
+        ... on Zone { stops { __typename uri } }
+      }
+    }`);
+    expect(data.node).toEqual({
+      stops: [
+        {
+          __typename: "Interchange",
+          uri: "https://metro.example/onto#central-exchange",
+        },
+        {
+          __typename: "Station",
+          uri: "https://metro.example/onto#northgate",
+        },
+      ],
+    });
   });
 });
 

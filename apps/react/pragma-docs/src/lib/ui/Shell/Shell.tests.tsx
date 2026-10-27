@@ -2,8 +2,8 @@
 
 import { createEnvironment, useHome } from "@canonical/prism-core";
 import {
+  ChipProjection,
   defaultProjectionMaps,
-  EntityChip,
   useProjectionMaps,
 } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
@@ -26,7 +26,7 @@ import Shell from "./Shell.js";
 const shellTestsQuerySource = (): unknown => graphql`
   query ShellTestsQuery($id: ID!) {
     node(id: $id) {
-      ...EntityChip_node
+      ...ChipProjection_node
     }
   }
 `;
@@ -122,6 +122,7 @@ describe("Shell", () => {
       {
         node: {
           __typename: "OntologyClass",
+          __isNode: "OntologyClass",
           uri: variables.id,
           _meta: {
             title: "Component",
@@ -142,7 +143,7 @@ describe("Shell", () => {
       }
       return (
         <p>
-          Built on <EntityChip node={data.node} />.
+          Built on <ChipProjection node={data.node} />.
         </p>
       );
     };

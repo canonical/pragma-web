@@ -7,8 +7,11 @@ export const LOCALE = "en";
 /**
  * Every string the app itself shows a reader, in English, by key. The lens
  * packages keep their own catalogs; these are the words the site adds around
- * them: its name, its rail, its lens labels, the fleet lens's headings and
- * states, and its not-found page.
+ * them: its name, its rail, its lens labels, its landing, the words its
+ * projections of the metro types fill their slots with, the fleet lens's
+ * headings and states, and its not-found page. A value may hold `{name}` placeholders the translator fills, or be a
+ * plural record whose branch the `count` value selects: the shape
+ * `@canonical/i18n-core`'s `createTranslator` reads.
  */
 export const MESSAGES = {
   "site.name": "Metro",
@@ -53,6 +56,45 @@ export const MESSAGES = {
   "fleet.cabFront": "{title}, cab at the front",
   "fleet.cabRear": "{title}, cab at the rear",
   "shell.loading": "Loading…",
+  "home.title": "Overview",
+  "home.lead":
+    "The metro network read three ways: its stations, its lines, and the definitions that describe them, each counted from the graph.",
+  "home.loading": "Counting the network…",
+  "home.error":
+    "The network could not be counted. Reload the page to try again.",
+  "home.stations.count": { one: "{count} station", other: "{count} stations" },
+  "home.stations.summary":
+    "Every stop on the network, with the lines that call at it.",
+  "home.lines.count": { one: "{count} line", other: "{count} lines" },
+  "home.lines.summary":
+    "Every line the network runs, with the stations it serves.",
+  "home.definitions.count": { one: "{count} class", other: "{count} classes" },
+  "home.definitions.summary":
+    "The ontology the network is described in: its classes and their properties.",
+  "station.platforms": "Platforms",
+  "station.platforms.count": {
+    one: "{count} platform",
+    other: "{count} platforms",
+  },
+  "station.zone": "Zone",
+  "station.lines": "Lines",
+  "station.lines.separator": ", ",
+  "interchange.word": "interchange",
+  "interchange.transfer": "Transfer",
+  "interchange.transfer.minutes": {
+    one: "{count} minute",
+    other: "{count} minutes",
+  },
+  "interchange.lines.count": { one: "{count} line", other: "{count} lines" },
+  "line.stops": "Stops",
+  "line.stops.count": { one: "{count} stop", other: "{count} stops" },
+  "line.ends": "Ends",
+  "line.ends.value": "{first} to {last}",
+  "line.loop": "loop",
+  "zone.stations.count": {
+    one: "{count} station",
+    other: "{count} stations",
+  },
   "notFound.title": "Page not found",
   "notFound.body": "No page of the metro docs lives at this address.",
 } as const;

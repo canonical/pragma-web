@@ -1,0 +1,49 @@
+---
+# LineCard: a line as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 484:264 and 505:1956. Best
+# guess: the kind is the line's class; the summary its definition; the key
+# values the count of its stops and, for a line that runs end to end, its
+# two end stations, the first and last calls of its first route; a loop
+# line has no ends and carries "loop" as its vital instead.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.line_card
+  projection: { on: Line }
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: summary
+              projection: { field: _meta.definition }
+            relation: { cardinality: "0..1", slotName: summary }
+          - node:
+              role: key values
+              edges:
+                - node: { role: stops, projection: { field: uri } }
+                  relation: { cardinality: "1", projection: { field: servedBy } }
+                - node:
+                    role: ends
+                    edges:
+                      - node: { role: terminus, projection: { field: _meta.title } }
+                        relation: { cardinality: "2", projection: { field: calls.stop } }
+                  relation: { cardinality: "0..1", projection: { field: routes } }
+            relation: { cardinality: "1", slotName: key-values }
+          - node:
+              role: vital
+              projection: { field: isLoop }
+            relation: { cardinality: "0..1", slotName: footer, projection: { field: routes } }
+      relation: { cardinality: "1" }

@@ -15,18 +15,21 @@
  * the render modules load through `vite.ssrLoadModule()` so edits are picked
  * up without a restart.
  *
- * The prepare step and the status resolver are imported natively, the route
- * table with them, while `EntryServer` loads in Vite's own module registry:
- * the data pass runs to completion before the render pass starts, and only
- * plain data, the serialised records, crosses between the two.
+ * The status resolver is imported natively, the route table with it. The
+ * prepare step loads in Vite's own module registry beside `EntryServer`, so
+ * the lens packages' queries it runs are the app's own compile, the ones the
+ * render reads, as Vite's plugins resolve them: the data pass runs to
+ * completion before the render pass starts, and only plain data, the
+ * serialised records, crosses between the two.
  */
 import fs from "node:fs";
 import { viteFetchMiddleware } from "@canonical/react-ssr/server";
 import { createServer as createViteServer } from "vite";
+import { resolvePort } from "#lib/site";
 import { resolveGraphqlUrl } from "#relay";
-import { resolvePort } from "#site";
-import prepareRelayData from "./prepareRelayData.js";
 import resolveRouteStatus from "./resolveRouteStatus.js";
+
+type PrepareRelayData = typeof import("./prepareRelayData.js").default;
 
 const PORT = resolvePort();
 
@@ -85,6 +88,10 @@ Bun.serve({
       const { extractPreferences } = await vite.ssrLoadModule(
         "@canonical/react-hooks",
       );
+
+      const { default: prepareRelayData } = (await vite.ssrLoadModule(
+        "/src/server/prepareRelayData.ts",
+      )) as { readonly default: PrepareRelayData };
 
       const { theme } = extractPreferences(req.headers.get("cookie"));
       // Warm the matched route against the graph and serialise the store

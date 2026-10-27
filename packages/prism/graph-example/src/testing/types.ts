@@ -1,13 +1,33 @@
 /**
- * The shapes the test readers return, as a client reads them through
- * GraphQL: `readNetwork`'s lines with their routes and calls and stations
- * with their lines and diagram places, and `readFleet`'s rolling stocks,
- * formations, units and car types with the lines they run; the cars and
- * cabs of a formation in train order, as the fleet tests derive them; and
- * the part of a `_meta` selection the field round-trip reads; and the
- * reference-extraction cases `extractReferences` is held to. Test-only, and
- * type-only.
+ * Test-only, type-only shapes shared by this package's tests: the
+ * reference-extraction and ranking cases; the shapes the test readers
+ * return, as a client reads them through GraphQL: `readNetwork`'s lines with
+ * their routes and calls and stations with their lines and diagram places,
+ * and `readFleet`'s rolling stocks, formations, units and car types with the
+ * lines they run; the cars and cabs of a formation in train order, as the
+ * fleet tests derive them; and the part of a `_meta` selection the field
+ * round-trip reads.
  */
+
+/**
+ * One reference-extraction case: a CommonMark document and the IRIs it must
+ * yield, in order.
+ */
+export interface ExtractionCase {
+  readonly name: string;
+  readonly markdown: string;
+  readonly expected: readonly string[];
+}
+
+/**
+ * One ranking case: search text and the IRIs `rankSearchEntries` must
+ * return for it over the search fixtures, best first.
+ */
+export interface RankingCase {
+  readonly name: string;
+  readonly text: string;
+  readonly expected: readonly string[];
+}
 
 /** One class's instances page, the way the readers select it. */
 export interface InstancePage<T> {
@@ -167,14 +187,4 @@ export interface Fleet {
   readonly carTypes: readonly FleetCarType[];
   readonly lines: readonly FleetLine[];
   readonly stations: readonly FleetStop[];
-}
-
-/**
- * One reference-extraction case: a CommonMark document and the IRIs it must
- * yield, in order.
- */
-export interface ExtractionCase {
-  readonly name: string;
-  readonly markdown: string;
-  readonly expected: readonly string[];
 }
