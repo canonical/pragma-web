@@ -60,8 +60,8 @@ describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
         link.getAttribute("href"),
       ),
     );
-    expect(hrefs).toContain("/stations/metro%3Anorthgate");
-    expect(hrefs).not.toContain("/stations/metro%3A");
+    expect(hrefs).toContain("/network/stations/metro%3Anorthgate");
+    expect(hrefs).not.toContain("/network/stations/metro%3A");
   });
 
   it("shows a station's page with the fields its class declares", async () => {
