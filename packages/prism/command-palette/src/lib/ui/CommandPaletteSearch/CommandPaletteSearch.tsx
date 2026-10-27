@@ -107,11 +107,13 @@ const componentCssClassName = "ds command-palette-search";
  * @implements prism.component.command_palette_search
  * @note Impure: fetches the search through Relay, reads the projection maps
  *   and the translator in scope, clicks and scrolls the highlighted
- *   option's element, prevents a pointer's press from moving the focus, and
- *   focuses the field after a click in the preview.
+ *   option's element, prevents a pointer's press from moving the focus,
+ *   focuses the field after a click in the preview, and tells the palette
+ *   whether the highlighted result is disabled.
  */
 export default function CommandPaletteSearch({
   onChoose,
+  onHighlight,
   session,
   className,
   ...props
@@ -139,15 +141,21 @@ export default function CommandPaletteSearch({
   const listed = results.length > 0;
 
   /**
-   * Hold the highlighted option's element, for Enter to choose, and scroll
-   * it into the results' view as the highlight reaches it.
+   * Hold the highlighted option's element, for Enter to choose, scroll it
+   * into the results' view as the highlight reaches it, and tell the
+   * palette whether it is disabled, as its result's row marks it.
    *
-   * @note Impure: writes the ref and scrolls the results.
+   * @note Impure: writes the ref, scrolls the results and calls the
+   *   palette's handler.
    */
-  const attachActiveOption = useCallback((option: HTMLLIElement | null) => {
-    activeOption.current = option;
-    option?.scrollIntoView({ block: "nearest" });
-  }, []);
+  const attachActiveOption = useCallback(
+    (option: HTMLLIElement | null) => {
+      activeOption.current = option;
+      option?.scrollIntoView({ block: "nearest" });
+      onHighlight(option?.getAttribute("aria-disabled") === "true");
+    },
+    [onHighlight],
+  );
 
   /**
    * Take the field's new text, and highlight the first result again.

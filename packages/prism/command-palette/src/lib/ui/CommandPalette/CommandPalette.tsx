@@ -42,8 +42,10 @@ const componentCssClassName = "ds command-palette";
  * alone. A search that fails renders one line in its place until the
  * palette opens again, and the line takes the focus the field held, so it
  * stays in the dialog; while it shows, only the hint to close remains,
- * since nothing is left to move through or open. Each opening starts a
- * fresh search, set up as the chord opens the dialog rather than when it
+ * since nothing is left to move through or open. While the highlighted
+ * result is disabled, its type having no home on the site, the hint to
+ * open is not shown, since Enter opens nothing. Each opening starts a fresh
+ * search, set up as the chord opens the dialog rather than when it
  * closes, since the platform tells of a closing only in a later task,
  * which a quick reopening can come before.
  *
@@ -72,6 +74,7 @@ export default function CommandPalette({
   const dialog = useRef<HTMLDialogElement>(null);
   const [session, setSession] = useState(0);
   const [failed, setFailed] = useState(false);
+  const [highlightDisabled, setHighlightDisabled] = useState(false);
 
   /**
    * Start the opening's session: a new, empty search, and a cleared
@@ -142,6 +145,7 @@ export default function CommandPalette({
             <CommandPaletteSearch
               key={session}
               onChoose={close}
+              onHighlight={setHighlightDisabled}
               session={session}
             />
           </Suspense>
@@ -159,12 +163,14 @@ export default function CommandPalette({
                 id="hints.move"
               />
             </span>
-            <span className="hint">
-              <Message
-                elements={{ enter: <KeyboardKey keyValue="enter" /> }}
-                id="hints.open"
-              />
-            </span>
+            {highlightDisabled ? null : (
+              <span className="hint">
+                <Message
+                  elements={{ enter: <KeyboardKey keyValue="enter" /> }}
+                  id="hints.open"
+                />
+              </span>
+            )}
           </>
         )}
         <span className="hint">

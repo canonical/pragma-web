@@ -29,18 +29,23 @@ const renderSearch = () => {
   const environment = createSearchEnvironment();
   const router = createSiteRouter();
   const onChoose = vi.fn();
+  const onHighlight = vi.fn();
   const view = render(
     createSiteTree({
       environment,
       router,
       children: (
         <Suspense fallback={null}>
-          <CommandPaletteSearch onChoose={onChoose} session={0} />
+          <CommandPaletteSearch
+            onChoose={onChoose}
+            onHighlight={onHighlight}
+            session={0}
+          />
         </Suspense>
       ),
     }),
   );
-  return { ...view, environment, router, onChoose };
+  return { ...view, environment, router, onChoose, onHighlight };
 };
 
 /** Type `text` in the field. */
@@ -114,7 +119,7 @@ describe("CommandPaletteSearch", () => {
   });
 
   it("groups the results by type in rank order and highlights the first", async () => {
-    await renderResults("lay");
+    const { onHighlight } = await renderResults("lay");
     const listbox = screen.getByRole("listbox", { name: "Results" });
     const groups = within(listbox).getAllByRole("group");
     expect(
@@ -131,6 +136,7 @@ describe("CommandPaletteSearch", () => {
     expect(first).toHaveAttribute("aria-selected", "true");
     expect(field).toHaveAttribute("aria-activedescendant", first?.id);
     expect(readPreviewTitle()).toBe("Layout switcher");
+    expect(onHighlight).toHaveBeenLastCalledWith(false);
   });
 
   it("names each group by its type's heading", async () => {
@@ -344,8 +350,11 @@ describe("CommandPaletteSearch", () => {
   });
 
   it("lists and previews a result its site gives no home, and Enter does nothing", async () => {
-    const { router, onChoose } = await renderResults("layton", [STATION_NODE]);
+    const { router, onChoose, onHighlight } = await renderResults("layton", [
+      STATION_NODE,
+    ]);
     expect(screen.getByRole("option")).toHaveAttribute("aria-disabled", "true");
+    expect(onHighlight).toHaveBeenLastCalledWith(true);
     expect(
       within(screen.getByRole("region", { name: "Preview" })).getByText(
         "Layton",
@@ -385,6 +394,7 @@ describe("CommandPaletteSearch", () => {
             className="custom-class"
             data-testid="search"
             onChoose={() => undefined}
+            onHighlight={() => undefined}
             session={0}
           />
         ),

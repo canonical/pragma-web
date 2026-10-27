@@ -111,6 +111,8 @@ query; a text nothing matches shows one line naming it; both are a `status`
 region. A search that fails renders one `alert` line in its place, which
 takes the focus the field held, so it stays in the dialog; while it shows,
 the hints to move and to open are gone and the hint to close remains.
+While the highlighted result is disabled, the hint to open is gone, since
+Enter opens nothing there.
 
 The search renders in the browser only: its combobox and listbox are wired
 by script, so the server sends the closed dialog and the key hints alone.
