@@ -6,11 +6,34 @@
 
 import type { HomeNode, HomeResolver, Homes } from "@canonical/prism-core";
 import { type Router, route } from "@canonical/router-core";
-import type { ClassPayload, NodePayload } from "./types.js";
+import type { ClassPayload, NodePayload, ShelfSearchSchema } from "./types.js";
 
-/** A site's route table with one entity page, addressed by the entity. */
+/**
+ * The shelf page's search schema, in the Standard Schema shape the router
+ * validates search parameters with: it reads the view the shelf shows its
+ * items in, and never fails.
+ */
+const SHELF_SEARCH: ShelfSearchSchema = {
+  "~standard": {
+    version: 1,
+    vendor: "prism-command-palette-testing",
+    validate: (value) => ({
+      value: { view: String((value as Record<string, unknown>).view ?? "") },
+    }),
+  },
+};
+
+/**
+ * A site's route table: one entity page, addressed by the entity, and a
+ * shelf of entities, which keeps the view it shows in its search.
+ */
 export const ROUTES = {
   thing: route({ url: "/things/:uri", content: () => null }),
+  shelf: route({
+    url: "/shelves/:uri",
+    search: SHELF_SEARCH,
+    content: () => null,
+  }),
 } as const;
 
 /** Build the thing page's href for `node`, through the router. */
@@ -114,3 +137,9 @@ export const COMPONENT_HREF = "/things/ds%3Aglobal.component.layout-switcher";
 
 /** The href the site's `thing` route builds for `ONTOLOGY_CLASS_NODE`. */
 export const ONTOLOGY_CLASS_HREF = "/things/ds%3ALayout";
+
+/**
+ * A home on the shelf page with a view in its search and a fragment: the
+ * route reads the search, and the fragment names a place on the page.
+ */
+export const SHELF_HREF = "/shelves/ds%3ALayout?view=rows#layouts";
