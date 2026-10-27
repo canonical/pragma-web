@@ -4,7 +4,7 @@ import { ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import type React from "react";
 import { Suspense } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import StockList from "./common/StockList/StockList.js";
 import type { FleetIndexProps } from "./types.js";
 import "./styles.css";
@@ -22,27 +22,30 @@ const componentCssClassName = "ds fleet-index";
 const FleetIndex = ({
   className,
   ...props
-}: FleetIndexProps): React.ReactElement => (
-  <article
-    {...props}
-    className={[componentCssClassName, className].filter(Boolean).join(" ")}
-  >
-    <Head title={MESSAGES["lens.fleet"]} />
-    <h1 className="title">{MESSAGES["lens.fleet"]}</h1>
-    <ErrorBoundary
-      fallback={
-        <p className="error" role="alert">
-          {MESSAGES["fleet.index.error"]}
-        </p>
-      }
+}: FleetIndexProps): React.ReactElement => {
+  const t = useMessages();
+  return (
+    <article
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <Suspense
-        fallback={<p className="status">{MESSAGES["fleet.index.loading"]}</p>}
+      <Head title={t("lens.fleet")} />
+      <h1 className="title">{t("lens.fleet")}</h1>
+      <ErrorBoundary
+        fallback={
+          <p className="error" role="alert">
+            {t("fleet.index.error")}
+          </p>
+        }
       >
-        <StockList />
-      </Suspense>
-    </ErrorBoundary>
-  </article>
-);
+        <Suspense
+          fallback={<p className="status">{t("fleet.index.loading")}</p>}
+        >
+          <StockList />
+        </Suspense>
+      </ErrorBoundary>
+    </article>
+  );
+};
 
 export default FleetIndex;

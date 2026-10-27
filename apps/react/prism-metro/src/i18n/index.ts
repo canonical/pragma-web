@@ -6,6 +6,5 @@
  */
 
 export { LOCALE, MESSAGES } from "./constants.js";
-export { default as formatMessage } from "./formatMessage.js";
 export { default as useMessages } from "./hooks/useMessages.js";
 export type { MessageKey, MessageValues, Translate } from "./types.js";

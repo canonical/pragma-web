@@ -3,7 +3,7 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import type React from "react";
 import { Suspense } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import FormationDetail from "./common/FormationDetail/FormationDetail.js";
 import type { FormationPageProps } from "./types.js";
 import "./styles.css";
@@ -23,26 +23,29 @@ const FormationPage = ({
   address,
   className,
   ...props
-}: FormationPageProps): React.ReactElement => (
-  <article
-    {...props}
-    className={[componentCssClassName, className].filter(Boolean).join(" ")}
-  >
-    <ErrorBoundary
-      fallback={
-        <p className="error" role="alert">
-          {MESSAGES["fleet.page.error"]}
-        </p>
-      }
-      resetKey={address}
+}: FormationPageProps): React.ReactElement => {
+  const t = useMessages();
+  return (
+    <article
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <Suspense
-        fallback={<p className="loading">{MESSAGES["fleet.page.loading"]}</p>}
+      <ErrorBoundary
+        fallback={
+          <p className="error" role="alert">
+            {t("fleet.page.error")}
+          </p>
+        }
+        resetKey={address}
       >
-        <FormationDetail address={address} />
-      </Suspense>
-    </ErrorBoundary>
-  </article>
-);
+        <Suspense
+          fallback={<p className="loading">{t("fleet.page.loading")}</p>}
+        >
+          <FormationDetail address={address} />
+        </Suspense>
+      </ErrorBoundary>
+    </article>
+  );
+};
 
 export default FormationPage;

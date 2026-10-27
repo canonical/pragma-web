@@ -1,10 +1,15 @@
+import { createTranslator } from "@canonical/i18n-core";
 import { describe, expect, it } from "vitest";
+import { MESSAGES } from "#i18n";
 import listFleetFacts, { type FleetPageNode } from "./listFleetFacts.js";
+
+/** The app's translator, as the catalog hook gives it outside a provider. */
+const t = createTranslator("en", MESSAGES);
 
 describe("listFleetFacts", () => {
   it("lists no facts for a node of another type", () => {
     const zone = { __typename: "%other" } as NonNullable<FleetPageNode>;
-    expect(listFleetFacts(zone)).toEqual([]);
+    expect(listFleetFacts(zone, t)).toEqual([]);
   });
 
   it("reads a rolling stock's measures as ranges when they differ", () => {
@@ -15,7 +20,7 @@ describe("listFleetFacts", () => {
         { length: 120000, capacity: 980 },
       ],
     } as unknown as NonNullable<FleetPageNode>;
-    expect(listFleetFacts(stock).map(({ value }) => value)).toEqual([
+    expect(listFleetFacts(stock, t).map(({ value }) => value)).toEqual([
       "2",
       "60 m to 120 m",
       "490 passengers to 980 passengers",

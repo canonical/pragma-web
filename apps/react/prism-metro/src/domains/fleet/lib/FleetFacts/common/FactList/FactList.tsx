@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { useMessages } from "#i18n";
 import carTypePageQueryNode from "#relay/__generated__/CarTypePageQuery.graphql.js";
 import formationPageQueryNode from "#relay/__generated__/FormationPageQuery.graphql.js";
 import stockPageQueryNode from "#relay/__generated__/StockPageQuery.graphql.js";
@@ -26,6 +27,7 @@ export default function FactList({
   kind,
   address,
 }: FactListProps): ReactElement {
+  const t = useMessages();
   const { node } = useFleetNode<
     FleetNodeOperation & { response: { node: FleetPageNode } }
   >({
@@ -37,7 +39,7 @@ export default function FactList({
       {(node !== null &&
       node !== undefined &&
       node.__typename === TYPENAME_BY_KIND[kind]
-        ? listFleetFacts(node)
+        ? listFleetFacts(node, t)
         : []
       ).map(({ term, value }) => (
         <div className="fact" key={term}>

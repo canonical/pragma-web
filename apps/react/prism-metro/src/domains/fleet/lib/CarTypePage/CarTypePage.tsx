@@ -3,7 +3,7 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import type React from "react";
 import { Suspense } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import CarTypeDetail from "./common/CarTypeDetail/CarTypeDetail.js";
 import type { CarTypePageProps } from "./types.js";
 import "./styles.css";
@@ -23,26 +23,29 @@ const CarTypePage = ({
   address,
   className,
   ...props
-}: CarTypePageProps): React.ReactElement => (
-  <article
-    {...props}
-    className={[componentCssClassName, className].filter(Boolean).join(" ")}
-  >
-    <ErrorBoundary
-      fallback={
-        <p className="error" role="alert">
-          {MESSAGES["fleet.page.error"]}
-        </p>
-      }
-      resetKey={address}
+}: CarTypePageProps): React.ReactElement => {
+  const t = useMessages();
+  return (
+    <article
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <Suspense
-        fallback={<p className="loading">{MESSAGES["fleet.page.loading"]}</p>}
+      <ErrorBoundary
+        fallback={
+          <p className="error" role="alert">
+            {t("fleet.page.error")}
+          </p>
+        }
+        resetKey={address}
       >
-        <CarTypeDetail address={address} />
-      </Suspense>
-    </ErrorBoundary>
-  </article>
-);
+        <Suspense
+          fallback={<p className="loading">{t("fleet.page.loading")}</p>}
+        >
+          <CarTypeDetail address={address} />
+        </Suspense>
+      </ErrorBoundary>
+    </article>
+  );
+};
 
 export default CarTypePage;

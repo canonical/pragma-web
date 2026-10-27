@@ -10,7 +10,7 @@ import { useRouterState } from "@canonical/router-react";
 import type React from "react";
 import type { ReactElement } from "react";
 import { MetroRail } from "#domains/lenses";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import { FLEET_ROUTES, KIND_BY_ROUTE } from "../../constants.js";
 import { FleetFacts } from "../FleetFacts/index.js";
 import type { FleetLayoutProps } from "./types.js";
@@ -51,6 +51,7 @@ const FleetLayout = ({
   children,
   ...props
 }: FleetLayoutProps): React.ReactElement => {
+  const t = useMessages();
   const { match } = useRouterState();
   return (
     <DocumentLayout
@@ -65,7 +66,7 @@ const FleetLayout = ({
       strip={
         <ModeStrip
           className="bar"
-          context={<FleetTrail lensLabel={MESSAGES["lens.fleet"]} />}
+          context={<FleetTrail lensLabel={t("lens.fleet")} />}
         />
       }
     >

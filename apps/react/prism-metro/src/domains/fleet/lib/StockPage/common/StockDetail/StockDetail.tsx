@@ -1,6 +1,6 @@
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useId } from "react";
-import { formatMessage, MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import type { StockPageQuery } from "#relay/__generated__/StockPageQuery.graphql.js";
 import stockPageQueryNode from "#relay/__generated__/StockPageQuery.graphql.js";
 import { useFleetNode } from "../../../../hooks/index.js";
@@ -21,6 +21,7 @@ import type { StockDetailProps } from "./types.js";
 export default function StockDetail({
   address,
 }: StockDetailProps): ReactElement {
+  const t = useMessages();
   const formationsId = useId();
   const carTypesId = useId();
   const { node } = useFleetNode<StockPageQuery>({
@@ -28,7 +29,7 @@ export default function StockDetail({
     address,
   });
   if (node?.__typename !== "RollingStock") {
-    const message = formatMessage("fleet.notFound", { address });
+    const message = t("fleet.notFound", { address });
     return (
       <>
         <Head title={message} />
@@ -56,7 +57,7 @@ export default function StockDetail({
       <Head title={node._meta.title} />
       <h1 className="title">{node._meta.title}</h1>
       <section aria-labelledby={formationsId} className="section">
-        <h2 id={formationsId}>{MESSAGES["fleet.formations"]}</h2>
+        <h2 id={formationsId}>{t("fleet.formations")}</h2>
         <ol className="list">
           {formations.map((formation) => (
             <li key={formation.uri}>
@@ -76,7 +77,7 @@ export default function StockDetail({
         </ol>
       </section>
       <section aria-labelledby={carTypesId} className="section">
-        <h2 id={carTypesId}>{MESSAGES["fleet.carTypes"]}</h2>
+        <h2 id={carTypesId}>{t("fleet.carTypes")}</h2>
         <ul className="list">
           {carTypes.map((carType) => (
             <li

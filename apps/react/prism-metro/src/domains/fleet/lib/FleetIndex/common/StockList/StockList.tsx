@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { useLazyLoadQuery } from "react-relay";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import type { FleetIndexQuery } from "#relay/__generated__/FleetIndexQuery.graphql.js";
 import fleetIndexQueryNode from "#relay/__generated__/FleetIndexQuery.graphql.js";
 import { FLEET_CLASS_URI, FLEET_PAGE_SIZE } from "../../../../constants.js";
@@ -17,6 +17,7 @@ import readFormationTrain from "../../../readFormationTrain.js";
  * suspends until the store holds the operation.
  */
 export default function StockList(): ReactElement {
+  const t = useMessages();
   const { ontologyClass } = useLazyLoadQuery<FleetIndexQuery>(
     fleetIndexQueryNode,
     { classUri: FLEET_CLASS_URI, count: FLEET_PAGE_SIZE },
@@ -25,7 +26,7 @@ export default function StockList(): ReactElement {
     node.__typename === "RollingStock" ? [node] : [],
   );
   if (stocks.length === 0) {
-    return <p className="status">{MESSAGES["fleet.index.empty"]}</p>;
+    return <p className="status">{t("fleet.index.empty")}</p>;
   }
   return (
     <ul className="list" data-placeholder="entity-list">

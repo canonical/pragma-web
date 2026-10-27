@@ -47,11 +47,20 @@ export const MESSAGES = {
   "fleet.yes": "Yes",
   "fleet.no": "No",
   "fleet.range": "{min} to {max}",
-  "fleet.passengers": "{count} passengers",
+  "fleet.passengers.count": {
+    one: "{count} passenger",
+    other: "{count} passengers",
+  },
+  "fleet.formations.count": {
+    one: "{count} formation",
+    other: "{count} formations",
+  },
+  "fleet.units.count": { one: "{count} unit", other: "{count} units" },
+  "fleet.cars.count": { one: "{count} car", other: "{count} cars" },
+  "fleet.lines.separator": ", ",
   "fleet.platformFit.shortest": "Shortest platform {length}",
   "fleet.platformFit.overhang":
     "{station}: {excess} past its {platform} platform",
-  "fleet.platformFit.stations": "station",
   "fleet.unit": "Unit {position}",
   "fleet.cabFront": "{title}, cab at the front",
   "fleet.cabRear": "{title}, cab at the rear",

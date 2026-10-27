@@ -3,7 +3,7 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import type React from "react";
 import { Suspense } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import UnitDetail from "./common/UnitDetail/UnitDetail.js";
 import type { UnitPageProps } from "./types.js";
 import "./styles.css";
@@ -23,26 +23,29 @@ const UnitPage = ({
   address,
   className,
   ...props
-}: UnitPageProps): React.ReactElement => (
-  <article
-    {...props}
-    className={[componentCssClassName, className].filter(Boolean).join(" ")}
-  >
-    <ErrorBoundary
-      fallback={
-        <p className="error" role="alert">
-          {MESSAGES["fleet.page.error"]}
-        </p>
-      }
-      resetKey={address}
+}: UnitPageProps): React.ReactElement => {
+  const t = useMessages();
+  return (
+    <article
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <Suspense
-        fallback={<p className="loading">{MESSAGES["fleet.page.loading"]}</p>}
+      <ErrorBoundary
+        fallback={
+          <p className="error" role="alert">
+            {t("fleet.page.error")}
+          </p>
+        }
+        resetKey={address}
       >
-        <UnitDetail address={address} />
-      </Suspense>
-    </ErrorBoundary>
-  </article>
-);
+        <Suspense
+          fallback={<p className="loading">{t("fleet.page.loading")}</p>}
+        >
+          <UnitDetail address={address} />
+        </Suspense>
+      </ErrorBoundary>
+    </article>
+  );
+};
 
 export default UnitPage;

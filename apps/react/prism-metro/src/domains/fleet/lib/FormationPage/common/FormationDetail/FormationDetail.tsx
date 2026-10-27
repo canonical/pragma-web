@@ -1,6 +1,6 @@
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useId } from "react";
-import { formatMessage, MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import type { FormationPageQuery } from "#relay/__generated__/FormationPageQuery.graphql.js";
 import formationPageQueryNode from "#relay/__generated__/FormationPageQuery.graphql.js";
 import { useFleetNode } from "../../../../hooks/index.js";
@@ -24,6 +24,7 @@ import type { FormationDetailProps } from "./types.js";
 export default function FormationDetail({
   address,
 }: FormationDetailProps): ReactElement {
+  const t = useMessages();
   const unitsId = useId();
   const fitId = useId();
   const { node } = useFleetNode<FormationPageQuery>({
@@ -31,7 +32,7 @@ export default function FormationDetail({
     address,
   });
   if (node?.__typename !== "Formation") {
-    const message = formatMessage("fleet.notFound", { address });
+    const message = t("fleet.notFound", { address });
     return (
       <>
         <Head title={message} />
@@ -73,7 +74,7 @@ export default function FormationDetail({
         fits={fits}
       />
       <section aria-labelledby={unitsId} className="section">
-        <h2 id={unitsId}>{MESSAGES["fleet.units"]}</h2>
+        <h2 id={unitsId}>{t("fleet.units")}</h2>
         <ol className="list">
           {units.map(({ position, reversed, unit }) => (
             <li className="entry" data-placeholder="entity-row" key={position}>
@@ -82,14 +83,14 @@ export default function FormationDetail({
               </NodeLink>
               <span className="vital">{formatLength(unit.length)}</span>
               {reversed ? (
-                <span className="vital">{MESSAGES["fleet.reversed"]}</span>
+                <span className="vital">{t("fleet.reversed")}</span>
               ) : null}
             </li>
           ))}
         </ol>
       </section>
       <section aria-labelledby={fitId} className="section">
-        <h2 id={fitId}>{MESSAGES["fleet.platformFit"]}</h2>
+        <h2 id={fitId}>{t("fleet.platformFit")}</h2>
         <PlatformFit fits={fits} />
       </section>
     </>

@@ -2,7 +2,7 @@
 
 import { Badge } from "@canonical/react-ds-global";
 import type React from "react";
-import { formatMessage, MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import formatLength from "../formatLength.js";
 import type { PlatformFitProps } from "./types.js";
 import "./styles.css";
@@ -25,59 +25,62 @@ const PlatformFit = ({
   fits,
   className,
   ...props
-}: PlatformFitProps): React.ReactElement => (
-  <div
-    {...props}
-    className={[componentCssClassName, className].filter(Boolean).join(" ")}
-  >
-    {fits.length === 0 ? (
-      <p className="empty">{MESSAGES["fleet.platformFit.none"]}</p>
-    ) : (
-      <ul className="lines">
-        {fits.map(({ title, code, shortest, overhangs }) => (
-          <li className="line" key={code}>
-            <span className="line-name" data-placeholder="entity-chip">
-              <code className="code">{code}</code> {title}
-            </span>
-            {shortest === null ? null : (
-              <span className="shortest">
-                {formatMessage("fleet.platformFit.shortest", {
-                  length: formatLength(shortest),
-                })}
+}: PlatformFitProps): React.ReactElement => {
+  const t = useMessages();
+  return (
+    <div
+      {...props}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
+      {fits.length === 0 ? (
+        <p className="empty">{t("fleet.platformFit.none")}</p>
+      ) : (
+        <ul className="lines">
+          {fits.map(({ title, code, shortest, overhangs }) => (
+            <li className="line" key={code}>
+              <span className="line-name" data-placeholder="entity-chip">
+                <code className="code">{code}</code> {title}
               </span>
-            )}
-            <span className="verdict">
-              {overhangs.length === 0 ? (
-                MESSAGES["fleet.fits"]
-              ) : (
-                <>
-                  {MESSAGES["fleet.overhangs"]}{" "}
-                  <Badge
-                    className="count"
-                    criticality="error"
-                    value={overhangs.length}
-                  />
-                </>
+              {shortest === null ? null : (
+                <span className="shortest">
+                  {t("fleet.platformFit.shortest", {
+                    length: formatLength(shortest),
+                  })}
+                </span>
               )}
-            </span>
-            {overhangs.length === 0 ? null : (
-              <ul className="overhangs">
-                {overhangs.map((overhang) => (
-                  <li key={overhang.title}>
-                    {formatMessage("fleet.platformFit.overhang", {
-                      station: overhang.title,
-                      excess: formatLength(overhang.excess),
-                      platform: formatLength(overhang.platformLength),
-                    })}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-);
+              <span className="verdict">
+                {overhangs.length === 0 ? (
+                  t("fleet.fits")
+                ) : (
+                  <>
+                    {t("fleet.overhangs")}{" "}
+                    <Badge
+                      className="count"
+                      criticality="error"
+                      value={overhangs.length}
+                    />
+                  </>
+                )}
+              </span>
+              {overhangs.length === 0 ? null : (
+                <ul className="overhangs">
+                  {overhangs.map((overhang) => (
+                    <li key={overhang.title}>
+                      {t("fleet.platformFit.overhang", {
+                        station: overhang.title,
+                        excess: formatLength(overhang.excess),
+                        platform: formatLength(overhang.platformLength),
+                      })}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 export default PlatformFit;

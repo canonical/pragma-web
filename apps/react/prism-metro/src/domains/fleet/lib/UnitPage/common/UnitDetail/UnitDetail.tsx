@@ -1,6 +1,6 @@
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
-import { formatMessage } from "#i18n";
+import { useMessages } from "#i18n";
 import type { UnitPageQuery } from "#relay/__generated__/UnitPageQuery.graphql.js";
 import unitPageQueryNode from "#relay/__generated__/UnitPageQuery.graphql.js";
 import { useFleetNode } from "../../../../hooks/index.js";
@@ -16,12 +16,13 @@ import type { UnitDetailProps } from "./types.js";
  * naming no unit says nothing lives there.
  */
 export default function UnitDetail({ address }: UnitDetailProps): ReactElement {
+  const t = useMessages();
   const { node } = useFleetNode<UnitPageQuery>({
     query: unitPageQueryNode,
     address,
   });
   if (node?.__typename !== "Unit") {
-    const message = formatMessage("fleet.notFound", { address });
+    const message = t("fleet.notFound", { address });
     return (
       <>
         <Head title={message} />

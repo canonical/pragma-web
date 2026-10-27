@@ -1,6 +1,6 @@
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
-import { formatMessage } from "#i18n";
+import { useMessages } from "#i18n";
 import type { CarTypePageQuery } from "#relay/__generated__/CarTypePageQuery.graphql.js";
 import carTypePageQueryNode from "#relay/__generated__/CarTypePageQuery.graphql.js";
 import { useFleetNode } from "../../../../hooks/index.js";
@@ -16,12 +16,13 @@ import type { CarTypeDetailProps } from "./types.js";
 export default function CarTypeDetail({
   address,
 }: CarTypeDetailProps): ReactElement {
+  const t = useMessages();
   const { node } = useFleetNode<CarTypePageQuery>({
     query: carTypePageQueryNode,
     address,
   });
   if (node?.__typename !== "CarType") {
-    const message = formatMessage("fleet.notFound", { address });
+    const message = t("fleet.notFound", { address });
     return (
       <>
         <Head title={message} />

@@ -3,7 +3,7 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import type React from "react";
 import { Suspense, useId } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import FactList from "./common/FactList/FactList.js";
 import type { FleetFactsProps } from "./types.js";
 import "./styles.css";
@@ -25,6 +25,7 @@ const FleetFacts = ({
   className,
   ...props
 }: FleetFactsProps): React.ReactElement => {
+  const t = useMessages();
   const headingId = useId();
   return (
     <section
@@ -33,7 +34,7 @@ const FleetFacts = ({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <h2 className="heading" id={headingId}>
-        {MESSAGES["fleet.facts"]}
+        {t("fleet.facts")}
       </h2>
       <ErrorBoundary fallback={null} resetKey={`${kind} ${address}`}>
         <Suspense fallback={null}>
