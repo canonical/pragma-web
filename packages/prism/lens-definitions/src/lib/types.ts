@@ -17,6 +17,8 @@ export interface LensFilter {
   readonly abstractions: readonly Abstraction[];
   /** Allowed ontology prefixes (`ds`, `cs`, `anatomy`). */
   readonly namespaces: readonly string[];
+  /** Whether the classes with no instances are dimmed. */
+  readonly withInstances: boolean;
 }
 
 /**
@@ -29,6 +31,17 @@ export interface LensFilter {
 export interface LensFilterState extends Omit<LensFilter, "namespaces"> {
   /** Allowed ontology prefixes, or `undefined` while no chip has been pressed. */
   readonly namespaces?: readonly string[] | undefined;
+}
+
+/**
+ * A reader's request to fit the graph's camera to one region: a new
+ * `serial` is a new request, so picking the same region twice fits it twice.
+ */
+export interface RegionRequest {
+  /** The prefix of the region to fit. */
+  readonly prefix: string;
+  /** The request's number, counting up from 1. */
+  readonly serial: number;
 }
 
 /** One ontology's addressing identity, as the graph states it. */

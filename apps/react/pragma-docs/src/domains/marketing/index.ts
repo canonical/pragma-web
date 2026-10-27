@@ -3,11 +3,11 @@ export {
   LOBBY_PATTERN_CLASS,
   LOBBY_STANDARD_CLASS,
 } from "./constants.js";
-export { default as GuidePage } from "./GuidePage.js";
-export { default as HomePage } from "./HomePage.js";
 export { default as marketingLayout } from "./layout.js";
+export { HomeIcon } from "./lib/HomeIcon/index.js";
 export {
   LOBBY_EXEMPLAR_COUNT,
+  LOBBY_EXEMPLAR_POOL,
   lobbyQueryNode,
   lobbyVariables,
 } from "./lobbyQuery.js";

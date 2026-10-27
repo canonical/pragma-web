@@ -1,0 +1,10 @@
+---
+# LensFilterProvider — holds the lens's shared state, its filter and the
+# region a reader asked the graph to fit, for the strip, the canvas and
+# the inspector it encloses. It renders no element of its own.
+node:
+  uri: prism.component.lens_filter_provider
+  edges:
+    - node:
+        role: children
+      relation: { cardinality: "1", slotName: default }

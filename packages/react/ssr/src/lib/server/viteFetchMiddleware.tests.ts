@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { Readable } from "node:stream";
 import { describe, expect, it, vi } from "vitest";
 import {
   type ViteMiddlewareServer,
@@ -269,5 +270,45 @@ describe("viteFetchMiddleware", () => {
 
     expect(response?.status).toBe(204);
     expect(await response?.text()).toBe("");
+  });
+
+  it("returns a binary body piped from a stream larger than the response's buffer, whole", async () => {
+    // A static asset as Vite's file server sends it: a font streamed from
+    // disk in 64 KiB chunks, its type set by writeHead. The bridge's
+    // response has no socket to drain into, so it must never hold the
+    // stream back.
+    const chunk = Buffer.alloc(64 * 1024, 0xab);
+    const chunks = [chunk, chunk, chunk, chunk, chunk];
+    const handle = viteFetchMiddleware(
+      fakeVite((_req, res) => {
+        res.writeHead(200, { "content-type": "font/woff2" });
+        Readable.from(chunks).pipe(res);
+      }),
+    );
+
+    const response = await handle(
+      new Request("http://localhost/@fs/fonts/UbuntuSans[wdth,wght].woff2"),
+    );
+
+    expect(response?.status).toBe(200);
+    expect(response?.headers.get("content-type")).toBe("font/woff2");
+    const body = Buffer.from((await response?.arrayBuffer()) ?? []);
+    expect(body.equals(Buffer.concat(chunks))).toBe(true);
+  });
+
+  it("calls a write() callback once the chunk is taken", async () => {
+    const written = vi.fn();
+    const handle = viteFetchMiddleware(
+      fakeVite((_req, res) => {
+        res.write("a", written);
+        res.write("b", "utf8", written);
+        res.end();
+      }),
+    );
+
+    const response = await handle(new Request("http://localhost/asset.js"));
+
+    expect(await response?.text()).toBe("ab");
+    expect(written).toHaveBeenCalledTimes(2);
   });
 });

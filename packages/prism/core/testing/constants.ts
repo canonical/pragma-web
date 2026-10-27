@@ -13,6 +13,7 @@
  * style keys: the side is the colour key's to name.
  */
 export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
+  "align-content": ["layout.alignContent"],
   "align-items": ["layout.align"],
   "align-self": ["layout.alignSelf"],
   background: ["appearance.background"],
@@ -25,6 +26,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "border-bottom-color": ["appearance.border.bottom.color"],
   "border-bottom-style": ["appearance.border.style"],
   "border-bottom-width": ["appearance.border.width"],
+  "border-collapse": ["layout.table.collapse"],
   "border-color": ["appearance.border.color"],
   "border-inline-end-color": ["appearance.border.inline.end.color"],
   "border-inline-end-style": ["appearance.border.style"],
@@ -51,9 +53,11 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "font-family": ["typography.fontFamily"],
   "font-size": ["typography.size"],
   "font-variant-caps": ["typography.variant.caps"],
+  "font-variant-numeric": ["typography.variant.numeric"],
   "font-weight": ["typography.weight"],
   gap: ["spacing.gap"],
   "grid-area": ["layout.grid.area"],
+  "grid-auto-rows": ["layout.grid.autoRows"],
   "grid-column": ["layout.grid.column"],
   "grid-row": ["layout.grid.row"],
   "grid-template-columns": ["layout.grid.columns"],
@@ -110,6 +114,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "overflow-block": ["layout.overflow.block"],
   "overflow-inline": ["layout.overflow.inline"],
   "overflow-x": ["layout.overflow.inline"],
+  "overflow-wrap": ["typography.wrap"],
   "overflow-y": ["layout.overflow.block"],
   padding: [
     "spacing.internal.block.start",
@@ -142,6 +147,10 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   "text-overflow": ["typography.overflow"],
   "text-wrap": ["typography.wrap"],
   top: ["layout.offset.top"],
+  "transition-duration": ["motion.duration"],
+  "transition-property": ["motion.property"],
+  "transition-timing-function": ["motion.easing"],
+  "user-select": ["interaction.select"],
   "vertical-align": ["layout.verticalAlign"],
   visibility: ["appearance.visibility"],
   "white-space": ["typography.whiteSpace"],
@@ -180,7 +189,8 @@ export const CAMEL_LIFTS: readonly (readonly [string, string])[] = [
 ];
 
 /**
- * The selector suffix each anatomy interaction state binds. `:focus` serves
+ * The selector suffix each anatomy interaction state binds; a pressed
+ * toggle button is selected, as a current link is. `:focus` serves
  * an element that takes focus only by script, which never shows a keyboard
  * ring; every other focusable element binds `:focus-visible`.
  */
@@ -191,9 +201,18 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":focus-visible": "focus",
   ":hover": "hover",
   '[aria-current="page"]': "selected",
+  '[aria-pressed="true"]': "selected",
   '[aria-selected="true"]': "selected",
   "[open]": "expanded",
 };
+
+/**
+ * How an anatomy names a custom state a modifier class marks: a `switch`
+ * case whose role ends in the class in parentheses, such as
+ * `faded node (.is-faded)`. The stylesheet writes the state as the slot's
+ * class followed by the modifier, `.node.is-faded`.
+ */
+export const MODIFIER_ROLE = /\((\.[a-z][a-z0-9-]*)\)\s*$/;
 
 /**
  * The selector qualifiers a component root or one of its slots may carry

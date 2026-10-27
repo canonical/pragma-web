@@ -40,6 +40,8 @@ import type { InitialData } from "#server";
 import mergeRecordMaps from "../../testing/mergeRecordMaps.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";
+import journeysExplorerRecords from "../domains/journeys/__fixtures__/journeysExplorerRecords.js";
+import journeysExplorerRecordsJob from "../domains/journeys/__fixtures__/journeysExplorerRecordsJob.js";
 import { appRoutes, middleware, notFoundRoute } from "../routes.js";
 import { hydrateApp } from "./hydrateApp.js";
 
@@ -219,6 +221,61 @@ describe("client-side navigation over a hydrated app", () => {
 
     // The whole round trip served from the seeded store: zero network, and
     // React reported no recoverable error at any transition.
+    expect(globalFetch).not.toHaveBeenCalled();
+    expect(onRecoverableError).not.toHaveBeenCalled();
+  });
+
+  it("keeps the journeys graph on a move from the lens index to a job", async () => {
+    // The index and the job are two routes, so the move remounts the
+    // journeys layout: the graph view survives it only because it rides
+    // the address.
+    const url = "/journeys?view=graph";
+    const records = mergeRecordMaps(
+      journeysExplorerRecords,
+      journeysExplorerRecordsJob,
+    );
+    const serverHtml = renderSeededServerHtml(createFetchSpy(), url, records);
+    window.history.pushState({}, "", url);
+    (window as TestWindow).__INITIAL_DATA__ = { url, relay: { records } };
+
+    const container = document.createElement("div");
+    container.innerHTML = serverHtml;
+    document.body.appendChild(container);
+    containers.push(container);
+    const onRecoverableError = vi.fn();
+    await act(async () => {
+      roots.push(hydrateApp(container, { onRecoverableError }));
+    });
+    const view = () =>
+      container
+        .querySelector(".ds.journeys-explorer")
+        ?.getAttribute("data-view");
+    expect(view()).toBe("graph");
+
+    const jobLink = container.querySelector<HTMLAnchorElement>(
+      `.ds.journey-rail a[href^="/journeys/${encodeURIComponent(
+        "sem://design-system-docs#job.l3",
+      )}"]`,
+    );
+    expect(jobLink?.getAttribute("href")).toMatch(/\?view=graph$/);
+    await act(async () => {
+      jobLink?.click();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(window.location.pathname).toBe(
+      `/journeys/${encodeURIComponent("sem://design-system-docs#job.l3")}`,
+    );
+    expect(window.location.search).toBe("?view=graph");
+    // The graph, its selected job ringed, and the job in the inspector.
+    expect(view()).toBe("graph");
+    expect(
+      container.querySelector(
+        ".ds.journey-well .journey-hop.is-selected .ring",
+      ),
+    ).not.toBeNull();
+    expect(
+      container.querySelector(".inspector #journey-inspector-title"),
+    ).not.toBeNull();
     expect(globalFetch).not.toHaveBeenCalled();
     expect(onRecoverableError).not.toHaveBeenCalled();
   });

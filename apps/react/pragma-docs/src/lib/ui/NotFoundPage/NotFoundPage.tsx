@@ -2,33 +2,40 @@
 
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
+import { ProsePage } from "#lib/ui/ProsePage";
 import type { NotFoundPageProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds not-found-page";
 
 /**
- * The page every URL no route matches renders: its title, as the document's
- * title too, and a line saying nothing lives at the address. It is a page of
- * the canvas, so it spans every column of the canvas's page grid; the not-found
- * route renders it inside the document archetype, with the site's rail and
- * colophon.
+ * The page every URL no route matches renders: the prose page with its
+ * title, as the document's title too, and a line saying nothing lives at
+ * the address. The not-found route renders it inside the document
+ * archetype with no strip, so the page starts one gutter under the
+ * canvas's top. The prose page renders the root and takes the page's
+ * native props.
  *
  * `import { NotFoundPage } from "#lib/ui";`
+ *
+ * @implements docs.component.not_found_page
+ * @note Impure: reads its words from the translator in scope.
  */
 export default function NotFoundPage({
   className,
   ...props
 }: NotFoundPageProps): ReactElement {
+  const t = useMessages();
   return (
-    <section
+    <ProsePage
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
+      heading={t("notFound.title")}
+      headingId="not-found-title"
     >
-      <Head title={MESSAGES["notFound.title"]} />
-      <h1>{MESSAGES["notFound.title"]}</h1>
-      <p>{MESSAGES["notFound.body"]}</p>
-    </section>
+      <Head title={t("notFound.title")} />
+      <p>{t("notFound.body")}</p>
+    </ProsePage>
   );
 }

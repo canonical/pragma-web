@@ -3,7 +3,15 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The card's every other style is EntityCard's. */
   .ds.ui-block-card {
     /* Component styles */
+  }
+
+  /* A summary's inline code cannot wrap at a space, so the summary breaks
+   * anywhere rather than running past the card, and the canvas, at the end
+   * of a row. */
+  .ds.ui-block-card .summary {
+    overflow-wrap: anywhere;
   }
 }

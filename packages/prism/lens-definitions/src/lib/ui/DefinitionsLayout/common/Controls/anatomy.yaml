@@ -1,0 +1,9 @@
+---
+# Controls — the strip's controls: the explorer's chips over the warm
+# explorer query and the lens's filter. It renders no element of its own.
+node:
+  uri: prism.component.controls
+  edges:
+    - node:
+        uri: prism.component.explorer_controls
+      relation: { cardinality: "1" }

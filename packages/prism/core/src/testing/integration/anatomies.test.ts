@@ -22,6 +22,8 @@ const UI_DIRECTORY = fileURLToPath(new URL("../../lib/ui", import.meta.url));
  * tier.
  */
 const EXTERNAL_TOKENS = [
+  "--color-background",
+  "--color-background-container",
   "--color-background-layer2",
   "--color-border-muted",
   "--color-brand-primary",

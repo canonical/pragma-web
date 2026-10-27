@@ -50,7 +50,6 @@
  * without anyone deciding that it should.
  */
 
-import "../../../testing/stubReactFlowGlobals.js";
 import * as relayAddonAnnotations from "@canonical/storybook-addon-relay/preview";
 import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
 import { act, render, waitFor } from "@testing-library/react";
@@ -99,9 +98,7 @@ const composedByPath = new Map<string, Record<string, ComposedStory>>(
  * module in the app rather than the one that means it. An entry here shows up
  * in a diff and someone has to defend it.
  */
-const DOCS_ONLY = new Set([
-  "../../addons/journeys/JourneysPage/JourneysPage.stories.tsx",
-]);
+const DOCS_ONLY = new Set<string>([]);
 
 describe("the story corpus", () => {
   it("is discovered from the tree, and has not shrunk", () => {

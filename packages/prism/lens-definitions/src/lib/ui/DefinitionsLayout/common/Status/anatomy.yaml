@@ -1,0 +1,9 @@
+---
+# Status — the strip's status: the explorer's counts over the warm
+# explorer query and the lens's filter. It renders no element of its own.
+node:
+  uri: prism.component.status
+  edges:
+    - node:
+        uri: prism.component.explorer_status
+      relation: { cardinality: "1" }

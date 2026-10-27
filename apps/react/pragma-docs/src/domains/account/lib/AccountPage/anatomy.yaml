@@ -1,0 +1,17 @@
+---
+# AccountPage — the protected account page: the prose page with its title
+# and the signed-in line. It renders no element of its own: the prose page
+# renders the root.
+node:
+  uri: docs.component.account_page
+  edges:
+    - node:
+        uri: docs.component.prose_page
+        edges:
+          - node:
+              role: title
+            relation: { cardinality: "1", slotName: heading }
+          - node:
+              role: copy (the signed-in line)
+            relation: { cardinality: "1", slotName: prose }
+      relation: { cardinality: "1" }

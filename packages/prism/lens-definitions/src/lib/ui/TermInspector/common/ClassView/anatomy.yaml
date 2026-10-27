@@ -1,0 +1,27 @@
+---
+# ClassView — the inspector's view of a class: a header (tags, name,
+# address), then sections for lineage, definition, subclasses, fields,
+# relations and instances, every reference a term link. Its slots are
+# styled by the inspector, whose anatomy names them.
+node:
+  uri: prism.component.class_view
+  edges:
+    - node:
+        role: header
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: section
+        edges:
+          - node:
+              uri: prism.component.lineage
+            relation: { cardinality: "0..1" }
+          - node:
+              uri: prism.component.field_list
+            relation: { cardinality: "0..*" }
+          - node:
+              uri: prism.component.relation_list
+            relation: { cardinality: "0..*" }
+          - node:
+              uri: prism.component.instance_item
+            relation: { cardinality: "0..*" }
+      relation: { cardinality: "6", slotName: section }

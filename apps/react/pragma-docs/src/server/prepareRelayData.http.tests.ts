@@ -40,19 +40,16 @@ import {
   it,
   vi,
 } from "vitest";
-import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#addons/journeys";
 import { CATALOG_PAGE_SIZE, RELATION_PAGE_SIZE } from "#domains/components";
-import { STANDARDS_BINDING } from "#domains/lenses";
+import { JOB_PAGE_SIZE, PAIRING_PAGE_SIZE } from "#domains/journeys";
 import {
   LOBBY_COMPONENT_CLASS,
-  LOBBY_EXEMPLAR_COUNT,
+  LOBBY_EXEMPLAR_POOL,
   LOBBY_PATTERN_CLASS,
   LOBBY_STANDARD_CLASS,
 } from "#domains/marketing";
-import {
-  RELATION_PAGE_SIZE as PROBE_RELATION_PAGE_SIZE,
-  PROBE_URI,
-} from "#domains/playground";
+import { PROBE_URI } from "#domains/playground";
+import { STANDARDS_BINDING } from "#domains/standards";
 import {
   COMPONENT_PROBE_RESPONSE,
   COMPONENT_URI,
@@ -134,10 +131,7 @@ describe("prepareRelayData over HTTP", () => {
     expect(request.body.operationName).toBe("ComponentProbeQuery");
     expect(typeof request.body.query).toBe("string");
     expect(request.body.query).toContain("query ComponentProbeQuery");
-    expect(request.body.variables).toEqual({
-      uri: PROBE_URI,
-      count: PROBE_RELATION_PAGE_SIZE,
-    });
+    expect(request.body.variables).toEqual({ uri: PROBE_URI });
 
     // …and marked as server-side traffic, which is what lets the graph
     // server's hit log distinguish an SSR render from a browser.
@@ -162,7 +156,7 @@ describe("prepareRelayData over HTTP", () => {
     {
       url: "/playground",
       operationName: "ComponentProbeQuery",
-      variables: { uri: PROBE_URI, count: PROBE_RELATION_PAGE_SIZE },
+      variables: { uri: PROBE_URI },
     },
     {
       url: "/components",
@@ -233,7 +227,7 @@ describe("prepareRelayData over HTTP", () => {
         componentClass: LOBBY_COMPONENT_CLASS,
         patternClass: LOBBY_PATTERN_CLASS,
         standardClass: LOBBY_STANDARD_CLASS,
-        exemplars: LOBBY_EXEMPLAR_COUNT,
+        exemplarPool: LOBBY_EXEMPLAR_POOL,
       },
     },
   ];

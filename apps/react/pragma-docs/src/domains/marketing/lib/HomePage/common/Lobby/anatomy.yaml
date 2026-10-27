@@ -1,0 +1,80 @@
+---
+# Lobby — the lobby's two projections of the graph, from one operation:
+#   - a few components, as the site's chips, in the graph's own order and
+#     one per title: where a title spans tiers the global tier's block
+#     stands for it, so no two chips read the same and lead to different
+#     pages. The chip stays the title alone, as the Figma's UI-block chip
+#     is; the choice is the lobby's, from the first components it reads;
+#   - the doors to the five lenses the rail lists, in the rail's order, as
+#     cards in the shared list view: each lens linked to its page, with a
+#     sentence on what it holds and the graph's count where the schema
+#     gives one (no count for Definitions, Guides or Journeys: the demand
+#     model is not in every graph the site reads, and a field the graph
+#     lacks would fail the lobby's one operation). Five doors at two columns each fill the ten
+#     columns of the main column at the desktop width.
+# Each is a page section. A subgrid of the page over every column, its gap
+# the grid's gutter on both axes. The section's lead holds a reading
+# measure of six columns; the chips wrap on one line, one tight gap apart,
+# with no markers or insets.
+#
+# Every decision is read through a component token declared on the root
+# (`--lobby-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   space.050 (4px) between the chips: they wrap as one line, and no gap
+#     may read a container gap.
+#   layout.grid.column "1 / -1", "1 / span 6": structure. layout.wrap
+#   wrap, layout.listStyle none: keywords. The 0 resets.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.050.
+node:
+  uri: docs.subcomponent.lobby
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              role: lead (one sentence on where the names come from)
+              styles:
+                layout.grid.column: "1 / span 6"
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: lead }
+          - node:
+              role: exemplars
+              styles:
+                layout.grid.column: "1 / -1"
+                layout.type: flex
+                layout.wrap: wrap
+                spacing.gap: space.050
+                layout.listStyle: none
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+              edges:
+                - node:
+                    role: exemplar (one item of the list)
+                    edges:
+                      - node:
+                          uri: docs.component.site_chip_projection
+                        relation: { cardinality: "1" }
+                  relation: { cardinality: "1..*" }
+            relation: { cardinality: "1", slotName: exemplars }
+      relation: { cardinality: "0..1" }
+    - node:
+        uri: docs.component.page_section
+        edges:
+          - node:
+              uri: prism.component.entity_list
+              edges:
+                - node:
+                    uri: prism.component.entity_card
+                  relation: { cardinality: "5", slotName: items }
+            relation: { cardinality: "1" }
+      relation: { cardinality: "1" }

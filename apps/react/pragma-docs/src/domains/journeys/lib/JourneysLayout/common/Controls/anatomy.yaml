@@ -1,0 +1,10 @@
+---
+# Controls — the journeys strip's controls tenant: the view switch over the
+# view the layout's provider shares. It renders no element of its own and
+# styles nothing.
+node:
+  uri: docs.subcomponent.controls
+  edges:
+    - node:
+        uri: docs.component.journey_view_switch
+      relation: { cardinality: "1" }

@@ -8,15 +8,16 @@ import relay from "vite-plugin-relay-lite";
 
 // Path aliases are declared as Node subpath imports in package.json "imports",
 // resolved natively by Vite — no resolver plugin. There is one per domain and
-// each names that domain's barrel (#lib/ui, #domains/lenses, #server). A
-// component of #lib/ui that the pages or their layouts render has an alias
-// of its own (#lib/ui/CanvasPage, #lib/ui/SiteColophon): the #lib/ui barrel
-// exports the Shell, whose homes reach the pages, so a page importing the
-// barrel would close a cycle. Two declared exceptions: #relay/__generated__/* is the sole wildcard, because
-// relay-compiler owns that directory and writes no barrel for it; and
-// #graphql-endpoint points at a FILE, because graphqlEndpoint.ts must keep its
-// zero imports — the graph process pins graphql v17, and importing it through
-// anything that reaches relay-runtime would drag the app's v16 in.
+// each names that domain's barrel (#domains/journeys, #lib/graph, #server). A
+// component of #lib/ui that the pages or their layouts render is reached
+// through the #lib/ui/* wildcard (#lib/ui/SiteRail, #lib/ui/ProsePage): the
+// #lib/ui barrel exports the Shell, whose homes reach the pages, so a page
+// importing the barrel would close a cycle. Two more exceptions:
+// #relay/__generated__/* is a wildcard because relay-compiler owns that
+// directory and writes no barrel for it; and #graphql-endpoint points at a
+// FILE, because graphqlEndpoint.ts must keep its zero imports — the graph
+// process pins graphql v17, and importing it through anything that reaches
+// relay-runtime would drag the app's v16 in.
 const PORT = Number(process.env.PORT) || undefined;
 
 // `build:server` runs `vite build --mode server` to compile the two server

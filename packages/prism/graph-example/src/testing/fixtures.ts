@@ -14,11 +14,8 @@
  */
 
 import { METRO_NAMESPACE } from "../lib/provider/constants.js";
-import {
-  BARE_ENTITY_URI,
-  EMPTY_LOCAL_NAME_URI,
-} from "../lib/provider/dataset.js";
-import type { SearchEntry } from "../lib/provider/types.js";
+import { BARE_ENTITY_URI, exampleDataset } from "../lib/provider/dataset.js";
+import type { ExampleDataset, SearchEntry } from "../lib/provider/types.js";
 import type { ExtractionCase, RankingCase } from "./types.js";
 
 /** A class every lens that looks a term up can be pointed at. */
@@ -51,7 +48,7 @@ export const LENS_OPERATION_VARIABLES: Record<
   DefinitionsExplorerQuery: { uri: SAMPLE_CLASS_URI, hasTerm: true },
   // `JourneysExplorerQuery` used to be listed here. Journeys is no longer a
   // core lens — an owner reclassified it as a pragma-specific add-on and it
-  // now lives in `apps/react/pragma-docs/src/addons/journeys`, outside the
+  // now lives in `apps/react/pragma-docs/src/domains/journeys`, outside the
   // scanned set — so the gate never discovers the operation and the entry was
   // dead config. Note the direction the gate checks: it walks DISCOVERED names
   // and demands a variables entry for each, so a leftover entry here would
@@ -61,7 +58,7 @@ export const LENS_OPERATION_VARIABLES: Record<
   // The standards lens now reaches its collection through the TBox, so it
   // needs a class binding — and this is the gate's OWN binding, never the
   // app's. The app's runtime binding lives in
-  // `apps/react/pragma-docs/src/domains/lenses/constants.ts`;
+  // `apps/react/pragma-docs/src/domains/standards/constants.ts`;
   // importing it here would couple the neutrality proof to the deployment it
   // exists to be independent of, and the gate would go green because the app
   // agreed with itself.
@@ -399,10 +396,31 @@ export const DIRECTIONAL_RING_LINE_URIS = [
 ] as const;
 
 /** The stations no route calls at, which therefore have no diagram position. */
-export const BARE_STATION_URIS = [
-  BARE_ENTITY_URI,
-  EMPTY_LOCAL_NAME_URI,
-] as const;
+export const BARE_STATION_URIS = [BARE_ENTITY_URI] as const;
+
+/**
+ * An IRI whose local name is empty: the metro namespace itself. The served
+ * graph holds no entity here, since the address is the ontology's own; only
+ * {@link EMPTY_LOCAL_NAME_DATASET} does.
+ */
+export const EMPTY_LOCAL_NAME_URI = METRO_NAMESPACE;
+
+/**
+ * The example dataset plus one station at {@link EMPTY_LOCAL_NAME_URI}, the
+ * deepest fallback tier of a Node: its curie compacts to a bare `metro:` and
+ * its title falls through to the whole IRI.
+ */
+export const EMPTY_LOCAL_NAME_DATASET: ExampleDataset = {
+  ...exampleDataset,
+  entities: [
+    ...exampleDataset.entities,
+    {
+      uri: EMPTY_LOCAL_NAME_URI,
+      type: `${METRO_NAMESPACE}Station`,
+      typename: "Station",
+    },
+  ],
+};
 
 /** A rolling stock that runs in one fixed formation of one unit. */
 export const FIXED_FORMATION_STOCK_URI = `${METRO_NAMESPACE}series-70`;

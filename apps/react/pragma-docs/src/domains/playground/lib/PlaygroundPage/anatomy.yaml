@@ -1,0 +1,59 @@
+---
+# PlaygroundPage — the playground: its title, one paragraph saying what it
+# shows, then one component off the live graph in every representation the
+# site projects it in, inside the error and loading boundaries. A page of
+# the document archetype. The root is a subgrid of the canvas's page grid
+# over every column, its gap the grid's gutter on both axes; it packs at
+# the top and ends one loose step above the canvas's end. The paragraph
+# holds a reading measure of six columns and carries `.editorial` and
+# `.content-flow`. Bespoke: no published component is a page.
+#
+# Every decision is read through a component token declared on the root
+# (`--playground-page-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1", "1 / span 6": structure. layout.alignSelf
+#   start: a keyword. The 0 resets.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# container.gap.loose.
+node:
+  uri: docs.component.playground_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+    spacing.internal.block.end: container.gap.loose
+  edges:
+    - node:
+        role: heading (the page's level-1 heading)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: prose (what the page shows, carrying .editorial and .content-flow)
+        styles:
+          layout.grid.column: "1 / span 6"
+      relation: { cardinality: "1", slotName: prose }
+    - node:
+        role: status (the loading line)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: status }
+    - node:
+        role: alert (the error line, role alert)
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "0..1", slotName: alert }
+    - node:
+        uri: docs.subcomponent.component_probe
+      relation: { cardinality: "0..1", slotName: default }

@@ -25,11 +25,11 @@
  *   keeps the layout's root node and its filter chips. The store the
  *   environment holds serves every page (the network is never called), and
  *   the head carries exactly one `<title>`.
- * - THE LAYOUT REMOUNTS. Each change of route yields a new Definitions root,
- *   with the chips back at their default.
+ * - THE LAYOUT REMOUNTS. Each change of route yields a new Definitions root;
+ *   the reader's chips survive a move to the lens index, and come back at
+ *   their default after a visit to another lens.
  */
 
-import "../../../testing/stubReactFlowGlobals.js";
 import {
   createEnvironment,
   setPrefetchEnvironment,
@@ -68,10 +68,13 @@ const readCurrentCrumb = (container: HTMLElement): string | undefined =>
   container.querySelector('[data-slot="context"] [aria-current="page"]')
     ?.textContent ?? undefined;
 
-/** How many of the strip's filter chips are turned off. */
+/**
+ * How many of the strip's abstraction and ontology chips are turned off:
+ * each of them starts on, unlike the instances chip, which starts off.
+ */
 const countChipsOff = (container: HTMLElement): number =>
   container.querySelectorAll(
-    '[data-slot="controls"] button[aria-pressed="false"]',
+    '[data-slot="controls"] fieldset:not([aria-label="Filter by instances"]) button[aria-pressed="false"]',
   ).length;
 
 /**
@@ -118,6 +121,14 @@ const clickRail = async (container: HTMLElement, href: string) => {
   });
 };
 
+/**
+ * Contention insurance (the catalog harness's precedent): the test renders
+ * the whole app through several lens switches, each Definitions page laying
+ * the class graph out, which can overrun the 5s default under heavy
+ * parallel machine load. Per-test only; the config default stands.
+ */
+const LENS_SWITCH_TIMEOUT_MS = 15_000;
+
 describe("Shell across a lens switch", () => {
   const roots: Root[] = [];
   const containers: HTMLElement[] = [];
@@ -156,128 +167,135 @@ describe("Shell across a lens switch", () => {
     vi.unstubAllGlobals();
   });
 
-  it("keeps the shell mounted across a lens switch and remounts the lens layout", async () => {
-    // One store warm for every page the test visits, behind a network that
-    // never answers: any fetch at all means the store did not survive.
-    const relayFetch = createFetchSpy();
-    const environment = createEnvironment({
-      records: mergeRecordMaps(
-        definitionsExplorerRecords,
-        definitionsExplorerRecordsComponent,
-        definitionsExplorerRecordsProperty,
-        standardsIndexRecords,
-      ),
-      fetchFn: relayFetch,
-    });
-    setPrefetchEnvironment(environment);
-    window.history.pushState({}, "", "/definitions/ds%3AComponent");
-    const router: Router<typeof appRoutes, typeof notFoundRoute> = createRouter(
-      appRoutes,
-      {
-        adapter: createBrowserAdapter(),
-        middleware: [...middleware],
-        notFound: notFoundRoute,
-      },
-    );
-    const liveSubscriptions = trackRouterSubscriptions(router);
-
-    const container = document.createElement("div");
-    document.body.appendChild(container);
-    containers.push(container);
-    const root = createRoot(container);
-    roots.push(root);
-    await act(async () => {
-      root.render(<Shell environment={environment} router={router} />);
-    });
-
-    // A Definitions term, unfiltered: every class is visible.
-    await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
-    // The shell is the one intrinsic grid, and the lens's layout, the
-    // workspace archetype, is its child.
-    const shell = container.querySelector(".ds.shell.grid.intrinsic");
-    expect(shell).not.toBeNull();
-    const definitionsLayout = container.querySelector(
-      ".ds.shell > .ds.workspace-layout",
-    );
-    expect(definitionsLayout).not.toBeNull();
-
-    // Turn one ontology off through the strip's chips: the figure recounts.
-    const chip = container.querySelector<HTMLButtonElement>(
-      '[data-slot="controls"] button[aria-pressed="true"]',
-    );
-    expect(chip).not.toBeNull();
-    await act(async () => {
-      if (chip !== null) fireEvent.click(chip);
-    });
-    expect(countChipsOff(container)).toBe(1);
-    const filteredStatus = readStatus(container);
-    expect(filteredStatus).not.toContain("60 of 60");
-
-    // Another term of the same lens: the same layout node, and the chip
-    // stays off, so nothing above the layout remounted.
-    await act(async () => {
-      router.navigate("definitionsTerm", {
-        params: { term: "ds:hasSubcomponent" },
+  it(
+    "keeps the shell mounted across a lens switch and remounts the lens layout",
+    async () => {
+      // One store warm for every page the test visits, behind a network that
+      // never answers: any fetch at all means the store did not survive.
+      const relayFetch = createFetchSpy();
+      const environment = createEnvironment({
+        records: mergeRecordMaps(
+          definitionsExplorerRecords,
+          definitionsExplorerRecordsComponent,
+          definitionsExplorerRecordsProperty,
+          standardsIndexRecords,
+        ),
+        fetchFn: relayFetch,
       });
-    });
-    await waitFor(() =>
-      expect(window.location.pathname).toBe(
-        "/definitions/ds%3AhasSubcomponent",
-      ),
-    );
-    expect(container.querySelector(".ds.workspace-layout")).toBe(
-      definitionsLayout,
-    );
-    expect(countChipsOff(container)).toBe(1);
-    expect(readStatus(container)).toBe(filteredStatus);
+      setPrefetchEnvironment(environment);
+      window.history.pushState({}, "", "/definitions/ds%3AComponent");
+      const router: Router<typeof appRoutes, typeof notFoundRoute> =
+        createRouter(appRoutes, {
+          adapter: createBrowserAdapter(),
+          middleware: [...middleware],
+          notFound: notFoundRoute,
+        });
+      const liveSubscriptions = trackRouterSubscriptions(router);
 
-    // The lens index: another route of the same lens, so the layout and its
-    // filter provider remount and the chips start over, while the nest above
-    // the layout stays. The subscriptions that outlive the move are the
-    // nest's own.
-    const liveOnTerm = new Set(liveSubscriptions);
-    await act(async () => {
-      router.navigate("definitions");
-    });
-    await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
-    const definitionsIndexLayout = container.querySelector(
-      ".ds.workspace-layout",
-    );
-    expect(definitionsIndexLayout).not.toBeNull();
-    expect(definitionsIndexLayout).not.toBe(definitionsLayout);
-    expect(countChipsOff(container)).toBe(0);
-    const nestSubscriptions = keepSurvivors(liveOnTerm, liveSubscriptions);
-    expect(nestSubscriptions.size).toBeGreaterThan(0);
+      const container = document.createElement("div");
+      document.body.appendChild(container);
+      containers.push(container);
+      const root = createRoot(container);
+      roots.push(root);
+      await act(async () => {
+        root.render(<Shell environment={environment} router={router} />);
+      });
 
-    // Switch to Standards: a different layout element, with its own strip.
-    await clickRail(container, "/standards");
-    await waitFor(() => expect(readCurrentCrumb(container)).toBe("Standards"));
-    expect(
-      container.querySelector(".ds.shell > .ds.document-layout"),
-    ).not.toBeNull();
-    expect(container.querySelector(".ds.workspace-layout")).toBeNull();
+      // A Definitions term, unfiltered: every class is visible.
+      await waitFor(() => expect(readStatus(container)).toContain("35 of 35"));
+      // The shell is the one intrinsic grid, and the lens's layout, the
+      // workspace archetype, is its child.
+      const shell = container.querySelector(".ds.shell.grid.intrinsic");
+      expect(shell).not.toBeNull();
+      const definitionsLayout = container.querySelector(
+        ".ds.shell > .ds.workspace-layout",
+      );
+      expect(definitionsLayout).not.toBeNull();
 
-    // And back: a new layout, with the chips at their default.
-    await clickRail(container, "/definitions");
-    await waitFor(() => expect(readStatus(container)).toContain("60 of 60"));
-    const definitionsLayoutAgain = container.querySelector(
-      ".ds.workspace-layout",
-    );
-    expect(definitionsLayoutAgain).not.toBeNull();
-    expect(definitionsLayoutAgain).not.toBe(definitionsIndexLayout);
-    expect(countChipsOff(container)).toBe(0);
+      // Turn one ontology off through the strip's chips: the figure recounts.
+      const chip = container.querySelector<HTMLButtonElement>(
+        '[data-slot="controls"] button[aria-pressed="true"]',
+      );
+      expect(chip).not.toBeNull();
+      await act(async () => {
+        if (chip !== null) fireEvent.click(chip);
+      });
+      expect(countChipsOff(container)).toBe(1);
+      const filteredStatus = readStatus(container);
+      expect(filteredStatus).not.toContain("35 of 35");
 
-    // The nest held every one of its subscriptions through the lens switch
-    // and back, and the shell's grid root stayed the same node: it was never
-    // unmounted.
-    expect(container.querySelector(".ds.shell")).toBe(shell);
-    expect(keepSurvivors(nestSubscriptions, liveSubscriptions)).toEqual(
-      nestSubscriptions,
-    );
+      // Another term of the same lens: the same layout node, and the chip
+      // stays off, so nothing above the layout remounted.
+      await act(async () => {
+        router.navigate("definitionsTerm", {
+          params: { term: "ds:hasSubcomponent" },
+        });
+      });
+      await waitFor(() =>
+        expect(window.location.pathname).toBe(
+          "/definitions/ds%3AhasSubcomponent",
+        ),
+      );
+      expect(container.querySelector(".ds.workspace-layout")).toBe(
+        definitionsLayout,
+      );
+      expect(countChipsOff(container)).toBe(1);
+      expect(readStatus(container)).toBe(filteredStatus);
 
-    // The store served every page, and the head carries one title.
-    expect(relayFetch).not.toHaveBeenCalled();
-    expect(globalFetch).not.toHaveBeenCalled();
-    expect(document.head.querySelectorAll("title")).toHaveLength(1);
-  });
+      // The lens index: another route of the same lens, so the layout and its
+      // filter provider remount, the reader's chips kept, while the nest
+      // above the layout stays. The subscriptions that outlive the move are
+      // the nest's own.
+      const liveOnTerm = new Set(liveSubscriptions);
+      await act(async () => {
+        router.navigate("definitions");
+      });
+      await waitFor(() =>
+        expect(window.location.pathname).toBe("/definitions"),
+      );
+      const definitionsIndexLayout = container.querySelector(
+        ".ds.workspace-layout",
+      );
+      expect(definitionsIndexLayout).not.toBeNull();
+      expect(definitionsIndexLayout).not.toBe(definitionsLayout);
+      expect(countChipsOff(container)).toBe(1);
+      expect(readStatus(container)).toBe(filteredStatus);
+      const nestSubscriptions = keepSurvivors(liveOnTerm, liveSubscriptions);
+      expect(nestSubscriptions.size).toBeGreaterThan(0);
+
+      // Switch to Standards: a different layout element, with its own strip.
+      await clickRail(container, "/standards");
+      await waitFor(() =>
+        expect(readCurrentCrumb(container)).toBe("Standards"),
+      );
+      expect(
+        container.querySelector(".ds.shell > .ds.document-layout"),
+      ).not.toBeNull();
+      expect(container.querySelector(".ds.workspace-layout")).toBeNull();
+
+      // And back: a new layout, with the chips at their default.
+      await clickRail(container, "/definitions");
+      await waitFor(() => expect(readStatus(container)).toContain("35 of 35"));
+      const definitionsLayoutAgain = container.querySelector(
+        ".ds.workspace-layout",
+      );
+      expect(definitionsLayoutAgain).not.toBeNull();
+      expect(definitionsLayoutAgain).not.toBe(definitionsIndexLayout);
+      expect(countChipsOff(container)).toBe(0);
+
+      // The nest held every one of its subscriptions through the lens switch
+      // and back, and the shell's grid root stayed the same node: it was never
+      // unmounted.
+      expect(container.querySelector(".ds.shell")).toBe(shell);
+      expect(keepSurvivors(nestSubscriptions, liveSubscriptions)).toEqual(
+        nestSubscriptions,
+      );
+
+      // The store served every page, and the head carries one title.
+      expect(relayFetch).not.toHaveBeenCalled();
+      expect(globalFetch).not.toHaveBeenCalled();
+      expect(document.head.querySelectorAll("title")).toHaveLength(1);
+    },
+    LENS_SWITCH_TIMEOUT_MS,
+  );
 });

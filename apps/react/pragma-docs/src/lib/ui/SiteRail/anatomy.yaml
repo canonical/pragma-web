@@ -1,0 +1,37 @@
+---
+# SiteRail — the docs site's rail: prism-core's Rail with the site's brand,
+# the lenses its route table declares, and the site's utilities: the
+# playground's door, the demo sign-in and the theme control. It renders no
+# element of its own: the Rail renders the root and styles every slot this
+# fills, so this anatomy binds no style.
+node:
+  uri: docs.component.site_rail
+  edges:
+    - node:
+        uri: prism.component.rail
+        edges:
+          - node:
+              role: utilities label
+            relation: { cardinality: "1", slotName: utilities-label }
+          - node:
+              role: utilities
+              edges:
+                - node:
+                    role: item (the playground's door)
+                    edges:
+                      - node:
+                          uri: docs.component.playground_icon
+                        relation: { cardinality: "1", slotName: icon }
+                  relation: { cardinality: "1", slotName: item }
+                - node:
+                    role: item (the demo sign-in)
+                    edges:
+                      - node:
+                          uri: docs.component.sign_in_icon
+                        relation: { cardinality: "1", slotName: icon }
+                  relation: { cardinality: "1", slotName: item }
+                - node:
+                    uri: prism.component.theme_selector
+                  relation: { cardinality: "1", slotName: theme }
+            relation: { cardinality: "1", slotName: utilities }
+      relation: { cardinality: "1" }

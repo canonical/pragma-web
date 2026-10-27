@@ -80,12 +80,6 @@ const UNIT_PROPERTY = `${METRO_NAMESPACE}unit`;
 /** IRI of the entity carrying no descriptive predicates whatsoever. */
 export const BARE_ENTITY_URI = `${METRO_NAMESPACE}ghost`;
 
-/**
- * IRI whose local name is empty — the deepest fallback tier for a Node, and
- * the edge case that keeps `curie` honest (it compacts to a bare `metro:`).
- */
-export const EMPTY_LOCAL_NAME_URI = METRO_NAMESPACE;
-
 /** IRI of the station carrying labels in more than one language. */
 export const MULTILINGUAL_ENTITY_URI = `${METRO_NAMESPACE}northgate`;
 
@@ -1182,20 +1176,14 @@ Le terminus nord de la [ligne Nord](metro:north-line).
       ],
     },
 
-    // The awkward two. Neither has a single descriptive predicate, and the
-    // contract still demands a non-null `_meta.title` for both.
+    // The awkward one: no label, no comment, no definition, no name, no
+    // line. Only an IRI and a class — the minimum an entity can be — and the
+    // contract still demands a non-null `_meta.title`. Title falls to the
+    // local name, "ghost". No entity sits at a namespace IRI itself: that is
+    // the ontology's own address, and an instance there would be listed
+    // among the stations as the ontology.
     {
-      // No label, no comment, no definition, no name, no line. Only an IRI
-      // and a class — the minimum an entity can be. Title falls to the local
-      // name, "ghost".
       uri: BARE_ENTITY_URI,
-      type: STATION,
-      typename: "Station",
-    },
-    {
-      // IRI ends in a separator, so the local name is the empty string and
-      // the title has to fall through to the whole IRI.
-      uri: EMPTY_LOCAL_NAME_URI,
       type: STATION,
       typename: "Station",
     },

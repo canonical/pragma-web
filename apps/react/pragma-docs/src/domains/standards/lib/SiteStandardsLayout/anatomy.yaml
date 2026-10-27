@@ -1,0 +1,20 @@
+---
+# SiteStandardsLayout — the Standards lens's layout with the site's rail
+# and colophon bound to it. It renders no element of its own:
+# StandardsLayout renders the root.
+node:
+  uri: docs.component.site_standards_layout
+  edges:
+    - node:
+        uri: prism.component.standards_layout
+        edges:
+          - node:
+              uri: docs.component.site_rail
+            relation: { cardinality: "1", slotName: rail }
+          - node:
+              role: routed page
+            relation: { cardinality: "1", slotName: default }
+          - node:
+              uri: docs.component.site_colophon
+            relation: { cardinality: "1", slotName: colophon }
+      relation: { cardinality: "1" }

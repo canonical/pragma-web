@@ -10,6 +10,8 @@ import {
   ASYMMETRIC_UNIT_URI,
   COUPLED_FORMATION_URI,
   COUPLED_STOCK_URI,
+  EMPTY_LOCAL_NAME_DATASET,
+  EMPTY_LOCAL_NAME_URI,
   MIXED_STOCK_LINE_URI,
   OVERLONG_LINE_URI,
   REVERSED_UNIT_FORMATION_URI,
@@ -30,7 +32,6 @@ import {
 import { createExampleProvider } from "./createExampleProvider.js";
 import {
   BARE_ENTITY_URI,
-  EMPTY_LOCAL_NAME_URI,
   exampleDataset,
   MULTILINGUAL_ENTITY_URI,
   SECOND_NAMESPACE_ENTITY_URI,
@@ -593,8 +594,8 @@ describe("OntologyClass.instances", () => {
       interchange: ontologyClass(uri: "metro:Interchange") { instanceCount }
       line: ontologyClass(uri: "metro:Line") { instanceCount }
     }`);
-    // 23 direct stations, two of them bare, plus 4 interchanges.
-    expect(data.station).toEqual({ instanceCount: 27 });
+    // 22 direct stations, one of them bare, plus 4 interchanges.
+    expect(data.station).toEqual({ instanceCount: 26 });
     // Central Exchange, Riverside Junction, Tannery Lane, Eastwick Cross.
     expect(data.interchange).toEqual({ instanceCount: 4 });
     // North, Circle and Coastal, plus Upland, Lowland and the two Ringways.
@@ -673,7 +674,7 @@ describe("OntologyClass.instances", () => {
   });
 
   it("resumes from a cursor", async () => {
-    const after = toCursor(EMPTY_LOCAL_NAME_URI);
+    const after = toCursor("https://metro.example/onto#central-exchange");
     const data = await run(`{
       ontologyClass(uri: "metro:Station") {
         instances(first: 1, after: "${after}") { edges { node { uri } } }
@@ -681,9 +682,7 @@ describe("OntologyClass.instances", () => {
     }`);
     expect(data.ontologyClass).toEqual({
       instances: {
-        edges: [
-          { node: { uri: "https://metro.example/onto#central-exchange" } },
-        ],
+        edges: [{ node: { uri: "https://metro.example/onto#dyers-green" } }],
       },
     });
   });
@@ -976,7 +975,8 @@ describe("_meta.curie", () => {
   });
 
   it("compacts to a bare prefix when the local name is empty", async () => {
-    const data = await run(
+    const data = await runWith(
+      EMPTY_LOCAL_NAME_DATASET,
       `{ node(id: "${EMPTY_LOCAL_NAME_URI}") { _meta { curie } } }`,
     );
     expect(data.node).toEqual({ _meta: { curie: "metro:" } });
@@ -1073,7 +1073,8 @@ describe("the awkward entities", () => {
   });
 
   it("titles an entity whose local name is empty from the whole IRI", async () => {
-    const data = await run(
+    const data = await runWith(
+      EMPTY_LOCAL_NAME_DATASET,
       `{ node(id: "${EMPTY_LOCAL_NAME_URI}") { _meta { title } } }`,
     );
     expect(data.node).toEqual({ _meta: { title: EMPTY_LOCAL_NAME_URI } });

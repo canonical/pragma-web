@@ -1,0 +1,80 @@
+---
+# AnatomyTree — a UI block's anatomy as a tree, drawn in native SVG at its
+# natural size, one user unit to the pixel, server-rendered with nothing
+# to measure. The root sits on the left and each level of depth one column
+# to the right; leaves take one row each, in the anatomy's order, and a
+# parent stands centred on its children's rows. Each node is the published
+# projection's EntityGraphNode, 192 by 48 (two 24-unit lines):
+#   - a named node (a design-system block) is filled, its title the block's
+#     local name in the identifier face, linked to its page when the block
+#     is a component;
+#   - an anonymous node (a role) and a switch are hollow;
+#   - the root is prominent;
+#   - the second line names the slot and its cardinality, a switch's
+#     discriminator, or a case's value;
+#   - the count is the node's number of style declarations.
+# Every top-left corner is on a 16-unit dot lattice, drawn under the tree,
+# on the floor the graph canvas uses, so hollow and filled boxes read
+# apart. The figure is as wide as its drawing, capped at the main column,
+# so the floor never runs on past the lattice. Edges are orthogonal, never curved: from a parent's right middle
+# along to a bus half a column gap away, down the bus, then along to each
+# child's left middle, 1 unit in the line colour. A tree wider than the
+# main column scrolls inside the figure rather than shrinking its text
+# below 12px.
+# Reference: the atlas's anatomy tree, rebuilt to the graph heuristics G1,
+# G3, G7, G9, G13, G14, G17 and G32.
+#
+# Bespoke: no published component draws a tree. SVG paints through
+# currentColor: the roster has no fill or stroke key, so each shape's
+# colour is bound as its typography.color.
+#
+# Every decision is read through a component token declared on the root
+# (`--anatomy-tree-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   appearance.background light-dark(oklch(94% 0 0),
+#     var(--color-background-container)): the floor, as GraphCanvas
+#     ledgers it (no background token sits 6 L* below the surface in light).
+#   layout.grid.column "1 / -1", size.width fit-content, size.max.width
+#   100%: structure. The figure's 0 margins.
+#   In constants.ts (SVG geometry is attributes, not CSS): NODE_WIDTH 192,
+#   NODE_HEIGHT 48, COLUMN_GAP 48, ROW_PITCH 64, MARGIN 16, LATTICE_PITCH 16
+#   (from #lib/graph), LATTICE_DOT_RADIUS 1, EDGE_WIDTH 1,
+#   LABEL_CHARACTERS 20.
+node:
+  uri: docs.component.anatomy_tree
+  styles:
+    layout.grid.column: "1 / -1"
+    size.width: fit-content
+    size.max.width: 100%
+    layout.overflow.inline: auto
+    size.min.width: 0
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+    spacing.external.inline.start: 0
+    spacing.external.inline.end: 0
+    appearance.background: "light-dark(oklch(94% 0 0), var(--color-background-container))"
+  edges:
+    - node:
+        role: drawing (the SVG, at its natural size)
+        styles:
+          layout.type: block
+        edges:
+          - node:
+              role: lattice (a 16-unit dot pattern)
+              styles:
+                typography.color: color.border.muted
+            relation: { cardinality: "1", slotName: lattice }
+          - node:
+              role: edges (one orthogonal path per child)
+              styles:
+                typography.color: color.border
+            relation: { cardinality: "1", slotName: edges }
+          - node:
+              role: node (a placed box, a <g transform>)
+              edges:
+                - node:
+                    uri: prism.component.entity_graph_node
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "1..*", slotName: node }
+      relation: { cardinality: "1", slotName: drawing }

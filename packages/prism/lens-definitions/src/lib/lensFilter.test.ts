@@ -12,6 +12,7 @@ import { ABSTRACTION_VALUES, DEFAULT_LENS_FILTER } from "./constants.js";
 import {
   classifyAbstraction,
   matchesChips,
+  matchesDimming,
   matchesText,
   normalizeFilterText,
   resolveFilter,
@@ -128,7 +129,30 @@ describe("resolveFilter", () => {
       text: "block",
       abstractions: ["concrete"],
       namespaces: prefixes,
+      withInstances: false,
     });
+  });
+});
+
+describe("matchesDimming", () => {
+  it("dims on the search text alone while the instances axis is off", () => {
+    const filter = createAllNamespacesFilter(["ds"]);
+    expect(matchesDimming(filter, "UI Block", "ds:UIBlock", 0)).toBe(true);
+    const searching = { ...filter, text: "chip" };
+    expect(matchesDimming(searching, "UI Block", "ds:UIBlock", 3)).toBe(false);
+  });
+
+  it("dims a class without instances while the instances axis is on", () => {
+    const withInstances = {
+      ...createAllNamespacesFilter(["ds"]),
+      withInstances: true,
+    };
+    expect(matchesDimming(withInstances, "UI Block", "ds:UIBlock", 0)).toBe(
+      false,
+    );
+    expect(matchesDimming(withInstances, "Component", "ds:Component", 12)).toBe(
+      true,
+    );
   });
 });
 
