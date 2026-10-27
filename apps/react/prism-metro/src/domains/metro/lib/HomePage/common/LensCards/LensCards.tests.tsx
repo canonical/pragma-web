@@ -6,6 +6,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import createMetroExecute from "../../../../../../../testing/createMetroExecute.js";
 import {
   LINE_COUNT,
+  ROLLING_STOCK_COUNT,
   STATION_COUNT,
 } from "../../../../../../../testing/fixtures.js";
 import renderLensPage from "../../../../../../../testing/renderLensPage.js";
@@ -59,7 +60,7 @@ describe("LensCards", () => {
     ).toEqual(lenses.map(({ label }) => label));
     expect(
       doors.map((door) => within(door).getByRole("link").getAttribute("href")),
-    ).toEqual(["/stations", "/lines", "/definitions"]);
+    ).toEqual(["/stations", "/lines", "/definitions", "/fleet"]);
   });
 
   it("states each lens's count as the graph gives it", async () => {
@@ -68,12 +69,20 @@ describe("LensCards", () => {
     const classes = await countGraphClasses();
     expect(
       doors.map((door) => door.querySelector("data")?.getAttribute("value")),
-    ).toEqual([String(STATION_COUNT), String(LINE_COUNT), String(classes)]);
+    ).toEqual([
+      String(STATION_COUNT),
+      String(LINE_COUNT),
+      String(classes),
+      String(ROLLING_STOCK_COUNT),
+    ]);
     expect(doors.at(0)?.querySelector("data")?.textContent).toBe(
       `${STATION_COUNT} stations`,
     );
     expect(doors.at(2)?.querySelector("data")?.textContent).toBe(
       `${classes} classes`,
+    );
+    expect(doors.at(3)?.querySelector("data")?.textContent).toBe(
+      `${ROLLING_STOCK_COUNT} rolling stocks`,
     );
   });
 

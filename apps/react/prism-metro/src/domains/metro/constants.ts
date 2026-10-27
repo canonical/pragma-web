@@ -26,6 +26,7 @@ export const HOME_LENS_MESSAGES = {
     count: "home.definitions.count",
     summary: "home.definitions.summary",
   },
+  fleet: { count: "home.fleet.count", summary: "home.fleet.summary" },
 } as const satisfies Readonly<Record<string, HomeLensMessages>>;
 
 /**

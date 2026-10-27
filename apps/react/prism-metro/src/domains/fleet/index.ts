@@ -8,6 +8,7 @@
  * @module
  */
 
+export { FLEET_CLASS_URI } from "./constants.js";
 export { fleetLayout } from "./layout.js";
 export {
   CarTypeCard,

@@ -3,7 +3,7 @@ import { graphql } from "react-relay";
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
 /**
  * Codegen source of truth for `MetroHomeQuery`, the landing's one
- * operation: the station and line classes' instance counts
+ * operation: the station, line and rolling-stock classes' instance counts
  * (`instanceCount`, which counts every named instance, uncapped, where a
  * connection's edges stop at a page), and every ontology's classes, whose
  * total is the Definitions lens's own denominator. Nothing calls it: the
@@ -11,12 +11,20 @@ import { graphql } from "react-relay";
  * evaluated tag throws wherever no Relay transform has run.
  */
 const declareMetroHomeQuery = (): unknown => graphql`
-  query MetroHomeQuery($stationClass: String!, $lineClass: String!) {
+  query MetroHomeQuery(
+    $stationClass: String!
+    $lineClass: String!
+    $fleetClass: String!
+  ) {
     stations: ontologyClass(uri: $stationClass) {
       uri
       instanceCount
     }
     lines: ontologyClass(uri: $lineClass) {
+      uri
+      instanceCount
+    }
+    fleet: ontologyClass(uri: $fleetClass) {
       uri
       instanceCount
     }

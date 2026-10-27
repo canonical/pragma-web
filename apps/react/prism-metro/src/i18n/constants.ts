@@ -67,7 +67,7 @@ export const MESSAGES = {
   "shell.loading": "Loading…",
   "home.title": "Overview",
   "home.lead":
-    "The metro network read three ways: its stations, its lines, and the definitions that describe them, each counted from the graph.",
+    "The metro network read four ways: its stations, its lines, the definitions that describe them, and the fleet that runs on them, each counted from the graph.",
   "home.loading": "Counting the network…",
   "home.error":
     "The network could not be counted. Reload the page to try again.",
@@ -80,6 +80,12 @@ export const MESSAGES = {
   "home.definitions.count": { one: "{count} class", other: "{count} classes" },
   "home.definitions.summary":
     "The ontology the network is described in: its classes and their properties.",
+  "home.fleet.count": {
+    one: "{count} rolling stock",
+    other: "{count} rolling stocks",
+  },
+  "home.fleet.summary":
+    "Every train the network runs: its formations drawn to scale, and how they fit the platforms.",
   "station.platforms": "Platforms",
   "station.platforms.count": {
     one: "{count} platform",
