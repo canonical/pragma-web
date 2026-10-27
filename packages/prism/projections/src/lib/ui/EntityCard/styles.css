@@ -242,7 +242,7 @@
    * the body's divider as the footer does, and the body keeps the two
    * tracks before it; the footer runs under both. */
   @container shell (width < 448px) {
-    .ds.entity-card,
+    .ds.entity-card:not(:has(> .sidecar)),
     .ds.entity-card:has(> .sidecar) {
       grid-column: var(--entity-card-narrow-column);
     }
