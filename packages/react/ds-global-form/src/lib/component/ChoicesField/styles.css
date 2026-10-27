@@ -18,6 +18,16 @@
       flex-wrap: nowrap;
     }
 
+    /* Hairline between consecutive options (withDividers, stacked only). */
+    & > .ds.choices-divider {
+      flex-basis: 100%;
+      width: 100%;
+      margin: 0;
+      border: none;
+      border-top: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
+    }
+
     /* Columns: a grid of equal-width columns. Each option fills its cell, so the
      * option WIDTH is column-based rather than content-based. The column count
      * comes from `--choices-columns` (set from the `columns` prop). */
@@ -32,12 +42,21 @@
     & > .ds.option {
       direction: inherit;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--space-100);
       cursor: pointer;
 
       label {
         padding: 0;
+      }
+
+      /* Muted one-line description under the label, indented past the mark. */
+      & > .ds.option-description {
+        flex-basis: 100%;
+        margin: 0;
+        margin-inline-start: calc(var(--dimension-200) + var(--space-100));
+        color: var(--color-text-muted);
       }
 
       /* RadioInput/CheckboxInput carry their own padding margins
