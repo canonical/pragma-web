@@ -18,8 +18,8 @@ const componentCssClassName = "ds platform-fit";
  *
  * Each line's entry is a row: the line's name (its title, or what
  * `renderName` makes of the fit, such as the line's chip), its shortest
- * platform, and the verdict in bold, pushed to the row's end so the
- * verdicts line up down the list. The stations overhung take a line of
+ * platform, and the verdict in bold right after it, so it reads with its
+ * line at every width. The stations overhung take a line of
  * their own under it.
  *
  * `import { PlatformFit } from "./PlatformFit/index.js";`

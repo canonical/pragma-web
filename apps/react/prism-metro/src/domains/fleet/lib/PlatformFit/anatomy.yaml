@@ -1,15 +1,15 @@
 ---
 # PlatformFit — how a formation fits the platforms of each line it runs on:
 # per line, a row: the line's name (its title, or the Line chip the caller
-# renders), its shortest known platform, and the verdict in bold pushed to
-# the row's end (fits, or overhangs with a count badge of the stations), so
-# the verdicts line up; then each station overhung, on a line of its own,
+# renders), its shortest known platform, and the verdict in bold right
+# after it (fits, or overhangs with a count badge of the stations), so the
+# verdict reads with its line at every width; then each station overhung,
+# on a line of its own,
 # with how far the train runs past its platform. A formation no line runs
 # says so in one muted line instead.
 #
 # Token ledger: space.100 (8px) between the words of a line's entry, an
-# inline run, one baseline pair; "auto" before the verdict, which takes the
-# space left on its row.
+# inline run, one baseline pair.
 node:
   uri: metro.component.platform_fit
   styles:
@@ -45,7 +45,6 @@ node:
     - node:
         role: verdict
         styles:
-          spacing.external.inline.start: auto
           typography.weight: typography.text.primary.bold.fontWeight
         edges:
           - node:

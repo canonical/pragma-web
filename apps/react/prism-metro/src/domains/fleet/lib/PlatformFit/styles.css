@@ -8,9 +8,6 @@
     --platform-fit-gap: var(--grid-gutter);
     /* One baseline pair between the words of a line's entry. */
     --platform-fit-entry-spacing: var(--space-100);
-    /* The verdict takes the space left on its row, so verdicts line up at
-     * the row's end. */
-    --platform-fit-verdict-margin-inline-start: auto;
     --platform-fit-verdict-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
@@ -41,7 +38,6 @@
   }
 
   .ds.platform-fit .verdict {
-    margin-inline-start: var(--platform-fit-verdict-margin-inline-start);
     font-weight: var(--platform-fit-verdict-font-weight);
   }
 
