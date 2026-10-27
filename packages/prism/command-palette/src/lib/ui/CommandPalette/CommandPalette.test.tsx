@@ -16,6 +16,7 @@ import createSiteTree from "../../../../testing/createSiteTree.js";
 import {
   COMPONENT_HREF,
   RANKED_RESULTS,
+  STATION_NODE,
 } from "../../../../testing/fixtures.js";
 import CommandPalette from "./CommandPalette.js";
 import type { CommandPaletteProps } from "./types.js";
@@ -120,6 +121,26 @@ describe("CommandPalette", () => {
     });
     expect(findDialog().open).toBe(true);
     expect(screen.getByRole("combobox")).toHaveValue("");
+  });
+
+  it("hides the hint to open while the highlighted result has no home", async () => {
+    const { environment } = renderPalette();
+    open();
+    type("lay");
+    await act(async () => {
+      environment.mock.resolveMostRecentOperation(
+        answerSearch([...RANKED_RESULTS, STATION_NODE]),
+      );
+    });
+    expect(readHints()).toEqual(["↑ ↓ to move", "↵ to open", "Esc to close"]);
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowUp" });
+    expect(screen.getByRole("option", { selected: true })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(readHints()).toEqual(["↑ ↓ to move", "Esc to close"]);
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown" });
+    expect(readHints()).toEqual(["↑ ↓ to move", "↵ to open", "Esc to close"]);
   });
 
   it("closes and opens a chosen result's home", async () => {

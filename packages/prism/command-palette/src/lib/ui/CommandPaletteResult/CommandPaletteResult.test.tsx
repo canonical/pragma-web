@@ -1,6 +1,6 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { HomesProvider } from "@canonical/prism-core";
+import { type Homes, HomesProvider } from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
@@ -16,7 +16,9 @@ import createSiteTree from "../../../../testing/createSiteTree.js";
 import {
   COMPONENT_HREF,
   COMPONENT_NODE,
+  HOMES,
   ONTOLOGY_CLASS_NODE,
+  SHELF_HREF,
   STATION_NODE,
 } from "../../../../testing/fixtures.js";
 import type { NodePayload } from "../../../../testing/types.js";
@@ -58,11 +60,13 @@ const ResultOverNode = (
 
 /**
  * Render the result of `entity` as an option of a listbox, under the site's
- * providers and the palette's inert title, as the palette lists it.
+ * providers and the palette's inert title, as the palette lists it, with
+ * the site's homes or the `homes` given.
  */
 const renderResult = (
   entity: NodePayload,
   props: Partial<Omit<CommandPaletteResultProps, "node">> = {},
+  homes: Homes = HOMES,
 ) => {
   const environment = createSearchEnvironment();
   environment.mock.queueOperationResolver((operation) =>
@@ -75,20 +79,22 @@ const renderResult = (
       environment,
       router,
       children: (
-        <ProjectionsProvider
-          LinkComponent={CommandPaletteTitle}
-          maps={defaultProjectionMaps}
-        >
-          <div aria-label="Results" role="listbox">
-            <ResultOverNode
-              aria-selected={false}
-              id="results-0"
-              onChoose={onChoose}
-              role="option"
-              {...props}
-            />
-          </div>
-        </ProjectionsProvider>
+        <HomesProvider homes={homes}>
+          <ProjectionsProvider
+            LinkComponent={CommandPaletteTitle}
+            maps={defaultProjectionMaps}
+          >
+            <div aria-label="Results" role="listbox">
+              <ResultOverNode
+                aria-selected={false}
+                id="results-0"
+                onChoose={onChoose}
+                role="option"
+                {...props}
+              />
+            </div>
+          </ProjectionsProvider>
+        </HomesProvider>
       ),
     }),
   );
@@ -127,6 +133,24 @@ describe("CommandPaletteResult", () => {
     await waitFor(() => {
       expect(router.getState().location.pathname).toBe(COMPONENT_HREF);
     });
+  });
+
+  it("opens a home with the search and the fragment its route reads", async () => {
+    const { router, onChoose } = renderResult(
+      COMPONENT_NODE,
+      {},
+      {
+        Component: () => SHELF_HREF,
+      },
+    );
+    fireEvent.click(screen.getByRole("option"));
+    expect(onChoose).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(router.getState().location.pathname).toBe("/shelves/ds%3ALayout");
+    });
+    const { location } = router.getState();
+    expect(location.searchParams.get("view")).toBe("rows");
+    expect(location.hash).toBe("#layouts");
   });
 
   it("is a disabled option, described as having no page, that does nothing when its type has no home", () => {

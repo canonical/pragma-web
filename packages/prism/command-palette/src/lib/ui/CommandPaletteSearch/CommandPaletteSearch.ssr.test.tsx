@@ -15,7 +15,11 @@ describe("CommandPaletteSearch SSR", () => {
         environment,
         router: createSiteRouter(),
         children: (
-          <CommandPaletteSearch onChoose={() => undefined} session={0} />
+          <CommandPaletteSearch
+            onChoose={() => undefined}
+            onHighlight={() => undefined}
+            session={0}
+          />
         ),
       }),
     );

@@ -9,6 +9,13 @@ type OwnProps = {
    */
   readonly onChoose: () => void;
   /**
+   * Called with whether the highlighted result is disabled, its type having
+   * no home on the site, each time the highlight lands on a result, and
+   * with `false` once no result is highlighted: the palette hides its hint
+   * to open while there is nothing Enter would open.
+   */
+  readonly onHighlight: (disabled: boolean) => void;
+  /**
    * The opening of the palette the search belongs to. A search runs afresh
    * in each session, so a text a failed search sent is sent again once the
    * palette reopens, rather than failing from the store's memory.

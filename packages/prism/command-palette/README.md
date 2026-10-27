@@ -78,6 +78,8 @@ whenever the palette closes, however the reader closed it.
   both ends. A pointer moving over a result highlights it too.
 - Enter in the field: choose the highlighted result. A click on a result,
   or following the link of the preview's title, chooses it too.
+- While an input method composes text in the field, the arrows and Enter
+  are its own: they move through its candidates and commit one.
 - Escape, or a click on the backdrop (pressed and released there): close
   the palette.
 
@@ -93,15 +95,15 @@ field. The dialog is named by its `aria-label`, "Search the graph".
 
 The search is the ARIA combobox pattern with a listbox popup. The field is
 the combobox and keeps the focus, even when a pointer presses a heading,
-the preview, a disabled option or the status line under it (a link alone
-takes its press): it is expanded and controls the listbox
-while there are results, and names the highlighted option as its active
+a result, a disabled one included, or the status line under it: it is
+expanded and controls the listbox while there are results, and names the highlighted option as its active
 descendant. Each group of results is a `group` named by its type's heading;
 each result is an `option`, selected while highlighted, disabled when its
 type has no home, and then described as having no page on the site. An option is chosen as a whole, so the title it holds is
 text, never a link of its own; the preview's title links to the result's
 home, and following it chooses the result as its row does, closing the
-palette.
+palette. A press in the preview selects its text, as anywhere on the site;
+a click there that selects nothing gives the field the focus back.
 
 While the next results load, the last ones stay on screen and the listbox
 is busy (`aria-busy`). An empty field shows a one-line hint and sends no
@@ -109,6 +111,8 @@ query; a text nothing matches shows one line naming it; both are a `status`
 region. A search that fails renders one `alert` line in its place, which
 takes the focus the field held, so it stays in the dialog; while it shows,
 the hints to move and to open are gone and the hint to close remains.
+While the highlighted result is disabled, the hint to open is gone, since
+Enter opens nothing there.
 
 The search renders in the browser only: its combobox and listbox are wired
 by script, so the server sends the closed dialog and the key hints alone.

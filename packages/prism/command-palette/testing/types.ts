@@ -1,3 +1,5 @@
+import type { StandardSchemaV1 } from "@canonical/router-core";
+
 /**
  * A node as a provider answers it in a search result: what the palette
  * reads of every node, with the typename again under `__isNode`, the key an
@@ -31,3 +33,15 @@ export interface ClassPayload extends NodePayload {
     readonly _meta: { readonly title: string };
   } | null;
 }
+
+/** What the fixture site's shelf page reads from its search. */
+export interface ShelfSearch {
+  /** The view the shelf shows its items in. */
+  readonly view: string;
+}
+
+/** The shelf page's search schema, over the raw search parameters. */
+export type ShelfSearchSchema = StandardSchemaV1<
+  Readonly<Record<string, unknown>>,
+  ShelfSearch
+>;

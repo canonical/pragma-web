@@ -29,18 +29,23 @@ const renderSearch = () => {
   const environment = createSearchEnvironment();
   const router = createSiteRouter();
   const onChoose = vi.fn();
+  const onHighlight = vi.fn();
   const view = render(
     createSiteTree({
       environment,
       router,
       children: (
         <Suspense fallback={null}>
-          <CommandPaletteSearch onChoose={onChoose} session={0} />
+          <CommandPaletteSearch
+            onChoose={onChoose}
+            onHighlight={onHighlight}
+            session={0}
+          />
         </Suspense>
       ),
     }),
   );
-  return { ...view, environment, router, onChoose };
+  return { ...view, environment, router, onChoose, onHighlight };
 };
 
 /** Type `text` in the field. */
@@ -73,6 +78,10 @@ const findActiveOption = (): HTMLElement => {
   if (option === undefined) throw new Error("no option is active");
   return option;
 };
+
+/** The title of the option the field's active descendant names. */
+const readActiveTitle = (): string | null | undefined =>
+  findActiveOption().querySelector(".title")?.textContent;
 
 /** The title of the card the preview shows. */
 const readPreviewTitle = (): string | null =>
@@ -110,7 +119,7 @@ describe("CommandPaletteSearch", () => {
   });
 
   it("groups the results by type in rank order and highlights the first", async () => {
-    await renderResults("lay");
+    const { onHighlight } = await renderResults("lay");
     const listbox = screen.getByRole("listbox", { name: "Results" });
     const groups = within(listbox).getAllByRole("group");
     expect(
@@ -127,6 +136,7 @@ describe("CommandPaletteSearch", () => {
     expect(first).toHaveAttribute("aria-selected", "true");
     expect(field).toHaveAttribute("aria-activedescendant", first?.id);
     expect(readPreviewTitle()).toBe("Layout switcher");
+    expect(onHighlight).toHaveBeenLastCalledWith(false);
   });
 
   it("names each group by its type's heading", async () => {
@@ -157,6 +167,15 @@ describe("CommandPaletteSearch", () => {
     expect(screen.getAllByRole("option", { selected: true })).toHaveLength(1);
   });
 
+  it("leaves the arrow keys to an input method while it composes text", async () => {
+    await renderResults("lay");
+    const field = screen.getByRole("combobox");
+    for (const key of ["ArrowDown", "ArrowUp"]) {
+      expect(fireEvent.keyDown(field, { key, isComposing: true })).toBe(true);
+      expect(readActiveTitle()).toBe("Layout switcher");
+    }
+  });
+
   it("scrolls each newly highlighted result into the results' view", async () => {
     await renderResults("lay");
     const scrollIntoView = vi.spyOn(Element.prototype, "scrollIntoView");
@@ -178,7 +197,7 @@ describe("CommandPaletteSearch", () => {
     expect(options.at(0)).toHaveAttribute("aria-selected", "false");
   });
 
-  it("keeps the focus in the field when a pointer presses under it, but on a link", async () => {
+  it("keeps the focus in the field when a pointer presses a heading or a result", async () => {
     const { container } = await renderResults("lay");
     const field = screen.getByRole("combobox");
     field.focus();
@@ -186,15 +205,37 @@ describe("CommandPaletteSearch", () => {
     if (heading === null) throw new Error("no group heading is rendered");
     expect(fireEvent.mouseDown(heading)).toBe(false);
     expect(
-      fireEvent.mouseDown(screen.getByRole("region", { name: "Preview" })),
+      fireEvent.mouseDown(screen.getAllByRole("option").at(1) as HTMLElement),
     ).toBe(false);
     expect(field).toHaveFocus();
     fireEvent.keyDown(field, { key: "ArrowDown" });
-    expect(findActiveOption()).toHaveTextContent("Player layout");
-    const link = within(
-      screen.getByRole("region", { name: "Preview" }),
-    ).getByRole("link");
+    expect(readActiveTitle()).toBe("Player layout");
+  });
+
+  it("lets a press in the preview select its text, and refocuses the field after a click that selects none", async () => {
+    await renderResults("lay");
+    const field = screen.getByRole("combobox");
+    const preview = screen.getByRole("region", { name: "Preview" });
+    const link = within(preview).getByRole("link");
     expect(fireEvent.mouseDown(link)).toBe(true);
+    expect(fireEvent.mouseDown(preview)).toBe(true);
+    // The press focuses the preview in a browser and selects its text.
+    preview.focus();
+    const selection = document.getSelection();
+    selection?.selectAllChildren(preview);
+    fireEvent.click(preview);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(preview).toHaveFocus();
+    // A click in the selection collapses it once the click is dispatched.
+    fireEvent.click(preview);
+    selection?.collapseToStart();
+    await waitFor(() => {
+      expect(field).toHaveFocus();
+    });
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    expect(readActiveTitle()).toBe("Player layout");
   });
 
   it("chooses the highlighted result with Enter, opening its home", async () => {
@@ -269,6 +310,29 @@ describe("CommandPaletteSearch", () => {
     expect(readPreviewTitle()).toBe("Layout switcher");
   });
 
+  it.each([
+    ["ArrowDown", "Layout switcher"],
+    ["ArrowUp", "Player layout"],
+  ])(
+    "steps %s from the result the highlight was kept on when fewer results came",
+    async (key, title) => {
+      const { environment } = await renderResults("lay", [
+        ...RANKED_RESULTS,
+        STATION_NODE,
+      ]);
+      type("layo");
+      fireEvent.pointerMove(screen.getAllByRole("option").at(3) as HTMLElement);
+      await act(async () => {
+        environment.mock.resolveMostRecentOperation(
+          answerSearch(RANKED_RESULTS),
+        );
+      });
+      expect(readActiveTitle()).toBe("Layout");
+      fireEvent.keyDown(screen.getByRole("combobox"), { key });
+      expect(readActiveTitle()).toBe(title);
+    },
+  );
+
   it("holds each row's title as text and links the preview's title home", async () => {
     await renderResults("lay");
     expect(within(screen.getByRole("listbox")).queryByRole("link")).toBeNull();
@@ -292,8 +356,11 @@ describe("CommandPaletteSearch", () => {
   });
 
   it("lists and previews a result its site gives no home, and Enter does nothing", async () => {
-    const { router, onChoose } = await renderResults("layton", [STATION_NODE]);
+    const { router, onChoose, onHighlight } = await renderResults("layton", [
+      STATION_NODE,
+    ]);
     expect(screen.getByRole("option")).toHaveAttribute("aria-disabled", "true");
+    expect(onHighlight).toHaveBeenLastCalledWith(true);
     expect(
       within(screen.getByRole("region", { name: "Preview" })).getByText(
         "Layton",
@@ -333,6 +400,7 @@ describe("CommandPaletteSearch", () => {
             className="custom-class"
             data-testid="search"
             onChoose={() => undefined}
+            onHighlight={() => undefined}
             session={0}
           />
         ),
