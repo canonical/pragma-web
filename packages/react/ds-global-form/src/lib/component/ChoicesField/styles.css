@@ -43,16 +43,12 @@
       direction: inherit;
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
-      gap: var(--space-100);
+      align-items: start;
+      column-gap: var(--space-100);
       cursor: pointer;
 
-      label {
-        padding: 0;
-      }
-
       /* Muted one-line description under the label, indented past the mark. */
-      & > .ds.option-description {
+      & > .ds.field-description {
         flex-basis: 100%;
         margin: 0;
         margin-inline-start: calc(var(--dimension-200) + var(--space-100));
@@ -85,8 +81,22 @@
       & > input[type="radio"] {
         appearance: none;
         box-sizing: border-box;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        /* Label-font box, seated like a text line so density modifiers track the label. */
+        height: var(--typography-text-primary-font-size);
+        width: var(--typography-text-primary-font-size);
+        padding: 0;
+        margin-block-start: var(--space-before);
+        margin-block-end: max(
+          0px,
+          calc(
+            var(
+              --density-line-height,
+              var(--density-lh-comfy, calc(var(--baseline-height) * 8))
+            ) -
+            var(--space-before) -
+            1em
+          )
+        );
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: 50%;
@@ -152,8 +162,22 @@
         appearance: none;
         box-sizing: border-box;
         position: relative;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        /* Label-font box, seated like a text line so density modifiers track the label. */
+        height: var(--typography-text-primary-font-size);
+        width: var(--typography-text-primary-font-size);
+        padding: 0;
+        margin-block-start: var(--space-before);
+        margin-block-end: max(
+          0px,
+          calc(
+            var(
+              --density-line-height,
+              var(--density-lh-comfy, calc(var(--baseline-height) * 8))
+            ) -
+            var(--space-before) -
+            1em
+          )
+        );
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: var(--dimension-radius-small);

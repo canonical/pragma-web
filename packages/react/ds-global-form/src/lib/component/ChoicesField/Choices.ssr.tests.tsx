@@ -40,7 +40,7 @@ describe("Choices (SSR)", () => {
         withDividers
       />,
     );
-    expect(html).toContain("ds option-description");
+    expect(html).toContain("ds field-description");
     expect(html).toContain("A warm colour");
     expect(html).toContain("<hr");
     expect(html).toContain("ds choices-divider");
