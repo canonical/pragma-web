@@ -24,6 +24,7 @@ describe("createSitemapRenderer", () => {
     vi.stubEnv("BASE_URL", "https://metro.example");
     const xml = await renderSitemap();
     expect(xml).toContain("<loc>https://metro.example/</loc>");
+    expect(xml).toContain("<loc>https://metro.example/network</loc>");
     expect(xml).toContain("<loc>https://metro.example/stations</loc>");
     expect(xml).toContain("<loc>https://metro.example/lines</loc>");
     expect(xml).toContain("<loc>https://metro.example/definitions</loc>");

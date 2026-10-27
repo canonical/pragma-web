@@ -10,6 +10,7 @@ import type { SitemapItem } from "@canonical/react-ssr/renderer";
 export default async function getSitemapItems(): Promise<SitemapItem[]> {
   return [
     { loc: "/", changefreq: "weekly", priority: 1.0 },
+    { loc: "/network", changefreq: "weekly", priority: 0.8 },
     { loc: "/stations", changefreq: "weekly", priority: 0.8 },
     { loc: "/lines", changefreq: "weekly", priority: 0.8 },
     { loc: "/definitions", changefreq: "monthly", priority: 0.6 },
