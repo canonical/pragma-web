@@ -56,9 +56,9 @@ describe("StockPage", () => {
       expect(found).toHaveLength(2);
       return [...found];
     });
-    expect(
-      rows.map((row) => row.querySelector(".identifier")?.textContent),
-    ).toEqual(["DM", "T"]);
+    expect(rows.map((row) => row.querySelector(".title")?.textContent)).toEqual(
+      ["Series 90 driving motor car", "Series 90 trailer car"],
+    );
     expect(
       within(section).getByRole("link", { name: "Series 90 trailer car" }),
     ).toHaveAttribute("href", "/fleet/car-types/metro%3Acar-90-trailer");

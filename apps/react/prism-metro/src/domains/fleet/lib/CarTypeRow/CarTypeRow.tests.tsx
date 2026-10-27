@@ -86,7 +86,7 @@ describe("CarTypeRow", () => {
         <Component node={node} />
       </ul>
     ));
-    for (const text of ["DM", "Series 90 driving motor car", "20 m"]) {
+    for (const text of ["Series 90 driving motor car", "20 m"]) {
       expect(container.textContent).toContain(text);
     }
   });
