@@ -2,7 +2,8 @@
 # Probe — a fixture the checks run against: a grid with one labelled
 # child and a link reached through its body, a hover and a selected state,
 # a reflow below one group and one that drops the label's rule when the
-# body follows it, every decision read through a component token.
+# body follows it, a mark whose muted state a modifier class sets, every
+# decision read through a component token.
 node:
   uri: prism.component.probe
   styles:
@@ -31,3 +32,15 @@ node:
                 typography.decoration@hover: underline
             relation: { cardinality: "0..1", slotName: link }
       relation: { cardinality: "1" }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: mark
+              styles:
+                appearance.opacity: 1
+          - node:
+              role: muted mark (.is-muted)
+              styles:
+                appearance.opacity: 0.4
+      relation: { cardinality: "1", slotName: mark }

@@ -13,6 +13,8 @@ type OwnProps = {
   readonly typename: string;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;
+  /** The node's height in SVG user units; the graph's layout decides it. */
+  readonly height?: number;
 };
 
 /**

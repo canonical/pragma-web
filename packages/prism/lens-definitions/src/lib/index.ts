@@ -7,7 +7,7 @@
  * @module
  */
 
-export type { DefinitionsLayoutProps } from "./DefinitionsLayout/index.js";
-export { DefinitionsLayout } from "./DefinitionsLayout/index.js";
 export { definitionsRoutes } from "./routes.js";
+export type { DefinitionsLayoutProps } from "./ui/DefinitionsLayout/index.js";
+export { DefinitionsLayout } from "./ui/DefinitionsLayout/index.js";
 export { default as warmDefinitions } from "./warmDefinitions.js";

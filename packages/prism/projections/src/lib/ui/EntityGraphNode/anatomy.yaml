@@ -1,6 +1,6 @@
 ---
-# EntityGraphNode — an entity as a node of a graph: a 50px box two lines
-# tall, drawn in native SVG.
+# EntityGraphNode — an entity as a node of a graph: a box with rounded
+# corners, two lines tall by default, drawn in native SVG.
 # Reference: the projection matrix's graph-node column (the title, then
 # "kind in location" muted, in a bordered box with 8px inline insets and no
 # block insets: two 24px lines inside a 1px border). Slot order: title, then
@@ -17,7 +17,8 @@
 # constants (constants.ts): an SVG rect and text are placed by attributes,
 # which no style key binds. Its text is the context's primary size, on the
 # node's own 24-unit lines. A long line is clipped at the inner inset, since
-# SVG text does not truncate.
+# SVG text does not truncate, by a nested SVG viewport over the inner box:
+# a clip path's document-wide id could differ between server and client.
 #
 # A linked title is an SVG link inside the title's `<text>`, and reads as
 # the title, as every representation's link does: the text's colour,
@@ -28,13 +29,34 @@
 # monospace face: an SVG `<text>` takes no face from a `<code>`, so the
 # node names the face the reset gives `code`.
 #
+# A graph sets the box's height (a one-line node sets its title on the
+# middle) and gives it the encodings of the Definitions graph: the vital
+# ends the title's line in muted tabular figures (an instance count); a
+# hollow box is drawn in the floor's colour with an italic title (an
+# abstract class: kind on the fill and the label style); a prominent node
+# sets its title one step larger (a hub). Hollow and prominent are modifier
+# classes on the shape they change. A node without text draws its box
+# alone. The italic is the title's `font-style` attribute: the roster has
+# no font-style key.
+#
 # Every decision is read through a component token declared on the root
 # (`--entity-graph-node-*`), bound to the symbol named here.
 #
 # Token ledger (no symbol to bind, held in constants.ts):
 #   GRAPH_NODE_HEIGHT 50, GRAPH_NODE_LINE 24, GRAPH_NODE_INSET 8,
-#   GRAPH_NODE_STROKE 1 and the default GRAPH_NODE_WIDTH 192, in SVG user
-#   units: SVG geometry is attributes, not CSS.
+#   GRAPH_NODE_STROKE 1, GRAPH_NODE_RADIUS 4 and the default
+#   GRAPH_NODE_WIDTH 192, in SVG user units: SVG geometry is attributes,
+#   not CSS.
+#   --entity-graph-node-hollow-surface-color:
+#     light-dark(oklch(94% 0 0), var(--color-background-container))
+#                                      the graph's floor, the literal the
+#                                      graph canvas ledgers: no background
+#                                      token sits 6 L* below the surface in
+#                                      light, so a hollow box reads as an
+#                                      outline on the floor.
+#   --entity-graph-node-prominent-font-size: 1rem
+#                                      a hub's title; the docs context has
+#                                      no 16px text size.
 #   --entity-graph-node-focus-ring-width: 2px,
 #   --entity-graph-node-focus-ring-offset: -2px
 #                                      the link's ring, drawn inside it.
@@ -51,38 +73,58 @@ node:
   styles:
     typography.size: typography.text.primary.fontSize
   edges:
-    - node:
-        role: surface
-        styles:
-          typography.color: color.background
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: surface
+              styles:
+                typography.color: color.background
+          - node:
+              role: hollow surface (.is-hollow)
+              styles:
+                typography.color: "light-dark(oklch(94% 0 0), var(--color-background-container))"
       relation: { cardinality: "1", slotName: surface }
     - node:
         role: frame
         styles:
           typography.color: color.border
       relation: { cardinality: "1", slotName: frame }
-    - node:
-        role: title
-        styles:
-          typography.weight: typography.text.primary.bold.fontWeight
-        edges:
+    - switch:
+        on: internal
+        cases:
           - node:
-              role: link
+              role: title
               styles:
-                typography.color: inherit
-                typography.decoration: none
-                typography.decoration@hover: underline
-                appearance.outline.width@focus: 2px
-                appearance.outline.style@focus: solid
-                appearance.outline.color@focus: color.focusRing
-                appearance.outline.offset@focus: -2px
-            relation: { cardinality: "0..1", slotName: link }
+                typography.weight: typography.text.primary.bold.fontWeight
+              edges:
+                - node:
+                    role: link
+                    styles:
+                      typography.color: inherit
+                      typography.decoration: none
+                      typography.decoration@hover: underline
+                      appearance.outline.width@focus: 2px
+                      appearance.outline.style@focus: solid
+                      appearance.outline.color@focus: color.focusRing
+                      appearance.outline.offset@focus: -2px
+                  relation: { cardinality: "0..1", slotName: link }
+                - node:
+                    role: identifier
+                    styles:
+                      typography.fontFamily: "ui-monospace, monospace"
+                  relation: { cardinality: "0..*", slotName: identifier }
           - node:
-              role: identifier
+              role: prominent title (.is-prominent)
               styles:
-                typography.fontFamily: "ui-monospace, monospace"
-            relation: { cardinality: "0..*", slotName: identifier }
+                typography.size: 1rem
       relation: { cardinality: "1", slotName: title }
+    - node:
+        role: count
+        styles:
+          typography.color: color.text.muted
+          typography.variant.numeric: tabular-nums
+      relation: { cardinality: "0..1", slotName: count }
     - node:
         role: context
         styles:

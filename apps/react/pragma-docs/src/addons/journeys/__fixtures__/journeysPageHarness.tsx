@@ -37,7 +37,7 @@ import { journeysStripSlots } from "../stripSlots.js";
 
 /**
  * Contention insurance (the definitions/components precedent): these tests
- * mount the full provider stack + static router + React Flow, which can
+ * mount the full provider stack + static router + the graph well, which can
  * overrun the 5s default under heavy parallel machine load. Per-test only —
  * the config default stands.
  */

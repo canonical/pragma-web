@@ -49,6 +49,16 @@ export const PLAIN_STATION_COUNT = STATION_COUNT - INTERCHANGE_COUNT;
 /** How many lines the network runs: seven lines. */
 export const LINE_COUNT = 7;
 
+/**
+ * How long a lens page test may take: it mounts the whole provider stack
+ * over a real socket, and the Definitions page lays its graph out, which
+ * overruns the default under parallel machine load.
+ */
+export const LENS_PAGE_TEST_TIMEOUT_MS = 15_000;
+
+/** How long a lens page test waits for the page to answer. */
+export const LENS_PAGE_WAIT_MS = 10_000;
+
 /** A metro IRI, by its local name, as the graph's dataset writes it. */
 const metroUri = (localName: string): string =>
   `https://metro.example/onto#${localName}`;

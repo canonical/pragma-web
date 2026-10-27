@@ -8,10 +8,19 @@
   .ds.entity-graph-node {
     --entity-graph-node-font-size: var(--typography-text-primary-font-size);
     --entity-graph-node-surface-color: var(--color-background);
+    /* The graph's floor, as the canvas ledgers it: no background token sits
+     * 6 L* below the surface in light; the dark floor is the container. */
+    --entity-graph-node-hollow-surface-color: light-dark(
+      oklch(94% 0 0),
+      var(--color-background-container)
+    );
     --entity-graph-node-frame-color: var(--color-border);
     --entity-graph-node-title-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
+    /* A hub's title; the docs context has no 16px text size. */
+    --entity-graph-node-prominent-font-size: 1rem;
+    --entity-graph-node-count-color: var(--color-text-muted);
     --entity-graph-node-context-color: var(--color-text-muted);
     /* The ring sits inside the link, since the node clips its lines. */
     --entity-graph-node-focus-ring-width: 2px;
@@ -27,12 +36,21 @@
     color: var(--entity-graph-node-surface-color);
   }
 
+  /* A hollow box takes the floor's colour. */
+  .ds.entity-graph-node .surface.is-hollow {
+    color: var(--entity-graph-node-hollow-surface-color);
+  }
+
   .ds.entity-graph-node .frame {
     color: var(--entity-graph-node-frame-color);
   }
 
   .ds.entity-graph-node .title {
     font-weight: var(--entity-graph-node-title-font-weight);
+  }
+
+  .ds.entity-graph-node .title.is-prominent {
+    font-size: var(--entity-graph-node-prominent-font-size);
   }
 
   /* The title's link reads as the title: the text's colour, underlined on
@@ -57,6 +75,11 @@
    * from no `<code>`. */
   .ds.entity-graph-node .identifier {
     font-family: var(--entity-graph-node-identifier-font-family);
+  }
+
+  .ds.entity-graph-node .count {
+    color: var(--entity-graph-node-count-color);
+    font-variant-numeric: tabular-nums;
   }
 
   .ds.entity-graph-node .context {
