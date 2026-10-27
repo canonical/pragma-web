@@ -34,11 +34,23 @@ const CELLS = [
   { script: "preview:bun", timeoutMs: PREVIEW_READY_MS },
 ] as const;
 
-/** The station page a click on the stations index opens. */
+/** The station's page in the stations lens. */
 const NORTHGATE_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
 
-/** The line page a click on the lines index opens. */
+/** The line's page in the lines lens. */
 const CIRCLE_LINE_PATH = `/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`;
+
+/**
+ * The station's home, its page in the network lens, which a click on the
+ * stations index opens.
+ */
+const NORTHGATE_HOME = `/network/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
+
+/**
+ * The line's home, its page in the network lens, which a click on the lines
+ * index opens.
+ */
+const CIRCLE_LINE_HOME = `/network/lines/${encodeURIComponent(CIRCLE_LINE_CURIE)}`;
 
 /** The landing and every route kind of each lens, which must all hydrate
  * silently. */
@@ -212,26 +224,26 @@ describe.each(CELLS)("$script in a browser", ({ script }) => {
   it("opens a station from the stations index without reloading the document", async () => {
     const { page, base } = await openTab(script);
     await loadPage(page, base, "/stations");
-    await followIndexEntry(page, NORTHGATE_PATH, NORTHGATE_TITLE);
-    expect(new URL(page.url()).pathname).toBe(NORTHGATE_PATH);
+    await followIndexEntry(page, NORTHGATE_HOME, NORTHGATE_TITLE);
+    expect(new URL(page.url()).pathname).toBe(NORTHGATE_HOME);
     expect(await readDocumentMarker(page)).toBe(true);
     await expect(
-      page.locator(".ds.field-list").first().isVisible(),
+      page.getByRole("heading", { level: 2, name: "Routes" }).isVisible(),
     ).resolves.toBe(true);
   });
 
   it("opens a line from the lines index without reloading the document", async () => {
     const { page, base } = await openTab(script);
     await loadPage(page, base, "/lines");
-    await followIndexEntry(page, CIRCLE_LINE_PATH, CIRCLE_LINE_TITLE);
-    expect(new URL(page.url()).pathname).toBe(CIRCLE_LINE_PATH);
+    await followIndexEntry(page, CIRCLE_LINE_HOME, CIRCLE_LINE_TITLE);
+    expect(new URL(page.url()).pathname).toBe(CIRCLE_LINE_HOME);
     expect(await readDocumentMarker(page)).toBe(true);
   });
 
   it("returns to the index on Back", async () => {
     const { page, base } = await openTab(script);
     await loadPage(page, base, "/stations");
-    await followIndexEntry(page, NORTHGATE_PATH, NORTHGATE_TITLE);
+    await followIndexEntry(page, NORTHGATE_HOME, NORTHGATE_TITLE);
     await page.goBack();
     await page
       .getByRole("heading", { level: 1, name: "Stations" })
