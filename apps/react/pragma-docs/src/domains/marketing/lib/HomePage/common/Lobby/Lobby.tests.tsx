@@ -107,8 +107,8 @@ describe("Lobby", () => {
         "/components",
         "/definitions",
         "/standards",
-        "/guides",
         "/journeys",
+        "/guides",
       ]);
       const vitals = cards.map((card) =>
         [...card.querySelectorAll(".vital")].map((vital) => vital.textContent),

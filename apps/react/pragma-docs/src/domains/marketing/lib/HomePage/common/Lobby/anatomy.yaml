@@ -5,12 +5,12 @@
 #     stands for it, so no two chips read the same and lead to different
 #     pages. The chip stays the title alone, as the Figma's UI-block chip
 #     is; the choice is the lobby's, from the first components it reads;
-#   - the doors to the five lenses the rail lists, as cards in the shared
-#     list view: each lens linked to its page, with a sentence on what it
-#     holds and the graph's count where the schema gives one (no count for
-#     Definitions, Guides or Journeys: the demand model is not in every
-#     graph the site reads, and a field the graph lacks would fail the
-#     lobby's one operation). Five doors at two columns each fill the ten
+#   - the doors to the five lenses the rail lists, in the rail's order, as
+#     cards in the shared list view: each lens linked to its page, with a
+#     sentence on what it holds and the graph's count where the schema
+#     gives one (no count for Definitions, Guides or Journeys: the demand
+#     model is not in every graph the site reads, and a field the graph
+#     lacks would fail the lobby's one operation). Five doors at two columns each fill the ten
 #     columns of the main column at the desktop width.
 # Each is a page section. A subgrid of the page over every column, its gap
 # the grid's gutter on both axes. The section's lead holds a reading

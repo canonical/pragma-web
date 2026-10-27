@@ -11,3 +11,21 @@ type OwnProps = Record<never, never>;
  */
 export type LobbyProps = OwnProps &
   Omit<ComponentProps<"div">, keyof OwnProps | "children">;
+
+/** One door of the lobby: a lens's title, what it holds, and its counts. */
+export interface LobbyDoor {
+  /** The lens's name. */
+  readonly title: string;
+  /** One sentence on what the lens holds. */
+  readonly summary: string;
+  /** The graph's counts for the lens, where the schema gives them. */
+  readonly vitals?: readonly string[];
+}
+
+/** The lenses the lobby opens a door to, by their index route's name. */
+export type LobbyDoorRoute =
+  | "components"
+  | "definitions"
+  | "standards"
+  | "journeys"
+  | "guides";
