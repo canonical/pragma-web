@@ -1,11 +1,12 @@
-import { LOCALE, type Translate } from "#i18n";
+import type { Translate } from "#i18n";
 import type { CarTypePageQuery$data } from "#relay/__generated__/CarTypePageQuery.graphql.js";
 import type { FormationPageQuery$data } from "#relay/__generated__/FormationPageQuery.graphql.js";
 import type { StockPageQuery$data } from "#relay/__generated__/StockPageQuery.graphql.js";
 import type { UnitPageQuery$data } from "#relay/__generated__/UnitPageQuery.graphql.js";
+import { COUNT_FORMAT } from "../constants.js";
 import type { FleetFact } from "../types.js";
 import assertFragment from "./assertFragment.js";
-import describeRange from "./describeRange.js";
+import describeFormations from "./describeFormations.js";
 import formatLength from "./formatLength.js";
 import readFormationTrain from "./readFormationTrain.js";
 import readUnitCars from "./readUnitCars.js";
@@ -16,9 +17,6 @@ export type FleetPageNode =
   | FormationPageQuery$data["node"]
   | UnitPageQuery$data["node"]
   | CarTypePageQuery$data["node"];
-
-/** Whole numbers, grouped as the app's locale groups them. */
-const COUNT = new Intl.NumberFormat(LOCALE);
 
 /** Read a capacity as a reader reads it: "960 passengers". */
 function describeCapacity(capacity: number, t: Translate): string {
@@ -48,28 +46,7 @@ export default function listFleetFacts(
 ): readonly FleetFact[] {
   switch (node.__typename) {
     case "RollingStock":
-      return [
-        {
-          term: t("fleet.fact.formations"),
-          value: COUNT.format(node.formations.length),
-        },
-        {
-          term: t("fleet.fact.length"),
-          value: describeRange(
-            node.formations.map(({ length }) => length),
-            formatLength,
-            t,
-          ),
-        },
-        {
-          term: t("fleet.fact.capacity"),
-          value: describeRange(
-            node.formations.map(({ capacity }) => capacity),
-            (capacity) => describeCapacity(capacity, t),
-            t,
-          ),
-        },
-      ];
+      return describeFormations(node.formations, t);
     case "Formation":
       return [
         { term: t("fleet.fact.stock"), value: node.stock._meta.title },
@@ -83,11 +60,11 @@ export default function listFleetFacts(
         },
         {
           term: t("fleet.fact.units"),
-          value: COUNT.format(node.units.length),
+          value: COUNT_FORMAT.format(node.units.length),
         },
         {
           term: t("fleet.fact.cars"),
-          value: COUNT.format(
+          value: COUNT_FORMAT.format(
             readFormationTrain(
               assertFragment(
                 node.readFormationTrain_formation,
@@ -109,7 +86,7 @@ export default function listFleetFacts(
         },
         {
           term: t("fleet.fact.cars"),
-          value: COUNT.format(
+          value: COUNT_FORMAT.format(
             readUnitCars(
               assertFragment(node.readUnitCars_unit, "readUnitCars_unit"),
             ).length,

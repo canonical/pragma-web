@@ -84,8 +84,8 @@ describe("RollingStockCard", () => {
     for (const text of [
       "Series 90",
       "Rolling stock",
-      "60 m to 120 m",
-      "490 passengers to 980 passengers",
+      "60–120 m",
+      "490–980 passengers",
       "2 formations",
     ]) {
       expect(container.textContent).toContain(text);
@@ -105,6 +105,24 @@ describe("RollingStockCard", () => {
       (svg) => svg.getAttribute("viewBox")?.split(" ").at(2),
     );
     expect(widths).toEqual(["120000", "120000"]);
+  });
+
+  it("captions each formation it draws by its title", () => {
+    const { container } = renderWithNode((node) => <Component node={node} />);
+    expect(
+      [...container.querySelectorAll(".sidecar figcaption")].map(
+        (caption) => caption.textContent,
+      ),
+    ).toHaveLength(2);
+  });
+
+  it("reads a stock with no formation as its count alone", () => {
+    const { container } = renderWithNode((node) => <Component node={node} />, {
+      formations: [],
+    });
+    expect(container.querySelector(".sidecar")).toBeNull();
+    expect(container.textContent).toContain("0 formations");
+    expect(container.textContent).not.toContain("Length");
   });
 
   it("applies custom className", () => {

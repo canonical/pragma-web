@@ -1,11 +1,4 @@
-import { LOCALE } from "#i18n";
-
-/** Metres to at most one decimal, in the app's locale. */
-const METRES = new Intl.NumberFormat(LOCALE, {
-  style: "unit",
-  unit: "meter",
-  maximumFractionDigits: 1,
-});
+import { LENGTH_FORMAT } from "../constants.js";
 
 /**
  * Format a length the graph gives in whole millimetres as metres, the unit
@@ -15,5 +8,5 @@ const METRES = new Intl.NumberFormat(LOCALE, {
  * @returns The length in metres, in the app's locale.
  */
 export default function formatLength(millimetres: number): string {
-  return METRES.format(millimetres / 1000);
+  return LENGTH_FORMAT.format(millimetres / 1000);
 }

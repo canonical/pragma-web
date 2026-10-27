@@ -5,8 +5,7 @@ import { useMessages } from "#i18n";
 import type { StockPageQuery } from "#relay/__generated__/StockPageQuery.graphql.js";
 import stockPageQueryNode from "#relay/__generated__/StockPageQuery.graphql.js";
 import { useFleetNode } from "../../../../hooks/index.js";
-import { FormationSideView } from "../../../FormationSideView/index.js";
-import findScaleLength from "../../../findScaleLength.js";
+import { FormationStack } from "../../../FormationStack/index.js";
 import formatLength from "../../../formatLength.js";
 import orientCars from "../../../orientCars.js";
 import readFormationTrain from "../../../readFormationTrain.js";
@@ -14,8 +13,9 @@ import type { StockDetailProps } from "./types.js";
 
 /**
  * A rolling stock's page, once its data is in the store: its title, its
- * formations at one scale, each named by its chip with its length, then
- * the car types its units are made of, each once, as its row. An address
+ * formations drawn at one scale, each captioned by its chip and its
+ * length, then the car types its units are made of, each once, as its
+ * row. A stock with no formation says so, and lists no car types. An address
  * naming no rolling stock says nothing lives there.
  */
 export default function StockDetail({
@@ -39,11 +39,6 @@ export default function StockDetail({
       </>
     );
   }
-  const formations = node.formations.map((formation) => ({
-    ...formation,
-    cars: orientCars(readFormationTrain(formation)),
-  }));
-  const scale = findScaleLength(formations.map(({ length }) => length));
   const carTypes = [
     ...new Map(
       node.formations
@@ -58,30 +53,36 @@ export default function StockDetail({
       <h1 className="title">{node._meta.title}</h1>
       <section aria-labelledby={formationsId} className="section">
         <h2 id={formationsId}>{t("fleet.formations")}</h2>
-        <ol className="list">
-          {formations.map((formation) => (
-            <li key={formation.uri}>
-              <p className="entry">
-                <ChipProjection node={formation} />
-                <span className="vital">{formatLength(formation.length)}</span>
-              </p>
-              <FormationSideView
-                cars={formation.cars}
-                className="side-view"
-                scale={scale}
-              />
-            </li>
-          ))}
-        </ol>
+        {node.formations.length === 0 ? (
+          <p className="empty">{t("fleet.formations.none")}</p>
+        ) : (
+          <FormationStack
+            className="formations"
+            trains={node.formations.map((formation) => ({
+              key: formation.uri,
+              cars: orientCars(readFormationTrain(formation)),
+              caption: (
+                <>
+                  <ChipProjection node={formation} />
+                  <span className="vital">
+                    {formatLength(formation.length)}
+                  </span>
+                </>
+              ),
+            }))}
+          />
+        )}
       </section>
-      <section aria-labelledby={carTypesId} className="section">
-        <h2 id={carTypesId}>{t("fleet.carTypes")}</h2>
-        <ul className="rows">
-          {carTypes.map((carType) => (
-            <RowProjection key={carType.uri} node={carType} />
-          ))}
-        </ul>
-      </section>
+      {carTypes.length === 0 ? null : (
+        <section aria-labelledby={carTypesId} className="section">
+          <h2 id={carTypesId}>{t("fleet.carTypes")}</h2>
+          <ul className="rows">
+            {carTypes.map((carType) => (
+              <RowProjection key={carType.uri} node={carType} />
+            ))}
+          </ul>
+        </section>
+      )}
     </>
   );
 }

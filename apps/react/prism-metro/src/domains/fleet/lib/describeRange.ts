@@ -1,23 +1,19 @@
-import type { Translate } from "#i18n";
-
 /**
  * Read a set of measures as a reader reads them: one value when every
- * member shares it, else the range from the least to the most, each end
- * described the same way.
+ * member shares it, else the range from the least to the most, written
+ * once with the unit, as the format's locale writes ranges: "60–120 m".
  *
  * @param values - The measures, at least one.
- * @param describe - How one measure reads, such as "120 m".
- * @param t - The translator the range's words are read through.
+ * @param format - How the measures read.
  * @returns The value, or the range.
  */
 export default function describeRange(
   values: readonly number[],
-  describe: (value: number) => string,
-  t: Translate,
+  format: Intl.NumberFormat,
 ): string {
   const least = Math.min(...values);
   const most = Math.max(...values);
   return least === most
-    ? describe(least)
-    : t("fleet.range", { min: describe(least), max: describe(most) });
+    ? format.format(least)
+    : format.formatRange(least, most);
 }

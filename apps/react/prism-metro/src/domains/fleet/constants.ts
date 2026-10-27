@@ -1,11 +1,11 @@
 import type { EntityListView } from "@canonical/prism-projections";
-import { MESSAGES } from "#i18n";
+import { LOCALE, MESSAGES } from "#i18n";
 import type { FleetNodeKind } from "./types.js";
 
 /**
  * The fleet lens in the rail: its label and its place, fifth. Stations,
- * lines and Definitions hold the first three places and the network lens
- * the fourth, and the rail needs every place distinct.
+ * lines and Definitions hold the first three places, the fourth is kept
+ * for a lens of the network, and the rail needs every place distinct.
  */
 export const FLEET_LENS = { label: MESSAGES["lens.fleet"], order: 5 };
 
@@ -50,6 +50,16 @@ export const FLEET_CLASS_URI = "metro:RollingStock";
  * small; the index shows it whole.
  */
 export const FLEET_PAGE_SIZE = 50;
+
+/** Metres to at most one decimal, in the app's locale: "120 m". */
+export const LENGTH_FORMAT = new Intl.NumberFormat(LOCALE, {
+  style: "unit",
+  unit: "meter",
+  maximumFractionDigits: 1,
+});
+
+/** Whole counts, in the app's locale. */
+export const COUNT_FORMAT = new Intl.NumberFormat(LOCALE);
 
 /** The two ways the index shows the fleet. */
 export const FLEET_VIEWS: readonly EntityListView[] = ["cards", "rows"];

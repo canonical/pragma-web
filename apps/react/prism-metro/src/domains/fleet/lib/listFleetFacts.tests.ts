@@ -22,8 +22,8 @@ describe("listFleetFacts", () => {
     } as unknown as NonNullable<FleetPageNode>;
     expect(listFleetFacts(stock, t).map(({ value }) => value)).toEqual([
       "2",
-      "60 m to 120 m",
-      "490 passengers to 980 passengers",
+      "60–120 m",
+      "490–980 passengers",
     ]);
   });
 });

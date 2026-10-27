@@ -68,8 +68,8 @@ describe("StockPage", () => {
     renderMetroPage(url);
     const facts = await screen.findByRole("region", { name: "Facts" });
     await within(facts).findByText("Formations");
-    expect(facts).toHaveTextContent("60 m to 120 m");
-    expect(facts).toHaveTextContent("490 passengers to 980 passengers");
+    expect(facts).toHaveTextContent("60–120 m");
+    expect(facts).toHaveTextContent("490–980 passengers");
   });
 
   it("reads one formation's measures as single values", async () => {

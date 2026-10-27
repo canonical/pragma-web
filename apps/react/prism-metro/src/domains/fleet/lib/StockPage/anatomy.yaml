@@ -1,16 +1,16 @@
 ---
 # StockPage — the fleet lens's page of one rolling stock, in the document
 # archetype's canvas, beside its facts in the aside: its title, then
-# its formations, each named by its chip and drawn at one scale with the
-# others, then the car types its units are made of, as rows. Sections sit
-# a loose step apart, more than the gutter
-# between the items inside them. While the page's data is on its way it
-# says so in one muted line; a failed read says so as an alert; an address
-# naming nothing of its type says that nothing lives there.
+# its formations drawn at one scale, each captioned by its chip and its
+# length, then the car types its units are made of, as rows. Sections sit
+# a loose step apart, more than the gutter between the items inside them.
+# A stock with no formation says so in one muted line, and has no car
+# types. While the page's data is on its way it says so in one muted line;
+# a failed read says so as an alert; an address naming nothing of its type
+# says that nothing lives there.
 #
 # Token ledger: container.gap.loose between sections, an item's external
-# spacing, never a gap; space.100 (8px) between the words of an entry, an
-# inline run, one baseline pair.
+# spacing, never a gap.
 node:
   uri: metro.component.stock_page
   styles:
@@ -30,15 +30,13 @@ node:
           spacing.gap: grid.gutter
       relation: { cardinality: "0..*", slotName: section }
     - node:
-        role: list of entries
+        uri: metro.component.formation_stack
+      relation: { cardinality: "0..1", slotName: formations }
+    - node:
+        role: no formation runs the stock
         styles:
-          layout.type: grid
-          spacing.gap: grid.gutter
-          spacing.internal.inline.start: 0
-          spacing.external.block.start: 0
-          spacing.external.block.end: 0
-          layout.listStyle: none
-      relation: { cardinality: "0..*", slotName: list }
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: empty }
     - node:
         role: list of rows
         styles:
@@ -48,21 +46,10 @@ node:
           layout.listStyle: none
       relation: { cardinality: "0..1", slotName: rows }
     - node:
-        role: entry, a formation's chip and its length
-        styles:
-          layout.type: flex
-          layout.wrap: wrap
-          layout.align: baseline
-          spacing.gap: space.100
-      relation: { cardinality: "0..*", slotName: entry }
-    - node:
-        role: vital
+        role: a formation's length, after its chip in its caption
         styles:
           typography.color: color.text.muted
       relation: { cardinality: "0..*", slotName: vital }
-    - node:
-        uri: metro.component.formation_side_view
-      relation: { cardinality: "0..*", slotName: side-view }
     - node:
         role: loading line
         styles:

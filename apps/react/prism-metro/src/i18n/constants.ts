@@ -23,6 +23,7 @@ export const MESSAGES = {
   "fleet.index.loading": "Loading the fleet…",
   "fleet.index.error": "The fleet could not be loaded.",
   "fleet.stocks.kind": { one: "rolling stock", other: "rolling stocks" },
+  "fleet.formations.none": "No formation runs this stock.",
   "fleet.index.empty": "The graph lists no rolling stock.",
   "fleet.page.loading": "Loading…",
   "fleet.page.error": "This page could not be loaded.",
@@ -47,11 +48,11 @@ export const MESSAGES = {
   "fleet.fact.cab": "Driving cab",
   "fleet.yes": "Yes",
   "fleet.no": "No",
-  "fleet.range": "{min} to {max}",
   "fleet.passengers.count": {
     one: "{count} passenger",
     other: "{count} passengers",
   },
+  "fleet.passengers.range": "{range} passengers",
   "fleet.formations.count": {
     one: "{count} formation",
     other: "{count} formations",
