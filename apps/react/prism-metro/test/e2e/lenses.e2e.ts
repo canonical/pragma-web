@@ -167,10 +167,15 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
       .split('class="ds card ds entity-card ds rolling-stock-card"')
       .slice(1);
     expect(cards).toHaveLength(ROLLING_STOCK_COUNT);
-    expect(html).toContain('href="/fleet/metro%3Aseries-90"');
-    expect(html).toMatch(
-      /class="sidecar".*?class="ds formation-stack".*?<svg[^>]*class="drawing"[^>]*viewBox="0 0 120000 3600"/s,
+    const series90 = cards.find((card) =>
+      card.includes('href="/fleet/metro%3Aseries-90"'),
     );
+    const sidecar = series90?.split('class="sidecar"').at(1) ?? "";
+    expect(
+      [
+        ...sidecar.matchAll(/<svg[^>]*class="drawing"[^>]*viewBox="([^"]+)"/g),
+      ].map(([, viewBox]) => viewBox),
+    ).toEqual(["0 0 120000 3600", "0 0 120000 3600"]);
   });
 
   it("renders the fleet index as rows when the address asks", async () => {

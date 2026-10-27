@@ -27,6 +27,7 @@ describe("createSitemapRenderer", () => {
     expect(xml).toContain("<loc>https://metro.example/stations</loc>");
     expect(xml).toContain("<loc>https://metro.example/lines</loc>");
     expect(xml).toContain("<loc>https://metro.example/definitions</loc>");
+    expect(xml).toContain("<loc>https://metro.example/fleet</loc>");
   });
 
   it("falls back to localhost on PORT when BASE_URL is not absolute", async () => {
