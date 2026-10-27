@@ -3,6 +3,7 @@
   "sources": {
     "apps/react/prism-metro/src": "prism-metro",
     "packages/prism/projections/src": "prism-metro",
+    "packages/prism/command-palette/src": "prism-metro",
     "packages/prism/lens-definitions/src": "prism-metro",
     "packages/prism/lens-entity/src": "prism-metro"
   },
