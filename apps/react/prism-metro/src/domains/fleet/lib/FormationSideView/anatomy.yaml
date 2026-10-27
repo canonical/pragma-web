@@ -22,6 +22,10 @@ node:
   styles:
     layout.type: grid
     spacing.gap: grid.gutter
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+    spacing.external.inline.start: 0
+    spacing.external.inline.end: 0
   edges:
     - node:
         role: drawing

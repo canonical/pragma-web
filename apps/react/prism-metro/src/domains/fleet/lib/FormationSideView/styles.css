@@ -3,7 +3,8 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The drawing over its text, one gutter apart. */
+  /* The drawing over its text, one gutter apart. The figure keeps no
+   * margin of its own, so the drawing starts where its column starts. */
   .ds.formation-side-view {
     --formation-side-view-gap: var(--grid-gutter);
     --formation-side-view-drawing-max-inline-size: 100%;
@@ -19,6 +20,7 @@
 
     display: grid;
     gap: var(--formation-side-view-gap);
+    margin: 0;
   }
 
   /* The drawing scales with its column and never overflows it. */
