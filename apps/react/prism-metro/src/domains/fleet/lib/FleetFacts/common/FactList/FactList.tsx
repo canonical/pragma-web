@@ -19,14 +19,16 @@ const QUERY_BY_KIND = {
 } as const;
 
 /**
- * The node's facts as a definition list, each term and value grouped. It
- * reads the page's operation for the node, so it suspends until the store
- * holds it; an address naming a node of another type lists none.
+ * The node's facts under their heading, as a definition list, each term
+ * and value grouped. It reads the page's operation for the node, so it
+ * suspends until the store holds it; an address naming nothing of the
+ * page's type has no facts, and renders nothing.
  */
 export default function FactList({
   kind,
   address,
-}: FactListProps): ReactElement {
+  headingId,
+}: FactListProps): ReactElement | null {
   const t = useMessages();
   const { node } = useFleetNode<
     FleetNodeOperation & { response: { node: FleetPageNode } }
@@ -34,19 +36,26 @@ export default function FactList({
     query: QUERY_BY_KIND[kind],
     address,
   });
+  const facts =
+    node !== null &&
+    node !== undefined &&
+    node.__typename === TYPENAME_BY_KIND[kind]
+      ? listFleetFacts(node, t)
+      : [];
+  if (facts.length === 0) return null;
   return (
-    <dl className="facts">
-      {(node !== null &&
-      node !== undefined &&
-      node.__typename === TYPENAME_BY_KIND[kind]
-        ? listFleetFacts(node, t)
-        : []
-      ).map(({ term, value }) => (
-        <div className="fact" key={term}>
-          <dt className="term">{term}</dt>
-          <dd className="value">{value}</dd>
-        </div>
-      ))}
-    </dl>
+    <>
+      <h2 className="heading" id={headingId}>
+        {t("fleet.facts")}
+      </h2>
+      <dl className="facts">
+        {facts.map(({ term, value }) => (
+          <div className="fact" key={term}>
+            <dt className="term">{term}</dt>
+            <dd className="value">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </>
   );
 }

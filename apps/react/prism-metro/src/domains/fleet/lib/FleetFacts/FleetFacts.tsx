@@ -3,7 +3,6 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import type React from "react";
 import { Suspense, useId } from "react";
-import { useMessages } from "#i18n";
 import FactList from "./common/FactList/FactList.js";
 import type { FleetFactsProps } from "./types.js";
 import "./styles.css";
@@ -14,8 +13,9 @@ const componentCssClassName = "ds fleet-facts";
  * The facts of the fleet node a page shows, for the layout's aside: a
  * heading, then the node's facts as a definition list, read from the same
  * operation as the page, so a page the server rendered answers both from
- * the store. While the data is on its way the list is empty; a failed read
- * leaves the heading alone, the page saying what went wrong.
+ * the store. The heading stands only over facts: while the data is on its
+ * way, for an address naming nothing of the page's type, and after a
+ * failed read the section is empty, the page saying what is wrong.
  *
  * `import { FleetFacts } from "./FleetFacts/index.js";`
  */
@@ -25,7 +25,6 @@ const FleetFacts = ({
   className,
   ...props
 }: FleetFactsProps): React.ReactElement => {
-  const t = useMessages();
   const headingId = useId();
   return (
     <section
@@ -33,12 +32,9 @@ const FleetFacts = ({
       aria-labelledby={headingId}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <h2 className="heading" id={headingId}>
-        {t("fleet.facts")}
-      </h2>
       <ErrorBoundary fallback={null} resetKey={`${kind} ${address}`}>
         <Suspense fallback={null}>
-          <FactList address={address} kind={kind} />
+          <FactList address={address} headingId={headingId} kind={kind} />
         </Suspense>
       </ErrorBoundary>
     </section>

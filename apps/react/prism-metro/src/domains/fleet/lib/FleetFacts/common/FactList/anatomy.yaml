@@ -1,20 +1,25 @@
 ---
-# FactList — a fleet node's facts, a subcomponent of FleetFacts: a
-# definition list, each term grouped with its value. It reads the page's
-# operation for the node; an address naming a node of another type lists
-# none.
+# FactList — a fleet node's facts, a subcomponent of FleetFacts: the
+# heading, then a definition list, each term grouped with its value. It
+# reads the page's operation for the node; an address naming nothing of
+# the page's type has no facts, and it renders nothing.
 #
-# It binds no styles: FleetFacts styles the list, each group, each term
-# and each value by its slot.
+# It binds no styles: FleetFacts styles the heading, the list, each group,
+# each term and each value by its slot.
 node:
   uri: metro.subcomponent.fact_list
-  role: facts
   edges:
+    - node: { role: heading }
+      relation: { cardinality: "1", slotName: heading }
     - node:
-        role: fact
+        role: fact list
         edges:
-          - node: { role: term }
-            relation: { cardinality: "1", slotName: term }
-          - node: { role: value }
-            relation: { cardinality: "1", slotName: value }
-      relation: { cardinality: "0..*", slotName: fact }
+          - node:
+              role: fact
+              edges:
+                - node: { role: term }
+                  relation: { cardinality: "1", slotName: term }
+                - node: { role: value }
+                  relation: { cardinality: "1", slotName: value }
+            relation: { cardinality: "1..*", slotName: fact }
+      relation: { cardinality: "1", slotName: facts }

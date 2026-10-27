@@ -18,7 +18,7 @@ import type { FormationDetailProps } from "./types.js";
 /**
  * A formation's page, once its data is in the store: its title, its stock's
  * chip, its side view with a tick at each line's shortest platform, its
- * units in order, each named by its chip, then its fit at the platforms of
+ * units in order, each by its place and its chip, then its fit at the platforms of
  * every line it runs on, each line named by its chip. An address
  * naming no formation says nothing lives there.
  */
@@ -78,6 +78,7 @@ export default function FormationDetail({
         <ol className="list">
           {units.map(({ position, reversed, unit }) => (
             <li className="entry" key={position}>
+              <span className="vital">{t("fleet.unit", { position })}</span>
               <ChipProjection node={unit} />
               <span className="vital">{formatLength(unit.length)}</span>
               {reversed ? (

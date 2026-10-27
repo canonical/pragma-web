@@ -25,8 +25,7 @@ const renderFacts = (props: FleetFactsProps, fetchFn = createMetroFetch()) =>
 describe("FleetFacts", () => {
   it("lists the node's facts, each term over its value", async () => {
     renderFacts({ kind: "formation", address: SERIES_90_SIX_CAR_CURIE });
-    const facts = screen.getByRole("region", { name: "Facts" });
-    await within(facts).findByText("Rolling stock");
+    const facts = await screen.findByRole("region", { name: "Facts" });
     const terms = within(facts)
       .getAllByRole("term")
       .map((term) => term.textContent);
@@ -44,18 +43,21 @@ describe("FleetFacts", () => {
     ).toEqual(["Series 90", "120 m", "980 passengers", "2", "6"]);
   });
 
-  it("lists no facts for an address of another type", async () => {
-    const { container } = renderFacts({
-      kind: "unit",
-      address: SERIES_90_SIX_CAR_CURIE,
-    });
+  it("renders nothing for an address of another type", async () => {
+    const fetchFn = vi.fn(createMetroFetch());
+    const { container } = renderFacts(
+      { kind: "unit", address: SERIES_90_SIX_CAR_CURIE },
+      fetchFn,
+    );
     await vi.waitFor(() => {
-      expect(container.querySelector(".facts")).not.toBeNull();
+      expect(fetchFn).toHaveBeenCalled();
     });
-    expect(container.querySelectorAll(".fact")).toHaveLength(0);
+    await fetchFn.mock.results.at(0)?.value;
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(container.querySelector(".ds.fleet-facts")).toBeEmptyDOMElement();
   });
 
-  it("keeps its heading alone when the facts cannot be read", async () => {
+  it("renders nothing when the facts cannot be read", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const { container } = renderFacts(
       { kind: "stock", address: "metro:series-90" },
@@ -64,16 +66,15 @@ describe("FleetFacts", () => {
     await vi.waitFor(() => {
       expect(console.error).toHaveBeenCalled();
     });
-    expect(container.querySelector(".facts")).toBeNull();
-    expect(screen.getByRole("heading", { name: "Facts" })).toBeInTheDocument();
+    expect(container.querySelector(".ds.fleet-facts")).toBeEmptyDOMElement();
   });
 
   it("passes native props to its section and merges its class", () => {
-    renderFacts(
+    const { container } = renderFacts(
       { kind: "stock", address: "metro:series-90", className: "x" },
       vi.fn().mockReturnValue(new Promise(() => {})),
     );
-    expect(screen.getByRole("region", { name: "Facts" })).toHaveClass(
+    expect(container.querySelector("section")).toHaveClass(
       "ds",
       "fleet-facts",
       "x",

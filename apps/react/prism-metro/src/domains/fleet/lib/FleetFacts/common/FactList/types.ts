@@ -6,4 +6,6 @@ export interface FactListProps {
   readonly kind: FleetNodeKind;
   /** The node's address, as the page's route gives it. */
   readonly address: string;
+  /** The id the heading takes, which names the section around the list. */
+  readonly headingId: string;
 }

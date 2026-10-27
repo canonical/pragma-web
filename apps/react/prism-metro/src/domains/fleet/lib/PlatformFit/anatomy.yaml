@@ -1,13 +1,15 @@
 ---
 # PlatformFit — how a formation fits the platforms of each line it runs on:
-# per line, the line (its code, then its name: its title, or the Line chip
-# the caller renders), its shortest known platform, the verdict (fits, or
-# overhangs with a count badge of the stations), and each station overhung
+# per line, a row: the line's name (its title, or the Line chip the caller
+# renders), its shortest known platform, and the verdict in bold pushed to
+# the row's end (fits, or overhangs with a count badge of the stations), so
+# the verdicts line up; then each station overhung, on a line of its own,
 # with how far the train runs past its platform. A formation no line runs
 # says so in one muted line instead.
 #
 # Token ledger: space.100 (8px) between the words of a line's entry, an
-# inline run, one baseline pair; no gutter, since the entry is no grid.
+# inline run, one baseline pair; "auto" before the verdict, which takes the
+# space left on its row.
 node:
   uri: metro.component.platform_fit
   styles:
@@ -25,7 +27,7 @@ node:
           layout.listStyle: none
       relation: { cardinality: "0..1", slotName: lines }
     - node:
-        role: line entry
+        role: line entry, its name, shortest platform and verdict in a row
         styles:
           layout.type: flex
           layout.wrap: wrap
@@ -33,13 +35,8 @@ node:
           spacing.gap: space.100
       relation: { cardinality: "0..*", slotName: line }
     - node:
-        role: line, as its code and its name
+        role: line's name
       relation: { cardinality: "1", slotName: line-name }
-    - node:
-        role: line code
-        styles:
-          typography.fontFamily: "ui-monospace, monospace"
-      relation: { cardinality: "1", slotName: code }
     - node:
         role: shortest platform
         styles:
@@ -47,6 +44,9 @@ node:
       relation: { cardinality: "0..1", slotName: shortest }
     - node:
         role: verdict
+        styles:
+          spacing.external.inline.start: auto
+          typography.weight: typography.text.primary.bold.fontWeight
         edges:
           - node:
               uri: global.component.badge

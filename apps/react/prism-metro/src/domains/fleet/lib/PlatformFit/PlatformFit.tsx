@@ -11,13 +11,16 @@ const componentCssClassName = "ds platform-fit";
 
 /**
  * How a formation fits the platforms of each line it runs on. Per line: the
- * line, by its code and its title; its shortest known platform; the
+ * line, by its name; its shortest known platform; the
  * verdict, "Fits", or "Overhangs" with a badge counting the stations; and
  * each station overhung, with how far the train runs past its platform. A
  * formation no line runs says so in one line instead.
  *
- * The line reads as its code, then its name: its title, or what
- * `renderName` makes of the fit, such as the line's chip.
+ * Each line's entry is a row: the line's name (its title, or what
+ * `renderName` makes of the fit, such as the line's chip), its shortest
+ * platform, and the verdict in bold, pushed to the row's end so the
+ * verdicts line up down the list. The stations overhung take a line of
+ * their own under it.
  *
  * `import { PlatformFit } from "./PlatformFit/index.js";`
  */
@@ -41,9 +44,7 @@ const PlatformFit = ({
             const { code, shortest, overhangs } = fit;
             return (
               <li className="line" key={code}>
-                <span className="line-name">
-                  <code className="code">{code}</code> {renderName(fit)}
-                </span>
+                <span className="line-name">{renderName(fit)}</span>
                 {shortest === null ? null : (
                   <span className="shortest">
                     {t("fleet.platformFit.shortest", {

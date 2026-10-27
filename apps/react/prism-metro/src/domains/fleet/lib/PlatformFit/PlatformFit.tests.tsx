@@ -8,12 +8,12 @@ import measurePlatformFit from "../measurePlatformFit.js";
 import PlatformFit from "./PlatformFit.js";
 
 describe("PlatformFit", () => {
-  it("names each line by its code and title", () => {
+  it("names each line by its title", () => {
     render(
       <PlatformFit fits={measurePlatformFit(60000, [NORTH_LINE_PLATFORMS])} />,
     );
     const line = screen.getByRole("listitem");
-    expect(line.querySelector(".line-name")).toHaveTextContent("1 North Line");
+    expect(line.querySelector(".line-name")).toHaveTextContent("North Line");
     expect(line).toHaveTextContent("Shortest platform 100 m");
     expect(line).toHaveTextContent("Fits");
   });
@@ -57,7 +57,7 @@ describe("PlatformFit", () => {
       />,
     );
     expect(container.querySelector(".line-name")).toHaveTextContent(
-      "1 NORTH LINE",
+      "NORTH LINE",
     );
   });
 });

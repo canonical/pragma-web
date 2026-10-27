@@ -8,8 +8,12 @@
     --platform-fit-gap: var(--grid-gutter);
     /* One baseline pair between the words of a line's entry. */
     --platform-fit-entry-spacing: var(--space-100);
-    /* No monospace family token sits above the primitive tier. */
-    --platform-fit-code-font-family: ui-monospace, monospace;
+    /* The verdict takes the space left on its row, so verdicts line up at
+     * the row's end. */
+    --platform-fit-verdict-margin-inline-start: auto;
+    --platform-fit-verdict-font-weight: var(
+      --typography-text-primary-bold-font-weight
+    );
     --platform-fit-secondary-color: var(--color-text-muted);
 
     display: grid;
@@ -32,15 +36,16 @@
     gap: var(--platform-fit-entry-spacing);
   }
 
-  .ds.platform-fit .code {
-    font-family: var(--platform-fit-code-font-family);
-  }
-
   .ds.platform-fit .shortest {
     color: var(--platform-fit-secondary-color);
   }
 
-  /* The stations overhung take a line of their own under the entry. */
+  .ds.platform-fit .verdict {
+    margin-inline-start: var(--platform-fit-verdict-margin-inline-start);
+    font-weight: var(--platform-fit-verdict-font-weight);
+  }
+
+  /* The stations overhung take the whole row under the entry. */
   .ds.platform-fit .overhangs {
     flex-basis: 100%;
     padding-inline-start: 0;
