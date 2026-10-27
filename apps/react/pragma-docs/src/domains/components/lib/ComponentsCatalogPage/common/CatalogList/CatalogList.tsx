@@ -63,6 +63,13 @@ void declareCatalogFragment;
 
 const componentCssClassName = "ds catalog-list";
 
+/**
+ * The id of the line that names the tier navigation while pages remain:
+ * fixed, not generated, since the server and the client must agree on it
+ * and the page holds one catalog.
+ */
+const PARTIAL_LINE_ID = "catalog-tiers-partial";
+
 /** The id of a tier's section, which its jump link targets. */
 const nameTierAnchor = (tier: string): string =>
   `catalog-tier-${tier.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
@@ -77,10 +84,10 @@ const nameTierAnchor = (tier: string): string =>
  * page in the graph, a published Button loads the next hundred, and each
  * count says it holds only the components loaded so far: the connection
  * carries no total, so a bare count would state a tier's size it cannot
- * know. The jump links' navigation is named the same way while pages
- * remain, since a tier may have no component loaded yet; a tier a later
- * page brings takes its place in the same order, Global first and the rest
- * alphabetically.
+ * know. While pages remain, the jump links' navigation opens with a muted
+ * line saying the same, which names it, since a tier may have no component
+ * loaded yet; a tier a later page brings takes its place in the same order,
+ * Global first and the rest alphabetically.
  *
  * It fills `EntityList` itself rather than rendering `NodeList`: NodeList's
  * fragment spreads the core card and row projections, which select only
@@ -124,9 +131,15 @@ export default function CatalogList({
         <EntityList empty={t("catalog.empty")} />
       ) : (
         <nav
-          aria-label={t(hasNext ? "catalog.tiersLoaded" : "catalog.tiers")}
+          aria-label={hasNext ? undefined : t("catalog.tiers")}
+          aria-labelledby={hasNext ? PARTIAL_LINE_ID : undefined}
           className="tiers"
         >
+          {hasNext ? (
+            <p className="partial" id={PARTIAL_LINE_ID}>
+              {t("catalog.tiersLoaded")}
+            </p>
+          ) : null}
           <ul className="links">
             {tiers.map(({ tier }) => (
               <li key={tier}>

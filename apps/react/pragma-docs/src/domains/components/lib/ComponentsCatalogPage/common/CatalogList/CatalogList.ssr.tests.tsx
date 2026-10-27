@@ -9,8 +9,9 @@ import catalogRecords from "../../../../__fixtures__/catalogRecords.js";
 describe("CatalogList SSR", () => {
   it("server-renders the jump links, each tier's list and the load-more line", () => {
     const html = renderToString(catalogPage(catalogRecords, createFetchSpy()));
+    // The visible line names the navigation while pages remain.
     expect(html).toContain(
-      '<nav aria-label="Tiers of the components loaded so far" class="tiers">',
+      '<nav aria-labelledby="catalog-tiers-partial" class="tiers"><p class="partial" id="catalog-tiers-partial">Tiers of the components loaded so far</p>',
     );
     expect(html).toContain('id="catalog-tier-global"');
     expect(html).toContain('class="ds entity-list"');

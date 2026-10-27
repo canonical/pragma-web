@@ -9,10 +9,11 @@
 # list carries its own count. A graph with no components leaves the shared
 # list view's empty line. When the graph holds more than one page, a
 # published Button loads the next hundred, and each count reads as the
-# components loaded so far, since the connection carries no total; the
-# jump links' navigation is named as the tiers of the components loaded so
-# far while pages remain, a tier a later page brings taking its place in
-# the same order.
+# components loaded so far, since the connection carries no total; while
+# pages remain the jump links' navigation opens with a muted line saying
+# it holds the tiers of the components loaded so far, the line naming the
+# navigation, a tier a later page brings taking its place in the same
+# order.
 #
 # Why EntityList and not NodeList, the shared projection over it: NodeList's
 # fragment spreads the core card and row projections, which select only the
@@ -24,15 +25,17 @@
 # design-system types' arms.
 #
 # The root is a subgrid of the page over every column, its gap the grid's
-# gutter on both axes; the jump links sit on one wrapping line, a gutter
-# apart, with no markers or insets.
+# gutter on both axes; the navigation's line and the jump links sit on one
+# wrapping line, a gutter apart and on a shared baseline, the links with no
+# markers or insets.
 #
 # Every decision is read through a component token declared on the root
 # (`--catalog-list-*`), bound to the symbol named here.
 #
 # Token ledger:
 #   layout.grid.column "1 / -1": structure. layout.wrap wrap,
-#   layout.listStyle none: keywords. The 0 resets on the list and the line.
+#   layout.align baseline, layout.listStyle none: keywords. The 0 resets on
+#   the partial line, the list and the load-more line.
 #
 # Roster namespaces (accepted and tracked): grid.gutter.
 node:
@@ -49,7 +52,18 @@ node:
         role: tiers (the jump links' navigation)
         styles:
           layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap: grid.gutter
         edges:
+          - node:
+              role: partial (the line naming the tiers loaded so far)
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+            relation: { cardinality: "0..1", slotName: partial }
           - node:
               role: links
               styles:
