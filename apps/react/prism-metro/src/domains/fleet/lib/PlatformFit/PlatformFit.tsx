@@ -16,13 +16,14 @@ const componentCssClassName = "ds platform-fit";
  * each station overhung, with how far the train runs past its platform. A
  * formation no line runs says so in one line instead.
  *
- * The line renders as its code and its title until the Line chip
- * projection takes its place; the element carries `data-placeholder`.
+ * The line reads as its code, then its name: its title, or what
+ * `renderName` makes of the fit, such as the line's chip.
  *
  * `import { PlatformFit } from "./PlatformFit/index.js";`
  */
 const PlatformFit = ({
   fits,
+  renderName = ({ title }) => title,
   className,
   ...props
 }: PlatformFitProps): React.ReactElement => {
@@ -36,47 +37,50 @@ const PlatformFit = ({
         <p className="empty">{t("fleet.platformFit.none")}</p>
       ) : (
         <ul className="lines">
-          {fits.map(({ title, code, shortest, overhangs }) => (
-            <li className="line" key={code}>
-              <span className="line-name" data-placeholder="entity-chip">
-                <code className="code">{code}</code> {title}
-              </span>
-              {shortest === null ? null : (
-                <span className="shortest">
-                  {t("fleet.platformFit.shortest", {
-                    length: formatLength(shortest),
-                  })}
+          {fits.map((fit) => {
+            const { code, shortest, overhangs } = fit;
+            return (
+              <li className="line" key={code}>
+                <span className="line-name">
+                  <code className="code">{code}</code> {renderName(fit)}
                 </span>
-              )}
-              <span className="verdict">
-                {overhangs.length === 0 ? (
-                  t("fleet.fits")
-                ) : (
-                  <>
-                    {t("fleet.overhangs")}{" "}
-                    <Badge
-                      className="count"
-                      criticality="error"
-                      value={overhangs.length}
-                    />
-                  </>
+                {shortest === null ? null : (
+                  <span className="shortest">
+                    {t("fleet.platformFit.shortest", {
+                      length: formatLength(shortest),
+                    })}
+                  </span>
                 )}
-              </span>
-              {overhangs.length === 0 ? null : (
-                <ul className="overhangs">
-                  {overhangs.map((overhang) => (
-                    <li key={overhang.title}>
-                      {t("fleet.platformFit.overhang", {
-                        station: overhang.title,
-                        excess: formatLength(overhang.excess),
-                        platform: formatLength(overhang.platformLength),
-                      })}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
+                <span className="verdict">
+                  {overhangs.length === 0 ? (
+                    t("fleet.fits")
+                  ) : (
+                    <>
+                      {t("fleet.overhangs")}{" "}
+                      <Badge
+                        className="count"
+                        criticality="error"
+                        value={overhangs.length}
+                      />
+                    </>
+                  )}
+                </span>
+                {overhangs.length === 0 ? null : (
+                  <ul className="overhangs">
+                    {overhangs.map((overhang) => (
+                      <li key={overhang.title}>
+                        {t("fleet.platformFit.overhang", {
+                          station: overhang.title,
+                          excess: formatLength(overhang.excess),
+                          platform: formatLength(overhang.platformLength),
+                        })}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

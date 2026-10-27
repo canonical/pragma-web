@@ -1,3 +1,4 @@
+import { ChipProjection } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useId } from "react";
 import { useMessages } from "#i18n";
@@ -8,7 +9,6 @@ import assertFragment from "../../../assertFragment.js";
 import { FormationSideView } from "../../../FormationSideView/index.js";
 import formatLength from "../../../formatLength.js";
 import measurePlatformFit from "../../../measurePlatformFit.js";
-import { NodeLink } from "../../../NodeLink/index.js";
 import orientCars from "../../../orientCars.js";
 import { PlatformFit } from "../../../PlatformFit/index.js";
 import readFormationLines from "../../../readFormationLines.js";
@@ -16,9 +16,10 @@ import readFormationTrain from "../../../readFormationTrain.js";
 import type { FormationDetailProps } from "./types.js";
 
 /**
- * A formation's page, once its data is in the store: its title, its stock,
- * its side view with a tick at each line's shortest platform, its units in
- * order, then its fit at the platforms of every line it runs on. An address
+ * A formation's page, once its data is in the store: its title, its stock's
+ * chip, its side view with a tick at each line's shortest platform, its
+ * units in order, each named by its chip, then its fit at the platforms of
+ * every line it runs on, each line named by its chip. An address
  * naming no formation says nothing lives there.
  */
 export default function FormationDetail({
@@ -52,14 +53,13 @@ export default function FormationDetail({
     ),
   );
   const units = [...node.units].sort((a, b) => a.position - b.position);
+  const lines = new Map(node.lines.map((line) => [line.code, line]));
   return (
     <>
       <Head title={node._meta.title} />
       <h1 className="title">{node._meta.title}</h1>
-      <p className="entry" data-placeholder="entity-chip">
-        <NodeLink address={node.stock._meta.curie} typename="RollingStock">
-          {node.stock._meta.title}
-        </NodeLink>
+      <p className="entry">
+        <ChipProjection node={node.stock} />
       </p>
       <FormationSideView
         cars={orientCars(
@@ -77,10 +77,8 @@ export default function FormationDetail({
         <h2 id={unitsId}>{t("fleet.units")}</h2>
         <ol className="list">
           {units.map(({ position, reversed, unit }) => (
-            <li className="entry" data-placeholder="entity-row" key={position}>
-              <NodeLink address={unit._meta.curie} typename="Unit">
-                {unit._meta.title}
-              </NodeLink>
+            <li className="entry" key={position}>
+              <ChipProjection node={unit} />
               <span className="vital">{formatLength(unit.length)}</span>
               {reversed ? (
                 <span className="vital">{t("fleet.reversed")}</span>
@@ -91,7 +89,13 @@ export default function FormationDetail({
       </section>
       <section aria-labelledby={fitId} className="section">
         <h2 id={fitId}>{t("fleet.platformFit")}</h2>
-        <PlatformFit fits={fits} />
+        <PlatformFit
+          fits={fits}
+          renderName={({ code, title }) => {
+            const line = lines.get(code);
+            return line === undefined ? title : <ChipProjection node={line} />;
+          }}
+        />
       </section>
     </>
   );

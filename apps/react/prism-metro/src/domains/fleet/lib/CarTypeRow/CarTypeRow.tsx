@@ -14,6 +14,7 @@ import "./styles.css";
 const declareNodeFragment = (): unknown => graphql`
   fragment CarTypeRow_node on CarType {
     __typename
+    code
     length
     _meta {
       title
@@ -27,8 +28,8 @@ void declareNodeFragment;
 const componentCssClassName = "ds car-type-row";
 
 /**
- * A car type as a 32px list entry: its name, linked to the car type's
- * page, and its length.
+ * A car type as a 32px list entry: its code leading its name, the name
+ * linked to the car type's page, and its length.
  *
  * Native props reach the root the EntityRow renders; a consumer
  * `className` merges after the projection's own, and the root carries the
@@ -56,6 +57,7 @@ export default function CarTypeRow({
       data-type={data.__typename}
       href={href}
       LinkComponent={LinkComponent}
+      location={<code className="identifier">{data.code}</code>}
       meta={formatLength(data.length)}
       title={title}
     />

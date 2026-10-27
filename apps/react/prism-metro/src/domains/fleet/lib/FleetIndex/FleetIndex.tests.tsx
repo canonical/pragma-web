@@ -2,18 +2,30 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { render, screen, within } from "@testing-library/react";
+import { createMemoryAdapter, createRouter } from "@canonical/router-core";
+import { RouterProvider } from "@canonical/router-react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ROLLING_STOCK_COUNT } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
+import { appRoutes } from "../../../../routes.js";
 import FleetIndex from "./FleetIndex.js";
 
 afterEach(() => {
   setPrefetchEnvironment(undefined);
 });
 
-/** Render the index alone, over an environment answering with `response`. */
+/**
+ * Render the index alone at `/fleet`, over an environment answering with
+ * `response`.
+ */
 const renderWithAnswer = (response: Promise<unknown>) =>
   render(
     <RelayEnvironmentProvider
@@ -21,31 +33,58 @@ const renderWithAnswer = (response: Promise<unknown>) =>
         fetchFn: vi.fn().mockReturnValue(response),
       })}
     >
-      <FleetIndex />
+      <RouterProvider
+        router={createRouter(appRoutes, {
+          adapter: createMemoryAdapter("/fleet"),
+        })}
+      >
+        <FleetIndex />
+      </RouterProvider>
     </RelayEnvironmentProvider>,
   );
 
 describe("FleetIndex", () => {
-  it("lists every rolling stock, each with its formations at one scale", async () => {
+  it("lists every rolling stock as a card, its formations at one scale", async () => {
     const { container } = renderMetroPage("/fleet");
-    const list = await screen
-      .findByRole("list", { name: "" })
-      .catch(() => container.querySelector('[data-placeholder="entity-list"]'));
-    expect(list).toHaveAttribute("data-placeholder", "entity-list");
-    const stocks = container.querySelectorAll(
-      '.stock[data-placeholder="entity-card"]',
-    );
-    expect(stocks).toHaveLength(ROLLING_STOCK_COUNT);
-    const series90 = [...stocks].find((stock) =>
-      stock.textContent?.includes("Series 90 six-car"),
+    const cards = await waitFor(() => {
+      const found = container.querySelectorAll(
+        ".ds.node-list .rolling-stock-card",
+      );
+      expect(found).toHaveLength(ROLLING_STOCK_COUNT);
+      return [...found];
+    });
+    const series90 = cards.find((card) =>
+      card.textContent?.includes("Series 90"),
     ) as HTMLElement;
-    const widths = [...series90.querySelectorAll("svg.drawing")].map((svg) =>
-      svg.getAttribute("viewBox")?.split(" ").at(2),
+    const widths = [...series90.querySelectorAll(".sidecar svg.drawing")].map(
+      (svg) => svg.getAttribute("viewBox")?.split(" ").at(2),
     );
     expect(widths).toEqual(["120000", "120000"]);
     expect(
       within(series90).getByRole("link", { name: "Series 90" }),
     ).toHaveAttribute("href", "/fleet/metro%3Aseries-90");
+    expect(container.querySelector(".ds.node-list .count")).toHaveTextContent(
+      `${ROLLING_STOCK_COUNT} rolling stocks`,
+    );
+  });
+
+  it("lists the rolling stock as rows when the address asks for them", async () => {
+    const { container } = renderMetroPage("/fleet?view=rows");
+    await waitFor(() => {
+      expect(
+        container.querySelectorAll(".ds.node-list .rolling-stock-row"),
+      ).toHaveLength(ROLLING_STOCK_COUNT);
+    });
+    expect(container.querySelector(".rolling-stock-card")).toBeNull();
+  });
+
+  it("switches to rows when the reader picks them", async () => {
+    const { container } = renderMetroPage("/fleet");
+    await screen.findByRole("link", { name: "Series 90" });
+    fireEvent.click(screen.getByRole("button", { name: "Rows" }));
+    await waitFor(() => {
+      expect(container.querySelector(".rolling-stock-row")).not.toBeNull();
+    });
   });
 
   it("says so while the fleet is on its way", () => {

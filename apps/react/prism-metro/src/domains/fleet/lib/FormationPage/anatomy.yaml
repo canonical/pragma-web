@@ -1,13 +1,13 @@
 ---
 # FormationPage — the fleet lens's page of one formation, in the document
 # archetype's canvas, beside its facts in the aside: its title, then
-# its stock, its side view with a tick at each line's shortest platform, its units in order, then its fit at the platforms of every line it runs on. Sections sit a loose step apart, more than the gutter
+# its stock's chip, its side view with a tick at each line's shortest
+# platform, its units in order, each named by its chip, then its fit at
+# the platforms of every line it runs on, each line named by its chip.
+# Sections sit a loose step apart, more than the gutter
 # between the items inside them. While the page's data is on its way it
 # says so in one muted line; a failed read says so as an alert; an address
 # naming nothing of its type says that nothing lives there.
-#
-# Entries name their node by its title, linked to its home, where a
-# projection will go; each such element carries `data-placeholder`.
 #
 # Token ledger: container.gap.loose between sections, an item's external
 # spacing, never a gap; space.100 (8px) between the words of an entry, an
@@ -41,7 +41,7 @@ node:
           layout.listStyle: none
       relation: { cardinality: "0..*", slotName: list }
     - node:
-        role: entry, a node named by its title (placeholder for its projection)
+        role: entry, a node's chip and its vitals
         styles:
           layout.type: flex
           layout.wrap: wrap

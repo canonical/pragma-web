@@ -7,8 +7,6 @@
    * apart. */
   .ds.fleet-index {
     --fleet-index-gap: var(--grid-gutter);
-    /* One baseline pair between the words of an entry. */
-    --fleet-index-entry-spacing: var(--space-100);
     --fleet-index-secondary-color: var(--color-text-muted);
     --fleet-index-error-color: var(--color-text-error);
 
@@ -16,36 +14,6 @@
     display: grid;
     gap: var(--fleet-index-gap);
     align-self: start;
-  }
-
-  .ds.fleet-index .list {
-    display: grid;
-    gap: var(--fleet-index-gap);
-    padding-inline-start: 0;
-    margin-block-start: 0;
-    margin-block-end: 0;
-    list-style: none;
-  }
-
-  .ds.fleet-index .stock {
-    display: grid;
-    gap: var(--fleet-index-gap);
-  }
-
-  .ds.fleet-index .sidecar {
-    display: grid;
-    gap: var(--fleet-index-gap);
-  }
-
-  .ds.fleet-index .entry {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--fleet-index-entry-spacing);
-  }
-
-  .ds.fleet-index .vital {
-    color: var(--fleet-index-secondary-color);
   }
 
   .ds.fleet-index .status {

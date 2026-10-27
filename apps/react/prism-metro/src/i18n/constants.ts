@@ -22,6 +22,7 @@ export const MESSAGES = {
   "lens.fleet": "Fleet",
   "fleet.index.loading": "Loading the fleet…",
   "fleet.index.error": "The fleet could not be loaded.",
+  "fleet.stocks.kind": { one: "rolling stock", other: "rolling stocks" },
   "fleet.index.empty": "The graph lists no rolling stock.",
   "fleet.page.loading": "Loading…",
   "fleet.page.error": "This page could not be loaded.",

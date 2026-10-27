@@ -1,3 +1,4 @@
+import type { EntityListView } from "@canonical/prism-projections";
 import { MESSAGES } from "#i18n";
 import type { FleetNodeKind } from "./types.js";
 
@@ -49,6 +50,22 @@ export const FLEET_CLASS_URI = "metro:RollingStock";
  * small; the index shows it whole.
  */
 export const FLEET_PAGE_SIZE = 50;
+
+/** The two ways the index shows the fleet. */
+export const FLEET_VIEWS: readonly EntityListView[] = ["cards", "rows"];
+
+/**
+ * The search parameter the index keeps its view in, so a view survives a
+ * reload and travels with a shared link: `/fleet?view=rows`.
+ */
+export const FLEET_VIEW_PARAM = "view";
+
+/**
+ * The view the index shows when the address names none, or names one it
+ * does not know: cards, whose sidecars draw each stock's formations. The
+ * address carries the parameter only for the other view.
+ */
+export const DEFAULT_FLEET_VIEW: EntityListView = "cards";
 
 // The side view's drawing constants, in the drawing's own space: whole
 // millimetres along and across the train, the unit the graph measures cars

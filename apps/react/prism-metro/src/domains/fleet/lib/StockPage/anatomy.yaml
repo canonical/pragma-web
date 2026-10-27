@@ -1,18 +1,16 @@
 ---
 # StockPage — the fleet lens's page of one rolling stock, in the document
 # archetype's canvas, beside its facts in the aside: its title, then
-# its formations, each linked to its page and drawn at one scale with the others, then the car types its units are made of. Sections sit a loose step apart, more than the gutter
+# its formations, each named by its chip and drawn at one scale with the
+# others, then the car types its units are made of, as rows. Sections sit
+# a loose step apart, more than the gutter
 # between the items inside them. While the page's data is on its way it
 # says so in one muted line; a failed read says so as an alert; an address
 # naming nothing of its type says that nothing lives there.
 #
-# Entries name their node by its title, linked to its home, where a
-# projection will go; each such element carries `data-placeholder`.
-#
 # Token ledger: container.gap.loose between sections, an item's external
 # spacing, never a gap; space.100 (8px) between the words of an entry, an
-# inline run, one baseline pair; "ui-monospace, monospace" for car codes:
-# no monospace family token sits above the primitive tier.
+# inline run, one baseline pair.
 node:
   uri: metro.component.stock_page
   styles:
@@ -42,7 +40,15 @@ node:
           layout.listStyle: none
       relation: { cardinality: "0..*", slotName: list }
     - node:
-        role: entry, a node named by its title (placeholder for its projection)
+        role: list of rows
+        styles:
+          spacing.internal.inline.start: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          layout.listStyle: none
+      relation: { cardinality: "0..1", slotName: rows }
+    - node:
+        role: entry, a formation's chip and its length
         styles:
           layout.type: flex
           layout.wrap: wrap
@@ -54,11 +60,6 @@ node:
         styles:
           typography.color: color.text.muted
       relation: { cardinality: "0..*", slotName: vital }
-    - node:
-        role: car code
-        styles:
-          typography.fontFamily: "ui-monospace, monospace"
-      relation: { cardinality: "0..*", slotName: code }
     - node:
         uri: metro.component.formation_side_view
       relation: { cardinality: "0..*", slotName: side-view }

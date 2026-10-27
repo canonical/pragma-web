@@ -1,3 +1,4 @@
+import { ChipProjection, RowProjection } from "@canonical/prism-projections";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, useId } from "react";
 import { useMessages } from "#i18n";
@@ -7,15 +8,14 @@ import { useFleetNode } from "../../../../hooks/index.js";
 import { FormationSideView } from "../../../FormationSideView/index.js";
 import findScaleLength from "../../../findScaleLength.js";
 import formatLength from "../../../formatLength.js";
-import { NodeLink } from "../../../NodeLink/index.js";
 import orientCars from "../../../orientCars.js";
 import readFormationTrain from "../../../readFormationTrain.js";
 import type { StockDetailProps } from "./types.js";
 
 /**
  * A rolling stock's page, once its data is in the store: its title, its
- * formations at one scale, each linked to its page with its length, then
- * the car types its units are made of, each once, by code. An address
+ * formations at one scale, each named by its chip with its length, then
+ * the car types its units are made of, each once, as its row. An address
  * naming no rolling stock says nothing lives there.
  */
 export default function StockDetail({
@@ -61,10 +61,8 @@ export default function StockDetail({
         <ol className="list">
           {formations.map((formation) => (
             <li key={formation.uri}>
-              <p className="entry" data-placeholder="entity-row">
-                <NodeLink address={formation._meta.curie} typename="Formation">
-                  {formation._meta.title}
-                </NodeLink>
+              <p className="entry">
+                <ChipProjection node={formation} />
                 <span className="vital">{formatLength(formation.length)}</span>
               </p>
               <FormationSideView
@@ -78,19 +76,9 @@ export default function StockDetail({
       </section>
       <section aria-labelledby={carTypesId} className="section">
         <h2 id={carTypesId}>{t("fleet.carTypes")}</h2>
-        <ul className="list">
+        <ul className="rows">
           {carTypes.map((carType) => (
-            <li
-              className="entry"
-              data-placeholder="entity-row"
-              key={carType.uri}
-            >
-              <code className="code">{carType.code}</code>
-              <NodeLink address={carType._meta.curie} typename="CarType">
-                {carType._meta.title}
-              </NodeLink>
-              <span className="vital">{formatLength(carType.length)}</span>
-            </li>
+            <RowProjection key={carType.uri} node={carType} />
           ))}
         </ul>
       </section>

@@ -17,7 +17,10 @@ const declareFleetNamespacesQuery = (): unknown => graphql`
 `;
 void declareFleetNamespacesQuery;
 
-/** The index: every rolling stock, with its formations' side views. */
+/**
+ * The index: every instance of the rolling-stock class, each as the list
+ * view's card and row, which draw its formations and count them.
+ */
 const declareFleetIndexQuery = (): unknown => graphql`
   query FleetIndexQuery($classUri: String!, $count: Int!) {
     ontologyClass(uri: $classUri) {
@@ -25,22 +28,7 @@ const declareFleetIndexQuery = (): unknown => graphql`
         edges {
           node {
             __typename
-            ... on RollingStock {
-              uri
-              _meta {
-                title
-                curie
-              }
-              formations {
-                uri
-                length
-                _meta {
-                  title
-                  curie
-                }
-                ...readFormationTrain_formation
-              }
-            }
+            ...NodeList_node
           }
         }
       }
@@ -50,8 +38,8 @@ const declareFleetIndexQuery = (): unknown => graphql`
 void declareFleetIndexQuery;
 
 /**
- * A stock's page: its formations, drawn at one scale, with their measures
- * and lines, and the car types its units are made of.
+ * A stock's page: its formations, each named by its chip and drawn at one
+ * scale, and the car types its units are made of, each as its row.
  */
 const declareStockPageQuery = (): unknown => graphql`
   query StockPageQuery($id: ID!) {
@@ -60,30 +48,18 @@ const declareStockPageQuery = (): unknown => graphql`
       ... on RollingStock {
         _meta {
           title
-          curie
         }
         formations {
           uri
           length
           capacity
-          _meta {
-            title
-            curie
-          }
-          lines {
-            uri
-          }
+          ...ChipProjection_node
           units {
             unit {
               cars {
                 carType {
                   uri
-                  code
-                  length
-                  _meta {
-                    title
-                    curie
-                  }
+                  ...RowProjection_node
                 }
               }
             }
@@ -97,8 +73,9 @@ const declareStockPageQuery = (): unknown => graphql`
 void declareStockPageQuery;
 
 /**
- * A formation's page: its stock, its measures, its units in order, its side
- * view and its fit at the platforms of every line it runs on.
+ * A formation's page: its stock's chip, its side view, its units in order,
+ * each named by its chip, and its fit at the platforms of every line it
+ * runs on, each line named by its chip.
  */
 const declareFormationPageQuery = (): unknown => graphql`
   query FormationPageQuery($id: ID!) {
@@ -109,26 +86,24 @@ const declareFormationPageQuery = (): unknown => graphql`
         capacity
         _meta {
           title
-          curie
         }
         stock {
-          uri
           _meta {
             title
-            curie
           }
+          ...ChipProjection_node
         }
         units {
           position
           reversed
           unit {
-            uri
             length
-            _meta {
-              title
-              curie
-            }
+            ...ChipProjection_node
           }
+        }
+        lines {
+          code
+          ...ChipProjection_node
         }
         ...readFormationTrain_formation @alias
         ...readFormationLines_formation @alias

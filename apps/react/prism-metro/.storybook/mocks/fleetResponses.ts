@@ -56,19 +56,24 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
               {
                 node: {
                   __typename: "RollingStock",
+                  __isNode: "RollingStock",
                   uri: "https://metro.example/onto#series-50",
                   _meta: {
                     title: "Series 50",
                     curie: "metro:series-50",
+                    definition: null,
+                    type: {
+                      _meta: {
+                        title: "Rolling stock",
+                      },
+                      uri: "https://metro.example/onto#RollingStock",
+                    },
                   },
                   formations: [
                     {
                       uri: "https://metro.example/onto#series-50-four-car",
                       length: 62000,
-                      _meta: {
-                        title: "Series 50 four-car",
-                        curie: "metro:series-50-four-car",
-                      },
+                      capacity: 460,
                       units: [
                         {
                           position: 1,
@@ -148,19 +153,24 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
               {
                 node: {
                   __typename: "RollingStock",
+                  __isNode: "RollingStock",
                   uri: "https://metro.example/onto#series-70",
                   _meta: {
                     title: "Series 70",
                     curie: "metro:series-70",
+                    definition: null,
+                    type: {
+                      _meta: {
+                        title: "Rolling stock",
+                      },
+                      uri: "https://metro.example/onto#RollingStock",
+                    },
                   },
                   formations: [
                     {
                       uri: "https://metro.example/onto#series-70-fixed",
                       length: 107200,
-                      _meta: {
-                        title: "Series 70 fixed formation",
-                        curie: "metro:series-70-fixed",
-                      },
+                      capacity: 880,
                       units: [
                         {
                           position: 1,
@@ -257,19 +267,24 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
               {
                 node: {
                   __typename: "RollingStock",
+                  __isNode: "RollingStock",
                   uri: "https://metro.example/onto#series-90",
                   _meta: {
                     title: "Series 90",
                     curie: "metro:series-90",
+                    definition: null,
+                    type: {
+                      _meta: {
+                        title: "Rolling stock",
+                      },
+                      uri: "https://metro.example/onto#RollingStock",
+                    },
                   },
                   formations: [
                     {
                       uri: "https://metro.example/onto#series-90-three-car",
                       length: 60000,
-                      _meta: {
-                        title: "Series 90 three-car",
-                        curie: "metro:series-90-three-car",
-                      },
+                      capacity: 490,
                       units: [
                         {
                           position: 1,
@@ -324,10 +339,7 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                     {
                       uri: "https://metro.example/onto#series-90-six-car",
                       length: 120000,
-                      _meta: {
-                        title: "Series 90 six-car",
-                        curie: "metro:series-90-six-car",
-                      },
+                      capacity: 980,
                       units: [
                         {
                           position: 1,
@@ -448,22 +460,18 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
           __typename: "RollingStock",
           _meta: {
             title: "Series 90",
-            curie: "metro:series-90",
           },
           formations: [
             {
               uri: "https://metro.example/onto#series-90-three-car",
               length: 60000,
               capacity: 490,
+              __isNode: "Formation",
+              __typename: "Formation",
               _meta: {
                 title: "Series 90 three-car",
                 curie: "metro:series-90-three-car",
               },
-              lines: [
-                {
-                  uri: "https://metro.example/onto#upland-line",
-                },
-              ],
               units: [
                 {
                   unit: {
@@ -471,12 +479,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-driving",
-                          code: "DM",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 driving motor car",
                             curie: "metro:car-90-driving",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "DM",
+                          length: 20000,
                           hasCab: true,
                         },
                         position: 1,
@@ -485,12 +501,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-trailer",
-                          code: "T",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 trailer car",
                             curie: "metro:car-90-trailer",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "T",
+                          length: 20000,
                           hasCab: false,
                         },
                         position: 2,
@@ -499,12 +523,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-driving",
-                          code: "DM",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 driving motor car",
                             curie: "metro:car-90-driving",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "DM",
+                          length: 20000,
                           hasCab: true,
                         },
                         position: 3,
@@ -522,18 +554,12 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
               uri: "https://metro.example/onto#series-90-six-car",
               length: 120000,
               capacity: 980,
+              __isNode: "Formation",
+              __typename: "Formation",
               _meta: {
                 title: "Series 90 six-car",
                 curie: "metro:series-90-six-car",
               },
-              lines: [
-                {
-                  uri: "https://metro.example/onto#coastal-line",
-                },
-                {
-                  uri: "https://metro.example/onto#north-line",
-                },
-              ],
               units: [
                 {
                   unit: {
@@ -541,12 +567,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-driving",
-                          code: "DM",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 driving motor car",
                             curie: "metro:car-90-driving",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "DM",
+                          length: 20000,
                           hasCab: true,
                         },
                         position: 1,
@@ -555,12 +589,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-trailer",
-                          code: "T",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 trailer car",
                             curie: "metro:car-90-trailer",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "T",
+                          length: 20000,
                           hasCab: false,
                         },
                         position: 2,
@@ -569,12 +611,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-driving",
-                          code: "DM",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 driving motor car",
                             curie: "metro:car-90-driving",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "DM",
+                          length: 20000,
                           hasCab: true,
                         },
                         position: 3,
@@ -592,12 +642,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-driving",
-                          code: "DM",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 driving motor car",
                             curie: "metro:car-90-driving",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "DM",
+                          length: 20000,
                           hasCab: true,
                         },
                         position: 1,
@@ -606,12 +664,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-trailer",
-                          code: "T",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 trailer car",
                             curie: "metro:car-90-trailer",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "T",
+                          length: 20000,
                           hasCab: false,
                         },
                         position: 2,
@@ -620,12 +686,20 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                       {
                         carType: {
                           uri: "https://metro.example/onto#car-90-driving",
-                          code: "DM",
-                          length: 20000,
+                          __isNode: "CarType",
+                          __typename: "CarType",
                           _meta: {
                             title: "Series 90 driving motor car",
                             curie: "metro:car-90-driving",
+                            type: {
+                              _meta: {
+                                title: "Car type",
+                              },
+                              uri: "https://metro.example/onto#CarType",
+                            },
                           },
+                          code: "DM",
+                          length: 20000,
                           hasCab: true,
                         },
                         position: 3,
@@ -658,26 +732,29 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
           capacity: 980,
           _meta: {
             title: "Series 90 six-car",
-            curie: "metro:series-90-six-car",
           },
           stock: {
-            uri: "https://metro.example/onto#series-90",
             _meta: {
               title: "Series 90",
               curie: "metro:series-90",
             },
+            __isNode: "RollingStock",
+            __typename: "RollingStock",
+            uri: "https://metro.example/onto#series-90",
           },
           units: [
             {
               position: 1,
               reversed: false,
               unit: {
-                uri: "https://metro.example/onto#unit-90",
                 length: 60000,
+                __isNode: "Unit",
+                __typename: "Unit",
                 _meta: {
                   title: "Series 90 unit",
                   curie: "metro:unit-90",
                 },
+                uri: "https://metro.example/onto#unit-90",
                 cars: [
                   {
                     position: 1,
@@ -725,12 +802,14 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
               position: 2,
               reversed: false,
               unit: {
-                uri: "https://metro.example/onto#unit-90",
                 length: 60000,
+                __isNode: "Unit",
+                __typename: "Unit",
                 _meta: {
                   title: "Series 90 unit",
                   curie: "metro:unit-90",
                 },
+                uri: "https://metro.example/onto#unit-90",
                 cars: [
                   {
                     position: 1,
@@ -778,9 +857,13 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
           lines: [
             {
               code: "3",
+              __isNode: "Line",
+              __typename: "Line",
               _meta: {
                 title: "Coastal Line",
+                curie: "metro:coastal-line",
               },
+              uri: "https://metro.example/onto#coastal-line",
               servedBy: [
                 {
                   __typename: "Interchange",
@@ -831,13 +914,16 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                   uri: "https://metro.example/onto#saltford",
                 },
               ],
-              uri: "https://metro.example/onto#coastal-line",
             },
             {
               code: "1",
+              __isNode: "Line",
+              __typename: "Line",
               _meta: {
                 title: "North Line",
+                curie: "metro:north-line",
               },
+              uri: "https://metro.example/onto#north-line",
               servedBy: [
                 {
                   __typename: "Interchange",
@@ -880,7 +966,6 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                   uri: "https://metro.example/onto#verge-park",
                 },
               ],
-              uri: "https://metro.example/onto#north-line",
             },
           ],
           uri: "https://metro.example/onto#series-90-six-car",

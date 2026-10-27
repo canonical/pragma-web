@@ -2,7 +2,7 @@ import {
   createEnvironment,
   setPrefetchEnvironment,
 } from "@canonical/prism-core";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SERIES_90_CURIE } from "../../../../../testing/fixtures.js";
@@ -48,12 +48,16 @@ describe("StockPage", () => {
     ).toHaveAttribute("href", "/fleet/formations/metro%3Aseries-90-six-car");
   });
 
-  it("lists each car type once, by its code, linked to its page", async () => {
+  it("lists each car type once, as its row, linked to its page", async () => {
     renderMetroPage(url);
     const section = await screen.findByRole("region", { name: "Car types" });
-    const entries = within(section).getAllByRole("listitem");
+    const rows = await waitFor(() => {
+      const found = section.querySelectorAll(".ds.car-type-row");
+      expect(found).toHaveLength(2);
+      return [...found];
+    });
     expect(
-      entries.map((entry) => entry.querySelector(".code")?.textContent),
+      rows.map((row) => row.querySelector(".identifier")?.textContent),
     ).toEqual(["DM", "T"]);
     expect(
       within(section).getByRole("link", { name: "Series 90 trailer car" }),

@@ -12,8 +12,9 @@ import "./styles.css";
 const componentCssClassName = "ds fleet-index";
 
 /**
- * The fleet lens's index: its heading, then every rolling stock with its
- * formations drawn at one scale. The heading stands while the list reads
+ * The fleet lens's index: its heading, then every rolling stock in the
+ * shared list view of nodes, as cards that draw each stock's formations at
+ * one scale, or as rows. The heading stands while the list reads
  * its operation inside its own error boundary and Suspense, so neither
  * reaches the router's outlet.
  *

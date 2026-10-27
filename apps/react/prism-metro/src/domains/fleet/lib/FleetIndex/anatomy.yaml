@@ -1,16 +1,10 @@
 ---
 # FleetIndex — the fleet lens's index, in the document archetype's canvas:
-# its heading, then every rolling stock, each with its formations drawn at
-# one scale, each formation linked to its page with its length. While the
-# fleet is on its way it says so in one muted line; a failed read says so as
-# an alert; a graph with no rolling stock says that too.
-#
-# The list stands where the shared list view of nodes will go, and each
-# stock where its card will go, its side views in the card's sidecar; each
-# such element carries `data-placeholder`.
-#
-# Token ledger: space.100 (8px) between the words of an entry, an inline
-# run, one baseline pair.
+# its heading, then every rolling stock in the shared list view of nodes,
+# as cards that draw each stock's formations at one scale, or as rows.
+# While the fleet is on its way it says so in one muted line; a failed read
+# says so as an alert; a graph with no rolling stock says that in the
+# list's own empty line.
 node:
   uri: metro.component.fleet_index
   styles:
@@ -23,45 +17,10 @@ node:
         role: heading
       relation: { cardinality: "1", slotName: title }
     - node:
-        role: list of rolling stocks (placeholder for the list view of nodes)
-        styles:
-          layout.type: grid
-          spacing.gap: grid.gutter
-          spacing.internal.inline.start: 0
-          spacing.external.block.start: 0
-          spacing.external.block.end: 0
-          layout.listStyle: none
+        uri: metro.subcomponent.stock_list
       relation: { cardinality: "0..1", slotName: list }
     - node:
-        role: rolling stock (placeholder for its card)
-        styles:
-          layout.type: grid
-          spacing.gap: grid.gutter
-      relation: { cardinality: "0..*", slotName: stock }
-    - node:
-        role: the card's sidecar, the stock's formations
-        styles:
-          layout.type: grid
-          spacing.gap: grid.gutter
-      relation: { cardinality: "0..*", slotName: sidecar }
-    - node:
-        role: formation entry
-        styles:
-          layout.type: flex
-          layout.wrap: wrap
-          layout.align: baseline
-          spacing.gap: space.100
-      relation: { cardinality: "0..*", slotName: entry }
-    - node:
-        role: vital
-        styles:
-          typography.color: color.text.muted
-      relation: { cardinality: "0..*", slotName: vital }
-    - node:
-        uri: metro.component.formation_side_view
-      relation: { cardinality: "0..*", slotName: side-view }
-    - node:
-        role: loading, empty or error line
+        role: loading line
         styles:
           typography.color: color.text.muted
       relation: { cardinality: "0..1", slotName: status }

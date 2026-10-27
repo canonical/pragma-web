@@ -10,8 +10,6 @@
     --stock-page-section-spacing: var(--container-gap-loose);
     /* One baseline pair between the words of an entry. */
     --stock-page-entry-spacing: var(--space-100);
-    /* No monospace family token sits above the primitive tier. */
-    --stock-page-code-font-family: ui-monospace, monospace;
     --stock-page-secondary-color: var(--color-text-muted);
     --stock-page-error-color: var(--color-text-error);
 
@@ -36,6 +34,13 @@
     list-style: none;
   }
 
+  .ds.stock-page .rows {
+    padding-inline-start: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    list-style: none;
+  }
+
   .ds.stock-page .entry {
     display: flex;
     flex-wrap: wrap;
@@ -45,10 +50,6 @@
 
   .ds.stock-page .vital {
     color: var(--stock-page-secondary-color);
-  }
-
-  .ds.stock-page .code {
-    font-family: var(--stock-page-code-font-family);
   }
 
   .ds.stock-page .loading {
