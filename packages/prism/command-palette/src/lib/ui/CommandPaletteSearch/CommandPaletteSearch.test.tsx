@@ -224,10 +224,16 @@ describe("CommandPaletteSearch", () => {
     const selection = document.getSelection();
     selection?.selectAllChildren(preview);
     fireEvent.click(preview);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve));
+    });
     expect(preview).toHaveFocus();
-    selection?.collapseToStart();
+    // A click in the selection collapses it once the click is dispatched.
     fireEvent.click(preview);
-    expect(field).toHaveFocus();
+    selection?.collapseToStart();
+    await waitFor(() => {
+      expect(field).toHaveFocus();
+    });
     fireEvent.keyDown(field, { key: "ArrowDown" });
     expect(readActiveTitle()).toBe("Player layout");
   });

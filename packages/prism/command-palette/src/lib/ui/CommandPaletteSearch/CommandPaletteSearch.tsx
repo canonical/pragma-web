@@ -190,18 +190,24 @@ export default function CommandPaletteSearch({
    * its row does, and the palette must not stay open over the page it
    * opens. Any other click in the preview that leaves no text selected
    * gives the field back the focus its press took, so the keys reach the
-   * field again; one that selected text leaves it, to be copied.
+   * field again; one that selected text leaves it, to be copied. The
+   * browser collapses a selection a click lands in only once the click has
+   * been dispatched, so the selection is read in the next task.
    *
-   * @note Impure: calls the palette's handler, which closes it, and moves
-   *   the focus.
+   * @note Impure: calls the palette's handler, which closes it, schedules
+   *   a task, reads the document's selection and moves the focus.
    */
   const handlePreviewClick = (event: MouseEvent<HTMLElement>): void => {
     if (isWithinLink(event.target)) {
       onChoose();
       return;
     }
-    const selection = event.currentTarget.ownerDocument.getSelection();
-    if (selection?.isCollapsed !== false) field.current?.focus();
+    const { ownerDocument } = event.currentTarget;
+    setTimeout(() => {
+      if (ownerDocument.getSelection()?.isCollapsed !== false) {
+        field.current?.focus();
+      }
+    });
   };
 
   /**
