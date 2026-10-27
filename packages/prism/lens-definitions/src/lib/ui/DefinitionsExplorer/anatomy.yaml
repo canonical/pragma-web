@@ -1,0 +1,49 @@
+---
+# DefinitionsExplorer — the explorer's canvas content: the term rail on
+# the first two columns of the canvas and the class graph on the rest, a
+# subgrid of the canvas's columns whose one row fills the canvas. The rail
+# scrolls on its own; the graph never scrolls, it pans. Its gap is the
+# grid's gutter.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 448px)  below one group: the rail and the
+#     graph stack, both on every column, the rail's search over the phone
+#     view, which scrolls.
+#
+# Why not a published component: the explorer's regions are the lens's own.
+#
+# Every decision is read through a component token declared on the root
+# (`--definitions-explorer-*`), bound to the symbol or the literal named
+# here.
+#
+# Token ledger:
+#   1px: the rail's divider.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: prism.component.definitions_explorer
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.grid.rows: "minmax(0, 1fr)"
+    spacing.gap: grid.gutter
+    size.block: 100%
+    size.min.block: 0
+  edges:
+    - node:
+        uri: prism.component.term_rail
+        styles:
+          layout.grid.column: "1 / span 2"
+          layout.overflow.block: auto
+          size.min.block: 0
+          appearance.border.inline.end.color: color.border.muted
+          appearance.border.width: 1px
+          appearance.border.style: solid
+      relation: { cardinality: "1", slotName: explorer-rail }
+    - node:
+        uri: prism.component.hierarchy_well
+        styles:
+          layout.grid.column: "3 / -1"
+          size.min.block: 0
+      relation: { cardinality: "1", slotName: explorer-well }

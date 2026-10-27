@@ -1,0 +1,183 @@
+---
+# TermRail — the explorer's term list: a search field over every term the
+# ontologies carry, each ontology's classes (in the graph's rail order,
+# each with its kind's mark and its depth) and properties as term links,
+# dense. Dimmed, never removed, when the filter leaves a term out; the term
+# the graph's focus names takes the hover fill.
+# Reference: the ontology explorer's rail (a search field over the terms,
+# grouped, each with its marks).
+#
+# Why not a published component: the published lists carry no per-item
+# marks; the search field is a native input with a visible label.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 448px)  below one group: the lists leave and
+#     the search stays, over the phone view.
+#
+# Every decision is read through a component token declared on the root
+# (`--term-rail-*`), bound to the symbol or the literal named here.
+#
+# Token ledger:
+#   1px: the search field's and the mark's hairlines.
+#   2px: the search field's focus ring.
+#   50%: the mark's circle.
+#   0.4: a dimmed item.
+#   space.050, space.100: the gaps inside an item and the field, and the
+#     mark's size; no semantic gap is admitted inside an item.
+#
+# Roster namespaces (accepted and tracked): component.padding.block,
+# component.padding.inline, container.gap.tight, container.gap.default,
+# container.gap.loose, space.050, space.100, and the semantic typography
+# symbols.
+node:
+  uri: prism.component.term_rail
+  styles:
+    typography.size: typography.text.primary.fontSize
+    spacing.internal.inline.end: component.padding.inline
+  edges:
+    - node:
+        role: search
+        styles:
+          layout.position: sticky
+          layout.offset.top: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          appearance.background: color.background
+        edges:
+          - node:
+              role: field
+              styles:
+                layout.type: flex
+                layout.direction: column
+                spacing.gap: space.050
+                typography.size: typography.text.secondary.fontSize
+                typography.color: color.text.muted
+              edges:
+                - node:
+                    role: query
+                    styles:
+                      size.inline: 100%
+                      size.min.width: 0
+                      spacing.internal.block.start: container.gap.tight
+                      spacing.internal.block.end: container.gap.tight
+                      spacing.internal.inline.start: container.gap.tight
+                      spacing.internal.inline.end: container.gap.tight
+                      appearance.background: color.background
+                      appearance.border.width: 1px
+                      appearance.border.style: solid
+                      appearance.border.color: color.border
+                      typography.font: inherit
+                      typography.size: typography.text.primary.fontSize
+                      typography.color: color.text
+                      appearance.outline.width@focus: 2px
+                      appearance.outline.style@focus: solid
+                      appearance.outline.color@focus: color.focusRing
+                  relation: { cardinality: "1", slotName: query }
+            relation: { cardinality: "1", slotName: field }
+      relation: { cardinality: "1", slotName: search }
+    - node:
+        role: ontology
+        edges:
+          - node:
+              role: heading
+              styles:
+                spacing.external.block.start: container.gap.loose
+                spacing.external.block.end: container.gap.tight
+                typography.size: typography.text.primary.fontSize
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "1", slotName: heading }
+          - node:
+              role: subheading
+              styles:
+                layout.type: flex
+                layout.align: baseline
+                layout.justify: space-between
+                spacing.external.block.start: container.gap.default
+                spacing.external.block.end: container.gap.tight
+                typography.size: typography.text.secondary.fontSize
+                typography.weight: typography.text.secondary.fontWeight
+                typography.variant.caps: all-small-caps
+                typography.color: color.text.muted
+              edges:
+                - node:
+                    role: count
+                    styles:
+                      typography.variant.numeric: tabular-nums
+                  relation: { cardinality: "1", slotName: count }
+            relation: { cardinality: "2", slotName: subheading }
+          - node:
+              role: list
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.inline.start: 0
+                layout.listStyle: none
+              edges:
+                - switch:
+                    on: internal
+                    cases:
+                      - node:
+                          role: item
+                          styles:
+                            layout.type: flex
+                            layout.align: baseline
+                            spacing.gap: space.050
+                            spacing.internal.block.start: container.gap.tight
+                            spacing.internal.block.end: container.gap.tight
+                            spacing.internal.inline.start: container.gap.tight
+                            spacing.internal.inline.end: container.gap.tight
+                            size.min.width: 0
+                          edges:
+                            - switch:
+                                on: internal
+                                cases:
+                                  - node:
+                                      role: mark (a dot for a concrete class)
+                                      styles:
+                                        layout.flex.shrink: 0
+                                        layout.alignSelf: center
+                                        size.width: space.100
+                                        size.height: space.100
+                                        appearance.radius: 50%
+                                        appearance.border.width: 1px
+                                        appearance.border.style: solid
+                                        appearance.border.color: color.text
+                                        appearance.background: color.text
+                                  - node:
+                                      role: abstract mark, a ring (.is-abstract)
+                                      styles:
+                                        appearance.background: transparent
+                              relation: { cardinality: "0..1", slotName: mark }
+                            - node:
+                                role: depth
+                                styles:
+                                  layout.flex.shrink: 0
+                                  typography.fontFamily: typography.text.primary.code.fontFamily
+                                  typography.size: typography.text.secondary.fontSize
+                                  typography.color: color.text.muted
+                              relation: { cardinality: "0..1", slotName: depth }
+                            - node:
+                                role: link
+                                styles:
+                                  typography.wrap: anywhere
+                                  typography.weight@selected: typography.text.primary.bold.fontWeight
+                              relation: { cardinality: "1", slotName: link }
+                            - node:
+                                role: note
+                                styles:
+                                  typography.size: typography.text.secondary.fontSize
+                                  typography.color: color.text.muted
+                              relation: { cardinality: "0..2", slotName: note }
+                      - node:
+                          role: dimmed item (.is-dimmed)
+                          styles:
+                            appearance.opacity: 0.4
+                      - node:
+                          role: hovered item (.is-hovered)
+                          styles:
+                            appearance.background: color.background.layer2
+                  relation: { cardinality: "0..*", slotName: item }
+            relation: { cardinality: "2", slotName: list }
+      relation: { cardinality: "1..*", slotName: ontology }

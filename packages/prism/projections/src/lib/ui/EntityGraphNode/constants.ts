@@ -12,3 +12,6 @@ export const GRAPH_NODE_INSET = 8;
 
 /** The border's thickness, in SVG user units. */
 export const GRAPH_NODE_STROKE = 1;
+
+/** The box's corner radius, in SVG user units. */
+export const GRAPH_NODE_RADIUS = 4;

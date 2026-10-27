@@ -1,6 +1,6 @@
 {
   "name": "@canonical/prism-lens-definitions",
-  "description": "The Definitions lens of a Prism documentation site: an ontology explorer over the graph's classes and properties, with a term rail, a class hierarchy well and a term inspector",
+  "description": "The Definitions lens of a Prism documentation site: an ontology explorer over the graph's classes and properties: a term rail, an SVG class graph and a term inspector on the workspace archetype",
   "version": "0.44.1",
   "type": "module",
   "exports": {
@@ -10,6 +10,7 @@
     "src",
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
+    "!src/**/*.stories.tsx",
     "!src/testing"
   ],
   "author": {
@@ -30,7 +31,8 @@
   },
   "scripts": {
     "build": "bun run relay",
-    "build:all": "bun run relay",
+    "build:all": "bun run relay && bun run build:storybook",
+    "build:storybook": "storybook build",
     "relay": "mkdir -p src/__generated__ && relay-compiler --project lens-definitions",
     "check": "bun run check:tier1 && bun run check:biome && bun run check:ts",
     "check:tier1": "relay-compiler --project lens-definitions --validate",
@@ -40,7 +42,8 @@
     "check:ts": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6013 --no-open --host 0.0.0.0"
   },
   "nx": {
     "targets": {
@@ -51,7 +54,8 @@
       },
       "build:all": {
         "outputs": [
-          "{projectRoot}/src/__generated__"
+          "{projectRoot}/src/__generated__",
+          "{projectRoot}/storybook-static"
         ]
       }
     }
@@ -60,6 +64,7 @@
     "@canonical/i18n-core": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-projections": "^0.44.1",
+    "@canonical/react-ds-global": "^0.44.1",
     "@canonical/react-head": "^0.44.1",
     "@canonical/router-core": "^0.44.1",
     "@canonical/router-react": "^0.44.1",
@@ -71,8 +76,12 @@
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
     "@canonical/prism-contract": "^0.44.1",
+    "@canonical/storybook-config": "^0.44.1",
+    "@canonical/styles": "^0.44.1",
     "@canonical/typescript-config-react": "^0.44.1",
     "@canonical/vitest-config-react": "^0.44.1",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/react-vite": "^10.6.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.0.0",
@@ -85,6 +94,7 @@
     "jsdom": "^28.1.0",
     "react-dom": "^19.2.4",
     "relay-compiler": "^21.0.1",
+    "storybook": "^10.6.0",
     "typescript": "^7.0.2",
     "vite": "^8.0.1",
     "vitest": "^5.0.0"

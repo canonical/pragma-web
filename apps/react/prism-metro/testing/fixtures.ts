@@ -402,3 +402,13 @@ export const MOCK_ZONE = {
     { __typename: "Station", uri: metroUri("northgate") },
   ],
 } as const;
+
+/**
+ * How long a lens page test may take: it mounts the whole provider stack
+ * over a real socket, and the Definitions page lays its graph out, which
+ * overruns the default under parallel machine load.
+ */
+export const LENS_PAGE_TEST_TIMEOUT_MS = 15_000;
+
+/** How long a lens page test waits for the page to answer. */
+export const LENS_PAGE_WAIT_MS = 10_000;
