@@ -74,6 +74,10 @@ const findActiveOption = (): HTMLElement => {
   return option;
 };
 
+/** The title of the option the field's active descendant names. */
+const readActiveTitle = (): string | null | undefined =>
+  findActiveOption().querySelector(".title")?.textContent;
+
 /** The title of the card the preview shows. */
 const readPreviewTitle = (): string | null =>
   within(screen.getByRole("region", { name: "Preview" })).getByRole("link")
@@ -268,6 +272,29 @@ describe("CommandPaletteSearch", () => {
     );
     expect(readPreviewTitle()).toBe("Layout switcher");
   });
+
+  it.each([
+    ["ArrowDown", "Layout switcher"],
+    ["ArrowUp", "Player layout"],
+  ])(
+    "steps %s from the result the highlight was kept on when fewer results came",
+    async (key, title) => {
+      const { environment } = await renderResults("lay", [
+        ...RANKED_RESULTS,
+        STATION_NODE,
+      ]);
+      type("layo");
+      fireEvent.pointerMove(screen.getAllByRole("option").at(3) as HTMLElement);
+      await act(async () => {
+        environment.mock.resolveMostRecentOperation(
+          answerSearch(RANKED_RESULTS),
+        );
+      });
+      expect(readActiveTitle()).toBe("Layout");
+      fireEvent.keyDown(screen.getByRole("combobox"), { key });
+      expect(readActiveTitle()).toBe(title);
+    },
+  );
 
   it("holds each row's title as text and links the preview's title home", async () => {
     await renderResults("lay");
