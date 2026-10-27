@@ -48,7 +48,10 @@ function collectMarks(fits: readonly LineFit[]): readonly number[] {
  * shortest platform, and the part of the train past the shortest of them
  * is underlined. The drawing is hidden from assistive technology; the
  * ordered list after it carries the same content, unit by unit, each car
- * by its code with its title and its cab's facing.
+ * by its code, with its title and its cab's facing in a description that
+ * assistive technology reads and the page does not show. A train of one
+ * unit, such as a unit or a car drawn alone, leaves out the unit's label.
+ * A `caption` names the train above its drawing.
  *
  * `import { FormationSideView } from "./FormationSideView/index.js";`
  */
@@ -56,6 +59,7 @@ const FormationSideView = ({
   cars,
   scale,
   fits = [],
+  caption,
   className,
   ...props
 }: FormationSideViewProps): React.ReactElement => {
@@ -68,11 +72,15 @@ const FormationSideView = ({
   );
   const height = marks.length === 0 ? CAR_HEIGHT : CAR_HEIGHT + MARK_DROP;
   const shortest = marks.at(0);
+  const units = groupByUnit(geometry.cars);
   return (
     <figure
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
+      {caption === undefined ? null : (
+        <figcaption className="caption">{caption}</figcaption>
+      )}
       <svg
         aria-hidden="true"
         className="drawing"
@@ -109,19 +117,20 @@ const FormationSideView = ({
         ) : null}
       </svg>
       <ol className="train-text">
-        {groupByUnit(geometry.cars).map((unit, index) => (
+        {units.map((unit, index) => (
           <li className="unit" key={unit.at(0)?.unitPosition}>
-            <span className="label">
-              {t("fleet.unit", { position: index + 1 })}
-            </span>
+            {units.length === 1 ? null : (
+              <span className="label">
+                {t("fleet.unit", { position: index + 1 })}
+              </span>
+            )}
             {unit.map((car) => (
-              <abbr
-                className="code"
-                key={car.start}
-                title={describeCar(car, t)}
-              >
-                {car.code}
-              </abbr>
+              <span className="car-text" key={car.start}>
+                <abbr className="code" title={describeCar(car, t)}>
+                  {car.code}
+                </abbr>
+                <span className="description">{describeCar(car, t)}</span>
+              </span>
             ))}
           </li>
         ))}

@@ -55,10 +55,42 @@ describe("FormationSideView", () => {
   it("repeats the train as text, unit by unit, each car by its code", () => {
     render(<FormationSideView cars={SIX_CAR} />);
     const units = within(screen.getByRole("list")).getAllByRole("listitem");
-    expect(units.map((unit) => unit.textContent)).toEqual([
-      "Unit 1DMTDM",
-      "Unit 2DMTDM",
-    ]);
+    expect(
+      units.map((unit) =>
+        [...unit.querySelectorAll(".label, .code")]
+          .map((part) => part.textContent)
+          .join(" "),
+      ),
+    ).toEqual(["Unit 1 DM T DM", "Unit 2 DM T DM"]);
+  });
+
+  it("describes each car for assistive technology, after its code", () => {
+    render(<FormationSideView cars={SIX_CAR} />);
+    const first = screen.getAllByRole("listitem").at(0) as HTMLElement;
+    expect(first.querySelector(".description")).toHaveTextContent(
+      "Series 90 driving motor car, cab at the front",
+    );
+    expect(first.querySelector(".code")?.nextElementSibling).toHaveClass(
+      "description",
+    );
+  });
+
+  it("leaves out the unit's label for a train of one unit", () => {
+    render(
+      <FormationSideView
+        cars={SIX_CAR.filter((car) => car.unitPosition === 1)}
+      />,
+    );
+    expect(document.querySelector(".label")).toBeNull();
+  });
+
+  it("names the train by its caption, above the drawing", () => {
+    const { container } = render(
+      <FormationSideView caption="Series 90 six-car" cars={SIX_CAR} />,
+    );
+    const caption = container.querySelector("figcaption.caption");
+    expect(caption).toHaveTextContent("Series 90 six-car");
+    expect(caption?.nextElementSibling).toHaveClass("drawing");
   });
 
   it("titles each car with its type and the way its cab faces", () => {

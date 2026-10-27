@@ -9,9 +9,11 @@ import "./styles.css";
 const componentCssClassName = "ds formation-stack";
 
 /**
- * Several trains drawn at one scale, one side view each, a gutter apart:
- * the longest train sets the scale, so every train reads against it, as a
- * rolling stock's formations do side by side.
+ * Several trains drawn at one scale, one side view each, each named by its
+ * caption when it has one: the longest train sets the scale, so every
+ * train reads against it, as a rolling stock's formations do side by side.
+ * A loose step after each train keeps its caption, drawing and text
+ * together, apart from the next. With no train the stack is empty.
  *
  * `import { FormationStack } from "./FormationStack/index.js";`
  */
@@ -20,18 +22,20 @@ const FormationStack = ({
   className,
   ...props
 }: FormationStackProps): React.ReactElement => {
-  const scale = findScaleLength(
-    trains.map(({ cars }) => cars.reduce((sum, car) => sum + car.length, 0)),
+  const lengths = trains.map(({ cars }) =>
+    cars.reduce((sum, car) => sum + car.length, 0),
   );
+  const scale = lengths.length === 0 ? 0 : findScaleLength(lengths);
   return (
     <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      {trains.map(({ key, cars }) => (
+      {trains.map(({ key, cars, caption }) => (
         <FormationSideView
+          caption={caption}
           cars={cars}
-          className="train"
+          className="formation"
           key={key}
           scale={scale}
         />

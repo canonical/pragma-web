@@ -21,6 +21,29 @@ describe("FormationStack", () => {
     expect(widths).toEqual(["120000", "120000"]);
   });
 
+  it("names each train by its caption, above its drawing", () => {
+    const { container } = render(
+      <FormationStack
+        trains={TRAINS.map((train, index) => ({
+          ...train,
+          caption: `Train ${index + 1}`,
+        }))}
+      />,
+    );
+    expect(
+      [...container.querySelectorAll("figcaption.caption")].map(
+        (caption) => caption.textContent,
+      ),
+    ).toEqual(TRAINS.map((_, index) => `Train ${index + 1}`));
+  });
+
+  it("draws nothing for no train", () => {
+    const { container } = render(<FormationStack trains={[]} />);
+    expect(
+      container.querySelector(".ds.formation-stack"),
+    ).toBeEmptyDOMElement();
+  });
+
   it("passes native props to its root and merges its class", () => {
     render(
       <FormationStack className="x" data-testid="stack" trains={TRAINS} />,

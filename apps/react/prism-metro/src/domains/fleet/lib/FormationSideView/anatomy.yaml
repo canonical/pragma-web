@@ -28,6 +28,14 @@ node:
     spacing.external.inline.end: 0
   edges:
     - node:
+        role: caption, naming the train
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap.inline: space.100
+      relation: { cardinality: "0..1", slotName: caption }
+    - node:
         role: drawing
         styles:
           layout.type: block
@@ -67,8 +75,27 @@ node:
           typography.color: color.text.muted
       relation: { cardinality: "1..*", slotName: unit }
     - node:
+        role: unit label, for a train of more than one unit
+      relation: { cardinality: "0..1", slotName: label }
+    - node:
+        role: one car as text
+      relation: { cardinality: "1..*", slotName: car-text }
+    - node:
         role: car code
         styles:
           typography.fontFamily: "ui-monospace, monospace"
           typography.color: color.text
       relation: { cardinality: "1..*", slotName: code }
+    - node:
+        role: the car's title and its cab's facing, read but not shown
+        styles:
+          layout.position: absolute
+          size.width: 1px
+          size.height: 1px
+          spacing.external.block.start: -1px
+          spacing.external.block.end: -1px
+          spacing.external.inline.start: -1px
+          spacing.external.inline.end: -1px
+          layout.overflow: hidden
+          typography.whiteSpace: nowrap
+      relation: { cardinality: "1..*", slotName: description }

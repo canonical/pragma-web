@@ -11,4 +11,6 @@ node:
   edges:
     - node:
         uri: metro.component.formation_side_view
-      relation: { cardinality: "1..*", slotName: train }
+        styles:
+          spacing.external.block.end: container.gap.default
+      relation: { cardinality: "0..*", slotName: formation }

@@ -3,11 +3,17 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The trains, one over the other, a gutter apart. */
+  /* The trains, one over the other, a gutter apart, and a loose step after
+   * each, so a train's caption, drawing and text read as one group. */
   .ds.formation-stack {
     --formation-stack-gap: var(--grid-gutter);
+    --formation-stack-formation-spacing: var(--container-gap-default);
 
     display: grid;
     gap: var(--formation-stack-gap);
+  }
+
+  .ds.formation-stack .formation {
+    margin-block-end: var(--formation-stack-formation-spacing);
   }
 }

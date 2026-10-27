@@ -12,6 +12,6 @@ describe("FormationStack SSR", () => {
       />,
     );
     expect(html).toContain('class="ds formation-stack"');
-    expect(html).toContain('class="ds formation-side-view train"');
+    expect(html).toContain('class="ds formation-side-view formation"');
   });
 });

@@ -17,10 +17,22 @@
     /* No monospace family token sits above the primitive tier. */
     --formation-side-view-code-font-family: ui-monospace, monospace;
     --formation-side-view-code-color: var(--color-text);
+    /* One baseline pair between the words of the caption. */
+    --formation-side-view-caption-spacing: var(--space-100);
+    /* A description read but not shown: one pixel, clipped. */
+    --formation-side-view-description-size: 1px;
+    --formation-side-view-description-margin: -1px;
 
     display: grid;
     gap: var(--formation-side-view-gap);
     margin: 0;
+  }
+
+  .ds.formation-side-view .caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--formation-side-view-caption-spacing);
   }
 
   /* The drawing scales with its column and never overflows it. */
@@ -60,5 +72,14 @@
   .ds.formation-side-view .code {
     font-family: var(--formation-side-view-code-font-family);
     color: var(--formation-side-view-code-color);
+  }
+
+  .ds.formation-side-view .description {
+    position: absolute;
+    width: var(--formation-side-view-description-size);
+    height: var(--formation-side-view-description-size);
+    margin: var(--formation-side-view-description-margin);
+    overflow: hidden;
+    white-space: nowrap;
   }
 }
