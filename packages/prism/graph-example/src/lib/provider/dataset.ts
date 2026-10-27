@@ -53,6 +53,7 @@ const LOCATION = `${GEO_NAMESPACE}location`;
 const LATITUDE = `${GEO_NAMESPACE}latitude`;
 const LONGITUDE = `${GEO_NAMESPACE}longitude`;
 const IN_ZONE = `${GEO_NAMESPACE}inZone`;
+const STOPS = `${GEO_NAMESPACE}stops`;
 const LABEL = `${RDFS_NAMESPACE}label`;
 const CODE = `${METRO_NAMESPACE}code`;
 const COLOUR = `${METRO_NAMESPACE}colour`;
@@ -308,7 +309,10 @@ export const exampleDataset: ExampleDataset = {
       labels: { "": "Fare zone" },
       definitions: { "": "A fare band covering part of the network." },
       isAbstract: false,
-      properties: [{ property: NAME, required: true, singular: true }],
+      properties: [
+        { property: NAME, required: true, singular: true },
+        { property: STOPS, required: false, singular: false },
+      ],
     },
     {
       // The metaclass. Present because `EntityMeta.type` is non-null and
@@ -327,7 +331,8 @@ export const exampleDataset: ExampleDataset = {
   // ---------------------------------------------------------------------
   // Properties. All three PropertyKind members appear, `functional` appears
   // in both states, `domain` appears both asserted and absent (the contract
-  // makes it nullable), and one inverse pair round-trips.
+  // makes it nullable), and two inverse pairs round-trip: a station's lines
+  // and a line's stops, a station's fare zone and a zone's stops.
   // ---------------------------------------------------------------------
   properties: [
     {
@@ -421,6 +426,16 @@ export const exampleDataset: ExampleDataset = {
       range: "geo:Zone",
       kind: "OBJECT",
       functional: true,
+      inverse: STOPS,
+    },
+    {
+      uri: STOPS,
+      labels: { "": "stops" },
+      domain: ZONE,
+      range: "metro:Stop",
+      kind: "OBJECT",
+      functional: false,
+      inverse: IN_ZONE,
     },
     {
       // Global, like metro:name. A route's label is its rdfs:label, which is

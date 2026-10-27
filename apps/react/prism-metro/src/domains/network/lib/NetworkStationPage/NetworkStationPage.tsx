@@ -4,7 +4,7 @@ import { DocumentLayout, ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import { EntityPlaceholder } from "../EntityPlaceholder/index.js";
 import useStationView from "../hooks/useStationView.js";
 import { StationPanel } from "../StationPanel/index.js";
@@ -18,33 +18,35 @@ const Boundary = ({
   children,
 }: {
   readonly children: ReactNode;
-}): ReactElement => (
-  <ErrorBoundary
-    fallback={
-      <p className="status" role="alert">
-        {MESSAGES["network.error"]}
-      </p>
-    }
-  >
-    <Suspense
-      fallback={<p className="status">{MESSAGES["network.loading"]}</p>}
+}): ReactElement => {
+  const t = useMessages();
+  return (
+    <ErrorBoundary
+      fallback={
+        <p className="status" role="alert">
+          {t("network.error")}
+        </p>
+      }
     >
-      {children}
-    </Suspense>
-  </ErrorBoundary>
-);
+      <Suspense fallback={<p className="status">{t("network.loading")}</p>}>
+        {children}
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
 
 /** The station's panel, or the page's not-found status. */
 const StationMain = ({
   address,
 }: Pick<NetworkStationPageProps, "address">): ReactElement => {
+  const t = useMessages();
   const station = useStationView({ address });
   if (station === undefined) {
     return (
       <section className="status">
-        <Head title={MESSAGES["network.notFound.title"]} />
-        <h1>{MESSAGES["network.notFound.title"]}</h1>
-        <p>{MESSAGES["network.notFound.body"]}</p>
+        <Head title={t("network.notFound.title")} />
+        <h1>{t("network.notFound.title")}</h1>
+        <p>{t("network.notFound.body")}</p>
       </section>
     );
   }
@@ -60,12 +62,13 @@ const StationMain = ({
 const StationAside = ({
   address,
 }: Pick<NetworkStationPageProps, "address">): ReactElement | null => {
+  const t = useMessages();
   const station = useStationView({ address });
   if (station === undefined) return null;
   return (
     <EntityPlaceholder component="EntityCard">
       <p>{station.title}</p>
-      <p>{MESSAGES[`network.station.kind.${station.kind}`]}</p>
+      <p>{t(`network.station.kind.${station.kind}`)}</p>
     </EntityPlaceholder>
   );
 };

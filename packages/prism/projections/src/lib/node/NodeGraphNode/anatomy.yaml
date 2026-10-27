@@ -1,0 +1,55 @@
+---
+# NodeGraphNode: any graph node as a node of a graph, two lines tall.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2357 and 566:2433 (the
+# compact address as the title, in the identifier face, then "kind in
+# location" muted). The kind is the node's class; the location the compact
+# address's prefix.
+# Projected onto EntityGraphNode, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved from
+# the compact address; a node without one reads as inert text.
+node:
+  uri: prism.component.node_graph_node
+  projection:
+    on: Node
+  edges:
+    - node:
+        uri: prism.component.entity_graph_node
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.curie
+              edges:
+                # The compact address is set in the identifier face.
+                - node:
+                    role: identifier
+                  relation:
+                    cardinality: "1"
+                    slotName: identifier
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "1"
+              slotName: kind
+              projection:
+                field: _meta.type
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+      relation:
+        cardinality: "1"

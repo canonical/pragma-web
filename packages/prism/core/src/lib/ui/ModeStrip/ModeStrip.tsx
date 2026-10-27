@@ -19,7 +19,9 @@ const componentCssClassName = "ds mode-strip";
  *
  * The band is the same height on every lens: the density line unit plus
  * one component padding on each side, so the canvas below never jumps on a
- * lens switch. It spans every column of the row a layout places it in.
+ * lens switch. It spans every column of the row a layout places it in,
+ * and its band bleeds across the gutter at its start to meet the rail's
+ * border, its context on the canvas's first column line.
  *
  * `import { ModeStrip } from "@canonical/prism-core";`
  *

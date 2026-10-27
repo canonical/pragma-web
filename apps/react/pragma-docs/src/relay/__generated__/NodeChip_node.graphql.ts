@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a047d1aa7ec98f85a9d6f3dfacdabd76>>
+ * @generated SignedSource<<72f8a1271d0a6083d61a6f0401458f9c>>
  * @lightSyntaxTransform
  */
 
@@ -10,12 +10,10 @@
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type NodeChip_node$data = {
+  readonly __typename: string;
   readonly _meta: {
     readonly curie: string;
     readonly title: string;
-    readonly type: {
-      readonly uri: string;
-    };
   };
   readonly " $fragmentType": "NodeChip_node";
 };
@@ -30,6 +28,13 @@ const node: ReaderFragment = {
   "metadata": null,
   "name": "NodeChip_node",
   "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "__typename",
+      "storageKey": null
+    },
     {
       "alias": null,
       "args": null,
@@ -51,24 +56,6 @@ const node: ReaderFragment = {
           "kind": "ScalarField",
           "name": "curie",
           "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "OntologyClass",
-          "kind": "LinkedField",
-          "name": "type",
-          "plural": false,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "uri",
-              "storageKey": null
-            }
-          ],
-          "storageKey": null
         }
       ],
       "storageKey": null
@@ -78,6 +65,6 @@ const node: ReaderFragment = {
   "abstractKey": "__isNode"
 };
 
-(node as any).hash = "a8c1e2f4ec7125b7c65489aea3086c12";
+(node as any).hash = "29b7e8f85f98b4f0feed2fc9ec216da4";
 
 export default node;

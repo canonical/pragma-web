@@ -1,20 +1,34 @@
+import {
+  OntologyClassCard,
+  OntologyClassChip,
+  OntologyClassCommand,
+  OntologyClassGraphNode,
+  OntologyClassRow,
+} from "../ontology/index.js";
 import type { ProjectionMaps } from "../projections/index.js";
 import { NodeCard } from "./NodeCard/index.js";
 import { NodeChip } from "./NodeChip/index.js";
 import { NodeCommand } from "./NodeCommand/index.js";
+import { NodeGraphNode } from "./NodeGraphNode/index.js";
 import { NodeRow } from "./NodeRow/index.js";
-import { NodeTitle } from "./NodeTitle/index.js";
 
 /**
- * The maps a site mounts: each representation renders any node through its
- * `Node` arm, which reads only what every node carries. They hold exactly
- * the arms the package's composites spread; an arm the composites do not
- * spread would read only what they already select.
+ * The maps a site mounts: each form renders any node through its `Node`
+ * arm, which reads only what every node carries, and each type the
+ * package projects through that type's own arm. A map's typed arms are
+ * exactly the composite's aliased spreads; a site adds arms for its own
+ * types under `siteTypes`.
  */
 export const defaultProjectionMaps: ProjectionMaps = {
-  chip: { Node: NodeChip },
-  row: { Node: NodeRow },
-  card: { Node: NodeCard },
-  command: { Node: NodeCommand },
-  title: { Node: NodeTitle },
+  chip: { Node: NodeChip, types: { OntologyClass: OntologyClassChip } },
+  row: { Node: NodeRow, types: { OntologyClass: OntologyClassRow } },
+  card: { Node: NodeCard, types: { OntologyClass: OntologyClassCard } },
+  command: {
+    Node: NodeCommand,
+    types: { OntologyClass: OntologyClassCommand },
+  },
+  graphNode: {
+    Node: NodeGraphNode,
+    types: { OntologyClass: OntologyClassGraphNode },
+  },
 };

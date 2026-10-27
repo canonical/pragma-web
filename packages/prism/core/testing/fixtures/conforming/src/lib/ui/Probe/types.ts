@@ -5,6 +5,8 @@ import type { ComponentProps } from "react";
 type OwnProps = {
   /** The text the box holds. */
   readonly label: string;
+  /** Where the link leads; without one the box holds no link. */
+  readonly href?: string;
 };
 
 /** Props accepted by `Probe`: its label, and its `<div>` root's own. */

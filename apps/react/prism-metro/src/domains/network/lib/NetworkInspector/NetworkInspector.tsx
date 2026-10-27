@@ -9,7 +9,7 @@ import {
   useId,
   useMemo,
 } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import { EntityPlaceholder } from "../EntityPlaceholder/index.js";
 import useNetworkLines from "../hooks/useNetworkLines.js";
 import type { NetworkInspectorProps } from "./types.js";
@@ -20,6 +20,7 @@ const componentCssClassName = "ds network-inspector";
 /** The network's lines in code order and its stations in name order, each
  * linking to its page. */
 const InspectorLists = (): ReactElement => {
+  const t = useMessages();
   const router = useRouter();
   const linesId = useId();
   const stationsId = useId();
@@ -44,7 +45,7 @@ const InspectorLists = (): ReactElement => {
   return (
     <>
       <section className="section" aria-labelledby={linesId}>
-        <h2 id={linesId}>{MESSAGES["network.inspector.lines"]}</h2>
+        <h2 id={linesId}>{t("network.inspector.lines")}</h2>
         <EntityPlaceholder component="EntityList">
           <ul className="lines">
             {lines.map((line) => (
@@ -73,7 +74,7 @@ const InspectorLists = (): ReactElement => {
         </EntityPlaceholder>
       </section>
       <section className="section" aria-labelledby={stationsId}>
-        <h2 id={stationsId}>{MESSAGES["network.inspector.stations"]}</h2>
+        <h2 id={stationsId}>{t("network.inspector.stations")}</h2>
         <ul className="stations">
           {stations.map((stop) => (
             <li className="station" data-placeholder="EntityRow" key={stop.uri}>
@@ -110,14 +111,15 @@ export default function NetworkInspector({
   className,
   ...props
 }: NetworkInspectorProps): ReactElement {
+  const t = useMessages();
   return (
     <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <p className="hint">{MESSAGES["network.inspector.hint"]}</p>
-      <ErrorBoundary fallback={<p role="alert">{MESSAGES["network.error"]}</p>}>
-        <Suspense fallback={<p>{MESSAGES["network.loading"]}</p>}>
+      <p className="hint">{t("network.inspector.hint")}</p>
+      <ErrorBoundary fallback={<p role="alert">{t("network.error")}</p>}>
+        <Suspense fallback={<p>{t("network.loading")}</p>}>
           <InspectorLists />
         </Suspense>
       </ErrorBoundary>

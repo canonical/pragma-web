@@ -5,5 +5,6 @@
  * @module
  */
 
+export { INTERCHANGE_CLASS_URI } from "./constants.js";
 export { networkLayout } from "./layouts.js";
 export { networkRoutes } from "./routes.js";

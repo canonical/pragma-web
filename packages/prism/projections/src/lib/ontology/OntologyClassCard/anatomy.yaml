@@ -1,0 +1,65 @@
+---
+# OntologyClassCard: an ontology class as a card in a grid of entities.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 505:2281 (the classes row's
+# card: "Layout ⊂ UiBlock", the superclass after the subclass sign in the
+# regular weight; then "Abstract class in design-system"; then the
+# definition; no key values and no footer). The kind sentence names the
+# class's abstraction and, as its location, the compact address's prefix,
+# so the card's own location line above the title stays empty.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address; a class without one reads as inert text.
+node:
+  uri: prism.component.ontology_class_card
+  projection:
+    on: OntologyClass
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: parent
+              projection:
+                field: _meta.title
+            relation:
+              cardinality: "0..1"
+              slotName: parent
+              projection:
+                field: superclass
+          - node:
+              role: kind
+              projection:
+                field: isAbstract
+              edges:
+                - node:
+                    role: location
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: kind
+          - node:
+              role: summary
+              projection:
+                field: definition
+            relation:
+              cardinality: "0..1"
+              slotName: summary
+      relation:
+        cardinality: "1"

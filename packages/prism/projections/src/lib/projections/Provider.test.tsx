@@ -7,11 +7,14 @@ import {
   ONTOLOGY_CLASS_HREF,
   ONTOLOGY_CLASS_NODE,
 } from "../../../testing/fixtures.js";
-import { EntityCard } from "../EntityCard/index.js";
-import { EntityChip } from "../EntityChip/index.js";
-import { EntityCommand } from "../EntityCommand/index.js";
-import { EntityRow } from "../EntityRow/index.js";
-import { defaultProjectionMaps } from "../node/index.js";
+import {
+  CardProjection,
+  ChipProjection,
+  CommandProjection,
+  defaultProjectionMaps,
+  GraphNodeProjection,
+  RowProjection,
+} from "../node/index.js";
 import useProjectionMaps from "./hooks/useProjectionMaps.js";
 import ProjectionsProvider from "./Provider.js";
 
@@ -34,7 +37,7 @@ const RouterLink = ({
 );
 
 describe("ProjectionsProvider", () => {
-  it("hands its maps to every representation below it", () => {
+  it("hands its maps to every dispatcher below it", () => {
     render(
       <ProjectionsProvider maps={defaultProjectionMaps}>
         <MapsProbe />
@@ -43,25 +46,28 @@ describe("ProjectionsProvider", () => {
     expect(screen.getByText("default maps")).toBeInTheDocument();
   });
 
-  it("renders every representation's link to a home through its LinkComponent", () => {
+  it("renders every form's link to a home through its LinkComponent", () => {
     const { container } = render(
       createNodePage(
         ONTOLOGY_CLASS_NODE,
         (node) => (
           <>
-            <EntityChip node={node} />
+            <ChipProjection node={node} />
             <ul>
-              <EntityRow node={node} />
-              <EntityCommand node={node} />
+              <RowProjection node={node} />
+              <CommandProjection node={node} />
             </ul>
-            <EntityCard node={node} />
+            <CardProjection node={node} />
+            <svg aria-label="Graph" role="img">
+              <GraphNodeProjection node={node} />
+            </svg>
           </>
         ),
         { LinkComponent: RouterLink },
       ),
     );
     const links = [...container.querySelectorAll("a")];
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(5);
     for (const link of links) {
       expect(link.hasAttribute("data-router-link")).toBe(true);
       expect(link.getAttribute("href")).toBe(ONTOLOGY_CLASS_HREF);

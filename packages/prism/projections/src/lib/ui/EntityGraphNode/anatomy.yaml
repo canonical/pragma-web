@@ -1,0 +1,97 @@
+---
+# EntityGraphNode — an entity as a node of a graph: a 50px box two lines
+# tall, drawn in native SVG.
+# Reference: the projection matrix's graph-node column (the title, then
+# "kind in location" muted, in a bordered box with 8px inline insets and no
+# block insets: two 24px lines inside a 1px border). Slot order: title, then
+# kind and location on the second line.
+#
+# Why not a published component: no published graph node exists. It is SVG
+# because a graph draws hundreds of nodes under pan and zoom: the root is a
+# `<g>` a graph positions with a transform, its box two rects, its lines
+# `<text>`.
+#
+# SVG paints through currentColor: the roster has no fill or stroke key, so
+# each shape's colour is bound as its `typography.color`, which the shape's
+# `fill` or `stroke` reads. The box's geometry is the component's own
+# constants (constants.ts): an SVG rect and text are placed by attributes,
+# which no style key binds. Its text is the context's primary size, on the
+# node's own 24-unit lines. A long line is clipped at the inner inset, since
+# SVG text does not truncate.
+#
+# A linked title is an SVG link inside the title's `<text>`, and reads as
+# the title, as every representation's link does: the text's colour,
+# underlined on hover, its focus ring drawn inside it since the node clips
+# its lines.
+#
+# An identifier in the title, a `<tspan class="identifier">`, sets the
+# monospace face: an SVG `<text>` takes no face from a `<code>`, so the
+# node names the face the reset gives `code`.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-graph-node-*`), bound to the symbol named here.
+#
+# Token ledger (no symbol to bind, held in constants.ts):
+#   GRAPH_NODE_HEIGHT 50, GRAPH_NODE_LINE 24, GRAPH_NODE_INSET 8,
+#   GRAPH_NODE_STROKE 1 and the default GRAPH_NODE_WIDTH 192, in SVG user
+#   units: SVG geometry is attributes, not CSS.
+#   --entity-graph-node-focus-ring-width: 2px,
+#   --entity-graph-node-focus-ring-offset: -2px
+#                                      the link's ring, drawn inside it.
+#   --entity-graph-node-identifier-font-family: ui-monospace, monospace
+#                                      the identifier's face: no token names
+#                                      the monospace face; the reset's list
+#                                      for `code`.
+#
+# Roster namespaces (accepted and tracked): the semantic typography symbols
+# typography.text.primary.fontSize and
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.entity_graph_node
+  styles:
+    typography.size: typography.text.primary.fontSize
+  edges:
+    - node:
+        role: surface
+        styles:
+          typography.color: color.background
+      relation: { cardinality: "1", slotName: surface }
+    - node:
+        role: frame
+        styles:
+          typography.color: color.border
+      relation: { cardinality: "1", slotName: frame }
+    - node:
+        role: title
+        styles:
+          typography.weight: typography.text.primary.bold.fontWeight
+        edges:
+          - node:
+              role: link
+              styles:
+                typography.color: inherit
+                typography.decoration: none
+                typography.decoration@hover: underline
+                appearance.outline.width@focus: 2px
+                appearance.outline.style@focus: solid
+                appearance.outline.color@focus: color.focusRing
+                appearance.outline.offset@focus: -2px
+            relation: { cardinality: "0..1", slotName: link }
+          - node:
+              role: identifier
+              styles:
+                typography.fontFamily: "ui-monospace, monospace"
+            relation: { cardinality: "0..*", slotName: identifier }
+      relation: { cardinality: "1", slotName: title }
+    - node:
+        role: context
+        styles:
+          typography.color: color.text.muted
+        edges:
+          - node:
+              role: kind
+            relation: { cardinality: "0..1", slotName: kind }
+          - node:
+              role: location
+            relation: { cardinality: "0..1", slotName: location }
+      relation: { cardinality: "0..1", slotName: context }

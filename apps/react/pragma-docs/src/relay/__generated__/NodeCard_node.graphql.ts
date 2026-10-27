@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<693362d66325fa25b32e5f841c0f0a13>>
+ * @generated SignedSource<<e49816226945e0216b0ce8e49f5a5f5f>>
  * @lightSyntaxTransform
  */
 
@@ -10,11 +10,15 @@
 import { ReaderFragment } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type NodeCard_node$data = {
+  readonly __typename: string;
   readonly _meta: {
     readonly curie: string;
+    readonly definition: string | null | undefined;
     readonly title: string;
     readonly type: {
-      readonly uri: string;
+      readonly _meta: {
+        readonly title: string;
+      };
     };
   };
   readonly " $fragmentType": "NodeCard_node";
@@ -24,7 +28,15 @@ export type NodeCard_node$key = {
   readonly " $fragmentSpreads": FragmentRefs<"NodeCard_node">;
 };
 
-const node: ReaderFragment = {
+const node: ReaderFragment = (function(){
+var v0 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "title",
+  "storageKey": null
+};
+return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -33,23 +45,31 @@ const node: ReaderFragment = {
     {
       "alias": null,
       "args": null,
+      "kind": "ScalarField",
+      "name": "__typename",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
       "concreteType": "EntityMeta",
       "kind": "LinkedField",
       "name": "_meta",
       "plural": false,
       "selections": [
+        (v0/*:: as any*/),
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "title",
+          "name": "curie",
           "storageKey": null
         },
         {
           "alias": null,
           "args": null,
           "kind": "ScalarField",
-          "name": "curie",
+          "name": "definition",
           "storageKey": null
         },
         {
@@ -63,8 +83,13 @@ const node: ReaderFragment = {
             {
               "alias": null,
               "args": null,
-              "kind": "ScalarField",
-              "name": "uri",
+              "concreteType": "EntityMeta",
+              "kind": "LinkedField",
+              "name": "_meta",
+              "plural": false,
+              "selections": [
+                (v0/*:: as any*/)
+              ],
               "storageKey": null
             }
           ],
@@ -77,7 +102,8 @@ const node: ReaderFragment = {
   "type": "Node",
   "abstractKey": "__isNode"
 };
+})();
 
-(node as any).hash = "784693aa04deba36802f52a6bc5b03b2";
+(node as any).hash = "78395d511fc25d08e36f0083089a0040";
 
 export default node;

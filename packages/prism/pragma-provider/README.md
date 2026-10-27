@@ -154,6 +154,58 @@ not served.
 
 ---
 
+## Search: one root field over titles, CURIEs and definitions
+
+The provider adds a second root field, for finding a node by what it is called:
+
+```graphql
+extend type Query {
+  search(text: String!, first: Int, after: String): NodeConnection!
+}
+```
+
+**The rule.** The text is trimmed and lowercased; empty text, or text that is only
+whitespace, matches nothing. A node matches when its title, its CURIE or its definition
+contains the text, ignoring case. The first of the three that does decides the match: a
+title match ranks before a CURIE match, and a CURIE match before a definition match.
+Within one, an earlier position ranks first, then a shorter title, then the title, then
+the IRI. Strings are compared by code unit, never by locale, so the order is the same on
+every machine.
+
+**What is indexed.** Every IRI the graph gives an `rdf:type`, read through the compiled
+schema's own `node(id:)`: instances and `OntologyClass` nodes alike. What `node(id:)`
+resolves to null, properties and ontologies among it, is left out. Each node is read once,
+at boot, with the same query a client would send (`uri` and `_meta { curie title
+definition }`), so search matches exactly what `_meta` serves. A node that fails to read
+fails the boot, naming its IRI, rather than the first search.
+
+**The cost.** On the installed ref packages, 877 IRIs are typed and 765 of them resolve;
+reading them takes about 0.6 to 0.7 s on top of a boot of about 0.5 s, measured under
+Node. The docsite's `bun run schema`, which boots the provider, takes about 1.7 s end to
+end. Every boot pays it: the graph server, `schema:check`, and the tests that boot the
+corpus.
+
+**The default language only.** Titles and definitions are read in `en`, the contract's
+default, once, at boot; the request's `x-prism-locale` is not consulted.
+
+**Paging.** The ranked IRIs are paged as every ke-graphql connection is: the cursor is the
+base64 of the IRI, a page holds 50 nodes unless `first` asks for fewer, and never more
+than 100. A cursor the ranking does not hold starts from the head, a negative `first` is
+an error, and `hasPreviousPage` is false after a cursor, as it is on every other
+connection this provider serves.
+
+**Why a root field.** For the reasons the Prose section gives: it is the one position
+ke-graphql can extend that every reader selects the same way. `createSearchExtensions`
+and `createProseExtensions` are composed into the one factory `createSchemaPlugin` takes,
+and a field both declared would fail the boot.
+
+**Written twice, on purpose.** `@canonical/prism-graph-example` serves the same field
+with its own copies of `matchSearchEntry` and `rankSearchEntries`. That package is the
+hand-written control and depends on nothing of this one, so the two rankings agree by
+test rather than by construction.
+
+---
+
 ## Testing: the hermetic corpus
 
 Pragma's real corpus is the three ref packages plus a semantics working tree. The

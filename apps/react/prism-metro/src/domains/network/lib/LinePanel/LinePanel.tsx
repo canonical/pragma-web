@@ -2,7 +2,7 @@
 
 import { useRouter } from "@canonical/router-react";
 import { type CSSProperties, type ReactElement, useId } from "react";
-import { formatMessage, MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import type { NodeRef } from "../types.js";
 import type { LinePanelProps } from "./types.js";
 import "./styles.css";
@@ -25,6 +25,7 @@ export default function LinePanel({
   style,
   ...props
 }: LinePanelProps): ReactElement {
+  const t = useMessages();
   const router = useRouter();
   const headingId = useId();
   const linkStop = (stop: NodeRef): ReactElement => (
@@ -49,16 +50,14 @@ export default function LinePanel({
       </h2>
       <dl className="facts">
         <div>
-          <dt className="term">{MESSAGES["network.line.service"]}</dt>
+          <dt className="term">{t("network.line.service")}</dt>
           <dd className="value">
-            {line.isLoop
-              ? MESSAGES["network.line.loop"]
-              : MESSAGES["network.line.linear"]}
+            {line.isLoop ? t("network.line.loop") : t("network.line.linear")}
           </dd>
         </div>
         {line.ends === undefined ? null : (
           <div>
-            <dt className="term">{MESSAGES["network.line.ends"]}</dt>
+            <dt className="term">{t("network.line.ends")}</dt>
             {line.ends.map((end) => (
               <dd className="value" key={end.curie}>
                 {linkStop(end)}
@@ -67,11 +66,11 @@ export default function LinePanel({
           </div>
         )}
         <div>
-          <dt className="term">{MESSAGES["network.line.stops"]}</dt>
+          <dt className="term">{t("network.line.stops")}</dt>
           <dd className="value">{line.stopCount}</dd>
         </div>
         <div>
-          <dt className="term">{MESSAGES["network.line.interchanges"]}</dt>
+          <dt className="term">{t("network.line.interchanges")}</dt>
           <dd className="value">
             <ul className="interchanges">
               {line.interchanges.map((stop) => (
@@ -79,7 +78,7 @@ export default function LinePanel({
                   {linkStop(stop)}{" "}
                   {stop.transferMinutes === undefined
                     ? null
-                    : formatMessage("network.station.minutes", {
+                    : t("network.station.minutes", {
                         minutes: stop.transferMinutes,
                       })}
                 </li>

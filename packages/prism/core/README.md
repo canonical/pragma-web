@@ -60,7 +60,11 @@ each a subgrid over every column:
   an optional `aside` and an optional `colophon` band under the body. The
   aside is the canvas's own: it holds the last three columns inside the
   canvas's scroll, starting at the top of the page and scrolling with it,
-  and below two groups of columns it moves under the page.
+  and below two groups of columns it moves under the page. A page that
+  lays a collection on the page grid, such as a catalog's cards, gives
+  each item `CANVAS_PAGE_TILE_CLASS_NAME`: the canvas spans each tile over
+  two columns, and over the whole row below one group of columns, where
+  the canvas holds three.
 
 Each archetype's gap is the grid's gutter on both axes, so its rows sit one
 gutter apart. A region given a node that renders nothing (`null`, a
@@ -94,9 +98,16 @@ export function GlossaryLayout({ children }: { children: ReactNode }) {
 ```
 
 Both render the skip link first (the published `SkipLink`, pointed at the
-canvas), then a `.rail` region, a `.strip` region and the `Canvas`. Regions are placed by column count from the start and by
+canvas), then a `.rail` region, a `.strip` region and the `Canvas`. A
+strip, an inspector, an aside or a colophon that renders nothing leaves no
+region, and no row or gutter for it: a layout with no strip starts its
+canvas at the viewport's top. Regions are placed by column count from the start and by
 negative lines from the end, so they hold their places at any column
-count, and below one group of columns the rail narrows to one column.
+count, and below one group of columns the rail narrows to one column. The
+bands, the `ModeStrip` and the colophon region, keep their columns but
+bleed across the gutter to meet the rail's border, a negative inline
+margin of one gutter compensated by the same padding, so their rules run
+edge to edge while their content sits on the canvas's first column line.
 
 The rail reads its lenses from the route table it is given and wires each
 lens's shortcut key itself, showing each key as a `KeyboardKey`. It does
@@ -324,7 +335,7 @@ site's own catalog, and the factory holds no reader-facing string.
 - Layouts: `WorkspaceLayout`, `DocumentLayout`; types
   `WorkspaceLayoutProps`, `DocumentLayoutProps`.
 - Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
-  `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+  `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
   `ModeStrip`, `Rail`, `ThemeSelector`; types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,

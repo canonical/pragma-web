@@ -1,15 +1,17 @@
 // @vitest-environment node
 
 import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertAnatomy,
+  assertProjectionMatchesFragment,
   assertScaffold,
   assertStylesheets,
   assertStylesMatchAnatomy,
   listAnatomyFolders,
 } from "@canonical/prism-core/testing";
+import type { ReaderFragment } from "relay-runtime";
 import { describe, expect, it } from "vitest";
 
 /** The app's root, three levels up from this file. */
@@ -18,7 +20,10 @@ const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 /** Where the app's general components live. */
 const UI_DIRECTORY = join(APP_ROOT, "src", "lib", "ui");
 
-/** Where each domain's own components live: `src/domains/<subject>/lib`. */
+/**
+ * Where each domain's own components live, `src/domains/<subject>/lib`, for
+ * the domains that have any.
+ */
 const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
   withFileTypes: true,
 })
@@ -34,6 +39,9 @@ const EXTERNAL_TOKENS = [
   "--color-text",
   "--color-text-link",
   "--color-text-muted",
+  "--typography-text-primary-bold-font-weight",
+  "--typography-text-primary-font-size",
+  "--typography-text-primary-line-height",
 ];
 
 /**
@@ -43,6 +51,36 @@ const EXTERNAL_TOKENS = [
 const DOCUMENT_TOKENS = ["--grid-col-min"];
 
 const folders = listAnatomyFolders([UI_DIRECTORY, ...DOMAIN_LIBRARIES]);
+
+/**
+ * The app's compiled fragments, by name: the reader artifact of each
+ * component's `<Name>_node`.
+ */
+const fragments = Object.fromEntries(
+  Object.values(
+    import.meta.glob<{ readonly default: ReaderFragment }>(
+      "../../relay/__generated__/*_node.graphql.ts",
+      { eager: true },
+    ),
+  ).map((module) => [module.default.name, module.default]),
+);
+
+/**
+ * The projections among the components: those whose anatomy's root
+ * narrows to a type through `projection.on`.
+ */
+const projectionFolders = folders.filter(
+  (folder) => assertAnatomy(folder).root.projection?.on !== undefined,
+);
+
+/**
+ * The private subcomponents, each in its parent's `common/` folder. The
+ * scaffold check places a component only under `src/lib/ui` or a domain's
+ * `lib`, so these keep their anatomy and their styles, not that check.
+ */
+const subcomponentFolders = listAnatomyFolders(
+  folders.map((folder) => join(folder, "common")),
+);
 
 describe("the app's components", () => {
   it("are found, the shell among them", () => {
@@ -57,8 +95,54 @@ describe("the app's components", () => {
     },
   );
 
+  it("have their projections found, the station card among them", () => {
+    expect(projectionFolders).toContain(
+      join(APP_ROOT, "src", "domains", "metro", "lib", "StationCard"),
+    );
+  });
+
+  it.each(projectionFolders)(
+    "%s reads the fields its fragment reads",
+    (folder) => {
+      const name = `${basename(folder)}_node`;
+      const fragment = fragments[name];
+      if (fragment === undefined) {
+        throw new Error(`${name} is not compiled: run \`bun run relay\``);
+      }
+      assertProjectionMatchesFragment(assertAnatomy(folder), fragment);
+    },
+  );
+
+  it("are found in the domains too, the landing among them", () => {
+    expect(folders).toContain(
+      join(APP_ROOT, "src", "domains", "metro", "lib", "HomePage"),
+    );
+  });
+
+  it("have their subcomponents found, the landing's doors among them", () => {
+    expect(subcomponentFolders).toContain(
+      join(
+        APP_ROOT,
+        "src",
+        "domains",
+        "metro",
+        "lib",
+        "HomePage",
+        "common",
+        "LensCards",
+      ),
+    );
+  });
+
+  it.each(subcomponentFolders)(
+    "%s keeps its anatomy and its styles",
+    (folder) => {
+      assertStylesMatchAnatomy(folder, assertAnatomy(folder));
+    },
+  );
+
   it.each([UI_DIRECTORY, ...DOMAIN_LIBRARIES])(
-    "under %s keep the design's token and grid rules in their stylesheets",
+    "keep the design's token and grid rules in the stylesheets under %s",
     (directory) => {
       expect(() =>
         assertStylesheets({

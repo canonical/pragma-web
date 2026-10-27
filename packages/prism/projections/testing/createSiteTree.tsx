@@ -1,51 +1,24 @@
-import {
-  createEnvironment,
-  type HomeNode,
-  type HomeResolver,
-  type Homes,
-  HomesProvider,
-} from "@canonical/prism-core";
+import { createEnvironment, HomesProvider } from "@canonical/prism-core";
 import type { LinkComponent } from "@canonical/react-ds-global";
-import {
-  createMemoryAdapter,
-  createRouter,
-  type Router,
-  route,
-} from "@canonical/router-core";
+import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
-import type { Environment } from "relay-runtime";
+import type { Environment, IEnvironment } from "relay-runtime";
 import { defaultProjectionMaps } from "../src/lib/node/index.js";
 import {
   type ProjectionMaps,
   ProjectionsProvider,
 } from "../src/lib/projections/index.js";
-
-/** A site's route table with one entity page, addressed by the entity. */
-const THING_ROUTES = {
-  thing: route({ url: "/things/:uri", content: () => null }),
-} as const;
-
-/** Build the thing page's href for `node`, through the router. */
-const buildThingPath = (
-  node: HomeNode,
-  router: Router<typeof THING_ROUTES>,
-): string => router.buildPath("thing", { params: { uri: node.uri } });
-
-/**
- * The site's homes: ontology classes live on the thing page. Typed over the
- * fixture table: a site registers its own route map, a test cannot.
- */
-const HOMES: Homes = {
-  OntologyClass: buildThingPath as unknown as HomeResolver,
-};
+import { HOMES, THING_ROUTES } from "./fixtures.js";
 
 /** Options for `createSiteTree`. */
 export interface SiteTreeOptions {
   /** The maps to provide, in place of `defaultProjectionMaps`. */
   readonly maps?: ProjectionMaps;
-  /** The link a node's home renders through, in place of the provider's default. */
+  /**
+   * The link a node's home renders through, in place of the provider's default.
+   */
   readonly LinkComponent?: LinkComponent;
 }
 
@@ -63,7 +36,7 @@ export const createStoreOnlyEnvironment = (): Environment =>
  * router over one entity page, the site's homes and the projection maps.
  */
 export default function createSiteTree(
-  environment: Environment,
+  environment: IEnvironment,
   children: ReactNode,
   { maps = defaultProjectionMaps, LinkComponent }: SiteTreeOptions = {},
 ): ReactElement {

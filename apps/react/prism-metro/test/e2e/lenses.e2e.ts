@@ -1,12 +1,13 @@
 // @vitest-environment node
 
 /**
- * The three lenses against the metro provider, end to end: the metro graph
- * in its own process, and each server-rendering web cell pointed at it. Each
- * page is fetched as a crawler would, so what is asserted is the HTML the
- * server rendered from the data it prepared.
+ * The landing and the three lenses against the metro provider, end to end:
+ * the metro graph in its own process, and each server-rendering web cell
+ * pointed at it. Each page is fetched as a crawler would, so what is
+ * asserted is the HTML the server rendered from the data it prepared.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { LINE_COUNT, STATION_COUNT } from "../../testing/fixtures.js";
 import { DEV_READY_MS, GRAPH_READY_MS, PREVIEW_READY_MS } from "./constants.js";
 import startServer from "./startServer.js";
 import type { RunningServer } from "./types.js";
@@ -18,7 +19,7 @@ const INITIAL_DATA_PATTERN = /window\.__INITIAL_DATA__ = (.*?)<\/script>/s;
 
 /** An instance chip of the term inspector, linking to the stations lens. */
 const INSTANCE_CHIP_PATTERN =
-  /<a class="ds router-link title" href="(\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
+  /<a class="ds router-link value" href="(\/stations\/metro%3A[\w-]+)">([^<]+)<\/a>/;
 
 const CELLS = [
   { script: "dev:bun", timeoutMs: DEV_READY_MS },
@@ -74,6 +75,25 @@ afterAll(async () => {
 });
 
 describe.each(CELLS)("$script over the metro graph", ({ script }) => {
+  it("renders the landing with a door and a count per lens", async () => {
+    const { status, html } = await fetchPage(script, "/");
+    expect(status).toBe(200);
+    const doors = html.split('class="ds card ds lens-card"').slice(1);
+    expect(doors).toHaveLength(3);
+    expect(doors.at(0)).toContain('href="/stations"');
+    expect(doors.at(1)).toContain('href="/lines"');
+    expect(doors.at(2)).toContain('href="/definitions"');
+    expect(html).toContain(
+      `<data value="${STATION_COUNT}">${STATION_COUNT} stations</data>`,
+    );
+    expect(html).toContain(
+      `<data value="${LINE_COUNT}">${LINE_COUNT} lines</data>`,
+    );
+    const embedded = INITIAL_DATA_PATTERN.exec(html)?.at(1);
+    const records = JSON.parse(String(embedded)).relay?.records ?? {};
+    expect(Object.keys(records).length).toBeGreaterThan(0);
+  });
+
   it("renders the stations index with its data", async () => {
     const { status, html } = await fetchPage(script, "/stations");
     expect(status).toBe(200);
@@ -90,14 +110,14 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     );
     expect(status).toBe(200);
     expect(html).toMatch(/<h1[^>]*>Northgate<\/h1>/);
-    expect(html).toContain('class="ds fields-table"');
+    expect(html).toContain('class="ds field-list"');
   });
 
   it("renders the lines index with the line rows", async () => {
     const { status, html } = await fetchPage(script, "/lines");
     expect(status).toBe(200);
     expect(html).toMatch(
-      /<li class="ds node-row ds line-row"[^>]*>.*?Circle Line/s,
+      /<li [^>]*class="ds entity-row ds line-row"[^>]*>.*?Circle Line/s,
     );
   });
 

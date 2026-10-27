@@ -16,7 +16,10 @@ export const WORKSPACE_PATH = "/definitions";
  * columns must fit four grid columns; a standard's entity page, whose
  * current crumb is the standard's IRI, an identifier with no break
  * opportunity; a component's entity page, whose identifiers and
- * properties table are wider than a phone; and the not-found page.
+ * properties table are wider than a phone; the not-found page; and the
+ * pages of plain flow, the sign-in and account pages, a lens's
+ * placeholder and the playground, whose sections must span the main
+ * column like every other page.
  */
 export const DOCUMENT_PATHS = [
   "/",
@@ -25,6 +28,10 @@ export const DOCUMENT_PATHS = [
   `/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#code.api.stability")}`,
   `/components/${encodeURIComponent("ds:global.component.accordion")}`,
   "/not-found",
+  "/login",
+  "/account?auth=1",
+  "/guides",
+  "/playground",
 ] as const;
 
 /** The Components catalog, whose cards must fill their rows. */

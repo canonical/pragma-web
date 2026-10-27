@@ -3,18 +3,17 @@
 import { ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, Suspense, useMemo } from "react";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import { buildNetworkGeometry } from "../geometry/index.js";
 import useNetworkLines from "../hooks/useNetworkLines.js";
 import { SchematicMap } from "../SchematicMap/index.js";
 
 /** The drawing, built from the lines the map query reads. */
 const NetworkDrawing = (): ReactElement => {
+  const t = useMessages();
   const lines = useNetworkLines();
   const geometry = useMemo(() => buildNetworkGeometry(lines), [lines]);
-  return (
-    <SchematicMap geometry={geometry} title={MESSAGES["network.map.title"]} />
-  );
+  return <SchematicMap geometry={geometry} title={t("network.map.title")} />;
 };
 
 /**
@@ -28,11 +27,12 @@ const NetworkDrawing = (): ReactElement => {
  * @implements metro.component.network_map
  */
 export default function NetworkMap(): ReactElement {
+  const t = useMessages();
   return (
     <>
-      <Head title={MESSAGES["lens.network"]} />
-      <ErrorBoundary fallback={<p role="alert">{MESSAGES["network.error"]}</p>}>
-        <Suspense fallback={<p>{MESSAGES["network.loading"]}</p>}>
+      <Head title={t("lens.network")} />
+      <ErrorBoundary fallback={<p role="alert">{t("network.error")}</p>}>
+        <Suspense fallback={<p>{t("network.loading")}</p>}>
           <NetworkDrawing />
         </Suspense>
       </ErrorBoundary>

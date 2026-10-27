@@ -1,0 +1,37 @@
+---
+# InterchangeCommand: an interchange as a 56px command-palette result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
+# title over "kind in location", one vital at the end). Best guess: the
+# kind is the interchange's class, the location its fare zone, and the
+# vital counts the lines that meet there: "Central Exchange / Interchange
+# in Central Zone · 3 lines".
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved
+# from the compact address.
+node:
+  uri: metro.component.interchange_command
+  projection: { on: Interchange }
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: location
+              projection: { field: _meta.title }
+            relation: { cardinality: "0..1", slotName: location, projection: { field: inZone } }
+          - node:
+              role: vital
+              projection: { field: uri }
+            relation: { cardinality: "1", slotName: vital, projection: { field: servesLine } }
+      relation: { cardinality: "1" }

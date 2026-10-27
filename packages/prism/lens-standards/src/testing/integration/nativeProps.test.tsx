@@ -19,34 +19,15 @@ import standardEntityRecords from "../../../testing/records/standardEntityRecord
 import standardsIndexRecords from "../../../testing/records/standardsIndexRecords.js";
 import type { StandardEntityQuery } from "../../__generated__/StandardEntityQuery.graphql.js";
 import standardEntityQueryNode from "../../__generated__/StandardEntityQuery.graphql.js";
-import type { StandardsIndexQuery } from "../../__generated__/StandardsIndexQuery.graphql.js";
-import standardsIndexQueryNode from "../../__generated__/StandardsIndexQuery.graphql.js";
-import { StandardProse } from "../../lib/StandardArticle/common/StandardProse/index.js";
-import { StandardArticle } from "../../lib/StandardArticle/index.js";
-import { StandardReadingPage } from "../../lib/StandardReadingPage/index.js";
-import { StandardsIcon } from "../../lib/StandardsIcon/index.js";
-import { StandardsIndex } from "../../lib/StandardsIndex/index.js";
-import { StandardsPage } from "../../lib/StandardsPage/index.js";
 import { buildStandardEntityVariables } from "../../lib/standardEntityQuery.js";
-import { buildStandardsIndexVariables } from "../../lib/standardsIndexQuery.js";
+import { StandardProse } from "../../lib/ui/StandardArticle/common/index.js";
+import { StandardArticle } from "../../lib/ui/StandardArticle/index.js";
+import { StandardReadingPage } from "../../lib/ui/StandardReadingPage/index.js";
+import { StandardsIcon } from "../../lib/ui/StandardsIcon/index.js";
+import { StandardsIndex } from "../../lib/ui/StandardsIndex/index.js";
+import { StandardsPage } from "../../lib/ui/StandardsPage/index.js";
 
 const { classUri } = STANDARDS_BINDING_FIXTURE;
-
-/** The index over the warm store, given native props. */
-const IndexProbe = () => {
-  const data = useLazyLoadQuery<StandardsIndexQuery>(
-    standardsIndexQueryNode,
-    buildStandardsIndexVariables(classUri),
-  );
-  return (
-    <StandardsIndex
-      className="probe"
-      data-probe="index"
-      id="index"
-      query={data}
-    />
-  );
-};
 
 /** The article over the warm store, given native props. */
 const ArticleProbe = () => {
@@ -87,7 +68,12 @@ describe("native props", () => {
         createFetchSpy(),
         <>
           <StandardsPage classUri={classUri} className="probe" id="page" />
-          <IndexProbe />
+          <StandardsIndex
+            classUri={classUri}
+            className="probe"
+            data-probe="index"
+            id="index"
+          />
         </>,
       ),
     );
@@ -135,7 +121,7 @@ describe("native props", () => {
 
     expect(container.querySelector("#reading")).toHaveClass(
       "ds",
-      "standard-reading",
+      "standard-reading-page",
       "probe",
     );
     expect(container.querySelector("#reading")).toHaveAttribute(

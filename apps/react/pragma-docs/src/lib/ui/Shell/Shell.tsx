@@ -10,6 +10,7 @@ import type { AnyRoute, RouteMap } from "@canonical/router-core";
 import { Outlet, RouterProvider } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
+import { MESSAGES } from "#i18n";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
 import { GRID_PRESET_CLASS_NAMES } from "./constants.js";
@@ -68,7 +69,11 @@ export default function Shell<
                   .filter(Boolean)
                   .join(" ")}
               >
-                <Outlet fallback={<p className="loading">Loading…</p>} />
+                <Outlet
+                  fallback={
+                    <p className="loading">{MESSAGES["shell.loading"]}</p>
+                  }
+                />
               </div>
             </ProjectionsProvider>
           </HomesProvider>

@@ -11,7 +11,12 @@
  * sits, that it scrolls with the page and that every entry of an aside
  * taller than the viewport can be scrolled into view, the gutter between
  * the rows, that a document with no colophon ends its canvas flush with
- * the viewport, and that nothing reaches past the viewport.
+ * the viewport, that a layout with no strip starts its canvas flush with
+ * the viewport's top, that a page's tiles fill their rows to the canvas's
+ * end, that the strip's and the colophon's bands run from the rail's
+ * border to the viewport's edge with their content between the canvas's
+ * first column line and its last, and that nothing reaches past the
+ * viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -23,12 +28,15 @@ import type { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  CANVAS_PAGE_TILE_CLASS_NAME,
   DocumentLayout,
   ModeStrip,
   WorkspaceLayout,
 } from "../../src/lib/ui/index.js";
 import {
+  BAND_SELECTOR,
   FRAME_SELECTOR,
+  type LayoutMeasure,
   launchBrowser,
   type MeasureLayoutOptions,
   measureLayout,
@@ -67,6 +75,7 @@ const MEASURE_OPTIONS: MeasureLayoutOptions = {
     "main.ds.canvas",
   ].join(", "),
   frameSelector: FRAME_SELECTOR,
+  bandSelector: BAND_SELECTOR,
   step: 4,
   tolerance: 0.5,
   clippingOverflows: ["auto", "scroll", "hidden", "clip"],
@@ -148,6 +157,54 @@ const bareDocumentLayout = (
   </DocumentLayout>
 );
 
+/** A document with a colophon and no strip, as a site's lobby renders it. */
+const striplessDocumentLayout = (
+  <DocumentLayout
+    colophon={<p>Colophon</p>}
+    rail={<nav aria-label="Rail">Rail</nav>}
+  >
+    <p>Page</p>
+  </DocumentLayout>
+);
+
+/** Items enough to fill several rows of tiles at every width. */
+const TILES = Array.from({ length: 12 }, (_, index) => `Tile ${index + 1}`);
+
+/**
+ * A document whose page lays a collection of tiles on a subgrid of its
+ * columns, as a catalog does.
+ */
+const tiledDocumentLayout = (
+  <DocumentLayout rail={<nav aria-label="Rail">Rail</nav>}>
+    <ul
+      style={{
+        display: "grid",
+        gridTemplateColumns: "subgrid",
+        gridColumn: "1 / -1",
+        gap: "var(--grid-gutter)",
+        margin: 0,
+        padding: 0,
+      }}
+    >
+      {TILES.map((text) => (
+        <li className={CANVAS_PAGE_TILE_CLASS_NAME} key={text}>
+          {text}
+        </li>
+      ))}
+    </ul>
+  </DocumentLayout>
+);
+
+/** A workspace with an inspector and no strip. */
+const striplessWorkspaceLayout = (
+  <WorkspaceLayout
+    inspector={<p>Inspector</p>}
+    rail={<nav aria-label="Rail">Rail</nav>}
+  >
+    <p>Canvas</p>
+  </WorkspaceLayout>
+);
+
 /**
  * Read the computed placement and display of the elements a reflow moves,
  * the layout's row gap and its rows.
@@ -184,12 +241,27 @@ function readPlacement(page: Page) {
       columns: getComputedStyle(
         document.querySelector(".ds.shell") ?? document.body,
       ).gridTemplateColumns.split(" ").length,
+      columnStarts: (() => {
+        const shell = getComputedStyle(
+          document.querySelector(".ds.shell") ?? document.body,
+        );
+        const gap = Number.parseFloat(shell.columnGap);
+        const widths = shell.gridTemplateColumns
+          .split(" ")
+          .map((width) => Number.parseFloat(width));
+        return widths.map((_, index) =>
+          widths
+            .slice(0, index)
+            .reduce((start, width) => start + width + gap, 0),
+        );
+      })(),
       rail: read(":is(.ds.workspace-layout, .ds.document-layout) > .rail"),
       canvas: read("main.ds.canvas"),
       page: read("main.ds.canvas > .page"),
       inspector: read(".ds.workspace-layout > .inspector"),
       trigger: read(".inspector-trigger"),
       aside: read("main.ds.canvas > .aside"),
+      colophon: read(".ds.document-layout > .colophon"),
     };
   });
 }
@@ -221,6 +293,29 @@ function countReachableAsideEntries(page: Page) {
     canvas.scrollTop = 0;
     return reached.size;
   });
+}
+
+/**
+ * Assert every band of a measured layout runs from the rail's border to
+ * the viewport's edge, its content starting where the canvas starts and
+ * ending on the last column line, the viewport's edge on a shell with no
+ * outer margin.
+ */
+function expectBands(
+  measure: LayoutMeasure,
+  width: number,
+  count: number,
+): void {
+  expect(measure.bands).toHaveLength(count);
+  for (const band of measure.bands) {
+    expect(band.start, band.element).toBeCloseTo(measure.edges.railEnd, 1);
+    expect(band.end, band.element).toBeCloseTo(width, 1);
+    expect(band.contentStart, band.element).toBeCloseTo(
+      measure.edges.canvasStart,
+      1,
+    );
+    expect(band.contentEnd, band.element).toBeCloseTo(width, 1);
+  }
 }
 
 let browser: Browser;
@@ -258,14 +353,25 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
         !viewport.inspectorShown,
       );
       expect(placement.canvas?.column).toEqual(viewport.canvasColumns);
+      // On the shell's column lines: the canvas from the rail's edge to the
+      // inspector, which takes the last three columns; without the region,
+      // the canvas runs to the viewport's edge.
+      const starts = placement.columnStarts;
       if (viewport.inspectorShown) {
-        expect(placement.canvas?.right).toBeLessThanOrEqual(
-          placement.inspector?.left ?? 0,
+        expect(placement.canvas?.left).toBeCloseTo(starts.at(2) ?? -1, 1);
+        expect(placement.inspector?.left).toBeCloseTo(starts.at(-3) ?? -1, 1);
+        expect(placement.inspector?.right).toBeCloseTo(viewport.width, 1);
+        expect(placement.canvas?.right).toBeCloseTo(
+          (starts.at(-3) ?? -1) - 16,
+          1,
         );
+      } else {
+        expect(placement.canvas?.right).toBeCloseTo(viewport.width, 1);
       }
       const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
       expect(measure.overflow).toEqual([]);
       expect(measure.scrollers).not.toContain("main.ds.canvas");
+      expectBands(measure, viewport.width, 1);
     } finally {
       await page.close();
     }
@@ -285,6 +391,13 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
         expect(before.aside?.column).toEqual(["-4", "-1"]);
         expect(before.page?.column).toEqual(["1", "-4"]);
         expect(before.aside?.top).toBe(before.canvas?.top);
+        // On the shell's column lines: the page from the rail's edge to the
+        // aside, which takes the last three columns to the viewport's edge.
+        const starts = before.columnStarts;
+        expect(before.page?.left).toBeCloseTo(starts.at(2) ?? -1, 1);
+        expect(before.page?.right).toBeCloseTo((starts.at(-3) ?? -1) - 16, 1);
+        expect(before.aside?.left).toBeCloseTo(starts.at(-3) ?? -1, 1);
+        expect(before.aside?.right).toBeCloseTo(viewport.width, 1);
       } else {
         expect(before.aside?.row).toBe("2");
         expect(before.page?.column).toEqual(["1", "-1"]);
@@ -305,6 +418,7 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       for (const scroller of measure.scrollers) {
         expect(["main.ds.canvas", "div.rail"]).toContain(scroller);
       }
+      expectBands(measure, viewport.width, 2);
 
       // The colophon takes a row of its own, one gutter under the canvas.
       expect(before.rows).toBe(3);
@@ -320,6 +434,67 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       const placement = await readPlacement(page);
       expect(placement.rows).toBe(2);
       expect(placement.canvas?.bottom).toBe(viewport.height);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("starts the canvas of a document with no strip flush with the viewport's top", async () => {
+    const page = await open(striplessDocumentLayout);
+    try {
+      const placement = await readPlacement(page);
+      expect(placement.rows).toBe(2);
+      expect(placement.canvas?.top).toBe(0);
+      expect(placement.colophon?.bottom).toBe(viewport.height);
+      expect(placement.colophon?.top).toBe(
+        (placement.canvas?.bottom ?? 0) + 16,
+      );
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("spans each page tile over two columns, or the whole row below one group", async () => {
+    const page = await open(tiledDocumentLayout);
+    try {
+      const { canvas, tiles } = await page.evaluate((selector) => {
+        const box = (element: Element | null) => {
+          const rect = element?.getBoundingClientRect();
+          return { left: rect?.left ?? -1, right: rect?.right ?? -1 };
+        };
+        return {
+          canvas: box(document.querySelector("main.ds.canvas")),
+          tiles: [...document.querySelectorAll(selector)].map((tile) => ({
+            ...box(tile),
+            column: `${getComputedStyle(tile).gridColumnStart} / ${getComputedStyle(tile).gridColumnEnd}`,
+          })),
+        };
+      }, `.${CANVAS_PAGE_TILE_CLASS_NAME}`);
+      expect(tiles).toHaveLength(TILES.length);
+      for (const tile of tiles) {
+        expect(tile.column).toBe(
+          viewport.width < 448 ? "1 / -1" : "span 2 / auto",
+        );
+      }
+      expect(Math.min(...tiles.map(({ left }) => left))).toBe(canvas.left);
+      expect(
+        canvas.right - Math.max(...tiles.map(({ right }) => right)),
+      ).toBeLessThanOrEqual(0.5);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("starts the canvas of a workspace with no strip flush with the viewport's top", async () => {
+    const page = await open(striplessWorkspaceLayout);
+    try {
+      const placement = await readPlacement(page);
+      expect(placement.rows).toBe(1);
+      expect(placement.canvas?.top).toBe(0);
+      expect(placement.canvas?.bottom).toBe(viewport.height);
+      if (viewport.inspectorShown) {
+        expect(placement.inspector?.top).toBe(0);
+      }
     } finally {
       await page.close();
     }

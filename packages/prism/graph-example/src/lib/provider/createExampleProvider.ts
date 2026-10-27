@@ -42,6 +42,7 @@ import { localName, resolveLabel, resolveTitle } from "./descriptive.js";
 import { extractReferences } from "./extractReferences.js";
 import { isNetworkEntity } from "./isNetworkEntity.js";
 import { readProviderSdl } from "./providerSdl.js";
+import { rankSearchEntries } from "./rankSearchEntries.js";
 import { selectProseLanguage } from "./selectProseLanguage.js";
 import { sumMeasures } from "./sumMeasures.js";
 import type {
@@ -66,6 +67,7 @@ import type {
   ExampleUnitPlacement,
   LangMap,
   ProseTexts,
+  SearchEntry,
 } from "./types.js";
 
 /**
@@ -102,6 +104,11 @@ interface ProseRecord {
   readonly availableLanguages: readonly string[];
   /** Candidate IRIs across every language, in order of first mention. */
   readonly references: readonly string[];
+}
+
+/** Arguments of `Query.search`. */
+interface SearchArgs extends ConnectionArgs {
+  readonly text: string;
 }
 
 /** An entity paired with its built view, the entity narrowed to `E`. */
@@ -666,6 +673,17 @@ export const createExampleProvider = (
             (record.entity.servesLine ?? []).includes(entity.uri),
         )
         .map((record) => record.view),
+    // The inverse of `inZone`, over every entity that carries it: a fare
+    // zone's stops are stations and interchanges alike, so the SDL types
+    // the list `[Stop!]!` as it does `servedBy`.
+    stops: () =>
+      records
+        .filter(
+          (record) =>
+            isNetworkEntity(record.entity) &&
+            record.entity.inZone === entity.uri,
+        )
+        .map((record) => record.view),
   });
 
   /**
@@ -742,6 +760,34 @@ export const createExampleProvider = (
   const viewByUri = new Map(
     records.map((record) => [record.entity.uri, record.view]),
   );
+
+  /** Resolve an IRI as `node(id:)` does: an entity, else a class, else null. */
+  const resolveNode = (uri: string): View | null =>
+    viewByUri.get(uri) ?? nullableClassView(uri);
+
+  /**
+   * Resolve each IRI as `node(id:)` does, and keep the ones that resolve as
+   * edges, in the order of `iris`.
+   */
+  const buildNodeEdges = (iris: readonly string[]): View[] =>
+    iris.flatMap((iri) => {
+      const node = resolveNode(iri);
+      return node === null ? [] : [{ node, cursor: toCursor(iri) }];
+    });
+
+  /** Build a `NodeConnection` view over a page's edges and its flags. */
+  const buildNodeConnectionView = (
+    edges: readonly View[],
+    flags: { readonly hasNextPage: boolean; readonly hasPreviousPage: boolean },
+  ): View => ({
+    edges,
+    pageInfo: {
+      hasNextPage: flags.hasNextPage,
+      hasPreviousPage: flags.hasPreviousPage,
+      startCursor: edges.at(0)?.cursor ?? null,
+      endCursor: edges.at(-1)?.cursor ?? null,
+    },
+  });
 
   /** Instances of a class, including instances of its subclasses. */
   const instancesOf = (cls: ExampleClass): EntityRecord[] =>
@@ -828,21 +874,11 @@ export const createExampleProvider = (
    * `node(id:)` resolves an IRI, with every edge on the one page. A
    * reference nothing answers to is dropped.
    */
-  const buildReferencesView = (iris: readonly string[]): View => {
-    const edges = iris.flatMap((iri) => {
-      const node = viewByUri.get(iri) ?? nullableClassView(iri);
-      return node === null ? [] : [{ node, cursor: toCursor(iri) }];
+  const buildReferencesView = (iris: readonly string[]): View =>
+    buildNodeConnectionView(buildNodeEdges(iris), {
+      hasNextPage: false,
+      hasPreviousPage: false,
     });
-    return {
-      edges,
-      pageInfo: {
-        hasNextPage: false,
-        hasPreviousPage: false,
-        startCursor: edges.at(0)?.cursor ?? null,
-        endCursor: edges.at(-1)?.cursor ?? null,
-      },
-    };
-  };
 
   /**
    * Build the `Prose` view. The context is read with `?.` because graphql-js
@@ -862,6 +898,51 @@ export const createExampleProvider = (
     references: () => buildReferencesView(prose.references),
   });
 
+  // -------------------------------------------------------------------
+  // Search. The entries are read once, here, from the same records and
+  // classes `node(id:)` serves, in the default language `_meta` falls back
+  // to; ranking and paging happen per request.
+  // -------------------------------------------------------------------
+
+  /** One node's search entry: its title, CURIE and definition. */
+  const buildSearchEntry = (
+    uri: string,
+    labels: LangMap | undefined,
+    definitions: LangMap | undefined,
+    typename: string,
+  ): SearchEntry => ({
+    uri,
+    title: resolveTitle(labels, DEFAULT_LANG, uri, typename),
+    curie: curieOf(uri),
+    definition: resolveLabel(definitions, DEFAULT_LANG),
+  });
+
+  const searchEntries: readonly SearchEntry[] = [
+    ...records.map(({ entity }) =>
+      buildSearchEntry(
+        entity.uri,
+        entity.labels,
+        entity.definitions,
+        entity.typename,
+      ),
+    ),
+    ...dataset.classes.map((cls) =>
+      buildSearchEntry(cls.uri, cls.labels, cls.definitions, "OntologyClass"),
+    ),
+  ];
+
+  /**
+   * Build one page of ranked IRIs as a `NodeConnection`, each node resolved
+   * as `node(id:)` resolves it.
+   */
+  const buildSearchView = (
+    uris: readonly string[],
+    args: ConnectionArgs,
+  ): View => {
+    const page = sliceConnection(uris, (uri) => uri, args);
+    return buildNodeConnectionView(buildNodeEdges(page.items), page);
+  };
+
   /**
    * Expand the prefixed convenience form (`"metro:Station"`) to an absolute
    * IRI. An absolute IRI passes through untouched: its scheme is never a
@@ -878,14 +959,13 @@ export const createExampleProvider = (
   };
 
   // -------------------------------------------------------------------
-  // The contract's five root fields, plus `prose`: the one root field this
-  // provider adds (see schema/extension.graphql for why it is a root field).
-  // Every type the provider declares is reachable from here.
+  // The contract's five root fields, plus `prose` and `search`: the two root
+  // fields this provider adds (see schema/extension.graphql for why each is
+  // a root field). Every type the provider declares is reachable from here.
   // -------------------------------------------------------------------
 
   const rootValue: Record<string, unknown> = {
-    node: (args: { id: string }) =>
-      viewByUri.get(args.id) ?? nullableClassView(args.id),
+    node: (args: { id: string }) => resolveNode(args.id),
     ontologies: () => dataset.ontologies.map(ontologyView),
     ontology: (args: { prefix: string }) => {
       const ontology = dataset.ontologies.find(
@@ -903,6 +983,8 @@ export const createExampleProvider = (
       const prose = proseByUri.get(args.uri);
       return prose === undefined ? null : buildProseView(prose);
     },
+    search: (args: SearchArgs) =>
+      buildSearchView(rankSearchEntries(searchEntries, args.text), args),
   };
 
   return { schema, rootValue, sdl };

@@ -12,7 +12,7 @@ import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { useRelayEnvironment } from "react-relay";
 import { describe, expect, it } from "vitest";
-import { metroProjectionMaps } from "#projections";
+import { metroProjectionMaps } from "#domains/metro";
 import {
   CIRCLE_LINE_CURIE,
   NORTHGATE_CURIE,

@@ -65,12 +65,13 @@ describe("DocumentLayout", () => {
     ).toBeNull();
   });
 
-  it("renders no aside and no colophon region when given neither", () => {
+  it("renders no strip, no aside and no colophon region when given none", () => {
     render(
       <DocumentLayout data-testid="document" rail={null}>
         <p>Routed page</p>
       </DocumentLayout>,
     );
+    expect(document.querySelector(".strip")).toBeNull();
     expect(document.querySelector(".aside")).toBeNull();
     expect(document.querySelector(".colophon")).toBeNull();
   });
@@ -79,15 +80,19 @@ describe("DocumentLayout", () => {
     ["false", false],
     ["true", true],
     ["the empty string", ""],
-  ])("renders no aside and no colophon region when given %s", (_name, node) => {
-    render(
-      <DocumentLayout aside={node} colophon={node} rail={null}>
-        <p>Routed page</p>
-      </DocumentLayout>,
-    );
-    expect(document.querySelector(".aside")).toBeNull();
-    expect(document.querySelector(".colophon")).toBeNull();
-  });
+  ])(
+    "renders no strip, no aside and no colophon region when given %s",
+    (_name, node) => {
+      render(
+        <DocumentLayout aside={node} colophon={node} rail={null} strip={node}>
+          <p>Routed page</p>
+        </DocumentLayout>,
+      );
+      expect(document.querySelector(".strip")).toBeNull();
+      expect(document.querySelector(".aside")).toBeNull();
+      expect(document.querySelector(".colophon")).toBeNull();
+    },
+  );
 
   it("merges a consumer className after its own and passes native props", () => {
     render(

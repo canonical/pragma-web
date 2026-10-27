@@ -1,5 +1,6 @@
 import type { Browser } from "playwright";
 import {
+  BAND_SELECTOR,
   CHROME_SELECTOR,
   CLIPPING_OVERFLOWS,
   FRAME_SELECTOR,
@@ -54,6 +55,7 @@ export default async function measurePage(
         chromeSelector: CHROME_SELECTOR,
         regionSelector: REGION_SELECTOR,
         frameSelector: FRAME_SELECTOR,
+        bandSelector: BAND_SELECTOR,
         fillSelector,
         step: SPACING_STEP_PX,
         tolerance: OVERFLOW_TOLERANCE_PX,

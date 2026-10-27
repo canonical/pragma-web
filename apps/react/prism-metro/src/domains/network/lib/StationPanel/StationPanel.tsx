@@ -2,7 +2,7 @@
 
 import { useRouter } from "@canonical/router-react";
 import type { CSSProperties, ReactElement } from "react";
-import { formatMessage, MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import type { NodeRef } from "../types.js";
 import type { StationPanelProps } from "./types.js";
 import "./styles.css";
@@ -27,6 +27,7 @@ export default function StationPanel({
   className,
   ...props
 }: StationPanelProps): ReactElement {
+  const t = useMessages();
   const router = useRouter();
   const linkStop = (stop: NodeRef): ReactElement => (
     <a
@@ -40,15 +41,15 @@ export default function StationPanel({
   const facts = [
     station.zone === undefined
       ? undefined
-      : [MESSAGES["network.station.zone"], station.zone],
+      : [t("network.station.zone"), station.zone],
     station.platformCount === undefined
       ? undefined
-      : [MESSAGES["network.station.platforms"], String(station.platformCount)],
+      : [t("network.station.platforms"), String(station.platformCount)],
     station.transferMinutes === undefined
       ? undefined
       : [
-          MESSAGES["network.station.transfer"],
-          formatMessage("network.station.minutes", {
+          t("network.station.transfer"),
+          t("network.station.minutes", {
             minutes: station.transferMinutes,
           }),
         ],
@@ -60,9 +61,7 @@ export default function StationPanel({
     >
       <header className="header">
         <h1>{station.title}</h1>
-        <p className="kind">
-          {MESSAGES[`network.station.kind.${station.kind}`]}
-        </p>
+        <p className="kind">{t(`network.station.kind.${station.kind}`)}</p>
       </header>
       <dl className="facts">
         {facts.map(([term, value]) => (
@@ -73,7 +72,7 @@ export default function StationPanel({
         ))}
       </dl>
       <section className="routes">
-        <h2 className="heading">{MESSAGES["network.station.routes"]}</h2>
+        <h2 className="heading">{t("network.station.routes")}</h2>
         {station.routes.map((route) => (
           <div className="route" key={`${route.line.curie} ${route.label}`}>
             <a
@@ -98,19 +97,15 @@ export default function StationPanel({
             <p className="neighbours">
               <span>{route.label}</span>
               <span>
-                <span className="muted">
-                  {MESSAGES["network.station.previous"]}
-                </span>{" "}
+                <span className="muted">{t("network.station.previous")}</span>{" "}
                 {route.previous === undefined
-                  ? MESSAGES["network.station.terminus"]
+                  ? t("network.station.terminus")
                   : linkStop(route.previous)}
               </span>
               <span>
-                <span className="muted">
-                  {MESSAGES["network.station.next"]}
-                </span>{" "}
+                <span className="muted">{t("network.station.next")}</span>{" "}
                 {route.next === undefined
-                  ? MESSAGES["network.station.terminus"]
+                  ? t("network.station.terminus")
                   : linkStop(route.next)}
               </span>
             </p>

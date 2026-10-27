@@ -1,0 +1,54 @@
+---
+# OntologyClassCommand: an ontology class as a 56px command-palette result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1898 ("Layout" over
+# "Class in design-system", "used in 88 instances" at the end) and 504:327
+# (the slot names). The kind names the class's abstraction; the location is
+# the compact address's prefix; the vital counts the class's instances.
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved from
+# the compact address; a class without one reads as inert text.
+node:
+  uri: prism.component.ontology_class_command
+  projection:
+    on: OntologyClass
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection:
+                field: _meta.title
+              edges:
+                - node:
+                    role: home
+                    projection:
+                      field: _meta.curie
+                  relation:
+                    cardinality: "0..1"
+            relation:
+              cardinality: "1"
+              slotName: title
+          - node:
+              role: kind
+              projection:
+                field: isAbstract
+            relation:
+              cardinality: "1"
+              slotName: kind
+          - node:
+              role: location
+              projection:
+                field: _meta.curie
+            relation:
+              cardinality: "0..1"
+              slotName: location
+          - node:
+              role: vital
+              projection:
+                field: instanceCount
+            relation:
+              cardinality: "1"
+              slotName: vital
+      relation:
+        cardinality: "1"

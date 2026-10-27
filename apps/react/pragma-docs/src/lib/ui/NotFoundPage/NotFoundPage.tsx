@@ -2,7 +2,7 @@
 
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
-import { NOT_FOUND_BODY, NOT_FOUND_TITLE } from "./constants.js";
+import { MESSAGES } from "#i18n";
 import type { NotFoundPageProps } from "./types.js";
 import "./styles.css";
 
@@ -26,9 +26,9 @@ export default function NotFoundPage({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
-      <Head title={NOT_FOUND_TITLE} />
-      <h1>{NOT_FOUND_TITLE}</h1>
-      <p>{NOT_FOUND_BODY}</p>
+      <Head title={MESSAGES["notFound.title"]} />
+      <h1>{MESSAGES["notFound.title"]}</h1>
+      <p>{MESSAGES["notFound.body"]}</p>
     </section>
   );
 }

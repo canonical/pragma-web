@@ -4,7 +4,7 @@ import { DocumentLayout, ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
-import { MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import useLineView from "../hooks/useLineView.js";
 import { LinePanel } from "../LinePanel/index.js";
 import { LineStrip } from "../LineStrip/index.js";
@@ -18,33 +18,35 @@ const Boundary = ({
   children,
 }: {
   readonly children: ReactNode;
-}): ReactElement => (
-  <ErrorBoundary
-    fallback={
-      <p className="status" role="alert">
-        {MESSAGES["network.error"]}
-      </p>
-    }
-  >
-    <Suspense
-      fallback={<p className="status">{MESSAGES["network.loading"]}</p>}
+}): ReactElement => {
+  const t = useMessages();
+  return (
+    <ErrorBoundary
+      fallback={
+        <p className="status" role="alert">
+          {t("network.error")}
+        </p>
+      }
     >
-      {children}
-    </Suspense>
-  </ErrorBoundary>
-);
+      <Suspense fallback={<p className="status">{t("network.loading")}</p>}>
+        {children}
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
 
 /** The line's title and its strips, or the page's not-found status. */
 const LineMain = ({
   address,
 }: Pick<NetworkLinePageProps, "address">): ReactElement => {
+  const t = useMessages();
   const line = useLineView({ address });
   if (line === undefined) {
     return (
       <section className="status">
-        <Head title={MESSAGES["network.notFound.title"]} />
-        <h1>{MESSAGES["network.notFound.title"]}</h1>
-        <p>{MESSAGES["network.notFound.body"]}</p>
+        <Head title={t("network.notFound.title")} />
+        <h1>{t("network.notFound.title")}</h1>
+        <p>{t("network.notFound.body")}</p>
       </section>
     );
   }

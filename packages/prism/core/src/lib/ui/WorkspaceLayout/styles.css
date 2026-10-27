@@ -4,8 +4,9 @@
 
 @layer ds.components.global {
   /* A subgrid of the shell over every column: the strip row, then the body
-   * row the canvas fills. Its gap is the grid's gutter on both axes, the
-   * shell's own, so the strip and the body sit one gutter apart. */
+   * row the canvas fills, the last row. Its gap is the grid's gutter on
+   * both axes, the shell's own, so the strip and the body sit one gutter
+   * apart. */
   .ds.workspace-layout {
     --workspace-layout-gap: var(--grid-gutter);
     --workspace-layout-trigger-offset: var(--container-gap-default);
@@ -16,6 +17,11 @@
     grid-template-rows: min-content minmax(0, 1fr);
     gap: var(--workspace-layout-gap);
     min-block-size: 0;
+  }
+
+  /* With no strip, the body is the only row, flush with the top. */
+  .ds.workspace-layout:not(:has(> .strip)) {
+    grid-template-rows: minmax(0, 1fr);
   }
 
   /* The rail's first two columns, on every row; it scrolls on its own. */
@@ -38,14 +44,14 @@
    * never scrolls: what it holds fits the viewport. */
   .ds.workspace-layout > .canvas {
     grid-column: 3 / -4;
-    grid-row: 2;
+    grid-row: -2 / -1;
     overflow: hidden;
   }
 
   /* The inspector holds the last three columns and scrolls on its own. */
   .ds.workspace-layout > .inspector {
     grid-column: -4 / -1;
-    grid-row: 2;
+    grid-row: -2 / -1;
     overflow-y: auto;
     min-block-size: 0;
   }
@@ -60,7 +66,7 @@
   .ds.workspace-layout > .inspector-trigger {
     display: none;
     grid-column: -2 / -1;
-    grid-row: 2;
+    grid-row: -2 / -1;
     align-self: start;
     margin-inline-start: auto;
     margin-block-start: var(--workspace-layout-trigger-offset);

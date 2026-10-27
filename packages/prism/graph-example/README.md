@@ -72,11 +72,11 @@ types with no IRI of their own: the embeddable `GeoPoint`; `Route`, `Call` and
 which carry the fleet model (see both below). `findBreakingChanges(contractOnly, extended)` returns zero, and
 `satisfiesContract(readProviderSdl())` returns **zero violations**.
 
-**The extension adds exactly one root field, `prose`, and no other.** Every entity type
-this provider declares is reachable through the contract's own five root fields —
+**The extension adds two root fields, `prose` and `search`, and no other.** Every entity
+type this provider declares is reachable through the contract's own five root fields —
 `node(id:)` and `OntologyClass.instances`. Adding provider root fields for them would
-have been easier and would have demonstrated less. `prose` is the exception because it is
-not part of the contract (see below).
+have been easier and would have demonstrated less. `prose` and `search` are the
+exceptions because neither is part of the contract (see below).
 
 ---
 
@@ -434,6 +434,31 @@ subtag fallback. Links whose destination is a declared-prefix CURIE (`metro:nort
 resolve them, class IRIs included; links in code, and links to anything the dataset does
 not hold, are not. `extractReferences.ts` is the pragma provider's function, copied rather
 than imported so the two packages stay independent.
+
+---
+
+## Search — hand-written
+
+`Query.search(text: String!, first: Int, after: String): NodeConnection!` finds nodes by
+what they are called, the same extension the pragma provider serves, written here by
+hand over the records and classes `node(id:)` already serves.
+
+The text is trimmed and lowercased; empty text, or text that is only whitespace, matches
+nothing. A node matches when its title, its CURIE or its definition contains the text,
+ignoring case, and the first of the three that does decides the match: a title match
+ranks before a CURIE match, and a CURIE match before a definition match. Within one, an
+earlier position ranks first, then a shorter title, then the title, then the IRI, each
+string compared by code unit and never by locale. Titles and definitions are read in
+`en`, the default `_meta` falls back to. The ranked IRIs page through `sliceConnection`,
+like every other connection here: 20 a page unless `first` says otherwise, an unknown
+`after` starts from the head, a negative `first` is an error, and `hasPreviousPage` is
+true after a cursor. The two providers differ there, as the contract leaves them free to;
+a client that wants a page size passes `first`.
+
+`matchSearchEntry.ts` and `rankSearchEntries.ts` repeat the pragma provider's functions
+of the same names on purpose. This package depends on the contract and `graphql` and on
+nothing of pragma's, so that it stays an independent second implementation; sharing the
+ranking would make the two providers agree by construction rather than by test.
 
 ---
 

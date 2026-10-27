@@ -18,6 +18,11 @@ export interface MeasureLayoutOptions {
    */
   readonly frameSelector: string;
   /**
+   * The layout's bands, whose edges and content start are measured against
+   * the rail's border, the viewport's edge and the canvas's start.
+   */
+  readonly bandSelector: string;
+  /**
    * The elements that must fill the rows of the canvas's page from its
    * inline start to its end, such as a catalog's cards; left out, nothing
    * is measured.
@@ -65,21 +70,47 @@ export interface LayoutMeasure {
   };
   /**
    * The canvas's page, in pixels: its inline size, its column gap, the
-   * inline size of its first element, which spans the page's columns, and
-   * how far from the page's inline start the leftmost element of
-   * `fillSelector` starts and how far short of its inline end the
-   * rightmost stops. A size is -1 when its element is absent; the
-   * shortfall is null when no element matches or none was asked for.
+   * inline size of its first element, which spans the page's columns, the
+   * top of that element's border box in the viewport, and how far from the
+   * page's inline start the leftmost element of `fillSelector` starts and
+   * how far short of its inline end the rightmost stops. A size or a top
+   * is -1 when its element is absent; the shortfall is null when no
+   * element matches or none was asked for.
    */
   readonly canvasPage: {
     readonly width: number;
     readonly columnGap: number;
     readonly firstChildWidth: number;
+    readonly firstChildTop: number;
     readonly fillShortfall: {
       readonly start: number;
       readonly end: number;
     } | null;
   };
+  /**
+   * The layout's edges, in pixels: the inline end of its rail region, the
+   * inline start and the top of its canvas, the bottom of its strip region
+   * (null when the layout renders none) and its row gap. An edge is -1
+   * when its element is absent.
+   */
+  readonly edges: {
+    readonly railEnd: number;
+    readonly canvasStart: number;
+    readonly canvasTop: number;
+    readonly stripBottom: number | null;
+    readonly rowGap: number;
+  };
+  /**
+   * Each band of `bandSelector`, in pixels: its border box's inline start
+   * and end, and where its content box starts and ends.
+   */
+  readonly bands: readonly {
+    readonly element: string;
+    readonly start: number;
+    readonly end: number;
+    readonly contentStart: number;
+    readonly contentEnd: number;
+  }[];
   /** The block overflow of the layout's rail and inspector regions. */
   readonly regionOverflow: Readonly<Record<string, string | null>>;
   /** Whether the inspector's drawer trigger shows. */

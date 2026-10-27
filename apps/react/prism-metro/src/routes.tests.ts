@@ -3,6 +3,7 @@
 import { collectLenses } from "@canonical/prism-core";
 import { createRouter } from "@canonical/router-core";
 import { describe, expect, it } from "vitest";
+import { HOME_LENS_MESSAGES } from "#domains/metro";
 import {
   CIRCLE_LINE_CURIE,
   NORTHGATE_CURIE,
@@ -31,8 +32,9 @@ describe("appRoutes", () => {
     ]);
   });
 
-  it("builds the nine route names the register carries", () => {
+  it("builds the ten route names the register carries", () => {
     expect([
+      router.buildPath("home"),
       router.buildPath("network"),
       router.buildPath("networkStation", { params: { uri: NORTHGATE_CURIE } }),
       router.buildPath("networkLine", { params: { uri: CIRCLE_LINE_CURIE } }),
@@ -45,6 +47,7 @@ describe("appRoutes", () => {
         params: { term: STATION_CLASS_CURIE },
       }),
     ]).toEqual([
+      "/",
       "/network",
       "/network/stations/metro%3Anorthgate",
       "/network/lines/metro%3Acircle-line",
@@ -61,7 +64,21 @@ describe("appRoutes", () => {
     expect(router.match("/nowhere")?.kind).toBe("not-found");
   });
 
-  it("has no route at the root", () => {
-    expect(router.match("/")?.kind).toBe("not-found");
+  it("lands the root on the home route", () => {
+    const match = router.match("/");
+    expect(match?.kind).toBe("route");
+    expect(match?.kind === "route" ? match.name : undefined).toBe("home");
+  });
+
+  it("keeps the landing out of the rail", () => {
+    expect(collectLenses(appRoutes).map(({ name }) => name)).not.toContain(
+      "home",
+    );
+  });
+
+  it("gives every lens a door on the landing, in rail order", () => {
+    expect(collectLenses(appRoutes).map(({ name }) => name)).toEqual(
+      Object.keys(HOME_LENS_MESSAGES),
+    );
   });
 });

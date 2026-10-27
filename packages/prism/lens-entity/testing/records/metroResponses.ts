@@ -54,7 +54,11 @@ export default [
                   _meta: {
                     title: "https://metro.example/onto#",
                     curie: "metro:",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -67,7 +71,11 @@ export default [
                   _meta: {
                     title: "Central Exchange",
                     curie: "metro:central-exchange",
-                    type: { uri: "https://metro.example/onto#Interchange" },
+                    type: {
+                      uri: "https://metro.example/onto#Interchange",
+                      _meta: { title: "Interchange" },
+                    },
+                    definition: "The busiest transfer point on the network.",
                   },
                   __isNode: "Interchange",
                 },
@@ -81,7 +89,11 @@ export default [
                   _meta: {
                     title: "Eastcliff",
                     curie: "metro:eastcliff",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -94,7 +106,11 @@ export default [
                   _meta: {
                     title: "Foundry Row",
                     curie: "metro:foundry-row",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -107,7 +123,11 @@ export default [
                   _meta: {
                     title: "ghost",
                     curie: "metro:ghost",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -120,7 +140,11 @@ export default [
                   _meta: {
                     title: "Greenhithe",
                     curie: "metro:greenhithe",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -133,7 +157,11 @@ export default [
                   _meta: {
                     title: "Harbourside",
                     curie: "metro:harbourside",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -146,7 +174,11 @@ export default [
                   _meta: {
                     title: "Kilnwood",
                     curie: "metro:kilnwood",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -159,7 +191,11 @@ export default [
                   _meta: {
                     title: "Marsh End",
                     curie: "metro:marsh-end",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -172,7 +208,11 @@ export default [
                   _meta: {
                     title: "Northgate",
                     curie: "metro:northgate",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: "The northern terminus.",
                   },
                   __isNode: "Station",
                 },
@@ -185,7 +225,11 @@ export default [
                   _meta: {
                     title: "Quarry Hill",
                     curie: "metro:quarry-hill",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -198,7 +242,11 @@ export default [
                   _meta: {
                     title: "Riverside Junction",
                     curie: "metro:riverside-junction",
-                    type: { uri: "https://metro.example/onto#Interchange" },
+                    type: {
+                      uri: "https://metro.example/onto#Interchange",
+                      _meta: { title: "Interchange" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Interchange",
                 },
@@ -212,7 +260,11 @@ export default [
                   _meta: {
                     title: "Saltford",
                     curie: "metro:saltford",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -225,7 +277,11 @@ export default [
                   _meta: {
                     title: "Tannery Lane",
                     curie: "metro:tannery-lane",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Interchange" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -238,7 +294,11 @@ export default [
                   _meta: {
                     title: "Verge Park",
                     curie: "metro:verge-park",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -251,7 +311,11 @@ export default [
                   _meta: {
                     title: "Willowbank",
                     curie: "metro:willowbank",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -284,7 +348,11 @@ export default [
                   _meta: {
                     title: "https://metro.example/onto#",
                     curie: "metro:",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -297,7 +365,11 @@ export default [
                   _meta: {
                     title: "Central Exchange",
                     curie: "metro:central-exchange",
-                    type: { uri: "https://metro.example/onto#Interchange" },
+                    type: {
+                      uri: "https://metro.example/onto#Interchange",
+                      _meta: { title: "Interchange" },
+                    },
+                    definition: "The busiest transfer point on the network.",
                   },
                   __isNode: "Interchange",
                 },
@@ -311,7 +383,11 @@ export default [
                   _meta: {
                     title: "Eastcliff",
                     curie: "metro:eastcliff",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -324,7 +400,11 @@ export default [
                   _meta: {
                     title: "Foundry Row",
                     curie: "metro:foundry-row",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -337,7 +417,11 @@ export default [
                   _meta: {
                     title: "ghost",
                     curie: "metro:ghost",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -374,7 +458,11 @@ export default [
                   _meta: {
                     title: "Greenhithe",
                     curie: "metro:greenhithe",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -387,7 +475,11 @@ export default [
                   _meta: {
                     title: "Harbourside",
                     curie: "metro:harbourside",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -400,7 +492,11 @@ export default [
                   _meta: {
                     title: "Kilnwood",
                     curie: "metro:kilnwood",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -413,7 +509,11 @@ export default [
                   _meta: {
                     title: "Marsh End",
                     curie: "metro:marsh-end",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -426,7 +526,11 @@ export default [
                   _meta: {
                     title: "Northgate",
                     curie: "metro:northgate",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: "The northern terminus.",
                   },
                   __isNode: "Station",
                 },
@@ -439,7 +543,11 @@ export default [
                   _meta: {
                     title: "Quarry Hill",
                     curie: "metro:quarry-hill",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -452,7 +560,11 @@ export default [
                   _meta: {
                     title: "Riverside Junction",
                     curie: "metro:riverside-junction",
-                    type: { uri: "https://metro.example/onto#Interchange" },
+                    type: {
+                      uri: "https://metro.example/onto#Interchange",
+                      _meta: { title: "Interchange" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Interchange",
                 },
@@ -466,7 +578,11 @@ export default [
                   _meta: {
                     title: "Saltford",
                     curie: "metro:saltford",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -479,7 +595,11 @@ export default [
                   _meta: {
                     title: "Tannery Lane",
                     curie: "metro:tannery-lane",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Interchange" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -492,7 +612,11 @@ export default [
                   _meta: {
                     title: "Verge Park",
                     curie: "metro:verge-park",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },
@@ -505,7 +629,11 @@ export default [
                   _meta: {
                     title: "Willowbank",
                     curie: "metro:willowbank",
-                    type: { uri: "https://metro.example/onto#Station" },
+                    type: {
+                      uri: "https://metro.example/onto#Station",
+                      _meta: { title: "Station" },
+                    },
+                    definition: null,
                   },
                   __isNode: "Station",
                 },

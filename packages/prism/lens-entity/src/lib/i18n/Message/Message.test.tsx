@@ -20,48 +20,43 @@ describe("Message", () => {
 
   it("places the elements where the translator's sentence puts them", () => {
     // A translator that reverses the order of the two elements.
-    const translate: Translate = () => "{range} : {name}";
+    const translate: Translate = () => "{range} : {property}";
     const wrapper = ({ children }: { children: ReactNode }) => (
       <MessagesContext value={translate}>{children}</MessagesContext>
     );
     const { container } = render(
       <Message
         elements={{
-          name: <code>servesLine</code>,
+          property: <code>metro:servesLine</code>,
           range: <code>metro:Line</code>,
         }}
-        id="relations.entry"
+        id="fields.value"
       />,
       { wrapper },
     );
     expect(container.innerHTML).toBe(
-      "<code>metro:Line</code> : <code>servesLine</code>",
+      "<code>metro:Line</code> : <code>metro:servesLine</code>",
     );
   });
 
   it("fills plain-text placeholders from the values", () => {
     const { container } = render(
       <Message
-        elements={{
-          name: <code>servesLine</code>,
-          range: <code>metro:Line</code>,
-        }}
-        id="relations.entry"
+        elements={{ range: <code>metro:Line</code> }}
+        id="relations.value"
         values={{ cardinality: "one or more" }}
       />,
     );
-    expect(container.innerHTML).toBe(
-      "<code>servesLine</code> to <code>metro:Line</code>, one or more",
-    );
+    expect(container.innerHTML).toBe("to <code>metro:Line</code>, one or more");
   });
 
   it("keeps a placeholder named twice apart, each in its own place", () => {
-    const translate: Translate = () => "{name} / {name}";
+    const translate: Translate = () => "{range} / {range}";
     const wrapper = ({ children }: { children: ReactNode }) => (
       <MessagesContext value={translate}>{children}</MessagesContext>
     );
     const { container } = render(
-      <Message elements={{ name: <code>a</code> }} id="relations.entry" />,
+      <Message elements={{ range: <code>a</code> }} id="relations.value" />,
       { wrapper },
     );
     expect(container.innerHTML).toBe("<code>a</code> / <code>a</code>");

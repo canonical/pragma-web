@@ -4,7 +4,7 @@ import { ClientOnly } from "@canonical/prism-core";
 import { Button } from "@canonical/react-ds-global";
 import { useRouter } from "@canonical/router-react";
 import { type CSSProperties, type ReactElement, useState } from "react";
-import { formatMessage, MESSAGES } from "#i18n";
+import { useMessages } from "#i18n";
 import type { StripDirection } from "../types.js";
 import type { LineStripProps } from "./types.js";
 import "./styles.css";
@@ -36,6 +36,7 @@ export default function LineStrip({
   style,
   ...props
 }: LineStripProps): ReactElement {
+  const t = useMessages();
   const router = useRouter();
   const [showsReverse, setShowsReverse] = useState(false);
   const { reverse } = strip;
@@ -45,7 +46,7 @@ export default function LineStrip({
   const renderContinues = (): ReactElement | null =>
     strip.isLoop ? (
       <li aria-hidden="true" className="continues">
-        {MESSAGES["network.strip.continues"]}
+        {t("network.strip.continues")}
       </li>
     ) : null;
 
@@ -89,7 +90,7 @@ export default function LineStrip({
               ) : null}
               {stop.transferMinutes === undefined ? null : (
                 <span className="transfer">
-                  {formatMessage("network.station.minutes", {
+                  {t("network.station.minutes", {
                     minutes: stop.transferMinutes,
                   })}
                 </span>
@@ -113,7 +114,7 @@ export default function LineStrip({
       ) : (
         <ClientOnly fallback={directions.map(renderDirection)}>
           <fieldset
-            aria-label={MESSAGES["network.strip.direction"]}
+            aria-label={t("network.strip.direction")}
             className="toggle"
           >
             {directions.map((direction, index) => (
