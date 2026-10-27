@@ -40,7 +40,7 @@ const Item = ({
     >
       {/* Header tab — <summary> owns the button semantics + keyboard toggle.
           The consumer supplies heading semantics inside `heading`. */}
-      <summary className="header">
+      <summary className="header control-seat">
         {/* Control/chevron indicator (cardinality: 1) */}
         <span className="chevron" aria-hidden="true" />
         <span className="heading">{heading}</span>

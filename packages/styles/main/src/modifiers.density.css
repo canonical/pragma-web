@@ -22,6 +22,10 @@
  *     --density-target-baseline-px     the grid line a control's baseline lands on
  *     --density-padding-inline         inline padding for a cell
  *     --density-space-sm / -md / -lg   three vertical spacing rungs for a cell
+ *     .control-seat                    marks an element that seats its own
+ *                                      text; bare prose inside it is exempt
+ *                                      from the engine's box (see the seat
+ *                                      exemption below)
  *
  * Every value is a WHOLE multiple of --baseline-height (from spacing.css), so
  * vertical rhythm holds in all four cells. Sites/docs run one baseline looser than
@@ -238,5 +242,33 @@
       (var(--control-seat-line) + 1cap) /
       2
     );
+  }
+
+  /* ── Seat exemption: bare prose inside a control ───────────────────────────
+   * The typography engine seats PROSE — bare h1–h6, p, .p — by element name:
+   * a tier line box plus block padding nudges that snap the baseline onto the
+   * nearest grid line (and, under the trim engine, text-box trimming). The
+   * control seat does the same job for CONTROLS, against the density TARGET
+   * instead of the nearest line: --control-seat-basis contains the engine's
+   * own (line + 1cap)/2 term. The two must not compose — inside a seat the
+   * engine's nudge would seat the text twice and land the baseline below the
+   * target, and its tier line box would overflow the dense cells.
+   *
+   * A control that seats text marks the element the seat applies to with
+   * .control-seat; bare prose inside it then gives up the engine's box and
+   * takes the seat line by inheritance (the control declares the seat line on
+   * the text's carrier). This generalises the engine's own bare-.code
+   * precedent ("the parent line already owns the baseline"), and lives here —
+   * ds.modifiers, above ds.typography — so it wins by layer order and no
+   * component ever cancels engine internals by hand. One rule covers every
+   * engine: the cap/metrics engines' nudges and the trim engine's text-box.
+   * Outside a density scope the rule is inert and the engine seats prose as
+   * always. */
+  :where(.comfortable, .dense, .app, .site, .docs)
+    .control-seat
+    :is(h1, h2, h3, h4, h5, h6, p, .p) {
+    padding-block: 0;
+    text-box: normal;
+    line-height: inherit;
   }
 }
