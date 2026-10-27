@@ -45,7 +45,6 @@ export const MESSAGES = {
   "network.line.interchanges": "Interchanges",
   "network.strip.direction": "Direction",
   "network.strip.continues": "continues",
-  "network.placeholder": "{component} goes here",
   "shell.loading": "Loading…",
   "home.title": "Overview",
   "home.lead":

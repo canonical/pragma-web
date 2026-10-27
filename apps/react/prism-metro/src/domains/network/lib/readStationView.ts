@@ -43,6 +43,7 @@ export default function readStationView(
             title: line._meta.title,
             code: line.code,
             colour: line.colour,
+            chip: line,
           },
           label: route.label,
           previous:
@@ -58,6 +59,7 @@ export default function readStationView(
     }),
   );
   return {
+    card: node,
     curie: node._meta.curie,
     title: node._meta.title,
     kind: node.__typename,

@@ -2,16 +2,26 @@
 
 import { screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { readRecordedStation } from "../../../../../testing/readRecordedViews.js";
+import {
+  createRecordedEnvironment,
+  readRecordedStation,
+} from "../../../../../testing/readRecordedViews.js";
 import renderWithSite from "../../../../../testing/renderWithSite.js";
 import StationPanel from "./StationPanel.js";
 
-const TANNERY_LANE = readRecordedStation("tannery-lane");
-const NORTHGATE = readRecordedStation("northgate");
+/** The environment the recorded answers are read from and rendered in. */
+const RECORDED = createRecordedEnvironment();
+
+const TANNERY_LANE = readRecordedStation(RECORDED, "tannery-lane");
+const NORTHGATE = readRecordedStation(RECORDED, "northgate");
 
 describe("StationPanel", () => {
   it("heads the page with the station's title and kind", () => {
-    renderWithSite(<StationPanel station={TANNERY_LANE} />);
+    renderWithSite(
+      <StationPanel station={TANNERY_LANE} />,
+      "/network",
+      RECORDED,
+    );
     expect(
       screen.getByRole("heading", { level: 1, name: "Tannery Lane" }),
     ).toBeInTheDocument();
@@ -21,6 +31,8 @@ describe("StationPanel", () => {
   it("states the platforms and the transfer time of an interchange", () => {
     const { container } = renderWithSite(
       <StationPanel station={TANNERY_LANE} />,
+      "/network",
+      RECORDED,
     );
     const facts = [...container.querySelectorAll(".fact")].map((fact) => [
       fact.querySelector("dt")?.textContent,
@@ -33,19 +45,25 @@ describe("StationPanel", () => {
   });
 
   it("shows the fare zone where the station has one", () => {
-    renderWithSite(<StationPanel station={NORTHGATE} />);
+    renderWithSite(<StationPanel station={NORTHGATE} />, "/network", RECORDED);
     expect(screen.getByText("Central Zone")).toHaveClass("value");
   });
 
   it("states no fact a station does not have", () => {
     const bare = { ...NORTHGATE, zone: undefined, platformCount: undefined };
-    const { container } = renderWithSite(<StationPanel station={bare} />);
+    const { container } = renderWithSite(
+      <StationPanel station={bare} />,
+      "/network",
+      RECORDED,
+    );
     expect(container.querySelectorAll(".fact")).toHaveLength(0);
   });
 
   it("links each route's line and the stops either side", () => {
     const { container } = renderWithSite(
       <StationPanel station={TANNERY_LANE} />,
+      "/network",
+      RECORDED,
     );
     const routes = container.querySelectorAll(".route");
     expect(routes).toHaveLength(6);
@@ -58,13 +76,15 @@ describe("StationPanel", () => {
     expect(
       within(clockwise).getByRole("link", { name: "Quarry Hill" }),
     ).toHaveAttribute("href", "/network/stations/metro%3Aquarry-hill");
-    expect(
-      clockwise.querySelector(".line")?.getAttribute("data-placeholder"),
-    ).toBe("EntityChip");
+    expect(clockwise.querySelector(".line")).toHaveClass("line-chip");
   });
 
   it("names a terminus where a route has no stop on one side", () => {
-    const { container } = renderWithSite(<StationPanel station={NORTHGATE} />);
+    const { container } = renderWithSite(
+      <StationPanel station={NORTHGATE} />,
+      "/network",
+      RECORDED,
+    );
     const southbound = [...container.querySelectorAll(".route")].find((route) =>
       route.textContent?.includes("To Marsh End"),
     );
@@ -74,6 +94,8 @@ describe("StationPanel", () => {
   it("applies custom className after its own", () => {
     const { container } = renderWithSite(
       <StationPanel className="custom-class" station={NORTHGATE} />,
+      "/network",
+      RECORDED,
     );
     expect(container.querySelector("article")?.getAttribute("class")).toBe(
       "ds station-panel custom-class",
@@ -81,7 +103,11 @@ describe("StationPanel", () => {
   });
 
   it("passes through additional props", () => {
-    renderWithSite(<StationPanel data-testid="panel" station={NORTHGATE} />);
+    renderWithSite(
+      <StationPanel data-testid="panel" station={NORTHGATE} />,
+      "/network",
+      RECORDED,
+    );
     expect(screen.getByTestId("panel")).toBeInTheDocument();
   });
 });

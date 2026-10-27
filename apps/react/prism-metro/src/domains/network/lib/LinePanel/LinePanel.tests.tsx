@@ -2,30 +2,40 @@
 
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { readRecordedLine } from "../../../../../testing/readRecordedViews.js";
+import {
+  createRecordedEnvironment,
+  readRecordedLine,
+} from "../../../../../testing/readRecordedViews.js";
 import renderWithSite from "../../../../../testing/renderWithSite.js";
 import LinePanel from "./LinePanel.js";
 
-const CIRCLE = readRecordedLine("circle-line");
-const NORTH = readRecordedLine("north-line");
+/** The environment the recorded answers are read from and rendered in. */
+const RECORDED = createRecordedEnvironment();
+
+const CIRCLE = readRecordedLine(RECORDED, "circle-line");
+const NORTH = readRecordedLine(RECORDED, "north-line");
 
 describe("LinePanel", () => {
   it("heads the facts with the line's code and name", () => {
-    renderWithSite(<LinePanel line={CIRCLE} />);
+    renderWithSite(<LinePanel line={CIRCLE} />, "/network", RECORDED);
     expect(
       screen.getByRole("heading", { level: 2, name: "2 Circle Line" }),
     ).toBeInTheDocument();
   });
 
   it("states a loop's service and stop count, and no ends", () => {
-    const { container } = renderWithSite(<LinePanel line={CIRCLE} />);
+    const { container } = renderWithSite(
+      <LinePanel line={CIRCLE} />,
+      "/network",
+      RECORDED,
+    );
     expect(screen.getByText("Loop")).toHaveClass("value");
     expect(screen.getByText("6")).toHaveClass("value");
     expect(container.textContent).not.toContain("Ends");
   });
 
   it("names a linear line's ends, each linking to its page", () => {
-    renderWithSite(<LinePanel line={NORTH} />);
+    renderWithSite(<LinePanel line={NORTH} />, "/network", RECORDED);
     expect(screen.getByText("End to end")).toHaveClass("value");
     expect(screen.getByRole("link", { name: "Marsh End" })).toHaveAttribute(
       "href",
@@ -34,7 +44,11 @@ describe("LinePanel", () => {
   });
 
   it("lists the interchanges with their transfer times", () => {
-    const { container } = renderWithSite(<LinePanel line={CIRCLE} />);
+    const { container } = renderWithSite(
+      <LinePanel line={CIRCLE} />,
+      "/network",
+      RECORDED,
+    );
     expect(
       [...container.querySelectorAll(".interchanges li")].map(
         (item) => item.textContent,
@@ -51,14 +65,22 @@ describe("LinePanel", () => {
       ...CIRCLE,
       interchanges: [{ curie: "metro:tannery-lane", title: "Tannery Lane" }],
     };
-    const { container } = renderWithSite(<LinePanel line={untimed} />);
+    const { container } = renderWithSite(
+      <LinePanel line={untimed} />,
+      "/network",
+      RECORDED,
+    );
     expect(container.querySelector(".interchanges li")?.textContent).toBe(
       "Tannery Lane ",
     );
   });
 
   it("sets the line's colour on its channel", () => {
-    const { container } = renderWithSite(<LinePanel line={CIRCLE} />);
+    const { container } = renderWithSite(
+      <LinePanel line={CIRCLE} />,
+      "/network",
+      RECORDED,
+    );
     expect(
       (
         container.querySelector("section") as HTMLElement
@@ -69,6 +91,8 @@ describe("LinePanel", () => {
   it("applies custom className after its own", () => {
     const { container } = renderWithSite(
       <LinePanel className="custom-class" line={NORTH} />,
+      "/network",
+      RECORDED,
     );
     expect(container.querySelector("section")?.getAttribute("class")).toBe(
       "ds line-panel custom-class",
@@ -76,7 +100,11 @@ describe("LinePanel", () => {
   });
 
   it("passes through additional props", () => {
-    renderWithSite(<LinePanel data-testid="panel" line={NORTH} />);
+    renderWithSite(
+      <LinePanel data-testid="panel" line={NORTH} />,
+      "/network",
+      RECORDED,
+    );
     expect(screen.getByTestId("panel")).toBeInTheDocument();
   });
 });

@@ -4,13 +4,19 @@ import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { readRecordedLine } from "../../../../../testing/readRecordedViews.js";
+import {
+  createRecordedEnvironment,
+  readRecordedLine,
+} from "../../../../../testing/readRecordedViews.js";
 import { appRoutes } from "../../../../routes.js";
 import LineStrip from "./LineStrip.js";
 
+/** The environment the recorded answers are read from and rendered in. */
+const RECORDED = createRecordedEnvironment();
+
 describe("LineStrip SSR", () => {
   it("renders both directions and no toggle without script", () => {
-    const circle = readRecordedLine("circle-line");
+    const circle = readRecordedLine(RECORDED, "circle-line");
     const html = renderToString(
       <RouterProvider
         router={createRouter(appRoutes, {

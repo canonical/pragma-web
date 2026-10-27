@@ -5,16 +5,11 @@
 # before and the stop after it. A subgrid of the page over every column, so
 # each fact and each route aligns to the grid's lines: the term or the line
 # in the first two columns, the value or the neighbours in the rest. Bespoke
-# as the page's arrangement; each route's line is where an EntityChip will
-# render (marked `data-placeholder="EntityChip"`).
+# as the page's arrangement; each route's line is the line's chip, as its
+# site projects it.
 #
 # Every decision is read through a component token declared on the root
 # (`--station-panel-*`), bound to the symbol named here.
-#
-# Token ledger:
-#   size.width / size.height 0.75rem on a line's swatch: no icon-size token.
-#   typography.fontFamily on a line code: the monospace family has no
-#     semantic token.
 node:
   uri: metro.component.station_panel
   styles:
@@ -91,25 +86,12 @@ node:
       relation: { cardinality: "1..*", slotName: route }
     - node:
         role: line
-        # the route's line, linking to its page: swatch, code and name
+        # the route's line as its chip, linking to its page
         styles:
           layout.grid.column: "1 / span 2"
-          layout.type: flex
-          layout.align: center
-          spacing.gap: space.100
+          layout.alignSelf: start
+          size.width: fit-content
       relation: { cardinality: "1..*", slotName: line }
-    - node:
-        role: line swatch
-        styles:
-          size.width: 0.75rem
-          size.height: 0.75rem
-          appearance.background: [station.panel.line.colour, color.border]
-      relation: { cardinality: "1..*", slotName: swatch }
-    - node:
-        role: line code
-        styles:
-          typography.fontFamily: "ui-monospace, monospace"
-      relation: { cardinality: "1..*", slotName: code }
     - node:
         role: neighbours
         # the route's label, then the stop before and the stop after, a

@@ -1,8 +1,8 @@
 ---
 # NetworkStationPage — the content of /network/stations/:uri, a document.
 # It renders prism-core's DocumentLayout with the metro rail and, in the
-# three-column aside, the region the station's EntityCard will fill (an
-# EntityPlaceholder until then); its own root is the main column: a subgrid
+# three-column aside, the station's card as its site projects it; its own
+# root is the main column: a subgrid
 # of the canvas's page over every column, holding the station's
 # StationPanel, or its not-found, loading or error status. It renders its
 # own archetype because its aside reads the station's own data.

@@ -5,16 +5,12 @@
 @layer ds.components.global {
   /* A subgrid of the page over every column, so every fact and every route
    * aligns to the grid's lines: the term or the line in the first two
-   * columns, the value or the neighbours in the rest. A swatch's gap reads a
-   * --space-* step: no semantic name of the shim fits the inside of a row. */
+   * columns, the value or the neighbours in the rest. */
   .ds.station-panel {
     --station-panel-gap: var(--grid-gutter);
     --station-panel-muted-color: var(--color-text-muted);
-    --station-panel-line-gap: var(--space-100);
     --station-panel-neighbours-gap: var(--space-200);
-    --station-panel-swatch-size: 0.75rem;
-    --station-panel-swatch-fallback: var(--color-border);
-    --station-panel-code-font: ui-monospace, monospace;
+    --station-panel-line-width: fit-content;
 
     display: grid;
     grid-template-columns: subgrid;
@@ -74,24 +70,11 @@
     gap: var(--station-panel-gap);
   }
 
+  /* The chip keeps its own width in its two columns. */
   .ds.station-panel .line {
     grid-column: 1 / span 2;
-    display: flex;
-    align-items: center;
-    gap: var(--station-panel-line-gap);
-  }
-
-  .ds.station-panel .swatch {
-    width: var(--station-panel-swatch-size);
-    height: var(--station-panel-swatch-size);
-    background-color: var(
-      --station-panel-line-colour,
-      var(--station-panel-swatch-fallback)
-    );
-  }
-
-  .ds.station-panel .code {
-    font-family: var(--station-panel-code-font);
+    align-self: start;
+    width: var(--station-panel-line-width);
   }
 
   .ds.station-panel .neighbours {

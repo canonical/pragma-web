@@ -2,18 +2,28 @@
 
 import { fireEvent, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { readRecordedLine } from "../../../../../testing/readRecordedViews.js";
+import {
+  createRecordedEnvironment,
+  readRecordedLine,
+} from "../../../../../testing/readRecordedViews.js";
 import renderWithSite from "../../../../../testing/renderWithSite.js";
 import LineStrip from "./LineStrip.js";
 
-const CIRCLE = readRecordedLine("circle-line");
-const NORTH = readRecordedLine("north-line");
+/** The environment the recorded answers are read from and rendered in. */
+const RECORDED = createRecordedEnvironment();
+
+const CIRCLE = readRecordedLine(RECORDED, "circle-line");
+const NORTH = readRecordedLine(RECORDED, "north-line");
 const CIRCLE_STRIP = CIRCLE.strips.at(0) as (typeof CIRCLE.strips)[number];
 const NORTH_STRIP = NORTH.strips.at(0) as (typeof NORTH.strips)[number];
 
 describe("LineStrip", () => {
   it("lists a route's stops in calling order, each linking to its page", () => {
-    renderWithSite(<LineStrip colour={NORTH.colour} strip={NORTH_STRIP} />);
+    renderWithSite(
+      <LineStrip colour={NORTH.colour} strip={NORTH_STRIP} />,
+      "/network",
+      RECORDED,
+    );
     const southbound = screen
       .getByRole("heading", { name: "To Marsh End" })
       .closest(".direction") as HTMLElement;
@@ -36,6 +46,8 @@ describe("LineStrip", () => {
   it("rings an interchange and names the lines it meets and its transfer", () => {
     const { container } = renderWithSite(
       <LineStrip colour={NORTH.colour} strip={NORTH_STRIP} />,
+      "/network",
+      RECORDED,
     );
     const central = [...container.querySelectorAll(".stop")].find((stop) =>
       stop.textContent?.startsWith("Central Exchange"),
@@ -54,6 +66,8 @@ describe("LineStrip", () => {
   it("marks a loop as continuing at both ends", () => {
     const { container } = renderWithSite(
       <LineStrip colour={CIRCLE.colour} strip={CIRCLE_STRIP} />,
+      "/network",
+      RECORDED,
     );
     const stops = container.querySelector(".stops");
     expect(stops?.firstElementChild).toHaveClass("continues");
@@ -63,12 +77,18 @@ describe("LineStrip", () => {
   it("marks no continuation on a linear route", () => {
     const { container } = renderWithSite(
       <LineStrip colour={NORTH.colour} strip={NORTH_STRIP} />,
+      "/network",
+      RECORDED,
     );
     expect(container.querySelector(".continues")).toBeNull();
   });
 
   it("shows one direction at a time once hydrated, switched by the toggle", () => {
-    renderWithSite(<LineStrip colour={CIRCLE.colour} strip={CIRCLE_STRIP} />);
+    renderWithSite(
+      <LineStrip colour={CIRCLE.colour} strip={CIRCLE_STRIP} />,
+      "/network",
+      RECORDED,
+    );
     const clockwise = screen.getByRole("button", { name: "Clockwise" });
     const anticlockwise = screen.getByRole("button", { name: "Anticlockwise" });
     expect(clockwise).toHaveAttribute("aria-pressed", "true");
@@ -87,7 +107,11 @@ describe("LineStrip", () => {
 
   it("shows a route with no reverse alone, with no toggle", () => {
     const alone = { ...NORTH_STRIP, reverse: undefined };
-    renderWithSite(<LineStrip colour={NORTH.colour} strip={alone} />);
+    renderWithSite(
+      <LineStrip colour={NORTH.colour} strip={alone} />,
+      "/network",
+      RECORDED,
+    );
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
     expect(screen.getAllByRole("heading")).toHaveLength(1);
   });
@@ -99,6 +123,8 @@ describe("LineStrip", () => {
         strip={NORTH_STRIP}
         style={{ opacity: 1 }}
       />,
+      "/network",
+      RECORDED,
     );
     const root = container.querySelector("section") as HTMLElement;
     expect(root.style.getPropertyValue("--line-strip-colour")).toBe("#c8102e");
@@ -112,6 +138,8 @@ describe("LineStrip", () => {
         colour={NORTH.colour}
         strip={NORTH_STRIP}
       />,
+      "/network",
+      RECORDED,
     );
     expect(container.querySelector("section")?.getAttribute("class")).toBe(
       "ds line-strip custom-class",
@@ -125,6 +153,8 @@ describe("LineStrip", () => {
         data-testid="strip"
         strip={NORTH_STRIP}
       />,
+      "/network",
+      RECORDED,
     );
     expect(screen.getByTestId("strip")).toBeInTheDocument();
   });

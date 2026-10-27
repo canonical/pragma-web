@@ -1,3 +1,7 @@
+import type { CardProjection_node$key } from "#relay/__generated__/CardProjection_node.graphql.js";
+import type { ChipProjection_node$key } from "#relay/__generated__/ChipProjection_node.graphql.js";
+import type { NodeList_node$key } from "#relay/__generated__/NodeList_node.graphql.js";
+
 /** A stop or a line as a link names it: its compact address and its title. */
 export interface NodeRef {
   readonly curie: string;
@@ -12,7 +16,10 @@ export interface LineRef extends NodeRef {
 
 /** Where a station sits on one route: the stops either side of it. */
 export interface RouteNeighbourView {
-  readonly line: LineRef;
+  readonly line: LineRef & {
+    /** The line's key, which its chip projects. */
+    readonly chip: ChipProjection_node$key;
+  };
   /** The route's label ("To Marsh End", "Clockwise"). */
   readonly label: string;
   /** The stop before, absent at a linear route's first stop. */
@@ -23,6 +30,8 @@ export interface RouteNeighbourView {
 
 /** A station as its page shows it. */
 export interface StationView extends NodeRef {
+  /** The station's key, which its card projects. */
+  readonly card: CardProjection_node$key;
   readonly kind: "Station" | "Interchange";
   readonly zone?: string;
   readonly platformCount?: number;
@@ -67,4 +76,12 @@ export interface LineView extends LineRef {
   readonly interchanges: readonly (NodeRef & {
     readonly transferMinutes?: number;
   })[];
+}
+
+/** The inspector's lists, each item the key its list projects. */
+export interface NetworkIndex {
+  /** The network's lines, in code order. */
+  readonly lines: NodeList_node$key;
+  /** Every stop a route calls at, once each, in name order. */
+  readonly stations: NodeList_node$key;
 }

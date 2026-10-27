@@ -18,39 +18,38 @@ describe("NetworkInspector", () => {
     expect(screen.getByText("Loading the network…")).toBeInTheDocument();
   });
 
-  it("lists every line in code order, linking to its page", async () => {
+  it("lists every line in code order as rows, each linking to its page", async () => {
     renderWithSite(<NetworkInspector />);
     const lines = (await screen.findByRole("heading", { name: "Lines" }))
       .parentElement as HTMLElement;
+    expect(lines.querySelector(".ds.node-list")).not.toBeNull();
     const links = within(lines).getAllByRole("link");
-    expect(
-      links.map((link) => link.querySelector(".code")?.textContent),
-    ).toEqual(["1", "2", "3", "4", "5", "R1", "R2"]);
     expect(links).toHaveLength(LINE_COUNT);
+    expect(links.map((link) => link.textContent)).toEqual([
+      "North Line",
+      "Circle Line",
+      "Coastal Line",
+      "Upland Line",
+      "Lowland Line",
+      "Ringway Clockwise",
+      "Ringway Anticlockwise",
+    ]);
     expect(
-      within(lines).getByRole("link", { name: "2 Circle Line" }),
+      within(lines).getByRole("link", { name: "Circle Line" }),
     ).toHaveAttribute("href", "/network/lines/metro%3Acircle-line");
-    expect(
-      lines
-        .querySelector("[data-placeholder]")
-        ?.getAttribute("data-placeholder"),
-    ).toBe("EntityList");
   });
 
-  it("lists every routed station in name order", async () => {
+  it("lists every routed station in name order as rows", async () => {
     renderWithSite(<NetworkInspector />);
     const stations = (await screen.findByRole("heading", { name: "Stations" }))
       .parentElement as HTMLElement;
+    expect(stations.querySelector(".ds.node-list")).not.toBeNull();
     const names = within(stations)
       .getAllByRole("link")
       .map((link) => link.textContent);
     expect(names).toHaveLength(ROUTED_STATION_COUNT);
     expect(names).toEqual(
       [...names].sort((a, b) => String(a).localeCompare(String(b))),
-    );
-    expect(stations.querySelector(".station")).toHaveAttribute(
-      "data-placeholder",
-      "EntityRow",
     );
   });
 

@@ -12,10 +12,12 @@ import { graphql } from "react-relay";
  * lens expands its own.
  *
  * `NetworkMapQuery` reads every line with its routes, each route's calls in
- * order and each stop's diagram position: all the schematic map draws.
+ * order and each stop's diagram position: all the schematic map draws,
+ * and every line and stop as the inspector's lists show them.
  *
- * `NetworkStationQuery` reads one stop: its facts, and every route of every
- * line serving it, in calling order, for the stops either side of it.
+ * `NetworkStationQuery` reads one stop: its facts, its card, and every
+ * route of every line serving it, in calling order, for the stops either
+ * side of it, each line as its chip.
  *
  * `NetworkLineQuery` reads one line: its title, code and colour, and its
  * routes, each paired with its reverse, with every call's stop, the other
@@ -41,6 +43,7 @@ const declareNetworkQueries = (): unknown => [
                 title
                 curie
               }
+              ...NodeList_node
               ... on Line {
                 code
                 colour
@@ -63,6 +66,7 @@ const declareNetworkQueries = (): unknown => [
                         x
                         y
                       }
+                      ...NodeList_node
                     }
                   }
                 }
@@ -82,6 +86,7 @@ const declareNetworkQueries = (): unknown => [
           title
           curie
         }
+        ...CardProjection_node
         ... on Stop {
           platformCount
           inZone {
@@ -97,6 +102,7 @@ const declareNetworkQueries = (): unknown => [
               title
               curie
             }
+            ...ChipProjection_node
             routes {
               label
               isLoop

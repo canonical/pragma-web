@@ -1,11 +1,14 @@
 import type { DiagramLine } from "../geometry/index.js";
-import type { LineView, StationView } from "../types.js";
+import type { LineView, NetworkIndex, StationView } from "../types.js";
 
 /** `useNetworkLines` takes nothing: the map query reads the whole network. */
 export type UseNetworkLinesProps = Record<string, never>;
 
 /** The network's lines, as the map draws them. */
 export type UseNetworkLinesResult = readonly DiagramLine[];
+
+/** The inspector's lists, each item the key its list projects. */
+export type UseNetworkIndexResult = NetworkIndex;
 
 /** What `useNetworkNodeId` reads an IRI from. */
 export interface UseNetworkNodeIdProps {

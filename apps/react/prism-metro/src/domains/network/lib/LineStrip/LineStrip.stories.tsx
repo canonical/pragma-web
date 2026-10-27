@@ -2,11 +2,17 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withRouter } from "../../../../../.storybook/decorators/index.js";
-import { readRecordedLine } from "../../../../../testing/readRecordedViews.js";
+import {
+  createRecordedEnvironment,
+  readRecordedLine,
+} from "../../../../../testing/readRecordedViews.js";
 import Component from "./LineStrip.js";
 
-const circle = readRecordedLine("circle-line");
-const north = readRecordedLine("north-line");
+/** The environment the recorded answers are read from and rendered in. */
+const RECORDED = createRecordedEnvironment();
+
+const circle = readRecordedLine(RECORDED, "circle-line");
+const north = readRecordedLine(RECORDED, "north-line");
 
 const meta = {
   title: "Components/LineStrip",

@@ -2,15 +2,21 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withRouter } from "../../../../../.storybook/decorators/index.js";
-import { readRecordedLine } from "../../../../../testing/readRecordedViews.js";
+import {
+  createRecordedEnvironment,
+  readRecordedLine,
+} from "../../../../../testing/readRecordedViews.js";
 import Component from "./LinePanel.js";
+
+/** The environment the recorded answers are read from and rendered in. */
+const RECORDED = createRecordedEnvironment();
 
 const meta = {
   title: "Components/LinePanel",
   component: Component,
   tags: ["autodocs"],
   decorators: [withRouter({ url: "/network/lines/metro%3Acircle-line" })],
-  args: { line: readRecordedLine("circle-line") },
+  args: { line: readRecordedLine(RECORDED, "circle-line") },
 } satisfies Meta<typeof Component>;
 
 export default meta;
@@ -22,5 +28,5 @@ export const Loop: Story = {};
 
 /** A linear line: its two ends, linked. */
 export const EndToEnd: Story = {
-  args: { line: readRecordedLine("north-line") },
+  args: { line: readRecordedLine(RECORDED, "north-line") },
 };
