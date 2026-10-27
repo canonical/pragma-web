@@ -111,7 +111,7 @@ describe("InterchangeRow", () => {
       screen
         .getByRole("link", { name: "Central Exchange" })
         .getAttribute("href"),
-    ).toBe("/stations/metro%3Acentral-exchange");
+    ).toBe("/network/stations/metro%3Acentral-exchange");
   });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (

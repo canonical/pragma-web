@@ -103,7 +103,7 @@ describe("StationGraphNode", () => {
       </svg>
     ));
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
-      "/stations/metro%3Anorthgate",
+      "/network/stations/metro%3Anorthgate",
     );
   });
 

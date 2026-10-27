@@ -60,6 +60,6 @@ describe("InterchangeCard SSR", () => {
     expect(html).toContain(
       'class="ds card ds entity-card ds interchange-card"',
     );
-    expect(html).toContain('href="/stations/metro%3Acentral-exchange"');
+    expect(html).toContain('href="/network/stations/metro%3Acentral-exchange"');
   });
 });

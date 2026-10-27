@@ -84,7 +84,7 @@ describe("StationChip", () => {
     renderWithNode((node) => <StationChip node={node} />);
     expect(
       screen.getByRole("link", { name: "Northgate" }).getAttribute("href"),
-    ).toBe("/stations/metro%3Anorthgate");
+    ).toBe("/network/stations/metro%3Anorthgate");
   });
 
   it("takes a passage's link text in place of the name", () => {

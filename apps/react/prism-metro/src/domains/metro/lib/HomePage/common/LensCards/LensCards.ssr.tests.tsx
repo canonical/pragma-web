@@ -31,6 +31,6 @@ describe("LensCards SSR", () => {
       />,
     );
     expect(html).toContain('class="ds cards subgrid ds lens-cards"');
-    expect(html.match(/class="ds card ds lens-card"/g)).toHaveLength(3);
+    expect(html.match(/class="ds card ds lens-card"/g)).toHaveLength(4);
   });
 });

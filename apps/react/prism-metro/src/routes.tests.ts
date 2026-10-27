@@ -16,7 +16,7 @@ import { appRoutes, notFoundRoute } from "./routes.js";
 const router = createRouter(appRoutes, { notFound: notFoundRoute });
 
 describe("appRoutes", () => {
-  it("declares the site's three lenses, in rail order", () => {
+  it("declares the site's four lenses, in rail order", () => {
     expect(
       collectLenses(appRoutes).map(({ name, label, order, tier }) => ({
         name,
@@ -25,15 +25,19 @@ describe("appRoutes", () => {
         tier,
       })),
     ).toEqual([
+      { name: "network", label: "Network", order: 0, tier: 2 },
       { name: "stations", label: "Stations", order: 1, tier: 1 },
       { name: "lines", label: "Lines", order: 2, tier: 1 },
       { name: "definitions", label: "Definitions", order: 3, tier: 1 },
     ]);
   });
 
-  it("builds the seven route names the register carries", () => {
+  it("builds the ten route names the register carries", () => {
     expect([
       router.buildPath("home"),
+      router.buildPath("network"),
+      router.buildPath("networkStation", { params: { uri: NORTHGATE_CURIE } }),
+      router.buildPath("networkLine", { params: { uri: CIRCLE_LINE_CURIE } }),
       router.buildPath("stations"),
       router.buildPath("stationsEntity", { params: { uri: NORTHGATE_CURIE } }),
       router.buildPath("lines"),
@@ -44,6 +48,9 @@ describe("appRoutes", () => {
       }),
     ]).toEqual([
       "/",
+      "/network",
+      "/network/stations/metro%3Anorthgate",
+      "/network/lines/metro%3Acircle-line",
       "/stations",
       "/stations/metro%3Anorthgate",
       "/lines",

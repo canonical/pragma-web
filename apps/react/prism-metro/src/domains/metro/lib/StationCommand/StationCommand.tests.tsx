@@ -105,7 +105,7 @@ describe("StationCommand", () => {
     ));
     expect(
       screen.getByRole("link", { name: "Northgate" }).getAttribute("href"),
-    ).toBe("/stations/metro%3Anorthgate");
+    ).toBe("/network/stations/metro%3Anorthgate");
   });
 
   it("names its class alone for a station in no zone", () => {

@@ -52,6 +52,6 @@ describe("LineCard SSR", () => {
       createProjectionTree(environment, <LineCardSsrTestNode />),
     );
     expect(html).toContain('class="ds card ds entity-card ds line-card"');
-    expect(html).toContain('href="/lines/metro%3Anorth-line"');
+    expect(html).toContain('href="/network/lines/metro%3Anorth-line"');
   });
 });

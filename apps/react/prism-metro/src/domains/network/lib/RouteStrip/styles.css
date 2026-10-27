@@ -1,0 +1,111 @@
+/* Scaffolded by @canonical/summon-component:react v0.43.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The strip spans the page's columns. The toggle's gap reads a --space-*
+   * step: no semantic name of the shim fits a pair of buttons. */
+  .ds.route-strip {
+    --route-strip-gap: var(--grid-gutter);
+    --route-strip-inner-gap: var(--space-100);
+    --route-strip-bleed: calc(-1 * var(--grid-gutter));
+    --route-strip-inset: var(--grid-gutter);
+    --route-strip-rule-width: 0.25rem;
+    --route-strip-rule-offset: var(--space-050);
+    --route-strip-rule-offset-vertical: calc(var(--grid-gutter) + 0.25rem);
+    --route-strip-rule-fallback: var(--color-border);
+    --route-strip-muted-color: var(--color-text-muted);
+    --route-strip-continues-offset: calc(0.75rem + var(--space-100));
+
+    display: grid;
+    grid-column: 1 / -1;
+    gap: var(--route-strip-gap);
+  }
+
+  .ds.route-strip .toggle {
+    display: flex;
+    gap: var(--route-strip-inner-gap);
+    border-style: none;
+    padding-block-start: 0;
+    padding-block-end: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+  }
+
+  .ds.route-strip .direction {
+    display: grid;
+    gap: var(--route-strip-gap);
+  }
+
+  /* The track bleeds one gutter into the gutters either side, compensated
+   * by padding, so the rule runs from the rail's border to the aside's. */
+  .ds.route-strip .track {
+    position: relative;
+    margin-inline-start: var(--route-strip-bleed);
+    margin-inline-end: var(--route-strip-bleed);
+    padding-inline-start: var(--route-strip-inset);
+    padding-inline-end: var(--route-strip-inset);
+  }
+
+  /* The rule runs through the ticks' centres, under the stops. */
+  .ds.route-strip .rule {
+    position: absolute;
+    inset-inline-start: 0;
+    inline-size: 100%;
+    inset-block-start: var(--route-strip-rule-offset);
+    block-size: var(--route-strip-rule-width);
+    background-color: var(
+      --route-strip-colour,
+      var(--route-strip-rule-fallback)
+    );
+  }
+
+  .ds.route-strip .stops {
+    position: relative;
+    display: flex;
+    gap: var(--route-strip-gap);
+    list-style: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+  }
+
+  /* The stops share the strip equally. */
+  .ds.route-strip .stop {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-inline-size: 0;
+  }
+
+  /* Set below the rule, on the stops' names' line. */
+  .ds.route-strip .continues {
+    color: var(--route-strip-muted-color);
+    flex-shrink: 0;
+    padding-block-start: var(--route-strip-continues-offset);
+  }
+
+  /* Below two groups the strip reads top to bottom: the stops stack, each
+   * laying its tick beside its name, and the rule turns vertical through
+   * the ticks' centres. */
+  @container shell (width < 912px) {
+    .ds.route-strip .stops {
+      flex-direction: column;
+    }
+
+    /* Set beside the rule, on the stops' names' column. */
+    .ds.route-strip .continues {
+      padding-block-start: 0;
+      padding-inline-start: var(--route-strip-continues-offset);
+    }
+
+    .ds.route-strip .rule {
+      inset-inline-start: var(--route-strip-rule-offset-vertical);
+      inline-size: var(--route-strip-rule-width);
+      inset-block-start: 0;
+      block-size: 100%;
+    }
+  }
+}

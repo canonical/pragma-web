@@ -57,6 +57,6 @@ describe("SiteCommandSlot SSR", () => {
       createProjectionTree(environment, <SiteCommandSlotSsrTestNode />),
     );
     expect(html).toContain("ds station-command");
-    expect(html).toContain('href="/stations/metro%3Anorthgate"');
+    expect(html).toContain('href="/network/stations/metro%3Anorthgate"');
   });
 });

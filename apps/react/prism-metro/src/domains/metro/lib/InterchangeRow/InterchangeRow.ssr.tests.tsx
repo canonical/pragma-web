@@ -62,6 +62,6 @@ describe("InterchangeRow SSR", () => {
       createProjectionTree(environment, <InterchangeRowSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-row ds interchange-row"');
-    expect(html).toContain('href="/stations/metro%3Acentral-exchange"');
+    expect(html).toContain('href="/network/stations/metro%3Acentral-exchange"');
   });
 });

@@ -55,6 +55,6 @@ describe("StationChip SSR", () => {
       createProjectionTree(environment, <StationChipSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-chip ds station-chip"');
-    expect(html).toContain('href="/stations/metro%3Anorthgate"');
+    expect(html).toContain('href="/network/stations/metro%3Anorthgate"');
   });
 });

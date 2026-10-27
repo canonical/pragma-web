@@ -1,0 +1,79 @@
+/* Scaffolded by @canonical/summon-component:react v0.43.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The tick over the name, then the connections and the transfer time.
+   * Gaps inside the stop and between a swatch and its code read --space-*
+   * steps: no semantic name of the shim fits the inside of one stop. */
+  .ds.call-stop {
+    --call-stop-gap: var(--space-100);
+    --call-stop-swatch-gap: var(--space-050);
+    --call-stop-fallback: var(--color-border);
+    --call-stop-tick-size: 0.75rem;
+    --call-stop-ring-width: 2px;
+    --call-stop-ring-fill: var(--color-background);
+    --call-stop-swatch-size: 0.5rem;
+    --call-stop-muted-color: var(--color-text-muted);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--call-stop-gap);
+  }
+
+  .ds.call-stop .tick {
+    flex-shrink: 0;
+    width: var(--call-stop-tick-size);
+    height: var(--call-stop-tick-size);
+    border-radius: 50%;
+    background-color: var(--call-stop-colour, var(--call-stop-fallback));
+  }
+
+  .ds.call-stop .ring {
+    flex-shrink: 0;
+    width: var(--call-stop-tick-size);
+    height: var(--call-stop-tick-size);
+    border-radius: 50%;
+    background-color: var(--call-stop-ring-fill);
+    border-width: var(--call-stop-ring-width);
+    border-style: solid;
+    border-color: var(--call-stop-colour, var(--call-stop-fallback));
+  }
+
+  .ds.call-stop .connections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--call-stop-gap);
+    list-style: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+  }
+
+  .ds.call-stop .connection {
+    display: flex;
+    align-items: center;
+    gap: var(--call-stop-swatch-gap);
+  }
+
+  .ds.call-stop .swatch {
+    width: var(--call-stop-swatch-size);
+    height: var(--call-stop-swatch-size);
+    background-color: var(
+      --call-stop-connection-colour,
+      var(--call-stop-fallback)
+    );
+  }
+
+  .ds.call-stop .transfer {
+    color: var(--call-stop-muted-color);
+  }
+
+  /* Below two groups the strip reads top to bottom, and each stop lays its
+   * tick beside its name. */
+  @container shell (width < 912px) {
+    .ds.call-stop {
+      flex-direction: row;
+    }
+  }
+}

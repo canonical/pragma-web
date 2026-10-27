@@ -55,6 +55,6 @@ describe("StationCard SSR", () => {
       createProjectionTree(environment, <StationCardSsrTestNode />),
     );
     expect(html).toContain('class="ds card ds entity-card ds station-card"');
-    expect(html).toContain('href="/stations/metro%3Anorthgate"');
+    expect(html).toContain('href="/network/stations/metro%3Anorthgate"');
   });
 });

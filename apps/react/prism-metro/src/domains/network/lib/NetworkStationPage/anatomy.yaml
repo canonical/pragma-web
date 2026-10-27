@@ -1,0 +1,29 @@
+---
+# NetworkStationPage — the content of /network/stations/:uri, a document.
+# It renders prism-core's DocumentLayout with the metro rail and, in the
+# three-column aside, the station's card as its site projects it; its own
+# root is the main column: a subgrid
+# of the canvas's page over every column, holding the station's
+# StationPanel, or its not-found, loading or error status. It renders its
+# own archetype because its aside reads the station's own data.
+#
+# Every decision is read through a component token declared on the root
+# (`--network-station-page-*`), bound to the symbol named here.
+node:
+  uri: metro.component.network_station_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        uri: metro.component.station_panel
+      relation: { cardinality: "0..1", slotName: panel }
+    - node:
+        role: status
+        # not found, loading or error, in place of the station
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: status }

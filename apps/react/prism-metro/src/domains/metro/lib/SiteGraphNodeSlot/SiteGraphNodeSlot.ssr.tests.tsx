@@ -60,6 +60,6 @@ describe("SiteGraphNodeSlot SSR", () => {
       createProjectionTree(environment, <SiteGraphNodeSlotSsrTestNode />),
     );
     expect(html).toContain("ds station-graph-node");
-    expect(html).toContain('href="/stations/metro%3Anorthgate"');
+    expect(html).toContain('href="/network/stations/metro%3Anorthgate"');
   });
 });
