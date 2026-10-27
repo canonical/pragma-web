@@ -180,20 +180,22 @@ export default function CommandPaletteSearch({
 
   /**
    * Move the highlight with the arrow keys, wrapping at both ends, and
-   * choose the highlighted result with Enter, unless an input method is
-   * composing text.
+   * choose the highlighted result with Enter. While an input method is
+   * composing text, every key is the input method's: it may move through
+   * its candidates with the arrows and commit one with Enter.
    *
    * @note Impure: sets the component's state, prevents the keys' default
    *   actions in the field, and clicks the highlighted option.
    */
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.nativeEvent.isComposing) return;
     const step = ARROW_STEPS.get(event.key);
     if (step !== undefined && active !== undefined) {
       event.preventDefault();
       setHighlighted((active.index + step + results.length) % results.length);
       return;
     }
-    if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+    if (event.key === "Enter") {
       event.preventDefault();
       activeOption.current?.click();
     }

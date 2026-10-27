@@ -161,6 +161,15 @@ describe("CommandPaletteSearch", () => {
     expect(screen.getAllByRole("option", { selected: true })).toHaveLength(1);
   });
 
+  it("leaves the arrow keys to an input method while it composes text", async () => {
+    await renderResults("lay");
+    const field = screen.getByRole("combobox");
+    for (const key of ["ArrowDown", "ArrowUp"]) {
+      expect(fireEvent.keyDown(field, { key, isComposing: true })).toBe(true);
+      expect(readActiveTitle()).toBe("Layout switcher");
+    }
+  });
+
   it("scrolls each newly highlighted result into the results' view", async () => {
     await renderResults("lay");
     const scrollIntoView = vi.spyOn(Element.prototype, "scrollIntoView");

@@ -78,6 +78,8 @@ whenever the palette closes, however the reader closed it.
   both ends. A pointer moving over a result highlights it too.
 - Enter in the field: choose the highlighted result. A click on a result,
   or following the link of the preview's title, chooses it too.
+- While an input method composes text in the field, the arrows and Enter
+  are its own: they move through its candidates and commit one.
 - Escape, or a click on the backdrop (pressed and released there): close
   the palette.
 
