@@ -23,6 +23,7 @@ export const MESSAGES = {
   "fleet.index.loading": "Loading the fleet…",
   "fleet.index.error": "The fleet could not be loaded.",
   "fleet.stocks.kind": { one: "rolling stock", other: "rolling stocks" },
+  "fleet.formation.caption": "{title}, {length}",
   "fleet.formations.none": "No formation runs this stock.",
   "fleet.index.empty": "The graph lists no rolling stock.",
   "fleet.page.loading": "Loading…",

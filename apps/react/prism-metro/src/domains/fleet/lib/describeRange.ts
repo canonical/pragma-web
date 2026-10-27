@@ -1,6 +1,6 @@
 /**
  * Read a set of measures as a reader reads them: one value when every
- * member shares it, else the range from the least to the most, written
+ * member reads the same, else the range from the least to the most, written
  * once with the unit, as the format's locale writes ranges: "60–120 m".
  *
  * @param values - The measures, at least one.
@@ -13,7 +13,8 @@ export default function describeRange(
 ): string {
   const least = Math.min(...values);
   const most = Math.max(...values);
-  return least === most
+  // Measures that differ below the format's precision read as one value.
+  return format.format(least) === format.format(most)
     ? format.format(least)
     : format.formatRange(least, most);
 }

@@ -7,6 +7,10 @@ describe("describeRange", () => {
     expect(describeRange([60, 60], LENGTH_FORMAT)).toBe("60 m");
   });
 
+  it("reads one value when the measures differ below the format's precision", () => {
+    expect(describeRange([62, 62.04], LENGTH_FORMAT)).toBe("62 m");
+  });
+
   it("reads the range from the least to the most, the unit once", () => {
     expect(describeRange([120, 60], LENGTH_FORMAT)).toBe("60–120 m");
   });

@@ -129,7 +129,7 @@ const FormationSideView = ({
                 <abbr className="code" title={describeCar(car, t)}>
                   {car.code}
                 </abbr>
-                <span className="description">{describeCar(car, t)}</span>
+                <span className="description">, {describeCar(car, t)}</span>
               </span>
             ))}
           </li>

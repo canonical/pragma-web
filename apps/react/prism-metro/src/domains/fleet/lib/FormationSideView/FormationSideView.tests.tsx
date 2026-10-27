@@ -68,7 +68,7 @@ describe("FormationSideView", () => {
     render(<FormationSideView cars={SIX_CAR} />);
     const first = screen.getAllByRole("listitem").at(0) as HTMLElement;
     expect(first.querySelector(".description")).toHaveTextContent(
-      "Series 90 driving motor car, cab at the front",
+      ", Series 90 driving motor car, cab at the front",
     );
     expect(first.querySelector(".code")?.nextElementSibling).toHaveClass(
       "description",

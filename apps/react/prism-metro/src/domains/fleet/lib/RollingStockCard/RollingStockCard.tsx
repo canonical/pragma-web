@@ -8,6 +8,7 @@ import { useMessages } from "#i18n";
 import nodeFragment from "#relay/__generated__/RollingStockCard_node.graphql.js";
 import describeFormations from "../describeFormations.js";
 import { FormationStack } from "../FormationStack/index.js";
+import formatLength from "../formatLength.js";
 import orientCars from "../orientCars.js";
 import readFormationTrain from "../readFormationTrain.js";
 import type { RollingStockCardProps } from "./types.js";
@@ -49,7 +50,7 @@ const componentCssClassName = "ds rolling-stock-card";
  * the stock's page, its class and its definition; how many formations it
  * runs in and the range of their lengths and capacities as key values;
  * that count as the footer's vital; and its formations drawn at one scale
- * in the sidecar, each named by its title. A stock with no formation
+ * in the sidecar, each named by its title and its length. A stock with no formation
  * shows its count alone, and no sidecar.
  *
  * Native props reach the root the EntityCard renders; a consumer
@@ -90,7 +91,10 @@ export default function RollingStockCard({
             trains={data.formations.map((formation) => ({
               key: formation.uri,
               cars: orientCars(readFormationTrain(formation)),
-              caption: formation._meta.title,
+              caption: t("fleet.formation.caption", {
+                title: formation._meta.title,
+                length: formatLength(formation.length),
+              }),
             }))}
           />
         )
