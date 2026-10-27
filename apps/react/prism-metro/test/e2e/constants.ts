@@ -26,3 +26,11 @@ export const PAGE_SETTLE_MS = 30_000;
 
 /** A page on the workspace archetype: the Definitions explorer. */
 export const WORKSPACE_PATH = "/definitions";
+
+/**
+ * A field name as long as an ontology property's local name runs, one word
+ * wider than a key's two columns: set in place of a station page's first
+ * key to measure how a long key lays out.
+ */
+export const LONG_FIELD_NAME =
+  "hasAccessibleStepFreeInterchangeWithBusTerminal";

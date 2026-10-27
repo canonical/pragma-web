@@ -9,6 +9,9 @@
 /** The components exemplar: the button component's CURIE. */
 export const COMPONENT_URI = "ds:global.component.button";
 
+/** The components exemplar's title, as a reader searches for it. */
+export const COMPONENT_TITLE = "Button";
+
 /** The definitions exemplar: the UIBlock class's term (a CURIE). */
 export const UIBLOCK_TERM = "ds:UIBlock";
 

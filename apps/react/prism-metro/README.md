@@ -65,12 +65,13 @@ the production build, on the same port and against the same graph.
 ## Checks and tests
 
 - `bun run check`: the schema check, a Relay compile, lint and type-check.
-  `bun run relay` compiles the app's own query together with the lens and
-  projection packages' documents against this app's schema, and fails when a
-  document selects something the metro provider does not serve. Its output
-  is not committed: every script that loads the app's code or its types
-  runs it first (the dev, graph, build, preview, type-check, test and
-  Storybook scripts), so only the schema and Biome scripts run without it.
+  `bun run relay` compiles the app's own query together with the lens,
+  projection and command-palette packages' documents against this app's
+  schema, and fails when a document selects something the metro provider
+  does not serve. Its output is not committed: every script that loads the
+  app's code or its types runs it first (the dev, graph, build, preview,
+  type-check, test and Storybook scripts), so only the schema and Biome
+  scripts run without it.
 - `bun run test`: the unit and integration suites; the server and
   integration suites start their own metro graph on a free port.
   `bun run test:coverage` enforces full coverage.
@@ -87,9 +88,12 @@ the production build, on the same port and against the same graph.
 ## The schema
 
 `src/relay/schema.graphql` is the metro provider's schema: the Prism data
-contract followed by the provider's extension. It is written by
-`bun run schema` and checked by `bun run check`, so after the provider
-changes, rerun `bun run schema` and commit the result.
+contract followed by the provider's extension, with the extension's root
+fields (`prose`, `search`) moved into `type Query`: relay-compiler reads a
+field under `extend type Query` as a client extension and never sends it to
+the server. It is written by `bun run schema` and checked by
+`bun run check`, so after the provider changes, rerun `bun run schema` and
+commit the result.
 
 ## Route names
 

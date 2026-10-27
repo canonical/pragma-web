@@ -1,0 +1,141 @@
+/* Scaffolded by @canonical/summon-component:react v0.43.0 */
+
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The palette's search: the field across the top, then the results on the
+   * left of the preview, the two scrolling on their own below the field. It
+   * sets the context's primary text on the matrix's 24px line. */
+  .ds.command-palette-search {
+    --command-palette-search-font-size: var(
+      --typography-text-primary-font-size
+    );
+    /* The matrix's 24px line, which every representation shares. */
+    --command-palette-search-line-height: var(--space-300);
+    --command-palette-search-gap: var(--grid-gutter);
+    --command-palette-search-padding-block: var(--component-padding-block);
+    --command-palette-search-padding-inline: var(--component-padding-inline);
+    /* The field's hairline under it: stroke thickness has no token. */
+    --command-palette-search-rule-width: 1px;
+    --command-palette-search-rule-color: var(--color-border-muted);
+    /* The field's ring sits inside it, since the dialog clips. */
+    --command-palette-search-focus-ring-width: 2px;
+    --command-palette-search-focus-ring-offset: -2px;
+    --command-palette-search-focus-ring-color: var(--color-focus-ring);
+    /* Four of the shell's columns and their three gutters; the preview
+     * takes what is left of the palette's six. */
+    --command-palette-search-results-basis: calc(
+      4 *
+      var(--grid-col-min) +
+      3 *
+      var(--grid-gutter)
+    );
+    --command-palette-search-heading-color: var(--color-text-muted);
+    --command-palette-search-heading-letter-spacing: var(
+      --typography-text-primary-smallcaps-letter-spacing
+    );
+    --command-palette-search-status-color: var(--color-text-muted);
+    --command-palette-search-preview-gap: var(--grid-gutter);
+
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-block-size: 0;
+    font-size: var(--command-palette-search-font-size);
+    line-height: var(--command-palette-search-line-height);
+  }
+
+  /* The field takes the dialog's surface and the palette's text, with a
+   * hairline under it. */
+  .ds.command-palette-search > .query {
+    padding-block: var(--command-palette-search-padding-block);
+    padding-inline: var(--command-palette-search-padding-inline);
+    border-width: var(--command-palette-search-rule-width);
+    border-style: none none solid;
+    border-bottom-color: var(--command-palette-search-rule-color);
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .ds.command-palette-search > .query:focus-visible {
+    outline-width: var(--command-palette-search-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--command-palette-search-focus-ring-color);
+    outline-offset: var(--command-palette-search-focus-ring-offset);
+  }
+
+  /* The results and the preview side by side, under the field. */
+  .ds.command-palette-search > .body {
+    display: flex;
+    gap: var(--command-palette-search-gap);
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-block-size: 0;
+  }
+
+  /* Four columns of results, scrolling on their own. */
+  .ds.command-palette-search > .body > .results {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: var(--command-palette-search-results-basis);
+    overflow-y: auto;
+    padding-block-end: var(--command-palette-search-padding-block);
+  }
+
+  .ds.command-palette-search > .body > .results > .group {
+    list-style: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+  }
+
+  /* A group's heading names its type in small capitals, on the rows' inset. */
+  .ds.command-palette-search > .body > .results > .group > .heading {
+    padding-block-start: var(--command-palette-search-padding-block);
+    padding-inline-start: var(--command-palette-search-padding-inline);
+    padding-inline-end: var(--command-palette-search-padding-inline);
+    color: var(--command-palette-search-heading-color);
+    font-variant-caps: all-small-caps;
+    letter-spacing: var(--command-palette-search-heading-letter-spacing);
+  }
+
+  .ds.command-palette-search > .body > .status {
+    padding-block: var(--command-palette-search-padding-block);
+    padding-inline: var(--command-palette-search-padding-inline);
+    color: var(--command-palette-search-status-color);
+  }
+
+  /* The highlighted result's card in the two columns left, laid out as the
+   * Cards group lays its cards: on four row tracks, the gutter between
+   * them, packed to the top. */
+  .ds.command-palette-search > .body > .preview {
+    display: grid;
+    gap: var(--command-palette-search-preview-gap);
+    align-content: start;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-width: 0;
+    overflow-y: auto;
+    padding-block: var(--command-palette-search-padding-block);
+    padding-inline-end: var(--command-palette-search-padding-inline);
+  }
+
+  /* Below two groups: the palette is four columns wide, the results take
+   * them all, however wide their rows' titles run, and the preview is not
+   * shown. */
+  @container shell (width < 912px) {
+    .ds.command-palette-search > .body > .results {
+      flex-grow: 1;
+      flex-basis: 0;
+    }
+
+    .ds.command-palette-search > .body > .preview {
+      display: none;
+    }
+  }
+}

@@ -9,6 +9,6 @@
  */
 
 export { default as createStandardsRoutes } from "./createStandardsRoutes.js";
-export type { StandardsLayoutProps } from "./StandardsLayout/index.js";
-export { StandardsLayout } from "./StandardsLayout/index.js";
 export type { StandardsBinding } from "./types.js";
+export type { StandardsLayoutProps } from "./ui/StandardsLayout/index.js";
+export { StandardsLayout } from "./ui/StandardsLayout/index.js";

@@ -1,0 +1,91 @@
+---
+# StandardArticle — a standard as a document: its header, the title as the
+# page's level-1 heading over one meta line (the compact address in the
+# published InlineCode, then the class it is an instance of, muted), over
+# its body: the prose rendered from Markdown (StandardProse), or the
+# description split into paragraphs on blank lines, or a line saying there
+# is none.
+#
+# The article uses the whole main column: the root is a subgrid over every
+# column, its gap the grid's gutter on both axes, and the header spans it.
+# Only the body, the prose, holds a reading measure of six intrinsic
+# columns from the column's first line (a narrower subgrid clamps the
+# span), flush left. The header is application UI: the title and the meta
+# line stack one small step apart, the meta line's parts one gutter apart
+# on a shared baseline. The body is prose, and its space is element-owned:
+# `.editorial` gives its headings and paragraphs their space after, and
+# `.content-flow` clears the last block's. A description keeps its
+# hand-written line breaks.
+#
+# Every decision is read through a component token declared on the root
+# (`--standard-article-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   space.100 (8px) between the title and the meta line: they read as one
+#     heading; no gap may read a container gap.
+#   layout.grid.column "1 / -1" (header) and "1 / span 6" (prose):
+#     structure, a span in columns.
+#   typography.whiteSpace pre-line, layout.wrap wrap, layout.align
+#     baseline: keywords; the 0 resets on the meta line.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.100.
+node:
+  uri: prism.component.standard_article
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: header
+        styles:
+          layout.grid.column: "1 / -1"
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: space.100
+        edges:
+          - node:
+              role: heading (the page's level-1 heading, the standard's title)
+            relation: { cardinality: "1" }
+          - node:
+              role: meta (the address and the class, on one line that wraps)
+              styles:
+                layout.type: flex
+                layout.wrap: wrap
+                layout.align: baseline
+                spacing.gap: grid.gutter
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.color: color.text.muted
+              edges:
+                - node:
+                    uri: global.component.inline_code
+                  relation: { cardinality: "1" }
+                - node:
+                    role: class (the catalog's sentence naming the class)
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "1", slotName: meta }
+      relation: { cardinality: "1", slotName: header }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              uri: prism.subcomponent.standard_prose
+              styles:
+                layout.grid.column: "1 / span 6"
+          - node:
+              role: prose (the description, carrying .editorial and .content-flow)
+              styles:
+                layout.grid.column: "1 / span 6"
+              edges:
+                - node:
+                    role: paragraph (one block of the description)
+                    styles:
+                      typography.whiteSpace: pre-line
+                  relation: { cardinality: "1..*", slotName: paragraph }
+          - node:
+              role: prose (the catalog's line for a standard with no text)
+              styles:
+                layout.grid.column: "1 / span 6"
+      relation: { cardinality: "1", slotName: prose }

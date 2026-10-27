@@ -115,3 +115,11 @@ packages/prism/lens-entity/.relay/
 # shipped; none is committed
 packages/prism/lens-standards/src/__generated__/
 packages/prism/lens-standards/.relay/
+
+# relay-compiler artifacts of the source-shipped command palette: its own,
+# built by its `build` script at install and shipped in its tarball, and,
+# under .relay, the schema its `schema` script writes and the projections
+# fragments its spreads resolve against, compiled beside them and never
+# shipped; none is committed
+packages/prism/command-palette/src/__generated__/
+packages/prism/command-palette/.relay/

@@ -1,0 +1,46 @@
+---
+# EntityPage — an entity route's content: the entity, inside the error and
+# loading boundaries, which the address keys, so a new entity starts
+# afresh. It is a page of the document archetype: the canvas is the only
+# region that scrolls, and nothing here sets a height.
+#
+# The page uses the whole main column: the root is a subgrid of the
+# canvas's page grid over every column, its gap the grid's gutter on both
+# axes; the loading line and the alert span it, and the entity places
+# itself. The root packs at the top and ends one loose step of block space
+# above the canvas's end. Bespoke: no published component is an entity
+# page.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-page-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure, a span in columns.
+#   layout.alignSelf start: a layout keyword.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# container.gap.loose.
+node:
+  uri: prism.component.entity_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+    spacing.internal.block.end: container.gap.loose
+  edges:
+    - node:
+        role: status (the loading line)
+        styles:
+          layout.grid.column: "1 / -1"
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: status }
+    - node:
+        role: alert (the error line, role alert)
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: alert }
+    - node:
+        uri: prism.subcomponent.entity_detail
+      relation: { cardinality: "0..1", slotName: default }

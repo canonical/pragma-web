@@ -1,0 +1,31 @@
+{
+  "root": "..",
+  "sources": {
+    "command-palette/src": "command-palette",
+    "projections/src": "prism-projections"
+  },
+  "excludes": ["**/node_modules/**", "**/__generated__/**"],
+  "projects": {
+    "prism-projections": {
+      "schema": "contract/schema/contract.graphql",
+      "language": "typescript",
+      "eagerEsModules": true,
+      "output": "command-palette/.relay/prism-projections",
+      "schemaConfig": {
+        "nodeInterfaceIdField": "uri",
+        "nodeInterfaceIdVariableName": "id"
+      }
+    },
+    "command-palette": {
+      "base": "prism-projections",
+      "schema": "command-palette/.relay/schema.graphql",
+      "language": "typescript",
+      "eagerEsModules": true,
+      "output": "command-palette/src/__generated__",
+      "schemaConfig": {
+        "nodeInterfaceIdField": "uri",
+        "nodeInterfaceIdVariableName": "id"
+      }
+    }
+  }
+}
