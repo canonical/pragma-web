@@ -41,6 +41,20 @@ describe("NetworkStationPage", () => {
     expect(container.querySelector(".canvas > .aside")?.textContent).toBe("");
   });
 
+  it("says a station no route calls at is on no route, linking to its entry", async () => {
+    renderWithSite(<NetworkStationPage address="metro:ghost" />);
+    const heading = await screen.findByRole("heading", { level: 1 });
+    expect(
+      screen.getByText(/no route calls at it, so the map does not draw it/),
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("link", { name: "Read its entry in the stations lens" })
+        .getAttribute("href"),
+    ).toBe("/stations/metro%3Aghost");
+    expect(heading.textContent).not.toBe("Not on the network");
+  });
+
   it("carries its address on its main column", () => {
     const { container } = renderWithSite(
       <NetworkStationPage address="metro:tannery-lane" />,

@@ -6,9 +6,6 @@ import { MESSAGES } from "#i18n";
  */
 export const NETWORK_LENS = { label: MESSAGES["lens.network"], order: 0 };
 
-/** The route param carrying a line's or a station's address. */
-export const NETWORK_ADDRESS_PARAM = "uri";
-
 /** The class whose instances are the network's lines. */
 export const LINE_CLASS_URI = "metro:Line";
 

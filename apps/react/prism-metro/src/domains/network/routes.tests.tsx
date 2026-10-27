@@ -87,6 +87,7 @@ describe("networkRoutes", () => {
     );
     expect(fetchFn.mock.calls.map(([request]) => request.name)).toEqual([
       "NetworkMapQuery",
+      "NetworkNamespacesQuery",
       "NetworkStationQuery",
       "NetworkLineQuery",
     ]);

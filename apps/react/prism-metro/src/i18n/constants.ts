@@ -30,6 +30,9 @@ export const MESSAGES = {
   "network.station.transfer": "Transfer",
   "network.station.minutes": "{minutes} min",
   "network.station.routes": "Routes",
+  "network.station.unrouted":
+    "{title} is in the graph, but no route calls at it, so the map does not draw it.",
+  "network.station.unrouted.link": "Read its entry in the stations lens",
   "network.station.previous": "Previous",
   "network.station.next": "Next",
   "network.station.terminus": "Terminus",

@@ -7,10 +7,12 @@ import { graphql } from "react-relay";
  * an evaluated tag throws at module scope wherever no Relay transform has
  * run.
  *
+ * `NetworkNamespacesQuery` reads the graph's prefixes, which expand a
+ * page's compact address into the IRI `node(id:)` takes, as the entity
+ * lens expands its own.
+ *
  * `NetworkMapQuery` reads every line with its routes, each route's calls in
- * order and each stop's diagram position: all the schematic map draws, and
- * the addresses every network page resolves its own against, since the
- * routes reach every station the lens shows.
+ * order and each stop's diagram position: all the schematic map draws.
  *
  * `NetworkStationQuery` reads one stop: its facts, and every route of every
  * line serving it, in calling order, for the stops either side of it.
@@ -20,6 +22,14 @@ import { graphql } from "react-relay";
  * lines it meets and, at an interchange, the time a transfer takes.
  */
 const declareNetworkQueries = (): unknown => [
+  graphql`
+    query NetworkNamespacesQuery {
+      ontologies {
+        prefix
+        namespace
+      }
+    }
+  `,
   graphql`
     query NetworkMapQuery($classUri: String!, $first: Int!) {
       ontologyClass(uri: $classUri) {

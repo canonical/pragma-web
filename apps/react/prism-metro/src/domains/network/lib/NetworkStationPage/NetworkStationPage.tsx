@@ -2,6 +2,7 @@
 
 import { DocumentLayout, ErrorBoundary } from "@canonical/prism-core";
 import { Head } from "@canonical/react-head";
+import { useRouter } from "@canonical/router-react";
 import { type ReactElement, type ReactNode, Suspense } from "react";
 import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
@@ -35,11 +36,16 @@ const Boundary = ({
   );
 };
 
-/** The station's panel, or the page's not-found status. */
+/**
+ * The station's panel; for a station no route calls at, a status saying so
+ * with a link to its entry in the stations lens; or the page's not-found
+ * status.
+ */
 const StationMain = ({
   address,
 }: Pick<NetworkStationPageProps, "address">): ReactElement => {
   const t = useMessages();
+  const router = useRouter();
   const station = useStationView({ address });
   if (station === undefined) {
     return (
@@ -47,6 +53,24 @@ const StationMain = ({
         <Head title={t("network.notFound.title")} />
         <h1>{t("network.notFound.title")}</h1>
         <p>{t("network.notFound.body")}</p>
+      </section>
+    );
+  }
+  if (station.routes.length === 0) {
+    return (
+      <section className="status">
+        <Head title={station.title} />
+        <h1>{station.title}</h1>
+        <p>{t("network.station.unrouted", { title: station.title })}</p>
+        <p>
+          <a
+            href={router.buildPath("stationsEntity", {
+              params: { uri: station.curie },
+            })}
+          >
+            {t("network.station.unrouted.link")}
+          </a>
+        </p>
       </section>
     );
   }
@@ -76,8 +100,9 @@ const StationAside = ({
 /**
  * A station's page in the network lens, a document: the metro rail, the
  * station's place on every route in the main column, and the region its
- * card will fill in the aside. An address the network does not route
- * renders the page's not-found status. It renders its own archetype,
+ * card will fill in the aside. A station no route calls at renders a status
+ * saying so, linking to its entry in the stations lens; an address that
+ * names no station renders the page's not-found status. It renders its own archetype,
  * because its aside reads the station's own data, and each region reads
  * under its own boundary.
  *

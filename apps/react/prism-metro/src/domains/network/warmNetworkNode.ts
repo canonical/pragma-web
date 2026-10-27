@@ -1,16 +1,12 @@
 import { getPrefetchEnvironment } from "@canonical/prism-core";
+import { readUriParam } from "@canonical/prism-lens-entity";
 import { type CacheConfig, fetchQuery } from "relay-runtime";
-import networkLineQueryNode from "../../relay/__generated__/NetworkLineQuery.graphql.js";
-import networkMapQueryNode, {
-  type NetworkMapQuery,
-} from "../../relay/__generated__/NetworkMapQuery.graphql.js";
-import networkStationQueryNode from "../../relay/__generated__/NetworkStationQuery.graphql.js";
-import buildNetworkMapVariables from "./buildNetworkMapVariables.js";
-import readAddressParam from "./lib/readAddressParam.js";
-import readDiagramLines from "./lib/readDiagramLines.js";
-import resolveNetworkAddress, {
-  type NetworkNodeKind,
-} from "./lib/resolveNetworkAddress.js";
+import networkLineQueryNode from "#relay/__generated__/NetworkLineQuery.graphql.js";
+import networkNamespacesQueryNode, {
+  type NetworkNamespacesQuery,
+} from "#relay/__generated__/NetworkNamespacesQuery.graphql.js";
+import networkStationQueryNode from "#relay/__generated__/NetworkStationQuery.graphql.js";
+import buildNetworkNodeVariables from "./lib/buildNetworkNodeVariables.js";
 
 /** Answer from the store when it holds the data, and fetch otherwise. */
 const STORE_OR_NETWORK: CacheConfig & {
@@ -23,12 +19,13 @@ const NODE_QUERIES = {
   stop: networkStationQueryNode,
 } as const;
 
+/** The kinds of node a network route addresses. */
+export type NetworkNodeKind = keyof typeof NODE_QUERIES;
+
 /**
- * Warm the store for one line's or one station's page, in two steps: the map,
- * which every network page shows or resolves against, then the node's own
- * operation, whose `node(id:)` takes the IRI the map resolves the route's
- * address to. An address the network does not route stops after the map: the
- * page renders its not-found status from the map alone.
+ * Warm the store for one line's or one station's page, in two steps: the
+ * graph's namespaces, then the node's own operation, whose `node(id:)`
+ * takes the address expanded through them.
  *
  * Like the entity lens's warm, it reads the published environment once,
  * synchronously, and runs both steps against it with relay-runtime's
@@ -49,27 +46,24 @@ export default function warmNetworkNode(
   kind: NetworkNodeKind,
   params: Readonly<Record<string, unknown>>,
 ): Promise<void> {
-  const address = readAddressParam(params);
+  const address = readUriParam(params);
   const environment = getPrefetchEnvironment();
   if (environment === undefined) return Promise.resolve();
-  return fetchQuery<NetworkMapQuery>(
+  return fetchQuery<NetworkNamespacesQuery>(
     environment,
-    networkMapQueryNode,
-    buildNetworkMapVariables(),
+    networkNamespacesQueryNode,
+    {},
     STORE_OR_NETWORK,
   )
     .toPromise()
-    .then((map) => {
-      /* v8 ignore next -- the observable yields the response before it completes */
-      const lines = map === undefined ? [] : readDiagramLines(map);
-      const id = resolveNetworkAddress(address, lines, kind);
-      if (id === undefined) return undefined;
-      return fetchQuery(
+    .then((data) =>
+      fetchQuery(
         environment,
         NODE_QUERIES[kind],
-        { id },
+        /* v8 ignore next -- the observable yields the response before it completes */
+        buildNetworkNodeVariables(address, data?.ontologies ?? []),
         STORE_OR_NETWORK,
-      ).toPromise();
-    })
+      ).toPromise(),
+    )
     .then(() => undefined);
 }

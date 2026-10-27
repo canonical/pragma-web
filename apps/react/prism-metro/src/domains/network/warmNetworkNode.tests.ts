@@ -40,13 +40,13 @@ describe("warmNetworkNode", () => {
     expect(() => warmNetworkNode("stop", {})).toThrow(/non-empty string/);
   });
 
-  it("reads the map, then the station the address resolves to", async () => {
+  it("reads the namespaces, then the station the address expands to", async () => {
     const fetchFn = createMetroFetch();
     await warmLikeTheServer(createEnvironment({ fetchFn }), "stop", {
       uri: "metro:tannery-lane",
     });
     expect(fetchFn.mock.calls.map(([request]) => request.name)).toEqual([
-      "NetworkMapQuery",
+      "NetworkNamespacesQuery",
       "NetworkStationQuery",
     ]);
     const [, variables] = fetchFn.mock.lastCall ?? [];
@@ -62,14 +62,13 @@ describe("warmNetworkNode", () => {
     expect(request?.name).toBe("NetworkLineQuery");
   });
 
-  it("stops after the map for an address the network does not route", async () => {
+  it("reads a station no route calls at, as every other", async () => {
     const fetchFn = createMetroFetch();
     await warmLikeTheServer(createEnvironment({ fetchFn }), "stop", {
       uri: "metro:ghost",
     });
-    expect(fetchFn.mock.calls.map(([request]) => request.name)).toEqual([
-      "NetworkMapQuery",
-    ]);
+    const [, variables] = fetchFn.mock.lastCall ?? [];
+    expect(variables).toEqual({ id: `${METRO_NAMESPACE}ghost` });
   });
 
   it("makes no request when the store already holds both operations", async () => {
