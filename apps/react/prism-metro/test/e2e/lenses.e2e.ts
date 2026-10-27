@@ -133,7 +133,7 @@ describe.each(CELLS)("$script over the metro graph", ({ script }) => {
     expect(html).toMatch(/class="ds hierarchy-well[ "]/);
     expect(html).toMatch(/class="ds class-graph[ "]/);
     expect(html).toMatch(
-      /<svg[^>]*class="viewport"[^>]*viewBox="-?\d+ -?\d+ \d+ \d+"/,
+      /<svg[^>]*class="viewport"[^>]*viewBox="-?[\d.]+ -?[\d.]+ [\d.]+ [\d.]+"/,
     );
     expect(html).toMatch(
       /<pattern class="lattice"[^>]*height="16"[^>]*width="16"/,
