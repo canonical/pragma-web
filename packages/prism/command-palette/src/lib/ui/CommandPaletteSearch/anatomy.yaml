@@ -57,6 +57,11 @@
 #     the field's ring, drawn inside it, since the dialog clips.
 #   transparent, inherit: keywords, written raw. The field takes the
 #     dialog's surface and the palette's text; they are no design decision.
+#   The reflow's literals, written raw under the container query: on the
+#     results, flex-grow: 1 and flex-basis: 0, so they take the palette's
+#     four columns however wide their rows' titles run; on the preview,
+#     display: none, so it is not shown below two groups. Flex mechanics
+#     and a keyword, no design decision.
 #   space.300 (24px) for the line height: the matrix's line.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
