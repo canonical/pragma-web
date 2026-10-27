@@ -5,6 +5,7 @@ import type { StockPageQuery$data } from "#relay/__generated__/StockPageQuery.gr
 import type { UnitPageQuery$data } from "#relay/__generated__/UnitPageQuery.graphql.js";
 import type { FleetFact } from "../types.js";
 import assertFragment from "./assertFragment.js";
+import describeRange from "./describeRange.js";
 import formatLength from "./formatLength.js";
 import readFormationTrain from "./readFormationTrain.js";
 import readUnitCars from "./readUnitCars.js";
@@ -22,22 +23,6 @@ const COUNT = new Intl.NumberFormat(LOCALE);
 /** Read a capacity as a reader reads it: "960 passengers". */
 function describeCapacity(capacity: number, t: Translate): string {
   return t("fleet.passengers.count", { count: capacity });
-}
-
-/** Read a set of values as one, or as the range from the least to the most. */
-function describeRange(
-  values: readonly number[],
-  describe: (value: number) => string,
-  t: Translate,
-): string {
-  const least = Math.min(...values);
-  const most = Math.max(...values);
-  return least === most
-    ? describe(least)
-    : t("fleet.range", {
-        min: describe(least),
-        max: describe(most),
-      });
 }
 
 /**
