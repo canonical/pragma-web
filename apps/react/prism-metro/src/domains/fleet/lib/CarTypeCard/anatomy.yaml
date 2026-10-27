@@ -2,8 +2,9 @@
 # CarTypeCard: a car type as a card in a grid of entities.
 # Best guess, with no Figma frame for the fleet: the title, the car type's
 # class as its kind and its definition as the summary; its code, whether
-# it has a driving cab, its length and its capacity as key values; its
-# length as the footer's vital; and the car drawn alone in the sidecar.
+# it has a driving cab, its length and its capacity as key values; and its
+# length as the footer's vital. The card has no sidecar: the car type's own
+# page draws the car.
 # Projected onto EntityCard, which carries every style: this anatomy binds
 # none. The home is the link the title renders through, resolved from the
 # compact address.
@@ -45,7 +46,4 @@ node:
               role: vital
               projection: { field: length }
             relation: { cardinality: "1", slotName: footer }
-          - node:
-              uri: metro.component.formation_side_view
-            relation: { cardinality: "1", slotName: sidecar }
       relation: { cardinality: "1" }
