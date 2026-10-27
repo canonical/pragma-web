@@ -93,5 +93,12 @@ export const COUPLING_GAP = 1000;
 /** The gap drawn between two cars of one unit, taken from both cars. */
 export const GANGWAY_GAP = 300;
 
+/**
+ * The length a car or a unit drawn on its own page is drawn against: a
+ * long metro train, so a 20 m car takes a sixth of the column, not all of
+ * it, and reads at about the scale the fleet's trains do.
+ */
+export const REFERENCE_TRAIN_LENGTH = 120000;
+
 /** How far a platform mark drops below the cars, to hold the overhang. */
 export const MARK_DROP = 1200;
