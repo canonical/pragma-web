@@ -80,8 +80,10 @@ const componentCssClassName = "ds command-palette-search";
  * highlighted option of the listbox it controls (`aria-activedescendant`),
  * wrapping at both ends; Enter chooses the highlighted result, opening its
  * home; a pointer moving over a result highlights it. Escape is the
- * dialog's. A pointer pressing anywhere under the field but on a link
- * leaves the focus in the field, so the keys keep reaching it.
+ * dialog's. A pointer pressing a heading, a result or the status line
+ * leaves the focus in the field, so the keys keep reaching it; a press in
+ * the preview selects its text, as anywhere on the site, and a click there
+ * that selects nothing gives the field the focus back.
  *
  * The field's text, trimmed, reaches the graph's search deferred: while the
  * next results load, the last ones stay on screen and the listbox is busy.
@@ -105,7 +107,8 @@ const componentCssClassName = "ds command-palette-search";
  * @implements prism.component.command_palette_search
  * @note Impure: fetches the search through Relay, reads the projection maps
  *   and the translator in scope, clicks and scrolls the highlighted
- *   option's element, and prevents a pointer's press from moving the focus.
+ *   option's element, prevents a pointer's press from moving the focus, and
+ *   focuses the field after a click in the preview.
  */
 export default function CommandPaletteSearch({
   onChoose,
@@ -119,6 +122,8 @@ export default function CommandPaletteSearch({
   const [text, setText] = useState("");
   const [highlighted, setHighlighted] = useState(0);
   const activeOption = useRef<HTMLLIElement>(null);
+  const field = useRef<HTMLInputElement>(null);
+  const preview = useRef<HTMLElement>(null);
   const searched = useDeferredValue(text.trim());
   const data = useLazyLoadQuery<CommandPaletteSearchQuery>(
     searchQuery,
@@ -155,27 +160,40 @@ export default function CommandPaletteSearch({
   };
 
   /**
-   * Keep the focus in the field when a pointer presses a heading, the
-   * preview, an option or the status line: none of them takes the focus,
-   * which would otherwise fall to the dialog and leave the arrow keys and
-   * the typing nowhere. A link keeps its press, to be followed.
+   * Keep the focus in the field when a pointer presses a heading, an
+   * option, the status line or the space between them: none of them takes
+   * the focus, which would otherwise fall to the scrolling results or the
+   * dialog and leave the arrow keys and the typing nowhere. A link keeps
+   * its press, to be followed, and the preview keeps its own, which starts
+   * a selection of its text.
    *
    * @note Impure: prevents the press's default action.
    */
   const handleBodyMouseDown = (event: MouseEvent<HTMLDivElement>): void => {
-    if (!isWithinLink(event.target)) event.preventDefault();
+    const target = event.target;
+    const inPreview =
+      target instanceof Node && preview.current?.contains(target) === true;
+    if (!inPreview && !isWithinLink(target)) event.preventDefault();
   };
 
   /**
    * Close the palette when the reader follows a link in the preview, by a
    * click or by Enter on it: the link opens the result's home, as choosing
    * its row does, and the palette must not stay open over the page it
-   * opens.
+   * opens. Any other click in the preview that leaves no text selected
+   * gives the field back the focus its press took, so the keys reach the
+   * field again; one that selected text leaves it, to be copied.
    *
-   * @note Impure: calls the palette's handler, which closes it.
+   * @note Impure: calls the palette's handler, which closes it, and moves
+   *   the focus.
    */
   const handlePreviewClick = (event: MouseEvent<HTMLElement>): void => {
-    if (isWithinLink(event.target)) onChoose();
+    if (isWithinLink(event.target)) {
+      onChoose();
+      return;
+    }
+    const selection = event.currentTarget.ownerDocument.getSelection();
+    if (selection?.isCollapsed !== false) field.current?.focus();
   };
 
   /**
@@ -217,6 +235,7 @@ export default function CommandPaletteSearch({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={t("search.placeholder")}
+        ref={field}
         role="combobox"
         spellCheck={false}
         type="text"
@@ -281,6 +300,7 @@ export default function CommandPaletteSearch({
             aria-label={t("search.preview")}
             className="preview"
             onClick={handlePreviewClick}
+            ref={preview}
             tabIndex={-1}
           >
             <CardProjection node={active.node} />

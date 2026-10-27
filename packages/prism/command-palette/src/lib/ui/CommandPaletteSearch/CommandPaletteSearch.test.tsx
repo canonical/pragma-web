@@ -191,7 +191,7 @@ describe("CommandPaletteSearch", () => {
     expect(options.at(0)).toHaveAttribute("aria-selected", "false");
   });
 
-  it("keeps the focus in the field when a pointer presses under it, but on a link", async () => {
+  it("keeps the focus in the field when a pointer presses a heading or a result", async () => {
     const { container } = await renderResults("lay");
     const field = screen.getByRole("combobox");
     field.focus();
@@ -199,15 +199,31 @@ describe("CommandPaletteSearch", () => {
     if (heading === null) throw new Error("no group heading is rendered");
     expect(fireEvent.mouseDown(heading)).toBe(false);
     expect(
-      fireEvent.mouseDown(screen.getByRole("region", { name: "Preview" })),
+      fireEvent.mouseDown(screen.getAllByRole("option").at(1) as HTMLElement),
     ).toBe(false);
     expect(field).toHaveFocus();
     fireEvent.keyDown(field, { key: "ArrowDown" });
-    expect(findActiveOption()).toHaveTextContent("Player layout");
-    const link = within(
-      screen.getByRole("region", { name: "Preview" }),
-    ).getByRole("link");
+    expect(readActiveTitle()).toBe("Player layout");
+  });
+
+  it("lets a press in the preview select its text, and refocuses the field after a click that selects none", async () => {
+    await renderResults("lay");
+    const field = screen.getByRole("combobox");
+    const preview = screen.getByRole("region", { name: "Preview" });
+    const link = within(preview).getByRole("link");
     expect(fireEvent.mouseDown(link)).toBe(true);
+    expect(fireEvent.mouseDown(preview)).toBe(true);
+    // The press focuses the preview in a browser and selects its text.
+    preview.focus();
+    const selection = document.getSelection();
+    selection?.selectAllChildren(preview);
+    fireEvent.click(preview);
+    expect(preview).toHaveFocus();
+    selection?.collapseToStart();
+    fireEvent.click(preview);
+    expect(field).toHaveFocus();
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    expect(readActiveTitle()).toBe("Player layout");
   });
 
   it("chooses the highlighted result with Enter, opening its home", async () => {
