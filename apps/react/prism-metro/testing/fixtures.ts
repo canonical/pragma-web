@@ -412,3 +412,116 @@ export const LENS_PAGE_TEST_TIMEOUT_MS = 15_000;
 
 /** How long a lens page test waits for the page to answer. */
 export const LENS_PAGE_WAIT_MS = 10_000;
+
+/** A unit's cars as a Relay mock environment answers them, front first. */
+const mockCars = (unit: FormationUnit) =>
+  unit.cars.map((car, index) => ({
+    position: index + 1,
+    reversed: car.reversed,
+    carType: {
+      code: car.code,
+      hasCab: car.hasCab,
+      length: car.length,
+      _meta: { title: car.title },
+    },
+  }));
+
+/** A formation's units as a Relay mock environment answers them. */
+const mockUnits = (units: readonly FormationUnit[]) =>
+  units.map((unit, index) => ({
+    position: index + 1,
+    reversed: unit.reversed,
+    unit: { cars: mockCars(unit) },
+  }));
+
+/**
+ * The Series 90 three-car and six-car as a Relay mock environment answers a
+ * rolling stock's formations: 60 m and 120 m, 490 and 980 passengers.
+ */
+const MOCK_SERIES_90_FORMATIONS = [
+  {
+    uri: metroUri("series-90-three-car"),
+    length: 60000,
+    capacity: 490,
+    units: mockUnits(SERIES_90_THREE_CAR),
+  },
+  {
+    uri: SERIES_90_SIX_CAR_IRI,
+    length: 120000,
+    capacity: 980,
+    units: mockUnits(SERIES_90_SIX_CAR),
+  },
+];
+
+/**
+ * The Series 90 as a Relay mock environment answers a `RollingStock`, with
+ * what the graph's dataset holds: its two formations.
+ */
+export const MOCK_ROLLING_STOCK = {
+  __typename: "RollingStock",
+  _meta: {
+    title: "Series 90",
+    curie: SERIES_90_CURIE,
+    definition: null,
+    type: { _meta: { title: "Rolling stock" } },
+  },
+  formations: MOCK_SERIES_90_FORMATIONS,
+} as const;
+
+/**
+ * The Series 90 six-car as a Relay mock environment answers a `Formation`,
+ * with what the graph's dataset holds: two units, 120 m, 980 passengers,
+ * on the Coastal and the North Lines.
+ */
+export const MOCK_FORMATION = {
+  __typename: "Formation",
+  length: 120000,
+  capacity: 980,
+  _meta: {
+    title: "Series 90 six-car",
+    curie: SERIES_90_SIX_CAR_CURIE,
+    definition: null,
+    type: { _meta: { title: "Formation" } },
+  },
+  stock: { _meta: { title: "Series 90" } },
+  lines: [
+    { _meta: { title: "Coastal Line" } },
+    { _meta: { title: "North Line" } },
+  ],
+  units: mockUnits(SERIES_90_SIX_CAR),
+} as const;
+
+/**
+ * The Series 90 unit as a Relay mock environment answers a `Unit`, with
+ * what the graph's dataset holds: three cars, 60 m, 490 passengers.
+ */
+export const MOCK_UNIT = {
+  __typename: "Unit",
+  length: 60000,
+  capacity: 490,
+  _meta: {
+    title: "Series 90 unit",
+    curie: SERIES_90_UNIT_CURIE,
+    definition: null,
+    type: { _meta: { title: "Unit" } },
+  },
+  cars: mockCars(SERIES_90_UNIT),
+} as const;
+
+/**
+ * The Series 90 driving motor car as a Relay mock environment answers a
+ * `CarType`: code DM, a cab, 20 m, 160 passengers.
+ */
+export const MOCK_CAR_TYPE = {
+  __typename: "CarType",
+  code: "DM",
+  hasCab: true,
+  length: 20000,
+  capacity: 160,
+  _meta: {
+    title: "Series 90 driving motor car",
+    curie: SERIES_90_DRIVING_CURIE,
+    definition: null,
+    type: { _meta: { title: "Car type" } },
+  },
+} as const;

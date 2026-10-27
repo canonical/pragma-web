@@ -2,6 +2,12 @@
 
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
+import {
+  CarTypeRow,
+  FormationRow,
+  RollingStockRow,
+  UnitRow,
+} from "#domains/fleet";
 import nodeFragment from "#relay/__generated__/SiteRowSlot_node.graphql.js";
 import assertSiteKey from "../../assertSiteKey.js";
 import { InterchangeRow } from "../InterchangeRow/index.js";
@@ -23,6 +29,10 @@ const declareNodeFragment = (): unknown => graphql`
     ...InterchangeRow_node @alias(as: "Interchange")
     ...LineRow_node @alias(as: "Line")
     ...ZoneRow_node @alias(as: "Zone")
+    ...RollingStockRow_node @alias(as: "RollingStock")
+    ...FormationRow_node @alias(as: "Formation")
+    ...UnitRow_node @alias(as: "Unit")
+    ...CarTypeRow_node @alias(as: "CarType")
   }
 `;
 void declareNodeFragment;
@@ -32,7 +42,7 @@ void declareNodeFragment;
  * A metro node as the 32px list entry, dispatched on its type inside the
  * package's row dispatcher: the row map lists it under `siteTypes` for every
  * metro type, and it renders the arm the node's typename selects, over that
- * type's aliased key: a station, an interchange, a line or a fare zone.
+ * type's aliased key: a station, an interchange, a line, a fare zone, a rolling stock, a formation, a unit or a car type.
  *
  * It renders no element of its own: the arm renders the root, an `<li>`, and
  * every native prop reaches it.
@@ -66,6 +76,26 @@ export default function SiteRowSlot({
       return <LineRow {...props} node={assertSiteKey(data.Line, typename)} />;
     case "Zone":
       return <ZoneRow {...props} node={assertSiteKey(data.Zone, typename)} />;
+    case "RollingStock":
+      return (
+        <RollingStockRow
+          {...props}
+          node={assertSiteKey(data.RollingStock, typename)}
+        />
+      );
+    case "Formation":
+      return (
+        <FormationRow
+          {...props}
+          node={assertSiteKey(data.Formation, typename)}
+        />
+      );
+    case "Unit":
+      return <UnitRow {...props} node={assertSiteKey(data.Unit, typename)} />;
+    case "CarType":
+      return (
+        <CarTypeRow {...props} node={assertSiteKey(data.CarType, typename)} />
+      );
     default:
       throw new Error(
         `SiteRowSlot: the row map arms no metro type named ${typename}`,

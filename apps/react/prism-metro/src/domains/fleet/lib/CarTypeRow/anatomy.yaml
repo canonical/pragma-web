@@ -1,0 +1,25 @@
+---
+# CarTypeRow: a car type as a 32px list entry.
+# Best guess: the muted end is the car type's length.
+# Projected onto EntityRow, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.car_type_row
+  projection: { on: CarType }
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: meta
+              projection: { field: length }
+            relation: { cardinality: "1", slotName: meta }
+      relation: { cardinality: "1" }

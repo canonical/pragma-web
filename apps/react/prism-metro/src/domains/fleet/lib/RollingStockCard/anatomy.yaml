@@ -1,0 +1,52 @@
+---
+# RollingStockCard: a rolling stock as a card in a grid of entities.
+# Best guess, with no Figma frame for the fleet: the title, the stock's
+# class as its kind and its definition as the summary; its formations'
+# count and the range of their lengths and capacities as key values; the
+# count again as the footer's vital; and its formations drawn at one scale
+# in the sidecar.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.rolling_stock_card
+  projection: { on: RollingStock }
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: summary
+              projection: { field: _meta.definition }
+            relation: { cardinality: "0..1", slotName: summary }
+          - node:
+              role: key values
+              edges:
+                - node: { role: formations }
+                  relation: { cardinality: "1..*", projection: { field: formations } }
+                - node: { role: lengths, projection: { field: length } }
+                  relation: { cardinality: "1..*", projection: { field: formations } }
+                - node: { role: capacities, projection: { field: capacity } }
+                  relation: { cardinality: "1..*", projection: { field: formations } }
+            relation: { cardinality: "1", slotName: key-values }
+          - node:
+              role: vital
+            relation: { cardinality: "1", slotName: footer, projection: { field: formations } }
+          - node:
+              uri: metro.component.formation_stack
+              edges:
+                - node: { role: train, projection: { field: uri } }
+                  relation: { cardinality: "1" }
+            relation: { cardinality: "1", slotName: sidecar, projection: { field: formations } }
+      relation: { cardinality: "1" }

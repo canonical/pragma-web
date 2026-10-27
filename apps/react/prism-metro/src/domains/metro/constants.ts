@@ -33,7 +33,7 @@ export const HOME_LENS_MESSAGES = {
  * metro types armed under `siteTypes`. Each form's site dispatcher reads
  * the package's site slot, the app's own compile of
  * `Site<Form>Slot_node`, and renders the station's, the
- * interchange's, the line's or the fare zone's projection; every other
+ * interchange's, the line's, the fare zone's or a fleet type's projection; every other
  * type keeps the package's arms.
  */
 export const metroProjectionMaps: ProjectionMaps = {
@@ -44,6 +44,10 @@ export const metroProjectionMaps: ProjectionMaps = {
       Interchange: SiteChipSlot,
       Line: SiteChipSlot,
       Zone: SiteChipSlot,
+      RollingStock: SiteChipSlot,
+      Formation: SiteChipSlot,
+      Unit: SiteChipSlot,
+      CarType: SiteChipSlot,
     },
   },
   row: {
@@ -53,6 +57,10 @@ export const metroProjectionMaps: ProjectionMaps = {
       Interchange: SiteRowSlot,
       Line: SiteRowSlot,
       Zone: SiteRowSlot,
+      RollingStock: SiteRowSlot,
+      Formation: SiteRowSlot,
+      Unit: SiteRowSlot,
+      CarType: SiteRowSlot,
     },
   },
   card: {
@@ -62,6 +70,10 @@ export const metroProjectionMaps: ProjectionMaps = {
       Interchange: SiteCardSlot,
       Line: SiteCardSlot,
       Zone: SiteCardSlot,
+      RollingStock: SiteCardSlot,
+      Formation: SiteCardSlot,
+      Unit: SiteCardSlot,
+      CarType: SiteCardSlot,
     },
   },
   command: {
@@ -71,6 +83,10 @@ export const metroProjectionMaps: ProjectionMaps = {
       Interchange: SiteCommandSlot,
       Line: SiteCommandSlot,
       Zone: SiteCommandSlot,
+      RollingStock: SiteCommandSlot,
+      Formation: SiteCommandSlot,
+      Unit: SiteCommandSlot,
+      CarType: SiteCommandSlot,
     },
   },
   graphNode: {
@@ -80,6 +96,10 @@ export const metroProjectionMaps: ProjectionMaps = {
       Interchange: SiteGraphNodeSlot,
       Line: SiteGraphNodeSlot,
       Zone: SiteGraphNodeSlot,
+      RollingStock: SiteGraphNodeSlot,
+      Formation: SiteGraphNodeSlot,
+      Unit: SiteGraphNodeSlot,
+      CarType: SiteGraphNodeSlot,
     },
   },
 };

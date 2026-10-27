@@ -2,6 +2,12 @@
 
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
+import {
+  CarTypeChip,
+  FormationChip,
+  RollingStockChip,
+  UnitChip,
+} from "#domains/fleet";
 import nodeFragment from "#relay/__generated__/SiteChipSlot_node.graphql.js";
 import assertSiteKey from "../../assertSiteKey.js";
 import { InterchangeChip } from "../InterchangeChip/index.js";
@@ -23,6 +29,10 @@ const declareNodeFragment = (): unknown => graphql`
     ...InterchangeChip_node @alias(as: "Interchange")
     ...LineChip_node @alias(as: "Line")
     ...ZoneChip_node @alias(as: "Zone")
+    ...RollingStockChip_node @alias(as: "RollingStock")
+    ...FormationChip_node @alias(as: "Formation")
+    ...UnitChip_node @alias(as: "Unit")
+    ...CarTypeChip_node @alias(as: "CarType")
   }
 `;
 void declareNodeFragment;
@@ -32,7 +42,7 @@ void declareNodeFragment;
  * A metro node as the inline mention, dispatched on its type inside the
  * package's chip dispatcher: the chip map lists it under `siteTypes` for every
  * metro type, and it renders the arm the node's typename selects, over that
- * type's aliased key: a station, an interchange, a line or a fare zone.
+ * type's aliased key: a station, an interchange, a line, a fare zone, a rolling stock, a formation, a unit or a car type.
  *
  * It renders no element of its own: the arm renders the root, a `<span>`, and
  * every native prop reaches it.
@@ -66,6 +76,26 @@ export default function SiteChipSlot({
       return <LineChip {...props} node={assertSiteKey(data.Line, typename)} />;
     case "Zone":
       return <ZoneChip {...props} node={assertSiteKey(data.Zone, typename)} />;
+    case "RollingStock":
+      return (
+        <RollingStockChip
+          {...props}
+          node={assertSiteKey(data.RollingStock, typename)}
+        />
+      );
+    case "Formation":
+      return (
+        <FormationChip
+          {...props}
+          node={assertSiteKey(data.Formation, typename)}
+        />
+      );
+    case "Unit":
+      return <UnitChip {...props} node={assertSiteKey(data.Unit, typename)} />;
+    case "CarType":
+      return (
+        <CarTypeChip {...props} node={assertSiteKey(data.CarType, typename)} />
+      );
     default:
       throw new Error(
         `SiteChipSlot: the chip map arms no metro type named ${typename}`,

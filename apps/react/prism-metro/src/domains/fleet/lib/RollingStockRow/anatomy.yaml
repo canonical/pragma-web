@@ -1,0 +1,25 @@
+---
+# RollingStockRow: a rolling stock as a 32px list entry.
+# Best guess: the muted end counts the stock's formations.
+# Projected onto EntityRow, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.rolling_stock_row
+  projection: { on: RollingStock }
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: meta
+              projection: { field: uri }
+            relation: { cardinality: "1", slotName: meta, projection: { field: formations } }
+      relation: { cardinality: "1" }
