@@ -13,25 +13,20 @@
 # roster has no fill or stroke key. A track's stroke is its line's colour
 # from the graph: data, not a design decision.
 #
-# Each station mark is where EntityGraphNode will render (a native SVG
-# group, never HTML in a foreignObject); until then the mark is this
-# component's own, marked `data-placeholder="EntityGraphNode"`.
+# The drawing lies in prism-core's GraphCanvas, which owns the floor, the
+# 16px dot lattice, the fit and the pan and zoom. Every station, interchange
+# capsule, line vertex and name anchor sits on a lattice dot: the dataset's
+# diagram positions are lattice units. The names show only in the canvas's
+# `full` zoom bucket, where 14-unit text renders at 12px or more; each
+# station keeps its name as its link's accessible title at every zoom.
 #
-# The drawing is an item of the canvas's page, a subgrid, so it spans every
-# column of it and fills its height.
+# Each station is a native SVG group, as EntityGraphNode is (never HTML in
+# a foreignObject), with its link inside it. The node's box, title and
+# kind do not fit a station dot on a line, so the map keeps its own marks
+# in that form rather than rendering the node.
 #
-# Under the drawing lies the map's lattice, FigJam style: a 1-unit dot every
-# 16 units, an SVG pattern in the drawing's own space, so it scales with it.
-# Every station, interchange capsule, line vertex and name anchor sits on a
-# dot: the dataset's diagram positions are lattice units. Until prism-core's
-# GraphCanvas owns the lattice, the fit and the pan and zoom, the map draws
-# it itself.
-#
-# Reflow, bound in styles.css:
-#   @container shell (width < 912px)  below two groups the names hide: at
-#     that size they would render under 12px. Each mark keeps its name as
-#     its accessible title. The lattice hides too: the drawing is scaled
-#     below 0.75 there, and its dots would blur into a tint.
+# The canvas is an item of the workspace canvas's page, a subgrid, so it
+# spans every column of it and fills its height.
 #
 # Every decision is read through a component token declared on the root
 # (`--schematic-map-*`), bound to the symbol named here.
@@ -39,44 +34,33 @@
 # Token ledger:
 #   appearance.outline.width@focus 2px on a station: no semantic stroke
 #     thickness token.
-#   appearance.opacity 0.5 on the lattice: no opacity token; the dots read
-#     as a ground under the drawing, not as marks.
 node:
   uri: metro.component.schematic_map
   styles:
-    layout.type: block
     layout.grid.column: "1 / -1"
-    size.inline: 100%
     size.block: 100%
     typography.color: color.text
   edges:
     - node:
-        role: title
-        # the <svg>'s <title>, its accessible name
-      relation: { cardinality: "1" }
-    - node:
-        role: lattice
-        # a <rect> over the viewBox, filled with the dot pattern; its dots
-        # fill with currentColor
-        styles:
-          typography.color: color.border
-          appearance.opacity: 0.5
-      relation: { cardinality: "1", slotName: lattice }
-    - node:
         role: line track
         # one <path> per drawn track, stroked in its line's colour
-      relation: { cardinality: "1..*" }
+      relation: { cardinality: "1..*", slotName: track }
     - node:
         role: station mark
-        # an <a> to the station's page: a box filled with currentColor,
-        # the fill inset inside it, and the name
+        # a <g> per station holding its link: a box filled with
+        # currentColor, the fill inset inside it, and the name
         styles:
           typography.color: color.text
           typography.color@hover: color.text.link
+      relation: { cardinality: "1..*", slotName: station }
+    - node:
+        role: station link
+        # the SVG <a> to the station's page, titled with its name
+        styles:
           appearance.outline.color@focus: color.focusRing
           appearance.outline.style@focus: solid
           appearance.outline.width@focus: 2px
-      relation: { cardinality: "1..*", slotName: station }
+      relation: { cardinality: "1..*", slotName: link }
     - node:
         role: mark fill
         # the inner shape of a mark, in the background's colour
@@ -85,5 +69,6 @@ node:
       relation: { cardinality: "1..*", slotName: fill }
     - node:
         role: station name
-        # a <text> at the placed anchor; it paints in its mark's colour
-      relation: { cardinality: "1..*", slotName: label }
+        # a <text> at the placed anchor, in the full zoom bucket only; it
+        # paints in its mark's colour
+      relation: { cardinality: "0..*", slotName: label }

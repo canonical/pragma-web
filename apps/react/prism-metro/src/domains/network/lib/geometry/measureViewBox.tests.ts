@@ -12,7 +12,12 @@ describe("measureViewBox", () => {
         { x: 100, y: 50 },
         { x: -4, y: 10 },
       ]),
-    ).toBe([-4 - MARGIN, -MARGIN, 104 + 2 * MARGIN, 50 + 2 * MARGIN].join(" "));
+    ).toEqual({
+      x: -4 - MARGIN,
+      y: -MARGIN,
+      width: 104 + 2 * MARGIN,
+      height: 50 + 2 * MARGIN,
+    });
   });
 
   it("throws on an empty drawing", () => {

@@ -4,8 +4,8 @@
 
 /**
  * User units per grid unit of a stop's diagram position: the map's lattice,
- * a dot every 16 units, on which every station, line vertex and label
- * anchor sits.
+ * a dot every 16 units, as the canvas draws it, on which every station,
+ * line vertex and label anchor sits.
  */
 export const GRID_UNIT = 16;
 
@@ -32,14 +32,10 @@ export const MARK_INSET = 1.5;
 export const LABEL_GAP = 2;
 
 /**
- * A station name's font size. The drawing is about 650 units wide, so in a
- * canvas of 680 pixels, its narrowest while the map shows names (two groups
- * of columns), a name renders at no less than 12 pixels.
+ * A station name's font size. The canvas shows every name only from the
+ * zoom of 12/14 up, so a 14-unit name never renders under 12 pixels.
  */
-export const LABEL_SIZE = 13;
-
-/** The radius of a lattice dot: a dot one unit across. */
-export const LATTICE_DOT_RADIUS = 0.5;
+export const LABEL_SIZE = 14;
 
 /**
  * A name's estimated width per character, as a fraction of its font size:

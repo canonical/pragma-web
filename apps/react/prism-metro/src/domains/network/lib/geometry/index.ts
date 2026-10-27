@@ -11,7 +11,6 @@ export { default as buildOctilinearPath } from "./buildOctilinearPath.js";
 export {
   GRID_UNIT,
   LABEL_SIZE,
-  LATTICE_DOT_RADIUS,
   MARK_INSET,
   STROKE_WIDTH,
 } from "./constants.js";

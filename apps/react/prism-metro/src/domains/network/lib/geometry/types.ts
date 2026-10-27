@@ -130,8 +130,8 @@ export interface OffsetRoute {
 
 /** Everything the schematic map draws, in SVG user units. */
 export interface NetworkGeometry {
-  /** The drawing's `viewBox` attribute. */
-  readonly viewBox: string;
+  /** The box around everything the drawing holds, with its margin. */
+  readonly viewBox: Box;
   readonly tracks: readonly Track[];
   readonly marks: readonly StationMark[];
 }

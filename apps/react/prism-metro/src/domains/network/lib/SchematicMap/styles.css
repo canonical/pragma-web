@@ -3,9 +3,9 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The drawing spans every column of the canvas's page and fills its
-   * height, and paints through currentColor: each slot sets the colour its
-   * shapes fill or stroke with. */
+  /* The canvas spans every column of the workspace canvas's page and fills
+   * its height, and the drawing paints through currentColor: each slot sets
+   * the colour its shapes fill or stroke with. */
   .ds.schematic-map {
     --schematic-map-color: var(--color-text);
     --schematic-map-station-color: var(--color-text);
@@ -13,20 +13,10 @@
     --schematic-map-focus-color: var(--color-focus-ring);
     --schematic-map-focus-width: 2px;
     --schematic-map-fill-color: var(--color-background);
-    --schematic-map-lattice-color: var(--color-border);
-    --schematic-map-lattice-opacity: 0.5;
 
-    display: block;
     grid-column: 1 / -1;
-    inline-size: 100%;
     block-size: 100%;
     color: var(--schematic-map-color);
-  }
-
-  /* The lattice: a dot every 16 units of the drawing, under everything. */
-  .ds.schematic-map .lattice {
-    color: var(--schematic-map-lattice-color);
-    opacity: var(--schematic-map-lattice-opacity);
   }
 
   .ds.schematic-map .station {
@@ -37,7 +27,7 @@
     color: var(--schematic-map-station-hover-color);
   }
 
-  .ds.schematic-map .station:focus-visible {
+  .ds.schematic-map .link:focus-visible {
     outline-color: var(--schematic-map-focus-color);
     outline-style: solid;
     outline-width: var(--schematic-map-focus-width);
@@ -45,18 +35,5 @@
 
   .ds.schematic-map .fill {
     color: var(--schematic-map-fill-color);
-  }
-
-  /* Below two groups the names would render under 12px, so they hide; each
-   * mark keeps its name as its accessible title. The lattice hides too: the
-   * drawing is scaled below 0.75 there. */
-  @container shell (width < 912px) {
-    .ds.schematic-map .label {
-      visibility: hidden;
-    }
-
-    .ds.schematic-map .lattice {
-      visibility: hidden;
-    }
   }
 }

@@ -23,8 +23,8 @@ describe("SchematicMap SSR", () => {
         />
       </RouterProvider>,
     );
-    expect(html).toContain('class="ds schematic-map"');
-    expect(html).toContain("<title");
+    expect(html).toContain('class="ds graph-canvas ds schematic-map"');
+    expect(html).toContain('aria-label="The network"');
     expect(html).toContain('href="/network/stations/metro%3Anorthgate"');
   });
 });

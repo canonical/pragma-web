@@ -14,15 +14,29 @@ import SchematicMap from "./SchematicMap.js";
 const GEOMETRY = buildNetworkGeometry(buildNetworkLines());
 
 describe("SchematicMap", () => {
-  it("is named by its title", () => {
+  it("draws in the graph canvas, named by its title", () => {
     const { container } = renderWithSite(
       <SchematicMap geometry={GEOMETRY} title="The network" />,
     );
-    const svg = container.querySelector("svg");
-    const title = container.querySelector(
-      `#${CSS.escape(String(svg?.getAttribute("aria-labelledby")))}`,
+    expect(container.querySelector(".ds.graph-canvas")).not.toBeNull();
+    expect(
+      screen.getByRole("group", { name: "The network" }).tagName.toLowerCase(),
+    ).toBe("svg");
+  });
+
+  it("opens on the drawing's box, which the canvas's lattice covers", () => {
+    const { container } = renderWithSite(
+      <SchematicMap geometry={GEOMETRY} title="The network" />,
     );
-    expect(title?.textContent).toBe("The network");
+    const { x, y, width, height } = GEOMETRY.viewBox;
+    expect(container.querySelector("svg.viewport")).toHaveAttribute(
+      "viewBox",
+      `${x} ${y} ${width} ${height}`,
+    );
+    expect(container.querySelector("pattern.lattice")).toHaveAttribute(
+      "width",
+      "16",
+    );
   });
 
   it("draws one track per line, stroked in the line's colour", () => {
@@ -36,34 +50,19 @@ describe("SchematicMap", () => {
     ).toHaveAttribute("stroke", "#c8102e");
   });
 
-  it("links every station's mark to its page in the network lens", () => {
+  it("groups every station's mark, linked to its page in the network lens", () => {
     const { container } = renderWithSite(
       <SchematicMap geometry={GEOMETRY} title="The network" />,
     );
-    const marks = container.querySelectorAll("a.station");
+    const marks = container.querySelectorAll("g.station");
     expect(marks).toHaveLength(ROUTED_STATION_COUNT);
     const tannery = [...marks].find(
-      (mark) => mark.querySelector("text")?.textContent === "Tannery Lane",
+      (mark) => mark.querySelector("title")?.textContent === "Tannery Lane",
     );
-    expect(tannery).toHaveAttribute(
+    expect(tannery?.querySelector("a.link")).toHaveAttribute(
       "href",
       "/network/stations/metro%3Atannery-lane",
     );
-    expect(tannery).toHaveAttribute("data-placeholder", "EntityGraphNode");
-  });
-
-  it("lays the lattice under the drawing, over the whole viewBox", () => {
-    const { container } = renderWithSite(
-      <SchematicMap geometry={GEOMETRY} title="The network" />,
-    );
-    const pattern = container.querySelector("pattern");
-    expect(pattern).toHaveAttribute("patternUnits", "userSpaceOnUse");
-    expect(pattern).toHaveAttribute("width", "16");
-    const lattice = container.querySelector("rect.lattice");
-    expect(lattice?.getAttribute("fill")).toBe(`url(#${pattern?.id})`);
-    const [minX, , width] = GEOMETRY.viewBox.split(" ");
-    expect(lattice).toHaveAttribute("x", minX);
-    expect(lattice).toHaveAttribute("width", width);
   });
 
   it("names each station at its placed anchor", () => {
@@ -84,8 +83,8 @@ describe("SchematicMap", () => {
         title="The network"
       />,
     );
-    expect(container.querySelector("svg")?.getAttribute("class")).toBe(
-      "ds schematic-map custom-class",
+    expect(container.firstElementChild?.getAttribute("class")).toBe(
+      "ds graph-canvas ds schematic-map custom-class",
     );
   });
 
@@ -97,9 +96,6 @@ describe("SchematicMap", () => {
         title="The network"
       />,
     );
-    expect(screen.getByTestId("map")).toHaveAttribute(
-      "viewBox",
-      GEOMETRY.viewBox,
-    );
+    expect(screen.getByTestId("map")).toHaveClass("schematic-map");
   });
 });

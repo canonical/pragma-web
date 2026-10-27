@@ -4,15 +4,16 @@ import type { ComponentProps } from "react";
 import type { NetworkGeometry } from "../geometry/index.js";
 
 type OwnProps = {
-  /** The drawing: its viewBox, its tracks and its station marks. */
+  /** The drawing: its box, its tracks and its station marks. */
   readonly geometry: NetworkGeometry;
-  /** The map's accessible name, its `<title>`. */
+  /** The map's accessible name, the canvas's label. */
   readonly title: string;
 };
 
 /**
- * Props accepted by `SchematicMap`: the drawing and its name, and the native
- * props of its `<svg>` root.
+ * Props accepted by `SchematicMap`: the drawing and its name, then the
+ * native props of the canvas's `<div>` root, without `children`: the canvas
+ * holds the map's own drawing.
  */
 export type SchematicMapProps = OwnProps &
-  Omit<ComponentProps<"svg">, keyof OwnProps>;
+  Omit<ComponentProps<"div">, keyof OwnProps | "children">;

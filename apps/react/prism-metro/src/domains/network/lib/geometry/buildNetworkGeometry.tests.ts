@@ -86,7 +86,7 @@ describe("buildNetworkGeometry", () => {
   });
 
   it("fits the viewBox around every mark and name", () => {
-    const [minX, minY, width, height] = geometry.viewBox.split(" ").map(Number);
+    const { x: minX, y: minY, width, height } = geometry.viewBox;
     for (const mark of [
       ...geometry.marks,
       ...geometry.marks.map((each) => each.label.box),

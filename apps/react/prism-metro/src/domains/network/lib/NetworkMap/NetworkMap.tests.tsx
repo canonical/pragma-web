@@ -11,7 +11,7 @@ describe("NetworkMap", () => {
     const { container } = renderWithSite(<NetworkMap />);
     expect(screen.getByText("Loading the network…")).toBeInTheDocument();
     expect(
-      await screen.findByText("Map of the metro network"),
+      await screen.findByRole("group", { name: "Map of the metro network" }),
     ).toBeInTheDocument();
     expect(container.querySelectorAll("path[data-line]")).toHaveLength(
       LINE_COUNT,
