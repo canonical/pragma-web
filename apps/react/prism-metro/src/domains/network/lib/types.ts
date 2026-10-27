@@ -1,6 +1,7 @@
 import type { CardProjection_node$key } from "#relay/__generated__/CardProjection_node.graphql.js";
 import type { ChipProjection_node$key } from "#relay/__generated__/ChipProjection_node.graphql.js";
 import type { NodeList_node$key } from "#relay/__generated__/NodeList_node.graphql.js";
+import type { RouteStrip_node$key } from "#relay/__generated__/RouteStrip_node.graphql.js";
 
 /** A stop or a line as a link names it: its compact address and its title. */
 export interface NodeRef {
@@ -58,12 +59,16 @@ export interface StripDirection {
 
 /** A route as its strip shows it, with its reverse when the line runs both ways. */
 export interface StripView extends StripDirection {
+  /** The route's key, which its strip projects. */
+  readonly route: RouteStrip_node$key;
   readonly isLoop: boolean;
   readonly reverse?: StripDirection;
 }
 
 /** A line as its page shows it. */
 export interface LineView extends LineRef {
+  /** The line's IRI, which its stops' connections leave out. */
+  readonly uri: string;
   /** Whether the line's service runs a loop. */
   readonly isLoop: boolean;
   /** One strip per route the line draws, each with its reverse. */

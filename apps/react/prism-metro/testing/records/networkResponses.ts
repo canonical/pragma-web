@@ -2,10 +2,10 @@
  * The metro provider's answers to the network lens's operations, at the
  * variables the stories and the record check use: the graph's namespaces,
  * the map, two stations (an interchange where four routes meet, and a
- * terminus) and two lines (a loop run both ways, and a linear line). Stories read the lens off these
- * answers, so Storybook needs no provider; `networkResponses.tests.ts`
- * re-runs each operation against the provider and fails when an answer
- * drifts.
+ * terminus) and three lines (a loop run both ways, a linear line, and a
+ * loop run one way only). Stories read the lens off these answers, so
+ * Storybook needs no provider; `networkResponses.tests.ts` re-runs each
+ * operation against the provider and fails when an answer drifts.
  *
  * Regenerate: execute each entry's operation (its text is the generated
  * artifact's `params.text`), with its variables, against the metro provider
@@ -3455,12 +3455,182 @@ export default [
               isLoop: true,
               reverse: {
                 label: "Anticlockwise",
+                calls: [
+                  {
+                    position: 1,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Central Exchange",
+                        curie: "metro:central-exchange",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#coastal-line",
+                          code: "3",
+                          colour: "#0072ce",
+                          _meta: {
+                            title: "Coastal Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 4,
+                      uri: "https://metro.example/onto#central-exchange",
+                    },
+                  },
+                  {
+                    position: 2,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Riverside Junction",
+                        curie: "metro:riverside-junction",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#coastal-line",
+                          code: "3",
+                          colour: "#0072ce",
+                          _meta: {
+                            title: "Coastal Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 7,
+                      uri: "https://metro.example/onto#riverside-junction",
+                    },
+                  },
+                  {
+                    position: 3,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Willowbank",
+                        curie: "metro:willowbank",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#willowbank",
+                    },
+                  },
+                  {
+                    position: 4,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Tannery Lane",
+                        curie: "metro:tannery-lane",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#upland-line",
+                          code: "4",
+                          colour: "#00843d",
+                          _meta: {
+                            title: "Upland Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#lowland-line",
+                          code: "5",
+                          colour: "#8e3ba3",
+                          _meta: {
+                            title: "Lowland Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 3,
+                      uri: "https://metro.example/onto#tannery-lane",
+                    },
+                  },
+                  {
+                    position: 5,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Quarry Hill",
+                        curie: "metro:quarry-hill",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#quarry-hill",
+                    },
+                  },
+                  {
+                    position: 6,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Kilnwood",
+                        curie: "metro:kilnwood",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#kilnwood",
+                    },
+                  },
+                ],
               },
               calls: [
                 {
                   position: 1,
                   stop: {
-                    uri: "https://metro.example/onto#central-exchange",
                     __typename: "Interchange",
                     _meta: {
                       title: "Central Exchange",
@@ -3496,12 +3666,12 @@ export default [
                       },
                     ],
                     transferMinutes: 4,
+                    uri: "https://metro.example/onto#central-exchange",
                   },
                 },
                 {
                   position: 2,
                   stop: {
-                    uri: "https://metro.example/onto#kilnwood",
                     __typename: "Station",
                     _meta: {
                       title: "Kilnwood",
@@ -3518,12 +3688,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#kilnwood",
                   },
                 },
                 {
                   position: 3,
                   stop: {
-                    uri: "https://metro.example/onto#quarry-hill",
                     __typename: "Station",
                     _meta: {
                       title: "Quarry Hill",
@@ -3540,12 +3710,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#quarry-hill",
                   },
                 },
                 {
                   position: 4,
                   stop: {
-                    uri: "https://metro.example/onto#tannery-lane",
                     __typename: "Interchange",
                     _meta: {
                       title: "Tannery Lane",
@@ -3581,12 +3751,12 @@ export default [
                       },
                     ],
                     transferMinutes: 3,
+                    uri: "https://metro.example/onto#tannery-lane",
                   },
                 },
                 {
                   position: 5,
                   stop: {
-                    uri: "https://metro.example/onto#willowbank",
                     __typename: "Station",
                     _meta: {
                       title: "Willowbank",
@@ -3603,12 +3773,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#willowbank",
                   },
                 },
                 {
                   position: 6,
                   stop: {
-                    uri: "https://metro.example/onto#riverside-junction",
                     __typename: "Interchange",
                     _meta: {
                       title: "Riverside Junction",
@@ -3635,6 +3805,7 @@ export default [
                       },
                     ],
                     transferMinutes: 7,
+                    uri: "https://metro.example/onto#riverside-junction",
                   },
                 },
               ],
@@ -3644,12 +3815,182 @@ export default [
               isLoop: true,
               reverse: {
                 label: "Clockwise",
+                calls: [
+                  {
+                    position: 1,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Central Exchange",
+                        curie: "metro:central-exchange",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#coastal-line",
+                          code: "3",
+                          colour: "#0072ce",
+                          _meta: {
+                            title: "Coastal Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 4,
+                      uri: "https://metro.example/onto#central-exchange",
+                    },
+                  },
+                  {
+                    position: 2,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Kilnwood",
+                        curie: "metro:kilnwood",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#kilnwood",
+                    },
+                  },
+                  {
+                    position: 3,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Quarry Hill",
+                        curie: "metro:quarry-hill",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#quarry-hill",
+                    },
+                  },
+                  {
+                    position: 4,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Tannery Lane",
+                        curie: "metro:tannery-lane",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#upland-line",
+                          code: "4",
+                          colour: "#00843d",
+                          _meta: {
+                            title: "Upland Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#lowland-line",
+                          code: "5",
+                          colour: "#8e3ba3",
+                          _meta: {
+                            title: "Lowland Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 3,
+                      uri: "https://metro.example/onto#tannery-lane",
+                    },
+                  },
+                  {
+                    position: 5,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Willowbank",
+                        curie: "metro:willowbank",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#willowbank",
+                    },
+                  },
+                  {
+                    position: 6,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Riverside Junction",
+                        curie: "metro:riverside-junction",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#coastal-line",
+                          code: "3",
+                          colour: "#0072ce",
+                          _meta: {
+                            title: "Coastal Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 7,
+                      uri: "https://metro.example/onto#riverside-junction",
+                    },
+                  },
+                ],
               },
               calls: [
                 {
                   position: 1,
                   stop: {
-                    uri: "https://metro.example/onto#central-exchange",
                     __typename: "Interchange",
                     _meta: {
                       title: "Central Exchange",
@@ -3685,12 +4026,12 @@ export default [
                       },
                     ],
                     transferMinutes: 4,
+                    uri: "https://metro.example/onto#central-exchange",
                   },
                 },
                 {
                   position: 2,
                   stop: {
-                    uri: "https://metro.example/onto#riverside-junction",
                     __typename: "Interchange",
                     _meta: {
                       title: "Riverside Junction",
@@ -3717,12 +4058,12 @@ export default [
                       },
                     ],
                     transferMinutes: 7,
+                    uri: "https://metro.example/onto#riverside-junction",
                   },
                 },
                 {
                   position: 3,
                   stop: {
-                    uri: "https://metro.example/onto#willowbank",
                     __typename: "Station",
                     _meta: {
                       title: "Willowbank",
@@ -3739,12 +4080,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#willowbank",
                   },
                 },
                 {
                   position: 4,
                   stop: {
-                    uri: "https://metro.example/onto#tannery-lane",
                     __typename: "Interchange",
                     _meta: {
                       title: "Tannery Lane",
@@ -3780,12 +4121,12 @@ export default [
                       },
                     ],
                     transferMinutes: 3,
+                    uri: "https://metro.example/onto#tannery-lane",
                   },
                 },
                 {
                   position: 5,
                   stop: {
-                    uri: "https://metro.example/onto#quarry-hill",
                     __typename: "Station",
                     _meta: {
                       title: "Quarry Hill",
@@ -3802,12 +4143,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#quarry-hill",
                   },
                 },
                 {
                   position: 6,
                   stop: {
-                    uri: "https://metro.example/onto#kilnwood",
                     __typename: "Station",
                     _meta: {
                       title: "Kilnwood",
@@ -3824,6 +4165,7 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#kilnwood",
                   },
                 },
               ],
@@ -3855,12 +4197,135 @@ export default [
               isLoop: false,
               reverse: {
                 label: "To Northgate",
+                calls: [
+                  {
+                    position: 1,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Marsh End",
+                        curie: "metro:marsh-end",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#marsh-end",
+                    },
+                  },
+                  {
+                    position: 2,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Central Exchange",
+                        curie: "metro:central-exchange",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#coastal-line",
+                          code: "3",
+                          colour: "#0072ce",
+                          _meta: {
+                            title: "Coastal Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 4,
+                      uri: "https://metro.example/onto#central-exchange",
+                    },
+                  },
+                  {
+                    position: 3,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Foundry Row",
+                        curie: "metro:foundry-row",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#foundry-row",
+                    },
+                  },
+                  {
+                    position: 4,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Verge Park",
+                        curie: "metro:verge-park",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#verge-park",
+                    },
+                  },
+                  {
+                    position: 5,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Northgate",
+                        curie: "metro:northgate",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#northgate",
+                    },
+                  },
+                ],
               },
               calls: [
                 {
                   position: 1,
                   stop: {
-                    uri: "https://metro.example/onto#northgate",
                     __typename: "Station",
                     _meta: {
                       title: "Northgate",
@@ -3877,12 +4342,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#northgate",
                   },
                 },
                 {
                   position: 2,
                   stop: {
-                    uri: "https://metro.example/onto#verge-park",
                     __typename: "Station",
                     _meta: {
                       title: "Verge Park",
@@ -3899,12 +4364,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#verge-park",
                   },
                 },
                 {
                   position: 3,
                   stop: {
-                    uri: "https://metro.example/onto#foundry-row",
                     __typename: "Station",
                     _meta: {
                       title: "Foundry Row",
@@ -3921,12 +4386,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#foundry-row",
                   },
                 },
                 {
                   position: 4,
                   stop: {
-                    uri: "https://metro.example/onto#central-exchange",
                     __typename: "Interchange",
                     _meta: {
                       title: "Central Exchange",
@@ -3962,12 +4427,12 @@ export default [
                       },
                     ],
                     transferMinutes: 4,
+                    uri: "https://metro.example/onto#central-exchange",
                   },
                 },
                 {
                   position: 5,
                   stop: {
-                    uri: "https://metro.example/onto#marsh-end",
                     __typename: "Station",
                     _meta: {
                       title: "Marsh End",
@@ -3984,6 +4449,7 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#marsh-end",
                   },
                 },
               ],
@@ -3993,12 +4459,135 @@ export default [
               isLoop: false,
               reverse: {
                 label: "To Marsh End",
+                calls: [
+                  {
+                    position: 1,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Northgate",
+                        curie: "metro:northgate",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#northgate",
+                    },
+                  },
+                  {
+                    position: 2,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Verge Park",
+                        curie: "metro:verge-park",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#verge-park",
+                    },
+                  },
+                  {
+                    position: 3,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Foundry Row",
+                        curie: "metro:foundry-row",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#foundry-row",
+                    },
+                  },
+                  {
+                    position: 4,
+                    stop: {
+                      __typename: "Interchange",
+                      _meta: {
+                        title: "Central Exchange",
+                        curie: "metro:central-exchange",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#circle-line",
+                          code: "2",
+                          colour: "#f2b705",
+                          _meta: {
+                            title: "Circle Line",
+                          },
+                        },
+                        {
+                          uri: "https://metro.example/onto#coastal-line",
+                          code: "3",
+                          colour: "#0072ce",
+                          _meta: {
+                            title: "Coastal Line",
+                          },
+                        },
+                      ],
+                      transferMinutes: 4,
+                      uri: "https://metro.example/onto#central-exchange",
+                    },
+                  },
+                  {
+                    position: 5,
+                    stop: {
+                      __typename: "Station",
+                      _meta: {
+                        title: "Marsh End",
+                        curie: "metro:marsh-end",
+                      },
+                      servesLine: [
+                        {
+                          uri: "https://metro.example/onto#north-line",
+                          code: "1",
+                          colour: "#c8102e",
+                          _meta: {
+                            title: "North Line",
+                          },
+                        },
+                      ],
+                      uri: "https://metro.example/onto#marsh-end",
+                    },
+                  },
+                ],
               },
               calls: [
                 {
                   position: 1,
                   stop: {
-                    uri: "https://metro.example/onto#marsh-end",
                     __typename: "Station",
                     _meta: {
                       title: "Marsh End",
@@ -4015,12 +4604,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#marsh-end",
                   },
                 },
                 {
                   position: 2,
                   stop: {
-                    uri: "https://metro.example/onto#central-exchange",
                     __typename: "Interchange",
                     _meta: {
                       title: "Central Exchange",
@@ -4056,12 +4645,12 @@ export default [
                       },
                     ],
                     transferMinutes: 4,
+                    uri: "https://metro.example/onto#central-exchange",
                   },
                 },
                 {
                   position: 3,
                   stop: {
-                    uri: "https://metro.example/onto#foundry-row",
                     __typename: "Station",
                     _meta: {
                       title: "Foundry Row",
@@ -4078,12 +4667,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#foundry-row",
                   },
                 },
                 {
                   position: 4,
                   stop: {
-                    uri: "https://metro.example/onto#verge-park",
                     __typename: "Station",
                     _meta: {
                       title: "Verge Park",
@@ -4100,12 +4689,12 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#verge-park",
                   },
                 },
                 {
                   position: 5,
                   stop: {
-                    uri: "https://metro.example/onto#northgate",
                     __typename: "Station",
                     _meta: {
                       title: "Northgate",
@@ -4122,6 +4711,222 @@ export default [
                         },
                       },
                     ],
+                    uri: "https://metro.example/onto#northgate",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+  },
+  {
+    operation: "NetworkLineQuery",
+    variables: {
+      id: "https://metro.example/onto#ringway-clockwise",
+    },
+    response: {
+      data: {
+        node: {
+          uri: "https://metro.example/onto#ringway-clockwise",
+          __typename: "Line",
+          _meta: {
+            title: "Ringway Clockwise",
+            curie: "metro:ringway-clockwise",
+          },
+          code: "R1",
+          colour: "#c46a2b",
+          routes: [
+            {
+              label: "Clockwise",
+              isLoop: true,
+              reverse: null,
+              calls: [
+                {
+                  position: 1,
+                  stop: {
+                    __typename: "Station",
+                    _meta: {
+                      title: "Dyers Green",
+                      curie: "metro:dyers-green",
+                    },
+                    servesLine: [
+                      {
+                        uri: "https://metro.example/onto#ringway-clockwise",
+                        code: "R1",
+                        colour: "#c46a2b",
+                        _meta: {
+                          title: "Ringway Clockwise",
+                          curie: "metro:ringway-clockwise",
+                        },
+                      },
+                      {
+                        uri: "https://metro.example/onto#ringway-anticlockwise",
+                        code: "R2",
+                        colour: "#7a4b2a",
+                        _meta: {
+                          title: "Ringway Anticlockwise",
+                          curie: "metro:ringway-anticlockwise",
+                        },
+                      },
+                    ],
+                    uri: "https://metro.example/onto#dyers-green",
+                  },
+                },
+                {
+                  position: 2,
+                  stop: {
+                    __typename: "Station",
+                    _meta: {
+                      title: "Fernside",
+                      curie: "metro:fernside",
+                    },
+                    servesLine: [
+                      {
+                        uri: "https://metro.example/onto#ringway-clockwise",
+                        code: "R1",
+                        colour: "#c46a2b",
+                        _meta: {
+                          title: "Ringway Clockwise",
+                          curie: "metro:ringway-clockwise",
+                        },
+                      },
+                      {
+                        uri: "https://metro.example/onto#ringway-anticlockwise",
+                        code: "R2",
+                        colour: "#7a4b2a",
+                        _meta: {
+                          title: "Ringway Anticlockwise",
+                          curie: "metro:ringway-anticlockwise",
+                        },
+                      },
+                    ],
+                    uri: "https://metro.example/onto#fernside",
+                  },
+                },
+                {
+                  position: 3,
+                  stop: {
+                    __typename: "Station",
+                    _meta: {
+                      title: "Nettlebed",
+                      curie: "metro:nettlebed",
+                    },
+                    servesLine: [
+                      {
+                        uri: "https://metro.example/onto#ringway-clockwise",
+                        code: "R1",
+                        colour: "#c46a2b",
+                        _meta: {
+                          title: "Ringway Clockwise",
+                          curie: "metro:ringway-clockwise",
+                        },
+                      },
+                      {
+                        uri: "https://metro.example/onto#ringway-anticlockwise",
+                        code: "R2",
+                        colour: "#7a4b2a",
+                        _meta: {
+                          title: "Ringway Anticlockwise",
+                          curie: "metro:ringway-anticlockwise",
+                        },
+                      },
+                    ],
+                    uri: "https://metro.example/onto#nettlebed",
+                  },
+                },
+                {
+                  position: 4,
+                  stop: {
+                    __typename: "Station",
+                    _meta: {
+                      title: "Orchard Gate",
+                      curie: "metro:orchard-gate",
+                    },
+                    servesLine: [
+                      {
+                        uri: "https://metro.example/onto#ringway-clockwise",
+                        code: "R1",
+                        colour: "#c46a2b",
+                        _meta: {
+                          title: "Ringway Clockwise",
+                          curie: "metro:ringway-clockwise",
+                        },
+                      },
+                      {
+                        uri: "https://metro.example/onto#ringway-anticlockwise",
+                        code: "R2",
+                        colour: "#7a4b2a",
+                        _meta: {
+                          title: "Ringway Anticlockwise",
+                          curie: "metro:ringway-anticlockwise",
+                        },
+                      },
+                    ],
+                    uri: "https://metro.example/onto#orchard-gate",
+                  },
+                },
+                {
+                  position: 5,
+                  stop: {
+                    __typename: "Station",
+                    _meta: {
+                      title: "Pinfold",
+                      curie: "metro:pinfold",
+                    },
+                    servesLine: [
+                      {
+                        uri: "https://metro.example/onto#ringway-clockwise",
+                        code: "R1",
+                        colour: "#c46a2b",
+                        _meta: {
+                          title: "Ringway Clockwise",
+                          curie: "metro:ringway-clockwise",
+                        },
+                      },
+                      {
+                        uri: "https://metro.example/onto#ringway-anticlockwise",
+                        code: "R2",
+                        colour: "#7a4b2a",
+                        _meta: {
+                          title: "Ringway Anticlockwise",
+                          curie: "metro:ringway-anticlockwise",
+                        },
+                      },
+                    ],
+                    uri: "https://metro.example/onto#pinfold",
+                  },
+                },
+                {
+                  position: 6,
+                  stop: {
+                    __typename: "Station",
+                    _meta: {
+                      title: "Ropewalk",
+                      curie: "metro:ropewalk",
+                    },
+                    servesLine: [
+                      {
+                        uri: "https://metro.example/onto#ringway-clockwise",
+                        code: "R1",
+                        colour: "#c46a2b",
+                        _meta: {
+                          title: "Ringway Clockwise",
+                          curie: "metro:ringway-clockwise",
+                        },
+                      },
+                      {
+                        uri: "https://metro.example/onto#ringway-anticlockwise",
+                        code: "R2",
+                        colour: "#7a4b2a",
+                        _meta: {
+                          title: "Ringway Anticlockwise",
+                          curie: "metro:ringway-anticlockwise",
+                        },
+                      },
+                    ],
+                    uri: "https://metro.example/onto#ropewalk",
                   },
                 },
               ],

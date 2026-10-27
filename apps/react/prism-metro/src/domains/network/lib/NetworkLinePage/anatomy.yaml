@@ -3,7 +3,7 @@
 # renders prism-core's DocumentLayout with the metro rail and, in the
 # three-column aside, the line's LinePanel; its own root is the main
 # column: a subgrid of the canvas's page over every column, holding the
-# line's title and one LineStrip per route the line draws, or its
+# line's title and one RouteStrip per route the line draws, or its
 # not-found, loading or error status. It renders its own archetype because
 # its aside reads the line's own data.
 #

@@ -4,7 +4,9 @@ import {
   createOperationDescriptor,
   type Environment,
   type GraphQLResponse,
+  getSelector,
 } from "relay-runtime";
+import type { CallStop_node$key } from "#relay/__generated__/CallStop_node.graphql.js";
 import networkLineQueryNode, {
   type NetworkLineQuery$data,
 } from "#relay/__generated__/NetworkLineQuery.graphql.js";
@@ -13,6 +15,9 @@ import networkNamespacesQueryNode from "#relay/__generated__/NetworkNamespacesQu
 import networkStationQueryNode, {
   type NetworkStationQuery$data,
 } from "#relay/__generated__/NetworkStationQuery.graphql.js";
+import routeStripFragmentNode, {
+  type RouteStrip_node$data,
+} from "#relay/__generated__/RouteStrip_node.graphql.js";
 import readLineView from "../src/domains/network/lib/readLineView.js";
 import readStationView from "../src/domains/network/lib/readStationView.js";
 import type {
@@ -126,4 +131,27 @@ export function readRecordedLine(
       : readLineView(node as NonNullable<NetworkLineQuery$data["node"]>);
   if (view === undefined) throw new Error(`${local} is no line`);
   return view;
+}
+
+/**
+ * Read the calls of a recorded line's first drawn route from `environment`,
+ * in calling order, each the key its `CallStop` projects.
+ *
+ * @param environment - An environment from `createRecordedEnvironment`.
+ * @param local - The line's local name: `circle-line` or `north-line`.
+ * @returns The calls' keys.
+ * @throws When no answer is recorded for the line, or it draws no route.
+ */
+export function readRecordedCalls(
+  environment: Environment,
+  local: string,
+): readonly CallStop_node$key[] {
+  const strip = readRecordedLine(environment, local).strips.at(0);
+  if (strip === undefined) throw new Error(`${local} draws no route`);
+  const selector = getSelector(routeStripFragmentNode, strip.route);
+  if (selector === null || "selectors" in selector) {
+    throw new Error(`${local}'s route has no single selector`);
+  }
+  const route = environment.lookup(selector).data as RouteStrip_node$data;
+  return [...route.calls].sort((a, b) => a.position - b.position);
 }

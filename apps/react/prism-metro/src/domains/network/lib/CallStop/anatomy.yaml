@@ -1,0 +1,112 @@
+---
+# CallStop — one call of a route as a door card reads it: a tick on the
+# strip's rule in the line's colour (a hollow ring at an interchange), the
+# stop's name linking to its home, the other lines it meets, each by its
+# code beside a swatch of its colour, and at an interchange the time a
+# transfer takes. A Relay projection of a Call; RouteStrip lays the calls
+# out along its rule. Bespoke: no published component reads a call.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups the strip reads top
+#     to bottom, and the stop lays its tick beside its name.
+#
+# Every decision is read through a component token declared on the root
+# (`--call-stop-*`), bound to the symbol named here. The line's colour
+# reaches the tick and the ring through `--call-stop-colour`, and each
+# connection's swatch through `--call-stop-connection-colour`, inline
+# channels set from the graph's data. Gaps inside the stop read `--space-*`
+# steps: no semantic name of the shim fits the inside of one stop.
+#
+# Token ledger:
+#   size.width / size.height 0.75rem on a tick and a ring and 0.5rem on a
+#     connection swatch: no icon-size tokens.
+#   appearance.border.width 2px on a ring: no stroke token.
+#   typography.fontFamily on a connection's code: the monospace family has
+#     no semantic token.
+node:
+  uri: metro.component.call_stop
+  projection:
+    on: Call
+  styles:
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: space.100
+  edges:
+    - node:
+        role: tick
+        # a plain station's mark on the rule
+        styles:
+          layout.flex.shrink: 0
+          size.width: 0.75rem
+          size.height: 0.75rem
+          appearance.radius: 50%
+          appearance.background: [call.stop.colour, color.border]
+      relation: { cardinality: "0..1", slotName: tick }
+    - node:
+        role: ring
+        # an interchange's mark on the rule, hollow
+        styles:
+          layout.flex.shrink: 0
+          size.width: 0.75rem
+          size.height: 0.75rem
+          appearance.radius: 50%
+          appearance.background: color.background
+          appearance.border.width: 2px
+          appearance.border.style: solid
+          appearance.border.color: [call.stop.colour, color.border]
+      relation: { cardinality: "0..1", slotName: ring }
+    - node:
+        role: name
+        # the stop's title, linking to its home
+        projection: { field: stop._meta.title }
+        edges:
+          - node: { role: home, projection: { field: stop._meta.curie } }
+            relation: { cardinality: "0..1" }
+      relation: { cardinality: "1", slotName: name }
+    - node:
+        role: connections
+        # the other lines serving the stop
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: space.100
+          layout.listStyle: none
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.inline.start: 0
+      relation: { cardinality: "0..1", slotName: connections }
+    - node:
+        role: connection
+        # a line's swatch and code, its name the code's title; the stop's
+        # own line, matched by its IRI, is left out
+        projection: { field: code }
+        styles:
+          layout.type: flex
+          layout.align: center
+          spacing.gap: space.050
+          typography.fontFamily: "ui-monospace, monospace"
+        edges:
+          - node: { role: line identity, projection: { field: uri } }
+            relation: { cardinality: "1" }
+          - node: { role: line name, projection: { field: _meta.title } }
+            relation: { cardinality: "1" }
+          - node:
+              role: connection swatch
+              projection: { field: colour }
+              styles:
+                size.width: 0.5rem
+                size.height: 0.5rem
+                appearance.background: [call.stop.connection.colour, color.border]
+            relation: { cardinality: "1", slotName: swatch }
+      relation:
+        cardinality: "0..*"
+        slotName: connection
+        projection: { field: stop.servesLine }
+    - node:
+        role: transfer time
+        projection:
+          on: Interchange
+          field: stop.transferMinutes
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: transfer }

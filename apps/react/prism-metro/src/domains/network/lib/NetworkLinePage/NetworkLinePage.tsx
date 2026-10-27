@@ -7,7 +7,7 @@ import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
 import useLineView from "../hooks/useLineView.js";
 import { LinePanel } from "../LinePanel/index.js";
-import { LineStrip } from "../LineStrip/index.js";
+import { RouteStrip } from "../RouteStrip/index.js";
 import type { NetworkLinePageProps } from "./types.js";
 import "./styles.css";
 
@@ -55,7 +55,12 @@ const LineMain = ({
       <Head title={line.title} />
       <h1 className="title">{line.title}</h1>
       {line.strips.map((strip) => (
-        <LineStrip colour={line.colour} key={strip.label} strip={strip} />
+        <RouteStrip
+          colour={line.colour}
+          key={strip.label}
+          lineUri={line.uri}
+          node={strip.route}
+        />
       ))}
     </>
   );

@@ -142,6 +142,7 @@ const declareNetworkQueries = (): unknown => [
             reverse {
               label
             }
+            ...RouteStrip_node
             calls {
               position
               stop {

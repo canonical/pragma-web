@@ -57,6 +57,7 @@ const pairStrips = (
     );
     return {
       ...readDirection(route, lineUri),
+      route,
       isLoop: route.isLoop,
       reverse:
         reverse === undefined ? undefined : readDirection(reverse, lineUri),
@@ -97,6 +98,7 @@ export default function readLineView(node: LineNode): LineView | undefined {
           { curie: lastStop.curie, title: lastStop.title },
         ];
   return {
+    uri: node.uri,
     curie: node._meta.curie,
     title: node._meta.title,
     code,
