@@ -7,6 +7,8 @@
  * title lists its matches with the first highlighted and its card in the
  * preview; the arrow keys move the highlight and the preview with it; Tab
  * leaves the field for the preview's link, never for the scrolling results;
+ * a drag in the preview selects its text, and a click there gives the field
+ * the focus back;
  * Enter opens the highlighted result's home without loading a new document
  * and closes the palette, as following the preview's link does; Cmd+K
  * reopens it empty and Escape closes it. On a phone the open palette fits
@@ -185,6 +187,33 @@ describe("the command palette", () => {
         (link) => link === document.activeElement,
       ),
     ).toBe(true);
+  });
+
+  it("selects the preview's text with a drag, and gives the field the focus back after a click", async () => {
+    const page = await openLobby();
+    await search(page, COMPONENT_TITLE);
+    const kind = findPalette(page)
+      .getByRole("region", { name: "Preview" })
+      .locator(".kind")
+      .first();
+    const box = await kind.boundingBox();
+    if (box === null) throw new Error("the preview shows no kind");
+    const middle = box.y + box.height / 2;
+    await page.mouse.move(box.x + 1, middle);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 1, middle, { steps: 8 });
+    await page.mouse.up();
+    expect(
+      await page.evaluate(() => String(document.getSelection()).length),
+    ).toBeGreaterThan(0);
+    await kind.click();
+    const field = findPalette(page).getByRole("combobox");
+    expect(
+      await field.evaluate((input) => input === document.activeElement),
+    ).toBe(true);
+    const first = await field.getAttribute("aria-activedescendant");
+    await page.keyboard.press("ArrowDown");
+    expect(await field.getAttribute("aria-activedescendant")).not.toBe(first);
   });
 
   it("opens the highlighted result's home with Enter, without loading a new document", async () => {
