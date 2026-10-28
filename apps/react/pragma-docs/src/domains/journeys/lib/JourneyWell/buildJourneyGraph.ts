@@ -33,8 +33,9 @@
  * silently depended on server iteration order would be a hydration bug
  * waiting for the day the store changes.
  *
- * HONEST ABSENCE. Most surfaces compose no layout — 16 of 133
- * pairings reach one. Where a journey has no layout hop, this function
+ * HONEST ABSENCE. Not every surface composes a layout — the chips, the
+ * palette and the GraphQL port do not, so 10 of the docs site's 30
+ * pairings reach none. Where a journey has no layout hop, this function
  * emits NO layout node and NO trailing edge, and the row simply ends at
  * its surface. It does NOT invent one by walking the `within` chain: the
  * ontology declares no layout-inheritance rule, and a lens that applied
@@ -313,8 +314,8 @@ export const classifyRole = (
 
 /**
  * Edge decoration from the pairing's arrival, by local name for the same
- * reason. Absent arrival decorates nothing: 34 of 133 pairings carry none
- * and ports carry none by rule, so "no class" is the honest rendering of
+ * reason. Absent arrival decorates nothing: ports carry none by rule (2 of
+ * the docs site's 30 pairings), so "no class" is the honest rendering of
  * a fact rather than a fallback.
  */
 export const classifyArrival = (

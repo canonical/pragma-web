@@ -7,8 +7,9 @@
  * interesting questions a demand model is asked ("which jobs are
  * unserved?", "which coordinate carries the most demand?", "what does the
  * architect actually have?") are SORT and GROUP questions, and a bulleted
- * list cannot answer any of them. The data is genuinely tabular: 52 rows
- * with several honest columns, every one of them already in the query.
+ * list cannot answer any of them. The data is genuinely tabular: a row per
+ * job (17 in the docs site's model) with several honest columns, every one
+ * of them already in the query.
  *
  * PURE BY CONSTRUCTION, and that is the SSR contract. `buildJourneyRows`,
  * `compareRows` and `groupRows` are functions of their arguments alone —

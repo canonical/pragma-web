@@ -5,13 +5,15 @@
  * pagination facts that are load-bearing rather than cosmetic.
  *
  * Both page sizes exist because the schema's DEFAULTS silently truncate
- * this model, and both numbers were measured against the live backend
- * rather than guessed:
+ * a model larger than the docs site's (17 jobs, 30 pairings), as they did
+ * an earlier model of 52 jobs and 133 pairings, measured rather than
+ * guessed:
  *
  *   - `pairings` defaults are irrelevant; `first:` hard-caps at 100 and
- *     the model holds 133. One window reaches 38 of the 51 paired jobs,
+ *     that model held 133. One window reached 38 of its 51 paired jobs,
  *     so 13 would vanish with nothing on screen saying so.
- *   - `jobs` defaults to FIFTY of the 52 jobs, with `hasNextPage: true`.
+ *   - `jobs` defaults to FIFTY: 50 of those 52 jobs, with
+ *     `hasNextPage: true`.
  *
  * A regression in either would show up as journeys quietly missing — the
  * exact failure this lens exists to expose — so both are pinned here.

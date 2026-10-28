@@ -5,8 +5,9 @@
  * approximate, and this module is where that honesty is enforced rather
  * than merely documented.
  *
- * The scale ruling: the default view is FILTERED, because ~260 nodes is
- * unreadable and virtualisation would break the well's SSR determinism.
+ * The scale ruling: the default view is FILTERED, because a whole model's
+ * nodes are unreadable at once and virtualisation would break the well's
+ * SSR determinism.
  */
 
 import { describe, expect, it } from "vitest";
@@ -30,7 +31,7 @@ import {
 const DOCS = "sem://design-system-docs#";
 
 describe("chooseDefaultJourneyFilter", () => {
-  it("defaults to ONE coordinate — the readable view, not all 260 nodes", () => {
+  it("defaults to ONE coordinate — the readable view, not every node", () => {
     const filter = chooseDefaultJourneyFilter([
       `${DOCS}coordinate.b`,
       `${DOCS}coordinate.a`,
@@ -80,7 +81,7 @@ describe("personaMatchesCoordinate (the APPROXIMATE axis)", () => {
   });
 
   it("treats an EMPTY role axis as the wildcard the ontology says it is", () => {
-    // 26 of the 52 live jobs carry no role axis. The ontology reads that
+    // The newcomer's jobs carry no role axis. The ontology reads that
     // as "any role", so such a coordinate genuinely serves every persona —
     // dimming it would be the lens contradicting the model.
     expect(personaMatchesCoordinate(`${DOCS}persona.agent`, [])).toBe(true);

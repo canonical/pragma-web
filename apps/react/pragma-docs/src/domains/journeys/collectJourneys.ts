@@ -193,8 +193,8 @@ export const findRouteForSurface = (
  *
  * Jobs with NO coordinate are dropped from the diagram (the diagram is
  * rooted at Coordinate per ruling R1, so a coordinate-less job has no
- * root to hang from) — but every job in the live model has one, measured:
- * 52 of 52.
+ * root to hang from) — but every job has one: the ontology's shape requires
+ * exactly one coordinate region per job.
  */
 export const collectJourneys = (
   jobs: readonly RawJob[],
@@ -210,8 +210,8 @@ export const collectJourneys = (
     const jobUri = pairing.forJob?.uri;
     // A pairing whose job is not in the jobs window is dropped: jobs drive
     // the tree (R1 coordinate-rooting), so a pairing with no rendered job
-    // has nowhere to hang. Honest by construction and no such orphans exist
-    // in the live model (all 51 paired jobs are within a single 100-page).
+    // has nowhere to hang. Honest by construction, and no such orphans exist
+    // while the jobs fit one page (the docs site's 17 do).
     if (jobUri === undefined) continue;
     const surface = pairing.pairsSurface;
     const layoutNode = surface?.composes?.edges.at(0)?.node;
@@ -220,7 +220,8 @@ export const collectJourneys = (
       uri: pairing.uri,
       label: readLocalName(pairing.uri),
       role: pairing.pairingRole?.uri,
-      // One arrival at most in this model; absent is data (34 of 133).
+      // One arrival at most in this model; absent is data (every pairing
+      // with a port, 2 of the docs site's 30).
       arrival: pairing.arrivals?.edges.at(0)?.node.uri,
       surface:
         surface == null

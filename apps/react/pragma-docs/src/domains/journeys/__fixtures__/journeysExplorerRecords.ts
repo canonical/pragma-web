@@ -6,26 +6,27 @@
  *
  * Nothing trimmed. The lens's ONE operation carries the whole demand
  * model: 52 jobs with their coordinates, both 100-pairing windows (whose
- * union is all 133 pairings), and the 6 personas. The SAME records serve
+ * union is all 133 pairings), and its 6 personas. The SAME records serve
  * the /journeys/:job address too — selection is presentation over data
  * already in the store, not a second fetch — which is why one fixture
  * covers both rows of every certification suite.
  *
- * HAND-EDITED, NOT RE-CAPTURED (the converged-base migration). The
- * converged `Node` base deleted the `id` field and `getDataID` now keys
- * the store by `uri`, so every fixture had to move to `uri`-keyed records
- * without an `id` field. The other nine were re-captured from a live
- * boot; this one could not be, because the second source root — the
- * semantics tree carrying `sem://surface#` and `sem://design-system-docs#`
- * — is ABSENT from this environment, so `/journeys` cannot resolve here at
- * all. Its record keys were ALREADY absolute (`sem://design-system-docs#job.a1`)
- * and already equal to each record's `uri`, so the only edit needed was
- * deleting the 294 `id:` lines — mechanically, with no other change. That
- * makes this fixture UNVERIFIED against a live graph: re-capture it on a
- * machine with the semantics tree before trusting it further.
+ * AN EARLIER, LARGER MODEL, KEPT ON PURPOSE. This is a capture of a demand
+ * model of 52 jobs and 133 pairings, not of the docs site's own (17 jobs,
+ * 30 pairings, in the `@canonical/design-system-docs` shim). It is kept
+ * because it is the only fixture whose pairings overflow one 100-pairing
+ * window, which is what the two-window union in `journeysQuery.ts` exists
+ * for; a capture of the docs site's model would leave that path untested.
  *
- * Regenerate: boot `dev:bun`, copy `relay.records` out of the
- * `__INITIAL_DATA__` script served at /journeys.
+ * HAND-EDITED, NOT RE-CAPTURED. When the converged `Node` base keyed the
+ * store by `uri`, its 294 `id:` lines were deleted, its record keys being
+ * already absolute and equal to each record's `uri`; when the compiler
+ * renamed the lens surface type, its `__typename: "Lens"` values became
+ * `"LensSurface"`. Both edits were mechanical, with no other change.
+ *
+ * Not regenerated from this repository's graph, whose model fits one
+ * window; a capture's shape is that of `relay.records` in the
+ * `__INITIAL_DATA__` script `dev:bun` serves at /journeys.
  */
 
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
