@@ -28,9 +28,9 @@
     --journey-table-expander-size: var(--space-300);
     --journey-table-expander-radius: 0.25rem;
     --journey-table-pill-radius: 999px;
-    /* One group of the intrinsic grid's columns: the measure follows the
-     * grid's column floor. */
-    --journey-table-story-measure: calc(4 * var(--grid-col-min));
+    /* The job's column takes a quarter of the table: a line for the story
+     * to be cut on, the rest left to the seven columns of short values. */
+    --journey-table-job-share: 25%;
 
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
@@ -178,6 +178,10 @@
     border-bottom-color: var(--journey-table-rule-color);
   }
 
+  .ds.journey-table .cell.is-job {
+    width: var(--journey-table-job-share);
+  }
+
   .ds.journey-table .cell.is-numeric {
     text-align: end;
     font-variant-numeric: tabular-nums;
@@ -206,10 +210,15 @@
     font-weight: var(--journey-table-bold);
   }
 
-  /* The story under the job's link, cut to one line of a reading measure. */
+  /* The story under the job's link, cut to one line of the job's column.
+   * A zero width under a full minimum keeps the story out of the column's
+   * intrinsic width (a percentage resolves to nothing while the table sizes
+   * its columns), so the columns are sized by their other content and the
+   * story fills whatever the job's column is given. */
   .ds.journey-table .story {
     display: block;
-    max-width: var(--journey-table-story-measure);
+    width: 0;
+    min-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

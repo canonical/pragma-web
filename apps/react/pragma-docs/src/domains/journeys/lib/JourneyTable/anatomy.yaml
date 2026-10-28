@@ -12,14 +12,15 @@
 # column's sort button and a decorative direction mark, `aria-sort` on the
 # active column alone; one row group per group, opened by a header cell
 # scoped to the row group, its count beside its label; the job as each
-# row's header cell, its link bold over its story cut to one line; an
-# expander per row whose detail row follows its row in document order,
-# hidden until expanded, holding the story verbatim under a start rule, the
-# acceptance criteria and, for a job nothing serves, a plain statement. The
-# selected job's row takes the layered background. A wildcard axis reads
-# "any" in muted text; a count aligns to the end in tabular figures, its
-# primary and secondary split beside it; a job with no surface leaves a
-# muted dash; the state is a pill, branded when served, muted when not.
+# row's header cell, a quarter of the table wide, its link bold over its
+# story cut to one line; an expander per row whose detail row follows its
+# row in document order, hidden until expanded, holding the story verbatim
+# under a start rule, the acceptance criteria and, for a job nothing
+# serves, a plain statement. The selected job's row takes the layered
+# background. A wildcard axis reads "any" in muted text; a count aligns to
+# the end in tabular figures, its primary and secondary split beside it; a
+# job with no surface leaves a muted dash; the state is a pill, branded
+# when served, muted when not.
 #
 # The root is a grid of two rows a gutter apart: the controls, then the
 # table's own scrolling region, which takes the rest and scrolls on both
@@ -41,9 +42,13 @@
 #   space.300 (24px): the expander's square, the line's height.
 #   1px: the hairlines. 0.25rem: the expander's corner. 999px: the state's
 #     pill; no radius token is a pill.
-#   size.max.width "calc(4 * var(--grid-col-min))": the story's measure in
-#     the job cell, one group of the intrinsic grid's columns, so it
-#     follows the grid's column floor.
+#   size.width 25% on the job's cell: its column takes a quarter of the
+#     table, a line for the story to be cut on, and the seven columns of
+#     short values share the rest.
+#   size.width 0 with size.min.width 100% on the story: it fills the job's
+#     column and adds nothing to the column's intrinsic width, so the
+#     longest story never sets the table's width and the columns fit the
+#     scrolling region.
 #   layout.grid.rows "auto minmax(0, 1fr)", size.width 100%,
 #     layout.position sticky, layout.table.collapse: structure. The 0
 #     resets and offsets. The hidden label is an empty box out of the flow
@@ -259,7 +264,8 @@ node:
                                             role: story (cut to one line)
                                             styles:
                                               layout.type: block
-                                              size.max.width: "calc(4 * var(--grid-col-min))"
+                                              size.width: 0
+                                              size.min.width: 100%
                                               layout.overflow: hidden
                                               typography.overflow: ellipsis
                                               typography.whiteSpace: nowrap
@@ -300,6 +306,10 @@ node:
                                                     appearance.border.color: color.border.muted
                                                     typography.color: color.text.muted
                                           relation: { cardinality: "0..1", slotName: state }
+                                  - node:
+                                      role: job cell (.is-job)
+                                      styles:
+                                        size.width: 25%
                                   - node:
                                       role: numeric cell (.is-numeric)
                                       styles:
