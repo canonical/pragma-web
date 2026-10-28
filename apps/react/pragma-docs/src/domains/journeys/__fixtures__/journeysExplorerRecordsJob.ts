@@ -4231,7 +4231,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#view.standards": {
     __id: "sem://design-system-docs#view.standards",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.standards",
     composes: {
       __ref: "client:sem://design-system-docs#view.standards:composes",
@@ -4372,7 +4372,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#lens.terminal-catalog": {
     __id: "sem://design-system-docs#lens.terminal-catalog",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#lens.terminal-catalog",
     composes: {
       __ref: "client:sem://design-system-docs#lens.terminal-catalog:composes",
@@ -4427,7 +4427,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#view.tokens": {
     __id: "sem://design-system-docs#view.tokens",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.tokens",
     composes: {
       __ref: "client:sem://design-system-docs#view.tokens:composes",
@@ -5136,7 +5136,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#view.definitions": {
     __id: "sem://design-system-docs#view.definitions",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.definitions",
     composes: {
       __ref: "client:sem://design-system-docs#view.definitions:composes",
@@ -5964,7 +5964,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#lens.doctor": {
     __id: "sem://design-system-docs#lens.doctor",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#lens.doctor",
     composes: {
       __ref: "client:sem://design-system-docs#lens.doctor:composes",
@@ -6081,7 +6081,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#view.guides": {
     __id: "sem://design-system-docs#view.guides",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.guides",
     composes: {
       __ref: "client:sem://design-system-docs#view.guides:composes",
@@ -6143,7 +6143,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#view.home": {
     __id: "sem://design-system-docs#view.home",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.home",
     composes: {
       __ref: "client:sem://design-system-docs#view.home:composes",
@@ -6726,7 +6726,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#view.components": {
     __id: "sem://design-system-docs#view.components",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.components",
     composes: {
       __ref: "client:sem://design-system-docs#view.components:composes",
@@ -8254,7 +8254,7 @@ const journeysExplorerRecordsJob = {
     },
   "sem://design-system-docs#view.search-results": {
     __id: "sem://design-system-docs#view.search-results",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.search-results",
     composes: {
       __ref: "client:sem://design-system-docs#view.search-results:composes",
@@ -9011,7 +9011,7 @@ const journeysExplorerRecordsJob = {
   },
   "sem://design-system-docs#view.review-queues": {
     __id: "sem://design-system-docs#view.review-queues",
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: "sem://design-system-docs#view.review-queues",
     composes: {
       __ref: "client:sem://design-system-docs#view.review-queues:composes",

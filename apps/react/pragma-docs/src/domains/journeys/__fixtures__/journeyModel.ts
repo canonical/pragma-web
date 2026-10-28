@@ -58,7 +58,7 @@ export const BROWSE_JOURNEY_JOB: JourneyJob = {
       surface: {
         uri: `${DOCS}view.components`,
         label: "view.components",
-        surfaceType: "Lens",
+        surfaceType: "LensSurface",
         route: "components",
         layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
       },
@@ -115,7 +115,7 @@ export const JOURNEY_MODEL: readonly JourneyCoordinate[] = [
             surface: {
               uri: `${DOCS}view.components`,
               label: "view.components",
-              surfaceType: "Lens",
+              surfaceType: "LensSurface",
               route: "components",
               layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
             },

@@ -65,7 +65,7 @@ const PAIRING_A: RawPairing = {
   forJob: { uri: `${DOCS}job.l3` },
   arrivals: { edges: [{ node: { uri: "surface:ColdEntry" } }] },
   pairsSurface: {
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: `${DOCS}view.components`,
     composes: {
       edges: [{ node: { uri: `${DOCS}layout.catalog`, name: "Catalog" } }],

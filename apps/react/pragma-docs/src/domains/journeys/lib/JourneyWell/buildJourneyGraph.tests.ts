@@ -59,7 +59,7 @@ const FIXTURE: readonly JourneyCoordinate[] = [
             surface: {
               uri: `${DOCS}view.components`,
               label: "Components",
-              surfaceType: "Lens",
+              surfaceType: "LensSurface",
               route: "components",
               layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
             },
@@ -94,7 +94,7 @@ const FIXTURE: readonly JourneyCoordinate[] = [
             surface: {
               uri: `${DOCS}view.components`,
               label: "Components",
-              surfaceType: "Lens",
+              surfaceType: "LensSurface",
               route: "components",
               layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
             },
