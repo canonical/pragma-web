@@ -87,6 +87,48 @@ describe("LineChip", () => {
     ).toBe("/network/lines/metro%3Anorth-line");
   });
 
+  it("leads with a swatch of the line's colour, set on its root", () => {
+    const { container } = renderWithNode((node) => <LineChip node={node} />);
+    const chip = container.querySelector(".ds.line-chip");
+    expect(chip?.querySelector(".mark > .swatch")).not.toBeNull();
+    expect(
+      (chip as HTMLElement | null)?.style.getPropertyValue(
+        "--line-chip-swatch-color",
+      ),
+    ).toBe("#c8102e");
+  });
+
+  it("paints each line in its own colour", () => {
+    const { container } = renderWithNode((node) => <LineChip node={node} />, {
+      colour: "#f2b705",
+    });
+    expect(
+      container
+        .querySelector<HTMLElement>(".ds.line-chip")
+        ?.style.getPropertyValue("--line-chip-swatch-color"),
+    ).toBe("#f2b705");
+  });
+
+  it("keeps its name the line's, whatever the colour", () => {
+    const { container } = renderWithNode((node) => <LineChip node={node} />);
+    expect(container.querySelector(".mark")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(screen.getByRole("link").textContent).toBe("North Line");
+  });
+
+  it("keeps a consumer's style beside the line's colour", () => {
+    const { container } = renderWithNode((node) => (
+      <LineChip node={node} style={{ marginInline: "0" }} />
+    ));
+    const chip = container.querySelector<HTMLElement>(".ds.line-chip");
+    expect(chip?.style.marginInline).toBe("0px");
+    expect(chip?.style.getPropertyValue("--line-chip-swatch-color")).toBe(
+      "#c8102e",
+    );
+  });
+
   it("takes a passage's link text in place of the name", () => {
     const { container } = renderWithNode((node) => (
       <LineChip node={node}>the north line</LineChip>

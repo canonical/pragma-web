@@ -295,11 +295,12 @@ export const MOCK_INTERCHANGE = {
 
 /**
  * The North Line as a Relay mock environment answers a `Line`, with what
- * the graph's dataset holds: five stops, run end to end from Northgate to
- * Marsh End and back.
+ * the graph's dataset holds: red, five stops, run end to end from
+ * Northgate to Marsh End and back.
  */
 export const MOCK_LINE = {
   __typename: "Line",
+  colour: "#c8102e",
   _meta: {
     title: "North Line",
     curie: "metro:north-line",
@@ -339,11 +340,12 @@ export const MOCK_LINE = {
 
 /**
  * The Circle Line as a Relay mock environment answers a `Line`, with what
- * the graph's dataset holds: six stops on a loop, run both ways, and no
- * definition.
+ * the graph's dataset holds: yellow, six stops on a loop, run both ways,
+ * and no definition.
  */
 export const MOCK_LOOP_LINE = {
   __typename: "Line",
+  colour: "#f2b705",
   _meta: {
     title: CIRCLE_LINE_TITLE,
     curie: CIRCLE_LINE_CURIE,

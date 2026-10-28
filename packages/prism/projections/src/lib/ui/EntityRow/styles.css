@@ -17,6 +17,8 @@
     --entity-row-font-size: var(--typography-text-primary-font-size);
     /* The matrix's 24px line, which every representation shares. */
     --entity-row-line-height: var(--space-300);
+    /* The chip's gap between its slots. */
+    --entity-row-mark-gap: var(--space-050);
     --entity-row-location-color: var(--color-text-muted);
     --entity-row-identifier-vertical-align: baseline;
     --entity-row-identifier-line-height: 0;
@@ -65,6 +67,11 @@
     outline-style: solid;
     outline-color: var(--entity-row-focus-ring-color);
     outline-offset: var(--entity-row-focus-ring-offset);
+  }
+
+  /* The mark leads the identity, set apart from the text after it. */
+  .ds.entity-row .mark {
+    margin-inline-end: var(--entity-row-mark-gap);
   }
 
   .ds.entity-row .location {

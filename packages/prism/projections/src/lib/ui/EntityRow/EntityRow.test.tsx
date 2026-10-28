@@ -49,6 +49,31 @@ describe("EntityRow", () => {
     });
   });
 
+  describe("mark", () => {
+    it("leads the identity with its mark, hidden and outside the title's link", () => {
+      const row = renderRow(
+        <EntityRow
+          href="#north"
+          mark={<span className="swatch" />}
+          meta="5 stops"
+          title="North Line"
+        />,
+      );
+      expect(
+        [...(row.querySelector(".identity")?.children ?? [])].map(
+          (element) => element.className,
+        ),
+      ).toEqual(["mark", "title"]);
+      expect(row.querySelector(".mark > .swatch")).not.toBeNull();
+      expect(row.querySelector(".mark")?.getAttribute("aria-hidden")).toBe(
+        "true",
+      );
+      expect(screen.getByRole("link", { name: "North Line" }).textContent).toBe(
+        "North Line",
+      );
+    });
+  });
+
   describe("href and LinkComponent", () => {
     it("links the title to the home through an intrinsic anchor by default", () => {
       renderRow(<EntityRow href="#layout" location="ds:" title="Layout" />);

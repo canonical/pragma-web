@@ -66,6 +66,14 @@ export const Chevron: Story = {
   },
 };
 
+/**
+ * A chip led by its mark, a sign its projection draws, such as a swatch of
+ * the entity's colour; here a published icon.
+ */
+export const Marked: Story = {
+  args: { ...pickChipArgs(UI_BLOCK_ENTITY), mark: <Icon icon="information" /> },
+};
+
 /** An entity without a home: the value is inert text. */
 export const WithoutHome: Story = {
   args: { ...pickChipArgs(CLASS_ENTITY), href: undefined },

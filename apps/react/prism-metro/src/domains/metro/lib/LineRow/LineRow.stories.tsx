@@ -77,7 +77,10 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The North Line: its name, linked to its page, and the count of its stops. */
+/**
+ * The North Line: a swatch of its red, its name, linked to its page, and
+ * the count of its stops.
+ */
 export const Default: Story = {};
 
 /** A consumer's class, merged after the projection's own. */
@@ -85,7 +88,7 @@ export const WithCustomClass: Story = {
   args: { className: "custom-class" },
 };
 
-/** A loop, the Circle Line: its stops, no ends, and "loop" as its vital. */
+/** A loop, the Circle Line: led by its yellow, then its name and its stops. */
 export const Loop: Story = {
   parameters: { relay: mockEntity(MOCK_LOOP_LINE) },
 };

@@ -57,5 +57,7 @@ describe("LineRow SSR", () => {
     );
     expect(html).toContain('class="ds entity-row ds line-row"');
     expect(html).toContain('href="/network/lines/metro%3Anorth-line"');
+    expect(html).toContain("--line-row-swatch-color:#c8102e");
+    expect(html).toContain('<span aria-hidden="true" class="mark">');
   });
 });
