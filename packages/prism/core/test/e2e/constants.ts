@@ -61,3 +61,9 @@ body { margin: 0; }
 
 /** How far the canvas is scrolled to see that the aside moves with it. */
 export const SCROLL_PX = 400;
+
+/**
+ * The class of the band a document's page draws at its top, such as a
+ * region's rule, which bleeds across the gutter to the rail's border.
+ */
+export const PAGE_BAND_CLASS_NAME = "page-band";

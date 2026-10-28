@@ -19,7 +19,9 @@ const componentCssClassName = "ds document-layout";
  * on its own; the strip and the colophon span the rest of their rows, each
  * band bleeding across the gutter to meet the rail's border while its
  * content keeps to the canvas's column lines; and
- * the canvas fills the body and scrolls. An aside, when there is one, is the canvas's own
+ * the canvas fills the body and scrolls, its box bleeding across the same
+ * gutter so that a band of the page that bleeds one gutter is painted to
+ * the rail's border rather than clipped by the scroll. An aside, when there is one, is the canvas's own
  * (see `Canvas`): it holds the canvas's last three columns inside the same
  * scroll, starting at the top of the page and scrolling with it, and takes
  * a row under the page below two groups of columns.

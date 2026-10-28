@@ -15,8 +15,10 @@
  * the viewport's top, that a page's tiles fill their rows to the canvas's
  * end, that the strip's and the colophon's bands run from the rail's
  * border to the viewport's edge with their content between the canvas's
- * first column line and its last, and that nothing reaches past the
- * viewport.
+ * first column line and its last, painted over that whole width, that a
+ * band of a document's page that bleeds across the gutter is painted to
+ * the rail's border rather than clipped by the canvas's scroll, and that
+ * nothing reaches past the viewport.
  */
 
 import { readFileSync } from "node:fs";
@@ -44,6 +46,7 @@ import {
 import {
   ARCHETYPE_VIEWPORTS,
   COMPONENT_STYLESHEETS,
+  PAGE_BAND_CLASS_NAME,
   SCROLL_PX,
   SHELL_RULES,
   SKIP_LINK_STYLESHEET,
@@ -125,6 +128,25 @@ const workspaceLayout = (
   </WorkspaceLayout>
 );
 
+/**
+ * A band of the page, such as a region's top rule: a hairline that bleeds
+ * across the gutter at its start to meet the rail's border, its content
+ * put back on the canvas's first column line by the same padding.
+ */
+const pageBand = (
+  <div
+    className={PAGE_BAND_CLASS_NAME}
+    style={{
+      marginInlineStart: "calc(-1 * var(--grid-gutter))",
+      paddingInlineStart: "var(--grid-gutter)",
+      borderBlockStartWidth: "1px",
+      borderBlockStartStyle: "solid",
+    }}
+  >
+    Region
+  </div>
+);
+
 /** A document long enough to scroll, with an aside taller than the viewport. */
 const documentLayout = (
   <DocumentLayout
@@ -140,6 +162,7 @@ const documentLayout = (
     strip={<ModeStrip context="Document" />}
   >
     <div>
+      {pageBand}
       {PARAGRAPHS.map((text) => (
         <p key={text}>{text}</p>
       ))}
@@ -297,9 +320,9 @@ function countReachableAsideEntries(page: Page) {
 
 /**
  * Assert every band of a measured layout runs from the rail's border to
- * the viewport's edge, its content starting where the canvas starts and
- * ending on the last column line, the viewport's edge on a shell with no
- * outer margin.
+ * the viewport's edge and is painted over that whole width, its content
+ * starting where the canvas's columns start and ending on the last column
+ * line, the viewport's edge on a shell with no outer margin.
  */
 function expectBands(
   measure: LayoutMeasure,
@@ -310,6 +333,11 @@ function expectBands(
   for (const band of measure.bands) {
     expect(band.start, band.element).toBeCloseTo(measure.edges.railEnd, 1);
     expect(band.end, band.element).toBeCloseTo(width, 1);
+    expect(band.paintedStart, band.element).toBeCloseTo(
+      measure.edges.railEnd,
+      1,
+    );
+    expect(band.paintedEnd, band.element).toBeCloseTo(width, 1);
     expect(band.contentStart, band.element).toBeCloseTo(
       measure.edges.canvasStart,
       1,
@@ -420,6 +448,28 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       }
       expectBands(measure, viewport.width, 2);
 
+      // A band of the page bleeds inside the canvas's scroll, so it is
+      // painted from the rail's border, its content on the canvas's first
+      // column line.
+      const pageMeasure = await page.evaluate(measureLayout, {
+        ...MEASURE_OPTIONS,
+        bandSelector: `.${PAGE_BAND_CLASS_NAME}`,
+      });
+      const [pageBandMeasure] = pageMeasure.bands;
+      expect(pageMeasure.bands).toHaveLength(1);
+      expect(pageBandMeasure?.paintedStart).toBeCloseTo(
+        pageMeasure.edges.railEnd,
+        1,
+      );
+      expect(pageBandMeasure?.contentStart).toBeCloseTo(
+        pageMeasure.edges.canvasStart,
+        1,
+      );
+      expect(pageMeasure.edges.canvasStart).toBeCloseTo(
+        before.page?.left ?? -1,
+        1,
+      );
+
       // The colophon takes a row of its own, one gutter under the canvas.
       expect(before.rows).toBe(3);
       expect(before.canvas?.bottom).toBeLessThan(viewport.height);
@@ -462,8 +512,18 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
           const rect = element?.getBoundingClientRect();
           return { left: rect?.left ?? -1, right: rect?.right ?? -1 };
         };
+        // The canvas's columns are its content box: its padding puts them
+        // back on their lines after its box bleeds across the gutter.
+        const columns = (element: Element | null) => {
+          const { left, right } = box(element);
+          const style = element === null ? null : getComputedStyle(element);
+          return {
+            left: left + Number.parseFloat(style?.paddingLeft ?? "0"),
+            right: right - Number.parseFloat(style?.paddingRight ?? "0"),
+          };
+        };
         return {
-          canvas: box(document.querySelector("main.ds.canvas")),
+          canvas: columns(document.querySelector("main.ds.canvas")),
           tiles: [...document.querySelectorAll(selector)].map((tile) => ({
             ...box(tile),
             column: `${getComputedStyle(tile).gridColumnStart} / ${getComputedStyle(tile).gridColumnEnd}`,

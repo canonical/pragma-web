@@ -108,6 +108,10 @@ bands, the `ModeStrip` and the colophon region, keep their columns but
 bleed across the gutter to meet the rail's border, a negative inline
 margin of one gutter compensated by the same padding, so their rules run
 edge to edge while their content sits on the canvas's first column line.
+A document's canvas bleeds the same way, so its scroll reaches the rail's
+border: a band of the page that bleeds one gutter, such as a region's top
+rule, is painted to the rail's border instead of being clipped by the
+canvas's scroll.
 
 The rail reads its lenses from the route table it is given and wires each
 lens's shortcut key itself, showing each key as a `KeyboardKey`. It does

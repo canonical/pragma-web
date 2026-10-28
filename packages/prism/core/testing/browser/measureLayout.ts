@@ -125,13 +125,37 @@ export default function measureLayout({
   const rail = layout?.querySelector(":scope > .rail");
   const strip = layout?.querySelector(":scope > .strip");
   const canvasBox = canvas?.getBoundingClientRect();
+  const canvasStyle = canvas === null ? null : getComputedStyle(canvas);
+  const readPaddingBox = (element: Element) => {
+    const box = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      start: box.left + Number.parseFloat(style.borderLeftWidth),
+      end: box.right - Number.parseFloat(style.borderRightWidth),
+    };
+  };
   const bands = [...document.querySelectorAll(bandSelector)].map((band) => {
     const box = band.getBoundingClientRect();
     const style = getComputedStyle(band);
+    let paintedStart = box.left;
+    let paintedEnd = box.right;
+    for (
+      let ancestor = band.parentElement;
+      ancestor !== null;
+      ancestor = ancestor.parentElement
+    ) {
+      if (clippingOverflows.includes(getComputedStyle(ancestor).overflowX)) {
+        const clip = readPaddingBox(ancestor);
+        paintedStart = Math.max(paintedStart, clip.start);
+        paintedEnd = Math.min(paintedEnd, clip.end);
+      }
+    }
     return {
       element: describe(band),
       start: box.left,
       end: box.right,
+      paintedStart,
+      paintedEnd,
       contentStart:
         box.left +
         Number.parseFloat(style.borderLeftWidth) +
@@ -191,7 +215,12 @@ export default function measureLayout({
     },
     edges: {
       railEnd: rail?.getBoundingClientRect().right ?? -1,
-      canvasStart: canvasBox?.left ?? -1,
+      canvasStart:
+        canvasBox === undefined || canvasStyle === null
+          ? -1
+          : canvasBox.left +
+            Number.parseFloat(canvasStyle.borderLeftWidth) +
+            Number.parseFloat(canvasStyle.paddingLeft),
       canvasTop: canvasBox?.top ?? -1,
       stripBottom: strip?.getBoundingClientRect().bottom ?? null,
       rowGap:

@@ -89,7 +89,8 @@ export interface LayoutMeasure {
   };
   /**
    * The layout's edges, in pixels: the inline end of its rail region, the
-   * inline start and the top of its canvas, the bottom of its strip region
+   * inline start of its canvas's content box, which is the canvas's first
+   * column line, the top of its canvas, the bottom of its strip region
    * (null when the layout renders none) and its row gap. An edge is -1
    * when its element is absent.
    */
@@ -102,12 +103,16 @@ export interface LayoutMeasure {
   };
   /**
    * Each band of `bandSelector`, in pixels: its border box's inline start
-   * and end, and where its content box starts and ends.
+   * and end, the part of that box that is painted, which is the box cut by
+   * the padding box of every ancestor that clips or scrolls its content,
+   * and where its content box starts and ends.
    */
   readonly bands: readonly {
     readonly element: string;
     readonly start: number;
     readonly end: number;
+    readonly paintedStart: number;
+    readonly paintedEnd: number;
     readonly contentStart: number;
     readonly contentEnd: number;
   }[];
