@@ -9,9 +9,10 @@
  *
  * Regenerate: execute `DefinitionsExplorerQuery` at these variables through
  * a Relay environment whose network answers from
- * `createPragmaProvider({ semRoot: null })` in process, over the
- * design-system, code-standards and anatomy-dsl ref packages, and serialise
- * its store with `getStore().getSource().toJSON()`.
+ * `createPragmaProvider()` in process, over the installed ref packages,
+ * serialise its store with `getStore().getSource().toJSON()`, and keep only
+ * the records of the `ds`, `cs` and `anatomy` namespaces: the capture
+ * predates the demand model's `surface` and `design-system-docs` packages.
  */
 
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
