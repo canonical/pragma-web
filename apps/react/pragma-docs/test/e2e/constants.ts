@@ -17,6 +17,17 @@ export const PAGE_SETTLE_MS = 30_000;
 export const WORKSPACE_PATH = "/definitions";
 
 /**
+ * Pages on the workspace archetype: the Definitions explorer, and a term's
+ * page addressed by the term's absolute IRI, whose current crumb is an
+ * identifier with no break opportunity, wider than the strip at a phone's
+ * width.
+ */
+export const WORKSPACE_PATHS = [
+  WORKSPACE_PATH,
+  `/definitions/${encodeURIComponent("http://pragma.canonical.com/codestandards#CodeStandard")}`,
+] as const;
+
+/**
  * The Journeys lens, on the workspace archetype too: its index and a job,
  * both opening on the table, whose rows scroll inside its own region.
  */

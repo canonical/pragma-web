@@ -8,13 +8,18 @@
  * width, measuring it in the light and the dark theme. What is
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
- * viewport or past its region, at 390px too; twelve columns at 1440px and
+ * viewport or past its region, a strip's crumb included, at 390px too,
+ * a strip's trail on one line with its current crumb's text clipped by
+ * the crumb,
+ * on a station's page, a term's page and a station or term addressed by
+ * its absolute IRI; twelve columns at 1440px and
  * four at 390px; a workspace canvas that never scrolls; a document whose
  * only scrolling regions are its canvas and its rail; a canvas that starts
  * one gutter under the strip, or at the viewport's top with no strip, as on
  * the landing and the not-found page, its page then starting one gutter
  * down; a strip whose band runs from the rail's
- * border to the viewport's edge with its content from the canvas's first
+ * border to the viewport's edge, painted over that whole width, with its
+ * content from the canvas's first
  * column line to its last; and every gap, padding and margin of the chrome
  * a multiple of 4px. The station index is measured in both its views, the
  * cards of the station and line indexes reaching the canvas's end, and
@@ -40,6 +45,8 @@ import {
   INDEX_CARD_SELECTOR,
   LONG_FIELD_NAME,
   PAGE_SETTLE_MS,
+  STATION_IRI_PATH,
+  TERM_IRI_PATH,
   WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
 } from "./constants.js";
@@ -53,13 +60,15 @@ const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
 
 /**
  * Pages on the document archetype: the station index in both its views and
- * a station's page, under their lens's strip, and the landing and the
- * not-found page, which have no strip.
+ * a station's page, under their lens's strip, by its compact address and by
+ * its absolute IRI, whose crumb is wider than the strip at a phone's width,
+ * and the landing and the not-found page, which have no strip.
  */
 const DOCUMENT_PATHS = [
   "/stations",
   "/stations?view=cards",
   STATION_PATH,
+  STATION_IRI_PATH,
   "/",
   "/not-found",
 ] as const;
@@ -121,6 +130,13 @@ function measureFieldKeys(): {
     plain: keys.filter((key) => !key.querySelector(".inherited")).map(heightOf),
   };
 }
+
+/**
+ * Pages on the workspace archetype: the Definitions explorer, and a term's
+ * page addressed by its absolute IRI, whose crumb is wider than the strip
+ * at a phone's width.
+ */
+const WORKSPACE_PATHS = [WORKSPACE_PATH, TERM_IRI_PATH];
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -238,6 +254,15 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
           layout.page.innerWidth,
           1,
         );
+        // Painted over that whole width: nothing clips the bleed.
+        expect(band.paintedStart, `${theme} ${band.element}`).toBeCloseTo(
+          edges.railEnd,
+          1,
+        );
+        expect(band.paintedEnd, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
         expect(band.contentStart, `${theme} ${band.element}`).toBeCloseTo(
           edges.canvasStart,
           1,
@@ -247,6 +272,14 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
           1,
         );
       }
+      // A lens's trail keeps to one line, its current crumb's text painted
+      // no further than the trail's end, clipped by the crumb itself.
+      for (const trail of layout.trails) {
+        expect(trail.rows, `${theme} ${trail.element}`).toBe(1);
+        expect(trail.textEnd, `${theme} ${trail.element}`).toBeLessThanOrEqual(
+          trail.end + WIDTH_TOLERANCE_PX,
+        );
+      }
       expect(
         layout.offGrid,
         `${theme} spacing histogram: ${JSON.stringify(layout.histogram)}`,
@@ -254,30 +287,33 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   };
 
-  it("lays the workspace on the one grid with a canvas that never scrolls", async () => {
-    const measures = await measure(WORKSPACE_PATH);
-    expectGrid(measures);
-    for (const { theme, measure: layout } of measures) {
-      expect(layout.canvas.overflow, theme).toBe("hidden");
-      expect(layout.canvas.scrollHeight, theme).toBe(
-        layout.canvas.clientHeight,
-      );
-      expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
-      // The Definitions lens gives its workspace an inspector: a region
-      // that scrolls on its own from three groups of columns, a drawer
-      // behind its trigger below them.
-      expect(layout.regionOverflow.inspector, theme).toBe("auto");
-      expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
-      // The page never scrolls, a phone's included: below one group of
-      // columns the class graph's rows scroll inside the explorer's well,
-      // under the strip and the rail's search, as every region of the
-      // workspace scrolls on its own; above it the well pans instead.
-      expect(
-        layout.scrollers.includes("div.ds.hierarchy-well.explorer-well"),
-        theme,
-      ).toBe(viewport.width < 448);
-    }
-  });
+  it.each(WORKSPACE_PATHS)(
+    "lays the workspace at %s on the one grid with a canvas that never scrolls",
+    async (path) => {
+      const measures = await measure(path);
+      expectGrid(measures);
+      for (const { theme, measure: layout } of measures) {
+        expect(layout.canvas.overflow, theme).toBe("hidden");
+        expect(layout.canvas.scrollHeight, theme).toBe(
+          layout.canvas.clientHeight,
+        );
+        expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
+        // The Definitions lens gives its workspace an inspector: a region
+        // that scrolls on its own from three groups of columns, a drawer
+        // behind its trigger below them.
+        expect(layout.regionOverflow.inspector, theme).toBe("auto");
+        expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
+        // The page never scrolls, a phone's included: below one group of
+        // columns the class graph's rows scroll inside the explorer's well,
+        // under the strip and the rail's search, as every region of the
+        // workspace scrolls on its own; above it the well pans instead.
+        expect(
+          layout.scrollers.includes("div.ds.hierarchy-well.explorer-well"),
+          theme,
+        ).toBe(viewport.width < 448);
+      }
+    },
+  );
 
   it.each(DOCUMENT_PATHS)(
     "lays the document at %s on the one grid, scrolling only its canvas and its rail",

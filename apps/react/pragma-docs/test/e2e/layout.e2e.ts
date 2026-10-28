@@ -7,8 +7,11 @@
  * width, measuring it in the light and the dark theme. What is asserted is
  * what the layout promises: one intrinsic grid, the shell, which is the one
  * query container; no page scroll, and nothing reaching past the viewport
- * or past its region, and nothing in the strip scrolling sideways, at
- * 390px too; twelve columns at 1440px and four at 390px; a workspace canvas
+ * or past its region, a strip's crumb included, a strip's trail on one
+ * line with its current crumb's text clipped by the crumb, and nothing in
+ * the strip scrolling sideways, at 390px too, on a term's page and a standard's page
+ * whose crumbs are absolute IRIs; twelve columns at 1440px and four at
+ * 390px; a workspace canvas
  * that never scrolls; a document whose only scrolling regions are its
  * canvas and its rail, and whose page's first element spans the whole main
  * column; a catalog whose cards fill their rows and stay inside the
@@ -17,7 +20,8 @@
  * gutter under the strip, or at the viewport's top with no strip, its
  * page then starting one gutter down; bands,
  * the strip's and the colophon's, that run from the rail's border to the
- * viewport's edge with their content from the canvas's first column line
+ * viewport's edge, painted over that whole width, with their content from
+ * the canvas's first column line
  * to its last;
  * every gap, padding and margin of the chrome a multiple of 4px; and the
  * workspace drawn in the face it ships, the dev cell delivering its font.
@@ -47,6 +51,7 @@ import {
   STANDARDS_INDEX_ROW_SELECTOR,
   WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
+  WORKSPACE_PATHS,
 } from "./constants.js";
 import { type RunningServer, startServer } from "./serverHarness.js";
 
@@ -233,6 +238,15 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
           layout.page.innerWidth,
           1,
         );
+        // Painted over that whole width: nothing clips the bleed.
+        expect(band.paintedStart, `${theme} ${band.element}`).toBeCloseTo(
+          edges.railEnd,
+          1,
+        );
+        expect(band.paintedEnd, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
         expect(band.contentStart, `${theme} ${band.element}`).toBeCloseTo(
           edges.canvasStart,
           1,
@@ -240,6 +254,14 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         expect(band.contentEnd, `${theme} ${band.element}`).toBeCloseTo(
           layout.page.innerWidth,
           1,
+        );
+      }
+      // A lens's trail keeps to one line, its current crumb's text painted
+      // no further than the trail's end, clipped by the crumb itself.
+      for (const trail of layout.trails) {
+        expect(trail.rows, `${theme} ${trail.element}`).toBe(1);
+        expect(trail.textEnd, `${theme} ${trail.element}`).toBeLessThanOrEqual(
+          trail.end + WIDTH_TOLERANCE_PX,
         );
       }
       expect(
@@ -282,30 +304,33 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   });
 
-  it("lays the workspace on the one grid with a canvas that never scrolls", async () => {
-    const measures = await measure(WORKSPACE_PATH);
-    expectGrid(measures);
-    for (const { theme, measure: layout } of measures) {
-      expect(layout.canvas.overflow, theme).toBe("hidden");
-      expect(layout.canvas.scrollHeight, theme).toBe(
-        layout.canvas.clientHeight,
-      );
-      expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
-      // The Definitions lens gives its workspace an inspector: a region
-      // that scrolls on its own from three groups of columns, a drawer
-      // behind its trigger below them.
-      expect(layout.regionOverflow.inspector, theme).toBe("auto");
-      expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
-      // The page never scrolls, a phone's included: below one group of
-      // columns the class graph's rows scroll inside the explorer's well,
-      // under the strip and the rail's search, as every region of the
-      // workspace scrolls on its own; above it the well pans instead.
-      expect(
-        layout.scrollers.includes("div.ds.hierarchy-well.explorer-well"),
-        theme,
-      ).toBe(viewport.width < 448);
-    }
-  });
+  it.each(WORKSPACE_PATHS)(
+    "lays the workspace at %s on the one grid with a canvas that never scrolls",
+    async (path) => {
+      const measures = await measure(path);
+      expectGrid(measures);
+      for (const { theme, measure: layout } of measures) {
+        expect(layout.canvas.overflow, theme).toBe("hidden");
+        expect(layout.canvas.scrollHeight, theme).toBe(
+          layout.canvas.clientHeight,
+        );
+        expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
+        // The Definitions lens gives its workspace an inspector: a region
+        // that scrolls on its own from three groups of columns, a drawer
+        // behind its trigger below them.
+        expect(layout.regionOverflow.inspector, theme).toBe("auto");
+        expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
+        // The page never scrolls, a phone's included: below one group of
+        // columns the class graph's rows scroll inside the explorer's well,
+        // under the strip and the rail's search, as every region of the
+        // workspace scrolls on its own; above it the well pans instead.
+        expect(
+          layout.scrollers.includes("div.ds.hierarchy-well.explorer-well"),
+          theme,
+        ).toBe(viewport.width < 448);
+      }
+    },
+  );
 
   it.each(JOURNEYS_PATHS)(
     "lays the journeys at %s on the workspace, the table scrolling in its own region",

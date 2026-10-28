@@ -37,6 +37,7 @@ export const ARCHETYPE_VIEWPORTS = [
 export const COMPONENT_STYLESHEETS = [
   "Canvas",
   "DocumentLayout",
+  "LensBreadcrumbs",
   "ModeStrip",
   "WorkspaceLayout",
 ] as const;
@@ -50,6 +51,24 @@ export const SKIP_LINK_STYLESHEET =
   "dist/esm/lib/_work_in_progress/SkipLink/styles.css";
 
 /**
+ * The published Breadcrumbs' stylesheets, within
+ * `@canonical/react-ds-global`: the list and its items, which a site loads
+ * before `LensBreadcrumbs`' own, as the component's imports order them.
+ */
+export const BREADCRUMBS_STYLESHEETS = [
+  "dist/esm/lib/component/Breadcrumbs/styles.css",
+  "dist/esm/lib/component/Breadcrumbs/common/Item/styles.css",
+] as const;
+
+/**
+ * An absolute IRI, the current crumb of an entity page whose address has
+ * no prefix: an identifier with no break opportunity, wider than the strip
+ * at a phone's width.
+ */
+export const ABSOLUTE_IRI =
+  "http://pragma.canonical.com/codestandards#code.api.stability";
+
+/**
  * The site-level rules a shell carries: the intrinsic grid's narrow column
  * floor and the shell's own grid, the one query container.
  */
@@ -61,3 +80,9 @@ body { margin: 0; }
 
 /** How far the canvas is scrolled to see that the aside moves with it. */
 export const SCROLL_PX = 400;
+
+/**
+ * The class of the band a document's page draws at its top, such as a
+ * region's rule, which bleeds across the gutter to the rail's border.
+ */
+export const PAGE_BAND_CLASS_NAME = "page-band";

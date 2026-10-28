@@ -15,14 +15,25 @@
  * the viewport's top, that a page's tiles fill their rows to the canvas's
  * end, that the strip's and the colophon's bands run from the rail's
  * border to the viewport's edge with their content between the canvas's
- * first column line and its last, and that nothing reaches past the
- * viewport.
+ * first column line and its last, painted over that whole width, that a
+ * band of a document's page that bleeds across the gutter is painted to
+ * the rail's border rather than clipped by the canvas's scroll, that a
+ * breadcrumb wider than the strip stays on one line and ends in an
+ * ellipsis inside it, its text clipped by its own crumb, and that
+ * nothing reaches past the viewport.
  */
 
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  createMemoryAdapter,
+  createRouter,
+  type RouteMap,
+  route,
+} from "@canonical/router-core";
+import { RouterProvider } from "@canonical/router-react";
 import type { Browser, Page } from "playwright";
 import type { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
@@ -30,6 +41,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   CANVAS_PAGE_TILE_CLASS_NAME,
   DocumentLayout,
+  LensBreadcrumbs,
   ModeStrip,
   WorkspaceLayout,
 } from "../../src/lib/ui/index.js";
@@ -42,8 +54,11 @@ import {
   measureLayout,
 } from "../../testing/browser/index.js";
 import {
+  ABSOLUTE_IRI,
   ARCHETYPE_VIEWPORTS,
+  BREADCRUMBS_STYLESHEETS,
   COMPONENT_STYLESHEETS,
+  PAGE_BAND_CLASS_NAME,
   SCROLL_PX,
   SHELL_RULES,
   SKIP_LINK_STYLESHEET,
@@ -101,6 +116,9 @@ function readStylesheets(): string {
     join(styles, "src", "spacing.css"),
     join(styles, "src", "grid.css"),
     require.resolve(`@canonical/react-ds-global/${SKIP_LINK_STYLESHEET}`),
+    ...BREADCRUMBS_STYLESHEETS.map((name) =>
+      require.resolve(`@canonical/react-ds-global/${name}`),
+    ),
     ...COMPONENT_STYLESHEETS.map((name) =>
       join(UI_DIRECTORY, name, "styles.css"),
     ),
@@ -125,6 +143,25 @@ const workspaceLayout = (
   </WorkspaceLayout>
 );
 
+/**
+ * A band of the page, such as a region's top rule: a hairline that bleeds
+ * across the gutter at its start to meet the rail's border, its content
+ * put back on the canvas's first column line by the same padding.
+ */
+const pageBand = (
+  <div
+    className={PAGE_BAND_CLASS_NAME}
+    style={{
+      marginInlineStart: "calc(-1 * var(--grid-gutter))",
+      paddingInlineStart: "var(--grid-gutter)",
+      borderBlockStartWidth: "1px",
+      borderBlockStartStyle: "solid",
+    }}
+  >
+    Region
+  </div>
+);
+
 /** A document long enough to scroll, with an aside taller than the viewport. */
 const documentLayout = (
   <DocumentLayout
@@ -140,6 +177,7 @@ const documentLayout = (
     strip={<ModeStrip context="Document" />}
   >
     <div>
+      {pageBand}
       {PARAGRAPHS.map((text) => (
         <p key={text}>{text}</p>
       ))}
@@ -165,6 +203,42 @@ const striplessDocumentLayout = (
   >
     <p>Page</p>
   </DocumentLayout>
+);
+
+/** The routes the trail's lens crumb links back to. */
+const TRAIL_ROUTES: RouteMap = {
+  standards: route({ url: "/standards", content: () => null }),
+};
+
+/**
+ * A document whose strip carries the trail to an entity addressed by an
+ * absolute IRI, under the router the trail links through.
+ */
+const trailDocumentLayout = (
+  <RouterProvider
+    router={createRouter(TRAIL_ROUTES, {
+      adapter: createMemoryAdapter(
+        `/standards/${encodeURIComponent(ABSOLUTE_IRI)}`,
+      ),
+    })}
+  >
+    <DocumentLayout
+      rail={<nav aria-label="Rail">Rail</nav>}
+      strip={
+        <ModeStrip
+          context={
+            <LensBreadcrumbs
+              current={ABSOLUTE_IRI}
+              lensLabel="Standards"
+              lensRouteName="standards"
+            />
+          }
+        />
+      }
+    >
+      <p>Page</p>
+    </DocumentLayout>
+  </RouterProvider>
 );
 
 /** Items enough to fill several rows of tiles at every width. */
@@ -297,9 +371,9 @@ function countReachableAsideEntries(page: Page) {
 
 /**
  * Assert every band of a measured layout runs from the rail's border to
- * the viewport's edge, its content starting where the canvas starts and
- * ending on the last column line, the viewport's edge on a shell with no
- * outer margin.
+ * the viewport's edge and is painted over that whole width, its content
+ * starting where the canvas's columns start and ending on the last column
+ * line, the viewport's edge on a shell with no outer margin.
  */
 function expectBands(
   measure: LayoutMeasure,
@@ -310,6 +384,11 @@ function expectBands(
   for (const band of measure.bands) {
     expect(band.start, band.element).toBeCloseTo(measure.edges.railEnd, 1);
     expect(band.end, band.element).toBeCloseTo(width, 1);
+    expect(band.paintedStart, band.element).toBeCloseTo(
+      measure.edges.railEnd,
+      1,
+    );
+    expect(band.paintedEnd, band.element).toBeCloseTo(width, 1);
     expect(band.contentStart, band.element).toBeCloseTo(
       measure.edges.canvasStart,
       1,
@@ -420,9 +499,79 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       }
       expectBands(measure, viewport.width, 2);
 
+      // A band of the page bleeds inside the canvas's scroll, so it is
+      // painted from the rail's border, its content on the canvas's first
+      // column line.
+      const pageMeasure = await page.evaluate(measureLayout, {
+        ...MEASURE_OPTIONS,
+        bandSelector: `.${PAGE_BAND_CLASS_NAME}`,
+      });
+      const [pageBandMeasure] = pageMeasure.bands;
+      expect(pageMeasure.bands).toHaveLength(1);
+      expect(pageBandMeasure?.paintedStart).toBeCloseTo(
+        pageMeasure.edges.railEnd,
+        1,
+      );
+      expect(pageBandMeasure?.contentStart).toBeCloseTo(
+        pageMeasure.edges.canvasStart,
+        1,
+      );
+      expect(pageMeasure.edges.canvasStart).toBeCloseTo(
+        before.page?.left ?? -1,
+        1,
+      );
+
       // The colophon takes a row of its own, one gutter under the canvas.
       expect(before.rows).toBe(3);
       expect(before.canvas?.bottom).toBeLessThan(viewport.height);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("ends a crumb wider than the strip in an ellipsis inside the strip", async () => {
+    const page = await open(trailDocumentLayout);
+    try {
+      const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
+      expect(measure.overflow).toEqual([]);
+      // One line: the lens crumb and the current crumb share a row, and the
+      // current crumb's text is painted no further than the trail's end,
+      // clipped by the crumb itself, not by the strip.
+      expect(measure.trails).toHaveLength(1);
+      const [trail] = measure.trails;
+      expect(trail?.rows).toBe(1);
+      expect(trail?.textEnd).toBeGreaterThan(0);
+      expect(trail?.textEnd).toBeLessThanOrEqual((trail?.end ?? 0) + 0.5);
+      const crumb = await page.evaluate(() => {
+        const text = document.querySelector(
+          '.ds.lens-breadcrumbs .link[aria-current="page"]',
+        );
+        const band = document.querySelector(".ds.mode-strip");
+        if (text === null || band === null) return null;
+        return {
+          right: text.getBoundingClientRect().right,
+          bandEnd: band.getBoundingClientRect().right,
+          truncated: text.scrollWidth > text.clientWidth,
+          textOverflow: getComputedStyle(text).textOverflow,
+          lensWidth:
+            document
+              .querySelector(".ds.lens-breadcrumbs .breadcrumbs-item > a.link")
+              ?.getBoundingClientRect().width ?? -1,
+          lensContentWidth:
+            document.querySelector(
+              ".ds.lens-breadcrumbs .breadcrumbs-item > a.link",
+            )?.scrollWidth ?? -1,
+        };
+      });
+      expect(crumb).not.toBeNull();
+      expect(crumb?.right).toBeLessThanOrEqual((crumb?.bandEnd ?? 0) + 0.5);
+      expect(crumb?.textOverflow).toBe("ellipsis");
+      // At a phone's width the IRI is wider than the strip: it is cut at
+      // the crumb's end, and the lens crumb keeps its whole label.
+      expect(crumb?.truncated).toBe(viewport.width < 448);
+      expect(crumb?.lensWidth).toBeGreaterThanOrEqual(
+        (crumb?.lensContentWidth ?? 0) - 0.5,
+      );
     } finally {
       await page.close();
     }
@@ -462,8 +611,18 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
           const rect = element?.getBoundingClientRect();
           return { left: rect?.left ?? -1, right: rect?.right ?? -1 };
         };
+        // The canvas's columns are its content box: its padding puts them
+        // back on their lines after its box bleeds across the gutter.
+        const columns = (element: Element | null) => {
+          const { left, right } = box(element);
+          const style = element === null ? null : getComputedStyle(element);
+          return {
+            left: left + Number.parseFloat(style?.paddingLeft ?? "0"),
+            right: right - Number.parseFloat(style?.paddingRight ?? "0"),
+          };
+        };
         return {
-          canvas: box(document.querySelector("main.ds.canvas")),
+          canvas: columns(document.querySelector("main.ds.canvas")),
           tiles: [...document.querySelectorAll(selector)].map((tile) => ({
             ...box(tile),
             column: `${getComputedStyle(tile).gridColumnStart} / ${getComputedStyle(tile).gridColumnEnd}`,

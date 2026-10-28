@@ -13,7 +13,15 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  * it, such as a code block that scrolls sideways, never by a region or the
  * shell. The frame excuses nothing: an element of the strip that scrolls
  * sideways is itself an overflow, since the controls it cuts can only be
- * reached by scrolling a strip a phone's width wide.
+ * reached by scrolling a strip a phone's width wide, and an element of the
+ * strip that reaches past the viewport is one even where an ancestor clips
+ * it, since a crumb cut off at the strip's end loses its text without a
+ * sign: what the strip holds must shrink inside it.
+ *
+ * A lens's breadcrumb trail is read for the rows its crumbs take and for
+ * where its current crumb's text is painted: the text's own extent, cut by
+ * every element of the trail that clips it, so a text that runs past its
+ * crumb unclipped shows even where the strip would hide it.
  *
  * The chrome's spacing excludes what resolves to a measure rather than a
  * choice: an auto margin, which takes the free space, and the typography
@@ -21,7 +29,7 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  *
  * @param options - The selectors, the spacing step and the overflow rules.
  * @returns The page's grids, scrollers, overflow, canvas page, edges,
- *   bands and spacing.
+ *   bands, trails and spacing.
  * @note Impure: reads the page's document and its computed styles.
  */
 export default function measureLayout({
@@ -49,7 +57,9 @@ export default function measureLayout({
 
   const shell = document.querySelector(".ds.shell");
   const regions = new Set(document.querySelectorAll(regionSelector));
+  const frames = [...document.querySelectorAll(frameSelector)];
   const isExcused = (element: Element): boolean => {
+    if (frames.some((frame) => frame.contains(element))) return false;
     for (
       let ancestor = element.parentElement;
       ancestor !== null && ancestor !== shell;
@@ -125,13 +135,37 @@ export default function measureLayout({
   const rail = layout?.querySelector(":scope > .rail");
   const strip = layout?.querySelector(":scope > .strip");
   const canvasBox = canvas?.getBoundingClientRect();
+  const canvasStyle = canvas === null ? null : getComputedStyle(canvas);
+  const readPaddingBox = (element: Element) => {
+    const box = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      start: box.left + Number.parseFloat(style.borderLeftWidth),
+      end: box.right - Number.parseFloat(style.borderRightWidth),
+    };
+  };
   const bands = [...document.querySelectorAll(bandSelector)].map((band) => {
     const box = band.getBoundingClientRect();
     const style = getComputedStyle(band);
+    let paintedStart = box.left;
+    let paintedEnd = box.right;
+    for (
+      let ancestor = band.parentElement;
+      ancestor !== null;
+      ancestor = ancestor.parentElement
+    ) {
+      if (clippingOverflows.includes(getComputedStyle(ancestor).overflowX)) {
+        const clip = readPaddingBox(ancestor);
+        paintedStart = Math.max(paintedStart, clip.start);
+        paintedEnd = Math.min(paintedEnd, clip.end);
+      }
+    }
     return {
       element: describe(band),
       start: box.left,
       end: box.right,
+      paintedStart,
+      paintedEnd,
       contentStart:
         box.left +
         Number.parseFloat(style.borderLeftWidth) +
@@ -142,6 +176,38 @@ export default function measureLayout({
         Number.parseFloat(style.paddingRight),
     };
   });
+
+  const trails = [...document.querySelectorAll(".ds.lens-breadcrumbs")].map(
+    (trail) => {
+      const itemTops = new Set(
+        [...trail.querySelectorAll(".breadcrumbs-item")].map((item) =>
+          Math.round(item.getBoundingClientRect().top),
+        ),
+      );
+      const current = trail.querySelector('.link[aria-current="page"]');
+      let textEnd = -1;
+      if (current !== null) {
+        const range = document.createRange();
+        range.selectNodeContents(current);
+        textEnd = range.getBoundingClientRect().right;
+        for (
+          let element: Element | null = current;
+          element !== null && trail.contains(element);
+          element = element.parentElement
+        ) {
+          if (clippingOverflows.includes(getComputedStyle(element).overflowX)) {
+            textEnd = Math.min(textEnd, readPaddingBox(element).end);
+          }
+        }
+      }
+      return {
+        element: describe(trail),
+        rows: itemTops.size,
+        textEnd,
+        end: trail.getBoundingClientRect().right,
+      };
+    },
+  );
 
   const histogram: Record<string, number> = {};
   const offGrid: string[] = [];
@@ -195,7 +261,12 @@ export default function measureLayout({
     },
     edges: {
       railEnd: rail?.getBoundingClientRect().right ?? -1,
-      canvasStart: canvasBox?.left ?? -1,
+      canvasStart:
+        canvasBox === undefined || canvasStyle === null
+          ? -1
+          : canvasBox.left +
+            Number.parseFloat(canvasStyle.borderLeftWidth) +
+            Number.parseFloat(canvasStyle.paddingLeft),
       canvasTop: canvasBox?.top ?? -1,
       stripBottom: strip?.getBoundingClientRect().bottom ?? null,
       triggerBottom:
@@ -208,6 +279,7 @@ export default function measureLayout({
           : Number.parseFloat(getComputedStyle(layout).rowGap),
     },
     bands,
+    trails,
     regionOverflow: {
       rail: readOverflow(
         ":is(.ds.workspace-layout, .ds.document-layout) > .rail",

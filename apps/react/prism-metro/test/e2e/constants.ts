@@ -44,5 +44,21 @@ export const CARDS_PATHS = [
 /** Every card of an index's cards view. */
 export const INDEX_CARD_SELECTOR = ".ds.entity-list .ds.entity-card";
 
-/** How far a measured edge may round from the edge it meets, in pixels. */
+/**
+ * A term's page on the workspace archetype, addressed by the term's
+ * absolute IRI: the trail's current crumb is an identifier with no break
+ * opportunity, wider than the strip at a phone's width.
+ */
+export const TERM_IRI_PATH = `/definitions/${encodeURIComponent("http://www.w3.org/2000/01/rdf-schema#Class")}`;
+
+/**
+ * A station's page addressed by its absolute IRI, whose current crumb is
+ * wider than the strip at a phone's width.
+ */
+export const STATION_IRI_PATH = `/stations/${encodeURIComponent("https://metro.example/onto#northgate")}`;
+
+/**
+ * How far past another edge, in pixels, an edge may round: sub-pixel
+ * layout rounds each box on its own.
+ */
 export const WIDTH_TOLERANCE_PX = 0.5;

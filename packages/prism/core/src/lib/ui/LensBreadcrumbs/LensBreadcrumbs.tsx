@@ -59,6 +59,11 @@ const createLensLinkComponent =
  * unchanged (the component's own contract: Canonical products must use
  * both), so this feeds plain `items` plus the router `LinkComponent`.
  *
+ * The trail stays on one line within the width its socket gives it: the
+ * current crumb may shrink below its text, which ends in an ellipsis, so
+ * an identifier with no break opportunity, such as an absolute IRI, never
+ * reaches past the strip; the lens crumb keeps its whole label.
+ *
  * `import { LensBreadcrumbs } from "@canonical/prism-core";`
  *
  * @implements prism.component.lens_breadcrumbs

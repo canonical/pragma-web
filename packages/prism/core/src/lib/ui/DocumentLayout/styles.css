@@ -54,11 +54,18 @@
     gap: var(--document-layout-gap);
   }
 
-  /* The one region that scrolls the document, the aside included. */
+  /* The one region that scrolls the document, the aside included. Its
+   * box bleeds across the gutter at its start to meet the rail's border,
+   * and the same padding puts its columns back on their lines: a band of
+   * the page that bleeds one gutter, such as a region's rule, then lies
+   * inside the scroll's padding box and is painted to the rail's border
+   * instead of being clipped at the canvas's first column line. */
   .ds.document-layout > .canvas {
     grid-column: 3 / -1;
     grid-row: 2;
     overflow: auto;
+    margin-inline-start: var(--document-layout-bleed);
+    padding-inline-start: var(--document-layout-gap);
   }
 
   .ds.document-layout:not(:has(> .strip)) > .canvas {

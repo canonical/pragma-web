@@ -66,7 +66,11 @@ export default function hydrateApp(
   return hydrateRoot(
     target,
     <SiteDocument lang={target.documentElement.lang} theme={initialData?.theme}>
-      <Shell environment={relayEnvironment} router={router} />
+      <Shell
+        environment={relayEnvironment}
+        router={router}
+        theme={initialData?.theme}
+      />
     </SiteDocument>,
     options,
   );

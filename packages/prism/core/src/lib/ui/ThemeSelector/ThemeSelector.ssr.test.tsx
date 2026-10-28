@@ -2,6 +2,7 @@
 
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { StoredThemeProvider } from "../../theme/index.js";
 import ThemeSelector from "./ThemeSelector.js";
 
 describe("ThemeSelector SSR", () => {
@@ -13,4 +14,26 @@ describe("ThemeSelector SSR", () => {
       expect(html).toContain(`value="${value}"`);
     }
   });
+
+  it("server-renders system selected when the request stores no theme", () => {
+    const html = renderToString(
+      <StoredThemeProvider>
+        <ThemeSelector />
+      </StoredThemeProvider>,
+    );
+    expect(html).toContain('<option value="system" selected="">');
+  });
+
+  it.each(["light", "dark"] as const)(
+    "server-renders the %s theme the request's cookie stores as selected",
+    (theme) => {
+      const html = renderToString(
+        <StoredThemeProvider theme={theme}>
+          <ThemeSelector />
+        </StoredThemeProvider>,
+      );
+      expect(html).toContain(`<option value="${theme}" selected="">`);
+      expect(html).not.toContain('<option value="system" selected="">');
+    },
+  );
 });

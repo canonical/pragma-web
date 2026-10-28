@@ -254,3 +254,22 @@ describe("EntryServer's document element", () => {
     expect(html).toMatch(/^<html class="docs comfortable"/);
   });
 });
+
+describe("EntryServer's theme control", () => {
+  it.each(["light", "dark"] as const)(
+    "shows the %s theme the reader's cookie stores as selected",
+    async (theme) => {
+      const html = renderToString(
+        <EntryServer initialData={{ url: "/nowhere", theme }} />,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(html).toContain(`<option value="${theme}" selected="">`);
+      expect(html).not.toContain('<option value="system" selected="">');
+    },
+  );
+
+  it("shows system selected while no theme is stored", async () => {
+    const html = await renderColdAndSettle("/nowhere");
+    expect(html).toContain('<option value="system" selected="">');
+  });
+});

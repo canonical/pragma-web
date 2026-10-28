@@ -47,6 +47,20 @@ describe("EntryServer", () => {
     );
   });
 
+  it.each(["light", "dark"] as const)(
+    "shows the %s theme the reader's cookie stores as selected in the theme control",
+    async (theme) => {
+      const html = await renderAndSettle({ url: "/not-found", theme });
+      expect(html).toContain(`<option value="${theme}" selected="">`);
+      expect(html).not.toContain('<option value="system" selected="">');
+    },
+  );
+
+  it("shows system selected in the theme control while no theme is stored", async () => {
+    const html = await renderAndSettle({ url: "/not-found" });
+    expect(html).toContain('<option value="system" selected="">');
+  });
+
   it("renders / when the renderer hands it no initial data", async () => {
     // The root is the landing.
     const html = renderToString(<EntryServer />);
