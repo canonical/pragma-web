@@ -17,7 +17,9 @@
  *
  * The pragma CLI's refs cache (`pragma sources update`) stays available as an
  * override, through `PRAGMA_REFS_DIR` or the `refsRoot` option, for work
- * against ontology branches that are not published yet. Its layout differs
+ * against ontology branches that are not published yet. It replaces where the
+ * packages are read from, never which packages the graph holds: a cache that
+ * lacks a package of the demand model is refused. Its layout differs
  * from a package's (`<package>/main/{definitions,data}` rather than
  * `<package>/{definitions,data}`), which is why resolution produces a list of
  * {@link RefRoot}s rather than one root directory: the collector never needs
@@ -28,6 +30,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  DEMAND_MODEL_PACKAGES,
   REF_NAME,
   REF_PACKAGES,
   REF_SCOPE,
@@ -109,14 +112,25 @@ export const installedRefRoots = (
  * The ref packages as the pragma CLI caches them: `<refsRoot>/<package>/main`.
  *
  * Throws when the cache root itself is missing, with the remedy in the
- * message. A package absent from an existing cache is tolerated (it is the
- * state a partially populated cache is in) and contributes nothing; the
- * collector reports the case where nothing at all was found.
+ * message, and when the cache lacks a package of the demand model
+ * ({@link DEMAND_MODEL_PACKAGES}), naming the package: the demand model is in
+ * every graph, so a cache without it is an incomplete cache, not a smaller
+ * graph. A published package absent from an existing cache is tolerated (it
+ * is the state a partially populated cache is in) and contributes nothing;
+ * the collector reports the case where nothing at all was found.
  */
 export const cacheRefRoots = (refsRoot: string): RefRoot[] => {
   if (!existsSync(refsRoot)) {
     throw new Error(
       `pragma refs cache not found at ${refsRoot} — run \`pragma sources update\` (or set PRAGMA_REFS_DIR).`,
+    );
+  }
+  const missing = DEMAND_MODEL_PACKAGES.find(
+    (pkg) => !existsSync(join(refsRoot, pkg, REF_NAME)),
+  );
+  if (missing !== undefined) {
+    throw new Error(
+      `${REF_SCOPE}/${missing} is missing from the pragma refs cache at ${refsRoot} — link the shim from packages/prism/semantics/${missing} as ${missing}/${REF_NAME}: the demand model is in every graph.`,
     );
   }
   return withVersions(

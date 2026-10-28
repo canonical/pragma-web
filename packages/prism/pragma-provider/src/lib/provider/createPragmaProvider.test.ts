@@ -226,11 +226,11 @@ describe("search index", () => {
     await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
     const infos = info.mock.calls.map((call) => String(call.at(0)));
     info.mockRestore();
-    // Five components, three classes from the design system and `sur:Job`
-    // from the surface ontology; the properties the graph types are left
-    // out.
+    // Five components, three classes from the design system, `sur:Job`
+    // from the surface ontology and the one job of the docs site's demand
+    // model; the properties the graph types are left out.
     expect(infos.join("\n")).toContain(
-      "2 prose sidecars bound, 9 nodes indexed for search",
+      "2 prose sidecars bound, 10 nodes indexed for search",
     );
   });
 });

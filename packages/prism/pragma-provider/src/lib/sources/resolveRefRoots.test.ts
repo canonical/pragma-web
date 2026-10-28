@@ -10,7 +10,13 @@
 // `bun install`.
 // =============================================================================
 
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it, vi } from "vitest";
@@ -142,13 +148,30 @@ describe("cacheRefRoots", () => {
     );
   });
 
-  it("tolerates a package absent from an existing cache", () => {
+  it("tolerates a published package absent from an existing cache", () => {
     // `code-standards` is not in the corpus; the entry is still produced and
     // the collector walks nothing under it. A partially populated cache is
     // the state a cache is actually in.
-    expect(cacheRefRoots(CORPUS_EMPTY_REFS_ROOT)).toHaveLength(
-      REF_PACKAGES.length,
+    expect(existsSync(join(CORPUS_REFS_ROOT, "code-standards"))).toBe(false);
+    expect(cacheRefRoots(CORPUS_REFS_ROOT)).toHaveLength(REF_PACKAGES.length);
+  });
+
+  it("refuses a cache without the demand model, naming the package", () => {
+    // The demand model is in every graph: a cache of the published packages
+    // alone is incomplete, never a graph without journeys.
+    expect(() => cacheRefRoots(CORPUS_EMPTY_REFS_ROOT)).toThrow(
+      /@canonical\/surface is missing from the pragma refs cache at /,
     );
+  });
+
+  it("checks every package of the demand model", () => {
+    // A cache holding `surface` but not `design-system-docs` is refused too.
+    const partial = mkdtempSync(join(tmpdir(), "prism-refs-partial-"));
+    mkdirSync(join(partial, "surface", "main"), { recursive: true });
+    expect(() => cacheRefRoots(partial)).toThrow(
+      /@canonical\/design-system-docs is missing from the pragma refs cache at /,
+    );
+    rmSync(partial, { recursive: true, force: true });
   });
 
   it("throws an actionable message when the cache root is missing", () => {

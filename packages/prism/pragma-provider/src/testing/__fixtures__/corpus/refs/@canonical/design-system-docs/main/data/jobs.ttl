@@ -1,0 +1,10 @@
+# The demand model's data, a ref package like the others: one job, an
+# instance of the `Job` class the corpus's `surface` package declares. Its
+# presence is what lets the corpus pass as a refs cache at all, since a cache
+# without the demand model is refused. The subject is a full IRI so the file
+# declares no prefix the corpus's other files do not already declare.
+
+@prefix sur: <sem://surface#> .
+
+<sem://design-system-docs#job.browse> a sur:Job ;
+    sur:jobLabel "Browse the components" .

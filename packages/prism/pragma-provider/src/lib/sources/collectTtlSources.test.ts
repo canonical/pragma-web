@@ -17,7 +17,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
-  CORPUS_EMPTY_REFS_ROOT,
+  CORPUS_EMPTY_REF_ROOTS,
   CORPUS_REFS_ROOT,
 } from "../../testing/corpus.js";
 import { REF_PACKAGES } from "../config/index.js";
@@ -48,6 +48,7 @@ describe("collectTtlSources over the ref packages", () => {
     // fixture nobody is reading; this makes adding one a deliberate act.
     expect(paths).toStrictEqual([
       "anatomy-dsl/definitions/anatomy.ttl",
+      "design-system-docs/data/jobs.ttl",
       "design-system/data/instances.ttl",
       "design-system/data/search.ttl",
       "design-system/data/tokens/colors.ttl",
@@ -74,17 +75,13 @@ describe("collectTtlSources over the ref packages", () => {
     expect(paths).toContain("design-system/data/tokens/colors.ttl");
   });
 
-  it("tolerates a ref package that is not in the cache", () => {
-    // `code-standards` and `design-system-docs` are in REF_PACKAGES and
-    // absent from the corpus — the state a partially-populated cache is
-    // actually in. They contribute nothing and throw nothing.
-    expect(
-      paths.some(
-        (path) =>
-          path.startsWith("code-standards/") ||
-          path.startsWith("design-system-docs/"),
-      ),
-    ).toBe(false);
+  it("tolerates a published ref package that is not in the cache", () => {
+    // `code-standards` is in REF_PACKAGES and absent from the corpus — the
+    // state a partially-populated cache is actually in. It contributes
+    // nothing and throws nothing.
+    expect(paths.some((path) => path.startsWith("code-standards/"))).toBe(
+      false,
+    );
   });
 
   it("escapes channel-dotted references in the content it hands the store", () => {
@@ -97,12 +94,13 @@ describe("collectTtlSources over the ref packages", () => {
 
 describe("collectTtlSources when the roots hold nothing", () => {
   it("throws an actionable message when no root contributes a source", () => {
-    // The cache root exists and is empty: "there but you have not run the
-    // update". The missing-root case is the resolver's to report, in
-    // `resolveRefRoots.test.ts`, before the collector is ever reached.
-    expect(() =>
-      collectTtlSources(cacheRefRoots(CORPUS_EMPTY_REFS_ROOT)),
-    ).toThrow(/no \.ttl sources found under /);
+    // The roots resolve and hold nothing: "there but not populated". A
+    // missing cache root, or a cache without the demand model, is the
+    // resolver's to report, in `resolveRefRoots.test.ts`, before the
+    // collector is ever reached.
+    expect(() => collectTtlSources(CORPUS_EMPTY_REF_ROOTS)).toThrow(
+      /no \.ttl sources found under /,
+    );
   });
 });
 

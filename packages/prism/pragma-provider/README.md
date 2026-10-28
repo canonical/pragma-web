@@ -44,6 +44,7 @@ would delete it from this repo. It is a pinned constant
 | Constant | What it encodes | The upstream fix that deletes it |
 |---|---|---|
 | `REF_PACKAGES` | `design-system`, `code-standards`, `anatomy-dsl`, `surface`, `design-system-docs` — the source packages, declared as dependencies and read from `node_modules`. The first three are published and pinned to exact versions; `surface` and `design-system-docs`, the docsite's own demand model, are private shims in `packages/prism/semantics/`, linked by `bun install` under the names the published packages will have | Publishing the two demand-model packages, which deletes the shims; and a manifest the packages publish themselves, so the list is read rather than hard-coded |
+| `DEMAND_MODEL_PACKAGES` | `surface`, `design-system-docs` — the packages of the demand model, which every graph carries: a refs cache that lacks one is refused, naming it, rather than compiled into a graph without journeys | None: the demand model stays in every graph once its packages are published |
 
 ### The anatomy collision: resolved upstream, still measured here
 
@@ -256,8 +257,9 @@ release that caused it; a private shim names no release and reads as `unversione
 To work against ontology branches that are not published yet, point `PRAGMA_REFS_DIR` (or
 the `refsRoot` option) at a pragma refs cache (`pragma sources update` populates one at
 `~/.cache/pragma/refs/@canonical`); its `<package>/main/{definitions,data}` layout is read
-instead. A cache root that does not exist is an error with the remedy in the message,
-before an Oxigraph store is ever created. A cache must hold the demand model too: link the
-shims into it as `surface/main` and `design-system-docs/main`. A package missing from an
-existing cache is tolerated and contributes nothing, so a cache without them compiles a
-graph without the demand model, and the journeys lens has nothing to show.
+instead. The cache changes where the packages are read from, never which packages the
+graph holds. A cache root that does not exist is an error with the remedy in the message,
+before an Oxigraph store is ever created, and so is a cache without the demand model: link
+the shims into it as `surface/main` and `design-system-docs/main`, or the boot fails naming
+the missing package. A published package missing from an existing cache is tolerated and
+contributes nothing, which is the state a partially populated cache is in.

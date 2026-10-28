@@ -25,11 +25,11 @@ holds 551 tests at 100%.
 | `refs/@canonical/anatomy-dsl/main/definitions/anatomy.ttl` | declares an `anatomy:uri` property, which collides with the compiler's own `uri` key (M005), **and** the `graphql:name "anatomyUri"` annotation the real anatomy DSL resolves it with. The boot test proves the annotation is honoured and that stripping it is fatal |
 | `refs/@canonical/design-system/main/definitions/NOTES.md` | a Markdown note beside Turtle that names no entity. The Turtle collector skips it by extension; the sidecar collector finds it, it binds to nothing, and the boot announces it rather than dropping it silently |
 | `refs/@canonical/surface/main/definitions/surface.ttl` | the demand model's ontology compiles as a ref package like the others: `sem://surface#Job` yields a `Job` type no other package declares |
+| `refs/@canonical/design-system-docs/main/data/jobs.ttl` | the demand model's data merges like any instance data; with `surface`, it is what lets the corpus pass as a refs cache at all, since a cache without the demand model is refused |
 
-`code-standards` and `design-system-docs` are listed in `REF_PACKAGES` but
-**deliberately absent from the corpus**: that is what exercises `walkFiles`'s
-"directory does not exist" return, which is the state a partially-populated
-refs cache is actually in.
+`code-standards` is listed in `REF_PACKAGES` but **deliberately absent from the
+corpus**: that is what exercises `walkFiles`'s "directory does not exist"
+return, which is the state a partially-populated refs cache is actually in.
 
 ## What this corpus is not
 

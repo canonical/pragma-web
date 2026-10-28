@@ -35,14 +35,26 @@ export const REF_SCOPE = "@canonical";
  * {@link REF_SCOPE}. `design-system`, `code-standards` and `anatomy-dsl` are
  * published on npm at exact versions; `surface` and `design-system-docs`, the
  * demand model, are the private shims in `packages/prism/semantics/`. A
- * pragma refs cache (`PRAGMA_REFS_DIR`) can stand in for them all, see
- * `resolveRefRoots.ts`. Each package is named once, which is what keeps the
- * collected paths unique.
+ * pragma refs cache (`PRAGMA_REFS_DIR`) can stand in for them all, provided it
+ * holds the demand model's two packages, see `resolveRefRoots.ts`. Each
+ * package is named once, which is what keeps the collected paths unique.
  */
 export const REF_PACKAGES: readonly string[] = [
   "design-system",
   "code-standards",
   "anatomy-dsl",
+  "surface",
+  "design-system-docs",
+];
+
+/**
+ * The ref packages that hold the demand model, which every graph carries.
+ *
+ * A refs cache that lacks one of them is refused, naming the package, rather
+ * than compiled into a graph without the demand model: what the graph holds is
+ * never decided by which cache a variable points at.
+ */
+export const DEMAND_MODEL_PACKAGES: readonly string[] = [
   "surface",
   "design-system-docs",
 ];
