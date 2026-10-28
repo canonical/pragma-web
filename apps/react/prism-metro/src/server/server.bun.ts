@@ -33,7 +33,11 @@ const PORT = resolvePort();
 // Resolved once, so every request prepares against the same graph.
 const graphqlUrl = resolveGraphqlUrl();
 
+// Bun imports the TypeScript config itself: Vite's bundled config rewrites
+// `import.meta.resolve` through Node's module hooks, which Bun lacks, so the
+// icon middleware could not find the icons.
 const vite = await createViteServer({
+  configLoader: "native",
   server: { middlewareMode: true },
   appType: "custom",
 });
