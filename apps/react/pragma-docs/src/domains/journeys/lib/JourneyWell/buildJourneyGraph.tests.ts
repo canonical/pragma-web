@@ -312,6 +312,19 @@ describe("the role and arrival class mappings", () => {
     expect(classifyArrival(undefined)).toBeUndefined();
   });
 
+  it("maps the snake_case spelling of the terms the same way", () => {
+    // The demand model's own vocabulary names its instances in snake_case
+    // (`surface:primary`, `surface:cold_entry`); the folded spelling is
+    // the same as the PascalCase one's.
+    expect(classifyRole("surface:primary")).toBe(ROLE_PRIMARY_CLASS);
+    expect(classifyRole(`${SURFACE}secondary`)).toBe(ROLE_SECONDARY_CLASS);
+    expect(classifyArrival("surface:cold_entry")).toBe("arrival-coldentry");
+    expect(classifyArrival(`${SURFACE}subject_kept`)).toBe(
+      "arrival-subjectkept",
+    );
+    expect(classifyArrival("surface:no_move")).toBe("arrival-nomove");
+  });
+
   it("decorates nothing for a term whose local name is empty", () => {
     expect(classifyArrival(SURFACE)).toBeUndefined();
     expect(classifyArrival("surface:")).toBeUndefined();

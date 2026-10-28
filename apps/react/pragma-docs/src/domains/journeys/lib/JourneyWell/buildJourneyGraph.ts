@@ -283,20 +283,31 @@ function separateColumns(
 }
 
 /**
+ * Fold a vocabulary term's local name to one spelling: lower case, with
+ * the underscores of a snake_case name removed. The demand model's terms
+ * are spelled in PascalCase (`ColdEntry`) by some graphs and in snake_case
+ * (`cold_entry`) by others, the instance-naming convention of Turtle; both
+ * fold to `coldentry`, so either spelling classifies the same way.
+ */
+const foldTermName = (local: string): string =>
+  local.toLowerCase().replaceAll("_", "");
+
+/**
  * Edge weight from the pairing's role. `PairingRole` is an OBJECT type
  * carrying a URI, not a GraphQL enum, so the mapping is by local name —
  * and an unrecognised role decorates nothing rather than guessing. The
  * demand model's vocabulary terms arrive in TWO forms depending on how the
- * store resolved them — full (`sem://surface#Primary`) or prefixed
- * (`surface:Primary`) — and `readLocalName` reads both.
+ * store resolved them — full (`sem://surface#primary`) or prefixed
+ * (`surface:primary`) — and `readLocalName` reads both; the local name's
+ * case and underscores do not matter (`foldTermName`).
  */
 export const classifyRole = (
   role: string | null | undefined,
 ): string | undefined => {
   if (role == null) return undefined;
-  const local = readLocalName(role);
-  if (local === "Primary") return ROLE_PRIMARY_CLASS;
-  if (local === "Secondary") return ROLE_SECONDARY_CLASS;
+  const term = foldTermName(readLocalName(role));
+  if (term === "primary") return ROLE_PRIMARY_CLASS;
+  if (term === "secondary") return ROLE_SECONDARY_CLASS;
   return undefined;
 };
 
@@ -314,5 +325,5 @@ export const classifyArrival = (
   // An arrival whose local name is empty names no term: the shared reading
   // returns the whole URI then, which ends at its separator.
   if (/[#:]$/.test(local)) return undefined;
-  return `${ARRIVAL_CLASS_PREFIX}${local.toLowerCase()}`;
+  return `${ARRIVAL_CLASS_PREFIX}${foldTermName(local)}`;
 };
