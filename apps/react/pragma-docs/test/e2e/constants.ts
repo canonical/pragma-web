@@ -7,8 +7,16 @@ export const DEV_READY_MS = 90_000;
 /** How long a page may take to settle once it is requested. */
 export const PAGE_SETTLE_MS = 30_000;
 
-/** A page on the workspace archetype: the Definitions explorer. */
-export const WORKSPACE_PATH = "/definitions";
+/**
+ * Pages on the workspace archetype: the Definitions explorer, and a term's
+ * page addressed by the term's absolute IRI, whose current crumb is an
+ * identifier with no break opportunity, wider than the strip at a phone's
+ * width.
+ */
+export const WORKSPACE_PATHS = [
+  "/definitions",
+  `/definitions/${encodeURIComponent("http://pragma.canonical.com/codestandards#CodeStandard")}`,
+] as const;
 
 /**
  * Pages on the document archetype: the lobby, whose canvas scrolls at a
