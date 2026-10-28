@@ -5,7 +5,7 @@
  * its own process, the dev cell pointed at it, and Chromium reading a page.
  * What is asserted is what the dev cell owes a reader besides the page: the
  * design system's icons draw, the glyph of the side panel's close button
- * among them.
+ * among them, and the live-reload client reaches its own server.
  */
 import {
   launchBrowser,
@@ -13,6 +13,7 @@ import {
 } from "@canonical/prism-core/testing/browser";
 import type { Browser, Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
+import { resolveHmrPort } from "#site";
 import {
   CLOSE_ICON_ID,
   CLOSE_ICON_PATH,
@@ -31,6 +32,9 @@ const PHONE = VIEWPORTS.find(({ name }) => name === "390");
 
 /** The attribute marking the icon the test draws. */
 const ICON_MARKER = "data-e2e-icon";
+
+/** Vite's live-reload server greets a client it accepts with this frame. */
+const HMR_CONNECTED_FRAME = '"type":"connected"';
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -130,5 +134,23 @@ describe("dev:bun in a browser at 390px", () => {
         { timeout: PAGE_SETTLE_MS },
       )
       .toBeGreaterThan(0);
+  });
+
+  it("connects the live-reload client to its own server", async () => {
+    const page = await openTab();
+    const hmrPort = String(resolveHmrPort(Number(new URL(server.base).port)));
+    // Listened for before the page loads: the greeting follows the
+    // handshake at once.
+    let isConnected = false;
+    page.on("websocket", (socket) => {
+      if (new URL(socket.url()).port !== hmrPort) return;
+      socket.on("framereceived", ({ payload }) => {
+        if (String(payload).includes(HMR_CONNECTED_FRAME)) isConnected = true;
+      });
+    });
+    await page.goto(new URL(WORKSPACE_PATH, server.base).href);
+    await expect
+      .poll(() => isConnected, { timeout: PAGE_SETTLE_MS })
+      .toBe(true);
   });
 });

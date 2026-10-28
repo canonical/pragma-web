@@ -24,7 +24,7 @@ import fs from "node:fs";
 import { viteFetchMiddleware } from "@canonical/react-ssr/server";
 import { createServer as createViteServer } from "vite";
 import { resolveGraphqlUrl } from "#relay";
-import { resolvePort } from "#site";
+import { resolveHmrPort, resolvePort } from "#site";
 import prepareRelayData from "./prepareRelayData.js";
 import resolveRouteStatus from "./resolveRouteStatus.js";
 
@@ -36,9 +36,12 @@ const graphqlUrl = resolveGraphqlUrl();
 // Bun imports the TypeScript config itself: Vite's bundled config rewrites
 // `import.meta.resolve` through Node's module hooks, which Bun lacks, so the
 // icon middleware could not find the icons.
+// In middleware mode Vite opens its live-reload WebSocket on a port of its
+// own, a fixed default unless told otherwise: a second dev server on the
+// machine would hold it, and this server's client would retry it forever.
 const vite = await createViteServer({
   configLoader: "native",
-  server: { middlewareMode: true },
+  server: { middlewareMode: true, hmr: { port: resolveHmrPort(PORT) } },
   appType: "custom",
 });
 

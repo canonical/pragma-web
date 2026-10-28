@@ -6,4 +6,5 @@
  */
 
 export { DEFAULT_PORT } from "./constants.js";
+export { default as resolveHmrPort } from "./resolveHmrPort.js";
 export { default as resolvePort } from "./resolvePort.js";
