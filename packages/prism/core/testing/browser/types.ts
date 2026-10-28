@@ -118,6 +118,18 @@ export interface LayoutMeasure {
     readonly contentStart: number;
     readonly contentEnd: number;
   }[];
+  /**
+   * Each lens's breadcrumb trail: how many rows its crumbs take, where the
+   * current crumb's text is painted to, its extent cut by every element of
+   * the trail that clips or scrolls it (-1 with no current crumb), and the
+   * trail's own inline end, in pixels.
+   */
+  readonly trails: readonly {
+    readonly element: string;
+    readonly rows: number;
+    readonly textEnd: number;
+    readonly end: number;
+  }[];
   /** The block overflow of the layout's rail and inspector regions. */
   readonly regionOverflow: Readonly<Record<string, string | null>>;
   /** Whether the inspector's drawer trigger shows. */

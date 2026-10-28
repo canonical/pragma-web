@@ -18,7 +18,8 @@
  * first column line and its last, painted over that whole width, that a
  * band of a document's page that bleeds across the gutter is painted to
  * the rail's border rather than clipped by the canvas's scroll, that a
- * breadcrumb wider than the strip ends in an ellipsis inside it, and that
+ * breadcrumb wider than the strip stays on one line and ends in an
+ * ellipsis inside it, its text clipped by its own crumb, and that
  * nothing reaches past the viewport.
  */
 
@@ -533,6 +534,14 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
     try {
       const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
       expect(measure.overflow).toEqual([]);
+      // One line: the lens crumb and the current crumb share a row, and the
+      // current crumb's text is painted no further than the trail's end,
+      // clipped by the crumb itself, not by the strip.
+      expect(measure.trails).toHaveLength(1);
+      const [trail] = measure.trails;
+      expect(trail?.rows).toBe(1);
+      expect(trail?.textEnd).toBeGreaterThan(0);
+      expect(trail?.textEnd).toBeLessThanOrEqual((trail?.end ?? 0) + 0.5);
       const crumb = await page.evaluate(() => {
         const text = document.querySelector(
           '.ds.lens-breadcrumbs .link[aria-current="page"]',

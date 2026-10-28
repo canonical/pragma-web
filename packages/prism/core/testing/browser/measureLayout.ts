@@ -18,13 +18,18 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  * it, since a crumb cut off at the strip's end loses its text without a
  * sign: what the strip holds must shrink inside it.
  *
+ * A lens's breadcrumb trail is read for the rows its crumbs take and for
+ * where its current crumb's text is painted: the text's own extent, cut by
+ * every element of the trail that clips it, so a text that runs past its
+ * crumb unclipped shows even where the strip would hide it.
+ *
  * The chrome's spacing excludes what resolves to a measure rather than a
  * choice: an auto margin, which takes the free space, and the typography
  * engine's baseline nudges on text blocks.
  *
  * @param options - The selectors, the spacing step and the overflow rules.
  * @returns The page's grids, scrollers, overflow, canvas page, edges,
- *   bands and spacing.
+ *   bands, trails and spacing.
  * @note Impure: reads the page's document and its computed styles.
  */
 export default function measureLayout({
@@ -172,6 +177,38 @@ export default function measureLayout({
     };
   });
 
+  const trails = [...document.querySelectorAll(".ds.lens-breadcrumbs")].map(
+    (trail) => {
+      const itemTops = new Set(
+        [...trail.querySelectorAll(".breadcrumbs-item")].map((item) =>
+          Math.round(item.getBoundingClientRect().top),
+        ),
+      );
+      const current = trail.querySelector('.link[aria-current="page"]');
+      let textEnd = -1;
+      if (current !== null) {
+        const range = document.createRange();
+        range.selectNodeContents(current);
+        textEnd = range.getBoundingClientRect().right;
+        for (
+          let element: Element | null = current;
+          element !== null && trail.contains(element);
+          element = element.parentElement
+        ) {
+          if (clippingOverflows.includes(getComputedStyle(element).overflowX)) {
+            textEnd = Math.min(textEnd, readPaddingBox(element).end);
+          }
+        }
+      }
+      return {
+        element: describe(trail),
+        rows: itemTops.size,
+        textEnd,
+        end: trail.getBoundingClientRect().right,
+      };
+    },
+  );
+
   const histogram: Record<string, number> = {};
   const offGrid: string[] = [];
   const properties = [
@@ -234,6 +271,7 @@ export default function measureLayout({
           : Number.parseFloat(getComputedStyle(layout).rowGap),
     },
     bands,
+    trails,
     regionOverflow: {
       rail: readOverflow(
         ":is(.ds.workspace-layout, .ds.document-layout) > .rail",
