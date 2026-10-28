@@ -7,14 +7,14 @@ import {
   STATION_NODE,
 } from "../../../../testing/fixtures.js";
 import type { NodePayload } from "../../../../testing/types.js";
-import { EntityRow } from "../../EntityRow/index.js";
+import { RowProjection } from "../../RowProjection/index.js";
 
 /** Render `node`'s row under the default maps, and return its root. */
 const renderRow = (node: NodePayload): Element => {
   const { container } = render(
     createNodePage(node, (key) => (
       <ul>
-        <EntityRow node={key} />
+        <RowProjection node={key} />
       </ul>
     )),
   );

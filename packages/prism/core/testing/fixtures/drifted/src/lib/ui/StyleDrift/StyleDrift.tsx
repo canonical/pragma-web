@@ -20,6 +20,11 @@ export default function StyleDrift({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <span className="label">{label}</span>
+      <span className="body">
+        <a className="link" href="#drift">
+          {label}
+        </a>
+      </span>
     </div>
   );
 }

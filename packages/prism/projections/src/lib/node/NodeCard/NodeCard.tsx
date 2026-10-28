@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import type { NodeCard_node$key } from "../../../__generated__/NodeCard_node.graphql.js";
 import nodeCardFragmentNode from "../../../__generated__/NodeCard_node.graphql.js";
-import type { EntityCardArmProps } from "../../EntityCard/index.js";
+import type { CardArmProps } from "../../CardProjection/index.js";
 import { useProjectionLink } from "../../projections/index.js";
 import "./styles.css";
 
@@ -42,7 +42,7 @@ export default function NodeCard({
   href,
   className,
   ...props
-}: EntityCardArmProps): ReactElement {
+}: CardArmProps): ReactElement {
   const data = useFragment<NodeCard_node$key>(nodeCardFragmentNode, node);
   const LinkComponent = useProjectionLink();
   return (

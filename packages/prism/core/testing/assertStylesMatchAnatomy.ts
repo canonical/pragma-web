@@ -9,9 +9,9 @@ import {
 } from "@canonical/anatomy-dsl";
 import {
   CAMEL_LIFTS,
+  LINK_QUALIFIERS,
   PROPERTY_KEYS,
   REFLOW_KEY_FAMILIES,
-  ROOT_QUALIFIERS,
   SHORTHAND_PROPERTIES,
   STATE_SELECTORS,
   UNKEYED_PROPERTIES,
@@ -94,6 +94,38 @@ function collectSlots(root: Node): Map<string, Style[]> {
   };
   visit(root);
   return slots;
+}
+
+/**
+ * Name the class a node is addressed by in a child chain: the slot name its
+ * edge gives it, else its role in kebab case. A published component placed
+ * without a slot name has none, and no chain passes through it.
+ */
+function nameNodeClass(edge: Edge, node: Node): string | undefined {
+  if (edge.relation.slotName !== undefined) return edge.relation.slotName;
+  return node.type === "anonymous"
+    ? node.role.trim().toLowerCase().replaceAll(/\s+/g, "-")
+    : undefined;
+}
+
+/**
+ * Collect the path of every slot of an anatomy: the classes of the nodes
+ * between the root and the slot, in order, the slot's own left out. A child
+ * chain that reaches the slot through child combinators names exactly these.
+ */
+function collectSlotPaths(root: Node): Map<string, string[]> {
+  const paths = new Map<string, string[]>();
+  const visit = (node: Node, path: readonly string[]): void => {
+    for (const edge of node.edges ?? []) {
+      for (const child of listEdgeTargets(edge)) {
+        const slot = edge.relation.slotName;
+        if (slot !== undefined && !paths.has(slot)) paths.set(slot, [...path]);
+        visit(child, [...path, nameNodeClass(edge, child) ?? ""]);
+      }
+    }
+  };
+  visit(root, []);
+  return paths;
 }
 
 /** List the nodes an edge places: its node, or every case of its switch. */
@@ -194,20 +226,35 @@ function stripStructuralQualifiers(compound: string): string {
   );
 }
 
+/** Strip the link qualifiers from a compound's suffix: they name no state. */
+function stripLinkQualifiers(suffix: string): string {
+  return LINK_QUALIFIERS.reduce(
+    (rest, qualifier) => rest.replace(qualifier, ""),
+    suffix,
+  );
+}
+
 /**
  * Map a selector to the anatomy slot and state it styles, or describe why it
  * maps to none. The root is `.ds.<kebab>`, optionally qualified by `[href]`
  * and re-flowed by `:has(…)`; a child is one further compound, `.<slot>`,
- * whether a descendant or a child combinator reaches it; either may end in
- * one state selector. A root qualified by `:has(…)` or `:not(…)` re-flows.
+ * whether a descendant or a child combinator reaches it, or the slot's whole
+ * path from the root through child combinators, one role class per node the
+ * anatomy places between them, so a rule reaches nothing a slot's content or
+ * another slot holds. The slot may carry `[href]`; either may end in one
+ * state selector. A root qualified by `:has(…)` or `:not(…)` re-flows.
  */
 function mapSelector(
   selector: string,
   kebab: string,
   slots: ReadonlyMap<string, readonly Style[]>,
+  paths: ReadonlyMap<string, readonly string[]>,
 ): Target | string {
-  const compounds = splitTopLevel(selector.replaceAll(/\s*>\s*/g, " "), " ");
-  const [first = "", child, ...rest] = compounds;
+  const parts = splitTopLevel(selector.replaceAll(/\s*>\s*/g, " > "), " ");
+  const compounds = parts.filter((part) => part !== ">");
+  const [first = "", ...children] = compounds;
+  const child = children.at(-1);
+  const between = children.slice(0, -1);
   const rootClass = `.ds.${kebab}`;
   if (
     !first.startsWith(rootClass) ||
@@ -215,22 +262,20 @@ function mapSelector(
   ) {
     return `"${selector}" is not rooted at ${rootClass}`;
   }
-  if (rest.length > 0) {
+  const isChildChain = parts.length === compounds.length * 2 - 1;
+  if (between.length > 0 && !isChildChain) {
     return `"${selector}" reaches deeper than one child`;
   }
   const qualified = stripStructuralQualifiers(first.slice(rootClass.length));
   const reflow = qualified !== first.slice(rootClass.length);
-  const rootSuffix = ROOT_QUALIFIERS.reduce(
-    (suffix, qualifier) => suffix.replace(qualifier, ""),
-    qualified,
-  );
+  const rootSuffix = stripLinkQualifiers(qualified);
   const childMatch =
     child === undefined ? undefined : /^\.([a-z][a-z0-9-]*)(.*)$/.exec(child);
   if (child !== undefined && childMatch === null) {
     return `"${selector}" addresses a child by anything but its role class`;
   }
   const slot = childMatch?.at(1) ?? "";
-  const suffix = childMatch?.at(2) ?? "";
+  const suffix = stripLinkQualifiers(childMatch?.at(2) ?? "");
   if (child !== undefined && rootSuffix !== "") {
     return `"${selector}" puts a state on the root and reaches a child`;
   }
@@ -241,6 +286,13 @@ function mapSelector(
   }
   if (!slots.has(slot)) {
     return `"${selector}" styles .${slot}, which no anatomy slot names`;
+  }
+  const path = paths.get(slot) ?? [];
+  if (
+    between.length > 0 &&
+    between.map((compound) => compound.slice(1)).join(" ") !== path.join(" ")
+  ) {
+    return `"${selector}" does not follow the anatomy's path to .${slot}, ${[rootClass, ...path.map((name) => `.${name}`), `.${slot}`].join(" > ")}`;
   }
   return { slot, state, reflow };
 }
@@ -290,7 +342,8 @@ function listChannels(folder: string, prefix: string): string[] {
  * declares is followed to its value; a `var()` chain is read as its symbols
  * and its terminal literal. Rules under `@container`, and rules that re-flow
  * the root through `:has()` or `:not()`, are reflow: each must style a slot that exists
- * and may only re-value placement, size, spacing and visibility. Rules under
+ * and may only re-value placement, size, spacing, visibility and border
+ * width (`REFLOW_KEY_FAMILIES`). Rules under
  * `@media` (the exempt feature queries) and the `:root` block are left to
  * `assertStylesheets`.
  *
@@ -309,6 +362,7 @@ export default function assertStylesMatchAnatomy(
   const { kebab } = nameComponent(folder);
   const file = join(folder, "styles.css");
   const slots = collectSlots(specification.root);
+  const paths = collectSlotPaths(specification.root);
   const expected = new Map<string, Map<string, string>>();
   for (const [slot, styles] of slots) {
     for (const style of styles) {
@@ -346,7 +400,7 @@ export default function assertStylesMatchAnatomy(
         condition.startsWith("@container"),
       );
       for (const selector of rule.selectors) {
-        const target = mapSelector(selector, kebab, slots);
+        const target = mapSelector(selector, kebab, slots, paths);
         if (typeof target === "string") {
           problems.push(target);
           continue;

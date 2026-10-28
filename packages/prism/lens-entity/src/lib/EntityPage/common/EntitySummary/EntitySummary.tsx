@@ -1,4 +1,4 @@
-import { EntityChip } from "@canonical/prism-projections";
+import { ChipProjection } from "@canonical/prism-projections";
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import entitySummaryFragmentNode from "../../../../__generated__/EntitySummary_node.graphql.js";
@@ -14,7 +14,7 @@ const declareEntitySummaryFragment = (): unknown => graphql`
       definition
       comment
       type {
-        ...EntityChip_node
+        ...ChipProjection_node
       }
     }
   }
@@ -47,7 +47,7 @@ export default function EntitySummary({
       {meta.comment ? <p className="comment">{meta.comment}</p> : null}
       <p className="type">
         <Message
-          elements={{ type: <EntityChip node={meta.type} /> }}
+          elements={{ type: <ChipProjection node={meta.type} /> }}
           id="page.type"
         />
       </p>

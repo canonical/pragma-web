@@ -1,0 +1,143 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as CardStories from "../lib/ui/EntityCard/EntityCard.stories";
+import * as ChipStories from "../lib/ui/EntityChip/EntityChip.stories";
+import * as CommandStories from "../lib/ui/EntityCommand/EntityCommand.stories";
+import * as GraphNodeStories from "../lib/ui/EntityGraphNode/EntityGraphNode.stories";
+import * as ListStories from "../lib/ui/EntityList/EntityList.stories";
+import * as RowStories from "../lib/ui/EntityRow/EntityRow.stories";
+
+<Meta title="Documentation/Projection matrix" />
+
+# Projection matrix
+
+Every entity has five representations, and each is a slotted component that
+renders only the slots it is given: the graph node, the chip, the card, the
+list entry and the command-palette result. The matrix below renders the five
+for each type of entity, one type a section and the five in the same order
+in each, so the same entity reads the same in each of its forms and every
+form fits the column at any width.
+
+## Class
+
+**Graph node**
+
+<Canvas of={GraphNodeStories.Class} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={ChipStories.Class} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={CardStories.Class} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={RowStories.Class} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={CommandStories.Class} sourceState="none" withToolbar={false} />
+
+## UI block
+
+**Graph node**
+
+<Canvas of={GraphNodeStories.UIBlock} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={ChipStories.UIBlock} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={CardStories.UIBlock} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={RowStories.UIBlock} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={CommandStories.UIBlock} sourceState="none" withToolbar={false} />
+
+## Modifier
+
+**Graph node**
+
+<Canvas of={GraphNodeStories.Modifier} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={ChipStories.Modifier} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={CardStories.Modifier} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={RowStories.Modifier} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={CommandStories.Modifier} sourceState="none" withToolbar={false} />
+
+## Modifier family
+
+**Graph node**
+
+<Canvas of={GraphNodeStories.ModifierFamily} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={ChipStories.ModifierFamily} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={CardStories.ModifierFamily} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={RowStories.ModifierFamily} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={CommandStories.ModifierFamily} sourceState="none" withToolbar={false} />
+
+## Standard
+
+**Graph node**
+
+<Canvas of={GraphNodeStories.Standard} sourceState="none" withToolbar={false} />
+
+**Chip**
+
+<Canvas of={ChipStories.Standard} sourceState="none" withToolbar={false} />
+
+**Card**
+
+<Canvas of={CardStories.Standard} sourceState="none" withToolbar={false} />
+
+**List entry**
+
+<Canvas of={RowStories.Standard} sourceState="none" withToolbar={false} />
+
+**Command**
+
+<Canvas of={CommandStories.Standard} sourceState="none" withToolbar={false} />
+
+## The card's sidecar
+
+A UI block's card carries a sidecar beside its body: a rendered example of
+the component, two columns wide at least. With it the card becomes a column
+subgrid two columns wider than its own span.
+
+<Canvas of={CardStories.Matrix} sourceState="none" />
+
+## The shared list view
+
+An index of entities renders through `EntityList`: the count line and the
+view toggle, then the entities as cards or as rows.
+
+<Canvas of={ListStories.Toggle} sourceState="none" />

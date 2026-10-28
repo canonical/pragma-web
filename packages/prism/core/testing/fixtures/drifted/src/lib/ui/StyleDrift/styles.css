@@ -16,6 +16,20 @@
 
   .ds.style-drift .label {
     font-weight: var(--typography-weight-bold);
+    font-variant-caps: small-caps;
+  }
+
+  .ds.style-drift > .label > .link {
+    text-decoration: none;
+  }
+
+  .ds.style-drift .body .link[href]:hover {
+    text-decoration: underline;
+  }
+
+  /* A label the body follows changes its rule's colour: a second design. */
+  .ds.style-drift:has(> .label + .body) > .label {
+    border-color: var(--color-text-muted);
   }
 
   /* Below one group the label hides. */

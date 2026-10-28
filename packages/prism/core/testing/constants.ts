@@ -18,6 +18,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   background: ["appearance.background"],
   "background-color": ["appearance.background"],
   "block-size": ["size.block"],
+  "border-block-end-width": ["appearance.border.width"],
   "border-block-start-color": ["appearance.border.block.start.color"],
   "border-block-start-style": ["appearance.border.style"],
   "border-block-start-width": ["appearance.border.width"],
@@ -49,6 +50,7 @@ export const PROPERTY_KEYS: Readonly<Record<string, readonly string[]>> = {
   font: ["typography.font"],
   "font-family": ["typography.fontFamily"],
   "font-size": ["typography.size"],
+  "font-variant-caps": ["typography.variant.caps"],
   "font-weight": ["typography.weight"],
   gap: ["spacing.gap"],
   "grid-area": ["layout.grid.area"],
@@ -189,15 +191,16 @@ export const STATE_SELECTORS: Readonly<Record<string, string>> = {
   ":focus-visible": "focus",
   ":hover": "hover",
   '[aria-current="page"]': "selected",
+  '[aria-selected="true"]': "selected",
   "[open]": "expanded",
 };
 
 /**
- * The selector qualifiers a component root may carry without naming a
- * state: `[href]` scopes the link-only rules of a component that renders a
- * link or inert text.
+ * The selector qualifiers a component root or one of its slots may carry
+ * without naming a state: `[href]` scopes the link-only rules of an element
+ * that renders a link or inert text.
  */
-export const ROOT_QUALIFIERS: readonly string[] = ["[href]"];
+export const LINK_QUALIFIERS: readonly string[] = ["[href]"];
 
 /**
  * The properties no style key binds, because they set no design decision:
@@ -222,15 +225,18 @@ export const UNTHEMABLE_DECLARATIONS: readonly string[] = [
 ];
 
 /**
- * The style-key families a reflow may re-value: placement, size, spacing
- * and whether an element shows. A container query or a `:has()` rule that
- * re-values anything else is a second design, not a reflow.
+ * The style-key families a reflow may re-value: placement, size, spacing,
+ * whether an element shows, and whether a border shows, as a divider
+ * between sections does when what follows them changes. A container query
+ * or a `:has()` rule that re-values anything else is a second design, not
+ * a reflow.
  */
 export const REFLOW_KEY_FAMILIES: readonly string[] = [
   "layout.",
   "size.",
   "spacing.",
   "appearance.visibility",
+  "appearance.border.width",
 ];
 
 /**

@@ -2,8 +2,8 @@ import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import type { NodeRow_node$key } from "../../../__generated__/NodeRow_node.graphql.js";
 import nodeRowFragmentNode from "../../../__generated__/NodeRow_node.graphql.js";
-import type { EntityRowArmProps } from "../../EntityRow/index.js";
 import { useProjectionLink } from "../../projections/index.js";
+import type { RowArmProps } from "../../RowProjection/index.js";
 import "./styles.css";
 
 /* v8 ignore start -- relay-compiler reads this tag; nothing calls it at runtime */
@@ -41,7 +41,7 @@ export default function NodeRow({
   href,
   className,
   ...props
-}: EntityRowArmProps): ReactElement {
+}: RowArmProps): ReactElement {
   const data = useFragment<NodeRow_node$key>(nodeRowFragmentNode, node);
   const LinkComponent = useProjectionLink();
   return (
