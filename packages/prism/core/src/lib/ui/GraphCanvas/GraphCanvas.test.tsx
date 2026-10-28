@@ -56,17 +56,25 @@ function stubReducedMotion(matches: boolean): void {
   );
 }
 
-/** Lay every SVG element out at the given size, as a browser would. */
-function stubViewportSize(width: number, height: number): void {
+/**
+ * Lay every SVG element out at the given size, as a browser would, from
+ * the page's origin or from the given offset.
+ */
+function stubViewportSize(
+  width: number,
+  height: number,
+  left = 0,
+  top = 0,
+): void {
   vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
     width,
     height,
-    x: 0,
-    y: 0,
-    top: 0,
-    left: 0,
-    right: width,
-    bottom: height,
+    x: left,
+    y: top,
+    top,
+    left,
+    right: left + width,
+    bottom: top + height,
     toJSON: () => ({}),
   });
 }
@@ -239,6 +247,23 @@ describe("GraphCanvas", () => {
       clientY: 270,
     });
     expect(readCamera()).toBe("translate(-400,-300) scale(2)");
+  });
+
+  it("zooms about the point under the pointer on the wheel, wherever the viewport sits on the page", () => {
+    // The viewport sits 100px from the page's left and 50px from its top,
+    // as beside the rail and below the mode strip; the pointer over its
+    // centre lies over the world's (400, 300), which stays under it.
+    stubViewportSize(720, 540, 100, 50);
+    renderCanvas();
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -500,
+      clientX: 460,
+      clientY: 320,
+    });
+    const { k, x, y } = parseCamera(readCamera());
+    expect(k).toBe(2);
+    expect((400 - x) / k).toBeCloseTo(400, 9);
+    expect((300 - y) / k).toBeCloseTo(300, 9);
   });
 
   it("zooms about the visible area's centre from the controls and the keys", () => {
