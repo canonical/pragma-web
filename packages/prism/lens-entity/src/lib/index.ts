@@ -9,12 +9,6 @@
  */
 
 export { default as createEntityRoutes } from "./createEntityRoutes.js";
-export type { EntityIndexPageProps } from "./EntityIndexPage/index.js";
-export { EntityIndexPage } from "./EntityIndexPage/index.js";
-export type { EntityLayoutProps } from "./EntityLayout/index.js";
-export { EntityLayout } from "./EntityLayout/index.js";
-export type { EntityPageProps } from "./EntityPage/index.js";
-export { EntityPage } from "./EntityPage/index.js";
 export { default as expandAddress } from "./expandAddress.js";
 export { default as readUriParam } from "./readUriParam.js";
 export type {
@@ -22,3 +16,9 @@ export type {
   EntityRoutes,
   OntologyNamespace,
 } from "./types.js";
+export type { EntityIndexPageProps } from "./ui/EntityIndexPage/index.js";
+export { EntityIndexPage } from "./ui/EntityIndexPage/index.js";
+export type { EntityLayoutProps } from "./ui/EntityLayout/index.js";
+export { EntityLayout } from "./ui/EntityLayout/index.js";
+export type { EntityPageProps } from "./ui/EntityPage/index.js";
+export { EntityPage } from "./ui/EntityPage/index.js";

@@ -8,11 +8,11 @@
     "#domains/lenses": "./src/domains/lenses/index.ts",
     "#domains/metro": "./src/domains/metro/index.ts",
     "#i18n": "./src/i18n/index.ts",
+    "#lib/site": "./src/lib/site/index.ts",
     "#lib/ui": "./src/lib/ui/index.ts",
-    "#projections": "./src/projections/index.ts",
     "#relay": "./src/relay/index.ts",
+    "#relay/__generated__/*": "./src/relay/__generated__/*",
     "#server": "./src/server/index.ts",
-    "#site": "./src/site/index.ts",
     "#sitemap": "./src/sitemap/index.ts"
   },
   "scripts": {
@@ -91,6 +91,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-relay": "^18.2.1",
     "@types/relay-runtime": "^20.1.1",
+    "@types/relay-test-utils": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/coverage-v8": "^5.0.0",
     "browserslist": "^4.28.1",

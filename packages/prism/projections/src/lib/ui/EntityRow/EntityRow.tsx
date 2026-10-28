@@ -7,14 +7,19 @@ import "./styles.css";
 const componentCssClassName = "ds entity-row";
 
 /**
- * The list entry of an entity: one 32px row of an index, its namespace
- * prefix and title on the left and one muted word about it on the right.
+ * The list entry of an entity: one 32px row of an index, its mark,
+ * namespace prefix and title on the left and one muted word about it on
+ * the right.
+ * Where the two do not share a line the word moves to a line of its own
+ * under the title, and a title longer than its line wraps rather than
+ * being cut.
  * With an `href` the title links to the entity's home through
  * `LinkComponent`; without one it is inert text.
  *
- * It renders only the slots it is given, in their fixed order: location,
- * title, meta. It is a list item, so its list is the consumer's `<ol>` or
- * `<ul>`. It reads no context, so it renders anywhere.
+ * It renders only the slots it is given, in their fixed order: mark,
+ * location, title, meta. The mark names nothing, so it is hidden from
+ * assistive technology. It is a list item, so its list is the consumer's
+ * `<ol>` or `<ul>`. It reads no context, so it renders anywhere.
  *
  * Native props reach the `<li>` root; a consumer `className` merges after
  * the row's own.
@@ -24,6 +29,7 @@ const componentCssClassName = "ds entity-row";
  * @implements prism.component.entity_row
  */
 export default function EntityRow({
+  mark,
   location,
   title,
   href,
@@ -38,6 +44,11 @@ export default function EntityRow({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
       <span className="identity">
+        {mark === undefined ? null : (
+          <span aria-hidden="true" className="mark">
+            {mark}
+          </span>
+        )}
         {location === undefined ? null : (
           <span className="location">{location}</span>
         )}

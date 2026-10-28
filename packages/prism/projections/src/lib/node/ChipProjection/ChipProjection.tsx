@@ -11,12 +11,14 @@ import type { ChipProjectionProps } from "./types.js";
 /**
  * The fields ChipProjection reads from the Node it dispatches: its typename,
  * and each arm's fragment, spread aliased by the type the arm projects, `Node`
- * for every type no other arm takes.
+ * for every type no other arm takes, and the site slot, the arms of the site's
+ * own types: `SiteChipSlot_node` spread aliased as `Site`.
  */
 const declareNodeFragment = (): unknown => graphql`
   fragment ChipProjection_node on Node {
     __typename
     ...NodeChip_node @alias(as: "Node")
+    ...SiteChipSlot_node @alias(as: "Site")
     ...OntologyClassChip_node @alias(as: "OntologyClass")
   }
 `;
@@ -27,7 +29,8 @@ void declareNodeFragment;
  * Any graph node as the inline mention, dispatched on its type: it renders the
  * arm the site's chip map holds for the node's typename, or the `Node` arm,
  * `NodeChip`, for every type no other arm takes. A site's arm for a type of its
- * own renders over the `Node` arm's key.
+ * own renders over the site slot's key, the site's own compile of
+ * `SiteChipSlot_node`.
  *
  * It renders no element of its own: the arm renders the root, a `<span>`, and
  * every native prop reaches it.

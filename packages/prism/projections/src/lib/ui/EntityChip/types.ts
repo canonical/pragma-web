@@ -4,6 +4,13 @@ import type { LinkComponent } from "@canonical/react-ds-global";
 import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
+  /**
+   * A small sign that leads the chip, such as a swatch of the entity's
+   * colour: an element its projection draws and styles. It names nothing:
+   * the chip hides it from assistive technology, so the chip's name stays
+   * its value.
+   */
+  readonly mark?: ReactNode;
   /** The key the value is filed under, shown before the catalog's separator. */
   readonly lead?: ReactNode;
   /** The mention's text. */

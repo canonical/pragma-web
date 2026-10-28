@@ -10,12 +10,14 @@ const componentCssClassName = "ds entity-chip";
 
 /**
  * The inline mention of an entity: a pill in running text that names it,
- * optionally filed under a key, counted by a badge, marked by an icon and
- * closed by a disclosure chevron. With an `href` the value links to the
- * entity's home through `LinkComponent`; without one it is inert text.
+ * optionally led by a mark, filed under a key, counted by a badge, marked
+ * by an icon and closed by a disclosure chevron. With an `href` the value
+ * links to the entity's home through `LinkComponent`; without one it is
+ * inert text.
  *
- * It renders only the slots it is given, in their fixed order: lead, value,
- * badge, icon, chevron, so it renders anywhere.
+ * It renders only the slots it is given, in their fixed order: mark, lead,
+ * value, badge, icon, chevron, so it renders anywhere. The mark names
+ * nothing, so it is hidden from assistive technology.
  *
  * Native props reach the `<span>` root; a consumer `className` merges after
  * the chip's own.
@@ -27,6 +29,7 @@ const componentCssClassName = "ds entity-chip";
  *   for the lead and its separator.
  */
 export default function EntityChip({
+  mark,
   lead,
   value,
   href,
@@ -42,6 +45,11 @@ export default function EntityChip({
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     >
+      {mark === undefined ? null : (
+        <span aria-hidden="true" className="mark">
+          {mark}
+        </span>
+      )}
       {lead === undefined ? null : (
         <span className="lead">
           <Message elements={{ lead }} id="chip.lead" />

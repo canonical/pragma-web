@@ -673,6 +673,17 @@ export const createExampleProvider = (
             (record.entity.servesLine ?? []).includes(entity.uri),
         )
         .map((record) => record.view),
+    // The inverse of `inZone`, over every entity that carries it: a fare
+    // zone's stops are stations and interchanges alike, so the SDL types
+    // the list `[Stop!]!` as it does `servedBy`.
+    stops: () =>
+      records
+        .filter(
+          (record) =>
+            isNetworkEntity(record.entity) &&
+            record.entity.inZone === entity.uri,
+        )
+        .map((record) => record.view),
   });
 
   /**

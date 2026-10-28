@@ -1,0 +1,27 @@
+---
+# LineGraphNode: a line as a node of a graph, two lines tall.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 566:2357 and 566:2433 (the
+# title, then its kind muted). Best guess: the title is the line's name,
+# the second line its class alone, since a line has no place of its own.
+# Projected onto EntityGraphNode, which carries every style: this anatomy
+# binds none. The home is the link the title renders through, resolved
+# from the compact address.
+node:
+  uri: metro.component.line_graph_node
+  projection: { on: Line }
+  edges:
+    - node:
+        uri: prism.component.entity_graph_node
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+      relation: { cardinality: "1" }

@@ -1,0 +1,63 @@
+---
+# LineChip: a line as an inline mention, a 28px pill in running text.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 449:22408 (the chip's
+# slots) and 505:2304 (the classes row's chip: the title alone in the pill,
+# no key, badge, icon or chevron), the order every metro chip keeps. A
+# passage's own link text, when given, stands in for the title.
+# Projected onto EntityChip, which carries every style but the swatch's.
+# The home is the link the value renders through, resolved from the
+# compact address.
+#
+# The line's colour leads the pill in the chip's mark: a swatch, a short
+# bar with round ends, 16px by 8px, as the network map draws a line, so a
+# line reads as its colour and its name. The colour is the line's own, the
+# `#rrggbb` the graph gives every line, which no token holds: the chip sets
+# it per line as an inline custom property on its root,
+# `--line-chip-swatch-color` (`LineChipChannelStyle` in types.ts), and the
+# swatch reads it, so the stylesheet names no colour. The chip hides its
+# mark from assistive technology, so its name is the line's name whatever
+# its colour. In forced colours the swatch keeps the line's colour
+# (`forced-color-adjust: none`, a declaration with no style key, bound in
+# styles.css only).
+#
+# Every other decision of the swatch is read through a component token
+# declared on the root (`--line-chip-swatch-*`), bound to the symbol or the
+# literal named here.
+#
+# Token ledger (no symbol to bind):
+#   line.chip.swatch.color             the inline channel: the line's
+#                                      colour, from the graph.
+#   --line-chip-swatch-radius: 9999px  a full radius has only the primitive
+#                                      dimension.radius.full.
+#   space.200 (16px) and space.100 (8px) for the swatch's width and height:
+#   no size token names a swatch.
+#
+# Roster namespaces (accepted and tracked): space.200, space.100 (sizes).
+node:
+  uri: metro.component.line_chip
+  projection: { on: Line }
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: mark
+              edges:
+                - node:
+                    role: swatch
+                    projection: { field: colour }
+                    styles:
+                      size.width: space.200
+                      size.height: space.100
+                      appearance.radius: 9999px
+                      appearance.background: line.chip.swatch.color
+                  relation: { cardinality: "1", slotName: swatch }
+            relation: { cardinality: "1", slotName: mark }
+          - node:
+              role: value
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: value }
+      relation: { cardinality: "1" }

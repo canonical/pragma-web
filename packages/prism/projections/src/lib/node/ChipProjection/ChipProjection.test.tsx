@@ -2,7 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { graphql, useLazyLoadQuery } from "react-relay";
+import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import createSiteTree, {
@@ -16,11 +16,13 @@ import {
 import testQuery, {
   type ChipProjectionTestQuery,
 } from "../../../__generated__/ChipProjectionTestQuery.graphql.js";
-import type { SiteArmProps } from "../../projections/index.js";
+import siteFragment, {
+  type SiteChipSlot_node$key,
+} from "../../../__generated__/SiteChipSlot_node.graphql.js";
+import type { ArmProps, SiteArmProps } from "../../projections/index.js";
 import { defaultProjectionMaps } from "../constants.js";
-import { NodeChip, type NodeChipProps } from "../NodeChip/index.js";
 import ChipProjection from "./ChipProjection.js";
-import type { ChipProjectionProps } from "./types.js";
+import type { ChipArmNative, ChipProjectionProps } from "./types.js";
 
 /**
  * The operation the tests render ChipProjection under: one
@@ -105,17 +107,28 @@ describe("ChipProjection", () => {
     expect(container.querySelector(".ds.node-chip")).toBeNull();
   });
 
-  it("renders a type the site arms through the site's arm, over the Node key", () => {
+  it("renders a type the site arms through the site's arm, over the site slot's key", () => {
     /**
-     * A site's arm for its own type: the Node projection, marked with the
-     * typename.
+     * A site's arm for its own type: it reads the site slot's key and marks
+     * its root with the typename it was handed and the one it read.
      */
-    const SiteNodeChip = ({
+    const SiteProbe = ({
+      node,
       typename,
       ...props
-    }: SiteArmProps<NodeChipProps>): ReactElement => (
-      <NodeChip {...props} data-site-type={typename} />
-    );
+    }: SiteArmProps<
+      ArmProps<SiteChipSlot_node$key, ChipArmNative>
+    >): ReactElement => {
+      const data = useFragment(siteFragment, node);
+      return (
+        <span
+          {...props}
+          className="site-probe"
+          data-site-type={typename}
+          data-typename={data.__typename}
+        />
+      );
+    };
     const { container } = renderWithNode(
       (node) => <ChipProjection node={node} />,
       {},
@@ -124,14 +137,15 @@ describe("ChipProjection", () => {
           ...defaultProjectionMaps,
           chip: {
             ...defaultProjectionMaps.chip,
-            siteTypes: { Component: SiteNodeChip },
+            siteTypes: { Component: SiteProbe },
           },
         },
       },
     );
-    expect(
-      container.querySelector(".ds.node-chip")?.getAttribute("data-site-type"),
-    ).toBe("Component");
+    const probe = container.querySelector(".site-probe");
+    expect(probe?.getAttribute("data-site-type")).toBe("Component");
+    expect(probe?.getAttribute("data-typename")).toBe("Component");
+    expect(container.querySelector(".ds.node-chip")).toBeNull();
   });
 
   it("renders a type the site arms for another typename through the Node arm", () => {

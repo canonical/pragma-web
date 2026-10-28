@@ -2,7 +2,12 @@
 # EntityRow — the list entry of an entity: a 32px row in an index.
 # Reference: the projection matrix's in-page list entry (the namespace prefix
 # muted, the title, and a muted word right-aligned, on a 24px line with 4px
-# block insets). Slot order: location, title, then meta at the end.
+# block insets). Slot order: mark, location, title, then meta at the end.
+#
+# The mark is a small sign that leads the identity, such as a swatch of the
+# entity's colour, drawn and styled by the projection that fills it. The
+# row hides it from assistive technology, so the row's name is its title
+# alone, and spaces it from the text after it by the chip's gap, 4px.
 #
 # The row sets the context's primary text on the matrix's 24px line, the
 # line every representation shares, so it is 32px in every context.
@@ -16,9 +21,16 @@
 # long identity would widen the track that holds the row past its column
 # instead of truncating.
 #
-# The identity clips along its line only, so nothing it holds is cut above
-# or below: a chip in the title is 28px, and its line grows to hold it (the
-# row is then 36px).
+# When the identity and the meta do not fit on one line, as on a phone,
+# the row wraps: the meta moves to a line of its own under the identity,
+# flush left, with no space between the two lines (the row is then 56px),
+# and a title longer than its line wraps between its words rather than
+# being cut, so the title is always whole. The meta stays on its one line
+# and clips at its end with an ellipsis only when it alone is longer than
+# the row; the whole word stays in the text. The identity clips along its
+# line only, for a single word longer than the row, so nothing it holds is
+# cut above or below: a chip in the title is 28px, and its line grows to
+# hold it (the row is then 36px).
 #
 # An identifier in the location, a `<code class="identifier">`, sets the
 # monospace face on the row's line and stands on the sans text's baseline:
@@ -40,19 +52,26 @@
 #
 # Token ledger (no symbol to bind):
 #   space.050 (4px) for the block insets: a 32px entry on a 24px line; the
-#   shim's block component padding (8px) would make it 40px.
+#   shim's block component padding (8px) would make it 40px. space.050
+#   again after the mark: the chip's gap between its slots; the shim's
+#   container gaps (8px and more) space layout containers, not a mark.
 #   --entity-row-focus-ring-width: 2px, --entity-row-focus-ring-offset: -2px
 #                                      the link's ring, drawn inside it since the identity clips.
 #   space.300 (24px) for the line height: the matrix's line; no typography
 #   token is 24px in every context (the docs' primary line is 20px).
+#   space.0 for the gap between a wrapped row's lines: the meta reads with
+#   the identity above it, its lines the 24px line apart.
+#   layout.wrap wrap, typography.whiteSpace normal and nowrap,
+#   layout.overflow.inline clip, typography.overflow ellipsis: keywords;
+#   size.min.width 0 lets the identity and the meta shrink to the row.
 #   --entity-row-identifier-vertical-align: baseline,
 #   --entity-row-identifier-line-height: 0
 #                                      the identifier on the text's baseline,
 #                                      its inline box of no height; a keyword
 #                                      and a number.
 #
-# Roster namespaces (accepted and tracked): grid.gutter, space.050,
-# space.300 (a line height), and the semantic typography symbol
+# Roster namespaces (accepted and tracked): grid.gutter, space.0,
+# space.050, space.300 (a line height), and the semantic typography symbol
 # typography.text.primary.fontSize.
 node:
   uri: prism.component.entity_row
@@ -60,8 +79,10 @@ node:
     layout.type: flex
     layout.align: baseline
     layout.justify: space-between
+    layout.wrap: wrap
     size.min.width: 0
-    spacing.gap: grid.gutter
+    spacing.gap.inline: grid.gutter
+    spacing.gap.block: space.0
     spacing.internal.block.start: space.050
     spacing.internal.block.end: space.050
     layout.listStyle: none
@@ -74,8 +95,13 @@ node:
           layout.overflow.inline: clip
           size.min.width: 0
           typography.overflow: ellipsis
-          typography.whiteSpace: nowrap
+          typography.whiteSpace: normal
         edges:
+          - node:
+              role: mark
+              styles:
+                spacing.external.inline.end: space.050
+            relation: { cardinality: "0..1", slotName: mark }
           - node:
               role: location
               styles:
@@ -106,4 +132,7 @@ node:
           typography.color: color.text.muted
           typography.align: end
           typography.whiteSpace: nowrap
+          layout.overflow.inline: clip
+          size.min.width: 0
+          typography.overflow: ellipsis
       relation: { cardinality: "0..1", slotName: meta }

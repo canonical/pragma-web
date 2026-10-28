@@ -1,0 +1,33 @@
+---
+# ZoneCommand: a fare zone as a 56px command-palette result.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, nodes 502:1801 and 504:327 (the
+# title over its kind, one vital at the end). Best guess: the kind is the
+# zone's class, with no location; the vital counts the stations in the
+# zone: "Central Zone / Fare zone · 2 stations". A fare zone has no home on
+# this site, so its title reads as inert text.
+# Projected onto EntityCommand, which carries every style: this anatomy
+# binds none. The home is the link the title would render through,
+# resolved from the compact address.
+node:
+  uri: metro.component.zone_command
+  projection: { on: Zone }
+  edges:
+    - node:
+        uri: prism.component.entity_command
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: vital
+              projection: { field: uri }
+            relation: { cardinality: "1", slotName: vital, projection: { field: stops } }
+      relation: { cardinality: "1" }

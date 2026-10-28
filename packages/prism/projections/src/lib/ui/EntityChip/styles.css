@@ -46,6 +46,11 @@
     white-space: nowrap;
   }
 
+  /* The mark is as tall as what it holds, so the pill centres it. */
+  .ds.entity-chip .mark {
+    display: flex;
+  }
+
   .ds.entity-chip .lead {
     color: var(--entity-chip-lead-color);
   }

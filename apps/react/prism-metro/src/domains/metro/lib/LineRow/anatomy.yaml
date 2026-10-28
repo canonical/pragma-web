@@ -1,0 +1,74 @@
+---
+# LineRow: a line as a 32px list entry.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 547:2201 (the title, one
+# muted word at the end). Best guess: the muted end counts the stops the
+# line serves.
+# Projected onto EntityRow, which carries every style but the swatch's.
+# The home is the link the title renders through, resolved from the
+# compact address.
+#
+# The line's colour leads the row in the row's mark: a swatch, a short bar
+# with round ends, 16px by 8px, as the network map draws a line and as the
+# line's chip shows it, so a line reads as its colour and its name. It
+# stands in the row's text, centred on the text's middle. The colour is the
+# line's own, the `#rrggbb` the graph gives every line, which no token
+# holds: the row sets it per line as an inline custom property on its root,
+# `--line-row-swatch-color` (`LineRowChannelStyle` in types.ts), and the
+# swatch reads it, so the stylesheet names no colour. The row hides its
+# mark from assistive technology, so its name is the line's name whatever
+# its colour. In forced colours the swatch keeps the line's colour
+# (`forced-color-adjust: none`, a declaration with no style key, bound in
+# styles.css only).
+#
+# Every other decision of the swatch is read through a component token
+# declared on the root (`--line-row-swatch-*`), bound to the symbol or the
+# literal named here.
+#
+# Token ledger (no symbol to bind):
+#   line.row.swatch.color              the inline channel: the line's
+#                                      colour, from the graph.
+#   --line-row-swatch-radius: 9999px   a full radius has only the primitive
+#                                      dimension.radius.full.
+#   --line-row-swatch-vertical-align: middle
+#                                      the swatch on the text's middle; a
+#                                      keyword.
+#   space.200 (16px) and space.100 (8px) for the swatch's width and height:
+#   no size token names a swatch.
+#   layout.type inline-block: a keyword, so the swatch takes its size in
+#   the row's line.
+#
+# Roster namespaces (accepted and tracked): space.200, space.100 (sizes).
+node:
+  uri: metro.component.line_row
+  projection: { on: Line }
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: mark
+              edges:
+                - node:
+                    role: swatch
+                    projection: { field: colour }
+                    styles:
+                      layout.type: inline-block
+                      layout.verticalAlign: middle
+                      size.width: space.200
+                      size.height: space.100
+                      appearance.radius: 9999px
+                      appearance.background: line.row.swatch.color
+                  relation: { cardinality: "1", slotName: swatch }
+            relation: { cardinality: "1", slotName: mark }
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: meta
+              projection: { field: uri }
+            relation: { cardinality: "1", slotName: meta, projection: { field: servedBy } }
+      relation: { cardinality: "1" }

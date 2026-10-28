@@ -41,10 +41,16 @@ lays the five representations of each type out as one matrix, under
 `Documentation/Projection matrix`.
 
 - **`EntityChip`**: the inline mention, a pill in running text: an
-  optional lead filed before the catalog's separator, the value, then an
-  optional badge, icon and disclosure chevron.
-- **`EntityRow`**: the list entry, one row of an index: the namespace
-  prefix and the title, then one muted word at the end.
+  optional mark, an optional lead filed before the catalog's separator,
+  the value, then an optional badge, icon and disclosure chevron. The
+  mark is a sign its projection draws, such as a swatch of the entity's
+  colour; the chip hides it from assistive technology, so its name never
+  depends on it.
+- **`EntityRow`**: the list entry, one row of an index: an optional mark,
+  hidden as the chip's is, the namespace prefix and the title, then one
+  muted word at the end. Where the two do not share a line, as on a
+  phone, the word moves to a line of its own under the title (56px) and a
+  long title wraps, so it is never cut.
 - **`EntityCard`**: the card, built on the published `Card`: location, the
   title and the entity it belongs to (after `∈`, or after `⊂` with
   `parentRelation="subclass"`), kind, summary, key values and the
@@ -205,19 +211,19 @@ every arm of one form renders the same representation, so the
 dispatcher's native props are that root's. The chip takes `children`, the
 mention's text in place of the name.
 
-A dispatcher reads a composite fragment: the node's typename, and each
-arm's fragment spread aliased by the type it projects,
+A dispatcher reads a composite fragment: the node's typename, each arm's
+fragment spread aliased by the type it projects,
 `...NodeCard_node @alias(as: "Node")` and
-`...OntologyClassCard_node @alias(as: "OntologyClass")`. Each form's map
-holds the arms:
+`...OntologyClassCard_node @alias(as: "OntologyClass")`, and the site slot,
+`...SiteCardSlot_node @alias(as: "Site")`. Each form's map holds the
+arms:
 
 - `Node`: the arm of every type no other arm takes.
 - `types`: one arm per aliased spread besides `Node`, each typed against
   that alias's key, so a wrong or missing arm does not compile.
-- `siteTypes`: a site's arms for its own types, by typename. A site cannot
-  add a spread to the package's composites, so a site arm reads the `Node`
-  key; it receives the node's typename beside it (`SiteArmProps`), and
-  usually wraps the `Node` projection.
+- `siteTypes`: a site's arms for its own types, by typename. Each reads
+  the site slot's key and receives the node's typename beside it
+  (`SiteArmProps`); see "Site arms" below.
 
 A typed arm wins, then a site arm, then the `Node` arm. The package's
 tests hold each composite's aliases, its map's `types` and its
@@ -240,28 +246,76 @@ import {
 </HomesProvider>;
 ```
 
-A site with types of its own extends the defaults:
-
-```tsx
-const maps: ProjectionMaps = {
-  ...defaultProjectionMaps,
-  card: {
-    ...defaultProjectionMaps.card,
-    siteTypes: { Station: StationCard },
-  },
-};
-```
+A site with types of its own extends the defaults, as "Site arms" below
+describes.
 
 Every link to a home renders through `LinkComponent`, typed against the
 shared `LinkComponentProps` of `@canonical/react-ds-global` and defaulting
 to the intrinsic `"a"`. A plain anchor follows a mention with a full
 document load, so a site with a client-side router passes an adapter that
 renders the router's own link for an `href`; the router then navigates on
-the client and the page keeps its state.
+the client and the page keeps its state. A site's own projections read the
+same link with `useProjectionLink`, so their homes navigate as the
+package's arms do.
 
 A node's or a class's home is resolved with its compact address
 (`_meta.curie`) as the `uri` a site's home resolver receives, so one
 entity has one address; a property's with its IRI, its only address.
+
+## Site arms
+
+A site projects its own types, a metro site's stations or a docsite's
+components, through the site slot every composite spreads:
+`...Site<Form>Slot_node @alias(as: "Site")`, a fragment on `Node`.
+The package ships a default of each, in `src/lib/site/`, that reads the
+typename alone, for a site with no types of its own; the package, the lens
+packages and any site that compiles the package's documents compile it.
+The slot's names are the package's: a site's own composite, for a
+dispatcher the site renders itself, takes a name of its own, need not
+spread the slot, and then arms no type under `siteTypes`; a map that does
+over a composite with no slot throws on the first such node.
+
+A site with types of its own takes three steps: it compiles the
+package's documents against its own schema, excluding `src/lib/site/`
+from its compile; it defines the five fragments itself; and it makes its
+bundler run the package's dispatchers on its own compile, as the last
+paragraph of this section describes. Each fragment spreads its arms'
+fragments aliased by the type they are on:
+
+```graphql
+fragment SiteCardSlot_node on Node {
+  __typename
+  ...StationCard_node @alias(as: "Station")
+  ...LineCard_node @alias(as: "Line")
+}
+```
+
+The component that defines that fragment is the site's dispatcher for the
+form: it reads the slot's key, switches on the typename it receives, and
+renders the arm over that type's aliased key. The site lists it in its
+maps under `siteTypes`, once per typename it arms:
+
+```tsx
+const maps: ProjectionMaps = {
+  ...defaultProjectionMaps,
+  card: {
+    ...defaultProjectionMaps.card,
+    siteTypes: { Station: SiteCardSlot, Line: SiteCardSlot },
+  },
+};
+```
+
+The package's dispatchers import the composites' artifacts their own
+compile writes, which spread the default slots. A site that defines the
+slots must therefore configure its bundler to resolve the package's
+artifact imports, `…/__generated__/<Name>.graphql.js` from any package
+source its `relay.config.json` lists, to the artifacts of the same name
+its own compile writes; without that step its arms find no data under
+their slot and throw on the first node. The package does not ship this
+step: a bundler loads its configuration under Node, which does not run
+a source-shipped package's TypeScript. The metro app's Vite plugin,
+`apps/react/prism-metro/src/relay/redirectPackageArtifacts.ts`, is the
+reference implementation a site copies.
 
 ## List view
 
@@ -335,7 +389,7 @@ unchanged; a renderer that strips hrefs with an unknown scheme turns every
   `EntityChipProps`, `EntityRowProps`, `EntityCardProps`,
   `EntityCardKeyValue`, `EntityCommandProps`, `EntityGraphNodeProps`,
   `EntityListProps`, `EntityListView`.
-- Maps: `ProjectionsProvider`, `useProjectionMaps`,
+- Maps: `ProjectionsProvider`, `useProjectionMaps`, `useProjectionLink`,
   `defaultProjectionMaps`; types `ArmProps`, `ProjectionArm`,
   `ProjectionMap`, `ProjectionMaps`, `ProjectionsProviderProps`,
   `SiteArmProps`.

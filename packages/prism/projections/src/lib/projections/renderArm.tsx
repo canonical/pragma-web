@@ -45,14 +45,17 @@ function renderTypeArm<
 /**
  * Render the arm a node's typename selects in one form's map: the typed arm
  * for its type when the map has one and its alias resolved, else the
- * site's arm for its typename, else the `Node` arm, which reads what every
- * node carries.
+ * site's arm for its typename over the site slot's key, else the `Node`
+ * arm, which reads what every node carries.
  *
  * @param map - The form's arms.
- * @param data - The composite fragment's data: the typename and every
- *   arm's aliased key.
+ * @param data - The composite fragment's data: the typename, every arm's
+ *   aliased key and the site slot's key.
  * @param native - The dispatcher's native props, handed to the arm.
  * @returns The arm's element.
+ * @throws When the map arms the typename under `siteTypes` but the
+ *   composite spreads no site slot: that is a wiring bug, since the site
+ *   arm would have no key to read.
  */
 export default function renderArm<
   TData extends DispatchedNode,
@@ -69,7 +72,13 @@ export default function renderArm<
   if (typed !== undefined) return typed;
   const SiteArm = map.siteTypes?.[typename];
   if (SiteArm !== undefined) {
-    return <SiteArm {...native} node={data.Node} typename={typename} />;
+    const site = data.Site;
+    if (site == null) {
+      throw new Error(
+        `renderArm: the map arms ${typename} under siteTypes, but the composite spreads no site slot`,
+      );
+    }
+    return <SiteArm {...native} node={site} typename={typename} />;
   }
   const NodeArm = map.Node;
   return <NodeArm {...native} node={data.Node} />;

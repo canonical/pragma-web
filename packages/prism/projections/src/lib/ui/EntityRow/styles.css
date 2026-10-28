@@ -7,13 +7,18 @@
    * right, on one 24px line of the context's primary text with 4px above
    * and below it: 32px. It sets no inline inset, so its text sits on the column line
    * of its list. It may be narrower than its content, so a long identity
-   * never widens the track that holds it: the identity truncates instead. */
+   * never widens the track that holds it. When the two do not fit on one line the meta wraps to a
+   * line of its own under the identity, the lines with no space between
+   * them: 56px. */
   .ds.entity-row {
     --entity-row-gap: var(--grid-gutter);
+    --entity-row-line-gap: var(--space-0);
     --entity-row-padding-block: var(--space-050);
     --entity-row-font-size: var(--typography-text-primary-font-size);
     /* The matrix's 24px line, which every representation shares. */
     --entity-row-line-height: var(--space-300);
+    /* The chip's gap between its slots. */
+    --entity-row-mark-gap: var(--space-050);
     --entity-row-location-color: var(--color-text-muted);
     --entity-row-identifier-vertical-align: baseline;
     --entity-row-identifier-line-height: 0;
@@ -26,22 +31,25 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+    flex-wrap: wrap;
     min-width: 0;
-    gap: var(--entity-row-gap);
+    column-gap: var(--entity-row-gap);
+    row-gap: var(--entity-row-line-gap);
     padding-block: var(--entity-row-padding-block);
     list-style: none;
     font-size: var(--entity-row-font-size);
     line-height: var(--entity-row-line-height);
   }
 
-  /* The identity truncates on its one line rather than wrapping the row.
-   * It clips only along its line, so a chip in it keeps its whole pill,
-   * and the line grows to hold it. */
+  /* A title longer than its line wraps between its words, so it is never
+   * cut; a single word longer than the row clips at its end. It clips
+   * only along its line, so a chip in it keeps its whole pill, and the
+   * line grows to hold it. */
   .ds.entity-row .identity {
     overflow-x: clip;
     min-width: 0;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   /* A linked title reads as the row's text, underlined on approach. */
@@ -61,6 +69,11 @@
     outline-offset: var(--entity-row-focus-ring-offset);
   }
 
+  /* The mark leads the identity, set apart from the text after it. */
+  .ds.entity-row .mark {
+    margin-inline-end: var(--entity-row-mark-gap);
+  }
+
   .ds.entity-row .location {
     color: var(--entity-row-location-color);
   }
@@ -73,9 +86,14 @@
     line-height: var(--entity-row-identifier-line-height);
   }
 
+  /* The meta stays on its one line and, longer than the row on a line of
+   * its own, clips at its end; the whole word stays in the text. */
   .ds.entity-row .meta {
     color: var(--entity-row-meta-color);
     text-align: end;
     white-space: nowrap;
+    overflow-x: clip;
+    min-width: 0;
+    text-overflow: ellipsis;
   }
 }

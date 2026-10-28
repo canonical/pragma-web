@@ -1,0 +1,28 @@
+---
+# StationRow: a station as a 32px list entry.
+# Reference: Figma ZwVhG78TEaKIDLCdIdQ9Fi, node 547:2201 (the list entry:
+# the title, one muted word at the end). Best guess: no namespace prefix,
+# since every station of an index shares it; the muted end is the
+# station's platform count, left out when the graph asserts none.
+# Projected onto EntityRow, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.station_row
+  projection: { on: Station }
+  edges:
+    - node:
+        uri: prism.component.entity_row
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: meta
+              projection: { field: platformCount }
+            relation: { cardinality: "0..1", slotName: meta }
+      relation: { cardinality: "1" }
