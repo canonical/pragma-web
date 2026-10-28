@@ -7,13 +7,16 @@
  * a phone width, measuring it in the light and the dark theme. What is
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
- * viewport or past its region, at 390px too; twelve columns at 1440px and
+ * viewport or past its region, a strip's crumb included, at 390px too,
+ * on a station's page, a term's page and a station or term addressed by
+ * its absolute IRI; twelve columns at 1440px and
  * four at 390px; a workspace canvas that never scrolls; a document whose
  * only scrolling regions are its canvas and its rail; a canvas that starts
  * one gutter under the strip, or at the viewport's top with no strip, as on
  * the lobby and the not-found page, its page then starting one gutter
  * down; a strip whose band runs from the rail's
- * border to the viewport's edge with its content from the canvas's first
+ * border to the viewport's edge, painted over that whole width, with its
+ * content from the canvas's first
  * column line to its last; and every gap, padding and margin of the chrome
  * a multiple of 4px.
  */
@@ -30,6 +33,8 @@ import {
   DEV_READY_MS,
   GRAPH_READY_MS,
   PAGE_SETTLE_MS,
+  STATION_IRI_PATH,
+  TERM_IRI_PATH,
   WORKSPACE_PATH,
 } from "./constants.js";
 import startServer from "./startServer.js";
@@ -39,13 +44,23 @@ const CWD = process.cwd();
 
 /**
  * Pages on the document archetype: a station's page, under its lens's
- * strip, and the lobby and the not-found page, which have no strip.
+ * strip, by its compact address and by its absolute IRI, whose crumb is
+ * wider than the strip at a phone's width, and the lobby and the not-found
+ * page, which have no strip.
  */
 const DOCUMENT_PATHS = [
   `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
+  STATION_IRI_PATH,
   "/",
   "/not-found",
 ];
+
+/**
+ * Pages on the workspace archetype: the Definitions explorer, and a term's
+ * page addressed by its absolute IRI, whose crumb is wider than the strip
+ * at a phone's width.
+ */
+const WORKSPACE_PATHS = [WORKSPACE_PATH, TERM_IRI_PATH];
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -124,6 +139,15 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
           layout.page.innerWidth,
           1,
         );
+        // Painted over that whole width: nothing clips the bleed.
+        expect(band.paintedStart, `${theme} ${band.element}`).toBeCloseTo(
+          edges.railEnd,
+          1,
+        );
+        expect(band.paintedEnd, `${theme} ${band.element}`).toBeCloseTo(
+          layout.page.innerWidth,
+          1,
+        );
         expect(band.contentStart, `${theme} ${band.element}`).toBeCloseTo(
           edges.canvasStart,
           1,
@@ -140,21 +164,24 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   };
 
-  it("lays the workspace on the one grid with a canvas that never scrolls", async () => {
-    const measures = await measure(WORKSPACE_PATH);
-    expectGrid(measures);
-    for (const { theme, measure: layout } of measures) {
-      expect(layout.canvas.overflow, theme).toBe("hidden");
-      expect(layout.canvas.scrollHeight, theme).toBe(
-        layout.canvas.clientHeight,
-      );
-      expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
-      // The Definitions lens gives its workspace no inspector: no region
-      // and no drawer trigger.
-      expect(layout.regionOverflow.inspector, theme).toBeNull();
-      expect(layout.triggerShown, theme).toBe(false);
-    }
-  });
+  it.each(WORKSPACE_PATHS)(
+    "lays the workspace at %s on the one grid with a canvas that never scrolls",
+    async (path) => {
+      const measures = await measure(path);
+      expectGrid(measures);
+      for (const { theme, measure: layout } of measures) {
+        expect(layout.canvas.overflow, theme).toBe("hidden");
+        expect(layout.canvas.scrollHeight, theme).toBe(
+          layout.canvas.clientHeight,
+        );
+        expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
+        // The Definitions lens gives its workspace no inspector: no region
+        // and no drawer trigger.
+        expect(layout.regionOverflow.inspector, theme).toBeNull();
+        expect(layout.triggerShown, theme).toBe(false);
+      }
+    },
+  );
 
   it.each(DOCUMENT_PATHS)(
     "lays the document at %s on the one grid, scrolling only its canvas and its rail",

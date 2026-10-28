@@ -26,3 +26,16 @@ export const PAGE_SETTLE_MS = 30_000;
 
 /** A page on the workspace archetype: the Definitions explorer. */
 export const WORKSPACE_PATH = "/definitions";
+
+/**
+ * A term's page on the workspace archetype, addressed by the term's
+ * absolute IRI: the trail's current crumb is an identifier with no break
+ * opportunity, wider than the strip at a phone's width.
+ */
+export const TERM_IRI_PATH = `/definitions/${encodeURIComponent("http://www.w3.org/2000/01/rdf-schema#Class")}`;
+
+/**
+ * A station's page addressed by its absolute IRI, whose current crumb is
+ * wider than the strip at a phone's width.
+ */
+export const STATION_IRI_PATH = `/stations/${encodeURIComponent("https://metro.example/onto#northgate")}`;
