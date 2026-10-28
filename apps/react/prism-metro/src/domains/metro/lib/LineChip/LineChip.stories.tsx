@@ -14,7 +14,11 @@ import {
   withProjections,
   withRouter,
 } from "../../../../../.storybook/decorators/index.js";
-import { MOCK_LINE, resolveRoot } from "../../../../../testing/fixtures.js";
+import {
+  MOCK_LINE,
+  MOCK_LOOP_LINE,
+  resolveRoot,
+} from "../../../../../testing/fixtures.js";
 import Component from "./LineChip.js";
 import type { LineChipProps } from "./types.js";
 
@@ -67,8 +71,16 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The North Line: its name in the pill, linked to its page. */
+/**
+ * The North Line: a swatch of its red, then its name in the pill, linked
+ * to its page.
+ */
 export const Default: Story = {};
+
+/** The Circle Line: the same pill, led by its yellow. */
+export const CircleLine: Story = {
+  parameters: { relay: mockEntity(MOCK_LOOP_LINE) },
+};
 
 /** A consumer's class, merged after the projection's own. */
 export const WithCustomClass: Story = {

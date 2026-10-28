@@ -53,5 +53,7 @@ describe("LineChip SSR", () => {
     );
     expect(html).toContain('class="ds entity-chip ds line-chip"');
     expect(html).toContain('href="/lines/metro%3Anorth-line"');
+    expect(html).toContain("--line-chip-swatch-color:#c8102e");
+    expect(html).toContain('<span aria-hidden="true" class="mark">');
   });
 });

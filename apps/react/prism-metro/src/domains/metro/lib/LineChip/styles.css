@@ -3,7 +3,21 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The chip sets the line's colour on its root per line, as
+   * --line-chip-swatch-color (LineChipChannelStyle); the swatch reads it. */
   .ds.line-chip {
-    /* Component styles */
+    --line-chip-swatch-width: var(--space-200);
+    --line-chip-swatch-height: var(--space-100);
+    --line-chip-swatch-radius: 9999px;
+  }
+
+  /* A short bar of the line's colour, as the network map draws the line;
+   * forced colours keep it, since it is the line's colour or nothing. */
+  .ds.line-chip .swatch {
+    width: var(--line-chip-swatch-width);
+    height: var(--line-chip-swatch-height);
+    border-radius: var(--line-chip-swatch-radius);
+    background: var(--line-chip-swatch-color);
+    forced-color-adjust: none;
   }
 }
