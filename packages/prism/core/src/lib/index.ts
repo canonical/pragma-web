@@ -36,6 +36,8 @@ export { collectLenses, routeLensFacet } from "./routeLens/index.js";
 export { createStaticRouter } from "./router/index.js";
 export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
+export type { StoredThemeProviderProps } from "./theme/index.js";
+export { StoredThemeProvider, useStoredTheme } from "./theme/index.js";
 export type {
   Box,
   CanvasProps,

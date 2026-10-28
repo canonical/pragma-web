@@ -18,6 +18,9 @@ package holds the parts every such site needs and none of them owns:
   `buildQuadArc`, `buildSelfLoop`, `settle`).
 - **Homes**: where each kind of graph node lives (`HomesProvider`,
   `useHome`), so a mention of a node links to the page that owns it.
+- **The stored theme**: the theme the reader's cookie stores, handed down
+  from the request (`StoredThemeProvider`, `useStoredTheme`), so the theme
+  control shows it on a server-rendered page as on the client.
 - **Entity bindings**: which GraphQL type serves each ontology class
   (`defineBinding`), checked against the schema (`assertBindings`) and the
   running graph (`assertBindingsLive`).
@@ -285,6 +288,25 @@ protocol-relative URL, a path that hides another host such as `/\host/path`,
 a relative href such as `#part`, a path no route matches), a modified click,
 and a link with a `target` or `download` stay the browser's.
 
+## The stored theme
+
+`ThemeSelector` shows the theme the reader stored, read from the `theme`
+cookie. The server cannot read that cookie from the document, so a site
+reads it off the request (`extractPreferences` from
+`@canonical/react-hooks`), carries it in the page's initial data, and
+mounts `StoredThemeProvider` with it in the shell, on the server and in the
+client entry alike:
+
+```tsx
+<StoredThemeProvider theme={initialData.theme}>
+  <Outlet />
+</StoredThemeProvider>;
+```
+
+The control then renders the stored theme on the server and hydrates to the
+same value. Without a provider it reads the cookie on the client alone, and
+a server-rendered page shows "System" until the reader changes it.
+
 ## Entity bindings
 
 ```ts
@@ -328,6 +350,8 @@ site's own catalog, and the factory holds no reader-facing string.
 ## Consumer obligations
 
 - Mount `HomesProvider` above routed content.
+- Mount `StoredThemeProvider` with the theme the request's cookie stores,
+  on the server and the client alike.
 - Pass `prepareRelayData` the site's `routes`, `middleware` and `notFound`,
   and stamp per-request attributes through `headers`, never module state.
 - Source `MentionChip`'s `prefixes` from the provider's `ontologies { prefix }`.
@@ -357,6 +381,8 @@ site's own catalog, and the factory holds no reader-facing string.
 - Links: `RouterLink`; types `RouterLinkProps`.
 - Homes: `HomesProvider`, `useHome`; types `Homes`, `HomeResolver`,
   `HomeNode`, `HomesProviderProps`.
+- Stored theme: `StoredThemeProvider`, `useStoredTheme`; types
+  `StoredThemeProviderProps`.
 - Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`; types
   `EntityBinding`, `GraphQLExecute`.
 - Relay: `createEnvironment`, `getPrefetchEnvironment`,
