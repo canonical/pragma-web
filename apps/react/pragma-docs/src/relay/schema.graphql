@@ -92,7 +92,7 @@ type Job implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -290,7 +290,7 @@ type Coordinate implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -396,7 +396,7 @@ type Actor implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -472,7 +472,7 @@ type Role implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -548,7 +548,7 @@ type Fluency implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -632,7 +632,7 @@ type Persona implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -711,7 +711,7 @@ type Substrate implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -747,7 +747,7 @@ type Capability implements Node {
   requiresAuthorities(first: Int, after: String, last: Int, before: String): AuthorityFamilyConnection!
 
   """
-  This capability is a thin bundle over the listed capabilities (a reader bundles read + snapshot + follow; a controller bundles deliver + lifecycle). Bundles exist to pass and attenuate scoped authority, never to add operations.
+  This capability is a thin bundle over the listed capabilities (a reader bundles reading the graph, searching it and reading its prose). Bundles exist to pass and attenuate scoped authority, never to add operations.
   """
   bundles(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
@@ -802,7 +802,7 @@ type Capability implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -893,7 +893,7 @@ type AuthorityFamily implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -969,7 +969,7 @@ type Rendering implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1045,7 +1045,7 @@ type Direction implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1121,7 +1121,7 @@ type Anchoring implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1200,7 +1200,7 @@ type LensSurface implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1245,7 +1245,7 @@ type LensSurface implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -1361,7 +1361,7 @@ type View implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1396,7 +1396,7 @@ type View implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -1462,7 +1462,7 @@ type Detail implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1497,7 +1497,7 @@ type Detail implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -1563,7 +1563,7 @@ type Peek implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1598,7 +1598,7 @@ type Peek implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -1664,7 +1664,7 @@ type Mechanism implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1699,7 +1699,7 @@ type Mechanism implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -1710,7 +1710,7 @@ type Mechanism implements Node & Surface {
 }
 
 """
-An anchored writing surface: where a consumer puts value INTO the substrate at a subject — the run's composer, a proposal form on an entity. The write quadrant the kind-enum scheme could not express.
+An anchored writing surface: where a consumer puts value into the substrate at one subject, such as a proposal form on an entity's page. Its anchoring sets it apart from an editor, which writes against the substrate at large.
 """
 type ComposerSurface implements Node & Surface {
   """The entity's absolute IRI — the primary key."""
@@ -1765,7 +1765,7 @@ type ComposerSurface implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1800,7 +1800,7 @@ type ComposerSurface implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -1866,7 +1866,7 @@ type Editor implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1901,7 +1901,7 @@ type Editor implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -1912,7 +1912,7 @@ type Editor implements Node & Surface {
 }
 
 """
-The invocable surface: where machine consumers call instead of look — API, MCP, CLI. Exposes capabilities directly; it curates nothing, so it has no slice, and pairings to it carry no arrival (agents have no reorientation to preserve).
+The invocable surface: where machine consumers call instead of look, through an API in the protocol the port names. Exposes capabilities directly; it curates nothing, so it has no slice, and pairings to it carry no arrival (agents have no reorientation to preserve).
 """
 type Port implements Node & Surface {
   """The entity's absolute IRI — the primary key."""
@@ -1972,12 +1972,12 @@ type Port implements Node & Surface {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  The protocol(s) this port speaks (MCP, GraphQL, CLI, a control socket).
+  The protocol or protocols this port speaks, each named as text (GraphQL, for one).
   """
   protocol: String
 
@@ -2012,7 +2012,7 @@ type Port implements Node & Surface {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -2078,7 +2078,7 @@ type Preservation implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2159,7 +2159,7 @@ type PairingRole implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2249,7 +2249,7 @@ type Pairing implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2335,7 +2335,7 @@ type Region implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2419,7 +2419,7 @@ type Slot implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2445,7 +2445,7 @@ type Slot implements Node {
 }
 
 """
-A falsifiable design assumption with a named test or kill-criterion — the third species of assumption beside the hard axiom and the soft heuristic. A bet without a kill-criterion is an opinion. Bets live in one shared ledger; jobs reference them by id; ids are stable and never renumbered (gaps mean retired bets). Modal character: P? — wagered, awaiting evidence.
+A falsifiable design assumption with a named test or kill-criterion. A bet without a kill-criterion is an opinion. Bets live in one shared ledger; jobs reference them by id; ids are stable and never renumbered (gaps mean retired bets). A bet is wagered and awaits evidence, unlike a law, which is held without a test.
 """
 type Bet implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2500,7 +2500,7 @@ type Bet implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2513,7 +2513,7 @@ type Bet implements Node {
   instruments: [String!]!
 
   """
-  The prior, 0..1 — how strongly the bet is believed before the instrument reports. A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from assume:status (the epistemic state); this is the number.
+  The prior, 0..1: how strongly the bet is believed before the instrument reports. A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from the bet's validity, which says whether it is still live; this is the number.
   """
   confidence: Float
 
@@ -2534,7 +2534,7 @@ type Bet implements Node {
 }
 
 """
-A named, reusable discipline of well-specified surfaces — the distilled cross-corpus rules (one substrate many projections; every word has one home; four states or it doesn't ship). Laws are cited by grammars (grammar:law) and instantiated by project rulings (assume:derivedFrom). A sibling of Axiom and Heuristic under assume:Assumption, deliberately outside their id/phase regimes: laws are timeless, not scheduled.
+A named, reusable discipline of well-specified surfaces: one substrate with many projections, one home for every noun, four states before a surface ships. A law is a rule every surface of the site follows. Unlike a bet it names no test that could retire it: laws are timeless, not wagered.
 """
 type Law implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2589,7 +2589,7 @@ type Law implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2678,7 +2678,7 @@ type Exemplar implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2764,7 +2764,7 @@ type Verdict implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2785,7 +2785,7 @@ type Verdict implements Node {
 }
 
 """
-Why an item is no longer (or never was) live: superseded, deprecated, cancelled or rejected (data/validities.ttl). Invalid items STAY in the graph with a note — the know-your-neighbour rule: anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from assume:status (the epistemics of assumptions). Absence of validity means live.
+Why an item is no longer (or never was) live: superseded, deprecated, cancelled or rejected (data/validities.ttl). Invalid items stay in the graph with a note, so anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from a bet's confidence (how strongly it is believed). Absence of validity means live.
 """
 type Validity implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2840,7 +2840,7 @@ type Validity implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -4508,7 +4508,7 @@ interface Surface implements Node {
   anchorings(first: Int, after: String, last: Int, before: String): AnchoringConnection!
 
   """
-  Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number.
+  Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number.
   """
   withins(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
@@ -4563,7 +4563,7 @@ interface Surface implements Node {
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 

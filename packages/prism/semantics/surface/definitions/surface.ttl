@@ -24,7 +24,7 @@ surface: a owl:Ontology ;
 
 surface:Validity a owl:Class ;
   rdfs:label "Validity" ;
-  rdfs:comment "Why an item is no longer (or never was) live: superseded, deprecated, cancelled or rejected (data/validities.ttl). Invalid items STAY in the graph with a note — the know-your-neighbour rule: anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from assume:status (the epistemics of assumptions). Absence of validity means live." .
+  rdfs:comment "Why an item is no longer (or never was) live: superseded, deprecated, cancelled or rejected (data/validities.ttl). Invalid items stay in the graph with a note, so anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from a bet's confidence (how strongly it is believed). Absence of validity means live." .
 
 surface:Verdict a owl:Class ;
   rdfs:label "Verdict" ;
@@ -36,11 +36,11 @@ surface:Exemplar a owl:Class ;
 
 surface:Law a owl:Class ;
   rdfs:label "Law" ;
-  rdfs:comment "A named, reusable discipline of well-specified surfaces — the distilled cross-corpus rules (one substrate many projections; every word has one home; four states or it doesn't ship). Laws are cited by grammars (grammar:law) and instantiated by project rulings (assume:derivedFrom). A sibling of Axiom and Heuristic under assume:Assumption, deliberately outside their id/phase regimes: laws are timeless, not scheduled." .
+  rdfs:comment "A named, reusable discipline of well-specified surfaces: one substrate with many projections, one home for every noun, four states before a surface ships. A law is a rule every surface of the site follows. Unlike a bet it names no test that could retire it: laws are timeless, not wagered." .
 
 surface:Bet a owl:Class ;
   rdfs:label "Bet" ;
-  rdfs:comment "A falsifiable design assumption with a named test or kill-criterion — the third species of assumption beside the hard axiom and the soft heuristic. A bet without a kill-criterion is an opinion. Bets live in one shared ledger; jobs reference them by id; ids are stable and never renumbered (gaps mean retired bets). Modal character: P? — wagered, awaiting evidence." .
+  rdfs:comment "A falsifiable design assumption with a named test or kill-criterion. A bet without a kill-criterion is an opinion. Bets live in one shared ledger; jobs reference them by id; ids are stable and never renumbered (gaps mean retired bets). A bet is wagered and awaits evidence, unlike a law, which is held without a test." .
 
 surface:Slot a owl:Class ;
   rdfs:label "Slot" ;
@@ -65,7 +65,7 @@ surface:Preservation a owl:Class ;
 surface:Port a owl:Class ;
   rdfs:subClassOf surface:Surface ;
   rdfs:label "Port" ;
-  rdfs:comment "The invocable surface: where machine consumers call instead of look — API, MCP, CLI. Exposes capabilities directly; it curates nothing, so it has no slice, and pairings to it carry no arrival (agents have no reorientation to preserve)." .
+  rdfs:comment "The invocable surface: where machine consumers call instead of look, through an API in the protocol the port names. Exposes capabilities directly; it curates nothing, so it has no slice, and pairings to it carry no arrival (agents have no reorientation to preserve)." .
 
 surface:Editor a owl:Class ;
   rdfs:subClassOf surface:Surface ;
@@ -75,7 +75,7 @@ surface:Editor a owl:Class ;
 surface:ComposerSurface a owl:Class ;
   rdfs:subClassOf surface:Surface ;
   rdfs:label "Composer surface" ;
-  rdfs:comment "An anchored writing surface: where a consumer puts value INTO the substrate at a subject — the run's composer, a proposal form on an entity. The write quadrant the kind-enum scheme could not express." .
+  rdfs:comment "An anchored writing surface: where a consumer puts value into the substrate at one subject, such as a proposal form on an entity's page. Its anchoring sets it apart from an editor, which writes against the substrate at large." .
 
 surface:Mechanism a owl:Class ;
   rdfs:subClassOf surface:Surface ;
@@ -163,7 +163,7 @@ surface:Surface a owl:Class ;
 surface:homedIn a owl:ObjectProperty ;
   rdfs:range surface:Lens ;
   rdfs:label "homed in" ;
-  rdfs:comment "The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery." .
+  rdfs:comment "The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. Stating the home as data makes the one-home law checkable: a noun without a homedIn target is a visible work item, not a mystery." .
 
 surface:supersededBy a owl:ObjectProperty ;
   rdfs:label "superseded by" ;
@@ -258,7 +258,7 @@ surface:confidence a owl:DatatypeProperty ;
   rdfs:domain surface:Bet ;
   rdfs:range xsd:decimal ;
   rdfs:label "confidence" ;
-  rdfs:comment "The prior, 0..1 — how strongly the bet is believed before the instrument reports. A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from assume:status (the epistemic state); this is the number." .
+  rdfs:comment "The prior, 0..1: how strongly the bet is believed before the instrument reports. A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from the bet's validity, which says whether it is still live; this is the number." .
 
 surface:instrument a owl:DatatypeProperty ;
   rdfs:domain surface:Bet ;
@@ -331,7 +331,7 @@ surface:within a owl:ObjectProperty ;
   rdfs:domain surface:Surface ;
   rdfs:range surface:Surface ;
   rdfs:label "within" ;
-  rdfs:comment "Placement: this surface lives inside another (the composer within the canvas). Altitude is the derived length of the within-chain — never a stored number." .
+  rdfs:comment "Placement: this surface lives inside another (a command palette within the page it opens from). Altitude is the derived length of the within-chain, never a stored number." .
 
 surface:anchoring a owl:ObjectProperty ;
   rdfs:domain surface:Surface ;
@@ -361,7 +361,7 @@ surface:protocol a owl:DatatypeProperty ;
   rdfs:domain surface:Port ;
   rdfs:range xsd:string ;
   rdfs:label "protocol" ;
-  rdfs:comment "The protocol(s) this port speaks (MCP, GraphQL, CLI, a control socket)." .
+  rdfs:comment "The protocol or protocols this port speaks, each named as text (GraphQL, for one)." .
 
 surface:dominantJob a owl:ObjectProperty ;
   rdfs:domain surface:Lens ;
@@ -391,7 +391,7 @@ surface:bundles a owl:ObjectProperty ;
   rdfs:domain surface:Capability ;
   rdfs:range surface:Capability ;
   rdfs:label "bundles" ;
-  rdfs:comment "This capability is a thin bundle over the listed capabilities (a reader bundles read + snapshot + follow; a controller bundles deliver + lifecycle). Bundles exist to pass and attenuate scoped authority, never to add operations." .
+  rdfs:comment "This capability is a thin bundle over the listed capabilities (a reader bundles reading the graph, searching it and reading its prose). Bundles exist to pass and attenuate scoped authority, never to add operations." .
 
 surface:requiresAuthority a owl:ObjectProperty ;
   rdfs:domain surface:Capability ;
