@@ -52,8 +52,9 @@ each a subgrid over every column:
 
 - `WorkspaceLayout`: a page that fills the viewport and never scrolls. The
   rail takes the first two columns, the strip the rest of the top row, the
-  canvas the body, and an `inspector` the last three columns of the body;
-  the rail and the inspector scroll on their own. Below three groups of
+  canvas the body, and an `inspector` the last three columns of the body,
+  a subgrid of them its content can sit on; the rail and the inspector
+  scroll on their own. Below three groups of
   columns the inspector moves into the published `SidePanel` drawer, which
   a trigger at the canvas's corner opens.
 - `DocumentLayout`: a page whose canvas is the one scrolling region, with
@@ -341,6 +342,29 @@ site's own catalog, and the factory holds no reader-facing string.
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
   `ThemeSelectorProps`.
+- Graphs: `GraphCanvas`, the pan-and-zoom SVG viewport on a 16px dot
+  lattice, and `useGraphZoomBucket`, the zoom bucket a drawing reads to
+  show only the text that renders at 12px or more; types
+  `GraphCanvasProps`, `GraphBox`, `GraphCameraMemory` (where a camera
+  stood, in screen terms, which a canvas mounted again on the same memory
+  resumes), `GraphFrameRequest` (a one-off fit the
+  camera makes once per serial), `GraphLegibleWindow` (the window a refit
+  shows of a box too large for the legible zoom), `GraphOpening` (the
+  camera a canvas opens on once the client has measured it, and again when
+  a resize shrinks an unmoved camera's view below the legible zoom),
+  `GraphTransform`, `GraphZoomBucket`. A canvas given no opening opens
+  where its viewBox shows at the legible zoom (12/14 on screen) on the
+  server's paint, and elsewhere, as on a phone, on a legible window of the
+  graph's first region, the one its legible window chooses or the
+  viewBox's top-left corner, the rest a pan away; a resize that leaves an
+  unmoved camera on such a window where the viewBox now shows legibly
+  returns it to the server's paint. The zoom extent widens to hold any
+  opening or fit, so the reader zooms in and out from it. A refit never zooms a legible view
+  out to an illegible one; Fit fits the whole graph, below the wheel's
+  floor when it must but never into the overview (a graph too large for
+  12/16 on screen shows from its top-left corner at that zoom, the rest a
+  pan away), and the camera pans over the graph's whole bounds however
+  small a window of it the viewBox opens on.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
   `RelaxOptions`, `QuadArc`.

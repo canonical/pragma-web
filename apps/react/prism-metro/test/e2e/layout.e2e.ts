@@ -3,15 +3,16 @@
 /**
  * The page grid and the scroll model, measured in a real browser: the metro
  * graph in its own process and the dev cell pointed at it serve a workspace
- * page and a document page, and Chromium lays each out once at a desktop and
- * a phone width, measuring it in the light and the dark theme. What is
+ * page and three document pages, a station's page, the landing and the
+ * not-found page, and Chromium lays each out once at a desktop and a phone
+ * width, measuring it in the light and the dark theme. What is
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
  * viewport or past its region, at 390px too; twelve columns at 1440px and
  * four at 390px; a workspace canvas that never scrolls; a document whose
  * only scrolling regions are its canvas and its rail; a canvas that starts
  * one gutter under the strip, or at the viewport's top with no strip, as on
- * the lobby and the not-found page, its page then starting one gutter
+ * the landing and the not-found page, its page then starting one gutter
  * down; a strip whose band runs from the rail's
  * border to the viewport's edge with its content from the canvas's first
  * column line to its last; and every gap, padding and margin of the chrome
@@ -39,13 +40,13 @@ const CWD = process.cwd();
 
 /**
  * Pages on the document archetype: a station's page, under its lens's
- * strip, and the lobby and the not-found page, which have no strip.
+ * strip, and the landing and the not-found page, which have no strip.
  */
 const DOCUMENT_PATHS = [
   `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`,
   "/",
   "/not-found",
-];
+] as const;
 
 let graph: RunningServer;
 let server: RunningServer;
@@ -103,13 +104,17 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       expect(layout.overflow, theme).toEqual([]);
       expect(layout.regionOverflow.rail, theme).toBe("auto");
       const { edges } = layout;
+      // The canvas starts one gutter under the row above it: the drawer
+      // trigger's own row while it shows, else the strip's; so the trigger
+      // covers nothing the canvas holds.
+      const above = edges.triggerBottom ?? edges.stripBottom;
       expect(edges.canvasTop, theme).toBeCloseTo(
-        edges.stripBottom === null ? 0 : edges.stripBottom + edges.rowGap,
+        above === null ? 0 : above + edges.rowGap,
         1,
       );
-      // With no strip the page itself starts one gutter under the
+      // With no row above, the page itself starts one gutter under the
       // viewport's top, as a page under a strip starts under its rule.
-      if (edges.stripBottom === null) {
+      if (above === null) {
         expect(layout.canvasPage.firstChildTop, theme).toBeCloseTo(
           edges.rowGap,
           1,
@@ -149,10 +154,19 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         layout.canvas.clientHeight,
       );
       expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
-      // The Definitions lens gives its workspace no inspector: no region
-      // and no drawer trigger.
-      expect(layout.regionOverflow.inspector, theme).toBeNull();
-      expect(layout.triggerShown, theme).toBe(false);
+      // The Definitions lens gives its workspace an inspector: a region
+      // that scrolls on its own from three groups of columns, a drawer
+      // behind its trigger below them.
+      expect(layout.regionOverflow.inspector, theme).toBe("auto");
+      expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
+      // The page never scrolls, a phone's included: below one group of
+      // columns the class graph's rows scroll inside the explorer's well,
+      // under the strip and the rail's search, as every region of the
+      // workspace scrolls on its own; above it the well pans instead.
+      expect(
+        layout.scrollers.includes("div.ds.hierarchy-well.explorer-well"),
+        theme,
+      ).toBe(viewport.width < 448);
     }
   });
 

@@ -29,6 +29,7 @@ const NODE_TOKENS = ["--color-border-muted", "--color-text-muted"];
 const UI_TOKENS = [
   "--card-span",
   "--color-background",
+  "--color-background-container",
   "--color-background-layer2",
   "--color-border",
   "--color-border-muted",

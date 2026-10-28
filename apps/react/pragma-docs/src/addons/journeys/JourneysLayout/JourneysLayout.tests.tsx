@@ -1,4 +1,3 @@
-import "../../../../testing/stubReactFlowGlobals.js";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createFetchSpy from "../../../../testing/createFetchSpy.js";
@@ -33,7 +32,7 @@ describe("JourneysLayout", () => {
 
     expect(graphOption).toHaveAttribute("aria-pressed", "true");
     expect(readExplorerView()).toBe("graph");
-    expect(document.querySelector(".react-flow__node-hop")).not.toBeNull();
+    expect(document.querySelector(".ds.journey-well .hop")).not.toBeNull();
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });

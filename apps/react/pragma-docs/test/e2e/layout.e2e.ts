@@ -17,7 +17,8 @@
  * the strip's and the colophon's, that run from the rail's border to the
  * viewport's edge with their content from the canvas's first column line
  * to its last;
- * and every gap, padding and margin of the chrome a multiple of 4px.
+ * every gap, padding and margin of the chrome a multiple of 4px; and the
+ * workspace drawn in the face it ships, the dev cell delivering its font.
  */
 import {
   launchBrowser,
@@ -90,13 +91,17 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
       expect(layout.overflow, theme).toEqual([]);
       expect(layout.regionOverflow.rail, theme).toBe("auto");
       const { edges } = layout;
+      // The canvas starts one gutter under the row above it: the drawer
+      // trigger's own row while it shows, else the strip's; so the trigger
+      // covers nothing the canvas holds.
+      const above = edges.triggerBottom ?? edges.stripBottom;
       expect(edges.canvasTop, theme).toBeCloseTo(
-        edges.stripBottom === null ? 0 : edges.stripBottom + edges.rowGap,
+        above === null ? 0 : above + edges.rowGap,
         1,
       );
-      // With no strip the page itself starts one gutter under the
+      // With no row above, the page itself starts one gutter under the
       // viewport's top, as a page under a strip starts under its rule.
-      if (edges.stripBottom === null) {
+      if (above === null) {
         expect(layout.canvasPage.firstChildTop, theme).toBeCloseTo(
           edges.rowGap,
           1,
@@ -127,6 +132,39 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
     }
   };
 
+  it("draws the workspace in the face it ships, Ubuntu Sans, delivered whole", async () => {
+    const page = await browser.newPage({ viewport });
+    try {
+      const origins = [
+        new URL(server.base).origin,
+        new URL(server.graphBase).origin,
+      ];
+      await page.route("**/*", (route) =>
+        origins.includes(new URL(route.request().url()).origin)
+          ? route.continue()
+          : route.fulfill({ status: 204, body: "" }),
+      );
+      await page.goto(new URL(WORKSPACE_PATH, server.base).href, {
+        waitUntil: "load",
+        timeout: PAGE_SETTLE_MS,
+      });
+      // The graph's widths are measured from this face: a page that falls
+      // back to another draws its labels past their boxes.
+      const face = await page.evaluate(async () => {
+        const font = '600 14px "Ubuntu Sans"';
+        const faces = await document.fonts.load(font).catch(() => []);
+        return {
+          loaded: faces.filter((each) => each.status === "loaded").length,
+          checked: document.fonts.check(font),
+        };
+      });
+      expect(face.loaded).toBeGreaterThan(0);
+      expect(face.checked).toBe(true);
+    } finally {
+      await page.close();
+    }
+  });
+
   it("lays the workspace on the one grid with a canvas that never scrolls", async () => {
     const measures = await measure(WORKSPACE_PATH);
     expectGrid(measures);
@@ -136,10 +174,19 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         layout.canvas.clientHeight,
       );
       expect(layout.scrollers, theme).not.toContain("main.ds.canvas");
-      // The Definitions lens gives its workspace no inspector: no region
-      // and no drawer trigger.
-      expect(layout.regionOverflow.inspector, theme).toBeNull();
-      expect(layout.triggerShown, theme).toBe(false);
+      // The Definitions lens gives its workspace an inspector: a region
+      // that scrolls on its own from three groups of columns, a drawer
+      // behind its trigger below them.
+      expect(layout.regionOverflow.inspector, theme).toBe("auto");
+      expect(layout.triggerShown, theme).toBe(viewport.width < 1376);
+      // The page never scrolls, a phone's included: below one group of
+      // columns the class graph's rows scroll inside the explorer's well,
+      // under the strip and the rail's search, as every region of the
+      // workspace scrolls on its own; above it the well pans instead.
+      expect(
+        layout.scrollers.includes("div.ds.hierarchy-well.explorer-well"),
+        theme,
+      ).toBe(viewport.width < 448);
     }
   });
 

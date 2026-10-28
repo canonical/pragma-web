@@ -1,12 +1,11 @@
 /**
  * The journey well's DETERMINISTIC layout: the demand model's coordinate →
- * job → pairing → surface → layout spine in, a fully-positioned React Flow
- * node/edge model out. Pure — same input, byte-equal output
+ * job → pairing → surface → layout spine in, a fully-positioned node/edge
+ * model out. Pure — same input, byte-equal output
  * (`buildJourneyGraph.tests.ts` pins it) — because the positions must be
- * computed identically on the server and the client: React Flow v12 renders
- * the full node DOM during SSR only when every node carries explicit
- * `width`/`height` (and `handles`, for server-rendered edge paths), so any
- * nondeterminism here surfaces as a hydration mismatch.
+ * computed identically on the server and the client: the well draws the
+ * graph as SVG from these positions on both, so any nondeterminism here
+ * surfaces as a hydration mismatch.
  *
  * LAYOUT MODEL — the hierarchy well transposed. There, ontologies are
  * blocks of layers running top-down; here the journey runs LEFT TO RIGHT,
@@ -15,10 +14,8 @@
  *   x = the hop's column   (coordinate | job | pairing | surface | layout)
  *   y = the row the journey occupies
  *
- * Handles follow the axis: every node carries a Right source and a Left
- * target, so a hop's edge leaves its right edge and lands on the next
- * hop's left edge — computable server-side, exactly as the vertical well's
- * Top/Bottom pair is.
+ * Edges follow the axis: a hop's edge leaves its right edge and lands on
+ * the next hop's left edge, so the well computes every path server-side.
  *
  * ROWS ARE ALLOCATED, NEVER MEASURED. Each journey (one coordinate → one
  * job → one pairing → …) claims a row; a node shared by several rows (the
@@ -44,15 +41,16 @@
  * which is exactly what it is.
  */
 
-import { Position } from "@xyflow/react";
-import type { HopKind, JourneyFlowEdge, JourneyFlowNode } from "./types.js";
-
-/** Explicit node metrics — the SSR contract (see module doc). */
-export const NODE_WIDTH = 176;
-export const NODE_HEIGHT = 44;
-/** Gaps: between columns (x), between rows (y). */
-export const COLUMN_GAP = 72;
-export const ROW_GAP = 20;
+import {
+  ARRIVAL_CLASS_PREFIX,
+  COLUMN_GAP,
+  NODE_HEIGHT,
+  NODE_WIDTH,
+  ROLE_PRIMARY_CLASS,
+  ROLE_SECONDARY_CLASS,
+  ROW_GAP,
+} from "./constants.js";
+import type { HopKind, JourneyGraphEdge, JourneyGraphNode } from "./types.js";
 
 /** The column index of each hop kind — the x axis, in one place. */
 const COLUMN_INDEX: Readonly<Record<HopKind, number>> = {
@@ -69,22 +67,6 @@ const columnX = (kind: HopKind): number =>
 
 /** A row's y: constant stride, no measurement. */
 const rowY = (row: number): number => row * (NODE_HEIGHT + ROW_GAP);
-
-/** Both handles, node-relative, so edge paths are computable server-side. */
-const HANDLES = [
-  {
-    type: "source" as const,
-    position: Position.Right,
-    x: NODE_WIDTH,
-    y: NODE_HEIGHT / 2,
-  },
-  {
-    type: "target" as const,
-    position: Position.Left,
-    x: 0,
-    y: NODE_HEIGHT / 2,
-  },
-];
 
 /** One pairing as the fragment delivers it. */
 export interface JourneyPairing {
@@ -125,10 +107,10 @@ export interface JourneyCoordinate {
   readonly jobs: readonly JourneyJob[];
 }
 
-/** The positioned graph: React Flow's inputs, deterministic. */
+/** The positioned graph the well draws, deterministic. */
 export interface JourneyGraph {
-  readonly nodes: readonly JourneyFlowNode[];
-  readonly edges: readonly JourneyFlowEdge[];
+  readonly nodes: readonly JourneyGraphNode[];
+  readonly edges: readonly JourneyGraphEdge[];
 }
 
 /** Sort a collection by URI — the explicit order the layout depends on. */
@@ -165,7 +147,7 @@ export const buildJourneyGraph = (
 ): JourneyGraph => {
   const placements = new Map<string, Placement>();
   const edgeIds = new Set<string>();
-  const edges: JourneyFlowEdge[] = [];
+  const edges: JourneyGraphEdge[] = [];
   let row = 0;
 
   /** Record a node's presence on a row, creating it on first sight. */
@@ -195,7 +177,6 @@ export const buildJourneyGraph = (
       id,
       source,
       target,
-      type: "smoothstep",
       ...(className === undefined ? {} : { className }),
     });
   };
@@ -268,7 +249,7 @@ export const buildJourneyGraph = (
     }
   }
 
-  const nodes: JourneyFlowNode[] = [];
+  const nodes: JourneyGraphNode[] = [];
   for (const [uri, placement] of placements) {
     // A shared node centres on the mean of its rows, SNAPPED TO THE HALF
     // ROW. The snap is what makes this reproducible in the only way that
@@ -285,16 +266,10 @@ export const buildJourneyGraph = (
       placement.rows.length;
     nodes.push({
       id: uri,
-      type: "hop",
-      position: {
-        x: columnX(placement.kind),
-        y: rowY(Math.round(mean * 2) / 2),
-      },
+      x: columnX(placement.kind),
+      y: rowY(Math.round(mean * 2) / 2),
       width: NODE_WIDTH,
       height: NODE_HEIGHT,
-      handles: HANDLES,
-      draggable: false,
-      connectable: false,
       data: {
         uri,
         label: placement.label,
@@ -309,11 +284,6 @@ export const buildJourneyGraph = (
 
   return { nodes, edges };
 };
-
-/** The class names this module emits — the CSS contract, in one place. */
-export const ROLE_PRIMARY_CLASS = "is-primary";
-export const ROLE_SECONDARY_CLASS = "is-secondary";
-export const ARRIVAL_CLASS_PREFIX = "arrival-";
 
 /**
  * The local name of a vocabulary URI. The demand model's vocabulary terms

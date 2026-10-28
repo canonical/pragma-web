@@ -1,10 +1,11 @@
 # @canonical/prism-lens-definitions
 
 The Definitions lens of a Prism documentation site: an ontology explorer over
-the graph's classes and properties. A term rail lists every term the
-ontologies carry, a class hierarchy well draws each ontology's classes and the
-relations between them, and a term inspector shows the selected class or
-property in full, with the instances of a class mentioned as entity chips.
+the graph's classes and properties, on the workspace archetype. A term rail
+lists every term the ontologies carry, an SVG class graph draws each
+ontology's classes and the relations between them on a canvas that pans and
+zooms, and a term inspector shows the selected class or property in full,
+with the instances of a class mentioned as entity chips.
 
 The lens is **Tier 1**: its one operation and its fragments compile against
 `@canonical/prism-contract`'s SDL alone, so it runs over any provider that
@@ -117,45 +118,80 @@ lens's own artifacts land in `src/__generated__`. `check:tier1` runs
 selection leaves the contract and when the artifacts are stale. Run
 `bun run relay` after editing a fragment.
 
+## The workspace
+
+`DefinitionsLayout` lays the lens on `WorkspaceLayout`: the site's rail, the
+mode strip (the breadcrumb trail, the filter chips and the status figure),
+the explorer in the canvas and the term inspector in the inspector region,
+a drawer below three groups of columns. The router mounts the layout
+again on each of the lens's routes, so the lens keeps the reader's chips,
+search, zoom and pan for the router's life while the reader stays in the
+lens: a pick in the rail pans the graph to the selection and changes
+nothing else, and a visit to another lens and back starts afresh.
+
+- **The term rail** lists each ontology's classes in the graph's own order,
+  a parent before its children, each with its depth and its kind's mark,
+  then its properties; a search field over every term heads it. The rail
+  dims what the filter leaves out and never hides it.
+- **The class graph** is laid out on the server, deterministically, in
+  layered columns per namespace on a 16px lattice: subclass buses with one
+  hollow head at each superclass, relations bundled per pair with a filled
+  head at each range, self-relations as one loop, hubs taller. It is drawn
+  as native SVG, each class an `EntityGraphNode`, inside prism-core's
+  `GraphCanvas`, which pans and zooms with `d3-zoom` on the client. The
+  canvas opens on the whole graph when it fits there at a zoom where every
+  label renders at 12px or more, else on a legible window of it, around the
+  class a term page selects, whose left, top and right edges cut through no
+  box, with no box cut on two sides in its corner; once the client has
+  measured the canvas it opens on the window that size calls for, and
+  again when a resize shrinks a view nothing has moved below the legible
+  zoom. A filter's refit or a picked namespace never zooms a legible view
+  out to an illegible one: what is too large shows from its corner in a
+  window that cuts no box. Fit fits the whole, and the camera pans over all
+  of it. Text below 12px on screen is not drawn. Pointing
+  at or focusing a class fades everything outside its neighbourhood and
+  labels its relations; the selection is ringed and its lineage drawn; the
+  arrows move along the tree. Below one group of columns the graph becomes
+  rows in rail order for a phone.
+- **The term inspector** shows the selected term in sections (lineage,
+  definition, subclasses, fields, relations, instances for a class; kind,
+  range, domain and inverse for a property), every reference a term link,
+  on the inspector region's three columns: a key or a field's name on the
+  first, its value on the rest, row after row.
+  With no term it explains the graph with a legend drawn by the graph's own
+  code, a row per namespace that fits the camera to it, and the gestures.
+
 ## Styling
 
-The stylesheets sit in the `ds.prism` cascade layer. Each design decision
-reads a component token, declared on `:root` and named for its component
-(`--term-rail-dimmed-opacity`, `--hierarchy-well-accent-color`, …), so a
-site retunes the lens by setting component tokens. Where the design system
-has a semantic token for the decision, the component token reads it, so a
-site also retunes those decisions through its theme:
+Every component is scaffolded by the React component generator under
+`src/lib/ui/`, with an `anatomy.yaml` its stylesheet transcribes, and its
+stylesheet sits in the `ds.components.global` cascade layer. Each design
+decision reads a component token declared on the component's root rule and
+named for it (`--term-rail-dimmed-opacity`, `--class-graph-edge-color`, …),
+so a site retunes the lens by setting component tokens. A component token
+reads the design system's semantic tier or the spacing shim where they hold
+the decision, so a site also retunes those through its theme:
 
 - colour: `--color-text`, `--color-text-muted`, `--color-text-branded`,
-  `--color-background`, `--color-background-contrasted`, `--color-border`,
-  `--color-border-muted`;
-- space and motion: `--space-025` to `--space-800`, `--motion-duration-fast`,
-  each with the lens's own default as its fallback.
+  `--color-background`, `--color-background-container`,
+  `--color-background-layer2`, `--color-border`, `--color-border-muted`,
+  `--color-focus-ring`;
+- type: the semantic `--typography-text-*` sizes, weights and code family;
+- motion: `--motion-duration-fast`, the graph's fade, which reduced motion
+  zeroes;
+- space: `--component-padding-*`, `--container-gap-*`, `--grid-gutter` and
+  the `--space-*` steps.
 
-The well's accent, which paints the semantic arcs (the object properties
-between classes), their arrowheads and predicate labels, and the legend's
-relation swatch, reads `--color-text-branded`, so it takes the theme's brand
-hue and follows it between light and dark. A site that wants a fixed accent
-sets `--hierarchy-well-accent-color` and
-`--well-legend-relation-color` to the same colour, for example
-`oklch(0.55 0.17 45)`.
+Where the tiers hold no token for a decision, the component token holds the
+lens's own value, and each component's anatomy names it in its ledger: the
+graph's floor and relation edge colours, the 16px type of a term's name and
+a region's prefix, the fade and dim opacities, the hairlines and focus
+rings, and the pills' radius. The lens reads no primitive token, and
+reshapes only through the shell's container queries at whole groups of
+columns.
 
-The design system has no semantic token for the rest, so the component
-token holds the lens's own value and only the component token retunes it:
-every type size, font family, weight, tracking and line height; every
-radius, border, stroke and edge width; the focus ring's width and offset;
-every opacity and shadow geometry; the indicator size and the legend's
-arrowhead; and two layout measures,
-`--definitions-explorer-well-min-block-size` and
-`--well-legend-max-inline-size`. No component token reads a primitive
-token.
-
-The stylesheets also read custom properties that are not design decisions:
-
-- `--z-plate` and `--z-underground`, the strata the well's floating hint and
-  legend are raised to and the well itself sits on, and
-  `--surface-underground-background`, the well floor's tint, which the site
-  defines.
+The package has a Storybook (`bun run storybook`) with a story for every
+component, each over a captured store.
 
 ## Public API
 

@@ -1,0 +1,15 @@
+---
+# SocketGuard — renders a socket's tenant while the store holds what it
+# reads, and its fallback, or nothing, while it does not. It renders no
+# element of its own.
+node:
+  uri: prism.component.socket_guard
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: tenant
+          - node:
+              role: fallback
+      relation: { cardinality: "0..1", slotName: default }

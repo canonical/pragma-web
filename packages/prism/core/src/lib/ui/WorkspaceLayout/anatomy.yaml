@@ -5,7 +5,8 @@
 # above its canvas. The rail takes columns 1 / span 2 on every row and
 # scrolls on its own; the strip row spans the rest; the canvas fills the
 # body row, the last, and never scrolls; the inspector is a persistent
-# region in the last three columns of the body row that scrolls on its own.
+# region in the last three columns of the body row that scrolls on its own,
+# a subgrid of those columns, so what it holds can sit on their lines.
 # Its gap is the grid's gutter on both axes, so the strip and the body sit
 # one gutter apart; the strip region, a subgrid, sets the same gap.
 #
@@ -17,17 +18,17 @@
 #   @container shell (width < 1376px)  below three groups: the canvas spans
 #     3 / -1; the inspector region is hidden and its content renders in the
 #     published SidePanel drawer, opened by `inspector-trigger` (shown only
-#     here, floating at the canvas's top end corner).
+#     here, at the end of a row of its own between the strip and the body:
+#     the rows become `min-content min-content minmax(0, 1fr)`, or
+#     `min-content minmax(0, 1fr)` with no strip, so it covers nothing the
+#     canvas holds).
 #   @container shell (width < 448px)   below one group: the rail spans one
 #     column; strip and canvas start at line 2.
 #
 # Every decision is read through a component token declared on the root
 # (`--workspace-layout-*`), bound to the symbol named here.
 #
-# Token ledger:
-#   layout.stack 1 on the trigger: it floats over the canvas.
-#
-# Roster namespaces (accepted and tracked): grid.gutter, container.gap.default.
+# Roster namespaces (accepted and tracked): grid.gutter.
 node:
   uri: prism.component.workspace_layout
   styles:
@@ -81,6 +82,10 @@ node:
               styles:
                 layout.grid.column: "-4 / -1"
                 layout.grid.row: "-2 / -1"
+                layout.type: grid
+                layout.grid.columns: subgrid
+                layout.alignContent: start
+                spacing.gap: grid.gutter
                 layout.overflow.block: auto
                 size.min.block: 0
           - node:
@@ -90,10 +95,7 @@ node:
         uri: global.component.button
         styles:
           layout.type: none
-          layout.grid.column: "-2 / -1"
-          layout.grid.row: "-2 / -1"
-          layout.alignSelf: start
+          layout.grid.column: "-3 / -1"
+          layout.grid.row: "-3 / -2"
           spacing.external.inline.start: auto
-          spacing.external.block.start: container.gap.default
-          layout.stack: 1
       relation: { cardinality: "0..1", slotName: inspector-trigger }

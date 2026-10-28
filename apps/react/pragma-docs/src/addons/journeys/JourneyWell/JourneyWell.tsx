@@ -1,94 +1,135 @@
+import { GraphCanvas } from "@canonical/prism-core";
 import { Link } from "@canonical/router-react";
-import { Handle, type NodeProps, Position, ReactFlow } from "@xyflow/react";
 import type React from "react";
 import { useMemo } from "react";
 import { buildJourneyGraph } from "./buildJourneyGraph.js";
-import type { JourneyFlowNode, JourneyWellProps } from "./types.js";
-import "@xyflow/react/dist/style.css";
+import { TAG_OFFSET, VIEW_MARGIN } from "./constants.js";
+import requireHop from "./requireHop.js";
+import truncateLabel from "./truncateLabel.js";
+import type {
+  JourneyGraphEdge,
+  JourneyGraphNode,
+  JourneyWellProps,
+} from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds journey-well";
 
+/** The corner radius of a hop's box, in SVG units. */
+const NODE_RADIUS = 8;
+
 /**
- * One hop in a journey. A JOB node is a real router link — the job is the
- * lens's addressable thing (P-D7), so selecting one is a navigation, not
- * component state. A SURFACE node links out to the docsite route that
- * surface lives at WHEN ONE EXISTS (`ROUTE_BY_SURFACE`); where the site
- * renders no such page the node is plain text rather than a dead link,
- * which is the honest rendering of a surface we do not yet build.
+ * One hop in a journey, drawn in SVG. A JOB hop is a real router link — the
+ * job is the lens's addressable thing (P-D7), so selecting one is a
+ * navigation, not component state. A SURFACE hop links out to the docsite
+ * route that surface lives at WHEN ONE EXISTS (`ROUTE_BY_SURFACE`); where
+ * the site renders no such page the hop is plain text rather than a dead
+ * link, which is the honest rendering of a surface we do not yet build.
  *
  * Every other hop is static text: coordinates and pairings are not places
  * on this site, and inventing addresses for them would be inventing pages.
  *
- * The label is `title`-attributed as well as rendered: node geometry is
- * fixed for SSR determinism (no text measurement is available on the
- * server), so a long name ellipsises and the tooltip is how the full name
- * stays recoverable — the hierarchy well's idiom exactly.
+ * The label is cut to the node's width, since the server measures no text,
+ * and the node's `<title>` keeps the full name.
  *
- * The kind rides as real text in a `data-kind` attribute AND as the node's
- * visible column, so the distinction survives with styling off rather than
- * living in position alone.
+ * The kind rides as real text in a `data-kind` attribute AND as the hop's
+ * column, so the distinction survives with styling off rather than living
+ * in position alone.
  */
-const HopNode = ({ data }: NodeProps<JourneyFlowNode>): React.ReactElement => {
-  const label = data.label;
+const Hop = ({
+  node,
+  selected,
+}: {
+  readonly node: JourneyGraphNode;
+  readonly selected: boolean;
+}): React.ReactElement => {
+  const { data, width, height } = node;
+  const text = (
+    <text
+      className="label"
+      dominantBaseline="central"
+      fill="currentColor"
+      textAnchor="middle"
+      x={width / 2}
+      y={height / 2}
+    >
+      {truncateLabel(data.label)}
+    </text>
+  );
   let body: React.ReactElement;
   if (data.kind === "job") {
     body = (
-      <Link
-        className="journey-node-link"
-        params={{ job: data.uri }}
-        title={label}
-        to="journeysJob"
-      >
-        {label}
+      <Link className="link" params={{ job: data.uri }} to="journeysJob">
+        {text}
       </Link>
     );
   } else if (data.href !== undefined) {
     body = (
-      <a className="journey-node-link" href={data.href} title={label}>
-        {label}
+      <a className="link" href={data.href}>
+        {text}
       </a>
     );
   } else {
-    body = (
-      <span className="journey-node-text" title={label}>
-        {label}
-      </span>
-    );
+    body = text;
   }
-
   return (
-    <div className="journey-node-shell" data-kind={data.kind}>
-      {/* The handle DOM the edges anchor to. React Flow v12 renders NO handle
-          elements for a non-connectable node and re-measures handle positions
-          from the DOM on the client — so without these, every edge loses its
-          anchor after hydration and vanishes (the same "Couldn't create edge
-          for target handle" failure the definitions well had). Rendered
-          non-connectable and visually hidden (.react-flow__handle in the well
-          CSS). Positions MIRROR buildJourneyGraph's HANDLES: the spine runs
-          left→right, so source is on the Right, target on the Left. */}
-      <Handle isConnectable={false} position={Position.Right} type="source" />
-      <Handle isConnectable={false} position={Position.Left} type="target" />
+    <g
+      className={selected ? "hop is-selected" : "hop"}
+      data-id={node.id}
+      data-kind={data.kind}
+      transform={`translate(${node.x},${node.y})`}
+    >
+      <title>{data.label}</title>
+      <rect
+        className="shell"
+        fill="currentColor"
+        height={height}
+        rx={NODE_RADIUS}
+        width={width}
+      />
+      <rect
+        className="outline"
+        fill="none"
+        height={height}
+        rx={NODE_RADIUS}
+        stroke="currentColor"
+        width={width}
+      />
       {body}
       {data.surfaceType === undefined ? null : (
-        <span className="journey-node-tag">{data.surfaceType}</span>
+        <text
+          className="tag"
+          fill="currentColor"
+          textAnchor="middle"
+          x={width / 2}
+          y={height + TAG_OFFSET}
+        >
+          {data.surfaceType}
+        </text>
       )}
-    </div>
+    </g>
   );
 };
 
-/** Module-scope node-type map — a stable identity, as React Flow requires. */
-const nodeTypes = { hop: HopNode };
-
 /**
- * The initial camera: a deterministic constant, NEVER a measured fit.
- * `fitView` is forbidden here — it measures the container, which the
- * server cannot do, so the server and the client would disagree about the
- * transform and hydration would have something to reconcile. 0.6 shows a
- * single coordinate's journeys whole on a typical canvas, and the flow
- * pans/zooms from there.
+ * An edge's path: from its source's right middle to its target's left
+ * middle, a cubic that leaves and lands horizontally. The layout connects
+ * only hops it has placed, so both ends are in `byId`; an end that is not
+ * fails at `requireHop`.
  */
-const DEFAULT_VIEWPORT = { x: 24, y: 24, zoom: 0.6 };
+const drawEdge = (
+  edge: JourneyGraphEdge,
+  byId: ReadonlyMap<string, JourneyGraphNode>,
+): string => {
+  const source = requireHop(byId, edge.source);
+  const target = requireHop(byId, edge.target);
+  const x1 = source.x + source.width;
+  const y1 = source.y + source.height / 2;
+  const x2 = target.x;
+  const y2 = target.y + target.height / 2;
+  const mx = (x1 + x2) / 2;
+  return `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+};
 
 /**
  * The well's legend: what the columns mean and what an edge's weight says.
@@ -119,17 +160,15 @@ const JourneyLegend = (): React.ReactElement => (
 /**
  * The Journeys lens's centre panel: the demand model's left-to-right
  * spine in an underground well (the `.ds.underground` hook — the
- * depression you look INTO, AX.3). Rendered with React Flow v12, whose SSR
- * path renders the full node DOM server-side because every node carries
- * explicit `width`/`height` and both `handles` from the deterministic
- * layout (`buildJourneyGraph`).
+ * depression you look INTO, AX.3), drawn as SVG in prism-core's
+ * `GraphCanvas`, which pans and zooms it.
  *
  * THE SSR DETERMINISM CONTRACT, in one place:
  *   - positions come from `buildJourneyGraph` and are pure over the data;
  *   - node dimensions are explicit constants, never measured;
- *   - `defaultViewport` is a constant, and `fitView` is never used;
- *   - both handles carry node-relative coordinates, so edge paths are
- *     computable without a browser;
+ *   - the viewBox is the nodes' bounds with a margin, so the first paint
+ *     fits the graph with no measurement, and the camera's transform is
+ *     written on the client only;
  *   - there is NO client-only state in this component at all — no hover,
  *     no focus, no filter. The whole component is a pure function of its
  *     props, so the first client render reproduces the server's markup by
@@ -143,14 +182,14 @@ const JourneyLegend = (): React.ReactElement => (
  * byte-identical whatever the roles say.
  *
  * Accessibility posture: the well carries an accessible name and its job
- * nodes are real links — but the COMPLETE keyboard path through the lens
+ * hops are real links — but the COMPLETE keyboard path through the lens
  * is the JourneyRail, which lists every job this graph draws; the well is
  * a spatial view over the same nouns, never the only route to any of them.
  *
- * Containment: nothing inside the flow uses `position: fixed` — the
+ * Containment: nothing inside the well uses `position: fixed` — the
  * canvas's `container-type` makes it the containing block for fixed
  * descendants (INTRINSIC-GRID.md entry 5), so a fixed element here would
- * silently anchor to the wrong box. Controls/minimap are not rendered.
+ * silently anchor to the wrong box.
  */
 const JourneyWell = ({
   className,
@@ -161,16 +200,24 @@ const JourneyWell = ({
     () => buildJourneyGraph(coordinates),
     [coordinates],
   );
-
-  // Selection is the URL's job, marked by className so it is a pure
-  // projection of props — the same input the server had.
-  const decorated = useMemo(
-    () =>
-      nodes.map((node) =>
-        node.id === job ? { ...node, className: "is-selected" } : node,
-      ),
-    [nodes, job],
+  const byId = useMemo(
+    () => new Map(nodes.map((node) => [node.id, node])),
+    [nodes],
   );
+  // The nodes' bounds with a margin; the layout's origin is its top-left
+  // node, and a surface's tag below its node stays inside the margin.
+  const viewBox = useMemo(() => {
+    const right = Math.max(0, ...nodes.map((node) => node.x + node.width));
+    const bottom = Math.max(0, ...nodes.map((node) => node.y + node.height));
+    return {
+      x: -VIEW_MARGIN,
+      y: -VIEW_MARGIN,
+      width: right + 2 * VIEW_MARGIN,
+      height: bottom + 2 * VIEW_MARGIN,
+    };
+  }, [nodes]);
+  // Selection is the URL's job: the camera pans it into view.
+  const selected = job === undefined ? undefined : byId.get(job);
 
   return (
     <div
@@ -179,29 +226,39 @@ const JourneyWell = ({
         .join(" ")}
       data-slot="journeys-canvas"
     >
-      <ReactFlow
-        aria-label="Journeys from demand to surface"
-        defaultViewport={DEFAULT_VIEWPORT}
-        edges={[...edges]}
-        elementsSelectable={false}
-        maxZoom={2}
-        minZoom={0.2}
-        nodes={[...decorated]}
-        nodesConnectable={false}
-        nodesDraggable={false}
-        nodeTypes={nodeTypes}
-      />
-      {/* Canvas-local furniture: the ONE floating hint over the graph. Its
-          text is a pure function of `job` (the URL — identical on server and
-          client), so it costs the hydration argument nothing. With no job
-          selected it also names the empty-selection action the explorer used
-          to state in a separate band above the well; that band is gone, so
-          the graph now fills the whole surface. */}
-      <p className="journey-furniture journey-hint">
-        {job === undefined
-          ? "Showing the default coordinate — select a job, from the rail or the diagram, to centre the graph on it"
-          : "Drag to pan · scroll to zoom · select a job to inspect it"}
-      </p>
+      {/* The ONE floating hint over the graph, which the canvas hangs under
+          its controls bar. Its text is a pure function of `job` (the URL —
+          identical on server and client), so it costs the hydration
+          argument nothing. */}
+      <GraphCanvas
+        hint={
+          job === undefined
+            ? "Showing the default coordinate — select a job, from the rail or the diagram, to centre the graph on it"
+            : "Drag to pan · scroll to zoom · select a job to inspect it"
+        }
+        label="Journeys from demand to surface"
+        reveal={selected}
+        viewBox={viewBox}
+      >
+        <g className="edges">
+          {edges.map((edge) => (
+            <path
+              className={["edge", edge.className].filter(Boolean).join(" ")}
+              d={drawEdge(edge, byId)}
+              data-source={edge.source}
+              data-target={edge.target}
+              fill="none"
+              key={edge.id}
+              stroke="currentColor"
+            />
+          ))}
+        </g>
+        <g className="hops">
+          {nodes.map((node) => (
+            <Hop key={node.id} node={node} selected={node.id === job} />
+          ))}
+        </g>
+      </GraphCanvas>
       <JourneyLegend />
     </div>
   );
