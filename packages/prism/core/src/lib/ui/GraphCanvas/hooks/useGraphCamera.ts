@@ -4,7 +4,10 @@ import { type ZoomBehavior, zoom, zoomIdentity } from "d3-zoom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import classifyZoomBucket from "../classifyZoomBucket.js";
 import computeFitTransform from "../computeFitTransform.js";
+import computeOpeningTransform from "../computeOpeningTransform.js";
 import computeRevealTransform from "../computeRevealTransform.js";
+import computeWheelZoomFactor from "../computeWheelZoomFactor.js";
+import computeZoomExtent from "../computeZoomExtent.js";
 import {
   CAMERA_MOVE_MS,
   CLICK_DISTANCE,
@@ -62,6 +65,37 @@ function measureViewport(
 }
 
 /**
+ * Locate a point of the screen in the viewport's user space, from the
+ * viewport's layout box and the viewBox's on-screen scale under
+ * `xMinYMin meet`: the measurement every other camera move reads. The
+ * point never depends on the root `<svg>`'s screen matrix, which d3-zoom's
+ * own pointer reads and which an environment may lack, d3-zoom then
+ * reading the pointer in layout pixels as user units, so a viewport drawn
+ * below its viewBox's size would zoom toward a point nearer its top-left
+ * corner than the pointer.
+ *
+ * @note Impure: reads the viewport's layout box.
+ */
+function locateClientPoint(
+  svg: SVGSVGElement,
+  viewBox: GraphBox,
+  clientX: number,
+  clientY: number,
+): [number, number] {
+  const { left, top } = svg.getBoundingClientRect();
+  const { scale, visible } = measureViewport(svg, viewBox);
+  return [
+    visible.x + (clientX - left) / scale,
+    visible.y + (clientY - top) / scale,
+  ];
+}
+
+/** Whether a camera stands at the identity, the server's paint. */
+function isIdentity({ k, x, y }: GraphTransform): boolean {
+  return k === 1 && x === 0 && y === 0;
+}
+
+/**
  * Read whether the reader asked for reduced motion.
  *
  * @note Impure: reads the environment's media queries.
@@ -75,7 +109,8 @@ function prefersReducedMotion(): boolean {
 
 /**
  * Bind a d3-zoom camera to a graph canvas's viewport: drag to pan, wheel or
- * pinch to zoom toward the pointer, within the zoom extent and a pan margin
+ * pinch to zoom about the point under the pointer, located from the
+ * viewport's own layout box, within the zoom extent and a pan margin
  * of twice the size of the graph's whole bounds, so a viewBox that opens on
  * a window of a large graph still lets the reader reach all of it. A press that moves less than the click
  * distance is a click, so a link under it still follows, and a double
@@ -87,9 +122,17 @@ function prefersReducedMotion(): boolean {
  * scale, measured on the client, and re-measures when the viewport
  * resizes. The first time it measures the viewport it moves, at once, to
  * the camera `memory` keeps, with `reveal` panned into view, or else to
- * the camera `opening` chooses, if any, and it opens again for the new
- * size when a resize shrinks the on-screen scale below the legible zoom
- * before anything has moved the camera since. It keeps every camera it
+ * the camera `opening` chooses, if any; without an `opening`, a viewBox
+ * that would show below the legible zoom, as on a phone, opens on a
+ * legible window of the graph's first region, the one `legibleWindow`
+ * chooses or the viewBox's top-left corner, the rest a pan away. It opens
+ * again for the new size when a resize shrinks the on-screen scale below
+ * the legible zoom before anything has moved the camera since, and,
+ * without an `opening`, when a resize leaves an unmoved camera on a window
+ * where the viewBox now shows legibly, which returns it to the identity,
+ * or at the identity where it shows below the legible zoom. The zoom
+ * extent widens to hold any camera an opening or a fit sets, so the wheel
+ * and the buttons zoom on, in and out, from there. It keeps every camera it
  * measures in `memory`, in screen terms. When `fit` changes it fits that
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
@@ -164,10 +207,9 @@ export default function useGraphCamera({
       const transform = zoomIdentity
         .translate(target.x, target.y)
         .scale(target.k);
-      // A fit below the extent's floor lowers the floor to it, so the
-      // wheel and the buttons zoom on from where the fit left the camera.
-      const [floor, ceiling] = active.scaleExtent();
-      if (target.k < floor) active.scaleExtent([target.k, ceiling]);
+      // A fit outside the extent widens it, so the wheel and the buttons
+      // zoom on from where the fit left the camera.
+      active.scaleExtent(computeZoomExtent(active.scaleExtent(), target.k));
       if (prefersReducedMotion()) {
         active.transform(select(svg), transform);
         return;
@@ -251,10 +293,10 @@ export default function useGraphCamera({
     // judged to have shrunk the view.
     let lastScreen: number | undefined;
     // Move the camera, at once, to a target nothing the reader chose,
-    // lowering the zoom's floor to it when it lies below.
+    // with the zoom extent set anew to hold it, so the wheel and the
+    // buttons zoom on from there, and an earlier opening's widening goes.
     const place = (target: GraphTransform): void => {
-      const [floor, ceiling] = active.scaleExtent();
-      active.scaleExtent([Math.min(floor, target.k), ceiling]);
+      active.scaleExtent(computeZoomExtent(ZOOM_EXTENT, target.k));
       isOpening = true;
       active.transform(
         select(svg),
@@ -282,13 +324,33 @@ export default function useGraphCamera({
       return true;
     };
     // Move the camera to where `opening` asks for the visible area and
-    // scale; nowhere when it asks for nothing. Either way the camera then
-    // stands unmoved.
+    // scale, nowhere when it asks for nothing; or, without one, to a
+    // legible window of the graph when the viewBox would show below the
+    // legible zoom, else to the identity, the server's paint, when the
+    // camera stands elsewhere. Either way the camera then stands unmoved;
+    // say whether it moved.
     const open = (visible: GraphBox, scale: number): boolean => {
-      const target = latest.current.opening?.(visible, scale);
+      const { opening, viewBox, legibleWindow } = latest.current;
+      const target =
+        opening === undefined
+          ? (computeOpeningTransform(viewBox, visible, scale, legibleWindow) ??
+            (isIdentity(current.current) ? undefined : zoomIdentity))
+          : opening(visible, scale);
       unmoved = true;
       if (target !== undefined) place(target);
       return target !== undefined;
+    };
+    // Whether a canvas without an `opening` would open, at this scale, on
+    // the identity or off it, the other way from where its camera stands:
+    // its viewBox has come to show at the legible zoom with the camera on
+    // a window, or below it with the camera at the identity.
+    const isOffOpening = (visible: GraphBox, scale: number): boolean => {
+      const { opening, viewBox, legibleWindow } = latest.current;
+      if (opening !== undefined) return false;
+      const opensOnIdentity =
+        computeOpeningTransform(viewBox, visible, scale, legibleWindow) ===
+        undefined;
+      return opensOnIdentity !== isIdentity(current.current);
     };
     // Keep the camera in the memory, in screen terms.
     const remember = (visible: GraphBox, scale: number): void => {
@@ -307,21 +369,24 @@ export default function useGraphCamera({
     // Read the zoom's scale against the viewport's size into the bucket and
     // the percentage; each changes state only when its value changes. The
     // first measured reading resumes the camera the memory keeps or opens
-    // it where `opening` asks, and a resize that shrinks an unmoved
-    // camera's view below the legible zoom opens it again. Every measured
-    // reading keeps the camera in the memory.
+    // it where `opening` asks. A resize opens an unmoved camera again when
+    // it shrinks the view below the legible zoom, or, without an
+    // `opening`, when the camera stands on the identity or off it the
+    // other way from where the canvas would now open, as when a viewport
+    // that opened on a phone's window grows to show the viewBox legibly.
+    // Every measured reading keeps the camera in the memory.
     const readScale = (): void => {
       const { scale, visible, measured } = measureViewport(
         svg,
         latest.current.viewBox,
       );
       const screen = scale * current.current.k;
-      const shrunk =
+      const resized =
         unmoved &&
         lastScreen !== undefined &&
-        screen < lastScreen &&
-        screen < HUBS_SCALE;
-      if (measured && !isOpening && (!opened || shrunk)) {
+        ((screen < lastScreen && screen < HUBS_SCALE) ||
+          isOffOpening(visible, scale));
+      if (measured && !isOpening && (!opened || resized)) {
         const resumed = !opened && resume(visible, scale);
         opened = true;
         if (resumed || open(visible, scale)) return;
@@ -358,8 +423,26 @@ export default function useGraphCamera({
         readScale();
       });
     const selection = select(svg);
+    // The wheel zooms about the point under the pointer, located as the
+    // controls locate the centre; d3-zoom's own wheel is replaced.
+    const zoomByWheel = (event: WheelEvent): void => {
+      event.preventDefault();
+      active.scaleBy(
+        selection,
+        computeWheelZoomFactor(event),
+        locateClientPoint(
+          svg,
+          latest.current.viewBox,
+          event.clientX,
+          event.clientY,
+        ),
+      );
+    };
     // A double click selects what it lands on; it never zooms the camera.
-    selection.call(active).on("dblclick.zoom", null);
+    selection
+      .call(active)
+      .on("dblclick.zoom", null)
+      .on("wheel.zoom", zoomByWheel, { passive: false });
     behaviour.current = active;
     readScale();
     const observer =

@@ -5,6 +5,22 @@
  */
 export const ZOOM_EXTENT: readonly [number, number] = [0.5, 2.4];
 
+/**
+ * How far one unit of a wheel's vertical delta zooms, as a power of two,
+ * indexed by the delta's mode: pixels, lines, pages. One notch of a mouse
+ * wheel (about 100 pixels or 3 lines) zooms by about 15%, as d3-zoom's own
+ * wheel does.
+ */
+export const WHEEL_ZOOM_RATES: readonly [number, number, number] = [
+  0.002, 0.05, 1,
+];
+
+/**
+ * How much faster a pinch on a trackpad zooms than the wheel: the browser
+ * reports a pinch as a wheel with the control key held, in small deltas.
+ */
+export const PINCH_ZOOM_BOOST = 10;
+
 /** The factor one press of zoom in or zoom out applies. */
 export const ZOOM_STEP = 1.2;
 

@@ -388,7 +388,14 @@ site's own catalog, and the factory holds no reader-facing string.
   shows of a box too large for the legible zoom), `GraphOpening` (the
   camera a canvas opens on once the client has measured it, and again when
   a resize shrinks an unmoved camera's view below the legible zoom),
-  `GraphTransform`, `GraphZoomBucket`. A refit never zooms a legible view
+  `GraphTransform`, `GraphZoomBucket`. A canvas given no opening opens
+  where its viewBox shows at the legible zoom (12/14 on screen) on the
+  server's paint, and elsewhere, as on a phone, on a legible window of the
+  graph's first region, the one its legible window chooses or the
+  viewBox's top-left corner, the rest a pan away; a resize that leaves an
+  unmoved camera on such a window where the viewBox now shows legibly
+  returns it to the server's paint. The zoom extent widens to hold any
+  opening or fit, so the reader zooms in and out from it. A refit never zooms a legible view
   out to an illegible one; Fit fits the whole graph, below the wheel's
   floor when it must but never into the overview (a graph too large for
   12/16 on screen shows from its top-left corner at that zoom, the rest a

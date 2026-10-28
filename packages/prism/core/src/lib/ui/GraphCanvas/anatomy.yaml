@@ -48,7 +48,8 @@
 #     admitted for a row of controls.
 #   In constants.ts, SVG geometry (attributes, not CSS): LATTICE_PITCH 16,
 #   LATTICE_DOT_RADIUS 1, the zoom extent [0.5, 2.4], the 1.2 zoom step,
-#   the 200ms camera move.
+#   the wheel's zoom rates [0.002, 0.05, 1] per delta mode and a pinch's
+#   tenfold boost, the 200ms camera move.
 #
 # Roster namespaces (accepted and tracked): component.padding.block,
 # component.padding.inline, container.gap.default, container.gap.tight,

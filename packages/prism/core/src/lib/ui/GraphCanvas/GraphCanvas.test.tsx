@@ -13,9 +13,35 @@ import type { MouseEvent } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import GraphCanvas from "./GraphCanvas.js";
 import useGraphZoomBucket from "./hooks/useGraphZoomBucket.js";
-import type { GraphBox, GraphCameraMemory } from "./types.js";
+import type { GraphBox, GraphCameraMemory, GraphOpening } from "./types.js";
 
 const VIEW_BOX: GraphBox = { x: 0, y: 0, width: 800, height: 600 };
+
+/**
+ * A map two and a half times as wide as a phone's canvas, its origin off
+ * the world's, as a network map's drawing box is.
+ */
+const PHONE_MAP: GraphBox = { x: -128, y: -32, width: 976, height: 736 };
+
+/**
+ * A map so wide that a phone's canvas shows it legibly only above the zoom
+ * extent's widest, 2.4.
+ */
+const WIDE_MAP: GraphBox = { x: 0, y: 0, width: 1400, height: 800 };
+
+/** Read the camera group's transform as its scale and translation. */
+function parseCamera(transform: string | null): {
+  k: number;
+  x: number;
+  y: number;
+} {
+  const match = /^translate\(([^,]+),([^)]+)\) scale\(([^)]+)\)$/.exec(
+    transform ?? "",
+  );
+  if (match === null) throw new Error(`No camera in "${transform}"`);
+  const [, x, y, k] = match.map(Number);
+  return { k: k as number, x: x as number, y: y as number };
+}
 
 /** A drawing that writes the zoom bucket it reads. */
 function BucketProbe() {
@@ -30,19 +56,43 @@ function stubReducedMotion(matches: boolean): void {
   );
 }
 
-/** Lay every SVG element out at the given size, as a browser would. */
-function stubViewportSize(width: number, height: number): void {
+/**
+ * Lay every SVG element out at the given size, as a browser would, from
+ * the page's origin or from the given offset.
+ */
+function stubViewportSize(
+  width: number,
+  height: number,
+  left = 0,
+  top = 0,
+): void {
   vi.spyOn(SVGElement.prototype, "getBoundingClientRect").mockReturnValue({
     width,
     height,
-    x: 0,
-    y: 0,
-    top: 0,
-    left: 0,
-    right: width,
-    bottom: height,
+    x: left,
+    y: top,
+    top,
+    left,
+    right: left + width,
+    bottom: top + height,
     toJSON: () => ({}),
   });
+}
+
+/** Stub the resize observer, and return a call that fires its callback. */
+function stubResizeObserver(): () => void {
+  let resize: () => void = () => undefined;
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      constructor(callback: () => void) {
+        resize = callback;
+      }
+      observe(): void {}
+      disconnect(): void {}
+    },
+  );
+  return () => resize();
 }
 
 /**
@@ -68,7 +118,9 @@ const follow =
     onClick();
   };
 
-const renderCanvas = (props: { fit?: GraphBox; reveal?: GraphBox } = {}) =>
+const renderCanvas = (
+  props: { fit?: GraphBox; reveal?: GraphBox; opening?: GraphOpening } = {},
+) =>
   render(
     <GraphCanvas
       data-testid="canvas"
@@ -200,6 +252,50 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(0,0) scale(2)");
   });
 
+  it("zooms about the point under the pointer on the wheel, at any on-screen scale", () => {
+    stubViewportSize(720, 540);
+    renderCanvas();
+    // At an on-screen scale of 0.9, the pointer at the viewport's centre
+    // lies over the world's (400, 300), which stays under it.
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -500,
+      clientX: 360,
+      clientY: 270,
+    });
+    expect(readCamera()).toBe("translate(-400,-300) scale(2)");
+  });
+
+  it("zooms about the point under the pointer on the wheel, wherever the viewport sits on the page", () => {
+    // The viewport sits 100px from the page's left and 50px from its top,
+    // as beside the rail and below the mode strip; the pointer over its
+    // centre lies over the world's (400, 300), which stays under it.
+    stubViewportSize(720, 540, 100, 50);
+    renderCanvas();
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -500,
+      clientX: 460,
+      clientY: 320,
+    });
+    const { k, x, y } = parseCamera(readCamera());
+    expect(k).toBe(2);
+    expect((400 - x) / k).toBeCloseTo(400, 9);
+    expect((300 - y) / k).toBeCloseTo(300, 9);
+  });
+
+  it("zooms about the visible area's centre from the controls and the keys", () => {
+    // The viewport is taller than the viewBox at an on-screen scale of
+    // 0.9, so it shows the world from (0, 0) to (800, 800), centred on
+    // (400, 400).
+    stubViewportSize(720, 720);
+    renderCanvas();
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(readCamera()).toBe("translate(-80,-80) scale(1.2)");
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    fireEvent.keyDown(screen.getByTestId("canvas"), { key: "+" });
+    expect(readCamera()).toBe("translate(-80,-80) scale(1.2)");
+  });
+
   it("keeps a press that jitters under the click distance a click", () => {
     const onClick = vi.fn();
     render(
@@ -250,7 +346,8 @@ describe("GraphCanvas", () => {
 
   it("hides the lattice and every text below the overview threshold", () => {
     stubViewportSize(600, 450);
-    renderCanvas();
+    // An opening that keeps the identity holds the server's paint at 0.75.
+    renderCanvas({ opening: () => undefined });
     expect(screen.getByTestId("bucket").textContent).toBe("hubs");
     fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
     expect(screen.getByTestId("bucket").textContent).toBe("overview");
@@ -258,17 +355,7 @@ describe("GraphCanvas", () => {
   });
 
   it("re-measures the scale when the viewport resizes", () => {
-    let resize: () => void = () => undefined;
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(callback: () => void) {
-          resize = callback;
-        }
-        observe(): void {}
-        disconnect(): void {}
-      },
-    );
+    const resize = stubResizeObserver();
     renderCanvas();
     stubViewportSize(1600, 1200);
     act(() => resize());
@@ -326,17 +413,7 @@ describe("GraphCanvas", () => {
   });
 
   it("opens where `opening` asks once the viewport is measured, and only then", () => {
-    let resize: () => void = () => undefined;
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(callback: () => void) {
-          resize = callback;
-        }
-        observe(): void {}
-        disconnect(): void {}
-      },
-    );
+    const resize = stubResizeObserver();
     stubViewportSize(0, 0);
     const opening = vi.fn(() => ({ k: 1.5, x: -40, y: -30 }));
     render(
@@ -353,6 +430,145 @@ describe("GraphCanvas", () => {
     expect(screen.getByRole("status").textContent).toBe("75%");
     act(() => resize());
     expect(opening).toHaveBeenCalledOnce();
+  });
+
+  it("opens a 390px canvas at the legible zoom on its first region", () => {
+    // The map fits a phone's canvas at 40%, below the legible zoom; it
+    // opens on its top-left corner at 12/14, every label at 12px or more,
+    // the rest a pan away.
+    stubViewportSize(390, 600);
+    render(
+      <GraphCanvas label="Network" viewBox={PHONE_MAP}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
+    const { k, x, y } = parseCamera(readCamera());
+    expect(PHONE_MAP.x * k + x).toBeCloseTo(PHONE_MAP.x);
+    expect(PHONE_MAP.y * k + y).toBeCloseTo(PHONE_MAP.y);
+  });
+
+  it("zooms in from an opening above the zoom extent's widest", () => {
+    // The map shows legibly on a 390px canvas only at a zoom of about 3.08.
+    stubViewportSize(390, 600);
+    render(
+      <GraphCanvas data-testid="canvas" label="Network" viewBox={WIDE_MAP}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    const opened = parseCamera(readCamera()).k;
+    expect(opened).toBeGreaterThan(2.4);
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -100,
+      clientX: 100,
+      clientY: 100,
+    });
+    const wheeled = parseCamera(readCamera()).k;
+    expect(wheeled).toBeGreaterThan(opened);
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(parseCamera(readCamera()).k).toBeCloseTo(wheeled * 1.2, 9);
+    fireEvent.keyDown(screen.getByTestId("canvas"), { key: "+" });
+    expect(parseCamera(readCamera()).k).toBeCloseTo(wheeled * 1.44, 9);
+  });
+
+  it("returns an unmoved camera from a phone's window to the identity when the viewport grows to show the map legibly", () => {
+    const resize = stubResizeObserver();
+    stubViewportSize(390, 600);
+    render(
+      <GraphCanvas label="Network" viewBox={PHONE_MAP}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    stubViewportSize(1440, 900);
+    act(() => resize());
+    // The whole map shows at 900 / 736 of its size.
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    expect(screen.getByRole("status").textContent).toBe("122%");
+    // Shrunk to the phone again, it opens on the same window.
+    stubViewportSize(390, 600);
+    act(() => resize());
+    expect(screen.getByRole("status").textContent).toBe("86%");
+  });
+
+  it("sets the zoom extent anew when an unmoved camera returns to the identity", () => {
+    const resize = stubResizeObserver();
+    // The phone's window of the wide map opens above the zoom extent's
+    // widest, which widens to hold it.
+    stubViewportSize(390, 600);
+    render(
+      <GraphCanvas label="Network" viewBox={WIDE_MAP}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(parseCamera(readCamera()).k).toBeGreaterThan(2.4);
+    stubViewportSize(1440, 900);
+    act(() => resize());
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    // From the identity the wheel zooms in no further than the widest.
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -5000,
+      clientX: 0,
+      clientY: 0,
+    });
+    expect(parseCamera(readCamera()).k).toBe(2.4);
+  });
+
+  it("keeps a moved camera where it is when the viewport grows to show the map legibly", () => {
+    const resize = stubResizeObserver();
+    stubViewportSize(390, 600);
+    render(
+      <GraphCanvas label="Network" viewBox={PHONE_MAP}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -100,
+      clientX: 100,
+      clientY: 100,
+    });
+    const moved = readCamera();
+    stubViewportSize(1440, 900);
+    act(() => resize());
+    expect(readCamera()).toBe(moved);
+    expect(readCamera()).not.toBe("translate(0,0) scale(1)");
+  });
+
+  it("opens a 390px canvas on the window `legibleWindow` chooses", () => {
+    stubViewportSize(390, 600);
+    const legibleWindow = vi.fn(() => ({
+      x: 384,
+      y: 256,
+      width: 176,
+      height: 272,
+    }));
+    render(
+      <GraphCanvas
+        label="Network"
+        legibleWindow={legibleWindow}
+        viewBox={PHONE_MAP}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    const scale = 390 / PHONE_MAP.width;
+    expect(legibleWindow).toHaveBeenCalledExactlyOnceWith(
+      PHONE_MAP,
+      {
+        x: PHONE_MAP.x,
+        y: PHONE_MAP.y,
+        width: expect.closeTo(PHONE_MAP.width),
+        height: expect.closeTo(600 / scale),
+      },
+      expect.closeTo(scale),
+    );
+    // The window fits whole, as large as the zoom extent's widest allows.
+    expect(screen.getByRole("status").textContent).toBe("96%");
+    const { k, x, y } = parseCamera(readCamera());
+    expect(384 * k + x).toBeCloseTo(PHONE_MAP.x);
+    expect(256 * k + y).toBeCloseTo(PHONE_MAP.y);
   });
 
   it("keeps the identity when `opening` asks for nothing", () => {
@@ -381,17 +597,7 @@ describe("GraphCanvas", () => {
   });
 
   it("opens again when a resize shrinks an unmoved camera's view below the legible zoom", () => {
-    let resize: () => void = () => undefined;
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(callback: () => void) {
-          resize = callback;
-        }
-        observe(): void {}
-        disconnect(): void {}
-      },
-    );
+    const resize = stubResizeObserver();
     const opening = vi.fn((_visible: GraphBox, scale: number) => ({
       k: 1 / scale,
       x: 0,
@@ -423,17 +629,7 @@ describe("GraphCanvas", () => {
   });
 
   it("keeps an unmoved camera where it is when a resize shrinks its view but leaves it legible", () => {
-    let resize: () => void = () => undefined;
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(callback: () => void) {
-          resize = callback;
-        }
-        observe(): void {}
-        disconnect(): void {}
-      },
-    );
+    const resize = stubResizeObserver();
     const opening = vi.fn((_visible: GraphBox, scale: number) => ({
       k: 1 / scale,
       x: 0,
@@ -680,17 +876,7 @@ describe("GraphCanvas", () => {
   });
 
   it("counts a resumed camera nothing had moved as unmoved", () => {
-    let resize: () => void = () => undefined;
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(callback: () => void) {
-          resize = callback;
-        }
-        observe(): void {}
-        disconnect(): void {}
-      },
-    );
+    const resize = stubResizeObserver();
     const memory: { current: GraphCameraMemory | undefined } = {
       current: { camera: { k: 1, x: 0, y: 0 }, moved: false },
     };
@@ -738,17 +924,7 @@ describe("GraphCanvas", () => {
   });
 
   it("counts a resumed camera that panned to reveal a box as moved", () => {
-    let resize: () => void = () => undefined;
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(callback: () => void) {
-          resize = callback;
-        }
-        observe(): void {}
-        disconnect(): void {}
-      },
-    );
+    const resize = stubResizeObserver();
     const memory: { current: GraphCameraMemory | undefined } = {
       current: { camera: { k: 1.2, x: -80, y: -60 }, moved: false },
     };
