@@ -200,6 +200,33 @@ describe("GraphCanvas", () => {
     expect(readCamera()).toBe("translate(0,0) scale(2)");
   });
 
+  it("zooms about the point under the pointer on the wheel, at any on-screen scale", () => {
+    stubViewportSize(720, 540);
+    renderCanvas();
+    // At an on-screen scale of 0.9, the pointer at the viewport's centre
+    // lies over the world's (400, 300), which stays under it.
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -500,
+      clientX: 360,
+      clientY: 270,
+    });
+    expect(readCamera()).toBe("translate(-400,-300) scale(2)");
+  });
+
+  it("zooms about the visible area's centre from the controls and the keys", () => {
+    // The viewport is taller than the viewBox at an on-screen scale of
+    // 0.9, so it shows the world from (0, 0) to (800, 800), centred on
+    // (400, 400).
+    stubViewportSize(720, 720);
+    renderCanvas();
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(readCamera()).toBe("translate(-80,-80) scale(1.2)");
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(readCamera()).toBe("translate(0,0) scale(1)");
+    fireEvent.keyDown(screen.getByTestId("canvas"), { key: "+" });
+    expect(readCamera()).toBe("translate(-80,-80) scale(1.2)");
+  });
+
   it("keeps a press that jitters under the click distance a click", () => {
     const onClick = vi.fn();
     render(

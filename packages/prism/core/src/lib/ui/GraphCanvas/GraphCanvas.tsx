@@ -31,12 +31,13 @@ function nameLattice(label: string): string {
  * far as twice the graph's `bounds` past them, and the lattice reaches as
  * far, however small a window of the graph the viewBox opens on.
  *
- * Drag pans, the wheel or a pinch zooms toward the pointer, and `+`, `-`
- * and `0` zoom in, out and back to the fit while focus is inside the
- * canvas. The camera's transform is written by d3-zoom on the client and
- * never by React, so the server renders the identity and hydration has
- * nothing to reconcile; once the client has measured the viewport the
- * camera moves to where `opening` asks, if anywhere. When `fit` changes the
+ * Drag pans, the wheel or a pinch zooms about the point under the pointer,
+ * and `+`, `-` and `0` zoom in and out about the viewport's centre and back
+ * to the fit while focus is inside the canvas. The camera's transform is
+ * written by d3-zoom on the client and never by React, so the server
+ * renders the identity and hydration has nothing to reconcile; once the
+ * client has measured the viewport the camera moves to where `opening`
+ * asks, if anywhere. When `fit` changes the
  * camera fits it, and the Fit control and `0` fit it again, whole, but
  * never into the overview bucket: a box too large for its floor shows from
  * its top-left corner at that floor, so the hub and region labels stay; a

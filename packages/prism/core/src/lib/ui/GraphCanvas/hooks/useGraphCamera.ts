@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import classifyZoomBucket from "../classifyZoomBucket.js";
 import computeFitTransform from "../computeFitTransform.js";
 import computeRevealTransform from "../computeRevealTransform.js";
+import computeWheelZoomFactor from "../computeWheelZoomFactor.js";
 import {
   CAMERA_MOVE_MS,
   CLICK_DISTANCE,
@@ -62,6 +63,32 @@ function measureViewport(
 }
 
 /**
+ * Locate a point of the screen in the viewport's user space, from the
+ * viewport's layout box and the viewBox's on-screen scale under
+ * `xMinYMin meet`: the measurement every other camera move reads. The
+ * point never depends on the root `<svg>`'s screen matrix, which d3-zoom's
+ * own pointer reads and which an environment may lack, d3-zoom then
+ * reading the pointer in layout pixels as user units, so a viewport drawn
+ * below its viewBox's size would zoom toward a point nearer its top-left
+ * corner than the pointer.
+ *
+ * @note Impure: reads the viewport's layout box.
+ */
+function locateClientPoint(
+  svg: SVGSVGElement,
+  viewBox: GraphBox,
+  clientX: number,
+  clientY: number,
+): [number, number] {
+  const { left, top } = svg.getBoundingClientRect();
+  const { scale, visible } = measureViewport(svg, viewBox);
+  return [
+    visible.x + (clientX - left) / scale,
+    visible.y + (clientY - top) / scale,
+  ];
+}
+
+/**
  * Read whether the reader asked for reduced motion.
  *
  * @note Impure: reads the environment's media queries.
@@ -75,7 +102,8 @@ function prefersReducedMotion(): boolean {
 
 /**
  * Bind a d3-zoom camera to a graph canvas's viewport: drag to pan, wheel or
- * pinch to zoom toward the pointer, within the zoom extent and a pan margin
+ * pinch to zoom about the point under the pointer, located from the
+ * viewport's own layout box, within the zoom extent and a pan margin
  * of twice the size of the graph's whole bounds, so a viewBox that opens on
  * a window of a large graph still lets the reader reach all of it. A press that moves less than the click
  * distance is a click, so a link under it still follows, and a double
@@ -358,8 +386,26 @@ export default function useGraphCamera({
         readScale();
       });
     const selection = select(svg);
+    // The wheel zooms about the point under the pointer, located as the
+    // controls locate the centre; d3-zoom's own wheel is replaced.
+    const zoomByWheel = (event: WheelEvent): void => {
+      event.preventDefault();
+      active.scaleBy(
+        selection,
+        computeWheelZoomFactor(event),
+        locateClientPoint(
+          svg,
+          latest.current.viewBox,
+          event.clientX,
+          event.clientY,
+        ),
+      );
+    };
     // A double click selects what it lands on; it never zooms the camera.
-    selection.call(active).on("dblclick.zoom", null);
+    selection
+      .call(active)
+      .on("dblclick.zoom", null)
+      .on("wheel.zoom", zoomByWheel, { passive: false });
     behaviour.current = active;
     readScale();
     const observer =
