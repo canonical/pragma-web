@@ -83,6 +83,16 @@ export const readLocalName = (uri: string): string => {
 };
 
 /**
+ * Fold a vocabulary term's local name to one spelling: lower case, with
+ * the underscores of a snake_case name removed. The demand model's terms
+ * are spelled in PascalCase (`ColdEntry`) by some graphs and in snake_case
+ * (`cold_entry`) by others, the instance-naming convention of Turtle; both
+ * fold to `coldentry`, so either spelling classifies the same way.
+ */
+export const foldTermName = (local: string): string =>
+  local.toLowerCase().replaceAll("_", "");
+
+/**
  * A coordinate AXIS value's display term. The docs graph names its axis
  * instances with a type-prefixed local name (`role.designer`,
  * `role.engineer`) because a Turtle local name has to be unique across

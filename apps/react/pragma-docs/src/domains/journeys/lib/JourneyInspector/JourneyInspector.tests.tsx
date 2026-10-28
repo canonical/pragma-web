@@ -68,13 +68,23 @@ describe("JourneyInspector", () => {
       (node) => `${node.getAttribute("data-facet")}:${node.textContent}`,
     );
     // The first pairing carries both; the second carries no arrival, so
-    // none is shown for it.
-    expect(facets).toContain("role:Primary");
-    expect(facets).toContain("arrival:ColdEntry");
-    expect(facets).toContain("role:Secondary");
+    // none is shown for it. Each term reads in the catalog's words, never
+    // as its local name.
+    expect(facets).toContain("role:primary");
+    expect(facets).toContain("arrival:cold entry");
+    expect(facets).toContain("role:secondary");
     expect(facets.filter((facet) => facet.startsWith("arrival:")).length).toBe(
       1,
     );
+  });
+
+  it("names a surface's kind in words, never by its type name", () => {
+    render(<JourneyInspector job={BROWSE} scope={SCOPE} />);
+    const kinds = [...document.querySelectorAll(".pairing .kind")].map(
+      (node) => node.textContent,
+    );
+    expect(kinds).toContain("Lens");
+    expect(kinds).not.toContain("LensSurface");
   });
 
   it("says in words that a surface composes no layout", () => {

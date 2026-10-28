@@ -86,6 +86,33 @@ describe("JourneyHop", () => {
     expect(hop?.querySelector("a")?.textContent).toContain("view.components");
   });
 
+  it("names its surface's kind in words, never by its type name", () => {
+    renderHop(
+      <JourneyHop
+        href={undefined}
+        node={{
+          ...SURFACE,
+          data: { ...SURFACE.data, surfaceType: "LensSurface" },
+        }}
+        selected={false}
+      />,
+    );
+    const hop = document.querySelector(".ds.journey-hop");
+    expect(hop?.querySelector(".location")?.textContent).toBe("Lens");
+  });
+
+  it("leaves out a surface kind the catalog does not name", () => {
+    renderHop(
+      <JourneyHop
+        href={undefined}
+        node={{ ...SURFACE, data: { ...SURFACE.data, surfaceType: "Surface" } }}
+        selected={false}
+      />,
+    );
+    const hop = document.querySelector(".ds.journey-hop");
+    expect(hop?.querySelector(".location")).toBeNull();
+  });
+
   it("places its box at the hop's corner and names its column", () => {
     renderHop(<JourneyHop href={undefined} node={SURFACE} selected={false} />);
     const hop = document.querySelector(".ds.journey-hop");

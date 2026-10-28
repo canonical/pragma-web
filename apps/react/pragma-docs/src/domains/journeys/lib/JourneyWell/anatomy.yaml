@@ -15,9 +15,9 @@
 #
 # Each hop is a JourneyHop over the published projection's
 # EntityGraphNode, 176 by 48 (two 24-unit lines): its label cut to the
-# box, its column's name as its kind and, on a surface, the surface's type
-# as its location. A pairing is hollow. A job's title links to its own
-# page, and a surface's to the
+# box, its column's name as its kind and, on a surface, the words for the
+# surface's kind as its location, never its type name. A pairing is
+# hollow. A job's title links to its own page, and a surface's to the
 # docsite page that renders it, where there is one; every other hop is
 # inert text. Columns stand 240 units apart and rows 64, and a hop shared
 # by several journeys stands on the mean of their rows, snapped to the
