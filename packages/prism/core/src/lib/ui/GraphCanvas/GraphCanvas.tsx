@@ -37,7 +37,9 @@ function nameLattice(label: string): string {
  * written by d3-zoom on the client and never by React, so the server
  * renders the identity and hydration has nothing to reconcile; once the
  * client has measured the viewport the camera moves to where `opening`
- * asks, if anywhere. When `fit` changes the
+ * asks, if anywhere, or, without one, when the viewBox would show below
+ * the legible zoom, as on a phone, to a legible window of the graph's
+ * first region, the rest a pan away. When `fit` changes the
  * camera fits it, and the Fit control and `0` fit it again, whole, but
  * never into the overview bucket: a box too large for its floor shows from
  * its top-left corner at that floor, so the hub and region labels stay; a

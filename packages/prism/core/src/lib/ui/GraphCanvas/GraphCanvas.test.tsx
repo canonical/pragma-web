@@ -13,9 +13,29 @@ import type { MouseEvent } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import GraphCanvas from "./GraphCanvas.js";
 import useGraphZoomBucket from "./hooks/useGraphZoomBucket.js";
-import type { GraphBox, GraphCameraMemory } from "./types.js";
+import type { GraphBox, GraphCameraMemory, GraphOpening } from "./types.js";
 
 const VIEW_BOX: GraphBox = { x: 0, y: 0, width: 800, height: 600 };
+
+/**
+ * A map two and a half times as wide as a phone's canvas, its origin off
+ * the world's, as a network map's drawing box is.
+ */
+const PHONE_MAP: GraphBox = { x: -128, y: -32, width: 976, height: 736 };
+
+/** Read the camera group's transform as its scale and translation. */
+function parseCamera(transform: string | null): {
+  k: number;
+  x: number;
+  y: number;
+} {
+  const match = /^translate\(([^,]+),([^)]+)\) scale\(([^)]+)\)$/.exec(
+    transform ?? "",
+  );
+  if (match === null) throw new Error(`No camera in "${transform}"`);
+  const [, x, y, k] = match.map(Number);
+  return { k: k as number, x: x as number, y: y as number };
+}
 
 /** A drawing that writes the zoom bucket it reads. */
 function BucketProbe() {
@@ -68,7 +88,9 @@ const follow =
     onClick();
   };
 
-const renderCanvas = (props: { fit?: GraphBox; reveal?: GraphBox } = {}) =>
+const renderCanvas = (
+  props: { fit?: GraphBox; reveal?: GraphBox; opening?: GraphOpening } = {},
+) =>
   render(
     <GraphCanvas
       data-testid="canvas"
@@ -277,7 +299,8 @@ describe("GraphCanvas", () => {
 
   it("hides the lattice and every text below the overview threshold", () => {
     stubViewportSize(600, 450);
-    renderCanvas();
+    // An opening that keeps the identity holds the server's paint at 0.75.
+    renderCanvas({ opening: () => undefined });
     expect(screen.getByTestId("bucket").textContent).toBe("hubs");
     fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
     expect(screen.getByTestId("bucket").textContent).toBe("overview");
@@ -380,6 +403,58 @@ describe("GraphCanvas", () => {
     expect(screen.getByRole("status").textContent).toBe("75%");
     act(() => resize());
     expect(opening).toHaveBeenCalledOnce();
+  });
+
+  it("opens a 390px canvas at the legible zoom on its first region", () => {
+    // The map fits a phone's canvas at 40%, below the legible zoom; it
+    // opens on its top-left corner at 12/14, every label at 12px or more,
+    // the rest a pan away.
+    stubViewportSize(390, 600);
+    render(
+      <GraphCanvas label="Network" viewBox={PHONE_MAP}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    expect(screen.getByTestId("bucket").textContent).toBe("full");
+    const { k, x, y } = parseCamera(readCamera());
+    expect(PHONE_MAP.x * k + x).toBeCloseTo(PHONE_MAP.x);
+    expect(PHONE_MAP.y * k + y).toBeCloseTo(PHONE_MAP.y);
+  });
+
+  it("opens a 390px canvas on the window `legibleWindow` chooses", () => {
+    stubViewportSize(390, 600);
+    const legibleWindow = vi.fn(() => ({
+      x: 384,
+      y: 256,
+      width: 176,
+      height: 272,
+    }));
+    render(
+      <GraphCanvas
+        label="Network"
+        legibleWindow={legibleWindow}
+        viewBox={PHONE_MAP}
+      >
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    const scale = 390 / PHONE_MAP.width;
+    expect(legibleWindow).toHaveBeenCalledExactlyOnceWith(
+      PHONE_MAP,
+      {
+        x: PHONE_MAP.x,
+        y: PHONE_MAP.y,
+        width: expect.closeTo(PHONE_MAP.width),
+        height: expect.closeTo(600 / scale),
+      },
+      expect.closeTo(scale),
+    );
+    // The window fits whole, as large as the zoom extent's widest allows.
+    expect(screen.getByRole("status").textContent).toBe("96%");
+    const { k, x, y } = parseCamera(readCamera());
+    expect(384 * k + x).toBeCloseTo(PHONE_MAP.x);
+    expect(256 * k + y).toBeCloseTo(PHONE_MAP.y);
   });
 
   it("keeps the identity when `opening` asks for nothing", () => {

@@ -94,8 +94,11 @@ type OwnProps = {
   /**
    * Where the camera opens once the client has measured the viewport, such
    * as a legible window of a graph whose viewBox would draw its labels
-   * below 12px on this screen. The identity, the server's paint, when
-   * omitted.
+   * below 12px on this screen. When omitted, the identity, the server's
+   * paint, where the viewBox shows at the legible zoom; elsewhere, as on a
+   * phone, a legible window of the graph's first region, the rest a pan
+   * away: the window `legibleWindow` chooses of the viewBox, or the
+   * viewBox's top-left corner, at no lower than the legible zoom.
    */
   readonly opening?: GraphOpening;
   /**
@@ -113,9 +116,10 @@ type OwnProps = {
    */
   readonly frame?: GraphFrameRequest;
   /**
-   * The window a refit of `fit` or `frame` shows when the box fits only
-   * below the legible zoom. Without one, such a box is shown from its
-   * top-left corner at the legible zoom.
+   * The window a refit of `fit` or `frame`, or the opening a canvas with
+   * no `opening` takes, shows when the box fits only below the legible
+   * zoom. Without one, such a box is shown from its top-left corner at the
+   * legible zoom.
    */
   readonly legibleWindow?: GraphLegibleWindow;
   /**

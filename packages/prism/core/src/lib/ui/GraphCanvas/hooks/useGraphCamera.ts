@@ -4,6 +4,7 @@ import { type ZoomBehavior, zoom, zoomIdentity } from "d3-zoom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import classifyZoomBucket from "../classifyZoomBucket.js";
 import computeFitTransform from "../computeFitTransform.js";
+import computeOpeningTransform from "../computeOpeningTransform.js";
 import computeRevealTransform from "../computeRevealTransform.js";
 import computeWheelZoomFactor from "../computeWheelZoomFactor.js";
 import {
@@ -115,9 +116,12 @@ function prefersReducedMotion(): boolean {
  * scale, measured on the client, and re-measures when the viewport
  * resizes. The first time it measures the viewport it moves, at once, to
  * the camera `memory` keeps, with `reveal` panned into view, or else to
- * the camera `opening` chooses, if any, and it opens again for the new
- * size when a resize shrinks the on-screen scale below the legible zoom
- * before anything has moved the camera since. It keeps every camera it
+ * the camera `opening` chooses, if any; without an `opening`, a viewBox
+ * that would show below the legible zoom, as on a phone, opens on a
+ * legible window of the graph's first region, the one `legibleWindow`
+ * chooses or the viewBox's top-left corner, the rest a pan away. It opens
+ * again for the new size when a resize shrinks the on-screen scale below
+ * the legible zoom before anything has moved the camera since. It keeps every camera it
  * measures in `memory`, in screen terms. When `fit` changes it fits that
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
@@ -310,10 +314,15 @@ export default function useGraphCamera({
       return true;
     };
     // Move the camera to where `opening` asks for the visible area and
-    // scale; nowhere when it asks for nothing. Either way the camera then
-    // stands unmoved.
+    // scale, or, without one, to a legible window of the graph when the
+    // viewBox would show below the legible zoom; nowhere when it asks for
+    // nothing. Either way the camera then stands unmoved.
     const open = (visible: GraphBox, scale: number): boolean => {
-      const target = latest.current.opening?.(visible, scale);
+      const { opening, viewBox, legibleWindow } = latest.current;
+      const target =
+        opening === undefined
+          ? computeOpeningTransform(viewBox, visible, scale, legibleWindow)
+          : opening(visible, scale);
       unmoved = true;
       if (target !== undefined) place(target);
       return target !== undefined;

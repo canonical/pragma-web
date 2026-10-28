@@ -22,11 +22,18 @@ export interface UseGraphCameraProps {
   readonly fit: GraphBox | undefined;
   /** The box the camera fits once each time the request changes. */
   readonly frame: GraphFrameRequest | undefined;
-  /** The window a legible refit shows of a box too large for it. */
+  /**
+   * The window a legible refit, or the opening without an `opening`, shows
+   * of a box too large for the legible zoom.
+   */
   readonly legibleWindow: GraphLegibleWindow | undefined;
   /** The box the camera pans into view when it changes. */
   readonly reveal: GraphBox | undefined;
-  /** Where the camera opens once the viewport is measured. */
+  /**
+   * Where the camera opens once the viewport is measured; without one, on
+   * a legible window of the graph when the viewBox would show below the
+   * legible zoom.
+   */
   readonly opening: GraphOpening | undefined;
   /** Where the camera keeps its place and resumes it from. */
   readonly memory: RefObject<GraphCameraMemory | undefined> | undefined;
