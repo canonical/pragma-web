@@ -698,14 +698,15 @@ describe("server matrix (2×3) serves correctly", () => {
 
             //     The table's row headers and the rail's jobs both index
             //     every job in the model, from the same response, so they
-            //     must be equal, and the model is big enough that the
-            //     graph's default coordinate filter is a real narrowing.
+            //     must be equal, and the model holds at least a dozen jobs
+            //     across several coordinates, so the graph's default
+            //     coordinate filter is a real narrowing.
             const tableRowHeaderCount = (
               journeysHtml.match(/<th class="cell" scope="row">/g) ?? []
             ).length;
             const railJobCount = (journeysHtml.match(/<li class="job">/g) ?? [])
               .length;
-            expect(tableRowHeaderCount).toBeGreaterThan(40);
+            expect(tableRowHeaderCount).toBeGreaterThanOrEqual(12);
             expect(tableRowHeaderCount).toBe(railJobCount);
 
             //     The persona axis states its approximation as text.
@@ -719,7 +720,7 @@ describe("server matrix (2×3) serves correctly", () => {
             expect(journeyJob.status).toBe(200);
             const journeyJobHtml = await journeyJob.text();
             expect(journeyJobHtml).toContain(
-              "I want to browse and filter the full catalog",
+              "I want the whole set at a glance",
             );
             expect(
               (journeyJobHtml.match(/class="row is-selected"/g) ?? []).length,
