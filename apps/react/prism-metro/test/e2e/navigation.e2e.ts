@@ -64,9 +64,8 @@ const pages: Page[] = [];
  * too: the suites read behaviour, not type, and the dev cell's asset bridge
  * stalls on a body streamed as large as a font, which would hold every load
  * open. Every WebSocket, which only the dev cell's live reload opens, meets
- * a silent stand-in: its port is fixed, so another Vite server on the
- * machine may hold it and answer. Every console error and uncaught page
- * error is collected.
+ * a silent stand-in, so a reload never interrupts what the suite reads.
+ * Every console error and uncaught page error is collected.
  *
  * @returns The tab, its base URL and the errors it collects.
  * @note Impure: opens a browser tab.

@@ -2,11 +2,13 @@
   "extends": ["@canonical/biome-config"],
   "files": {
     "includes": [
+      ".storybook",
       "src",
       "testing",
       "test",
       "*.json",
       "vite.config.ts",
+      "vite-plugin-ds-icons.ts",
       "!src/relay/__generated__",
       "!src/relay/schema.graphql"
     ]

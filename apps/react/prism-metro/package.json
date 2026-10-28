@@ -24,9 +24,10 @@
     "preview": "bun run build:client && vite preview --outDir dist/client",
     "preview:bun": "bun run build:client && bun run build:server && bun src/server/preview.bun.ts",
     "build": "bun run build:client",
-    "build:all": "bun run build:client && bun run build:server",
+    "build:all": "bun run build:client && bun run build:server && bun run build:storybook",
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --mode server",
+    "build:storybook": "storybook build",
     "check": "bun run check:biome && bun run check:ts && bun run schema:check && bun run relay",
     "check:fix": "bun run check:biome:fix && bun run check:ts",
     "check:biome": "biome check",
@@ -35,9 +36,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "vitest run --config vitest.e2e.config.ts"
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "storybook": "storybook dev -p 6011 --no-open --host 0.0.0.0"
   },
   "dependencies": {
+    "@canonical/ds-assets": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",
     "@canonical/prism-graph-example": "^0.44.1",
     "@canonical/prism-lens-definitions": "^0.44.1",
@@ -49,6 +52,8 @@
     "@canonical/react-ssr": "^0.44.1",
     "@canonical/router-core": "^0.44.1",
     "@canonical/router-react": "^0.44.1",
+    "@canonical/storybook-addon-relay": "^0.44.1",
+    "@canonical/storybook-config": "^0.44.1",
     "@canonical/styles": "^0.44.1",
     "graphql": "^16.11.0",
     "react": "^19.2.4",
@@ -76,6 +81,8 @@
     "lightningcss": "^1.32.0",
     "playwright": "^1.61.1",
     "relay-compiler": "^21.0.1",
+    "relay-test-utils": "^21.0.1",
+    "storybook": "^10.6.0",
     "typescript": "^7.0.2",
     "vite": "^8.0.1",
     "vitest": "^5.0.0"

@@ -26,3 +26,12 @@ export const PAGE_SETTLE_MS = 30_000;
 
 /** A page on the workspace archetype: the Definitions explorer. */
 export const WORKSPACE_PATH = "/definitions";
+
+/**
+ * The glyph the published `SidePanel`'s close button draws, at the path
+ * every design-system `Icon` resolves it from.
+ */
+export const CLOSE_ICON_PATH = "/icons/close.svg";
+
+/** The fragment of `CLOSE_ICON_PATH` holding the glyph itself. */
+export const CLOSE_ICON_ID = "close";
