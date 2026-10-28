@@ -23,6 +23,12 @@ const VIEW_BOX: GraphBox = { x: 0, y: 0, width: 800, height: 600 };
  */
 const PHONE_MAP: GraphBox = { x: -128, y: -32, width: 976, height: 736 };
 
+/**
+ * A map so wide that a phone's canvas shows it legibly only above the zoom
+ * extent's widest, 2.4.
+ */
+const WIDE_MAP: GraphBox = { x: 0, y: 0, width: 1400, height: 800 };
+
 /** Read the camera group's transform as its scale and translation. */
 function parseCamera(transform: string | null): {
   k: number;
@@ -420,6 +426,30 @@ describe("GraphCanvas", () => {
     const { k, x, y } = parseCamera(readCamera());
     expect(PHONE_MAP.x * k + x).toBeCloseTo(PHONE_MAP.x);
     expect(PHONE_MAP.y * k + y).toBeCloseTo(PHONE_MAP.y);
+  });
+
+  it("zooms in from an opening above the zoom extent's widest", () => {
+    // The map shows legibly on a 390px canvas only at a zoom of about 3.08.
+    stubViewportSize(390, 600);
+    render(
+      <GraphCanvas data-testid="canvas" label="Network" viewBox={WIDE_MAP}>
+        <BucketProbe />
+      </GraphCanvas>,
+    );
+    expect(screen.getByRole("status").textContent).toBe("86%");
+    const opened = parseCamera(readCamera()).k;
+    expect(opened).toBeGreaterThan(2.4);
+    fireEvent.wheel(screen.getByRole("group"), {
+      deltaY: -100,
+      clientX: 100,
+      clientY: 100,
+    });
+    const wheeled = parseCamera(readCamera()).k;
+    expect(wheeled).toBeGreaterThan(opened);
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(parseCamera(readCamera()).k).toBeCloseTo(wheeled * 1.2, 9);
+    fireEvent.keyDown(screen.getByTestId("canvas"), { key: "+" });
+    expect(parseCamera(readCamera()).k).toBeCloseTo(wheeled * 1.44, 9);
   });
 
   it("opens a 390px canvas on the window `legibleWindow` chooses", () => {

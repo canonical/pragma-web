@@ -7,6 +7,7 @@ import computeFitTransform from "../computeFitTransform.js";
 import computeOpeningTransform from "../computeOpeningTransform.js";
 import computeRevealTransform from "../computeRevealTransform.js";
 import computeWheelZoomFactor from "../computeWheelZoomFactor.js";
+import computeZoomExtent from "../computeZoomExtent.js";
 import {
   CAMERA_MOVE_MS,
   CLICK_DISTANCE,
@@ -121,7 +122,9 @@ function prefersReducedMotion(): boolean {
  * legible window of the graph's first region, the one `legibleWindow`
  * chooses or the viewBox's top-left corner, the rest a pan away. It opens
  * again for the new size when a resize shrinks the on-screen scale below
- * the legible zoom before anything has moved the camera since. It keeps every camera it
+ * the legible zoom before anything has moved the camera since. The zoom
+ * extent widens to hold any camera an opening or a fit sets, so the wheel
+ * and the buttons zoom on, in and out, from there. It keeps every camera it
  * measures in `memory`, in screen terms. When `fit` changes it fits that
  * box; when `frame`'s serial changes it fits the frame's box, once; neither
  * refit zooms a legible view (every 14px text at 12px or more) out to an
@@ -196,10 +199,9 @@ export default function useGraphCamera({
       const transform = zoomIdentity
         .translate(target.x, target.y)
         .scale(target.k);
-      // A fit below the extent's floor lowers the floor to it, so the
-      // wheel and the buttons zoom on from where the fit left the camera.
-      const [floor, ceiling] = active.scaleExtent();
-      if (target.k < floor) active.scaleExtent([target.k, ceiling]);
+      // A fit outside the extent widens it, so the wheel and the buttons
+      // zoom on from where the fit left the camera.
+      active.scaleExtent(computeZoomExtent(active.scaleExtent(), target.k));
       if (prefersReducedMotion()) {
         active.transform(select(svg), transform);
         return;
@@ -283,10 +285,10 @@ export default function useGraphCamera({
     // judged to have shrunk the view.
     let lastScreen: number | undefined;
     // Move the camera, at once, to a target nothing the reader chose,
-    // lowering the zoom's floor to it when it lies below.
+    // with the zoom extent set anew to hold it, so the wheel and the
+    // buttons zoom on from there, and an earlier opening's widening goes.
     const place = (target: GraphTransform): void => {
-      const [floor, ceiling] = active.scaleExtent();
-      active.scaleExtent([Math.min(floor, target.k), ceiling]);
+      active.scaleExtent(computeZoomExtent(ZOOM_EXTENT, target.k));
       isOpening = true;
       active.transform(
         select(svg),
