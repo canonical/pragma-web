@@ -6,6 +6,13 @@
 // the design system's real entities, every job is served or deferred, every
 // surface is reached by a pairing, and no node is typed as the abstract
 // surface the schema makes an interface.
+//
+// DELIBERATELY NOT HERMETIC. The subject is the installed set, so this reads
+// the real `node_modules`, read-only. It sits in this package because this
+// package's manifest pins both the published packages and the shims: a
+// release bump that renames a block the shims name changes that manifest,
+// and this test turns red on the same pull request, where the shims have to
+// follow. Everything else in the suite runs over the hermetic corpus.
 // =============================================================================
 
 import { createStore } from "@canonical/ke";

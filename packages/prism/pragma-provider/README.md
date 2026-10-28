@@ -210,9 +210,15 @@ test rather than by construction.
 Pragma's real corpus is the five ref packages, two of them the local shims of the demand
 model. The packages are installed, so a boot over them is possible in CI, but it is a
 two-second boot over several hundred files and it proves pragma's ontologies rather than
-this package's logic. The unit suite therefore runs against a corpus of its own, and only
-`resolveRefRoots.test.ts` touches the real install, read-only, to prove the default
-resolution finds it.
+this package's logic. The unit suite therefore runs against a corpus of its own. Two files
+touch the real install, read-only, and are deliberately not hermetic: `resolveRefRoots.test.ts`,
+to prove the default resolution finds it, and `src/testing/integration/demandModel.test.ts`,
+whose subject is the installed set itself. That second test checks that the demand model's
+shims name only entities the published packages declare, that every job is served or
+deferred, and that every surface is paired. It lives here because this package's manifest
+pins both the published packages and the shims: a release bump that renames a block the
+shims name changes this manifest, so the test turns red on that pull request, where the
+shims have to follow.
 
 `src/testing/__fixtures__/corpus/` is a hand-written Turtle corpus in the exact shape the
 collector walks, small enough to read in one sitting and complete enough to make every
