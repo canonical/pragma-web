@@ -702,7 +702,7 @@ describe("server matrix (2×3) serves correctly", () => {
             //     across several coordinates, so the graph's default
             //     coordinate filter is a real narrowing.
             const tableRowHeaderCount = (
-              journeysHtml.match(/<th class="cell" scope="row">/g) ?? []
+              journeysHtml.match(/<th class="cell[^"]*" scope="row">/g) ?? []
             ).length;
             const railJobCount = (journeysHtml.match(/<li class="job">/g) ?? [])
               .length;
