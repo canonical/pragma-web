@@ -98,7 +98,9 @@ type OwnProps = {
    * paint, where the viewBox shows at the legible zoom; elsewhere, as on a
    * phone, a legible window of the graph's first region, the rest a pan
    * away: the window `legibleWindow` chooses of the viewBox, or the
-   * viewBox's top-left corner, at no lower than the legible zoom.
+   * viewBox's top-left corner, at no lower than the legible zoom; a resize
+   * then moves an unmoved camera between the two as the viewBox comes to
+   * show above or below the legible zoom.
    */
   readonly opening?: GraphOpening;
   /**

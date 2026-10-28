@@ -90,6 +90,11 @@ function locateClientPoint(
   ];
 }
 
+/** Whether a camera stands at the identity, the server's paint. */
+function isIdentity({ k, x, y }: GraphTransform): boolean {
+  return k === 1 && x === 0 && y === 0;
+}
+
 /**
  * Read whether the reader asked for reduced motion.
  *
@@ -122,7 +127,10 @@ function prefersReducedMotion(): boolean {
  * legible window of the graph's first region, the one `legibleWindow`
  * chooses or the viewBox's top-left corner, the rest a pan away. It opens
  * again for the new size when a resize shrinks the on-screen scale below
- * the legible zoom before anything has moved the camera since. The zoom
+ * the legible zoom before anything has moved the camera since, and,
+ * without an `opening`, when a resize leaves an unmoved camera on a window
+ * where the viewBox now shows legibly, which returns it to the identity,
+ * or at the identity where it shows below the legible zoom. The zoom
  * extent widens to hold any camera an opening or a fit sets, so the wheel
  * and the buttons zoom on, in and out, from there. It keeps every camera it
  * measures in `memory`, in screen terms. When `fit` changes it fits that
@@ -316,18 +324,33 @@ export default function useGraphCamera({
       return true;
     };
     // Move the camera to where `opening` asks for the visible area and
-    // scale, or, without one, to a legible window of the graph when the
-    // viewBox would show below the legible zoom; nowhere when it asks for
-    // nothing. Either way the camera then stands unmoved.
+    // scale, nowhere when it asks for nothing; or, without one, to a
+    // legible window of the graph when the viewBox would show below the
+    // legible zoom, else to the identity, the server's paint, when the
+    // camera stands elsewhere. Either way the camera then stands unmoved;
+    // say whether it moved.
     const open = (visible: GraphBox, scale: number): boolean => {
       const { opening, viewBox, legibleWindow } = latest.current;
       const target =
         opening === undefined
-          ? computeOpeningTransform(viewBox, visible, scale, legibleWindow)
+          ? (computeOpeningTransform(viewBox, visible, scale, legibleWindow) ??
+            (isIdentity(current.current) ? undefined : zoomIdentity))
           : opening(visible, scale);
       unmoved = true;
       if (target !== undefined) place(target);
       return target !== undefined;
+    };
+    // Whether a canvas without an `opening` would open, at this scale, on
+    // the identity or off it, the other way from where its camera stands:
+    // its viewBox has come to show at the legible zoom with the camera on
+    // a window, or below it with the camera at the identity.
+    const isOffOpening = (visible: GraphBox, scale: number): boolean => {
+      const { opening, viewBox, legibleWindow } = latest.current;
+      if (opening !== undefined) return false;
+      const opensOnIdentity =
+        computeOpeningTransform(viewBox, visible, scale, legibleWindow) ===
+        undefined;
+      return opensOnIdentity !== isIdentity(current.current);
     };
     // Keep the camera in the memory, in screen terms.
     const remember = (visible: GraphBox, scale: number): void => {
@@ -346,21 +369,24 @@ export default function useGraphCamera({
     // Read the zoom's scale against the viewport's size into the bucket and
     // the percentage; each changes state only when its value changes. The
     // first measured reading resumes the camera the memory keeps or opens
-    // it where `opening` asks, and a resize that shrinks an unmoved
-    // camera's view below the legible zoom opens it again. Every measured
-    // reading keeps the camera in the memory.
+    // it where `opening` asks. A resize opens an unmoved camera again when
+    // it shrinks the view below the legible zoom, or, without an
+    // `opening`, when the camera stands on the identity or off it the
+    // other way from where the canvas would now open, as when a viewport
+    // that opened on a phone's window grows to show the viewBox legibly.
+    // Every measured reading keeps the camera in the memory.
     const readScale = (): void => {
       const { scale, visible, measured } = measureViewport(
         svg,
         latest.current.viewBox,
       );
       const screen = scale * current.current.k;
-      const shrunk =
+      const resized =
         unmoved &&
         lastScreen !== undefined &&
-        screen < lastScreen &&
-        screen < HUBS_SCALE;
-      if (measured && !isOpening && (!opened || shrunk)) {
+        ((screen < lastScreen && screen < HUBS_SCALE) ||
+          isOffOpening(visible, scale));
+      if (measured && !isOpening && (!opened || resized)) {
         const resumed = !opened && resume(visible, scale);
         opened = true;
         if (resumed || open(visible, scale)) return;
