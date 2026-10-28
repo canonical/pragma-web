@@ -18,16 +18,13 @@
 // means the app stopped committing its schema, which is exactly the state this
 // gate exists to notice, and a skip would report that as success.
 //
-// 🔴 IT IS NOT POINTED AT `../__fixtures__/*.sdl.txt`. Those captures predate
-// the converged base and carry 12 violations each; a gate aimed at them would
-// be red by construction and would be silenced within a week. They pin a
-// DIFFERENT property (additivity of the second source root, in
-// `./sourceAdditivity.test.ts`) which survives their staleness. THIS gate is
-// what measures the schema THE APP ACTUALLY SHIPS. Note the limit precisely:
-// the subject is the committed artifact, not a live emission, so this gate
-// catches the committed file drifting from the CONTRACT and cannot catch it
-// drifting from what `createPragmaProvider` would emit today. Closing that
-// second gap needs a boot, which is the app's job and not a unit test's.
+// THIS gate measures the schema THE APP ACTUALLY SHIPS. Note the limit
+// precisely: the subject is the committed artifact, not a live emission, so
+// this gate catches the committed file drifting from the CONTRACT and cannot
+// catch it drifting from what `createPragmaProvider` would emit today. That
+// second gap is closed in the app, which boots the provider and compares its
+// emission with the committed file (`src/server/committedSchema.tests.ts`),
+// beside `schema:check`, which regenerates the file and diffs it.
 //
 // 🔴 SCHEDULING — READ THIS BEFORE TRUSTING THE GATE. `nx affected` propagates
 // from a changed project to its DEPENDENTS. The app depends on this package,

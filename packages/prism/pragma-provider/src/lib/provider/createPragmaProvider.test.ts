@@ -42,11 +42,7 @@ import { createStore, type Plugin } from "@canonical/ke";
 import { createSchemaPlugin } from "@canonical/ke-graphql";
 import { satisfiesContract } from "@canonical/prism-contract";
 import { describe, expect, it, vi } from "vitest";
-import {
-  CORPUS_REFS_ROOT,
-  CORPUS_SEM_ROOT,
-  MISSING_ROOT,
-} from "../../testing/corpus.js";
+import { CORPUS_REFS_ROOT, MISSING_ROOT } from "../../testing/corpus.js";
 import {
   cacheRefRoots,
   collectTtlSources,
@@ -55,16 +51,14 @@ import {
 import { createPragmaProvider } from "./createPragmaProvider.js";
 
 /** One boot, shared: Oxigraph is a WASM store and booting it is not free. */
-const booted = createPragmaProvider({
-  refsRoot: CORPUS_REFS_ROOT,
-  semRoot: CORPUS_SEM_ROOT,
-});
+const booted = createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
 
-describe("createPragmaProvider over both roots", () => {
-  it("compiles a schema from both roots into one store", async () => {
+describe("createPragmaProvider over the ref packages", () => {
+  it("compiles a schema from every ref package into one store", async () => {
     const { api } = await booted;
     expect(api.sdl).toContain("type Component");
-    // `Job` comes only from the semantics tree — proof the second root merged.
+    // `Job` comes only from the `surface` package, a ref package like the
+    // others: proof the demand model compiles into the same store.
     expect(api.sdl).toContain("type Job");
   });
 
@@ -75,11 +69,6 @@ describe("createPragmaProvider over both roots", () => {
     // is red on the bump itself.
     const { api } = await booted;
     expect(satisfiesContract(api.sdl).violations).toEqual([]);
-  });
-
-  it("keeps the excluded shim out of the compiled schema", async () => {
-    const { api } = await booted;
-    expect(api.sdl).not.toContain("embodiesConcept");
   });
 
   it("parses the channel-dotted reference rather than choking on it", async () => {
@@ -176,13 +165,11 @@ describe("the pinned compiler options", () => {
     // `createPragmaProvider`: same sources, same prefixes, same
     // `mode`/`prefixing`/`incremental`. The only difference is the annotation.
     const ANNOTATION = /^\s*graphql:name "anatomyUri" ;\n/m;
-    const sources = collectTtlSources({
-      refRoots: cacheRefRoots(CORPUS_REFS_ROOT),
-      semRoot: CORPUS_SEM_ROOT,
-    }).map((source) =>
-      source.path.endsWith("anatomy.ttl")
-        ? { ...source, content: source.content.replace(ANNOTATION, "") }
-        : source,
+    const sources = collectTtlSources(cacheRefRoots(CORPUS_REFS_ROOT)).map(
+      (source) =>
+        source.path.endsWith("anatomy.ttl")
+          ? { ...source, content: source.content.replace(ANNOTATION, "") }
+          : source,
     );
     expect(sources.some((source) => ANNOTATION.test(source.content))).toBe(
       false,
@@ -219,10 +206,7 @@ describe("prose sidecars", () => {
   it("announces a sidecar that names no entity, and binds the rest", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
-    await createPragmaProvider({
-      refsRoot: CORPUS_REFS_ROOT,
-      semRoot: CORPUS_SEM_ROOT,
-    });
+    await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
     const warnings = warn.mock.calls.map((call) => String(call.at(0)));
     const infos = info.mock.calls.map((call) => String(call.at(0)));
     warn.mockRestore();
@@ -239,14 +223,12 @@ describe("prose sidecars", () => {
 describe("search index", () => {
   it("indexes every node node(id:) resolves at boot, and says how many", async () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
-    await createPragmaProvider({
-      refsRoot: CORPUS_REFS_ROOT,
-      semRoot: CORPUS_SEM_ROOT,
-    });
+    await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
     const infos = info.mock.calls.map((call) => String(call.at(0)));
     info.mockRestore();
-    // Five components, three classes from the first root and `sur:Job`
-    // from the second; the properties the graph types are left out.
+    // Five components, three classes from the design system and `sur:Job`
+    // from the surface ontology; the properties the graph types are left
+    // out.
     expect(infos.join("\n")).toContain(
       "2 prose sidecars bound, 9 nodes indexed for search",
     );
@@ -256,10 +238,7 @@ describe("search index", () => {
 describe("sdlOutput", () => {
   it("writes nothing and says so when it is absent", async () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
-    await createPragmaProvider({
-      refsRoot: CORPUS_REFS_ROOT,
-      semRoot: CORPUS_SEM_ROOT,
-    });
+    await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
     expect(info).toHaveBeenCalledWith(
       expect.stringContaining("SDL output disabled (no sdlOutput given)"),
     );
@@ -281,7 +260,6 @@ describe("sdlOutput", () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
     await createPragmaProvider({
       refsRoot: CORPUS_REFS_ROOT,
-      semRoot: CORPUS_SEM_ROOT,
       sdlOutput: destination,
     });
     info.mockRestore();
@@ -294,35 +272,12 @@ describe("sdlOutput", () => {
   });
 });
 
-describe("createPragmaProvider with the semantics root left to the environment", () => {
-  it("reads PRAGMA_SEM_DIR when no semRoot option is given", async () => {
-    vi.stubEnv("PRAGMA_SEM_DIR", CORPUS_SEM_ROOT);
-    const { api } = await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
-    vi.unstubAllEnvs();
-    // `Job` comes only from the semantics tree, so its presence proves the
-    // environment's root was walked rather than skipped.
-    expect(api.sdl).toContain("type Job");
-  });
-
-  it("skips the semantics tree when semRoot is null, whatever the environment says", async () => {
-    vi.stubEnv("PRAGMA_SEM_DIR", CORPUS_SEM_ROOT);
-    const { api } = await createPragmaProvider({
-      refsRoot: CORPUS_REFS_ROOT,
-      semRoot: null,
-    });
-    vi.unstubAllEnvs();
-    expect(api.sdl).toContain("type Component");
-    expect(api.sdl).not.toContain("type Job");
-  });
-});
-
 describe("createPragmaProvider without roots", () => {
   it("resolves the refs root from the environment and fails actionably", async () => {
-    // Called with NO options at all, so both defaults resolve. In any
+    // Called with NO options at all, so the default resolves. In any
     // environment without a populated pragma cache this is the message a
     // developer sees, and it must name the remedy.
     vi.stubEnv("PRAGMA_REFS_DIR", MISSING_ROOT);
-    vi.stubEnv("PRAGMA_SEM_DIR", MISSING_ROOT);
     await expect(createPragmaProvider()).rejects.toThrow(
       /pragma refs cache not found at .*— run `pragma sources update`/,
     );

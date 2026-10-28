@@ -18,10 +18,7 @@ import { CORPUS_REFS_ROOT } from "./corpus.js";
  * @note Impure: reads the corpus and boots an Oxigraph WASM store.
  */
 export const bootCorpusQuery = async (): Promise<QueryFn> => {
-  const sources = collectTtlSources({
-    refRoots: cacheRefRoots(CORPUS_REFS_ROOT),
-    semRoot: null,
-  });
+  const sources = collectTtlSources(cacheRefRoots(CORPUS_REFS_ROOT));
   const store = await createStore({
     sources: sources.map(({ content, path }) => ({ content, path })),
   });

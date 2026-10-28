@@ -26,10 +26,7 @@ const LINKING: ProseDocument = {
 };
 
 describe("createProseExtensions", () => {
-  const booted = createPragmaProvider({
-    refsRoot: CORPUS_REFS_ROOT,
-    semRoot: null,
-  });
+  const booted = createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
 
   /**
    * Run `source` against `schema` with a hand-built context. The compiled

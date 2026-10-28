@@ -13,10 +13,10 @@ import { walkFiles } from "./walkFiles.js";
  * Every Markdown sidecar under the ref packages' `definitions/` and `data/`,
  * sorted by store-visible path.
  *
- * Only the ref packages are walked. A sidecar describes an entity of the
- * package it ships in, and the semantics tree is a working tree whose
- * contents are not published with the graph. Which entity a sidecar
- * describes is decided later, against the store; this only finds the files.
+ * Every ref package is walked, the demand model's shims included: a sidecar
+ * describes an entity of the package it ships in, whichever package that
+ * is. Which entity a sidecar describes is decided later, against the store;
+ * this only finds the files.
  *
  * @param refRoots - The ref packages, each resolved to a directory.
  * @returns The sidecars, with their Markdown text.

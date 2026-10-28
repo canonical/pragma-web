@@ -11,7 +11,7 @@ const DS = "https://design.example.org/ontology#";
 
 describe("listProseCandidates", () => {
   const refRoots = cacheRefRoots(CORPUS_REFS_ROOT);
-  const sources = collectTtlSources({ refRoots, semRoot: null });
+  const sources = collectTtlSources(refRoots);
   const candidates = listProseCandidates(
     collectProseSidecars(refRoots),
     sources,

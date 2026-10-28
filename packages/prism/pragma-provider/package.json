@@ -48,8 +48,10 @@
     "@canonical/anatomy-dsl": "0.43.0",
     "@canonical/code-standards": "0.43.0",
     "@canonical/design-system": "0.43.0",
+    "@canonical/design-system-docs": "^0.44.1",
     "@canonical/ke": "0.43.0",
     "@canonical/ke-graphql": "0.43.0",
+    "@canonical/surface": "^0.44.1",
     "graphql": "17.0.0-rc.0",
     "mdast-util-from-markdown": "^2.0.3"
   },

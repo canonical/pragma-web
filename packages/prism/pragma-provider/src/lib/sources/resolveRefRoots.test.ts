@@ -34,17 +34,22 @@ const fakeInstall = mkdtempSync(join(tmpdir(), "prism-refs-"));
 const fakeFrom = join(fakeInstall, "dist", "esm", "resolveRefRoots.js");
 /** The one package whose manifest declares no version: a root stays unversioned. */
 const UNVERSIONED = "anatomy-dsl";
+/**
+ * The one package whose manifest is private: it declares a version, the
+ * workspace's, but names no release, so its root stays unversioned too.
+ */
+const PRIVATE = "surface";
+/** The manifest each fake package carries. */
+const fakeManifest = (pkg: string): Record<string, unknown> => {
+  const name = `${REF_SCOPE}/${pkg}`;
+  if (pkg === UNVERSIONED) return { name };
+  if (pkg === PRIVATE) return { name, version: "9.9.9", private: true };
+  return { name, version: "9.9.9" };
+};
 for (const pkg of REF_PACKAGES) {
   const dir = join(fakeInstall, "node_modules", REF_SCOPE, pkg);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(
-    join(dir, "package.json"),
-    JSON.stringify(
-      pkg === UNVERSIONED
-        ? { name: `${REF_SCOPE}/${pkg}` }
-        : { name: `${REF_SCOPE}/${pkg}`, version: "9.9.9" },
-    ),
-  );
+  writeFileSync(join(dir, "package.json"), JSON.stringify(fakeManifest(pkg)));
 }
 /** The same tree with one package deleted: a broken install. */
 const brokenInstall = mkdtempSync(join(tmpdir(), "prism-refs-broken-"));
@@ -83,10 +88,10 @@ describe("findInstalledPackage", () => {
 });
 
 describe("installedRefRoots", () => {
-  it("resolves every ref package to its directory, with the version it declares", () => {
+  it("resolves every ref package to its directory, with the release it declares", () => {
     expect(installedRefRoots(fakeFrom)).toStrictEqual(
       REF_PACKAGES.map((pkg) =>
-        pkg === UNVERSIONED
+        pkg === UNVERSIONED || pkg === PRIVATE
           ? {
               package: pkg,
               dir: join(fakeInstall, "node_modules", REF_SCOPE, pkg),
@@ -110,8 +115,20 @@ describe("installedRefRoots", () => {
     // Read-only: the dependencies this package declares, where Bun put them.
     for (const root of installedRefRoots()) {
       expect(root.dir).toMatch(/node_modules/);
-      expect(root.version).toMatch(/^\d+\.\d+\.\d+/);
     }
+  });
+
+  it("versions the published packages and leaves the private shims unversioned", () => {
+    // The demand model's shims are private workspace packages: the version
+    // in their manifests is the workspace's, which names no release.
+    const versions = Object.fromEntries(
+      installedRefRoots().map((root) => [root.package, root.version]),
+    );
+    for (const pkg of ["design-system", "code-standards", "anatomy-dsl"]) {
+      expect(versions[pkg], pkg).toMatch(/^\d+\.\d+\.\d+/);
+    }
+    expect(versions.surface).toBeUndefined();
+    expect(versions["design-system-docs"]).toBeUndefined();
   });
 });
 

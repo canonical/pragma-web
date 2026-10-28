@@ -35,19 +35,11 @@ export interface RefRoot {
   readonly package: string;
   /** The directory holding `definitions/` and `data/`. */
   readonly dir: string;
-  /** The package version, when the directory carries a `package.json`. */
-  readonly version?: string;
-}
-
-/** The roots `collectTtlSources` walks. */
-export interface SourceRoots {
-  /** The ref packages, each resolved to a directory. */
-  readonly refRoots: readonly RefRoot[];
   /**
-   * The semantics working tree, or `null` to skip it deliberately. A string
-   * that names a missing directory is announced as a miss; `null` is not.
+   * The package version, when the directory carries the manifest of a
+   * released package. A private package names no release, so it has none.
    */
-  readonly semRoot: string | null;
+  readonly version?: string;
 }
 
 /** Options for {@link createPragmaProvider}. */
@@ -58,12 +50,6 @@ export interface PragmaProviderOptions {
    * `$PRAGMA_REFS_DIR` when set, else the packages installed next to this one.
    */
   readonly refsRoot?: string;
-  /**
-   * The semantics working tree. Default: `$PRAGMA_SEM_DIR`, else the sibling
-   * checkout. Pass `null` to compile the ref packages alone, whatever the
-   * machine has — the schema the docsite commits is generated that way.
-   */
-  readonly semRoot?: string | null;
   /** Where to write the emitted SDL. Absent means no write. */
   readonly sdlOutput?: string;
 }

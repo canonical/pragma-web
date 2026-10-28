@@ -19,20 +19,17 @@ import {
   collectTtlSources,
   harvestPrefixes,
 } from "../lib/sources/index.js";
-import { CORPUS_REFS_ROOT, CORPUS_SEM_ROOT } from "./corpus.js";
+import { CORPUS_REFS_ROOT } from "./corpus.js";
 
 /**
- * Boot a store over both corpus roots with the schema plugin, compiled as
- * the provider compiles it, and return the schema, a fresh context and a
- * query function.
+ * Boot a store over the corpus's ref packages with the schema plugin,
+ * compiled as the provider compiles it, and return the schema, a fresh
+ * context and a query function.
  *
  * @note Impure: reads the corpus and boots an Oxigraph WASM store.
  */
 export const bootCorpusSchema = async (): Promise<SearchIndexSources> => {
-  const sources = collectTtlSources({
-    refRoots: cacheRefRoots(CORPUS_REFS_ROOT),
-    semRoot: CORPUS_SEM_ROOT,
-  });
+  const sources = collectTtlSources(cacheRefRoots(CORPUS_REFS_ROOT));
   // biome-ignore lint/suspicious/noExplicitAny: the Plugin generic is invariant, so the plugin array needs `any` here, as in createPragmaProvider
   const plugins: Plugin<any>[] = [
     createSchemaPlugin({

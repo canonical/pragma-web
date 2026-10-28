@@ -17,10 +17,7 @@ const SEARCH_QUERY = `query Search($text: String!, $first: Int) {
 }`;
 
 describe("createSearchExtensions", () => {
-  const booted = createPragmaProvider({
-    refsRoot: CORPUS_REFS_ROOT,
-    semRoot: null,
-  });
+  const booted = createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
 
   /**
    * Run `SEARCH_QUERY` against the compiled schema with a hand-built

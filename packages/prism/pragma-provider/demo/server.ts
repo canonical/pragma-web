@@ -8,11 +8,12 @@
  * prism-graph-example holds 5176, so all three run at once and the same lenses
  * can be pointed at any of them via the docsite's `VITE_GRAPHQL_URL`.
  *
- * ⚠ THIS WILL NOT BOOT WITHOUT A POPULATED PRAGMA REFS CACHE, and that is
- * correct behaviour rather than a defect. `collectTtlSources` throws before an
- * Oxigraph store is ever created, carrying the remedy ("run `pragma sources
- * update`"). A demo that fabricated a graph to have something to serve would
- * be demonstrating something other than this provider.
+ * It boots from the installed packages: the ref packages this package
+ * depends on, the demand model's shims among them, are in `node_modules`
+ * after `bun install`. A missing one fails the boot, naming the package,
+ * before an Oxigraph store is ever created. A demo that fabricated a graph to
+ * have something to serve would be demonstrating something other than this
+ * provider.
  *
  * It passes NO `sdlOutput`, so it writes no file. See
  * `src/lib/provider/createPragmaProvider.ts` for why that is the default.

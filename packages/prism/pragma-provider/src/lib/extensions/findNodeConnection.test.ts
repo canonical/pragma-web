@@ -11,10 +11,7 @@ import { findNodeConnection } from "./findNodeConnection.js";
 
 describe("findNodeConnection", () => {
   it("reaches NodeConnection from the compiled Node interface", async () => {
-    const { api } = await createPragmaProvider({
-      refsRoot: CORPUS_REFS_ROOT,
-      semRoot: null,
-    });
+    const { api } = await createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
     const node = api.schema.getType("Node");
     if (!isInterfaceType(node)) throw new Error("the schema has no Node");
     expect(findNodeConnection(node)).toBe(api.schema.getType("NodeConnection"));

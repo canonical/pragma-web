@@ -8,7 +8,7 @@
 // =============================================================================
 
 import { describe, expect, it } from "vitest";
-import { CORPUS_REFS_ROOT, CORPUS_SEM_ROOT } from "../../testing/corpus.js";
+import { CORPUS_REFS_ROOT } from "../../testing/corpus.js";
 import { collectTtlSources } from "./collectTtlSources.js";
 import { harvestPrefixes } from "./harvestPrefixes.js";
 import { cacheRefRoots } from "./resolveRefRoots.js";
@@ -17,10 +17,7 @@ const source = (content: string) => [{ path: "x.ttl", content }];
 
 describe("harvestPrefixes over the corpus", () => {
   const prefixes = harvestPrefixes(
-    collectTtlSources({
-      refRoots: cacheRefRoots(CORPUS_REFS_ROOT),
-      semRoot: CORPUS_SEM_ROOT,
-    }),
+    collectTtlSources(cacheRefRoots(CORPUS_REFS_ROOT)),
   );
 
   it("harvests from both roots", () => {

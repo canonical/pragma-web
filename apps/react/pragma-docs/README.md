@@ -158,7 +158,7 @@ fetches it only spreads it.
 ([`@canonical/prism-pragma-provider`](../../../packages/prism/pragma-provider))
 and serves its compiled schema at `http://127.0.0.1:5175/graphql` — nothing
 else, no HTML. **The app assembles no provider of its own**: the ref-package
-list, the ontology exclusions and the compiler options all live in that
+list and the compiler options live in that
 package, and this app depends on no knowledge engine
 (no `@canonical/ke`, no `@canonical/ke-graphql`). `graph.ts` is transport plus
 one factory call. Every `dev*` / `preview*` script starts one for you via the
@@ -170,10 +170,13 @@ that variable also tells the launcher an endpoint already exists, so it starts
 no graph of its own — which is how you point the app at a shared or remote
 one.
 
-**Prerequisite:** the *default* provider compiles from the pragma CLI's refs
-cache, so `~/.cache/pragma/refs/@canonical` must be populated (`pragma sources
-update`, or point `PRAGMA_REFS_DIR` at a cache) before any server script serves
-data. See
+**Prerequisite:** `bun install`, and nothing else. The default provider
+compiles from the ref packages it declares as dependencies, installed in
+`node_modules`: the published design system, code standards and anatomy DSL,
+and the docsite's demand model, which ships as two private shim packages in
+[`packages/prism/semantics/`](../../../packages/prism/semantics) until it is
+published. `PRAGMA_REFS_DIR` points it at a pragma refs cache instead, for
+ontology branches that are not published yet. See
 [the provider's README](../../../packages/prism/pragma-provider/README.md)
 for the source layout it expects. This is a prerequisite of *that provider*,
 not of this app: any provider implementing `@canonical/prism-contract` can take
@@ -182,14 +185,15 @@ hand without the compiler — and set `VITE_GRAPHQL_URL`.
 
 **The schema is generated, and gated.** `src/relay/schema.graphql` is what
 relay-compiler validates every operation against. `bun run schema`
-(`src/server/schema.ts`) writes it from two halves: the SDL the pragma provider
-emits over the ref packages it declares as dependencies, at the exact versions
-in its `package.json` and with no semantics tree, plus the authored extensions
-under `src/relay/extensions/` (today the journeys add-on's types, which have no
-published source yet). `bun run check` runs `schema:check`, which regenerates
-and fails on a diff, so a schema change is always a visible diff with a cause:
-a bumped ref package, a changed extension, or a changed compiler. The graph
-server never writes this file; what it serves may be a superset of it.
+(`src/server/schema.ts`) writes it from one generated source: the SDL the
+pragma provider emits over the ref packages it declares as dependencies, the
+demand model's shims among them, so the journeys add-on's types are generated
+like every other type and nothing is authored by hand. `bun run check` runs
+`schema:check`, which regenerates and fails on a diff, so a schema change is
+always a visible diff with a cause: a bumped ref package, a changed shim, or a
+changed compiler. The graph server never writes this file, and serves exactly
+what it holds (`src/server/committedSchema.tests.ts` boots the provider and
+compares).
 
 **Generated artifacts are committed.** The Vite plugin runs with
 `codegen: false`, so `src/relay/__generated__/` is not rebuilt on the fly:

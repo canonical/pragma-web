@@ -15,7 +15,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { createPragmaProvider } from "../../lib/provider/index.js";
-import { CORPUS_REFS_ROOT, CORPUS_SEM_ROOT } from "../corpus.js";
+import { CORPUS_REFS_ROOT } from "../corpus.js";
 
 const DS = "https://design.example.org/ontology#";
 
@@ -35,10 +35,7 @@ const readCorpusFile = (path: string): string =>
   readFileSync(join(CORPUS_REFS_ROOT, "design-system/main", path), "utf-8");
 
 describe("Query.prose", () => {
-  const booted = createPragmaProvider({
-    refsRoot: CORPUS_REFS_ROOT,
-    semRoot: CORPUS_SEM_ROOT,
-  });
+  const booted = createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
 
   /** POST `PROSE_QUERY` with `variables`, and `locale` as the header. */
   const ask = async (
@@ -163,9 +160,7 @@ describe("createPragmaProvider over a sidecar linking to an unparseable IRI", ()
   ])("refuses to boot over %s", async (link, iri) => {
     const refsRoot = copyCorpusWithButtonLine(`\nSee ${link}.\n`);
     try {
-      await expect(
-        createPragmaProvider({ refsRoot, semRoot: CORPUS_SEM_ROOT }),
-      ).rejects.toThrow(
+      await expect(createPragmaProvider({ refsRoot })).rejects.toThrow(
         `prose sidecar design-system/data/button.md links to ${iri}, which the store cannot parse as an IRI: fix the link's destination.`,
       );
     } finally {

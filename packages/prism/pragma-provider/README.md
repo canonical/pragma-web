@@ -35,21 +35,19 @@ proves anything without the other.
 
 ---
 
-## The four pieces of relocated pragma knowledge
+## The relocated pragma knowledge
 
-Each of these is a fact about a specific upstream ontology, and each has a fix that
-would delete it from this repo. They are pinned constants
-(`src/lib/config/constants.ts`), not options — see that file's header for why.
+What the graph is made of is a fact about specific upstream ontologies, with a fix that
+would delete it from this repo. It is a pinned constant
+(`src/lib/config/constants.ts`), not an option — see that file's header for why.
 
 | Constant | What it encodes | The upstream fix that deletes it |
 |---|---|---|
-| `REF_PACKAGES` | `design-system`, `code-standards`, `anatomy-dsl` — the source packages, declared as dependencies at exact versions and read from `node_modules` | A manifest the packages publish themselves, so the list is read rather than hard-coded |
-| `SEM_PACKAGES` | `surface`, `design-system-docs` — the docsite's own demand model, in a second root | Publishing the demand model as a ref package, collapsing two roots to one |
-| `EXCLUDED_SOURCES` | drops `design-system-docs/data/shim-concept.ttl`, whose `ds:embodiesConcept rdfs:domain ds:Entity` smears two fields onto all fourteen `ds:` types | A modelling fix: narrow the domain off the class-tree root |
+| `REF_PACKAGES` | `design-system`, `code-standards`, `anatomy-dsl`, `surface`, `design-system-docs` — the source packages, declared as dependencies and read from `node_modules`. The first three are published and pinned to exact versions; `surface` and `design-system-docs`, the docsite's own demand model, are private shims in `packages/prism/semantics/`, linked by `bun install` under the names the published packages will have | Publishing the two demand-model packages, which deletes the shims; and a manifest the packages publish themselves, so the list is read rather than hard-coded |
 
 ### The anatomy collision: resolved upstream, still measured here
 
-A fourth constant used to sit in that table: `CUSTOM_MAPPINGS`, renaming `anatomy:uri`
+Another constant used to sit in that table: `CUSTOM_MAPPINGS`, renaming `anatomy:uri`
 to `anatomyUri` because `uri` is the primary key the compiler injects on every Node, and
 an ontology property of the same name is an `M005` error that kills the boot. Its
 documented upstream fix was a `graphql:name "anatomyUri"` annotation on the term in the
@@ -179,11 +177,11 @@ at boot, with the same query a client would send (`uri` and `_meta { curie title
 definition }`), so search matches exactly what `_meta` serves. A node that fails to read
 fails the boot, naming its IRI, rather than the first search.
 
-**The cost.** On the installed ref packages, 877 IRIs are typed and 765 of them resolve;
-reading them takes about 0.6 to 0.7 s on top of a boot of about 0.5 s, measured under
-Node. The docsite's `bun run schema`, which boots the provider, takes about 1.7 s end to
-end. Every boot pays it: the graph server, `schema:check`, and the tests that boot the
-corpus.
+**The cost.** On the installed ref packages, the demand model's shims included, 1,103
+IRIs are typed and 931 of them resolve. A whole boot, the search index included, takes
+about 1.7 to 2.1 s under Bun; the docsite's `bun run schema`, which boots the provider,
+takes about 2 s end to end. Every boot pays it: the graph server, `schema:check`, and the
+tests that boot the corpus.
 
 **The default language only.** Titles and definitions are read in `en`, the contract's
 default, once, at boot; the request's `x-prism-locale` is not consulted.
@@ -208,43 +206,32 @@ test rather than by construction.
 
 ## Testing: the hermetic corpus
 
-Pragma's real corpus is the three ref packages plus a semantics working tree. The
-packages are installed, so a boot over them is possible in CI, but it is a three-second
-boot over several hundred files and it proves pragma's ontologies rather than this
-package's logic; the semantics tree does not exist in CI at all. The unit suite therefore
-runs against a corpus of its own, and only `resolveRefRoots.test.ts` touches the real
-install, read-only, to prove the default resolution finds it.
+Pragma's real corpus is the five ref packages, two of them the local shims of the demand
+model. The packages are installed, so a boot over them is possible in CI, but it is a
+two-second boot over several hundred files and it proves pragma's ontologies rather than
+this package's logic. The unit suite therefore runs against a corpus of its own, and only
+`resolveRefRoots.test.ts` touches the real install, read-only, to prove the default
+resolution finds it.
 
 `src/testing/__fixtures__/corpus/` is a hand-written Turtle corpus in the exact shape the
 collector walks, small enough to read in one sitting and complete enough to make every
-property falsifiable: two roots merging, dot-prefixed files skipped, the exclusion
-dropped, channel-dotted references escaped, prefixes harvested, both actionable failure
+property falsifiable: every ref package compiling into one store, dot-prefixed files
+skipped, channel-dotted references escaped, prefixes harvested, both actionable failure
 messages, and the anatomy collision in both directions. See that directory's README for
 what each file is for. Precedent: [`demo/graph.ttl`](https://github.com/canonical/pragma-core/blob/main/packages/engine/ke-graphql/demo/graph.ttl)
 in `@canonical/ke-graphql`.
 
-### The two SDL captures are stale, and it is written down
+### What the corpus does not cover
 
-`src/testing/__fixtures__/*.sdl.txt` back `src/testing/integration/sourceAdditivity.test.ts` (ported
-unchanged from the app). Measured at `4d228c8` against `@canonical/prism-contract`:
-**12 violations each, identical set**. They predate the converged base.
-
-They are kept because the property that suite asserts — additivity of the second source
-root — is a property of the **source set**, orthogonal to the structural head, and both
-sides of the comparison are equally stale. The type inventory has not drifted: the
-merged capture carries 183 top-level definitions, exactly the live schema's count. They
-cannot be regenerated without the semantics tree, and a capture from a *partial* corpus is
-worse than a stale one because it looks current.
-
-What that leaves open is measured only in part. `src/testing/integration/committedSdl.test.ts`
-checks the schema the app **ships** — the committed `schema.graphql` — against the live
-contract on every run, so the structural head those captures are stale against is not
-unmeasured. Its subject is a **committed artifact**, not a live emission, so it cannot
-see that file drift from what `createPragmaProvider` would emit today. Closing that
-second gap is the docsite's `schema:check`, which regenerates the committed file from the installed packages and fails on a diff; the test's own header states the
-same limit. What a live emission can show without one — that the compiler this package
-pins still satisfies the contract — `createPragmaProvider.test.ts` checks over the
-hermetic corpus.
+`src/testing/integration/committedSdl.test.ts` checks the schema the app **ships** — the
+committed `schema.graphql` — against the live contract on every run. Its subject is a
+**committed artifact**, not a live emission, so it cannot see that file drift from what
+`createPragmaProvider` would emit today. The docsite closes that gap twice: its
+`schema:check` regenerates the committed file from the installed packages and fails on a
+diff, and `src/server/committedSchema.tests.ts` boots the provider and compares its
+emission with the committed file. What a live emission can show without either — that the
+compiler this package pins still satisfies the contract — `createPragmaProvider.test.ts`
+checks over the hermetic corpus.
 
 ---
 
@@ -259,18 +246,18 @@ run at once and the docsite can be pointed at any of them with `VITE_GRAPHQL_URL
 
 **It boots from the installed ref packages.** `@canonical/design-system`,
 `@canonical/code-standards` and `@canonical/anatomy-dsl` are dependencies of this package,
-pinned to exact versions, so `bun install` is the whole setup and two machines with the
-same lockfile compile the same graph. The versions are stamped into the emitted SDL's
-provenance header as its `revision`, so a schema diff names the release that caused it.
+pinned to exact versions, and `@canonical/surface` and `@canonical/design-system-docs`,
+the demand model's shims, are workspace dependencies linked from
+`packages/prism/semantics/`. `bun install` is the whole setup, and two machines with the
+same lockfile compile the same graph. The versions of the published packages are stamped
+into the emitted SDL's provenance header as its `revision`, so a schema diff names the
+release that caused it; a private shim names no release and reads as `unversioned`.
 
 To work against ontology branches that are not published yet, point `PRAGMA_REFS_DIR` (or
 the `refsRoot` option) at a pragma refs cache (`pragma sources update` populates one at
 `~/.cache/pragma/refs/@canonical`); its `<package>/main/{definitions,data}` layout is read
 instead. A cache root that does not exist is an error with the remedy in the message,
-before an Oxigraph store is ever created.
-
-**The semantics tree is optional, and can be refused.** `PRAGMA_SEM_DIR` (or `semRoot`)
-names the working tree holding `surface` and `design-system-docs`; a missing one is
-announced and skipped. `semRoot: null` skips it silently whatever the machine has, which
-is how the docsite generates the schema it commits: from the ref packages alone, so a
-local checkout cannot leak into the committed file.
+before an Oxigraph store is ever created. A cache must hold the demand model too: link the
+shims into it as `surface/main` and `design-system-docs/main`. A package missing from an
+existing cache is tolerated and contributes nothing, so a cache without them compiles a
+graph without the demand model, and the journeys lens has nothing to show.

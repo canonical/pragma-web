@@ -9,8 +9,7 @@
     "**/__generated__/**",
     "packages/prism/*/src/**/*.test.tsx",
     "packages/prism/*/src/**/*.stories.tsx",
-    "**/dist/**",
-    "**/relay/extensions/**"
+    "**/dist/**"
   ],
   "projects": {
     "pragma-docs": {
