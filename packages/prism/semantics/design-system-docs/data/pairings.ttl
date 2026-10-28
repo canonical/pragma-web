@@ -1,0 +1,279 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The pairings of the site's jobs with the surfaces that serve them, named
+# pairing.<job>.<surface>. Each carries its role and, for a curated
+# surface, what the arrival keeps; a pairing with the GraphQL port carries
+# no arrival, because an agent has nothing to reorient. Every surface of the
+# site is paired at least once.
+
+# ---- job.l1
+
+dsd:pairing.l1.home a surface:Pairing ;
+  rdfs:label "job.l1 to view.home" ;
+  rdfs:comment "A first visit lands on the lobby, which names every lens." ;
+  surface:forJob dsd:job.l1 ;
+  surface:pairsSurface dsd:view.home ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.l1.guides a surface:Pairing ;
+  rdfs:label "job.l1 to view.guides" ;
+  rdfs:comment "The guides walk a newcomer through the system from the start." ;
+  surface:forJob dsd:job.l1 ;
+  surface:pairsSurface dsd:view.guides ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:cold_entry .
+
+# ---- job.l2
+
+dsd:pairing.l2.standards a surface:Pairing ;
+  rdfs:label "job.l2 to view.standards" ;
+  rdfs:comment "The standards index shows every rule the code is held to." ;
+  surface:forJob dsd:job.l2 ;
+  surface:pairsSurface dsd:view.standards ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.l2.guides a surface:Pairing ;
+  rdfs:label "job.l2 to view.guides" ;
+  rdfs:comment "A guide explains how the standards are applied in review." ;
+  surface:forJob dsd:job.l2 ;
+  surface:pairsSurface dsd:view.guides ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:cold_entry .
+
+# ---- job.l3
+
+dsd:pairing.l3.components a surface:Pairing ;
+  rdfs:label "job.l3 to view.components" ;
+  rdfs:comment "The catalogue shows the whole set of UI blocks at a glance." ;
+  surface:forJob dsd:job.l3 ;
+  surface:pairsSurface dsd:view.components ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.l3.chips a surface:Pairing ;
+  rdfs:label "job.l3 to view.chips" ;
+  rdfs:comment "A chip in prose opens a component without a trip through the catalogue." ;
+  surface:forJob dsd:job.l3 ;
+  surface:pairsSurface dsd:view.chips ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:no_move .
+
+# ---- job.l4
+
+dsd:pairing.l4.chips a surface:Pairing ;
+  rdfs:label "job.l4 to view.chips" ;
+  rdfs:comment "The chip on the term itself leads to its definition." ;
+  surface:forJob dsd:job.l4 ;
+  surface:pairsSurface dsd:view.chips ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:no_move .
+
+dsd:pairing.l4.palette a surface:Pairing ;
+  rdfs:label "job.l4 to view.palette" ;
+  rdfs:comment "The palette finds a term by name over the page the reader is on." ;
+  surface:forJob dsd:job.l4 ;
+  surface:pairsSurface dsd:view.palette ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:view_kept .
+
+dsd:pairing.l4.definitions a surface:Pairing ;
+  rdfs:label "job.l4 to view.definitions" ;
+  rdfs:comment "The definitions graph shows the term among the terms it relates to." ;
+  surface:forJob dsd:job.l4 ;
+  surface:pairsSurface dsd:view.definitions ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:subject_kept .
+
+# ---- job.d1
+
+dsd:pairing.d1.component a surface:Pairing ;
+  rdfs:label "job.d1 to view.component" ;
+  rdfs:comment "The component page shows the anatomy and the variants of the component picked in the catalogue." ;
+  surface:forJob dsd:job.d1 ;
+  surface:pairsSurface dsd:view.component ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:subject_kept .
+
+dsd:pairing.d1.components a surface:Pairing ;
+  rdfs:label "job.d1 to view.components" ;
+  rdfs:comment "The catalogue's cards preview each component before it is opened." ;
+  surface:forJob dsd:job.d1 ;
+  surface:pairsSurface dsd:view.components ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:view_kept .
+
+# ---- job.d2
+
+dsd:pairing.d2.component a surface:Pairing ;
+  rdfs:label "job.d2 to view.component" ;
+  rdfs:comment "The component page names the tokens its parts bind." ;
+  surface:forJob dsd:job.d2 ;
+  surface:pairsSurface dsd:view.component ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:subject_kept .
+
+dsd:pairing.d2.definitions a surface:Pairing ;
+  rdfs:label "job.d2 to view.definitions" ;
+  rdfs:comment "The definitions graph shows what a token is and where it is bound." ;
+  surface:forJob dsd:job.d2 ;
+  surface:pairsSurface dsd:view.definitions ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:subject_kept .
+
+# ---- job.d3
+
+dsd:pairing.d3.playground a surface:Pairing ;
+  rdfs:label "job.d3 to view.playground" ;
+  rdfs:comment "The playground composes components live." ;
+  surface:forJob dsd:job.d3 ;
+  surface:pairsSurface dsd:view.playground ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.d3.component a surface:Pairing ;
+  rdfs:label "job.d3 to view.component" ;
+  rdfs:comment "A component page opens its example in the playground." ;
+  surface:forJob dsd:job.d3 ;
+  surface:pairsSurface dsd:view.component ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:subject_kept .
+
+# ---- job.e1
+
+dsd:pairing.e1.component a surface:Pairing ;
+  rdfs:label "job.e1 to view.component" ;
+  rdfs:comment "The component page lists the props and shows a usage example." ;
+  surface:forJob dsd:job.e1 ;
+  surface:pairsSurface dsd:view.component ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.e1.palette a surface:Pairing ;
+  rdfs:label "job.e1 to view.palette" ;
+  rdfs:comment "The palette opens a component's page by its name." ;
+  surface:forJob dsd:job.e1 ;
+  surface:pairsSurface dsd:view.palette ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:view_kept .
+
+# ---- job.e2
+
+dsd:pairing.e2.standard a surface:Pairing ;
+  rdfs:label "job.e2 to view.standard" ;
+  rdfs:comment "A standard's page is the stable address a review cites." ;
+  surface:forJob dsd:job.e2 ;
+  surface:pairsSurface dsd:view.standard ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.e2.standards a surface:Pairing ;
+  rdfs:label "job.e2 to view.standards" ;
+  rdfs:comment "The standards index finds the standard a change breaks." ;
+  surface:forJob dsd:job.e2 ;
+  surface:pairsSurface dsd:view.standards ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:view_kept .
+
+dsd:pairing.e2.chips a surface:Pairing ;
+  rdfs:label "job.e2 to view.chips" ;
+  rdfs:comment "A chip names a standard inline in a guide or a component page." ;
+  surface:forJob dsd:job.e2 ;
+  surface:pairsSurface dsd:view.chips ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:no_move .
+
+# ---- job.e3
+
+dsd:pairing.e3.palette a surface:Pairing ;
+  rdfs:label "job.e3 to view.palette" ;
+  rdfs:comment "The palette searches every node of the graph from any page." ;
+  surface:forJob dsd:job.e3 ;
+  surface:pairsSurface dsd:view.palette ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:view_kept .
+
+# ---- job.e4
+
+dsd:pairing.e4.playground a surface:Pairing ;
+  rdfs:label "job.e4 to view.playground" ;
+  rdfs:comment "The playground re-renders a component as its props change." ;
+  surface:forJob dsd:job.e4 ;
+  surface:pairsSurface dsd:view.playground ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:view_kept .
+
+# ---- job.m1
+
+dsd:pairing.m1.definitions a surface:Pairing ;
+  rdfs:label "job.m1 to view.definitions" ;
+  rdfs:comment "The definitions graph shows where a class sits and what it relates to." ;
+  surface:forJob dsd:job.m1 ;
+  surface:pairsSurface dsd:view.definitions ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.m1.palette a surface:Pairing ;
+  rdfs:label "job.m1 to view.palette" ;
+  rdfs:comment "The palette finds a class by name." ;
+  surface:forJob dsd:job.m1 ;
+  surface:pairsSurface dsd:view.palette ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:view_kept .
+
+# ---- job.m2
+
+dsd:pairing.m2.journeys a surface:Pairing ;
+  rdfs:label "job.m2 to view.journeys" ;
+  rdfs:comment "The journeys view lists every job with the surfaces that serve it." ;
+  surface:forJob dsd:job.m2 ;
+  surface:pairsSurface dsd:view.journeys ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:cold_entry .
+
+# ---- job.m3
+
+dsd:pairing.m3.guide a surface:Pairing ;
+  rdfs:label "job.m3 to view.guide" ;
+  rdfs:comment "A guide's page renders its links to entities as chips." ;
+  surface:forJob dsd:job.m3 ;
+  surface:pairsSurface dsd:view.guide ;
+  surface:pairingRole surface:primary ;
+  surface:arrival surface:subject_kept .
+
+dsd:pairing.m3.guides a surface:Pairing ;
+  rdfs:label "job.m3 to view.guides" ;
+  rdfs:comment "The guides index lists every guide a maintainer may extend." ;
+  surface:forJob dsd:job.m3 ;
+  surface:pairsSurface dsd:view.guides ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:cold_entry .
+
+dsd:pairing.m3.chips a surface:Pairing ;
+  rdfs:label "job.m3 to view.chips" ;
+  rdfs:comment "A chip shows that a link in a guide resolves to an entity." ;
+  surface:forJob dsd:job.m3 ;
+  surface:pairsSurface dsd:view.chips ;
+  surface:pairingRole surface:secondary ;
+  surface:arrival surface:no_move .
+
+# ---- job.a1
+
+dsd:pairing.a1.graphql a surface:Pairing ;
+  rdfs:label "job.a1 to port.graphql" ;
+  rdfs:comment "The GraphQL port serves the components and their props as data." ;
+  surface:forJob dsd:job.a1 ;
+  surface:pairsSurface dsd:port.graphql ;
+  surface:pairingRole surface:primary .
+
+# ---- job.a2
+
+dsd:pairing.a2.graphql a surface:Pairing ;
+  rdfs:label "job.a2 to port.graphql" ;
+  rdfs:comment "The GraphQL port serves the standards with their rules and examples." ;
+  surface:forJob dsd:job.a2 ;
+  surface:pairsSurface dsd:port.graphql ;
+  surface:pairingRole surface:primary .

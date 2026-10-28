@@ -1,0 +1,45 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The coordinate regions the site's jobs and personas are placed in. An axis
+# left empty matches any value. The designer region sorts first, so it is
+# the region a reader of the journeys sees first.
+
+dsd:coordinate.designer a surface:Coordinate ;
+  rdfs:label "Designer" ;
+  rdfs:comment "People who design with the design system, at any fluency." ;
+  surface:actor surface:human ;
+  surface:role dsd:role.designer .
+
+dsd:coordinate.engineer a surface:Coordinate ;
+  rdfs:label "Engineer" ;
+  rdfs:comment "People who build applications with the design system, at any fluency." ;
+  surface:actor surface:human ;
+  surface:role dsd:role.engineer .
+
+dsd:coordinate.engineer_agent a surface:Coordinate ;
+  rdfs:label "Engineering agent" ;
+  rdfs:comment "Coding assistants and scripts that do an engineer's work with the design system: they call the graph rather than read the pages." ;
+  surface:actor surface:agent ;
+  surface:role dsd:role.engineer .
+
+dsd:coordinate.maintainer a surface:Coordinate ;
+  rdfs:label "Maintainer" ;
+  rdfs:comment "The expert maintainers who change the design system and its documentation." ;
+  surface:actor surface:human ;
+  surface:role dsd:role.maintainer ;
+  surface:fluency surface:expert .
+
+dsd:coordinate.maker a surface:Coordinate ;
+  rdfs:label "Maker" ;
+  rdfs:comment "Fluent and expert people who both design and build: they compose and tune components live." ;
+  surface:actor surface:human ;
+  surface:role dsd:role.designer , dsd:role.engineer ;
+  surface:fluency surface:fluent , surface:expert .
+
+dsd:coordinate.newcomer a surface:Coordinate ;
+  rdfs:label "Newcomer" ;
+  rdfs:comment "Anyone meeting the design system for the first time, whatever their role." ;
+  surface:actor surface:human ;
+  surface:fluency surface:newcomer .

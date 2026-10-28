@@ -783,6 +783,14 @@
         "vitest": "^5.0.0",
       },
     },
+    "packages/prism/semantics/design-system-docs": {
+      "name": "@canonical/design-system-docs",
+      "version": "0.44.1",
+      "devDependencies": {
+        "@biomejs/biome": "2.5.15",
+        "@canonical/biome-config": "0.43.0",
+      },
+    },
     "packages/prism/semantics/surface": {
       "name": "@canonical/surface",
       "version": "0.44.1",
@@ -1969,6 +1977,8 @@
     "@canonical/code-standards": ["@canonical/code-standards@0.43.0", "", {}, "sha512-sVnYlsL7sVFTyPhQN3sZuj/FTP6XR7C58ppuXXBbCMz9jZYgFo53+p3NihXoToGqAQ9oHHujTN7xRL6wZFlp8w=="],
 
     "@canonical/design-system": ["@canonical/design-system@0.43.0", "", { "dependencies": { "@canonical/anatomy-dsl": "^0.43.0", "@canonical/token-ontology": "^0.43.0", "ajv": "^8.17.1", "jsonld": "^9.0.0", "n3": "^2.0.1", "tinyglobby": "^0.2.14", "yaml": "^2.7.1" }, "bin": { "collect-implementations": "src/collect-implementations.ts" } }, "sha512-JnQyVqUoLS8VC/zwShjG6gauuJI8gzN9WVNh6vg8XGzx7I+hM63Nw+0/PrGprQzE3mxAoTF8t5s6ccGrgLOalg=="],
+
+    "@canonical/design-system-docs": ["@canonical/design-system-docs@workspace:packages/prism/semantics/design-system-docs"],
 
     "@canonical/design-tokens": ["@canonical/design-tokens@0.43.0", "", {}, "sha512-mTzlUV9L1v0cc+6STx2rQwopztzbx9bxTVLDCzpkOKqjtFCS5363NcM6AEuWGBQq58mFQC1PtqvDlNIlv6U2WA=="],
 

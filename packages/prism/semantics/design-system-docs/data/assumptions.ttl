@@ -1,0 +1,54 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# The bets the site's design leans on, each with the test that would kill
+# it, and the laws it follows. Jobs name bets by their local name. A bet
+# that lost stays here, tombstoned, with a note and its successor.
+
+# ---- bets
+
+dsd:bet.cards_over_tree a surface:Bet ;
+  rdfs:label "Cards over a tree" ;
+  rdfs:comment "Readers pick a component faster from a catalogue of cards with previews than from a navigation tree of names." ;
+  surface:confidence "0.7"^^xsd:decimal ;
+  surface:test "Readers who open the catalogue reach the component they want in fewer steps than they did from the navigation tree." ;
+  surface:instrument "Referrer analytics on the component pages." ,
+    "A moderated test with five designers, picking a component for a given screen." .
+
+dsd:bet.agents_over_graphql a surface:Bet ;
+  rdfs:label "Agents over GraphQL" ;
+  rdfs:comment "Agents answer questions about the design system from the GraphQL port rather than by reading rendered pages." ;
+  surface:confidence "0.6"^^xsd:decimal ;
+  surface:test "Agent sessions that use the design system call the GraphQL port and fetch no rendered documentation page." ;
+  surface:instrument "The graph server's request log, by user agent." .
+
+dsd:bet.palette_first a surface:Bet ;
+  rdfs:label "Palette first" ;
+  rdfs:comment "Returning readers reach a page from the command palette more often than from the navigation." ;
+  surface:confidence "0.5"^^xsd:decimal ;
+  surface:test "Over a month, more page views by returning readers start from the palette than from the rail." ;
+  surface:instrument "Counts of palette opens and of the pages opened from it." .
+
+dsd:bet.side_navigation a surface:Bet ;
+  rdfs:label "Side navigation" ;
+  rdfs:comment "Readers find components fastest through a side navigation tree of every component's name." ;
+  surface:test "Readers reach the component they want from the side navigation in fewer steps than from any other surface." ;
+  surface:validity surface:superseded ;
+  surface:validityNote "Superseded when the catalogue moved to cards with previews and the side navigation was removed; the catalogue's bet is bet.cards_over_tree." ;
+  surface:supersededBy dsd:bet.cards_over_tree .
+
+# ---- laws
+
+dsd:law.one_substrate a surface:Law ;
+  rdfs:label "One substrate, many projections" ;
+  rdfs:comment "Every page of the site projects the one graph; no page keeps a copy of what the graph holds, and when two pages disagree the graph decides." .
+
+dsd:law.one_home a surface:Law ;
+  rdfs:label "Every noun has one home" ;
+  rdfs:comment "Each kind of entity has exactly one lens where its mentions land, so a chip always jumps to the same place." .
+
+dsd:law.four_states a surface:Law ;
+  rdfs:label "Four states or it does not ship" ;
+  rdfs:comment "Every surface that loads data designs its loading, empty, error and full states before it ships." .

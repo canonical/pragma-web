@@ -1,0 +1,162 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The jobs the design system's documentation site is built to serve. The
+# letter before each job's number names the kind of work: l for finding and
+# learning, d for design, e for engineering, m for maintenance, a for an
+# agent's work. Who has a job is its coordinates, never its letter. Bets are
+# named by the local name of the bet in assumptions.ttl.
+
+# ---- newcomers
+
+dsd:job.l1 a surface:Job ;
+  rdfs:label "Find my way around" ;
+  rdfs:comment "A newcomer's first visit: what the site holds and where to start." ;
+  surface:coordinates dsd:coordinate.newcomer ;
+  surface:story "When I open the design system's documentation for the first time, I want to see what it holds and where each part lives, so I can decide where to start, without reading a manual about the site first." ;
+  surface:acceptance "The lobby names every lens of the site and says in one line what each shows." ,
+    "Every lens is reached in one step from the lobby." .
+
+dsd:job.l2 a surface:Job ;
+  rdfs:label "Judge how mature the system is" ;
+  rdfs:comment "A newcomer weighing adoption reads the standards the system holds its code to." ;
+  surface:coordinates dsd:coordinate.newcomer ;
+  surface:story "When I am weighing whether to adopt the design system, I want to read the standards it holds its code to, so I can judge how mature it is, without asking a maintainer." ;
+  surface:acceptance "The standards index lists every standard with its rule, grouped by language." ,
+    "A guide explains how the standards are applied in review." .
+
+dsd:job.l4 a surface:Job ;
+  rdfs:label "Define a term in place" ;
+  rdfs:comment "A reader meets an unfamiliar term and wants its meaning without leaving the page." ;
+  surface:coordinates dsd:coordinate.newcomer ;
+  surface:story "When I meet a term I do not know on a page, I want its definition where I am, so I can keep reading, without losing my place." ;
+  surface:acceptance "Every entity named on a page links to its definition." ,
+    "The definition of a term opens without leaving the page the reader is on." ;
+  surface:bet "bet.palette_first" .
+
+# ---- designers
+
+dsd:job.l3 a surface:Job ;
+  rdfs:label "Browse the component catalogue" ;
+  rdfs:comment "A designer looks over the whole component set to pick what fits a screen." ;
+  surface:coordinates dsd:coordinate.designer ;
+  surface:story "When I browse the component catalogue, I want the whole set at a glance, so I can pick the component that fits my screen, without opening each page in turn." ;
+  surface:acceptance "The catalogue shows every UI block of the design system on one page." ,
+    "Each block shows its name, its kind and a rendered preview." ,
+    "The catalogue switches between cards and rows without losing the reader's place." ;
+  surface:bet "bet.cards_over_tree" .
+
+dsd:job.d1 a surface:Job ;
+  rdfs:label "Study a component's anatomy" ;
+  rdfs:comment "A designer who has picked a component learns its parts and its variants." ;
+  surface:coordinates dsd:coordinate.designer ;
+  surface:story "When I have picked a component, I want to see its anatomy and its variants, so I can design with its real parts, without guessing from screenshots." ;
+  surface:acceptance "The component page opens with the rendered component, then its anatomy tree." ,
+    "Every variant the component declares is named on its page." ;
+  surface:bet "bet.cards_over_tree" .
+
+dsd:job.d2 a surface:Job ;
+  rdfs:label "Check the tokens a component binds" ;
+  rdfs:comment "A designer keeps a screen on the system's values by reading which tokens a component uses." ;
+  surface:coordinates dsd:coordinate.designer ;
+  surface:story "When I specify a screen, I want to know which tokens a component binds, so I can keep my design on the system's values, without reading its stylesheet." ;
+  surface:acceptance "The component page lists the tokens each of its parts binds." ,
+    "Each token links to its definition." .
+
+# ---- makers, who design and build
+
+dsd:job.d3 a surface:Job ;
+  rdfs:label "Compose components live" ;
+  rdfs:comment "A maker tries a layout with the real components before starting a project." ;
+  surface:coordinates dsd:coordinate.maker ;
+  surface:story "When I prototype a screen, I want to compose components live, so I can try a layout with the real parts, without setting up a project." ;
+  surface:acceptance "The playground renders any composition of the design system's components." ,
+    "A composition can be reached again from its address." .
+
+dsd:job.e4 a surface:Job ;
+  rdfs:label "Change props live" ;
+  rdfs:comment "A maker settles a component's props by changing them and watching the result." ;
+  surface:coordinates dsd:coordinate.maker ;
+  surface:story "When I tune a component for my case, I want to change its props and see the result at once, so I can settle on the props I need, without a build and reload cycle." ;
+  surface:acceptance "Changing a prop in the playground re-renders the component at once." .
+
+# ---- engineers
+
+dsd:job.e1 a surface:Job ;
+  rdfs:label "Learn a component's props and usage" ;
+  rdfs:comment "An engineer wires a component into an application from its props and an example." ;
+  surface:coordinates dsd:coordinate.engineer ;
+  surface:story "When I implement a component in my application, I want its props and a usage example, so I can wire it correctly the first time, without reading its source." ;
+  surface:acceptance "The component page lists every prop with its type and its default." ,
+    "The component page shows a usage example that can be copied." .
+
+dsd:job.e2 a surface:Job ;
+  rdfs:label "Cite a standard in review" ;
+  rdfs:comment "An engineer reviewing a change points its author at the rule it breaks." ;
+  surface:coordinates dsd:coordinate.engineer ;
+  surface:story "When I review a change, I want to cite the code standard it breaks by a stable address, so I can point the author at the rule, without paraphrasing it." ;
+  surface:acceptance "Every standard has a page at an address that does not change." ,
+    "A standard's identifier can be copied from its page." .
+
+dsd:job.e3 a surface:Job ;
+  rdfs:label "Jump to anything by name" ;
+  rdfs:comment "An engineer who knows a name goes straight to its page." ;
+  surface:coordinates dsd:coordinate.engineer ;
+  surface:story "When I know the name of what I am looking for, I want to jump to it from anywhere, so I can get there in one step, without navigating the site's structure." ;
+  surface:acceptance "A keyboard shortcut opens a search over every node of the graph from any page." ,
+    "Choosing a result opens its page." ;
+  surface:bet "bet.palette_first" .
+
+# ---- maintainers
+
+dsd:job.m1 a surface:Job ;
+  rdfs:label "Place a class in the ontology" ;
+  rdfs:comment "A maintainer adding a concept sees where its class sits and what it relates to." ;
+  surface:coordinates dsd:coordinate.maintainer ;
+  surface:story "When I add a concept to the design system, I want to see where its class sits in the ontology and what it relates to, so I can place it correctly, without breaking the queries that read it." ;
+  surface:acceptance "The definitions graph shows every class with its superclasses and its relations." ,
+    "Selecting a class shows its properties in the inspector." .
+
+dsd:job.m2 a surface:Job ;
+  rdfs:label "Find the jobs no surface serves" ;
+  rdfs:comment "A maintainer planning the site's next work finds its real gaps." ;
+  surface:coordinates dsd:coordinate.maintainer ;
+  surface:story "When I plan the site's next work, I want to see which jobs no surface serves, so I can pick the real gaps, without auditing every page by hand." ;
+  surface:acceptance "The journeys view lists every job with the surfaces that serve it." ,
+    "A deferred job is shown as deferred, with the condition that wakes it." .
+
+dsd:job.m3 a surface:Job ;
+  rdfs:label "Link entities in a guide" ;
+  rdfs:comment "A maintainer writing a guide keeps it true by linking the entities it names." ;
+  surface:coordinates dsd:coordinate.maintainer ;
+  surface:story "When I write a guide, I want to link the entities it mentions by their addresses, so I can keep the guide true as the entities change, without copying their descriptions." ;
+  surface:acceptance "A guide links an entity by its prefixed name and the link opens the entity's page." ,
+    "A link to an entity that does not exist fails the build." .
+
+dsd:job.m4 a surface:Job ;
+  rdfs:label "Retire a component" ;
+  rdfs:comment "A maintainer retires a component and sends its readers to the successor." ;
+  surface:coordinates dsd:coordinate.maintainer ;
+  surface:story "When a component is retired, I want to mark it and name its successor, so I can remove it from new work, without stranding the pages and the code that link to it." ;
+  surface:acceptance "A retired component's page says it is retired and links to its successor." ;
+  surface:deferred true ;
+  surface:wakeCondition "When the design system's ontology carries a lifecycle state for retired components and a link to their successors." .
+
+# ---- agents
+
+dsd:job.a1 a surface:Job ;
+  rdfs:label "Read components and props as data" ;
+  rdfs:comment "An agent writing interface code reads the design system from the graph." ;
+  surface:coordinates dsd:coordinate.engineer_agent ;
+  surface:story "When I generate interface code for a developer, I want the components and their props as data, so I can produce code that uses the design system correctly, without scraping the documentation pages." ;
+  surface:acceptance "Every component, its props and its usage can be read from the GraphQL port." ;
+  surface:bet "bet.agents_over_graphql" .
+
+dsd:job.a2 a surface:Job ;
+  rdfs:label "Check code against the standards" ;
+  rdfs:comment "An agent reviewing code reads the standards with their rules and examples." ;
+  surface:coordinates dsd:coordinate.engineer_agent ;
+  surface:story "When I review code a developer wrote, I want the code standards as data with their rules and examples, so I can check the code against them, without a person relaying the rules." ;
+  surface:acceptance "Every standard, its rule and its examples can be read from the GraphQL port." ;
+  surface:bet "bet.agents_over_graphql" .

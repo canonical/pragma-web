@@ -1,0 +1,20 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix ds: <https://ds.canonical.com/> .
+@prefix cs: <http://pragma.canonical.com/codestandards#> .
+
+# The lens where each kind of entity is at home: where a chip naming one of
+# its instances jumps to. The classes are the ontologies' own, named by
+# their addresses and never redefined here.
+
+ds:Component surface:homedIn dsd:view.components .
+
+ds:Pattern surface:homedIn dsd:view.components .
+
+ds:Layout surface:homedIn dsd:view.components .
+
+ds:Subcomponent surface:homedIn dsd:view.components .
+
+cs:CodeStandard surface:homedIn dsd:view.standards .
+
+surface:Job surface:homedIn dsd:view.journeys .
