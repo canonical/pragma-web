@@ -304,8 +304,13 @@ client entry alike:
 ```
 
 The control then renders the stored theme on the server and hydrates to the
-same value. Without a provider it reads the cookie on the client alone, and
-a server-rendered page shows "System" until the reader changes it.
+same value. The request's theme only seeds the provider: the control records
+each choice the reader makes there (`useStoredTheme` returns the stored
+`theme` and its `setTheme`), so a control mounted later in the session, such
+as the one in another route's rail, shows the reader's latest choice. Keep
+the provider above the routed content, where a client navigation does not
+remount it. Without a provider the control reads the cookie on each mount,
+and a server-rendered page shows "System" until the reader changes it.
 
 ## Entity bindings
 
@@ -350,8 +355,8 @@ site's own catalog, and the factory holds no reader-facing string.
 ## Consumer obligations
 
 - Mount `HomesProvider` above routed content.
-- Mount `StoredThemeProvider` with the theme the request's cookie stores,
-  on the server and the client alike.
+- Mount `StoredThemeProvider` above routed content with the theme the
+  request's cookie stores, on the server and the client alike.
 - Pass `prepareRelayData` the site's `routes`, `middleware` and `notFound`,
   and stamp per-request attributes through `headers`, never module state.
 - Source `MentionChip`'s `prefixes` from the provider's `ontologies { prefix }`.

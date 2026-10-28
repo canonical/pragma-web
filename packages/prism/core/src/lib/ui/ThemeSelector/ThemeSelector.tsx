@@ -19,8 +19,11 @@ const componentCssClassName = "ds theme-selector";
  * the stored theme otherwise. It first shows the theme the nearest
  * `StoredThemeProvider` holds, the one the request's cookie stores, so a
  * server-rendered page and its hydration show the reader's choice; with no
- * provider, or none stored there, it reads the cookie on the client. Native `<select>` props pass through to the
- * root, a consumer `className` merges after the component's own, and an
+ * provider, or none stored there, it reads the cookie on the client. Each
+ * choice is recorded in the provider too, so a control mounted later in the
+ * session, such as the one in another route's rail, shows the reader's
+ * latest choice rather than the request's. Native `<select>` props pass
+ * through to the root, a consumer `className` merges after the component's own, and an
  * `aria-label` (or an `aria-labelledby`, which takes precedence) replaces
  * the default accessible name. The control may be narrower than its longest
  * option, so the cell that holds it, such as the rail's theme cell, decides
@@ -36,12 +39,12 @@ export default function ThemeSelector({
   ...props
 }: ThemeSelectorProps): ReactElement {
   const t = useMessages();
-  const storedTheme = useStoredTheme();
+  const { theme: storedTheme, setTheme: setStoredTheme } = useStoredTheme();
   const { value, source, set, reset } = usePreferredTheme({
     initialValue: storedTheme,
   });
   // The server cannot read the cookie, so the hook reports no stored theme
-  // there: the control keeps its own choice, first the request's stored
+  // there: the control keeps its own choice, first the provider's stored
   // theme, which the server and the hydrating client share.
   const [choice, setChoice] = useState<ThemeChoice>(
     () => storedTheme ?? (source === "stored" ? value : "system"),
@@ -53,8 +56,10 @@ export default function ThemeSelector({
 
     if (selected === "system") {
       reset();
+      setStoredTheme(undefined);
     } else {
       set(selected);
+      setStoredTheme(selected);
     }
   }
 

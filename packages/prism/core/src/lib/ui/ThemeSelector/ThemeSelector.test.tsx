@@ -63,6 +63,47 @@ describe("ThemeSelector", () => {
     expect(getSelect().value).toBe("system");
   });
 
+  it("keeps the reader's later theme when it mounts again under the request's", () => {
+    // biome-ignore lint/suspicious/noDocumentCookie: test setup
+    document.cookie = "theme=light; path=/";
+    // A client navigation to another layout drops the rail's control and
+    // mounts a new one, while the shell's provider stays mounted.
+    const { rerender } = render(
+      <StoredThemeProvider theme="light">
+        <ThemeSelector />
+      </StoredThemeProvider>,
+    );
+    fireEvent.change(getSelect(), { target: { value: "dark" } });
+    rerender(<StoredThemeProvider theme="light">{null}</StoredThemeProvider>);
+    rerender(
+      <StoredThemeProvider theme="light">
+        <ThemeSelector />
+      </StoredThemeProvider>,
+    );
+    expect(getSelect().value).toBe("dark");
+    expect(document.cookie).toContain("theme=dark");
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+  });
+
+  it("keeps system when it mounts again after the reader cleared the request's theme", () => {
+    // biome-ignore lint/suspicious/noDocumentCookie: test setup
+    document.cookie = "theme=light; path=/";
+    const { rerender } = render(
+      <StoredThemeProvider theme="light">
+        <ThemeSelector />
+      </StoredThemeProvider>,
+    );
+    fireEvent.change(getSelect(), { target: { value: "system" } });
+    rerender(<StoredThemeProvider theme="light">{null}</StoredThemeProvider>);
+    rerender(
+      <StoredThemeProvider theme="light">
+        <ThemeSelector />
+      </StoredThemeProvider>,
+    );
+    expect(getSelect().value).toBe("system");
+    expect(document.cookie).not.toContain("theme=");
+  });
+
   it("stores light or dark when chosen", () => {
     render(<ThemeSelector />);
     fireEvent.change(getSelect(), { target: { value: "dark" } });
