@@ -11,8 +11,9 @@
  * the inspector's drawer trigger covers nothing of the explorer, its search
  * field least of all. A filter chip's refit and a namespace's keep every
  * class in view labelled and cut none; Fit brings the graph into view
- * whole, or from its top-left corner at the overview's floor where the
- * whole fits only below it, keeping the hub and region labels; a pick in
+ * whole, or a window of it from its top-left corner at the overview's
+ * floor where the whole fits only below it, keeping the hub and region
+ * labels and cutting no class; a pick in
  * the rail keeps the chips, the search and the zoom; and the inspector's
  * field rows put their ranges on one column line.
  */
@@ -383,9 +384,10 @@ describe("at 1440 px", () => {
     );
     expect(errors).toEqual([]);
     // At 1440 the docsite's graph fits whole only below the overview zoom,
-    // so Fit stops at its floor, from the graph's top-left corner, the rest
-    // a pan away: every class in view drawn, the hubs and the regions
-    // labelled, none cut on the left, top or right.
+    // so Fit stops at its floor, on a window from the graph's top-left
+    // corner whose edges fall between classes, the rest a pan away: every
+    // class in view drawn, the hubs and the regions labelled, none cut on
+    // the left, top or right.
     expect(Number.parseInt(view.zoom ?? "", 10)).toBeGreaterThanOrEqual(75);
     expect(measure.inView).toBeGreaterThan(0);
     expect(measure.inView).toBeLessThanOrEqual(measure.drawn);

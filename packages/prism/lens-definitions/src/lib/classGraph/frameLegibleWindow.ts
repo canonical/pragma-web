@@ -26,7 +26,8 @@ function containsRect(outer: Rect, inner: Rect): boolean {
  * Frame the window of the class graph a canvas of a given size opens on,
  * or refits to, in world units and in the canvas's own aspect: the box it
  * frames when that fits there at the legible zoom, so every 14px label
- * renders at 12px or more; else a window at the legible zoom or the least
+ * renders at 12px or more, or at the zoom the options name, such as the
+ * overview's floor a Fit stops at; else a window at that zoom or the least
  * zoom above it whose left, top and right edges cut through no class's box
  * and no region's label, and whose bottom edge crosses only boxes that
  * continue below within its width, the sign that more of the graph lies
@@ -45,16 +46,21 @@ function containsRect(outer: Rect, inner: Rect): boolean {
  * @param layout - The class graph's boxes, regions and viewBox; only the
  *   boxes drawn, when a filter hides some.
  * @param canvas - The canvas's size, in screen pixels.
- * @param options - The box of the class selected on arrival, if any, and
- *   the box to frame, the whole viewBox when omitted.
+ * @param options - The box of the class selected on arrival, if any, the
+ *   box to frame, the whole viewBox when omitted, and the least zoom, the
+ *   legible zoom when omitted.
  * @returns The window.
  */
 export default function frameLegibleWindow(
   layout: Pick<ClassGraphLayout, "nodes" | "regions" | "viewBox">,
   canvas: { readonly w: number; readonly h: number },
-  { arrival, within: frame = layout.viewBox }: LegibleWindowOptions = {},
+  {
+    arrival,
+    within: frame = layout.viewBox,
+    zoom = MIN_FIT,
+  }: LegibleWindowOptions = {},
 ): Rect {
-  if (Math.min(canvas.w / frame.w, canvas.h / frame.h) >= MIN_FIT) {
+  if (Math.min(canvas.w / frame.w, canvas.h / frame.h) >= zoom) {
     return frame;
   }
   const obstacles: Rect[] = [
@@ -68,8 +74,8 @@ export default function frameLegibleWindow(
   ];
   const aspect = canvas.h / canvas.w;
   const least = {
-    w: canvas.w / (MIN_FIT * LEGIBLE_MARGIN),
-    h: canvas.h / (MIN_FIT * LEGIBLE_MARGIN),
+    w: canvas.w / (zoom * LEGIBLE_MARGIN),
+    h: canvas.h / (zoom * LEGIBLE_MARGIN),
   };
   const isFramed = (window: Rect): boolean =>
     obstacles.some((box) => containsRect(window, box)) &&
