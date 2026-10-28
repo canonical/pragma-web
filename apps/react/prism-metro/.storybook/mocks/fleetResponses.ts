@@ -876,6 +876,7 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                 curie: "metro:coastal-line",
               },
               uri: "https://metro.example/onto#coastal-line",
+              colour: "#0072ce",
               servedBy: [
                 {
                   __typename: "Interchange",
@@ -936,6 +937,7 @@ export const FLEET_RESPONSES: readonly FleetResponse[] = [
                 curie: "metro:north-line",
               },
               uri: "https://metro.example/onto#north-line",
+              colour: "#c8102e",
               servedBy: [
                 {
                   __typename: "Interchange",
