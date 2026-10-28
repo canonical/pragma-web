@@ -101,8 +101,8 @@ Each metro type is projected in the five forms, each a component in
 `src/domains/metro/lib/<Name>/` with a Relay fragment on its type that
 fills one of `@canonical/prism-projections`' generic components, and an
 `anatomy.yaml` its fragment is checked against. The generic components
-carry every style but one: a line's chip leads with a swatch of the
-line's colour in the chip's mark, styled by the projection, which sets
+carry every style but one: a line's chip and row lead with a swatch of
+the line's colour in their mark, styled by the projection, which sets
 the colour on its root per line as a custom property, so no stylesheet
 names a colour. The mark is hidden from assistive technology: the name
 is the line's whatever its colour.
@@ -111,7 +111,7 @@ is the line's whatever its colour.
 | ----------- | -------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------ | ----------------------------------- |
 | Station     | its zone above its name; Platforms, Zone and Lines as key values; its platform count  | "4 platforms" | "Northgate / Station in Central Zone · 4 platforms" | its name; "Station in Central Zone" |
 | Interchange | a station's card, with its transfer time, and the count of its lines as a second vital | "interchange" | "… / Interchange in Central Zone · 3 lines"      | as a station's                      |
-| Line        | Stops, and Ends for a line run end to end; "loop" as the vital of a loop               | "5 stops"     | "North Line / Line · 5 stops"                    | its colour's swatch and its name; its class |
+| Line        | Stops, and Ends for a line run end to end; "loop" as the vital of a loop               | its colour's swatch; "5 stops" | "North Line / Line · 5 stops"                    | its colour's swatch and its name; its class |
 | Fare zone   | the count of its stations as its vital                                                 | "2 stations"  | "Central Zone / Fare zone · 2 stations"          | its name; its class                 |
 
 A value the graph does not assert leaves its slot, its pair or its vital

@@ -3,7 +3,25 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
+  /* The row sets the line's colour on its root per line, as
+   * --line-row-swatch-color (LineRowChannelStyle); the swatch reads it. */
   .ds.line-row {
-    /* Component styles */
+    --line-row-swatch-width: var(--space-200);
+    --line-row-swatch-height: var(--space-100);
+    --line-row-swatch-radius: 9999px;
+    --line-row-swatch-vertical-align: middle;
+  }
+
+  /* A short bar of the line's colour in the row's text, as the network
+   * map draws the line; forced colours keep it, since it is the line's
+   * colour or nothing. */
+  .ds.line-row .swatch {
+    display: inline-block;
+    vertical-align: var(--line-row-swatch-vertical-align);
+    width: var(--line-row-swatch-width);
+    height: var(--line-row-swatch-height);
+    border-radius: var(--line-row-swatch-radius);
+    background: var(--line-row-swatch-color);
+    forced-color-adjust: none;
   }
 }

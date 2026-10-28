@@ -98,6 +98,61 @@ describe("LineRow", () => {
     expect(container.querySelector(".location")).toBeNull();
   });
 
+  it("leads with a swatch of the line's colour, set on its root", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <LineRow node={node} />
+      </ul>
+    ));
+    const row = container.querySelector<HTMLElement>(".ds.line-row");
+    expect(row?.querySelector(".identity > .mark > .swatch")).not.toBeNull();
+    expect(row?.style.getPropertyValue("--line-row-swatch-color")).toBe(
+      "#c8102e",
+    );
+  });
+
+  it("paints each line in its own colour", () => {
+    const { container } = renderWithNode(
+      (node) => (
+        <ul>
+          <LineRow node={node} />
+        </ul>
+      ),
+      { colour: "#f2b705" },
+    );
+    expect(
+      container
+        .querySelector<HTMLElement>(".ds.line-row")
+        ?.style.getPropertyValue("--line-row-swatch-color"),
+    ).toBe("#f2b705");
+  });
+
+  it("keeps its name the line's, whatever the colour", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <LineRow node={node} />
+      </ul>
+    ));
+    expect(container.querySelector(".mark")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(screen.getByRole("link").textContent).toBe("North Line");
+  });
+
+  it("keeps a consumer's style beside the line's colour", () => {
+    const { container } = renderWithNode((node) => (
+      <ul>
+        <LineRow node={node} style={{ marginInline: "0" }} />
+      </ul>
+    ));
+    const row = container.querySelector<HTMLElement>(".ds.line-row");
+    expect(row?.style.marginInline).toBe("0px");
+    expect(row?.style.getPropertyValue("--line-row-swatch-color")).toBe(
+      "#c8102e",
+    );
+  });
+
   it("links its title to the line's page", () => {
     renderWithNode((node) => (
       <ul>
