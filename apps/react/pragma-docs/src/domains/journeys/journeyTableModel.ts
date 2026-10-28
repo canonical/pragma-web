@@ -32,6 +32,7 @@ import { readAxisTerm, readLocalName } from "./collectJourneys.js";
 import type {
   JourneyCoordinate,
   JourneyPairing,
+  JourneySurface,
   SurfaceRouteName,
 } from "./types.js";
 
@@ -93,7 +94,11 @@ export interface JourneyRow {
   /** Pairings whose role is primary, and the rest. Counted, not guessed. */
   readonly primaryCount: number;
   readonly secondaryCount: number;
-  /** The first surface this job lands on, by URI order. */
+  /**
+   * The surface this job is meant to land on: its primary pairing's
+   * surface (the first by URI among several primaries), else the first
+   * secondary surface by URI for a job the model gives no primary.
+   */
   readonly surfaceLabel: string | undefined;
   /** The name of that surface's site route, when the site renders it. */
   readonly surfaceRoute: SurfaceRouteName | undefined;
@@ -125,6 +130,33 @@ const isPrimary = (pairing: JourneyPairing): boolean =>
   readLocalName(pairing.role).toLowerCase().includes("primary");
 
 /**
+ * Read the first surface by URI among some pairings. Ordering by URI makes
+ * the choice deterministic rather than dependent on the graph's iteration
+ * order; pairings without a surface are skipped.
+ */
+const readFirstSurface = (
+  pairings: readonly JourneyPairing[],
+): JourneySurface | undefined =>
+  pairings
+    .map((pairing) => pairing.surface)
+    .filter((surface): surface is JourneySurface => surface != null)
+    .sort((left, right) => left.uri.localeCompare(right.uri))
+    .at(0);
+
+/**
+ * Find the surface a job's row reports: the one a consumer with this job
+ * is meant to land on. The ontology names that surface through the
+ * PRIMARY pairing, so the primaries are consulted first and a secondary
+ * surface is reported only for a job with no primary at all. Within each
+ * role the first by URI wins; jobs with several surfaces say so via the
+ * counts.
+ */
+const findReportedSurface = (
+  pairings: readonly JourneyPairing[],
+): JourneySurface | undefined =>
+  readFirstSurface(pairings.filter(isPrimary)) ?? readFirstSurface(pairings);
+
+/**
  * Flatten the coordinate tree into rows — one row per job.
  *
  * PURE: coordinates in, rows out, nothing read from the environment. The
@@ -150,16 +182,7 @@ export const buildJourneyRows = (
   for (const coordinate of coordinates) {
     for (const job of coordinate.jobs) {
       const extra = detail[job.uri];
-      // The surface the row REPORTS is the first by URI order, so the
-      // choice is deterministic rather than dependent on the graph's
-      // iteration order. Jobs with several surfaces say so via the count.
-      const surfaces = [...job.pairings]
-        .map((pairing) => pairing.surface)
-        .filter(
-          (surface): surface is NonNullable<typeof surface> => surface != null,
-        )
-        .sort((left, right) => left.uri.localeCompare(right.uri));
-      const first = surfaces.at(0);
+      const reported = findReportedSurface(job.pairings);
       const primaryCount = job.pairings.filter(isPrimary).length;
       rows.push({
         uri: job.uri,
@@ -174,10 +197,10 @@ export const buildJourneyRows = (
         primaryCount,
         secondaryCount: job.pairings.length - primaryCount,
         surfaceLabel:
-          first === undefined
+          reported === undefined
             ? undefined
-            : (first.label ?? readLocalName(first.uri)),
-        surfaceRoute: first?.route ?? undefined,
+            : (reported.label ?? readLocalName(reported.uri)),
+        surfaceRoute: reported?.route ?? undefined,
         served: job.pairings.length > 0,
       });
     }

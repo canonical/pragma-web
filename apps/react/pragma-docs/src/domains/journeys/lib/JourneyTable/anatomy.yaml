@@ -18,7 +18,9 @@
 # under a start rule, the acceptance criteria and, for a job nothing
 # serves, a plain statement. The selected job's row takes the layered
 # background. A wildcard axis reads "any" in muted text; a count aligns to
-# the end in tabular figures, its primary and secondary split beside it; a
+# the end in tabular figures, its primary and secondary split beside it;
+# the surface cell names where the job is meant to land, its primary
+# pairing's surface (a secondary's only for a job with no primary), and a
 # job with no surface leaves a muted dash; the state is a pill, branded
 # when served, muted when not.
 #
