@@ -3,8 +3,14 @@
 # Reference: the projection matrix's chip (a 24px line, 2px block insets, 8px
 # before the value and 4px after the last slot, 4px between slots, a full
 # radius and a 1px border), with the segmented chip's icon and chevron. Slot
-# order, left to right: lead (the key, then the catalog's separator), value,
-# badge, icon, chevron.
+# order, left to right: mark, lead (the key, then the catalog's separator),
+# value, badge, icon, chevron.
+#
+# The mark is a small sign that leads the pill, such as a swatch of the
+# entity's colour, drawn and styled by the projection that fills it. The
+# chip hides it from assistive technology, so the chip's name is its value
+# alone, sizes it to its content (a flex box, so no line box makes it 24px
+# tall) and spaces it from the next slot with its gap.
 #
 # Why not a published component: the published Chip renders a span or a
 # button, never a link, has no badge, icon or chevron slot, and carries outer
@@ -71,6 +77,11 @@ node:
     typography.lineHeight: space.300
     typography.whiteSpace: nowrap
   edges:
+    - node:
+        role: mark
+        styles:
+          layout.type: flex
+      relation: { cardinality: "0..1", slotName: mark }
     - node:
         role: lead
         styles:

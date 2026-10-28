@@ -41,12 +41,16 @@ lays the five representations of each type out as one matrix, under
 `Documentation/Projection matrix`.
 
 - **`EntityChip`**: the inline mention, a pill in running text: an
-  optional lead filed before the catalog's separator, the value, then an
-  optional badge, icon and disclosure chevron.
-- **`EntityRow`**: the list entry, one row of an index: the namespace
-  prefix and the title, then one muted word at the end. Where the two do
-  not share a line, as on a phone, the word moves to a line of its own
-  under the title (56px) and a long title wraps, so it is never cut.
+  optional mark, an optional lead filed before the catalog's separator,
+  the value, then an optional badge, icon and disclosure chevron. The
+  mark is a sign its projection draws, such as a swatch of the entity's
+  colour; the chip hides it from assistive technology, so its name never
+  depends on it.
+- **`EntityRow`**: the list entry, one row of an index: an optional mark,
+  hidden as the chip's is, the namespace prefix and the title, then one
+  muted word at the end. Where the two do not share a line, as on a
+  phone, the word moves to a line of its own under the title (56px) and a
+  long title wraps, so it is never cut.
 - **`EntityCard`**: the card, built on the published `Card`: location, the
   title and the entity it belongs to (after `∈`, or after `⊂` with
   `parentRelation="subclass"`), kind, summary, key values and the

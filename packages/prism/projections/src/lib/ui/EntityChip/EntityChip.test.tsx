@@ -66,6 +66,28 @@ describe("EntityChip", () => {
     });
   });
 
+  describe("mark", () => {
+    it("leads the chip with its mark, hidden and outside the value's link", () => {
+      render(
+        <EntityChip
+          data-testid="chip"
+          href="#north"
+          mark={<span className="swatch" />}
+          value="North Line"
+        />,
+      );
+      const chip = screen.getByTestId("chip");
+      expect(listSlots(chip)).toEqual(["mark", "value"]);
+      expect(chip.querySelector(".mark > .swatch")).not.toBeNull();
+      expect(chip.querySelector(".mark")?.getAttribute("aria-hidden")).toBe(
+        "true",
+      );
+      expect(screen.getByRole("link", { name: "North Line" }).textContent).toBe(
+        "North Line",
+      );
+    });
+  });
+
   describe("badge, icon and chevron", () => {
     it("renders every slot in the anatomy's order", () => {
       render(
@@ -75,14 +97,15 @@ describe("EntityChip", () => {
           data-testid="chip"
           icon={<Icon className="glyph" icon="warning" />}
           lead="Modifier"
+          mark={<span className="swatch" />}
           value="Danger"
         />,
       );
       const slots = listSlots(screen.getByTestId("chip"));
-      expect(slots.slice(0, 2)).toEqual(["lead", "value"]);
-      expect(slots.at(2)).toContain("count");
-      expect(slots.at(3)).toContain("glyph");
-      expect(slots).toHaveLength(5);
+      expect(slots.slice(0, 3)).toEqual(["mark", "lead", "value"]);
+      expect(slots.at(3)).toContain("count");
+      expect(slots.at(4)).toContain("glyph");
+      expect(slots).toHaveLength(6);
     });
 
     it("ends in the chevron-down icon when asked", () => {

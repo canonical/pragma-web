@@ -5,6 +5,13 @@ import type { ComponentProps, ReactNode } from "react";
 
 type OwnProps = {
   /**
+   * A small sign that leads the identity, such as a swatch of the entity's
+   * colour: an element its projection draws and styles. It names nothing:
+   * the row hides it from assistive technology, so the row's name stays
+   * its title.
+   */
+  readonly mark?: ReactNode;
+  /**
    * The namespace the entity sits in, leading the title: the compact
    * address's prefix with its colon. An identifier in it is a
    * `<code className="identifier">`, which keeps the row's line.
