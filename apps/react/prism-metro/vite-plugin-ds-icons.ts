@@ -4,18 +4,17 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Plugin, ResolvedConfig } from "vite";
 
+/** One directory of SVGs, by exact name: no traversal, no directory listing. */
+const ICON_NAME = /^[a-z0-9-]+\.svg$/;
+
 /**
- * The design system's icons at `/icons`, in development and in the build.
+ * Resolve the icons directory of the installed `@canonical/ds-assets`.
  *
- * `Icon`, `Spinner`, and every component that renders one resolve
- * `/icons/<name>.svg#<name>` at runtime, from the site root. An unserved
- * icon renders as nothing at all — no error, no broken-image glyph — so the
- * files must be reachable in development and in the assembled app alike.
- * They live in `@canonical/ds-assets`; this plugin serves them from there
- * rather than copying them into the repository, so they can never drift
- * from the installed package version.
+ * @returns The absolute path of the package's `icons` directory.
+ * @note Impure: it reads the module resolution of the running process, so the
+ * path follows whichever version of the package is installed.
  */
-const iconsDir = () =>
+const resolveIconsDir = (): string =>
   join(
     dirname(
       fileURLToPath(import.meta.resolve("@canonical/ds-assets/package.json")),
@@ -23,10 +22,26 @@ const iconsDir = () =>
     "icons",
   );
 
-/** One directory of SVGs, by exact name: no traversal, no directory listing. */
-const ICON_NAME = /^[a-z0-9-]+\.svg$/;
-
-export function dsIcons(): Plugin {
+/**
+ * Create the Vite plugin that serves the design system's icons at `/icons`,
+ * in development and in the build.
+ *
+ * `Icon`, `Spinner`, and every component that renders one resolve
+ * `/icons/<name>.svg#<name>` at runtime, from the site root. An unserved icon
+ * renders as nothing at all, with no error and no broken-image glyph, so the
+ * files must be reachable in development and in the assembled app alike. They
+ * live in `@canonical/ds-assets`; the plugin serves them from there rather
+ * than copying them into the repository, so they can never drift from the
+ * installed package version. In development a middleware answers
+ * `/icons/<name>.svg` from the package (a 404 for an unknown icon); after a
+ * client build the directory is copied into the build's output directory.
+ *
+ * @returns The Vite plugin.
+ * @note Impure: the plugin's hooks register a middleware on the dev server,
+ * read icon files from the filesystem, and write the copied icons into the
+ * client build output.
+ */
+export function createIconsPlugin(): Plugin {
   let config: ResolvedConfig;
 
   return {
@@ -36,12 +51,14 @@ export function dsIcons(): Plugin {
     },
     configureServer(server) {
       server.middlewares.use("/icons", (request, response, next) => {
-        const name = (request.url ?? "").split("?")[0].replace(/^\//, "");
+        // The request URL comes from the client: an absent URL reads as empty.
+        const path = (request.url ?? "").split("?").at(0) ?? "";
+        const name = path.replace(/^\//, "");
         if (!ICON_NAME.test(name)) {
           next();
           return;
         }
-        const file = join(iconsDir(), name);
+        const file = join(resolveIconsDir(), name);
         if (!existsSync(file)) {
           // A real 404, not the SPA fallback: a missing icon should be
           // visible in the network tab, not silently resolve to HTML.
@@ -63,7 +80,7 @@ export function dsIcons(): Plugin {
       }
       const target = join(config.build.outDir, "icons");
       await mkdir(target, { recursive: true });
-      await cp(iconsDir(), target, { recursive: true });
+      await cp(resolveIconsDir(), target, { recursive: true });
     },
   };
 }
