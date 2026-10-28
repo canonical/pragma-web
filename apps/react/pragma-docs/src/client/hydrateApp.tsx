@@ -65,7 +65,11 @@ export const hydrateApp = (
 
   return hydrateRoot(
     container,
-    <Shell environment={relayEnvironment} router={router} />,
+    <Shell
+      environment={relayEnvironment}
+      router={router}
+      theme={initialData?.theme}
+    />,
     options,
   );
 };

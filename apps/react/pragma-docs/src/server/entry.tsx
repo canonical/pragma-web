@@ -73,7 +73,10 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
   // Paint the styles context and density, and the cookie-resolved theme, on
   // <html> for a flash-free first render — the same element
   // `usePreferredTheme` toggles on the client, and one React does not
-  // hydrate (only `#root` is), so there is no mismatch to reconcile.
+  // hydrate (only `#root` is), so there is no mismatch to reconcile. The
+  // shell hands the same theme to the theme control, which shows it
+  // selected, and the client entry hands it the same value from the
+  // initial data.
   return (
     <html
       className={[DOCUMENT_CONTEXT_CLASS_NAME, initialData.theme]
@@ -88,7 +91,11 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
       </head>
       <body>
         <div id="root">
-          <Shell environment={relayEnvironment} router={router} />
+          <Shell
+            environment={relayEnvironment}
+            router={router}
+            theme={initialData.theme}
+          />
         </div>
       </body>
     </html>
