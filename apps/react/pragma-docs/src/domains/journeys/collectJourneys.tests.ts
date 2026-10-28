@@ -65,7 +65,7 @@ const PAIRING_A: RawPairing = {
   forJob: { uri: `${DOCS}job.l3` },
   arrivals: { edges: [{ node: { uri: "surface:ColdEntry" } }] },
   pairsSurface: {
-    __typename: "Lens",
+    __typename: "LensSurface",
     uri: `${DOCS}view.components`,
     composes: {
       edges: [{ node: { uri: `${DOCS}layout.catalog`, name: "Catalog" } }],
@@ -77,7 +77,7 @@ const PAIRING_B: RawPairing = {
   uri: `${DOCS}pairing.b2-chips`,
   pairingRole: { uri: "surface:Secondary" },
   forJob: { uri: `${DOCS}job.b2` },
-  // No arrival — the honest 34-of-133 case.
+  // No arrival — the honest case of every pairing with a port.
   arrivals: { edges: [] },
   pairsSurface: {
     __typename: "Mechanism",
@@ -237,6 +237,8 @@ describe("SURFACE_ROUTES", () => {
   it("finds the route a surface the site renders lands on", () => {
     expect(findRouteForSurface(`${DOCS}view.components`)).toBe("components");
     expect(findRouteForSurface("surface:view.home")).toBe("home");
+    expect(findRouteForSurface(`${DOCS}view.playground`)).toBe("playground");
+    expect(findRouteForSurface(`${DOCS}view.journeys`)).toBe("journeys");
   });
 
   it("returns undefined for a surface the site does not render", () => {

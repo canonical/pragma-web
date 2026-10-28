@@ -23,8 +23,8 @@ export const formatStoreVisiblePath = (
 
 /**
  * Order two collected files by their store-visible paths. Paths are unique
- * (each root's label is its package name and the ref and semantics package
- * lists are disjoint), so there is no equal arm.
+ * (each root's label is its package name, and `REF_PACKAGES` names each
+ * package once), so there is no equal arm.
  *
  * @param a - One collected file.
  * @param b - The other.

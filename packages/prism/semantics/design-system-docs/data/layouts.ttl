@@ -1,0 +1,167 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix ds: <https://ds.canonical.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The slots the site's three layouts declare, and the design system's UI
+# blocks that render in them. The layouts and the blocks are the design
+# system's own entities, named by their addresses and never typed here: this
+# file only attaches demand to them. An optional slot names the job that
+# summons it.
+
+# ---- regions this site adds to the base vocabulary
+
+dsd:region.strip a surface:Region ;
+  rdfs:label "Strip" ;
+  rdfs:comment "The bar across the top of the canvas that says where the reader is and what mode the page is in." .
+
+dsd:region.inspector a surface:Region ;
+  rdfs:label "Inspector" ;
+  rdfs:comment "The region beside a workspace's canvas that shows the selection in depth." .
+
+# ---- the documentation layout
+
+ds:documentation.layout.documentation_layout surface:declaresSlot
+    dsd:slot.documentation_layout.rails ,
+    dsd:slot.documentation_layout.strip ,
+    dsd:slot.documentation_layout.canvas ,
+    dsd:slot.documentation_layout.aside .
+
+dsd:slot.documentation_layout.rails a surface:Slot ;
+  rdfs:label "Documentation rails" ;
+  rdfs:comment "The site's navigation, at the start of every documentation page." ;
+  surface:ofRegion surface:rails ;
+  surface:required true .
+
+dsd:slot.documentation_layout.strip a surface:Slot ;
+  rdfs:label "Documentation strip" ;
+  rdfs:comment "The breadcrumbs over a documentation page, which keep the reader's place." ;
+  surface:ofRegion dsd:region.strip ;
+  surface:required false ;
+  surface:summonedBy dsd:job.l4 .
+
+dsd:slot.documentation_layout.canvas a surface:Slot ;
+  rdfs:label "Documentation canvas" ;
+  rdfs:comment "The page's subject: the lobby's doors, a component, a standard or a guide." ;
+  surface:ofRegion surface:canvas ;
+  surface:required true .
+
+dsd:slot.documentation_layout.aside a surface:Slot ;
+  rdfs:label "Documentation aside" ;
+  rdfs:comment "The table of contents beside a long page." ;
+  surface:ofRegion surface:aside ;
+  surface:required false ;
+  surface:summonedBy dsd:job.l2 .
+
+# ---- the list page layout
+
+ds:apps.layout.list_page_layout surface:declaresSlot
+    dsd:slot.list_page_layout.rails ,
+    dsd:slot.list_page_layout.controls ,
+    dsd:slot.list_page_layout.canvas .
+
+dsd:slot.list_page_layout.rails a surface:Slot ;
+  rdfs:label "List rails" ;
+  rdfs:comment "The site's navigation, at the start of every index." ;
+  surface:ofRegion surface:rails ;
+  surface:required true .
+
+dsd:slot.list_page_layout.controls a surface:Slot ;
+  rdfs:label "List controls" ;
+  rdfs:comment "The count of the list and the switch between cards and rows." ;
+  surface:ofRegion surface:controls ;
+  surface:required false ;
+  surface:summonedBy dsd:job.l3 .
+
+dsd:slot.list_page_layout.canvas a surface:Slot ;
+  rdfs:label "List canvas" ;
+  rdfs:comment "The list itself: one card or one row per entity." ;
+  surface:ofRegion surface:canvas ;
+  surface:required true .
+
+# ---- the application layout
+
+ds:apps.layout.application_layout surface:declaresSlot
+    dsd:slot.application_layout.rails ,
+    dsd:slot.application_layout.controls ,
+    dsd:slot.application_layout.canvas ,
+    dsd:slot.application_layout.inspector .
+
+dsd:slot.application_layout.rails a surface:Slot ;
+  rdfs:label "Workspace rails" ;
+  rdfs:comment "The site's navigation, at the start of every workspace." ;
+  surface:ofRegion surface:rails ;
+  surface:required true .
+
+dsd:slot.application_layout.controls a surface:Slot ;
+  rdfs:label "Workspace controls" ;
+  rdfs:comment "The search and the filters over a workspace's canvas." ;
+  surface:ofRegion surface:controls ;
+  surface:required false ;
+  surface:summonedBy dsd:job.m1 .
+
+dsd:slot.application_layout.canvas a surface:Slot ;
+  rdfs:label "Workspace canvas" ;
+  rdfs:comment "The workspace's subject: a graph, a table or a live composition." ;
+  surface:ofRegion surface:canvas ;
+  surface:required true .
+
+dsd:slot.application_layout.inspector a surface:Slot ;
+  rdfs:label "Workspace inspector" ;
+  rdfs:comment "The selection in depth, beside the workspace's canvas." ;
+  surface:ofRegion dsd:region.inspector ;
+  surface:required false ;
+  surface:summonedBy dsd:job.m1 .
+
+# ---- the UI blocks that fill the slots, and the jobs they serve
+
+ds:global.pattern.navigation
+  surface:rendersIn dsd:slot.documentation_layout.rails ,
+    dsd:slot.list_page_layout.rails ,
+    dsd:slot.application_layout.rails ;
+  surface:serves dsd:job.l1 .
+
+ds:global.component.breadcrumbs
+  surface:rendersIn dsd:slot.documentation_layout.strip ;
+  surface:serves dsd:job.l4 .
+
+ds:global.component.card
+  surface:rendersIn dsd:slot.list_page_layout.canvas ;
+  surface:serves dsd:job.l3 .
+
+ds:global.component.segmented_control_field
+  surface:rendersIn dsd:slot.list_page_layout.controls ;
+  surface:serves dsd:job.l3 .
+
+ds:global.component.search_field
+  surface:rendersIn dsd:slot.application_layout.controls ;
+  surface:serves dsd:job.m1 , dsd:job.e3 .
+
+ds:global.component.tabs
+  surface:rendersIn dsd:slot.documentation_layout.canvas ;
+  surface:serves dsd:job.d1 , dsd:job.e1 .
+
+ds:global.component.code_snippet
+  surface:rendersIn dsd:slot.documentation_layout.canvas ;
+  surface:serves dsd:job.d1 , dsd:job.e1 .
+
+ds:global.pattern.table_of_contents
+  surface:rendersIn dsd:slot.documentation_layout.aside ;
+  surface:serves dsd:job.l2 , dsd:job.m3 .
+
+ds:global.pattern.description_list
+  surface:rendersIn dsd:slot.application_layout.inspector ;
+  surface:serves dsd:job.m1 .
+
+ds:global.component.table
+  surface:rendersIn dsd:slot.application_layout.canvas ;
+  surface:serves dsd:job.m2 .
+
+ds:global.component.chip
+  surface:serves dsd:job.l4 .
+
+ds:global.pattern.modal
+  surface:serves dsd:job.e3 .
+
+ds:global.component.keyboard_key
+  surface:serves dsd:job.e3 .

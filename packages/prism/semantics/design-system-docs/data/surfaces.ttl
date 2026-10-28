@@ -1,0 +1,148 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix ds: <https://ds.canonical.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The surfaces of the design system's documentation site, each asserted as
+# its idiom, never as a plain surface. Each states its three dimensions and,
+# when it is curated, the design system layout it composes. The chips, the
+# palette and the GraphQL port compose no layout of their own.
+
+# ---- lenses
+
+dsd:view.home a surface:Lens ;
+  rdfs:label "Lobby" ;
+  rdfs:comment "The site's front page: one door per lens, each with what it shows." ;
+  surface:slice "The design system as a whole, as one door per lens." ;
+  surface:kindOfLooking "orientation" ;
+  surface:dominantJob dsd:job.l1 ;
+  surface:over dsd:substrate.design_system_graph ;
+  surface:composes ds:documentation.layout.documentation_layout ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.components a surface:Lens ;
+  rdfs:label "Components" ;
+  rdfs:comment "The catalogue of the design system's UI blocks, as cards or rows." ;
+  surface:slice "Every UI block of the design system: components, patterns, layouts and subcomponents." ;
+  surface:kindOfLooking "entity browsing" ;
+  surface:dominantJob dsd:job.l3 ;
+  surface:over dsd:substrate.design_system_graph ;
+  surface:composes ds:apps.layout.list_page_layout ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.definitions a surface:Lens ;
+  rdfs:label "Definitions" ;
+  rdfs:comment "The ontology explorer: a graph of the classes and their relations, a term rail and an inspector." ;
+  surface:slice "The classes and properties of the ontologies the graph compiles." ;
+  surface:kindOfLooking "structure exploration" ;
+  surface:dominantJob dsd:job.m1 ;
+  surface:over dsd:substrate.design_system_graph ;
+  surface:composes ds:apps.layout.application_layout ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.standards a surface:Lens ;
+  rdfs:label "Standards" ;
+  rdfs:comment "The index of the code standards, grouped by language and topic." ;
+  surface:slice "Every code standard, with its rule." ;
+  surface:kindOfLooking "rule lookup" ;
+  surface:dominantJob dsd:job.l2 ;
+  surface:over dsd:substrate.design_system_graph ;
+  surface:composes ds:apps.layout.list_page_layout ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.guides a surface:Lens ;
+  rdfs:label "Guides" ;
+  rdfs:comment "The index of the guides: prose that walks a reader through the system." ;
+  surface:slice "The guides, the prose that links the entities it explains." ;
+  surface:kindOfLooking "narrative reading" ;
+  surface:dominantJob dsd:job.l1 ;
+  surface:over dsd:substrate.design_system_graph ;
+  surface:composes ds:documentation.layout.documentation_layout ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.journeys a surface:Lens ;
+  rdfs:label "Journeys" ;
+  rdfs:comment "The demand model of this site: each job's path through the surfaces that serve it, as a table or a graph." ;
+  surface:slice "The jobs, their pairings and the surfaces they reach." ;
+  surface:kindOfLooking "coverage audit" ;
+  surface:dominantJob dsd:job.m2 ;
+  surface:over dsd:substrate.design_system_graph ;
+  surface:composes ds:apps.layout.application_layout ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+# ---- details
+
+dsd:view.component a surface:Detail ;
+  rdfs:label "Component page" ;
+  rdfs:comment "One UI block in depth: its rendered example, its anatomy tree and its properties." ;
+  surface:composes ds:documentation.layout.documentation_layout ;
+  surface:anchoring surface:subject_bound ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.standard a surface:Detail ;
+  rdfs:label "Standard page" ;
+  rdfs:comment "One code standard in depth: its rule, its dos and don'ts and its examples." ;
+  surface:composes ds:documentation.layout.documentation_layout ;
+  surface:anchoring surface:subject_bound ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.guide a surface:Detail ;
+  rdfs:label "Guide page" ;
+  rdfs:comment "One guide, read from start to end, with its table of contents beside it." ;
+  surface:composes ds:documentation.layout.documentation_layout ;
+  surface:anchoring surface:subject_bound ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+# ---- editor
+
+dsd:view.playground a surface:Editor ;
+  rdfs:label "Playground" ;
+  rdfs:comment "Where components are composed and their props changed live." ;
+  surface:composes ds:apps.layout.application_layout ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face , surface:write_face ;
+  surface:rendering surface:curated .
+
+# ---- woven through the other surfaces
+
+dsd:view.chips a surface:Mechanism ;
+  rdfs:label "Entity chips" ;
+  rdfs:comment "The inline chips that name an entity in prose and open its page." ;
+  surface:within dsd:view.component , dsd:view.standard , dsd:view.guide ;
+  surface:anchoring surface:subject_bound ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+dsd:view.palette a surface:Peek ;
+  rdfs:label "Command palette" ;
+  rdfs:comment "The search over every node of the graph, opened from any page with a keyboard shortcut." ;
+  surface:within dsd:view.home ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:curated .
+
+# ---- port
+
+dsd:port.graphql a surface:Port ;
+  rdfs:label "GraphQL port" ;
+  rdfs:comment "The GraphQL endpoint of the site's graph, where agents and scripts read what the pages show." ;
+  surface:protocol "GraphQL" ;
+  surface:exposes dsd:capability.reader ;
+  surface:anchoring surface:free ;
+  surface:direction surface:read_face ;
+  surface:rendering surface:invocable .

@@ -11,9 +11,9 @@
  * cases rather than a tidy tree: a shared coordinate, a surface two jobs
  * both reach, a pairing with no arrival, a job with no pairings, and a
  * surface composing no layout. Those are the five shapes the demand model
- * actually contains — 34 of 133 pairings carry no arrival, and only 16
- * reach a layout — so a layout that only worked on the happy path would
- * fail here.
+ * actually contains — a pairing with a port carries no arrival, and the
+ * chips, the palette and the port compose no layout — so a layout that
+ * only worked on the happy path would fail here.
  */
 
 import { describe, expect, it } from "vitest";
@@ -59,13 +59,13 @@ const FIXTURE: readonly JourneyCoordinate[] = [
             surface: {
               uri: `${DOCS}view.components`,
               label: "Components",
-              surfaceType: "Lens",
+              surfaceType: "LensSurface",
               route: "components",
               layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
             },
           },
           {
-            // No arrival — the honest 34-of-133 case.
+            // No arrival — the honest case of a pairing with a port.
             uri: `${DOCS}pairing.l3-chips`,
             label: "L3 → chips",
             role: `${SURFACE}Secondary`,
@@ -94,7 +94,7 @@ const FIXTURE: readonly JourneyCoordinate[] = [
             surface: {
               uri: `${DOCS}view.components`,
               label: "Components",
-              surfaceType: "Lens",
+              surfaceType: "LensSurface",
               route: "components",
               layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
             },
@@ -290,11 +290,11 @@ describe("the role and arrival class mappings", () => {
     expect(classifyRole(undefined)).toBeUndefined();
   });
 
-  it("maps the PREFIXED form the live graph actually returns", () => {
-    // Verified against the running backend: `pairingRole.uri` comes back
-    // as `surface:Primary`, not `sem://surface#Primary`. Both forms must
-    // map, or every edge would silently lose its weight in production
-    // while the full-IRI unit fixtures stayed green.
+  it("maps the PREFIXED form a graph may return", () => {
+    // A store may resolve `pairingRole.uri` to its prefixed form
+    // (`surface:Primary`) rather than the full IRI; an earlier graph did.
+    // Both forms must map, or every edge would silently lose its weight in
+    // production while the full-IRI unit fixtures stayed green.
     expect(classifyRole("surface:Primary")).toBe(ROLE_PRIMARY_CLASS);
     expect(classifyRole("surface:Secondary")).toBe(ROLE_SECONDARY_CLASS);
     expect(classifyArrival("surface:ColdEntry")).toBe("arrival-coldentry");
@@ -307,9 +307,22 @@ describe("the role and arrival class mappings", () => {
       "arrival-subjectkept",
     );
     expect(classifyArrival(`${SURFACE}NoMove`)).toBe("arrival-nomove");
-    // The 34-of-133 case: no arrival is DATA, so it decorates nothing.
+    // A pairing with a port: no arrival is DATA, so it decorates nothing.
     expect(classifyArrival(null)).toBeUndefined();
     expect(classifyArrival(undefined)).toBeUndefined();
+  });
+
+  it("maps the snake_case spelling of the terms the same way", () => {
+    // The demand model's own vocabulary names its instances in snake_case
+    // (`surface:primary`, `surface:cold_entry`); the folded spelling is
+    // the same as the PascalCase one's.
+    expect(classifyRole("surface:primary")).toBe(ROLE_PRIMARY_CLASS);
+    expect(classifyRole(`${SURFACE}secondary`)).toBe(ROLE_SECONDARY_CLASS);
+    expect(classifyArrival("surface:cold_entry")).toBe("arrival-coldentry");
+    expect(classifyArrival(`${SURFACE}subject_kept`)).toBe(
+      "arrival-subjectkept",
+    );
+    expect(classifyArrival("surface:no_move")).toBe("arrival-nomove");
   });
 
   it("decorates nothing for a term whose local name is empty", () => {

@@ -152,7 +152,7 @@ node:
                             typography.weight: typography.text.primary.bold.fontWeight
                           edges:
                             - node:
-                                role: kind (the surface's type)
+                                role: kind (the words for the surface's kind)
                                 styles:
                                   typography.size: typography.text.secondary.fontSize
                                   typography.weight: typography.text.primary.fontWeight

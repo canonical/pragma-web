@@ -33,6 +33,51 @@ export const LEGEND_MESSAGES: Readonly<Record<HopKind, MessageKey>> = {
   layout: "journeys.legend.layout",
 };
 
+/**
+ * The words each kind of surface reads as, by the GraphQL type the surface
+ * resolves to. A type is a schema's name, never a reader's word: a kind the
+ * map does not hold is left unsaid rather than printed as its type name.
+ */
+export const SURFACE_TYPE_MESSAGES: ReadonlyMap<string, MessageKey> = new Map<
+  string,
+  MessageKey
+>([
+  ["LensSurface", "journeys.surfaceType.lens"],
+  ["View", "journeys.surfaceType.view"],
+  ["Detail", "journeys.surfaceType.detail"],
+  ["Peek", "journeys.surfaceType.peek"],
+  ["Mechanism", "journeys.surfaceType.mechanism"],
+  ["ComposerSurface", "journeys.surfaceType.composer"],
+  ["Editor", "journeys.surfaceType.editor"],
+  ["Port", "journeys.surfaceType.port"],
+]);
+
+/**
+ * The words a pairing's role reads as, by the role term's folded local
+ * name (`foldTermName`), so either spelling of the term finds its words.
+ */
+export const ROLE_MESSAGES: ReadonlyMap<string, MessageKey> = new Map<
+  string,
+  MessageKey
+>([
+  ["primary", "journeys.role.primary"],
+  ["secondary", "journeys.role.secondary"],
+]);
+
+/**
+ * The words an arrival reads as, by the preservation term's folded local
+ * name (`foldTermName`).
+ */
+export const ARRIVAL_MESSAGES: ReadonlyMap<string, MessageKey> = new Map<
+  string,
+  MessageKey
+>([
+  ["coldentry", "journeys.arrival.coldEntry"],
+  ["subjectkept", "journeys.arrival.subjectKept"],
+  ["viewkept", "journeys.arrival.viewKept"],
+  ["nomove", "journeys.arrival.noMove"],
+]);
+
 /** The two readings of the demand model, in the switch's order. */
 export const JOURNEY_VIEWS: readonly JourneyView[] = ["table", "graph"];
 
@@ -60,4 +105,6 @@ export const SURFACE_ROUTES: ReadonlyMap<string, SurfaceRouteName> = new Map([
   ["view.definitions", "definitions"],
   ["view.standards", "standards"],
   ["view.guides", "guides"],
+  ["view.playground", "playground"],
+  ["view.journeys", "journeys"],
 ]);

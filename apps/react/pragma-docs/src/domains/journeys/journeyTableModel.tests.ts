@@ -110,11 +110,75 @@ describe("buildJourneyRows projects the model honestly", () => {
     expect(zebra?.pairings).toHaveLength(2);
     expect(zebra?.primaryCount).toBe(1);
     expect(zebra?.secondaryCount).toBe(1);
-    // The reported surface is the first by URI order — deterministic,
-    // never the graph's iteration order.
+    // The reported surface is the primary pairing's, never the graph's
+    // iteration order.
     expect(zebra?.surfaceLabel).toBe("view.components");
     expect(zebra?.surfaceRoute).toBe("components");
     expect(zebra?.served).toBe(true);
+  });
+
+  it("reports the primary pairing's surface even when a secondary sorts first", () => {
+    // `view.chips` sorts before `view.components`; the job is meant to
+    // land on its primary surface, so the row must name that one.
+    const [row] = buildJourneyRows(
+      [
+        {
+          uri: "sem://docs#coord.c",
+          jobs: [
+            {
+              uri: "sem://docs#job.browse",
+              pairings: [
+                {
+                  uri: "sem://docs#pair.chips",
+                  role: "sem://docs#role.secondary",
+                  surface: { uri: "sem://docs#view.chips" },
+                },
+                {
+                  uri: "sem://docs#pair.components",
+                  role: "sem://docs#role.primary",
+                  surface: {
+                    uri: "sem://docs#view.components",
+                    route: "components",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      {},
+    );
+    expect(row?.surfaceLabel).toBe("view.components");
+    expect(row?.surfaceRoute).toBe("components");
+  });
+
+  it("falls back to the first secondary surface by URI for a job with no primary", () => {
+    const [row] = buildJourneyRows(
+      [
+        {
+          uri: "sem://docs#coord.c",
+          jobs: [
+            {
+              uri: "sem://docs#job.drift",
+              pairings: [
+                {
+                  uri: "sem://docs#pair.guides",
+                  role: "sem://docs#role.secondary",
+                  surface: { uri: "sem://docs#view.guides" },
+                },
+                {
+                  uri: "sem://docs#pair.chips",
+                  surface: { uri: "sem://docs#view.chips" },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      {},
+    );
+    expect(row?.surfaceLabel).toBe("view.chips");
+    expect(row?.surfaceRoute).toBeUndefined();
   });
 
   it("reports an unserved job as unserved, with no invented surface", () => {

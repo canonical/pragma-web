@@ -2,27 +2,25 @@
  * The relocated pragma knowledge: every fact about pragma's specific ontologies
  * that the docsite app used to carry, in one place.
  *
- * `EXCLUDED_SOURCES` is a PINNED CONSTANT, not a `PragmaProviderOptions`
- * field.
+ * `REF_PACKAGES` is a PINNED CONSTANT, not a `PragmaProviderOptions` field.
+ * Which packages the graph compiles decides which types the schema has, and
+ * relay-compiler reads the schema the docsite commits. A second caller
+ * passing a different list would silently compile a schema incompatible with
+ * that file — the same class of divergence `mode` and `prefixing` are pinned
+ * against in `createPragmaProvider`. One place, one answer to "what is in the
+ * graph"; an option would turn that into "it depends who called".
  *
- * It is a fact about a specific upstream ontology rather than about any
- * caller, and it has a documented upstream remedy that DELETES it (a
- * modelling fix for `shim-concept.ttl`). Exposing it as an option would mean a
- * second caller could pass a different value and silently compile a schema
- * incompatible with the `schema.graphql` relay-compiler reads — the same class
- * of divergence `mode`/`prefixing` are pinned against in
- * `createPragmaProvider`. The whole point of this file is that there is ONE
- * place these live and one answer to "why is this here"; an option turns that
- * into "it depends who called".
+ * Two of the five packages are SHIMS: `surface` and `design-system-docs`,
+ * the docsite's own demand model, live in this repository as private
+ * workspace packages (`packages/prism/semantics/`) under the names the
+ * published packages will have. They are dependencies of this package, so
+ * `bun install` links them into `node_modules` like the published ones and
+ * the collector cannot tell them apart. Their upstream fix is publishing the
+ * two packages; the shims are then deleted and the published versions
+ * pinned, and nothing in this file changes.
  *
- * The precedent for the remedy: the `anatomy:uri` → `anatomyUri` rename used
- * to be a `CUSTOM_MAPPINGS` constant here, until the anatomy DSL carried the
- * `graphql:name` annotation itself (0.43.0). The constant was then deleted,
- * which is the lifecycle every entry in this file is meant to have.
- *
- * The cost is real and accepted: a consumer who needs different exclusions
- * must fork or send a PR. That is the correct friction for a value whose
- * existence is a bug report against an ontology.
+ * The cost is real and accepted: a consumer who needs a different graph must
+ * fork or send a PR.
  */
 
 import { homedir } from "node:os";
@@ -32,30 +30,31 @@ import { join } from "node:path";
 export const REF_SCOPE = "@canonical";
 
 /**
- * The source packages whose TTL constitutes the docsite graph: published on
- * npm under {@link REF_SCOPE}, declared as this package's dependencies at
- * exact versions, and read from `node_modules` by default. A pragma refs
- * cache (`PRAGMA_REFS_DIR`) can stand in for them, see `resolveRefRoots.ts`.
+ * The source packages whose TTL constitutes the docsite graph: declared as
+ * this package's dependencies and read from `node_modules` by default, under
+ * {@link REF_SCOPE}. `design-system`, `code-standards` and `anatomy-dsl` are
+ * published on npm at exact versions; `surface` and `design-system-docs`, the
+ * demand model, are the private shims in `packages/prism/semantics/`. A
+ * pragma refs cache (`PRAGMA_REFS_DIR`) can stand in for them all, provided it
+ * holds the demand model's two packages, see `resolveRefRoots.ts`. Each
+ * package is named once, which is what keeps the collected paths unique.
  */
 export const REF_PACKAGES: readonly string[] = [
   "design-system",
   "code-standards",
   "anatomy-dsl",
+  "surface",
+  "design-system-docs",
 ];
 
 /**
- * The SECOND source root: the semantic packages that carry the docsite's
- * own demand model — the surface ontology (jobs, coordinates, pairings,
- * surfaces, layouts) and the docs graph that instantiates it. These live
- * in the semantics working tree rather than the pragma CLI's refs cache,
- * so they are collected from their own root and merged into the same
- * store: one schema, two roots.
+ * The ref packages that hold the demand model, which every graph carries.
  *
- * Compiling them alongside the refs packages is purely additive — no
- * existing type loses a field and no prefix collides (`sem://surface#Job`
- * yields `Job`, `sem://design-system-docs#` its own block).
+ * A refs cache that lacks one of them is refused, naming the package, rather
+ * than compiled into a graph without the demand model: what the graph holds is
+ * never decided by which cache a variable points at.
  */
-export const SEM_PACKAGES: readonly string[] = [
+export const DEMAND_MODEL_PACKAGES: readonly string[] = [
   "surface",
   "design-system-docs",
 ];
@@ -68,26 +67,6 @@ export const TTL_DIRS: readonly string[] = ["definitions", "data"];
  * describes the entity its name names (`button.md`, `button.fr.md`).
  */
 export const PROSE_EXTENSION = ".md";
-
-/**
- * Sources excluded from the semantic root.
- *
- * `shim-concept.ttl` declares `ds:embodiesConcept` with `rdfs:domain
- * ds:Entity`. Because `ds:Entity` is the root of the design-system class
- * tree, that one domain assertion smears the property (and its inverse)
- * onto ALL FOURTEEN `ds:` types once both roots compile together — every
- * existing docsite type would silently gain two fields, and `Concept`
- * would gain a malformed single-character field. The shim is a modelling
- * bridge for a graph the docsite does not read; excluding it keeps the
- * second root additive-only. The exclusion is executed and asserted by
- * `src/lib/sources/collectTtlSources.test.ts`;
- * `src/testing/integration/sourceAdditivity.test.ts` records what the second
- * root did to the schema's shape when the captures were taken, which is
- * history rather than a guard on this constant.
- */
-export const EXCLUDED_SOURCES: readonly string[] = [
-  "design-system-docs/data/shim-concept.ttl",
-];
 
 /**
  * The ref (branch) directory under each package in the pragma CLI's refs
@@ -138,21 +117,4 @@ export const DEFAULT_REFS_ROOT: string = join(
   "pragma",
   "refs",
   "@canonical",
-);
-
-/**
- * The sibling semantics working tree — the sem root when nothing overrides it.
- *
- * Unlike {@link DEFAULT_REFS_ROOT}, which is a tool-owned cache at a location
- * the pragma CLI defines, this is a GUESS at where a developer keeps a second
- * checkout. It is right on the machines the docsite is developed on and wrong
- * everywhere else, which is why the collector announces the miss rather than
- * treating it as ordinary: override it with `PRAGMA_SEM_DIR` or the
- * `semRoot` option rather than relying on this.
- */
-export const DEFAULT_SEM_ROOT: string = join(
-  homedir(),
-  "code",
-  "cn",
-  "semantics",
 );

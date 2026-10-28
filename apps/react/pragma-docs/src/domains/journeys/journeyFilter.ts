@@ -13,12 +13,13 @@
  *   graph gives no exact answer here and this module refuses to fake one;
  *   see `personaMatchesCoordinate` for the measurement and the argument.
  *
- * THE SCALE RULING. ~260 nodes across 5 columns is too much to read at
- * once, and virtualisation is not available to us: it would break the SSR
- * determinism contract the well depends on (the well renders SVG
- * server-side only for nodes it is given). So the lens DEFAULTS TO A
- * FILTERED VIEW — one coordinate — rather than drawing everything and
- * hoping. `DEFAULT_JOURNEY_FILTER` is therefore NOT the no-op the
+ * THE SCALE RULING. A whole demand model across 5 columns is too many
+ * nodes to read at once (an earlier 52-job model ran to ~260; the docs
+ * site's runs to some 70), and virtualisation is not available to us: it
+ * would break the SSR determinism contract the well depends on (the well
+ * renders SVG server-side only for nodes it is given). So the lens
+ * DEFAULTS TO A FILTERED VIEW — one coordinate — rather than drawing
+ * everything and hoping. `DEFAULT_JOURNEY_FILTER` is therefore NOT the no-op the
  * definitions filter is, and that difference is deliberate.
  *
  * SSR DETERMINISM still holds, by a different route: the default filter is
@@ -33,23 +34,25 @@ import type { JourneyCoordinate, JourneyFilterChoice } from "./types.js";
 /**
  * The persona axis, and the honest statement of what it can and cannot do.
  *
- * MEASURED, against the live graph: `Persona` carries `uri` and `essence`
- * and NO axis fields at all — no roles, no actors, no fluencies. There is
- * therefore no edge in the graph from a persona to a job, and no exact
- * join to compute. The only available correspondence is NOMINAL: a
- * coordinate's role axis names terms like `role.architect`, and there is a
- * `persona.architect`, so the names line up for some personas.
+ * There is no edge in the graph from a persona to a job: the ontology
+ * derives a persona's jobs by comparing its region with each job's
+ * coordinates axis by axis, and the lens reads neither the region nor
+ * computes that overlap. The correspondence it uses is NOMINAL: a
+ * coordinate's role axis names terms like `role.designer`, and there is a
+ * `persona.designer`, so the names line up where a model names its
+ * personas after its roles.
  *
- * How far that gets us, measured over the 52 live jobs:
+ * How far that gets us, measured over the docs site's 17 jobs, whose
+ * three personas are named after its three roles:
  *
- *   role.architect → 15 jobs      persona.agent    → 0 jobs
- *   role.steward   → 13 jobs      persona.designer → 0 jobs
- *   role.writer    → 13 jobs      persona.engineer → 0 jobs
+ *   role.designer   → 5 jobs      persona.designer   → 5 jobs
+ *   role.engineer   → 7 jobs      persona.engineer   → 7 jobs
+ *   role.maintainer → 4 jobs      persona.maintainer → 4 jobs
  *
- * …and 26 of the 52 jobs carry an EMPTY role axis, which the ontology
- * reads as a wildcard ("any role"), not as a gap. So three of the six
- * personas match nothing by name, and half the jobs match every persona
- * by rule.
+ * …and 3 of the 17 jobs, the newcomer's, carry an EMPTY role axis, which
+ * the ontology reads as a wildcard ("any role"), not as a gap, so they
+ * match every persona by rule. A model whose personas are not named after
+ * its roles matches nothing by name.
  *
  * This is why the axis is labelled approximate in the interface (the
  * catalog's `journeys.personaNote`, under the rail's chips and over the
@@ -78,7 +81,7 @@ export const ALL_JOURNEYS_FILTER: JourneyFilter = {
  * The lens's INITIAL filter, and the one place the URL gets a say.
  *
  * With NO job selected, the default is the first coordinate in URI order:
- * a readable single journey group rather than 260 unreadable nodes.
+ * a readable single journey group rather than every node at once.
  *
  * With a job selected, the default is THAT JOB'S OWN COORDINATE. Anything
  * else would be an outright bug: a reader following a link to a job would

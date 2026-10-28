@@ -41,11 +41,12 @@ function nameLattice(label: string): string {
  * the legible zoom, as on a phone, to a legible window of the graph's
  * first region, the rest a pan away. When `fit` changes the
  * camera fits it, and the Fit control and `0` fit it again, whole, but
- * never into the overview bucket: a box too large for its floor shows from
- * its top-left corner at that floor, so the hub and region labels stay; a
- * `frame` request fits its box once per serial; neither a changed `fit`
- * nor a frame zooms a legible view out to an illegible one, showing the
- * window of a box too large for it that `legibleWindow` chooses. When `reveal`
+ * never into the overview bucket: a box too large for its floor shows the
+ * window of it that `legibleWindow` chooses at that floor, or its top-left
+ * corner at that floor, so the hub and region labels stay; a `frame`
+ * request fits its box once per serial; neither a changed `fit` nor a
+ * frame zooms a legible view out to an illegible one, showing the window
+ * of a box too large for it that `legibleWindow` chooses. When `reveal`
  * changes the camera pans it into view if it is not already. A canvas given
  * a `memory` keeps its camera there, and a canvas mounted again on it
  * resumes the reader's view, panning `reveal` into view, in place of the

@@ -11,6 +11,7 @@
 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { REF_PACKAGES, type RefRoot } from "../lib/config/index.js";
 
 /** The fixtures sit beside this file, under `src/testing/`. */
 const CORPUS_ROOT: string = resolve(
@@ -21,22 +22,21 @@ const CORPUS_ROOT: string = resolve(
 /** The corpus's refs cache — the shape `~/.cache/pragma/refs/@canonical` has. */
 export const CORPUS_REFS_ROOT: string = join(CORPUS_ROOT, "refs/@canonical");
 
-/** The corpus's semantics tree — the shape `~/code/cn/semantics` has. */
-export const CORPUS_SEM_ROOT: string = join(CORPUS_ROOT, "sem");
-
-/** A directory that exists but holds no `.ttl` — the empty-cache case. */
+/**
+ * A directory that exists but holds no ref package — the empty-cache case,
+ * which the resolver refuses for its missing demand model.
+ */
 export const CORPUS_EMPTY_REFS_ROOT: string = join(CORPUS_ROOT, "refs");
 
 /**
- * A directory that EXISTS but is not a semantics tree: neither expected
- * package sits under it. The `PRAGMA_SEM_DIR` points somewhere wrong case,
- * which an existence check on the root cannot tell from a healthy one.
- *
- * Deliberately the same path as {@link CORPUS_EMPTY_REFS_ROOT}: one directory
- * answers both descriptions, and inventing a second empty tree to say so would
- * add a fixture nobody reads.
+ * Every ref package rooted under {@link CORPUS_EMPTY_REFS_ROOT}, where none of
+ * them exists: roots that resolve but hold nothing, for the collectors'
+ * nothing-found cases, which the resolver's own checks would otherwise
+ * report first.
  */
-export const CORPUS_WRONG_SEM_ROOT: string = join(CORPUS_ROOT, "refs");
+export const CORPUS_EMPTY_REF_ROOTS: readonly RefRoot[] = REF_PACKAGES.map(
+  (pkg) => ({ package: pkg, dir: join(CORPUS_EMPTY_REFS_ROOT, pkg) }),
+);
 
 /** A path guaranteed absent — the missing-cache case. */
 export const MISSING_ROOT: string = join(CORPUS_ROOT, "no-such-root");

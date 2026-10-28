@@ -341,6 +341,11 @@ export interface LegibleWindowOptions {
   readonly arrival?: Rect | undefined;
   /** The box to frame; the graph's whole viewBox when omitted. */
   readonly within?: Rect;
+  /**
+   * The least on-screen zoom the window shows at: the legible zoom
+   * (`MIN_FIT`) when omitted; the overview's floor for a Fit.
+   */
+  readonly zoom?: number;
 }
 
 /**

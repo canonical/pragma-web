@@ -5,18 +5,22 @@ import { EntityGraphNode } from "@canonical/prism-projections";
 import { Link } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
-import { readLocalName } from "../../collectJourneys.js";
-import { HOP_KINDS, HOP_MESSAGES, LEGEND_MESSAGES } from "../../constants.js";
+import {
+  ARRIVAL_MESSAGES,
+  HOP_KINDS,
+  HOP_MESSAGES,
+  LEGEND_MESSAGES,
+  ROLE_MESSAGES,
+} from "../../constants.js";
+import {
+  findSurfaceTypeMessage,
+  findTermMessage,
+} from "../../findTermMessage.js";
 import { NODE_HEIGHT, NODE_WIDTH } from "../JourneyWell/constants.js";
 import type { JourneyInspectorProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds journey-inspector";
-
-/** A vocabulary URI's display term, `surface:Primary` to `Primary`. */
-function readTerm(uri: string | null | undefined): string | undefined {
-  return uri == null ? undefined : readLocalName(uri);
-}
 
 /**
  * The journeys workspace's inspector: everything the model says about the
@@ -27,9 +31,10 @@ function readTerm(uri: string | null | undefined): string | undefined {
  * what someone said. The coordinate is spelled out in words, wildcards
  * included, since the ontology reads an absent axis as matching anything.
  *
- * Each pairing shows its role and its arrival as the graph's own terms; an
- * arrival the pairing does not carry is left out rather than defaulted, and
- * a surface that composes no layout says so. A surface links out only where
+ * Each pairing shows its surface's kind, its role and its arrival in the
+ * catalog's words, never as a type name or a term's local name; an arrival
+ * the pairing does not carry, or a term the catalog does not name, is left
+ * out rather than defaulted, and a surface that composes no layout says so. A surface links out only where
  * the docsite renders it: a dead link would say more than the site holds.
  *
  * With no job selected it is an overview of what the graph draws: the
@@ -135,8 +140,14 @@ export default function JourneyInspector({
               <ul className="pairings">
                 {job.pairings.map((pairing) => {
                   const surface = pairing.surface;
-                  const role = readTerm(pairing.role);
-                  const arrival = readTerm(pairing.arrival);
+                  const role = findTermMessage(ROLE_MESSAGES, pairing.role);
+                  const arrival = findTermMessage(
+                    ARRIVAL_MESSAGES,
+                    pairing.arrival,
+                  );
+                  const surfaceType = findSurfaceTypeMessage(
+                    surface?.surfaceType,
+                  );
                   const name = surface?.label ?? surface?.uri;
                   return (
                     <li className="pairing" key={pairing.uri}>
@@ -148,19 +159,19 @@ export default function JourneyInspector({
                         ) : (
                           <Link to={surface.route}>{name}</Link>
                         )}
-                        {surface?.surfaceType == null ? null : (
-                          <span className="kind">{surface.surfaceType}</span>
+                        {surfaceType === undefined ? null : (
+                          <span className="kind">{t(surfaceType)}</span>
                         )}
                       </p>
                       <p className="facets">
                         {role === undefined ? null : (
                           <span className="facet" data-facet="role">
-                            {role}
+                            {t(role)}
                           </span>
                         )}
                         {arrival === undefined ? null : (
                           <span className="facet" data-facet="arrival">
-                            {arrival}
+                            {t(arrival)}
                           </span>
                         )}
                         {surface?.layout == null ? (

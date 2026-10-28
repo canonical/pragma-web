@@ -356,7 +356,7 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         const canvas = await page.evaluate(readJourneysCanvas);
         if (canvas.alert !== null) {
           throw new Error(
-            `${path} shows "${canvas.alert}" in place of the explorer: the graph serves no demand model, so the journeys cannot be measured. Boot the graph with the semantics tree.`,
+            `${path} shows "${canvas.alert}" in place of the explorer: the graph serves no demand model, so the journeys cannot be measured. The demand model's shims are linked by bun install; check the provider's boot log.`,
           );
         }
         expect(canvas.explorer).toBe(true);

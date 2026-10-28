@@ -1,0 +1,17 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The roles of the consumers of the design system's documentation site.
+
+dsd:role.designer a surface:Role ;
+  rdfs:label "Designer" ;
+  rdfs:comment "Designs product screens with the design system: picks components, follows their anatomy and binds the system's tokens." .
+
+dsd:role.engineer a surface:Role ;
+  rdfs:label "Engineer" ;
+  rdfs:comment "Builds applications with the design system's components and holds their code to its standards." .
+
+dsd:role.maintainer a surface:Role ;
+  rdfs:label "Maintainer" ;
+  rdfs:comment "Changes the design system itself: its ontology, its components, its standards and this documentation site." .

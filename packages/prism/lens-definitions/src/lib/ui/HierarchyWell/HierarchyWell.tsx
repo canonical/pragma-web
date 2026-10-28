@@ -149,8 +149,9 @@ export default function HierarchyWell({
   }, [activeEdge, focus, hidden, layout, t]);
   // The server paints the whole graph, or a legible window of it around
   // the class selected on arrival, for the design canvas; the client opens
-  // on the window its own canvas calls for. Fit fits the whole, or shows it
-  // from its top-left corner at the overview's floor, never below.
+  // on the window its own canvas calls for. Fit fits the whole, or shows a
+  // window of it at the overview's floor whose edges cut no class, never
+  // below.
   const [arrival] = useState(selected);
   const arrivalNode =
     arrival === undefined ? undefined : layout.nodes.get(arrival);
@@ -177,8 +178,8 @@ export default function HierarchyWell({
     [bounds, hidden, layout],
   );
   const legibleWindow = useCallback(
-    (box: GraphBox, visible: GraphBox, scale: number): GraphBox =>
-      frameRefitWindow(layout, hidden, box, visible, scale),
+    (box: GraphBox, visible: GraphBox, scale: number, zoom: number): GraphBox =>
+      frameRefitWindow(layout, hidden, box, visible, scale, zoom),
     [hidden, layout],
   );
   const frame = useMemo(() => {

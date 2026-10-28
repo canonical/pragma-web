@@ -1,0 +1,33 @@
+{
+  "name": "@canonical/design-system-docs",
+  "description": "Shim of the pragma documentation site's demand model, an instance of the surface ontology, as Turtle; replaced by the published @canonical/design-system-docs",
+  "version": "0.44.1",
+  "private": true,
+  "type": "module",
+  "files": [
+    "data"
+  ],
+  "author": {
+    "email": "webteam@canonical.com",
+    "name": "Canonical Webteam"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/canonical/pragma-web"
+  },
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/canonical/pragma-web/issues"
+  },
+  "homepage": "https://github.com/canonical/pragma-web#readme",
+  "scripts": {
+    "check": "bun run check:biome",
+    "check:fix": "bun run check:biome:fix",
+    "check:biome": "biome check",
+    "check:biome:fix": "biome check --write"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0"
+  }
+}

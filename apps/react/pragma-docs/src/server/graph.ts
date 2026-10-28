@@ -12,8 +12,8 @@
  *
  * **The provider is no longer assembled here.** It comes from
  * `@canonical/prism-pragma-provider`, which owns pragma's ref-package list,
- * its semantic-package list, the shim-concept exclusion and the compiler
- * options — every fact about pragma's specific
+ * the demand model's shims among them, and the compiler options — every
+ * fact about pragma's specific
  * ontologies that used to live in this app's `src/server/graphql.ts`. What is
  * left in this file is TRANSPORT: the port, the hostname, the `/graphql`-only
  * routing and the per-request hit log. This app depends on no knowledge engine
@@ -66,13 +66,13 @@ const HOSTNAME = new URL(DEFAULT_GRAPHQL_URL).hostname;
 let hits = 0;
 
 // No `sdlOutput`: this boot WRITES NOTHING. `src/relay/schema.graphql` is
-// produced by `bun run schema` (`src/server/schema.ts`) from the ref packages
-// alone, and gated by `schema:check`. A server that rewrote it on every boot,
-// from whatever this machine has cached or checked out, is exactly the
-// unstated input that gate exists to remove. The boot may still see MORE
-// than the committed schema — a semantics tree next door adds the journeys
-// types — and that is fine at runtime: the served schema is a superset of
-// the compiled one.
+// produced by `bun run schema` (`src/server/schema.ts`) from the same
+// installed ref packages, and gated by `schema:check`. A server that rewrote
+// it on every boot is exactly the unstated input that gate exists to remove.
+// Both boot the provider over the same packages, so the served schema equals
+// the committed one (`committedSchema.tests.ts`), the journeys types
+// included; a refs cache named by `PRAGMA_REFS_DIR` is the one way to serve
+// something else.
 const backend = await createPragmaProvider().catch((error: unknown): never => {
   console.error(
     "[graph] the GraphQL backend failed to boot:",

@@ -28,28 +28,31 @@ import "./styles.css";
  * whole design.
  *
  * The naive shape — root at `views` and walk down — structurally CANNOT
- * see this model: `Lens` is a separate type from `View`, so the 11
- * `composes` edges that hang off lenses are invisible from a `views` root.
- * Rooting at `pairings` and reading `pairsSurface` through the `Surface`
- * INTERFACE sees every implementor at once (`View`, `Lens`, `Port`,
- * `Peek`, `Detail`, `Mechanism`, `ComposerSurface`, `Editor` — all eight,
- * verified live). `composes` is declared ON the interface, so no inline
- * fragments are needed at all: one selection set covers every surface kind.
+ * see this model: `LensSurface` is a separate type from `View`, so the six
+ * `composes` edges that hang off the docs site's lenses are invisible from
+ * a `views` root. Rooting at `pairings` and reading `pairsSurface` through
+ * the `Surface` INTERFACE sees every implementor at once (`View`,
+ * `LensSurface`, `Port`, `Peek`, `Detail`, `Mechanism`, `ComposerSurface`,
+ * `Editor` — all eight). `composes` is declared ON the interface, so no
+ * inline fragments are needed at all: one selection set covers every
+ * surface kind.
  *
- * THE TWO WINDOWS. `first:` hard-caps at 100 and the model holds 133
- * pairings, so ONE page silently loses 13 of the 51 paired jobs. The union
- * of `first:100` and `last:100` covers all 133 in ONE operation with no
- * cursor threading (see `journeysQuery.ts` for the full argument);
- * `collectJourneys` merges them by URI, so the 67-pairing overlap
- * collapses to nothing.
+ * THE TWO WINDOWS. `first:` hard-caps at 100, and a model of more than 100
+ * pairings would silently lose jobs to ONE page: an earlier model of 133
+ * lost 13 of its 51 paired jobs. The union of `first:100` and `last:100`
+ * covers up to 200 in ONE operation with no cursor threading (see
+ * `journeysQuery.ts` for the full argument); `collectJourneys` merges them
+ * by URI, so the overlap collapses to nothing. The docs site's 30 pairings
+ * sit whole in each window.
  *
- * `jobs` IS ALSO PAGINATED, deliberately. Its connection defaults to FIFTY
- * — measured — so the two jobs beyond that would vanish without an
+ * `jobs` IS ALSO PAGINATED, deliberately. Its connection defaults to FIFTY,
+ * so the jobs of a larger model beyond that would vanish without an
  * explicit `first`. The variable is named and asserted rather than left to
  * a default that is not documented anywhere in the schema.
  *
  * `arrivals` and `pairingRole` are OBJECT types carrying URIs, not enums,
- * and 34 of 133 pairings carry no arrival — so both are read as nullable
+ * and a pairing with a port carries no arrival (2 of the docs site's 30)
+ * — so both are read as nullable
  * URI-bearing nodes and mapped by local name downstream.
  */
 const declareJourneysExplorerQuery = (): unknown => graphql`
@@ -74,7 +77,7 @@ const declareJourneysExplorerQuery = (): unknown => graphql`
         }
       }
     }
-    # The two overlapping windows — the union covers all 133 pairings.
+    # The two overlapping windows — the union covers up to 200 pairings.
     #
     # The selection set is spelled out TWICE rather than shared through a
     # fragment, and that is deliberate: Relay MASKS fragment data, so a
@@ -141,9 +144,10 @@ const componentCssClassName = "ds journeys-explorer";
  * come from the builder the route's `warm` uses, so the warm store always
  * holds this exact operation.
  *
- * The graph is filtered by default: the whole model is some 260 hops
- * across five columns, unreadable at once, and the graph server-renders
- * only what it is given, so it cannot be virtualised. The filter starts on
+ * The graph is filtered by default: a whole model across five columns is
+ * too many hops to read at once (an earlier 52-job model ran to some 260;
+ * the docs site's runs to some 70), and the graph server-renders only
+ * what it is given, so it cannot be virtualised. The filter starts on
  * one coordinate, the first by URI or the selected job's, a function of
  * the operation's data and the URL alone, so the server and the client
  * compute it alike. The rail dims and the table lists every job whatever

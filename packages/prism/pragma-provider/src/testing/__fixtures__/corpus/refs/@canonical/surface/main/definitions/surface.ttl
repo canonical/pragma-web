@@ -1,6 +1,5 @@
-# The SECOND root: the docsite's own demand model, from the semantics working
-# tree rather than the refs cache. Merging it must be purely additive — it
-# contributes `Job`, and takes nothing from the first root.
+# The demand model's ontology, a ref package like the others: it contributes
+# `Job`, a type no other package in the corpus declares.
 
 @prefix sur: <sem://surface#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .

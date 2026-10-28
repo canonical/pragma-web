@@ -140,9 +140,9 @@ function prefersReducedMotion(): boolean {
  * it `legibleWindow` chooses, or its top-left corner at that zoom. Fit and
  * `0` fit the fit box whole down to the overview's floor (12/16, where the
  * 16px hub and region labels still render at 12px) and no further: a box
- * too large for it shows from its top-left corner at that floor, the rest
- * a pan away, and the zoom extent's floor follows them down. No fit lands
- * in the overview. When
+ * too large for it shows the window of it `legibleWindow` chooses at that
+ * floor, or its top-left corner at that floor, the rest a pan away, and
+ * the zoom extent's floor follows them down. No fit lands in the overview. When
  * `reveal` changes it pans that box into view, without zooming, only if it
  * is not already in view. Every move a control or a prop asks for takes
  * 200ms, and is instant under reduced motion.
@@ -223,11 +223,11 @@ export default function useGraphCamera({
   );
 
   // Fit a box, or the graph's whole bounds, into the visible area, never
-  // into the overview: a box too large for the overview's floor shows from
-  // its top-left corner at that floor, the rest a pan away, so the hub and
-  // region labels stay. A refit that keeps the view legible zooms no lower
-  // than the legible zoom when the camera is legible now, and shows the
-  // legible window of a box too large for that zoom.
+  // into the overview: the floor is the overview's, so the hub and region
+  // labels stay, or the legible zoom for a refit that keeps the view
+  // legible when the camera is legible now. A box too large for the floor
+  // shows the window of it `legibleWindow` chooses at that floor, or its
+  // top-left corner at that floor without one, the rest a pan away.
   const fitBox = useCallback(
     (box: GraphBox | undefined, keepLegible: boolean): void => {
       const svg = viewport.current;
@@ -236,17 +236,17 @@ export default function useGraphCamera({
       const { scale, visible } = measureViewport(svg, latest.current.viewBox);
       const target = box ?? latest.current.bounds;
       const legible = keepLegible && scale * current.current.k >= HUBS_SCALE;
-      const least =
-        ((legible ? HUBS_SCALE : OVERVIEW_SCALE) * LEGIBLE_NUDGE) / scale;
+      const floor = legible ? HUBS_SCALE : OVERVIEW_SCALE;
+      const least = (floor * LEGIBLE_NUDGE) / scale;
       const fitsLegibly =
         Math.min(
           visible.width / target.width,
           visible.height / target.height,
         ) >= least;
       const shown =
-        fitsLegibly || !legible || latest.current.legibleWindow === undefined
+        fitsLegibly || latest.current.legibleWindow === undefined
           ? target
-          : latest.current.legibleWindow(target, visible, scale);
+          : latest.current.legibleWindow(target, visible, scale, floor);
       moveTo(computeFitTransform(visible, shown, least));
     },
     [moveTo, viewport],

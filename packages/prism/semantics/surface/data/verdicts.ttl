@@ -1,0 +1,16 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The outcomes of walking an exemplar against the surfaces.
+
+surface:renders a surface:Verdict ;
+  rdfs:label "Renders" ;
+  rdfs:comment "The story completes cleanly across the surfaces it walks." .
+
+surface:ceremony a surface:Verdict ;
+  rdfs:label "Ceremony" ;
+  rdfs:comment "The story completes, but awkwardly: a friction worth recording." .
+
+surface:wall a surface:Verdict ;
+  rdfs:label "Wall" ;
+  rdfs:comment "The story cannot complete: a real gap in the surfaces." .

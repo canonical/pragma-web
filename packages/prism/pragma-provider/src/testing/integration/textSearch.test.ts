@@ -7,7 +7,7 @@
 import { toBase64 } from "@canonical/ke-graphql";
 import { describe, expect, it } from "vitest";
 import { createPragmaProvider } from "../../lib/provider/index.js";
-import { CORPUS_REFS_ROOT, CORPUS_SEM_ROOT } from "../corpus.js";
+import { CORPUS_REFS_ROOT } from "../corpus.js";
 
 const DS = "https://design.example.org/ontology#";
 
@@ -40,10 +40,7 @@ interface SearchBody {
 }
 
 describe("Query.search", () => {
-  const booted = createPragmaProvider({
-    refsRoot: CORPUS_REFS_ROOT,
-    semRoot: CORPUS_SEM_ROOT,
-  });
+  const booted = createPragmaProvider({ refsRoot: CORPUS_REFS_ROOT });
 
   /** POST `SEARCH_QUERY` with `variables`, and return the body. */
   const post = async (
@@ -104,7 +101,7 @@ describe("Query.search", () => {
     expect(await rank("surface")).toEqual([`${DS}card`]);
   });
 
-  it("finds a class from the second root", async () => {
+  it("finds a class from the surface ontology", async () => {
     const page = await search({ text: "job" });
     expect(page.edges.map((edge) => edge.node)).toContainEqual({
       __typename: "OntologyClass",

@@ -1,0 +1,38 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Stories walked against the site's surfaces, each to a verdict. The steps
+# of a narrative are numbered, because a list of values keeps no order.
+
+dsd:exemplar.find_a_card a surface:Exemplar ;
+  rdfs:label "Find a card" ;
+  rdfs:comment "A designer looks for a component to show a summary of an item, and studies it before using it." ;
+  surface:verdict surface:renders ;
+  surface:walksJob dsd:job.l3 , dsd:job.d1 ;
+  surface:walksSurface dsd:view.components , dsd:view.component ;
+  surface:narrative "1. The designer opens the Components lens from the lobby." ,
+    "2. The catalogue shows every UI block as a card with a preview; the designer spots the Card." ,
+    "3. The Card's page opens with the rendered component, then its anatomy tree and its properties." ;
+  surface:finding "The walk completes in three steps, each on the surface the job names as primary." .
+
+dsd:exemplar.cite_a_standard a surface:Exemplar ;
+  rdfs:label "Cite a standard" ;
+  rdfs:comment "An engineer reviewing a change points its author at the one rule the change breaks." ;
+  surface:verdict surface:ceremony ;
+  surface:walksJob dsd:job.e2 ;
+  surface:walksSurface dsd:view.standards , dsd:view.standard ;
+  surface:narrative "1. The engineer opens the Standards lens and finds the standard by its topic." ,
+    "2. The standard's page shows its rule, its dos and its don'ts." ,
+    "3. The engineer copies the page's address into the review and names the rule in prose." ;
+  surface:finding "There is no copyable address for a single rule of a standard: the review cites the page and paraphrases the rule." .
+
+dsd:exemplar.retire_a_component a surface:Exemplar ;
+  rdfs:label "Retire a component" ;
+  rdfs:comment "A maintainer retires a component and wants its readers sent to the successor." ;
+  surface:verdict surface:wall ;
+  surface:walksJob dsd:job.m4 ;
+  surface:walksSurface dsd:view.component ;
+  surface:narrative "1. The maintainer opens the retired component's page." ,
+    "2. Nothing in the graph can mark the component as retired or name its successor, so the page cannot say so." ;
+  surface:finding "No surface can mark a component as retired: the job is deferred until the ontology carries a lifecycle state." .

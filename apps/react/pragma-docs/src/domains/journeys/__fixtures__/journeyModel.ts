@@ -6,9 +6,9 @@
  * Deliberately shaped like the real graph rather than a tidy tree: a
  * shared coordinate, a surface two jobs both reach, a pairing with no
  * arrival, a job with no pairings, and a surface composing no layout —
- * because those are the shapes the live model actually contains (34 of
- * 133 pairings carry no arrival; only 16 of 133 reach a layout; one job
- * of 52 is served by nothing).
+ * because those are the shapes the docs site's model contains (2 of its
+ * 30 pairings carry no arrival; 10 of 30 reach no layout; one job of 17 is
+ * served by nothing, being deferred).
  *
  * Lives in `__fixtures__` beside the record captures: imported by tests,
  * never collected as one.
@@ -58,7 +58,7 @@ export const BROWSE_JOURNEY_JOB: JourneyJob = {
       surface: {
         uri: `${DOCS}view.components`,
         label: "view.components",
-        surfaceType: "Lens",
+        surfaceType: "LensSurface",
         route: "components",
         layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
       },
@@ -115,7 +115,7 @@ export const JOURNEY_MODEL: readonly JourneyCoordinate[] = [
             surface: {
               uri: `${DOCS}view.components`,
               label: "view.components",
-              surfaceType: "Lens",
+              surfaceType: "LensSurface",
               route: "components",
               layout: { uri: `${DOCS}layout.catalog`, label: "Catalog" },
             },
@@ -126,7 +126,11 @@ export const JOURNEY_MODEL: readonly JourneyCoordinate[] = [
   },
 ];
 
-/** Every persona the live graph carries (6, measured). */
+/**
+ * Six personas, of which only the architect and the writer name a role
+ * the fixture's coordinates carry, so the approximate persona filter meets
+ * both a name that matches and names that match nothing.
+ */
 export const PERSONAS: readonly string[] = [
   `${DOCS}persona.agent`,
   PERSONA_ARCHITECT,

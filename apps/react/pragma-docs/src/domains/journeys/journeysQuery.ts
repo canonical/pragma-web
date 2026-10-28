@@ -9,8 +9,9 @@
  * ONE operation serves BOTH routes (`/journeys` and `/journeys/:job`): the
  * job-less index runs the same operation, and the selected job is read
  * from the URL rather than fetched separately — the whole demand model is
- * small enough (52 jobs, 133 pairings) that one operation carries it and
- * selection is pure presentation over data already in the store.
+ * small enough (17 jobs and 30 pairings in the docs site's model) that one
+ * operation carries it and selection is pure presentation over data already
+ * in the store.
  *
  * THE JOB IS THE ADDRESSABLE THING (P-D7). A journey is a job's path
  * through the surfaces that serve it, so the job — not the coordinate,
@@ -44,20 +45,22 @@ export const readJobParam = (
 
 /**
  * The page ceiling the schema enforces. `first:` caps at 100 — asking for
- * 200 silently returns 100, verified against the live backend — and the
- * model holds 133 pairings.
+ * 200 silently returns 100 — and a demand model may hold more pairings
+ * than that: the docs site's holds 30, and an earlier model of 52 jobs held
+ * 133 (the record captures in `__fixtures__/` are of that model).
  *
- * THE COVERAGE PROBLEM, and why this is not paginated. A single
- * `first:100` page reaches only 38 of the 51 jobs that have pairings: 13
- * jobs would vanish from the lens with nothing on screen saying so. That
- * is precisely the silent-truncation failure this lens exists to expose,
- * so it cannot be the lens's own bug.
+ * THE COVERAGE PROBLEM, and why this is not paginated. Over 133 pairings a
+ * single `first:100` page reached only 38 of the 51 jobs that had
+ * pairings: 13 jobs would vanish from the lens with nothing on screen
+ * saying so. That is precisely the silent-truncation failure this lens
+ * exists to expose, so it cannot be the lens's own bug.
  *
  * THE SOLUTION is a `first:100` + `last:100` UNION in one operation rather
- * than a cursor walk. The two windows overlap by 67 and together cover all
- * 133 pairings and all 51 paired jobs (measured against the live backend,
- * not assumed). The union is taken by URI, so the overlap collapses to
- * nothing. This beats the cursor approach on every axis that matters here:
+ * than a cursor walk. Over those 133 pairings the two windows overlapped
+ * by 67 and together covered every pairing and every paired job; over the
+ * docs site's 30 each window holds all of them. The union is taken by URI,
+ * so the overlap collapses to nothing. This beats the cursor approach on
+ * every axis that matters here:
  * no `endCursor` has to be threaded through the route's `warm` as a
  * variable, no second round trip exists to fail
  * independently, and the operation stays one operation — the P-2 register
@@ -73,11 +76,12 @@ export const PAIRING_PAGE_SIZE = 100;
 
 /**
  * The jobs page size. The `jobs` root connection defaults to FIFTY, not to
- * everything — measured live: the default page returns 50 of the 52 jobs
- * with `hasNextPage: true`, and `first: 100` returns all 52 with
- * `hasNextPage: false`. Asking explicitly is therefore load-bearing, not
- * decoration: without it two jobs (and their journeys) would be missing
- * from the diagram for no visible reason.
+ * everything: over the earlier 52-job model the default page returned 50
+ * jobs with `hasNextPage: true`, and `first: 100` returned all 52. The docs
+ * site's 17 jobs fit the default page, but a model past fifty jobs would
+ * not, so asking explicitly is load-bearing, not decoration: without it the
+ * jobs beyond the fiftieth (and their journeys) would be missing from the
+ * diagram for no visible reason.
  */
 export const JOB_PAGE_SIZE = 100;
 

@@ -19,7 +19,7 @@ const readCorpusFile = (path: string): string =>
 
 describe("bindProseSidecars", () => {
   const refRoots = cacheRefRoots(CORPUS_REFS_ROOT);
-  const sources = collectTtlSources({ refRoots, semRoot: null });
+  const sources = collectTtlSources(refRoots);
   const binding = bootCorpusQuery().then((query) =>
     bindProseSidecars({
       sidecars: collectProseSidecars(refRoots),

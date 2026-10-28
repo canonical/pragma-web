@@ -57,16 +57,19 @@ export interface GraphCameraMemory {
 
 /**
  * Choose the window of a box the camera shows instead of the box when a
- * refit that keeps the view legible could fit the box only below the
- * legible zoom: from the box, the area of user space the viewport shows at
- * the identity and the on-screen size of one user unit there, a window in
- * world space small enough to show at the legible zoom, such as one whose
- * edges cut through nothing the drawing holds.
+ * fit could show the box only below its floor: the legible zoom for a
+ * refit that keeps the view legible and for the opening of a canvas with
+ * no `opening`, the overview's floor for Fit. From
+ * the box, the area of user space the viewport shows at the identity, the
+ * on-screen size of one user unit there and the floor as an on-screen
+ * zoom, a window in world space small enough to show at that floor, such
+ * as one whose edges cut through nothing the drawing holds.
  */
 export type GraphLegibleWindow = (
   box: GraphBox,
   visible: GraphBox,
   scale: number,
+  zoom: number,
 ) => GraphBox;
 
 /**
@@ -107,8 +110,9 @@ type OwnProps = {
    * The box the Fit control and the `0` key fit whole, and the camera fits
    * whenever it changes, never zooming a legible view out to an illegible
    * one, and never into the overview: a box too large for the overview's
-   * floor shows from its top-left corner at that floor. The visible part
-   * of the graph under a filter; the graph's whole bounds when omitted.
+   * floor shows the window of it `legibleWindow` chooses at that floor, or
+   * its top-left corner at that floor. The visible part of the graph under
+   * a filter; the graph's whole bounds when omitted.
    */
   readonly fit?: GraphBox;
   /**
@@ -118,10 +122,11 @@ type OwnProps = {
    */
   readonly frame?: GraphFrameRequest;
   /**
-   * The window a refit of `fit` or `frame`, or the opening a canvas with
-   * no `opening` takes, shows when the box fits only below the legible
-   * zoom. Without one, such a box is shown from its top-left corner at the
-   * legible zoom.
+   * The window a fit shows when its box fits only below the fit's floor: a
+   * refit of `fit` or `frame` that keeps the view legible, and the opening
+   * a canvas with no `opening` takes, below the legible zoom; the Fit
+   * control and the `0` key, below the overview's floor. Without one, such
+   * a box is shown from its top-left corner at that floor.
    */
   readonly legibleWindow?: GraphLegibleWindow;
   /**

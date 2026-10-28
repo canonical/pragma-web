@@ -8,7 +8,6 @@ export { collectProseSidecars } from "./collectProseSidecars.js";
 export {
   collectTtlSources,
   escapeChannelDottedRefs,
-  resolveSemRoot,
 } from "./collectTtlSources.js";
 export { harvestPrefixes } from "./harvestPrefixes.js";
 export {

@@ -33,8 +33,9 @@
  * silently depended on server iteration order would be a hydration bug
  * waiting for the day the store changes.
  *
- * HONEST ABSENCE. Most surfaces compose no layout — 16 of 133
- * pairings reach one. Where a journey has no layout hop, this function
+ * HONEST ABSENCE. Not every surface composes a layout — the chips, the
+ * palette and the GraphQL port do not, so 10 of the docs site's 30
+ * pairings reach none. Where a journey has no layout hop, this function
  * emits NO layout node and NO trailing edge, and the row simply ends at
  * its surface. It does NOT invent one by walking the `within` chain: the
  * ontology declares no layout-inheritance rule, and a lens that applied
@@ -44,7 +45,7 @@
  */
 
 import { snapToLattice } from "#lib/graph";
-import { readLocalName } from "../../collectJourneys.js";
+import { foldTermName, readLocalName } from "../../collectJourneys.js";
 import type {
   HopKind,
   JourneyCoordinate,
@@ -287,23 +288,24 @@ function separateColumns(
  * carrying a URI, not a GraphQL enum, so the mapping is by local name —
  * and an unrecognised role decorates nothing rather than guessing. The
  * demand model's vocabulary terms arrive in TWO forms depending on how the
- * store resolved them — full (`sem://surface#Primary`) or prefixed
- * (`surface:Primary`) — and `readLocalName` reads both.
+ * store resolved them — full (`sem://surface#primary`) or prefixed
+ * (`surface:primary`) — and `readLocalName` reads both; the local name's
+ * case and underscores do not matter (`foldTermName`).
  */
 export const classifyRole = (
   role: string | null | undefined,
 ): string | undefined => {
   if (role == null) return undefined;
-  const local = readLocalName(role);
-  if (local === "Primary") return ROLE_PRIMARY_CLASS;
-  if (local === "Secondary") return ROLE_SECONDARY_CLASS;
+  const term = foldTermName(readLocalName(role));
+  if (term === "primary") return ROLE_PRIMARY_CLASS;
+  if (term === "secondary") return ROLE_SECONDARY_CLASS;
   return undefined;
 };
 
 /**
  * Edge decoration from the pairing's arrival, by local name for the same
- * reason. Absent arrival decorates nothing: 34 of 133 pairings carry none
- * and ports carry none by rule, so "no class" is the honest rendering of
+ * reason. Absent arrival decorates nothing: ports carry none by rule (2 of
+ * the docs site's 30 pairings), so "no class" is the honest rendering of
  * a fact rather than a fallback.
  */
 export const classifyArrival = (
@@ -314,5 +316,5 @@ export const classifyArrival = (
   // An arrival whose local name is empty names no term: the shared reading
   // returns the whole URI then, which ends at its separator.
   if (/[#:]$/.test(local)) return undefined;
-  return `${ARRIVAL_CLASS_PREFIX}${local.toLowerCase()}`;
+  return `${ARRIVAL_CLASS_PREFIX}${foldTermName(local)}`;
 };

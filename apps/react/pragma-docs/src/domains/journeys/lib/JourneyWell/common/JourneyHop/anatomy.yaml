@@ -2,8 +2,9 @@
 # JourneyHop — one placed hop of the journeys graph: a <g> at the hop's
 # corner holding the published projection's EntityGraphNode, 176 by 48
 # (two 24-unit lines), its label cut to the box, its column's name as its
-# kind and, on a surface, the surface's type as its location; a pairing is
-# hollow. The hop's full label rides in its <title>.
+# kind and, on a surface, the words for the surface's kind as its
+# location, from the catalog, never its type name; a pairing is hollow.
+# The hop's full label rides in its <title>.
 #
 # The selected job's hop carries a ring 4 units off its box, 2 units wide,
 # in the branded colour.

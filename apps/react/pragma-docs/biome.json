@@ -7,8 +7,7 @@
       "*.json",
       "vite.config.ts",
       "!src/relay/__generated__",
-      "!src/relay/schema.graphql",
-      "!src/relay/extensions"
+      "!src/relay/schema.graphql"
     ]
   }
 }

@@ -60,7 +60,7 @@
  * remedy) and invalidate every committed Relay artifact at once. An implicit
  * default that a dependency bump could change is exactly the kind of unstated
  * fact this package exists to write down. They are constants, not options,
- * for the same reason `EXCLUDED_SOURCES` is (see config/constants.ts).
+ * for the same reason `REF_PACKAGES` is (see config/constants.ts).
  */
 
 import { relative } from "node:path";
@@ -84,7 +84,6 @@ import {
   describeRefRoots,
   harvestPrefixes,
   resolveRefRoots,
-  resolveSemRoot,
 } from "../sources/index.js";
 import { composeExtensions } from "./composeExtensions.js";
 
@@ -109,12 +108,7 @@ export const createPragmaProvider = async (
   options: PragmaProviderOptions = {},
 ): Promise<PragmaProvider> => {
   const refRoots = resolveRefRoots(options.refsRoot);
-  const sources = collectTtlSources({
-    refRoots,
-    // `undefined` means "not given", so the environment decides; `null` is
-    // the caller saying "the ref packages alone", and is passed through.
-    semRoot: options.semRoot === undefined ? resolveSemRoot() : options.semRoot,
-  });
+  const sources = collectTtlSources(refRoots);
   const sidecars = collectProseSidecars(refRoots);
   const prefixes = harvestPrefixes(sources);
   const graphql = createSchemaPlugin({
@@ -130,8 +124,7 @@ export const createPragmaProvider = async (
     prefixing: PREFIXING,
     provider: PROVIDER,
     // Which release of each ref package the SDL was compiled from, so a
-    // schema diff names its cause. The semantics tree is a working tree and
-    // has no version to name; its presence shows in the types instead.
+    // schema diff names its cause.
     revision: describeRefRoots(refRoots),
     sdlOutput: options.sdlOutput,
   });

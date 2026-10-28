@@ -3,7 +3,7 @@
  * options and its result.
  *
  * The internal cross-domain surface — the source collector, the prefix
- * harvester, and the eleven configuration constants — is deliberately NOT
+ * harvester, and the configuration constants — is deliberately NOT
  * re-exported. Those are decisions this package makes on the consumer's
  * behalf; `constants.ts` argues at length that they must not be configurable,
  * which is an argument for keeping them off the public surface rather than for

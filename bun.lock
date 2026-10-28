@@ -721,8 +721,10 @@
         "@canonical/anatomy-dsl": "0.43.0",
         "@canonical/code-standards": "0.43.0",
         "@canonical/design-system": "0.43.0",
+        "@canonical/design-system-docs": "^0.44.1",
         "@canonical/ke": "0.43.0",
         "@canonical/ke-graphql": "0.43.0",
+        "@canonical/surface": "^0.44.1",
         "graphql": "17.0.0-rc.0",
         "mdast-util-from-markdown": "^2.0.3",
       },
@@ -782,6 +784,22 @@
         "typescript": "^7.0.2",
         "vite": "^8.0.1",
         "vitest": "^5.0.0",
+      },
+    },
+    "packages/prism/semantics/design-system-docs": {
+      "name": "@canonical/design-system-docs",
+      "version": "0.44.1",
+      "devDependencies": {
+        "@biomejs/biome": "2.5.15",
+        "@canonical/biome-config": "0.43.0",
+      },
+    },
+    "packages/prism/semantics/surface": {
+      "name": "@canonical/surface",
+      "version": "0.44.1",
+      "devDependencies": {
+        "@biomejs/biome": "2.5.15",
+        "@canonical/biome-config": "0.43.0",
       },
     },
     "packages/react/ds-app": {
@@ -1963,6 +1981,8 @@
 
     "@canonical/design-system": ["@canonical/design-system@0.43.0", "", { "dependencies": { "@canonical/anatomy-dsl": "^0.43.0", "@canonical/token-ontology": "^0.43.0", "ajv": "^8.17.1", "jsonld": "^9.0.0", "n3": "^2.0.1", "tinyglobby": "^0.2.14", "yaml": "^2.7.1" }, "bin": { "collect-implementations": "src/collect-implementations.ts" } }, "sha512-JnQyVqUoLS8VC/zwShjG6gauuJI8gzN9WVNh6vg8XGzx7I+hM63Nw+0/PrGprQzE3mxAoTF8t5s6ccGrgLOalg=="],
 
+    "@canonical/design-system-docs": ["@canonical/design-system-docs@workspace:packages/prism/semantics/design-system-docs"],
+
     "@canonical/design-tokens": ["@canonical/design-tokens@0.43.0", "", {}, "sha512-mTzlUV9L1v0cc+6STx2rQwopztzbx9bxTVLDCzpkOKqjtFCS5363NcM6AEuWGBQq58mFQC1PtqvDlNIlv6U2WA=="],
 
     "@canonical/ds-assets": ["@canonical/ds-assets@workspace:packages/ds-assets"],
@@ -2074,6 +2094,8 @@
     "@canonical/styles-vanilla-adapter": ["@canonical/styles-vanilla-adapter@workspace:packages/styles/vanilla-adapter"],
 
     "@canonical/summon-core": ["@canonical/summon-core@0.43.0", "", { "dependencies": { "@canonical/task": "^0.43.0", "@canonical/utils": "^0.43.0", "chalk": "^6.0.0", "commander": "^15.0.0", "ejs": "^5.0.0", "ink": "^6.8.0", "ink-select-input": "^6.2.0", "ink-text-input": "^6.0.0", "react": "^19.2.4" } }, "sha512-ZEGnQQotRjOuRhVVIcDTliKmK+H3llmr9qOL2RVylKlcNqYP1W+EMdK7VwyFMdKnlinRUvnzQuYGsg/If9lMUA=="],
+
+    "@canonical/surface": ["@canonical/surface@workspace:packages/prism/semantics/surface"],
 
     "@canonical/svelte-ds-app": ["@canonical/svelte-ds-app@workspace:packages/svelte/ds-app"],
 

@@ -1,0 +1,54 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# What the site's graph lets a consumer do, and who is granted it. The pages
+# and the GraphQL port bind the same contracts, so the human and the machine
+# faces of the site cannot drift apart.
+
+dsd:substrate.design_system_graph a surface:Substrate ;
+  rdfs:label "Design system graph" ;
+  rdfs:comment "The knowledge graph compiled from the design system's ontologies and data, which every surface of the site projects." .
+
+dsd:capability.read_graph a surface:Capability ;
+  rdfs:label "Read the graph" ;
+  rdfs:comment "Read any node of the graph and follow its relations." ;
+  surface:contract "node(id:) and the typed root fields of the GraphQL schema, each a lookup by IRI and a paginated listing." ;
+  surface:requiresAuthority surface:read ;
+  surface:over dsd:substrate.design_system_graph .
+
+dsd:capability.search a surface:Capability ;
+  rdfs:label "Search the graph" ;
+  rdfs:comment "Find nodes by the words in their names and descriptions." ;
+  surface:contract "search(text:, first:, after:), a ranked connection of nodes." ;
+  surface:requiresAuthority surface:read ;
+  surface:over dsd:substrate.design_system_graph .
+
+dsd:capability.read_prose a surface:Capability ;
+  rdfs:label "Read prose" ;
+  rdfs:comment "Read the prose written about a node, in the reader's language." ;
+  surface:contract "prose(uri:), the Markdown sidecar of a node with its links resolved." ;
+  surface:requiresAuthority surface:read ;
+  surface:over dsd:substrate.design_system_graph .
+
+dsd:capability.reader a surface:Capability ;
+  rdfs:label "Reader" ;
+  rdfs:comment "The bundle a reader of the site is handed: read, search and read prose." ;
+  surface:contract "The union of the contracts it bundles." ;
+  surface:bundles dsd:capability.read_graph , dsd:capability.search , dsd:capability.read_prose ;
+  surface:requiresAuthority surface:read ;
+  surface:over dsd:substrate.design_system_graph .
+
+dsd:capability.read_components a surface:Capability ;
+  rdfs:label "Read components" ;
+  rdfs:comment "Reading narrowed to the design system's UI blocks." ;
+  surface:contract "component(uri:) and components(first:, after:), with their props and anatomy." ;
+  surface:attenuates dsd:capability.read_graph ;
+  surface:requiresAuthority surface:read ;
+  surface:over dsd:substrate.design_system_graph .
+
+# ---- grants
+
+surface:human surface:granted dsd:capability.reader .
+
+surface:agent surface:granted dsd:capability.reader .

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  CORPUS_EMPTY_REFS_ROOT,
+  CORPUS_EMPTY_REF_ROOTS,
   CORPUS_REFS_ROOT,
 } from "../../testing/corpus.js";
 import { collectProseSidecars } from "./collectProseSidecars.js";
@@ -32,8 +32,6 @@ describe("collectProseSidecars", () => {
   });
 
   it("collects nothing from roots that hold no Markdown", () => {
-    expect(collectProseSidecars(cacheRefRoots(CORPUS_EMPTY_REFS_ROOT))).toEqual(
-      [],
-    );
+    expect(collectProseSidecars(CORPUS_EMPTY_REF_ROOTS)).toEqual([]);
   });
 });

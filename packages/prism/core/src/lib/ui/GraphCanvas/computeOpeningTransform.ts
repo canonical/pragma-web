@@ -27,7 +27,7 @@ export default function computeOpeningTransform(
   const shown =
     legibleWindow === undefined
       ? viewBox
-      : legibleWindow(viewBox, visible, scale);
+      : legibleWindow(viewBox, visible, scale, HUBS_SCALE);
   return computeFitTransform(
     visible,
     shown,

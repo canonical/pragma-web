@@ -25,7 +25,9 @@ export type SurfaceRouteName =
   | "components"
   | "definitions"
   | "standards"
-  | "guides";
+  | "guides"
+  | "playground"
+  | "journeys";
 
 /** One of the journey's columns, from `HOP_KINDS`: what a hop stands for. */
 export type HopKind = (typeof HOP_KINDS)[number];

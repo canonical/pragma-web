@@ -1,0 +1,19 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The ordinal familiarity arc of a coordinate's fluency axis.
+
+surface:newcomer a surface:Fluency ;
+  rdfs:label "Newcomer" ;
+  rdfs:comment "First contact with the system: every name is new and nothing can be assumed." ;
+  surface:fluencyOrder 1 .
+
+surface:fluent a surface:Fluency ;
+  rdfs:label "Fluent" ;
+  rdfs:comment "Works with the system routinely: knows its names and where things live." ;
+  surface:fluencyOrder 2 .
+
+surface:expert a surface:Fluency ;
+  rdfs:label "Expert" ;
+  rdfs:comment "Knows the system's model as well as its surfaces, and changes it." ;
+  surface:fluencyOrder 3 .

@@ -5,9 +5,11 @@
  * measurements are pinned against it.
  *
  * Regenerate: run the Definitions page's ontology selection against
- * `createPragmaProvider({ semRoot: null })` and keep each class's IRI,
- * label, prefix, abstractness, superclass, instance count and field count,
- * and each object property's IRI, label, domain and range.
+ * `createPragmaProvider()`, keep only the classes and properties of the
+ * `ds`, `cs` and `anatomy` namespaces (the capture predates the demand
+ * model's `surface` package), and keep each class's IRI, label, prefix,
+ * abstractness, superclass, instance count and field count, and each
+ * object property's IRI, label, domain and range.
  */
 
 import type { ClassGraphInput } from "../../src/lib/classGraph/types.js";

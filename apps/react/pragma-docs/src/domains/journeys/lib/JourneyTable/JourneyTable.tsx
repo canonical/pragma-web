@@ -111,7 +111,7 @@ export default function JourneyTable({
             <span aria-hidden="true">{isExpanded ? "−" : "+"}</span>
           </button>
         </td>
-        <th className="cell" scope="row">
+        <th className="cell is-job" scope="row">
           <Link className="link" params={{ job: row.uri }} to="journeysJob">
             {row.label}
           </Link>

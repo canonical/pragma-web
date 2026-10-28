@@ -1,0 +1,24 @@
+@prefix surface: <sem://surface#> .
+@prefix dsd: <sem://design-system-docs#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The personas the site is planned and tested for. Each names a coordinate
+# region; which jobs a persona has is derived by overlap, never stored.
+
+dsd:persona.designer a surface:Persona ;
+  rdfs:label "Designer" ;
+  rdfs:comment "The designer archetype, for coverage planning and review of the site." ;
+  surface:essence "Designs product screens and needs the whole component set, each component's anatomy and the tokens it binds." ;
+  surface:region dsd:coordinate.designer .
+
+dsd:persona.engineer a surface:Persona ;
+  rdfs:label "Engineer" ;
+  rdfs:comment "The engineer archetype, for coverage planning and review of the site." ;
+  surface:essence "Builds applications with the components and needs their props, their usage and the standards code is reviewed against." ;
+  surface:region dsd:coordinate.engineer .
+
+dsd:persona.maintainer a surface:Persona ;
+  rdfs:label "Maintainer" ;
+  rdfs:comment "The maintainer archetype, for coverage planning and review of the site." ;
+  surface:essence "Changes the design system and its documentation, and needs to see its model and where the site falls short." ;
+  surface:region dsd:coordinate.maintainer .
