@@ -45,6 +45,10 @@
 #   size.width 25% on the job's cell: its column takes a quarter of the
 #     table, a line for the story to be cut on, and the seven columns of
 #     short values share the rest.
+#   size.min.width 24ch on the job's cell: a reading measure the column
+#     never falls below, so on a table wider than its scrolling region the
+#     label holds one line and the story shows words; a length, since a
+#     percentage resolves to nothing while the table sizes its columns.
 #   size.width 0 with size.min.width 100% on the story: it fills the job's
 #     column and adds nothing to the column's intrinsic width, so the
 #     longest story never sets the table's width and the columns fit the
@@ -310,6 +314,7 @@ node:
                                       role: job cell (.is-job)
                                       styles:
                                         size.width: 25%
+                                        size.min.width: 24ch
                                   - node:
                                       role: numeric cell (.is-numeric)
                                       styles:

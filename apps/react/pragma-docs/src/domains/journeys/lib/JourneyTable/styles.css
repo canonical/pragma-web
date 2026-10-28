@@ -31,6 +31,11 @@
     /* The job's column takes a quarter of the table: a line for the story
      * to be cut on, the rest left to the seven columns of short values. */
     --journey-table-job-share: 25%;
+    /* A quarter of a narrow table is a few letters wide, so the job's column
+     * never falls below a reading measure: the label on one line and enough
+     * of the story to read as words. A length, never a percentage, so it
+     * holds while the table sizes its columns. */
+    --journey-table-job-measure: 24ch;
 
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
@@ -180,6 +185,7 @@
 
   .ds.journey-table .cell.is-job {
     width: var(--journey-table-job-share);
+    min-width: var(--journey-table-job-measure);
   }
 
   .ds.journey-table .cell.is-numeric {
