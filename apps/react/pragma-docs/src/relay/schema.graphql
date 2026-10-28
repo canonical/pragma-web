@@ -57,12 +57,12 @@ type Job implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -77,27 +77,27 @@ type Job implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  The full job story in one sentence carrying the four slots: 'When [circumstance], I want [desire], so I can [outcome], without [pain]'. Kept as one string by decision D2 (data/decisions.ttl); reify the slots only when a real query needs slot-level joins.
+  The full job story in one sentence carrying the four slots: 'When [circumstance], I want [desire], so I can [outcome], without [pain]'. Kept as one string; reify the slots only when a real query needs slot-level joins.
   """
   story: String
 
@@ -112,12 +112,12 @@ type Job implements Node {
   bets: [String!]!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferreds: [Boolean!]!
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -220,7 +220,7 @@ type LensSurfaceEdge {
 }
 
 """
-A reified position or region in demand space. Currently one axis (actor); role and fluency axes join by discussion (decision D5). Reified so that jobs and personas share ONE type: a job's coordinates and a persona's region are compared axis by axis, and the persona↔job link is derived by overlap, never stored.
+A reified position or region in demand space, on three axes: actor, role and fluency. An axis left unconstrained matches any value. Reified so that jobs and personas share ONE type: a job's coordinates and a persona's region are compared axis by axis, and the persona↔job link is derived by overlap, never stored.
 """
 type Coordinate implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -255,12 +255,12 @@ type Coordinate implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -275,32 +275,32 @@ type Coordinate implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -341,7 +341,7 @@ type FluencyEdge {
 }
 
 """
-The species of consumer on a coordinate axis. Base instances: Human, Agent (data/actors.ttl). Surfaces are bi-modal by default — a machine consumer is a first-class actor, not an afterthought.
+The species of consumer on a coordinate axis. Base instances: human and agent (data/actors.ttl). Surfaces are bi-modal by default — a machine consumer is a first-class actor, not an afterthought.
 """
 type Actor implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -361,12 +361,12 @@ type Actor implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -381,32 +381,32 @@ type Actor implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -417,7 +417,7 @@ type Actor implements Node {
 }
 
 """
-A consumer's discipline or authority position on a coordinate axis (engineer, designer, writer; author, operator). Authority is a role, not a fluency level. Project vocabulary: no base instances ship — each spec graph defines its own. An axis left unconstrained matches any role (wildcard). Added by D9 when the two-graph confrontation fired D5's reversal trigger.
+A consumer's discipline or authority position on a coordinate axis (engineer, designer, writer; author, operator). Authority is a role, not a fluency level. Project vocabulary: no base instances ship — each spec graph defines its own. An axis left unconstrained matches any role (wildcard).
 """
 type Role implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -437,12 +437,12 @@ type Role implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -457,32 +457,32 @@ type Role implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -493,7 +493,7 @@ type Role implements Node {
 }
 
 """
-Ordinal familiarity with the system on a coordinate axis: Newcomer < Fluent < Expert (data/fluencies.ttl, ordered by fluencyOrder). Expert is a fluency waypoint, not a role — authority positions are roles. Landed by D17 after the trigger fired twice (Yuki≡Dev in mriya; prose-only waypoint arcs in the docs graph).
+Ordinal familiarity with the system on a coordinate axis: newcomer < fluent < expert (data/fluencies.ttl, ordered by fluencyOrder). Expert is a fluency waypoint, not a role — authority positions are roles.
 """
 type Fluency implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -513,12 +513,12 @@ type Fluency implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -533,22 +533,22 @@ type Fluency implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -556,12 +556,12 @@ type Fluency implements Node {
   fluencyOrder: Int
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -597,12 +597,12 @@ type Persona implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -617,22 +617,22 @@ type Persona implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -640,12 +640,12 @@ type Persona implements Node {
   essence: String
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -676,12 +676,12 @@ type Substrate implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -696,32 +696,32 @@ type Substrate implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -767,12 +767,12 @@ type Capability implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -787,22 +787,22 @@ type Capability implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -812,12 +812,12 @@ type Capability implements Node {
   contract: String
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -838,7 +838,7 @@ type AuthorityFamilyEdge {
 }
 
 """
-The species of authority a capability requires. Base instances (data/authority-families.ttl): read, observe, write, control, genesis. Projects extend with their own families (freefold adds ingress, derive, operator). Reachability and authorization are two layers: authority flows through handles, but write-authorization is checked at the target regardless of which handle called.
+The species of authority a capability requires. Base instances (data/authority-families.ttl): read, observe, write, control, genesis. A project's graph may add its own families. Reachability and authorization are two layers: authority flows through handles, but write-authorization is checked at the target regardless of which handle called.
 """
 type AuthorityFamily implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -858,12 +858,12 @@ type AuthorityFamily implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -878,32 +878,32 @@ type AuthorityFamily implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -914,7 +914,7 @@ type AuthorityFamily implements Node {
 }
 
 """
-What the surface does with the substrate: Curated (re-presents a chosen slice for perception) or Invocable (exposes operations for calling). Instances in data/dimensions.ttl.
+What the surface does with the substrate: curated (re-presents a chosen slice for perception) or invocable (exposes operations for calling). Instances in data/dimensions.ttl.
 """
 type Rendering implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -934,12 +934,12 @@ type Rendering implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -954,32 +954,32 @@ type Rendering implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1010,12 +1010,12 @@ type Direction implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1030,32 +1030,32 @@ type Direction implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1086,12 +1086,12 @@ type Anchoring implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1106,32 +1106,32 @@ type Anchoring implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1142,7 +1142,7 @@ type Anchoring implements Node {
 }
 
 """
-A way of looking at the substrate, tuned for one kind of task: curated, read-facing, standalone. You don't navigate into a lens like a folder — you switch lenses and the same entities re-present. A lens without a slice is a folder (shape F5).
+A way of looking at the substrate, tuned for one kind of task: curated, read-facing, standalone. You don't navigate into a lens like a folder — you switch lenses and the same entities re-present. A lens without a slice is a folder.
 """
 type LensSurface implements Node & Surface {
   """The entity's absolute IRI — the primary key."""
@@ -1165,12 +1165,12 @@ type LensSurface implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1185,22 +1185,22 @@ type LensSurface implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1215,12 +1215,12 @@ type LensSurface implements Node & Surface {
   kindOfLooking: String
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1326,12 +1326,12 @@ type View implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1346,32 +1346,32 @@ type View implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1407,7 +1407,7 @@ type View implements Node & Surface {
 }
 
 """
-A View you dwell in: one entity in depth — the entity page, the spec sheet. Its pairings typically arrive at ColdEntry (deeplinks) or SubjectKept.
+A View you dwell in: one entity in depth — the entity page, the spec sheet. Its pairings typically arrive at cold_entry (deep links) or subject_kept.
 """
 type Detail implements Node & Surface {
   """The entity's absolute IRI — the primary key."""
@@ -1427,12 +1427,12 @@ type Detail implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1447,32 +1447,32 @@ type Detail implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1508,7 +1508,7 @@ type Detail implements Node & Surface {
 }
 
 """
-A View you pass through: preview without commitment, one step back up. Its pairings typically arrive at SubjectKept.
+A View you pass through: preview without commitment, one step back up. Its pairings typically arrive at subject_kept.
 """
 type Peek implements Node & Surface {
   """The entity's absolute IRI — the primary key."""
@@ -1528,12 +1528,12 @@ type Peek implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1548,32 +1548,32 @@ type Peek implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1609,7 +1609,7 @@ type Peek implements Node & Surface {
 }
 
 """
-A View woven through everything: inline mentions, status glyphs. Its pairings arrive at NoMove — reaching it costs nothing, which is its entire point.
+A View woven through everything: inline mentions, status glyphs. Its pairings arrive at no_move — reaching it costs nothing, which is its entire point.
 """
 type Mechanism implements Node & Surface {
   """The entity's absolute IRI — the primary key."""
@@ -1629,12 +1629,12 @@ type Mechanism implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1649,32 +1649,32 @@ type Mechanism implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1730,12 +1730,12 @@ type ComposerSurface implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1750,32 +1750,32 @@ type ComposerSurface implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1831,12 +1831,12 @@ type Editor implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1851,32 +1851,32 @@ type Editor implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -1912,7 +1912,7 @@ type Editor implements Node & Surface {
 }
 
 """
-The invocable surface: where machine consumers call instead of look — API, MCP, CLI. Exposes capabilities directly; it curates nothing, so it has no slice (shape F6 forbids one), and pairings to it carry no arrival (agents have no reorientation to preserve).
+The invocable surface: where machine consumers call instead of look — API, MCP, CLI. Exposes capabilities directly; it curates nothing, so it has no slice, and pairings to it carry no arrival (agents have no reorientation to preserve).
 """
 type Port implements Node & Surface {
   """The entity's absolute IRI — the primary key."""
@@ -1937,12 +1937,12 @@ type Port implements Node & Surface {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -1957,22 +1957,22 @@ type Port implements Node & Surface {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -1982,12 +1982,12 @@ type Port implements Node & Surface {
   protocol: String
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2023,7 +2023,7 @@ type Port implements Node & Surface {
 }
 
 """
-What an arrival keeps, ordered by reorientation cost: ColdEntry(4) keeps nothing; SubjectKept(3) keeps the subject; ViewKept(2) keeps view and subject; NoMove(1) is in-place reach. Pure edge vocabulary — the ex-grade, minus the abolished CallGrade (invocability is a node fact). Instances in data/arrivals.ttl.
+What an arrival keeps, ordered by reorientation cost (reorientationOrder): cold_entry (4) keeps nothing; subject_kept (3) keeps the subject; view_kept (2) keeps view and subject; no_move (1) is in-place reach. Pure edge vocabulary: whether a surface can be called is a fact about the surface, never about an arrival. Instances in data/arrivals.ttl.
 """
 type Preservation implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2043,12 +2043,12 @@ type Preservation implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2063,22 +2063,22 @@ type Preservation implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2088,12 +2088,12 @@ type Preservation implements Node {
   reorientationOrder: Int
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2104,7 +2104,7 @@ type Preservation implements Node {
 }
 
 """
-Whether a pairing is the job's Primary serving surface or a Secondary route. Instances in data/arrivals.ttl.
+Whether a pairing is the job's primary serving surface or a secondary route. Instances in data/arrivals.ttl: primary and secondary.
 """
 type PairingRole implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2124,12 +2124,12 @@ type PairingRole implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2144,32 +2144,32 @@ type PairingRole implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2196,11 +2196,11 @@ type Pairing implements Node {
   pairsSurface: Surface
 
   """
-  What this arrival preserves. Required for curated surfaces; absent for ports (shape F7).
+  What this arrival preserves. Required for curated surfaces; absent for ports.
   """
   arrivals(first: Int, after: String, last: Int, before: String): PreservationConnection!
 
-  """Primary or Secondary."""
+  """primary or secondary."""
   pairingRole: PairingRole
 
   """
@@ -2214,12 +2214,12 @@ type Pairing implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2234,32 +2234,32 @@ type Pairing implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2280,7 +2280,7 @@ type PreservationEdge {
 }
 
 """
-A typed slot kind, one shared vocabulary so 'where is it' means the same thing on every surface (canvas, rails, controls, status, aside…). Base instances in data/regions.ttl; projects extend (mriya adds rail). A region type never changes side — the compass is part of the stationary frame.
+A typed slot kind, one shared vocabulary so 'where is it' means the same thing on every surface. Base instances in data/regions.ttl: canvas, rails, controls, status and aside; a project's graph may add its own. A region type never changes side — the compass is part of the stationary frame.
 """
 type Region implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2300,12 +2300,12 @@ type Region implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2320,32 +2320,32 @@ type Region implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2356,7 +2356,7 @@ type Region implements Node {
 }
 
 """
-A layout's declaration of a region: which region, whether required, and — if optional — WHICH JOB SUMMONS IT (shape F8: no job, no region). One canvas always; everything else earns its slot. Layouts themselves are ds:Layout instances, reused directly (D12), carrying ds:grid/ds:name; surface adds the slot-and-demand layer ds lacks.
+A layout's declaration of a region: which region, whether required, and — if optional — WHICH JOB SUMMONS IT: no job, no region. One canvas always; everything else earns its slot. Layouts themselves are ds:Layout instances, reused directly, carrying ds:grid and ds:name; surface adds the slot-and-demand layer ds lacks.
 """
 type Slot implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2384,12 +2384,12 @@ type Slot implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2404,22 +2404,22 @@ type Slot implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2429,12 +2429,12 @@ type Slot implements Node {
   required: Boolean
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2465,12 +2465,12 @@ type Bet implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2485,22 +2485,22 @@ type Bet implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2508,22 +2508,22 @@ type Bet implements Node {
   test: String
 
   """
-  The concrete instrument that arms this bet — the thing that must exist and run to produce the evidence (a CI job, referrer analytics, a parity diff). A bet with a test but no instrument names a kill-criterion nobody is measuring; naming the instrument is what makes an armed bet continuously tested (D28).
+  The concrete instrument that arms this bet — the thing that must exist and run to produce the evidence (a CI job, referrer analytics, a parity diff). A bet with a test but no instrument names a kill-criterion nobody is measuring; naming the instrument is what makes an armed bet continuously tested.
   """
   instruments: [String!]!
 
   """
-  The prior, 0..1 — how strongly the bet is believed before the instrument reports (D28). A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from assume:status (the epistemic state); this is the number.
+  The prior, 0..1 — how strongly the bet is believed before the instrument reports. A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from assume:status (the epistemic state); this is the number.
   """
   confidence: Float
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2554,12 +2554,12 @@ type Law implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2574,32 +2574,32 @@ type Law implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2610,7 +2610,7 @@ type Law implements Node {
 }
 
 """
-A worked story walked against the specification to a verdict — the sufficiency test that jobs (existence) and bets (assumption) cannot give. Where the no-job-no-element law grounds why a surface exists, an exemplar grounds whether the surfaces a job touches actually let a real person complete it. A story that cannot complete across a job's served surfaces is a WALL found before anything is built; one that completes only awkwardly is CEREMONY; one that completes cleanly RENDERS. Ported from the source falsification traditions (mriya's CLEAN/PIN/BREAK, the docsite's pilot go/no-go).
+A worked story walked against the specification to a verdict — the sufficiency test that jobs (existence) and bets (assumption) cannot give. Where the no-job-no-element law grounds why a surface exists, an exemplar grounds whether the surfaces a job touches actually let a real person complete it. A story that cannot complete across a job's served surfaces is a wall found before anything is built; one that completes only awkwardly is a ceremony; one that completes cleanly renders.
 """
 type Exemplar implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2625,11 +2625,11 @@ type Exemplar implements Node {
   walksJobs(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The surface(s) the story passes through — what a Wall or Ceremony verdict indicts, and what a spec change must re-walk.
+  The surface(s) the story passes through — what a wall or ceremony verdict indicts, and what a spec change must re-walk.
   """
   walksSurfaces(first: Int, after: String, last: Int, before: String): SurfaceConnection!
 
-  """How the walk came out: Renders, Ceremony, or Wall."""
+  """How the walk came out: renders, ceremony or wall."""
   verdict: Verdict
 
   """
@@ -2643,12 +2643,12 @@ type Exemplar implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2663,22 +2663,22 @@ type Exemplar implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
@@ -2693,12 +2693,12 @@ type Exemplar implements Node {
   finding: String
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2709,7 +2709,7 @@ type Exemplar implements Node {
 }
 
 """
-The result of walking an exemplar: Renders (completes cleanly), Ceremony (completes but awkwardly — a friction worth recording), Wall (cannot complete — a real gap). Instances in data/verdicts.ttl. A verdict is dated and cites the surfaces walked; re-walking on a spec change is the regression test.
+The result of walking an exemplar: renders (completes cleanly), ceremony (completes but awkwardly — a friction worth recording) or wall (cannot complete — a real gap). Instances in data/verdicts.ttl. A verdict is dated and cites the surfaces walked; re-walking on a spec change is the regression test.
 """
 type Verdict implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2729,12 +2729,12 @@ type Verdict implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2749,32 +2749,32 @@ type Verdict implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -2785,7 +2785,7 @@ type Verdict implements Node {
 }
 
 """
-Why an item is no longer (or never was) live: Superseded, Deprecated, Cancelled, Rejected (data/validities.ttl). Invalid items STAY in the graph with a mandatory note — the know-your-neighbour rule: anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from assume:status (the epistemics of assumptions). Absence of validity means live.
+Why an item is no longer (or never was) live: superseded, deprecated, cancelled or rejected (data/validities.ttl). Invalid items STAY in the graph with a note — the know-your-neighbour rule: anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from assume:status (the epistemics of assumptions). Absence of validity means live.
 """
 type Validity implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -2805,12 +2805,12 @@ type Validity implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -2825,32 +2825,32 @@ type Validity implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 
@@ -4483,7 +4483,7 @@ type Specification implements Node {
 }
 
 """
-An addressable place of encounter between a consumer and the substrate. Its nature is carried by three dimensions (rendering, direction, anchoring); the idiom classes below are named cells whose dimension values materialize through the closure — assert the idiom, infer the physics. A surface matching no idiom is asserted as a plain Surface with raw dimensions: fully described, honestly unnamed. How a surface is PRESENT (ambient, transient, dwelt-in) is edge information and lives on pairings as arrival — never on the node (the presence-dimension deletion, D11).
+An addressable place of encounter between a consumer and the substrate. Its nature is carried by three dimensions (rendering, direction, anchoring); the idiom classes below are named cells whose dimension values materialize through the closure — assert the idiom, infer the physics. A surface matching no idiom is asserted as a plain Surface with raw dimensions: fully described, honestly unnamed. How a surface is PRESENT (ambient, transient, dwelt-in) is edge information and lives on pairings as arrival — never on the node.
 """
 interface Surface implements Node {
   """The entity's absolute IRI — the primary key."""
@@ -4528,12 +4528,12 @@ interface Surface implements Node {
   serves(first: Int, after: String, last: Int, before: String): JobConnection!
 
   """
-  The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
+  The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening.
   """
   granteds(first: Int, after: String, last: Int, before: String): CapabilityConnection!
 
   """
-  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
+  An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size.
   """
   expandsTos(first: Int, after: String, last: Int, before: String): RegionConnection!
 
@@ -4548,32 +4548,32 @@ interface Surface implements Node {
   declaresSlots(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts.
+  What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts.
   """
   rendersIns(first: Int, after: String, last: Int, before: String): SlotConnection!
 
   """
-  This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone.
+  This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone.
   """
   validities(first: Int, after: String, last: Int, before: String): ValidityConnection!
 
   """
-  The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours.
+  The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours.
   """
   supersededBies: [String!]!
 
   """
-  The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
+  The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery.
   """
   homedIns(first: Int, after: String, last: Int, before: String): LensSurfaceConnection!
 
   """
-  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved.
+  This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved.
   """
   deferred: Boolean
 
   """
-  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
+  What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language.
   """
   wakeCondition: String
 

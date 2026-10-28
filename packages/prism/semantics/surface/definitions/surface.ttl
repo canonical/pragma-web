@@ -24,15 +24,15 @@ surface: a owl:Ontology ;
 
 surface:Validity a owl:Class ;
   rdfs:label "Validity" ;
-  rdfs:comment "Why an item is no longer (or never was) live: Superseded, Deprecated, Cancelled, Rejected (data/validities.ttl). Invalid items STAY in the graph with a mandatory note — the know-your-neighbour rule: anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from assume:status (the epistemics of assumptions). Absence of validity means live." .
+  rdfs:comment "Why an item is no longer (or never was) live: superseded, deprecated, cancelled or rejected (data/validities.ttl). Invalid items STAY in the graph with a note — the know-your-neighbour rule: anyone who finds the node learns its fate and its reason. Distinct from deferred (still wanted, consciously parked) and from assume:status (the epistemics of assumptions). Absence of validity means live." .
 
 surface:Verdict a owl:Class ;
   rdfs:label "Verdict" ;
-  rdfs:comment "The result of walking an exemplar: Renders (completes cleanly), Ceremony (completes but awkwardly — a friction worth recording), Wall (cannot complete — a real gap). Instances in data/verdicts.ttl. A verdict is dated and cites the surfaces walked; re-walking on a spec change is the regression test." .
+  rdfs:comment "The result of walking an exemplar: renders (completes cleanly), ceremony (completes but awkwardly — a friction worth recording) or wall (cannot complete — a real gap). Instances in data/verdicts.ttl. A verdict is dated and cites the surfaces walked; re-walking on a spec change is the regression test." .
 
 surface:Exemplar a owl:Class ;
   rdfs:label "Exemplar" ;
-  rdfs:comment "A worked story walked against the specification to a verdict — the sufficiency test that jobs (existence) and bets (assumption) cannot give. Where the no-job-no-element law grounds why a surface exists, an exemplar grounds whether the surfaces a job touches actually let a real person complete it. A story that cannot complete across a job's served surfaces is a WALL found before anything is built; one that completes only awkwardly is CEREMONY; one that completes cleanly RENDERS. Ported from the source falsification traditions (mriya's CLEAN/PIN/BREAK, the docsite's pilot go/no-go)." .
+  rdfs:comment "A worked story walked against the specification to a verdict — the sufficiency test that jobs (existence) and bets (assumption) cannot give. Where the no-job-no-element law grounds why a surface exists, an exemplar grounds whether the surfaces a job touches actually let a real person complete it. A story that cannot complete across a job's served surfaces is a wall found before anything is built; one that completes only awkwardly is a ceremony; one that completes cleanly renders." .
 
 surface:Law a owl:Class ;
   rdfs:label "Law" ;
@@ -44,11 +44,11 @@ surface:Bet a owl:Class ;
 
 surface:Slot a owl:Class ;
   rdfs:label "Slot" ;
-  rdfs:comment "A layout's declaration of a region: which region, whether required, and — if optional — WHICH JOB SUMMONS IT (shape F8: no job, no region). One canvas always; everything else earns its slot. Layouts themselves are ds:Layout instances, reused directly (D12), carrying ds:grid/ds:name; surface adds the slot-and-demand layer ds lacks." .
+  rdfs:comment "A layout's declaration of a region: which region, whether required, and — if optional — WHICH JOB SUMMONS IT: no job, no region. One canvas always; everything else earns its slot. Layouts themselves are ds:Layout instances, reused directly, carrying ds:grid and ds:name; surface adds the slot-and-demand layer ds lacks." .
 
 surface:Region a owl:Class ;
   rdfs:label "Region" ;
-  rdfs:comment "A typed slot kind, one shared vocabulary so 'where is it' means the same thing on every surface (canvas, rails, controls, status, aside…). Base instances in data/regions.ttl; projects extend (mriya adds rail). A region type never changes side — the compass is part of the stationary frame." .
+  rdfs:comment "A typed slot kind, one shared vocabulary so 'where is it' means the same thing on every surface. Base instances in data/regions.ttl: canvas, rails, controls, status and aside; a project's graph may add its own. A region type never changes side — the compass is part of the stationary frame." .
 
 surface:Pairing a owl:Class ;
   rdfs:label "Pairing" ;
@@ -56,16 +56,16 @@ surface:Pairing a owl:Class ;
 
 surface:PairingRole a owl:Class ;
   rdfs:label "Pairing role" ;
-  rdfs:comment "Whether a pairing is the job's Primary serving surface or a Secondary route. Instances in data/arrivals.ttl." .
+  rdfs:comment "Whether a pairing is the job's primary serving surface or a secondary route. Instances in data/arrivals.ttl: primary and secondary." .
 
 surface:Preservation a owl:Class ;
   rdfs:label "Preservation" ;
-  rdfs:comment "What an arrival keeps, ordered by reorientation cost: ColdEntry(4) keeps nothing; SubjectKept(3) keeps the subject; ViewKept(2) keeps view and subject; NoMove(1) is in-place reach. Pure edge vocabulary — the ex-grade, minus the abolished CallGrade (invocability is a node fact). Instances in data/arrivals.ttl." .
+  rdfs:comment "What an arrival keeps, ordered by reorientation cost (reorientationOrder): cold_entry (4) keeps nothing; subject_kept (3) keeps the subject; view_kept (2) keeps view and subject; no_move (1) is in-place reach. Pure edge vocabulary: whether a surface can be called is a fact about the surface, never about an arrival. Instances in data/arrivals.ttl." .
 
 surface:Port a owl:Class ;
   rdfs:subClassOf surface:Surface ;
   rdfs:label "Port" ;
-  rdfs:comment "The invocable surface: where machine consumers call instead of look — API, MCP, CLI. Exposes capabilities directly; it curates nothing, so it has no slice (shape F6 forbids one), and pairings to it carry no arrival (agents have no reorientation to preserve)." .
+  rdfs:comment "The invocable surface: where machine consumers call instead of look — API, MCP, CLI. Exposes capabilities directly; it curates nothing, so it has no slice, and pairings to it carry no arrival (agents have no reorientation to preserve)." .
 
 surface:Editor a owl:Class ;
   rdfs:subClassOf surface:Surface ;
@@ -80,17 +80,17 @@ surface:ComposerSurface a owl:Class ;
 surface:Mechanism a owl:Class ;
   rdfs:subClassOf surface:Surface ;
   rdfs:label "Mechanism" ;
-  rdfs:comment "A View woven through everything: inline mentions, status glyphs. Its pairings arrive at NoMove — reaching it costs nothing, which is its entire point." .
+  rdfs:comment "A View woven through everything: inline mentions, status glyphs. Its pairings arrive at no_move — reaching it costs nothing, which is its entire point." .
 
 surface:Peek a owl:Class ;
   rdfs:subClassOf surface:Surface ;
   rdfs:label "Peek" ;
-  rdfs:comment "A View you pass through: preview without commitment, one step back up. Its pairings typically arrive at SubjectKept." .
+  rdfs:comment "A View you pass through: preview without commitment, one step back up. Its pairings typically arrive at subject_kept." .
 
 surface:Detail a owl:Class ;
   rdfs:subClassOf surface:Surface ;
   rdfs:label "Detail" ;
-  rdfs:comment "A View you dwell in: one entity in depth — the entity page, the spec sheet. Its pairings typically arrive at ColdEntry (deeplinks) or SubjectKept." .
+  rdfs:comment "A View you dwell in: one entity in depth — the entity page, the spec sheet. Its pairings typically arrive at cold_entry (deep links) or subject_kept." .
 
 surface:View a owl:Class ;
   rdfs:subClassOf surface:Surface ;
@@ -106,7 +106,7 @@ surface:Lens a owl:Class ;
   # lensSurfaces, the same pattern as ComposerSurface.
   graphql:name "LensSurface" ;
   rdfs:label "Lens" ;
-  rdfs:comment "A way of looking at the substrate, tuned for one kind of task: curated, read-facing, standalone. You don't navigate into a lens like a folder — you switch lenses and the same entities re-present. A lens without a slice is a folder (shape F5)." .
+  rdfs:comment "A way of looking at the substrate, tuned for one kind of task: curated, read-facing, standalone. You don't navigate into a lens like a folder — you switch lenses and the same entities re-present. A lens without a slice is a folder." .
 
 surface:Anchoring a owl:Class ;
   rdfs:label "Anchoring" ;
@@ -118,11 +118,11 @@ surface:Direction a owl:Class ;
 
 surface:Rendering a owl:Class ;
   rdfs:label "Rendering" ;
-  rdfs:comment "What the surface does with the substrate: Curated (re-presents a chosen slice for perception) or Invocable (exposes operations for calling). Instances in data/dimensions.ttl." .
+  rdfs:comment "What the surface does with the substrate: curated (re-presents a chosen slice for perception) or invocable (exposes operations for calling). Instances in data/dimensions.ttl." .
 
 surface:AuthorityFamily a owl:Class ;
   rdfs:label "Authority family" ;
-  rdfs:comment "The species of authority a capability requires. Base instances (data/authority-families.ttl): read, observe, write, control, genesis. Projects extend with their own families (freefold adds ingress, derive, operator). Reachability and authorization are two layers: authority flows through handles, but write-authorization is checked at the target regardless of which handle called." .
+  rdfs:comment "The species of authority a capability requires. Base instances (data/authority-families.ttl): read, observe, write, control, genesis. A project's graph may add its own families. Reachability and authorization are two layers: authority flows through handles, but write-authorization is checked at the target regardless of which handle called." .
 
 surface:Capability a owl:Class ;
   rdfs:label "Capability" ;
@@ -138,19 +138,19 @@ surface:Persona a owl:Class ;
 
 surface:Fluency a owl:Class ;
   rdfs:label "Fluency" ;
-  rdfs:comment "Ordinal familiarity with the system on a coordinate axis: Newcomer < Fluent < Expert (data/fluencies.ttl, ordered by fluencyOrder). Expert is a fluency waypoint, not a role — authority positions are roles. Landed by D17 after the trigger fired twice (Yuki≡Dev in mriya; prose-only waypoint arcs in the docs graph)." .
+  rdfs:comment "Ordinal familiarity with the system on a coordinate axis: newcomer < fluent < expert (data/fluencies.ttl, ordered by fluencyOrder). Expert is a fluency waypoint, not a role — authority positions are roles." .
 
 surface:Role a owl:Class ;
   rdfs:label "Role" ;
-  rdfs:comment "A consumer's discipline or authority position on a coordinate axis (engineer, designer, writer; author, operator). Authority is a role, not a fluency level. Project vocabulary: no base instances ship — each spec graph defines its own. An axis left unconstrained matches any role (wildcard). Added by D9 when the two-graph confrontation fired D5's reversal trigger." .
+  rdfs:comment "A consumer's discipline or authority position on a coordinate axis (engineer, designer, writer; author, operator). Authority is a role, not a fluency level. Project vocabulary: no base instances ship — each spec graph defines its own. An axis left unconstrained matches any role (wildcard)." .
 
 surface:Actor a owl:Class ;
   rdfs:label "Actor" ;
-  rdfs:comment "The species of consumer on a coordinate axis. Base instances: Human, Agent (data/actors.ttl). Surfaces are bi-modal by default — a machine consumer is a first-class actor, not an afterthought." .
+  rdfs:comment "The species of consumer on a coordinate axis. Base instances: human and agent (data/actors.ttl). Surfaces are bi-modal by default — a machine consumer is a first-class actor, not an afterthought." .
 
 surface:Coordinate a owl:Class ;
   rdfs:label "Coordinate" ;
-  rdfs:comment "A reified position or region in demand space. Currently one axis (actor); role and fluency axes join by discussion (decision D5). Reified so that jobs and personas share ONE type: a job's coordinates and a persona's region are compared axis by axis, and the persona↔job link is derived by overlap, never stored." .
+  rdfs:comment "A reified position or region in demand space, on three axes: actor, role and fluency. An axis left unconstrained matches any value. Reified so that jobs and personas share ONE type: a job's coordinates and a persona's region are compared axis by axis, and the persona↔job link is derived by overlap, never stored." .
 
 surface:Job a owl:Class ;
   rdfs:label "Job" ;
@@ -158,26 +158,26 @@ surface:Job a owl:Class ;
 
 surface:Surface a owl:Class ;
   rdfs:label "Surface" ;
-  rdfs:comment "An addressable place of encounter between a consumer and the substrate. Its nature is carried by three dimensions (rendering, direction, anchoring); the idiom classes below are named cells whose dimension values materialize through the closure — assert the idiom, infer the physics. A surface matching no idiom is asserted as a plain Surface with raw dimensions: fully described, honestly unnamed. How a surface is PRESENT (ambient, transient, dwelt-in) is edge information and lives on pairings as arrival — never on the node (the presence-dimension deletion, D11)." .
+  rdfs:comment "An addressable place of encounter between a consumer and the substrate. Its nature is carried by three dimensions (rendering, direction, anchoring); the idiom classes below are named cells whose dimension values materialize through the closure — assert the idiom, infer the physics. A surface matching no idiom is asserted as a plain Surface with raw dimensions: fully described, honestly unnamed. How a surface is PRESENT (ambient, transient, dwelt-in) is edge information and lives on pairings as arrival — never on the node." .
 
 surface:homedIn a owl:ObjectProperty ;
   rdfs:range surface:Lens ;
   rdfs:label "homed in" ;
-  rdfs:comment "The lens where a noun's mentions land (domain open by design — D1: zero TBox edges to the grammar package; nouns pair in data) (D31: a chip's jump goes to the canonical home). The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery." .
+  rdfs:comment "The lens where a noun's mentions land, and where a chip's jump goes: the noun's canonical home. Its domain is open by design: nouns pair with their home in data. The object form of grammar:home's prose — shapeable: the one-home law becomes checkable data, and a noun without a homedIn target is a visible work item, not a mystery." .
 
 surface:supersededBy a owl:ObjectProperty ;
   rdfs:label "superseded by" ;
-  rdfs:comment "The successor item. Required when validity is Superseded — a supersession without a forwarding address strands the neighbours." .
+  rdfs:comment "The successor item. Required when validity is superseded — a supersession without a forwarding address strands the neighbours." .
 
 surface:validity a owl:ObjectProperty ;
   rdfs:range surface:Validity ;
   rdfs:label "validity" ;
-  rdfs:comment "This item's invalidity, when it has one. Requires exactly one validityNote (F12); Superseded requires supersededBy. Never delete — tombstone." .
+  rdfs:comment "This item's invalidity, when it has one. Explained by one validityNote; superseded requires supersededBy. Never delete — tombstone." .
 
 surface:rendersIn a owl:ObjectProperty ;
   rdfs:range surface:Slot ;
   rdfs:label "renders in" ;
-  rdfs:comment "What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree (D13); within remains the layout-free shorthand for specs that skip layouts." .
+  rdfs:comment "What fills a slot — a surface now, components later (domain deliberately open). Where a surface has rendersIn, its within is DERIVABLE (slot → layout → composing surface) and an asserted within must agree; within remains the layout-free shorthand for specs that skip layouts." .
 
 surface:declaresSlot a owl:ObjectProperty ;
   rdfs:range surface:Slot ;
@@ -192,12 +192,12 @@ surface:composes a owl:ObjectProperty ;
 surface:expandsTo a owl:ObjectProperty ;
   rdfs:range surface:Region ;
   rdfs:label "expands to" ;
-  rdfs:comment "An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance (D29). A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size." .
+  rdfs:comment "An embedded curated surface can expand out of its host slot into a larger region — the folded-to-fullscreen affordance. A graph shown folded below the fold on an entity page expands into the overlay; a rail can expand into the canvas. The expansion is a presentation state, not a second surface: same slice, more room. When present, the surface owes a stated collapsed floor (it must be usable BEFORE expansion) — expansion is enhancement, never the only working size." .
 
 surface:granted a owl:ObjectProperty ;
   rdfs:range surface:Capability ;
   rdfs:label "granted" ;
-  rdfs:comment "The capability (usually a bundle) this holder actually receives — the grant record (D26). Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening." .
+  rdfs:comment "The capability (usually a bundle) this holder actually receives — the grant record. Grants make authority auditable: the parity query compares what agent and human holders reach; narrowing applies through attenuates chains, never by widening." .
 
 surface:serves a owl:ObjectProperty ;
   rdfs:range surface:Job ;
@@ -217,24 +217,24 @@ surface:validityNote a owl:DatatypeProperty ;
 surface:wakeCondition a owl:DatatypeProperty ;
   rdfs:range xsd:string ;
   rdfs:label "wake condition" ;
-  rdfs:comment "What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work (D23). A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language." .
+  rdfs:comment "What must become true for this deferred item to wake — the written trigger that turns a parked promise into scheduled work. A deferral with a wake condition is a roadmap; without one it is furniture. Sources phrase these as 'when X exists / earns it / matures'; carry that language." .
 
 surface:deferred a owl:DatatypeProperty ;
   rdfs:range xsd:boolean ;
   rdfs:label "deferred" ;
-  rdfs:comment "This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (F10) — a job must be served or consciously deferred, never silently unserved." .
+  rdfs:comment "This job is explicitly parked by the spec (its status note carries the reason and trigger). Exempts it from the served gate (JobShape) — a job must be served or consciously deferred, never silently unserved." .
 
 surface:verdict a owl:ObjectProperty ;
   rdfs:domain surface:Exemplar ;
   rdfs:range surface:Verdict ;
   rdfs:label "verdict" ;
-  rdfs:comment "How the walk came out: Renders, Ceremony, or Wall." .
+  rdfs:comment "How the walk came out: renders, ceremony or wall." .
 
 surface:walksSurface a owl:ObjectProperty ;
   rdfs:domain surface:Exemplar ;
   rdfs:range surface:Surface ;
   rdfs:label "walks surface" ;
-  rdfs:comment "The surface(s) the story passes through — what a Wall or Ceremony verdict indicts, and what a spec change must re-walk." .
+  rdfs:comment "The surface(s) the story passes through — what a wall or ceremony verdict indicts, and what a spec change must re-walk." .
 
 surface:walksJob a owl:ObjectProperty ;
   rdfs:domain surface:Exemplar ;
@@ -258,13 +258,13 @@ surface:confidence a owl:DatatypeProperty ;
   rdfs:domain surface:Bet ;
   rdfs:range xsd:decimal ;
   rdfs:label "confidence" ;
-  rdfs:comment "The prior, 0..1 — how strongly the bet is believed before the instrument reports (D28). A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from assume:status (the epistemic state); this is the number." .
+  rdfs:comment "The prior, 0..1 — how strongly the bet is believed before the instrument reports. A ledger you can be measurably wrong about builds judgment; scoring recorded confidence against outcomes is calibration. Distinct from assume:status (the epistemic state); this is the number." .
 
 surface:instrument a owl:DatatypeProperty ;
   rdfs:domain surface:Bet ;
   rdfs:range xsd:string ;
   rdfs:label "instrument" ;
-  rdfs:comment "The concrete instrument that arms this bet — the thing that must exist and run to produce the evidence (a CI job, referrer analytics, a parity diff). A bet with a test but no instrument names a kill-criterion nobody is measuring; naming the instrument is what makes an armed bet continuously tested (D28)." .
+  rdfs:comment "The concrete instrument that arms this bet — the thing that must exist and run to produce the evidence (a CI job, referrer analytics, a parity diff). A bet with a test but no instrument names a kill-criterion nobody is measuring; naming the instrument is what makes an armed bet continuously tested." .
 
 surface:test a owl:DatatypeProperty ;
   rdfs:domain surface:Bet ;
@@ -294,13 +294,13 @@ surface:pairingRole a owl:ObjectProperty ;
   rdfs:domain surface:Pairing ;
   rdfs:range surface:PairingRole ;
   rdfs:label "pairing role" ;
-  rdfs:comment "Primary or Secondary." .
+  rdfs:comment "primary or secondary." .
 
 surface:arrival a owl:ObjectProperty ;
   rdfs:domain surface:Pairing ;
   rdfs:range surface:Preservation ;
   rdfs:label "arrival" ;
-  rdfs:comment "What this arrival preserves. Required for curated surfaces; absent for ports (shape F7)." .
+  rdfs:comment "What this arrival preserves. Required for curated surfaces; absent for ports." .
 
 surface:pairsSurface a owl:ObjectProperty ;
   rdfs:domain surface:Pairing ;
@@ -463,4 +463,4 @@ surface:story a owl:DatatypeProperty ;
   rdfs:domain surface:Job ;
   rdfs:range xsd:string ;
   rdfs:label "story" ;
-  rdfs:comment "The full job story in one sentence carrying the four slots: 'When [circumstance], I want [desire], so I can [outcome], without [pain]'. Kept as one string by decision D2 (data/decisions.ttl); reify the slots only when a real query needs slot-level joins." .
+  rdfs:comment "The full job story in one sentence carrying the four slots: 'When [circumstance], I want [desire], so I can [outcome], without [pain]'. Kept as one string; reify the slots only when a real query needs slot-level joins." .

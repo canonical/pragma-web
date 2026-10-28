@@ -12,7 +12,7 @@
 surface:JobShape a sh:NodeShape ;
   sh:targetClass surface:Job ;
   rdfs:label "Job shape" ;
-  rdfs:comment "A job carries one story with its four slots, one coordinate region, at least one acceptance clause, and any number of bets by id; and it is served (the forJob of at least one pairing) or consciously deferred, never silently unserved (the served gate, F10)." ;
+  rdfs:comment "A job carries one story with its four slots, one coordinate region, at least one acceptance clause, and any number of bets by id; and it is served (the forJob of at least one pairing) or consciously deferred, never silently unserved (the served gate)." ;
   sh:property [ sh:path surface:acceptance ; sh:minCount 1 ] ;
   sh:property [ sh:path surface:story ; sh:minCount 1 ; sh:maxCount 1 ] ;
   sh:property [ sh:path surface:coordinates ; sh:minCount 1 ; sh:maxCount 1 ] ;
