@@ -11,6 +11,7 @@ import {
 import { select } from "d3-selection";
 import type { MouseEvent } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { HUBS_SCALE, OVERVIEW_SCALE } from "./constants.js";
 import GraphCanvas from "./GraphCanvas.js";
 import useGraphZoomBucket from "./hooks/useGraphZoomBucket.js";
 import type { GraphBox, GraphCameraMemory } from "./types.js";
@@ -563,13 +564,23 @@ describe("GraphCanvas", () => {
     rerender(draw({ x: 0, y: 0, width: 400, height: 300 }));
     expect(legibleWindow).not.toHaveBeenCalled();
     rerender(draw(large));
-    expect(legibleWindow).toHaveBeenCalledExactlyOnceWith(large, VIEW_BOX, 1);
+    expect(legibleWindow).toHaveBeenCalledExactlyOnceWith(
+      large,
+      VIEW_BOX,
+      1,
+      HUBS_SCALE,
+    );
     expect(readCamera()).toBe("translate(-160,-80) scale(1)");
-    // Fit shows the whole box from its top-left corner at the overview's
-    // floor, with no window.
+    // Fit shows the window of the box at the overview's floor: the window
+    // fits there whole, so the camera fits it.
     fireEvent.click(screen.getByRole("button", { name: "Fit" }));
-    expect(readCamera()).toBe("translate(0,0) scale(0.7500007499999999)");
-    expect(legibleWindow).toHaveBeenCalledOnce();
+    expect(legibleWindow).toHaveBeenLastCalledWith(
+      large,
+      VIEW_BOX,
+      1,
+      OVERVIEW_SCALE,
+    );
+    expect(readCamera()).toBe("translate(-160,-80) scale(1)");
   });
 
   it("never frames a region from a legible view into an illegible one", () => {

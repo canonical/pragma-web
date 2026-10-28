@@ -351,15 +351,17 @@ site's own catalog, and the factory holds no reader-facing string.
   `GraphCanvasProps`, `GraphBox`, `GraphCameraMemory` (where a camera
   stood, in screen terms, which a canvas mounted again on the same memory
   resumes), `GraphFrameRequest` (a one-off fit the
-  camera makes once per serial), `GraphLegibleWindow` (the window a refit
-  shows of a box too large for the legible zoom), `GraphOpening` (the
+  camera makes once per serial), `GraphLegibleWindow` (the window a fit
+  shows of a box too large for its floor, the legible zoom for a refit or
+  the overview's for Fit), `GraphOpening` (the
   camera a canvas opens on once the client has measured it, and again when
   a resize shrinks an unmoved camera's view below the legible zoom),
   `GraphTransform`, `GraphZoomBucket`. A refit never zooms a legible view
   out to an illegible one; Fit fits the whole graph, below the wheel's
   floor when it must but never into the overview (a graph too large for
-  12/16 on screen shows from its top-left corner at that zoom, the rest a
-  pan away), and the camera pans over the graph's whole bounds however
+  12/16 on screen shows the canvas's legible window of it at that zoom,
+  or its top-left corner at that zoom without one, the rest a pan away), and
+  the camera pans over the graph's whole bounds however
   small a window of it the viewBox opens on.
 - Well geometry: `settle`, `findEdgeEndpoint`, `relaxBoxes`,
   `buildQuadArc`, `buildSelfLoop`; types `WellBox`, `WellPoint`,
