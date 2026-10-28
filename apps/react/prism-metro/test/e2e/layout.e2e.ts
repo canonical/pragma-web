@@ -8,6 +8,8 @@
  * asserted is what the layout promises: one intrinsic grid, the shell, which
  * is the one query container; no page scroll, and nothing reaching past the
  * viewport or past its region, a strip's crumb included, at 390px too,
+ * a strip's trail on one line with its current crumb's text clipped by
+ * the crumb,
  * on a station's page, a term's page and a station or term addressed by
  * its absolute IRI; twelve columns at 1440px and
  * four at 390px; a workspace canvas that never scrolls; a document whose
@@ -35,6 +37,7 @@ import {
   PAGE_SETTLE_MS,
   STATION_IRI_PATH,
   TERM_IRI_PATH,
+  WIDTH_TOLERANCE_PX,
   WORKSPACE_PATH,
 } from "./constants.js";
 import startServer from "./startServer.js";
@@ -155,6 +158,14 @@ describe.each(VIEWPORTS)("at $name px", (viewport) => {
         expect(band.contentEnd, `${theme} ${band.element}`).toBeCloseTo(
           layout.page.innerWidth,
           1,
+        );
+      }
+      // A lens's trail keeps to one line, its current crumb's text painted
+      // no further than the trail's end, clipped by the crumb itself.
+      for (const trail of layout.trails) {
+        expect(trail.rows, `${theme} ${trail.element}`).toBe(1);
+        expect(trail.textEnd, `${theme} ${trail.element}`).toBeLessThanOrEqual(
+          trail.end + WIDTH_TOLERANCE_PX,
         );
       }
       expect(

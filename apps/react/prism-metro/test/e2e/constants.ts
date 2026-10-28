@@ -39,3 +39,9 @@ export const TERM_IRI_PATH = `/definitions/${encodeURIComponent("http://www.w3.o
  * wider than the strip at a phone's width.
  */
 export const STATION_IRI_PATH = `/stations/${encodeURIComponent("https://metro.example/onto#northgate")}`;
+
+/**
+ * How far past another edge, in pixels, an edge may round: sub-pixel
+ * layout rounds each box on its own.
+ */
+export const WIDTH_TOLERANCE_PX = 0.5;
