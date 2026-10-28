@@ -5,6 +5,7 @@ import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
 import { defineConfig } from "vite";
 import redirectPackageArtifacts from "./src/relay/redirectPackageArtifacts.js";
+import { createIconsPlugin } from "./vite-plugin-ds-icons.js";
 
 // Path aliases are declared as Node subpath imports in package.json
 // "imports", one per domain, each naming that domain's barrel (#lib/ui,
@@ -32,8 +33,13 @@ export default defineConfig(({ mode }) => ({
   // same name, so the packages' queries fetch what the site's own arms read.
   // vitest, the dev server (its prepare step and its render), the server
   // build and Storybook all load this file, so each of them runs the
-  // packages the same way.
+  // packages the same way. createIconsPlugin() serves the
+  // @canonical/ds-assets icons at /icons in dev and copies them into the
+  // client build output: design-system components fetch glyphs at runtime
+  // from `/icons/<name>.svg#<name>`, and an unserved icon renders empty with
+  // no error.
   plugins: [
+    createIconsPlugin(),
     redirectPackageArtifacts({
       appRoot: APP_ROOT,
       relayConfig: join(APP_ROOT, "relay.config.json"),

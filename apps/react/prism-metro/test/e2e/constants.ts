@@ -62,3 +62,12 @@ export const STATION_IRI_PATH = `/stations/${encodeURIComponent("https://metro.e
  * layout rounds each box on its own.
  */
 export const WIDTH_TOLERANCE_PX = 0.5;
+
+/**
+ * The glyph the published `SidePanel`'s close button draws, at the path
+ * every design-system `Icon` resolves it from.
+ */
+export const CLOSE_ICON_PATH = "/icons/close.svg";
+
+/** The fragment of `CLOSE_ICON_PATH` holding the glyph itself. */
+export const CLOSE_ICON_ID = "close";

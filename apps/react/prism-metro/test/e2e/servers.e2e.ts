@@ -11,7 +11,13 @@
  * `test` run by the `*.e2e.ts` name; run it with `bun run test:e2e`.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { DEV_READY_MS, GRAPH_READY_MS, PREVIEW_READY_MS } from "./constants.js";
+import {
+  CLOSE_ICON_ID,
+  CLOSE_ICON_PATH,
+  DEV_READY_MS,
+  GRAPH_READY_MS,
+  PREVIEW_READY_MS,
+} from "./constants.js";
 import startServer from "./startServer.js";
 import type { RunningServer } from "./types.js";
 
@@ -57,7 +63,7 @@ afterAll(() => graph.stop());
 describe("the server matrix serves correctly", () => {
   for (const cell of MATRIX) {
     it(
-      `${cell.script} serves an HTML page and JS assets (not HTML)`,
+      `${cell.script} serves an HTML page, JS assets and icons (not HTML)`,
       async () => {
         const server = await startServer(cell.script, CWD, {
           timeoutMs: cell.timeoutMs,
@@ -83,13 +89,20 @@ describe("the server matrix serves correctly", () => {
           expect(asset.status).toBe(200);
           expect(asset.headers.get("content-type")).toMatch(JS_CONTENT_TYPE);
 
+          // 4. The design system's icons are served, as SVG, never as the
+          // HTML page: a component's icon drawn from anything else is empty.
+          const icon = await fetch(`${server.base}${CLOSE_ICON_PATH}`);
+          expect(icon.status).toBe(200);
+          expect(icon.headers.get("content-type")).toMatch(/image\/svg\+xml/);
+          expect(await icon.text()).toContain(`id="${CLOSE_ICON_ID}"`);
+
           if (cell.ssr) {
-            // 4. The page's own title, exactly once, inside <head>.
+            // 5. The page's own title, exactly once, inside <head>.
             const head = html.slice(0, html.indexOf("</head>"));
             expect(head.match(/<title>/g)?.length ?? 0).toBe(1);
             expect(head).toContain("<title>Stations — Metro</title>");
 
-            // 5. /sitemap.xml comes from the sitemap renderer, as XML.
+            // 6. /sitemap.xml comes from the sitemap renderer, as XML.
             const sitemap = await fetch(`${server.base}/sitemap.xml`);
             expect(sitemap.status).toBe(200);
             expect(sitemap.headers.get("content-type")).toMatch(/xml/);

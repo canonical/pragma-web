@@ -60,6 +60,7 @@
     }
   },
   "dependencies": {
+    "@canonical/ds-assets": "^0.44.1",
     "@canonical/i18n-core": "^0.44.1",
     "@canonical/prism-command-palette": "^0.44.1",
     "@canonical/prism-core": "^0.44.1",

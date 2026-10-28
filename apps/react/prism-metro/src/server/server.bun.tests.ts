@@ -19,7 +19,7 @@ import {
   it,
   vi,
 } from "vitest";
-import { DEFAULT_PORT } from "#lib/site";
+import { DEFAULT_PORT, resolveHmrPort } from "#lib/site";
 import { GRAPHQL_URL_ENV_VAR } from "#relay";
 import { NORTHGATE_TITLE } from "../../testing/fixtures.js";
 import startMetroGraph from "../../testing/startMetroGraph.js";
@@ -40,8 +40,9 @@ const BOOT_TIMEOUT_MS = 60_000;
 /** The one path the stand-in asset middleware serves. */
 const ASSET_PATH = "/@vite/client";
 
-const { handleAsset, vite } = vi.hoisted(() => ({
+const { handleAsset, vite, viteConfigs } = vi.hoisted(() => ({
   handleAsset: vi.fn(),
+  viteConfigs: [] as unknown[],
   vite: {
     transformIndexHtml: vi.fn(),
     ssrLoadModule: vi.fn(),
@@ -49,7 +50,12 @@ const { handleAsset, vite } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("vite", () => ({ createServer: async () => vite }));
+vi.mock("vite", () => ({
+  createServer: async (config: unknown) => {
+    viteConfigs.push(config);
+    return vite;
+  },
+}));
 
 vi.mock("@canonical/react-ssr/server", async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -137,6 +143,7 @@ afterEach(() => {
   vite.transformIndexHtml.mockReset();
   vite.ssrLoadModule.mockReset();
   vite.ssrFixStacktrace.mockReset();
+  viteConfigs.length = 0;
 });
 
 describe("the Bun dev server", { timeout: BOOT_TIMEOUT_MS }, () => {
@@ -150,6 +157,14 @@ describe("the Bun dev server", { timeout: BOOT_TIMEOUT_MS }, () => {
     vi.stubEnv("PORT", "");
     const { port } = await bootServer();
     expect(port).toBe(DEFAULT_PORT);
+  });
+
+  it("opens its live-reload socket on the port derived from PORT", async () => {
+    vi.stubEnv("PORT", "6178");
+    await bootServer();
+    expect(viteConfigs.at(-1)).toMatchObject({
+      server: { middlewareMode: true, hmr: { port: resolveHmrPort(6178) } },
+    });
   });
 
   it("answers a path that does not decode with 404 before Vite sees it", async () => {
