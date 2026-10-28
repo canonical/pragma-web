@@ -237,6 +237,8 @@ describe("SURFACE_ROUTES", () => {
   it("finds the route a surface the site renders lands on", () => {
     expect(findRouteForSurface(`${DOCS}view.components`)).toBe("components");
     expect(findRouteForSurface("surface:view.home")).toBe("home");
+    expect(findRouteForSurface(`${DOCS}view.playground`)).toBe("playground");
+    expect(findRouteForSurface(`${DOCS}view.journeys`)).toBe("journeys");
   });
 
   it("returns undefined for a surface the site does not render", () => {

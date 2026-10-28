@@ -60,4 +60,6 @@ export const SURFACE_ROUTES: ReadonlyMap<string, SurfaceRouteName> = new Map([
   ["view.definitions", "definitions"],
   ["view.standards", "standards"],
   ["view.guides", "guides"],
+  ["view.playground", "playground"],
+  ["view.journeys", "journeys"],
 ]);
