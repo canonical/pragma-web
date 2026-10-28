@@ -177,10 +177,16 @@ describe("hydrateApp", () => {
     expect(onRecoverableError).not.toHaveBeenCalled();
     expect(consoleError).not.toHaveBeenCalled();
     expect(document.documentElement.className).toBe(
-      "ds site-document app comfortable dark",
+      "ds site-document docs comfortable dark",
     );
     expect(document.documentElement.lang).toBe("en");
     expect(document.title).toContain("Lines");
+    // The theme control showed the stored theme on the server and hydrated
+    // to the same value.
+    const control = document.querySelector<HTMLSelectElement>(
+      "select.ds.theme-selector",
+    );
+    expect(control?.value).toBe("dark");
   });
 
   it("hydrates the not-found page at a path that does not decode", async () => {

@@ -1,0 +1,85 @@
+---
+# ModeStrip — the band atop a lens's canvas with three sockets: context
+# (west), controls (grow, pack east), status (east). Its height is the
+# density line unit plus one component padding on each side, content-box,
+# so an empty strip and a one-row strip are the same height and the canvas
+# never jumps on a lens switch. It spans every column of the row the
+# archetype layout places it in, and its band bleeds across the gutter at
+# its inline start to meet the rail's border: a negative inline margin of
+# one gutter, compensated by the same padding, so the hairline runs edge to
+# edge while the context sits on the canvas's first column line. At its
+# inline end the band meets the last column line; on a shell with no outer
+# grid margin that line is the viewport's edge, so there is nothing to
+# bleed across and the band takes no end padding: the status ends on the
+# line, like the canvas's content. The band and each socket may be narrower
+# than their content (`size.min.width: 0`), and the band, the controls and
+# the status wrap, so a tenant wider than the strip's columns reflows inside
+# them instead of pushing past them. The context stays on one line and is
+# clipped on the inline axis at the socket's end (an ellipsis where the
+# clipped content is the socket's own text), so a crumb with no break
+# opportunity, such as an identifier, never reaches past the band.
+#
+# Every decision is read through a component token declared on the root
+# (`--mode-strip-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   --mode-strip-divider-width: 1px  a hairline below the band.
+#   --mode-strip-bleed: calc(-1 * var(--grid-gutter))  the negation of
+#   grid.gutter, which the DSL cannot spell as a symbol.
+#   space.100 (8px) between controls and between readouts: one baseline pair;
+#   container.gap.tight (4px) is for key/value pairs, and the band's own gap
+#   is the grid's gutter.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, density.line.height,
+# component.padding.block, space.100 and the
+# semantic typography symbol typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.mode_strip
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: flex
+    layout.align: center
+    layout.wrap: wrap
+    layout.boxSizing: content-box
+    size.min.block: density.line.height
+    size.min.width: 0
+    spacing.gap: grid.gutter
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+    spacing.internal.inline.start: grid.gutter
+    spacing.internal.inline.end: 0
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.bottom.color: color.border.muted
+  edges:
+    - node:
+        role: context socket
+        styles:
+          size.min.width: 0
+          layout.overflow.inline: clip
+          typography.weight: typography.text.primary.bold.fontWeight
+          typography.whiteSpace: nowrap
+          typography.overflow: ellipsis
+      relation: { cardinality: "1", slotName: context }
+    - node:
+        role: controls socket
+        styles:
+          layout.flex.grow: 1
+          layout.type: flex
+          layout.align: center
+          layout.justify: flex-end
+          layout.wrap: wrap
+          size.min.width: 0
+          spacing.gap: space.100
+      relation: { cardinality: "1", slotName: controls }
+    - node:
+        role: status socket
+        styles:
+          layout.type: flex
+          layout.align: center
+          layout.wrap: wrap
+          size.min.width: 0
+          spacing.gap: space.100
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: status }

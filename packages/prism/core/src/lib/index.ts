@@ -10,22 +10,6 @@ export {
   assertBindingsLive,
   defineBinding,
 } from "./bindings/index.js";
-export type { CanvasProps } from "./Canvas/index.js";
-export { Canvas } from "./Canvas/index.js";
-export type { CanvasSkipLinkProps } from "./CanvasSkipLink/index.js";
-export { CanvasSkipLink } from "./CanvasSkipLink/index.js";
-export type {
-  Box,
-  ChipLegendProps,
-  ChipProps,
-  Kind,
-  Lifecycle,
-} from "./Chip/index.js";
-export { Chip, ChipLegend } from "./Chip/index.js";
-export type { ClientOnlyProps } from "./ClientOnly/index.js";
-export { ClientOnly } from "./ClientOnly/index.js";
-export type { ErrorBoundaryProps } from "./ErrorBoundary/index.js";
-export { ErrorBoundary } from "./ErrorBoundary/index.js";
 export type {
   HomeNode,
   HomeResolver,
@@ -33,15 +17,6 @@ export type {
   HomesProviderProps,
 } from "./homes/index.js";
 export { HomesProvider, useHome } from "./homes/index.js";
-export type {
-  LensBreadcrumbsProps,
-  LensContextProps,
-} from "./LensBreadcrumbs/index.js";
-export { LensBreadcrumbs, makeLensContext } from "./LensBreadcrumbs/index.js";
-export type { ModeStripProps } from "./ModeStrip/index.js";
-export { ModeStrip } from "./ModeStrip/index.js";
-export type { RailBrand, RailProps } from "./Rail/index.js";
-export { Rail } from "./Rail/index.js";
 export type {
   CreateEnvironmentOptions,
   PreparedRelayData,
@@ -61,10 +36,45 @@ export { collectLenses, routeLensFacet } from "./routeLens/index.js";
 export { createStaticRouter } from "./router/index.js";
 export type { ShortcutAllocation } from "./routeShortcut/index.js";
 export { collectShortcuts, routeShortcutFacet } from "./routeShortcut/index.js";
-export type { ThemeSelectorProps } from "./ThemeSelector/index.js";
-export { ThemeSelector } from "./ThemeSelector/index.js";
-export type { RouterLinkProps } from "./ui/index.js";
-export { RouterLink } from "./ui/index.js";
+export type { StoredThemeProviderProps } from "./theme/index.js";
+export { StoredThemeProvider, useStoredTheme } from "./theme/index.js";
+export type {
+  Box,
+  CanvasProps,
+  CanvasSkipLinkProps,
+  ChipLegendProps,
+  ClientOnlyProps,
+  DocumentLayoutProps,
+  ErrorBoundaryProps,
+  Kind,
+  LensBreadcrumbsProps,
+  LensContextProps,
+  Lifecycle,
+  MentionChipProps,
+  ModeStripProps,
+  RailBrand,
+  RailProps,
+  RouterLinkProps,
+  ThemeSelectorProps,
+  WorkspaceLayoutProps,
+} from "./ui/index.js";
+export {
+  CANVAS_PAGE_TILE_CLASS_NAME,
+  Canvas,
+  CanvasSkipLink,
+  ChipLegend,
+  ClientOnly,
+  DocumentLayout,
+  ErrorBoundary,
+  LensBreadcrumbs,
+  MentionChip,
+  ModeStrip,
+  makeLensContext,
+  Rail,
+  RouterLink,
+  ThemeSelector,
+  WorkspaceLayout,
+} from "./ui/index.js";
 export type {
   QuadArc,
   RelaxOptions,

@@ -12,34 +12,25 @@ const FilterProbe = () => {
 };
 
 describe("DefinitionsLayout", () => {
-  it("renders the site's rail and colophon around the canvas", () => {
-    render(
+  it("lays the site's rail, the strip and the page on the workspace", () => {
+    const { container } = render(
       createDefinitionsLayout({
         url: "/definitions",
         records: definitionsExplorerRecords,
         fetchFn: createFetchSpy(),
         rail: <nav aria-label="Site rail" />,
-        colophon: <footer>Colophon</footer>,
         children: <p>Routed page</p>,
       }),
     );
 
-    expect(screen.getByRole("navigation", { name: "Site rail" })).toBeVisible();
-    expect(screen.getByRole("contentinfo")).toHaveTextContent("Colophon");
-    expect(screen.getByText("Routed page")).toBeInTheDocument();
-  });
-
-  it("renders no footer band when the site gives no colophon", () => {
-    render(
-      createDefinitionsLayout({
-        url: "/definitions",
-        records: definitionsExplorerRecords,
-        fetchFn: createFetchSpy(),
-        rail: null,
-        children: null,
-      }),
+    const workspace = container.querySelector(".ds.workspace-layout");
+    expect(workspace?.querySelector(":scope > .rail")?.firstElementChild).toBe(
+      screen.getByRole("navigation", { name: "Site rail" }),
     );
-
+    expect(
+      workspace?.querySelector(":scope > .strip > .ds.mode-strip"),
+    ).not.toBeNull();
+    expect(screen.getByRole("main")).toHaveTextContent("Routed page");
     expect(screen.queryByRole("contentinfo")).toBeNull();
   });
 
@@ -121,8 +112,8 @@ describe("DefinitionsLayout", () => {
       }),
     );
 
-    expect(container.querySelector(".ds.definitions-layout")?.className).toBe(
-      "ds definitions-layout site-layout",
+    expect(container.querySelector(".ds.workspace-layout")?.className).toBe(
+      "ds workspace-layout site-layout",
     );
   });
 });

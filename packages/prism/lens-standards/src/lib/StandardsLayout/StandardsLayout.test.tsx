@@ -95,7 +95,7 @@ describe("StandardsLayout", () => {
     );
 
     const root = container.querySelector("#layout");
-    expect(root?.className).toBe("ds standards-layout site-layout");
+    expect(root?.className).toBe("ds document-layout site-layout");
     expect(root).toHaveAttribute("data-probe", "layout");
   });
 });

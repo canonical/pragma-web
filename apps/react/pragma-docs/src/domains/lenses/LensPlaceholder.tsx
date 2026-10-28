@@ -1,5 +1,6 @@
 import { Head } from "@canonical/react-head";
 import type { ReactElement } from "react";
+import { CanvasPage } from "#lib/ui/CanvasPage";
 
 interface LensPlaceholderProps {
   /** The lens's name, as the rail shows it. */
@@ -24,7 +25,7 @@ export default function LensPlaceholder({
   const headingId = `lens-${title.toLowerCase()}-title`;
 
   return (
-    <section aria-labelledby={headingId}>
+    <CanvasPage aria-labelledby={headingId}>
       <Head title={title} />
       <h1 id={headingId}>{title}</h1>
       <p>{lands}</p>
@@ -32,6 +33,6 @@ export default function LensPlaceholder({
         This canvas is a placeholder: the frame around it is finished, the view
         lands with {builtBy}.
       </p>
-    </section>
+    </CanvasPage>
   );
 }

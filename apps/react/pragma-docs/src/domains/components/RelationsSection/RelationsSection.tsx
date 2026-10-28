@@ -42,11 +42,11 @@ void relationsSectionFragmentSource;
 const componentCssClassName = "ds relations-section";
 
 /**
- * The entity's graph neighborhood: subcomponents and modifier families as
- * two plain lists (name + URI in code voice). Deliberately NOT chips —
- * subcomponents are not a registered Chip kind (ruling R5); linking waits
- * for the D31 landing map. Empty states say "None." so absence reads as a
- * fact, not a loading state.
+ * The entity's graph neighborhood: subcomponents and modifier families as two
+ * plain lists (name + URI in code voice). Deliberately NOT chips —
+ * subcomponents are not a registered MentionChip kind (ruling R5); linking
+ * waits for the D31 landing map. Empty states say "None." so absence reads as
+ * a fact, not a loading state.
  */
 const RelationsSection = ({
   className,

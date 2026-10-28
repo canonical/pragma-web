@@ -5,8 +5,7 @@
 import "../styles/app.css";
 import { createEnvironment, createStaticRouter } from "@canonical/prism-core";
 import type { ServerEntrypointProps } from "@canonical/react-ssr/renderer";
-import { SiteDocument } from "#lib/ui";
-import { Shell } from "#shell";
+import { Shell, SiteDocument } from "#lib/ui";
 import { appRoutes, notFoundRoute } from "../routes.js";
 import selectRoutableUrl from "../selectRoutableUrl.js";
 import type { InitialData } from "./types.js";
@@ -26,7 +25,8 @@ import type { InitialData } from "./types.js";
  * server and the client render one tree. The cookie-resolved theme travels
  * in the initial data and is painted on `<html>` beside the site's context,
  * so the first paint matches the reader's preference, and the client renders
- * the same class from the same data.
+ * the same class from the same data; the shell hands it to the theme
+ * control, which shows it selected.
  *
  * @param props - The renderer's entry props: the initial data and the head
  *   elements of the HTML shell.
@@ -54,7 +54,11 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
       lang={props.lang}
       theme={initialData.theme}
     >
-      <Shell environment={relayEnvironment} router={router} />
+      <Shell
+        environment={relayEnvironment}
+        router={router}
+        theme={initialData.theme}
+      />
     </SiteDocument>
   );
 }

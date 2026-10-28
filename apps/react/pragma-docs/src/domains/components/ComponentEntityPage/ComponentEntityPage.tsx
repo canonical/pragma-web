@@ -95,9 +95,9 @@ const EntityContent = ({
           <PropertiesSection component={component} />
           <RelationsSection component={component} />
         </article>
-        <EntityAside component={component} />
+        <EntityAside className="component-entity-aside" component={component} />
       </div>
-      {/* The closing well spans the full row UNDER the two-tenant body:
+      {/* The closing well spans the full row UNDER the body:
           the page ends by looking down into the graph it was projected
           from (AX.3, AV-364). */}
       <NeighbourhoodWell

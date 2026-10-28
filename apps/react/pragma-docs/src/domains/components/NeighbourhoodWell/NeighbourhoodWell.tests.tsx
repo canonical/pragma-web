@@ -73,9 +73,9 @@ describe("NeighbourhoodWell", () => {
     const readCentreTint = (well: HTMLElement): string =>
       (
         well.querySelector(
-          `[data-well-uri="${BUTTON_URI}"] .chip`,
+          `[data-well-uri="${BUTTON_URI}"] .mention-chip`,
         ) as HTMLElement
-      ).style.getPropertyValue("--chip-tint");
+      ).style.getPropertyValue("--mention-chip-tint");
 
     // The captured provider lists `ds` first: the first hue on the wheel.
     expect(readCentreTint(renderWell())).toMatch(/ 0\)$/);

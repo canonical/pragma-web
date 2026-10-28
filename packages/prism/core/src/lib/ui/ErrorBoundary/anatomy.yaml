@@ -1,0 +1,14 @@
+---
+# ErrorBoundary — renders its subtree until it throws, then its fallback
+# until `resetKey` changes. It renders no element of its own.
+node:
+  uri: prism.component.error_boundary
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: subtree
+          - node:
+              role: fallback
+      relation: { cardinality: "1", slotName: default }

@@ -5,19 +5,22 @@ set of lenses over one knowledge graph: each lens is a domain with its own
 routes and page layout, and every lens reads the graph through Relay. This
 package holds the parts every such site needs and none of them owns:
 
-- **Lens chrome**: the components a lens layout composes — `Rail`,
-  `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`), `Canvas`,
-  `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page needs,
-  `ErrorBoundary` and `ClientOnly`. There is no shared frame: each lens's
-  layout arranges these as it needs.
-- **Chip**: the inline mention of a graph entity, tinted by its namespace,
-  shaped by its kind, filled or outlined by class vs instance, and dotted by
-  lifecycle; `ChipLegend` explains the grammar.
+- **Lens chrome**: the two page archetypes every lens layout is built on,
+  `WorkspaceLayout` and `DocumentLayout`, the components they place —
+  `Rail`, `ModeStrip`, `LensBreadcrumbs` (with `makeLensContext`),
+  `Canvas`, `CanvasSkipLink`, `ThemeSelector` — and the wrappers every page
+  needs, `ErrorBoundary` and `ClientOnly`.
+- **MentionChip**: the inline mention of a graph entity, tinted by its
+  namespace, shaped by its kind, filled or outlined by class vs instance,
+  and dotted by lifecycle; `ChipLegend` explains the grammar.
 - **Well geometry**: the pure, deterministic layout functions a graph well
   settles its nodes and edges with (`relaxBoxes`, `findEdgeEndpoint`,
   `buildQuadArc`, `buildSelfLoop`, `settle`).
 - **Homes**: where each kind of graph node lives (`HomesProvider`,
   `useHome`), so a mention of a node links to the page that owns it.
+- **The stored theme**: the theme the reader's cookie stores, handed down
+  from the request (`StoredThemeProvider`, `useStoredTheme`), so the theme
+  control shows it on a server-rendered page as on the client.
 - **Entity bindings**: which GraphQL type serves each ontology class
   (`defineBinding`), checked against the schema (`assertBindings`) and the
   running graph (`assertBindingsLive`).
@@ -44,67 +47,134 @@ Requires React 19 and `@canonical/router-core` / `@canonical/router-react`.
 
 ## Lens chrome
 
+A site renders one grid: its shell's root carries the `grid intrinsic`
+classes of `@canonical/styles` and is the one query container, named
+`shell`. Every layout below it is a subgrid of that grid, so every page
+reads against the same columns. A lens layout is one of two archetypes,
+each a subgrid over every column:
+
+- `WorkspaceLayout`: a page that fills the viewport and never scrolls. The
+  rail takes the first two columns, the strip the rest of the top row, the
+  canvas the body, and an `inspector` the last three columns of the body;
+  the rail and the inspector scroll on their own. Below three groups of
+  columns the inspector moves into the published `SidePanel` drawer, which
+  a trigger at the canvas's corner opens.
+- `DocumentLayout`: a page whose canvas is the one scrolling region, with
+  an optional `aside` and an optional `colophon` band under the body. The
+  aside is the canvas's own: it holds the last three columns inside the
+  canvas's scroll, starting at the top of the page and scrolling with it,
+  and below two groups of columns it moves under the page. A page that
+  lays a collection on the page grid, such as a catalog's cards, gives
+  each item `CANVAS_PAGE_TILE_CLASS_NAME`: the canvas spans each tile over
+  two columns, and over the whole row below one group of columns, where
+  the canvas holds three.
+
+Each archetype's gap is the grid's gutter on both axes, so its rows sit one
+gutter apart. A region given a node that renders nothing (`null`, a
+boolean or the empty string) is left out, as if the prop were omitted.
+
 ```tsx
 import {
-  Canvas,
-  CanvasSkipLink,
   collectLenses,
+  DocumentLayout,
   ModeStrip,
   Rail,
 } from "@canonical/prism-core";
-import { Outlet, useRouter } from "@canonical/router-react";
+import { useRouter } from "@canonical/router-react";
+import type { ReactNode } from "react";
 
-export function GlossaryLayout() {
+export function GlossaryLayout({ children }: { children: ReactNode }) {
   const { routes } = useRouter();
   return (
-    <div className="glossary-layout">
-      <CanvasSkipLink />
-      <Rail brand={{ label: "Atlas", to: "home" }} entries={collectLenses(routes)}>
-        {/* the site's utility cluster */}
-      </Rail>
-      <ModeStrip context={<GlossaryContext />} />
-      <Canvas>
-        <Outlet />
-      </Canvas>
-    </div>
+    <DocumentLayout
+      rail={
+        <Rail brand={{ label: "Atlas", to: "home" }} entries={collectLenses(routes)}>
+          {/* the site's utility cluster */}
+        </Rail>
+      }
+      strip={<ModeStrip context={<GlossaryContext lensLabel="Glossary" />} />}
+    >
+      {children}
+    </DocumentLayout>
   );
 }
 ```
 
+Both render the skip link first (the published `SkipLink`, pointed at the
+canvas), then a `.rail` region, a `.strip` region and the `Canvas`. A
+strip, an inspector, an aside or a colophon that renders nothing leaves no
+region, and no row or gutter for it: a layout with no strip starts its
+canvas at the viewport's top. Regions are placed by column count from the start and by
+negative lines from the end, so they hold their places at any column
+count, and below one group of columns the rail narrows to one column. The
+bands, the `ModeStrip` and the colophon region, keep their columns but
+bleed across the gutter to meet the rail's border, a negative inline
+margin of one gutter compensated by the same padding, so their rules run
+edge to edge while their content sits on the canvas's first column line.
+A document's canvas bleeds the same way, so its scroll reaches the rail's
+border: a band of the page that bleeds one gutter, such as a region's top
+rule, is painted to the rail's border instead of being clipped by the
+canvas's scroll.
+
 The rail reads its lenses from the route table it is given and wires each
-lens's shortcut key itself. Its `children` render at its foot as the site's
-utility cluster, styled from a class contract: a `p.utilities-label`
-heading, a `ul.utilities` labelled by it, `a.item.util`
-links (icon plus `span.label`) and an `li.theme` for a control
-such as `ThemeSelector`, whose `.ds.theme-selector` root shrinks with the
-collapsed rail.
+lens's shortcut key itself, showing each key as a `KeyboardKey`. It does
+not place itself: a layout puts it in a region that spans the first two
+columns and scrolls on its own. Its `children` render at its foot as the
+site's utility cluster, styled from a class contract: a `p.utilities-label`
+heading, a `ul.utilities` labelled by it, `a.item` links (a `span.icon`
+plus a `span.label`, as a lens entry) and an `li.theme` cell that stretches
+a control such as `ThemeSelector` to the rail's width and lets it shrink
+with the rail. Below one group of columns the wordmark, labels, hints and
+headings hide and the brand dot and the icons stay.
 
 ### Stylesheets
 
 Each component imports its own stylesheet, so a bundler that handles CSS
-imports needs no further setup. The rules sit in `@layer ds.prism`: below a
-site's own `app` layer, above `ds.components.global`, so a site overrides
-them without specificity games. Load `@canonical/styles` first; it declares
-the layer order.
+imports needs no further setup. The rules sit in
+`@layer ds.components.global`, so a site's `app` layer overrides them
+without specificity games. Load `@canonical/styles` first; it declares the
+layer order, the spacing shim and the grid presets the components read.
 
-The stylesheets read the site's layout tokens and fall back when a site
-does not define them: `--strip-h` (the strip's height), `--z-plate`,
-`--z-chrome` and `--z-overlay` (the z-axis strata) and `--rail-span` (the
-rail's column span over the layout's `--grid-intrinsic` columns).
+Every design decision is read through a component token declared on the
+component's root (`--rail-gap`, `--mode-strip-divider-color`), bound to
+the spacing shim (`--grid-gutter`, `--container-gap-*`,
+`--component-padding-*`), to the semantic tier for colours and text styles,
+to the density channel for the line unit, or to a literal where no token
+exists; a site re-themes a component by overriding its tokens. Every grid
+and subgrid sets its gap from `--grid-gutter`. A site puts its context and
+density classes (`docs comfortable`) on the document. The container
+queries read the `shell` container a site's shell names.
 
-The stylesheets name no theme. Their fallbacks are light values; a site's
-dark theme (whatever class or query activates it) defines the Chip's hooks:
-`--chip-tint-l` and `--chip-tint-c` (every namespace tint's lightness and
-chroma), `--chip-fill-weight-instance` (an instance's fill, 15% by
-default), and `--chip-dot-canonical`, `--chip-dot-beta` and
-`--chip-dot-deprecated` (the lifecycle dots). The site keeps an instance's
-text-on-fill contrast at 4.5:1 or above for every hue at its values; the
-light fallbacks are held to that floor here.
+The stylesheets name no theme. The MentionChip's fallbacks are light values;
+a site's dark theme (whatever class or query activates it) defines the
+MentionChip's hooks: `--mention-chip-tint-l` and `--mention-chip-tint-c`
+(every namespace tint's lightness and chroma),
+`--mention-chip-fill-weight-instance` (an instance's fill, 15% by default),
+and `--mention-chip-dot-canonical`, `--mention-chip-dot-beta` and
+`--mention-chip-dot-deprecated` (the lifecycle dots). The site keeps an
+instance's text-on-fill contrast at 4.5:1 or above for every hue at its
+values; the light fallbacks are held to that floor here.
 
-## Chip
+### Component checks
+
+Every component folder carries an `anatomy.yaml` in the anatomy DSL, and
+its stylesheet transcribes it. The experimental `@canonical/prism-core/testing`
+subpath holds the checks the prism packages and apps run over their own
+components: `assertAnatomy`, `assertStylesMatchAnatomy`, `assertScaffold`,
+`assertStylesheets` and `listAnatomyFolders`. Its `testing/browser` subpath
+holds the browser side the apps' layout suites share: `launchBrowser`,
+`measurePage` and `measureLayout`, which read a page's grid, scroll model,
+overflow and spacing. Both subpaths ship as TypeScript source and import
+what only a test run needs, so a consumer installs those optional peer
+dependencies itself: `@canonical/anatomy-dsl`, `@canonical/summon-core`,
+`vitest` and `yaml` for `testing`, and `playwright` for `testing/browser`.
+
+Every component has its stories; `bun run storybook` serves them.
+
+## MentionChip
 
 ```tsx
-<Chip
+<MentionChip
   href={href}
   kind="component"
   label="Button"
@@ -119,8 +189,8 @@ place in the list picks its hue (golden-angle steps), so the same list
 always tints the same way and appending a prefix keeps every earlier tint.
 A chip's namespace is its URI's prefix unless `namespace` overrides it; one
 outside the list gets a neutral tint. Lightness and chroma are shared by
-every hue behind `--chip-tint-l` and `--chip-tint-c`, so text-on-fill
-contrast holds at AA for every hue at once.
+every hue behind `--mention-chip-tint-l` and `--mention-chip-tint-c`, so
+text-on-fill contrast holds at AA for every hue at once.
 
 The chip knows no routes: pass `href` (the noun's canonical home, which the
 site resolves) to render a link, or leave it out to render inert text.
@@ -218,6 +288,30 @@ protocol-relative URL, a path that hides another host such as `/\host/path`,
 a relative href such as `#part`, a path no route matches), a modified click,
 and a link with a `target` or `download` stay the browser's.
 
+## The stored theme
+
+`ThemeSelector` shows the theme the reader stored, read from the `theme`
+cookie. The server cannot read that cookie from the document, so a site
+reads it off the request (`extractPreferences` from
+`@canonical/react-hooks`), carries it in the page's initial data, and
+mounts `StoredThemeProvider` with it in the shell, on the server and in the
+client entry alike:
+
+```tsx
+<StoredThemeProvider theme={initialData.theme}>
+  <Outlet />
+</StoredThemeProvider>;
+```
+
+The control then renders the stored theme on the server and hydrates to the
+same value. The request's theme only seeds the provider: the control records
+each choice the reader makes there (`useStoredTheme` returns the stored
+`theme` and its `setTheme`), so a control mounted later in the session, such
+as the one in another route's rail, shows the reader's latest choice. Keep
+the provider above the routed content, where a client navigation does not
+remount it. Without a provider the control reads the cookie on each mount,
+and a server-rendered page shows "System" until the reader changes it.
+
 ## Entity bindings
 
 ```ts
@@ -261,17 +355,21 @@ site's own catalog, and the factory holds no reader-facing string.
 ## Consumer obligations
 
 - Mount `HomesProvider` above routed content.
+- Mount `StoredThemeProvider` above routed content with the theme the
+  request's cookie stores, on the server and the client alike.
 - Pass `prepareRelayData` the site's `routes`, `middleware` and `notFound`,
   and stamp per-request attributes through `headers`, never module state.
-- Source `Chip`'s `prefixes` from the provider's `ontologies { prefix }`.
-- Define the Chip's hooks in a dark theme (see Stylesheets).
+- Source `MentionChip`'s `prefixes` from the provider's `ontologies { prefix }`.
+- Define the MentionChip's hooks in a dark theme (see Stylesheets).
 - Run `assertBindings` in a `check` script and `assertBindingsLive` at boot.
 
 ## Public API
 
-- Components: `Chip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`, `ClientOnly`,
-  `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
-  `ModeStrip`, `Rail`, `ThemeSelector`; types `ChipProps`,
+- Layouts: `WorkspaceLayout`, `DocumentLayout`; types
+  `WorkspaceLayoutProps`, `DocumentLayoutProps`.
+- Components: `MentionChip`, `ChipLegend`, `Canvas`, `CanvasSkipLink`,
+  `CANVAS_PAGE_TILE_CLASS_NAME`, `ClientOnly`, `ErrorBoundary`, `LensBreadcrumbs`, `makeLensContext`,
+  `ModeStrip`, `Rail`, `ThemeSelector`; types `MentionChipProps`,
   `ChipLegendProps`, `Kind`, `Box`, `Lifecycle`, `CanvasProps`,
   `CanvasSkipLinkProps`, `ClientOnlyProps`, `ErrorBoundaryProps`,
   `LensBreadcrumbsProps`, `LensContextProps`, `ModeStripProps`, `RailProps`, `RailBrand`,
@@ -288,6 +386,8 @@ site's own catalog, and the factory holds no reader-facing string.
 - Links: `RouterLink`; types `RouterLinkProps`.
 - Homes: `HomesProvider`, `useHome`; types `Homes`, `HomeResolver`,
   `HomeNode`, `HomesProviderProps`.
+- Stored theme: `StoredThemeProvider`, `useStoredTheme`; types
+  `StoredThemeProviderProps`.
 - Bindings: `defineBinding`, `assertBindings`, `assertBindingsLive`; types
   `EntityBinding`, `GraphQLExecute`.
 - Relay: `createEnvironment`, `getPrefetchEnvironment`,

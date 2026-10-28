@@ -1,0 +1,99 @@
+---
+# WorkspaceLayout — the workspace archetype: a subgrid of the shell spanning
+# every column, two rows (strip, body), or the body row alone when there is
+# no strip, so a workspace given none keeps no empty track and no gutter
+# above its canvas. The rail takes columns 1 / span 2 on every row and
+# scrolls on its own; the strip row spans the rest; the canvas fills the
+# body row, the last, and never scrolls; the inspector is a persistent
+# region in the last three columns of the body row that scrolls on its own.
+# Its gap is the grid's gutter on both axes, so the strip and the body sit
+# one gutter apart; the strip region, a subgrid, sets the same gap.
+#
+# Reflow, bound in styles.css:
+#   `.ds.workspace-layout:not(:has(> .strip))` the rows are `minmax(0, 1fr)`:
+#     the body row is the only one, flush with the viewport's top.
+#   `.ds.workspace-layout:not(:has(> .inspector))` the canvas spans 3 / -1:
+#     a workspace given no inspector leaves no empty columns.
+#   @container shell (width < 1376px)  below three groups: the canvas spans
+#     3 / -1; the inspector region is hidden and its content renders in the
+#     published SidePanel drawer, opened by `inspector-trigger` (shown only
+#     here, floating at the canvas's top end corner).
+#   @container shell (width < 448px)   below one group: the rail spans one
+#     column; strip and canvas start at line 2.
+#
+# Every decision is read through a component token declared on the root
+# (`--workspace-layout-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.stack 1 on the trigger: it floats over the canvas.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, container.gap.default.
+node:
+  uri: prism.component.workspace_layout
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.grid.rows: "min-content minmax(0, 1fr)"
+    spacing.gap: grid.gutter
+    size.min.block: 0
+  edges:
+    - node:
+        uri: prism.component.canvas_skip_link
+      relation: { cardinality: "1", slotName: skip-link }
+    - node:
+        role: rail region
+        styles:
+          layout.grid.column: "1 / span 2"
+          layout.grid.row: "1 / -1"
+          layout.overflow.block: auto
+          size.min.block: 0
+        edges:
+          - node:
+              uri: prism.component.rail
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: rail }
+    - node:
+        role: strip region
+        styles:
+          layout.grid.column: "3 / -1"
+          layout.grid.row: "1"
+          layout.type: grid
+          layout.grid.columns: subgrid
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              uri: prism.component.mode_strip
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "0..1", slotName: strip }
+    - node:
+        uri: prism.component.canvas
+        styles:
+          layout.grid.column: "3 / -4"
+          layout.grid.row: "-2 / -1"
+          layout.overflow: hidden
+      relation: { cardinality: "1", slotName: canvas }
+    - switch:
+        on: internal
+        cases:
+          - node:
+              role: inspector region
+              styles:
+                layout.grid.column: "-4 / -1"
+                layout.grid.row: "-2 / -1"
+                layout.overflow.block: auto
+                size.min.block: 0
+          - node:
+              uri: apps.component.side-panel
+      relation: { cardinality: "0..1", slotName: inspector }
+    - node:
+        uri: global.component.button
+        styles:
+          layout.type: none
+          layout.grid.column: "-2 / -1"
+          layout.grid.row: "-2 / -1"
+          layout.alignSelf: start
+          spacing.external.inline.start: auto
+          spacing.external.block.start: container.gap.default
+          layout.stack: 1
+      relation: { cardinality: "0..1", slotName: inspector-trigger }

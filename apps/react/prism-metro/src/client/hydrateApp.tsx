@@ -8,10 +8,9 @@ import {
   hydrateRoot,
   type Root,
 } from "react-dom/client";
-import { SiteDocument } from "#lib/ui";
+import { Shell, SiteDocument } from "#lib/ui";
 import { resolveGraphqlUrl } from "#relay";
 import type { InitialData } from "#server";
-import { Shell } from "#shell";
 import { appRoutes, notFoundRoute } from "../routes.js";
 import createRoutableAdapter from "./createRoutableAdapter.js";
 
@@ -67,7 +66,11 @@ export default function hydrateApp(
   return hydrateRoot(
     target,
     <SiteDocument lang={target.documentElement.lang} theme={initialData?.theme}>
-      <Shell environment={relayEnvironment} router={router} />
+      <Shell
+        environment={relayEnvironment}
+        router={router}
+        theme={initialData?.theme}
+      />
     </SiteDocument>,
     options,
   );

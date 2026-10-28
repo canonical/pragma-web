@@ -4,9 +4,9 @@
  * `window.__INITIAL_DATA__` — with no React 19 recoverable error and no
  * network request, proving the render is served entirely from the seeded
  * store. React 19 reports hydration mismatches through `onRecoverableError`
- * (a `console.error` spy does NOT catch them — see `Chip.ssr.tests.tsx`), so
- * the spy rides the seam's `hydrateRoot` options; two deliberate-breakage
- * controls prove both spies can fail.
+ * (a `console.error` spy does NOT catch them — see `MentionChip.ssr.test.tsx`
+ * in prism-core), so the spy rides the seam's `hydrateRoot` options; two
+ * deliberate-breakage controls prove both spies can fail.
  */
 
 import {
@@ -20,7 +20,7 @@ import { renderToString } from "react-dom/server";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Shell } from "#lib/Shell";
+import { Shell } from "#lib/ui";
 import createFetchSpy from "../../testing/createFetchSpy.js";
 import catalogRecords from "../domains/components/__fixtures__/catalogRecords.js";
 import componentEntityRecordsButton from "../domains/components/__fixtures__/componentEntityRecordsButton.js";

@@ -11,7 +11,6 @@
     "#projections": "./src/projections/index.ts",
     "#relay": "./src/relay/index.ts",
     "#server": "./src/server/index.ts",
-    "#shell": "./src/shell/index.ts",
     "#site": "./src/site/index.ts",
     "#sitemap": "./src/sitemap/index.ts"
   },
@@ -61,6 +60,7 @@
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
     "@canonical/typescript-config-react": "^0.44.1",
+    "@storybook/react-vite": "^10.6.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.0.0",

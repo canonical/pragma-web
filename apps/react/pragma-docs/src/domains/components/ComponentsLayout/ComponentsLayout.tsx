@@ -1,16 +1,12 @@
 import {
-  Canvas,
-  CanvasSkipLink,
+  DocumentLayout,
   ModeStrip,
   makeLensContext,
 } from "@canonical/prism-core";
 import type { ReactElement } from "react";
-import { SiteColophon } from "#lib/SiteColophon";
 import { SiteRail } from "#lib/SiteRail";
+import { SiteColophon } from "#lib/ui/SiteColophon";
 import type { ComponentsLayoutProps } from "./types.js";
-import "./styles.css";
-
-const componentCssClassName = "ds components-layout";
 
 /**
  * The strip's breadcrumb trail: `Components` on the catalog,
@@ -26,28 +22,25 @@ const ComponentsContext = makeLensContext({
  * The Components lens's page layout: the site rail and colophon around the
  * catalog and entity pages, with the strip carrying the breadcrumb trail.
  *
- * Its root is the layout's own page grid: the rail in the west columns,
- * then a viewport stacking the strip, the canvas and the colophon.
+ * The layout is the document archetype: the rail in its rail region, the
+ * strip in the top row, the page in the canvas, the one region that
+ * scrolls, and the colophon in the band under it. It renders no element of
+ * its own: `DocumentLayout` renders the root.
  *
  * `import { ComponentsLayout } from "./ComponentsLayout/index.js";`
  */
 export default function ComponentsLayout({
   children,
-  className,
-  ...props
 }: ComponentsLayoutProps): ReactElement {
   return (
-    <div
-      {...props}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
-    >
-      <CanvasSkipLink />
-      <SiteRail />
-      <div className="viewport">
+    <DocumentLayout
+      colophon={<SiteColophon />}
+      rail={<SiteRail />}
+      strip={
         <ModeStrip context={<ComponentsContext lensLabel="Components" />} />
-        <Canvas>{children}</Canvas>
-        <SiteColophon />
-      </div>
-    </div>
+      }
+    >
+      {children}
+    </DocumentLayout>
   );
 }
