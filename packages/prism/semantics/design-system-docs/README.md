@@ -44,8 +44,11 @@ compiles them all into one graph.
 Conventions:
 
 - `dsd:` is `<sem://design-system-docs#>`; instance names are lowercase and
-  dotted (`dsd:job.l3`, `dsd:pairing.l3.components`), with snake_case
-  inside a segment.
+  dotted (`dsd:job.l3`, `dsd:view.components`), with snake_case inside a
+  segment. A pairing is named `<job>.<surface>` without a kind word
+  (`dsd:l3.components`): the journeys graph cuts a hop's label at 20
+  characters and names its kind on a line of its own, so the surface that
+  tells two pairings of one job apart stays inside the cut.
 - Every instance carries an `rdfs:label` and an `rdfs:comment`.
 - The design system's entities are named by their real addresses
   (`ds:global.component.card`) and never typed here; this package only
