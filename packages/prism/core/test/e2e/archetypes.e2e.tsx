@@ -17,7 +17,8 @@
  * border to the viewport's edge with their content between the canvas's
  * first column line and its last, painted over that whole width, that a
  * band of a document's page that bleeds across the gutter is painted to
- * the rail's border rather than clipped by the canvas's scroll, and that
+ * the rail's border rather than clipped by the canvas's scroll, that a
+ * breadcrumb wider than the strip ends in an ellipsis inside it, and that
  * nothing reaches past the viewport.
  */
 
@@ -25,6 +26,13 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  createMemoryAdapter,
+  createRouter,
+  type RouteMap,
+  route,
+} from "@canonical/router-core";
+import { RouterProvider } from "@canonical/router-react";
 import type { Browser, Page } from "playwright";
 import type { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
@@ -32,6 +40,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   CANVAS_PAGE_TILE_CLASS_NAME,
   DocumentLayout,
+  LensBreadcrumbs,
   ModeStrip,
   WorkspaceLayout,
 } from "../../src/lib/ui/index.js";
@@ -44,7 +53,9 @@ import {
   measureLayout,
 } from "../../testing/browser/index.js";
 import {
+  ABSOLUTE_IRI,
   ARCHETYPE_VIEWPORTS,
+  BREADCRUMBS_STYLESHEETS,
   COMPONENT_STYLESHEETS,
   PAGE_BAND_CLASS_NAME,
   SCROLL_PX,
@@ -104,6 +115,9 @@ function readStylesheets(): string {
     join(styles, "src", "spacing.css"),
     join(styles, "src", "grid.css"),
     require.resolve(`@canonical/react-ds-global/${SKIP_LINK_STYLESHEET}`),
+    ...BREADCRUMBS_STYLESHEETS.map((name) =>
+      require.resolve(`@canonical/react-ds-global/${name}`),
+    ),
     ...COMPONENT_STYLESHEETS.map((name) =>
       join(UI_DIRECTORY, name, "styles.css"),
     ),
@@ -188,6 +202,42 @@ const striplessDocumentLayout = (
   >
     <p>Page</p>
   </DocumentLayout>
+);
+
+/** The routes the trail's lens crumb links back to. */
+const TRAIL_ROUTES: RouteMap = {
+  standards: route({ url: "/standards", content: () => null }),
+};
+
+/**
+ * A document whose strip carries the trail to an entity addressed by an
+ * absolute IRI, under the router the trail links through.
+ */
+const trailDocumentLayout = (
+  <RouterProvider
+    router={createRouter(TRAIL_ROUTES, {
+      adapter: createMemoryAdapter(
+        `/standards/${encodeURIComponent(ABSOLUTE_IRI)}`,
+      ),
+    })}
+  >
+    <DocumentLayout
+      rail={<nav aria-label="Rail">Rail</nav>}
+      strip={
+        <ModeStrip
+          context={
+            <LensBreadcrumbs
+              current={ABSOLUTE_IRI}
+              lensLabel="Standards"
+              lensRouteName="standards"
+            />
+          }
+        />
+      }
+    >
+      <p>Page</p>
+    </DocumentLayout>
+  </RouterProvider>
 );
 
 /** Items enough to fill several rows of tiles at every width. */
@@ -473,6 +523,46 @@ describe.each(ARCHETYPE_VIEWPORTS)("at $width px", (viewport) => {
       // The colophon takes a row of its own, one gutter under the canvas.
       expect(before.rows).toBe(3);
       expect(before.canvas?.bottom).toBeLessThan(viewport.height);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("ends a crumb wider than the strip in an ellipsis inside the strip", async () => {
+    const page = await open(trailDocumentLayout);
+    try {
+      const measure = await page.evaluate(measureLayout, MEASURE_OPTIONS);
+      expect(measure.overflow).toEqual([]);
+      const crumb = await page.evaluate(() => {
+        const text = document.querySelector(
+          '.ds.lens-breadcrumbs .link[aria-current="page"]',
+        );
+        const band = document.querySelector(".ds.mode-strip");
+        if (text === null || band === null) return null;
+        return {
+          right: text.getBoundingClientRect().right,
+          bandEnd: band.getBoundingClientRect().right,
+          truncated: text.scrollWidth > text.clientWidth,
+          textOverflow: getComputedStyle(text).textOverflow,
+          lensWidth:
+            document
+              .querySelector(".ds.lens-breadcrumbs .breadcrumbs-item > a.link")
+              ?.getBoundingClientRect().width ?? -1,
+          lensContentWidth:
+            document.querySelector(
+              ".ds.lens-breadcrumbs .breadcrumbs-item > a.link",
+            )?.scrollWidth ?? -1,
+        };
+      });
+      expect(crumb).not.toBeNull();
+      expect(crumb?.right).toBeLessThanOrEqual((crumb?.bandEnd ?? 0) + 0.5);
+      expect(crumb?.textOverflow).toBe("ellipsis");
+      // At a phone's width the IRI is wider than the strip: it is cut at
+      // the crumb's end, and the lens crumb keeps its whole label.
+      expect(crumb?.truncated).toBe(viewport.width < 448);
+      expect(crumb?.lensWidth).toBeGreaterThanOrEqual(
+        (crumb?.lensContentWidth ?? 0) - 0.5,
+      );
     } finally {
       await page.close();
     }

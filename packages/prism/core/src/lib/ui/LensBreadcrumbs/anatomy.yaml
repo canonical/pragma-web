@@ -1,18 +1,48 @@
 ---
 # LensBreadcrumbs — the strip's context tenant: the published Breadcrumbs
 # with the lens crumb (linked through the router on an entity page, current
-# on the index) and the current page's crumb. It binds no styles of its own:
-# the published pattern carries them.
+# on the index) and the current page's crumb. The published pattern carries
+# the crumbs' typography, colours and separators; the decisions bound here
+# keep the trail on one line inside whatever width its socket gives it.
+#
+# The trail may be narrower than its content wherever it is placed, and it
+# does not wrap (`layout.wrap: nowrap` on the list, which may be narrower
+# than its content either), and the current crumb, the trail's last, may
+# shrink below its text: its text keeps to one line and is cut at the
+# crumb's end with an ellipsis. An absolute IRI, an identifier with no break
+# opportunity, so never pushes the strip past the viewport. The lens crumb
+# keeps its whole label. Each of these is an unthemable value, a keyword or
+# zero, so none reads a component token (cs:css.properties.values).
 node:
   uri: prism.component.lens_breadcrumbs
+  styles:
+    size.min.width: 0
   edges:
     - node:
         uri: global.component.breadcrumbs
         edges:
           - node:
-              role: lens crumb
-            relation: { cardinality: "1", slotName: lens }
-          - node:
-              role: current page crumb
-            relation: { cardinality: "0..1", slotName: current }
+              role: crumb list
+              styles:
+                layout.wrap: nowrap
+                size.min.width: 0
+              edges:
+                - node:
+                    role: lens crumb
+                  relation: { cardinality: "1", slotName: lens }
+                - node:
+                    role: current page crumb
+                    styles:
+                      size.min.width: 0
+                    edges:
+                      - node:
+                          role: current page text
+                          styles:
+                            size.min.width@selected: 0
+                            layout.overflow@selected: hidden
+                            typography.whiteSpace@selected: nowrap
+                            typography.overflow@selected: ellipsis
+                        relation: { cardinality: "1", slotName: link }
+                  relation: { cardinality: "0..1", slotName: current }
+            relation: { cardinality: "1", slotName: list }
       relation: { cardinality: "1" }

@@ -36,12 +36,15 @@ const EXTERNAL_TOKENS = [
 /**
  * The rules that style markup a component does not write itself: the
  * site's utility cluster at the rail's foot, styled from the class
- * contract `Rail` documents.
+ * contract `Rail` documents, and the published Breadcrumbs' list and its
+ * current crumb's text, which `LensBreadcrumbs` keeps on one line.
  */
 const REACHES = [
   ".ds.rail .utilities-label",
   ".ds.rail .utilities",
   ".ds.rail .theme",
+  ".ds.lens-breadcrumbs .list",
+  '.ds.lens-breadcrumbs .link[aria-current="page"]',
 ];
 
 const folders = listAnatomyFolders([UI_DIRECTORY]);

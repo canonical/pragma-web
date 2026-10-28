@@ -13,8 +13,9 @@ export interface MeasureLayoutOptions {
   /** The layout's regions, which never excuse an overflow. */
   readonly regionSelector: string;
   /**
-   * The layout's frame, its strips: nothing in it may scroll sideways, so a
-   * control cut by a scroller of its own counts as an overflow.
+   * The layout's frame, its strips: nothing in it may scroll sideways or
+   * reach past the viewport, so a control cut by a scroller of its own, or
+   * a crumb clipped at the strip's end, counts as an overflow.
    */
   readonly frameSelector: string;
   /**
@@ -56,8 +57,9 @@ export interface LayoutMeasure {
    * each as `element right=…`: the shell's content (which the shell clips,
    * so the document never shows it), a region whose content is wider than
    * the region, every element whose box ends past the viewport and that
-   * no element of its own scrolls or clips, and every element of the frame
-   * that scrolls its content sideways.
+   * no element of its own scrolls or clips (an element of the frame is
+   * never excused), and every element of the frame that scrolls its
+   * content sideways.
    */
   readonly overflow: readonly string[];
   /** The elements that scroll: a scrolling overflow and content past it. */

@@ -13,7 +13,10 @@ import type { LayoutMeasure, MeasureLayoutOptions } from "./types.js";
  * it, such as a code block that scrolls sideways, never by a region or the
  * shell. The frame excuses nothing: an element of the strip that scrolls
  * sideways is itself an overflow, since the controls it cuts can only be
- * reached by scrolling a strip a phone's width wide.
+ * reached by scrolling a strip a phone's width wide, and an element of the
+ * strip that reaches past the viewport is one even where an ancestor clips
+ * it, since a crumb cut off at the strip's end loses its text without a
+ * sign: what the strip holds must shrink inside it.
  *
  * The chrome's spacing excludes what resolves to a measure rather than a
  * choice: an auto margin, which takes the free space, and the typography
@@ -49,7 +52,9 @@ export default function measureLayout({
 
   const shell = document.querySelector(".ds.shell");
   const regions = new Set(document.querySelectorAll(regionSelector));
+  const frames = [...document.querySelectorAll(frameSelector)];
   const isExcused = (element: Element): boolean => {
+    if (frames.some((frame) => frame.contains(element))) return false;
     for (
       let ancestor = element.parentElement;
       ancestor !== null && ancestor !== shell;
