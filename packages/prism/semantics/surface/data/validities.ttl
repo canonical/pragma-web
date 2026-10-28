@@ -1,0 +1,21 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Why an item is no longer live. An invalid item stays in the graph with a
+# validity note.
+
+surface:superseded a surface:Validity ;
+  rdfs:label "Superseded" ;
+  rdfs:comment "Replaced by a successor, which the item names with supersededBy." .
+
+surface:deprecated a surface:Validity ;
+  rdfs:label "Deprecated" ;
+  rdfs:comment "Still in place but on its way out: new work does not lean on it." .
+
+surface:cancelled a surface:Validity ;
+  rdfs:label "Cancelled" ;
+  rdfs:comment "Started and then stopped before it was finished." .
+
+surface:rejected a surface:Validity ;
+  rdfs:label "Rejected" ;
+  rdfs:comment "Proposed and turned down: it never became live." .

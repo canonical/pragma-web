@@ -20,6 +20,7 @@
     "configs/*",
     "packages/*",
     "packages/prism/*",
+    "packages/prism/semantics/*",
     "packages/react/*",
     "packages/runtime/*",
     "packages/storybook/*",

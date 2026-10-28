@@ -783,6 +783,14 @@
         "vitest": "^5.0.0",
       },
     },
+    "packages/prism/semantics/surface": {
+      "name": "@canonical/surface",
+      "version": "0.44.1",
+      "devDependencies": {
+        "@biomejs/biome": "2.5.15",
+        "@canonical/biome-config": "0.43.0",
+      },
+    },
     "packages/react/ds-app": {
       "name": "@canonical/react-ds-app",
       "version": "0.44.1",
@@ -2073,6 +2081,8 @@
     "@canonical/styles-vanilla-adapter": ["@canonical/styles-vanilla-adapter@workspace:packages/styles/vanilla-adapter"],
 
     "@canonical/summon-core": ["@canonical/summon-core@0.43.0", "", { "dependencies": { "@canonical/task": "^0.43.0", "@canonical/utils": "^0.43.0", "chalk": "^6.0.0", "commander": "^15.0.0", "ejs": "^5.0.0", "ink": "^6.8.0", "ink-select-input": "^6.2.0", "ink-text-input": "^6.0.0", "react": "^19.2.4" } }, "sha512-ZEGnQQotRjOuRhVVIcDTliKmK+H3llmr9qOL2RVylKlcNqYP1W+EMdK7VwyFMdKnlinRUvnzQuYGsg/If9lMUA=="],
+
+    "@canonical/surface": ["@canonical/surface@workspace:packages/prism/semantics/surface"],
 
     "@canonical/svelte-ds-app": ["@canonical/svelte-ds-app@workspace:packages/svelte/ds-app"],
 

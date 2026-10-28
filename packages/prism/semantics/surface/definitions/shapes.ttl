@@ -1,0 +1,59 @@
+@prefix surface: <sem://surface#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# The cardinality shapes of the surface ontology. The GraphQL compiler reads
+# them to decide which fields are singular: sh:maxCount 1 makes a property
+# singular, and a property a shape names with no maxCount stays a list on
+# the shape's target class. Only sh:minCount and sh:maxCount are used, plus
+# the one sh:or that carries the served gate.
+
+surface:JobShape a sh:NodeShape ;
+  sh:targetClass surface:Job ;
+  rdfs:label "Job shape" ;
+  rdfs:comment "A job carries one story with its four slots, one coordinate region, at least one acceptance clause, and any number of bets by id; and it is served (the forJob of at least one pairing) or consciously deferred, never silently unserved (the served gate, F10)." ;
+  sh:property [ sh:path surface:acceptance ; sh:minCount 1 ] ;
+  sh:property [ sh:path surface:story ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path surface:coordinates ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path surface:bet ; sh:datatype xsd:string ] ;
+  sh:or (
+    [ sh:property [ sh:path [ sh:inversePath surface:forJob ] ; sh:minCount 1 ] ]
+    [ sh:property [ sh:path surface:deferred ; sh:hasValue true ] ]
+  ) .
+
+surface:ExemplarShape a sh:NodeShape ;
+  sh:targetClass surface:Exemplar ;
+  rdfs:label "Exemplar shape" ;
+  rdfs:comment "An exemplar tells its walk in at least one narrative step, comes out with at most one verdict, and walks at least one job." ;
+  sh:property [ sh:path surface:narrative ; sh:minCount 1 ] ;
+  sh:property [ sh:path surface:verdict ; sh:maxCount 1 ] ;
+  sh:property [ sh:path surface:walksJob ; sh:minCount 1 ] .
+
+surface:BetShape a sh:NodeShape ;
+  sh:targetClass surface:Bet ;
+  rdfs:label "Bet shape" ;
+  rdfs:comment "A bet names exactly one test or kill-criterion, any number of instruments, and at most one prior confidence." ;
+  sh:property [ sh:path surface:test ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path surface:instrument ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path surface:confidence ; sh:maxCount 1 ] .
+
+surface:PairingShape a sh:NodeShape ;
+  sh:targetClass surface:Pairing ;
+  rdfs:label "Pairing shape" ;
+  rdfs:comment "A pairing joins exactly one job to exactly one surface in exactly one role, primary or secondary." ;
+  sh:property [ sh:path surface:forJob ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path surface:pairsSurface ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path surface:pairingRole ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+surface:SlotShape a sh:NodeShape ;
+  sh:targetClass surface:Slot ;
+  rdfs:label "Slot shape" ;
+  rdfs:comment "A slot instantiates exactly one region kind." ;
+  sh:property [ sh:path surface:ofRegion ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+surface:PersonaShape a sh:NodeShape ;
+  sh:targetClass surface:Persona ;
+  rdfs:label "Persona shape" ;
+  rdfs:comment "A persona names exactly one coordinate region." ;
+  sh:property [ sh:path surface:region ; sh:minCount 1 ; sh:maxCount 1 ] .

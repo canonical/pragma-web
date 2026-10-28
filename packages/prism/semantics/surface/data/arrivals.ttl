@@ -1,0 +1,33 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The pairing roles, and the preservations an arrival keeps, ordered by the
+# cost of reorienting after it (4 is the most expensive).
+
+surface:primary a surface:PairingRole ;
+  rdfs:label "Primary" ;
+  rdfs:comment "The surface that serves the job first: where a consumer with this job is meant to land." .
+
+surface:secondary a surface:PairingRole ;
+  rdfs:label "Secondary" ;
+  rdfs:comment "Another route to the job: a surface that also serves it, after or beside the primary one." .
+
+surface:cold_entry a surface:Preservation ;
+  rdfs:label "Cold entry" ;
+  rdfs:comment "The arrival keeps nothing: a deep link or a first visit, where the consumer orients from scratch." ;
+  surface:reorientationOrder 4 .
+
+surface:subject_kept a surface:Preservation ;
+  rdfs:label "Subject kept" ;
+  rdfs:comment "The arrival keeps the subject: the consumer moves to another surface about the same entity." ;
+  surface:reorientationOrder 3 .
+
+surface:view_kept a surface:Preservation ;
+  rdfs:label "View kept" ;
+  rdfs:comment "The arrival keeps the view and the subject: only a part of the surface changes." ;
+  surface:reorientationOrder 2 .
+
+surface:no_move a surface:Preservation ;
+  rdfs:label "No move" ;
+  rdfs:comment "The arrival is in place: the job is reached without leaving the current surface." ;
+  surface:reorientationOrder 1 .

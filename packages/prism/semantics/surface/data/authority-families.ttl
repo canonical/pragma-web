@@ -1,0 +1,25 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The base species of authority a capability may require. Projects extend
+# the list with their own families.
+
+surface:read a surface:AuthorityFamily ;
+  rdfs:label "Read" ;
+  rdfs:comment "Authority to read the substrate as it is." .
+
+surface:observe a surface:AuthorityFamily ;
+  rdfs:label "Observe" ;
+  rdfs:comment "Authority to follow the substrate as it changes: subscriptions and live views." .
+
+surface:write a surface:AuthorityFamily ;
+  rdfs:label "Write" ;
+  rdfs:comment "Authority to put values into the substrate." .
+
+surface:control a surface:AuthorityFamily ;
+  rdfs:label "Control" ;
+  rdfs:comment "Authority to change how a running part of the system behaves." .
+
+surface:genesis a surface:AuthorityFamily ;
+  rdfs:label "Genesis" ;
+  rdfs:comment "Authority to bring a new part of the system into existence." .

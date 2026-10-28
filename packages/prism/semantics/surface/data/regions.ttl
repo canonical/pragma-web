@@ -1,0 +1,25 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The base slot kinds, one shared vocabulary for where something is on any
+# surface. Projects extend the list with their own regions.
+
+surface:canvas a surface:Region ;
+  rdfs:label "Canvas" ;
+  rdfs:comment "The main region, where the surface's subject is shown. Every layout has one." .
+
+surface:rails a surface:Region ;
+  rdfs:label "Rails" ;
+  rdfs:comment "The navigation region at the start edge, which carries the way between surfaces." .
+
+surface:controls a surface:Region ;
+  rdfs:label "Controls" ;
+  rdfs:comment "The region that holds the controls acting on the canvas: search, filters and view switches." .
+
+surface:status a surface:Region ;
+  rdfs:label "Status" ;
+  rdfs:comment "The region that reports the state of the surface or of the work in progress." .
+
+surface:aside a surface:Region ;
+  rdfs:label "Aside" ;
+  rdfs:comment "The secondary region beside the canvas, for what supports the subject without being it." .

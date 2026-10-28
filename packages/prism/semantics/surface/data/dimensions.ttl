@@ -1,0 +1,29 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The values of a surface's three dimensions: anchoring, direction and
+# rendering.
+
+surface:free a surface:Anchoring ;
+  rdfs:label "Free" ;
+  rdfs:comment "The surface is coherent standalone: it needs no subject to make sense." .
+
+surface:subject_bound a surface:Anchoring ;
+  rdfs:label "Subject bound" ;
+  rdfs:comment "The surface is meaningless without a subject: it shows something of something." .
+
+surface:read_face a surface:Direction ;
+  rdfs:label "Read face" ;
+  rdfs:comment "Value flows out of the substrate to the consumer, who takes." .
+
+surface:write_face a surface:Direction ;
+  rdfs:label "Write face" ;
+  rdfs:comment "Value flows from the consumer into the substrate, the consumer puts." .
+
+surface:curated a surface:Rendering ;
+  rdfs:label "Curated" ;
+  rdfs:comment "The surface re-presents a chosen slice of the substrate for perception." .
+
+surface:invocable a surface:Rendering ;
+  rdfs:label "Invocable" ;
+  rdfs:comment "The surface exposes operations over the substrate for calling." .

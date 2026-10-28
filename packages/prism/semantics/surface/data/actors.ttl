@@ -1,0 +1,12 @@
+@prefix surface: <sem://surface#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The species of consumer a coordinate's actor axis ranges over.
+
+surface:human a surface:Actor ;
+  rdfs:label "Human" ;
+  rdfs:comment "A person reading or working through the surfaces: they look, compare and decide." .
+
+surface:agent a surface:Actor ;
+  rdfs:label "Agent" ;
+  rdfs:comment "A machine consumer, a coding assistant or a script, that calls the surfaces instead of looking at them." .
