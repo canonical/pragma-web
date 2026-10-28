@@ -56,6 +56,6 @@ describe("LineRow SSR", () => {
       createProjectionTree(environment, <LineRowSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-row ds line-row"');
-    expect(html).toContain('href="/lines/metro%3Anorth-line"');
+    expect(html).toContain('href="/network/lines/metro%3Anorth-line"');
   });
 });

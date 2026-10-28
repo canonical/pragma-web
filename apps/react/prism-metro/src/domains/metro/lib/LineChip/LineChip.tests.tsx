@@ -84,7 +84,7 @@ describe("LineChip", () => {
     renderWithNode((node) => <LineChip node={node} />);
     expect(
       screen.getByRole("link", { name: "North Line" }).getAttribute("href"),
-    ).toBe("/lines/metro%3Anorth-line");
+    ).toBe("/network/lines/metro%3Anorth-line");
   });
 
   it("takes a passage's link text in place of the name", () => {

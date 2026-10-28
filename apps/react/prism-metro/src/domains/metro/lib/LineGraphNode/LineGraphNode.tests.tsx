@@ -102,7 +102,7 @@ describe("LineGraphNode", () => {
       </svg>
     ));
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
-      "/lines/metro%3Anorth-line",
+      "/network/lines/metro%3Anorth-line",
     );
   });
   it("applies custom className", () => {

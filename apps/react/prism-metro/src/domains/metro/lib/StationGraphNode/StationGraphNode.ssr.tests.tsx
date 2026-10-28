@@ -61,6 +61,6 @@ describe("StationGraphNode SSR", () => {
     expect(html).toContain(
       'class="ds entity-graph-node ds station-graph-node"',
     );
-    expect(html).toContain('href="/stations/metro%3Anorthgate"');
+    expect(html).toContain('href="/network/stations/metro%3Anorthgate"');
   });
 });

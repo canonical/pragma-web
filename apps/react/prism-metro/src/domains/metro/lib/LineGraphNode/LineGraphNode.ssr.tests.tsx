@@ -58,6 +58,6 @@ describe("LineGraphNode SSR", () => {
       createProjectionTree(environment, <LineGraphNodeSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-graph-node ds line-graph-node"');
-    expect(html).toContain('href="/lines/metro%3Anorth-line"');
+    expect(html).toContain('href="/network/lines/metro%3Anorth-line"');
   });
 });

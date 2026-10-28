@@ -1,0 +1,16 @@
+---
+# NetworkMap — the network workspace's canvas content: it reads every line,
+# route and stop position, builds the drawing with the geometry module and
+# renders it as one SchematicMap; while loading, and if loading fails, a
+# status line takes the map's place. It renders no element of its own and
+# binds no styles.
+node:
+  uri: metro.component.network_map
+  edges:
+    - switch:
+        on: internal
+        cases:
+          - node: { uri: metro.component.schematic_map }
+          - node: { role: loading status }
+          - node: { role: error status }
+      relation: { cardinality: "1" }

@@ -20,3 +20,13 @@ export interface MetroGraph {
   /** Stop listening; resolves once the socket is closed. */
   readonly close: () => Promise<void>;
 }
+
+/** One operation's answer, recorded from the metro provider. */
+export interface RecordedResponse {
+  /** The operation's name, as its generated artifact names it. */
+  readonly operation: string;
+  /** The variables it was executed with. */
+  readonly variables: Readonly<Record<string, unknown>>;
+  /** The provider's answer. */
+  readonly response: { readonly data?: unknown; readonly errors?: unknown };
+}

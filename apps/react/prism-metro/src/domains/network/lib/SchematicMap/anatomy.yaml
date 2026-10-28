@@ -1,0 +1,74 @@
+---
+# SchematicMap — the network as an octilinear diagram, drawn as SVG on the
+# server: every line once (a route and its reverse are one track), lines
+# sharing a stretch side by side, each station a dot or, where tracks pass
+# side by side or lines meet, a capsule, every station's name placed clear
+# of every other mark and name, and every mark a link to its station.
+# Bespoke: no published component draws a diagram.
+#
+# Geometry is SVG drawing in the viewBox's user units (positions, path data,
+# radii, stroke widths, the names' font size), computed by the geometry
+# module, not CSS. Paint goes through currentColor: each slot sets `color`
+# and its shapes fill or stroke with currentColor, since the style-key
+# roster has no fill or stroke key. A track's stroke is its line's colour
+# from the graph: data, not a design decision.
+#
+# The drawing lies in prism-core's GraphCanvas, which owns the floor, the
+# 16px dot lattice, the fit and the pan and zoom. Every station, interchange
+# capsule, line vertex and name anchor sits on a lattice dot: the dataset's
+# diagram positions are lattice units. The names show only in the canvas's
+# `full` zoom bucket, where 14-unit text renders at 12px or more; each
+# station keeps its name as its link's accessible title at every zoom.
+#
+# Each station is a native SVG group, as EntityGraphNode is (never HTML in
+# a foreignObject), with its link inside it. The node's box, title and
+# kind do not fit a station dot on a line, so the map keeps its own marks
+# in that form rather than rendering the node.
+#
+# The canvas is an item of the workspace canvas's page, a subgrid, so it
+# spans every column of it and fills its height.
+#
+# Every decision is read through a component token declared on the root
+# (`--schematic-map-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   appearance.outline.width@focus 2px on a station: no semantic stroke
+#     thickness token.
+node:
+  uri: metro.component.schematic_map
+  styles:
+    layout.grid.column: "1 / -1"
+    size.block: 100%
+    typography.color: color.text
+  edges:
+    - node:
+        role: line track
+        # one <path> per drawn track, stroked in its line's colour
+      relation: { cardinality: "1..*", slotName: track }
+    - node:
+        role: station mark
+        # a <g> per station holding its link: a box filled with
+        # currentColor, the fill inset inside it, and the name
+        styles:
+          typography.color: color.text
+          typography.color@hover: color.text.link
+      relation: { cardinality: "1..*", slotName: station }
+    - node:
+        role: station link
+        # the SVG <a> to the station's page, titled with its name
+        styles:
+          appearance.outline.color@focus: color.focusRing
+          appearance.outline.style@focus: solid
+          appearance.outline.width@focus: 2px
+      relation: { cardinality: "1..*", slotName: link }
+    - node:
+        role: mark fill
+        # the inner shape of a mark, in the background's colour
+        styles:
+          typography.color: color.background
+      relation: { cardinality: "1..*", slotName: fill }
+    - node:
+        role: station name
+        # a <text> at the placed anchor, in the full zoom bucket only; it
+        # paints in its mark's colour
+      relation: { cardinality: "0..*", slotName: label }

@@ -1,0 +1,32 @@
+---
+# HierarchyWell — the explorer's class graph region: the graph in a canvas
+# that pans and zooms, on its lattice, fitted on first paint; below one
+# group of columns, the phone view in its place, which scrolls. The canvas
+# and the drawing carry every visual decision; the well places them.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 448px)  below one group: the canvas leaves,
+#     the phone view shows, and the well scrolls.
+#
+# Why not a published component: no published component draws a graph;
+# the canvas is prism-core's GraphCanvas, the drawing the lens's
+# ClassGraph.
+node:
+  uri: prism.component.hierarchy_well
+  styles:
+    layout.position: relative
+    size.block: 100%
+    size.min.block: 0
+  edges:
+    - node:
+        uri: prism.component.graph_canvas
+        edges:
+          - node:
+              uri: prism.component.class_graph
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "1", slotName: desktop }
+    - node:
+        uri: prism.component.phone_graph
+        styles:
+          layout.type: none
+      relation: { cardinality: "1", slotName: phone }

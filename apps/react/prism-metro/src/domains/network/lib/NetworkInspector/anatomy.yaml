@@ -1,0 +1,40 @@
+---
+# NetworkInspector — the network workspace's inspector: a one-line hint,
+# then the network's lines and its stations, each list the shared NodeList
+# view in rows, each row its node's projection linking to its page.
+# Bespoke as the inspector's arrangement.
+#
+# Every decision is read through a component token declared on the root
+# (`--network-inspector-*`), bound to the symbol named here.
+node:
+  uri: metro.component.network_inspector
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+  edges:
+    - node:
+        role: hint
+        styles:
+          layout.grid.column: "1 / -1"
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: hint }
+    - node:
+        role: section
+        # the lines, then the stations, each under its heading
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+      relation: { cardinality: "2", slotName: section }
+    - node:
+        role: list
+        # NodeList in rows: the lines in code order, the stations in name
+        # order
+      relation: { cardinality: "2" }

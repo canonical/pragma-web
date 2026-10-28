@@ -10,6 +10,7 @@ import {
   stationsRoutes,
 } from "#domains/lenses";
 import { homeLayout, homeRoutes } from "#domains/metro";
+import { networkLayout, networkRoutes } from "#domains/network";
 import { NotFoundPage } from "#lib/ui";
 
 /**
@@ -35,6 +36,12 @@ export const notFoundRoute = route({
 
 const [home] = group(homeLayout, [homeRoutes.home] as const);
 
+// The network lens's map is a workspace and shares its wrapper; its station
+// and line pages are documents that render their own archetype, so they sit
+// in the table directly.
+const [network] = group(networkLayout, [networkRoutes.network] as const);
+const { networkStation, networkLine } = networkRoutes;
+
 const [definitions, definitionsTerm] = group(definitionsLayout, [
   definitionsRoutes.definitions,
   definitionsRoutes.definitionsTerm,
@@ -57,12 +64,15 @@ const [lines, linesEntity] = group(linesLayout, [
  */
 export const appRoutes = {
   home,
+  network,
   definitions,
   stations,
   lines,
   definitionsTerm,
   stationsEntity,
   linesEntity,
+  networkStation,
+  networkLine,
 } as const;
 
 /**

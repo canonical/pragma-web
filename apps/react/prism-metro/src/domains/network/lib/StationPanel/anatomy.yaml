@@ -1,0 +1,116 @@
+---
+# StationPanel — a station's place on the network, the main column of its
+# page: its title and kind, its facts (fare zone, platforms, transfer time
+# at an interchange), and for every route of every line serving it the stop
+# before and the stop after it. A subgrid of the page over every column, so
+# each fact and each route aligns to the grid's lines: the term or the line
+# in the first two columns, the value or the neighbours in the rest. Bespoke
+# as the page's arrangement; each route's line is the line's chip, as its
+# site projects it.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups a term or a route's
+#     line takes the whole row, its value or neighbours the row below, so
+#     nothing is squeezed into the narrow columns' remainder.
+#
+# Every decision is read through a component token declared on the root
+# (`--station-panel-*`), bound to the symbol named here.
+node:
+  uri: metro.component.station_panel
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: header
+        # the station's title (<h1>) and its kind
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: kind
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1", slotName: kind }
+    - node:
+        role: facts
+        # a <dl>, a subgrid of the panel
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "1", slotName: facts }
+    - node:
+        role: fact
+        # one term and its value, a subgrid row
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+      relation: { cardinality: "0..3", slotName: fact }
+    - node:
+        role: term
+        styles:
+          layout.grid.column: "1 / span 2"
+          typography.color: color.text.muted
+      relation: { cardinality: "0..3", slotName: term }
+    - node:
+        role: value
+        styles:
+          layout.grid.column: "3 / -1"
+          spacing.external.inline.start: 0
+      relation: { cardinality: "0..3", slotName: value }
+    - node:
+        role: routes
+        # the routes' heading and one row per route, a subgrid of the panel
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+      relation: { cardinality: "1", slotName: routes }
+    - node:
+        role: routes heading
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "1", slotName: heading }
+    - node:
+        role: route
+        # one route's row, a subgrid
+        styles:
+          layout.type: grid
+          layout.grid.columns: subgrid
+          layout.grid.column: "1 / -1"
+          spacing.gap: grid.gutter
+      relation: { cardinality: "1..*", slotName: route }
+    - node:
+        role: line
+        # the route's line as its chip, linking to its page
+        styles:
+          layout.grid.column: "1 / span 2"
+          layout.alignSelf: start
+          size.width: fit-content
+      relation: { cardinality: "1..*", slotName: line }
+    - node:
+        role: neighbours
+        # the route's label, then the stop before and the stop after, a
+        # wrapping row a --space-* step apart: no semantic name of the shim
+        # fits the gap between the parts of one line of text
+        styles:
+          layout.grid.column: "3 / -1"
+          layout.type: flex
+          layout.wrap: wrap
+          spacing.gap: space.200
+      relation: { cardinality: "1..*", slotName: neighbours }
+    - node:
+        role: neighbour label
+        # "Previous", "Next", "Terminus"
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "1..*", slotName: muted }

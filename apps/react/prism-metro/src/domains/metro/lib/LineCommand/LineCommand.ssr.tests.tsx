@@ -58,6 +58,6 @@ describe("LineCommand SSR", () => {
       createProjectionTree(environment, <LineCommandSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-command ds line-command"');
-    expect(html).toContain('href="/lines/metro%3Anorth-line"');
+    expect(html).toContain('href="/network/lines/metro%3Anorth-line"');
   });
 });

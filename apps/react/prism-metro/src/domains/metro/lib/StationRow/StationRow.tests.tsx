@@ -106,7 +106,7 @@ describe("StationRow", () => {
     ));
     expect(
       screen.getByRole("link", { name: "Northgate" }).getAttribute("href"),
-    ).toBe("/stations/metro%3Anorthgate");
+    ).toBe("/network/stations/metro%3Anorthgate");
   });
 
   it("counts a single platform in the singular", () => {

@@ -1,0 +1,35 @@
+---
+# NetworkLinePage — the content of /network/lines/:uri, a document. It
+# renders prism-core's DocumentLayout with the metro rail and, in the
+# three-column aside, the line's LinePanel; its own root is the main
+# column: a subgrid of the canvas's page over every column, holding the
+# line's title and one RouteStrip per route the line draws, or its
+# not-found, loading or error status. It renders its own archetype because
+# its aside reads the line's own data.
+#
+# Every decision is read through a component token declared on the root
+# (`--network-line-page-*`), bound to the symbol named here.
+node:
+  uri: metro.component.network_line_page
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    layout.alignSelf: start
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: line title
+        # the page's <h1>
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: title }
+    - node:
+        uri: metro.component.line_strip
+      relation: { cardinality: "0..*", slotName: strips }
+    - node:
+        role: status
+        # not found, loading or error, in place of the line
+        styles:
+          layout.grid.column: "1 / -1"
+      relation: { cardinality: "0..1", slotName: status }

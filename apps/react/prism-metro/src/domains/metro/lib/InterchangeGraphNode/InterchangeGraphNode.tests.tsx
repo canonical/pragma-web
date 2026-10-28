@@ -107,7 +107,7 @@ describe("InterchangeGraphNode", () => {
       </svg>
     ));
     expect(container.querySelector(".link")?.getAttribute("href")).toBe(
-      "/stations/metro%3Acentral-exchange",
+      "/network/stations/metro%3Acentral-exchange",
     );
   });
 

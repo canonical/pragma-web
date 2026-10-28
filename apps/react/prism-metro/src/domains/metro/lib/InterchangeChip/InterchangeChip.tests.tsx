@@ -91,7 +91,7 @@ describe("InterchangeChip", () => {
       screen
         .getByRole("link", { name: "Central Exchange" })
         .getAttribute("href"),
-    ).toBe("/stations/metro%3Acentral-exchange");
+    ).toBe("/network/stations/metro%3Acentral-exchange");
   });
 
   it("takes a passage's link text in place of the name", () => {

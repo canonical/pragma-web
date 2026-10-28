@@ -58,6 +58,6 @@ describe("StationRow SSR", () => {
       createProjectionTree(environment, <StationRowSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-row ds station-row"');
-    expect(html).toContain('href="/stations/metro%3Anorthgate"');
+    expect(html).toContain('href="/network/stations/metro%3Anorthgate"');
   });
 });

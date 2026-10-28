@@ -23,21 +23,21 @@ const resolveHome = (typename: string, uri: string): string | undefined =>
   homes[typename]?.({ __typename: typename, uri }, router);
 
 describe("homes", () => {
-  it("homes a station on its stations entity page", () => {
+  it("homes a station on its page in the network lens", () => {
     expect(resolveHome("Station", NORTHGATE_CURIE)).toBe(
-      "/stations/metro%3Anorthgate",
+      "/network/stations/metro%3Anorthgate",
     );
   });
 
-  it("homes an interchange on the stations lens too", () => {
+  it("homes an interchange on the network lens too", () => {
     expect(resolveHome("Interchange", CENTRAL_EXCHANGE_CURIE)).toBe(
-      "/stations/metro%3Acentral-exchange",
+      "/network/stations/metro%3Acentral-exchange",
     );
   });
 
-  it("homes a line on its lines entity page", () => {
+  it("homes a line on its page in the network lens", () => {
     expect(resolveHome("Line", CIRCLE_LINE_CURIE)).toBe(
-      "/lines/metro%3Acircle-line",
+      "/network/lines/metro%3Acircle-line",
     );
   });
 

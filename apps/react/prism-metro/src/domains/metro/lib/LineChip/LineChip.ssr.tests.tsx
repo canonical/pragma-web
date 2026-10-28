@@ -52,6 +52,6 @@ describe("LineChip SSR", () => {
       createProjectionTree(environment, <LineChipSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-chip ds line-chip"');
-    expect(html).toContain('href="/lines/metro%3Anorth-line"');
+    expect(html).toContain('href="/network/lines/metro%3Anorth-line"');
   });
 });

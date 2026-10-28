@@ -110,7 +110,7 @@ describe("InterchangeCommand", () => {
       screen
         .getByRole("link", { name: "Central Exchange" })
         .getAttribute("href"),
-    ).toBe("/stations/metro%3Acentral-exchange");
+    ).toBe("/network/stations/metro%3Acentral-exchange");
   });
 
   it("names its class alone for an interchange in no zone", () => {

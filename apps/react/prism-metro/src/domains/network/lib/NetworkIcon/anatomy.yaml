@@ -1,0 +1,12 @@
+---
+# NetworkIcon — the network lens's rail glyph: two lines crossing at a
+# station, a 16-unit stroke drawing in currentColor, always aria-hidden
+# because the rail entry's label names it. Bespoke: no published icon draws
+# a network. Binds no styles: its size is the rail's.
+node:
+  uri: metro.component.network_icon
+  edges:
+    - node:
+        role: glyph
+      relation:
+        cardinality: "1"

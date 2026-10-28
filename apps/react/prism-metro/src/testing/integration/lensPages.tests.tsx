@@ -3,6 +3,8 @@ import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   CIRCLE_LINE_TITLE,
+  LENS_PAGE_TEST_TIMEOUT_MS,
+  LENS_PAGE_WAIT_MS,
   LINE_COUNT,
   NORTHGATE_TITLE,
   STATION_COUNT,
@@ -27,79 +29,95 @@ afterEach(() => {
 
 afterAll(() => graph.close());
 
+/** How long each query and wait below gives the page to answer. */
+const WAIT = { timeout: LENS_PAGE_WAIT_MS };
+
 /** The rows of the entity index's list view once its query has answered. */
 const findIndexRows = async (): Promise<HTMLElement[]> => {
-  const canvas = await screen.findByRole("main");
+  const canvas = await screen.findByRole("main", {}, WAIT);
   await waitFor(() => {
     expect(
       canvas.querySelector(".entity-index .entity-list .items"),
     ).not.toBeNull();
-  });
+  }, WAIT);
   return within(canvas).getAllByRole("listitem");
 };
 
-describe("the stations lens", () => {
+describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("lists every instance of the station class", async () => {
     renderLensPage("/stations", graph.url);
     expect(await findIndexRows()).toHaveLength(STATION_COUNT);
     expect(screen.getByRole("link", { name: NORTHGATE_TITLE })).toHaveAttribute(
       "href",
-      "/stations/metro%3Anorthgate",
+      "/network/stations/metro%3Anorthgate",
     );
   });
 
   it("shows a station's page with the fields its class declares", async () => {
     renderLensPage("/stations/metro%3Anorthgate", graph.url);
     expect(
-      await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: NORTHGATE_TITLE },
+        WAIT,
+      ),
     ).toBeInTheDocument();
-    const fields = await screen.findByRole("region", { name: "Fields" });
+    const fields = await screen.findByRole("region", { name: "Fields" }, WAIT);
     expect(within(fields).getByText("servesLine")).toBeInTheDocument();
   });
 
-  it("opens a station from the stations index on the client", async () => {
+  it("opens a station's network page from the stations index on the client", async () => {
     renderLensPage("/stations", graph.url);
     await findIndexRows();
     // The router took the click: the browser's own navigation was prevented
-    // and the station's page rendered in place.
+    // and the station's page in the network lens, its home, rendered in
+    // place.
     expect(
       fireEvent.click(screen.getByRole("link", { name: NORTHGATE_TITLE })),
     ).toBe(false);
     expect(
-      await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: NORTHGATE_TITLE },
+        WAIT,
+      ),
     ).toBeInTheDocument();
     expect(
-      await screen.findByRole("region", { name: "Fields" }),
+      await screen.findByRole("heading", { level: 2, name: "Routes" }, WAIT),
     ).toBeInTheDocument();
   });
 });
 
-describe("the lines lens", () => {
+describe("the lines lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("lists every line of the network", async () => {
     renderLensPage("/lines", graph.url);
     expect(await findIndexRows()).toHaveLength(LINE_COUNT);
     expect(
       screen.getByRole("link", { name: CIRCLE_LINE_TITLE }),
-    ).toHaveAttribute("href", "/lines/metro%3Acircle-line");
+    ).toHaveAttribute("href", "/network/lines/metro%3Acircle-line");
   });
 
-  it("opens a line from the lines index on the client", async () => {
+  it("opens a line's network page from the lines index on the client", async () => {
     renderLensPage("/lines", graph.url);
     await findIndexRows();
     expect(
       fireEvent.click(screen.getByRole("link", { name: CIRCLE_LINE_TITLE })),
     ).toBe(false);
     expect(
-      await screen.findByRole("heading", { level: 1, name: CIRCLE_LINE_TITLE }),
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: CIRCLE_LINE_TITLE },
+        WAIT,
+      ),
     ).toBeInTheDocument();
     expect(
-      await screen.findByRole("region", { name: "Fields" }),
+      await screen.findByRole("heading", { level: 2, name: "Clockwise" }, WAIT),
     ).toBeInTheDocument();
   });
 });
 
-describe("the Definitions lens", () => {
-  it("inspects the station class, with its instances linked to the stations lens", async () => {
+describe("the Definitions lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
+  it("inspects the station class, with its instances linked to the network lens", async () => {
     const { container } = renderLensPage(
       "/definitions/metro%3AStation",
       graph.url,
@@ -108,7 +126,7 @@ describe("the Definitions lens", () => {
       expect(
         container.querySelector(".term-inspector .entity-chip a"),
       ).not.toBeNull();
-    });
+    }, WAIT);
     const chips = [
       ...container.querySelectorAll<HTMLAnchorElement>(
         ".term-inspector .entity-chip a",
@@ -116,14 +134,17 @@ describe("the Definitions lens", () => {
     ];
     expect(chips.length).toBeGreaterThan(0);
     for (const chip of chips) {
-      expect(chip.getAttribute("href")).toMatch(/^\/stations\/metro%3A[\w-]*$/);
+      expect(chip.getAttribute("href")).toMatch(
+        /^\/network\/stations\/metro%3A[\w-]*$/,
+      );
     }
     // The inspector shows the first page of instances in IRI order, which
     // Central Exchange is on and Northgate, past the first page, is not.
     expect(
       chips.some(
         (chip) =>
-          chip.getAttribute("href") === "/stations/metro%3Acentral-exchange",
+          chip.getAttribute("href") ===
+          "/network/stations/metro%3Acentral-exchange",
       ),
     ).toBe(true);
   });

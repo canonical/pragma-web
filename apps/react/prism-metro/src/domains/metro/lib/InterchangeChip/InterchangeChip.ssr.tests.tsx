@@ -58,6 +58,6 @@ describe("InterchangeChip SSR", () => {
       createProjectionTree(environment, <InterchangeChipSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-chip ds interchange-chip"');
-    expect(html).toContain('href="/stations/metro%3Acentral-exchange"');
+    expect(html).toContain('href="/network/stations/metro%3Acentral-exchange"');
   });
 });

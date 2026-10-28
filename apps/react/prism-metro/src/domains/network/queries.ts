@@ -1,0 +1,177 @@
+import { graphql } from "react-relay";
+
+/* v8 ignore start -- relay-compiler reads these tags; nothing calls them at runtime */
+/**
+ * Codegen source of truth for the network lens's operations. Nothing calls
+ * it: the warm functions and the pages read the compiled artifacts, because
+ * an evaluated tag throws at module scope wherever no Relay transform has
+ * run.
+ *
+ * `NetworkNamespacesQuery` reads the graph's prefixes, which expand a
+ * page's compact address into the IRI `node(id:)` takes, as the entity
+ * lens expands its own.
+ *
+ * `NetworkMapQuery` reads every line with its routes, each route's calls in
+ * order and each stop's diagram position: all the schematic map draws,
+ * and every line and stop as the inspector's lists show them.
+ *
+ * `NetworkStationQuery` reads one stop: its facts, its card, and every
+ * route of every line serving it, in calling order, for the stops either
+ * side of it, each line as its chip.
+ *
+ * `NetworkLineQuery` reads one line: its title, code and colour, and its
+ * routes, each paired with its reverse, with every call's stop, the other
+ * lines it meets and, at an interchange, the time a transfer takes.
+ */
+const declareNetworkQueries = (): unknown => [
+  graphql`
+    query NetworkNamespacesQuery {
+      ontologies {
+        prefix
+        namespace
+      }
+    }
+  `,
+  graphql`
+    query NetworkMapQuery($classUri: String!, $first: Int!) {
+      ontologyClass(uri: $classUri) {
+        instances(first: $first) {
+          edges {
+            node {
+              uri
+              _meta {
+                title
+                curie
+              }
+              ...NodeList_node
+              ... on Line {
+                code
+                colour
+                routes {
+                  label
+                  isLoop
+                  reverse {
+                    label
+                  }
+                  calls {
+                    position
+                    stop {
+                      uri
+                      __typename
+                      _meta {
+                        title
+                        curie
+                      }
+                      diagramPosition {
+                        x
+                        y
+                      }
+                      ...NodeList_node
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+  graphql`
+    query NetworkStationQuery($id: ID!) {
+      node(id: $id) {
+        uri
+        __typename
+        _meta {
+          title
+          curie
+        }
+        ...CardProjection_node
+        ... on Stop {
+          platformCount
+          inZone {
+            _meta {
+              title
+            }
+          }
+          servesLine {
+            uri
+            code
+            colour
+            _meta {
+              title
+              curie
+            }
+            ...ChipProjection_node
+            routes {
+              label
+              isLoop
+              calls {
+                position
+                stop {
+                  uri
+                  _meta {
+                    title
+                    curie
+                  }
+                }
+              }
+            }
+          }
+        }
+        ... on Interchange {
+          transferMinutes
+        }
+      }
+    }
+  `,
+  graphql`
+    query NetworkLineQuery($id: ID!) {
+      node(id: $id) {
+        uri
+        __typename
+        _meta {
+          title
+          curie
+        }
+        ... on Line {
+          code
+          colour
+          routes {
+            label
+            isLoop
+            reverse {
+              label
+            }
+            ...RouteStrip_node
+            calls {
+              position
+              stop {
+                uri
+                __typename
+                _meta {
+                  title
+                  curie
+                }
+                servesLine {
+                  uri
+                  code
+                  colour
+                  _meta {
+                    title
+                    curie
+                  }
+                }
+                ... on Interchange {
+                  transferMinutes
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+];
+void declareNetworkQueries;
+/* v8 ignore stop */

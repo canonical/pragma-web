@@ -65,6 +65,6 @@ describe("InterchangeCommand SSR", () => {
       createProjectionTree(environment, <InterchangeCommandSsrTestNode />),
     );
     expect(html).toContain('class="ds entity-command ds interchange-command"');
-    expect(html).toContain('href="/stations/metro%3Acentral-exchange"');
+    expect(html).toContain('href="/network/stations/metro%3Acentral-exchange"');
   });
 });

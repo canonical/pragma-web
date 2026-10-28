@@ -67,6 +67,6 @@ describe("InterchangeGraphNode SSR", () => {
     expect(html).toContain(
       'class="ds entity-graph-node ds interchange-graph-node"',
     );
-    expect(html).toContain('href="/stations/metro%3Acentral-exchange"');
+    expect(html).toContain('href="/network/stations/metro%3Acentral-exchange"');
   });
 });

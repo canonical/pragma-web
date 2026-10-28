@@ -1,0 +1,20 @@
+---
+# NetworkLayout — the network lens's workspace, the map's router wrapper:
+# prism-core's WorkspaceLayout with the metro rail, the map as the canvas
+# (it never scrolls) and the network inspector as the inspector region,
+# which scrolls on its own and becomes the archetype's drawer below three
+# groups. It renders no element of its own and binds no styles: the
+# archetype owns the grid, the regions and the scroll model.
+node:
+  uri: metro.component.network_layout
+  edges:
+    - node:
+        uri: prism.component.workspace_layout
+        edges:
+          - node: { uri: metro.component.metro_rail }
+            relation: { cardinality: "1", slotName: rail }
+          - node: { uri: metro.component.network_map }
+            relation: { cardinality: "1", slotName: canvas }
+          - node: { uri: metro.component.network_inspector }
+            relation: { cardinality: "1", slotName: inspector }
+      relation: { cardinality: "1" }

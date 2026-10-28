@@ -119,7 +119,7 @@ describe("StationCard", () => {
     renderWithNode((node) => <StationCard node={node} />);
     expect(
       screen.getByRole("link", { name: "Northgate" }).getAttribute("href"),
-    ).toBe("/stations/metro%3Anorthgate");
+    ).toBe("/network/stations/metro%3Anorthgate");
   });
 
   it("leaves out the pair and the vital of an unasserted platform count", () => {

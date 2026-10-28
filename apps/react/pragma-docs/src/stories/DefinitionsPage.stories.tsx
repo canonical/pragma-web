@@ -1,6 +1,7 @@
 /**
- * `@canonical/prism-lens-definitions` ships no Storybook of its own; its page
- * story lives in the docs site, rendered over the site's styles.
+ * The Definitions page in the docs site, rendered over the site's styles;
+ * `@canonical/prism-lens-definitions` has a story for each of its
+ * components in its own Storybook, over its captured stores.
  */
 
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";

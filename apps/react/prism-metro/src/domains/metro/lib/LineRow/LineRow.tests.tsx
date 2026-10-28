@@ -106,7 +106,7 @@ describe("LineRow", () => {
     ));
     expect(
       screen.getByRole("link", { name: "North Line" }).getAttribute("href"),
-    ).toBe("/lines/metro%3Anorth-line");
+    ).toBe("/network/lines/metro%3Anorth-line");
   });
   it("applies custom className", () => {
     const { container } = renderWithNode((node) => (

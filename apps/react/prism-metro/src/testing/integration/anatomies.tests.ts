@@ -34,7 +34,10 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
 /** The semantic tokens the app's components read beyond the shim. */
 const EXTERNAL_TOKENS = [
   "--color-background",
+  "--color-border",
+  "--color-focus-ring",
   "--color-text",
+  "--color-text-link",
   "--color-text-muted",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-font-size",
