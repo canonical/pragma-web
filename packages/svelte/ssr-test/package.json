@@ -57,8 +57,8 @@
     "svelte": "^5.38.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@canonical/biome-config": "0.43.0",
+    "@biomejs/biome": "2.6.4",
+    "@canonical/biome-config": "0.44.0",
     "@canonical/typescript-config": "0.43.0",
     "@canonical/webarchitect": "0.43.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",

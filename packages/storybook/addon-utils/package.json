@@ -64,8 +64,8 @@
     "@storybook/icons": "^2.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@canonical/biome-config": "0.43.0",
+    "@biomejs/biome": "2.6.4",
+    "@canonical/biome-config": "0.44.0",
     "@canonical/router-core": "^0.45.0",
     "@canonical/router-react": "^0.45.0",
     "@canonical/storybook-addon-shell-theme": "^0.45.0",

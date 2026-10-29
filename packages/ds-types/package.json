@@ -45,8 +45,8 @@
     "test": "echo 'Type-only package — no runtime tests'"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@canonical/biome-config": "0.43.0",
+    "@biomejs/biome": "2.6.4",
+    "@canonical/biome-config": "0.44.0",
     "@canonical/typescript-config": "0.43.0",
     "@canonical/webarchitect": "0.43.0",
     "typescript": "^7.0.2"
