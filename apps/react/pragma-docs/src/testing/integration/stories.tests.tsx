@@ -50,7 +50,6 @@
  * without anyone deciding that it should.
  */
 
-import "../../../testing/stubReactFlowGlobals.js";
 import * as relayAddonAnnotations from "@canonical/storybook-addon-relay/preview";
 import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
 import { act, render, waitFor } from "@testing-library/react";

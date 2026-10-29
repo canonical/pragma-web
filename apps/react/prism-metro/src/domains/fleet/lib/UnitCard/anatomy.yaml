@@ -1,0 +1,50 @@
+---
+# UnitCard: a unit as a card in a grid of entities.
+# Best guess, with no Figma frame for the fleet: the title, the unit's
+# class as its kind and its definition as the summary; its length, its
+# capacity and its car count as key values; the car count again as the
+# footer's vital; and the unit drawn as a train of its own in the
+# sidecar. The schema gives a unit no inverse, so it has no location.
+# Projected onto EntityCard, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.unit_card
+  projection: { on: Unit }
+  edges:
+    - node:
+        uri: prism.component.entity_card
+        edges:
+          - node:
+              role: title
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: kind
+              projection: { field: _meta.title }
+            relation: { cardinality: "1", slotName: kind, projection: { field: _meta.type } }
+          - node:
+              role: summary
+              projection: { field: _meta.definition }
+            relation: { cardinality: "0..1", slotName: summary }
+          - node:
+              role: key values
+              edges:
+                - node: { role: length, projection: { field: length } }
+                  relation: { cardinality: "1" }
+                - node: { role: capacity, projection: { field: capacity } }
+                  relation: { cardinality: "1" }
+                - node: { role: cars, projection: { field: position } }
+                  relation: { cardinality: "1..*", projection: { field: cars } }
+            relation: { cardinality: "1", slotName: key-values }
+          - node:
+              role: vital
+              projection: { field: position }
+            relation: { cardinality: "1", slotName: footer, projection: { field: cars } }
+          - node:
+              uri: metro.component.formation_side_view
+            relation: { cardinality: "1", slotName: sidecar }
+      relation: { cardinality: "1" }

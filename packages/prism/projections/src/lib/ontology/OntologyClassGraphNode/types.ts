@@ -11,6 +11,11 @@ type OwnProps = {
   readonly node: OntologyClassGraphNode_node$key;
   /** The node's width in SVG user units; the graph's layout decides it. */
   readonly width?: number;
+  /**
+   * The node's height in SVG user units; the graph's layout decides it. A
+   * node with no kind and no location sets its title on the box's middle.
+   */
+  readonly height?: number;
 };
 
 /**

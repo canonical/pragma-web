@@ -1,0 +1,21 @@
+---
+# UnitChip: a unit as an inline mention.
+# Best guess: the unit's name in the pill, linked to its page.
+# Projected onto EntityChip, which carries every style: this anatomy binds
+# none. The home is the link the title renders through, resolved from the
+# compact address.
+node:
+  uri: metro.component.unit_chip
+  projection: { on: Unit }
+  edges:
+    - node:
+        uri: prism.component.entity_chip
+        edges:
+          - node:
+              role: value
+              projection: { field: _meta.title }
+              edges:
+                - node: { role: home, projection: { field: _meta.curie } }
+                  relation: { cardinality: "0..1" }
+            relation: { cardinality: "1", slotName: value }
+      relation: { cardinality: "1" }

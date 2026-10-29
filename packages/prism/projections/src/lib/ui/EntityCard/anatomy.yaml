@@ -94,12 +94,16 @@
 # (`1 / -1`), under the body and the sidecar.
 #
 # Reflow, bound in styles.css:
-#   @container shell (width < 448px)   below one group, under
-#     `.ds.entity-card:not(:has(> .sidecar))`: the card spans every column
-#     of the grid that holds it (`--entity-card-narrow-column`, `1 / -1`)
-#     instead of the Cards group's span, since the canvas beside the rail
-#     holds three columns there and a card at two would leave the last one
-#     empty on every row. A card with a sidecar keeps its own reflow.
+#   @container shell (width < 448px)   below one group, every card spans
+#     every column of the grid that holds it (`--entity-card-narrow-column`,
+#     `1 / -1`) instead of the Cards group's span, since the canvas beside
+#     the rail holds three columns there: a card at two would leave the
+#     last one empty on every row, and a card with a sidecar would need
+#     four. Under `.ds.entity-card:has(> .sidecar)` the body takes every
+#     column on its first two tracks (`1 / 3`) and the sidecar stacks under
+#     it on the third (`3 / 4`), meeting the body at its divider as the
+#     footer does (`--entity-card-footer-overlap`); the footer runs under
+#     both.
 #
 # Every decision is read through a component token declared on the root
 # (`--entity-card-*`), bound to the symbol or the literal named here.

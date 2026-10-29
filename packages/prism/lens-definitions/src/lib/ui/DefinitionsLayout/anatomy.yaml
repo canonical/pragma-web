@@ -1,0 +1,39 @@
+---
+# DefinitionsLayout — the Definitions lens's page layout: the workspace
+# archetype with the site's rail, the strip (the trail, the chips and the
+# status), the explorer in the canvas and the term inspector in its
+# region, all under the lens's filter provider. It renders no element of
+# its own: the workspace renders the root.
+node:
+  uri: prism.component.definitions_layout
+  edges:
+    - node:
+        uri: prism.component.lens_filter_provider
+        edges:
+          - node:
+              uri: prism.component.workspace_layout
+              edges:
+                - node:
+                    role: rail
+                  relation: { cardinality: "1", slotName: rail }
+                - node:
+                    uri: prism.component.mode_strip
+                    edges:
+                      - node:
+                          uri: prism.component.trail
+                        relation: { cardinality: "1", slotName: context }
+                      - node:
+                          uri: prism.component.controls
+                        relation: { cardinality: "1", slotName: controls }
+                      - node:
+                          uri: prism.component.status
+                        relation: { cardinality: "1", slotName: status }
+                  relation: { cardinality: "1", slotName: strip }
+                - node:
+                    uri: prism.component.inspector
+                  relation: { cardinality: "1", slotName: inspector }
+                - node:
+                    role: routed page
+                  relation: { cardinality: "1", slotName: default }
+            relation: { cardinality: "1" }
+      relation: { cardinality: "1" }

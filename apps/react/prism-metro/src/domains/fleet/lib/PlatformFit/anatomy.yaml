@@ -1,0 +1,68 @@
+---
+# PlatformFit — how a formation fits the platforms of each line it runs on:
+# per line, a row: the line's name (its title, or the Line chip the caller
+# renders), its shortest known platform, and the verdict in bold right
+# after it (fits, or overhangs with a count badge of the stations), so the
+# verdict reads with its line at every width; then each station overhung,
+# on a line of its own,
+# with how far the train runs past its platform. A formation no line runs
+# says so in one muted line instead.
+#
+# Token ledger: space.100 (8px) between the words of a line's entry, an
+# inline run, one baseline pair.
+node:
+  uri: metro.component.platform_fit
+  styles:
+    layout.type: grid
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: line list
+        styles:
+          layout.type: grid
+          spacing.gap: grid.gutter
+          spacing.internal.inline.start: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          layout.listStyle: none
+      relation: { cardinality: "0..1", slotName: lines }
+    - node:
+        role: line entry, its name, shortest platform and verdict in a row
+        styles:
+          layout.type: flex
+          layout.wrap: wrap
+          layout.align: baseline
+          spacing.gap: space.100
+      relation: { cardinality: "0..*", slotName: line }
+    - node:
+        role: line's name
+      relation: { cardinality: "1", slotName: line-name }
+    - node:
+        role: shortest platform
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: shortest }
+    - node:
+        role: verdict
+        styles:
+          typography.weight: typography.text.primary.bold.fontWeight
+        edges:
+          - node:
+              uri: global.component.badge
+            relation: { cardinality: "0..1", slotName: count }
+      relation: { cardinality: "1", slotName: verdict }
+    - node:
+        role: stations overhung
+        styles:
+          layout.flex.basis: 100%
+          spacing.internal.inline.start: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          layout.listStyle: none
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: overhangs }
+    - node:
+        role: no line runs the formation
+        styles:
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: empty }

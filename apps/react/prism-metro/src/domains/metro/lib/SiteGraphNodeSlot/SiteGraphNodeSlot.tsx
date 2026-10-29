@@ -2,6 +2,12 @@
 
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
+import {
+  CarTypeGraphNode,
+  FormationGraphNode,
+  RollingStockGraphNode,
+  UnitGraphNode,
+} from "#domains/fleet";
 import nodeFragment from "#relay/__generated__/SiteGraphNodeSlot_node.graphql.js";
 import assertSiteKey from "../../assertSiteKey.js";
 import { InterchangeGraphNode } from "../InterchangeGraphNode/index.js";
@@ -23,6 +29,10 @@ const declareNodeFragment = (): unknown => graphql`
     ...InterchangeGraphNode_node @alias(as: "Interchange")
     ...LineGraphNode_node @alias(as: "Line")
     ...ZoneGraphNode_node @alias(as: "Zone")
+    ...RollingStockGraphNode_node @alias(as: "RollingStock")
+    ...FormationGraphNode_node @alias(as: "Formation")
+    ...UnitGraphNode_node @alias(as: "Unit")
+    ...CarTypeGraphNode_node @alias(as: "CarType")
   }
 `;
 void declareNodeFragment;
@@ -73,6 +83,31 @@ export default function SiteGraphNodeSlot({
     case "Zone":
       return (
         <ZoneGraphNode {...props} node={assertSiteKey(data.Zone, typename)} />
+      );
+    case "RollingStock":
+      return (
+        <RollingStockGraphNode
+          {...props}
+          node={assertSiteKey(data.RollingStock, typename)}
+        />
+      );
+    case "Formation":
+      return (
+        <FormationGraphNode
+          {...props}
+          node={assertSiteKey(data.Formation, typename)}
+        />
+      );
+    case "Unit":
+      return (
+        <UnitGraphNode {...props} node={assertSiteKey(data.Unit, typename)} />
+      );
+    case "CarType":
+      return (
+        <CarTypeGraphNode
+          {...props}
+          node={assertSiteKey(data.CarType, typename)}
+        />
       );
     default:
       throw new Error(

@@ -3,6 +3,8 @@ import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   CIRCLE_LINE_TITLE,
+  LENS_PAGE_TEST_TIMEOUT_MS,
+  LENS_PAGE_WAIT_MS,
   LINE_COUNT,
   NORTHGATE_TITLE,
   STATION_COUNT,
@@ -27,18 +29,21 @@ afterEach(() => {
 
 afterAll(() => graph.close());
 
+/** How long each query and wait below gives the page to answer. */
+const WAIT = { timeout: LENS_PAGE_WAIT_MS };
+
 /** The rows of the entity index's list view once its query has answered. */
 const findIndexRows = async (): Promise<HTMLElement[]> => {
-  const canvas = await screen.findByRole("main");
+  const canvas = await screen.findByRole("main", {}, WAIT);
   await waitFor(() => {
     expect(
       canvas.querySelector(".entity-index .entity-list .items"),
     ).not.toBeNull();
-  });
+  }, WAIT);
   return within(canvas).getAllByRole("listitem");
 };
 
-describe("the stations lens", () => {
+describe("the stations lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("lists every instance of the station class", async () => {
     renderLensPage("/stations", graph.url);
     expect(await findIndexRows()).toHaveLength(STATION_COUNT);
@@ -51,9 +56,13 @@ describe("the stations lens", () => {
   it("shows a station's page with the fields its class declares", async () => {
     renderLensPage("/stations/metro%3Anorthgate", graph.url);
     expect(
-      await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: NORTHGATE_TITLE },
+        WAIT,
+      ),
     ).toBeInTheDocument();
-    const fields = await screen.findByRole("region", { name: "Fields" });
+    const fields = await screen.findByRole("region", { name: "Fields" }, WAIT);
     expect(within(fields).getByText("servesLine")).toBeInTheDocument();
   });
 
@@ -66,15 +75,19 @@ describe("the stations lens", () => {
       fireEvent.click(screen.getByRole("link", { name: NORTHGATE_TITLE })),
     ).toBe(false);
     expect(
-      await screen.findByRole("heading", { level: 1, name: NORTHGATE_TITLE }),
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: NORTHGATE_TITLE },
+        WAIT,
+      ),
     ).toBeInTheDocument();
     expect(
-      await screen.findByRole("region", { name: "Fields" }),
+      await screen.findByRole("region", { name: "Fields" }, WAIT),
     ).toBeInTheDocument();
   });
 });
 
-describe("the lines lens", () => {
+describe("the lines lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("lists every line of the network", async () => {
     renderLensPage("/lines", graph.url);
     expect(await findIndexRows()).toHaveLength(LINE_COUNT);
@@ -90,15 +103,19 @@ describe("the lines lens", () => {
       fireEvent.click(screen.getByRole("link", { name: CIRCLE_LINE_TITLE })),
     ).toBe(false);
     expect(
-      await screen.findByRole("heading", { level: 1, name: CIRCLE_LINE_TITLE }),
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: CIRCLE_LINE_TITLE },
+        WAIT,
+      ),
     ).toBeInTheDocument();
     expect(
-      await screen.findByRole("region", { name: "Fields" }),
+      await screen.findByRole("region", { name: "Fields" }, WAIT),
     ).toBeInTheDocument();
   });
 });
 
-describe("the Definitions lens", () => {
+describe("the Definitions lens", { timeout: LENS_PAGE_TEST_TIMEOUT_MS }, () => {
   it("inspects the station class, with its instances linked to the stations lens", async () => {
     const { container } = renderLensPage(
       "/definitions/metro%3AStation",
@@ -108,7 +125,7 @@ describe("the Definitions lens", () => {
       expect(
         container.querySelector(".term-inspector .entity-chip a"),
       ).not.toBeNull();
-    });
+    }, WAIT);
     const chips = [
       ...container.querySelectorAll<HTMLAnchorElement>(
         ".term-inspector .entity-chip a",

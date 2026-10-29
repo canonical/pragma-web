@@ -1,0 +1,17 @@
+---
+# PropertyView — the inspector's view of a property: a header (tag, name,
+# address), its definition, then its kind, functionality, range, domain
+# and inverse as key-value rows. Its slots are styled by the inspector,
+# whose anatomy names them.
+node:
+  uri: prism.component.property_view
+  edges:
+    - node:
+        role: header
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: section
+      relation: { cardinality: "1", slotName: section }
+    - node:
+        role: details
+      relation: { cardinality: "1", slotName: details }

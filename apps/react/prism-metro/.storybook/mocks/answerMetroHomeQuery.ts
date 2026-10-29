@@ -5,12 +5,16 @@ const METRO_HOME_QUERY = "MetroHomeQuery";
 
 /**
  * The metro graph's answer to the landing's query, as the example provider
- * gives it: the station and line classes with their instance counts, and
- * every ontology's classes, seven between them.
+ * gives it: the station, line and rolling-stock classes with their instance
+ * counts, and every ontology's classes, sixteen between them.
  */
 const METRO_HOME_ANSWER = {
   stations: { uri: "https://metro.example/onto#Station", instanceCount: 16 },
   lines: { uri: "https://metro.example/onto#Line", instanceCount: 3 },
+  fleet: {
+    uri: "https://metro.example/onto#RollingStock",
+    instanceCount: 3,
+  },
   ontologies: [
     {
       prefix: "metro",
@@ -19,6 +23,15 @@ const METRO_HOME_ANSWER = {
         { uri: "https://metro.example/onto#Station" },
         { uri: "https://metro.example/onto#Interchange" },
         { uri: "https://metro.example/onto#Line" },
+        { uri: "https://metro.example/onto#Route" },
+        { uri: "https://metro.example/onto#Call" },
+        { uri: "https://metro.example/onto#DiagramPoint" },
+        { uri: "https://metro.example/onto#RollingStock" },
+        { uri: "https://metro.example/onto#Formation" },
+        { uri: "https://metro.example/onto#Unit" },
+        { uri: "https://metro.example/onto#CarType" },
+        { uri: "https://metro.example/onto#UnitPosition" },
+        { uri: "https://metro.example/onto#CarPosition" },
       ],
     },
     {

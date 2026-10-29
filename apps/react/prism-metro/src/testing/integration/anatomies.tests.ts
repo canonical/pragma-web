@@ -35,6 +35,7 @@ const DOMAIN_LIBRARIES = readdirSync(join(APP_ROOT, "src", "domains"), {
 const EXTERNAL_TOKENS = [
   "--color-background",
   "--color-text",
+  "--color-text-error",
   "--color-text-muted",
   "--typography-text-primary-bold-font-weight",
   "--typography-text-primary-font-size",

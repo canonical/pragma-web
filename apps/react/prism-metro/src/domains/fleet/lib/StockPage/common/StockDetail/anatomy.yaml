@@ -1,0 +1,40 @@
+---
+# StockDetail — a rolling stock's page once its data is in the store, a
+# subcomponent of StockPage: its title, then its formations, each named by
+# its chip with its length and drawn at one scale with the others, then the
+# car types its units are made of, each once, as its row. An address naming
+# no rolling stock says nothing lives there.
+#
+# It renders no element of its own and binds no styles: its elements land
+# in StockPage's grid, which styles each by its slot.
+node:
+  uri: metro.subcomponent.stock_detail
+  edges:
+    - node: { role: page title }
+      relation: { cardinality: "0..1", slotName: title }
+    - node:
+        role: section
+        edges:
+          - node:
+              role: list of entries
+              edges:
+                - node:
+                    role: entry
+                    edges:
+                      - node: { uri: prism.component.chip_projection }
+                        relation: { cardinality: "1", slotName: chip }
+                      - node: { role: vital }
+                        relation: { cardinality: "1", slotName: vital }
+                  relation: { cardinality: "1..*", slotName: entry }
+                - node: { uri: metro.component.formation_side_view }
+                  relation: { cardinality: "1..*", slotName: side-view }
+            relation: { cardinality: "0..1", slotName: list }
+          - node:
+              role: list of rows
+              edges:
+                - node: { uri: prism.component.row_projection }
+                  relation: { cardinality: "1..*", slotName: row }
+            relation: { cardinality: "0..1", slotName: rows }
+      relation: { cardinality: "0..2", slotName: section }
+    - node: { role: not-found line }
+      relation: { cardinality: "0..1", slotName: not-found }

@@ -58,9 +58,13 @@ lays the five representations of each type out as one matrix, under
   for a rendered example of the entity.
 - **`EntityCommand`**: the command-palette result, a two-line row: the title
   over "kind in location", and one vital at the end.
-- **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a 50-unit
-  box and two lines of `<text>`, the title over "kind in location", for a
-  graph to place with a transform inside its `<svg>`.
+- **`EntityGraphNode`**: the graph node, native SVG: a `<g>` of a box with
+  rounded corners and its `<text>`, the title over "kind in location" (50
+  units tall by default), or the title alone on the middle of a box the
+  graph sizes, an optional vital (an instance count) at the end of the
+  title's line, and the graph's encodings: `hollow` (an abstract class),
+  `prominent` (a hub) and `showText` (off when zoomed out), for a graph to
+  place with a transform inside its `<svg>`.
 - **`EntityList`**: the shared list view of an index: a toolbar with the
   count line and the cards and rows toggle, then its children as cards in
   the published `Cards` group (two columns each) or as rows in an ordered

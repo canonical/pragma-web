@@ -1,0 +1,40 @@
+---
+# FormationDetail — a formation's page once its data is in the store, a
+# subcomponent of FormationPage: its title, its stock's chip, its side view
+# with a tick at each line's shortest platform, its units in order, each
+# named by its chip with its length and whether it runs reversed, then its
+# fit at the platforms of every line it runs on, each line named by its
+# chip. An address naming no formation says nothing lives there.
+#
+# It renders no element of its own and binds no styles: its elements land
+# in FormationPage's grid, which styles each by its slot.
+node:
+  uri: metro.subcomponent.formation_detail
+  edges:
+    - node: { role: page title }
+      relation: { cardinality: "0..1", slotName: title }
+    - node:
+        role: entry
+        edges:
+          - node: { uri: prism.component.chip_projection }
+            relation: { cardinality: "1", slotName: chip }
+          - node: { role: vital }
+            relation: { cardinality: "0..2", slotName: vital }
+      relation: { cardinality: "0..*", slotName: entry }
+    - node: { uri: metro.component.formation_side_view }
+      relation: { cardinality: "0..1", slotName: side-view }
+    - node:
+        role: section
+        edges:
+          - node:
+              role: list of entries
+            relation: { cardinality: "0..1", slotName: list }
+          - node:
+              uri: metro.component.platform_fit
+              edges:
+                - node: { uri: prism.component.chip_projection }
+                  relation: { cardinality: "0..*", slotName: line-name }
+            relation: { cardinality: "0..1", slotName: fit }
+      relation: { cardinality: "0..2", slotName: section }
+    - node: { role: not-found line }
+      relation: { cardinality: "0..1", slotName: not-found }

@@ -1,0 +1,17 @@
+---
+# CarTypeDetail — a car type's page once its data is in the store, a
+# subcomponent of CarTypePage: its title, then its side view, the car drawn
+# alone, its cab at the front when it has one. An address naming no car
+# type says nothing lives there.
+#
+# It renders no element of its own and binds no styles: its elements land
+# in CarTypePage's grid, which styles each by its slot.
+node:
+  uri: metro.subcomponent.car_type_detail
+  edges:
+    - node: { role: page title }
+      relation: { cardinality: "0..1", slotName: title }
+    - node: { uri: metro.component.formation_side_view }
+      relation: { cardinality: "0..1", slotName: side-view }
+    - node: { role: not-found line }
+      relation: { cardinality: "0..1", slotName: not-found }

@@ -15,7 +15,7 @@
  *
  * THE SCALE RULING. ~260 nodes across 5 columns is too much to read at
  * once, and virtualisation is not available to us: it would break the SSR
- * determinism contract the well depends on (React Flow renders node DOM
+ * determinism contract the well depends on (the well renders SVG
  * server-side only for nodes it is given). So the lens DEFAULTS TO A
  * FILTERED VIEW — one coordinate — rather than drawing everything and
  * hoping. `DEFAULT_JOURNEY_FILTER` is therefore NOT the no-op the

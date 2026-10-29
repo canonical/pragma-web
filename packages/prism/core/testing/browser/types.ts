@@ -90,14 +90,16 @@ export interface LayoutMeasure {
   /**
    * The layout's edges, in pixels: the inline end of its rail region, the
    * inline start and the top of its canvas, the bottom of its strip region
-   * (null when the layout renders none) and its row gap. An edge is -1
-   * when its element is absent.
+   * (null when the layout renders none), the bottom of the inspector's
+   * drawer trigger (null while it is hidden) and its row gap. An edge is
+   * -1 when its element is absent.
    */
   readonly edges: {
     readonly railEnd: number;
     readonly canvasStart: number;
     readonly canvasTop: number;
     readonly stripBottom: number | null;
+    readonly triggerBottom: number | null;
     readonly rowGap: number;
   };
   /**

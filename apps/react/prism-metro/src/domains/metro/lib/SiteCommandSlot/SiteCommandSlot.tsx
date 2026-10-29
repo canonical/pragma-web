@@ -2,6 +2,12 @@
 
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
+import {
+  CarTypeCommand,
+  FormationCommand,
+  RollingStockCommand,
+  UnitCommand,
+} from "#domains/fleet";
 import nodeFragment from "#relay/__generated__/SiteCommandSlot_node.graphql.js";
 import assertSiteKey from "../../assertSiteKey.js";
 import { InterchangeCommand } from "../InterchangeCommand/index.js";
@@ -23,6 +29,10 @@ const declareNodeFragment = (): unknown => graphql`
     ...InterchangeCommand_node @alias(as: "Interchange")
     ...LineCommand_node @alias(as: "Line")
     ...ZoneCommand_node @alias(as: "Zone")
+    ...RollingStockCommand_node @alias(as: "RollingStock")
+    ...FormationCommand_node @alias(as: "Formation")
+    ...UnitCommand_node @alias(as: "Unit")
+    ...CarTypeCommand_node @alias(as: "CarType")
   }
 `;
 void declareNodeFragment;
@@ -73,6 +83,31 @@ export default function SiteCommandSlot({
     case "Zone":
       return (
         <ZoneCommand {...props} node={assertSiteKey(data.Zone, typename)} />
+      );
+    case "RollingStock":
+      return (
+        <RollingStockCommand
+          {...props}
+          node={assertSiteKey(data.RollingStock, typename)}
+        />
+      );
+    case "Formation":
+      return (
+        <FormationCommand
+          {...props}
+          node={assertSiteKey(data.Formation, typename)}
+        />
+      );
+    case "Unit":
+      return (
+        <UnitCommand {...props} node={assertSiteKey(data.Unit, typename)} />
+      );
+    case "CarType":
+      return (
+        <CarTypeCommand
+          {...props}
+          node={assertSiteKey(data.CarType, typename)}
+        />
       );
     default:
       throw new Error(

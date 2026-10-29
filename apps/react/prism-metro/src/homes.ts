@@ -5,7 +5,8 @@ import type { Homes } from "@canonical/prism-core";
  * mention of a node links there, addressed by the compact address the
  * mention resolves it with. Stations and interchanges, the station subclass
  * the graph serves as its own type, live in the stations lens; lines in the
- * lines lens; ontology classes and properties in the Definitions lens. A
+ * lines lens; rolling stocks, formations, units and car types in the
+ * fleet lens; ontology classes and properties in the Definitions lens. A
  * type with no entry, such as a fare zone, has no home, and its mentions
  * read as text.
  */
@@ -16,6 +17,14 @@ export const homes: Homes = {
     router.buildPath("stationsEntity", { params: { uri: node.uri } }),
   Line: (node, router) =>
     router.buildPath("linesEntity", { params: { uri: node.uri } }),
+  RollingStock: (node, router) =>
+    router.buildPath("fleetStock", { params: { uri: node.uri } }),
+  Formation: (node, router) =>
+    router.buildPath("fleetFormation", { params: { uri: node.uri } }),
+  Unit: (node, router) =>
+    router.buildPath("fleetUnit", { params: { uri: node.uri } }),
+  CarType: (node, router) =>
+    router.buildPath("fleetCarType", { params: { uri: node.uri } }),
   OntologyClass: (node, router) =>
     router.buildPath("definitionsTerm", { params: { term: node.uri } }),
   OntologyProperty: (node, router) =>

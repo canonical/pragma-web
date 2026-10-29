@@ -18,4 +18,8 @@ node:
           - node: { uri: metro.component.interchange_chip, projection: { on: Interchange } }
           - node: { uri: metro.component.line_chip, projection: { on: Line } }
           - node: { uri: metro.component.zone_chip, projection: { on: Zone } }
+          - node: { uri: metro.component.rolling_stock_chip, projection: { on: RollingStock } }
+          - node: { uri: metro.component.formation_chip, projection: { on: Formation } }
+          - node: { uri: metro.component.unit_chip, projection: { on: Unit } }
+          - node: { uri: metro.component.car_type_chip, projection: { on: CarType } }
       relation: { cardinality: "1" }

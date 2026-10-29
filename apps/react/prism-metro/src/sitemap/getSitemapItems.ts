@@ -13,5 +13,6 @@ export default async function getSitemapItems(): Promise<SitemapItem[]> {
     { loc: "/stations", changefreq: "weekly", priority: 0.8 },
     { loc: "/lines", changefreq: "weekly", priority: 0.8 },
     { loc: "/definitions", changefreq: "monthly", priority: 0.6 },
+    { loc: "/fleet", changefreq: "weekly", priority: 0.8 },
   ];
 }
