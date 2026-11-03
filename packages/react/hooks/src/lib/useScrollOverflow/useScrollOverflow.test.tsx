@@ -38,12 +38,14 @@ let renderCount = 0;
 function Probe({
   children,
   forwardedRef,
+  enabled,
 }: {
   children?: ReactNode;
   forwardedRef?: Ref<HTMLDivElement>;
+  enabled?: boolean;
 }): ReactNode {
   const { ref, overflowTop, overflowBottom } =
-    useScrollOverflow<HTMLDivElement>(forwardedRef);
+    useScrollOverflow<HTMLDivElement>(forwardedRef, { enabled });
   renderCount += 1;
   return (
     <div
@@ -212,6 +214,96 @@ describe("useScrollOverflow", () => {
       // The pane plus its two children: a child resizing changes the
       // scrollable height without resizing the pane.
       expect(observer?.observe).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe("the enabled option", () => {
+    it("measures nothing while disabled", () => {
+      layout = { clientHeight: 200, scrollHeight: 600 };
+      render(<Probe enabled={false} />);
+      const pane = screen.getByTestId("pane");
+      // No flags and no observer — and a scroll changes nothing, because
+      // the hook attached no listener either.
+      expect(pane).not.toHaveAttribute("data-overflow-top");
+      expect(pane).not.toHaveAttribute("data-overflow-bottom");
+      expect(observers()).toHaveLength(0);
+      scrollTo(pane, 100);
+      expect(pane).not.toHaveAttribute("data-overflow-top");
+      expect(pane).not.toHaveAttribute("data-overflow-bottom");
+    });
+
+    it("clears the flags it reported when it is disabled", () => {
+      layout = { clientHeight: 200, scrollHeight: 600 };
+      const view = render(<Probe />);
+      expect(screen.getByTestId("pane")).toHaveAttribute(
+        "data-overflow-bottom",
+      );
+
+      // Another mechanism has taken over the edge affordance: the hook
+      // stands down, and the state it last reported must not linger in the
+      // markup as a stale claim nobody updates.
+      act(() => {
+        view.rerender(<Probe enabled={false} />);
+      });
+      expect(screen.getByTestId("pane")).not.toHaveAttribute(
+        "data-overflow-bottom",
+      );
+      expect(liveObserver()?.disconnect).toHaveBeenCalled();
+    });
+
+    it("resumes measuring when it is re-enabled", () => {
+      layout = { clientHeight: 200, scrollHeight: 600 };
+      const view = render(<Probe enabled={false} />);
+      expect(screen.getByTestId("pane")).not.toHaveAttribute(
+        "data-overflow-bottom",
+      );
+
+      act(() => {
+        view.rerender(<Probe />);
+      });
+      expect(screen.getByTestId("pane")).toHaveAttribute(
+        "data-overflow-bottom",
+      );
+    });
+
+    it("stays render-neutral while persistently disabled", () => {
+      layout = { clientHeight: 200, scrollHeight: 600 };
+      const view = render(<Probe enabled={false} />);
+      const before = renderCount;
+
+      // Each re-render re-runs the effect; the stand-down reset must not
+      // turn into updates of its own, so the only render is the re-render
+      // itself — one more, not two.
+      act(() => {
+        view.rerender(<Probe enabled={false} />);
+      });
+      expect(renderCount).toBe(before + 1);
+    });
+
+    it("does not re-render when disabled after the flags returned to no-overflow", () => {
+      layout = { clientHeight: 200, scrollHeight: 600 };
+      const view = render(<Probe />);
+      expect(screen.getByTestId("pane")).toHaveAttribute(
+        "data-overflow-bottom",
+      );
+
+      // The content shrinks back and the flags flip to no-overflow — a fresh
+      // object, not the hook's `NO_OVERFLOW` constant. Disabling afterwards
+      // must not schedule a confirmation render writing an equal value, so
+      // the reset bails out on the flags rather than on object identity.
+      layout = { clientHeight: 200, scrollHeight: 200 };
+      act(() => {
+        liveObserver()?.trigger();
+      });
+      expect(screen.getByTestId("pane")).not.toHaveAttribute(
+        "data-overflow-bottom",
+      );
+      const before = renderCount;
+
+      act(() => {
+        view.rerender(<Probe enabled={false} />);
+      });
+      expect(renderCount).toBe(before + 1);
     });
   });
 

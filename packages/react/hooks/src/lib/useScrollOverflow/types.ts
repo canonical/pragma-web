@@ -1,3 +1,15 @@
+/** Optional behaviour of the scroll-overflow hook. */
+export interface UseScrollOverflowOptions {
+  /**
+   * Whether the hook measures at all; defaults to true. When false, the hook
+   * detaches its listener and observer and clears both flags, so a consumer
+   * whose edge affordance is owned by another mechanism — CSS scroll-driven
+   * animations, say — pays no measurement cost and its markup carries no
+   * stale edge state. Toggling back to true resumes measuring.
+   */
+  enabled?: boolean;
+}
+
 /** What the scroll-overflow hook reports, and the ref it hands back. */
 export interface UseScrollOverflowResult<TElement extends HTMLElement> {
   /**

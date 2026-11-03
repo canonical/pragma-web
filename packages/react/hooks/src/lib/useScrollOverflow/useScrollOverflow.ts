@@ -6,7 +6,10 @@ import {
   useRef,
   useState,
 } from "react";
-import type { UseScrollOverflowResult } from "./types.js";
+import type {
+  UseScrollOverflowOptions,
+  UseScrollOverflowResult,
+} from "./types.js";
 
 // `useLayoutEffect` logs a warning on the server ("does nothing on the
 // server"), so fall back to `useEffect` there. On the client we keep the
@@ -61,11 +64,17 @@ const NO_OVERFLOW: OverflowEdges = {
  * is handed. Callback refs and ref objects are both accepted; a cleanup
  * returned by a forwarded callback ref is ignored, since the fan-out is
  * driven by this hook's own callback ref, not by React.
+ * @param options Optional behaviour — see `UseScrollOverflowOptions`. With
+ * `enabled: false` the hook detaches its listener and observer and clears
+ * both flags, for consumers whose edge affordance is owned by another
+ * mechanism, such as CSS scroll-driven animations; the edge attributes in
+ * the markup then reflect that the hook is not the one driving them.
  * @returns The callback ref to attach to the scroll container, and the two
  * edge flags.
  */
 export default function useScrollOverflow<TElement extends HTMLElement>(
   forwardedRef?: Ref<TElement>,
+  { enabled = true }: UseScrollOverflowOptions = {},
 ): UseScrollOverflowResult<TElement> {
   // The container in a REF, not state: attaching it must not schedule a
   // render. React detaches and reattaches a ref callback whenever its
@@ -82,7 +91,8 @@ export default function useScrollOverflow<TElement extends HTMLElement>(
    * with an equal value would not be free: React confirms a same-value
    * update with one extra render, and a stream of scroll and resize events
    * must cost zero renders, not one render per event. The mirror is written
-   * only by `measure`, the only writer of the state.
+   * only by `measure` and the stand-down reset above, the only writers of
+   * the state.
    */
   const overflowRef = useRef<OverflowEdges>(NO_OVERFLOW);
 
@@ -111,6 +121,23 @@ export default function useScrollOverflow<TElement extends HTMLElement>(
   useIsomorphicLayoutEffect(() => {
     const element = elementRef.current;
     if (!element) return;
+
+    // Stood down: attach nothing, and clear whatever the last measurement
+    // reported. Another mechanism owns the edge affordance now — flags left
+    // standing would publish a state nobody updates, so the rule for every
+    // reader of the flags stays simple: they are true if and only if this
+    // hook is driving. The guard keeps a persistently disabled hook at zero
+    // renders (a same-value `setState` still costs a confirmation render).
+    if (!enabled) {
+      if (
+        overflowRef.current.overflowTop ||
+        overflowRef.current.overflowBottom
+      ) {
+        overflowRef.current = NO_OVERFLOW;
+        setOverflow(NO_OVERFLOW);
+      }
+      return;
+    }
 
     const measure = (): void => {
       const { clientHeight, scrollHeight, scrollTop } = element;
