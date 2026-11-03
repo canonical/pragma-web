@@ -1,30 +1,45 @@
 /**
- * Manages the chaining state for tooltips, allowing for a grace period during which tooltips can be shown without delay.
+ * Keeps chaining active while any tooltip is visible and for a grace period after the last one closes.
  */
 export class ChainingManager {
-  private _chaining: boolean = false;
-  private chainingTimeout: ReturnType<typeof setTimeout> | null = null;
+  readonly #chainingThreshold: number;
+  #activeCount = 0;
+  #chainingTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     /**
-     * The duration (in milliseconds) for which chaining remains active after being set to true.
+     * The duration (in milliseconds) for which chaining remains active after the last tooltip closes.
      */
-    private readonly chainingThreshold: number,
-  ) {}
-
-  set chaining(value: boolean) {
-    this._chaining = value;
-    if (this.chainingTimeout !== null) clearTimeout(this.chainingTimeout);
-
-    if (value) {
-      this.chainingTimeout = setTimeout(() => {
-        this._chaining = false;
-        this.chainingTimeout = null;
-      }, this.chainingThreshold);
-    }
+    chainingThreshold: number,
+  ) {
+    this.#chainingThreshold = chainingThreshold;
   }
 
   get chaining() {
-    return this._chaining;
+    return this.#activeCount > 0 || this.#chainingTimeout !== null;
+  }
+
+  acquire(): () => void {
+    if (this.#chainingTimeout !== null) {
+      clearTimeout(this.#chainingTimeout);
+      this.#chainingTimeout = null;
+    }
+
+    this.#activeCount += 1;
+
+    let released = false;
+
+    return () => {
+      if (released) return;
+      released = true;
+
+      this.#activeCount -= 1;
+
+      if (this.#activeCount === 0) {
+        this.#chainingTimeout = setTimeout(() => {
+          this.#chainingTimeout = null;
+        }, this.#chainingThreshold);
+      }
+    };
   }
 }
