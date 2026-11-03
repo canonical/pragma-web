@@ -14,6 +14,11 @@ ds:implementation.svelte-ds-global.global.component.breadcrumbs a ds:Implementat
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Breadcrumbs/Breadcrumbs.svelte";
     ds:importStatement "import { Breadcrumbs } from \"@canonical/svelte-ds-global\";";
     ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.45.0/packages/svelte/ds-global/src/lib/component/Breadcrumbs/Breadcrumbs.svelte".
+ds:implementation.svelte-ds-global.global.component.button a ds:ImplementationObject;
+    ds:implementsBlock ds:global.component.button;
+    ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/component/Button/Button.svelte";
+    ds:importStatement "import { Button } from \"@canonical/svelte-ds-global\";";
+    ds:versionedLink "https://github.com/canonical/pragma-web/blob/v0.45.0/packages/svelte/ds-global/src/lib/component/Button/Button.svelte".
 ds:implementation.svelte-ds-global.global.pattern.modal a ds:ImplementationObject;
     ds:implementsBlock ds:global.pattern.modal;
     ds:headLink "https://github.com/canonical/pragma-web/blob/main/packages/svelte/ds-global/src/lib/_work_in_progress/Modal/Modal.svelte";
