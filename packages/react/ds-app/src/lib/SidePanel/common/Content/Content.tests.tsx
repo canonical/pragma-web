@@ -1,6 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import { createRef } from "react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vitest } from "vitest";
 import Content from "./Content.js";
 
 /*
@@ -69,13 +69,17 @@ describe("SidePanel.Content", () => {
     expect(screen.getByTestId("test-component")).toBeInTheDocument();
   });
 
-  describe("overflow lines", () => {
-    it("marks itself driven once JavaScript mounts", () => {
-      // The marker disables the no-JavaScript CSS fallback; it appears only
-      // after the client effect runs, and never in server markup (the SSR
-      // suite asserts the absence).
-      render(<Content>Body</Content>);
-      expect(screen.getByText("Body")).toHaveAttribute("data-overflow-driven");
+  describe("overflow lines — the JavaScript fallback", () => {
+    /*
+      Engines without scroll-driven animations get their lines from the
+      hook. Pin the capability probe to that world for the whole block,
+      whatever the test environment's own `CSS.supports` says.
+    */
+    beforeEach(() => {
+      vitest.stubGlobal("CSS", { supports: () => false });
+    });
+    afterEach(() => {
+      vitest.unstubAllGlobals();
     });
 
     it("marks no edge while the content fits", () => {
@@ -115,6 +119,27 @@ describe("SidePanel.Content", () => {
       const ref = createRef<HTMLDivElement>();
       render(<Content ref={ref}>Body</Content>);
       expect(ref.current).toBe(screen.getByText("Body"));
+    });
+  });
+
+  describe("overflow lines — engines with scroll-driven animations", () => {
+    afterEach(() => {
+      vitest.unstubAllGlobals();
+    });
+
+    it("leaves the lines to the CSS and publishes no edge state", () => {
+      /*
+        The CSS animates the pane's borders against its own scroll progress;
+        the hook stands down and clears the flags it measured on mount, so
+        the markup carries no edge attributes — exactly one mechanism owns
+        the lines per pane.
+      */
+      vitest.stubGlobal("CSS", { supports: () => true });
+      layout = { clientHeight: 200, scrollHeight: 600 };
+      render(<Content>Body</Content>);
+      const pane = screen.getByText("Body");
+      expect(pane).not.toHaveAttribute("data-overflow-top");
+      expect(pane).not.toHaveAttribute("data-overflow-bottom");
     });
   });
 });

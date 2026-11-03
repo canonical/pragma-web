@@ -28,22 +28,25 @@
     /*
       The scroll region's edges — 2px lines marking the boundaries the header
       and footer meet the pane at, painted only while content is hidden past
-      that edge. `useScrollOverflow` measures the pane and publishes the two
-      edge states as `data-overflow-top` / `data-overflow-bottom` (see
-      Content.tsx); the selectors below switch the border colours on them.
-      Plain measurement rather than scroll-driven animations or scroll-state
-      container queries, so the lines behave identically in every browser
-      JavaScript runs in; the no-JavaScript story is the `@supports` block at
-      the end of this sheet.
+      that edge. CSS-first: the `@supports` block at the end of this sheet
+      animates these borders against the pane's own scroll progress in the
+      engines that ship scroll-driven animations — with or without
+      JavaScript. The engines without fall back to measurement:
+      `useScrollOverflow` publishes the two edge states as
+      `data-overflow-top` / `data-overflow-bottom` (see Content.tsx), and the
+      selectors below switch the border colours on them. Engines with neither
+      paint nothing: without a measurement there is nothing to say which
+      edges overflow, and a line that cannot tell the truth is worse than
+      none.
 
-      The borders are always reserved — the attributes switch their colour,
-      never their width — so the lines appearing or disappearing never shifts
-      the pane. And a scroll container's borders are part of its box, not its
-      content: they stay pinned at the edges while the pane scrolls. A border
-      spans the padding box, so with the pane's inline padding the lines run
-      edge to edge across the panel while the text stays in its column. The
-      colour is the panel's to own: `--side-panel-color-border` is declared in
-      the panel's `:root` block.
+      The borders are always reserved — animation or attributes switch their
+      colour, never their width — so the lines appearing or disappearing
+      never shifts the pane. And a scroll container's borders are part of its
+      box, not its content: they stay pinned at the edges while the pane
+      scrolls. A border spans the padding box, so with the pane's inline
+      padding the lines run edge to edge across the panel while the text
+      stays in its column. The colour is the panel's to own:
+      `--side-panel-color-border` is declared in the panel's `:root` block.
     */
     border-block: var(--side-panel-overflow-line-thickness) solid transparent;
 
@@ -78,16 +81,14 @@
   }
 
   /*
-    The no-JavaScript fallback, in the engines that ship scroll-driven
-    animations. When JavaScript runs, Content.tsx stamps `data-overflow-driven`
-    onto the pane after mount and the hook's attributes own the lines — this
-    block's `:not()` leaves such panes alone, so exactly one mechanism paints
-    per pane. When JavaScript does not run the attribute never appears, and
-    the pane animates the same borders against its OWN scroll progress
-    instead — no scripting involved. Engines with neither JavaScript nor
-    scroll-driven animations show no lines: without a measurement there is
-    nothing to say which edges overflow, and a line that cannot tell the
-    truth is worse than none.
+    The primary mechanism, with or without JavaScript: in the engines that
+    ship scroll-driven animations the pane animates the same borders against
+    its OWN scroll progress — the engine does the measuring. Content.tsx
+    probes the same capability and stands the `useScrollOverflow` hook down
+    when it holds, so nothing is measured twice and no edge attributes
+    appear in the markup; in the engines this `@supports` test excludes, the
+    hook's attributes own the lines instead (selectors above). Engines with
+    neither mechanism paint nothing.
 
     Each animation is narrowed to a single pixel of the scroll range by
     `animation-range`, so the colour change reads as a switch, not a fade:
@@ -102,7 +103,7 @@
       turns transparent.
   */
   @supports (animation-timeline: scroll()) {
-    .ds.side-panel-content:not([data-overflow-driven]) {
+    .ds.side-panel-content {
       animation:
         side-panel-line-top linear both,
         side-panel-line-bottom linear both;
