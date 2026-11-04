@@ -1,0 +1,73 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * DataChart styles
+   *
+   * A work-in-progress prototype: no chart exists in the design system, so it
+   * binds the text, border, surface and foreground tokens the other parts
+   * bind. The bars and the band borrow the primary foreground, since there is
+   * no chart palette token; that missing token is a finding, recorded in the
+   * recipe, not a value invented here. Each range marker carries a ring in
+   * the surface colour, so it stays legible where it meets the band.
+   */
+  .ds.data-chart {
+    --data-chart-gap: var(--dimension-100);
+    --data-chart-status-padding-block: var(--dimension-050);
+    --data-chart-cell-padding-block: var(--dimension-050);
+    --data-chart-cell-padding-inline-end: var(--dimension-200);
+    --data-chart-stroke-width: var(--dimension-stroke-thickness-medium);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--data-chart-gap);
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--typography-text-primary-font-family);
+    font-size: var(--typography-text-primary-font-size);
+    font-weight: var(--typography-text-primary-font-weight);
+
+    & > .status {
+      padding-block: var(--data-chart-status-padding-block);
+    }
+
+    & > .chart {
+      inline-size: 100%;
+      block-size: auto;
+    }
+
+    & :is(.grid-line, .axis) {
+      stroke: var(--color-border-muted);
+      stroke-width: var(--data-chart-stroke-width);
+      vector-effect: non-scaling-stroke;
+    }
+
+    & :is(.bar, .band, .marker) {
+      fill: var(--color-foreground-primary);
+    }
+
+    & .marker {
+      stroke: var(--color-background);
+      stroke-width: var(--data-chart-stroke-width);
+    }
+
+    & :is(.label, .value) {
+      fill: var(--color-text);
+    }
+
+    & .tick {
+      fill: var(--color-text-muted);
+    }
+
+    & > .data {
+      border-collapse: collapse;
+      text-align: start;
+    }
+
+    & > .data :is(th, td) {
+      padding-block: var(--data-chart-cell-padding-block);
+      padding-inline-end: var(--data-chart-cell-padding-inline-end);
+      text-align: start;
+    }
+  }
+}

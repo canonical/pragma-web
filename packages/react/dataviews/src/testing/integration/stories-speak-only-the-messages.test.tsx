@@ -28,6 +28,7 @@ import { DELIVERY_WAIT } from "../../../testing/constants.js";
 import findEnglish from "../../../testing/findEnglish.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
+import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as actionsStories from "../../lib/_work_in_progress/DataViews/common/Actions/Actions.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
@@ -39,8 +40,6 @@ import * as sortPanelStories from "../../lib/_work_in_progress/DataViews/common/
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
 import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
-import * as barChartStories from "../../lib/_work_in_progress/FacetBarChart/FacetBarChart.stories.js";
-import * as rangeChartStories from "../../lib/_work_in_progress/FacetRangeChart/FacetRangeChart.stories.js";
 import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
 import * as switchStories from "../../lib/_work_in_progress/RendererSwitch/RendererSwitch.stories.js";
 import {
@@ -87,8 +86,7 @@ const parts = {
   SortPanel: composeStories(sortPanelStories),
   RendererSwitch: composeStories(switchStories),
   DataCards: composeStories(dataCardsStories),
-  FacetBarChart: composeStories(barChartStories),
-  FacetRangeChart: composeStories(rangeChartStories),
+  DataChart: composeStories(dataChartStories),
 };
 
 /**

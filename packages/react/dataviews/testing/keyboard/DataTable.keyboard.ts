@@ -42,11 +42,8 @@ const SETTINGS = "_work_in_progress/DataViews/Settings";
 /** The cards' stories, a collection's records as the design system's cards. */
 const DATA_CARDS = "_work_in_progress/DataCards";
 
-/** The bar chart prototype's stories, a field's counts beside the filters. */
-const FACET_BAR_CHART = "_work_in_progress/FacetBarChart";
-
-/** The range chart prototype's stories, a number field's range beside the filters. */
-const FACET_RANGE_CHART = "_work_in_progress/FacetRangeChart";
+/** The chart prototype's stories, a field's counts or range beside the filters. */
+const DATA_CHART = "_work_in_progress/DataChart";
 
 /** The renderer switch's stories, one collection shown through a chosen renderer. */
 const RENDERER_SWITCH = "_work_in_progress/RendererSwitch";
@@ -68,8 +65,7 @@ const TITLES: readonly string[] = [
   FILTERS,
   SETTINGS,
   DATA_CARDS,
-  FACET_BAR_CHART,
-  FACET_RANGE_CHART,
+  DATA_CHART,
   RENDERER_SWITCH,
   REST_API,
   GRAPHQL_API,
@@ -761,10 +757,10 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     ).toBeChecked();
   });
 
-  test("FacetBarChart BesideFilters: Space on a status filter narrows the table, and the chart keeps every status's count", async ({
+  test("DataChart CountsBesideFilters: Space on a status filter narrows the table, and the chart keeps every status's count", async ({
     page,
   }) => {
-    await openStory(page, findStory(FACET_BAR_CHART, "Beside Filters").id);
+    await openStory(page, findStory(DATA_CHART, "Counts Beside Filters").id);
     const summary = page
       .getByRole("navigation", { name: "Pagination" })
       .getByRole("status");

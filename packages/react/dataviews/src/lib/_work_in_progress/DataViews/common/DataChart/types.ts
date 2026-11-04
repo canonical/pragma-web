@@ -1,5 +1,5 @@
 import type { SchemaFieldDefinition } from "@canonical/dataviews-core";
-import type { FacetRangeChartProps } from "../../../FacetRangeChart/index.js";
+import type { DataChartProps } from "../../../DataChart/index.js";
 
 /**
  * Props of the connected chart: the chart's own, less the provider and the
@@ -8,7 +8,7 @@ import type { FacetRangeChartProps } from "../../../FacetRangeChart/index.js";
  * @experimental Pre-release: a work-in-progress prototype, not admitted to
  * the package root; its shape may change or it may be withdrawn.
  */
-export type DataViewsFacetRangeChartProps = Omit<
-  FacetRangeChartProps<readonly SchemaFieldDefinition[]>,
+export type DataViewsDataChartProps = Omit<
+  DataChartProps<readonly SchemaFieldDefinition[]>,
   "provider" | "messages"
 >;

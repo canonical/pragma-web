@@ -22,14 +22,13 @@ import expectNoAxeViolations from "../../../testing/expectNoAxeViolations.js";
 import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
+import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
-import * as barChartStories from "../../lib/_work_in_progress/FacetBarChart/FacetBarChart.stories.js";
-import * as rangeChartStories from "../../lib/_work_in_progress/FacetRangeChart/FacetRangeChart.stories.js";
 import * as switchStories from "../../lib/_work_in_progress/RendererSwitch/RendererSwitch.stories.js";
 import {
   createGraphQLHandlers,
@@ -57,8 +56,7 @@ const played = {
   "REST API": composeStories(restStories),
   "GraphQL API": composeStories(graphqlStories),
   DataCards: composeStories(dataCardsStories),
-  FacetBarChart: composeStories(barChartStories),
-  FacetRangeChart: composeStories(rangeChartStories),
+  DataChart: composeStories(dataChartStories),
   Filters: Object.fromEntries(
     Object.entries(composeStories(filtersStories)).filter(([name]) =>
       FACETED_FILTER_STORIES.has(name),

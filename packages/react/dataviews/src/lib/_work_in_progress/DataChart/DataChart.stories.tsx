@@ -13,23 +13,26 @@ import {
   useMachineProvider,
 } from "../../../storybook/machines/story-utils.js";
 import type { DataTableColumn } from "../DataTable/index.js";
-import { FacetBarChart as ConnectedChart } from "../DataViews/common/FacetBarChart/index.js";
+import { DataChart as ConnectedChart } from "../DataViews/common/DataChart/index.js";
 import { DataViews } from "../DataViews/index.js";
-import Component from "./FacetBarChart.js";
+import Component from "./DataChart.js";
+import type { DataChartType } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/FacetBarChart",
+  title: "_work_in_progress/DataChart",
   component: Component,
   decorators: [withAppScope],
   args: {
+    type: "bar",
     field: "status",
     label: "Machines by status",
   },
   argTypes: {
+    type: { control: "inline-radio", options: ["bar", "range"] },
     provider: { control: false },
     renderStatus: { control: false },
   },
-  // The REST-backed story's endpoint, served through the Storybook MSW
+  // The REST-backed stories' endpoint, served through the Storybook MSW
   // addon before a story first renders. Every story here carries it, so a
   // docs page that renders them all together never clears it.
   parameters: { msw: { handlers: createRestHandlers({ latency: 300 }) } },
@@ -48,20 +51,32 @@ const columns: readonly DataTableColumn[] = [
 /** The import every story's code shows for a part not yet on the root. */
 const prototypeImports = `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress prototype: not yet exported from the package root.
-import { FacetBarChart } from "./FacetBarChart.js";`;
+import { DataChart } from "./DataChart.js";`;
+
+/** The import a connected chart's code shows. */
+const connectedImports = `import { machineCollection, machines } from "./machines.js";
+// A work-in-progress prototype: not yet exported from the package root.
+import { DataChart } from "./DataViews/DataChart.js";`;
 
 /** The chart over a provider bound to the story's own source. */
 function MachineChart({
+  type,
   field,
   label,
   options,
 }: {
+  readonly type: DataChartType;
   readonly field: string;
   readonly label: string;
   readonly options?: MachineProviderConfig | undefined;
 }): ReactElement {
-  const provider = useMachineProvider({ facets: ["status"], ...options });
-  return <Component provider={provider} field={field} label={label} />;
+  const provider = useMachineProvider({
+    facets: ["status", "cores"],
+    ...options,
+  });
+  return (
+    <Component provider={provider} type={type} field={field} label={label} />
+  );
 }
 
 /**
@@ -70,13 +85,15 @@ function MachineChart({
  * are in the table that follows the drawing.
  */
 export const StatusCounts: Story = {
-  render: ({ field, label }) => <MachineChart field={field} label={label} />,
+  render: ({ type, field, label }) => (
+    <MachineChart type={type} field={field} label={label} />
+  ),
   parameters: consumerCode({
     // A prototype: nothing of it is exported from the package root to name.
     parts: [],
     imports: prototypeImports,
     facets: ["status"],
-    render: `<FacetBarChart provider={provider} field="status" label="Machines by status" />`,
+    render: `<DataChart provider={provider} type="bar" field="status" label="Machines by status" />`,
   }),
   play: async ({ canvas }) => {
     await expect(
@@ -87,8 +104,33 @@ export const StatusCounts: Story = {
   },
 };
 
-/** The chart beside the filters, a table and its pagination, over one root. */
-function BesideFiltersMachines({
+/**
+ * Cores range: the fewest and the most cores any machine the query matches
+ * holds, measured by the source, drawn as a band on an axis that starts at
+ * the field's declared minimum. Both values are in the table that follows.
+ */
+export const CoresRange: Story = {
+  args: { type: "range", field: "cores", label: "Cores" },
+  render: ({ type, field, label }) => (
+    <MachineChart type={type} field={field} label={label} />
+  ),
+  parameters: consumerCode({
+    parts: [],
+    imports: prototypeImports,
+    facets: ["cores"],
+    render: `<DataChart provider={provider} type="range" field="cores" label="Cores" />`,
+  }),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole("img", {
+        name: "Cores: a range chart from 2 to 64",
+      }),
+    ).toBeVisible();
+  },
+};
+
+/** The counts beside the filters, a table and its pagination, over one root. */
+function CountsBesideFiltersMachines({
   label,
 }: {
   readonly label: string;
@@ -100,7 +142,7 @@ function BesideFiltersMachines({
   return (
     <DataViews provider={provider}>
       <DataViews.Filters />
-      <ConnectedChart field="status" label={label} />
+      <ConnectedChart type="bar" field="status" label={label} />
       <DataViews.DataTable
         columns={columns}
         label="Machines"
@@ -112,17 +154,16 @@ function BesideFiltersMachines({
 }
 
 /**
- * Beside the filters: keeping only the failed machines narrows the table,
- * while the chart keeps every status's count, since a facet lifts its own
- * field's filter. The chart is never drawn from the page of rows on screen.
+ * Counts beside the filters: keeping only the failed machines narrows the
+ * table, while the chart keeps every status's count, since a facet lifts its
+ * own field's filter. The chart is never drawn from the page of rows on
+ * screen.
  */
-export const BesideFilters: Story = {
-  render: ({ label }) => <BesideFiltersMachines label={label} />,
+export const CountsBesideFilters: Story = {
+  render: ({ label }) => <CountsBesideFiltersMachines label={label} />,
   parameters: consumerCode({
     parts: ["DataViews", "type DataTableColumn"],
-    imports: `import { machineCollection, machines } from "./machines.js";
-// A work-in-progress prototype: not yet exported from the package root.
-import { FacetBarChart } from "./DataViews/FacetBarChart.js";`,
+    imports: connectedImports,
     query: "page=1&size=5",
     facets: ["status", "cores"],
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -132,7 +173,7 @@ import { FacetBarChart } from "./DataViews/FacetBarChart.js";`,
 ];`,
     render: `<DataViews provider={provider}>
   <DataViews.Filters />
-  <FacetBarChart field="status" label="Machines by status" />
+  <DataChart type="bar" field="status" label="Machines by status" />
   <DataViews.DataTable columns={columns} label="Machines" />
   <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`,
@@ -159,10 +200,56 @@ import { FacetBarChart } from "./DataViews/FacetBarChart.js";`,
   },
 };
 
+/** The range beside the filters, over one root. */
+function RangeBesideFiltersMachines({
+  label,
+}: {
+  readonly label: string;
+}): ReactElement {
+  const provider = useMachineProvider({ facets: ["status", "cores"] });
+  return (
+    <DataViews provider={provider}>
+      <DataViews.Filters />
+      <ConnectedChart type="range" field="cores" label={label} />
+    </DataViews>
+  );
+}
+
+/**
+ * The range beside the filters: keeping only the failed machines narrows the
+ * range to the cores those machines hold, since the source measures it over
+ * every machine the query matches.
+ */
+export const RangeBesideFilters: Story = {
+  args: { type: "range", field: "cores", label: "Cores" },
+  render: ({ label }) => <RangeBesideFiltersMachines label={label} />,
+  parameters: consumerCode({
+    parts: ["DataViews"],
+    imports: connectedImports,
+    facets: ["status", "cores"],
+    render: `<DataViews provider={provider}>
+  <DataViews.Filters />
+  <DataChart type="range" field="cores" label="Cores" />
+</DataViews>`,
+  }),
+  play: async ({ canvas }) => {
+    await canvas.findByRole("img", {
+      name: "Cores: a range chart from 2 to 64",
+    });
+    await userEvent.click(canvas.getByRole("checkbox", { name: /^failed/ }));
+    await waitFor(() =>
+      expect(
+        canvas.getByRole("img", { name: "Cores: a range chart from 2 to 8" }),
+      ).toBeVisible(),
+    );
+  },
+};
+
 /** Loading: the source has not answered, so the chart says so and draws nothing. */
 export const Loading: Story = {
-  render: ({ field, label }) => (
+  render: ({ type, field, label }) => (
     <MachineChart
+      type={type}
       field={field}
       label={label}
       options={{ source: createPendingSource }}
@@ -175,29 +262,42 @@ export const Loading: Story = {
 
 /** The chart over the REST endpoint, which computes its facets. */
 function RestBackedMachines({
+  type,
+  field,
   label,
+  query,
 }: {
+  readonly type: DataChartType;
+  readonly field: string;
   readonly label: string;
+  readonly query?: string;
 }): ReactElement {
   const provider = useMachineProvider({
     source: () => createRestMachineSource("live"),
-    query: "page=1&size=5",
+    ...(query === undefined ? {} : { query }),
     facets: SERVER_BACKED_FACETS,
   });
   return (
     <DataViews provider={provider}>
-      <ConnectedChart field="status" label={label} />
+      <ConnectedChart type={type} field={field} label={label} />
     </DataViews>
   );
 }
 
 /**
- * REST-backed: the same chart over a REST endpoint reached through TanStack
- * Query. The endpoint counts each status over every machine it matches, and
- * the chart draws what it answers.
+ * Counts over REST: the same chart over a REST endpoint reached through
+ * TanStack Query. The endpoint counts each status over every machine it
+ * matches, and the chart draws what it answers.
  */
-export const RestBacked: Story = {
-  render: ({ label }) => <RestBackedMachines label={label} />,
+export const CountsRestBacked: Story = {
+  render: ({ label }) => (
+    <RestBackedMachines
+      type="bar"
+      field="status"
+      label={label}
+      query="page=1&size=5"
+    />
+  ),
   play: async ({ canvas }) => {
     const table = await canvas.findByRole(
       "table",
@@ -209,5 +309,25 @@ export const RestBacked: Story = {
         .getAllByRole("rowheader")
         .map((cell) => cell.textContent),
     ).toEqual(["running", "failed", "pending"]);
+  },
+};
+
+/**
+ * The range over REST: the endpoint measures the cores over every machine it
+ * matches, and the chart draws the range it answers.
+ */
+export const RangeRestBacked: Story = {
+  args: { type: "range", field: "cores", label: "Cores" },
+  render: ({ label }) => (
+    <RestBackedMachines type="range" field="cores" label={label} />
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByRole(
+        "img",
+        { name: "Cores: a range chart from 2 to 64" },
+        { timeout: 3000 },
+      ),
+    ).toBeVisible();
   },
 };
