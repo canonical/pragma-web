@@ -7,10 +7,12 @@
  */
 
 import { describe, expectTypeOf, it } from "vitest";
+import createFormatters from "./createFormatters.js";
 import createLocaleSource from "./createLocaleSource.js";
 import type {
   Direction,
   Formatters,
+  FormattersOptions,
   I18nConfig,
   Locale,
   LocaleSource,
@@ -159,6 +161,20 @@ describe("Formatters", () => {
     expectTypeOf<Formatters["isolate"]>().toEqualTypeOf<
       (text: string) => string
     >();
+  });
+});
+
+describe("FormattersOptions", () => {
+  it("makes strict an optional, read-only flag", () => {
+    expectTypeOf<FormattersOptions>().toEqualTypeOf<{
+      readonly strict?: boolean;
+    }>();
+  });
+
+  it("is the optional second argument of createFormatters", () => {
+    expectTypeOf(createFormatters)
+      .parameter(1)
+      .toEqualTypeOf<FormattersOptions | undefined>();
   });
 });
 

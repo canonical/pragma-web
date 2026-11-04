@@ -192,6 +192,75 @@ describe("createFormatters", () => {
     });
   });
 
+  describe("strict mode", () => {
+    const fr = createFormatters("fr", { strict: true });
+    const strictEn = createFormatters("en", { strict: true });
+
+    it("throws a RangeError naming each plural category the forms lack", () => {
+      expect(() =>
+        fr.selectPlural(2, { one: "ligne", other: "lignes" }),
+      ).toThrow(
+        new RangeError('Missing cardinal plural forms for "fr": many.'),
+      );
+      const ar = createFormatters("ar", { strict: true });
+      expect(() => ar.selectPlural(1, { one: "عنصر", other: "عنصر" })).toThrow(
+        new RangeError(
+          'Missing cardinal plural forms for "ar": zero, two, few, many.',
+        ),
+      );
+    });
+
+    it("throws a RangeError naming each ordinal category the forms lack", () => {
+      expect(() =>
+        strictEn.selectOrdinal(4, { one: "1st", other: "4th" }),
+      ).toThrow(
+        new RangeError('Missing ordinal plural forms for "en": two, few.'),
+      );
+    });
+
+    it("throws even when the selected category is present", () => {
+      expect(() =>
+        fr.selectPlural(1, { one: "ligne", other: "lignes" }),
+      ).toThrow(RangeError);
+    });
+
+    it("selects a form when every category is present", () => {
+      expect(
+        fr.selectPlural(1_000_000, {
+          one: "ligne",
+          many: "de lignes",
+          other: "lignes",
+        }),
+      ).toBe("de lignes");
+      expect(
+        strictEn.selectOrdinal(3, {
+          one: "1st",
+          two: "2nd",
+          few: "3rd",
+          other: "4th",
+        }),
+      ).toBe("3rd");
+    });
+
+    it("leaves the other formatters unchanged", () => {
+      expect(strictEn.formatNumber(1234.5)).toBe("1,234.5");
+      expect(strictEn.isolate("Ada")).toBe("\u2068Ada\u2069");
+    });
+
+    it("accepts a form the locale never selects", () => {
+      expect(
+        strictEn.selectPlural(0, { zero: "none", one: "one", other: "many" }),
+      ).toBe("many");
+    });
+
+    it("is off by default", () => {
+      const lenient = createFormatters("fr", {});
+      expect(lenient.selectPlural(2, { one: "ligne", other: "lignes" })).toBe(
+        "lignes",
+      );
+    });
+  });
+
   it("constructs one Intl.PluralRules per rule type (memoized)", () => {
     const RealPluralRules = Intl.PluralRules;
     let constructed = 0;
