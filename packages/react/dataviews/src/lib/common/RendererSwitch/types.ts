@@ -11,7 +11,7 @@ import type { ComponentProps, ReactNode } from "react";
 export type RendererChoice = {
   /** The renderer's identity, unique within the switch. */
   readonly id: string;
-  /** The renderer's name, shown beside its choice and naming its region. */
+  /** The renderer's name, on the button that chooses it and naming its region. */
   readonly label: string;
   /** What the renderer draws: a table, cards or anything else the application places. */
   readonly content: ReactNode;
@@ -19,8 +19,8 @@ export type RendererChoice = {
 
 type OwnProps = {
   /**
-   * The switch's accessible name, and the legend of its choices. Defaults to
-   * the messages' `renderer`.
+   * The switch's accessible name, which names its choice too. Defaults to the
+   * messages' `renderer`.
    */
   readonly label?: string;
   /** The renderers offered, in order; the first is shown until another is chosen. */

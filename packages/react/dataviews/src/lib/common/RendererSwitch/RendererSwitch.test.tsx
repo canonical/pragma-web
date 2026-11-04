@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
@@ -12,21 +12,30 @@ const renderers: readonly RendererChoice[] = [
   { id: "cards", label: "Cards", content: <p>the cards</p> },
 ];
 
-/** The switch's select, by the label it is given. */
-const readChoice = (): HTMLSelectElement =>
-  screen.getByRole("combobox", { name: "Show machines as" });
+/** The switch's choice, a group named by the label it is given. */
+const readChoice = (name = "Show machines as"): HTMLElement =>
+  screen.getByRole("group", { name });
+
+/** The renderer the choice holds pressed, by its name. */
+const readPressed = (): string | null =>
+  screen.getByRole("button", { pressed: true }).textContent;
 
 describe("RendererSwitch", () => {
-  it("offers each renderer in a select named by its label, the first chosen", () => {
+  it("offers each renderer as a button in a group named by its label, the first pressed", () => {
     render(<RendererSwitch label="Show machines as" renderers={renderers} />);
-    const choice = readChoice();
+    const buttons = within(readChoice()).getAllByRole("button");
     expect(
-      [...choice.options].map((option) => [option.value, option.text]),
+      buttons.map((button) => [
+        button.textContent,
+        button.getAttribute("aria-pressed"),
+        button.getAttribute("type"),
+      ]),
     ).toEqual([
-      ["table", "Table"],
-      ["cards", "Cards"],
+      ["Table", "true", "button"],
+      ["Cards", "false", "button"],
     ]);
-    expect(choice.value).toBe("table");
+    expect(buttons.at(0)).toHaveClass("primary");
+    expect(buttons.at(1)).toHaveClass("secondary");
   });
 
   it("draws only the chosen renderer, in a region named for it", () => {
@@ -38,31 +47,62 @@ describe("RendererSwitch", () => {
     expect(screen.queryByText("the cards")).toBeNull();
   });
 
-  it("draws the renderer chosen instead, keeping focus on the choice", () => {
+  it("places the choice after the renderers", () => {
     render(<RendererSwitch label="Show machines as" renderers={renderers} />);
-    const choice = readChoice();
-    choice.focus();
-    fireEvent.change(choice, { target: { value: "cards" } });
-    expect(choice.value).toBe("cards");
-    expect(choice).toHaveFocus();
+    const region = screen.getByRole("region", { name: "Table" });
+    expect(
+      region.compareDocumentPosition(readChoice()) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("draws the renderer pressed instead, keeping focus on its button", () => {
+    render(<RendererSwitch label="Show machines as" renderers={renderers} />);
+    const cards = screen.getByRole("button", { name: "Cards" });
+    cards.focus();
+    fireEvent.click(cards);
+    expect(cards).toHaveAttribute("aria-pressed", "true");
+    expect(cards).toHaveFocus();
+    expect(
+      screen.getByRole("button", { name: "Table", pressed: false }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Cards" })).toHaveTextContent(
       "the cards",
     );
     expect(screen.queryByText("the table")).toBeNull();
   });
 
+  it("changes nothing when the pressed button is pressed again", () => {
+    render(<RendererSwitch label="Show machines as" renderers={renderers} />);
+    const table = screen.getByRole("button", { name: "Table" });
+    table.focus();
+    fireEvent.click(table);
+    expect(readPressed()).toBe("Table");
+    expect(screen.getByText("the table")).toBeInTheDocument();
+    expect(table).toHaveFocus();
+  });
+
+  it("presses the button of the renderer it draws, and no other", () => {
+    render(<RendererSwitch label="Show machines as" renderers={renderers} />);
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
+    expect(screen.getAllByRole("button", { pressed: true })).toHaveLength(1);
+    expect(readPressed()).toBe(
+      screen.getByRole("region", { name: "Cards" }).getAttribute("aria-label"),
+    );
+  });
+
   it("returns to the first renderer when the chosen one is no longer offered", () => {
     const { rerender } = render(
       <RendererSwitch label="Show machines as" renderers={renderers} />,
     );
-    fireEvent.change(readChoice(), { target: { value: "cards" } });
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     rerender(
       <RendererSwitch
         label="Show machines as"
         renderers={renderers.filter((renderer) => renderer.id !== "cards")}
       />,
     );
-    expect(readChoice().value).toBe("table");
+    expect(readPressed()).toBe("Table");
     expect(screen.getByText("the table")).toBeInTheDocument();
   });
 
@@ -86,9 +126,7 @@ describe("RendererSwitch", () => {
 
   it("names itself and its choice from the words where nothing names it", () => {
     render(<RendererSwitch renderers={renderers} />);
-    expect(
-      screen.getByRole("combobox", { name: "Show as" }),
-    ).toBeInTheDocument();
+    expect(readChoice("Show as")).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Show as" })).toBeInTheDocument();
   });
 
@@ -99,8 +137,9 @@ describe("RendererSwitch", () => {
         messages={{ renderer: "Afficher comme" }}
       />,
     );
+    expect(readChoice("Afficher comme")).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: "Afficher comme" }),
+      screen.getByRole("region", { name: "Afficher comme" }),
     ).toBeInTheDocument();
   });
 
@@ -156,11 +195,7 @@ describe("RendererSwitch hydrating what the server drew", () => {
     });
     expect(recovered).not.toHaveBeenCalled();
     expect(errors).not.toHaveBeenCalled();
-    expect(
-      screen.getByRole<HTMLSelectElement>("combobox", {
-        name: "Show machines as",
-      }).value,
-    ).toBe("table");
+    expect(readPressed()).toBe("Table");
     expect(screen.getByText("the table")).toBeInTheDocument();
     expect(screen.queryByText("the cards")).toBeNull();
   });
@@ -204,7 +239,7 @@ describe("RendererSwitch hydrating with the focus elsewhere", () => {
     expect(document.activeElement).toBe(document.body);
     await hydrate(container);
     expect(errors).not.toHaveBeenCalled();
-    expect(readChoice().value).toBe("table");
+    expect(readPressed()).toBe("Table");
     expect(screen.getByText("the table")).toBeInTheDocument();
     expect(screen.queryByText("the cards")).toBeNull();
   });
@@ -219,7 +254,7 @@ describe("RendererSwitch hydrating with the focus elsewhere", () => {
     const container = drawServerMarkup();
     outside.focus();
     await hydrate(container);
-    expect(readChoice().value).toBe("table");
+    expect(readPressed()).toBe("Table");
     expect(document.activeElement).toBe(outside);
   });
 });

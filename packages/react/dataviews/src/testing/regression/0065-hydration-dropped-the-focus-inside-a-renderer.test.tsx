@@ -55,10 +55,8 @@ describe("hydrating a renderer switch a reader is inside", () => {
     });
     expect(errors).not.toHaveBeenCalled();
     expect(
-      screen.getByRole<HTMLSelectElement>("combobox", {
-        name: "Show machines as",
-      }).value,
-    ).toBe("cards");
+      screen.getByRole("button", { name: "Cards", pressed: true }),
+    ).toBeInTheDocument();
     expect(screen.getByText("in the cards")).toBe(document.activeElement);
     expect(screen.queryByText("in the table")).toBeNull();
   });

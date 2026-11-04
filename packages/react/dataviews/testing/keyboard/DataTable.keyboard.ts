@@ -752,6 +752,37 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     ).toBeChecked();
   });
 
+  test("DataCards TableOrCards: Enter on Table shows the table, Space on Cards brings the cards back, focus stays on the choice", async ({
+    page,
+  }) => {
+    await openStory(page, findStory(DATA_CARDS, "Table Or Cards").id);
+    const choice = page.getByRole("group", {
+      name: "Show machines as",
+      exact: true,
+    });
+    const table = choice.getByRole("button", { name: "Table", exact: true });
+    const cards = choice.getByRole("button", { name: "Cards", exact: true });
+    // The story's own play function chooses the cards first; start from there.
+    await expect(cards).toHaveAttribute("aria-pressed", "true");
+    await tabTo(page, table);
+    await page.keyboard.press("Enter");
+    await expect(table).toHaveAttribute("aria-pressed", "true");
+    await expect(table).toBeFocused();
+    await expect(
+      page.getByRole("region", { name: "Table", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Cards", exact: true }),
+    ).toHaveCount(0);
+    await tabTo(page, cards);
+    await page.keyboard.press("Space");
+    await expect(cards).toHaveAttribute("aria-pressed", "true");
+    await expect(cards).toBeFocused();
+    await expect(
+      page.getByRole("region", { name: "Cards", exact: true }),
+    ).toBeVisible();
+  });
+
   test("DataChart CountsBesideFilters: Space on a status filter narrows the table, and the chart keeps every status's count", async ({
     page,
   }) => {

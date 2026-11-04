@@ -375,10 +375,13 @@ import { RendererSwitch } from "./RendererSwitch.js";`,
     await userEvent.click(
       await canvas.findByRole("checkbox", { name: "Select alder.example.com" }),
     );
-    await userEvent.selectOptions(
-      canvas.getByRole("combobox", { name: "Show machines as" }),
-      "cards",
+    const choice = canvas.getByRole("group", { name: "Show machines as" });
+    await userEvent.click(
+      within(choice).getByRole("button", { name: "Cards" }),
     );
+    await expect(
+      within(choice).getByRole("button", { name: "Cards" }),
+    ).toHaveAttribute("aria-pressed", "true");
     const card = await canvas.findByRole("listitem", {
       name: "alder.example.com",
     });

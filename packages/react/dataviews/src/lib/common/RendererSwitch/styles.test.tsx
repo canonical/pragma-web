@@ -62,10 +62,14 @@ describe("RendererSwitch stylesheet", () => {
     ).not.toBeNull();
   });
 
-  it("themes the select through the form layer's channels", () => {
+  it("sets the choice after the renderer at the inline end, spaced by a token", () => {
     expect(sheet).toMatch(
-      /--form-input-height: var\(--density-line-height-effective\);/,
+      /& > \.choice \{ display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var\(--renderer-switch-choice-gap\); \}/,
     );
+    expect(sheet).toMatch(
+      /--renderer-switch-choice-gap: var\(--dimension-050\);/,
+    );
+    expect(sheet).not.toMatch(/--form-input-/);
   });
 
   it("writes no length or colour of its own", () => {

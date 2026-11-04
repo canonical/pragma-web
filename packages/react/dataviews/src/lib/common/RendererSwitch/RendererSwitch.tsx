@@ -1,8 +1,7 @@
-import { SelectInput } from "@canonical/react-ds-global-form";
+import { Button } from "@canonical/react-ds-global";
 import {
   type ReactElement,
   useCallback,
-  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -21,10 +20,15 @@ const componentCssClassName = "ds renderer-switch";
  * reads the same query, rows and selection, and changing renderer asks the
  * source for nothing.
  *
- * Once scripts run, the renderers are offered in the design system's select,
- * labelled by `label` or, where the application names nothing, by the words'
- * own `renderer`, and only the chosen one is drawn; the first until another
- * is chosen. Without scripting there is nothing to choose with, so
+ * Once scripts run, only the chosen renderer is drawn, the first until another
+ * is chosen. The renderers are offered as a segmented choice after them, at
+ * the inline end: one design-system button per renderer, the chosen one
+ * pressed, in a group named by `label` or, where the application names
+ * nothing, by the words' own `renderer`. Each button is a Tab stop that Enter
+ * and Space press. The design system names a SegmentedControlInput that no
+ * library implements yet; the switch adopts it when one does.
+ *
+ * Without scripting there is nothing to choose with, so
  * every renderer is drawn in turn, each in a region named for it, and each
  * stays reachable.
  *
@@ -53,15 +57,10 @@ export default function RendererSwitch({
   if (ids.size !== renderers.length) {
     throw new Error("RendererSwitch requires a distinct id for each renderer");
   }
-  const options = renderers.map((renderer) => ({
-    value: renderer.id,
-    label: renderer.label,
-  }));
   const words = useMessages(messages);
   // The application's name for this collection, or the words' own.
   const name = label ?? words.renderer;
   const hydrated = useIsHydrated();
-  const selectId = useId();
   const [chosen, setChosen] = useState(first.id);
   const root = useRef<HTMLElement | null>(null);
   // The root is the switch's own, so a caller's ref is merged onto it rather
@@ -101,19 +100,6 @@ export default function RendererSwitch({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-label={name}
     >
-      {hydrated ? (
-        <div className="choice">
-          <label htmlFor={selectId}>{name}</label>
-          <SelectInput
-            id={selectId}
-            value={active}
-            options={options}
-            onChange={(event) => {
-              setChosen(event.target.value);
-            }}
-          />
-        </div>
-      ) : null}
       {renderers.map((renderer) =>
         hydrated && renderer.id !== active ? null : (
           <section
@@ -125,6 +111,24 @@ export default function RendererSwitch({
           </section>
         ),
       )}
+      {hydrated ? (
+        // biome-ignore lint/a11y/useSemanticElements: a fieldset groups form controls under a legend; this groups toggle buttons, a segmented choice, under the switch's own name
+        <div className="choice" role="group" aria-label={name}>
+          {renderers.map((renderer) => (
+            <Button
+              key={renderer.id}
+              type="button"
+              aria-pressed={renderer.id === active}
+              importance={renderer.id === active ? "primary" : "secondary"}
+              onClick={() => {
+                setChosen(renderer.id);
+              }}
+            >
+              {renderer.label}
+            </Button>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

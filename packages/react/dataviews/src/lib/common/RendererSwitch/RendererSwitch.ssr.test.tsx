@@ -34,7 +34,8 @@ describe("RendererSwitch on the server", () => {
     expect(markup.indexOf("the table")).toBeLessThan(
       markup.indexOf("the cards"),
     );
-    expect(markup).not.toContain("<select");
+    expect(markup).not.toContain('role="group"');
+    expect(markup).not.toContain("<button");
   });
 });
 
@@ -108,6 +109,7 @@ describe("a composition of renderers on the server", () => {
     // The table's headings are real links to the ordering they lead to.
     expect(table).toContain("sort=name__asc");
     // And nothing offers a choice that would do nothing without scripts.
-    expect(markup).not.toContain("<select");
+    expect(markup).not.toContain('role="group"');
+    expect(markup).not.toContain("<button");
   });
 });
