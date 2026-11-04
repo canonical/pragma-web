@@ -1,6 +1,6 @@
 import { createFormatters, type Formatters } from "@canonical/i18n-core";
 import { useMemo, useSyncExternalStore } from "react";
-import useI18nContext from "./useI18nContext.js";
+import { useI18nContext } from "../I18nProvider/index.js";
 
 /**
  * Access memoized {@link Formatters} (number, currency, date, time, relative

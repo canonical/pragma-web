@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import I18nContext from "../I18nProvider/Context.js";
-import type { I18nContextValue } from "../I18nProvider/types.js";
+import I18nContext from "../Context.js";
+import type { I18nContextValue } from "../types.js";
 
 /**
  * Read the i18n context, throwing when used outside an `I18nProvider` so
