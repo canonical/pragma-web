@@ -5,9 +5,11 @@
  * `@ts-expect-error`.
  */
 import { describe, expect, expectTypeOf, it } from "vitest";
+import type { RecordTypes } from "../collection/index.js";
 import { createSchema } from "../schema/index.js";
 import type {
   CapabilityDeclaration,
+  ExecuteSliceConfig,
   FacetFieldNameOf,
   PaginationCapabilities,
 } from "./types.js";
@@ -63,5 +65,13 @@ describe("PaginationCapabilities", () => {
     // @ts-expect-error a cursor source says whether its tokens go backward
     const unsaid: PaginationCapabilities = { kind: "cursor", durable: true };
     expect([offset, cursor, unsaid]).toHaveLength(3);
+  });
+});
+
+describe("ExecuteSliceConfig", () => {
+  it("takes the collection's record types, or null for one type", () => {
+    expectTypeOf<
+      ExecuteSliceConfig["types"]
+    >().toEqualTypeOf<RecordTypes | null>();
   });
 });

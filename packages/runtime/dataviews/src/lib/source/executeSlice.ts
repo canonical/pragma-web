@@ -25,5 +25,6 @@ export default function executeSlice<TRow extends object>(
     schema: config.schema,
     collation: config.sort.collation,
     empties: config.sort.empties,
+    types: config.types,
   });
 }

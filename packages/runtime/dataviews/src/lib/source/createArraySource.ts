@@ -102,6 +102,7 @@ export default function createArraySource<TRow extends object = RowRecord>(
           schema,
           sort: capabilities.sort,
           searchFields,
+          types: collection.types,
         }),
       };
     }
