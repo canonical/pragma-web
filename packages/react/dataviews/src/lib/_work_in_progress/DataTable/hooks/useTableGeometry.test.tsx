@@ -1,7 +1,8 @@
 /**
  * One table's geometry, resolved from its layout and its container: the
  * declarative tracks before the container is measured, the solved widths
- * after, the room the reserving cells take, and a live resize's preview.
+ * after, the room the reserving cells take, a live resize's preview, and
+ * the space past a last column that cannot grow staying the table's.
  */
 import {
   type ColumnToSize,
@@ -65,6 +66,34 @@ describe("useTableGeometry", () => {
     });
     expect(hook.result.current.widths).toEqual([100, 300]);
     expect(hook.result.current.template).toBe("100px 300px");
+  });
+
+  it("leaves the space past a capped last column empty", () => {
+    const { hook } = mount([
+      FIXED_NAME,
+      {
+        id: "status",
+        sizing: { kind: "flex", weight: 1, minPx: 50, maxPx: 200 },
+      },
+    ]);
+    act(() => {
+      hook.result.current.attach(measured(400));
+    });
+    expect(hook.result.current.widths).toEqual([100, 200]);
+  });
+
+  it("leaves the space past a fixed last column empty", () => {
+    const { hook } = mount([
+      {
+        id: "status",
+        sizing: { kind: "flex", weight: 1, minPx: 50, maxPx: 150 },
+      },
+      FIXED_NAME,
+    ]);
+    act(() => {
+      hook.result.current.attach(measured(400));
+    });
+    expect(hook.result.current.widths).toEqual([150, 100]);
   });
 
   it("shares only what the reserving cells leave, until each is released", () => {

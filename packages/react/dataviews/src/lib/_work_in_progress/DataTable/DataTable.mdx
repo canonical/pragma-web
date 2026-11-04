@@ -64,7 +64,7 @@ Every column shows the record field its id names; `field` names a different one.
 
 The recipes from here on keep the provider built above and change only the columns.
 
-A column is `fixed` — it keeps exactly its width — or `flex`: it takes at least its `minPx`, at most its `maxPx`, and a share of whatever is left by `weight`. The solver reserves every fixed width and every minimum first, then shares the rest; a column that reaches its maximum hands its excess back to the others. When even the reservations do not fit, nothing is squeezed: the table scrolls. The one exception is the last column, which takes whatever width the columns before it leave — past its own maximum or fixed width when there is room to spare — so the table never ends in a gap.
+A column is `fixed` — it keeps exactly its width — or `flex`: it takes at least its `minPx`, at most its `maxPx`, and a share of whatever is left by `weight`. The solver reserves every fixed width and every minimum first, then shares the rest; a column that reaches its maximum hands its excess back to the others. When even the reservations do not fit, nothing is squeezed: the table scrolls. A flexible last column takes whatever width the columns before it leave, up to its own maximum; the space past a capped or fixed last column is the table's, and stays empty rather than stretching a column past what it declares.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
@@ -138,7 +138,7 @@ const columns: readonly DataTableColumn[] = [
 
 `resizable` puts a control on a column's trailing edge, driven by the pointer or the keyboard — a drag, or a press on the edge and then a press in the header row where the column should end, so resizing never needs a drag; arrow keys step the edge, and Escape abandons a drag or a placement. Right to left, the edge is on the left, and a drag, the arrow keys and the placing press all follow it. A press on the edge that does not travel changes nothing until the second press. Every resize is held to the column's declared `minPx` and `maxPx`, however often it has been resized, and a column widened past the container scrolls the table so the edge being moved stays in view.
 
-The last column never gets a control, even when it is declared `resizable`: its trailing edge is the table's own edge, with nothing beyond it to resize against. It takes whatever width the others leave instead. Two tables on one provider read one presentation, the provider's, so a resize in either is the arrangement of both and nothing is passed between them; the presentation also holds the column order and which columns are hidden, and a column may declare `hideable: false` to stay in every arrangement.
+The last column never gets a control, even when it is declared `resizable`: its trailing edge is the table's own edge, with nothing beyond it to resize against. Where it is flexible, it takes whatever width the others leave instead, up to its maximum. Two tables on one provider read one presentation, the provider's, so a resize in either is the arrangement of both and nothing is passed between them; the presentation also holds the column order and which columns are hidden, and a column may declare `hideable: false` to stay in every arrangement.
 
 ```tsx
 import { DataTable, type DataTableColumn } from "@canonical/dataviews-react";
