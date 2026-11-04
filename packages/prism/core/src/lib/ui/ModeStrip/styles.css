@@ -90,9 +90,11 @@
   }
 
   /* The count closes the group on the last line, even when nothing grows
-   * before it. */
+   * before it. Where the group is narrower than its content, the count
+   * shrinks last and is clipped at its end, so the band never overflows. */
   .ds.mode-strip > .filtering > .count {
-    flex-shrink: 0;
+    min-inline-size: 0;
+    overflow-x: clip;
     margin-inline-start: auto;
   }
 

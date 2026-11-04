@@ -16,16 +16,21 @@ export {
   CHROMIUM_EXECUTABLE_PATH_ENV_VAR,
   FRAME_SELECTOR,
   SPACING_STEP_PX,
+  STRIP_VIEWPORTS,
   THEMES,
   VIEWPORTS,
 } from "./constants.js";
 export { default as launchBrowser } from "./launchBrowser.js";
 export { default as measureLayout } from "./measureLayout.js";
 export { default as measurePage } from "./measurePage.js";
+export { default as measureStrip } from "./measureStrip.js";
 export type {
   LayoutMeasure,
   MeasureLayoutOptions,
   MeasurePageOptions,
+  StripGroupBox,
+  StripMeasure,
+  StripViewport,
   Theme,
   ThemedMeasure,
   Viewport,

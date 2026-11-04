@@ -7,7 +7,9 @@
 # filtering group is a row that never wraps: Search grows into every free
 # track, the applied chips follow, and the count closes the group flush on
 # the last line; nothing is left empty at the side. An unused group leaves
-# its place empty: no placeholder, no divider, nothing moves.
+# its place empty: no placeholder, no divider, nothing moves. Where the
+# group is narrower than its content, the count shrinks and is clipped at
+# its end, so the band never overflows.
 #
 # Its height is the density line plus one component padding above and
 # below, content-box, so an empty strip and a full one are 53px alike and
@@ -121,7 +123,8 @@ node:
           - node:
               role: count slot
               styles:
-                layout.flex.shrink: 0
+                size.min.width: 0
+                layout.overflow.inline: clip
                 spacing.external.inline.start: auto
               edges:
                 - node:

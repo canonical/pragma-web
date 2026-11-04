@@ -25,6 +25,7 @@ const EXTERNAL_TOKENS = [
   "--color-background",
   "--color-background-container",
   "--color-background-layer2",
+  "--color-border-highlighted",
   "--color-border-muted",
   "--color-brand-primary",
   "--color-focus-ring",

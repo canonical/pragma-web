@@ -1,7 +1,40 @@
-import type { THEMES, VIEWPORTS } from "./constants.js";
+import type { STRIP_VIEWPORTS, THEMES, VIEWPORTS } from "./constants.js";
 
 /** A viewport a layout is measured at. */
 export type Viewport = (typeof VIEWPORTS)[number];
+
+/** A viewport the strip is measured at. */
+export type StripViewport = (typeof STRIP_VIEWPORTS)[number];
+
+/** Where one group of the strip starts and ends, in viewport pixels. */
+export interface StripGroupBox {
+  readonly x: number;
+  readonly right: number;
+}
+
+/** What the strip of one page measures to. */
+export interface StripMeasure {
+  /** The strip's border-box height; `null` on a page with no strip. */
+  readonly height: number | null;
+  /** The facet bar's border-box height; `null` on a page with no bar. */
+  readonly bar: number | null;
+  /** The strip's three groups; each `null` when the strip is absent. */
+  readonly groups: {
+    readonly trail: StripGroupBox | null;
+    readonly view: StripGroupBox | null;
+    readonly filtering: StripGroupBox | null;
+  };
+  /** The strip's content end: its right edge less its end padding. */
+  readonly contentEnd: number | null;
+  /** The count slot's right edge; `null` when the strip counts nothing. */
+  readonly countRight: number | null;
+  /** The search slot's width; `null` when the strip has no search. */
+  readonly searchWidth: number | null;
+  /** Whether the strip's content is wider than the strip. */
+  readonly overflow: boolean;
+  /** The hrefs on the page that carry the retired `view=` parameter. */
+  readonly viewHrefs: readonly string[];
+}
 
 /** A theme a layout is measured in. */
 export type Theme = (typeof THEMES)[number];

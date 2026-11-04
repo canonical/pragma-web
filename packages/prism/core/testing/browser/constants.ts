@@ -19,6 +19,19 @@ export const VIEWPORTS = [
   { name: "390", width: 390, height: 844, columns: 4 },
 ] as const;
 
+/**
+ * The viewports the strip is measured at: each side of the two-group
+ * threshold, the widest desktop, a common laptop and a phone, with the
+ * columns the shell's intrinsic grid lays at each.
+ */
+export const STRIP_VIEWPORTS = [
+  { name: "1440", width: 1440, height: 900, columns: 12 },
+  { name: "1366", width: 1366, height: 768, columns: 10 },
+  { name: "912", width: 912, height: 1368, columns: 8 },
+  { name: "820", width: 820, height: 1180, columns: 6 },
+  { name: "390", width: 390, height: 844, columns: 4 },
+] as const;
+
 /** The themes a layout is measured in, by the class on `<html>`. */
 export const THEMES = ["light", "dark"] as const;
 

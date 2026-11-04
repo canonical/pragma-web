@@ -14,8 +14,46 @@
     --renderer-switch-overlay-background: var(--color-background);
     --renderer-switch-overlay-border-width: 1px;
     --renderer-switch-overlay-border-color: var(--color-border-muted);
+    --renderer-switch-tab-gap: var(--space-200);
+    --renderer-switch-tab-color: var(--color-text);
+    --renderer-switch-tab-underline-width: 2px;
+    --renderer-switch-tab-current-color: var(--color-border-highlighted);
+    --renderer-switch-focus-ring-width: 2px;
+    --renderer-switch-focus-ring-color: var(--color-focus-ring);
 
     min-inline-size: 0;
+  }
+
+  /* The tab links on one row, on the strip's line. */
+  .ds.renderer-switch > .tabs > .list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin-block: 0;
+    padding-inline-start: 0;
+    gap: var(--renderer-switch-tab-gap);
+  }
+
+  /* A tab link with no block inset, so it stays on the strip's line. */
+  .ds.renderer-switch .tab {
+    display: inline-flex;
+    align-items: center;
+    color: var(--renderer-switch-tab-color);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* The current tab's highlighted underline. */
+  .ds.renderer-switch .tab[aria-current="page"] {
+    border-bottom-width: var(--renderer-switch-tab-underline-width);
+    border-bottom-style: solid;
+    border-bottom-color: var(--renderer-switch-tab-current-color);
+  }
+
+  .ds.renderer-switch .tab:focus-visible {
+    outline-width: var(--renderer-switch-focus-ring-width);
+    outline-style: solid;
+    outline-color: var(--renderer-switch-focus-ring-color);
   }
 
   /* The narrow form, a disclosure; at two groups and wider it is not
