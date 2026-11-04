@@ -1,7 +1,7 @@
-import { createLocaleSource } from "@canonical/i18n-core";
-import { type ReactElement, useMemo, useState } from "react";
+import type { ReactElement } from "react";
 import I18nContext from "./Context.js";
-import type { I18nContextValue, I18nProviderProps } from "./types.js";
+import { useProviderState } from "./hooks/index.js";
+import type { I18nProviderProps } from "./types.js";
 
 /**
  * Provide the i18n runtime to the `useTranslation`, `useLocale`, and
@@ -14,20 +14,8 @@ import type { I18nContextValue, I18nProviderProps } from "./types.js";
  */
 export default function I18nProvider({
   children,
-  config,
-  catalogs,
-  locale,
-  source,
+  ...props
 }: I18nProviderProps): ReactElement {
-  const [ownSource] = useState(() =>
-    createLocaleSource(config, { initial: locale ?? config.defaultLocale }),
-  );
-  const activeSource = source ?? ownSource;
-
-  const value = useMemo<I18nContextValue>(
-    () => ({ source: activeSource, config, catalogs }),
-    [activeSource, config, catalogs],
-  );
-
+  const value = useProviderState(props);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
