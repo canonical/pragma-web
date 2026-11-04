@@ -33,12 +33,18 @@ describe("Message", () => {
   });
 
   it("fills plain-text placeholders from the values", () => {
+    const translate: Translate = (_key, values) =>
+      `${String(values?.count)} {kind}`;
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <MessagesContext value={translate}>{children}</MessagesContext>
+    );
     const { container } = render(
       <Message
         elements={{ kind: <b>stations</b> }}
-        id="list.count"
+        id="entity.context"
         values={{ count: 12 }}
       />,
+      { wrapper },
     );
     expect(container.innerHTML).toBe("12 <b>stations</b>");
   });

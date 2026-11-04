@@ -5,7 +5,7 @@ import {
   withRelayEnvironment,
 } from "@canonical/storybook-addon-relay";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { type ReactElement, useState } from "react";
+import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { withProjectionSite } from "../../../../.storybook/decorators/index.js";
 import {
@@ -15,7 +15,6 @@ import {
 import storyQuery, {
   type NodeListStoryQuery,
 } from "../../../__generated__/NodeListStoryQuery.graphql.js";
-import type { EntityListView } from "../../ui/index.js";
 import Component from "./NodeList.js";
 import type { NodeListProps } from "./types.js";
 
@@ -38,27 +37,16 @@ const declareStoryQuery = (): unknown => graphql`
 `;
 void declareStoryQuery;
 
-/**
- * NodeList over the instances the story's mock environment answers, its
- * view held as a lens holds it, so the toggle switches it.
- */
+/** NodeList over the instances the story's mock environment answers. */
 const NodeListOverNodes = (
   props: Omit<NodeListProps, "nodes">,
 ): ReactElement => {
   const data = useLazyLoadQuery<NodeListStoryQuery>(storyQuery, {});
-  const [view, setView] = useState<EntityListView>(props.view ?? "cards");
   const edges = data.ontologyClass?.instances.edges;
   if (!edges) {
     throw new Error("the mock environment resolved no instances");
   }
-  return (
-    <Component
-      {...props}
-      nodes={edges.map(({ node }) => node)}
-      onViewChange={setView}
-      view={view}
-    />
-  );
+  return <Component {...props} nodes={edges.map(({ node }) => node)} />;
 };
 
 /** The story's mock environment, answering the class's instances. */
@@ -96,21 +84,18 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/**
- * Three nodes as cards, each through its type's arm; the toggle switches the
- * view.
- */
-export const Cards: Story = {
-  args: { count: 3, kind: "instances" },
+/** Three nodes as rows, each through its type's arm. */
+export const Default: Story = {
+  args: {},
 };
 
-/** The same nodes as rows. */
-export const Rows: Story = {
-  args: { count: 3, kind: "instances", view: "rows" },
+/** The same nodes as cards. */
+export const Cards: Story = {
+  args: { renderer: "cards" },
 };
 
 /** No nodes: the list's one empty line. */
 export const Empty: Story = {
-  args: { count: 0, kind: "instances", empty: "No instances yet." },
+  args: { empty: "No instances yet." },
   parameters: { relay: mockInstances([]) },
 };

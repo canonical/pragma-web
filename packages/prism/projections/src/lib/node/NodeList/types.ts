@@ -10,10 +10,10 @@ type OwnProps = {
    * spreads `...NodeList_node` on a list of nodes.
    */
   readonly nodes: NodeList_node$key;
-} & Pick<EntityListProps, "view" | "onViewChange" | "count" | "kind" | "empty">;
+} & Pick<EntityListProps, "renderer" | "empty">;
 
 /**
- * Props accepted by `NodeList`: its own, the list view's view, count and
+ * Props accepted by `NodeList`: its own, the list view's renderer and
  * empty line among them, then the native props of the list's `<div>` root.
  * The native `children` are excluded: the list's items are its nodes.
  */

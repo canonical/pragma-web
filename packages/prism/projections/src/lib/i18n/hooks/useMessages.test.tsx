@@ -9,7 +9,7 @@ import useMessages from "./useMessages.js";
 describe("useMessages", () => {
   it("reads the English catalog when no translator is provided", () => {
     const { result } = renderHook(() => useMessages());
-    expect(result.current("list.view.label")).toBe(MESSAGES["list.view.label"]);
+    expect(result.current("list.empty")).toBe(MESSAGES["list.empty"]);
   });
 
   it("fills every placeholder from the values", () => {

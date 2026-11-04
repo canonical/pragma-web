@@ -1,7 +1,7 @@
 // Scaffolded by @canonical/summon-component:react v0.43.0
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import { type ReactElement, useState } from "react";
+import { render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { describe, expect, it, vi } from "vitest";
@@ -13,7 +13,6 @@ import {
 import testQuery, {
   type NodeListTestQuery,
 } from "../../../__generated__/NodeListTestQuery.graphql.js";
-import type { EntityListView } from "../../ui/index.js";
 import NodeList from "./NodeList.js";
 import type { NodeListProps } from "./types.js";
 
@@ -83,53 +82,29 @@ const renderWithNodes = (
 };
 
 describe("NodeList", () => {
-  it("lists each node as a card through its type's arm by default", () => {
+  it("lists each node as a row through its type's arm by default", () => {
     const { container } = renderWithNodes((nodes) => (
       <NodeList nodes={nodes} />
-    ));
-    expect(container.querySelector(".ds.node-card")).not.toBeNull();
-    expect(container.querySelector(".ds.ontology-class-card")).not.toBeNull();
-    expect(container.querySelector(".ds.entity-row")).toBeNull();
-  });
-
-  it("lists each node as a row through its type's arm in the rows view", () => {
-    const { container } = renderWithNodes((nodes) => (
-      <NodeList nodes={nodes} view="rows" />
     ));
     expect(container.querySelector("ol .ds.node-row")).not.toBeNull();
     expect(container.querySelector("ol .ds.ontology-class-row")).not.toBeNull();
     expect(container.querySelector(".ds.entity-card")).toBeNull();
   });
 
-  it("takes its view from its consumer, which holds the reader's pick", () => {
-    /** A lens that holds the view, as it would in the page's address. */
-    const Lens = ({
-      nodes,
-    }: {
-      nodes: NodeListProps["nodes"];
-    }): ReactElement => {
-      const [view, setView] = useState<EntityListView>("cards");
-      return <NodeList nodes={nodes} onViewChange={setView} view={view} />;
-    };
-    const { container } = renderWithNodes((nodes) => <Lens nodes={nodes} />);
-    fireEvent.click(screen.getByRole("button", { name: "Rows" }));
-    expect(container.querySelectorAll(".ds.entity-row")).toHaveLength(2);
-    expect(container.querySelector(".ds.entity-card")).toBeNull();
+  it("lists each node as a card through its type's arm in the cards", () => {
+    const { container } = renderWithNodes((nodes) => (
+      <NodeList nodes={nodes} renderer="cards" />
+    ));
+    expect(container.querySelector(".ds.node-card")).not.toBeNull();
+    expect(container.querySelector(".ds.ontology-class-card")).not.toBeNull();
+    expect(container.querySelector(".ds.entity-row")).toBeNull();
   });
 
-  it("hands the list its count line and its empty line", () => {
+  it("hands the list its empty line", () => {
     renderWithNodes(
-      (nodes) => (
-        <NodeList
-          count={0}
-          empty="No instances."
-          kind="instances"
-          nodes={nodes}
-        />
-      ),
+      (nodes) => <NodeList empty="No instances." nodes={nodes} />,
       [],
     );
-    expect(document.querySelector(".count")?.textContent).toBe("0 instances");
     expect(screen.getByText("No instances.")).toBeInTheDocument();
   });
 

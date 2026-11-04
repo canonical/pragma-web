@@ -30,9 +30,7 @@ export const MESSAGES = {
   "property.range": "Range",
   "property.inverse": "Inverse",
   "property.functional": "functional",
-  "list.count": "{count} {kind}",
   "list.empty": "Nothing to list.",
-  "list.view.label": "View",
-  "list.view.cards": "Cards",
-  "list.view.rows": "Rows",
+  "renderer.table": "Table",
+  "renderer.cards": "Cards",
 } as const;

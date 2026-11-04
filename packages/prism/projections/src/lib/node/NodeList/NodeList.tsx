@@ -3,7 +3,7 @@
 import type { ReactElement } from "react";
 import { graphql, useFragment } from "react-relay";
 import nodeFragment from "../../../__generated__/NodeList_node.graphql.js";
-import { DEFAULT_ENTITY_LIST_VIEW } from "../../ui/EntityList/constants.js";
+import { DEFAULT_ENTITY_LIST_RENDERER } from "../../ui/EntityList/constants.js";
 import { EntityList } from "../../ui/index.js";
 import { CardProjection } from "../CardProjection/index.js";
 import { RowProjection } from "../RowProjection/index.js";
@@ -30,14 +30,13 @@ const componentCssClassName = "ds node-list";
 
 /**
  * An index of graph nodes as the shared list view: `EntityList` with each
- * node as an item, a card through `CardProjection` in the cards view and a
- * row through `RowProjection` in the rows view, so each node reads through
- * the arm its site maps to its type.
+ * node as an item, a row through `RowProjection` in the `table` renderer
+ * and a card through `CardProjection` in the `cards` renderer, so each node
+ * reads through the arm its site maps to its type.
  *
- * It keeps no view of its own: the lens holds the view, in the page's
- * address, passes it as `view` and takes the reader's pick from
- * `onViewChange`. The count line, its noun and the empty line are the
- * lens's too.
+ * It keeps no renderer of its own: the lens reads it from the page's
+ * address and passes its name as `renderer`. The empty line is the lens's
+ * too.
  *
  * Native props reach the list's `<div>` root; a consumer `className` merges
  * after the projection's own.
@@ -50,7 +49,7 @@ const componentCssClassName = "ds node-list";
  */
 export default function NodeList({
   nodes,
-  view = DEFAULT_ENTITY_LIST_VIEW,
+  renderer = DEFAULT_ENTITY_LIST_RENDERER,
   className,
   ...props
 }: NodeListProps): ReactElement {
@@ -59,13 +58,13 @@ export default function NodeList({
     <EntityList
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      view={view}
+      renderer={renderer}
     >
       {data.map((node) =>
-        view === "rows" ? (
-          <RowProjection key={node.uri} node={node} />
-        ) : (
+        renderer === "cards" ? (
           <CardProjection key={node.uri} node={node} />
+        ) : (
+          <RowProjection key={node.uri} node={node} />
         ),
       )}
     </EntityList>

@@ -85,6 +85,7 @@ export {
   useProjectionLink,
   useProjectionMaps,
 } from "./projections/index.js";
+export { useListRenderers } from "./renderers/index.js";
 export type {
   EntityCardKeyValue,
   EntityCardProps,
@@ -92,10 +93,12 @@ export type {
   EntityCommandProps,
   EntityGraphNodeProps,
   EntityListProps,
-  EntityListView,
+  EntityListRenderer,
   EntityRowProps,
 } from "./ui/index.js";
 export {
+  DEFAULT_ENTITY_LIST_RENDERER,
+  ENTITY_LIST_RENDERERS,
   EntityCard,
   EntityChip,
   EntityCommand,
