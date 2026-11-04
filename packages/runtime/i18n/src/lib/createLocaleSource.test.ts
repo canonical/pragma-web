@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { localeConfig as config } from "../../testing/fixtures.js";
 import createLocaleSource from "./createLocaleSource.js";
-import type { I18nConfig } from "./types.js";
-
-const config: I18nConfig = {
-  locales: ["en", "fr", "ar"],
-  defaultLocale: "en",
-  rtlLocales: ["ar"],
-};
 
 describe("createLocaleSource", () => {
   it("starts at the default locale", () => {
