@@ -53,3 +53,13 @@ describe("effectsOff", () => {
     expect(fixtures.effectsOff).toEqual({ persist: false, reflect: false });
   });
 });
+
+describe("arabicItemForms", () => {
+  it("words every cardinal category Arabic uses", () => {
+    const categories = new Intl.PluralRules("ar").resolvedOptions()
+      .pluralCategories;
+    for (const category of categories) {
+      expect(fixtures.arabicItemForms[category]).toBeTypeOf("string");
+    }
+  });
+});

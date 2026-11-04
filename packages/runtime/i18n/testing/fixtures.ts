@@ -8,6 +8,7 @@ import type {
   I18nConfig,
   LocaleSourceOptions,
   Messages,
+  PluralRecord,
 } from "../src/lib/index.js";
 
 /** Three locales, one of them right-to-left. */
@@ -84,4 +85,14 @@ export const baseCatalog: Messages = { a: "base-a", b: "base-b" };
 export const effectsOff: LocaleSourceOptions = {
   persist: false,
   reflect: false,
+};
+
+/** Arabic forms for a count of items, one per CLDR category Arabic uses. */
+export const arabicItemForms: PluralRecord = {
+  zero: "لا عناصر",
+  one: "عنصر",
+  two: "عنصران",
+  few: "3 عناصر",
+  many: "11 عنصرًا",
+  other: "100 عنصر",
 };
