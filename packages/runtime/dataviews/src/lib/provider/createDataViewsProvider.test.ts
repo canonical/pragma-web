@@ -126,6 +126,7 @@ describe("createDataViewsProvider", () => {
     const { provider } = machineProvider();
     expect(Object.keys(provider).sort()).toEqual([
       "capabilities",
+      "clear",
       "collection",
       "issues",
       "navigateWindow",

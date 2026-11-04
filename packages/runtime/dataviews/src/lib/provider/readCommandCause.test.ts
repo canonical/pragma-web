@@ -34,4 +34,16 @@ describe("readCommandCause", () => {
       "window",
     );
   });
+
+  it("announces a clear as the filter's move when it empties the filter", () => {
+    expect(readCommandCause({ kind: "clear", paths: ["filter"] })).toBe(
+      "filter",
+    );
+    expect(
+      readCommandCause({ kind: "clear", paths: ["search", "filter"] }),
+    ).toBe("filter");
+    expect(readCommandCause({ kind: "clear", paths: ["search"] })).toBe(
+      "search",
+    );
+  });
 });

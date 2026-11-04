@@ -58,6 +58,15 @@ export type PredicateRef = {
 };
 
 /**
+ * A part of the query `clear` empties: `filter`, every conjunct of the
+ * filter, or `search`, the search text.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type QueryClearPath = "filter" | "search";
+
+/**
  * Sort direction of a single ordered term.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -170,7 +179,7 @@ export type WindowNavigation = Partial<Omit<ResultWindow, "collapsed">>;
 
 /**
  * An addressed query command: a predicate command names one conjunct by
- * its `nth`, 0 when left out.
+ * its `nth`, 0 when left out, and `clear` empties whole parts.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -203,6 +212,14 @@ export type QueryCommand =
       readonly add: readonly Predicate[];
     }
   | { readonly kind: "setSearch"; readonly search: string }
+  | {
+      readonly kind: "clear";
+      /**
+       * The parts emptied, one or more; repeated or reordered, they name
+       * the same clear.
+       */
+      readonly paths: readonly [QueryClearPath, ...QueryClearPath[]];
+    }
   | { readonly kind: "setSort"; readonly sort: readonly SortTerm[] }
   | { readonly kind: "setGroup"; readonly group: readonly GroupTerm[] }
   | {

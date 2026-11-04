@@ -840,4 +840,93 @@ describe("applyQueryCommand", () => {
       });
     });
   });
+
+  describe("clearing parts of the query", () => {
+    const busy = slice({
+      filter: [
+        { field: "tags", operator: "isAny", operands: ["ex-gpu"] },
+        { field: "tags", operator: "isAny", operands: ["ex-nvme"] },
+      ],
+      search: "alder",
+      sort: [{ field: "name", direction: "asc" }],
+    });
+    const deep = window({ page: 3, cursor: "ex-token", collapsed: [["a"]] });
+
+    it("empties the filter, the search, or both, and keeps the rest", () => {
+      expect(
+        applyQueryCommand(busy, deep, { kind: "clear", paths: ["filter"] }),
+      ).toMatchObject({
+        status: "accepted",
+        slice: { ...busy, filter: [] },
+        sliceChanged: true,
+      });
+      expect(
+        applyQueryCommand(busy, deep, { kind: "clear", paths: ["search"] }),
+      ).toMatchObject({ slice: { ...busy, search: null } });
+      expect(
+        applyQueryCommand(busy, deep, {
+          kind: "clear",
+          paths: ["filter", "search"],
+        }),
+      ).toMatchObject({ slice: { ...busy, filter: [], search: null } });
+    });
+
+    it("returns to the first page and keeps the collapsed groups", () => {
+      expect(
+        applyQueryCommand(busy, deep, { kind: "clear", paths: ["filter"] }),
+      ).toMatchObject({
+        window: { page: 1, cursor: null, collapsed: [["a"]] },
+        windowChanged: true,
+      });
+    });
+
+    it("reads repeated or reordered parts as the same clear", () => {
+      const once = applyQueryCommand(busy, deep, {
+        kind: "clear",
+        paths: ["filter", "search"],
+      });
+      expect(
+        applyQueryCommand(busy, deep, {
+          kind: "clear",
+          paths: ["search", "filter", "search"],
+        }),
+      ).toEqual(once);
+    });
+
+    it("changes nothing when the parts are already empty", () => {
+      expect(
+        applyQueryCommand(slice(), deep, {
+          kind: "clear",
+          paths: ["filter", "search"],
+        }),
+      ).toEqual({
+        status: "accepted",
+        slice: slice(),
+        window: deep,
+        sliceChanged: false,
+        windowChanged: false,
+      });
+    });
+
+    it("rejects a clear naming no part, or one the query has not", () => {
+      expect(
+        applyQueryCommand(busy, deep, {
+          kind: "clear",
+          paths: [] as unknown as ["filter"],
+        }),
+      ).toMatchObject({
+        status: "rejected",
+        reason: "a clear must name at least one part of the query",
+      });
+      expect(
+        applyQueryCommand(busy, deep, {
+          kind: "clear",
+          paths: ["filter", "sort"] as unknown as ["filter"],
+        }),
+      ).toMatchObject({
+        status: "rejected",
+        reason: "a clear cannot empty sort, only filter or search",
+      });
+    });
+  });
 });

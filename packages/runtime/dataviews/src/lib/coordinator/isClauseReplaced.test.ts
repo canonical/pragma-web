@@ -89,4 +89,19 @@ describe("isClauseReplaced", () => {
       false,
     );
   });
+
+  it("replaces a clause by a clear emptying the part it is in", () => {
+    expect(isClauseReplaced({ kind: "clear", paths: ["filter"] }, status)).toBe(
+      true,
+    );
+    expect(isClauseReplaced({ kind: "clear", paths: ["filter"] }, search)).toBe(
+      false,
+    );
+    expect(isClauseReplaced({ kind: "clear", paths: ["search"] }, search)).toBe(
+      true,
+    );
+    expect(isClauseReplaced({ kind: "clear", paths: ["search"] }, status)).toBe(
+      false,
+    );
+  });
 });

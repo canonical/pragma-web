@@ -74,6 +74,7 @@ import type {
   PresentationStore,
   PresentationTarget,
   Query,
+  QueryClearPath,
   QueryIssue,
   QueryIssueCode,
   QueryLocation,
@@ -242,6 +243,7 @@ type EveryPublicType = [
   Predicate,
   PredicateOperand,
   PredicateOperator,
+  QueryClearPath,
   PredicateRef,
   PreferenceResult,
   PresentationPatch,
@@ -628,6 +630,7 @@ describe("public surface types", () => {
           | "navigateWindow"
           | "setSort"
           | "setSearch"
+          | "clear"
           | "setGroup"
           | "setCollapsed"]
       >
@@ -769,6 +772,7 @@ describe("public surface types", () => {
       surface.filter((name) => /^(Relay|Query)/.test(name)).sort(),
     ).toEqual([
       "Query",
+      "QueryClearPath",
       "QueryIssue",
       "QueryIssueCode",
       "QueryLocation",

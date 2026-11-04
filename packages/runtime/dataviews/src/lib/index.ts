@@ -76,6 +76,7 @@ export type {
   PredicateOperator,
   PredicateRef,
   Query,
+  QueryClearPath,
   ResultWindow,
   Slice,
   SortDirection,

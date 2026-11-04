@@ -55,6 +55,23 @@ const firstPage = (window: ResultWindow): ResultWindow => ({
   cursor: null,
 });
 
+/** The parts of the query `clear` may empty. */
+const CLEAR_PATHS: ReadonlySet<string> = new Set(["filter", "search"]);
+
+/**
+ * Why a clear's parts are not a list of them, or null when they are. The
+ * type asks for one or more, and a caller past the type is told so.
+ */
+const rejectClearPaths = (paths: readonly string[]): string | null => {
+  if (paths.length === 0) {
+    return "a clear must name at least one part of the query";
+  }
+  const unknown = paths.find((path) => !CLEAR_PATHS.has(path));
+  return unknown === undefined
+    ? null
+    : `a clear cannot empty ${String(unknown)}, only filter or search`;
+};
+
 /** Why a conjunct's place is not one, or null when it is. */
 const rejectNth = (nth: number | undefined): string | null =>
   nth === undefined || (Number.isSafeInteger(nth) && nth >= 0)
@@ -143,7 +160,8 @@ const collapsedEquals = (
  * cursor token) are rejected with the input state unchanged, and so is one
  * naming a conjunct the slice does not hold: a place that is no whole
  * number, one past the conjuncts at its address, or a conjunct an edit
- * names twice.
+ * names twice. A clear naming no part of the query, or one it has not, is
+ * rejected too.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -280,6 +298,8 @@ const commandRejection = (
       }
       return null;
     }
+    case "clear":
+      return rejectClearPaths(command.paths);
     case "setSort":
       return command.sort.some((term) => term.field === "")
         ? "sort term field must not be empty"
@@ -320,6 +340,12 @@ const applyToSlice = (slice: Slice, command: SliceCommand): Slice => {
       return {
         ...slice,
         search: command.search === "" ? null : command.search,
+      };
+    case "clear":
+      return {
+        ...slice,
+        filter: command.paths.includes("filter") ? [] : slice.filter,
+        search: command.paths.includes("search") ? null : slice.search,
       };
     case "setSort":
       // Collapsed here as well as in canonicalization, so the query the

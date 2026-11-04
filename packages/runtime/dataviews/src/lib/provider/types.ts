@@ -21,6 +21,7 @@ import type {
   PredicateOperator,
   PredicateRef,
   Query,
+  QueryClearPath,
   QueryCommand,
   SortTerm,
   WindowNavigation,
@@ -123,6 +124,13 @@ export type DataViewsProvider<
   ) => readonly SourceRefusal[];
   readonly setSort: (sort: readonly SortTerm[]) => readonly SourceRefusal[];
   readonly setSearch: (search: string) => readonly SourceRefusal[];
+  /**
+   * Empty the named parts of the query, and their refused clauses, in one
+   * transition from page one. A clear that changes nothing commits nothing.
+   */
+  readonly clear: (
+    paths: readonly [QueryClearPath, ...QueryClearPath[]],
+  ) => readonly SourceRefusal[];
   /**
    * Replace the grouping levels. Reserved: refused while no source declares
    * a groupable field.

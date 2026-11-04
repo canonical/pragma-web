@@ -17,6 +17,7 @@ import type {
   PredicateOperator,
   PredicateRef,
   Query,
+  QueryClearPath,
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
@@ -363,6 +364,8 @@ export default function createDataViewsProvider<
       command({ kind: "navigateWindow", ...window }),
     setSort: (sort: readonly SortTerm[]) => command({ kind: "setSort", sort }),
     setSearch: (search: string) => command({ kind: "setSearch", search }),
+    clear: (paths: readonly [QueryClearPath, ...QueryClearPath[]]) =>
+      command({ kind: "clear", paths }),
     setGroup: (group: readonly GroupTerm[]) =>
       command({ kind: "setGroup", group }),
     setCollapsed: (collapsed: readonly GroupPath[]) =>
