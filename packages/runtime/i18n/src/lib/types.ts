@@ -48,25 +48,31 @@ export type Translator = (key: string, vars?: TranslateVars) => string;
  */
 export interface Formatters {
   /** Format a number for the locale. */
-  number(value: number, options?: Intl.NumberFormatOptions): string;
+  formatNumber(value: number, options?: Intl.NumberFormatOptions): string;
   /** Format a number as currency (ISO 4217 code, e.g. `"USD"`). */
-  currency(
+  formatCurrency(
     value: number,
     currency: string,
     options?: Intl.NumberFormatOptions,
   ): string;
   /** Format a date/timestamp for the locale. */
-  date(value: Date | number, options?: Intl.DateTimeFormatOptions): string;
+  formatDate(
+    value: Date | number,
+    options?: Intl.DateTimeFormatOptions,
+  ): string;
   /** Format the time portion of a date/timestamp for the locale. */
-  time(value: Date | number, options?: Intl.DateTimeFormatOptions): string;
+  formatTime(
+    value: Date | number,
+    options?: Intl.DateTimeFormatOptions,
+  ): string;
   /** Format a relative time, e.g. `(-3, "day")` → "3 days ago". */
-  relativeTime(
+  formatRelativeTime(
     value: number,
     unit: Intl.RelativeTimeFormatUnit,
     options?: Intl.RelativeTimeFormatOptions,
   ): string;
   /** Join a list with locale-aware conjunctions, e.g. "A, B, and C". */
-  list(items: Iterable<string>, options?: Intl.ListFormatOptions): string;
+  formatList(items: Iterable<string>, options?: Intl.ListFormatOptions): string;
 }
 
 /**
