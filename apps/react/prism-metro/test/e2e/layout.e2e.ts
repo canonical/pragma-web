@@ -66,7 +66,7 @@ const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
  */
 const DOCUMENT_PATHS = [
   "/stations",
-  "/stations?view=cards",
+  "/stations?as=cards",
   STATION_PATH,
   STATION_IRI_PATH,
   "/",
