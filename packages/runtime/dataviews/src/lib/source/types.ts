@@ -7,7 +7,7 @@
  */
 
 import type { ActionOutcome } from "../action/index.js";
-import type { Collection } from "../collection/index.js";
+import type { Collection, RecordTypes } from "../collection/index.js";
 import type {
   PredicateOperator,
   Query,
@@ -716,4 +716,10 @@ export type ExecuteSliceConfig = {
   readonly sort: SortCapabilities;
   /** Fields free-text search reads; none by default. */
   readonly searchFields?: readonly string[];
+  /**
+   * The collection's record types, or null when it has one. A presence
+   * field scoped to other types than a row's is not applicable to that
+   * row, and orders with the empties.
+   */
+  readonly types: RecordTypes | null;
 };

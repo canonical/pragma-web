@@ -32,7 +32,7 @@ const findContaining = (operand: string): readonly string[] =>
       ...EMPTY_SLICE,
       filter: [{ field: "name", operator: "contains", operands: [operand] }],
     },
-    { schema, sort: declareSort(schema.fieldNames) },
+    { schema, sort: declareSort(schema.fieldNames), types: null },
   ).map((row) => row.id);
 
 describe("regression 0064 — contains missed final sigma and recomposed letters", () => {

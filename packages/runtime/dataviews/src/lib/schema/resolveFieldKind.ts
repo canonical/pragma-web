@@ -49,15 +49,6 @@ const compareScalars = (
   return null;
 };
 
-/** Booleans order false before true; anything else is not a presence value. */
-const compareBooleans = (
-  value: unknown,
-  bound: PredicateOperand,
-): number | null =>
-  typeof value === "boolean" && typeof bound === "boolean"
-    ? Number(value) - Number(bound)
-    : null;
-
 const CHOICES: FieldKindRules<ChoicesField> = {
   operators: ["isAny", "isNone"],
   rejectDefinition: (definition) => {
@@ -205,16 +196,15 @@ const NUMBER: FieldKindRules<NumberField> = {
 };
 
 /**
- * A presence field orders false before true. Its domain is presence — the
- * one thing it filters on — so anything present that is not a boolean
- * counts as set and only an absent value is empty. Ordering and `isSet` then
- * agree about which rows are set.
+ * A presence field orders in two ranks: unset, then set. Its domain is
+ * presence — the one thing it filters on — so anything but an absent or
+ * null value is set, `false` included, and ordering and `isSet` agree about
+ * which rows are set. `false` and `true` share the set rank, so the next
+ * term or the tiebreak orders them. No value is empty to this kind; a row
+ * the field does not apply to is placed by the ordering, not by the kind.
  */
 const PRESENCE_ORDER: KindOrder = {
-  readKey: (value) =>
-    value === null || value === undefined
-      ? null
-      : createKey(value === false ? 0 : 1),
+  readKey: (value) => createKey(value === null || value === undefined ? 0 : 1),
   compareText: compareByCodeUnit,
 };
 
@@ -231,7 +221,9 @@ const PRESENCE: FieldKindRules<PresenceField> = {
   rejectOperands: () => null,
   readApplied: () => true,
   areAppliedEqual: isSameValue,
-  compareToBound: compareBooleans,
+  // Presence has no range: it orders in two ranks, and a set `false` and a
+  // set `true` tie, so no bound compares with either.
+  compareToBound: () => null,
   createOrder: () => PRESENCE_ORDER,
 };
 

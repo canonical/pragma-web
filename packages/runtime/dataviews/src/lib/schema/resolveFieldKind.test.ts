@@ -115,7 +115,9 @@ describe("resolveFieldKind", () => {
     expect(resolveFieldKind("number").compareToBound(Number.NaN, 4)).toBeNull();
     expect(resolveFieldKind("text").compareToBound("b", "a")).toBe(1);
     expect(resolveFieldKind("text").compareToBound(1, "a")).toBeNull();
-    expect(resolveFieldKind("presence").compareToBound(false, true)).toBe(-1);
+    // Presence has no range, so no pair of its values compares.
+    expect(resolveFieldKind("presence").compareToBound(false, true)).toBeNull();
+    expect(resolveFieldKind("presence").compareToBound(true, true)).toBeNull();
     expect(resolveFieldKind("presence").compareToBound("yes", true)).toBeNull();
   });
 

@@ -50,7 +50,9 @@ export type NumberField = {
 
 /**
  * A presence field: whether a record sets it, filtered by the zero-value
- * `isSet` operator.
+ * `isSet` operator. Any value but an absent or null one is set, `false`
+ * included. It orders in two ranks, unset before set; `false` and `true`
+ * are both set and tie.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -205,10 +207,10 @@ export type InputParse =
   | { readonly status: "invalid"; readonly reason: string };
 
 /**
- * The comparison key of one present value: a rank the kind places it at,
- * then the text that orders values sharing a rank. Numbers, instants,
- * presence values and declared options need only the rank; text needs only
- * the text; an option the schema does not list needs both.
+ * The comparison key of one value the kind orders: a rank the kind places
+ * it at, then the text that orders values sharing a rank. Numbers,
+ * instants, presence and declared options need only the rank; text needs
+ * only the text; an option the schema does not list needs both.
  */
 export type OrderKey = {
   readonly rank: number;
