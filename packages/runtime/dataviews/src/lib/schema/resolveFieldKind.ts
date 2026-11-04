@@ -7,10 +7,10 @@ import type {
   DateField,
   FieldKind,
   FieldKindRules,
-  FlagField,
   KindOrder,
   NumberField,
   OrderKey,
+  PresenceField,
   SchemaFieldDefinition,
   TextField,
 } from "./types.js";
@@ -49,7 +49,7 @@ const compareScalars = (
   return null;
 };
 
-/** Booleans order false before true; anything else is not a flag value. */
+/** Booleans order false before true; anything else is not a presence value. */
 const compareBooleans = (
   value: unknown,
   bound: PredicateOperand,
@@ -205,12 +205,12 @@ const NUMBER: FieldKindRules<NumberField> = {
 };
 
 /**
- * A flag orders false before true. Its domain is presence — the one thing
- * it filters on — so anything present that is not a boolean counts as set
- * and only an absent value is empty. Ordering and `isSet` then agree about
- * which rows are set.
+ * A presence field orders false before true. Its domain is presence — the
+ * one thing it filters on — so anything present that is not a boolean
+ * counts as set and only an absent value is empty. Ordering and `isSet` then
+ * agree about which rows are set.
  */
-const FLAG_ORDER: KindOrder = {
+const PRESENCE_ORDER: KindOrder = {
   readKey: (value) =>
     value === null || value === undefined
       ? null
@@ -218,18 +218,21 @@ const FLAG_ORDER: KindOrder = {
   compareText: compareByCodeUnit,
 };
 
-const FLAG: FieldKindRules<FlagField> = {
+const PRESENCE: FieldKindRules<PresenceField> = {
   operators: ["isSet"],
-  // A flag is its name and nothing more.
+  // A presence field is its name and nothing more.
   rejectDefinition: () => null,
-  input: { kind: "none", reason: "flag fields edit through direct commands" },
+  input: {
+    kind: "none",
+    reason: "presence fields edit through direct commands",
+  },
   // Neither carries an operand to check; operand arity is the operator's
   // concern, and the grammar checks it.
   rejectOperands: () => null,
   readApplied: () => true,
   areAppliedEqual: isSameValue,
   compareToBound: compareBooleans,
-  createOrder: () => FLAG_ORDER,
+  createOrder: () => PRESENCE_ORDER,
 };
 
 const DATE_ORDER: KindOrder = {
@@ -309,7 +312,7 @@ const FIELD_KINDS: {
 } = {
   choices: CHOICES,
   number: NUMBER,
-  flag: FLAG,
+  presence: PRESENCE,
   date: DATE,
   text: TEXT,
 };

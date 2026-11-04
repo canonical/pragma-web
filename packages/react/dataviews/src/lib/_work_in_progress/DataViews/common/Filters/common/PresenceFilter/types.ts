@@ -36,5 +36,5 @@ type OwnProps = {
  * Props of one presence filter: its own, and the native props of the `div`
  * it renders as its root.
  */
-export type FlagFilterProps = OwnProps &
+export type PresenceFilterProps = OwnProps &
   Omit<ComponentProps<"div">, keyof OwnProps | "children">;

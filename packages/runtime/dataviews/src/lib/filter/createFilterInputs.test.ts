@@ -19,7 +19,7 @@ const machines = createCollection({
   fields: [
     { field: "status", kind: "choices", options: ["failed", "cancelled"] },
     { field: "cpu", kind: "number", min: 0, max: 64 },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
     { field: "updated", kind: "date" },
     { field: "name", kind: "text" },
   ],

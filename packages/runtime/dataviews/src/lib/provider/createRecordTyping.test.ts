@@ -44,7 +44,7 @@ const instances = () =>
         appliesTo: ["virtual-machine"],
       },
       { field: "processes", kind: "number", min: 0, appliesTo: ["container"] },
-      { field: "name", kind: "flag" },
+      { field: "name", kind: "presence" },
     ],
   });
 

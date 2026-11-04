@@ -48,7 +48,6 @@ import type {
   FilterHandle,
   FilterHandles,
   FilterInputState,
-  FlagField,
   GroupCapabilities,
   GroupPath,
   GroupSummary,
@@ -66,6 +65,7 @@ import type {
   PredicateOperand,
   PredicateOperator,
   PreferenceResult,
+  PresenceField,
   Presentation,
   PresentationPatch,
   PresentationState,
@@ -190,7 +190,7 @@ type EveryPublicType = [
   ActionRequest,
   ActionRun,
   ActionTargets,
-  AppliedOf<FlagField>,
+  AppliedOf<PresenceField>,
   ArraySource,
   ArraySourceConfig,
   CapabilityDeclaration<readonly SchemaFieldDefinition[]>,
@@ -222,7 +222,7 @@ type EveryPublicType = [
   FilterHandle<unknown>,
   FilterHandles<readonly SchemaFieldDefinition[]>,
   FilterInputState,
-  FlagField,
+  PresenceField,
   GroupCapabilities,
   GroupPath,
   GroupSummary,
@@ -586,7 +586,7 @@ describe("public surface types", () => {
     const machines = dataviews.createSchema([
       { field: "status", kind: "choices", options: ["failed", "cancelled"] },
       { field: "cpu", kind: "number" },
-      { field: "owner", kind: "flag" },
+      { field: "owner", kind: "presence" },
     ]);
     type Machines = FilterHandles<typeof machines.fields>;
     expectTypeOf<Machines["status"]["isAny"]["applied"]>().toEqualTypeOf<

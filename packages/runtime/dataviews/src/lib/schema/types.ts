@@ -49,14 +49,15 @@ export type NumberField = {
 };
 
 /**
- * A presence field: the zero-value isSet operator.
+ * A presence field: whether a record sets it, filtered by the zero-value
+ * `isSet` operator.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
-export type FlagField = {
+export type PresenceField = {
   readonly field: string;
-  readonly kind: "flag";
+  readonly kind: "presence";
 };
 
 /**
@@ -120,7 +121,7 @@ type TypeScoped = {
  * name may change or move before the first release.
  */
 export type SchemaFieldDefinition = TypeScoped &
-  (ChoicesField | NumberField | FlagField | DateField | TextField);
+  (ChoicesField | NumberField | PresenceField | DateField | TextField);
 
 /**
  * Result of validating one text input against a field's kind: the operands
@@ -139,8 +140,8 @@ export type FieldValidation =
 
 /**
  * The applied semantic value a field's predicate carries: a `choices` set,
- * a number or date bound, a flag's presence, or the text a text field
- * contains or starts with.
+ * a number or date bound, whether a presence field is set, or the text a
+ * text field contains or starts with.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -156,7 +157,7 @@ export type AppliedOf<TField extends SchemaFieldDefinition> = TField extends {
     ? ReadonlySet<string>
     : TField extends { readonly kind: "number" }
       ? number
-      : TField extends { readonly kind: "flag" }
+      : TField extends { readonly kind: "presence" }
         ? boolean
         : TField extends { readonly kind: "date" | "text" }
           ? string
@@ -193,7 +194,7 @@ export type FieldKind = SchemaFieldDefinition["kind"];
 export type FieldKindOperators = {
   readonly choices: "isAny" | "isNone";
   readonly number: "gte" | "lte";
-  readonly flag: "isSet";
+  readonly presence: "isSet";
   readonly date: "gte" | "lte";
   readonly text: "contains" | "startsWith";
 };
@@ -205,9 +206,9 @@ export type InputParse =
 
 /**
  * The comparison key of one present value: a rank the kind places it at,
- * then the text that orders values sharing a rank. Numbers, instants, flags
- * and declared options need only the rank; text needs only the text; an
- * option the schema does not list needs both.
+ * then the text that orders values sharing a rank. Numbers, instants,
+ * presence values and declared options need only the rank; text needs only
+ * the text; an option the schema does not list needs both.
  */
 export type OrderKey = {
   readonly rank: number;
@@ -316,7 +317,7 @@ export type Schema<TFields extends readonly SchemaFieldDefinition[]> = {
   readonly listOperators: (name: string) => readonly PredicateOperator[];
   /**
    * Validate one text input for the field's single-value editing path.
-   * Flag fields do not edit through a text input.
+   * Presence fields do not edit through a text input.
    */
   readonly validateInput: (name: string, input: string) => FieldValidation;
   /**

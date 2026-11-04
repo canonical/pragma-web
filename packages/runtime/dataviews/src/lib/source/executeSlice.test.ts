@@ -16,7 +16,7 @@ const schema = createSchema([
   { field: "id", kind: "text" },
   { field: "name", kind: "text" },
   { field: "cpu", kind: "number" },
-  { field: "ready", kind: "flag" },
+  { field: "ready", kind: "presence" },
   { field: "owner", kind: "text" },
   { field: "seen", kind: "date" },
 ]);
@@ -214,7 +214,7 @@ describe("executeSlice", () => {
     ).toEqual([]);
   });
 
-  it("bounds flags, false below true", () => {
+  it("bounds a presence field's booleans, false below true", () => {
     expect(
       ids(
         executeSlice(

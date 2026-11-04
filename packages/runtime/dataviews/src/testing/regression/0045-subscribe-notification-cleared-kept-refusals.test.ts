@@ -25,7 +25,7 @@ const collection = createCollection({
   identify: byId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "running"] },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
   ],
 });
 
