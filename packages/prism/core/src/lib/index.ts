@@ -29,6 +29,37 @@ export {
   prepareRelayData,
   setPrefetchEnvironment,
 } from "./relay/index.js";
+export type {
+  FilterPlacement,
+  LensRenderers,
+  ListRendererProps,
+  PageRendererProps,
+  Renderer,
+  RendererDeclaration,
+  RendererDefaults,
+  RendererFacts,
+  RendererKind,
+  RenderersProviderProps,
+  RenderersValue,
+  ResolvedRenderers,
+  ViewSearch,
+  ViewSearchSchema,
+} from "./renderers/index.js";
+export {
+  buildRendererSearch,
+  DEFAULT_FILTER_PLACEMENT,
+  FILTER_PLACEMENTS,
+  FILTER_SHEET,
+  PAGE_RENDERER_NAMES,
+  RENDERER_KINDS,
+  RENDERER_LABEL_KEYS,
+  RenderersProvider,
+  readRenderer,
+  resolveRenderers,
+  useRenderers,
+  VIEW_PARAMS,
+  viewSearch,
+} from "./renderers/index.js";
 export type { FacetBearer, RouteFacet, RouteMeta } from "./routeFacet/index.js";
 export { collectFacet, defineFacet } from "./routeFacet/index.js";
 export type { CollectedLens, LensEntry, LensTier } from "./routeLens/index.js";

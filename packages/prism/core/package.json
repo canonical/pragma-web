@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@canonical/i18n-core": "^0.44.1",
+    "@canonical/prism-contract": "^0.44.1",
     "@canonical/react-ds-app": "^0.44.1",
     "@canonical/react-ds-global": "^0.44.1",
     "@canonical/react-hooks": "^0.44.1",

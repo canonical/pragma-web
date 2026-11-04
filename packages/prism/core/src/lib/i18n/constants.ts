@@ -16,6 +16,8 @@ export const MESSAGES = {
   "graphCanvas.zoomOut": "Zoom out",
   "graphCanvas.zoomOut.glyph": "−",
   "graphCanvas.zoomLevel": "{percent}%",
+  "renderer.page": "Page",
+  "renderer.turtle": "Turtle",
   "workspaceLayout.inspectorTrigger": "Details",
   "workspaceLayout.inspectorTitle": "Details",
   "chip.summaryWithLifecycle": "{summary} ({lifecycle})",

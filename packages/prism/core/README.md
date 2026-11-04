@@ -412,6 +412,16 @@ site's own catalog, and the factory holds no reader-facing string.
   `FacetBearer`, `LensEntry`, `LensTier`, `CollectedLens`,
   `ShortcutAllocation`.
 - Router: `createStaticRouter`.
+- Renderers: `RenderersProvider`, `useRenderers`, `resolveRenderers`,
+  `readRenderer`, `buildRendererSearch`, `viewSearch` (the search schema
+  every route with a strip declares), `VIEW_PARAMS` (the address's view grammar: the renderer, the search
+  text, the open sheet and the graph's kind, selection and expansion), `FILTER_SHEET`, `FILTER_PLACEMENTS`,
+  `DEFAULT_FILTER_PLACEMENT`, `RENDERER_KINDS`, `PAGE_RENDERER_NAMES`,
+  `RENDERER_LABEL_KEYS`; types `Renderer`, `RendererDeclaration`,
+  `RendererDefaults`, `RendererFacts`, `RendererKind`, `LensRenderers`,
+  `ListRendererProps`, `PageRendererProps`, `ResolvedRenderers`,
+  `RenderersProviderProps`, `RenderersValue`, `FilterPlacement`,
+  `ViewSearch`, `ViewSearchSchema`.
 - Links: `RouterLink`; types `RouterLinkProps`.
 - Homes: `HomesProvider`, `useHome`; types `Homes`, `HomeResolver`,
   `HomeNode`, `HomesProviderProps`.
