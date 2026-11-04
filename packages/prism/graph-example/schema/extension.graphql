@@ -9,17 +9,17 @@
 # contract's superset rule is for (contract.graphql:39-42). `buildSchema` over
 # the contract alone cannot serve instance data.
 #
-# TWO ROOT FIELDS ARE ADDED: `prose` and `search`, at the end of this file.
-# Every entity type below is reachable through the contract's own root
-# fields — `node(id:)` and `OntologyClass.instances` — and adding a root
-# field for them would have been easier and would have proved less: the
-# point is that the contract's five roots suffice for the graph. Prose and
-# search are not part of the contract; they are provider extensions, and
-# each is a root field because that is the one position a reader can select
-# the same way against every provider that offers it. A compiled provider
-# can add fields only to the object types it generates and to Query, never
-# to `Node`, so a field on each concrete type would need a type-specific
-# fragment to read.
+# THREE ROOT FIELDS ARE ADDED: `prose`, `search` and `source`, at the end of
+# this file. Every entity type below is reachable through the contract's own
+# root fields — `node(id:)` and `OntologyClass.instances` — and adding a root
+# field for them would have been easier and would have proved less: the point
+# is that the contract's five roots suffice for the graph. Prose, search and
+# source are not part of the contract; they are provider extensions, and each
+# is a root field because that is the one position a reader can select the
+# same way against every provider that offers it. A compiled provider can add
+# fields only to the object types it generates and to Query, never to `Node`,
+# so a field on each concrete type would need a type-specific fragment to
+# read.
 # =============================================================================
 
 """
@@ -167,6 +167,8 @@ extend type Query {
   prose(uri: ID!): Prose
   "Nodes whose title, CURIE or definition contains `text`, ignoring case. A title match ranks before a CURIE match, and a CURIE match before a definition match; within one, an earlier match ranks first, then a shorter title, then the title and then the IRI in code-point order. Text that is empty or only whitespace matches nothing. Titles and definitions are read in the default language, en."
   search(text: String!, first: Int, after: String): NodeConnection!
+  "The statements whose subject is `uri` (an absolute IRI), as Turtle with the provider's prefixes, or null when the graph holds none."
+  source(uri: ID!): String
 }
 
 """

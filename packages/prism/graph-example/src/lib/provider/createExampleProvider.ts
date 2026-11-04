@@ -69,6 +69,7 @@ import type {
   ProseTexts,
   SearchEntry,
 } from "./types.js";
+import writeEntityTurtle from "./writeEntityTurtle.js";
 
 /**
  * A view object: scalars, nested views, and zero-argument thunks. The schema
@@ -959,8 +960,8 @@ export const createExampleProvider = (
   };
 
   // -------------------------------------------------------------------
-  // The contract's five root fields, plus `prose` and `search`: the two root
-  // fields this provider adds (see schema/extension.graphql for why each is
+  // The contract's five root fields, plus `prose`, `search` and `source`:
+  // the three root fields this provider adds (see schema/extension.graphql for why each is
   // a root field). Every type the provider declares is reachable from here.
   // -------------------------------------------------------------------
 
@@ -985,6 +986,11 @@ export const createExampleProvider = (
     },
     search: (args: SearchArgs) =>
       buildSearchView(rankSearchEntries(searchEntries, args.text), args),
+    source: (args: { uri: string }) => {
+      const record =
+        recordByUri.get(args.uri)?.entity ?? classByUri.get(args.uri);
+      return record === undefined ? null : writeEntityTurtle(record, dataset);
+    },
   };
 
   return { schema, rootValue, sdl };
