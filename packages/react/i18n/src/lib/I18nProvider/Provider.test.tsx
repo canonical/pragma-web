@@ -6,8 +6,7 @@ import {
 } from "@canonical/i18n-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import useLocale from "../hooks/useLocale.js";
-import useTranslation from "../hooks/useTranslation.js";
+import { useLocale, useTranslation } from "../hooks/index.js";
 import I18nProvider from "./Provider.js";
 
 const config: I18nConfig = {
@@ -74,20 +73,20 @@ describe("I18nProvider", () => {
   });
 
   it("keeps a runtime locale switch across provider re-renders", () => {
-    const ui = (locale: Locale): React.ReactElement => (
+    const buildApp = (locale: Locale): React.ReactElement => (
       <I18nProvider config={config} catalogs={catalogs} locale={locale}>
         <Greeting />
         <ShowLocale />
         <SwitchTo locale="fr" />
       </I18nProvider>
     );
-    const { rerender } = render(ui("en"));
+    const { rerender } = render(buildApp("en"));
     fireEvent.click(screen.getByText("switch-fr"));
     expect(screen.getByText("Bonjour, Ada !")).toBeTruthy();
 
     // A parent re-render — even one passing a different `locale` prop — must
     // not clobber the runtime choice: the prop is the SSR-negotiated initial.
-    rerender(ui("ar"));
+    rerender(buildApp("ar"));
     expect(screen.getByText("fr")).toBeTruthy();
     expect(screen.getByText("Bonjour, Ada !")).toBeTruthy();
   });
