@@ -1,3 +1,4 @@
+import type { RecordTypes } from "../collection/index.js";
 import { collapseSortTerms } from "../query/index.js";
 import { readField } from "../rows/index.js";
 import {
@@ -70,6 +71,12 @@ type CompiledTerm = {
   /** Whether this field's empty values order before its values. */
   readonly emptiesFirst: boolean;
   readonly order: KindOrder;
+  /**
+   * Whether the field applies to a row, or null when it applies to every
+   * row. A row it does not apply to has no key, so it orders with the
+   * empties.
+   */
+  readonly applies: ((row: object) => boolean) | null;
 };
 
 /**
@@ -108,6 +115,33 @@ type OrderRowsConfig = {
   readonly collation: string | null;
   /** Where each placed field's empty values order; last for every other. */
   readonly empties: Readonly<Record<string, EmptyPlacement>>;
+  /** The collection's record types, or null when it has one. */
+  readonly types: RecordTypes | null;
+};
+
+/**
+ * Whether a field applies to a row, for a presence field scoped to some of
+ * the collection's types; null when it applies to every row.
+ *
+ * Only a presence field asks. Every other kind reads a value a source wrote
+ * no value for as empty already, so a row it does not apply to orders with
+ * the empties by its value alone. A presence field reads that same absence
+ * as unset, a rank of its own, so it must tell the two apart by the row's
+ * type.
+ */
+const compileApplicability = (
+  definition: SchemaFieldDefinition,
+  types: RecordTypes | null,
+): ((row: object) => boolean) | null => {
+  if (
+    definition.kind !== "presence" ||
+    definition.appliesTo === undefined ||
+    types === null
+  ) {
+    return null;
+  }
+  const scope = new Set<unknown>(definition.appliesTo);
+  return (row) => scope.has(readField(row, types.field));
 };
 
 /**
@@ -118,7 +152,7 @@ type OrderRowsConfig = {
  * only tie.
  */
 const compileTerms = (config: OrderRowsConfig): readonly CompiledTerm[] => {
-  const { ordering, schema, collation, empties } = config;
+  const { ordering, schema, collation, empties, types } = config;
   return collapseSortTerms([
     ...ordering.terms,
     ...(typeof ordering.tiebreak === "string" ? [] : ordering.tiebreak),
@@ -141,6 +175,7 @@ const compileTerms = (config: OrderRowsConfig): readonly CompiledTerm[] => {
               definition,
               getCachedTextComparison(collation),
             ),
+            applies: compileApplicability(definition, types),
           },
         ];
   });
@@ -152,11 +187,13 @@ const compileTerms = (config: OrderRowsConfig): readonly CompiledTerm[] => {
  * Each term reads its field through its kind: text through the source's
  * collation, or by digit runs where the runtime has no data for it,
  * `choices` by declared option index with unknown values after the known
- * ones, dates as instants however the row spells them, presence fields
- * false before true, numbers numerically. A value the kind has none of — absent, null, an
- * empty string, or outside its domain — orders after every value that has
- * one in both directions, or before every one in both directions where the
- * source places that field's empties first.
+ * ones, dates as instants however the row spells them, presence unset
+ * before set, numbers numerically. A value the kind has none of — absent,
+ * null, an empty string, or outside its domain — orders after every value
+ * that has one in both directions, or before every one in both directions
+ * where the source places that field's empties first. A presence field has
+ * no empty value, since absent is unset; only a row the field does not
+ * apply to orders with the empties.
  *
  * A term naming no field of the schema orders nothing: a field with no kind
  * cannot be compared meaningfully, and pretending otherwise is how a column
@@ -177,7 +214,11 @@ export default function orderRows<TRow extends object>(
   }
   const keyed = rows.map((row) => ({
     row,
-    keys: terms.map((term) => term.order.readKey(readField(row, term.field))),
+    keys: terms.map((term) =>
+      term.applies === null || term.applies(row)
+        ? term.order.readKey(readField(row, term.field))
+        : null,
+    ),
   }));
   keyed.sort((a, b) => {
     // An index loop: a sort calls this for every comparison, and an entries
