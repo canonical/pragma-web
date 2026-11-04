@@ -1,7 +1,7 @@
 import { directionOf } from "@canonical/i18n-core";
 import { useSyncExternalStore } from "react";
+import { useI18nContext } from "../I18nProvider/index.js";
 import type { UseLocaleResult } from "./types.js";
-import useI18nContext from "./useI18nContext.js";
 
 /**
  * Read and change the active locale. Re-renders the calling component on every
