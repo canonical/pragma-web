@@ -1,8 +1,7 @@
 import type { I18nConfig, Locale, Messages } from "@canonical/i18n-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import useLocale from "../hooks/useLocale.js";
-import useTranslation from "../hooks/useTranslation.js";
+import { useLocale, useTranslation } from "../hooks/index.js";
 import I18nProvider from "./Provider.js";
 
 const config: I18nConfig = {
