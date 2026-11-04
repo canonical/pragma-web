@@ -15,6 +15,7 @@ import type {
   Locale,
   LocaleSource,
   LocaleSourceOptions,
+  LocaleSources,
   Messages,
   MessageValue,
   PluralCategory,
@@ -159,6 +160,23 @@ describe("I18nConfig", () => {
       defaultLocale: Locale;
       rtlLocales?: readonly string[];
       cookieName?: string;
+    }>();
+  });
+});
+
+describe("LocaleSources", () => {
+  it("makes both request headers optional and nullable", () => {
+    expectTypeOf<Record<string, never>>().toExtend<LocaleSources>();
+    expectTypeOf<{
+      cookieHeader: null;
+      acceptLanguage: null;
+    }>().toExtend<LocaleSources>();
+  });
+
+  it("has exactly the two request headers", () => {
+    expectTypeOf<LocaleSources>().toEqualTypeOf<{
+      cookieHeader?: string | null;
+      acceptLanguage?: string | null;
     }>();
   });
 });
