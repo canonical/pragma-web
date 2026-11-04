@@ -33,8 +33,9 @@
     --button-padding-inline-start: var(--dimension-200);
     --button-gap: var(--dimension-100);
     --button-border-width: var(--dimension-stroke-thickness-medium);
-    /* Label weight — the button label is medium, not the `.p` body weight. */
-    --button-font-weight: var(--typography-weight-medium);
+    /* Label weight — the text-primary ramp's own weight (400), not the
+     * stand-alone `--typography-weight-medium` (500) that made it read heavy. */
+    --button-font-weight: var(--typography-text-primary-font-weight);
     /* Label size — the button label is the text-secondary tier (14px), not the
        `.p` text-primary tier (16px). The line-height snaps up to the baseline
        grid exactly as the typography mapper does, so the box stays 32px tall
