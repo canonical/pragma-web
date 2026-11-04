@@ -93,7 +93,26 @@ import { createLocaleSource } from "@canonical/i18n-core";
 const source = createLocaleSource(config, { initial: locale });
 const unsubscribe = source.subscribe((next) => render(next));
 source.set("ar"); // notifies subscribers; persists + reflects dir="rtl"
+source.set("fr-CA"); // stores "fr": matched by language
+source.set("de"); // throws a RangeError: no configured locale matches
 ```
+
+`set` matches a tag as `negotiateLocale` matches an `Accept-Language` tag: the
+exact configured tag first, then its base language, ignoring case. A cookie is
+matched only exactly, ignoring case, so a `locale=fr-CA` cookie selects nothing
+when only `fr` is configured. A locale `set` stores is always a
+configured tag, so `<html lang>` names the language the words are in. A tag that
+matches nothing throws a `RangeError`; negotiate requests and cookies first. A
+tag that matches the current locale, such as `FR` or `fr-CA` while on `fr`,
+changes nothing. `initial` is stored as given, so pass it a negotiated locale
+too.
+
+A tag from elsewhere, such as a URL segment, either goes through negotiation,
+as in `source.set(negotiateLocale(config, { acceptLanguage: segment }))`, which
+falls back to the default locale when the tag matches nothing, or is set inside
+a `try`/`catch` for the `RangeError` that `set` throws instead.
+`isSupportedLocale` checks the exact tag only, so it refuses `FR` and `fr-CA`,
+which `set` accepts.
 
 On the server, create one source **per request** — the React binding's
 `I18nProvider` already does this. A module-level singleton shared across

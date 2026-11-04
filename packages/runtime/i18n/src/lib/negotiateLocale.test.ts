@@ -25,6 +25,15 @@ describe("negotiateLocale", () => {
     ).toBe("ar");
   });
 
+  it("matches a cookie only exactly, not by its base language", () => {
+    expect(
+      negotiateLocale(config, {
+        cookieHeader: "locale=fr-CA",
+        acceptLanguage: "ar",
+      }),
+    ).toBe("ar");
+  });
+
   it("matches the base language when only a regional tag is requested", () => {
     expect(negotiateLocale(config, { acceptLanguage: "fr-CA,fr;q=0.9" })).toBe(
       "fr",
