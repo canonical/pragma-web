@@ -84,6 +84,14 @@ export interface I18nConfig {
   cookieName?: string;
 }
 
+/** Raw request inputs `negotiateLocale` reads from, in priority order. */
+export interface LocaleSources {
+  /** Raw `Cookie` header — an explicit prior choice wins over everything. */
+  cookieHeader?: string | null;
+  /** Raw `Accept-Language` header, consulted when no cookie matches. */
+  acceptLanguage?: string | null;
+}
+
 /** Options for `createLocaleSource`. */
 export interface LocaleSourceOptions {
   /** Starting locale. Defaults to {@link I18nConfig.defaultLocale}. */
