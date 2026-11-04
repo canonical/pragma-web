@@ -1,6 +1,7 @@
 import {
   buildColumnTemplate,
   type ColumnLayout,
+  type ColumnSizing,
   type ColumnToSize,
   type GridInteraction,
   type ResolvedColumn,
@@ -12,24 +13,31 @@ import { areTracksEqual } from "../common/utils/index.js";
 import type { UseTableGeometryResult } from "./types.js";
 
 /**
- * Give the last column whatever width the others leave, even past its own
- * maximum: its trailing edge is the table's own edge, so it is never resized
- * on its own and grows and shrinks as the columns before it are. Nothing
- * changes once the columns no longer fit, or before the container is
- * measured.
+ * Give a flexible last column whatever width the others leave, up to its
+ * own maximum: its trailing edge is the table's own edge, so it is never
+ * resized on its own and grows and shrinks as the columns before it are.
+ * Space past a capped or fixed last column is the table's, not a column's,
+ * and stays empty rather than stretching the column past its declaration.
+ * Nothing changes once the columns no longer fit, or before the container
+ * is measured.
  */
 const fillLast = (
   columns: readonly ResolvedColumn[],
   available: number | null,
+  sizing: ColumnSizing | undefined,
 ): readonly ResolvedColumn[] => {
   const last = columns.at(-1);
-  if (available === null || last === undefined) {
+  if (available === null || last === undefined || sizing?.kind !== "flex") {
     return columns;
   }
   const spare =
     available - columns.reduce((total, column) => total + column.width, 0);
-  return spare > 0
-    ? [...columns.slice(0, -1), { id: last.id, width: last.width + spare }]
+  const width = Math.min(
+    last.width + spare,
+    sizing.maxPx ?? Number.POSITIVE_INFINITY,
+  );
+  return width > last.width
+    ? [...columns.slice(0, -1), { id: last.id, width }]
     : columns;
 };
 
@@ -154,7 +162,11 @@ export default function useTableGeometry(
     () => resolveColumns(tracks, width ?? 0),
     [tracks, width],
   );
-  const filled = useMemo(() => fillLast(resolved, width), [resolved, width]);
+  const lastSizing = tracks.at(-1)?.sizing;
+  const filled = useMemo(
+    () => fillLast(resolved, width, lastSizing),
+    [resolved, width, lastSizing],
+  );
   const widths = useMemo(() => filled.map((column) => column.width), [filled]);
 
   const preview =
@@ -182,6 +194,7 @@ export default function useTableGeometry(
                 : column,
             ),
             width,
+            lastSizing,
           );
   return {
     attach,

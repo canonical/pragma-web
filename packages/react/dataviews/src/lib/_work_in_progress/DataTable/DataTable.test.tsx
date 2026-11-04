@@ -2393,7 +2393,7 @@ describe("DataTable", () => {
     expect(screen.queryByRole("separator")).toBeNull();
   });
 
-  it("gives the last column whatever width the others leave, live", () => {
+  it("gives a flexible last column whatever width the others leave, live", () => {
     const notified: ResizeObserverCallback[] = [];
     class StubObserver {
       constructor(callback: ResizeObserverCallback) {
@@ -2424,7 +2424,7 @@ describe("DataTable", () => {
             {
               id: "status",
               header: "Status",
-              sizing: { kind: "fixed", px: 100 },
+              sizing: { kind: "flex", weight: 1, minPx: 100 },
             },
           ]}
           label="Machines"
@@ -2450,20 +2450,77 @@ describe("DataTable", () => {
         isPrimary: true,
         clientX: 0,
       });
-      fireEvent.pointerMove(window, { clientX: 50 });
+      fireEvent.pointerMove(window, { clientX: -50 });
       act(() => {
         for (const frame of frames.splice(0)) {
           frame(0);
         }
       });
       // The last column follows the edge being dragged, before any commit.
-      expect(readTracks()).toBe("150px 250px");
-      fireEvent.pointerUp(window, { clientX: 50 });
-      expect(readTracks()).toBe("150px 250px");
+      expect(readTracks()).toBe("50px 350px");
+      fireEvent.pointerUp(window, { clientX: -50 });
+      expect(readTracks()).toBe("50px 350px");
       // Once the columns no longer fit, nothing is stretched: the table
       // scrolls instead.
-      measure(200);
-      expect(readTracks()).toBe("150px 100px");
+      measure(100);
+      expect(readTracks()).toBe("50px 100px");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("leaves the space past a fixed or capped last column empty", () => {
+    const notified: ResizeObserverCallback[] = [];
+    class StubObserver {
+      constructor(callback: ResizeObserverCallback) {
+        notified.push(callback);
+      }
+      observe(): void {}
+      unobserve(): void {}
+      disconnect(): void {}
+    }
+    vi.stubGlobal("ResizeObserver", StubObserver);
+    try {
+      const mountWithLast = (
+        sizing: NonNullable<DataTableColumn["sizing"]>,
+      ): string => {
+        notified.length = 0;
+        const { provider } = createMachineProvider();
+        const view = render(
+          <DataTable
+            provider={provider}
+            columns={[
+              {
+                id: "name",
+                header: "Name",
+                sizing: { kind: "fixed", px: 100 },
+              },
+              { id: "status", header: "Status", sizing },
+            ]}
+            label="Machines"
+          />,
+        );
+        act(() => {
+          for (const observer of notified) {
+            observer(
+              [
+                { contentRect: { width: 400 } },
+              ] as unknown as ResizeObserverEntry[],
+              {} as ResizeObserver,
+            );
+          }
+        });
+        const tracks = screen
+          .getByRole("table", { name: "Machines" })
+          .style.getPropertyValue("--data-table-columns");
+        view.unmount();
+        return tracks;
+      };
+      // The leftover is the table's, not a column's.
+      expect(mountWithLast({ kind: "fixed", px: 100 })).toBe("100px 100px");
+      expect(
+        mountWithLast({ kind: "flex", weight: 1, minPx: 50, maxPx: 150 }),
+      ).toBe("100px 150px");
     } finally {
       vi.unstubAllGlobals();
     }
