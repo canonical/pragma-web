@@ -23,11 +23,11 @@ const InspectorLists = (): ReactElement => {
     <>
       <section className="section" aria-labelledby={linesId}>
         <h2 id={linesId}>{t("network.inspector.lines")}</h2>
-        <NodeList nodes={lines} view="rows" />
+        <NodeList nodes={lines} />
       </section>
       <section className="section" aria-labelledby={stationsId}>
         <h2 id={stationsId}>{t("network.inspector.stations")}</h2>
-        <NodeList nodes={stations} view="rows" />
+        <NodeList nodes={stations} />
       </section>
     </>
   );

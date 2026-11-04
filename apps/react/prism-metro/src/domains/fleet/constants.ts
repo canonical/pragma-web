@@ -1,4 +1,4 @@
-import type { EntityListView } from "@canonical/prism-projections";
+import type { LensRenderers } from "@canonical/prism-core";
 import { LOCALE, MESSAGES } from "#i18n";
 import type { FleetNodeKind } from "./types.js";
 
@@ -61,21 +61,15 @@ export const LENGTH_FORMAT = new Intl.NumberFormat(LOCALE, {
 /** Whole counts, in the app's locale. */
 export const COUNT_FORMAT = new Intl.NumberFormat(LOCALE);
 
-/** The two ways the index shows the fleet. */
-export const FLEET_VIEWS: readonly EntityListView[] = ["cards", "rows"];
-
 /**
- * The search parameter the index keeps its view in, so a view survives a
- * reload and travels with a shared link: `/fleet?view=rows`.
+ * The renderers the fleet's pages offer over the site's defaults: the index
+ * as a table, the default, or as cards, whose sidecars draw each stock's
+ * formations; a node's page as the page.
  */
-export const FLEET_VIEW_PARAM = "view";
-
-/**
- * The view the index shows when the address names none, or names one it
- * does not know: cards, whose sidecars draw each stock's formations. The
- * address carries the parameter only for the other view.
- */
-export const DEFAULT_FLEET_VIEW: EntityListView = "cards";
+export const FLEET_RENDERERS: LensRenderers = {
+  list: ["table", "cards"],
+  page: ["page"],
+};
 
 // The side view's drawing constants, in the drawing's own space: whole
 // millimetres along and across the train, the unit the graph measures cars

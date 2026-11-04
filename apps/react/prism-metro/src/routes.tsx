@@ -1,4 +1,4 @@
-import { DocumentLayout } from "@canonical/prism-core";
+import { DocumentLayout, ModeStrip } from "@canonical/prism-core";
 import { definitionsRoutes } from "@canonical/prism-lens-definitions";
 import { group, route } from "@canonical/router-core";
 import { fleetLayout, fleetRoutes } from "#domains/fleet";
@@ -16,13 +16,14 @@ import { NotFoundPage } from "#lib/ui";
 
 /**
  * The page every URL no route matches renders, at its own `/not-found`: the
- * document archetype with the site's rail, so a reader who lands there keeps
- * the grid and a way back.
+ * document archetype with the site's rail and an empty strip (the band
+ * every page carries, so the canvas starts at the same line), so a reader
+ * who lands there keeps the grid and a way back.
  */
 export const notFoundRoute = route({
   url: "/not-found",
   content: () => (
-    <DocumentLayout rail={<MetroRail />}>
+    <DocumentLayout rail={<MetroRail />} strip={<ModeStrip />}>
       <NotFoundPage />
     </DocumentLayout>
   ),

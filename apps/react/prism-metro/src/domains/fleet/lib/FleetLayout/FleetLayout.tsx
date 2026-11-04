@@ -13,6 +13,7 @@ import { MetroRail } from "#domains/lenses";
 import { useMessages } from "#i18n";
 import { FLEET_ROUTES, KIND_BY_ROUTE } from "../../constants.js";
 import { FleetFacts } from "../FleetFacts/index.js";
+import { FleetView } from "./common/index.js";
 import type { FleetLayoutProps } from "./types.js";
 
 const componentCssClassName = "ds fleet-layout";
@@ -39,7 +40,8 @@ function selectFacts(
 
 /**
  * The fleet lens's layout, on the document archetype: the metro rail, the
- * fleet trail in the mode strip, the routed page in the canvas and, on a
+ * fleet trail and, on the index, its renderers (the table and the cards) in
+ * the mode strip, the routed page in the canvas and, on a
  * node's page, its facts in the aside, the canvas's last three columns.
  * The strip's rule bleeds one gutter west, so it meets the rail's border.
  *
@@ -62,7 +64,16 @@ const FleetLayout = ({
       }
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       rail={<MetroRail />}
-      strip={<ModeStrip context={<FleetTrail lensLabel={t("lens.fleet")} />} />}
+      strip={
+        <ModeStrip
+          trail={<FleetTrail lensLabel={t("lens.fleet")} />}
+          view={
+            match?.kind === "route" && match.name === FLEET_ROUTES.index ? (
+              <FleetView />
+            ) : null
+          }
+        />
+      }
     >
       {children}
     </DocumentLayout>

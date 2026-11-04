@@ -9,6 +9,7 @@ import type { ReactElement, ReactNode } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { IEnvironment } from "relay-runtime";
 import { homes } from "../src/homes.js";
+import { SiteRenderers } from "../src/lib/ui/SiteRenderers/index.js";
 import { appRoutes } from "../src/routes.js";
 
 /**
@@ -35,7 +36,7 @@ export default function createProjectionTree(
             LinkComponent={RouterLink}
             maps={defaultProjectionMaps}
           >
-            {children}
+            <SiteRenderers>{children}</SiteRenderers>
           </ProjectionsProvider>
         </HomesProvider>
       </RouterProvider>

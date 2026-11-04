@@ -1,5 +1,5 @@
 import { setPrefetchEnvironment } from "@canonical/prism-core";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   CENTRAL_EXCHANGE_TITLE,
@@ -55,8 +55,7 @@ const readVitals = (card: Element): (string | null)[] =>
 
 describe("the stations lens's cards", () => {
   it("card every station as a station and every interchange as one", async () => {
-    const { container } = renderLensPage("/stations", graph.url);
-    fireEvent.click(await screen.findByRole("button", { name: "Cards" }));
+    const { container } = renderLensPage("/stations?as=cards", graph.url);
     await waitFor(() => {
       expect(container.querySelectorAll(".ds.station-card")).toHaveLength(
         PLAIN_STATION_COUNT,

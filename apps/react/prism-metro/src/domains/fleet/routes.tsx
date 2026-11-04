@@ -1,4 +1,4 @@
-import { routeLensFacet } from "@canonical/prism-core";
+import { routeLensFacet, viewSearch } from "@canonical/prism-core";
 import { readUriParam } from "@canonical/prism-lens-entity";
 import { route } from "@canonical/router-core";
 import type { ReactElement } from "react";
@@ -42,12 +42,14 @@ type NodeRouteProps = {
 export const fleetRoutes = {
   fleet: route({
     url: "/fleet",
+    search: viewSearch,
     content: (): ReactElement => <FleetIndex />,
     warm: () => warmFleetIndex(),
     meta: routeLensFacet.of({ ...FLEET_LENS, icon: FleetIcon, tier: 2 }),
   }),
   fleetStock: route({
     url: "/fleet/:uri",
+    search: viewSearch,
     content: ({ params }: NodeRouteProps): ReactElement => (
       <StockPage address={readUriParam(params)} />
     ),
@@ -55,6 +57,7 @@ export const fleetRoutes = {
   }),
   fleetFormation: route({
     url: "/fleet/formations/:uri",
+    search: viewSearch,
     content: ({ params }: NodeRouteProps): ReactElement => (
       <FormationPage address={readUriParam(params)} />
     ),
@@ -62,6 +65,7 @@ export const fleetRoutes = {
   }),
   fleetUnit: route({
     url: "/fleet/units/:uri",
+    search: viewSearch,
     content: ({ params }: NodeRouteProps): ReactElement => (
       <UnitPage address={readUriParam(params)} />
     ),
@@ -69,6 +73,7 @@ export const fleetRoutes = {
   }),
   fleetCarType: route({
     url: "/fleet/car-types/:uri",
+    search: viewSearch,
     content: ({ params }: NodeRouteProps): ReactElement => (
       <CarTypePage address={readUriParam(params)} />
     ),

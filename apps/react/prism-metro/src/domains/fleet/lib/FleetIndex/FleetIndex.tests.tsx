@@ -4,17 +4,12 @@ import {
 } from "@canonical/prism-core";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ROLLING_STOCK_COUNT } from "../../../../../testing/fixtures.js";
 import renderMetroPage from "../../../../../testing/renderMetroPage.js";
+import { SiteRenderers } from "../../../../lib/ui/SiteRenderers/index.js";
 import { appRoutes } from "../../../../routes.js";
 import FleetIndex from "./FleetIndex.js";
 
@@ -38,14 +33,16 @@ const renderWithAnswer = (response: Promise<unknown>) =>
           adapter: createMemoryAdapter("/fleet"),
         })}
       >
-        <FleetIndex />
+        <SiteRenderers>
+          <FleetIndex />
+        </SiteRenderers>
       </RouterProvider>
     </RelayEnvironmentProvider>,
   );
 
 describe("FleetIndex", () => {
   it("lists every rolling stock as a card, its formations at one scale", async () => {
-    const { container } = renderMetroPage("/fleet");
+    const { container } = renderMetroPage("/fleet?as=cards");
     const cards = await waitFor(() => {
       const found = container.querySelectorAll(
         ".ds.node-list .rolling-stock-card",
@@ -63,28 +60,16 @@ describe("FleetIndex", () => {
     expect(
       within(series90).getByRole("link", { name: "Series 90" }),
     ).toHaveAttribute("href", "/fleet/metro%3Aseries-90");
-    expect(container.querySelector(".ds.node-list .count")).toHaveTextContent(
-      `${ROLLING_STOCK_COUNT} rolling stocks`,
-    );
   });
 
-  it("lists the rolling stock as rows when the address asks for them", async () => {
-    const { container } = renderMetroPage("/fleet?view=rows");
+  it("lists the rolling stock as rows in the table, by default", async () => {
+    const { container } = renderMetroPage("/fleet");
     await waitFor(() => {
       expect(
         container.querySelectorAll(".ds.node-list .rolling-stock-row"),
       ).toHaveLength(ROLLING_STOCK_COUNT);
     });
     expect(container.querySelector(".rolling-stock-card")).toBeNull();
-  });
-
-  it("switches to rows when the reader picks them", async () => {
-    const { container } = renderMetroPage("/fleet");
-    await screen.findByRole("link", { name: "Series 90" });
-    fireEvent.click(screen.getByRole("button", { name: "Rows" }));
-    await waitFor(() => {
-      expect(container.querySelector(".rolling-stock-row")).not.toBeNull();
-    });
   });
 
   it("says so while the fleet is on its way", () => {

@@ -1,3 +1,4 @@
+import type { EntityLensOptions } from "@canonical/prism-lens-entity";
 import { MESSAGES } from "#i18n";
 
 /**
@@ -6,5 +7,13 @@ import { MESSAGES } from "#i18n";
  */
 export const STATIONS_LENS = { label: MESSAGES["lens.stations"], order: 1 };
 
-/** The lines lens in the rail: its label and its place, second. */
-export const LINES_LENS = { label: MESSAGES["lens.lines"], order: 2 };
+/**
+ * The lines lens in the rail: its label and its place, second. Its index
+ * places its filters (the count and the search) in a panel beside the
+ * list.
+ */
+export const LINES_LENS = {
+  label: MESSAGES["lens.lines"],
+  order: 2,
+  filters: "panel",
+} as const satisfies EntityLensOptions;
