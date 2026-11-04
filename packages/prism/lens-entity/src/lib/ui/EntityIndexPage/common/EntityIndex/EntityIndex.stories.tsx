@@ -21,10 +21,10 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The rows view, with the toggle that keeps the view in the address. */
+/** The table renderer, the default: one 32px row per station. */
 export const Rows: Story = {};
 
-/** The cards view: the published Cards group at two columns a card. */
+/** The cards renderer: the published Cards group at two columns a card. */
 export const Cards: Story = {
-  decorators: [withSite({ url: "/stations?view=cards" })],
+  decorators: [withSite({ url: "/stations?as=cards" })],
 };
