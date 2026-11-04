@@ -143,6 +143,36 @@ export const BoundApplied: Story = {
   },
 };
 
+/** The query the provider starts on: two lower bounds on cores, both in force. */
+const twoLowerBounds = "cores__gte=16&cores__gte__1=4";
+
+/**
+ * Further restrictions applied: the link holds two lower bounds on cores,
+ * and both restrict, so a machine must meet each. The bound's input edits
+ * one; the other is shown read-only after it, with a Clear that removes it
+ * alone. Without scripting, the Clear is a real link and a hidden input
+ * carries the restriction through the form.
+ */
+export const FurtherConjunctsApplied: Story = {
+  parameters: consumerCode({
+    parts,
+    declarations: columnsCode,
+    query: twoLowerBounds,
+    render: composition,
+  }),
+  render: renderWith({ query: twoLowerBounds }),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByLabelText("Cores from")).toHaveValue(16);
+    await expect(canvas.getByText("Cores from 4")).toBeVisible();
+    await waitFor(() => expect(recordRows(canvas)).toBe(4));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Clear Cores from 4" }),
+    );
+    await expect(canvas.queryByText("Cores from 4")).toBeNull();
+    await expect(canvas.getByLabelText("Cores from")).toHaveValue(16);
+  },
+};
+
 /**
  * An invalid edit keeps the restriction: sixteen cores was applied, then the
  * bound was edited below the schema's minimum of one. The edit is refused

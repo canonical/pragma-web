@@ -1,0 +1,11 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /** One further conjunct: read-only, then its Clear. */
+  .ds.data-views-filters-further-conjunct {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--dimension-100);
+  }
+}

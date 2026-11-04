@@ -9,6 +9,7 @@ import {
 import { Button } from "@canonical/react-ds-global";
 import { type ReactElement, useId } from "react";
 import {
+  useDataViewsValue,
   useHydrationFocusHandoff,
   useIsHydrated,
 } from "../../../../../../hooks/index.js";
@@ -67,6 +68,9 @@ export default function ChoicesFilter({
   const { messages } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
   const alternativeField = useFilterHandle(alternativeHandle);
+  // The set the control shows may be any conjunct at its address, so the
+  // move names the one it is.
+  const nth = useDataViewsValue(handle.nth);
   const hydrated = useIsHydrated();
   // The move link a server rendered and the button replacing it: the button
   // takes the link's focus, or the reader who tabbed to the move before
@@ -101,7 +105,7 @@ export default function ChoicesFilter({
     const { slice, window } = host.state.get();
     const moved = applyQueryCommand(slice, window, {
       kind: "editPredicates",
-      remove: [{ field: fieldName, operator, nth: 0 }],
+      remove: [{ field: fieldName, operator, nth }],
       add: [{ field: fieldName, operator: to, operands: [...selected] }],
     });
     const params = host.spellQuery({
@@ -131,7 +135,7 @@ export default function ChoicesFilter({
           className="switch"
           onClick={() => {
             host.editPredicates(
-              [{ field: fieldName, operator, nth: 0 }],
+              [{ field: fieldName, operator, nth }],
               [
                 {
                   field: fieldName,

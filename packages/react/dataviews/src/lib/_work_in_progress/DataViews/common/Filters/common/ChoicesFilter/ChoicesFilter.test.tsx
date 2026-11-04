@@ -27,7 +27,11 @@ type Row = { readonly id: string };
 const collection = createCollection({
   identify: (row: Row) => row.id,
   fields: [
-    { field: "tags", kind: "choices", options: ["ex-gpu", "ex-nvme"] },
+    {
+      field: "tags",
+      kind: "choices",
+      options: ["ex-gpu", "ex-nvme", "ex-ssd"],
+    },
     { field: "cpu", kind: "number" },
   ],
 });
@@ -48,12 +52,14 @@ type Provider = ReturnType<typeof makeProvider>;
 /** The any-of filter on `tags`, beside its none-of alternative. */
 const Harness = ({
   onLeave,
+  options = ["ex-gpu", "ex-nvme"],
   ...native
-}: Pick<ChoicesFilterProps, "onLeave" | "className" | "id">) => {
+}: Pick<ChoicesFilterProps, "onLeave" | "className" | "id"> &
+  Partial<Pick<ChoicesFilterProps, "options">>) => {
   const { provider, filters } = useDataViewsRoot("ChoicesFilter test");
   return (
     <ChoicesFilter
-      options={["ex-gpu", "ex-nvme"]}
+      options={options}
       serverOwned={false}
       counts={null}
       handle={findFilterHandle<ReadonlySet<PredicateOperand>>(
@@ -79,10 +85,17 @@ const Harness = ({
   );
 };
 
-const mount = (provider: Provider, onLeave = () => {}) =>
+const mount = (
+  provider: Provider,
+  onLeave = () => {},
+  options?: ChoicesFilterProps["options"],
+) =>
   render(
     <DataViews provider={provider}>
-      <Harness onLeave={onLeave} />
+      <Harness
+        onLeave={onLeave}
+        {...(options === undefined ? {} : { options })}
+      />
     </DataViews>,
   );
 
@@ -119,6 +132,23 @@ describe("ChoicesFilter", () => {
     ]);
     expect(heard).toEqual(["filter"]);
     expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("moves the set it shows, whichever conjunct at its address that is", () => {
+    const provider = makeProvider(
+      "/machines?tags=ex-gpu&tags__isAny__1=ex-nvme",
+    );
+    mount(provider, () => {}, ["ex-gpu", "ex-nvme", "ex-ssd"]);
+    // The control's set becomes ex-ssd, which sorts after ex-nvme's.
+    fireEvent.click(screen.getByRole("checkbox", { name: "ex-ssd" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "ex-gpu" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Match none of these instead" }),
+    );
+    expect(provider.state.get().slice.filter).toEqual([
+      { field: "tags", operator: "isAny", operands: ["ex-nvme"] },
+      { field: "tags", operator: "isNone", operands: ["ex-ssd"] },
+    ]);
   });
 
   it("links to where the move leads before any script runs", () => {

@@ -95,4 +95,5 @@ export {
   isNarrowingIssue,
   QUERY_KEYS,
   spellWireKey,
+  spellWireValues,
 } from "../wire/index.js";

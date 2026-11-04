@@ -18,4 +18,5 @@ export { default as readWireField } from "./readWireField.js";
 export { default as rejectWireName } from "./rejectWireName.js";
 export { default as spellArrangementParams } from "./spellArrangementParams.js";
 export { default as spellWireKey } from "./spellWireKey.js";
+export { default as spellWireValues } from "./spellWireValues.js";
 export type * from "./types.js";

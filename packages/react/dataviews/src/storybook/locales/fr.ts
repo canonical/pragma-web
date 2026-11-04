@@ -139,6 +139,7 @@ export const FRENCH: DataViewsMessages = {
   filterLowest: (value) => `Minimum : ${value}`,
   filterHighest: (value) => `Maximum : ${value}`,
   clearFilter: (name) => `Effacer ${name}`,
+  filterAlso: (phrase, values) => `${phrase} ${values.join(", ")}`,
   linkRefusals: "Non appliqué depuis le lien",
   clauseRefused: (name, reason) => `${name} : ${clause(reason)}.`,
   grouping: "Regroupement",
