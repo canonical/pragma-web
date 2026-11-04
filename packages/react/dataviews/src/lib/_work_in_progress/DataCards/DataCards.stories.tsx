@@ -4,21 +4,19 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
 import { createRestHandlers } from "../../../storybook/machines/api/index.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import {
-  createEmptySource,
-  createFailingSource,
-  createPendingSource,
-  type Machine,
-  type MachineFields,
-  machineCollection,
-} from "../../../storybook/machines/fixtures.js";
+import createEmptySource from "../../../storybook/machines/createEmptySource.js";
+import createFailingSource from "../../../storybook/machines/createFailingSource.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
+import { machineCollection } from "../../../storybook/machines/fixtures.js";
+import readHostName from "../../../storybook/machines/readHostName.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
-import {
-  hostName,
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProviderConfig,
+} from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import {
   type DisplayField,
   type DisplayFieldCellProps,
@@ -97,7 +95,7 @@ function MachineCards({
       {...args}
       provider={provider}
       fields={cardFields}
-      rowLabel={hostName}
+      rowLabel={readHostName}
     />
   );
 }

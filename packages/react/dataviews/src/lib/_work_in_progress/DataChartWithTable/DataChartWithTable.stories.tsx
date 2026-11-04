@@ -4,12 +4,10 @@ import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import { createPendingSource } from "../../../storybook/machines/fixtures.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
-import {
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import type { DataChartProps } from "../DataChart/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataChartWithTable as ConnectedChartWithTable } from "../DataViews/common/DataChartWithTable/index.js";

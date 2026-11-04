@@ -2,25 +2,23 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope, withFrame } from "../../../storybook/decorators.js";
+import buildMachines from "../../../storybook/machines/buildMachines.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import {
-  createEmptySource,
-  createFailingSource,
-  createMachineSource,
-  createOneTermSource,
-  createPendingSource,
-  type Machine,
-  type MachineFields,
-  machineCollection,
-  manyMachines,
-  type SortableField,
-} from "../../../storybook/machines/fixtures.js";
-import {
-  hostName,
-  type MachineProvider,
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import createEmptySource from "../../../storybook/machines/createEmptySource.js";
+import createFailingSource from "../../../storybook/machines/createFailingSource.js";
+import createMachineSource from "../../../storybook/machines/createMachineSource.js";
+import createOneTermSource from "../../../storybook/machines/createOneTermSource.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
+import { machineCollection } from "../../../storybook/machines/fixtures.js";
+import readHostName from "../../../storybook/machines/readHostName.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProvider,
+  MachineProviderConfig,
+  SortableField,
+} from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { virtualizeRows } from "../../virtualization/index.js";
@@ -69,7 +67,7 @@ function MachinesTable({
       {...args}
       provider={provider}
       columns={columns}
-      rowLabel={hostName}
+      rowLabel={readHostName}
     />
   );
 }
@@ -1037,7 +1035,7 @@ const virtualization = virtualizeRows({ estimatedRowHeight: 24 });
 
 /** Ten thousand machines, all in one window. */
 const tenThousand = {
-  source: () => createMachineSource({ rows: manyMachines(10_000) }),
+  source: () => createMachineSource({ rows: buildMachines(10_000) }),
   query: "page=1&size=10000",
 } as const;
 

@@ -3,15 +3,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
-import {
-  createEmptySource,
-  createFailingSource,
-  createMachineSource,
-  createPendingSource,
-  type Machine,
-  machineCollection,
-} from "../../../storybook/machines/fixtures.js";
-import { useMachineProvider } from "../../../storybook/machines/story-utils.js";
+import createEmptySource from "../../../storybook/machines/createEmptySource.js";
+import createFailingSource from "../../../storybook/machines/createFailingSource.js";
+import createMachineSource from "../../../storybook/machines/createMachineSource.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
+import { machineCollection } from "../../../storybook/machines/fixtures.js";
+import type { Machine } from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataViews } from "../DataViews/index.js";
 import { ConnectedRecordList, PlainList, StatusList } from "./common/index.js";
