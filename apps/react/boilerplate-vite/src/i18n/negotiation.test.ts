@@ -6,8 +6,8 @@
  */
 import {
   createTranslator,
-  directionOf,
-  documentAttrs,
+  getDirection,
+  getDocumentAttributes,
   negotiateLocale,
 } from "@canonical/i18n-core";
 import { describe, expect, it } from "vitest";
@@ -47,12 +47,12 @@ describe("locale negotiation with the app config", () => {
 
 describe("document attributes for the app locales", () => {
   it("maps ar to rtl and the rest to ltr", () => {
-    expect(documentAttrs(i18nConfig, "ar")).toEqual({
+    expect(getDocumentAttributes(i18nConfig, "ar")).toEqual({
       lang: "ar",
       dir: "rtl",
     });
-    expect(directionOf(i18nConfig, "en")).toBe("ltr");
-    expect(directionOf(i18nConfig, "fr")).toBe("ltr");
+    expect(getDirection(i18nConfig, "en")).toBe("ltr");
+    expect(getDirection(i18nConfig, "fr")).toBe("ltr");
   });
 });
 
