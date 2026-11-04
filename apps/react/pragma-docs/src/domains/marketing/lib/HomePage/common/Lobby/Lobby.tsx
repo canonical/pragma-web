@@ -160,7 +160,7 @@ export default function Lobby({
         heading={t("lobby.doors.title")}
         headingId="lobby-doors-title"
       >
-        <EntityList>
+        <EntityList renderer="cards">
           {lenses
             .map(({ name }) => name)
             .filter((name): name is LobbyDoorRoute =>

@@ -15,19 +15,15 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** An unclaimed strip: every socket renders its sensible empty. */
+/** An unclaimed strip: every group keeps its place, empty. */
 export const EmptySockets: Story = {};
 
-/** A dense strip, as an explorer lens claims it. */
+/** An index's strip: the trail, the view group, Search and the count. */
 export const Claimed: Story = {
   args: {
-    context: "Definitions",
-    controls: (
-      <>
-        <button type="button">Validated</button>
-        <button type="button">Proposal</button>
-      </>
-    ),
-    status: <span>19 of 31 classes validated</span>,
+    trail: "Components",
+    view: <a href="?as=cards">Cards</a>,
+    search: <input aria-label="Search components" type="search" />,
+    count: <span>48 of 48 components</span>,
   },
 };

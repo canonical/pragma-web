@@ -65,7 +65,7 @@ const readStatus = (container: HTMLElement): string | undefined =>
 
 /** The strip trail's current crumb: the page the strip says you are on. */
 const readCurrentCrumb = (container: HTMLElement): string | undefined =>
-  container.querySelector('[data-slot="context"] [aria-current="page"]')
+  container.querySelector('[data-slot="trail"] [aria-current="page"]')
     ?.textContent ?? undefined;
 
 /**
@@ -74,7 +74,7 @@ const readCurrentCrumb = (container: HTMLElement): string | undefined =>
  */
 const countChipsOff = (container: HTMLElement): number =>
   container.querySelectorAll(
-    '[data-slot="controls"] fieldset:not([aria-label="Filter by instances"]) button[aria-pressed="false"]',
+    '[data-slot="facets"] fieldset:not([aria-label="Filter by instances"]) button[aria-pressed="false"]',
   ).length;
 
 /**
@@ -214,7 +214,7 @@ describe("Shell across a lens switch", () => {
 
       // Turn one ontology off through the strip's chips: the figure recounts.
       const chip = container.querySelector<HTMLButtonElement>(
-        '[data-slot="controls"] button[aria-pressed="true"]',
+        '[data-slot="facets"] button[aria-pressed="true"]',
       );
       expect(chip).not.toBeNull();
       await act(async () => {

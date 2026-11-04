@@ -1,16 +1,14 @@
-import type { EntityListView } from "@canonical/prism-projections";
+import type { LensRenderers } from "@canonical/prism-core";
 
-/** The search parameter the catalog keeps its view in. */
-export const CATALOG_VIEW_PARAM = "view";
-
-/** The views the catalog shows its components in. */
-export const CATALOG_VIEWS = [
-  "cards",
-  "rows",
-] as const satisfies readonly EntityListView[];
-
-/** The view the catalog shows when the address names none. */
-export const DEFAULT_CATALOG_VIEW = "cards";
+/**
+ * The renderers the lens's pages offer over the site's defaults: the
+ * catalog as a table, the default, or as cards, and a component's page as
+ * the page or its Turtle.
+ */
+export const COMPONENTS_RENDERERS: LensRenderers = {
+  list: ["table", "cards"],
+  page: ["page", "turtle"],
+};
 
 /** The tier the catalog lists first. */
 export const GLOBAL_TIER = "Global";

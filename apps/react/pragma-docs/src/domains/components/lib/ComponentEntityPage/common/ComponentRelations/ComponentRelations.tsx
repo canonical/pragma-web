@@ -117,7 +117,7 @@ export default function ComponentRelations({
             </h3>
             <EntityList
               aria-labelledby={`component-relations-${field}`}
-              view="rows"
+              renderer="table"
             >
               {edges.map(({ node }) => (
                 <SiteRowProjection key={node.uri} node={node} />

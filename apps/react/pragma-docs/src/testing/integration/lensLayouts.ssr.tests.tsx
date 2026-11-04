@@ -20,13 +20,15 @@
  *      inside the archetype its layout is built on, named by the layout
  *      root's class;
  *   3. `aria-current` sits exactly where the per-URL model says (the rail's
- *      exact-match link, plus the breadcrumb's current crumb);
- *   4. the strip's `context`, `controls` and `status` slots carry exactly
- *      what the URL's lens layout puts there, asserted on the raw markup.
+ *      exact-match link, the renderer switch's current renderer, in its
+ *      tabs and its menu, plus the breadcrumb's current crumb);
+ *   4. the strip's `trail`, `view` and `count` slots carry exactly what the
+ *      URL's lens layout puts there, asserted on the raw markup, and no
+ *      href carries the retired `view=` parameter.
  *
- * The status figure carries a live count off the graph, so the strip's
- * controls and status are asserted STRUCTURALLY (which tenant fills the
- * slot), never as pinned strings. The breadcrumb trail is URL-derived (the
+ * The count carries a live figure off the graph, so the strip's view group
+ * and count are asserted STRUCTURALLY (which tenant fills the slot), never
+ * as pinned strings. The breadcrumb trail is URL-derived (the
  * lens name + the route param), so it is pinned in full.
  *
  * Head elements are outside the measurement on purpose: titles are
@@ -212,7 +214,18 @@ const EXPECTED_ARIA_CURRENT: Readonly<Record<string, readonly string[]>> = {
 };
 
 /**
- * Per-URL expectation for the mode strip's `data-slot="context"` MARKUP:
+ * Per-URL expectation for the renderer switch: the href of the renderer the
+ * address selects, which the switch marks current twice, in its tabs and
+ * in its menu; none where the page offers fewer than two renderers.
+ */
+const EXPECTED_SWITCH_CURRENT: Readonly<Record<string, readonly string[]>> = {
+  "/components": ["/components", "/components"],
+  [BUTTON_ENTITY_URL]: [BUTTON_ENTITY_URL, BUTTON_ENTITY_URL],
+  [STANDARD_READING_URL]: [STANDARD_READING_URL, STANDARD_READING_URL],
+};
+
+/**
+ * Per-URL expectation for the mode strip's `data-slot="trail"` MARKUP:
  * the DS `Breadcrumbs` trail to the current page, which every lens layout
  * but the stubs' renders there.
  *
@@ -282,7 +295,7 @@ const EXPECTED_STRIP_CONTEXT: Readonly<Record<string, string>> = {
   }),
 };
 
-/** Per-URL count of `aria-current="page"` carried INSIDE the strip context
+/** Per-URL count of `aria-current="page"` carried INSIDE the strip trail
  * slot: the breadcrumb trail's terminal (current) crumb carries exactly one,
  * on every URL, since every layout renders a trail. The aria-current census
  * below adds this to the rail's anchor count, because the current crumb is a
@@ -303,49 +316,41 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
 };
 
 /**
- * Per-URL expectation for the strip's `controls` and `status` slots (R5 —
- * "a toolbar and the top bar should be useful"). Only the Definitions and
- * Journeys layouts fill them; every other URL must still render both
- * sockets EMPTY, and this model is what says so.
+ * Per-URL expectation for the strip's view group and count. Only the
+ * Components, Standards and Journeys layouts fill the view group, and only
+ * the Definitions layout counts; every other URL renders the view group
+ * EMPTY and no count, and this model is what says so.
  *
- * The slots are asserted STRUCTURALLY, never as pinned strings. The status
- * figure reports a live count off the graph, so pinning its text would make
- * this suite fail whenever the ontology gains a class — a false alarm about
- * something it does not measure. Structure ("does this slot carry the
- * toolbar / the figure, or nothing at all?") is the honest claim.
+ * The slots are asserted STRUCTURALLY, never as pinned strings. The count
+ * reports a live figure off the graph, so pinning its text would make this
+ * suite fail whenever the ontology gains a class.
  */
 const EXPECTED_STRIP_CLAIMS: Readonly<
   Record<
     string,
     {
-      /** The controls slot's expected tenant: the component class its inner
-       * markup must carry, or `false` for an empty socket. Different lenses
-       * fill it with different toolbars (definitions → chips, journeys →
-       * the view switch), so the claim is the tenant, not a bare boolean. */
-      readonly controls: string | false;
-      readonly status: boolean;
+      /** The view group's expected tenant: the component class its inner
+       * markup must carry, or `false` for an empty group. */
+      readonly view: string | false;
+      readonly count: boolean;
     }
   >
 > = {
-  "/": { controls: false, status: false },
-  "/components": { controls: false, status: false },
-  "/definitions": { controls: "explorer-controls", status: true },
-  "/standards": { controls: false, status: false },
-  // Journeys claims the context and the controls. The controls socket
-  // holds the table and graph switch, which chooses the reading the canvas
-  // shows and whose labels are data-independent; the coordinate chooser and
-  // the persona filter stay in the explorer's rail, each with its own
-  // explanatory text. The status socket stays empty.
-  "/journeys": { controls: "journey-view-switch", status: false },
-  "/guides": { controls: false, status: false },
-  [BUTTON_ENTITY_URL]: { controls: false, status: false },
-  [DEFINITIONS_TERM_URL]: { controls: "explorer-controls", status: true },
-  [STANDARD_READING_URL]: { controls: false, status: false },
-  // The job view claims the switch too: the view is the reader's passing
-  // choice, not the URL's, so both journeys addresses carry it.
-  [JOURNEYS_JOB_URL]: { controls: "journey-view-switch", status: false },
+  "/": { view: false, count: false },
+  "/components": { view: "renderer-switch", count: false },
+  "/definitions": { view: false, count: true },
+  "/standards": { view: false, count: false },
+  // Journeys claims the trail and the view group, which holds the table
+  // and graph switch; the coordinate chooser and the persona filter stay in
+  // the explorer's rail.
+  "/journeys": { view: "journey-view-switch", count: false },
+  "/guides": { view: false, count: false },
+  [BUTTON_ENTITY_URL]: { view: "renderer-switch", count: false },
+  [DEFINITIONS_TERM_URL]: { view: false, count: true },
+  [STANDARD_READING_URL]: { view: "renderer-switch", count: false },
+  [JOURNEYS_JOB_URL]: { view: "journey-view-switch", count: false },
   ...Object.fromEntries(
-    NON_LENS_URLS.map((url) => [url, { controls: false, status: false }]),
+    NON_LENS_URLS.map((url) => [url, { view: false, count: false }]),
   ),
 };
 
@@ -389,25 +394,24 @@ const splitAtCanvas = (body: string): { chrome: string; canvas: string } => {
 };
 
 /**
- * The strip's context slot, as the ModeStrip renders it. Since P-6 this
- * holds ELEMENTS — the DS `Breadcrumbs` trail — not a bare string, so the
- * content group is non-greedy across markup (like controls/status below),
- * bounded by the next slot's open tag. The pattern still pins the slot's
- * full identity (class + data-slot), so it can never latch onto a sibling.
+ * The strip's trail group, as the ModeStrip renders it: ELEMENTS (the DS
+ * `Breadcrumbs` trail), so the content group is non-greedy across markup,
+ * bounded by the next group's open tag. The pattern pins the group's full
+ * identity (class + data-slot), so it can never latch onto a sibling.
  */
-const STRIP_CONTEXT_PATTERN =
-  /(<div class="context" data-slot="context">)([\s\S]*?)(<\/div><div class="controls")/;
+const STRIP_TRAIL_PATTERN =
+  /(<div class="trail" data-slot="trail">)([\s\S]*?)(<\/div><div class="view")/;
 
 /**
- * The controls and status slots. Like `context`, these hold ELEMENTS
- * (a chip toolbar, a status figure), so the content group is non-greedy
- * across markup rather than text-only. Each pattern still pins the slot's
- * full identity, so it can never latch onto a sibling.
+ * The view group and the count slot. Like the trail, these hold ELEMENTS
+ * (a renderer switch, a status figure), so the content group is non-greedy
+ * across markup. The count is the filtering group's last slot, so it ends
+ * where the group and the band end.
  */
-const STRIP_CONTROLS_PATTERN =
-  /(<div class="controls" data-slot="controls">)([\s\S]*?)(<\/div><div class="status")/;
-const STRIP_STATUS_PATTERN =
-  /(<div class="status" data-slot="status">)([\s\S]*?)(<\/div><\/header>)/;
+const STRIP_VIEW_PATTERN =
+  /(<div class="view" data-slot="view">)([\s\S]*?)(<\/div><div class="filtering")/;
+const STRIP_COUNT_PATTERN =
+  /(<div class="count" data-slot="count">)([\s\S]*?)(<\/div><\/div><\/header>)/;
 
 /**
  * A strip slot's raw inner markup: the content group (the second capture) of
@@ -421,9 +425,9 @@ const extractStripSlot = (chrome: string, pattern: RegExp): string => {
   return content;
 };
 
-/** The context slot's raw markup, asserted against the per-URL model. */
-const extractStripContext = (chrome: string): string =>
-  extractStripSlot(chrome, STRIP_CONTEXT_PATTERN);
+/** The trail group's raw markup, asserted against the per-URL model. */
+const extractStripTrail = (chrome: string): string =>
+  extractStripSlot(chrome, STRIP_TRAIL_PATTERN);
 
 /** The hrefs of anchors carrying aria-current, in document order. */
 const ariaCurrentHrefs = (chrome: string): string[] =>
@@ -589,9 +593,9 @@ describe("the lens layouts, rendered through the SSR entry", () => {
     for (const [url, { chrome }] of getPages()) {
       for (const marker of [
         ...listExpectedRegions(url),
-        'data-slot="context"',
-        'data-slot="controls"',
-        'data-slot="status"',
+        'data-slot="trail"',
+        'data-slot="view"',
+        'data-slot="filtering"',
         "Skip to content",
       ]) {
         expect(
@@ -620,9 +624,10 @@ describe("the lens layouts, rendered through the SSR entry", () => {
 
   it("places aria-current exactly as modelled, per lens", () => {
     for (const [url, { chrome }] of getPages()) {
-      expect(ariaCurrentHrefs(chrome), `aria-current on ${url}`).toEqual(
-        EXPECTED_ARIA_CURRENT[url],
-      );
+      expect(ariaCurrentHrefs(chrome), `aria-current on ${url}`).toEqual([
+        ...(EXPECTED_ARIA_CURRENT[url] ?? []),
+        ...(EXPECTED_SWITCH_CURRENT[url] ?? []),
+      ]);
     }
   });
 
@@ -641,48 +646,56 @@ describe("the lens layouts, rendered through the SSR entry", () => {
         (chrome.match(/aria-current="page"/g) ?? []).length,
         `raw aria-current count on ${url}`,
       ).toBe(
-        EXPECTED_ARIA_CURRENT[url].length + STRIP_CONTEXT_ARIA_CURRENT[url],
+        (EXPECTED_ARIA_CURRENT[url]?.length ?? 0) +
+          (EXPECTED_SWITCH_CURRENT[url]?.length ?? 0) +
+          (STRIP_CONTEXT_ARIA_CURRENT[url] ?? 0),
       );
     }
   });
 
-  it("carries the strip context exactly as modelled, per URL", () => {
+  it("carries the strip trail exactly as modelled, per URL", () => {
     // A layout rendering the wrong trail (or a stub suddenly rendering one)
     // fails here.
     for (const [url, { chrome }] of getPages()) {
-      expect(extractStripContext(chrome), `strip context on ${url}`).toBe(
+      expect(extractStripTrail(chrome), `strip trail on ${url}`).toBe(
         EXPECTED_STRIP_CONTEXT[url],
       );
     }
   });
 
-  it("carries the strip controls and status exactly as modelled, per URL", () => {
-    // A layout that wrongly fills (or wrongly leaves empty) a socket fails
+  it("writes no href with the retired view parameter on any URL", () => {
+    for (const [url, { chrome, canvas }] of getPages()) {
+      expect(`${chrome}${canvas}`, `view= on ${url}`).not.toMatch(
+        /href="[^"]*[?&]view=/,
+      );
+    }
+  });
+
+  it("carries the strip view group and count exactly as modelled, per URL", () => {
+    // A layout that wrongly fills (or wrongly leaves empty) a slot fails
     // here.
     for (const [url, { chrome }] of getPages()) {
       const expected = EXPECTED_STRIP_CLAIMS[url];
       if (expected === undefined) throw new Error(`no strip model for ${url}`);
 
-      const controls = extractStripSlot(chrome, STRIP_CONTROLS_PATTERN);
-      const status = extractStripSlot(chrome, STRIP_STATUS_PATTERN);
-
-      if (expected.controls) {
-        // Structural, not a pinned string: the toolbar is present and is the
-        // real one this lens claims, identified by its component class
-        // (definitions → `explorer-controls`, journeys → `journey-view-switch`).
-        expect(controls, `controls on ${url}`).toContain(
-          `class="ds ${expected.controls}`,
-        );
+      const view = extractStripSlot(chrome, STRIP_VIEW_PATTERN);
+      if (expected.view) {
+        // Structural, not a pinned string: the tenant is the real one this
+        // lens claims, identified by its component class.
+        expect(view, `view on ${url}`).toContain(`class="ds ${expected.view}`);
       } else {
-        expect(controls, `controls on ${url} must be empty`).toBe("");
+        expect(view, `view on ${url} must be empty`).toBe("");
       }
 
-      if (expected.status) {
-        expect(status, `status on ${url}`).toContain(
-          'data-slot="explorer-status"',
-        );
+      if (expected.count) {
+        expect(
+          extractStripSlot(chrome, STRIP_COUNT_PATTERN),
+          `count on ${url}`,
+        ).toContain('data-slot="explorer-status"');
       } else {
-        expect(status, `status on ${url} must be empty`).toBe("");
+        expect(chrome, `count on ${url} must be absent`).not.toContain(
+          'data-slot="count"',
+        );
       }
     }
   });
@@ -692,8 +705,8 @@ describe("the lens layouts, rendered through the SSR entry", () => {
  * The not-found route. It is deliberately NOT a member of MEASURED_URLS,
  * which lists the lens pages: `notFoundRoute` is declared outside every
  * `group(...)` in routes.tsx and renders the document archetype itself, with
- * the site's rail and colophon and no strip, so a reader who lands there
- * keeps the grid and a way back.
+ * the site's rail, an empty strip and the colophon, so a reader who lands
+ * there keeps the grid and a way back.
  */
 describe("the not-found route", () => {
   const body = extractBody(renderPage("/no-such-page"));
@@ -709,6 +722,7 @@ describe("the not-found route", () => {
     expect(countOccurrences(body, 'data-region="primary-nav"')).toBe(1);
     expect(countOccurrences(body, 'data-region="canvas"')).toBe(1);
     expect(countOccurrences(body, 'data-region="footer"')).toBe(1);
+    expect(countOccurrences(body, 'data-region="mode-strip"')).toBe(1);
     expect(body).toContain('class="ds prose-page ds not-found-page"');
   });
 

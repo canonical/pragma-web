@@ -45,7 +45,7 @@ export default function GuidesLayout({
       colophon={<SiteColophon />}
       rail={<SiteRail />}
       strip={
-        <ModeStrip context={<GuidesContext lensLabel={t("guides.title")} />} />
+        <ModeStrip trail={<GuidesContext lensLabel={t("guides.title")} />} />
       }
     >
       {children}

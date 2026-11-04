@@ -62,8 +62,8 @@ export default function JourneysWorkspace({
       rail={<SiteRail />}
       strip={
         <ModeStrip
-          context={<JourneysTrail lensLabel={t("journeys.title")} />}
-          controls={<Controls />}
+          trail={<JourneysTrail lensLabel={t("journeys.title")} />}
+          view={<Controls />}
         />
       }
     >

@@ -18,7 +18,10 @@ node:
               edges:
                 - node:
                     role: trail (the catalog, then the component's address)
-                  relation: { cardinality: "1", slotName: context }
+                  relation: { cardinality: "1", slotName: trail }
+                - node:
+                    uri: docs.subcomponent.components_view
+                  relation: { cardinality: "0..1", slotName: view }
             relation: { cardinality: "1", slotName: strip }
           - node:
               role: routed page

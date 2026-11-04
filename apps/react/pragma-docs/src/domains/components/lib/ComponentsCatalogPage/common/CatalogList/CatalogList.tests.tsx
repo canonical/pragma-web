@@ -91,7 +91,7 @@ describe("CatalogList", () => {
   );
 
   it(
-    "counts each tier and shows the view toggle on the first tier only",
+    "counts each tier once every page is loaded",
     () => {
       const records = copyRecords();
       for (const record of Object.values(records)) {
@@ -107,13 +107,7 @@ describe("CatalogList", () => {
         "2 components",
         "2 components",
       ]);
-      expect(screen.getAllByRole("button", { name: "Cards" })).toHaveLength(1);
-      expect(
-        within(screen.getByRole("region", { name: "Global" })).getByRole(
-          "button",
-          { name: "Rows" },
-        ),
-      ).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Cards" })).toBeNull();
     },
     HARNESS_TEST_TIMEOUT_MS,
   );
@@ -121,7 +115,13 @@ describe("CatalogList", () => {
   it(
     "keeps a UI block's rendered example beside its card",
     () => {
-      render(catalogPage(catalogRecords, createFetchSpy()));
+      render(
+        catalogPage(
+          catalogRecords,
+          createFetchSpy(),
+          createCatalogRouter("/components?as=cards"),
+        ),
+      );
       const button = screen
         .getAllByRole("link", { name: "Button" })
         .at(0)
@@ -171,7 +171,7 @@ describe("CatalogList", () => {
         catalogPage(
           records as unknown as RecordMap,
           createFetchSpy(),
-          createCatalogRouter("/components?view=rows"),
+          createCatalogRouter("/components"),
         ),
       );
       expect(

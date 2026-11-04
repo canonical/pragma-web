@@ -138,7 +138,7 @@ export default function ComponentProbe({
             heading={t("playground.probe.card")}
             headingId="component-probe-card-title"
           >
-            <EntityList>
+            <EntityList renderer="cards">
               <SiteCardProjection node={component} />
             </EntityList>
           </PageSection>

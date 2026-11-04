@@ -5,10 +5,12 @@ import {
 } from "@canonical/prism-projections";
 import type { ElementType } from "react";
 import { homes } from "../../src/homes.js";
+import { SiteRenderers } from "../../src/lib/ui/SiteRenderers/index.js";
 
 /**
  * Storybook decorator that provides the site's homes, the default
- * projection maps and the router link adapter, as `Shell` does, so a
+ * projection maps, the router link adapter and the site's renderers, as
+ * `Shell` does, so a
  * story's entity chips dispatch on their node's type and link to its home.
  *
  * Its homes build hrefs through the router, so list it before
@@ -25,7 +27,9 @@ const withProjections = () => (Story: ElementType) => (
       LinkComponent={RouterLink}
       maps={defaultProjectionMaps}
     >
-      <Story />
+      <SiteRenderers>
+        <Story />
+      </SiteRenderers>
     </ProjectionsProvider>
   </HomesProvider>
 );

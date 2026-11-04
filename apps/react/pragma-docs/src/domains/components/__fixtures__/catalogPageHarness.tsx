@@ -26,6 +26,7 @@ import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
+import { SiteRenderers } from "#lib/ui/SiteRenderers";
 import formatDocumentTitle from "../../../formatDocumentTitle.js";
 import { homes } from "../../../homes.js";
 import { appRoutes, middleware, notFoundRoute } from "../../../routes.js";
@@ -69,7 +70,9 @@ export const catalogPage = (
             LinkComponent={RouterLink}
             maps={defaultProjectionMaps}
           >
-            <ComponentsCatalogPage />
+            <SiteRenderers>
+              <ComponentsCatalogPage />
+            </SiteRenderers>
           </ProjectionsProvider>
         </HomesProvider>
       </RouterProvider>

@@ -5,10 +5,12 @@ import {
   ModeStrip,
   makeLensContext,
 } from "@canonical/prism-core";
+import { useRouterState } from "@canonical/router-react";
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
 import { SiteColophon } from "#lib/ui/SiteColophon";
 import { SiteRail } from "#lib/ui/SiteRail";
+import { ComponentsView } from "./common/index.js";
 import type { ComponentsLayoutProps } from "./types.js";
 
 /**
@@ -23,7 +25,9 @@ const ComponentsContext = makeLensContext({
 
 /**
  * The Components lens's page layout: the site rail and colophon around the
- * catalog and a component's page, with the strip carrying the trail.
+ * catalog and a component's page, with the strip carrying the trail and
+ * the page's renderers: the catalog's table and cards, a component's page
+ * and its Turtle.
  *
  * The layout is the document archetype: the rail in its rail region, the
  * strip in the top row, the page in the canvas, the one region that
@@ -33,19 +37,29 @@ const ComponentsContext = makeLensContext({
  * `import { ComponentsLayout } from "./lib/ComponentsLayout/index.js";`
  *
  * @implements docs.component.components_layout
- * @note Impure: reads its words from the translator in scope.
+ * @note Impure: reads its words from the translator and the matched route
+ *   in scope.
  */
 export default function ComponentsLayout({
   children,
 }: ComponentsLayoutProps): ReactElement {
   const t = useMessages();
+  const { match } = useRouterState();
+  const onCatalog = match?.kind === "route" && match.name === "components";
+  const onComponent =
+    match?.kind === "route" && match.name === "componentEntity";
   return (
     <DocumentLayout
       colophon={<SiteColophon />}
       rail={<SiteRail />}
       strip={
         <ModeStrip
-          context={<ComponentsContext lensLabel={t("catalog.title")} />}
+          trail={<ComponentsContext lensLabel={t("catalog.title")} />}
+          view={
+            onCatalog || onComponent ? (
+              <ComponentsView kind={onCatalog ? "list" : "page"} />
+            ) : null
+          }
         />
       }
     >
