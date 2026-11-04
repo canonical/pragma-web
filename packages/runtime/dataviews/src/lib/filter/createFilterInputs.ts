@@ -27,12 +27,14 @@ type AddressedInput = {
  * its host. The records are the root's, not the provider's — two roots on
  * one provider share the applied query and never each other's half-typed
  * input — and `observe()` keeps every applied mirror in step with the
- * query as the location, a saved view or a reset moves it.
+ * query as the location, a saved view or a reset moves it. A move of the
+ * location — Back, Forward, a pasted URL — also ends every input session:
+ * what was being typed goes, and each input shows what is applied.
  *
  * Construction reads the query once and subscribes to nothing.
  *
  * @note Impure by design: the records hold what a person is typing, and
- * observing subscribes to the provider's state.
+ * observing subscribes to the provider's state and its transitions.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -67,6 +69,18 @@ export default function createFilterInputs<
     handles[definition.field] = byOperator;
   }
 
+  /** Each applied predicate of a slice, by the address a record edits. */
+  const readApplied = (slice: Slice): Map<string, Predicate> => {
+    const applied = new Map<string, Predicate>();
+    for (const predicate of canonicalizeSlice(slice).filter) {
+      applied.set(
+        addressPredicate(predicate.field, predicate.operator),
+        predicate,
+      );
+    }
+    return applied;
+  };
+
   /**
    * Re-sync every record's applied mirror from the provider's slice. Built
    * once per sync: the slice is the same one for every record, and
@@ -81,13 +95,7 @@ export default function createFilterInputs<
       return;
     }
     synced = slice;
-    const applied = new Map<string, Predicate>();
-    for (const predicate of canonicalizeSlice(slice).filter) {
-      applied.set(
-        addressPredicate(predicate.field, predicate.operator),
-        predicate,
-      );
-    }
+    const applied = readApplied(slice);
     for (const { address, input } of records) {
       const predicate = applied.get(address) ?? null;
       // Only a predicate that moved is adopted: the record's own edit comes
@@ -100,6 +108,19 @@ export default function createFilterInputs<
   };
   sync();
 
+  /**
+   * Show what is applied in every input, dropping what was typed: Back,
+   * Forward or a pasted URL is the reader's move to another query, so what
+   * was being typed for the one they left — an invalid or half-typed value
+   * — goes, even where the predicate did not move.
+   */
+  const dropTypedInput = (): void => {
+    const applied = readApplied(host.state.get().slice);
+    for (const { address, input } of records) {
+      input.setApplied(applied.get(address) ?? null);
+    }
+  };
+
   return {
     // Built by walking `schema.fields`, so it holds exactly the schema's
     // own literal keys and their operators; the map type is what the walk
@@ -108,12 +129,21 @@ export default function createFilterInputs<
     observe(): () => void {
       // The query may have moved while nothing was following it.
       sync();
-      // Its own closure, never the shared function: the channel holds its
+      // Their own closures, never the shared functions: a channel holds its
       // listeners in a set, so two observations subscribing one reference
       // would register once and the first release deafen the second.
-      return host.state.subscribe(() => {
+      const stopState = host.state.subscribe(() => {
         sync();
       });
+      const stopTransitions = host.transitions.subscribe(() => {
+        if (host.transitions.get()?.cause === "adopt") {
+          dropTypedInput();
+        }
+      });
+      return () => {
+        stopState();
+        stopTransitions();
+      };
     },
   };
 }
