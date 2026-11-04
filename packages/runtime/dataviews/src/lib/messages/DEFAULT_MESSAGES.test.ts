@@ -368,6 +368,10 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.renderer).toBe("Show as");
   });
 
+  it("names the chart and the table a switch offers", () => {
+    expect([m.chartRenderer, m.tableRenderer]).toEqual(["Chart", "Table"]);
+  });
+
   it("words the action bar, counting rows", () => {
     expect(m.selectionActions).toBe("Selection actions");
     expect(m.rowsSelected(3)).toBe("3 selected");

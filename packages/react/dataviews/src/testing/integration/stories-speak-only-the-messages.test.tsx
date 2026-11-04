@@ -102,11 +102,16 @@ const AUTHORED_ANYWHERE: readonly string[] = ["Search machines"];
 const AUTHORED: Readonly<Record<string, readonly string[]>> = {
   Actions: ["Delete", "machines selected"],
   // The name a switch's story gives its own collection, which says the
-  // record's "Show" without being its word.
-  RendererSwitch: ["Show machines as"],
+  // record's "Show" without being its word, and the name it gives its own
+  // table renderer, which is the chart's switch's word too.
+  RendererSwitch: ["Show machines as", "Table"],
   // The cards' stories place a switch of their own, named the same way, and
   // one story's own cell writes a sentence saying the record's "from".
-  Cards: ["Show machines as", "Waiting on an address from the upstream pool."],
+  Cards: [
+    "Show machines as",
+    "Table",
+    "Waiting on an address from the upstream pool.",
+  ],
 };
 
 /** List every phrase a part's stories author, the shared ones included. */
