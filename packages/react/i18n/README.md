@@ -53,7 +53,7 @@ function Cart({ count }: { count: number }) {
 
 function Price({ amount }: { amount: number }) {
   const f = useFormatters();
-  return <span>{f.currency(amount, "USD")}</span>;
+  return <span>{f.formatCurrency(amount, "USD")}</span>;
 }
 
 ```

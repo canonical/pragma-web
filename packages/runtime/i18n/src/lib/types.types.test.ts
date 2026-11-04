@@ -90,47 +90,52 @@ describe("Translator", () => {
 });
 
 describe("Formatters", () => {
-  it("has exactly the six formatting members", () => {
+  it("has exactly the six formatting members, named with verbs", () => {
     expectTypeOf<keyof Formatters>().toEqualTypeOf<
-      "number" | "currency" | "date" | "time" | "relativeTime" | "list"
+      | "formatNumber"
+      | "formatCurrency"
+      | "formatDate"
+      | "formatTime"
+      | "formatRelativeTime"
+      | "formatList"
     >();
   });
 
   it("formats each value to text", () => {
-    expectTypeOf<Formatters["number"]>().returns.toEqualTypeOf<string>();
-    expectTypeOf<Formatters["time"]>()
+    expectTypeOf<Formatters["formatNumber"]>().returns.toEqualTypeOf<string>();
+    expectTypeOf<Formatters["formatTime"]>()
       .parameter(0)
       .toEqualTypeOf<Date | number>();
-    expectTypeOf<Formatters["list"]>()
+    expectTypeOf<Formatters["formatList"]>()
       .parameter(0)
       .toEqualTypeOf<Iterable<string>>();
   });
 
   it("gives each member its full signature", () => {
-    expectTypeOf<Formatters["number"]>().toEqualTypeOf<
+    expectTypeOf<Formatters["formatNumber"]>().toEqualTypeOf<
       (value: number, options?: Intl.NumberFormatOptions) => string
     >();
-    expectTypeOf<Formatters["currency"]>().toEqualTypeOf<
+    expectTypeOf<Formatters["formatCurrency"]>().toEqualTypeOf<
       (
         value: number,
         currency: string,
         options?: Intl.NumberFormatOptions,
       ) => string
     >();
-    expectTypeOf<Formatters["date"]>().toEqualTypeOf<
+    expectTypeOf<Formatters["formatDate"]>().toEqualTypeOf<
       (value: Date | number, options?: Intl.DateTimeFormatOptions) => string
     >();
-    expectTypeOf<Formatters["time"]>().toEqualTypeOf<
+    expectTypeOf<Formatters["formatTime"]>().toEqualTypeOf<
       (value: Date | number, options?: Intl.DateTimeFormatOptions) => string
     >();
-    expectTypeOf<Formatters["relativeTime"]>().toEqualTypeOf<
+    expectTypeOf<Formatters["formatRelativeTime"]>().toEqualTypeOf<
       (
         value: number,
         unit: Intl.RelativeTimeFormatUnit,
         options?: Intl.RelativeTimeFormatOptions,
       ) => string
     >();
-    expectTypeOf<Formatters["list"]>().toEqualTypeOf<
+    expectTypeOf<Formatters["formatList"]>().toEqualTypeOf<
       (items: Iterable<string>, options?: Intl.ListFormatOptions) => string
     >();
   });
