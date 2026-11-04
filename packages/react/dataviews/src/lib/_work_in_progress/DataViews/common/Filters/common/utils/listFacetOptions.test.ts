@@ -19,7 +19,7 @@ describe("listFacetOptions", () => {
     ).toEqual(["eu", "42", "us"]);
   });
 
-  it("lists neither the empty text nor a flag's value", () => {
+  it("lists neither the empty text nor a presence field's value", () => {
     expect(
       listFacetOptions({
         kind: "values",

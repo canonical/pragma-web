@@ -152,8 +152,8 @@ const compileTerms = (config: OrderRowsConfig): readonly CompiledTerm[] => {
  * Each term reads its field through its kind: text through the source's
  * collation, or by digit runs where the runtime has no data for it,
  * `choices` by declared option index with unknown values after the known
- * ones, dates as instants however the row spells them, flags false before
- * true, numbers numerically. A value the kind has none of — absent, null, an
+ * ones, dates as instants however the row spells them, presence fields
+ * false before true, numbers numerically. A value the kind has none of — absent, null, an
  * empty string, or outside its domain — orders after every value that has
  * one in both directions, or before every one in both directions where the
  * source places that field's empties first.

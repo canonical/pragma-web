@@ -18,14 +18,14 @@ import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
 import { findFilterHandle } from "../../../utils/index.js";
-import FlagFilter from "./FlagFilter.js";
-import type { FlagFilterProps } from "./types.js";
+import PresenceFilter from "./PresenceFilter.js";
+import type { PresenceFilterProps } from "./types.js";
 
 type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,
-  fields: [{ field: "owner", kind: "flag" }],
+  fields: [{ field: "owner", kind: "presence" }],
 });
 
 const makeProvider = () =>
@@ -43,7 +43,7 @@ type Provider = ReturnType<typeof makeProvider>;
 
 /** What a case sets; the handle, label and field are the harness's. */
 type HarnessProps = Partial<
-  Omit<FlagFilterProps, "handle" | "label" | "field">
+  Omit<PresenceFilterProps, "handle" | "label" | "field">
 >;
 
 /** The filter at the root's own `owner` presence handle. */
@@ -54,9 +54,9 @@ const Harness = ({
   onLeave = () => {},
   ...rest
 }: HarnessProps) => {
-  const { filters } = useDataViewsRoot("FlagFilter test");
+  const { filters } = useDataViewsRoot("PresenceFilter test");
   return (
-    <FlagFilter
+    <PresenceFilter
       {...rest}
       handle={findFilterHandle<boolean>(filters, "owner", "isSet")}
       label="Owned"
@@ -94,7 +94,7 @@ const setOwner = (provider: Provider): void => {
   });
 };
 
-describe("FlagFilter", () => {
+describe("PresenceFilter", () => {
   it("applies the presence predicate when checked, and removes it when unchecked", () => {
     const provider = makeProvider();
     mount(provider);
@@ -165,7 +165,7 @@ describe("FlagFilter", () => {
       title: "Machines with an owner",
     });
     const root = container.firstElementChild;
-    expect(root).toHaveClass("ds", "data-views-filters-flag", "extra");
+    expect(root).toHaveClass("ds", "data-views-filters-presence", "extra");
     expect(root).toHaveAttribute("title", "Machines with an owner");
   });
 });

@@ -50,7 +50,7 @@ describe("readFacets", () => {
     });
   });
 
-  it("counts a flag field's set records as one value, and none when none is set", () => {
+  it("counts a presence field's set records as one value, and none when none is set", () => {
     // Set as isSet reads it: false is a value, null and absent are not.
     expect(readFacetsOver(EMPTY_SLICE, "owner")).toEqual({
       owner: {

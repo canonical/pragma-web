@@ -52,7 +52,7 @@ export type SourceCounts = {
 /**
  * One value a discrete field holds across the records matching the query,
  * with how many of them hold it: an option of a `choices` field, or `true`
- * for a `flag` field's records that are set.
+ * for a `presence` field's records that are set.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -68,11 +68,11 @@ export type FacetValue = {
  * out keep their counts and a bound can widen past itself. Computed by the
  * source over the whole matching set, never over a loaded page.
  *
- * - `values`, for a `choices` or `flag` field: every distinct value held
+ * - `values`, for a `choices` or `presence` field: every distinct value held
  *   by at least one matching record, each with its count, in the field's
  *   order — a `choices` field's declared options in their order, then any
  *   other value by code unit, and where the options are the server's each
- *   value as its text; a `flag` field's one value, `true`, while any
+ *   value as its text; a `presence` field's one value, `true`, while any
  *   record is set.
  * - `range`, for a `number` or `date` field: the least and greatest value a
  *   matching record holds, null while none holds one — a number among the

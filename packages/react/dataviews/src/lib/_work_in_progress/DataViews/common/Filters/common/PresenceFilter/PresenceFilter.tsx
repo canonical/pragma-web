@@ -2,9 +2,9 @@ import { spellWireKey } from "@canonical/dataviews-core/bindings";
 import { type ReactElement, useId } from "react";
 import { spellCount } from "../../../../../../utils/index.js";
 import { useDataViewsRoot, useFilterHandle } from "../../../../hooks/index.js";
-import type { FlagFilterProps } from "./types.js";
+import type { PresenceFilterProps } from "./types.js";
 
-const componentCssClassName = "ds data-views-filters-flag";
+const componentCssClassName = "ds data-views-filters-presence";
 
 /**
  * One presence filter: the predicate is either applied or absent, so the
@@ -12,16 +12,16 @@ const componentCssClassName = "ds data-views-filters-flag";
  * asserting the field is unset — the grammar has no operator for that. The
  * checkbox is named as the wire spells presence, and its value is the
  * marker the encoder writes, so a GET submission is the same clause.
- * Unchecking an undeclared flag removes the control, so focus moves to the
- * filters' group. Beside the checkbox is how many matching records set the
- * field, from the facet, describing the checkbox while a facet answers the
- * applied query.
+ * Unchecking an undeclared presence field removes the control, so focus
+ * moves to the filters' group. Beside the checkbox is how many matching
+ * records set the field, from the facet, describing the checkbox while a
+ * facet answers the applied query.
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
  * @implements ds:apps.subcomponent.data_views_filters-presence_filter
  */
-export default function FlagFilter({
+export default function PresenceFilter({
   handle,
   count,
   label,
@@ -31,7 +31,7 @@ export default function FlagFilter({
   onLeave,
   className,
   ...rest
-}: FlagFilterProps): ReactElement | null {
+}: PresenceFilterProps): ReactElement | null {
   const { messages } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
   const countId = useId();

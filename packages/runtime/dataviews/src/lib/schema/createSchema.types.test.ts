@@ -5,7 +5,7 @@ import type { AppliedOf } from "./types.js";
 const machines = createSchema([
   { field: "status", kind: "choices", options: ["failed", "cancelled"] },
   { field: "cpu", kind: "number" },
-  { field: "owner", kind: "flag" },
+  { field: "owner", kind: "presence" },
   { field: "name", kind: "text" },
 ]);
 

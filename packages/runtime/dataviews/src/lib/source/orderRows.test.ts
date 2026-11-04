@@ -18,7 +18,7 @@ const schema = createSchema([
   },
   { field: "cores", kind: "number" },
   { field: "seen", kind: "date" },
-  { field: "ready", kind: "flag" },
+  { field: "ready", kind: "presence" },
 ]);
 
 // Recorded against ICU 75.1; a backend claiming this order is checked against
@@ -201,7 +201,7 @@ describe("orderRows", () => {
     ]);
   });
 
-  it("orders flags false before true, and anything present as set", () => {
+  it("orders presence fields false before true, and anything present as set", () => {
     // Presence, as `isSet` reads it: a falsy value that is not `false` is
     // still set.
     const rows = [

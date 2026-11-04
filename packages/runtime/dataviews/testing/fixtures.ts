@@ -50,7 +50,7 @@ export const FACETED_SCHEMA = createSchema([
     options: ["running", "failed", "pending"],
   },
   { field: "cpu", kind: "number" },
-  { field: "owner", kind: "flag" },
+  { field: "owner", kind: "presence" },
   { field: "updated", kind: "date" },
   { field: "name", kind: "text" },
 ]);

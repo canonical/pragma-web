@@ -7,7 +7,7 @@ import * as Stories from "./Filters.stories";
 
 `DataViews.Filters` edits the collection's query. It takes no query and no list of fields: which fields it offers comes from the collection's schema, and which operators each accepts comes from what the provider's source declares it can execute. It never offers a restriction the source would refuse, and it has no draft to keep in step with the applied query — each edit is the applied query.
 
-The design has not drawn the filters yet, so the part renders plain form controls: a group of checkboxes for a choices field — any of the options, or none of them — a from and a to bound for a number or date field, one checkbox for a flag, and a text input for the text a text field must contain or start with.
+The design has not drawn the filters yet, so the part renders plain form controls: a group of checkboxes for a choices field — any of the options, or none of them — a from and a to bound for a number or date field, one checkbox for a presence field, and a text input for the text a text field must contain or start with.
 
 ## Filters over a composed collection
 
@@ -81,7 +81,7 @@ A text field is filtered by the text its value contains, or the text it starts w
 
 ## Counts beside the options
 
-A provider asked for facets — `createDataViewsProvider({ collection, source, facets: ["status", "cores"] })` — has its source count, over every record the query matches, how many hold each option or set a flag, and find the least and greatest value a number or date field holds. Filters shows each count beside its option or flag checkbox and each end of the range beside its bound — the hints read Lowest and Highest — as a description of the control rather than part of its name. A field's own restriction is left out of its own facet, so with failed machines kept the other statuses still show how many machines they would add. Nothing is counted from the rows on screen: while no result answers the applied query, no count is shown.
+A provider asked for facets — `createDataViewsProvider({ collection, source, facets: ["status", "cores"] })` — has its source count, over every record the query matches, how many hold each option or set a presence field, and find the least and greatest value a number or date field holds. Filters shows each count beside its option or presence checkbox and each end of the range beside its bound — the hints read Lowest and Highest — as a description of the control rather than part of its name. A field's own restriction is left out of its own facet, so with failed machines kept the other statuses still show how many machines they would add. Nothing is counted from the rows on screen: while no result answers the applied query, no count is shown.
 
 A choices field whose options are the server's — declared with no `options` list — takes its options from the facet, with any option the set already holds kept beside them. They stay listed until a newer result lists others — while a changed query is pending, or after it fails — from the facet the latest result answered; only their counts wait for an answer to the applied query. An empty value is never offered as an option.
 
