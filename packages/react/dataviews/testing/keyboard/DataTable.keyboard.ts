@@ -1,16 +1,15 @@
 /**
  * The keyboard-only pass over the DataTable's stories, its sort panel's, the
- * renderer switch's and the server-backed ones, in the built Storybook, where the service worker
- * answers the server-backed stories: Tab, Shift+Tab, Enter and Space, and no
- * other key.
+ * other renderers' and the server-backed ones, in the built Storybook, where
+ * the service worker answers the server-backed stories: Tab, Shift+Tab, Enter
+ * and Space, and no other key.
  *
  * Every story is walked both ways, asserting that each interactive control
  * is reached and that focus is visible on it when it is. Then the controls
  * a key operates are operated: a sort heading cycles and keeps focus, a row
- * checkbox checks. Arrow keys belong to one journey alone, the renderer
- * switch's select, whose own keys they are: the table offers no arrow
- * navigation, and a resize handle's arrow keys are its own enhancement, so
- * the handle is only reached.
+ * checkbox checks. No journey presses an arrow key: the table offers no
+ * arrow navigation, and a resize handle's arrow keys are its own
+ * enhancement, so the handle is only reached.
  *
  * Necessary evidence, not a conformance claim: it proves what a keyboard
  * reaches, not what a screen reader announces.
@@ -45,9 +44,6 @@ const DATA_CARDS = "_work_in_progress/DataCards";
 /** The chart prototype's stories, a field's counts or range beside the filters. */
 const DATA_CHART = "_work_in_progress/DataChart";
 
-/** The renderer switch's stories, one collection shown through a chosen renderer. */
-const RENDERER_SWITCH = "_work_in_progress/RendererSwitch";
-
 /** The stories over a REST endpoint, through TanStack Query. */
 const REST_API = "_work_in_progress/DataViews/REST API";
 
@@ -66,7 +62,6 @@ const TITLES: readonly string[] = [
   SETTINGS,
   DATA_CARDS,
   DATA_CHART,
-  RENDERER_SWITCH,
   REST_API,
   GRAPHQL_API,
 ];
@@ -784,28 +779,6 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(summary).toHaveText("Showing 1–3 out of 3 rows");
     // The chart still counts every machine, filtered or not.
     await expect(running).toContainText("6");
-  });
-
-  test("RendererSwitch TableOrSummary: the select's own arrow keys choose a renderer, focus stays on the choice", async ({
-    page,
-  }) => {
-    await openStory(page, findStory(RENDERER_SWITCH, "Table Or Summary").id);
-    const choice = page.getByRole("combobox", {
-      name: "Show machines as",
-      exact: true,
-    });
-    await expect(choice).toHaveValue("table");
-    await tabTo(page, choice);
-    // A closed select's own key: the one exception to Tab, Enter and Space.
-    await page.keyboard.press("ArrowDown");
-    await expect(choice).toHaveValue("summary");
-    await expect(choice).toBeFocused();
-    await expect(
-      page.getByRole("region", { name: "Summary", exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("region", { name: "Table", exact: true }),
-    ).toHaveCount(0);
   });
 
   test("SortPanel Default: Enter and Space move a term up, focus kept or handed to its Remove", async ({

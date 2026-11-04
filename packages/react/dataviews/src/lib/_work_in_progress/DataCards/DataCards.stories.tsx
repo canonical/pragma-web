@@ -19,14 +19,14 @@ import {
   type MachineProviderConfig,
   useMachineProvider,
 } from "../../../storybook/machines/story-utils.js";
-import type {
-  DisplayField,
-  DisplayFieldCellProps,
+import {
+  type DisplayField,
+  type DisplayFieldCellProps,
+  RendererSwitch,
 } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataCards as ConnectedCards } from "../DataViews/common/DataCards/index.js";
 import { DataViews } from "../DataViews/index.js";
-import { RendererSwitch } from "../RendererSwitch/index.js";
 import Component from "./DataCards.js";
 import type { DataCardsProps } from "./types.js";
 

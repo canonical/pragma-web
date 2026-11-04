@@ -7,8 +7,8 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { RendererChoice } from "../../lib/_work_in_progress/RendererSwitch/index.js";
-import { RendererSwitch } from "../../lib/_work_in_progress/RendererSwitch/index.js";
+import type { RendererChoice } from "../../lib/common/RendererSwitch/index.js";
+import { RendererSwitch } from "../../lib/common/RendererSwitch/index.js";
 
 const table: RendererChoice = {
   id: "table",
