@@ -26,7 +26,7 @@ import Pagination from "../Pagination/Pagination.js";
 import Component from "./Actions.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Actions",
+  title: "_work_in_progress/Actions",
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<typeof Component>;

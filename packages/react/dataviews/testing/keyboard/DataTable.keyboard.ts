@@ -27,31 +27,31 @@ type IndexedStory = {
 };
 
 /** The table's stories. */
-const TABLE = "_work_in_progress/DataTable";
+const TABLE = "_work_in_progress/Renderers/DataTable";
 
 /** The sort panel's stories, the path to an ordering without Shift. */
-const SORT_PANEL = "_work_in_progress/DataViews/SortPanel";
+const SORT_PANEL = "_work_in_progress/SortPanel";
 
 /** The filters' stories, the primary fields and the disclosure of the rest. */
-const FILTERS = "_work_in_progress/DataViews/Filters";
+const FILTERS = "_work_in_progress/Filters";
 
 /** The table settings' stories, the path to every arrangement without a drag. */
-const SETTINGS = "_work_in_progress/DataViews/Settings";
+const SETTINGS = "_work_in_progress/Settings";
 
 /** The cards' stories, a collection's records as the design system's cards. */
-const DATA_CARDS = "_work_in_progress/DataCards";
+const DATA_CARDS = "_work_in_progress/Renderers/DataCards";
 
 /** The chart prototype's stories, a field's counts or range beside the filters. */
-const DATA_CHART = "_work_in_progress/DataChart";
+const DATA_CHART = "_work_in_progress/Renderers/DataChart";
 
 /** The chart-with-table stories, a chart and its table behind one switch. */
-const DATA_CHART_WITH_TABLE = "_work_in_progress/DataChartWithTable";
+const DATA_CHART_WITH_TABLE = "_work_in_progress/Renderers/DataChartWithTable";
 
 /** The stories over a REST endpoint, through TanStack Query. */
-const REST_API = "_work_in_progress/DataViews/REST API";
+const REST_API = "_work_in_progress/In context/REST API";
 
 /** The stories over a GraphQL endpoint, through Relay. */
-const GRAPHQL_API = "_work_in_progress/DataViews/GraphQL API";
+const GRAPHQL_API = "_work_in_progress/In context/GraphQL API";
 
 /**
  * The stories this pass walks: the table's own, the sort panel's, the

@@ -17,7 +17,7 @@ import { DataViews } from "../DataViews/index.js";
 import Component from "./DataChartWithTable.js";
 
 const meta = {
-  title: "_work_in_progress/DataChartWithTable",
+  title: "_work_in_progress/Renderers/DataChartWithTable",
   component: Component,
   decorators: [withAppScope],
   argTypes: {

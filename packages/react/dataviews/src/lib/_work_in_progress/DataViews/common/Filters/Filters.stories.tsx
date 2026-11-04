@@ -15,7 +15,7 @@ import Component from "./Filters.js";
 import type { DataViewsFiltersProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Filters",
+  title: "_work_in_progress/Filters",
   component: Component,
   decorators: [withAppScope],
   args: {

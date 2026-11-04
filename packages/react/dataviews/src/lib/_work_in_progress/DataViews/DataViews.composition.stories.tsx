@@ -20,7 +20,7 @@ import { useDataViews } from "./hooks/index.js";
 import Component from "./Provider.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/Composition",
+  title: "_work_in_progress/In context/Composition",
   component: Component,
   decorators: [withAppScope],
   argTypes: {

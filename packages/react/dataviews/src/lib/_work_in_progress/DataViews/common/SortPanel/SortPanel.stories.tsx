@@ -12,7 +12,7 @@ import DataViews from "../../Provider.js";
 import Component from "./SortPanel.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/SortPanel",
+  title: "_work_in_progress/SortPanel",
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<typeof Component>;

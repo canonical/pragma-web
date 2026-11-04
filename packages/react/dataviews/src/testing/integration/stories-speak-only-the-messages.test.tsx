@@ -38,9 +38,9 @@ import * as savedViewsStories from "../../lib/_work_in_progress/DataViews/common
 import * as searchStories from "../../lib/_work_in_progress/DataViews/common/Search/Search.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as sortPanelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
+import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
-import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
 import {
   createGraphQLHandlers,

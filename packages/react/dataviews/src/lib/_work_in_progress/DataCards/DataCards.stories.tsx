@@ -31,7 +31,7 @@ import Component from "./DataCards.js";
 import type { DataCardsProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/DataCards",
+  title: "_work_in_progress/Renderers/DataCards",
   component: Component,
   decorators: [withAppScope],
   args: {

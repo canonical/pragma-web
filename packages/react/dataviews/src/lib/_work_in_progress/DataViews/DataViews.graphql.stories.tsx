@@ -19,7 +19,7 @@ import { createGraphQLMachineSource } from "../../../storybook/machines/sources/
 import Component from "./Provider.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews/GraphQL API",
+  title: "_work_in_progress/In context/GraphQL API",
   component: Component,
   decorators: [withAppScope],
   argTypes: {
