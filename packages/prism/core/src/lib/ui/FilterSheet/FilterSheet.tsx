@@ -6,7 +6,6 @@ import {
   type KeyboardEvent,
   type ReactElement,
   useEffect,
-  useId,
   useRef,
 } from "react";
 import { useMessages } from "../../i18n/index.js";
@@ -40,7 +39,6 @@ export default function FilterSheet({
 }: FilterSheetProps): ReactElement {
   const t = useMessages();
   const router = useRouter<RouteMap, AnyRoute>();
-  const titleId = useId();
   const title = useRef<HTMLHeadingElement>(null);
   const { pathname, search } = useViewLocation();
   const closeHref = buildViewHref(pathname, {
@@ -66,7 +64,7 @@ export default function FilterSheet({
 
   return (
     <dialog
-      aria-labelledby={titleId}
+      aria-label={t("filterSheet.title")}
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       data-region="filter-sheet"
@@ -74,7 +72,7 @@ export default function FilterSheet({
       open={open}
     >
       <div className="header">
-        <h2 className="title" id={titleId} ref={title} tabIndex={-1}>
+        <h2 className="title" ref={title} tabIndex={-1}>
           {t("filterSheet.title")}
         </h2>
         <RouterLink href={closeHref}>{t("filterSheet.close")}</RouterLink>
