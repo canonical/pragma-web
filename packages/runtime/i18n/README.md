@@ -6,8 +6,8 @@ API. Zero runtime dependencies.
 
 `i18n-core` owns everything that is not framework reactivity — locale
 negotiation, message catalogs and translation, memoized formatters, and a live
-locale source. React, Svelte, and Lit bindings stay thin and share this one
-engine.
+locale source. The React binding, `@canonical/i18n-react`, stays thin and
+shares this one engine; a binding for another framework would do the same.
 
 ## Installation
 
@@ -95,9 +95,9 @@ const unsubscribe = source.subscribe((next) => render(next));
 source.set("ar"); // notifies subscribers; persists + reflects dir="rtl"
 ```
 
-On the server, create one source **per request** — the React/Svelte/Lit
-bindings already do this. A module-level singleton shared across concurrent
-requests leaks locale state between them.
+On the server, create one source **per request** — the React binding's
+`I18nProvider` already does this. A module-level singleton shared across
+concurrent requests leaks locale state between them.
 
 ## Server-side rendering
 
