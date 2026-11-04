@@ -41,6 +41,7 @@ import * as sortPanelStories from "../../lib/_work_in_progress/DataViews/common/
 import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
+import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
 import {
   createGraphQLHandlers,
@@ -72,6 +73,7 @@ serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
 /** Every story of the package, by the part it shows. */
 const parts = {
+  DataViews: composeStories(rootStories),
   DataTable: composeStories(tableStories),
   PaginationBar: composeStories(barStories),
   Composition: composeStories(compositionStories),
@@ -99,6 +101,8 @@ const AUTHORED_ANYWHERE: readonly string[] = ["Search machines"];
 /** What one part's stories write themselves, beside the text every story may. */
 const AUTHORED: Readonly<Record<string, readonly string[]>> = {
   Actions: ["Delete", "machines selected"],
+  // The root's own story places a child that counts the page's rows.
+  DataViews: ["machines on this page"],
   // The cards' stories place a switch of their own, named the same way, and
   // one story's own cell writes a sentence saying the record's "from".
   DataCards: [

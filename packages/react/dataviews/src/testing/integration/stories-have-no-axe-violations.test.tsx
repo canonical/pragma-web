@@ -30,6 +30,7 @@ import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/S
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
+import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -45,6 +46,7 @@ serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
 /** The stories checked as first rendered, by the part they show. */
 const rendered = {
+  DataViews: composeStories(rootStories),
   DataTable: composeStories(tableStories),
   SortPanel: composeStories(panelStories),
   Settings: composeStories(settingsStories),
