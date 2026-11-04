@@ -45,16 +45,16 @@ export default function createFormatters(locale: Locale): Formatters {
   );
 
   return {
-    number: (value, options) => getNumberFormat(options).format(value),
-    currency: (value, currency, options) =>
+    formatNumber: (value, options) => getNumberFormat(options).format(value),
+    formatCurrency: (value, currency, options) =>
       getNumberFormat({ ...options, style: "currency", currency }).format(
         value,
       ),
-    date: (value, options) => getDateFormat(options).format(value),
-    time: (value, options) =>
+    formatDate: (value, options) => getDateFormat(options).format(value),
+    formatTime: (value, options) =>
       getDateFormat(options ?? { timeStyle: "short" }).format(value),
-    relativeTime: (value, unit, options) =>
+    formatRelativeTime: (value, unit, options) =>
       getRelativeTimeFormat(options).format(value, unit),
-    list: (items, options) => getListFormat(options).format([...items]),
+    formatList: (items, options) => getListFormat(options).format([...items]),
   };
 }
