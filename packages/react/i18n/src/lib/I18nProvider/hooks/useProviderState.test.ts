@@ -45,6 +45,17 @@ describe("useProviderState", () => {
     expect(result.current.source).toBe(source);
   });
 
+  it("leaves the document as an external source reflected it", () => {
+    const source = createLocaleSource(localeConfig, {
+      persist: false,
+      initial: "ar",
+    });
+    expect(document.documentElement.lang).toBe("ar");
+    renderHook(() => useProviderState({ ...base, source }));
+    expect(document.documentElement.lang).toBe("ar");
+    expect(document.documentElement.dir).toBe("rtl");
+  });
+
   it("passes on the catalogs it is given", () => {
     const { result } = renderHook(() =>
       useProviderState({ ...base, catalogs: greetingCatalogs }),
