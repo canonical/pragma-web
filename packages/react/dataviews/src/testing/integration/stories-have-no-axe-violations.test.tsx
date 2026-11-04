@@ -23,6 +23,7 @@ import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
+import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
@@ -55,6 +56,7 @@ const played = {
   "GraphQL API": composeStories(graphqlStories),
   DataCards: composeStories(dataCardsStories),
   DataChart: composeStories(dataChartStories),
+  DataChartWithTable: composeStories(dataChartWithTableStories),
   Filters: Object.fromEntries(
     Object.entries(composeStories(filtersStories)).filter(([name]) =>
       FACETED_FILTER_STORIES.has(name),

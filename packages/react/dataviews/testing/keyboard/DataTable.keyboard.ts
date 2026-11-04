@@ -44,6 +44,9 @@ const DATA_CARDS = "_work_in_progress/DataCards";
 /** The chart prototype's stories, a field's counts or range beside the filters. */
 const DATA_CHART = "_work_in_progress/DataChart";
 
+/** The chart-with-table stories, a chart and its table behind one switch. */
+const DATA_CHART_WITH_TABLE = "_work_in_progress/DataChartWithTable";
+
 /** The stories over a REST endpoint, through TanStack Query. */
 const REST_API = "_work_in_progress/DataViews/REST API";
 
@@ -62,6 +65,7 @@ const TITLES: readonly string[] = [
   SETTINGS,
   DATA_CARDS,
   DATA_CHART,
+  DATA_CHART_WITH_TABLE,
   REST_API,
   GRAPHQL_API,
 ];
@@ -810,6 +814,34 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(summary).toHaveText("Showing 1–3 out of 3 rows");
     // The chart still counts every machine, filtered or not.
     await expect(running).toContainText("6");
+  });
+
+  test("DataChartWithTable Default: Enter on Table shows the table, Space on Chart brings the chart back, focus stays on the choice", async ({
+    page,
+  }) => {
+    await openStory(page, findStory(DATA_CHART_WITH_TABLE, "Default").id);
+    const choice = page.getByRole("group", { name: "Show as", exact: true });
+    const chart = choice.getByRole("button", { name: "Chart", exact: true });
+    const table = choice.getByRole("button", { name: "Table", exact: true });
+    // The story's own play function ends back on the chart; start from there.
+    await expect(chart).toHaveAttribute("aria-pressed", "true");
+    await tabTo(page, table);
+    await page.keyboard.press("Enter");
+    await expect(table).toHaveAttribute("aria-pressed", "true");
+    await expect(table).toBeFocused();
+    await expect(
+      page.getByRole("region", { name: "Table", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Chart", exact: true }),
+    ).toHaveCount(0);
+    await tabTo(page, chart);
+    await page.keyboard.press("Space");
+    await expect(chart).toHaveAttribute("aria-pressed", "true");
+    await expect(chart).toBeFocused();
+    await expect(
+      page.getByRole("figure", { name: "Machines by status" }),
+    ).toBeVisible();
   });
 
   test("SortPanel Default: Enter and Space move a term up, focus kept or handed to its Remove", async ({

@@ -1,0 +1,90 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DataChartWithTable.stories";
+
+<Meta of={Stories} name="Recipes" />
+
+# DataChartWithTable recipes
+
+`DataChartWithTable` puts a `DataChart` and a `DataTable` behind one switch: the chart is shown first, and the table of its records is a press away. It is a work-in-progress prototype: it is not exported from the package root, and its shape may change or it may be withdrawn.
+
+## A chart and its table over one provider
+
+Give it one provider, the chart's own props in `chartProps` and the table's own in `tableProps`. Each takes everything it takes on its own, less the provider and the words, which come from here. Both read the same provider, so choosing asks the source for nothing: one query, one result, one selection.
+
+```tsx
+import {
+  createArraySource,
+  createDataViewsProvider,
+} from "@canonical/dataviews-core";
+import type { DataTableColumn } from "@canonical/dataviews-react";
+import { useState } from "react";
+import { machineCollection, machines } from "./machines.js";
+// A work-in-progress prototype: not yet exported from the package root.
+import { DataChartWithTable } from "./DataChartWithTable.js";
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "status", header: "Status" },
+  { id: "cores", header: "Cores" },
+];
+
+export function Machines() {
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: machineCollection,
+      source: createArraySource({ rows: machines, collection: machineCollection }),
+      facets: ["status", "cores"],
+    }),
+  );
+  return (
+    <DataChartWithTable
+      provider={provider}
+      chartProps={{ type: "bar", field: "status", label: "Machines by status" }}
+      tableProps={{ columns, label: "Machines" }}
+    />
+  );
+}
+```
+
+<Canvas of={Stories.Default} sourceState="none" />
+
+`chartProps` takes either type of chart: a number field's range draws the same way.
+
+<Canvas of={Stories.RangeOrTable} sourceState="none" />
+
+## Choosing the table
+
+Pressing "Table" draws the table in place of the chart and keeps the focus on the button. A row selected in the table stays selected when the chart is shown and the table comes back, since the selection is the provider's. The choice is held while the part is mounted, and is written to neither the URL nor a saved view.
+
+## Inside a root
+
+The connected `DataChartWithTable` reads the enclosing `DataViews` root, so it sits beside the root's filters and pagination. Keeping only the failed machines narrows the table, while the chart still counts every status, since a facet lifts its own field's filter.
+
+<Canvas of={Stories.BesideFilters} sourceState="none" />
+
+While no result answers the query, the chart shows the core's status in place of its drawing.
+
+<Canvas of={Stories.Loading} sourceState="none" />
+
+## Without scripting
+
+The server draws both the chart and the table, each in a region named for it ("Chart" and "Table"), and no button, since there is nothing to choose with. Once scripts run, whichever region holds the focus becomes the chosen one, so nothing the reader is in leaves the page under them.
+
+## The segmented choice
+
+The choice comes after the renderers in the page and sits at their inline end, bottom right in a left-to-right page, so what is read and what is seen keep one order. It is a group named by `label`, or the words' own "Show as", of one design-system `Button` per renderer, named by the words `chartRenderer` and `tableRenderer`. The chosen one is pressed (`aria-pressed`) and primary, the other secondary, so the state is not carried by colour alone. Each button is a Tab stop that Enter and Space press.
+
+A design finding: the design system names a `SegmentedControlInput`, but no library implements it yet. The switch adopts it once one does.
+
+## Provisional coverage
+
+These notes are provisional, recorded for a prototype.
+
+| Surface | Principal criteria | Behaviour today |
+|---|---|---|
+| Choice group | 1.3.1, 4.1.2 | A group named by `label` or the words' own `renderer` |
+| Choice buttons | 1.4.1, 2.1.1, 4.1.2 | One native button per renderer, named by the words; the chosen one pressed and primary, so its state is not colour alone; Tab, Enter and Space reach and press each |
+| Order and focus | 1.3.2, 2.4.3 | The choice follows the renderers in the page as on screen; pressing keeps the focus on the pressed button |
+| Renderer regions | 1.3.1 | The chart and the table each in a region named for it; both drawn, in turn, without scripting |
+| Chart figure | 1.1.1, 1.3.1 | The chart keeps its caption, and its own numbers table as its text alternative |
+| Table | 1.3.1, 4.1.2 | The `DataTable` over the same provider, with its own baseline |

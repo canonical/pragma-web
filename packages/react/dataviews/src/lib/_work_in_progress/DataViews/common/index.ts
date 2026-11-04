@@ -1,6 +1,7 @@
 export * from "./Actions/index.js";
 export * from "./DataCards/index.js";
 export * from "./DataChart/index.js";
+export * from "./DataChartWithTable/index.js";
 export * from "./DataTable/index.js";
 export * from "./Filters/index.js";
 export * from "./HiddenQueryFields/index.js";
