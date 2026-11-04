@@ -4,7 +4,7 @@
 // system's layers reach the browser through the client bundle's stylesheet,
 // which the renderer links from the built HTML.
 import "#styles/app.css";
-import { documentAttrs, isSupportedLocale } from "@canonical/i18n-core";
+import { getDocumentAttributes, isSupportedLocale } from "@canonical/i18n-core";
 import { I18nProvider } from "@canonical/i18n-react";
 import { HeadProvider } from "@canonical/react-head";
 import type { ServerEntrypointProps } from "@canonical/react-ssr/renderer";
@@ -258,7 +258,7 @@ export default function EntryServer(props: ServerEntrypointProps<InitialData>) {
   // `<html lang dir>` must be right on first paint for assistive technology
   // and RTL locales; after hydration the client's locale source keeps both
   // attributes in sync with every switch.
-  const { lang, dir } = documentAttrs(i18nConfig, locale);
+  const { lang, dir } = getDocumentAttributes(i18nConfig, locale);
 
   // The root declaration plus the theme, on one element. `app` is the context
   // and `comfortable` the density; together they choose the --density-* channel

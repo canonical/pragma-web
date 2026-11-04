@@ -91,7 +91,7 @@ in the browser, persists the choice to a cookie and flips `<html dir>` for RTL
 locales — all via the shared `@canonical/i18n-core` source.
 
 For a correct first paint, set `<html lang dir>` on the server from the
-negotiated locale with `documentAttrs` (see the
+negotiated locale with `getDocumentAttributes` (see the
 [`@canonical/i18n-core` README](../../runtime/i18n/README.md#server-side-rendering)).
 
 ## License
