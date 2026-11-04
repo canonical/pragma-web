@@ -3,7 +3,7 @@ import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import { useMachineProvider } from "../../../storybook/machines/story-utils.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import { DataViews } from "../DataViews/index.js";
 import Component from "./RendererSwitch.js";

@@ -7,21 +7,19 @@ import {
   createRestHandlers,
 } from "../../../storybook/machines/api/index.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import {
-  createEmptySource,
-  createFailingSource,
-  createPendingSource,
-  type Machine,
-  type MachineFields,
-  machineCollection,
-} from "../../../storybook/machines/fixtures.js";
+import createEmptySource from "../../../storybook/machines/createEmptySource.js";
+import createFailingSource from "../../../storybook/machines/createFailingSource.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
+import { machineCollection } from "../../../storybook/machines/fixtures.js";
+import hostName from "../../../storybook/machines/hostName.js";
 import readPaginationSummary from "../../../storybook/machines/readPaginationSummary.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
-import {
-  hostName,
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProviderConfig,
+} from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
