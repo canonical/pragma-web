@@ -33,6 +33,7 @@ export type {
   FilterHandle,
   FilterHandles,
   FilterInputState,
+  FurtherConjunct,
 } from "./filter/index.js";
 export type {
   HistoryMode,

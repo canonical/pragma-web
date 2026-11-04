@@ -31,13 +31,17 @@ const hostThat = (answer: readonly SourceRefusal[] = []) => ({
   >(() => answer),
 });
 
-const cpuAtLeast = (host = hostThat()) => ({
+/** No conjunct stands at the record's address. */
+const readNone = (): readonly Predicate[] => [];
+
+const cpuAtLeast = (host = hostThat(), readConjuncts = readNone) => ({
   host,
   input: createFilterInput({
     schema: machines.schema,
     field: "cpu",
     operator: "gte",
     host,
+    readConjuncts,
   }),
 });
 
@@ -49,6 +53,7 @@ describe("createFilterInput", () => {
         field: "memory",
         operator: "gte",
         host: hostThat(),
+        readConjuncts: readNone,
       }),
     ).toThrow('the schema has no field "memory" to filter');
   });
@@ -58,7 +63,7 @@ describe("createFilterInput", () => {
     input.edit("4");
     expect(host.setPredicate).toHaveBeenCalledWith(
       { field: "cpu", operator: "gte", operands: [4] },
-      undefined,
+      0,
       undefined,
     );
     expect(input.state.get()).toEqual({
@@ -155,13 +160,66 @@ describe("createFilterInput", () => {
     const { host, input } = cpuAtLeast();
     input.edit("4");
     expect(input.clear()).toEqual([]);
-    expect(host.removePredicate).toHaveBeenCalledWith("cpu", "gte");
+    expect(host.removePredicate).toHaveBeenCalledWith("cpu", "gte", 0);
     expect(input.state.get()).toEqual({
       input: "",
       feedback: { status: "none" },
     });
     expect(input.predicate).toBeNull();
     expect(input.applied.get()).toEqual({ kind: "empty" });
+  });
+
+  it("edits and clears the conjunct it holds, at its place among the others", () => {
+    const four: Predicate = { field: "cpu", operator: "gte", operands: [4] };
+    const eight: Predicate = { field: "cpu", operator: "gte", operands: [8] };
+    const { host, input } = cpuAtLeast(hostThat(), () => [four, eight]);
+    input.setApplied(eight);
+    input.edit("16");
+    expect(host.setPredicate).toHaveBeenLastCalledWith(
+      { field: "cpu", operator: "gte", operands: [16] },
+      1,
+      undefined,
+    );
+    input.setApplied(eight);
+    input.clear();
+    expect(host.removePredicate).toHaveBeenLastCalledWith("cpu", "gte", 1);
+  });
+
+  it("edits the first conjunct when the one it held no longer stands", () => {
+    const four: Predicate = { field: "cpu", operator: "gte", operands: [4] };
+    const { host, input } = cpuAtLeast(hostThat(), () => [four]);
+    input.setApplied({ field: "cpu", operator: "gte", operands: [8] });
+    input.edit("16");
+    expect(host.setPredicate).toHaveBeenLastCalledWith(
+      { field: "cpu", operator: "gte", operands: [16] },
+      0,
+      undefined,
+    );
+  });
+
+  it("reads as its predicate the one on its way while the host hears it", () => {
+    const host = hostThat();
+    const { input } = cpuAtLeast(host);
+    const heard: (Predicate | null)[] = [];
+    host.setPredicate.mockImplementation(() => {
+      heard.push(input.predicate);
+      return [];
+    });
+    input.edit("4");
+    expect(heard).toEqual([{ field: "cpu", operator: "gte", operands: [4] }]);
+  });
+
+  it("keeps a conjunct promoted to its place while the host hears a clear", () => {
+    const host = hostThat();
+    const { input } = cpuAtLeast(host);
+    input.edit("4");
+    host.removePredicate.mockImplementation(() => {
+      input.setApplied({ field: "cpu", operator: "gte", operands: [8] });
+      return [];
+    });
+    input.clear();
+    expect(input.state.get().input).toBe("8");
+    expect(input.applied.get()).toEqual({ kind: "value", value: 8 });
   });
 
   it("adopts an external predicate and discards the stale input", () => {
@@ -189,6 +247,7 @@ describe("createFilterInput", () => {
       field: "owner",
       operator: "isSet",
       host,
+      readConjuncts: readNone,
     });
     owner.setApplied({ field: "owner", operator: "isSet", operands: [] });
     expect(owner.state.get().input).toBe("");
@@ -225,6 +284,7 @@ describe("createFilterInput", () => {
       field: "status",
       operator: "isAny",
       host,
+      readConjuncts: readNone,
     });
     const seen = vi.fn();
     status.applied.subscribe(seen);
@@ -254,7 +314,7 @@ describe("createFilterInput", () => {
     /** One call of the host, entering history as `history` says. */
     const readCall = (operands: number[], history?: "replace") => [
       buildGte(operands),
-      undefined,
+      0,
       history,
     ];
 
