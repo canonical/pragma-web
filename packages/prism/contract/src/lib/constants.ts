@@ -55,17 +55,6 @@ export const BUILD_LAYOUT_PREFIX = "../../..";
  * and this return type.
  */
 export const PROVIDER_EXTENSIONS = {
-  /** The long-form Markdown authored for one entity, per language. */
-  prose: { args: [["uri", "ID!"]], type: "Prose" },
-  /** The nodes whose text matches a query, one page at a time. */
-  search: {
-    args: [
-      ["text", "String!"],
-      ["first", "Int"],
-      ["after", "String"],
-    ],
-    type: "NodeConnection!",
-  },
   /** One entity's statements as Turtle, or null when the graph holds none. */
   source: { args: [["uri", "ID!"]], type: "String" },
 } as const;

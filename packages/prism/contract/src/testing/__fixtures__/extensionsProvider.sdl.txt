@@ -1,10 +1,3 @@
-"Long-form Markdown authored for one entity."
-type Prose {
-  markdown(lang: String): String!
-}
-
 extend type Query {
-  prose(uri: ID!): Prose
-  search(text: String!, first: Int, after: String): NodeConnection!
   source(uri: ID!): String
 }

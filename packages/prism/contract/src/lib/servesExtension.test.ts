@@ -16,14 +16,10 @@ const extendedSdl = `${contractSdl}\n${readFileSync(
 
 describe("servesExtension", () => {
   it("finds each extension a provider declares with its signature", () => {
-    expect(servesExtension(extendedSdl, "prose")).toBe(true);
-    expect(servesExtension(extendedSdl, "search")).toBe(true);
     expect(servesExtension(extendedSdl, "source")).toBe(true);
   });
 
   it("finds none on the bare contract", () => {
-    expect(servesExtension(contractSdl, "prose")).toBe(false);
-    expect(servesExtension(contractSdl, "search")).toBe(false);
     expect(servesExtension(contractSdl, "source")).toBe(false);
   });
 
@@ -42,11 +38,11 @@ describe("servesExtension", () => {
     expect(servesExtension(sdl, "source")).toBe(false);
   });
 
-  it("refuses a field with arguments in another order or number", () => {
-    const reordered = `${contractSdl}\nextend type Query { search(first: Int, text: String!, after: String): NodeConnection! }`;
-    const shorter = `${contractSdl}\nextend type Query { search(text: String!): NodeConnection! }`;
-    expect(servesExtension(reordered, "search")).toBe(false);
-    expect(servesExtension(shorter, "search")).toBe(false);
+  it("refuses a field with another number of arguments", () => {
+    const longer = `${contractSdl}\nextend type Query { source(uri: ID!, lang: String): String }`;
+    const shorter = `${contractSdl}\nextend type Query { source: String }`;
+    expect(servesExtension(longer, "source")).toBe(false);
+    expect(servesExtension(shorter, "source")).toBe(false);
   });
 
   it("refuses an SDL that does not parse", () => {

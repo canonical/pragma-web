@@ -6,7 +6,5 @@ import type { ProviderExtension } from "@canonical/prism-contract";
  * `source`) only when they are here. A test pins this list to the schema.
  */
 export const SITE_EXTENSIONS = [
-  "prose",
-  "search",
   "source",
 ] as const satisfies readonly ProviderExtension[];

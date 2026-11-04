@@ -23,7 +23,7 @@ const SiteRenderers = ({
 }): ReactElement => (
   <RenderersProvider
     defaults={{ list: useListRenderers(), page: usePageRenderers() }}
-    extensions={["prose", "search", "source"]}
+    extensions={["source"]}
   >
     {children}
   </RenderersProvider>

@@ -14,12 +14,12 @@ describe("listServedExtensions", () => {
       ),
       "utf8",
     )}`;
-    expect(listServedExtensions(sdl)).toEqual(["prose", "search", "source"]);
+    expect(listServedExtensions(sdl)).toEqual(["source"]);
   });
 
-  it("lists only the extensions a provider serves", () => {
-    const sdl = `${contractSdl}\nextend type Query { source(uri: ID!): String }`;
-    expect(listServedExtensions(sdl)).toEqual(["source"]);
+  it("lists no extension a provider serves with another signature", () => {
+    const sdl = `${contractSdl}\nextend type Query { source(uri: ID!): String! }`;
+    expect(listServedExtensions(sdl)).toEqual([]);
   });
 
   it("lists nothing for the bare contract", () => {

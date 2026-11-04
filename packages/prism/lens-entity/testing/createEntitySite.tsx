@@ -56,7 +56,7 @@ export default function createEntitySite({
   layout,
   navigable = false,
   history,
-  extensions = ["prose", "search", "source"],
+  extensions = ["source"],
 }: EntitySiteSetup): ReactElement {
   const router = navigable
     ? createRouter(SITE_ROUTES, {

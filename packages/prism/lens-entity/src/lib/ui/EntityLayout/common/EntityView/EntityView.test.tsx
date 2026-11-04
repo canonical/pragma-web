@@ -11,7 +11,7 @@ import EntityView from "./EntityView.js";
 const renderView = (
   url: string,
   element: Parameters<typeof EntityView>[0],
-  extensions?: readonly ("prose" | "search" | "source")[],
+  extensions?: readonly "source"[],
 ) =>
   render(
     createEntitySite({
@@ -61,7 +61,7 @@ describe("EntityView", () => {
     const { container } = renderView(
       "/stations/metro%3Anorthgate",
       { kind: "page" },
-      ["prose", "search"],
+      [],
     );
     expect(container).toBeEmptyDOMElement();
   });
