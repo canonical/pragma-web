@@ -1,4 +1,4 @@
-import type { Formatters, Locale } from "./types.js";
+import type { Formatters, Locale, PluralRecord } from "./types.js";
 
 /**
  * Wrap an `Intl` constructor in an options-keyed cache. Building `Intl`
@@ -83,6 +83,19 @@ export default function createFormatters(locale: Locale): Formatters {
   const getListFormat = memoizeByOptions(
     (options?: Intl.ListFormatOptions) => new Intl.ListFormat(locale, options),
   );
+  const getPluralRules = memoizeByOptions(
+    (options?: Intl.PluralRulesOptions) =>
+      new Intl.PluralRules(locale, options),
+  );
+
+  /** Select the form of `forms` that `rules` picks for `value`. */
+  const selectForm = (
+    rules: Intl.PluralRules,
+    value: number,
+    forms: PluralRecord,
+  ): string => {
+    return forms[rules.select(value)] ?? forms.other;
+  };
 
   return {
     formatNumber: (value, options) => getNumberFormat(options).format(value),
@@ -96,5 +109,6 @@ export default function createFormatters(locale: Locale): Formatters {
     formatRelativeTime: (value, unit, options) =>
       getRelativeTimeFormat(options).format(value, unit),
     formatList: (items, options) => getListFormat(options).format([...items]),
+    selectPlural: (count, forms) => selectForm(getPluralRules(), count, forms),
   };
 }

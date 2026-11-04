@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { arabicItemForms } from "../../testing/fixtures.js";
 import createFormatters from "./createFormatters.js";
 
 describe("createFormatters", () => {
@@ -107,5 +108,38 @@ describe("createFormatters", () => {
     formatters.formatCurrency(5, "USD"); // distinct options → one more instance
 
     expect(constructed).toBe(2);
+  });
+
+  describe("selectPlural", () => {
+    it("selects an English plural form by count", () => {
+      const wordItems = (count: number) =>
+        en.selectPlural(count, {
+          one: `${count} item`,
+          other: `${count} items`,
+        });
+      expect(wordItems(1)).toBe("1 item");
+      expect(wordItems(5)).toBe("5 items");
+    });
+
+    it("uses locale-specific plural categories", () => {
+      const ar = createFormatters("ar");
+      expect(ar.selectPlural(0, arabicItemForms)).toBe("لا عناصر");
+      expect(ar.selectPlural(1, arabicItemForms)).toBe("عنصر");
+      expect(ar.selectPlural(2, arabicItemForms)).toBe("عنصران");
+      expect(ar.selectPlural(3, arabicItemForms)).toBe("3 عناصر");
+      expect(ar.selectPlural(11, arabicItemForms)).toBe("11 عنصرًا");
+      expect(ar.selectPlural(100, arabicItemForms)).toBe("100 عنصر");
+    });
+
+    it("falls back to other when the selected category is undefined", () => {
+      const ar = createFormatters("ar");
+      expect(ar.selectPlural(3, { other: "3 other" })).toBe("3 other");
+    });
+
+    it("selects other for a count that is not a finite number", () => {
+      expect(en.selectPlural(Number.NaN, { one: "one", other: "other" })).toBe(
+        "other",
+      );
+    });
   });
 });
