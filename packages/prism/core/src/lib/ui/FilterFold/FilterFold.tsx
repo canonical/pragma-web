@@ -38,7 +38,7 @@ export default function FilterFold({
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       href={href}
     >
-      {`${t("filterFold.label")} ${t("filterFold.separator")} ${count}`}
+      {t("filterFold.label", { count: String(count) })}
     </RouterLink>
   );
 }
