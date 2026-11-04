@@ -29,6 +29,10 @@ function SwitchTo({ locale }: { locale: Locale }): React.ReactElement {
 }
 
 describe("I18nProvider", () => {
+  it("shows as I18nProvider in React DevTools and component stacks", () => {
+    expect(I18nProvider.displayName).toBe("I18nProvider");
+  });
+
   it("renders translated content for the default locale", () => {
     render(
       <I18nProvider config={config} catalogs={catalogs}>
