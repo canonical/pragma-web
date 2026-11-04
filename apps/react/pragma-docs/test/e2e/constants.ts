@@ -62,8 +62,8 @@ export const DOCUMENT_PATHS = [
   "/playground",
 ] as const;
 
-/** The Components catalog, whose cards must fill their rows. */
-export const CATALOG_PATH = "/components";
+/** The Components catalog as cards, which must fill their rows. */
+export const CATALOG_PATH = "/components?as=cards";
 
 /** The catalog's cards, as the layout's fill check reads them. */
 export const CATALOG_CARD_SELECTOR =
