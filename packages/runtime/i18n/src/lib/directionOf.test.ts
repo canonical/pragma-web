@@ -1,12 +1,9 @@
 import { describe, expect, it } from "vitest";
+import {
+  rightToLeftConfig as config,
+  unlistedDirectionConfig,
+} from "../../testing/fixtures.js";
 import directionOf from "./directionOf.js";
-import type { I18nConfig } from "./types.js";
-
-const config: I18nConfig = {
-  locales: ["en", "ar"],
-  defaultLocale: "en",
-  rtlLocales: ["ar", "he"],
-};
 
 describe("directionOf", () => {
   it("returns ltr for an undefined locale", () => {
@@ -23,8 +20,6 @@ describe("directionOf", () => {
   });
 
   it("returns ltr when no rtl locales are configured", () => {
-    expect(directionOf({ locales: ["ar"], defaultLocale: "ar" }, "ar")).toBe(
-      "ltr",
-    );
+    expect(directionOf(unlistedDirectionConfig, "ar")).toBe("ltr");
   });
 });

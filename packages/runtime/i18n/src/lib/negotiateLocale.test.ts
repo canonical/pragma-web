@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import {
+  negotiationConfig as config,
+  regionalOnlyConfig,
+} from "../../testing/fixtures.js";
 import negotiateLocale from "./negotiateLocale.js";
 import type { I18nConfig } from "./types.js";
-
-const config: I18nConfig = { locales: ["en", "fr", "ar"], defaultLocale: "en" };
 
 describe("negotiateLocale", () => {
   it("prefers a supported locale cookie above all else", () => {
@@ -34,14 +36,15 @@ describe("negotiateLocale", () => {
   });
 
   it("negotiates case-insensitively and returns the configured casing", () => {
-    const cased: I18nConfig = { locales: ["en", "fr-CA"], defaultLocale: "en" };
-    expect(negotiateLocale(cased, { acceptLanguage: "fr-CA,en;q=0.5" })).toBe(
-      "fr-CA",
-    );
-    expect(negotiateLocale(cased, { acceptLanguage: "fr-FR" })).toBe("en");
-    expect(negotiateLocale(cased, { cookieHeader: "locale=fr-ca" })).toBe(
-      "fr-CA",
-    );
+    expect(
+      negotiateLocale(regionalOnlyConfig, { acceptLanguage: "fr-CA,en;q=0.5" }),
+    ).toBe("fr-CA");
+    expect(
+      negotiateLocale(regionalOnlyConfig, { acceptLanguage: "fr-FR" }),
+    ).toBe("en");
+    expect(
+      negotiateLocale(regionalOnlyConfig, { cookieHeader: "locale=fr-ca" }),
+    ).toBe("fr-CA");
   });
 
   it("uses a custom cookie name from config", () => {
