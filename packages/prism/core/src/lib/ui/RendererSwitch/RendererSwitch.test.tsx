@@ -73,6 +73,14 @@ describe("RendererSwitch", () => {
     expect(container.querySelector("summary")?.textContent).toBe("Cards");
   });
 
+  it("marks the default current for a renderer it does not offer", () => {
+    const { container } = renderAt(
+      "/catalog?as=graph",
+      <RendererSwitch active="graph" renderers={RENDERERS} />,
+    );
+    expect(container.querySelector("summary")?.textContent).toBe("Table");
+  });
+
   it("takes its accessible name from the label when given", () => {
     renderAt(
       "/catalog",
@@ -88,7 +96,9 @@ describe("RendererSwitch", () => {
     );
     const details = container.querySelector("details");
     if (details === null) throw new Error("no menu");
-    details.open = true;
+    fireEvent.click(screen.getByText("Table", { selector: "summary" }));
+    fireEvent(details, new Event("toggle"));
+    expect(details.open).toBe(true);
     fireEvent.click(
       within(screen.getByRole("list", { name: "Show as" })).getByRole("link", {
         name: "Cards",
