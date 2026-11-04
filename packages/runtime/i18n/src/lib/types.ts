@@ -72,23 +72,42 @@ export type Translations<T, L extends Locale = Locale> = {
   readonly [K in L]: T;
 };
 
-/** A single catalog entry: a flat string or a count-sensitive plural record. */
+/**
+ * A single catalog entry: a flat string or a count-sensitive plural record.
+ *
+ * @deprecated Write a typed message record instead: a {@link MessageRecord}
+ * per locale, collected in {@link Translations}. Catalogs keep working until
+ * a later release removes them.
+ */
 export type MessageValue = string | PluralRecord;
 
 /**
  * A flat map of message keys to values for one locale. Keys are dotted
  * namespaces by convention (e.g. `"nav.home"`); the engine treats them as
  * opaque strings.
+ *
+ * @deprecated Write a typed message record instead: a {@link MessageRecord}
+ * per locale, collected in {@link Translations}. Catalogs keep working until
+ * a later release removes them.
  */
 export type Messages = Record<string, MessageValue>;
 
 /**
  * Values interpolated into `{placeholder}` slots. A `count` value additionally
  * drives plural selection for a {@link PluralRecord} entry.
+ *
+ * @deprecated A message in a {@link MessageRecord} takes its facts as typed
+ * arguments instead. Catalogs keep working until a later release removes them.
  */
 export type TranslateVars = Record<string, string | number>;
 
-/** Resolves a message key (with optional variables) to a localized string. */
+/**
+ * Resolves a message key (with optional variables) to a localized string.
+ *
+ * @deprecated Read a typed {@link MessageRecord} by member instead, so `tsc`
+ * checks the key and its facts. Catalogs keep working until a later release
+ * removes them.
+ */
 export type Translator = (key: string, vars?: TranslateVars) => string;
 
 /**
