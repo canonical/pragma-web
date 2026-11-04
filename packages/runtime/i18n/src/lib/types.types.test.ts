@@ -99,6 +99,7 @@ describe("Formatters", () => {
       | "formatRelativeTime"
       | "formatList"
       | "selectPlural"
+      | "selectOrdinal"
     >();
   });
 
@@ -144,6 +145,12 @@ describe("Formatters", () => {
   it("selects a plural form by count from a plural record", () => {
     expectTypeOf<Formatters["selectPlural"]>().toEqualTypeOf<
       (count: number, forms: PluralRecord) => string
+    >();
+  });
+
+  it("selects an ordinal form by position from a plural record", () => {
+    expectTypeOf<Formatters["selectOrdinal"]>().toEqualTypeOf<
+      (position: number, forms: PluralRecord) => string
     >();
   });
 });
