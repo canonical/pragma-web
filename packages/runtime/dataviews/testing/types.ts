@@ -1,15 +1,10 @@
-/**
- * Test-only shapes: what a manual source records and answers with, what a
- * counting view store reports, what a recording location port records, how
- * often a set of counted rows was read, a promise a test settles on cue, and
- * the row a settled page carries.
- * Named here so a test file imports one place for them.
- */
+/** Test-only shapes, named here so a test file imports one place for them. */
 
 import type { Mock } from "vitest";
 import type { HistoryMode, QueryLocation } from "../src/lib/location/index.js";
-import type { Query } from "../src/lib/query/index.js";
+import type { Query, Slice } from "../src/lib/query/index.js";
 import type {
+  QueryIssue,
   SourceDelivery,
   SourcePage,
   SourceRefusal,
@@ -113,3 +108,14 @@ export type CountedRows = {
 
 /** The row a settled page carries: an identity and nothing else. */
 export type SettledRow = { readonly id: string };
+
+/**
+ * One link as the wire grammar reads it: the parameters, the query and the
+ * issues they decode to, and the parameters written back over them.
+ */
+export type LinkReading = {
+  readonly params: string;
+  readonly slice: Slice;
+  readonly issues: readonly QueryIssue[];
+  readonly encoded: string;
+};

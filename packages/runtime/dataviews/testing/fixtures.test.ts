@@ -8,6 +8,9 @@ import {
   FACETED_ROWS,
   FACETED_SCHEMA,
   FORWARD_CURSORS,
+  LINKS_CAPABILITIES,
+  LINKS_COLLECTION,
+  LINKS_VALID_TODAY,
   NOTHING_DECLARED,
 } from "./fixtures.js";
 import readId from "./readId.js";
@@ -41,5 +44,31 @@ describe("FACETED_SCHEMA and FACETED_ROWS", () => {
       "name",
     ]);
     expect(new Set(FACETED_ROWS.map(readId)).size).toBe(FACETED_ROWS.length);
+  });
+});
+
+describe("LINKS_COLLECTION and LINKS_CAPABILITIES", () => {
+  it("declare a field of every kind, narrowing tags and the host name", () => {
+    expect(LINKS_COLLECTION.schema.fieldNames).toEqual([
+      "status",
+      "tags",
+      "cpu",
+      "memory",
+      "updated",
+      "owner",
+      "hostname",
+      "config.region",
+      "config.cores",
+    ]);
+    expect(LINKS_CAPABILITIES.filter["tags"]).toEqual(["isAny"]);
+    expect(LINKS_CAPABILITIES.filter["hostname"]).toEqual(["contains"]);
+    expect(LINKS_CAPABILITIES.search).toEqual({ fields: ["hostname"] });
+  });
+});
+
+describe("LINKS_VALID_TODAY", () => {
+  it("holds each link once", () => {
+    const params = LINKS_VALID_TODAY.map((link) => link.params);
+    expect(new Set(params).size).toBe(params.length);
   });
 });
