@@ -110,5 +110,7 @@ export default function createFormatters(locale: Locale): Formatters {
       getRelativeTimeFormat(options).format(value, unit),
     formatList: (items, options) => getListFormat(options).format([...items]),
     selectPlural: (count, forms) => selectForm(getPluralRules(), count, forms),
+    selectOrdinal: (position, forms) =>
+      selectForm(getPluralRules({ type: "ordinal" }), position, forms),
   };
 }

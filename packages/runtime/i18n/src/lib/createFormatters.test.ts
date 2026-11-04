@@ -142,4 +142,65 @@ describe("createFormatters", () => {
       );
     });
   });
+
+  describe("selectOrdinal", () => {
+    it("selects a form under the locale's ordinal rules", () => {
+      const wordPlace = (position: number) =>
+        en.selectOrdinal(position, {
+          one: `${position}st`,
+          two: `${position}nd`,
+          few: `${position}rd`,
+          other: `${position}th`,
+        });
+      expect([1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 111].map(wordPlace)).toEqual([
+        "1st",
+        "2nd",
+        "3rd",
+        "4th",
+        "11th",
+        "12th",
+        "13th",
+        "21st",
+        "22nd",
+        "23rd",
+        "111th",
+      ]);
+    });
+
+    it("falls back to other when the selected category is undefined", () => {
+      expect(
+        en.selectOrdinal(2, { one: "first", other: "another place" }),
+      ).toBe("another place");
+    });
+
+    it("uses one form when the locale has a single ordinal category", () => {
+      const ar = createFormatters("ar");
+      expect(ar.selectOrdinal(1, { one: "unused", other: "الأول" })).toBe(
+        "الأول",
+      );
+    });
+  });
+
+  it("constructs one Intl.PluralRules per rule type (memoized)", () => {
+    const RealPluralRules = Intl.PluralRules;
+    let constructed = 0;
+    class CountingPluralRules extends RealPluralRules {
+      constructor(...args: ConstructorParameters<typeof Intl.PluralRules>) {
+        super(...args);
+        constructed += 1;
+      }
+    }
+    vi.stubGlobal(
+      "Intl",
+      Object.create(Intl, { PluralRules: { value: CountingPluralRules } }),
+    );
+
+    const formatters = createFormatters("en");
+    formatters.selectPlural(1, { other: "items" });
+    formatters.selectPlural(2, { other: "items" }); // cardinal rules → cached
+    formatters.selectOrdinal(3, { other: "3rd" }); // ordinal rules → one more
+    formatters.selectOrdinal(4, { other: "4th" }); // ordinal rules → cached
+
+    expect(constructed).toBe(2);
+  });
 });

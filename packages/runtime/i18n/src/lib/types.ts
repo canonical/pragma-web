@@ -16,10 +16,10 @@ export type Direction = "ltr" | "rtl";
 export type PluralCategory = "zero" | "one" | "two" | "few" | "many" | "other";
 
 /**
- * The forms of a wording that varies by count, one per CLDR plural category:
- * the `forms` of `Formatters.selectPlural`, or a plural catalog entry. `other` is
- * required — it is the fallback used whenever a locale does not define the
- * selected category.
+ * The forms of a wording that varies by count or position, one per CLDR plural
+ * category: the `forms` of `Formatters.selectPlural` and `Formatters.selectOrdinal`, or a
+ * plural catalog entry. `other` is required — it is the fallback used whenever
+ * a locale does not define the selected category.
  */
 export type PluralRecord = Partial<Record<PluralCategory, string>> & {
   other: string;
@@ -94,6 +94,25 @@ export interface Formatters {
    * the signature may change in a minor release before 1.0.
    */
   selectPlural(count: number, forms: PluralRecord): string;
+  /**
+   * Pick the form a position takes under the locale's ordinal rules. As with
+   * `selectPlural`, each form holds the whole wording:
+   *
+   * ```ts
+   * f.selectOrdinal(position, {
+   *   one: `${f.formatNumber(position)}st`,
+   *   two: `${f.formatNumber(position)}nd`,
+   *   few: `${f.formatNumber(position)}rd`,
+   *   other: `${f.formatNumber(position)}th`,
+   * }); // "2nd" for 2 in English
+   * ```
+   *
+   * A category the locale selects but `forms` lacks falls back to `other`.
+   *
+   * @experimental Part of the typed message records, which are pre-release:
+   * the signature may change in a minor release before 1.0.
+   */
+  selectOrdinal(position: number, forms: PluralRecord): string;
 }
 
 /**
