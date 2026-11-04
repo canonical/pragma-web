@@ -17,10 +17,13 @@ export type {
   LocaleSource,
   LocaleSourceOptions,
   LocaleSources,
+  Message,
+  MessageRecord,
   Messages,
   MessageValue,
   PluralCategory,
   PluralRecord,
   TranslateVars,
+  Translations,
   Translator,
 } from "./types.js";
