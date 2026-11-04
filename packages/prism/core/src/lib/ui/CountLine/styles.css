@@ -4,12 +4,17 @@
 
 @layer ds.components.global {
   /* Muted, on one line, its numerals of one width so a changing count does
-   * not shift what follows. */
+   * not shift what follows. A line of its own that may be narrower than its
+   * text, which is then cut with an ellipsis rather than spilling past it. */
   .ds.count-line {
     --count-line-color: var(--color-text-muted);
 
+    display: block;
+    min-inline-size: 0;
+    overflow-x: clip;
     color: var(--count-line-color);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }

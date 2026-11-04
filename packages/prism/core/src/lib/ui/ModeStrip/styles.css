@@ -108,6 +108,10 @@
       gap: var(--mode-strip-spacing);
     }
 
+    .ds.mode-strip > .view {
+      flex-shrink: 0;
+    }
+
     .ds.mode-strip > .filtering {
       flex-grow: 1;
     }

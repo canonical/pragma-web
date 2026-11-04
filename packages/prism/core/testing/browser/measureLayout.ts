@@ -144,38 +144,40 @@ export default function measureLayout({
       end: box.right - Number.parseFloat(style.borderRightWidth),
     };
   };
-  const bands = [...document.querySelectorAll(bandSelector)].map((band) => {
-    const box = band.getBoundingClientRect();
-    const style = getComputedStyle(band);
-    let paintedStart = box.left;
-    let paintedEnd = box.right;
-    for (
-      let ancestor = band.parentElement;
-      ancestor !== null;
-      ancestor = ancestor.parentElement
-    ) {
-      if (clippingOverflows.includes(getComputedStyle(ancestor).overflowX)) {
-        const clip = readPaddingBox(ancestor);
-        paintedStart = Math.max(paintedStart, clip.start);
-        paintedEnd = Math.min(paintedEnd, clip.end);
+  const bands = [...document.querySelectorAll(bandSelector)]
+    .filter((band) => getComputedStyle(band).display !== "none")
+    .map((band) => {
+      const box = band.getBoundingClientRect();
+      const style = getComputedStyle(band);
+      let paintedStart = box.left;
+      let paintedEnd = box.right;
+      for (
+        let ancestor = band.parentElement;
+        ancestor !== null;
+        ancestor = ancestor.parentElement
+      ) {
+        if (clippingOverflows.includes(getComputedStyle(ancestor).overflowX)) {
+          const clip = readPaddingBox(ancestor);
+          paintedStart = Math.max(paintedStart, clip.start);
+          paintedEnd = Math.min(paintedEnd, clip.end);
+        }
       }
-    }
-    return {
-      element: describe(band),
-      start: box.left,
-      end: box.right,
-      paintedStart,
-      paintedEnd,
-      contentStart:
-        box.left +
-        Number.parseFloat(style.borderLeftWidth) +
-        Number.parseFloat(style.paddingLeft),
-      contentEnd:
-        box.right -
-        Number.parseFloat(style.borderRightWidth) -
-        Number.parseFloat(style.paddingRight),
-    };
-  });
+      return {
+        element: describe(band),
+        start: box.left,
+        end: box.right,
+        paintedStart,
+        paintedEnd,
+        contentStart:
+          box.left +
+          Number.parseFloat(style.borderLeftWidth) +
+          Number.parseFloat(style.paddingLeft),
+        contentEnd:
+          box.right -
+          Number.parseFloat(style.borderRightWidth) -
+          Number.parseFloat(style.paddingRight),
+      };
+    });
 
   const trails = [...document.querySelectorAll(".ds.lens-breadcrumbs")].map(
     (trail) => {

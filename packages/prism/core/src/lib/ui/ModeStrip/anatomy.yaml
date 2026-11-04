@@ -40,8 +40,9 @@
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)  below two groups: the root is a flex
-#     row (nowrap, gap space.100) instead of a subgrid, the filtering group
-#     grows into the free space; the search and chips slots are not
+#     row (nowrap, gap space.100) instead of a subgrid, the view group's
+#     menu keeps its width (the trail shrinks), the filtering group grows
+#     into the free space; the search and chips slots are not
 #     displayed; the fold slot is displayed.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,

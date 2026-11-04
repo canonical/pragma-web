@@ -14,9 +14,10 @@
 # fixed height. The tab links set no block inset; the current tab draws a
 # 2px highlighted underline, which stays inside the line, and a keyboard
 # focus draws the focus ring. The menu's overlay is the disclosure's own list,
-# absolutely positioned under the summary (the resilient baseline), on the
-# page's background with a hairline, one compact inset, so the strip stays
-# one line while it is open.
+# absolutely positioned under the summary and ending where it ends, so it
+# opens toward the strip's start and never past the viewport (the resilient
+# baseline), on the page's background with a hairline, one compact inset,
+# so the strip stays one line while it is open.
 #
 # Every decision is read through a component token declared on the root
 # (`--renderer-switch-*`), bound to the symbol named here.
@@ -91,7 +92,7 @@ node:
               styles:
                 layout.position: absolute
                 layout.offset.top: 100%
-                layout.offset.inline.start: 0
+                layout.offset.right: 0
                 layout.stack: 1
                 layout.listStyle: none
                 layout.type: flex

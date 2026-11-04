@@ -70,11 +70,12 @@
   }
 
   /* The open menu's list overlays the canvas under the summary, so the
-   * strip stays one line. */
+   * strip stays one line, and ends where the summary ends, so it opens
+   * toward the strip's start and never past the viewport. */
   .ds.renderer-switch > .menu > .options {
     position: absolute;
     top: 100%;
-    inset-inline-start: 0;
+    right: 0;
     z-index: var(--renderer-switch-overlay-stack);
     list-style: none;
     display: flex;

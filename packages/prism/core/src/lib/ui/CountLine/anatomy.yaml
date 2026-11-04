@@ -4,7 +4,9 @@
 # lower bound (a page loaded of more), "‹shown› ‹kind›" with no total: the
 # three kinds of count the dataviews stack's Count names, so the rebase is
 # a rename. A live region (an output, polite), so a change the filters make
-# is announced. Muted, tabular numerals, one line.
+# is announced. Muted, tabular numerals, one line of its own, which may be
+# narrower than its text: the text is then cut with an ellipsis rather than
+# spilling past it.
 #
 # Every decision is read through a component token declared on the root
 # (`--count-line-*`), bound to the symbol named here.
@@ -13,6 +15,10 @@
 node:
   uri: prism.component.count_line
   styles:
+    layout.type: block
+    size.min.width: 0
+    layout.overflow.inline: clip
     typography.color: color.text.muted
     typography.variant.numeric: tabular-nums
     typography.whiteSpace: nowrap
+    typography.overflow: ellipsis
