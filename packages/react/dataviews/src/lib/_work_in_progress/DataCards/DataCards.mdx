@@ -1,11 +1,11 @@
 import { Canvas, Meta } from "@storybook/addon-docs/blocks";
-import * as Stories from "./Cards.stories";
+import * as Stories from "./DataCards.stories";
 
 <Meta of={Stories} name="Recipes" />
 
-# Cards recipes
+# DataCards recipes
 
-`Cards` shows a collection's records as the design system's cards: one card per record on the page, headed and named by its title field, with the other fields listed beneath it. The cards are the design system's own `Card`, laid out by its `Cards` group, and they form a list a reader moves through in order. `Cards` takes a provider; its connected twin reads the enclosing `DataViews` root instead. Both are work-in-progress spikes: neither is exported from the package root, and their shape may change or they may be withdrawn.
+`DataCards` shows a collection's records as the design system's cards: one card per record on the page, headed and named by its title field, with the other fields listed beneath it. The cards are the design system's own `Card`, laid out by its `Cards` group, and they form a list a reader moves through in order. `DataCards` takes a provider; its connected twin reads the enclosing `DataViews` root instead. Both are work-in-progress spikes: neither is exported from the package root, and their shape may change or they may be withdrawn.
 
 ## Fields and the title
 
@@ -20,7 +20,7 @@ import type { DisplayField } from "@canonical/dataviews-react";
 import { useState } from "react";
 import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
-import { Cards } from "./Cards.js";
+import { DataCards } from "./DataCards.js";
 
 const fields: readonly DisplayField[] = [
   { id: "name", header: "Host" },
@@ -37,7 +37,7 @@ export function Machines() {
     }),
   );
   return (
-    <Cards provider={provider} fields={fields} title="name" label="Machines" />
+    <DataCards provider={provider} fields={fields} title="name" label="Machines" />
   );
 }
 ```
@@ -56,7 +56,7 @@ With `selectable`, each card carries a checkbox named for its title, and one che
 
 ## Status
 
-Cards show the core's status as the table does. While nothing has arrived they say they are loading; when a request fails or there is nothing to show, they say why in a polite status; and cards that no longer answer the current query stay in view beneath a status that says so.
+DataCards show the core's status as the table does. While nothing has arrived they say they are loading; when a request fails or there is nothing to show, they say why in a polite status; and cards that no longer answer the current query stay in view beneath a status that says so.
 
 <Canvas of={Stories.Loading} sourceState="none" />
 
@@ -64,7 +64,7 @@ Cards show the core's status as the table does. While nothing has arrived they s
 
 ## Ordering and paging
 
-Cards show nothing of the ordering or the paging themselves. Place `DataViews.SortPanel` and `DataViews.Pagination` beside the connected cards in the same root: the panel orders them and the bar pages them, as they would a table.
+DataCards show nothing of the ordering or the paging themselves. Place `DataViews.SortPanel` and `DataViews.Pagination` beside the connected cards in the same root: the panel orders them and the bar pages them, as they would a table.
 
 <Canvas of={Stories.SortedAndPaged} sourceState="none" />
 
@@ -92,9 +92,9 @@ These notes are provisional, recorded for a spike and re-evaluated when data car
 
 | Surface | Principal criteria | Behaviour today |
 |---|---|---|
-| Cards list | 1.3.1, 1.3.2, 2.4.3, 4.1.2 | A region named by `label` holding a list; one list item per record in result order; no grid role and no roving focus, so Tab moves through each card's controls in order |
+| DataCards list | 1.3.1, 1.3.2, 2.4.3, 4.1.2 | A region named by `label` holding a list; one list item per record in result order; no grid role and no roving focus, so Tab moves through each card's controls in order |
 | Card | 1.3.1, 2.4.6, 4.1.2 | The design system's `Card` as a list item, named by its title field; the other fields as a description list, each value under its heading |
 | Card checkbox | 1.3.1, 2.1.1, 4.1.2 | A native checkbox named "Select" and the record's name; its state agrees with the provider's selection, shared with every table on the provider |
 | Select all displayed rows | 1.3.1, 2.1.1, 4.1.2 | A native labelled checkbox; checked only when every card on the page is selected, mixed when some are; acts on the page's records alone |
-| Cards status | 1.3.1, 4.1.3 | The core's status above the cards: a settled outcome announced once, politely; a passing state silent; never an empty list claimed as no results while the source has not answered |
+| DataCards status | 1.3.1, 4.1.3 | The core's status above the cards: a settled outcome announced once, politely; a passing state silent; never an empty list claimed as no results while the source has not answered |
 | Custom cells on a card | 1.1.1, 2.4.4, 4.1.2 | A field's own cell renders in the same cell scope as a table cell; its content contract is the cell's own |

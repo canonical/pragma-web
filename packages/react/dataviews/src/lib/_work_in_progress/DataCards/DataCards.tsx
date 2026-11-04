@@ -29,7 +29,7 @@ import {
   readFieldName,
 } from "../../utils/index.js";
 import { CardList, SelectAllOnPage } from "./common/index.js";
-import type { CardsProps } from "./types.js";
+import type { DataCardsProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-cards";
@@ -39,7 +39,7 @@ const areNamesEqual = (a: readonly string[], b: readonly string[]): boolean =>
   areListsEqual(a, b, (name, other) => name === other);
 
 /**
- * Cards render the records of one collection as the design system's cards:
+ * DataCards render the records of one collection as the design system's cards:
  * one card per record on the page, each headed and named by its title field,
  * with the other fields listed beneath it. They are a list, and each card an
  * item of it, so a reader moves through them in order with no key of their
@@ -74,7 +74,7 @@ const areNamesEqual = (a: readonly string[], b: readonly string[]): boolean =>
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export default function Cards<
+export default function DataCards<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 >({
@@ -88,10 +88,10 @@ export default function Cards<
   messages,
   className,
   ...rest
-}: CardsProps<TFields, TRow>): ReactElement {
+}: DataCardsProps<TFields, TRow>): ReactElement {
   if (!isDataViewsProvider(provider)) {
     throw new Error(
-      "Cards requires a provider created by createDataViewsProvider",
+      "DataCards requires a provider created by createDataViewsProvider",
     );
   }
   const words = useMessages(messages);
@@ -101,7 +101,7 @@ export default function Cards<
   // field at all.
   const heading = declared.find((field) => field.id === title);
   if (heading === undefined) {
-    throw new Error(`Cards names no field "${title}" as its title`);
+    throw new Error(`DataCards names no field "${title}" as its title`);
   }
   // Observed for as long as the cards are mounted, as a table observes it.
   useEffect(() => provider.observe(), [provider]);

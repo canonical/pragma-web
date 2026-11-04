@@ -24,14 +24,14 @@ import type {
   DisplayFieldCellProps,
 } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
-import { Cards as ConnectedCards } from "../DataViews/common/Cards/index.js";
+import { DataCards as ConnectedCards } from "../DataViews/common/DataCards/index.js";
 import { DataViews } from "../DataViews/index.js";
 import { RendererSwitch } from "../RendererSwitch/index.js";
-import Component from "./Cards.js";
-import type { CardsProps } from "./types.js";
+import Component from "./DataCards.js";
+import type { DataCardsProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/Cards",
+  title: "_work_in_progress/DataCards",
   component: Component,
   decorators: [withAppScope],
   args: {
@@ -57,7 +57,7 @@ type Story = StoryObj<typeof Component>;
 
 /** The cards' own props, less the ones a story's collection supplies. */
 type StoryCardsProps = Omit<
-  CardsProps<MachineFields, Machine>,
+  DataCardsProps<MachineFields, Machine>,
   "provider" | "fields" | "rowLabel"
 >;
 
@@ -80,7 +80,7 @@ const fieldsCode = `const fields: readonly DisplayField[] = [
 /** The import every story's code shows for a part not yet on the root. */
 const spikeImports = `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
-import { Cards } from "./Cards.js";`;
+import { DataCards } from "./DataCards.js";`;
 
 /** The cards over a provider bound to the story's own source. */
 function MachineCards({
@@ -113,7 +113,7 @@ export const Default: Story = {
     parts: ["type DisplayField"],
     imports: spikeImports,
     declarations: fieldsCode,
-    render: `<Cards provider={provider} fields={fields} title="name" label="Machines" />`,
+    render: `<DataCards provider={provider} fields={fields} title="name" label="Machines" />`,
   }),
   play: async ({ canvas }) => {
     await expect(
@@ -133,7 +133,7 @@ export const Selectable: Story = {
     parts: ["type DisplayField"],
     imports: spikeImports,
     declarations: fieldsCode,
-    render: `<Cards
+    render: `<DataCards
   provider={provider}
   fields={fields}
   title="name"
@@ -196,7 +196,7 @@ const fields: readonly DisplayField[] = [
   { id: "status", header: "Status", cell: StatusCell },
   { id: "cores", header: "Cores" },
 ];`,
-    render: `<Cards provider={provider} fields={fields} title="name" label="Machines" />`,
+    render: `<DataCards provider={provider} fields={fields} title="name" label="Machines" />`,
   }),
   play: async ({ canvas }) => {
     const birch = await canvas.findByRole("listitem", {
@@ -240,7 +240,7 @@ export const NoData: Story = {
   },
 };
 
-/** Cards in a root, beside the sort panel and the pagination bar. */
+/** DataCards in a root, beside the sort panel and the pagination bar. */
 function SortedAndPagedMachines({
   label,
 }: {
@@ -273,12 +273,12 @@ export const SortedAndPaged: Story = {
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // A work-in-progress spike: not yet exported from the package root.
-import { Cards } from "./DataViews/Cards.js";`,
+import { DataCards } from "./DataViews/DataCards.js";`,
     query: "page=1&size=5",
     declarations: fieldsCode,
     render: `<DataViews provider={provider}>
   <DataViews.SortPanel />
-  <Cards fields={fields} title="name" label="Machines" selectable />
+  <DataCards fields={fields} title="name" label="Machines" selectable />
   <DataViews.Pagination sizes={[5, 10]} />
 </DataViews>`,
   }),
@@ -348,7 +348,7 @@ export const TableOrCards: Story = {
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
 // Work-in-progress spikes: not yet exported from the package root.
-import { Cards } from "./DataViews/Cards.js";
+import { DataCards } from "./DataViews/DataCards.js";
 import { RendererSwitch } from "./RendererSwitch.js";`,
     query: "page=1&size=5",
     declarations: fieldsCode,
@@ -364,7 +364,7 @@ import { RendererSwitch } from "./RendererSwitch.js";`,
       {
         id: "cards",
         label: "Cards",
-        content: <Cards fields={fields} title="name" label="Machines" selectable />,
+        content: <DataCards fields={fields} title="name" label="Machines" selectable />,
       },
     ]}
   />
@@ -388,7 +388,7 @@ import { RendererSwitch } from "./RendererSwitch.js";`,
   },
 };
 
-/** Cards over the REST endpoint, with the pagination bar reaching it too. */
+/** DataCards over the REST endpoint, with the pagination bar reaching it too. */
 function RestBackedMachines({
   label,
 }: {

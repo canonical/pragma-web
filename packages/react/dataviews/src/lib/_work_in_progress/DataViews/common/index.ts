@@ -1,5 +1,5 @@
 export * from "./Actions/index.js";
-export * from "./Cards/index.js";
+export * from "./DataCards/index.js";
 export * from "./DataTable/index.js";
 export * from "./FacetBarChart/index.js";
 export * from "./FacetRangeChart/index.js";

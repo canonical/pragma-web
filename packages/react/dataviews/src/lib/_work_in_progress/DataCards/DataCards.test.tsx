@@ -25,8 +25,8 @@ import type {
 } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataTable } from "../DataTable/index.js";
-import Cards from "./Cards.js";
-import type { CardsProps } from "./types.js";
+import DataCards from "./DataCards.js";
+import type { DataCardsProps } from "./types.js";
 
 type Provider = DataViewsProvider<MachineFields, Machine>;
 
@@ -41,14 +41,14 @@ const rows: readonly Machine[] = [
   machine("m-2", "beta", "failed", 8),
 ];
 
-/** Cards whose source answers every request at once with `answered`. */
+/** DataCards whose source answers every request at once with `answered`. */
 const loadedCards = (
   answered: readonly Machine[] = rows,
-  extra: Partial<CardsProps<MachineFields, Machine>> = {},
+  extra: Partial<DataCardsProps<MachineFields, Machine>> = {},
 ) => {
   const { provider, source } = createMachineProvider({ rows: answered });
   const view = render(
-    <Cards
+    <DataCards
       provider={provider}
       fields={fields}
       title="name"
@@ -69,19 +69,21 @@ const failure = (reason: string): SourceDelivery<Machine> => ({
 const readList = (): HTMLElement =>
   within(screen.getByRole("region", { name: "Machines" })).getByRole("list");
 
-describe("Cards", () => {
+describe("DataCards", () => {
   it("refuses a value that is not a provider", () => {
     silenceRenderErrors();
     expect(() =>
       render(
-        <Cards
+        <DataCards
           provider={{} as Provider}
           fields={fields}
           title="name"
           label="Machines"
         />,
       ),
-    ).toThrow("Cards requires a provider created by createDataViewsProvider");
+    ).toThrow(
+      "DataCards requires a provider created by createDataViewsProvider",
+    );
   });
 
   it("refuses a title naming none of its fields", () => {
@@ -89,14 +91,14 @@ describe("Cards", () => {
     const { provider } = createMachineProvider({ rows });
     expect(() =>
       render(
-        <Cards
+        <DataCards
           provider={provider}
           fields={fields}
           title="owner"
           label="Machines"
         />,
       ),
-    ).toThrow('Cards names no field "owner" as its title');
+    ).toThrow('DataCards names no field "owner" as its title');
   });
 
   it("renders the design system's cards as a list, one item per record, each named by its title", () => {
@@ -249,7 +251,7 @@ describe("Cards", () => {
     const { provider } = createMachineProvider({ rows });
     render(
       <>
-        <Cards
+        <DataCards
           provider={provider}
           fields={fields}
           title="name"
@@ -276,7 +278,7 @@ describe("Cards", () => {
   it("says it is loading while nothing has arrived, busy and silent", () => {
     const { provider } = createMachineProvider();
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -295,7 +297,7 @@ describe("Cards", () => {
   it("says why a failed request left no cards, politely", () => {
     const { provider, source } = createMachineProvider();
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -318,7 +320,7 @@ describe("Cards", () => {
   it("keeps the cards of an earlier query under stale, and says so", () => {
     const { provider, source } = createMachineProvider();
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -352,7 +354,7 @@ describe("Cards", () => {
   it("says a query matched nothing, apart from a collection holding nothing", () => {
     const { provider, source } = createMachineProvider();
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -372,7 +374,7 @@ describe("Cards", () => {
   it("keeps the cards a failed refresh could not replace, and says so", () => {
     const { provider, source } = createMachineProvider();
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -402,7 +404,7 @@ describe("Cards", () => {
   it("holds one status element across the results that keep it", () => {
     const { provider, source } = createMachineProvider();
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -431,7 +433,7 @@ describe("Cards", () => {
     const ref = createRef<HTMLElement>();
     const { provider } = createMachineProvider({ rows });
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -463,7 +465,7 @@ describe("Cards", () => {
         setTick((tick) => tick + 1);
       };
       return (
-        <Cards
+        <DataCards
           provider={provider}
           // A new array on every render, saying the same thing.
           fields={[
@@ -498,7 +500,7 @@ describe("Cards", () => {
   it("has no axe violation with a status standing over kept cards", async () => {
     const { provider, source } = createMachineProvider();
     const view = render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -520,7 +522,7 @@ describe("Cards", () => {
   });
 });
 
-describe("Cards hydrating what the server drew", () => {
+describe("DataCards hydrating what the server drew", () => {
   it("draws the cards and checkboxes the server drew, with no mismatch", async () => {
     const errors = vi.spyOn(console, "error");
     onTestFinished(() => {
@@ -533,7 +535,7 @@ describe("Cards hydrating what the server drew", () => {
       });
       provider.refresh();
       return (
-        <Cards
+        <DataCards
           provider={provider}
           fields={fields}
           title="name"

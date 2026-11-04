@@ -27,7 +27,7 @@ import preview from "../../../.storybook/preview.js";
 import { DELIVERY_WAIT } from "../../../testing/constants.js";
 import findEnglish from "../../../testing/findEnglish.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
-import * as cardsStories from "../../lib/_work_in_progress/Cards/Cards.stories.js";
+import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as actionsStories from "../../lib/_work_in_progress/DataViews/common/Actions/Actions.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
@@ -86,7 +86,7 @@ const parts = {
   Settings: composeStories(settingsStories),
   SortPanel: composeStories(sortPanelStories),
   RendererSwitch: composeStories(switchStories),
-  Cards: composeStories(cardsStories),
+  DataCards: composeStories(dataCardsStories),
   FacetBarChart: composeStories(barChartStories),
   FacetRangeChart: composeStories(rangeChartStories),
 };
@@ -107,7 +107,7 @@ const AUTHORED: Readonly<Record<string, readonly string[]>> = {
   RendererSwitch: ["Show machines as", "Table"],
   // The cards' stories place a switch of their own, named the same way, and
   // one story's own cell writes a sentence saying the record's "from".
-  Cards: [
+  DataCards: [
     "Show machines as",
     "Table",
     "Waiting on an address from the upstream pool.",

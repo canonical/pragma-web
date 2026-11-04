@@ -18,14 +18,14 @@ import {
   machines,
 } from "../../../../testing/machines.js";
 import type { DisplayField } from "../../common/index.js";
-import Cards from "./Cards.js";
+import DataCards from "./DataCards.js";
 
 const fields: readonly DisplayField[] = [
   { id: "name", header: "Host" },
   { id: "status", header: "Status" },
 ];
 
-describe("Cards on the server", () => {
+describe("DataCards on the server", () => {
   it("draws the rows of the URL's query as a list of cards with native checkboxes", () => {
     const fleet = buildFleet(9);
     const provider = createDataViewsProvider({
@@ -35,7 +35,7 @@ describe("Cards on the server", () => {
     });
     provider.refresh();
     const markup = renderToString(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -61,7 +61,7 @@ describe("Cards on the server", () => {
     const { provider } = createMachineProvider();
     provider.refresh();
     const markup = renderToString(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"

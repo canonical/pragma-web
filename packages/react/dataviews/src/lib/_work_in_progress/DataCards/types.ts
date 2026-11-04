@@ -52,7 +52,7 @@ type OwnProps<
 };
 
 /**
- * Cards props. The root is a `section` named by `label`, so it extends
+ * DataCards props. The root is a `section` named by `label`, so it extends
  * native section props, less the ones the cards own: `children`, because
  * their content is the records, which they render themselves; and
  * `aria-label`, `aria-labelledby` and `aria-busy`, which they set from what
@@ -61,7 +61,7 @@ type OwnProps<
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export type CardsProps<
+export type DataCardsProps<
   TFields extends readonly SchemaFieldDefinition[],
   TRow extends object = RowRecord,
 > = OwnProps<TFields, TRow> &

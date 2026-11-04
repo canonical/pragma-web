@@ -1,5 +1,5 @@
 import type { SchemaFieldDefinition } from "@canonical/dataviews-core";
-import type { CardsProps } from "../../../Cards/index.js";
+import type { DataCardsProps } from "../../../DataCards/index.js";
 
 /**
  * Props of the connected cards: the cards' own, less the provider and the
@@ -10,7 +10,7 @@ import type { CardsProps } from "../../../Cards/index.js";
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export type DataViewsCardsProps = Omit<
-  CardsProps<readonly SchemaFieldDefinition[]>,
+export type DataViewsDataCardsProps = Omit<
+  DataCardsProps<readonly SchemaFieldDefinition[]>,
   "provider" | "messages"
 >;

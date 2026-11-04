@@ -40,7 +40,7 @@ const FILTERS = "_work_in_progress/DataViews/Filters";
 const SETTINGS = "_work_in_progress/DataViews/Settings";
 
 /** The cards' stories, a collection's records as the design system's cards. */
-const CARDS = "_work_in_progress/Cards";
+const DATA_CARDS = "_work_in_progress/DataCards";
 
 /** The bar chart prototype's stories, a field's counts beside the filters. */
 const FACET_BAR_CHART = "_work_in_progress/FacetBarChart";
@@ -67,7 +67,7 @@ const TITLES: readonly string[] = [
   SORT_PANEL,
   FILTERS,
   SETTINGS,
-  CARDS,
+  DATA_CARDS,
   FACET_BAR_CHART,
   FACET_RANGE_CHART,
   RENDERER_SWITCH,
@@ -738,10 +738,10 @@ test.describe("DataTable, sort panel, filters, settings, cards, chart prototypes
     await expect(checkbox).toBeFocused();
   });
 
-  test("Cards Selectable: Space checks a card's checkbox, and the page's, focus stays", async ({
+  test("DataCards Selectable: Space checks a card's checkbox, and the page's, focus stays", async ({
     page,
   }) => {
-    await openStory(page, findStory(CARDS, "Selectable").id);
+    await openStory(page, findStory(DATA_CARDS, "Selectable").id);
     const birch = page.getByRole("checkbox", {
       name: "Select birch.example.com",
     });

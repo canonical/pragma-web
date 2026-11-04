@@ -1,12 +1,12 @@
 import type { ReactElement } from "react";
-import { Cards as StandaloneCards } from "../../../Cards/index.js";
+import { DataCards as Standalone } from "../../../DataCards/index.js";
 import { useDataViewsRoot } from "../../hooks/index.js";
-import type { DataViewsCardsProps } from "./types.js";
+import type { DataViewsDataCardsProps } from "./types.js";
 
 /**
  * The collection's records as cards, bound to the enclosing root's provider.
  *
- * It renders exactly what `Cards` renders for that provider. The difference is
+ * It renders exactly what `DataCards` renders for that provider. The difference is
  * where the provider and the words come from: this part reads the root it is
  * placed in, and throws outside one, rather than taking a provider or messages
  * of its own. So a table and cards placed in one root share one query, one set
@@ -18,7 +18,9 @@ import type { DataViewsCardsProps } from "./types.js";
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
  */
-export default function Cards(props: DataViewsCardsProps): ReactElement {
-  const { provider, messages } = useDataViewsRoot("Cards");
-  return <StandaloneCards {...props} provider={provider} messages={messages} />;
+export default function DataCards(
+  props: DataViewsDataCardsProps,
+): ReactElement {
+  const { provider, messages } = useDataViewsRoot("DataCards");
+  return <Standalone {...props} provider={provider} messages={messages} />;
 }

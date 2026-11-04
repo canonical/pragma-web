@@ -20,7 +20,7 @@ import {
   machine,
 } from "../../../../testing/machines.js";
 import type { DisplayField } from "../../common/index.js";
-import Cards from "./Cards.js";
+import DataCards from "./DataCards.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -41,11 +41,11 @@ const fields: readonly DisplayField[] = [
   { id: "status", header: "Status" },
 ];
 
-/** Cards whose source has not answered: the status stands in their place. */
+/** DataCards whose source has not answered: the status stands in their place. */
 const pending = (): HTMLElement => {
   const { provider } = createMachineProvider();
   const { container } = render(
-    <Cards
+    <DataCards
       provider={provider}
       fields={fields}
       title="name"
@@ -72,7 +72,7 @@ const mounted = (): HTMLElement => {
     rows: [machine("m-1", "alpha"), machine("m-2", "beta")],
   });
   const { container } = render(
-    <Cards
+    <DataCards
       provider={provider}
       fields={fields}
       title="name"
@@ -85,7 +85,7 @@ const mounted = (): HTMLElement => {
 
 const root = ".ds.data-cards";
 
-describe("Cards stylesheet", () => {
+describe("DataCards stylesheet", () => {
   it("styles only classes the cards render", () => {
     const styled = new Set(
       [...sheet.matchAll(/\.([a-z][\w-]*)/g)].map(([, name = ""]) => name),
@@ -114,7 +114,7 @@ describe("Cards stylesheet", () => {
     expect(sheet).toMatch(/& > \.status \{/);
     const { provider } = createMachineProvider();
     const { container } = render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"
@@ -131,12 +131,12 @@ describe("Cards stylesheet", () => {
   });
 });
 
-describe("Cards anatomy", () => {
-  const anatomy = read("Cards.anatomy.yaml");
+describe("DataCards anatomy", () => {
+  const anatomy = read("DataCards.anatomy.yaml");
 
   it("is implemented by the component beside it", () => {
     expect(anatomy).toContain("ref: ds:global.group.cards");
-    expect(read("Cards.tsx")).toMatch(
+    expect(read("DataCards.tsx")).toMatch(
       /@implements ds:global\.group\.cards(?![\w.-])/,
     );
   });

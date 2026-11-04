@@ -14,7 +14,7 @@ import { describe, expect, it } from "vitest";
 import { buildFleet, machines } from "../../../../testing/machines.js";
 import type { DisplayField } from "../../common/index.js";
 import type { DataTableColumn } from "../DataTable/index.js";
-import { Cards } from "../DataViews/common/Cards/index.js";
+import { DataCards } from "../DataViews/common/DataCards/index.js";
 import { DataViews } from "../DataViews/index.js";
 import RendererSwitch from "./RendererSwitch.js";
 import type { RendererChoice } from "./types.js";
@@ -73,7 +73,7 @@ describe("a composition of renderers on the server", () => {
               id: "cards",
               label: "Cards",
               content: (
-                <Cards
+                <DataCards
                   fields={fields}
                   title="name"
                   label="Machines as cards"

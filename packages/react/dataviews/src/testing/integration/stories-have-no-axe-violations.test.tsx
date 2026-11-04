@@ -21,7 +21,7 @@ import preview from "../../../.storybook/preview.js";
 import expectNoAxeViolations from "../../../testing/expectNoAxeViolations.js";
 import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
-import * as cardsStories from "../../lib/_work_in_progress/Cards/Cards.stories.js";
+import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
@@ -56,7 +56,7 @@ const rendered = {
 const played = {
   "REST API": composeStories(restStories),
   "GraphQL API": composeStories(graphqlStories),
-  Cards: composeStories(cardsStories),
+  DataCards: composeStories(dataCardsStories),
   FacetBarChart: composeStories(barChartStories),
   FacetRangeChart: composeStories(rangeChartStories),
   Filters: Object.fromEntries(
