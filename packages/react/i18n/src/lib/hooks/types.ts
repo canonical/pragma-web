@@ -31,10 +31,18 @@ export type UseLocalizedResult<T> = T;
  * Props of `useTranslation`, which takes no input. The type is empty and
  * internal: it names the hook's props, as every hook does, and the package
  * does not export it.
+ *
+ * @deprecated Belongs to the deprecated `useTranslation`; read typed message
+ * records with `useLocalized` instead.
  */
 export type UseTranslationProps = Record<string, never>;
 
-/** Result of `useTranslation`. */
+/**
+ * Result of `useTranslation`.
+ *
+ * @deprecated Returned only by the deprecated `useTranslation`; read typed
+ * message records with `useLocalized` instead.
+ */
 export interface UseTranslationResult {
   /** Translate a key for the active locale. */
   t: Translator;
