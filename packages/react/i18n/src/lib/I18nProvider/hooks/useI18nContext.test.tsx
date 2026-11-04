@@ -1,8 +1,8 @@
 import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import { emptyCatalogs, localeConfig } from "../../../testing/fixtures.js";
-import { I18nProvider } from "../I18nProvider/index.js";
+import { emptyCatalogs, localeConfig } from "../../../../testing/fixtures.js";
+import { I18nProvider } from "../index.js";
 import useI18nContext from "./useI18nContext.js";
 
 function WithProvider({
