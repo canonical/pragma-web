@@ -181,6 +181,17 @@ describe("createFormatters", () => {
     });
   });
 
+  describe("isolate", () => {
+    it("wraps text in first-strong isolate and pop directional isolate", () => {
+      expect(en.isolate("Ada")).toBe("\u2068Ada\u2069");
+    });
+
+    it("keeps a right-to-left name whole inside a left-to-right sentence", () => {
+      const sentence = `Select ${en.isolate("أحمد")} now`;
+      expect(sentence).toBe("Select \u2068أحمد\u2069 now");
+    });
+  });
+
   it("constructs one Intl.PluralRules per rule type (memoized)", () => {
     const RealPluralRules = Intl.PluralRules;
     let constructed = 0;
