@@ -17,7 +17,6 @@ import type {
   PredicateOperator,
   PredicateRef,
   Query,
-  SetOperator,
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
@@ -207,11 +206,8 @@ export default function createDataViewsProvider<
     capabilities,
     state: protectChannel(state),
     refusals,
-    setPredicate: (
-      predicate: Predicate,
-      replaces?: SetOperator,
-      history?: HistoryMode,
-    ) => command({ kind: "setPredicate", predicate, replaces }, history),
+    setPredicate: (predicate: Predicate, nth?: number, history?: HistoryMode) =>
+      command({ kind: "setPredicate", predicate, nth }, history),
     removePredicate: (
       field: string,
       operator: PredicateOperator,

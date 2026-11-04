@@ -5,18 +5,12 @@ import type {
   PredicateOperator,
 } from "@canonical/dataviews-core";
 import type { ProviderHost } from "@canonical/dataviews-core/bindings";
+import type { ComponentProps } from "react";
 
 /** The operators a closed-set filter edits. */
 type ChoicesOperator = Extract<PredicateOperator, "isAny" | "isNone">;
 
-/**
- * Props of one closed-set filter.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the schema field it was built for, not forwarding
- * a caller's native props.
- */
-export type ChoicesFilterProps = {
+type OwnProps = {
   /**
    * The options the control lists, in order: the schema's, or, where the
    * options are the server's, those the latest facet lists, as text.
@@ -49,7 +43,7 @@ export type ChoicesFilterProps = {
    */
   readonly alternativeHandle: FilterHandle<ReadonlySet<PredicateOperand>>;
   /** The provider's host, which moves a set and spells where a move leads. */
-  readonly host: Pick<ProviderHost, "state" | "setPredicate" | "spellQuery">;
+  readonly host: Pick<ProviderHost, "state" | "editPredicates" | "spellQuery">;
   /** The field's visible name; the group's legend. */
   readonly label: string;
   /** The field the control addresses, which names its checkboxes. */
@@ -73,3 +67,10 @@ export type ChoicesFilterProps = {
    */
   readonly onLeave: () => void;
 };
+
+/**
+ * Props of one closed-set filter: its own, and the native props of the
+ * `fieldset` it renders as its root.
+ */
+export type ChoicesFilterProps = OwnProps &
+  Omit<ComponentProps<"fieldset">, keyof OwnProps | "children">;

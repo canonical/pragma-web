@@ -41,28 +41,11 @@ const SWITCH_MESSAGES = {
 >;
 
 /**
- * One closed-set filter: a checkbox per option, so the applied set is
- * visible and reachable without opening anything. Membership is the whole
- * state — the last option cleared removes the predicate rather than
- * applying an empty restriction that matches nothing. Every checkbox is
- * named as the wire spells the set — the field for any-of, `<field>__isNone`
- * for none-of — so a GET submission repeats it once per chosen option.
- * Unchecking an option of an undeclared set disables its checkbox, or
- * removes the control with the last, so focus moves to the filters' group.
+ * One closed-set filter: a checkbox per option, named as the wire spells
+ * the set, with each option's facet count. A standing set can move to the
+ * other set operator, by a link before scripts and a button after.
  *
- * The options are the schema's, or, where the options are the server's, the
- * values the latest facet lists with any the set already holds: they stay
- * until a newer result lists others — while a query is pending, or after it
- * fails, as the rows on screen are — and a restriction in force is never
- * hidden. Beside each option is how many matching records hold it, from the
- * facet, which the source computes over the whole matching set with this
- * field's own restriction lifted; the count describes its checkbox rather
- * than naming it, and is absent while no facet answers the applied query.
- *
- * While a set stands, the source declares the other set operator on the
- * field and nothing stands under it, the set can move there: a real link
- * before any script runs, and a button once it does, which moves it as one
- * transition.
+ * @implements ds:apps.subcomponent.data_views_filters-choices_filter
  */
 export default function ChoicesFilter({
   options,
@@ -78,6 +61,8 @@ export default function ChoicesFilter({
   declared,
   leavesWhenCleared,
   onLeave,
+  className,
+  ...rest
 }: ChoicesFilterProps): ReactElement | null {
   const { messages } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
@@ -115,9 +100,9 @@ export default function ChoicesFilter({
     // nothing moves the query under it; once hydrated the button stands in.
     const { slice, window } = host.state.get();
     const moved = applyQueryCommand(slice, window, {
-      kind: "setPredicate",
-      predicate: { field: fieldName, operator: to, operands: [...selected] },
-      replaces: operator,
+      kind: "editPredicates",
+      remove: [{ field: fieldName, operator, nth: 0 }],
+      add: [{ field: fieldName, operator: to, operands: [...selected] }],
     });
     const params = host.spellQuery({
       slice: moved.slice,
@@ -145,13 +130,15 @@ export default function ChoicesFilter({
           importance="tertiary"
           className="switch"
           onClick={() => {
-            host.setPredicate(
-              {
-                field: fieldName,
-                operator: alternative,
-                operands: [...selected],
-              },
-              operator,
+            host.editPredicates(
+              [{ field: fieldName, operator, nth: 0 }],
+              [
+                {
+                  field: fieldName,
+                  operator: alternative,
+                  operands: [...selected],
+                },
+              ],
             );
             // The control leaves with the set it moved.
             onLeave();
@@ -169,7 +156,10 @@ export default function ChoicesFilter({
     );
   };
   return (
-    <fieldset className={componentCssClassName}>
+    <fieldset
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <legend className="legend">
         {messages[LEGEND_MESSAGES[operator]](label)}
       </legend>

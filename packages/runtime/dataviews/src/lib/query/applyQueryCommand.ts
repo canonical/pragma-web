@@ -14,7 +14,6 @@ import type {
   QueryCommand,
   QueryCommandResult,
   ResultWindow,
-  SetOperator,
   Slice,
 } from "./types.js";
 
@@ -109,13 +108,12 @@ const resolveRefs = (
 
 /**
  * Replace the conjunct at `nth` of the predicate's address, or add it where
- * the address holds none, and drop the set under `replaces`.
+ * the address holds none.
  */
 const setPredicate = (
   slice: Slice,
   predicate: Predicate,
   nth: number,
-  replaces: SetOperator | undefined,
 ): Slice => {
   const replaced = listConjuncts(slice, predicate.field, predicate.operator).at(
     nth,
@@ -126,16 +124,7 @@ const setPredicate = (
       : withoutConjunct(slice.filter, replaced);
   return {
     ...slice,
-    filter: [
-      ...(replaces === undefined
-        ? kept
-        : kept.filter(
-            (existing) =>
-              existing.field !== predicate.field ||
-              existing.operator !== replaces,
-          )),
-      predicate,
-    ],
+    filter: [...kept, predicate],
   };
 };
 
@@ -259,16 +248,6 @@ const commandRejection = (
 ): string | null => {
   switch (command.kind) {
     case "setPredicate": {
-      // A move replaces the other set operator on the field, nothing else:
-      // never itself, and never a restriction of another kind.
-      if (
-        command.replaces !== undefined &&
-        (OPERATOR_ARITY[command.replaces] !== "many" ||
-          OPERATOR_ARITY[command.predicate.operator] !== "many" ||
-          command.replaces === command.predicate.operator)
-      ) {
-        return "a set moves only onto the other set operator on its field";
-      }
       const nth = command.nth ?? 0;
       const rejection = rejectNth(nth) ?? predicateRejection(command.predicate);
       if (rejection !== null) {
@@ -317,12 +296,7 @@ const commandRejection = (
 const applyToSlice = (slice: Slice, command: SliceCommand): Slice => {
   switch (command.kind) {
     case "setPredicate":
-      return setPredicate(
-        slice,
-        command.predicate,
-        command.nth ?? 0,
-        command.replaces,
-      );
+      return setPredicate(slice, command.predicate, command.nth ?? 0);
     case "removePredicate": {
       const removed = listConjuncts(slice, command.field, command.operator).at(
         command.nth ?? 0,

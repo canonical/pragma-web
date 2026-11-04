@@ -22,7 +22,6 @@ import type {
   PredicateRef,
   Query,
   QueryCommand,
-  SetOperator,
   SortTerm,
   WindowNavigation,
 } from "../query/index.js";
@@ -353,15 +352,15 @@ export type ProviderHost<
   "collection" | "capabilities" | "state" | "refusals"
 > & {
   /**
-   * Replace the predicate at its address, and the one at the same field
-   * under `replaces` when given, as one transition; the window returns to
-   * page one. Given `history`, the transition enters history that way
-   * rather than as the policy says: a typed value's later edits in one input
-   * session replace the entry its first one entered.
+   * Replace the conjunct at `nth` of the predicate's address, 0 when left
+   * out, or add it where the address holds none, as one transition; the
+   * window returns to page one. Given `history`, the transition enters
+   * history that way rather than as the policy says: a typed value's later
+   * edits in one input session replace the entry its first one entered.
    */
   readonly setPredicate: (
     predicate: Predicate,
-    replaces?: SetOperator,
+    nth?: number,
     history?: HistoryMode,
   ) => readonly SourceRefusal[];
   /**

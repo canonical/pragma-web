@@ -1387,9 +1387,9 @@ describe("createDataViewsProvider host", () => {
     });
     const writesBefore = recorded.writes.length;
     expect(
-      host.setPredicate(
-        { field: "status", operator: "isNone", operands: ["failed"] },
-        "isAny",
+      host.editPredicates(
+        [{ field: "status", operator: "isAny", nth: 0 }],
+        [{ field: "status", operator: "isNone", operands: ["failed"] }],
       ),
     ).toEqual([]);
     expect(provider.state.get().slice.filter).toEqual([
