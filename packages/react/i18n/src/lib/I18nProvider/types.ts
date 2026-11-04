@@ -14,6 +14,9 @@ export interface I18nContextValue {
   config: I18nConfig;
   /**
    * Message catalogs keyed by locale; empty when the provider was given none.
+   *
+   * @deprecated Read only by the deprecated `useTranslation`. Typed message
+   * records are read with `useLocalized` and need no catalogs.
    */
   catalogs: Record<Locale, Messages>;
 }
@@ -27,6 +30,10 @@ export interface I18nProviderProps {
   /**
    * Message catalogs keyed by locale, read by `useTranslation`. Optional: an
    * app that reads typed message records needs none.
+   *
+   * @deprecated Write typed message records and read them with
+   * `useLocalized` instead. Catalogs keep working until a later release
+   * removes them.
    */
   catalogs?: Record<Locale, Messages>;
   /**
