@@ -34,8 +34,16 @@ describe("useFormatters", () => {
       () => ({ formatters: useFormatters(), locale: useLocale() }),
       { wrapper: WithProvider },
     );
-    const before = result.current.formatters.number(1234.5);
     act(() => result.current.locale.setLocale("fr-FR"));
-    expect(result.current.formatters.number(1234.5)).not.toBe(before);
+    expect(result.current.formatters.number(1234.5)).toBe("1\u202f234,5");
+  });
+
+  it("returns the same formatters across re-renders of one locale", () => {
+    const { result, rerender } = renderHook(() => useFormatters(), {
+      wrapper: WithProvider,
+    });
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
   });
 });
