@@ -1344,7 +1344,7 @@
       "dependencies": {
         "@canonical/design-tokens": "0.44.0",
         "@canonical/styles": "^0.45.0",
-        "@canonical/svelte-icons": "^0.0.9",
+        "@canonical/svelte-icons": "^0.1.0",
         "@floating-ui/dom": "^1.7.6",
       },
       "devDependencies": {
@@ -1656,7 +1656,7 @@
 
     "@canonical/svelte-ds-global": ["@canonical/svelte-ds-global@workspace:packages/svelte/ds-global"],
 
-    "@canonical/svelte-icons": ["@canonical/svelte-icons@0.0.9", "", { "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-gZqkM1oxYTe0QWGZt9dxvrVLLhjKI7Q41BCd2MzhdsF7XCBS9cMTUZOSnPe/U60GdciF8zbVLw8eCTRXclSgHw=="],
+    "@canonical/svelte-icons": ["@canonical/svelte-icons@0.1.0", "", { "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-N1l26Jpm1jjIx4uA94Y9Ruq1FYCsijiCQp0MDRJdU8X6G3pRwFkfISXZZs3kBN75SwGnhw+TcRnwxoDR47LTgg=="],
 
     "@canonical/svelte-ssr-test": ["@canonical/svelte-ssr-test@workspace:packages/svelte/ssr-test"],
 
