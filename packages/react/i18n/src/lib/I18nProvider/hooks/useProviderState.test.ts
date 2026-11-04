@@ -82,6 +82,13 @@ describe("useProviderState", () => {
     expect(result.current.catalogs).toBe(greetingCatalogs);
   });
 
+  it("shares one empty catalog object between providers given none", () => {
+    const first = renderHook(() => useProviderState({ config: localeConfig }));
+    const second = renderHook(() => useProviderState({ config: localeConfig }));
+    expect(first.result.current.catalogs).toEqual({});
+    expect(first.result.current.catalogs).toBe(second.result.current.catalogs);
+  });
+
   it("keeps the same value across re-renders with the same props", () => {
     const { result, rerender } = renderHook(() => useProviderState(base));
     const first = result.current;
