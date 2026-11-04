@@ -1,7 +1,10 @@
 /**
  * The Standards lens's domain constants: the page size it asks the graph
- * for, and the language its group headings are ordered in.
+ * for, the language its group headings are ordered in, and the renderers
+ * its pages offer.
  */
+
+import type { LensRenderers } from "@canonical/prism-core";
 
 /**
  * One page of the bound class's instances. 100 is a size this lens chooses,
@@ -20,3 +23,13 @@ export const STANDARDS_PAGE_SIZE = 100;
  * the groups the same way and the markup hydrates.
  */
 export const COLLATION_LOCALE = "en";
+
+/**
+ * The renderers the lens's pages offer over the site's defaults: the index
+ * as a table only, and a standard's reading page as the page or its
+ * Turtle.
+ */
+export const STANDARDS_RENDERERS: LensRenderers = {
+  list: ["table"],
+  page: ["page", "turtle"],
+};

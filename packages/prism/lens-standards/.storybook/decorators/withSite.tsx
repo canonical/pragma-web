@@ -1,20 +1,37 @@
 import {
   createStaticRouter,
   HomesProvider,
+  RenderersProvider,
   RouterLink,
+  usePageRenderers,
 } from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
+  useListRenderers,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
-import type { ElementType, ReactElement } from "react";
+import type { ElementType, ReactElement, ReactNode } from "react";
 import createStandardsRoutes from "../../src/lib/createStandardsRoutes.js";
 import { HOMES, STANDARDS_BINDING_FIXTURE } from "../../testing/fixtures.js";
 
 /** The lens's own two routes, bound as a pragma site binds them. */
 const routes = createStandardsRoutes(STANDARDS_BINDING_FIXTURE);
+
+/** The site's renderers, over a provider that serves source. */
+const SiteRenderers = ({
+  children,
+}: {
+  readonly children: ReactNode;
+}): ReactElement => (
+  <RenderersProvider
+    defaults={{ list: useListRenderers(), page: usePageRenderers() }}
+    extensions={["prose", "search", "source"]}
+  >
+    {children}
+  </RenderersProvider>
+);
 
 /** A site's document title template: the page's title, then the site's. */
 const formatDocumentTitle = (title: string): string => `${title} — Docs`;
@@ -51,7 +68,9 @@ const withSite =
             LinkComponent={RouterLink}
             maps={defaultProjectionMaps}
           >
-            <Story />
+            <SiteRenderers>
+              <Story />
+            </SiteRenderers>
           </ProjectionsProvider>
         </HomesProvider>
       </RouterProvider>

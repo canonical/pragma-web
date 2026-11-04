@@ -1,4 +1,8 @@
-import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
+import {
+  routeLensFacet,
+  routeShortcutFacet,
+  viewSearch,
+} from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
 import { MESSAGES } from "./i18n/index.js";
 import type { StandardsBinding, StandardsRoutes } from "./types.js";
@@ -50,6 +54,7 @@ export default function createStandardsRoutes(
   return {
     standards: route({
       url: "/standards",
+      search: viewSearch,
       content: () => <StandardsPage classUri={classUri} />,
       warm: () => warmStandardsIndex(binding),
       meta: {
@@ -66,6 +71,7 @@ export default function createStandardsRoutes(
     }),
     standardEntity: route({
       url: "/standards/:uri",
+      search: viewSearch,
       content: ({ params }) => (
         <StandardReadingPage classUri={classUri} params={params} />
       ),

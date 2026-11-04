@@ -47,6 +47,7 @@ describe("the lens's components", () => {
     expect(subcomponentFolders.map((folder) => basename(folder))).toEqual([
       "StandardProse",
       "StandardDetail",
+      "StandardsView",
       "Trail",
     ]);
   });

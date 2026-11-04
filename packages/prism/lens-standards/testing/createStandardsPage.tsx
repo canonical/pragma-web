@@ -2,10 +2,13 @@ import {
   createEnvironment,
   createStaticRouter,
   HomesProvider,
+  RenderersProvider,
+  usePageRenderers,
 } from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
+  useListRenderers,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { RouterProvider } from "@canonical/router-react";
@@ -19,6 +22,20 @@ import { HOMES, STANDARDS_BINDING_FIXTURE } from "./fixtures.js";
 /** The lens's own two routes, bound as a pragma site binds them. */
 const routes = createStandardsRoutes(STANDARDS_BINDING_FIXTURE);
 
+/** The site's renderers, over a provider that serves source. */
+const SiteRenderers = ({
+  children,
+}: {
+  readonly children: ReactNode;
+}): ReactElement => (
+  <RenderersProvider
+    defaults={{ list: useListRenderers(), page: usePageRenderers() }}
+    extensions={["prose", "search", "source"]}
+  >
+    {children}
+  </RenderersProvider>
+);
+
 /** A site's document title template: the page's title, then the site's. */
 const formatDocumentTitle = (title: string): string => `${title} — Docs`;
 
@@ -30,7 +47,7 @@ const formatDocumentTitle = (title: string): string => `${title} — Docs`;
  * `Link`s whose hrefs come from the `standards` and `standardEntity` codecs.
  * The homes and the default projection maps sit inside the router, because
  * a mention in a standard's prose renders as a chip that links to its home
- * through it.
+ * through it, and the site's renderers over a provider that serves source.
  *
  * @param url - The URL the static router matches.
  * @param records - The store to seed the environment with, or undefined.
@@ -52,7 +69,7 @@ export default function createStandardsPage(
         <RouterProvider router={createStaticRouter(routes, url)}>
           <HomesProvider homes={HOMES}>
             <ProjectionsProvider maps={defaultProjectionMaps}>
-              {page}
+              <SiteRenderers>{page}</SiteRenderers>
             </ProjectionsProvider>
           </HomesProvider>
         </RouterProvider>

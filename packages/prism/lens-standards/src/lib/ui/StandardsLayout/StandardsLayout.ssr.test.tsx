@@ -26,7 +26,7 @@ describe("StandardsLayout on the server", () => {
 
     expect(html).toContain('class="ds document-layout"');
     expect(html).toContain('aria-label="Site rail"');
-    expect(html).toContain('data-slot="context"');
+    expect(html).toContain('data-slot="trail"');
     expect(html).toContain(LINK_COMPONENT_URI);
     expect(html).toContain("<p>Routed page</p>");
     expect(html).toContain("<footer>Colophon</footer>");

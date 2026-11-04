@@ -52,6 +52,9 @@ node:
         styles:
           layout.grid.column: "1 / -1"
       relation: { cardinality: "0..1", slotName: alert }
-    - node:
-        uri: prism.subcomponent.standard_detail
+    - switch:
+        on: props
+        cases:
+          - uri: prism.subcomponent.standard_detail
+          - uri: prism.component.entity_source
       relation: { cardinality: "0..1", slotName: default }

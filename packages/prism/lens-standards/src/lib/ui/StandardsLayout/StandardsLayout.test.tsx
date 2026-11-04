@@ -55,7 +55,7 @@ describe("StandardsLayout", () => {
     );
 
     const context = container.querySelector(
-      '[data-slot="context"]',
+      '[data-slot="trail"]',
     ) as HTMLElement;
     expect(within(context).getByText("Standards")).toBeInTheDocument();
   });
@@ -71,12 +71,43 @@ describe("StandardsLayout", () => {
     );
 
     const context = container.querySelector(
-      '[data-slot="context"]',
+      '[data-slot="trail"]',
     ) as HTMLElement;
     expect(
       within(context).getByRole("link", { name: "Standards" }),
     ).toHaveAttribute("href", "/standards");
     expect(context).toHaveTextContent(LINK_COMPONENT_URI);
+  });
+
+  it("offers the page and its Turtle in the strip on a reading page only", () => {
+    const reading = render(
+      createStandardsPage(
+        READING_URL,
+        undefined,
+        createFetchSpy(),
+        <StandardsLayout rail={null}>{null}</StandardsLayout>,
+      ),
+    );
+    const tabs = within(screen.getByRole("navigation", { name: "Show as" }));
+    expect(tabs.getByRole("link", { name: "Page" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(tabs.getByRole("link", { name: "Turtle" })).toHaveAttribute(
+      "href",
+      `${READING_URL}?as=turtle`,
+    );
+    reading.unmount();
+
+    const { container } = render(
+      createStandardsPage(
+        "/standards",
+        undefined,
+        createFetchSpy(),
+        <StandardsLayout rail={null}>{null}</StandardsLayout>,
+      ),
+    );
+    expect(container.querySelector('[data-slot="view"]')).toBeEmptyDOMElement();
   });
 
   it("spreads native props onto its root and merges the site's class names after its own", () => {

@@ -339,4 +339,22 @@ describe("StandardReadingPage", () => {
     },
     STANDARDS_TEST_TIMEOUT_MS,
   );
+
+  it("draws the standard's Turtle in place of the article when the address asks", () => {
+    const fetchFn = createFetchSpy();
+    render(
+      createStandardsPage(
+        `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}?as=turtle`,
+        undefined,
+        fetchFn,
+        <StandardReadingPage
+          classUri={STANDARDS_BINDING_FIXTURE.classUri}
+          params={{ uri: LINK_COMPONENT_URI }}
+        />,
+      ),
+    );
+    expect(screen.getByText("Loading the source…")).toBeInTheDocument();
+    const names = fetchFn.mock.calls.map(([request]) => request.name);
+    expect(names).toEqual(["EntitySourceQuery"]);
+  });
 });
