@@ -5,6 +5,8 @@
  * excludes this file.
  */
 
+import type { PROVIDER_EXTENSIONS } from "./constants.js";
+
 /**
  * Every code a {@link ContractViolation} can carry.
  *
@@ -76,3 +78,6 @@ export interface AssertSatisfiesContractOptions
   /** Name used in thrown-error text. Defaults to `"provider"`. */
   readonly providerName?: string;
 }
+
+/** The name of one provider extension, a key of `PROVIDER_EXTENSIONS`. */
+export type ProviderExtension = keyof typeof PROVIDER_EXTENSIONS;
