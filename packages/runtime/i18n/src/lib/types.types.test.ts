@@ -100,6 +100,7 @@ describe("Formatters", () => {
       | "formatList"
       | "selectPlural"
       | "selectOrdinal"
+      | "isolate"
     >();
   });
 
@@ -151,6 +152,12 @@ describe("Formatters", () => {
   it("selects an ordinal form by position from a plural record", () => {
     expectTypeOf<Formatters["selectOrdinal"]>().toEqualTypeOf<
       (position: number, forms: PluralRecord) => string
+    >();
+  });
+
+  it("isolates text and returns text", () => {
+    expectTypeOf<Formatters["isolate"]>().toEqualTypeOf<
+      (text: string) => string
     >();
   });
 });
