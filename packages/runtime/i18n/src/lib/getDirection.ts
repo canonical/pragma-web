@@ -6,7 +6,7 @@ import type { Direction, I18nConfig, Locale } from "./types.js";
  * @param config - Active locale configuration; its `rtlLocales` list decides.
  * @param locale - Locale tag, e.g. `"ar-EG"`, or undefined.
  */
-export default function directionOf(
+export default function getDirection(
   config: I18nConfig,
   locale: Locale | undefined,
 ): Direction {

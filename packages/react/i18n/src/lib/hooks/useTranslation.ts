@@ -1,4 +1,4 @@
-import { createTranslator, directionOf } from "@canonical/i18n-core";
+import { createTranslator, getDirection } from "@canonical/i18n-core";
 import { useMemo, useSyncExternalStore } from "react";
 import { useI18nContext } from "../I18nProvider/index.js";
 import type { UseTranslationResult } from "./types.js";
@@ -15,5 +15,5 @@ export default function useTranslation(): UseTranslationResult {
     [locale, catalogs],
   );
 
-  return { t, locale, direction: directionOf(config, locale) };
+  return { t, locale, direction: getDirection(config, locale) };
 }

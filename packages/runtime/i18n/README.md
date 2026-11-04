@@ -32,13 +32,13 @@ const config: I18nConfig = {
 ## Locale negotiation (pure, SSR-safe)
 
 ```ts
-import { directionOf, negotiateLocale } from "@canonical/i18n-core";
+import { getDirection, negotiateLocale } from "@canonical/i18n-core";
 
 const locale = negotiateLocale(config, {
   cookieHeader: request.headers.get("cookie"),
   acceptLanguage: request.headers.get("accept-language"),
 });
-const dir = directionOf(config, locale); // "ltr" | "rtl"
+const dir = getDirection(config, locale); // "ltr" | "rtl"
 ```
 
 An explicit cookie wins, then `Accept-Language` negotiation, then the default
@@ -103,16 +103,16 @@ concurrent requests leaks locale state between them.
 
 The source can only set `<html lang dir>` from the client. For a correct first
 paint and assistive technology, render `<html lang dir>` on the server from the
-negotiated locale with `documentAttrs`:
+negotiated locale with `getDocumentAttributes`:
 
 ```ts
-import { documentAttrs, negotiateLocale } from "@canonical/i18n-core";
+import { getDocumentAttributes, negotiateLocale } from "@canonical/i18n-core";
 
 const locale = negotiateLocale(config, {
   cookieHeader: request.headers.get("cookie"),
   acceptLanguage: request.headers.get("accept-language"),
 });
-const { lang, dir } = documentAttrs(config, locale);
+const { lang, dir } = getDocumentAttributes(config, locale);
 // render: <html lang={lang} dir={dir}> … </html>
 ```
 
@@ -122,7 +122,7 @@ client render agree.
 
 ## Right-to-left & accessibility
 
-`directionOf` resolves writing direction from `rtlLocales` (base languages); a
+`getDirection` resolves writing direction from `rtlLocales` (base languages); a
 sensible default set is `["ar", "he", "fa", "ur"]`. Flipping `dir` is necessary
 but not sufficient — author UI with CSS **logical properties**
 (`margin-inline-start`, `inset-inline`, `text-align: start`) and mirror
