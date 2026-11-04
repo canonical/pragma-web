@@ -1,7 +1,8 @@
 /**
  * Test-only shapes: what a manual source records and answers with, what a
  * counting view store reports, what a recording location port records, how
- * often a set of counted rows was read, and a promise a test settles on cue.
+ * often a set of counted rows was read, a promise a test settles on cue, and
+ * the row a settled page carries.
  * Named here so a test file imports one place for them.
  */
 
@@ -109,3 +110,6 @@ export type CountedRows = {
   readonly rows: readonly RowRecord[];
   readonly readCount: () => number;
 };
+
+/** The row a settled page carries: an identity and nothing else. */
+export type SettledRow = { readonly id: string };
