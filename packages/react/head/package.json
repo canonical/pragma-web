@@ -51,7 +51,7 @@
     "@canonical/biome-config": "0.43.0",
     "@canonical/typescript-config-react": "^0.45.0",
     "@canonical/vitest-config-react": "^0.45.0",
-    "@canonical/webarchitect": "0.43.0",
+    "@canonical/webarchitect": "0.44.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.0.0",
