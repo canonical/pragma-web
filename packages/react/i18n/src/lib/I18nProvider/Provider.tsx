@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import I18nContext from "./Context.js";
+import Context from "./Context.js";
 import { useProviderState } from "./hooks/index.js";
 import type { I18nProviderProps } from "./types.js";
 
@@ -11,11 +11,17 @@ import type { I18nProviderProps } from "./types.js";
  * Pass the SSR-negotiated `locale` so the server and first client render agree.
  * Supply an external `source` only to share one locale value across frameworks;
  * otherwise the provider owns it.
+ *
+ * `import { I18nProvider } from "@canonical/i18n-react";`
+ *
+ * @implements ds:global.provider.i18n
  */
-export default function I18nProvider({
+export default function Provider({
   children,
   ...props
 }: I18nProviderProps): ReactElement {
   const value = useProviderState(props);
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 }
+
+Provider.displayName = "I18nProvider";
