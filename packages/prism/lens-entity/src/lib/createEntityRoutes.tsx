@@ -2,11 +2,11 @@ import {
   defineBinding,
   type EntityBinding,
   routeLensFacet,
+  viewSearch,
 } from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
 import type { ReactElement } from "react";
 import { ENTITY_ROUTE_SUFFIX } from "./constants.js";
-import entityIndexSearch from "./entityIndexSearch.js";
 import readUriParam from "./readUriParam.js";
 import type { EntityLensOptions, EntityRoutes } from "./types.js";
 import { EntityIcon } from "./ui/EntityIcon/index.js";
@@ -20,11 +20,15 @@ import warmEntityIndex from "./warmEntityIndex.js";
  * site's route table keeps them by:
  *
  * - `${id}`, at `/${id}`: the bound class's index, which declares the lens
- *   (`routeLensFacet`), so the rail and the trail link to it, and keeps
- *   its view in a search parameter (`/${id}?view=cards`);
+ *   (`routeLensFacet`), so the rail and the trail link to it, and reads
+ *   its renderer and its search from the address (`/${id}?as=cards&q=cen`);
  * - `${id}Entity`, at `/${id}/:uri`: one instance, the address compact
  *   (`/stations/metro%3Anorthgate`, the form the site's homes build from
- *   `_meta.curie`) or absolute.
+ *   `_meta.curie`) or absolute, in the renderer the address names
+ *   (`?as=turtle`).
+ *
+ * Both routes declare core's view search, so a site's register carries the
+ * view's parameters.
  *
  * The URL is the binding's id as written, a stated convention rather than a
  * pluralisation: a binding `stations` gives `/stations`. Each route reaches
@@ -41,7 +45,8 @@ import warmEntityIndex from "./warmEntityIndex.js";
  * `import { createEntityRoutes } from "@canonical/prism-lens-entity";`
  *
  * @param binding - The class the lens shows, and the type serving it.
- * @param lens - The lens's label, rail order and optional icon.
+ * @param lens - The lens's label, rail order, optional icon, renderers and
+ *   filter placement.
  * @returns The two routes, keyed by their literal names.
  * @throws When the binding is malformed.
  */
@@ -50,28 +55,39 @@ export default function createEntityRoutes<const TId extends string>(
   lens: EntityLensOptions,
 ): EntityRoutes<TId> {
   const { id } = defineBinding(binding);
-  const { label, order, icon = EntityIcon } = lens;
+  const { label, order, icon = EntityIcon, renderers, filters } = lens;
 
   const EntityIndexContent = (): ReactElement => (
-    <EntityIndexPage binding={binding} label={label} />
+    <EntityIndexPage
+      binding={binding}
+      filters={filters}
+      label={label}
+      renderers={renderers}
+    />
   );
   const EntityPageContent = ({
     params,
   }: {
     readonly params: Readonly<Record<string, unknown>>;
   }): ReactElement => (
-    <EntityPage binding={binding} label={label} uri={readUriParam(params)} />
+    <EntityPage
+      binding={binding}
+      label={label}
+      renderers={renderers}
+      uri={readUriParam(params)}
+    />
   );
 
   const index = route({
     url: `/${id}`,
-    search: entityIndexSearch,
+    search: viewSearch,
     content: EntityIndexContent,
     warm: () => warmEntityIndex(binding),
     meta: routeLensFacet.of({ label, icon, order, tier: 1 }),
   });
   const entity = route({
     url: `/${id}/:uri`,
+    search: viewSearch,
     content: EntityPageContent,
     warm: (params) => warmEntity(binding, params),
   });

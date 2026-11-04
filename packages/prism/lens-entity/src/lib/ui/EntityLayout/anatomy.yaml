@@ -1,48 +1,55 @@
 ---
 # EntityLayout — one entity lens on the document archetype: the site's
 # rail, the mode strip, the routed page (the index or an entity page) in
-# the one scrolling canvas, and the site's colophon under it. On the index
-# the strip carries the search box and the count of entries shown; on an
-# entity page only the trail. The filter provider encloses the whole layout
-# because the strip and the index are siblings that share one filter. It
-# renders no element of its own: core's DocumentLayout is the root and
-# takes the layout's native props, so this anatomy binds no style and the
-# folder has no stylesheet. No aside: an entity's page has nothing to set
-# beside it.
+# the one scrolling canvas, and the site's colophon under it. The strip
+# carries the trail and the page's renderers (the view group) on every
+# page; on the index, when the lens places its filters in the bar, the
+# search box and the count of entries shown, and the fold below two
+# groups. The index's sheet sits in the canvas, displayed only open below
+# two groups. The search text and the renderer are the address's, so the
+# strip and the index share no state of their own. It renders no element
+# of its own: core's DocumentLayout is the root and takes the layout's
+# native props, so this anatomy binds no style and the folder has no
+# stylesheet. No aside: an entity's page has nothing to set beside it.
 node:
   uri: prism.component.entity_layout
   edges:
     - node:
-        uri: prism.component.entity_filter_provider
+        uri: prism.component.document_layout
         edges:
           - node:
-              uri: prism.component.document_layout
+              role: rail (the site's own)
+            relation: { cardinality: "1", slotName: rail }
+          - node:
+              uri: prism.component.mode_strip
               edges:
                 - node:
-                    role: rail (the site's own)
-                  relation: { cardinality: "1", slotName: rail }
+                    uri: prism.subcomponent.trail
+                  relation: { cardinality: "1", slotName: trail }
                 - node:
-                    uri: prism.component.mode_strip
+                    uri: prism.subcomponent.entity_view
+                  relation: { cardinality: "0..1", slotName: view }
+                - node:
+                    uri: prism.subcomponent.entity_search
+                  relation: { cardinality: "0..1", slotName: search }
+                - node:
+                    uri: prism.component.filter_fold
+                  relation: { cardinality: "0..1", slotName: fold }
+                - node:
+                    uri: prism.subcomponent.socket_guard
                     edges:
                       - node:
-                          uri: prism.subcomponent.trail
-                        relation: { cardinality: "1", slotName: context }
-                      - node:
-                          uri: prism.subcomponent.entity_controls
-                        relation: { cardinality: "0..1", slotName: controls }
-                      - node:
-                          uri: prism.subcomponent.socket_guard
-                          edges:
-                            - node:
-                                uri: prism.subcomponent.entity_status
-                              relation: { cardinality: "1", slotName: tenant }
-                        relation: { cardinality: "0..1", slotName: status }
-                  relation: { cardinality: "1", slotName: strip }
-                - node:
-                    role: routed page (the index or an entity page)
-                  relation: { cardinality: "1", slotName: default }
-                - node:
-                    role: colophon (the site's own footer band)
-                  relation: { cardinality: "0..1", slotName: colophon }
-            relation: { cardinality: "1", slotName: layout }
-      relation: { cardinality: "1" }
+                          uri: prism.subcomponent.entity_status
+                        relation: { cardinality: "1", slotName: tenant }
+                  relation: { cardinality: "0..1", slotName: count }
+            relation: { cardinality: "1", slotName: strip }
+          - node:
+              role: routed page (the index or an entity page)
+            relation: { cardinality: "1", slotName: default }
+          - node:
+              uri: prism.component.filter_sheet
+            relation: { cardinality: "0..1", slotName: sheet }
+          - node:
+              role: colophon (the site's own footer band)
+            relation: { cardinality: "0..1", slotName: colophon }
+      relation: { cardinality: "1", slotName: layout }

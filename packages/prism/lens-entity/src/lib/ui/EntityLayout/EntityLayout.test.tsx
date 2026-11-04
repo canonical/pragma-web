@@ -78,14 +78,14 @@ describe("EntityLayout", () => {
       }),
     );
     // One crumb, the lens itself, as text: the index is the current page.
-    expect(within(readSocket("context")).getAllByRole("listitem")).toHaveLength(
+    expect(within(readSocket("trail")).getAllByRole("listitem")).toHaveLength(
       1,
     );
-    expect(within(readSocket("context")).getByText("Stations")).toHaveAttribute(
+    expect(within(readSocket("trail")).getByText("Stations")).toHaveAttribute(
       "aria-current",
       "page",
     );
-    expect(within(readSocket("context")).queryByRole("link")).toBeNull();
+    expect(within(readSocket("trail")).queryByRole("link")).toBeNull();
     unmount();
 
     const url = "/stations/metro%3Anorthgate";
@@ -99,18 +99,18 @@ describe("EntityLayout", () => {
     );
     // The lens crumb links back to the index; the address is the current
     // page, as the URL carries it.
-    expect(within(readSocket("context")).getAllByRole("listitem")).toHaveLength(
+    expect(within(readSocket("trail")).getAllByRole("listitem")).toHaveLength(
       2,
     );
     expect(
-      within(readSocket("context")).getByRole("link", { name: "Stations" }),
+      within(readSocket("trail")).getByRole("link", { name: "Stations" }),
     ).toHaveAttribute("href", "/stations");
     expect(
-      within(readSocket("context")).getByText("metro:northgate"),
+      within(readSocket("trail")).getByText("metro:northgate"),
     ).toHaveAttribute("aria-current", "page");
   });
 
-  it("claims the controls and the status on the index only", {
+  it("claims the search, the fold and the count on the index only", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const index = await createWarmEnvironment("/stations");
@@ -122,11 +122,11 @@ describe("EntityLayout", () => {
       }),
     );
     expect(
-      within(readSocket("controls")).getByRole("searchbox", {
+      within(readSocket("search")).getByRole("searchbox", {
         name: MESSAGES["controls.search.label"],
       }),
     ).toBeInTheDocument();
-    expect(readSocket("status")).toHaveTextContent(
+    expect(readSocket("count")).toHaveTextContent(
       `${STATION_COUNT} of ${STATION_COUNT} entries`,
     );
     unmount();
@@ -140,11 +140,71 @@ describe("EntityLayout", () => {
         layout: STATIONS_LAYOUT,
       }),
     );
-    expect(readSocket("controls")).toBeEmptyDOMElement();
-    expect(readSocket("status")).toBeEmptyDOMElement();
+    expect(readSocket("search")).toBeNull();
+    expect(readSocket("fold")).toBeNull();
+    expect(readSocket("count")).toBeNull();
   });
 
-  it("narrows the canvas and the status together as the reader types", {
+  it("offers the index's renderers and an entity's in the view group", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const index = await createWarmEnvironment("/stations");
+    const { unmount } = render(
+      createEntitySite({
+        url: "/stations",
+        environment: index.environment,
+        layout: STATIONS_LAYOUT,
+      }),
+    );
+    const listTabs = within(
+      within(readSocket("view")).getByRole("navigation", { name: "Show as" }),
+    );
+    expect(listTabs.getByRole("link", { name: "Table" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(listTabs.getByRole("link", { name: "Cards" })).toHaveAttribute(
+      "href",
+      "/stations?as=cards",
+    );
+    unmount();
+
+    const url = "/stations/metro%3Anorthgate";
+    const entity = await createWarmEnvironment(url);
+    render(
+      createEntitySite({
+        url,
+        environment: entity.environment,
+        layout: STATIONS_LAYOUT,
+      }),
+    );
+    const pageTabs = within(
+      within(readSocket("view")).getByRole("navigation", { name: "Show as" }),
+    );
+    expect(pageTabs.getByRole("link", { name: "Page" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(pageTabs.getByRole("link", { name: "Turtle" })).toHaveAttribute(
+      "href",
+      "/stations/metro%3Anorthgate?as=turtle",
+    );
+  });
+
+  it("offers no renderers on a route that is not the lens's own", () => {
+    render(
+      createEntitySite({
+        url: "/lines",
+        environment: createEnvironment({ fetchFn: createFetchSpy() }),
+        layout: STATIONS_LAYOUT,
+        children: null,
+      }),
+    );
+    expect(readSocket("view")).toBeEmptyDOMElement();
+    expect(readSocket("fold")).toBeNull();
+  });
+
+  it("leaves the search and the count to the panel when the lens places it", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
@@ -152,30 +212,48 @@ describe("EntityLayout", () => {
       createEntitySite({
         url: "/stations",
         environment,
+        layout: { ...STATIONS_LAYOUT, filters: "panel" },
+      }),
+    );
+    expect(readSocket("search")).toBeNull();
+    expect(readSocket("count")).toBeNull();
+    expect(readSocket("fold")).not.toBeNull();
+  });
+
+  it("folds the filters into a link that opens the sheet", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { environment } = await createWarmEnvironment("/stations");
+    const { unmount } = render(
+      createEntitySite({
+        url: "/stations?q=north",
+        environment,
         layout: STATIONS_LAYOUT,
       }),
     );
-
-    fireEvent.change(screen.getByRole("searchbox"), {
-      target: { value: "north" },
-    });
     expect(
-      within(screen.getByRole("main")).getAllByRole("listitem"),
-    ).toHaveLength(1);
-    expect(readSocket("status")).toHaveTextContent(
-      `1 of ${STATION_COUNT} entries`,
-    );
+      within(readSocket("fold")).getByRole("link", {
+        name: "Filter, 1 applied",
+      }),
+    ).toHaveAttribute("href", "/stations?q=north&sheet=filter");
+    expect(document.querySelector("dialog")).not.toHaveAttribute("open");
+    unmount();
 
-    fireEvent.change(screen.getByRole("searchbox"), {
-      target: { value: "no such station" },
-    });
-    expect(screen.getByText(MESSAGES["index.noMatch"])).toBeInTheDocument();
-    expect(readSocket("status")).toHaveTextContent(
-      `0 of ${STATION_COUNT} entries`,
+    render(
+      createEntitySite({
+        url: "/stations?q=north&sheet=filter",
+        environment,
+        layout: STATIONS_LAYOUT,
+      }),
+    );
+    const sheet = document.querySelector("dialog");
+    expect(sheet).toHaveAttribute("open");
+    expect(within(sheet as HTMLElement).getByRole("searchbox")).toHaveValue(
+      "north",
     );
   });
 
-  it("keeps the search when the reader switches the index's view", {
+  it("narrows the canvas and the count together as the reader types", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
@@ -187,20 +265,62 @@ describe("EntityLayout", () => {
         navigable: true,
       }),
     );
-    // The strip holds the search alone: the view toggle is the index's.
+
+    fireEvent.change(screen.getByRole("searchbox"), {
+      target: { value: "north" },
+    });
+    await waitFor(() => {
+      expect(
+        within(screen.getByRole("main")).getAllByRole("listitem"),
+      ).toHaveLength(1);
+    });
+    expect(readSocket("count")).toHaveTextContent(
+      `1 of ${STATION_COUNT} entries`,
+    );
+
+    fireEvent.change(screen.getByRole("searchbox"), {
+      target: { value: "no such station" },
+    });
     expect(
-      within(readSocket("controls")).queryByRole("button"),
-    ).not.toBeInTheDocument();
+      await screen.findByText(MESSAGES["index.noMatch"]),
+    ).toBeInTheDocument();
+    expect(readSocket("count")).toHaveTextContent(
+      `0 of ${STATION_COUNT} entries`,
+    );
+  });
+
+  it("keeps the search when the reader switches the index's renderer", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { environment } = await createWarmEnvironment("/stations");
+    render(
+      createEntitySite({
+        url: "/stations",
+        environment,
+        layout: STATIONS_LAYOUT,
+        navigable: true,
+      }),
+    );
     fireEvent.change(screen.getByRole("searchbox"), {
       target: { value: "northgate" },
     });
+    await waitFor(() => {
+      expect(readSocket("count")).toHaveTextContent(
+        `1 of ${STATION_COUNT} entries`,
+      );
+    });
 
-    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
+    fireEvent.click(
+      within(screen.getByRole("navigation", { name: "Show as" })).getByRole(
+        "link",
+        { name: "Cards" },
+      ),
+    );
     await waitFor(() => {
       expect(document.querySelectorAll(".ds.node-card")).toHaveLength(1);
     });
     expect(screen.getByRole("searchbox")).toHaveValue("northgate");
-    expect(readSocket("status")).toHaveTextContent(
+    expect(readSocket("count")).toHaveTextContent(
       `1 of ${STATION_COUNT} entries`,
     );
   });
@@ -235,7 +355,7 @@ describe("EntityLayout", () => {
     expect(screen.getByRole("main")).toHaveTextContent(
       MESSAGES["index.loading"],
     );
-    expect(readSocket("status")).toBeEmptyDOMElement();
+    expect(readSocket("count")).toBeEmptyDOMElement();
     expect(screen.getByRole("searchbox")).toBeInTheDocument();
   });
 });

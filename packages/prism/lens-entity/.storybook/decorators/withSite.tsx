@@ -1,14 +1,33 @@
-import { HomesProvider, RouterLink } from "@canonical/prism-core";
+import {
+  HomesProvider,
+  RenderersProvider,
+  RouterLink,
+  usePageRenderers,
+} from "@canonical/prism-core";
 import {
   defaultProjectionMaps,
   ProjectionsProvider,
+  useListRenderers,
 } from "@canonical/prism-projections";
 import { HeadProvider } from "@canonical/react-head";
 import { createMemoryAdapter, createRouter } from "@canonical/router-core";
 import { RouterProvider } from "@canonical/router-react";
-import type { ElementType, ReactElement } from "react";
-import { EntityFilterProvider } from "../../src/lib/ui/EntityFilterProvider/index.js";
+import type { ElementType, ReactElement, ReactNode } from "react";
 import { HOMES, SITE_ROUTES } from "../../testing/fixtures.js";
+
+/** The site's renderers, over a provider that serves source. */
+const SiteRenderers = ({
+  children,
+}: {
+  readonly children: ReactNode;
+}): ReactElement => (
+  <RenderersProvider
+    defaults={{ list: useListRenderers(), page: usePageRenderers() }}
+    extensions={["prose", "search", "source"]}
+  >
+    {children}
+  </RenderersProvider>
+);
 
 /** A site's document title template: the page's title, then the site's. */
 const formatDocumentTitle = (title: string): string => `${title} — Metro`;
@@ -23,8 +42,8 @@ interface WithSiteOptions {
  * in: the site's document-title template, a router over a memory history
  * holding a site's two entity lenses (its stations and its lines) at `url`,
  * the site's homes, the default projection maps with the router link
- * adapter, and the lens's filter, so the index's entries, the trail, the
- * strip's controls and the view toggle work as they do in the site. The
+ * adapter, and the site's renderers, so the index's entries, the trail, the
+ * strip's search and the renderer switch work as they do in the site. The
  * Relay addon's mock environment, which a story asks for through
  * `parameters.relay`, wraps it.
  *
@@ -50,9 +69,9 @@ const withSite =
             LinkComponent={RouterLink}
             maps={defaultProjectionMaps}
           >
-            <EntityFilterProvider>
+            <SiteRenderers>
               <Story />
-            </EntityFilterProvider>
+            </SiteRenderers>
           </ProjectionsProvider>
         </HomesProvider>
       </RouterProvider>

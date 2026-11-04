@@ -2,10 +2,10 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { withSite } from "../../../../../../.storybook/decorators/index.js";
-import Component from "./EntityControls.js";
+import Component from "./EntitySearch.js";
 
 const meta: Meta<typeof Component> = {
-  title: "Components/EntityLayout/EntityControls",
+  title: "Components/EntityLayout/EntitySearch",
   component: Component,
   tags: ["autodocs"],
   decorators: [withSite()],
@@ -14,5 +14,5 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** The strip's search box, which narrows the index's loaded entries. */
+/** The strip's search box, which narrows the index's loaded entries through the address. */
 export const Default: Story = {};

@@ -1,4 +1,9 @@
-import type { EntityBinding } from "@canonical/prism-core";
+import type { ProviderExtension } from "@canonical/prism-contract";
+import type {
+  EntityBinding,
+  FilterPlacement,
+  LensRenderers,
+} from "@canonical/prism-core";
 import type { MemoryAdapter } from "@canonical/router-core";
 import type { ReactNode } from "react";
 import type {
@@ -52,7 +57,14 @@ export interface EntitySiteLayout {
   readonly colophon?: ReactNode;
   /** Class names the site adds to the layout's root. */
   readonly className?: string;
+  /** The lens's renderers; the site's defaults when omitted. */
+  readonly renderers?: LensRenderers;
+  /** Where the index places its filters; the bar when omitted. */
+  readonly filters?: FilterPlacement;
 }
+
+/** An extension the test site's provider serves. */
+export type SiteExtension = ProviderExtension;
 
 /** What `createEntitySite` mounts. */
 export interface EntitySiteSetup {
@@ -77,6 +89,11 @@ export interface EntitySiteSetup {
    * when omitted.
    */
   readonly history?: MemoryAdapter;
+  /**
+   * The provider extensions the site serves, which decide the renderers it
+   * offers; every extension when omitted.
+   */
+  readonly extensions?: readonly SiteExtension[];
 }
 
 /** What a server render of one page hands the client. */

@@ -23,7 +23,7 @@ describe("EntityStatus on the server", () => {
         children: <EntityStatus binding={STATIONS_BINDING} />,
       }),
     );
-    expect(html).toContain('class="ds entity-status"');
+    expect(html).toContain('class="ds count-line ds entity-status"');
     expect(html).toContain(`${STATION_COUNT} of ${STATION_COUNT} entries`);
   });
 });

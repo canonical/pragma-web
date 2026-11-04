@@ -1,3 +1,5 @@
+import { VIEW_PARAMS } from "@canonical/prism-core";
+import { useSearchParam } from "@canonical/router-react";
 import { useFragment, useLazyLoadQuery } from "react-relay";
 import type { EntityIndex_query$key } from "../../../../__generated__/EntityIndex_query.graphql.js";
 import entityIndexFragmentNode from "../../../../__generated__/EntityIndex_query.graphql.js";
@@ -5,7 +7,6 @@ import type { EntityIndexQuery } from "../../../../__generated__/EntityIndexQuer
 import entityIndexQueryNode from "../../../../__generated__/EntityIndexQuery.graphql.js";
 import buildEntityIndexVariables from "../../../buildEntityIndexVariables.js";
 import matchesEntityText from "../../../matchesEntityText.js";
-import { useEntityFilter } from "../../EntityFilterProvider/index.js";
 import type {
   UseIndexStripQueryProps,
   UseIndexStripQueryResult,
@@ -13,7 +14,7 @@ import type {
 
 /**
  * Read what the strip's status states: how many instances the bound class
- * has, and how many of the loaded entries the shared search shows.
+ * has, and how many of the loaded entries the address's search text shows.
  *
  * The strip renders in the layout, beside the routed page, so nothing the
  * index holds can reach it as a prop, and data the index announced could
@@ -24,7 +25,7 @@ import type {
  *
  * @param binding - The binding whose class the index lists.
  * @returns The class's instance count and the number of entries shown.
- * @note Impure: reads the Relay store and the filter context, and suspends
+ * @note Impure: reads the Relay store and the address, and suspends
  *   while the store does not hold the operation.
  */
 export default function useIndexStripQuery(
@@ -38,12 +39,11 @@ export default function useIndexStripQuery(
     entityIndexFragmentNode,
     query,
   );
-  const { filter } = useEntityFilter();
+  const text = useSearchParam(VIEW_PARAMS.query) ?? "";
   const edges = ontologyClass?.instances.edges ?? [];
   return {
     count: ontologyClass?.instanceCount ?? 0,
-    visible: edges.filter(({ node }) =>
-      matchesEntityText(filter.text, node._meta),
-    ).length,
+    visible: edges.filter(({ node }) => matchesEntityText(text, node._meta))
+      .length,
   };
 }

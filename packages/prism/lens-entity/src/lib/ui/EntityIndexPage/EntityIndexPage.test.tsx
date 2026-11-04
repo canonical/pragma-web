@@ -44,57 +44,41 @@ describe("EntityIndexPage", () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
-  it("renders the cards view the address names, one card per station", {
+  it("renders the cards the address names, one card per station", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
-    render(createEntitySite({ url: "/stations?view=cards", environment }));
+    render(createEntitySite({ url: "/stations?as=cards", environment }));
 
     expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
       STATION_COUNT,
     );
     expect(document.querySelector(".ds.entity-index")).toHaveAttribute(
-      "data-view",
+      "data-renderer",
       "cards",
-    );
-    expect(screen.getByRole("button", { name: "Cards" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
     );
   });
 
-  it("keeps the view the reader picks in the address", {
+  it("hands the index the lens's renderers and filter placement", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
     render(
       createEntitySite({
-        url: "/stations",
+        url: "/stations?as=cards",
         environment,
-        navigable: true,
         children: (
-          <EntityIndexPage binding={STATIONS_BINDING} label="Stations" />
+          <EntityIndexPage
+            binding={STATIONS_BINDING}
+            filters="panel"
+            label="Stations"
+            renderers={{ list: ["table"] }}
+          />
         ),
       }),
     );
-    const rows = screen.getByRole("button", { name: "Rows" });
-    expect(rows).toHaveAttribute("aria-pressed", "true");
-
-    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
-    await waitFor(() => {
-      expect(document.querySelectorAll(".ds.node-card")).toHaveLength(
-        STATION_COUNT,
-      );
-    });
-    expect(screen.queryByRole("list")).toBeNull();
-
-    fireEvent.click(screen.getByRole("button", { name: "Rows" }));
-    await waitFor(() => {
-      expect(document.querySelectorAll(".ds.node-card")).toHaveLength(0);
-    });
-    expect(
-      within(screen.getByRole("list")).getAllByRole("listitem"),
-    ).toHaveLength(STATION_COUNT);
+    expect(document.querySelectorAll(".ds.node-card")).toHaveLength(0);
+    expect(document.querySelector(".ds.filter-panel")).not.toBeNull();
   });
 
   it("pages through the class with an explicit Load more", {

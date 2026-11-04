@@ -12,10 +12,15 @@ import {
 } from "../../../../../../testing/fixtures.js";
 import EntityDetail from "./EntityDetail.js";
 
-/** The interior at `address` over a store the entity route's warm filled. */
-const renderDetail = async (address: string) => {
-  const url = `/stations/${encodeURIComponent(address)}`;
-  const { environment } = await createWarmEnvironment(url);
+/**
+ * The interior at `address` over a store the entity route's warm filled,
+ * with the search the address carries.
+ */
+const renderDetail = async (address: string, search = "") => {
+  const url = `/stations/${encodeURIComponent(address)}${search}`;
+  const { environment } = await createWarmEnvironment(
+    `/stations/${encodeURIComponent(address)}`,
+  );
   return render(
     createEntitySite({
       url,
@@ -44,6 +49,17 @@ describe("EntityDetail", () => {
       [...(root?.children ?? [])].map((child) => child.classList.item(1)),
     ).toEqual(["entity-heading", "entity-summary", "field-list", "relations"]);
     expect(document.title).toBe("Northgate — Stations");
+  });
+
+  it("renders the entity's Turtle under its heading when the address asks", {
+    timeout: ENTITY_TEST_TIMEOUT_MS,
+  }, async () => {
+    const { container } = await renderDetail(NORTHGATE_CURIE, "?as=turtle");
+    const root = container.querySelector('[data-probe="detail"]');
+    expect(
+      [...(root?.children ?? [])].map((child) => child.classList.item(1)),
+    ).toEqual(["entity-heading", "entity-source"]);
+    expect(screen.getByText("Loading the source…")).toBeInTheDocument();
   });
 
   it("names an address nothing answers to in a status line, in InlineCode", {
