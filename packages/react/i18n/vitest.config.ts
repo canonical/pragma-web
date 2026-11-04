@@ -1,8 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
-// biome-ignore lint/suspicious/noExplicitAny: Vite 8 plugin types are incompatible with vitest's Vite 7 re-exports
-const plugins: any[] = [react()];
+const plugins = [react()];
 
 export default defineConfig({
   plugins,
@@ -12,7 +11,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: "v8",
-      include: ["src/**/*.{ts,tsx}"],
+      include: ["src/**/*.{ts,tsx}", "testing/**/*.ts"],
       exclude: [
         "**/index.ts",
         "**/*.test.ts",
@@ -36,7 +35,11 @@ export default defineConfig({
           environment: "jsdom",
           globals: true,
           setupFiles: ["./vitest.setup.ts"],
-          include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+          include: [
+            "src/**/*.test.ts",
+            "src/**/*.test.tsx",
+            "testing/**/*.test.ts",
+          ],
           exclude: ["src/**/*.ssr.test.tsx"],
         },
       },
