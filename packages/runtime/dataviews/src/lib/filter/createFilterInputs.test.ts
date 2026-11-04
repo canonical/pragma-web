@@ -201,6 +201,33 @@ describe("createFilterInputs", () => {
     });
   });
 
+  it("ends every input session on a move of the location, the predicate kept or not", () => {
+    const location = createMemoryLocation({
+      href: "/machines?cpu__gte=4&page=1&size=50",
+    });
+    const p = provider(location);
+    const release = p.observe();
+    const inputs = createFilterInputs({ host: readProviderHost(p) });
+    const stop = inputs.observe();
+    inputs.handles.cpu.gte.edit("4e");
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4e");
+    // Back to the same bound on another page: the half-typed value goes.
+    location.write(new URLSearchParams("cpu__gte=4&page=2&size=50"));
+    expect(inputs.handles.cpu.gte.state.get()).toEqual({
+      input: "4",
+      feedback: { status: "none" },
+    });
+    // A move the reader makes through the records ends nothing.
+    inputs.handles.cpu.gte.edit("4e");
+    p.navigateWindow({ page: 3 });
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4e");
+    stop();
+    // Released: a later move leaves the records alone.
+    location.write(new URLSearchParams("cpu__gte=4&page=1&size=50"));
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4e");
+    release();
+  });
+
   it("adopts nothing for a publication that moved no predicate", () => {
     const p = provider();
     const host = readProviderHost(p);
