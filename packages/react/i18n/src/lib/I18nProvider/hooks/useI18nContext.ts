@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import I18nContext from "../Context.js";
+import Context from "../Context.js";
 import type { UseI18nContextResult } from "./types.js";
 
 /**
@@ -7,7 +7,7 @@ import type { UseI18nContextResult } from "./types.js";
  * consumers fail fast instead of silently rendering untranslated content.
  */
 export default function useI18nContext(): UseI18nContextResult {
-  const value = useContext(I18nContext);
+  const value = useContext(Context);
 
   if (!value) {
     throw new Error("I18nProvider is required to use i18n-react hooks.");
