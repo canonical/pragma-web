@@ -54,7 +54,7 @@ const collection = createCollection({
     },
     { field: "cpu", kind: "number", min: 0, max: 64 },
     { field: "updated", kind: "date" },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
     { field: "name", kind: "text" },
   ],
 });
@@ -123,7 +123,7 @@ describe("DataViews.Filters", () => {
 
   it("offers one control per field and legal operator, and no others", () => {
     mount(makeProvider());
-    // Three options and the flag; two bounds on each of two fields.
+    // Three options and the presence field; two bounds on each of two fields.
     expect(screen.getAllByRole("checkbox")).toHaveLength(4);
     expect(screen.getAllByRole("spinbutton")).toHaveLength(2);
     expect(screen.queryByLabelText("owner from")).toBeNull();

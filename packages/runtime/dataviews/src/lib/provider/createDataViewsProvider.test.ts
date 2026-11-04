@@ -47,7 +47,7 @@ const machineCollection = (
     fields: [
       { field: "status", kind: "choices", options: ["failed", "cancelled"] },
       { field: "cpu", kind: "number", min: 0, max: 64 },
-      { field: "owner", kind: "flag" },
+      { field: "owner", kind: "presence" },
       { field: "updated", kind: "date" },
       { field: "name", kind: "text" },
     ],
@@ -1719,7 +1719,7 @@ describe("createDataViewsProvider monomorphic collection", () => {
     const scoped = createCollection({
       fields: [
         { field: "type", kind: "choices", options: ["container"] },
-        { field: "secureboot", kind: "flag", appliesTo: ["container"] },
+        { field: "secureboot", kind: "presence", appliesTo: ["container"] },
       ],
       identify: (row: Machine) => row.id,
     });

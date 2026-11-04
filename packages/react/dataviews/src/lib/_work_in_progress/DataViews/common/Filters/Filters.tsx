@@ -26,7 +26,7 @@ import { NO_RECORDS } from "./common/constants.js";
 import {
   BoundFilter,
   ChoicesFilter,
-  FlagFilter,
+  PresenceFilter,
   TextFilter,
 } from "./common/index.js";
 import { listFacetOptions } from "./common/utils/index.js";
@@ -201,10 +201,10 @@ const controls: {
       </Fragment>
     );
   },
-  flag: (context, definition, name) => {
+  presence: (context, definition, name) => {
     const facet = context.answered?.[definition.field];
     return (
-      <FlagFilter
+      <PresenceFilter
         key={definition.field}
         handle={findFilterHandle<boolean>(
           context.filters,
@@ -286,10 +286,10 @@ const renderControl = (
  * two roots over one provider never share a half-typed input.
  *
  * Where the provider asks its source for facets, the controls read them:
- * counts beside a choice's options and beside a flag, the least and greatest
- * value beside a number or date bound, and the server's options where the
- * schema lists none — each computed by the source over the whole matching
- * set. Counts and ranges are shown only while the result answers the applied
+ * counts beside a choice's options and beside a presence field, the least
+ * and greatest value beside a number or date bound, and the server's
+ * options where the schema lists none — each computed by the source over
+ * the whole matching set. Counts and ranges are shown only while the result answers the applied
  * query; the server's options stay from the latest result until a newer one
  * lists others.
  *

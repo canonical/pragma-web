@@ -21,7 +21,7 @@ const machines = () =>
     },
     { field: "cpu", kind: "number", min: 0, max: 64 },
     { field: "updated", kind: "date" },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
     { field: "name", kind: "text" },
   ]);
 
@@ -459,7 +459,7 @@ describe("decodeQuery", () => {
       {
         parameter: "owner",
         code: "invalid",
-        reason: 'flag field "owner" does not accept the isAny operator',
+        reason: 'presence field "owner" does not accept the isAny operator',
       },
     ]);
     expect(decode("status__gte=ready").issues).toEqual([

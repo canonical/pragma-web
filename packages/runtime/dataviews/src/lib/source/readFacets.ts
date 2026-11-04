@@ -70,7 +70,7 @@ const FACET_READERS: {
       ),
     };
   },
-  flag: (rows, definition) => {
+  presence: (rows, definition) => {
     // Set as `isSet` reads it: any value that is neither absent nor null.
     const set = rows.filter((row) => {
       const value = readField(row, definition.field);

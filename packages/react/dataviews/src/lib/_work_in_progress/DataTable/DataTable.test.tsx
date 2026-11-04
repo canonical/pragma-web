@@ -336,19 +336,19 @@ describe("DataTable", () => {
     // their own, over a source that answers with the one odd row.
     type Oddity = {
       readonly id: string;
-      readonly flag: boolean;
+      readonly ready: boolean;
       readonly big: bigint;
       readonly shape: object;
     };
     const oddities = createCollection({
       identify: (row: Oddity) => row.id,
-      fields: [{ field: "flag", kind: "flag" }],
+      fields: [{ field: "ready", kind: "presence" }],
     });
     const source = createManualSource<Oddity>({
       capabilities: declareCapabilities(oddities, {}),
       answer: () =>
         buildPage([
-          { id: "m-1", flag: false, big: 9007199254740993n, shape: {} },
+          { id: "m-1", ready: false, big: 9007199254740993n, shape: {} },
         ]),
     });
     const provider = createDataViewsProvider({
@@ -359,7 +359,7 @@ describe("DataTable", () => {
       <DataTable
         provider={provider}
         columns={[
-          { id: "flag", header: "Flag" },
+          { id: "ready", header: "Ready" },
           { id: "big", header: "Big" },
           { id: "shape", header: "Shape" },
           { id: "missing", header: "Missing" },

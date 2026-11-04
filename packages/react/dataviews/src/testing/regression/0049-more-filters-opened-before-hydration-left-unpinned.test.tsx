@@ -31,7 +31,7 @@ const collection = createCollection({
   identify: (row: Row) => row.id,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "ready"] },
-    { field: "owner", kind: "flag" },
+    { field: "owner", kind: "presence" },
   ],
 });
 

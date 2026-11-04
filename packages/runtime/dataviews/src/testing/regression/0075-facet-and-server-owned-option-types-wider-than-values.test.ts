@@ -2,7 +2,7 @@
  * Regression: a facet's value and a server-owned choice's applied set are
  * typed as narrowly as the values they can hold.
  *
- * Before the fix, a facet value was any boolean, though a flag field's
+ * Before the fix, a facet value was any boolean, though a presence field's
  * facet only ever lists `true`, so a reader had to handle a `false` no source
  * sends; and a choices field whose options are the server's applied a set of
  * strings and numbers, though such a field refuses every operand that is not
@@ -18,7 +18,7 @@ describe("regression 0075 — facet and server-owned option types wider than val
   it("types a facet value as text, a number or true, never false", () => {
     expectTypeOf<FacetValue["value"]>().toEqualTypeOf<string | number | true>();
     const refused: FacetValue = {
-      // @ts-expect-error a flag's facet lists only the records that are set
+      // @ts-expect-error a presence field's facet lists only the records that are set
       value: false,
       count: { kind: "exact", value: 1 },
     };
