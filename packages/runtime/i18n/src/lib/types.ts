@@ -16,8 +16,10 @@ export type Direction = "ltr" | "rtl";
 export type PluralCategory = "zero" | "one" | "two" | "few" | "many" | "other";
 
 /**
- * A message whose wording varies by count. `other` is required — it is the
- * fallback used whenever a locale does not define the selected category.
+ * The forms of a wording that varies by count, one per CLDR plural category:
+ * the `forms` of `Formatters.selectPlural`, or a plural catalog entry. `other` is
+ * required — it is the fallback used whenever a locale does not define the
+ * selected category.
  */
 export type PluralRecord = Partial<Record<PluralCategory, string>> & {
   other: string;
@@ -78,6 +80,20 @@ export interface Formatters {
   ): string;
   /** Join a list with locale-aware conjunctions, e.g. "A, B, and C". */
   formatList(items: Iterable<string>, options?: Intl.ListFormatOptions): string;
+  /**
+   * Pick the form a count takes under the locale's cardinal plural rules. The
+   * forms hold the whole wording, so format the count inside each one:
+   *
+   * ```ts
+   * f.selectPlural(count, { one: `${f.formatNumber(count)} row`, other: `${f.formatNumber(count)} rows` });
+   * ```
+   *
+   * A category the locale selects but `forms` lacks falls back to `other`.
+   *
+   * @experimental Part of the typed message records, which are pre-release:
+   * the signature may change in a minor release before 1.0.
+   */
+  selectPlural(count: number, forms: PluralRecord): string;
 }
 
 /**

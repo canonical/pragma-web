@@ -90,7 +90,7 @@ describe("Translator", () => {
 });
 
 describe("Formatters", () => {
-  it("has exactly the six formatting members, named with verbs", () => {
+  it("has exactly its members, each named with a verb", () => {
     expectTypeOf<keyof Formatters>().toEqualTypeOf<
       | "formatNumber"
       | "formatCurrency"
@@ -98,6 +98,7 @@ describe("Formatters", () => {
       | "formatTime"
       | "formatRelativeTime"
       | "formatList"
+      | "selectPlural"
     >();
   });
 
@@ -137,6 +138,12 @@ describe("Formatters", () => {
     >();
     expectTypeOf<Formatters["formatList"]>().toEqualTypeOf<
       (items: Iterable<string>, options?: Intl.ListFormatOptions) => string
+    >();
+  });
+
+  it("selects a plural form by count from a plural record", () => {
+    expectTypeOf<Formatters["selectPlural"]>().toEqualTypeOf<
+      (count: number, forms: PluralRecord) => string
     >();
   });
 });
