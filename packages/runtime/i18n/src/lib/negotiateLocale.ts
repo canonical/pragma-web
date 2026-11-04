@@ -28,7 +28,7 @@ function matchSupported(
   for (const tag of requested) {
     const exact = findByLower(config, tag);
     if (exact !== undefined) return exact;
-    const base = findByLower(config, tag.split("-")[0]);
+    const base = findByLower(config, tag.split("-").at(0));
     if (base !== undefined) return base;
   }
   return undefined;
