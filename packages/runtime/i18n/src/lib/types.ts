@@ -25,6 +25,53 @@ export type PluralRecord = Partial<Record<PluralCategory, string>> & {
   other: string;
 };
 
+/**
+ * One message in a {@link MessageRecord}: text, or a pure function of one
+ * argument that returns text. The argument is the message's one fact, such as
+ * a name or a count, or one object of named facts when there are two or more,
+ * so a translation cannot take facts in the wrong order.
+ *
+ * A function that declares a second parameter is not a `Message`, whether that
+ * parameter is required, optional or a rest parameter. The one exception is an
+ * optional or rest second parameter typed `unknown` or `any`: every argument
+ * fits such a parameter, so no type can refuse it. Do not declare one.
+ *
+ * @experimental Typed message records are pre-release: the shape of a
+ * message's argument may change in a minor release before 1.0.
+ */
+export type Message =
+  | string
+  | (((facts: never) => string) &
+      ((facts: never, ...rest: unknown[]) => string));
+
+/**
+ * Messages under stable keys, read as members (`messages.heading`,
+ * `messages.rowsSelected(count)`), so `tsc` checks every key and every fact.
+ * Declare a record with `type`, not `interface`: an interface has no index
+ * signature, so it does not satisfy this type.
+ *
+ * A locale is written as a factory that takes that locale's
+ * {@link Formatters} and returns the record, with the record named as its
+ * return type so a missing or misspelled member fails to compile. Call each
+ * factory once, at module scope.
+ *
+ * @experimental Typed message records are pre-release and may change in a
+ * minor release before 1.0.
+ */
+export type MessageRecord = { readonly [key: string]: Message };
+
+/**
+ * One value per locale: a {@link MessageRecord}, or any other per-locale data
+ * such as field labels. Pass the app's locale union as `L` so a missing locale
+ * fails to compile.
+ *
+ * @experimental Typed message records are pre-release: a form that loads a
+ * locale on demand may be added in a minor release before 1.0.
+ */
+export type Translations<T, L extends Locale = Locale> = {
+  readonly [K in L]: T;
+};
+
 /** A single catalog entry: a flat string or a count-sensitive plural record. */
 export type MessageValue = string | PluralRecord;
 
