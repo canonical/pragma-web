@@ -3,8 +3,9 @@ import type { QueryIssue } from "../result/index.js";
 
 /**
  * Whether a command addresses a refused clause, and so replaces it: a
- * predicate set or removed on the clause's field, or the search set for a
- * refused `q`. Every other command leaves the clause standing.
+ * predicate set or removed on the clause's field, an edit removing or adding
+ * a conjunct on it, or the search set for a refused `q`. Every other command
+ * leaves the clause standing.
  */
 export default function isClauseReplaced(
   command: QueryCommand,
@@ -15,6 +16,11 @@ export default function isClauseReplaced(
       return command.predicate.field === issue.field;
     case "removePredicate":
       return command.field === issue.field;
+    case "editPredicates":
+      return (
+        command.remove.some((ref) => ref.field === issue.field) ||
+        command.add.some((predicate) => predicate.field === issue.field)
+      );
     case "setSearch":
       return issue.field === null;
     default:

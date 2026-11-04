@@ -673,4 +673,183 @@ describe("applyQueryCommand", () => {
       "rejected",
     );
   });
+
+  describe("one conjunct among several at an address", () => {
+    const gte = (cores: number): Predicate => ({
+      field: "cpu",
+      operator: "gte",
+      operands: [cores],
+    });
+    const bounded = slice({ filter: [gte(8), gte(4), gte(16)] });
+
+    const accept = (result: ReturnType<typeof applyQueryCommand>) => {
+      if (result.status !== "accepted") {
+        throw new Error(`expected acceptance, not ${result.reason}`);
+      }
+      return result;
+    };
+
+    // Canonical order compares operands by their text: 16, then 4, then 8.
+    it("replaces the conjunct at nth, counted in canonical order", () => {
+      const result = accept(
+        applyQueryCommand(bounded, window(), {
+          kind: "setPredicate",
+          predicate: gte(2),
+          nth: 1,
+        }),
+      );
+      expect(result.slice.filter).toEqual([gte(8), gte(16), gte(2)]);
+    });
+
+    it("replaces conjunct 0 when no place is given", () => {
+      expect(
+        accept(
+          applyQueryCommand(bounded, window(), {
+            kind: "setPredicate",
+            predicate: gte(2),
+          }),
+        ).slice.filter,
+      ).toEqual([gte(8), gte(4), gte(2)]);
+    });
+
+    it("rejects a place past the conjuncts present, or no whole number", () => {
+      for (const nth of [3, -1, 1.5, Number.NaN]) {
+        const result = applyQueryCommand(bounded, window(), {
+          kind: "setPredicate",
+          predicate: gte(2),
+          nth,
+        });
+        expect(result.status).toBe("rejected");
+        expect(result.slice).toBe(bounded);
+      }
+      expect(
+        applyQueryCommand(slice(), window(), {
+          kind: "setPredicate",
+          predicate: gte(2),
+          nth: 1,
+        }),
+      ).toMatchObject({
+        status: "rejected",
+        reason: "cpu gte holds no conjunct 1",
+      });
+    });
+
+    it("removes the conjunct at nth alone, and nothing for one already gone", () => {
+      expect(
+        accept(
+          applyQueryCommand(bounded, window(), {
+            kind: "removePredicate",
+            field: "cpu",
+            operator: "gte",
+            nth: 2,
+          }),
+        ).slice.filter,
+      ).toEqual([gte(4), gte(16)]);
+      expect(
+        accept(
+          applyQueryCommand(bounded, window({ page: 2 }), {
+            kind: "removePredicate",
+            field: "cpu",
+            operator: "gte",
+            nth: 3,
+          }),
+        ),
+      ).toMatchObject({ sliceChanged: false, windowChanged: false });
+      expect(
+        applyQueryCommand(bounded, window(), {
+          kind: "removePredicate",
+          field: "cpu",
+          operator: "gte",
+          nth: -1,
+        }).status,
+      ).toBe("rejected");
+    });
+
+    it("removes every copy of a conjunct the slice spells twice", () => {
+      expect(
+        accept(
+          applyQueryCommand(slice({ filter: [gte(4), gte(4)] }), window(), {
+            kind: "removePredicate",
+            field: "cpu",
+            operator: "gte",
+          }),
+        ).slice.filter,
+      ).toEqual([]);
+    });
+
+    it("edits by refs read before the edit, in one transition", () => {
+      const result = accept(
+        applyQueryCommand(bounded, window({ page: 3 }), {
+          kind: "editPredicates",
+          remove: [
+            { field: "cpu", operator: "gte", nth: 0 },
+            { field: "cpu", operator: "gte", nth: 1 },
+          ],
+          add: [{ field: "cpu", operator: "lte", operands: [32] }],
+        }),
+      );
+      expect(result.slice.filter).toEqual([
+        gte(8),
+        { field: "cpu", operator: "lte", operands: [32] },
+      ]);
+      expect(result.window.page).toBe(1);
+    });
+
+    it("accepts an empty edit as no change", () => {
+      expect(
+        accept(
+          applyQueryCommand(bounded, window(), {
+            kind: "editPredicates",
+            remove: [],
+            add: [],
+          }),
+        ),
+      ).toMatchObject({ sliceChanged: false, windowChanged: false });
+    });
+
+    it("rejects an edit naming a conjunct twice, or one the slice lacks", () => {
+      const twice = applyQueryCommand(bounded, window(), {
+        kind: "editPredicates",
+        remove: [
+          { field: "cpu", operator: "gte", nth: 1 },
+          { field: "cpu", operator: "gte", nth: 1 },
+        ],
+        add: [],
+      });
+      expect(twice).toMatchObject({
+        status: "rejected",
+        reason: "conjunct 1 of cpu gte is named twice",
+      });
+      expect(
+        applyQueryCommand(bounded, window(), {
+          kind: "editPredicates",
+          remove: [{ field: "cpu", operator: "lte", nth: 0 }],
+          add: [],
+        }),
+      ).toMatchObject({
+        status: "rejected",
+        reason: "cpu lte holds no conjunct 0",
+      });
+      expect(
+        applyQueryCommand(bounded, window(), {
+          kind: "editPredicates",
+          remove: [{ field: "cpu", operator: "gte", nth: 0.5 }],
+          add: [],
+        }).status,
+      ).toBe("rejected");
+    });
+
+    it("rejects an edit adding a conjunct outside the grammar", () => {
+      expect(
+        applyQueryCommand(bounded, window(), {
+          kind: "editPredicates",
+          remove: [],
+          add: [{ field: "cpu", operator: "gte", operands: [] }],
+        }),
+      ).toMatchObject({
+        status: "rejected",
+        reason: "gte predicate needs exactly one operand",
+      });
+    });
+  });
 });

@@ -64,6 +64,7 @@ import type {
   Predicate,
   PredicateOperand,
   PredicateOperator,
+  PredicateRef,
   PreferenceResult,
   PresenceField,
   Presentation,
@@ -239,6 +240,7 @@ type EveryPublicType = [
   Predicate,
   PredicateOperand,
   PredicateOperator,
+  PredicateRef,
   PreferenceResult,
   PresentationPatch,
   PresentationTarget,
@@ -642,6 +644,7 @@ describe("public surface types", () => {
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("invokeAction");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("setPredicate");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("removePredicate");
+    expectTypeOf<DataViewsProvider>().not.toHaveProperty("editPredicates");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("applicability");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("recordType");
     expectTypeOf<DataViewsProvider>().not.toHaveProperty("fields");

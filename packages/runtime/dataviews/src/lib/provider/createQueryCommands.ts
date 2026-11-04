@@ -8,8 +8,8 @@ import {
 import type { QueryIssue, SourceRefusal } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import { refusalsOf } from "../source/index.js";
-import { CAUSE_OF_COMMAND } from "./constants.js";
 import listIncurredRefusals from "./listIncurredRefusals.js";
+import readCommandCause from "./readCommandCause.js";
 import type {
   AdoptionCause,
   QueryCommands,
@@ -123,7 +123,7 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
       // Applied above to a copy, and here for real: the same command over
       // the same state, so what moved there moves here and issues a request.
       coordinator.dispatch(next);
-      announce(CAUSE_OF_COMMAND[next.kind], history);
+      announce(readCommandCause(next), history);
       return NO_REFUSALS;
     },
     adopt(

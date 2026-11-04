@@ -19,6 +19,7 @@ import type {
   GroupTerm,
   Predicate,
   PredicateOperator,
+  PredicateRef,
   Query,
   QueryCommand,
   SetOperator,
@@ -363,10 +364,25 @@ export type ProviderHost<
     replaces?: SetOperator,
     history?: HistoryMode,
   ) => readonly SourceRefusal[];
-  /** Remove the predicate at an address; the window returns to page one. */
+  /**
+   * Remove the conjunct at `nth` of an address, 0 when left out; the window
+   * returns to page one. A conjunct already gone is no change.
+   */
   readonly removePredicate: (
     field: string,
     operator: PredicateOperator,
+    nth?: number,
+  ) => readonly SourceRefusal[];
+  /**
+   * Remove the named conjuncts and add others, as one transition: a set
+   * moved to another operator, two bounds merged into one. Each ref names a
+   * conjunct as the query stands before the edit; one naming none, or named
+   * twice, is a stale reading of the query and throws. The window returns to
+   * page one.
+   */
+  readonly editPredicates: (
+    remove: readonly PredicateRef[],
+    add: readonly Predicate[],
   ) => readonly SourceRefusal[];
   /**
    * Request the current query again and name the request. A withheld query

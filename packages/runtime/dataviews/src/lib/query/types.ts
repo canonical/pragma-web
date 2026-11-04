@@ -54,6 +54,19 @@ export type Predicate = {
 };
 
 /**
+ * One conjunct of a slice's filter, by address and place.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type PredicateRef = {
+  readonly field: string;
+  readonly operator: PredicateOperator;
+  /** Zero-based among the conjuncts at this address, in canonical order. */
+  readonly nth: number;
+};
+
+/**
  * Sort direction of a single ordered term.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -165,13 +178,21 @@ export type Query = {
 export type WindowNavigation = Partial<Omit<ResultWindow, "collapsed">>;
 
 /**
- * An addressed query command. `set*` replaces a whole value and the caller
- * computes it; `navigateWindow` and `setCollapsed` address the window only.
+ * An addressed query command: a predicate command names one conjunct by
+ * its `nth`, 0 when left out.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
  */
 export type QueryCommand =
   | {
       readonly kind: "setPredicate";
       readonly predicate: Predicate;
+      /**
+       * The conjunct at the predicate's address it replaces, 0 when left
+       * out. Where the address holds none, the 0th is added.
+       */
+      readonly nth?: number | undefined;
       /**
        * An operator on the same field whose predicate this one replaces in
        * the same transition — a set moved from `isAny` to `isNone` — so the
@@ -183,6 +204,18 @@ export type QueryCommand =
       readonly kind: "removePredicate";
       readonly field: string;
       readonly operator: PredicateOperator;
+      /** The conjunct at the address it removes, 0 when left out. */
+      readonly nth?: number | undefined;
+    }
+  | {
+      readonly kind: "editPredicates";
+      /**
+       * The conjuncts removed, each named as the slice stands before the
+       * edit, so removing one never moves the place of another.
+       */
+      readonly remove: readonly PredicateRef[];
+      /** The conjuncts added, beside whatever already stands. */
+      readonly add: readonly Predicate[];
     }
   | { readonly kind: "setSearch"; readonly search: string }
   | { readonly kind: "setSort"; readonly sort: readonly SortTerm[] }
@@ -193,7 +226,12 @@ export type QueryCommand =
     }
   | ({ readonly kind: "navigateWindow" } & WindowNavigation);
 
-/** Outcome of applying a query command: accepted change or explicit rejection. */
+/**
+ * Outcome of applying a query command: accepted change or explicit rejection.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
 export type QueryCommandResult =
   | (Query & {
       readonly status: "accepted";

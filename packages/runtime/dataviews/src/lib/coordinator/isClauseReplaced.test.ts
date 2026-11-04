@@ -41,6 +41,39 @@ describe("isClauseReplaced", () => {
     ).toBe(false);
   });
 
+  it("replaces a filter's clause by an edit touching its field", () => {
+    expect(
+      isClauseReplaced(
+        {
+          kind: "editPredicates",
+          remove: [{ field: "status", operator: "isAny", nth: 0 }],
+          add: [],
+        },
+        status,
+      ),
+    ).toBe(true);
+    expect(
+      isClauseReplaced(
+        {
+          kind: "editPredicates",
+          remove: [],
+          add: [{ field: "status", operator: "isNone", operands: ["a"] }],
+        },
+        status,
+      ),
+    ).toBe(true);
+    expect(
+      isClauseReplaced(
+        {
+          kind: "editPredicates",
+          remove: [{ field: "cpu", operator: "gte", nth: 0 }],
+          add: [{ field: "cpu", operator: "lte", operands: [8] }],
+        },
+        status,
+      ),
+    ).toBe(false);
+  });
+
   it("replaces a refused search by the search, and nothing else by it", () => {
     expect(isClauseReplaced({ kind: "setSearch", search: "" }, search)).toBe(
       true,

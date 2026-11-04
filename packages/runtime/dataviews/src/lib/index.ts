@@ -73,6 +73,7 @@ export type {
   Predicate,
   PredicateOperand,
   PredicateOperator,
+  PredicateRef,
   Query,
   ResultWindow,
   Slice,

@@ -15,6 +15,7 @@ import type {
   GroupTerm,
   Predicate,
   PredicateOperator,
+  PredicateRef,
   Query,
   SetOperator,
   SortTerm,
@@ -211,8 +212,15 @@ export default function createDataViewsProvider<
       replaces?: SetOperator,
       history?: HistoryMode,
     ) => command({ kind: "setPredicate", predicate, replaces }, history),
-    removePredicate: (field: string, operator: PredicateOperator) =>
-      command({ kind: "removePredicate", field, operator }),
+    removePredicate: (
+      field: string,
+      operator: PredicateOperator,
+      nth?: number,
+    ) => command({ kind: "removePredicate", field, operator, nth }),
+    editPredicates: (
+      remove: readonly PredicateRef[],
+      add: readonly Predicate[],
+    ) => command({ kind: "editPredicates", remove, add }),
     refresh: issueRefresh,
     adopt,
     view: protectChannel(openView),
