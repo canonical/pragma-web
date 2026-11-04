@@ -1,5 +1,5 @@
 import { COOKIE_MAX_AGE, DEFAULT_COOKIE_NAME } from "./constants.js";
-import directionOf from "./directionOf.js";
+import getDirection from "./getDirection.js";
 import type {
   Direction,
   I18nConfig,
@@ -60,18 +60,18 @@ export default function createLocaleSource(
   // inert on the server). Without this, a page negotiated to a non-default
   // locale keeps stale `<html lang dir>` until the first locale change — a WCAG
   // 3.1.1 hole and wrong direction for RTL.
-  if (reflect) reflectDocument(current, directionOf(config, current));
+  if (reflect) reflectDocument(current, getDirection(config, current));
 
   return {
     get: () => current,
     get direction(): Direction {
-      return directionOf(config, current);
+      return getDirection(config, current);
     },
     set(locale) {
       if (locale === current) return;
       current = locale;
       if (persist) writeCookie(cookieName, locale);
-      if (reflect) reflectDocument(locale, directionOf(config, locale));
+      if (reflect) reflectDocument(locale, getDirection(config, locale));
       for (const run of [...subscribers]) run(current);
     },
     subscribe(run) {

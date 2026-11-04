@@ -1,4 +1,4 @@
-import { directionOf } from "@canonical/i18n-core";
+import { getDirection } from "@canonical/i18n-core";
 import { useSyncExternalStore } from "react";
 import { useI18nContext } from "../I18nProvider/index.js";
 import type { UseLocaleResult } from "./types.js";
@@ -15,7 +15,7 @@ export default function useLocale(): UseLocaleResult {
   // provably part of the reactive snapshot.
   return {
     locale,
-    direction: directionOf(config, locale),
+    direction: getDirection(config, locale),
     setLocale: source.set,
     locales: config.locales,
   };

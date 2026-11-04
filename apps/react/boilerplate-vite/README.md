@@ -191,7 +191,7 @@ the compiled `renderer.tsx`) calls i18n-core's `negotiateLocale(config,
 { cookieHeader, acceptLanguage })`: an explicit `locale` cookie wins, then
 `Accept-Language` negotiation (exact tag, then base language), then the
 default. The result flows into `EntryServer` through the existing
-`initialData` mechanism, where `documentAttrs` renders the matching
+`initialData` mechanism, where `getDocumentAttributes` renders the matching
 `<html lang dir>` and the `I18nProvider` receives it as the initial locale.
 The client entry reads the same value back from `window.__INITIAL_DATA__`, so
 the first client render agrees with the server markup; the SPA cells (no SSR)
@@ -210,8 +210,8 @@ the next request — and updates `<html lang dir>` live.
 tests, and the Storybook toolbar list (`.storybook/preview.ts`) pick it up
 from there. The type error you get until the catalog is complete is the point.
 
-**Right-to-left.** `ar` exists to keep the RTL path honest: `directionOf` /
-`documentAttrs` flip `dir` with no app-side branching. Write styles with CSS
+**Right-to-left.** `ar` exists to keep the RTL path honest: `getDirection` /
+`getDocumentAttributes` flip `dir` with no app-side branching. Write styles with CSS
 logical properties (`margin-inline-start`, `text-align: start`) so layouts
 mirror structurally.
 
