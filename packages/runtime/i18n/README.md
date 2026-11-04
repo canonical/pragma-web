@@ -70,10 +70,10 @@ itself, an absent placeholder is left verbatim.
 import { createFormatters } from "@canonical/i18n-core";
 
 const f = createFormatters("en-US");
-f.number(1234.5); // "1,234.5"
-f.currency(1234.5, "USD"); // "$1,234.50"
-f.relativeTime(-3, "day", { numeric: "auto" }); // "3 days ago"
-f.list(["A", "B", "C"]); // "A, B, and C"
+f.formatNumber(1234.5); // "1,234.5"
+f.formatCurrency(1234.5, "USD"); // "$1,234.50"
+f.formatRelativeTime(-3, "day", { numeric: "auto" }); // "3 days ago"
+f.formatList(["A", "B", "C"]); // "A, B, and C"
 ```
 
 Formatters memoize their `Intl` instances by options, since constructing them
