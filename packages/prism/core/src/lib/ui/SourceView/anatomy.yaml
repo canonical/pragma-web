@@ -1,0 +1,113 @@
+---
+# SourceView — an entity's statements as Turtle, read as code: a figure
+# whose caption holds the entity's title, the text's size in bytes and,
+# once scripts run, a Copy button (the published Button, tertiary; "Copied"
+# announced in the caption's live region); then the text in a preformatted
+# block, wrapped on the inline axis so nothing scrolls sideways at 390,
+# in the code face at the secondary size, on the second background layer
+# inside a hairline, with the component's insets. A hand-written lossless
+# tokenizer marks four roles, each coloured through a component token:
+# directives (@prefix, @base) muted, IRIs and prefixed names in the link
+# colour, literals (strings with their language or datatype, numbers,
+# booleans) in the branded text colour, comments muted. Punctuation, `a`,
+# brackets and whitespace stay in the text colour. The concatenation of
+# the tokens is the input, byte for byte. Spans the whole main column.
+#
+# Every decision is read through a component token declared on the root
+# (`--source-view-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   1px: the block's hairline.
+#   layout.grid.column "1 / -1": structure.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, space.100,
+# component.padding.block, component.padding.inline, and the semantic
+# typography symbols typography.text.primary.code.fontFamily,
+# typography.text.secondary.fontSize,
+# typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.source_view
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+    spacing.external.inline.start: 0
+    spacing.external.inline.end: 0
+    size.min.width: 0
+  edges:
+    - node:
+        role: caption
+        styles:
+          layout.type: flex
+          layout.align: baseline
+          layout.wrap: wrap
+          spacing.gap: space.100
+        edges:
+          - node:
+              role: title
+              styles:
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              role: size
+              styles:
+                typography.color: color.text.muted
+                typography.variant.numeric: tabular-nums
+            relation: { cardinality: "1", slotName: size }
+          - node:
+              uri: prism.component.client_only
+              edges:
+                - node:
+                    uri: global.component.button
+                  relation: { cardinality: "1", slotName: default }
+            relation: { cardinality: "1", slotName: copy }
+          - node:
+              role: announcement
+              styles:
+                typography.color: color.text.muted
+            relation: { cardinality: "1", slotName: announcement }
+      relation: { cardinality: "1", slotName: caption }
+    - node:
+        role: code block
+        styles:
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.internal.block.start: component.padding.block
+          spacing.internal.block.end: component.padding.block
+          spacing.internal.inline.start: component.padding.inline
+          spacing.internal.inline.end: component.padding.inline
+          appearance.background: color.background.layer2
+          appearance.border.width: 1px
+          appearance.border.style: solid
+          appearance.border.color: color.border.muted
+          typography.fontFamily: typography.text.primary.code.fontFamily
+          typography.size: typography.text.secondary.fontSize
+          typography.color: color.text
+          typography.whiteSpace: pre-wrap
+          typography.wrap: anywhere
+          size.min.width: 0
+        edges:
+          - node:
+              role: directive token
+              styles:
+                typography.color: color.text.muted
+            relation: { cardinality: "0..*", slotName: directive }
+          - node:
+              role: iri token
+              styles:
+                typography.color: color.text.link
+            relation: { cardinality: "0..*", slotName: iri }
+          - node:
+              role: literal token
+              styles:
+                typography.color: color.text.branded
+            relation: { cardinality: "0..*", slotName: literal }
+          - node:
+              role: comment token
+              styles:
+                typography.color: color.text.muted
+            relation: { cardinality: "0..*", slotName: comment }
+      relation: { cardinality: "1", slotName: code }

@@ -1,0 +1,44 @@
+---
+# EntitySource — the Turtle renderer's body on an entity page: it asks the
+# provider for `source(uri)` through the site's Relay environment's network
+# (one full-text operation, no compiled artifact), on the client, after
+# mount, and only when it is rendered, which the `as=turtle` address
+# decides; the server render and the first paint show the loading line.
+# Three states after that: the SourceView over the text, one line when the
+# provider holds no source for the address, one alert line when the
+# request failed. A subgrid of the page over every column, one gutter
+# between its lines.
+#
+# Every decision is read through a component token declared on the root
+# (`--entity-source-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.grid.column "1 / -1": structure.
+#
+# Roster namespaces (accepted and tracked): grid.gutter.
+node:
+  uri: prism.component.entity_source
+  styles:
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.grid.column: "1 / -1"
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: status
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          typography.color: color.text.muted
+      relation: { cardinality: "0..1", slotName: status }
+    - node:
+        role: alert
+        styles:
+          layout.grid.column: "1 / -1"
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+      relation: { cardinality: "0..1", slotName: alert }
+    - node:
+        uri: prism.component.source_view
+      relation: { cardinality: "0..1", slotName: default }

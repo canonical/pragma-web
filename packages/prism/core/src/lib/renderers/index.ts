@@ -15,7 +15,7 @@ export {
   RENDERER_LABEL_KEYS,
   VIEW_PARAMS,
 } from "./constants.js";
-export { useRenderers } from "./hooks/index.js";
+export { usePageRenderers, useRenderers } from "./hooks/index.js";
 export { default as RenderersProvider } from "./Provider.js";
 export { default as readRenderer } from "./readRenderer.js";
 export { default as resolveRenderers } from "./resolveRenderers.js";

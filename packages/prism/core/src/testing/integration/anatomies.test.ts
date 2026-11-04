@@ -29,8 +29,11 @@ const EXTERNAL_TOKENS = [
   "--color-brand-primary",
   "--color-focus-ring",
   "--color-text",
+  "--color-text-branded",
+  "--color-text-link",
   "--color-text-muted",
   "--typography-text-primary-bold-font-weight",
+  "--typography-text-primary-code-font-family",
   "--typography-text-secondary-font-size",
   "--typography-text-secondary-font-weight",
 ];
