@@ -18,6 +18,7 @@ export interface I18nContextValue {
 
 /** Props for `I18nProvider`. */
 export interface I18nProviderProps {
+  /** The subtree that reads the i18n runtime through the hooks. */
   children: ReactNode;
   /** Active locale configuration. */
   config: I18nConfig;
