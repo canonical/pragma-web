@@ -1,4 +1,10 @@
-import type { Formatters, Locale, PluralRecord } from "./types.js";
+import { PLURAL_CATEGORIES } from "./constants.js";
+import type {
+  Formatters,
+  FormattersOptions,
+  Locale,
+  PluralRecord,
+} from "./types.js";
 
 /**
  * Wrap an `Intl` constructor in an options-keyed cache. Building `Intl`
@@ -62,12 +68,40 @@ function ensureTimeFields(
 }
 
 /**
+ * Throw when `forms` lacks a category that `rules` can select for its locale,
+ * naming every missing category in CLDR order.
+ */
+function assertComplete(
+  locale: Locale,
+  rules: Intl.PluralRules,
+  forms: PluralRecord,
+): void {
+  const { pluralCategories, type } = rules.resolvedOptions();
+  const used = new Set<string>(pluralCategories);
+  const missing = PLURAL_CATEGORIES.filter(
+    (category) => used.has(category) && forms[category] === undefined,
+  );
+  if (missing.length > 0) {
+    throw new RangeError(
+      `Missing ${type} plural forms for "${locale}": ${missing.join(", ")}.`,
+    );
+  }
+}
+
+/**
  * Create locale-aware {@link Formatters} backed by memoized native `Intl`
  * instances. Framework-agnostic and SSR-safe — `Intl` is a platform global.
  *
  * @param locale - BCP 47 tag every formatter is bound to.
+ * @param options - `strict` makes `selectPlural` and `selectOrdinal` throw on missing
+ *   forms; see {@link FormattersOptions}. The options parameter is
+ *   experimental, as {@link FormattersOptions} is.
  */
-export default function createFormatters(locale: Locale): Formatters {
+export default function createFormatters(
+  locale: Locale,
+  options: FormattersOptions = {},
+): Formatters {
+  const { strict = false } = options;
   const getNumberFormat = memoizeByOptions(
     (options?: Intl.NumberFormatOptions) =>
       new Intl.NumberFormat(locale, options),
@@ -94,6 +128,7 @@ export default function createFormatters(locale: Locale): Formatters {
     value: number,
     forms: PluralRecord,
   ): string => {
+    if (strict) assertComplete(locale, rules, forms);
     return forms[rules.select(value)] ?? forms.other;
   };
 
