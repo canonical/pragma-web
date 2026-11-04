@@ -116,8 +116,9 @@ const { lang, dir } = documentAttrs(config, locale);
 // render: <html lang={lang} dir={dir}> … </html>
 ```
 
-Pass the same `locale` to the client (`createLocaleSource({ initial: locale })`)
-so the server and first client render agree.
+Pass the same `locale` to the client
+(`createLocaleSource(config, { initial: locale })`) so the server and first
+client render agree.
 
 ## Right-to-left & accessibility
 
