@@ -1,13 +1,6 @@
 import { SelectInput } from "@canonical/react-ds-global-form";
-import {
-  type ReactElement,
-  useCallback,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import { useIsHydrated, useMergedRef, useMessages } from "../../hooks/index.js";
+import { type ReactElement, useId, useState } from "react";
+import { useIsHydrated, useMessages } from "../../hooks/index.js";
 import type { RendererSwitchProps } from "./types.js";
 import "./styles.css";
 
@@ -24,15 +17,20 @@ const componentCssClassName = "ds renderer-switch";
  * Once scripts run, the renderers are offered in the design system's select,
  * labelled by `label` or, where the application names nothing, by the words'
  * own `renderer`, and only the chosen one is drawn; the first until another
- * is chosen. Without scripting there is nothing to choose with, so
- * every renderer is drawn in turn, each in a region named for it, and each
- * stays reachable.
+ * is chosen. Without scripting there is nothing to choose with, so the
+ * first renderer — the default — is drawn alone, in a region named for it:
+ * drawing every renderer would repeat each record's checkboxes, links and
+ * status, and the switch has no choice it could know before it draws.
  *
  * Not exported from the package root: a work-in-progress spike, imported from
  * its own module until it is admitted.
  *
  * @experimental Pre-release: a work-in-progress spike, not admitted to the
  * package root; its shape may change or it may be withdrawn.
+ *
+ * `import { RendererSwitch } from "./_work_in_progress/RendererSwitch/index.js";`
+ *
+ * @implements ds:apps.pattern.renderer_switch
  */
 export default function RendererSwitch({
   label,
@@ -63,31 +61,6 @@ export default function RendererSwitch({
   const hydrated = useIsHydrated();
   const selectId = useId();
   const [chosen, setChosen] = useState(first.id);
-  const root = useRef<HTMLElement | null>(null);
-  // The root is the switch's own, so a caller's ref is merged onto it rather
-  // than dropped: the focus handoff below reads the regions inside it.
-  const hold = useCallback((node: HTMLElement) => {
-    root.current = node;
-    return () => {
-      root.current = null;
-    };
-  }, []);
-  const attach = useMergedRef(ref, hold);
-  // Without scripting every renderer is drawn, so a reader may be inside one
-  // that hydration is about to remove. Whichever renderer holds the focus
-  // becomes the chosen one, before the browser paints, so nothing the reader
-  // was reading — or focused — leaves the page under them.
-  useLayoutEffect(() => {
-    const focused = document.activeElement;
-    const region =
-      focused instanceof HTMLElement && root.current?.contains(focused) === true
-        ? focused.closest<HTMLElement>("[data-renderer]")
-        : null;
-    const held = region?.dataset["renderer"];
-    if (held !== undefined) {
-      setChosen(held);
-    }
-  }, []);
   // A renderer the application stopped offering is no longer chosen, and is
   // not chosen again should it come back.
   if (!ids.has(chosen)) {
@@ -97,7 +70,7 @@ export default function RendererSwitch({
   return (
     <section
       {...rest}
-      ref={attach}
+      ref={ref}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-label={name}
     >
@@ -114,8 +87,9 @@ export default function RendererSwitch({
           />
         </div>
       ) : null}
+      {/* The chosen renderer alone; before scripts, the first. */}
       {renderers.map((renderer) =>
-        hydrated && renderer.id !== active ? null : (
+        renderer.id === active ? (
           <section
             key={renderer.id}
             data-renderer={renderer.id}
@@ -123,7 +97,7 @@ export default function RendererSwitch({
           >
             {renderer.content}
           </section>
-        ),
+        ) : null,
       )}
     </section>
   );

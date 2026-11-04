@@ -1,8 +1,10 @@
 /**
- * Without scripting the renderer switch draws every renderer, so a reader may
- * be inside the second when scripts take over. Hydration kept the first and
- * removed the rest, taking the focused control with them and leaving focus on
- * the document. The renderer holding the focus becomes the chosen one.
+ * Without scripting the renderer switch once drew every renderer, so a
+ * reader could be inside the second when scripts took over. Hydration kept
+ * the first and removed the rest, taking the focused control with them and
+ * leaving focus on the document. The switch now draws the first renderer
+ * alone before scripts (regression 0127), so a reader can only be inside
+ * the renderer hydration keeps, and the focus stays where it was.
  */
 
 import { act, screen } from "@testing-library/react";
@@ -39,11 +41,12 @@ describe("hydrating a renderer switch a reader is inside", () => {
     onTestFinished(() => {
       container.remove();
     });
-    // What a reader without scripting can do: the second renderer is drawn,
-    // and its control takes the focus before hydration.
-    const inTheCards = screen.getByText("in the cards");
-    inTheCards.focus();
-    expect(document.activeElement).toBe(inTheCards);
+    // What a reader without scripting can do: the drawn renderer's control
+    // takes the focus before hydration. The other is not drawn to reach.
+    expect(screen.queryByText("in the cards")).toBeNull();
+    const inTheTable = screen.getByText("in the table");
+    inTheTable.focus();
+    expect(document.activeElement).toBe(inTheTable);
 
     await act(async () => {
       const root = hydrateRoot(container, tree);
@@ -58,8 +61,8 @@ describe("hydrating a renderer switch a reader is inside", () => {
       screen.getByRole<HTMLSelectElement>("combobox", {
         name: "Show machines as",
       }).value,
-    ).toBe("cards");
-    expect(screen.getByText("in the cards")).toBe(document.activeElement);
-    expect(screen.queryByText("in the table")).toBeNull();
+    ).toBe("table");
+    expect(screen.getByText("in the table")).toBe(document.activeElement);
+    expect(screen.queryByText("in the cards")).toBeNull();
   });
 });

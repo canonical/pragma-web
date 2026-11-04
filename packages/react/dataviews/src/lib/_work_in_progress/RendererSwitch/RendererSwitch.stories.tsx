@@ -83,7 +83,7 @@ function TableOrSummaryMachines({
  * between. Both read the same root, so a machine selected in one stays
  * selected in the other, and choosing asks the source for nothing. The
  * choice lasts while the switch is mounted; it is not written to the URL or
- * to a saved view. Without scripting both renderers are drawn in turn.
+ * to a saved view. Without scripting the first renderer is drawn alone.
  */
 export const TableOrSummary: Story = {
   render: ({ label = "Show machines as" }) => (
