@@ -9,7 +9,8 @@ import {
 } from "@canonical/dataviews-core";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
 import type { ApiScenario, FacetValue } from "../api/index.js";
-import { type Machine, machineCollection } from "../fixtures.js";
+import { machineCollection } from "../fixtures.js";
+import type { Machine } from "../types.js";
 
 /** Whether a value is a count, of a kind the envelope names. */
 const isCount = (value: unknown): value is Count =>
