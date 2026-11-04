@@ -112,5 +112,6 @@ export default function createFormatters(locale: Locale): Formatters {
     selectPlural: (count, forms) => selectForm(getPluralRules(), count, forms),
     selectOrdinal: (position, forms) =>
       selectForm(getPluralRules({ type: "ordinal" }), position, forms),
+    isolate: (text) => `\u2068${text}\u2069`,
   };
 }

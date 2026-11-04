@@ -113,6 +113,16 @@ export interface Formatters {
    * the signature may change in a minor release before 1.0.
    */
   selectOrdinal(position: number, forms: PluralRecord): string;
+  /**
+   * Wrap `text` between FIRST STRONG ISOLATE (U+2068) and POP DIRECTIONAL
+   * ISOLATE (U+2069), so a name or number placed in a sentence keeps its own
+   * direction and cannot reorder the words around it, as an Arabic name can
+   * inside an English sentence.
+   *
+   * @experimental Part of the typed message records, which are pre-release:
+   * the signature may change in a minor release before 1.0.
+   */
+  isolate(text: string): string;
 }
 
 /**
