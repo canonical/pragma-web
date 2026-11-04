@@ -1,24 +1,13 @@
-import {
-  createLocaleSource,
-  type I18nConfig,
-  type Locale,
-  type Messages,
-} from "@canonical/i18n-core";
+import { createLocaleSource, type Locale } from "@canonical/i18n-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import {
+  greetingCatalogs as catalogs,
+  localeConfig as config,
+  effectsOff,
+} from "../../../testing/fixtures.js";
 import { useLocale, useTranslation } from "../hooks/index.js";
 import I18nProvider from "./Provider.js";
-
-const config: I18nConfig = {
-  locales: ["en", "fr", "ar"],
-  defaultLocale: "en",
-  rtlLocales: ["ar"],
-};
-
-const catalogs: Record<Locale, Messages> = {
-  en: { greeting: "Hello, {name}!" },
-  fr: { greeting: "Bonjour, {name} !" },
-};
 
 function Greeting(): React.ReactElement {
   const { t } = useTranslation();
@@ -60,9 +49,8 @@ describe("I18nProvider", () => {
 
   it("binds to an external locale source when provided", () => {
     const source = createLocaleSource(config, {
+      ...effectsOff,
       initial: "fr",
-      persist: false,
-      reflect: false,
     });
     render(
       <I18nProvider config={config} catalogs={catalogs} source={source}>
@@ -93,9 +81,8 @@ describe("I18nProvider", () => {
 
   it("propagates a shared external source switch to every provider tree", () => {
     const source = createLocaleSource(config, {
+      ...effectsOff,
       initial: "en",
-      persist: false,
-      reflect: false,
     });
     render(
       <>
