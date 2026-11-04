@@ -301,4 +301,22 @@ describe("encodeQuery", () => {
     const second = encodeQuery({ schema, slice, window, preserve: first });
     expect(second.toString()).toBe(first.toString());
   });
+  it("writes each further conjunct at an address under its ordinal", () => {
+    expect(
+      encodeQuery({
+        schema: machines(),
+        slice: {
+          ...emptySlice,
+          filter: [
+            { field: "status", operator: "isAny", operands: ["ready"] },
+            { field: "cpu", operator: "gte", operands: [8] },
+            { field: "status", operator: "isAny", operands: ["failed"] },
+            { field: "cpu", operator: "gte", operands: [4] },
+            { field: "status", operator: "isAny", operands: ["failed"] },
+          ],
+        },
+        window: null,
+      }).toString(),
+    ).toBe("cpu__gte=4&cpu__gte__1=8&status=failed&status__isAny__1=ready");
+  });
 });

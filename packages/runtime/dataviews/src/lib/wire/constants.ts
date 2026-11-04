@@ -1,12 +1,18 @@
 /**
  * The names of the flat, form-compatible wire grammar: the delimiter
- * between a field and its operator, the parameters the grammar writes and
- * reserves, and the operators written with the delimiter.
+ * between a field, its operator and a conjunct's ordinal, the parameters
+ * the grammar writes and reserves, and the operators written with the
+ * delimiter.
  */
 
 import type { PredicateOperator } from "../query/index.js";
 
-/** The delimiter between a field's wire name and its operator. */
+/**
+ * The delimiter between a field's wire name and its operator, and between
+ * the operator and a conjunct's ordinal: `tags__isAny__1` is the second
+ * conjunct on `tags` under `isAny`. A field's wire name never holds it, so
+ * the three segments cannot be confused.
+ */
 export const OPERATOR_DELIMITER = "__";
 
 /**

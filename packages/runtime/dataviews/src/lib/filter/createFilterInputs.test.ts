@@ -202,6 +202,33 @@ describe("createFilterInputs", () => {
     });
   });
 
+  it("hands each record the first conjunct its address holds", () => {
+    const p = provider();
+    const host = readProviderHost(p);
+    host.adopt(
+      {
+        slice: {
+          filter: [
+            { field: "cpu", operator: "gte", operands: [8] },
+            { field: "cpu", operator: "gte", operands: [4] },
+          ],
+          search: null,
+          sort: [],
+          group: [],
+        },
+        window: p.state.get().window,
+      },
+      "adopt",
+      null,
+    );
+    const inputs = createFilterInputs({ host });
+    expect(inputs.handles.cpu.gte.applied.get()).toEqual({
+      kind: "value",
+      value: 4,
+    });
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4");
+  });
+
   it("ends every input session on a move of the location, the predicate kept or not", () => {
     const location = createMemoryLocation({
       href: "/machines?cpu__gte=4&page=1&size=50",

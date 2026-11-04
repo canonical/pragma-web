@@ -3,7 +3,7 @@
  * including the owned parameters it rejected.
  */
 
-import type { Query, ResultWindow, Slice } from "../query/index.js";
+import type { Predicate, Query, ResultWindow, Slice } from "../query/index.js";
 import type { QueryIssue } from "../result/index.js";
 import type { Schema, SchemaFieldDefinition } from "../schema/index.js";
 import type { SourceCapabilities } from "../source/index.js";
@@ -93,4 +93,53 @@ export type DecodeQueryConfig = {
    * Omitted or null, only the grammar and the schema are checked.
    */
   readonly capabilities?: SourceCapabilities | null | undefined;
+};
+
+/**
+ * One parameter name split as the grammar spells a filter: the field's wire
+ * name, the operator text after the first delimiter — null for a bare name —
+ * and the conjunct's ordinal after the second: zero when none is spelled,
+ * and null when what is spelled is no ordinal.
+ */
+export type WireKey = {
+  readonly field: string;
+  readonly operator: string | null;
+  readonly ordinal: number | null;
+};
+
+/**
+ * One conjunct as one key reads it: its predicate, its ordinal, and the
+ * indices of the key's values it takes.
+ */
+export type KeyConjunct = {
+  readonly predicate: Predicate;
+  readonly ordinal: number;
+  readonly taken: readonly number[];
+};
+
+/** What one filter key reads as: the issues it raises, and its conjunct. */
+export type KeyReading = {
+  readonly issues: readonly QueryIssue[];
+  readonly conjunct: KeyConjunct | null;
+};
+
+/**
+ * One conjunct as the parameters spelled it: the ordinal it was read under
+ * and the keys it was read from, so a refusal of the conjunct is reported
+ * under each key the link holds.
+ */
+export type ReadPredicate = {
+  readonly predicate: Predicate;
+  readonly ordinal: number;
+  readonly keys: readonly string[];
+};
+
+/** What keeping one key's conjunct did: a new one, merged, or a repeat. */
+export type ConjunctRecord = "added" | "merged" | "repeated";
+
+/** The conjuncts read so far after one key's, and the issue it raised. */
+export type RecordedConjunct = {
+  readonly filter: readonly ReadPredicate[];
+  readonly issue: QueryIssue | null;
+  readonly record: ConjunctRecord;
 };

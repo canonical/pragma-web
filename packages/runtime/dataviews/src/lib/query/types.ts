@@ -37,7 +37,9 @@ export type SetOperator = Extract<PredicateOperator, "isAny" | "isNone">;
 export type PredicateOperand = string | number | boolean | null;
 
 /**
- * One filter clause, addressed by its field and operator. `isAny` and
+ * One filter clause — a conjunct of the slice's filter — addressed by its
+ * field and operator; an address may hold several, and each restricts the
+ * result. `isAny` and
  * `isNone` operands are a non-empty set; `gte`, `lte`, `contains` and
  * `startsWith` carry exactly one operand; `isSet` carries none. Numbers must
  * be finite.
@@ -101,6 +103,12 @@ export type GroupPath = readonly PredicateOperand[];
  * name may change or move before the first release.
  */
 export type Slice = {
+  /**
+   * The conjuncts every row must match, all of them: two on one address
+   * both restrict, so `tags` any of `a` and `tags` any of `b` asks for rows
+   * holding both. Their order carries no meaning; the canonical form sorts
+   * them.
+   */
   readonly filter: readonly Predicate[];
   readonly search: string | null;
   readonly sort: readonly SortTerm[];

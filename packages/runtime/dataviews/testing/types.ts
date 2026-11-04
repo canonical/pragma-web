@@ -17,6 +17,7 @@ import type {
   SourceRequest,
 } from "../src/lib/source/index.js";
 import type { ViewStore } from "../src/lib/views/index.js";
+import type { DecodedQuery } from "../src/lib/wire/index.js";
 
 /** One execution the manual source was asked for, and how to answer it. */
 export type ManualCall<TRow extends object = RowRecord> = {
@@ -118,4 +119,14 @@ export type LinkReading = {
   readonly slice: Slice;
   readonly issues: readonly QueryIssue[];
   readonly encoded: string;
+};
+
+/**
+ * One followed link written back with its refusals carried: how it read,
+ * what was written, and how that reads.
+ */
+export type RespelledLink = {
+  readonly decoded: DecodedQuery;
+  readonly written: URLSearchParams;
+  readonly reread: DecodedQuery;
 };

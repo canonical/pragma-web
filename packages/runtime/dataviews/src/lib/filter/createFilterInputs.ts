@@ -74,14 +74,17 @@ export default function createFilterInputs<
     handles[definition.field] = byOperator;
   }
 
-  /** Each applied predicate of a slice, by the address a record edits. */
+  /**
+   * The applied conjunct each record edits, by its address: the first at
+   * the address in canonical order.
+   */
   const readApplied = (slice: Slice): Map<string, Predicate> => {
     const applied = new Map<string, Predicate>();
     for (const predicate of canonicalizeSlice(slice).filter) {
-      applied.set(
-        addressPredicate(predicate.field, predicate.operator),
-        predicate,
-      );
+      const address = addressPredicate(predicate.field, predicate.operator);
+      if (!applied.has(address)) {
+        applied.set(address, predicate);
+      }
     }
     return applied;
   };
