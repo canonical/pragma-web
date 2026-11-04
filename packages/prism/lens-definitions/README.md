@@ -54,7 +54,7 @@ The lens renders inside the site's provider nest: `HeadProvider`,
 `RelayEnvironmentProvider`, `RouterProvider`, and inside the router
 `HomesProvider` and `ProjectionsProvider`, which the inspector's instance
 chips read their homes and arms from. `DefinitionsLayout` mounts the lens's
-own filter provider, shared by the strip's chips and the explorer.
+own filter provider, shared by the facet bar's chips and the explorer.
 
 On the server, a site prepares the store through each route's `warm`
 (`warmDefinitions`), which prefetches the lens's one operation into the
@@ -121,9 +121,11 @@ selection leaves the contract and when the artifacts are stale. Run
 ## The workspace
 
 `DefinitionsLayout` lays the lens on `WorkspaceLayout`: the site's rail, the
-mode strip (the breadcrumb trail, the filter chips and the status figure),
-the explorer in the canvas and the term inspector in the inspector region,
-a drawer below three groups of columns. The router mounts the layout
+mode strip (the breadcrumb trail and the status figure), the facet bar
+under it (the filter chips), the explorer in the canvas and the term
+inspector in the inspector region, a drawer below three groups of columns.
+Below two groups the bar folds into the strip's "Filter · n" link, which
+opens the filter sheet through the address (`?sheet=filter`). The router mounts the layout
 again on each of the lens's routes, so the lens keeps the reader's chips,
 search, zoom and pan for the router's life while the reader stays in the
 lens: a pick in the rail pans the graph to the selection and changes

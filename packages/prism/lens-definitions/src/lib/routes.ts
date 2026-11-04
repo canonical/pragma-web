@@ -1,4 +1,8 @@
-import { routeLensFacet, routeShortcutFacet } from "@canonical/prism-core";
+import {
+  routeLensFacet,
+  routeShortcutFacet,
+  viewSearch,
+} from "@canonical/prism-core";
 import { route } from "@canonical/router-core";
 import { DEFINITIONS_TERM_URL, DEFINITIONS_URL } from "./constants.js";
 import { MESSAGES } from "./i18n/index.js";
@@ -28,13 +32,16 @@ import warmDefinitions from "./warmDefinitions.js";
  *
  * The explorer declares the lens (`routeLensFacet`) and its shortcut digit.
  * A site groups both routes under a wrapper of `DefinitionsLayout`, whose
- * strip carries the trail, the filter chips and the status figure.
+ * strip carries the trail and the status figure, its facet bar the filter
+ * chips. Both routes declare core's view search, whose `sheet` opens the
+ * folded filters below two groups.
  *
  * `import { definitionsRoutes } from "@canonical/prism-lens-definitions";`
  */
 export const definitionsRoutes = {
   definitions: route({
     url: DEFINITIONS_URL,
+    search: viewSearch,
     content: DefinitionsPage,
     warm: warmDefinitions,
     meta: {
@@ -51,6 +58,7 @@ export const definitionsRoutes = {
   }),
   definitionsTerm: route({
     url: DEFINITIONS_TERM_URL,
+    search: viewSearch,
     content: DefinitionsPage,
     warm: warmDefinitions,
   }),
