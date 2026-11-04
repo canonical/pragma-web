@@ -35,6 +35,7 @@ import {
   type SourceRequest,
 } from "../src/lib/source/index.js";
 import type { SavedView } from "../src/lib/views/index.js";
+import type { SettledRow } from "./types.js";
 
 /** The identity every fixture record carries: its own `id`. */
 export const byId = (row: RowRecord): string => String(row["id"]);
@@ -137,9 +138,6 @@ export const FORWARD_CURSORS: PaginationCapabilities = Object.freeze({
   backward: false,
   durable: false,
 });
-
-/** The row a settled page carries: an identity and nothing else. */
-export type SettledRow = { readonly id: string };
 
 /** A page of `rows` records, counted and continued as the settled fields say. */
 export const buildSettledPage = ({

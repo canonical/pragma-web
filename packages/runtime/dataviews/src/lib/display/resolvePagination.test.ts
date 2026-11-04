@@ -12,8 +12,8 @@ import {
   exactly,
   FORWARD_CURSORS,
   readIssuedRequest,
-  type SettledRow,
 } from "../../../testing/fixtures.js";
+import type { SettledRow } from "../../../testing/types.js";
 import {
   createQueryCoordinator,
   type QueryCoordinator,
