@@ -217,8 +217,9 @@ describe("LocaleSource", () => {
     >();
     expectTypeOf<LocaleSource["get"]>().toEqualTypeOf<() => Locale>();
     expectTypeOf<LocaleSource["direction"]>().toEqualTypeOf<Direction>();
-    expectTypeOf<LocaleSource["set"]>().toEqualTypeOf<
-      (locale: Locale) => void
-    >();
+  });
+
+  it("sets the locale from a tag, which it matches to a configured locale", () => {
+    expectTypeOf<LocaleSource["set"]>().toEqualTypeOf<(tag: Locale) => void>();
   });
 });

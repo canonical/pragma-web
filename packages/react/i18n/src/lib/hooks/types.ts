@@ -35,8 +35,16 @@ export interface UseLocaleResult {
   locale: Locale;
   /** Writing direction of the active locale. */
   direction: Direction;
-  /** Change the active locale. */
-  setLocale: (locale: Locale) => void;
+  /**
+   * Change the active locale. The tag is matched as negotiation matches an
+   * `Accept-Language` tag: the exact configured tag first, then its base
+   * language, ignoring case, so `setLocale("fr-CA")` selects `"fr"` when only
+   * `"fr"` is configured. A tag that matches the current locale changes
+   * nothing.
+   *
+   * @throws RangeError when the tag matches no configured locale.
+   */
+  setLocale: (tag: Locale) => void;
   /** Every configured locale, for building a selector. */
   locales: readonly Locale[];
 }

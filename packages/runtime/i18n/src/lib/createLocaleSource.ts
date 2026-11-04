@@ -1,5 +1,6 @@
 import { COOKIE_MAX_AGE, DEFAULT_COOKIE_NAME } from "./constants.js";
 import getDirection from "./getDirection.js";
+import matchLocale from "./matchLocale.js";
 import type {
   Direction,
   I18nConfig,
@@ -42,6 +43,14 @@ function reflectDocument(locale: Locale, direction: Direction): void {
  * `<html lang dir>`. On the server those effects are inert, so the same source
  * is safe to construct during SSR.
  *
+ * `set` matches a tag the way `negotiateLocale` matches an `Accept-Language`
+ * tag — exactly, then by base language, ignoring case — so a locale it stores
+ * is always a configured tag and `<html lang>` names the language the words are
+ * in. A tag that matches no configured locale throws a `RangeError`; negotiate
+ * request and cookie tags first, and catch the error for a tag from elsewhere,
+ * such as a URL segment. `initial` is stored as given: pass a negotiated locale
+ * so the first one is configured too.
+ *
  * `subscribe` honors the Svelte store contract, so a Svelte component can use
  * `$source` directly, React can pass it to `useSyncExternalStore`, and a Lit
  * reactive controller can subscribe — all from this one object.
@@ -77,7 +86,13 @@ export default function createLocaleSource(
     get direction(): Direction {
       return getDirection(config, current);
     },
-    set(locale) {
+    set(tag) {
+      const locale = matchLocale(config, tag);
+      if (locale === undefined) {
+        throw new RangeError(
+          `The locale "${tag}" matches none of the configured locales: ${config.locales.join(", ")}.`,
+        );
+      }
       if (locale === current) return;
       current = locale;
       if (persist) writeCookie(cookieName, locale);
