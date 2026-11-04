@@ -5,9 +5,27 @@
  * shapes those types accept. `tsc --noEmit` checks it.
  */
 
-import type { Direction, Locale, Translator } from "@canonical/i18n-core";
+import type {
+  Direction,
+  Formatters,
+  Locale,
+  Translator,
+} from "@canonical/i18n-core";
 import { describe, expectTypeOf, it } from "vitest";
-import type { UseLocaleResult, UseTranslationResult } from "./types.js";
+import type {
+  UseFormattersProps,
+  UseFormattersResult,
+  UseLocaleProps,
+  UseLocaleResult,
+  UseTranslationProps,
+  UseTranslationResult,
+} from "./types.js";
+
+describe("UseTranslationProps", () => {
+  it("is empty, since the hook takes no input", () => {
+    expectTypeOf<UseTranslationProps>().toEqualTypeOf<Record<string, never>>();
+  });
+});
 
 describe("UseTranslationResult", () => {
   it("exposes the translator, the locale and its direction", () => {
@@ -22,6 +40,12 @@ describe("UseTranslationResult", () => {
     expectTypeOf<keyof UseTranslationResult>().toEqualTypeOf<
       "t" | "locale" | "direction"
     >();
+  });
+});
+
+describe("UseLocaleProps", () => {
+  it("is empty, since the hook takes no input", () => {
+    expectTypeOf<UseLocaleProps>().toEqualTypeOf<Record<string, never>>();
   });
 });
 
@@ -41,5 +65,17 @@ describe("UseLocaleResult", () => {
     expectTypeOf<keyof UseLocaleResult>().toEqualTypeOf<
       "locale" | "direction" | "setLocale" | "locales"
     >();
+  });
+});
+
+describe("UseFormattersProps", () => {
+  it("is empty, since the hook takes no input", () => {
+    expectTypeOf<UseFormattersProps>().toEqualTypeOf<Record<string, never>>();
+  });
+});
+
+describe("UseFormattersResult", () => {
+  it("is the core Formatters interface", () => {
+    expectTypeOf<UseFormattersResult>().toEqualTypeOf<Formatters>();
   });
 });
