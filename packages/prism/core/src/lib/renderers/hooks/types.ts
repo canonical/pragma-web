@@ -8,3 +8,11 @@ export type UseProviderStateProps = Pick<
 
 /** What `useProviderState` returns: the context's value. */
 export type UseProviderStateResult = RenderersValue;
+
+/** What `useViewLocation` returns: the address's path and parameters. */
+export interface UseViewLocationResult {
+  /** The page's path. */
+  readonly pathname: string;
+  /** The address's search parameters, by name. */
+  readonly search: Readonly<Record<string, string>>;
+}

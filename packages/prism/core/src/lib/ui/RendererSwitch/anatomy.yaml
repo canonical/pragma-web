@@ -1,0 +1,86 @@
+---
+# RendererSwitch — the strip's view group: the renderers a page offers as a
+# row of links, so it works before hydration and in a new tab; exactly one
+# carries aria-current. Rendered only with two or more renderers (a lone
+# renderer is not drawn). Two forms of the same list: at two groups and
+# wider the published navigational Tabs (each tab a RouterLink whose href
+# differs from the address only in `as`, with `expand` dropped); below two
+# groups one menu, a native disclosure whose summary names the current
+# renderer, opening an overlay list of the same links under it. Both are
+# in the markup; the container query displays one.
+#
+# Built on published components: the published Tabs carries the tabs'
+# insets, rule, underline and focus ring. The menu's overlay is the
+# disclosure's own list, absolutely positioned under the summary (the
+# resilient baseline), on the page's background with a hairline, one
+# compact inset, so the strip stays one line while it is open.
+#
+# Every decision is read through a component token declared on the root
+# (`--renderer-switch-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   1px: the overlay's hairline frame.
+#   layout.stack 1: the overlay sits over the canvas's in-flow content; no
+#     semantic stacking symbol exists.
+#   layout.offset.top 100%: the overlay starts under the summary (an
+#     unthemable percentage).
+#   space.100 (8px) inset and gap of the overlay list.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups: the tabs are not
+#     displayed and the menu is.
+#
+# Roster namespaces (accepted and tracked): space.100, and the semantic
+# typography symbol typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.renderer_switch
+  styles:
+    size.min.width: 0
+  edges:
+    - node:
+        uri: global.component.tabs
+        edges:
+          - node:
+              uri: prism.component.router_link
+            relation: { cardinality: "2..*", slotName: tab }
+      relation: { cardinality: "1", slotName: tabs }
+    - node:
+        role: menu
+        styles:
+          layout.type: none
+          layout.position: relative
+        edges:
+          - node:
+              role: summary
+              styles:
+                interaction.cursor: pointer
+                typography.whiteSpace: nowrap
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "1", slotName: summary }
+          - node:
+              role: overlay list
+              styles:
+                layout.position: absolute
+                layout.offset.top: 100%
+                layout.offset.inline.start: 0
+                layout.stack: 1
+                layout.listStyle: none
+                layout.type: flex
+                layout.direction: column
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                spacing.internal.block.start: space.100
+                spacing.internal.block.end: space.100
+                spacing.internal.inline.start: space.100
+                spacing.internal.inline.end: space.100
+                spacing.gap: space.100
+                appearance.background: color.background
+                appearance.border.width: 1px
+                appearance.border.style: solid
+                appearance.border.color: color.border.muted
+              edges:
+                - node:
+                    uri: prism.component.router_link
+                  relation: { cardinality: "2..*", slotName: option }
+            relation: { cardinality: "1", slotName: options }
+      relation: { cardinality: "1", slotName: menu }

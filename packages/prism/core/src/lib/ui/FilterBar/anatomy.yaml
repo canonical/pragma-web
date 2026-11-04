@@ -1,0 +1,65 @@
+---
+# FilterBar — the second band under the strip, present only when a lens
+# has facets for the current set: the facet controls from column 5 (under
+# Search), then the applied chips, filling the band to the last line. The
+# same height rule as the strip (the density line plus one component
+# padding above and below, content-box, 53px) and the same bleed at its
+# inline start, so its hairline meets the rail's border; its end is the
+# last column line. It bleeds upward across the layout's row gap (a
+# negative block margin of one gutter), so the two bands touch and the
+# layout keeps one gap variable on both axes. It is one line at every
+# width: its controls never wrap. Below two groups the bar is not
+# displayed: its content is the sheet's.
+#
+# Every decision is read through a component token declared on the root
+# (`--filter-bar-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   --filter-bar-divider-width: 1px  the hairline below the band.
+#   --filter-bar-bleed: calc(-1 * var(--grid-gutter))  the negation of
+#     grid.gutter (inline start and block start alike).
+#   space.100 (8px) between the controls.
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups: not displayed.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# density.line.height, component.padding.block, space.100.
+node:
+  uri: prism.component.filter_bar
+  styles:
+    layout.grid.column: "1 / -1"
+    layout.type: grid
+    layout.grid.columns: subgrid
+    layout.align: center
+    layout.boxSizing: content-box
+    size.min.block: density.line.height
+    size.min.width: 0
+    spacing.gap: grid.gutter
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.external.block.start: "calc(-1 * var(--grid-gutter))"
+    spacing.external.inline.start: "calc(-1 * var(--grid-gutter))"
+    spacing.internal.inline.start: grid.gutter
+    spacing.internal.inline.end: 0
+    appearance.border.width: 1px
+    appearance.border.style: solid
+    appearance.border.bottom.color: color.border.muted
+  edges:
+    - node:
+        role: controls
+        styles:
+          layout.grid.column: "5 / -1"
+          layout.type: flex
+          layout.align: center
+          layout.wrap: nowrap
+          size.min.width: 0
+          spacing.gap: space.100
+        edges:
+          - node:
+              role: facets slot
+            relation: { cardinality: "1", slotName: facets }
+          - node:
+              role: chips slot
+            relation: { cardinality: "0..1", slotName: chips }
+      relation: { cardinality: "1", slotName: controls }

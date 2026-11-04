@@ -5,40 +5,60 @@ import { createRef } from "react";
 import { describe, expect, it } from "vitest";
 import ModeStrip from "./ModeStrip.js";
 
+/** The `data-slot` names of an element's children, in order. */
+const listSlots = (element: Element | null | undefined): string[] =>
+  [...(element?.children ?? [])].map(
+    (child) => (child as HTMLElement).dataset.slot ?? "",
+  );
+
 describe("ModeStrip", () => {
-  it("renders the three slot sockets with stable identities, empty", () => {
+  it("renders its three groups in order, empty, with stable identities", () => {
     render(<ModeStrip data-testid="strip" />);
     const strip = screen.getByTestId("strip");
     expect(strip.dataset.region).toBe("mode-strip");
-    for (const slot of ["context", "controls", "status"]) {
-      const socket = strip.querySelector(`[data-slot="${slot}"]`);
-      expect(socket, `socket ${slot}`).not.toBeNull();
-      // A sensible empty: the socket exists and holds nothing.
-      expect(socket?.textContent).toBe("");
-    }
+    expect(listSlots(strip)).toEqual(["trail", "view", "filtering"]);
+    expect(strip.textContent).toBe("");
+    expect(listSlots(strip.querySelector('[data-slot="filtering"]'))).toEqual(
+      [],
+    );
   });
 
-  it("mounts claimed content into the matching socket", () => {
+  it("mounts each group's content and the filtering slots in order", () => {
     render(
       <ModeStrip
-        context="Components"
-        controls={<button type="button">Filter</button>}
+        chips={<span>zone 1</span>}
+        count={<span>12 stations</span>}
         data-testid="strip"
-        status={<span>142 components</span>}
+        fold={<a href="?sheet=filter">Filter</a>}
+        search={<input aria-label="Search" />}
+        trail="Stations"
+        view={<a href="?as=cards">Cards</a>}
       />,
     );
     const strip = screen.getByTestId("strip");
-    expect(strip.querySelector('[data-slot="context"]')?.textContent).toBe(
-      "Components",
+    expect(strip.querySelector('[data-slot="trail"]')?.textContent).toBe(
+      "Stations",
     );
+    expect(strip.querySelector('[data-slot="view"]')?.textContent).toBe(
+      "Cards",
+    );
+    const filtering = strip.querySelector('[data-slot="filtering"]');
+    expect(listSlots(filtering)).toEqual(["search", "chips", "fold", "count"]);
     expect(
-      strip
-        .querySelector('[data-slot="controls"]')
-        ?.contains(screen.getByRole("button", { name: "Filter" })),
+      filtering
+        ?.querySelector('[data-slot="search"]')
+        ?.contains(screen.getByRole("textbox", { name: "Search" })),
     ).toBe(true);
-    expect(strip.querySelector('[data-slot="status"]')?.textContent).toBe(
-      "142 components",
+    expect(filtering?.querySelector('[data-slot="count"]')?.textContent).toBe(
+      "12 stations",
     );
+  });
+
+  it("renders the fold only when given", () => {
+    render(<ModeStrip count="3 lines" data-testid="strip" />);
+    expect(
+      screen.getByTestId("strip").querySelector('[data-slot="fold"]'),
+    ).toBeNull();
   });
 
   it("applies custom className alongside the component class", () => {

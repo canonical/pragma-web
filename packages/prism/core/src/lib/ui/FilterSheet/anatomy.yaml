@@ -1,0 +1,91 @@
+---
+# FilterSheet — the sheet the folded filters open below two groups: a
+# native dialog whose open state is the address's (`sheet=filter`), so it
+# opens from the fold's link without scripting and closes through a link
+# to the address without the parameter; hydrated, Escape closes it the
+# same way and focus moves to its title when it opens. It is not modal
+# (nothing can call showModal before scripts run), so it is positioned
+# over the shell: fixed, every inset 0, the full viewport, on the page's
+# background, above the canvas's in-flow content. It holds a header (the
+# title, then the close link at the end) and a scrolling content column:
+# the count, the applied chips, Search, then the facets, one gutter apart,
+# the same parts the panel or the bar hold at wider widths. It is not
+# displayed unless it is open below two groups, whatever the address says:
+# the bar and the panel exist at wider widths.
+#
+# Why not the published SidePanel: it opens only through its imperative
+# handle, so a link to `?sheet=filter` could not open it before hydration.
+#
+# Every decision is read through a component token declared on the root
+# (`--filter-sheet-*`), bound to the symbol named here.
+#
+# Token ledger:
+#   layout.stack 1: over the canvas's in-flow content; no semantic stacking
+#     symbol exists.
+#   size.width, size.max.width, size.max.height 100%: fills the viewport
+#     (unthemable).
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups: the open sheet is a
+#     flex column (`[open]`); closed, or at two groups and wider, it is not
+#     displayed.
+#
+# Roster namespaces (accepted and tracked): grid.gutter,
+# component.padding.block, component.padding.inline, and the semantic
+# typography symbol typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.filter_sheet
+  styles:
+    layout.position: fixed
+    layout.offset.top: 0
+    layout.offset.right: 0
+    layout.offset.bottom: 0
+    layout.offset.left: 0
+    layout.stack: 1
+    size.width: 100%
+    size.max.width: 100%
+    size.max.height: 100%
+    spacing.external.block.start: 0
+    spacing.external.block.end: 0
+    spacing.external.inline.start: 0
+    spacing.external.inline.end: 0
+    spacing.internal.block.start: component.padding.block
+    spacing.internal.block.end: component.padding.block
+    spacing.internal.inline.start: component.padding.inline
+    spacing.internal.inline.end: component.padding.inline
+    appearance.border.width: 0
+    appearance.background: color.background
+    typography.color: color.text
+    layout.type: none
+    layout.direction: column
+    spacing.gap: grid.gutter
+  edges:
+    - node:
+        role: header
+        styles:
+          layout.type: flex
+          layout.align: center
+          layout.justify: space-between
+          spacing.gap: grid.gutter
+        edges:
+          - node:
+              role: title
+              styles:
+                spacing.external.block.start: 0
+                spacing.external.block.end: 0
+                typography.size: inherit
+                typography.weight: typography.text.primary.bold.fontWeight
+            relation: { cardinality: "1", slotName: title }
+          - node:
+              uri: prism.component.router_link
+            relation: { cardinality: "1", slotName: close }
+      relation: { cardinality: "1", slotName: header }
+    - node:
+        role: content
+        styles:
+          layout.type: flex
+          layout.direction: column
+          spacing.gap: grid.gutter
+          layout.overflow.block: auto
+          size.min.block: 0
+      relation: { cardinality: "1", slotName: content }

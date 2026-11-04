@@ -137,7 +137,7 @@ const workspaceLayout = (
   <WorkspaceLayout
     inspector={<p>Inspector</p>}
     rail={<nav aria-label="Rail">Rail</nav>}
-    strip={<ModeStrip context="Workspace" />}
+    strip={<ModeStrip trail="Workspace" />}
   >
     <p>Canvas</p>
   </WorkspaceLayout>
@@ -174,7 +174,7 @@ const documentLayout = (
     }
     colophon={<p>Colophon</p>}
     rail={<nav aria-label="Rail">Rail</nav>}
-    strip={<ModeStrip context="Document" />}
+    strip={<ModeStrip trail="Document" />}
   >
     <div>
       {pageBand}
@@ -189,7 +189,7 @@ const documentLayout = (
 const bareDocumentLayout = (
   <DocumentLayout
     rail={<nav aria-label="Rail">Rail</nav>}
-    strip={<ModeStrip context="Document" />}
+    strip={<ModeStrip trail="Document" />}
   >
     <p>Page</p>
   </DocumentLayout>
@@ -226,7 +226,7 @@ const trailDocumentLayout = (
       rail={<nav aria-label="Rail">Rail</nav>}
       strip={
         <ModeStrip
-          context={
+          trail={
             <LensBreadcrumbs
               current={ABSOLUTE_IRI}
               lensLabel="Standards"

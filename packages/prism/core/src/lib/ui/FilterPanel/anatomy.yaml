@@ -1,0 +1,52 @@
+---
+# FilterPanel — the filters as a left panel in the workspace's shape, on
+# the canvas's first two columns, sticky while the list scrolls in the
+# canvas (the canvas is the scroller), holding top to bottom the count,
+# the applied chips, Search, then the facets. It is rendered by the lens's
+# index page as the page's first child; the list takes the remaining
+# columns (the page's own reflow, `:has()`). It is a column of its parts
+# one gutter apart. Below two groups it is not displayed: its content is
+# the sheet's. The strip then holds the trail and the view group only;
+# the count is the panel's, in bold.
+#
+# Every decision is read through a component token declared on the root
+# (`--filter-panel-*`), bound to the symbol named here.
+#
+# Token ledger: none (every value is a symbol, a keyword or 0).
+#
+# Reflow, bound in styles.css:
+#   @container shell (width < 912px)  below two groups: not displayed.
+#
+# Roster namespaces (accepted and tracked): grid.gutter, and the semantic
+# typography symbol typography.text.primary.bold.fontWeight.
+node:
+  uri: prism.component.filter_panel
+  styles:
+    layout.grid.column: "1 / span 2"
+    layout.grid.row: "1"
+    layout.position: sticky
+    layout.offset.top: 0
+    layout.alignSelf: start
+    layout.type: flex
+    layout.direction: column
+    spacing.gap: grid.gutter
+    size.min.width: 0
+  edges:
+    - node:
+        role: count slot
+        styles:
+          typography.weight: typography.text.primary.bold.fontWeight
+        edges:
+          - node:
+              uri: prism.component.count_line
+            relation: { cardinality: "1", slotName: default }
+      relation: { cardinality: "0..1", slotName: count }
+    - node:
+        role: chips slot
+      relation: { cardinality: "0..1", slotName: chips }
+    - node:
+        role: search slot
+      relation: { cardinality: "0..1", slotName: search }
+    - node:
+        role: facets slot
+      relation: { cardinality: "0..1", slotName: facets }

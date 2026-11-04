@@ -66,6 +66,9 @@ node:
           - node:
               uri: prism.component.mode_strip
             relation: { cardinality: "1", slotName: default }
+          - node:
+              uri: prism.component.filter_bar
+            relation: { cardinality: "0..1", slotName: default }
       relation: { cardinality: "0..1", slotName: strip }
     - node:
         uri: prism.component.canvas

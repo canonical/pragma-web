@@ -94,7 +94,7 @@ export function GlossaryLayout({ children }: { children: ReactNode }) {
           {/* the site's utility cluster */}
         </Rail>
       }
-      strip={<ModeStrip context={<GlossaryContext lensLabel="Glossary" />} />}
+      strip={<ModeStrip trail={<GlossaryContext lensLabel="Glossary" />} />}
     >
       {children}
     </DocumentLayout>
@@ -423,6 +423,11 @@ site's own catalog, and the factory holds no reader-facing string.
   `RenderersProviderProps`, `RenderersValue`, `FilterPlacement`,
   `ViewSearch`, `ViewSearchSchema`.
 - Links: `RouterLink`; types `RouterLinkProps`.
+- The strip and the filters: the strip itself (above), `RendererSwitch` (the
+  view group's links), `CountLine`, `FilterBar`, `FilterPanel`,
+  `FilterSheet`, `FilterFold`; types `RendererSwitchProps`, `Count`,
+  `CountLineProps`, `FilterBarProps`, `FilterPanelProps`,
+  `FilterSheetProps`, `FilterFoldProps`.
 - Homes: `HomesProvider`, `useHome`; types `Homes`, `HomeResolver`,
   `HomeNode`, `HomesProviderProps`.
 - Stored theme: `StoredThemeProvider`, `useStoredTheme`; types

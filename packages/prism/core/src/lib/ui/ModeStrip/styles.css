@@ -3,16 +3,13 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The band's height is the density line plus one component padding on
-   * each side, content-box: an empty strip and a one-row strip match, so
-   * the canvas below never jumps on a lens switch. The band and its sockets
-   * may be narrower than their content, so a tenant wider than the band
-   * wraps inside it instead of pushing past its columns. The band bleeds
-   * across the gutter at its start to meet the rail's border, and the same
-   * padding puts its context back on the canvas's first column line. Its
-   * end is the last column line, which is the viewport's edge on a shell
-   * with no outer margin: there is nothing to bleed across, so the band
-   * takes no end padding and the status ends on that line. */
+  /* A subgrid of the canvas's columns, so the three groups start on fixed
+   * lines on every page. The band's height is the density line plus one
+   * component padding on each side, content-box: an empty strip and a full
+   * one match, so the canvas below never jumps. The band bleeds across the
+   * gutter at its start to meet the rail's border, and the same padding
+   * puts its trail back on the canvas's first column line. Its end is the
+   * last column line, so it takes no end padding. */
   .ds.mode-strip {
     --mode-strip-gap: var(--grid-gutter);
     --mode-strip-min-block-size: var(--density-line-height);
@@ -21,17 +18,16 @@
     --mode-strip-padding-inline-start: var(--grid-gutter);
     --mode-strip-divider-width: 1px;
     --mode-strip-divider-color: var(--color-border-muted);
-    --mode-strip-context-font-weight: var(
+    --mode-strip-trail-font-weight: var(
       --typography-text-primary-bold-font-weight
     );
-    --mode-strip-status-color: var(--color-text-muted);
-    /* One baseline pair, between controls and between readouts. */
+    /* One baseline pair, between the controls of one group. */
     --mode-strip-spacing: var(--space-100);
 
     grid-column: 1 / -1;
-    display: flex;
+    display: grid;
+    grid-template-columns: subgrid;
     align-items: center;
-    flex-wrap: wrap;
     box-sizing: content-box;
     min-block-size: var(--mode-strip-min-block-size);
     min-inline-size: 0;
@@ -45,37 +41,82 @@
     border-bottom-color: var(--mode-strip-divider-color);
   }
 
-  /* The context stays on one line and never reaches past the band: a
-   * crumb wider than the socket, such as an identifier with no break
-   * opportunity, is clipped at the socket's inline end, with an ellipsis
-   * where the clipped content is the socket's own text. Clipped on the
-   * inline axis only, so a crumb's focus ring keeps its block extent. */
-  .ds.mode-strip .context {
+  /* The trail stays on one line and never reaches past its columns: a
+   * crumb wider than the group, such as an identifier with no break
+   * opportunity, is clipped at the group's end, with an ellipsis where the
+   * clipped content is its own text. */
+  .ds.mode-strip > .trail {
+    grid-column: 1 / span 2;
     min-inline-size: 0;
     overflow-x: clip;
-    font-weight: var(--mode-strip-context-font-weight);
+    font-weight: var(--mode-strip-trail-font-weight);
     white-space: nowrap;
     text-overflow: ellipsis;
   }
 
-  /* The controls claim the middle of the band and pack east; empty, they
-   * collapse to nothing. */
-  .ds.mode-strip .controls {
-    flex-grow: 1;
+  .ds.mode-strip > .view {
+    grid-column: 3 / span 2;
+    min-inline-size: 0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
+  }
+
+  /* One row that never wraps, from the fifth line to the last. */
+  .ds.mode-strip > .filtering {
+    grid-column: 5 / -1;
     min-inline-size: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
     gap: var(--mode-strip-spacing);
   }
 
-  .ds.mode-strip .status {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+  /* Search grows into every free track between the view group and the
+   * count. */
+  .ds.mode-strip > .filtering > .search {
+    flex-grow: 1;
     min-inline-size: 0;
-    gap: var(--mode-strip-spacing);
-    color: var(--mode-strip-status-color);
+  }
+
+  .ds.mode-strip > .filtering > .chips {
+    min-inline-size: 0;
+  }
+
+  /* The fold is the narrow form's; at two groups and wider it is not
+   * displayed. */
+  .ds.mode-strip > .filtering > .fold {
+    display: none;
+    flex-shrink: 0;
+  }
+
+  /* The count closes the group on the last line, even when nothing grows
+   * before it. */
+  .ds.mode-strip > .filtering > .count {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+  }
+
+  /* Below two groups the band is one flex line: the trail, the view
+   * group's menu, then the fold and the count; the sheet holds Search and
+   * the chips. */
+  @container shell (width < 912px) {
+    .ds.mode-strip {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: var(--mode-strip-spacing);
+    }
+
+    .ds.mode-strip > .filtering {
+      flex-grow: 1;
+    }
+
+    .ds.mode-strip > .filtering > .search,
+    .ds.mode-strip > .filtering > .chips {
+      display: none;
+    }
+
+    .ds.mode-strip > .filtering > .fold {
+      display: flex;
+    }
   }
 }

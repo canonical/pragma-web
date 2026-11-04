@@ -1,0 +1,14 @@
+---
+# FilterFold — the folded filtering control below two groups: one link
+# reading "Filter · n", n the applied filters, to the current address with
+# `sheet=filter`, so it opens the sheet without scripting. The strip's fold
+# slot displays it only below two groups. Its root is the router's link
+# (the published Button renders a native button only, which cannot carry
+# an href), named for assistive technology as "Filter, n applied"; the
+# label never wraps.
+#
+# Token ledger: none.
+node:
+  uri: prism.component.filter_fold
+  styles:
+    typography.whiteSpace: nowrap
