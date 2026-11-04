@@ -1,17 +1,12 @@
-import type { I18nConfig, Locale, Messages } from "@canonical/i18n-core";
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
+import {
+  localeConfig as config,
+  emptyCatalogs,
+} from "../../../testing/fixtures.js";
 import { I18nProvider } from "../I18nProvider/index.js";
 import useLocale from "./useLocale.js";
-
-const config: I18nConfig = {
-  locales: ["en", "fr", "ar"],
-  defaultLocale: "en",
-  rtlLocales: ["ar"],
-};
-
-const catalogs: Record<Locale, Messages> = { en: {}, fr: {} };
 
 function WithProvider({
   children,
@@ -19,7 +14,7 @@ function WithProvider({
   children: ReactNode;
 }): React.ReactElement {
   return (
-    <I18nProvider config={config} catalogs={catalogs}>
+    <I18nProvider config={config} catalogs={emptyCatalogs}>
       {children}
     </I18nProvider>
   );
