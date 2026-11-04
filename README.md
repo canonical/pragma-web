@@ -256,7 +256,7 @@ The following tables list all workspace packages with their location and purpose
 | `@canonical/ssr-adapter-vercel` | `packages/react/ssr-adapter-vercel` | Vercel deployment adapter for `@canonical/react-ssr` (**internal**) |
 | `@canonical/react-head` | `packages/react/head` | Declarative head management for React that renders head tags on the server and the client |
 | `@canonical/react-hooks` | `packages/react/hooks` | Shared React hooks: preferences, navigation tree |
-| `@canonical/i18n-react` | `packages/react/i18n` | React bindings for `@canonical/i18n-core`: I18nProvider plus useTranslation, useLocale, and useFormatters hooks |
+| `@canonical/i18n-react` | `packages/react/i18n` | React bindings for `@canonical/i18n-core`: I18nProvider plus the useLocalized, useLocale, useFormatters and (deprecated) useTranslation hooks |
 | `@canonical/router-react` | `packages/react/router` | React bindings for `@canonical/router-core` |
 | `@canonical/react-tokens` | `packages/react/tokens` | Token explorer components (TokenTable, TokenSwatch) for browsing design tokens in Storybook |
 
