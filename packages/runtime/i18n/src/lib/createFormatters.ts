@@ -21,6 +21,46 @@ function memoizeByOptions<TOptions, TFormatter>(
   };
 }
 
+/** Options that already ask for a part of the time of day. */
+const TIME_FIELDS = [
+  "hour",
+  "minute",
+  "second",
+  "dayPeriod",
+  "fractionalSecondDigits",
+  "timeStyle",
+] as const;
+
+/**
+ * Options that ask for a part of the date or for the time zone's name. `Intl`
+ * refuses a time style beside any of them, so they gain the hour and minute.
+ */
+const NON_STYLE_FIELDS = [
+  "weekday",
+  "era",
+  "year",
+  "month",
+  "day",
+  "timeZoneName",
+] as const;
+
+/**
+ * Make sure date-time options ask for the time of day. Options that already
+ * name a time field pass through; options that name a date field or the time
+ * zone's name gain the hour and minute; any other options gain the short time
+ * style.
+ */
+function ensureTimeFields(
+  options: Intl.DateTimeFormatOptions | undefined,
+): Intl.DateTimeFormatOptions {
+  if (options === undefined) return { timeStyle: "short" };
+  if (TIME_FIELDS.some((field) => options[field] !== undefined)) return options;
+  if (NON_STYLE_FIELDS.some((field) => options[field] !== undefined)) {
+    return { ...options, hour: "numeric", minute: "2-digit" };
+  }
+  return { ...options, timeStyle: "short" };
+}
+
 /**
  * Create locale-aware {@link Formatters} backed by memoized native `Intl`
  * instances. Framework-agnostic and SSR-safe — `Intl` is a platform global.
@@ -52,7 +92,7 @@ export default function createFormatters(locale: Locale): Formatters {
       ),
     date: (value, options) => getDateFormat(options).format(value),
     time: (value, options) =>
-      getDateFormat(options ?? { timeStyle: "short" }).format(value),
+      getDateFormat(ensureTimeFields(options)).format(value),
     relativeTime: (value, unit, options) =>
       getRelativeTimeFormat(options).format(value, unit),
     list: (items, options) => getListFormat(options).format([...items]),
