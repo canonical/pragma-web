@@ -1,8 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
-// biome-ignore lint/suspicious/noExplicitAny: Vite 8 plugin types are incompatible with vitest's Vite 7 re-exports
-const plugins: any[] = [react()];
+const plugins = [react()];
 
 export default defineConfig({
   plugins,
