@@ -126,6 +126,23 @@ export interface Formatters {
 }
 
 /**
+ * Options for `createFormatters`.
+ *
+ * @experimental Part of the typed message records, which are pre-release:
+ * options may be added or changed in a minor release before 1.0.
+ */
+export interface FormattersOptions {
+  /**
+   * Check plural forms for completeness: `selectPlural` and `selectOrdinal` throw a
+   * `RangeError` naming each category the locale uses that `forms` lacks, even
+   * when the count selects a category that is present. Meant for tests, so a
+   * translation short of a form fails there rather than falling back to
+   * `other` in production. Defaults to `false`.
+   */
+  readonly strict?: boolean;
+}
+
+/**
  * Declarative, framework-agnostic locale configuration. Plain data, listed
  * explicitly rather than discovered (Constitution VI — no magic).
  */

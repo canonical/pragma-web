@@ -11,6 +11,7 @@ export { default as readCookie } from "./readCookie.js";
 export type {
   Direction,
   Formatters,
+  FormattersOptions,
   I18nConfig,
   Locale,
   LocaleSource,
