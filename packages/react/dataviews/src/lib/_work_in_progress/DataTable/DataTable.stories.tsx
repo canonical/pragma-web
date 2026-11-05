@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement, ReactNode } from "react";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope, withFrame } from "../../../storybook/decorators.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import {
@@ -271,8 +271,9 @@ export const Sortable: Story = {
 
 /**
  * Sorted ascending: the Status heading reads `ascending`, and the rows fall
- * into failed, pending and running order — machines of one status keep the
- * source's order among themselves.
+ * into running, failed and pending order — the order the collection declares
+ * the status options in, its lifecycle rather than the alphabet — while
+ * machines of one status keep the source's order among themselves.
  */
 export const SortedAscending: Story = {
   parameters: consumerCode({
@@ -297,8 +298,26 @@ export const SortedAscending: Story = {
       canvas.getByRole("button", { name: "Host" }).querySelector("svg"),
     ).toBeNull();
     await waitFor(() =>
-      expect(canvas.getAllByRole("cell")[0]).toHaveTextContent(
-        "birch.example.com",
+      expect(
+        canvas
+          .getAllByRole("row")
+          .slice(1)
+          .map((row) => within(row).getAllByRole("cell")[0]?.textContent),
+      ).toEqual(
+        [
+          "alder",
+          "cedar",
+          "elm",
+          "gum",
+          "ironwood",
+          "karri",
+          "birch",
+          "fir",
+          "juniper",
+          "dogwood",
+          "hazel",
+          "larch",
+        ].map((host) => `${host}.example.com`),
       ),
     );
   },
@@ -363,7 +382,7 @@ const sortByStatusThenCores = (provider: MachineProvider): void => {
 };
 
 /**
- * Sorted by two terms: failed, pending and running machines, and the
+ * Sorted by two terms: running, failed and pending machines, and the
  * largest first within each status. Each sorted heading shows its place as
  * a numeral and states it — Cores reads "descending, 2nd of 2" — while only
  * Status, the first term, reports the sort through `aria-sort`, so exactly
