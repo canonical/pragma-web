@@ -288,12 +288,13 @@ export const SortedAscending: Story = {
         canvas.getByRole("columnheader", { name: "Status" }),
       ).toHaveAttribute("aria-sort", "ascending"),
     );
-    // The chevron repeats the order for the eye; unsorted headings show none.
+    // The chevron repeats the order for the eye; an unsorted heading's sort
+    // control shows none (its column menu keeps its own icon).
     await expect(
       canvas.getByRole("columnheader", { name: "Status" }).querySelector("use"),
     ).toHaveAttribute("href", expect.stringMatching(/#chevron-up$/));
     await expect(
-      canvas.getByRole("columnheader", { name: "Host" }).querySelector("svg"),
+      canvas.getByRole("button", { name: "Host" }).querySelector("svg"),
     ).toBeNull();
     await waitFor(() =>
       expect(canvas.getAllByRole("cell")[0]).toHaveTextContent(
@@ -692,7 +693,7 @@ export const ResizePastTheContainer: Story = {
       start + table.clientWidth + 0.5,
     );
     await expect(
-      widthOf(canvas.getByRole("columnheader", { name: "Owner" })),
+      widthOf(canvas.getByRole("columnheader", { name: /^Owner/ })),
     ).toBe(96);
   },
 };
@@ -738,7 +739,7 @@ export const LastColumnTakesTheRest: Story = {
   render: renderMachines(fixedColumns),
   play: async ({ canvas }) => {
     await expect(
-      widthOf(await canvas.findByRole("columnheader", { name: "Owner" })),
+      widthOf(await canvas.findByRole("columnheader", { name: /^Owner/ })),
     ).toBeGreaterThan(120);
   },
 };

@@ -310,9 +310,12 @@ export const AViewsArrangement: Story = {
         ),
       ).toBe(320),
     );
-    await expect(
-      canvas.getAllByRole("columnheader").map((header) => header.textContent),
-    ).toEqual(["Owner", "Host", "Status"]);
+    // Each heading is named by its label alone, not its column menu's.
+    const headers = canvas.getAllByRole("columnheader");
+    await expect(headers).toHaveLength(3);
+    for (const [index, header] of ["Owner", "Host", "Status"].entries()) {
+      await expect(headers[index]).toHaveAccessibleName(header);
+    }
   },
 };
 
