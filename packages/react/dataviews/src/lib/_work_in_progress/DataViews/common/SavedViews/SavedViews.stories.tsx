@@ -185,7 +185,12 @@ export const SaveAsANewView: Story = {
         'A view named "Failed machines" already exists.',
       ),
     );
-    await expect(name).toHaveAttribute("aria-invalid", "true");
+    // The refusal is the input's own validity, as the browser reports it.
+    await expect(name).toBeInvalid();
+    await expect(name).toHaveProperty(
+      "validationMessage",
+      'A view named "Failed machines" already exists.',
+    );
   },
 };
 
