@@ -12,5 +12,7 @@ import type { SelectFieldProps } from "./types.js";
  * @implements ds:global.component.select_field
  */
 export default withWrapper<SelectFieldProps>(
-  bindField<SelectFieldProps>(SelectInput, "native"),
+  bindField<SelectFieldProps>(SelectInput, "native", {
+    injectDefaultValue: true,
+  }),
 );

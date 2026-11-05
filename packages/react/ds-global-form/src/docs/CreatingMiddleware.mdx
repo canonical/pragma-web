@@ -49,6 +49,8 @@ Field
 
 The first middleware in the array is the outermost wrapper. Each middleware receives the result of the next one as its `Component` argument. The innermost middleware receives the **bound** component — `bindField(Input)`, not the presentational input itself.
 
+Keep middleware function identities stable between renders; changing one remounts the composed input. StrictMode may call factories more than once, so factories must not perform side effects during composition.
+
 That distinction matters. `bindField` is where `register()` or `useController` runs, so `value`, `onChange` and the element `ref` are all created *below* every middleware. Middleware sees the props going into the binding — `name`, `registerProps`, the ARIA props — and can add to them; it cannot intercept the value on its way out, and it never has the DOM node.
 
 This ordering is handled by `withWrapper`, which reverses the array and reduces it:
@@ -70,28 +72,18 @@ Fetches options from an API endpoint and injects them as the `options` prop. Use
 ```tsx
 import { Field, addRESTOptions } from "@canonical/react-ds-global-form";
 
+const countryOptions = addRESTOptions("/api/countries", {
+  method: "GET",
+  headers: { Accept: "application/json" },
+  transformData: (data) => data.countries.map((c) => ({ value: c.code, label: c.name })),
+});
+
 <Field
   name="country"
   inputType="select"
   label="Country"
   options={[]}
-  middleware={[
-    addRESTOptions("/api/countries", {
-      // HTTP method (default: "GET")
-      method: "GET",
-
-      // Custom headers for the request
-      headers: { Accept: "application/json" },
-
-      // Transform the API response into the { value, label } format
-      // that select/combobox/choices expect
-      transformData: (data) =>
-        data.countries.map((c) => ({
-          value: c.code,
-          label: c.name,
-        })),
-    }),
-  ]}
+  middleware={[countryOptions]}
 />
 ```
 
@@ -99,40 +91,31 @@ The middleware manages loading and error states internally. While the fetch is i
 
 ### addRESTValidation
 
-Validates the field value against an API endpoint with debouncing. Useful for checking uniqueness (usernames, email addresses) or applying server-side validation rules.
+Performs a debounced advisory check against an API endpoint, for example to give early feedback about a username.
 
 ```tsx
 import { Field, addRESTValidation } from "@canonical/react-ds-global-form";
+
+const usernameValidation = addRESTValidation("/api/check-username", {
+  method: "POST",
+  minLength: 3,
+  debounceWait: 300,
+  bodyFormatter: (value) => ({ username: value }),
+  errorExtractor: async (response) => {
+    const data = await response.json();
+    return data.message;
+  },
+});
 
 <Field
   name="username"
   inputType="text"
   label="Username"
-  middleware={[
-    addRESTValidation("/api/check-username", {
-      // HTTP method (default: "POST")
-      method: "POST",
-
-      // Minimum input length before validation triggers (default: 3)
-      minLength: 3,
-
-      // Debounce wait in milliseconds (default: 300)
-      debounceWait: 300,
-
-      // Format the request body (default: { value })
-      bodyFormatter: (value) => ({ username: value }),
-
-      // Extract the error message from a failed response
-      errorExtractor: async (response) => {
-        const data = await response.json();
-        return data.message;
-      },
-    }),
-  ]}
+  middleware={[usernameValidation]}
 />
 ```
 
-The middleware watches the field value via `useFormContext`. When the value changes and meets the minimum length, it debounces and sends a request. If the server returns a non-OK response, the middleware calls `setError` on the field, which triggers the `.danger` error state. If the server returns OK, it calls `clearErrors`.
+The middleware watches the field value and debounces requests when the minimum length is met. A non-OK response sets a manual error only when no independent error exists. Superseded requests are cancelled, stale results ignored and unrelated errors preserved. Network or error-extraction failures do not establish validity. This is advisory: pending or failed requests do not block submission, and RHF validation or submission can clear even a completed remote error. Validate authoritatively in the resolver or submit flow and on the server.
 
 ## Writing custom middleware
 

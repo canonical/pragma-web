@@ -3,6 +3,10 @@ import type { RegisterOptions } from "react-hook-form";
 export type BindMode = "native" | "controlled";
 
 export interface BindFieldOptions {
+  /** Render the initial form value as a native default. */
+  injectDefaultValue?: boolean;
+  /** Convert a form default to a native control value. */
+  formatDefaultValue?: (value: unknown) => unknown;
   /**
    * Inject the live field value as a `value` prop on the presentational input.
    * Needed by inputs that render their own value (e.g. Range's `<output>`).

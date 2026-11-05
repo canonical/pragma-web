@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { type RegisterOptions, useFormContext } from "react-hook-form";
 
 import {
@@ -36,34 +36,27 @@ const useFieldWrapper = (
 
   const isError = !!fieldError;
 
-  // Optionality is the source of truth for required-ness (see `registerProps`
-  // below, which maps `!isOptional` to RHF's `required` rule).
   const ariaProps = useFieldAriaProperties(name, isError, !isOptional);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Comparing the `name` suffices
-  const registerProps = useMemo(() => {
-    const props: RegisterOptions = {};
-    // We take advantage of the declaration of optionality to map to the required prop
-    if (!isOptional) {
-      props.required = {
-        value: true,
-        message: messages.required(label || name),
-      };
-    }
-    return {
-      ...nestedRegisterProps,
-      ...props,
-      ...userRegisterProps,
-    };
-  }, [name]);
+  const registerProps = {
+    ...nestedRegisterProps,
+    ...(!isOptional
+      ? { required: { value: true, message: messages.required(label || name) } }
+      : {}),
+    ...userRegisterProps,
+  } as RegisterOptions;
 
   const { unregister } = useFormContext();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Comparing the `name` suffices
-  useEffect(
-    () => () => (unregisterOnUnmount ? unregister(name) : undefined),
-    [name],
-  );
+  const lifecycle = useRef({ name, unregister, unregisterOnUnmount });
+  useEffect(() => {
+    lifecycle.current = { name, unregister, unregisterOnUnmount };
+  }, [name, unregister, unregisterOnUnmount]);
+  useEffect(() => {
+    return () => {
+      if (lifecycle.current.unregisterOnUnmount) unregister(name);
+    };
+  }, [name, unregister]);
 
   return {
     fieldError,
