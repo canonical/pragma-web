@@ -9,6 +9,8 @@ export interface OptionProps {
   type: "checkbox" | "radio";
   /** The option to render */
   option: ChoiceOption;
+  /** Whether the option's `description` is shown (the group's stacked layout only) */
+  showDescription?: boolean;
   /** Whether this option is currently selected */
   checked: boolean;
   /** Whether this option is disabled */

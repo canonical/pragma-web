@@ -32,12 +32,21 @@
     & > .ds.option {
       direction: inherit;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--space-100);
       cursor: pointer;
 
       label {
         padding: 0;
+      }
+
+      /* Muted one-line description under the label, indented past the mark. */
+      & > .ds.option-description {
+        flex-basis: 100%;
+        margin: 0;
+        margin-inline-start: calc(var(--dimension-200) + var(--space-100));
+        color: var(--color-text-muted);
       }
 
       /* RadioInput/CheckboxInput carry their own padding margins
