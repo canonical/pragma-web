@@ -19,6 +19,7 @@ const Option = ({
   name,
   type,
   option,
+  showDescription = true,
   checked,
   disabled,
   onChange,
@@ -55,6 +56,11 @@ const Option = ({
       <Label name={name} isOptional className="p" {...ariaProps.label}>
         {option.label}
       </Label>
+      {option.description && showDescription ? (
+        <p className="ds option-description" {...ariaProps.description}>
+          {option.description}
+        </p>
+      ) : null}
     </div>
   );
 };

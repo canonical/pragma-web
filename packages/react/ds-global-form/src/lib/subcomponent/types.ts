@@ -13,6 +13,8 @@ export type BaseProps = {
 export type Option = {
   value: string;
   label: string;
+  /** One-line muted text shown beneath the label (Choices stacked layout only) */
+  description?: string;
   disabled?: boolean;
   /**
    * BCP 47 language of the label, when it differs from the page's: a language
