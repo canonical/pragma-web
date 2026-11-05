@@ -9,22 +9,12 @@
     /* Align to the field edge like the label (no side margin by default), not to
      * the input's inner padding. Overridable via the shared variable. */
     margin-inline: var(--form-label-padding-inline, 0);
-    /* Label-font box, seated like a text line so density modifiers track the label. */
+    /* Label-font box; the density layer computes its seat (--space-before /
+       --seat-after, modifiers.density.css) and this sheet only applies it. */
     height: var(--typography-text-primary-font-size);
     width: var(--typography-text-primary-font-size);
     padding: 0;
-    margin-block-start: var(--space-before);
-    margin-block-end: max(
-      0px,
-      calc(
-        var(
-          --density-line-height,
-          var(--density-lh-comfy, calc(var(--baseline-height) * 8))
-        ) -
-        var(--space-before) -
-        1em
-      )
-    );
+    margin-block: var(--space-before, 0) var(--seat-after, 0);
     border: var(--dimension-stroke-thickness-medium) solid var(--color-border);
     border-radius: var(--dimension-radius-small);
     background: var(
