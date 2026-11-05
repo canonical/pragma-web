@@ -1,23 +1,23 @@
-import type { InputProps } from "../../common/types.js";
-import type { CheckboxFieldProps } from "../../component/CheckboxField/index.js";
-import type { ChoicesFieldProps } from "../../component/ChoicesField/index.js";
-import type { ColorFieldProps } from "../../component/ColorField/index.js";
-import type { ComboboxFieldProps } from "../../component/ComboboxField/index.js";
-import type { DateFieldProps } from "../../component/DateField/index.js";
-import type { DateTimeFieldProps } from "../../component/DateTimeField/index.js";
-import type { FileUploadFieldProps } from "../../component/FileUploadField/index.js";
-import type { HiddenFieldProps } from "../../component/HiddenField/index.js";
-import type { NumberFieldProps } from "../../component/NumberField/index.js";
-import type { PasswordFieldProps } from "../../component/PasswordField/index.js";
-import type { PhoneFieldProps } from "../../component/PhoneField/index.js";
-import type { RangeFieldProps } from "../../component/RangeField/index.js";
-import type { RatingFieldProps } from "../../component/RatingField/index.js";
-import type { RichChoicesFieldProps } from "../../component/RichChoicesField/index.js";
-import type { SelectFieldProps } from "../../component/SelectField/index.js";
-import type { SwitchFieldProps } from "../../component/SwitchField/index.js";
-import type { TextareaFieldProps } from "../../component/TextareaField/index.js";
-import type { TextFieldProps } from "../../component/TextField/index.js";
-import type { TimeFieldProps } from "../../component/TimeField/index.js";
+import type { ComponentProps, ComponentType } from "react";
+import type { CheckboxField } from "../../component/CheckboxField/index.js";
+import type { ChoicesField } from "../../component/ChoicesField/index.js";
+import type { ColorField } from "../../component/ColorField/index.js";
+import type { ComboboxField } from "../../component/ComboboxField/index.js";
+import type { DateField } from "../../component/DateField/index.js";
+import type { DateTimeField } from "../../component/DateTimeField/index.js";
+import type { FileUploadField } from "../../component/FileUploadField/index.js";
+import type { HiddenField } from "../../component/HiddenField/index.js";
+import type { NumberField } from "../../component/NumberField/index.js";
+import type { PasswordField } from "../../component/PasswordField/index.js";
+import type { PhoneField } from "../../component/PhoneField/index.js";
+import type { RangeField } from "../../component/RangeField/index.js";
+import type { RatingField } from "../../component/RatingField/index.js";
+import type { RichChoicesField } from "../../component/RichChoicesField/index.js";
+import type { SelectField } from "../../component/SelectField/index.js";
+import type { SwitchField } from "../../component/SwitchField/index.js";
+import type { TextareaField } from "../../component/TextareaField/index.js";
+import type { TextField } from "../../component/TextField/index.js";
+import type { TimeField } from "../../component/TimeField/index.js";
 import type { NativeInputType } from "../../subcomponent/types.js";
 
 export type {
@@ -41,31 +41,57 @@ export type {
   OptionsProps,
 } from "../../subcomponent/types.js";
 
-export type FieldProps =
-  | ({
-      inputType: Exclude<NativeInputType, "password" | "number">;
-    } & TextFieldProps)
-  | ({ inputType: "password" } & PasswordFieldProps)
-  | ({ inputType: "number" } & NumberFieldProps)
-  | ({ inputType: "checkbox" } & CheckboxFieldProps)
-  | ({ inputType: "switch" } & SwitchFieldProps)
-  | ({ inputType: "hidden" } & HiddenFieldProps)
-  | ({ inputType: "range" } & RangeFieldProps)
-  | ({ inputType: "rating" } & RatingFieldProps)
-  | ({ inputType: "select" } & SelectFieldProps)
-  | ({ inputType: "combobox" } & ComboboxFieldProps)
-  | ({ inputType: "choices" } & ChoicesFieldProps)
-  | ({ inputType: "textarea" } & TextareaFieldProps)
-  | ({ inputType: "date" } & DateFieldProps)
-  | ({ inputType: "time" } & TimeFieldProps)
-  | ({ inputType: "datetime" } & DateTimeFieldProps)
-  | ({ inputType: "file" } & FileUploadFieldProps)
-  | ({ inputType: "color" } & ColorFieldProps)
-  | ({ inputType: "phone" } & PhoneFieldProps)
-  | ({ inputType: "rich-choices" } & RichChoicesFieldProps)
-  | ({
-      inputType: "custom";
-      // biome-ignore lint/suspicious/noExplicitAny: In the case of a custom component, we'd expect
-      CustomComponent: React.ComponentType<InputProps<any>>;
-      // biome-ignore lint/suspicious/noExplicitAny: In the case of a custom component, we'd expect
-    } & InputProps<any>);
+type ReservedCustomKeys<P> = P extends unknown
+  ? Extract<"inputType" | "CustomComponent" | "key", keyof P>
+  : never;
+
+type CustomVariant<
+  P extends { name: string },
+  Whole extends { name: string } = P,
+> = P extends unknown
+  ? { inputType: "custom"; CustomComponent: ComponentType<Whole> } & NoInfer<P>
+  : never;
+
+type TextInputType = Exclude<NativeInputType, "password" | "number">;
+type TextVariants = {
+  [T in TextInputType]: { inputType: T } & Omit<
+    ComponentProps<typeof TextField>,
+    "inputType"
+  >;
+}[TextInputType];
+
+type BuiltinFields =
+  | TextVariants
+  | ({ inputType: "password" } & ComponentProps<typeof PasswordField>)
+  | ({ inputType: "number" } & ComponentProps<typeof NumberField>)
+  | ({ inputType: "checkbox" } & ComponentProps<typeof CheckboxField>)
+  | ({ inputType: "switch" } & ComponentProps<typeof SwitchField>)
+  | ({ inputType: "hidden" } & ComponentProps<typeof HiddenField>)
+  | ({ inputType: "range" } & ComponentProps<typeof RangeField>)
+  | ({ inputType: "rating" } & ComponentProps<typeof RatingField>)
+  | ({ inputType: "select" } & ComponentProps<typeof SelectField>)
+  | ({ inputType: "combobox" } & ComponentProps<typeof ComboboxField>)
+  | ({ inputType: "choices" } & ComponentProps<typeof ChoicesField>)
+  | ({ inputType: "textarea" } & ComponentProps<typeof TextareaField>)
+  | ({ inputType: "date" } & ComponentProps<typeof DateField>)
+  | ({ inputType: "time" } & ComponentProps<typeof TimeField>)
+  | ({ inputType: "datetime" } & ComponentProps<typeof DateTimeField>)
+  | ({ inputType: "file" } & ComponentProps<typeof FileUploadField>)
+  | ({ inputType: "color" } & ComponentProps<typeof ColorField>)
+  | ({ inputType: "phone" } & ComponentProps<typeof PhoneField>)
+  | ({ inputType: "rich-choices" } & ComponentProps<typeof RichChoicesField>);
+
+// Field owns the native input type; distribute Omit to preserve toggle unions.
+type WithoutNativeType<T> = T extends unknown
+  ? Omit<T, "type"> & { type?: never }
+  : never;
+
+/**
+ * Props for a built-in or custom field. Custom props are inferred from the
+ * component in JSX or supplied as the type argument for a field map. They must
+ * include a string `name` and cannot declare `inputType`, `CustomComponent`,
+ * or React's `key`, which are consumed before the component is rendered.
+ */
+export type FieldProps<P extends { name: string } = { name: string }> =
+  | WithoutNativeType<BuiltinFields>
+  | ([ReservedCustomKeys<P>] extends [never] ? CustomVariant<P> : never);
