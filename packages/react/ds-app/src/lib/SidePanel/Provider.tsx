@@ -69,9 +69,8 @@ const componentCssClassName = "ds side-panel";
  * this clipping. When it must overlap the panel, give its overlay layer a
  * z-index higher than `--side-panel-z-index`.
  *
- * The panel's width comes from `size`: `"medium"` (465px) is the default,
- * `"large"` (640px) opts into the wider panel. Both map onto the
- * `--side-panel-inline-size` custom property
+ * The panel's width comes from the `--side-panel-inline-size` custom
+ * property, 465px by default.
  *
  * `import { SidePanel } from "@canonical/react-ds-app";`
  *
@@ -79,7 +78,6 @@ const componentCssClassName = "ds side-panel";
  */
 const Provider = ({
   children,
-  size = "medium",
   ...props
 }: SidePanelProviderProps): React.ReactElement => {
   const {
@@ -115,13 +113,7 @@ const Provider = ({
     <Context.Provider value={contextValue}>
       <dialog
         ref={dialogRef}
-        className={[
-          componentCssClassName,
-          size === "large" ? "large" : undefined,
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className={[componentCssClassName, className].filter(Boolean).join(" ")}
         // The panel is always named by its header's title — the header is
         // required, so this always points at a live element (the development
         // warning above catches panels composed without one). A consumer

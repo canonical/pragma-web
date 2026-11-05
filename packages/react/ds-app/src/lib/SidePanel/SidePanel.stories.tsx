@@ -141,55 +141,6 @@ export const Default: Story = {
 };
 
 /**
- * The wide panel: `size="large"` opts into 640px instead of the 465px
- * default, for content that needs the room
- */
-export const Large: Story = {
-  render: () => (
-    <>
-      <style>
-        {`
-          /* Disable animations for visual testing */
-          :root {
-            --side-panel-transition-duration: 0ms;
-          }
-        `}
-      </style>
-      <Component
-        size="large"
-        ref={(handle: SidePanelHandle | null) => {
-          handle?.open();
-        }}
-      >
-        <Component.Header>Instance details</Component.Header>
-        <Component.Content>
-          <p>
-            The large panel is 640px wide — room for content that outgrows the
-            465px default, like wider tables or longer lines of input.
-          </p>
-        </Component.Content>
-        <Component.Footer>
-          <Button importance="primary">Done</Button>
-        </Component.Footer>
-      </Component>
-    </>
-  ),
-  parameters: {
-    docs: {
-      source: {
-        code: `<SidePanel ref={panelRef} size="large">
-  <SidePanel.Header>Instance details</SidePanel.Header>
-  <SidePanel.Content>…</SidePanel.Content>
-  <SidePanel.Footer>
-    <Button importance="primary">Done</Button>
-  </SidePanel.Footer>
-</SidePanel>`,
-      },
-    },
-  },
-};
-
-/**
  * A form panel, for creating or editing an entity. The
  * form scrolls with the content pane while the header and actions stay pinned.
  *
