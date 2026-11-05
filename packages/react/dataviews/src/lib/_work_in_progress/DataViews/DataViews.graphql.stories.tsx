@@ -6,7 +6,6 @@ import { withAppScope } from "../../../storybook/decorators.js";
 import {
   answerBehind,
   createGraphQLHandlers,
-  createMockApiLoader,
 } from "../../../storybook/machines/api/index.js";
 import {
   SERVER_BACKED_COLUMNS_CODE,
@@ -28,8 +27,9 @@ const meta = {
   },
   // Every scenario at once, each under its own path: a story reaches the one
   // its source addresses, and the docs page renders them all together. Each
-  // answer waits a moment, so the pending state is seen between them.
-  loaders: [createMockApiLoader(createGraphQLHandlers({ latency: 300 }))],
+  // answer waits a moment, so the pending state is seen between them. The
+  // Storybook MSW addon installs them before a story first renders.
+  parameters: { msw: { handlers: createGraphQLHandlers({ latency: 300 }) } },
 } satisfies Meta<typeof Component>;
 
 export default meta;

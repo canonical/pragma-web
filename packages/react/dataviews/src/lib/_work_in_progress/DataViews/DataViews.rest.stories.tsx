@@ -3,7 +3,6 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
 import {
   answerBehind,
-  createMockApiLoader,
   createRestHandlers,
 } from "../../../storybook/machines/api/index.js";
 import {
@@ -26,8 +25,9 @@ const meta = {
   },
   // Every scenario at once, each under its own path: a story reaches the one
   // its source addresses, and the docs page renders them all together. Each
-  // answer waits a moment, so the pending state is seen between them.
-  loaders: [createMockApiLoader(createRestHandlers({ latency: 300 }))],
+  // answer waits a moment, so the pending state is seen between them. The
+  // Storybook MSW addon installs them before a story first renders.
+  parameters: { msw: { handlers: createRestHandlers({ latency: 300 }) } },
 } satisfies Meta<typeof Component>;
 
 export default meta;

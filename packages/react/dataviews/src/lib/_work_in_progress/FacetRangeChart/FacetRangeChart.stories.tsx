@@ -2,10 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { withAppScope } from "../../../storybook/decorators.js";
-import {
-  createMockApiLoader,
-  createRestHandlers,
-} from "../../../storybook/machines/api/index.js";
+import { createRestHandlers } from "../../../storybook/machines/api/index.js";
 import { SERVER_BACKED_FACETS } from "../../../storybook/machines/constants.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import { createPendingSource } from "../../../storybook/machines/fixtures.js";
@@ -30,6 +27,10 @@ const meta = {
     provider: { control: false },
     renderStatus: { control: false },
   },
+  // The REST-backed story's endpoint, served through the Storybook MSW
+  // addon before a story first renders. Every story here carries it, so a
+  // docs page that renders them all together never clears it.
+  parameters: { msw: { handlers: createRestHandlers({ latency: 300 }) } },
 } satisfies Meta<typeof Component>;
 
 export default meta;
@@ -156,7 +157,6 @@ function RestBackedMachines({
  * Query, which measures the cores over every machine it matches.
  */
 export const RestBacked: Story = {
-  loaders: [createMockApiLoader(createRestHandlers({ latency: 300 }))],
   render: ({ label }) => <RestBackedMachines label={label} />,
   play: async ({ canvas }) => {
     await expect(

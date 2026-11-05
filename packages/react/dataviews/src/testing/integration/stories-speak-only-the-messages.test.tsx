@@ -67,8 +67,8 @@ vi.mock("@canonical/dataviews-core/bindings", async (importOriginal) => {
 
 setProjectAnnotations([preview]);
 
-// jsdom has no service worker, so the server-backed stories are answered by
-// msw/node over the same handlers.
+// Storybook's MSW addon serves the server-backed stories through a service
+// worker, which jsdom lacks: msw/node answers the same handlers here instead.
 serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
 /** Every story of the package, by the part it shows. */

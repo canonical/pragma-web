@@ -26,8 +26,8 @@ import readPaginationSummary from "../../storybook/machines/readPaginationSummar
 // Storybook's core annotations, which bind each play function's `canvas`.
 setProjectAnnotations([preview]);
 
-// jsdom has no service worker, so the stories' loaders start none: msw/node
-// answers the same handlers here instead.
+// Storybook's MSW addon serves the stories' handlers through a service
+// worker, which jsdom lacks: msw/node answers the same handlers here instead.
 serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
 /** Each story file's composed stories, by the endpoint they reach. */

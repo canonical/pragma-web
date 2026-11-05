@@ -40,8 +40,8 @@ import {
 // renders with the parameters and annotations it has in Storybook.
 setProjectAnnotations([preview]);
 
-// jsdom has no service worker, so the stories' loaders start none: msw/node
-// answers the same handlers here instead.
+// Storybook's MSW addon serves the stories' handlers through a service
+// worker, which jsdom lacks: msw/node answers the same handlers here instead.
 serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
 /** The stories checked as first rendered, by the part they show. */
