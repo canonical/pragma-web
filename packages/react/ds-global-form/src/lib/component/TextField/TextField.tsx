@@ -12,5 +12,5 @@ import type { TextFieldProps } from "./types.js";
  * @implements ds:global.component.text_field
  */
 export default withWrapper<TextFieldProps>(
-  bindField<TextFieldProps>(TextInput, "native"),
+  bindField<TextFieldProps>(TextInput, "native", { injectDefaultValue: true }),
 );

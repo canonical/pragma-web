@@ -197,57 +197,90 @@ An option's optional `lang` marks a label written in another language, so assist
 
 ## Middleware Pattern
 
-Middleware are higher-order components that wrap fields to add functionality. They compose via the `middleware` prop:
+Middleware are higher-order components that wrap fields to add functionality. Create them outside render and pass them through the `middleware` prop:
 
 ```tsx
-<Field
-  name="country"
-  inputType="select"
-  label="Country"
-  options={[]}
-  middleware={[addRESTOptions("/api/countries")]}
-/>
+import { Field, Form, addRESTOptions } from "@canonical/react-ds-global-form";
+
+const countryOptions = addRESTOptions("/api/countries");
+
+function CountryForm() {
+  return (
+    <Form onSubmit={(data) => console.log(data)}>
+      <Field
+        name="country"
+        inputType="select"
+        label="Country"
+        options={[]}
+        middleware={[countryOptions]}
+      />
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}
 ```
 
 The middleware signature is `(Component) => Component`. Multiple middleware compose in array order, with the first middleware as the outermost wrapper.
+Keep middleware function identities stable between renders: replacing one remounts the field and can lose focus. If its configuration depends on props, memoize the factory call with `useMemo` and the relevant dependencies.
 
 ### Built-in Middleware
 
 **addRESTOptions** - Fetches options from an API endpoint:
 
 ```tsx
-import { addRESTOptions } from "@canonical/react-ds-global-form";
+import { Field, Form, addRESTOptions } from "@canonical/react-ds-global-form";
 
-<Field
-  name="category"
-  inputType="select"
-  options={[]}
-  middleware={[
-    addRESTOptions("/api/categories", {
-      transformData: (data) => data.categories,
-    }),
-  ]}
-/>
+const categoryOptions = addRESTOptions("/api/categories", {
+  transformData: (data) => data.categories,
+});
+
+function CategoryForm() {
+  return (
+    <Form onSubmit={(data) => console.log(data)}>
+      <Field
+        name="category"
+        inputType="select"
+        label="Category"
+        options={[]}
+        middleware={[categoryOptions]}
+      />
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}
 ```
 
-**addRESTValidation** - Validates field values against an API:
+**addRESTValidation** - Performs an advisory remote check:
 
 ```tsx
-import { addRESTValidation } from "@canonical/react-ds-global-form";
+import { Field, Form, addRESTValidation } from "@canonical/react-ds-global-form";
 
-<Field
-  name="username"
-  inputType="text"
-  middleware={[
-    addRESTValidation("/api/validate-username", {
-      debounceWait: 300,
-      minLength: 3,
-    }),
-  ]}
-/>
+const usernameCheck = addRESTValidation("/api/validate-username", {
+  debounceWait: 300,
+  minLength: 3,
+});
+
+function UsernameForm() {
+  return (
+    <Form onSubmit={(data) => console.log(data)}>
+      <Field
+        name="username"
+        inputType="text"
+        label="Username"
+        middleware={[usernameCheck]}
+      />
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}
 ```
 
 Custom middleware follows the same factory pattern: an outer function accepts configuration and returns a HOC.
+
+Remote checks do not enforce submission: RHF validation may clear a completed
+remote error, and pending or failed requests do not block submission. Validate
+authoritatively in the resolver or submit flow and on the server. See
+[Getting Started](src/docs/GettingStarted.mdx) for hydration and RHF rule limitations.
 
 ## Conditional Display
 
