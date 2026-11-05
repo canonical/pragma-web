@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactElement } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators.js";
+import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import { createSourceWithoutCores } from "../../../../../storybook/machines/fixtures.js";
 import {
@@ -140,9 +141,7 @@ export const BoundApplied: Story = {
     await expect(
       canvas.getByRole("button", { name: "Clear Cores from" }),
     ).toBeVisible();
-    await expect(
-      canvas.getByRole("button", { name: "Apply filters", hidden: true }),
-    ).not.toBeVisible();
+    await expect(getHiddenButton(canvas, "Apply filters")).not.toBeVisible();
   },
 };
 

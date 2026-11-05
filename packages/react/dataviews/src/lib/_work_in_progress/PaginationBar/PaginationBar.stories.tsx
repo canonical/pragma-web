@@ -6,6 +6,7 @@ import {
   withAppScope,
   withScrollingFrame,
 } from "../../../storybook/decorators.js";
+import getHiddenButton from "../../../storybook/getHiddenButton.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import {
   createPendingSource,
@@ -207,9 +208,7 @@ import { platform } from "./router.js";`,
       canvas.getByRole("link", { name: "Last page" }),
     ).toHaveAttribute("href", "?page=3&size=5");
     // Scripting is enabled here: the forms' submit controls are hidden.
-    await expect(
-      canvas.getByRole("button", { name: "Go to page", hidden: true }),
-    ).not.toBeVisible();
+    await expect(getHiddenButton(canvas, "Go to page")).not.toBeVisible();
     // A plain click pages in place.
     await userEvent.click(next);
     await waitFor(() =>

@@ -6,6 +6,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators.js";
+import getHiddenButton from "../../../../../storybook/getHiddenButton.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
 import {
   type MachineProviderConfig,
@@ -114,9 +115,7 @@ export const Default: Story = {
     await waitFor(() => expect(recordRows(canvas)).toBe(12));
     // Scripting is enabled here, so the baseline's submit control is hidden
     // and every edit applies as it is typed.
-    await expect(
-      canvas.getByRole("button", { name: "Search", hidden: true }),
-    ).not.toBeVisible();
+    await expect(getHiddenButton(canvas, "Search")).not.toBeVisible();
     await userEvent.type(input, "birch");
     await waitFor(() => expect(recordRows(canvas)).toBe(1));
   },
