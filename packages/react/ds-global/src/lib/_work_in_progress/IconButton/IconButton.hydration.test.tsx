@@ -1,13 +1,16 @@
 import { act } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Component from "./IconButton.js";
 
 /**
- * The real server and client contract: the server HTML must hydrate with
- * no recoverable error (React 19 reports hydration mismatches through
- * `onRecoverableError`).
+ * The real server and client contract: the server HTML must hydrate
+ * cleanly. React 19 reports the two kinds of mismatch in two places: a
+ * structural one through `onRecoverableError`, and an attribute one (a
+ * class, an aria-* value) only through `console.error` in development, so
+ * the test listens to both.
  */
 describe("IconButton (hydration)", () => {
   beforeEach(() => {
@@ -19,26 +22,51 @@ describe("IconButton (hydration)", () => {
     vi.restoreAllMocks();
   });
 
-  it("hydrates the server HTML with no recoverable error", () => {
-    const ui = <Component icon="edit" aria-label="Edit" />;
-
+  /** Server-render `serverUi`, hydrate `clientUi` over it, and report. */
+  const hydrate = (serverUi: ReactElement, clientUi: ReactElement) => {
     const container = document.createElement("div");
-    container.innerHTML = renderToString(ui);
+    container.innerHTML = renderToString(serverUi);
     document.body.appendChild(container);
 
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const onRecoverableError = vi.fn();
     let root: Root | undefined;
     act(() => {
-      root = hydrateRoot(container, ui, { onRecoverableError });
+      root = hydrateRoot(container, clientUi, { onRecoverableError });
     });
-    expect(onRecoverableError).not.toHaveBeenCalled();
+    const unmount = () => {
+      act(() => {
+        root?.unmount();
+      });
+      container.remove();
+    };
+    return { container, error, onRecoverableError, unmount };
+  };
 
+  it("hydrates the server HTML with no mismatch of any kind", () => {
+    const ui = <Component icon="edit" aria-label="Edit" />;
+    const { container, error, onRecoverableError, unmount } = hydrate(ui, ui);
+
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
     expect(container.querySelector("button")).toHaveAccessibleName("Edit");
 
-    act(() => {
-      root?.unmount();
-    });
-    container.remove();
+    unmount();
     expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("would report an attribute mismatch through console.error", () => {
+    // The control for the case above: a server and a client that disagree
+    // on one attribute are caught by the console.error spy, so its silence
+    // there means something.
+    const { error, onRecoverableError, unmount } = hydrate(
+      <Component icon="edit" aria-label="Edit" />,
+      <Component icon="edit" aria-label="Rename" />,
+    );
+
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalled();
+
+    unmount();
   });
 });
