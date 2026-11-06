@@ -12,8 +12,7 @@ describe("IconButton SSR", () => {
   it("renders a button with Button's and its own classes", () => {
     const html = renderToString(<Component icon="edit" aria-label="Edit" />);
     expect(html).toContain("<button");
-    // Compared as a set: Button's base and IconButton's own class both carry
-    // the `ds` scope, so the attribute may name it twice.
+    // As a set: the attribute names `ds` twice.
     const classes = html
       .match(/<button[^>]* class="([^"]*)"/)
       ?.at(1)
@@ -25,8 +24,7 @@ describe("IconButton SSR", () => {
   });
 
   it("names its own class with the ds scope, after Button's classes", () => {
-    // In order, duplicates kept: Button's base and modifier, then
-    // IconButton's own constant, "ds icon-button", whole.
+    // In order, duplicates kept.
     const html = renderToString(<Component icon="edit" aria-label="Edit" />);
     expect(
       html

@@ -1,10 +1,4 @@
-/**
- * The stylesheet's contract. jsdom applies no CSS, so a change to this sheet
- * can break the square box or the seated baseline with every render test
- * still green. What is pinned here is what such a change would break: the
- * layer, the selectors each rule hangs on, the generated baseline carrier,
- * the out-of-flow icon, and that every length is a token or a density input.
- */
+/** The stylesheet's contract, which jsdom cannot lay out. */
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -18,15 +12,13 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 /** The sheet as written, comments included. */
 const source = readFileSync(path.join(here, "styles.css"), "utf8");
 
-// Comments and the layer name dropped, so neither prose nor
-// `ds.components.global` is ever taken for a selector; whitespace collapsed,
-// so a rule is named by its selector list on one line.
+// Comments and the layer name dropped, whitespace collapsed.
 const sheet = source
   .replace(/\/\*[\s\S]*?\*\//g, "")
   .replace(/@layer[^{;]*/g, "")
   .replace(/\s+/g, " ");
 
-/** The density and context scopes Button's seat reads its inputs from. */
+/** The density and context scopes. */
 const SCOPES = ":where(.comfortable, .dense, .app, .site, .docs)";
 
 /** The declarations of the first rule whose selector is exactly `selector`. */
@@ -48,8 +40,7 @@ describe("IconButton stylesheet", () => {
   });
 
   it("sets the inline padding on .ds.button.icon-button, independent of order", () => {
-    // Button's `.ds.button { padding-inline }` is (0,2,0) in the same layer.
-    // At (0,3,0) this rule wins wherever the sheets land in a bundle.
+    // (0,3,0) beats Button's (0,2,0) in either order.
     expect(findDeclarations(".ds.button.icon-button")).toMatch(
       /padding-inline: var\(--icon-button-padding-inline/,
     );
@@ -63,8 +54,7 @@ describe("IconButton stylesheet", () => {
   });
 
   it("works the inline padding out from the density inputs inside a scope", () => {
-    // The exact expression: (cell − line) / 2 − border, the half of the two
-    // block pads that makes the inline sum equal the block sum.
+    // (cell - line) / 2 - border.
     expect(
       findDeclarations(`${SCOPES} .ds.icon-button`)?.replace(/\s+/g, ""),
     ).toBe(
@@ -91,10 +81,7 @@ describe("IconButton stylesheet", () => {
   });
 
   it("sets on the icon only what Button's icon slot leaves unset", () => {
-    // `.ds.icon-button > .icon` ties Button's `.ds.button > .icon` at (0,3,0),
-    // and the two sheets load in either order (index.css lists IconButton's
-    // first, the component imports emit Button's first), so a property both
-    // set would be decided by whichever loads last.
+    // Tied at (0,3,0) with either load order, so no shared property.
     const buttonSheet = readFileSync(
       path.join(here, "../../component/Button/styles.css"),
       "utf8",
@@ -122,8 +109,7 @@ describe("IconButton stylesheet", () => {
   });
 
   it("finds every literal length, of any unit and either sign", () => {
-    // The control for the case below: what the matcher must catch, and what
-    // it must leave alone (custom-property names, strings, unitless numbers).
+    // Control for the matcher.
     expect(
       findLiteralLengths(
         'margin: -1px; inline-size: 2vmin; inset: 1pt; block-size: 1dvh; a: 1cqi; b: 1mm; c: 1in; d: calc(100% - 2px); e: .5Q; --dimension-200: var(--x-2, 3); content: "4px"; order: 2;',
@@ -151,11 +137,7 @@ describe("IconButton stylesheet", () => {
   });
 });
 
-/**
- * Every literal length in `css`: a signed number followed by a unit or `%`.
- * Quoted strings and custom-property names are dropped first, so neither the
- * generated `"\200b"` nor a token such as `--dimension-200` is read as one.
- */
+/** Every literal length in `css`, ignoring strings and custom-property names. */
 function findLiteralLengths(css: string): string[] {
   return (
     css
