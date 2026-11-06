@@ -3,9 +3,7 @@ import { Button } from "../../component/Button/index.js";
 import type { IconButtonProps } from "./types.js";
 import "./styles.css";
 
-// Only the component's own class: the Button it renders already supplies
-// the `ds` scope, so the markup carries `ds` once.
-const componentCssClassName = "icon-button";
+const componentCssClassName = "ds icon-button";
 
 /**
  * A square, icon-only Button. It renders `Button` — so importance,
