@@ -1,0 +1,20 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* The option description (common/Option) is styled at the OPTION level so it
+   * renders identically inside a Choices group and standalone: the group sheet
+   * (ChoicesField/styles.css) only loads with the group, so a group-scoped rule
+   * would leave a standalone Option unstyled. Scoped to the option's own
+   * subtree so the generic `.ds.option` class cannot collide with option rows
+   * elsewhere. */
+  .ds.option > .ds.option-description {
+    /* In the group's flex row, the description wraps below the mark+label pair;
+       standalone (no flex) it flows below them. */
+    flex-basis: 100%;
+    margin: 0;
+    /* Indented past the input mark: the mark's own 16px (--dimension-200)
+       plus the row's inline gap (--space-100). */
+    margin-inline-start: calc(var(--dimension-200) + var(--space-100));
+    color: var(--color-text-muted);
+  }
+}
