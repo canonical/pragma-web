@@ -53,10 +53,12 @@ const Harness = ({
   declared = true,
   leavesWhenCleared = false,
   onLeave = () => {},
+  ...rest
 }: HarnessProps) => {
   const { filters } = useDataViewsRoot("TextFilter test");
   return (
     <TextFilter
+      {...rest}
       handle={findFilterHandle<string>(filters, "name", operator)}
       operator={operator}
       label="name"
@@ -141,5 +143,15 @@ describe("TextFilter", () => {
     );
     expect(onLeave).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("textbox")).toBeNull();
+  });
+
+  it("takes the native props of its root, merging the class name", () => {
+    const { container } = mount(makeProvider(), {
+      className: "extra",
+      title: "From the link",
+    });
+    const root = container.querySelector(".ds.data-views-filters-text");
+    expect(root).toHaveClass("extra");
+    expect(root).toHaveAttribute("title", "From the link");
   });
 });

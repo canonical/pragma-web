@@ -41,6 +41,10 @@ const RANGE_MESSAGES = {
  * value a matching record holds for the lower bound ("Lowest") and the
  * greatest for the upper ("Highest"), from the range computed over the whole
  * matching set with this field's bounds lifted.
+ *
+ * `import { DataViews } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.subcomponent.data_views_filters-bound_filter
  */
 export default function BoundFilter({
   handle,
@@ -51,6 +55,8 @@ export default function BoundFilter({
   declared,
   leavesWhenCleared,
   onLeave,
+  className,
+  ...rest
 }: BoundFilterProps): ReactElement | null {
   const { messages } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
@@ -82,7 +88,10 @@ export default function BoundFilter({
         }
       : { type: "date" };
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <label htmlFor={inputId} className="label">
         {name}
       </label>

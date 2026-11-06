@@ -2,15 +2,9 @@ import type {
   FilterHandle,
   PredicateOperator,
 } from "@canonical/dataviews-core";
+import type { ComponentProps } from "react";
 
-/**
- * Props of one text filter.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the schema field it was built for, not forwarding
- * a caller's native props.
- */
-export type TextFilterProps = {
+type OwnProps = {
   /** The root's handle for the text this field must contain or start with. */
   readonly handle: FilterHandle<string>;
   /** Which text operator this control edits. */
@@ -37,3 +31,10 @@ export type TextFilterProps = {
    */
   readonly onLeave: () => void;
 };
+
+/**
+ * Props of one text filter: its own, and the native props of the
+ * `div` it renders as its root.
+ */
+export type TextFilterProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps | "children">;
