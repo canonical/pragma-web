@@ -39,6 +39,7 @@ const testConfig = reactTestConfig({
       "testing/machines.ts",
       "testing/readDisplayStatus.ts",
       "testing/readFailureReason.ts",
+      "testing/renderInRoot.tsx",
       "testing/renderRefusingTable.tsx",
     ],
     exclude: [
