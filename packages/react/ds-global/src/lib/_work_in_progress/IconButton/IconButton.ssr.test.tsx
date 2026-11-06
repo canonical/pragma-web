@@ -24,6 +24,18 @@ describe("IconButton SSR", () => {
     expect(html).toContain('aria-label="Edit"');
   });
 
+  it("names its own class with the ds scope, after Button's classes", () => {
+    // In order, duplicates kept: Button's base and modifier, then
+    // IconButton's own constant, "ds icon-button", whole.
+    const html = renderToString(<Component icon="edit" aria-label="Edit" />);
+    expect(
+      html
+        .match(/<button[^>]* class="([^"]*)"/)
+        ?.at(1)
+        ?.split(" "),
+    ).toEqual(["ds", "button", "primary", "ds", "icon-button"]);
+  });
+
   it("renders the <button> as the root of the server HTML", () => {
     const html = renderToString(<Component icon="edit" aria-label="Edit" />);
     expect(html).toMatch(/^<button /);
