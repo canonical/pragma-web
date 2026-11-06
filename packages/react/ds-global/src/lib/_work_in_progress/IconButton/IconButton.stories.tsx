@@ -46,6 +46,16 @@ const row = {
 /** Layout is compared to a hundredth of a pixel. */
 const TOLERANCE = 0.01;
 
+/**
+ * The first element under `parent` that matches `selector`. Throws when there
+ * is none, so a play fails on a missing part rather than measuring nothing.
+ */
+const findRequiredElement = (parent: ParentNode, selector: string): Element => {
+  const element = parent.querySelector(selector);
+  if (!element) throw new Error(`No element matches "${selector}".`);
+  return element;
+};
+
 /** The border box of an element, in CSS pixels. */
 const measureBox = (element: Element) => element.getBoundingClientRect();
 
@@ -60,14 +70,16 @@ const expectSquareSeatedIconButtons = async (canvasElement: HTMLElement) => {
   const rows = [...canvasElement.querySelectorAll("[data-geometry-row]")];
   await expect(rows.length).toBeGreaterThan(0);
   for (const rowElement of rows) {
-    const labelled = rowElement.querySelector("button:not(.icon-button)");
+    const labelled = findRequiredElement(
+      rowElement,
+      "button:not(.icon-button)",
+    );
     const iconButtons = [...rowElement.querySelectorAll("button.icon-button")];
-    await expect(labelled).not.toBeNull();
     await expect(iconButtons.length).toBeGreaterThan(0);
-    const reference = measureBox(labelled as Element);
+    const reference = measureBox(labelled);
     for (const iconButton of iconButtons) {
       const box = measureBox(iconButton);
-      const icon = measureBox(iconButton.querySelector(".icon") as Element);
+      const icon = measureBox(findRequiredElement(iconButton, ".icon"));
       await expect(Math.abs(box.width - box.height)).toBeLessThan(TOLERANCE);
       await expect(Math.abs(box.height - reference.height)).toBeLessThan(
         TOLERANCE,

@@ -69,7 +69,9 @@ describe("IconButton component", () => {
           style={{ marginInlineStart: "auto" }}
         />,
       );
-      const root = container.firstElementChild as HTMLElement;
+      const root = container.firstElementChild;
+      expect(root).toBeInstanceOf(HTMLElement);
+      if (!(root instanceof HTMLElement)) return;
       expect(root).toHaveClass("custom");
       expect(root.style.marginInlineStart).toBe("auto");
     });
