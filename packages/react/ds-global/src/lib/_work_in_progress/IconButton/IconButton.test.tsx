@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Component from "./IconButton.js";
 
@@ -248,6 +249,57 @@ describe("IconButton component", () => {
       fireEvent.keyDown(document, { key: "Escape" });
       runTooltipDelay();
       expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("as a trigger", () => {
+    /** Render a popover trigger, with or without its Tooltip. */
+    const renderTrigger = (tooltip?: false) => {
+      const ref = createRef<HTMLButtonElement>();
+      render(
+        <Component
+          ref={ref}
+          icon="menu-contextual"
+          aria-label="Row options"
+          importance="tertiary"
+          popoverTarget="row-options"
+          popoverTargetAction="toggle"
+          aria-haspopup="menu"
+          aria-expanded={false}
+          aria-controls="row-options"
+          style={{ marginInlineStart: "auto" }}
+          tooltip={tooltip}
+        />,
+      );
+      return {
+        ref,
+        button: screen.getByRole("button", { name: "Row options" }),
+      };
+    };
+
+    it.each([
+      ["with", undefined],
+      ["without", false as const],
+    ])(
+      "passes the popover and menu attributes to the button %s the Tooltip",
+      (_, tooltip) => {
+        const { ref, button } = renderTrigger(tooltip);
+        expect(button).toHaveAttribute("popovertarget", "row-options");
+        expect(button).toHaveAttribute("popovertargetaction", "toggle");
+        expect(button).toHaveAttribute("aria-haspopup", "menu");
+        expect(button).toHaveAttribute("aria-expanded", "false");
+        expect(button).toHaveAttribute("aria-controls", "row-options");
+        expect(button.style.marginInlineStart).toBe("auto");
+        expect(ref.current).toBe(button);
+      },
+    );
+
+    it("keeps the Tooltip area outermost and the button inside it", () => {
+      const { button } = renderTrigger();
+      const area = button.closest(".ds.tooltip-area");
+      expect(area).toBeInTheDocument();
+      expect(area).not.toHaveAttribute("popovertarget");
+      expect(area).not.toHaveAttribute("style");
     });
   });
 });
