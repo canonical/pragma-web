@@ -3,7 +3,7 @@ import {
   type DataViewsState,
   readWithheld,
 } from "../coordinator/index.js";
-import type { QueryLocation } from "../location/index.js";
+import type { HistoryMode, QueryLocation } from "../location/index.js";
 import {
   createChannel,
   protectChannel,
@@ -206,8 +206,11 @@ export default function createDataViewsProvider<
     capabilities,
     state: protectChannel(state),
     refusals,
-    setPredicate: (predicate: Predicate, replaces?: SetOperator) =>
-      command({ kind: "setPredicate", predicate, replaces }),
+    setPredicate: (
+      predicate: Predicate,
+      replaces?: SetOperator,
+      history?: HistoryMode,
+    ) => command({ kind: "setPredicate", predicate, replaces }, history),
     removePredicate: (field: string, operator: PredicateOperator) =>
       command({ kind: "removePredicate", field, operator }),
     refresh: issueRefresh,

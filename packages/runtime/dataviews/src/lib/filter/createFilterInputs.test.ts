@@ -2,10 +2,11 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import answering from "../../../testing/answering.js";
 import byId from "../../../testing/byId.js";
 import createManualSource from "../../../testing/createManualSource.js";
+import createRecordingLocation from "../../../testing/createRecordingLocation.js";
 import declare from "../../../testing/declare.js";
 import declareSort from "../../../testing/declareSort.js";
 import { createCollection } from "../collection/index.js";
-import { createMemoryLocation } from "../location/index.js";
+import { createMemoryLocation, type QueryLocation } from "../location/index.js";
 import type { ReadonlyChannel } from "../observable/index.js";
 import {
   createDataViewsProvider,
@@ -26,7 +27,7 @@ const machines = createCollection({
 });
 
 /** A provider whose source executes every filter, over an empty page. */
-const provider = (location?: ReturnType<typeof createMemoryLocation>) =>
+const provider = (location?: QueryLocation) =>
   createDataViewsProvider({
     collection: machines,
     source: createManualSource({
@@ -199,6 +200,55 @@ describe("createFilterInputs", () => {
       kind: "value",
       value: 8,
     });
+  });
+
+  it("ends every input session on a move of the location, the predicate kept or not", () => {
+    const location = createMemoryLocation({
+      href: "/machines?cpu__gte=4&page=1&size=50",
+    });
+    const p = provider(location);
+    const release = p.observe();
+    const inputs = createFilterInputs({ host: readProviderHost(p) });
+    const stop = inputs.observe();
+    inputs.handles.cpu.gte.edit("4e");
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4e");
+    // Back to the same bound on another page: the half-typed value goes.
+    location.write(new URLSearchParams("cpu__gte=4&page=2&size=50"));
+    expect(inputs.handles.cpu.gte.state.get()).toEqual({
+      input: "4",
+      feedback: { status: "none" },
+    });
+    // A move the reader makes through the records ends nothing.
+    inputs.handles.cpu.gte.edit("4e");
+    p.navigateWindow({ page: 3 });
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4e");
+    stop();
+    // Released: a later move leaves the records alone.
+    location.write(new URLSearchParams("cpu__gte=4&page=1&size=50"));
+    expect(inputs.handles.cpu.gte.state.get().input).toBe("4e");
+    release();
+  });
+
+  it("ends every typing session at once, keeping what each input reads", () => {
+    const { location, writes } = createRecordingLocation({ href: "/machines" });
+    const p = provider(location);
+    const release = p.observe();
+    const inputs = createFilterInputs({ host: readProviderHost(p) });
+    const stop = inputs.observe();
+    const from = inputs.handles.cpu.gte;
+    from.edit("4");
+    from.edit("4e");
+    expect(from.state.get().input).toBe("4e");
+    writes.length = 0;
+    inputs.endSessions();
+    // Ending the session drops nothing typed, and writes nothing.
+    expect(from.state.get().input).toBe("4e");
+    expect(writes).toEqual([]);
+    // The next change is a step of its own.
+    from.edit("8");
+    expect(writes.map(([, mode]) => mode)).toEqual(["push"]);
+    stop();
+    release();
   });
 
   it("adopts nothing for a publication that moved no predicate", () => {

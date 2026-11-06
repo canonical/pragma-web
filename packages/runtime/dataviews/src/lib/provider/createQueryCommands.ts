@@ -1,4 +1,5 @@
 import { isClauseReplaced, readWithheld } from "../coordinator/index.js";
+import type { HistoryMode } from "../location/index.js";
 import {
   applyQueryCommand,
   type Query,
@@ -50,24 +51,30 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
     source,
     publish,
     transitions,
-    history,
+    history: policy,
     view: openView,
   } = config;
 
-  /** Announce the move the published state made. */
-  const announceTransition = (cause: TransitionCause): void => {
+  /**
+   * Announce the move the published state made, entering history as
+   * `history` says or, left out, as the policy does.
+   */
+  const announceTransition = (
+    cause: TransitionCause,
+    history: HistoryMode | null = policy[cause],
+  ): void => {
     const { slice, window } = coordinator.state;
     transitions.set({
       query: { slice, window },
       cause,
-      history: history[cause],
+      history,
     });
   };
 
   /** Publish the state the coordinator reached, then announce the move. */
-  const announce = (cause: TransitionCause): void => {
+  const announce = (cause: TransitionCause, history?: HistoryMode): void => {
     publish();
-    announceTransition(cause);
+    announceTransition(cause, history);
   };
 
   const refusals = (query: Query): readonly SourceRefusal[] => {
@@ -86,7 +93,10 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
 
   return {
     refusals,
-    command(next: QueryCommand): readonly SourceRefusal[] {
+    command(
+      next: QueryCommand,
+      history?: HistoryMode,
+    ): readonly SourceRefusal[] {
       const { slice, window } = coordinator.state;
       const applied = applyQueryCommand(slice, window, next);
       if (applied.status === "rejected") {
@@ -113,7 +123,7 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
       // Applied above to a copy, and here for real: the same command over
       // the same state, so what moved there moves here and issues a request.
       coordinator.dispatch(next);
-      announce(CAUSE_OF_COMMAND[next.kind]);
+      announce(CAUSE_OF_COMMAND[next.kind], history);
       return NO_REFUSALS;
     },
     adopt(
