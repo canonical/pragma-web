@@ -11,7 +11,7 @@ import { useDataViews } from "./hooks/index.js";
 import Component from "./Provider.js";
 
 const meta = {
-  title: "_work_in_progress/DataViews",
+  title: "_work_in_progress/DataViews/DataViews",
   component: Component,
   decorators: [withAppScope],
   argTypes: {

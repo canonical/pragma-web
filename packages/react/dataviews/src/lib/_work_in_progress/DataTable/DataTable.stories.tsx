@@ -28,7 +28,7 @@ import Component from "./DataTable.js";
 import type { DataTableColumn, DataTableProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/Renderers/DataTable",
+  title: "_work_in_progress/DataViews/Renderers/DataTable",
   component: Component,
   decorators: [withAppScope],
   args: {

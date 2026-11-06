@@ -18,7 +18,7 @@ import Component from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/Search",
+  title: "_work_in_progress/DataViews/Search",
   component: Component,
   decorators: [withAppScope],
   args: {

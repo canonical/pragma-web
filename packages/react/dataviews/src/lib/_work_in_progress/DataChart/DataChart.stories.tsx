@@ -19,7 +19,7 @@ import Component from "./DataChart.js";
 import type { DataChartType } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/Renderers/DataChart",
+  title: "_work_in_progress/DataViews/Renderers/DataChart",
   component: Component,
   decorators: [withAppScope],
   args: {

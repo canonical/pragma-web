@@ -12,7 +12,7 @@ bun add @canonical/dataviews-react @canonical/dataviews-core
 
 ## Status
 
-Under active development; the public surface grows change by change. Prototype renderers not exported from the root — DataCards, DataChart and DataChartWithTable — have their recipes under _work_in_progress / Renderers. The current exports:
+Under active development; the public surface grows change by change. Prototype renderers not exported from the root — DataCards, DataChart and DataChartWithTable — have their recipes under _work_in_progress / DataViews / Renderers. The current exports:
 
 - **`DataViews`** — the root component: mounts a provider created by `createDataViewsProvider` (from `@canonical/dataviews-core`) as the collection's context, observes it for as long as it is mounted — which starts the provider's source, location, presentation and saved views, ref-counted, so a table inside the root observing too costs nothing and a StrictMode rehearsal leaves a working provider — and owns the root's filter records. Throws unless the provider is one `createDataViewsProvider` built. Nothing is wired in an effect by the application: it builds the provider once, in state, and mounts.
 - **Messages and announcements** — every word a part renders or announces comes from one messages record, `DataViewsMessages` (from `@canonical/dataviews-core`), in English unless the application says otherwise. The root takes `messages`: any of them, merged over English, or all of them — annotate a whole replacement as `DataViewsMessages` and a missing message fails to compile. A message stating a fact is a function of it — a count, a position, a name, a reason — and words its own plurals and ordinals. Field and option labels are not messages. A standalone `DataTable` or `PaginationBar` is its own root and takes `messages` itself; the connected parts take their root's. What a command did that has no place on screen — a sort's new order, why it changed nothing, a column hidden, shown or moved — is said through one polite live region per root, rendered after its children: what is said in one moment is spoken as one announcement — words repeated in that moment said once, and an outcome with one latest answer, such as what the rows are ordered by, standing where the last one stood — the same words said again in a later moment are spoken again, and a second root over the same provider says nothing of the first root's commands. Status regions that belong to a place — the pagination summary, the table's status row, a filter's feedback, the saved views' status — speak for themselves and are never repeated.
@@ -77,7 +77,7 @@ export function MachinesPage({ rows }: { rows: readonly Machine[] }) {
 
 ## Composition recipes
 
-The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / In context / Recipes** — source in [`src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx`](src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx):
+The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / Recipes** — source in [`src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx`](src/lib/_work_in_progress/DataViews/DataViews.recipes.mdx):
 
 - **The connected parts** — one root, every part reading its provider; place them in any order and any wrapper.
 - **Your own words** — `<DataViews provider={provider} messages={{ search: "Rechercher", shownRows: ({ first, shown, total }) => … }}>`: the parts left out keep English, and a record typed `DataViewsMessages` replaces them all. Keep the record at module scope, or its functions stable: the root holds its words while their members stay the same.
@@ -101,7 +101,7 @@ The pagination bar's selects are the design system's `SelectInput`, whose input 
 
 ## DataTable recipes
 
-The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / Renderers / DataTable / Recipes** — under **DataViews** in the Storybook hub — source in [`src/lib/_work_in_progress/DataTable/DataTable.mdx`](src/lib/_work_in_progress/DataTable/DataTable.mdx):
+The recipes, with consumer code and the live stories beside them, are the Storybook page **_work_in_progress / DataViews / Renderers / DataTable / Recipes** — under **DataViews** in the Storybook hub — source in [`src/lib/_work_in_progress/DataTable/DataTable.mdx`](src/lib/_work_in_progress/DataTable/DataTable.mdx):
 
 - **A table over a provider** — build the provider once, over the collection and its source, and mount: the table observes it.
 - **Columns and sizing** — fixed and flexible widths, bounds, and the last column taking the rest.

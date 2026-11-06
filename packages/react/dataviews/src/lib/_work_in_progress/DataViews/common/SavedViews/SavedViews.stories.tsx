@@ -26,7 +26,7 @@ import DataViews from "../../Provider.js";
 import Component from "./SavedViews.js";
 
 const meta = {
-  title: "_work_in_progress/SavedViews",
+  title: "_work_in_progress/DataViews/SavedViews",
   component: Component,
   decorators: [withAppScope],
 } satisfies Meta<typeof Component>;
