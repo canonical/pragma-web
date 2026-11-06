@@ -6,6 +6,7 @@ import { Label } from "../../../../subcomponent/Field/index.js";
 import { RadioInput } from "../../../../subcomponent/RadioInput/index.js";
 import useOptionAriaProperties from "../../../../utils/hooks/useOptionAriaProperties.js";
 import type { OptionProps } from "./types.js";
+import "./styles.css";
 
 const componentCssClassName = "ds option";
 
@@ -19,6 +20,7 @@ const Option = ({
   name,
   type,
   option,
+  showDescription = true,
   checked,
   disabled,
   onChange,
@@ -55,6 +57,11 @@ const Option = ({
       <Label name={name} isOptional className="p" {...ariaProps.label}>
         {option.label}
       </Label>
+      {option.description && showDescription ? (
+        <p className="ds option-description" {...ariaProps.description}>
+          {option.description}
+        </p>
+      ) : null}
     </div>
   );
 };
