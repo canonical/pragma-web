@@ -1,8 +1,10 @@
 import type React from "react";
 import { Button } from "../Button/index.js";
-import type Props from "./types.js";
+import type { IconButtonProps } from "./types.js";
 import "./styles.css";
 
+// Only the component's own class: the Button it renders already supplies
+// the `ds` scope, so the markup carries `ds` once.
 const componentCssClassName = "icon-button";
 
 /**
@@ -11,21 +13,24 @@ const componentCssClassName = "icon-button";
  * and only makes the box square around a centred icon, with its baseline
  * seated where a labelled Button's label baseline sits.
  *
- * Pair it with a Tooltip that states the action, and name it with
- * `aria-label` or `aria-labelledby`.
+ * The design-system ontology has no IconButton block yet. Until it does, this
+ * follows the "Icon buttons" guideline of Button: pair it with a Tooltip that
+ * states the action, and name it with `aria-label` or `aria-labelledby`.
  *
  * `import { IconButton } from "@canonical/react-ds-global";`
+ *
+ * @implements ds:global.component.icon_button
  */
-const IconButton = ({
+export default function IconButton({
   className,
   icon,
   ...props
-}: Props): React.ReactElement => (
-  <Button
-    {...props}
-    icon={icon}
-    className={[componentCssClassName, className].filter(Boolean).join(" ")}
-  />
-);
-
-export default IconButton;
+}: IconButtonProps): React.ReactElement {
+  return (
+    <Button
+      {...props}
+      icon={icon}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    />
+  );
+}
