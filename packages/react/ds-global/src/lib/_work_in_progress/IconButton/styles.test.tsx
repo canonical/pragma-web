@@ -103,26 +103,63 @@ describe("IconButton stylesheet", () => {
     const buttonIcon = buttonSheet
       .match(/\.ds\.button > \.icon \{([^}]*)\}/)
       ?.at(1);
-    const propertiesOf = (declarations = "") =>
+    const listPropertyNames = (declarations = "") =>
       declarations
         .split(";")
         .map((declaration) => declaration.split(":").at(0)?.trim())
         .filter(Boolean);
     const iconRule = sheet.match(/& > \.icon \{([^}]*)\}/)?.at(1);
-    expect(propertiesOf(iconRule)).toEqual(["position", "inset", "margin"]);
-    expect(propertiesOf(buttonIcon).length).toBeGreaterThan(0);
-    for (const property of propertiesOf(iconRule)) {
-      expect(propertiesOf(buttonIcon)).not.toContain(property);
+    expect(listPropertyNames(iconRule)).toEqual([
+      "position",
+      "inset",
+      "margin",
+    ]);
+    expect(listPropertyNames(buttonIcon).length).toBeGreaterThan(0);
+    for (const property of listPropertyNames(iconRule)) {
+      expect(listPropertyNames(buttonIcon)).not.toContain(property);
     }
   });
 
-  it("uses no literal lengths other than zero and the carrier's 1lh", () => {
-    const lengths =
-      sheet.match(
-        /(?<![\w-])\d*\.?\d+(px|rem|em|lh|rlh|cap|ch|ex|vw|vh|vi|vb|%)(?![\w-])/g,
-      ) ?? [];
-    expect(lengths.filter((length) => !/^0+(px)?$/.test(length))).toEqual([
-      "1lh",
+  it("finds every literal length, of any unit and either sign", () => {
+    // The control for the case below: what the matcher must catch, and what
+    // it must leave alone (custom-property names, strings, unitless numbers).
+    expect(
+      findLiteralLengths(
+        'margin: -1px; inline-size: 2vmin; inset: 1pt; block-size: 1dvh; a: 1cqi; b: 1mm; c: 1in; d: calc(100% - 2px); e: .5Q; --dimension-200: var(--x-2, 3); content: "4px"; order: 2;',
+      ),
+    ).toEqual([
+      "-1px",
+      "2vmin",
+      "1pt",
+      "1dvh",
+      "1cqi",
+      "1mm",
+      "1in",
+      "100%",
+      "2px",
+      ".5Q",
     ]);
   });
+
+  it("uses no literal lengths other than zero and the carrier's 1lh", () => {
+    expect(
+      findLiteralLengths(sheet).filter(
+        (length) => !/^-?0*\.?0+(px)?$/.test(length),
+      ),
+    ).toEqual(["1lh"]);
+  });
 });
+
+/**
+ * Every literal length in `css`: a signed number followed by a unit or `%`.
+ * Quoted strings and custom-property names are dropped first, so neither the
+ * generated `"\200b"` nor a token such as `--dimension-200` is read as one.
+ */
+function findLiteralLengths(css: string): string[] {
+  return (
+    css
+      .replace(/"[^"]*"/g, "")
+      .replace(/--[\w-]+/g, "")
+      .match(/(?<![\w.])-?(?:\d+\.?\d*|\.\d+)(?:[a-z]+|%)/gi) ?? []
+  );
+}
