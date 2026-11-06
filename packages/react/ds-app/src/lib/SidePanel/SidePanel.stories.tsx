@@ -207,7 +207,6 @@ export const WithForm: Story = {
           </Form>
         </Component.Content>
         <Component.Footer>
-          <Button>Cancel</Button>
           <Button
             importance="primary"
             anticipation="constructive"
@@ -216,6 +215,7 @@ export const WithForm: Story = {
           >
             Create instance
           </Button>
+          <Button>Cancel</Button>
         </Component.Footer>
       </Component>
     </>
@@ -260,7 +260,6 @@ export const WithForm: Story = {
     </Form>
   </SidePanel.Content>
   <SidePanel.Footer>
-    <Button>Cancel</Button>
     <Button
       importance="primary"
       anticipation="constructive"
@@ -269,6 +268,7 @@ export const WithForm: Story = {
     >
       Create instance
     </Button>
+    <Button>Cancel</Button>
   </SidePanel.Footer>
 </SidePanel>
         `,
@@ -438,10 +438,10 @@ export const RightToLeft: Story = {
           </p>
         </Component.Content>
         <Component.Footer>
-          <Button>إلغاء</Button>
           <Button importance="primary" anticipation="constructive">
             إطلاق
           </Button>
+          <Button>إلغاء</Button>
         </Component.Footer>
       </Component>
     </div>
@@ -461,10 +461,10 @@ export const RightToLeft: Story = {
   <SidePanel.Header>معاينة</SidePanel.Header>
   <SidePanel.Content>…</SidePanel.Content>
   <SidePanel.Footer>
-    <Button>إلغاء</Button>
     <Button importance="primary" anticipation="constructive">
       إطلاق
     </Button>
+    <Button>إلغاء</Button>
   </SidePanel.Footer>
 </SidePanel>
         `,
@@ -554,10 +554,10 @@ export const OverflowingTooltip: Story = {
             <p>End of the content.</p>
           </Component.Content>
           <Component.Footer>
-            <Button>Cancel</Button>
             <Button importance="primary" anticipation="constructive">
               Save
             </Button>
+            <Button>Cancel</Button>
           </Component.Footer>
         </Component>
       </>

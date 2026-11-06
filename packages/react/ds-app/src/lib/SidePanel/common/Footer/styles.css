@@ -8,14 +8,14 @@
     */
     flex: none;
 
-    /*
-      Inset by margin rather than padding, so the actions stay in line with
-      the text column while the pane's edge line runs the full panel width.
-    */
-    margin-inline: var(--side-panel-padding-inline);
+    padding-inline: var(--side-panel-padding-inline);
 
+    /*
+      Actions start at the inline-start edge, and the consumer renders the
+      primary action first: order in the markup is order on screen.
+    */
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
     gap: var(--side-panel-footer-gap);
     flex-wrap: wrap;

@@ -27,26 +27,27 @@ const meta = {
 export default meta;
 
 /**
- * Actions align to the end edge. Only the confirming action is
+ * Actions align to the start edge, and the primary action comes first —
+ * markup order is screen order. Only the confirming action is
  * `constructive`: the modifier means "this creates or confirms", so a green
  * Cancel would misread.
  */
 export const Default: StoryFn = () => (
   <Component>
-    <Button onClick={fn()}>Cancel</Button>
     <Button importance="primary" anticipation="constructive" onClick={fn()}>
       Subscribe
     </Button>
+    <Button onClick={fn()}>Cancel</Button>
   </Component>
 );
 Default.parameters = {
   docs: {
     source: {
       code: `<SidePanel.Footer>
-  <Button>Cancel</Button>
   <Button importance="primary" anticipation="constructive">
     Subscribe
   </Button>
+  <Button>Cancel</Button>
 </SidePanel.Footer>`,
     },
   },
@@ -55,24 +56,24 @@ Default.parameters = {
 /** More actions than fit on one line wrap rather than overflow. */
 export const Wrapping: StoryFn = () => (
   <Component>
-    <Button onClick={fn()}>Reset to defaults</Button>
-    <Button onClick={fn()}>Save as draft</Button>
-    <Button onClick={fn()}>Cancel</Button>
     <Button importance="primary" anticipation="constructive" onClick={fn()}>
       Save and apply
     </Button>
+    <Button onClick={fn()}>Save as draft</Button>
+    <Button onClick={fn()}>Reset to defaults</Button>
+    <Button onClick={fn()}>Cancel</Button>
   </Component>
 );
 Wrapping.parameters = {
   docs: {
     source: {
       code: `<SidePanel.Footer>
-  <Button>Reset to defaults</Button>
-  <Button>Save as draft</Button>
-  <Button>Cancel</Button>
   <Button importance="primary" anticipation="constructive">
     Save and apply
   </Button>
+  <Button>Save as draft</Button>
+  <Button>Reset to defaults</Button>
+  <Button>Cancel</Button>
 </SidePanel.Footer>`,
     },
   },
