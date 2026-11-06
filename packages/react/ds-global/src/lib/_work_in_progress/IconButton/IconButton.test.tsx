@@ -150,15 +150,13 @@ describe("IconButton component", () => {
       runTooltipDelay();
     };
 
-    // The cases marked it.fails need the Tooltip pairing, which the next
-    // commit adds.
-    it.fails("shows the aria-label as the Tooltip's message on hover", () => {
+    it("shows the aria-label as the Tooltip's message on hover", () => {
       render(<Component icon="edit" aria-label="Edit" />);
       hover(screen.getByRole("button", { name: "Edit" }));
       expect(screen.getByRole("tooltip")).toHaveTextContent("Edit");
     });
 
-    it.fails("shows the Tooltip on focus", () => {
+    it("shows the Tooltip on focus", () => {
       render(<Component icon="edit" aria-label="Edit" />);
       act(() => {
         screen.getByRole("button", { name: "Edit" }).focus();
@@ -167,12 +165,11 @@ describe("IconButton component", () => {
       expect(screen.getByRole("tooltip")).toHaveTextContent("Edit");
     });
 
-    it.fails("shows a different message when one is given", () => {
+    it("shows a different message when one is given", () => {
       render(
         <Component
           icon="copy"
           aria-label="Copy"
-          // @ts-expect-error the tooltip prop does not exist yet.
           tooltip="Copy the instance address"
         />,
       );
@@ -184,18 +181,13 @@ describe("IconButton component", () => {
 
     it("renders the bare button when the tooltip is false", () => {
       const { container } = render(
-        <Component
-          icon="edit"
-          aria-label="Edit"
-          // @ts-expect-error the tooltip prop does not exist yet.
-          tooltip={false}
-        />,
+        <Component icon="edit" aria-label="Edit" tooltip={false} />,
       );
       expect(container.querySelector(".tooltip-area")).not.toBeInTheDocument();
       expect(container.firstElementChild?.tagName).toBe("BUTTON");
     });
 
-    it.fails("shows no Tooltip and warns once when named only by aria-labelledby", () => {
+    it("shows no Tooltip and warns once when named only by aria-labelledby", () => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const { container, rerender } = render(
         <>
@@ -224,7 +216,7 @@ describe("IconButton component", () => {
       expect(button).not.toHaveAttribute("aria-describedby");
     });
 
-    it.fails("stays closed while the button's panel is expanded", () => {
+    it("stays closed while the button's panel is expanded", () => {
       const { rerender } = render(
         <Component
           icon="settings"
@@ -249,7 +241,7 @@ describe("IconButton component", () => {
       expect(screen.getByRole("tooltip")).toHaveTextContent("Settings");
     });
 
-    it.fails("hides on Escape", () => {
+    it("hides on Escape", () => {
       render(<Component icon="edit" aria-label="Edit" />);
       hover(screen.getByRole("button", { name: "Edit" }));
       expect(screen.getByRole("tooltip")).toBeInTheDocument();
