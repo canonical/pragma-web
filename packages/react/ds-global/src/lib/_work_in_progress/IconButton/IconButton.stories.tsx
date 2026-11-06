@@ -10,10 +10,34 @@ import { TooltipEngine, withTooltip } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
 import type { IconButtonProps } from "./types.js";
 
+/**
+ * A Tooltip portals its message to the document body: stories that show
+ * one render in a docs iframe of their own.
+ */
+const tooltipParameters = {
+  docs: { story: { inline: false, iframeHeight: "240px" } },
+} as const;
+
+/**
+ * An icon button paired with a Tooltip that repeats its accessible name,
+ * composed around it with `TooltipEngine`: the pattern every story shows.
+ */
+function PairedIconButton(props: IconButtonProps): ReactElement {
+  return (
+    <TooltipEngine Message={props["aria-label"]}>
+      <Component {...props} />
+    </TooltipEngine>
+  );
+}
+
 const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
   decorators: [decorators.surface()],
+  // Every story pairs the icon button with its Tooltip, as Button's
+  // guideline requires; a story that renders its own row pairs each one.
+  render: (args) => <PairedIconButton {...args} />,
+  parameters: tooltipParameters,
   argTypes: {
     importance: {
       control: "select",
@@ -129,8 +153,8 @@ export const Loading: Story = {
   args: { loading: true, "aria-label": "Saving" },
   render: (args) => (
     <div style={row}>
-      <Component {...args} />
-      <Component {...args} loading={false} aria-label="Save" />
+      <PairedIconButton {...args} />
+      <PairedIconButton {...args} loading={false} aria-label="Save" />
     </div>
   ),
   play: async ({ canvas }) => {
@@ -171,9 +195,9 @@ export const BaselineAlignment: Story = {
           data-geometry-row
         >
           <span style={{ whiteSpace: "nowrap" }}>Instance name</span>
-          <Component {...args} importance="tertiary" />
-          <Component {...args} importance="secondary" />
-          <Component {...args} importance="primary" />
+          <PairedIconButton {...args} importance="tertiary" />
+          <PairedIconButton {...args} importance="secondary" />
+          <PairedIconButton {...args} importance="primary" />
           <Button importance="secondary">Rename</Button>
         </div>
       ))}
@@ -184,14 +208,6 @@ export const BaselineAlignment: Story = {
   },
 };
 
-/**
- * A Tooltip portals its message to the document body: stories that show
- * one render in a docs iframe of their own.
- */
-const tooltipParameters = {
-  docs: { story: { inline: false, iframeHeight: "240px" } },
-} as const;
-
 /** The Tooltip, once it is open, from the whole document. */
 const findOpenTooltip = (canvasElement: HTMLElement) =>
   within(canvasElement.ownerDocument.body).findByRole("tooltip");
@@ -201,15 +217,14 @@ const EditButtonWithTooltip = withTooltip(Component, "Edit");
 
 /**
  * Always pair an icon button with a Tooltip that states the action, as
- * Button's guideline asks for every icon-only button. Compose it: wrap the
- * icon button with `withTooltip`, or render `TooltipEngine` around it when
- * the message has to follow state. The Tooltip shows on hover or focus,
- * after its own delay.
+ * Button's guideline asks for every icon-only button. Every story here
+ * composes `TooltipEngine` around the icon button; this one wraps it with
+ * `withTooltip`, the other way to pair it when the message is fixed. The
+ * Tooltip shows on hover or focus, after its own delay.
  */
 export const WithTooltip: Story = {
   name: "With Tooltip",
   args: { importance: "tertiary" },
-  parameters: tooltipParameters,
   render: (args) => <EditButtonWithTooltip {...args} />,
   play: async ({ canvas, canvasElement }) => {
     const button = canvas.getByRole("button", { name: "Edit" });
@@ -228,7 +243,7 @@ export const Anticipation: Story = {
       {(["destructive", "constructive"] as const).map((anticipation) => (
         <div key={anticipation} style={row}>
           {MODIFIER_FAMILIES.importance.map((importance) => (
-            <Component
+            <PairedIconButton
               key={importance}
               {...args}
               importance={importance}
@@ -246,11 +261,17 @@ export const Anticipation: Story = {
 /**
  * Every context (app, site, docs) in both densities, with the baseline grid
  * on: the icon button follows the density cell, and stays on the text's
- * baseline with or without a Tooltip around it.
+ * baseline. The secondary icon button in each row is left without its
+ * Tooltip on purpose, as the geometry control: its box matches the paired
+ * ones beside it.
  */
 export const DensityAndContext: Story = {
   name: "Density and context",
-  parameters: { baseline: true, ...tooltipParameters },
+  parameters: {
+    baseline: true,
+    // Six rows: taller than the shared docs iframe.
+    docs: { story: { inline: false, iframeHeight: "480px" } },
+  },
   render: (args) => (
     <div style={{ display: "grid", gap: "var(--dimension-400)" }}>
       {(["app", "site", "docs"] as const).flatMap((context) =>
@@ -264,13 +285,10 @@ export const DensityAndContext: Story = {
             <span style={{ whiteSpace: "nowrap" }}>
               {context}, {density}
             </span>
-            <TooltipEngine Message="Edit">
-              <Component {...args} importance="tertiary" />
-            </TooltipEngine>
+            <PairedIconButton {...args} importance="tertiary" />
+            {/* Unpaired on purpose: the geometry control. */}
             <Component {...args} importance="secondary" />
-            <TooltipEngine Message="Edit">
-              <Component {...args} importance="primary" />
-            </TooltipEngine>
+            <PairedIconButton {...args} importance="primary" />
             <Button importance="secondary">Rename</Button>
           </div>
         )),
@@ -289,8 +307,9 @@ const SCOPES = ".comfortable, .dense, .app, .site, .docs";
  * A test-only story: Storybook puts a density and a context on its root, so
  * this one portals its row to a container on the document body, outside
  * every scope, where Button has no seat. There the icon button is still as
- * wide as it is tall, with its icon centred, with and without a Tooltip
- * around it. A labelled Button is taller there, so it is not compared.
+ * wide as it is tall, with its icon centred. The first icon button is left
+ * without its Tooltip on purpose, as the geometry control for the paired one
+ * beside it. A labelled Button is taller there, so it is not compared.
  */
 export const OutsideADensityScope: Story = {
   name: "Outside a density scope",
@@ -363,7 +382,7 @@ export const OnContrastedSurface: Story = {
       }}
     >
       {MODIFIER_FAMILIES.importance.map((importance) => (
-        <Component key={importance} {...args} importance={importance} />
+        <PairedIconButton key={importance} {...args} importance={importance} />
       ))}
     </div>
   ),
@@ -462,7 +481,6 @@ const expectTooltipGatedByPanel = async (
  */
 export const AsPopoverTrigger: Story = {
   name: "As a popover trigger",
-  parameters: tooltipParameters,
   render: (args) => (
     <PopoverIconButton
       buttonProps={{
@@ -500,7 +518,6 @@ export const AsPopoverTrigger: Story = {
  */
 export const GearAndThreeDots: Story = {
   name: "Gear and three dots",
-  parameters: tooltipParameters,
   render: (args) => (
     <div style={row}>
       <PopoverIconButton
