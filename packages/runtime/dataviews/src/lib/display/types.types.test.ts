@@ -24,7 +24,6 @@ describe("DisplayStatus", () => {
       | "refresh-failed"
       | "stale"
       | "no-access"
-      | "regrouping"
       | "no-data"
       | "no-results"
     >();

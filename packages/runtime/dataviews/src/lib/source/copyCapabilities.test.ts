@@ -104,16 +104,15 @@ describe("copyCapabilities", () => {
     });
   });
 
-  it("copies the three counts", () => {
+  it("copies the two counts", () => {
     const copy = copyCapabilities(
       declared({
-        counts: { pageable: "exact", matched: "at-least", total: "unknown" },
+        counts: { pageable: "exact", matched: "at-least" },
       }),
     );
     expect(copy.counts).toEqual({
       pageable: "exact",
       matched: "at-least",
-      total: "unknown",
     });
   });
 

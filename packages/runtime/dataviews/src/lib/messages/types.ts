@@ -88,8 +88,6 @@ export type DataViewsMessages = {
   // The table's status row.
   /** A first page is on its way. */
   readonly statusPending: string;
-  /** Rows are withheld while a grouping is applied. */
-  readonly statusRegrouping: string;
   /** No rows could be loaded, and why. */
   readonly statusFailed: (reason: string) => string;
   /**

@@ -127,7 +127,6 @@ export default function declareCapabilities<
     counts: {
       pageable: declaration.counts?.pageable ?? "unknown",
       matched: declaration.counts?.matched ?? "unknown",
-      total: declaration.counts?.total ?? "unknown",
     },
     pagination: declaration.pagination ?? { kind: "offset" },
     selection: { scope: "explicit" },

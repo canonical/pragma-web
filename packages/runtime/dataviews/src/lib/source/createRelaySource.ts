@@ -235,7 +235,7 @@ export default function createRelaySource<
             groups: null,
             // Nothing collapses, so the rows the window pages over are the
             // rows that matched; the whole collection is never asked for.
-            counts: { pageable: matched, matched, total: UNKNOWN_COUNT },
+            counts: { pageable: matched, matched },
             // What the operation selected; the provider holds it to what
             // the request asked for.
             facets: connection.facets ?? {},

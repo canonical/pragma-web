@@ -5,7 +5,6 @@ describe("DISPLAY_STATUS_PHASES", () => {
   it("marks every settled outcome terminal and every passing state transient", () => {
     expect(DISPLAY_STATUS_PHASES).toEqual({
       pending: "transient",
-      regrouping: "transient",
       failed: "terminal",
       refused: "terminal",
       "no-access": "terminal",

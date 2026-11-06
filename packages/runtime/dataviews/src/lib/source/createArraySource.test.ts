@@ -84,7 +84,7 @@ describe("createArraySource", () => {
         collation: ROOT_NUMERIC_COLLATION,
       },
       group: { fields: [], levels: 0, summaries: "none", collapse: false },
-      counts: { pageable: "exact", matched: "exact", total: "exact" },
+      counts: { pageable: "exact", matched: "exact" },
       pagination: { kind: "offset" },
       selection: { scope: "explicit" },
       actions: {},
@@ -208,7 +208,7 @@ describe("createArraySource", () => {
     expect(Object.isFrozen(capabilities.sort.fields)).toBe(true);
   });
 
-  it("delivers the requested window synchronously with all three counts", () => {
+  it("delivers the requested window synchronously with both counts", () => {
     const deliver = delivery();
     source().execute(request(), deliver);
     expect(deliver).toHaveBeenCalledTimes(1);
@@ -217,7 +217,7 @@ describe("createArraySource", () => {
       page: {
         rows: [rows[0], rows[1]],
         groups: null,
-        counts: { pageable: exact(3), matched: exact(3), total: exact(3) },
+        counts: { pageable: exact(3), matched: exact(3) },
         facets: {},
         more: null,
         cursors: null,
@@ -258,12 +258,12 @@ describe("createArraySource", () => {
     expect(deliveredAt(deliver, 0)).toMatchObject({
       page: {
         rows: [rows[0]],
-        counts: { pageable: exact(3), matched: exact(3), total: exact(3) },
+        counts: { pageable: exact(3), matched: exact(3) },
       },
     });
   });
 
-  it("reports the filtered set apart from the collection total", () => {
+  it("counts the filtered set exactly", () => {
     const deliver = delivery();
     source().execute(
       request({
@@ -276,7 +276,7 @@ describe("createArraySource", () => {
     );
     expect(deliveredAt(deliver, 0)).toMatchObject({
       page: {
-        counts: { pageable: exact(2), matched: exact(2), total: exact(3) },
+        counts: { pageable: exact(2), matched: exact(2) },
       },
     });
   });

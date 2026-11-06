@@ -507,7 +507,6 @@ describe("public surface types", () => {
   it("spells one status vocabulary, in one casing, with its phases", () => {
     expectTypeOf<DisplayStatus["status"]>().toEqualTypeOf<
       | "pending"
-      | "regrouping"
       | "failed"
       | "refused"
       | "refresh-failed"
@@ -721,7 +720,7 @@ describe("public surface types", () => {
 
   it("reports refusals structurally, by part and code", () => {
     expectTypeOf<SourceRefusalPart>().toEqualTypeOf<
-      "filter" | "search" | "sort" | "group" | "window" | "targets"
+      "filter" | "search" | "sort" | "group" | "window"
     >();
     expectTypeOf<DataViewsProvider["refusals"]>().returns.toEqualTypeOf<
       readonly SourceRefusal[]

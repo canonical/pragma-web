@@ -56,7 +56,7 @@ const renderFirstPage = () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: createPage({ rows, matched: 2, total: 2 }),
+        page: createPage({ rows, matched: 2 }),
       });
     });
   };

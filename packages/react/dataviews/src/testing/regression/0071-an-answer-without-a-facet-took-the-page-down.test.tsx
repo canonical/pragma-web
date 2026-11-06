@@ -24,7 +24,6 @@ const answerWithoutFacets = (
       page: createPage({
         rows: [machine("m-1", "alpha")],
         matched: 1,
-        total: 1,
         facets: {},
       }),
     });

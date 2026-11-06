@@ -23,7 +23,6 @@ const answer = (
       page: createPage({
         rows: [machine("m-1", "alpha")],
         matched: 1,
-        total: 1,
         facets: {
           status: { kind: "values", values },
           cores: { kind: "range", min: 1, max: 1 },

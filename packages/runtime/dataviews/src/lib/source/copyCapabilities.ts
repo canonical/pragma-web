@@ -86,7 +86,6 @@ export default function copyCapabilities(
     counts: Object.freeze({
       pageable: capabilities.counts.pageable,
       matched: capabilities.counts.matched,
-      total: capabilities.counts.total,
     }),
     pagination:
       capabilities.pagination.kind === "offset"

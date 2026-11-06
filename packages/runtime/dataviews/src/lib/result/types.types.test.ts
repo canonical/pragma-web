@@ -11,9 +11,11 @@ import type {
   QueryIssue,
   QueryIssueCode,
   ResultProblem,
+  SourceCounts,
   SourceDelivery,
   SourceRefusal,
   SourceRefusalCode,
+  SourceRefusalPart,
 } from "./types.js";
 
 describe("Count", () => {
@@ -24,6 +26,21 @@ describe("Count", () => {
     // @ts-expect-error an unknown count has no value to carry
     const valued: Count = { kind: "unknown", value: 0 };
     expect([exact, atLeast, unknown, valued]).toHaveLength(4);
+  });
+});
+
+describe("SourceCounts", () => {
+  it("counts the pageable and the matched records, and nothing else", () => {
+    expectTypeOf<keyof SourceCounts>().toEqualTypeOf<"pageable" | "matched">();
+    expectTypeOf<SourceCounts["matched"]>().toEqualTypeOf<Count>();
+  });
+});
+
+describe("SourceRefusalPart", () => {
+  it("names the members of a request a source can refuse", () => {
+    expectTypeOf<SourceRefusalPart>().toEqualTypeOf<
+      "filter" | "search" | "sort" | "group" | "window"
+    >();
   });
 });
 
