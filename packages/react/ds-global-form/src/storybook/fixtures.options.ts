@@ -10,6 +10,24 @@ export const continents: Option[] = [
   { value: "south_america", label: "South America" },
 ];
 
+export const describedOptions: Option[] = [
+  {
+    value: "immediate",
+    label: "Immediate updates",
+    description: "A short message whenever something changes.",
+  },
+  {
+    value: "weekly",
+    label: "Weekly digest",
+    description: "Everything from the past week in one message.",
+  },
+  {
+    value: "none",
+    label: "No updates",
+    description: "Nothing is sent.",
+  },
+];
+
 export const fruits: Option[] = [
   { value: "apple", label: "Apple" },
   { value: "banana", label: "Banana" },
