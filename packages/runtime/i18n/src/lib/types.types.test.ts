@@ -7,20 +7,26 @@
  */
 
 import { describe, expectTypeOf, it } from "vitest";
+import type { ItemMessages, TwoLocales } from "../../testing/types.js";
+import createFormatters from "./createFormatters.js";
 import createLocaleSource from "./createLocaleSource.js";
 import type {
   Direction,
   Formatters,
+  FormattersOptions,
   I18nConfig,
   Locale,
   LocaleSource,
   LocaleSourceOptions,
   LocaleSources,
+  Message,
+  MessageRecord,
   Messages,
   MessageValue,
   PluralCategory,
   PluralRecord,
   TranslateVars,
+  Translations,
   Translator,
 } from "./types.js";
 
@@ -90,7 +96,7 @@ describe("Translator", () => {
 });
 
 describe("Formatters", () => {
-  it("has exactly the six formatting members, named with verbs", () => {
+  it("has exactly its members, each named with a verb", () => {
     expectTypeOf<keyof Formatters>().toEqualTypeOf<
       | "formatNumber"
       | "formatCurrency"
@@ -98,6 +104,9 @@ describe("Formatters", () => {
       | "formatTime"
       | "formatRelativeTime"
       | "formatList"
+      | "selectPlural"
+      | "selectOrdinal"
+      | "isolate"
     >();
   });
 
@@ -138,6 +147,38 @@ describe("Formatters", () => {
     expectTypeOf<Formatters["formatList"]>().toEqualTypeOf<
       (items: Iterable<string>, options?: Intl.ListFormatOptions) => string
     >();
+  });
+
+  it("selects a plural form by count from a plural record", () => {
+    expectTypeOf<Formatters["selectPlural"]>().toEqualTypeOf<
+      (count: number, forms: PluralRecord) => string
+    >();
+  });
+
+  it("selects an ordinal form by position from a plural record", () => {
+    expectTypeOf<Formatters["selectOrdinal"]>().toEqualTypeOf<
+      (position: number, forms: PluralRecord) => string
+    >();
+  });
+
+  it("isolates text and returns text", () => {
+    expectTypeOf<Formatters["isolate"]>().toEqualTypeOf<
+      (text: string) => string
+    >();
+  });
+});
+
+describe("FormattersOptions", () => {
+  it("makes strict an optional, read-only flag", () => {
+    expectTypeOf<FormattersOptions>().toEqualTypeOf<{
+      readonly strict?: boolean;
+    }>();
+  });
+
+  it("is the optional second argument of createFormatters", () => {
+    expectTypeOf(createFormatters)
+      .parameter(1)
+      .toEqualTypeOf<FormattersOptions | undefined>();
   });
 });
 
@@ -221,5 +262,164 @@ describe("LocaleSource", () => {
 
   it("sets the locale from a tag, which it matches to a configured locale", () => {
     expectTypeOf<LocaleSource["set"]>().toEqualTypeOf<(tag: Locale) => void>();
+  });
+});
+
+describe("Message", () => {
+  it("accepts text", () => {
+    expectTypeOf<"Search">().toExtend<Message>();
+  });
+
+  it("accepts a function of one fact", () => {
+    expectTypeOf<(name: string) => string>().toExtend<Message>();
+  });
+
+  it("accepts a function of one object of named facts", () => {
+    expectTypeOf<
+      (facts: { readonly first: number; readonly total: number }) => string
+    >().toExtend<Message>();
+  });
+
+  it("accepts a function whose one fact is optional", () => {
+    expectTypeOf<(name?: string) => string>().toExtend<Message>();
+  });
+
+  it("refuses a function of two positional facts", () => {
+    expectTypeOf<
+      (first: number, total: number) => string
+    >().not.toExtend<Message>();
+  });
+
+  it("refuses a function with an optional second fact", () => {
+    expectTypeOf<
+      (first: number, total?: number) => string
+    >().not.toExtend<Message>();
+  });
+
+  it("refuses a rest parameter of fact types", () => {
+    expectTypeOf<(...facts: number[]) => string>().not.toExtend<Message>();
+  });
+
+  it("refuses a required second fact typed unknown", () => {
+    expectTypeOf<
+      (first: string, extra: unknown) => string
+    >().not.toExtend<Message>();
+  });
+
+  it("refuses a required second fact typed any", () => {
+    expectTypeOf<
+      // biome-ignore lint/suspicious/noExplicitAny: the row pins how Message treats an any-typed second fact
+      (first: string, extra: any) => string
+    >().not.toExtend<Message>();
+  });
+
+  it("accepts an optional or rest second parameter typed unknown or any, which no type can refuse", () => {
+    expectTypeOf<
+      (name: string, extra?: unknown) => string
+    >().toExtend<Message>();
+    expectTypeOf<
+      (name: string, ...rest: unknown[]) => string
+    >().toExtend<Message>();
+    expectTypeOf<
+      // biome-ignore lint/suspicious/noExplicitAny: the row pins that an optional any-typed second parameter is accepted
+      (name: string, extra?: any) => string
+    >().toExtend<Message>();
+    expectTypeOf<
+      // biome-ignore lint/suspicious/noExplicitAny: the row pins that an any-typed rest parameter is accepted
+      (name: string, ...rest: any[]) => string
+    >().toExtend<Message>();
+  });
+
+  it("refuses a function that does not return text", () => {
+    expectTypeOf<(count: number) => number>().not.toExtend<Message>();
+  });
+});
+
+describe("MessageRecord", () => {
+  it("accepts a record declared with type", () => {
+    type Greetings = {
+      readonly heading: string;
+      readonly greeting: (name: string) => string;
+    };
+    expectTypeOf<Greetings>().toExtend<MessageRecord>();
+  });
+
+  it("refuses a record declared as an interface", () => {
+    interface Greetings {
+      readonly heading: string;
+    }
+    expectTypeOf<Greetings>().not.toExtend<MessageRecord>();
+  });
+
+  it("refuses a member that takes two facts", () => {
+    type Pair = { readonly pair: (a: string, b: string) => string };
+    expectTypeOf<Pair>().not.toExtend<MessageRecord>();
+  });
+
+  it("refuses a method member with an optional second fact", () => {
+    type Pair = { pair(a: string, b?: string): string };
+    expectTypeOf<Pair>().not.toExtend<MessageRecord>();
+  });
+
+  it("refuses an unannotated pair of facts in a record literal", () => {
+    const record = {
+      // @ts-expect-error two unannotated facts are not a Message
+      pair: (a, b) => `${a}${b}`,
+    } satisfies MessageRecord;
+    expectTypeOf(record).toBeObject();
+  });
+
+  describe("a locale factory with the record as its return type", () => {
+    it("compiles when it words every member with the formatters", () => {
+      const createFrench = (f: Formatters): ItemMessages => ({
+        items: (count) =>
+          f.selectPlural(count, {
+            one: "article",
+            many: "d’articles",
+            other: "articles",
+          }),
+      });
+      expectTypeOf(
+        createFrench(createFormatters("fr")),
+      ).toExtend<MessageRecord>();
+    });
+
+    it("fails to compile with a misspelled member", () => {
+      const createFrench = (f: Formatters): ItemMessages => ({
+        // @ts-expect-error `itemz` is not a member of the named record
+        itemz: (count: number) => f.selectPlural(count, { other: "articles" }),
+      });
+      expectTypeOf(createFrench).toBeFunction();
+    });
+
+    it("fails to compile with a missing member", () => {
+      // @ts-expect-error `items` is missing from the returned record
+      const createFrench = (): ItemMessages => ({});
+      expectTypeOf(createFrench).toBeFunction();
+    });
+  });
+});
+
+describe("Translations", () => {
+  it("requires an entry for every locale", () => {
+    expectTypeOf<{
+      en: string;
+      fr: string;
+    }>().toExtend<Translations<string, TwoLocales>>();
+    expectTypeOf<{ en: string }>().not.toExtend<
+      Translations<string, TwoLocales>
+    >();
+  });
+
+  it("requires every entry to have the declared type", () => {
+    expectTypeOf<{ en: string; fr: number }>().not.toExtend<
+      Translations<string, TwoLocales>
+    >();
+  });
+
+  it("keys any locale when no locale union is given", () => {
+    expectTypeOf<Translations<string>>().toEqualTypeOf<{
+      readonly [locale: string]: string;
+    }>();
   });
 });
