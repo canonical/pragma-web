@@ -11,6 +11,25 @@ export const rtl = () => (Story: ElementType) => (
   </div>
 );
 
+/**
+ * Paints the story on one surface: the `.surface` class defines the
+ * `--surface-color-*` channels and the wrapper paints itself with them
+ * (surfaces consume themselves), so a component sits on the background it
+ * would have in an app rather than on the bare Storybook canvas.
+ */
+export const surface = (Story: ElementType): ReactElement => (
+  <div
+    className="surface"
+    style={{
+      background: "var(--surface-color-background)",
+      color: "var(--surface-color-text)",
+      padding: "var(--dimension-300, 24px)",
+    }}
+  >
+    <Story />
+  </div>
+);
+
 /* Grid is provided by @canonical/storybook-addon-utils via `parameters.grid`
  * (a GridMode: "intrinsic" | "responsive" | "none"), which toggles the `.grid`
  * classes on the story root. There is no local grid decorator. */

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import type { ElementType, ReactElement } from "react";
+import type { ElementType } from "react";
 import { describe, expect, it } from "vitest";
 import * as decorators from "./decorators.js";
 
@@ -47,12 +47,8 @@ describe("story decorators", () => {
     ).toBeTruthy();
   });
 
-  // Fails until the shared single-surface decorator exists.
-  it.fails("surface paints the story on one surface, with padding", async () => {
-    const { surface } = (await import("./decorators.js")) as unknown as {
-      surface: (Story: ElementType) => ReactElement;
-    };
-    const { container } = render(surface(Story));
+  it("surface paints the story on one surface, with padding", () => {
+    const { container } = render(decorators.surface(Story));
     const band = container.firstElementChild as HTMLElement;
     expect(band).toHaveClass("surface");
     expect(band.style.background).toBe("var(--surface-color-background)");
