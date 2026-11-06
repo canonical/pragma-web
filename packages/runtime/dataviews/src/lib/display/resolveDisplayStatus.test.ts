@@ -230,11 +230,11 @@ describe("resolveDisplayStatus", () => {
     expect(resolveDisplayStatus(state)).toEqual({ status: "pending" });
   });
 
-  it("produces no regrouping status from any published state", () => {
-    // Every combination a state can hold, hand-built because the absence
-    // must cover the whole input space and not only the paths a source
-    // takes: no result status, rows, problem or query yields the kind the
-    // grouping work reserves.
+  it("reaches every status kind, and no other, from the published states", () => {
+    // Every combination a state can hold, hand-built because the claim must
+    // cover the whole input space and not only the paths a source takes:
+    // each kind the union names is reached, so none is a kind nothing
+    // emits.
     const statuses = Object.keys({
       idle: true,
       pending: true,
@@ -311,16 +311,8 @@ describe("resolveDisplayStatus", () => {
         }
       }
     }
-    expect(seen.has("regrouping")).toBe(false);
-    // Every other kind is reached, so the absence is not an artefact of
-    // the matrix missing a path.
     expect([...seen].sort()).toEqual(
-      [
-        null,
-        ...Object.keys(DISPLAY_STATUS_PHASES).filter(
-          (kind) => kind !== "regrouping",
-        ),
-      ].sort(),
+      [null, ...Object.keys(DISPLAY_STATUS_PHASES)].sort(),
     );
   });
 

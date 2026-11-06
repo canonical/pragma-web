@@ -11,7 +11,6 @@ export default function createUncountedSource(): Source<Machine> {
   const counts = {
     pageable: "unknown",
     matched: "unknown",
-    total: "unknown",
   } as const;
   return {
     capabilities: { ...source.capabilities, counts },
@@ -26,7 +25,7 @@ export default function createUncountedSource(): Source<Machine> {
           status: "succeeded",
           page: {
             ...delivery.page,
-            counts: { pageable: unknown, matched: unknown, total: unknown },
+            counts: { pageable: unknown, matched: unknown },
           },
         });
       }),

@@ -9,6 +9,8 @@ import type { RecordTypes } from "../collection/index.js";
 import { createSchema } from "../schema/index.js";
 import type {
   CapabilityDeclaration,
+  CountCapabilities,
+  CountSupport,
   ExecuteSliceConfig,
   FacetFieldNameOf,
   PaginationCapabilities,
@@ -91,5 +93,14 @@ describe("RelaySourceConfig", () => {
     expectTypeOf<RelaySourceConfig["isForbidden"]>().toEqualTypeOf<
       ((error: unknown) => boolean) | undefined
     >();
+  });
+});
+
+describe("CountCapabilities", () => {
+  it("declares support for the pageable and the matched counts, and nothing else", () => {
+    expectTypeOf<keyof CountCapabilities>().toEqualTypeOf<
+      "pageable" | "matched"
+    >();
+    expectTypeOf<CountCapabilities["pageable"]>().toEqualTypeOf<CountSupport>();
   });
 });

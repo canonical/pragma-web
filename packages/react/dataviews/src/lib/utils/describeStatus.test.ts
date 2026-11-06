@@ -7,9 +7,6 @@ const english = resolveMessages();
 describe("describeStatus", () => {
   it("gives each status its own words", () => {
     expect(describeStatus({ status: "pending" }, english)).toBe("Loading…");
-    expect(describeStatus({ status: "regrouping" }, english)).toBe(
-      "Regrouping…",
-    );
     expect(
       describeStatus({ status: "failed", reason: "offline" }, english),
     ).toBe("These rows could not be loaded: offline");
