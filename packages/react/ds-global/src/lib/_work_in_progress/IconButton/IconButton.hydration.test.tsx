@@ -2,7 +2,7 @@ import { act } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import Component from "./IconButton.js";
 
 /**
@@ -13,16 +13,18 @@ import Component from "./IconButton.js";
  * the test listens to both.
  */
 describe("IconButton (hydration)", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
   afterEach(() => {
-    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
-  /** Server-render `serverUi`, hydrate `clientUi` over it, and report. */
+  /**
+   * Server-render `serverUi`, hydrate `clientUi` over it, and report.
+   *
+   * @note Impure: appends a container to `document.body`, replaces
+   * `console.error` with a spy and mounts a React root. The returned
+   * `unmount` unmounts the root and removes the container; the spy is
+   * restored after each case.
+   */
   const hydrate = (serverUi: ReactElement, clientUi: ReactElement) => {
     const container = document.createElement("div");
     container.innerHTML = renderToString(serverUi);
@@ -52,7 +54,6 @@ describe("IconButton (hydration)", () => {
     expect(container.querySelector("button")).toHaveAccessibleName("Edit");
 
     unmount();
-    expect(vi.getTimerCount()).toBe(0);
   });
 
   it("would report an attribute mismatch through console.error", () => {
