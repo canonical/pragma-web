@@ -1,0 +1,29 @@
+{
+  "extends": "@canonical/typescript-config-react",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "types": [
+      "node",
+      "react",
+      "react-dom",
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "testing/**/*.ts",
+    "testing/**/*.tsx",
+    ".storybook/*.ts",
+    ".storybook/*.tsx",
+    "vite.config.ts",
+    "vitest.setup.ts"
+  ]
+}

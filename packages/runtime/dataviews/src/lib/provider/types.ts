@@ -1,0 +1,615 @@
+/**
+ * The provider's contract: the configuration it is built from, the handle
+ * it hands an application, and the internal host its ports and the
+ * framework bindings drive.
+ */
+
+import type { ActionRequest, ActionRun } from "../action/index.js";
+import type { Collection } from "../collection/index.js";
+import type { DataViewsState, QueryCoordinator } from "../coordinator/index.js";
+import type { HistoryMode, QueryLocation } from "../location/index.js";
+import type { Channel, ReadonlyChannel } from "../observable/index.js";
+import type {
+  Presentation,
+  PresentationStore,
+  ViewArrangement,
+} from "../presentation/index.js";
+import type {
+  GroupPath,
+  GroupTerm,
+  Predicate,
+  PredicateOperator,
+  Query,
+  QueryCommand,
+  SetOperator,
+  SortTerm,
+  WindowNavigation,
+} from "../query/index.js";
+import type { Completion, SourceRefusal } from "../result/index.js";
+import type {
+  Applicability,
+  RowIdentifier,
+  RowModel,
+  RowRecord,
+} from "../rows/index.js";
+import type { SchemaFieldDefinition } from "../schema/index.js";
+import type { Selection } from "../selection/index.js";
+import type { DataViewsSnapshot } from "../snapshot/index.js";
+import type {
+  FacetFieldNameOf,
+  Source,
+  SourceCapabilities,
+} from "../source/index.js";
+import type {
+  SavedViews,
+  ViewAdoptionCause,
+  ViewStore,
+} from "../views/index.js";
+import type { QueryIssue } from "../wire/index.js";
+
+/**
+ * The provider: the one owner of a collection's state and of the ports
+ * that feed it. Built once per page over a module-scope collection, a
+ * source and, optionally, a location, a view store and a presentation
+ * store; every mount that reads it calls `observe()`.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type DataViewsProvider<
+  TFields extends
+    readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
+  /** The collection this provider was built over; the witness a hook compares. */
+  readonly collection: Collection<TFields, TRow>;
+  /**
+   * A frozen copy of what the source declares it can execute, taken once
+   * when the provider is built. Connected parts, and DataTable's
+   * sortable columns, offer only what is declared; a command outside it is
+   * refused at the boundary and moves nothing.
+   */
+  readonly capabilities: SourceCapabilities;
+  /**
+   * The collection's snapshot: query, window, result and pending request,
+   * published at every mutation boundary. Read-only at runtime.
+   */
+  readonly state: ReadonlyChannel<DataViewsState<TRow>>;
+  /**
+   * The displayed rows as one shared model: stable identities in result
+   * order. Every root and every table on this provider reads the same model,
+   * so no cell owns a duplicate record.
+   */
+  readonly rows: ReadonlyChannel<RowModel<TRow>>;
+  /**
+   * The owned parameters the location carries that were refused — a clause
+   * the grammar, the schema or the source cannot run. Read with the
+   * location at construction, so a server render reports them too. Empty
+   * while the query is clean. Without a location, what the snapshot's query
+   * was refused for, and otherwise nothing; with a location carrying no
+   * query, those refusals too, while neither the provider's query nor the
+   * location has moved since — a reset is such a move; a saved view opened,
+   * reverted to or left, or a group collapsed, over the same query is not.
+   */
+  readonly issues: ReadonlyChannel<readonly QueryIssue[]>;
+  readonly selection: Selection;
+  /**
+   * The collection's saved views over the store the provider was given, or
+   * null when it was given none: no store means no views, never views kept
+   * in memory and lost on reload.
+   */
+  readonly views: SavedViews | null;
+  /**
+   * The collection's presentation — column widths, order and visibility —
+   * the one authority every table on this provider reads and a resize
+   * writes. Over the presentation store the provider was given, or in
+   * memory for the session without one, which is never labelled saved.
+   */
+  readonly presentation: Presentation;
+  /**
+   * The collection as it stands, as one serialisable value: the query and
+   * its window as canonical text, and the arrangement in force. Never the
+   * selection. What a server render hands the client, whose provider starts
+   * from it through `snapshot` and so draws what the server drew; and what
+   * an application keeps to put the collection back later.
+   */
+  readonly readSnapshot: () => DataViewsSnapshot;
+  /**
+   * Bounded commands, not raw dispatch. Each answers with the refusals the
+   * query it would produce incurs, empty when applied; a refused command
+   * publishes nothing, requests nothing and writes nothing.
+   */
+  readonly navigateWindow: (
+    window: WindowNavigation,
+  ) => readonly SourceRefusal[];
+  readonly setSort: (sort: readonly SortTerm[]) => readonly SourceRefusal[];
+  readonly setSearch: (search: string) => readonly SourceRefusal[];
+  /**
+   * Replace the grouping levels. Reserved: refused while no source declares
+   * a groupable field.
+   *
+   * @seam grouping — read by the group header row
+   */
+  readonly setGroup: (group: readonly GroupTerm[]) => readonly SourceRefusal[];
+  /**
+   * Replace the collapsed group paths. Reserved: refused while no source
+   * honours collapse.
+   *
+   * @seam grouping — read by the group header's disclosure
+   */
+  readonly setCollapsed: (
+    collapsed: readonly GroupPath[],
+  ) => readonly SourceRefusal[];
+  /**
+   * Request the current query again; retained rows stay while it runs.
+   * While nothing observes the provider — on a server, or on a client
+   * before it hydrates — the source is read within this call: a source that
+   * can answer from what it holds, as the array source does, publishes its
+   * page first, so a render that follows draws rows, and one that cannot
+   * leaves the request pending for the first observer. Nothing is started
+   * or subscribed either way, and the first observer takes the source up
+   * over the rows drawn without asking for them again. This is the call a
+   * server render makes before rendering.
+   */
+  readonly refresh: () => void;
+  /**
+   * Every refusal a query would incur, from the declaration and from the
+   * source's own check. Empty means executable. What a control reads before
+   * offering a destination.
+   */
+  readonly refusals: (query: Query) => readonly SourceRefusal[];
+  /**
+   * Run one declared action over the given identities, or over the
+   * selection when none are given. Resolves with the settled run once every
+   * captured target has an outcome — a target the source reports nothing
+   * for fails rather than staying pending. Successful targets leave the
+   * selection; failures stay for review. Rejects when the action is not
+   * declared, addresses nothing, or addresses more than the declaration
+   * allows.
+   */
+  readonly runAction: (request: ActionRequest) => Promise<ActionRun>;
+  /**
+   * Start the provider's ports and return the release. Ref-counted: the first
+   * observer adopts the location, or the write it still awaits there, starts
+   * source execution, the location loop, the presentation and the saved views,
+   * and asks for a page when nothing is pending after that — the first page
+   * when the state is idle, the current one again when an earlier observation
+   * settled it and released; the last release stops all of it. Every mount that
+   * reads the provider calls this in an effect, so two roots on one provider do
+   * not race and a rehearsal mount and unmount leaves a provider that starts
+   * again on the next observer. Construction reads the location once and starts
+   * nothing, so a server render carries the location's query and a location
+   * moved before the first observer still wins.
+   */
+  readonly observe: () => () => void;
+  /**
+   * Begin the next generation: query, window, result, rows and selection
+   * return to where the provider started — the snapshot's query, or the
+   * empty query — with no saved view open, even when the snapshot named
+   * one, and a completion of the old generation never publishes into the
+   * new one.
+   */
+  readonly reset: () => void;
+};
+
+/**
+ * Configuration of one DataViews provider: the collection it is built
+ * over, the source that answers it, and the ports it drives.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type DataViewsProviderConfig<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
+  /** The module-scope collection: schema, identity and record types. */
+  readonly collection: Collection<TFields, TRow>;
+  /** The source that executes the requests; its capabilities are read here. */
+  readonly source: Source<TRow>;
+  /**
+   * Where the applied query lives — a URL through `createPlatformLocation`
+   * or a memory location. Read once at construction: a location carrying a
+   * query is where the provider stands before anything observes it, with
+   * what it refused on `issues`. Left out, the query lives in the provider
+   * alone.
+   */
+  readonly location?: QueryLocation | undefined;
+  /**
+   * How each query transition enters the location's history. By default a
+   * search replaces, so typing never floods history, and every other
+   * transition — a filter, a sort, a grouping, a window move, a saved view
+   * opened, written with its `view` beside the query in one entry — pushes
+   * an entry Back returns from. One mode sets every transition; a record
+   * overrides the default per transition. Adopting the location writes
+   * nothing back; a canonical respelling, a reset, and a saved view reverted
+   * to or left replace; and collapse has no spelling, whatever this says.
+   */
+  readonly history?: HistoryPolicy | undefined;
+  /**
+   * Where the collection's saved views live — `createIndexedDBViewStore`
+   * from `@canonical/dataviews-core/indexeddb`, or a store of the
+   * application's own. Left out, the collection has no views.
+   */
+  readonly views?: ViewStore | undefined;
+  /**
+   * Where the viewer's arrangement lives — the same IndexedDB store, which
+   * implements both ports, a `localStorage`-backed store or the
+   * application's own server preferences. Left out, the arrangement lives
+   * in memory for the session: widths, order and visibility still work, and
+   * nothing claims they were saved.
+   */
+  readonly presentation?: PresentationStore | undefined;
+  /**
+   * What the provider starts from, and returns to on `reset()`: the
+   * snapshot a server rendered with — `readSnapshot()` on the provider it
+   * rendered — or one an application kept. Its query is read as a
+   * location's is, what it refuses left out and reported on `issues`, and a
+   * location carrying a query wins over it. `issues` always reports the
+   * query the provider stands on: a location carrying no query takes the
+   * snapshot's executable query, and what the snapshot's query was refused
+   * for stays reported while neither the provider's query nor the location
+   * has moved since — a reset is such a move; a saved view opened, reverted
+   * to or left, or a group collapsed, over the same query is not. Its
+   * arrangement is the default arrangement until the
+   * presentation store is first read — or, when it names an open view, that
+   * view's arrangement as drawn, until the view's own preferences are read
+   * or another view, or none, is shown. Left out, the provider starts on the
+   * empty query at the first page.
+   */
+  readonly snapshot?: DataViewsSnapshot | undefined;
+  /**
+   * The fields whose facets every request asks the source for — the options
+   * and counts Filters shows beside a choice, the range beside a number or a
+   * date — each one the source declares: a field it does not is refused, and
+   * the provider throws when it is built, before anything executes. A
+   * filterable `choices` field whose options are the server's must be named,
+   * since its facet is where its options come from, and the provider throws
+   * otherwise. None when left out.
+   */
+  readonly facets?: readonly FacetFieldNameOf<TFields>[] | undefined;
+};
+
+/**
+ * What a query transition changed, named for the member it moved: the key
+ * a history policy is written against. `Transition` is the announced move
+ * itself, on the internal host.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type QueryTransition =
+  | "filter"
+  | "search"
+  | "sort"
+  | "group"
+  | "window"
+  | "view";
+
+/**
+ * How query transitions enter the location's history: one mode for every
+ * transition, or overrides per transition over the default — search
+ * replaces, everything else pushes.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type HistoryPolicy =
+  | HistoryMode
+  | Readonly<Partial<Record<QueryTransition, HistoryMode>>>;
+
+/**
+ * What moved the query: a transition that enters history, a collapse —
+ * which has no spelling and enters none — the location adopted, a reset
+ * back to where the provider started, or a saved view reverted to or left,
+ * which respell the entry in place.
+ */
+export type TransitionCause =
+  | QueryTransition
+  | "collapse"
+  | "reset"
+  | AdoptionCause;
+
+/**
+ * Whose authority an adoption takes: the location's, or a saved view's —
+ * opened, reverted to, or left — spelled once, by the saved views.
+ */
+export type AdoptionCause = "adopt" | ViewAdoptionCause;
+
+/**
+ * One move of the query, as the location sync hears it: where the query
+ * now stands, what moved it, and how the move enters history — null when it
+ * enters none, because the location moved it or it has no spelling. The
+ * saved view open beside it is the host's `view`, moved before the
+ * transition is announced.
+ */
+export type Transition = {
+  readonly query: Query;
+  readonly cause: TransitionCause;
+  readonly history: HistoryMode | null;
+};
+
+/** The history mode of every cause, resolved from the provider's policy. */
+export type TransitionHistory = Readonly<
+  Record<TransitionCause, HistoryMode | null>
+>;
+
+/**
+ * The provider's internal host: what its ports and the framework bindings
+ * drive, and nothing an application writes reaches. Reachable through
+ * `readProviderHost` on the bindings entry point.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type ProviderHost<
+  TFields extends
+    readonly SchemaFieldDefinition[] = readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = Pick<
+  DataViewsProvider<TFields, TRow>,
+  "collection" | "capabilities" | "state" | "refusals"
+> & {
+  /**
+   * Replace the predicate at its address, and the one at the same field
+   * under `replaces` when given, as one transition; the window returns to
+   * page one.
+   */
+  readonly setPredicate: (
+    predicate: Predicate,
+    replaces?: SetOperator,
+  ) => readonly SourceRefusal[];
+  /** Remove the predicate at an address; the window returns to page one. */
+  readonly removePredicate: (
+    field: string,
+    operator: PredicateOperator,
+  ) => readonly SourceRefusal[];
+  /** Request the current query again and name the request. */
+  readonly refresh: () => string;
+  /**
+   * Adopt an externally authoritative query with the saved view open beside
+   * it — null for none — and name the request it issued, or null when the
+   * query did not move. Query and view move as one transition, so one write
+   * enters history once. The cause says whose authority: the location's
+   * (`adopt`), which is never written back; a view opened (`view`), which
+   * enters history as the policy says; or a view reverted to or left
+   * (`revert`), which replaces.
+   */
+  readonly adopt: (
+    query: Query,
+    cause: AdoptionCause,
+    view: string | null,
+  ) => string | null;
+  /**
+   * The saved view open beside the query — the location's `view`, or the
+   * snapshot's — or null: read with the query the provider stands on when
+   * it is built, moved by
+   * `adopt`, and spelled beside every query the location sync writes. It
+   * asks the source for nothing and never marks a view modified.
+   */
+  readonly view: ReadonlyChannel<string | null>;
+  /**
+   * Every move of the query, as it happens: what the location sync writes
+   * from. Null until the first move.
+   */
+  readonly transitions: ReadonlyChannel<Transition | null>;
+  /**
+   * A query spelled as the location would carry it, the location's other
+   * parameters preserved — the destination a link or a form leads to. Null
+   * without a location: there is nowhere for a destination to lead.
+   */
+  readonly spellQuery: (query: Query) => URLSearchParams | null;
+  /**
+   * The read side of the location port the provider was given, or null:
+   * what a control spelling destinations watches, since the location's
+   * other parameters can move without the query moving. Never its write:
+   * the location sync is the one writer.
+   */
+  readonly location: Pick<QueryLocation, "read" | "subscribe"> | null;
+  /** Complete the pending request; false when it is not the one pending. */
+  readonly complete: (
+    requestId: string,
+    completion: Completion<TRow>,
+  ) => boolean;
+  /**
+   * Whether a schema field applies to a row, by the field's type scoping.
+   * Always "applies" on a monomorphic collection, and on a field the schema
+   * does not scope.
+   *
+   * @seam typed cells — read by the body cell, whose not-applicable cell is
+   * the third state beside value and empty
+   */
+  readonly applicability: (field: string, row: TRow) => Applicability;
+  /**
+   * The type remembered for a selected identity, or null when the provider
+   * never modelled it while it was selected — a selection restored by a host
+   * over rows this provider has not seen. A remembered type is let go when
+   * the rows are next replaced after its identity leaves the selection, so
+   * one reselected before then answers as before. It answers from the row on
+   * display whenever there is one, so it never contradicts `applicability`,
+   * and it changes only with a `rows` or a `selection` publication: watching
+   * those is watching this.
+   *
+   * @seam actions — read by `useDataViewsAction`, which decides an action's
+   * applicability to records selected on an earlier page from here
+   */
+  readonly recordType: (id: string) => string | null;
+};
+
+/** Configuration of one collection's record typing. */
+export type RecordTypingConfig<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
+  /** The collection, whose declared types and scoped fields are read. */
+  readonly collection: Collection<TFields, TRow>;
+  /** The selection whose identities are the ones worth remembering. */
+  readonly selection: Selection;
+  /** The displayed rows, read for a type the memory has not taken yet. */
+  readonly rows: ReadonlyChannel<RowModel<TRow>>;
+};
+
+/** One collection's record typing: what the provider answers about types. */
+export type RecordTyping<TRow extends object = RowRecord> = {
+  /** Why a model cannot be displayed, or null when every row is typed. */
+  readonly rejectionOf: (model: RowModel<TRow>) => string | null;
+  /** Whether a schema field applies to a row. */
+  readonly applicability: (field: string, row: TRow) => Applicability;
+  /** The remembered type of a selected identity. */
+  readonly recordType: (id: string) => string | null;
+  /** Take the type of every selected row of a model about to be replaced. */
+  readonly remember: (model: RowModel<TRow>) => void;
+  /** Drop the memory: the generation moved, so nothing displayed survives. */
+  readonly forget: () => void;
+};
+
+/** Configuration of the source run: the host it feeds and the source it drives. */
+export type SourceRunConfig<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
+  readonly host: ProviderHost<TFields, TRow>;
+  readonly source: Source<TRow>;
+  /** The fields whose facets every request asks for, each one declared. */
+  readonly facets: readonly string[];
+};
+
+/** Configuration of the location sync: the host and the location. */
+export type LocationSyncConfig<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+> = {
+  readonly host: ProviderHost<TFields, TRow>;
+  readonly location: QueryLocation;
+  /**
+   * Whether the provider keeps saved views. Without, a view the location
+   * names is read as none, and spelled out of it.
+   */
+  readonly keepsViews: boolean;
+  /**
+   * What the query the provider stands on was refused for when it read it
+   * at construction, reported while neither the provider's query nor the
+   * location has moved since.
+   */
+  readonly issues: readonly QueryIssue[];
+};
+
+/**
+ * Where a provider starts, read before anything observes it: the snapshot's
+ * query a reset returns to, the location's query when it carries one, what
+ * the query it stands on refused, the open view and the restored
+ * arrangement.
+ */
+export type StartingPoint = {
+  /**
+   * Where the provider started: the snapshot's query, which a reset returns
+   * to; none without a snapshot, when it starts on the empty query.
+   */
+  readonly start: Query | undefined;
+  /** The location's query, when it carries one. */
+  readonly initial: Query | undefined;
+  /**
+   * What the query the provider stands on was refused for: the location's
+   * when it carries one, the snapshot's otherwise, none without either.
+   */
+  readonly issues: readonly QueryIssue[];
+  /** The saved view open beside the query the provider stands on. */
+  readonly view: string | null;
+  /** The snapshot's arrangement, with the view it was drawn under, if any. */
+  readonly restored: ViewArrangement | undefined;
+  /** The arrangement a followed link carries, with the view it named, if any. */
+  readonly linked: ViewArrangement | undefined;
+};
+
+/** One port's run: starts on `observe()`, stops through its release. */
+export type PortRun = {
+  readonly observe: () => () => void;
+};
+
+/** The source's run: a port, and the request it can answer unobserved. */
+export type SourceRun = PortRun & {
+  /**
+   * Complete the pending request while nothing observes the run, from what
+   * the source reads within the call — refused when the source cannot run
+   * it, published when the source answers, and left pending for the first
+   * observer when it cannot answer without waiting. Nothing is executed or
+   * subscribed. Does nothing while observed, where the live run executes
+   * every request, or with nothing pending.
+   */
+  readonly completePending: () => void;
+};
+
+/** One ref-counted observation over several ports. */
+export type PortsObservation = PortRun & {
+  /** How many observers hold the ports right now. */
+  readonly observers: number;
+};
+
+/** Configuration of one ports observation. */
+export type PortsObservationConfig = {
+  /** The ports, in the order they start; they stop in reverse. */
+  readonly ports: readonly PortRun[];
+  /** Runs once the first observer has started every port. */
+  readonly afterStart: () => void;
+};
+
+/** Configuration of the provider's query path. */
+export type QueryCommandsConfig<TRow extends object = RowRecord> = {
+  readonly coordinator: QueryCoordinator<TRow>;
+  readonly capabilities: SourceCapabilities;
+  readonly source: Source<TRow>;
+  /** Publish the coordinator's state after a move. */
+  readonly publish: () => void;
+  /** Where every move is announced, after its state is published. */
+  readonly transitions: Channel<Transition | null>;
+  /** How each cause enters history. */
+  readonly history: TransitionHistory;
+  /** The saved view open beside the query, which an adoption moves with it. */
+  readonly view: Channel<string | null>;
+};
+
+/**
+ * The provider's query path: the refusal check, the command boundary, and
+ * the two moves the ports make.
+ */
+export type QueryCommands = Pick<
+  ProviderHost,
+  "refusals" | "adopt" | "refresh"
+> & {
+  /** Apply one command at the boundary; the refusals it incurs, empty when applied. */
+  readonly command: (command: QueryCommand) => readonly SourceRefusal[];
+};
+
+/**
+ * The location sync: the loop and the issues it publishes. On start the
+ * location wins when it carries a query, and takes the host's query when it
+ * carries none. After that, a transition with a history mode is written in
+ * that mode where the location says otherwise — over the query the location
+ * already decodes to, only the view's parameter is placed — and every
+ * external location change — back, forward, a pasted URL — has its refusals
+ * reported, is adopted and made canonical in place, and is never written
+ * back.
+ */
+export type LocationSync = PortRun & {
+  /** The owned parameters the location carries that were refused. */
+  readonly issues: ReadonlyChannel<readonly QueryIssue[]>;
+};
+
+/** Configuration of the provider's action runner. */
+export type ActionRunnerConfig<TRow extends object = RowRecord> = {
+  readonly source: Source<TRow>;
+  readonly capabilities: SourceCapabilities;
+  readonly selection: Selection;
+};
+
+/** Configuration of the provider's completion path. */
+export type RequestCompleterConfig<TRow extends object = RowRecord> = {
+  readonly coordinator: QueryCoordinator<TRow>;
+  /** The shared row model, written here and nowhere else. */
+  readonly rows: Channel<RowModel<TRow>>;
+  readonly identify: RowIdentifier<TRow>;
+  /** The record typing, or null on a monomorphic collection. */
+  readonly recordTyping: RecordTyping<TRow> | null;
+  /** Publish the coordinator's state after a completion. */
+  readonly publish: () => void;
+};

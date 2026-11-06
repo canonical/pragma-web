@@ -1,0 +1,110 @@
+import {
+  canonicalizeSlice,
+  OPERATOR_ARITY,
+  type PredicateOperand,
+} from "../query/index.js";
+import { OPERATOR_DELIMITER } from "./constants.js";
+import isOwnedKey from "./isOwnedKey.js";
+import spellWireKey from "./spellWireKey.js";
+import type { EncodeQueryConfig } from "./types.js";
+
+/** The presence marker of the zero-value operator. */
+const IS_SET_VALUE = "1";
+
+/**
+ * A number in the plain decimal the input grammar reads. A number's own
+ * string form switches to exponent notation beyond 1e21 and below 1e-6;
+ * moving the point respells the same shortest round-trip digits, so the
+ * value read back is exactly the value written.
+ */
+const plainDecimal = (value: number): string => {
+  const spelled = String(value);
+  const at = spelled.indexOf("e");
+  if (at === -1) {
+    return spelled;
+  }
+  const exponent = Number(spelled.slice(at + 1));
+  const mantissa = spelled.slice(0, at);
+  const negative = mantissa.startsWith("-");
+  const unsigned = negative ? mantissa.slice(1) : mantissa;
+  const dot = unsigned.indexOf(".");
+  const whole = dot === -1 ? unsigned : unsigned.slice(0, dot);
+  const fraction = dot === -1 ? "" : unsigned.slice(dot + 1);
+  const digits = `${whole}${fraction}`;
+  const point = whole.length + exponent;
+  const body =
+    exponent < 0
+      ? `0.${"0".repeat(-point)}${digits}`
+      : digits.padEnd(point, "0");
+  return negative ? `-${body}` : body;
+};
+
+/** One operand as the input grammar spells it. */
+const operandText = (operand: PredicateOperand): string =>
+  typeof operand === "number" ? plainDecimal(operand) : String(operand);
+
+/**
+ * Write one query and its window as URL parameters.
+ *
+ * The slice is canonicalized first, so the same query always produces the
+ * same parameters: set operands are a set, `isAny` is the bare field name,
+ * ordered sort terms keep their precedence, and an empty search is no
+ * search. Only the grammar's own keys are replaced in `preserve` — every
+ * host parameter survives, in its original order and with its duplicates.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export default function encodeQuery(
+  config: EncodeQueryConfig,
+): URLSearchParams {
+  const { schema, slice, window } = config;
+  const params = new URLSearchParams(config.preserve);
+  for (const key of new Set(params.keys())) {
+    if (isOwnedKey(key, schema)) {
+      params.delete(key);
+    }
+  }
+
+  const canonical = canonicalizeSlice(slice);
+  for (const predicate of canonical.filter) {
+    const key = spellWireKey(predicate.field, predicate.operator);
+    if (predicate.operator === "isSet") {
+      params.append(key, IS_SET_VALUE);
+      continue;
+    }
+    for (const operand of predicate.operands) {
+      // A set operator's option is matched by its own string form; a bound
+      // is read by the number grammar.
+      params.append(
+        key,
+        OPERATOR_ARITY[predicate.operator] === "many"
+          ? String(operand)
+          : operandText(operand),
+      );
+    }
+  }
+  if (canonical.search !== null) {
+    params.set("q", canonical.search);
+  }
+  for (const term of canonical.sort) {
+    params.append(
+      "sort",
+      `${term.field}${OPERATOR_DELIMITER}${term.direction}`,
+    );
+  }
+  for (const term of canonical.group) {
+    params.append("group", term.field);
+  }
+  // Written whenever given: a window read back is the window that was
+  // displayed, never a default the reader has to know. Collapse is left
+  // out, so a reload expands every group.
+  if (window !== null) {
+    params.set("page", String(window.page));
+    params.set("size", String(window.size));
+    if (window.cursor !== null) {
+      params.set("cursor", window.cursor);
+    }
+  }
+  return params;
+}

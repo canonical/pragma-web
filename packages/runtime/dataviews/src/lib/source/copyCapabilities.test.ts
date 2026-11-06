@@ -1,0 +1,159 @@
+import { describe, expect, it } from "vitest";
+import { declare, declareSort } from "../../../testing/fixtures.js";
+import type { PredicateOperator, SortTerm } from "../query/index.js";
+import copyCapabilities from "./copyCapabilities.js";
+import type { EmptyPlacement, SourceCapabilities } from "./types.js";
+
+const declared = (
+  overrides: Partial<SourceCapabilities> = {},
+): SourceCapabilities => declare(overrides);
+
+describe("copyCapabilities", () => {
+  it("keeps a field declared with no operator as filterable by none", () => {
+    const copy = copyCapabilities(declared({ filter: { cpu: [] } }));
+    expect(copy.filter["cpu"]).toEqual([]);
+  });
+
+  it("keeps the declared operators of a field that has them", () => {
+    const copy = copyCapabilities(declared({ filter: { status: ["isAny"] } }));
+    expect(copy.filter["status"]).toEqual(["isAny"]);
+  });
+
+  it("does not change when the declaration is mutated afterwards", () => {
+    const filter: Record<string, PredicateOperator[]> = { status: ["isAny"] };
+    const copy = copyCapabilities(declared({ filter }));
+    filter["status"]?.push("isSet");
+    expect(copy.filter["status"]).toEqual(["isAny"]);
+  });
+
+  it("reads a field named for a prototype member as absent", () => {
+    const copy = copyCapabilities(declared({ filter: { status: ["isAny"] } }));
+    expect(copy.filter.toString).toBeUndefined();
+  });
+
+  it("copies the searchable fields, and keeps no search as none", () => {
+    const fields = ["name"];
+    const copy = copyCapabilities(declared({ search: { fields } }));
+    fields.push("owner");
+    expect(copy.search).toEqual({ fields: ["name"] });
+    expect(copyCapabilities(declared()).search).toBeNull();
+  });
+
+  it("copies the whole ordering block, terms and all", () => {
+    const fields = ["cpu"];
+    const tiebreak: SortTerm[] = [{ field: "id", direction: "asc" }];
+    const empties: Record<string, EmptyPlacement> = { cpu: "first" };
+    const copy = copyCapabilities(
+      declared({
+        sort: {
+          fields,
+          terms: 2,
+          default: [{ field: "cpu", direction: "desc" }],
+          tiebreak,
+          empties,
+          collation: "en-GB",
+        },
+      }),
+    );
+    fields.push("zone");
+    tiebreak.push({ field: "name", direction: "asc" });
+    empties["cpu"] = "last";
+    empties["zone"] = "first";
+    expect(copy.sort).toEqual({
+      fields: ["cpu"],
+      terms: 2,
+      default: [{ field: "cpu", direction: "desc" }],
+      tiebreak: [{ field: "id", direction: "asc" }],
+      empties: { cpu: "first" },
+      collation: "en-GB",
+    });
+    expect(Object.isFrozen(copy.sort.tiebreak)).toBe(true);
+    expect(Object.isFrozen(copy.sort.empties)).toBe(true);
+    // Prototype-free, so a field named for an `Object.prototype` member
+    // reads as unplaced rather than as a function.
+    expect(Object.getPrototypeOf(copy.sort.empties)).toBeNull();
+  });
+
+  it("keeps a named tiebreak as the word it was declared with", () => {
+    expect(
+      copyCapabilities(declared({ sort: declareSort(["cpu"]) })).sort,
+    ).toEqual({
+      fields: ["cpu"],
+      terms: null,
+      default: [],
+      tiebreak: "opaque",
+      empties: {},
+      collation: null,
+    });
+  });
+
+  it("copies the grouping block against a later mutation", () => {
+    const fields = ["status"];
+    const copy = copyCapabilities(
+      declared({
+        group: { fields, levels: 2, summaries: "counts", collapse: true },
+      }),
+    );
+    fields.push("zone");
+    expect(copy.group).toEqual({
+      fields: ["status"],
+      levels: 2,
+      summaries: "counts",
+      collapse: true,
+    });
+  });
+
+  it("copies the three counts", () => {
+    const copy = copyCapabilities(
+      declared({
+        counts: { pageable: "exact", matched: "at-least", total: "unknown" },
+      }),
+    );
+    expect(copy.counts).toEqual({
+      pageable: "exact",
+      matched: "at-least",
+      total: "unknown",
+    });
+  });
+
+  it("copies a cursor pagination block with its two flags", () => {
+    const copy = copyCapabilities(
+      declared({
+        pagination: { kind: "cursor", backward: true, durable: false },
+      }),
+    );
+    expect(copy.pagination).toEqual({
+      kind: "cursor",
+      backward: true,
+      durable: false,
+    });
+    expect(copyCapabilities(declared()).pagination).toEqual({ kind: "offset" });
+  });
+
+  it("copies each declared row operation", () => {
+    const actions = { stop: { targets: "explicit" as const, limit: 10 } };
+    const copy = copyCapabilities(declared({ actions }));
+    expect(copy.actions["stop"]).toEqual({ targets: "explicit", limit: 10 });
+    expect(Object.isFrozen(copy.actions["stop"])).toBe(true);
+    expect(copyCapabilities(declared()).actions).toEqual({});
+  });
+
+  it("freezes every part of the copy", () => {
+    const copy = copyCapabilities(
+      declared({
+        filter: { status: ["isAny"] },
+        search: { fields: ["name"] },
+        sort: declareSort(["cpu"]),
+      }),
+    );
+    expect(Object.isFrozen(copy)).toBe(true);
+    expect(Object.isFrozen(copy.filter)).toBe(true);
+    expect(Object.isFrozen(copy.filter["status"])).toBe(true);
+    expect(Object.isFrozen(copy.search)).toBe(true);
+    expect(Object.isFrozen(copy.sort.fields)).toBe(true);
+    expect(Object.isFrozen(copy.group)).toBe(true);
+    expect(Object.isFrozen(copy.counts)).toBe(true);
+    expect(Object.isFrozen(copy.pagination)).toBe(true);
+    expect(Object.isFrozen(copy.selection)).toBe(true);
+  });
+});

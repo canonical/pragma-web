@@ -1,0 +1,136 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Actions.stories";
+
+<Meta of={Stories} name="Recipes" />
+
+# DataViews.Actions recipes
+
+`DataViews.Actions` is the action bar: how much is selected, the actions that apply to it, and a button that clears it. It reads the enclosing root's selection and takes no copy of it, and it is absent while nothing is selected.
+
+It renders on the design system's contrasted surface — its root carries `.contrasted`, from `@canonical/styles` — so it paints no colour of its own. Place it in the collection's footer beside the pagination bar.
+
+## Actions over the selection
+
+The actions are your own components, placed as children. Each runs through the provider when it is pressed: `runAction({ action })` from `useDataViews(collection)` captures the selection as its targets — or the `targets` you name — calls the source's own `runAction`, and removes the targets that succeed from the selection. A failed target stays selected, for review and retry. An action the source did not declare, one addressing nothing, or one addressing more rows than it declared it can take at once, is rejected before anything runs.
+
+A destructive action is the design system's `Button` with `anticipation="destructive"`.
+
+```tsx
+import {
+  createArraySource,
+  createDataViewsProvider,
+} from "@canonical/dataviews-core";
+import {
+  DataTable,
+  DataViews,
+  type DataTableColumn,
+  useDataViews,
+} from "@canonical/dataviews-react";
+import { Button, type ButtonProps } from "@canonical/react-ds-global";
+import { useState } from "react";
+import { archiveMachines, machineCollection, machines } from "./machines.js";
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "status", header: "Status" },
+  { id: "owner", header: "Owner" },
+];
+
+// Pressed, it runs through the provider, which captures the selection as
+// its targets, runs the source's action and removes the ones that succeed.
+function SelectionAction({
+  action,
+  ...button
+}: Omit<ButtonProps, "onClick"> & { action: string }) {
+  const { runAction } = useDataViews(machineCollection);
+  return (
+    <Button
+      {...button}
+      type="button"
+      importance="tertiary"
+      onClick={() => {
+        // Targets left out: the action addresses the selection.
+        void runAction({ action });
+      }}
+    />
+  );
+}
+
+export function Machines() {
+  // Built once: the parts observe it, which starts its source and ports.
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: machineCollection,
+      source: createArraySource({
+        rows: machines,
+        collection: machineCollection,
+        // Declared, then served: the provider refuses a source that
+        // declares an action and has no runner for it.
+        actions: {
+          archive: { targets: "explicit", limit: null },
+          delete: { targets: "explicit", limit: null },
+        },
+        // Resolves with one outcome per target: { target, status }.
+        runAction: ({ action, targets }) => archiveMachines(action, targets),
+      }),
+      snapshot: { query: "page=1&size=5", presentation: {} },
+    }),
+  );
+  return (
+    <DataViews provider={provider}>
+      <DataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        selectable
+        rowLabel={(row) => row.name}
+      />
+      <DataViews.Actions>
+        <SelectionAction action="archive">Archive</SelectionAction>
+        <SelectionAction action="delete" anticipation="destructive" icon="delete">
+          Delete
+        </SelectionAction>
+      </DataViews.Actions>
+      <DataViews.Pagination sizes={[5, 10]} />
+    </DataViews>
+  );
+}
+```
+
+<Canvas of={Stories.TwoSelected} sourceState="none" />
+
+Nothing selected, no bar:
+
+<Canvas of={Stories.NothingSelected} sourceState="none" />
+
+## The whole selection
+
+The count is the selection's, across pages — not the rows on screen — and an action acts on every selected target. The deselect button is named with what it clears ("Deselect 2 rows").
+
+<Canvas of={Stories.SelectedAcrossPages} sourceState="none" />
+
+When an action succeeds for every target, the targets leave the selection, and with nothing left selected the bar goes too. If the focus was inside it, the focus returns to the control it entered the bar from — the last row checkbox, typically — rather than to the document.
+
+<Canvas of={Stories.Archived} sourceState="none" />
+
+## Your own indicator
+
+`indicator` replaces the count; `null` shows none. A replacement reads the selection itself, through `useDataViews(collection)`, and owns its own announcement: the default count is a polite status, so give yours `role="status"` if it stands in for it, and the class `indicator` to take the default's inset. When the persistent selection panel ships, its trigger takes this place.
+
+```tsx
+function MachinesSelected() {
+  const { selection } = useDataViews(machineCollection);
+  const count = useDataViewsValue(selection.state).ids.size;
+  return (
+    <span role="status" className="indicator">
+      {`${count} ${count === 1 ? "machine" : "machines"} selected`}
+    </span>
+  );
+}
+
+<DataViews.Actions indicator={<MachinesSelected />}>
+  {/* the actions */}
+</DataViews.Actions>;
+```
+
+<Canvas of={Stories.CustomIndicator} sourceState="none" />

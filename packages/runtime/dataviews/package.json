@@ -1,0 +1,74 @@
+{
+  "name": "@canonical/dataviews-core",
+  "description": "Framework-agnostic collection-views core for Canonical apps: query grammar, schema-enforced field validation, observation channels, selection and window projection, lifecycle transition records, the request-lifecycle coordinator, the provider assembling them, the Location port with the flat URL query grammar and the authority loop that keeps them in step, and the source contract with its local-array, observable-query-client and Relay forward-connection sources, the provider's saved views over a store it is given and its presentation — column widths, order and visibility — over a presentation store or in memory, an explicitly imported local-first IndexedDB store implementing both, and the explicitly imported virtual range a virtualized table mounts its rows by",
+  "version": "0.45.0",
+  "type": "module",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js"
+    },
+    "./bindings": {
+      "types": "./dist/types/lib/bindings/index.d.ts",
+      "import": "./dist/esm/lib/bindings/index.js"
+    },
+    "./indexeddb": {
+      "types": "./dist/types/lib/indexeddb/index.d.ts",
+      "import": "./dist/esm/lib/indexeddb/index.js"
+    },
+    "./virtualization": {
+      "types": "./dist/types/lib/virtualization/index.d.ts",
+      "import": "./dist/esm/lib/virtualization/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "author": {
+    "email": "webteam@canonical.com",
+    "name": "Canonical Webteam"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/canonical/pragma-web"
+  },
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/canonical/pragma-web/issues"
+  },
+  "homepage": "https://github.com/canonical/pragma-web#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:all": "bun run build",
+    "check": "bun run check:biome && bun run check:ts && bun run check:webarchitect",
+    "check:webarchitect": "webarchitect library",
+    "check:fix": "bun run check:biome:fix && bun run check:ts",
+    "check:biome": "biome check",
+    "check:biome:fix": "biome check --write",
+    "check:ts": "tsc --noEmit",
+    "test": "bun run test:vitest",
+    "test:vitest": "vitest run --coverage",
+    "test:vitest:watch": "vitest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0",
+    "@canonical/router-core": "^0.45.0",
+    "@canonical/typescript-config": "0.43.0",
+    "@canonical/webarchitect": "0.43.0",
+    "@tanstack/query-core": "^5.102.8",
+    "@types/node": "^26.0.0",
+    "@types/relay-runtime": "^20.1.1",
+    "@vitest/coverage-v8": "^5.0.0",
+    "fake-indexeddb": "^6.2.5",
+    "relay-runtime": "^21.0.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}
