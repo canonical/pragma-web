@@ -11,6 +11,7 @@ import type {
   QueryIssue,
   QueryIssueCode,
   ResultProblem,
+  SourceDelivery,
   SourceRefusal,
   SourceRefusalCode,
 } from "./types.js";
@@ -26,10 +27,34 @@ describe("Count", () => {
   });
 });
 
+describe("SourceDelivery", () => {
+  it("tells a page, a failure and a forbidden request apart by status", () => {
+    expectTypeOf<SourceDelivery["status"]>().toEqualTypeOf<
+      "succeeded" | "failed" | "forbidden"
+    >();
+    expectTypeOf<
+      Extract<SourceDelivery, { readonly status: "forbidden" }>
+    >().toEqualTypeOf<{
+      readonly status: "forbidden";
+      readonly cause: unknown;
+    }>();
+  });
+
+  it("refuses a forbidden delivery carrying rows", () => {
+    const leaked: SourceDelivery = {
+      status: "forbidden",
+      cause: null,
+      // @ts-expect-error a forbidden request delivers no page
+      page: {},
+    };
+    expect(leaked.status).toBe("forbidden");
+  });
+});
+
 describe("Completion", () => {
   it("adds the binding's refusal to what a source delivers", () => {
     expectTypeOf<Completion["status"]>().toEqualTypeOf<
-      "succeeded" | "failed" | "refused"
+      "succeeded" | "failed" | "forbidden" | "refused"
     >();
     expectTypeOf<
       Extract<Completion, { readonly status: "refused" }>["refusals"]
@@ -63,7 +88,7 @@ describe("QueryIssue", () => {
 describe("ResultProblem", () => {
   it("is every completion but a success", () => {
     expectTypeOf<ResultProblem["status"]>().toEqualTypeOf<
-      "failed" | "refused"
+      "failed" | "forbidden" | "refused"
     >();
   });
 

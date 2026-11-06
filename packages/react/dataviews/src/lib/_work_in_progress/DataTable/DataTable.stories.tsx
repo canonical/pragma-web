@@ -5,6 +5,7 @@ import { withAppScope, withFrame } from "../../../storybook/decorators.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
 import createEmptySource from "../../../storybook/machines/createEmptySource.js";
 import createFailingSource from "../../../storybook/machines/createFailingSource.js";
+import createForbiddingSource from "../../../storybook/machines/createForbiddingSource.js";
 import createMachineSource from "../../../storybook/machines/createMachineSource.js";
 import createOneTermSource from "../../../storybook/machines/createOneTermSource.js";
 import createPendingSource from "../../../storybook/machines/createPendingSource.js";
@@ -978,6 +979,32 @@ export const Failed: Story = {
     await expect(canvas.getByRole("table")).toHaveAttribute(
       "aria-busy",
       "false",
+    );
+  },
+};
+
+/**
+ * No access: the source answered that the reader may not see these rows.
+ * Every row, count and facet is withdrawn, the status says so without the
+ * server's words, and nothing is in the error colour, since nothing
+ * malfunctioned. A change of filter or search asks again.
+ */
+export const NoAccess: Story = {
+  parameters: consumerCode({
+    parts: tableParts,
+    declarations: `${plainColumnsCode}
+
+// Shown once the source answers that the request is forbidden.`,
+    render: tableCode,
+  }),
+  render: renderMachines(plainColumns, { source: createForbiddingSource }),
+  play: async ({ canvas }) => {
+    const status = await canvas.findByText(
+      "You do not have permission to see these rows.",
+    );
+    await expect(status.closest("[data-status]")).toHaveAttribute(
+      "data-status",
+      "no-access",
     );
   },
 };

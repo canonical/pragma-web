@@ -365,19 +365,23 @@ const fakeObserver = () => {
   };
 };
 
-const fakeSource = (observer: ReturnType<typeof fakeObserver>) =>
+const createFakeSource = (
+  observer: ReturnType<typeof fakeObserver>,
+  isForbidden?: (error: unknown) => boolean,
+) =>
   createQuerySource({
     capabilities: endpoint,
     queryKey: ["machines"],
     fetchPage: () => Promise.resolve(page([], 0)),
     createObserver: () => observer.handle,
+    ...(isForbidden === undefined ? {} : { isForbidden }),
   });
 
 describe("createQuerySource observation handling", () => {
   const attach = () => {
     const observer = fakeObserver();
     const deliver = delivery();
-    const release = fakeSource(observer).execute(request(), deliver);
+    const release = createFakeSource(observer).execute(request(), deliver);
     return { observer, deliver, release };
   };
 
@@ -453,7 +457,7 @@ describe("createQuerySource observation handling", () => {
       error: null,
     });
     const deliver = delivery();
-    fakeSource(observer).execute(request(), deliver);
+    createFakeSource(observer).execute(request(), deliver);
     expect(deliver).toHaveBeenCalledTimes(1);
   });
 
@@ -467,5 +471,38 @@ describe("createQuerySource observation handling", () => {
       error: null,
     });
     expect(deliver).not.toHaveBeenCalled();
+  });
+
+  describe("an error the application reads as forbidden", () => {
+    const forbidden = new Error("403");
+    const deliverError = (isForbidden: (error: unknown) => boolean) => {
+      const observer = fakeObserver();
+      const deliver = delivery();
+      createFakeSource(observer, isForbidden).execute(request(), deliver);
+      observer.emit({ status: "error", data: undefined, error: forbidden });
+      return deliveredAt(deliver, 0);
+    };
+
+    it("delivers forbidden, with the error as its cause and no reason", () => {
+      expect(deliverError((error) => error === forbidden)).toEqual({
+        status: "forbidden",
+        cause: forbidden,
+      });
+    });
+
+    it("delivers a failure where the check answers no", () => {
+      expect(deliverError(() => false)).toMatchObject({
+        status: "failed",
+        failure: { reason: "403", cause: forbidden },
+      });
+    });
+
+    it("delivers a failure where the check throws", () => {
+      expect(
+        deliverError(() => {
+          throw new Error("the check broke");
+        }),
+      ).toMatchObject({ status: "failed", failure: { reason: "403" } });
+    });
   });
 });

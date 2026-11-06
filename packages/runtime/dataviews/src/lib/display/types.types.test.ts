@@ -1,6 +1,8 @@
 /**
  * The display contracts every binding renders the same answer from: the
- * table's status, the entries of its body and the pagination facts.
+ * table's status, the entries of its body and the pagination facts. A
+ * status that starts carrying what it must not say fails the build through
+ * `@ts-expect-error`.
  */
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Count } from "../result/index.js";
@@ -21,6 +23,7 @@ describe("DisplayStatus", () => {
       | "refused"
       | "refresh-failed"
       | "stale"
+      | "no-access"
       | "regrouping"
       | "no-data"
       | "no-results"
@@ -34,6 +37,12 @@ describe("DisplayStatus", () => {
       readonly status: "refused";
       readonly reason: string;
     }>();
+  });
+
+  it("says nothing about why access was denied", () => {
+    // @ts-expect-error no access carries no reason of the server's
+    const said: DisplayStatus = { status: "no-access", reason: "403" };
+    expect(said.status).toBe("no-access");
   });
 });
 
