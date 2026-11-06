@@ -55,8 +55,7 @@ describe("IconButton stylesheet", () => {
     );
   });
 
-  // Fails until the token's default moves off :root onto the component.
-  it.fails("keeps its token on the component, with no :root rule", () => {
+  it("keeps its token on the component, with no :root rule", () => {
     expect(sheet).not.toMatch(/(?:^|[;{}]) ?:root ?\{/);
     expect(findDeclarations(".ds.button.icon-button")?.trim()).toBe(
       "padding-inline: var(--icon-button-padding-inline, 0px);",
