@@ -202,11 +202,18 @@ snapped line-height and inter-block margins.
 
 This is the rule that lets a density scope and `.editorial` prose _nest_ without
 conflict — for example a density-sized header above an `.editorial` content
-panel (the future Accordion case). Because density and the typography engine
+panel (the Accordion does exactly this). Because density and the typography engine
 write to disjoint element sets, there is no specificity war and no override: each
 system owns its own elements. An earlier attempt to have density crush prose to
 `line-height: 1` fought the engine and only ever landed the _first_ line on the
 grid — wrapped lines drifted. Partitioning prose out removed that fight entirely.
+
+One sanctioned exception: bare prose _inside_ a control that seats its own text
+(an accordion header's `<h6>`). Such a control marks its seat element with
+`.control-seat`, and the shared layer hands the prose within it to the seat —
+engine box off, seat line on. The hand-over is safe because the seat is the
+engine's nudge formula re-aimed at the density target; see the Baseline Grid
+guide for the full account.
 
 Practically:
 
@@ -218,6 +225,9 @@ Practically:
 - Do **not** try to make density seat a paragraph. If a text reference must line
   up with controls (as the spike testbed does for its measuring lead), seat that
   one element explicitly; do not change how prose ships.
+- If a control must carry bare prose that lives on its seat (a heading inside an
+  accordion header), mark the seat element `.control-seat` — the shared layer
+  exempts the prose from the engine and hands it the seat line.
 
 ## A former rough edge, resolved
 
