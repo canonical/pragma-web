@@ -158,4 +158,14 @@ describe("FlagFilter", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Owned" }));
     expect(onLeave).not.toHaveBeenCalled();
   });
+
+  it("takes the native props of its root, merging the class name", () => {
+    const { container } = mount(makeProvider(), {
+      className: "extra",
+      title: "Machines with an owner",
+    });
+    const root = container.firstElementChild;
+    expect(root).toHaveClass("ds", "data-views-filters-flag", "extra");
+    expect(root).toHaveAttribute("title", "Machines with an owner");
+  });
 });

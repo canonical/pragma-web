@@ -16,6 +16,10 @@ const componentCssClassName = "ds data-views-filters-flag";
  * filters' group. Beside the checkbox is how many matching records set the
  * field, from the facet, describing the checkbox while a facet answers the
  * applied query.
+ *
+ * `import { DataViews } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.subcomponent.data_views_filters-presence_filter
  */
 export default function FlagFilter({
   handle,
@@ -25,6 +29,8 @@ export default function FlagFilter({
   declared,
   leavesWhenCleared,
   onLeave,
+  className,
+  ...rest
 }: FlagFilterProps): ReactElement | null {
   const { messages } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
@@ -35,7 +41,10 @@ export default function FlagFilter({
   }
   const spelled = count === null ? null : spellCount(count, messages);
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <label className="option">
         <input
           type="checkbox"

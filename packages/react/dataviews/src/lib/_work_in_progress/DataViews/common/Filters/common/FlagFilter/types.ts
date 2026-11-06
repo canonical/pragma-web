@@ -1,13 +1,7 @@
 import type { Count, FilterHandle } from "@canonical/dataviews-core";
+import type { ComponentProps } from "react";
 
-/**
- * Props of one presence filter.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the schema field it was built for, not forwarding
- * a caller's native props.
- */
-export type FlagFilterProps = {
+type OwnProps = {
   /** The root's handle for this field's presence predicate. */
   readonly handle: FilterHandle<boolean>;
   /**
@@ -37,3 +31,10 @@ export type FlagFilterProps = {
    */
   readonly onLeave: () => void;
 };
+
+/**
+ * Props of one presence filter: its own, and the native props of the `div`
+ * it renders as its root.
+ */
+export type FlagFilterProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps | "children">;
