@@ -1,4 +1,4 @@
-import type { ReactNode, Ref } from "react";
+import type { Ref } from "react";
 import { describe, expectTypeOf, it } from "vitest";
 import type { IconButtonProps as Props } from "./types.js";
 
@@ -71,26 +71,6 @@ describe("IconButton props", () => {
   });
 
   it("has no tooltip prop: a Tooltip is composed around the button", () => {
-    // Like `it.fails`, at the type level: the prop still exists, so this
-    // assertion is an error. Once the prop is removed, the directive becomes
-    // unused and fails the check, and has to go.
-    // @ts-expect-error the tooltip prop is removed by the next commit.
     expectTypeOf<Props>().not.toHaveProperty("tooltip");
-  });
-
-  it("takes a Tooltip message or false", () => {
-    expectTypeOf<{
-      icon: "copy";
-      "aria-label": "Copy";
-      tooltip: "Copy the instance address";
-    }>().toExtend<Props>();
-    expectTypeOf<{
-      icon: "copy";
-      "aria-label": "Copy";
-      tooltip: false;
-    }>().toExtend<Props>();
-    expectTypeOf<Props["tooltip"]>().toEqualTypeOf<
-      ReactNode | false | undefined
-    >();
   });
 });

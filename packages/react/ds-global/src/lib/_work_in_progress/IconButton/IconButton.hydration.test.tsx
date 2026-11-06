@@ -5,10 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Component from "./IconButton.js";
 
 /**
- * The real server and client contract, with no `createPortal` mock: the
- * server HTML must hydrate with no recoverable error (React 19 reports
- * hydration mismatches through `onRecoverableError`), and the Tooltip's
- * message must reach the document body only after mount.
+ * The real server and client contract: the server HTML must hydrate with
+ * no recoverable error (React 19 reports hydration mismatches through
+ * `onRecoverableError`).
  */
 describe("IconButton (hydration)", () => {
   beforeEach(() => {
@@ -20,13 +19,12 @@ describe("IconButton (hydration)", () => {
     vi.restoreAllMocks();
   });
 
-  it("hydrates with no recoverable error and portals the Tooltip after mount", () => {
+  it("hydrates the server HTML with no recoverable error", () => {
     const ui = <Component icon="edit" aria-label="Edit" />;
 
     const container = document.createElement("div");
     container.innerHTML = renderToString(ui);
     document.body.appendChild(container);
-    expect(container.querySelector('[role="tooltip"]')).toBeNull();
 
     const onRecoverableError = vi.fn();
     let root: Root | undefined;
@@ -35,9 +33,7 @@ describe("IconButton (hydration)", () => {
     });
     expect(onRecoverableError).not.toHaveBeenCalled();
 
-    const message = document.body.querySelector(".ds.tooltip .text");
-    expect(message?.textContent).toBe("Edit");
-    expect(message?.closest(".ds.tooltip-area")).toBeNull();
+    expect(container.querySelector("button")).toHaveAccessibleName("Edit");
 
     act(() => {
       root?.unmount();

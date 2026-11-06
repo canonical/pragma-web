@@ -4,6 +4,7 @@ import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import { Button } from "../../component/Button/index.js";
+import { TooltipEngine } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
 
 /**
@@ -124,14 +125,19 @@ const findOpenTooltip = (canvasElement: HTMLElement) =>
   within(canvasElement.ownerDocument.body).findByRole("tooltip");
 
 /**
- * The default: a Tooltip whose message is the `aria-label`, shown on hover or
- * focus after the Tooltip's own delay, as Button's guideline asks for every
- * icon-only button.
+ * Paired with a Tooltip that states the action, as Button's guideline asks
+ * for every icon-only button. The Tooltip is composed around the icon
+ * button and shows on hover or focus after its own delay.
  */
 export const WithTooltip: Story = {
   name: "With Tooltip",
   args: { importance: "tertiary", icon: "edit", "aria-label": "Edit" },
   parameters: tooltipParameters,
+  render: (args) => (
+    <TooltipEngine Message="Edit">
+      <Component {...args} />
+    </TooltipEngine>
+  ),
   play: async ({ canvas, canvasElement }) => {
     const button = canvas.getByRole("button", { name: "Edit" });
     await userEvent.tab();
@@ -140,48 +146,6 @@ export const WithTooltip: Story = {
       "Edit",
     );
   },
-};
-
-/**
- * A Tooltip message that differs from the accessible name. It is visual
- * only for now: the Tooltip engine describes its own wrapper, not the button,
- * so a screen reader does not announce this message.
- */
-export const TooltipWithDifferentMessage: Story = {
-  name: "Tooltip with a different message",
-  args: {
-    importance: "tertiary",
-    icon: "copy",
-    "aria-label": "Copy",
-    tooltip: "Copy the instance address",
-  },
-  parameters: tooltipParameters,
-  play: async ({ canvas, canvasElement }) => {
-    await userEvent.hover(canvas.getByRole("button", { name: "Copy" }));
-    await expect(await findOpenTooltip(canvasElement)).toHaveTextContent(
-      "Copy the instance address",
-    );
-  },
-};
-
-/**
- * `tooltip={false}` when the action is already written next to the button.
- * The `<button>` is then the outermost element.
- */
-export const WithoutTooltip: Story = {
-  name: "Without Tooltip",
-  render: (args) => (
-    <div style={row}>
-      <Component
-        {...args}
-        importance="tertiary"
-        icon="delete"
-        aria-label="Delete"
-        tooltip={false}
-      />
-      <span>Delete the instance</span>
-    </div>
-  ),
 };
 
 /** Anticipation recolours the icon button as it does Button. */
@@ -208,8 +172,8 @@ export const Anticipation: Story = {
 
 /**
  * Every context (app, site, docs) in both densities, with the baseline grid
- * and the Tooltip on: the box is the density cell both ways, and the Tooltip's
- * wrapper keeps the icon button on the text's baseline.
+ * on, with and without a Tooltip around the icon button: the box is the
+ * density cell both ways, on the text's baseline.
  */
 export const DensityAndContext: Story = {
   name: "Density and context",
@@ -226,9 +190,13 @@ export const DensityAndContext: Story = {
             <span style={{ whiteSpace: "nowrap" }}>
               {context}, {density}
             </span>
-            <Component {...args} importance="tertiary" />
-            <Component {...args} importance="secondary" tooltip={false} />
-            <Component {...args} importance="primary" />
+            <TooltipEngine Message="Edit">
+              <Component {...args} importance="tertiary" />
+            </TooltipEngine>
+            <Component {...args} importance="secondary" />
+            <TooltipEngine Message="Edit">
+              <Component {...args} importance="primary" />
+            </TooltipEngine>
             <Button importance="secondary">Rename</Button>
           </div>
         )),
@@ -258,8 +226,8 @@ export const OnContrastedSurface: Story = {
 };
 
 /**
- * As the trigger of a panel: while `aria-expanded` is true the Tooltip stays
- * closed, so it never covers the panel it opened.
+ * As the trigger of a panel: the Tooltip composed around it is kept closed
+ * while the panel is open, so it never covers what the button opened.
  */
 export const AsMenuTrigger: Story = {
   name: "As a menu trigger",
@@ -268,15 +236,20 @@ export const AsMenuTrigger: Story = {
     const [isExpanded, setIsExpanded] = useState(false);
     return (
       <div style={{ display: "grid", gap: "var(--dimension-200)" }}>
-        <Component
-          {...args}
-          importance="tertiary"
-          icon="menu-contextual"
-          aria-label="Row options"
-          aria-haspopup="menu"
-          aria-expanded={isExpanded}
-          onClick={() => setIsExpanded((expanded) => !expanded)}
-        />
+        <TooltipEngine
+          Message="Row options"
+          open={isExpanded ? false : undefined}
+        >
+          <Component
+            {...args}
+            importance="tertiary"
+            icon="menu-contextual"
+            aria-label="Row options"
+            aria-haspopup="menu"
+            aria-expanded={isExpanded}
+            onClick={() => setIsExpanded((expanded) => !expanded)}
+          />
+        </TooltipEngine>
         {isExpanded ? <span>The row options panel is open.</span> : null}
       </div>
     );
