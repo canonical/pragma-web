@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
+import type { ProviderHost } from "../provider/index.js";
 import type { Predicate, PredicateOperator } from "../query/index.js";
 import type { SourceRefusal } from "../result/index.js";
 import createFilterInput from "./createFilterInput.js";
@@ -24,9 +25,7 @@ const refusal: SourceRefusal = {
 
 /** A host that applies everything, or refuses everything, and records it. */
 const hostThat = (answer: readonly SourceRefusal[] = []) => ({
-  setPredicate: vi.fn<(predicate: Predicate) => readonly SourceRefusal[]>(
-    () => answer,
-  ),
+  setPredicate: vi.fn<ProviderHost["setPredicate"]>(() => answer),
   removePredicate: vi.fn<
     (field: string, operator: PredicateOperator) => readonly SourceRefusal[]
   >(() => answer),
@@ -57,11 +56,11 @@ describe("createFilterInput", () => {
   it("applies a valid edit through the host and publishes it", () => {
     const { host, input } = cpuAtLeast();
     input.edit("4");
-    expect(host.setPredicate).toHaveBeenCalledWith({
-      field: "cpu",
-      operator: "gte",
-      operands: [4],
-    });
+    expect(host.setPredicate).toHaveBeenCalledWith(
+      { field: "cpu", operator: "gte", operands: [4] },
+      undefined,
+      undefined,
+    );
     expect(input.state.get()).toEqual({
       input: "4",
       feedback: { status: "applied" },
@@ -244,5 +243,73 @@ describe("createFilterInput", () => {
       expect(Object.isFrozen(channel)).toBe(true);
       expect(channel).not.toHaveProperty("set");
     }
+  });
+
+  describe("one input session", () => {
+    const buildGte = (operands: number[]): Predicate => ({
+      field: "cpu",
+      operator: "gte",
+      operands,
+    });
+    /** One call of the host, entering history as `history` says. */
+    const readCall = (operands: number[], history?: "replace") => [
+      buildGte(operands),
+      undefined,
+      history,
+    ];
+
+    it("lets the first applied edit take the policy's mode, and replaces after it", () => {
+      const { host, input } = cpuAtLeast();
+      input.edit("4");
+      input.edit("4e");
+      input.edit("48");
+      expect(host.setPredicate.mock.calls).toEqual([
+        readCall([4]),
+        readCall([48], "replace"),
+      ]);
+    });
+
+    it("starts a new step once the session ends, by leaving or a discrete change", () => {
+      const { host, input } = cpuAtLeast();
+      input.edit("4");
+      input.endSession();
+      input.edit("8");
+      input.set([16]);
+      input.edit("32");
+      input.clear();
+      input.edit("2");
+      input.setApplied(buildGte([3]));
+      input.edit("5");
+      expect(host.setPredicate.mock.calls).toEqual([
+        readCall([4]),
+        readCall([8]),
+        readCall([16]),
+        readCall([32]),
+        readCall([2]),
+        readCall([5]),
+      ]);
+    });
+
+    it("keeps the session unstarted while its edits are refused", () => {
+      const { host, input } = cpuAtLeast(hostThat([refusal]));
+      input.edit("4");
+      input.edit("8");
+      expect(host.setPredicate.mock.calls).toEqual([
+        readCall([4]),
+        readCall([8]),
+      ]);
+    });
+
+    it("starts no session with an edit that reads as what is applied", () => {
+      const { host, input } = cpuAtLeast();
+      input.setApplied(buildGte([4]));
+      // "4.0" reads as the 4 already applied: nothing moves.
+      input.edit("4.0");
+      input.edit("8");
+      expect(host.setPredicate.mock.calls).toEqual([
+        readCall([4]),
+        readCall([8]),
+      ]);
+    });
   });
 });

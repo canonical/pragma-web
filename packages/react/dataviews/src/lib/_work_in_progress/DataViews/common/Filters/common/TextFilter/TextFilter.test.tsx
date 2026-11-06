@@ -14,6 +14,7 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import createManualSource from "../../../../../../../../testing/createManualSource.js";
+import createRecordingLocation from "../../../../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
@@ -153,5 +154,21 @@ describe("TextFilter", () => {
     const root = container.querySelector(".ds.data-views-filters-text");
     expect(root).toHaveClass("extra");
     expect(root).toHaveAttribute("title", "From the link");
+  });
+
+  it("types text as one history step, until the input is left", () => {
+    const recorded = createRecordingLocation({ href: "/machines" });
+    mount(makeProvider(recorded.location));
+    const contains = screen.getByRole("textbox", { name: "name contains" });
+    const before = recorded.writes.length;
+    fireEvent.change(contains, { target: { value: "w" } });
+    fireEvent.change(contains, { target: { value: "web" } });
+    fireEvent.blur(contains);
+    fireEvent.change(contains, { target: { value: "web-1" } });
+    expect(recorded.writes.slice(before).map(([, mode]) => mode)).toEqual([
+      "push",
+      "replace",
+      "push",
+    ]);
   });
 });

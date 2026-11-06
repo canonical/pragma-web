@@ -9,10 +9,12 @@ import {
   declareCapabilities,
   type QueryLocation,
 } from "@canonical/dataviews-core";
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import createManualSource from "../../../../../testing/createManualSource.js";
+import createRecordingLocation from "../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
+import { findFilterHandle } from "../common/utils/index.js";
 import useProviderState from "./useProviderState.js";
 
 type Row = { readonly id: string };
@@ -76,5 +78,25 @@ describe("useProviderState", () => {
     hook.rerender();
     expect(hook.result.current.value).toBe(first);
     expect(first.provider).toBe(provider);
+  });
+
+  it("ends the typing session of every filter record at once", () => {
+    const recorded = createRecordingLocation({ href: "/machines" });
+    const { provider } = makeFixture(recorded.location);
+    const hook = renderHook(() => useProviderState({ provider }));
+    const { filters, endSessions } = hook.result.current.value;
+    const from = findFilterHandle<number>(filters, "cpu", "gte");
+    const before = recorded.writes.length;
+    act(() => {
+      from.edit("4");
+      from.edit("48");
+      endSessions();
+      from.edit("8");
+    });
+    expect(recorded.writes.slice(before).map(([, mode]) => mode)).toEqual([
+      "push",
+      "replace",
+      "push",
+    ]);
   });
 });

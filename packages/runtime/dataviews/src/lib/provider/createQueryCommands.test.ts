@@ -178,6 +178,15 @@ describe("createQueryCommands", () => {
         commands.command({ kind: "navigateWindow", page: 0 }),
       ).toThrow();
     });
+
+    it("enters history as the command asks, over the policy", () => {
+      const { commands, transitions } = setup();
+      commands.command(
+        { kind: "setPredicate", predicate: failedOnly },
+        "replace",
+      );
+      expect(transitions.get()?.history).toBe("replace");
+    });
   });
 
   describe("adopt", () => {

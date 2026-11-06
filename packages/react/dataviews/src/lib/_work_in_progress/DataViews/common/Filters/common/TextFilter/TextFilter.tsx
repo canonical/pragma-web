@@ -47,7 +47,7 @@ export default function TextFilter({
   className,
   ...rest
 }: TextFilterProps): ReactElement | null {
-  const { messages } = useDataViewsRoot("Filters");
+  const { messages, endSessions } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +83,8 @@ export default function TextFilter({
         onChange={(event) => {
           field.edit(event.target.value);
         }}
+        // Leaving the input ends its session: typing again is a new step.
+        onBlur={endSessions}
       />
       {retained ? (
         <Button
