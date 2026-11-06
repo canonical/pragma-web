@@ -152,9 +152,9 @@ describe("IconButton component", () => {
   });
 
   describe("as a trigger", () => {
-    it("passes the popover and menu attributes, style and ref to the button", () => {
+    it("passes the popover and menu attributes, style and ref to the root button", () => {
       const ref = createRef<HTMLButtonElement>();
-      render(
+      const { container } = render(
         <Component
           ref={ref}
           icon="menu-contextual"
@@ -176,6 +176,7 @@ describe("IconButton component", () => {
       expect(button).toHaveAttribute("aria-controls", "row-options");
       expect(button.style.marginInlineStart).toBe("auto");
       expect(ref.current).toBe(button);
+      expect(container.firstElementChild).toBe(button);
     });
   });
 });
