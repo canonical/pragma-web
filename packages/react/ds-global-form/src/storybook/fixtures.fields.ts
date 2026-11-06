@@ -1,4 +1,10 @@
+import type { FieldProps } from "../lib/pattern/Field/index.js";
 import * as options from "./fixtures.options.js";
+
+const columns = (value: string): React.CSSProperties =>
+  ({
+    "--form-field-columns": value,
+  }) as React.CSSProperties;
 
 export const base = [
   {
@@ -106,15 +112,15 @@ export const base = [
     name: "telephone_field_area",
     inputType: "number",
     label: "Area Code",
-    style: { "--form-field-columns": "1 / 5" },
+    style: columns("1 / 5"),
   },
   {
     name: "telephone_field_number",
     inputType: "tel",
     label: "Phone Number",
-    style: { "--form-field-columns": "5 / -1" },
+    style: columns("5 / -1"),
   },
-];
+] satisfies FieldProps[];
 
 export const withDisabled = [
   { name: "text_field", inputType: "text", label: "Text Field" },
@@ -131,19 +137,19 @@ export const withDisabled = [
     label: "Checkbox Field",
     disabled: true,
   },
-];
+] satisfies FieldProps[];
 
 export const phone = [
   {
     name: "telephone_field_area",
     inputType: "number",
     label: "Area Code",
-    style: { "--form-field-columns": "1 / 5" },
+    style: columns("1 / 5"),
   },
   {
     name: "telephone_field_number",
     inputType: "tel",
     label: "Phone Number",
-    style: { "--form-field-columns": "5 / -1" },
+    style: columns("5 / -1"),
   },
-];
+] satisfies FieldProps[];
