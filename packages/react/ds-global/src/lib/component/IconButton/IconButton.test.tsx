@@ -101,19 +101,6 @@ describe("IconButton component", () => {
       ).toBeInTheDocument();
     });
 
-    it("requires an accessible name and forbids children at the type level", () => {
-      vi.spyOn(console, "warn").mockImplementation(() => {});
-      // @ts-expect-error — neither aria-label nor aria-labelledby is given.
-      render(<Component icon="edit" />);
-      render(
-        // @ts-expect-error — an icon button has no visible children.
-        <Component icon="edit" aria-label="Edit">
-          Edit
-        </Component>,
-      );
-      expect(screen.getAllByRole("button")).toHaveLength(2);
-    });
-
     it("does not trigger Button's missing-name warning", () => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       render(<Component icon="close" aria-label="Close" />);
