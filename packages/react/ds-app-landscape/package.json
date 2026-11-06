@@ -1,7 +1,7 @@
 {
   "name": "@canonical/react-ds-app-landscape",
   "description": "Landscape-specific components for the Pragma design system",
-  "version": "0.42.0",
+  "version": "0.45.0",
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -14,13 +14,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/canonical/pragma"
+    "url": "https://github.com/canonical/pragma-web"
   },
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/canonical/pragma/issues"
+    "url": "https://github.com/canonical/pragma-web/issues"
   },
-  "homepage": "https://github.com/canonical/pragma#readme",
+  "homepage": "https://github.com/canonical/pragma-web#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -43,20 +43,20 @@
     "test:vitest:watch": "vitest"
   },
   "dependencies": {
-    "@canonical/react-ds-global": "^0.42.0",
-    "@canonical/storybook-config": "^0.42.0",
-    "@canonical/styles": "^0.42.0",
+    "@canonical/react-ds-global": "^0.45.0",
+    "@canonical/storybook-config": "^0.45.0",
+    "@canonical/styles": "^0.45.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
-    "@canonical/biome-config": "^0.42.0",
-    "@canonical/design-tokens": "0.10.0",
-    "@canonical/storybook-helpers": "^0.42.0",
-    "@canonical/typescript-config-react": "^0.42.0",
-    "@canonical/vitest-config-react": "^0.42.0",
-    "@canonical/webarchitect": "^0.42.0",
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0",
+    "@canonical/design-tokens": "0.44.0",
+    "@canonical/storybook-helpers": "^0.45.0",
+    "@canonical/typescript-config-react": "^0.45.0",
+    "@canonical/vitest-config-react": "^0.45.0",
+    "@canonical/webarchitect": "0.44.0",
     "@chromatic-com/storybook": "^5.0.1",
     "@storybook/addon-docs": "^10.6.0",
     "@storybook/react-vite": "^10.6.0",
@@ -72,6 +72,6 @@
     "storybook": "^10.6.0",
     "typescript": "^7.0.2",
     "vite": "^8.0.1",
-    "vitest": "^4.0.18"
+    "vitest": "^5.0.0"
   }
 }

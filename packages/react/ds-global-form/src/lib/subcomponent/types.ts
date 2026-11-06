@@ -14,6 +14,12 @@ export type Option = {
   value: string;
   label: string;
   disabled?: boolean;
+  /**
+   * BCP 47 language of the label, when it differs from the page's: a language
+   * picker labels each option in its own language, and `lang` lets assistive
+   * technology pronounce it correctly.
+   */
+  lang?: string;
 };
 
 export type OptionsProps = {

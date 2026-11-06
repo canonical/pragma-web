@@ -17,8 +17,8 @@ Forms are where users provide data — getting them right is critical for both u
   status="stable"
   dependencies={["@canonical/ds-utils", "@canonical/react-ds-global", "@canonical/styles", "@canonical/utils", "downshift", "react-hook-form"]}
   links={{
-    source: "https://github.com/canonical/pragma/tree/main/packages/react/ds-global-form",
-    ontology: "https://github.com/canonical/design-system",
+    source: "https://github.com/canonical/pragma-web/tree/main/packages/react/ds-global-form",
+    ontology: "https://github.com/canonical/pragma-core/tree/main/packages/semantics/design-system",
   }}
 />
 
@@ -29,11 +29,12 @@ The form system has four layers:
 ```
 Form            react-hook-form provider + subgrid container
   └─ Field      type-safe router — selects input by inputType prop
-       └─ Wrapper    label, description, error, ARIA, middleware
-            └─ Input     one of 15 built-in types or a custom component
+       ├─ Wrapper    label, description, error, ARIA, middleware for built-in fields
+       │    └─ Input
+       └─ Custom component    owns its binding and presentation
 ```
 
-`Form` wraps children in a `FormProvider` and renders as a CSS subgrid, inheriting columns from the parent `.grid` context. `Field` is a discriminated union — the `inputType` prop selects which input component renders, and TypeScript enforces the correct props for that type. `Wrapper` composes the field chrome (label, description, error message, ARIA attributes) and applies middleware. The input component handles the actual user interaction.
+`Form` wraps children in a `FormProvider` and renders as a CSS subgrid, inheriting columns from the parent `.grid` context. `Field` is a discriminated union — the `inputType` prop selects which input component renders, and TypeScript enforces the correct props for that type. For built-in fields, internal wrappers compose field chrome and apply middleware. Custom components are rendered directly and provide their own behavior.
 
 ## Quick example
 
@@ -68,7 +69,7 @@ Forms require a `.grid` parent — `Form` renders as a subgrid and inherits the 
 ## Built on react-hook-form
 
 This package is a thin layer over [react-hook-form](https://react-hook-form.com/)
-(`^7.71`): `Form` provides the `FormProvider`, `Field` calls `register`, and
+(`^7.71`): `Form` provides the `FormProvider`, built-in fields bind to RHF, and
 everything beyond a single field — form state, validation, submission — is
 react-hook-form's API. Validation uses the [`registerProps`](https://react-hook-form.com/docs/useform/register)
 prop, and error states apply a `.danger` CSS class that shifts the input border to
@@ -110,8 +111,8 @@ package also builds on `@canonical/react-ds-global`. See
   </thead>
   <tbody>
     <tr><td><a href="?path=/docs/global-form-getting-started--docs">Getting Started</a></td><td>Full tutorial — Form, Field, validation, layout, middleware, conditionals</td></tr>
-    <tr><td><a href="?path=/docs/global-form-guides-creating-custom-fields--docs">Creating Custom Fields</a></td><td>How to build custom input types with withWrapper</td></tr>
+    <tr><td><a href="?path=/docs/global-form-guides-creating-custom-fields--docs">Creating Custom Fields</a></td><td>How to build custom input types</td></tr>
     <tr><td><a href="?path=/docs/global-form-guides-creating-middleware--docs">Creating Middleware</a></td><td>How to write middleware for API integration</td></tr>
-    <tr><td><a href="?path=/docs/global-form-guides-the-wrapper-pattern--docs">The Wrapper Pattern</a></td><td>How field chrome works, alternative wrappers, InvisibleWrapper</td></tr>
+    <tr><td><a href="?path=/docs/global-form-guides-the-wrapper-pattern--docs">The Wrapper Pattern</a></td><td>How built-in field chrome and binding work</td></tr>
   </tbody>
 </table>

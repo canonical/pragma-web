@@ -1,6 +1,5 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { setDescriptionListContext } from "../../context.js";
   import { DescriptionList } from "../../index.js";
   import Item from "./Item.svelte";
 
@@ -8,27 +7,16 @@
     title: "Components/DescriptionList/Item",
     tags: ["autodocs"],
     component: Item,
-    args: {
-      name: "Example term",
-    },
-    argTypes: {
-      children: {
-        control: { disable: true },
-      },
-    },
-  });
-</script>
-
-<script lang="ts">
-  setDescriptionListContext({
-    layout: "auto",
   });
 </script>
 
 <Story name="Default">
-  {#snippet template({ children: _, ...args })}
+  {#snippet template()}
     <DescriptionList>
-      <DescriptionList.Item {...args}>Example description</DescriptionList.Item>
+      <DescriptionList.Item>
+        <dt>Example term</dt>
+        <dd>Example description</dd>
+      </DescriptionList.Item>
     </DescriptionList>
   {/snippet}
 </Story>

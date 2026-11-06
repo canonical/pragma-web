@@ -236,6 +236,7 @@ all.
 | `keyboardShortcut` | `boolean` | `true` | Binds the Ctrl+B collapse shortcut (§4); pass `false` to opt out. |
 | `skipTo` | `string` | `"#main-content"` | Skip-link target; see §5. |
 | `aria-label` | `string` | `"Main navigation"` | Forwarded to Content's `<nav>`. |
+| `messages` | `Partial<SideNavigationMessages>` | English text | The built-in text, one function per string, for translation: `skipToContent`, `navigation` (the `<nav>` name when no `aria-label` is given), and the collapse toggle's `collapseNavigation`, `expandNavigation` (accessible names), `collapse`, `expand` (tooltips), `openMenu` and `closeMenu` (its text below 620px). Any message left out keeps its default. |
 
 The remaining native `<div>` attributes (`id`, `data-*`, `style`, …) pass
 through to the root.

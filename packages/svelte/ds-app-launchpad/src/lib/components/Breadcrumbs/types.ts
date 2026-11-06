@@ -13,14 +13,14 @@ type TextSegment = Omit<SvelteHTMLElements["span"], "children"> & {
   href?: never;
 };
 
-export type Segment = LinkSegment | TextSegment;
+export type BreadcrumbsSegment = LinkSegment | TextSegment;
 
 export interface BreadcrumbsProps
   extends Omit<SvelteHTMLElements["nav"], "children"> {
   /**
    * Breadcrumb segments.
    */
-  segments: Segment[];
+  segments: BreadcrumbsSegment[];
   /**
    * The number of segments, from the end, that should never be collapsed.
    * If set to `all` or a number greater or equal to the total number of segments, no segments will be collapsed.
@@ -30,6 +30,6 @@ export interface BreadcrumbsProps
   minNumExpanded?: "all" | number;
 }
 
-export type PossiblyCollapsedSegment = Segment & {
+export type PossiblyCollapsedSegment = BreadcrumbsSegment & {
   collapsed?: boolean;
 };

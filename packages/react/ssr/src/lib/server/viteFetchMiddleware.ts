@@ -117,7 +117,6 @@ export function viteFetchMiddleware(
       const res = new ServerResponse(req);
 
       const chunks: Buffer[] = [];
-      const originalWrite = res.write.bind(res);
       const originalEnd = res.end.bind(res);
       const originalWriteHead = res.writeHead.bind(res);
 
@@ -139,21 +138,40 @@ export function viteFetchMiddleware(
         )(statusCode, ...rest);
       }) as ServerResponse["writeHead"];
 
+      // The body is collected here and handed to the Fetch Response, never
+      // written to the socket: the socket is not connected, so forwarding a
+      // write would fill its buffer and report backpressure that never drains.
+      // `pipe()` (how Vite's static middleware streams files) then waits for a
+      // `drain` that never comes, and a body past the 64 KiB high-water mark —
+      // a variable font, say — never completes. Every write is accepted.
       res.write = ((chunk: unknown, ...rest: unknown[]) => {
-        chunks.push(Buffer.from(chunk as Uint8Array));
-        return (originalWrite as (...args: unknown[]) => boolean)(
-          chunk,
-          ...rest,
+        const encoding = typeof rest[0] === "string" ? rest[0] : undefined;
+        chunks.push(
+          typeof chunk === "string"
+            ? Buffer.from(chunk, encoding as BufferEncoding | undefined)
+            : Buffer.from(chunk as Uint8Array),
         );
+        const callback = rest.find((arg) => typeof arg === "function");
+        if (callback) queueMicrotask(callback as () => void);
+        return true;
       }) as ServerResponse["write"];
 
       res.end = ((chunk: unknown, ...rest: unknown[]) => {
         if (chunk != null && typeof chunk !== "function") {
-          chunks.push(Buffer.from(chunk as Uint8Array));
+          const encoding = typeof rest[0] === "string" ? rest[0] : undefined;
+          chunks.push(
+            typeof chunk === "string"
+              ? Buffer.from(chunk, encoding as BufferEncoding | undefined)
+              : Buffer.from(chunk as Uint8Array),
+          );
         }
+        // End without the final chunk, for the same reason `write` keeps the
+        // body off the socket; a callback, if any, is still honoured.
+        const callback = [chunk, ...rest].find(
+          (arg) => typeof arg === "function",
+        );
         const result = (originalEnd as (...args: unknown[]) => ServerResponse)(
-          chunk,
-          ...rest,
+          ...(callback ? [callback] : []),
         );
 
         // Merge setHeader() headers with writeHead() headers (the latter win),

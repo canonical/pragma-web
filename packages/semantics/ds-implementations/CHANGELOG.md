@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
+
+**Note:** Version bump only for package @canonical/ds-implementations
+
+
+
+
+
+# [0.44.0](https://github.com/canonical/pragma-web/compare/v0.43.0...v0.44.0) (2026-10-05)
+
+**Note:** Version bump only for package @canonical/ds-implementations
+
+
+
+
+
+# [0.43.0](https://github.com/canonical/pragma-web/compare/v0.42.0...v0.43.0) (2026-09-30)
+
+**Note:** Version bump only for package @canonical/ds-implementations
+
+
+
+
+
 # [0.42.0](https://github.com/canonical/pragma/compare/v0.41.0...v0.42.0) (2026-09-28)
 
 **Note:** Version bump only for package @canonical/ds-implementations

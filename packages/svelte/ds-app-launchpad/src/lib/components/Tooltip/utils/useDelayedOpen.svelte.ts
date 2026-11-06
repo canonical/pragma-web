@@ -6,8 +6,8 @@ import type { ChainingManager } from "./ChainingManager.js";
  * where successive tooltips open without delay.
  *
  * The returned getter reflects whether the tooltip should currently be considered open
- * (after any applied delay). When `getOpen()` becomes false the delayed state resets and
- * briefly enables chaining for the next open.
+ * (after any applied delay). Visible tooltips register with the shared manager
+ * until they close or are destroyed.
  *
  * @param getOpen - Reactive getter indicating the raw (immediate) open intent.
  * @param getDelay - Reactive getter providing the delay in milliseconds before showing.
@@ -40,14 +40,10 @@ export function useDelayedOpen(
     delayedOpen = false;
   });
 
-  let firstRun = true;
   $effect(() => {
-    // Each time the tooltip closes, enable chaining for a short period
-    // Skip first run. Be sure to read `delayedOpen` first to ensure the effect runs again when it changes
-    if (!delayedOpen && !firstRun) {
-      chainingManager.chaining = true;
+    if (delayedOpen) {
+      return chainingManager.acquire();
     }
-    firstRun = false;
   });
 
   return () => delayedOpen;

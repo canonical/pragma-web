@@ -1,4 +1,5 @@
 import { useTranslation } from "@canonical/i18n-react";
+import { SelectInput } from "@canonical/react-ds-global-form";
 import { usePreferredTheme } from "@canonical/react-hooks";
 import type { ChangeEvent, ReactElement } from "react";
 
@@ -19,14 +20,15 @@ export default function ThemeSelector(): ReactElement {
   const selectValue = source === "system" ? "system" : value;
 
   return (
-    <select
+    <SelectInput
       aria-label={t("theme.label")}
       onChange={handleChange}
+      options={[
+        { value: "system", label: t("theme.system") },
+        { value: "light", label: t("theme.light") },
+        { value: "dark", label: t("theme.dark") },
+      ]}
       value={selectValue}
-    >
-      <option value="system">{t("theme.system")}</option>
-      <option value="light">{t("theme.light")}</option>
-      <option value="dark">{t("theme.dark")}</option>
-    </select>
+    />
   );
 }

@@ -3,6 +3,7 @@ import type { IconName } from "@canonical/ds-assets";
 // (cs:react.component.link_component); re-exported for this module's import sites.
 import type { LinkComponentProps } from "@canonical/react-ds-global";
 import type { ComponentProps, ComponentType, ReactNode } from "react";
+import type { CollapseToggleMessages } from "./common/CollapseToggle/types.js";
 import type { ContextSwitcherProps } from "./common/ContextSwitcher/types.js";
 
 export type { LinkComponentProps };
@@ -145,6 +146,17 @@ type _AnyNavNodeFields = {
 export type _AnyNavNode = _AnyNavNodeFields &
   ({ key: string; url?: undefined } | { key?: string; url: string });
 
+/**
+ * SideNavigation's built-in text, one function per string, so an application
+ * can supply translations. Each defaults to its English text.
+ */
+export interface SideNavigationMessages extends CollapseToggleMessages {
+  /** The visually hidden link that skips past the navigation. */
+  skipToContent: () => string;
+  /** The navigation landmark's name when no `aria-label` is given. */
+  navigation: () => string;
+}
+
 type OwnProps = {
   /** Brand content (logo/wordmark) rendered in the header. */
   brand?: ReactNode;
@@ -193,6 +205,12 @@ type OwnProps = {
    * `ContextSwitcherProps`.
    */
   contextSwitcher?: ContextSwitcherProps;
+  /**
+   * The navigation's built-in text, for translation: the skip link, the
+   * landmark's default name and the collapse toggle's labels. Any message
+   * left out keeps its English default.
+   */
+  messages?: Partial<SideNavigationMessages>;
 };
 
 /**

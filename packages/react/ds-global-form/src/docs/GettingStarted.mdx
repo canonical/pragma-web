@@ -5,7 +5,7 @@ import * as Stories from "./GettingStarted.stories";
 
 # Getting Started with Forms
 
-The form system provides a `Form` wrapper and a `Field` router that handle form registration, validation, error display, and accessibility. It integrates with [react-hook-form](https://react-hook-form.com/) and uses CSS subgrid for layout.
+The form system provides a `Form` wrapper and a `Field` router. Built-in fields provide form binding, validation, error display, and accessibility; custom components supply their own. It integrates with [react-hook-form](https://react-hook-form.com/) and uses CSS subgrid for layout.
 
 ## Installation
 
@@ -118,8 +118,7 @@ ignored — configure those on your `useForm` call instead.
 
 This library is a thin layer over [react-hook-form](https://react-hook-form.com/)
 (RHF, `^7.71`). `Form` provides the [`FormProvider`](https://react-hook-form.com/docs/formprovider)
-and `Field` calls [`register`](https://react-hook-form.com/docs/useform/register)
-for you — but **the form state, validation, submission, and everything beyond a
+and built-in fields bind to RHF for you — but **the form state, validation, submission, and everything beyond a
 single field is react-hook-form's API, not this library's.** To build a real
 form you should read the RHF docs; this section is a map of the surface you will
 use, with the pieces this library already wires up called out.
@@ -210,13 +209,15 @@ is the authoritative reference for everything the form can do.
 
 <Canvas of={Stories.InputTypes} />
 
-Each `Field` is wrapped internally by the `Wrapper` component, which provides:
+Built-in fields use internal wrappers and binding that provide:
 
 - Label rendering and `<label>` association
 - Description text (the `description` prop)
 - Error message display when validation fails
 - ARIA attributes (`aria-labelledby`, `aria-describedby`, `aria-errormessage`, `aria-invalid`)
 - Form registration via react-hook-form
+
+Custom components are rendered directly and provide their own binding and presentation.
 
 ## Input types
 
@@ -233,8 +234,8 @@ Each `Field` is wrapped internally by the `Wrapper` component, which provides:
     <tr><td><code>"textarea"</code></td><td>Textarea</td><td>Multi-line text</td></tr>
     <tr><td><code>"select"</code></td><td>Select</td><td>Native dropdown with <code>options</code> array</td></tr>
     <tr><td><code>"checkbox"</code></td><td>Checkbox</td><td>Single boolean toggle</td></tr>
-    <tr><td><code>"simple-choices"</code></td><td>SimpleChoices</td><td>Radio buttons (single) or checkboxes (multiple) from <code>options</code></td></tr>
-    <tr><td><code>"choices"</code></td><td>Choices</td><td>Radio/checkbox groups with rich <code>ReactNode</code> labels</td></tr>
+    <tr><td><code>"choices"</code></td><td>Choices</td><td>Radio buttons (single) or checkboxes (multiple) from <code>options</code></td></tr>
+    <tr><td><code>"rich-choices"</code></td><td>RichChoices</td><td>Radio/checkbox groups with rich <code>ReactNode</code> labels</td></tr>
     <tr><td><code>"combobox"</code></td><td>Combobox</td><td>Searchable select with filtering, single or multiple</td></tr>
     <tr><td><code>"range"</code></td><td>Range</td><td>Numeric slider with <code>min</code> and <code>max</code></td></tr>
     <tr><td><code>"date"</code></td><td>DateInput</td><td>HTML5 date picker</td></tr>
@@ -272,6 +273,7 @@ import { Field, addRESTOptions, addRESTValidation } from "@canonical/react-ds-gl
   name="country"
   inputType="select"
   label="Country"
+  options={[]}
   middleware={[
     addRESTOptions("/api/countries", {
       transformData: (data) => data.countries.map(c => ({
@@ -355,7 +357,7 @@ import { MyDateRange } from "./MyDateRange";
 />
 ```
 
-Custom components must satisfy the `InputProps` type and integrate with react-hook-form via `useFormContext`. See the [Creating Custom Fields](?path=/docs/global-form-guides-creating-custom-fields--docs) guide for implementation details.
+Custom components accept at least a `name` and provide any binding, labels, errors, conditional display and middleware they need. See the [Creating Custom Fields](?path=/docs/global-form-guides-creating-custom-fields--docs) guide for implementation details.
 
 ## Further reading
 

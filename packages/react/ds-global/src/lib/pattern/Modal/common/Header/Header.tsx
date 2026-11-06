@@ -33,7 +33,7 @@ const Header = ({
   const modal = useModalContext();
 
   return (
-    <header
+    <div
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       {...props}
     >
@@ -42,6 +42,7 @@ const Header = ({
       </span>
       {!undismissible && (
         <Button
+          type="button"
           className="close"
           importance="tertiary"
           icon="close"
@@ -49,7 +50,7 @@ const Header = ({
           onClick={onDismiss ?? modal.onDismiss}
         />
       )}
-    </header>
+    </div>
   );
 };
 

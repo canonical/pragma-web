@@ -1,7 +1,7 @@
 {
   "name": "@canonical/prism-contract",
   "description": "The minimal GraphQL surface a Prism docsite provider must offer, plus a semantic-subsumption check that a provider's SDL satisfies it",
-  "version": "0.42.0",
+  "version": "0.45.0",
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -22,13 +22,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/canonical/pragma"
+    "url": "https://github.com/canonical/pragma-web"
   },
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/canonical/pragma/issues"
+    "url": "https://github.com/canonical/pragma-web/issues"
   },
-  "homepage": "https://github.com/canonical/pragma#readme",
+  "homepage": "https://github.com/canonical/pragma-web#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -48,16 +48,15 @@
     "test:vitest:watch": "vitest"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
-    "@canonical/biome-config": "^0.42.0",
-    "@canonical/ke-graphql": "^0.42.0",
-    "@canonical/typescript-config": "^0.42.0",
-    "@canonical/webarchitect": "^0.42.0",
-    "@types/node": "^24.12.0",
-    "@vitest/coverage-v8": "^4.0.18",
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0",
+    "@canonical/typescript-config": "0.44.0",
+    "@canonical/webarchitect": "0.44.0",
+    "@types/node": "^26.0.0",
+    "@vitest/coverage-v8": "^5.0.0",
     "graphql": "^16.11.0",
     "typescript": "^7.0.2",
-    "vitest": "^4.0.18"
+    "vitest": "^5.0.0"
   },
   "peerDependencies": {
     "graphql": "^16.11.0 || ^17.0.0-rc.0"

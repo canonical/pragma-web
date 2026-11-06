@@ -8,6 +8,7 @@ export default mergeConfig(
     test: {
       environment: "happy-dom",
       include: ["src/**/*.tests.ts"],
+      css: true,
     },
   }),
 );

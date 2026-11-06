@@ -21,17 +21,26 @@ const componentCssClassName = "ds side-panel";
  * application behind stays clickable and tabbable.
  *
  * The panel is controlled through its `ref`: `open()` shows it and moves focus
- * in, `close()` hides it and hands focus back. The ref is required, since the
- * handle is the only way in — a panel with no ref is a panel that can never
- * open. The dialog's native open state is the single source of truth — there
- * is no `open` prop to mirror it.
+ * in, `close()` hides it and hands focus back, and `toggle()` switches between
+ * those states. The ref is required, since the handle is the only way in — a
+ * panel with no ref is a panel that can never open. The dialog's native open
+ * state is the single source of truth — there is no `open` prop to mirror it.
+ *
+ * The panel forwards the native dialog `onClose`: pass your own to hear about
+ * every close, whatever caused it — the handle's `close()`, Escape, or anything else.
  *
  * Compose the body from `SidePanel.Header`, `SidePanel.Content` and
  * `SidePanel.Footer`. The panel lays them out as a flex column: header and
  * footer keep their size, and the content pane takes the rest and scrolls
- * within it. The content pane is a tab stop, so keyboard users can scroll it;
- * opening the panel still focuses the panel itself, so from there Tab reaches
- * the close button, then the content, then the footer's actions.
+ * within it. 2px lines mark the pane's edges while content is hidden past
+ * them — the start line once the pane scrolls away from the top, the end
+ * line until it bottoms out, both together in between — drawn CSS-first:
+ * engines with scroll-driven animations paint them with or without
+ * JavaScript, and engines without fall back to measurement by the
+ * `useScrollOverflow` hook; engines with neither paint nothing. The content
+ * pane is a tab stop, so keyboard users can scroll it; opening the panel
+ * still focuses the panel itself, so from there Tab reaches the close
+ * button, then the content, then the footer's actions.
  *
  * There are two consumption patterns, `withSidePanel` and `SidePanel`.
  * `withSidePanel` is meant for static content: the call belongs at module

@@ -1,18 +1,58 @@
-// Public package surface (unchanged by the tier restructure): the Field pattern
+// Public package surface: the Field pattern
 // (Field + FieldProps + the shared/machinery types it re-exports), the Form
-// pattern, and the form middleware. The component/ and subcomponent/ tiers are
-// otherwise internal — composed by the Field pattern, not exported at the root.
+// pattern, the form middleware, and the input subcomponents below. The
+// component/ tier is otherwise internal — composed by the Field pattern.
 export * from "./pattern/index.js";
-// RatingInput is exposed directly (work in progress): a standalone input that
-// consumers use on its own rather than only through the Field pattern. It is
-// re-exported through the subcomponent tier barrel (rather than reaching into
-// its folder) — a curated selection, so the rest of the subcomponent tier
-// stays internal.
+// The input subcomponents are exposed directly: presentational inputs with no
+// react-hook-form context, for controls that live outside a <Form> — a theme
+// or language picker in an application's chrome, a filter bar, a standalone
+// rating. Each carries the same input chrome the Field pattern composes. The
+// Field chrome subcomponents (Field.Label, Field.Description, Field.Error)
+// stay internal: they are reached through the Field pattern.
 export type {
+  CheckboxInputProps,
+  ColorInputProps,
+  ComboboxInputProps,
+  DateInputProps,
+  DateTimeInputProps,
+  FileUploadInputProps,
+  HexFormat,
+  HiddenInputProps,
+  NumberInputProps,
+  PasswordInputProps,
+  PhoneInputProps,
+  PhoneValue,
+  RadioInputProps,
+  RangeInputProps,
   RatingInputProps,
   RatingScale,
+  SelectInputProps,
+  SwitchInputProps,
+  TextareaInputProps,
+  TextInputProps,
+  TextInputType,
+  TimeInputProps,
 } from "./subcomponent/index.js";
-export { RatingInput } from "./subcomponent/index.js";
+export {
+  CheckboxInput,
+  ColorInput,
+  ComboboxInput,
+  DateInput,
+  DateTimeInput,
+  FileUploadInput,
+  HiddenInput,
+  NumberInput,
+  PasswordInput,
+  PhoneInput,
+  RadioInput,
+  RangeInput,
+  RatingInput,
+  SelectInput,
+  SwitchInput,
+  TextareaInput,
+  TextInput,
+  TimeInput,
+} from "./subcomponent/index.js";
 // Value formatting. `Formatter` is the contract for an input whose displayed
 // string differs from the one it submits; `useFormattedValue` is the piece worth
 // sharing, since keeping the caret stable across a reformat is the hard part.

@@ -102,10 +102,6 @@ jobs:
         uses: ./.github/actions/lerna-version
         with:
           release_type: ${{ github.event.inputs.release_type }}
-          # Optional. The pack repositories are internal and this job's deploy
-          # key does not reach them, so the embedded-pack refresh is skipped
-          # (loudly) until a token that can read them exists.
-          packs_token: ${{ secrets.PACKS_READ_TOKEN }}
 
   publish:
     name: Publish packages
@@ -128,7 +124,7 @@ jobs:
         uses: ./.github/actions/setup-env
 
       - name: Setup Node, authenticate with NPM registry
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org

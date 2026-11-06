@@ -1,7 +1,7 @@
 {
   "name": "@canonical/styles",
   "description": "Canonical Design System global stylesheet. The reset, typography, and design tokens, in named cascade layers.",
-  "version": "0.42.0",
+  "version": "0.45.0",
   "type": "module",
   "exports": {
     ".": "./src/index.css",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/canonical/pragma"
+    "url": "https://github.com/canonical/pragma-web"
   },
   "license": "LGPL-3.0",
   "publishConfig": {
@@ -40,13 +40,13 @@
     "check:webarchitect": "webarchitect assets"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
-    "@canonical/biome-config": "^0.42.0",
-    "@canonical/webarchitect": "^0.42.0"
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0",
+    "@canonical/webarchitect": "0.44.0"
   },
   "dependencies": {
-    "@canonical/design-tokens": "0.10.0",
-    "@canonical/styles-typography": "^0.42.0"
+    "@canonical/design-tokens": "0.44.0",
+    "@canonical/styles-typography": "^0.45.0"
   },
   "peerDependencies": {
     "@canonical/ds-assets": ">=0.18.0"

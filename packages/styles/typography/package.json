@@ -1,7 +1,7 @@
 {
   "name": "@canonical/styles-typography",
   "description": "Typography baseline alignment engines and scale tokens for the Canonical Design System.",
-  "version": "0.42.0",
+  "version": "0.45.0",
   "exports": {
     ".": "./src/index.css",
     "./tokens.css": "./src/tokens.css",
@@ -40,24 +40,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/canonical/pragma"
+    "url": "https://github.com/canonical/pragma-web"
   },
   "license": "LGPL-3.0",
   "dependencies": {
-    "@canonical/design-tokens": "0.10.0",
+    "@canonical/design-tokens": "0.44.0",
     "opentype.js": "^1.3.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
-    "@canonical/biome-config": "^0.42.0",
-    "@canonical/typescript-config": "^0.42.0",
-    "@canonical/webarchitect": "^0.42.0",
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0",
+    "@canonical/typescript-config": "0.44.0",
+    "@canonical/webarchitect": "0.44.0",
     "@types/bun": "^1.3.10",
     "@types/node": "^26.0.0",
     "typescript": "^7.0.2",
-    "vitest": "^4.0.18"
-  },
-  "peerDependencies": {
-    "typescript": "^5.9.3 || ^6.0.0 || ^7.0.0"
+    "vitest": "^5.0.0"
   }
 }

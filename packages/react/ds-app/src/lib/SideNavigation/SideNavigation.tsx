@@ -1,6 +1,7 @@
 import type React from "react";
 import { useCallback, useEffect, useId, useState } from "react";
 import { Content, ContextSwitcher, Footer, Header } from "./common/index.js";
+import { DEFAULT_MESSAGES } from "./constants.js";
 import { useCollapseShortcut } from "./hooks/useCollapseShortcut/index.js";
 import type { SideNavigationProps } from "./types.js";
 import "./styles.css";
@@ -14,9 +15,9 @@ const componentCssClassName = "ds side-navigation";
  * region it controls.
  *
  * Four regions: Header (branding, collapse toggle), the optional
- * ContextSwitcher region (a `role="menu"` select-like widget — not
- * navigation, so it sits outside the landmark in a plain `<div>` between
- * Header and Content; hidden when collapsed, where labels are unviable),
+ * ContextSwitcher (a `role="menu"` select-like widget — not navigation,
+ * so it sits outside the landmark between Header and Content; hidden
+ * when collapsed, where labels are unviable),
  * Content (the main `<nav>` landmark) and Footer (user profile, settings
  * and non-navigational actions). The root element is a plain `<div>` and
  * the component's single *navigation* landmark is Content's `<nav>`, so
@@ -50,15 +51,14 @@ const SideNavigation = ({
   LinkComponent = "a",
   currentUrl,
   skipTo = "#main-content",
-  // Controlled circuit — not official yet.
-  // expanded: expandedProp,
   defaultExpanded: defaultExpandedProp,
-  // onExpandedChange,
   keyboardShortcut = true,
   "aria-label": ariaLabel,
+  messages: messagesProp,
   ...props
 }: SideNavigationProps): React.ReactElement => {
   const contentId = useId();
+  const messages = { ...DEFAULT_MESSAGES, ...messagesProp };
 
   const [expanded, setExpanded] = useState(defaultExpandedProp ?? true);
 
@@ -82,19 +82,6 @@ const SideNavigation = ({
   // `keyboardShortcut` opts out. See hooks/useCollapseShortcut.
   useCollapseShortcut({ condition: keyboardShortcut, onTrigger: handleToggle });
 
-  // --- Controlled circuit (not official yet) -------------------------------
-  // const [uncontrolledExpanded, setUncontrolledExpanded] =
-  //   useState(defaultExpanded);
-  // const isControlled = expandedProp !== undefined;
-  // const expanded = isControlled ? expandedProp : uncontrolledExpanded;
-  //
-  // const handleToggle = useCallback(() => {
-  //   const next = !expanded;
-  //   if (!isControlled) setUncontrolledExpanded(next);
-  //   onExpandedChange?.(next);
-  // }, [expanded, isControlled, onExpandedChange]);
-  // -------------------------------------------------------------------------
-
   return (
     <div
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
@@ -104,7 +91,7 @@ const SideNavigation = ({
       {/* Skip navigation, first in DOM order — visually hidden until focused,
           then jumps keyboard users past the navigation block. */}
       <a className="skip-link" href={skipTo}>
-        Skip to main content
+        {messages.skipToContent()}
       </a>
       <Header
         brand={brand}
@@ -112,23 +99,20 @@ const SideNavigation = ({
         expanded={expanded}
         onToggle={handleToggle}
         collapseControls={contentId}
+        collapseToggleMessages={messages}
       />
       {contextSwitcher ? (
-        // Own plain <div> region — a select-like widget is not navigation,
-        // so it sits outside the <nav> landmark. Hidden when collapsed:
-        // its rows are label-driven, unviable icon-only (the collapsed CSS
-        // hides the region via the root's data-expanded, so the region
-        // carries no state of its own).
-        <div className="ds side-navigation-context-switcher-region">
-          <ContextSwitcher {...contextSwitcher} />
-        </div>
+        // Own region between Header and Content — a select-like widget is
+        // not navigation, so it sits outside the <nav> landmark. The root's
+        // collapsed CSS hides it: label-driven rows are unviable icon-only.
+        <ContextSwitcher {...contextSwitcher} />
       ) : null}
       <Content
         id={contentId}
         root={root}
         LinkComponent={LinkComponent}
         currentUrl={currentUrl}
-        aria-label={ariaLabel ?? "Main navigation"}
+        aria-label={ariaLabel ?? messages.navigation()}
       />
       {footerRoot ? (
         <Footer

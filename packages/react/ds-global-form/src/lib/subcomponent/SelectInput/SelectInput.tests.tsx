@@ -41,6 +41,25 @@ describe("SelectInput (presentational)", () => {
     expect(screen.getByRole("option", { name: "Disabled" })).toBeDisabled();
   });
 
+  it("sets an option's lang when the option names one", () => {
+    const languages = [
+      { label: "English", value: "en", lang: "en" },
+      { label: "français", value: "fr", lang: "fr" },
+    ];
+    render(<SelectInput name="locale" options={languages} />);
+    expect(screen.getByRole("option", { name: "français" })).toHaveAttribute(
+      "lang",
+      "fr",
+    );
+  });
+
+  it("leaves lang off options that name none", () => {
+    render(<SelectInput name="color" options={options} />);
+    expect(screen.getByRole("option", { name: "Red" })).not.toHaveAttribute(
+      "lang",
+    );
+  });
+
   it("is controllable via value/onChange", () => {
     const onChange = vi.fn();
     render(

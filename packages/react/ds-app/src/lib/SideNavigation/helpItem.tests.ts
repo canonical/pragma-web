@@ -19,6 +19,12 @@ describe("createHelpItem", () => {
     });
   });
 
+  it("allows overriding the Help item's own label", () => {
+    const item = createHelpItem("https://ubuntu.com/legal", { label: "Aide" });
+    expect(item.label).toBe("Aide");
+    expect(item.key).toBe("help");
+  });
+
   it("allows overriding the legal link's label", () => {
     const item = createHelpItem("https://ubuntu.com/legal", {
       legalLabel: "Terms & privacy",

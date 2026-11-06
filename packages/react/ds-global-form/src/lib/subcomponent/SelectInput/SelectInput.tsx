@@ -33,6 +33,7 @@ export const SelectInput = forwardRef<HTMLSelectElement, SelectInputProps>(
             key={option.value}
             value={option.value}
             disabled={option.disabled}
+            lang={option.lang}
           >
             {option.label}
           </option>

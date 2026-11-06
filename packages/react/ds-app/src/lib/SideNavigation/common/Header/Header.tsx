@@ -23,6 +23,7 @@ const Header = ({
   expanded,
   onToggle,
   collapseControls,
+  collapseToggleMessages,
   ...props
 }: HeaderProps): React.ReactElement => {
   return (
@@ -44,6 +45,7 @@ const Header = ({
         <CollapseToggle
           expanded={expanded}
           aria-controls={collapseControls}
+          messages={collapseToggleMessages}
           onClick={onToggle}
         />
       )}

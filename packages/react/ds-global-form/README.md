@@ -12,16 +12,19 @@ Form components for the Pragma design system. This package provides a field syst
 bun add @canonical/react-ds-global-form @canonical/styles
 ```
 
-Import the global styles and the form component styles in your application's root stylesheet:
+Import the design system's styles **first** in your application's entry, before anything that imports a component:
 
-```css
-@import url("@canonical/styles");
-@import url("@canonical/react-ds-global-form/dist/esm/index.css");
+```ts
+import "@canonical/styles";
 ```
 
-The global styles provide the CSS reset, typography baseline, and design tokens (colour, spacing, surfaces, states) that all form components depend on. The form stylesheet provides input chrome, field layout, and component-specific styles.
+Or, from a stylesheet: `@import url("@canonical/styles");`.
 
-The package builds on top of `@canonical/react-ds-global`.
+Each component brings its own stylesheet when you import it. The package stylesheet (field layout, input chrome, form tokens) is not imported by any component, so import it right after the styles:
+
+```ts
+import "@canonical/react-ds-global-form/dist/esm/index.css";
+```
 
 ### How component CSS reaches the page
 
@@ -143,12 +146,16 @@ The `Field` component uses `inputType` to select the appropriate input component
 | `checkbox` | Checkbox | Boolean toggle |
 | `range` | Range | Slider input |
 | `select` | Select | Dropdown selection |
-| `simple-choices` | SimpleChoices | Radio buttons or checkboxes |
+| `choices`, `rich-choices` | Choices | Radio buttons or checkboxes |
 | `combobox` | Combobox | Searchable dropdown |
 | `hidden` | Hidden | Hidden input |
 | `custom` | Your component | Pass via `CustomComponent` prop |
 
-All fields are wrapped with `withWrapper`, which provides form registration, labels, descriptions, error display, and middleware support.
+Built-in fields provide form binding and field chrome. Custom fields are rendered directly and own their binding and chrome.
+
+`FieldProps` is a discriminated union. When migrating from the previously unchecked type, preserve literal `inputType` values with `satisfies FieldProps[]`, provide `options` for selects (use `[]` when middleware supplies them) and a `label` or `controlLabel` for toggles. Extend it with a type intersection rather than `interface extends FieldProps`; use `FieldProps<CustomProps>` for a custom component with additional required props. Custom-field declarations require TypeScript 5.5 or newer: although `NoInfer` was introduced in 5.4, the reserved-prop conditional does not resolve correctly in 5.4.
+
+Built-in `Field` variants determine the native input type from `inputType`; do not pass a separate native `type` prop. Custom components may define their own `type` prop.
 
 ### Custom Fields
 
@@ -166,7 +173,27 @@ import { MyColorPicker } from "./MyColorPicker";
 />
 ```
 
-Custom components must be wrapped with `withWrapper`. Custom components must satisfy the `InputProps` type and integrate with react-hook-form via `useFormContext`.
+Custom components receive the supplied props except `inputType`, `CustomComponent` and React's `key`. They must implement any needed registration, labels, errors, conditions and middleware themselves; `withWrapper` is internal. JSX checks the custom component's props. For typed maps, use `FieldProps<MyCustomProps>[]`; a map with different custom components needs a union of those types and narrowing before rendering each custom variant. See the Creating Custom Fields guide for an example.
+
+### Standalone Inputs
+
+Every input the Field pattern composes is also exported on its own: `TextInput`, `SelectInput`, `CheckboxInput`, `SwitchInput`, `RadioInput`, `NumberInput`, `PasswordInput`, `RangeInput`, `RatingInput`, `DateInput`, `TimeInput`, `DateTimeInput`, `ColorInput`, `ComboboxInput`, `PhoneInput`, `FileUploadInput`, `TextareaInput` and `HiddenInput`, each with its props type. They are presentational: no `<Form>`, no react-hook-form context and no label, so a control outside a form keeps the same input chrome. Name it with `aria-label` or a `<label>` of your own.
+
+```tsx
+import { SelectInput } from "@canonical/react-ds-global-form";
+
+<SelectInput
+  aria-label="Language"
+  value={locale}
+  onChange={(event) => setLocale(event.target.value)}
+  options={[
+    { value: "en", label: "English", lang: "en" },
+    { value: "fr", label: "français", lang: "fr" },
+  ]}
+/>
+```
+
+An option's optional `lang` marks a label written in another language, so assistive technology pronounces it correctly.
 
 ## Middleware Pattern
 
@@ -177,6 +204,7 @@ Middleware are higher-order components that wrap fields to add functionality. Th
   name="country"
   inputType="select"
   label="Country"
+  options={[]}
   middleware={[addRESTOptions("/api/countries")]}
 />
 ```
@@ -193,6 +221,7 @@ import { addRESTOptions } from "@canonical/react-ds-global-form";
 <Field
   name="category"
   inputType="select"
+  options={[]}
   middleware={[
     addRESTOptions("/api/categories", {
       transformData: (data) => data.categories,
@@ -249,4 +278,4 @@ The Storybook configuration includes MSW integration for mocking backend respons
 
 ## Component Specifications
 
-Form component specifications are defined in the [Design System Ontology](https://github.com/canonical/design-system).
+Form component specifications are defined in the [Design System Ontology](https://github.com/canonical/pragma-core/tree/main/packages/semantics/design-system).

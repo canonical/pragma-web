@@ -19,7 +19,7 @@ For OIDC to work, each package must have a trusted publisher configured once on 
 
 1. Go to the package page on npmjs.com → **Settings** → **Trusted Publisher**.
 2. Select **GitHub Actions**.
-3. Set organisation/repository to `canonical/pragma`.
+3. Set organisation/repository to `canonical/pragma-web`.
 4. Set the workflow file to `tag.yml`.
 5. Leave the environment field blank (the publish job uses no GitHub environment).
 
@@ -86,7 +86,7 @@ After the first manual publish and trusted-publisher configuration, use the auto
 ## Automated Publishing
 
 1. **Open the Tag workflow**
-   - Go to the [Tag workflow action](https://github.com/canonical/ds25/actions/workflows/tag.yml).
+   - Go to the [Tag workflow action](https://github.com/canonical/pragma-web/actions/workflows/tag.yml).
    - Click "Run workflow".
 
 2. **Select release type**
