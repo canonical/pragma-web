@@ -118,8 +118,11 @@
       .ds.field-label,
       .ds.field-description,
       .ds.field-error,
-      .ds.option > input,
-      .field-toggle-control > input
+      /* The choice and toggle MARKS join the seated text by their own classes
+         (RadioInput/CheckboxInput/SwitchInput), not by their group ancestry. */
+      .ds.form-radio,
+      .ds.form-checkbox,
+      .ds.form-switch
     ) {
     line-height: 1;
     /* Baseline within a line-height:1 box (font-relative cap approximation). */
@@ -344,13 +347,15 @@
    * partition above), so its box is its OWN snapped line-height and the engine's
    * --end-nudge already lands its bottom on the grid. Adding a density fill on top
    * would double-pad. Prose bottom rhythm belongs to the engine / `.editorial`. */
-  :is(.comfortable, .dense, .app, .site, .docs)
-  :is(
+  :is(.comfortable, .dense, .app, .site, .docs) :is(
     .ds.field-label,
     .ds.field-description,
     .ds.field-error,
-    .ds.option > input,
-    .field-toggle-control > input
+    /* The choice and toggle MARKS join the seated text by their own classes
+         (RadioInput/CheckboxInput/SwitchInput), not by their group ancestry. */
+    .ds.form-radio,
+    .ds.form-checkbox,
+    .ds.form-switch
   ) {
     --seat-after: max(
       0px,
