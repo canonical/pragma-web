@@ -10,6 +10,7 @@ import {
   HIDDEN_QUERY_KEY,
   OPERATOR_DELIMITER,
   ORDER_QUERY_KEY,
+  QUERY_KEYS,
   RESERVED_QUERY_KEYS,
   SUFFIXED_OPERATORS,
 } from "./constants.js";
@@ -19,6 +20,18 @@ import rejectWireName from "./rejectWireName.js";
 import spellWireKey from "./spellWireKey.js";
 
 describe("the wire grammar's names", () => {
+  it("names the parameter each written member of a query is spelled under", () => {
+    expect(QUERY_KEYS).toEqual({
+      search: "q",
+      sort: "sort",
+      group: "group",
+      page: "page",
+      size: "size",
+      cursor: "cursor",
+    });
+    expect(Object.isFrozen(QUERY_KEYS)).toBe(true);
+  });
+
   it("reserves the written keys and the annotations", () => {
     expect([...RESERVED_QUERY_KEYS]).toEqual([
       "q",

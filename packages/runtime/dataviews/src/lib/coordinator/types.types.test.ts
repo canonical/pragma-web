@@ -4,7 +4,7 @@
  */
 import { describe, expectTypeOf, it } from "vitest";
 import type { Query } from "../query/index.js";
-import type { ResultProblem } from "../result/index.js";
+import type { QueryIssue, ResultProblem } from "../result/index.js";
 import type {
   DataViewsState,
   DispatchResult,
@@ -48,7 +48,10 @@ describe("DataViewsState", () => {
 });
 
 describe("QueryCoordinatorConfig", () => {
-  it("takes the query the first generation stands on", () => {
+  it("takes the clauses a link was refused for beside the initial query", () => {
+    expectTypeOf<QueryCoordinatorConfig["withheld"]>().toEqualTypeOf<
+      readonly QueryIssue[] | undefined
+    >();
     expectTypeOf<QueryCoordinatorConfig["initial"]>().toEqualTypeOf<
       Query | undefined
     >();
@@ -62,9 +65,9 @@ describe("DispatchResult", () => {
 });
 
 describe("QueryCoordinator", () => {
-  it("adopts an externally authoritative query", () => {
+  it("adopts a query with the clauses its link was refused for, optionally", () => {
     expectTypeOf<QueryCoordinator["adopt"]>().toEqualTypeOf<
-      (query: Query) => string | null
+      (query: Query, withheld?: readonly QueryIssue[]) => string | null
     >();
   });
 });

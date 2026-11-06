@@ -19,6 +19,8 @@ export default function describeStatus(
       return messages.statusRegrouping;
     case "failed":
       return messages.statusFailed(status.reason);
+    case "refused":
+      return messages.statusRefused(status.reason);
     case "refresh-failed":
       return messages.statusRefreshFailed(status.reason);
     case "stale":

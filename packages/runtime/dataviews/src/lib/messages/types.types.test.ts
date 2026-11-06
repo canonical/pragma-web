@@ -34,4 +34,14 @@ describe("DataViewsMessages", () => {
       (name: string) => string
     >();
   });
+
+  it("says why a link was refused, and lists each refused clause by name", () => {
+    expectTypeOf<DataViewsMessages["statusRefused"]>().toEqualTypeOf<
+      (reason: string) => string
+    >();
+    expectTypeOf<DataViewsMessages["linkRefusals"]>().toEqualTypeOf<string>();
+    expectTypeOf<DataViewsMessages["clauseRefused"]>().toEqualTypeOf<
+      (name: string, reason: string) => string
+    >();
+  });
 });

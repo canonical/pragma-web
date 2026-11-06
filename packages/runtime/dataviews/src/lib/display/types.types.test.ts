@@ -18,13 +18,22 @@ describe("DisplayStatus", () => {
     expectTypeOf<DisplayStatus["status"]>().toEqualTypeOf<
       | "pending"
       | "failed"
+      | "refused"
       | "refresh-failed"
       | "stale"
-      | "regrouping"
       | "regrouping"
       | "no-data"
       | "no-results"
     >();
+  });
+
+  it("says why a link was refused", () => {
+    expectTypeOf<
+      Extract<DisplayStatus, { readonly status: "refused" }>
+    >().toEqualTypeOf<{
+      readonly status: "refused";
+      readonly reason: string;
+    }>();
   });
 });
 

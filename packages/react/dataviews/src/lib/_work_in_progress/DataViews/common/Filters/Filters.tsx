@@ -8,12 +8,17 @@ import type {
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
 import {
+  isNarrowingIssue,
   type ProviderHost,
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { Button } from "@canonical/react-ds-global";
-import { Fragment, type ReactElement, useRef } from "react";
-import { type UseFacetsResult, useFacets } from "../../../../hooks/index.js";
+import { Fragment, type ReactElement, useMemo, useRef } from "react";
+import {
+  type UseFacetsResult,
+  useDataViewsValue,
+  useFacets,
+} from "../../../../hooks/index.js";
 import { interceptSubmit } from "../../../../utils/index.js";
 import {
   useDataViewsRoot,
@@ -26,6 +31,7 @@ import { NO_RECORDS } from "./common/constants.js";
 import {
   BoundFilter,
   ChoicesFilter,
+  LinkRefusals,
   PresenceFilter,
   TextFilter,
 } from "./common/index.js";
@@ -34,9 +40,6 @@ import type { DataViewsFiltersProps } from "./types.js";
 import "./styles.css";
 
 const componentCssClassName = "ds data-views-filters";
-
-/** The controls submit every filter themselves; nothing else is theirs. */
-const NO_OWN_KEYS: readonly string[] = [];
 
 /**
  * The destination a submission reaches: the applied query less every
@@ -285,6 +288,12 @@ const renderControl = (
  * restriction that is already in force and says so beside the control, and
  * two roots over one provider never share a half-typed input.
  *
+ * A followed link's refused clauses are listed after the controls, each with
+ * its reason, under "Not applied from the link". A refused filter or search
+ * withheld the query, so it has a Clear control that removes it: a link to
+ * the URL without it before scripts run, a button after. The GET form
+ * leaves refused parameters out, so submitting it removes them too.
+ *
  * Where the provider asks its source for facets, the controls read them:
  * counts beside a choice's options and beside a presence field, the least
  * and greatest value beside a number or date bound, and the server's
@@ -326,6 +335,14 @@ export default function Filters({
   const { provider, filters, messages } = useDataViewsRoot("Filters");
   const facets = useFacets({ provider });
   const restricted = useRestrictedFields({ provider });
+  const issues = useDataViewsValue(provider.issues);
+  // The controls submit every filter themselves, and the refused clauses
+  // the query is withheld for are left out: submitting the form removes
+  // them, as their Clear does.
+  const refused = useMemo(
+    () => issues.filter(isNarrowingIssue).map((issue) => issue.parameter),
+    [issues],
+  );
   const groupRef = useRef<HTMLFieldSetElement>(null);
   const { schema } = provider.collection;
   const marked = primary ?? [];
@@ -380,12 +397,9 @@ export default function Filters({
       groupRef.current?.focus();
     },
   };
+  const nameField = (field: string): string => labels?.[field] ?? field;
   const renderField = (definition: SchemaFieldDefinition) =>
-    renderControl(
-      context,
-      definition,
-      labels?.[definition.field] ?? definition.field,
-    );
+    renderControl(context, definition, nameField(definition.field));
   const outside = [
     ...primaryFields,
     ...schema.fields.filter(
@@ -452,10 +466,19 @@ export default function Filters({
           </details>
         ) : null}
       </fieldset>
+      <LinkRefusals
+        issues={issues}
+        nameField={nameField}
+        params={context.host.location?.read() ?? null}
+        onClear={(issue) => {
+          context.host.clearRefused(issue.parameter);
+        }}
+        focusGroup={context.focusGroup}
+      />
       <HiddenQueryFields
         provider={provider}
         destinationOf={destinationOf}
-        omit={NO_OWN_KEYS}
+        omit={refused}
       />
       <Button type="submit" importance="secondary" className="submit">
         {messages.submitFilters}

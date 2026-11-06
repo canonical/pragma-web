@@ -5,6 +5,7 @@ export default function displayStatusOf(
   status: DisplayStatus["status"],
 ): DisplayStatus {
   return status === "failed" ||
+    status === "refused" ||
     status === "refresh-failed" ||
     status === "stale"
     ? { status, reason: "offline" }

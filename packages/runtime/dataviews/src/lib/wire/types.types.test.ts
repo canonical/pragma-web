@@ -3,15 +3,15 @@
  * encode and a decode take.
  */
 import { describe, expectTypeOf, it } from "vitest";
-import type { Query } from "../query/index.js";
-
+import type { Query, Slice } from "../query/index.js";
+import type { QueryIssue } from "../result/index.js";
 import type { SourceCapabilities } from "../source/index.js";
 import type {
   ArrangementParams,
+  CarryingEncodeConfig,
   DecodedQuery,
   DecodeQueryConfig,
   EncodeQueryConfig,
-  QueryIssue,
 } from "./types.js";
 
 describe("ArrangementParams", () => {
@@ -35,10 +35,21 @@ describe("DecodedQuery", () => {
 });
 
 describe("EncodeQueryConfig", () => {
-  it("keeps the host's parameters it is given", () => {
+  it("keeps the host's parameters it is given, and carries nothing", () => {
     expectTypeOf<EncodeQueryConfig["preserve"]>().toEqualTypeOf<
       URLSearchParams | undefined
     >();
+    expectTypeOf<EncodeQueryConfig>().not.toHaveProperty("carry");
+  });
+});
+
+describe("CarryingEncodeConfig", () => {
+  it("carries the keys it names, less what the applied slice supplied", () => {
+    expectTypeOf<CarryingEncodeConfig["carry"]>().toEqualTypeOf<
+      readonly string[]
+    >();
+    expectTypeOf<CarryingEncodeConfig["applied"]>().toEqualTypeOf<Slice>();
+    expectTypeOf<CarryingEncodeConfig>().toExtend<EncodeQueryConfig>();
   });
 });
 

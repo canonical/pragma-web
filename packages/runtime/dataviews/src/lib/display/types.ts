@@ -34,6 +34,12 @@ export type DisplayStatus =
    */
   | { readonly status: "regrouping" }
   | { readonly status: "failed"; readonly reason: string }
+  /**
+   * The query was refused before anything ran — a followed link's clause
+   * that would have narrowed the result, or a query the source cannot
+   * execute — and the reasons it was refused for.
+   */
+  | { readonly status: "refused"; readonly reason: string }
   | { readonly status: "refresh-failed"; readonly reason: string }
   | { readonly status: "stale"; readonly reason: string }
   | { readonly status: "no-data" }

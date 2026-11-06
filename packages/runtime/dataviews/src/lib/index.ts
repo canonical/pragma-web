@@ -87,6 +87,8 @@ export type {
   Facet,
   GroupSummary,
   PageCursors,
+  QueryIssue,
+  QueryIssueCode,
   ResultProblem,
   ResultProvenance,
   SourceCounts,
@@ -174,7 +176,5 @@ export type {
   DecodedQuery,
   DecodeQueryConfig,
   EncodeQueryConfig,
-  QueryIssue,
-  QueryIssueCode,
 } from "./wire/index.js";
 export { decodeQuery, encodeQuery } from "./wire/index.js";

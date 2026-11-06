@@ -5,7 +5,7 @@
  * refused for.
  */
 import { describe, expect, expectTypeOf, it } from "vitest";
-import type { QueryIssue } from "../wire/index.js";
+import type { QueryIssue } from "../result/index.js";
 import type {
   StoredQuery,
   ViewAdoptionCause,
