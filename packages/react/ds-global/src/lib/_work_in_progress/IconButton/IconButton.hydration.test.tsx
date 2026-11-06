@@ -20,8 +20,7 @@ describe("IconButton (hydration)", () => {
     vi.restoreAllMocks();
   });
 
-  // Fails until IconButton pairs itself with a Tooltip.
-  it.fails("hydrates with no recoverable error and portals the Tooltip after mount", () => {
+  it("hydrates with no recoverable error and portals the Tooltip after mount", () => {
     const ui = <Component icon="edit" aria-label="Edit" />;
 
     const container = document.createElement("div");

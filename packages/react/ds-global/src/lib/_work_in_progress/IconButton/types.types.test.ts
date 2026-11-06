@@ -1,4 +1,4 @@
-import type { Ref } from "react";
+import type { ReactNode, Ref } from "react";
 import { describe, expectTypeOf, it } from "vitest";
 import type { IconButtonProps as Props } from "./types.js";
 
@@ -71,12 +71,18 @@ describe("IconButton props", () => {
   });
 
   it("takes a Tooltip message or false", () => {
-    const withMessage: Props = {
-      icon: "copy",
-      "aria-label": "Copy",
-      // @ts-expect-error the tooltip prop does not exist yet.
-      tooltip: "Copy the instance address",
-    };
-    expectTypeOf(withMessage).toEqualTypeOf<Props>();
+    expectTypeOf<{
+      icon: "copy";
+      "aria-label": "Copy";
+      tooltip: "Copy the instance address";
+    }>().toExtend<Props>();
+    expectTypeOf<{
+      icon: "copy";
+      "aria-label": "Copy";
+      tooltip: false;
+    }>().toExtend<Props>();
+    expectTypeOf<Props["tooltip"]>().toEqualTypeOf<
+      ReactNode | false | undefined
+    >();
   });
 });

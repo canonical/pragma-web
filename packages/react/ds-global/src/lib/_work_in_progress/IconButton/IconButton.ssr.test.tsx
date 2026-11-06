@@ -19,7 +19,7 @@ describe("IconButton SSR", () => {
   });
 
   describe("tooltip", () => {
-    it.fails("wraps the button in the Tooltip area", () => {
+    it("wraps the button in the Tooltip area", () => {
       const html = renderToString(<Component icon="edit" aria-label="Edit" />);
       expect(html).toMatch(/^<span class="ds tooltip-area"/);
     });
