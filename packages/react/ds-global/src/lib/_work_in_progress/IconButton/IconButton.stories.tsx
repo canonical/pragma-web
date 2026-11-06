@@ -5,7 +5,7 @@ import { useState } from "react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import * as decorators from "../../../storybook/decorators.js";
 import { Button } from "../../component/Button/index.js";
-import { TooltipEngine } from "../../component/Tooltip/index.js";
+import { TooltipEngine, withTooltip } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
 
 const meta = {
@@ -42,25 +42,25 @@ export const Primary: Story = {
   args: { importance: "primary" },
 };
 
-/** Secondary: the outlined ghost importance. */
+/** Secondary: the outlined importance. */
 export const Secondary: Story = {
   args: { importance: "secondary" },
 };
 
-/** Tertiary: the borderless ghost importance, the usual icon-only look. */
+/** Tertiary: the borderless importance, the usual look of an icon button. */
 export const Tertiary: Story = {
   args: { importance: "tertiary" },
 };
 
 /**
- * Loading overlays Button's Spinner on the centred icon, marks the button
- * `aria-busy` and disables it, while the box keeps its size.
+ * While its action runs, the icon button shows a spinner in place of its
+ * icon and cannot be pressed again; it keeps its size.
  */
 export const Loading: Story = {
   args: { loading: true, "aria-label": "Saving" },
 };
 
-/** Disabled takes Button's disabled surface, text and icon colours. */
+/** Disabled, when the action is not available. */
 export const Disabled: Story = {
   args: { disabled: true },
 };
@@ -72,12 +72,9 @@ const row = {
 } as const;
 
 /**
- * An icon button beside a line of text and a labelled Button, in a flex row
- * aligned on `baseline`, in both densities with the baseline grid overlay on.
- * The icon button's baseline is a generated line of text seated like
- * Button's label, so the text, the label and the icon button share one
- * baseline, and every box spans the same grid lines; the icon button's box is
- * exactly as wide as it is tall.
+ * In a row aligned on the text baseline, icon buttons line up with the text
+ * and with a labelled Button, in both densities, and each is exactly as wide
+ * as it is tall. The baseline grid overlay is on.
  */
 export const BaselineAlignment: Story = {
   name: "Baseline alignment",
@@ -97,29 +94,33 @@ export const BaselineAlignment: Story = {
   ),
 };
 
-/** Tooltip stories portal their message: show them in an iframe of their own. */
+/**
+ * A Tooltip portals its message to the document body: stories that show
+ * one render in a docs iframe of their own.
+ */
 const tooltipParameters = {
-  docs: { story: { inline: false, iframeHeight: "200px" } },
+  docs: { story: { inline: false, iframeHeight: "240px" } },
 } as const;
 
-/** The Tooltip, once the engine has opened it, from the whole document. */
+/** The Tooltip, once it is open, from the whole document. */
 const findOpenTooltip = (canvasElement: HTMLElement) =>
   within(canvasElement.ownerDocument.body).findByRole("tooltip");
 
+/** An icon button paired once, by composition, with a fixed message. */
+const EditButtonWithTooltip = withTooltip(Component, "Edit");
+
 /**
- * Paired with a Tooltip that states the action, as Button's guideline asks
- * for every icon-only button. The Tooltip is composed around the icon
- * button and shows on hover or focus after its own delay.
+ * Always pair an icon button with a Tooltip that states the action, as
+ * Button's guideline asks for every icon-only button. Compose it: wrap the
+ * icon button with `withTooltip`, or render `TooltipEngine` around it when
+ * the message has to follow state. The Tooltip shows on hover or focus,
+ * after its own delay.
  */
 export const WithTooltip: Story = {
   name: "With Tooltip",
-  args: { importance: "tertiary", icon: "edit", "aria-label": "Edit" },
+  args: { importance: "tertiary" },
   parameters: tooltipParameters,
-  render: (args) => (
-    <TooltipEngine Message="Edit">
-      <Component {...args} />
-    </TooltipEngine>
-  ),
+  render: (args) => <EditButtonWithTooltip {...args} />,
   play: async ({ canvas, canvasElement }) => {
     const button = canvas.getByRole("button", { name: "Edit" });
     await userEvent.tab();
@@ -130,7 +131,7 @@ export const WithTooltip: Story = {
   },
 };
 
-/** Anticipation recolours the icon button as it does Button. */
+/** Anticipation recolours the icon button as it recolours a Button. */
 export const Anticipation: Story = {
   render: (args) => (
     <div style={{ display: "grid", gap: "var(--dimension-200)" }}>
@@ -154,12 +155,12 @@ export const Anticipation: Story = {
 
 /**
  * Every context (app, site, docs) in both densities, with the baseline grid
- * on, with and without a Tooltip around the icon button: the box is the
- * density cell both ways, on the text's baseline.
+ * on: the icon button follows the density cell, and stays on the text's
+ * baseline with or without a Tooltip around it.
  */
 export const DensityAndContext: Story = {
   name: "Density and context",
-  parameters: { baseline: true },
+  parameters: { baseline: true, ...tooltipParameters },
   render: (args) => (
     <div style={{ display: "grid", gap: "var(--dimension-400)" }}>
       {(["app", "site", "docs"] as const).flatMap((context) =>
@@ -208,32 +209,42 @@ export const OnContrastedSurface: Story = {
 };
 
 /**
- * As the trigger of a panel: the Tooltip composed around it is kept closed
- * while the panel is open, so it never covers what the button opened.
+ * As the trigger of a popover panel, wired with `popoverTarget`. Keep the
+ * Tooltip closed while the panel is open, so it never covers what the
+ * button opened: here the panel's `toggle` event drives both
+ * `aria-expanded` and the Tooltip's `open`.
  */
-export const AsMenuTrigger: Story = {
-  name: "As a menu trigger",
+export const AsPopoverTrigger: Story = {
+  name: "As a popover trigger",
   parameters: tooltipParameters,
-  render: function AsMenuTriggerRender(args) {
-    const [isExpanded, setIsExpanded] = useState(false);
+  render: function AsPopoverTriggerRender(args) {
+    const [isOpen, setIsOpen] = useState(false);
     return (
-      <div style={{ display: "grid", gap: "var(--dimension-200)" }}>
-        <TooltipEngine
-          Message="Row options"
-          open={isExpanded ? false : undefined}
-        >
+      <>
+        <TooltipEngine Message="Row options" open={isOpen ? false : undefined}>
           <Component
             {...args}
             importance="tertiary"
             icon="menu-contextual"
             aria-label="Row options"
-            aria-haspopup="menu"
-            aria-expanded={isExpanded}
-            onClick={() => setIsExpanded((expanded) => !expanded)}
+            popoverTarget="row-options"
+            aria-expanded={isOpen}
+            aria-controls="row-options"
           />
         </TooltipEngine>
-        {isExpanded ? <span>The row options panel is open.</span> : null}
-      </div>
+        <section
+          id="row-options"
+          popover="auto"
+          aria-label="Row options"
+          onToggle={(event) => setIsOpen(event.newState === "open")}
+          style={{ padding: "var(--dimension-200)" }}
+        >
+          <Button importance="tertiary">Rename</Button>
+          <Button importance="tertiary" anticipation="destructive">
+            Delete
+          </Button>
+        </section>
+      </>
     );
   },
   play: async ({ canvas, canvasElement }) => {
@@ -241,7 +252,12 @@ export const AsMenuTrigger: Story = {
     await userEvent.hover(button);
     await findOpenTooltip(canvasElement);
     await userEvent.click(button);
-    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() =>
+      expect(button).toHaveAttribute("aria-expanded", "true"),
+    );
+    await expect(
+      canvasElement.ownerDocument.querySelector("#row-options:popover-open"),
+    ).not.toBeNull();
     await waitFor(() =>
       expect(
         within(canvasElement.ownerDocument.body).queryByRole("tooltip"),
@@ -250,22 +266,27 @@ export const AsMenuTrigger: Story = {
   },
 };
 
+const TableSettingsButton = withTooltip(Component, "Table settings");
+const ColumnOptionsButton = withTooltip(Component, "Column options");
+
 /**
- * The DataViews triggers: a gear for the table settings and three vertical
- * dots for the column and row options. Both are tertiary, and neither has a
- * chevron: they are icon buttons, not dropdown buttons.
+ * The data view triggers: a gear for the table settings and three vertical
+ * dots for the column and row options, each paired with its Tooltip. Both
+ * are tertiary, and neither has a chevron: they are icon buttons, not
+ * dropdown buttons.
  */
 export const GearAndThreeDots: Story = {
   name: "Gear and three dots",
+  parameters: tooltipParameters,
   render: (args) => (
     <div style={row}>
-      <Component
+      <TableSettingsButton
         {...args}
         importance="tertiary"
         icon="settings"
         aria-label="Table settings"
       />
-      <Component
+      <ColumnOptionsButton
         {...args}
         importance="tertiary"
         icon="menu-contextual"
