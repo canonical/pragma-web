@@ -33,18 +33,17 @@
     --button-padding-inline-start: var(--dimension-200);
     --button-gap: var(--dimension-100);
     --button-border-width: var(--dimension-stroke-thickness-medium);
-    /* Label weight — the button label is medium, not the `.p` body weight. */
-    --button-font-weight: var(--typography-weight-medium);
-    /* Label size — the button label is the text-secondary tier (14px), not the
-       `.p` text-primary tier (16px). The line-height snaps up to the baseline
-       grid exactly as the typography mapper does, so the box stays 32px tall
-       (24px line + 8px of baseline nudges) around 14px text. */
-    --button-font-size: var(--typography-text-secondary-font-size);
+    /* Label typography — the `typography.text.primary` composite token, the
+       default text style for UI elements such as buttons: regular weight, and
+       the token's size and ratio.*/
+    --button-font-weight: var(--typography-text-primary-font-weight);
+    --button-font-size: var(--typography-text-primary-font-size);
+
     --button-line-height: round(
       up,
       calc(
         var(--button-font-size) *
-        var(--typography-text-secondary-line-height)
+        var(--typography-text-primary-line-height)
       ),
       var(--baseline-height)
     );
@@ -96,14 +95,20 @@
     border-style: solid;
     border-width: var(--button-border-width);
 
-    /* Label typography tokens (text-secondary tier, 14px). The block placement that
+    /* Label typography tokens — every attribute of the
+       `typography.text.primary` composite: regular weight, and the family and
+       letter-spacing declared here (both identical in every tier; the family
+       is the label's inherited one anyway). The block placement that
        lands the label on the baseline grid comes from the density seat at the end of
        this file (the button no longer carries `.p`, so the engine's on-element nudges
        don't apply — without the seat the label is flat/unaligned). --font-size /
-       --line-height are still exposed for any consumer that reads them. */
+       --line-height stay exposed, as on every text-styled element, for any
+       consumer that reads them. */
     --font-size: var(--button-font-size);
     --line-height: var(--button-line-height);
+    font-family: var(--typography-text-primary-font-family);
     font-weight: var(--button-font-weight);
+    letter-spacing: var(--typography-text-primary-letter-spacing);
     padding-inline: var(--button-padding-inline-start)
       var(--button-padding-inline-end);
 

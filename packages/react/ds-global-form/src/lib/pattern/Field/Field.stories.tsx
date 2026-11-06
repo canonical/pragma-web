@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useMemo } from "react";
+import { useController, useFormContext } from "react-hook-form";
 import * as decorators from "storybook/decorators.js";
 import Component from "./Field.js";
 import type { FieldProps } from "./types.js";
@@ -116,6 +117,7 @@ export const TypeCheckbox: Story = {
   args: {
     name: "subscribe",
     inputType: "checkbox",
+    label: "Subscribe",
   },
 };
 
@@ -157,49 +159,47 @@ export const TypeColor: Story = {
 
 /**
  * A custom input: `inputType: "custom"` renders the supplied `CustomComponent`,
- * which receives the field's `InputProps` (name + react-hook-form registration)
- * so it participates in the form like any built-in input. This example is a
- * simple star-rating control wired through `onChange`.
+ * which owns its form binding and accessible label.
  */
-const StarRating = ({
-  value,
-  onChange,
-}: {
-  value?: number;
-  onChange?: (value: number) => void;
-}) => (
-  <div role="radiogroup" aria-label="Rating">
-    {[1, 2, 3, 4, 5].map((star) => (
-      <button
-        key={star}
-        type="button"
-        aria-label={`${star} star${star > 1 ? "s" : ""}`}
-        aria-pressed={(value ?? 0) >= star}
-        onClick={() => onChange?.(star)}
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          fontSize: "1.25rem",
-          color: (value ?? 0) >= star ? "#f5a623" : "#ccc",
-        }}
-      >
-        ★
-      </button>
-    ))}
-  </div>
-);
+const StarRating = ({ name }: { name: string }) => {
+  const { control } = useFormContext();
+  const { field } = useController({ name, control });
+  return (
+    <fieldset>
+      <legend>Rating</legend>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          aria-label={`${star} star${star > 1 ? "s" : ""}`}
+          aria-pressed={(field.value ?? 0) >= star}
+          onClick={() => field.onChange(star)}
+          onBlur={field.onBlur}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "1.25rem",
+            color: (field.value ?? 0) >= star ? "#f5a623" : "#ccc",
+          }}
+        >
+          ★
+        </button>
+      ))}
+    </fieldset>
+  );
+};
 
 export const TypeCustom: Story = {
   args: {
     name: "rating",
     inputType: "custom",
-    label: "Rating",
     CustomComponent: StarRating,
   },
 };
 
 export const ConditionalDisplay: Story = {
+  args: { name: "email", inputType: "text" },
   render: () => {
     const emailField: FieldProps = useMemo(
       () => ({
@@ -220,7 +220,7 @@ export const ConditionalDisplay: Story = {
         isOptional: true,
         condition: [
           ["email"],
-          (values: string[]) => {
+          (values: unknown[]) => {
             const value = values[0] as string;
             if (!value) return false;
             return value.endsWith("@gmail.com");

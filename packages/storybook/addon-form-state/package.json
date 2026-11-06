@@ -54,7 +54,7 @@
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.43.0",
     "@canonical/typescript-config-react": "^0.45.0",
-    "@canonical/webarchitect": "0.43.0",
+    "@canonical/webarchitect": "0.44.0",
     "@storybook/react-vite": "^10.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

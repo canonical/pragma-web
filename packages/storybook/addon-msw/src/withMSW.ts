@@ -27,7 +27,7 @@ const initializeWorker = async (): Promise<SetupWorker | null> => {
       worker = setupWorker();
       await worker.start({
         serviceWorker: { url: "/mockServiceWorker.js" },
-        onUnhandledRequest: "bypass",
+        onUnhandledFrame: "bypass",
       });
       return worker;
     } catch (error) {
