@@ -6,6 +6,8 @@
  * on behaviour.
  */
 
+import type { RouteArgs, RouteMap, RouteName } from "@canonical/router-core";
+
 /** Mapping of selected search-param keys to their current values. */
 export type SearchParamValues<TKeys extends readonly string[]> = Readonly<{
   [TKey in TKeys[number]]: string | null;
@@ -19,3 +21,16 @@ export interface UseRouterStateOptions<TSelected> {
    */
   readonly isEqual?: (previous: TSelected, next: TSelected) => boolean;
 }
+
+/**
+ * The build options `useHref` takes after the route name: core's own
+ * `RouteArgs`, so params and search are checked exactly as `buildPath` and
+ * `Link` check them.
+ */
+export type UseHrefProps<
+  TRoutes extends RouteMap,
+  TName extends RouteName<TRoutes>,
+> = RouteArgs<TRoutes, TName>;
+
+/** The href `useHref` resolves: the path, then the query string and the hash. */
+export type UseHrefResult = string;

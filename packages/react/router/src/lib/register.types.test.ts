@@ -1,6 +1,7 @@
 import type { SearchParamKey, StandardSchemaV1 } from "@canonical/router-core";
 import { route } from "@canonical/router-core";
 import { describe, expectTypeOf, it } from "vitest";
+import useHref from "./hooks/useHref.js";
 import useSearchParam from "./hooks/useSearchParam.js";
 import type useSearchParams from "./hooks/useSearchParams.js";
 import type { RegisteredRouteMap } from "./register.js";
@@ -75,5 +76,23 @@ describe("SearchParamKey against a registered route map", () => {
     type Selected = ReturnType<typeof useSearchParams<readonly ["nope"]>>;
 
     expectTypeOf<Selected>().not.toBeNever();
+  });
+});
+
+describe("useHref against a registered route map", () => {
+  // `expectTypeOf(useHref)` would erase the generics to their constraints,
+  // so these assertions type real calls inside a function that never runs.
+  it("infers the route name without generics", () => {
+    void (() => {
+      expectTypeOf(useHref("home")).toEqualTypeOf<string>();
+      useHref("results", { search: { page: "2", q: "x" } });
+    });
+  });
+
+  it("rejects a name no registered route declares", () => {
+    void (() => {
+      // @ts-expect-error - "nope" is not a registered route name.
+      useHref("nope");
+    });
   });
 });

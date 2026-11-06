@@ -1,6 +1,7 @@
 export * from "./types.js";
 export type { BlockerState } from "./useBlocker.js";
 export { default as useBlocker } from "./useBlocker.js";
+export { default as useHref } from "./useHref.js";
 export { default as useNavigationState } from "./useNavigationState.js";
 export { default as useRoute } from "./useRoute.js";
 export { default as useRouter } from "./useRouter.js";

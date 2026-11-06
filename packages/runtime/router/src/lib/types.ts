@@ -301,6 +301,7 @@ export interface AnyRoute {
   render(params: Readonly<Record<string, unknown>>): string;
 }
 
+/** A route with `TWrapper` prepended to its wrappers, outermost first. */
 export type PrependWrapper<
   TWrapper extends AnyWrapper,
   TRoute extends AnyRoute,
@@ -308,12 +309,23 @@ export type PrependWrapper<
   readonly wrappers: readonly [TWrapper, ...TRoute["wrappers"]];
 };
 
+/** A route list whose every route has `TWrapper` prepended to its wrappers; positions are preserved. */
 export type GroupedRoutes<
   TWrapper extends AnyWrapper,
   TRoutes extends readonly AnyRoute[],
 > = {
   readonly [TIndex in keyof TRoutes]: TRoutes[TIndex] extends AnyRoute
     ? PrependWrapper<TWrapper, TRoutes[TIndex]>
+    : never;
+};
+
+/** A route record whose every route has `TWrapper` prepended to its wrappers; keys are preserved. */
+export type GroupedRouteMap<
+  TWrapper extends AnyWrapper,
+  TRoutes extends RouteMap,
+> = {
+  readonly [TName in keyof TRoutes]: TRoutes[TName] extends AnyRoute
+    ? PrependWrapper<TWrapper, TRoutes[TName]>
     : never;
 };
 

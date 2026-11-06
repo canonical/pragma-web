@@ -118,6 +118,7 @@ Important distinction:
 - `useSearchParams()` returns all search params or a selected subset of keys.
 - `useNavigationState()` returns the router's navigation lifecycle state.
 - `useRouter()` returns the router instance itself.
+- `useHref()` returns the href of a named route without subscribing to router state.
 
 ## Data ownership
 
@@ -479,6 +480,7 @@ The reference integration lives in [apps/react/boilerplate-vite](../../../apps/r
 - `renderToStream()` — load a URL into a router and stream the matched React output with dehydrated state and a bootstrap script.
 - `RouterRegister` / `RegisteredRouteMap` / `RegisteredNotFound` — module-augmentation hooks for generics-free typing.
 - `useBlocker()` — block navigation when the component has unsaved state.
+- `useHref()` — resolve a named route's href, typed like `Link`.
 - `useNavigationState()` — subscribe to the navigation lifecycle state.
 - `useRoute()` — subscribe to a tracked location object.
 - `useRouter()` — read the router instance from context.
