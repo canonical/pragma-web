@@ -40,7 +40,7 @@ describe("useColumnArrangement", () => {
     expect(hook.result.current).toEqual([CORES, NAME]);
   });
 
-  it.fails("keeps the list's reference when a width is written", () => {
+  it("keeps the list's reference when a width is written", () => {
     const { presentation, hook, readRenders } = mount([NAME, STATUS]);
     const columns = hook.result.current;
     const renders = readRenders();
