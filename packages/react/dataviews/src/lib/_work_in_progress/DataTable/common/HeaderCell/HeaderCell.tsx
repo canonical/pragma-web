@@ -63,6 +63,8 @@ const isActivationKey = (event: KeyboardEvent<HTMLButtonElement>): boolean =>
  * beside it; a column that can be neither sorted, hidden nor moved has no
  * menu.
  *
+ * `import { DataTable } from "@canonical/dataviews-react";`
+ *
  * @implements ds:apps.subcomponent.data_table-header_cell
  */
 export default function HeaderCell({
@@ -85,6 +87,8 @@ export default function HeaderCell({
   bounds,
   width,
   labelId,
+  className,
+  ...rest
 }: HeaderCellProps): ReactElement {
   const messages = useContext(MessagesContext);
   // Whether Shift was held when a key began activating the button: a click
@@ -115,8 +119,9 @@ export default function HeaderCell({
     // biome-ignore lint/a11y/useSemanticElements: <th> is only valid inside a <table>, and this grid is deliberately not one
     // biome-ignore lint/a11y/useFocusableInteractive: the header is structure, not a widget — its sort control and resize handle carry the focus
     <div
+      {...rest}
       role="columnheader"
-      className={componentCssClassName}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       // Named by its label alone: a reader hears a column's name on every
       // cell, and the menu's button, the resize handle and a refusal's
       // message would otherwise be read into it each time.
