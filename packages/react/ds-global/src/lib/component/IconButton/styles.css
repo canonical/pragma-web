@@ -57,10 +57,13 @@
      block padding is set to 0 and the inline padding follows it: the box is
      2·border + 1lh both ways — square by the same intrinsic sum.
 
-     Specificity and order: every rule here is (0,2,0), like Button's. The
-     padding-inline rule beats `.ds.button { padding-inline }` on source order,
-     which holds because this sheet is imported by a module that imports Button
-     first. Nothing here redeclares a property of Button's density seat on a
+     Specificity and order: the padding-inline rule is on
+     `.ds.button.icon-button`, (0,3,0), so it beats Button's (0,2,0)
+     `.ds.button { padding-inline }` in the same layer wherever the two sheets
+     land in a bundle; it is independent of order. The only other (0,3,0) rule
+     that sets padding-inline is `.ds.button.link`, and IconButton's props
+     refuse `variant`. The other rules here are (0,2,0) and set nothing Button
+     sets. Nothing here redeclares a property of Button's density seat on a
      scoped button: the block-padding rule applies only outside a scope. */
 
   :root {
@@ -76,9 +79,11 @@
     );
   }
 
-  .ds.icon-button {
+  .ds.button.icon-button {
     padding-inline: var(--icon-button-padding-inline);
+  }
 
+  .ds.icon-button {
     /* The baseline carrier: one line of text (a zero-width space), 1lh wide. */
     &::before {
       content: "\200b" / "";
