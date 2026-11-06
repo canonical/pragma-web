@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_MESSAGES as m } from "./DEFAULT_MESSAGES.js";
+import {
+  DIRECTIONS,
+  DEFAULT_MESSAGES as m,
+  NOT_DONE,
+  PENDING,
+  STILL_APPLIES,
+} from "./constants.js";
 
 const exact = (value: number) => ({ kind: "exact", value }) as const;
 const atLeast = (value: number) => ({ kind: "at-least", value }) as const;
@@ -373,5 +379,25 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.rowsSelected(3)).toBe("3 selected");
     expect(m.deselectRows(1)).toBe("Deselect 1 row");
     expect(m.deselectRows(3)).toBe("Deselect 3 rows");
+  });
+});
+
+describe("DIRECTIONS", () => {
+  it("reads each direction as English words it", () => {
+    expect(DIRECTIONS).toEqual({ asc: "ascending", desc: "descending" });
+  });
+});
+
+describe("NOT_DONE and PENDING", () => {
+  it("say what each saved-view command did not do, or is doing", () => {
+    expect(NOT_DONE.remove).toBe("Not deleted");
+    expect(PENDING["save-as"]).toBe("Saving…");
+    expect(Object.keys(NOT_DONE)).toEqual(Object.keys(PENDING));
+  });
+});
+
+describe("STILL_APPLIES", () => {
+  it("says the earlier restriction stands", () => {
+    expect(STILL_APPLIES).toBe("The previous restriction still applies.");
   });
 });
