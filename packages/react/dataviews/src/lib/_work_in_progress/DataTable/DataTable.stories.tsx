@@ -752,20 +752,19 @@ const fixedColumns: readonly DataTableColumn[] = [
   },
   {
     id: "owner",
-    header: ruled("Owner", "fixed 120 · takes the rest"),
+    header: ruled("Owner", "fixed 120"),
     sizing: { kind: "fixed", px: 120 },
   },
 ];
 
 /**
- * Last column takes the rest: every column here is fixed, and together they
- * are narrower than the frame. Rather than leave a gap at the table's edge,
- * the last column takes whatever width the others leave — Owner declares
- * 120 and shows more. Narrow Host and Owner grows by the same amount; widen
- * Host and Owner gives it back, down to its own 120, after which the table
- * scrolls.
+ * Space after fixed columns: every column here is fixed, and together they
+ * are narrower than the frame. Each keeps its declared width, Owner its 120,
+ * and the space past the last is the table's, left empty rather than
+ * stretching a column past its declaration. A flexible last column would
+ * take it, up to its own maximum.
  */
-export const LastColumnTakesTheRest: Story = {
+export const SpaceAfterFixedColumns: Story = {
   parameters: consumerCode({
     parts: tableParts,
     declarations: `const columns: readonly DataTableColumn[] = [
@@ -779,8 +778,10 @@ export const LastColumnTakesTheRest: Story = {
   render: renderMachines(fixedColumns),
   play: async ({ canvas }) => {
     await expect(
-      widthOf(await canvas.findByRole("columnheader", { name: "Owner" })),
-    ).toBeGreaterThan(120);
+      Math.round(
+        widthOf(await canvas.findByRole("columnheader", { name: "Owner" })),
+      ),
+    ).toBe(120);
   },
 };
 
