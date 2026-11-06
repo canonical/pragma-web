@@ -92,6 +92,7 @@ describe("createGraphQLMachineSource", () => {
           ...EMPTY_SLICE,
           filter: [
             { field: "status", operator: "isAny", operands: ["failed"] },
+            { field: "status", operator: "isNone", operands: ["pending"] },
             { field: "cores", operator: "gte", operands: [4] },
             { field: "cores", operator: "lte", operands: [16] },
             { field: "name", operator: "contains", operands: ["web"] },
@@ -99,7 +100,10 @@ describe("createGraphQLMachineSource", () => {
             { field: "owner", operator: "contains", operands: ["ex:"] },
           ],
           search: "ivy",
-          sort: [{ field: "cores", direction: "desc" }],
+          sort: [
+            { field: "cores", direction: "desc" },
+            { field: "name", direction: "asc" },
+          ],
         },
         window: DEFAULT_WINDOW,
         facets: [],
@@ -115,6 +119,7 @@ describe("createGraphQLMachineSource", () => {
         after: null,
         where: {
           status: ["failed"],
+          statusIsNone: ["pending"],
           coresGte: 4,
           coresLte: 16,
           nameContains: "web",
@@ -122,7 +127,10 @@ describe("createGraphQLMachineSource", () => {
           ownerContains: "ex:",
           search: "ivy",
         },
-        orderBy: [{ field: "cores", direction: "DESC" }],
+        orderBy: [
+          { field: "cores", direction: "DESC" },
+          { field: "name", direction: "ASC" },
+        ],
       },
     });
   });

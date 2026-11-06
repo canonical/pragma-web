@@ -5,6 +5,7 @@ import {
   type SourceRequest,
 } from "@canonical/dataviews-core";
 import { describe, expect, it } from "vitest";
+import createFailingSource from "./createFailingSource.js";
 import createUncountedSource from "./createUncountedSource.js";
 import type { Machine } from "./types.js";
 
@@ -45,5 +46,11 @@ describe("createUncountedSource", () => {
         },
       },
     });
+  });
+
+  it("passes a delivery that is not a page through as it is", () => {
+    expect(deliveries(createUncountedSource(createFailingSource()))).toEqual(
+      deliveries(createFailingSource()),
+    );
   });
 });
