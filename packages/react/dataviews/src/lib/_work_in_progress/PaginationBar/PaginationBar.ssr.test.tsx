@@ -1,0 +1,119 @@
+import { createMemoryLocation, createPage } from "@canonical/dataviews-core";
+import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { renderToString } from "react-dom/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { createStandInViewStore } from "../../../../testing/createStandInStores.js";
+import {
+  createMachineProvider,
+  machine,
+} from "../../../../testing/machines.js";
+import PaginationBar from "./PaginationBar.js";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe("PaginationBar SSR", () => {
+  it("renders on the server, claiming nothing before results", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { provider } = createMachineProvider();
+    const html = renderToString(<PaginationBar provider={provider} />);
+    expect(html).toContain('aria-label="Pagination"');
+    expect(html).toContain("Rows per page");
+    // No count yet, so no total and an empty summary.
+    expect(html).not.toContain('class="total"');
+    expect(html).toMatch(/class="summary"[^>]*><\/span>/);
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("renders the same markup twice and asks the source for nothing", () => {
+    // No effect runs on the server, so the bar never observes the provider:
+    // the source is not executed, and two renders of one provider agree.
+    const { provider, source } = createMachineProvider();
+    const html = renderToString(<PaginationBar provider={provider} />);
+    expect(renderToString(<PaginationBar provider={provider} />)).toBe(html);
+    expect(source.calls).toHaveLength(0);
+    expect(provider.state.get().pendingRequestId).toBe(null);
+  });
+
+  it("renders the baseline's links and forms from the query the location carries", () => {
+    const location = createMemoryLocation({
+      href: "/machines?tab=overview&page=2&size=2",
+    });
+    const { provider, source } = createMachineProvider({ location });
+    const host = readProviderHost(provider);
+    host.complete(host.refresh(), {
+      status: "succeeded",
+      page: createPage({
+        rows: [machine("m3", "three"), machine("m4", "four")],
+        matched: 6,
+        total: 6,
+      }),
+    });
+    const html = renderToString(<PaginationBar provider={provider} />);
+    // Every reachable page is a link the encoder spelled, host parameter kept.
+    expect(html).toContain('href="?tab=overview&amp;page=1&amp;size=2"');
+    expect(html).toContain('href="?tab=overview&amp;page=3&amp;size=2"');
+    // The two GET forms, their selects named as the wire spells them.
+    expect(html.match(/<form [^>]*method="get"/g)).toHaveLength(2);
+    expect(html).toContain('name="size"');
+    expect(html).toContain('name="page"');
+    expect(html).toContain('type="hidden" name="tab" value="overview"');
+    expect(source.calls).toHaveLength(0);
+  });
+
+  it("carries the open view in every link and form it spells", () => {
+    const location = createMemoryLocation({
+      href: "/machines?view=x&page=2&size=2",
+    });
+    const { provider } = createMachineProvider({
+      location,
+      views: createStandInViewStore(),
+    });
+    const host = readProviderHost(provider);
+    host.complete(host.refresh(), {
+      status: "succeeded",
+      page: createPage({
+        rows: [machine("m3", "three"), machine("m4", "four")],
+        matched: 6,
+        total: 6,
+      }),
+    });
+    const html = renderToString(<PaginationBar provider={provider} />);
+    expect(html).toContain('href="?view=x&amp;page=1&amp;size=2"');
+    expect(html).toContain('type="hidden" name="view" value="x"');
+  });
+
+  it("renders results the provider already holds", () => {
+    const { provider, source } = createMachineProvider({
+      snapshot: { query: "page=1&size=2", presentation: {} },
+    });
+    // Fed through the host by hand: nothing observes the provider here.
+    const host = readProviderHost(provider);
+    host.complete(host.refresh(), {
+      status: "succeeded",
+      page: createPage({
+        rows: [machine("m1", "one"), machine("m2", "two")],
+        matched: 5,
+        total: 5,
+      }),
+    });
+    const html = renderToString(<PaginationBar provider={provider} />);
+    expect(html).toContain("Showing 1–2 out of 5 rows");
+    expect(html).toContain("of 3 pages");
+    expect(source.calls).toHaveLength(0);
+  });
+
+  it("carries the words it is given in the server's markup", () => {
+    const { provider } = createMachineProvider();
+    const html = renderToString(
+      <PaginationBar
+        provider={provider}
+        messages={{ rowsPerPage: "Lignes par page", pagination: "Pages" }}
+      />,
+    );
+    expect(html).toContain('aria-label="Pages"');
+    expect(html).toContain("Lignes par page");
+    expect(html).not.toContain("Rows per page");
+  });
+});

@@ -1,0 +1,94 @@
+/**
+ * Every DataTable, sort panel, renderer switch, cards, chart prototype and
+ * server-backed story, and the filters' faceted stories, have no axe violation:
+ * the automated half of the evidence the Storybook accessibility addon shows
+ * in its panel, run with the package's tests so a story that gains a
+ * violation fails `test` rather than waiting for someone to open the panel.
+ * Each story renders through its own decorators and args. A table or panel
+ * story is checked as a reader first sees it; a server-backed story once its
+ * play function has run, in the state that leaves — the failure beside the
+ * rows, the refusal beside the header, the text applied with its clear
+ * control — answered by the mock endpoints it declares.
+ *
+ * Necessary evidence, not a conformance claim: jsdom lays nothing out, so
+ * contrast is left to a browser, and axe checks what markup can prove.
+ */
+
+import { composeStories, setProjectAnnotations } from "@storybook/react-vite";
+import { render } from "@testing-library/react";
+import { afterAll, describe, it } from "vitest";
+import preview from "../../../.storybook/preview.js";
+import expectNoAxeViolations from "../../../testing/expectNoAxeViolations.js";
+import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
+import serveMockApi from "../../../testing/serveMockApi.js";
+import * as cardsStories from "../../lib/_work_in_progress/Cards/Cards.stories.js";
+import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
+import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
+import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
+import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
+import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
+import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
+import * as barChartStories from "../../lib/_work_in_progress/FacetBarChart/FacetBarChart.stories.js";
+import * as rangeChartStories from "../../lib/_work_in_progress/FacetRangeChart/FacetRangeChart.stories.js";
+import * as switchStories from "../../lib/_work_in_progress/RendererSwitch/RendererSwitch.stories.js";
+import {
+  createGraphQLHandlers,
+  createRestHandlers,
+} from "../../storybook/machines/api/index.js";
+
+// The package's own preview, as Storybook applies it, so every story here
+// renders with the parameters and annotations it has in Storybook.
+setProjectAnnotations([preview]);
+
+// Storybook's MSW addon serves the stories' handlers through a service
+// worker, which jsdom lacks: msw/node answers the same handlers here instead.
+serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
+
+/** The stories checked as first rendered, by the part they show. */
+const rendered = {
+  DataTable: composeStories(tableStories),
+  SortPanel: composeStories(panelStories),
+  Settings: composeStories(settingsStories),
+  RendererSwitch: composeStories(switchStories),
+};
+
+/** The stories checked once their play function has run, by part. */
+const played = {
+  "REST API": composeStories(restStories),
+  "GraphQL API": composeStories(graphqlStories),
+  Cards: composeStories(cardsStories),
+  FacetBarChart: composeStories(barChartStories),
+  FacetRangeChart: composeStories(rangeChartStories),
+  Filters: Object.fromEntries(
+    Object.entries(composeStories(filtersStories)).filter(([name]) =>
+      FACETED_FILTER_STORIES.has(name),
+    ),
+  ),
+};
+
+describe("stories have no axe violations", () => {
+  for (const [part, stories] of Object.entries(rendered)) {
+    for (const [name, Story] of Object.entries(stories)) {
+      it(`${part} ${name}`, async () => {
+        const { container } = render(<Story />);
+        await expectNoAxeViolations(container);
+      });
+    }
+  }
+
+  for (const [part, stories] of Object.entries(played)) {
+    for (const [name, Story] of Object.entries(stories)) {
+      it(`${part} ${name}`, async () => {
+        // A story's run removes the one before it; its own markup is in the
+        // page until the next.
+        await Story.run();
+        await expectNoAxeViolations(document.body);
+      });
+    }
+  }
+
+  // The last story run is removed by no later one.
+  afterAll(() => {
+    document.body.innerHTML = "";
+  });
+});

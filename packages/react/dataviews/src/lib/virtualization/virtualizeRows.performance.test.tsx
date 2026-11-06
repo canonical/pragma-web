@@ -1,0 +1,259 @@
+/**
+ * The virtualized table's share of the representative performance suite, as
+ * far as jsdom takes it: bounded DOM at every scroll position of a large
+ * local window, work in proportion to the rows entering the range, no row
+ * work for a selection or a resize, variable-height rows, and repeated
+ * mounting that leaves nothing subscribed. Layout, paint and latency need
+ * a browser and are not measured here.
+ */
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import elementAt from "../../../testing/elementAt.js";
+import {
+  createMachineProvider,
+  type Machine,
+  machine,
+} from "../../../testing/machines.js";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "../_work_in_progress/DataTable/index.js";
+import type { DisplayFieldCellProps } from "../common/index.js";
+import virtualizeRows from "./virtualizeRows.js";
+
+const rows: readonly Machine[] = Array.from({ length: 10_000 }, (_, position) =>
+  machine(`m-${position}`, `host-${position}`),
+);
+
+/** 32px rows in a 640px viewport: twenty in view, four more past each edge. */
+const rowHeight = 32;
+const inView = 640 / rowHeight;
+const mountedAtMost = inView + 1 + 2 * 4;
+
+let cellRenders = 0;
+
+/** A cell that counts its renders: every mounted row renders one. */
+function CountedCell({ value }: DisplayFieldCellProps) {
+  cellRenders += 1;
+  return <>{String(value)}</>;
+}
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Name", cell: CountedCell, resizable: true },
+  { id: "status", header: "Status" },
+];
+
+/** A ResizeObserver the test drives. */
+class FakeResizeObserver {
+  static live: FakeResizeObserver[] = [];
+  readonly observed = new Set<Element>();
+  readonly #callback: ResizeObserverCallback;
+  constructor(callback: ResizeObserverCallback) {
+    this.#callback = callback;
+    FakeResizeObserver.live.push(this);
+  }
+  observe(target: Element): void {
+    this.observed.add(target);
+  }
+  unobserve(target: Element): void {
+    this.observed.delete(target);
+  }
+  disconnect(): void {
+    this.observed.clear();
+  }
+  report(sizes: readonly (readonly [Element, number])[]): void {
+    this.#callback(
+      sizes.map(([target, height]) => ({
+        target,
+        borderBoxSize: [{ blockSize: height, inlineSize: 800 }],
+      })) as unknown as ResizeObserverEntry[],
+      this as unknown as ResizeObserver,
+    );
+  }
+}
+
+/**
+ * A virtualized table over all ten thousand rows, scrolled to the top. The
+ * source answers the table's first request at once, so the rows are there
+ * after the table's effect observes the provider.
+ */
+const largeTable = (selectable = false) => {
+  const { provider } = createMachineProvider({ rows });
+  const view = render(
+    <DataTable
+      provider={provider}
+      columns={columns}
+      label="Machines"
+      selectable={selectable}
+      virtualization={virtualizeRows({ estimatedRowHeight: rowHeight })}
+    />,
+  );
+  const table = screen.getByRole("table");
+  Object.defineProperty(table, "scrollTop", {
+    value: 0,
+    writable: true,
+    configurable: true,
+  });
+  return { provider, view, table };
+};
+
+const scrollTo = (table: HTMLElement, top: number): void => {
+  act(() => {
+    table.scrollTop = top;
+    fireEvent.scroll(table);
+  });
+};
+
+/** How many elements a subtree is: its root and every element under it. */
+const countElements = (root: Element): number =>
+  1 + root.querySelectorAll("*").length;
+
+/** The body rows mounted right now. */
+const mountedRows = (table: HTMLElement): HTMLElement[] => [
+  ...table.querySelectorAll<HTMLElement>(
+    '.ds.data-table-row-group.body > [role="row"]',
+  ),
+];
+
+beforeEach(() => {
+  cellRenders = 0;
+  FakeResizeObserver.live = [];
+  vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+  vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(
+    function (this: HTMLElement) {
+      return this.getAttribute("role") === "table" ? 640 : 0;
+    },
+  );
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
+describe("virtualized DataTable, bounded work", () => {
+  // Every hundredth row of the window, a quarter of it per case: each
+  // scroll mounts a range none before it held.
+  it.each([0, 1, 2, 3])(
+    "mounts a bounded range of a 10,000-row window at every scroll position, quarter %i",
+    (quarter) => {
+      const { table } = largeTable();
+      // What the range may hold, as first drawn: one row's elements, and
+      // the frame around the rows — the header, the body and its gaps.
+      const [firstRow] = mountedRows(table);
+      if (firstRow === undefined) {
+        throw new Error("the window mounts no row");
+      }
+      const perRow = countElements(firstRow);
+      const frame =
+        table.querySelectorAll("*").length -
+        mountedRows(table).reduce((sum, row) => sum + countElements(row), 0);
+      // Away from the top a second gap stands before the rows.
+      const elementsAtMost = frame + 1 + mountedAtMost * perRow;
+      const span = (rows.length * rowHeight) / 4;
+      for (let top = quarter * span; top < (quarter + 1) * span; top += 3_200) {
+        scrollTo(table, top);
+        const mounted = mountedRows(table);
+        expect(mounted.length).toBeLessThanOrEqual(mountedAtMost);
+        expect(mounted.length).toBeGreaterThanOrEqual(inView);
+        // The row at the viewport's top is among them, at its position.
+        expect(
+          mounted.some(
+            (row) =>
+              row.getAttribute("aria-rowindex") === String(top / rowHeight + 2),
+          ),
+        ).toBe(true);
+        // Every element under the table, gaps and cells included, is
+        // bounded by the range at every scroll, rather than the window: an
+        // element left behind by one scroll fails the next.
+        expect(table.querySelectorAll("*").length).toBeLessThanOrEqual(
+          elementsAtMost,
+        );
+      }
+    },
+  );
+
+  it("renders only the rows entering the range as it scrolls", () => {
+    const { table } = largeTable();
+    scrollTo(table, 16_000);
+    for (let step = 1; step <= 20; step += 1) {
+      cellRenders = 0;
+      scrollTo(table, 16_000 + step * 10 * rowHeight);
+      expect(cellRenders).toBe(10);
+    }
+  });
+
+  it("renders no cell for a scroll inside the range, a selection or a resize", () => {
+    const { provider, table } = largeTable(true);
+    scrollTo(table, 16_000);
+    cellRenders = 0;
+    scrollTo(table, 16_005);
+    act(() => {
+      provider.selection.toggle("m-505");
+    });
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Select all displayed rows" }),
+    );
+    fireEvent.keyDown(screen.getByRole("separator"), { key: "ArrowRight" });
+    expect(cellRenders).toBe(0);
+    expect(provider.selection.state.get().ids.size).toBe(rows.length);
+  });
+
+  it("keeps its gaps equal to the rows they stand for, however tall each is", () => {
+    const { table } = largeTable();
+    const measured = mountedRows(table).map(
+      (row, position) => [row, position % 2 === 0 ? 32 : 64] as const,
+    );
+    const firstMeasured = elementAt(measured, 0)[0];
+    const observer = FakeResizeObserver.live.find((candidate) =>
+      candidate.observed.has(firstMeasured),
+    );
+    if (observer === undefined) {
+      throw new Error("no observer is measuring the rows");
+    }
+    act(() => {
+      observer.report(measured);
+    });
+    scrollTo(table, 160_000);
+    const before = elementAt(
+      [...table.querySelectorAll<HTMLElement>(".ds.data-table-gap")],
+      0,
+    );
+    const first = Number(
+      elementAt(mountedRows(table), 0).getAttribute("aria-rowindex"),
+    );
+    // Every row before the first mounted one: the measured ones at their
+    // measured heights, the rest at the estimate.
+    const grown = measured.reduce((total, [, height]) => total + height, 0);
+    expect(before.style.blockSize).toBe(
+      `${grown + (first - 2 - measured.length) * rowHeight}px`,
+    );
+  });
+
+  it("leaves nothing subscribed or observed after repeated mounting", () => {
+    // A hundred rows, more than the viewport holds: what a mount subscribes
+    // and observes does not grow with the rows past its range.
+    const { provider, source } = createMachineProvider({
+      rows: rows.slice(0, 100),
+    });
+    for (let cycle = 0; cycle < 25; cycle += 1) {
+      const { unmount } = render(
+        <DataTable
+          provider={provider}
+          columns={columns}
+          label="Machines"
+          virtualization={virtualizeRows({ estimatedRowHeight: rowHeight })}
+        />,
+      );
+      unmount();
+    }
+    // Each mount observed the provider once and released it: one execution
+    // per mount, every one of them released. A provider's channels are
+    // frozen, so what the table subscribed is read off the source it drove.
+    expect(source.calls).toHaveLength(25);
+    expect(source.calls.every((call) => call.releases === 1)).toBe(true);
+    expect(
+      FakeResizeObserver.live.every((observer) => observer.observed.size === 0),
+    ).toBe(true);
+  });
+});

@@ -1,0 +1,19 @@
+import type { PredicateOperator } from "../query/index.js";
+import { OPERATOR_DELIMITER } from "./constants.js";
+
+/**
+ * The wire key one predicate address is written as: `isAny` is the bare
+ * field name, as the one set operator was always spelled. What a form control
+ * filtering the field is named.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export default function spellWireKey(
+  field: string,
+  operator: PredicateOperator,
+): string {
+  return operator === "isAny"
+    ? field
+    : `${field}${OPERATOR_DELIMITER}${operator}`;
+}

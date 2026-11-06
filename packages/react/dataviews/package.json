@@ -1,0 +1,101 @@
+{
+  "name": "@canonical/dataviews-react",
+  "description": "React bindings for @canonical/dataviews-core: the DataViews root with its connected Search, Filters, SortPanel, Actions, Pagination and SavedViews parts, provider context, the four scoped observation hooks, the DataTable renderer with its explicitly imported row virtualization, and the PaginationBar",
+  "version": "0.45.0",
+  "type": "module",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "style": "dist/esm/lib/index.css",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js"
+    },
+    "./virtualization": {
+      "types": "./dist/types/lib/virtualization/index.d.ts",
+      "import": "./dist/esm/lib/virtualization/index.js"
+    },
+    "./index.css": "./dist/esm/lib/index.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": {
+    "email": "webteam@canonical.com",
+    "name": "Canonical Webteam"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/canonical/pragma-web"
+  },
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/canonical/pragma-web/issues"
+  },
+  "homepage": "https://github.com/canonical/pragma-web#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bun run build:package",
+    "build:all": "bun run build:package && bun run build:storybook",
+    "build:storybook": "storybook build",
+    "build:package": "bun run build:package:tsc && bun run build:package:copycss",
+    "build:package:copycss": "copyfiles -u 1 'src/lib/{,**/}*.css' dist/esm",
+    "build:package:tsc": "tsc -p tsconfig.build.json",
+    "check": "bun run check:biome && bun run check:ts && bun run check:webarchitect",
+    "check:webarchitect": "webarchitect library",
+    "check:fix": "bun run check:biome:fix && bun run check:ts",
+    "check:biome": "biome check",
+    "check:biome:fix": "biome check --write",
+    "check:ts": "tsc --noEmit",
+    "storybook": "storybook dev -p 6010 --no-open --host 0.0.0.0",
+    "test": "vitest run --coverage",
+    "test:keyboard": "playwright test --config testing/playwright.config.ts",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@canonical/dataviews-core": "^0.45.0",
+    "@canonical/react-ds-global": "^0.45.0",
+    "@canonical/react-ds-global-form": "^0.45.0",
+    "@canonical/styles": "^0.45.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.43.0",
+    "@canonical/design-tokens": "0.43.0",
+    "@canonical/storybook-addon-msw": "^0.45.0",
+    "@canonical/storybook-config": "^0.45.0",
+    "@canonical/typescript-config": "0.43.0",
+    "@canonical/typescript-config-react": "^0.45.0",
+    "@canonical/vitest-config-react": "^0.45.0",
+    "@canonical/webarchitect": "0.43.0",
+    "@chromatic-com/storybook": "^5.0.1",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/react-vite": "^10.6.0",
+    "@tanstack/query-core": "^5.102.8",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.0",
+    "@vitest/coverage-v8": "^5.0.0",
+    "axe-core": "^4.11.1",
+    "copyfiles": "^2.4.1",
+    "jsdom": "^28.1.0",
+    "msw": "^3.0.0",
+    "playwright": "^1.61.1",
+    "relay-runtime": "^21.0.1",
+    "storybook": "^10.6.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.0.1",
+    "vitest": "^5.0.0"
+  }
+}

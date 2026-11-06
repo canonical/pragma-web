@@ -1,0 +1,82 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Pagination.stories";
+
+<Meta of={Stories} name="Recipes" />
+
+# DataViews.Pagination recipes
+
+`DataViews.Pagination` is the pagination bar bound to the enclosing `DataViews` root. It renders exactly what `PaginationBar` renders (its own recipes are the **PaginationBar / Recipes** page) — the page size, the summary, the page select and its four page controls — for the root's provider. The one difference is where the provider comes from: the part reads the root it is placed in, and throws outside one.
+
+Use the part inside a composition and the bar beside a standalone table. The two never mix: the part takes no provider prop, and the bar never reads a root.
+
+## In a composition
+
+The part takes presentation choices — a name, the page sizes — and never a second copy of the window the provider owns. Moving it means moving the element: it can sit anywhere inside the root. The root observes the provider for as long as it is mounted, and that is what starts the source; the parts inside it read what the provider holds.
+
+```tsx
+import {
+  createArraySource,
+  createDataViewsProvider,
+} from "@canonical/dataviews-core";
+import {
+  DataTable,
+  DataViews,
+  type DataTableColumn,
+} from "@canonical/dataviews-react";
+import { useState } from "react";
+import { machineCollection, machines } from "./machines.js";
+
+const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host" },
+  { id: "status", header: "Status" },
+  { id: "owner", header: "Owner" },
+];
+
+export function Machines() {
+  // Built once: the root observes it, which starts its source.
+  const [provider] = useState(() =>
+    createDataViewsProvider({
+      collection: machineCollection,
+      source: createArraySource({
+        rows: machines,
+        collection: machineCollection,
+        searchFields: ["name", "owner"],
+      }),
+      snapshot: { query: "page=1&size=5", presentation: {} },
+    }),
+  );
+  return (
+    <DataViews provider={provider}>
+      <DataTable provider={provider} columns={columns} label="Machines" />
+      <DataViews.Pagination label="Machines pagination" sizes={[5, 10, 25]} />
+    </DataViews>
+  );
+}
+```
+
+<Canvas of={Stories.InAComposition} sourceState="none" />
+
+## A filtered total
+
+The summary and the page total describe the current query. Filter the collection and both follow the source's new count; while the new count is on its way, they say nothing rather than repeat the old one. A query the collection should open on is in the provider's `snapshot`: the story below starts on failed machines only.
+
+```tsx
+import {
+  createArraySource,
+  createDataViewsProvider,
+} from "@canonical/dataviews-core";
+
+const [provider] = useState(() =>
+  createDataViewsProvider({
+    collection: machineCollection,
+    source: createArraySource({
+      rows: machines,
+      collection: machineCollection,
+      searchFields: ["name", "owner"],
+    }),
+    snapshot: { query: "status=failed&size=5", presentation: {} },
+  }),
+);
+```
+
+<Canvas of={Stories.AFilteredTotal} sourceState="none" />
