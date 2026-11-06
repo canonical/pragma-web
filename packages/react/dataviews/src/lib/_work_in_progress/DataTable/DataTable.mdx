@@ -136,7 +136,7 @@ const columns: readonly DataTableColumn[] = [
 
 ## Resizing and its limits
 
-`resizable` puts a control on a column's trailing edge, driven by the pointer or the keyboard — arrow keys step the edge, Escape abandons a drag. Every resize is held to the column's declared `minPx` and `maxPx`, however often it has been resized, and a column widened past the container scrolls the table so the edge being moved stays in view.
+`resizable` puts a control on a column's trailing edge, driven by the pointer or the keyboard — a drag, or a press on the edge and then a press in the header row where the column should end, so resizing never needs a drag; arrow keys step the edge, and Escape abandons a drag or a placement. Right to left, the edge is on the left, and a drag, the arrow keys and the placing press all follow it. A press on the edge that does not travel changes nothing until the second press. Every resize is held to the column's declared `minPx` and `maxPx`, however often it has been resized, and a column widened past the container scrolls the table so the edge being moved stays in view.
 
 The last column never gets a control, even when it is declared `resizable`: its trailing edge is the table's own edge, with nothing beyond it to resize against. It takes whatever width the others leave instead. Two tables on one provider read one presentation, the provider's, so a resize in either is the arrangement of both and nothing is passed between them; the presentation also holds the column order and which columns are hidden, and a column may declare `hideable: false` to stay in every arrangement.
 

@@ -553,6 +553,19 @@ export const HorizontalScroll: Story = {
   render: renderMachines(sizedColumns),
 };
 
+/** The code a resizable table's stories show. */
+const resizableCode = consumerCode({
+  parts: tableParts,
+  declarations: `const columns: readonly DataTableColumn[] = [
+  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
+  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
+  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
+  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
+  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 }, resizable: true },
+];`,
+  render: tableCode,
+});
+
 /**
  * Resizable: Host and Region carry a resize control at their trailing edge.
  * Drag it to set the column's width; the preview is live and nothing is
@@ -569,17 +582,7 @@ export const HorizontalScroll: Story = {
  * so it has no control and takes whatever width the others leave.
  */
 export const Resizable: Story = {
-  parameters: consumerCode({
-    parts: tableParts,
-    declarations: `const columns: readonly DataTableColumn[] = [
-  { id: "name", header: "Host", sizing: { kind: "flex", weight: 2, minPx: 160 }, resizable: true },
-  { id: "status", header: "Status", sizing: { kind: "fixed", px: 112 } },
-  { id: "region", header: "Region", sizing: { kind: "flex", weight: 1, minPx: 96, maxPx: 144 }, resizable: true },
-  { id: "cores", header: "Cores", sizing: { kind: "fixed", px: 80 } },
-  { id: "owner", header: "Owner", sizing: { kind: "flex", weight: 1, minPx: 96 }, resizable: true },
-];`,
-    render: tableCode,
-  }),
+  parameters: resizableCode,
   decorators: [withFrame("48rem")],
   render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
   play: async ({ canvas }) => {
@@ -610,6 +613,78 @@ export const MixedResizableColumns: Story = {
   }),
   decorators: [withFrame("48rem")],
   render: renderMachines(resizing(plainColumns, ["name", "region"])),
+};
+
+/**
+ * Resize without dragging: a press on a column's edge that does not travel
+ * starts placing it, and the next press in the header row says where the
+ * column should end. The edge takes the focus colour and a hint shows under
+ * the heading until then; a press on the edge again, a press outside the
+ * header row, Escape or leaving the column cancels with nothing changed.
+ * Host has been pressed once, then pressed again where it should end.
+ */
+export const ResizeWithoutDragging: Story = {
+  parameters: resizableCode,
+  decorators: [withFrame("48rem")],
+  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByRole("separator", { name: /^Host/ });
+    const before = Number(host.getAttribute("aria-valuenow"));
+    const edge = host.getBoundingClientRect();
+    const centre = edge.top + edge.height / 2;
+    await userEvent.pointer({
+      keys: "[MouseLeft]",
+      target: host,
+      coords: { clientX: edge.left + edge.width / 2, clientY: centre },
+    });
+    await expect(host.parentElement).toHaveAttribute("data-mode", "placing");
+    await expect(host).toHaveAccessibleDescription(
+      "Click or tap in the header row where the Host column should end. Press the edge again or Escape to cancel.",
+    );
+    const status = canvas.getByRole("columnheader", { name: "Status" });
+    await userEvent.pointer({
+      keys: "[MouseLeft]",
+      target: status,
+      coords: { clientX: edge.right + 40, clientY: centre },
+    });
+    await expect(host.parentElement).not.toHaveAttribute("data-mode");
+    await expect(Number(host.getAttribute("aria-valuenow"))).toBeGreaterThan(
+      before,
+    );
+  },
+};
+
+/**
+ * The state between the two presses: the Host column's edge is being
+ * placed, so its hairline is a focused one and the hint below the heading
+ * says where to press and how to cancel. The story ends there.
+ */
+export const PlacingAColumnsEdge: Story = {
+  name: "Placing a column's edge",
+  parameters: resizableCode,
+  decorators: [withFrame("48rem")],
+  render: renderMachines(resizing(sizedColumns, ["name", "region", "owner"])),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByRole("separator", { name: /^Host/ });
+    const edge = host.getBoundingClientRect();
+    await userEvent.pointer({
+      keys: "[MouseLeft]",
+      target: host,
+      coords: {
+        clientX: edge.left + edge.width / 2,
+        clientY: edge.top + edge.height / 2,
+      },
+    });
+    await expect(host.parentElement).toHaveAttribute("data-mode", "placing");
+    await expect(host).toHaveAccessibleDescription(
+      "Click or tap in the header row where the Host column should end. Press the edge again or Escape to cancel.",
+    );
+    // The hint the handle is described by is drawn, not only read.
+    const hint = host.ownerDocument.getElementById(
+      host.getAttribute("aria-describedby") ?? "",
+    );
+    await expect(hint).toBeVisible();
+  },
 };
 
 const boundedColumns: readonly DataTableColumn[] = [

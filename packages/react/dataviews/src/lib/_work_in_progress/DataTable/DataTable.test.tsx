@@ -2221,7 +2221,10 @@ describe("DataTable", () => {
           { id: "status", header: "Status" },
         ],
       });
-      fireEvent.pointerDown(screen.getByRole("separator"), { clientX: 0 });
+      fireEvent.pointerDown(screen.getByRole("separator"), {
+        isPrimary: true,
+        clientX: 0,
+      });
       fireEvent.pointerMove(window, { clientX: 180 });
       act(() => {
         for (const frame of frames.splice(0)) {
@@ -2503,7 +2506,10 @@ describe("DataTable", () => {
           .style.getPropertyValue("--data-table-columns");
       measure(400);
       expect(readTracks()).toBe("100px 300px");
-      fireEvent.pointerDown(screen.getByRole("separator"), { clientX: 0 });
+      fireEvent.pointerDown(screen.getByRole("separator"), {
+        isPrimary: true,
+        clientX: 0,
+      });
       fireEvent.pointerMove(window, { clientX: 50 });
       act(() => {
         for (const frame of frames.splice(0)) {
@@ -2512,7 +2518,7 @@ describe("DataTable", () => {
       });
       // The last column follows the edge being dragged, before any commit.
       expect(readTracks()).toBe("150px 250px");
-      fireEvent.pointerUp(window);
+      fireEvent.pointerUp(window, { clientX: 50 });
       expect(readTracks()).toBe("150px 250px");
       // Once the columns no longer fit, nothing is stretched: the table
       // scrolls instead.
@@ -2607,7 +2613,7 @@ describe("DataTable", () => {
       // A drag reveals the edge on every render it causes: the capture, each
       // published frame, and the commit.
       place(200);
-      fireEvent.pointerDown(handle, { clientX: 0 });
+      fireEvent.pointerDown(handle, { isPrimary: true, clientX: 0 });
       expect(scrolled).toBe(106);
       place(230);
       fireEvent.pointerMove(window, { clientX: 40 });
@@ -2617,7 +2623,7 @@ describe("DataTable", () => {
         }
       });
       expect(scrolled).toBe(222);
-      fireEvent.pointerUp(window);
+      fireEvent.pointerUp(window, { clientX: 40 });
       expect(scrolled).toBe(338);
     } finally {
       vi.unstubAllGlobals();
@@ -2754,6 +2760,23 @@ describe("DataTable", () => {
           { id: "status", header: "Status" },
         ],
       });
+      await expectNoAxeViolations(view.container);
+    });
+
+    it("has no axe violation while a column's edge is being placed", async () => {
+      const { view } = loadedTable(undefined, {
+        columns: [
+          { id: "name", header: "Name", sortable: true, resizable: true },
+          { id: "status", header: "Status" },
+        ],
+      });
+      const handle = screen.getByRole("separator");
+      fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
+      act(() => {
+        fireEvent.pointerUp(window, { clientX: 100 });
+      });
+      expect(handle.parentElement).toHaveAttribute("data-mode", "placing");
+      expect(handle).toHaveAccessibleDescription(/Press the edge again/);
       await expectNoAxeViolations(view.container);
     });
 
