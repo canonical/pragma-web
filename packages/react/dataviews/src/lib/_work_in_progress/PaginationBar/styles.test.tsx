@@ -16,10 +16,8 @@ import { fileURLToPath } from "node:url";
 import { createPage } from "@canonical/dataviews-core";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../testing/machines.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import machine from "../../../../testing/machine.js";
 import PaginationBar from "./PaginationBar.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));

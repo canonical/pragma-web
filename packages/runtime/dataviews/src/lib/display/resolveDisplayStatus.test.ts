@@ -7,12 +7,10 @@
  * completed by hand with what a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import {
-  failedWith,
-  pageOf,
-  readIssuedRequest,
-  refusedWith,
-} from "../../../testing/fixtures.js";
+import failedWith from "../../../testing/failedWith.js";
+import pageOf from "../../../testing/pageOf.js";
+import readIssuedRequest from "../../../testing/readIssuedRequest.js";
+import refusedWith from "../../../testing/refusedWith.js";
 import {
   createQueryCoordinator,
   type DataViewsState,

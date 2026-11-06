@@ -7,7 +7,7 @@
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider } from "../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import DataViews from "../../Provider.js";
 import Search from "./Search.js";
 

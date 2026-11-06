@@ -13,8 +13,9 @@
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { createStandInViewStore } from "../../../testing/createStandInStores.js";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0026 — destinations kept a view left behind", () => {

@@ -8,11 +8,9 @@
 
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import machine from "../../../testing/machine.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0017 — the sort panel sent dead buttons before hydration", () => {

@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../testing/fixtures.js";
+import pageOf from "../../../testing/pageOf.js";
 import { createQueryCoordinator } from "../../lib/coordinator/index.js";
 import type { Facet } from "../../lib/result/index.js";
 

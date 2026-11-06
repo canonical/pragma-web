@@ -7,10 +7,8 @@ import { type ReactElement, useState, useSyncExternalStore } from "react";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators.js";
 import { consumerCode } from "../../../../../storybook/machines/consumerCode.js";
-import {
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../../../storybook/machines/story-utils.js";
+import type { MachineProviderConfig } from "../../../../../storybook/machines/types.js";
+import useMachineProvider from "../../../../../storybook/machines/useMachineProvider.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 import Component from "./Search.js";

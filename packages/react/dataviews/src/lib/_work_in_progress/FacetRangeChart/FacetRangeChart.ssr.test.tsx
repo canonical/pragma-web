@@ -7,10 +7,8 @@
 
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import {
-  createFacetedFleet,
-  createFacetedManual,
-} from "../../../../testing/createFacetedProviders.js";
+import createFacetedFleet from "../../../../testing/createFacetedFleet.js";
+import createFacetedManual from "../../../../testing/createFacetedManual.js";
 import FacetRangeChart from "./FacetRangeChart.js";
 
 describe("FacetRangeChart on the server", () => {

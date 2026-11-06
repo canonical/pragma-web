@@ -11,11 +11,12 @@
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Profiler } from "react";
 import { afterEach, describe, expect, it } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "../../../testing/createStandInStores.js";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

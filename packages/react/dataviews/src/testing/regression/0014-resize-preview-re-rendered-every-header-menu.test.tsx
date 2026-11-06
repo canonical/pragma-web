@@ -16,11 +16,9 @@ import type * as DsGlobal from "@canonical/react-ds-global";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import machine from "../../../testing/machine.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 const renders = vi.hoisted(() => ({ count: 0 }));

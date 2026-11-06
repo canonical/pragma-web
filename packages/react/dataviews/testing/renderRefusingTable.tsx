@@ -1,11 +1,9 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { DataTable } from "../src/lib/_work_in_progress/DataTable/index.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type MachineProvider,
-  machine,
-} from "./machines.js";
+import createMachineProvider from "./createMachineProvider.js";
+import declareMachineOrdering from "./declareMachineOrdering.js";
+import machine from "./machine.js";
+import type { MachineProvider } from "./types.js";
 
 /**
  * Render a table over a source ordering by at most one term, with Name

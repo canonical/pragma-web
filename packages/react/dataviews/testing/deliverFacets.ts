@@ -1,7 +1,7 @@
 import { createPage, type Facet } from "@canonical/dataviews-core";
 import { act } from "@testing-library/react";
-import { type Machine, machine } from "./machines.js";
-import type { ManualSource } from "./types.js";
+import machine from "./machine.js";
+import type { Machine, ManualSource } from "./types.js";
 
 /**
  * Answer a manual source's latest request with one machine and these facets:

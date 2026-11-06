@@ -12,7 +12,8 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import machine from "../../../testing/machine.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

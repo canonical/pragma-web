@@ -1,11 +1,9 @@
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import answering from "../../../testing/answering.js";
+import byId from "../../../testing/byId.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import {
-  answering,
-  byId,
-  declare,
-  declareSort,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation } from "../location/index.js";
 import type { ReadonlyChannel } from "../observable/index.js";

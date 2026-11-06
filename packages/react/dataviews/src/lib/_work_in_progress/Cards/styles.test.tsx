@@ -15,10 +15,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../testing/machines.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import machine from "../../../../testing/machine.js";
 import type { DisplayField } from "../../common/index.js";
 import Cards from "./Cards.js";
 

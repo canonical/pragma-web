@@ -10,15 +10,13 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import byId from "../../../testing/byId.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import {
-  byId,
-  declare,
-  declareSort,
-  NOTHING_DECLARED,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
+import pageOf from "../../../testing/pageOf.js";
 import { createCollection } from "../collection/index.js";
 import { createFilterInputs } from "../filter/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";

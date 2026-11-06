@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../testing/fixtures.js";
+import pageOf from "../../../testing/pageOf.js";
 import { createQueryCoordinator } from "../../lib/coordinator/index.js";
 import { DEFAULT_WINDOW, EMPTY_SLICE } from "../../lib/query/index.js";
 

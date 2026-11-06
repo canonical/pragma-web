@@ -8,12 +8,10 @@ import {
 } from "../../../storybook/machines/api/index.js";
 import { SERVER_BACKED_FACETS } from "../../../storybook/machines/constants.js";
 import { consumerCode } from "../../../storybook/machines/consumerCode.js";
-import { createPendingSource } from "../../../storybook/machines/fixtures.js";
+import createPendingSource from "../../../storybook/machines/createPendingSource.js";
 import { createRestMachineSource } from "../../../storybook/machines/sources/index.js";
-import {
-  type MachineProviderConfig,
-  useMachineProvider,
-} from "../../../storybook/machines/story-utils.js";
+import type { MachineProviderConfig } from "../../../storybook/machines/types.js";
+import useMachineProvider from "../../../storybook/machines/useMachineProvider.js";
 import { FacetRangeChart as ConnectedChart } from "../DataViews/common/FacetRangeChart/index.js";
 import { DataViews } from "../DataViews/index.js";
 import Component from "./FacetRangeChart.js";

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import byId from "../../../testing/byId.js";
 import { createCollection } from "../collection/index.js";
 import type { Predicate, PredicateOperator } from "../query/index.js";
 import type { SourceRefusal } from "../result/index.js";

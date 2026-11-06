@@ -17,8 +17,8 @@ import {
   within,
 } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { buildStoredView } from "../../../../../../testing/fixtures.js";
-import { createMachineProvider } from "../../../../../../testing/machines.js";
+import buildStoredView from "../../../../../../testing/buildStoredView.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import DataViews from "../../Provider.js";
 import SavedViews from "./SavedViews.js";
 

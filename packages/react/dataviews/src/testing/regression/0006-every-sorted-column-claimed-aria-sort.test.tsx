@@ -10,12 +10,10 @@
 import { render, screen, within } from "@testing-library/react";
 import { act } from "react";
 import { describe, expect, it } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import elementAt from "../../../testing/elementAt.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 describe("regression 0006 — every sorted column claimed aria-sort", () => {

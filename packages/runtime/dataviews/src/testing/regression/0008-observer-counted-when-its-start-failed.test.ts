@@ -9,9 +9,10 @@
  */
 
 import { describe, expect, it } from "vitest";
+import byId from "../../../testing/byId.js";
 import createCountingViewStore from "../../../testing/createCountingViewStore.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createMemoryLocation } from "../../lib/location/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";

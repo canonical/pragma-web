@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import byId from "../../../testing/byId.js";
 import { createCollection } from "../collection/index.js";
 import { DEFAULT_WINDOW, EMPTY_SLICE } from "../query/index.js";
 import spellLocation from "./spellLocation.js";

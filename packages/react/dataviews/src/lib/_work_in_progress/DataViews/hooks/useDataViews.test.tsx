@@ -14,13 +14,11 @@ import {
 import { act, renderHook } from "@testing-library/react";
 import { type ReactNode, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
+import createMachineProvider from "../../../../../testing/createMachineProvider.js";
 import createManualSource from "../../../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type MachineProvider,
-  machines,
-} from "../../../../../testing/machines.js";
+import { machines } from "../../../../../testing/machines.js";
+import type { MachineProvider } from "../../../../../testing/types.js";
 import { useDataViewsValue } from "../../../hooks/index.js";
 import DataViews from "../Provider.js";
 import useDataViews from "./useDataViews.js";

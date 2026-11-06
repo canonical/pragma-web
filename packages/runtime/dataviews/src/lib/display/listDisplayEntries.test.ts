@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { displayStatusOf } from "../../../testing/fixtures.js";
+import displayStatusOf from "../../../testing/displayStatusOf.js";
 import { DISPLAY_STATUS_PHASES } from "./constants.js";
 import listDisplayEntries from "./listDisplayEntries.js";
 import type { DisplayStatus } from "./types.js";

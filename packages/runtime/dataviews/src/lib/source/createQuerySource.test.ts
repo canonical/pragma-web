@@ -3,7 +3,9 @@ import {
   QueryObserver as TanStackObserver,
 } from "@tanstack/query-core";
 import { describe, expect, it, vi } from "vitest";
-import { byId, declare, declareSort } from "../../../testing/fixtures.js";
+import byId from "../../../testing/byId.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
 import { createCollection } from "../collection/index.js";
 import { createDataViewsProvider } from "../provider/index.js";
 import { DEFAULT_WINDOW, type Slice } from "../query/index.js";

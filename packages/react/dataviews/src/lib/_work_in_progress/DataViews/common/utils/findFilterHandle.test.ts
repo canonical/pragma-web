@@ -3,7 +3,7 @@ import {
   readProviderHost,
 } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider } from "../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import findFilterHandle from "./findFilterHandle.js";
 
 /** The filter records one root would build over the machine provider. */

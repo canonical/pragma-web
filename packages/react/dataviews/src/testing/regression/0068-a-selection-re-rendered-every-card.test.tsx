@@ -7,7 +7,8 @@
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import machine from "../../../testing/machine.js";
 import { Cards } from "../../lib/_work_in_progress/Cards/index.js";
 import type {
   DisplayField,

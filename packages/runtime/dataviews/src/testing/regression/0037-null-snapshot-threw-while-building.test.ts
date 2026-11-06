@@ -8,8 +8,9 @@
  */
 
 import { describe, expect, it } from "vitest";
+import byId from "../../../testing/byId.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 import { EMPTY_SLICE } from "../../lib/query/index.js";

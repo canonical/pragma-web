@@ -12,7 +12,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { declareSort } from "../../../testing/fixtures.js";
+import declareSort from "../../../testing/declareSort.js";
 import { EMPTY_SLICE } from "../../lib/query/index.js";
 import { createSchema } from "../../lib/schema/index.js";
 import { executeSlice } from "../../lib/source/index.js";

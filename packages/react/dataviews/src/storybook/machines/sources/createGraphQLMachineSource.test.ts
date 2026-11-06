@@ -8,7 +8,8 @@ import { describe, expect, it, vi } from "vitest";
 import { DELIVERY_WAIT } from "../../../../testing/constants.js";
 import readFailureReason from "../../../../testing/readFailureReason.js";
 import serveMockApi from "../../../../testing/serveMockApi.js";
-import { type Machine, machines } from "../fixtures.js";
+import { machines } from "../fixtures.js";
+import type { Machine } from "../types.js";
 import createGraphQLMachineSource from "./createGraphQLMachineSource.js";
 
 // Each test answers the one request its source sends its own way.

@@ -13,14 +13,12 @@ import {
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import { createStandInPresentationStore } from "../../../../testing/createStandInStores.js";
-import { deliverRows } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-  machines,
-} from "../../../../testing/machines.js";
+import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
+import deliverRows from "../../../../testing/deliverRows.js";
+import machine from "../../../../testing/machine.js";
+import { machines } from "../../../../testing/machines.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./types.js";
 

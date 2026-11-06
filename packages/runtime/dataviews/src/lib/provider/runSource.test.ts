@@ -1,11 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
+import byId from "../../../testing/byId.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import {
-  byId,
-  declare,
-  declareSort,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import pageOf from "../../../testing/pageOf.js";
 import { createCollection } from "../collection/index.js";
 import type { DataViewsState } from "../coordinator/index.js";
 import { DEFAULT_WINDOW, type Query, type Slice } from "../query/index.js";

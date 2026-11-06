@@ -2,11 +2,9 @@ import { createMemoryLocation, createPage } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import { createStandInViewStore } from "../../../../testing/createStandInStores.js";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../testing/machines.js";
+import machine from "../../../../testing/machine.js";
 import PaginationBar from "./PaginationBar.js";
 
 afterEach(() => {

@@ -4,11 +4,9 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { deliverRows } from "../../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import deliverRows from "../../../../../../testing/deliverRows.js";
+import machine from "../../../../../../testing/machine.js";
 import { BodyCell } from "./index.js";
 
 /**

@@ -11,11 +11,9 @@ import { act, within } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import machine from "../../../testing/machine.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 
 describe("regression 0009 — a header link's focus lost on hydration", () => {
