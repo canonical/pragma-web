@@ -47,8 +47,7 @@ describe("IconButton stylesheet", () => {
     expect(button).toHaveClass("ds", "button", "icon-button");
   });
 
-  // Fails until the padding rule moves to `.ds.button.icon-button`.
-  it.fails("sets the inline padding on .ds.button.icon-button, independent of order", () => {
+  it("sets the inline padding on .ds.button.icon-button, independent of order", () => {
     // Button's `.ds.button { padding-inline }` is (0,2,0) in the same layer.
     // At (0,3,0) this rule wins wherever the sheets land in a bundle.
     expect(findDeclarations(".ds.button.icon-button")).toMatch(
