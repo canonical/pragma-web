@@ -11,12 +11,7 @@ export const rtl = () => (Story: ElementType) => (
   </div>
 );
 
-/**
- * Paints the story on one surface: the `.surface` class defines the
- * `--surface-color-*` channels and the wrapper paints itself with them
- * (surfaces consume themselves), so a component sits on the background it
- * would have in an app rather than on the bare Storybook canvas.
- */
+/** Paints the story on one surface, as it would sit in an app. */
 export const surface =
   () =>
   (Story: ElementType): ReactElement => (
