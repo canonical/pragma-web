@@ -9,6 +9,7 @@ import type {
   Direction,
   Formatters,
   Locale,
+  Translations,
   Translator,
 } from "@canonical/i18n-core";
 import { describe, expectTypeOf, it } from "vitest";
@@ -17,9 +18,27 @@ import type {
   UseFormattersResult,
   UseLocaleProps,
   UseLocaleResult,
+  UseLocalizedProps,
+  UseLocalizedResult,
   UseTranslationProps,
   UseTranslationResult,
 } from "./types.js";
+
+describe("UseLocalizedProps", () => {
+  it("is one entry per locale", () => {
+    expectTypeOf<UseLocalizedProps<string>>().toEqualTypeOf<
+      Translations<string>
+    >();
+  });
+});
+
+describe("UseLocalizedResult", () => {
+  it("is the entry type itself", () => {
+    expectTypeOf<UseLocalizedResult<{ heading: string }>>().toEqualTypeOf<{
+      heading: string;
+    }>();
+  });
+});
 
 describe("UseTranslationProps", () => {
   it("is empty, since the hook takes no input", () => {
