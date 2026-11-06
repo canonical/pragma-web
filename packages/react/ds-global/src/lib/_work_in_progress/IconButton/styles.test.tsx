@@ -33,7 +33,7 @@ const SCOPES = ":where(.comfortable, .dense, .app, .site, .docs)";
 const findDeclarations = (selector: string): string | undefined => {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const match = sheet.match(new RegExp(`(?:^|[;{}]) ?${escaped} ?\\{([^}]*)`));
-  return match?.[1];
+  return match?.at(1);
 };
 
 describe("IconButton stylesheet", () => {
@@ -51,16 +51,26 @@ describe("IconButton stylesheet", () => {
     // Button's `.ds.button { padding-inline }` is (0,2,0) in the same layer.
     // At (0,3,0) this rule wins wherever the sheets land in a bundle.
     expect(findDeclarations(".ds.button.icon-button")).toMatch(
-      /padding-inline: var\(--icon-button-padding-inline\)/,
+      /padding-inline: var\(--icon-button-padding-inline/,
+    );
+  });
+
+  // Fails until the token's default moves off :root onto the component.
+  it.fails("keeps its token on the component, with no :root rule", () => {
+    expect(sheet).not.toMatch(/(?:^|[;{}]) ?:root ?\{/);
+    expect(findDeclarations(".ds.button.icon-button")?.trim()).toBe(
+      "padding-inline: var(--icon-button-padding-inline, 0px);",
     );
   });
 
   it("works the inline padding out from the density inputs inside a scope", () => {
-    const declarations = findDeclarations(`${SCOPES} .ds.icon-button`);
-    expect(declarations).toContain("--icon-button-padding-inline:");
-    expect(declarations).toContain("var(--density-line-height-effective)");
-    expect(declarations).toContain("var(--control-seat-line)");
-    expect(declarations).toContain("var(--button-border-width, 0px)");
+    // The exact expression: (cell − line) / 2 − border, the half of the two
+    // block pads that makes the inline sum equal the block sum.
+    expect(
+      findDeclarations(`${SCOPES} .ds.icon-button`)?.replace(/\s+/g, ""),
+    ).toBe(
+      "--icon-button-padding-inline:calc((var(--density-line-height-effective)-var(--control-seat-line))/2-var(--button-border-width,0px));",
+    );
   });
 
   it("zeroes the block padding only outside a scope", () => {
@@ -81,8 +91,39 @@ describe("IconButton stylesheet", () => {
     );
   });
 
-  it("uses no literal lengths other than zero", () => {
-    const lengths = sheet.match(/(?<![\w-])\d*\.?\d+(px|rem|em)\b/g) ?? [];
-    expect(lengths.filter((length) => !/^0+(px)?$/.test(length))).toEqual([]);
+  it("sets on the icon only what Button's icon slot leaves unset", () => {
+    // `.ds.icon-button > .icon` ties Button's `.ds.button > .icon` at (0,3,0),
+    // and IconButton's sheet loads first, so a property both set would go to
+    // Button's by order.
+    const buttonSheet = readFileSync(
+      path.join(here, "../../component/Button/styles.css"),
+      "utf8",
+    )
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\s+/g, " ");
+    const buttonIcon = buttonSheet
+      .match(/\.ds\.button > \.icon \{([^}]*)\}/)
+      ?.at(1);
+    const propertiesOf = (declarations = "") =>
+      declarations
+        .split(";")
+        .map((declaration) => declaration.split(":").at(0)?.trim())
+        .filter(Boolean);
+    const iconRule = sheet.match(/& > \.icon \{([^}]*)\}/)?.at(1);
+    expect(propertiesOf(iconRule)).toEqual(["position", "inset", "margin"]);
+    expect(propertiesOf(buttonIcon).length).toBeGreaterThan(0);
+    for (const property of propertiesOf(iconRule)) {
+      expect(propertiesOf(buttonIcon)).not.toContain(property);
+    }
+  });
+
+  it("uses no literal lengths other than zero and the carrier's 1lh", () => {
+    const lengths =
+      sheet.match(
+        /(?<![\w-])\d*\.?\d+(px|rem|em|lh|rlh|cap|ch|ex|vw|vh|vi|vb|%)(?![\w-])/g,
+      ) ?? [];
+    expect(lengths.filter((length) => !/^0+(px)?$/.test(length))).toEqual([
+      "1lh",
+    ]);
   });
 });
