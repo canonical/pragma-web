@@ -1,5 +1,5 @@
 import type { IconName } from "@canonical/ds-assets";
-import type { ButtonProps } from "../Button/index.js";
+import type { ButtonProps } from "../../component/Button/index.js";
 
 /**
  * An icon-only button has no visible text, so it must be named explicitly:

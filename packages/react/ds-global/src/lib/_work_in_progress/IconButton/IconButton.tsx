@@ -1,5 +1,5 @@
 import type React from "react";
-import { Button } from "../Button/index.js";
+import { Button } from "../../component/Button/index.js";
 import type { IconButtonProps } from "./types.js";
 import "./styles.css";
 

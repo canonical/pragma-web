@@ -2,7 +2,7 @@ import { ICON_NAMES } from "@canonical/ds-assets";
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import { Button } from "../Button/index.js";
+import { Button } from "../../component/Button/index.js";
 import Component from "./IconButton.js";
 
 /**
@@ -23,7 +23,7 @@ const surface: Decorator = (Story) => (
 );
 
 const meta = {
-  title: "components/IconButton",
+  title: "_work_in_progress/IconButton",
   component: Component,
   decorators: [surface],
   argTypes: {
