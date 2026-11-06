@@ -32,6 +32,7 @@
 @import url("./_work_in_progress/CategoriesSection/styles.css");
 @import url("./_work_in_progress/ChatSection/styles.css");
 @import url("./_work_in_progress/DescriptionSection/styles.css");
+@import url("./_work_in_progress/IconButton/styles.css");
 @import url("./_work_in_progress/IconSection/styles.css");
 @import url("./_work_in_progress/Label/styles.css");
 @import url("./_work_in_progress/Link/styles.css");
@@ -58,7 +59,6 @@
 @import url("./component/ContextualMenu/common/Item/styles.css");
 @import url("./component/ContextualMenu/styles.css");
 @import url("./component/Icon/styles.css");
-@import url("./component/IconButton/styles.css");
 @import url("./component/InlineCode/styles.css");
 @import url("./component/KeyboardKey/styles.css");
 @import url("./component/Popover/styles.css");
