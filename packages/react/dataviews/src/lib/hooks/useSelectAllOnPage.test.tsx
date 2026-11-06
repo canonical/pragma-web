@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider } from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import useSelectAllOnPage from "./useSelectAllOnPage.js";
 
 /** The ids the collection's selection holds, sorted. */

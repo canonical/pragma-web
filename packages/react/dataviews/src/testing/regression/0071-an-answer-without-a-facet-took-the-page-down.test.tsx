@@ -9,8 +9,8 @@
 import { createPage } from "@canonical/dataviews-core";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createFacetedManual } from "../../../testing/createFacetedProviders.js";
-import { machine } from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createFacetedManual from "../../../testing/createFacetedManual.js";
 import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** Answer the source's latest request with a page carrying no facet at all. */
@@ -21,7 +21,7 @@ const answerWithoutFacets = (
     source.latest().deliver({
       status: "succeeded",
       page: createPage({
-        rows: [machine("m-1", "alpha")],
+        rows: [buildMachine("m-1", "alpha")],
         matched: 1,
         total: 1,
         facets: {},

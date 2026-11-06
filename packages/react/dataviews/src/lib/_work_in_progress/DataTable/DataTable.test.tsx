@@ -34,30 +34,30 @@ import { createRef, type ReactElement, StrictMode, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import buildMachine from "../../../../testing/buildMachine.js";
+import buildPage from "../../../../testing/buildPage.js";
+import buildStoredView from "../../../../testing/buildStoredView.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import createManualSource from "../../../../testing/createManualSource.js";
 import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "../../../../testing/createStandInStores.js";
+import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
+import deliverRows from "../../../../testing/deliverRows.js";
 import elementAt from "../../../../testing/elementAt.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import fakeAnnouncerClock from "../../../../testing/fakeAnnouncerClock.js";
 import {
-  buildStoredView,
-  deliverRows,
-  pageOf,
-} from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
   MACHINE_CAPABILITIES,
-  type Machine,
-  type MachineFields,
-  machine,
   machines,
 } from "../../../../testing/machines.js";
 import readAnnouncements from "../../../../testing/readAnnouncements.js";
-import type { ManualSource } from "../../../../testing/types.js";
+import type {
+  Machine,
+  MachineFields,
+  ManualSource,
+} from "../../../../testing/types.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";
@@ -80,7 +80,7 @@ const unsortedColumns: readonly DataTableColumn[] = [
 /** A page of rows, as the manual source delivers one. */
 const page = (rows: readonly Machine[]): SourceDelivery<Machine> => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 /** A request the source accepted and could not complete. */
@@ -108,7 +108,10 @@ const fail = (source: ManualSource<Machine>, reason: string): void => {
 
 /** A table whose source answers every request at once with `rows`. */
 const loadedTable = (
-  rows: readonly Machine[] = [machine("m-1", "alpha"), machine("m-2", "beta")],
+  rows: readonly Machine[] = [
+    buildMachine("m-1", "alpha"),
+    buildMachine("m-2", "beta"),
+  ],
   extra: Partial<Parameters<typeof DataTable<MachineFields, Machine>>[0]> = {},
 ) => {
   const { provider, source } = createMachineProvider({ rows });
@@ -129,7 +132,10 @@ const loadedTable = (
  * from.
  */
 const deliveredTable = (
-  rows: readonly Machine[] = [machine("m-1", "alpha"), machine("m-2", "beta")],
+  rows: readonly Machine[] = [
+    buildMachine("m-1", "alpha"),
+    buildMachine("m-2", "beta"),
+  ],
   extra: Partial<Parameters<typeof DataTable<MachineFields, Machine>>[0]> = {},
 ) => {
   const { provider, source } = createMachineProvider();
@@ -197,7 +203,7 @@ describe("DataTable", () => {
   });
 
   it("merges the caller's class name and inline style onto the root", () => {
-    loadedTable([machine("m-1", "alpha")], {
+    loadedTable([buildMachine("m-1", "alpha")], {
       className: "host",
       style: { opacity: 0.5 },
       id: "machines",
@@ -304,8 +310,8 @@ describe("DataTable", () => {
   it("renders primitive values as text and leaves other values to a renderer", () => {
     loadedTable(
       [
-        machine("m-1", "alpha", "running", 4),
-        machine("m-2", "beta", "running", 8),
+        buildMachine("m-1", "alpha", "running", 4),
+        buildMachine("m-2", "beta", "running", 8),
       ],
       {
         columns: [
@@ -341,7 +347,9 @@ describe("DataTable", () => {
     const source = createManualSource<Oddity>({
       capabilities: declareCapabilities(oddities, {}),
       answer: () =>
-        pageOf([{ id: "m-1", flag: false, big: 9007199254740993n, shape: {} }]),
+        buildPage([
+          { id: "m-1", flag: false, big: 9007199254740993n, shape: {} },
+        ]),
     });
     const provider = createDataViewsProvider({
       collection: oddities,
@@ -367,7 +375,7 @@ describe("DataTable", () => {
   });
 
   it("reads the record field a column names instead of its own id", () => {
-    loadedTable([machine("m-1", "alpha")], {
+    loadedTable([buildMachine("m-1", "alpha")], {
       columns: [{ id: "machine-name", header: "Name", field: "name" }],
     });
     expect(elementAt(screen.getAllByRole("cell"), 0).textContent).toBe("alpha");
@@ -385,7 +393,7 @@ describe("DataTable", () => {
         </span>
       );
     };
-    loadedTable([machine("m-1", "alpha", "failed")], {
+    loadedTable([buildMachine("m-1", "alpha", "failed")], {
       columns: [{ id: "status", header: "Status", cell: Badge }],
     });
     expect(screen.getByTestId("m-1-status").textContent).toBe(
@@ -468,7 +476,10 @@ describe("DataTable", () => {
     ],
   ) => {
     const { provider, source } = createMachineProvider({
-      rows: [machine("m-1", "alpha"), machine("m-2", "beta", "failed", 8)],
+      rows: [
+        buildMachine("m-1", "alpha"),
+        buildMachine("m-2", "beta", "failed", 8),
+      ],
       capabilities: declareMachineOrdering(terms, defaultSort),
     });
     const view = render(
@@ -1025,7 +1036,7 @@ describe("DataTable", () => {
     const location = createMemoryLocation({ href: "/machines?tab=inventory" });
     const build = () =>
       createMachineProvider({
-        rows: [machine("m-1", "alpha")],
+        rows: [buildMachine("m-1", "alpha")],
         location,
         capabilities: declareMachineOrdering(3),
       }).provider;
@@ -1279,7 +1290,7 @@ describe("DataTable", () => {
 
   it("draws a settings cell and nothing else in a table declaring no columns", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     render(
       <DataTable
@@ -1335,7 +1346,7 @@ describe("DataTable", () => {
 
   it("names each header by its label alone, whatever controls it holds", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(1),
     });
     render(
@@ -1403,7 +1414,7 @@ describe("DataTable", () => {
     // A source's declared default already orders its rows, so the header
     // says so rather than claiming the rows are unsorted.
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareCapabilities(machines, {
         filter: { status: ["isAny"] },
         sort: {
@@ -1601,7 +1612,7 @@ describe("DataTable", () => {
 
   it("offers a real checkbox per row, named after the record", () => {
     const { provider } = loadedTable(
-      [machine("m-1", "alpha"), machine("m-2", "beta")],
+      [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
       { selectable: true, rowLabel: (row) => row.name },
     );
     const checkbox = screen.getByRole("checkbox", { name: "Select alpha" });
@@ -1623,19 +1634,19 @@ describe("DataTable", () => {
   });
 
   it("names a row by its identity when no label is supplied", () => {
-    loadedTable([machine("m-1", "alpha")], { selectable: true });
+    loadedTable([buildMachine("m-1", "alpha")], { selectable: true });
     expect(
       screen.getByRole("checkbox", { name: "Select m-1" }),
     ).toBeInTheDocument();
   });
 
   it("omits aria-selected where selection is not offered", () => {
-    loadedTable([machine("m-1", "alpha")]);
+    loadedTable([buildMachine("m-1", "alpha")]);
     expect(screen.getAllByRole("row")[1]).not.toHaveAttribute("aria-selected");
   });
 
   it("leaves row counts and positions to a virtualized table", () => {
-    loadedTable([machine("m-1", "alpha")]);
+    loadedTable([buildMachine("m-1", "alpha")]);
     expect(screen.getByRole("table")).not.toHaveAttribute("aria-rowcount");
     for (const row of screen.getAllByRole("row")) {
       expect(row).not.toHaveAttribute("aria-rowindex");
@@ -1644,7 +1655,7 @@ describe("DataTable", () => {
 
   it("selects and clears exactly the displayed rows from the header", () => {
     const { provider } = loadedTable(
-      [machine("m-1", "alpha"), machine("m-2", "beta")],
+      [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
       { selectable: true },
     );
     act(() => {
@@ -1678,7 +1689,7 @@ describe("DataTable", () => {
 
   it("shows a partial selection of the displayed rows as mixed", () => {
     const { provider } = loadedTable(
-      [machine("m-1", "alpha"), machine("m-2", "beta")],
+      [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
       { selectable: true },
     );
     act(() => {
@@ -1710,7 +1721,7 @@ describe("DataTable", () => {
       return null;
     };
     const { provider } = loadedTable(
-      [machine("m-1", "alpha"), machine("m-2", "beta")],
+      [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
       {
         columns: [{ id: "name", header: "Name", cell: Probe }],
         selectable: true,
@@ -1730,7 +1741,7 @@ describe("DataTable", () => {
       return null;
     };
     const { source } = deliveredTable(
-      [machine("m-1", "alpha"), machine("m-2", "beta")],
+      [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
       {
         columns: [
           { id: "name", header: "Name", cell: Probe },
@@ -1741,8 +1752,8 @@ describe("DataTable", () => {
     renders.length = 0;
     // A later delivery of the same request: a store write, republished.
     deliver(source, [
-      machine("m-1", "alpha", "failed"),
-      machine("m-2", "beta"),
+      buildMachine("m-1", "alpha", "failed"),
+      buildMachine("m-2", "beta"),
     ]);
     expect(renders).toEqual(["m-1/status"]);
   });
@@ -1776,7 +1787,10 @@ describe("DataTable", () => {
       );
     };
     render(<Host />);
-    deliver(source, [machine("m-1", "alpha"), machine("m-2", "beta")]);
+    deliver(source, [
+      buildMachine("m-1", "alpha"),
+      buildMachine("m-2", "beta"),
+    ]);
     const firstRow = seen.filter((entry) => entry.rowId === "m-1");
     expect(firstRow).toHaveLength(2);
     const [firstSeen, secondSeen] = firstRow;
@@ -1796,8 +1810,8 @@ describe("DataTable", () => {
     // And nothing was re-minted: the next record change reaches the same
     // scope the first render handed out.
     deliver(source, [
-      machine("m-1", "alpha", "failed"),
-      machine("m-2", "beta"),
+      buildMachine("m-1", "alpha", "failed"),
+      buildMachine("m-2", "beta"),
     ]);
     expect(seen.find((entry) => entry.rowId === "m-1")?.record).toBe(
       firstSeen?.record,
@@ -1805,7 +1819,7 @@ describe("DataTable", () => {
   });
 
   it("rebuilds its model when a column genuinely changes", () => {
-    const { provider, view } = loadedTable([machine("m-1", "alpha")]);
+    const { provider, view } = loadedTable([buildMachine("m-1", "alpha")]);
     expect(
       screen
         .getAllByRole("columnheader")
@@ -1837,7 +1851,7 @@ describe("DataTable", () => {
       return null;
     };
     const { provider, source, view } = deliveredTable(
-      [machine("m-1", "alpha")],
+      [buildMachine("m-1", "alpha")],
       { columns: [{ id: "name", header: "Name", cell: Probe }] },
     );
     view.unmount();
@@ -1849,7 +1863,7 @@ describe("DataTable", () => {
     const host = readProviderHost(provider);
     host.complete(
       host.refresh(),
-      deliverRows([machine("m-1", "alpha", "failed")]),
+      deliverRows([buildMachine("m-1", "alpha", "failed")]),
     );
     act(() => {
       provider.selection.toggle("m-1");
@@ -1904,7 +1918,7 @@ describe("DataTable", () => {
 
   it("sizes a column named for a prototype member from its declaration", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     render(
       <DataTable
@@ -1926,7 +1940,7 @@ describe("DataTable", () => {
 
   it("renders the columns the presentation shows, in its order, a column declared not hideable always", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     render(
       <DataTable
@@ -2166,7 +2180,7 @@ describe("DataTable", () => {
   });
 
   it("resizes a column from its header, publishing new tracks", () => {
-    loadedTable([machine("m-1", "alpha")], {
+    loadedTable([buildMachine("m-1", "alpha")], {
       columns: [
         {
           id: "name",
@@ -2194,7 +2208,7 @@ describe("DataTable", () => {
       return frames.length;
     });
     try {
-      const { provider } = loadedTable([machine("m-1", "alpha")], {
+      const { provider } = loadedTable([buildMachine("m-1", "alpha")], {
         columns: [
           {
             id: "name",
@@ -2235,7 +2249,7 @@ describe("DataTable", () => {
       vi.unstubAllGlobals();
     });
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     const { container } = render(
       <DataTable
@@ -2254,7 +2268,7 @@ describe("DataTable", () => {
 
   it("is safe under StrictMode double-mount without orphaned subscriptions", () => {
     const { provider, source } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     // Elements under observation, across every observer the table creates:
     // its container's and its selection cell's.
@@ -2298,7 +2312,7 @@ describe("DataTable", () => {
         1,
       );
       act(() => {
-        source.latest().deliver(page([machine("m-2", "beta")]));
+        source.latest().deliver(page([buildMachine("m-2", "beta")]));
       });
       expect(screen.getByRole("cell", { name: "beta" })).toBeInTheDocument();
       unmount();
@@ -2331,7 +2345,7 @@ describe("DataTable", () => {
       throw new Error("expected a live execution");
     }
     act(() => {
-      kept.deliver(page([machine("m-1", "alpha")]));
+      kept.deliver(page([buildMachine("m-1", "alpha")]));
     });
     expect(screen.getByRole("cell", { name: "alpha" })).toBeInTheDocument();
     // A render that changes nothing observes nothing again.
@@ -2356,7 +2370,7 @@ describe("DataTable", () => {
     );
     // Three observers, one request.
     expect(source.calls).toHaveLength(1);
-    deliver(source, [machine("m-1", "alpha")]);
+    deliver(source, [buildMachine("m-1", "alpha")]);
     for (const name of ["Inside", "Outside"]) {
       expect(
         within(screen.getByRole("table", { name })).getByRole("cell", {
@@ -2372,7 +2386,7 @@ describe("DataTable", () => {
       provider.setSearch("alpha");
     });
     expect(source.calls).toHaveLength(2);
-    deliver(source, [machine("m-1", "alpha")]);
+    deliver(source, [buildMachine("m-1", "alpha")]);
     expect(
       within(screen.getByRole("table", { name: "Inside" })).getByRole("cell", {
         name: "alpha",
@@ -2389,7 +2403,7 @@ describe("DataTable", () => {
       renders.push(`${rowId}/${columnId}`);
       return null;
     };
-    loadedTable([machine("m-1", "alpha"), machine("m-2", "beta")], {
+    loadedTable([buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")], {
       columns: [
         {
           id: "name",
@@ -2414,7 +2428,7 @@ describe("DataTable", () => {
   });
 
   it("offers no resize control on the table's trailing edge", () => {
-    const { provider, view } = loadedTable([machine("m-1", "alpha")], {
+    const { provider, view } = loadedTable([buildMachine("m-1", "alpha")], {
       columns: [
         { id: "name", header: "Name", resizable: true },
         { id: "status", header: "Status", resizable: true },
@@ -2508,7 +2522,7 @@ describe("DataTable", () => {
   });
 
   it("holds every resize to the column's declared bounds", () => {
-    loadedTable([machine("m-1", "alpha")], {
+    loadedTable([buildMachine("m-1", "alpha")], {
       columns: [
         {
           id: "name",
@@ -2542,7 +2556,7 @@ describe("DataTable", () => {
       return frames.length;
     });
     try {
-      loadedTable([machine("m-1", "alpha")], {
+      loadedTable([buildMachine("m-1", "alpha")], {
         columns: [
           {
             id: "name",
@@ -2650,7 +2664,7 @@ describe("DataTable", () => {
 
   it("keeps one stale status element across re-renders", () => {
     const { provider, source, view } = deliveredTable([
-      machine("m-1", "alpha"),
+      buildMachine("m-1", "alpha"),
     ]);
     act(() => {
       provider.setSearch("beta");
@@ -2679,7 +2693,7 @@ describe("DataTable", () => {
     act(() => {
       provider.setSearch("");
     });
-    deliver(source, [machine("m-2", "beta")]);
+    deliver(source, [buildMachine("m-2", "beta")]);
     expect(screen.queryByRole("status")).toBeNull();
     expect(screen.getAllByRole("row")).toHaveLength(2);
     // A refresh that fails and then succeeds clears the same way.
@@ -2691,7 +2705,7 @@ describe("DataTable", () => {
     act(() => {
       provider.refresh();
     });
-    deliver(source, [machine("m-2", "beta")]);
+    deliver(source, [buildMachine("m-2", "beta")]);
     expect(screen.queryByRole("status")).toBeNull();
     expect(screen.getAllByRole("row")).toHaveLength(2);
   });
@@ -2757,7 +2771,7 @@ describe("DataTable", () => {
 
     it("has no axe violation over several terms and a refusal's reason", async () => {
       const { provider } = createMachineProvider({
-        rows: [machine("m-1", "alpha")],
+        rows: [buildMachine("m-1", "alpha")],
         capabilities: declareMachineOrdering(2),
       });
       const view = render(

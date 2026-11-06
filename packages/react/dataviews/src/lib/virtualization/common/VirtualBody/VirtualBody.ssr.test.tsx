@@ -6,11 +6,9 @@
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { deliverRows } from "../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../testing/machines.js";
+import buildMachine from "../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../testing/createMachineProvider.js";
+import deliverRows from "../../../../../testing/deliverRows.js";
 import { DataTable } from "../../../_work_in_progress/DataTable/index.js";
 import virtualizeRows from "../../virtualizeRows.js";
 
@@ -24,7 +22,7 @@ describe("virtualized DataTable SSR", () => {
       host.refresh(),
       deliverRows(
         Array.from({ length: 30 }, (_, position) =>
-          machine(`m-${position}`, `host-${position}`),
+          buildMachine(`m-${position}`, `host-${position}`),
         ),
       ),
     );

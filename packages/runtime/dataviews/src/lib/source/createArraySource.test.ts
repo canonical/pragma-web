@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { DEFAULT_WINDOW, type Slice, type SortTerm } from "../query/index.js";
 import type { SourceDelivery } from "../result/index.js";
@@ -27,7 +27,7 @@ const rows = [
 ];
 
 const collection = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "id", kind: "text" },
     { field: "name", kind: "text" },

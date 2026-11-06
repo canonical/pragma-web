@@ -5,11 +5,7 @@
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
 import {
-  buildStoredView,
   COUNTED_EXACTLY,
-  countExactly,
-  deliverRows,
-  displayStatusOf,
   FACET_CASES,
   FACET_RECORDS,
   FACETED_FILTER_STORIES,
@@ -17,44 +13,12 @@ import {
   MESSAGE_SAMPLES,
   OPERATOR_CASES,
   OPERATOR_RECORDS,
-  pageOf,
   SERVER_RENDER_HREF,
 } from "./fixtures.js";
 
-describe("COUNTED_EXACTLY and countExactly", () => {
-  it("count exactly", () => {
+describe("COUNTED_EXACTLY", () => {
+  it("counts exactly", () => {
     expect(COUNTED_EXACTLY.matched).toBe("exact");
-    expect(countExactly(3)).toEqual({ kind: "exact", value: 3 });
-  });
-});
-
-describe("pageOf and deliverRows", () => {
-  it("are a complete page of the rows, counted exactly, and its delivery", () => {
-    const rows = [{ id: "a" }, { id: "b" }];
-    expect(pageOf(rows).counts.matched).toEqual(countExactly(2));
-    expect(deliverRows(rows)).toEqual({
-      status: "succeeded",
-      page: pageOf(rows),
-    });
-  });
-});
-
-describe("displayStatusOf", () => {
-  it("gives a reason to the statuses that carry one", () => {
-    expect(displayStatusOf("failed")).toEqual({
-      status: "failed",
-      reason: "offline",
-    });
-    expect(displayStatusOf("pending")).toEqual({ status: "pending" });
-  });
-});
-
-describe("buildStoredView", () => {
-  it("is one stored view, with the given fields changed", () => {
-    expect(buildStoredView({ pinned: true })).toMatchObject({
-      id: "v1",
-      pinned: true,
-    });
   });
 });
 

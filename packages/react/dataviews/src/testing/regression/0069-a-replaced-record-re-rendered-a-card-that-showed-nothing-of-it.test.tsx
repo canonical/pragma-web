@@ -8,8 +8,9 @@
 
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../testing/fixtures.js";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import buildPage from "../../../testing/buildPage.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type {
   DisplayField,
@@ -39,7 +40,7 @@ describe("a page of records replaced by equal ones", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m-1", "alpha")]),
+        page: buildPage([buildMachine("m-1", "alpha")]),
       });
     });
     expect(renders).toEqual(["m-1"]);
@@ -52,7 +53,7 @@ describe("a page of records replaced by equal ones", () => {
       // The same machine, in a new object: nothing a card shows has moved.
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m-1", "alpha")]),
+        page: buildPage([buildMachine("m-1", "alpha")]),
       });
     });
     expect(renders).toEqual([]);

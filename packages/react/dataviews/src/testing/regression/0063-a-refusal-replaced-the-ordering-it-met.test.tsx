@@ -10,11 +10,9 @@
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
@@ -36,7 +34,7 @@ afterEach(() => {
 describe("regression 0063 — a refusal replaced the ordering it met", () => {
   it("says both the ordering that stands and why the other term was refused", async () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       // One term at a time: a second, added with Shift, is refused.
       capabilities: declareMachineOrdering(1),
     });

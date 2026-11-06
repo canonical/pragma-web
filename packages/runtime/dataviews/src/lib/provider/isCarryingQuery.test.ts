@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import isCarryingQuery from "./isCarryingQuery.js";
 
 const { schema } = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "status", kind: "choices", options: ["failed"] }],
 });
 

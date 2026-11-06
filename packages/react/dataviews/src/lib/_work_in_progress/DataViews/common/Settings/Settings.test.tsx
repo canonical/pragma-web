@@ -21,17 +21,15 @@ import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
 import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
+import declareMachineOrdering from "../../../../../../testing/declareMachineOrdering.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import fakeAnnouncerClock from "../../../../../../testing/fakeAnnouncerClock.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type MachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
 import readAnnouncements from "../../../../../../testing/readAnnouncements.js";
+import type { MachineProvider } from "../../../../../../testing/types.js";
 import { DataTable, type DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 
@@ -44,7 +42,7 @@ const columns: readonly DataTableColumn[] = [
 /** A provider over one machine, ordering by every field. */
 const createProvider = (location?: QueryLocation) =>
   createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
     capabilities: declareMachineOrdering(null),
     ...(location === undefined ? {} : { location }),
   });
@@ -322,7 +320,7 @@ describe("DataViews.Settings", () => {
     /** A provider over one machine keeping its views in the shared store. */
     const createViewer = () => {
       const { provider } = createMachineProvider({
-        rows: [machine("m-1", "alpha")],
+        rows: [buildMachine("m-1", "alpha")],
         capabilities: declareMachineOrdering(null),
         views: store,
       });

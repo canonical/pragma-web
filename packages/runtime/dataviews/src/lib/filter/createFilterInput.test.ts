@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import type { Predicate, PredicateOperator } from "../query/index.js";
 import type { SourceRefusal } from "../result/index.js";
 import createFilterInput from "./createFilterInput.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "cpu", kind: "number", min: 0, max: 64 },
     { field: "status", kind: "choices", options: ["failed", "ready"] },

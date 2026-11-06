@@ -4,7 +4,7 @@ import type {
 } from "@canonical/dataviews-core";
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it } from "vitest";
-import { buildStoredView } from "../../../../../../testing/fixtures.js";
+import buildStoredView from "../../../../../../testing/buildStoredView.js";
 import describeViewStatus from "./describeViewStatus.js";
 
 const view = buildStoredView({ revision: 2 });

@@ -11,13 +11,14 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { byId, declareSort } from "../../../testing/fixtures.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { EMPTY_SLICE } from "../../lib/query/index.js";
 import { executeSlice, readFacets } from "../../lib/source/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "updated", kind: "date" }],
 });
 

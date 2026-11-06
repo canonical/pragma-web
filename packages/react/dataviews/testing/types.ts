@@ -1,6 +1,10 @@
 import type {
+  Collection,
+  DataViewsProvider,
+  DataViewsProviderConfig,
   Facet,
   HistoryMode,
+  PresentationStore,
   Query,
   QueryLocation,
   ReadonlyChannel,
@@ -14,6 +18,7 @@ import type {
   SourceRequest,
   ViewStore,
 } from "@canonical/dataviews-core";
+import type { machines } from "./machines.js";
 
 /** One value a values facet lists, with how many matching records hold it. */
 export type FacetValue = Extract<
@@ -149,4 +154,54 @@ export type MockRequestWatch = {
   readonly hasEnded: () => boolean;
   /** Stop following the server's events. */
   readonly stop: () => void;
+};
+
+/** One machine record, as a source would deliver it. */
+export type Machine = {
+  readonly id: string;
+  readonly name: string;
+  readonly status: "failed" | "running";
+  readonly cores: number;
+};
+
+/** The fields of the machine collection, for typed handles and providers. */
+export type MachineFields = typeof machines.schema.fields;
+
+/** How one test's machine provider is set up. */
+export type MachineProviderConfig = Omit<
+  ManualSourceConfig<Machine>,
+  "capabilities"
+> & {
+  readonly capabilities?: SourceCapabilities | undefined;
+  /** The rows every request is answered with at once; by hand when left out. */
+  readonly rows?: readonly Machine[] | undefined;
+  readonly location?: QueryLocation | undefined;
+  readonly views?: ViewStore | undefined;
+  readonly presentation?: PresentationStore | undefined;
+  readonly snapshot?: DataViewsProviderConfig<
+    MachineFields,
+    Machine
+  >["snapshot"];
+};
+
+/** The provider every test drives, over the machine collection. */
+export type MachineProvider = DataViewsProvider<MachineFields, Machine>;
+
+/** A machine provider over a manual source, with the source to answer it. */
+export type MachineFixture = {
+  readonly provider: MachineProvider;
+  readonly collection: Collection<MachineFields, Machine>;
+  readonly source: ManualSource<Machine>;
+};
+
+/** How a faceted fleet provider is set up. */
+export type FacetedFleetConfig = {
+  /** How many machines the fleet holds; twelve by default. */
+  readonly count?: number | undefined;
+  /** The URL the provider stands on; none by default. */
+  readonly href?: string | undefined;
+  /** The query it starts on, as a snapshot carries it; none by default. */
+  readonly query?: string | undefined;
+  /** The fields it asks facets for; the status and the cores by default. */
+  readonly facets?: readonly ("status" | "cores")[] | undefined;
 };

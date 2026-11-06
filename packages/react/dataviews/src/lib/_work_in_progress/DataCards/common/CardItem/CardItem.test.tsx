@@ -1,10 +1,8 @@
 import { createRowScopes } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
 import CardItem from "./CardItem.js";
 
@@ -16,7 +14,7 @@ import CardItem from "./CardItem.js";
  */
 const observeRow = (fields: readonly string[]) => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha", "failed", 8)],
+    rows: [buildMachine("m-1", "alpha", "failed", 8)],
   });
   const releaseProvider = provider.observe();
   const scopes = createRowScopes({

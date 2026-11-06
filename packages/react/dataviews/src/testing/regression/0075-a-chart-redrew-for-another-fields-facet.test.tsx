@@ -11,7 +11,7 @@
 
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { createFacetedManual } from "../../../testing/createFacetedProviders.js";
+import createFacetedManual from "../../../testing/createFacetedManual.js";
 import deliverFacets from "../../../testing/deliverFacets.js";
 
 /** Every set of values the drawing was asked to draw, in order. */

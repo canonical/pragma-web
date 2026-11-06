@@ -13,13 +13,14 @@ import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { act, renderHook } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { useColumnManagement } from "../../lib/_work_in_progress/DataTable/hooks/index.js";
 
 describe("regression 0058 — a column change renewed every header's offers", () => {
   it("keeps the offers of every column whose changes hold, through a width and a hide elsewhere", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     const columns = [
       { id: "name", header: "Name" },

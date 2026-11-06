@@ -16,10 +16,8 @@ import { fileURLToPath } from "node:url";
 import { createPage } from "@canonical/dataviews-core";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../testing/machines.js";
+import buildMachine from "../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import PaginationBar from "./PaginationBar.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -68,7 +66,7 @@ const selectorOf = (dom: string): string =>
 
 /** Two of three rows, counted exactly, as a source delivers them. */
 const twoOfThree = createPage({
-  rows: [machine("m1", "one"), machine("m2", "two")],
+  rows: [buildMachine("m1", "one"), buildMachine("m2", "two")],
   matched: 3,
   total: 3,
 });

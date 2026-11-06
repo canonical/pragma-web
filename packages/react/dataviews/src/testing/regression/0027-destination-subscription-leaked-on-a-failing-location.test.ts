@@ -13,7 +13,7 @@ import {
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { describe, expect, it, vi } from "vitest";
-import { createMachineProvider } from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { subscribeToDestinationInputs } from "../../lib/utils/index.js";
 
 describe("regression 0027 — a destination subscription leaked on a failing location", () => {

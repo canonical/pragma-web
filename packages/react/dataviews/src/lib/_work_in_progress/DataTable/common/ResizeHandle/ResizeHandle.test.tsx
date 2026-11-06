@@ -11,7 +11,7 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createMachineProvider } from "../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import ResizeHandle from "./ResizeHandle.js";
 
 /** A layout over a fresh provider's presentation, kept in memory. */

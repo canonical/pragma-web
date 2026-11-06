@@ -1,11 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
+import buildPage from "../../../testing/buildPage.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import {
-  byId,
-  declare,
-  declareSort,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import type { DataViewsState } from "../coordinator/index.js";
 import { DEFAULT_WINDOW, type Query, type Slice } from "../query/index.js";
@@ -29,7 +27,7 @@ import runSource from "./runSource.js";
 import type { ProviderHost } from "./types.js";
 
 const collection = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "ready"] },
     { field: "cpu", kind: "number" },
@@ -48,7 +46,7 @@ const exact = (value: number): Count => ({ kind: "exact", value });
 
 const succeeded = (rows: readonly RowRecord[]): SourceDelivery => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 const failed = (reason: string): SourceDelivery => ({
@@ -72,7 +70,7 @@ const rows = [
 ];
 
 const localCollection = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "id", kind: "text" },
     { field: "name", kind: "text" },
@@ -432,7 +430,7 @@ describe("runSource", () => {
       rows,
       groups: null,
       facets: {},
-      counts: pageOf(rows).counts,
+      counts: buildPage(rows).counts,
       more: null,
       cursors: null,
       provenance: {
@@ -670,7 +668,7 @@ describe("runSource", () => {
       createArraySource<RowRecord>({
         rows: fleet,
         collection: createCollection({
-          identify: byId,
+          identify: readId,
           fields: [
             { field: "id", kind: "text" },
             { field: "status", kind: "choices", options: ["failed", "ready"] },
@@ -1061,7 +1059,7 @@ describe("runSource take-up", () => {
   it("executes under the request the rows answer, republishing nothing for the same page", () => {
     const source = createManualSource<RowRecord>({
       capabilities: permissive,
-      answer: () => pageOf(rows),
+      answer: () => buildPage(rows),
     });
     const { host, run } = build(source.source);
     host.refresh();
@@ -1084,7 +1082,7 @@ describe("runSource take-up", () => {
     const { host, release } = running(source.source);
     host.refresh();
     source.callAt(0).deliver(succeeded(rows));
-    const page = pageOf(rows);
+    const page = buildPage(rows);
     const recounted = {
       pageable: exact(9),
       matched: exact(9),
@@ -1131,7 +1129,7 @@ describe("runSource take-up", () => {
     const { host, release } = running(source.source);
     host.refresh();
     source.callAt(0).deliver(succeeded(rows));
-    const page = pageOf(rows);
+    const page = buildPage(rows);
     const summary = { path: ["ready"], count: exact(2) };
     // Each delivery differs from the one before it in one member alone.
     const moves: readonly SourcePage[] = [
@@ -1172,7 +1170,7 @@ describe("runSource counts", () => {
     host.refresh();
     source.callAt(0).deliver({
       status: "succeeded",
-      page: { ...pageOf(rows), counts: delivered },
+      page: { ...buildPage(rows), counts: delivered },
     });
     const published = host.state.get().result.counts;
     release();
@@ -1327,7 +1325,7 @@ describe("runSource counts", () => {
     source.callAt(0).deliver({
       status: "succeeded",
       page: {
-        ...pageOf(rows),
+        ...buildPage(rows),
         facets: {
           status: {
             kind: "values",
@@ -1380,7 +1378,7 @@ describe("runSource counts", () => {
     ): void => {
       source.callAt(0).deliver({
         status: "succeeded",
-        page: { ...pageOf(rows), facets: { status, cpu } },
+        page: { ...buildPage(rows), facets: { status, cpu } },
       });
     };
     const failedTwice: NonNullable<SourcePage["facets"]>[string] = {

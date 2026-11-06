@@ -8,7 +8,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createQueryCoordinator } from "../../lib/coordinator/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
@@ -38,7 +39,7 @@ describe("regression 0071 — a page had to spell facets it never asked for", ()
       },
     };
     const provider = createDataViewsProvider({
-      collection: createCollection({ fields: [], identify: byId }),
+      collection: createCollection({ fields: [], identify: readId }),
       source,
     });
     const release = provider.observe();

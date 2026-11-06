@@ -1,5 +1,5 @@
 import { describe, expect, it, onTestFinished } from "vitest";
-import { createFacetedManual } from "./createFacetedProviders.js";
+import createFacetedManual from "./createFacetedManual.js";
 import deliverFacets from "./deliverFacets.js";
 
 describe("deliverFacets", () => {

@@ -8,7 +8,7 @@
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider } from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { PaginationBar } from "../../lib/_work_in_progress/PaginationBar/index.js";
 
 describe("regression 0060 — a colon was read into the page size name", () => {

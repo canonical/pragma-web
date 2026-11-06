@@ -7,10 +7,8 @@
 import { createMemoryLocation } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  machines,
-} from "../../../../testing/machines.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import { machines } from "../../../../testing/machines.js";
 import { useDataViewsValue } from "../../hooks/index.js";
 import useDataViews from "./hooks/useDataViews.js";
 import useDataViewsFilter from "./hooks/useDataViewsFilter.js";
