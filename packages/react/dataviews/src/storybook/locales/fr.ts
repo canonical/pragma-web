@@ -77,6 +77,8 @@ export const FRENCH: DataViewsMessages = {
   selectRow: (name) => `Sélectionner ${name}`,
   columnWidth: (pixels) =>
     `${count(pixels)} ${plural(pixels, "pixel", "pixels")}`,
+  columnEndPlacement: (name) =>
+    `Cliquez ou touchez dans la ligne d’en-tête là où la colonne ${name} doit se terminer. Appuyez de nouveau sur le bord ou sur Échap pour annuler.`,
 
   sortPrecedence: (direction, position, terms) =>
     terms === 1

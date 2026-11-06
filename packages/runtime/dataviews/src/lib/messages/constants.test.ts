@@ -33,6 +33,9 @@ describe("DEFAULT_MESSAGES", () => {
     expect(m.selectRow("alder")).toBe("Select alder");
     expect(m.columnWidth(1)).toBe("1 pixel");
     expect(m.columnWidth(120)).toBe("120 pixels");
+    expect(m.columnEndPlacement("Name")).toBe(
+      "Click or tap in the header row where the Name column should end. Press the edge again or Escape to cancel.",
+    );
   });
 
   it("words a sort's precedence with an English ordinal once there are two terms", () => {

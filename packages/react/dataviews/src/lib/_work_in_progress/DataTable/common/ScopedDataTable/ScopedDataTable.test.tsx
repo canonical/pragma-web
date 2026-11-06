@@ -1,11 +1,13 @@
 /**
  * The table within the UI scope it is handed: it speaks the words it is
- * given, never resolving its own, and takes its root's native props.
+ * given and through the announcer it is given, never resolving its own,
+ * and takes its root's native props.
  */
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
+import buildMachine from "../../../../../../testing/buildMachine.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { DataTableColumn } from "../../types.js";
 import ScopedDataTable from "./ScopedDataTable.js";
@@ -47,6 +49,30 @@ describe("ScopedDataTable", () => {
     );
     expect(screen.getByRole("table", { name: "Machines" })).toHaveTextContent(
       "Nothing here yet.",
+    );
+  });
+
+  it("says a resize handle's hint through the announcer it is handed", () => {
+    const { provider } = createMachineProvider({
+      rows: [buildMachine("m-1", "alpha")],
+    });
+    const announce = vi.fn();
+    render(
+      <ScopedDataTable
+        provider={provider}
+        columns={columns}
+        label="Machines"
+        messages={resolveMessages()}
+        announce={announce}
+      />,
+    );
+    const handle = screen.getByRole("separator", { name: "Name" });
+    fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
+    act(() => {
+      fireEvent.pointerUp(window, { clientX: 100 });
+    });
+    expect(announce).toHaveBeenCalledWith(
+      "Click or tap in the header row where the Name column should end. Press the edge again or Escape to cancel.",
     );
   });
 

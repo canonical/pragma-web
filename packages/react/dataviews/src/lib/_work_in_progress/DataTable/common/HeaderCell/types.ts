@@ -9,7 +9,7 @@ import type {
   GridInteraction,
   SizingBounds,
 } from "@canonical/dataviews-core/bindings";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import type { DataTableColumn } from "../../types.js";
 import type { HeaderColumnChange, HeaderColumnOffers } from "../types.js";
 
@@ -107,6 +107,11 @@ type OwnProps = {
   readonly width: number;
   /** The id this header's label carries, for the resize handle's name. */
   readonly labelId: string;
+  /**
+   * Say something through the table's announcer: the resize handle's hint
+   * as a press starts placing the column's edge.
+   */
+  readonly announce: (message: ReactNode) => void;
 };
 
 /**
