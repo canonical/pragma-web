@@ -21,6 +21,26 @@ describe("IconButton component", () => {
       expect(button?.querySelector(":scope > .label")).not.toBeInTheDocument();
     });
 
+    it("orders its classes base, Button's modifiers, its own, then the consumer's", () => {
+      render(
+        <Component
+          icon="delete"
+          aria-label="Delete"
+          importance="tertiary"
+          anticipation="destructive"
+          className="custom"
+        />,
+      );
+      expect([...screen.getByRole("button").classList]).toEqual([
+        "ds",
+        "button",
+        "tertiary",
+        "destructive",
+        "icon-button",
+        "custom",
+      ]);
+    });
+
     it("merges a consumer className", () => {
       render(<Component icon="edit" aria-label="Edit" className="custom" />);
       expect(screen.getByRole("button")).toHaveClass(

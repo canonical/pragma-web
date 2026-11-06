@@ -12,7 +12,9 @@ describe("IconButton SSR", () => {
   it("renders a button with Button's and its own classes", () => {
     const html = renderToString(<Component icon="edit" aria-label="Edit" />);
     expect(html).toContain("<button");
-    expect(html).toContain("ds button primary icon-button");
+    expect(html.match(/<button[^>]* class="([^"]*)"/)?.[1]).toBe(
+      "ds button primary icon-button",
+    );
     expect(html).toContain('aria-label="Edit"');
   });
 });
