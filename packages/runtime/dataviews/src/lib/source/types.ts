@@ -7,7 +7,7 @@
  */
 
 import type { ActionOutcome } from "../action/index.js";
-import type { Collection } from "../collection/index.js";
+import type { Collection, RecordTypes } from "../collection/index.js";
 import type {
   PredicateOperator,
   Query,
@@ -333,7 +333,7 @@ type FieldNameOf<TFields extends readonly SchemaFieldDefinition[]> =
 export type FacetFieldNameOf<TFields extends readonly SchemaFieldDefinition[]> =
   Extract<
     TFields[number],
-    { readonly kind: "choices" | "flag" | "number" | "date" }
+    { readonly kind: "choices" | "presence" | "number" | "date" }
   >["field"];
 
 /** The operators one field of a schema accepts, from its kind. */
@@ -420,9 +420,9 @@ export type CapabilityDeclaration<
  * One slice read by field, typed from the schema: a field whose kind accepts
  * several operators as a record keyed by operator — a number or date filter
  * as its bounds, a `choices` filter as the sets it is any and none of, a text
- * filter as the text it contains and starts with — and a flag as `true` when
- * set, each present only when the slice carries it; plus the search text and
- * the ordered sort terms. An adapter finds the status filter by name instead
+ * filter as the text it contains and starts with — and a presence field as
+ * `true` when set, each present only when the slice carries it; plus the
+ * search text and the ordered sort terms. An adapter finds the status filter by name instead
  * of scanning predicates and stringifying operands.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
@@ -431,7 +431,7 @@ export type CapabilityDeclaration<
 export type SliceReading<TFields extends readonly SchemaFieldDefinition[]> = {
   readonly filters: {
     readonly [TDefinition in TFields[number] as TDefinition["field"]]?: TDefinition extends {
-      readonly kind: "flag";
+      readonly kind: "presence";
     }
       ? AppliedOf<TDefinition>
       : TDefinition extends {
@@ -716,4 +716,10 @@ export type ExecuteSliceConfig = {
   readonly sort: SortCapabilities;
   /** Fields free-text search reads; none by default. */
   readonly searchFields?: readonly string[];
+  /**
+   * The collection's record types, or null when it has one. A presence
+   * field scoped to other types than a row's is not applicable to that
+   * row, and orders with the empties.
+   */
+  readonly types: RecordTypes | null;
 };

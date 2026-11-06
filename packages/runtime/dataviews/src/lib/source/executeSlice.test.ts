@@ -16,7 +16,7 @@ const schema = createSchema([
   { field: "id", kind: "text" },
   { field: "name", kind: "text" },
   { field: "cpu", kind: "number" },
-  { field: "ready", kind: "flag" },
+  { field: "ready", kind: "presence" },
   { field: "owner", kind: "text" },
   { field: "seen", kind: "date" },
 ]);
@@ -27,6 +27,7 @@ const buildExecuteConfig = (
 ): ExecuteSliceConfig => ({
   schema,
   sort: declareSort(schema.fieldNames),
+  types: null,
   ...overrides,
 });
 
@@ -214,7 +215,7 @@ describe("executeSlice", () => {
     ).toEqual([]);
   });
 
-  it("bounds flags, false below true", () => {
+  it("bounds no presence field, which has no range", () => {
     expect(
       ids(
         executeSlice(
@@ -225,7 +226,7 @@ describe("executeSlice", () => {
           buildExecuteConfig(),
         ),
       ),
-    ).toEqual(["a", "c"]);
+    ).toEqual([]);
     expect(
       ids(
         executeSlice(
@@ -236,7 +237,7 @@ describe("executeSlice", () => {
           buildExecuteConfig(),
         ),
       ),
-    ).toEqual(["b", "d"]);
+    ).toEqual([]);
   });
 
   it("never satisfies a range across value types", () => {
@@ -449,8 +450,9 @@ describe("executeSlice", () => {
   });
 
   it("runs the query's own terms instead of the default, not before it", () => {
-    // Were the default appended, c and d — tied on ready — would order by
-    // cpu descending; replaced, they keep the order they came in.
+    // Every row sets ready, so all four tie on it. Were the default
+    // appended, they would order by name descending; replaced, they keep
+    // the order they came in.
     expect(
       ids(
         executeSlice(
@@ -459,7 +461,7 @@ describe("executeSlice", () => {
           buildConfigWithDefault([{ field: "name", direction: "desc" }]),
         ),
       ),
-    ).toEqual(["b", "d", "a", "c"]);
+    ).toEqual(["a", "b", "c", "d"]);
   });
 
   it("keeps the input order when neither the query nor the source orders", () => {
@@ -480,7 +482,7 @@ describe("executeSlice", () => {
           }),
         ),
       ),
-    ).toEqual(["b", "d", "c", "a"]);
+    ).toEqual(["b", "c", "d", "a"]);
   });
 
   it("places a field's empties where the source declares them, in both directions", () => {

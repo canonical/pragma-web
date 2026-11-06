@@ -48,7 +48,7 @@ describe("regression 0066 — date facet offered bounds no filter reaches", () =
         ...EMPTY_SLICE,
         filter: [{ field: "updated", operator: "lte", operands: [facet.max] }],
       },
-      { schema, sort: declareSort(schema.fieldNames) },
+      { schema, sort: declareSort(schema.fieldNames), types: null },
     ).map((row) => row.id);
     expect(facet).toEqual({
       kind: "range",

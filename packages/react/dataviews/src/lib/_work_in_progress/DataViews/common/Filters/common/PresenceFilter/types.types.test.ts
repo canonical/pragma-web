@@ -5,24 +5,24 @@
 import type { Count, FilterHandle } from "@canonical/dataviews-core";
 import type { ComponentProps } from "react";
 import { describe, expectTypeOf, it } from "vitest";
-import type { FlagFilterProps } from "./types.js";
+import type { PresenceFilterProps } from "./types.js";
 
-describe("FlagFilterProps", () => {
+describe("PresenceFilterProps", () => {
   it("binds one field's presence handle, with its count when a facet answers", () => {
-    expectTypeOf<FlagFilterProps["handle"]>().toEqualTypeOf<
+    expectTypeOf<PresenceFilterProps["handle"]>().toEqualTypeOf<
       FilterHandle<boolean>
     >();
-    expectTypeOf<FlagFilterProps["count"]>().toEqualTypeOf<Count | null>();
+    expectTypeOf<PresenceFilterProps["count"]>().toEqualTypeOf<Count | null>();
   });
 
   it("takes the native props of the div it renders as its root", () => {
-    expectTypeOf<FlagFilterProps["className"]>().toEqualTypeOf<
+    expectTypeOf<PresenceFilterProps["className"]>().toEqualTypeOf<
       ComponentProps<"div">["className"]
     >();
-    expectTypeOf<FlagFilterProps>().toHaveProperty("onKeyDown");
+    expectTypeOf<PresenceFilterProps>().toHaveProperty("onKeyDown");
   });
 
   it("draws its own content", () => {
-    expectTypeOf<FlagFilterProps>().not.toHaveProperty("children");
+    expectTypeOf<PresenceFilterProps>().not.toHaveProperty("children");
   });
 });

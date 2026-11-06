@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { RecordTypes } from "../collection/index.js";
 import type { SortTerm } from "../query/index.js";
 import {
   createSchema,
@@ -18,7 +19,7 @@ const schema = createSchema([
   },
   { field: "cores", kind: "number" },
   { field: "seen", kind: "date" },
-  { field: "ready", kind: "flag" },
+  { field: "ready", kind: "presence" },
 ]);
 
 // Recorded against ICU 75.1; a backend claiming this order is checked against
@@ -38,6 +39,7 @@ type Ordered = {
   readonly collation?: string | null;
   readonly tiebreak?: EffectiveOrdering["tiebreak"];
   readonly empties?: Readonly<Record<string, EmptyPlacement>>;
+  readonly types?: RecordTypes | null;
 };
 
 const buildOrderConfig = (
@@ -51,6 +53,7 @@ const buildOrderConfig = (
       ? ROOT_NUMERIC_COLLATION
       : options.collation,
   empties: options.empties ?? {},
+  types: options.types ?? null,
 });
 
 /** Order rows by one ordering, answering their ids. */
@@ -201,30 +204,103 @@ describe("orderRows", () => {
     ]);
   });
 
-  it("orders flags false before true, and anything present as set", () => {
-    // Presence, as `isSet` reads it: a falsy value that is not `false` is
-    // still set.
+  it("orders a presence field unset before set, false and true tied", () => {
+    // Presence, as `isSet` reads it: anything but absent or null is set,
+    // `false` and a falsy value included. The set rows tie, so they keep
+    // their input order in both directions.
     const rows = [
       { id: "t", ready: true },
+      { id: "absent" },
       { id: "f", ready: false },
       { id: "other", ready: "yes" },
+      { id: "null", ready: null },
       { id: "zero", ready: 0 },
       { id: "blank", ready: "" },
     ];
     expect(order(rows, [buildAscTerm("ready")])).toEqual([
-      "f",
+      "absent",
+      "null",
       "t",
+      "f",
       "other",
       "zero",
       "blank",
     ]);
     expect(order(rows, [buildDescTerm("ready")])).toEqual([
       "t",
+      "f",
       "other",
       "zero",
       "blank",
-      "f",
+      "absent",
+      "null",
     ]);
+  });
+
+  it("leaves false and true of a presence field to the next term", () => {
+    const rows = [
+      { id: "t", ready: true, cores: 2 },
+      { id: "f", ready: false, cores: 1 },
+    ];
+    expect(order(rows, [buildAscTerm("ready"), buildAscTerm("cores")])).toEqual(
+      ["f", "t"],
+    );
+  });
+
+  describe("a presence field scoped to some record types", () => {
+    const scoped = createSchema([
+      { field: "type", kind: "choices", options: ["vm", "container"] },
+      { field: "secureboot", kind: "presence", appliesTo: ["vm"] },
+      { field: "cores", kind: "number", appliesTo: ["vm"] },
+    ]);
+    const types: RecordTypes = { field: "type", names: ["vm", "container"] };
+    const rows = [
+      { id: "container", type: "container" },
+      { id: "set", type: "vm", secureboot: true },
+      { id: "unset", type: "vm" },
+    ];
+
+    it("orders a row it does not apply to last in both directions", () => {
+      const options = { schema: scoped, types };
+      expect(order(rows, [buildAscTerm("secureboot")], options)).toEqual([
+        "unset",
+        "set",
+        "container",
+      ]);
+      expect(order(rows, [buildDescTerm("secureboot")], options)).toEqual([
+        "set",
+        "unset",
+        "container",
+      ]);
+    });
+
+    it("places a row it does not apply to where the source places empties", () => {
+      expect(
+        order(rows, [buildDescTerm("secureboot")], {
+          schema: scoped,
+          types,
+          empties: { secureboot: "first" },
+        }),
+      ).toEqual(["container", "set", "unset"]);
+    });
+
+    it("reads every row as applicable in a collection of one type", () => {
+      expect(
+        order(rows, [buildAscTerm("secureboot")], { schema: scoped }),
+      ).toEqual(["container", "unset", "set"]);
+    });
+
+    it("leaves another kind's scope to its value", () => {
+      // A row of another type carries no value at a scoped key, so it is
+      // empty by its value alone; one carrying a value anyway orders by it.
+      const numbered = [
+        { id: "stray", type: "container", cores: 1 },
+        { id: "vm", type: "vm", cores: 2 },
+      ];
+      expect(
+        order(numbered, [buildAscTerm("cores")], { schema: scoped, types }),
+      ).toEqual(["stray", "vm"]);
+    });
   });
 
   it("orders numbers numerically, with -0 equal to 0", () => {

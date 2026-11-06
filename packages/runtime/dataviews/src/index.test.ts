@@ -34,7 +34,7 @@ describe("public surface", () => {
 
   it("wires the barrel to working functions", () => {
     expect(
-      dataviews.createSchema([{ field: "owner", kind: "flag" }]).fieldNames,
+      dataviews.createSchema([{ field: "owner", kind: "presence" }]).fieldNames,
     ).toEqual(["owner"]);
     const ids = dataviews.createCollection({
       identify: (row: { readonly id: string }) => row.id,

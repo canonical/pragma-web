@@ -13,7 +13,7 @@ import type { Collection, DiscriminatorField } from "./types.js";
 const instances = createSchema([
   { field: "type", kind: "choices", options: ["container", "virtual-machine"] },
   { field: "rank", kind: "choices", options: [1, 2] },
-  { field: "status", kind: "flag" },
+  { field: "status", kind: "presence" },
 ]);
 
 type Fields = typeof instances.fields;
@@ -54,11 +54,11 @@ describe("DiscriminatorField", () => {
   });
 
   it("refuses a field that is not a closed set of names", () => {
-    // @ts-expect-error a flag field has no options to name types with
-    const flag: Discriminator<{ readonly status: boolean }> = "status";
+    // @ts-expect-error a presence field has no options to name types with
+    const presence: Discriminator<{ readonly status: boolean }> = "status";
     // @ts-expect-error a choices field of numbers names no types
     const numeric: Discriminator<{ readonly rank: 1 | 2 }> = "rank";
-    expect([flag, numeric]).toEqual(["status", "rank"]);
+    expect([presence, numeric]).toEqual(["status", "rank"]);
   });
 });
 
