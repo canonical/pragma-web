@@ -11,7 +11,7 @@ import Component from "./IconButton.js";
 const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
-  decorators: [decorators.surface],
+  decorators: [decorators.surface()],
   argTypes: {
     importance: {
       control: "select",

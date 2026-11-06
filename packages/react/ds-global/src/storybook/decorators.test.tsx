@@ -30,14 +30,6 @@ describe("rtl", () => {
 
 describe("surface", () => {
   it("paints the story on one surface, with padding", () => {
-    const { container } = render(decorators.surface(Story));
-    expectSurfaceBand(container);
-  });
-
-  // Fails until surface is a factory like rtl and grid, called as
-  // `decorators.surface()`.
-  it.fails("is a factory, like rtl and grid", () => {
-    // @ts-expect-error surface takes the story itself until the next commit.
     const { container } = render(decorators.surface()(Story));
     expectSurfaceBand(container);
   });

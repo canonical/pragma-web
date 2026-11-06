@@ -11,7 +11,7 @@ import Component from "./Button.js";
 const meta = {
   title: "components/Button",
   component: Component,
-  decorators: [decorators.surface],
+  decorators: [decorators.surface()],
   argTypes: {
     // Importance is never blank — primary is the default hierarchy.
     importance: {
