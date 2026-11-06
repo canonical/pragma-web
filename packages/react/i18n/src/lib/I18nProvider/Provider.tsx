@@ -14,8 +14,9 @@ import type { I18nProviderProps } from "./types.js";
  *
  * `import { I18nProvider } from "@canonical/i18n-react";`
  *
- * @note - This function is impure - its first render creates the provider's
- * own locale source, which in the browser writes `<html lang dir>`.
+ * @note - This function is impure - the first render without an external
+ * `source` creates the provider's own locale source, which in the browser
+ * writes `<html lang dir>`; while a `source` is given, it writes nothing.
  * @implements ds:global.provider.i18n
  */
 export default function Provider({

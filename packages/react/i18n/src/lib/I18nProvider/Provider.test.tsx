@@ -1,6 +1,6 @@
 import { createLocaleSource, type Locale } from "@canonical/i18n-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   greetingCatalogs as catalogs,
   localeConfig as config,
@@ -29,6 +29,11 @@ function SwitchTo({ locale }: { locale: Locale }): React.ReactElement {
 }
 
 describe("I18nProvider", () => {
+  afterEach(() => {
+    document.documentElement.lang = "";
+    document.documentElement.dir = "";
+  });
+
   it("shows as I18nProvider in React DevTools and component stacks", () => {
     expect(I18nProvider.displayName).toBe("I18nProvider");
   });
@@ -62,6 +67,21 @@ describe("I18nProvider", () => {
       </I18nProvider>,
     );
     expect(screen.getByText("fr")).toBeTruthy();
+  });
+
+  it("leaves the document as an external source reflected it", () => {
+    const source = createLocaleSource(config, {
+      initial: "ar",
+      persist: false,
+    });
+    expect(document.documentElement.lang).toBe("ar");
+    render(
+      <I18nProvider config={config} catalogs={catalogs} source={source}>
+        <ShowLocale />
+      </I18nProvider>,
+    );
+    expect(document.documentElement.lang).toBe("ar");
+    expect(document.documentElement.dir).toBe("rtl");
   });
 
   it("keeps a runtime locale switch across provider re-renders", () => {
