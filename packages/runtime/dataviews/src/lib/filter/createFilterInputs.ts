@@ -61,9 +61,14 @@ export default function createFilterInputs<
         address: addressPredicate(definition.field, operator),
         input,
       });
-      // The handle alone: the predicate and its adoption stay with the
-      // records that sync.
-      const { setApplied: _adopt, predicate: _predicate, ...handle } = input;
+      // The handle alone: the predicate, its adoption and the session's end
+      // stay with the records.
+      const {
+        setApplied: _adopt,
+        predicate: _predicate,
+        endSession: _end,
+        ...handle
+      } = input;
       byOperator[operator] = handle;
     }
     handles[definition.field] = byOperator;
@@ -126,6 +131,11 @@ export default function createFilterInputs<
     // own literal keys and their operators; the map type is what the walk
     // can say, and this is what the walk in fact produced.
     handles: handles as FilterInputs<TFields>["handles"],
+    endSessions(): void {
+      for (const { input } of records) {
+        input.endSession();
+      }
+    },
     observe(): () => void {
       // The query may have moved while nothing was following it.
       sync();

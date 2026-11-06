@@ -309,7 +309,10 @@ const renderControl = (
  * a real link, hidden controls carry the rest of the query, and the submit
  * control leads to the destination the provider would have written. Once
  * scripting is enabled every edit applies as it is made, the clear controls
- * appear, and a submission is intercepted.
+ * appear, and a submission is intercepted. A typed value — text, a number
+ * or a date — edits in one input session: its first change enters history
+ * and the rest replace it, until the reader leaves the input or submits the
+ * form.
  *
  * With `primary` fields marked, the controls shown by default are theirs, in
  * the order marked, then any other field's that carries a restriction; the
@@ -322,6 +325,8 @@ const renderControl = (
  *
  * `import { DataViews } from "@canonical/dataviews-react";`
  *
+ * @implements ds:apps.subcomponent.data_table-filters
+ *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
  */
@@ -332,7 +337,8 @@ export default function Filters({
   className,
   ...rest
 }: DataViewsFiltersProps): ReactElement {
-  const { provider, filters, messages } = useDataViewsRoot("Filters");
+  const { provider, filters, messages, endSessions } =
+    useDataViewsRoot("Filters");
   const facets = useFacets({ provider });
   const restricted = useRestrictedFields({ provider });
   const issues = useDataViewsValue(provider.issues);
@@ -438,7 +444,11 @@ export default function Filters({
       {...rest}
       method="get"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      onSubmit={interceptSubmit}
+      onSubmit={(event) => {
+        interceptSubmit(event);
+        // Submitting ends every input session, as leaving an input does.
+        endSessions();
+      }}
     >
       {/* Focusable from code, never by Tab: where focus goes when a control
           that had it leaves with the restriction it removed, or is

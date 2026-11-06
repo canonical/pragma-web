@@ -354,11 +354,14 @@ export type ProviderHost<
   /**
    * Replace the predicate at its address, and the one at the same field
    * under `replaces` when given, as one transition; the window returns to
-   * page one.
+   * page one. Given `history`, the transition enters history that way
+   * rather than as the policy says: a typed value's later edits in one input
+   * session replace the entry its first one entered.
    */
   readonly setPredicate: (
     predicate: Predicate,
     replaces?: SetOperator,
+    history?: HistoryMode,
   ) => readonly SourceRefusal[];
   /** Remove the predicate at an address; the window returns to page one. */
   readonly removePredicate: (
@@ -598,8 +601,15 @@ export type QueryCommands = Pick<
   ProviderHost,
   "refusals" | "adopt" | "refresh"
 > & {
-  /** Apply one command at the boundary; the refusals it incurs, empty when applied. */
-  readonly command: (command: QueryCommand) => readonly SourceRefusal[];
+  /**
+   * Apply one command at the boundary; the refusals it incurs, empty when
+   * applied. Given `history`, its transition enters history that way rather
+   * than as the policy says.
+   */
+  readonly command: (
+    command: QueryCommand,
+    history?: HistoryMode,
+  ) => readonly SourceRefusal[];
 };
 
 /**
