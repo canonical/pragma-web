@@ -18,6 +18,12 @@ describe("IconButton SSR", () => {
     expect(html).toContain('aria-label="Edit"');
   });
 
+  // Fails until the built-in Tooltip is removed.
+  it.fails("renders the <button> as the root of the server HTML", () => {
+    const html = renderToString(<Component icon="edit" aria-label="Edit" />);
+    expect(html).toMatch(/^<button /);
+  });
+
   describe("tooltip", () => {
     it("wraps the button in the Tooltip area", () => {
       const html = renderToString(<Component icon="edit" aria-label="Edit" />);
