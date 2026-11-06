@@ -1,12 +1,14 @@
 import type { SortTerm } from "@canonical/dataviews-core";
+import { areListsEqual } from "@canonical/dataviews-core/bindings";
+import areSortTermsEqual from "./areSortTermsEqual.js";
 
 /**
- * Whether two orderings say the same thing. A placeholder that answers no
- * until the comparison lands, so the rows that pin it can be seen failing.
+ * Whether two orderings say the same thing: the same terms, each on one
+ * field in one direction, in the same order.
  */
 export default function areSortListsEqual(
-  _terms: readonly SortTerm[],
-  _others: readonly SortTerm[],
+  terms: readonly SortTerm[],
+  others: readonly SortTerm[],
 ): boolean {
-  return false;
+  return areListsEqual(terms, others, areSortTermsEqual);
 }
