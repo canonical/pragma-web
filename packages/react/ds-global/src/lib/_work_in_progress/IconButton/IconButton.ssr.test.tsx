@@ -12,8 +12,14 @@ describe("IconButton SSR", () => {
   it("renders a button with Button's and its own classes", () => {
     const html = renderToString(<Component icon="edit" aria-label="Edit" />);
     expect(html).toContain("<button");
-    expect(html.match(/<button[^>]* class="([^"]*)"/)?.[1]).toBe(
-      "ds button primary icon-button",
+    // Compared as a set: Button's base and IconButton's own class both carry
+    // the `ds` scope, so the attribute may name it twice.
+    const classes = html
+      .match(/<button[^>]* class="([^"]*)"/)
+      ?.at(1)
+      ?.split(" ");
+    expect(new Set(classes)).toEqual(
+      new Set(["ds", "button", "primary", "icon-button"]),
     );
     expect(html).toContain('aria-label="Edit"');
   });
