@@ -68,12 +68,18 @@ describe("SettingsCell", () => {
     expect(release).toHaveBeenCalledTimes(1);
   });
 
-  it("draws as the header cell's settings part", () => {
+  it("carries the class named for its own part", () => {
     mount();
     expect(screen.getByRole("columnheader")).toHaveClass(
       "ds",
-      "data-table-header-cell",
-      "settings",
+      "data-table-settings-cell",
     );
+  });
+
+  it("takes the native props of its root, merging the class name", () => {
+    mount({ className: "extra", title: "From the table" });
+    const root = screen.getByRole("columnheader");
+    expect(root).toHaveClass("ds", "data-table-settings-cell", "extra");
+    expect(root).toHaveAttribute("title", "From the table");
   });
 });

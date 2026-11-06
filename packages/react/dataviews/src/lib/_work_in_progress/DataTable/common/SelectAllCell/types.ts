@@ -1,13 +1,8 @@
 import type { ReadonlyChannel, Selection } from "@canonical/dataviews-core";
+import type { ComponentProps } from "react";
 
-/**
- * Props of the select-all header cell.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the selection model and the displayed identities,
- * not forwarding a caller's native props.
- */
-export type SelectAllCellProps = {
+type OwnProps = {
+  /** The collection's selection, which the checkbox adds to and removes from. */
   readonly selection: Selection;
   /**
    * The displayed row identities — the scope this control acts on. Passed
@@ -21,3 +16,11 @@ export type SelectAllCellProps = {
    */
   readonly reserve: (cell: HTMLDivElement) => () => void;
 };
+
+/**
+ * Props of the select-all header cell: its own, and the native props of the
+ * `div` it renders as its root. The cell owns its role, and its ref is the
+ * table's geometry, so neither is taken.
+ */
+export type SelectAllCellProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps | "children" | "role" | "ref">;

@@ -95,12 +95,18 @@ describe("SelectAllCell", () => {
     expect(release).toHaveBeenCalledTimes(1);
   });
 
-  it("draws as the header cell's selection part", () => {
+  it("carries the class named for its own part", () => {
     mount(["m-1"]);
     expect(screen.getByRole("columnheader")).toHaveClass(
       "ds",
-      "data-table-header-cell",
-      "selection",
+      "data-table-select-all-cell",
     );
+  });
+
+  it("takes the native props of its root, merging the class name", () => {
+    mount(["m-1"], { className: "extra", title: "From the table" });
+    const root = screen.getByRole("columnheader");
+    expect(root).toHaveClass("ds", "data-table-select-all-cell", "extra");
+    expect(root).toHaveAttribute("title", "From the table");
   });
 });

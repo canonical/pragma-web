@@ -50,7 +50,6 @@ const testConfig = reactTestConfig({
       "testing/elementAt.ts",
       "testing/expectNoAxeViolations.ts",
       "testing/fakeAnnouncerClock.ts",
-      "testing/findEnglish.ts",
       "testing/readAnnouncements.ts",
       "testing/requestMockApi.ts",
       "testing/serveMockApi.ts",

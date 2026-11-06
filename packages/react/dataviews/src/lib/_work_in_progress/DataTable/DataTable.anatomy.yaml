@@ -10,21 +10,21 @@
 #   DataTable       design "DataTable"    DOM `ds data-table dense`
 #   header row group                      DOM `ds data-table-row-group header`
 #   header row, row                       DOM `ds data-table-row`
-#   select-all cell                       DOM `ds data-table-header-cell selection`
+#   select-all cell                       DOM `ds data-table-select-all-cell`
 #   body row group                        DOM `ds data-table-row-group body`
 #   selection cell  design "BodyCell: Checkbox variant"
-#                                         DOM `ds data-table-body-cell selection`
+#                                         DOM `ds data-table-selection-cell`
 #   status row      DOM `ds data-table-row status`
 #   status cell     DOM `ds data-table-body-cell status`, `data-status="<status>"`
 #   gap             DOM `ds data-table-gap`, hidden from assistive technology
 #   settings cell   design "settings action cell"
-#                   DOM `ds data-table-header-cell settings`
+#                   DOM `ds data-table-settings-cell`
 #   announcement    DOM `ds data-views-announcer`, beside the root, read
 #                   and not drawn: a standalone table's own, or none, where a
 #                   connected table speaks through its root's
-# The selection and status cells share the body cell's class for its shared
-# box, but they are role nodes here, not BodyCells: the table's `selectable`
-# prop and its outcome choose them, never a column.
+# The status cell shares the body cell's class for its shared box. It and
+# the selection cell are role nodes here, not BodyCells: the table's
+# `selectable` prop and its outcome choose them, never a column.
 #
 # Tokens are `/`-paths over `@canonical/design-tokens` 0.43.0 ids. Two
 # bindings read a `@canonical/styles` channel rather than a token: the row's
@@ -88,11 +88,6 @@
 #     selection track precedes it and the settings track follows it, both
 #     the stylesheet's own and both present only when the header holds
 #     their cell; every body row keeps the settings track, empty.
-#   - The selection and settings cells are drawn as header cells, sharing
-#     the header cell's box, with `ds data-table-header-cell selection` and
-#     `ds data-table-header-cell settings` rather than a class named for the
-#     part that renders each: a recorded deviation from the code standards'
-#     kebab-case class names, so both cells take the header row's rules.
 #   - The announcement is hidden by clipping, unthemable geometry, and is
 #     rendered beside the root rather than inside it, since a table's
 #     children are its row groups: the DSL has no node for a region read and

@@ -287,14 +287,14 @@ describe("DataTable stylesheet", () => {
       ".ds.data-table-header-cell > .sort > .ds.icon",
       ".ds.data-table-header-cell > .label",
       ".ds.data-table-header-cell > .ds.data-table-resize-handle",
-      ".ds.data-table-header-cell.selection",
-      ".ds.data-table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-header-cell.selection",
+      ".ds.data-table-select-all-cell",
+      ".ds.data-table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-select-all-cell",
       ".ds.data-table-row-group.header > .ds.data-table-row",
       ".ds.data-table-row-group.body > .ds.data-table-row.selected",
-      ".ds.data-table-row > .ds.data-table-body-cell.selection",
-      // A data cell, not only the selection and status cells sharing its
-      // class: its ellipsis and padding live on this class.
-      ".ds.data-table-row-group.body > .ds.data-table-row > .ds.data-table-body-cell:not(.selection)",
+      ".ds.data-table-row > .ds.data-table-selection-cell",
+      // A data cell, not only the status cell sharing its class: its
+      // ellipsis and padding live on this class.
+      ".ds.data-table-row-group.body > .ds.data-table-row > .ds.data-table-body-cell:not(.status)",
     ]) {
       expect(container.querySelector(selector), selector).not.toBeNull();
     }
@@ -369,14 +369,38 @@ describe("DataTable stylesheet", () => {
     // Each set on a table whose header holds its cell, and empty otherwise.
     expect(
       rule(
-        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.selection\s*\)/,
+        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-select-all-cell\s*\)/,
       ),
     ).toMatch(/--data-table-selection-track:\s*var\(--dimension-400\);/);
     expect(
       rule(
-        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-header-cell\.settings\s*\)/,
+        /\.ds\.data-table:has\(\s*>\s*\.ds\.data-table-row-group\.header\s*>\s*\.ds\.data-table-row\s*>\s*\.ds\.data-table-settings-cell\s*\)/,
       ),
     ).toMatch(/--data-table-settings-track:\s*var\(--dimension-400\);/);
+  });
+
+  it("draws the selection and settings cells by their own classes", () => {
+    // One control centred in its track, never clipped, never widening it.
+    const controls = rule(
+      /\.ds\.data-table-select-all-cell,\s*\.ds\.data-table-selection-cell,\s*\.ds\.data-table-settings-cell/,
+    );
+    expect(controls).toMatch(/display:\s*flex;/);
+    expect(controls).toMatch(/justify-content:\s*center;/);
+    expect(controls).toMatch(/min-inline-size:\s*0;/);
+    expect(controls).toMatch(/padding-inline:\s*0;/);
+    expect(controls).toMatch(/overflow:\s*visible;/);
+    // The header's two take its full height and its type.
+    const header = rule(
+      /\.ds\.data-table-select-all-cell,\s*\.ds\.data-table-settings-cell/,
+    );
+    expect(header).toMatch(/align-self:\s*stretch;/);
+    expect(header).toMatch(
+      /font-weight:\s*var\(--typography-text-primary-bold-font-weight\);/,
+    );
+    // The settings menu's disclosure is placed below the cell.
+    expect(rule(/\.ds\.data-table-settings-cell/)).toMatch(
+      /position:\s*relative;/,
+    );
   });
 
   it("spans the status row across the table, however many tracks it has", () => {

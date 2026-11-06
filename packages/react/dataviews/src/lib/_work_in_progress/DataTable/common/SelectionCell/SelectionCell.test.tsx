@@ -66,12 +66,18 @@ describe("SelectionCell", () => {
     expect([...provider.selection.state.get().ids]).toEqual(["m-1"]);
   });
 
-  it("draws as the body cell's selection part", () => {
+  it("carries the class named for its own part", () => {
     mount();
     expect(screen.getByRole("cell")).toHaveClass(
       "ds",
-      "data-table-body-cell",
-      "selection",
+      "data-table-selection-cell",
     );
+  });
+
+  it("takes the native props of its root, merging the class name", () => {
+    mount({ className: "extra", title: "From the table" });
+    const root = screen.getByRole("cell");
+    expect(root).toHaveClass("ds", "data-table-selection-cell", "extra");
+    expect(root).toHaveAttribute("title", "From the table");
   });
 });

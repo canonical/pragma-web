@@ -236,9 +236,7 @@ const mountedHosts = (scope: HTMLElement = document.body): string[] =>
     .getAllByRole("row")
     .slice(1)
     .map(
-      (row) =>
-        row.querySelector(".ds.data-table-body-cell:not(.selection)")
-          ?.textContent ?? "",
+      (row) => row.querySelector(".ds.data-table-body-cell")?.textContent ?? "",
     );
 
 /** The heights of the gaps, in order. */

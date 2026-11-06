@@ -29,7 +29,7 @@ const columns: readonly DataTableColumn[] = [
  */
 const choose = (name: string): void => {
   const cell = document.querySelector<HTMLElement>(
-    ".data-table-header-cell.settings",
+    ".ds.data-table-settings-cell",
   );
   if (cell === null) {
     throw new Error("expected the table's settings cell");

@@ -119,7 +119,7 @@
   .ds.data-table:has(
     > .ds.data-table-row-group.header
       > .ds.data-table-row
-      > .ds.data-table-header-cell.selection
+      > .ds.data-table-select-all-cell
   ) {
     --data-table-selection-track: var(--dimension-400);
   }
@@ -130,7 +130,7 @@
   .ds.data-table:has(
     > .ds.data-table-row-group.header
       > .ds.data-table-row
-      > .ds.data-table-header-cell.settings
+      > .ds.data-table-settings-cell
   ) {
     --data-table-settings-track: var(--dimension-400);
   }
@@ -330,17 +330,33 @@
     }
   }
 
-  /* The selection column, in the header and in every row: one checkbox,
-     centred in its track. Overflow is visible so a focus ring on the
-     checkbox is not clipped by the cell that holds it. */
-  .ds.data-table-body-cell.selection,
-  .ds.data-table-header-cell.selection,
-  .ds.data-table-header-cell.settings {
+  /* The selection column, in the header and in every row, and the
+     settings cell: one control, centred in its track. A grid item's
+     automatic minimum is its content, so zero here, as for every cell.
+     Overflow is visible so a focus ring on the control is not clipped by
+     the cell that holds it. */
+  .ds.data-table-select-all-cell,
+  .ds.data-table-selection-cell,
+  .ds.data-table-settings-cell {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-inline-size: 0;
     padding-inline: 0;
     overflow: visible;
+  }
+
+  /* The header's own cells take the header row's full height and type, as
+     a header cell does. The settings cell is also the containing block of
+     its menu's disclosure, shown below it. */
+  .ds.data-table-select-all-cell,
+  .ds.data-table-settings-cell {
+    align-self: stretch;
+    font-weight: var(--typography-text-primary-bold-font-weight);
+  }
+
+  .ds.data-table-settings-cell {
+    position: relative;
   }
 
   /* The table's status: a single cell spanning every track, carrying which
