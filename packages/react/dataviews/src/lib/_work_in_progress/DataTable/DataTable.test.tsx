@@ -2063,7 +2063,9 @@ describe("DataTable", () => {
     const measured = vi
       .spyOn(HTMLElement.prototype, "offsetWidth", "get")
       .mockImplementation(function (this: HTMLElement) {
-        return this.matches(".selection") ? selectionWidth : 0;
+        return this.matches(".ds.data-table-select-all-cell")
+          ? selectionWidth
+          : 0;
       });
     try {
       const { provider } = createMachineProvider();
@@ -2095,7 +2097,7 @@ describe("DataTable", () => {
       // The report only says the cell resized: its width is read again from
       // the cell's layout, never taken from the entry.
       selectionWidth = 40;
-      report((target) => target.matches(".selection"), 0);
+      report((target) => target.matches(".ds.data-table-select-all-cell"), 0);
       expect(table.style.getPropertyValue("--data-table-columns")).toBe(
         "100px 260px",
       );

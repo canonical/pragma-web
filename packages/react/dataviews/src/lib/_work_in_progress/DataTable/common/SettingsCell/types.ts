@@ -1,14 +1,7 @@
-import type { ReactElement } from "react";
+import type { ComponentProps, ReactElement } from "react";
 import type { SettingsMenuProps } from "../SettingsMenu/index.js";
 
-/**
- * Props of the settings header cell.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * holding what the table was given as its settings, not forwarding a
- * caller's native props.
- */
-export type SettingsCellProps = {
+type OwnProps = {
   /** What the table was given as its `settings`, drawn in the cell. */
   readonly settings: ReactElement;
   /** The menu's facts and commands, which what is drawn in the cell reads. */
@@ -19,3 +12,11 @@ export type SettingsCellProps = {
    */
   readonly reserve: (cell: HTMLDivElement) => () => void;
 };
+
+/**
+ * Props of the settings header cell: its own, and the native props of the
+ * `div` it renders as its root. The cell owns its role, and its ref is the
+ * table's geometry, so neither is taken.
+ */
+export type SettingsCellProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps | "children" | "role" | "ref">;

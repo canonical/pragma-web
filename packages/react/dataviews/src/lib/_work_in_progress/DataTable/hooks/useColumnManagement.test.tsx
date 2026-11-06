@@ -162,7 +162,7 @@ describe("useColumnManagement", () => {
     const row = buildHeaderRow([null, "Before", null, null]);
     const settings = document.createElement("div");
     settings.setAttribute("role", "columnheader");
-    settings.className = "settings";
+    settings.className = "ds data-table-settings-cell";
     settings.append(document.createElement("button"));
     row.append(settings);
     const { hook } = mountHook(row);

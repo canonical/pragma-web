@@ -93,7 +93,7 @@ const listShown = (): readonly (string | null)[] =>
  */
 const findTrigger = (): HTMLElement => {
   const cell = findTable().querySelector<HTMLElement>(
-    ".data-table-header-cell.settings",
+    ".ds.data-table-settings-cell",
   );
   if (cell === null) {
     throw new Error("expected the table's settings cell");
@@ -135,7 +135,7 @@ describe("DataViews.Settings", () => {
     const { provider } = createProvider();
     const view = render(<Composition provider={provider} />);
     const cell = findTrigger().closest("[role='columnheader']");
-    expect(cell).toHaveClass("ds", "data-table-header-cell", "settings");
+    expect(cell).toHaveClass("ds", "data-table-settings-cell");
     // Last in the header row, after every column's heading.
     expect(cell?.parentElement?.lastElementChild).toBe(cell);
     expect(cell).toHaveAccessibleName("Table settings");
@@ -144,7 +144,7 @@ describe("DataViews.Settings", () => {
       <DataTable provider={provider} columns={columns} label="Machines" />,
     );
     expect(
-      document.querySelector(".data-table-header-cell.settings"),
+      document.querySelector(".ds.data-table-settings-cell"),
     ).not.toBeInTheDocument();
   });
 

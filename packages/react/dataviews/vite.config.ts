@@ -31,6 +31,7 @@ const testConfig = reactTestConfig({
       "testing/declareMachineOrdering.ts",
       "testing/deliverFacets.ts",
       "testing/deliverRows.ts",
+      "testing/findEnglish.ts",
       "testing/fixtures.ts",
       "testing/MachineComposition.tsx",
       "testing/machines.ts",
