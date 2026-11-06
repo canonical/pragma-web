@@ -230,4 +230,10 @@ describe("HeaderCell", () => {
       expect(screen.queryByRole("separator")).toBeNull();
     });
   });
+
+  it("takes the native props of its root, merging the class name", () => {
+    mount({ className: "pinned", title: "Machine name" });
+    expect(header()).toHaveClass("ds", "data-table-header-cell", "pinned");
+    expect(header()).toHaveAttribute("title", "Machine name");
+  });
 });
