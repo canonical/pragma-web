@@ -1,13 +1,14 @@
 import { ICON_NAMES } from "@canonical/ds-assets";
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useState } from "react";
+import { type ReactElement, type ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import * as decorators from "../../../storybook/decorators.js";
 import { Button } from "../../component/Button/index.js";
 import { TooltipEngine, withTooltip } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
+import type { IconButtonProps } from "./types.js";
 
 const meta = {
   title: "_work_in_progress/IconButton",
@@ -368,108 +369,172 @@ export const OnContrastedSurface: Story = {
   ),
 };
 
+/** What a popover trigger takes beyond the icon button's own props. */
+type PopoverIconButtonProps = {
+  /** The icon button's props. */
+  buttonProps: IconButtonProps;
+  /** The id of the popover panel the button opens. */
+  panelId: string;
+  /** The panel's content. */
+  panel: ReactNode;
+};
+
+/**
+ * An icon button that opens a popover panel, with its Tooltip composed
+ * around it and kept closed while the panel is open. The panel's `toggle`
+ * event drives both the button's `aria-expanded` and the Tooltip's `open`.
+ */
+function PopoverIconButton({
+  buttonProps,
+  panelId,
+  panel,
+}: PopoverIconButtonProps): ReactElement {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <TooltipEngine
+        Message={buttonProps["aria-label"]}
+        open={isOpen ? false : undefined}
+      >
+        <Component
+          {...buttonProps}
+          popoverTarget={panelId}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+        />
+      </TooltipEngine>
+      <dialog
+        id={panelId}
+        popover="auto"
+        aria-label={buttonProps["aria-label"]}
+        onToggle={(event) => setIsOpen(event.newState === "open")}
+        style={{ padding: "var(--dimension-200)" }}
+      >
+        {panel}
+      </dialog>
+    </>
+  );
+}
+
+/**
+ * Plays the gating a popover trigger's Tooltip follows: closed until the
+ * button is hovered, closed while the panel is open, and back on the next
+ * hover once the panel closes. The panel is closed with a second press: a
+ * scripted Escape is not a trusted key press, so the browser does not
+ * dismiss the popover on it.
+ */
+const expectTooltipGatedByPanel = async (
+  canvasElement: HTMLElement,
+  name: string,
+  panelId: string,
+) => {
+  const document = canvasElement.ownerDocument;
+  const body = within(document.body);
+  const button = within(canvasElement).getByRole("button", { name });
+
+  await expect(body.queryByRole("tooltip")).toBeNull();
+  await userEvent.hover(button);
+  await expect(await findOpenTooltip(canvasElement)).toHaveTextContent(name);
+
+  await userEvent.click(button);
+  await waitFor(() => expect(button).toHaveAttribute("aria-expanded", "true"));
+  await expect(
+    document.querySelector(`#${panelId}:popover-open`),
+  ).not.toBeNull();
+  await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
+
+  await userEvent.click(button);
+  await waitFor(() => expect(button).toHaveAttribute("aria-expanded", "false"));
+  await expect(document.querySelector(`#${panelId}:popover-open`)).toBeNull();
+  await userEvent.unhover(button);
+  await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
+  await userEvent.hover(button);
+  await expect(await findOpenTooltip(canvasElement)).toHaveTextContent(name);
+  await userEvent.unhover(button);
+  await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
+};
+
 /**
  * As the trigger of a popover panel, wired with `popoverTarget`. Keep the
  * Tooltip closed while the panel is open, so it never covers what the
- * button opened: here the panel's `toggle` event drives both
- * `aria-expanded` and the Tooltip's `open`.
+ * button opened.
  */
 export const AsPopoverTrigger: Story = {
   name: "As a popover trigger",
   parameters: tooltipParameters,
-  render: function AsPopoverTriggerRender(args) {
-    const [isOpen, setIsOpen] = useState(false);
-    return (
-      <>
-        <TooltipEngine Message="Row options" open={isOpen ? false : undefined}>
-          <Component
-            {...args}
-            importance="tertiary"
-            icon="menu-contextual"
-            aria-label="Row options"
-            popoverTarget="row-options"
-            aria-expanded={isOpen}
-            aria-controls="row-options"
-          />
-        </TooltipEngine>
-        <section
-          id="row-options"
-          popover="auto"
-          aria-label="Row options"
-          onToggle={(event) => setIsOpen(event.newState === "open")}
-          style={{ padding: "var(--dimension-200)" }}
-        >
+  render: (args) => (
+    <PopoverIconButton
+      buttonProps={{
+        ...args,
+        importance: "tertiary",
+        icon: "menu-contextual",
+        "aria-label": "Row options",
+      }}
+      panelId="row-options"
+      panel={
+        <>
           <Button importance="tertiary">Rename</Button>
           <Button importance="tertiary" anticipation="destructive">
             Delete
           </Button>
-        </section>
-      </>
+        </>
+      }
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expectTooltipGatedByPanel(
+      canvasElement,
+      "Row options",
+      "row-options",
     );
-  },
-  play: async ({ canvas, canvasElement }) => {
-    const document = canvasElement.ownerDocument;
-    const body = within(document.body);
-    const button = canvas.getByRole("button", { name: "Row options" });
-
-    // Closed until the button is hovered.
-    await expect(body.queryByRole("tooltip")).toBeNull();
-    await userEvent.hover(button);
-    await findOpenTooltip(canvasElement);
-
-    // Opening the panel closes the Tooltip.
-    await userEvent.click(button);
-    await waitFor(() =>
-      expect(button).toHaveAttribute("aria-expanded", "true"),
-    );
-    await expect(
-      document.querySelector("#row-options:popover-open"),
-    ).not.toBeNull();
-    await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
-
-    // Closing the panel, with a second press, lets the Tooltip show again
-    // on the next hover. (A scripted Escape is not a trusted key press, so
-    // the browser does not light-dismiss the popover on it.)
-    await userEvent.click(button);
-    await waitFor(() =>
-      expect(button).toHaveAttribute("aria-expanded", "false"),
-    );
-    await expect(
-      document.querySelector("#row-options:popover-open"),
-    ).toBeNull();
-    await userEvent.unhover(button);
-    await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
-    await userEvent.hover(button);
-    await findOpenTooltip(canvasElement);
   },
 };
 
-const TableSettingsButton = withTooltip(Component, "Table settings");
-const ColumnOptionsButton = withTooltip(Component, "Column options");
-
 /**
  * The data view triggers: a gear for the table settings and three vertical
- * dots for the column and row options, each paired with its Tooltip. Both
- * are tertiary, and neither has a chevron: they are icon buttons, not
- * dropdown buttons.
+ * dots for the column options. Both are tertiary, and neither has a
+ * chevron: they are icon buttons, not dropdown buttons. Each opens its
+ * panel and keeps its Tooltip closed while the panel is open, as in "As a
+ * popover trigger".
  */
 export const GearAndThreeDots: Story = {
   name: "Gear and three dots",
   parameters: tooltipParameters,
   render: (args) => (
     <div style={row}>
-      <TableSettingsButton
-        {...args}
-        importance="tertiary"
-        icon="settings"
-        aria-label="Table settings"
+      <PopoverIconButton
+        buttonProps={{
+          ...args,
+          importance: "tertiary",
+          icon: "settings",
+          "aria-label": "Table settings",
+        }}
+        panelId="table-settings"
+        panel={<Button importance="tertiary">Show or hide columns</Button>}
       />
-      <ColumnOptionsButton
-        {...args}
-        importance="tertiary"
-        icon="menu-contextual"
-        aria-label="Column options"
+      <PopoverIconButton
+        buttonProps={{
+          ...args,
+          importance: "tertiary",
+          icon: "menu-contextual",
+          "aria-label": "Column options",
+        }}
+        panelId="column-options"
+        panel={<Button importance="tertiary">Sort ascending</Button>}
       />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    await expectTooltipGatedByPanel(
+      canvasElement,
+      "Table settings",
+      "table-settings",
+    );
+    await expectTooltipGatedByPanel(
+      canvasElement,
+      "Column options",
+      "column-options",
+    );
+  },
 };
