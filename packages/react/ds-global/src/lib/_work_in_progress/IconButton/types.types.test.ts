@@ -69,4 +69,14 @@ describe("IconButton props", () => {
     const iconless: Props = { "aria-label": "Edit" };
     expectTypeOf(iconless).toEqualTypeOf<Props>();
   });
+
+  it("takes a Tooltip message or false", () => {
+    const withMessage: Props = {
+      icon: "copy",
+      "aria-label": "Copy",
+      // @ts-expect-error the tooltip prop does not exist yet.
+      tooltip: "Copy the instance address",
+    };
+    expectTypeOf(withMessage).toEqualTypeOf<Props>();
+  });
 });

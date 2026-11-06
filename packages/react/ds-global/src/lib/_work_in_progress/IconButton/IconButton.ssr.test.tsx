@@ -17,4 +17,23 @@ describe("IconButton SSR", () => {
     );
     expect(html).toContain('aria-label="Edit"');
   });
+
+  describe("tooltip", () => {
+    it.fails("wraps the button in the Tooltip area", () => {
+      const html = renderToString(<Component icon="edit" aria-label="Edit" />);
+      expect(html).toMatch(/^<span class="ds tooltip-area"/);
+    });
+
+    it("renders no Tooltip message on the server", () => {
+      const html = renderToString(<Component icon="edit" aria-label="Edit" />);
+      expect(html).not.toContain('role="tooltip"');
+    });
+
+    it("puts no aria-describedby on the button", () => {
+      const html = renderToString(<Component icon="edit" aria-label="Edit" />);
+      expect(html.match(/<button[^>]*>/)?.[0]).not.toContain(
+        "aria-describedby",
+      );
+    });
+  });
 });
