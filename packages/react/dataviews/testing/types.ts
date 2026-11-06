@@ -205,3 +205,10 @@ export type FacetedFleetConfig = {
   /** The fields it asks facets for; the status and the cores by default. */
   readonly facets?: readonly ("status" | "cores")[] | undefined;
 };
+
+/** What the value hook's suites read from a channel: two lists and a page. */
+export type Listing = {
+  readonly ids: readonly number[];
+  readonly other: readonly number[];
+  readonly page: number;
+};
