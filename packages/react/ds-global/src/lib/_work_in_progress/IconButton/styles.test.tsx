@@ -92,8 +92,9 @@ describe("IconButton stylesheet", () => {
 
   it("sets on the icon only what Button's icon slot leaves unset", () => {
     // `.ds.icon-button > .icon` ties Button's `.ds.button > .icon` at (0,3,0),
-    // and IconButton's sheet loads first, so a property both set would go to
-    // Button's by order.
+    // and the two sheets load in either order (index.css lists IconButton's
+    // first, the component imports emit Button's first), so a property both
+    // set would be decided by whichever loads last.
     const buttonSheet = readFileSync(
       path.join(here, "../../component/Button/styles.css"),
       "utf8",
