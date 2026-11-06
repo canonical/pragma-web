@@ -7,7 +7,7 @@
  */
 
 import type { ViewPresentation } from "@canonical/dataviews-core";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { act } from "react";
 import { describe, expect, it } from "vitest";
 import {
@@ -24,10 +24,24 @@ const columns: readonly DataTableColumn[] = [
   { id: "cores", header: "Cores", sortable: true },
 ];
 
-/** Choose one item from the table's settings menu. */
+/**
+ * Choose one item from the table's settings menu: the trigger read within
+ * its settings cell and the item within the open menu, as a named role
+ * query over the whole document names every button and item it meets.
+ */
 const choose = (name: string): void => {
-  fireEvent.click(screen.getByRole("button", { name: "Table settings" }));
-  fireEvent.click(screen.getByRole("menuitem", { name }));
+  const cell = document.querySelector<HTMLElement>(
+    ".data-table-header-cell.settings",
+  );
+  if (cell === null) {
+    throw new Error("expected the table's settings cell");
+  }
+  fireEvent.click(within(cell).getByRole("button", { name: "Table settings" }));
+  const menu = document.querySelector<HTMLElement>("[role='menu']");
+  if (menu === null) {
+    throw new Error("expected the settings menu open");
+  }
+  fireEvent.click(within(menu).getByRole("menuitem", { name }));
 };
 
 /** The headings carrying `aria-sort`, with the value each carries. */
