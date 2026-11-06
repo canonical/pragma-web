@@ -15,6 +15,7 @@ import type {
   MachineFixture,
   MachineProvider,
   MemoryViewStore,
+  RootedHook,
 } from "./types.js";
 
 describe("Machine", () => {
@@ -47,5 +48,17 @@ describe("Listing", () => {
     expectTypeOf<Listing["ids"]>().toEqualTypeOf<readonly number[]>();
     expectTypeOf<Listing["other"]>().toEqualTypeOf<readonly number[]>();
     expectTypeOf<Listing["page"]>().toEqualTypeOf<number>();
+  });
+});
+
+describe("RootedHook", () => {
+  it("is a machine fixture with the rendered hook and its render count", () => {
+    expectTypeOf<RootedHook<string>>().toExtend<MachineFixture>();
+    expectTypeOf<
+      RootedHook<string>["hook"]["result"]["current"]
+    >().toEqualTypeOf<string>();
+    expectTypeOf<RootedHook<string>["readRenders"]>().toEqualTypeOf<
+      () => number
+    >();
   });
 });

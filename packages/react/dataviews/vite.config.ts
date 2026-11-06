@@ -38,6 +38,7 @@ const testConfig = reactTestConfig({
       "testing/pageOf.ts",
       "testing/MachineComposition.tsx",
       "testing/readFailureReason.ts",
+      "testing/renderInRoot.tsx",
       "testing/renderRefusingTable.tsx",
     ],
     exclude: ["src/storybook/**", "**/*.stories.{ts,tsx}"],
