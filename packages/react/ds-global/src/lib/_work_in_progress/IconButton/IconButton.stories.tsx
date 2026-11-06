@@ -1,35 +1,17 @@
 import { ICON_NAMES } from "@canonical/ds-assets";
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
-import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
+import * as decorators from "../../../storybook/decorators.js";
 import { Button } from "../../component/Button/index.js";
 import { TooltipEngine } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
 
-/**
- * Render every story on a real surface, as Button's stories do, so the button
- * sits on the background it would have in an app. It stays inline, as in
- * Button's stories: the shared `surfaces` decorator draws three nested bands,
- * which is more than an icon button needs.
- */
-const surface: Decorator = (Story) => (
-  <div
-    className="surface"
-    style={{
-      background: "var(--surface-color-background)",
-      color: "var(--surface-color-text)",
-      padding: "var(--dimension-300, 24px)",
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
-  decorators: [surface],
+  decorators: [decorators.surface],
   argTypes: {
     importance: {
       control: "select",
