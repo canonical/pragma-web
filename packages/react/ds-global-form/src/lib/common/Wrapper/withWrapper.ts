@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useMemo } from "react";
 import type {
   BaseInputProps,
   BaseWrapperProps,
@@ -8,8 +9,6 @@ import type {
 } from "../types.js";
 import DefaultWrapper from "./Wrapper.js";
 import withConditionalDisplay from "./withConditionalDisplay.js";
-
-const noMiddleware: never[] = [];
 
 type WrappedComponentPropsInternal<ComponentProps extends BaseInputProps> =
   Omit<WrappedComponentProps<ComponentProps>, "Component"> & {
@@ -30,33 +29,25 @@ const withWrapper = <
   const MemoizedComponent = React.memo(Component);
 
   function WrappedComponent({
-    middleware = noMiddleware,
+    middleware = [],
     WrapperComponent = Wrapper,
     ...props
   }: WrappedComponentPropsInternal<ComponentProps>): React.ReactElement {
-    const committed = React.useRef<{
-      middleware: typeof middleware;
-      component: React.ComponentType<ComponentProps>;
-    } | null>(null);
-    const previous = committed.current;
-    // Only committed compositions may be reused after a suspended render.
-    const ExtendedComponent =
-      previous &&
-      previous.middleware.length === middleware.length &&
-      middleware.every((hoc, index) => previous.middleware.at(index) === hoc)
-        ? previous.component
-        : [...middleware]
-            .reverse()
-            .reduce<React.ComponentType<ComponentProps>>(
-              (component, hoc) => hoc(component),
-              MemoizedComponent,
-            );
-    React.useLayoutEffect(() => {
-      committed.current = {
-        middleware: [...middleware],
-        component: ExtendedComponent,
-      };
-    });
+    // We apply the middleware to the component in reverse orderso
+    // so that the first middleware in the array is the first to be applied to the component
+
+    const ExtendedComponent = useMemo(
+      () =>
+        // The middleware happens between the Wrapper and the Component,
+        // hence the return type of P
+        [...middleware]
+          .reverse()
+          .reduce<React.ComponentType<ComponentProps>>(
+            (AccumulatedComponent, hoc) => hoc(AccumulatedComponent),
+            MemoizedComponent,
+          ),
+      [middleware],
+    );
 
     // Type casting to avoid hard to read overloads.
     const finalProps = {

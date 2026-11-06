@@ -7,7 +7,6 @@ import {
 } from "../../subcomponent/Field/index.js";
 import type { BaseInputProps, WrapperProps } from "../types.js";
 import { useFieldWrapper } from "./hooks/index.js";
-import messages from "./messages.js";
 import "./styles.css";
 import "./ToggleWrapper.css";
 
@@ -117,7 +116,7 @@ const ToggleWrapper = <ComponentProps extends BaseInputProps>({
 
       {isError && (
         <FieldError {...ariaProps.error}>
-          {fieldError?.message?.toString() || messages.invalid}
+          {fieldError?.message?.toString()}
         </FieldError>
       )}
     </div>

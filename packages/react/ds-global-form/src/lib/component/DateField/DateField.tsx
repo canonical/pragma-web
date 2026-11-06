@@ -34,13 +34,6 @@ const dateRangeRules = ({
  */
 export default withWrapper<DateFieldProps>(
   bindField<DateFieldProps>(DateInput, "native", {
-    injectDefaultValue: true,
-    formatDefaultValue: (value) =>
-      value instanceof Date
-        ? Number.isNaN(value.getTime())
-          ? ""
-          : value.toISOString().slice(0, 10)
-        : value,
     additionalRegisterProps: dateRangeRules,
   }),
 );

@@ -14,7 +14,7 @@ export default defineConfig({
     sourcemap: true,
   },
   test: reactTestConfig({
-    glob: ["test", "tests"],
+    glob: "tests",
     setupFiles: ["./vitest.setup.ts"],
   }),
 });

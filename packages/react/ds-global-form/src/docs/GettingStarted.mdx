@@ -114,27 +114,6 @@ function SignupForm() {
 When you pass `methods`, `Form`'s own `defaultValues` and `mode` props are
 ignored — configure those on your `useForm` call instead.
 
-Text, number, date and select fields render representable RHF defaults in server
-markup. A select default is representable only when its option is present. An
-explicit native `defaultValue` takes precedence in that markup. During hydration,
-an early browser edit is adopted if the form value has not changed since the
-field's client render; `reset` subsequently uses RHF defaults. A form mutation
-or equal-value reset before client initialization cannot be distinguished from
-an unchanged default: hosts needing conflict safety must coordinate hydration
-and retain their own revision or draft. For `valueAsDate`, a Date default renders
-its UTC calendar date while RHF retains its original time until an edit or reset.
-Textarea and checkbox defaults and early edits do not have this hydration support.
-
-Native-bound fields are RHF-owned: use `defaultValues`, `setValue`, `reset` and
-`registerProps.onChange` rather than a separate native `value`/`onChange` pair.
-React can display a native `value` without synchronizing RHF's submitted value;
-RHF replaces native `onChange`. Use a custom field with RHF `Controller` or
-`useController` for externally controlled widgets.
-
-RHF registers during render, so a suspended or abandoned render can expose its
-native registration rules before commit. Use a resolver or submit flow and server
-validation for authoritative validation.
-
 ## Understanding react-hook-form
 
 This library is a thin layer over [react-hook-form](https://react-hook-form.com/)
@@ -185,22 +164,6 @@ passed straight to `register`: `required`, `min`, `max`, `minLength`,
 `maxLength`, `pattern`, and `validate`, plus the value transforms `valueAsNumber`,
 `valueAsDate`, and `setValueAs`. See [Validation](#validation) below for a live
 example.
-
-RHF merges registrations by field name: removing a `registerProps` key does not
-reliably remove an earlier rule or callback. Explicitly set the key to `undefined`
-or `required: false` when the field exclusively owns it. In particular, changing
-`isOptional` from optional to required and back does not remove the previously
-registered required rule. Explicitly supply `registerProps={{ required: false }}`
-when making an exclusively owned field optional. Clearing a rule on a shared name
-affects its other registrations.
-
-Same-name checkbox group ownership is unresolved. Native required validity can
-disagree with RHF when another checkbox is checked; disabled registration order can
-affect submitted values; shared errors can produce duplicate alerts and inconsistent
-required announcements; and suspended optionality changes can affect validation
-before commit. Prefer one `ChoicesField` for an RHF-owned group, and independently
-verify native and no-JavaScript requirements. Checkbox defaults are not rendered
-into server HTML and an early checkbox edit may be lost during hydration.
 
 ### Schema validation (optional)
 
@@ -305,63 +268,37 @@ Middleware wraps the input component to add cross-cutting behaviour. Each middle
 ```tsx
 import { Field, addRESTOptions, addRESTValidation } from "@canonical/react-ds-global-form";
 
-// Create middleware outside render, or use useMemo for changing configuration.
-const countries = addRESTOptions("/api/countries", {
-  transformData: (data) => data.countries.map(c => ({ value: c.code, label: c.name })),
-});
-const usernameValidation = addRESTValidation("/api/check-username", {
-  debounceWait: 300, minLength: 3,
-});
-
 // Fetch options from an API
 <Field
   name="country"
   inputType="select"
   label="Country"
   options={[]}
-  middleware={[countries]}
+  middleware={[
+    addRESTOptions("/api/countries", {
+      transformData: (data) => data.countries.map(c => ({
+        value: c.code,
+        label: c.name,
+      })),
+    }),
+  ]}
 />
 
-// Advisory remote check with debouncing
+// Server-side validation with debouncing
 <Field
   name="username"
   inputType="text"
   label="Username"
-  middleware={[usernameValidation]}
+  middleware={[
+    addRESTValidation("/api/check-username", {
+      debounceWait: 300,
+      minLength: 3,
+    }),
+  ]}
 />
 ```
 
 Middleware composes as an array. The first middleware in the array wraps outermost; the last wraps innermost (closest to the input). Custom middleware follows the same signature: `(Component) => EnhancedComponent`.
-
-Keep middleware function identities stable between renders; changing one remounts
-the composed input. StrictMode may call factories more than once, so factories
-must not perform side effects during composition.
-
-`addRESTValidation` is advisory: pending or failed requests do not block
-submission, and RHF validation or submission can clear even a completed remote
-error. Validate authoritatively in the resolver or submit flow and on the server.
-Superseded requests are cancelled, stale results ignored and unrelated errors
-preserved. Network or response-extraction failures do not establish validity.
-
-When a single select initially has options but no form or native default, the
-browser's first enabled option becomes the RHF value. Supply an empty placeholder
-option if an explicit choice is required. Dynamic options are not reconciled to
-the form value: when options arrive or change, the browser's selection and RHF's
-value may differ. Coordinate the choice list and form value in the host.
-
-When a select's RHF value contains unavailable or disabled options, the field
-marks the control invalid and displays a warning while retaining the form value.
-The warning does not block submission. If a selected single option disappears,
-the browser may display and submit a fallback while RHF retains and submits the
-old value. A disabled selected option may be omitted from native `FormData`.
-Before hydration, missing defaults likewise cannot be represented in native
-markup, and the browser may choose a fallback; early edits and form defaults can
-conflict. Do not rely on the warning to prevent these discrepancies: ensure the
-choices and defaults agree before rendering and reject unavailable or disabled
-values in the resolver or submit flow and on the server. For multiple selects,
-`null`, `undefined` and an empty string render no selection; the RHF value is
-retained until an edit produces an array. Native multiple-select values follow
-DOM order; RHF retains the form's array order until an edit.
 
 ## Conditional fields
 
