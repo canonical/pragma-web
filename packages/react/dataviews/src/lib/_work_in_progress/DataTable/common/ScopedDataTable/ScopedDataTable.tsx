@@ -181,7 +181,7 @@ export default function ScopedDataTable<
   // construction would outlive the interaction nothing else holds.
   useEffect(() => interaction.observe(), [interaction]);
 
-  const geometry = useTableGeometry(layout, interaction, columnIds);
+  const geometry = useTableGeometry({ layout, interaction, columnIds });
   const scopes = useRowScopes(provider, fields);
   const state = useDataViewsValue(provider.state);
   // The core's answer, held at one reference while it says the same thing,

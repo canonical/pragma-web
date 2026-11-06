@@ -1,15 +1,13 @@
 import {
   buildColumnTemplate,
-  type ColumnLayout,
   type ColumnToSize,
-  type GridInteraction,
   type ResolvedColumn,
   resolveColumns,
 } from "@canonical/dataviews-core/bindings";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useDataViewsValue, useStableValue } from "../../../hooks/index.js";
 import { areTracksEqual } from "../common/utils/index.js";
-import type { UseTableGeometryResult } from "./types.js";
+import type { UseTableGeometryProps, UseTableGeometryResult } from "./types.js";
 
 /**
  * Give the last column whatever width the others leave, even past its own
@@ -36,6 +34,8 @@ const fillLast = (
 /**
  * Call `onResize` with each resize of one element. Returns the disconnect,
  * or nothing where there is no observer.
+ *
+ * @note Impure: observes the element until the returned disconnect is called.
  */
 const observeResize = (
   element: HTMLElement,
@@ -72,11 +72,11 @@ const observeResize = (
  * Two tables on one provider read one presentation, so they share the
  * arrangement while resolving their own widths against their own container.
  */
-export default function useTableGeometry(
-  layout: ColumnLayout,
-  interaction: GridInteraction,
-  columnIds: readonly string[],
-): UseTableGeometryResult {
+export default function useTableGeometry({
+  layout,
+  interaction,
+  columnIds,
+}: UseTableGeometryProps): UseTableGeometryResult {
   const [container, setContainer] = useState<number | null>(null);
   const [reserved, setReserved] = useState(0);
   // The snapshot keys the track list.
