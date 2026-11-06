@@ -17,18 +17,20 @@ export const rtl = () => (Story: ElementType) => (
  * (surfaces consume themselves), so a component sits on the background it
  * would have in an app rather than on the bare Storybook canvas.
  */
-export const surface = (Story: ElementType): ReactElement => (
-  <div
-    className="surface"
-    style={{
-      background: "var(--surface-color-background)",
-      color: "var(--surface-color-text)",
-      padding: "var(--dimension-300, 24px)",
-    }}
-  >
-    <Story />
-  </div>
-);
+export const surface =
+  () =>
+  (Story: ElementType): ReactElement => (
+    <div
+      className="surface"
+      style={{
+        background: "var(--surface-color-background)",
+        color: "var(--surface-color-text)",
+        padding: "var(--dimension-300, 24px)",
+      }}
+    >
+      <Story />
+    </div>
+  );
 
 /* Grid is provided by @canonical/storybook-addon-utils via `parameters.grid`
  * (a GridMode: "intrinsic" | "responsive" | "none"), which toggles the `.grid`
