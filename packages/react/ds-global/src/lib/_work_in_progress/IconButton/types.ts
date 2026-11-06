@@ -46,6 +46,14 @@ type OwnProps = {
  * `variant` is left out: the `link` variant strips the button's chrome and
  * inline padding, which an icon-only button cannot do without losing its
  * square box and its target size.
+ *
+ * A Tooltip is not part of these props: it is composed around the button,
+ * with `withTooltip` or `TooltipEngine`, as it is around a Button.
+ *
+ * @experimental IconButton sits in `_work_in_progress`: its design-system
+ * block, `ds:global.component.icon_button`, is proposed in
+ * canonical/pragma-core#131 and is not yet in the ontology, so the props may
+ * change when the block is entered.
  */
 export type IconButtonProps = OwnProps &
   Omit<ButtonProps, keyof OwnProps | "variant">;

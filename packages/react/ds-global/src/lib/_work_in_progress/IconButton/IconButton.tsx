@@ -6,16 +6,12 @@ import "./styles.css";
 const componentCssClassName = "ds icon-button";
 
 /**
- * A square, icon-only Button. It renders `Button` — so importance,
- * anticipation, loading, disabled and the density seat all come from Button —
- * and only makes the box square around a centred icon, with its baseline
- * seated where a labelled Button's label baseline sits.
- *
- * The design-system ontology has no IconButton block yet. Until it does, this
- * follows the "Icon buttons" guideline of Button: it is named with
- * `aria-label` or `aria-labelledby`, and paired with a Tooltip that states
- * the action. The Tooltip is composed around it, with `withTooltip` or
- * `TooltipEngine`, as it is around a Button; the `<button>` stays the root.
+ * An icon button is a square Button that shows a single icon and no visible
+ * label. Unlike a Button with an icon and a label, its box is exactly as wide
+ * as it is tall in every density, and its baseline sits where a labelled
+ * Button's label baseline sits, so it lines up with text and with other
+ * buttons in a row. It has no visible text, so it is always named explicitly
+ * and always paired with a Tooltip that states the action.
  *
  * `import { IconButton } from "@canonical/react-ds-global";`
  *
