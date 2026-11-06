@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import createFormatters from "./createFormatters.js";
 
 describe("createFormatters", () => {
   const en = createFormatters("en-US");
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it("formats numbers and currency", () => {
     expect(en.number(1234.5)).toBe("1,234.5");
@@ -41,14 +45,16 @@ describe("createFormatters", () => {
         constructed += 1;
       }
     }
-    vi.stubGlobal("Intl", { ...Intl, NumberFormat: CountingNumberFormat });
+    vi.stubGlobal(
+      "Intl",
+      Object.create(Intl, { NumberFormat: { value: CountingNumberFormat } }),
+    );
 
     const formatters = createFormatters("en-US");
     formatters.number(1000);
     formatters.number(2000); // same default options → cached, no new instance
     formatters.currency(5, "USD"); // distinct options → one more instance
 
-    vi.unstubAllGlobals();
     expect(constructed).toBe(2);
   });
 });
