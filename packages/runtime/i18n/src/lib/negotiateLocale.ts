@@ -1,15 +1,7 @@
 import { DEFAULT_COOKIE_NAME } from "./constants.js";
 import parseAcceptLanguage from "./parseAcceptLanguage.js";
 import readCookie from "./readCookie.js";
-import type { I18nConfig, Locale } from "./types.js";
-
-/** Raw request inputs negotiation reads from, in priority order. */
-export interface LocaleSources {
-  /** Raw `Cookie` header — an explicit prior choice wins over everything. */
-  cookieHeader?: string | null;
-  /** Raw `Accept-Language` header, consulted when no cookie matches. */
-  acceptLanguage?: string | null;
-}
+import type { I18nConfig, Locale, LocaleSources } from "./types.js";
 
 /**
  * Find the configured locale that matches `value` case-insensitively, returned
@@ -36,7 +28,7 @@ function matchSupported(
   for (const tag of requested) {
     const exact = findByLower(config, tag);
     if (exact !== undefined) return exact;
-    const base = findByLower(config, tag.split("-")[0]);
+    const base = findByLower(config, tag.split("-").at(0));
     if (base !== undefined) return base;
   }
   return undefined;

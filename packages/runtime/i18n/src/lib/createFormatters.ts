@@ -6,7 +6,7 @@ import type { Formatters, Locale } from "./types.js";
  * same options, so memoizing by serialized options keeps reuse cheap
  * (Constitution IX — optimise only where it pays).
  */
-function cached<TOptions, TFormatter>(
+function memoizeByOptions<TOptions, TFormatter>(
   build: (options: TOptions | undefined) => TFormatter,
 ): (options?: TOptions) => TFormatter {
   const cache = new Map<string, TFormatter>();
@@ -28,31 +28,33 @@ function cached<TOptions, TFormatter>(
  * @param locale - BCP 47 tag every formatter is bound to.
  */
 export default function createFormatters(locale: Locale): Formatters {
-  const numberFormat = cached(
+  const getNumberFormat = memoizeByOptions(
     (options?: Intl.NumberFormatOptions) =>
       new Intl.NumberFormat(locale, options),
   );
-  const dateFormat = cached(
+  const getDateFormat = memoizeByOptions(
     (options?: Intl.DateTimeFormatOptions) =>
       new Intl.DateTimeFormat(locale, options),
   );
-  const relativeTimeFormat = cached(
+  const getRelativeTimeFormat = memoizeByOptions(
     (options?: Intl.RelativeTimeFormatOptions) =>
       new Intl.RelativeTimeFormat(locale, options),
   );
-  const listFormat = cached(
+  const getListFormat = memoizeByOptions(
     (options?: Intl.ListFormatOptions) => new Intl.ListFormat(locale, options),
   );
 
   return {
-    number: (value, options) => numberFormat(options).format(value),
-    currency: (value, currency, options) =>
-      numberFormat({ ...options, style: "currency", currency }).format(value),
-    date: (value, options) => dateFormat(options).format(value),
-    time: (value, options) =>
-      dateFormat(options ?? { timeStyle: "short" }).format(value),
-    relativeTime: (value, unit, options) =>
-      relativeTimeFormat(options).format(value, unit),
-    list: (items, options) => listFormat(options).format([...items]),
+    formatNumber: (value, options) => getNumberFormat(options).format(value),
+    formatCurrency: (value, currency, options) =>
+      getNumberFormat({ ...options, style: "currency", currency }).format(
+        value,
+      ),
+    formatDate: (value, options) => getDateFormat(options).format(value),
+    formatTime: (value, options) =>
+      getDateFormat(options ?? { timeStyle: "short" }).format(value),
+    formatRelativeTime: (value, unit, options) =>
+      getRelativeTimeFormat(options).format(value, unit),
+    formatList: (items, options) => getListFormat(options).format([...items]),
   };
 }

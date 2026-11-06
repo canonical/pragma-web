@@ -44,11 +44,11 @@ export default function ProductCard({
       <p>{data.tagline}</p>
       <p>
         <strong>
-          {formatters.currency(data.priceCents / 100, data.currency)}
+          {formatters.formatCurrency(data.priceCents / 100, data.currency)}
         </strong>{" "}
         ·{" "}
         {t("catalog.rating", {
-          rating: formatters.number(data.rating, {
+          rating: formatters.formatNumber(data.rating, {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1,
           }),

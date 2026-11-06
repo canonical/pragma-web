@@ -72,7 +72,7 @@ export default function InstancesPage(): ReactElement {
           <dt>{t("dashboard.instances.memory")}</dt>
           <dd>
             {t("dashboard.instances.memoryValue", {
-              value: formatters.number(selected.memoryGib),
+              value: formatters.formatNumber(selected.memoryGib),
             })}
           </dd>
         </dl>

@@ -26,7 +26,7 @@ describe("useFormatters", () => {
     const { result } = renderHook(() => useFormatters(), {
       wrapper: WithProvider,
     });
-    expect(result.current.number(1234.5)).toBe("1,234.5");
+    expect(result.current.formatNumber(1234.5)).toBe("1,234.5");
   });
 
   it("re-formats when the locale changes", () => {
@@ -35,7 +35,7 @@ describe("useFormatters", () => {
       { wrapper: WithProvider },
     );
     act(() => result.current.locale.setLocale("fr-FR"));
-    expect(result.current.formatters.number(1234.5)).toBe("1\u202f234,5");
+    expect(result.current.formatters.formatNumber(1234.5)).toBe("1\u202f234,5");
   });
 
   it("returns the same formatters across re-renders of one locale", () => {

@@ -6,8 +6,8 @@ import type { I18nConfig } from "@canonical/i18n-core";
  *
  * Locales are declared explicitly rather than discovered by convention
  * (Constitution VI — no magic). `ar` is included to exercise the
- * right-to-left path end to end: `rtlLocales` drives `directionOf` /
- * `documentAttrs`, so `<html dir>` flips without any app-side branching.
+ * right-to-left path end to end: `rtlLocales` drives `getDirection` /
+ * `getDocumentAttributes`, so `<html dir>` flips without any app-side branching.
  */
 export const i18nConfig = {
   locales: ["en", "fr", "ar"],

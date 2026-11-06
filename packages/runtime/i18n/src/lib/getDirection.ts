@@ -6,11 +6,13 @@ import type { Direction, I18nConfig, Locale } from "./types.js";
  * @param config - Active locale configuration; its `rtlLocales` list decides.
  * @param locale - Locale tag, e.g. `"ar-EG"`, or undefined.
  */
-export default function directionOf(
+export default function getDirection(
   config: I18nConfig,
   locale: Locale | undefined,
 ): Direction {
   if (!locale) return "ltr";
-  const base = locale.toLowerCase().split("-")[0];
+  const lower = locale.toLowerCase();
+  const separator = lower.indexOf("-");
+  const base = separator === -1 ? lower : lower.slice(0, separator);
   return config.rtlLocales?.includes(base) ? "rtl" : "ltr";
 }
