@@ -32,16 +32,6 @@ const areIdListsEqual = (
   previous.length === next.length &&
   previous.every((id, index) => id === next.at(index));
 
-/**
- * The hook as these rows call it: with a selector and the guard, which the
- * signature does not take yet.
- */
-const useGuarded = useDataViewsValue as <T, TSelected>(
-  channel: ReadonlyChannel<T>,
-  select: (value: T) => TSelected,
-  isEqual?: (previous: TSelected, next: TSelected) => boolean,
-) => TSelected;
-
 describe("useDataViewsValue", () => {
   it("returns the channel's current snapshot", () => {
     const channel = createFakeChannel({ count: 0 });
@@ -132,7 +122,7 @@ describe("useDataViewsValue", () => {
   });
 
   describe("a selector that builds its value", () => {
-    it.fails("re-renders once per publication when it has no isEqual", () => {
+    it("re-renders once per publication when it has no isEqual", () => {
       const failure = vi.spyOn(console, "error").mockImplementation(() => {});
       const channel = createFakeChannel(createListing());
       let renders = 0;
@@ -149,11 +139,11 @@ describe("useDataViewsValue", () => {
       failure.mockRestore();
     });
 
-    it.fails("does not run select again for an unchanged snapshot", () => {
+    it("does not run select again for an unchanged snapshot", () => {
       const channel = createFakeChannel(createListing());
       const select = vi.fn(selectIds);
       const { result, rerender } = renderHook(() =>
-        useGuarded(channel, select, areIdListsEqual),
+        useDataViewsValue(channel, select, areIdListsEqual),
       );
       const first = result.current;
       const calls = select.mock.calls.length;
@@ -163,11 +153,13 @@ describe("useDataViewsValue", () => {
       expect(result.current).toBe(first);
     });
 
-    it.fails("hydrates the server's markup without a mismatch or a comparison", async () => {
+    it("hydrates the server's markup without a mismatch or a comparison", async () => {
       const channel = createFakeChannel(createListing());
       const isEqual = vi.fn(areIdListsEqual);
       const Probe = () => (
-        <output>{useGuarded(channel, listIds, isEqual).join(",")}</output>
+        <output>
+          {useDataViewsValue(channel, listIds, isEqual).join(",")}
+        </output>
       );
       const container = document.createElement("div");
       container.innerHTML = renderToString(<Probe />);
@@ -195,18 +187,18 @@ describe("useDataViewsValue", () => {
       const channel = createFakeChannel(createListing());
       const isEqual = vi.fn(areIdListsEqual);
       const { result } = renderHook(() =>
-        useGuarded(channel, selectIds, isEqual),
+        useDataViewsValue(channel, selectIds, isEqual),
       );
       expect(result.current).toEqual([1, 2]);
       expect(isEqual).not.toHaveBeenCalled();
     });
 
-    it.fails("returns the held value while isEqual says the next one is the same", () => {
+    it("returns the held value while isEqual says the next one is the same", () => {
       const channel = createFakeChannel(createListing());
       let renders = 0;
       const { result } = renderHook(() => {
         renders += 1;
-        return useGuarded(channel, selectIds, areIdListsEqual);
+        return useDataViewsValue(channel, selectIds, areIdListsEqual);
       });
       const first = result.current;
       act(() => channel.set(createListing({ page: 2 })));
@@ -219,7 +211,7 @@ describe("useDataViewsValue", () => {
       let renders = 0;
       const { result } = renderHook(() => {
         renders += 1;
-        return useGuarded(channel, selectIds, areIdListsEqual);
+        return useDataViewsValue(channel, selectIds, areIdListsEqual);
       });
       const first = result.current;
       act(() => channel.set(createListing({ ids: [1, 3] })));
@@ -228,10 +220,10 @@ describe("useDataViewsValue", () => {
       expect(renders).toBe(2);
     });
 
-    it.fails("keeps the held value across a new select that reads an equal value", () => {
+    it("keeps the held value across a new select that reads an equal value", () => {
       const channel = createFakeChannel(createListing({ other: [1, 2] }));
       const { result, rerender } = renderHook(
-        ({ select }) => useGuarded(channel, select, areIdListsEqual),
+        ({ select }) => useDataViewsValue(channel, select, areIdListsEqual),
         { initialProps: { select: selectIds } },
       );
       const first = result.current;
@@ -242,7 +234,7 @@ describe("useDataViewsValue", () => {
     it("reads through a new select in the render that passes it", () => {
       const channel = createFakeChannel(createListing());
       const { result, rerender } = renderHook(
-        ({ select }) => useGuarded(channel, select, areIdListsEqual),
+        ({ select }) => useDataViewsValue(channel, select, areIdListsEqual),
         { initialProps: { select: selectIds } },
       );
       expect(result.current).toEqual([1, 2]);
@@ -250,10 +242,10 @@ describe("useDataViewsValue", () => {
       expect(result.current).toEqual([9]);
     });
 
-    it.fails("decides by a new isEqual against the held value", () => {
+    it("decides by a new isEqual against the held value", () => {
       const channel = createFakeChannel(createListing());
       const { result, rerender } = renderHook(
-        ({ isEqual }) => useGuarded(channel, selectIds, isEqual),
+        ({ isEqual }) => useDataViewsValue(channel, selectIds, isEqual),
         { initialProps: { isEqual: (): boolean => true } },
       );
       act(() => channel.set(createListing({ ids: [4] })));
@@ -262,11 +254,11 @@ describe("useDataViewsValue", () => {
       expect(result.current).toEqual([4]);
     });
 
-    it.fails("keeps the held value across a new channel whose selection is equal", () => {
+    it("keeps the held value across a new channel whose selection is equal", () => {
       const first = createFakeChannel(createListing());
       const second = createFakeChannel(createListing({ page: 7 }));
       const { result, rerender } = renderHook(
-        ({ channel }) => useGuarded(channel, selectIds, areIdListsEqual),
+        ({ channel }) => useDataViewsValue(channel, selectIds, areIdListsEqual),
         { initialProps: { channel: first } },
       );
       const held = result.current;
@@ -278,7 +270,7 @@ describe("useDataViewsValue", () => {
       const first = createFakeChannel(createListing());
       const second = createFakeChannel(createListing({ ids: [5] }));
       const { result, rerender } = renderHook(
-        ({ channel }) => useGuarded(channel, selectIds, areIdListsEqual),
+        ({ channel }) => useDataViewsValue(channel, selectIds, areIdListsEqual),
         { initialProps: { channel: first } },
       );
       expect(result.current).toEqual([1, 2]);
@@ -290,11 +282,11 @@ describe("useDataViewsValue", () => {
       expect(result.current).toEqual([7]);
     });
 
-    it.fails("keeps the first value when an equal publication lands before it is held", () => {
+    it("keeps the first value when an equal publication lands before it is held", () => {
       const channel = createFakeChannel(createListing());
       const seen: (readonly number[])[] = [];
       const Probe = (): null => {
-        seen.push(useGuarded(channel, selectIds, areIdListsEqual));
+        seen.push(useDataViewsValue(channel, selectIds, areIdListsEqual));
         return null;
       };
       // Publishes after the commit and before the probe's passive effects,
@@ -315,13 +307,13 @@ describe("useDataViewsValue", () => {
       expect(seen.at(0)).toEqual([1, 2]);
     });
 
-    it.fails("holds one value through StrictMode's double render and effects", () => {
+    it("holds one value through StrictMode's double render and effects", () => {
       const channel = createFakeChannel(createListing());
       const isEqual = vi.fn(areIdListsEqual);
       const committed = new Set<readonly number[]>();
       const { result } = renderHook(
         () => {
-          const value = useGuarded(channel, selectIds, isEqual);
+          const value = useDataViewsValue(channel, selectIds, isEqual);
           useEffect(() => {
             committed.add(value);
           }, [value]);
@@ -338,7 +330,7 @@ describe("useDataViewsValue", () => {
       ).toBe(true);
     });
 
-    it.fails("never compares with a value from a render React discarded", async () => {
+    it("never compares with a value from a render React discarded", async () => {
       const channel = createFakeChannel(createListing());
       const isEqual = vi.fn(areIdListsEqual);
       const other = vi.fn(selectOther);
@@ -351,7 +343,7 @@ describe("useDataViewsValue", () => {
       }: {
         readonly select: (snapshot: Listing) => readonly number[];
       }): null => {
-        const value = useGuarded(channel, select, isEqual);
+        const value = useDataViewsValue(channel, select, isEqual);
         useEffect(() => {
           committed.add(value);
           shown = value;
@@ -403,7 +395,7 @@ describe("useDataViewsValue", () => {
       const commits: (readonly (readonly number[] | undefined)[])[] = [];
       let published = false;
       const Probe = ({ name }: { readonly name: string }): null => {
-        const value = useGuarded(channel, selectIds, areIdListsEqual);
+        const value = useDataViewsValue(channel, selectIds, areIdListsEqual);
         useLayoutEffect(() => {
           latest.set(name, value);
         });
@@ -463,7 +455,7 @@ describe("useDataViewsValue", () => {
         createListing(),
       );
       const { result } = renderHook(() =>
-        useGuarded(
+        useDataViewsValue(
           channel,
           (snapshot) => snapshot.page,
           (previous, next) => {
