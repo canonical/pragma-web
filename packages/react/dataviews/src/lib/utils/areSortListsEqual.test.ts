@@ -6,7 +6,7 @@ const BY_NAME: SortTerm = { field: "name", direction: "asc" };
 const BY_CORES: SortTerm = { field: "cores", direction: "desc" };
 
 describe("areSortListsEqual", () => {
-  it.fails("says two lists of the same terms in the same order are equal", () => {
+  it("says two lists of the same terms in the same order are equal", () => {
     expect(
       areSortListsEqual(
         [BY_NAME, BY_CORES],
@@ -31,7 +31,7 @@ describe("areSortListsEqual", () => {
     ).toBe(false);
   });
 
-  it.fails("says two empty lists are equal", () => {
+  it("says two empty lists are equal", () => {
     expect(areSortListsEqual([], [])).toBe(true);
   });
 });
