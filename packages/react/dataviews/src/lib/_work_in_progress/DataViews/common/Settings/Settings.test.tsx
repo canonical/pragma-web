@@ -89,8 +89,19 @@ const listShown = (): readonly (string | null)[] =>
         ?.textContent ?? null,
   );
 
-const findTrigger = (): HTMLElement =>
-  within(findTable()).getByRole("button", { name: "Table settings" });
+/**
+ * The settings menu's trigger, read within the settings cell: within the
+ * whole table, the query would name every sort and column-options button.
+ */
+const findTrigger = (): HTMLElement => {
+  const cell = findTable().querySelector<HTMLElement>(
+    ".data-table-header-cell.settings",
+  );
+  if (cell === null) {
+    throw new Error("expected the table's settings cell");
+  }
+  return within(cell).getByRole("button", { name: "Table settings" });
+};
 
 /** Choose one item from the settings menu. */
 const choose = (name: string): void => {
