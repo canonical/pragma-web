@@ -8,25 +8,31 @@ import type {
   LocaleSourceOptions,
 } from "./types.js";
 
-/** Persist the locale to a cookie. Browser-only; a no-op on the server. */
+/**
+ * Persist the locale to a cookie. Browser-only; a no-op on the server.
+ *
+ * @note - This function is impure - it writes `document.cookie` in the browser,
+ * so the choice survives a reload and reaches the server's negotiation.
+ */
 function writeCookie(name: string, value: Locale): void {
   const env = globalThis as { document?: { cookie: string } };
-  /* v8 ignore start -- browser-only effect, exercised through framework bindings */
   if (env.document === undefined) return;
   env.document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-  /* v8 ignore stop */
 }
 
-/** Reflect the locale onto `<html lang dir>`. Browser-only; a no-op on the server. */
+/**
+ * Reflect the locale onto `<html lang dir>`. Browser-only; a no-op on the server.
+ *
+ * @note - This function is impure - it writes `<html lang dir>` in the browser,
+ * so assistive technology reads the page in the right language and direction.
+ */
 function reflectDocument(locale: Locale, direction: Direction): void {
   const env = globalThis as {
     document?: { documentElement: { lang: string; dir: string } };
   };
-  /* v8 ignore start -- browser-only effect, exercised through framework bindings */
   if (env.document === undefined) return;
   env.document.documentElement.lang = locale;
   env.document.documentElement.dir = direction;
-  /* v8 ignore stop */
 }
 
 /**
@@ -42,6 +48,10 @@ function reflectDocument(locale: Locale, direction: Direction): void {
  *
  * @param config - Active locale configuration.
  * @param options - Initial locale and effect toggles.
+ * @note - This function is impure - in the browser, constructing a source with
+ * `reflect` on writes `<html lang dir>`, and its `set` writes the cookie and
+ * `<html lang dir>` as `persist` and `reflect` allow, so the page and the next
+ * request agree on the locale.
  */
 export default function createLocaleSource(
   config: I18nConfig,
