@@ -25,7 +25,10 @@
 #                                         design system's ContextualMenu
 #   menu trigger    design none yet       DOM `button.trigger`
 #   resize handle   design "Resize handle wrapper" + "Column resizing handle"
-#                                         DOM `ds data-table-resize-handle`
+#                                         DOM `ds data-table-resize-handle`,
+#                                         a wrapper with no box of its own
+#                                         holding `div.strip`, the separator,
+#                                         and while placing `span.resize-hint`
 #
 # States:
 #   - The ordering in force — the query's terms, or the source's default when
@@ -45,12 +48,22 @@
 #   - The resize handle's behaviour — idle, previewing, keyboard step (±16px
 #     per arrow key), cancelled (Escape or a cancelled pointer) — changes no
 #     style and is recorded here, not as states.
+#   - Placing: a press on the resize handle that does not travel starts
+#     placing the column's edge; the next press in the header row moves it
+#     there. A press on the edge again, a press outside the row, Escape, or
+#     focus leaving the header cell ends it. While placing, the handle's root
+#     carries `data-mode="placing"`, the strip's hairline takes
+#     `color/focus-ring`, and `span.resize-hint` below the heading says where
+#     to press and how to cancel. The table's status is carried as a data
+#     attribute the same way; the code standards are being changed to admit
+#     `data-*` states.
 #
 # The resize mark is a pseudo-element, which the DSL cannot express. It is a
-# 3×20 hairline centred in the handle's 16px pointer target:
+# 3×20 hairline centred in the strip's 24px pointer target:
 #   width  dimension/stroke/thickness/large (3px)
 #   height dimension/250 (20px)
-#   colour color/border/muted; on hover and on focus, color/focus-ring
+#   colour color/border/muted; on hover, on focus and while placing,
+#          color/focus-ring
 #
 # A header cell holding a resize handle drops its trailing inline padding:
 # the handle carries that inset itself. The DSL cannot condition a style on
@@ -72,9 +85,9 @@
 #
 # Accessibility: "Sort/header menu/resize" (2.1.1, 2.5.2, 2.5.7-2.5.8, 4.1.2),
 # with 1.4.1 — the ordering is `aria-sort` and the description, never only
-# the chevron or the numeral — and 2.5.8 for the resize handle: its 16px
-# strip is under the 24px minimum target and passes only with the keyboard
-# alternative and the spacing exception.
+# the chevron or the numeral. The resize handle meets 2.5.7 with a press,
+# then a press where the column should end, beside the drag and the arrow
+# keys, and 2.5.8 with a 24px strip, the minimum target at every density.
 node:
   uri: apps.subcomponent.data_table-header_cell
   styles:

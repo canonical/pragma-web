@@ -108,6 +108,12 @@ export type DataViewsMessages = {
   readonly selectRow: (name: string) => string;
   /** A resize handle's value: the column's width in pixels. */
   readonly columnWidth: (pixels: number) => string;
+  /**
+   * The hint a resize handle gives once a press has started placing its
+   * column's edge, by the column's name: where to press next, and how to
+   * cancel.
+   */
+  readonly columnEndPlacement: (name: string) => string;
 
   // The table's sort.
   /**

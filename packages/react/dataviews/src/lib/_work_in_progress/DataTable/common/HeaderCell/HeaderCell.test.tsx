@@ -42,6 +42,7 @@ const mount = (props: CaseProps = {}) => {
     onRemoveFromSort: vi.fn(),
     onChangeColumn: vi.fn(),
     onClearRefusal: vi.fn(),
+    announce: vi.fn(),
   };
   const view = render(
     <HeaderRow>

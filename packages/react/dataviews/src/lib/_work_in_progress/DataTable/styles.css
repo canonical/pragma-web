@@ -154,41 +154,77 @@
   }
 
   .ds.data-table-resize-handle {
-    /* Pushed to the trailing edge of the header cell and stretched to its
-       height: the whole strip is the pointer target. */
-    flex: none;
-    align-self: stretch;
-    inline-size: var(--dimension-200);
-    margin-inline-start: auto;
-    position: relative;
-    cursor: col-resize;
-    /* A drag is a pointer gesture, never a scroll — and never a text
-       selection, which a second press would pick up as a native drag of
-       the selected text instead of a resize. */
-    touch-action: none;
-    user-select: none;
+    /* No box of its own: the strip sits at the header cell's trailing edge
+       and the hint below its heading, each placed by the cell. */
+    display: contents;
 
-    /* The mark the strip shows: the design's hairline, as wide as the large
-       stroke and as tall as a line of text, centred in the target. */
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      margin: auto;
-      inline-size: var(--dimension-stroke-thickness-large);
-      block-size: var(--dimension-250);
-      background-color: var(--color-border-muted);
+    & > .strip {
+      /* Pushed to the trailing edge of the header cell and stretched to its
+         height: the whole strip is the pointer target. */
+      flex: none;
+      align-self: stretch;
+      /* 24px: the target size WCAG 2.5.8 asks for, on width alone, at every
+         density. The hairline stays the mark it shows. */
+      inline-size: var(--dimension-300);
+      margin-inline-start: auto;
+      position: relative;
+      cursor: col-resize;
+      /* A drag is a pointer gesture, never a scroll — and never a text
+         selection, which a second press would pick up as a native drag of
+         the selected text instead of a resize. */
+      touch-action: none;
+      user-select: none;
+
+      /* The mark the strip shows: the design's hairline, as wide as the large
+         stroke and as tall as a line of text, centred in the target. */
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        inline-size: var(--dimension-stroke-thickness-large);
+        block-size: var(--dimension-250);
+        background-color: var(--color-border-muted);
+      }
+
+      &:hover::after,
+      &:focus-visible::after {
+        background-color: var(--color-focus-ring, currentColor);
+      }
+
+      &:focus-visible {
+        outline: var(--dimension-stroke-thickness-large) solid
+          var(--color-focus-ring, currentColor);
+        outline-offset: calc(-1 * var(--dimension-stroke-thickness-large));
+      }
     }
 
-    &:hover::after,
-    &:focus-visible::after {
+    /* While its edge is placed, the strip's hairline is a focused one. */
+    &[data-mode="placing"] > .strip::after {
       background-color: var(--color-focus-ring, currentColor);
     }
 
-    &:focus-visible {
-      outline: var(--dimension-stroke-thickness-large) solid
-        var(--color-focus-ring, currentColor);
-      outline-offset: calc(-1 * var(--dimension-stroke-thickness-large));
+    /* Below the heading, over the first row, and never in a pointer's way:
+       a click on the row beneath reaches the row. It says where the press
+       placing the column's edge should land, and spans the heading and
+       wraps within it, so a trailing column's never widens the table's
+       scroll area. */
+    & > .resize-hint {
+      position: absolute;
+      pointer-events: none;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      z-index: 1;
+      padding-block: var(--dimension-050);
+      padding-inline: var(--density-padding-inline);
+      font-weight: var(--typography-text-primary-font-weight);
+      color: var(--color-text);
+      background-color: var(
+        --surface-color-background,
+        var(--color-background)
+      );
+      border: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
     }
   }
 
@@ -278,31 +314,31 @@
       white-space: nowrap;
     }
 
-    /* Why an activation changed nothing, shown below the heading, over the
-       first row, while it stands; the table's announcer says it. It spans the
-       heading and wraps within it, so a trailing column's reason never
-       widens the table's scroll area. Empty, it takes no room. */
+    /* Below the heading, over the first row, and never in a pointer's way:
+       a click on the row beneath reaches the row. The reason says why an
+       activation changed nothing, while it stands; the table's announcer
+       says it. It spans the heading and wraps within it, so a trailing
+       column's never widens the table's scroll area. An empty reason takes
+       no room. */
     & > .sort-reason {
       position: absolute;
-      /* Read and seen, never in a pointer's way: a click on the row beneath
-         reaches the row. */
       pointer-events: none;
       inset-block-start: 100%;
       inset-inline: 0;
       z-index: 1;
       font-weight: var(--typography-text-primary-font-weight);
+    }
 
-      &:not(:empty) {
-        padding-block: var(--dimension-050);
-        padding-inline: var(--density-padding-inline);
-        color: var(--color-text);
-        background-color: var(
-          --surface-color-background,
-          var(--color-background)
-        );
-        border: var(--dimension-stroke-thickness-medium) solid
-          var(--color-border-muted);
-      }
+    & > .sort-reason:not(:empty) {
+      padding-block: var(--dimension-050);
+      padding-inline: var(--density-padding-inline);
+      color: var(--color-text);
+      background-color: var(
+        --surface-color-background,
+        var(--color-background)
+      );
+      border: var(--dimension-stroke-thickness-medium) solid
+        var(--color-border-muted);
     }
 
     /* The column's menu: an icon beside the sort control that neither

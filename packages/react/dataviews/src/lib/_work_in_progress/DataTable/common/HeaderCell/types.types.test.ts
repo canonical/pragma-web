@@ -3,7 +3,7 @@
  * root's native props beside them, and the attributes it derives itself.
  */
 import type { SortDirection } from "@canonical/dataviews-core";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { describe, expectTypeOf, it } from "vitest";
 import type { HeaderCellProps, SortPrecedence } from "./types.js";
 
@@ -24,6 +24,12 @@ describe("HeaderCellProps", () => {
     >().toEqualTypeOf<SortPrecedence | null>();
     expectTypeOf<HeaderCellProps["destination"]>().toEqualTypeOf<
       string | null
+    >();
+  });
+
+  it("speaks through the table's announcer", () => {
+    expectTypeOf<HeaderCellProps["announce"]>().toEqualTypeOf<
+      (message: ReactNode) => void
     >();
   });
 

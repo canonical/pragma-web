@@ -466,6 +466,7 @@ export const MESSAGE_SAMPLES: {
   selectAllRows: null,
   selectRow: [[MESSAGE_MARK]],
   columnWidth: [[1], [7]],
+  columnEndPlacement: [[MESSAGE_MARK]],
   sortPrecedence: [
     ["asc", 1, 1],
     ["desc", 2, 3],

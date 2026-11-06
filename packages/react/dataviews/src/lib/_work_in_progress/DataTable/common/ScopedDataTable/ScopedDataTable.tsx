@@ -93,6 +93,10 @@ const renderVirtualizedBody = (
  * `DataViews.DataTable` hands it its root's, so a root holds one announcer
  * however many tables it places. Its private cells and menus read the words
  * from the context it installs over them.
+ *
+ * `import { DataTable } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.pattern.data_table
  */
 export default function ScopedDataTable<
   TFields extends readonly SchemaFieldDefinition[],
@@ -364,6 +368,7 @@ export default function ScopedDataTable<
                   // Solved for every rendered column, in the same order.
                   width={geometry.widths[position] as number}
                   labelId={`${baseId}-${column.id}`}
+                  announce={announce}
                 />
               );
             })}
