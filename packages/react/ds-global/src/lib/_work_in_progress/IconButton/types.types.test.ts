@@ -2,14 +2,7 @@ import type { Ref } from "react";
 import { describe, expectTypeOf, it } from "vitest";
 import type { IconButtonProps as Props } from "./types.js";
 
-/**
- * Type-level tests for IconButton's props.
- *
- * Nothing here asserts at runtime: `tsc --noEmit` is the gate, and this
- * package's tsconfig includes test files, so every `@ts-expect-error` below
- * must still be an error or the check fails. The `it()` wrappers exist so
- * Vitest sees a suite.
- */
+/** Type-level tests, enforced by `tsc --noEmit`. */
 describe("IconButton props", () => {
   it("requires an accessible name", () => {
     expectTypeOf<{

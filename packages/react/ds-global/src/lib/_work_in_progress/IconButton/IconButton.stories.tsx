@@ -10,18 +10,12 @@ import { TooltipEngine, withTooltip } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
 import type { IconButtonProps } from "./types.js";
 
-/**
- * A Tooltip portals its message to the document body: stories that show
- * one render in a docs iframe of their own.
- */
+/** Tooltips portal to the body, so the docs render each story in an iframe. */
 const tooltipParameters = {
   docs: { story: { inline: false, iframeHeight: "240px" } },
 } as const;
 
-/**
- * An icon button paired with a Tooltip that repeats its accessible name,
- * composed around it with `TooltipEngine`: the pattern every story shows.
- */
+/** An icon button with a Tooltip composed around it. */
 function PairedIconButton(props: IconButtonProps): ReactElement {
   return (
     <TooltipEngine Message={props["aria-label"]}>
@@ -34,8 +28,7 @@ const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
   decorators: [decorators.surface()],
-  // Every story pairs the icon button with its Tooltip, as Button's
-  // guideline requires; a story that renders its own row pairs each one.
+  // Every story pairs the icon button with a Tooltip.
   render: (args) => <PairedIconButton {...args} />,
   parameters: tooltipParameters,
   argTypes: {
@@ -72,10 +65,7 @@ const row = {
 /** Layout is compared to a hundredth of a pixel. */
 const TOLERANCE = 0.01;
 
-/**
- * The first element under `parent` that matches `selector`. Throws when there
- * is none, so a play fails on a missing part rather than measuring nothing.
- */
+/** The first match for `selector` under `parent`; throws when there is none. */
 const findRequiredElement = (parent: ParentNode, selector: string): Element => {
   const element = parent.querySelector(selector);
   if (!element) throw new Error(`No element matches "${selector}".`);
@@ -85,10 +75,7 @@ const findRequiredElement = (parent: ParentNode, selector: string): Element => {
 /** The border box of an element, in CSS pixels. */
 const measureBox = (element: Element) => element.getBoundingClientRect();
 
-/**
- * Checks that one icon button is as wide as it is tall, with its icon
- * centred in the box, and returns the box.
- */
+/** Expects an icon button to be square with a centred icon; returns its box. */
 const expectSquareCentredIconButton = async (iconButton: Element) => {
   const box = measureBox(iconButton);
   const icon = measureBox(findRequiredElement(iconButton, ".icon"));
@@ -103,10 +90,8 @@ const expectSquareCentredIconButton = async (iconButton: Element) => {
 };
 
 /**
- * Checks the geometry IconButton exists for, in every row of `canvasElement`
- * that holds icon buttons and a labelled Button: each icon button is as wide
- * as it is tall, as tall as the labelled Button, on its top edge (so on its
- * baseline, the seat being the same), with the icon centred in the box.
+ * Expects every icon button in each geometry row to be square, centred, and
+ * as tall as the row's labelled Button on the same top edge.
  */
 const expectSquareSeatedIconButtons = async (canvasElement: HTMLElement) => {
   await canvasElement.ownerDocument.fonts.ready;
@@ -135,20 +120,17 @@ export const Primary: Story = {
   args: { importance: "primary" },
 };
 
-/** Secondary: the outlined importance. */
+/** The outlined importance. */
 export const Secondary: Story = {
   args: { importance: "secondary" },
 };
 
-/** Tertiary: the borderless importance, the usual look of an icon button. */
+/** The borderless importance, the usual one for icon buttons. */
 export const Tertiary: Story = {
   args: { importance: "tertiary" },
 };
 
-/**
- * While its action runs, the icon button shows a spinner in place of its
- * icon and cannot be pressed again; it keeps its size.
- */
+/** A spinner replaces the icon while the action runs; the size holds. */
 export const Loading: Story = {
   args: { loading: true, "aria-label": "Saving" },
   render: (args) => (
@@ -172,16 +154,12 @@ export const Loading: Story = {
   },
 };
 
-/** Disabled, when the action is not available. */
+/** The action is unavailable. */
 export const Disabled: Story = {
   args: { disabled: true },
 };
 
-/**
- * In a row aligned on the text baseline, icon buttons line up with the text
- * and with a labelled Button, in both densities, and each is exactly as wide
- * as it is tall. The baseline grid overlay is on.
- */
+/** Icon buttons share the baseline of text and a labelled Button. */
 export const BaselineAlignment: Story = {
   name: "Baseline alignment",
   parameters: { baseline: true },
@@ -208,19 +186,16 @@ export const BaselineAlignment: Story = {
   },
 };
 
-/** The Tooltip, once it is open, from the whole document. */
+/** The open Tooltip, anywhere in the document. */
 const findOpenTooltip = (canvasElement: HTMLElement) =>
   within(canvasElement.ownerDocument.body).findByRole("tooltip");
 
-/** An icon button paired once, by composition, with a fixed message. */
+/** An icon button wrapped with a fixed Tooltip message. */
 const EditButtonWithTooltip = withTooltip(Component, "Edit");
 
 /**
- * Always pair an icon button with a Tooltip that states the action, as
- * Button's guideline asks for every icon-only button. Every story here
- * composes `TooltipEngine` around the icon button; this one wraps it with
- * `withTooltip`, the other way to pair it when the message is fixed. The
- * Tooltip shows on hover or focus, after its own delay.
+ * Always pair an icon button with a Tooltip. The other stories compose
+ * `TooltipEngine`; this one uses `withTooltip`, for a fixed message.
  */
 export const WithTooltip: Story = {
   name: "With Tooltip",
@@ -236,7 +211,7 @@ export const WithTooltip: Story = {
   },
 };
 
-/** Anticipation recolours the icon button as it recolours a Button. */
+/** Anticipation recolours the icon button as it does a Button. */
 export const Anticipation: Story = {
   render: (args) => (
     <div style={{ display: "grid", gap: "var(--dimension-200)" }}>
@@ -259,11 +234,8 @@ export const Anticipation: Story = {
 };
 
 /**
- * Every context (app, site, docs) in both densities, with the baseline grid
- * on: the icon button follows the density cell, and stays on the text's
- * baseline. The secondary icon button in each row is left without its
- * Tooltip on purpose, as the geometry control: its box matches the paired
- * ones beside it.
+ * Every context and density: the box is the density cell, on the text's
+ * baseline. The secondary button has no Tooltip: it is the geometry control.
  */
 export const DensityAndContext: Story = {
   name: "Density and context",
@@ -300,22 +272,18 @@ export const DensityAndContext: Story = {
   },
 };
 
-/** The density and context classes Button's seat reads its inputs from. */
+/** The density and context classes. */
 const SCOPES = ".comfortable, .dense, .app, .site, .docs";
 
 /**
- * A test-only story: Storybook puts a density and a context on its root, so
- * this one portals its row to a container on the document body, outside
- * every scope, where Button has no seat. There the icon button is still as
- * wide as it is tall, with its icon centred. The first icon button is left
- * without its Tooltip on purpose, as the geometry control for the paired one
- * beside it. A labelled Button is taller there, so it is not compared.
+ * Test only: the row is portalled to the body, outside every density scope,
+ * where the box must still be square. The first button has no Tooltip: it is
+ * the geometry control.
  */
 export const OutsideADensityScope: Story = {
   name: "Outside a density scope",
   tags: ["!dev", "!autodocs"],
-  // The row is portalled, which the generated JSX source cannot print, so
-  // the story names its source instead.
+  // Generated JSX cannot print a portal.
   parameters: {
     docs: {
       source: {
@@ -333,8 +301,7 @@ export const OutsideADensityScope: Story = {
       setContainer(element);
       return () => element.remove();
     }, []);
-    // A fragment, so the story always returns an element; the row joins it
-    // once the container exists.
+    // A fragment: a story must return an element.
     return (
       <>
         {container
@@ -368,7 +335,7 @@ export const OutsideADensityScope: Story = {
   },
 };
 
-/** On a contrasted surface, the surface recolours the icon button. */
+/** The surface recolours the icon button. */
 export const OnContrastedSurface: Story = {
   name: "On a contrasted surface",
   render: (args) => (
@@ -388,7 +355,7 @@ export const OnContrastedSurface: Story = {
   ),
 };
 
-/** What a popover trigger takes beyond the icon button's own props. */
+/** Props of a popover trigger. */
 type PopoverIconButtonProps = {
   /** The icon button's props. */
   buttonProps: IconButtonProps;
@@ -399,9 +366,8 @@ type PopoverIconButtonProps = {
 };
 
 /**
- * An icon button that opens a popover panel, with its Tooltip composed
- * around it and kept closed while the panel is open. The panel's `toggle`
- * event drives both the button's `aria-expanded` and the Tooltip's `open`.
+ * An icon button that opens a popover panel. The panel's `toggle` event
+ * drives `aria-expanded` and keeps the Tooltip closed while the panel is open.
  */
 function PopoverIconButton({
   buttonProps,
@@ -437,11 +403,9 @@ function PopoverIconButton({
 }
 
 /**
- * Plays the gating a popover trigger's Tooltip follows: closed until the
- * button is hovered, closed while the panel is open, and back on the next
- * hover once the panel closes. The panel is closed with a second press: a
- * scripted Escape is not a trusted key press, so the browser does not
- * dismiss the popover on it.
+ * Expects the trigger's Tooltip to open on hover, close while the panel is
+ * open, and open again after. The panel closes on a second press: a scripted
+ * Escape does not dismiss a popover.
  */
 const expectTooltipGatedByPanel = async (
   canvasElement: HTMLElement,
@@ -474,11 +438,7 @@ const expectTooltipGatedByPanel = async (
   await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
 };
 
-/**
- * As the trigger of a popover panel, wired with `popoverTarget`. Keep the
- * Tooltip closed while the panel is open, so it never covers what the
- * button opened.
- */
+/** A popover trigger: keep the Tooltip closed while the panel is open. */
 export const AsPopoverTrigger: Story = {
   name: "As a popover trigger",
   render: (args) => (
@@ -510,11 +470,8 @@ export const AsPopoverTrigger: Story = {
 };
 
 /**
- * The data view triggers: a gear for the table settings and three vertical
- * dots for the column options. Both are tertiary, and neither has a
- * chevron: they are icon buttons, not dropdown buttons. Each opens its
- * panel and keeps its Tooltip closed while the panel is open, as in "As a
- * popover trigger".
+ * The data view triggers: a gear for settings, three vertical dots for
+ * column options. Tertiary, no chevron, wired as a popover trigger.
  */
 export const GearAndThreeDots: Story = {
   name: "Gear and three dots",
