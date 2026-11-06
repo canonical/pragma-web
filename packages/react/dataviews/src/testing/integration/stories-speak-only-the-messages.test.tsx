@@ -27,6 +27,7 @@ import preview from "../../../.storybook/preview.js";
 import { DELIVERY_WAIT } from "../../../testing/constants.js";
 import findEnglish from "../../../testing/findEnglish.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
+import * as buildARendererStories from "../../lib/_work_in_progress/BuildARenderer/BuildARenderer.stories.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
 import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
@@ -89,6 +90,7 @@ const parts = {
   DataCards: composeStories(dataCardsStories),
   DataChart: composeStories(dataChartStories),
   DataChartWithTable: composeStories(dataChartWithTableStories),
+  "Build your own renderer": composeStories(buildARendererStories),
 };
 
 /**
@@ -105,6 +107,8 @@ const AUTHORED: Readonly<Record<string, readonly string[]>> = {
   DataViews: ["machines on this page"],
   // The cards' stories place a switch of their own, named the same way, and
   // one story's own cell writes a sentence saying the record's "from".
+  // The tutorial's list names its own sort controls.
+  "Build your own renderer": ["Sort by host"],
   DataCards: [
     "Show machines as",
     "Table",

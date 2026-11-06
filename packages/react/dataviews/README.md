@@ -120,3 +120,12 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 - **A cell that reads its own scope** — a module-scope renderer reading its row's record through `useDataViewsCell(collection)`, typed by the collection.
 - **The outcomes** — pending, failed, empty and no match in place of the rows; a failed refresh and retained rows that no longer answer the current query (`refresh-failed`, `stale`) above them, with `renderStatus` over the core's `DisplayStatus`.
 - **Mounting only the rows in view** — `virtualization={virtualizeRows({ estimatedRowHeight })}`, from `@canonical/dataviews-react/virtualization`, for a result window of thousands of rows: the table becomes its own scroll viewport and every row still counts.
+
+## Build your own renderer
+
+The Storybook page **_work_in_progress / DataViews / Renderers / Build your own renderer** is a tutorial for writing a renderer over a provider, as `DataTable`, `DataCards` and `DataChart` are written — source in [`src/lib/_work_in_progress/BuildARenderer/BuildARenderer.mdx`](src/lib/_work_in_progress/BuildARenderer/BuildARenderer.mdx), with the example's compiled and tested code beside it:
+
+- **A plain list** — observe the provider from an effect for as long as the list is mounted, and read its rows with `useDataViewsValue`.
+- **The status** — `resolveDisplayStatus` and `listDisplayEntries` from `@canonical/dataviews-core/bindings`: loading, failed, refresh-failed, stale, empty and no match.
+- **Selection, sort and refusals** — one channel set per row from `createRowScopes`, a sort offered only where the source declares it, every refusal's reason shown, and no control drawn before scripts run.
+- **A standalone list and its connected twin** — the standalone form takes `provider`; the twin reads the root through `useDataViews(collection)`.
