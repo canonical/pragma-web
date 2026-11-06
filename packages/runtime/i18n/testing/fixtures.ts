@@ -4,7 +4,11 @@
  * Each export is a plain value a test reads and never mutates.
  */
 
-import type { I18nConfig, Messages } from "../src/lib/index.js";
+import type {
+  I18nConfig,
+  LocaleSourceOptions,
+  Messages,
+} from "../src/lib/index.js";
 
 /** Three locales, one of them right-to-left. */
 export const localeConfig: I18nConfig = {
@@ -63,3 +67,9 @@ export const translatorCatalog: Messages = {
 
 /** A two-entry catalog that `mergeCatalogs` layers overrides onto. */
 export const baseCatalog: Messages = { a: "base-a", b: "base-b" };
+
+/** Locale source options that turn off both browser effects. */
+export const effectsOff: LocaleSourceOptions = {
+  persist: false,
+  reflect: false,
+};
