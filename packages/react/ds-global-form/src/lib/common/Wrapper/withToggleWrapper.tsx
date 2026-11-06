@@ -2,7 +2,7 @@ import type { ComponentType, FC } from "react";
 import type {
   BaseInputProps,
   ToggleLabelProps,
-  WrapperProps,
+  WrappedComponentProps,
 } from "../types.js";
 import ToggleWrapper from "./ToggleWrapper.js";
 import withWrapper from "./withWrapper.js";
@@ -13,7 +13,7 @@ import withWrapper from "./withWrapper.js";
  * label-less toggle is a compile error.
  */
 type ToggleWrapperProps<ComponentProps extends BaseInputProps> = Omit<
-  WrapperProps<ComponentProps>,
+  WrappedComponentProps<ComponentProps>,
   "Component" | "label" | "controlLabel"
 > &
   ToggleLabelProps;
