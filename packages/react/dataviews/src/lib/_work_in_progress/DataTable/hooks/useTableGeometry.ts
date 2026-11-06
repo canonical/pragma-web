@@ -1,6 +1,7 @@
 import {
   buildColumnTemplate,
   type ColumnLayout,
+  type ColumnLayoutState,
   type ColumnSizing,
   type ColumnToSize,
   type GridInteraction,
@@ -8,7 +9,7 @@ import {
   resolveColumns,
 } from "@canonical/dataviews-core/bindings";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useDataViewsValue, useStableValue } from "../../../hooks/index.js";
+import { useDataViewsValue } from "../../../hooks/index.js";
 import { areTracksEqual } from "../common/utils/index.js";
 import type { UseTableGeometryResult } from "./types.js";
 
@@ -87,8 +88,6 @@ export default function useTableGeometry(
 ): UseTableGeometryResult {
   const [container, setContainer] = useState<number | null>(null);
   const [reserved, setReserved] = useState(0);
-  // The snapshot keys the track list.
-  const snapshot = useDataViewsValue(layout.state);
   const interactionState = useDataViewsValue(interaction.state);
 
   const attach = useCallback(
@@ -137,10 +136,11 @@ export default function useTableGeometry(
 
   const width = container === null ? null : Math.max(0, container - reserved);
 
-  // Rebuilt only when a width or the column list changes, never per frame
-  // of a preview, which moves neither.
-  const declared = useMemo<readonly ColumnToSize[]>(
-    () =>
+  // Rebuilt only when the column list changes, so it runs once per layout
+  // publication — never per frame of a preview, which publishes none — and
+  // the tracks keep one reference while they read the same.
+  const selectTracks = useCallback(
+    (snapshot: ColumnLayoutState): readonly ColumnToSize[] =>
       columnIds.map((id) => ({
         id,
         // The snapshot's own override, else the declaration — whose guard
@@ -151,9 +151,9 @@ export default function useTableGeometry(
             ? snapshot.overrides[id]
             : undefined) ?? layout.readDeclared(id),
       })),
-    [columnIds, layout, snapshot],
+    [columnIds, layout],
   );
-  const tracks = useStableValue(declared, areTracksEqual);
+  const tracks = useDataViewsValue(layout.state, selectTracks, areTracksEqual);
 
   // Resolving against zero yields each column's own reservation, which is
   // exactly the width a resize should capture before the container is
