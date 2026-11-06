@@ -45,6 +45,11 @@ type OwnProps = {
    */
   children: ReactNode;
   /**
+   * How wide the panel is: `"medium"` (465px, the default) or `"large"`
+   * (640px).
+   */
+  size?: "medium" | "large";
+  /**
    * The panel's imperative handle, and the only way the panel opens:
    * `ref.current?.open()`, with `ref.current?.close()` closing it, and
    * `ref.current?.toggle()` switching it between those states.
