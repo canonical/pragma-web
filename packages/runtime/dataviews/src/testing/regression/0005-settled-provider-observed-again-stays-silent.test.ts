@@ -12,13 +12,15 @@
  */
 
 import { describe, expect, it } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { answering, byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "cpu", kind: "number" }],
 });
 
@@ -26,7 +28,7 @@ describe("regression 0005 — a settled provider observed again keeps its source
   it("asks for the current page again, so the source has a live execution", () => {
     const source = createManualSource({
       capabilities: declare({}),
-      answer: answering([{ id: "a" }]),
+      answer: answerWith([{ id: "a" }]),
     });
     const provider = createDataViewsProvider({
       collection: machines,

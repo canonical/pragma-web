@@ -18,9 +18,25 @@ const testConfig = reactTestConfig({
   coverage: {
     include: [
       "src/**/*.{ts,tsx}",
-      "testing/fixtures.ts",
+      "testing/buildFleet.ts",
+      "testing/buildMachine.ts",
+      "testing/buildPage.ts",
+      "testing/buildStoredView.ts",
+      "testing/constants.ts",
+      "testing/countExactly.ts",
+      "testing/createFacetedFleet.ts",
+      "testing/createFacetedManual.ts",
+      "testing/createMachineProvider.ts",
+      "testing/createMemoryViewStore.ts",
+      "testing/declareMachineOrdering.ts",
       "testing/deliverFacets.ts",
+      "testing/deliverRows.ts",
+      "testing/fixtures.ts",
+      "testing/MachineComposition.tsx",
+      "testing/machines.ts",
+      "testing/readDisplayStatus.ts",
       "testing/readFailureReason.ts",
+      "testing/renderRefusingTable.tsx",
     ],
     exclude: [
       "**/*.stories.{ts,tsx}",
@@ -66,7 +82,7 @@ export default defineConfig({
               ...client.test,
               include: [
                 ...(client.test?.include ?? []),
-                "testing/**/*.test.ts",
+                "testing/**/*.test.{ts,tsx}",
               ],
             },
           }

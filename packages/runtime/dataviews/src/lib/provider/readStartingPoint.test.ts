@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation } from "../location/index.js";
 import type { DataViewsSnapshot } from "../snapshot/index.js";
 import readStartingPoint from "./readStartingPoint.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "running"] },
     { field: "cores", kind: "number", min: 0 },

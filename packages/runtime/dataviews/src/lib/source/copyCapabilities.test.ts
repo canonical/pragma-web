@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { declare, declareSort } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
 import type { PredicateOperator, SortTerm } from "../query/index.js";
 import copyCapabilities from "./copyCapabilities.js";
 import type { EmptyPlacement, SourceCapabilities } from "./types.js";

@@ -8,7 +8,8 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { machine, machines } from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import { machines } from "../../../../../../testing/machines.js";
 import RecordItem from "./RecordItem.js";
 
 const english = resolveMessages();
@@ -18,7 +19,7 @@ const readChannels = () => {
   const provider = createDataViewsProvider({
     collection: machines,
     source: createArraySource({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       collection: machines,
     }),
   });

@@ -10,8 +10,10 @@
 
 import { IDBFactory } from "fake-indexeddb";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { answering, byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createIndexedDBViewStore } from "../../lib/indexeddb/index.js";
 import {
@@ -20,7 +22,7 @@ import {
 } from "../../lib/provider/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "status", kind: "choices", options: ["failed"] }],
 });
 
@@ -37,7 +39,7 @@ describe("regression 0018 — a reset dropped the open view from the list", () =
       collection: machines,
       source: createManualSource({
         capabilities: declare({ filter: { status: ["isAny"] } }),
-        answer: answering([]),
+        answer: answerWith([]),
       }).source,
       views: store,
     });

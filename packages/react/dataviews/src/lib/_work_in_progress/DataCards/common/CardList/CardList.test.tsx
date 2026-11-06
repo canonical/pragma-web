@@ -1,10 +1,8 @@
 import { createRowScopes } from "@canonical/dataviews-core/bindings";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { DisplayField } from "../../../../common/index.js";
 import CardList from "./CardList.js";
 
@@ -18,7 +16,7 @@ const details: readonly DisplayField[] = [{ id: "status", header: "Status" }];
  */
 const observeFleet = () => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha"), machine("m-2", "beta", "failed")],
+    rows: [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta", "failed")],
   });
   const releaseProvider = provider.observe();
   const scopes = createRowScopes({

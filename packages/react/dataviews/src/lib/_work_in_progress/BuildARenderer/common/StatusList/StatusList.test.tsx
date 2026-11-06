@@ -1,12 +1,10 @@
 import type { SourceDelivery } from "@canonical/dataviews-core";
 import { act, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type Machine,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import buildPage from "../../../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import type { Machine } from "../../../../../../testing/types.js";
 import StatusList from "./StatusList.js";
 
 const failure: SourceDelivery<Machine> = {
@@ -42,7 +40,7 @@ describe("StatusList", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m-1", "alpha")]),
+        page: buildPage([buildMachine("m-1", "alpha")]),
       });
     });
     expect(region).toHaveAttribute("aria-busy", "false");
@@ -73,7 +71,7 @@ describe("StatusList", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m-1", "alpha")]),
+        page: buildPage([buildMachine("m-1", "alpha")]),
       });
     });
     act(() => {

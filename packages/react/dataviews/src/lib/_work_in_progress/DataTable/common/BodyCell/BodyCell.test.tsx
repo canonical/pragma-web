@@ -4,11 +4,9 @@ import {
 } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { deliverRows } from "../../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import deliverRows from "../../../../../../testing/deliverRows.js";
 import { BodyCell } from "./index.js";
 
 /**
@@ -18,7 +16,7 @@ import { BodyCell } from "./index.js";
 const channelsOver = (fields: readonly string[]) => {
   const { provider } = createMachineProvider();
   const host = readProviderHost(provider);
-  host.complete(host.refresh(), deliverRows([machine("m-1", "alpha")]));
+  host.complete(host.refresh(), deliverRows([buildMachine("m-1", "alpha")]));
   const scopes = createRowScopes({
     rows: provider.rows,
     selection: provider.selection,

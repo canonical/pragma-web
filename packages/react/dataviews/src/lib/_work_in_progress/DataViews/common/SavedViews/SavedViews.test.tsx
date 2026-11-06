@@ -24,9 +24,9 @@ import {
 } from "@testing-library/react";
 import { StrictMode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import buildStoredView from "../../../../../../testing/buildStoredView.js";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
 import { createStandInPresentationStore } from "../../../../../../testing/createStandInStores.js";
-import { buildStoredView } from "../../../../../../testing/fixtures.js";
 import DataViews from "../../Provider.js";
 import SavedViews from "./SavedViews.js";
 

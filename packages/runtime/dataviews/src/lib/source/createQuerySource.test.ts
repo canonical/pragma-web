@@ -3,7 +3,9 @@ import {
   QueryObserver as TanStackObserver,
 } from "@tanstack/query-core";
 import { describe, expect, it, vi } from "vitest";
-import { byId, declare, declareSort } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createDataViewsProvider } from "../provider/index.js";
 import { DEFAULT_WINDOW, type Slice } from "../query/index.js";
@@ -266,7 +268,7 @@ describe("createQuerySource over @tanstack/query-core", () => {
         fields: [
           { field: "status", kind: "choices", options: ["ready", "failed"] },
         ],
-        identify: byId,
+        identify: readId,
       }),
       source: source(queryClient, () => Promise.resolve(served)),
     });

@@ -10,9 +10,11 @@
  */
 
 import { describe, expect, it } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { answering, byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   createMemoryLocation,
@@ -25,7 +27,7 @@ import {
 } from "../../lib/provider/index.js";
 
 const collection = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "running"] },
   ],
@@ -50,7 +52,7 @@ const buildLagging = () => {
     collection,
     source: createManualSource({
       capabilities: declare({ filter: { status: ["isAny"] } }),
-      answer: answering([]),
+      answer: answerWith([]),
     }).source,
     location,
     snapshot: { query: "status=failed", presentation: {} },

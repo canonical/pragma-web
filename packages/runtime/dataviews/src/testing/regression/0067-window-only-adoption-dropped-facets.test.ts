@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../testing/fixtures.js";
+import buildPage from "../../../testing/buildPage.js";
 import { createQueryCoordinator } from "../../lib/coordinator/index.js";
 import { DEFAULT_WINDOW, EMPTY_SLICE } from "../../lib/query/index.js";
 
@@ -24,7 +24,7 @@ describe("regression 0067 — window-only adoption dropped facets", () => {
     });
     coordinator.complete(first ?? "", {
       status: "succeeded",
-      page: pageOf([]),
+      page: buildPage([]),
     });
     const before = coordinator.state.slice;
     const requestId = coordinator.adopt({

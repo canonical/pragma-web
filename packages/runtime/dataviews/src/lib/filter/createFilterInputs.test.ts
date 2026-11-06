@@ -1,11 +1,9 @@
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import {
-  answering,
-  byId,
-  declare,
-  declareSort,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation } from "../location/index.js";
 import type { ReadonlyChannel } from "../observable/index.js";
@@ -17,7 +15,7 @@ import type { EmptyOr } from "../schema/index.js";
 import createFilterInputs from "./createFilterInputs.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "cancelled"] },
     { field: "cpu", kind: "number", min: 0, max: 64 },
@@ -41,7 +39,7 @@ const provider = (location?: ReturnType<typeof createMemoryLocation>) =>
         },
         sort: declareSort(["cpu"]),
       }),
-      answer: answering([]),
+      answer: answerWith([]),
     }).source,
     ...(location === undefined ? {} : { location }),
   });

@@ -13,13 +13,13 @@
 import { IDBFactory } from "fake-indexeddb";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import createManualSource from "../../../testing/createManualSource.js";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createIndexedDBViewStore } from "../../lib/indexeddb/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "cpu", kind: "number" }],
 });
 const database = "operations-console";

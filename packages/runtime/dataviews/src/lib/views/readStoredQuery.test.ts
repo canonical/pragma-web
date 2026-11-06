@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { buildStoredView, byId, declare } from "../../../testing/fixtures.js";
+import buildStoredView from "../../../testing/buildStoredView.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import readStoredQuery from "./readStoredQuery.js";
 import type { SavedView } from "./types.js";
@@ -8,7 +10,7 @@ const collection = createCollection({
   fields: [
     { field: "status", kind: "choices", options: ["failed", "running"] },
   ],
-  identify: byId,
+  identify: readId,
 });
 
 const host = {

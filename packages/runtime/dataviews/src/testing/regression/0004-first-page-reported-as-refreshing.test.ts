@@ -8,13 +8,15 @@
  */
 
 import { describe, expect, it } from "vitest";
+import buildPage from "../../../testing/buildPage.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { byId, declare, pageOf } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [{ field: "cpu", kind: "number" }],
 });
 
@@ -30,7 +32,7 @@ describe("regression 0004 — the first page is pending, a later one refreshing"
     expect(provider.state.get().result.rows).toBeNull();
     source
       .callAt(0)
-      .deliver({ status: "succeeded", page: pageOf([{ id: "a" }]) });
+      .deliver({ status: "succeeded", page: buildPage([{ id: "a" }]) });
     expect(provider.state.get().result.status).toBe("ready");
     provider.refresh();
     expect(provider.state.get().result.status).toBe("refreshing");

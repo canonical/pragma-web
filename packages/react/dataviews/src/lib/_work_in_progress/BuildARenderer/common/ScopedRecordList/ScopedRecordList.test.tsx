@@ -1,16 +1,14 @@
 import type { Query, SourceRefusal } from "@canonical/dataviews-core";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type MachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import buildPage from "../../../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import type { MachineProvider } from "../../../../../../testing/types.js";
 import ScopedRecordList from "./ScopedRecordList.js";
 import type { RecordListOwnProps } from "./types.js";
 
-const rows = [machine("m-1", "alpha"), machine("m-2", "beta")];
+const rows = [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")];
 
 const nameRecord = (record: { readonly name: string }): string => record.name;
 
@@ -120,7 +118,7 @@ describe("ScopedRecordList", () => {
     const { provider, source } = createMachineProvider();
     renderList({}, provider);
     act(() => {
-      source.latest().deliver({ status: "succeeded", page: pageOf(rows) });
+      source.latest().deliver({ status: "succeeded", page: buildPage(rows) });
     });
     act(() => {
       provider.refresh();

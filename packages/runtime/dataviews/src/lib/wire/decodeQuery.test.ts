@@ -5,7 +5,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { declare, declareSort } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
 import { DEFAULT_WINDOW, type ResultWindow } from "../query/index.js";
 import { createSchema } from "../schema/index.js";
 import decodeQuery from "./decodeQuery.js";

@@ -27,13 +27,11 @@ import {
 } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type Machine,
-  machine,
-} from "../../../../testing/machines.js";
+import buildMachine from "../../../../testing/buildMachine.js";
+import buildPage from "../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
+import type { Machine } from "../../../../testing/types.js";
 import { virtualizeRows } from "../../virtualization/index.js";
 import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";
@@ -74,7 +72,7 @@ const columns: readonly DataTableColumn[] = [
 /** A page of rows, as the manual source delivers one. */
 const page = (rows: readonly Machine[]): SourceDelivery<Machine> => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 /** A request the source accepted and could not complete. */
@@ -124,8 +122,8 @@ const settled = (
 const loaded = (): HTMLElement =>
   settled(
     page([
-      machine("m-1", "alpha", "running"),
-      machine("m-2", "beta", "failed"),
+      buildMachine("m-1", "alpha", "running"),
+      buildMachine("m-2", "beta", "failed"),
     ]),
     { field: "name", direction: "asc" },
   );
@@ -139,7 +137,7 @@ const refreshFailedTable = (): HTMLElement => {
     <DataTable provider={provider} columns={columns} label="Machines" />,
   );
   act(() => {
-    source.latest().deliver(page([machine("m-1", "alpha")]));
+    source.latest().deliver(page([buildMachine("m-1", "alpha")]));
   });
   act(() => {
     provider.refresh();
@@ -153,7 +151,7 @@ const refreshFailedTable = (): HTMLElement => {
 /** A virtualized table over more rows than it mounts, so it holds a gap. */
 const virtualizedTable = (): HTMLElement => {
   const rows = Array.from({ length: 20 }, (_, position) =>
-    machine(`m-${position}`, `host-${position}`),
+    buildMachine(`m-${position}`, `host-${position}`),
   );
   const { provider } = createMachineProvider({ rows });
   const { container } = render(
@@ -170,7 +168,7 @@ const virtualizedTable = (): HTMLElement => {
 /** A table ordered by two terms: each sorted header shows its precedence. */
 const renderSortedByTwo = (): HTMLElement => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
     capabilities: declareMachineOrdering(null),
   });
   const { container } = render(
@@ -213,7 +211,7 @@ const renderServerMarkup = (): HTMLElement => {
 /** A table holding its settings, one column hidden and announced. */
 const renderSettingsTable = (): HTMLElement => {
   const { provider } = createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
   });
   const { container } = render(
     <DataTable

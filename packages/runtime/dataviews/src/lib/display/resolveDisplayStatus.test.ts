@@ -7,12 +7,10 @@
  * completed by hand with what a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import {
-  failedWith,
-  pageOf,
-  readIssuedRequest,
-  refusedWith,
-} from "../../../testing/fixtures.js";
+import buildFailedResult from "../../../testing/buildFailedResult.js";
+import buildPage from "../../../testing/buildPage.js";
+import buildRefusedResult from "../../../testing/buildRefusedResult.js";
+import readIssuedRequest from "../../../testing/readIssuedRequest.js";
 import {
   createQueryCoordinator,
   type DataViewsState,
@@ -37,7 +35,7 @@ const machine = (id: string, name: string): Machine => ({ id, name });
 /** The rows a source delivers. */
 const delivery = (rows: readonly Machine[]): Completion<Machine> => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 /** A coordinator whose first request was settled with `rows`. */
@@ -76,7 +74,7 @@ describe("resolveDisplayStatus", () => {
     const coordinator = createQueryCoordinator<Machine>();
     coordinator.complete(
       coordinator.refresh(),
-      failedWith("the collection is unreachable"),
+      buildFailedResult("the collection is unreachable"),
     );
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "failed",
@@ -88,7 +86,7 @@ describe("resolveDisplayStatus", () => {
     const coordinator = createQueryCoordinator<Machine>();
     coordinator.complete(
       coordinator.refresh(),
-      refusedWith("name cannot be ordered", "two orderings at once"),
+      buildRefusedResult("name cannot be ordered", "two orderings at once"),
     );
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "failed",
@@ -157,7 +155,7 @@ describe("resolveDisplayStatus", () => {
 
   it("prefers the failure over emptiness when an empty result then failed", () => {
     const coordinator = loaded([]);
-    coordinator.complete(coordinator.refresh(), failedWith("offline"));
+    coordinator.complete(coordinator.refresh(), buildFailedResult("offline"));
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "failed",
       reason: "offline",
@@ -167,7 +165,7 @@ describe("resolveDisplayStatus", () => {
   it("reports rows an earlier query produced as stale, with the reason", () => {
     const coordinator = searched(
       loaded([machine("m-1", "alpha")]),
-      failedWith("search is unavailable"),
+      buildFailedResult("search is unavailable"),
     );
     expect(coordinator.state.result.status).toBe("stale");
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
@@ -179,7 +177,7 @@ describe("resolveDisplayStatus", () => {
   it("reports a failed query with no earlier rows to keep as a failure", () => {
     const coordinator = searched(
       loaded([]),
-      failedWith("search is unavailable"),
+      buildFailedResult("search is unavailable"),
     );
     expect(coordinator.state.result.status).toBe("stale");
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
@@ -190,7 +188,7 @@ describe("resolveDisplayStatus", () => {
 
   it("reports rows kept through a failed refresh, with the reason", () => {
     const coordinator = loaded([machine("m-1", "alpha")]);
-    coordinator.complete(coordinator.refresh(), failedWith("offline"));
+    coordinator.complete(coordinator.refresh(), buildFailedResult("offline"));
     expect(coordinator.state.result.status).toBe("refresh-failed");
     expect(resolveDisplayStatus(coordinator.state)).toEqual({
       status: "refresh-failed",
@@ -238,7 +236,7 @@ describe("resolveDisplayStatus", () => {
         status: "failed",
         failure: { reason: "x", cause: null, transient: null },
       },
-      refusedWith("x"),
+      buildRefusedResult("x"),
     ];
     const rowSets: readonly (readonly Machine[] | null)[] = [
       null,

@@ -8,12 +8,10 @@
  */
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import elementAt from "../../../testing/elementAt.js";
-import {
-  createMachineProvider,
-  type Machine,
-  machine,
-} from "../../../testing/machines.js";
+import type { Machine } from "../../../testing/types.js";
 import {
   DataTable,
   type DataTableColumn,
@@ -22,7 +20,7 @@ import type { DisplayFieldCellProps } from "../common/index.js";
 import virtualizeRows from "./virtualizeRows.js";
 
 const rows: readonly Machine[] = Array.from({ length: 10_000 }, (_, position) =>
-  machine(`m-${position}`, `host-${position}`),
+  buildMachine(`m-${position}`, `host-${position}`),
 );
 
 /** 32px rows in a 640px viewport: twenty in view, four more past each edge. */

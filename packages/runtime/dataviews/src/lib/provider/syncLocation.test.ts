@@ -10,15 +10,13 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import buildPage from "../../../testing/buildPage.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import {
-  byId,
-  declare,
-  declareSort,
-  NOTHING_DECLARED,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import { createFilterInputs } from "../filter/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
@@ -51,13 +49,13 @@ const machines = createCollection({
     { field: "cpu", kind: "number", min: 0, max: 64 },
     { field: "owner", kind: "flag" },
   ],
-  identify: byId,
+  identify: readId,
 });
 
 /** The machines without their cpu: a source over it cannot order by one. */
 const machinesWithoutCpu = createCollection({
   fields: machines.schema.fields.filter((field) => field.field !== "cpu"),
-  identify: byId,
+  identify: readId,
 });
 
 /** Everything the scenarios command: every filter, search, a two-field ordering. */
@@ -107,7 +105,7 @@ const fleet: readonly RowRecord[] = [
 /** One exactly counted page of rows, as a source delivers it. */
 const delivered = (rows: readonly RowRecord[]): Completion => ({
   status: "succeeded",
-  page: pageOf(rows),
+  page: buildPage(rows),
 });
 
 /**

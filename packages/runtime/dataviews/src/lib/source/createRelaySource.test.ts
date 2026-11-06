@@ -11,12 +11,10 @@ import {
   type Variables,
 } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import {
-  byId,
-  declare,
-  declareSort,
-  exactly,
-} from "../../../testing/fixtures.js";
+import countExactly from "../../../testing/countExactly.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import {
   createDataViewsProvider,
@@ -396,7 +394,7 @@ const lastOf = (deliver: ReturnType<typeof delivery>): SourceDelivery => {
 
 const machinesCollection = createCollection({
   fields: [{ field: "status", kind: "choices", options: ["ready", "failed"] }],
-  identify: byId,
+  identify: readId,
 });
 
 /** A window as the snapshot a provider starts from spells it. */
@@ -497,7 +495,7 @@ describe("createRelaySource over relay-runtime", () => {
       page: {
         rows: [machines[0], machines[1]],
         groups: null,
-        counts: countsOf(exactly(5)),
+        counts: countsOf(countExactly(5)),
         facets: {},
         more: true,
         cursors: { next: "c:m2", previous: null },
@@ -723,7 +721,7 @@ describe("createRelaySource over relay-runtime", () => {
       page: {
         rows: [],
         groups: null,
-        counts: countsOf(exactly(0)),
+        counts: countsOf(countExactly(0)),
         facets: {},
         more: false,
         cursors: { next: null, previous: null },
@@ -1258,7 +1256,7 @@ describe("createRelaySource bound to a collection", () => {
     expect(shown()).toMatchObject({
       ids: ["m1", "m2"],
       status: "ready",
-      counts: countsOf(exactly(5)),
+      counts: countsOf(countExactly(5)),
       matches: true,
     });
 
@@ -1293,7 +1291,7 @@ describe("createRelaySource bound to a collection", () => {
     expect(shown()).toMatchObject({
       ids: ["m1", "m3"],
       status: "ready",
-      counts: countsOf(exactly(3)),
+      counts: countsOf(countExactly(3)),
       matches: true,
     });
     release();

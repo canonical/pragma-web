@@ -15,8 +15,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
@@ -45,7 +46,7 @@ beforeEach(() => {
 describe("regression 0054 — an announcement rendered the header row again", () => {
   it("renders no header cell to say that a column is always shown", async () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
     });
     render(
       <DataTable

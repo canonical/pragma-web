@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import answerWith from "../../../testing/answerWith.js";
+import buildPage from "../../../testing/buildPage.js";
 import createCountingViewStore from "../../../testing/createCountingViewStore.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
@@ -6,11 +8,7 @@ import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "../../../testing/createStandInStores.js";
-import {
-  answering,
-  NOTHING_DECLARED,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
 import type { ActionOutcome } from "../action/index.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";
@@ -68,7 +66,7 @@ const permissive: SourceCapabilities = declareCapabilities(machines, {
 
 const delivered = <TRow extends object>(
   rows: readonly TRow[],
-): SourceDelivery<TRow> => ({ status: "succeeded", page: pageOf(rows) });
+): SourceDelivery<TRow> => ({ status: "succeeded", page: buildPage(rows) });
 
 const FAILED: Completion<Machine> = {
   status: "failed",
@@ -359,7 +357,7 @@ describe("createDataViewsProvider construction", () => {
   it("adopts a location moved before the first observer before taking up rows drawn for the old query", () => {
     const { source, calls } = createManualSource<Machine>({
       capabilities: permissive,
-      answer: answering([{ id: "m-1" }]),
+      answer: answerWith([{ id: "m-1" }]),
     });
     const recorded = createRecordingLocation({
       href: "/machines?status=failed&page=1&size=50",
@@ -648,7 +646,7 @@ describe("createDataViewsProvider snapshot", () => {
   it("reads the query, its window and the arrangement in force, never the selection", () => {
     const { source } = createManualSource<Machine>({
       capabilities: permissive,
-      answer: answering([{ id: "m-1" }, { id: "m-2" }]),
+      answer: answerWith([{ id: "m-1" }, { id: "m-2" }]),
     });
     const provider = createDataViewsProvider({
       collection: machines,
@@ -839,7 +837,7 @@ describe("createDataViewsProvider refresh", () => {
   it("is taken up by the first observer over the rows it drew, asking for nothing new", () => {
     const { source, calls } = createManualSource<Machine>({
       capabilities: permissive,
-      answer: answering([{ id: "m-1" }]),
+      answer: answerWith([{ id: "m-1" }]),
     });
     const provider = createDataViewsProvider({ collection: machines, source });
     provider.refresh();

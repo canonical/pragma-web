@@ -15,14 +15,13 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Profiler, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import buildPage from "../../../../../../testing/buildPage.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
-import { COUNTED_EXACTLY, pageOf } from "../../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type MachineProvider,
-  machine,
-  machines,
-} from "../../../../../../testing/machines.js";
+import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
+import { machines } from "../../../../../../testing/machines.js";
+import type { MachineProvider } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import Search from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";
@@ -133,7 +132,7 @@ describe("DataViews.Search", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m1", "alder")]),
+        page: buildPage([buildMachine("m1", "alder")]),
       });
     });
     act(() => {
@@ -142,7 +141,7 @@ describe("DataViews.Search", () => {
     act(() => {
       source.latest().deliver({
         status: "succeeded",
-        page: pageOf([machine("m2", "birch")]),
+        page: buildPage([buildMachine("m2", "birch")]),
       });
     });
     expect(rendered).toHaveBeenCalledTimes(mounted);

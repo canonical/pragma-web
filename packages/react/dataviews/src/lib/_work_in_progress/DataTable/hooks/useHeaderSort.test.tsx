@@ -1,17 +1,15 @@
 import { resolveMessages } from "@canonical/dataviews-core/bindings";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../../../testing/machines.js";
+import buildMachine from "../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../../../testing/declareMachineOrdering.js";
 import useHeaderSort from "./useHeaderSort.js";
 
 describe("useHeaderSort", () => {
   it("changes nothing and says nothing for an action on a column no longer shown", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(1),
     });
     const { slice, window } = provider.state.get();

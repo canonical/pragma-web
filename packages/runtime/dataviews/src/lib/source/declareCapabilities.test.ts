@@ -1,11 +1,11 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import readId from "../../../testing/readId.js";
 import { createCollection } from "../collection/index.js";
 import declareCapabilities from "./declareCapabilities.js";
 import type { CapabilityDeclaration } from "./types.js";
 
 const machines = createCollection({
-  identify: byId,
+  identify: readId,
   fields: [
     { field: "status", kind: "choices", options: ["failed", "ready"] },
     { field: "cpu", kind: "number" },

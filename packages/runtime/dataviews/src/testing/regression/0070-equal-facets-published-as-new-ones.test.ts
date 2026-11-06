@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../testing/fixtures.js";
+import buildPage from "../../../testing/buildPage.js";
 import { createQueryCoordinator } from "../../lib/coordinator/index.js";
 import type { Facet } from "../../lib/result/index.js";
 
@@ -24,14 +24,14 @@ describe("regression 0070 — equal facets published as new ones", () => {
     const first = coordinator.refresh();
     coordinator.complete(first, {
       status: "succeeded",
-      page: { ...pageOf([{ id: "a" }]), facets },
+      page: { ...buildPage([{ id: "a" }]), facets },
     });
     const published = coordinator.state.result.facets;
     const second = coordinator.refresh();
     coordinator.complete(second, {
       status: "succeeded",
       page: {
-        ...pageOf([{ id: "b" }]),
+        ...buildPage([{ id: "b" }]),
         facets: {
           status: { ...facets.status, values: [...facets.status.values] },
         },

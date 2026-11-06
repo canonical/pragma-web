@@ -10,18 +10,16 @@
 import { createMemoryLocation, decodeQuery } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-  machines,
-} from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
+import { machines } from "../../../testing/machines.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 describe("regression 0025 — the sort panel offered no path without scripts", () => {
   it("links a later term's move up to the ordering with it first", () => {
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha")],
+      rows: [buildMachine("m-1", "alpha")],
       capabilities: declareMachineOrdering(null),
       location: createMemoryLocation({ href: "/machines" }),
     });

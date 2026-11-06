@@ -11,7 +11,8 @@ import {
 } from "@canonical/dataviews-core";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { buildFleet, machines } from "../../../../testing/machines.js";
+import buildFleet from "../../../../testing/buildFleet.js";
+import { machines } from "../../../../testing/machines.js";
 import type { DataTableColumn } from "../../_work_in_progress/DataTable/index.js";
 import { DataCards } from "../../_work_in_progress/DataViews/common/DataCards/index.js";
 import { DataViews } from "../../_work_in_progress/DataViews/index.js";

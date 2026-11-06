@@ -9,10 +9,8 @@ import { createMemoryLocation } from "@canonical/dataviews-core";
 import { resolveColumnArrangement } from "@canonical/dataviews-core/bindings";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import buildMachine from "../../../../../../testing/buildMachine.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";
 
@@ -25,7 +23,7 @@ const columns: readonly DataTableColumn[] = [
 /** A provider over one machine, standing on `href`, or on no location. */
 const createProvider = (href: string | null) =>
   createMachineProvider({
-    rows: [machine("m-1", "alpha")],
+    rows: [buildMachine("m-1", "alpha")],
     ...(href === null ? {} : { location: createMemoryLocation({ href }) }),
   }).provider;
 

@@ -7,7 +7,8 @@
 
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import buildMachine from "../../../testing/buildMachine.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type {
   DisplayField,
@@ -26,7 +27,7 @@ describe("a selection made on a card", () => {
       { id: "probe", header: "Probe", field: "status", cell: Probe },
     ];
     const { provider } = createMachineProvider({
-      rows: [machine("m-1", "alpha"), machine("m-2", "beta")],
+      rows: [buildMachine("m-1", "alpha"), buildMachine("m-2", "beta")],
     });
     render(
       <DataCards
