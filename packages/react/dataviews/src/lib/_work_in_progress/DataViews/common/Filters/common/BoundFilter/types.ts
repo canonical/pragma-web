@@ -3,15 +3,9 @@ import type {
   PredicateOperator,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
+import type { ComponentProps } from "react";
 
-/**
- * Props of one bound filter.
- *
- * Exempt from the native-prop extension convention: an internal renderer
- * deriving its root from the schema field it was built for, not forwarding
- * a caller's native props.
- */
-export type BoundFilterProps = {
+type OwnProps = {
   /** The root's handle for this field's lower or upper bound. */
   readonly handle: FilterHandle<number | string>;
   /** The field's visible name; the bound's own wording is added to it. */
@@ -48,3 +42,10 @@ export type BoundFilterProps = {
    */
   readonly onLeave: () => void;
 };
+
+/**
+ * Props of one bound filter: its own, and the native props of the
+ * `div` it renders as its root.
+ */
+export type BoundFilterProps = OwnProps &
+  Omit<ComponentProps<"div">, keyof OwnProps | "children">;

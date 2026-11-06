@@ -31,6 +31,10 @@ const OPERATOR_MESSAGES = {
  * filters' group when it leaves with the text — undeclared, or shown only
  * because it is restricted. What the source refused, and why, is said beside
  * the input.
+ *
+ * `import { DataViews } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.subcomponent.data_views_filters-text_filter
  */
 export default function TextFilter({
   handle,
@@ -40,6 +44,8 @@ export default function TextFilter({
   declared,
   leavesWhenCleared,
   onLeave,
+  className,
+  ...rest
 }: TextFilterProps): ReactElement | null {
   const { messages } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
@@ -53,7 +59,10 @@ export default function TextFilter({
   const message = describeFilterFeedback(field.feedback, retained, messages);
   const name = messages[OPERATOR_MESSAGES[operator]](label);
   return (
-    <div className={componentCssClassName}>
+    <div
+      {...rest}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
+    >
       <label htmlFor={inputId} className="label">
         {name}
       </label>

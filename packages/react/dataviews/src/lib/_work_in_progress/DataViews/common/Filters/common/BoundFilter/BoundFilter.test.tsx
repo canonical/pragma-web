@@ -58,6 +58,7 @@ const Harness = ({
   declared = true,
   leavesWhenCleared = false,
   onLeave = () => {},
+  ...rest
 }: HarnessProps) => {
   const { filters } = useDataViewsRoot("BoundFilter test");
   const definition = collection.schema.findField(field);
@@ -66,6 +67,7 @@ const Harness = ({
   }
   return (
     <BoundFilter
+      {...rest}
       handle={findFilterHandle<number | string>(filters, field, bound)}
       label={field}
       bound={bound}
@@ -164,5 +166,15 @@ describe("BoundFilter", () => {
     fireEvent.click(screen.getByRole("button", { name: "Clear cpu from" }));
     expect(onLeave).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("spinbutton")).toBeNull();
+  });
+
+  it("takes the native props of its root, merging the class name", () => {
+    const { container } = mount(makeProvider(), {
+      className: "extra",
+      title: "From the link",
+    });
+    const root = container.querySelector(".ds.data-views-filters-bound");
+    expect(root).toHaveClass("extra");
+    expect(root).toHaveAttribute("title", "From the link");
   });
 });
