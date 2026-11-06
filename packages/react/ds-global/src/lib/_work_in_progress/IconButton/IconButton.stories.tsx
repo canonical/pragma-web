@@ -1,7 +1,8 @@
 import { ICON_NAMES } from "@canonical/ds-assets";
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import * as decorators from "../../../storybook/decorators.js";
 import { Button } from "../../component/Button/index.js";
@@ -60,6 +61,23 @@ const findRequiredElement = (parent: ParentNode, selector: string): Element => {
 const measureBox = (element: Element) => element.getBoundingClientRect();
 
 /**
+ * Checks that one icon button is as wide as it is tall, with its icon
+ * centred in the box, and returns the box.
+ */
+const expectSquareCentredIconButton = async (iconButton: Element) => {
+  const box = measureBox(iconButton);
+  const icon = measureBox(findRequiredElement(iconButton, ".icon"));
+  await expect(Math.abs(box.width - box.height)).toBeLessThan(TOLERANCE);
+  await expect(
+    Math.abs(icon.left + icon.width / 2 - (box.left + box.width / 2)),
+  ).toBeLessThan(TOLERANCE);
+  await expect(
+    Math.abs(icon.top + icon.height / 2 - (box.top + box.height / 2)),
+  ).toBeLessThan(TOLERANCE);
+  return box;
+};
+
+/**
  * Checks the geometry IconButton exists for, in every row of `canvasElement`
  * that holds icon buttons and a labelled Button: each icon button is as wide
  * as it is tall, as tall as the labelled Button, on its top edge (so on its
@@ -78,19 +96,11 @@ const expectSquareSeatedIconButtons = async (canvasElement: HTMLElement) => {
     await expect(iconButtons.length).toBeGreaterThan(0);
     const reference = measureBox(labelled);
     for (const iconButton of iconButtons) {
-      const box = measureBox(iconButton);
-      const icon = measureBox(findRequiredElement(iconButton, ".icon"));
-      await expect(Math.abs(box.width - box.height)).toBeLessThan(TOLERANCE);
+      const box = await expectSquareCentredIconButton(iconButton);
       await expect(Math.abs(box.height - reference.height)).toBeLessThan(
         TOLERANCE,
       );
       await expect(Math.abs(box.top - reference.top)).toBeLessThan(TOLERANCE);
-      await expect(
-        Math.abs(icon.left + icon.width / 2 - (box.left + box.width / 2)),
-      ).toBeLessThan(TOLERANCE);
-      await expect(
-        Math.abs(icon.top + icon.height / 2 - (box.top + box.height / 2)),
-      ).toBeLessThan(TOLERANCE);
     }
   }
 };
@@ -268,6 +278,73 @@ export const DensityAndContext: Story = {
   ),
   play: async ({ canvasElement }) => {
     await expectSquareSeatedIconButtons(canvasElement);
+  },
+};
+
+/** The density and context classes Button's seat reads its inputs from. */
+const SCOPES = ".comfortable, .dense, .app, .site, .docs";
+
+/**
+ * A test-only story: Storybook puts a density and a context on its root, so
+ * this one portals its row to a container on the document body, outside
+ * every scope, where Button has no seat. There the icon button is still as
+ * wide as it is tall, with its icon centred, with and without a Tooltip
+ * around it. A labelled Button is taller there, so it is not compared.
+ */
+export const OutsideADensityScope: Story = {
+  name: "Outside a density scope",
+  tags: ["!dev", "!autodocs"],
+  // The row is portalled, which the generated JSX source cannot print, so
+  // the story names its source instead.
+  parameters: {
+    docs: {
+      source: {
+        type: "code",
+        code: '<IconButton icon="edit" aria-label="Edit" importance="secondary" />',
+      },
+    },
+  },
+  render: function OutsideADensityScopeRender(args) {
+    const [container, setContainer] = useState<HTMLElement | null>(null);
+    useEffect(() => {
+      const element = document.createElement("div");
+      element.dataset.outsideScope = "";
+      document.body.append(element);
+      setContainer(element);
+      return () => element.remove();
+    }, []);
+    // A fragment, so the story always returns an element; the row joins it
+    // once the container exists.
+    return (
+      <>
+        {container
+          ? createPortal(
+              <div style={row}>
+                <Component {...args} importance="secondary" />
+                <TooltipEngine Message="Edit">
+                  <Component {...args} importance="secondary" />
+                </TooltipEngine>
+              </div>,
+              container,
+            )
+          : null}
+      </>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const document = canvasElement.ownerDocument;
+    await document.fonts.ready;
+    await waitFor(() =>
+      expect(
+        document.querySelectorAll("[data-outside-scope] button.icon-button"),
+      ).toHaveLength(2),
+    );
+    for (const iconButton of document.querySelectorAll(
+      "[data-outside-scope] button.icon-button",
+    )) {
+      await expect(iconButton.closest(SCOPES)).toBeNull();
+      await expectSquareCentredIconButton(iconButton);
+    }
   },
 };
 
