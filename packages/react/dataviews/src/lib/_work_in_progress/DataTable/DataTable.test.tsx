@@ -481,13 +481,53 @@ describe("DataTable", () => {
     return { provider, source, view };
   };
 
-  /** The sort button of the header with this name. */
-  const findSortButton = (name: string): HTMLElement =>
-    screen.getByRole("button", { name });
+  /**
+   * The one table's header row. The header reads below are scoped to it: a
+   * named role query over the whole document computes the name and the
+   * visibility of every candidate it meets, and the cases that click
+   * through many orderings would spend most of their time there.
+   */
+  const findHeaderRow = (): HTMLElement => {
+    const [row, ...rest] = document.querySelectorAll<HTMLElement>(
+      ".data-table-row-group.header [role='row']",
+    );
+    if (row === undefined || rest.length > 0) {
+      throw new Error("expected one table's header row");
+    }
+    return row;
+  };
 
-  /** The header whose sort control has this name. */
-  const findHeader = (name: string): HTMLElement =>
-    screen.getByRole("columnheader", { name });
+  /**
+   * The header headed by this text: found by its visible heading rather
+   * than by computing every header's name.
+   */
+  const findHeader = (name: string): HTMLElement => {
+    const headers = Array.from(
+      findHeaderRow().querySelectorAll<HTMLElement>("[role='columnheader']"),
+    ).filter((header) => header.querySelector(".label")?.textContent === name);
+    const [header, ...rest] = headers;
+    if (header === undefined || rest.length > 0) {
+      throw new Error(`expected one header headed ${name}`);
+    }
+    return header;
+  };
+
+  /**
+   * The sort button of the header with this name: the button that labels
+   * it, so the header's name is the button's. The cases that test that
+   * name read it themselves.
+   */
+  const findSortButton = (name: string): HTMLElement => {
+    const header = findHeader(name);
+    const button = header.querySelector<HTMLElement>("button.sort");
+    if (
+      button === null ||
+      button.id !== header.getAttribute("aria-labelledby")
+    ) {
+      throw new Error(`expected a sort button labelling the header ${name}`);
+    }
+    return button;
+  };
 
   /** The polite region where that header says why a sort changed nothing. */
   const findSortReason = (name: string): Element | null =>
@@ -1033,16 +1073,22 @@ describe("DataTable", () => {
 
   /** Open one column's header menu from its trigger. */
   const openMenuOf = (name: string): HTMLElement => {
+    const trigger = `Column options for ${name}`;
     fireEvent.click(
-      screen.getByRole("button", { name: `Column options for ${name}` }),
+      within(findHeader(name)).getByRole("button", { name: trigger }),
     );
     // The menu mounts as it opens, replacing the button that opened it.
-    return screen.getByRole("button", { name: `Column options for ${name}` });
+    return within(findHeader(name)).getByRole("button", { name: trigger });
   };
 
-  /** Choose an item of the open header menu. */
+  /** Choose an item of the open header menu, the one menu open. */
   const choose = (item: string): void => {
-    fireEvent.click(screen.getByRole("menuitem", { name: item }));
+    const [menu, ...rest] =
+      document.querySelectorAll<HTMLElement>("[role='menu']");
+    if (menu === undefined || rest.length > 0) {
+      throw new Error("expected one header menu open");
+    }
+    fireEvent.click(within(menu).getByRole("menuitem", { name: item }));
   };
 
   it("sorts from a column's header menu and returns focus to its trigger", () => {
