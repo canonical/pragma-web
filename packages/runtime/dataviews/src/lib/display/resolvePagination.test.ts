@@ -5,14 +5,11 @@
  * completed by hand with the page a source would deliver.
  */
 import { describe, expect, it } from "vitest";
-import {
-  atLeast,
-  BY_NUMBER,
-  buildSettledPage,
-  exactly,
-  FORWARD_CURSORS,
-  readIssuedRequest,
-} from "../../../testing/fixtures.js";
+import atLeast from "../../../testing/atLeast.js";
+import buildSettledPage from "../../../testing/buildSettledPage.js";
+import exactly from "../../../testing/exactly.js";
+import { BY_NUMBER, FORWARD_CURSORS } from "../../../testing/fixtures.js";
+import readIssuedRequest from "../../../testing/readIssuedRequest.js";
 import type { SettledRow } from "../../../testing/types.js";
 import {
   createQueryCoordinator,

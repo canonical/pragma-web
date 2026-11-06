@@ -8,12 +8,10 @@
  */
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import elementAt from "../../../testing/elementAt.js";
-import {
-  createMachineProvider,
-  type Machine,
-  machine,
-} from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
+import type { Machine } from "../../../testing/types.js";
 import {
   DataTable,
   type DataTableColumn,

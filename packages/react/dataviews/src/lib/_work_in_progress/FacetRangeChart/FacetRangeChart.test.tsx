@@ -11,19 +11,14 @@ import { createRef } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import {
-  createFacetedFleet,
-  createFacetedManual,
-} from "../../../../testing/createFacetedProviders.js";
+import createFacetedFleet from "../../../../testing/createFacetedFleet.js";
+import createFacetedManual from "../../../../testing/createFacetedManual.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import deliverFacets from "../../../../testing/deliverFacets.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
-import {
-  createMachineProvider,
-  type Machine,
-  type MachineFields,
-  machine,
-} from "../../../../testing/machines.js";
+import machine from "../../../../testing/machine.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
+import type { Machine, MachineFields } from "../../../../testing/types.js";
 import FacetRangeChart from "./FacetRangeChart.js";
 
 type Provider = DataViewsProvider<MachineFields, Machine>;

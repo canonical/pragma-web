@@ -12,9 +12,11 @@
  */
 
 import { describe, expect, it } from "vitest";
+import answering from "../../../testing/answering.js";
+import byId from "../../../testing/byId.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
-import { answering, byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
 import observeUntilFinished from "../../../testing/observeUntilFinished.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {

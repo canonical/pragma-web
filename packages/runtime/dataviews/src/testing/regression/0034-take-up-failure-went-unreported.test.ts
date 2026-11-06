@@ -9,7 +9,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { byId, declare, pageOf } from "../../../testing/fixtures.js";
+import byId from "../../../testing/byId.js";
+import declare from "../../../testing/declare.js";
+import pageOf from "../../../testing/pageOf.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createDataViewsProvider } from "../../lib/provider/index.js";
 import type { Source } from "../../lib/source/index.js";

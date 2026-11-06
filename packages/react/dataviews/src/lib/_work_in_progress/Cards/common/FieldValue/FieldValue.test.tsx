@@ -1,11 +1,9 @@
 import { createRowScopes } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, onTestFinished } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-  machines,
-} from "../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import machine from "../../../../../../testing/machine.js";
+import { machines } from "../../../../../../testing/machines.js";
 import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
 import type { DisplayFieldCellProps } from "../../../../common/index.js";
 import {

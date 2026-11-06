@@ -12,10 +12,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createFacetedFleet,
-  createFacetedManual,
-} from "../../../../testing/createFacetedProviders.js";
+import createFacetedFleet from "../../../../testing/createFacetedFleet.js";
+import createFacetedManual from "../../../../testing/createFacetedManual.js";
 import FacetBarChart from "./FacetBarChart.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));

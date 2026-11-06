@@ -11,13 +11,11 @@
 
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  machine,
-} from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";

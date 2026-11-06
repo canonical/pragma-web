@@ -2,7 +2,7 @@ import type { DisplayStatus } from "@canonical/dataviews-core";
 import { DISPLAY_STATUS_PHASES } from "@canonical/dataviews-core/bindings";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { displayStatusOf } from "../../../../testing/fixtures.js";
+import displayStatusOf from "../../../../testing/displayStatusOf.js";
 import StatusItem from "./StatusItem.js";
 
 /** The status's own name, as a test's renderer shows it. */

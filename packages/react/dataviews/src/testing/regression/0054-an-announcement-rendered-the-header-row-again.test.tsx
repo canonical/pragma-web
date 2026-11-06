@@ -15,8 +15,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";

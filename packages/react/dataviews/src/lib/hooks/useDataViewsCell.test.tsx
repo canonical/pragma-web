@@ -9,7 +9,9 @@ import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import createFakeChannel from "../../../testing/createFakeChannel.js";
-import { type Machine, machine, machines } from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
+import { machines } from "../../../testing/machines.js";
+import type { Machine } from "../../../testing/types.js";
 import { CellContext, type CellContextValue } from "../common/index.js";
 import useDataViewsCell from "./useDataViewsCell.js";
 

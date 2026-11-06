@@ -9,8 +9,8 @@
 import { createPage } from "@canonical/dataviews-core";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createFacetedManual } from "../../../testing/createFacetedProviders.js";
-import { machine } from "../../../testing/machines.js";
+import createFacetedManual from "../../../testing/createFacetedManual.js";
+import machine from "../../../testing/machine.js";
 import { FacetBarChart } from "../../lib/_work_in_progress/FacetBarChart/index.js";
 import { FacetRangeChart } from "../../lib/_work_in_progress/FacetRangeChart/index.js";
 

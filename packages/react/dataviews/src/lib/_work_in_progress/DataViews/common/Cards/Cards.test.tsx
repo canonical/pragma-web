@@ -1,9 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  createMachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import machine from "../../../../../../testing/machine.js";
 import silenceRenderErrors from "../../../../../../testing/silenceRenderErrors.js";
 import type { DisplayField } from "../../../../common/index.js";
 import DataViews from "../../Provider.js";

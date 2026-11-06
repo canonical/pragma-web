@@ -19,15 +19,13 @@ import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
 import createTokenMessages from "../../../testing/createTokenMessages.js";
+import declareMachineOrdering from "../../../testing/declareMachineOrdering.js";
 import findEnglish from "../../../testing/findEnglish.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type MachineProvider,
-  machine,
-} from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
+import type { MachineProvider } from "../../../testing/types.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

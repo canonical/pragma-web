@@ -27,13 +27,11 @@ import {
 } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type Machine,
-  machine,
-} from "../../../../testing/machines.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
+import machine from "../../../../testing/machine.js";
+import pageOf from "../../../../testing/pageOf.js";
+import type { Machine } from "../../../../testing/types.js";
 import { virtualizeRows } from "../../virtualization/index.js";
 import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";

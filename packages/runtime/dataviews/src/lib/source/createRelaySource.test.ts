@@ -11,12 +11,10 @@ import {
   type Variables,
 } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
-import {
-  byId,
-  declare,
-  declareSort,
-  exactly,
-} from "../../../testing/fixtures.js";
+import byId from "../../../testing/byId.js";
+import declare from "../../../testing/declare.js";
+import declareSort from "../../../testing/declareSort.js";
+import exactly from "../../../testing/exactly.js";
 import { createCollection } from "../collection/index.js";
 import {
   createDataViewsProvider,

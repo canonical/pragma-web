@@ -13,7 +13,8 @@
 
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createMachineProvider, machine } from "../../../testing/machines.js";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
+import machine from "../../../testing/machine.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

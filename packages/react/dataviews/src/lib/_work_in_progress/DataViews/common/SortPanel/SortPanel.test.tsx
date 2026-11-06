@@ -11,15 +11,13 @@ import { Profiler } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import declareMachineOrdering from "../../../../../../testing/declareMachineOrdering.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import fakeAnnouncerClock from "../../../../../../testing/fakeAnnouncerClock.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
-  type MachineProvider,
-  machine,
-} from "../../../../../../testing/machines.js";
+import machine from "../../../../../../testing/machine.js";
 import readAnnouncements from "../../../../../../testing/readAnnouncements.js";
+import type { MachineProvider } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import SortPanel from "./SortPanel.js";
 

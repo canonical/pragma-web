@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import answering from "../../../testing/answering.js";
 import createCountingViewStore from "../../../testing/createCountingViewStore.js";
 import createManualSource from "../../../testing/createManualSource.js";
 import createRecordingLocation from "../../../testing/createRecordingLocation.js";
@@ -6,11 +7,8 @@ import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "../../../testing/createStandInStores.js";
-import {
-  answering,
-  NOTHING_DECLARED,
-  pageOf,
-} from "../../../testing/fixtures.js";
+import { NOTHING_DECLARED } from "../../../testing/fixtures.js";
+import pageOf from "../../../testing/pageOf.js";
 import type { ActionOutcome } from "../action/index.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation, type QueryLocation } from "../location/index.js";

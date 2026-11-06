@@ -34,30 +34,30 @@ import { createRef, type ReactElement, StrictMode, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import buildStoredView from "../../../../testing/buildStoredView.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import createManualSource from "../../../../testing/createManualSource.js";
 import {
   createStandInPresentationStore,
   createStandInViewStore,
 } from "../../../../testing/createStandInStores.js";
+import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
+import deliverRows from "../../../../testing/deliverRows.js";
 import elementAt from "../../../../testing/elementAt.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import fakeAnnouncerClock from "../../../../testing/fakeAnnouncerClock.js";
+import machine from "../../../../testing/machine.js";
 import {
-  buildStoredView,
-  deliverRows,
-  pageOf,
-} from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  declareMachineOrdering,
   MACHINE_CAPABILITIES,
-  type Machine,
-  type MachineFields,
-  machine,
   machines,
 } from "../../../../testing/machines.js";
+import pageOf from "../../../../testing/pageOf.js";
 import readAnnouncements from "../../../../testing/readAnnouncements.js";
-import type { ManualSource } from "../../../../testing/types.js";
+import type {
+  Machine,
+  MachineFields,
+  ManualSource,
+} from "../../../../testing/types.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";

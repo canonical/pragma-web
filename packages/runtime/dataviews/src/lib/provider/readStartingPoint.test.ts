@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { byId, declare } from "../../../testing/fixtures.js";
+import byId from "../../../testing/byId.js";
+import declare from "../../../testing/declare.js";
 import { createCollection } from "../collection/index.js";
 import { createMemoryLocation } from "../location/index.js";
 import type { DataViewsSnapshot } from "../snapshot/index.js";

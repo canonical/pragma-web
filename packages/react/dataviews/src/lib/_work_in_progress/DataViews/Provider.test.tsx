@@ -7,13 +7,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, type ReactNode, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
-import { pageOf } from "../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type MachineProvider,
-  machine,
-  machines,
-} from "../../../../testing/machines.js";
+import createMachineProvider from "../../../../testing/createMachineProvider.js";
+import machine from "../../../../testing/machine.js";
+import { machines } from "../../../../testing/machines.js";
+import pageOf from "../../../../testing/pageOf.js";
+import type { MachineProvider } from "../../../../testing/types.js";
 import type { DataTableColumn } from "../DataTable/index.js";
 import useDataViewsFilter from "./hooks/useDataViewsFilter.js";
 import DataViews from "./Provider.js";

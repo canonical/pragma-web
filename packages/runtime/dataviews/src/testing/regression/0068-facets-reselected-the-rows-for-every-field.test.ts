@@ -10,8 +10,8 @@
  */
 
 import { describe, expect, it } from "vitest";
+import byId from "../../../testing/byId.js";
 import createCountedRows from "../../../testing/createCountedRows.js";
-import { byId } from "../../../testing/fixtures.js";
 import { createCollection } from "../../lib/collection/index.js";
 import {
   DEFAULT_WINDOW,

@@ -10,15 +10,12 @@ import { createPage, DEFAULT_WINDOW } from "@canonical/dataviews-core";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
+import createMachineProvider from "../../../testing/createMachineProvider.js";
 import createMemoryViewStore from "../../../testing/createMemoryViewStore.js";
 import fakeAnnouncerClock from "../../../testing/fakeAnnouncerClock.js";
-import {
-  createMachineProvider,
-  type Machine,
-  type MachineProvider,
-  machine,
-} from "../../../testing/machines.js";
+import machine from "../../../testing/machine.js";
 import readAnnouncements from "../../../testing/readAnnouncements.js";
+import type { Machine, MachineProvider } from "../../../testing/types.js";
 import type { DataTableColumn } from "../../lib/_work_in_progress/DataTable/index.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

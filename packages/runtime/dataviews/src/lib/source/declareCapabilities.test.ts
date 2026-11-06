@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { byId } from "../../../testing/fixtures.js";
+import byId from "../../../testing/byId.js";
 import { createCollection } from "../collection/index.js";
 import declareCapabilities from "./declareCapabilities.js";
 import type { CapabilityDeclaration } from "./types.js";

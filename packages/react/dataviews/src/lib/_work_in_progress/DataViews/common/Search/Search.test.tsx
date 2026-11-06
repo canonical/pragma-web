@@ -15,14 +15,13 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Profiler, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
+import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
-import { COUNTED_EXACTLY, pageOf } from "../../../../../../testing/fixtures.js";
-import {
-  createMachineProvider,
-  type MachineProvider,
-  machine,
-  machines,
-} from "../../../../../../testing/machines.js";
+import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
+import machine from "../../../../../../testing/machine.js";
+import { machines } from "../../../../../../testing/machines.js";
+import pageOf from "../../../../../../testing/pageOf.js";
+import type { MachineProvider } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import Search from "./Search.js";
 import type { DataViewsSearchProps } from "./types.js";

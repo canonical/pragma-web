@@ -10,8 +10,10 @@
 
 import { IDBFactory } from "fake-indexeddb";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+import answering from "../../../testing/answering.js";
+import byId from "../../../testing/byId.js";
 import createManualSource from "../../../testing/createManualSource.js";
-import { answering, byId, declare } from "../../../testing/fixtures.js";
+import declare from "../../../testing/declare.js";
 import { createCollection } from "../../lib/collection/index.js";
 import { createIndexedDBViewStore } from "../../lib/indexeddb/index.js";
 import {
