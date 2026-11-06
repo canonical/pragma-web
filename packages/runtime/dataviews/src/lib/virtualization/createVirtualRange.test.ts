@@ -348,13 +348,18 @@ describe("createVirtualRange", () => {
   });
 
   it("bounds what it mounts however many entries there are", () => {
-    const range = createVirtualRange({ estimates: { record: 32, status: 64 } });
-    range.setEntries(records(rowIds(1_000_000)));
-    range.setViewport(16_000_000, 640);
-    const run = onlyRun(range.get());
-    expect(run.end - run.start).toBe(20 + 1 + 8);
-    expect(run.before + (run.end - run.start) * 32 + range.get().after).toBe(
-      32_000_000,
-    );
+    // A hundredfold more entries mount no more: the bound is the viewport's.
+    for (const count of [1_000, 100_000]) {
+      const range = createVirtualRange({
+        estimates: { record: 32, status: 64 },
+      });
+      range.setEntries(records(rowIds(count)));
+      range.setViewport((count / 2) * 32, 640);
+      const run = onlyRun(range.get());
+      expect(run.end - run.start).toBe(20 + 1 + 8);
+      expect(run.before + (run.end - run.start) * 32 + range.get().after).toBe(
+        count * 32,
+      );
+    }
   });
 });
