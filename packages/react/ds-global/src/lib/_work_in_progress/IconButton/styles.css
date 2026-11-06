@@ -62,14 +62,17 @@
      `.ds.button { padding-inline }` in the same layer wherever the two sheets
      land in a bundle; it is independent of order. The only other (0,3,0) rule
      that sets padding-inline is `.ds.button.link`, and IconButton's props
-     refuse `variant`. The other rules here are (0,2,0) and set nothing Button
-     sets. Nothing here redeclares a property of Button's density seat on a
-     scoped button: the block-padding rule applies only outside a scope. */
+     refuse `variant`. The icon rule, `.ds.icon-button > .icon`, ties Button's
+     `.ds.button > .icon` at (0,3,0) and this sheet loads first, so it sets
+     only `position`, `inset` and `margin`, which Button's icon slot does not
+     set. The other rules are (0,2,0) or, for the `::before`, (0,2,1), and set
+     nothing Button sets. Nothing here redeclares a property of Button's
+     density seat on a scoped button: the block-padding rule applies only
+     outside a scope.
 
-  :root {
-    /* Outside a density scope: no block padding, so no inline padding. */
-    --icon-button-padding-inline: 0px;
-  }
+     The component token, `--icon-button-padding-inline`, is declared only on
+     the component, inside a density scope; its default outside one is the
+     fallback where it is read. */
 
   :where(.comfortable, .dense, .app, .site, .docs) .ds.icon-button {
     --icon-button-padding-inline: calc(
@@ -79,8 +82,10 @@
     );
   }
 
+  /* Outside a density scope the token is unset: no block padding, so no
+     inline padding, from the fallback. */
   .ds.button.icon-button {
-    padding-inline: var(--icon-button-padding-inline);
+    padding-inline: var(--icon-button-padding-inline, 0px);
   }
 
   .ds.icon-button {
