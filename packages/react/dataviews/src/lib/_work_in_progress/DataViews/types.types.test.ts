@@ -41,4 +41,8 @@ describe("ContextOptions", () => {
       ContextOptions["messages"]
     >().toEqualTypeOf<DataViewsMessages>();
   });
+
+  it("ends every typing session of the root's records at once", () => {
+    expectTypeOf<ContextOptions["endSessions"]>().toEqualTypeOf<() => void>();
+  });
 });

@@ -111,6 +111,19 @@ export type FilterInput = FilterHandle<unknown> & {
    * predicate must address this record's field and operator.
    */
   readonly setApplied: (applied: Predicate | null) => void;
+  /**
+   * End the input session, as leaving the input or submitting its form
+   * does. Within one session, the first typed edit that moves the query
+   * enters history as the policy says and every later one replaces that
+   * entry; the next edit after the session ends is a step of its own. A
+   * discrete `set`, a `clear` and a move of the query under the record end
+   * it too.
+   *
+   * @note Typing back to the value applied before the session began still
+   * leaves its one entry, identical to the one before it, so Back takes one
+   * step more than it seems to need.
+   */
+  readonly endSession: () => void;
 };
 
 /**
@@ -168,4 +181,15 @@ export type FilterInputs<TFields extends readonly SchemaFieldDefinition[]> = {
    * The release stops following.
    */
   readonly observe: () => () => void;
+  /**
+   * End every record's input session, as leaving an input or submitting
+   * the form does: each typed bound's next edit is a history step of its
+   * own, where a session's later edits replace its first.
+   *
+   * @note A session that types back to the value applied before it began
+   * still leaves its one entry, identical to the one before it, so Back
+   * takes one step more than it seems to need; stepping back over it needs
+   * a location that can move back through history.
+   */
+  readonly endSessions: () => void;
 };

@@ -72,6 +72,12 @@ describe("ProviderHost", () => {
       (parameter: string) => void
     >();
   });
+
+  it("sets a predicate entering history as it is told, or as the policy says", () => {
+    expectTypeOf<ProviderHost["setPredicate"]>()
+      .parameter(2)
+      .toEqualTypeOf<HistoryMode | undefined>();
+  });
 });
 
 describe("StartingPoint", () => {
@@ -90,6 +96,12 @@ describe("QueryCommands", () => {
     expectTypeOf<QueryCommands["command"]>().returns.toEqualTypeOf<
       readonly SourceRefusal[]
     >();
+  });
+
+  it("enters a command's move into history as it is told, optionally", () => {
+    expectTypeOf<QueryCommands["command"]>()
+      .parameter(1)
+      .toEqualTypeOf<HistoryMode | undefined>();
   });
 });
 

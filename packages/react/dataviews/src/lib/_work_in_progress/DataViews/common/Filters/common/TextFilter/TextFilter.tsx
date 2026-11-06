@@ -31,6 +31,10 @@ const OPERATOR_MESSAGES = {
  * filters' group when it leaves with the text — undeclared, or shown only
  * because it is restricted. What the source refused, and why, is said beside
  * the input.
+ *
+ * `import { DataViews } from "@canonical/dataviews-react";`
+ *
+ * @implements ds:apps.subcomponent.data_views_filters-text_filter
  */
 export default function TextFilter({
   handle,
@@ -41,7 +45,7 @@ export default function TextFilter({
   leavesWhenCleared,
   onLeave,
 }: TextFilterProps): ReactElement | null {
-  const { messages } = useDataViewsRoot("Filters");
+  const { messages, endSessions } = useDataViewsRoot("Filters");
   const field = useFilterHandle(handle);
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -74,6 +78,8 @@ export default function TextFilter({
         onChange={(event) => {
           field.edit(event.target.value);
         }}
+        // Leaving the input ends its session: typing again is a new step.
+        onBlur={endSessions}
       />
       {retained ? (
         <Button

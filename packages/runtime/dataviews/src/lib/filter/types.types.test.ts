@@ -11,6 +11,7 @@ import type {
   FilterHandle,
   FilterHandles,
   FilterInput,
+  FilterInputs,
 } from "./types.js";
 
 const machines = createSchema([
@@ -62,7 +63,19 @@ describe("FilterHandles", () => {
 });
 
 describe("FilterInput", () => {
+  it("ends its input session, as leaving the input does", () => {
+    expectTypeOf<FilterInput["endSession"]>().toEqualTypeOf<() => void>();
+  });
+
   it("is a handle its owner can also move under", () => {
     expectTypeOf<FilterInput>().toExtend<FilterHandle<unknown>>();
+  });
+});
+
+describe("FilterInputs", () => {
+  it("ends every record's input session at once", () => {
+    expectTypeOf<
+      FilterInputs<typeof machines.fields>["endSessions"]
+    >().toEqualTypeOf<() => void>();
   });
 });

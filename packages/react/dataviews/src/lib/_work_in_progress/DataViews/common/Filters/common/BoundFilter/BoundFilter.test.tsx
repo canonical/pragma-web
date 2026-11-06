@@ -14,6 +14,7 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import createManualSource from "../../../../../../../../testing/createManualSource.js";
+import createRecordingLocation from "../../../../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";
@@ -164,5 +165,21 @@ describe("BoundFilter", () => {
     fireEvent.click(screen.getByRole("button", { name: "Clear cpu from" }));
     expect(onLeave).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("spinbutton")).toBeNull();
+  });
+
+  it("types a bound as one history step, until the input is left", () => {
+    const recorded = createRecordingLocation({ href: "/machines" });
+    mount(makeProvider(recorded.location));
+    const from = screen.getByRole("spinbutton", { name: "cpu from" });
+    const before = recorded.writes.length;
+    fireEvent.change(from, { target: { value: "4" } });
+    fireEvent.change(from, { target: { value: "48" } });
+    fireEvent.blur(from);
+    fireEvent.change(from, { target: { value: "8" } });
+    expect(recorded.writes.slice(before).map(([, mode]) => mode)).toEqual([
+      "push",
+      "replace",
+      "push",
+    ]);
   });
 });
