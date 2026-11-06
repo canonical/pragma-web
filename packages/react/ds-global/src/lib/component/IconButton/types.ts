@@ -1,6 +1,5 @@
 import type { IconName } from "@canonical/ds-assets";
-import type { ComponentProps } from "react";
-import type { Button } from "../Button/index.js";
+import type { ButtonProps } from "../Button/index.js";
 
 /**
  * An icon-only button has no visible text, so it must be named explicitly:
@@ -41,11 +40,12 @@ type OwnProps = {
 
 /**
  * Button's props with a required `icon`, no children and a required accessible
- * name. `variant` is also left out: the `link` variant strips the button's
- * chrome and inline padding, which an icon-only button cannot do without
- * losing its square box and its target size.
+ * name. The root element is Button's `<button>`, so the native half is
+ * `ComponentProps<"button">`, reached through `ButtonProps`: `type`, `form`,
+ * `popoverTarget`, `ref`, `style` and every handler reach the `<button>`.
+ * `variant` is left out: the `link` variant strips the button's chrome and
+ * inline padding, which an icon-only button cannot do without losing its
+ * square box and its target size.
  */
-type Props = OwnProps &
-  Omit<ComponentProps<typeof Button>, keyof OwnProps | "variant">;
-
-export type { Props as default };
+export type IconButtonProps = OwnProps &
+  Omit<ButtonProps, keyof OwnProps | "variant">;

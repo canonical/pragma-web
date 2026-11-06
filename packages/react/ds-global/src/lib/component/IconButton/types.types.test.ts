@@ -1,12 +1,6 @@
 import type { Ref } from "react";
 import { describe, expectTypeOf, it } from "vitest";
-import type Props from "./types.js";
-// Like `it.fails`, at the type level: `types.ts` has no named
-// `IconButtonProps` yet, so this import is an error and the name is `any`.
-// Once the named export lands, this directive becomes unused and fails the
-// check, and the `toBeAny` below must become `toEqualTypeOf<Props>()`.
-// @ts-expect-error IconButtonProps is not a named export of types.ts yet.
-import type { IconButtonProps } from "./types.js";
+import type { IconButtonProps as Props } from "./types.js";
 
 /**
  * Type-level tests for IconButton's props.
@@ -52,7 +46,7 @@ describe("IconButton props", () => {
   });
 
   it("is the named IconButtonProps export", () => {
-    expectTypeOf<IconButtonProps>().toBeAny();
+    expectTypeOf<Props>().not.toBeAny();
   });
 
   it("accepts every native button attribute through Button", () => {
