@@ -1,5 +1,5 @@
-import type { RequestHandler } from "msw";
-import { type SetupServerApi, setupServer } from "msw/node";
+import type { AnyHandler } from "msw";
+import { type SetupServer, setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, expect } from "vitest";
 
 /**
@@ -17,18 +17,17 @@ import { afterAll, afterEach, beforeAll, expect } from "vitest";
  * global fetch while the file's tests run.
  */
 export default function serveMockApi(
-  handlers: readonly RequestHandler[],
-): SetupServerApi {
+  handlers: readonly AnyHandler[],
+): SetupServer {
   const server = setupServer(...handlers);
   /** The requests no handler answered since the last test ended. */
   const unhandled: string[] = [];
+  const onUnhandled = ({ request }: { readonly request: Request }) => {
+    unhandled.push(`${request.method} ${request.url}`);
+  };
   beforeAll(() => {
-    server.listen({
-      onUnhandledRequest: (request, print) => {
-        unhandled.push(`${request.method} ${request.url}`);
-        print.error();
-      },
-    });
+    server.events.on("request:unhandled", onUnhandled);
+    server.listen({ onUnhandledFrame: "error" });
   });
   // A request no handler matches only rejects a fetch, which a source shows as
   // a failure a test may never read; the test fails here instead.
@@ -42,6 +41,7 @@ export default function serveMockApi(
     try {
       expect(unhandled.splice(0)).toEqual([]);
     } finally {
+      server.events.removeListener("request:unhandled", onUnhandled);
       server.close();
     }
   });

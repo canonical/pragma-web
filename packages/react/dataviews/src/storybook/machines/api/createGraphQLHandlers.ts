@@ -1,10 +1,5 @@
-import {
-  delay,
-  type GraphQLResponseBody,
-  graphql,
-  HttpResponse,
-  type RequestHandler,
-} from "msw";
+import { delay, HttpResponse, type RequestHandler } from "msw";
+import { type GraphQLResponseBody, graphql } from "msw/graphql";
 import { machines } from "../fixtures.js";
 import { API_SCENARIOS } from "./constants.js";
 import foldStoredText from "./foldStoredText.js";

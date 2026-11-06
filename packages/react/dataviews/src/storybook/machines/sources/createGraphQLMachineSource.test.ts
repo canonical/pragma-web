@@ -5,6 +5,7 @@ import {
 } from "@canonical/dataviews-core";
 import { HttpResponse, type HttpResponseResolver, http } from "msw";
 import { describe, expect, it, vi } from "vitest";
+import answerOverHttp2 from "../../../../testing/answerOverHttp2.js";
 import { DELIVERY_WAIT } from "../../../../testing/constants.js";
 import readFailureReason from "../../../../testing/readFailureReason.js";
 import serveMockApi from "../../../../testing/serveMockApi.js";
@@ -126,17 +127,17 @@ describe("createGraphQLMachineSource", () => {
   });
 
   it("names the status when a failed answer gives no error", async () => {
-    // Status 599 has no standard text, so it stays empty, as over HTTP/2.
-    answerWith(() => HttpResponse.json({}, { status: 599, statusText: "" }));
+    // Status 599 has no standard text, and over HTTP/2 none is given.
+    answerOverHttp2();
+    answerWith(() => HttpResponse.json({}, { status: 599 }));
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered 599",
     );
   });
 
   it("names the status when a failed answer is not JSON", async () => {
-    answerWith(
-      () => new HttpResponse("<html>", { status: 599, statusText: "" }),
-    );
+    answerOverHttp2();
+    answerWith(() => new HttpResponse("<html>", { status: 599 }));
     expect(await readFailureReason(createGraphQLMachineSource("live"))).toBe(
       "the endpoint answered 599",
     );

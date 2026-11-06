@@ -1,4 +1,4 @@
-import type { SetupServerApi } from "msw/node";
+import type { SetupServer } from "msw/node";
 import type { MockRequestWatch } from "./types.js";
 
 /**
@@ -9,7 +9,7 @@ import type { MockRequestWatch } from "./types.js";
  * @note Impure: listens to the server's events until stopped.
  */
 export default function watchMockRequest(
-  server: SetupServerApi,
+  server: SetupServer,
   path: string,
 ): MockRequestWatch {
   let followed: string | null = null;
