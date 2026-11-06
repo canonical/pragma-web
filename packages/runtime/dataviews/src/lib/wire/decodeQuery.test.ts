@@ -91,6 +91,7 @@ describe("decodeQuery", () => {
     expect(decode("status__isNone=deployed").issues).toEqual([
       {
         parameter: "status__isNone",
+        field: "status",
         code: "invalid",
         reason: '"deployed" is not an option of "status"',
       },
@@ -105,6 +106,7 @@ describe("decodeQuery", () => {
     expect(decode("name__startsWith=a&name__startsWith=b").issues).toEqual([
       {
         parameter: "name__startsWith",
+        field: "name",
         code: "malformed",
         reason:
           '"name__startsWith" takes one value; the extra values were ignored',
@@ -113,6 +115,7 @@ describe("decodeQuery", () => {
     expect(decode("status__startsWith=f").issues).toEqual([
       {
         parameter: "status__startsWith",
+        field: "status",
         code: "invalid",
         reason:
           'choices field "status" does not accept the startsWith operator',
@@ -121,6 +124,7 @@ describe("decodeQuery", () => {
     expect(decode("name__isAny=web").issues).toEqual([
       {
         parameter: "name__isAny",
+        field: "name",
         code: "invalid",
         reason: 'text field "name" does not accept the isAny operator',
       },
@@ -174,6 +178,7 @@ describe("decodeQuery", () => {
       issues: [
         {
           parameter: "page",
+          field: null,
           code: "malformed",
           reason: '"none" is not a positive integer',
         },
@@ -182,6 +187,7 @@ describe("decodeQuery", () => {
     expect(decode("size=0").issues).toEqual([
       {
         parameter: "size",
+        field: null,
         code: "malformed",
         reason: '"0" is not a positive integer',
       },
@@ -196,11 +202,13 @@ describe("decodeQuery", () => {
       issues: [
         {
           parameter: "page",
+          field: null,
           code: "malformed",
           reason: `"${huge}" is too large`,
         },
         {
           parameter: "size",
+          field: null,
           code: "malformed",
           reason: `"${huge}" is too large`,
         },
@@ -230,6 +238,7 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "cursor",
+        field: null,
         code: "unreachable-page",
         reason: "this source pages by number and reaches no page by token",
       },
@@ -255,6 +264,7 @@ describe("decodeQuery", () => {
     expect(decode("page=2&page=5").issues).toEqual([
       {
         parameter: "page",
+        field: null,
         code: "malformed",
         reason: '"page" takes one value; the extra values were ignored',
       },
@@ -264,6 +274,7 @@ describe("decodeQuery", () => {
     expect(decode("cursor=a&cursor=b").issues).toEqual([
       {
         parameter: "cursor",
+        field: null,
         code: "malformed",
         reason: '"cursor" takes one value; the extra values were ignored',
       },
@@ -274,6 +285,7 @@ describe("decodeQuery", () => {
     expect(decode("cpu__gte=4&cpu__gte=8").issues).toEqual([
       {
         parameter: "cpu__gte",
+        field: "cpu",
         code: "malformed",
         reason: '"cpu__gte" takes one value; the extra values were ignored',
       },
@@ -297,6 +309,7 @@ describe("decodeQuery", () => {
     expect(decode("sort=updated").issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "malformed",
         reason: '"updated" is not an ordered sort term',
       },
@@ -304,6 +317,7 @@ describe("decodeQuery", () => {
     expect(decode("sort=__asc").issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "malformed",
         reason: '"__asc" is not an ordered sort term',
       },
@@ -311,6 +325,7 @@ describe("decodeQuery", () => {
     expect(decode("sort=updated__sideways").issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "malformed",
         reason: '"updated__sideways" is not an ordered sort term',
       },
@@ -324,6 +339,7 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "malformed",
         reason: '"bogus" is not an ordered sort term',
       },
@@ -331,11 +347,13 @@ describe("decodeQuery", () => {
     expect(decode("sort=bogus&sort=worse").issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "malformed",
         reason: '"bogus" is not an ordered sort term',
       },
       {
         parameter: "sort",
+        field: null,
         code: "malformed",
         reason: '"worse" is not an ordered sort term',
       },
@@ -353,6 +371,7 @@ describe("decodeQuery", () => {
     expect(decode("name=alder").issues).toEqual([
       {
         parameter: "name",
+        field: "name",
         code: "invalid",
         reason: 'text field "name" does not accept the isAny operator',
       },
@@ -370,6 +389,7 @@ describe("decodeQuery", () => {
     expect(decode("name__contains=web&name__contains=api").issues).toEqual([
       {
         parameter: "name__contains",
+        field: "name",
         code: "malformed",
         reason:
           '"name__contains" takes one value; the extra values were ignored',
@@ -378,6 +398,7 @@ describe("decodeQuery", () => {
     expect(decode("status__contains=fail").issues).toEqual([
       {
         parameter: "status__contains",
+        field: "status",
         code: "invalid",
         reason: 'choices field "status" does not accept the contains operator',
       },
@@ -397,6 +418,7 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "unknown-field",
         reason: '"region" is not a field of this collection',
       },
@@ -425,12 +447,29 @@ describe("decodeQuery", () => {
 
   it("leaves a delimited parameter naming no field to the host", () => {
     // A host may spell its own keys with the delimiter; only a field's
-    // addresses are the collection's.
-    expect(decode("utm__source=mail&memory__gte=4")).toEqual({
+    // addresses, and the grammar's operators, are the collection's.
+    expect(decode("utm__source=mail&memory__near=4")).toEqual({
       slice: noQuery,
       window: firstPage,
       issues: [],
     });
+  });
+
+  it("refuses a filter on a field the collection does not declare", () => {
+    // A field since removed: leaving its clause out would widen the query,
+    // so it is refused, and its field named.
+    expect(decode("memory__gte=4&status=failed").issues).toEqual([
+      {
+        parameter: "memory__gte",
+        field: "memory",
+        code: "undeclared-field",
+        reason: '"memory" is not a field of this collection',
+      },
+    ]);
+    // A bare name cannot be told from the host's own parameter.
+    expect(decode("memory=4").issues).toEqual([]);
+    // Nor can a key with no name before the delimiter.
+    expect(decode("__gte=4").issues).toEqual([]);
   });
 
   it("refuses an unknown operator on a field it owns", () => {
@@ -440,6 +479,7 @@ describe("decodeQuery", () => {
       issues: [
         {
           parameter: "cpu__near",
+          field: "cpu",
           code: "malformed",
           reason: 'unknown operator "near"',
         },
@@ -451,6 +491,7 @@ describe("decodeQuery", () => {
     expect(decode("status__isSet=1").issues).toEqual([
       {
         parameter: "status__isSet",
+        field: "status",
         code: "invalid",
         reason: 'choices field "status" does not accept the isSet operator',
       },
@@ -458,6 +499,7 @@ describe("decodeQuery", () => {
     expect(decode("owner=yes").issues).toEqual([
       {
         parameter: "owner",
+        field: "owner",
         code: "invalid",
         reason: 'presence field "owner" does not accept the isAny operator',
       },
@@ -465,6 +507,7 @@ describe("decodeQuery", () => {
     expect(decode("status__gte=ready").issues).toEqual([
       {
         parameter: "status__gte",
+        field: "status",
         code: "invalid",
         reason: 'choices field "status" does not accept the gte operator',
       },
@@ -477,17 +520,24 @@ describe("decodeQuery", () => {
       issues: [
         {
           parameter: "status",
+          field: "status",
           code: "invalid",
           reason: '"melted" is not an option of "status"',
         },
       ],
     });
     expect(decode("cpu__gte=lots").issues).toEqual([
-      { parameter: "cpu__gte", code: "invalid", reason: "not a number" },
+      {
+        parameter: "cpu__gte",
+        field: "cpu",
+        code: "invalid",
+        reason: "not a number",
+      },
     ]);
     expect(decode("cpu__gte=99").issues).toEqual([
       {
         parameter: "cpu__gte",
+        field: "cpu",
         code: "invalid",
         reason: "99 is above the maximum of 64",
       },
@@ -495,6 +545,7 @@ describe("decodeQuery", () => {
     expect(decode("updated__gte=2026-02-30").issues).toEqual([
       {
         parameter: "updated__gte",
+        field: "updated",
         code: "invalid",
         reason: '"2026-02-30" is not an ISO-8601 calendar date (YYYY-MM-DD)',
       },
@@ -525,6 +576,7 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "status",
+        field: "status",
         code: "invalid",
         reason: '"melted" is not an option of "status"',
       },
@@ -553,7 +605,27 @@ describe("decodeQuery", () => {
       decodeQuery({ schema, params: new URLSearchParams("load__gte=1e999") })
         .issues,
     ).toEqual([
-      { parameter: "load__gte", code: "invalid", reason: "not a number" },
+      {
+        parameter: "load__gte",
+        field: "load",
+        code: "invalid",
+        reason: "not a number",
+      },
+    ]);
+  });
+
+  it("reports a clause the source cannot execute under each key that spelled it", () => {
+    const decoded = decodeQuery({
+      schema: machines(),
+      params: new URLSearchParams("status__isAny=ready&status=failed"),
+      capabilities: declare({}),
+    });
+    expect(decoded.slice.filter).toEqual([]);
+    expect(
+      decoded.issues.map(({ parameter, field }) => [parameter, field]),
+    ).toEqual([
+      ["status__isAny", "status"],
+      ["status", "status"],
     ]);
   });
 
@@ -581,21 +653,25 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "cpu__lte",
+        field: "cpu",
         code: "undeclared-operator",
         reason: 'field "cpu" cannot be filtered with lte',
       },
       {
         parameter: "owner__isSet",
+        field: "owner",
         code: "undeclared-field",
         reason: 'field "owner" cannot be filtered',
       },
       {
         parameter: "q",
+        field: null,
         code: "undeclared-field",
         reason: "this source cannot search",
       },
       {
         parameter: "group",
+        field: null,
         code: "too-many-levels",
         reason: "this source cannot group",
       },
@@ -612,11 +688,13 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "undeclared-field",
         reason: 'field "cpu" cannot be sorted',
       },
       {
         parameter: "sort",
+        field: null,
         code: "undeclared-field",
         reason: 'field "name" cannot be sorted',
       },
@@ -636,6 +714,7 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "too-many-terms",
         reason: "this source orders by at most 1 term",
       },
@@ -680,6 +759,7 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "sort",
+        field: null,
         code: "undeclared-field",
         reason: 'field "name" cannot be sorted',
       },
@@ -703,6 +783,7 @@ describe("decodeQuery", () => {
     expect(decoded.issues).toEqual([
       {
         parameter: "group",
+        field: null,
         code: "undeclared-field",
         reason: 'field "region" cannot be grouped',
       },

@@ -5,7 +5,15 @@
  * through `@ts-expect-error`.
  */
 import { describe, expect, expectTypeOf, it } from "vitest";
-import type { Completion, Count, SourceRefusal } from "./types.js";
+import type {
+  Completion,
+  Count,
+  QueryIssue,
+  QueryIssueCode,
+  ResultProblem,
+  SourceRefusal,
+  SourceRefusalCode,
+} from "./types.js";
 
 describe("Count", () => {
   it("carries a value only when the count says how many", () => {
@@ -26,5 +34,42 @@ describe("Completion", () => {
     expectTypeOf<
       Extract<Completion, { readonly status: "refused" }>["refusals"]
     >().toEqualTypeOf<readonly SourceRefusal[]>();
+  });
+});
+
+describe("QueryIssueCode", () => {
+  it("reports every code a source refuses for, and the grammar's own", () => {
+    expectTypeOf<SourceRefusalCode>().toExtend<QueryIssueCode>();
+    expectTypeOf<Exclude<QueryIssueCode, SourceRefusalCode>>().toEqualTypeOf<
+      "malformed" | "invalid" | "unknown-field"
+    >();
+  });
+});
+
+describe("QueryIssue", () => {
+  it("names the parameter, and the field where one is addressed", () => {
+    const search: QueryIssue = {
+      parameter: "q",
+      field: null,
+      code: "undeclared-field",
+      reason: "this source cannot search",
+    };
+    // @ts-expect-error an issue says which field it addresses, or null
+    const unsaid: QueryIssue = { parameter: "q", code: "invalid", reason: "" };
+    expect([search, unsaid]).toHaveLength(2);
+  });
+});
+
+describe("ResultProblem", () => {
+  it("is every completion but a success", () => {
+    expectTypeOf<ResultProblem["status"]>().toEqualTypeOf<
+      "failed" | "refused"
+    >();
+  });
+
+  it("carries a source's refusals or a link's refused clauses under refused", () => {
+    const bySource: ResultProblem = { status: "refused", refusals: [] };
+    const byLink: ResultProblem = { status: "refused", issues: [] };
+    expect([bySource, byLink]).toHaveLength(2);
   });
 });

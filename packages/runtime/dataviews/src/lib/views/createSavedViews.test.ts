@@ -1234,11 +1234,13 @@ describe("createSavedViews", () => {
         issues: [
           {
             parameter: "q",
+            field: null,
             code: "undeclared-field",
             reason: "this source cannot search",
           },
           {
             parameter: "region",
+            field: "region",
             code: "unknown-field",
             reason: '"region" names no field of this collection',
           },
@@ -1262,6 +1264,7 @@ describe("createSavedViews", () => {
         issues: [
           {
             parameter: "as",
+            field: "as",
             code: "unknown-field",
             reason: '"as" names no field of this collection',
           },

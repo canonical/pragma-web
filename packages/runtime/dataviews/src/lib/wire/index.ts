@@ -1,12 +1,16 @@
+export { default as areQueryIssuesEqual } from "./areQueryIssuesEqual.js";
 export {
   OPERATOR_DELIMITER,
+  QUERY_KEYS,
   RESERVED_QUERY_KEYS,
   SUFFIXED_OPERATORS,
   VIEW_KEY,
   WRITTEN_QUERY_KEYS,
 } from "./constants.js";
 export { default as decodeQuery } from "./decodeQuery.js";
+export { default as encodeCarryingQuery } from "./encodeCarryingQuery.js";
 export { default as encodeQuery } from "./encodeQuery.js";
+export { default as isNarrowingIssue } from "./isNarrowingIssue.js";
 export { default as isOwnedKey } from "./isOwnedKey.js";
 export { default as readArrangementParams } from "./readArrangementParams.js";
 export { default as readOpenView } from "./readOpenView.js";

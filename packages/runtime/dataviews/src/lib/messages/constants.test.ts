@@ -26,6 +26,18 @@ describe("DEFAULT_MESSAGES", () => {
     );
     expect(m.statusNoResults).toBe("No rows match this query.");
     expect(m.statusNoData).toBe("There is nothing here yet.");
+    expect(m.statusRefused('"melted" is not an option')).toBe(
+      'This link could not be followed: "melted" is not an option.',
+    );
+    expect(m.statusRefused(" . ")).toBe("This link could not be followed.");
+  });
+
+  it("words a followed link's refused clauses as a list of them", () => {
+    expect(m.linkRefusals).toBe("Not applied from the link");
+    expect(m.clauseRefused("Status", '"melted" is not an option.')).toBe(
+      'Status: "melted" is not an option.',
+    );
+    expect(m.grouping).toBe("Grouping");
   });
 
   it("words the table's selection and resize controls, with the width's plural", () => {

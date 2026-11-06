@@ -10,13 +10,12 @@ import type { ReadonlyChannel } from "../observable/index.js";
 import type {
   OwnedPresentation,
   PreferenceResult,
-  ViewPresentation,
 } from "../presentation/index.js";
 import type { Query, ResultWindow, Slice } from "../query/index.js";
+import type { QueryIssue } from "../result/index.js";
 import type { Schema, SchemaFieldDefinition } from "../schema/index.js";
 import type { DataViewsSnapshot } from "../snapshot/index.js";
 import type { SourceCapabilities } from "../source/index.js";
-import type { QueryIssue } from "../wire/index.js";
 
 /**
  * One saved view, resolved for this viewer: a snapshot of the collection —

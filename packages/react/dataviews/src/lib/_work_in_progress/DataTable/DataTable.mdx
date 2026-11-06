@@ -208,7 +208,7 @@ const columns: readonly DataTableColumn[] = [
 
 ## The outcomes
 
-A table with no rows says why, and the reasons stay distinct: nothing has arrived yet (`pending`), the read failed (`failed`), the collection is empty (`no-data`), or the query matched nothing (`no-results`). They call for different responses from the reader — wait, retry, add something, change the query — so they are never collapsed into one message.
+A table with no rows says why, and the reasons stay distinct: nothing has arrived yet (`pending`), the read failed (`failed`), a followed link carried a filter or a search that was refused, so nothing ran rather than something wider (`refused`), the collection is empty (`no-data`), or the query matched nothing (`no-results`). They call for different responses from the reader — wait, retry, fix the link, add something, change the query — so they are never collapsed into one message.
 
 Two more are said *above* rows rather than in place of them, because a table that keeps showing rows must not hide what went wrong: `refresh-failed`, where the rows still answer the query but the request that would have replaced them failed, and `stale`, where an earlier query produced them. The status is the core's `DisplayStatus`, decided once from the collection's state; the table renders it and decides nothing itself. A settled outcome is announced once as a polite status message, a passing state is silent. `renderStatus` replaces the default text with your own words; the stories below show the defaults.
 
@@ -229,6 +229,8 @@ const statusText = (status: DisplayStatus): string => {
       return "Regrouping machines…";
     case "failed":
       return `Could not read machines: ${status.reason}`;
+    case "refused":
+      return `This link to machines could not be followed: ${status.reason}`;
     case "refresh-failed":
       return `These machines could not be refreshed: ${status.reason}`;
     case "stale":

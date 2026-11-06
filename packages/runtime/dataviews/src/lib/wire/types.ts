@@ -4,7 +4,7 @@
  */
 
 import type { Query, ResultWindow, Slice } from "../query/index.js";
-import type { SourceRefusalCode } from "../result/index.js";
+import type { QueryIssue } from "../result/index.js";
 import type { Schema, SchemaFieldDefinition } from "../schema/index.js";
 import type { SourceCapabilities } from "../source/index.js";
 
@@ -19,43 +19,11 @@ export type ArrangementParams = {
 };
 
 /**
- * Which stage refused a parameter, for a control to switch on: the
- * source's own code where the source refused it, `malformed` where the
- * grammar could not read it, `invalid` where the schema refused its value or
- * its operator, and `unknown-field` where it names a field the collection
- * does not have.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type QueryIssueCode =
-  | SourceRefusalCode
-  | "malformed"
-  | "invalid"
-  | "unknown-field";
-
-/**
- * One refusal of an owned parameter — by the grammar, the schema or the
- * source — named for a visible query error. One parameter may carry
- * several. The code names the stage that refused it, and the reason is what
- * a control says.
- *
- * @experimental Pre-release: the whole surface is still settling, and this
- * name may change or move before the first release.
- */
-export type QueryIssue = {
-  /** The parameter as it was spelled in the URL. */
-  readonly parameter: string;
-  /** Which stage refused it, for a control to switch on. */
-  readonly code: QueryIssueCode;
-  /** Why it was refused: a lowercase fragment, as schema reasons are. */
-  readonly reason: string;
-};
-
-/**
  * What one parameter set decodes to. A refused clause is left out of the
  * query and reported: the slice is what could be read, the issues are what
- * could not.
+ * could not. A refused clause that narrows the result — a filter or the
+ * search — means the slice is wider than the link asked for, and the
+ * provider withholds it rather than run it.
  *
  * @experimental Pre-release: the whole surface is still settling, and this
  * name may change or move before the first release.
@@ -88,6 +56,25 @@ export type EncodeQueryConfig = {
    * other parameter survives in its original order, duplicates included.
    */
   readonly preserve?: URLSearchParams | undefined;
+};
+
+/**
+ * Configuration of one encode that carries a followed link's refused
+ * clauses through: the provider's own, never the package's.
+ */
+export type CarryingEncodeConfig = EncodeQueryConfig & {
+  /**
+   * The grammar's own keys to carry through from `preserve` as they are
+   * spelled there: the refused clauses a link carries, which stand until
+   * the reader removes them.
+   */
+  readonly carry: readonly string[];
+  /**
+   * The slice the link's readable clauses were applied as. A carried key
+   * keeps only the values it did not supply, after what the encode writes:
+   * the values it supplied are the encode's to write again, or not.
+   */
+  readonly applied: Slice;
 };
 
 /**

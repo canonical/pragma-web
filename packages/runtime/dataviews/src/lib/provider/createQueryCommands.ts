@@ -1,9 +1,10 @@
+import { isClauseReplaced, readWithheld } from "../coordinator/index.js";
 import {
   applyQueryCommand,
   type Query,
   type QueryCommand,
 } from "../query/index.js";
-import type { SourceRefusal } from "../result/index.js";
+import type { QueryIssue, SourceRefusal } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import { refusalsOf } from "../source/index.js";
 import { CAUSE_OF_COMMAND } from "./constants.js";
@@ -91,7 +92,12 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
       if (applied.status === "rejected") {
         throw new Error(applied.reason);
       }
-      if (!applied.sliceChanged && !applied.windowChanged) {
+      // A command replacing a refused clause of the link moves the query
+      // even when the slice stays: the clause no longer stands.
+      const replaces = readWithheld(coordinator.state).some((issue) =>
+        isClauseReplaced(next, issue),
+      );
+      if (!applied.sliceChanged && !applied.windowChanged && !replaces) {
         return NO_REFUSALS;
       }
       // The query the command starts from is checked only when the one it
@@ -114,10 +120,13 @@ export default function createQueryCommands<TRow extends object = RowRecord>(
       query: Query,
       cause: AdoptionCause,
       view: string | null,
+      withheld?: readonly QueryIssue[],
     ): string | null {
-      const requestId = coordinator.adopt(query);
+      const before = coordinator.state;
+      const requestId = coordinator.adopt(query, withheld);
       const viewMoved = view !== openView.get();
-      if (requestId === null && !viewMoved) {
+      // Withheld, an adoption issues no request and still moves the state.
+      if (coordinator.state === before && !viewMoved) {
         return null;
       }
       // The adopted state is published before the view moves, so anything
