@@ -105,18 +105,10 @@
    * so `.editorial` composes with density with no specificity war. `:is()` (not
    * `:where()`) still gives the control seat the specificity to beat a control's own
    * centring (e.g. the Button's `align-items: center`). */
-  /* Body font tier for the field label/description/error plus the toggle control
-     row (its own line metrics must match the label's so the control row centres
-     exactly), which lost `.p`. Scoped to just these (NOT the headings, which
-     keep their own tier). */
+  /* Body font tier for the field label/description/error, which lost `.p`. Scoped
+     to just these (NOT the headings, which keep their own tier). */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(
-    .ds.field-label,
-    .ds.field-description,
-    .ds.field-error,
-    .ds.field-toggle,
-    .ds.option
-  ) {
+  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
     font-size: var(--typography-text-primary-font-size);
     font-family: var(--typography-text-primary-font-family);
   }
@@ -126,8 +118,8 @@
       .ds.field-label,
       .ds.field-description,
       .ds.field-error,
-      .ds.field-toggle,
-      .ds.option
+      .ds.option > input,
+      .field-toggle-control > input
     ) {
     line-height: 1;
     /* Baseline within a line-height:1 box (font-relative cap approximation). */
@@ -342,13 +334,25 @@
    * Fill the box out to a whole density line-height so its bottom lands on a grid
    * line. The `- 1em` term is correct precisely because these are line-height:1.
    *
+   * The fill is named --seat-after so the seat consumers share it: the seated
+   * text above reads it as its padding-block-end, and the label-sized choice and
+   * toggle MARKS (RadioInput/CheckboxInput/SwitchInput, the scoped ChoicesField
+   * rules) read the SAME variable as their margin-block-end — one computed seat,
+   * two applications, no duplicated max/calc in the component sheets.
+   *
    * Bare prose (p / .p / h1–h6) is NOT here: it is no longer density-seated (see the
    * partition above), so its box is its OWN snapped line-height and the engine's
    * --end-nudge already lands its bottom on the grid. Adding a density fill on top
    * would double-pad. Prose bottom rhythm belongs to the engine / `.editorial`. */
   :is(.comfortable, .dense, .app, .site, .docs)
-  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
-    padding-block-end: max(
+  :is(
+    .ds.field-label,
+    .ds.field-description,
+    .ds.field-error,
+    .ds.option > input,
+    .field-toggle-control > input
+  ) {
+    --seat-after: max(
       0px,
       calc(
         var(
@@ -359,6 +363,7 @@
         1em
       )
     );
+    padding-block-end: var(--seat-after);
   }
 
   /* ── The native-control text drift — RESOLVED for single-line inputs ──────────

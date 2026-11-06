@@ -9,10 +9,12 @@
     appearance: none;
     box-sizing: border-box;
     margin-inline: var(--form-input-padding-inline);
-    /* 16px control — a fixed element size, not a baseline multiple (the 4px-baseline
-       spike halved the old `--space-baseline × 2`). Stable --dimension-200 (16px). */
-    width: var(--dimension-200);
-    height: var(--dimension-200);
+    /* Label-font box; the density layer computes its seat (--space-before /
+       --seat-after, modifiers.density.css) and this sheet only applies it. */
+    height: var(--typography-text-primary-font-size);
+    width: var(--typography-text-primary-font-size);
+    padding: 0;
+    margin-block: var(--space-before, 0) var(--seat-after, 0);
     border: var(--dimension-stroke-thickness-medium) solid var(--color-border);
     border-radius: 50%;
     background-color: var(

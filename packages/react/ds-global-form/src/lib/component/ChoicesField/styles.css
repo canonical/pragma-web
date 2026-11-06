@@ -33,16 +33,12 @@
       direction: inherit;
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
-      gap: var(--space-100);
+      align-items: start;
+      column-gap: var(--space-100);
       cursor: pointer;
 
-      label {
-        padding: 0;
-      }
-
       /* Muted one-line description under the label, indented past the mark. */
-      & > .ds.option-description {
+      & > .ds.field-description {
         flex-basis: 100%;
         margin: 0;
         margin-inline-start: calc(var(--dimension-200) + var(--space-100));
@@ -75,8 +71,12 @@
       & > input[type="radio"] {
         appearance: none;
         box-sizing: border-box;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        /* Label-font box; the density layer computes its seat (--space-before /
+           --seat-after, modifiers.density.css) and this sheet only applies it. */
+        height: var(--typography-text-primary-font-size);
+        width: var(--typography-text-primary-font-size);
+        padding: 0;
+        margin-block: var(--space-before, 0) var(--seat-after, 0);
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: 50%;
@@ -142,8 +142,12 @@
         appearance: none;
         box-sizing: border-box;
         position: relative;
-        width: var(--dimension-200); /* 16px */
-        height: var(--dimension-200); /* 16px */
+        /* Label-font box; the density layer computes its seat (--space-before /
+           --seat-after, modifiers.density.css) and this sheet only applies it. */
+        height: var(--typography-text-primary-font-size);
+        width: var(--typography-text-primary-font-size);
+        padding: 0;
+        margin-block: var(--space-before, 0) var(--seat-after, 0);
         border: var(--dimension-stroke-thickness-medium) solid
           var(--color-border);
         border-radius: var(--dimension-radius-small);
