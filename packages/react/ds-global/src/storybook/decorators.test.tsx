@@ -6,6 +6,18 @@ import * as decorators from "./decorators.js";
 /** A story stand-in: one element the decorators wrap. */
 const Story: ElementType = () => <span data-testid="story">Story</span>;
 
+/** Expects `container` to hold one surface band around the story. */
+function expectSurfaceBand(container: HTMLElement) {
+  const band = container.firstElementChild;
+  expect(band).toBeInstanceOf(HTMLElement);
+  if (!(band instanceof HTMLElement)) return;
+  expect(band).toHaveClass("surface");
+  expect(band.style.background).toBe("var(--surface-color-background)");
+  expect(band.style.color).toBe("var(--surface-color-text)");
+  expect(band.style.padding).toBe("var(--dimension-300, 24px)");
+  expect(screen.getByTestId("story").closest(".surface")).toBe(band);
+}
+
 describe("rtl", () => {
   it("wraps the story in dir=rtl", () => {
     render(decorators.rtl()(Story));
@@ -19,14 +31,15 @@ describe("rtl", () => {
 describe("surface", () => {
   it("paints the story on one surface, with padding", () => {
     const { container } = render(decorators.surface(Story));
-    const band = container.firstElementChild;
-    expect(band).toBeInstanceOf(HTMLElement);
-    if (!(band instanceof HTMLElement)) return;
-    expect(band).toHaveClass("surface");
-    expect(band.style.background).toBe("var(--surface-color-background)");
-    expect(band.style.color).toBe("var(--surface-color-text)");
-    expect(band.style.padding).toBe("var(--dimension-300, 24px)");
-    expect(screen.getByTestId("story").closest(".surface")).toBe(band);
+    expectSurfaceBand(container);
+  });
+
+  // Fails until surface is a factory like rtl and grid, called as
+  // `decorators.surface()`.
+  it.fails("is a factory, like rtl and grid", () => {
+    // @ts-expect-error surface takes the story itself until the next commit.
+    const { container } = render(decorators.surface()(Story));
+    expectSurfaceBand(container);
   });
 });
 
