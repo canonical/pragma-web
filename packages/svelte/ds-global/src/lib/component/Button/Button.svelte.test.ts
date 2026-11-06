@@ -1,7 +1,7 @@
 import type { Locator } from "@vitest/browser/context";
 import type { ComponentProps } from "svelte";
 import { createRawSnippet } from "svelte";
-import { describe, expect, it, onTestFinished, vi } from "vitest";
+import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
 import { commands } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
@@ -198,6 +198,10 @@ describe("Button component", () => {
   describe("accessibility", () => {
     describe("icon-only warning", () => {
       const iconOnlyWarning = expect.stringContaining("icon-only buttons");
+
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
 
       it("warns for an icon-only button without an accessible name", async () => {
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});

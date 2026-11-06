@@ -16,14 +16,15 @@
     --button-padding-inline-start: var(--dimension-200);
     --button-gap: var(--dimension-100);
     --button-border-width: var(--dimension-stroke-thickness-medium);
-    --button-font-weight: var(--typography-weight-medium);
+    /* Label typography: the `typography.text.primary` composite token. */
+    --button-font-weight: var(--typography-text-primary-font-weight);
+    --button-font-size: var(--typography-text-primary-font-size);
     /* Snaps up to the baseline grid, as the typography mapper does. */
-    --button-font-size: var(--typography-text-secondary-font-size);
     --button-line-height: round(
       up,
       calc(
         var(--button-font-size) *
-        var(--typography-text-secondary-line-height)
+        var(--typography-text-primary-line-height)
       ),
       var(--baseline-height)
     );
@@ -62,7 +63,9 @@
 
     --font-size: var(--button-font-size);
     --line-height: var(--button-line-height);
+    font-family: var(--typography-text-primary-font-family);
     font-weight: var(--button-font-weight);
+    letter-spacing: var(--typography-text-primary-letter-spacing);
     padding-inline: var(--button-padding-inline-start)
       var(--button-padding-inline-end);
 
