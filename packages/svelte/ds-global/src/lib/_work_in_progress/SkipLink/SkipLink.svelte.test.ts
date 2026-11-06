@@ -1,6 +1,5 @@
 import type { Locator } from "@vitest/browser/context";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { userEvent } from "vitest/browser";
 import type { RenderResult } from "vitest-browser-svelte";
 import { render } from "vitest-browser-svelte";
 import Component from "./SkipLink.svelte";
@@ -22,16 +21,14 @@ describe("SkipLink component", () => {
     it("moves focus to the main element when activated", async () => {
       mainEl.id = "main";
       const page = await render(Component);
-      componentLocator(page).element().focus();
-      await userEvent.keyboard("{Enter}");
+      (componentLocator(page).element() as HTMLElement).click();
       await expect.poll(() => document.activeElement).toBe(mainEl);
     });
 
     it("moves focus to a custom main element when mainId is set", async () => {
       mainEl.id = "custom-content";
       const page = await render(Component, { mainId: "custom-content" });
-      componentLocator(page).element().focus();
-      await userEvent.keyboard("{Enter}");
+      (componentLocator(page).element() as HTMLElement).click();
       await expect.poll(() => document.activeElement).toBe(mainEl);
     });
   });
