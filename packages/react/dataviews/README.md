@@ -85,6 +85,15 @@ The recipes, with consumer code and the live stories beside them, are the Storyb
 
 The parts have recipe pages of their own: [`Filters.mdx`](src/lib/_work_in_progress/DataViews/common/Filters/Filters.mdx), [`Actions.mdx`](src/lib/_work_in_progress/DataViews/common/Actions/Actions.mdx), [`Pagination.mdx`](src/lib/_work_in_progress/DataViews/common/Pagination/Pagination.mdx) and [`PaginationBar.mdx`](src/lib/_work_in_progress/PaginationBar/PaginationBar.mdx).
 
+## Messages and internationalization
+
+Every word the parts render or announce comes from one record, `DataViewsMessages`, shipped in English. The Storybook page **_work_in_progress / Messages and internationalization** covers it, with live stories — source in [`src/lib/_work_in_progress/DataViews/DataViews.messages.mdx`](src/lib/_work_in_progress/DataViews/DataViews.messages.mdx):
+
+- **The root's `messages`** — a partial set merged over English, or a whole replacement annotated `DataViewsMessages`, which fails to compile while it misses a message; standalone `DataTable` and `PaginationBar` take `messages` themselves.
+- **Messages that state a fact** — functions of the names, counts, positions and reasons they state, which word their own plurals and ordinals.
+- **What the announcer says** — one polite live region per root, for outcomes with no place on screen, and nothing a status on screen already says.
+- **A whole locale** — a French record with its plurals chosen by `Intl.PluralRules("fr")`, field labels and column headings left to the application, and what right-to-left text needs.
+
 ## Styles
 
 Each component imports its own stylesheet, so a page that renders one has the rules it needs. A page that would rather have every rule present from the first paint — before the JavaScript of a lazily loaded route arrives — links the package's entry stylesheet instead:
