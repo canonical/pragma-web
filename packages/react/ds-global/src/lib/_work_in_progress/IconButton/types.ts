@@ -1,5 +1,4 @@
 import type { IconName } from "@canonical/ds-assets";
-import type { ReactNode } from "react";
 import type { ButtonProps } from "../../component/Button/index.js";
 
 /**
@@ -37,19 +36,6 @@ type OwnProps = {
    * `aria-labelledby` instead.
    */
   children?: never;
-  /**
-   * The Tooltip that states the action. Button's guideline reads "Always pair
-   * an icon-only button with a Tooltip", so one is shown by default, with the
-   * `aria-label` as its message and the Tooltip's own show and hide delay.
-   * - `undefined`: a Tooltip whose message is the `aria-label`.
-   * - a node: a Tooltip with that message. It is visual only: the Tooltip
-   *   engine does not yet describe the button with it.
-   * - `false`: no Tooltip, for a button whose action is already shown nearby.
-   *
-   * A button named only by `aria-labelledby` has no default message, so it
-   * shows no Tooltip unless one is given here.
-   */
-  tooltip?: ReactNode | false;
 } & AccessibleName;
 
 /**

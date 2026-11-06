@@ -1,6 +1,6 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { createRef } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import Component from "./IconButton.js";
 
 describe("IconButton component", () => {
@@ -53,16 +53,14 @@ describe("IconButton component", () => {
     });
   });
 
-  // Fails until the built-in Tooltip is removed: IconButton's root must be
-  // the <button>, with a Tooltip paired by composition around it.
   describe("root", () => {
-    it.fails("renders the <button> as its root, with no Tooltip area", () => {
+    it("renders the <button> as its root, with no Tooltip area", () => {
       const { container } = render(<Component icon="edit" aria-label="Edit" />);
       expect(container.firstElementChild?.tagName).toBe("BUTTON");
       expect(container.querySelector(".tooltip-area")).not.toBeInTheDocument();
     });
 
-    it.fails("puts the consumer's className and style on the root", () => {
+    it("puts the consumer's className and style on the root", () => {
       const { container } = render(
         <Component
           icon="edit"
@@ -153,132 +151,8 @@ describe("IconButton component", () => {
     });
   });
 
-  describe("tooltip", () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    /** Run the Tooltip engine's show or hide delay. */
-    const runTooltipDelay = () => {
-      act(() => {
-        vi.advanceTimersByTime(1000);
-      });
-    };
-
-    /** Hover the button and wait out the delay. */
-    const hover = (element: HTMLElement) => {
-      fireEvent.pointerEnter(element);
-      runTooltipDelay();
-    };
-
-    it("shows the aria-label as the Tooltip's message on hover", () => {
-      render(<Component icon="edit" aria-label="Edit" />);
-      hover(screen.getByRole("button", { name: "Edit" }));
-      expect(screen.getByRole("tooltip")).toHaveTextContent("Edit");
-    });
-
-    it("shows the Tooltip on focus", () => {
-      render(<Component icon="edit" aria-label="Edit" />);
-      act(() => {
-        screen.getByRole("button", { name: "Edit" }).focus();
-      });
-      runTooltipDelay();
-      expect(screen.getByRole("tooltip")).toHaveTextContent("Edit");
-    });
-
-    it("shows a different message when one is given", () => {
-      render(
-        <Component
-          icon="copy"
-          aria-label="Copy"
-          tooltip="Copy the instance address"
-        />,
-      );
-      hover(screen.getByRole("button", { name: "Copy" }));
-      expect(screen.getByRole("tooltip")).toHaveTextContent(
-        "Copy the instance address",
-      );
-    });
-
-    it("renders the bare button when the tooltip is false", () => {
-      const { container } = render(
-        <Component icon="edit" aria-label="Edit" tooltip={false} />,
-      );
-      expect(container.querySelector(".tooltip-area")).not.toBeInTheDocument();
-      expect(container.firstElementChild?.tagName).toBe("BUTTON");
-    });
-
-    it("shows no Tooltip and warns once when named only by aria-labelledby", () => {
-      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-      const { container, rerender } = render(
-        <>
-          <span id="close-label">Close dialog</span>
-          <Component icon="close" aria-labelledby="close-label" />
-        </>,
-      );
-      rerender(
-        <>
-          <span id="close-label">Close dialog</span>
-          <Component icon="close" aria-labelledby="close-label" />
-        </>,
-      );
-      expect(container.querySelector(".tooltip-area")).not.toBeInTheDocument();
-      expect(warn).toHaveBeenCalledOnce();
-      expect(warn.mock.calls[0]?.[0]).toMatch(/IconButton/);
-    });
-
-    it("leaves the button's accessible description empty", () => {
-      // The Tooltip engine puts aria-describedby on its own wrapper span, not
-      // on the button, so the message is never read as the description.
-      render(<Component icon="edit" aria-label="Edit" />);
-      const button = screen.getByRole("button", { name: "Edit" });
-      hover(button);
-      expect(button).toHaveAccessibleDescription("");
-      expect(button).not.toHaveAttribute("aria-describedby");
-    });
-
-    it("stays closed while the button's panel is expanded", () => {
-      const { rerender } = render(
-        <Component
-          icon="settings"
-          aria-label="Settings"
-          aria-expanded="true"
-        />,
-      );
-      const button = screen.getByRole("button", { name: "Settings" });
-      hover(button);
-      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
-
-      rerender(
-        <Component
-          icon="settings"
-          aria-label="Settings"
-          aria-expanded="false"
-        />,
-      );
-      fireEvent.pointerLeave(button);
-      runTooltipDelay();
-      hover(button);
-      expect(screen.getByRole("tooltip")).toHaveTextContent("Settings");
-    });
-
-    it("hides on Escape", () => {
-      render(<Component icon="edit" aria-label="Edit" />);
-      hover(screen.getByRole("button", { name: "Edit" }));
-      expect(screen.getByRole("tooltip")).toBeInTheDocument();
-      fireEvent.keyDown(document, { key: "Escape" });
-      runTooltipDelay();
-      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
-    });
-  });
-
   describe("as a trigger", () => {
-    /** Render a popover trigger, with or without its Tooltip. */
-    const renderTrigger = (tooltip?: false) => {
+    it("passes the popover and menu attributes, style and ref to the button", () => {
       const ref = createRef<HTMLButtonElement>();
       render(
         <Component
@@ -292,38 +166,16 @@ describe("IconButton component", () => {
           aria-expanded={false}
           aria-controls="row-options"
           style={{ marginInlineStart: "auto" }}
-          tooltip={tooltip}
         />,
       );
-      return {
-        ref,
-        button: screen.getByRole("button", { name: "Row options" }),
-      };
-    };
-
-    it.each([
-      ["with", undefined],
-      ["without", false as const],
-    ])(
-      "passes the popover and menu attributes to the button %s the Tooltip",
-      (_, tooltip) => {
-        const { ref, button } = renderTrigger(tooltip);
-        expect(button).toHaveAttribute("popovertarget", "row-options");
-        expect(button).toHaveAttribute("popovertargetaction", "toggle");
-        expect(button).toHaveAttribute("aria-haspopup", "menu");
-        expect(button).toHaveAttribute("aria-expanded", "false");
-        expect(button).toHaveAttribute("aria-controls", "row-options");
-        expect(button.style.marginInlineStart).toBe("auto");
-        expect(ref.current).toBe(button);
-      },
-    );
-
-    it("keeps the Tooltip area outermost and the button inside it", () => {
-      const { button } = renderTrigger();
-      const area = button.closest(".ds.tooltip-area");
-      expect(area).toBeInTheDocument();
-      expect(area).not.toHaveAttribute("popovertarget");
-      expect(area).not.toHaveAttribute("style");
+      const button = screen.getByRole("button", { name: "Row options" });
+      expect(button).toHaveAttribute("popovertarget", "row-options");
+      expect(button).toHaveAttribute("popovertargetaction", "toggle");
+      expect(button).toHaveAttribute("aria-haspopup", "menu");
+      expect(button).toHaveAttribute("aria-expanded", "false");
+      expect(button).toHaveAttribute("aria-controls", "row-options");
+      expect(button.style.marginInlineStart).toBe("auto");
+      expect(ref.current).toBe(button);
     });
   });
 });
