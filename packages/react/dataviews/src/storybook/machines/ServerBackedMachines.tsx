@@ -40,7 +40,6 @@ export default function ServerBackedMachines({
       <DataViews.DataTable
         columns={SERVER_BACKED_COLUMNS}
         label={SERVER_BACKED_PARTS.tableLabel}
-        rowLabel={(row) => String(row["name"])}
       />
       <DataViews.Pagination sizes={SERVER_BACKED_PARTS.sizes} />
     </DataViews>
