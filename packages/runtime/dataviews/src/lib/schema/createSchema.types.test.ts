@@ -15,7 +15,7 @@ type FieldOf<TName extends string> = Extract<
   { readonly field: TName }
 >;
 
-describe("schema type inference", () => {
+describe("createSchema type inference", () => {
   it("infers literal field names from the construction", () => {
     expectTypeOf<(typeof machines.fields)[number]["field"]>().toEqualTypeOf<
       "status" | "cpu" | "owner" | "name"

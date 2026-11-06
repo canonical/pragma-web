@@ -1,6 +1,8 @@
 /**
- * The discriminator's whole job is to refuse: a field that cannot name a
- * record's type must not compile as one. Every rejection below is pinned
+ * The types `createCollection` infers and checks: the record type it reads
+ * from `identify`, and the discriminator it accepts. The discriminator's
+ * whole job is to refuse: a field that cannot name a record's type must not
+ * compile as one. Every rejection below is pinned
  * with `@ts-expect-error`, which fails the build if the type starts
  * accepting the case.
  */
@@ -22,7 +24,7 @@ type Discriminator<TRow extends object> = DiscriminatorField<Fields, TRow>;
 type Container = { readonly id: string; readonly type: "container" };
 type VirtualMachine = { readonly id: string; readonly type: "virtual-machine" };
 
-describe("DiscriminatorField", () => {
+describe("createCollection discriminator: DiscriminatorField", () => {
   it("names a choices field the row carries with a matching value", () => {
     const precise: Discriminator<Container | VirtualMachine> = "type";
     // An adapter typing the key wider still carries the options.
