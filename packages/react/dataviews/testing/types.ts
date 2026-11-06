@@ -18,6 +18,7 @@ import type {
   SourceRequest,
   ViewStore,
 } from "@canonical/dataviews-core";
+import type { RenderHookResult } from "@testing-library/react";
 import type { machines } from "./machines.js";
 
 /** One value a values facet lists, with how many matching records hold it. */
@@ -211,4 +212,11 @@ export type Listing = {
   readonly ids: readonly number[];
   readonly other: readonly number[];
   readonly page: number;
+};
+
+/** A hook rendered inside a DataViews root, with the fixture it reads. */
+export type RootedHook<TResult> = MachineFixture & {
+  readonly hook: RenderHookResult<TResult, unknown>;
+  /** How many times the hook has rendered so far. */
+  readonly readRenders: () => number;
 };
