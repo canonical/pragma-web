@@ -32,7 +32,7 @@ const mount = (columns: readonly ColumnToSize[]) => {
   const interaction = createGridInteraction(layout);
   const ids = columns.map((column) => column.id);
   const hook = renderHook(() => useTableGeometry(layout, interaction, ids));
-  return { interaction, hook };
+  return { layout, interaction, hook };
 };
 
 const FIXED_NAME: ColumnToSize = {
@@ -127,7 +127,7 @@ describe("useTableGeometry", () => {
       hook.result.current.attach(measured(400));
     });
     act(() => {
-      observed[0]?.(
+      observed.at(0)?.(
         [{ contentRect: { width: 250 } } as ResizeObserverEntry],
         {} as ResizeObserver,
       );
@@ -167,5 +167,28 @@ describe("useTableGeometry", () => {
     const { hook } = mount([]);
     expect(hook.result.current.template).toBeUndefined();
     expect(hook.result.current.widths).toEqual([]);
+  });
+
+  it("keeps its tracks' reference across an equal layout publication", () => {
+    const { layout, hook } = mount([FIXED_NAME, FLEX_STATUS]);
+    const { widths } = hook.result.current;
+    // An override equal to the declaration: the layout publishes, and the
+    // tracks it yields read the same.
+    act(() => {
+      layout.setOverride("name", { kind: "fixed", px: 100 });
+    });
+    expect(Object.hasOwn(layout.state.get().overrides, "name")).toBe(true);
+    expect(hook.result.current.widths).toBe(widths);
+  });
+
+  it("rebuilds its tracks when an override changes", () => {
+    const { layout, hook } = mount([FIXED_NAME, FLEX_STATUS]);
+    const { widths } = hook.result.current;
+    act(() => {
+      layout.setOverride("name", { kind: "fixed", px: 140 });
+    });
+    expect(hook.result.current.widths).not.toBe(widths);
+    expect(hook.result.current.widths).toEqual([140, 50]);
+    expect(hook.result.current.template).toBe("140px minmax(50px, 1fr)");
   });
 });
