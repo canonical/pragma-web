@@ -9,6 +9,7 @@ import type {
 } from "@canonical/dataviews-core";
 import { describe, expectTypeOf, it } from "vitest";
 import type {
+  Listing,
   Machine,
   MachineFields,
   MachineFixture,
@@ -38,5 +39,13 @@ describe("MemoryViewStore", () => {
     expectTypeOf<MemoryViewStore["elsewhere"]>().toEqualTypeOf<
       (id: string, changes: Partial<SavedView>) => void
     >();
+  });
+});
+
+describe("Listing", () => {
+  it("holds two lists of ids and a page", () => {
+    expectTypeOf<Listing["ids"]>().toEqualTypeOf<readonly number[]>();
+    expectTypeOf<Listing["other"]>().toEqualTypeOf<readonly number[]>();
+    expectTypeOf<Listing["page"]>().toEqualTypeOf<number>();
   });
 });
