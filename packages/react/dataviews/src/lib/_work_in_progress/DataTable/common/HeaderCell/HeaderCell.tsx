@@ -87,6 +87,7 @@ export default function HeaderCell({
   bounds,
   width,
   labelId,
+  announce,
   className,
   ...rest
 }: HeaderCellProps): ReactElement {
@@ -245,9 +246,11 @@ export default function HeaderCell({
         <ResizeHandle
           interaction={interaction}
           columnId={column.id}
+          name={column.header}
           width={width}
           {...bounds}
           labelledBy={labelId}
+          announce={announce}
         />
       ) : null}
     </div>

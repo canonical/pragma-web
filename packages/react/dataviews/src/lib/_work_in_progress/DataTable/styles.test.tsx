@@ -130,6 +130,20 @@ const loaded = (): HTMLElement =>
 
 const failed = (): HTMLElement => settled(unreachable);
 
+/** Loaded rows, with a press on the first resize handle placing its edge. */
+const placing = (): HTMLElement => {
+  const container = loaded();
+  const [handle] = screen.getAllByRole("separator");
+  if (handle === undefined) {
+    throw new Error("expected a resize handle");
+  }
+  fireEvent.pointerDown(handle, { isPrimary: true, clientX: 100 });
+  act(() => {
+    fireEvent.pointerUp(window, { clientX: 100 });
+  });
+  return container;
+};
+
 /** Rows that still answer the query, under a refresh that failed. */
 const refreshFailedTable = (): HTMLElement => {
   const { provider, source } = createMachineProvider();
@@ -274,6 +288,10 @@ describe("DataTable stylesheet", () => {
       rendered.add(name);
     }
     cleanup();
+    for (const name of classesOf(placing())) {
+      rendered.add(name);
+    }
+    cleanup();
     expect(styled.size).toBeGreaterThan(0);
     expect([...styled].filter((name) => !rendered.has(name))).toEqual([]);
   });
@@ -286,7 +304,7 @@ describe("DataTable stylesheet", () => {
       ".ds.data-table-header-cell > .sort > .label",
       ".ds.data-table-header-cell > .sort > .ds.icon",
       ".ds.data-table-header-cell > .label",
-      ".ds.data-table-header-cell > .ds.data-table-resize-handle",
+      ".ds.data-table-header-cell > .ds.data-table-resize-handle > .strip",
       ".ds.data-table-header-cell.selection",
       ".ds.data-table > .ds.data-table-row-group.header > .ds.data-table-row > .ds.data-table-header-cell.selection",
       ".ds.data-table-row-group.header > .ds.data-table-row",
@@ -412,14 +430,20 @@ describe("DataTable stylesheet", () => {
   it("keeps a resize drag from starting a text selection", () => {
     // A selection left by one drag turns the next press on the control into
     // a native drag of the selected text, and the column stops resizing.
-    const resize = rule(/\.ds\.data-table-resize-handle/);
+    const resize = rule(/& > \.strip/);
     expect(resize).toMatch(/user-select:\s*none;/);
     expect(resize).toMatch(/touch-action:\s*none;/);
   });
 
+  it("draws the hairline of an edge being placed as a focused one", () => {
+    expect(rule(/&\[data-mode="placing"\] > \.strip::after/)).toMatch(
+      /background-color:\s*var\(--color-focus-ring, currentColor\);/,
+    );
+  });
+
   it("marks the resize target with the design's hairline, centred", () => {
     const mark = sheet.match(
-      /\.ds\.data-table-resize-handle\s*\{[^}]*?&::after\s*\{([^{}]*)/,
+      /\.ds\.data-table-resize-handle\s*\{[^}]*?& > \.strip\s*\{[^}]*?&::after\s*\{([^{}]*)/,
     )?.[1];
     expect(mark).toMatch(
       /inline-size:\s*var\(--dimension-stroke-thickness-large\);/,
@@ -427,8 +451,8 @@ describe("DataTable stylesheet", () => {
     expect(mark).toMatch(/block-size:\s*var\(--dimension-250\);/);
     expect(mark).toMatch(/inset:\s*0;/);
     expect(mark).toMatch(/margin:\s*auto;/);
-    expect(rule(/\.ds\.data-table-resize-handle/)).toMatch(
-      /inline-size:\s*var\(--dimension-200\);/,
+    expect(rule(/& > \.strip/)).toMatch(
+      /inline-size:\s*var\(--dimension-300\);/,
     );
   });
 });
