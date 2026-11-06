@@ -44,11 +44,11 @@
 #                       "Row/select-all checkboxes" (1.3.1, 2.1.1, 4.1.2-4.1.3)
 #                       — CheckboxInput's own contract, plus the table's
 #                       names: "Select all displayed rows", "Select <row>"
-#   status row          "pending/regrouping/failed/refused/refresh-failed/stale/no-data/no-results"
+#   status row          "pending/regrouping/failed/refused/refresh-failed/stale/no-access/no-data/no-results"
 #                       (1.3.1, 1.4.1, 4.1.3). The cell is `role=cell`, not a
 #                       live region; a settled outcome — failed, refused, stale,
-#                       refresh-failed, no-data, no-results — wraps its text
-#                       in `role=status`, a passing state is silent.
+#                       refresh-failed, no-access, no-data, no-results — wraps
+#                       its text in `role=status`, a passing state is silent.
 #   settings cell       "DataViews.Settings" (1.3.1, 2.1.1, 2.4.3, 2.5.7,
 #                       4.1.2-4.1.3): present only when the table is given
 #                       `DataViews.Settings` as its `settings`; the settings
@@ -111,15 +111,15 @@
 #     row lays out as a block, so it spans the table even when a selectable
 #     table has no columns; the DSL has no keys for either.
 #   - The statuses (pending, regrouping, failed, refused, refresh-failed,
-#     stale, no-data, no-results) are the core's `DisplayStatus`, carried as
-#     `data-status`; they are not registry states. They change text, and only
-#     the two failures take `color/text/error` in place of `color/text/muted`:
-#     `refused` stays muted, since nothing malfunctioned.
-#     A recorded deviation from the code standards' state selectors, which
-#     reserve attributes for native states and classes for custom ones: a
-#     bare state word as a class (`.failed`, `.stale`) collides with global
-#     classes, so the status is an attribute the stylesheet selects by value
-#     and the anatomy names by that value. To be raised against the standard.
+#     stale, no-access, no-data, no-results) are the core's `DisplayStatus`,
+#     carried as `data-status`; they are not registry states. They change
+#     text, and only the two failures take `color/text/error` in place of
+#     `color/text/muted`: `refused` and `no-access` stay muted, since nothing
+#     malfunctioned.
+#     The status is a data attribute the stylesheet selects by value, as the
+#     resize handle's placing state is: a bare state word as a class
+#     (`.failed`, `.stale`) would collide with global classes. The code
+#     standards' state selectors are being changed to admit `data-*` states.
 #   - `color/focus-ring` is the package's `color.focusRing`: a camelCase id
 #     the DSL's token-path grammar (`[a-z0-9-]+`) cannot spell.
 #   - The header row group's stacking above the scrolled body uses z-index 1;

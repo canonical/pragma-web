@@ -330,13 +330,19 @@ const operation = (page: RelayPageRequest) =>
 
 const source = (
   environment: RelayEnvironment,
-  overrides: { readonly capabilities?: SourceCapabilities } = {},
+  overrides: {
+    readonly capabilities?: SourceCapabilities;
+    readonly isForbidden?: (error: unknown) => boolean;
+  } = {},
 ) =>
   createRelaySource<MachinesOperation>({
     capabilities: overrides.capabilities ?? connectionCapabilities,
     environment,
     operation,
     connection: (data: MachinesData) => data.machines,
+    ...(overrides.isForbidden === undefined
+      ? {}
+      : { isForbidden: overrides.isForbidden }),
   });
 
 const emptySlice: Slice = { filter: [], search: null, sort: [], group: [] };
@@ -816,6 +822,60 @@ describe("createRelaySource over relay-runtime", () => {
         },
       ],
     ]);
+  });
+
+  it("delivers a fetch the application reads as forbidden as forbidden", () => {
+    const { environment, fetchAt } = relay();
+    const deliver = delivery();
+    const denied = new Error("403 from the graph");
+    source(environment, {
+      isForbidden: (error) => error === denied,
+    }).execute(request(), deliver);
+    fetchAt(0).fail(denied);
+    expect(deliver.mock.calls).toEqual([
+      [{ status: "forbidden", cause: denied }],
+    ]);
+  });
+
+  it("delivers nothing from the store once the fetch is forbidden", () => {
+    const { environment, fetchAt } = relay();
+    const denied = new Error("403 from the graph");
+    const adapter = source(environment, {
+      isForbidden: (error) => error === denied,
+    });
+    const release = adapter.execute(request(), delivery());
+    fetchAt(0).respond();
+    release();
+
+    // The page is in the store, so it is delivered at once; the fetch then
+    // says the reader may not see it.
+    const deliver = delivery();
+    adapter.execute(request(), deliver);
+    fetchAt(1).fail(denied);
+    expect(lastOf(deliver)).toEqual({ status: "forbidden", cause: denied });
+    const delivered = deliver.mock.calls.length;
+    commitLocalUpdate(environment, (store) => {
+      store.get("m1")?.setValue("alpha-renamed", "name");
+    });
+    expect(deliver).toHaveBeenCalledTimes(delivered);
+  });
+
+  it("delivers a failure where the forbidden check answers no or throws", () => {
+    for (const isForbidden of [
+      () => false,
+      () => {
+        throw new Error("the check broke");
+      },
+    ]) {
+      const { environment, fetchAt } = relay();
+      const deliver = delivery();
+      source(environment, { isForbidden }).execute(request(), deliver);
+      fetchAt(0).fail(new Error("403"));
+      expect(lastOf(deliver)).toMatchObject({
+        status: "failed",
+        failure: { reason: "403" },
+      });
+    }
   });
 
   it("fails a page whose response left selected data missing", () => {

@@ -251,6 +251,7 @@ describe("resolveDisplayStatus", () => {
         failure: { reason: "x", cause: null, transient: null },
       },
       refusedWith("x"),
+      { status: "forbidden", cause: null },
       {
         status: "refused",
         issues: [
@@ -321,5 +322,20 @@ describe("resolveDisplayStatus", () => {
         ),
       ].sort(),
     );
+  });
+
+  it("says no access over rows kept from before, and gives no reason", () => {
+    const coordinator = createQueryCoordinator<Machine>();
+    coordinator.complete(
+      coordinator.refresh(),
+      delivery([machine("m-1", "alpha")]),
+    );
+    coordinator.complete(coordinator.refresh(), {
+      status: "forbidden",
+      cause: new Error("403"),
+    });
+    expect(resolveDisplayStatus(coordinator.state)).toEqual({
+      status: "no-access",
+    });
   });
 });

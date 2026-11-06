@@ -8,6 +8,7 @@ import {
 import type { RowRecord } from "../rows/index.js";
 import copyCapabilities from "./copyCapabilities.js";
 import describeError from "./describeError.js";
+import resolveErrorDelivery from "./resolveErrorDelivery.js";
 import type {
   RelayConnection,
   RelaySnapshot,
@@ -152,6 +153,11 @@ export default function createRelaySource<
       let settled = false;
       /** What was delivered last: the data read, or a failure's reason. */
       let delivered: unknown;
+      /**
+       * Whether the fetch was forbidden: the rows it withdrew stay withdrawn,
+       * however the store changes after, for as long as this execution runs.
+       */
+      let forbidden = false;
 
       /** Deliver once per thing read: the same data or reason is not repeated. */
       const send = (what: unknown, delivery: SourceDelivery<TRow>): void => {
@@ -169,6 +175,9 @@ export default function createRelaySource<
       };
 
       const publish = (): void => {
+        if (forbidden) {
+          return;
+        }
         const { data, isMissingData } = latest;
         if (isMissingData) {
           // While the fetch runs, missing data is data still to come.
@@ -252,7 +261,9 @@ export default function createRelaySource<
         const fetch = environment.execute({ operation }).subscribe({
           error(error) {
             settled = true;
-            fail(error, describeError(error), error);
+            const answer = resolveErrorDelivery(error, config.isForbidden);
+            forbidden = answer.status === "forbidden";
+            send(error, answer);
           },
           complete() {
             settled = true;

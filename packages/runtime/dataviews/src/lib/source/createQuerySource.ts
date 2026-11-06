@@ -2,7 +2,7 @@ import { spellQueryKey } from "../query/index.js";
 import type { SourcePage } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import copyCapabilities from "./copyCapabilities.js";
-import describeError from "./describeError.js";
+import resolveErrorDelivery from "./resolveErrorDelivery.js";
 import type { QueryObservation, QuerySourceConfig, Source } from "./types.js";
 
 /** The last thing delivered, so an unchanged observation is not repeated. */
@@ -61,14 +61,7 @@ export default function createQuerySource<TRow extends object = RowRecord>(
               return;
             }
             delivered = { status: "failed", error };
-            deliver({
-              status: "failed",
-              failure: {
-                reason: describeError(error),
-                cause: error,
-                transient: null,
-              },
-            });
+            deliver(resolveErrorDelivery(error, config.isForbidden));
             return;
           }
         }

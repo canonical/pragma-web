@@ -12,6 +12,8 @@ import type {
   ExecuteSliceConfig,
   FacetFieldNameOf,
   PaginationCapabilities,
+  QuerySourceConfig,
+  RelaySourceConfig,
 } from "./types.js";
 
 const machines = createSchema([
@@ -73,5 +75,21 @@ describe("ExecuteSliceConfig", () => {
     expectTypeOf<
       ExecuteSliceConfig["types"]
     >().toEqualTypeOf<RecordTypes | null>();
+  });
+});
+
+describe("QuerySourceConfig", () => {
+  it("takes an optional check of whether an error forbids the request", () => {
+    expectTypeOf<QuerySourceConfig["isForbidden"]>().toEqualTypeOf<
+      ((error: unknown) => boolean) | undefined
+    >();
+  });
+});
+
+describe("RelaySourceConfig", () => {
+  it("takes an optional check of whether an error forbids the request", () => {
+    expectTypeOf<RelaySourceConfig["isForbidden"]>().toEqualTypeOf<
+      ((error: unknown) => boolean) | undefined
+    >();
   });
 });

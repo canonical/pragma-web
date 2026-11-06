@@ -42,6 +42,11 @@ export type DisplayStatus =
   | { readonly status: "refused"; readonly reason: string }
   | { readonly status: "refresh-failed"; readonly reason: string }
   | { readonly status: "stale"; readonly reason: string }
+  /**
+   * The source answered that the request is forbidden: every row, count and
+   * facet is withdrawn, and nothing about the denial is said.
+   */
+  | { readonly status: "no-access" }
   | { readonly status: "no-data" }
   | { readonly status: "no-results" };
 

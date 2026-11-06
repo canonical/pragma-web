@@ -44,4 +44,8 @@ describe("DataViewsMessages", () => {
       (name: string, reason: string) => string
     >();
   });
+
+  it("says no access in words of its own, handed nothing of the server's", () => {
+    expectTypeOf<DataViewsMessages["statusNoAccess"]>().toEqualTypeOf<string>();
+  });
 });

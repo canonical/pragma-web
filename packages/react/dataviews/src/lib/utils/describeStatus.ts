@@ -25,6 +25,8 @@ export default function describeStatus(
       return messages.statusRefreshFailed(status.reason);
     case "stale":
       return messages.statusStale(status.reason);
+    case "no-access":
+      return messages.statusNoAccess;
     case "no-results":
       return messages.statusNoResults;
     case "no-data":

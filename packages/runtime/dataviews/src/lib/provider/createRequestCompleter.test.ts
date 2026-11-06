@@ -106,6 +106,20 @@ describe("createRequestCompleter", () => {
     expect(accepting.remember).not.toHaveBeenCalled();
   });
 
+  it("withdraws every row the model holds when the source forbids the request", () => {
+    const { coordinator, model, complete } = setup();
+    const first = coordinator.state.pendingRequestId ?? "";
+    complete(first, succeeded(rows));
+    const requestId = coordinator.refresh();
+    const cause = new Error("403");
+    complete(requestId, { status: "forbidden", cause });
+    expect(model.get()).toBe(EMPTY_ROW_MODEL);
+    expect(coordinator.state.result.problem).toEqual({
+      status: "forbidden",
+      cause,
+    });
+  });
+
   it("keeps the rows shown when the request fails", () => {
     const { coordinator, model, complete, requestId } = setup();
     complete(requestId, succeeded(rows));
