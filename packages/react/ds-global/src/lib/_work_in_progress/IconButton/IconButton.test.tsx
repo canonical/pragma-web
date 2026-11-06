@@ -53,6 +53,30 @@ describe("IconButton component", () => {
     });
   });
 
+  // Fails until the built-in Tooltip is removed: IconButton's root must be
+  // the <button>, with a Tooltip paired by composition around it.
+  describe("root", () => {
+    it.fails("renders the <button> as its root, with no Tooltip area", () => {
+      const { container } = render(<Component icon="edit" aria-label="Edit" />);
+      expect(container.firstElementChild?.tagName).toBe("BUTTON");
+      expect(container.querySelector(".tooltip-area")).not.toBeInTheDocument();
+    });
+
+    it.fails("puts the consumer's className and style on the root", () => {
+      const { container } = render(
+        <Component
+          icon="edit"
+          aria-label="Edit"
+          className="custom"
+          style={{ marginInlineStart: "auto" }}
+        />,
+      );
+      const root = container.firstElementChild as HTMLElement;
+      expect(root).toHaveClass("custom");
+      expect(root.style.marginInlineStart).toBe("auto");
+    });
+  });
+
   describe("inherited Button props", () => {
     it("defaults to the primary importance", () => {
       render(<Component icon="edit" aria-label="Edit" />);
