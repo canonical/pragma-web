@@ -1,5 +1,6 @@
 /* @canonical/generator-ds 0.9.0-experimental.4 */
 import type React from "react";
+import { useMemo } from "react";
 import { states } from "../../constants.js";
 import {
   Description,
@@ -9,7 +10,6 @@ import {
 import type { BaseInputProps, WrapperProps } from "../types.js";
 import "./styles.css";
 import { useFieldWrapper } from "./hooks/index.js";
-import messages from "./messages.js";
 
 const componentCssClassName = "ds field";
 
@@ -48,12 +48,16 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
     },
   );
 
-  const componentProps = {
-    name,
-    registerProps,
-    ...ariaProps.input,
-    ...otherProps,
-  } as unknown as ComponentProps;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: -
+  const componentProps = useMemo(
+    () => ({
+      name,
+      registerProps,
+      ...ariaProps.input,
+      ...otherProps,
+    }),
+    [name, registerProps, ariaProps.input],
+  ) as unknown as ComponentProps;
 
   return (
     <div
@@ -79,7 +83,7 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
         <Component {...componentProps} />
         {isError && (
           <FieldError {...ariaProps.error}>
-            {fieldError?.message?.toString() || messages.invalid}
+            {fieldError?.message?.toString()}
           </FieldError>
         )}
       </div>
