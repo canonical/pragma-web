@@ -24,11 +24,16 @@ export interface I18nProviderProps {
   config: I18nConfig;
   /** Message catalogs keyed by locale. */
   catalogs: Record<Locale, Messages>;
-  /** Initial locale (e.g. SSR-negotiated). Defaults to `config.defaultLocale`. */
+  /**
+   * Initial locale (e.g. SSR-negotiated). Defaults to `config.defaultLocale`.
+   * Ignored when `source` is given: the external source keeps its own locale.
+   */
   locale?: Locale;
   /**
    * An existing {@link LocaleSource} to bind to — supply this only to share one
-   * locale value across frameworks. When omitted, the provider owns one.
+   * locale value across frameworks. When omitted, the provider owns one. When
+   * given, the provider creates no source of its own, so `locale` is ignored and
+   * the document keeps what this source reflected.
    */
   source?: LocaleSource;
 }
