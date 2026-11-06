@@ -331,21 +331,39 @@ export const AsPopoverTrigger: Story = {
     );
   },
   play: async ({ canvas, canvasElement }) => {
+    const document = canvasElement.ownerDocument;
+    const body = within(document.body);
     const button = canvas.getByRole("button", { name: "Row options" });
+
+    // Closed until the button is hovered.
+    await expect(body.queryByRole("tooltip")).toBeNull();
     await userEvent.hover(button);
     await findOpenTooltip(canvasElement);
+
+    // Opening the panel closes the Tooltip.
     await userEvent.click(button);
     await waitFor(() =>
       expect(button).toHaveAttribute("aria-expanded", "true"),
     );
     await expect(
-      canvasElement.ownerDocument.querySelector("#row-options:popover-open"),
+      document.querySelector("#row-options:popover-open"),
     ).not.toBeNull();
+    await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
+
+    // Closing the panel, with a second press, lets the Tooltip show again
+    // on the next hover. (A scripted Escape is not a trusted key press, so
+    // the browser does not light-dismiss the popover on it.)
+    await userEvent.click(button);
     await waitFor(() =>
-      expect(
-        within(canvasElement.ownerDocument.body).queryByRole("tooltip"),
-      ).toBeNull(),
+      expect(button).toHaveAttribute("aria-expanded", "false"),
     );
+    await expect(
+      document.querySelector("#row-options:popover-open"),
+    ).toBeNull();
+    await userEvent.unhover(button);
+    await waitFor(() => expect(body.queryByRole("tooltip")).toBeNull());
+    await userEvent.hover(button);
+    await findOpenTooltip(canvasElement);
   },
 };
 
