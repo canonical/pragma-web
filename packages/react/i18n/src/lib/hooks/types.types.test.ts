@@ -54,7 +54,7 @@ describe("UseLocaleResult", () => {
     expectTypeOf<UseLocaleResult["locale"]>().toEqualTypeOf<Locale>();
     expectTypeOf<UseLocaleResult["direction"]>().toEqualTypeOf<Direction>();
     expectTypeOf<UseLocaleResult["setLocale"]>().toEqualTypeOf<
-      (locale: Locale) => void
+      (tag: Locale) => void
     >();
     expectTypeOf<UseLocaleResult["locales"]>().toEqualTypeOf<
       readonly Locale[]
