@@ -47,3 +47,9 @@ describe("baseCatalog", () => {
     expect(fixtures.baseCatalog).toEqual({ a: "base-a", b: "base-b" });
   });
 });
+
+describe("effectsOff", () => {
+  it("turns off both browser effects", () => {
+    expect(fixtures.effectsOff).toEqual({ persist: false, reflect: false });
+  });
+});
