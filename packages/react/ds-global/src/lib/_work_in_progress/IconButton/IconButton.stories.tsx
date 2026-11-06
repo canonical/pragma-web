@@ -37,6 +37,52 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const row = {
+  display: "flex",
+  alignItems: "baseline",
+  gap: "var(--dimension-200)",
+} as const;
+
+/** Layout is compared to a hundredth of a pixel. */
+const TOLERANCE = 0.01;
+
+/** The border box of an element, in CSS pixels. */
+const measureBox = (element: Element) => element.getBoundingClientRect();
+
+/**
+ * Checks the geometry IconButton exists for, in every row of `canvasElement`
+ * that holds icon buttons and a labelled Button: each icon button is as wide
+ * as it is tall, as tall as the labelled Button, on its top edge (so on its
+ * baseline, the seat being the same), with the icon centred in the box.
+ */
+const expectSquareSeatedIconButtons = async (canvasElement: HTMLElement) => {
+  await canvasElement.ownerDocument.fonts.ready;
+  const rows = [...canvasElement.querySelectorAll("[data-geometry-row]")];
+  await expect(rows.length).toBeGreaterThan(0);
+  for (const rowElement of rows) {
+    const labelled = rowElement.querySelector("button:not(.icon-button)");
+    const iconButtons = [...rowElement.querySelectorAll("button.icon-button")];
+    await expect(labelled).not.toBeNull();
+    await expect(iconButtons.length).toBeGreaterThan(0);
+    const reference = measureBox(labelled as Element);
+    for (const iconButton of iconButtons) {
+      const box = measureBox(iconButton);
+      const icon = measureBox(iconButton.querySelector(".icon") as Element);
+      await expect(Math.abs(box.width - box.height)).toBeLessThan(TOLERANCE);
+      await expect(Math.abs(box.height - reference.height)).toBeLessThan(
+        TOLERANCE,
+      );
+      await expect(Math.abs(box.top - reference.top)).toBeLessThan(TOLERANCE);
+      await expect(
+        Math.abs(icon.left + icon.width / 2 - (box.left + box.width / 2)),
+      ).toBeLessThan(TOLERANCE);
+      await expect(
+        Math.abs(icon.top + icon.height / 2 - (box.top + box.height / 2)),
+      ).toBeLessThan(TOLERANCE);
+    }
+  }
+};
+
 /** The default hierarchy: a filled primary icon button. */
 export const Primary: Story = {
   args: { importance: "primary" },
@@ -58,18 +104,31 @@ export const Tertiary: Story = {
  */
 export const Loading: Story = {
   args: { loading: true, "aria-label": "Saving" },
+  render: (args) => (
+    <div style={row}>
+      <Component {...args} />
+      <Component {...args} loading={false} aria-label="Save" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const loading = canvas.getByRole("button", { name: "Saving" });
+    const idle = canvas.getByRole("button", { name: "Save" });
+    const loadingBox = measureBox(loading);
+    const idleBox = measureBox(idle);
+    await expect(loading).toHaveAttribute("aria-busy", "true");
+    await expect(Math.abs(loadingBox.width - idleBox.width)).toBeLessThan(
+      TOLERANCE,
+    );
+    await expect(Math.abs(loadingBox.height - idleBox.height)).toBeLessThan(
+      TOLERANCE,
+    );
+  },
 };
 
 /** Disabled, when the action is not available. */
 export const Disabled: Story = {
   args: { disabled: true },
 };
-
-const row = {
-  display: "flex",
-  alignItems: "baseline",
-  gap: "var(--dimension-200)",
-} as const;
 
 /**
  * In a row aligned on the text baseline, icon buttons line up with the text
@@ -82,7 +141,12 @@ export const BaselineAlignment: Story = {
   render: (args) => (
     <div style={{ display: "grid", gap: "var(--dimension-400)" }}>
       {(["comfortable", "dense"] as const).map((density) => (
-        <div key={density} className={`app ${density}`} style={row}>
+        <div
+          key={density}
+          className={`app ${density}`}
+          style={row}
+          data-geometry-row
+        >
           <span style={{ whiteSpace: "nowrap" }}>Instance name</span>
           <Component {...args} importance="tertiary" />
           <Component {...args} importance="secondary" />
@@ -92,6 +156,9 @@ export const BaselineAlignment: Story = {
       ))}
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    await expectSquareSeatedIconButtons(canvasElement);
+  },
 };
 
 /**
@@ -169,6 +236,7 @@ export const DensityAndContext: Story = {
             key={`${context}-${density}`}
             className={`${context} ${density}`}
             style={row}
+            data-geometry-row
           >
             <span style={{ whiteSpace: "nowrap" }}>
               {context}, {density}
@@ -186,6 +254,9 @@ export const DensityAndContext: Story = {
       )}
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    await expectSquareSeatedIconButtons(canvasElement);
+  },
 };
 
 /** On a contrasted surface, the surface recolours the icon button. */
