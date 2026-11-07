@@ -1,16 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import type { ElementType } from "react";
 import { describe, expect, it } from "vitest";
+import surface from "./surface.js";
 
 /** A story stand-in. */
 const Story: ElementType = () => <span data-testid="story">Story</span>;
 
 describe("surface", () => {
-  // Fails until surface moves to its own module.
-  it.fails("paints the story on one padded surface", async () => {
-    // A computed path, so the bundler does not resolve the missing module.
-    const modulePath = "./surface.js";
-    const { default: surface } = await import(/* @vite-ignore */ modulePath);
+  it("paints the story on one padded surface", () => {
     const { container } = render(surface()(Story));
     const wrapper = container.firstElementChild;
     expect(wrapper).toBeInstanceOf(HTMLElement);
