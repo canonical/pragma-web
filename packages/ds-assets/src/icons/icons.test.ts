@@ -7,8 +7,7 @@ import { ICON_METADATA } from "./metadata.js";
 import type { IconMetadata, IconName } from "./types.js";
 
 describe("icons", () => {
-  // Fails until skip-to-end.svg and skip-to-start.svg are drawn.
-  it.fails("each icon in `ICON_NAMES` exists in the icons directory", () => {
+  it("each icon in `ICON_NAMES` exists in the icons directory", () => {
     const iconsDir = join(process.cwd(), "icons");
 
     ICON_NAMES.forEach((iconName) => {
