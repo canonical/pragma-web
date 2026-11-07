@@ -20,17 +20,16 @@ type AccessibleName =
 type OwnProps = {
   /** The design-system icon, the button's only visible content. */
   icon: IconName;
-  /** No visible children: name the button with `aria-label` instead. */
+  /** No visible children: name it with `aria-label` or `aria-labelledby`. */
   children?: never;
 } & AccessibleName;
 
 /**
- * Button's props, with a required `icon` and accessible name, no children
- * and no `variant`. All of them reach the root `<button>`. A Tooltip is
- * composed around it, not passed as a prop.
+ * Button's props, with a required `icon` and accessible name, no children,
+ * and no `variant`, whose link style drops the square box. All reach the
+ * root `<button>`.
  *
- * @experimental Its block is a draft (canonical/pragma-core#131), so the
- * props may change when the block is entered.
+ * @experimental Its block is a draft; the props may change.
  */
 export type IconButtonProps = OwnProps &
   Omit<ButtonProps, keyof OwnProps | "variant">;
