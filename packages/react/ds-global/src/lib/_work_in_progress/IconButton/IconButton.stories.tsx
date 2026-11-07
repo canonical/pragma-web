@@ -384,12 +384,11 @@ function PopoverIconButton({
         <Component
           {...buttonProps}
           popoverTarget={panelId}
-          aria-haspopup="dialog"
           aria-expanded={isOpen}
           aria-controls={panelId}
         />
       </TooltipEngine>
-      <dialog
+      <section
         id={panelId}
         popover="auto"
         aria-label={buttonProps["aria-label"]}
@@ -397,7 +396,7 @@ function PopoverIconButton({
         style={{ padding: "var(--dimension-200)" }}
       >
         {panel}
-      </dialog>
+      </section>
     </>
   );
 }
