@@ -1,0 +1,50 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* IconButton: Button's sheet styles everything but the box.
+
+     1. Baseline: the ::before is one line of text (a zero-width space with
+        empty alt text) that the density seat places like a labelled
+        Button's label, so the button's baseline is the label's.
+     2. Square: that line is 1lh wide, and the inline padding mirrors the
+        block padding: pad = (cell - line) / 2 - border.
+     3. Centred icon: positioned against the padding box, because the seat's
+        two block pads differ.
+
+     Outside a density scope the block padding is 0 and the token falls back
+     to 0px, so the box is 2·border + 1lh both ways.
+
+     Order: the padding rule is (0,3,0), so it beats Button's (0,2,0) in
+     either load order. The icon rule ties Button's icon slot at (0,3,0), so
+     it sets only properties that slot leaves unset. */
+
+  :where(.comfortable, .dense, .app, .site, .docs) .ds.icon-button {
+    --icon-button-padding-inline: calc(
+      (var(--density-line-height-effective) - var(--control-seat-line)) /
+      2 -
+      var(--button-border-width, 0px)
+    );
+  }
+
+  .ds.button.icon-button {
+    padding-inline: var(--icon-button-padding-inline, 0px);
+  }
+
+  .ds.icon-button {
+    &::before {
+      content: "\200b" / "";
+      inline-size: 1lh;
+    }
+
+    & > .icon {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+    }
+  }
+
+  /* Outside a density scope. `:not(:where(…) *)` adds no specificity. */
+  .ds.icon-button:not(:where(.comfortable, .dense, .app, .site, .docs) *) {
+    padding-block: 0;
+  }
+}
