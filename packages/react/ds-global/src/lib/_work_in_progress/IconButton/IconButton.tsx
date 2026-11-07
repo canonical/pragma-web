@@ -22,13 +22,11 @@ const componentCssClassName = "ds icon-button";
  */
 export default function IconButton({
   className,
-  icon,
   ...props
 }: IconButtonProps): React.ReactElement {
   return (
     <Button
       {...props}
-      icon={icon}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
     />
   );
