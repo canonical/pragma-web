@@ -340,12 +340,23 @@ export const OutsideADensityScope: Story = {
         document.querySelectorAll("[data-outside-scope] button.icon-button"),
       ).toHaveLength(2),
     );
-    for (const iconButton of document.querySelectorAll(
+    const [control, paired] = document.querySelectorAll(
       "[data-outside-scope] button.icon-button",
-    )) {
+    );
+    if (!control || !paired) throw new Error("Expected two icon buttons.");
+    await expect(paired.closest(".tooltip-area")).not.toBeNull();
+    for (const iconButton of [control, paired]) {
       await expect(iconButton.closest(SCOPES)).toBeNull();
       await expectSquareCentredIconButton(iconButton);
     }
+    const controlBox = measureBox(control);
+    const pairedBox = measureBox(paired);
+    await expect(Math.abs(pairedBox.width - controlBox.width)).toBeLessThan(
+      TOLERANCE,
+    );
+    await expect(Math.abs(pairedBox.height - controlBox.height)).toBeLessThan(
+      TOLERANCE,
+    );
   },
 };
 
