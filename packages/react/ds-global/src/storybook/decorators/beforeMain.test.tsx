@@ -1,16 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import type { ElementType } from "react";
 import { describe, expect, it } from "vitest";
+import beforeMain from "./beforeMain.js";
 
 /** A story stand-in. */
 const Story: ElementType = () => <span data-testid="story">Story</span>;
 
 describe("beforeMain", () => {
-  // Fails until beforeMain moves to its own module.
-  it.fails("places the story before a focusable main element", async () => {
-    // A computed path, so the bundler does not resolve the missing module.
-    const modulePath = "./beforeMain.js";
-    const { default: beforeMain } = await import(/* @vite-ignore */ modulePath);
+  it("places the story before a focusable main element", () => {
     const { container } = render(
       beforeMain({ id: "content", children: <p>Main</p> })(Story),
     );

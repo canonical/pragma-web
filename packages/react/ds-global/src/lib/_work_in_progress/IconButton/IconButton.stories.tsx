@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactElement, type ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
-import * as decorators from "../../../storybook/decorators.js";
+import surface from "../../../storybook/decorators/surface.js";
 import { Button } from "../../component/Button/index.js";
 import { TooltipEngine, withTooltip } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
@@ -27,7 +27,7 @@ function PairedIconButton(props: IconButtonProps): ReactElement {
 const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
-  decorators: [decorators.surface()],
+  decorators: [surface()],
   // Every story pairs the icon button with a Tooltip.
   render: (args) => <PairedIconButton {...args} />,
   parameters: tooltipParameters,
