@@ -21,16 +21,16 @@ import preview from "../../../.storybook/preview.js";
 import expectNoAxeViolations from "../../../testing/expectNoAxeViolations.js";
 import { FACETED_FILTER_STORIES } from "../../../testing/fixtures.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
-import * as cardsStories from "../../lib/_work_in_progress/Cards/Cards.stories.js";
+import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
+import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
+import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as panelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
-import * as barChartStories from "../../lib/_work_in_progress/FacetBarChart/FacetBarChart.stories.js";
-import * as rangeChartStories from "../../lib/_work_in_progress/FacetRangeChart/FacetRangeChart.stories.js";
-import * as switchStories from "../../lib/_work_in_progress/RendererSwitch/RendererSwitch.stories.js";
+import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -46,19 +46,19 @@ serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
 /** The stories checked as first rendered, by the part they show. */
 const rendered = {
+  DataViews: composeStories(rootStories),
   DataTable: composeStories(tableStories),
   SortPanel: composeStories(panelStories),
   Settings: composeStories(settingsStories),
-  RendererSwitch: composeStories(switchStories),
 };
 
 /** The stories checked once their play function has run, by part. */
 const played = {
   "REST API": composeStories(restStories),
   "GraphQL API": composeStories(graphqlStories),
-  Cards: composeStories(cardsStories),
-  FacetBarChart: composeStories(barChartStories),
-  FacetRangeChart: composeStories(rangeChartStories),
+  DataCards: composeStories(dataCardsStories),
+  DataChart: composeStories(dataChartStories),
+  DataChartWithTable: composeStories(dataChartWithTableStories),
   Filters: Object.fromEntries(
     Object.entries(composeStories(filtersStories)).filter(([name]) =>
       FACETED_FILTER_STORIES.has(name),

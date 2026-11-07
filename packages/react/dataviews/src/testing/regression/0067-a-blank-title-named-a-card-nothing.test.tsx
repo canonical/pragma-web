@@ -8,7 +8,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createMachineProvider, machine } from "../../../testing/machines.js";
-import { Cards } from "../../lib/_work_in_progress/Cards/index.js";
+import { DataCards } from "../../lib/_work_in_progress/DataCards/index.js";
 import type { DisplayField } from "../../lib/common/index.js";
 
 const fields: readonly DisplayField[] = [
@@ -22,7 +22,7 @@ describe("a card whose title holds no text", () => {
       rows: [machine("m-1", ""), machine("m-2", "beta")],
     });
     render(
-      <Cards
+      <DataCards
         provider={provider}
         fields={fields}
         title="name"

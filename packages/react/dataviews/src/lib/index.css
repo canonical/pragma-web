@@ -16,7 +16,8 @@
  * line, alphabetically.
  */
 
-@import url("./_work_in_progress/Cards/styles.css");
+@import url("./_work_in_progress/DataCards/styles.css");
+@import url("./_work_in_progress/DataChart/styles.css");
 @import url("./_work_in_progress/DataTable/common/SettingsMenu/styles.css");
 @import url("./_work_in_progress/DataTable/styles.css");
 @import url("./_work_in_progress/DataViews/common/Actions/styles.css");
@@ -25,9 +26,7 @@
 @import url("./_work_in_progress/DataViews/common/Filters/styles.css");
 @import url("./_work_in_progress/DataViews/common/SavedViews/styles.css");
 @import url("./_work_in_progress/DataViews/common/Search/styles.css");
-@import url("./_work_in_progress/FacetBarChart/styles.css");
-@import url("./_work_in_progress/FacetRangeChart/styles.css");
 @import url("./_work_in_progress/PaginationBar/styles.css");
-@import url("./_work_in_progress/RendererSwitch/styles.css");
 @import url("./common/Announcer/styles.css");
+@import url("./common/RendererSwitch/styles.css");
 @import url("./virtualization/common/VirtualBody/styles.css");

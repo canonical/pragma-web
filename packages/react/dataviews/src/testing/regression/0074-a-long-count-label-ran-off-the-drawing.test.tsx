@@ -9,7 +9,7 @@ import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createFacetedManual } from "../../../testing/createFacetedProviders.js";
 import { machine } from "../../../testing/machines.js";
-import { FacetBarChart } from "../../lib/_work_in_progress/FacetBarChart/index.js";
+import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 /** The drawing's own width, as the chart's viewBox states it. */
 const WIDTH = 480;
@@ -18,7 +18,8 @@ describe("a count label with no room at its bar's tip", () => {
   it("is anchored to the drawing's far edge, not past it", () => {
     const { provider, source } = createFacetedManual();
     const { container } = render(
-      <FacetBarChart
+      <DataChart
+        type="bar"
         provider={provider}
         field="status"
         label="Machines by status"

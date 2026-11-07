@@ -24,7 +24,7 @@ import Component from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
 
 const meta = {
-  title: "_work_in_progress/PaginationBar",
+  title: "_work_in_progress/DataViews/PaginationBar",
   component: Component,
   decorators: [withAppScope],
   args: {

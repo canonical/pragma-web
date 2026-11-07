@@ -11,7 +11,7 @@ import { act, render } from "@testing-library/react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import { createFacetedManual } from "../../../testing/createFacetedProviders.js";
 import { machine } from "../../../testing/machines.js";
-import { FacetRangeChart } from "../../lib/_work_in_progress/FacetRangeChart/index.js";
+import { DataChart } from "../../lib/_work_in_progress/DataChart/index.js";
 
 describe("a number field answered with a facet of values", () => {
   it("is refused rather than drawn as no value at all", () => {
@@ -23,7 +23,12 @@ describe("a number field answered with a facet of values", () => {
     const { provider, source } = createFacetedManual();
     const draw = (): void => {
       render(
-        <FacetRangeChart provider={provider} field="cores" label="Cores" />,
+        <DataChart
+          type="range"
+          provider={provider}
+          field="cores"
+          label="Cores"
+        />,
       );
     };
     draw();
@@ -44,6 +49,8 @@ describe("a number field answered with a facet of values", () => {
           }),
         });
       });
-    }).toThrow('FacetRangeChart draws a range, and "cores" holds values');
+    }).toThrow(
+      'DataChart of type "range" draws a range, and "cores" holds values',
+    );
   });
 });

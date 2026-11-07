@@ -27,7 +27,10 @@ import preview from "../../../.storybook/preview.js";
 import { DELIVERY_WAIT } from "../../../testing/constants.js";
 import findEnglish from "../../../testing/findEnglish.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
-import * as cardsStories from "../../lib/_work_in_progress/Cards/Cards.stories.js";
+import * as buildARendererStories from "../../lib/_work_in_progress/BuildARenderer/BuildARenderer.stories.js";
+import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
+import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
+import * as dataChartWithTableStories from "../../lib/_work_in_progress/DataChartWithTable/DataChartWithTable.stories.js";
 import * as tableStories from "../../lib/_work_in_progress/DataTable/DataTable.stories.js";
 import * as actionsStories from "../../lib/_work_in_progress/DataViews/common/Actions/Actions.stories.js";
 import * as filtersStories from "../../lib/_work_in_progress/DataViews/common/Filters/Filters.stories.js";
@@ -36,13 +39,11 @@ import * as savedViewsStories from "../../lib/_work_in_progress/DataViews/common
 import * as searchStories from "../../lib/_work_in_progress/DataViews/common/Search/Search.stories.js";
 import * as settingsStories from "../../lib/_work_in_progress/DataViews/common/Settings/Settings.stories.js";
 import * as sortPanelStories from "../../lib/_work_in_progress/DataViews/common/SortPanel/SortPanel.stories.js";
+import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.composition.stories.js";
 import * as graphqlStories from "../../lib/_work_in_progress/DataViews/DataViews.graphql.stories.js";
 import * as restStories from "../../lib/_work_in_progress/DataViews/DataViews.rest.stories.js";
-import * as compositionStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
-import * as barChartStories from "../../lib/_work_in_progress/FacetBarChart/FacetBarChart.stories.js";
-import * as rangeChartStories from "../../lib/_work_in_progress/FacetRangeChart/FacetRangeChart.stories.js";
+import * as rootStories from "../../lib/_work_in_progress/DataViews/DataViews.stories.js";
 import * as barStories from "../../lib/_work_in_progress/PaginationBar/PaginationBar.stories.js";
-import * as switchStories from "../../lib/_work_in_progress/RendererSwitch/RendererSwitch.stories.js";
 import {
   createGraphQLHandlers,
   createRestHandlers,
@@ -73,6 +74,7 @@ serveMockApi([...createRestHandlers(), ...createGraphQLHandlers()]);
 
 /** Every story of the package, by the part it shows. */
 const parts = {
+  DataViews: composeStories(rootStories),
   DataTable: composeStories(tableStories),
   PaginationBar: composeStories(barStories),
   Composition: composeStories(compositionStories),
@@ -85,10 +87,10 @@ const parts = {
   Search: composeStories(searchStories),
   Settings: composeStories(settingsStories),
   SortPanel: composeStories(sortPanelStories),
-  RendererSwitch: composeStories(switchStories),
-  Cards: composeStories(cardsStories),
-  FacetBarChart: composeStories(barChartStories),
-  FacetRangeChart: composeStories(rangeChartStories),
+  DataCards: composeStories(dataCardsStories),
+  DataChart: composeStories(dataChartStories),
+  DataChartWithTable: composeStories(dataChartWithTableStories),
+  "Build your own renderer": composeStories(buildARendererStories),
 };
 
 /**
@@ -101,12 +103,17 @@ const AUTHORED_ANYWHERE: readonly string[] = ["Search machines"];
 /** What one part's stories write themselves, beside the text every story may. */
 const AUTHORED: Readonly<Record<string, readonly string[]>> = {
   Actions: ["Delete", "machines selected"],
-  // The name a switch's story gives its own collection, which says the
-  // record's "Show" without being its word.
-  RendererSwitch: ["Show machines as"],
+  // The root's own story places a child that counts the page's rows.
+  DataViews: ["machines on this page"],
   // The cards' stories place a switch of their own, named the same way, and
   // one story's own cell writes a sentence saying the record's "from".
-  Cards: ["Show machines as", "Waiting on an address from the upstream pool."],
+  // The tutorial's list names its own sort controls.
+  "Build your own renderer": ["Sort by host"],
+  DataCards: [
+    "Show machines as",
+    "Table",
+    "Waiting on an address from the upstream pool.",
+  ],
 };
 
 /** List every phrase a part's stories author, the shared ones included. */

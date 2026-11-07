@@ -665,6 +665,8 @@ export const MESSAGE_SAMPLES: {
   rowsSelected: [[7]],
   deselectRows: [[1], [7]],
   renderer: null,
+  chartRenderer: null,
+  tableRenderer: null,
   facetCountsAbsent: null,
   facetRangeAbsent: null,
   facetValuesNone: null,

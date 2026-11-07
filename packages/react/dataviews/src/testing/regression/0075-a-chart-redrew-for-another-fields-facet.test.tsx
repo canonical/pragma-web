@@ -18,11 +18,11 @@ import deliverFacets from "../../../testing/deliverFacets.js";
 const drawn: unknown[] = [];
 
 vi.mock(
-  "../../lib/_work_in_progress/FacetBarChart/common/BarDrawing/BarDrawing.js",
+  "../../lib/_work_in_progress/DataChart/common/BarDrawing/BarDrawing.js",
   async (importOriginal) => {
     const actual =
       await importOriginal<
-        typeof import("../../lib/_work_in_progress/FacetBarChart/common/BarDrawing/BarDrawing.js")
+        typeof import("../../lib/_work_in_progress/DataChart/common/BarDrawing/BarDrawing.js")
       >();
     const Drawing = actual.default;
     const { memo, createElement } = await import("react");
@@ -35,8 +35,8 @@ vi.mock(
   },
 );
 
-const { FacetBarChart } = await import(
-  "../../lib/_work_in_progress/FacetBarChart/index.js"
+const { DataChart } = await import(
+  "../../lib/_work_in_progress/DataChart/index.js"
 );
 
 /** One status facet, minted fresh each time, saying the same thing. */
@@ -50,7 +50,8 @@ describe("a result that moved another field's facet", () => {
   it("redraws no bar of the chart that reads this one", () => {
     const { provider, source } = createFacetedManual();
     render(
-      <FacetBarChart
+      <DataChart
+        type="bar"
         provider={provider}
         field="status"
         label="Machines by status"
