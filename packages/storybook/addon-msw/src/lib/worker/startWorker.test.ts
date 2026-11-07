@@ -15,9 +15,6 @@ vi.mock("msw/browser", () => {
   return { setupWorker: browser.setupWorker };
 });
 
-/** The function under test, which is not written yet. */
-type StartWorker = () => Promise<SetupWorker | null>;
-
 /** The worker the fake msw/browser sets up. */
 const worker = { start: browser.start } as unknown as SetupWorker;
 
@@ -27,13 +24,9 @@ const worker = { start: browser.start } as unknown as SetupWorker;
  *
  * @note Impure: resets the module registry.
  */
-const loadStartWorker = async (): Promise<StartWorker> => {
+const loadStartWorker = async () => {
   vi.resetModules();
-  const path = "./startWorker.js";
-  const module = (await import(/* @vite-ignore */ path)) as {
-    default: StartWorker;
-  };
-  return module.default;
+  return (await import("./startWorker.js")).default;
 };
 
 /** The restore of the browser-process stub, when a case set one. */
@@ -71,14 +64,14 @@ afterEach(() => {
 });
 
 describe("startWorker", () => {
-  it.fails("resolves null in a Node process, and never imports msw/browser", async () => {
+  it("resolves null in a Node process, and never imports msw/browser", async () => {
     const startWorker = await loadStartWorker();
     await expect(startWorker()).resolves.toBeNull();
     expect(browser.imported).not.toHaveBeenCalled();
     expect(browser.setupWorker).not.toHaveBeenCalled();
   });
 
-  it.fails("starts on a browser page from the worker script beside the preview, letting unhandled requests through", async () => {
+  it("starts on a browser page from the worker script beside the preview, letting unhandled requests through", async () => {
     stubBrowser();
     expect("serviceWorker" in navigator).toBe(false);
     const startWorker = await loadStartWorker();
@@ -90,7 +83,7 @@ describe("startWorker", () => {
     });
   });
 
-  it.fails("starts in a page with no process at all", async () => {
+  it("starts in a page with no process at all", async () => {
     const startWorker = await loadStartWorker();
     vi.stubGlobal("process", undefined);
     const started = startWorker();
@@ -98,7 +91,7 @@ describe("startWorker", () => {
     await expect(started).resolves.toBe(worker);
   });
 
-  it.fails("starts in Electron's renderer and worker processes, which msw counts as browsers", async () => {
+  it("starts in Electron's renderer and worker processes, which msw counts as browsers", async () => {
     stubElectron("renderer");
     await expect((await loadStartWorker())()).resolves.toBe(worker);
     stubElectron("worker");
@@ -106,7 +99,7 @@ describe("startWorker", () => {
     expect(browser.start).toHaveBeenCalledTimes(2);
   });
 
-  it.fails("starts once for every caller", async () => {
+  it("starts once for every caller", async () => {
     stubBrowser();
     const startWorker = await loadStartWorker();
     const [first, second] = await Promise.all([startWorker(), startWorker()]);
@@ -117,7 +110,7 @@ describe("startWorker", () => {
     expect(browser.start).toHaveBeenCalledTimes(1);
   });
 
-  it.fails("warns of a failed start, resolves null, and starts again on the next call", async () => {
+  it("warns of a failed start, resolves null, and starts again on the next call", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const failure = new Error("The worker script was not found");
     browser.start.mockRejectedValueOnce(failure);
