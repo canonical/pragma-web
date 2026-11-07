@@ -12,6 +12,9 @@
     "src/stories",
     "src/**/*.stories.ts",
     "src/**/*.stories.tsx",
-    ".storybook"
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    ".storybook",
+    "testing"
   ]
 }
