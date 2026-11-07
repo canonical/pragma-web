@@ -94,10 +94,10 @@
 
   /* Full: this star's whole-number radio is checked. */
   .ds.form-rating
-  > .star:has(
-    > .star-input[data-rating$="0"]:checked,
-    > .star-input:not([data-rating*="."]):checked
-  ) {
+    > .star:has(
+      > .star-input[data-rating$="0"]:checked,
+      > .star-input:not([data-rating*="."]):checked
+    ) {
     --star-fill: 100%;
   }
 
@@ -109,9 +109,9 @@
   /* Half: this star's half radio (a `.5` value) is checked. Comes after the full
      rules so, when both apply to different stars, each resolves independently. */
   .ds.form-rating.half
-  > .star:has(> .star-input[data-rating$=".5"]:checked):not(
-    :has(~ .star .star-input:checked)
-  ) {
+    > .star:has(> .star-input[data-rating$=".5"]:checked):not(
+      :has(~ .star .star-input:checked)
+    ) {
     --star-fill: 50%;
   }
 
