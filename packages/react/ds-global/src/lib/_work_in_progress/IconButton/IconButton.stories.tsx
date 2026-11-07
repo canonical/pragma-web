@@ -1,35 +1,29 @@
 import { ICON_NAMES } from "@canonical/ds-assets";
 import { MODIFIER_FAMILIES } from "@canonical/ds-types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { type ReactElement, type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import surface from "../../../storybook/decorators/surface.js";
 import { Button } from "../../component/Button/index.js";
 import { TooltipEngine, withTooltip } from "../../component/Tooltip/index.js";
 import Component from "./IconButton.js";
-import type { IconButtonProps } from "./types.js";
 
 /** Tooltips portal to the body, so the docs render each story in an iframe. */
 const tooltipParameters = {
   docs: { story: { inline: false, iframeHeight: "240px" } },
 } as const;
 
-/** An icon button with a Tooltip composed around it. */
-function PairedIconButton(props: IconButtonProps): ReactElement {
-  return (
-    <TooltipEngine Message={props["aria-label"]}>
-      <Component {...props} />
-    </TooltipEngine>
-  );
-}
-
 const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
   decorators: [surface()],
   // Every story pairs the icon button with a Tooltip.
-  render: (args) => <PairedIconButton {...args} />,
+  render: (args) => (
+    <TooltipEngine Message={args["aria-label"]}>
+      <Component {...args} />
+    </TooltipEngine>
+  ),
   parameters: tooltipParameters,
   argTypes: {
     importance: {
@@ -135,8 +129,12 @@ export const Loading: Story = {
   args: { loading: true, "aria-label": "Saving" },
   render: (args) => (
     <div style={row}>
-      <PairedIconButton {...args} />
-      <PairedIconButton {...args} loading={false} aria-label="Save" />
+      <TooltipEngine Message="Saving">
+        <Component {...args} />
+      </TooltipEngine>
+      <TooltipEngine Message="Save">
+        <Component {...args} loading={false} aria-label="Save" />
+      </TooltipEngine>
     </div>
   ),
   play: async ({ canvas }) => {
@@ -173,9 +171,15 @@ export const BaselineAlignment: Story = {
           data-geometry-row
         >
           <span style={{ whiteSpace: "nowrap" }}>Instance name</span>
-          <PairedIconButton {...args} importance="tertiary" />
-          <PairedIconButton {...args} importance="secondary" />
-          <PairedIconButton {...args} importance="primary" />
+          <TooltipEngine Message="Edit">
+            <Component {...args} importance="tertiary" />
+          </TooltipEngine>
+          <TooltipEngine Message="Edit">
+            <Component {...args} importance="secondary" />
+          </TooltipEngine>
+          <TooltipEngine Message="Edit">
+            <Component {...args} importance="primary" />
+          </TooltipEngine>
           <Button importance="secondary">Rename</Button>
         </div>
       ))}
@@ -201,6 +205,13 @@ export const WithTooltip: Story = {
   name: "With Tooltip",
   args: { importance: "tertiary" },
   render: (args) => <EditButtonWithTooltip {...args} />,
+  parameters: {
+    docs: {
+      source: {
+        code: 'const EditButton = withTooltip(IconButton, "Edit");',
+      },
+    },
+  },
   play: async ({ canvas, canvasElement }) => {
     const button = canvas.getByRole("button", { name: "Edit" });
     await userEvent.tab();
@@ -218,14 +229,18 @@ export const Anticipation: Story = {
       {(["destructive", "constructive"] as const).map((anticipation) => (
         <div key={anticipation} style={row}>
           {MODIFIER_FAMILIES.importance.map((importance) => (
-            <PairedIconButton
+            <TooltipEngine
               key={importance}
-              {...args}
-              importance={importance}
-              anticipation={anticipation}
-              icon={anticipation === "destructive" ? "delete" : "plus"}
-              aria-label={anticipation === "destructive" ? "Delete" : "Add"}
-            />
+              Message={anticipation === "destructive" ? "Delete" : "Add"}
+            >
+              <Component
+                {...args}
+                importance={importance}
+                anticipation={anticipation}
+                icon={anticipation === "destructive" ? "delete" : "plus"}
+                aria-label={anticipation === "destructive" ? "Delete" : "Add"}
+              />
+            </TooltipEngine>
           ))}
         </div>
       ))}
@@ -257,10 +272,14 @@ export const DensityAndContext: Story = {
             <span style={{ whiteSpace: "nowrap" }}>
               {context}, {density}
             </span>
-            <PairedIconButton {...args} importance="tertiary" />
+            <TooltipEngine Message="Edit">
+              <Component {...args} importance="tertiary" />
+            </TooltipEngine>
             {/* Unpaired on purpose: the geometry control. */}
             <Component {...args} importance="secondary" />
-            <PairedIconButton {...args} importance="primary" />
+            <TooltipEngine Message="Edit">
+              <Component {...args} importance="primary" />
+            </TooltipEngine>
             <Button importance="secondary">Rename</Button>
           </div>
         )),
@@ -349,57 +368,13 @@ export const OnContrastedSurface: Story = {
       }}
     >
       {MODIFIER_FAMILIES.importance.map((importance) => (
-        <PairedIconButton key={importance} {...args} importance={importance} />
+        <TooltipEngine key={importance} Message="Edit">
+          <Component {...args} importance={importance} />
+        </TooltipEngine>
       ))}
     </div>
   ),
 };
-
-/** Props of a popover trigger. */
-type PopoverIconButtonProps = {
-  /** The icon button's props. */
-  buttonProps: IconButtonProps;
-  /** The id of the popover panel the button opens. */
-  panelId: string;
-  /** The panel's content. */
-  panel: ReactNode;
-};
-
-/**
- * An icon button that opens a popover panel. The panel's `toggle` event
- * drives `aria-expanded` and keeps the Tooltip closed while the panel is open.
- */
-function PopoverIconButton({
-  buttonProps,
-  panelId,
-  panel,
-}: PopoverIconButtonProps): ReactElement {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <>
-      <TooltipEngine
-        Message={buttonProps["aria-label"]}
-        open={isOpen ? false : undefined}
-      >
-        <Component
-          {...buttonProps}
-          popoverTarget={panelId}
-          aria-expanded={isOpen}
-          aria-controls={panelId}
-        />
-      </TooltipEngine>
-      <section
-        id={panelId}
-        popover="auto"
-        aria-label={buttonProps["aria-label"]}
-        onToggle={(event) => setIsOpen(event.newState === "open")}
-        style={{ padding: "var(--dimension-200)" }}
-      >
-        {panel}
-      </section>
-    </>
-  );
-}
 
 /**
  * Expects the trigger's Tooltip to open on hover, close while the panel is
@@ -440,25 +415,38 @@ const expectTooltipGatedByPanel = async (
 /** A popover trigger: keep the Tooltip closed while the panel is open. */
 export const AsPopoverTrigger: Story = {
   name: "As a popover trigger",
-  render: (args) => (
-    <PopoverIconButton
-      buttonProps={{
-        ...args,
-        importance: "tertiary",
-        icon: "menu-contextual",
-        "aria-label": "Row options",
-      }}
-      panelId="row-options"
-      panel={
-        <>
+  // The gate is state, so the docs show the story's own source.
+  parameters: { docs: { source: { type: "code" } } },
+  render: function AsPopoverTriggerRender(args) {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+      <>
+        <TooltipEngine Message="Row options" open={isOpen ? false : undefined}>
+          <Component
+            {...args}
+            importance="tertiary"
+            icon="menu-contextual"
+            aria-label="Row options"
+            popoverTarget="row-options"
+            aria-expanded={isOpen}
+            aria-controls="row-options"
+          />
+        </TooltipEngine>
+        <section
+          id="row-options"
+          popover="auto"
+          aria-label="Row options"
+          onToggle={(event) => setIsOpen(event.newState === "open")}
+          style={{ padding: "var(--dimension-200)" }}
+        >
           <Button importance="tertiary">Rename</Button>
           <Button importance="tertiary" anticipation="destructive">
             Delete
           </Button>
-        </>
-      }
-    />
-  ),
+        </section>
+      </>
+    );
+  },
   play: async ({ canvasElement }) => {
     await expectTooltipGatedByPanel(
       canvasElement,
@@ -474,30 +462,62 @@ export const AsPopoverTrigger: Story = {
  */
 export const GearAndThreeDots: Story = {
   name: "Gear and three dots",
-  render: (args) => (
-    <div style={row}>
-      <PopoverIconButton
-        buttonProps={{
-          ...args,
-          importance: "tertiary",
-          icon: "settings",
-          "aria-label": "Table settings",
-        }}
-        panelId="table-settings"
-        panel={<Button importance="tertiary">Show or hide columns</Button>}
-      />
-      <PopoverIconButton
-        buttonProps={{
-          ...args,
-          importance: "tertiary",
-          icon: "menu-contextual",
-          "aria-label": "Column options",
-        }}
-        panelId="column-options"
-        panel={<Button importance="tertiary">Sort ascending</Button>}
-      />
-    </div>
-  ),
+  // The gate is state, so the docs show the story's own source.
+  parameters: { docs: { source: { type: "code" } } },
+  render: function GearAndThreeDotsRender(args) {
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+    return (
+      <div style={row}>
+        <TooltipEngine
+          Message="Table settings"
+          open={isSettingsOpen ? false : undefined}
+        >
+          <Component
+            {...args}
+            importance="tertiary"
+            icon="settings"
+            aria-label="Table settings"
+            popoverTarget="table-settings"
+            aria-expanded={isSettingsOpen}
+            aria-controls="table-settings"
+          />
+        </TooltipEngine>
+        <section
+          id="table-settings"
+          popover="auto"
+          aria-label="Table settings"
+          onToggle={(event) => setIsSettingsOpen(event.newState === "open")}
+          style={{ padding: "var(--dimension-200)" }}
+        >
+          <Button importance="tertiary">Show or hide columns</Button>
+        </section>
+        <TooltipEngine
+          Message="Column options"
+          open={isOptionsOpen ? false : undefined}
+        >
+          <Component
+            {...args}
+            importance="tertiary"
+            icon="menu-contextual"
+            aria-label="Column options"
+            popoverTarget="column-options"
+            aria-expanded={isOptionsOpen}
+            aria-controls="column-options"
+          />
+        </TooltipEngine>
+        <section
+          id="column-options"
+          popover="auto"
+          aria-label="Column options"
+          onToggle={(event) => setIsOptionsOpen(event.newState === "open")}
+          style={{ padding: "var(--dimension-200)" }}
+        >
+          <Button importance="tertiary">Sort ascending</Button>
+        </section>
+      </div>
+    );
+  },
   play: async ({ canvasElement }) => {
     await expectTooltipGatedByPanel(
       canvasElement,
