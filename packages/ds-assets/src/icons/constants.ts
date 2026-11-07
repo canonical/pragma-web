@@ -144,6 +144,8 @@ export const ICON_NAMES = [
   "share",
   "show",
   "single-host",
+  "skip-to-end",
+  "skip-to-start",
   "snapshot",
   "snooze",
   "spinner",

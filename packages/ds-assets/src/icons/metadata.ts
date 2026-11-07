@@ -1974,6 +1974,24 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     categories: ["product"],
     description: "A single host outside a cluster.",
   },
+  "skip-to-end": {
+    tags: ["last page", "last", "end", "jump", "pagination", "chevron", "bar"],
+    categories: ["navigation"],
+    description: "A chevron pointing at a bar: go to the last page.",
+  },
+  "skip-to-start": {
+    tags: [
+      "first page",
+      "first",
+      "start",
+      "jump",
+      "pagination",
+      "chevron",
+      "bar",
+    ],
+    categories: ["navigation"],
+    description: "A chevron pointing at a bar: go to the first page.",
+  },
   snapshot: {
     tags: [
       "camera",
