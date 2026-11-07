@@ -68,7 +68,7 @@ While no result answers the query, the chart shows the core's status in place of
 
 ## Without scripting
 
-The server draws both the chart and the table, each in a region named for it ("Chart" and "Table"), and no button, since there is nothing to choose with. Once scripts run, whichever region holds the focus becomes the chosen one, so nothing the reader is in leaves the page under them.
+The server draws the chart, the default, alone in a region named for it ("Chart"), and no button, since there is nothing to choose with: drawing both would repeat every record's checkbox, link and status in the page. Once scripts run, the table is a press away.
 
 ## The segmented choice
 
@@ -85,6 +85,6 @@ These notes are provisional, recorded for a prototype.
 | Choice group | 1.3.1, 4.1.2 | A group named by `label` or the words' own `renderer` |
 | Choice buttons | 1.4.1, 2.1.1, 4.1.2 | One native button per renderer, named by the words; the chosen one pressed and primary, so its state is not colour alone; Tab, Enter and Space reach and press each |
 | Order and focus | 1.3.2, 2.4.3 | The choice follows the renderers in the page as on screen; pressing keeps the focus on the pressed button |
-| Renderer regions | 1.3.1 | The chart and the table each in a region named for it; both drawn, in turn, without scripting |
+| Renderer regions | 1.3.1 | The chart and the table each in a region named for it; the chart alone drawn without scripting |
 | Chart figure | 1.1.1, 1.3.1 | The chart keeps its caption, and its own numbers table as its text alternative |
 | Table | 1.3.1, 4.1.2 | The `DataTable` over the same provider, with its own baseline |

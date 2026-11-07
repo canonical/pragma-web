@@ -1,12 +1,6 @@
 import { Button } from "@canonical/react-ds-global";
-import {
-  type ReactElement,
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import { useIsHydrated, useMergedRef, useMessages } from "../../hooks/index.js";
+import { type ReactElement, useState } from "react";
+import { useIsHydrated, useMessages } from "../../hooks/index.js";
 import type { RendererSwitchProps } from "./types.js";
 import "./styles.css";
 
@@ -20,23 +14,18 @@ const componentCssClassName = "ds renderer-switch";
  * reads the same query, rows and selection, and changing renderer asks the
  * source for nothing.
  *
- * Once scripts run, only the chosen renderer is drawn, the first until another
- * is chosen. The renderers are offered as a segmented choice after them, at
- * the inline end: one design-system button per renderer, the chosen one
- * pressed, in a group named by `label` or, where the application names
- * nothing, by the words' own `renderer`. Each button is a Tab stop that Enter
- * and Space press. The design system names a SegmentedControlInput that no
+ * Draws the chosen renderer alone, the first before scripts or until another
+ * is chosen. Once scripts run, the renderers are offered as a segmented
+ * choice after it, at the inline end: one design-system button per
+ * renderer, the chosen one pressed, in a group named by `label` or, where
+ * the application names nothing, by the words' own `renderer`. Each button
+ * is a Tab stop that Enter and Space press. The design system names a SegmentedControlInput that no
  * library implements yet; the switch adopts it when one does.
  *
- * Without scripting there is nothing to choose with, so
- * every renderer is drawn in turn, each in a region named for it, and each
- * stays reachable.
+ * @experimental Pre-release: a work-in-progress spike, internal to the
+ * package and not exported; its shape may change or it may be withdrawn.
  *
- * Not exported from the package root: a work-in-progress spike, imported from
- * its own module until it is admitted.
- *
- * @experimental Pre-release: a work-in-progress spike, not admitted to the
- * package root; its shape may change or it may be withdrawn.
+ * @implements ds:apps.pattern.renderer_switch
  */
 export default function RendererSwitch({
   label,
@@ -62,31 +51,6 @@ export default function RendererSwitch({
   const name = label ?? words.renderer;
   const hydrated = useIsHydrated();
   const [chosen, setChosen] = useState(first.id);
-  const root = useRef<HTMLElement | null>(null);
-  // The root is the switch's own, so a caller's ref is merged onto it rather
-  // than dropped: the focus handoff below reads the regions inside it.
-  const hold = useCallback((node: HTMLElement) => {
-    root.current = node;
-    return () => {
-      root.current = null;
-    };
-  }, []);
-  const attach = useMergedRef(ref, hold);
-  // Without scripting every renderer is drawn, so a reader may be inside one
-  // that hydration is about to remove. Whichever renderer holds the focus
-  // becomes the chosen one, before the browser paints, so nothing the reader
-  // was reading — or focused — leaves the page under them.
-  useLayoutEffect(() => {
-    const focused = document.activeElement;
-    const region =
-      focused instanceof HTMLElement && root.current?.contains(focused) === true
-        ? focused.closest<HTMLElement>("[data-renderer]")
-        : null;
-    const held = region?.dataset["renderer"];
-    if (held !== undefined) {
-      setChosen(held);
-    }
-  }, []);
   // A renderer the application stopped offering is no longer chosen, and is
   // not chosen again should it come back.
   if (!ids.has(chosen)) {
@@ -96,12 +60,13 @@ export default function RendererSwitch({
   return (
     <section
       {...rest}
-      ref={attach}
+      ref={ref}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
       aria-label={name}
     >
+      {/* The chosen renderer alone; before scripts, the first. */}
       {renderers.map((renderer) =>
-        hydrated && renderer.id !== active ? null : (
+        renderer.id === active ? (
           <section
             key={renderer.id}
             data-renderer={renderer.id}
@@ -109,7 +74,7 @@ export default function RendererSwitch({
           >
             {renderer.content}
           </section>
-        ),
+        ) : null,
       )}
       {hydrated ? (
         // biome-ignore lint/a11y/useSemanticElements: a fieldset groups form controls under a legend; this groups toggle buttons, a segmented choice, under the switch's own name

@@ -337,15 +337,15 @@ function TableOrCardsMachines({
 /**
  * Table or cards: one query, one page and one selection, shown as a table or
  * as cards. A machine selected in the table is selected on its card, and the
- * page stays where it was. Without scripting the table and the cards are
- * drawn in turn.
+ * page stays where it was. Without scripting the table, the default, is
+ * drawn alone.
  */
 export const TableOrCards: Story = {
   render: ({ label }) => <TableOrCardsMachines label={label} />,
   parameters: consumerCode({
     parts: ["DataViews", "type DisplayField"],
     imports: `import { machineCollection, machines } from "./machines.js";
-// Work-in-progress spikes: not yet exported from the package root.
+// Internal to the package and not exported: shown for their shape.
 import { DataCards } from "./DataViews/DataCards.js";
 import { RendererSwitch } from "./RendererSwitch.js";`,
     query: "page=1&size=5",
