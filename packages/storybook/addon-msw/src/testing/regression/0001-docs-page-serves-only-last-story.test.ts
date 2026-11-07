@@ -50,7 +50,7 @@ afterEach(() => {
 });
 
 describe("regression 0001 — a docs page served only its last story", () => {
-  it.fails("serves every story of a docs page at once, and a story's teardown leaves the others", async () => {
+  it("serves every story of a docs page at once, and a story's teardown leaves the others", async () => {
     const preview = await loadPreview();
     const shown = [
       prepareStoryRender(preview, "Default"),

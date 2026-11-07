@@ -132,7 +132,7 @@ describe("preview", () => {
     await expect(readAnswer(worker, "/api/options")).resolves.toBeUndefined();
   });
 
-  it.fails("registers no decorator, so nothing wraps a story or mounts it again", async () => {
+  it("registers no decorator, so nothing wraps a story or mounts it again", async () => {
     const preview = await loadPreview();
     expect(preview).not.toHaveProperty("decorators");
   });
