@@ -127,11 +127,8 @@ const badReplacements = (
     .map(([name, meta]) => `${name} -> ${meta.deprecated?.replacedBy}`);
 
 describe("metadata", () => {
-  // `ICON_METADATA` is typed `Record<IconName, IconMetadata>`, so TypeScript
-  // already rejects a missing or extra key. These two run anyway: TypeScript's
-  // message inlines all 167 entries and truncates, while these name the icon,
-  // and they still hold for JavaScript consumers and for anything that reaches
-  // the object through an `as` cast.
+  // TypeScript rejects a missing or extra key too; these name the icon, and
+  // hold for JavaScript and `as` casts.
   it("every icon in `ICON_NAMES` has a metadata entry", () => {
     const missing = ICON_NAMES.filter((iconName) => !ICON_METADATA[iconName]);
 
