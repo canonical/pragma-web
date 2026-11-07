@@ -11,33 +11,7 @@ import { machines, options, validation } from "../../../testing/fixtures.js";
 import readAnswer from "../../../testing/readAnswer.js";
 import { KEY } from "../../constants.js";
 import type { MswParameter } from "../../types.js";
-
-/** The registry under test, which is not written yet. */
-type StoryRegistry = {
-  readonly serveStory: (context: StoryContext<Renderer>) => Promise<void>;
-  readonly scheduleWithdrawal: (
-    context: StoryContext<Renderer>,
-  ) => CleanupCallback | undefined;
-};
-
-/** The factory under test, which is not written yet. */
-type CreateStoryRegistry = (
-  start?: () => Promise<SetupWorker | null>,
-) => StoryRegistry;
-
-/**
- * Create a registry from the module under test, loaded by a path the
- * compiler does not check while the module does not exist.
- */
-const createStoryRegistry = async (
-  ...args: Parameters<CreateStoryRegistry>
-): Promise<StoryRegistry> => {
-  const path = "./createStoryRegistry.js";
-  const module = (await import(/* @vite-ignore */ path)) as {
-    default: CreateStoryRegistry;
-  };
-  return module.default(...args);
-};
+import createStoryRegistry from "./createStoryRegistry.js";
 
 /** What a story declares and how it is shown, for one render. */
 type StoryRender = {
@@ -68,7 +42,7 @@ const createContext = ({
  * @note Impure: serves the story on the registry's worker.
  */
 const renderStory = async (
-  registry: StoryRegistry,
+  registry: ReturnType<typeof createStoryRegistry>,
   story: StoryRender,
 ): Promise<CleanupCallback> => {
   const context = createContext(story);
@@ -86,9 +60,9 @@ afterEach(() => {
 
 describe("createStoryRegistry", () => {
   describe("serveStory", () => {
-    it.fails("serves every shown story's handlers at once, the story served last first", async () => {
+    it("serves every shown story's handlers at once, the story served last first", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       await renderStory(registry, { id: "a", msw: { handlers: [options] } });
       await renderStory(registry, {
         id: "b",
@@ -97,14 +71,14 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([validation, machines, options]);
     });
 
-    it.fails("serves stories waiting on one start together, as a docs page does", async () => {
+    it("serves stories waiting on one start together, as a docs page does", async () => {
       const worker = createWorker();
       let finishStart = (): void => undefined;
       const starting = new Promise<SetupWorker>((resolve) => {
         finishStart = () => resolve(worker);
       });
       const start = vi.fn(() => starting);
-      const registry = await createStoryRegistry(start);
+      const registry = createStoryRegistry(start);
       const first = registry.serveStory(
         createContext({ id: "a", msw: { handlers: [options] } }),
       );
@@ -116,18 +90,18 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([validation, options]);
     });
 
-    it.fails("serves a story served again in its own place, never twice", async () => {
+    it("serves a story served again in its own place, never twice", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       await renderStory(registry, { id: "a", msw: { handlers: [options] } });
       await renderStory(registry, { id: "b", msw: { handlers: [validation] } });
       await renderStory(registry, { id: "a", msw: { handlers: [machines] } });
       expect(worker.listHandlers()).toEqual([machines, validation]);
     });
 
-    it.fails("serves a story without handlers none, after a story with them", async () => {
+    it("serves a story without handlers none, after a story with them", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       const cleanup = await renderStory(registry, {
         id: "a",
         msw: { handlers: [options] },
@@ -139,9 +113,9 @@ describe("createStoryRegistry", () => {
       await expect(readAnswer(worker, "/api/options")).resolves.toBeUndefined();
     });
 
-    it.fails("withdraws only the story MSW is off for, by the toolbar or by the story", async () => {
+    it("withdraws only the story MSW is off for, by the toolbar or by the story", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       await renderStory(registry, { id: "a", msw: { handlers: [options] } });
       await renderStory(registry, { id: "b", msw: { handlers: [validation] } });
       await renderStory(registry, {
@@ -158,9 +132,9 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([validation]);
     });
 
-    it.fails("serves nothing once the toolbar turns MSW off for the only story shown", async () => {
+    it("serves nothing once the toolbar turns MSW off for the only story shown", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       await renderStory(registry, { id: "a", msw: { handlers: [options] } });
       await renderStory(registry, {
         id: "a",
@@ -171,9 +145,9 @@ describe("createStoryRegistry", () => {
       await expect(readAnswer(worker, "/api/options")).resolves.toBeUndefined();
     });
 
-    it.fails("never starts the worker for a story MSW is off for", async () => {
+    it("never starts the worker for a story MSW is off for", async () => {
       const start = vi.fn(async () => createWorker());
-      const registry = await createStoryRegistry(start);
+      const registry = createStoryRegistry(start);
       await renderStory(registry, {
         id: "a",
         msw: { handlers: [options] },
@@ -182,13 +156,13 @@ describe("createStoryRegistry", () => {
       expect(start).not.toHaveBeenCalled();
     });
 
-    it.fails("serves nothing for a story torn down while the worker starts", async () => {
+    it("serves nothing for a story torn down while the worker starts", async () => {
       const worker = createWorker();
       let finishStart = (): void => undefined;
       const starting = new Promise<SetupWorker>((resolve) => {
         finishStart = () => resolve(worker);
       });
-      const registry = await createStoryRegistry(() => starting);
+      const registry = createStoryRegistry(() => starting);
       const render = new AbortController();
       const served = registry.serveStory(
         createContext({
@@ -204,9 +178,9 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([validation]);
     });
 
-    it.fails("withdraws a story whose render is aborted after it is served", async () => {
+    it("withdraws a story whose render is aborted after it is served", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       const render = new AbortController();
       await registry.serveStory(
         createContext({
@@ -220,9 +194,9 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([validation]);
     });
 
-    it.fails("keeps a story served when its render is aborted after its beforeEach, as a hot update cancelling its play does", async () => {
+    it("keeps a story served when its render is aborted after its beforeEach, as a hot update cancelling its play does", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       const render = new AbortController();
       await renderStory(registry, {
         id: "a",
@@ -233,9 +207,9 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([options]);
     });
 
-    it.fails("keeps another story's sequential responses where they were", async () => {
+    it("keeps another story's sequential responses where they were", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       const job = http.get("/api/job", function* () {
         yield HttpResponse.json({ state: "pending" }, { status: 202 });
         return HttpResponse.json({ state: "done" });
@@ -246,26 +220,26 @@ describe("createStoryRegistry", () => {
       await expect(readAnswer(worker, "/api/job")).resolves.toBe(200);
     });
 
-    it.fails("lets a story render against the network when no worker starts, and serves it once one does", async () => {
+    it("lets a story render against the network when no worker starts, and serves it once one does", async () => {
       const worker = createWorker();
       const start = vi
         .fn<() => Promise<SetupWorker | null>>()
         .mockResolvedValueOnce(null)
         .mockResolvedValue(worker);
-      const registry = await createStoryRegistry(start);
+      const registry = createStoryRegistry(start);
       await renderStory(registry, { id: "a", msw: { handlers: [options] } });
       expect(worker.listHandlers()).toEqual([]);
       await renderStory(registry, { id: "b", msw: { handlers: [validation] } });
       expect(worker.listHandlers()).toEqual([validation, options]);
     });
 
-    it.fails("keeps serving on the started worker when a later start resolves none", async () => {
+    it("keeps serving on the started worker when a later start resolves none", async () => {
       const worker = createWorker();
       const start = vi
         .fn<() => Promise<SetupWorker | null>>()
         .mockResolvedValueOnce(worker)
         .mockResolvedValue(null);
-      const registry = await createStoryRegistry(start);
+      const registry = createStoryRegistry(start);
       const cleanupA = await renderStory(registry, {
         id: "a",
         msw: { handlers: [options] },
@@ -276,9 +250,9 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([validation]);
     });
 
-    it.fails("never disposes a shown story's handlers when another story is served", async () => {
+    it("never disposes a shown story's handlers when another story is served", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       const disposeOptions = vi.spyOn(options, "dispose");
       await renderStory(registry, { id: "a", msw: { handlers: [options] } });
       await renderStory(registry, { id: "b", msw: { handlers: [validation] } });
@@ -287,9 +261,9 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([validation, options]);
     });
 
-    it.fails("keeps a handler two shown stories share when one of them is withdrawn", async () => {
+    it("keeps a handler two shown stories share when one of them is withdrawn", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       await renderStory(registry, { id: "a", msw: { handlers: [options] } });
       const cleanupB = await renderStory(registry, {
         id: "b",
@@ -301,8 +275,8 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([options]);
     });
 
-    it.fails("starts the preview's own worker by default, which resolves none in Node", async () => {
-      const registry = await createStoryRegistry();
+    it("starts the preview's own worker by default, which resolves none in Node", async () => {
+      const registry = createStoryRegistry();
       const cleanup = await renderStory(registry, {
         id: "a",
         msw: { handlers: [options] },
@@ -312,9 +286,9 @@ describe("createStoryRegistry", () => {
   });
 
   describe("scheduleWithdrawal", () => {
-    it.fails("returns a cleanup that leaves the other stories' handlers in place, as on a docs page or at a remount", async () => {
+    it("returns a cleanup that leaves the other stories' handlers in place, as on a docs page or at a remount", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       const cleanupA = await renderStory(registry, {
         id: "a",
         msw: { handlers: [options] },
@@ -329,9 +303,9 @@ describe("createStoryRegistry", () => {
       expect(worker.listHandlers()).toEqual([]);
     });
 
-    it.fails("withdraws a story once, however many of its renders' cleanups run", async () => {
+    it("withdraws a story once, however many of its renders' cleanups run", async () => {
       const worker = createWorker();
-      const registry = await createStoryRegistry(async () => worker);
+      const registry = createStoryRegistry(async () => worker);
       const firstRender = await renderStory(registry, {
         id: "a",
         msw: { handlers: [options] },
