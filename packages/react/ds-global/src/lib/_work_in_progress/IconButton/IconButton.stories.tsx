@@ -18,7 +18,6 @@ const meta = {
   title: "_work_in_progress/IconButton",
   component: Component,
   decorators: [surface()],
-  // Every story pairs the icon button with a Tooltip.
   render: (args) => (
     <TooltipEngine Message={args["aria-label"]}>
       <Component {...args} />
@@ -197,10 +196,7 @@ const findOpenTooltip = (canvasElement: HTMLElement) =>
 /** An icon button wrapped with a fixed Tooltip message. */
 const EditButtonWithTooltip = withTooltip(Component, "Edit");
 
-/**
- * Always pair an icon button with a Tooltip. The other stories compose
- * `TooltipEngine`; this one uses `withTooltip`, for a fixed message.
- */
+/** Pairs it with `withTooltip`, for a fixed message. */
 export const WithTooltip: Story = {
   name: "With Tooltip",
   args: { importance: "tertiary" },
@@ -275,7 +271,6 @@ export const DensityAndContext: Story = {
             <TooltipEngine Message="Edit">
               <Component {...args} importance="tertiary" />
             </TooltipEngine>
-            {/* Unpaired on purpose: the geometry control. */}
             <Component {...args} importance="secondary" />
             <TooltipEngine Message="Edit">
               <Component {...args} importance="primary" />
@@ -458,7 +453,7 @@ export const AsPopoverTrigger: Story = {
 
 /**
  * The data view triggers: a gear for settings, three vertical dots for
- * column options. Tertiary, no chevron, wired as a popover trigger.
+ * column options. Tertiary, no chevron.
  */
 export const GearAndThreeDots: Story = {
   name: "Gear and three dots",
