@@ -14,15 +14,10 @@
    * (the typography-text-primary tier, per the Figma spec).
    */
   .ds.breadcrumbs {
-    /* Component tokens — pure aliases to semantic tokens, component-scoped
+    /* Component token — a pure alias to a semantic token, component-scoped
        per cs:styling.tokens.scoping. Defined on the component root so both
-       the list and the items resolve them. */
-    --breadcrumbs-item-link-color: var(--color-text-link);
-    --breadcrumbs-item-current-color: var(--color-text);
-    --breadcrumbs-item-disabled-color: var(--color-text-disabled);
-    --breadcrumbs-item-separator-color: var(--color-text);
+       the list and the items resolve it. */
     --breadcrumbs-item-separator-margin: var(--dimension-100);
-    --breadcrumbs-item-focus-color: var(--color-text-link);
 
     & > .list {
       /* layout.type: flow, layout.direction: horizontal */

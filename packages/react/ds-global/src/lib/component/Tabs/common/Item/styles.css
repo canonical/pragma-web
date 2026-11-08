@@ -44,7 +44,8 @@
   :where(.comfortable, .dense, .app, .site, .docs) .ds.tabs-item .tabs-link {
     min-block-size: calc(
       var(--density-line-height-effective, calc(var(--baseline-height) * 8)) +
-        3 * var(--baseline-height)
+      3 *
+      var(--baseline-height)
     );
     padding-block: 0;
   }
@@ -55,7 +56,7 @@
      interactive); suppressed while keyboard-focused so the hover affordance
      never paints over the focus border. */
   .ds.tabs-item:not([data-active]):not([data-inert]):not([data-disabled])
-    .tabs-link:hover:not(:focus-visible) {
+  .tabs-link:hover:not(:focus-visible) {
     border-bottom-color: var(--color-border-muted);
     transition-duration: var(--motion-duration-fast);
   }
