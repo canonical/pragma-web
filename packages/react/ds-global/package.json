@@ -56,7 +56,6 @@
     "@canonical/ds-assets": "^0.45.0",
     "@canonical/ds-utils": "^0.45.0",
     "@canonical/react-hooks": "^0.45.0",
-    "@canonical/storybook-config": "^0.45.0",
     "@canonical/styles": "^0.45.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
@@ -69,6 +68,7 @@
     "@canonical/router-core": "^0.45.0",
     "@canonical/router-react": "^0.45.0",
     "@canonical/storybook-addon-utils": "^0.45.0",
+    "@canonical/storybook-config": "^0.45.0",
     "@canonical/storybook-helpers": "^0.45.0",
     "@canonical/typescript-config-react": "^0.45.0",
     "@canonical/vitest-config-react": "^0.45.0",
