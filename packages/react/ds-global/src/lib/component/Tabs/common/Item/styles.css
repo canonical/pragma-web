@@ -44,7 +44,8 @@
   :where(.comfortable, .dense, .app, .site, .docs) .ds.tabs-item .tabs-link {
     min-block-size: calc(
       var(--density-line-height-effective, calc(var(--baseline-height) * 8)) +
-        3 * var(--baseline-height)
+      3 *
+      var(--baseline-height)
     );
     padding-block: 0;
   }
