@@ -78,11 +78,6 @@ export type WrapperProps<ComponentProps> = BaseWrapperProps<ComponentProps> & {
    * "required" (a "*" marker before the label of required fields). */
   requiredIndicator?: RequiredIndicator;
 
-  /* Where the label sits. "stacked" (default) — the label renders
-   * above the payload; "aside" — beside the payload (input and helper
-   * text), aligned on the text baseline. */
-  labelLayout?: "stacked" | "aside";
-
   /* Where the description (helper text) sits within the payload. "leading"
    * (default) — above the control; "trailing" — below the control, before
    * any error. */

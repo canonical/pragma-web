@@ -34,7 +34,6 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
   nestedRegisterProps,
   unregisterOnUnmount,
 
-  labelLayout = "stacked",
   descriptionPosition = "leading",
   mockLabel = false,
   ...otherProps
@@ -66,12 +65,7 @@ const Wrapper = <ComponentProps extends BaseInputProps>({
     <div
       id={id}
       style={style}
-      className={[
-        componentCssClassName,
-        labelLayout === "aside" && "label-aside",
-        className,
-        isError && states.Danger,
-      ]
+      className={[componentCssClassName, className, isError && states.Danger]
         .filter(Boolean)
         .join(" ")}
     >
