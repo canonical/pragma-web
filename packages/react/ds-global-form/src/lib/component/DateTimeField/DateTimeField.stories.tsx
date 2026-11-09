@@ -47,12 +47,16 @@ export const WithHelperText: Story = {
   },
 };
 
-/** Aside label layout: the label sits beside the input and its helper text. */
+/** Aside label layout: the `form-layout-side` class on the form places the
+ * label beside the input and its helper text, on the grid's own column
+ * tracks. The `grid: "responsive"` parameter gives the form's subgrid real
+ * column tracks — matching how a form is laid out on a real page. */
 export const AsideLabelLayout: Story = {
+  parameters: { grid: "responsive" },
+  decorators: [decorators.form({ className: "form-layout-side" })],
   args: {
     name: "event_aside",
     label: "Starts at",
     description: "Times are in your local timezone.",
-    labelLayout: "aside",
   },
 };
