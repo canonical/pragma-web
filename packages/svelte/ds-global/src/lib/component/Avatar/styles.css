@@ -1,0 +1,75 @@
+@layer ds.components.global {
+  .ds.avatar {
+    display: inline-grid;
+    flex: none;
+    border: var(--dimension-stroke-thickness-medium) solid var(--color-border);
+    background-color: var(
+      --surface-color-foreground-input,
+      var(--color-foreground-input)
+    );
+    color: var(--surface-color-text, var(--color-text));
+
+    width: var(--dimension-250);
+    height: var(--dimension-250);
+    font:
+      var(--typography-text-secondary-bold-font-weight)
+      var(--typography-text-secondary-bold-font-size) /
+      var(--typography-text-secondary-bold-line-height)
+      var(--typography-text-secondary-bold-font-family);
+    letter-spacing: 0;
+
+    &.large {
+      width: var(--dimension-400);
+      height: var(--dimension-400);
+      font:
+        var(--typography-heading-5-font-weight)
+        var(--typography-heading-5-font-size) /
+        var(--typography-heading-5-line-height)
+        var(--typography-heading-5-font-family);
+    }
+
+    &:is(img) {
+      object-fit: cover;
+      position: relative;
+      overflow: hidden;
+
+      /*
+    A fallback for when there is no JS and the image cannot be loaded.
+     
+    When name is provided, the initials are displayed. When name is not provided, a "?" is displayed.
+    Ideally this would be a user icon instead of "?", but that would require either
+    - a base64 encoded SVG, that would bloat CSS (rather unnecessarily, for the rare case of no name and image load failure),
+    - or a url to a static asset (difficult to achieve for a component library without making assumptions on the hosting app's bundler and asset management).
+    */
+      &::after {
+        position: absolute;
+        inset: 0;
+        background-color: inherit;
+        display: grid;
+        place-content: center;
+        text-transform: uppercase;
+        user-select: none;
+        content: "?";
+      }
+
+      &[data-initials]::after {
+        content: attr(data-initials);
+      }
+    }
+
+    &:is(abbr) {
+      user-select: none;
+      place-content: center;
+      text-transform: uppercase;
+      text-decoration: none;
+
+      > .initials {
+        text-box: trim-both cap alphabetic;
+      }
+    }
+
+    &:is(div) {
+      place-content: center;
+    }
+  }
+}
