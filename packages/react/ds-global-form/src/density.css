@@ -113,17 +113,18 @@
     font-family: var(--typography-text-primary-font-family);
   }
 
+  /* Seat variables for the seated text AND the choice/toggle marks
+     (`.ds.option > input`, `.field-toggle-control > input`). The marks read
+     them as margin-block only; the padding seat (below) applies to text only,
+     so the marks keep their own sheets' `padding: 0`. */
   :is(.comfortable, .dense, .app, .site, .docs)
-    :is(
-      .ds.field-label,
-      .ds.field-description,
-      .ds.field-error,
-      /* The choice and toggle MARKS join the seated text by their own classes
-         (RadioInput/CheckboxInput/SwitchInput), not by their group ancestry. */
-      .ds.form-radio,
-      .ds.form-checkbox,
-      .ds.form-switch
-    ) {
+  :is(
+    .ds.field-label,
+    .ds.field-description,
+    .ds.field-error,
+    .ds.option > input,
+    .field-toggle-control > input
+  ) {
     line-height: 1;
     /* Baseline within a line-height:1 box (font-relative cap approximation). */
     --natural-baseline: calc((1em + 1cap) / 2);
@@ -137,6 +138,11 @@
         var(--border-top-width, 0px)
       )
     );
+  }
+
+  /* Padding seat: seated text only. */
+  :is(.comfortable, .dense, .app, .site, .docs)
+  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
     padding-block-start: var(--space-before);
     padding-block-end: 0;
   }
@@ -337,11 +343,8 @@
    * Fill the box out to a whole density line-height so its bottom lands on a grid
    * line. The `- 1em` term is correct precisely because these are line-height:1.
    *
-   * The fill is named --seat-after so the seat consumers share it: the seated
-   * text above reads it as its padding-block-end, and the label-sized choice and
-   * toggle MARKS (RadioInput/CheckboxInput/SwitchInput, the scoped ChoicesField
-   * rules) read the SAME variable as their margin-block-end — one computed seat,
-   * two applications, no duplicated max/calc in the component sheets.
+   * The fill is named --seat-after and shared: the seated text reads it as its
+   * padding-block-end, the choice/toggle marks as their margin-block-end.
    *
    * Bare prose (p / .p / h1–h6) is NOT here: it is no longer density-seated (see the
    * partition above), so its box is its OWN snapped line-height and the engine's
@@ -351,11 +354,10 @@
     .ds.field-label,
     .ds.field-description,
     .ds.field-error,
-    /* The choice and toggle MARKS join the seated text by their own classes
-         (RadioInput/CheckboxInput/SwitchInput), not by their group ancestry. */
-    .ds.form-radio,
-    .ds.form-checkbox,
-    .ds.form-switch
+    /* Marks read --seat-after as margin-block-end; the padding fill below
+         applies to text only, so the marks keep `padding: 0`. */
+    .ds.option > input,
+    .field-toggle-control > input
   ) {
     --seat-after: max(
       0px,
@@ -368,6 +370,11 @@
         1em
       )
     );
+  }
+
+  /* The padding fill: seated text only. */
+  :is(.comfortable, .dense, .app, .site, .docs)
+  :is(.ds.field-label, .ds.field-description, .ds.field-error) {
     padding-block-end: var(--seat-after);
   }
 
