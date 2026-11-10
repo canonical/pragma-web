@@ -12,6 +12,15 @@ inputs:
 runs:
   using: composite
   steps:
+      # Every cache key carries the OS release, not only runner.os ("Linux"):
+      # when ubuntu-latest moves to a new release, a cache saved on the old one
+      # would otherwise be restored onto the new one, and its binaries can need
+      # system libraries the new release no longer ships. Exported to the job
+      # environment so the workflows' own cache keys use the same value.
+    - name: Detect OS version
+      shell: bash
+      run: echo "OS_VERSION=$(. /etc/os-release && echo "$VERSION_ID")" >> "$GITHUB_ENV"
+
     - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
       with:
         node-version: ${{ inputs.node-version }}
@@ -31,19 +40,19 @@ runs:
         # .bun-version is in the key deliberately: the lockfile does not change
         # when Bun does, so hashing it alone would restore the previous Bun's
         # node_modules and the new version would never install anything.
-        key: node-modules-${{ runner.os }}-${{ inputs.node-version }}-${{ hashFiles('bun.lock', '.bun-version') }}
+        key: node-modules-${{ runner.os }}-${{ env.OS_VERSION }}-${{ inputs.node-version }}-${{ hashFiles('bun.lock', '.bun-version') }}
 
     - name: Cache Bun global cache
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       with:
         path: ~/.bun/install/cache
-        key: bun-cache-${{ runner.os }}-${{ hashFiles('bun.lock', '.bun-version') }}
+        key: bun-cache-${{ runner.os }}-${{ env.OS_VERSION }}-${{ hashFiles('bun.lock', '.bun-version') }}
 
     - name: Cache Nx remote cache
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       with:
         path: /tmp/nx-remote-cache
-        key: nx-remote-cache-${{ runner.os }}-${{ inputs.node-version }}-${{ github.sha }}
+        key: nx-remote-cache-${{ runner.os }}-${{ env.OS_VERSION }}-${{ inputs.node-version }}-${{ github.sha }}
 
     - name: Install dependencies
       shell: bash
