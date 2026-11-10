@@ -23,12 +23,17 @@ describe("ContextSwitcher", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("lists every context, including description, once open", () => {
+  it("lists every context, including description, once open", async () => {
     render(
       <ContextSwitcher currentContext={contexts[0]} contexts={contexts} />,
     );
     open();
-    expect(screen.getByRole("menu")).toHaveAttribute("aria-hidden", "false");
+    // The surface fades in over a transition, so it joins the accessibility
+    // tree a frame or two after the click, not synchronously.
+    expect(await screen.findByRole("menu")).toHaveAttribute(
+      "aria-hidden",
+      "false",
+    );
     expect(screen.getByText("Globex")).toBeInTheDocument();
     expect(screen.getByText("Secondary account")).toBeInTheDocument();
   });

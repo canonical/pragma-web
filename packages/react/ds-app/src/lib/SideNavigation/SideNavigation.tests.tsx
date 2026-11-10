@@ -179,7 +179,11 @@ describe("SideNavigation", () => {
         footerRoot={footerWithExpandable}
       />,
     );
-    expect(screen.getByRole("link", { name: "Profile" })).toBeInTheDocument();
+    // Collapsed, the closed <details> hides the sub-items (display: none),
+    // so the link is in the DOM but has no accessible name: query the DOM.
+    expect(document.querySelector('a[href="/profile"]')).toHaveTextContent(
+      "Profile",
+    );
     expect(document.querySelector("details")).toBeInTheDocument();
   });
 
