@@ -15,6 +15,9 @@ pragma-web consumes the pragma-core packages from npm, pinned to exact versions.
 
 Both repositories are Bun and Lerna monorepos with the same toolchain, the same commit, issue and pull-request rules, and the same CI shape. This file and the topic files listed below are shared: canonical/pragma-core holds the originals, and canonical/pragma-web carries copies that link to them. What is specific to this repository is in `.kb/this-repository.md`.
 
+Spacing follows an external specification. Planning and evidence never enter Pragma:
+`main` adopts only approved rulings, while experimental spacing stays on feature branches.
+
 # Important
 
 - Every change lands through a pull request from a `type/description` branch; nobody pushes to `main` directly.
