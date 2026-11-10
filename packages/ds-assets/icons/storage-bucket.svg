@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <g id="storage-bucket">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M14 6.75h-.83l-.925 8.333a.75.75 0 0 1-.745.667h-7a.75.75 0 0 1-.745-.667L2.829 6.75H2v-1.5h12zm-8.83 7.5h5.66l.832-7.5H4.338z" fill="currentColor"/>
+    <path d="M8.5.25A3.75 3.75 0 0 1 12.25 4h-1.5A2.25 2.25 0 0 0 8.5 1.75h-1A2.25 2.25 0 0 0 5.25 4h-1.5A3.75 3.75 0 0 1 7.5.25z" fill="currentColor"/>
+  </g>
+</svg>
