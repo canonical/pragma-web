@@ -17,7 +17,7 @@ export const Default: Story = {
   args: {
     children: [
       <Component.Header key="header">
-        <h4>Tile header</h4>
+        <h5>Tile header</h5>
       </Component.Header>,
       <Component.Content key="content">
         <p className="p">This is the tile content area.</p>
@@ -57,7 +57,7 @@ export const OnSurfaces: Story = {
     decorators.surfaces((level) => (
       <Component>
         <Component.Header>
-          <h4>On surface level {level + 1}</h4>
+          <h5>On surface level {level + 1}</h5>
         </Component.Header>
         <Component.Content>
           <p className="p">The tile background steps above its container.</p>

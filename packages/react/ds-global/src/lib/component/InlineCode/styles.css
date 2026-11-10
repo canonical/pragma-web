@@ -5,17 +5,20 @@
     --inline-code-color-text: var(--color-text);
     --inline-code-color-background: var(--color-foreground-secondary);
     --inline-code-padding-inline: var(--dimension-050);
+    --inline-code-padding-block: var(--dimension-025);
     --inline-code-border-radius: var(--dimension-radius-small);
   }
 
   /* The `.code` baseline utility (from @canonical/styles) supplies the
-     monospace typography tier and the baseline-grid padding-block nudges, so
-     the component sets no vertical padding. Per the Figma spec it adds only the
-     horizontal padding plus the code colour and background (both mode-aware). */
+     monospace typography tier; inline `.code` gets no vertical padding of its
+     own, so the chip adds it — 2px top and bottom per the design review —
+     plus the horizontal padding and the code colour and background (both
+     mode-aware). */
   .ds.inline-code {
     color: var(--inline-code-color-text);
     background-color: var(--inline-code-color-background);
 
+    padding-block: var(--inline-code-padding-block);
     padding-inline: var(--inline-code-padding-inline);
     border-radius: var(--inline-code-border-radius);
   }
