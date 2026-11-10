@@ -93,8 +93,9 @@ const Provider = ({
   // The header is required: its title is the panel's accessible name, and a
   // panel without one cannot be named. Direct children only — a Header wrapped
   // in a fragment escapes this check, and the warning is a nudge, not a gate.
+  // `process.env.NODE_ENV` is left bare for the bundler to replace: a
+  // `typeof process` guard is never replaced, and in a browser it is false.
   if (
-    typeof process !== "undefined" &&
     process.env.NODE_ENV !== "production" &&
     !Children.toArray(children).some(
       (child) => isValidElement(child) && child.type === Header,
