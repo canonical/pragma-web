@@ -26,7 +26,6 @@
 
     position: relative;
 
-    /* The textarea is the grey box; the actions sit inside it. */
     > .prompt {
       box-sizing: border-box;
       width: 100%;
@@ -56,7 +55,6 @@
       }
     }
 
-    /* With a compact hint, the overlay replaces the native placeholder. */
     &:has(> .placeholder) > .prompt::placeholder {
       color: transparent;
     }
@@ -117,7 +115,6 @@
       }
     }
 
-    /* The suggestions hang under the field, over the content that follows. */
     > .ds.prompt-input-suggestions {
       position: absolute;
       inset-block-start: 100%;
@@ -125,7 +122,6 @@
       z-index: var(--z-index-overlay, 100);
     }
 
-    /* The submit button is icon-only, so it is a square. */
     .ds.button {
       display: inline-flex;
       align-items: center;

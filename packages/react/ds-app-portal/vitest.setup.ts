@@ -8,8 +8,7 @@ afterEach(() => {
   cleanup();
 });
 
-// A class, not `vitest.fn().mockImplementation(arrowFn)`: consumers call
-// `new ResizeObserver(callback)`, and an arrow function is not a constructor.
+// A class, since an arrow-function mock can't be called with `new`.
 class ResizeObserverMock {
   observe = vitest.fn();
   unobserve = vitest.fn();

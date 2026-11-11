@@ -25,8 +25,7 @@ const Suggestions = ({
       id={id}
       role="listbox"
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      // Keep focus in the textarea: a press here would otherwise blur it and
-      // close the list before the click lands.
+      // Otherwise the textarea blurs and closes the list before the click lands.
       onMouseDown={(event) => event.preventDefault()}
       {...props}
     >

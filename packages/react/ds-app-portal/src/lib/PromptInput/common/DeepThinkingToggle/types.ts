@@ -5,7 +5,6 @@ import type { ComponentProps } from "react";
  * can supply translations. Each defaults to its English text.
  */
 export interface DeepThinkingToggleMessages {
-  /** The visible label of the switch. */
   label: string;
 }
 

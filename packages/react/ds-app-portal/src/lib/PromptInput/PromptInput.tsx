@@ -13,8 +13,7 @@ import "./styles.css";
 
 const componentCssClassName = "ds prompt-input";
 
-// The submit button sits at the inline end, so its tooltip opens above and
-// grows back towards the start, keeping it inside the field.
+// Align to the end so the tooltip of the end-aligned button stays inside the field.
 const TOOLTIP_DIRECTIONS: WithTooltipOptions["preferredDirections"] = [
   { side: "block-start", align: "end" },
   { side: "block-end", align: "end" },
@@ -57,7 +56,6 @@ const PromptInput = ({
     })),
   );
   const isOpen = hasFocus && !dismissed && options.length > 0;
-  // An id left over from an earlier list matches nothing, so no row is lit.
   const activeOption = isOpen
     ? options.find((option) => option.id === activeOptionId)
     : undefined;
@@ -101,8 +99,7 @@ const PromptInput = ({
       close();
       return;
     }
-    // Shift + Enter keeps the textarea's native new line, and Enter is left
-    // alone while an input method is composing, where it confirms the text.
+    // While an input method is composing, Enter confirms the text instead.
     if (
       event.key !== "Enter" ||
       event.shiftKey ||
@@ -141,7 +138,6 @@ const PromptInput = ({
           setActiveOptionId(undefined);
         }}
       />
-      {/* The native placeholder can't change with width, so this draws both hints over it. */}
       {placeholder && compactPlaceholder ? (
         <div className="placeholder" aria-hidden="true">
           <span className="full">{placeholder}</span>

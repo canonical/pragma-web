@@ -1,7 +1,4 @@
-/**
- * The DOM id of a row. Built from positions rather than the consumer's ids,
- * which may hold characters an id attribute cannot.
- */
+// Built from positions, as consumer ids may hold characters invalid in an id.
 export const getOptionId = (
   listboxId: string,
   groupIndex: number,

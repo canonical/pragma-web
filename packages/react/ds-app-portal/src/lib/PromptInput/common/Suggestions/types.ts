@@ -2,7 +2,6 @@ import type { ComponentProps, ReactNode } from "react";
 
 /** One row of the suggestions list. */
 export interface PromptInputSuggestion {
-  /** Identifies the row within its group. */
   id: string;
   /** The row's text. It is cut short with an ellipsis when it does not fit. */
   label: string;
@@ -17,11 +16,9 @@ export interface PromptInputSuggestion {
 
 /** A labelled group of rows, such as "History" or "Tickets". */
 export interface PromptInputSuggestionGroup {
-  /** Identifies the group. */
   id: string;
   /** The group's visible heading, which also names it for assistive tech. */
   label: string;
-  /** The group's rows, in display order. */
   items: PromptInputSuggestion[];
 }
 
@@ -31,11 +28,9 @@ type OwnProps = {
    * derived from it with `getOptionId`.
    */
   id: string;
-  /** The groups to show. Groups without items are left out. */
+  /** Groups without items are left out. */
   groups: PromptInputSuggestionGroup[];
-  /** The id of the highlighted row, if any. */
   activeOptionId?: string;
-  /** Called with the row that is clicked and its group. */
   onSelect: (
     suggestion: PromptInputSuggestion,
     group: PromptInputSuggestionGroup,
