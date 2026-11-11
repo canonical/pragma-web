@@ -3,7 +3,8 @@
  * This is the pragma entry's first import on a mixed page. It loads two of
  * pragma's three entries, tokens.css and layout.css, then this package's
  * confined copy of the third (elements.css), then adds the boundary and the
- * bridge. The component stylesheets follow it in the same entry, the one that
+ * bridge, and sets Vanilla's text at pragma's text size (text-size.css). The
+ * component stylesheets follow it in the same entry, the one that
  * is never purged; the order inside that entry does not matter, because layer
  * precedence comes from layers.css, not from source order. Never inside the
  * `vanilla` layer, and never next to `@canonical/styles` itself, whose
@@ -11,7 +12,7 @@
  *
  *   @import url("@canonical/styles-vanilla-adapter/adapter.css");
  *
- * Four imports, two boundaries, one bridge and three layers, with no tooling: what
+ * Five imports, two boundaries, one bridge and three layers, with no tooling: what
  * you read here is what the browser runs. The README explains why each piece is
  * written the way it is.
  */
@@ -42,6 +43,10 @@
 @import url("@canonical/styles/tokens.css");
 @import url("@canonical/styles/layout.css");
 @import url("./elements.css");
+
+/* Vanilla's default-size text at pragma's text size. Imported into `vanilla`,
+ * where its rules come after Vanilla's own; text-size.css explains. */
+@import url("./text-size.css") layer(vanilla);
 
 /* ── The boundary ──────────────────────────────────────────────────────────
  * Pragma territory is every element with the class `ds` and everything inside

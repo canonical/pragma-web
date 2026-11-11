@@ -524,16 +524,23 @@ describe.each(VANILLA_VERSIONS)(
       // rather than advice. A layer takes its place at the first mention of its
       // name; `ds` mentioned before the statement is placed at the bottom of the
       // order, below `boundary`, and the boundary's `all: revert` then erases
-      // pragma instead of Vanilla. Nothing warns.
+      // pragma instead of Vanilla. Nothing warns. Without adapter.css's
+      // text-size rules, so that bare island text shows the browser's 16px
+      // rather than the 14px the collapsed island would inherit from the body.
       const late = await render(
         mixedPage(vanilla, {
           root: ROOT,
           body: COLLAPSE_BODY,
           before: [COMPONENT_CSS],
+          textSize: false,
         }),
       );
       const first = await render(
-        mixedPage(vanilla, { root: ROOT, body: COLLAPSE_BODY }),
+        mixedPage(vanilla, {
+          root: ROOT,
+          body: COLLAPSE_BODY,
+          textSize: false,
+        }),
       );
       // Statement first: pragma's typography reaches the island.
       expect(computed(first, "text").fontSize).toBe("14px");
@@ -559,6 +566,7 @@ describe.each(VANILLA_VERSIONS)(
           body: COLLAPSE_BODY,
           adapter: "before",
           statement: "self",
+          textSize: false,
         }),
       );
       expect(computed(carried, "text").fontSize).toBe("14px");
@@ -572,6 +580,7 @@ describe.each(VANILLA_VERSIONS)(
           body: COLLAPSE_BODY,
           adapter: "before",
           statement: "none",
+          textSize: false,
         }),
       );
       expect(computed(missing, "text").fontSize).toBe("16px");

@@ -123,8 +123,13 @@ describe.each(VANILLA_VERSIONS)("ds-permeable (Vanilla %s)", (version) => {
     expect(failures).toEqual([]);
   });
 
+  // adapter.css's text-size rules give a plain child the same size as the
+  // rest of Vanilla territory under app, which text-size.test.ts asserts; they
+  // are left out here so that the comparison sees the boundary alone.
   it("leaves a plain Vanilla child computing as it would outside any island", async () => {
-    const mixed = await render(mixedPage(version, { body: PERMEABLE_BLOCK }));
+    const mixed = await render(
+      mixedPage(version, { body: PERMEABLE_BLOCK, textSize: false }),
+    );
     const vanilla = await render(vanillaPage(version, PERMEABLE_VANILLA_ONLY));
     const failures: string[] = [];
     // perm-root itself keeps the confined baseline (asserted above), so only
@@ -147,7 +152,7 @@ describe.each(VANILLA_VERSIONS)("ds-permeable (Vanilla %s)", (version) => {
 
   it("leaves a plain Vanilla child alone even when the permeable root is nested inside an ordinary .ds ancestor", async () => {
     const mixed = await render(
-      mixedPage(version, { body: NESTED_PERMEABLE_BLOCK }),
+      mixedPage(version, { body: NESTED_PERMEABLE_BLOCK, textSize: false }),
     );
     const vanilla = await render(
       vanillaPage(version, NESTED_PERMEABLE_VANILLA_ONLY),
