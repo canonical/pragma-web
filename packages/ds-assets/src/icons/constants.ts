@@ -52,6 +52,7 @@ export const ICON_NAMES = [
   "download",
   "drag",
   "edit",
+  "edit-off",
   "email",
   "error",
   "error-fill",
