@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -19,6 +20,10 @@ import type {
   WindowFitmentPlacement,
   WindowFitmentSide,
 } from "./types.js";
+
+// `useLayoutEffect` warns on the server, so fall back to `useEffect` there.
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /** A resolved PHYSICAL placement — what the fitment core consumes internally. */
 type PhysicalPlacement = {
@@ -174,9 +179,20 @@ const useWindowFitment = <
   // logical→physical resolution re-runs (see the MutationObserver effect below).
   const [dirVersion, setDirVersion] = useState(0);
 
+  // The elements the refs point at, mirrored into state after each commit. A
+  // popup that mounts on open is attached only after the render that mounts
+  // it, so reading `popupRef.current` during that render sees null, and
+  // nothing re-renders to look again: the popup would never be measured.
+  const [targetElement, setTargetElement] = useState<TTarget | null>(null);
+  const [popupElement, setPopupElement] = useState<TPopup | null>(null);
+  useIsomorphicLayoutEffect(() => {
+    setTargetElement(targetRef.current);
+    setPopupElement(popupRef.current);
+  });
+
   const windowDimensions = useWindowDimensions({ resizeDelay, scrollDelay });
-  const targetSize = useResizeObserver(targetRef?.current);
-  const popupSize = useResizeObserver(popupRef?.current);
+  const targetSize = useResizeObserver(targetElement);
+  const popupSize = useResizeObserver(popupElement);
 
   /** The distance, in pixels, between the target and the popup. */
   const distanceAsPixelsNumber = useMemo(
@@ -453,6 +469,8 @@ const useWindowFitment = <
     windowDimensions,
     popupSize,
     targetSize,
+    popupElement,
+    targetElement,
     isServer,
     directionProp,
     dirVersion,
