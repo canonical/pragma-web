@@ -182,7 +182,7 @@ describe("Modal pattern", () => {
       expect(container.querySelector("dialog")).not.toHaveAttribute("open");
     });
 
-    it("passes the native close event through to the consumer", () => {
+    it("passes the native close event through to the consumer", async () => {
       const onClose = vi.fn();
       const ref = createRef<HTMLDialogElement>();
       render(
@@ -194,7 +194,8 @@ describe("Modal pattern", () => {
       ref.current?.showModal();
       ref.current?.close();
 
-      expect(onClose).toHaveBeenCalledTimes(1);
+      // A browser fires `close` as a queued task, not inside close().
+      await vi.waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     });
 
     /*
@@ -202,7 +203,7 @@ describe("Modal pattern", () => {
       be told apart from a dismissal closes with a return value, which the
       platform records on the dialog.
     */
-    it("carries a close return value to the consumer", () => {
+    it("carries a close return value to the consumer", async () => {
       const returnValues: string[] = [];
       const ref = createRef<HTMLDialogElement>();
       render(
@@ -219,7 +220,7 @@ describe("Modal pattern", () => {
       ref.current?.showModal();
       ref.current?.close("confirm");
 
-      expect(returnValues).toEqual(["confirm"]);
+      await vi.waitFor(() => expect(returnValues).toEqual(["confirm"]));
     });
 
     /*

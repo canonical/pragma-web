@@ -10,7 +10,12 @@ import type { MenuItem } from "./types.js";
 
 // Mock only the leaf positioning hook; the navigation tree runs for real so
 // composition is genuinely exercised.
-vi.mock("../useWindowFitment/index.js");
+// An explicit factory: browser mode cannot automock a module that re-exports
+// with `export *`.
+vi.mock("../useWindowFitment/index.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../useWindowFitment/index.js")>()),
+  useWindowFitment: vi.fn(),
+}));
 
 const menu: MenuItem = {
   key: "menu",

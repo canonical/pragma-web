@@ -1,9 +1,7 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Accordion from "./Accordion.js";
+import itemStylesheet from "./common/Item/styles.css?raw";
 
 describe("Accordion", () => {
   it("renders with children", () => {
@@ -107,15 +105,7 @@ describe("Accordion.Item styles contract: header surface stepping", () => {
   // built surfaces modifier exposes no ghost hover/active channel, so the
   // component itself must re-point its hover/active tokens at the layered
   // state tokens per surface nesting depth (the OnSurfaces story regression).
-  const stylesheet = readFileSync(
-    join(
-      dirname(fileURLToPath(import.meta.url)),
-      "common",
-      "Item",
-      "styles.css",
-    ),
-    "utf-8",
-  )
+  const stylesheet = itemStylesheet
     // Normalise formatting so assertions survive line wrapping.
     .replace(/\s+/g, " ")
     .replace(/\( /g, "(")

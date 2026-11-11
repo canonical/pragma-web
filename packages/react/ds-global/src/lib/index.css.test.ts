@@ -1,7 +1,5 @@
-import { readdirSync, readFileSync } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import indexCss from "./index.css?raw";
 
 /**
  * `index.css` is the one file a consumer links to get every component's CSS.
@@ -17,25 +15,19 @@ import { describe, expect, it } from "vitest";
  * to let the two disagree.
  */
 
-// `path.dirname(fileURLToPath(import.meta.url))` and not `new URL(".", …)`:
-// the tests run in jsdom, whose global `URL` is not Node's, and resolving a
-// relative reference through it loses the `file:` scheme.
-const libDir = path.dirname(fileURLToPath(import.meta.url));
-
-/** Every `styles.css` under `src/lib`, as a path relative to `src/lib`. */
-const stylesheetsOnDisk = readdirSync(libDir, { recursive: true })
-  .map((entry) => String(entry).split(path.sep).join("/"))
-  // `rel === "styles.css"` catches a sheet placed directly at `src/lib`,
-  // whose relative path carries no separator; none exists today, and the day
-  // one does the list must still name it.
-  .filter((rel) => rel === "styles.css" || rel.endsWith("/styles.css"));
+/**
+ * Every `styles.css` under `src/lib`, as a path relative to `src/lib`. The
+ * tests run in a browser, so the file system is read through Vite's glob
+ * import, which lists the matching files when the test is transformed.
+ */
+const stylesheetsOnDisk = Object.keys(
+  import.meta.glob("./**/styles.css", { query: "?raw" }),
+).map((key) => key.replace(/^\.\//, ""));
 
 /** The paths `index.css` imports, in the order it imports them. */
-const imported = [
-  ...readFileSync(path.join(libDir, "index.css"), "utf8").matchAll(
-    /^@import url\("\.\/(.+?)"\);$/gm,
-  ),
-].map(([, importPath]) => importPath);
+const imported = [...indexCss.matchAll(/^@import url\("\.\/(.+?)"\);$/gm)].map(
+  ([, importPath]) => importPath,
+);
 
 describe("index.css lists every component stylesheet", () => {
   it("finds the stylesheets it is meant to compare against", () => {

@@ -19,7 +19,7 @@
     "src/**/*.tests.tsx",
     "src/storybook",
     "vite.config.ts",
-    "vitest.setup.ts",
+    "vitest.setup.browser.ts",
     ".storybook"
   ]
 }
