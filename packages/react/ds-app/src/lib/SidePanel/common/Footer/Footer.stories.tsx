@@ -4,7 +4,6 @@ import { fn } from "storybook/test";
 // The parts read the panel's shared tokens (inline padding, gaps, border),
 // which the panel's own stylesheet declares.
 import "../../styles.css";
-import * as panelViewport from "../../../../storybook/sidePanel/viewport.js";
 import Component from "./Footer.js";
 
 const meta = {
@@ -13,25 +12,16 @@ const meta = {
   parameters: {
     // The part alone, edge to edge: nothing in the snapshot but the part.
     layout: "fullscreen",
-    // Shown and captured at the panel's width, which decides where it wraps.
-    ...panelViewport.parameters,
     docs: {
       // The consumer composes the sections on a `SidePanel`, so serve the
       // consumer-facing snippet explicitly instead of the story's own source.
       source: { type: "code", language: "tsx" },
     },
   },
-  globals: panelViewport.globals,
 } satisfies Meta<typeof Component>;
 
 export default meta;
 
-/**
- * Actions align to the start edge, and the primary action comes first —
- * markup order is screen order. Only the confirming action is
- * `constructive`: the modifier means "this creates or confirms", so a green
- * Cancel would misread.
- */
 export const Default: StoryFn = () => (
   <Component>
     <Button importance="primary" anticipation="constructive" onClick={fn()}>
@@ -47,32 +37,6 @@ Default.parameters = {
   <Button importance="primary" anticipation="constructive">
     Subscribe
   </Button>
-  <Button>Cancel</Button>
-</SidePanel.Footer>`,
-    },
-  },
-};
-
-/** More actions than fit on one line wrap rather than overflow. */
-export const Wrapping: StoryFn = () => (
-  <Component>
-    <Button importance="primary" anticipation="constructive" onClick={fn()}>
-      Save and apply
-    </Button>
-    <Button onClick={fn()}>Save as draft</Button>
-    <Button onClick={fn()}>Reset to defaults</Button>
-    <Button onClick={fn()}>Cancel</Button>
-  </Component>
-);
-Wrapping.parameters = {
-  docs: {
-    source: {
-      code: `<SidePanel.Footer>
-  <Button importance="primary" anticipation="constructive">
-    Save and apply
-  </Button>
-  <Button>Save as draft</Button>
-  <Button>Reset to defaults</Button>
   <Button>Cancel</Button>
 </SidePanel.Footer>`,
     },

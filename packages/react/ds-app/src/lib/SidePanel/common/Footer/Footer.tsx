@@ -10,7 +10,9 @@ const componentCssClassName = "ds side-panel-footer";
  * reachable.
  *
  * Actions line up at the inline-start edge. Render the primary action first —
- * markup order is screen order.
+ * markup order is screen order. Actions that do not fit on one line wrap
+ * onto the next rather than overflow the panel, as is shown on the "Wrapping Actions"
+ * story of the sidepanel.
  *
  * @implements ds:apps.subcomponent.side_panel-footer
  */
