@@ -1,0 +1,138 @@
+/* Layer: ds.components.apps-portal (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.apps-portal {
+  /* component variables
+      --prompt-input-color-background: background color of the textarea
+      --prompt-input-color-border: color of the rule under the textarea
+      --prompt-input-padding: space between the textarea edge and its content
+      --prompt-input-actions-offset: space between the actions row and the
+        textarea's bottom and inline-end edges
+      --prompt-input-actions-height: room reserved at the bottom of the
+        textarea for the actions row
+      --prompt-input-color-placeholder: color of the hint shown while empty
+      --prompt-input-line-height: line height of the prompt and its hint
+  */
+  .ds.prompt-input {
+    --prompt-input-color-background: var(--color-foreground-input);
+    --prompt-input-color-border: var(--color-border);
+    --prompt-input-padding: var(--dimension-200);
+    --prompt-input-actions-offset: var(--dimension-100);
+    --prompt-input-actions-height: calc(
+      var(--dimension-400) +
+      var(--dimension-100)
+    );
+    --prompt-input-color-placeholder: var(--color-text-muted);
+    --prompt-input-line-height: var(--form-input-line-height);
+
+    position: relative;
+
+    /* The textarea is the grey box; the actions sit inside it. */
+    > .prompt {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: calc(
+        2lh +
+        var(--prompt-input-padding) +
+        var(--prompt-input-actions-offset) +
+        var(--prompt-input-actions-height)
+      );
+      height: auto;
+      padding-block: var(--prompt-input-padding)
+        calc(
+          var(--prompt-input-actions-offset) +
+          var(--prompt-input-actions-height)
+        );
+      padding-inline: var(--prompt-input-padding);
+      border: none;
+      border-block-end: var(--dimension-stroke-thickness-thin, 1px) solid
+        var(--prompt-input-color-border);
+      border-radius: 0;
+      background-color: var(--prompt-input-color-background);
+      line-height: var(--prompt-input-line-height);
+      resize: none;
+
+      &::placeholder {
+        color: var(--prompt-input-color-placeholder);
+      }
+    }
+
+    /* With a compact hint, the overlay replaces the native placeholder. */
+    &:has(> .placeholder) > .prompt::placeholder {
+      color: transparent;
+    }
+
+    /* The hidden long hint would otherwise overflow and show a scrollbar. */
+    &:has(> .placeholder) > .prompt:placeholder-shown {
+      overflow: hidden;
+    }
+
+    /* Sits exactly over the textarea's text, so it must share its metrics. */
+    > .placeholder {
+      container-type: inline-size;
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline: 0;
+      box-sizing: border-box;
+      padding: var(--prompt-input-padding);
+      color: var(--prompt-input-color-placeholder);
+      font-family: var(--typography-text-primary-font-family);
+      font-size: var(--form-input-font-size);
+      line-height: var(--prompt-input-line-height);
+      white-space: pre-line;
+      pointer-events: none;
+
+      > .compact {
+        display: none;
+      }
+
+      @container (width < 30rem) {
+        > .full {
+          display: none;
+        }
+
+        > .compact {
+          display: block;
+        }
+      }
+    }
+
+    > .prompt:not(:placeholder-shown) ~ .placeholder {
+      display: none;
+    }
+
+    > .actions {
+      position: absolute;
+      inset-block-end: var(--prompt-input-actions-offset);
+      inset-inline: var(--prompt-input-padding)
+        var(--prompt-input-actions-offset);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--dimension-200);
+      /* Let clicks on the empty part of the row reach the textarea. */
+      pointer-events: none;
+
+      > * {
+        pointer-events: auto;
+      }
+    }
+
+    /* The suggestions hang under the field, over the content that follows. */
+    > .ds.prompt-input-suggestions {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      z-index: var(--z-index-overlay, 100);
+    }
+
+    /* The submit button is icon-only, so it is a square. */
+    .ds.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: var(--dimension-400);
+      block-size: var(--dimension-400);
+      padding: 0;
+    }
+  }
+}

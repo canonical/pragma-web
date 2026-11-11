@@ -20,3 +20,6 @@
 @layer ds.components.apps-portal;
 
 @import url("./Button/styles.css");
+@import url("./PromptInput/common/DeepThinkingToggle/styles.css");
+@import url("./PromptInput/common/Suggestions/styles.css");
+@import url("./PromptInput/styles.css");

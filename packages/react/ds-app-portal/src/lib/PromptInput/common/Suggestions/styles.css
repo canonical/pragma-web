@@ -1,0 +1,84 @@
+/* Layer: ds.components.apps-portal (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.apps-portal {
+  /* component variables
+      --prompt-input-suggestions-color-background: background of the list
+      --prompt-input-suggestions-color-divider: rule between groups and rows
+      --prompt-input-suggestions-color-label: color of the group headings
+      --prompt-input-suggestions-color-option-active: background of the
+        hovered or highlighted row
+      --prompt-input-suggestions-label-width: width of the headings column
+  */
+  .ds.prompt-input-suggestions {
+    --prompt-input-suggestions-color-background: var(--color-background);
+    --prompt-input-suggestions-color-divider: var(--color-border-muted);
+    --prompt-input-suggestions-color-label: var(--color-text-muted);
+    --prompt-input-suggestions-color-option-active: var(
+      --color-foreground-ghost-hover
+    );
+    --prompt-input-suggestions-label-width: 13rem;
+
+    background-color: var(--prompt-input-suggestions-color-background);
+    box-shadow:
+      0 1px 1px 0 rgba(0, 0, 0, 0.15),
+      0 2px 2px -1px rgba(0, 0, 0, 0.15),
+      0 0 3px 0 rgba(0, 0, 0, 0.2);
+
+    > .group {
+      display: grid;
+      grid-template-columns: var(--prompt-input-suggestions-label-width) minmax(
+          0,
+          1fr
+        );
+      padding: var(--dimension-100) var(--dimension-200);
+
+      & + .group {
+        border-block-start: var(--dimension-stroke-thickness-thin, 1px) solid
+          var(--prompt-input-suggestions-color-divider);
+      }
+    }
+
+    .label {
+      padding-block: var(--dimension-100);
+      color: var(--prompt-input-suggestions-color-label);
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+      padding: var(--dimension-100);
+      cursor: pointer;
+
+      & + .option {
+        border-block-start: var(--dimension-stroke-thickness-thin, 1px) solid
+          var(--prompt-input-suggestions-color-divider);
+      }
+
+      &:hover,
+      &[aria-selected="true"] {
+        background-color: var(--prompt-input-suggestions-color-option-active);
+      }
+
+      > .icon {
+        display: inline-flex;
+        flex: none;
+      }
+
+      > .text {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      > .tags {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        gap: var(--dimension-100);
+      }
+    }
+  }
+}
