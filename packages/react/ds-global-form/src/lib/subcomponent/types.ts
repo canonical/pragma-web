@@ -20,6 +20,12 @@ export type Option = {
    * technology pronounce it correctly.
    */
   lang?: string;
+  /**
+   * Advisory text about the option, which SelectInput renders as the native
+   * `<option title>`. Browsers show it as a tooltip on hover only, so it must
+   * not carry anything the user needs to choose: put that in the label.
+   */
+  title?: string;
 };
 
 export type OptionsProps = {
