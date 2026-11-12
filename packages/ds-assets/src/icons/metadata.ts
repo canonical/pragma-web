@@ -723,6 +723,21 @@ export const ICON_METADATA: Readonly<Record<IconName, IconMetadata>> = {
     ],
     categories: ["action"],
   },
+  "edit-off": {
+    tags: [
+      "pencil",
+      "off",
+      "disable",
+      "read only",
+      "read-only",
+      "view only",
+      "not editable",
+      "no editing",
+    ],
+    categories: ["action"],
+    description:
+      "A pencil struck through: editing is turned off or not allowed.",
+  },
   email: {
     tags: [
       "mail",
