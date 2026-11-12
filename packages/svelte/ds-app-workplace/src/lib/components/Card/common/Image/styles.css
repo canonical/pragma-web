@@ -1,0 +1,7 @@
+@layer ds.components.apps-workplace {
+  .ds.card-image {
+    display: block;
+    height: auto;
+    width: 100%;
+  }
+}

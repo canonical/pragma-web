@@ -5,7 +5,7 @@
 /packages/svelte/                    @canonical/pragma
 
 /packages/svelte/ds-app-launchpad/   @canonical/launchpad-ui  @canonical/pragma
-/packages/svelte/ds-app-wpe/         @canonical/workplace-engineering-ui  @canonical/pragma
+/packages/svelte/ds-app-workplace/         @canonical/workplace-engineering-ui  @canonical/pragma
 
 /packages/svelte/ssr-test/    @canonical/launchpad-ui  @canonical/workplace-engineering-ui  @canonical/pragma
 /configs/typescript-svelte/   @canonical/launchpad-ui  @canonical/workplace-engineering-ui  @canonical/pragma
