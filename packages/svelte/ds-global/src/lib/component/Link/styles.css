@@ -1,0 +1,18 @@
+@layer ds.components.global {
+  .ds.link {
+    text-decoration: none;
+    color: var(--color-text-link);
+
+    &:visited {
+      color: var(--color-text-link-visited);
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &.soft {
+      color: inherit;
+    }
+  }
+}
