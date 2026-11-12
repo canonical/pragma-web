@@ -1,4 +1,5 @@
 @import url("@canonical/styles");
+@import url("@canonical/react-ds-global-form/dist/esm/index.css");
 
 :root {
   /* For debug */

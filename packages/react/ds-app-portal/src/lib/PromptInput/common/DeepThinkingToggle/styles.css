@@ -1,0 +1,13 @@
+/* Layer: ds.components.apps-portal (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.apps-portal {
+  .ds.deep-thinking-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dimension-100);
+
+    > label {
+      cursor: pointer;
+    }
+  }
+}
