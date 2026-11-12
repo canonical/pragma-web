@@ -32,6 +32,22 @@ describe("Accordion", () => {
     );
     expect(screen.getByTestId("test-accordion")).toBeInTheDocument();
   });
+
+  it("accepts conditional items and fragments", () => {
+    const showSecond: boolean = false;
+    render(
+      <Accordion>
+        <>
+          <Accordion.Item heading="First">First content</Accordion.Item>
+        </>
+        {showSecond && (
+          <Accordion.Item heading="Second">Second content</Accordion.Item>
+        )}
+      </Accordion>,
+    );
+    expect(screen.getByText("First")).toBeInTheDocument();
+    expect(screen.queryByText("Second")).not.toBeInTheDocument();
+  });
 });
 
 describe("Accordion.Item", () => {

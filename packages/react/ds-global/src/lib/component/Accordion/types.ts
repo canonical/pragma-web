@@ -1,11 +1,13 @@
-import type { ComponentProps, ReactElement } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 import type { ItemProps } from "./common/Item/types.js";
 
 type OwnProps = {
   /**
-   * Accordion.Item elements to render
+   * Accordion.Item elements to render. Typed as `ReactNode` so conditional
+   * items (`{cond && <Accordion.Item />}`) and fragments are accepted; the
+   * Accordion renders them as given.
    */
-  children: ReactElement<ItemProps> | ReactElement<ItemProps>[];
+  children: ReactNode;
 };
 
 /**
