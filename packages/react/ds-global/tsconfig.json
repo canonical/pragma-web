@@ -17,6 +17,6 @@
     ".storybook/*.ts",
     ".storybook/*.tsx",
     "vite.config.ts",
-    "vitest.setup.ts"
+    "vitest.setup.browser.ts"
   ]
 }

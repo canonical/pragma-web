@@ -33,8 +33,9 @@ const Button = ({
   const hasVisibleChildren =
     children != null && typeof children !== "boolean" && children !== "";
 
+  // `process.env.NODE_ENV` is left bare for the bundler to replace: a
+  // `typeof process` guard is never replaced, and in a browser it is false.
   if (
-    typeof process !== "undefined" &&
     process.env.NODE_ENV !== "production" &&
     (icon || loading) &&
     !hasVisibleChildren &&

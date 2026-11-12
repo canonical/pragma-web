@@ -8,8 +8,16 @@ import {
 } from "../useWindowFitment/index.js";
 import { useDisclosure } from "./index.js";
 
-vi.mock("../useDelayedToggle/index.js");
-vi.mock("../useWindowFitment/index.js");
+// Explicit factories: browser mode cannot automock a module that re-exports
+// with `export *`.
+vi.mock("../useDelayedToggle/index.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../useDelayedToggle/index.js")>()),
+  useDelayedToggle: vi.fn(),
+}));
+vi.mock("../useWindowFitment/index.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../useWindowFitment/index.js")>()),
+  useWindowFitment: vi.fn(),
+}));
 
 describe("useDisclosure", () => {
   const mockTargetRef = { current: document.createElement("div") };
