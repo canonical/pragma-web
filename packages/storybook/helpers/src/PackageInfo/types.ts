@@ -1,7 +1,7 @@
 /**
  * Design system tier levels ordered from foundational to specialized.
  */
-export type Tier = "global" | "global_form" | "apps" | "apps_wpe";
+export type Tier = "global" | "global_form" | "apps" | "apps_workplace";
 
 /**
  * Supported UI frameworks.

@@ -1438,8 +1438,8 @@
         "svelte": "^5.47.1",
       },
     },
-    "packages/svelte/ds-app-wpe": {
-      "name": "@canonical/svelte-ds-app-wpe",
+    "packages/svelte/ds-app-workplace": {
+      "name": "@canonical/svelte-ds-app-workplace",
       "version": "0.45.0",
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
@@ -1720,7 +1720,7 @@
 
     "@canonical/svelte-ds-app-launchpad": ["@canonical/svelte-ds-app-launchpad@workspace:packages/svelte/ds-app-launchpad"],
 
-    "@canonical/svelte-ds-app-wpe": ["@canonical/svelte-ds-app-wpe@workspace:packages/svelte/ds-app-wpe"],
+    "@canonical/svelte-ds-app-workplace": ["@canonical/svelte-ds-app-workplace@workspace:packages/svelte/ds-app-wpe"],
 
     "@canonical/svelte-ds-global": ["@canonical/svelte-ds-global@workspace:packages/svelte/ds-global"],
 
@@ -3956,7 +3956,7 @@
 
     "@canonical/svelte-ds-app-launchpad/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
-    "@canonical/svelte-ds-app-wpe/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
+    "@canonical/svelte-ds-app-workplace/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@canonical/svelte-ds-global/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 

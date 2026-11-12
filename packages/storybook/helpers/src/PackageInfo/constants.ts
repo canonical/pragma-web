@@ -7,7 +7,7 @@ export const TIER_LABELS: Record<Tier, string> = {
   global: "Global",
   global_form: "Global Form",
   apps: "Apps",
-  apps_wpe: "Apps WPE",
+  apps_workplace: "Apps Workplace",
 };
 
 /**
@@ -17,7 +17,7 @@ export const TIER_DESCRIPTIONS: Record<Tier, string> = {
   global: "Universal components for all products",
   global_form: "Form-specific components and patterns",
   apps: "Application-level components",
-  apps_wpe: "WordPress Engine specific components",
+  apps_workplace: "Workplace specific components",
 };
 
 /**

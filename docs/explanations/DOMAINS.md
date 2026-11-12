@@ -73,7 +73,7 @@ What does not belong: anything a React consumer would also want. Shared logic go
 | `svelte/ds-global` | `@canonical/svelte-ds-global` | same |
 | `svelte/ds-app` | `@canonical/svelte-ds-app` | same |
 | `svelte/ds-app-launchpad` | `@canonical/svelte-ds-app-launchpad` | same |
-| `svelte/ds-app-wpe` | `@canonical/svelte-ds-app-wpe` | same |
+| `svelte/ds-app-workplace` | `@canonical/svelte-ds-app-workplace` | same |
 | `svelte/ssr-test` | `@canonical/svelte-ssr-test` | same |
 
 ## `packages/lit`: The Web Components Implementation

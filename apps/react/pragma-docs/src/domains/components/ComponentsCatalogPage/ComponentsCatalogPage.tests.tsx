@@ -60,12 +60,12 @@ const pageTwoResponse = {
           node: {
             __typename: "Component",
             tier: {
-              name: "Apps/WorkplaceEngineering",
-              uri: "ds:apps_workplaceengineering",
+              name: "Apps/Workplace",
+              uri: "ds:apps_workplace",
             },
-            uri: "ds:apps_workplaceengineering.component.theme_switcher",
+            uri: "ds:apps_workplace.component.theme_switcher",
             _meta: {
-              curie: "ds:apps_workplaceengineering.component.theme_switcher",
+              curie: "ds:apps_workplace.component.theme_switcher",
             },
             name: "ThemeSwitcher",
             summary: "",
