@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -144,21 +145,25 @@ export const computeArrowOffset = (
   return { axis, offset: clampedOffset };
 };
 
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+const DEFAULT_PREFERRED_DIRECTIONS: readonly (
+  | WindowFitmentSide
+  | WindowFitmentPlacement
+)[] = ["block-start", "block-end", "inline-start", "inline-end"];
+
 const useWindowFitment = <
   TTarget extends HTMLElement = HTMLElement,
   TPopup extends HTMLElement = HTMLDivElement,
 >({
-  preferredDirections = [
-    "block-start",
-    "block-end",
-    "inline-start",
-    "inline-end",
-  ],
+  preferredDirections = DEFAULT_PREFERRED_DIRECTIONS,
   distance = "0px",
   gutter = "0px",
   maxWidth = "350px",
   resizeDelay = 150,
   scrollDelay = 150,
+  isOpen,
   onBestPositionChange,
   autoFit = false,
   direction: directionProp,
@@ -170,13 +175,27 @@ const useWindowFitment = <
   const targetRef = useRef<TTarget | null>(null);
   const popupRef = useRef<TPopup | null>(null);
   const prevBestPosition = useRef<BestPosition | undefined>(undefined);
+  // Track the committed DOM elements from `targetRef`/`popupRef` in state so
+  // ref attachment/detachment (e.g. deferred portals or conditional popups)
+  // triggers `useResizeObserver` and `bestPosition` even when rects are 0×0.
+  const [targetElement, setTargetElement] = useState<TTarget | null>(null);
+  const [popupElement, setPopupElement] = useState<TPopup | null>(null);
   // Bumped when the anchored element's `dir` flips with no layout change, so the
   // logical→physical resolution re-runs (see the MutationObserver effect below).
   const [dirVersion, setDirVersion] = useState(0);
 
   const windowDimensions = useWindowDimensions({ resizeDelay, scrollDelay });
-  const targetSize = useResizeObserver(targetRef?.current);
-  const popupSize = useResizeObserver(popupRef?.current);
+  const targetSize = useResizeObserver(targetElement);
+  const popupSize = useResizeObserver(popupElement);
+
+  useIsomorphicLayoutEffect(() => {
+    if (targetElement !== targetRef.current) {
+      setTargetElement(targetRef.current);
+    }
+    if (popupElement !== popupRef.current) {
+      setPopupElement(popupRef.current);
+    }
+  });
 
   /** The distance, in pixels, between the target and the popup. */
   const distanceAsPixelsNumber = useMemo(
@@ -425,25 +444,26 @@ const useWindowFitment = <
   );
 
   /** The best possible position for the popup. */
-  // biome-ignore lint/correctness/useExhaustiveDependencies: dirVersion is a deliberate re-resolution trigger — the memo reads document.documentElement.dir (not tracked by React), and the <html dir> MutationObserver bumps dirVersion to force a re-read.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dirVersion and isOpen are deliberate re-resolution triggers — the memo reads document.documentElement.dir and live DOM rects (not tracked by React).
   const bestPosition: BestPosition | undefined = useMemo(() => {
     if (
       !isServer &&
-      targetRef.current &&
-      popupRef.current &&
+      targetElement &&
+      popupElement &&
       windowDimensions &&
       popupSize &&
       targetSize
     ) {
       // Resolve logical → physical BEFORE findBestPosition so positionName stays
       // a physical direction. The direction is the `direction` override if given,
-      // else the document's <html dir>. Re-runs on resize/scroll/content (deps)
-      // and on an <html dir> flip (dirVersion, from the observer below).
+      // else the document's <html dir>. Re-runs on resize/scroll/content (deps),
+      // on ref attachment or open-state changes (targetElement, popupElement,
+      // isOpen), and on an <html dir> flip (dirVersion, from the observer below).
       const dir = directionProp ?? readHtmlDirection();
       const physical = placements.map((p) => resolveLogicalPlacement(p, dir));
       return findBestPosition(
-        targetRef.current.getBoundingClientRect(),
-        popupRef.current.getBoundingClientRect(),
+        targetElement.getBoundingClientRect(),
+        popupElement.getBoundingClientRect(),
         physical,
       );
     }
@@ -453,9 +473,12 @@ const useWindowFitment = <
     windowDimensions,
     popupSize,
     targetSize,
+    targetElement,
+    popupElement,
     isServer,
     directionProp,
     dirVersion,
+    isOpen,
   ]);
 
   // Re-resolve when the document's <html dir> flips (a language toggle) with no
@@ -479,8 +502,8 @@ const useWindowFitment = <
     if (
       isServer ||
       !bestPosition ||
-      !targetRef.current ||
-      !popupRef.current ||
+      !targetElement ||
+      !popupElement ||
       !targetSize ||
       !popupSize
     )
@@ -497,12 +520,19 @@ const useWindowFitment = <
     } as DOMRect;
     return computeArrowOffset(
       bestPosition.positionName,
-      targetRef.current.getBoundingClientRect(),
+      targetElement.getBoundingClientRect(),
       popupRect,
       // Authoritative placement — avoids the one-frame lag of the live popup rect.
       bestPosition.position,
     );
-  }, [bestPosition, isServer, targetSize, popupSize]);
+  }, [
+    bestPosition,
+    isServer,
+    targetElement,
+    popupElement,
+    targetSize,
+    popupSize,
+  ]);
 
   /** Notify the consumer when the best position changes. */
   useEffect(() => {
