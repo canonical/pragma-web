@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
+
+### Bug Fixes
+
+* **deps:** bumps pragma-core to v0.44.0 ([#1531](https://github.com/canonical/pragma-web/issues/1531)) ([e9552b2](https://github.com/canonical/pragma-web/commit/e9552b221e5e0f8cbac3aaca468685aca73fc75d))
+* **react-ds-global:** raise Tooltip above overlay-tier surfaces ([#1471](https://github.com/canonical/pragma-web/issues/1471)) ([cb3608e](https://github.com/canonical/pragma-web/commit/cb3608ec4e0f81d59fff556376a4956bd63afcd7))
+* **react-ds-global:** use the typography.text.primary composite token for the Button label ([#1486](https://github.com/canonical/pragma-web/issues/1486)) ([0eb4e09](https://github.com/canonical/pragma-web/commit/0eb4e094ccf3fae14a1de7d0a5ac75de0eb47c09))
+
+
 # [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
 
 ### Bug Fixes

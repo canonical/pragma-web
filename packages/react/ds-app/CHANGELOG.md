@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.46.0](https://github.com/canonical/pragma-web/compare/v0.45.0...v0.46.0) (2026-11-13)
+
+### Bug Fixes
+
+* **deps:** bumps pragma-core to v0.44.0 ([#1531](https://github.com/canonical/pragma-web/issues/1531)) ([e9552b2](https://github.com/canonical/pragma-web/commit/e9552b221e5e0f8cbac3aaca468685aca73fc75d))
+
+### Features
+
+* **ds-app:** SidePanel overflow lines via scroll-driven CSS, JavaScript as fallback ([#1483](https://github.com/canonical/pragma-web/issues/1483)) ([fed63c8](https://github.com/canonical/pragma-web/commit/fed63c865cdab787c548a985a7e26d7e089b11aa))
+
+
 # [0.45.0](https://github.com/canonical/pragma-web/compare/v0.44.1...v0.45.0) (2026-10-23)
 
 ### Features
