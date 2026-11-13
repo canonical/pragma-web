@@ -68,6 +68,7 @@
     "@canonical/ds-types": "^0.46.0",
     "@canonical/storybook-config": "^0.46.0",
     "@canonical/storybook-helpers": "^0.46.0",
+    "@canonical/svelte-icons": "^0.1.0",
     "@canonical/svelte-ssr-test": "^0.46.0",
     "@canonical/typescript-config-svelte": "^0.46.0",
     "@canonical/webarchitect": "0.44.0",
@@ -88,6 +89,7 @@
     "vitest-browser-svelte": "^3.0.0"
   },
   "peerDependencies": {
+    "@canonical/svelte-icons": "^0.1.0",
     "svelte": "^5.47.1"
   },
   "nx": {
