@@ -13,7 +13,7 @@
     max-inline-size: 100%;
   }
 
-  .ds.tabs > .tabs-list {
+  .ds.tabs > .list {
     display: flex;
     gap: 0;
     overflow-x: auto;
@@ -23,11 +23,11 @@
     border-block-end: var(--tabs-border-width) solid var(--color-border-muted);
   }
 
-  .ds.tabs > .tabs-list > .tabs-item {
+  .ds.tabs > .list > .item {
     display: flex;
     flex-shrink: 0;
 
-    > .tabs-link {
+    > .link {
       display: inline-flex;
       align-items: center;
       box-sizing: border-box;
@@ -46,22 +46,22 @@
       }
     }
 
-    &:not([data-active], [data-inert], [data-disabled]) > .tabs-link:hover {
+    &:not([data-active], [data-inert], [data-disabled]) > .link:hover {
       border-block-end-color: var(--color-border-muted);
     }
 
-    &[data-active] > .tabs-link {
+    &[data-active] > .link {
       border-block-end-color: var(--color-border-highlighted);
     }
 
-    &:is([data-inert], [data-disabled]) > .tabs-link {
+    &:is([data-inert], [data-disabled]) > .link {
       color: var(--color-text-muted);
       cursor: default;
     }
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .ds.tabs > .tabs-list > .tabs-item > .tabs-link {
+    .ds.tabs > .list > .item > .link {
       transition: border-block-end-color var(--motion-duration-fast, 100ms)
         var(--motion-easing-standard, ease-out);
     }

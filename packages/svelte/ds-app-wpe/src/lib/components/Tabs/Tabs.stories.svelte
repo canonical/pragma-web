@@ -19,6 +19,11 @@
       "aria-label": "Directory sections",
       navigationRoot,
       currentUrl: "#people",
+      onclick(event) {
+        if (event.target instanceof Element) {
+          event.target.closest("a")?.setAttribute("target", "_self");
+        }
+      },
     },
     parameters: {
       docs: {

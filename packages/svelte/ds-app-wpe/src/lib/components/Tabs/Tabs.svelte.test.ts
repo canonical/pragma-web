@@ -64,8 +64,10 @@ describe("Tabs component", () => {
 
   it("renders unavailable sections without links or tab stops", async () => {
     const page = await render(Tabs, props);
-    const disabled = page.getByText("Archived");
+    const disabled = page.getByRole("link", { name: "Archived" });
     await expect.element(disabled).toHaveAttribute("aria-disabled", "true");
+    await expect.element(disabled).not.toHaveAttribute("href");
+    await expect.element(disabled).not.toHaveAttribute("tabindex");
     expect(disabled.element().tagName).toBe("SPAN");
     expect(page.getByText("Coming soon").element().tagName).toBe("SPAN");
   });

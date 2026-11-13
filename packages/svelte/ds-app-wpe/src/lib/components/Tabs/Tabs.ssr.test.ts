@@ -9,7 +9,7 @@ const props = {
     key: "directory",
     label: "Root",
     items: [
-      { url: "/directory", label: "People" },
+      { url: "/directory", label: "People", class: "custom-item" },
       { url: "/teams", label: "Teams" },
       { key: "soon", label: "Coming soon" },
       { url: "/archived", label: "Archived", disabled: true },
@@ -46,10 +46,14 @@ describe("Tabs SSR", () => {
   it("renders inert and disabled items without a destination", () => {
     const page = render(Tabs, { props });
     expect(page.getByText("Coming soon").tagName).toBe("SPAN");
-    expect(page.getByText("Archived").getAttribute("aria-disabled")).toBe(
-      "true",
-    );
+    expect(page.getByText("Coming soon").hasAttribute("role")).toBe(false);
+    expect(
+      page
+        .getByRole("link", { name: "Archived" })
+        .getAttribute("aria-disabled"),
+    ).toBe("true");
     expect(page.getByText("Archived").hasAttribute("href")).toBe(false);
+    expect(page.getByText("Archived").hasAttribute("tabindex")).toBe(false);
   });
 
   it("forwards classes and native navigation attributes", () => {
@@ -62,6 +66,12 @@ describe("Tabs SSR", () => {
       },
     });
     const nav = page.getByRole("navigation", { name: "Directory sections" });
+    expect(nav.querySelectorAll(":scope > .list > .item > .link")).toHaveLength(
+      4,
+    );
+    expect(nav.querySelector("li")?.classList.contains("custom-item")).toBe(
+      true,
+    );
     expect(nav.classList.contains("custom")).toBe(true);
     expect(nav.id).toBe("sections");
     expect(nav.querySelector("ul")?.classList.contains("custom-list")).toBe(
