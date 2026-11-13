@@ -66,7 +66,7 @@ const ContextItemContent = ({
  * embeds via `SideNavigation`'s `contextSwitcher` prop slot, its region
  * class owning the collapsed-rail hide.
  *
- * @implements ds:apps.subcomponent.side-navigation-context-switcher
+ * @implements ds:apps.subcomponent.side_navigation-context_switcher
  */
 const ContextSwitcher = ({
   title,

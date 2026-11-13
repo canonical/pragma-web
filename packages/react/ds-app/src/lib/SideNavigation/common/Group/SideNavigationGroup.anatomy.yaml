@@ -5,7 +5,7 @@
 # but ItemExpandable's OWN children may not (enforced by the LeafNavItem /
 # ExpandableNavItem type split, not the anatomy DSL).
 node:
-  uri: apps.subcomponent.side-navigation-group
+  uri: apps.subcomponent.side_navigation-group
   styles:
     layout.type: stack
     layout.direction: column
@@ -13,7 +13,7 @@ node:
     spacing.padding.vertical: dimension/100 dimension/200
   edges:
     - node:
-        uri: apps.subcomponent.side-navigation-group-header
+        uri: apps.subcomponent.side_navigation-group_header
       relation:
         cardinality: "0..1"
         slotName: header
@@ -24,8 +24,8 @@ node:
           cases:
             # Links, plain labels and expandable disclosures only —
             # interactive action rows are Footer's job.
-            - uri: apps.subcomponent.side-navigation-item
-            - uri: apps.subcomponent.side-navigation-item-expandable
+            - uri: apps.subcomponent.side_navigation-item
+            - uri: apps.subcomponent.side_navigation-item_expandable
             - uri: $custom
       relation:
         cardinality: "0..*"

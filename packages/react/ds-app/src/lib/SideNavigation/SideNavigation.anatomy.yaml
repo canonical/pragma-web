@@ -11,7 +11,7 @@
 # does not currently express (no per-state edge visibility); left as a
 # structural note rather than encoded here.
 node:
-  uri: apps.pattern.side-navigation
+  uri: apps.component.side_navigation
   styles:
     layout.type: stack
     layout.direction: column
@@ -22,22 +22,22 @@ node:
     appearance.background: color/foreground/navigation/primary
   edges:
     - node:
-        uri: apps.subcomponent.side-navigation-header
+        uri: apps.subcomponent.side_navigation-header
       relation:
         cardinality: "1"
         slotName: header
     - node:
-        uri: apps.subcomponent.side-navigation-context-switcher
+        uri: apps.subcomponent.side_navigation-context_switcher
       relation:
         cardinality: "0..1"
         slotName: context-switcher
     - node:
-        uri: apps.subcomponent.side-navigation-content
+        uri: apps.subcomponent.side_navigation-content
       relation:
         cardinality: "1"
         slotName: default
     - node:
-        uri: apps.subcomponent.side-navigation-footer
+        uri: apps.subcomponent.side_navigation-footer
       relation:
         cardinality: "0..1"
         slotName: footer

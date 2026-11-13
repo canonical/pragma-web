@@ -72,7 +72,7 @@ const FooterRow = ({
  * the content tree uses). A certificate-user application, for instance,
  * composes the `certificate` icon and omits the logout item itself.
  *
- * @implements ds:apps.subcomponent.side-navigation-footer
+ * @implements ds:apps.subcomponent.side_navigation-footer
  */
 const Footer = ({
   className,
