@@ -144,13 +144,28 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
+      # The tag's tree is what gets published, but the release tooling must
+      # come from this workflow's own commit: a tag cut before an action existed
+      # or changed would otherwise run missing or stale tooling (the v0.45.0 /
+      # v0.46.0 recovery failed exactly so). Checked out untracked beside the
+      # tag, which lerna's clean-tree check (`git describe --dirty`) ignores;
+      # non-cone so no root files land in the workspace.
+      - name: Checkout release tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          path: .release-tooling
+          sparse-checkout: /.github/actions/
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
       - name: Publish packages
-        uses: ./.github/actions/npm-publish
+        uses: ./.release-tooling/.github/actions/npm-publish
         with:
           version: ${{ env.VERSION }}
 
       - name: Create GitHub Release with artifacts
-        uses: ./.github/actions/github-release
+        uses: ./.release-tooling/.github/actions/github-release
         env:
           GH_TOKEN: ${{ github.token }}
         with:
