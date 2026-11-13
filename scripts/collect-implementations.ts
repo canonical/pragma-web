@@ -229,8 +229,15 @@ async function collectPackage(
 	const cwd = pkg.path;
 	const librarySlug = slugify(config.name);
 
-	// Scan for annotations
-	const annotations = await scanAnnotations(config.pattern, cwd);
+	// Scan for annotations. Story and test files may carry @implements
+	// annotations (Storybook CSF meta, test descriptions), but a story or a
+	// test is not an implementation: the package must export the component
+	// for it to count. They are skipped so a stories-only folder does not
+	// make the graph report a block as implemented.
+	const nonSource = /\.(stories|tests?)\.[a-z]+$/;
+	const annotations = (await scanAnnotations(config.pattern, cwd)).filter(
+		ann => !nonSource.test(ann.filePath),
+	);
 
 	// Filter to valid prefix
 	const validAnnotations = annotations.filter(
