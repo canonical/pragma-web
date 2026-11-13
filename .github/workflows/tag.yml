@@ -14,6 +14,11 @@ on:
           - "beta"
           - "rc"
           - "stable"
+      force_publish:
+        description: "Bump and publish every package, changed or not. Use to re-release after a failed publish when nothing changed since the stranded tag."
+        default: false
+        required: false
+        type: boolean
       publish_version:
         description: "Recovery only: publish this existing release (e.g. 0.45.0, no 'v') without building or bumping. Leave empty for a normal release."
         default: ""
@@ -110,6 +115,7 @@ jobs:
         uses: ./.github/actions/lerna-version
         with:
           release_type: ${{ github.event.inputs.release_type }}
+          force_publish: ${{ github.event.inputs.force_publish }}
 
   publish:
     name: Publish packages
