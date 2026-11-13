@@ -15,9 +15,10 @@
   :root {
     /*
       design-tokens 0.8.1 ships no `size/*` token, so this is a literal.
+      The default panel width (465px).
       TODO: replace with a token when one exists.
     */
-    --side-panel-inline-size: 33.5rem;
+    --side-panel-inline-size: 465px;
     /*
       ...and no `shadow/*` token either. The shadow is what separates the panel
       from the live page, so unlike a modal we cannot drop it.
