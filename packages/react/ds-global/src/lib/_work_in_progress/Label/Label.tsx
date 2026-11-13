@@ -10,7 +10,7 @@ const componentCssClassName = "ds label";
  * visualization. While it has similar visual properties to the Chip, it is
  * purely informational and does not trigger actions or allow for removal.
  *
- * @implements ds:global.component.label
+ * @implements ds:global.component.tag
  */
 const Label = ({
   children,

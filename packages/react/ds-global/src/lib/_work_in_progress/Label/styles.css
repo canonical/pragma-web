@@ -3,7 +3,7 @@
 @layer ds.components.global {
   /**
    * Label styles
-   * @implements ds:global.component.label
+   * @implements ds:global.component.tag
    *
    * DSL anatomy mapping:
    * - layout.display: inline -> display: inline

@@ -41,7 +41,7 @@ type OwnProps = {
 /**
  * Props for the Label component
  *
- * @implements ds:global.component.label
+ * @implements ds:global.component.tag
  *
  * Anatomy (from DSL):
  * - layout.display: inline
