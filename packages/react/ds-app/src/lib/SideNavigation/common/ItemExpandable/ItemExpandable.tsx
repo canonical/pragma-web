@@ -24,7 +24,7 @@ const componentCssClassName = "ds side-navigation-item-expandable";
  * among the `children` collapses the disclosure. The content tree does not
  * opt in: its branch stays open so the active row remains visible.
  *
- * @implements ds:apps.subcomponent.side-navigation-item-expandable
+ * @implements ds:apps.subcomponent.side_navigation-item_expandable
  */
 const ItemExpandable = ({
   heading,

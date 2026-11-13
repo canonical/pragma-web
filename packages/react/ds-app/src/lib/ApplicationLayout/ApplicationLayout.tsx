@@ -12,6 +12,8 @@ const componentCssClassName = "ds application-layout";
  * Divides the viewport between a leading navigation rail (named slot,
  * `min-content`) and the main content area (default slot, `1fr`), per the
  * ontology instance `apps.layout.application_layout`.
+ *
+ * @implements ds:apps.layout.application_layout
  */
 const ApplicationLayout = ({
   className,

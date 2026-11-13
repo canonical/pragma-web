@@ -108,17 +108,17 @@ them by hand.
 
 | Component                    | URI                                              | File |
 |------------------------------|--------------------------------------------------|------|
-| `SideNavigation`             | `apps.pattern.side-navigation`               | [SideNavigation.anatomy.yaml](./SideNavigation.anatomy.yaml) |
-| `SideNavigation.Header`      | `apps.subcomponent.side-navigation-header`     | [SideNavigationHeader.anatomy.yaml](./common/Header/SideNavigationHeader.anatomy.yaml) |
-| `SideNavigation.Content`     | `apps.subcomponent.side-navigation-content`    | [SideNavigationContent.anatomy.yaml](./common/Content/SideNavigationContent.anatomy.yaml) |
-| `SideNavigation.Footer`      | `apps.subcomponent.side-navigation-footer`     | [SideNavigationFooter.anatomy.yaml](./common/Footer/SideNavigationFooter.anatomy.yaml) |
-| `SideNavigation.CollapseToggle` | `apps.subcomponent.side-navigation-collapse-toggle` | [SideNavigationCollapseToggle.anatomy.yaml](./common/CollapseToggle/SideNavigationCollapseToggle.anatomy.yaml) |
-| `SideNavigation.ContextSwitcher` | `apps.subcomponent.side-navigation-context-switcher` | [SideNavigationContextSwitcher.anatomy.yaml](./common/ContextSwitcher/SideNavigationContextSwitcher.anatomy.yaml) |
-| `SideNavigation.Group`       | `apps.subcomponent.side-navigation-group`      | [SideNavigationGroup.anatomy.yaml](./common/Group/SideNavigationGroup.anatomy.yaml) |
-| `SideNavigation.GroupHeader` | `apps.subcomponent.side-navigation-group-header` | [SideNavigationGroupHeader.anatomy.yaml](./common/GroupHeader/SideNavigationGroupHeader.anatomy.yaml) |
-| `SideNavigation.Item`        | `apps.subcomponent.side-navigation-item`       | [SideNavigationItem.anatomy.yaml](./common/Item/SideNavigationItem.anatomy.yaml) |
-| `SideNavigation.ItemButton`  | `apps.subcomponent.side-navigation-item-button` | [SideNavigationItemButton.anatomy.yaml](./common/ItemButton/SideNavigationItemButton.anatomy.yaml) |
-| `SideNavigation.ItemExpandable` | `apps.subcomponent.side-navigation-item-expandable` | [SideNavigationItemExpandable.anatomy.yaml](./common/ItemExpandable/SideNavigationItemExpandable.anatomy.yaml) |
+| `SideNavigation`             | `apps.component.side_navigation`               | [SideNavigation.anatomy.yaml](./SideNavigation.anatomy.yaml) |
+| `SideNavigation.Header`      | `apps.subcomponent.side_navigation-header`     | [SideNavigationHeader.anatomy.yaml](./common/Header/SideNavigationHeader.anatomy.yaml) |
+| `SideNavigation.Content`     | `apps.subcomponent.side_navigation-content`    | [SideNavigationContent.anatomy.yaml](./common/Content/SideNavigationContent.anatomy.yaml) |
+| `SideNavigation.Footer`      | `apps.subcomponent.side_navigation-footer`     | [SideNavigationFooter.anatomy.yaml](./common/Footer/SideNavigationFooter.anatomy.yaml) |
+| `SideNavigation.CollapseToggle` | `apps.subcomponent.side_navigation-collapse_toggle` | [SideNavigationCollapseToggle.anatomy.yaml](./common/CollapseToggle/SideNavigationCollapseToggle.anatomy.yaml) |
+| `SideNavigation.ContextSwitcher` | `apps.subcomponent.side_navigation-context_switcher` | [SideNavigationContextSwitcher.anatomy.yaml](./common/ContextSwitcher/SideNavigationContextSwitcher.anatomy.yaml) |
+| `SideNavigation.Group`       | `apps.subcomponent.side_navigation-group`      | [SideNavigationGroup.anatomy.yaml](./common/Group/SideNavigationGroup.anatomy.yaml) |
+| `SideNavigation.GroupHeader` | `apps.subcomponent.side_navigation-group_header` | [SideNavigationGroupHeader.anatomy.yaml](./common/GroupHeader/SideNavigationGroupHeader.anatomy.yaml) |
+| `SideNavigation.Item`        | `apps.subcomponent.side_navigation-item`       | [SideNavigationItem.anatomy.yaml](./common/Item/SideNavigationItem.anatomy.yaml) |
+| `SideNavigation.ItemButton`  | `apps.subcomponent.side_navigation-item_button` | [SideNavigationItemButton.anatomy.yaml](./common/ItemButton/SideNavigationItemButton.anatomy.yaml) |
+| `SideNavigation.ItemExpandable` | `apps.subcomponent.side_navigation-item_expandable` | [SideNavigationItemExpandable.anatomy.yaml](./common/ItemExpandable/SideNavigationItemExpandable.anatomy.yaml) |
 
 `GroupHeader` is a semantic divider — it carries no tooltip and has no
 standalone interactive story; its rendering is covered by the grouped
