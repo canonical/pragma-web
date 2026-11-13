@@ -1,0 +1,69 @@
+@layer ds.components.apps-workplaceengineering {
+  :root {
+    --tabs-border-width: var(--dimension-stroke-thickness-medium, 1px);
+    --tabs-item-border-width: var(--dimension-stroke-thickness-large, 3px);
+    --tabs-item-padding-inline: var(--dimension-200, 16px);
+    --tabs-item-padding-block: var(--dimension-150, 12px);
+    --tabs-item-min-block-size: calc(var(--baseline-height, 8px) * 5);
+  }
+
+  .ds.tabs {
+    display: block;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  .ds.tabs > .list {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-end: var(--tabs-border-width) solid var(--color-border-muted);
+  }
+
+  .ds.tabs > .list > .item {
+    display: flex;
+    flex-shrink: 0;
+
+    > .link {
+      display: inline-flex;
+      align-items: center;
+      box-sizing: border-box;
+      min-block-size: var(--tabs-item-min-block-size);
+      padding-block: var(--tabs-item-padding-block);
+      padding-inline: var(--tabs-item-padding-inline);
+      color: var(--surface-color-text, var(--color-text));
+      font: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+      border-block-end: var(--tabs-item-border-width) solid transparent;
+
+      &:focus-visible {
+        outline: var(--tabs-item-border-width) solid var(--color-focus-ring);
+        outline-offset: calc(-1 * var(--tabs-item-border-width));
+      }
+    }
+
+    &:not([data-active], [data-inert], [data-disabled]) > .link:hover {
+      border-block-end-color: var(--color-border-muted);
+    }
+
+    &[data-active] > .link {
+      border-block-end-color: var(--color-border-highlighted);
+    }
+
+    &:is([data-inert], [data-disabled]) > .link {
+      color: var(--color-text-muted);
+      cursor: default;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ds.tabs > .list > .item > .link {
+      transition: border-block-end-color var(--motion-duration-fast, 100ms)
+        var(--motion-easing-standard, ease-out);
+    }
+  }
+}

@@ -3,3 +3,4 @@ export * from "./Card/index.js";
 export * from "./Example/index.js";
 export * from "./KeyboardKey/index.js";
 export * from "./Section/index.js";
+export * from "./Tabs/index.js";
