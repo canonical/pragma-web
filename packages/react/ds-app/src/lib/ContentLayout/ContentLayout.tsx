@@ -14,6 +14,8 @@ const componentCssClassName = "ds content-layout";
  * fixed-responsive breakpoint columns by default, or the intrinsic
  * (fluid auto-fill) grid via `grid="intrinsic"`. Children are grid items;
  * span them via `grid-column`/`grid-row` where a card needs more room.
+ *
+ * @implements ds:apps.layout.content_layout
  */
 const ContentLayout = ({
   className,

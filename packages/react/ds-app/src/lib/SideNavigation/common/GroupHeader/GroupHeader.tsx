@@ -9,7 +9,7 @@ const componentCssClassName = "ds side-navigation-group-header";
  * SideNavigation.Group's entries. Purely presentational; rendered by Group
  * when its `label` is set.
  *
- * @implements ds:apps.subcomponent.side-navigation-group-header
+ * @implements ds:apps.subcomponent.side_navigation-group_header
  */
 const GroupHeader = ({
   children,

@@ -9,7 +9,7 @@
 # The shell grows past the viewport (min-height), so the page scrolls rather than
 # this region: overflow is vertical-only as a safety valve, never horizontal.
 node:
-  uri: apps.subcomponent.side-navigation-content
+  uri: apps.subcomponent.side_navigation-content
   styles:
     layout.type: stack
     layout.direction: column
@@ -27,10 +27,10 @@ node:
             # groups MUST be the mandatory collapsible "Help" item (an
             # ItemExpandable containing at least one external link).
             - node:
-                uri: apps.subcomponent.side-navigation-group
+                uri: apps.subcomponent.side_navigation-group
                 edges:
                   - node:
-                      uri: apps.subcomponent.side-navigation-group-header
+                      uri: apps.subcomponent.side_navigation-group_header
                     relation:
                       cardinality: "0..1"
                       slotName: header
@@ -41,8 +41,8 @@ node:
                         cases:
                           # Links, plain labels and expandable disclosures
                           # only — interactive action rows are Footer's job.
-                          - uri: apps.subcomponent.side-navigation-item
-                          - uri: apps.subcomponent.side-navigation-item-expandable
+                          - uri: apps.subcomponent.side_navigation-item
+                          - uri: apps.subcomponent.side_navigation-item_expandable
                           - uri: $custom
                     relation:
                       cardinality: "0..*"

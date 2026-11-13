@@ -14,7 +14,7 @@ const componentCssClassName = "ds side-navigation-content";
  * and may be overridden by the consumer; with no `root`, the landmark
  * renders empty (the landmark contract stays stable).
  *
- * @implements ds:apps.subcomponent.side-navigation-content
+ * @implements ds:apps.subcomponent.side_navigation-content
  */
 const Content = ({
   className,

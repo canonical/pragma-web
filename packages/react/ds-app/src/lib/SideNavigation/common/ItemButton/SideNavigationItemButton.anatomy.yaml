@@ -5,7 +5,7 @@
 # lives in a SideNavigation.Footer (rendered from a `control: "button"`
 # footer item or composed via the Footer's children).
 node:
-  uri: apps.subcomponent.side-navigation-item-button
+  uri: apps.subcomponent.side_navigation-item_button
   styles:
     layout.type: stack
     layout.direction: column
