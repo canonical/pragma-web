@@ -29,7 +29,23 @@ import adapterResolved from "../../src/adapter.css?inline";
 import adapterCss from "../../src/adapter.css?raw";
 import elementsCss from "../../src/elements.css?raw";
 import layersCss from "../../src/layers.css?raw";
+import textSizeCss from "../../src/text-size.css?raw";
 import type { MediaEmulation } from "../../vite.config.js";
+import rcCustomSelect from "./react-components/custom-select.scss?inline";
+import rcMultiSelect from "./react-components/multi-select.scss?inline";
+import rcPrefixedInput from "./react-components/prefixed-input.scss?inline";
+
+/**
+ * What @canonical/react-components compiles about text size, on Vanilla 4.61:
+ * one stylesheet per component, as the package compiles them.
+ */
+export const reactComponentsCss = [
+  rcMultiSelect,
+  rcCustomSelect,
+  rcPrefixedInput,
+]
+  .map((css) => css.replace(/@charset\s+"[^"]*";/, ""))
+  .join("\n");
 
 /** The Vanilla releases the fixtures run against: the sites' pin and the latest. */
 export const VANILLA_VERSIONS = ["4.56", "4.61"] as const;
@@ -204,6 +220,17 @@ const withoutStatement = (css: string): string =>
   css.replace(/@layer[^{;]*;/, "");
 
 /**
+ * adapter.css without the text-size rules it imports into `vanilla`, as it
+ * would ship without them: the comparison that isolates what they change.
+ */
+const withoutTextSize = (css: string): string => {
+  const block = textSizeCss.trim();
+  if (!css.includes(block))
+    throw new Error("adapter.css does not inline text-size.css verbatim");
+  return css.replace(block, "");
+};
+
+/**
  * The mixed page: layers, Vanilla in its layer, then pragma's CSS as a mixed
  * page loads it. `adapter` places adapter.css before or after the component
  * sheets, or leaves it out: then the page still loads tokens.css, layout.css
@@ -230,21 +257,37 @@ export const mixedPage = (
      * adapter would ship if the import were removed.
      */
     statement?: "linked" | "self" | "none";
+    /** `false` strips the text-size rules adapter.css carries. */
+    textSize?: boolean;
+    /** Sheets in the layer that holds Vanilla, after Vanilla and before
+     * pragma's entry, where a bundler can put CSS that components import from
+     * JavaScript. */
+    afterVanilla?: string[];
+    /** The same, after pragma's entry, which a bundler can do as well. */
+    afterPragma?: string[];
   } = {},
 ): PageSpec => {
   const adapter = options.adapter ?? "after";
   const statement = options.statement ?? "linked";
+  const shipped =
+    options.textSize === false
+      ? withoutTextSize(adapterResolved)
+      : adapterResolved;
   const adapterCssText =
-    statement === "none" ? withoutStatement(adapterResolved) : adapterResolved;
+    statement === "none" ? withoutStatement(shipped) : shipped;
+  const inVanilla = (sheets: string[] = []) =>
+    sheets.map((css) => `@layer vanilla{${css}}`);
   const styles = [
     ...(options.before ?? []),
     ...(statement === "linked" ? [layersCss] : []),
     vanillaCss[vanilla],
+    ...inVanilla(options.afterVanilla),
   ];
   if (adapter === "none")
     styles.push(tokensCss, layoutCss, elementsCss, COMPONENT_CSS);
   else if (adapter === "before") styles.push(adapterCssText, COMPONENT_CSS);
   else styles.push(COMPONENT_CSS, adapterCssText);
+  styles.push(...inVanilla(options.afterPragma));
   return {
     root: options.root ?? "app comfortable light",
     styles,
@@ -535,6 +578,56 @@ export const vanillaImportantReach = (version: VanillaVersion): string[] => {
   return [...found].sort();
 };
 
+/** A selector list split into its selectors, commas inside parentheses kept. */
+export const selectorsOf = (selectorText: string): string[] =>
+  selectorText
+    .split(/,\s*(?![^()]*\))/)
+    .map((selector) => selector.trim())
+    .filter(Boolean);
+
+/** A style rule that declares `font-size`, in document order. */
+export interface FontSizeRule {
+  selectors: string[];
+  value: string;
+  /** The condition of every enclosing media rule, outermost first. */
+  media: string[];
+}
+
+/**
+ * Every style rule in a stylesheet text that declares `font-size`, at any
+ * depth, in document order and as the CSSOM serialises it. Read from the
+ * compiled build for Vanilla, so that a release adding a rule at the default
+ * size is a test failure rather than a size left behind.
+ */
+export const fontSizeRules = (css: string): FontSizeRule[] => {
+  const found: FontSizeRule[] = [];
+  const walk = (rules: CSSRuleList, media: string[]): void => {
+    for (const rule of rules) {
+      if (rule instanceof CSSStyleRule) {
+        const value = rule.style.getPropertyValue("font-size");
+        if (value)
+          found.push({
+            selectors: selectorsOf(rule.selectorText),
+            value,
+            media,
+          });
+      }
+      const children = childRules(rule);
+      if (children)
+        walk(
+          children,
+          rule instanceof CSSMediaRule ? [...media, rule.conditionText] : media,
+        );
+    }
+  };
+  walk(parse(css).cssRules, []);
+  return found;
+};
+
+/** Vanilla's rules that declare `font-size`, from the compiled build. */
+export const vanillaFontSizeRules = (version: VanillaVersion): FontSizeRule[] =>
+  fontSizeRules(vanillaCss[version]);
+
 export {
   adapterCss,
   elementsCss,
@@ -543,5 +636,6 @@ export {
   parse,
   pragmaElementsCss,
   stylesCss,
+  textSizeCss,
   tokensCss,
 };
