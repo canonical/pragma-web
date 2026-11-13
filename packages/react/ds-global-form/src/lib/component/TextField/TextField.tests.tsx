@@ -23,6 +23,13 @@ describe("TextField", () => {
     });
   });
 
+  it("points the field label's htmlFor at the input", () => {
+    renderWithForm(<TextField name="username" label="Username" />);
+    const input = screen.getByRole("textbox");
+    const label = screen.getByText("Username").closest("label");
+    expect(label).toHaveAttribute("for", input.id);
+  });
+
   it("accepts user input", () => {
     renderWithForm(<TextField name="username" />);
     const input = screen.getByRole("textbox");
