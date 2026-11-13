@@ -26,7 +26,7 @@
     "check": "bun run check:ttl",
     "check:fix": "bun run check:ttl",
     "check:ttl": "bun scripts/validate-ttl.ts",
-    "test": "bun run check:ttl",
+    "test": "bun run check:ttl && bun test ../../../scripts/collect-implementations.test.ts",
     "prepack": "rm -rf data && cp -r ../../../data data"
   },
   "devDependencies": {
