@@ -6,6 +6,7 @@ import type { DateTimeFieldProps } from "./types.js";
 /**
  * DateTime input bound to react-hook-form, wrapped with field chrome
  * (label, description, error) and middleware/conditional-display support.
+ * Helper text (description) sits under the input by default.
  *
  * `import { DateTimeField } from "@canonical/react-ds-global-form";`
  *
@@ -13,4 +14,5 @@ import type { DateTimeFieldProps } from "./types.js";
  */
 export default withWrapper<DateTimeFieldProps>(
   bindField<DateTimeFieldProps>(DateTimeInput, "native"),
+  { descriptionPosition: "trailing" },
 );

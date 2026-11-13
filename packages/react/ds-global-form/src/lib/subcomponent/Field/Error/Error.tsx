@@ -1,4 +1,6 @@
 /* @canonical/generator-ds 0.9.0-experimental.9 */
+
+import { Icon } from "@canonical/react-ds-global";
 import type React from "react";
 import type { ErrorProps } from "./types.js";
 import "./styles.css";
@@ -21,11 +23,12 @@ const FieldError = ({
     <p
       id={id}
       style={style}
-      className={[componentCssClassName, "p", className]
-        .filter(Boolean)
-        .join(" ")}
+      className={[componentCssClassName, className].filter(Boolean).join(" ")}
       role="alert"
     >
+      {/* Decorative: the alert role already announces the message, so the
+          icon adds no information a screen reader needs. */}
+      <Icon icon="error" />
       {children}
     </p>
   );

@@ -3,6 +3,10 @@
 @layer ds.components.global {
   .ds.field-description {
     color: var(--form-description-color);
+    font-size: var(--form-description-font-size);
+    font-weight: var(--form-description-font-weight);
+    line-height: var(--form-description-line-height);
+    letter-spacing: var(--form-description-letter-spacing);
     /* Align to the field edge like the label (no side padding by default), not
      * to the input's inner padding. Overridable via the shared variable. */
     padding-inline: var(--form-label-padding-inline, 0);

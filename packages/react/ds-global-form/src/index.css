@@ -121,6 +121,10 @@
 
     --form-input-background: var(--color-foreground-input);
     --form-input-color: var(--color-text);
+    /* Mask text (the native date/time segments and separators) reads the muted
+     * token while the input is empty; a real value restores --form-input-color.
+     * See the date/datetime sheets for the WebKit segment selectors. */
+    --form-input-color-mask: var(--color-text-muted);
     --form-input-font-size: var(--typography-text-primary-font-size);
     --form-input-line-height: var(--typography-text-primary-line-height);
 
@@ -140,15 +144,30 @@
 
     /* ── Description ────────────────────────────────────────────────── */
 
-    /* Description reads the SECONDARY type ramp (design review): it is subordinate
-       supporting text, so it takes the smaller secondary size, not the primary
-       body size. Colour is already the muted token. */
+    /* Subordinate supporting text: reads the SECONDARY type ramp. */
     --form-description-font-size: var(--typography-text-secondary-font-size);
+    --form-description-font-weight: var(
+      --typography-text-secondary-font-weight
+    );
+    --form-description-line-height: var(
+      --typography-text-secondary-line-height-dimension
+    );
+    --form-description-letter-spacing: var(
+      --typography-text-secondary-letter-spacing
+    );
     --form-description-color: var(--color-text-muted);
 
     /* ── Error ──────────────────────────────────────────────────────── */
 
-    --form-error-font-size: var(--typography-text-primary-font-size);
+    /* Status message: reads the SECONDARY type ramp like the description. */
+    --form-error-font-size: var(--typography-text-secondary-font-size);
+    --form-error-font-weight: var(--typography-text-secondary-font-weight);
+    --form-error-line-height: var(
+      --typography-text-secondary-line-height-dimension
+    );
+    --form-error-letter-spacing: var(
+      --typography-text-secondary-letter-spacing
+    );
     --form-error-color: var(--modifier-color-text, var(--color-text-error));
 
     /* ── State colors ───────────────────────────────────────────────── */
@@ -160,7 +179,7 @@
     /* Design review (15/07): a disabled control shows no border. Default the
      * disabled border to transparent; a theme wanting a visible disabled border
      * can still override this token (e.g. back to `--disabled--color-border`). */
-    --form-input-border-color-disabled: transparent;
+    --form-input-border-color-disabled: var(--color-border-disabled);
 
     /* ── Focus ring ─────────────────────────────────────────────────── */
 
@@ -313,11 +332,7 @@
      * carry the disabled affordance instead. */
     &:disabled,
     &:has(input:disabled) {
-      border-color: var(--form-input-border-color-disabled);
-      border-top-color: var(--form-input-border-color-disabled);
-      border-right-color: var(--form-input-border-color-disabled);
       border-bottom-color: var(--form-input-border-color-disabled);
-      border-left-color: var(--form-input-border-color-disabled);
       background-color: var(--form-input-background-disabled);
       color: var(--form-input-color-disabled);
       cursor: not-allowed;

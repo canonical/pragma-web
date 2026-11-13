@@ -16,6 +16,22 @@
       display: none;
     }
 
+    &,
+    &::-webkit-datetime-edit-text,
+    &::-webkit-datetime-edit-month-field,
+    &::-webkit-datetime-edit-day-field,
+    &::-webkit-datetime-edit-year-field {
+      color: var(--form-input-color-mask);
+    }
+
+    &:valid,
+    &:valid::-webkit-datetime-edit-text,
+    &:valid::-webkit-datetime-edit-month-field,
+    &:valid::-webkit-datetime-edit-day-field,
+    &:valid::-webkit-datetime-edit-year-field {
+      color: var(--form-input-color);
+    }
+
     /* NOTE (design review) — two native-<input type="date"> limits parked for Diana:
      * 1. "Suggested" format text → muted: NOT implementable in pure CSS. No
      *    placeholder attribute (so `:placeholder-shown` never matches), and
