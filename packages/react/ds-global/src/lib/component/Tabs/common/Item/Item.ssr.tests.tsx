@@ -14,4 +14,17 @@ describe("Tabs Item SSR", () => {
     expect(html).toContain('aria-current="page"');
     expect(html).toContain("A");
   });
+
+  it("renders the slot after the label", () => {
+    const html = renderToString(
+      <ul>
+        <Item
+          item={{ url: "/a", label: "A", slot: <b>3</b> }}
+          active={false}
+          LinkComponent="a"
+        />
+      </ul>,
+    );
+    expect(html).toContain('A<span class="slot"><b>3</b></span></a>');
+  });
 });

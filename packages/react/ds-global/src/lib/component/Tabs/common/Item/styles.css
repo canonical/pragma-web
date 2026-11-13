@@ -20,6 +20,8 @@
     --tabs-tab-min-block-size: calc(var(--baseline-height) * 5);
     --tabs-tab-focus-ring-width: var(--dimension-strokeThickness-large, 2px);
     --tabs-tab-focus-ring-color: var(--color-focus-ring);
+    /* Space between the label and the trailing slot (badge, spinner). */
+    --tabs-tab-slot-gap: var(--space-100); /* 8px */
   }
 
   .ds.tabs-item {
@@ -29,6 +31,7 @@
   .ds.tabs-item .tabs-link {
     display: inline-flex;
     align-items: center;
+    column-gap: var(--tabs-tab-slot-gap);
     box-sizing: border-box;
     /* Baseline-snapped block size; vertical padding kept to baseline units so the
        label's line box centres on the grid. */
@@ -52,6 +55,13 @@
       outline: var(--tabs-tab-focus-ring-width) solid
         var(--tabs-tab-focus-ring-color);
       outline-offset: calc(-1 * var(--tabs-tab-focus-ring-width));
+    }
+
+    /* Trailing slot (badge, spinner): sits after the label without shrinking. */
+    > .slot {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
     }
   }
 

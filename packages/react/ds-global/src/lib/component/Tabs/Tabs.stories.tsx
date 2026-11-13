@@ -10,6 +10,8 @@ import {
   HashLink,
   withHashRouter,
 } from "../../../storybook/tabs/story-utils.js";
+import { Spinner } from "../../subcomponent/Spinner/index.js";
+import { Badge } from "../Badge/index.js";
 import Component from "./Tabs.js";
 
 const meta = {
@@ -41,6 +43,34 @@ export const Default: Story = {
 export const WithInertTab: Story = {
   args: {
     navigationRoot: productTabsWithInertRoot,
+    currentUrl: "#/overview",
+  },
+};
+
+/**
+ * Each tab item can carry a `slot`: trailing content rendered after its plain
+ * text `label`, inside the tab — here a count `Badge` and a loading `Spinner`.
+ */
+export const WithSlots: Story = {
+  args: {
+    navigationRoot: {
+      key: "machine-tabs-slots-root",
+      label: "Machine sections",
+      items: [
+        { url: "#/overview", label: "Overview" },
+        {
+          url: "#/alerts",
+          label: "Alerts",
+          slot: <Badge value={12} criticality="warning" />,
+        },
+        {
+          url: "#/packages",
+          label: "Packages",
+          slot: <Spinner aria-label="Loading packages" />,
+        },
+        { url: "#/activities", label: "Activities", slot: <Badge value={3} /> },
+      ],
+    },
     currentUrl: "#/overview",
   },
 };
