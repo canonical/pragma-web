@@ -9,7 +9,7 @@ inputs:
     required: false
     default: "v"
   force_publish:
-    description: "'true' bumps every package, changed or not (lerna --force-publish). Default 'false'."
+    description: "'true' bumps every package, changed or not. Default 'false'."
     required: false
     default: "false"
 outputs:
