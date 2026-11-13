@@ -1,0 +1,14 @@
+# docket watches every issue, pull request and discussion in this repository,
+# measures how long each has waited for its next reply, review or close, and
+# who owes it. Settings live here for the team's practice, and in the personal
+# file `~/.config/docket/docket.yaml` for which repositories to watch and
+# what describes the person running docket. `docket config` reports both.
+version: 1
+# The people are grouped only where the automatic classification is wrong:
+# a bot account is a bot, a member of the organisation is internal, and
+# anyone else is external. The `team` group is the members of the pragma
+# team, the CODEOWNERS of this repository's design-system packages.
+people:
+  advl: team
+  potentialwook: team
+  stavropouloskonstantinoss: team
