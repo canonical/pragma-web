@@ -14,12 +14,20 @@ on:
           - "beta"
           - "rc"
           - "stable"
+      publish_version:
+        description: "Recovery only: publish this existing release (e.g. 0.45.0, no 'v') without building or bumping. Leave empty for a normal release."
+        default: ""
+        required: false
+        type: string
 env:
   MAIN_BRANCH: "refs/heads/main"
 
 jobs:
   build:
     name: Build
+    # Publish-only recovery skips the whole bump chain: check, test and version
+    # all need this job, so skipping it skips them.
+    if: inputs.publish_version == ''
     runs-on: ubuntu-latest
     steps:
       - name: Validate input
@@ -107,6 +115,13 @@ jobs:
     name: Publish packages
     runs-on: ubuntu-latest
     needs: version
+    # Runs after a successful bump, or alone to publish an existing tag that a
+    # failed publish left behind. `from-package` makes either case idempotent.
+    # The recovery path lives in this workflow, not a separate one, because npm
+    # trusted publishing is bound to the `tag.yml` filename.
+    if: ${{ !cancelled() && (needs.version.result == 'success' || inputs.publish_version != '') }}
+    env:
+      VERSION: ${{ inputs.publish_version || needs.version.outputs.VERSION }}
     # OIDC trusted publishing: GitHub mints a short-lived npm token at publish
     # time instead of using a long-lived NPM_AUTH_TOKEN secret.
     # contents:write lets the job create the GitHub Release for the tag.
@@ -117,7 +132,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: v${{ needs.version.outputs.VERSION }}
+          ref: v${{ env.VERSION }}
           fetch-depth: 0
 
       - name: Setup Environment
@@ -130,33 +145,13 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Publish packages
-        # `from-package` publishes exactly the public packages whose manifest
-        # version the registry does not have yet. So recovery from a partial
-        # publish is to re-run this job: it publishes only what is missing, and
-        # a re-run after a full publish is a no-op.
-        #
-        # Route pre-releases to a dist-tag named after their pre-release
-        # identifier (e.g. 0.30.0-experimental.1 -> "experimental") so they
-        # never take over npm's `latest`; stable releases go to `latest`.
-        env:
-          VERSION: ${{ needs.version.outputs.VERSION }}
-        run: |
-          if [[ -z "$VERSION" ]]; then
-            echo "Error: VERSION output from the version job is empty; refusing to publish."
-            exit 1
-          fi
-          if [[ "$VERSION" == *-* ]]; then
-            PRERELEASE="${VERSION#*-}"
-            DIST_TAG="${PRERELEASE%%.*}"
-          else
-            DIST_TAG="latest"
-          fi
-          echo "Publishing $VERSION to dist-tag '$DIST_TAG'"
-          lerna publish --yes --no-private --dist-tag "$DIST_TAG" from-package
+        uses: ./.github/actions/npm-publish
+        with:
+          version: ${{ env.VERSION }}
 
       - name: Create GitHub Release with artifacts
         uses: ./.github/actions/github-release
         env:
           GH_TOKEN: ${{ github.token }}
         with:
-          version: ${{ needs.version.outputs.VERSION }}
+          version: ${{ env.VERSION }}
