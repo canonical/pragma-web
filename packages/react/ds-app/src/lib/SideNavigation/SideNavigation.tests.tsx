@@ -160,9 +160,9 @@ describe("SideNavigation", () => {
   });
 
   it("keeps the footer's expandable sub-items in the DOM when collapsed", () => {
-    // Collapse is CSS-only: the popover degradation (styles.css) shows the
-    // sub-items, but the tree must render regardless so Tab navigation and
-    // the accessibility tree survive.
+    // Collapse is CSS-only, so the sub-items stay in the DOM. They are not
+    // reachable by Tab while their parent is collapsed: expanding the parent
+    // is what makes them reachable.
     const footerWithExpandable: FooterRoot = {
       key: "footer",
       items: [
@@ -179,7 +179,15 @@ describe("SideNavigation", () => {
         footerRoot={footerWithExpandable}
       />,
     );
-    expect(screen.getByRole("link", { name: "Profile" })).toBeInTheDocument();
+    // The closed <details> hides the sub-items (display: none), so the link
+    // is in the DOM but outside the accessibility tree: query the DOM.
+    const profile = document.querySelector('a[href="/profile"]');
+    expect(profile).toHaveTextContent("Profile");
+    expect(screen.queryByRole("link", { name: "Profile" })).toBeNull();
+
+    // Expanding the parent puts the sub-item back in reach.
+    fireEvent.click(screen.getByText("Account"));
+    expect(screen.getByRole("link", { name: "Profile" })).toBe(profile);
     expect(document.querySelector("details")).toBeInTheDocument();
   });
 
