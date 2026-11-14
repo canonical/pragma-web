@@ -1,6 +1,8 @@
 import { createDataViewsProvider } from "@canonical/dataviews-core";
-import buildPage from "./buildPage.js";
-import createManualSource from "./createManualSource.js";
+import {
+  buildPage,
+  createManualSource,
+} from "@canonical/dataviews-core/testing";
 import { MACHINE_CAPABILITIES, machines } from "./machines.js";
 import type {
   Machine,

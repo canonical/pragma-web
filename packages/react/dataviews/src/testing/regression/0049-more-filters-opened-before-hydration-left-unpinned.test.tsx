@@ -17,11 +17,11 @@ import {
   createMemoryLocation,
   declareCapabilities,
 } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, within } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
 import toggleDisclosure from "../../../testing/toggleDisclosure.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 

@@ -4,6 +4,7 @@
  * can be brought about on cue: a conflict, a rejection, an unreadable
  * record.
  */
+
 import {
   createArraySource,
   createCollection,
@@ -15,6 +16,10 @@ import {
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import {
+  buildStoredView,
+  createStandInPresentationStore,
+} from "@canonical/dataviews-core/testing";
+import {
   act,
   fireEvent,
   render,
@@ -24,9 +29,7 @@ import {
 } from "@testing-library/react";
 import { StrictMode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
-import buildStoredView from "../../../../../../testing/buildStoredView.js";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
-import { createStandInPresentationStore } from "../../../../../../testing/createStandInStores.js";
 import DataViews from "../../Provider.js";
 import SavedViews from "./SavedViews.js";
 

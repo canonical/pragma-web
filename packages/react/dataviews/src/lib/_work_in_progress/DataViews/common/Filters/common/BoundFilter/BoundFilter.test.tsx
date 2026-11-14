@@ -3,6 +3,7 @@
  * the native input the wire spells, the hint a facet offers, the clear
  * control and where focus goes after it, and typing as one history step.
  */
+
 import {
   createCollection,
   createDataViewsProvider,
@@ -11,10 +12,12 @@ import {
   type QueryLocation,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import {
+  createManualSource,
+  createRecordingLocation,
+} from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";

@@ -3,14 +3,15 @@
  * they read the same, so a result landing, a search or a new state with an
  * equal ordering re-renders nothing that lists them.
  */
+
 import {
   createMemoryLocation,
   type QueryLocation,
 } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../testing/buildPage.js";
 import renderInRoot from "../../../../../testing/renderInRoot.js";
 import useAppliedSort from "./useAppliedSort.js";
 

@@ -12,9 +12,9 @@ import {
   createDataViewsProvider,
   declareCapabilities,
 } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import createManualSource from "../../../testing/createManualSource.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
 
 type Row = { readonly id: string; readonly name: string };

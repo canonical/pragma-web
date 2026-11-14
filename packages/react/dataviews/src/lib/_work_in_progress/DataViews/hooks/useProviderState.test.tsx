@@ -3,16 +3,19 @@
  * root's own filter records and the sessions they type in, and the words
  * its parts speak.
  */
+
 import {
   createCollection,
   createDataViewsProvider,
   declareCapabilities,
   type QueryLocation,
 } from "@canonical/dataviews-core";
+import {
+  createManualSource,
+  createRecordingLocation,
+} from "@canonical/dataviews-core/testing";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
 import { findFilterHandle } from "../common/utils/index.js";
 import useProviderState from "./useProviderState.js";

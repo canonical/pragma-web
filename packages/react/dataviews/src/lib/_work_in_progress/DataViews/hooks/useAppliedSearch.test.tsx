@@ -2,10 +2,10 @@
  * The applied search text of a provider's state, so a result landing
  * re-renders no search box.
  */
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../testing/buildPage.js";
 import renderInRoot from "../../../../../testing/renderInRoot.js";
 import useAppliedSearch from "./useAppliedSearch.js";
 

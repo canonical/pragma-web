@@ -4,11 +4,11 @@
  * through, so two roots over one provider share the query and never a
  * half-typed input.
  */
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, type ReactNode, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../testing/buildMachine.js";
-import buildPage from "../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import { machines } from "../../../../testing/machines.js";
 import type { MachineProvider } from "../../../../testing/types.js";

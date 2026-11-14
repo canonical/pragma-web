@@ -11,10 +11,10 @@ import {
   type FurtherConjunct,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import createFakeChannel from "../../../../../../../../testing/createFakeChannel.js";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
 import expectNoAxeViolations from "../../../../../../../../testing/expectNoAxeViolations.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
 import DataViews from "../../../../Provider.js";

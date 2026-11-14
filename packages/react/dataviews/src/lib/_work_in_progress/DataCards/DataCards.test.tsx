@@ -4,13 +4,13 @@ import {
   type DataViewsProvider,
   type SourceDelivery,
 } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { createRef, useState } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import buildMachine from "../../../../testing/buildMachine.js";
-import buildPage from "../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../testing/createMachineProvider.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import { machines } from "../../../../testing/machines.js";

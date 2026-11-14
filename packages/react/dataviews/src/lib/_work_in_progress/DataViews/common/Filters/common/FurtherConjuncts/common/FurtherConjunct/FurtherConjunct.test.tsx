@@ -13,11 +13,11 @@ import {
   EMPTY_SLICE,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
-import createManualSource from "../../../../../../../../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../../../testing/fixtures.js";
 import DataViews from "../../../../../../Provider.js";
 import Filters from "../../../../Filters.js";

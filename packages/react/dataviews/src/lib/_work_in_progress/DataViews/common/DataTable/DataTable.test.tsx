@@ -3,10 +3,10 @@
  * provider. The table's own behaviour is pinned beside it; this pins the
  * binding, which is the whole of the part.
  */
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { DataTableColumn } from "../../../DataTable/index.js";
 import DataViews from "../../Provider.js";

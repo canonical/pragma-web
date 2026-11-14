@@ -14,6 +14,7 @@
  */
 
 import { declareCapabilities } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import {
   act,
   cleanup,
@@ -24,7 +25,6 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import buildMachine from "../../../testing/buildMachine.js";
-import buildPage from "../../../testing/buildPage.js";
 import createMachineProvider from "../../../testing/createMachineProvider.js";
 import { machines } from "../../../testing/machines.js";
 import { DataTable } from "../../lib/_work_in_progress/DataTable/index.js";

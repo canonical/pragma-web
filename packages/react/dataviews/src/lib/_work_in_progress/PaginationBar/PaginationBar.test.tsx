@@ -5,6 +5,7 @@
  * it itself: the source's first request exists once the bar has rendered,
  * and each case answers it by hand.
  */
+
 import {
   type Count,
   createMemoryLocation,
@@ -12,6 +13,7 @@ import {
   DEFAULT_WINDOW,
   declareCapabilities,
 } from "@canonical/dataviews-core";
+import type { ManualSource } from "@canonical/dataviews-core/testing";
 import type { LinkComponentProps } from "@canonical/react-ds-global";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { type ReactElement, StrictMode } from "react";
@@ -23,7 +25,6 @@ import type {
   Machine,
   MachineFields,
   MachineFixture,
-  ManualSource,
 } from "../../../../testing/types.js";
 import { DataViews } from "../DataViews/index.js";
 import PaginationBar from "./PaginationBar.js";

@@ -4,11 +4,12 @@
  * a passing state in silence, and the logical position a virtualized table
  * reports for it.
  */
+
 import type { DisplayStatus } from "@canonical/dataviews-core";
 import { DISPLAY_STATUS_PHASES } from "@canonical/dataviews-core/bindings";
+import { readDisplayStatus } from "@canonical/dataviews-core/testing";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import readDisplayStatus from "../../../../../../testing/readDisplayStatus.js";
 import StatusRow from "./StatusRow.js";
 
 /** The words the table would give a status: here, the status named. */

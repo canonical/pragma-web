@@ -4,6 +4,7 @@
  * collection's records; what it is handed is read-only and commands the
  * shared query.
  */
+
 import {
   type ActionRun,
   createCollection,
@@ -11,11 +12,11 @@ import {
   declareCapabilities,
   type SourceActionRunner,
 } from "@canonical/dataviews-core";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, renderHook } from "@testing-library/react";
 import { type ReactNode, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import createMachineProvider from "../../../../../testing/createMachineProvider.js";
-import createManualSource from "../../../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
 import { machines } from "../../../../../testing/machines.js";
 import type { MachineProvider } from "../../../../../testing/types.js";

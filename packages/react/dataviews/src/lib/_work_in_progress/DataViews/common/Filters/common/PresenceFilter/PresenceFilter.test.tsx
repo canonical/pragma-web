@@ -3,6 +3,7 @@
  * wire spells, the count beside it, and the control leaving with the last
  * restriction it removes.
  */
+
 import {
   type Count,
   createCollection,
@@ -11,9 +12,9 @@ import {
   declareCapabilities,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import createManualSource from "../../../../../../../../testing/createManualSource.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
 import { useDataViewsRoot } from "../../../../hooks/index.js";
 import DataViews from "../../../../Provider.js";

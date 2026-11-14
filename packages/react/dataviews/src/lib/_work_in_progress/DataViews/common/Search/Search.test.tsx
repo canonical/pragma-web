@@ -5,6 +5,7 @@
  * form the baseline submits. Each case is mutation-tested against that
  * contract.
  */
+
 import {
   createMemoryLocation,
   DEFAULT_WINDOW,
@@ -12,13 +13,15 @@ import {
   EMPTY_SLICE,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import {
+  buildPage,
+  createRecordingLocation,
+} from "@canonical/dataviews-core/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Profiler, StrictMode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
-import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
 import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
 import { machines } from "../../../../../../testing/machines.js";
 import type { MachineProvider } from "../../../../../../testing/types.js";

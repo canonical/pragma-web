@@ -1,8 +1,8 @@
 import type { SourceDelivery } from "@canonical/dataviews-core";
+import { buildPage } from "@canonical/dataviews-core/testing";
 import { act, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import buildMachine from "../../../../../../testing/buildMachine.js";
-import buildPage from "../../../../../../testing/buildPage.js";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
 import type { Machine } from "../../../../../../testing/types.js";
 import StatusList from "./StatusList.js";

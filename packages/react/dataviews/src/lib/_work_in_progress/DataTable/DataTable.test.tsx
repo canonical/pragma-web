@@ -21,6 +21,14 @@ import {
   type SourceDelivery,
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
+import type { ManualSource } from "@canonical/dataviews-core/testing";
+import {
+  buildPage,
+  buildStoredView,
+  createManualSource,
+  createStandInPresentationStore,
+  createStandInViewStore,
+} from "@canonical/dataviews-core/testing";
 import {
   act,
   cleanup,
@@ -35,14 +43,7 @@ import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import buildMachine from "../../../../testing/buildMachine.js";
-import buildPage from "../../../../testing/buildPage.js";
-import buildStoredView from "../../../../testing/buildStoredView.js";
 import createMachineProvider from "../../../../testing/createMachineProvider.js";
-import createManualSource from "../../../../testing/createManualSource.js";
-import {
-  createStandInPresentationStore,
-  createStandInViewStore,
-} from "../../../../testing/createStandInStores.js";
 import declareMachineOrdering from "../../../../testing/declareMachineOrdering.js";
 import deliverRows from "../../../../testing/deliverRows.js";
 import elementAt from "../../../../testing/elementAt.js";
@@ -53,11 +54,7 @@ import {
   machines,
 } from "../../../../testing/machines.js";
 import readAnnouncements from "../../../../testing/readAnnouncements.js";
-import type {
-  Machine,
-  MachineFields,
-  ManualSource,
-} from "../../../../testing/types.js";
+import type { Machine, MachineFields } from "../../../../testing/types.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";

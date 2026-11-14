@@ -1,8 +1,9 @@
 import { createDataViewsProvider } from "@canonical/dataviews-core";
+import type { ManualSource } from "@canonical/dataviews-core/testing";
+import { createManualSource } from "@canonical/dataviews-core/testing";
 import { CHART_FACETS } from "./constants.js";
-import createManualSource from "./createManualSource.js";
 import { MACHINE_CAPABILITIES, machines } from "./machines.js";
-import type { Machine, MachineProvider, ManualSource } from "./types.js";
+import type { Machine, MachineProvider } from "./types.js";
 
 /**
  * A provider over a manual source that declares the status and cores facets,

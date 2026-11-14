@@ -4,6 +4,7 @@
  * invalid input that keeps the restriction already in force. Each case is
  * mutation-tested against that contract.
  */
+
 import {
   createArraySource,
   createCollection,
@@ -21,6 +22,10 @@ import {
 } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import {
+  createManualSource,
+  createRecordingLocation,
+} from "@canonical/dataviews-core/testing";
+import {
   act,
   fireEvent,
   isInaccessible,
@@ -31,8 +36,6 @@ import {
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
-import createManualSource from "../../../../../../testing/createManualSource.js";
-import createRecordingLocation from "../../../../../../testing/createRecordingLocation.js";
 import elementAt from "../../../../../../testing/elementAt.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
