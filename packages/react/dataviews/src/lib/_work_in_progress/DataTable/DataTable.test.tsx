@@ -14,7 +14,6 @@ import {
   createCollection,
   createDataViewsProvider,
   createMemoryLocation,
-  type DataViewsProvider,
   type DisplayStatus,
   declareCapabilities,
   type SortTerm,
@@ -54,14 +53,16 @@ import {
   machines,
 } from "../../../../testing/machines.js";
 import readAnnouncements from "../../../../testing/readAnnouncements.js";
-import type { Machine, MachineFields } from "../../../../testing/types.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProvider as Provider,
+} from "../../../../testing/types.js";
 import type { DisplayFieldCellProps } from "../../common/index.js";
 import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataViews } from "../DataViews/index.js";
 import DataTable from "./DataTable.js";
 import type { DataTableColumn } from "./types.js";
-
-type Provider = DataViewsProvider<MachineFields, Machine>;
 
 const columns: readonly DataTableColumn[] = [
   { id: "name", header: "Name", sortable: true },

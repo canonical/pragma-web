@@ -9,7 +9,6 @@
 import {
   type Count,
   createMemoryLocation,
-  type DataViewsProvider,
   DEFAULT_WINDOW,
   declareCapabilities,
 } from "@canonical/dataviews-core";
@@ -25,12 +24,11 @@ import type {
   Machine,
   MachineFields,
   MachineFixture,
+  MachineProvider as Provider,
 } from "../../../../testing/types.js";
 import { DataViews } from "../DataViews/index.js";
 import PaginationBar from "./PaginationBar.js";
 import type { PaginationBarProps } from "./types.js";
-
-type Provider = DataViewsProvider<MachineFields, Machine>;
 
 /** The default window on one page of one size, as every case reads it. */
 const at = (page: number, size: number) => ({

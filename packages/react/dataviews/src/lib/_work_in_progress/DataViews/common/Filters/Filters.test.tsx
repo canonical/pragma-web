@@ -36,15 +36,14 @@ import {
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest";
+import answerFacetValues from "../../../../../../testing/answerFacetValues.js";
 import elementAt from "../../../../../../testing/elementAt.js";
 import expectNoAxeViolations from "../../../../../../testing/expectNoAxeViolations.js";
 import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
 import toggleDisclosure from "../../../../../../testing/toggleDisclosure.js";
+import type { IdentifiedRecord as Row } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import Filters from "./Filters.js";
-
-/** One record of the collection; the controls never read a row. */
-type Row = { readonly id: string };
 
 /** A collection with a field of every kind, so every control is exercised. */
 const collection = createCollection({
@@ -870,32 +869,17 @@ describe("DataViews.Filters", () => {
         facets: ["status"],
       });
       mount(provider);
-      /** Answer the latest request with a count of failed machines. */
-      const answerWith = (count: number): void => {
-        act(() => {
-          manual.latest().deliver({
-            status: "succeeded",
-            page: createPage({
-              rows: [],
-              facets: {
-                status: {
-                  kind: "values",
-                  values: [
-                    { value: "failed", count: { kind: "exact", value: count } },
-                  ],
-                },
-              },
-            }),
-          });
-        });
-      };
-      answerWith(2);
+      answerFacetValues(manual, "status", [
+        { value: "failed", count: { kind: "exact", value: 2 } },
+      ]);
       const failed = screen.getByRole("checkbox", { name: "failed" });
       expect(failed).toHaveAccessibleDescription("2");
       // Another query is pending: the counts it answers are not yet known.
       fireEvent.click(screen.getByRole("checkbox", { name: "ready" }));
       expect(failed).not.toHaveAttribute("aria-describedby");
-      answerWith(1);
+      answerFacetValues(manual, "status", [
+        { value: "failed", count: { kind: "exact", value: 1 } },
+      ]);
       expect(failed).toHaveAccessibleDescription("1");
     });
 

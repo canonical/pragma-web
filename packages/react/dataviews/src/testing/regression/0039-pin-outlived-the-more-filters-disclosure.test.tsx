@@ -15,7 +15,6 @@
 import {
   createCollection,
   createDataViewsProvider,
-  createPage,
   DEFAULT_WINDOW,
   declareCapabilities,
   EMPTY_SLICE,
@@ -24,11 +23,13 @@ import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import { createManualSource } from "@canonical/dataviews-core/testing";
 import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import answerFacetValues from "../../../testing/answerFacetValues.js";
 import toggleDisclosure from "../../../testing/toggleDisclosure.js";
-import type { FacetValue } from "../../../testing/types.js";
+import type {
+  FacetValue,
+  IdentifiedRecord as Placed,
+} from "../../../testing/types.js";
 import { DataViews } from "../../lib/_work_in_progress/DataViews/index.js";
-
-type Placed = { readonly id: string };
 
 const places = createCollection({
   identify: (row: Placed) => row.id,
@@ -61,19 +62,7 @@ describe("regression 0039 — pin outlived the More filters disclosure", () => {
         <DataViews.Filters primary={["status"]} />
       </DataViews>,
     );
-    /** Answer the latest request with the region facet's values. */
-    const answerWith = (values: readonly FacetValue[]): void => {
-      act(() => {
-        manual.latest().deliver({
-          status: "succeeded",
-          page: createPage({
-            rows: [],
-            facets: { region: { kind: "values", values } },
-          }),
-        });
-      });
-    };
-    answerWith(ONE_REGION);
+    answerFacetValues(manual, "region", ONE_REGION);
     await toggleDisclosure(container, true);
     act(() => {
       readProviderHost(provider).adopt(
@@ -90,7 +79,7 @@ describe("regression 0039 — pin outlived the More filters disclosure", () => {
         null,
       );
     });
-    answerWith([]);
+    answerFacetValues(manual, "region", []);
     // No facet lists the region's options any more, so nothing is inside.
     expect(container.querySelector("details")?.open).toBe(true);
     // Closed, the pin is released, and a disclosure holding nothing leaves.

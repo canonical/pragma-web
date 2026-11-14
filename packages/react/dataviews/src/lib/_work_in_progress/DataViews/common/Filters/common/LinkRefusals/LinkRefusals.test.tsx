@@ -17,11 +17,10 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it, onTestFinished } from "vitest";
 import expectNoAxeViolations from "../../../../../../../../testing/expectNoAxeViolations.js";
 import { COUNTED_EXACTLY } from "../../../../../../../../testing/fixtures.js";
+import type { IdentifiedRecord as Row } from "../../../../../../../../testing/types.js";
 import DataViews from "../../../../Provider.js";
 import Filters from "../../Filters.js";
 import LinkRefusals from "./LinkRefusals.js";
-
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,

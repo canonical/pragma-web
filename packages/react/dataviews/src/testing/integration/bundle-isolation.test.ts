@@ -13,23 +13,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "vite";
 import { describe, expect, it } from "vitest";
+import type { BundleOutput as Output } from "../../../testing/types.js";
 
 /** The library folder, two levels up from `src/testing/integration`. */
 const lib = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../lib",
 );
-
-type Output = {
-  readonly output: readonly (
-    | { readonly type: "chunk"; readonly moduleIds: readonly string[] }
-    | {
-        readonly type: "asset";
-        readonly fileName: string;
-        readonly source: string | Uint8Array;
-      }
-  )[];
-};
 
 /** Bundle one consumer module; return its module graph and its CSS. */
 const bundle = async (

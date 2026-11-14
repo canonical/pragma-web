@@ -8,7 +8,6 @@
  * and every row's measured size are the test's to set.
  */
 
-import type { DataViewsProvider } from "@canonical/dataviews-core";
 import { readProviderHost } from "@canonical/dataviews-core/bindings";
 import type { ManualSource } from "@canonical/dataviews-core/testing";
 import { buildPage } from "@canonical/dataviews-core/testing";
@@ -21,7 +20,11 @@ import buildMachine from "../../../../../testing/buildMachine.js";
 import createMachineProvider from "../../../../../testing/createMachineProvider.js";
 import deliverRows from "../../../../../testing/deliverRows.js";
 import elementAt from "../../../../../testing/elementAt.js";
-import type { Machine, MachineFields } from "../../../../../testing/types.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProvider as Provider,
+} from "../../../../../testing/types.js";
 import {
   DataTable,
   type DataTableColumn,
@@ -29,8 +32,6 @@ import {
 } from "../../../_work_in_progress/DataTable/index.js";
 import type { DisplayFieldCellProps } from "../../../common/index.js";
 import virtualizeRows from "../../virtualizeRows.js";
-
-type Provider = DataViewsProvider<MachineFields, Machine>;
 
 /** `count` machines from `m-<from>`, each named `host-<n>`. */
 const machines = (count: number, from = 0): Machine[] =>

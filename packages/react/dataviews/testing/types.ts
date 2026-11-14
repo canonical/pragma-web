@@ -14,6 +14,10 @@ import type {
   ManualSourceConfig,
 } from "@canonical/dataviews-core/testing";
 import type { RenderHookResult } from "@testing-library/react";
+import type { HeaderCellProps } from "../src/lib/_work_in_progress/DataTable/common/HeaderCell/types.js";
+import type { BoundFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/BoundFilter/types.js";
+import type { PresenceFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/PresenceFilter/types.js";
+import type { TextFilterProps } from "../src/lib/_work_in_progress/DataViews/common/Filters/common/TextFilter/types.js";
 import type { Machine } from "../src/storybook/machines/index.js";
 import type { machines } from "./machines.js";
 
@@ -154,4 +158,81 @@ export type RootedHook<TResult> = MachineFixture & {
   readonly hook: RenderHookResult<TResult, unknown>;
   /** How many times the hook has rendered so far. */
   readonly readRenders: () => number;
+};
+
+/** A record a case needs no field of but its identity. */
+export type IdentifiedRecord = { readonly id: string };
+
+/** What a bound filter case sets; the handle, label and definition follow the field. */
+export type BoundFilterHarnessProps = Partial<
+  Omit<BoundFilterProps, "handle" | "label" | "definition">
+> & { readonly field?: "cpu" | "updated" };
+
+/** What a presence filter case sets; the handle, label and field are the root's. */
+export type PresenceFilterHarnessProps = Partial<
+  Omit<PresenceFilterProps, "handle" | "label" | "field">
+>;
+
+/** What a text filter case sets; the handle, label and field are the root's. */
+export type TextFilterHarnessProps = Partial<
+  Omit<TextFilterProps, "handle" | "label" | "field">
+>;
+
+/** A record with an identity and a name. */
+export type NamedRecord = { readonly id: string; readonly name: string };
+
+/** A record with an identity and a count of cores. */
+export type CoredRecord = { readonly id: string; readonly cores: number };
+
+/** A record with an identity, a status and a spare flag. */
+export type SpareRecord = {
+  readonly id: string;
+  readonly status: string;
+  readonly spare: boolean;
+};
+
+/** A record with an identity and a status. */
+export type StatusRecord = { readonly id: string; readonly status: string };
+
+/** A record with an identity, a status and a CPU count. */
+export type CpuRecord = {
+  readonly id: string;
+  readonly status: string;
+  readonly cpu: number;
+};
+
+/** A record whose tag may be of any shape. */
+export type TaggedRecord = { readonly id: string; readonly tag: unknown };
+
+/** What a header cell case sets; the rest is a plain, unsorted column. */
+export type HeaderCellCaseProps = Partial<HeaderCellProps>;
+
+/** What a bundle of one consumer module writes: its chunks and assets. */
+export type BundleOutput = {
+  readonly output: readonly (
+    | { readonly type: "chunk"; readonly moduleIds: readonly string[] }
+    | {
+        readonly type: "asset";
+        readonly fileName: string;
+        readonly source: string | Uint8Array;
+      }
+  )[];
+};
+
+/** What a story's requests to the mock endpoints have come to so far. */
+export type RequestsRead = {
+  /** Requests sent to an endpoint that answers, still waiting on it. */
+  readonly waiting: number;
+  /**
+   * Whether the page shows what its answers say: no request was sent, or
+   * one waits on the endpoint that never answers, or nothing on the page
+   * is still busy.
+   */
+  readonly settled: boolean;
+};
+
+/** One rule of the sheet: the selectors it resolves to, and its declarations. */
+export type ResolvedRule = {
+  readonly selectors: readonly string[];
+  readonly declarations: string;
 };

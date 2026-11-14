@@ -11,6 +11,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import createMachineProvider from "../../../../../../testing/createMachineProvider.js";
+import type { HeaderCellCaseProps as CaseProps } from "../../../../../../testing/types.js";
 import HeaderCell from "./HeaderCell.js";
 import type { HeaderCellProps } from "./types.js";
 
@@ -27,9 +28,6 @@ const HeaderRow = ({ children }: { readonly children: ReactNode }) => (
   // biome-ignore lint/a11y/useFocusableInteractive: the row is structure, as the table's is
   <div role="row">{children}</div>
 );
-
-/** What a case sets; the rest is a plain, unsorted column. */
-type CaseProps = Partial<HeaderCellProps>;
 
 const mount = (props: CaseProps = {}) => {
   const layout = createColumnLayout({

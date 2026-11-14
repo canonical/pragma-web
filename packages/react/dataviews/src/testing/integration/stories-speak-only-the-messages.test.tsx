@@ -27,6 +27,7 @@ import preview from "../../../.storybook/preview.js";
 import { DELIVERY_WAIT } from "../../../testing/constants.js";
 import findEnglish from "../../../testing/findEnglish.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
+import type { RequestsRead } from "../../../testing/types.js";
 import * as buildARendererStories from "../../lib/_work_in_progress/BuildARenderer/BuildARenderer.stories.js";
 import * as dataCardsStories from "../../lib/_work_in_progress/DataCards/DataCards.stories.js";
 import * as dataChartStories from "../../lib/_work_in_progress/DataChart/DataChart.stories.js";
@@ -126,18 +127,6 @@ const readEnglish = async (): Promise<DataViewsMessages> => {
     typeof import("@canonical/dataviews-core/bindings")
   >("@canonical/dataviews-core/bindings");
   return actual.resolveMessages();
-};
-
-/** What a story's requests to the mock endpoints have come to so far. */
-type RequestsRead = {
-  /** Requests sent to an endpoint that answers, still waiting on it. */
-  readonly waiting: number;
-  /**
-   * Whether the page shows what its answers say: no request was sent, or
-   * one waits on the endpoint that never answers, or nothing on the page
-   * is still busy.
-   */
-  readonly settled: boolean;
 };
 
 /**

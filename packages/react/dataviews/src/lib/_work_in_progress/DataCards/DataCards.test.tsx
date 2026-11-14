@@ -1,7 +1,6 @@
 import {
   createArraySource,
   createDataViewsProvider,
-  type DataViewsProvider,
   type SourceDelivery,
 } from "@canonical/dataviews-core";
 import { buildPage } from "@canonical/dataviews-core/testing";
@@ -15,7 +14,11 @@ import createMachineProvider from "../../../../testing/createMachineProvider.js"
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import { machines } from "../../../../testing/machines.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
-import type { Machine, MachineFields } from "../../../../testing/types.js";
+import type {
+  Machine,
+  MachineFields,
+  MachineProvider as Provider,
+} from "../../../../testing/types.js";
 import type {
   DisplayField,
   DisplayFieldCellProps,
@@ -24,8 +27,6 @@ import { useDataViewsCell, useDataViewsValue } from "../../hooks/index.js";
 import { DataTable } from "../DataTable/index.js";
 import DataCards from "./DataCards.js";
 import type { DataCardsProps } from "./types.js";
-
-type Provider = DataViewsProvider<MachineFields, Machine>;
 
 const fields: readonly DisplayField[] = [
   { id: "name", header: "Name" },

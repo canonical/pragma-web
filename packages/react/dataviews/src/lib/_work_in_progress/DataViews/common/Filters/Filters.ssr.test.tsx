@@ -19,10 +19,9 @@ import { createManualSource } from "@canonical/dataviews-core/testing";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { COUNTED_EXACTLY } from "../../../../../../testing/fixtures.js";
+import type { IdentifiedRecord as Row } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import Filters from "./Filters.js";
-
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,

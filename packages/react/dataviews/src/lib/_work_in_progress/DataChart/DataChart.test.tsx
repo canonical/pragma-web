@@ -2,7 +2,6 @@ import {
   createArraySource,
   createCollection,
   createDataViewsProvider,
-  type DataViewsProvider,
 } from "@canonical/dataviews-core";
 import { act, render, screen, within } from "@testing-library/react";
 import { createRef } from "react";
@@ -15,10 +14,8 @@ import createMachineProvider from "../../../../testing/createMachineProvider.js"
 import deliverFacets from "../../../../testing/deliverFacets.js";
 import expectNoAxeViolations from "../../../../testing/expectNoAxeViolations.js";
 import silenceRenderErrors from "../../../../testing/silenceRenderErrors.js";
-import type { Machine, MachineFields } from "../../../../testing/types.js";
+import type { MachineProvider as Provider } from "../../../../testing/types.js";
 import DataChart from "./DataChart.js";
-
-type Provider = DataViewsProvider<MachineFields, Machine>;
 
 /** The accessible name the status chart is given. */
 const NAME =

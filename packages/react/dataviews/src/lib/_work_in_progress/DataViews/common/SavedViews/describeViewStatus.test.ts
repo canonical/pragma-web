@@ -11,10 +11,7 @@ const view = buildStoredView({ revision: 2 });
 
 const english = resolveMessages();
 
-type Command = ViewCommand;
-type Outcome = ViewSettledOutcome;
-
-const commands: readonly Command[] = [
+const commands: readonly ViewCommand[] = [
   "open",
   "save",
   "save-as",
@@ -23,7 +20,10 @@ const commands: readonly Command[] = [
 ];
 
 /** What the status says for each command settling to one outcome. */
-const describeSettledAs = (outcome: Outcome, modified = false): string[] =>
+const describeSettledAs = (
+  outcome: ViewSettledOutcome,
+  modified = false,
+): string[] =>
   commands.map((command) =>
     describeViewStatus(
       { command, status: "settled", outcome },

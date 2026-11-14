@@ -17,10 +17,9 @@ import {
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { COUNTED_EXACTLY } from "../../../../../testing/fixtures.js";
+import type { IdentifiedRecord as Row } from "../../../../../testing/types.js";
 import { findFilterHandle } from "../common/utils/index.js";
 import useProviderState from "./useProviderState.js";
-
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,

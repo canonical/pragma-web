@@ -30,11 +30,9 @@ import {
 import { StrictMode } from "react";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 import createMemoryViewStore from "../../../../../../testing/createMemoryViewStore.js";
+import type { IdentifiedRecord as Row } from "../../../../../../testing/types.js";
 import DataViews from "../../Provider.js";
 import SavedViews from "./SavedViews.js";
-
-/** One record of the collection; no case reads a row. */
-type Row = { readonly id: string };
 
 const collection = createCollection({
   identify: (row: Row) => row.id,
