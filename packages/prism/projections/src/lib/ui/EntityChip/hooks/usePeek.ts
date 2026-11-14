@@ -7,8 +7,9 @@ import type { PeekHandlers, UsePeekProps, UsePeekResult } from "./types.js";
  * pen resting on the chip, at once when its link takes focus; open while
  * the pointer is over the chip or the peek, closed `PEEK_CLOSE_DELAY_MS`
  * after it has left both, when focus leaves both, and on Escape, which
- * returns focus to the link. A touch never opens it, so a tap follows the
- * link. While open, the peek is shown in the top layer as a manual popover,
+ * returns focus to the link when focus was in the chip. A peek opened by
+ * hover holds no focus, so its Escape is heard on the document while it
+ * is open. A touch never opens it, so a tap follows the link. While open, the peek is shown in the top layer as a manual popover,
  * so no ancestor's overflow clips it.
  *
  * The handlers go on the chip's root, which holds the link and the peek:
@@ -18,7 +19,8 @@ import type { PeekHandlers, UsePeekProps, UsePeekResult } from "./types.js";
  * @param props - Whether the chip can peek, and the consumer's handlers.
  * @returns Whether the peek is open, the refs of the root and the peek,
  *   and the handlers for the root.
- * @note Impure: runs timers, moves focus and shows the popover.
+ * @note Impure: runs timers, moves focus, shows the popover and listens
+ *   for Escape on the document while the peek is open.
  */
 export default function usePeek({
   enabled,
@@ -32,6 +34,19 @@ export default function usePeek({
   const returning = useRef(false);
 
   useEffect(() => () => clearTimeout(timer.current), []);
+
+  useEffect(() => {
+    if (!open) return;
+    // A hover-opened peek: focus is elsewhere, so the root hears no key.
+    // An Escape the chip or anything else already handled is left alone.
+    const closeOnEscape = (event: KeyboardEvent): void => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      clearTimeout(timer.current);
+      setOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
 
   useLayoutEffect(() => {
     const peek = peekRef.current;

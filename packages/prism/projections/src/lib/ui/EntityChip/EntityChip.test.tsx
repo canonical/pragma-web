@@ -265,6 +265,40 @@ describe("EntityChip", () => {
       expect(document.activeElement).toBe(link);
     });
 
+    it("closes a hover-opened peek on Escape, wherever focus is", () => {
+      renderPeeking();
+      const chip = screen.getByTestId("chip");
+      fireEvent.pointerEnter(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_OPEN_DELAY_MS);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+      fireEvent.keyDown(document.body, { key: "Enter" });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+      fireEvent.keyDown(document.body, { key: "Escape" });
+      expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+      expect(document.activeElement).toBe(document.body);
+    });
+
+    it("leaves a hover-opened peek open on an Escape another handler took", () => {
+      renderPeeking();
+      const chip = screen.getByTestId("chip");
+      fireEvent.pointerEnter(chip, { pointerType: "mouse" });
+      act(() => {
+        vi.advanceTimersByTime(PEEK_OPEN_DELAY_MS);
+      });
+      const handled = new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key: "Escape",
+      });
+      handled.preventDefault();
+      act(() => {
+        document.body.dispatchEvent(handled);
+      });
+      expect(screen.queryByRole("dialog", { hidden: true })).not.toBeNull();
+    });
+
     it("closes when focus leaves the chip and the peek", () => {
       const link = renderPeeking();
       act(() => {
