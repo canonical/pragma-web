@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     name: "client",
     environment: "jsdom",
-    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    include: ["src/**/*.test.{ts,tsx}", "testing/**/*.test.ts"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
