@@ -5,7 +5,12 @@
  * measured with, are the engine's, in `@canonical/prism-core`.
  */
 
-import { BUS_OFFSET, LATTICE } from "@canonical/prism-core";
+import {
+  BUS_OFFSET,
+  GRAPH_LABEL_PX_MIN,
+  LABEL_SIZE,
+  LATTICE,
+} from "@canonical/prism-core";
 
 /** A class box's height, in px. */
 export const BOX_HEIGHT = 32;
@@ -76,8 +81,11 @@ export const SHELF_ALIGNMENTS: readonly number[] = [0, 0.5, 1];
  */
 export const ALIGNMENT_SEARCH_LIMIT = 6;
 
-/** The smallest zoom at which every 14px label renders at 12px or more. */
-export const MIN_FIT = 12 / 14;
+/**
+ * The smallest zoom at which every label, set at `LABEL_SIZE`, renders at
+ * the graph budget's `GRAPH_LABEL_PX_MIN` or more.
+ */
+export const MIN_FIT = GRAPH_LABEL_PX_MIN / LABEL_SIZE;
 
 /**
  * How far above the legible zoom a window opens, as a factor, so the
