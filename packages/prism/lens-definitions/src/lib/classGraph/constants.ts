@@ -1,15 +1,11 @@
 /**
- * The class graph's geometry and type: every length the layout places by,
- * on a 16px lattice (boxes, columns, rows, regions and waypoints sit on
- * multiples of 16; ports, arrowheads and labels on the 4px grid inside
- * them), and the advance widths of the shipped font the layout measures
- * labels with, so no browser measures anything.
+ * The class graph's own lengths, on the layered engine's 16px lattice:
+ * its boxes, channels, shelves, hubs, camera fits and phone view. The
+ * lengths every layered region shares, and the font metrics labels are
+ * measured with, are the engine's, in `@canonical/prism-core`.
  */
 
 import { BUS_OFFSET, LATTICE } from "@canonical/prism-core";
-
-/** The finer grid ports, arrowheads and labels sit on inside a box, in px. */
-export const FINE_GRID = 4;
 
 /** A class box's height, in px. */
 export const BOX_HEIGHT = 32;
