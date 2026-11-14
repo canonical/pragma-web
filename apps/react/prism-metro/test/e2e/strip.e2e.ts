@@ -263,7 +263,10 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
             right: box?.right ?? 0,
           };
         };
-        return { fold: read('[data-slot="fold"]'), count: read('[data-slot="count"]') };
+        return {
+          fold: read('[data-slot="fold"]'),
+          count: read('[data-slot="count"]'),
+        };
       });
       if (viewport.width < 912) {
         // The folded strip reads the trail, the menu, the fold, the count.
