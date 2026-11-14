@@ -213,7 +213,7 @@ export interface LabelledBundle extends LayeredBundle {
 
 /** A node laid out in the graph, as the label placer reads it. */
 export interface LabelledNode {
-  /** The node's id: its full IRI. */
+  /** The node's id, unique in the graph. */
   readonly uri: string;
   /** The column in its region. */
   readonly col: number;

@@ -54,14 +54,14 @@ function measureLabelBox(
 }
 
 /** The box a region's label row's text takes: its prefix and its count. */
-function measureRegionLabel(region: LabelledRegion, classCount: string): Rect {
+function measureRegionLabel(region: LabelledRegion, memberCount: string): Rect {
   return {
     x: region.x,
     y: region.y,
     w:
       measureTextWidth(region.prefix.toUpperCase(), "bold", REGION_LABEL_SIZE) +
       REGION_LABEL_GAP +
-      measureTextWidth(classCount, "regular", LABEL_SIZE),
+      measureTextWidth(memberCount, "regular", LABEL_SIZE),
     h: REGION_LABEL_ROW,
   };
 }
@@ -83,7 +83,7 @@ function measureRegionLabel(region: LabelledRegion, classCount: string): Rect {
  * @param faded - The nodes not drawn at full strength: outside the
  *   focus's neighbourhood, or hidden by the filter.
  * @param formatCount - How "‹n› relations" reads, from the catalog.
- * @param formatClassCount - How a region's "‹n› classes" reads.
+ * @param formatMemberCount - How a region's "‹n› members" reads.
  * @returns The placed and the omitted labels.
  */
 export default function placeEdgeLabels(
@@ -91,14 +91,14 @@ export default function placeEdgeLabels(
   focus: string,
   faded: ReadonlySet<string>,
   formatCount: (count: number) => string,
-  formatClassCount: (count: number) => string,
+  formatMemberCount: (count: number) => string,
 ): LabelPlacement {
   const visible = [...layout.nodes.values()].filter(
     (node) => !faded.has(node.uri),
   );
   const obstacles = visible.map(measureCollisionBox);
   const texts = layout.regions.map((region) =>
-    measureRegionLabel(region, formatClassCount(region.ids.length)),
+    measureRegionLabel(region, formatMemberCount(region.ids.length)),
   );
   const { viewBox } = layout;
   const placed: PlacedLabel[] = [];
