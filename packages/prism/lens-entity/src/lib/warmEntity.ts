@@ -1,6 +1,8 @@
 import {
   type EntityBinding,
   getPrefetchEnvironment,
+  type ViewSearch,
+  warmPageRenderer,
 } from "@canonical/prism-core";
 import { type CacheConfig, fetchQuery } from "relay-runtime";
 import type { EntityNamespacesQuery } from "../__generated__/EntityNamespacesQuery.graphql.js";
@@ -18,7 +20,8 @@ const STORE_OR_NETWORK: CacheConfig & {
 /**
  * Warm the store for one entity's page, in two steps: the graph's
  * namespaces, then the page's own operation, whose `node(id:)` takes the
- * absolute IRI the namespaces expand the route's address to.
+ * absolute IRI the namespaces expand the route's address to, beside what
+ * the address's page renderer reads of that IRI.
  *
  * It cannot go through `prefetchQuery` twice. `prefetchQuery` reads the
  * published prefetch environment when it is called, and the server publishes
@@ -33,16 +36,20 @@ const STORE_OR_NETWORK: CacheConfig & {
  * @param binding - The binding whose class the entity must belong to.
  * @param params - The matched route params, carrying the percent-decoded
  *   `uri`.
+ * @param search - The matched view search: beside the page's operation,
+ *   the page renderer it selects is warmed for the expanded IRI, so the
+ *   server's Turtle page carries its document.
  * @returns A promise that settles when the store holds both operations'
  *   data, at once when no environment is published, or rejects with the
  *   first fetch's error.
  * @throws When the params carry no `uri`.
  * @note Impure: reads the module-level prefetch environment and performs up
- *   to two network requests through it.
+ *   to three network requests through it.
  */
 export default function warmEntity(
   binding: EntityBinding,
   params: Readonly<Record<string, unknown>>,
+  search: ViewSearch = {},
 ): Promise<void> {
   const uri = readUriParam(params);
   const environment = getPrefetchEnvironment();
@@ -54,18 +61,22 @@ export default function warmEntity(
     STORE_OR_NETWORK,
   )
     .toPromise()
-    .then((namespaces) =>
-      fetchQuery<EntityPageQuery>(
-        environment,
-        entityPageQueryNode,
-        buildEntityPageVariables(
-          binding,
-          uri,
-          /* v8 ignore next -- the observable yields the response before it completes */
-          namespaces?.ontologies ?? [],
-        ),
-        STORE_OR_NETWORK,
-      ).toPromise(),
-    )
+    .then((namespaces) => {
+      const variables = buildEntityPageVariables(
+        binding,
+        uri,
+        /* v8 ignore next -- the observable yields the response before it completes */
+        namespaces?.ontologies ?? [],
+      );
+      return Promise.all([
+        fetchQuery<EntityPageQuery>(
+          environment,
+          entityPageQueryNode,
+          variables,
+          STORE_OR_NETWORK,
+        ).toPromise(),
+        warmPageRenderer(variables.id, search, environment),
+      ]);
+    })
     .then(() => undefined);
 }

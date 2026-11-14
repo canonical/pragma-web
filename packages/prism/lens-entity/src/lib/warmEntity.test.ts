@@ -82,6 +82,31 @@ describe("warmEntity", () => {
     });
   });
 
+  it("warms the entity's Turtle at its expanded IRI when the address asks", async () => {
+    const recorded = createRecordedFetch();
+    const fetchFn = createFetchSpy();
+    fetchFn.mockImplementation((request, variables, ...rest) =>
+      request.name === "EntitySourceQuery"
+        ? Promise.resolve({ data: { source: "<s> a <o> ." } })
+        : recorded(request, variables, ...rest),
+    );
+    const environment = createEnvironment({ fetchFn });
+    setPrefetchEnvironment(environment);
+    try {
+      await warmEntity(
+        STATIONS_BINDING,
+        { uri: NORTHGATE_CURIE },
+        { as: "turtle" },
+      );
+    } finally {
+      setPrefetchEnvironment(undefined);
+    }
+    const source = fetchFn.mock.calls.find(
+      ([request]) => request.name === "EntitySourceQuery",
+    );
+    expect(source?.at(1)).toEqual({ uri: NORTHGATE_IRI });
+  });
+
   it("rejects with the first fetch's error", async () => {
     const fetchFn = createFetchSpy();
     fetchFn.mockRejectedValue(new Error("graph down"));
