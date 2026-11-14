@@ -1,10 +1,11 @@
 ---
-# EntitySource — the Turtle renderer's body on an entity page: it asks the
-# provider for `source(uri)` through the site's Relay environment's network
-# (one full-text operation, no compiled artifact), on the client, after
-# mount, and only when it is rendered, which the `as=turtle` address
-# decides; the server render and the first paint show the loading line.
-# Three states after that: the SourceView over the text, one line when the
+# EntitySource — the Turtle renderer's body on an entity page: it reads
+# `source(uri)` from the store, where the route's warm put it for an
+# `as=turtle` address, so the server render already carries the document;
+# on a cold store it asks the provider through the site's Relay
+# environment's network (one full-text operation, no compiled artifact) on
+# the client, after mount, showing the loading line until then. Three
+# states once it has an answer: the SourceView over the text, one line when the
 # provider holds no source for the address, one alert line when the
 # request failed. A subgrid of the page over every column, one gutter
 # between its lines.

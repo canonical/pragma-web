@@ -60,6 +60,7 @@ export {
   useRenderers,
   VIEW_PARAMS,
   viewSearch,
+  warmPageRenderer,
 } from "./renderers/index.js";
 export type { FacetBearer, RouteFacet, RouteMeta } from "./routeFacet/index.js";
 export { collectFacet, defineFacet } from "./routeFacet/index.js";

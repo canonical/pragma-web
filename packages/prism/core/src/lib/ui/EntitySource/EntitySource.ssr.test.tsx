@@ -2,8 +2,15 @@
 
 import { renderToString } from "react-dom/server";
 import { RelayEnvironmentProvider } from "react-relay";
-import { Environment, Network, RecordSource, Store } from "relay-runtime";
+import {
+  createOperationDescriptor,
+  Environment,
+  Network,
+  RecordSource,
+  Store,
+} from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
+import { ENTITY_SOURCE_QUERY } from "./constants.js";
 import EntitySource from "./EntitySource.js";
 
 describe("EntitySource SSR", () => {
@@ -24,5 +31,25 @@ describe("EntitySource SSR", () => {
     expect(html).toContain("ds entity-source");
     expect(html).toContain("Loading the source…");
     expect(fetchSource).not.toHaveBeenCalled();
+  });
+
+  it("renders the document a warm store holds on the server", () => {
+    const uri = "https://metro.example/data/central";
+    const environment = new Environment({
+      network: Network.create(vi.fn()),
+      store: new Store(new RecordSource()),
+    });
+    environment.commitPayload(
+      createOperationDescriptor(ENTITY_SOURCE_QUERY, { uri }),
+      { source: "<s> a <o> ." },
+    );
+    const html = renderToString(
+      <RelayEnvironmentProvider environment={environment}>
+        <EntitySource title="Central" uri={uri} />
+      </RelayEnvironmentProvider>,
+    );
+    expect(html).toContain('class="ds source-view"');
+    expect(html).toContain("11 bytes");
+    expect(html).not.toContain("Loading the source…");
   });
 });

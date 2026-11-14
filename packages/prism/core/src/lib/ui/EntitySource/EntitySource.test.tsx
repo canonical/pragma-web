@@ -4,6 +4,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import {
+  createOperationDescriptor,
   Environment,
   Network,
   Observable,
@@ -11,6 +12,7 @@ import {
   Store,
 } from "relay-runtime";
 import { describe, expect, it, vi } from "vitest";
+import { ENTITY_SOURCE_QUERY } from "./constants.js";
 import EntitySource from "./EntitySource.js";
 
 /** An environment whose network answers every request with `answer`. */
@@ -101,6 +103,21 @@ describe("EntitySource", () => {
     expect(variables).toEqual({ uri: URI });
     unmount();
     expect(cleanup).toHaveBeenCalled();
+  });
+
+  it("shows the document a warm store holds, without asking", () => {
+    const fetchSource = vi.fn(() => Observable.create(() => {}));
+    const environment = new Environment({
+      network: Network.create(fetchSource),
+      store: new Store(new RecordSource()),
+    });
+    environment.commitPayload(
+      createOperationDescriptor(ENTITY_SOURCE_QUERY, { uri: URI }),
+      { source: "<s> a <o> ." },
+    );
+    renderUnder(environment, <EntitySource title="Central" uri={URI} />);
+    expect(screen.getByRole("figure")).toHaveTextContent("<s> a <o> .");
+    expect(fetchSource).not.toHaveBeenCalled();
   });
 
   it("applies custom className and passes native props through", () => {

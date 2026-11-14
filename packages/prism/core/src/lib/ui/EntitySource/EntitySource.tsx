@@ -11,10 +11,12 @@ const componentCssClassName = "ds entity-source";
 
 /**
  * The Turtle renderer's body on an entity page: the entity's statements,
- * asked of the provider's `source(uri)` on the client once the page has
- * mounted, so the server and the first paint show the loading line. Then
- * the document, a line when the provider holds none for the address, or
- * an alert when the request failed.
+ * read from the store a route's warm filled (`warmPageRenderer`), so the
+ * server's render carries the document; on a cold store, asked of the
+ * provider's `source(uri)` on the client once the page has mounted, the
+ * loading line standing until then. Then the document, a line when the
+ * provider holds none for the address, or an alert when the request
+ * failed.
  *
  * `import { EntitySource } from "@canonical/prism-core";`
  *
