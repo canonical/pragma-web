@@ -246,7 +246,7 @@ export const Anticipation: Story = {
 
 /**
  * Every context and density: the box is the density cell, on the text's
- * baseline. The secondary button has no Tooltip: it is the geometry control.
+ * baseline.
  */
 export const DensityAndContext: Story = {
   name: "Density and context",
@@ -271,7 +271,9 @@ export const DensityAndContext: Story = {
             <TooltipEngine Message="Edit">
               <Component {...args} importance="tertiary" />
             </TooltipEngine>
-            <Component {...args} importance="secondary" />
+            <TooltipEngine Message="Edit">
+              <Component {...args} importance="secondary" />
+            </TooltipEngine>
             <TooltipEngine Message="Edit">
               <Component {...args} importance="primary" />
             </TooltipEngine>
@@ -297,7 +299,6 @@ const SCOPES = ".comfortable, .dense, .app, .site, .docs";
 export const OutsideADensityScope: Story = {
   name: "Outside a density scope",
   tags: ["!dev", "!autodocs"],
-  // Generated JSX cannot print a portal.
   parameters: {
     docs: {
       source: {
@@ -315,7 +316,6 @@ export const OutsideADensityScope: Story = {
       setContainer(element);
       return () => element.remove();
     }, []);
-    // A fragment: a story must return an element.
     return (
       <>
         {container
@@ -421,7 +421,6 @@ const expectTooltipGatedByPanel = async (
 /** A popover trigger: keep the Tooltip closed while the panel is open. */
 export const AsPopoverTrigger: Story = {
   name: "As a popover trigger",
-  // The gate is state, so the docs show the story's own source.
   parameters: { docs: { source: { type: "code" } } },
   render: function AsPopoverTriggerRender(args) {
     const [isOpen, setIsOpen] = useState(false);
@@ -468,7 +467,6 @@ export const AsPopoverTrigger: Story = {
  */
 export const GearAndThreeDots: Story = {
   name: "Gear and three dots",
-  // The gate is state, so the docs show the story's own source.
   parameters: { docs: { source: { type: "code" } } },
   render: function GearAndThreeDotsRender(args) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
