@@ -16,15 +16,13 @@ const TANNERY_LANE = readRecordedStation(RECORDED, "tannery-lane");
 const NORTHGATE = readRecordedStation(RECORDED, "northgate");
 
 describe("StationPanel", () => {
-  it("heads the page with the station's title and kind", () => {
+  it("heads the panel with the station's kind, leaving the title to the page", () => {
     renderWithSite(
       <StationPanel station={TANNERY_LANE} />,
       "/network",
       RECORDED,
     );
-    expect(
-      screen.getByRole("heading", { level: 1, name: "Tannery Lane" }),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
     expect(screen.getByText("Interchange")).toHaveClass("kind");
   });
 

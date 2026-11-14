@@ -3,7 +3,6 @@
 import {
   DocumentLayout,
   ErrorBoundary,
-  PAGE_RENDERER_NAMES,
   useRenderers,
 } from "@canonical/prism-core";
 import { CardProjection } from "@canonical/prism-projections";
@@ -44,9 +43,9 @@ const Boundary = ({
 };
 
 /**
- * The station's panel; for a station no route calls at, a status saying so
- * with a link to its entry in the stations lens; or the page's not-found
- * status.
+ * The station's title, then, drawn by the active page renderer, its panel
+ * or, for a station no route calls at, a status saying so with a link to
+ * its entry in the stations lens; or the page's not-found status.
  */
 const StationMain = ({
   address,
@@ -64,25 +63,17 @@ const StationMain = ({
       </section>
     );
   }
-  if (active.name !== PAGE_RENDERER_NAMES.page) {
-    return (
-      <>
-        <Head title={station.title} />
-        <h1 className="title">{station.title}</h1>
-        {active.render({
-          uri: station.uri,
-          title: station.title,
-          children: null,
-        })}
-      </>
-    );
-  }
-  if (station.routes.length === 0) {
-    return (
-      <section className="status">
-        <Head title={station.title} />
-        <h1>{station.title}</h1>
-        <p>{t("network.station.unrouted", { title: station.title })}</p>
+  return (
+    <>
+      <Head title={station.title} />
+      <h1 className="title">{station.title}</h1>
+      {active.render({
+        uri: station.uri,
+        title: station.title,
+        children:
+          station.routes.length === 0 ? (
+            <section className="status">
+              <p>{t("network.station.unrouted", { title: station.title })}</p>
         <p>
           <a
             href={router.buildPath("stationsEntity", {
@@ -98,12 +89,10 @@ const StationMain = ({
           </a>
         </p>
       </section>
-    );
-  }
-  return (
-    <>
-      <Head title={station.title} />
-      <StationPanel station={station} />
+          ) : (
+            <StationPanel station={station} />
+          ),
+      })}
     </>
   );
 };
@@ -118,9 +107,9 @@ const StationAside = ({
 
 /**
  * A station's page in the network lens, a document: the metro rail, the
- * network strip with the page's renderers, the station's place on every
- * route in the main column (or, at `as=turtle`, its Turtle source under
- * its title), and its card, as its
+ * network strip with the page's renderers, the station's title and, drawn
+ * by the active page renderer, its place on every route in the main column
+ * (at `as=turtle`, its Turtle source), and its card, as its
  * site projects it, in the aside. A station no route calls at renders a
  * status saying so, linking to its entry in the stations lens; an address
  * that names no station renders the page's not-found status. It renders its
