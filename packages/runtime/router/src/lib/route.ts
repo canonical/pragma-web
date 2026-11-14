@@ -148,9 +148,7 @@ function isRedirectRouteInput<
  * route defined inline inside a router factory keeps its path-derived
  * types instead of collapsing to the generic constraints. The wrapper
  * list is left uninstrumented: a leaked `NoInfer` marker there blocks the
- * route map from ever being inferred back out of a match function. Both
- * directions are pinned by mutation-tested assertions in
- * `types.types.test.ts` ("router surface").
+ * route map from ever being inferred back out of a match function.
  */
 export default function route<
   const TPath extends string,
