@@ -32,6 +32,13 @@ export interface StripMeasure {
   readonly searchWidth: number | null;
   /** Whether the strip's content is wider than the strip. */
   readonly overflow: boolean;
+  /**
+   * Whether the count, or an element inside it, is narrower than its text;
+   * `false` when the strip counts nothing.
+   */
+  readonly countClipped: boolean;
+  /** The trail's crumbs, by their text, from the first to the current. */
+  readonly crumbs: readonly string[];
   /** The hrefs on the page that carry the retired `view=` parameter. */
   readonly viewHrefs: readonly string[];
 }
