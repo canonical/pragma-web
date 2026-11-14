@@ -1,13 +1,9 @@
 import { type Query, type Slice, spellSliceKey } from "../query/index.js";
-import {
-  type Count,
-  type SourceDelivery,
-  type SourceRefusal,
-  UNKNOWN_COUNT,
-} from "../result/index.js";
+import type { SourceDelivery, SourceRefusal } from "../result/index.js";
 import type { RowRecord } from "../rows/index.js";
 import copyCapabilities from "./copyCapabilities.js";
 import describeError from "./describeError.js";
+import readRelayPage from "./readRelayPage.js";
 import resolveErrorDelivery from "./resolveErrorDelivery.js";
 import type {
   RelayConnection,
@@ -205,59 +201,17 @@ export default function createRelaySource<
           fail(data, describeError(error), error);
           return;
         }
-        if (connection === null || connection === undefined) {
-          fail(data, "the response carries no connection");
+        const reading = readRelayPage(connection);
+        if (reading.status === "failed") {
+          fail(data, reading.reason);
           return;
         }
-        const { edges } = connection;
-        if (edges === null || edges === undefined) {
-          fail(data, "the connection carries no edges");
-          return;
-        }
-        const rows: TRow[] = [];
-        for (const edge of edges) {
-          const node = edge?.node;
-          if (node === null || node === undefined) {
-            fail(data, "the connection carries an edge without a record");
-            return;
-          }
-          rows.push(node);
-        }
-        const { pageInfo } = connection;
-        if (pageInfo === null || pageInfo === undefined) {
-          fail(data, "the connection carries no page info");
-          return;
-        }
-        const { endCursor, hasNextPage } = pageInfo;
-        // A page with no end cursor has no next page to reach any more.
-        if (typeof endCursor === "string") {
-          trail.set(window.page + 1, endCursor);
-        } else {
+        if (reading.endCursor === null) {
           trail.delete(window.page + 1);
+        } else {
+          trail.set(window.page + 1, reading.endCursor);
         }
-        const matched: Count =
-          typeof connection.totalCount === "number"
-            ? { kind: "exact", value: connection.totalCount }
-            : UNKNOWN_COUNT;
-        const more = typeof hasNextPage === "boolean" ? hasNextPage : null;
-        send(data, {
-          status: "succeeded",
-          page: {
-            rows,
-            groups: null,
-            // Nothing collapses, so the rows the window pages over are the
-            // rows that matched; the whole collection is never asked for.
-            counts: { pageable: matched, matched },
-            // What the operation selected; the provider holds it to what
-            // the request asked for.
-            facets: connection.facets ?? {},
-            more,
-            cursors: {
-              next: more === false ? null : (endCursor ?? null),
-              previous: null,
-            },
-          },
-        });
+        send(data, { status: "succeeded", page: reading.page });
       };
 
       try {

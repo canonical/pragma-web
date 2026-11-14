@@ -1,19 +1,11 @@
-import {
-  addressPredicate,
-  canonicalizeSlice,
-  type Query,
-} from "../query/index.js";
+import { canonicalizeSlice, type Query } from "../query/index.js";
 import type { SourceRefusal } from "../result/index.js";
-import pluralize from "./pluralize.js";
+import createRefusal from "./createRefusal.js";
+import listFilterRefusals from "./listFilterRefusals.js";
+import listGroupRefusals from "./listGroupRefusals.js";
+import listSortRefusals from "./listSortRefusals.js";
+import listWindowRefusals from "./listWindowRefusals.js";
 import type { SourceCapabilities } from "./types.js";
-
-const refusal = (
-  part: SourceRefusal["part"],
-  code: SourceRefusal["code"],
-  reason: string,
-  field: string | null = null,
-  operator: SourceRefusal["operator"] = null,
-): SourceRefusal => ({ part, code, field, operator, reason });
 
 /**
  * Decide whether a source can execute a request from its declaration
@@ -34,127 +26,19 @@ export default function refusalsOf(
   // Canonicalizing first fixes the order, so one query always produces the
   // same refusals.
   const slice = canonicalizeSlice(query.slice);
-  const { window } = query;
-  const refusals: SourceRefusal[] = [];
-
-  // An address is refused once, however many conjuncts it holds: what the
-  // source cannot execute is the field and operator, not each operand.
-  const refused = new Set<string>();
-  for (const predicate of slice.filter) {
-    const address = addressPredicate(predicate.field, predicate.operator);
-    if (refused.has(address)) {
-      continue;
-    }
-    // A field declared with no operator is a field not declared.
-    const operators = Object.hasOwn(capabilities.filter, predicate.field)
-      ? capabilities.filter[predicate.field]
-      : undefined;
-    if (operators === undefined || operators.length === 0) {
-      refused.add(address);
-      refusals.push(
-        refusal(
-          "filter",
-          "undeclared-field",
-          `field "${predicate.field}" cannot be filtered`,
-          predicate.field,
-          predicate.operator,
-        ),
-      );
-    } else if (!operators.includes(predicate.operator)) {
-      refused.add(address);
-      refusals.push(
-        refusal(
-          "filter",
-          "undeclared-operator",
-          `field "${predicate.field}" cannot be filtered with ${predicate.operator}`,
-          predicate.field,
-          predicate.operator,
-        ),
-      );
-    }
-  }
-
-  if (slice.search !== null && capabilities.search === null) {
-    refusals.push(
-      refusal("search", "undeclared-field", "this source cannot search"),
-    );
-  }
-
-  const { terms } = capabilities.sort;
-  if (terms !== null && slice.sort.length > terms) {
-    refusals.push(
-      // A ceiling of zero is still a ceiling: one code covers both, so a
-      // control reacts to "too many terms" without a second case.
-      refusal(
-        "sort",
-        "too-many-terms",
-        terms === 0
-          ? "this source cannot sort"
-          : `this source orders by at most ${pluralize(terms, "term")}`,
-      ),
-    );
-  }
-  // Collected beside the arity refusal, not instead of it: an ordering over
-  // a source's arity must not hide that one of its terms names no sortable
-  // field either. A source that cannot sort at all says so once, because
-  // every term of every ordering would repeat it.
-  for (const term of terms === 0 ? [] : slice.sort) {
-    if (!capabilities.sort.fields.includes(term.field)) {
-      refusals.push(
-        refusal(
-          "sort",
-          "undeclared-field",
-          `field "${term.field}" cannot be sorted`,
-          term.field,
-        ),
-      );
-    }
-  }
-
-  const { levels } = capabilities.group;
-  if (slice.group.length > levels) {
-    refusals.push(
-      refusal(
-        "group",
-        "too-many-levels",
-        levels === 0
-          ? "this source cannot group"
-          : `this source groups by at most ${pluralize(levels, "level")}`,
-      ),
-    );
-  }
-  for (const term of levels === 0 ? [] : slice.group) {
-    if (!capabilities.group.fields.includes(term.field)) {
-      refusals.push(
-        refusal(
-          "group",
-          "undeclared-field",
-          `field "${term.field}" cannot be grouped`,
-          term.field,
-        ),
-      );
-    }
-  }
-
-  if (window.collapsed.length > 0 && !capabilities.group.collapse) {
-    refusals.push(
-      refusal(
-        "window",
-        "unsupported-collapse",
-        "this source cannot leave collapsed groups out of a page",
-      ),
-    );
-  }
-
-  if (capabilities.pagination.kind === "offset" && window.cursor !== null) {
-    refusals.push(
-      refusal(
-        "window",
-        "unreachable-page",
-        "this source pages by number and reaches no page by token",
-      ),
-    );
-  }
-
-  return Object.freeze(refusals);
+  return Object.freeze([
+    ...listFilterRefusals(capabilities.filter, slice.filter),
+    ...(slice.search !== null && capabilities.search === null
+      ? [
+          createRefusal(
+            "search",
+            "undeclared-field",
+            "this source cannot search",
+          ),
+        ]
+      : []),
+    ...listSortRefusals(capabilities.sort, slice.sort),
+    ...listGroupRefusals(capabilities.group, slice.group),
+    ...listWindowRefusals(capabilities, query.window),
+  ]);
 }
