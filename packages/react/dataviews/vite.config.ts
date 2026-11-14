@@ -51,7 +51,6 @@ const testConfig = reactTestConfig({
       "testing/expectNoAxeViolations.ts",
       "testing/fakeAnnouncerClock.ts",
       "testing/readAnnouncements.ts",
-      "testing/requestMockApi.ts",
       "testing/serveMockApi.ts",
       "testing/silenceRenderErrors.ts",
       "testing/toggleDisclosure.ts",
