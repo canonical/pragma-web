@@ -19,7 +19,7 @@ describe("Trail on the server", () => {
       ),
     );
     expect(html).toContain('href="/standards"');
-    expect(html).toContain(LINK_COMPONENT_URI);
+    expect(html).not.toContain(LINK_COMPONENT_URI);
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });

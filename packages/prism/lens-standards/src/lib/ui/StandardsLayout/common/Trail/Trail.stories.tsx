@@ -18,7 +18,7 @@ type Story = StoryObj<typeof Component>;
 /** On the index: the lens's label alone. */
 export const OnTheIndex: Story = {};
 
-/** On a reading page: the label, linked back to the index, then the address. */
+/** On a reading page: the trail ends at the label, linked back to the index. */
 export const OnAReadingPage: Story = {
   decorators: [
     withSite({ url: `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}` }),
