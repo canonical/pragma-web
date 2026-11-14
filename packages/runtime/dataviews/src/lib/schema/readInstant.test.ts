@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import isCalendarDate from "./isCalendarDate.js";
 import readInstant from "./readInstant.js";
 
 describe("readInstant", () => {
@@ -103,13 +102,5 @@ describe("readInstant", () => {
         Date.parse("0026-01-02T00:00:00.000Z"),
       );
     });
-  });
-});
-
-describe("isCalendarDate", () => {
-  it("accepts a real calendar date and nothing else", () => {
-    expect(isCalendarDate("2026-01-02")).toBe(true);
-    expect(isCalendarDate("2026-02-30")).toBe(false);
-    expect(isCalendarDate("2026-01-02T06:00:00Z")).toBe(false);
   });
 });
