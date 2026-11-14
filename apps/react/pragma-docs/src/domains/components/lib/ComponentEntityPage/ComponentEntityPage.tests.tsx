@@ -14,7 +14,7 @@ import {
 
 describe("ComponentEntityPage", () => {
   it(
-    "opens with the header, then the example, the anatomy, the properties and the relations",
+    "lays the header, the example, then the anatomy, the properties and the relations on the view",
     () => {
       const fetchFn = createFetchSpy();
       const { container } = render(
@@ -22,18 +22,23 @@ describe("ComponentEntityPage", () => {
       );
       const page = container.querySelector('[data-view="component-entity"]');
       expect(page?.className).toBe("ds component-entity-page");
-      const detail = page?.querySelector(".ds.component-detail");
-      expect(
-        [...(detail?.children ?? [])].map((child) =>
-          [...child.classList].filter((name) => name.startsWith("component-")),
-        ),
-      ).toEqual([
-        ["component-header"],
-        ["component-example"],
-        ["component-anatomy"],
-        ["component-properties"],
-        ["component-relations"],
+      const view = page?.querySelector(
+        ":scope > .ds.component-detail > .ds.sectioned-view",
+      );
+      if (view === null || view === undefined) {
+        throw new Error("the page is not laid on the sectioned view");
+      }
+      const parts = (selector: string) =>
+        [...view.querySelectorAll(selector)].map((part) =>
+          [...part.classList].find((name) => name.startsWith("component-")),
+        );
+      expect(parts(":scope > .header > *")).toEqual(["component-header"]);
+      expect(parts(":scope > .content > .body > *")).toEqual([
+        "component-example",
       ]);
+      expect(parts(":scope > .content > .section > .section-body > *")).toEqual(
+        ["component-anatomy", "component-properties", "component-relations"],
+      );
       expect(fetchFn).not.toHaveBeenCalled();
     },
     ENTITY_TEST_TIMEOUT_MS,
@@ -49,10 +54,9 @@ describe("ComponentEntityPage", () => {
           createFetchSpy(),
         ),
       );
+      expect(screen.queryByRole("region", { name: "Example" })).toBeNull();
       expect(
-        screen
-          .getByRole("region", { name: "Example" })
-          .querySelector(".absent"),
+        document.querySelector(".ds.component-example > .absent"),
       ).not.toBeNull();
       expect(
         screen

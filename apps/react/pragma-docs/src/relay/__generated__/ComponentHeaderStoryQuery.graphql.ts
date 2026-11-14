@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e075a2672c82f97574a152145bb40473>>
+ * @generated SignedSource<<20b653efd13d5a80862b8abd94d714c8>>
  * @lightSyntaxTransform
  */
 
@@ -29,38 +29,6 @@ var v0 = [
   }
 ],
 v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "name",
-  "storageKey": null
-},
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "uri",
-  "storageKey": null
-},
-v3 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "EntityMeta"
-},
-v4 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "String"
-},
-v5 = {
-  "enumValues": null,
-  "nullable": false,
-  "plural": false,
-  "type": "ID"
-},
-v6 = {
   "enumValues": null,
   "nullable": true,
   "plural": false,
@@ -107,19 +75,18 @@ return {
         "name": "component",
         "plural": false,
         "selections": [
-          (v1/*:: as any*/),
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "summary",
+            "name": "name",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "version",
+            "name": "summary",
             "storageKey": null
           },
           {
@@ -143,82 +110,17 @@ return {
           {
             "alias": null,
             "args": null,
-            "concreteType": "Tier",
-            "kind": "LinkedField",
-            "name": "tier",
-            "plural": false,
-            "selections": [
-              (v1/*:: as any*/),
-              (v2/*:: as any*/)
-            ],
+            "kind": "ScalarField",
+            "name": "uri",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": [
-              {
-                "kind": "Literal",
-                "name": "first",
-                "value": 1
-              }
-            ],
-            "concreteType": "TagConnection",
-            "kind": "LinkedField",
-            "name": "documentationStages",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "TagEdge",
-                "kind": "LinkedField",
-                "name": "edges",
-                "plural": true,
-                "selections": [
-                  {
-                    "alias": null,
-                    "args": null,
-                    "concreteType": "Tag",
-                    "kind": "LinkedField",
-                    "name": "node",
-                    "plural": false,
-                    "selections": [
-                      {
-                        "alias": null,
-                        "args": null,
-                        "concreteType": "EntityMeta",
-                        "kind": "LinkedField",
-                        "name": "_meta",
-                        "plural": false,
-                        "selections": [
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "title",
-                            "storageKey": null
-                          }
-                        ],
-                        "storageKey": null
-                      },
-                      (v2/*:: as any*/)
-                    ],
-                    "storageKey": null
-                  }
-                ],
-                "storageKey": null
-              }
-            ],
-            "storageKey": "documentationStages(first:1)"
-          },
-          (v2/*:: as any*/)
+          }
         ],
         "storageKey": "component(uri:\"ds:global.component.button\")"
       }
     ]
   },
   "params": {
-    "cacheID": "3420079e741a699827526a56447883d4",
+    "cacheID": "75c916c4409ea6a3ce37f2e38e1fd119",
     "id": null,
     "metadata": {
       "relayTestingSelectionTypeInfo": {
@@ -228,46 +130,31 @@ return {
           "plural": false,
           "type": "Component"
         },
-        "component._meta": (v3/*:: as any*/),
-        "component._meta.curie": (v4/*:: as any*/),
-        "component.documentationStages": {
+        "component._meta": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
-          "type": "TagConnection"
+          "type": "EntityMeta"
         },
-        "component.documentationStages.edges": {
-          "enumValues": null,
-          "nullable": false,
-          "plural": true,
-          "type": "TagEdge"
-        },
-        "component.documentationStages.edges.node": {
+        "component._meta.curie": {
           "enumValues": null,
           "nullable": false,
           "plural": false,
-          "type": "Tag"
+          "type": "String"
         },
-        "component.documentationStages.edges.node._meta": (v3/*:: as any*/),
-        "component.documentationStages.edges.node._meta.title": (v4/*:: as any*/),
-        "component.documentationStages.edges.node.uri": (v5/*:: as any*/),
-        "component.name": (v6/*:: as any*/),
-        "component.summary": (v6/*:: as any*/),
-        "component.tier": {
+        "component.name": (v1/*:: as any*/),
+        "component.summary": (v1/*:: as any*/),
+        "component.uri": {
           "enumValues": null,
-          "nullable": true,
+          "nullable": false,
           "plural": false,
-          "type": "Tier"
-        },
-        "component.tier.name": (v6/*:: as any*/),
-        "component.tier.uri": (v5/*:: as any*/),
-        "component.uri": (v5/*:: as any*/),
-        "component.version": (v6/*:: as any*/)
+          "type": "ID"
+        }
       }
     },
     "name": "ComponentHeaderStoryQuery",
     "operationKind": "query",
-    "text": "query ComponentHeaderStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentHeader_node\n    uri\n  }\n}\n\nfragment ComponentHeader_node on Component {\n  name\n  summary\n  version\n  _meta {\n    curie\n  }\n  tier {\n    name\n    uri\n  }\n  documentationStages(first: 1) {\n    edges {\n      node {\n        _meta {\n          title\n        }\n        uri\n      }\n    }\n  }\n}\n"
+    "text": "query ComponentHeaderStoryQuery {\n  component(uri: \"ds:global.component.button\") {\n    ...ComponentHeader_node\n    uri\n  }\n}\n\nfragment ComponentHeader_node on Component {\n  name\n  summary\n  _meta {\n    curie\n  }\n}\n"
   }
 };
 })();

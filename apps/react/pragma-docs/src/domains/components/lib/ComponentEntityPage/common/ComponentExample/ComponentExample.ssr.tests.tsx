@@ -9,6 +9,8 @@ describe("ComponentExample SSR", () => {
     const html = renderToString(
       <ComponentExample address="ds:global.component.button" />,
     );
-    expect(html).toContain('<div class="stage"><button class="ds button');
+    expect(html).toContain(
+      '<section aria-label="Example" class="stage"><button class="ds button',
+    );
   });
 });

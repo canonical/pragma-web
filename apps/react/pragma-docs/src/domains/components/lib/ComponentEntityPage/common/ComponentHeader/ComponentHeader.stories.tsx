@@ -66,5 +66,5 @@ const meta: Meta<typeof Component> = {
 export default meta;
 type Story = StoryObj<typeof Component>;
 
-/** Button's name, summary and key values. */
+/** Button's name and summary. */
 export const Default: Story = {};

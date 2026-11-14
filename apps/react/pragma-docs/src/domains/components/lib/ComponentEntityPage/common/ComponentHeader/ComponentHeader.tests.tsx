@@ -7,16 +7,8 @@ import componentEntityRecordsButton from "../../../../__fixtures__/componentEnti
 import {
   BUTTON_URI,
   ENTITY_TEST_TIMEOUT_MS,
-  editBlock,
   entityPageAt,
 } from "../../../../__fixtures__/entityPageHarness.js";
-
-/** The header's key values, each term with its value. */
-const readFacts = () =>
-  [...document.querySelectorAll(".ds.component-header .pair")].map((pair) => [
-    pair.querySelector(".key")?.textContent,
-    pair.querySelector(".value")?.textContent,
-  ]);
 
 describe("ComponentHeader", () => {
   it(
@@ -40,7 +32,7 @@ describe("ComponentHeader", () => {
   );
 
   it(
-    "lists the address in inline code, then the tier and the stage the graph records",
+    "leaves the component's facts to the page",
     () => {
       render(
         entityPageAt(
@@ -49,49 +41,9 @@ describe("ComponentHeader", () => {
           createFetchSpy(),
         ),
       );
-      expect(readFacts().at(0)).toEqual(["Address", BUTTON_URI]);
       expect(
-        document.querySelector(".ds.component-header .pair .value code")
-          ?.textContent,
-      ).toBe(BUTTON_URI);
-      expect(readFacts().map(([term]) => term)).toContain("Tier");
-    },
-    ENTITY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    "leaves out the tier, the version and the stage the graph does not record",
-    () => {
-      const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
-        tier: null,
-        version: null,
-      }) as unknown as Record<string, Record<string, unknown>>;
-      const stages =
-        records[
-          "client:https://ds.canonical.com/global.component.button:documentationStages(first:1)"
-        ];
-      if (stages === undefined) throw new Error("the fixture lost its stages");
-      stages.edges = { __refs: [] };
-      render(
-        entityPageAt(
-          BUTTON_URI,
-          records as unknown as typeof componentEntityRecordsButton,
-          createFetchSpy(),
-        ),
-      );
-      expect(readFacts()).toEqual([["Address", BUTTON_URI]]);
-    },
-    ENTITY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    "shows the version when the graph records one",
-    () => {
-      const records = editBlock(componentEntityRecordsButton, BUTTON_URI, {
-        version: "2.1",
-      });
-      render(entityPageAt(BUTTON_URI, records, createFetchSpy()));
-      expect(readFacts()).toContainEqual(["Version", "2.1"]);
+        document.querySelector(".ds.component-header .ds.key-value-list"),
+      ).toBeNull();
     },
     ENTITY_TEST_TIMEOUT_MS,
   );

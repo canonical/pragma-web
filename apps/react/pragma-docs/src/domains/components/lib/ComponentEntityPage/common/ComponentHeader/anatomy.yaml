@@ -1,10 +1,10 @@
 ---
 # ComponentHeader — the component page's header: the name as the page's
-# level-1 heading, the summary on a reading measure of six intrinsic
-# columns and at most 75 characters, then the key values on the page's grid: the compact address in
-# the published InlineCode, the tier, the version and the first
-# documentation stage. An absent value leaves no pair. Application UI, not
-# prose: the heading, the summary and the key values sit one gutter apart.
+# level-1 heading (the compact address when it has no name), the summary
+# on a reading measure of six intrinsic columns and at most 75 characters.
+# The component's facts are the page's, shown beside the header.
+# Application UI, not prose: the heading and the summary sit one gutter
+# apart.
 #
 # Every decision is read through a component token declared on the root
 # (`--component-header-*`), bound to the symbol named here.
@@ -26,13 +26,22 @@ node:
     spacing.gap: grid.gutter
   edges:
     - node:
-        role: heading (the page's level-1 heading, the block's name)
-        projection:
-          field: name
+        role: heading (the page's level-1 heading, the name, else the address)
         styles:
           layout.grid.column: "1 / -1"
           spacing.external.block.start: 0
           spacing.external.block.end: 0
+        edges:
+          - node:
+              role: name
+              projection:
+                field: name
+            relation: { cardinality: "0..1" }
+          - node:
+              role: address
+              projection:
+                field: _meta.curie
+            relation: { cardinality: "0..1" }
       relation: { cardinality: "1", slotName: heading }
     - node:
         role: summary
@@ -44,37 +53,3 @@ node:
           spacing.external.block.start: 0
           spacing.external.block.end: 0
       relation: { cardinality: "0..1", slotName: summary }
-    - node:
-        uri: prism.component.key_value_list
-        edges:
-          - node:
-              role: address
-              projection:
-                field: _meta.curie
-              edges:
-                - node:
-                    uri: global.component.inline_code
-                  relation: { cardinality: "1" }
-            relation: { cardinality: "1" }
-          - node:
-              role: tier
-              projection:
-                field: name
-            relation:
-              cardinality: "0..1"
-              projection:
-                field: tier
-          - node:
-              role: version
-              projection:
-                field: version
-            relation: { cardinality: "0..1" }
-          - node:
-              role: stage
-              projection:
-                field: _meta.title
-            relation:
-              cardinality: "0..1"
-              projection:
-                field: documentationStages
-      relation: { cardinality: "1", slotName: facts }

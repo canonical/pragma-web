@@ -7,16 +7,19 @@ import ComponentExample from "./ComponentExample.js";
 describe("ComponentExample", () => {
   it("renders the published component on its stage", () => {
     render(<ComponentExample address="ds:global.component.button" />);
-    const section = screen.getByRole("region", { name: "Example" });
-    expect(section.querySelector(".stage .ds.button")).not.toBeNull();
-    expect(section.querySelector(".absent")).toBeNull();
+    const stage = screen.getByRole("region", { name: "Example" });
+    expect(stage).toHaveClass("stage");
+    expect(stage.querySelector(".ds.button")).not.toBeNull();
+    expect(screen.queryByRole("heading")).toBeNull();
+    expect(document.querySelector(".absent")).toBeNull();
   });
 
   it("says a block the published package does not implement has no example", () => {
-    render(<ComponentExample address="ds:global.component.accordion" />);
-    const section = screen.getByRole("region", { name: "Example" });
-    expect(section.querySelector(".stage")).toBeNull();
-    expect(section.querySelector(".absent")).toHaveTextContent(
+    const { container } = render(
+      <ComponentExample address="ds:global.component.accordion" />,
+    );
+    expect(screen.queryByRole("region")).toBeNull();
+    expect(container.querySelector(".absent")).toHaveTextContent(
       "has no rendered example",
     );
   });
@@ -30,7 +33,7 @@ describe("ComponentExample", () => {
       />,
     );
     expect(screen.getByTestId("example").className).toBe(
-      "ds page-section ds component-example is-quiet",
+      "ds component-example is-quiet",
     );
   });
 });

@@ -2,7 +2,6 @@
 
 import type { ReactElement } from "react";
 import { useMessages } from "#i18n";
-import { PageSection } from "#lib/ui/PageSection";
 import {
   BLOCK_EXAMPLES,
   UIBlockExample,
@@ -13,10 +12,12 @@ import "./styles.css";
 const componentCssClassName = "ds component-example";
 
 /**
- * The component page's first section: the block's rendered example, the
- * published React component in its default state, server-rendered on a
- * stage framed by a hairline across the main column. A block the
- * published package does not implement says so in one muted line.
+ * The component page's example, the body before its sections: the block's
+ * rendered example, the published React component in its default state,
+ * server-rendered on a stage framed by a hairline across the main column.
+ * The stage is a region named "Example", the page's sections carrying the
+ * headings. A block the published package does not implement says so in
+ * one muted line.
  *
  * `import { ComponentExample } from "../ComponentExample/index.js";`
  *
@@ -31,19 +32,17 @@ export default function ComponentExample({
   const t = useMessages();
   const example = BLOCK_EXAMPLES.get(address);
   return (
-    <PageSection
+    <div
       {...props}
       className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      heading={t("component.example")}
-      headingId="component-example-title"
     >
       {example === undefined ? (
         <p className="absent">{t("component.noExample")}</p>
       ) : (
-        <div className="stage">
+        <section aria-label={t("component.example")} className="stage">
           <UIBlockExample example={example} />
-        </div>
+        </section>
       )}
-    </PageSection>
+    </div>
   );
 }

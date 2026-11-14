@@ -10,11 +10,13 @@ import {
 } from "../../../../__fixtures__/entityPageHarness.js";
 
 describe("ComponentHeader SSR", () => {
-  it("server-renders the heading and the key values on the page's grid", () => {
+  it("server-renders the heading over the summary", () => {
     const html = renderToString(
       entityPageAt(BUTTON_URI, componentEntityRecordsButton, createFetchSpy()),
     );
     expect(html).toContain('<header class="ds component-header">');
-    expect(html).toContain('<dl class="ds key-value-list facts">');
+    expect(html).toContain(
+      '<h1 class="heading" id="component-entity-title">Button</h1>',
+    );
   });
 });

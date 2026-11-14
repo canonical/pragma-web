@@ -3,19 +3,26 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* The section is the page section's; its tokens sit on this root. */
+  /* A subgrid of the content over every column, its gap the grid's
+   * gutter on both axes. */
   .ds.component-example {
+    --component-example-gap: var(--grid-gutter);
     --component-example-stage-padding-block: var(--container-gap-loose);
     --component-example-stage-padding-inline: var(--component-padding-inline);
     --component-example-stage-border-width: 1px;
     --component-example-stage-border-color: var(--color-border-muted);
     --component-example-absent-color: var(--color-text-muted);
+
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    gap: var(--component-example-gap);
   }
 
   /* The stage spans the main column, framed by a hairline, the component
    * one loose step from its top and bottom and one inline padding from
    * its sides. */
-  .ds.component-example .stage {
+  .ds.component-example > .stage {
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
@@ -27,7 +34,7 @@
     border-color: var(--component-example-stage-border-color);
   }
 
-  .ds.component-example .absent {
+  .ds.component-example > .absent {
     grid-column: 1 / -1;
     margin-block: 0;
     color: var(--component-example-absent-color);

@@ -79,6 +79,30 @@ const componentEntityRecordsAccordion = {
     },
   },
   "client:https://ds.canonical.com/global.component.accordion:_meta": {
+    fields: {
+      __refs: [
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:0",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:1",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:2",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:3",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:4",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:5",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:6",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:7",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:8",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:9",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:10",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:11",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:12",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:13",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:14",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:15",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:16",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:17",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:18",
+        "client:https://ds.canonical.com/global.component.accordion:_meta:fields:19",
+      ],
+    },
     __id: "client:https://ds.canonical.com/global.component.accordion:_meta",
     __typename: "EntityMeta",
     curie: "ds:global.component.accordion",
@@ -289,6 +313,192 @@ const componentEntityRecordsAccordion = {
       edges: {
         __refs: [],
       },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:0": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:0",
+    __typename: "ClassProperty",
+    name: "subcomponents",
+    order: 5,
+    group: { __ref: "https://ds.canonical.com/section.relations" },
+  },
+  "https://ds.canonical.com/section.relations": {
+    __id: "https://ds.canonical.com/section.relations",
+    __typename: "PropertyGroup",
+    order: 6,
+    uri: "https://ds.canonical.com/section.relations",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:1": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:1",
+    __typename: "ClassProperty",
+    name: "tokenBindings",
+    order: 3,
+    group: { __ref: "https://ds.canonical.com/section.anatomy" },
+  },
+  "https://ds.canonical.com/section.anatomy": {
+    __id: "https://ds.canonical.com/section.anatomy",
+    __typename: "PropertyGroup",
+    order: 4,
+    uri: "https://ds.canonical.com/section.anatomy",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:2": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:2",
+    __typename: "ClassProperty",
+    name: "variants",
+    order: 4,
+    group: { __ref: "https://ds.canonical.com/section.relations" },
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:3": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:3",
+    __typename: "ClassProperty",
+    name: "variantOfs",
+    order: 3,
+    group: { __ref: "https://ds.canonical.com/section.relations" },
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:4": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:4",
+    __typename: "ClassProperty",
+    name: "specializedBies",
+    order: 2,
+    group: { __ref: "https://ds.canonical.com/section.relations" },
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:5": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:5",
+    __typename: "ClassProperty",
+    name: "inheritsFroms",
+    order: 1,
+    group: { __ref: "https://ds.canonical.com/section.relations" },
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:6": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:6",
+    __typename: "ClassProperty",
+    name: "changeLogs",
+    order: 1,
+    group: { __ref: "https://ds.canonical.com/section.history" },
+  },
+  "https://ds.canonical.com/section.history": {
+    __id: "https://ds.canonical.com/section.history",
+    __typename: "PropertyGroup",
+    order: 7,
+    uri: "https://ds.canonical.com/section.history",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:7": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:7",
+    __typename: "ClassProperty",
+    name: "documentationStages",
+    order: 4,
+    group: { __ref: "https://ds.canonical.com/section.overview" },
+  },
+  "https://ds.canonical.com/section.overview": {
+    __id: "https://ds.canonical.com/section.overview",
+    __typename: "PropertyGroup",
+    order: 1,
+    uri: "https://ds.canonical.com/section.overview",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:8": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:8",
+    __typename: "ClassProperty",
+    name: "properties",
+    order: 1,
+    group: { __ref: "https://ds.canonical.com/section.api" },
+  },
+  "https://ds.canonical.com/section.api": {
+    __id: "https://ds.canonical.com/section.api",
+    __typename: "PropertyGroup",
+    order: 5,
+    uri: "https://ds.canonical.com/section.api",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:9": {
+    __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:9",
+    __typename: "ClassProperty",
+    name: "modifierFamilies",
+    order: 2,
+    group: { __ref: "https://ds.canonical.com/section.api" },
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:10":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:10",
+      __typename: "ClassProperty",
+      name: "tier",
+      order: 3,
+      group: { __ref: "https://ds.canonical.com/section.overview" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:11":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:11",
+      __typename: "ClassProperty",
+      name: "guidelines",
+      order: 2,
+      group: { __ref: "https://ds.canonical.com/section.usage" },
+    },
+  "https://ds.canonical.com/section.usage": {
+    __id: "https://ds.canonical.com/section.usage",
+    __typename: "PropertyGroup",
+    order: 3,
+    uri: "https://ds.canonical.com/section.usage",
+  },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:12":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:12",
+      __typename: "ClassProperty",
+      name: "usage",
+      order: 1,
+      group: { __ref: "https://ds.canonical.com/section.usage" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:13":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:13",
+      __typename: "ClassProperty",
+      name: "anatomyDsl",
+      order: 1,
+      group: { __ref: "https://ds.canonical.com/section.anatomy" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:14":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:14",
+      __typename: "ClassProperty",
+      name: "anatomyClassic",
+      order: 2,
+      group: { __ref: "https://ds.canonical.com/section.anatomy" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:15":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:15",
+      __typename: "ClassProperty",
+      name: "figmaLink",
+      order: 6,
+      group: { __ref: "https://ds.canonical.com/section.overview" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:16":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:16",
+      __typename: "ClassProperty",
+      name: "decisionLog",
+      order: 2,
+      group: { __ref: "https://ds.canonical.com/section.history" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:17":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:17",
+      __typename: "ClassProperty",
+      name: "version",
+      order: 5,
+      group: { __ref: "https://ds.canonical.com/section.overview" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:18":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:18",
+      __typename: "ClassProperty",
+      name: "summary",
+      order: 2,
+      group: { __ref: "https://ds.canonical.com/section.overview" },
+    },
+  "client:https://ds.canonical.com/global.component.accordion:_meta:fields:19":
+    {
+      __id: "client:https://ds.canonical.com/global.component.accordion:_meta:fields:19",
+      __typename: "ClassProperty",
+      name: "name",
+      order: 1,
+      group: { __ref: "https://ds.canonical.com/section.overview" },
     },
 } as unknown as RecordMap;
 
