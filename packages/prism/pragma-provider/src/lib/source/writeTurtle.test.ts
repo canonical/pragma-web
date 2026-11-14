@@ -155,7 +155,7 @@ ds:button
     expect(text).toContain("ds:part [] .");
   });
 
-  it("keeps a label Turtle accepts for a blank node two statements name", () => {
+  it("labels a blank node two statements name _:b0, not by its store id", () => {
     const shared: Term = { termType: "BlankNode", value: "b0:x" };
     const text = writeTurtle(
       [
@@ -167,13 +167,41 @@ ds:button
     );
     expect(text).toBe(`@prefix ds: <${DS}> .
 
-_:b0_x
+_:b0
   ds:value "4" .
 
 ds:button
-  ds:also _:b0_x ;
-  ds:part _:b0_x .
+  ds:also _:b0 ;
+  ds:part _:b0 .
 `);
+  });
+
+  it("writes the same text under two different sets of blank-node ids", () => {
+    /** The statements, their blank nodes named by `ids`. */
+    const describe = (ids: readonly string[]): Quad[] => {
+      const [first, second, third] = ids.map(
+        (value): Term => ({ termType: "BlankNode", value }),
+      );
+      if (first === undefined || second === undefined || third === undefined) {
+        throw new Error("three ids are needed");
+      }
+      return [
+        statement(button, `${DS}part`, first),
+        statement(button, `${DS}part`, second),
+        statement(button, `${DS}also`, first),
+        statement(button, `${DS}also`, second),
+        statement(first, `${DS}next`, second),
+        statement(second, `${DS}next`, first),
+        statement(first, `${DS}value`, { termType: "Literal", value: "4" }),
+        statement(second, `${DS}value`, { termType: "Literal", value: "5" }),
+        statement(third, `${DS}value`, { termType: "Literal", value: "6" }),
+      ];
+    };
+    const text = writeTurtle(describe(["zz9", "aa1", "mm5"]), PREFIXES);
+    expect(writeTurtle(describe(["n0", "n7", "n3"]), PREFIXES)).toBe(text);
+    expect(text).toContain("_:b0");
+    expect(text).toContain("_:b2");
+    expect(text).not.toMatch(/zz9|aa1|mm5/);
   });
 
   it("lists several objects in order and several subjects in order", () => {

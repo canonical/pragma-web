@@ -39,8 +39,34 @@ const findPrefixedName = (
 const writeString = (value: string): string =>
   `"${[...value].map((character) => STRING_ESCAPES.get(character) ?? character).join("")}"`;
 
+/** Writes a labelled blank node. */
+type LabelBlankNode = (term: Term) => string;
+
 /**
- * Write one term, recording the prefix it uses.
+ * The label every labelled blank node is sorted by: the same for all of
+ * them, so the order of the document never depends on the store's ids.
+ */
+const labelForSorting: LabelBlankNode = () => "_:";
+
+/**
+ * A labeller that writes `_:b0`, `_:b1`, ... in the order it is first
+ * asked for each blank node, which is the order of first appearance when
+ * the document is written front to back.
+ *
+ * @note Impure: the labeller records each blank node it labels.
+ */
+const createBlankNodeLabeller = (): LabelBlankNode => {
+  const labels = new Map<string, string>();
+  return (term) => {
+    const label = labels.get(term.value) ?? `_:b${labels.size}`;
+    labels.set(term.value, label);
+    return label;
+  };
+};
+
+/**
+ * Write one term, recording the prefix it uses; a blank node is written
+ * with the label `label` gives it.
  *
  * @note Impure: adds to `used`.
  */
@@ -48,10 +74,9 @@ const writeTerm = (
   term: Term,
   prefixes: ReadonlyMap<string, string>,
   used: Set<string>,
+  label: LabelBlankNode,
 ): string => {
-  if (term.termType === "BlankNode") {
-    return `_:${term.value.replaceAll(/[^A-Za-z0-9_-]/g, "_")}`;
-  }
+  if (term.termType === "BlankNode") return label(term);
   if (term.termType === "NamedNode") {
     const name = findPrefixedName(term.value, prefixes);
     if (name === undefined) return `<${term.value}>`;
@@ -69,7 +94,7 @@ const writeTerm = (
   ) {
     return text;
   }
-  return `${text}^^${writeTerm({ termType: "NamedNode", value: term.datatype }, prefixes, used)}`;
+  return `${text}^^${writeTerm({ termType: "NamedNode", value: term.datatype }, prefixes, used, label)}`;
 };
 
 /** The key a term is told apart by: its kind, value, language and datatype. */
@@ -112,7 +137,9 @@ const describeSubjects = (
       objects: new Map<string, Term[]>(),
     };
     const predicateText =
-      predicate.value === RDF_TYPE ? "a" : writeTerm(predicate, prefixes, used);
+      predicate.value === RDF_TYPE
+        ? "a"
+        : writeTerm(predicate, prefixes, used, labelForSorting);
     description.objects.set(predicateText, [
       ...(description.objects.get(predicateText) ?? []),
       object,
@@ -134,9 +161,12 @@ const describeSubjects = (
  * predicate in code-point order of their written form, separated by `,`.
  * A blank node that is the object of exactly one statement is written in
  * place, as `[ … ]` with its own statements nested the same way; any other
- * blank node keeps a label and its own block, so a cycle still closes. An
- * IRI is shortened only when a prefix's namespace starts it and the rest is
- * a valid local name; literals keep their language or datatype. The same
+ * blank node gets a label and its own block, so a cycle still closes. The
+ * labels are `_:b0`, `_:b1`, ... in order of first appearance, and the
+ * order is decided with every label alike, so the text never depends on
+ * the store's own blank-node ids, which are new on every boot. An IRI is
+ * shortened only when a prefix's namespace starts it and the rest is a
+ * valid local name; literals keep their language or datatype. The same
  * statements always read the same.
  *
  * @param quads - The statements.
@@ -152,10 +182,14 @@ export const writeTurtle = (
   const isNested = (term: Term): boolean =>
     term.termType === "BlankNode" && references.get(readTermKey(term)) === 1;
 
-  /** One subject's predicate lines, each indented `depth` steps. */
+  /**
+   * One subject's predicate lines, each indented `depth` steps, the
+   * objects ordered as written with every label alike.
+   */
   const writeLines = (
     objects: ReadonlyMap<string, readonly Term[]>,
     depth: number,
+    label: LabelBlankNode,
   ): string =>
     [...objects]
       .sort(([left], [right]) =>
@@ -164,28 +198,41 @@ export const writeTurtle = (
       .map(
         ([predicate, terms]) =>
           `${"  ".repeat(depth)}${predicate} ${terms
-            .map((term) => writeObject(term, depth))
-            .sort(compareText)
+            .map((term) => ({
+              term,
+              key: writeObject(term, depth, labelForSorting),
+            }))
+            .sort((left, right) => compareText(left.key, right.key))
+            .map(({ term }) => writeObject(term, depth, label))
             .join(", ")}`,
       )
       .join(" ;\n");
 
   /** An object: a nested blank node in place, any other term as itself. */
-  const writeObject = (term: Term, depth: number): string => {
-    if (!isNested(term)) return writeTerm(term, prefixes, used);
+  const writeObject = (
+    term: Term,
+    depth: number,
+    label: LabelBlankNode,
+  ): string => {
+    if (!isNested(term)) return writeTerm(term, prefixes, used, label);
     const objects = descriptions.get(readTermKey(term))?.objects;
     if (objects === undefined) return "[]";
-    return `[\n${writeLines(objects, depth + 1)}\n${"  ".repeat(depth)}]`;
+    return `[\n${writeLines(objects, depth + 1, label)}\n${"  ".repeat(depth)}]`;
   };
 
+  const label = createBlankNodeLabeller();
   const statements = [...descriptions.values()]
     .filter(({ subject }) => !isNested(subject))
     .map(({ subject, objects }) => ({
-      subject: writeTerm(subject, prefixes, used),
-      lines: writeLines(objects, 1),
+      subject,
+      objects,
+      key: `${writeTerm(subject, prefixes, used, labelForSorting)}\n${writeLines(objects, 1, labelForSorting)}`,
     }))
-    .sort((left, right) => compareText(left.subject, right.subject))
-    .map(({ subject, lines }) => `${subject}\n${lines} .\n`);
+    .sort((left, right) => compareText(left.key, right.key))
+    .map(
+      ({ subject, objects }) =>
+        `${writeTerm(subject, prefixes, used, label)}\n${writeLines(objects, 1, label)} .\n`,
+    );
   const header = [...used]
     .sort(compareText)
     .map((prefix) => `@prefix ${prefix}: <${prefixes.get(prefix)}> .\n`)

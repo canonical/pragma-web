@@ -60,8 +60,10 @@ const writeTermText = ({ termType, value, language, datatype }: AnyTerm) => {
 
 /**
  * The statements of `subject` with every blank object written as its own
- * statements, in place and in order: two graphs that describe `subject`
- * the same read the same, whatever their blank nodes' labels.
+ * statements, in place and in order, and a blank object that closes a
+ * cycle as how many steps up the path it was first written: two graphs
+ * that describe `subject` the same read the same, whatever their blank
+ * nodes' labels.
  */
 const describeTree = (
   subject: AnyTerm,
@@ -74,11 +76,15 @@ const describeTree = (
         quad.subject.termType === subject.termType &&
         quad.subject.value === subject.value,
     )
-    .map(({ predicate, object }) =>
-      object.termType === "BlankNode" && !seen.has(object.value)
-        ? `<${predicate.value}> [${describeTree(object, quads, new Set([...seen, object.value])).join(" ; ")}]`
-        : `<${predicate.value}> ${writeTermText(object)}`,
-    )
+    .map(({ predicate, object }) => {
+      if (object.termType !== "BlankNode") {
+        return `<${predicate.value}> ${writeTermText(object)}`;
+      }
+      if (seen.has(object.value)) {
+        return `<${predicate.value}> ^${[...seen].reverse().indexOf(object.value)}`;
+      }
+      return `<${predicate.value}> [${describeTree(object, quads, new Set([...seen, object.value])).join(" ; ")}]`;
+    })
     .sort();
 
 /** The blank nodes `quads` name as an object but never describe. */
