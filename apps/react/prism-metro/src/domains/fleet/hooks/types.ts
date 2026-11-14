@@ -1,3 +1,4 @@
+import type { FleetIndexQuery$data } from "#relay/__generated__/FleetIndexQuery.graphql.js";
 import type { GraphQLTaggedNode, OperationType } from "relay-runtime";
 
 /** An operation that reads one node by its absolute IRI, as `id`. */
@@ -16,3 +17,8 @@ export interface UseFleetNodeProps {
 /** What `useFleetNode` returns: the operation's response. */
 export type UseFleetNodeResult<TQuery extends FleetNodeOperation> =
   TQuery["response"];
+
+/** A rolling stock the fleet index's operation lists. */
+export type FleetStock = NonNullable<
+  FleetIndexQuery$data["ontologyClass"]
+>["instances"]["edges"][number]["node"];

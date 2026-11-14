@@ -1,0 +1,16 @@
+---
+# FleetCount — the strip's count on the fleet index, closing its filtering
+# group: how many rolling stocks the index lists, read from the index's own
+# operation through the hook the list reads it with. The operation carries
+# no total, so the line states the stocks listed. It renders core's count
+# line and binds no style of its own.
+#
+# Token ledger: none.
+node:
+  uri: metro.subcomponent.fleet_count
+  projection:
+    on: Query
+  edges:
+    - node:
+        uri: prism.component.count_line
+      relation: { cardinality: "1", slotName: default }

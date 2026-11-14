@@ -34,6 +34,7 @@ describe("FleetLayout", () => {
     );
     const facts = await screen.findByRole("region", { name: "Facts" });
     expect(container.querySelector(".aside")).toContainElement(facts);
+    expect(container.querySelector('[data-slot="count"]')).toBeNull();
   });
 
   it("names the page's address as the trail's current crumb", async () => {
