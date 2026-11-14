@@ -4,7 +4,7 @@ import {
   type ViewSearch,
   warmPageRenderer,
 } from "@canonical/prism-core";
-import { type CacheConfig, fetchQuery } from "relay-runtime";
+import { type CacheConfig, type Environment, fetchQuery } from "relay-runtime";
 import type { EntityNamespacesQuery } from "../__generated__/EntityNamespacesQuery.graphql.js";
 import entityNamespacesQueryNode from "../__generated__/EntityNamespacesQuery.graphql.js";
 import type { EntityPageQuery } from "../__generated__/EntityPageQuery.graphql.js";
@@ -61,22 +61,45 @@ export default function warmEntity(
     STORE_OR_NETWORK,
   )
     .toPromise()
-    .then((namespaces) => {
-      const variables = buildEntityPageVariables(
-        binding,
-        uri,
-        /* v8 ignore next -- the observable yields the response before it completes */
-        namespaces?.ontologies ?? [],
-      );
-      return Promise.all([
-        fetchQuery<EntityPageQuery>(
-          environment,
-          entityPageQueryNode,
-          variables,
-          STORE_OR_NETWORK,
-        ).toPromise(),
-        warmPageRenderer(variables.id, search, environment),
-      ]);
-    })
-    .then(() => undefined);
+    .then((namespaces) =>
+      warmEntityPage(
+        environment,
+        buildEntityPageVariables(
+          binding,
+          uri,
+          /* v8 ignore next -- the observable yields the response before it completes */
+          namespaces?.ontologies ?? [],
+        ),
+        search,
+      ),
+    );
+}
+
+/**
+ * Warm the page's own operation and, beside it, what the address's page
+ * renderer reads of the expanded IRI.
+ *
+ * @param environment - The environment both requests go through.
+ * @param variables - The page operation's variables, carrying the
+ *   expanded IRI as `id`.
+ * @param search - The matched view search, selecting the page renderer.
+ * @returns A promise that settles when both are warm, or rejects with the
+ *   page operation's error.
+ * @note Impure: performs up to two network requests through the
+ *   environment.
+ */
+function warmEntityPage(
+  environment: Environment,
+  variables: EntityPageQuery["variables"],
+  search: ViewSearch,
+): Promise<void> {
+  return Promise.all([
+    fetchQuery<EntityPageQuery>(
+      environment,
+      entityPageQueryNode,
+      variables,
+      STORE_OR_NETWORK,
+    ).toPromise(),
+    warmPageRenderer(variables.id, search, environment),
+  ]).then(() => undefined);
 }
