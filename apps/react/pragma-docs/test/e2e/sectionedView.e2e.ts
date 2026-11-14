@@ -5,7 +5,10 @@
  * last three of the canvas's twelve columns: on a standard's page the
  * aside sits on `-4 / -1`, sticky, 348px wide beside an 833px content
  * column whose Rule paragraph keeps a 592px measure; on Button's page the
- * aside stays where it is while the canvas scrolls to its end.
+ * aside stays where it is while the canvas scrolls to its end. Below three
+ * groups, at 1366 and 390, Button's page opens on the "On this page" bar,
+ * which sticks, names the current section, opens over the page without
+ * moving it, and works with scripts off.
  */
 
 import { launchBrowser } from "@canonical/prism-core/testing/browser";
@@ -18,6 +21,24 @@ const CWD = process.cwd();
 
 /** The desktop the view's three groups are designed for. */
 const DESKTOP = { width: 1440, height: 900 } as const;
+
+/** A laptop just below three groups, and a phone: both show the bar. */
+const BAR_VIEWPORTS = [
+  { width: 1366, height: 768 },
+  { width: 390, height: 844 },
+] as const;
+
+/** The phone the current section and the scripts-off bar are read on. */
+const PHONE = { width: 390, height: 844 } as const;
+
+/** The bar's height at most (M14). */
+const BAR_MAX_BLOCK_SIZE_PX = 44;
+
+/** The bar's hook (Annex D). */
+const BAR = "[data-region=contents-bar]";
+
+/** The fewest of Button's headings a scroll must bring to the bar's edge. */
+const MIN_HEADINGS_REACHED = 2;
 
 /** A standard's reading page, which has one section, the rule. */
 const STANDARD_PATH = `/standards/${encodeURIComponent("http://pragma.canonical.com/codestandards#code.api.stability")}`;
@@ -60,13 +81,22 @@ afterAll(async () => {
 });
 
 /**
- * Open `path` at 1440 by 900, serving only the app's and the graph's
- * origins.
+ * Open `path` at 1440 by 900, or at the viewport given, with scripts on
+ * unless told otherwise, serving only the app's and the graph's origins.
  *
  * @note Impure: opens a browser tab, which the caller closes.
  */
-const open = async (path: string): Promise<Page> => {
-  const page = await browser.newPage({ viewport: DESKTOP });
+const open = async (
+  path: string,
+  {
+    viewport = DESKTOP,
+    javaScriptEnabled = true,
+  }: {
+    readonly viewport?: { readonly width: number; readonly height: number };
+    readonly javaScriptEnabled?: boolean;
+  } = {},
+): Promise<Page> => {
+  const page = await browser.newPage({ viewport, javaScriptEnabled });
   const origins = [
     new URL(server.base).origin,
     new URL(server.graphBase).origin,
@@ -159,6 +189,208 @@ describe("the sectioned view at 1440px", () => {
       expect(Math.abs((after ?? 0) - (before ?? 0))).toBeLessThanOrEqual(
         TOLERANCE_PX,
       );
+    } finally {
+      await page.close();
+    }
+  });
+});
+
+/** What the bar and the page around it measure below three groups. */
+type BarMeasure = {
+  readonly asideDisplay: string | null;
+  readonly contentsDisplay: string | null;
+  readonly firstChildIsBar: boolean;
+  readonly barPosition: string;
+  readonly barTop: number;
+  readonly barHeight: number;
+  readonly scrollTop: number;
+  readonly sectionTops: readonly number[];
+  readonly headings: readonly { id: string; scrollMargin: number }[];
+};
+
+/**
+ * Measure Button's view below three groups: its aside and index, its first
+ * child, the bar, the canvas's scroll and every section heading. Runs in
+ * the page.
+ *
+ * @throws When the page has no view, no bar or no canvas.
+ */
+const measureBar = (): BarMeasure => {
+  const view = document.querySelector(".ds.sectioned-view");
+  const bar = view?.querySelector(":scope > [data-region=contents-bar]");
+  const canvas = document.querySelector("main.ds.canvas");
+  if (!view || !bar || !canvas) throw new Error("the page has no bar");
+  const aside = view.querySelector(":scope > .aside");
+  const contents = view.querySelector(":scope > .aside > .contents");
+  const headings = [
+    ...view.querySelectorAll(":scope > .content > .section > h2"),
+  ];
+  const box = bar.getBoundingClientRect();
+  return {
+    asideDisplay: aside ? getComputedStyle(aside).display : null,
+    contentsDisplay: contents ? getComputedStyle(contents).display : null,
+    firstChildIsBar: view.firstElementChild === bar,
+    barPosition: getComputedStyle(bar).position,
+    barTop: box.top,
+    barHeight: box.height,
+    scrollTop: canvas.scrollTop,
+    sectionTops: headings.map((heading) => heading.getBoundingClientRect().top),
+    headings: headings.map((heading) => ({
+      id: heading.id,
+      scrollMargin: Number.parseFloat(
+        getComputedStyle(heading).scrollMarginBlockStart,
+      ),
+    })),
+  };
+};
+
+/**
+ * Scroll the canvas to its end and wait a frame. Runs in the page.
+ *
+ * @throws When the page has no canvas.
+ */
+const scrollToEnd = async (): Promise<number> => {
+  const canvas = document.querySelector("main.ds.canvas");
+  if (!canvas) throw new Error("the page has no canvas");
+  canvas.scrollTop = canvas.scrollHeight;
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  return canvas.scrollTop;
+};
+
+describe("the sectioned view's contents bar below three groups", () => {
+  it.each(BAR_VIEWPORTS)(
+    "opens Button's page at $width on a sticky bar of at most 44px, with no aside (W6a-A5)",
+    async (viewport) => {
+      const page = await open(BUTTON_PATH, { viewport });
+      try {
+        const before = await page.evaluate(measureBar);
+        expect(before.asideDisplay).toBe("contents");
+        expect(before.contentsDisplay).toBe("none");
+        expect(before.firstChildIsBar).toBe(true);
+        expect(before.barPosition).toBe("sticky");
+        expect(before.barHeight).toBeGreaterThan(0);
+        expect(before.barHeight).toBeLessThanOrEqual(
+          BAR_MAX_BLOCK_SIZE_PX + TOLERANCE_PX,
+        );
+        expect(before.headings.length).toBeGreaterThan(0);
+        for (const { id, scrollMargin } of before.headings) {
+          expect(id).not.toBe("");
+          expect(Math.abs(scrollMargin - before.barHeight)).toBeLessThanOrEqual(
+            TOLERANCE_PX,
+          );
+        }
+
+        await page.locator(`${BAR} summary`).click();
+        const opened = await page.evaluate(measureBar);
+        expect(
+          await page.locator(`${BAR} details`).getAttribute("open"),
+        ).not.toBeNull();
+        expect(await page.locator(`${BAR} .panel`).isVisible()).toBe(true);
+        expect(opened.scrollTop).toBe(before.scrollTop);
+        expect(opened.sectionTops).toEqual(before.sectionTops);
+        await page.locator(`${BAR} summary`).click();
+
+        expect(await page.evaluate(scrollToEnd)).toBeGreaterThan(0);
+        const after = await page.evaluate(measureBar);
+        expect(Math.abs(after.barTop - before.barTop)).toBeLessThanOrEqual(
+          TOLERANCE_PX,
+        );
+      } finally {
+        await page.close();
+      }
+    },
+  );
+
+  it("shows no bar at 1440, where the aside holds the index", async () => {
+    const page = await open(BUTTON_PATH);
+    try {
+      expect(await page.locator(BAR).isVisible()).toBe(false);
+      expect(
+        await page.locator(".ds.sectioned-view > .aside").isVisible(),
+      ).toBe(true);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("names the section whose heading reached the bar, and marks its links (W6a-A3)", async () => {
+    const page = await open(BUTTON_PATH, { viewport: PHONE });
+    try {
+      const sections = await page.evaluate(() =>
+        [
+          ...document.querySelectorAll(
+            ".ds.sectioned-view > .content > .section > h2",
+          ),
+        ].map((heading) => ({
+          id: heading.id,
+          title: heading.textContent ?? "",
+        })),
+      );
+      let reached = 0;
+      for (const { id, title } of sections) {
+        const rests = await page.evaluate(async (target) => {
+          const heading = document.getElementById(target);
+          const bar = document.querySelector("[data-region=contents-bar]");
+          if (!heading || !bar) throw new Error("no heading or no bar");
+          heading.scrollIntoView({ behavior: "instant", block: "start" });
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          return (
+            Math.abs(
+              heading.getBoundingClientRect().top -
+                bar.getBoundingClientRect().bottom,
+            ) <= 1
+          );
+        }, id);
+        if (!rests) continue;
+        reached += 1;
+        await expect
+          .poll(() => page.locator(`${BAR} summary .current`).textContent())
+          .toBe(title);
+        const marked = await page.evaluate(() =>
+          [
+            ...document.querySelectorAll(
+              '.ds.sectioned-view a[aria-current="location"]',
+            ),
+          ].map((link) => link.getAttribute("href")),
+        );
+        expect(marked).toEqual([`#${id}`, `#${id}`]);
+      }
+      expect(reached).toBeGreaterThanOrEqual(MIN_HEADINGS_REACHED);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it("opens with scripts off and its links move a heading to the bar's edge (W6a-A8)", async () => {
+    const page = await open(BUTTON_PATH, {
+      viewport: PHONE,
+      javaScriptEnabled: false,
+    });
+    try {
+      const summary = page.locator(`${BAR} summary`);
+      expect((await summary.textContent())?.trim()).toBe("On this page");
+      expect(
+        await page.locator(`${BAR} details`).getAttribute("open"),
+      ).toBeNull();
+      await summary.click();
+      expect(
+        await page.locator(`${BAR} details`).getAttribute("open"),
+      ).not.toBeNull();
+      const link = page.locator(`${BAR} .panel a`).first();
+      const href = (await link.getAttribute("href")) ?? "";
+      await link.click();
+      const heading = page.locator(`[id="${href.slice(1)}"]`);
+      await expect
+        .poll(async () => {
+          const [bar, target] = await Promise.all([
+            page.locator(BAR).boundingBox(),
+            heading.boundingBox(),
+          ]);
+          return Math.abs(
+            (target?.y ?? 0) - ((bar?.y ?? 0) + (bar?.height ?? 0)),
+          );
+        })
+        .toBeLessThanOrEqual(TOLERANCE_PX);
     } finally {
       await page.close();
     }
