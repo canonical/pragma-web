@@ -101,6 +101,12 @@
     margin-inline-start: auto;
   }
 
+  /* A folded count is the narrow form's, where the panel that holds it at
+   * two groups and wider is not displayed. */
+  .ds.mode-strip > .filtering > .count.is-folded {
+    display: none;
+  }
+
   /* Below two groups the band is one flex line: the trail, the view
    * group's menu, then the fold and the count at the end; the sheet holds
    * Search and the chips. The trail takes only the room the other groups
@@ -140,6 +146,10 @@
 
     .ds.mode-strip > .filtering > .fold {
       display: flex;
+    }
+
+    .ds.mode-strip > .filtering > .count.is-folded {
+      display: block;
     }
   }
 }

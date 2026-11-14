@@ -30,6 +30,11 @@
 # trail gives way first, down to nothing; only then does the count shorten,
 # its text ending in an ellipsis, so no group is painted over another.
 #
+# A folded count (`.is-folded`, the `countFolded` prop) is displayed only
+# below two groups: a lens whose count stands in a panel at two groups and
+# wider passes the panel's own count there, so the folded strip reads the
+# trail, the menu, "Filter · n" and the count in either placement.
+#
 # Every decision is read through a component token declared on the root
 # (`--mode-strip-*`), bound to the symbol named here.
 #
@@ -54,8 +59,8 @@
 #     shrinks only once the trail is gone, and then its count slot shrinks
 #     (`layout.flex.shrink: 1`, `size.min.width: 0`), the count line's
 #     text ending in an ellipsis; nothing reaches back over another group;
-#     the search and chips slots are not displayed; the fold slot is
-#     displayed.
+#     the search and chips slots are not displayed; the fold slot and a
+#     folded count slot are displayed.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
 # density.line.height, component.padding.block, space.100, and the
@@ -134,14 +139,25 @@ node:
                     uri: prism.component.filter_fold
                   relation: { cardinality: "1", slotName: default }
             relation: { cardinality: "0..1", slotName: fold }
-          - node:
-              role: count slot
-              styles:
-                layout.flex.shrink: 0
-                spacing.external.inline.start: auto
-              edges:
+          - switch:
+              on: internal
+              cases:
                 - node:
-                    uri: prism.component.count_line
-                  relation: { cardinality: "0..1", slotName: default }
+                    role: count slot
+                    styles:
+                      layout.flex.shrink: 0
+                      spacing.external.inline.start: auto
+                    edges:
+                      - node:
+                          uri: prism.component.count_line
+                        relation: { cardinality: "0..1", slotName: default }
+                - node:
+                    role: folded count slot (.is-folded)
+                    styles:
+                      layout.type: none
+                    edges:
+                      - node:
+                          uri: prism.component.count_line
+                        relation: { cardinality: "0..1", slotName: default }
             relation: { cardinality: "0..1", slotName: count }
       relation: { cardinality: "1", slotName: filtering }
