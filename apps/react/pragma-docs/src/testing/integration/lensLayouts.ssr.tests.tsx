@@ -318,8 +318,9 @@ const STRIP_CONTEXT_ARIA_CURRENT: Readonly<Record<string, number>> = {
 /**
  * Per-URL expectation for the strip's view group and count. Only the
  * Components, Standards and Journeys layouts fill the view group, and only
- * the Definitions layout counts; every other URL renders the view group
- * EMPTY and no count, and this model is what says so.
+ * the Definitions explorer and the Components catalog count, each through
+ * its own tenant, named by its `data-slot`; every other URL renders the view
+ * group EMPTY and no count, and this model is what says so.
  *
  * The slots are asserted STRUCTURALLY, never as pinned strings. The count
  * reports a live figure off the graph, so pinning its text would make this
@@ -332,13 +333,13 @@ const EXPECTED_STRIP_CLAIMS: Readonly<
       /** The view group's expected tenant: the component class its inner
        * markup must carry, or `false` for an empty group. */
       readonly view: string | false;
-      readonly count: boolean;
+      readonly count: false | string;
     }
   >
 > = {
   "/": { view: false, count: false },
-  "/components": { view: "renderer-switch", count: false },
-  "/definitions": { view: false, count: true },
+  "/components": { view: "renderer-switch", count: "catalog-count" },
+  "/definitions": { view: false, count: "explorer-status" },
   "/standards": { view: false, count: false },
   // Journeys claims the trail and the view group, which holds the table
   // and graph switch; the coordinate chooser and the persona filter stay in
@@ -346,7 +347,7 @@ const EXPECTED_STRIP_CLAIMS: Readonly<
   "/journeys": { view: "journey-view-switch", count: false },
   "/guides": { view: false, count: false },
   [BUTTON_ENTITY_URL]: { view: "renderer-switch", count: false },
-  [DEFINITIONS_TERM_URL]: { view: false, count: true },
+  [DEFINITIONS_TERM_URL]: { view: false, count: "explorer-status" },
   [STANDARD_READING_URL]: { view: "renderer-switch", count: false },
   [JOURNEYS_JOB_URL]: { view: "journey-view-switch", count: false },
   ...Object.fromEntries(
@@ -691,7 +692,7 @@ describe("the lens layouts, rendered through the SSR entry", () => {
         expect(
           extractStripSlot(chrome, STRIP_COUNT_PATTERN),
           `count on ${url}`,
-        ).toContain('data-slot="explorer-status"');
+        ).toContain(`data-slot="${expected.count}"`);
       } else {
         expect(chrome, `count on ${url} must be absent`).not.toContain(
           'data-slot="count"',
