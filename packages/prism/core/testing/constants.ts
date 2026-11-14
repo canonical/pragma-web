@@ -224,11 +224,16 @@ export const LINK_QUALIFIERS: readonly string[] = ["[href]"];
 
 /**
  * The properties no style key binds, because they set no design decision:
- * generated content, and whether forced colours may repaint an element.
+ * generated content, whether forced colours may repaint an element, and
+ * which anchor a tethered box reads its place from and where it tries to
+ * go when the viewport has no room (the anatomy DSL has no anchor key; the
+ * gap from the anchor is the box's margin, which a key binds).
  */
 export const UNKEYED_PROPERTIES: readonly string[] = [
   "content",
   "forced-color-adjust",
+  "position-area",
+  "position-try-fallbacks",
 ];
 
 /**
@@ -370,3 +375,18 @@ export const COMPONENT_PLACEMENTS: readonly RegExp[] = [
 
 /** A cardinality: one count, or a range whose upper bound may be `*`. */
 export const CARDINALITY = /^\d+(?:\.\.(?:\d+|\*))?$/;
+
+/**
+ * The slots an entity's identity is rendered in, in the order every
+ * representation keeps: a form may leave slots out, never reorder them.
+ */
+export const SLOT_ORDER: readonly string[] = [
+  "mark",
+  "prefix",
+  "title",
+  "address",
+  "kind",
+  "summary",
+  "facts",
+  "status",
+];
