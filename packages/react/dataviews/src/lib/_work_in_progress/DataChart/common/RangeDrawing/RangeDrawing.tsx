@@ -30,13 +30,22 @@ const TEXT_SIZE = 12;
 /** A coordinate as the drawing writes it: rounded, so no float tail is drawn. */
 const place = (value: number): number => Number(value.toFixed(2));
 
-function RangeDrawing({
+/**
+ * A range as a band on a labelled axis, its two ends marked and named — and
+ * the same two values as a native table, so nothing is carried by the drawing
+ * alone.
+ *
+ * Memoised, and the chart holds its facet at one reference while it claims
+ * the same, so a result that moved another field's facet redraws nothing
+ * here.
+ */
+const RangeDrawing = ({
   label,
   min,
   max,
   lowerBound,
   upperBound,
-}: RangeDrawingProps): ReactElement {
+}: RangeDrawingProps): ReactElement => {
   const messages = useContext(MessagesContext);
   const { ticks, low, high } = listNiceTicks(
     Math.min(lowerBound ?? min, min),
@@ -132,15 +141,6 @@ function RangeDrawing({
       </table>
     </>
   );
-}
+};
 
-/**
- * A range as a band on a labelled axis, its two ends marked and named — and
- * the same two values as a native table, so nothing is carried by the drawing
- * alone.
- *
- * Memoised, and the chart holds its facet at one reference while it claims
- * the same, so a result that moved another field's facet redraws nothing
- * here.
- */
 export default memo(RangeDrawing);

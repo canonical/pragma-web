@@ -9,14 +9,23 @@ import type { CardItemProps } from "./types.js";
 
 const componentCssClassName = "data-card";
 
-function CardItem<TRow extends object>({
+/**
+ * One record as the design system's card: the title field heads it and names
+ * it, beside the record's selection checkbox, and the other fields are listed
+ * beneath, each under its heading. A list item of the cards' list.
+ *
+ * Memoised: every prop it takes is held at a stable reference by the cards,
+ * so a card re-renders for its own selection, for a name that changed, and
+ * for a field list that changed, and for nothing else.
+ */
+const CardItem = <TRow extends object>({
   provider,
   channels,
   title,
   details,
   selectable,
   nameRecord,
-}: CardItemProps<TRow>): ReactElement {
+}: CardItemProps<TRow>): ReactElement => {
   const messages = useContext(MessagesContext);
   const selected = useDataViewsValue(channels.selected);
   // The name the caller gives the record, read from the record channel as
@@ -85,15 +94,6 @@ function CardItem<TRow extends object>({
       )}
     </Card>
   );
-}
+};
 
-/**
- * One record as the design system's card: the title field heads it and names
- * it, beside the record's selection checkbox, and the other fields are listed
- * beneath, each under its heading. A list item of the cards' list.
- *
- * Memoised: every prop it takes is held at a stable reference by the cards,
- * so a card re-renders for its own selection, for a name that changed, and
- * for a field list that changed, and for nothing else.
- */
 export default memo(CardItem) as typeof CardItem;

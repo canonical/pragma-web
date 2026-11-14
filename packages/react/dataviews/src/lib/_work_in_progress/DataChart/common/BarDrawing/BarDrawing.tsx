@@ -52,7 +52,16 @@ const spellBarPath = (x0: number, x1: number, y: number): string => {
 const readDrawnCount = (entry: DrawnValue): number | null =>
   entry.count.kind === "unknown" ? null : entry.count.value;
 
-function BarDrawing({ label, values }: BarDrawingProps): ReactElement {
+/**
+ * One field's values as bars, each as long as the number of records holding
+ * it, on an axis of whole records — and the same numbers as a native table,
+ * so nothing is carried by the drawing alone.
+ *
+ * Memoised, and the chart holds its facet at one reference while it claims
+ * the same, so a result that moved another field's facet redraws nothing
+ * here.
+ */
+const BarDrawing = ({ label, values }: BarDrawingProps): ReactElement => {
   const messages = useContext(MessagesContext);
   const largest = Math.max(
     0,
@@ -155,15 +164,6 @@ function BarDrawing({ label, values }: BarDrawingProps): ReactElement {
       </table>
     </>
   );
-}
+};
 
-/**
- * One field's values as bars, each as long as the number of records holding
- * it, on an axis of whole records — and the same numbers as a native table,
- * so nothing is carried by the drawing alone.
- *
- * Memoised, and the chart holds its facet at one reference while it claims
- * the same, so a result that moved another field's facet redraws nothing
- * here.
- */
 export default memo(BarDrawing);

@@ -22,12 +22,6 @@ export const MOCK_API_ORIGIN = "http://localhost";
  * longer found, so a row leaves with the fix.
  */
 export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
-  "src/lib/_work_in_progress/BuildARenderer/common/RecordItem/RecordItem.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataCards/common/CardItem/CardItem.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataCards/common/CardList/CardList.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataCards/common/FieldValue/FieldValue.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataChart/common/BarDrawing/BarDrawing.tsx export:memo-over-function",
-  "src/lib/_work_in_progress/DataChart/common/RangeDrawing/RangeDrawing.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/BodyCell/BodyCell.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/HeaderMenu/HeaderMenu.tsx export:memo-over-function",
   "src/lib/_work_in_progress/DataTable/common/Row/Row.tsx export:memo-over-function",
@@ -40,7 +34,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/_work_in_progress/DataTable/common/utils/spellDestinationKey.ts test",
   "src/lib/_work_in_progress/DataTable/constants.ts test",
   "src/lib/_work_in_progress/PaginationBar/common/PageControl/PageControl.tsx test",
-  "src/lib/common/Announcer/Announcer.tsx export:memo-over-function",
   "src/lib/common/SettingsMenuContext/SettingsMenuContext.tsx test",
   "src/lib/virtualization/common/VirtualBody/VirtualBody.tsx export:memo-over-function",
   "testing/keyboard/DataTable.keyboard.ts export:none",

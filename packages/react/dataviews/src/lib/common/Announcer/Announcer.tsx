@@ -49,7 +49,7 @@ type Waiting = {
  *
  * @note Impure: schedules timers to speak and to clear, released on unmount.
  */
-function Announcer({ ref }: AnnouncerProps): ReactElement {
+const Announcer = ({ ref }: AnnouncerProps): ReactElement => {
   const [said, setSaid] = useState<readonly Announcement[]>([]);
   // What has been said since the wait began, not yet spoken.
   const waiting = useRef<Waiting[]>([]);
@@ -136,6 +136,6 @@ function Announcer({ ref }: AnnouncerProps): ReactElement {
       ))}
     </div>
   );
-}
+};
 
 export default memo(Announcer);

@@ -7,11 +7,21 @@ import { useDataViewsValue } from "../../../../hooks/index.js";
 import { readFieldName, spellPrimitiveValue } from "../../../../utils/index.js";
 import type { FieldValueProps } from "./types.js";
 
-function FieldValue<TRow extends object>({
+/**
+ * One field's value on a card, inside the same cell scope a table's cell
+ * installs, so a field's own `cell` renders unchanged on a card and may call
+ * `useDataViewsCell` for the record's channels. Without one, primitive values
+ * render as text and every other value renders nothing.
+ *
+ * It subscribes to its own field's channel, so a record update re-renders
+ * only the values that changed. Memoised, so a card re-rendering for its
+ * selection re-renders none of them.
+ */
+const FieldValue = <TRow extends object>({
   provider,
   channels,
   field,
-}: FieldValueProps<TRow>): ReactElement {
+}: FieldValueProps<TRow>): ReactElement => {
   const name = readFieldName(field);
   const channel = channels.fields[name];
   if (channel === undefined) {
@@ -41,16 +51,6 @@ function FieldValue<TRow extends object>({
       )}
     </CellContext>
   );
-}
+};
 
-/**
- * One field's value on a card, inside the same cell scope a table's cell
- * installs, so a field's own `cell` renders unchanged on a card and may call
- * `useDataViewsCell` for the record's channels. Without one, primitive values
- * render as text and every other value renders nothing.
- *
- * It subscribes to its own field's channel, so a record update re-renders
- * only the values that changed. Memoised, so a card re-rendering for its
- * selection re-renders none of them.
- */
 export default memo(FieldValue) as typeof FieldValue;
