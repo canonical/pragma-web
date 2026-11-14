@@ -28,8 +28,12 @@ export interface ClassEdgeDeclaration {
 }
 
 /**
- * Instance statements a store holds for one property between two classes,
- * each statement counted under its subject's and object's asserted classes.
+ * Instance statements a store holds for one property between two classes.
+ *
+ * Each statement is counted in exactly one observation, under one class pair.
+ * When its subject or object carries several asserted classes, the provider
+ * attributes the statement to one of them, so the observations of a property
+ * sum to its number of statements and no edge counts a statement twice.
  */
 export interface ClassEdgeObservation {
   readonly property: string;

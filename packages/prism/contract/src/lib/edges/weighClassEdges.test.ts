@@ -67,6 +67,35 @@ describe("weighClassEdges", () => {
     ).toEqual([{ ...observation, count: 4, declared: false }]);
   });
 
+  it("counts each statement once per edge that covers it", () => {
+    const statement = {
+      property: `${EX}worksFor`,
+      subjectClass: `${EX}Employee`,
+      objectClass: `${EX}Agent`,
+      count: 1,
+    };
+    const nested = weighClassEdges(
+      [
+        {
+          property: `${EX}worksFor`,
+          domain: `${EX}Person`,
+          range: `${EX}Agent`,
+        },
+        {
+          property: `${EX}worksFor`,
+          domain: `${EX}Employee`,
+          range: `${EX}Agent`,
+        },
+      ],
+      [statement],
+      LENS_OUTLINE,
+    );
+    expect(nested.map((edge) => [edge.subjectClass, edge.count])).toEqual([
+      [`${EX}Employee`, 1],
+      [`${EX}Person`, 1],
+    ]);
+  });
+
   it("sorts by property, then subject class, then object class", () => {
     expect(
       edges.map((edge) => [edge.property, edge.subjectClass, edge.objectClass]),

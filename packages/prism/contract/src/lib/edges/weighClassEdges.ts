@@ -26,6 +26,10 @@ const compareEdges = (a: ClassEdge, b: ClassEdge): number =>
  * subclass of it. A declared edge nothing covers is served with count 0.
  * Undeclared observations of the same property and pair are summed.
  *
+ * Since each statement sits in one observation, an edge's count is the number
+ * of statements it covers. Declarations over nested classes, such as one from
+ * a class and one from its subclass, each count the statements they cover.
+ *
  * @param declarations - The edges the ontology declares.
  * @param observations - The store's counts of statements by class pair.
  * @param outline - The class hierarchy subclass coverage is read from.
