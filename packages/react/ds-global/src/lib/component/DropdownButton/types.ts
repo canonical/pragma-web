@@ -21,10 +21,11 @@ export type DropdownTriggerOwnedProps = Pick<
 
 /**
  * What withDropdownPanel needs from its trigger: it renders a real
- * `<button>` and forwards these to it. Button and IconButton do.
+ * `<button>` and forwards these to it. Button and IconButton do. `onKeyDown`
+ * carries the menu button's arrow keys.
  */
 export type WithDropdownPanelTriggerProps = DropdownTriggerOwnedProps &
-  Pick<ComponentProps<"button">, "id" | "type" | "style">;
+  Pick<ComponentProps<"button">, "id" | "type" | "style" | "onKeyDown">;
 
 /**
  * withDropdownButton's trigger also takes `children`, which the chevron

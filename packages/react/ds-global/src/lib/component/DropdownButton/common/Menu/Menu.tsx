@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect } from "react";
 import { isMenuSeparator, useIsMounted } from "../../../../hooks/index.js";
 import { MenuItem } from "../MenuItem/index.js";
+import { MenuList } from "../MenuList/index.js";
 import { usePanelContext } from "../Panel/hooks/index.js";
 import type { DropdownMenuEntry, DropdownMenuProps } from "./types.js";
 import "./styles.css";
@@ -39,8 +40,12 @@ function findScriptOnlySeparators(items: DropdownMenuEntry[]): Set<string> {
 
 /**
  * A menu inside a DropdownPanel: a flat list of actions and links, with
- * separators and no submenus. Choosing an item calls `onSelect(item, event)`,
- * then closes the panel, and focus returns to the trigger.
+ * separators and no submenus. Once hydrated, it follows the menu button
+ * pattern: the arrow keys move between items, Home and End reach the ends,
+ * typing moves to the first item whose label starts with what was typed,
+ * Enter or Space chooses an item, and Escape or Tab closes the menu with
+ * focus back on the trigger. Choosing an item calls `onSelect(item, event)`,
+ * then closes the panel.
  *
  * An item with a `url` is a real link, so it works with no script. Its
  * `onSelect` runs first, and `event.preventDefault()` there leaves the
@@ -72,15 +77,32 @@ export default function Menu({
   const hasLink = items.some(
     (entry) => !isMenuSeparator(entry) && entry.url !== undefined,
   );
+  const rootProps = {
+    ...props,
+    className: [componentCssClassName, className].filter(Boolean).join(" "),
+    "data-requires-script": hasLink ? undefined : "",
+  };
+
+  // The keyboard hook mounts only while the panel is open, so a closed menu,
+  // and a menu before hydration, is a static list with no listener.
+  if (isMounted && panel?.isOpen) {
+    return (
+      <MenuList
+        {...rootProps}
+        items={items}
+        onSelect={onSelect}
+        hide={panel.hide}
+        focusIntent={panel.focusIntent}
+        label={panel.label}
+        labelledBy={panel.labelledBy}
+      />
+    );
+  }
 
   const scriptOnlySeparators = findScriptOnlySeparators(items);
 
   return (
-    <div
-      {...props}
-      className={[componentCssClassName, className].filter(Boolean).join(" ")}
-      data-requires-script={hasLink ? undefined : ""}
-    >
+    <div {...rootProps}>
       {items.map((entry) =>
         isMenuSeparator(entry) ? (
           <hr
@@ -91,18 +113,7 @@ export default function Menu({
             }
           />
         ) : (
-          <MenuItem
-            key={entry.key ?? entry.url}
-            item={entry}
-            onSelect={
-              isMounted && panel
-                ? (event) => {
-                    onSelect?.(entry, event);
-                    panel.hide();
-                  }
-                : undefined
-            }
-          />
+          <MenuItem key={entry.key ?? entry.url} item={entry} />
         ),
       )}
     </div>

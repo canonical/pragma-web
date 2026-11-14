@@ -54,6 +54,7 @@ export default function withDropdownPanel<
     const { triggerProps, renderProps, contextValue } = useDropdownTrigger({
       id: triggerOwnProps.id,
       style: triggerOwnProps.style,
+      onKeyDown: triggerOwnProps.onKeyDown,
     });
 
     return (

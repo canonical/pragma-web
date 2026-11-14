@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, KeyboardEventHandler } from "react";
 import type { PanelContextValue } from "../common/Panel/hooks/types.js";
 import type {
   DropdownTriggerOwnedProps,
@@ -11,6 +11,8 @@ export type UseDropdownTriggerProps = {
   id?: string;
   /** The trigger's own style, merged under the anchor name. */
   style?: CSSProperties;
+  /** The trigger's own key handler, which runs before the HOC's. */
+  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
 };
 
 /** The wiring {@link useDropdownTrigger} returns. */
@@ -19,6 +21,7 @@ export type UseDropdownTriggerResult = {
   triggerProps: DropdownTriggerOwnedProps & {
     id: string;
     style: CSSProperties;
+    onKeyDown: KeyboardEventHandler<HTMLButtonElement>;
   };
   /** What the render function receives. */
   renderProps: WithDropdownRenderProps;
