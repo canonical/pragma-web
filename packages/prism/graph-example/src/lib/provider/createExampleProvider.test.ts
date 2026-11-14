@@ -718,7 +718,7 @@ describe("Query.ontologyProperty", () => {
     expect(data.ontologyProperty).toEqual({
       uri: "https://metro.example/onto#servesLine",
       label: "serves line",
-      definition: null,
+      definition: "A line whose trains call at the station.",
       range: "metro:Line",
       kind: "OBJECT",
       functional: false,

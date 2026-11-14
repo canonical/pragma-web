@@ -17,6 +17,8 @@ type Zone implements Node {
 
   """Self-describing TBox access for this entity."""
   _meta: EntityMeta!
+
+  """A stop that lies in the fare zone."""
   stops(first: Int, after: String, last: Int, before: String): StopConnection!
 }
 
@@ -49,7 +51,11 @@ type GeoPoint implements Node {
 
   """Self-describing TBox access for this entity."""
   _meta: EntityMeta!
+
+  """Degrees east of the prime meridian, negative to the west."""
   longitude: Float
+
+  """Degrees north of the equator, negative to the south."""
   latitude: Float
 }
 
@@ -60,6 +66,8 @@ type CarPosition implements Node {
 
   """Self-describing TBox access for this entity."""
   _meta: EntityMeta!
+
+  """The car type placed at this position in a unit."""
   carType: CarType
 
   """The formations a line is run with, or a rolling stock runs in."""
@@ -101,6 +109,8 @@ type UnitPosition implements Node {
 
   """Self-describing TBox access for this entity."""
   _meta: EntityMeta!
+
+  """The unit placed at this position in a formation."""
   unit: Unit
 
   """The formations a line is run with, or a rolling stock runs in."""
@@ -338,6 +348,8 @@ type Call implements Node {
 
   """The formations a line is run with, or a rolling stock runs in."""
   formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """The stop a call is made at."""
   stop: Stop
 
   """True when a car or a unit runs the other way round in its place."""
@@ -369,7 +381,11 @@ type Route implements Node {
 
   """The formations a line is run with, or a rolling stock runs in."""
   formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """The same route run in the other direction."""
   reverse: Route
+
+  """The calls of a route, in the order its trains make them."""
   calls(first: Int, after: String, last: Int, before: String): CallConnection!
 
   """True when a car or a unit runs the other way round in its place."""
@@ -383,6 +399,8 @@ type Route implements Node {
 
   """A place in an ordered list, counted from 1."""
   position: Int
+
+  """Whether the route ends where it starts."""
   loop: Boolean
 
   """The short code a line or a car type is known by."""
@@ -412,7 +430,11 @@ type Line implements Node {
 
   """The formations a line is run with, or a rolling stock runs in."""
   formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """A route the line's trains run, in one direction."""
   routes(first: Int, after: String, last: Int, before: String): RouteConnection!
+
+  """A station the line's trains call at."""
   servedBies(first: Int, after: String, last: Int, before: String): StationConnection!
 
   """True when a car or a unit runs the other way round in its place."""
@@ -484,17 +506,29 @@ type Interchange implements Node & Station & Stop {
 
   """The short code a line or a car type is known by."""
   code: String
+
+  """The minutes allowed for changing lines at the interchange."""
   transferMinutes: Int
 
   """The name shown to passengers."""
   name: String
+
+  """Where the station sits on the network diagram."""
   diagramPosition: DiagramPoint
+
+  """The fare zone the station lies in."""
   inZone: Zone
+
+  """Where the station stands, as a point on the map."""
   location: GeoPoint
+
+  """A line whose trains call at the station."""
   servesLines(first: Int, after: String, last: Int, before: String): LineConnection!
 
   """The usable length of the station's shortest platform, in millimetres."""
   platformLength: Int
+
+  """How many platforms the station has."""
   platformCount: Int
 }
 
@@ -508,9 +542,17 @@ interface Station implements Node & Stop {
 
   """The formations a line is run with, or a rolling stock runs in."""
   formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """Where the station sits on the network diagram."""
   diagramPosition: DiagramPoint
+
+  """The fare zone the station lies in."""
   inZone: Zone
+
+  """Where the station stands, as a point on the map."""
   location: GeoPoint
+
+  """A line whose trains call at the station."""
   servesLines(first: Int, after: String, last: Int, before: String): LineConnection!
 
   """True when a car or a unit runs the other way round in its place."""
@@ -530,6 +572,8 @@ interface Station implements Node & Stop {
 
   """The usable length of the station's shortest platform, in millimetres."""
   platformLength: Int
+
+  """How many platforms the station has."""
   platformCount: Int
 
   """The name shown to passengers."""

@@ -78,10 +78,12 @@ metro:name a owl:DatatypeProperty , owl:FunctionalProperty ;
   rdfs:range xsd:string .
 
 metro:note a owl:AnnotationProperty ;
-  rdfs:label "note" .
+  rdfs:label "note" ;
+  rdfs:comment "A remark kept with a stop for the network's editors." .
 
 metro:platformCount a owl:DatatypeProperty , owl:FunctionalProperty ;
   rdfs:label "platform count" ;
+  rdfs:comment "How many platforms the station has." ;
   rdfs:domain metro:Station ;
   rdfs:range xsd:integer .
 
@@ -93,44 +95,52 @@ metro:platformLength a owl:DatatypeProperty , owl:FunctionalProperty ;
 
 metro:servesLine a owl:ObjectProperty ;
   rdfs:label "serves line" ;
+  rdfs:comment "A line whose trains call at the station." ;
   rdfs:domain metro:Station ;
   rdfs:range metro:Line ;
   owl:inverseOf metro:servedBy .
 
 metro:servedBy a owl:ObjectProperty ;
   rdfs:label "served by" ;
+  rdfs:comment "A station the line's trains call at." ;
   rdfs:domain metro:Line ;
   rdfs:range metro:Station ;
   owl:inverseOf metro:servesLine .
 
 metro:transferMinutes a owl:DatatypeProperty , owl:FunctionalProperty ;
   rdfs:label "transfer minutes" ;
+  rdfs:comment "The minutes allowed for changing lines at the interchange." ;
   rdfs:domain metro:Interchange ;
   rdfs:range xsd:integer .
 
 geo:location a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "location" ;
+  rdfs:comment "Where the station stands, as a point on the map." ;
   rdfs:domain metro:Station ;
   rdfs:range geo:GeoPoint .
 
 geo:latitude a owl:DatatypeProperty , owl:FunctionalProperty ;
   rdfs:label "latitude" ;
+  rdfs:comment "Degrees north of the equator, negative to the south." ;
   rdfs:domain geo:GeoPoint ;
   rdfs:range xsd:double .
 
 geo:longitude a owl:DatatypeProperty , owl:FunctionalProperty ;
   rdfs:label "longitude" ;
+  rdfs:comment "Degrees east of the prime meridian, negative to the west." ;
   rdfs:domain geo:GeoPoint ;
   rdfs:range xsd:double .
 
 geo:inZone a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "in zone" ;
+  rdfs:comment "The fare zone the station lies in." ;
   rdfs:domain metro:Station ;
   rdfs:range geo:Zone ;
   owl:inverseOf geo:stops .
 
 geo:stops a owl:ObjectProperty ;
   rdfs:label "stops" ;
+  rdfs:comment "A stop that lies in the fare zone." ;
   rdfs:domain geo:Zone ;
   rdfs:range metro:Stop ;
   owl:inverseOf geo:inZone .
@@ -148,21 +158,25 @@ metro:colour a owl:DatatypeProperty , owl:FunctionalProperty ;
 
 metro:routes a owl:ObjectProperty ;
   rdfs:label "routes" ;
+  rdfs:comment "A route the line's trains run, in one direction." ;
   rdfs:domain metro:Line ;
   rdfs:range metro:Route .
 
 metro:isLoop a owl:DatatypeProperty , owl:FunctionalProperty ;
   rdfs:label "is loop" ;
+  rdfs:comment "Whether the route ends where it starts." ;
   rdfs:domain metro:Route ;
   rdfs:range xsd:boolean .
 
 metro:calls a owl:ObjectProperty ;
   rdfs:label "calls" ;
+  rdfs:comment "The calls of a route, in the order its trains make them." ;
   rdfs:domain metro:Route ;
   rdfs:range metro:Call .
 
 metro:reverse a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "reverse" ;
+  rdfs:comment "The same route run in the other direction." ;
   rdfs:domain metro:Route ;
   rdfs:range metro:Route ;
   owl:inverseOf metro:reverse .
@@ -174,11 +188,13 @@ metro:position a owl:DatatypeProperty , owl:FunctionalProperty ;
 
 metro:stop a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "stop" ;
+  rdfs:comment "The stop a call is made at." ;
   rdfs:domain metro:Call ;
   rdfs:range metro:Stop .
 
 metro:diagramPosition a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "diagram position" ;
+  rdfs:comment "Where the station sits on the network diagram." ;
   rdfs:domain metro:Station ;
   rdfs:range metro:DiagramPoint .
 
@@ -234,6 +250,7 @@ metro:lines a owl:ObjectProperty ;
 
 metro:unit a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "unit" ;
+  rdfs:comment "The unit placed at this position in a formation." ;
   rdfs:domain metro:UnitPosition ;
   rdfs:range metro:Unit .
 
@@ -251,6 +268,7 @@ metro:hasCab a owl:DatatypeProperty , owl:FunctionalProperty ;
 
 metro:carType a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "car type" ;
+  rdfs:comment "The car type placed at this position in a unit." ;
   rdfs:domain metro:CarPosition ;
   rdfs:range metro:CarType .
 
