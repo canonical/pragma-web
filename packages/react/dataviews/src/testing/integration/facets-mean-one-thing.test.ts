@@ -16,10 +16,8 @@ import {
 } from "@canonical/dataviews-core";
 import { describe, expect, it } from "vitest";
 import { FACET_CASES, FACET_RECORDS } from "../../../testing/fixtures.js";
-import {
-  requestGraphQL,
-  requestRest,
-} from "../../../testing/requestMockApi.js";
+import requestGraphQL from "../../../testing/requestGraphQL.js";
+import requestRest from "../../../testing/requestRest.js";
 import serveMockApi from "../../../testing/serveMockApi.js";
 import type { FacetCase, FacetRecord } from "../../../testing/types.js";
 import {
