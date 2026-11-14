@@ -8,11 +8,10 @@ const componentCssClassName = "ds entity-row";
 
 /**
  * The list entry of an entity: one 32px row of an index, its mark,
- * namespace prefix and title on the left and one muted word about it on
- * the right.
- * Where the two do not share a line the word moves to a line of its own
- * under the title, and a title longer than its line wraps rather than
- * being cut.
+ * namespace prefix and title on the left and its facts, meta and status
+ * ending the row. Its height comes from `lines` alone: the first line
+ * never wraps, so a title longer than its line ends in an ellipsis, and
+ * below two groups only the first fact stays on it.
  * With an `href` the title links to the entity's home through
  * `LinkComponent`; without one it is inert text.
  *
@@ -79,8 +78,12 @@ export default function EntityRow({
       ) : null}
       {facts.length === 0 ? null : (
         <span className="facts">
-          {facts.map(({ property, label, value }) => (
-            <span className="fact" data-property={property} key={property}>
+          {facts.map(({ property, label, value }, index) => (
+            <span
+              className={index === 0 ? "fact" : "fact is-later"}
+              data-property={property}
+              key={property}
+            >
               <span className="term">{label}</span>
               <span className="detail">{value}</span>
             </span>

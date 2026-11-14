@@ -3,12 +3,12 @@
 /* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
 
 @layer ds.components.global {
-  /* One entry of an index: the identity on the left, one muted word on the
-   * right, on one 24px line of the context's primary text with 4px above
-   * and below it: 32px. It sets no inline inset, so its text sits on the column line
-   * of its list. When the two do not fit on one line the meta wraps to a
-   * line of its own under the identity, the lines with no space between
-   * them: 56px. It may be narrower than its content, so a long identity
+  /* One entry of an index, whose height comes from `lines` alone: one
+   * 24px line of the context's primary text with 4px above and below it,
+   * 32px, which never wraps; a two-line row adds the summary as its only
+   * second line, with no space between the lines: 56px. The identity takes
+   * the free width, so the facts, the meta and the status end the row as
+   * one group. It may be narrower than its content, so a long identity
    * never widens the track that holds it. */
   .ds.entity-row {
     --entity-row-gap: var(--grid-gutter);
@@ -41,8 +41,7 @@
 
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     min-width: 0;
     column-gap: var(--entity-row-gap);
     row-gap: var(--entity-row-line-gap);
@@ -52,21 +51,27 @@
     line-height: var(--entity-row-line-height);
   }
 
-  /* A title longer than its line wraps between its words, so it is never
-   * cut; a single word longer than the row clips at its end. It clips
-   * only along its line, so a chip in it keeps its whole pill, and the
-   * line grows to hold it. */
+  /* The identity takes the free width and never wraps: a title longer
+   * than its line ends in an ellipsis. It clips only along its line, so a
+   * chip in it keeps its whole pill. */
   .ds.entity-row .identity {
     display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
     align-items: center;
     overflow-x: clip;
     min-width: 0;
-    text-overflow: ellipsis;
-    white-space: normal;
+    white-space: nowrap;
   }
 
-  /* A linked title reads as the row's text, underlined on approach. */
+  /* The title gives way first, ending in an ellipsis; it clips only along
+   * its line. A linked title reads as the row's text, underlined on
+   * approach. */
   .ds.entity-row .title {
+    overflow-x: clip;
+    min-width: 0;
+    text-overflow: ellipsis;
     color: inherit;
     text-decoration: none;
   }
@@ -104,8 +109,8 @@
     line-height: var(--entity-row-identifier-line-height);
   }
 
-  /* The meta stays on its one line and, longer than the row on a line of
-   * its own, clips at its end; the whole word stays in the text. */
+  /* The meta stays on the row's line and clips at its end when the row
+   * is too narrow; the whole word stays in the text. */
   .ds.entity-row .meta {
     color: var(--entity-row-meta-color);
     text-align: end;
@@ -116,12 +121,14 @@
   }
 
   .ds.entity-row .prefix {
+    flex-shrink: 0;
     margin-inline-end: var(--entity-row-mark-gap);
     color: var(--entity-row-prefix-color);
     font-family: var(--entity-row-prefix-font-family);
   }
 
   .ds.entity-row .kind {
+    flex-shrink: 0;
     margin-inline-start: var(--entity-row-mark-gap);
     color: var(--entity-row-kind-color);
   }
@@ -141,6 +148,8 @@
   .ds.entity-row .facts {
     display: flex;
     column-gap: var(--entity-row-gap);
+    overflow-x: clip;
+    min-width: 0;
     white-space: nowrap;
   }
 
@@ -151,5 +160,19 @@
 
   .ds.entity-row .status {
     display: flex;
+    flex-shrink: 0;
+  }
+
+  /* A two-line row: the summary is the only slot that leaves the first
+   * line. */
+  .ds.entity-row:has(> .summary) {
+    flex-wrap: wrap;
+  }
+
+  /* Below two groups the first line keeps the first fact alone. */
+  @container shell (width < 912px) {
+    .ds.entity-row .fact.is-later {
+      display: none;
+    }
   }
 }

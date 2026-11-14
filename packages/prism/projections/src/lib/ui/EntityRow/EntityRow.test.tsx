@@ -157,5 +157,25 @@ describe("EntityRow", () => {
       );
       expect(screen.getByTestId("row").querySelector(".summary")).toBeNull();
     });
+
+    it("marks every fact after the first as one that leaves a narrow line", () => {
+      render(
+        <ol>
+          <EntityRow
+            data-testid="row"
+            facts={[
+              ...facts,
+              { property: "ds:since", label: "Since", value: "1.0" },
+            ]}
+            title="Button"
+          />
+        </ol>,
+      );
+      expect(
+        [...screen.getByTestId("row").querySelectorAll(".fact")].map(
+          (cell) => cell.className,
+        ),
+      ).toEqual(["fact", "fact is-later", "fact is-later"]);
+    });
   });
 });
