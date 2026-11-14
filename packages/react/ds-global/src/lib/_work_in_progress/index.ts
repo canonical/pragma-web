@@ -7,6 +7,7 @@ export * from "./grid/index.js";
 export * from "./IconSection/index.js";
 export * from "./Label/index.js";
 export * from "./Link/index.js";
+export * from "./QueryChip/index.js";
 export * from "./Rule/index.js";
 export * from "./Section/index.js";
 export * from "./SkipLink/index.js";

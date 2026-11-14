@@ -1,0 +1,41 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* Its tokens are the chip's, set on .ds.query-chip. */
+  .ds.query-chip-entry {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dimension-050);
+    box-sizing: border-box;
+    min-block-size: var(--dimension-300);
+    padding-inline: var(--query-chip-segment-padding-inline);
+    color: var(--query-chip-entry-text);
+    background: var(--query-chip-entry-background);
+
+    & > .input {
+      field-sizing: content;
+      min-inline-size: var(--dimension-300);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font: inherit;
+      letter-spacing: inherit;
+      color: inherit;
+      background: transparent;
+    }
+
+    /* The chip's body draws one ring around the clause. */
+    & > .input:focus-visible {
+      outline: none;
+    }
+
+    & > :is(.template, .suffix) {
+      color: var(--color-text-muted);
+    }
+
+    &[data-invalid] {
+      box-shadow: inset 0 0 0 var(--dimension-stroke-thickness-medium)
+        var(--color-border-error);
+    }
+  }
+}

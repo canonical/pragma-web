@@ -1,0 +1,152 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  .ds.query-chip {
+    /* The body, which holds the parts and does their separation. */
+    --query-chip-background: transparent;
+    --query-chip-border-color: transparent;
+    --query-chip-border-width: 0;
+    --query-chip-radius: var(--dimension-radius-full);
+    --query-chip-min-height: var(--dimension-300);
+    /* 2 px between parts, through which the surface beneath shows. */
+    --query-chip-separation: var(--dimension-025);
+    --query-chip-gap: var(--dimension-100);
+    --query-chip-ring-color: var(--color-focusRing);
+    --query-chip-ring-width: var(--dimension-stroke-thickness-large);
+    --query-chip-ring-offset: var(--dimension-025);
+
+    /* Each segment. Its fill reads the modifier channels first. */
+    --query-chip-segment-background: var(--color-foreground-secondary);
+    --query-chip-segment-background-hover: var(
+      --color-foreground-secondary-hover
+    );
+    --query-chip-segment-background-selected: var(
+      --color-foreground-secondary-active
+    );
+    --query-chip-segment-background-invalid: var(
+      --color-foreground-secondary-error
+    );
+    --query-chip-segment-background-disabled: var(
+      --color-foreground-secondary-disabled
+    );
+    --query-chip-segment-text: var(--color-text-onForegroundSecondary);
+    /* 6 px, which no symbol declares. */
+    --query-chip-segment-padding-inline: 0.375rem;
+
+    /* The entry, which has its own look. */
+    --query-chip-entry-background: var(--color-foreground-input);
+    --query-chip-entry-text: var(--color-text);
+
+    /* The remove control, which stays neutral on every tone. */
+    --query-chip-remove-size: var(--dimension-300);
+    --query-chip-remove-background: var(--color-foreground-secondary);
+    --query-chip-remove-background-hover: var(
+      --color-foreground-secondary-hover
+    );
+    --query-chip-remove-background-active: var(
+      --color-foreground-secondary-active
+    );
+    --query-chip-remove-icon-size: var(--dimension-200);
+    --query-chip-remove-icon-color: var(--color-icon-onForegroundSecondary);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--query-chip-gap);
+    vertical-align: middle;
+    white-space: nowrap;
+    font-family: var(--typography-text-secondary-font-family);
+    font-size: var(--typography-text-secondary-font-size);
+    font-weight: var(--typography-text-secondary-font-weight);
+    letter-spacing: var(--typography-text-secondary-letter-spacing);
+    line-height: var(--typography-text-secondary-line-height);
+
+    /* The body clips its parts' ends to its radius and separates them by
+       its gap. */
+    & > .body {
+      display: inline-flex;
+      align-items: stretch;
+      gap: var(--query-chip-separation);
+      box-sizing: border-box;
+      min-block-size: var(--query-chip-min-height);
+      border: var(--query-chip-border-width) solid
+        var(--query-chip-border-color);
+      border-radius: var(--query-chip-radius);
+      overflow: hidden;
+      background: var(--query-chip-background);
+    }
+
+    /* One ring around the clause, outside the body so it is drawn against
+       the surface beneath rather than the selected fill. */
+    & > .body:focus-within {
+      outline: var(--query-chip-ring-width) solid var(--query-chip-ring-color);
+      outline-offset: var(--query-chip-ring-offset);
+    }
+
+    /* Selected while focus is on a segment: the segments take the selected
+       step, which replaces a channel's tone. An invalid segment keeps its
+       own fill. */
+    & > .body:focus-within:not(:has(> .ds.query-chip-entry)) {
+      --query-chip-segment-state-background: var(
+        --query-chip-segment-background-selected
+      );
+    }
+
+    /* Criticality Error's glyph on a refused chip's first segment, from the
+       root's error scope. */
+    &.error > .body > .ds.query-chip-segment:first-child::before {
+      content: "";
+      flex: none;
+      inline-size: var(--dimension-200);
+      block-size: var(--dimension-200);
+      background-color: var(--color-icon-onForegroundSecondary-error);
+      mask: var(--modifier-icon) center / contain no-repeat;
+    }
+
+    /* Text for assistive technology only: labels and descriptions. */
+    & .assistive {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    & > .remove {
+      --icon-size: var(--query-chip-remove-icon-size);
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      box-sizing: border-box;
+      min-inline-size: var(--query-chip-remove-size);
+      min-block-size: var(--query-chip-remove-size);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: var(--query-chip-radius);
+      color: var(--query-chip-remove-icon-color);
+      background: var(--query-chip-remove-background);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    & > .remove:is(a, :enabled):hover {
+      background: var(--query-chip-remove-background-hover);
+    }
+
+    & > .remove:is(a, :enabled):active {
+      background: var(--query-chip-remove-background-active);
+    }
+
+    & > .remove:disabled {
+      cursor: default;
+    }
+
+    & > .remove:focus-visible {
+      outline: var(--query-chip-ring-width) solid var(--query-chip-ring-color);
+      outline-offset: var(--query-chip-ring-offset);
+    }
+  }
+}

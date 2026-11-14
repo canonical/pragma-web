@@ -1,0 +1,83 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /* Its tokens are the chip's, set on .ds.query-chip for each unity. A
+     chip-wide state, such as selected, reaches it through
+     --query-chip-segment-state-background, which the chip's body sets. */
+  .ds.query-chip-segment {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--dimension-050);
+    box-sizing: border-box;
+    min-inline-size: var(--dimension-300);
+    min-block-size: var(--dimension-300);
+    margin: 0;
+    padding-block: var(--dimension-025);
+    padding-inline: var(--query-chip-segment-padding-inline);
+    border: 0;
+    border-radius: 0;
+    /* A native button does not inherit the chip's font. */
+    font-family: var(--typography-text-secondary-font-family);
+    font-size: var(--typography-text-secondary-font-size);
+    font-weight: var(--typography-text-secondary-font-weight);
+    letter-spacing: var(--typography-text-secondary-letter-spacing);
+    line-height: var(--typography-text-secondary-line-height);
+    color: var(
+      --modifier-color-text-onForegroundSecondary,
+      var(--query-chip-segment-text)
+    );
+    background: var(
+      --query-chip-segment-state-background,
+      var(
+        --modifier-color-foreground-secondary,
+        var(--query-chip-segment-background)
+      )
+    );
+
+    & > .text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* The glyph's shape comes from the --modifier-icon channel. */
+    & > .glyph {
+      flex: none;
+      inline-size: var(--dimension-200);
+      block-size: var(--dimension-200);
+      background-color: var(
+        --modifier-color-icon,
+        var(--color-icon-onForegroundSecondary)
+      );
+      mask: var(--modifier-icon) center / contain no-repeat;
+    }
+
+    & > .glyph.error {
+      background-color: var(--color-icon-onForegroundSecondary-error);
+    }
+
+    &:is(button) {
+      cursor: text;
+    }
+
+    &:is(button):enabled:hover {
+      background: var(--query-chip-segment-background-hover);
+    }
+
+    /* The chip's body draws one ring around the clause. */
+    &:focus-visible {
+      outline: none;
+    }
+
+    &[data-invalid] {
+      color: var(--color-text-onForegroundSecondary-error);
+      background: var(--query-chip-segment-background-invalid);
+    }
+
+    &:is(:disabled, [data-disabled]) {
+      color: var(--color-text-onForegroundSecondary-disabled);
+      background: var(--query-chip-segment-background-disabled);
+      cursor: default;
+    }
+  }
+}

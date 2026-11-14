@@ -35,6 +35,9 @@
 @import url("./_work_in_progress/IconSection/styles.css");
 @import url("./_work_in_progress/Label/styles.css");
 @import url("./_work_in_progress/Link/styles.css");
+@import url("./_work_in_progress/QueryChip/common/Entry/styles.css");
+@import url("./_work_in_progress/QueryChip/common/Segment/styles.css");
+@import url("./_work_in_progress/QueryChip/styles.css");
 @import url("./_work_in_progress/Rule/styles.css");
 @import url("./_work_in_progress/Section/styles.css");
 @import url("./_work_in_progress/SkipLink/styles.css");
