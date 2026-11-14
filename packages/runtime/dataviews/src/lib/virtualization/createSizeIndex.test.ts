@@ -52,6 +52,16 @@ describe("createSizeIndex", () => {
     expect(index.at(15)).toBe(2);
   });
 
+  it.fails("refuses an offset outside the sequence", () => {
+    const index = createSizeIndex([10, 20]);
+    expect(() => index.offset(3)).toThrow("no offset at position 3 of 2");
+    expect(() => index.offset(-1)).toThrow("no offset at position -1 of 2");
+    expect(() => index.offset(0.5)).toThrow("no offset at position 0.5 of 2");
+    expect(() => index.offset(Number.NaN)).toThrow(
+      "no offset at position NaN of 2",
+    );
+  });
+
   it("has no size for a position outside the sequence, and sets none", () => {
     const index = createSizeIndex([10, 20]);
     expect(index.size(2)).toBeNaN();
