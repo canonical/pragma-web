@@ -33,6 +33,33 @@ function readRule(selector: string): string {
 }
 
 describe("EntityRow stylesheet", () => {
+  it("sets a one-line row on one line that never wraps", () => {
+    const root = readRule(".ds.entity-row");
+    expect(root).toContain("flex-wrap: nowrap;");
+    expect(root).toContain("line-height: var(--entity-row-line-height);");
+    for (const slot of ["identity", "summary", "facts", "meta"]) {
+      expect(readRule(`.ds.entity-row .${slot}`)).toContain(
+        "white-space: nowrap;",
+      );
+    }
+    expect(readRule(".ds.entity-row .title")).toContain(
+      "text-overflow: ellipsis;",
+    );
+  });
+
+  it("wraps only a row that holds a summary", () => {
+    expect(styles.match(/flex-wrap: wrap;/g)).toHaveLength(1);
+    expect(readRule(".ds.entity-row:has(> .summary)")).toContain(
+      "flex-wrap: wrap;",
+    );
+  });
+
+  it("drops the later facts below two groups", () => {
+    expect(styles).toMatch(
+      /@container shell \(width < 912px\) \{\s*\.ds\.entity-row \.fact\.is-later \{\s*display: none;\s*\}/,
+    );
+  });
+
   it("keeps the identity's content basis and shrinks it last", () => {
     const identity = readRule(".ds.entity-row .identity");
     expect(identity).toContain("flex-grow: 0;");
