@@ -1,0 +1,43 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * DropdownPanel.Menu styles
+   * @implements ds:global.subcomponent.dropdown_button-menu
+   *
+   * A flat list of items with muted separators, as ContextualMenu draws them.
+   */
+  .ds.dropdown-button-menu {
+    --dropdown-button-menu-divider-color: var(--color-border-muted);
+    --dropdown-button-menu-divider-width: var(
+      --dimension-stroke-thickness-medium
+    );
+
+    display: flex;
+    flex-direction: column;
+
+    > .separator {
+      margin: 0;
+      border: none;
+      border-block-start: var(--dropdown-button-menu-divider-width) solid
+        var(--dropdown-button-menu-divider-color);
+    }
+  }
+
+  /* A menu of actions alone does nothing before scripts run, so its trigger
+     hides with it. The element before the panel is the trigger, or the
+     Tooltip area around it. A separator next to a group of actions alone
+     hides too, so none is left dangling. */
+  @media (scripting: none) {
+    .ds.dropdown-button-menu > .separator[data-requires-script] {
+      display: none;
+    }
+
+    .ds:has(
+        + .ds.dropdown-button-panel
+          > .ds.dropdown-button-menu[data-requires-script]
+      ) {
+      display: none;
+    }
+  }
+}

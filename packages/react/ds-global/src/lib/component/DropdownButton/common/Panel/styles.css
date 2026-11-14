@@ -59,6 +59,11 @@
     @media (prefers-reduced-motion: reduce) {
       transition: none;
     }
+
+    /* A menu's items carry their own padding, edge to edge. */
+    &:has(> .ds.dropdown-button-menu) {
+      padding: 0;
+    }
   }
 
   /* Tethered under the trigger where the browser has anchor positioning. A

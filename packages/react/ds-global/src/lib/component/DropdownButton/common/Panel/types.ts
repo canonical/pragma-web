@@ -25,7 +25,10 @@ type OwnProps = {
   ref: Ref<DropdownPanelHandle>;
   /** The popover's id. Required: the trigger's `popovertarget` names it. */
   id: string;
-  /** Any content, such as a checkbox list in a form or a search field. */
+  /**
+   * Any content, such as a checkbox list in a form or a search field, or a
+   * `<DropdownPanel.Menu>`.
+   */
   children: ReactNode;
 };
 

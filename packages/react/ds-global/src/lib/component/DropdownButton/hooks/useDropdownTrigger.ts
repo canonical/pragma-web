@@ -13,8 +13,8 @@ import type {
  *
  * The trigger names the panel with `popovertarget` and carries the CSS
  * anchor name, `--` and the panel's id, from the first render. The ARIA
- * that advertises the popup waits for hydration, because before it only the
- * native popover runs.
+ * that advertises the popup, a dialog or a menu, waits for hydration,
+ * because before it only the native popover runs.
  *
  * @param id The trigger's own id, used when given.
  * @param style The trigger's own style; the anchor name is applied last.
@@ -30,10 +30,15 @@ export default function useDropdownTrigger({
   // A root's identifierPrefix lands inside the id, and may hold characters a
   // CSS ident cannot, so they become underscores, the same on both sides.
   const anchorName = `--${panelId.replace(/[^\w-]/g, "_")}`;
-  const contextValue = usePanelState({ panelId, triggerId, anchorName });
-  const isMounted = useIsMounted();
   const ref = useRef<DropdownPanelHandle>(null);
   const close = useCallback(() => ref.current?.hide(), []);
+  const contextValue = usePanelState({
+    panelId,
+    triggerId,
+    anchorName,
+    hide: close,
+  });
+  const isMounted = useIsMounted();
 
   return {
     triggerProps: {
@@ -41,7 +46,7 @@ export default function useDropdownTrigger({
       popoverTarget: panelId,
       popoverTargetAction: undefined,
       style: { ...style, anchorName },
-      "aria-haspopup": isMounted ? "dialog" : undefined,
+      "aria-haspopup": isMounted ? contextValue.kind : undefined,
       "aria-expanded": isMounted ? contextValue.isOpen : undefined,
       "aria-controls": isMounted ? panelId : undefined,
     },

@@ -71,13 +71,24 @@ export default function usePanelElement({
     [elementRef],
   );
   const hadFocusRef = useRef(false);
-  const { isOpen, setOpen, triggerId } = panel;
+  const { isOpen, setOpen, kind, setFocusIntent, triggerId } = panel;
 
   // A popover opened before hydration fired its toggle event before React
-  // listened, so read its real state once the element mounts.
+  // listened, so read its real state once the element mounts. A menu in it
+  // then keeps focus where the user put it: on the same item, or outside.
   useEffect(() => {
-    if (element) setOpen(element.matches(":popover-open"));
-  }, [element, setOpen]);
+    if (!element) return;
+    const isOpenNow = element.matches(":popover-open");
+    if (isOpenNow) {
+      const items = [
+        ...element.querySelectorAll(".ds.dropdown-button-menu-item"),
+      ];
+      // activeElement is null only with no focus at all, which indexOf misses.
+      const index = items.indexOf(findActiveElement(element) as Element);
+      setFocusIntent(index >= 0 ? index : "none");
+    }
+    setOpen(isOpenNow);
+  }, [element, setOpen, setFocusIntent]);
 
   // A page restored from the back-forward cache comes back as it was left.
   // While the panel is open, re-read its real state then, so the trigger
@@ -108,15 +119,18 @@ export default function usePanelElement({
   };
 
   // @note Impure: moves focus into the panel when it opens, and back to the
-  // trigger when it closes with focus inside.
+  // trigger when it closes with focus inside. A menu moves its own focus.
   const handleToggle = (event: ToggleEvent<HTMLDivElement>): void => {
     onToggle?.(event);
     if (event.target !== event.currentTarget) return;
     const target = event.currentTarget;
     setOpen(event.newState === "open");
     if (event.newState === "open") {
-      focusFirstControl(target);
-    } else if (hadFocusRef.current) {
+      if (kind === "dialog") focusFirstControl(target);
+      return;
+    }
+    setFocusIntent("first");
+    if (hadFocusRef.current) {
       hadFocusRef.current = false;
       // The trigger sits in the same tree as the panel, a document or a
       // shadow root.
