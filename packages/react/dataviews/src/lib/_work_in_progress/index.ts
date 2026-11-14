@@ -35,3 +35,8 @@ export type {
 export { QueryChip } from "./QueryChip/index.js";
 export type { QueryChipsProps } from "./QueryChips/index.js";
 export { QueryChips } from "./QueryChips/index.js";
+export type {
+  QueryInputOption,
+  QueryInputProps,
+} from "./QueryInput/index.js";
+export { QueryInput } from "./QueryInput/index.js";

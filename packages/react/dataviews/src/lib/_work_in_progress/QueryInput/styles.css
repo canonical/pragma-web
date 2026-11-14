@@ -1,0 +1,191 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * QueryInput styles
+   * @implements ds:global_dataviews.subcomponent.query_input
+   *
+   * The root keeps the room of one line in the layout. The field inside it
+   * holds one line while unfocused, clipping and fading the chips that
+   * overflow; focused, it wraps and overlays what follows the root.
+   */
+  .ds.query-input {
+    /* 4 px of block padding, with the 1 px borders, keeps the field 34 px
+       tall around a 24 px chip. No symbol declares 4 px. */
+    --query-input-padding-block: 0.25rem;
+    --query-input-border-width: var(--dimension-stroke-thickness-medium);
+    --query-input-block-size: calc(
+      var(--dimension-300) +
+      2 *
+      var(--query-input-padding-block) +
+      2 *
+      var(--query-input-border-width)
+    );
+    --query-input-background: var(
+      --surface-color-foreground-input,
+      var(--color-foreground-input)
+    );
+    --query-input-ring-width: var(--dimension-stroke-thickness-large);
+
+    position: relative;
+    flex: 1 1 0%;
+    min-inline-size: 20rem;
+    max-inline-size: 42.25rem;
+    block-size: var(--query-input-block-size);
+
+    & > .field {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--dimension-100);
+      box-sizing: border-box;
+      min-block-size: 100%;
+      padding-block: var(--query-input-padding-block);
+      padding-inline: var(--dimension-200);
+      border: var(--query-input-border-width) solid transparent;
+      border-block-end-color: var(--color-border);
+      border-radius: var(--dimension-radius-small);
+      background-color: var(--query-input-background);
+      color: var(--color-text);
+      font-family: var(--typography-text-secondary-font-family);
+      font-size: var(--typography-text-secondary-font-size);
+      font-weight: var(--typography-text-secondary-font-weight);
+      line-height: var(--typography-text-secondary-line-height);
+
+      &:hover {
+        background-color: var(
+          --hover--color-foreground-input,
+          var(--color-foreground-input-hover)
+        );
+      }
+
+      &:focus-within {
+        z-index: 1;
+        border-block-end-color: var(--color-border-highlighted);
+        outline: var(--query-input-ring-width) solid var(--color-focusRing);
+        outline-offset: calc(-1 * var(--query-input-ring-width));
+      }
+    }
+
+    &[data-disabled] > .field {
+      background-color: var(--color-foreground-input-disabled);
+      color: var(--color-text-disabled);
+    }
+
+    & .search-icon {
+      --icon-size: var(--dimension-200);
+
+      flex: none;
+      color: var(--color-icon-muted);
+    }
+
+    /* The chips and the entry. Unfocused, one line whose overflow fades. */
+    & .content {
+      display: flex;
+      flex: 1 1 auto;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: var(--dimension-100);
+      min-inline-size: 0;
+      overflow: hidden;
+    }
+
+    /* Unfocused, the chips hold one line and the list clips them, before
+       the entry, which stays visible. */
+    & .content > .ds.query-chips {
+      flex: 0 1 auto;
+      flex-wrap: nowrap;
+      min-inline-size: 0;
+      overflow: hidden;
+
+      & > li {
+        flex: none;
+      }
+    }
+
+    /* Unfocused, a clipped chip leaves a press to the field, which focuses
+       the entry and wraps with the chip in reach. */
+    &
+      > .field:not(:focus-within)
+      .content
+      > .ds.query-chips
+      > li[data-clipped] {
+      pointer-events: none;
+    }
+
+    /* Focused, the row and the chips wrap, over what follows the field. */
+    & > .field:focus-within .content {
+      flex-wrap: wrap;
+      overflow: visible;
+    }
+
+    & > .field:focus-within .content > .ds.query-chips {
+      flex-wrap: wrap;
+      overflow: visible;
+    }
+
+    /* Only while chips overflow the one line does the list's end fade. */
+    &[data-overflowing] > .field:not(:focus-within) .content > .ds.query-chips {
+      mask-image: linear-gradient(
+        to right,
+        black calc(100% - var(--dimension-300)),
+        transparent
+      );
+
+      &:dir(rtl) {
+        mask-image: linear-gradient(
+          to left,
+          black calc(100% - var(--dimension-300)),
+          transparent
+        );
+      }
+    }
+
+    /* The entry fills the rest of the row. */
+    & .content > .ds.query-input-entry {
+      flex: 1 0 var(--dimension-300);
+      min-inline-size: var(--dimension-300);
+    }
+
+    /* A chips' list the host wraps in its own element still hides the
+       placeholder. */
+    & .content:has(.ds.query-chip) > .ds.query-input-entry::placeholder {
+      color: transparent;
+    }
+
+    & .hidden-count {
+      flex: none;
+      color: var(--color-text-muted);
+      font-size: var(--typography-text-tertiary-font-size);
+      line-height: var(--typography-text-tertiary-line-height);
+    }
+
+    & > .field:focus-within .hidden-count {
+      display: none;
+    }
+
+    & .clear {
+      display: inline-flex;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      min-inline-size: var(--dimension-300);
+      min-block-size: var(--dimension-300);
+      padding: 0;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Text for assistive technology only. */
+    & .assistive {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+}

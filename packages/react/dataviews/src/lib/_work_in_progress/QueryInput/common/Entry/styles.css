@@ -1,0 +1,31 @@
+/* Layer: ds.components.global (@canonical/styles README, "Cascade layers"). */
+
+@layer ds.components.global {
+  /**
+   * QueryInput's own entry; a chip's entry styles itself.
+   * @implements ds:global_dataviews.subcomponent.query_input
+   */
+  .ds.query-input-entry {
+    /* The house target, which the field's padding and borders make 34 px. */
+    min-block-size: var(--dimension-300);
+    margin: 0;
+    padding: 0;
+    border: none;
+    appearance: none;
+    background: transparent;
+    outline: none;
+    color: inherit;
+    font: inherit;
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    /* Before scripts run the entry is a search input: the field's own clear
+       control is the only one. */
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-decoration {
+      appearance: none;
+    }
+  }
+}
