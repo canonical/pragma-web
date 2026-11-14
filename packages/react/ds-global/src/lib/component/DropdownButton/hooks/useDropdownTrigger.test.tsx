@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { createRoot } from "react-dom/client";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import useDropdownTrigger from "./useDropdownTrigger.js";
 
 describe("useDropdownTrigger", () => {
@@ -46,6 +46,35 @@ describe("useDropdownTrigger", () => {
     const { result } = renderHook(() => useDropdownTrigger({}));
     expect(() => result.current.renderProps.close()).not.toThrow();
   });
+
+  it("composes the consumer's onKeyDown, and ignores the arrows outside a menu", () => {
+    const onKeyDown = vi.fn();
+    const { result } = renderHook(() => useDropdownTrigger({ onKeyDown }));
+    const event = {
+      key: "ArrowDown",
+      defaultPrevented: false,
+      preventDefault: vi.fn(),
+    } as unknown as React.KeyboardEvent<HTMLButtonElement>;
+    act(() => result.current.triggerProps.onKeyDown(event));
+    expect(onKeyDown).toHaveBeenCalledWith(event);
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it("asks a menu to focus its last item on ArrowUp", () => {
+    const { result } = renderHook(() => useDropdownTrigger({}));
+    act(() => {
+      result.current.contextValue.registerMenu();
+    });
+    const event = {
+      key: "ArrowUp",
+      defaultPrevented: false,
+      preventDefault: vi.fn(),
+    } as unknown as React.KeyboardEvent<HTMLButtonElement>;
+    act(() => result.current.triggerProps.onKeyDown(event));
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(result.current.contextValue.focusIntent).toBe("last");
+  });
+
   it("keeps the anchor name a CSS ident under any identifierPrefix", () => {
     let result: ReturnType<typeof useDropdownTrigger> | undefined;
     const Probe = () => {

@@ -27,6 +27,11 @@ const renderOptions: WithDropdownRender = ({ ref, id, triggerId, close }) => (
 );
 
 const OptionsTrigger = withDropdownPanel(Button, renderOptions);
+const MenuTrigger = withDropdownPanel(Button, ({ ref, id, triggerId }) => (
+  <DropdownPanel ref={ref} id={id} aria-labelledby={triggerId}>
+    <DropdownPanel.Menu items={[{ key: "copy", label: "Copy" }]} />
+  </DropdownPanel>
+));
 const SettingsTrigger = withDropdownPanel(IconButton, renderOptions);
 
 const renderTrigger = (props: ComponentProps<typeof OptionsTrigger> = {}) => {
@@ -215,6 +220,98 @@ describe("withDropdownPanel", () => {
       await flushToggles();
       expect(panel.matches(":popover-open")).toBe(false);
       expect(document.activeElement).toBe(trigger);
+    });
+  });
+
+  describe("menu mode", () => {
+    const ItemsTrigger = withDropdownPanel(Button, ({ ref, id, triggerId }) => (
+      <DropdownPanel ref={ref} id={id} aria-labelledby={triggerId}>
+        <DropdownPanel.Menu
+          items={[
+            { key: "cut", label: "Cut" },
+            { key: "copy", label: "Copy" },
+            { key: "paste", label: "Paste", disabled: true },
+          ]}
+        />
+      </DropdownPanel>
+    ));
+
+    it.each([
+      ["ArrowDown", "Cut"],
+      ["ArrowUp", "Copy"],
+    ])(
+      "moves focus into an open menu on %s from the trigger",
+      async (key, label) => {
+        Element.prototype.scrollIntoView = () => {};
+        render(<ItemsTrigger>Edit</ItemsTrigger>);
+        const trigger = screen
+          .getByText("Edit")
+          .closest("button") as HTMLElement;
+        fireEvent.click(trigger);
+        await flushToggles();
+        act(() => trigger.focus());
+        fireEvent.keyDown(trigger, { key });
+        expect(document.activeElement).toHaveTextContent(label);
+        expect(document.activeElement).toHaveAttribute("tabindex", "0");
+        Reflect.deleteProperty(Element.prototype, "scrollIntoView");
+      },
+    );
+
+    const renderMenuTrigger = (
+      props: ComponentProps<typeof MenuTrigger> = {},
+    ) => {
+      render(<MenuTrigger {...props}>Actions</MenuTrigger>);
+      const trigger = screen
+        .getByText("Actions")
+        .closest("button") as HTMLElement;
+      return { trigger, panel: trigger.nextElementSibling as HTMLElement };
+    };
+
+    it("advertises a menu", () => {
+      expect(renderMenuTrigger().trigger).toHaveAttribute(
+        "aria-haspopup",
+        "menu",
+      );
+    });
+
+    it.each(["ArrowDown", "ArrowUp"])("opens on %s", async (key) => {
+      const { trigger, panel } = renderMenuTrigger();
+      const event = new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+      });
+      act(() => {
+        trigger.dispatchEvent(event);
+      });
+      await flushToggles();
+      expect(event.defaultPrevented).toBe(true);
+      expect(panel.matches(":popover-open")).toBe(true);
+    });
+
+    it("leaves other keys alone", async () => {
+      const { trigger, panel } = renderMenuTrigger();
+      fireEvent.keyDown(trigger, { key: "a" });
+      await flushToggles();
+      expect(panel.matches(":popover-open")).toBe(false);
+    });
+
+    it("runs the consumer's onKeyDown first, whose preventDefault skips its own", async () => {
+      const onKeyDown = vi.fn((event: React.KeyboardEvent) =>
+        event.preventDefault(),
+      );
+      const { trigger, panel } = renderMenuTrigger({ onKeyDown });
+      fireEvent.keyDown(trigger, { key: "ArrowDown" });
+      await flushToggles();
+      expect(onKeyDown).toHaveBeenCalledTimes(1);
+      expect(panel.matches(":popover-open")).toBe(false);
+    });
+
+    it("ignores the arrows in panel mode", async () => {
+      const { trigger, panel } = renderTrigger();
+      fireEvent.keyDown(trigger, { key: "ArrowDown" });
+      await flushToggles();
+      expect(panel.matches(":popover-open")).toBe(false);
     });
   });
 });
