@@ -35,9 +35,13 @@
     border-bottom-color: var(--filter-bar-divider-color);
   }
 
-  /* The facets under Search, then the chips, on one line. */
+  /* The facets under Search, then the chips, on one line: a fieldset
+   * without its native border, padding and margin. */
   .ds.filter-bar > .controls {
     grid-column: 5 / -1;
+    border: 0;
+    padding: 0;
+    margin: 0;
     display: flex;
     align-items: center;
     flex-wrap: nowrap;

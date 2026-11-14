@@ -51,9 +51,18 @@ node:
     appearance.border.bottom.color: color.border.muted
   edges:
     - node:
-        role: controls
+        role: controls (a fieldset, labelled by the bar's name)
         styles:
           layout.grid.column: "5 / -1"
+          appearance.border.width: 0
+          spacing.internal.block.start: 0
+          spacing.internal.block.end: 0
+          spacing.internal.inline.start: 0
+          spacing.internal.inline.end: 0
+          spacing.external.block.start: 0
+          spacing.external.block.end: 0
+          spacing.external.inline.start: 0
+          spacing.external.inline.end: 0
           layout.type: flex
           layout.align: center
           layout.wrap: nowrap
