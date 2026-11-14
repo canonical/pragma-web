@@ -47,6 +47,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": "^22.13.0 || ^24.0.0 || ^26.0.0"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && bun run build:testing",
     "build:testing": "tsc -p tsconfig.build.testing.json && cp -R dist/testing-build/esm/testing dist/esm/ && cp -R dist/testing-build/types/testing dist/types/ && rm -rf dist/testing-build && perl -pi -e 's#\\.\\./src/lib/#../lib/#g' dist/esm/testing/*.js dist/types/testing/*.d.ts",
