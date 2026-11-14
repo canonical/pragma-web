@@ -37,13 +37,13 @@ describe("FleetLayout", () => {
     expect(container.querySelector('[data-slot="count"]')).toBeNull();
   });
 
-  it("names the page's address as the trail's current crumb", async () => {
+  it("ends a stock's trail at the link back to the fleet", async () => {
     const { container } = renderMetroPage(
       `/fleet/${encodeURIComponent(SERIES_90_CURIE)}`,
     );
     await screen.findByRole("heading", { level: 1, name: "Series 90" });
     const trail = container.querySelector(".ds.mode-strip") as HTMLElement;
-    expect(trail).toHaveTextContent(SERIES_90_CURIE);
+    expect(trail).not.toHaveTextContent(SERIES_90_CURIE);
     expect(within(trail).getByRole("link", { name: "Fleet" })).toHaveAttribute(
       "href",
       "/fleet",

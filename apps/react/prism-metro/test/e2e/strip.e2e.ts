@@ -3,8 +3,10 @@
 /**
  * The strip in the browser, at each side of the two-group threshold: one
  * band of the same height on every page, its view and filtering groups on
- * the same column lines across pages at two groups and wider, its count
- * whole at every width and ending on the band's last line, the facet bar
+ * the same column lines across pages at two groups and wider, no group
+ * painted over another, its count shortened only once the trail has given
+ * way, no crumb reading as an address, the count ending on the band's last
+ * line, the facet bar
  * one band of the strip's height only where a lens has facets, the folded
  * renderer menu's options as links that change only `as`, each a full
  * target, the folded sheet covering a phone's viewport, and no link to the
@@ -46,6 +48,9 @@ const BAND_TOLERANCE_PX = 0.5;
 
 /** The smallest target a menu option may be, in pixels. */
 const MIN_TARGET_PX = 24;
+
+/** A crumb that reads as an address, a prefixed name or an absolute IRI. */
+const ADDRESS_PATTERN = /^[a-z][\w-]*:/;
 
 /** A station's page. */
 const STATION_PATH = `/stations/${encodeURIComponent(NORTHGATE_CURIE)}`;
@@ -138,15 +143,25 @@ describe.each(STRIP_VIEWPORTS)("at $name px", (viewport) => {
     }
   };
 
-  it("keeps the strip one 53px band on every page, its count whole", async () => {
+  it("keeps the strip one 53px band on every page, no group over another", async () => {
     for (const path of STRIP_PATHS) {
       const strip = await measure(path);
+      const trail = strip.groups.trail;
+      const trailWidth = trail === null ? 0 : trail.right - trail.x;
       expect(
         Math.abs((strip.height ?? 0) - STRIP_HEIGHT_PX),
         path,
       ).toBeLessThanOrEqual(BAND_TOLERANCE_PX);
       expect(strip.overflow, path).toBe(false);
-      expect(strip.countClipped, path).toBe(false);
+      expect(strip.overlaps, path).toEqual([]);
+      // The count shortens only once the trail has given way entirely.
+      expect(strip.countClipped && trailWidth > EDGE_TOLERANCE_PX, path).toBe(
+        false,
+      );
+      expect(
+        strip.crumbs.filter((crumb) => ADDRESS_PATTERN.test(crumb)),
+        path,
+      ).toEqual([]);
       expect(strip.viewHrefs, path).toEqual([]);
     }
   });
