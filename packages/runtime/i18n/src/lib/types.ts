@@ -105,7 +105,11 @@ export interface LocaleSources {
 
 /** Options for `createLocaleSource`. */
 export interface LocaleSourceOptions {
-  /** Starting locale. Defaults to {@link I18nConfig.defaultLocale}. */
+  /**
+   * Starting locale. Defaults to {@link I18nConfig.defaultLocale}. Stored as
+   * given, unlike a tag passed to `set`, so pass a configured locale, such as
+   * the result of `negotiateLocale`.
+   */
   initial?: Locale;
   /** Persist changes to the cookie (browser only). Defaults to `true`. */
   persist?: boolean;
@@ -125,8 +129,16 @@ export interface LocaleSource {
   get(): Locale;
   /** Writing direction of the current locale. */
   readonly direction: Direction;
-  /** Change the active locale (persists + reflects per options). */
-  set(locale: Locale): void;
+  /**
+   * Change the active locale (persists + reflects per options). The tag is
+   * matched as negotiation matches an `Accept-Language` tag: the exact
+   * configured tag first, then its base language, ignoring case, so
+   * `set("fr-CA")` selects `"fr"` when only `"fr"` is configured. A tag that
+   * matches the current locale changes nothing.
+   *
+   * @throws RangeError when the tag matches no configured locale.
+   */
+  set(tag: Locale): void;
   /** Subscribe; invokes `run` immediately and on each change. Returns unsubscribe. */
   subscribe(run: (locale: Locale) => void): () => void;
 }

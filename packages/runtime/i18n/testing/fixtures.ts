@@ -29,6 +29,18 @@ export const regionalOnlyConfig: I18nConfig = {
   defaultLocale: "en",
 };
 
+/** A base language configured beside one of its regional tags. */
+export const baseAndRegionalConfig: I18nConfig = {
+  locales: ["en", "fr", "fr-CA"],
+  defaultLocale: "en",
+};
+
+/** Base languages beside a regional tag of another language. */
+export const mixedRegionConfig: I18nConfig = {
+  locales: ["en", "fr", "pt-BR"],
+  defaultLocale: "en",
+};
+
 /** English and Arabic, with Arabic marked right-to-left. */
 export const englishArabicConfig: I18nConfig = {
   locales: ["en", "ar"],

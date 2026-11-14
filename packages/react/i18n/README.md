@@ -88,7 +88,16 @@ function LanguageSwitcher() {
 
 Changing the locale re-translates and re-formats every subscribed component and,
 in the browser, persists the choice to a cookie and flips `<html dir>` for RTL
-locales — all via the shared `@canonical/i18n-core` source.
+locales — all via the shared `@canonical/i18n-core` source. `setLocale` matches
+a tag as negotiation matches an `Accept-Language` tag, so `setLocale("fr-CA")`
+selects `fr` when only `fr` is configured; a tag that matches no configured
+locale throws a `RangeError`. A tag from elsewhere, such as a URL segment,
+either goes through negotiation, as in
+`setLocale(negotiateLocale(config, { acceptLanguage: segment }))`, which falls
+back to the default locale when the tag matches nothing, or is set inside a
+`try`/`catch` for the `RangeError` that `setLocale` throws instead.
+`isSupportedLocale` checks the exact tag only, so it refuses `FR` and `fr-CA`,
+which `setLocale` accepts.
 
 For a correct first paint, set `<html lang dir>` on the server from the
 negotiated locale with `getDocumentAttributes` (see the
