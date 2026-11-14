@@ -25,8 +25,10 @@
 #
 # Below two groups the band folds to one flex line: the trail, the view
 # group's menu, then the filtering group's fold ("Filter · n", a link to
-# the sheet) and the count; Search and the chips are not displayed, the
-# sheet holds them. The fold is displayed only there.
+# the sheet) and the count at the end; Search and the chips are not
+# displayed, the sheet holds them. The fold is displayed only there. The
+# trail gives way first, down to nothing; only then does the count shorten,
+# its text ending in an ellipsis, so no group is painted over another.
 #
 # Every decision is read through a component token declared on the root
 # (`--mode-strip-*`), bound to the symbol named here.
@@ -43,10 +45,17 @@
 #
 # Reflow, bound in styles.css:
 #   @container shell (width < 912px)  below two groups: the root is a flex
-#     row (nowrap, gap space.100) instead of a subgrid, the view group's
-#     menu keeps its width (the trail shrinks), the filtering group grows
-#     into the free space; the search and chips slots are not
-#     displayed; the fold slot is displayed.
+#     row (nowrap, gap space.100) instead of a subgrid; the view group's
+#     menu keeps its width; the trail grows from nothing into the room the
+#     other groups leave, up to its own width (`layout.flex.grow: 1`,
+#     `layout.flex.basis: 0`, `size.max.width: max-content`), so it gives
+#     way first; the filtering
+#     group sits at the end (`spacing.external.inline.start: auto`) and
+#     shrinks only once the trail is gone, and then its count slot shrinks
+#     (`layout.flex.shrink: 1`, `size.min.width: 0`), the count line's
+#     text ending in an ellipsis; nothing reaches back over another group;
+#     the search and chips slots are not displayed; the fold slot is
+#     displayed.
 #
 # Roster namespaces (accepted and tracked): grid.gutter,
 # density.line.height, component.padding.block, space.100, and the

@@ -102,8 +102,11 @@
   }
 
   /* Below two groups the band is one flex line: the trail, the view
-   * group's menu, then the fold and the count; the sheet holds Search and
-   * the chips. */
+   * group's menu, then the fold and the count at the end; the sheet holds
+   * Search and the chips. The trail takes only the room the other groups
+   * leave, up to its own width, so it gives way first, down to nothing;
+   * only then does the filtering group shrink, and in it the count, whose
+   * text ends in an ellipsis. Nothing reaches back over another group. */
   @container shell (width < 912px) {
     .ds.mode-strip {
       display: flex;
@@ -111,12 +114,23 @@
       gap: var(--mode-strip-spacing);
     }
 
+    .ds.mode-strip > .trail {
+      flex-grow: 1;
+      flex-basis: 0;
+      max-inline-size: max-content;
+    }
+
     .ds.mode-strip > .view {
       flex-shrink: 0;
     }
 
     .ds.mode-strip > .filtering {
-      flex-grow: 1;
+      margin-inline-start: auto;
+    }
+
+    .ds.mode-strip > .filtering > .count {
+      flex-shrink: 1;
+      min-inline-size: 0;
     }
 
     .ds.mode-strip > .filtering > .search,
