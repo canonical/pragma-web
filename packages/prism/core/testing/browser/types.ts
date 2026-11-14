@@ -33,11 +33,20 @@ export interface StripMeasure {
   /** Whether the strip's content is wider than the strip. */
   readonly overflow: boolean;
   /**
-   * Whether the count, or an element inside it, is narrower than its text;
-   * `false` when the strip counts nothing.
+   * Whether the count, or an element inside it, is narrower than its text,
+   * which then ends in an ellipsis; `false` when the strip counts nothing.
    */
   readonly countClipped: boolean;
-  /** The trail's crumbs, by their text, from the first to the current. */
+  /**
+   * The groups painted over one another, each pair as `first/second
+   * shared`, the width they share in pixels; a group is painted where its
+   * descendants are, cut by what clips them inside the group.
+   */
+  readonly overlaps: readonly string[];
+  /**
+   * The trail's crumbs, each by its own text without the separator, from
+   * the first to the last.
+   */
   readonly crumbs: readonly string[];
   /** The hrefs on the page that carry the retired `view=` parameter. */
   readonly viewHrefs: readonly string[];
@@ -162,8 +171,8 @@ export interface LayoutMeasure {
   }[];
   /**
    * Each lens's breadcrumb trail: how many rows its crumbs take, where the
-   * current crumb's text is painted to, its extent cut by every element of
-   * the trail that clips or scrolls it (-1 with no current crumb), and the
+   * last crumb's text is painted to, its extent cut by every element of
+   * the trail that clips or scrolls it (-1 with no crumb), and the
    * trail's own inline end, in pixels.
    */
   readonly trails: readonly {
