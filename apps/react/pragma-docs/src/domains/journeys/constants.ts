@@ -1,3 +1,4 @@
+import { VIEW_PARAMS } from "@canonical/prism-core";
 import type { MessageKey } from "#i18n";
 import type { HopKind, JourneyView, SurfaceRouteName } from "./types.js";
 
@@ -87,8 +88,12 @@ export const JOURNEY_VIEWS: readonly JourneyView[] = ["table", "graph"];
  */
 export const DEFAULT_JOURNEY_VIEW: JourneyView = "table";
 
-/** The search parameter both journeys routes keep the view in. */
-export const JOURNEY_VIEW_PARAM = "view";
+/**
+ * The search parameter both journeys routes keep the view in: the
+ * renderer parameter every strip writes (`as`), so the two readings are
+ * named in the address as every other page's renderers are.
+ */
+export const JOURNEY_VIEW_PARAM = VIEW_PARAMS.renderer;
 
 /**
  * The site routes the demand model's surfaces land on, by the surface

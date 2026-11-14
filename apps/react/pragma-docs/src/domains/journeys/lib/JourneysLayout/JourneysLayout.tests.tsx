@@ -109,10 +109,10 @@ describe("JourneysLayout", () => {
     // The job's hop links to the job's page in the graph view, so the move
     // from the index, which remounts the layout, keeps the graph.
     const jobHop = document.querySelector('.journey-hop[data-kind="job"] a');
-    expect(jobHop?.getAttribute("href")).toMatch(/\?view=graph$/);
+    expect(jobHop?.getAttribute("href")).toMatch(/\?as=graph$/);
     // So does the rail's link to every job.
     for (const link of document.querySelectorAll(".ds.journey-rail .job a")) {
-      expect(link.getAttribute("href")).toMatch(/\?view=graph$/);
+      expect(link.getAttribute("href")).toMatch(/\?as=graph$/);
     }
     index.unmount();
     const { container } = render(

@@ -21,6 +21,6 @@ describe("Controls", () => {
     expect(graph).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(graph);
     await waitFor(() => expect(graph).toHaveAttribute("aria-pressed", "true"));
-    expect(router.getState().location.href).toMatch(/\?view=graph$/);
+    expect(router.getState().location.href).toMatch(/\?as=graph$/);
   });
 });
