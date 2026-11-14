@@ -334,10 +334,8 @@ describe("DataViews.SavedViews", () => {
     expect(queryStatus()).toHaveTextContent("");
     expect(getSelect().options).toHaveLength(2);
 
-    // A blank name passes the native check and is refused by the
+    // A name submitted past the native check is refused by the
     // collection, which the input reports as its own validity.
-    fireEvent.change(name, { target: { value: "   " } });
-    expect(name).toBeValid();
     fireEvent.submit(form);
     await waitFor(() => {
       expect(name).toHaveAccessibleDescription("A view needs a name.");
@@ -374,7 +372,7 @@ describe("DataViews.SavedViews", () => {
     );
   });
 
-  it("cancels a panel with Escape, returning the focus to its command", async () => {
+  it("cancels a dialog with Escape, returning the focus to its command", async () => {
     await mountListed(createMemoryViewStore([failed]).store);
     await choose(failed);
     fireEvent.click(getButton("Save as…"));
@@ -404,7 +402,7 @@ describe("DataViews.SavedViews", () => {
     });
   });
 
-  it.fails("opens each dialog natively from its command", async () => {
+  it("opens each dialog natively from its command", async () => {
     await mountListed(createMemoryViewStore([failed]).store);
     await choose(failed);
     for (const name of ["Save as…", "Rename…", "Delete…"]) {
@@ -423,7 +421,7 @@ describe("DataViews.SavedViews", () => {
     }
   });
 
-  it.fails("refuses a blank name natively, never asking the collection", async () => {
+  it("refuses a blank name natively, never asking the collection", async () => {
     await mountListed(createMemoryViewStore([failed]).store);
     fireEvent.click(getButton("Save as…"));
     const form = screen.getByRole("form", { name: "Save as a new view" });
@@ -435,7 +433,7 @@ describe("DataViews.SavedViews", () => {
     expect(getSelect().options).toHaveLength(2);
   });
 
-  it.fails("asks before deleting in a dialog named by its question", async () => {
+  it("asks before deleting in a dialog named by its question", async () => {
     await mountListed(createMemoryViewStore([failed]).store);
     await choose(failed);
     fireEvent.click(getButton("Delete…"));
@@ -478,7 +476,7 @@ describe("DataViews.SavedViews", () => {
     );
     await choose(failed);
     fireEvent.click(getButton("Delete…"));
-    const confirm = screen.getByRole("group", {
+    const confirm = screen.getByRole("dialog", {
       name: 'Delete "Failed"? This cannot be undone.',
     });
     expect(
@@ -553,7 +551,7 @@ describe("DataViews.SavedViews", () => {
     expect(getButton("Revert")).toBeDisabled();
   });
 
-  it("keeps the rename form open through a conflict, for a second try", async () => {
+  it("keeps the rename dialog open through a conflict, for a second try", async () => {
     const memory = createMemoryViewStore([failed]);
     await mountListed(memory.store);
     await choose(failed);
@@ -575,7 +573,7 @@ describe("DataViews.SavedViews", () => {
     });
   });
 
-  it("closes a panel whose view was deleted elsewhere, and keeps the focus", async () => {
+  it("closes a dialog whose view was deleted elsewhere, and keeps the focus", async () => {
     const memory = createMemoryViewStore([failed]);
     await mountListed(memory.store);
     await choose(failed);
@@ -588,7 +586,7 @@ describe("DataViews.SavedViews", () => {
       expect(screen.queryByRole("form")).toBeNull();
     });
     expect(getSelect()).toHaveFocus();
-    // Opening a view later does not bring the old panel back.
+    // Opening a view later does not bring the old dialog back.
     await act(() =>
       memory.store.create({
         id: running.id,
@@ -749,7 +747,7 @@ describe("DataViews.SavedViews", () => {
     expect(unsubscribe).toHaveBeenCalledTimes(2);
   });
 
-  it.fails("pre-fills Rename with the name a save conflict brings back", async () => {
+  it("pre-fills Rename with the name a save conflict brings back", async () => {
     const memory = createMemoryViewStore([failed]);
     const { provider } = await mountListed(memory.store);
     await choose(failed);

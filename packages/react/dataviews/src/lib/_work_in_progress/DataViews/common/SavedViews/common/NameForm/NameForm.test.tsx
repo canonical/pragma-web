@@ -2,12 +2,11 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import NameForm from "./NameForm.js";
 
-/** The form over the given answers. */
+/** The dialog over the given answers, closed. */
 const mountForm = ({
   initial = "",
   pending = false,
   onSubmit = vi.fn(async (_name: string): Promise<string | null> => null),
-  onCancel = vi.fn(),
 } = {}) => {
   render(
     <NameForm
@@ -18,10 +17,9 @@ const mountForm = ({
       initial={initial}
       pending={pending}
       onSubmit={onSubmit}
-      onCancel={onCancel}
     />,
   );
-  return { onSubmit, onCancel };
+  return { onSubmit };
 };
 
 /** Open the one dialog rendered, as its command does. */
@@ -46,9 +44,10 @@ const submitForm = async (): Promise<void> => {
 describe("NameForm", () => {
   it("is a named form that takes the focus on its input", () => {
     mountForm({ initial: "Failed" });
+    openDialog();
     expect(
       screen.getByRole("form", { name: "Save as a new view" }),
-    ).toHaveClass("ds", "data-views-saved-views-name-form");
+    ).toBeInTheDocument();
     const input = screen.getByRole("textbox", { name: "Name" });
     expect(input).toHaveValue("Failed");
     expect(input).toHaveFocus();
@@ -57,6 +56,7 @@ describe("NameForm", () => {
 
   it("submits the name as edited", async () => {
     const { onSubmit } = mountForm();
+    openDialog();
     fireEvent.change(screen.getByRole("textbox", { name: "Name" }), {
       target: { value: "Busy" },
     });
@@ -68,6 +68,7 @@ describe("NameForm", () => {
   it("shows a refusal as the input's validity, and takes the focus back", async () => {
     const onSubmit = vi.fn(async (): Promise<string | null> => "Taken");
     mountForm({ initial: "Failed", onSubmit });
+    openDialog();
     const input = screen.getByRole("textbox", { name: "Name" });
     screen.getByRole("button", { name: "Cancel" }).focus();
     await submitForm();
@@ -79,6 +80,7 @@ describe("NameForm", () => {
   it("clears a refusal as the name is edited", async () => {
     const onSubmit = vi.fn(async (): Promise<string | null> => "Taken");
     mountForm({ initial: "Failed", onSubmit });
+    openDialog();
     await submitForm();
     const input = screen.getByRole("textbox", { name: "Name" });
     fireEvent.change(input, { target: { value: "Failed again" } });
@@ -93,27 +95,19 @@ describe("NameForm", () => {
       .mockResolvedValueOnce("Taken")
       .mockResolvedValueOnce(null);
     mountForm({ initial: "Failed", onSubmit });
+    openDialog();
     await submitForm();
     await submitForm();
     expect(onSubmit).toHaveBeenCalledTimes(2);
     expect(screen.getByRole("textbox", { name: "Name" })).toBeValid();
   });
 
-  it("cancels on Cancel, and on Escape alone", () => {
-    const { onCancel } = mountForm();
-    const form = screen.getByRole("form");
-    fireEvent.keyDown(form, { key: "a" });
-    expect(onCancel).not.toHaveBeenCalled();
-    expect(fireEvent.keyDown(form, { key: "Escape" })).toBe(false);
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    expect(onCancel).toHaveBeenCalledTimes(2);
-  });
-
   it("disables the submit while pending", () => {
     mountForm({ pending: true });
+    openDialog();
     expect(screen.getByRole("button", { name: "Save view" })).toBeDisabled();
   });
-  it.fails("is a dialog named for what the name is for, focusing its input as it opens", () => {
+  it("is a dialog named for what the name is for, focusing its input as it opens", () => {
     mountForm({ initial: "Failed" });
     openDialog();
     expect(
@@ -122,7 +116,7 @@ describe("NameForm", () => {
     expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
   });
 
-  it.fails("refuses a name of only spaces natively", () => {
+  it("refuses a name of only spaces natively", () => {
     mountForm();
     openDialog();
     const input = screen.getByRole<HTMLInputElement>("textbox", {
@@ -133,7 +127,7 @@ describe("NameForm", () => {
     expect(input.validity.patternMismatch).toBe(true);
   });
 
-  it.fails("closes on Cancel and on Escape, back to the name it started with", () => {
+  it("closes on Cancel and on Escape, back to the name it started with", () => {
     mountForm({ initial: "Failed" });
     const dialog = openDialog();
     fireEvent.change(screen.getByRole("textbox", { name: "Name" }), {
@@ -149,9 +143,11 @@ describe("NameForm", () => {
     expect(dialog.open).toBe(false);
   });
 
-  it.fails("takes its dialog's native props", () => {
+  it("takes its dialog's native props", () => {
     render(
       <NameForm
+        id="names"
+        className="extra"
         label="Save as a new view"
         submit="Save view"
         nameLabel="Name"
@@ -159,10 +155,6 @@ describe("NameForm", () => {
         initial=""
         pending={false}
         onSubmit={async () => null}
-        // Typed for both shapes: the props before and after the dialog.
-        {...({ id: "names", className: "extra", onCancel: () => {} } as {
-          readonly onCancel: () => void;
-        })}
       />,
     );
     const dialog = document.querySelector("dialog");
@@ -174,7 +166,7 @@ describe("NameForm", () => {
     );
   });
 
-  it.fails("ignores a refusal that arrives after the dialog closed", async () => {
+  it("ignores a refusal that arrives after the dialog closed", async () => {
     let answer = (_refused: string | null): void => {};
     const onSubmit = vi.fn(
       (_name: string) =>

@@ -273,7 +273,7 @@ export const DeletingAView: Story = {
     await userEvent.click(
       getViews(canvas).getByRole("button", { name: "Delete…" }),
     );
-    const confirm = getViews(canvas).getByRole("group", {
+    const confirm = getViews(canvas).getByRole("dialog", {
       name: 'Delete "Failed machines"? This cannot be undone.',
     });
     await expect(

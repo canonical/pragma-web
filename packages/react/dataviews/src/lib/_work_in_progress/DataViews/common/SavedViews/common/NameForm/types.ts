@@ -1,10 +1,7 @@
-/**
- * Exempt from the native-prop extension convention: an internal renderer of
- * the saved-views control, never rendered by a caller, whose root the control
- * places.
- */
-export type NameFormProps = {
-  /** The form's accessible name: what the name is for. */
+import type { ComponentProps } from "react";
+
+type OwnProps = {
+  /** The dialog's and the form's accessible name: what the name is for. */
   readonly label: string;
   /** The submit button's text. */
   readonly submit: string;
@@ -12,7 +9,7 @@ export type NameFormProps = {
   readonly nameLabel: string;
   /** The cancel button's text. */
   readonly cancel: string;
-  /** The name the input starts with. */
+  /** The name the input starts with, and returns to as the dialog closes. */
   readonly initial: string;
   /** Whether a command is in flight; the form cannot submit meanwhile. */
   readonly pending: boolean;
@@ -21,5 +18,12 @@ export type NameFormProps = {
    * once it is taken.
    */
   readonly onSubmit: (name: string) => Promise<string | null>;
-  readonly onCancel: () => void;
 };
+
+/**
+ * Props of the name dialog. The root is a `dialog`, so it extends native
+ * dialog props; `children` is excluded, since the dialog renders its own
+ * form, and so is `aria-label`, which `label` gives.
+ */
+export type NameFormProps = OwnProps &
+  Omit<ComponentProps<"dialog">, keyof OwnProps | "children" | "aria-label">;
