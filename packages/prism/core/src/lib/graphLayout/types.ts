@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 /** A face of the shipped font the canvas sets text in. */
 export type FontFace = "regular" | "bold" | "boldItalic";
 
@@ -279,15 +277,29 @@ export interface LabelPlacement {
   }[];
 }
 
+/** A node as a graph engine places it: its box and its column. */
+export type GraphLayoutNode = RegionNode;
+
+/** An edge as a graph engine routes it: its ends, its path and its heads. */
+export type GraphLayoutEdge<TBundle extends LayeredBundle = LayeredBundle> =
+  RegionEdge<TBundle>;
+
+/** What a graph engine is told beside its nodes and edges. */
+export type GraphLayoutOptions = LayeredOptions;
+
+/**
+ * A graph engine's output: its nodes' positions, its edges' routes, and what
+ * it found while placing them.
+ */
+export type GraphLayoutResult<TBundle extends LayeredBundle = LayeredBundle> =
+  RegionLayout<TBundle>;
+
 /**
  * A graph engine's layout: a pure function of its nodes, edges and options
  * to positions and routes, so the same input always gives the same result.
  */
-export type GraphLayout<TNodes, TEdges, TOptions, TResult> = (
-  nodes: TNodes,
-  edges: TEdges,
-  options: TOptions,
-) => TResult;
-
-/** A graph engine's drawing: a layout's result as SVG for `GraphCanvas`. */
-export type GraphDraw<TResult> = (result: TResult) => ReactNode;
+export type GraphLayout = <TBundle extends LayeredBundle>(
+  nodes: LayeredNodes,
+  edges: LayeredEdges<TBundle>,
+  options: GraphLayoutOptions,
+) => GraphLayoutResult<TBundle>;

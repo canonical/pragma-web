@@ -1,15 +1,16 @@
 /**
  * The graph layout engines beside `GraphCanvas`: the contract every kind
- * implements (`layout(nodes, edges, options)` to positions and routes,
- * `draw(result)` to SVG) and the layered engine, pure functions of their
- * input, with the geometry they share.
+ * implements (`layout(nodes, edges, options)` to positions and routes) and
+ * the layered engine on it, pure functions of their input, with the
+ * geometry the lens draws by.
  *
  * `layoutLayered` is the layered kind on the contract, over `layOutRegion`;
  * `placeEdgeLabels` places the relation labels of a laid-out graph; the
  * lengths, the font metrics and the geometry are shared by both, so a
  * caller's drawing lands on the same lattice the layout placed by. The
  * same input always gives the same output, byte for byte, so a server
- * render and the hydrated client agree.
+ * render and the hydrated client agree. Only the names a caller needs are
+ * exported; the rest of the engine stays internal to this package.
  *
  * @note Every export is pure. `requireAt`, `requireEntry` and
  *   `requireDefined` throw only when a caller breaks an invariant, never on
@@ -32,14 +33,12 @@ export {
   REGION_LABEL_ROW,
   REGION_LABEL_SIZE,
 } from "./constants.js";
-export { default as formatEdgeLabelLines } from "./formatEdgeLabelLines.js";
 export {
   buildArrowhead,
   ceilTo,
   compareText,
   containsPoint,
   findCentredBaseline,
-  findPointOnPath,
   flattenPath,
   formatPathData,
   insetRect,
@@ -61,27 +60,20 @@ export { requireAt, requireDefined, requireEntry } from "./require.js";
 export type {
   CrossPort,
   FontFace,
-  GraphDraw,
   GraphLayout,
+  GraphLayoutEdge,
+  GraphLayoutNode,
+  GraphLayoutOptions,
+  GraphLayoutResult,
   LabelledBundle,
-  LabelledEdge,
   LabelledLayout,
-  LabelledNode,
-  LabelledRegion,
-  LabelledRelation,
   LabelPlacement,
   LayeredBundle,
   LayeredEdges,
   LayeredModel,
-  LayeredNode,
   LayeredNodes,
-  LayeredOptions,
-  LayeredRelation,
   PathCommand,
-  PlacedLabel,
   Point,
   Rect,
-  RegionEdge,
   RegionLayout,
-  RegionNode,
 } from "./types.js";

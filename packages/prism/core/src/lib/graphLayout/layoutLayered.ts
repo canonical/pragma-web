@@ -1,11 +1,5 @@
 import layOutRegion from "./layOutRegion.js";
-import type {
-  LayeredBundle,
-  LayeredEdges,
-  LayeredNodes,
-  LayeredOptions,
-  RegionLayout,
-} from "./types.js";
+import type { GraphLayout } from "./types.js";
 
 /**
  * The layered engine on the graph layout contract: lay out one region of
@@ -17,16 +11,13 @@ import type {
  *   ports of its relations to other regions.
  * @returns The region's layout: positions, routes and findings.
  */
-export default function layoutLayered<TBundle extends LayeredBundle>(
-  nodes: LayeredNodes,
-  edges: LayeredEdges<TBundle>,
-  options: LayeredOptions,
-): RegionLayout<TBundle> {
-  return layOutRegion(
+const layoutLayered: GraphLayout = (nodes, edges, options) =>
+  layOutRegion(
     { ...nodes, ...edges },
     options.ids,
     options.channel,
     options.sweeps,
     options.crossPorts,
   );
-}
+
+export default layoutLayered;

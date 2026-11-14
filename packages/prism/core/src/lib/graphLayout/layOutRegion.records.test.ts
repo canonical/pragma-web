@@ -7,11 +7,8 @@ import type {
   CrossPort,
   GraphLayout,
   LayeredBundle,
-  LayeredEdges,
   LayeredModel,
   LayeredNode,
-  LayeredNodes,
-  LayeredOptions,
   RegionLayout,
 } from "./types.js";
 
@@ -129,12 +126,7 @@ describe("layOutRegion over recorded regions", () => {
 
 describe("layoutLayered", () => {
   it("implements the graph layout contract over layOutRegion", () => {
-    const kind: GraphLayout<
-      LayeredNodes,
-      LayeredEdges,
-      LayeredOptions,
-      RegionLayout
-    > = layoutLayered;
+    const kind: GraphLayout = layoutLayered;
     for (const record of readRecords()) {
       const { ids, channel, sweeps, crossPorts } = record.input;
       const model = readModel(record);
