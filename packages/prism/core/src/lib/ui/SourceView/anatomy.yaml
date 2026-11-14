@@ -86,7 +86,7 @@ node:
           typography.fontFamily: typography.text.primary.code.fontFamily
           typography.size: typography.text.secondary.fontSize
           typography.color: color.text
-          typography.whiteSpace: pre-wrap
+          typography.whiteSpace: break-spaces
           typography.wrap: anywhere
           size.min.width: 0
         edges:

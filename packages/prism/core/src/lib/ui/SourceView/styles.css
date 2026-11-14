@@ -52,7 +52,8 @@
     color: var(--source-view-muted-color);
   }
 
-  /* The document wraps on the inline axis, so nothing scrolls sideways. */
+  /* The document wraps on the inline axis, so nothing scrolls sideways;
+   * a run of spaces wraps too rather than hanging past the line's end. */
   .ds.source-view > .code {
     margin-block: 0;
     padding-block: var(--source-view-padding-block);
@@ -64,7 +65,7 @@
     font-family: var(--source-view-code-font-family);
     font-size: var(--source-view-code-font-size);
     color: var(--source-view-code-color);
-    white-space: pre-wrap;
+    white-space: break-spaces;
     overflow-wrap: anywhere;
     min-inline-size: 0;
   }
