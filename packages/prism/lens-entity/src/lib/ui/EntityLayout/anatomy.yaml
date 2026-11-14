@@ -5,7 +5,9 @@
 # carries the trail and the page's renderers (the view group) on every
 # page; on the index, when the lens places its filters in the bar, the
 # search box and the count of entries shown, and the fold below two
-# groups. The index's sheet sits in the canvas, displayed only open below
+# groups. When the lens places them in a panel, the strip holds the
+# panel's own count folded (`countFolded`), displayed only below two
+# groups, where the panel is not. The index's sheet sits in the canvas, displayed only open below
 # two groups. The search text and the renderer are the address's, so the
 # strip and the index share no state of their own. It renders no element
 # of its own: core's DocumentLayout is the root and takes the layout's

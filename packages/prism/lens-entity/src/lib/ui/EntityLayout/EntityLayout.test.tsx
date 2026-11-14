@@ -202,7 +202,7 @@ describe("EntityLayout", () => {
     expect(readSocket("fold")).toBeNull();
   });
 
-  it("leaves the search and the count to the panel when the lens places it", {
+  it("leaves the search to the panel and folds the count when the lens places it", {
     timeout: ENTITY_TEST_TIMEOUT_MS,
   }, async () => {
     const { environment } = await createWarmEnvironment("/stations");
@@ -214,7 +214,7 @@ describe("EntityLayout", () => {
       }),
     );
     expect(readSocket("search")).toBeNull();
-    expect(readSocket("count")).toBeNull();
+    expect(readSocket("count")).toHaveClass("is-folded");
     expect(readSocket("fold")).not.toBeNull();
   });
 
