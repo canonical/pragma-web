@@ -5,8 +5,18 @@ import type {
   RowRecord,
   SchemaFieldDefinition,
 } from "@canonical/dataviews-core";
-import type { ReactNode } from "react";
-import type { AnnouncerTopic } from "../../common/index.js";
+import type { ReactElement, ReactNode, RefObject } from "react";
+import type { AnnouncerHandle, AnnouncerTopic } from "../../common/index.js";
+import type {
+  Actions,
+  DataTable,
+  Filters,
+  Pagination,
+  SavedViews,
+  Search,
+  Settings,
+  SortPanel,
+} from "./common/index.js";
 
 type OwnProps<
   TFields extends readonly SchemaFieldDefinition[],
@@ -73,4 +83,77 @@ export type ContextOptions = {
    * session's later edits replace its first.
    */
   readonly endSessions: () => void;
+  /** The ref the root renders its announcer's region with; no part reads it. */
+  readonly announcer: RefObject<AnnouncerHandle | null>;
+};
+
+/**
+ * The DataViews root and its connected parts, each a member: the type
+ * `Provider.tsx` casts the root to.
+ *
+ * @experimental Pre-release: the whole surface is still settling, and this
+ * name may change or move before the first release.
+ */
+export type DataViewsComponent = (<
+  TFields extends readonly SchemaFieldDefinition[],
+  TRow extends object = RowRecord,
+>(
+  props: DataViewsProps<TFields, TRow>,
+) => ReactElement) & {
+  /**
+   * The connected action bar, over the current selection.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly Actions: typeof Actions;
+  /**
+   * The collection's rows, bound to this root.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly DataTable: typeof DataTable;
+  /**
+   * The connected query-editing part of the composition.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly Filters: typeof Filters;
+  /**
+   * The connected window-navigation part of the composition.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly Pagination: typeof Pagination;
+  /**
+   * The connected saved-view control, over the store the provider was given.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly SavedViews: typeof SavedViews;
+  /**
+   * The connected search part, over the applied search.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly Search: typeof Search;
+  /**
+   * The table's column settings, given to a table as its `settings`.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly Settings: typeof Settings;
+  /**
+   * The connected sort panel, over the applied ordering.
+   *
+   * @experimental Pre-release: the whole surface is still settling, and this
+   * name may change or move before the first release.
+   */
+  readonly SortPanel: typeof SortPanel;
 };

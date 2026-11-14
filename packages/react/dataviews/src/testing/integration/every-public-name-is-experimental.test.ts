@@ -7,13 +7,23 @@ import { describe, expect, it } from "vitest";
 const listUnmarked = (barrel: string): readonly string[] =>
   listUnmarkedNames(path.resolve(barrel), path.resolve("src/lib"));
 
-/** Each DataViews member's assignment, with its TSDoc. */
+/** The members block of the `DataViewsComponent` type. */
+const readMembersBlock = (): string =>
+  /export type DataViewsComponent = [\s\S]*?\) & \{([\s\S]*?)\n\};/
+    .exec(
+      readFileSync(
+        path.resolve("src/lib/_work_in_progress/DataViews/types.ts"),
+        "utf8",
+      ),
+    )
+    ?.at(1) ?? "";
+
+/** Each DataViews member's declaration in its type, with its TSDoc. */
 const listMembers = (): readonly (readonly [string, string])[] =>
   [
-    ...readFileSync(
-      path.resolve("src/lib/_work_in_progress/DataViews/Provider.tsx"),
-      "utf8",
-    ).matchAll(/(\/\*\*(?:(?!\*\/)[\s\S])*\*\/)\s*DataViews\.(\w+) =/g),
+    ...readMembersBlock().matchAll(
+      /(\/\*\*(?:(?!\*\/)[\s\S])*\*\/)\s*readonly (\w+):/g,
+    ),
   ].map(([, doc = "", member = ""]) => [member, doc] as const);
 
 describe("every public name is experimental", () => {

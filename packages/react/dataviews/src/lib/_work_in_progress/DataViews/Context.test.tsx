@@ -6,9 +6,9 @@ import Context from "./Context.js";
 import DataViews from "./Provider.js";
 
 describe("Context", () => {
-  it("holds null outside a root", () => {
+  it("holds nothing outside a root", () => {
     const { result } = renderHook(() => useContext(Context));
-    expect(result.current).toBeNull();
+    expect(result.current).toBeUndefined();
   });
 
   it("carries the root's provider inside one", () => {

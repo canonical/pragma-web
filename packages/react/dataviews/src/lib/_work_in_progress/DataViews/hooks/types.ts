@@ -18,7 +18,6 @@ import type {
   SourceRefusal,
 } from "@canonical/dataviews-core";
 import type { MouseEvent, RefObject, ToggleEvent } from "react";
-import type { AnnouncerHandle } from "../../../common/index.js";
 import type { ContextOptions, DataViewsProps } from "../types.js";
 
 /**
@@ -30,14 +29,8 @@ export type UseProviderStateProps<
   TRow extends object = RowRecord,
 > = Omit<DataViewsProps<TFields, TRow>, "children">;
 
-/**
- * What the root's state hook hands the root: the value its context carries,
- * and the ref its announcer's region is rendered with, which no part reads.
- */
-export type UseProviderStateResult = {
-  readonly value: ContextOptions;
-  readonly announcer: RefObject<AnnouncerHandle | null>;
-};
+/** What the root's state hook hands the root: the value its context carries. */
+export type UseProviderStateResult = ContextOptions;
 
 /** What a connected part reads off the enclosing root: its value. */
 export type UseDataViewsRootResult = ContextOptions;

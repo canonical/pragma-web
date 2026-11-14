@@ -40,7 +40,6 @@ export const FILE_RULE_ALLOWLIST: readonly string[] = Object.freeze([
   "src/lib/_work_in_progress/DataTable/common/hooks/useMenuPhase.ts test",
   "src/lib/_work_in_progress/DataTable/common/utils/spellDestinationKey.ts test",
   "src/lib/_work_in_progress/DataTable/constants.ts test",
-  "src/lib/_work_in_progress/DataViews/Provider.tsx export:default-misnamed",
   "src/lib/_work_in_progress/PaginationBar/common/PageControl/PageControl.tsx test",
   "src/lib/common/Announcer/Announcer.tsx export:memo-over-function",
   "src/lib/common/Announcer/constants.ts test",

@@ -45,7 +45,7 @@ export default function useDataViewsFilter<
   operator: TOperator,
 ): UseDataViewsFilterResult<AppliedAt<TFields, TField, TOperator>> {
   const root = useContext(Context);
-  if (root === null) {
+  if (root === undefined) {
     throw new Error("useDataViewsFilter must be used inside a DataViews root");
   }
   if (root.provider.collection !== collection) {

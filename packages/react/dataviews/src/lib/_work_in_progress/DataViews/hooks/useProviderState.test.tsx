@@ -68,7 +68,7 @@ describe("useProviderState", () => {
         messages: { statusNoData: "Nothing here yet." },
       }),
     );
-    const { messages } = hook.result.current.value;
+    const { messages } = hook.result.current;
     expect(messages.statusNoData).toBe("Nothing here yet.");
     expect(messages.statusPending).toBeTypeOf("string");
   });
@@ -76,9 +76,9 @@ describe("useProviderState", () => {
   it("holds one value while nothing it carries changes", () => {
     const { provider } = makeFixture();
     const hook = renderHook(() => useProviderState({ provider }));
-    const first = hook.result.current.value;
+    const first = hook.result.current;
     hook.rerender();
-    expect(hook.result.current.value).toBe(first);
+    expect(hook.result.current).toBe(first);
     expect(first.provider).toBe(provider);
   });
 
@@ -86,7 +86,7 @@ describe("useProviderState", () => {
     const recorded = createRecordingLocation({ href: "/machines" });
     const { provider } = makeFixture(recorded.location);
     const hook = renderHook(() => useProviderState({ provider }));
-    const { filters, endSessions } = hook.result.current.value;
+    const { filters, endSessions } = hook.result.current;
     const from = findFilterHandle<number>(filters, "cpu", "gte");
     const before = recorded.writes.length;
     act(() => {
