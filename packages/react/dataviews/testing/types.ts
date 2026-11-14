@@ -2,7 +2,6 @@ import type {
   Collection,
   DataViewsProvider,
   DataViewsProviderConfig,
-  Facet,
   PresentationStore,
   QueryLocation,
   ReadonlyChannel,
@@ -15,13 +14,12 @@ import type {
   ManualSourceConfig,
 } from "@canonical/dataviews-core/testing";
 import type { RenderHookResult } from "@testing-library/react";
+import type { Machine } from "../src/storybook/machines/index.js";
 import type { machines } from "./machines.js";
 
-/** One value a values facet lists, with how many matching records hold it. */
-export type FacetValue = Extract<
-  Facet,
-  { readonly kind: "values" }
->["values"][number];
+export type { FacetValue } from "../src/storybook/machines/api/index.js";
+/** One machine record, the shape the stories and the tests share. */
+export type { Machine } from "../src/storybook/machines/index.js";
 
 /** A channel a test publishes on: the read side plus `set`. */
 export type FakeChannel<T> = ReadonlyChannel<T> & {
@@ -100,14 +98,6 @@ export type MockRequestWatch = {
   readonly hasEnded: () => boolean;
   /** Stop following the server's events. */
   readonly stop: () => void;
-};
-
-/** One machine record, as a source would deliver it. */
-export type Machine = {
-  readonly id: string;
-  readonly name: string;
-  readonly status: "failed" | "running";
-  readonly cores: number;
 };
 
 /** The fields of the machine collection, for typed handles and providers. */

@@ -187,7 +187,7 @@ describe("createRestMachineSource", () => {
     expect(deliveries.at(0)).toMatchObject({ status: "succeeded" });
   });
 
-  it.fails("reads the answer's machines, leaving out any of another shape", async () => {
+  it("reads the answer's machines, leaving out any of another shape", async () => {
     const machine = {
       id: "m-01",
       name: "alder.example.com",

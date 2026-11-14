@@ -1,4 +1,5 @@
-import { machines } from "./fixtures.js";
+import { assertInvariant } from "@canonical/dataviews-core/bindings";
+import { storyMachines } from "./fixtures.js";
 import type { Machine } from "./types.js";
 
 /**
@@ -7,7 +8,10 @@ import type { Machine } from "./types.js";
  */
 export default function buildMachines(count: number): readonly Machine[] {
   return Array.from({ length: count }, (_, position) => ({
-    ...(machines[position % machines.length] as Machine),
+    ...assertInvariant(
+      storyMachines.at(position % storyMachines.length),
+      "a position modulo the fixtures' length is in range",
+    ),
     id: `n-${position}`,
     name: `node-${String(position).padStart(5, "0")}.example.com`,
   }));

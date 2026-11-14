@@ -1,4 +1,5 @@
 import { describe, expect, it, onTestFinished } from "vitest";
+import buildMachine from "./buildMachine.js";
 import createFacetedManual from "./createFacetedManual.js";
 import deliverFacets from "./deliverFacets.js";
 
@@ -15,9 +16,7 @@ describe("deliverFacets", () => {
     } as const;
     deliverFacets(source, facets);
     const { result } = provider.state.get();
-    expect(result.rows).toEqual([
-      { id: "m-1", name: "alpha", status: "running", cores: 4 },
-    ]);
+    expect(result.rows).toEqual([buildMachine("m-1", "alpha")]);
     expect(result.facets).toEqual(facets);
   });
 });

@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { machineCollection, machines } from "./fixtures.js";
+import { machineCollection, storyMachines } from "./fixtures.js";
 
-describe("machines", () => {
+describe("storyMachines", () => {
   it("holds twelve machines of distinct identity, every status among them", () => {
-    expect(machines).toHaveLength(12);
-    expect(new Set(machines.map(machineCollection.identify)).size).toBe(12);
-    expect(new Set(machines.map(({ status }) => status))).toEqual(
+    expect(storyMachines).toHaveLength(12);
+    expect(new Set(storyMachines.map(machineCollection.identify)).size).toBe(
+      12,
+    );
+    expect(new Set(storyMachines.map(({ status }) => status))).toEqual(
       new Set(["running", "failed", "pending"]),
     );
   });

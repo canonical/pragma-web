@@ -1,6 +1,6 @@
 import type { Facet } from "@canonical/dataviews-core";
 import { delay, HttpResponse, http, type RequestHandler } from "msw";
-import { machines } from "../fixtures.js";
+import { storyMachines } from "../fixtures.js";
 import compileLikePattern from "./compileLikePattern.js";
 import { API_SCENARIOS } from "./constants.js";
 import foldStoredText from "./foldStoredText.js";
@@ -54,7 +54,7 @@ const respondWithProblem = (status: number, reason: string) =>
  * @note Impure: its handlers wait on timers before they answer.
  */
 export default function createRestHandlers({
-  records = machines,
+  records = storyMachines,
   latency = 0,
 }: MockApiConfig = {}): readonly RequestHandler[] {
   const answer = async (scenario: ApiScenario, url: URL): Promise<Response> => {

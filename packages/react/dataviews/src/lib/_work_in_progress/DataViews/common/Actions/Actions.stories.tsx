@@ -10,7 +10,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { withAppScope } from "../../../../../storybook/decorators/index.js";
 import {
   machineCollection,
-  machines,
+  storyMachines,
 } from "../../../../../storybook/machines/fixtures.js";
 import readHostName from "../../../../../storybook/machines/readHostName.js";
 import showConsumerCode from "../../../../../storybook/machines/showConsumerCode.js";
@@ -43,7 +43,7 @@ const columns: readonly DataTableColumn[] = [
  * machines out of the collection, and every live request delivers again.
  */
 const createManagedSource = (): Source<Machine> => {
-  let remaining: readonly Machine[] = machines;
+  let remaining: readonly Machine[] = storyMachines;
   const overAnyRows: ActionCapabilities = { targets: "explicit", limit: null };
   const managed = createArraySource<Machine>({
     rows: remaining,

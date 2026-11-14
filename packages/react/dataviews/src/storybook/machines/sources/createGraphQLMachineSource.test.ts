@@ -9,7 +9,7 @@ import answerOverHttp2 from "../../../../testing/answerOverHttp2.js";
 import { DELIVERY_WAIT } from "../../../../testing/constants.js";
 import readFailureReason from "../../../../testing/readFailureReason.js";
 import serveMockApi from "../../../../testing/serveMockApi.js";
-import { machines } from "../fixtures.js";
+import { storyMachines } from "../fixtures.js";
 import type { Machine } from "../types.js";
 import createGraphQLMachineSource from "./createGraphQLMachineSource.js";
 
@@ -23,7 +23,7 @@ const answerWith = (resolver: HttpResponseResolver): void => {
 
 describe("createGraphQLMachineSource", () => {
   it("publishes a partial answer's data rather than failing it", async () => {
-    const [machine] = machines;
+    const [machine] = storyMachines;
     if (machine === undefined) {
       throw new Error("the story fixtures hold a machine");
     }
