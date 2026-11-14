@@ -61,12 +61,16 @@
     align-items: center;
   }
 
-  /* One row that never wraps, from the fifth line to the last. */
+  /* One row that never wraps, from the fifth line to the last, aligned to
+   * its end: where Search has given way and the count is still wider than
+   * the group, the count reaches back over the view group's empty columns
+   * instead of past the last line. */
   .ds.mode-strip > .filtering {
     grid-column: 5 / -1;
     min-inline-size: 0;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     flex-wrap: nowrap;
     gap: var(--mode-strip-spacing);
   }
@@ -90,11 +94,10 @@
   }
 
   /* The count closes the group on the last line, even when nothing grows
-   * before it. Where the group is narrower than its content, the count
-   * shrinks last and is clipped at its end, so the band never overflows. */
+   * before it. It is the last thing to give way: it keeps its whole text
+   * while Search, the chips and, below two groups, the trail shrink. */
   .ds.mode-strip > .filtering > .count {
-    min-inline-size: 0;
-    overflow-x: clip;
+    flex-shrink: 0;
     margin-inline-start: auto;
   }
 
