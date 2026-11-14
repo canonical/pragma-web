@@ -299,14 +299,7 @@ const SCOPES = ".comfortable, .dense, .app, .site, .docs";
 export const OutsideADensityScope: Story = {
   name: "Outside a density scope",
   tags: ["!dev", "!autodocs"],
-  parameters: {
-    docs: {
-      source: {
-        type: "code",
-        code: '<IconButton icon="edit" aria-label="Edit" importance="secondary" />',
-      },
-    },
-  },
+  parameters: { docs: { source: { type: "code" } } },
   render: function OutsideADensityScopeRender(args) {
     const [container, setContainer] = useState<HTMLElement | null>(null);
     useEffect(() => {
