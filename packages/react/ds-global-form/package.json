@@ -61,6 +61,7 @@
     "@biomejs/biome": "2.6.6",
     "@canonical/biome-config": "0.46.0",
     "@canonical/design-tokens": "0.44.0",
+    "@canonical/react-ds-app": "^0.47.0",
     "@canonical/storybook-addon-form-state": "^0.47.0",
     "@canonical/storybook-addon-msw": "^0.47.0",
     "@canonical/storybook-helpers": "^0.47.0",
