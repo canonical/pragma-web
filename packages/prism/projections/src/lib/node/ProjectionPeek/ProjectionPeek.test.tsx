@@ -16,7 +16,7 @@ const NODE_IRI = "https://ds.canonical.com/global.component.icon-button";
  * address, a CURIE included. Return the container and the variables the
  * query ran with.
  */
-const renderPeek = (uri: string) => {
+const renderPeek = (uri: string, failure?: Error) => {
   // relay-test-utils wraps the mock environment's methods in `jest.fn` when
   // NODE_ENV is "test"; vitest's `vi` offers the same surface.
   vi.stubGlobal("jest", vi);
@@ -24,6 +24,7 @@ const renderPeek = (uri: string) => {
   const variables: Record<string, unknown>[] = [];
   environment.mock.queueOperationResolver((operation) => {
     variables.push(operation.request.variables);
+    if (failure !== undefined) return failure;
     return operation.request.variables.id === NODE_IRI
       ? MockPayloadGenerator.generate(operation, {
           Node: resolveRoot({ ...MOCK_NODE, uri: NODE_IRI }),
@@ -31,7 +32,12 @@ const renderPeek = (uri: string) => {
       : { data: { node: null } };
   });
   const { container } = render(
-    createSiteTree(environment, <ProjectionPeek uri={uri} />),
+    createSiteTree(
+      environment,
+      <div className="passage">
+        Read <ProjectionPeek uri={uri} />.
+      </div>,
+    ),
   );
   return { container, variables };
 };
@@ -45,6 +51,14 @@ describe("ProjectionPeek", () => {
 
   it("renders nothing for a CURIE, an address node(id:) does not accept", () => {
     const { container } = renderPeek(MOCK_NODE._meta.curie);
-    expect(container.innerHTML).toBe("");
+    expect(container.querySelector(".passage")?.textContent).toBe("Read .");
+  });
+
+  it("renders nothing and keeps the text around it when the query fails", () => {
+    const report = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { container } = renderPeek(NODE_IRI, new Error("the graph is down"));
+    expect(container.querySelector(".passage")?.textContent).toBe("Read .");
+    expect(report).toHaveBeenCalled();
+    report.mockRestore();
   });
 });

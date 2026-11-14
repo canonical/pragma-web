@@ -9,6 +9,12 @@
 # on the server for a mention). The node field reads no field of its own;
 # the card dispatcher's fragment reads the rest.
 #
+# Both the Suspense boundary and an ErrorBoundary (prism-core) have a null
+# fallback: the peek shows nothing while loading, for a node the graph does
+# not hold, and for a failed query, which stays inside the peek instead of
+# replacing the page region the chip sits in; the chip's link is the way to
+# the node in every case.
+#
 # No styles: the chip's peek dialog sizes and places the card.
 node:
   uri: prism.component.projection_peek
