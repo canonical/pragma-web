@@ -15,7 +15,12 @@
  * test is what stands between a green gate and a broken deployment.
  */
 
-import { render, screen } from "@testing-library/react";
+import {
+  type PageRendererProps,
+  type Renderer,
+  RenderersProvider,
+} from "@canonical/prism-core";
+import { render, screen, within } from "@testing-library/react";
 import type { FetchFunction } from "relay-runtime";
 import type { RecordMap } from "relay-runtime/store/RelayStoreTypes.js";
 import { describe, expect, it, vi } from "vitest";
@@ -48,6 +53,9 @@ const standardReadingPageAt = (
       params={{ uri }}
     />,
   );
+
+/** The standard's statements as the provider would serve them. */
+const TURTLE = "cs:react.component.link_component a cs:CodeStandard .";
 
 /** An unknown IRI resolved to null — the server's own answer, verbatim. */
 const NO_SUCH_URI = `${CS_NAMESPACE}no.such.standard`;
@@ -340,21 +348,79 @@ describe("StandardReadingPage", () => {
     STANDARDS_TEST_TIMEOUT_MS,
   );
 
-  it("draws the standard's Turtle in place of the article when the address asks", () => {
-    const fetchFn = createFetchSpy();
-    render(
-      createStandardsPage(
-        `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}?as=turtle`,
-        undefined,
-        fetchFn,
-        <StandardReadingPage
-          classUri={STANDARDS_BINDING_FIXTURE.classUri}
-          params={{ uri: LINK_COMPONENT_URI }}
-        />,
-      ),
-    );
-    expect(screen.getByText("Loading the source…")).toBeInTheDocument();
-    const names = fetchFn.mock.calls.map(([request]) => request.name);
-    expect(names).toEqual(["EntitySourceQuery"]);
-  });
+  it(
+    "draws the standard's Turtle from the warm store under its title",
+    () => {
+      const fetchFn = createFetchSpy();
+      render(
+        createStandardsPage(
+          `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}?as=turtle`,
+          patchRecords(standardEntityRecords, {
+            "client:root": {
+              [`source(uri:"${LINK_COMPONENT_URI}")`]: TURTLE,
+            },
+          }),
+          fetchFn,
+          <StandardReadingPage
+            classUri={STANDARDS_BINDING_FIXTURE.classUri}
+            params={{ uri: LINK_COMPONENT_URI }}
+          />,
+        ),
+      );
+      expect(
+        screen.getByRole("heading", {
+          level: 1,
+          name: "react.component.link_component",
+        }),
+      ).toBeInTheDocument();
+      expect(document.title).toBe("react.component.link_component — Docs");
+      expect(screen.getByRole("figure")).toHaveTextContent(TURTLE);
+      // The prose gave way to the document…
+      expect(
+        screen.queryByRole("heading", { level: 2, name: "Why one prop" }),
+      ).not.toBeInTheDocument();
+      // …and neither the standard nor its source was asked for.
+      expect(fetchFn).not.toHaveBeenCalled();
+    },
+    STANDARDS_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "draws the body through the page renderer's render",
+    () => {
+      const page: Renderer<PageRendererProps> = {
+        name: "page",
+        label: "Page",
+        render: ({ children, title }) => (
+          <section aria-label={title}>{children}</section>
+        ),
+      };
+      render(
+        createStandardsPage(
+          `/standards/${encodeURIComponent(LINK_COMPONENT_URI)}`,
+          standardEntityRecords,
+          createFetchSpy(),
+          <RenderersProvider
+            defaults={{
+              list: [],
+              page: [page, { name: "turtle", label: "Turtle", render: () => null }],
+            }}
+            extensions={["source"]}
+          >
+            <StandardReadingPage
+              classUri={STANDARDS_BINDING_FIXTURE.classUri}
+              params={{ uri: LINK_COMPONENT_URI }}
+            />
+          </RenderersProvider>,
+        ),
+      );
+      const drawn = screen.getByRole("region", {
+        name: "react.component.link_component",
+      });
+      expect(
+        within(drawn).getByRole("heading", { level: 2, name: "Why one prop" }),
+      ).toBeInTheDocument();
+    },
+    STANDARDS_TEST_TIMEOUT_MS,
+  );
 });

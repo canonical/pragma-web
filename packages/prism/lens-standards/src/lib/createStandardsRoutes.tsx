@@ -75,7 +75,7 @@ export default function createStandardsRoutes(
       content: ({ params }) => (
         <StandardReadingPage classUri={classUri} params={params} />
       ),
-      warm: (params) => warmStandardEntity(binding, params),
+      warm: (params, search) => warmStandardEntity(binding, params, search),
     }),
   };
 }

@@ -4,7 +4,9 @@
 # published InlineCode, then the class it is an instance of, muted), over
 # its body: the prose rendered from Markdown (StandardProse), or the
 # description split into paragraphs on blank lines, or a line saying there
-# is none.
+# is none. A reader may draw the body another way (`renderBody`): the
+# reading page hands the prose to the address's page renderer, which shows
+# it or, for Turtle, the standard's statements under the same header.
 #
 # The article uses the whole main column: the root is a subgrid over every
 # column, its gap the grid's gutter on both axes, and the header spans it.
@@ -88,4 +90,6 @@ node:
               role: prose (the catalog's line for a standard with no text)
               styles:
                 layout.grid.column: "1 / span 6"
+          - node:
+              uri: prism.component.entity_source
       relation: { cardinality: "1", slotName: prose }

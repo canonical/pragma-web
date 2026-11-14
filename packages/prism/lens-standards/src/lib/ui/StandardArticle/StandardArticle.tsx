@@ -66,7 +66,9 @@ function splitProseBlocks(text: string): string[] {
  * blocks, so inline backticks and `*emphasis*` marks in the source text show
  * verbatim; without either, one line says so. The body alone holds the
  * reading measure, and its space is the typography layer's: it carries
- * `.editorial` and `.content-flow`.
+ * `.editorial` and `.content-flow`. A reader that draws the body another
+ * way, such as the reading page's Turtle renderer, receives the prose
+ * through `renderBody` and returns what stands in its place.
  *
  * The title is `_meta.title`, which is total: the provider computes a
  * fallback chain ending in the IRI's local name, so there is no fallback
@@ -81,6 +83,7 @@ function splitProseBlocks(text: string): string[] {
 export default function StandardArticle({
   body,
   className,
+  renderBody = (prose) => prose,
   standard,
   ...props
 }: StandardArticleProps): ReactElement {
@@ -109,18 +112,20 @@ export default function StandardArticle({
           </span>
         </p>
       </header>
-      {body ? (
-        <StandardProse body={body} className="prose" />
-      ) : data._meta.definition ? (
-        <div className="prose editorial content-flow">
-          {splitProseBlocks(data._meta.definition).map((block) => (
-            <p className="paragraph" key={block}>
-              {block}
-            </p>
-          ))}
-        </div>
-      ) : (
-        <p className="prose">{t("article.definition.none")}</p>
+      {renderBody(
+        body ? (
+          <StandardProse body={body} className="prose" />
+        ) : data._meta.definition ? (
+          <div className="prose editorial content-flow">
+            {splitProseBlocks(data._meta.definition).map((block) => (
+              <p className="paragraph" key={block}>
+                {block}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <p className="prose">{t("article.definition.none")}</p>
+        ),
       )}
     </article>
   );
