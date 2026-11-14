@@ -1,0 +1,873 @@
+# The metro's TBox and type lens (metro.ttl and lens.ttl beside this file),
+# compiled by a ke-graphql that reads the type lens, with the prefixes metro
+# and geo, provider "fixture" and revision "0". The compile reports no lens
+# diagnostic.
+# ke-graphql · canonical SDL
+# graphql-schema-spec: 1
+# provider: fixture
+# mode: annotated
+# validated-store: false
+# revision: 0
+# prefixing: none
+
+"""A fare band covering part of the network."""
+type Zone implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+  stops(first: Int, after: String, last: Int, before: String): StopConnection!
+}
+
+interface Node {
+  uri: ID!
+  _meta: EntityMeta!
+}
+
+type StopConnection {
+  edges: [StopEdge!]!
+  pageInfo: PageInfo!
+}
+
+type StopEdge {
+  node: Stop!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+"""A latitude/longitude pair on the WGS 84 datum."""
+type GeoPoint implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+  longitude: Float
+  latitude: Float
+}
+
+"""One car in a unit, at its place in the order."""
+type CarPosition implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+  carType: CarType
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+type FormationConnection {
+  edges: [FormationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type FormationEdge {
+  node: Formation!
+  cursor: String!
+}
+
+"""One unit in a formation, at its place in the order."""
+type UnitPosition implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+  unit: Unit
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+"""
+A kind of car: its code, whether it has a driving cab, its length and how many it carries.
+"""
+type CarType implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when the car has a driving cab at its leading end."""
+  cab: Boolean
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+"""A set of cars permanently coupled in order, which runs on its own."""
+type Unit implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The cars of a unit, from its front."""
+  cars(first: Int, after: String, last: Int, before: String): CarPositionConnection!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+type CarPositionConnection {
+  edges: [CarPositionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CarPositionEdge {
+  node: CarPosition!
+  cursor: String!
+}
+
+"""A train as it runs: an ordered list of units, each possibly reversed."""
+type Formation implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The lines run with the formation."""
+  lines(first: Int, after: String, last: Int, before: String): LineConnection!
+
+  """The units of a formation, from its front."""
+  units(first: Int, after: String, last: Int, before: String): UnitPositionConnection!
+
+  """The rolling stock that lists the formation."""
+  stock: RollingStock
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+type LineConnection {
+  edges: [LineEdge!]!
+  pageInfo: PageInfo!
+}
+
+type LineEdge {
+  node: Line!
+  cursor: String!
+}
+
+type UnitPositionConnection {
+  edges: [UnitPositionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UnitPositionEdge {
+  node: UnitPosition!
+  cursor: String!
+}
+
+"""A class of train: cars of one design, and the formations they run in."""
+type RollingStock implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+"""A place on the schematic network diagram, in grid units."""
+type DiagramPoint implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """Grid rows south of the diagram's north edge."""
+  y: Int
+
+  """Grid columns east of the diagram's west edge."""
+  x: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+"""One stop on a route, at its place in the order."""
+type Call implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+  stop: Stop
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+"""One direction of a line's service: the stops it calls at, in order."""
+type Route implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+  reverse: Route
+  calls(first: Int, after: String, last: Int, before: String): CallConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+  loop: Boolean
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+type CallConnection {
+  edges: [CallEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CallEdge {
+  node: Call!
+  cursor: String!
+}
+
+"""A named service over one or more routes."""
+type Line implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+  routes(first: Int, after: String, last: Int, before: String): RouteConnection!
+  servedBies(first: Int, after: String, last: Int, before: String): StationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The line's colour on maps and signs, as a hex triplet."""
+  colour: String
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+type RouteConnection {
+  edges: [RouteEdge!]!
+  pageInfo: PageInfo!
+}
+
+type RouteEdge {
+  node: Route!
+  cursor: String!
+}
+
+type StationConnection {
+  edges: [StationEdge!]!
+  pageInfo: PageInfo!
+}
+
+type StationEdge {
+  node: Station!
+  cursor: String!
+}
+
+"""
+A station where lines serving different stops meet, so passengers change there.
+"""
+type Interchange implements Node & Station & Stop {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+  transferMinutes: Int
+
+  """The name shown to passengers."""
+  name: String
+  diagramPosition: DiagramPoint
+  inZone: Zone
+  location: GeoPoint
+  servesLines(first: Int, after: String, last: Int, before: String): LineConnection!
+
+  """The usable length of the station's shortest platform, in millimetres."""
+  platformLength: Int
+  platformCount: Int
+}
+
+"""A staffed stop with platforms."""
+interface Station implements Node & Stop {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+  diagramPosition: DiagramPoint
+  inZone: Zone
+  location: GeoPoint
+  servesLines(first: Int, after: String, last: Int, before: String): LineConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The usable length of the station's shortest platform, in millimetres."""
+  platformLength: Int
+  platformCount: Int
+
+  """The name shown to passengers."""
+  name: String
+}
+
+"""Any place a service calls at."""
+interface Stop implements Node {
+  """The entity's absolute IRI — the primary key."""
+  uri: ID!
+
+  """Self-describing TBox access for this entity."""
+  _meta: EntityMeta!
+
+  """The formations a line is run with, or a rolling stock runs in."""
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+
+  """True when a car or a unit runs the other way round in its place."""
+  reversed: Boolean
+
+  """The passengers carried, seated plus standing."""
+  capacity: Int
+
+  """A length in whole millimetres, measured over couplers."""
+  length: Int
+
+  """A place in an ordered list, counted from 1."""
+  position: Int
+
+  """The short code a line or a car type is known by."""
+  code: String
+
+  """The name shown to passengers."""
+  name: String
+}
+
+"""
+Self-describing TBox access attached to every generated type, plus the generic descriptive fields a lens renders without knowing the concrete type.
+"""
+type EntityMeta {
+  """
+  Compact display form of `uri`: `prefix:local` from the compiled namespace inventory, else the absolute IRI unchanged, else the GraphQL type name when the value has no IRI at all (an embedded blank node). TOTAL, exactly like `title`. NEVER an identity — `uri` is the only address; this string is not accepted by `node(id:)` and never appears in a cursor.
+  """
+  curie: String!
+
+  """
+  TOTAL display string: label(lang), else any-tag literal, else the IRI local name, else the IRI, else the GraphQL type name when the value has no IRI at all (an embedded blank node). Never null — render this.
+  """
+  title(lang: String = "en"): String!
+
+  """
+  rdfs:label, else skos:prefLabel, else the class's own name/title predicate — exact language tag, else untagged. Null when none is asserted; `title` is the total alternative.
+  """
+  label(lang: String = "en"): String
+
+  """
+  Incidental prose: rdfs:comment, else the class's own summary predicate. Null when none is asserted.
+  """
+  comment(lang: String = "en"): String
+
+  """
+  Defining prose: skos:definition, else the class's own description predicate. Null when none is asserted.
+  """
+  definition(lang: String = "en"): String
+  type: OntologyClass!
+  field(name: String!): ClassProperty
+  fields: [ClassProperty!]!
+}
+
+type OntologyClass implements Node {
+  uri: ID!
+
+  """Self-describing TBox access for this class."""
+  _meta: EntityMeta!
+  label: String
+  definition: String
+  superclass: OntologyClass
+  superclasses: [OntologyClass!]!
+  subclasses: [OntologyClass!]!
+  properties: [ClassProperty!]!
+
+  """
+  Named instances of this class (blank-node instances are embeddable and not standalone-resolvable).
+  """
+  instances(first: Int, after: String, last: Int, before: String): NodeConnection!
+
+  """Count of NAMED instances (matches `instances`)."""
+  instanceCount: Int!
+  isAbstract: Boolean!
+  namespace: String!
+
+  """
+  prism:visibility of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  visibility: TermVisibility
+
+  """
+  prism:glyph of the class or its nearest declaring ancestor; null when none declares one.
+  """
+  glyph: String
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); never inherited; null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+}
+
+"""
+Class-scoped view of a property: SHACL cardinality is a fact about a (class, property) pair — and so is `name`.
+"""
+type ClassProperty {
+  """
+  The field name this property answers to ON THIS CLASS — the exact string `EntityMeta.field(name:)` accepts, so `fields { name }` and `field(name:)` round-trip. Class-scoped because per-class cardinality decides pluralization: one property is `part` on one class and `parts` on another. When the property projects no field on this class (SHACL sh:maxCount 0, an unexposed range, an unprojected class) the OWL local name is returned as a label — there is no name `field(name:)` would accept.
+  """
+  name: String!
+  property: OntologyProperty!
+  required: Boolean!
+  singular: Boolean!
+  inherited: Boolean!
+
+  """
+  sh:group of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  group: PropertyGroup
+
+  """
+  sh:order of the lens shape targeting this class, else of its nearest ancestor's that declares one, ascending; null when none does.
+  """
+  order: Float
+
+  """
+  shui:propertyRole of the lens shape targeting this class, else of its nearest ancestor's that declares one; null when none does.
+  """
+  role: PropertyRole
+
+  """
+  prism:visibility on this class: the lens shape's, else the property's own; null when neither declares one.
+  """
+  visibility: TermVisibility
+}
+
+type OntologyProperty {
+  uri: ID!
+  label: String
+  definition: String
+  domain: OntologyClass
+  range: String!
+  kind: PropertyKind!
+  functional: Boolean!
+  inverse: OntologyProperty
+  acceptanceCriteria: String
+  completionGuidance: String
+  namespace: String!
+
+  """prism:visibility of the property; null when undeclared."""
+  visibility: TermVisibility
+
+  """
+  prism:pluralLabel in `lang` (exact tag, else untagged); null when undeclared.
+  """
+  pluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseLabel, else the declared inverse property's asserted rdfs:label; null when neither exists.
+  """
+  inverseLabel(lang: String = "en"): String
+
+  """
+  prism:inversePluralLabel, else the declared inverse property's prism:pluralLabel; null when neither exists.
+  """
+  inversePluralLabel(lang: String = "en"): String
+
+  """
+  prism:inverseVisibility, else the declared inverse property's prism:visibility; null when neither exists.
+  """
+  inverseVisibility: TermVisibility
+}
+
+enum PropertyKind {
+  DATATYPE
+  OBJECT
+  ANNOTATION
+}
+
+"""
+How prominently a term is shown: prominent leads, normal is listed, hidden is a value and never an entity (prism:visibility).
+"""
+enum TermVisibility {
+  PROMINENT
+  NORMAL
+  HIDDEN
+}
+
+"""A sh:PropertyGroup: a named, ordered section of a class's properties."""
+type PropertyGroup {
+  """The group's IRI."""
+  uri: ID!
+
+  """rdfs:label in `lang` (exact tag, else untagged); null when undeclared."""
+  label(lang: String = "en"): String
+
+  """
+  sh:order: the group's position among a class's groups, ascending; null when undeclared.
+  """
+  order: Float
+}
+
+"""
+The role a property's values play for their subject (SHACL UI shui:propertyRole).
+"""
+enum PropertyRole {
+  LABEL
+  DESCRIPTION
+  DEPICTION
+  ICON
+  CLASSIFICATION
+}
+
+type NodeConnection {
+  edges: [NodeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type NodeEdge {
+  node: Node!
+  cursor: String!
+}
+
+type Query {
+  ontologies: [Ontology!]!
+  ontology(prefix: String!): Ontology
+  ontologyClass(uri: String!): OntologyClass
+  ontologyProperty(uri: String!): OntologyProperty
+
+  """Relay node resolution by absolute IRI."""
+  node(id: ID!): Node
+  zone(uri: String!): Zone
+  zones(first: Int, after: String, last: Int, before: String): ZoneConnection!
+  geoPoint(uri: String!): GeoPoint
+  geoPoints(first: Int, after: String, last: Int, before: String): GeoPointConnection!
+  carPosition(uri: String!): CarPosition
+  carPositions(first: Int, after: String, last: Int, before: String): CarPositionConnection!
+  unitPosition(uri: String!): UnitPosition
+  unitPositions(first: Int, after: String, last: Int, before: String): UnitPositionConnection!
+  carType(uri: String!): CarType
+  carTypes(first: Int, after: String, last: Int, before: String): CarTypeConnection!
+  unit(uri: String!): Unit
+  units(first: Int, after: String, last: Int, before: String): UnitConnection!
+  formation(uri: String!): Formation
+  formations(first: Int, after: String, last: Int, before: String): FormationConnection!
+  rollingStock(uri: String!): RollingStock
+  rollingStocks(first: Int, after: String, last: Int, before: String): RollingStockConnection!
+  diagramPoint(uri: String!): DiagramPoint
+  diagramPoints(first: Int, after: String, last: Int, before: String): DiagramPointConnection!
+  call(uri: String!): Call
+  calls(first: Int, after: String, last: Int, before: String): CallConnection!
+  route(uri: String!): Route
+  routes(first: Int, after: String, last: Int, before: String): RouteConnection!
+  line(uri: String!): Line
+  lines(first: Int, after: String, last: Int, before: String): LineConnection!
+  interchange(uri: String!): Interchange
+  interchanges(first: Int, after: String, last: Int, before: String): InterchangeConnection!
+}
+
+type Ontology {
+  prefix: String!
+  namespace: String!
+  label: String
+  classes: [OntologyClass!]!
+  properties: [OntologyProperty!]!
+}
+
+type ZoneConnection {
+  edges: [ZoneEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ZoneEdge {
+  node: Zone!
+  cursor: String!
+}
+
+type GeoPointConnection {
+  edges: [GeoPointEdge!]!
+  pageInfo: PageInfo!
+}
+
+type GeoPointEdge {
+  node: GeoPoint!
+  cursor: String!
+}
+
+type CarTypeConnection {
+  edges: [CarTypeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CarTypeEdge {
+  node: CarType!
+  cursor: String!
+}
+
+type UnitConnection {
+  edges: [UnitEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UnitEdge {
+  node: Unit!
+  cursor: String!
+}
+
+type RollingStockConnection {
+  edges: [RollingStockEdge!]!
+  pageInfo: PageInfo!
+}
+
+type RollingStockEdge {
+  node: RollingStock!
+  cursor: String!
+}
+
+type DiagramPointConnection {
+  edges: [DiagramPointEdge!]!
+  pageInfo: PageInfo!
+}
+
+type DiagramPointEdge {
+  node: DiagramPoint!
+  cursor: String!
+}
+
+type InterchangeConnection {
+  edges: [InterchangeEdge!]!
+  pageInfo: PageInfo!
+}
+
+type InterchangeEdge {
+  node: Interchange!
+  cursor: String!
+}

@@ -1,0 +1,173 @@
+# The metro's type lens in SHACL UI and prism: terms, a rendering of
+# graph-example's site lens. Compiled with metro.ttl by a ke-graphql that
+# reads the type lens. Two of its entries have no Turtle reading and are left
+# out: metro:note's visibility (prism:visibility does not apply to an
+# annotation property) and metro:Route's rdfs:label field (a standard-vocabulary
+# path carries no presentation).
+@prefix metro: <https://metro.example/onto#> .
+@prefix geo: <https://geo.example/onto#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shui: <http://www.w3.org/ns/shacl-ui/> .
+@prefix prism: <https://pragma.canonical.com/prism#> .
+
+metro:section.overview a sh:PropertyGroup ;
+  rdfs:label "Overview"@en ;
+  sh:order 1 .
+
+metro:section.service a sh:PropertyGroup ;
+  rdfs:label "Service"@en ;
+  sh:order 2 .
+
+metro:section.place a sh:PropertyGroup ;
+  rdfs:label "Place"@en ;
+  sh:order 3 .
+
+metro:Stop prism:glyph "location" ;
+  prism:pluralLabel "Stops"@en .
+
+metro:Station prism:visibility prism:prominent ;
+  prism:pluralLabel "Stations"@en , "Gares"@fr .
+
+metro:Interchange prism:glyph "swap" ;
+  prism:pluralLabel "Interchanges"@en .
+
+metro:Line prism:visibility prism:prominent ;
+  prism:glyph "connected" ;
+  prism:pluralLabel "Lines"@en .
+
+metro:Route prism:pluralLabel "Routes"@en .
+
+metro:Call prism:pluralLabel "Calls"@en .
+
+metro:DiagramPoint prism:pluralLabel "Diagram points"@en .
+
+metro:RollingStock prism:visibility prism:prominent ;
+  prism:glyph "containers" ;
+  prism:pluralLabel "Rolling stock"@en .
+
+metro:Formation prism:glyph "units" ;
+  prism:pluralLabel "Formations"@en .
+
+metro:Unit prism:glyph "bundle" ;
+  prism:pluralLabel "Units"@en .
+
+metro:CarType prism:glyph "blueprint" ;
+  prism:pluralLabel "Car types"@en .
+
+metro:UnitPosition prism:pluralLabel "Unit positions"@en .
+
+metro:CarPosition prism:pluralLabel "Car positions"@en .
+
+geo:GeoPoint prism:pluralLabel "Geo points"@en .
+
+geo:Zone prism:visibility prism:hidden ;
+  prism:glyph "map" ;
+  prism:pluralLabel "Fare zones"@en .
+
+metro:servesLine prism:visibility prism:prominent ;
+  prism:pluralLabel "serves lines"@en .
+
+metro:servedBy prism:pluralLabel "served by"@en .
+
+geo:inZone prism:pluralLabel "in zones"@en .
+
+geo:stops prism:pluralLabel "stops"@en .
+
+geo:location prism:visibility prism:prominent .
+
+metro:stop prism:inverseLabel "Called at by"@en ;
+  prism:inversePluralLabel "Called at by"@en .
+
+metro:routes prism:pluralLabel "routes"@en ;
+  prism:inverseLabel "Line"@en ;
+  prism:inversePluralLabel "Lines"@en .
+
+metro:formations prism:pluralLabel "formations"@en ;
+  prism:inverseLabel "Run on"@en ;
+  prism:inversePluralLabel "Run on"@en .
+
+metro:unit prism:inverseLabel "Placed in"@en ;
+  prism:inversePluralLabel "Placed in"@en .
+
+metro:carType prism:inverseLabel "Placed in"@en ;
+  prism:inversePluralLabel "Placed in"@en .
+
+metro:StopLens a sh:NodeShape ;
+  sh:targetClass metro:Stop ;
+  sh:property
+    [ sh:path metro:name ; sh:group metro:section.overview ; sh:order 1 ; shui:propertyRole shui:LabelRole ] .
+
+metro:StationLens a sh:NodeShape ;
+  sh:targetClass metro:Station ;
+  sh:property
+    [ sh:path metro:platformCount ; sh:group metro:section.overview ; sh:order 2 ] ,
+    [ sh:path metro:platformLength ; sh:group metro:section.overview ; sh:order 3 ] ,
+    [ sh:path metro:servesLine ; sh:group metro:section.service ; sh:order 1 ; prism:visibility prism:prominent ] ,
+    [ sh:path geo:location ; sh:group metro:section.place ; sh:order 1 ; prism:visibility prism:prominent ] ,
+    [ sh:path geo:inZone ; sh:group metro:section.place ; sh:order 2 ] ,
+    [ sh:path metro:diagramPosition ; sh:group metro:section.place ; sh:order 3 ] .
+
+metro:InterchangeLens a sh:NodeShape ;
+  sh:targetClass metro:Interchange ;
+  sh:property
+    [ sh:path metro:transferMinutes ; sh:group metro:section.overview ; sh:order 2 ; prism:visibility prism:prominent ] ,
+    [ sh:path metro:platformCount ; sh:order 3 ] .
+
+metro:LineLens a sh:NodeShape ;
+  sh:targetClass metro:Line ;
+  sh:property
+    [ sh:path metro:name ; sh:group metro:section.overview ; sh:order 1 ; shui:propertyRole shui:LabelRole ] ,
+    [ sh:path metro:code ; sh:group metro:section.overview ; sh:order 2 ; prism:visibility prism:prominent ] ,
+    [ sh:path metro:colour ; sh:group metro:section.overview ; sh:order 3 ] ,
+    [ sh:path metro:routes ; sh:group metro:section.service ; sh:order 1 ] ,
+    [ sh:path metro:servedBy ; sh:group metro:section.service ; sh:order 2 ] ,
+    [ sh:path metro:formations ; sh:group metro:section.service ; sh:order 3 ] .
+
+metro:RouteLens a sh:NodeShape ;
+  sh:targetClass metro:Route ;
+  sh:property
+    [ sh:path metro:isLoop ; sh:group metro:section.overview ; sh:order 2 ] ,
+    [ sh:path metro:calls ; sh:group metro:section.service ; sh:order 1 ] ,
+    [ sh:path metro:reverse ; sh:group metro:section.service ; sh:order 2 ] .
+
+metro:CallLens a sh:NodeShape ;
+  sh:targetClass metro:Call ;
+  sh:property
+    [ sh:path metro:position ; sh:order 1 ] ,
+    [ sh:path metro:stop ; sh:order 2 ; prism:visibility prism:prominent ] .
+
+metro:RollingStockLens a sh:NodeShape ;
+  sh:targetClass metro:RollingStock ;
+  sh:property
+    [ sh:path metro:name ; sh:group metro:section.overview ; sh:order 1 ; shui:propertyRole shui:LabelRole ] ,
+    [ sh:path metro:formations ; sh:group metro:section.service ; sh:order 1 ] .
+
+metro:FormationLens a sh:NodeShape ;
+  sh:targetClass metro:Formation ;
+  sh:property
+    [ sh:path metro:name ; sh:group metro:section.overview ; sh:order 1 ; shui:propertyRole shui:LabelRole ] ,
+    [ sh:path metro:length ; sh:group metro:section.overview ; sh:order 2 ] ,
+    [ sh:path metro:capacity ; sh:group metro:section.overview ; sh:order 3 ; prism:visibility prism:prominent ] ,
+    [ sh:path metro:stock ; sh:group metro:section.service ; sh:order 1 ] ,
+    [ sh:path metro:units ; sh:group metro:section.service ; sh:order 2 ] ,
+    [ sh:path metro:lines ; sh:group metro:section.service ; sh:order 3 ] .
+
+metro:UnitLens a sh:NodeShape ;
+  sh:targetClass metro:Unit ;
+  sh:property
+    [ sh:path metro:name ; sh:group metro:section.overview ; sh:order 1 ; shui:propertyRole shui:LabelRole ] ,
+    [ sh:path metro:length ; sh:group metro:section.overview ; sh:order 2 ] ,
+    [ sh:path metro:capacity ; sh:group metro:section.overview ; sh:order 3 ] ,
+    [ sh:path metro:cars ; sh:group metro:section.service ; sh:order 1 ] .
+
+metro:CarTypeLens a sh:NodeShape ;
+  sh:targetClass metro:CarType ;
+  sh:property
+    [ sh:path metro:name ; sh:group metro:section.overview ; sh:order 1 ; shui:propertyRole shui:LabelRole ] ,
+    [ sh:path metro:code ; sh:group metro:section.overview ; sh:order 2 ; prism:visibility prism:prominent ] ,
+    [ sh:path metro:hasCab ; sh:group metro:section.overview ; sh:order 3 ] ,
+    [ sh:path metro:length ; sh:group metro:section.overview ; sh:order 4 ] ,
+    [ sh:path metro:capacity ; sh:group metro:section.overview ; sh:order 5 ] .

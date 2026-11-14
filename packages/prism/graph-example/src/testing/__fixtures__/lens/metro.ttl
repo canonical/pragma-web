@@ -1,0 +1,323 @@
+# The metro's TBox in Turtle: the classes and properties of graph-example's
+# dataset, with their labels, definitions, superclasses, domains, ranges and
+# inverses. Properties declared on a class without a domain of their own are
+# attached through count-carrying constraint shapes. Compiled with the lens
+# beside it by a ke-graphql that reads the type lens.
+@prefix metro: <https://metro.example/onto#> .
+@prefix geo: <https://geo.example/onto#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+metro:Stop a owl:Class ;
+  rdfs:label "Stop" ;
+  rdfs:comment "Any place a service calls at." .
+
+metro:Station a owl:Class ;
+  rdfs:label "Station" , "Gare"@fr ;
+  rdfs:comment "A staffed stop with platforms." ;
+  rdfs:subClassOf metro:Stop .
+
+metro:Interchange a owl:Class ;
+  rdfs:label "Interchange" ;
+  rdfs:comment "A station where lines serving different stops meet, so passengers change there." ;
+  rdfs:subClassOf metro:Station .
+
+metro:Line a owl:Class ;
+  rdfs:label "Line" ;
+  rdfs:comment "A named service over one or more routes." .
+
+metro:Route a owl:Class ;
+  rdfs:label "Route" ;
+  rdfs:comment "One direction of a line's service: the stops it calls at, in order." .
+
+metro:Call a owl:Class ;
+  rdfs:label "Call" ;
+  rdfs:comment "One stop on a route, at its place in the order." .
+
+metro:DiagramPoint a owl:Class ;
+  rdfs:label "Diagram point" ;
+  rdfs:comment "A place on the schematic network diagram, in grid units." .
+
+metro:RollingStock a owl:Class ;
+  rdfs:label "Rolling stock" ;
+  rdfs:comment "A class of train: cars of one design, and the formations they run in." .
+
+metro:Formation a owl:Class ;
+  rdfs:label "Formation" ;
+  rdfs:comment "A train as it runs: an ordered list of units, each possibly reversed." .
+
+metro:Unit a owl:Class ;
+  rdfs:label "Unit" ;
+  rdfs:comment "A set of cars permanently coupled in order, which runs on its own." .
+
+metro:CarType a owl:Class ;
+  rdfs:label "Car type" ;
+  rdfs:comment "A kind of car: its code, whether it has a driving cab, its length and how many it carries." .
+
+metro:UnitPosition a owl:Class ;
+  rdfs:label "Unit position" ;
+  rdfs:comment "One unit in a formation, at its place in the order." .
+
+metro:CarPosition a owl:Class ;
+  rdfs:label "Car position" ;
+  rdfs:comment "One car in a unit, at its place in the order." .
+
+geo:GeoPoint a owl:Class ;
+  rdfs:label "Geo point" ;
+  rdfs:comment "A latitude/longitude pair on the WGS 84 datum." .
+
+geo:Zone a owl:Class ;
+  rdfs:label "Fare zone" ;
+  rdfs:comment "A fare band covering part of the network." .
+
+metro:name a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "name" ;
+  rdfs:comment "The name shown to passengers." ;
+  rdfs:range xsd:string .
+
+metro:note a owl:AnnotationProperty ;
+  rdfs:label "note" .
+
+metro:platformCount a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "platform count" ;
+  rdfs:domain metro:Station ;
+  rdfs:range xsd:integer .
+
+metro:platformLength a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "platform length" ;
+  rdfs:comment "The usable length of the station's shortest platform, in millimetres." ;
+  rdfs:domain metro:Station ;
+  rdfs:range xsd:integer .
+
+metro:servesLine a owl:ObjectProperty ;
+  rdfs:label "serves line" ;
+  rdfs:domain metro:Station ;
+  rdfs:range metro:Line ;
+  owl:inverseOf metro:servedBy .
+
+metro:servedBy a owl:ObjectProperty ;
+  rdfs:label "served by" ;
+  rdfs:domain metro:Line ;
+  rdfs:range metro:Station ;
+  owl:inverseOf metro:servesLine .
+
+metro:transferMinutes a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "transfer minutes" ;
+  rdfs:domain metro:Interchange ;
+  rdfs:range xsd:integer .
+
+geo:location a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "location" ;
+  rdfs:domain metro:Station ;
+  rdfs:range geo:GeoPoint .
+
+geo:latitude a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "latitude" ;
+  rdfs:domain geo:GeoPoint ;
+  rdfs:range xsd:double .
+
+geo:longitude a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "longitude" ;
+  rdfs:domain geo:GeoPoint ;
+  rdfs:range xsd:double .
+
+geo:inZone a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "in zone" ;
+  rdfs:domain metro:Station ;
+  rdfs:range geo:Zone ;
+  owl:inverseOf geo:stops .
+
+geo:stops a owl:ObjectProperty ;
+  rdfs:label "stops" ;
+  rdfs:domain geo:Zone ;
+  rdfs:range metro:Stop ;
+  owl:inverseOf geo:inZone .
+
+metro:code a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "code" ;
+  rdfs:comment "The short code a line or a car type is known by." ;
+  rdfs:range xsd:string .
+
+metro:colour a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "colour" ;
+  rdfs:comment "The line's colour on maps and signs, as a hex triplet." ;
+  rdfs:domain metro:Line ;
+  rdfs:range xsd:string .
+
+metro:routes a owl:ObjectProperty ;
+  rdfs:label "routes" ;
+  rdfs:domain metro:Line ;
+  rdfs:range metro:Route .
+
+metro:isLoop a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "is loop" ;
+  rdfs:domain metro:Route ;
+  rdfs:range xsd:boolean .
+
+metro:calls a owl:ObjectProperty ;
+  rdfs:label "calls" ;
+  rdfs:domain metro:Route ;
+  rdfs:range metro:Call .
+
+metro:reverse a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "reverse" ;
+  rdfs:domain metro:Route ;
+  rdfs:range metro:Route ;
+  owl:inverseOf metro:reverse .
+
+metro:position a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "position" ;
+  rdfs:comment "A place in an ordered list, counted from 1." ;
+  rdfs:range xsd:integer .
+
+metro:stop a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "stop" ;
+  rdfs:domain metro:Call ;
+  rdfs:range metro:Stop .
+
+metro:diagramPosition a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "diagram position" ;
+  rdfs:domain metro:Station ;
+  rdfs:range metro:DiagramPoint .
+
+metro:x a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "x" ;
+  rdfs:comment "Grid columns east of the diagram's west edge." ;
+  rdfs:domain metro:DiagramPoint ;
+  rdfs:range xsd:integer .
+
+metro:y a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "y" ;
+  rdfs:comment "Grid rows south of the diagram's north edge." ;
+  rdfs:domain metro:DiagramPoint ;
+  rdfs:range xsd:integer .
+
+metro:length a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "length" ;
+  rdfs:comment "A length in whole millimetres, measured over couplers." ;
+  rdfs:range xsd:integer .
+
+metro:capacity a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "capacity" ;
+  rdfs:comment "The passengers carried, seated plus standing." ;
+  rdfs:range xsd:integer .
+
+metro:reversed a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "reversed" ;
+  rdfs:comment "True when a car or a unit runs the other way round in its place." ;
+  rdfs:range xsd:boolean .
+
+metro:formations a owl:ObjectProperty ;
+  rdfs:label "formations" ;
+  rdfs:comment "The formations a line is run with, or a rolling stock runs in." ;
+  rdfs:range metro:Formation .
+
+metro:stock a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "stock" ;
+  rdfs:comment "The rolling stock that lists the formation." ;
+  rdfs:domain metro:Formation ;
+  rdfs:range metro:RollingStock .
+
+metro:units a owl:ObjectProperty ;
+  rdfs:label "units" ;
+  rdfs:comment "The units of a formation, from its front." ;
+  rdfs:domain metro:Formation ;
+  rdfs:range metro:UnitPosition .
+
+metro:lines a owl:ObjectProperty ;
+  rdfs:label "lines" ;
+  rdfs:comment "The lines run with the formation." ;
+  rdfs:domain metro:Formation ;
+  rdfs:range metro:Line .
+
+metro:unit a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "unit" ;
+  rdfs:domain metro:UnitPosition ;
+  rdfs:range metro:Unit .
+
+metro:cars a owl:ObjectProperty ;
+  rdfs:label "cars" ;
+  rdfs:comment "The cars of a unit, from its front." ;
+  rdfs:domain metro:Unit ;
+  rdfs:range metro:CarPosition .
+
+metro:hasCab a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "has cab" ;
+  rdfs:comment "True when the car has a driving cab at its leading end." ;
+  rdfs:domain metro:CarType ;
+  rdfs:range xsd:boolean .
+
+metro:carType a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "car type" ;
+  rdfs:domain metro:CarPosition ;
+  rdfs:range metro:CarType .
+
+metro:StopShape a sh:NodeShape ;
+  sh:targetClass metro:Stop ;
+  sh:property
+    [ sh:path metro:name ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:note ; sh:minCount 0 ; sh:maxCount 1 ] .
+
+metro:LineShape a sh:NodeShape ;
+  sh:targetClass metro:Line ;
+  sh:property
+    [ sh:path metro:name ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:code ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:formations ; sh:minCount 1 ] .
+
+metro:RouteShape a sh:NodeShape ;
+  sh:targetClass metro:Route ;
+  sh:property
+    [ sh:path rdfs:label ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+metro:CallShape a sh:NodeShape ;
+  sh:targetClass metro:Call ;
+  sh:property
+    [ sh:path metro:position ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+metro:RollingStockShape a sh:NodeShape ;
+  sh:targetClass metro:RollingStock ;
+  sh:property
+    [ sh:path metro:name ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:formations ; sh:minCount 1 ] .
+
+metro:FormationShape a sh:NodeShape ;
+  sh:targetClass metro:Formation ;
+  sh:property
+    [ sh:path metro:name ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:length ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:capacity ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+metro:UnitShape a sh:NodeShape ;
+  sh:targetClass metro:Unit ;
+  sh:property
+    [ sh:path metro:name ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:length ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:capacity ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+metro:CarTypeShape a sh:NodeShape ;
+  sh:targetClass metro:CarType ;
+  sh:property
+    [ sh:path metro:name ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:code ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:length ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:capacity ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+metro:UnitPositionShape a sh:NodeShape ;
+  sh:targetClass metro:UnitPosition ;
+  sh:property
+    [ sh:path metro:position ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:reversed ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+metro:CarPositionShape a sh:NodeShape ;
+  sh:targetClass metro:CarPosition ;
+  sh:property
+    [ sh:path metro:position ; sh:minCount 1 ; sh:maxCount 1 ] ,
+    [ sh:path metro:reversed ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+geo:ZoneShape a sh:NodeShape ;
+  sh:targetClass geo:Zone ;
+  sh:property
+    [ sh:path metro:name ; sh:minCount 1 ; sh:maxCount 1 ] .

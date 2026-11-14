@@ -1,0 +1,14 @@
+# What a provider appends to a compiled schema to serve class edges: no
+# compiler emits them, since they are computed from the store.
+
+extend type Query {
+  classEdges: [ClassEdge!]!
+}
+
+type ClassEdge {
+  property: ID!
+  subjectClass: ID!
+  objectClass: ID!
+  count: Int!
+  declared: Boolean!
+}
