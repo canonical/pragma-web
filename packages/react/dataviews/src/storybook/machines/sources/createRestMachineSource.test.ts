@@ -186,4 +186,46 @@ describe("createRestMachineSource", () => {
       .finally(stop);
     expect(deliveries.at(0)).toMatchObject({ status: "succeeded" });
   });
+
+  it.fails("reads the answer's machines, leaving out any of another shape", async () => {
+    const machine = {
+      id: "m-01",
+      name: "alder.example.com",
+      status: "running",
+      region: "eu-west-1",
+      cores: 4,
+      owner: "ex:ana",
+      note: "Nominal.",
+    };
+    answerWith(() =>
+      HttpResponse.json({
+        items: [
+          machine,
+          null,
+          "m-02",
+          { ...machine, id: "m-03", cores: "8" },
+          { ...machine, id: "m-04", status: "lost" },
+        ],
+      }),
+    );
+    const deliveries: SourceDelivery<Machine>[] = [];
+    const stop = createRestMachineSource("live").execute(
+      {
+        requestId: "mixed",
+        slice: EMPTY_SLICE,
+        window: DEFAULT_WINDOW,
+        facets: [],
+      },
+      (delivery) => {
+        deliveries.push(delivery);
+      },
+    );
+    await vi
+      .waitFor(() => expect(deliveries).toHaveLength(1), DELIVERY_WAIT)
+      .finally(stop);
+    expect(deliveries.at(0)).toMatchObject({
+      status: "succeeded",
+      page: { rows: [machine] },
+    });
+  });
 });
