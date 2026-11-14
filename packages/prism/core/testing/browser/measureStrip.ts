@@ -112,7 +112,9 @@ export default function measureStrip(): StripMeasure {
     },
     contentEnd: stripBox === undefined ? null : stripBox.right - endPadding,
     countRight:
-      count === null || count === undefined || count.getClientRects().length === 0
+      count === null ||
+      count === undefined ||
+      count.getClientRects().length === 0
         ? null
         : count.getBoundingClientRect().right,
     searchWidth:
