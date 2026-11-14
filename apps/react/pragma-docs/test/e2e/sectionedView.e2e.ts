@@ -127,9 +127,9 @@ describe("the sectioned view at 1440px", () => {
         Math.abs(view.contentWidth - CONTENT_WIDTH_PX),
       ).toBeLessThanOrEqual(TOLERANCE_PX);
       expect(view.ruleWidth).not.toBeNull();
-      expect(view.ruleWidth ?? 0).toBeLessThanOrEqual(
-        PROSE_MEASURE_PX + TOLERANCE_PX,
-      );
+      expect(
+        Math.abs((view.ruleWidth ?? 0) - PROSE_MEASURE_PX),
+      ).toBeLessThanOrEqual(TOLERANCE_PX);
     } finally {
       await page.close();
     }
